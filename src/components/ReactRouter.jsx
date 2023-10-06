@@ -1,4 +1,5 @@
-import React from 'react'
+// @ts-check
+import * as React from 'react'
 import { Route, Routes } from 'react-router-dom'
 
 import Auth from './layout/auth/Auth'
@@ -6,41 +7,44 @@ import Login from './layout/auth/Login'
 import Blocked from './layout/auth/Blocked'
 import Errors from './Errors'
 import ClearStorage from './ClearStorage'
+import Config from './Config'
 
-export default function ReactRouter({ serverSettings, getServerSettings }) {
-  const authRoute = React.useMemo(
-    () => (
-      <Auth
-        serverSettings={serverSettings}
-        getServerSettings={getServerSettings}
-      />
-    ),
-    [serverSettings],
-  )
+const Playground = React.lazy(() => import('../features/playground'))
 
+const authRoute = (
+  <Config>
+    <Auth />
+  </Config>
+)
+const loginRoute = (
+  <Config>
+    <Login />
+  </Config>
+)
+const resetRoute = <ClearStorage />
+const blockedRoute = <Blocked />
+const errorRoute = <Errors />
+
+export default function ReactRouter() {
   return (
     <Routes>
       <Route path="/" element={authRoute} />
-      <Route path="reset" element={<ClearStorage />} />
+      <Route path="reset" element={resetRoute} />
+      <Route path="login" element={loginRoute} />
       <Route
-        path="login"
+        path="playground"
         element={
-          <Login
-            clickedTwice
-            serverSettings={serverSettings}
-            getServerSettings={getServerSettings}
-          />
+          <Config>
+            <Playground />
+          </Config>
         }
       />
-      <Route
-        path="blocked/:info"
-        element={<Blocked serverSettings={serverSettings} />}
-      />
+      <Route path="blocked/:info" element={blockedRoute} />
       <Route path="@/:lat/:lon" element={authRoute} />
       <Route path="@/:lat/:lon/:zoom" element={authRoute} />
       <Route path="id/:category/:id" element={authRoute} />
       <Route path="id/:category/:id/:zoom" element={authRoute} />
-      <Route path="*" element={<Errors />} />
+      <Route path="*" element={errorRoute} />
     </Routes>
   )
 }

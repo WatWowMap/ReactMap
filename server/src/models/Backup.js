@@ -1,24 +1,15 @@
+// @ts-check
 /* eslint-disable no-bitwise */
 const { Model } = require('objection')
-const {
-  database: {
-    settings: {
-      userBackupLimits,
-      userBackupSizeLimit,
-      userTableName,
-      backupTableName,
-    },
-  },
-} = require('../services/config')
+const config = require('@rm/config')
 
 const bytes = (s) => ~-encodeURI(s).split(/%..|./).length
 
 const jsonSize = (s) => bytes(JSON.stringify(s))
 
 class Backup extends Model {
-  /** @returns {string} */
   static get tableName() {
-    return backupTableName
+    return config.getSafe('database.settings.backupTableName')
   }
 
   $beforeInsert() {
@@ -37,8 +28,8 @@ class Backup extends Model {
         relation: Model.BelongsToOneRelation,
         modelClass: Db.models.User,
         join: {
-          from: `${backupTableName}.userId`,
-          to: `${userTableName}.id`,
+          from: `${config.getSafe('database.settings.backupTableName')}.userId`,
+          to: `${config.getSafe('database.settings.userTableName')}.id`,
         },
       },
     }
@@ -48,7 +39,7 @@ class Backup extends Model {
    *
    * @param {number} id
    * @param {number} userId
-   * @returns
+   * @returns {Promise<import('@rm/types').FullBackup>}
    */
   static async getOne(id, userId) {
     return this.query().findById(id).where('userId', userId)
@@ -57,13 +48,14 @@ class Backup extends Model {
   /**
    *
    * @param {number} userId
-   * @returns
+   * @returns {Promise<import('@rm/types').FullBackup[]>}
    */
   static async getAll(userId) {
-    return this.query()
+    const records = await this.query()
       .select(['id', 'name', 'createdAt', 'updatedAt'])
-      .where('userId', userId)
+      .where({ userId })
       .whereNotNull('data')
+    return records
   }
 
   /**
@@ -73,11 +65,18 @@ class Backup extends Model {
    * @returns
    */
   static async create(backup, userId) {
-    if (jsonSize(backup.data) > userBackupSizeLimit)
+    if (
+      jsonSize(backup.data) >
+      config.getSafe('database.settings.userBackupSizeLimit')
+    )
       throw new Error('Data too large')
     const count = await this.query().count().where('userId', userId).first()
-    if (count['count(*)'] < userBackupLimits) {
+    if (
+      count['count(*)'] < config.getSafe('database.settings.userBackupLimits')
+    ) {
+      // @ts-ignore
       return this.query().insert({
+        // @ts-ignore
         userId,
         name: backup.name,
         data: JSON.stringify(backup.data),
@@ -92,12 +91,18 @@ class Backup extends Model {
    * @returns
    */
   static async update(backup, userId) {
-    if (jsonSize(backup.data) > userBackupSizeLimit)
+    if (
+      jsonSize(backup.data) >
+      config.getSafe('database.settings.userBackupSizeLimit')
+    )
       throw new Error('Data too large')
-    return this.query()
-      .update({ name: backup.name, data: JSON.stringify(backup.data) })
-      .where('id', +backup.id)
-      .where('userId', userId)
+    return (
+      this.query()
+        // @ts-ignore
+        .update({ name: backup.name, data: JSON.stringify(backup.data) })
+        .where('id', +backup.id)
+        .where('userId', userId)
+    )
   }
 
   /**

@@ -1,14 +1,16 @@
+// @ts-check
 const fs = require('fs')
 const { resolve } = require('path')
 
-const fetch = require('node-fetch')
-const config = require('../config')
-const { log, HELPERS } = require('../logger')
+const { default: fetch } = require('node-fetch')
+
+const config = require('@rm/config')
+const { log, HELPERS } = require('@rm/logger')
 
 /**
  * fetch wrapper with timeout and error handling
  * @param {string} url
- * @param {RequestInit} [options]
+ * @param {import('node-fetch').RequestInit} [options]
  * @returns
  */
 async function fetchJson(url, options = undefined) {
@@ -16,28 +18,32 @@ async function fetchJson(url, options = undefined) {
 
   const timeout = setTimeout(() => {
     controller.abort()
-  }, config.api.fetchTimeoutMs)
+  }, config.getSafe('api.fetchTimeoutMs'))
 
   try {
     log.debug(HELPERS.fetch, url, options || '')
     const response = await fetch(url, { ...options, signal: controller.signal })
     if (!response.ok) {
-      throw new Error(`${response.status} (${response.statusText})`)
+      throw new Error(`${response.status} (${response.statusText})`, {
+        cause: response,
+      })
     }
     return response.json()
   } catch (e) {
-    log.warn(HELPERS.fetch, `Unable to fetch ${url}`, '\n', e)
-    if (options) {
-      fs.writeFileSync(
-        resolve(
-          __dirname,
-          '../../../../logs',
-          `${url.replaceAll('/', '_')}${Math.floor(Date.now() / 1000)}.json`,
-        ),
-        JSON.stringify(options, null, 2),
-      )
+    if (e instanceof Error) {
+      log.error(HELPERS.fetch, `Unable to fetch ${url}`, '\n', e)
+      if (options) {
+        fs.writeFileSync(
+          resolve(
+            __dirname,
+            '../../../../logs',
+            `${url.replaceAll('/', '_')}${Math.floor(Date.now() / 1000)}.json`,
+          ),
+          JSON.stringify(options, null, 2),
+        )
+      }
+      return e.cause
     }
-    return null
   } finally {
     clearTimeout(timeout)
   }

@@ -26,13 +26,12 @@ export default function AdvancedFilter({
   toggleAdvMenu,
   advancedFilter,
   type,
-  isTutorial,
   isMobile,
 }) {
   Utility.analytics(`/${type}/${advancedFilter.id}`)
 
   const ui = useStatic((state) => state.ui)
-  const { questConditions = {} } = useStatic((state) => state.available)
+  const { questConditions } = useStatic((state) => state.available)
   const [filterValues, setFilterValues] = useState(advancedFilter.tempFilters)
   const filters = useStore((state) => state.filters)
   const userSettings = useStore((state) => state.userSettings)
@@ -43,10 +42,6 @@ export default function AdvancedFilter({
     `ID: ${advancedFilter.id} Size: ${filterValues.size}`,
     type,
   )
-  if (isTutorial) {
-    ui.pokemon = isTutorial
-  }
-
   const handleChange = (event, values) => {
     if (values) {
       if (event === 'default') {

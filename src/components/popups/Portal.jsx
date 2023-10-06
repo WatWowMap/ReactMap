@@ -1,34 +1,51 @@
-import React, { Fragment, useState, useEffect } from 'react'
-import { Grid, Typography } from '@mui/material'
-
+// @ts-check
+import * as React from 'react'
+import Grid from '@mui/material/Grid'
+import Typography from '@mui/material/Typography'
 import { useTranslation } from 'react-i18next'
 
 import Utility from '@services/Utility'
 import ErrorBoundary from '@components/ErrorBoundary'
+import { useStatic, useStore } from '@hooks/useStore'
+
 import Navigation from './common/Navigation'
 import Coords from './common/Coords'
 
-export default function PortalPopup({ portal, userSettings, ts, Icons }) {
+/**
+ *
+ * @param {import('@rm/types').Portal} props
+ * @returns
+ */
+export default function PortalPopup({
+  url,
+  name,
+  lat,
+  lon,
+  updated,
+  imported,
+}) {
   const { t } = useTranslation()
-  const [portalName, setPortalName] = useState(true)
-  const { url: imageUrl, name, lat, lon, updated, imported } = portal
+  const Icons = useStatic((s) => s.Icons)
+  const enablePortalPopupCoords = useStore(
+    (s) => s.userSettings?.wayfarer?.enablePortalPopupCoords,
+  )
 
-  const src = imageUrl
-    ? imageUrl.replace('http://', 'https://')
-    : Icons.getMisc('portal')
+  const [portalName, setPortalName] = React.useState(true)
+
+  const src = url ? url.replace('http://', 'https://') : Icons.getMisc('portal')
 
   const extraMetaData = [
     {
       description: t('last_updated'),
-      data: Utility.dayCheck(ts, updated),
+      data: Utility.dayCheck(Date.now() / 1000, updated),
     },
     {
       description: t('imported'),
-      data: Utility.dayCheck(ts, imported),
+      data: Utility.dayCheck(Date.now() / 1000, imported),
     },
   ]
 
-  useEffect(() => {
+  React.useEffect(() => {
     Utility.analytics('Popup', `Name: ${name}`, 'Portal')
   }, [])
 
@@ -53,12 +70,7 @@ export default function PortalPopup({ portal, userSettings, ts, Icons }) {
           </Typography>
         </Grid>
         <Grid item xs={12} style={{ textAlign: 'center' }}>
-          <a
-            href={imageUrl}
-            alt={name || 'unknown'}
-            target="_blank"
-            rel="noreferrer"
-          >
+          <a href={url} target="_blank" rel="noreferrer">
             <img
               src={src}
               alt={name || 'unknown'}
@@ -72,22 +84,22 @@ export default function PortalPopup({ portal, userSettings, ts, Icons }) {
         </Grid>
         <Grid item xs={12} style={{ textAlign: 'center' }}>
           {extraMetaData.map((meta) => (
-            <Fragment key={meta.description}>
+            <React.Fragment key={meta.description}>
               <Typography variant="subtitle1" style={{ textAlign: 'center' }}>
                 {meta.description}
               </Typography>
               <Typography variant="caption" style={{ textAlign: 'center' }}>
                 {meta.data}
               </Typography>
-            </Fragment>
+            </React.Fragment>
           ))}
         </Grid>
         <Grid item xs={4} style={{ textAlign: 'center' }}>
           <Navigation lat={lat} lon={lon} />
         </Grid>
-        {userSettings.enablePortalPopupCoords && (
+        {enablePortalPopupCoords && (
           <Grid item xs={12} style={{ textAlign: 'center' }}>
-            <Coords lat={portal.lat} lon={portal.lon} />
+            <Coords lat={lat} lon={lon} />
           </Grid>
         )}
       </Grid>

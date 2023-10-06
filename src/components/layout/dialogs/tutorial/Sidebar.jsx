@@ -19,14 +19,16 @@ import {
 
 import { useTranslation } from 'react-i18next'
 
-import { useStatic } from '@hooks/useStore'
+import { useStatic, toggleDialog } from '@hooks/useStore'
 import Utility from '@services/Utility'
 
 import data from './data'
 
-export default function TutSidebar({ toggleDialog, isMobile }) {
+export default function TutSidebar() {
   const { t } = useTranslation()
   const { perms } = useStatic((state) => state.auth)
+  const isMobile = useStatic((state) => state.isMobile)
+
   const [tempFilters, setTempFilters] = React.useState(
     Object.fromEntries(
       Object.keys(data.filters).map((x) => [x, !!Math.round(Math.random())]),

@@ -124,13 +124,12 @@ function ExpandableWrapper({ disabled = false, children, expandKey, primary }) {
 
 /**
  *
- * @param {import('../../../server/src/types').Route & { end?: boolean }} props
+ * @param {import("@rm/types").Route & { end?: boolean }} props
  * @returns
  */
 export default function RoutePopup({ end, ...props }) {
   const [route, setRoute] = React.useState({ ...props, tags: [] })
-  // @ts-ignore
-  const locale = useStore((s) => s.settings.localeSelection)
+  const { i18n } = useTranslation()
 
   const [getRoute, { data, called }] = useLazyQuery(Query.routes('getOne'), {
     variables: { id: props.id },
@@ -163,7 +162,7 @@ export default function RoutePopup({ end, ...props }) {
     return sum
   }, [!!route.waypoints])
 
-  const numFormatter = new Intl.NumberFormat(locale, {
+  const numFormatter = new Intl.NumberFormat(i18n.language, {
     unitDisplay: 'short',
     unit: 'meter',
     style: 'unit',

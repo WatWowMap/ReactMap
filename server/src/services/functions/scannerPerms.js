@@ -1,6 +1,16 @@
-const { scanner } = require('../config')
+// @ts-check
+const config = require('@rm/config')
 
-module.exports = function scannerPerms(roles, provider, trialActive = false) {
+const scanner = config.getSafe('scanner')
+
+/**
+ *
+ * @param {string[]} roles
+ * @param {'discordRoles' | 'telegramGroups'} provider
+ * @param {boolean} [trialActive]
+ * @returns {string[]}
+ */
+function scannerPerms(roles, provider, trialActive = false) {
   const perms = []
   roles.forEach((role) => {
     Object.keys(scanner).forEach((mode) => {
@@ -17,3 +27,5 @@ module.exports = function scannerPerms(roles, provider, trialActive = false) {
   })
   return [...new Set(perms)]
 }
+
+module.exports = scannerPerms

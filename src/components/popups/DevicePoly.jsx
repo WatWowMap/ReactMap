@@ -1,47 +1,67 @@
+// @ts-check
 /* eslint-disable react/no-array-index-key */
-import React, { memo } from 'react'
+import * as React from 'react'
 import { Polyline, Polygon, Circle } from 'react-leaflet'
 
-const DevicePoly = ({ device, color }) => {
-  if (!device.route) return null
+import { useStore } from '@hooks/useStore'
 
-  if (typeof device.route === 'string') {
-    device.route = JSON.parse(device.route)
-  }
-  if (device.type === 'leveling') {
+/**
+ *
+ * @param {import('@rm/types').Device} props
+ * @returns
+ */
+const DevicePoly = ({ route, type, radius }) => {
+  const color = useStore((s) => s.userSettings.admin.devicePathColor)
+
+  const safeRoute = React.useMemo(() => {
+    try {
+      // check for null
+      if (!route) return null
+      // check for mariadb or mysql route
+      const parsed = typeof route === 'string' ? JSON.parse(route) : route
+      // Leveling
+      if (!Array.isArray(parsed)) return parsed
+      // Normalizing
+      return parsed[0].lat ? [parsed] : parsed
+    } catch (e) {
+      // eslint-disable-next-line no-console
+      console.warn(e)
+      return route
+    }
+  }, [route])
+
+  if (!safeRoute) return null
+
+  if (type === 'leveling') {
     return (
       <>
-        <Circle center={device.route} pathOptions={{ color }} />
-        <Circle
-          center={device.route}
-          radius={device.radius}
-          pathOptions={{ color }}
-        />
+        <Circle center={safeRoute} radius={5} color={color} />
+        <Circle center={safeRoute} radius={radius} color={color} />
       </>
     )
   }
-  const arrayRoute = device.route[0].lat ? [device.route] : device.route
-  if (Array.isArray(arrayRoute)) {
-    return device?.type?.includes('circle')
-      ? arrayRoute.map((polygon, i) => (
-          <Polyline
-            key={i}
-            positions={polygon.map((route) => [route.lat, route.lon])}
-            pathOptions={{ color }}
-          />
-        ))
-      : arrayRoute.map((polygon, i) => (
-          <Polygon
-            key={i}
-            positions={polygon.map((route) => [route.lat, route.lon])}
-            pathOptions={{ color }}
-          />
-        ))
-  }
-  return null
+  if (!Array.isArray(safeRoute)) return null
+
+  return type?.includes('circle')
+    ? safeRoute.map((polygon, i) => (
+        <Polyline
+          key={i}
+          positions={polygon.map((poly) => [poly.lat, poly.lon])}
+          color={color}
+        />
+      ))
+    : safeRoute.map((polygon, i) => (
+        <Polygon
+          key={i}
+          positions={polygon.map((poly) => [poly.lat, poly.lon])}
+          color={color}
+        />
+      ))
 }
 
-const areEqual = (prev, next) =>
-  prev.device.type === next.device.type && prev.color === next.color
+const MemoDevicePoly = React.memo(
+  DevicePoly,
+  (prev, next) => prev.type === next.type,
+)
 
-export default memo(DevicePoly, areEqual)
+export default MemoDevicePoly

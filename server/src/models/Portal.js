@@ -1,15 +1,26 @@
+// @ts-check
 const { Model } = require('objection')
-const getAreaSql = require('../services/functions/getAreaSql')
-const {
-  api: { searchResultsLimit, portalUpdateLimit, queryLimits },
-} = require('../services/config')
+const config = require('@rm/config')
 
-module.exports = class Portal extends Model {
+const getAreaSql = require('../services/functions/getAreaSql')
+
+const { searchResultsLimit, portalUpdateLimit, queryLimits } =
+  config.getSafe('api')
+
+class Portal extends Model {
   static get tableName() {
     return 'ingress_portals'
   }
 
-  static async getAll(perms, args) {
+  /**
+   *
+   * @param {import("@rm/types").Permissions} perms
+   * @param {object} args
+   * @param {import("@rm/types").DbContext} _ctx
+   * @returns {Promise<import("@rm/types").FullPortal[]>}
+   */
+  // eslint-disable-next-line no-unused-vars
+  static async getAll(perms, args, _ctx) {
     const { areaRestrictions } = perms
     const {
       filters: { onlyAreas = [] },
@@ -32,6 +43,14 @@ module.exports = class Portal extends Model {
     return query.limit(queryLimits.portals)
   }
 
+  /**
+   *
+   * @param {import("@rm/types").Permissions} perms
+   * @param {object} args
+   * @param {import("@rm/types").DbContext} context
+   * @param {ReturnType<typeof import('objection').raw>} distance
+   * @returns {Promise<import("@rm/types").FullPortal[]>}
+   */
   static async search(perms, args, { isMad }, distance) {
     const { areaRestrictions } = perms
     const { onlyAreas = [], search } = args
@@ -51,7 +70,14 @@ module.exports = class Portal extends Model {
     return query
   }
 
-  static getOne(id) {
+  /**
+   *
+   * @param {number} id
+   * @returns {Promise<import("@rm/types").FullPortal>}
+   */
+  static async getOne(id) {
     return this.query().findById(id).select(['lat', 'lon'])
   }
 }
+
+module.exports = Portal

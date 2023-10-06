@@ -1,17 +1,30 @@
-import React from 'react'
+// @ts-check
+import * as React from 'react'
 import Create from '@mui/icons-material/Create'
-import { Button, Typography, Divider, DialogContent } from '@mui/material'
-
+import DialogContent from '@mui/material/DialogContent'
+import Typography from '@mui/material/Typography'
+import Button from '@mui/material/Button'
+import Divider from '@mui/material/Divider'
 import { useTranslation } from 'react-i18next'
+
+import { useLayoutStore, useStatic } from '@hooks/useStore'
+
 import Header from '../general/Header'
 import Footer from '../general/Footer'
+import { DialogWrapper } from './DialogWrapper'
 
-export default function Feedback({ link, setFeedback }) {
+export default function Feedback() {
   const { t } = useTranslation()
 
+  const link = useStatic((s) => s.config.links.feedbackLink)
+  const handleClose = React.useCallback(
+    () => useLayoutStore.setState({ feedback: false }),
+    [],
+  )
+
   return (
-    <>
-      <Header titles={[t('submit_feedback_title')]} />
+    <DialogWrapper dialog="feedback" variant="small">
+      <Header titles={[t('submit_feedback_title')]} action={handleClose} />
       <DialogContent>
         <Typography variant="subtitle1" align="center">
           {t('use_the_link_below')}
@@ -41,13 +54,13 @@ export default function Feedback({ link, setFeedback }) {
         options={[
           {
             name: 'close',
-            action: () => setFeedback(false),
+            action: handleClose,
             color: 'primary',
             align: 'right',
           },
         ]}
         role="webhook_footer"
       />
-    </>
+    </DialogWrapper>
   )
 }

@@ -1,4 +1,5 @@
-module.exports = class BaseFilter {
+// @ts-check
+class BaseFilter {
   /**
    *
    * @param {boolean} [enabled]
@@ -10,3 +11,5 @@ module.exports = class BaseFilter {
     this.adv = ''
   }
 }
+
+module.exports = BaseFilter

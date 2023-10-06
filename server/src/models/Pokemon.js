@@ -7,16 +7,10 @@ const { resolve } = require('path')
 const { default: getDistance } = require('@turf/distance')
 const { point } = require('@turf/helpers')
 
+const { log, HELPERS } = require('@rm/logger')
+const config = require('@rm/config')
+
 const { Event } = require('../services/initialization')
-const {
-  devOptions: { queryDebug },
-  api: {
-    searchResultsLimit,
-    pvp: { reactMapHandlesPvp },
-    queryLimits,
-  },
-  map: { distanceUnit },
-} = require('../services/config')
 const getAreaSql = require('../services/functions/getAreaSql')
 const { filterRTree } = require('../services/functions/filterRTree')
 const fetchJson = require('../services/api/fetchJson')
@@ -29,9 +23,14 @@ const {
   BASE_KEYS,
 } = require('../services/filters/pokemon/constants')
 const PkmnFilter = require('../services/filters/pokemon/Backend')
-const { log, HELPERS } = require('../services/logger')
 
-module.exports = class Pokemon extends Model {
+const distanceUnit = config.getSafe('map.misc.distanceUnit')
+const searchResultsLimit = config.getSafe('api.searchResultsLimit')
+const queryLimits = config.getSafe('api.queryLimits')
+const queryDebug = config.getSafe('devOptions.queryDebug')
+const reactMapHandlesPvp = config.getSafe('api.pvp.reactMapHandlesPvp')
+
+class Pokemon extends Model {
   static get tableName() {
     return 'pokemon'
   }
@@ -73,9 +72,9 @@ module.exports = class Pokemon extends Model {
   }
 
   /**
-   * @param {import("../types").Permissions} perms
+   * @param {import("@rm/types").Permissions} perms
    * @param {object} args
-   * @param {import("../types").DbContext} ctx
+   * @param {import("@rm/types").DbContext} ctx
    * @returns {{ filterMap: Record<string, PkmnFilter>, globalFilter: PkmnFilter }}
    */
   static getFilters(perms, args, ctx) {
@@ -118,25 +117,18 @@ module.exports = class Pokemon extends Model {
   }
 
   /**
-   * @param {import("../types").Permissions} perms
+   * @param {import("@rm/types").Permissions} perms
    * @param {object} args
-   * @param {import("../types").DbContext} ctx
-   * @returns {Promise<Partial<import('../types').Pokemon>[]>}
+   * @param {import("@rm/types").DbContext} ctx
+   * @returns {Promise<Partial<import("@rm/types").Pokemon>[]>}
    */
   static async getAll(perms, args, ctx) {
     const { iv: ivs, pvp, areaRestrictions } = perms
-    const {
-      onlyIvOr,
-      onlyHundoIv,
-      onlyZeroIv,
-      ts,
-      onlyAreas = [],
-    } = args.filters
+    const { onlyIvOr, onlyHundoIv, onlyZeroIv, onlyAreas = [] } = args.filters
     const { hasSize, hasHeight, isMad, mem, secret, pvpV2 } = ctx
     const { filterMap, globalFilter } = this.getFilters(perms, args, ctx)
     let queryPvp = LEAGUES.some((league) => globalFilter.filterKeys.has(league))
-
-    const safeTs = ts || Math.floor(Date.now() / 1000)
+    const ts = Math.floor(Date.now() / 1000)
 
     // quick check to make sure no Pokemon are returned when none are enabled for users with only Pokemon perms
     if (!ivs && !pvp) {
@@ -145,6 +137,7 @@ module.exports = class Pokemon extends Model {
       )
       if (!noPokemonSelect) return []
     }
+
     const query = this.query()
 
     const pokemonIds = []
@@ -170,7 +163,7 @@ module.exports = class Pokemon extends Model {
         .where(
           isMad ? 'disappear_time' : 'expire_timestamp',
           '>=',
-          isMad ? this.knex().fn.now() : safeTs,
+          isMad ? this.knex().fn.now() : ts,
         )
         .andWhereBetween(isMad ? 'pokemon.latitude' : 'lat', [
           args.minLat,
@@ -240,7 +233,7 @@ module.exports = class Pokemon extends Model {
       }
     }
 
-    /** @type {import("../types").Pokemon[]} */
+    /** @type {import("@rm/types").Pokemon[]} */
     const results = await this.evalQuery(
       mem ? `${mem}/api/pokemon/scan` : null,
       mem
@@ -315,7 +308,7 @@ module.exports = class Pokemon extends Model {
         .where(
           isMad ? 'disappear_time' : 'expire_timestamp',
           '>=',
-          isMad ? this.knex().fn.now() : safeTs,
+          isMad ? this.knex().fn.now() : ts,
         )
         .andWhereBetween(isMad ? 'pokemon.latitude' : 'lat', [
           args.minLat,
@@ -369,7 +362,7 @@ module.exports = class Pokemon extends Model {
   }
 
   /**
-   * @template [T=import('../types').Pokemon[]]
+   * @template [T=import("@rm/types").Pokemon[]]
    * @param {string} mem
    * @param {string | import("objection").QueryBuilder<Pokemon>} query
    * @param {'GET' | 'POST' | 'PATCH' | 'DELETE'} method
@@ -409,14 +402,14 @@ module.exports = class Pokemon extends Model {
   }
 
   /**
-   * @param {import("../types").Permissions} perms
+   * @param {import("@rm/types").Permissions} perms
    * @param {object} args
-   * @param {import("../types").DbContext} ctx
-   * @returns {Promise<Partial<import('../types').Pokemon>[]>}
+   * @param {import("@rm/types").DbContext} ctx
+   * @returns {Promise<Partial<import("@rm/types").Pokemon>[]>}
    */
   static async getLegacy(perms, args, ctx) {
     const { isMad, hasSize, hasHeight, mem, secret } = ctx
-    const ts = Math.floor(new Date().getTime() / 1000)
+    const ts = Math.floor(Date.now() / 1000)
     const { filterMap, globalFilter } = this.getFilters(perms, args, ctx)
 
     if (!perms.iv && !perms.pvp) {
@@ -502,12 +495,12 @@ module.exports = class Pokemon extends Model {
   }
 
   /**
-   * @param {import("../types").DbContext} ctx
+   * @param {import("@rm/types").DbContext} ctx
    */
   static async getAvailable({ isMad, mem, secret }) {
     const ts = Math.floor(Date.now() / 1000)
 
-    /** @type {import('../types').AvailablePokemon[]} */
+    /** @type {import("@rm/types").AvailablePokemon[]} */
     const available = await this.evalQuery(
       mem ? `${mem}/api/pokemon/available` : null,
       mem
@@ -535,8 +528,8 @@ module.exports = class Pokemon extends Model {
 
   /**
    * @param {string} id
-   * @param {import("../types").DbContext} ctx
-   * @returns {Promise<import('../types').Pokemon>}
+   * @param {import("@rm/types").DbContext} ctx
+   * @returns {Promise<import("@rm/types").Pokemon>}
    */
   static getOne(id, { isMad, mem, secret }) {
     return this.evalQuery(
@@ -556,25 +549,25 @@ module.exports = class Pokemon extends Model {
   }
 
   /**
-   * @param {import("../types").Permissions} perms
+   * @param {import("@rm/types").Permissions} perms
    * @param {object} args
-   * @param {import("../types").DbContext} ctx
+   * @param {import("@rm/types").DbContext} ctx
    * @param {number} distance
-   * @returns {Promise<Partial<import('../types').Pokemon>[]>}
+   * @returns {Promise<Partial<import("@rm/types").Pokemon>[]>}
    */
   static async search(perms, args, { isMad, mem, secret }, distance) {
     const { search, locale, onlyAreas = [] } = args
     const pokemonIds = Object.keys(Event.masterfile.pokemon).filter((pkmn) =>
       i18next.t(`poke_${pkmn}`, { lng: locale }).toLowerCase().includes(search),
     )
-    const safeTs = args.ts || Math.floor(Date.now() / 1000)
+    const ts = Math.floor(Date.now() / 1000)
     const query = this.query()
       .select(['pokemon_id', distance])
       .whereIn('pokemon_id', pokemonIds)
       .andWhere(
         isMad ? 'disappear_time' : 'expire_timestamp',
         '>=',
-        isMad ? this.knex().fn.now() : safeTs,
+        isMad ? this.knex().fn.now() : ts,
       )
       .limit(searchResultsLimit)
       .orderBy('distance')
@@ -645,3 +638,5 @@ module.exports = class Pokemon extends Model {
       }))
   }
 }
+
+module.exports = Pokemon

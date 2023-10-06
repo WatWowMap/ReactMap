@@ -1,6 +1,6 @@
 import { gql } from '@apollo/client'
 
-const scanner = gql`
+export const SCANNER_STATUS = gql`
   query Scanner($category: String!, $method: String!, $data: JSON!) {
     scanner(category: $category, method: $method, data: $data) {
       status
@@ -9,4 +9,26 @@ const scanner = gql`
   }
 `
 
-export default scanner
+export const SCANNER_CONFIG = gql`
+  query ScannerConfig($mode: String) {
+    scannerConfig(mode: $mode) {
+      scannerType
+      showScanCount
+      showScanQueue
+      cooldown
+      advancedOptions
+      pokemonRadius
+      gymRadius
+      spacing
+      maxSize
+      refreshQueue
+      enabled
+    }
+  }
+`
+
+export const CHECK_VALID_SCAN = gql`
+  query CheckValidScan($mode: String, $points: [[Float]]) {
+    checkValidScan(mode: $mode, points: $points)
+  }
+`

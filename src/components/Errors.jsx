@@ -1,10 +1,21 @@
-import React from 'react'
-import { Grid, Typography, Button } from '@mui/material'
+// @ts-check
+import * as React from 'react'
+import Grid from '@mui/material/Grid'
+import Typography from '@mui/material/Typography'
+import Button from '@mui/material/Button'
 import { useTranslation } from 'react-i18next'
+
+const rootLoading = document.getElementById('loader')
 
 export default function Errors() {
   const { t } = useTranslation()
   const error = window.location.href.split('/').pop()
+
+  React.useEffect(() => {
+    if (rootLoading) {
+      rootLoading.style.display = 'none'
+    }
+  }, [])
 
   return (
     <Grid
@@ -12,7 +23,7 @@ export default function Errors() {
       direction="column"
       justifyContent="center"
       alignItems="center"
-      style={{ minHeight: '95vh' }}
+      minHeight="100cqh"
     >
       <Grid item>
         <Typography variant="h1" align="center">
@@ -26,9 +37,9 @@ export default function Errors() {
       </Grid>
       <Grid item style={{ paddingTop: 20 }}>
         <Button
-          variant="outlined"
+          variant="contained"
           color="secondary"
-          onClick={() => (window.location = window.location.origin)}
+          onClick={() => window.history.back()}
         >
           {t('go_back')}
         </Button>

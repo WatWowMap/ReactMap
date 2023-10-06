@@ -1,42 +1,85 @@
 /* eslint-disable react/no-array-index-key */
-import React from 'react'
+// @ts-check
+import * as React from 'react'
+import { Navigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { Box, Grid, Typography, useMediaQuery, useTheme } from '@mui/material'
+import Box from '@mui/material/Box'
+import Typography from '@mui/material/Typography'
+import Grid from '@mui/material/Unstable_Grid2'
+import { useQuery } from '@apollo/client'
 
+import { CUSTOM_COMPONENT } from '@services/queries/config'
+
+import { basicEqualFn, useStatic } from '@hooks/useStore'
 import LocalLogin from './Local'
 import LocaleSelection from '../general/LocaleSelection'
 import DiscordLogin from './Discord'
 import TelegramLogin from './Telegram'
 import CustomTile from '../custom/CustomTile'
 import ThemeToggle from '../general/ThemeToggle'
+import { Loading } from '../general/Loading'
 
-export default function Login({ serverSettings, getServerSettings }) {
-  const { t } = useTranslation()
-  const theme = useTheme()
-  const isMobile = useMediaQuery(theme.breakpoints.only('xs'))
-  const { settings, components } = serverSettings.config.map.loginPage
+export default function Login() {
+  const [
+    loggedIn,
+    loginPage,
+    headerTitle,
+    discordInvite,
+    discordAuthUrl,
+    telegramBotName,
+    telegramAuthUrl,
+    localAuthUrl,
+  ] = useStatic(
+    (s) => [
+      s.auth.loggedIn,
+      !!s.config.loginPage,
+      s.config.general.headerTitle,
+      s.config.links.discordInvite,
+      s.config.customRoutes.discordAuthUrl,
+      s.config.customRoutes.telegramBotName,
+      s.config.customRoutes.telegramAuthUrl,
+      s.config.customRoutes.localAuthUrl,
+    ],
+    basicEqualFn,
+  )
+  const authMethods = useStatic((s) => s.auth.methods)
 
+  const { t, i18n } = useTranslation()
+  const { data, loading } = useQuery(CUSTOM_COMPONENT, {
+    fetchPolicy: 'cache-first',
+    variables: { component: 'loginPage' },
+    skip: !loginPage,
+  })
+
+  if (loading) {
+    return <Loading height="100vh">{t('loading', { category: '' })}</Loading>
+  }
+
+  if (loggedIn && process.env.NODE_ENV !== 'development') {
+    return <Navigate to="/" />
+  }
+
+  const { settings, components } = data?.customComponent || {
+    settings: {},
+    components: [],
+  }
   return (
     <>
-      <Box sx={{ position: 'absolute', top: 10, right: 10 }}>
+      <Box position="absolute" top={10} right={10}>
         <ThemeToggle />
       </Box>
       {components?.length ? (
         <Grid
           container
+          key={i18n.language}
           spacing={settings.parentSpacing || 0}
           alignItems={settings.parentAlignItems || 'center'}
           justifyContent={settings.parentJustifyContent || 'center'}
           style={settings.parentStyle || {}}
+          sx={settings.parentSx || {}}
         >
           {components.map((block, i) => (
-            <CustomTile
-              key={i}
-              block={block}
-              defaultReturn={null}
-              serverSettings={serverSettings}
-              getServerSettings={getServerSettings}
-            />
+            <CustomTile key={i} block={block} />
           ))}
         </Grid>
       ) : (
@@ -45,83 +88,62 @@ export default function Login({ serverSettings, getServerSettings }) {
           direction="column"
           justifyContent="center"
           alignItems="center"
-          sx={{ height: { xs: '90vh', sm: '100vh' }, width: '100%' }}
+          height="100cqh"
+          width="100%"
         >
-          <Grid item style={{ marginTop: 20, marginBottom: 20 }}>
+          <Grid pb={8} xs={12}>
             <Typography variant="h3" align="center">
-              {t('welcome')} {serverSettings.config.map.headerTitle}
+              {t('welcome')} {headerTitle}
             </Typography>
           </Grid>
-          {serverSettings?.authMethods?.includes('discord') && (
+          {authMethods.includes('discord') && (
             <Grid
               container
-              item
               justifyContent="center"
               alignItems="center"
-              style={{ marginTop: 20, marginBottom: 20 }}
+              direction="row"
+              xs={12}
             >
               <Grid
-                item
-                xs={
-                  serverSettings.config.map.discordInvite
-                    ? t('login_button')
-                    : 10
-                }
-                sm={serverSettings.config.map.discordInvite ? 3 : 10}
-                style={{
-                  textAlign: 'center',
-                  marginTop: serverSettings.config.map.discordAuthUrl ? 20 : 0,
-                }}
+                xs={discordInvite ? t('login_button') : 10}
+                sm={discordInvite ? 3 : 10}
+                textAlign="center"
               >
-                <DiscordLogin href={serverSettings.config.map.discordAuthUrl} />
+                <DiscordLogin href={discordAuthUrl} bgcolor="success.dark" />
               </Grid>
-              {serverSettings.config.map.discordInvite && (
-                <Grid
-                  item
-                  xs={t('join_button')}
-                  sm={3}
-                  style={{ textAlign: 'center', marginTop: 20 }}
-                >
-                  <DiscordLogin
-                    href={serverSettings.config.map.discordInvite}
-                    text="join"
-                  />
+              {discordInvite && (
+                <Grid xs={t('join_button')} sm={3} textAlign="center">
+                  <DiscordLogin href={discordInvite}>join</DiscordLogin>
                 </Grid>
               )}
             </Grid>
           )}
-          {serverSettings?.authMethods?.includes('telegram') && (
-            <Grid item style={{ marginTop: 20, marginBottom: 20 }}>
+          {authMethods?.includes('telegram') && (
+            <Grid>
               <TelegramLogin
-                botName={serverSettings.config.map.telegramBotName}
-                authUrl={serverSettings.config.map.telegramAuthUrl}
+                botName={telegramBotName}
+                authUrl={telegramAuthUrl}
               />
             </Grid>
           )}
-          {serverSettings?.authMethods?.includes('local') && (
-            <Grid item style={{ marginTop: 20, marginBottom: 20 }}>
-              <LocalLogin
-                href={serverSettings.config.map.localAuthUrl}
-                serverSettings={serverSettings}
-                getServerSettings={getServerSettings}
-              />
+          {authMethods?.includes('local') && (
+            <Grid>
+              <LocalLogin href={localAuthUrl} />
             </Grid>
           )}
-          <Grid
-            item
-            style={{
-              marginTop: 20,
-              marginBottom: 20,
-              bottom: 0,
-              position: 'absolute',
-              width: isMobile ? '50%' : '20%',
-            }}
-          >
-            <LocaleSelection
-              localeSelection={serverSettings.config.localeSelection}
-            />
-          </Grid>
         </Grid>
+      )}
+      {!components?.length && (
+        <Box
+          position="absolute"
+          bottom={20}
+          left={0}
+          right={0}
+          mx="auto"
+          width={{ xs: '50%', sm: '33%', md: '25%', lg: '20%' }}
+        >
+          <LocaleSelection />
+        </Box>
       )}
     </>
   )

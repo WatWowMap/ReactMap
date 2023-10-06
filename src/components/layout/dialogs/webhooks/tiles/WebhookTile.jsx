@@ -3,6 +3,7 @@ import Check from '@mui/icons-material/Check'
 import Clear from '@mui/icons-material/Clear'
 import Tune from '@mui/icons-material/Tune'
 import { Grid, IconButton, Typography } from '@mui/material'
+import Utility from '@services/Utility'
 
 const getOtherData = (id) => {
   switch (id.charAt(0)) {
@@ -22,7 +23,6 @@ export default function NewPokemon({ data, rowIndex, columnIndex, style }) {
     setTempFilters,
     isMobile,
     type,
-    Utility,
     toggleWebhook,
   } = data
 

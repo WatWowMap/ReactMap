@@ -1,16 +1,11 @@
+// @ts-check
 const { Model } = require('objection')
-const {
-  api: { maxSessions },
-  database: {
-    settings: { sessionTableName },
-  },
-} = require('../services/config')
-const { log, HELPERS } = require('../services/logger')
+const config = require('@rm/config')
+const { log, HELPERS } = require('@rm/logger')
 
-module.exports = class Session extends Model {
-  /** @returns {string} */
+class Session extends Model {
   static get tableName() {
-    return sessionTableName
+    return config.getSafe('database.settings.sessionTableName')
   }
 
   static async clear() {
@@ -19,20 +14,31 @@ module.exports = class Session extends Model {
     return results
   }
 
+  /**
+   *
+   * @param {number} userId
+   * @returns
+   */
   static async isValidSession(userId) {
     try {
-      const ts = Math.floor(new Date().getTime() / 1000)
+      const ts = Math.floor(Date.now() / 1000)
       const results = await this.query()
         .select('session_id')
         .whereRaw(`json_extract(data, '$.passport.user.id') = ${userId}`)
         .andWhere('expires', '>=', ts)
-      return results.length < maxSessions
+      return results.length < config.getSafe('api.maxSessions')
     } catch (e) {
       log.error(HELPERS.session, 'Unable to validate session', e)
       return false
     }
   }
 
+  /**
+   *
+   * @param {number} userId
+   * @param {string} currentSessionId
+   * @returns
+   */
   static async clearOtherSessions(userId, currentSessionId) {
     try {
       const results = await this.query()
@@ -47,6 +53,12 @@ module.exports = class Session extends Model {
     return 0
   }
 
+  /**
+   *
+   * @param {string} discordId
+   * @param {string} botName
+   * @returns
+   */
   static async clearDiscordSessions(discordId, botName) {
     try {
       const results = await this.query()
@@ -68,3 +80,5 @@ module.exports = class Session extends Model {
     return 0
   }
 }
+
+module.exports = Session

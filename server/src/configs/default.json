@@ -2,12 +2,14 @@
   "interface": "0.0.0.0",
   "port": 8080,
   "packageSource": "git",
+  "googleAnalyticsId": "",
   "devOptions": {
     "enabled": false,
     "graphiql": false,
     "queryDebug": false,
     "clientPath": "../../dist",
-    "logLevel": "info"
+    "logLevel": "info",
+    "skipMinified": false
   },
   "api": {
     "sessionSecret": "98ki^e72~!@#(85o3kXLI*#c9wu5l!Z",
@@ -101,6 +103,7 @@
     "hideOldGyms": false,
     "stopValidDataLimit": 30,
     "hideOldPokestops": false,
+    "routeUpdateLimit": 7,
     "fetchTimeoutMs": 5000,
     "pogoApiEndpoints": {
       "invasions": "https://raw.githubusercontent.com/WatWowMap/event-info/main/grunts/formatted.json",
@@ -143,23 +146,6 @@
         "settings"
       ]
     },
-    "localeSelection": [
-      "en",
-      "de",
-      "es",
-      "fr",
-      "hi",
-      "id",
-      "it",
-      "ja",
-      "ko",
-      "nl",
-      "pl",
-      "ru",
-      "sv",
-      "th",
-      "tr"
-    ],
     "customRoutes": {
       "discordAuthUrl": "/auth/discord/callback",
       "telegramAuthUrl": "/auth/telegram/callback",
@@ -455,22 +441,6 @@
       "eggs": true,
       "pokemon": true,
       "gymBadges": false,
-      "baseRaidTiers": [
-        1,
-        3,
-        5,
-        6,
-        7,
-        8,
-        9,
-        10
-      ],
-      "baseTeamIds": [
-        0,
-        1,
-        2,
-        3
-      ],
       "baseGymSlotAmounts": [
         1,
         2,
@@ -611,6 +581,7 @@
     "backendConfig": {
       "platform": "rdm/mad",
       "apiEndpoint": "http://ip:port/api/",
+      "headers": [],
       "apiUsername": "username",
       "apiPassword": "password",
       "queueRefreshInterval": 5,
@@ -658,8 +629,10 @@
         "type": "discord",
         "enabled": false,
         "logChannelId": "",
+        "logChannelHidePii": false,
         "scanNextLogChannelId": "",
         "scanZoneLogChannelId": "",
+        "eventLogChannelId": "",
         "presence": "Map Status: Online",
         "presenceType": 3,
         "botToken": "",
@@ -981,5 +954,22 @@
     "event": [],
     "never": []
   },
-  "manualAreas": []
+  "manualAreas": [],
+  "sentry": {
+    "client": {
+      "enabled": false,
+      "debug": false,
+      "dsn": "",
+      "tracesSampleRate": 0.1,
+      "authToken": "",
+      "org": "",
+      "project": ""
+    },
+    "server": {
+      "enabled": false,
+      "debug": false,
+      "dsn": "",
+      "tracesSampleRate": 0.1
+    }
+  }
 }

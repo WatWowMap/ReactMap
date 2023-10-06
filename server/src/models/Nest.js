@@ -1,17 +1,18 @@
+// @ts-check
 /* eslint-disable no-nested-ternary */
 const { Model } = require('objection')
 const i18next = require('i18next')
+const config = require('@rm/config')
 
 const { Event, Db } = require('../services/initialization')
 const getAreaSql = require('../services/functions/getAreaSql')
-const {
-  api: { searchResultsLimit, queryLimits },
-  defaultFilters: {
-    nests: { avgFilter },
-  },
-} = require('../services/config')
 
-module.exports = class Nest extends Model {
+const { searchResultsLimit, queryLimits } = config.getSafe('api')
+const { avgFilter } = config.getSafe('defaultFilters.nests')
+
+/** @typedef {Nest & Partial<import("@rm/types").Nest>} FullNest */
+
+class Nest extends Model {
   static get tableName() {
     return 'nests'
   }
@@ -22,10 +23,10 @@ module.exports = class Nest extends Model {
 
   /**
    *
-   * @param {import('../types').Permissions} perms
+   * @param {import("@rm/types").Permissions} perms
    * @param {object} args
-   * @param {import('../types').DbContext} ctx
-   * @returns
+   * @param {import("@rm/types").DbContext} ctx
+   * @returns {Promise<FullNest[]>}
    */
   static async getAll(perms, args, { polygon }) {
     const { areaRestrictions } = perms
@@ -51,32 +52,35 @@ module.exports = class Nest extends Model {
     if (!getAreaSql(query, areaRestrictions, filters.onlyAreas || [])) {
       return []
     }
-    const results = await query.limit(queryLimits.nests)
+
+    const results = /** @type {FullNest[]} */ (
+      await query.limit(queryLimits.nests)
+    )
 
     const submittedNameMap = await Db.query(
       'NestSubmission',
       'getAllByIds',
-      results.map((x) => x.nest_id),
+      results.map((x) => x.id),
     ).then((submissions) =>
       Object.fromEntries(submissions.map((x) => [x.nest_id, x])),
     )
 
-    /** @type {Nest[]} */
-    const withNames = results.map((x) => ({
-      ...x,
-      name: submittedNameMap[x.id]?.name || x.name,
-      submitted_by: submittedNameMap[x.id]?.submitted_by,
-    }))
+    /** @type {(FullNest & { submitted_by?: string })[]} */
+    const withNames = results.map((x) => {
+      x.name = submittedNameMap[x.id]?.name || x.name
+      x.submitted_by = submittedNameMap[x.id]?.submitted_by
+      return x
+    })
 
     return Nest.secondaryFilter(withNames, filters, polygon)
   }
 
   /**
    *
-   * @param {Nest[]} queryResults
+   * @param {(FullNest & { submitted_by?: string })[]} queryResults
    * @param {object} filters
    * @param {boolean} polygon
-   * @returns {Nest[]}
+   * @returns {FullNest[]}
    */
   static secondaryFilter(queryResults, filters, polygon) {
     const returnedResults = []
@@ -85,17 +89,19 @@ module.exports = class Nest extends Model {
         const formId = Event.masterfile.pokemon[pkmn.pokemon_id].defaultFormId
         if (formId) pkmn.pokemon_form = formId
       }
-      pkmn.polygon_path = polygon
-        ? typeof pkmn.polygon === 'string' && pkmn.polygon
-          ? pkmn.polygon
-          : JSON.stringify(pkmn.polygon || { type: 'Polygon', coordinates: [] })
-        : JSON.stringify({
-            type: 'Polygon',
-            coordinates: JSON.parse(pkmn.polygon_path || '[]').map((line) =>
-              line.map((point) => [point[1], point[0]]),
-            ),
-          })
       if (filters[`${pkmn.pokemon_id}-${pkmn.pokemon_form}`]) {
+        pkmn.polygon_path = polygon
+          ? typeof pkmn.polygon === 'string' && pkmn.polygon
+            ? pkmn.polygon
+            : JSON.stringify(
+                pkmn.polygon || { type: 'Polygon', coordinates: [] },
+              )
+          : JSON.stringify({
+              type: 'Polygon',
+              coordinates: JSON.parse(pkmn.polygon_path || '[]').map((line) =>
+                line.map((point) => [point[1], point[0]]),
+              ),
+            })
         returnedResults.push(pkmn)
       }
     })
@@ -107,11 +113,13 @@ module.exports = class Nest extends Model {
    * @returns
    */
   static async getAvailable() {
-    const results = await this.query()
-      .select(['pokemon_id', 'pokemon_form'])
-      .whereNotNull('pokemon_id')
-      .groupBy('pokemon_id', 'pokemon_form')
-      .orderBy('pokemon_id', 'asc')
+    const results = /** @type {FullNest[]} */ (
+      await this.query()
+        .select(['pokemon_id', 'pokemon_form'])
+        .whereNotNull('pokemon_id')
+        .groupBy('pokemon_id', 'pokemon_form')
+        .orderBy('pokemon_id', 'asc')
+    )
 
     return {
       available: results.map((pokemon) => {
@@ -127,11 +135,11 @@ module.exports = class Nest extends Model {
 
   /**
    *
-   * @param {import('../types').Permissions} perms
+   * @param {import("@rm/types").Permissions} perms
    * @param {object} args
-   * @param {import('../types').DbContext} ctx
+   * @param {import("@rm/types").DbContext} ctx
    * @param {import('objection').Raw} distance
-   * @returns
+   * @returns {Promise<FullNest[]>}
    */
   static async search(perms, args, { isMad }, distance) {
     const { search, locale, onlyAreas = [] } = args
@@ -157,7 +165,7 @@ module.exports = class Nest extends Model {
           .whereIn('pokemon_id', pokemonIds)
           .orWhereIn(
             'nest_id',
-            submittedNests.map((x) => x.id),
+            submittedNests.map((x) => x.nest_id),
           )
           .orWhere('name', 'like', `%${search}%`)
       })
@@ -166,15 +174,18 @@ module.exports = class Nest extends Model {
     if (!getAreaSql(query, perms.areaRestrictions, onlyAreas, isMad)) {
       return []
     }
-    return query
+    const results = /** @type {FullNest[]} */ (await query)
+    return results
   }
 
   /**
    *
    * @param {number} id
-   * @returns
+   * @returns {Promise<FullNest>}
    */
   static async getOne(id) {
     return this.query().findById(id).select(['lat', 'lon'])
   }
 }
+
+module.exports = Nest

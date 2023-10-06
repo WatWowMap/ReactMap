@@ -1,19 +1,29 @@
-import React from 'react'
-import { Typography } from '@mui/material'
+// @ts-check
+import * as React from 'react'
+import Typography from '@mui/material/Typography'
 
-import Utility from '@services/Utility'
-
-import LinkWrapper from './LinkWrapper'
-
-export default function CustomText({ block, isMuiColor = false }) {
-  const text = (
+/**
+ *
+ * @param {import('@mui/material').TypographyProps} props
+ * @returns
+ */
+export default function CustomText({
+  className,
+  variant,
+  sx,
+  color,
+  style,
+  children,
+}) {
+  return (
     <Typography
-      variant={block.variant}
-      color={isMuiColor ? block.color : 'inherit'}
-      style={block.style || { color: isMuiColor ? 'inherit' : block.color }}
+      className={className}
+      variant={variant}
+      color={color}
+      style={style}
+      sx={sx}
     >
-      {Utility.getBlockContent(block.content)}
+      {children}
     </Typography>
   )
-  return block.link ? <LinkWrapper block={block} element={text} /> : text
 }

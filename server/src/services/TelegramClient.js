@@ -1,23 +1,35 @@
-const fetch = require('node-fetch')
+// @ts-check
+const { default: fetch } = require('node-fetch')
 const { TelegramStrategy } = require('@rainb0w-clwn/passport-telegram-official')
 const passport = require('passport')
+const config = require('@rm/config')
 
-const Utility = require('./Utility')
+const { log, HELPERS } = require('@rm/logger')
 const { Db } = require('./initialization')
-const {
-  map: { forceTutorial },
-  authentication,
-} = require('./config')
-const { log, HELPERS } = require('./logger')
+const areaPerms = require('./functions/areaPerms')
+const webhookPerms = require('./functions/webhookPerms')
+const scannerPerms = require('./functions/scannerPerms')
+const mergePerms = require('./functions/mergePerms')
 
-module.exports = class TelegramClient {
+/**
+ * @typedef {import('@rainb0w-clwn/passport-telegram-official/dist/types').PassportTelegramUser} TGUser
+ */
+class TelegramClient {
+  /**
+   *
+   * @param {import("@rm/types").Config['authentication']['strategies'][number]} strategy
+   * @param {string} rmStrategy
+   */
   constructor(strategy, rmStrategy) {
     this.strategy = strategy
     this.rmStrategy = rmStrategy
-    this.perms = authentication.perms
-    this.alwaysEnabledPerms = authentication.alwaysEnabledPerms
+    this.perms = config.getSafe('authentication.perms')
+    this.alwaysEnabledPerms = config.getSafe(
+      'authentication.alwaysEnabledPerms',
+    )
   }
 
+  /** @param {TGUser} user */
   async getUserGroups(user) {
     if (!user || !user.id) return []
 
@@ -59,6 +71,12 @@ module.exports = class TelegramClient {
     return groups
   }
 
+  /**
+   *
+   * @param {TGUser} user
+   * @param {string[]} groups
+   * @returns {TGUser & { perms: import("@rm/types").Permissions }}
+   */
   getUserPerms(user, groups) {
     const date = new Date()
     const trialActive =
@@ -66,8 +84,10 @@ module.exports = class TelegramClient {
       date >= this.strategy.trialPeriod.start.js &&
       date <= this.strategy.trialPeriod.end.js
 
+    /** @type { TGUser & { perms: import("@rm/types").Permissions }} */
     const newUserObj = {
       ...user,
+      // @ts-ignore
       perms: {
         ...Object.fromEntries(
           Object.entries(this.perms).map(([perm, info]) => [
@@ -82,14 +102,19 @@ module.exports = class TelegramClient {
                   ))),
           ]),
         ),
-        areaRestrictions: Utility.areaPerms(groups, 'telegram', trialActive),
-        webhooks: Utility.webhookPerms(groups, 'telegramGroups', trialActive),
-        scanner: Utility.scannerPerms(groups, 'telegramGroups', trialActive),
+        admin: false,
+        areaRestrictions: areaPerms(groups),
+        webhooks: webhookPerms(groups, 'telegramGroups', trialActive),
+        scanner: scannerPerms(groups, 'telegramGroups', trialActive),
       },
+    }
+    if (this.strategy.allowedUsers?.includes(newUserObj.id)) {
+      newUserObj.perms.admin = true
     }
     return newUserObj
   }
 
+  /** @type {import('@rainb0w-clwn/passport-telegram-official/dist/types').CallbackWithRequest} */
   async authHandler(req, profile, done) {
     const baseUser = { ...profile, rmStrategy: this.rmStrategy }
     const groups = await this.getUserGroups(baseUser)
@@ -106,19 +131,47 @@ module.exports = class TelegramClient {
     try {
       await Db.models.User.query()
         .findOne({ telegramId: user.id })
-        .then(async (userExists) => {
-          if (req.user && userExists?.strategy === 'local') {
-            await Db.models.User.query()
-              .update({
+        .then(
+          async (/** @type {import('@rm/types').FullUser} */ userExists) => {
+            if (req.user && userExists?.strategy === 'local') {
+              await Db.models.User.query()
+                .update({
+                  telegramId: user.id,
+                  telegramPerms: JSON.stringify(user.perms),
+                  webhookStrategy: 'telegram',
+                })
+                .where('id', req.user.id)
+              await Db.models.User.query()
+                .where('telegramId', user.id)
+                .whereNot('id', req.user.id)
+                .delete()
+              log.info(
+                HELPERS.custom(this.rmStrategy, '#26A8EA'),
+                user.username,
+                `(${user.id})`,
+                'Authenticated successfully.',
+              )
+              return done(null, {
+                ...user,
+                ...req.user,
+                username: userExists.username || user.username,
                 telegramId: user.id,
-                telegramPerms: JSON.stringify(user.perms),
-                webhookStrategy: 'telegram',
+                perms: mergePerms(req.user.perms, user.perms),
               })
-              .where('id', req.user.id)
-            await Db.models.User.query()
-              .where('telegramId', user.id)
-              .whereNot('id', req.user.id)
-              .delete()
+            }
+            if (!userExists) {
+              userExists = await Db.models.User.query().insertAndFetch({
+                telegramId: user.id,
+                strategy: user.provider,
+                tutorial: !config.getSafe('map.misc.forceTutorial'),
+              })
+            }
+            if (userExists.strategy !== 'telegram') {
+              await Db.models.User.query()
+                .update({ strategy: 'telegram' })
+                .where('id', userExists.id)
+              userExists.strategy = 'telegram'
+            }
             log.info(
               HELPERS.custom(this.rmStrategy, '#26A8EA'),
               user.username,
@@ -127,37 +180,11 @@ module.exports = class TelegramClient {
             )
             return done(null, {
               ...user,
-              ...req.user,
+              ...userExists,
               username: userExists.username || user.username,
-              telegramId: user.id,
-              perms: Utility.mergePerms(req.user.perms, user.perms),
             })
-          }
-          if (!userExists) {
-            userExists = await Db.models.User.query().insertAndFetch({
-              telegramId: user.id,
-              strategy: user.provider,
-              tutorial: !forceTutorial,
-            })
-          }
-          if (userExists.strategy !== 'telegram') {
-            await Db.models.User.query()
-              .update({ strategy: 'telegram' })
-              .where('id', userExists.id)
-            userExists.strategy = 'telegram'
-          }
-          log.info(
-            HELPERS.custom(this.rmStrategy, '#26A8EA'),
-            user.username,
-            `(${user.id})`,
-            'Authenticated successfully.',
-          )
-          return done(null, {
-            ...user,
-            ...userExists,
-            username: userExists.username || user.username,
-          })
-        })
+          },
+        )
     } catch (e) {
       log.error(
         HELPERS.custom(this.rmStrategy, '#26A8EA'),
@@ -175,8 +202,10 @@ module.exports = class TelegramClient {
           botToken: this.strategy.botToken,
           passReqToCallback: true,
         },
-        (...args) => this.authHandler(...args),
+        (req, profile, done) => this.authHandler(req, profile, done),
       ),
     )
   }
 }
+
+module.exports = TelegramClient

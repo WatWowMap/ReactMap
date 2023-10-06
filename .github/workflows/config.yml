@@ -21,10 +21,10 @@ jobs:
           fetch-depth: 2
       - name: Run script
         run: |
-          yarn config-check
+          yarn config:check
       - name: Generate latest env vars
         run: |
-          yarn gen-env-config
+          yarn config:env
       - name: Configure git
         run: |
           git config --global user.name "turtlesocks-bot"

@@ -1,12 +1,7 @@
 process.title = 'ReactMap'
-process.env.FORCE_COLOR = 3
-
-if (!process.env.NODE_CONFIG_DIR) {
-  process.env.NODE_CONFIG_DIR = `${__dirname}/configs`
-  process.env.ALLOW_CONFIG_MUTATIONS = 'true'
-}
 
 require('dotenv').config()
+const fs = require('fs')
 const path = require('path')
 const express = require('express')
 const logger = require('morgan')
@@ -14,169 +9,76 @@ const compression = require('compression')
 const session = require('express-session')
 const passport = require('passport')
 const rateLimit = require('express-rate-limit')
-const i18next = require('i18next')
-const Backend = require('i18next-fs-backend')
 const { rainbow } = require('chalkercli')
 const Sentry = require('@sentry/node')
-const { ApolloServer } = require('@apollo/server')
 const { expressMiddleware } = require('@apollo/server/express4')
-const {
-  ApolloServerPluginDrainHttpServer,
-} = require('@apollo/server/plugin/drainHttpServer')
 const cors = require('cors')
 const { json } = require('body-parser')
 const http = require('http')
 const { GraphQLError } = require('graphql')
 const { ApolloServerErrorCode } = require('@apollo/server/errors')
 const { parse } = require('graphql')
-const NodeCache = require('node-cache')
+
+const { log, HELPERS } = require('@rm/logger')
+const { create, writeAll } = require('@rm/locales')
 
 const config = require('./services/config')
-const { log, HELPERS } = require('./services/logger')
 const { Db, Event } = require('./services/initialization')
+require('./models')
 const Clients = require('./services/Clients')
 const sessionStore = require('./services/sessionStore')
 const rootRouter = require('./routes/rootRouter')
-const typeDefs = require('./graphql/typeDefs')
-const resolvers = require('./graphql/resolvers')
 const pkg = require('../../package.json')
 const getAreas = require('./services/areas')
 const { connection } = require('./db/knexfile.cjs')
+const startApollo = require('./graphql/server')
+require('./services/watcher')
 
 Event.clients = Clients
 
-if (!config.devOptions.skipUpdateCheck) {
+if (!config.has('devOptions.skipUpdateCheck')) {
   require('./services/checkForUpdates')
 }
 
-const errorCache = new NodeCache({ stdTTL: 60 * 60 })
-
 const app = express()
 const httpServer = http.createServer(app)
-const apolloServer = new ApolloServer({
-  typeDefs,
-  resolvers,
-  introspection: config.devOptions.enabled,
-  formatError: (e) => {
-    let customMessage = ''
-    if (e?.message.includes('skipUndefined()') || e?.message === 'old_client') {
-      customMessage =
-        'old client detected, forcing user to refresh, no need to report this error unless it continues to happen'
-    } else if (e.message === 'session_expired') {
-      customMessage =
-        'user session expired, forcing logout, no need to report this error unless it continues to happen'
-    } else if (e.message === 'unauthenticated') {
-      customMessage =
-        'user is not authenticated, forcing logout, no need to report this error unless it continues to happen'
-    }
 
-    const key = `${e.extensions.id || e.extensions.user}-${e.message}`
-    if (errorCache.has(key)) {
-      return e
-    }
-    errorCache.set(key, true)
+const sentry = config.getSafe('sentry.server')
+if (sentry.enabled || process.env.SENTRY_DSN) {
+  Sentry.init({
+    dsn: sentry.dsn || process.env.SENTRY_DSN,
+    debug: sentry.debug || !!process.env.SENTRY_DEBUG,
+    environment: process.env.NODE_ENV || 'production',
+    integrations: [
+      // enable HTTP calls tracing
+      new Sentry.Integrations.Http({ tracing: true }),
+      // enable Express.js middleware tracing
+      new Sentry.Integrations.Express({
+        // to trace all requests to the default router
+        app,
+        // alternatively, you can specify the routes you want to trace:
+        // router: someRouter,
+      }),
+      ...Sentry.autoDiscoverNodePerformanceMonitoringIntegrations(),
+    ],
+    tracesSampleRate:
+      parseFloat(
+        process.env.SENTRY_TRACES_SAMPLE_RATE || sentry.tracesSampleRate,
+      ) || 0.1,
+    release: pkg.version,
+  })
 
-    log[customMessage ? 'info' : 'error'](
-      HELPERS.gql,
-      HELPERS[e.extensions.endpoint] ||
-        `[${e.extensions.endpoint?.toUpperCase()}]`,
-      'Client:',
-      e.extensions.clientV,
-      'Server:',
-      e.extensions.serverV,
-      'User:',
-      e.extensions.user || 'Not Logged In',
-      e.extensions.id || '',
-      customMessage || e,
-    )
-    return e
-  },
-  logger: {
-    debug: (...e) => log.debug(HELPERS.gql, ...e),
-    info: (...e) => log.info(HELPERS.gql, ...e),
-    warn: (...e) => log.warn(HELPERS.gql, ...e),
-    error: (...e) => log.error(HELPERS.gql, ...e),
-  },
-  plugins: [
-    ApolloServerPluginDrainHttpServer({ httpServer }),
-    {
-      async requestDidStart(requestContext) {
-        requestContext.contextValue.startTime = Date.now()
-        const filterCount = Object.keys(
-          requestContext.request?.variables?.filters || {},
-        ).length
-
-        return {
-          async willSendResponse(context) {
-            const { response, contextValue } = context
-            if (
-              response.body.kind === 'single' &&
-              'data' in response.body.singleResult
-            ) {
-              const endpoint =
-                context?.operation?.selectionSet?.selections?.[0]?.name?.value
-              const returned =
-                response.body.singleResult?.data?.[endpoint]?.length || 0
-
-              context.logger.info(
-                HELPERS[endpoint] || `[${endpoint?.toUpperCase()}]`,
-                '|',
-                context.operationName,
-                '|',
-                returned || 0,
-                '|',
-                `${Date.now() - contextValue.startTime}ms`,
-                '|',
-                contextValue.user || 'Not Logged In',
-                '|',
-                'Filters:',
-                filterCount || 0,
-              )
-
-              const { transaction } = contextValue
-
-              if (returned) {
-                transaction.setMeasurement(`${endpoint}.returned`, returned)
-              }
-            }
-          },
-        }
-      },
-    },
-  ],
-})
-
-Sentry.init({
-  dsn:
-    process.env.SENTRY_DSN ||
-    'https://c40dad799323428f83aee04391639345@o1096501.ingest.sentry.io/6117162',
-  environment: process.env.NODE_ENV || 'production',
-  integrations: [
-    // enable HTTP calls tracing
-    new Sentry.Integrations.Http({ tracing: true }),
-    // enable Express.js middleware tracing
-    new Sentry.Integrations.Express({
-      // to trace all requests to the default router
-      app,
-      // alternatively, you can specify the routes you want to trace:
-      // router: someRouter,
-    }),
-    ...Sentry.autoDiscoverNodePerformanceMonitoringIntegrations(),
-  ],
-  tracesSampleRate: parseFloat(process.env.SENTRY_TRACES_SAMPLE_RATE) || 0.1,
-  version: pkg.version,
-})
-
-// RequestHandler creates a separate execution context, so that all
-// transactions/spans/breadcrumbs are isolated across requests
-app.use(Sentry.Handlers.requestHandler())
-// TracingHandler creates a trace for every incoming request
-app.use(Sentry.Handlers.tracingHandler())
+  // RequestHandler creates a separate execution context, so that all
+  // transactions/spans/breadcrumbs are isolated across requests
+  app.use(Sentry.Handlers.requestHandler())
+  // TracingHandler creates a trace for every incoming request
+  app.use(Sentry.Handlers.tracingHandler())
+}
 
 if (
-  process.env.LOG_LEVEL === 'debug' ||
-  process.env.LOG_LEVEL === 'trace' ||
-  config.devOptions.enabled
+  config.getSafe('devOptions.logLevel') === 'debug' ||
+  config.getSafe('devOptions.logLevel') === 'trace' ||
+  config.getSafe('devOptions.enabled')
 ) {
   app.use(
     logger((tokens, req, res) =>
@@ -196,9 +98,17 @@ if (
   )
 }
 
-const RateLimitTime = config.api.rateLimit.time * 60 * 1000
+app.use((req, res, next) => {
+  if (req.url.endsWith('.map')) {
+    res.status(403).send('Naughty!')
+  } else {
+    next()
+  }
+})
+
+const RateLimitTime = config.getSafe('api.rateLimit.time') * 60 * 1000
 const MaxRequestsPerHour =
-  config.api.rateLimit.requests * (RateLimitTime / 1000)
+  config.getSafe('api.rateLimit.requests') * (RateLimitTime / 1000)
 
 const rateLimitOptions = {
   windowMs: RateLimitTime, // Time window in milliseconds
@@ -208,8 +118,15 @@ const rateLimitOptions = {
     status: 429, // optional, of course
     limiter: true,
     type: 'error',
-    message: `Too many requests from this IP, please try again in ${config.api.rateLimit.time} minutes.`,
+    message: `Too many requests from this IP, please try again in ${config.getSafe(
+      'api.rateLimit.time',
+    )} minutes.`,
   },
+  /**
+   *
+   * @param {import('express').Request} req
+   * @param {import('express').Response} res
+   */
   onLimitReached: (req, res) => {
     log.info(
       HELPERS.express,
@@ -225,17 +142,18 @@ app.use(compression())
 
 app.use(express.json({ limit: '50mb' }))
 
-app.use(express.static(path.join(__dirname, config.devOptions.clientPath)))
+app.use(
+  express.static(path.join(__dirname, config.getSafe('devOptions.clientPath'))),
+)
 
 app.use(
   session({
-    name: 'reactmap0',
-    key: 'session',
-    secret: config.api.sessionSecret,
+    name: 'reactmap1',
+    secret: config.getSafe('api.sessionSecret'),
     store: sessionStore,
     resave: true,
     saveUninitialized: false,
-    cookie: { maxAge: 86400000 * config.api.cookieAgeDays },
+    cookie: { maxAge: 86400000 * config.getSafe('api.cookieAgeDays') },
   }),
 )
 
@@ -251,31 +169,26 @@ passport.deserializeUser(async (user, done) => {
   if (user.perms.map) {
     done(null, user)
   } else {
-    done(null, false)
+    done('User does not have map permissions', null)
   }
 })
 
-i18next.use(Backend).init(
-  {
-    lng: 'en',
-    fallbackLng: 'en',
-    preload: config.map.localeSelection,
-    ns: ['translation'],
-    defaultNS: 'translation',
-    backend: {
-      loadPath: path.resolve(
-        `${__dirname}/../../public/locales/{{lng}}/{{ns}}.json`,
-      ),
-    },
-  },
-  (err) => {
-    if (err) return log.error(HELPERS.i18n, err)
-  },
-)
+const localePath = path.resolve(__dirname, '../../dist/locales')
+if (fs.existsSync(localePath)) {
+  require('./services/i18n')
+} else {
+  create().then((newLocales) =>
+    writeAll(newLocales, true, localePath).then(() =>
+      require('./services/i18n'),
+    ),
+  )
+}
 
 app.use(rootRouter, requestRateLimiter)
 
-app.use(Sentry.Handlers.errorHandler())
+if (sentry.enabled || process.env.SENTRY_DSN) {
+  app.use(Sentry.Handlers.errorHandler())
+}
 
 // eslint-disable-next-line no-unused-vars
 app.use((err, req, res, next) => {
@@ -299,12 +212,12 @@ app.use((err, req, res, next) => {
   }
 })
 
-apolloServer.start().then(() => {
+startApollo(httpServer).then((server) => {
   app.use(
     '/graphql',
     cors(),
     json(),
-    expressMiddleware(apolloServer, {
+    expressMiddleware(server, {
       context: ({ req, res }) => {
         const perms = req.user ? req.user.perms : req.session.perms
         const user = req?.user?.username || ''
@@ -314,14 +227,16 @@ apolloServer.start().then(() => {
           pkg.version ||
           1
         const serverV = pkg.version || 1
-
-        let transaction = res.__sentry_transaction
-        if (!transaction) {
-          transaction = Sentry.startTransaction({ name: 'POST /graphql' })
+        let transaction
+        if (sentry.enabled || process.env.SENTRY_DSN) {
+          transaction = res.__sentry_transaction
+          if (!transaction) {
+            transaction = Sentry.startTransaction({ name: 'POST /graphql' })
+          }
+          Sentry.configureScope((scope) => {
+            scope.setSpan(transaction)
+          })
         }
-        Sentry.configureScope((scope) => {
-          scope.setSpan(transaction)
-        })
 
         const definition = parse(req.body.query).definitions.find(
           (d) => d.kind === 'OperationDefinition',
@@ -384,34 +299,39 @@ apolloServer.start().then(() => {
   )
 })
 
-connection.migrate.latest().then(async () => {
-  await Db.getDbContext()
-  await Promise.all([
-    Db.historicalRarity(),
-    Db.getFilterContext(),
-    Event.setAvailable('gyms', 'Gym', Db),
-    Event.setAvailable('pokestops', 'Pokestop', Db),
-    Event.setAvailable('pokemon', 'Pokemon', Db),
-    Event.setAvailable('nests', 'Nest', Db),
-  ])
-  await Promise.all([
-    Event.getUicons(config.icons.styles),
-    Event.getMasterfile(Db.historical, Db.rarity),
-    Event.getInvasions(config.api.pogoApiEndpoints.invasions),
-    Event.getWebhooks(config),
-    getAreas().then((res) => (config.areas = res)),
-  ])
-  httpServer.listen(config.port, config.interface)
-  const text = rainbow(
-    `ℹ ${new Date()
-      .toISOString()
-      .split('.')[0]
-      .split('T')
-      .join(' ')} [ReactMap] Server is now listening at http://${
-      config.interface
-    }:${config.port}`,
-  )
-  setTimeout(() => text.stop(), 3_000)
-})
+connection.migrate
+  .latest()
+  .then(() => connection.destroy())
+  .then(async () => {
+    await Db.getDbContext()
+    await Promise.all([
+      Db.historicalRarity(),
+      Db.getFilterContext(),
+      Event.setAvailable('gyms', 'Gym', Db),
+      Event.setAvailable('pokestops', 'Pokestop', Db),
+      Event.setAvailable('pokemon', 'Pokemon', Db),
+      Event.setAvailable('nests', 'Nest', Db),
+    ])
+    await Promise.all([
+      Event.getUicons(config.getSafe('icons.styles')),
+      Event.getMasterfile(Db.historical, Db.rarity),
+      Event.getInvasions(config.getSafe('api.pogoApiEndpoints.invasions')),
+      Event.getWebhooks(),
+      getAreas().then((res) => (config.areas = res)),
+    ])
+    httpServer.listen(config.getSafe('port'), config.getSafe('interface'))
+    const text = rainbow(
+      `ℹ ${new Date()
+        .toISOString()
+        .split('.')[0]
+        .split('T')
+        .join(
+          ' ',
+        )} [ReactMap] Server is now listening at http://${config.getSafe(
+        'interface',
+      )}:${config.getSafe('port')}`,
+    )
+    setTimeout(() => text.stop(), 1_000)
+  })
 
 module.exports = app

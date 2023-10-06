@@ -1,3 +1,6 @@
+// @ts-check
+import { useStatic } from '@hooks/useStore'
+
 import getAllDevices from './queries/device'
 import * as gymIndex from './queries/gym'
 import * as pokestopIndex from './queries/pokestop'
@@ -11,8 +14,6 @@ import { getOne, getAllNests, nestSubmission } from './queries/nest'
 import { getAllScanAreas, getScanAreasMenu } from './queries/scanAreas'
 import * as searchIndex from './queries/search'
 import * as webhookIndex from './queries/webhook'
-import scanner from './queries/scanner'
-import getGeocoder from './queries/geocoder'
 import * as user from './queries/user'
 import s2cell from './queries/s2cell'
 import { getRoute, getRoutes } from './queries/route'
@@ -22,7 +23,8 @@ export default class Query {
     return getAllDevices
   }
 
-  static gyms(filters, perms) {
+  static gyms(filters) {
+    const perms = useStatic.getState().ui.gyms
     if (filters === 'id') {
       return gymIndex.getOne
     }
@@ -62,7 +64,8 @@ export default class Query {
     return getAllNests
   }
 
-  static pokestops(filters, perms) {
+  static pokestops(filters) {
+    const perms = useStatic.getState().ui.pokestops
     if (filters === 'id') {
       return pokestopIndex.getOne
     }
@@ -82,7 +85,8 @@ export default class Query {
     return pokestopIndex[query]
   }
 
-  static pokemon(filters, perms) {
+  static pokemon(filters) {
+    const perms = useStatic.getState().ui.pokemon
     if (filters === 'id') {
       return pokemonIndex.getOne
     }
@@ -149,14 +153,6 @@ export default class Query {
 
   static webhook(type) {
     return webhookIndex[type]
-  }
-
-  static scanner() {
-    return scanner
-  }
-
-  static geocoder() {
-    return getGeocoder
   }
 
   static user(type) {

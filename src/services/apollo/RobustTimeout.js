@@ -1,13 +1,18 @@
 // @ts-check
+import { useStatic } from '@hooks/useStore'
 import AbortableContext from './AbortableContext'
 
 export default class RobustTimeout extends AbortableContext {
   /**
-   * @param {number} ms
+   * @param {keyof import('@rm/types').Config['api']['polling'] | number} category
    */
-  constructor(ms) {
+  constructor(category) {
     super(null)
-    this._ms = ms
+    this._category = category
+    this._ms =
+      (typeof category === 'number'
+        ? category
+        : useStatic.getState().polling[category] || 10) * 1000
     this._lastUpdated = 0
   }
 

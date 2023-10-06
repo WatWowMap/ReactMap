@@ -1,14 +1,10 @@
-const {
-  database: {
-    settings: { userTableName, backupTableName },
-  },
-} = require('../../services/config')
-/**
- * @typedef {import("knex").Knex} Knex
- */
+const config = require('@rm/config')
+
+const userTableName = config.getSafe('database.settings.userTableName')
+const backupTableName = config.getSafe('database.settings.backupTableName')
 
 /**
- * @param {Knex} knex
+ * @param {import("knex").Knex} knex
  */
 exports.up = async (knex) =>
   knex.schema.createTable(backupTableName, (table) => {
@@ -26,6 +22,6 @@ exports.up = async (knex) =>
   })
 
 /**
- * @param {Knex} knex
+ * @param {import("knex").Knex} knex
  */
 exports.down = (knex) => knex.schema.dropTableIfExists(backupTableName)

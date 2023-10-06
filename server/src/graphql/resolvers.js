@@ -1,36 +1,39 @@
-/* global BigInt */
-const GraphQLJSON = require('graphql-type-json')
+const fs = require('fs')
+const { resolve } = require('path')
+const { GraphQLJSON } = require('graphql-type-json')
 const { S2LatLng, S2RegionCoverer, S2LatLngRect } = require('nodes2ts')
+const config = require('@rm/config')
 
-const config = require('../services/config')
-const Utility = require('../services/Utility')
-const Fetch = require('../services/Fetch')
 const buildDefaultFilters = require('../services/filters/builder/base')
+const filterComponents = require('../services/functions/filterComponents')
+const { filterRTree } = require('../services/functions/filterRTree')
+const validateSelectedWebhook = require('../services/functions/validateSelectedWebhook')
+const PoracleAPI = require('../services/api/Poracle')
+const { geocoder } = require('../services/geocoder')
+const scannerApi = require('../services/api/scannerApi')
+const getPolyVector = require('../services/functions/getPolyVector')
+const getPlacementCells = require('../services/functions/getPlacementCells')
+const getTypeCells = require('../services/functions/getTypeCells')
 
-/**
- * @typedef {(parent: unknown, args: object, context: import('../types').GqlContext) => unknown} Resolver
- * @type {{
- *  JSON: typeof GraphQLJSON
- *  Query: Record<string, Resolver>
- *  Mutation: Record<string, Resolver>
- * }}
- */
+/** @type {import("@apollo/server").ApolloServerOptions<import("@rm/types").GqlContext>['resolvers']} */
 const resolvers = {
   JSON: GraphQLJSON,
   Query: {
     available: (_, _args, { Event, Db, perms }) => {
-      const available = {
+      const data = {
         pokemon: perms.pokemon ? Event.available.pokemon : [],
         gyms: perms.gyms ? Event.available.gyms : [],
         nests: perms.nests ? Event.available.nests : [],
         pokestops: perms.pokestops ? Event.available.pokestops : [],
         questConditions: perms.quests ? Db.questConditions : {},
-      }
-      return {
-        ...available,
         masterfile: { ...Event.masterfile, invasions: Event.invasions },
-        filters: buildDefaultFilters(perms, available, Db),
+        filters: buildDefaultFilters(perms, Db),
+        icons: {
+          ...config.getSafe('icons'),
+          styles: Event.uicons,
+        },
       }
+      return data
     },
     backup: (_, args, { req, perms, Db }) => {
       if (perms?.backups && req?.user?.id) {
@@ -38,9 +41,10 @@ const resolvers = {
       }
       return {}
     },
-    backups: (_, _args, { req, perms, Db }) => {
+    backups: async (_, _args, { req, perms, Db }) => {
       if (perms?.backups) {
-        return Db.models.Backup.getAll(req.user?.id)
+        const records = await Db.query('Backup', 'getAll', req.user?.id)
+        return records
       }
       return []
     },
@@ -59,17 +63,97 @@ const resolvers = {
       )
       return !!results.length
     },
-    devices: (_, args, { perms, Db }) => {
-      if (perms?.devices) {
-        return Db.getAll('Device', perms, args)
+    /** @param {unknown} _ @param {{ mode: 'scanNext' | 'scanZone' }} args */
+    checkValidScan: (_, { mode, points }, { perms }) => {
+      if (perms?.scanner.includes(mode)) {
+        const areaRestrictions =
+          config.getSafe(`scanner.${mode}.${mode}AreaRestriction`) || []
+
+        const validPoints = points.map((point) =>
+          filterRTree(
+            { lat: point[0], lon: point[1] },
+            perms.areaRestrictions,
+            areaRestrictions,
+          ),
+        )
+        return validPoints
       }
       return []
     },
-    geocoder: (_, args, { perms, Event }) => {
+    /** @param {unknown} _ @param {{ component: 'loginPage' | 'donationPage' | 'messageOfTheDay' }} args */
+    customComponent: (_, { component }, { perms, req, user }) => {
+      switch (component) {
+        case 'messageOfTheDay':
+        case 'donationPage':
+        case 'loginPage':
+          if (config.has(`map.${component}`)) {
+            const {
+              footerButtons = [],
+              components = [],
+              ...rest
+            } = config.getMapConfig(req)[component]
+            return {
+              ...rest,
+              footerButtons: filterComponents(
+                footerButtons,
+                !!user,
+                perms.donor,
+              ),
+              components: filterComponents(components, !!user, perms.donor),
+            }
+          }
+          return null
+        default:
+          return null
+      }
+    },
+    devices: (_, args, { perms, Db }) => {
+      if (perms?.devices) {
+        return Db.query('Device', 'getAll', perms, args)
+      }
+      return []
+    },
+    fabButtons: async (_, _args, { perms, user, req, Db, Event }) => {
+      const { donationPage, misc } = config.getMapConfig(req)
+
+      const scanner = config.getSafe('scanner')
+
+      const selectedWebhook = await validateSelectedWebhook(req.user, Db, Event)
+      if (selectedWebhook) {
+        req.user.selectedWebhook = selectedWebhook
+        req.session.save()
+      }
+
+      return {
+        custom: misc.customFloatingIcons,
+        donationButton:
+          donationPage.showOnMap &&
+          (perms.donor ? donationPage.showToDonors : true)
+            ? donationPage.fabIcon
+            : '',
+        profileButton: !!(user && misc.enableFloatingProfileButton),
+        scanZone:
+          scanner.backendConfig.platform !== 'mad' &&
+          scanner.scanZone.enabled &&
+          perms.scanner.includes('scanZone'),
+        scanNext:
+          scanner.scanNext.enabled && perms.scanner.includes('scanNext'),
+        search: Object.entries(config.getSafe('api.searchable')).some(
+          ([k, v]) => v && perms[k],
+        ),
+        webhooks: !!selectedWebhook,
+      }
+    },
+    geocoder: (_, { search }, { perms, Event, req }) => {
       if (perms?.webhooks) {
-        const webhook = Event.webhookObj[args.name]
+        const webhook = Event.webhookObj[req.user?.selectedWebhook]
         if (webhook) {
-          return Utility.geocoder(webhook.server.nominatimUrl, args.search)
+          return geocoder(
+            webhook.nominatimUrl,
+            search,
+            false,
+            webhook.addressFormat,
+          )
         }
       }
       return []
@@ -86,9 +170,20 @@ const resolvers = {
       }
       return {}
     },
+    motdCheck: (_, { clientIndex }, { req, perms }) => {
+      const motd = config.getMapConfig(req).messageOfTheDay
+      return (
+        motd.components.length &&
+        (motd.index > clientIndex || motd.settings.permanent) &&
+        ((perms.donor
+          ? motd.settings.donorOnly
+          : motd.settings.freeloaderOnly) ||
+          (!motd.settings.donorOnly && !motd.settings.freeloaderOnly))
+      )
+    },
     nests: (_, args, { perms, Db }) => {
       if (perms?.nests) {
-        return Db.getAll('Nest', perms, args)
+        return Db.query('Nest', 'getAll', perms, args)
       }
       return []
     },
@@ -105,7 +200,7 @@ const resolvers = {
         perms?.quests ||
         perms?.invasions
       ) {
-        return Db.getAll('Pokestop', perms, args)
+        return Db.query('Pokestop', 'getAll', perms, args)
       }
       return []
     },
@@ -132,7 +227,7 @@ const resolvers = {
     },
     portals: (_, args, { perms, Db }) => {
       if (perms?.portals) {
-        return Db.getAll('Portal', perms, args)
+        return Db.query('Portal', 'getAll', perms, args)
       }
       return []
     },
@@ -166,27 +261,28 @@ const resolvers = {
           regionCoverer.setMinLevel(level)
           regionCoverer.setMaxLevel(level)
           return regionCoverer.getCoveringCells(region).map((cell) => {
-            const id = BigInt(cell.id).toString()
+            const id = cell.id.toString()
             return {
               id,
-              coords: Utility.getPolyVector(id).poly,
+              coords: getPolyVector(id).polygon,
             }
           })
         })
       }
       return []
     },
-    scanCells: (_, args, { perms, Db }) => {
-      if (perms?.scanCells && args.zoom >= config.map.scanCellsZoom) {
-        return Db.getAll('ScanCell', perms, args)
+    scanCells: (_, args, { perms, Db, req }) => {
+      if (
+        perms?.scanCells &&
+        args.zoom >= config.getMapConfig(req).general.scanCellsZoom
+      ) {
+        return Db.query('ScanCell', 'getAll', perms, args)
       }
       return []
     },
     scanAreas: (_, _args, { req, perms }) => {
       if (perms?.scanAreas) {
-        const scanAreas = config.areas.scanAreas[req.headers.host]
-          ? config.areas.scanAreas[req.headers.host]
-          : config.areas.scanAreas.main
+        const scanAreas = config.getAreas(req, 'scanAreas')
         return [
           {
             ...scanAreas,
@@ -204,10 +300,7 @@ const resolvers = {
     },
     scanAreasMenu: (_, _args, { req, perms }) => {
       if (perms?.scanAreas) {
-        const scanAreas = config.areas.scanAreasMenu[req.headers.host]
-          ? config.areas.scanAreasMenu[req.headers.host]
-          : config.areas.scanAreasMenu.main
-
+        const scanAreas = config.getAreas(req, 'scanAreasMenu')
         if (perms.areaRestrictions.length) {
           const filtered = scanAreas
             .map((parent) => ({
@@ -227,7 +320,7 @@ const resolvers = {
                 type: 'Feature',
                 properties: {
                   name: '',
-                  manual: Boolean(config.manualAreas.length),
+                  manual: !!config.getSafe('manualAreas.length'),
                 },
               })
             }
@@ -237,6 +330,35 @@ const resolvers = {
         return scanAreas.filter((parent) => parent.children.length)
       }
       return []
+    },
+    scannerConfig: (_, { mode }, { perms }) => {
+      const scanner = config.getSafe('scanner')
+
+      if (perms.scanner?.includes(mode) && scanner[mode].enabled) {
+        return mode === 'scanZone'
+          ? {
+              scannerType: scanner.backendConfig.platform,
+              showScanCount: scanner.scanZone.showScanCount,
+              showScanQueue: scanner.scanZone.showScanQueue,
+              advancedOptions: scanner.scanZone.advancedScanZoneOptions,
+              pokemonRadius: scanner.scanZone.scanZoneRadius.pokemon,
+              gymRadius: scanner.scanZone.scanZoneRadius.gym,
+              spacing: scanner.scanZone.scanZoneSpacing,
+              maxSize: scanner.scanZone.scanZoneMaxSize,
+              cooldown: scanner.scanZone.userCooldownSeconds,
+              refreshQueue: scanner.backendConfig.queueRefreshInterval,
+              enabled: scanner[mode].enabled,
+            }
+          : {
+              scannerType: scanner.backendConfig.platform,
+              showScanCount: scanner.scanNext.showScanCount,
+              showScanQueue: scanner.scanNext.showScanQueue,
+              cooldown: scanner.scanNext.userCooldownSeconds,
+              refreshQueue: scanner.backendConfig.queueRefreshInterval,
+              enabled: scanner[mode].enabled,
+            }
+      }
+      return null
     },
     search: async (_, args, { Event, perms, Db }) => {
       const { category, webhookName, search } = args
@@ -258,8 +380,8 @@ const resolvers = {
               const withFormatted = await Promise.all(
                 results.map(async (result) => ({
                   ...result,
-                  formatted: await Utility.geocoder(
-                    webhook.server.nominatimUrl,
+                  formatted: await geocoder(
+                    webhook.nominatimUrl,
                     { lat: result.lat, lon: result.lon },
                     true,
                   ),
@@ -299,59 +421,145 @@ const resolvers = {
       }
       return []
     },
+    searchable: (_, __, { perms }) => {
+      const options = config.getSafe('api.searchable')
+      return Object.keys(options).filter((k) => options[k] && perms[k])
+    },
     spawnpoints: (_, args, { perms, Db }) => {
       if (perms?.spawnpoints) {
-        return Db.getAll('Spawnpoint', perms, args)
+        return Db.query('Spawnpoint', 'getAll', perms, args)
       }
       return []
     },
-    submissionCells: async (_, args, { perms, Db }) => {
-      if (
-        perms?.submissionCells &&
-        args.zoom >= config.map.submissionZoom - 1
-      ) {
+    submissionCells: async (_, args, { req, perms, Db }) => {
+      const { submissionZoom } = config.getMapConfig(req).general
+      if (perms?.submissionCells && args.zoom >= submissionZoom - 1) {
         const [pokestops, gyms] = await Db.submissionCells(perms, args)
         return [
           {
-            placementCells:
-              args.zoom >= config.map.submissionZoom
-                ? Utility.getPlacementCells(args, pokestops, gyms)
-                : [],
-            typeCells: args.filters.onlyS14Cells
-              ? Utility.getTypeCells(args, pokestops, gyms)
-              : [],
+            ...(args.zoom >= submissionZoom
+              ? getPlacementCells(args, pokestops, gyms)
+              : { pois: [], level17Cells: [] }),
+            level14Cells: getTypeCells(args, pokestops, gyms),
           },
         ]
       }
-      return [{ placementCells: [], typeCells: [] }]
+      return [{ level17Cells: [], level14Cells: [], pois: [] }]
     },
     weather: (_, args, { perms, Db }) => {
       if (perms?.weather) {
-        return Db.getAll('Weather', perms, args)
+        return Db.query('Weather', 'getAll', perms, args)
       }
       return []
     },
-    webhook: (_, args, { req, perms }) => {
-      if (perms?.webhooks) {
-        return Fetch.webhookApi(
-          args.category,
-          Utility.evalWebhookId(req.user),
-          args.status,
-          args.name,
+    webhook: async (_, { status, category }, { req, perms, Event }) => {
+      if (perms?.webhooks && req.user?.selectedWebhook) {
+        const result = await Event.webhookObj[req.user.selectedWebhook].api(
+          PoracleAPI.getWebhookId(req.user),
+          category,
+          status,
         )
+        if (category === 'pokemon') {
+          result.pokemon = result.pokemon.map((x) => ({
+            ...x,
+            allForms: !x.form,
+            pvpEntry: !!x.pvp_ranking_league,
+            xs: x.max_weight !== 9000000,
+            xl: x.min_weight !== 0,
+          }))
+        }
+        if (category === 'invasion') {
+          const { invasions } = Event.masterfile
+          result.invasion = result.invasion.map((x) => ({
+            ...x,
+            real_grunt_id:
+              +Object.keys(invasions).find(
+                (key) =>
+                  invasions[key]?.type?.toLowerCase() ===
+                    x.grunt_type.toLowerCase() &&
+                  invasions[key].gender === (x.gender || 1),
+              ) || 0,
+          }))
+        }
+        if (category === 'raid') {
+          result.raid = result.raid.map((x) => ({
+            ...x,
+            allMoves: x.move === 9000,
+          }))
+        }
+
+        return result
+      }
+      return {}
+    },
+    webhookAreas: async (_, __, { req, perms, Event }) => {
+      if (perms.webhooks.includes(req.user?.selectedWebhook) && req.user?.id) {
+        return Event.webhookObj[req.user.selectedWebhook].getUserAreas(
+          PoracleAPI.getWebhookId(req.user),
+        )
+      }
+      return []
+    },
+    webhookCategories: async (_, __, { req, perms, Event }) => {
+      if (req.user?.id && perms.webhooks.includes(req.user?.selectedWebhook)) {
+        const human = await Event.webhookObj[req.user?.selectedWebhook].api(
+          PoracleAPI.getWebhookId(req.user),
+          'oneHuman',
+          'GET',
+        )
+        return Event.webhookObj[req.user?.selectedWebhook].getAllowedCategories(
+          human.blocked_alerts,
+        )
+      }
+      return []
+    },
+    webhookContext: async (_, __, { req, perms, Event }) => {
+      if (
+        req.user?.selectedWebhook &&
+        perms?.webhooks.includes(req.user?.selectedWebhook)
+      ) {
+        return Event.webhookObj[req.user.selectedWebhook].getClientContext(
+          req.user.strategy || req.user.webhookStrategy,
+        )
+      }
+    },
+    webhookGeojson: async (_, __, { perms, req, Event }) => {
+      if (perms?.webhooks) {
+        return Event.webhookObj[req.user.selectedWebhook].getClientGeojson(
+          PoracleAPI.getWebhookId(req.user),
+        )
+      }
+      return null
+    },
+    webhookUser: async (_, __, { req, perms }) => {
+      if (req.user?.id && perms.webhooks) {
+        const enabledHooks = config
+          .getSafe('webhooks')
+          .filter((hook) => hook.enabled)
+          .map((x) => x.name)
+        return {
+          webhooks: (perms.webhooks || []).filter((x) =>
+            enabledHooks.includes(x),
+          ),
+          selected: req.user?.selectedWebhook,
+        }
       }
       return {}
     },
     scanner: (_, args, { req, perms }) => {
       const { category, method, data } = args
       if (category === 'getQueue') {
-        return Fetch.scannerApi(category, method, data, req?.user)
+        return scannerApi(category, method, data, req?.user)
       }
       if (perms?.scanner?.includes(category)) {
-        return Fetch.scannerApi(category, method, data, req?.user)
+        return scannerApi(category, method, data, req?.user)
       }
       return {}
     },
+    validateUser: (_, __, { user, perms }) => ({
+      loggedIn: !!user,
+      admin: perms?.admin,
+    }),
   },
   Mutation: {
     createBackup: async (_, args, { req, perms, Db }) => {
@@ -386,19 +594,39 @@ const resolvers = {
       }
       return false
     },
-    webhook: (_, args, { req }) => {
-      const perms = req.user ? req.user.perms : false
-      const { category, data, status, name } = args
-      if (perms?.webhooks?.includes(name)) {
-        return Fetch.webhookApi(
+    webhook: async (_, args, { req, Event, perms }) => {
+      if (
+        req.user?.selectedWebhook &&
+        perms?.webhooks?.includes(req.user?.selectedWebhook)
+      ) {
+        const { category, data, status } = args
+        const result = await Event.webhookObj[req.user.selectedWebhook].api(
+          PoracleAPI.getWebhookId(req.user),
           category,
-          Utility.evalWebhookId(req.user),
           status,
-          name,
           data,
         )
+        return result
       }
       return {}
+    },
+    webhookChange: async (_, args, { req, Db, perms, Event }) => {
+      if (req.user?.id && perms.webhooks.includes(args.webhook)) {
+        const user = await Db.query(
+          'User',
+          'updateWebhook',
+          req.user.id,
+          args.webhook,
+        )
+        req.user.selectedWebhook = user.selectedWebhook
+        req.session.save()
+        return Event.webhookObj[user.selectedWebhook].api(
+          PoracleAPI.getWebhookId(req.user),
+          'oneHuman',
+          'GET',
+        )
+      }
+      return ''
     },
     tutorial: async (_, args, { req, Db }) => {
       if (req.user) {
@@ -413,6 +641,35 @@ const resolvers = {
       }
       return false
     },
+    saveComponent: async (_, { code, component }, { perms, req }) => {
+      if (perms.admin && code && component) {
+        const configFolder = resolve(__dirname, '../configs')
+        const ts = Math.floor(Date.now() / 1000)
+        if (
+          fs.existsSync(`${configFolder}/${component}/${req.headers.host}.json`)
+        ) {
+          fs.copyFileSync(
+            `${configFolder}/${component}/${req.headers.host}.json`,
+            `${configFolder}/${component}/${req.headers.host}_${ts}.json`,
+          )
+          fs.writeFileSync(
+            `${configFolder}/${component}/${req.headers.host}.json`,
+            code,
+            'utf8',
+          )
+          return `Saved to ${configFolder}/${component}/${req.headers.host}.json`
+        }
+        if (fs.existsSync(`${configFolder}/${component}.json`)) {
+          fs.copyFileSync(
+            `${configFolder}/${component}.json`,
+            `${configFolder}/${component}_${ts}.json`,
+          )
+        }
+        fs.writeFileSync(`${configFolder}/${component}.json`, code, 'utf8')
+        return `Saved to ${configFolder}/${component}.json`
+      }
+      return null
+    },
     strategy: async (_, args, { req, Db }) => {
       if (req.user) {
         await Db.models.User.query()
@@ -424,7 +681,7 @@ const resolvers = {
     },
     setExtraFields: async (_, { key, value }, { req, Db }) => {
       if (req.user?.id) {
-        const user = await Db.models.User.query().findById(req.user.id)
+        const user = await Db.query('User', 'getOne', req.user.id)
         if (user) {
           const data =
             typeof user.data === 'string'
@@ -437,8 +694,7 @@ const resolvers = {
       }
       return false
     },
-    setGymBadge: async (_, args, { req, Db }) => {
-      const perms = req.user ? req.user.perms : false
+    setGymBadge: async (_, args, { req, Db, perms }) => {
       if (perms?.gymBadges && req?.user?.id) {
         if (
           await Db.models.Badge.query()

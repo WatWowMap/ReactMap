@@ -1,16 +1,18 @@
 import * as React from 'react'
-import { Dialog, DialogContent, TextField } from '@mui/material'
+import Dialog from '@mui/material/Dialog'
+import DialogContent from '@mui/material/DialogContent'
+import TextField from '@mui/material/TextField'
 import { useMutation } from '@apollo/client'
 import { useTranslation } from 'react-i18next'
 
 import Query from '@services/Query'
-import { useDialogStore, useStatic } from '@hooks/useStore'
+import { useLayoutStore, useStatic } from '@hooks/useStore'
 
 import Header from '../general/Header'
 import Footer from '../general/Footer'
 
 export default function NestSubmission({ id, name }) {
-  const open = useDialogStore((s) => s.nestSubmissions)
+  const open = useLayoutStore((s) => s.nestSubmissions)
   const [newName, setNewName] = React.useState(name)
   const { t } = useTranslation()
 
@@ -21,7 +23,7 @@ export default function NestSubmission({ id, name }) {
     },
   )
 
-  const handleClose = () => useDialogStore.setState({ nestSubmissions: '0' })
+  const handleClose = () => useLayoutStore.setState({ nestSubmissions: '0' })
 
   const handleSubmit = (e) => {
     if (e) e.preventDefault()

@@ -1,48 +1,70 @@
+// @ts-check
+/* eslint-disable react/destructuring-assignment */
 import ErrorBoundary from '@components/ErrorBoundary'
-import React, { memo, useRef, useEffect, useState } from 'react'
+import * as React from 'react'
 import { Marker, Popup } from 'react-leaflet'
+
+import { basicEqualFn, useStatic } from '@hooks/useStore'
 
 import deviceMarker from '../markers/device'
 import PopupContent from '../popups/Device'
 import DevicePoly from '../popups/DevicePoly'
 
-const DeviceTile = ({ item, ts, Icons, userSettings }) => {
-  const [poly, setPoly] = useState(false)
-  const markerRef = useRef(null)
-  const isOnline = ts - item.updated < 900
+/**
+ *
+ * @param {import('@rm/types').Device} device
+ * @returns
+ */
+const DeviceTile = (device) => {
+  const ts = Math.floor(Date.now() / 1000)
+  const [poly, setPoly] = React.useState(false)
+  const markerRef = React.useRef(null)
+  const isOnline = ts - device.updated < 900
+  const [iconUrl, iconSize, modifiers] = useStatic(
+    (s) => [
+      s.Icons.getDevices(isOnline),
+      s.Icons.getSize('device'),
+      s.Icons.getModifiers('device')[0],
+    ],
+    basicEqualFn,
+  )
 
-  useEffect(() => {
+  React.useEffect(() => {
     if (poly && markerRef) {
       markerRef.current.openPopup()
     }
   })
 
+  const icon = React.useMemo(
+    () => deviceMarker(iconUrl, iconSize, modifiers),
+    [iconUrl, iconSize],
+  )
+
   return (
     <Marker
-      position={[item.lat, item.lon]}
-      icon={deviceMarker(isOnline, Icons)}
+      position={[device.lat, device.lon]}
+      icon={icon}
       ref={markerRef}
       eventHandlers={{
         popupopen: () => setPoly(true),
         popupclose: () => setPoly(false),
       }}
     >
-      <Popup position={[item.lat, item.lon]}>
-        <PopupContent device={item} isOnline={isOnline} ts={ts} />
+      <Popup position={[device.lat, device.lon]}>
+        <PopupContent {...device} isOnline={isOnline} ts={ts} />
       </Popup>
-      {poly && !item.isMad && (
+      {poly && !device.isMad && (
         <ErrorBoundary>
-          <DevicePoly device={item} color={userSettings.devicePathColor} />
+          <DevicePoly {...device} />
         </ErrorBoundary>
       )}
     </Marker>
   )
 }
 
-const areEqual = (prev, next) =>
-  prev.item.type === next.item.type &&
-  prev.item.lat === next.item.lat &&
-  prev.item.lon === next.item.lon &&
-  prev.item.updated === next.item.updated
+const MemoDevice = React.memo(
+  DeviceTile,
+  (prev, next) => prev.updated === next.updated,
+)
 
-export default memo(DeviceTile, areEqual)
+export default MemoDevice

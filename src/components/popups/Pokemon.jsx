@@ -1,5 +1,5 @@
 /* eslint-disable no-nested-ternary */
-import React, { Fragment, useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import Check from '@mui/icons-material/Check'
 import Clear from '@mui/icons-material/Clear'
 import ExpandMore from '@mui/icons-material/ExpandMore'
@@ -21,12 +21,14 @@ import { useTranslation } from 'react-i18next'
 import { useStore, useStatic } from '@hooks/useStore'
 import Utility from '@services/Utility'
 import ErrorBoundary from '@components/ErrorBoundary'
+import { TextWithIcon } from '@components/layout/custom/CustomImg'
 
-import GenericTimer from './common/Timer'
 import NameTT from './common/NameTT'
 import GenderIcon from './common/GenderIcon'
 import Navigation from './common/Navigation'
 import Coords from './common/Coords'
+import { TimeStamp } from './common/TimeStamps'
+import { ExtraInfo } from './common/ExtraInfo'
 
 const rowClass = { width: 30, fontWeight: 'bold' }
 
@@ -51,28 +53,23 @@ const getColor = (ivPercent) => {
   }
 }
 
-export default function PokemonPopup({
-  pokemon,
-  iconUrl,
-  userSettings,
-  isTutorial,
-  Icons,
-  timeOfDay,
-}) {
+export default function PokemonPopup({ pokemon, iconUrl, isTutorial = false }) {
   const { t } = useTranslation()
   const { pokemon_id, cleanPvp, iv, cp } = pokemon
-  const { perms } = useStatic((state) => state.auth)
+  const perms = useStatic((state) => state.auth.perms)
+  const timeOfDay = useStatic((s) => s.timeOfDay)
+  const metaData = useStatic((state) => state.masterfile.pokemon[pokemon_id])
+  const Icons = useStatic((state) => state.Icons)
+
+  const userSettings = useStore((s) => s.userSettings.pokemon)
   const pokePerms = isTutorial
     ? {
         pvp: true,
         iv: true,
       }
     : perms
-  const {
-    pokemon: { [pokemon_id]: metaData },
-  } = useStatic((state) => state.masterfile)
   const popups = useStore((state) => state.popups)
-  const setPopups = useStore((state) => state.setPopups)
+
   const hasLeagues = cleanPvp ? Object.keys(cleanPvp) : []
   const hasStats = iv || cp
 
@@ -132,7 +129,6 @@ export default function PokemonPopup({
         <Footer
           pokemon={pokemon}
           popups={popups}
-          setPopups={setPopups}
           hasPvp={!!hasLeagues.length}
           Icons={Icons}
         />
@@ -149,7 +145,7 @@ export default function PokemonPopup({
           ))}
         </Collapse>
         <Collapse in={popups.extras} timeout="auto" unmountOnExit>
-          <ExtraInfo
+          <ExtraPokemonInfo
             pokemon={pokemon}
             perms={pokePerms}
             userSettings={userSettings}
@@ -170,14 +166,7 @@ const Header = ({
   userSettings,
   isTutorial,
 }) => {
-  const hideList = useStatic((state) => state.hideList)
-  const setHideList = useStatic((state) => state.setHideList)
-  const excludeList = useStatic((state) => state.excludeList)
-  const setExcludeList = useStatic((state) => state.setExcludeList)
-  const timerList = useStatic((state) => state.timerList)
-  const setTimerList = useStatic((state) => state.setTimerList)
   const filters = useStore((state) => state.filters)
-  const setFilters = useStore((state) => state.setFilters)
 
   const [anchorEl, setAnchorEl] = useState(false)
   const { id, pokemon_id, form, ditto_form, display_pokemon_id } = pokemon
@@ -192,37 +181,42 @@ const Header = ({
 
   const handleHide = () => {
     setAnchorEl(null)
-    setHideList([...hideList, id])
+    useStatic.setState((prev) => ({ hideList: new Set(prev.hideList).add(id) }))
   }
 
   const handleExclude = () => {
     setAnchorEl(null)
     const key = `${pokemon_id}-${form}`
     if (filters?.pokemon?.filter) {
-      setFilters({
-        ...filters,
-        pokemon: {
-          ...filters.pokemon,
-          filter: {
-            ...filters.pokemon.filter,
-            [key]: {
-              ...filters.pokemon.filter[key],
-              enabled: false,
+      useStore.setState((prev) => ({
+        filters: {
+          ...prev.filters,
+          pokemon: {
+            ...prev.filters.pokemon,
+            filter: {
+              ...prev.filters.pokemon.filter,
+              [key]: {
+                ...prev.filters.pokemon.filter[key],
+                enabled: false,
+              },
             },
           },
         },
-      })
-      setExcludeList([...excludeList, key])
+      }))
+      useStatic.setState((prev) => ({
+        excludeList: [...prev.excludeList, key],
+      }))
     }
   }
 
   const handleTimer = () => {
     setAnchorEl(null)
-    if (timerList.includes(id)) {
-      setTimerList(timerList.filter((x) => x !== id))
-    } else {
-      setTimerList([...timerList, id])
-    }
+    useStatic.setState((prev) => {
+      if (prev.timerList.includes(id)) {
+        return { timerList: prev.timerList.filter((x) => x !== id) }
+      }
+      return { timerList: [...prev.timerList, id] }
+    })
   }
 
   const options = [
@@ -335,7 +329,7 @@ const Stats = ({ pokemon, t }) => {
 const Info = ({ pokemon, metaData, perms, Icons, timeOfDay, t }) => {
   const { gender, size, weather, form } = pokemon
   const formTypes = metaData?.forms?.[form]?.types || metaData?.types || []
-
+  const darkMode = useStore((s) => s.darkMode)
   return (
     <Grid
       item
@@ -348,7 +342,7 @@ const Info = ({ pokemon, metaData, perms, Icons, timeOfDay, t }) => {
       {weather != 0 && perms.iv && (
         <Grid
           item
-          className="grid-item"
+          className={`grid-item ${darkMode ? '' : 'darken-image'}`}
           style={{
             height: 24,
             width: 24,
@@ -436,17 +430,19 @@ const Timer = ({ pokemon, hasStats, t }) => {
   )
 }
 
-const Footer = ({ pokemon, popups, setPopups, hasPvp, Icons }) => {
+const Footer = ({ pokemon, popups, hasPvp, Icons }) => {
   const { lat, lon } = pokemon
   const darkMode = useStore((s) => s.darkMode)
 
   const handleExpandClick = (category) => {
     const opposite = category === 'extras' ? 'pvp' : 'extras'
-    setPopups({
-      ...popups,
-      [category]: !popups[category],
-      [opposite]: false,
-    })
+    useStore.setState((prev) => ({
+      popups: {
+        ...prev.popups,
+        [category]: !popups[category],
+        [opposite]: false,
+      },
+    }))
   }
 
   return (
@@ -485,8 +481,8 @@ const Footer = ({ pokemon, popups, setPopups, hasPvp, Icons }) => {
   )
 }
 
-const ExtraInfo = ({ pokemon, perms, userSettings, t, Icons }) => {
-  const { moves } = useStatic((state) => state.masterfile)
+const ExtraPokemonInfo = ({ pokemon, perms, userSettings, t, Icons }) => {
+  const moves = useStatic((state) => state.masterfile.moves)
 
   const { move_1, move_2, first_seen_timestamp, updated, iv } = pokemon
 
@@ -494,65 +490,23 @@ const ExtraInfo = ({ pokemon, perms, userSettings, t, Icons }) => {
     <Grid container alignItems="center" justifyContent="center">
       {perms.iv &&
         iv !== null &&
-        [move_1, move_2].map((move) => {
+        [move_1, move_2].map((move, i) => {
           if (!move) return null
           return (
-            <Fragment key={move}>
-              <Grid
-                item
-                xs={2}
-                className="grid-item"
-                style={{
-                  height: 15,
-                  width: 15,
-                  backgroundImage: `url(${Icons.getTypes(moves[move].type)})`,
-                }}
-              />
-              <Grid item xs={4}>
-                <Typography variant="caption">{t(`move_${move}`)}</Typography>
-              </Grid>
-              {/* <Grid item xs={3} style={{ textAlign: 'right' }}>
-                <Typography variant="caption">
-                  {i
-                    ? `${weight ? weight.toFixed(2) : '? '}${t('kilogram')}`
-                    : `${height ? height.toFixed(2) : '? '}${t('meter')}`}
-                </Typography>
-              </Grid> */}
-            </Fragment>
+            <ExtraInfo key={move} title={i ? 'charged' : 'fast'}>
+              <TextWithIcon src={Icons.getTypes(moves[move].type)}>
+                {t(`move_${move}`)}
+              </TextWithIcon>
+            </ExtraInfo>
           )
         })}
       <Divider
         flexItem
         style={{ width: '100%', height: 2, margin: '10px 0' }}
       />
-      {[first_seen_timestamp, updated].map((time, i) =>
-        time ? (
-          <Grid
-            container
-            item
-            xs={6}
-            key={`${time}-${i ? 'updated' : 'first'}`}
-            style={{ flexGrow: i ? 0 : 1, textAlign: 'center' }}
-            direction="column"
-          >
-            <Grid item>
-              <Typography variant="subtitle2">
-                {i ? t('last_seen') : t('first_seen')}:
-              </Typography>
-            </Grid>
-            <Grid item>
-              <Typography variant="caption">
-                {new Date(time * 1000).toLocaleTimeString(
-                  localStorage.getItem('i18nextLng') || 'en',
-                )}
-              </Typography>
-            </Grid>
-            <Grid item>
-              <GenericTimer expireTime={time} />
-            </Grid>
-          </Grid>
-        ) : null,
-      )}
+      <TimeStamp time={first_seen_timestamp}>first_seen</TimeStamp>
+      <TimeStamp time={updated}>last_seen</TimeStamp>
+
       {process.env.NODE_ENV === 'development' && (
         <Grid item xs={12} style={{ paddingTop: 10 }}>
           <Typography variant="subtitle1" align="center">

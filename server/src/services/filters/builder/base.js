@@ -1,33 +1,42 @@
-const {
-  defaultFilters,
-  map: { enableMapJsFilter },
-} = require('../../config')
+// @ts-check
+const config = require('@rm/config')
+
 const buildPokemon = require('./pokemon')
 const buildPokestops = require('./pokestop')
 const buildGyms = require('./gym')
 const BaseFilter = require('../Base')
 const PokemonFilter = require('../pokemon/Frontend')
 
+const defaultFilters = config.getSafe('defaultFilters')
+
 const base = new PokemonFilter(defaultFilters.pokemon.allPokemon)
 const custom = new PokemonFilter(
   defaultFilters.pokemon.allPokemon,
   'md',
-  ...Object.values(defaultFilters.pokemon.globalValues),
+  defaultFilters.pokemon.globalValues.iv,
+  defaultFilters.pokemon.globalValues.level,
+  defaultFilters.pokemon.globalValues.atk_iv,
+  defaultFilters.pokemon.globalValues.def_iv,
+  defaultFilters.pokemon.globalValues.sta_iv,
+  defaultFilters.pokemon.globalValues.pvp,
+  defaultFilters.pokemon.globalValues.gender,
+  defaultFilters.pokemon.globalValues.cp,
+  defaultFilters.pokemon.globalValues.xxs,
+  defaultFilters.pokemon.globalValues.xxl,
 )
 
 /**
  *
- * @param {import('../../../types').Permissions} perms
- * @param {import('../../../types').Available} available
- * @param {import('../../../types').DbCheckClass} database
+ * @param {import("@rm/types").Permissions} perms
+ * @param {import("@rm/types").DbCheckClass} database
  * @returns
  */
-function buildDefaultFilters(perms, available, database) {
+function buildDefaultFilters(perms, database) {
   const stopReducer =
     perms.pokestops || perms.lures || perms.quests || perms.invasions
   const gymReducer = perms.gyms || perms.raids
   const pokemonReducer = perms.iv || perms.pvp
-  const pokemon = buildPokemon(defaultFilters, base, custom, available)
+  const pokemon = buildPokemon(defaultFilters, base, custom)
 
   return {
     gyms:
@@ -46,7 +55,7 @@ function buildDefaultFilters(perms, available, database) {
             badge: perms.gymBadges ? 'all' : undefined,
             raidTier: perms.raids ? 'all' : undefined,
             filter: {
-              ...buildGyms(perms, defaultFilters.gyms, available),
+              ...buildGyms(perms, defaultFilters.gyms),
               ...pokemon.raids,
             },
           }
@@ -86,7 +95,7 @@ function buildDefaultFilters(perms, available, database) {
             arEligible: perms.pokestops ? false : undefined,
             filter: {
               ...pokemon.rocket,
-              ...buildPokestops(perms, defaultFilters.pokestops, available),
+              ...buildPokestops(perms, defaultFilters.pokestops),
               ...pokemon.quests,
             },
           }
@@ -96,7 +105,7 @@ function buildDefaultFilters(perms, available, database) {
         ? {
             enabled: defaultFilters.pokemon.enabled,
             legacy:
-              pokemonReducer && enableMapJsFilter
+              pokemonReducer && config.getSafe('map.misc.enableMapJsFilter')
                 ? defaultFilters.pokemon.legacyFilter
                 : undefined,
             iv: perms.iv ? true : undefined,

@@ -78,7 +78,7 @@ export default function AreaDropDown() {
           component={Paper}
           sx={{
             minHeight: 50,
-            maxHeight: config.map.scanAreaMenuHeight || 400,
+            maxHeight: config.misc.scanAreaMenuHeight || 400,
             overflow: 'auto',
           }}
         >
@@ -122,13 +122,13 @@ export default function AreaDropDown() {
                             feature={details}
                             allAreas={allAreas}
                             childAreas={children}
-                            scanAreasZoom={config.map.scanAreasZoom}
+                            scanAreasZoom={config.general.scanAreasZoom}
                             map={map}
                             scanAreas={filters.scanAreas}
                             setAreas={setAreas}
                             open={open}
                             setOpen={
-                              config.map.expandAllScanAreas
+                              config.misc.expandAllScanAreas
                                 ? undefined
                                 : setOpen
                             }
@@ -140,7 +140,7 @@ export default function AreaDropDown() {
                         <TableCell padding="none" sx={{ border: 'none' }}>
                           <Collapse
                             in={
-                              config.map.expandAllScanAreas ||
+                              config.misc.expandAllScanAreas ||
                               open === name ||
                               !!filters?.scanAreas?.filter?.search
                             }
@@ -158,7 +158,9 @@ export default function AreaDropDown() {
                                         feature={feature}
                                         allAreas={allAreas}
                                         childAreas={children}
-                                        scanAreasZoom={config.map.scanAreasZoom}
+                                        scanAreasZoom={
+                                          config.general.scanAreasZoom
+                                        }
                                         map={map}
                                         borderRight={
                                           row.length === 2 && j === 0

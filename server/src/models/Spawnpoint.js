@@ -1,15 +1,22 @@
+// @ts-check
 const { Model, raw } = require('objection')
-const getAreaSql = require('../services/functions/getAreaSql')
-const {
-  api: { queryLimits },
-} = require('../services/config')
-const { log, HELPERS } = require('../services/logger')
+const config = require('@rm/config')
 
-module.exports = class Spawnpoint extends Model {
+const { log, HELPERS } = require('@rm/logger')
+const getAreaSql = require('../services/functions/getAreaSql')
+
+class Spawnpoint extends Model {
   static get tableName() {
     return 'spawnpoint'
   }
 
+  /**
+   *
+   * @param {import("@rm/types").Permissions} perms
+   * @param {object} args
+   * @param {import("@rm/types").DbContext} context
+   * @returns {Promise<import("@rm/types").FullSpawnpoint[]>}
+   */
   static async getAll(perms, args, { isMad }) {
     const { areaRestrictions } = perms
     const {
@@ -48,7 +55,9 @@ module.exports = class Spawnpoint extends Model {
       return []
     }
     return query
-      .limit(queryLimits.spawnpoints)
+      .limit(config.getSafe('api.queryLimits.spawnpoints'))
       .from(isMad ? 'trs_spawn' : 'spawnpoint')
   }
 }
+
+module.exports = Spawnpoint

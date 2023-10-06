@@ -1,5 +1,5 @@
-/* eslint-disable no-nested-ternary */
-import React, { Fragment } from 'react'
+// @ts-check
+import * as React from 'react'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import SettingsIcon from '@mui/icons-material/Settings'
 import TuneIcon from '@mui/icons-material/Tune'
@@ -16,7 +16,7 @@ import {
 
 import { useTranslation } from 'react-i18next'
 
-import { useStore, useStatic } from '@hooks/useStore'
+import { useStore, useStatic, toggleDialog } from '@hooks/useStore'
 import Utility from '@services/Utility'
 
 import SettingsMenu from './Settings'
@@ -25,12 +25,11 @@ import PokemonSection from './Pokemon'
 import Areas from './Areas'
 import Extras from './Extras'
 
-export default function DrawerSection({ category, value, toggleDialog }) {
+export default function DrawerSection({ category, value }) {
   const { t } = useTranslation()
 
   const sidebar = useStore((s) => s.sidebar)
   const staticUserSettings = useStatic((s) => s.userSettings)
-  const { config } = useStatic.getState()
 
   const handleChange = (panel) => (_, isExpanded) =>
     useStore.setState({ sidebar: isExpanded ? panel : false })
@@ -53,21 +52,14 @@ export default function DrawerSection({ category, value, toggleDialog }) {
           {category === 'pokemon' ? (
             <PokemonSection category={category} context={value} />
           ) : category === 'settings' ? (
-            <SettingsMenu toggleDialog={toggleDialog} />
+            <SettingsMenu />
           ) : (
-            Object.entries(value).map(([subItem, subValue]) =>
-              category === 'scanAreas' &&
-              config.map.noScanAreasOverlay ? null : (
-                <Fragment key={`${category}-${subItem}`}>
-                  <ItemToggle category={category} subItem={subItem} />
-                  <Extras
-                    category={category}
-                    subItem={subItem}
-                    data={subValue}
-                  />
-                </Fragment>
-              ),
-            )
+            Object.entries(value).map(([subItem, subValue]) => (
+              <React.Fragment key={`${category}-${subItem}`}>
+                <ItemToggle category={category} subItem={subItem} />
+                <Extras category={category} subItem={subItem} data={subValue} />
+              </React.Fragment>
+            ))
           )}
           {staticUserSettings[category] && (
             <ListItemButton onClick={toggleDialog(true, category, 'options')}>

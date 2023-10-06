@@ -20,6 +20,9 @@ jobs:
       - name: Install Dependencies
         run: yarn
 
+      - name: Masterfile
+        run: yarn masterfile
+
       - name: Lint
         run: yarn eslint:check
 

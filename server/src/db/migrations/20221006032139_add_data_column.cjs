@@ -1,16 +1,9 @@
-/* eslint-disable no-unused-vars */
-const {
-  database: {
-    settings: { userTableName: tableName },
-  },
-} = require('../../services/config')
+const config = require('@rm/config')
+
+const tableName = config.getSafe('database.settings.userTableName')
 
 /**
- * @typedef {import("knex").Knex} Knex
- */
-
-/**
- * @param {Knex} knex
+ * @param {import("knex").Knex} knex
  */
 exports.up = async (knex) =>
   knex.schema.table(tableName, (table) => {
@@ -18,7 +11,7 @@ exports.up = async (knex) =>
   })
 
 /**
- * @param {Knex} knex
+ * @param {import("knex").Knex} knex
  */
 exports.down = async (knex) =>
   knex.schema.table(tableName, (table) => {

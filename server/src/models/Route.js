@@ -1,5 +1,9 @@
-const { Model } = require('objection')
+// @ts-check
+const { Model, raw } = require('objection')
+const config = require('@rm/config')
+
 const getAreaSql = require('../services/functions/getAreaSql')
+const { getEpoch } = require('../services/functions/getClientTime')
 
 const GET_ALL_SELECT = /** @type {const} */ ([
   'id',
@@ -11,6 +15,18 @@ const GET_ALL_SELECT = /** @type {const} */ ([
   'image_border_color',
   'reversible',
 ])
+const GET_MAD_ALL_SELECT = /** @type {const} */ ({
+  id: 'route_id',
+  start_lat: 'start_poi_latitude',
+  start_lon: 'start_poi_longitude',
+  end_lat: 'end_poi_latitude',
+  end_lon: 'end_poi_longitude',
+  waypoints: 'waypoints',
+  image_border_color: 'image_border_color_hex',
+  reversible: 'reversible',
+})
+
+const updateSeconds = config.getSafe('api.routeUpdateLimit') * 24 * 60 * 60
 
 class Route extends Model {
   static get tableName() {
@@ -19,37 +35,51 @@ class Route extends Model {
 
   /**
    * Returns the bare essentials for displaying on the map
-   * @param {import('../types').Permissions} perms
+   * @param {import("@rm/types").Permissions} perms
    * @param {object} args
-   * @param {import('../types').DbContext} ctx
-   * @returns
+   * @param {import("@rm/types").DbContext} ctx
+   * @returns {Promise<import("@rm/types").FullRoute[]>}
    */
-  static async getAll(perms, args, ctx) {
+  static async getAll(perms, args, { isMad }) {
     const { areaRestrictions } = perms
     const { onlyAreas, onlyDistance } = args.filters
-
+    const ts = getEpoch() - updateSeconds
     const distanceInMeters = (onlyDistance || [0.5, 100]).map((x) => x * 1000)
 
-    const query = this.query()
-      .select(GET_ALL_SELECT)
-      .whereBetween('start_lat', [args.minLat, args.maxLat])
-      .andWhereBetween('start_lon', [args.minLon, args.maxLon])
-      .andWhereBetween('distance_meters', distanceInMeters)
-      .union((qb) => {
-        qb.select(GET_ALL_SELECT)
-          .whereBetween('end_lat', [args.minLat, args.maxLat])
-          .andWhereBetween('end_lon', [args.minLon, args.maxLon])
-          .andWhereBetween('distance_meters', distanceInMeters)
-          .from('route')
+    const startLatitude = isMad ? 'start_poi_latitude' : 'start_lat'
+    const startLongitude = isMad ? 'start_poi_longitude' : 'start_lon'
+    const distanceMeters = isMad ? 'route_distance_meters' : 'distance_meters'
+    const endLatitude = isMad ? 'end_poi_latitude' : 'end_lat'
+    const endLongitude = isMad ? 'end_poi_longitude' : 'end_lon'
 
-        getAreaSql(qb, areaRestrictions, onlyAreas, ctx.isMad, 'route_end')
+    const query = this.query()
+      .select(isMad ? GET_MAD_ALL_SELECT : GET_ALL_SELECT)
+      .whereBetween(startLatitude, [args.minLat, args.maxLat])
+      .andWhereBetween(startLongitude, [args.minLon, args.maxLon])
+      .andWhereBetween(distanceMeters, distanceInMeters)
+      .andWhere(
+        isMad ? raw(`UNIX_TIMESTAMP(last_updated) > ${ts}`) : 'updated',
+        '>',
+        ts,
+      )
+      .union((qb) => {
+        qb.select(isMad ? GET_MAD_ALL_SELECT : GET_ALL_SELECT)
+          .whereBetween(endLatitude, [args.minLat, args.maxLat])
+          .andWhereBetween(endLongitude, [args.minLon, args.maxLon])
+          .andWhereBetween(distanceMeters, distanceInMeters)
+          .andWhere(
+            isMad ? raw(`UNIX_TIMESTAMP(last_updated) > ${ts}`) : 'updated',
+            '>',
+            ts,
+          )
+          .from('route')
+        getAreaSql(qb, areaRestrictions, onlyAreas, isMad, 'route_end')
       })
 
-    if (
-      !getAreaSql(query, areaRestrictions, onlyAreas, ctx.isMad, 'route_start')
-    ) {
+    if (!getAreaSql(query, areaRestrictions, onlyAreas, isMad, 'route_start')) {
       return []
     }
+    /** @type {import("@rm/types").FullRoute[]} */
     const results = await query
 
     return results.map((result) => {
@@ -65,9 +95,40 @@ class Route extends Model {
   /**
    * Returns the full route after querying it, generally from the Popup
    * @param {number} id
+   * @param {import('@rm/types').DbContext} ctx
    */
-  static async getOne(id) {
-    const result = await this.query().findById(id)
+  static async getOne(id, { isMad }) {
+    /** @type {import('@rm/types').FullRoute} */
+    const result = isMad
+      ? await this.query()
+          .select({
+            id: 'route_id',
+            name: 'name',
+            description: 'description',
+            distance_meters: 'route_distance_meters',
+            duration_seconds: 'route_duration_seconds',
+            start_fort_id: 'start_poi_fort_id',
+            start_lat: 'start_poi_latitude',
+            start_lon: 'start_poi_longitude',
+            start_image: 'start_poi_image_url',
+            end_fort_id: 'end_poi_fort_id',
+            end_lat: 'end_poi_latitude',
+            end_lon: 'end_poi_longitude',
+            end_image: 'end_poi_image_url',
+            image: 'image',
+            image_border_color: 'image_border_color_hex',
+            reversible: 'reversible',
+            tags: 'tags',
+            type: 'type',
+            version: 'version',
+            waypoints: 'waypoints',
+          })
+          .select(raw('UNIX_TIMESTAMP(last_updated)').as('updated'))
+          .findOne({ route_id: id })
+      : await this.query().findById(id)
+
+    if (!result) return null
+
     if (typeof result.waypoints === 'string') {
       result.waypoints = JSON.parse(result.waypoints)
     } else if (result.waypoints === null) {
@@ -92,14 +153,26 @@ class Route extends Model {
 
   /**
    * returns route context
-   * @returns {{ max_distance: number, max_duration: number }}
+   * @param {import('@rm/types').DbContext} ctx
+   * @returns {Promise<{ max_distance: number, max_duration: number }>}
    */
-  static async getFilterContext() {
+  static async getFilterContext({ isMad }) {
+    if (isMad) {
+      const result = await this.query()
+        .max('route_distance_meters AS max_distance')
+        .max('route_duration_seconds AS max_duration')
+        .first()
+
+      // @ts-ignore
+      return result
+    }
+
     const result = await this.query()
       .max('distance_meters AS max_distance')
       .max('duration_seconds AS max_duration')
       .first()
 
+    // @ts-ignore // shrug, I think we would TS to make this actually work
     return result
   }
 }

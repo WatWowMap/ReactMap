@@ -7,9 +7,6 @@ import getProperName from './functions/getProperName'
 import checkAdvFilter from './functions/checkAdvFilter'
 import dayCheck from './functions/dayCheck'
 import parseQuestConditions from './functions/parseConditions'
-import formatter from './functions/formatter'
-import getRewardInfo from './functions/getRewardInfo'
-import checkAreaValidity from './functions/checkAreaValidity'
 
 export default class Utility {
   static getProperName(word) {
@@ -36,20 +33,12 @@ export default class Utility {
     return parseQuestConditions(conditions)
   }
 
-  static formatter(addressFormat, data) {
-    return formatter(addressFormat, data)
-  }
-
   static camelToSnake(str) {
     return str.replace(/([a-z](?=[A-Z]))/g, '$1_').toLowerCase()
   }
 
   static capitalize(str) {
     return str.charAt(0).toUpperCase() + str.slice(1)
-  }
-
-  static getRewardInfo(...args) {
-    return getRewardInfo(...args)
   }
 
   static getTileBackground(columnIndex, rowIndex) {
@@ -89,28 +78,8 @@ export default class Utility {
     }
   }
 
-  static getMidnight() {
-    const date = new Date()
-    return Math.floor(
-      new Date(
-        date.getFullYear(),
-        date.getMonth(),
-        date.getDate(),
-        0,
-        0,
-        1,
-        0,
-      ).getTime() / 1000,
-    )
-  }
-
-  static analytics(
-    category,
-    action = false,
-    label = false,
-    nonInteraction = false,
-  ) {
-    if (inject?.GOOGLE_ANALYTICS_ID) {
+  static analytics(category, action = '', label = '', nonInteraction = false) {
+    if (CONFIG.googleAnalyticsId) {
       if (action) {
         ReactGA.event({
           category,
@@ -124,6 +93,9 @@ export default class Utility {
     }
   }
 
+  /**
+   * @param {Record<string, number>} sizeObj
+   */
   static getSizes = (sizeObj) => ({
     xs: sizeObj?.xs || 12,
     sm: sizeObj?.sm || sizeObj?.xs || 12,
@@ -138,28 +110,16 @@ export default class Utility {
       12,
   })
 
-  static getQueryArgs(map) {
-    const mapBounds = map.getBounds()
-    return {
-      minLat: mapBounds._southWest.lat,
-      maxLat: mapBounds._northEast.lat,
-      minLon: mapBounds._southWest.lng,
-      maxLon: mapBounds._northEast.lng,
-      zoom: Math.floor(map.getZoom()),
-      ts: Math.floor(Date.now() / 1000),
-      midnight: this.getMidnight(),
-    }
-  }
-
+  /**
+   * Provides the raw content or translated content if available
+   * @param {string | Record<string, string>} content
+   * @returns
+   */
   static getBlockContent(content) {
     if (!content) return ''
     if (typeof content === 'string') return content
     return typeof content === 'object'
       ? content[localStorage.getItem('i18nextLng')] || Object.values(content)[0]
       : ''
-  }
-
-  static checkAreaValidity(...args) {
-    return checkAreaValidity(...args)
   }
 }

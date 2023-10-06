@@ -1,49 +1,92 @@
+// @ts-check
 /* eslint-disable react/no-array-index-key */
-import React from 'react'
-import { Typography } from '@mui/material'
+import * as React from 'react'
+import Typography from '@mui/material/Typography'
+import Dialog from '@mui/material/Dialog'
+import Box from '@mui/material/Box'
+import { useQuery } from '@apollo/client'
 
+import { useLayoutStore, useStore } from '@hooks/useStore'
+import { CUSTOM_COMPONENT, MOTD_CHECK } from '@services/queries/config'
 import Utility from '@services/Utility'
 
 import DialogWrapper from '../custom/DialogWrapper'
 import CustomTile from '../custom/CustomTile'
+import { Loading } from '../general/Loading'
 
-export default function Motd({ motd, perms, handleMotdClose }) {
+const DEFAULT = {
+  settings: {},
+  components: [],
+  titles: [],
+  footerButtons: [],
+}
+
+export default function MessageOfTheDay() {
+  const clientIndex = useStore((s) => s.motdIndex)
+  const tutorial = useStore((s) => s.tutorial)
+
+  const open = useLayoutStore((s) => s.motd)
+
+  const { data: check, loading: loadingCheck } = useQuery(MOTD_CHECK, {
+    fetchPolicy: 'cache-first',
+    variables: { clientIndex },
+  })
+
+  const { data, loading } = useQuery(CUSTOM_COMPONENT, {
+    fetchPolicy: 'cache-first',
+    variables: { component: 'messageOfTheDay' },
+    skip: !open,
+  })
+
+  const motd = /** @type {typeof DEFAULT} */ (data?.customComponent || DEFAULT)
+
+  const handleMotdClose = React.useCallback(() => {
+    if (motd.settings.permanent === false) {
+      useStore.setState({ motdIndex: motd.settings.index })
+    }
+    useLayoutStore.setState({ motd: false })
+  }, [motd])
+
+  React.useEffect(() => {
+    if (check?.motdCheck && !open) {
+      useLayoutStore.setState({ motd: true })
+    }
+  }, [check])
+
   return (
-    <DialogWrapper
-      configObj={motd}
-      defaultTitle="message_of_the_day"
-      handleClose={handleMotdClose}
+    <Dialog
+      open={open && !tutorial}
+      maxWidth={motd.dialogMaxWidth || 'sm'}
+      onClose={handleMotdClose}
     >
-      {motd.components.map((block, i) => {
-        if (block.donorOnly && !perms.donor) return null
-        if (block.freeloaderOnly && perms.donor) return null
-        return (
-          <CustomTile
-            key={i}
-            block={block}
-            defaultReturn={block.type ? null : <DefaultMotD block={block} />}
-          />
-        )
-      })}
-    </DialogWrapper>
+      <DialogWrapper
+        configObj={motd}
+        defaultTitle="message_of_the_day"
+        handleClose={handleMotdClose}
+      >
+        {loading || loadingCheck ? (
+          <Loading />
+        ) : (
+          motd.components.map((block, i) => (
+            <CustomTile
+              key={i}
+              block={block}
+              defaultReturn={block.type ? null : <DefaultMotD block={block} />}
+            />
+          ))
+        )}
+      </DialogWrapper>
+    </Dialog>
   )
 }
 
 const DefaultMotD = ({ block }) =>
   typeof block === 'string' ? (
-    <Typography
-      key={block}
-      variant="subtitle1"
-      align="center"
-      style={{ margin: 20 }}
-    >
+    <Typography key={block} variant="subtitle1" align="center" margin={3}>
       {block}
     </Typography>
   ) : (
-    <div
-      key={`${block.title}-${block.body}`}
-      style={{ whiteSpace: 'pre-line', margin: 20, textAlign: 'center' }}
-    >
+    <Box whiteSpace="pre-line" margin={3} textAlign="center">
       {block.title && (
         <Typography variant="h6">
           {Utility.getBlockContent(block.title)}
@@ -59,5 +102,5 @@ const DefaultMotD = ({ block }) =>
           {Utility.getBlockContent(block.footer)}
         </Typography>
       )}
-    </div>
+    </Box>
   )

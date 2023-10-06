@@ -23,12 +23,12 @@ export default function Extras({ category, subItem, data }) {
   const { setFilters } = useStore.getState()
   const {
     config: {
-      map: { enableConfirmedInvasions, enableQuestSetSelector },
+      misc: { enableConfirmedInvasions, enableQuestSetSelector },
     },
     filters: staticFilters,
   } = useStatic.getState()
 
-  if (category === 'nests' && subItem === 'sliders') {
+  if (category === 'nests' && subItem === 'sliders' && filters[category]) {
     return (
       <ListItem>
         <SliderTile
@@ -50,32 +50,34 @@ export default function Extras({ category, subItem, data }) {
 
   if (category === 's2cells' && subItem === 'cells') {
     return (
-      <CollapsibleItem open={!!filters[category].enabled}>
-        <Select
-          fullWidth
-          value={
-            Array.isArray(filters[category][subItem])
-              ? filters[category][subItem]
-              : []
-          }
-          renderValue={(selected) => selected.join(', ')}
-          multiple
-          onChange={({ target }) =>
-            setFilters({
-              ...filters,
-              [category]: {
-                ...filters[category],
-                [subItem]: target.value,
-              },
-            })
-          }
-        >
-          {[10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20].map((level) => (
-            <MenuItem key={level} value={level}>
-              Level {level}
-            </MenuItem>
-          ))}
-        </Select>
+      <CollapsibleItem open={!!filters[category]?.enabled}>
+        <ListItem>
+          <Select
+            sx={{ mx: 'auto', width: '90%' }}
+            value={
+              Array.isArray(filters[category]?.[subItem])
+                ? filters[category]?.[subItem] || []
+                : []
+            }
+            renderValue={(selected) => selected.join(', ')}
+            multiple
+            onChange={({ target }) =>
+              setFilters({
+                ...filters,
+                [category]: {
+                  ...filters[category],
+                  [subItem]: target.value,
+                },
+              })
+            }
+          >
+            {[10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20].map((level) => (
+              <MenuItem key={level} value={level}>
+                Level {level}
+              </MenuItem>
+            ))}
+          </Select>
+        </ListItem>
       </CollapsibleItem>
     )
   }
@@ -85,7 +87,7 @@ export default function Extras({ category, subItem, data }) {
     (category === 'gyms' && subItem === 'allGyms')
   ) {
     return (
-      <CollapsibleItem open={filters[category][subItem] === true}>
+      <CollapsibleItem open={filters[category]?.[subItem] === true}>
         <ListItem
           secondaryAction={
             <MultiSelector
@@ -107,7 +109,7 @@ export default function Extras({ category, subItem, data }) {
     if (subItem === 'gymBadges') {
       return (
         <CollapsibleItem
-          open={filters[category].gymBadges === true}
+          open={filters[category]?.gymBadges === true}
           style={{ textAlign: 'center', padding: '12px 0' }}
         >
           <ListItem>
@@ -126,13 +128,13 @@ export default function Extras({ category, subItem, data }) {
     if (subItem === 'raids') {
       return (
         <CollapsibleItem
-          open={filters[category].raids === true}
+          open={filters[category]?.raids === true}
           style={{ width: '100%' }}
         >
           <ListItem
             secondaryAction={
               <Select
-                value={filters[category].raidTier}
+                value={filters[category]?.raidTier || ''}
                 fullWidth
                 size="small"
                 onChange={(e) => {
@@ -170,7 +172,7 @@ export default function Extras({ category, subItem, data }) {
     if (enableQuestSetSelector === true && subItem === 'quests') {
       return (
         <CollapsibleItem
-          open={filters[category].quests === true}
+          open={filters[category]?.quests === true}
           style={{ textAlign: 'center' }}
         >
           <ListItem>
@@ -188,7 +190,7 @@ export default function Extras({ category, subItem, data }) {
     if (enableConfirmedInvasions === true && subItem === 'invasions') {
       return (
         <CollapsibleItem
-          open={filters[category][subItem]}
+          open={!!filters[category]?.[subItem]}
           style={{ width: '100%' }}
           alignItems="center"
           justifyContent="flex-end"
@@ -196,7 +198,7 @@ export default function Extras({ category, subItem, data }) {
           <ListItem
             secondaryAction={
               <Switch
-                checked={filters[category].confirmed}
+                checked={filters[category]?.confirmed || false}
                 onChange={() => {
                   setFilters({
                     ...filters,
@@ -216,7 +218,7 @@ export default function Extras({ category, subItem, data }) {
     }
     if (subItem === 'eventStops') {
       return (
-        <CollapsibleItem open={filters[category][subItem]}>
+        <CollapsibleItem open={!!filters[category]?.[subItem]}>
           {available?.pokestops
             .filter((event) => event.startsWith('b'))
             .map((event) => (
@@ -235,7 +237,7 @@ export default function Extras({ category, subItem, data }) {
                   )}
                 />
                 <Switch
-                  checked={filters[category].filter[event].enabled}
+                  checked={filters[category]?.filter[event]?.enabled || false}
                   onChange={() => {
                     setFilters({
                       ...filters,
@@ -259,15 +261,19 @@ export default function Extras({ category, subItem, data }) {
     }
   }
 
-  if (category === 'wayfarer' && subItem === 'submissionCells') {
+  if (
+    category === 'wayfarer' &&
+    subItem === 'submissionCells' &&
+    filters[subItem]
+  ) {
     return (
-      <CollapsibleItem open={filters[subItem].enabled}>
+      <CollapsibleItem open={!!filters[subItem]?.enabled}>
         {['rings', 's14Cells', 's17Cells'].map((item, i) => (
           <ListItem
             key={item}
             secondaryAction={
               <Switch
-                checked={filters[subItem][item]}
+                checked={!!filters[subItem]?.[item]}
                 onChange={() => {
                   setFilters({
                     ...filters,
@@ -277,7 +283,7 @@ export default function Extras({ category, subItem, data }) {
                     },
                   })
                 }}
-                disabled={!filters[subItem].enabled}
+                disabled={filters[subItem]?.enabled === false}
               />
             }
           >
@@ -297,9 +303,9 @@ export default function Extras({ category, subItem, data }) {
       </CollapsibleItem>
     )
   }
-  if (category === 'routes' && subItem === 'enabled') {
+  if (category === 'routes' && subItem === 'enabled' && staticFilters.routes) {
     return (
-      <CollapsibleItem open={filters[category][subItem]}>
+      <CollapsibleItem open={!!filters[category]?.[subItem]}>
         <ListItem>
           <SliderTile
             filterSlide={{
@@ -330,7 +336,7 @@ export default function Extras({ category, subItem, data }) {
 
   if (category === 'admin' && subItem === 'spawnpoints') {
     return (
-      <CollapsibleItem open={filters[subItem]?.enabled === true}>
+      <CollapsibleItem open={!!filters[subItem]?.enabled}>
         <ListItem>
           <MultiSelector
             filters={filters}

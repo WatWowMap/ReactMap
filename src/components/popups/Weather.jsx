@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react'
+// @ts-check
+import * as React from 'react'
 import { Grid, Typography } from '@mui/material'
 import { useTranslation } from 'react-i18next'
 
@@ -6,12 +7,19 @@ import { useStatic } from '@hooks/useStore'
 import Utility from '@services/Utility'
 import ErrorBoundary from '@components/ErrorBoundary'
 
-export default function WeatherPopup({ weather, ts, Icons }) {
+/**
+ *
+ * @param {import('@rm/types').Weather} props
+ * @returns
+ */
+export default function WeatherPopup({ gameplay_condition, updated }) {
   const { t } = useTranslation()
-  const { weather: weatherTypes } = useStatic((state) => state.masterfile)
-  const { gameplay_condition, updated } = weather
+  const weatherTypes = useStatic(
+    (state) => state.masterfile.weather[gameplay_condition]?.types || [],
+  )
+  const Icons = useStatic((state) => state.Icons)
 
-  useEffect(() => {
+  React.useEffect(() => {
     Utility.analytics(
       'Popup',
       `Type: ${t(`weather_${gameplay_condition}`)}`,
@@ -20,7 +28,7 @@ export default function WeatherPopup({ weather, ts, Icons }) {
   }, [])
 
   return (
-    <ErrorBoundary noRefresh style={{}} variant="h5">
+    <ErrorBoundary noRefresh variant="h5">
       <Grid
         container
         direction="row"
@@ -38,13 +46,13 @@ export default function WeatherPopup({ weather, ts, Icons }) {
             {t('last_updated')}:
           </Typography>
         </Grid>
-        <Timer updated={updated} ts={ts} t={t} />
+        <Timer updated={updated} />
         <Grid item xs={12}>
           <Typography variant="subtitle2" align="center">
             {t('boosted_types')}:
           </Typography>
         </Grid>
-        {weatherTypes[gameplay_condition].types.map((type) => (
+        {weatherTypes.map((type) => (
           <Grid item xs={4} key={type} style={{ textAlign: 'center' }}>
             <Typography variant="caption">{t(`poke_type_${type}`)}</Typography>
             <img
@@ -62,9 +70,10 @@ export default function WeatherPopup({ weather, ts, Icons }) {
   )
 }
 
-const Timer = ({ updated, ts, t }) => {
+const Timer = ({ updated, ts = Date.now() / 1000 }) => {
+  const { t } = useTranslation()
   const lastUpdated = new Date(updated * 1000)
-  const [timer, setTimer] = useState(Utility.getTimeUntil(lastUpdated))
+  const [timer, setTimer] = React.useState(Utility.getTimeUntil(lastUpdated))
 
   const date = new Date()
   const currentHour = date.getHours()
@@ -77,7 +86,7 @@ const Timer = ({ updated, ts, t }) => {
     color = 'success.main'
   }
 
-  useEffect(() => {
+  React.useEffect(() => {
     const timer2 = setTimeout(() => {
       setTimer(Utility.getTimeUntil(lastUpdated))
     }, 1000)

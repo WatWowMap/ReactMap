@@ -1,29 +1,27 @@
 const { knex } = require('knex')
 const { raw } = require('objection')
 const extend = require('extend')
-const { log, HELPERS } = require('./logger')
+const config = require('@rm/config')
+
+const { log, HELPERS } = require('@rm/logger')
 
 /**
- * @type {import("../types").DbCheckClass}
+ * @type {import("@rm/types").DbCheckClass}
  */
 module.exports = class DbCheck {
-  /**
-   * @param {import("../models").ScannerModelKeys[]} validModels
-   * @param {{ schemas: import("../types").Schema[], settings: { maxConnections: number } }} dbConfig
-   * @param {boolean} queryDebug
-   * @param {object} apiSettings
-   * @param {'km' | 'mi'} distanceUnit
-   * @param {import("../types").RarityPercents} rarityPercents
-   */
-  constructor(
-    validModels,
-    dbConfig,
-    queryDebug,
-    apiSettings,
-    distanceUnit,
-    rarityPercents,
-  ) {
-    this.validModels = validModels
+  constructor() {
+    this.validModels = /** @type {const} */ ([
+      'Device',
+      'Gym',
+      'Nest',
+      'Pokestop',
+      'Pokemon',
+      'Portal',
+      'Route',
+      'ScanCell',
+      'Spawnpoint',
+      'Weather',
+    ])
     this.singleModels = /** @type {const} */ ([
       'Backup',
       'Badge',
@@ -31,8 +29,8 @@ module.exports = class DbCheck {
       'Session',
       'User',
     ])
-    this.searchLimit = apiSettings.searchLimit
-    this.rarityPercents = rarityPercents
+    this.searchLimit = config.getSafe('api.searchResultsLimit')
+    this.rarityPercents = config.getSafe('rarity.percents')
     this.models = {}
     this.questConditions = {}
     this.endpoints = {}
@@ -42,7 +40,8 @@ module.exports = class DbCheck {
       Route: { maxDistance: 0, maxDuration: 0 },
     }
     this.reactMapDb = null
-    this.connections = dbConfig.schemas
+    this.connections = config
+      .getSafe('database.schemas')
       .filter((s) => s.useFor.length)
       .map((schema, i) => {
         schema.useFor.forEach((category) => {
@@ -62,7 +61,7 @@ module.exports = class DbCheck {
             this.models[capital].push({ connection: i })
           }
         })
-        if (schema.endpoint) {
+        if ('endpoint' in schema) {
           this.endpoints[i] = schema
           return null
         }
@@ -75,10 +74,10 @@ module.exports = class DbCheck {
             password: schema.password,
             database: schema.database,
           },
-          debug: queryDebug,
+          debug: config.getSafe('devOptions.queryDebug'),
           pool: {
             min: 0,
-            max: dbConfig.settings.maxConnections,
+            max: config.getSafe('database.settings.maxConnections'),
             afterCreate: (conn, done) =>
               conn.query('SET time_zone="+00:00";', (err) => done(err, conn)),
           },
@@ -86,7 +85,10 @@ module.exports = class DbCheck {
             warn: (message) => log.warn(HELPERS.knex, message),
             error: (message) => log.error(HELPERS.knex, message),
             debug: (message) =>
-              log[queryDebug ? 'info' : 'debug'](HELPERS.knex, message),
+              log[config.getSafe('devOptions.queryDebug') ? 'info' : 'debug'](
+                HELPERS.knex,
+                message,
+              ),
             enableColors: true,
           },
         })
@@ -98,7 +100,7 @@ module.exports = class DbCheck {
       )
       process.exit(0)
     }
-    this.distanceUnit = distanceUnit
+    this.distanceUnit = config.getSafe('map.misc.distanceUnit')
   }
 
   /**
@@ -122,7 +124,7 @@ module.exports = class DbCheck {
 
   /**
    * @param {import('knex').Knex} schema
-   * @returns {Promise<import('../types').DbContext>}
+   * @returns {Promise<import("@rm/types").DbContext>}
    */
   static async schemaCheck(schema) {
     const [isMad, pvpV2, hasSize, hasHeight] = await schema('pokemon')
@@ -341,7 +343,7 @@ module.exports = class DbCheck {
       log.error(
         HELPERS.db,
         e,
-        `\n\nOnly ${[this.validModels].join(
+        `\n\nOnly ${[...this.validModels, ...this.singleModels].join(
           ', ',
         )} are valid options in the useFor arrays`,
       )
@@ -350,7 +352,7 @@ module.exports = class DbCheck {
   }
 
   /**
-   * @template {import('../types').BaseRecord} T
+   * @template {import("@rm/types").BaseRecord} T
    * @param {T[][]} results
    * @returns {T[]}
    */
@@ -377,9 +379,9 @@ module.exports = class DbCheck {
   }
 
   /**
-   * @template {import('../types').BaseRecord} T
+   * @template {import("@rm/types").BaseRecord} T
    * @param {import("../models").ScannerModelKeys} model
-   * @param {import("../types").Permissions} perms
+   * @param {import("@rm/types").Permissions} perms
    * @param {object} args
    * @param {number} userId
    * @param {'getAll' | string} method
@@ -400,7 +402,7 @@ module.exports = class DbCheck {
   }
 
   /**
-   * @template {import('../types').BaseRecord} T
+   * @template {import("@rm/types").BaseRecord} T
    * @param {import("../models").ScannerModelKeys} model
    * @param {string} id
    * @returns {Promise<T | {}>}
@@ -416,9 +418,9 @@ module.exports = class DbCheck {
   }
 
   /**
-   * @template {import('../types').BaseRecord} T
+   * @template {import("@rm/types").BaseRecord} T
    * @param {import("../models").ScannerModelKeys} model
-   * @param {import("../types").Permissions} perms
+   * @param {import("@rm/types").Permissions} perms
    * @param {object} args
    * @param {'search' | string} method
    * @returns {Promise<T[]>}
@@ -444,11 +446,11 @@ module.exports = class DbCheck {
   }
 
   /**
-   * @param {import("../types").Permissions} perms
+   * @param {import("@rm/types").Permissions} perms
    * @param {object} args
    * @returns {Promise<[
-   *  import('../types').BaseRecord[],
-   *  import('../types').BaseRecord[]
+   *  import("@rm/types").BaseRecord[],
+   *  import("@rm/types").BaseRecord[]
    * ]>}
    */
   async submissionCells(perms, args) {
@@ -473,13 +475,13 @@ module.exports = class DbCheck {
    * const results = await dbCheck.query('Pokemon', 'getAll', perms, args)
    *
    * @template {import('../models').ModelKeys} T
-   * @template {keyof import('../types').ExtractMethods<import('../models').Models[T]>} U
-   * @template {ReturnType<import('../types').ExtractMethods<import('../models').Models[T]>[U]>} V
+   * @template {keyof import("@rm/types").ExtractMethods<import('../models').Models[T]>} U
+   * @template {Awaited<ReturnType<import("@rm/types").ExtractMethods<import('../models').Models[T]>[U]>>} V
    * @param {T} model The model to query
    * @param {U} method The method to call on the model
    * @param {T extends import('../models').ScannerModelKeys
-   *  ? import('../types').Head<Parameters<import('../types').ExtractMethods<import('../models').Models[T]>[U]>>
-   *  : Parameters<import('../types').ExtractMethods<import('../models').Models[T]>[U]>
+   *  ? import("@rm/types").Head<Parameters<import("@rm/types").ExtractMethods<import('../models').Models[T]>[U]>>
+   *  : Parameters<import("@rm/types").ExtractMethods<import('../models').Models[T]>[U]>
    * } args The arguments to pass to the method
    * @returns {Promise<V>} The result of the query
    */
@@ -490,7 +492,7 @@ module.exports = class DbCheck {
           SubModel[method](...args, source),
         ),
       )
-      return DbCheck.deDupeResults(data)
+      return DbCheck.deDupeResults(data.filter(Boolean))
     }
     return this.models[model][method](...args)
   }

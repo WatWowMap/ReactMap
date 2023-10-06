@@ -1,84 +1,48 @@
-import React from 'react'
+import * as React from 'react'
 import MarkerClusterGroup from 'react-leaflet-cluster'
-import { useStatic } from '@hooks/useStore'
-import * as index from './tiles/index'
+import { useStatic, useStore } from '@hooks/useStore'
+
 import Notification from './layout/general/Notification'
 
-const ignoredClustering = ['devices', 'submissionCells', 'scanCells', 'weather']
+const IGNORE_CLUSTERING = ['devices', 'submissionCells', 'scanCells', 'weather']
 
-export default function Clustering({
-  category,
-  renderedData,
-  userSettings,
-  clusteringRules,
-  staticUserSettings,
-  params,
-  filters,
-  map,
-  Icons,
-  perms,
-  tileStyle,
-  config,
-  userIcons,
-  setParams,
-  timeOfDay,
-  onlyAreas,
-}) {
-  const Component = index[category]
-  const hideList = useStatic((state) => state.hideList)
-  const excludeList = useStatic((state) => state.excludeList)
-  const timerList = useStatic((state) => state.timerList)
+/**
+ *
+ * @param {{
+ *  category: keyof import('@rm/types').Config['api']['polling'],
+ *  children: React.ReactNode[]
+ * }} param0
+ * @returns
+ */
+export default function Clustering({ category, children }) {
+  const {
+    config: {
+      clustering: { [category]: clustering },
+      general: { minZoom },
+    },
+  } = useStatic.getState()
 
-  const ts = Math.floor(Date.now() / 1000)
-  const currentZoom = map.getZoom()
+  const clusteringRules = clustering || {
+    forcedLimit: 10000,
+    zoomLevel: minZoom,
+  }
 
-  const showCircles =
-    userSettings.interactionRanges && currentZoom >= config.interactionRangeZoom
-
-  const finalData = renderedData.map((each) => {
-    if (!each) return null
-    const id = each.id || category
-    if (!hideList.includes(id)) {
-      return (
-        <Component
-          key={`${id}-${userSettings.clustering}`}
-          item={each}
-          ts={ts}
-          filters={filters}
-          map={map}
-          config={config}
-          showTimer={timerList.includes(each.id)}
-          Icons={Icons}
-          userIcons={userIcons}
-          perms={perms}
-          zoom={currentZoom}
-          tileStyle={tileStyle}
-          excludeList={excludeList}
-          userSettings={userSettings}
-          staticUserSettings={staticUserSettings}
-          params={params}
-          setParams={setParams}
-          showCircles={showCircles}
-          timeOfDay={timeOfDay}
-          onlyAreas={onlyAreas}
-        />
-      )
-    }
-    return null
-  })
+  const userCluster = useStore(
+    (s) => s.userSettings[category]?.clustering || false,
+  )
 
   const limitHit =
-    finalData.length > clusteringRules.forcedLimit &&
-    !ignoredClustering.includes(category)
+    children.length > clusteringRules.forcedLimit &&
+    !IGNORE_CLUSTERING.includes(category)
 
-  return limitHit || (clusteringRules.zoomLevel && userSettings.clustering) ? (
+  return limitHit || (clusteringRules.zoomLevel && userCluster) ? (
     <>
       <MarkerClusterGroup
-        key={`${limitHit}-${userSettings.clustering}-${category}`}
+        key={`${userCluster}-${limitHit}`}
         disableClusteringAtZoom={limitHit ? 20 : clusteringRules.zoomLevel}
         chunkedLoading
       >
-        {finalData}
+        {children}
       </MarkerClusterGroup>
       <Notification
         open={limitHit}
@@ -87,7 +51,7 @@ export default function Clustering({
         messages={[
           {
             key: 'limitHit',
-            variables: [category, clusteringRules.forcedLimit],
+            variables: [category, clusteringRules.forcedLimit || 0],
           },
           {
             key: 'zoomIn',
@@ -97,6 +61,6 @@ export default function Clustering({
       />
     </>
   ) : (
-    finalData
+    children
   )
 }

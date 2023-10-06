@@ -1,14 +1,20 @@
 import { useState } from 'react'
-import Locate from 'leaflet.locatecontrol'
-import L from 'leaflet'
+import { LayerGroup, DomEvent, DomUtil, Control } from 'leaflet'
 import { useTranslation } from 'react-i18next'
+import { useMap } from 'react-leaflet'
+import 'leaflet.locatecontrol'
 
-export default function useLocation(map) {
+/**
+ * Use location hook
+ * @returns {{ lc: any, color: import('@mui/material').ButtonProps['color'] }}
+ */
+export default function useLocation() {
+  const map = useMap()
   const [color, setColor] = useState('inherit')
   const { t } = useTranslation()
 
   const [lc] = useState(() => {
-    const LocateFab = Locate.extend({
+    const LocateFab = Control.Locate.extend({
       _setClasses(state) {
         if (state === 'requesting') setColor('secondary')
         else if (state === 'active') setColor('success')
@@ -18,13 +24,13 @@ export default function useLocation(map) {
         setColor('inherit')
       },
       onAdd() {
-        const container = L.DomUtil.create(
+        const container = DomUtil.create(
           'div',
           'react-locate-control leaflet-bar leaflet-control',
         )
         this._container = container
         this._map = map
-        this._layer = this.options.layer || new L.LayerGroup()
+        this._layer = this.options.layer || new LayerGroup()
         this._layer.addTo(map)
         this._event = undefined
         this._compassHeading = null
@@ -37,16 +43,16 @@ export default function useLocation(map) {
         this._link = linkAndIcon.link
         this._icon = linkAndIcon.icon
 
-        L.DomEvent.on(
+        DomEvent.on(
           this._link,
           'click',
           function stuff(ev) {
-            L.DomEvent.stopPropagation(ev)
-            L.DomEvent.preventDefault(ev)
+            DomEvent.stopPropagation(ev)
+            DomEvent.preventDefault(ev)
             this._onClick()
           },
           this,
-        ).on(this._link, 'dblclick', L.DomEvent.stopPropagation)
+        ).on(this._link, 'dblclick', DomEvent.stopPropagation)
 
         this._resetVariables()
 
@@ -68,8 +74,7 @@ export default function useLocation(map) {
           maximumAge: 5000,
         },
       },
-    })
-    result.addTo(map)
+    }).addTo(map)
     return result
   })
   return { lc, color }

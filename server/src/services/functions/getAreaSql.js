@@ -1,16 +1,28 @@
-const config = require('../config')
+// @ts-check
+const config = require('@rm/config')
 const { consolidateAreas } = require('./consolidateAreas')
 
-module.exports = function getAreaRestrictionSql(
+/**
+ *
+ * @param {import('objection').QueryBuilder} query
+ * @param {string[]} areaRestrictions
+ * @param {string[]} onlyAreas
+ * @param {boolean} [isMad]
+ * @param {string} [category]
+ * @returns
+ */
+function getAreaRestrictionSql(
   query,
   areaRestrictions,
   onlyAreas,
-  isMad,
-  category,
+  isMad = false,
+  category = '',
 ) {
+  const authentication = config.getSafe('authentication')
+  const areas = config.getSafe('areas')
   if (
-    config.authentication.strictAreaRestrictions &&
-    config.authentication.areaRestrictions.length &&
+    authentication.strictAreaRestrictions &&
+    authentication.areaRestrictions.length &&
     !areaRestrictions.length
   )
     return false
@@ -30,6 +42,10 @@ module.exports = function getAreaRestrictionSql(
     }
     if (category === 'pokemon') {
       columns = columns.map((each) => `pokemon.${each}`)
+    } else if (category === 'route_start') {
+      columns = columns.map((each) => `start_poi_${each}`)
+    } else if (category === 'route_end') {
+      columns = columns.map((each) => `end_poi_${each}`)
     }
   } else if (category === 'device') {
     columns = columns.map((each) => `last_${each}`)
@@ -43,10 +59,10 @@ module.exports = function getAreaRestrictionSql(
 
   query.andWhere((restrictions) => {
     consolidatedAreas.forEach((area) => {
-      if (config.areas.polygons[area]) {
+      if (areas.polygons[area]) {
         restrictions.orWhereRaw(
           `ST_CONTAINS(ST_GeomFromGeoJSON('${JSON.stringify(
-            config.areas.polygons[area],
+            areas.polygons[area],
           )}', 2, 0), POINT(${columns[1]}, ${columns[0]}))`,
         )
       }
@@ -54,3 +70,5 @@ module.exports = function getAreaRestrictionSql(
   })
   return true
 }
+
+module.exports = getAreaRestrictionSql

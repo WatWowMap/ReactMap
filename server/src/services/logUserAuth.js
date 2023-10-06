@@ -1,6 +1,14 @@
 // @ts-check
 const { default: fetch } = require('node-fetch')
-const { log, HELPERS } = require('./logger')
+const { log, HELPERS } = require('@rm/logger')
+
+// PII fields inside getAuthInfo embed
+const PII_FIELDS = [
+  'Ip Address',
+  'Geo Lookup',
+  'Google Map',
+  'Network Provider',
+]
 
 /**
  * Convert camelCase to Capitalized Words
@@ -17,7 +25,7 @@ const capCamel = (str) =>
 /**
  * Map permissions to a string
  * @param {string[]} perms
- * @param {import('../types').Permissions} userPerms
+ * @param {import("@rm/types").Permissions} userPerms
  */
 const mapPerms = (perms, userPerms) =>
   perms
@@ -29,11 +37,12 @@ const mapPerms = (perms, userPerms) =>
 /**
  * Log user authentication to Discord
  * @param {import('express').Request} req
- * @param {import('../types').User} user
+ * @param {{ id: string, username: string, perms: import("@rm/types").Permissions, valid: boolean, avatar: string }} user
  * @param {string} strategy
- * @returns
+ * @param {boolean} hidePii
+ * @returns {Promise<import('discord.js').APIEmbed>}
  */
-async function getAuthInfo(req, user, strategy = 'custom') {
+async function getAuthInfo(req, user, strategy = 'custom', hidePii = false) {
   const ip =
     req.headers['cf-connecting-ip'] ||
     `${req.headers['x-forwarded-for'] || ''}`.split(', ')[0] ||
@@ -144,7 +153,7 @@ async function getAuthInfo(req, user, strategy = 'custom') {
         inline: true,
       },
     ],
-    timestamp: new Date(),
+    timestamp: new Date().toISOString(),
   }
   if (user.perms.areaRestrictions.length) {
     const trimmed = user.perms.areaRestrictions
@@ -197,6 +206,11 @@ async function getAuthInfo(req, user, strategy = 'custom') {
       HELPERS.custom(strategy, '#7289da'),
       user.id,
       'Not authorized to access map',
+    )
+  }
+  if (hidePii) {
+    embed.fields = embed.fields.filter(
+      (field) => !PII_FIELDS.includes(field.name),
     )
   }
   return embed

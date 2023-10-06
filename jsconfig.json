@@ -2,23 +2,23 @@
   "compilerOptions": {
     "target": "ESNext",
     "module": "CommonJS",
-    "allowSyntheticDefaultImports": false,
     "resolveJsonModule": true,
-    "baseUrl": "./src",
+    "esModuleInterop": true,
+    "baseUrl": ".",
     "jsx": "react",
     "paths": {
       "@assets/*": [
-        "./assets/*"
+        "./src/assets/*"
       ],
       "@components/*": [
-        "./components/*"
+        "./src/components/*"
       ],
       "@services/*": [
-        "./services/*"
+        "./src/services/*"
       ],
       "@hooks/*": [
-        "./hooks/*"
-      ]
+        "./src/hooks/*"
+      ],
     }
   },
   "exclude": [

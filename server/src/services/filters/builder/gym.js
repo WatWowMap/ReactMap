@@ -1,10 +1,18 @@
+// @ts-check
+const { Event } = require('../../initialization')
 const BaseFilter = require('../Base')
 
-module.exports = function buildGyms(perms, defaults, available) {
+/**
+ *
+ * @param {import("@rm/types").Permissions} perms
+ * @param {import("@rm/types").Config['defaultFilters']['gyms']} defaults
+ * @returns
+ */
+function buildGyms(perms, defaults) {
   const gymFilters = {}
 
   if (perms.gyms) {
-    defaults.baseTeamIds.forEach((team, i) => {
+    Object.keys(Event.masterfile.teams).forEach((team, i) => {
       gymFilters[`t${team}-0`] = new BaseFilter(defaults.allGyms)
       if (i) {
         defaults.baseGymSlotAmounts.forEach((slot) => {
@@ -14,12 +22,14 @@ module.exports = function buildGyms(perms, defaults, available) {
     })
   }
   if (perms.raids) {
-    defaults.baseRaidTiers.forEach((tier) => {
-      gymFilters[`e${tier}`] = new BaseFilter(defaults.eggs)
-      gymFilters[`r${tier}`] = new BaseFilter(defaults.raids)
+    Object.keys(Event.masterfile.raids).forEach((tier) => {
+      if (tier !== '0') {
+        gymFilters[`e${tier}`] = new BaseFilter(defaults.eggs)
+        gymFilters[`r${tier}`] = new BaseFilter(defaults.raids)
+      }
     })
   }
-  available.gyms.forEach((avail) => {
+  Event.getAvailable('gyms').forEach((avail) => {
     if (perms.gyms && (avail.startsWith('t') || avail.startsWith('g'))) {
       gymFilters[avail] = new BaseFilter(defaults.allGyms)
     }
@@ -34,3 +44,5 @@ module.exports = function buildGyms(perms, defaults, available) {
   })
   return gymFilters
 }
+
+module.exports = buildGyms

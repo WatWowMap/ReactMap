@@ -1,6 +1,7 @@
-import L from 'leaflet'
+import { useStatic } from '@hooks/useStore'
+import { divIcon } from 'leaflet'
 
-export default function weatherMarker(weather, Icons, timeOfDay) {
+export default function weatherMarker(iconUrl) {
   const [
     {
       offsetX,
@@ -10,9 +11,9 @@ export default function weatherMarker(weather, Icons, timeOfDay) {
       sizeMultiplier,
       disableColorShift = false,
     },
-  ] = Icons.getModifiers('weather')
+  ] = useStatic.getState().Icons.getModifiers('weather')
 
-  return L.divIcon({
+  return divIcon({
     iconAnchor: [17 * offsetX, 17 * offsetY],
     popupAnchor: [popupX + 1, -20 + popupY],
     iconSize: [30 * sizeMultiplier, 30 * sizeMultiplier],
@@ -20,12 +21,12 @@ export default function weatherMarker(weather, Icons, timeOfDay) {
     html: /* html */ `
       <img
         class="${disableColorShift ? '' : 'fancy'}"
-        alt="${weather.gameplay_condition}"
-        src="${Icons.getWeather(weather.gameplay_condition, timeOfDay)}"
+        alt="${iconUrl}"
+        src="${iconUrl}"
         style="
-          width: 24px;
-          height: 24px;
-          padding: 2.5px;
+          width: 26px;
+          height: 26px;
+          padding: 4px;
         "
       />
     `,

@@ -1,5 +1,6 @@
-import L from 'leaflet'
-import getOpacity from '@services/functions/getOpacity'
+// @ts-check
+import { divIcon } from 'leaflet'
+import { useStatic } from '@hooks/useStore'
 
 const getBadgeColor = (raidLevel) => {
   switch (raidLevel) {
@@ -18,92 +19,52 @@ const getBadgeColor = (raidLevel) => {
   }
 }
 
-export default function GymMarker(
-  gym,
-  hasHatched,
-  hasRaid,
-  filters,
-  Icons,
-  userSettings,
+/**
+ *
+ * @param {{
+ *  gymIconUrl: string,
+ *  gymIconSize: number,
+ *  raidIconUrl: string,
+ *  raidIconSize: number,
+ *  showDiamond: boolean,
+ *  showExBadge: boolean,
+ *  showArBadge: boolean,
+ *  showRaidLevel: boolean,
+ *  opacity: number,
+ * } & import('@rm/types').Gym} params
+ * @returns
+ */
+export default function gymMarker({
+  gymIconUrl,
+  gymIconSize,
+  raidIconUrl,
+  raidIconSize,
+  showDiamond,
+  showExBadge,
+  showArBadge,
+  showRaidLevel,
+  opacity,
+  available_slots,
+  in_battle,
+  raid_level,
   badge,
-) {
-  const {
-    in_battle,
-    team_id,
-    available_slots,
-    raid_level,
-    ex_raid_eligible,
-    ar_scan_eligible,
-  } = gym
+  ...gym
+}) {
+  const { Icons } = useStatic.getState()
   const [gymMod, raidMod] = Icons.getModifiers('gym', 'raid')
 
   const filledSlots = available_slots !== null ? 6 - available_slots : 0
-  let filterId =
-    team_id === 0 ? `t${team_id}-0` : `g${team_id}-${filledSlots || 0}`
-  const gymIcon = Icons.getGyms(
-    team_id,
-    filledSlots,
-    in_battle,
-    userSettings.showExBadge && ex_raid_eligible,
-    userSettings.showArBadge && ar_scan_eligible,
-  )
-  const gymSize = Icons.getSize('gym', filters.filter[filterId])
-  let raidIcon
-  let raidSize = 0
-  const slotModifier = gymMod[filledSlots] || gymMod['0'] || gymSize * 0.5
-  const showDiamond =
-    filters.gymBadges && userSettings.gymBadgeDiamonds && badge
+  const slotModifier = gymMod[filledSlots] || gymMod['0'] || gymIconSize * 0.5
 
-  if (hasRaid) {
-    const {
-      raid_pokemon_id,
-      raid_pokemon_evolution,
-      raid_pokemon_costume,
-      raid_pokemon_gender,
-      raid_pokemon_form,
-      raid_pokemon_alignment,
-      raid_is_exclusive,
-    } = gym
+  const hasBattle = Boolean(in_battle && !gymIconUrl.includes('_b'))
 
-    if (raid_pokemon_id) {
-      filterId = `${raid_pokemon_id}-${raid_pokemon_form}`
-      raidIcon = Icons.getPokemon(
-        raid_pokemon_id,
-        raid_pokemon_form,
-        raid_pokemon_evolution,
-        raid_pokemon_gender,
-        raid_pokemon_costume,
-        raid_pokemon_alignment,
-      )
-      raidSize = Icons.getSize('raid', filters.filter[filterId])
-    } else {
-      filterId = `e${raid_level}`
-      raidIcon = Icons.getEggs(raid_level, hasHatched, raid_is_exclusive)
-      raidSize = Icons.getSize('raid', filters.filter[filterId])
-    }
-  }
-
-  const opacity = userSettings.raidOpacity
-    ? getOpacity(gym.raid_end_timestamp, userSettings)
-    : 1
-
-  const hasEx = Boolean(
-    userSettings.showExBadge && ex_raid_eligible && !gymIcon.includes('_ex'),
-  )
-
-  const hasAr = Boolean(
-    userSettings.showArBadge && ar_scan_eligible && !gymIcon.includes('_ar'),
-  )
-
-  const hasBattle = Boolean(in_battle && !gymIcon.includes('_b'))
-
-  return L.divIcon({
+  return divIcon({
     popupAnchor: [
       0 + gymMod.popupX + gymMod.offsetX,
-      (-gymSize - (showDiamond ? 20 : slotModifier) - raidSize) * 0.67 +
+      (-gymIconSize - (showDiamond ? 20 : slotModifier) - raidIconSize) * 0.67 +
         gymMod.popupY +
         gymMod.offsetY +
-        (raidIcon ? raidMod.offsetY + raidMod.popupY : 0),
+        (raidIconUrl ? raidMod.offsetY + raidMod.popupY : 0),
     ],
     className: 'gym-marker',
     html: /* html */ `
@@ -137,24 +98,24 @@ export default function GymMarker(
                 />`
               : /* html */
                 `<img
-                  src="${gymIcon}"
-                  alt="${gymIcon}"
+                  src="${gymIconUrl}"
+                  alt="${gymIconUrl}"
                   style="
-                    width: ${gymSize}px;
-                    height: ${gymSize}px;
+                    width: ${gymIconSize}px;
+                    height: ${gymIconSize}px;
                     bottom: ${2 + gymMod.offsetY}px;
                     left: ${gymMod.offsetX * 50}%;
                     transform: translateX(-50%);
                   "
                 />
           ${
-            hasEx
+            showExBadge
               ? /* html */
                 `<img
                   src="${Icons.getMisc('ex')}"
                   alt="ex"
                   style="
-                    width: ${gymSize / 1.5}px;
+                    width: ${gymIconSize / 1.5}px;
                     height: auto;
                     bottom: ${2 + gymMod.offsetY}px;
                     left: ${gymMod.offsetX * -33}%;
@@ -164,13 +125,13 @@ export default function GymMarker(
               : ''
           }
           ${
-            hasAr
+            showArBadge
               ? /* html */
                 `<img
                   src="${Icons.getMisc('ar')}"
                   alt="ar"
                   style="
-                    width: ${gymSize / 2}px;
+                    width: ${gymIconSize / 2}px;
                     height: auto;
                     bottom: ${23 + gymMod.offsetY}px;
                     left: ${gymMod.offsetX * -40}%;
@@ -186,7 +147,7 @@ export default function GymMarker(
                   src="${Icons.getMisc('battle')}"
                   alt="battle"
                   style="
-                    width: ${gymSize}px;
+                    width: ${gymIconSize}px;
                     height: 'auto',
                     bottom: ${13 + gymMod.offsetY}px;
                     left: ${gymMod.offsetX * 50}%;
@@ -198,16 +159,18 @@ export default function GymMarker(
           `
           }
           ${
-            raidIcon
+            raidIconUrl
               ? /* html */
                 `<img
-                  src="${raidIcon}"
-                  alt="${raidIcon}"
+                  src="${raidIconUrl}"
+                  alt="${raidIconUrl}"
                   style="
                     opacity: ${opacity};
-                    width: ${raidSize}px;
-                    height: ${raidSize}px;
-                    bottom: ${gymSize * 0.4 + slotModifier * raidMod.offsetY}px;
+                    width: ${raidIconSize}px;
+                    height: ${raidIconSize}px;
+                    bottom: ${
+                      gymIconSize * 0.4 + slotModifier * raidMod.offsetY
+                    }px;
                     left: ${raidMod.offsetX * 55}%;
                     transform: translateX(-50%);
                   "
@@ -215,14 +178,14 @@ export default function GymMarker(
               : ''
           }
           ${
-            raidIcon && userSettings.raidLevelBadges /* html */
+            showRaidLevel /* html */
               ? `
                 <div
                   class="iv-badge flex-center raid-badge"
                   style="
                     opacity: ${opacity};
                     background-color: ${getBadgeColor(raid_level)};
-                    bottom: ${gymSize * 0.4 * raidMod.offsetY}px;
+                    bottom: ${gymIconSize * 0.4 * raidMod.offsetY}px;
                     left: ${raidMod.offsetX * 200}%;
                     transform: translateX(-50%);
                     min-width: ${raid_level === 6 ? 10 : 12}px;

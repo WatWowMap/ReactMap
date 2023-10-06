@@ -1,28 +1,44 @@
-import React from 'react'
-import { Button, Typography } from '@mui/material'
+import * as React from 'react'
+import Button from '@mui/material/Button'
 
-import Utility from '@services/Utility'
+import { I } from '../general/I'
 
-import LinkWrapper from './LinkWrapper'
-import FAIcon from '../general/FAIcon'
+const THEME_COLORS = new Set([
+  'success',
+  'warning',
+  'error',
+  'info',
+  'primary',
+  'secondary',
+  'inherit',
+])
 
-export default function CustomButton({ block, isMuiColor = false }) {
-  const button = (
+/** @param {import('@mui/material').ButtonProps & { icon?: string }} */
+export default function CustomButton({
+  size,
+  color = 'inherit',
+  variant = 'text',
+  style = {},
+  sx,
+  icon = null,
+  children,
+  className,
+}) {
+  const isMuiColor = THEME_COLORS.has(color)
+  return (
     <Button
-      size={block.size}
-      color={isMuiColor ? block.color : 'inherit'}
-      variant={block.variant}
-      href={block.href}
-      style={block.style || { color: isMuiColor ? 'inherit' : block.color }}
+      className={className}
+      size={size}
+      color={isMuiColor ? color : undefined}
+      bgcolor={isMuiColor ? undefined : color}
+      variant={variant}
+      style={style}
+      sx={sx}
+      startIcon={
+        icon ? <I className={icon} style={{ fontSize: 30 }} /> : undefined
+      }
     >
-      {Boolean(block.icon) && (
-        <FAIcon className={block.icon} style={{ fontSize: 30 }} />
-      )}
-      &nbsp;
-      <Typography variant="button" align="right">
-        {Utility.getBlockContent(block.content)}
-      </Typography>
+      {children}
     </Button>
   )
-  return block.link ? <LinkWrapper block={block} element={button} /> : button
 }

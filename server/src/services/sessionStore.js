@@ -1,30 +1,30 @@
+// @ts-check
 const session = require('express-session')
+// @ts-ignore
 const MySQLStore = require('express-mysql-session')(session)
-const {
-  api: { sessionCheckIntervalMs },
-  database: {
-    schemas,
-    settings: { sessionTableName },
-  },
-} = require('./config')
 
-const dbSelection = schemas.find(({ useFor }) => useFor?.includes('user'))
+const config = require('@rm/config')
 
-const sessionStore = dbSelection
-  ? new MySQLStore({
-      clearExpired: true,
-      checkExpirationInterval: sessionCheckIntervalMs,
-      createDatabaseTable: true,
-      endConnectionOnClose: true,
-      schema: {
-        tableName: sessionTableName,
-      },
-      host: dbSelection.host,
-      port: dbSelection.port,
-      password: dbSelection.password,
-      user: dbSelection.username,
-      database: dbSelection.database,
-    })
-  : null
+const dbSelection = config
+  .getSafe('database.schemas')
+  .find(({ useFor }) => useFor?.includes('user'))
+
+const sessionStore =
+  dbSelection && 'host' in dbSelection
+    ? new MySQLStore({
+        clearExpired: true,
+        checkExpirationInterval: config.getSafe('api.sessionCheckIntervalMs'),
+        createDatabaseTable: true,
+        endConnectionOnClose: true,
+        schema: {
+          tableName: config.getSafe('database.settings.sessionTableName'),
+        },
+        host: dbSelection.host,
+        port: dbSelection.port,
+        password: dbSelection.password,
+        user: dbSelection.username,
+        database: dbSelection.database,
+      })
+    : null
 
 module.exports = sessionStore

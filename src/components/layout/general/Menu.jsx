@@ -17,8 +17,6 @@ import WebhookAdvanced from '../dialogs/webhooks/WebhookAdv'
 import AdvSearch from '../dialogs/filters/AdvSearch'
 
 export default function Menu({
-  isTablet,
-  isMobile,
   category,
   Tile,
   webhookCategory,
@@ -32,9 +30,10 @@ export default function Menu({
 }) {
   Utility.analytics(`/advanced/${category}`)
 
-  const { setMenus, setAdvMenu } = useStore.getState()
+  const isMobile = useStatic((s) => s.isMobile)
+  const isTablet = useStatic((s) => s.isTablet)
+
   const menus = useStore((state) => state.menus)
-  const advMenu = useStore((state) => state.advMenu)
   const { t } = useTranslation()
   const Icons = useStatic((s) => s.Icons)
 
@@ -79,15 +78,18 @@ export default function Menu({
     setTempFilters({ ...tempFilters, ...newObj })
   }
 
-  const toggleDrawer = (open) => (event) => {
-    if (
-      event.type === 'keydown' &&
-      (event.key === 'Tab' || event.key === 'Shift')
-    ) {
-      return
-    }
-    setFilterDrawer(open)
-  }
+  const toggleDrawer = React.useCallback(
+    (open) => (event) => {
+      if (
+        event.type === 'keydown' &&
+        (event.key === 'Tab' || event.key === 'Shift')
+      ) {
+        return
+      }
+      setFilterDrawer(open)
+    },
+    [],
+  )
 
   const toggleAdvMenu = (open, id, newFilters) => (event) => {
     if (
@@ -111,7 +113,10 @@ export default function Menu({
         newObj[key] = { ...newFilters, enabled }
 
         // ugly patch for also changing gym slots with the apply to all
-        if (key.startsWith('t') && key.charAt(1) != 0) {
+        if (
+          (key.startsWith('t') && key.charAt(1) != 0 && category === 'gym') ||
+          webhookCategory
+        ) {
           Object.assign(
             newObj,
             Utility.generateSlots(key, newFilters, tempFilters),
@@ -196,71 +201,55 @@ export default function Menu({
     }
   }
 
-  const handleReset = () => {
-    const resetPayload = {}
-    Object.keys(menus[category].filters).forEach((cat) => {
-      resetPayload[cat] = {}
-      Object.keys(menus[category].filters[cat]).forEach((filter) => {
-        resetPayload[cat][filter] = false
-      })
-    })
-    setMenus({
-      ...menus,
-      [category]: { ...menus[category], filters: resetPayload },
-    })
-  }
-
-  const Options = (
-    <OptionsContainer
-      count={count}
-      category={category}
-      Utility={Utility}
-      handleReset={handleReset}
-      advMenu={advMenu}
-      setAdvMenu={setAdvMenu}
-      search={search}
-      setSearch={setSearch}
-      menus={menus}
-      setMenus={setMenus}
-      toggleDrawer={toggleDrawer}
-      isMobile={isMobile}
-      categories={categories}
-    />
+  const Options = React.useMemo(
+    () => (
+      <OptionsContainer
+        countTotal={count.total}
+        countShow={count.show}
+        category={category}
+        toggleDrawer={toggleDrawer}
+        categories={categories}
+      />
+    ),
+    [category, categories],
   )
 
-  const footerButtons = [
-    {
-      name: 'help',
-      action: () => setHelpDialog(!helpDialog),
-      icon: 'HelpOutline',
-    },
-    {
-      name: 'openFilter',
-      action: toggleDrawer(true),
-      icon: 'Ballot',
-      mobileOnly: true,
-    },
-    {
-      name: 'apply_to_all',
-      action: webhookCategory
-        ? toggleWebhook(true, 'global')
-        : toggleAdvMenu(true, 'global'),
-      icon: category === 'pokemon' || webhookCategory ? 'Tune' : 'FormatSize',
-    },
-    {
-      name: 'disable_all',
-      action: () => selectAllOrNone(false),
-      icon: 'Clear',
-      color: 'error',
-    },
-    {
-      name: 'enable_all',
-      action: () => selectAllOrNone(true),
-      icon: 'Check',
-      color: 'success',
-    },
-    ...extraButtons,
-  ]
+  const footerButtons = React.useMemo(
+    () => [
+      {
+        name: 'help',
+        action: () => setHelpDialog((prev) => !prev),
+        icon: 'HelpOutline',
+      },
+      {
+        name: 'openFilter',
+        action: toggleDrawer(true),
+        icon: 'Ballot',
+        mobileOnly: true,
+      },
+      {
+        name: 'apply_to_all',
+        action: webhookCategory
+          ? toggleWebhook(true, 'global')
+          : toggleAdvMenu(true, 'global'),
+        icon: category === 'pokemon' || webhookCategory ? 'Tune' : 'FormatSize',
+      },
+      {
+        name: 'disable_all',
+        action: () => selectAllOrNone(false),
+        icon: 'Clear',
+        color: 'error',
+      },
+      {
+        name: 'enable_all',
+        action: () => selectAllOrNone(true),
+        icon: 'Check',
+        color: 'success',
+      },
+      ...extraButtons,
+    ],
+    [category, webhookCategory, extraButtons, filteredObj, tempFilters],
+  )
 
   return (
     <>
@@ -304,7 +293,6 @@ export default function Menu({
                     toggleAdvMenu,
                     toggleSlotsMenu,
                     type: category,
-                    Utility,
                     toggleWebhook,
                     webhookCategory,
                     standard: filters.standard,
