@@ -24,6 +24,7 @@ const SLIDERS = {
         min: 1,
         max: 35,
         perm: 'iv',
+        color: 'secondary',
       },
       {
         name: 'atk_iv',
@@ -31,6 +32,7 @@ const SLIDERS = {
         min: 0,
         max: 15,
         perm: 'iv',
+        color: 'secondary',
       },
       {
         name: 'def_iv',
@@ -38,6 +40,7 @@ const SLIDERS = {
         min: 0,
         max: 15,
         perm: 'iv',
+        color: 'secondary',
       },
       {
         name: 'sta_iv',
@@ -45,6 +48,7 @@ const SLIDERS = {
         min: 0,
         max: 15,
         perm: 'iv',
+        color: 'secondary',
       },
       {
         name: 'cp',
@@ -52,6 +56,7 @@ const SLIDERS = {
         min: 10,
         max: 5000,
         perm: 'iv',
+        color: 'secondary',
       },
     ],
   },
