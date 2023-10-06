@@ -78,6 +78,7 @@ function assign(newObject, reference, props) {
  * @returns {(pokemon: import("@rm/types").Pokemon) => boolean}
  */
 const jsFnCache = new NodeCache({ stdTTL: 60 * 5 })
+
 /**
  *
  * @param {string} filter
@@ -199,10 +200,99 @@ function jsifyIvFilter(filter) {
   return fn
 }
 
+/**
+ *
+ * @param {string} filter
+ * @param {import('@rm/types').FilterId} pokemon
+ * @returns
+ */
+function dnfifyIvFilter(filter, pokemon) {
+  const results = /** @type {import('@rm/types').DnfFilter[]} */ ([])
+  const input = filter.toUpperCase()
+  const tokenizer =
+    /\s*([|&,]|([ADSLXG]?|CP|LC|[GU]L)\s*([0-9]+(?:\.[0-9]*)?)(?:\s*-\s*([0-9]+(?:\.[0-9]*)?))?)/g
+  let expectClause = true // expect a clause or '('
+  let lastIndex = 0
+  let match
+  let clause = { pokemon }
+  while ((match = tokenizer.exec(input)) !== null) {
+    if (match.index > lastIndex) {
+      return []
+    }
+    if (expectClause) {
+      if (match[3] === undefined) {
+        return []
+      }
+      let column = 'iv'
+      switch (match[2]) {
+        case 'A':
+          column = 'atk_iv'
+          break
+        case 'D':
+          column = 'def_iv'
+          break
+        case 'G':
+          column = 'gender'
+          break
+        case 'S':
+          column = 'sta_iv'
+          break
+        case 'L':
+          column = 'level'
+          break
+        case 'X':
+          column = 'size'
+          break
+        case 'CP':
+          column = 'cp'
+          break
+        case 'GL':
+          column = 'pvp_great'
+          break
+        case 'UL':
+          column = 'pvp_ultra'
+          break
+        case 'LC':
+          column = 'pvp_little'
+          break
+      }
+      const minMax = { min: parseFloat(match[3]) }
+      if (match[4] !== undefined) {
+        minMax.max = parseInt(match[4])
+      } else {
+        minMax.max = minMax.min
+      }
+      clause[column] = minMax
+      expectClause = false
+    } else if (match[3] !== undefined) {
+      return []
+    } else {
+      switch (match[1]) {
+        case '&':
+          expectClause = true
+          break
+        case '|':
+        case ',':
+          results.push(clause)
+          clause = { pokemon }
+          expectClause = true
+          break
+      }
+    }
+    lastIndex = tokenizer.lastIndex
+  }
+  if (expectClause) {
+    return [{ pokemon, iv: { min: -1, max: 100 } }]
+  }
+  results.push(clause)
+  return results
+}
+
 module.exports = {
   getParsedPvp,
   deepCompare,
   between,
   assign,
   jsifyIvFilter,
+  dnfifyIvFilter,
 }
