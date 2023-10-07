@@ -233,9 +233,24 @@ class Pokemon extends Model {
       }
     }
 
-    /** @type {import("@rm/types").Pokemon[]} */
+    const filters = mem
+      ? Object.values(filterMap).flatMap((filter) => filter.buildApiFilter())
+      : []
+    if ((perms.iv || perms.pvp) && mem) {
+      const pokemon = Object.keys(filterMap)
+        .filter((key) => key.includes('-'))
+        .map((key) => {
+          const [id, form] = key.split('-', 2).map(Number)
+          return { id, form }
+        })
+      if (!globalFilter.mods.onlyLinkGlobal) pokemon.push({ id: -1 }) // add everything else
+      filters.push(...globalFilter.buildApiFilter(pokemon))
+      if (onlyZeroIv) filters.push({ iv: { min: 0, max: 0 }, pokemon })
+      if (onlyHundoIv) filters.push({ iv: { min: 100, max: 100 }, pokemon })
+    }
+    /** @type {import("../types").Pokemon[]} */
     const results = await this.evalQuery(
-      mem ? `${mem}/api/pokemon/scan` : null,
+      mem ? `${mem}/api/pokemon/v2/scan` : null,
       mem
         ? JSON.stringify({
             min: {
@@ -246,25 +261,8 @@ class Pokemon extends Model {
               latitude: args.maxLat,
               longitude: args.maxLon,
             },
-            center: {
-              latitude: 0,
-              longitude: 0,
-            },
-            searchIds: [],
-            global: {
-              ...globalFilter.buildApiFilter(),
-              additional: {
-                include_xxs: onlyIvOr.xxs || false,
-                include_xxl: onlyIvOr.xxl || false,
-                include_zeroiv: onlyZeroIv,
-                include_hundoiv: onlyHundoIv,
-                include_everything: false,
-              },
-            },
             limit: queryLimits.pokemon + queryLimits.pokemonPvp,
-            filters: Object.fromEntries(
-              Object.values(filterMap).map((x) => [x.id, x.buildApiFilter()]),
-            ),
+            filters,
           })
         : query.limit(queryLimits.pokemon),
       'POST',
@@ -450,8 +448,14 @@ class Pokemon extends Model {
       return []
     }
 
+    const filters = mem
+      ? Object.values(filterMap).flatMap((filter) => filter.buildApiFilter())
+      : []
+    if ((perms.iv || perms.pvp) && mem)
+      filters.push(...globalFilter.buildApiFilter())
+
     const results = await this.evalQuery(
-      mem ? `${mem}/api/pokemon/scan` : null,
+      mem ? `${mem}/api/pokemon/v2/scan` : null,
       mem
         ? JSON.stringify({
             min: {
@@ -462,15 +466,8 @@ class Pokemon extends Model {
               latitude: args.maxLat,
               longitude: args.maxLon,
             },
-            global: {
-              expert: args.filters.onlyIvOr.adv,
-            },
             limit: queryLimits.pokemon + queryLimits.pokemonPvp,
-            filters: Object.fromEntries(
-              Object.entries(args.filters)
-                .filter(([k, v]) => k.includes('-') && v.enabled)
-                .map(([k, v]) => [k, { expert: v.adv }]),
-            ),
+            filters,
           })
         : query,
       'POST',

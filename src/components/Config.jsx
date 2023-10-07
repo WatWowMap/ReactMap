@@ -131,7 +131,10 @@ export default function Config({ children }) {
         userSettings: deepMerge({}, data.userSettings, prev.userSettings),
         settings: {
           ...Object.fromEntries(
-            Object.entries(settings).map(([k, v]) => [k, Object.keys(v)[0]]),
+            Object.entries(settings).map(([k, v]) => [
+              k,
+              data.map.misc[k] || Object.keys(v)[0],
+            ]),
           ),
           ...prev.settings,
         },

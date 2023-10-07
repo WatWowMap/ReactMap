@@ -42,7 +42,11 @@ export function ScanAreaTile(featureCollection) {
           if (webhookMode && name) {
             handleClick(name)().then((newAreas) => {
               layer.setStyle({
-                fillOpacity: newAreas.includes(name) ? 0.8 : 0.2,
+                fillOpacity: newAreas.some(
+                  (area) => area.toLowerCase() === name.toLowerCase(),
+                )
+                  ? 0.8
+                  : 0.2,
               })
             })
           } else if (!manual && tapToToggle) {
@@ -79,7 +83,9 @@ export function ScanAreaTile(featureCollection) {
                   webhookMode === 'areas'
                     ? useWebhookStore
                         .getState()
-                        .human?.area?.includes(name?.toLowerCase())
+                        .human?.area?.some(
+                          (area) => area.toLowerCase() === name?.toLowerCase(),
+                        )
                     : (
                         useStore.getState().filters?.scanAreas?.filter?.areas ||
                         []

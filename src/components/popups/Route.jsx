@@ -19,10 +19,11 @@ import Box from '@mui/material/Box'
 import ArrowDropDown from '@mui/icons-material/ArrowDropDown'
 import ArrowDropUp from '@mui/icons-material/ArrowDropUp'
 import Typography from '@mui/material/Typography'
+import DownloadIcon from '@mui/icons-material/Download'
 
 import Query from '@services/Query'
 import formatInterval from '@services/functions/formatInterval'
-import { useStore } from '@hooks/useStore'
+import { useStatic, useStore } from '@hooks/useStore'
 
 import Title from './common/Title'
 import TimeSince from './common/Timer'
@@ -130,6 +131,7 @@ function ExpandableWrapper({ disabled = false, children, expandKey, primary }) {
 export default function RoutePopup({ end, ...props }) {
   const [route, setRoute] = React.useState({ ...props, tags: [] })
   const { i18n } = useTranslation()
+  const { config } = useStatic.getState()
 
   const [getRoute, { data, called }] = useLazyQuery(Query.routes('getOne'), {
     variables: { id: props.id },
@@ -293,8 +295,50 @@ export default function RoutePopup({ end, ...props }) {
             lon={end ? route.end_lon : route.start_lon}
             size="small"
           />
+          {config.misc.enableRouteDownload && (
+            <DownloadRouteGPX route={route} />
+          )}
         </Grid2>
       </Grid2>
     </Popup>
+  )
+}
+
+function DownloadRouteGPX({ route }) {
+  const GPXContent = React.useMemo(() => {
+    if (!route.waypoints.length) {
+      return null
+    }
+
+    return `<?xml version="1.0" encoding="UTF-8"?>
+<gpx version="1.1" creator="ReactMap" xmlns="http://www.topografix.com/GPX/1/1">
+  <rte>
+    <name>${route.name}</name>
+    <desc>${route.description}</desc>
+    ${route.waypoints
+      .map(
+        (waypoint) =>
+          `<rtept lat="${waypoint.lat_degrees}" lon="${waypoint.lng_degrees}"><ele>${waypoint.elevation_in_meters}</ele></rtept>`,
+      )
+      .join('\n    ')}
+  </rte>
+</gpx>`
+  }, [route.name, route.description, route.waypoints])
+
+  if (!GPXContent) {
+    return null
+  }
+
+  return (
+    <IconButton
+      href={`data:application/gpx;charset=utf-8,${encodeURIComponent(
+        GPXContent,
+      )}`}
+      download={`${route.name}.gpx`}
+      size="small"
+      style={{ color: 'inherit' }}
+    >
+      <DownloadIcon />
+    </IconButton>
   )
 }

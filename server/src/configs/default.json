@@ -244,7 +244,8 @@
       "enablePokestopPopupCoordsSelector": false,
       "enablePortalPopupCoordsSelector": false,
       "customFloatingIcons": [],
-      "expandAllScanAreas": false
+      "expandAllScanAreas": false,
+      "enableRouteDownload": false
     },
     "theme": {
       "style": "dark",

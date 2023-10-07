@@ -2,6 +2,8 @@
 /* eslint-disable react/no-array-index-key */
 import * as React from 'react'
 import Grid from '@mui/material/Unstable_Grid2'
+import { useTranslation } from 'react-i18next'
+
 import CustomTile from '@components/layout/custom/CustomTile'
 import DialogWrapper from '@components/layout/custom/DialogWrapper'
 import ErrorBoundary from '@components/ErrorBoundary'
@@ -13,6 +15,7 @@ export function Viewer() {
   const hideEditor = usePlayStore((s) => s.hideEditor)
   const component = usePlayStore((s) => s.component)
   const configObj = useSafeParse()
+  const { i18n } = useTranslation()
 
   if (!configObj) return null
 
@@ -30,6 +33,7 @@ export function Viewer() {
       >
         {component === 'loginPage' ? (
           <Grid
+            key={i18n.language}
             container
             spacing={configObj.settings.parentSpacing || 0}
             alignItems={configObj.settings.parentAlignItems || 'center'}

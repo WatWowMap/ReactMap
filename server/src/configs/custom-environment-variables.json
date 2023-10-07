@@ -452,6 +452,10 @@
       "expandAllScanAreas": {
         "__name": "MAP_MISC_EXPAND_ALL_SCAN_AREAS",
         "__format": "boolean"
+      },
+      "enableRouteDownload": {
+        "__name": "MAP_MISC_ENABLE_ROUTE_DOWNLOAD",
+        "__format": "boolean"
       }
     },
     "theme": {
