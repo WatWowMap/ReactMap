@@ -58,7 +58,7 @@ class Route extends Model {
       .andWhereBetween(startLongitude, [args.minLon, args.maxLon])
       .andWhereBetween(distanceMeters, distanceInMeters)
       .andWhere(
-        isMad ? raw(`UNIX_TIMESTAMP(last_updated) > ${ts}`) : 'updated',
+        isMad ? raw('UNIX_TIMESTAMP(last_updated)') : 'updated',
         '>',
         ts,
       )
@@ -68,7 +68,7 @@ class Route extends Model {
           .andWhereBetween(endLongitude, [args.minLon, args.maxLon])
           .andWhereBetween(distanceMeters, distanceInMeters)
           .andWhere(
-            isMad ? raw(`UNIX_TIMESTAMP(last_updated) > ${ts}`) : 'updated',
+            isMad ? raw('UNIX_TIMESTAMP(last_updated)') : 'updated',
             '>',
             ts,
           )
