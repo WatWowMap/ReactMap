@@ -1,66 +1,174 @@
+// @ts-check
 import * as React from 'react'
-import MarkerClusterGroup from 'react-leaflet-cluster'
+import { useMap, GeoJSON } from 'react-leaflet'
+import Supercluster from 'supercluster'
+import { marker, divIcon, point } from 'leaflet'
 import { useStatic, useStore } from '@hooks/useStore'
-
 import Notification from './layout/general/Notification'
 
-const IGNORE_CLUSTERING = ['devices', 'submissionCells', 'scanCells', 'weather']
+const IGNORE_CLUSTERING = new Set([
+  'devices',
+  'submissionCells',
+  'scanCells',
+  'weather',
+])
+
+/**
+ *
+ * @param {import('geojson').Feature<import('geojson').Point>} feature
+ * @param {import('leaflet').LatLng} latlng
+ * @returns
+ */
+function createClusterIcon(feature, latlng) {
+  if (!feature.properties.cluster) return null
+
+  const count = feature.properties.point_count
+  const size = count < 100 ? 'small' : count < 1000 ? 'medium' : 'large'
+  const icon = divIcon({
+    html: `<div><span>${feature.properties.point_count_abbreviated}</span></div>`,
+    className: `marker-cluster marker-cluster-${size}`,
+    iconSize: point(40, 40),
+  })
+  return marker(latlng, { icon })
+}
 
 /**
  *
  * @param {{
  *  category: keyof import('@rm/types').Config['api']['polling'],
- *  children: React.ReactNode[]
- * }} param0
+ *  children: React.ReactElement<{ lat: number, lon: number }>[]
+ * }} props
  * @returns
  */
-export default function Clustering({ category, children }) {
-  const {
-    config: {
-      clustering: { [category]: clustering },
-      general: { minZoom },
-    },
-  } = useStatic.getState()
+function Clustering({ category, children }) {
+  /** @type {ReturnType<typeof React.useRef<import('leaflet').GeoJSON>>} */
+  const featureRef = React.useRef(null)
 
-  const clusteringRules = clustering || {
-    forcedLimit: 10000,
-    zoomLevel: minZoom,
-  }
-
+  const map = useMap()
   const userCluster = useStore(
     (s) => s.userSettings[category]?.clustering || false,
   )
+  const {
+    config: {
+      clustering,
+      general: { minZoom: configMinZoom },
+    },
+  } = useStatic.getState()
 
-  const limitHit =
-    children.length > clusteringRules.forcedLimit &&
-    !IGNORE_CLUSTERING.includes(category)
+  const [rules] = React.useState(
+    category in clustering
+      ? clustering[category]
+      : {
+          forcedLimit: 10000,
+          zoomLevel: configMinZoom,
+        },
+  )
+  const [markers, setMarkers] = React.useState(new Set())
+  const [superCluster, setSuperCluster] = React.useState(
+    /** @type {InstanceType<typeof Supercluster> | null} */ (null),
+  )
+  const [limitHit, setLimitHit] = React.useState(
+    children.length > rules.forcedLimit && !IGNORE_CLUSTERING.has(category),
+  )
 
-  return limitHit || (clusteringRules.zoomLevel && userCluster) ? (
+  React.useEffect(() => {
+    setLimitHit(
+      userCluster ||
+        (children.length > rules.forcedLimit &&
+          !IGNORE_CLUSTERING.has(category))
+        ? !!rules.forcedLimit
+        : false,
+    )
+  }, [category, userCluster, rules.forcedLimit, children.length])
+
+  React.useEffect(() => {
+    if (limitHit) {
+      setSuperCluster(
+        new Supercluster({
+          radius: 60,
+          extent: 256,
+          maxZoom: rules.zoomLevel,
+          minPoints: category === 'pokemon' ? 4 : 3,
+        }),
+      )
+    } else {
+      setSuperCluster(null)
+    }
+  }, [rules.zoomLevel, limitHit, category])
+
+  React.useEffect(() => {
+    if (superCluster) {
+      /** @type {import('geojson').Feature<import('geojson').Point>[]} */
+      const features = children.map((reactEl) => ({
+        type: 'Feature',
+        id: reactEl.key,
+        properties: {},
+        geometry: {
+          type: 'Point',
+          coordinates: [reactEl.props.lon, reactEl.props.lat],
+        },
+      }))
+
+      superCluster.load(features)
+
+      const bounds = map.getBounds()
+      /** @type {[number, number, number, number]} */
+      const bbox = [
+        bounds.getWest(),
+        bounds.getSouth(),
+        bounds.getEast(),
+        bounds.getNorth(),
+      ]
+      const zoom = map.getZoom()
+
+      const rawClusters = superCluster.getClusters(bbox, zoom)
+
+      const newClusters = []
+      const newMarkers = new Set()
+      for (let i = 0; i < rawClusters.length; i += 1) {
+        const cluster = rawClusters[i]
+        if (cluster.properties.cluster) {
+          newClusters.push(cluster)
+        } else {
+          newMarkers.add(cluster.id)
+        }
+      }
+      // @ts-ignore
+      featureRef?.current?.addData(newClusters)
+      setMarkers(newMarkers)
+    } else {
+      setMarkers(new Set())
+    }
+    return () => {
+      featureRef.current?.clearLayers()
+    }
+  }, [children, featureRef, superCluster])
+
+  return (
     <>
-      <MarkerClusterGroup
-        key={`${userCluster}-${limitHit}`}
-        disableClusteringAtZoom={limitHit ? 20 : clusteringRules.zoomLevel}
-        chunkedLoading
-      >
-        {children}
-      </MarkerClusterGroup>
-      <Notification
-        open={limitHit}
-        severity="warning"
-        i18nKey="cluster_limit"
-        messages={[
-          {
-            key: 'limitHit',
-            variables: [category, clusteringRules.forcedLimit || 0],
-          },
-          {
-            key: 'zoomIn',
-            variables: [],
-          },
-        ]}
-      />
+      <GeoJSON ref={featureRef} data={null} pointToLayer={createClusterIcon} />
+      {children.length > rules.forcedLimit || userCluster
+        ? children.filter((x) => markers.has(x.key))
+        : children}
+      {limitHit && (
+        <Notification
+          open={!!limitHit}
+          severity="warning"
+          i18nKey="cluster_limit"
+          messages={[
+            {
+              key: 'limitHit',
+              variables: [category, rules.forcedLimit.toString()],
+            },
+            {
+              key: 'zoomIn',
+              variables: [],
+            },
+          ]}
+        />
+      )}
     </>
-  ) : (
-    children
   )
 }
+
+export default Clustering

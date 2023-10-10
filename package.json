@@ -92,7 +92,6 @@
     "knex": "^2.4.2",
     "leaflet": "1.9.4",
     "leaflet.locatecontrol": "^0.73.0",
-    "leaflet.markercluster": "1.5.3",
     "lodash.debounce": "^4.0.8",
     "moment-timezone": "^0.5.43",
     "morgan": "^1.10.0",
@@ -111,7 +110,6 @@
     "react-ga4": "^1.4.1",
     "react-i18next": "^11.16.7",
     "react-leaflet": "4.2.1",
-    "react-leaflet-cluster": "2.1.0",
     "react-router-dom": "^6.15.0",
     "react-virtualized-auto-sizer": "^1.0.20",
     "react-virtuoso": "^4.5.0",
@@ -119,6 +117,7 @@
     "rtree": "^1.4.2",
     "source-map": "^0.7.4",
     "suncalc": "^1.9.0",
+    "supercluster": "^8.0.1",
     "zustand": "^4.4.1"
   },
   "devDependencies": {
