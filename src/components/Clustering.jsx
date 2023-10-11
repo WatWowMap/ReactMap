@@ -73,28 +73,26 @@ function Clustering({ category, children }) {
 
   React.useEffect(() => {
     setLimitHit(
-      userCluster ||
-        (children.length > rules.forcedLimit &&
-          !IGNORE_CLUSTERING.has(category))
+      children.length > rules.forcedLimit && !IGNORE_CLUSTERING.has(category)
         ? !!rules.forcedLimit
         : false,
     )
   }, [category, userCluster, rules.forcedLimit, children.length])
 
   React.useEffect(() => {
-    if (limitHit) {
+    if (limitHit || userCluster) {
       setSuperCluster(
         new Supercluster({
           radius: 60,
           extent: 256,
           maxZoom: rules.zoomLevel,
-          minPoints: category === 'pokemon' ? 4 : 3,
+          minPoints: category === 'pokemon' ? 7 : 5,
         }),
       )
     } else {
       setSuperCluster(null)
     }
-  }, [rules.zoomLevel, limitHit, category])
+  }, [rules.zoomLevel, limitHit, userCluster, category])
 
   React.useEffect(() => {
     if (superCluster) {
