@@ -99,7 +99,7 @@ function Clustering({ category, children }) {
       /** @type {import('geojson').Feature<import('geojson').Point>[]} */
       const features = children.map((reactEl) => ({
         type: 'Feature',
-        id: reactEl.key,
+        id: reactEl?.key,
         properties: {},
         geometry: {
           type: 'Point',
