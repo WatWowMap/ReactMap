@@ -97,7 +97,7 @@ function Clustering({ category, children }) {
   React.useEffect(() => {
     if (superCluster) {
       /** @type {import('geojson').Feature<import('geojson').Point>[]} */
-      const features = children.map((reactEl) => ({
+      const features = children.filter(Boolean).map((reactEl) => ({
         type: 'Feature',
         id: reactEl?.key,
         properties: {},
