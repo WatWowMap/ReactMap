@@ -672,5 +672,5 @@
   "fast": "Fast",
   "charged": "Charged",
   "offline_mode": "Offline Mode",
-  "disable": "Disable {{name}}"
+  "disable": "Disable {{- name}}"
 }

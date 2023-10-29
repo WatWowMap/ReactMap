@@ -40,11 +40,9 @@ export default function BoolToggle({
   return (
     <ListItem>
       {children}
-      <ListItemText
-        primary={
-          t(label, fromSnakeCase(label)) ?? t(field, fromSnakeCase(field))
-        }
-      />
+      <ListItemText sx={{ maxWidth: 150 }}>
+        {t(label, fromSnakeCase(label)) ?? t(field, fromSnakeCase(field))}
+      </ListItemText>
       <Switch
         edge="end"
         onChange={onChange}
