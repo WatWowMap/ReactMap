@@ -7,6 +7,8 @@ import Switch from '@mui/material/Switch'
 import { useStore } from '@hooks/useStore'
 import { useTranslation } from 'react-i18next'
 import { fromSnakeCase } from '@services/functions/fromSnakeCase'
+import dlv from 'dlv'
+import { setDeep } from '@services/functions/setDeep'
 
 /**
  * @param {{
@@ -23,9 +25,18 @@ export default function BoolToggle({
   disabled = false,
   children,
 }) {
-  const value = useStore((s) => s[field])
+  const value = useStore((s) => dlv(s, field))
   const { t } = useTranslation()
 
+  const onChange = React.useCallback(
+    (
+      /** @type {React.ChangeEvent<HTMLInputElement>} */ _,
+      /** @type {boolean} */ checked,
+    ) => {
+      useStore.setState((prev) => setDeep(prev, field, checked))
+    },
+    [field],
+  )
   return (
     <ListItem>
       {children}
@@ -36,7 +47,7 @@ export default function BoolToggle({
       />
       <Switch
         edge="end"
-        onChange={(_e, v) => useStore.setState({ [field]: v })}
+        onChange={onChange}
         checked={!!value}
         disabled={disabled}
       />

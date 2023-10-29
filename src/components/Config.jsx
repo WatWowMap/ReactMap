@@ -8,6 +8,7 @@ import { setLoadingText } from '@services/functions/setLoadingText'
 import Utility from '@services/Utility'
 import { deepMerge } from '@services/functions/deepMerge'
 import { Navigate } from 'react-router-dom'
+import { checkHoliday } from '@services/functions/checkHoliday'
 
 const rootLoading = document.getElementById('loader')
 
@@ -109,13 +110,15 @@ export default function Config({ children }) {
           userBackupLimits: data.database.settings.userBackupLimits || 0,
         },
         theme: data.map.theme,
-        holidayEffects: data.map.holidayEffects || [],
         ui: data.ui,
         menus: data.menus,
         extraUserFields: data.database.settings.extraUserFields,
         userSettings: data.clientMenus,
         timeOfDay: Utility.timeCheck(...location),
-        config: data.map,
+        config: {
+          ...data.map,
+          holidayEffects: (data.map.holidayEffects || []).filter(checkHoliday),
+        },
         polling: data.api.polling,
         settings,
         gymValidDataLimit: data.api.gymValidDataLimit,
