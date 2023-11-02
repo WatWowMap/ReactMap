@@ -17,6 +17,7 @@ import { persist } from 'zustand/middleware'
  *    tileServers: string
  *   },
  *   menus: Record<string, boolean>,
+ *   holidayEffects: Record<string, boolean>,
  *   motdIndex: number
  *   tutorial: boolean,
  *   searchTab: string,
@@ -69,6 +70,7 @@ export const useStore = create(
           })
         }
       },
+      holidayEffects: {},
       settings: {},
       userSettings: {},
       icons: {},
@@ -189,7 +191,6 @@ export const useStatic = create((set) => ({
   menuFilters: {},
   userSettings: undefined,
   settings: undefined,
-  holidayEffects: [],
   available: {
     gyms: [],
     pokemon: [],
