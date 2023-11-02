@@ -827,6 +827,8 @@
       "darkMapBorder": "CLIENT_SIDE_OPTIONS_WAYFARER_DARK_MAP_BORDER",
       "cellBlocked": "CLIENT_SIDE_OPTIONS_WAYFARER_CELL_BLOCKED",
       "poiColor": "CLIENT_SIDE_OPTIONS_WAYFARER_POI_COLOR",
+      "showcaseColor": "CLIENT_SIDE_OPTIONS_WAYFARER_SHOWCASE_COLOR",
+      "partnerColor": "CLIENT_SIDE_OPTIONS_WAYFARER_PARTNER_COLOR",
       "enablePortalPopupCoords": {
         "__name": "CLIENT_SIDE_OPTIONS_WAYFARER_ENABLE_PORTAL_POPUP_COORDS",
         "__format": "boolean"
@@ -1128,6 +1130,10 @@
       },
       "s14Cells": {
         "__name": "DEFAULT_FILTERS_SUBMISSION_CELLS_S14CELLS",
+        "__format": "boolean"
+      },
+      "includeSponsored": {
+        "__name": "DEFAULT_FILTERS_SUBMISSION_CELLS_INCLUDE_SPONSORED",
         "__format": "boolean"
       }
     },
