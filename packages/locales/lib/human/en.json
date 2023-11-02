@@ -672,5 +672,7 @@
   "fast": "Fast",
   "charged": "Charged",
   "offline_mode": "Offline Mode",
-  "include_sponsored": "Include Sponsored"
+  "include_sponsored": "Include Sponsored",
+  "showcase_color": "Showcase Color",
+  "partner_color": "Partner Color"
 }
