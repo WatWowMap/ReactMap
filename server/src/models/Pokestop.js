@@ -1723,9 +1723,9 @@ class Pokestop extends Model {
       .first()
   }
 
-  static getSubmissions(perms, args, { isMad }) {
+  static getSubmissions(perms, args, { isMad, hasShowcaseData }) {
     const {
-      filters: { onlyAreas = [] },
+      filters: { onlyAreas = [], onlyIncludeSponsored = true },
       minLat,
       minLon,
       maxLat,
@@ -1744,9 +1744,15 @@ class Pokestop extends Model {
     if (isMad) {
       query.select(['pokestop_id AS id', 'latitude AS lat', 'longitude AS lon'])
     } else {
-      query.select(['id', 'lat', 'lon']).andWhere((poi) => {
-        poi.whereNull('sponsor_id').orWhere('sponsor_id', 0)
-      })
+      query.select(['id', 'lat', 'lon', 'partner_id'])
+      if (!onlyIncludeSponsored) {
+        query.andWhere((poi) => {
+          poi.whereNull('partner_id').orWhere('partner_id', 0)
+        })
+      }
+      if (hasShowcaseData) {
+        query.select('showcase_expiry')
+      }
     }
     if (!getAreaSql(query, perms.areaRestrictions, onlyAreas, isMad)) {
       return []

@@ -149,10 +149,13 @@ function generateUi(req, perms) {
     wayfarer:
       perms.portals || perms.submissionCells
         ? {
-            portals: (perms.portals && Db.models.Portal) || undefined,
+            portals: !!(perms.portals && Db.models.Portal) || undefined,
             submissionCells:
-              (perms.submissionCells && Db.models.Pokestop && Db.models.Gym) ||
-              undefined,
+              !!(
+                perms.submissionCells &&
+                Db.models.Pokestop &&
+                Db.models.Gym
+              ) || undefined,
           }
         : undefined,
     s2cells: perms.s2cells ? { enabled: true, cells: true } : undefined,
@@ -164,9 +167,9 @@ function generateUi(req, perms) {
       perms.spawnpoints || perms.scanCells || perms.devices
         ? {
             spawnpoints:
-              (perms.spawnpoints && Db.models.Spawnpoint) || undefined,
-            scanCells: (perms.scanCells && Db.models.ScanCell) || undefined,
-            devices: (perms.devices && Db.models.Device) || undefined,
+              !!(perms.spawnpoints && Db.models.Spawnpoint) || undefined,
+            scanCells: !!(perms.scanCells && Db.models.ScanCell) || undefined,
+            devices: !!(perms.devices && Db.models.Device) || undefined,
           }
         : undefined,
     settings: true,

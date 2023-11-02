@@ -60,7 +60,16 @@ function getPlacementCells(filters, pokestops, gyms) {
       ? Object.values(indexedCells)
       : [],
     pois: filters.filters.onlyRings
-      ? allCoords.map((poi) => new PoI(poi.id, poi.lat, poi.lon))
+      ? allCoords.map(
+          (poi) =>
+            new PoI(
+              poi.id,
+              poi.lat,
+              poi.lon,
+              !!poi.partner_id,
+              'showcase_expiry' in poi ? !!poi.showcase_expiry : false,
+            ),
+        )
       : [],
   }
 }

@@ -195,23 +195,20 @@ export default function Extras({ category, subItem, data }) {
           alignItems="center"
           justifyContent="flex-end"
         >
-          <ListItem
-            secondaryAction={
-              <Switch
-                checked={filters[category]?.confirmed || false}
-                onChange={() => {
-                  setFilters({
-                    ...filters,
-                    [category]: {
-                      ...filters[category],
-                      confirmed: !filters[category].confirmed,
-                    },
-                  })
-                }}
-              />
-            }
-          >
+          <ListItem>
             <ListItemText sx={{ pl: 4 }} primary={t('only_confirmed')} />
+            <Switch
+              checked={filters[category]?.confirmed || false}
+              onChange={() => {
+                setFilters({
+                  ...filters,
+                  [category]: {
+                    ...filters[category],
+                    confirmed: !filters[category].confirmed,
+                  },
+                })
+              }}
+            />
           </ListItem>
         </CollapsibleItem>
       )
@@ -268,10 +265,21 @@ export default function Extras({ category, subItem, data }) {
   ) {
     return (
       <CollapsibleItem open={!!filters[subItem]?.enabled}>
-        {['rings', 's14Cells', 's17Cells'].map((item, i) => (
-          <ListItem
-            key={item}
-            secondaryAction={
+        {['rings', 'includeSponsored', 's14Cells', 's17Cells'].map(
+          (item, i) => (
+            <ListItem key={item}>
+              <ListItemText
+                sx={{ pl: 4 }}
+                primary={
+                  i > 1 ? (
+                    <Trans i18nKey="s2_cell_level">
+                      {{ level: item.substring(1, 3) }}
+                    </Trans>
+                  ) : (
+                    t(i ? 'include_sponsored' : 'poi')
+                  )
+                }
+              />
               <Switch
                 checked={!!filters[subItem]?.[item]}
                 onChange={() => {
@@ -285,21 +293,9 @@ export default function Extras({ category, subItem, data }) {
                 }}
                 disabled={filters[subItem]?.enabled === false}
               />
-            }
-          >
-            <ListItemText
-              primary={
-                i ? (
-                  <Trans i18nKey="s2_cell_level">
-                    {{ level: item.substring(1, 3) }}
-                  </Trans>
-                ) : (
-                  t('poi')
-                )
-              }
-            />
-          </ListItem>
-        ))}
+            </ListItem>
+          ),
+        )}
       </CollapsibleItem>
     )
   }

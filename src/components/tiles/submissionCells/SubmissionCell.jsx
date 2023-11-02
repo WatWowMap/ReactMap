@@ -14,6 +14,8 @@ import PoITile from './PoI'
  */
 const SubmissionCellTile = ({ level14Cells, level17Cells, pois }) => {
   const poiColor = useStore((s) => s.userSettings.wayfarer.poiColor)
+  const showcaseColor = useStore((s) => s.userSettings.wayfarer.showcaseColor)
+  const partnerColor = useStore((s) => s.userSettings.wayfarer.partnerColor)
   const cellBlocked = useStore((s) => s.userSettings.wayfarer.cellBlocked)
   const oneStopTillNext = useStore(
     (s) => s.userSettings.wayfarer.oneStopTillNext,
@@ -31,7 +33,17 @@ const SubmissionCellTile = ({ level14Cells, level17Cells, pois }) => {
   return (
     <>
       {pois?.map((ring) => (
-        <PoITile key={ring.id} {...ring} color={poiColor} />
+        <PoITile
+          key={ring.id}
+          {...ring}
+          color={
+            ring.showcase
+              ? showcaseColor
+              : ring.partner
+              ? partnerColor
+              : poiColor
+          }
+        />
       ))}
       {level17Cells?.map((cell) => (
         <Level17Tile

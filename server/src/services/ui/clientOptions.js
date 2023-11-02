@@ -82,6 +82,8 @@ function clientOptions(perms) {
       darkMapBorder: { type: 'color', perm: ['submissionCells'] },
       cellBlocked: { type: 'color', perm: ['submissionCells'] },
       poiColor: { type: 'color', perm: ['submissionCells'] },
+      partnerColor: { type: 'color', perm: ['submissionCells'] },
+      showcaseColor: { type: 'color', perm: ['submissionCells'] },
     },
     s2cells: {
       lightMapBorder: { type: 'color', perm: ['s2cells'] },
