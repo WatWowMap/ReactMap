@@ -158,6 +158,7 @@ function buildDefaultFilters(perms, database) {
             rings: defaultFilters.submissionCells.rings,
             s17Cells: defaultFilters.submissionCells.s17Cells,
             s14Cells: defaultFilters.submissionCells.s14Cells,
+            includeSponsored: defaultFilters.submissionCells.includeSponsored,
             filter: { global: new BaseFilter() },
           }
         : undefined,

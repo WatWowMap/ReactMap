@@ -412,6 +412,8 @@
       "darkMapBorder": "#ff0000",
       "cellBlocked": "#000000",
       "poiColor": "#03ffff",
+      "showcaseColor": "#D365F5",
+      "partnerColor": "#F60042",
       "enablePortalPopupCoords": false
     },
     "s2cells": {
@@ -554,7 +556,8 @@
       "enabled": false,
       "rings": true,
       "s17Cells": true,
-      "s14Cells": true
+      "s14Cells": true,
+      "includeSponsored": true
     },
     "s2cells": {
       "enabled": false,

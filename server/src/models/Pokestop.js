@@ -62,6 +62,18 @@ class Pokestop extends Model {
     return 'pokestop'
   }
 
+  /**
+   *
+   * @param {import('objection').QueryBuilder<Pokestop, Pokestop[]>} query
+   * @param {boolean} isMad
+   */
+  static onlyValid(query, isMad) {
+    query.andWhere('enabled', true)
+    if (!isMad) {
+      query.andWhere('deleted', false)
+    }
+  }
+
   static async getAll(
     perms,
     args,
@@ -176,7 +188,8 @@ class Pokestop extends Model {
     query
       .whereBetween(isMad ? 'latitude' : 'lat', [args.minLat, args.maxLat])
       .andWhereBetween(isMad ? 'longitude' : 'lon', [args.minLon, args.maxLon])
-      .andWhere(isMad ? 'enabled' : 'deleted', isMad)
+
+    Pokestop.onlyValid(query, isMad)
     if (!getAreaSql(query, areaRestrictions, onlyAreas, isMad)) {
       return []
     }
@@ -1557,13 +1570,13 @@ class Pokestop extends Model {
         isMad ? 'image AS url' : 'url',
         distance,
       ])
-      .where(isMad ? 'enabled' : 'deleted', isMad)
       .whereRaw(`LOWER(name) LIKE '%${search}%'`)
       .limit(searchResultsLimit)
       .orderBy('distance')
     if (!getAreaSql(query, perms.areaRestrictions, onlyAreas, isMad)) {
       return []
     }
+    Pokestop.onlyValid(query, isMad)
     return query
   }
 
@@ -1606,7 +1619,6 @@ class Pokestop extends Model {
         isMad ? 'quest_reward AS quest_rewards' : 'quest_rewards',
         distance,
       ])
-      .where(isMad ? 'enabled' : 'deleted', isMad)
       .andWhere('quest_timestamp', '>=', midnight || 0)
       .andWhere((quests) => {
         quests
@@ -1628,6 +1640,8 @@ class Pokestop extends Model {
     if (!getAreaSql(query, perms.areaRestrictions, onlyAreas, isMad)) {
       return []
     }
+    Pokestop.onlyValid(query, isMad)
+
     const results = await query
     const mapped = results.map((q) => ({ ...q, with_ar: q.with_ar ?? true }))
 
@@ -1697,7 +1711,6 @@ class Pokestop extends Model {
           : 'lure_expire_timestamp',
         distance,
       ])
-      .where(isMad ? 'enabled' : 'deleted', isMad)
       .andWhere(
         isMad ? 'lure_expiration' : 'lure_expire_timestamp',
         '>=',
@@ -1709,6 +1722,8 @@ class Pokestop extends Model {
     if (!getAreaSql(query, perms.areaRestrictions, onlyAreas, isMad)) {
       return []
     }
+    Pokestop.onlyValid(query, isMad)
+
     const results = await query
     return results
   }
@@ -1723,9 +1738,9 @@ class Pokestop extends Model {
       .first()
   }
 
-  static getSubmissions(perms, args, { isMad }) {
+  static getSubmissions(perms, args, { isMad, hasShowcaseData }) {
     const {
-      filters: { onlyAreas = [] },
+      filters: { onlyAreas = [], onlyIncludeSponsored = true },
       minLat,
       minLon,
       maxLat,
@@ -1740,17 +1755,24 @@ class Pokestop extends Model {
         minLon - 0.025,
         maxLon + 0.025,
       ])
-      .andWhere(isMad ? 'enabled' : 'deleted', isMad)
     if (isMad) {
       query.select(['pokestop_id AS id', 'latitude AS lat', 'longitude AS lon'])
     } else {
-      query.select(['id', 'lat', 'lon']).andWhere((poi) => {
-        poi.whereNull('sponsor_id').orWhere('sponsor_id', 0)
-      })
+      query.select(['id', 'lat', 'lon', 'partner_id'])
+      if (!onlyIncludeSponsored) {
+        query.andWhere((poi) => {
+          poi.whereNull('partner_id').orWhere('partner_id', 0)
+        })
+      }
+      if (hasShowcaseData) {
+        query.select('showcase_expiry')
+      }
     }
     if (!getAreaSql(query, perms.areaRestrictions, onlyAreas, isMad)) {
       return []
     }
+    Pokestop.onlyValid(query, isMad)
+
     return query
   }
 }

@@ -37,6 +37,7 @@ type Gym {
   total_cp: Int
   first_seen_timestamp: Int
   sponsor_id: Int
+  partner_id: Int
   raid_pokemon_costume: Int
   raid_pokemon_gender: Int
   raid_pokemon_evolution: Int
@@ -140,6 +141,7 @@ type Pokestop {
   pokestop_display: Int
   first_seen_timestamp: Int
   sponsor_id: Int
+  partner_id: Int
   ar_scan_eligible: Boolean
   quests: [Quest]
   invasions: [Invasion]
