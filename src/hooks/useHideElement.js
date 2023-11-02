@@ -7,5 +7,5 @@ export function useHideElement(ready = true) {
     if (rootLoading && ready) {
       rootLoading.style.display = 'none'
     }
-  }, [])
+  }, [ready])
 }
