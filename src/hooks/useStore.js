@@ -17,6 +17,7 @@ import { persist } from 'zustand/middleware'
  *    tileServers: string
  *   },
  *   menus: Record<string, boolean>,
+ *   holidayEffects: Record<string, boolean>,
  *   motdIndex: number
  *   tutorial: boolean,
  *   searchTab: string,
@@ -25,6 +26,7 @@ import { persist } from 'zustand/middleware'
  *   scannerCooldown: number
  *   icons: Record<string, string>
  *   userSettings: Record<string, any>
+ *   profiling: boolean
  *   setAreas: (areas: string | string[], validAreas: string[], unselectAll?: boolean) => void,
  * }} UseStore
  * @type {import("zustand").UseBoundStore<import("zustand").StoreApi<UseStore>>}
@@ -69,6 +71,7 @@ export const useStore = create(
           })
         }
       },
+      holidayEffects: {},
       settings: {},
       userSettings: {},
       icons: {},
@@ -99,6 +102,7 @@ export const useStore = create(
       },
       motdIndex: 0,
       scannerCooldown: 0,
+      profiling: false,
     }),
     {
       name: 'local-state',
@@ -189,7 +193,6 @@ export const useStatic = create((set) => ({
   menuFilters: {},
   userSettings: undefined,
   settings: undefined,
-  holidayEffects: [],
   available: {
     gyms: [],
     pokemon: [],
