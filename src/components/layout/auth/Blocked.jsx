@@ -6,13 +6,15 @@ import Grid from '@mui/material/Grid'
 import Typography from '@mui/material/Typography'
 import Button from '@mui/material/Button'
 import { useStatic } from '@hooks/useStore'
+import { useHideElement } from '@hooks/useHideElement'
 
 import DiscordLogin from './Discord'
 
 export default function Blocked() {
   const { t } = useTranslation()
   const { info } = useParams()
-  const discordInvite = useStatic((s) => s.config.links.discordInvite)
+  const discordInvite = useStatic((s) => s.config?.links?.discordInvite)
+  useHideElement()
 
   const queryParams = new URLSearchParams(info)
 

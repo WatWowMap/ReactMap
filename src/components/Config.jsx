@@ -9,8 +9,7 @@ import Utility from '@services/Utility'
 import { deepMerge } from '@services/functions/deepMerge'
 import { Navigate } from 'react-router-dom'
 import { checkHoliday } from '@services/functions/checkHoliday'
-
-const rootLoading = document.getElementById('loader')
+import { useHideElement } from '@hooks/useHideElement'
 
 export default function Config({ children }) {
   const { t } = useTranslation()
@@ -20,11 +19,8 @@ export default function Config({ children }) {
     fetched: false,
   })
 
-  if (rootLoading) {
-    if (serverSettings.fetched) {
-      rootLoading.style.display = 'none'
-    }
-  }
+  useHideElement(serverSettings.fetched)
+
   const getServerSettings = async () => {
     const data = await Fetch.getSettings()
 
