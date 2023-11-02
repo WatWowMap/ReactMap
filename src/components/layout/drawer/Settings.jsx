@@ -16,6 +16,7 @@ import StyleIcon from '@mui/icons-material/Style'
 import DevicesOtherIcon from '@mui/icons-material/DevicesOther'
 import Brightness7Icon from '@mui/icons-material/Brightness7'
 import CakeIcon from '@mui/icons-material/Cake'
+import InsightsIcon from '@mui/icons-material/Insights'
 
 import { useTranslation } from 'react-i18next'
 
@@ -162,6 +163,13 @@ export default function Settings() {
           </ListItemIcon>
         </BoolToggle>
       ))}
+      {process.env.NODE_ENV === 'development' && (
+        <BoolToggle field="profiling" label={t('profiling')}>
+          <ListItemIcon>
+            <InsightsIcon />
+          </ListItemIcon>
+        </BoolToggle>
+      )}
       {!separateDrawerActions && (
         <>
           <Divider style={{ margin: '10px 0' }} />
