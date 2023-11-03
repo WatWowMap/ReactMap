@@ -1,6 +1,6 @@
 import Utility from '@services/Utility'
 import { create } from 'zustand'
-import { persist } from 'zustand/middleware'
+import { persist, createJSONStorage } from 'zustand/middleware'
 
 /**
  * TODO: Finish this
@@ -106,7 +106,7 @@ export const useStore = create(
     }),
     {
       name: 'local-state',
-      getStorage: () => localStorage,
+      storage: createJSONStorage(() => localStorage),
     },
   ),
 )

@@ -118,7 +118,7 @@
     "source-map": "^0.7.4",
     "suncalc": "^1.9.0",
     "supercluster": "^8.0.1",
-    "zustand": "^4.4.1"
+    "zustand": "4.4.6"
   },
   "devDependencies": {
     "@rm/types": "*",

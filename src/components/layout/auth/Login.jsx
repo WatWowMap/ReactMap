@@ -10,7 +10,7 @@ import { useQuery } from '@apollo/client'
 
 import { CUSTOM_COMPONENT } from '@services/queries/config'
 
-import { basicEqualFn, useStatic } from '@hooks/useStore'
+import { useStatic } from '@hooks/useStore'
 import LocalLogin from './Local'
 import LocaleSelection from '../general/LocaleSelection'
 import DiscordLogin from './Discord'
@@ -20,28 +20,18 @@ import ThemeToggle from '../general/ThemeToggle'
 import { Loading } from '../general/Loading'
 
 export default function Login() {
-  const [
-    loggedIn,
-    loginPage,
-    headerTitle,
-    discordInvite,
-    discordAuthUrl,
-    telegramBotName,
-    telegramAuthUrl,
-    localAuthUrl,
-  ] = useStatic(
-    (s) => [
-      s.auth.loggedIn,
-      !!s.config.loginPage,
-      s.config.general.headerTitle,
-      s.config.links.discordInvite,
-      s.config.customRoutes.discordAuthUrl,
-      s.config.customRoutes.telegramBotName,
-      s.config.customRoutes.telegramAuthUrl,
-      s.config.customRoutes.localAuthUrl,
-    ],
-    basicEqualFn,
+  const loggedIn = useStatic((s) => s.auth.loggedIn)
+  const loginPage = useStatic((s) => !!s.config.loginPage)
+  const headerTitle = useStatic((s) => s.config.general.headerTitle)
+  const discordInvite = useStatic((s) => s.config.links.discordInvite)
+  const discordAuthUrl = useStatic((s) => s.config.customRoutes.discordAuthUrl)
+  const telegramBotName = useStatic(
+    (s) => s.config.customRoutes.telegramBotName,
   )
+  const telegramAuthUrl = useStatic(
+    (s) => s.config.customRoutes.telegramAuthUrl,
+  )
+  const localAuthUrl = useStatic((s) => s.config.customRoutes.localAuthUrl)
   const authMethods = useStatic((s) => s.auth.methods)
 
   const { t, i18n } = useTranslation()
