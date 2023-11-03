@@ -22,7 +22,11 @@ const loginRoute = (
   </Config>
 )
 const resetRoute = <ClearStorage />
-const blockedRoute = <Blocked />
+const blockedRoute = (
+  <Config>
+    <Blocked />
+  </Config>
+)
 const errorRoute = <Errors />
 
 export default function ReactRouter() {
