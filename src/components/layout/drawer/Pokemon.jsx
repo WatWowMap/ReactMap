@@ -121,7 +121,7 @@ export default function WithSliders({ category, context }) {
                         <Fragment key={each}>
                           <Grid item xs={3}>
                             <Typography variant="subtitle2" align="center">
-                              {t(i ? 'size_5' : 'size_1')}
+                              {t(i ? 'size_1' : 'size_5')}
                             </Typography>
                           </Grid>
                           <Grid item xs={3}>
