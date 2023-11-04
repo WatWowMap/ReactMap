@@ -36,6 +36,8 @@ export interface PoI {
   id: string
   lat: number
   lon: number
+  showcase: boolean
+  partner: boolean
 }
 
 export interface BaseCell {

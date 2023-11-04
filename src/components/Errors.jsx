@@ -4,18 +4,12 @@ import Grid from '@mui/material/Grid'
 import Typography from '@mui/material/Typography'
 import Button from '@mui/material/Button'
 import { useTranslation } from 'react-i18next'
-
-const rootLoading = document.getElementById('loader')
+import { useHideElement } from '@hooks/useHideElement'
 
 export default function Errors() {
   const { t } = useTranslation()
   const error = window.location.href.split('/').pop()
-
-  React.useEffect(() => {
-    if (rootLoading) {
-      rootLoading.style.display = 'none'
-    }
-  }, [])
+  useHideElement()
 
   return (
     <Grid

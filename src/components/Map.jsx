@@ -1,7 +1,7 @@
 // @ts-check
 import * as React from 'react'
 
-import { useStatic } from '@hooks/useStore'
+import { useStatic, useStore } from '@hooks/useStore'
 import Utility from '@services/Utility'
 import FilterPermCheck from './QueryData'
 
@@ -9,14 +9,15 @@ export default function Map() {
   Utility.analytics(window.location.pathname)
 
   const ready = useStatic((s) => !!s.map && !!s.Icons)
-  const ui = useStatic((state) => state.ui)
+  const ui = useStatic((s) => s.ui)
+  const profiling = useStore((s) => s.profiling)
 
   if (!ready) return null
   return (
     <>
       {Object.keys({ ...ui, ...ui.wayfarer, ...ui.admin }).map((category) => {
         if (category === 'settings') return null
-        return process.env.NODE_ENV === 'development' ? (
+        return process.env.NODE_ENV === 'development' && profiling ? (
           <React.Profiler
             key={category}
             id={category}

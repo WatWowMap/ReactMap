@@ -53,6 +53,18 @@ class Gym extends Model {
     return 'gym'
   }
 
+  /**
+   *
+   * @param {import('objection').QueryBuilder<Gym, Gym[]>} query
+   * @param {boolean} isMad
+   */
+  static onlyValid(query, isMad) {
+    query.andWhere('enabled', true)
+    if (!isMad) {
+      query.andWhere('deleted', false)
+    }
+  }
+
   static async getAll(perms, args, { isMad, availableSlotsCol }, userId) {
     const {
       gyms: gymPerms,
@@ -118,7 +130,7 @@ class Gym extends Model {
     query
       .whereBetween(isMad ? 'latitude' : 'lat', [args.minLat, args.maxLat])
       .andWhereBetween(isMad ? 'longitude' : 'lon', [args.minLon, args.maxLon])
-      .andWhere(isMad ? 'enabled' : 'deleted', isMad)
+    Gym.onlyValid(query, isMad)
 
     const raidBosses = new Set()
     const raidForms = new Set()
@@ -459,7 +471,6 @@ class Gym extends Model {
         'url',
         distance,
       ])
-      .where(isMad ? 'enabled' : 'deleted', isMad)
       .whereRaw(`LOWER(name) LIKE '%${search}%'`)
       .limit(searchResultsLimit)
       .orderBy('distance')
@@ -469,6 +480,8 @@ class Gym extends Model {
     if (!getAreaSql(query, areaRestrictions, onlyAreas, isMad)) {
       return []
     }
+    Gym.onlyValid(query, isMad)
+
     return query
   }
 
@@ -507,7 +520,6 @@ class Gym extends Model {
         '>=',
         isMad ? this.knex().fn.now() : ts,
       )
-      .andWhere(isMad ? 'enabled' : 'deleted', isMad)
     if (isMad) {
       query
         .leftJoin('gymdetails', 'gym.gym_id', 'gymdetails.gym_id')
@@ -519,6 +531,8 @@ class Gym extends Model {
     if (!getAreaSql(query, perms.areaRestrictions, onlyAreas, isMad)) {
       return []
     }
+    Gym.onlyValid(query, isMad)
+
     return query
   }
 
@@ -567,36 +581,42 @@ class Gym extends Model {
       .first()
   }
 
-  static getSubmissions(perms, args, { isMad }) {
+  static async getSubmissions(perms, args, { isMad }) {
     const {
-      filters: { onlyAreas = [] },
+      filters: { onlyAreas = [], onlyIncludeSponsored = true },
       minLat,
       minLon,
       maxLat,
       maxLon,
     } = args
+    const wiggle = 0.025
     const query = this.query()
       .whereBetween(`lat${isMad ? 'itude' : ''}`, [
-        minLat - 0.025,
-        maxLat + 0.025,
+        minLat - wiggle,
+        maxLat + wiggle,
       ])
       .andWhereBetween(`lon${isMad ? 'gitude' : ''}`, [
-        minLon - 0.025,
-        maxLon + 0.025,
+        minLon - wiggle,
+        maxLon + wiggle,
       ])
-      .andWhere(isMad ? 'enabled' : 'deleted', isMad)
     if (isMad) {
       query.select(['gym_id AS id', 'latitude AS lat', 'longitude AS lon'])
     } else {
-      query.select(['id', 'lat', 'lon']).andWhere((poi) => {
-        poi.whereNull('sponsor_id').orWhere('sponsor_id', 0)
-      })
+      query.select(['id', 'lat', 'lon', 'partner_id'])
+
+      if (!onlyIncludeSponsored) {
+        query.andWhere((poi) => {
+          poi.whereNull('partner_id').orWhere('partner_id', 0)
+        })
+      }
     }
     if (!getAreaSql(query, perms.areaRestrictions, onlyAreas, isMad)) {
       return []
     }
+    Gym.onlyValid(query, isMad)
 
-    return query
+    const results = await query
+    return results
   }
 }
 
