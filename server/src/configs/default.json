@@ -879,6 +879,10 @@
     {
       "name": "Intel",
       "url": "https://intel.ingress.com/intel?pll={x},{y}"
+    },
+    {
+      "name": "GeoURI",
+      "url": "geo:{x},{y}"
     }
   ],
   "icons": {
