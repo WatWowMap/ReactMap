@@ -46,7 +46,9 @@ const Location = () => {
   /** @param {[number, number]} location */
   const handleLocationChange = (location) => {
     if (location.every((x) => x !== 0)) {
-      useWebhookStore.setState({ location })
+      useWebhookStore.setState({
+        location: [location[0] ?? 0, location[1] ?? 0],
+      })
       save({
         variables: {
           category: 'setLocation',
@@ -111,7 +113,7 @@ const Location = () => {
       </Grid>
       <Grid item xs={6} sm={4} style={{ textAlign: 'center' }}>
         <Typography variant="body2">
-          {[latitude, longitude].map((x) => x.toFixed(6)).join(', ')}
+          {[latitude ?? 0, longitude ?? 0].map((x) => x.toFixed(6)).join(', ')}
         </Typography>
       </Grid>
       <Grid item xs={6} sm={3} style={{ textAlign: 'center' }}>
