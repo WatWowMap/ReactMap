@@ -131,7 +131,7 @@ const GymTile = (gym) => {
     ]
   }, basicEqualFn)
 
-  const opacity = useOpacity('gyms', 'raids')(gym.raid_end_timestamp)
+  const opacity = useOpacity('gyms', 'raid')(gym.raid_end_timestamp)
 
   const timerToDisplay =
     gym.raid_pokemon_id || hasHatched

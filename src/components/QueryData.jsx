@@ -3,7 +3,7 @@ import * as React from 'react'
 import { useQuery } from '@apollo/client'
 import { useMap } from 'react-leaflet'
 
-import { basicEqualFn, useStatic, useStore } from '@hooks/useStore'
+import { useStatic, useStore } from '@hooks/useStore'
 import { usePermCheck } from '@hooks/usePermCheck'
 import Query from '@services/Query'
 import { getQueryArgs } from '@services/functions/getQueryArgs'
@@ -96,13 +96,12 @@ function QueryData({ category, timeout }) {
     (s) => s.userSettings[userSettingsCategory(category)],
   )
   const filters = useStore((s) => s.filters[category])
-  const onlyAreas = useStore(
-    (s) =>
-      (s.filters?.scanAreas?.filterByAreas &&
-        s.filters?.scanAreas?.filter?.areas) ||
-      [],
-    basicEqualFn,
-  )
+  const onlyAreas =
+    useStore(
+      (s) =>
+        s.filters?.scanAreas?.filterByAreas &&
+        s.filters?.scanAreas?.filter?.areas,
+    ) || []
 
   const initial = React.useMemo(
     () => ({

@@ -43,8 +43,8 @@
     ]
   },
   "dependencies": {
-    "@apollo/client": "^3.7.15",
-    "@apollo/server": "^4.7.4",
+    "@apollo/client": "^3.8.7",
+    "@apollo/server": "^4.9.5",
     "@emotion/react": "^11.11.1",
     "@emotion/styled": "^11.11.0",
     "@graphql-tools/graphql-file-loader": "^8.0.0",
@@ -118,7 +118,7 @@
     "source-map": "^0.7.4",
     "suncalc": "^1.9.0",
     "supercluster": "^8.0.1",
-    "zustand": "^4.4.1"
+    "zustand": "4.4.6"
   },
   "devDependencies": {
     "@rm/types": "*",

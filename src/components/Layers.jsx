@@ -1,3 +1,4 @@
+// @ts-check
 import * as React from 'react'
 import { TileLayer, ZoomControl, useMap } from 'react-leaflet'
 import { control } from 'leaflet'
@@ -33,7 +34,9 @@ export function ControlledLocate() {
           setView: 'untilPan',
         })
         .addTo(map)
-      return () => lc.remove()
+      return () => {
+        lc.remove()
+      }
     }
   }, [navSetting])
 
