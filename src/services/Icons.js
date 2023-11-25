@@ -58,8 +58,9 @@ class UIcons {
           : dirtyPath
 
         if (data) {
+          const indexes = Object.keys(data)
           this[name] = {
-            indexes: Object.keys(data),
+            ...this[name],
             ...icon,
             path,
           }
@@ -76,7 +77,7 @@ class UIcons {
           if (!this[name].modifiers) {
             this[name].modifiers = {}
           }
-          this[name].indexes.forEach((category) => {
+          indexes.forEach((category) => {
             let isValid = false
             if (
               !parseInt(category) &&
