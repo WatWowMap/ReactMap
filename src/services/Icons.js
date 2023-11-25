@@ -131,15 +131,15 @@ class UIcons {
       }
     })
     // for debugging purposes/viewing
-    if (!window.uicons) {
-      Object.defineProperty(window, 'uicons', {
-        value: this,
-        writable: false,
-        enumerable: true,
-        configurable: false,
-      })
-    }
-    return this
+    // if (!window.uicons) {
+    Object.defineProperty(window, 'uicons', {
+      value: this,
+      writable: true,
+      enumerable: true,
+      configurable: false,
+    })
+    // }
+    // return this
   }
 
   get selection() {
@@ -312,9 +312,10 @@ class UIcons {
       }
       return `${baseUrl}/0.${extension}`
     } catch (e) {
-      console.error('[UICONS]', e)
-      console.error('[UICONS]', this)
-      console.error('[UICONS]', this.selected.pokemon)
+      console.error('[UICONS] Error:', e)
+      console.error('[UICONS] This:', this)
+      console.error('[UICONS] Selected Pokemon', this.selected.pokemon)
+      console.error('[UICONS] Select UICON', this[this.selected.pokemon])
       return `${this.fallback}/pokemon/0.webp`
     }
   }
