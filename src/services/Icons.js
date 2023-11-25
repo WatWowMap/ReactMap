@@ -313,6 +313,8 @@ class UIcons {
       return `${baseUrl}/0.${extension}`
     } catch (e) {
       console.error('[UICONS]', e)
+      console.error('[UICONS]', this)
+      console.error('[UICONS]', this.selected.pokemon)
       return `${this.fallback}/pokemon/0.webp`
     }
   }
