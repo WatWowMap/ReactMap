@@ -26,7 +26,7 @@ class Session extends Model {
         .select('session_id')
         .whereRaw(`json_extract(data, '$.passport.user.id') = ${userId}`)
         .andWhere('expires', '>=', ts)
-      return results.length < config.getSafe('api.maxSessions')
+      return results.length <= config.getSafe('api.maxSessions')
     } catch (e) {
       log.error(HELPERS.session, 'Unable to validate session', e)
       return false
