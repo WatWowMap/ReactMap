@@ -1,5 +1,12 @@
 // @ts-check
 /* eslint-disable no-console */
+
+/**
+ *
+ * @template {object} T
+ * @param {T} target
+ * @param {keyof T} property
+ */
 const freezeProps = (target, property) => {
   const {
     value,
@@ -19,11 +26,21 @@ const freezeProps = (target, property) => {
 
 // TODO: This is dumb, should be a state machine with Zustand
 class UIcons {
-  constructor({ customizable, sizes, cacheHrs }, questRewardTypes) {
+  /**
+   *
+   * @param {import("@rm/types").Config['icons']} iconsConfig
+   * @param {import("@rm/types").Masterfile['questRewardTypes']} questRewardTypes
+   */
+  constructor({ customizable, sizes }, questRewardTypes) {
     this.customizable = customizable
     this.sizes = sizes
     this.selected = {}
-    this.questRewardTypes = {}
+    this.questRewardTypes = Object.fromEntries(
+      Object.entries(questRewardTypes).map(([id, category]) => [
+        id,
+        category.toLowerCase().replace(' ', '_').replace(' ', '_'),
+      ]),
+    )
     this.fallback =
       'https://raw.githubusercontent.com/WatWowMap/wwm-uicons-webp/main'
     this.modifiers = {
@@ -35,17 +52,17 @@ class UIcons {
         popupY: 0,
       },
     }
-    this.cacheMs = cacheHrs * 60 * 60 * 1000
-    Object.entries(questRewardTypes).forEach(
-      ([id, category]) =>
-        (this.questRewardTypes[id] = category.toLowerCase().replace(' ', '_')),
-    )
+
     // Freezing since we don't change them in the codebase but we're exposing uicons to the global object and we don't want them to be changed in the browser console
     freezeProps(this, 'customizable')
     freezeProps(this, 'sizes')
     freezeProps(this, 'questRewardTypes')
   }
 
+  /**
+   *
+   * @param {import("@rm/types").UIconsClient[]} icons
+   */
   build(icons) {
     icons.forEach((icon) => {
       try {
@@ -65,11 +82,12 @@ class UIcons {
             path,
           }
           if (!path) {
-            // eslint-disable-next-line no-console
-            console.error('No path provided for', name, 'using default path')
-            this[
-              name
-            ].path = `https://raw.githubusercontent.com/WatWowMap/wwm-uicons-webp/main`
+            console.error(
+              '[UICONS] No path provided for',
+              name,
+              'using default path',
+            )
+            this[name].path = this.fallback
           }
           if (!path.startsWith('http')) {
             this[name].path = `/images/uicons/${path}`
@@ -103,10 +121,10 @@ class UIcons {
                 })
               }
               if (!this[category]) {
-                this[category] = []
+                this[category] = new Set()
               }
               if (isValid) {
-                this[category].push(name)
+                this[category].add(name)
               }
               if (!this[name].modifiers[category]) {
                 this[name].modifiers[category] = this.modifiers.base
@@ -127,33 +145,36 @@ class UIcons {
           })
         }
       } catch (e) {
-        // eslint-disable-next-line no-console
-        console.error('Issue loading', icon, '\n', e)
+        console.error('[ICONS] issue building', icon, '\n', e)
       }
     })
     // for debugging purposes/viewing
-    // if (!window.uicons) {
     Object.defineProperty(window, 'uicons', {
       value: this,
       writable: true,
       enumerable: true,
       configurable: false,
     })
-    // }
-    // return this
   }
 
   get selection() {
     return { ...this.selected }
   }
 
+  /** @param {Record<string, string>} localIconObj */
   checkValid(localIconObj) {
     return Object.values(localIconObj || {}).every((icon) => this[icon])
   }
 
+  /**
+   *
+   * @param {Record<string, string> | string} categories
+   * @param {string} [value]
+   */
   setSelection(categories, value) {
     if (typeof categories === 'object') {
       Object.keys(categories).forEach((category) => {
+        console.log(category, categories[category], this[categories[category]])
         if (this[categories[category]]) {
           this.selected[category] = categories[category]
           this.modifiers[category] = this[categories[category]]
@@ -180,12 +201,14 @@ class UIcons {
       : baseSize
   }
 
+  /** @param {string[]} categories */
   getModifiers(...categories) {
     return categories.map((category) =>
       this.modifiers[category] ? this.modifiers[category] : this.modifiers.base,
     )
   }
 
+  /** @param {string} id */
   getIconById(id) {
     if (id === 'kecleon') {
       id = 'b8'
@@ -252,6 +275,7 @@ class UIcons {
     }
   }
 
+  /** @param {number | string} [displayType] */
   getEventStops(displayType = 0) {
     try {
       switch (+displayType) {
@@ -273,8 +297,19 @@ class UIcons {
     }
   }
 
+  /**
+   *
+   * @param {string | number} [pokemonId]
+   * @param {string | number} [form]
+   * @param {string | number} [evolution]
+   * @param {string | number} [gender]
+   * @param {string | number} [costume]
+   * @param {string | number} [alignment]
+   * @param {boolean} [shiny]
+   * @returns
+   */
   getPokemon(
-    pokemonId,
+    pokemonId = 0,
     form = 0,
     evolution = 0,
     gender = 0,
@@ -313,15 +348,13 @@ class UIcons {
       }
       return `${baseUrl}/0.${extension}`
     } catch (e) {
-      console.error('[UICONS] Error:', e)
-      console.error('[UICONS] This:', this)
-      console.error('[UICONS] Selected Pokemon', this.selected.pokemon)
-      console.error('[UICONS] Select UICON', this[this.selected.pokemon])
+      console.error('[UICONS]', e)
       return `${this.fallback}/pokemon/0.webp`
     }
   }
 
-  getTypes(typeId) {
+  /** @param {number | string} [typeId] */
+  getTypes(typeId = 0) {
     try {
       const baseUrl = `${this[this.selected.type]?.path || this.fallback}/type`
       const extension = this[this.selected.type]?.extension || 'png'
@@ -337,8 +370,18 @@ class UIcons {
     }
   }
 
+  /**
+   *
+   * @param {string | number} [lureId]
+   * @param {boolean} [invasionActive]
+   * @param {boolean} [questActive]
+   * @param {boolean} [ar]
+   * @param {string | number} [power]
+   * @param {string | number} [display]
+   * @returns
+   */
   getPokestops(
-    lureId,
+    lureId = 0,
     invasionActive = false,
     questActive = false,
     ar = false,
@@ -376,7 +419,14 @@ class UIcons {
     }
   }
 
-  getRewards(rewardType, id, amount) {
+  /**
+   *
+   * @param {string | number} [rewardType]
+   * @param {string | number} [id]
+   * @param {number} [amount]
+   * @returns
+   */
+  getRewards(rewardType, id, amount = 0) {
     try {
       const category = this.questRewardTypes[rewardType] || 'unset'
       const baseUrl = `${
@@ -400,6 +450,12 @@ class UIcons {
     }
   }
 
+  /**
+   *
+   * @param {string | number} gruntType
+   * @param {boolean} [confirmed]
+   * @returns
+   */
   getInvasions(gruntType, confirmed = false) {
     try {
       const baseUrl = `${
@@ -421,6 +477,15 @@ class UIcons {
     }
   }
 
+  /**
+   *
+   * @param {string | number} teamId
+   * @param {string | number} trainerCount
+   * @param {boolean} [inBattle]
+   * @param {boolean} [ex]
+   * @param {boolean} [ar]
+   * @returns
+   */
   getGyms(
     teamId = 0,
     trainerCount = 0,
@@ -455,6 +520,13 @@ class UIcons {
     }
   }
 
+  /**
+   *
+   * @param {string | number} level
+   * @param {boolean} [hatched]
+   * @param {boolean} [ex]
+   * @returns
+   */
   getEggs(level, hatched = false, ex = false) {
     try {
       const baseUrl = `${
@@ -482,6 +554,11 @@ class UIcons {
     }
   }
 
+  /**
+   *
+   * @param {string | number} [teamId]
+   * @returns
+   */
   getTeams(teamId = 0) {
     try {
       const baseUrl = `${this[this.selected.team]?.path || this.fallback}/team`
@@ -498,6 +575,12 @@ class UIcons {
     }
   }
 
+  /**
+   *
+   * @param {string | number} weatherId
+   * @param {'day' | 'night'} [timeOfDay]
+   * @returns
+   */
   getWeather(weatherId, timeOfDay = 'day') {
     try {
       const baseUrl = `${
@@ -519,6 +602,11 @@ class UIcons {
     }
   }
 
+  /**
+   *
+   * @param {string | number} typeId
+   * @returns
+   */
   getNests(typeId) {
     try {
       const baseUrl = `${this[this.selected.nest]?.path || this.fallback}/nest`
@@ -535,12 +623,14 @@ class UIcons {
     }
   }
 
+  /** @param {string} fileName */
   doesMiscHave(fileName) {
     return this[this.selected.misc].misc.has(
       `${fileName}.${this[this.selected.misc].extension || 'png'}`,
     )
   }
 
+  /** @param {string} fileName */
   getMisc(fileName = '') {
     try {
       const baseUrl = `${this[this.selected.misc]?.path || this.fallback}/misc`
@@ -573,6 +663,7 @@ class UIcons {
     }
   }
 
+  /** @param {boolean} [online] */
   getDevices(online = false) {
     try {
       const baseUrl = `${
@@ -587,6 +678,7 @@ class UIcons {
     }
   }
 
+  /** @param {boolean} [hasTth] */
   getSpawnpoints(hasTth = false) {
     try {
       const baseUrl = `${
