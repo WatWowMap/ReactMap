@@ -174,7 +174,6 @@ class UIcons {
   setSelection(categories, value) {
     if (typeof categories === 'object') {
       Object.keys(categories).forEach((category) => {
-        console.log(category, categories[category], this[categories[category]])
         if (this[categories[category]]) {
           this.selected[category] = categories[category]
           this.modifiers[category] = this[categories[category]]
