@@ -3,7 +3,6 @@ import useMediaQuery from '@mui/material/useMediaQuery'
 
 import useGenerate from '@hooks/useGenerate'
 import useRefresh from '@hooks/useRefresh'
-import { useWindowState } from '@hooks/useWindowState'
 import { useStatic } from '@hooks/useStore'
 import { useParams } from 'react-router-dom'
 import { useMap } from 'react-leaflet'
@@ -16,7 +15,6 @@ export function Effects() {
 
   useRefresh()
   useGenerate()
-  useWindowState()
 
   const isMobile = useMediaQuery((theme) => theme.breakpoints.only('xs'))
   const isTablet = useMediaQuery((theme) => theme.breakpoints.only('sm'))

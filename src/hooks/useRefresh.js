@@ -16,7 +16,6 @@ export default function useRefresh() {
 
   const { data, stopPolling, startPolling, refetch } = useQuery(getAvailable, {
     fetchPolicy: active && online ? 'network-only' : 'cache-only',
-    pollInterval: 1000 * 60 * 60,
   })
 
   useEffect(() => {
