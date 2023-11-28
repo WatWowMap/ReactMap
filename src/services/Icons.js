@@ -1,28 +1,28 @@
 // @ts-check
 /* eslint-disable no-console */
 
-/**
- *
- * @template {object} T
- * @param {T} target
- * @param {keyof T} property
- */
-const freezeProps = (target, property) => {
-  const {
-    value,
-    get = () => value,
-    set = () => undefined,
-    // eslint-disable-next-line no-unused-vars
-    writable: _writable,
-    ...desc
-  } = Object.getOwnPropertyDescriptor(target, property)
-  Object.defineProperty(target, property, {
-    ...desc,
-    get,
-    set,
-    configurable: false,
-  })
-}
+// /**
+//  *
+//  * @template {object} T
+//  * @param {T} target
+//  * @param {keyof T} property
+//  */
+// const freezeProps = (target, property) => {
+//   const {
+//     value,
+//     get = () => value,
+//     set = () => undefined,
+//     // eslint-disable-next-line no-unused-vars
+//     writable: _writable,
+//     ...desc
+//   } = Object.getOwnPropertyDescriptor(target, property)
+//   Object.defineProperty(target, property, {
+//     ...desc,
+//     get,
+//     set,
+//     configurable: false,
+//   })
+// }
 
 // TODO: This is dumb, should be a state machine with Zustand
 class UIcons {
@@ -54,9 +54,9 @@ class UIcons {
     }
 
     // Freezing since we don't change them in the codebase but we're exposing uicons to the global object and we don't want them to be changed in the browser console
-    freezeProps(this, 'customizable')
-    freezeProps(this, 'sizes')
-    freezeProps(this, 'questRewardTypes')
+    // freezeProps(this, 'customizable')
+    // freezeProps(this, 'sizes')
+    // freezeProps(this, 'questRewardTypes')
   }
 
   /**
@@ -149,12 +149,12 @@ class UIcons {
       }
     })
     // for debugging purposes/viewing
-    Object.defineProperty(window, 'uicons', {
-      value: this,
-      writable: true,
-      enumerable: true,
-      configurable: false,
-    })
+    // Object.defineProperty(window, 'uicons', {
+    //   value: this,
+    //   writable: true,
+    //   enumerable: true,
+    //   configurable: false,
+    // })
   }
 
   get selection() {
