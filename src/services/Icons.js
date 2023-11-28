@@ -126,8 +126,11 @@ class UIcons {
               if (isValid) {
                 this[category].add(name)
               }
+              if (!this[name].modifiers) {
+                this[name].modifiers = {}
+              }
               if (!this[name].modifiers[category]) {
-                this[name].modifiers[category] = this.modifiers.base
+                this[name].modifiers[category] = { ...this.modifiers.base }
               } else {
                 this[name].modifiers[category] = {
                   ...this.modifiers.base,
@@ -149,12 +152,12 @@ class UIcons {
       }
     })
     // for debugging purposes/viewing
-    // Object.defineProperty(window, 'uicons', {
-    //   value: this,
-    //   writable: true,
-    //   enumerable: true,
-    //   configurable: false,
-    // })
+    Object.defineProperty(window, 'uicons', {
+      value: this,
+      writable: true,
+      enumerable: true,
+      configurable: false,
+    })
   }
 
   get selection() {
@@ -202,8 +205,8 @@ class UIcons {
 
   /** @param {string[]} categories */
   getModifiers(...categories) {
-    return categories.map((category) =>
-      this.modifiers[category] ? this.modifiers[category] : this.modifiers.base,
+    return categories.map(
+      (category) => this.modifiers[category] ?? this.modifiers.base,
     )
   }
 
