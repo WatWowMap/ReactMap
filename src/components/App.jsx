@@ -11,15 +11,14 @@ import { ApolloProvider } from '@apollo/client'
 
 import useCustomTheme from '@assets/mui/theme'
 import { globalStyles } from '@assets/mui/global'
-import { useStatic, useStore } from '@hooks/useStore'
 import { apolloClient } from '@services/apollo'
 import { isLocalStorageEnabled } from '@services/functions/isLocalStorageEnabled'
 import { setLoadingText } from '@services/functions/setLoadingText'
+import '@services/events'
 
 import ErrorBoundary from './ErrorBoundary'
 import ReactRouter from './ReactRouter'
 import HolidayEffects from './HolidayEffects'
-
 /**
  * @type {Record<string, string>}
  */
@@ -46,20 +45,6 @@ function SetText() {
   setLoadingText(LOADING_LOCALES[locale.toLowerCase()] || LOADING_LOCALES.en)
   return <div />
 }
-
-/** @param {KeyboardEvent} event */
-function toggleDarkMode(event) {
-  // This is mostly meant for development purposes
-  if (event.ctrlKey && event.key === 'd') {
-    useStore.setState((prev) => ({ darkMode: !prev.darkMode }))
-  }
-}
-
-window.addEventListener('keydown', toggleDarkMode)
-
-window.addEventListener('online', () => useStatic.setState({ online: true }))
-
-window.addEventListener('offline', () => useStatic.setState({ online: false }))
 
 export default function App() {
   const theme = useCustomTheme()
