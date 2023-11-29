@@ -38,7 +38,7 @@ export default function useRefresh() {
       const existing = useStatic.getState().Icons
       const Icons = existing ?? new UIcons(icons, masterfile.questRewardTypes)
 
-      Icons.build(icons.styles)
+      Icons.build(structuredClone(icons.styles))
       if (icons.defaultIcons && !existing) {
         Icons.setSelection(icons.defaultIcons)
       }
