@@ -127,7 +127,7 @@ export default function Settings() {
             />
           }
         >
-          {Icons[category].map((option) => (
+          {[...Icons[category]].map((option) => (
             <MenuItem key={option} value={option}>
               {t(
                 `${category.toLowerCase()}_${option.toLowerCase()}`,
