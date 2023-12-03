@@ -2,8 +2,8 @@
 import * as React from 'react'
 import { Marker, useMap } from 'react-leaflet'
 
-import { useScanStore } from '@hooks/useStore'
 import fallbackIcon from '@components/markers/fallback'
+import { useScanStore } from './store'
 
 /**
  * @param {{ children: React.ReactNode }} props

@@ -1,13 +1,12 @@
 // @ts-check
 import * as React from 'react'
 
-import { useScanStore } from '@hooks/useStore'
-
 import { ScanCircle, ScanCircles } from '../Shared'
 import { useCheckValid } from '../useCheckValid'
 import { ScanNextPopup } from './PopupContent'
 import { ScanOnDemandMarker } from '../Marker'
 import { ScanOnDemandPopup } from '../Popup'
+import { useScanStore } from '../store'
 
 const POKEMON_RADIUS = 70
 const GYM_RADIUS = 750

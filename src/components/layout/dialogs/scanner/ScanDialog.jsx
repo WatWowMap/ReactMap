@@ -5,7 +5,8 @@ import { useTranslation } from 'react-i18next'
 
 import Header from '@components/layout/general/Header'
 import Footer from '@components/layout/general/Footer'
-import { useScanStore } from '@hooks/useStore'
+
+import { useScanStore } from './store'
 
 const { setScanMode } = useScanStore.getState()
 
