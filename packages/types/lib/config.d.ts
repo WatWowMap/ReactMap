@@ -124,7 +124,7 @@ export interface Config<Client extends boolean = false>
     customizable: string[]
     styles: ExampleConfig['icons']['styles'][number][]
     defaultIcons: Record<string, string>
-  } & BaseConfig['icons']
+  } & Omit<BaseConfig['icons'], 'customizable' | 'styles' | 'defaultIcons'>
   manualAreas: ExampleConfig['manualAreas'][number][]
 }
 
