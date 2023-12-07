@@ -10,6 +10,7 @@ import { deepMerge } from '@services/functions/deepMerge'
 import { Navigate } from 'react-router-dom'
 import { checkHoliday } from '@services/functions/checkHoliday'
 import { useHideElement } from '@hooks/useHideElement'
+import { useScannerSessionStorage } from './layout/dialogs/scanner/store'
 
 export default function Config({ children }) {
   const { t } = useTranslation()
@@ -87,6 +88,9 @@ export default function Config({ children }) {
         ),
       }
 
+      useScannerSessionStorage.setState((prev) => ({
+        cooldown: Math.max(prev.cooldown, data.user.cooldown || 0),
+      }))
       useStatic.setState({
         auth: {
           strategy: data.user?.strategy || '',

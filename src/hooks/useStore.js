@@ -23,7 +23,6 @@ import { persist, createJSONStorage } from 'zustand/middleware'
  *   searchTab: string,
  *   search: string,
  *   filters: object,
- *   scannerCooldown: number
  *   icons: Record<string, string>
  *   userSettings: Record<string, any>
  *   profiling: boolean
@@ -101,7 +100,6 @@ export const useStore = create(
         names: true,
       },
       motdIndex: 0,
-      scannerCooldown: 0,
       profiling: false,
     }),
     {
@@ -281,57 +279,6 @@ export const toggleDialog = (open, category, type, filter) => (event) => {
     }))
   }
 }
-
-/**
- * @typedef {'scanNext' | 'scanZone'} ScanMode
- * @typedef {'' | 'mad' | 'rdm' | 'custom'} ScannerType
- * @typedef {{
- *   scannerType: ScannerType,
- *   showScanCount: boolean,
- *   showScanQueue: boolean,
- *   advancedOptions: boolean,
- *   pokemonRadius: number,
- *   gymRadius: number,
- *   spacing: number,
- *   maxSize: number,
- *   cooldown: number,
- *   refreshQueue: number
- *   enabled: boolean,
- * }} ScanConfig
- * @typedef {{
- *  scanNextMode: '' | 'setLocation' | 'sendCoords' | 'loading' | 'confirmed' | 'error',
- *  scanZoneMode: UseScanStore['scanNextMode']
- *  queue: 'init' | '...' | number,
- *  scanLocation: [number, number],
- *  scanCoords: [number, number][],
- *  validCoords: boolean[],
- *  scanNextSize: 'S' | 'M' | 'L' | 'XL',
- *  scanZoneSize: number,
- *  userRadius: number,
- *  userSpacing: number,
- *  valid: 'none' | 'some' | 'all',
- *  estimatedDelay: number,
- *  setScanMode: <T extends `${ScanMode}Mode`>(mode: T, nextMode?: UseScanStore[T]) => void,
- *  setScanSize: <T extends `${ScanMode}Size`>(mode: T, size: UseScanStore[T]) => void,
- * }} UseScanStore
- * @type {import("zustand").UseBoundStore<import("zustand").StoreApi<UseScanStore>>}
- */
-export const useScanStore = create((set) => ({
-  scanNextMode: '',
-  scanZoneMode: '',
-  queue: 'init',
-  scanLocation: [0, 0],
-  scanCoords: [],
-  validCoords: [],
-  scanNextSize: 'S',
-  scanZoneSize: 1,
-  userRadius: 70,
-  userSpacing: 1,
-  valid: 'none',
-  estimatedDelay: 0,
-  setScanMode: (mode, nextMode = '') => set({ [mode]: nextMode }),
-  setScanSize: (mode, size) => set({ [mode]: size }),
-}))
 
 /**
  * @template {string | number | boolean} T

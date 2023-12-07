@@ -3,7 +3,7 @@ import * as React from 'react'
 import { Button, ButtonGroup, ListItem } from '@mui/material'
 import { useTranslation } from 'react-i18next'
 
-import { useScanStore } from '@hooks/useStore'
+import { useScanStore } from '../store'
 
 const SIZES = /** @type {const} */ (['S', 'M', 'XL'])
 

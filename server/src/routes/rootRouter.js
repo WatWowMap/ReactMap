@@ -50,12 +50,13 @@ rootRouter.post('/api/error/client', async (req, res) => {
     const originalStack =
       typeof stack === 'string'
         ? await Promise.all(
-            stack.split('\n').map(async (stackLine) => {
+            stack.split('\n').map(async (stackLine, i) => {
               const match = stackLine.match(
                 /at (.+) \(https?:\/\/([^/]+)\/(.+\.js):(\d+):(\d+)\)/,
               )
+              log.debug(HELPERS.client, { match, stackLine })
               if (match) {
-                const [, functionName, , file, line, column] = match
+                const [full, functionName, host, file, line, column] = match
                 const foundStack = await SourceMapConsumer.with(
                   await fs.promises.readFile(
                     resolve(__dirname, '../../../dist', `${file}.map`),
@@ -77,6 +78,21 @@ rootRouter.post('/api/error/client', async (req, res) => {
                 if (foundStack) {
                   return foundStack
                 }
+                log.warn(HELPERS.client, 'Unable to find source map', {
+                  full,
+                  functionName,
+                  host,
+                  file,
+                  line,
+                  column,
+                })
+              }
+              if (i > 0) {
+                log.warn(
+                  HELPERS.client,
+                  'Regex missed for stack line:',
+                  stackLine,
+                )
               }
               return stackLine
             }),

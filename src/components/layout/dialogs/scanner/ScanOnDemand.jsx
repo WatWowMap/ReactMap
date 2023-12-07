@@ -2,7 +2,7 @@
 import * as React from 'react'
 import { useQuery, useLazyQuery } from '@apollo/client'
 
-import { useScanStore, useStatic, useStore } from '@hooks/useStore'
+import { useStatic, useStore } from '@hooks/useStore'
 
 import { SCANNER_CONFIG, SCANNER_STATUS } from '@services/queries/scanner'
 
@@ -11,6 +11,7 @@ import ScanZone from './scanZone'
 import { getScanNextCoords } from './scanNext/getCoords'
 import { getScanZoneCoords } from './scanZone/getCoords'
 import { ConfigContext, DEFAULT } from './ContextProvider'
+import { useScanStore, useScannerSessionStorage } from './store'
 
 const { setScanMode } = useScanStore.getState()
 
@@ -57,13 +58,12 @@ function ScanOnDemand({ mode }) {
   const demandScan = () => {
     const { scanCoords, validCoords, scanLocation, ...rest } =
       useScanStore.getState()
-    useStore.setState({
-      scannerCooldown:
-        (typeof config.cooldown === 'number' ? config.cooldown : 0) *
-          validCoords.filter(Boolean).length *
-          1000 +
-        Date.now(),
-    })
+    const cooldown =
+      (typeof config.cooldown === 'number' ? config.cooldown : 0) *
+        validCoords.filter(Boolean).length *
+        1000 +
+      Date.now()
+    useScannerSessionStorage.setState({ cooldown })
     setScanMode(`${mode}Mode`, 'loading')
     scan({
       variables: {
@@ -73,6 +73,7 @@ function ScanOnDemand({ mode }) {
           scanLocation,
           scanCoords: scanCoords.filter((_, i) => validCoords[i]),
           scanSize: rest[`${mode}Size`],
+          cooldown,
         },
       },
     })
