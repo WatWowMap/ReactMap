@@ -213,6 +213,9 @@ class Pokestop extends Model {
         switch (pokestop.charAt(0)) {
           case 'o':
             break
+          case 'f':
+            // do nothing
+            break
           case 'd':
             stardust.push(pokestop.slice(1).split('-')[0])
             break
@@ -716,6 +719,15 @@ class Pokestop extends Model {
                 ? MAD_GRUNT_MAP[event.grunt_type] || 8
                 : event.display_type,
           }))
+          .filter((event) =>
+            event.showcase_pokemon_id
+              ? filters[
+                  `f${event.showcase_pokemon_id}-${
+                    event.showcase_pokemon_form_id ?? 0
+                  }`
+                ]
+              : true,
+          )
       }
       if (
         perms.invasions &&

@@ -43,40 +43,41 @@ export default function MenuTile({ data, rowIndex, columnIndex, style }) {
     )
   }
 
-  const image = item.id.startsWith('a') ? (
-    <div style={{ position: 'relative' }}>
+  const image =
+    item.id.startsWith('a') || item.id.startsWith('f') ? (
+      <div style={{ position: 'relative' }}>
+        <img
+          alt={item.url}
+          src={item.url}
+          style={{
+            maxHeight: isMobile ? 50 : 75,
+            maxWidth: isMobile ? 50 : 75,
+          }}
+        />
+        <img
+          alt="shadow"
+          style={{
+            height: isMobile ? 30 : 40,
+            width: isMobile ? 30 : 40,
+            position: 'absolute',
+            bottom: 0,
+            left: isMobile ? 'auto' : 0,
+          }}
+          src={Icons.getMisc(item.id.startsWith('a') ? 'shadow' : 'showcase')}
+        />
+      </div>
+    ) : (
       <img
+        className="grid-item"
         alt={item.url}
         src={item.url}
         style={{
           maxHeight: isMobile ? 50 : 75,
           maxWidth: isMobile ? 50 : 75,
         }}
+        onClick={handleFilterChange}
       />
-      <img
-        alt="shadow"
-        style={{
-          height: isMobile ? 30 : 40,
-          width: isMobile ? 30 : 40,
-          position: 'absolute',
-          bottom: 0,
-          left: isMobile ? 'auto' : 0,
-        }}
-        src={Icons.getMisc('shadow')}
-      />
-    </div>
-  ) : (
-    <img
-      className="grid-item"
-      alt={item.url}
-      src={item.url}
-      style={{
-        maxHeight: isMobile ? 50 : 75,
-        maxWidth: isMobile ? 50 : 75,
-      }}
-      onClick={handleFilterChange}
-    />
-  )
+    )
   const selection = (
     <IconButton onClick={handleFilterChange} size="large">
       {tempFilters[item.id]?.enabled ? (

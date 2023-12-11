@@ -32,7 +32,7 @@ class EventManager {
   /**
    *
    * @param {keyof EventManager['available']} category
-   * @returns
+   * @returns {string[]}
    */
   getAvailable(category) {
     return this.available[category]
