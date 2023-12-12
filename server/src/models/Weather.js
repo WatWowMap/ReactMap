@@ -34,7 +34,7 @@ class Weather extends Model {
     const results = await query
 
     const areas = config.getSafe('areas')
-    const cleanUserAreas = args.filters.onlyAreas.filter((area) =>
+    const cleanUserAreas = (args.filters.onlyAreas || []).filter((area) =>
       areas.names.has(area),
     )
     const merged = perms.areaRestrictions.length

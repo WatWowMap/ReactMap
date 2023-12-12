@@ -454,7 +454,7 @@ class Pokemon extends Model {
       !getAreaSql(
         query,
         perms.areaRestrictions,
-        args.filters.onlyAreas,
+        args.filters.onlyAreas || [],
         isMad,
         'pokemon',
       )
