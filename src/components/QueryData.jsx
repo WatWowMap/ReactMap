@@ -32,18 +32,13 @@ const userSettingsCategory = (category) => {
   }
 }
 
-const trimFilters = (
-  requestedFilters,
-  userSettings,
-  category,
-  onlyAreas = [],
-) => {
+const trimFilters = (requestedFilters, userSettings, category, onlyAreas) => {
   const { filters: staticFilters } = useStatic.getState()
   const trimmed = {
     onlyLegacy: userSettings?.legacyFilter,
     onlyLinkGlobal: userSettings?.linkGlobalAndAdvanced,
     onlyAllPvp: userSettings?.showAllPvpRanks,
-    onlyAreas,
+    onlyAreas: onlyAreas || [],
   }
   Object.entries(requestedFilters).forEach((topLevelFilter) => {
     const [id, specifics] = topLevelFilter
