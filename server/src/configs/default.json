@@ -470,6 +470,7 @@
       "lures": true,
       "quests": true,
       "eventStops": false,
+      "showcasePokemon": true,
       "questSet": "both",
       "confirmed": false,
       "items": true,
