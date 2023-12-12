@@ -202,6 +202,7 @@ export default function PokestopPopup({
                                     alt="invasion reward"
                                     src={Icons.getPokemon(
                                       event.showcase_pokemon_id,
+                                      event.showcase_pokemon_form_id,
                                     )}
                                   />
                                   <img

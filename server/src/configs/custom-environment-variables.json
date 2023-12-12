@@ -947,6 +947,10 @@
         "__name": "DEFAULT_FILTERS_POKESTOPS_EVENT_STOPS",
         "__format": "boolean"
       },
+      "showcasePokemon": {
+        "__name": "DEFAULT_FILTERS_POKESTOPS_SHOWCASE_POKEMON",
+        "__format": "boolean"
+      },
       "questSet": "DEFAULT_FILTERS_POKESTOPS_QUEST_SET",
       "confirmed": {
         "__name": "DEFAULT_FILTERS_POKESTOPS_CONFIRMED",

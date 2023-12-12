@@ -213,6 +213,9 @@ class Pokestop extends Model {
         switch (pokestop.charAt(0)) {
           case 'o':
             break
+          case 'f':
+            // do nothing
+            break
           case 'd':
             stardust.push(pokestop.slice(1).split('-')[0])
             break
@@ -708,6 +711,7 @@ class Pokestop extends Model {
           .map((event) => ({
             event_expire_timestamp: event.incident_expire_timestamp,
             showcase_pokemon_id: pokestop.showcase_pokemon_id,
+            showcase_pokemon_form_id: pokestop.showcase_pokemon_form_id,
             showcase_rankings: showcaseData,
             showcase_ranking_standard: pokestop.showcase_ranking_standard,
             display_type:
@@ -715,6 +719,15 @@ class Pokestop extends Model {
                 ? MAD_GRUNT_MAP[event.grunt_type] || 8
                 : event.display_type,
           }))
+          .filter((event) =>
+            event.showcase_pokemon_id
+              ? filters[
+                  `f${event.showcase_pokemon_id}-${
+                    event.showcase_pokemon_form_id ?? 0
+                  }`
+                ]
+              : true,
+          )
       }
       if (
         perms.invasions &&
@@ -978,6 +991,7 @@ class Pokestop extends Model {
     hasRewardAmount,
     hasConfirmed,
     hasShowcaseData,
+    hasShowcaseForm,
   }) {
     const ts = Math.floor(Date.now() / 1000)
     const finalList = new Set()
@@ -1353,11 +1367,15 @@ class Pokestop extends Model {
     // lures
 
     if (hasShowcaseData) {
-      queries.showcase = this.query()
-        .select('showcase_pokemon_id')
-        .distinct('showcase_pokemon_id')
-        .where('showcase_expiry', '>=', ts)
-        .orderBy('showcase_pokemon_id')
+      queries.showcase = hasShowcaseForm
+        ? this.query()
+            .distinct('showcase_pokemon_id', 'showcase_pokemon_form_id')
+            .where('showcase_expiry', '>=', ts)
+            .orderBy('showcase_pokemon_id', 'showcase_pokemon_form_id')
+        : this.query()
+            .distinct('showcase_pokemon_id')
+            .where('showcase_expiry', '>=', ts)
+            .orderBy('showcase_pokemon_id')
     }
 
     const resolved = Object.fromEntries(
@@ -1472,7 +1490,11 @@ class Pokestop extends Model {
         case 'showcase':
           if (hasShowcaseData) {
             rewards.forEach((reward) => {
-              finalList.add(`f${reward.showcase_pokemon_id}`)
+              finalList.add(
+                `f${reward.showcase_pokemon_id}-${
+                  reward.showcase_pokemon_form_id ?? 0
+                }`,
+              )
             })
           }
           break
