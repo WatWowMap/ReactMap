@@ -175,6 +175,7 @@ export interface Pokestop {
   showcase_pokemon_id?: number
   showcase_ranking_standard?: number
   showcase_rankings?: ShowcaseDetails | string
+  hasShowcase: boolean
 }
 
 export type FullPokestop = FullModel<Pokestop, PokestopModel>

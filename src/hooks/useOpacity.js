@@ -4,8 +4,9 @@ import { useStore } from './useStore'
 
 /**
  * Returns dynamic opacity based on timestamp
- * @param {'pokemon' | 'gyms' | 'pokestops'} category
- * @param {'raid' | 'invasion'} [subCategory]
+ * @template {'pokemon' | 'gyms' | 'pokestops'} T
+ * @param {T} category
+ * @param {T extends 'pokestops' ? 'invasion' : T extends 'gyms' ? 'raid' : never} [subCategory]
  * @returns
  */
 export default function useOpacity(category, subCategory) {

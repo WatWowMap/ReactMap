@@ -676,5 +676,6 @@
   "showcase_color": "Showcase Color",
   "partner_color": "Partner Color",
   "disable": "Disable {{- name}}",
-  "profiling": "Profiling"
+  "profiling": "Profiling",
+  "showcase_block": "Blocked due to a showcase"
 }
