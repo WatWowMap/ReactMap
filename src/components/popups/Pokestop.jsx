@@ -155,6 +155,7 @@ export default function PokestopPopup({
                           invasion.grunt_type,
                           invasion.confirmed,
                         )}
+                        disabled={pokestop.hasShowcase ? 'showcase_block' : ''}
                         until
                         tt={
                           invasion.grunt_type === 44 && !invasion.confirmed
@@ -173,9 +174,9 @@ export default function PokestopPopup({
                   {(hasQuest || hasLure || hasInvasion) && (
                     <Divider light flexItem className="popup-divider" />
                   )}
-                  {events.map(({ showcase_rankings = {}, ...event }, index) => {
+                  {events.map(({ showcase_rankings, ...event }, index) => {
                     const { contest_entries = [], ...showcase } =
-                      showcase_rankings
+                      showcase_rankings || { contest_entries: [] }
                     return (
                       <React.Fragment
                         key={`${event.display_type}-${event.event_expire_timestamp}`}
@@ -189,6 +190,11 @@ export default function PokestopPopup({
                             event.showcase_pokemon_id
                               ? `event_${event.display_type}`
                               : undefined
+                          }
+                          disabled={
+                            event.display_type !== 9 && pokestop.hasShowcase
+                              ? 'showcase_block'
+                              : ''
                           }
                           icon={
                             event.showcase_pokemon_id ? (
