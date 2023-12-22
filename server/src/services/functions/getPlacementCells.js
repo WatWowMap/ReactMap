@@ -1,5 +1,4 @@
 // @ts-check
-
 const {
   S2LatLng,
   S2RegionCoverer,
