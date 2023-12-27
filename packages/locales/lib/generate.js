@@ -9,9 +9,11 @@ const { log, HELPERS } = require('@rm/logger')
 
 const { readAndParseJson, readLocaleDirectory, writeAll } = require('./utils')
 
-const openAI = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-})
+const openAI = process.env.OPENAI_API_KEY
+  ? new OpenAI({
+      apiKey: process.env.OPENAI_API_KEY,
+    })
+  : null
 
 /**
  * @typedef {Record<string, string>} I18nObject
