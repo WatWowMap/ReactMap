@@ -671,5 +671,11 @@
   "done": "完成",
   "fast": "快速",
   "charged": "已充能",
-  "offline_mode": "離線模式"
+  "offline_mode": "離線模式",
+  "include_sponsored": "包括贊助內容",
+  "showcase_color": "專區顏色",
+  "partner_color": "合作夥伴顏色",
+  "disable": "停用 {{- name}}",
+  "profiling": "個人化配置",
+  "showcase_block": "由於專區而被屏蔽"
 }

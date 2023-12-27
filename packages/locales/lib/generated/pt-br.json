@@ -672,5 +672,11 @@
   "done": "Concluído",
   "fast": "Rápido",
   "charged": "Carregado",
-  "offline_mode": "Modo Offline"
+  "offline_mode": "Modo Offline",
+  "include_sponsored": "Incluir Patrocinado",
+  "showcase_color": "Cor da Destaque",
+  "partner_color": "Cor do Parceiro",
+  "disable": "Desativar {{- name}}",
+  "profiling": "Perfilamento",
+  "showcase_block": "Bloqueado devido ao destaque"
 }

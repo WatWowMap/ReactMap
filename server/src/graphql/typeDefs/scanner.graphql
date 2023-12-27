@@ -150,6 +150,7 @@ type Pokestop {
   power_up_level: Int
   power_up_points: Int
   power_up_end_timestamp: Int
+  hasShowcase: Boolean
 }
 
 type Pokemon {

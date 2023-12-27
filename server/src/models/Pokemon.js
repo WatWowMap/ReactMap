@@ -243,24 +243,10 @@ class Pokemon extends Model {
           const [id, form] = key.split('-', 2).map(Number)
           return { id, form }
         })
-
-      if (globalFilter.filterKeys.size) {
-        filters.push(
-          ...globalFilter.buildApiFilter(
-            globalFilter.mods.onlyLinkGlobal ? pokemon : undefined,
-          ),
-        )
-      }
-      if (onlyZeroIv)
-        filters.push({
-          iv: { min: 0, max: 0 },
-          pokemon: globalFilter.mods.onlyLinkGlobal ? pokemon : [],
-        })
-      if (onlyHundoIv)
-        filters.push({
-          iv: { min: 100, max: 100 },
-          pokemon: globalFilter.mods.onlyLinkGlobal ? pokemon : [],
-        })
+      if (!globalFilter.mods.onlyLinkGlobal) pokemon.push({ id: -1 }) // add everything else
+      filters.push(...globalFilter.buildApiFilter(pokemon))
+      if (onlyZeroIv) filters.push({ iv: { min: 0, max: 0 }, pokemon })
+      if (onlyHundoIv) filters.push({ iv: { min: 100, max: 100 }, pokemon })
     }
     /** @type {import("../types").Pokemon[]} */
     const results = await this.evalQuery(

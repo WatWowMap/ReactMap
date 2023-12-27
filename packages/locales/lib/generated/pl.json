@@ -676,5 +676,11 @@
   "done": "Gotowe",
   "fast": "Szybko",
   "charged": "Naładowane",
-  "offline_mode": "Tryb offline"
+  "offline_mode": "Tryb offline",
+  "include_sponsored": "Uwzględnij Sponsorowane",
+  "showcase_color": "Kolor Wystawy",
+  "partner_color": "Kolor Partnera",
+  "disable": "Wyłącz {{- name}}",
+  "profiling": "Tworzenie Profili",
+  "showcase_block": "Zablokowane ze względu na wystawę"
 }

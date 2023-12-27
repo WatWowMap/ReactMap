@@ -669,7 +669,7 @@ class Pokestop extends Model {
     const filteredResults = []
     for (let i = 0; i < queryResults.length; i += 1) {
       const pokestop = queryResults[i]
-      const filtered = {}
+      const filtered = { hasShowcase: pokestop.showcase_expiry > ts }
 
       this.fieldAssigner(filtered, pokestop, [
         'id',
@@ -710,10 +710,17 @@ class Pokestop extends Model {
           )
           .map((event) => ({
             event_expire_timestamp: event.incident_expire_timestamp,
-            showcase_pokemon_id: pokestop.showcase_pokemon_id,
-            showcase_pokemon_form_id: pokestop.showcase_pokemon_form_id,
-            showcase_rankings: showcaseData,
-            showcase_ranking_standard: pokestop.showcase_ranking_standard,
+            showcase_pokemon_id:
+              event.display_type === 9 ? pokestop.showcase_pokemon_id : null,
+            showcase_pokemon_form_id:
+              event.display_type === 9
+                ? pokestop.showcase_pokemon_form_id
+                : null,
+            showcase_rankings: event.display_type === 9 ? showcaseData : null,
+            showcase_ranking_standard:
+              event.display_type === 9
+                ? pokestop.showcase_ranking_standard
+                : null,
             display_type:
               isMad && !hasMultiInvasions
                 ? MAD_GRUNT_MAP[event.grunt_type] || 8

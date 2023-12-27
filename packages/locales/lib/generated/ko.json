@@ -671,5 +671,11 @@
   "done": "완료",
   "fast": "빠른",
   "charged": "충전된",
-  "offline_mode": "오프라인 모드"
+  "offline_mode": "오프라인 모드",
+  "include_sponsored": "스폰서 포함하기",
+  "showcase_color": "쇼케이스 색상",
+  "partner_color": "파트너 색상",
+  "disable": "{{- name}} 비활성화하기",
+  "profiling": "프로필링",
+  "showcase_block": "쇼케이스로 인해 차단됨"
 }

@@ -39,6 +39,7 @@ function getTypeCells(filters, pokestops, gyms) {
       polygon,
     }
   }
+  const seemGyms = new Set()
   for (let i = 0; i < gyms.length; i += 1) {
     const coords = gyms[i]
     const level14Cell = S2CellId.fromPoint(
@@ -49,16 +50,19 @@ function getTypeCells(filters, pokestops, gyms) {
     if (cell) {
       cell.count_gyms += 1
     }
+    seemGyms.add(coords.id)
   }
   for (let i = 0; i < pokestops.length; i += 1) {
     const coords = pokestops[i]
-    const level14Cell = S2CellId.fromPoint(
-      S2LatLng.fromDegrees(coords.lat, coords.lon).toPoint(),
-    ).parentL(14)
-    const cellId = level14Cell.id.toString()
-    const cell = indexedCells[cellId]
-    if (cell) {
-      cell.count_pokestops += 1
+    if (!seemGyms.has(coords.id)) {
+      const level14Cell = S2CellId.fromPoint(
+        S2LatLng.fromDegrees(coords.lat, coords.lon).toPoint(),
+      ).parentL(14)
+      const cellId = level14Cell.id.toString()
+      const cell = indexedCells[cellId]
+      if (cell) {
+        cell.count_pokestops += 1
+      }
     }
   }
   return Object.values(indexedCells)

@@ -19,6 +19,7 @@ import NameTT from './NameTT'
  *  expandKey?: string
  *  caption?: string
  *  children?: React.ReactNode
+ *  disabled?: string
  * }} param0
  * @returns
  */
@@ -31,6 +32,7 @@ export default function TimeTile({
   expandKey,
   caption,
   children,
+  disabled = '',
 }) {
   const endTime = new Date(expireTime * 1000)
   const expanded = useStore((state) => !!state.popups[expandKey])
@@ -40,14 +42,23 @@ export default function TimeTile({
       {icon && (
         <Grid item xs={size} style={{ textAlign: 'center' }}>
           {typeof icon === 'string' ? (
-            <NameTT id={tt}>
-              <img src={icon} className="quest-popup-img" alt={icon} />
+            <NameTT id={disabled || tt}>
+              <img
+                src={icon}
+                className={`quest-popup-img ${disabled ? 'disable-image' : ''}`}
+                alt={icon}
+              />
             </NameTT>
           ) : (
             icon
           )}
           {caption && (
-            <Typography variant="caption" className="ar-task" noWrap>
+            <Typography
+              variant="caption"
+              className="ar-task"
+              noWrap
+              color={disabled ? 'GrayText' : 'inherit'}
+            >
               {caption}
             </Typography>
           )}
@@ -59,8 +70,15 @@ export default function TimeTile({
           xs={icon ? (children ? 10 : 12) - size : children ? 10 : 12}
           style={{ textAlign: 'center' }}
         >
-          <Timer expireTime={expireTime} until={until} />
-          <Typography variant="caption">
+          <Timer
+            expireTime={expireTime}
+            until={until}
+            color={disabled ? 'GrayText' : 'inherit'}
+          />
+          <Typography
+            variant="caption"
+            color={disabled ? 'GrayText' : 'inherit'}
+          >
             {new Date(endTime).toLocaleTimeString(
               localStorage.getItem('i18nextLng') || 'en',
             )}
@@ -71,6 +89,7 @@ export default function TimeTile({
         <>
           <Grid item xs={2}>
             <IconButton
+              disabled={!!disabled}
               className={expanded ? 'expanded' : 'closed'}
               onClick={() =>
                 useStore.setState((prev) => ({

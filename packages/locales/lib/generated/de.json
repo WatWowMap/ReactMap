@@ -679,5 +679,11 @@
   "webhook_footer_feedback_width": 4,
   "cooldown": "Abkühlen",
   "saved": "Gespeichert",
-  "offline_mode": "Offline-Modus"
+  "offline_mode": "Offline-Modus",
+  "include_sponsored": "Gesponserte einbeziehen",
+  "showcase_color": "Ausstellungs-Farbe",
+  "partner_color": "Partner-Farbe",
+  "disable": "{{- name}} deaktivieren",
+  "profiling": "Profiling",
+  "showcase_block": "Aufgrund einer Ausstellung blockiert"
 }
