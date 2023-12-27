@@ -259,7 +259,8 @@ module.exports = class PkmnBackend {
 
   /**
    * Build the API filter for Golbat
-   * @returns {import('../../../types').DnfFilter[]}
+   * @param {import('@rm/types').FilterId[]} [pokemon]
+   * @returns {import('@rm/types').DnfFilter[]}
    */
   buildApiFilter(pokemon = undefined) {
     const {
@@ -282,7 +283,10 @@ module.exports = class PkmnBackend {
     if (this.mods.onlyLegacy) {
       return dnfifyIvFilter(adv, pokemon)
     }
-    if (!this.filterKeys.size || (!this.perms.iv && !this.perms.pvp)) {
+    if (
+      this.id !== 'global' &&
+      (!this.filterKeys.size || (!this.perms.iv && !this.perms.pvp))
+    ) {
       return [{ pokemon, iv: { min: -1, max: 100 } }]
     }
     const results = /** @type {import('../../../types').DnfFilter[]} */ ([])
