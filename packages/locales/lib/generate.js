@@ -3,16 +3,15 @@
 /* eslint-disable guard-for-in */
 
 require('dotenv').config()
-const { Configuration, OpenAIApi } = require('openai')
+const { OpenAI } = require('openai')
 
 const { log, HELPERS } = require('@rm/logger')
 
 const { readAndParseJson, readLocaleDirectory, writeAll } = require('./utils')
 
-const configuration = new Configuration({
+const openAI = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 })
-const openai = new OpenAIApi(configuration)
 
 /**
  * @typedef {Record<string, string>} I18nObject
@@ -101,7 +100,7 @@ function matchJSON(str) {
  * @returns
  */
 async function sendToGPT(locale, missingKeys) {
-  return openai.createChatCompletion({
+  return openAI.chat.completions.create({
     model: 'gpt-3.5-turbo',
     messages: [
       {
@@ -157,7 +156,7 @@ async function generate() {
           const result = await Promise.all(
             chunks.map(async (x) => {
               const raw = await sendToGPT(locale, x)
-              const { content } = raw.data.choices[0].message
+              const { content } = raw.choices[0].message
               const clean = matchJSON(`${content}`)
               try {
                 return JSON.parse(clean)
