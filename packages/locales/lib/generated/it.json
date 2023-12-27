@@ -686,5 +686,11 @@
   "done": "Concluído",
   "fast": "Rápido",
   "charged": "Carregado",
-  "offline_mode": "Modo Offline"
+  "offline_mode": "Modo Offline",
+  "include_sponsored": "Includi pubblicità",
+  "showcase_color": "Mostra colore in evidenza",
+  "partner_color": "Mostra colore partner",
+  "disable": "Disabilita {{- name}}",
+  "profiling": "Profilazione",
+  "showcase_block": "Bloccato a causa di un'anteprima"
 }

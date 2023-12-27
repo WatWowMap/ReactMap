@@ -671,5 +671,11 @@
   "done": "Klaar",
   "fast": "Snel",
   "charged": "Opgeladen",
-  "offline_mode": "Offline modus"
+  "offline_mode": "Offline modus",
+  "include_sponsored": "Gesponsorde inhoud weergeven",
+  "showcase_color": "Showcase-kleur",
+  "partner_color": "Partnerkleur",
+  "disable": "{{- name}} uitschakelen",
+  "profiling": "Profilering",
+  "showcase_block": "Geblokkeerd vanwege een showcase"
 }

@@ -671,5 +671,11 @@
   "done": "Tamamlandı",
   "fast": "Hızlı",
   "charged": "Şarj Etme",
-  "offline_mode": "Çevrimdışı Mod"
+  "offline_mode": "Çevrimdışı Mod",
+  "include_sponsored": "Sponsorlu İçerikleri Göster",
+  "showcase_color": "Vitrin Rengi",
+  "partner_color": "Ortak Rengi",
+  "disable": "{{- name}} Devre Dışı",
+  "profiling": "Profillemeler",
+  "showcase_block": "Bir vitrine bağlı olduğu için engellendi"
 }

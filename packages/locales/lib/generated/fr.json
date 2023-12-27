@@ -677,5 +677,11 @@
   "done": "Terminé",
   "fast": "Rapide",
   "charged": "Chargé",
-  "offline_mode": "Mode hors ligne"
+  "offline_mode": "Mode hors ligne",
+  "include_sponsored": "Inclure les parrainages",
+  "showcase_color": "Couleur de la vitrine",
+  "partner_color": "Couleur du partenaire",
+  "disable": "Désactiver {{- name}}",
+  "profiling": "Profilage",
+  "showcase_block": "Bloqué en raison d'une vitrine"
 }

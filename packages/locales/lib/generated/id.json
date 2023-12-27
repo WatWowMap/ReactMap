@@ -672,5 +672,11 @@
   "done": "Selesai",
   "fast": "Cepat",
   "charged": "Diisi ulang",
-  "offline_mode": "Mode Offline"
+  "offline_mode": "Mode Offline",
+  "include_sponsored": "Tampilkan yang Disponsori",
+  "showcase_color": "Warna Showcase",
+  "partner_color": "Warna Mitra",
+  "disable": "Nonaktifkan {{- name}}",
+  "profiling": "Profiling",
+  "showcase_block": "Diblokir karena showcase"
 }

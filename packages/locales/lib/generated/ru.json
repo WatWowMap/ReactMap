@@ -671,5 +671,11 @@
   "done": "Готово",
   "fast": "Быстро",
   "charged": "Заряжено",
-  "offline_mode": "Автономный режим"
+  "offline_mode": "Автономный режим",
+  "include_sponsored": "Включить Рекламу",
+  "showcase_color": "Цвет Витрины",
+  "partner_color": "Цвет Партнера",
+  "disable": "Отключить {{- name}}",
+  "profiling": "Профилирование",
+  "showcase_block": "Заблокировано из-за витрины"
 }

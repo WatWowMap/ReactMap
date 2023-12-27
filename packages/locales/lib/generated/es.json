@@ -671,5 +671,11 @@
   "done": "Hecho",
   "fast": "Rápido",
   "charged": "Cargado",
-  "offline_mode": "Modo sin conexión"
+  "offline_mode": "Modo sin conexión",
+  "include_sponsored": "Incluir Patrocinado",
+  "showcase_color": "Color de Destaque",
+  "partner_color": "Color de Socio",
+  "disable": "Deshabilitar {{- name}}",
+  "profiling": "Perfilado",
+  "showcase_block": "Bloqueado debido a un destacado"
 }

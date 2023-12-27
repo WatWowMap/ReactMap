@@ -671,5 +671,11 @@
   "done": "完了",
   "fast": "速い",
   "charged": "チャージ済み",
-  "offline_mode": "オフラインモード"
+  "offline_mode": "オフラインモード",
+  "include_sponsored": "スポンサーを含める",
+  "showcase_color": "ショーケースの色",
+  "partner_color": "パートナーの色",
+  "disable": "{{- name}}を無効にする",
+  "profiling": "プロファイリング",
+  "showcase_block": "ショーケースによるブロック"
 }

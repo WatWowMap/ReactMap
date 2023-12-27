@@ -671,5 +671,11 @@
   "done": "เสร็จสิ้น",
   "fast": "เร็ว",
   "charged": "ชาร์จแล้ว",
-  "offline_mode": "โหมดออฟไลน์"
+  "offline_mode": "โหมดออฟไลน์",
+  "include_sponsored": "รวมการโฆษณาสปอนเซอร์",
+  "showcase_color": "สีโปรไฟล์ร้านค้า",
+  "partner_color": "สีพันธมิตร",
+  "disable": "ปิดใช้งาน {{- name}}",
+  "profiling": "การทำโปรไฟล์",
+  "showcase_block": "ถูกบล็อกเนื่องจากโปรไฟล์ร้านค้า"
 }

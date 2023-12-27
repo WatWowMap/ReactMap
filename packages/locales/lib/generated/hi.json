@@ -671,5 +671,11 @@
   "done": "हो गया",
   "fast": "तेज़",
   "charged": "चार्ज़",
-  "offline_mode": "ऑफ़लाइन मोड"
+  "offline_mode": "ऑफ़लाइन मोड",
+  "include_sponsored": "स्पॉन्सर शामिल करें",
+  "showcase_color": "दिखावट रंग",
+  "partner_color": "सहयोगी रंग",
+  "disable": "{{- name}} को अक्षम करें",
+  "profiling": "प्रोफ़ाइलिंग",
+  "showcase_block": "दिखावट के कारण अवरोधित"
 }
