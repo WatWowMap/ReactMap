@@ -282,10 +282,7 @@ module.exports = class PkmnBackend {
     if (this.mods.onlyLegacy) {
       return dnfifyIvFilter(adv, pokemon)
     }
-    if (
-      (!this.filterKeys.size || (!this.perms.iv && !this.perms.pvp)) &&
-      this.id !== 'global'
-    ) {
+    if (!this.filterKeys.size || (!this.perms.iv && !this.perms.pvp)) {
       return [{ pokemon, iv: { min: -1, max: 100 } }]
     }
     const results = /** @type {import('../../../types').DnfFilter[]} */ ([])
