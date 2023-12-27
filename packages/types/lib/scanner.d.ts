@@ -53,6 +53,7 @@ export interface Gym {
   total_cp: number
   first_seen_timestamp: number
   sponsor_id: number
+  partner_id: number
   raid_pokemon_costume: number
   raid_pokemon_gender: number
   raid_pokemon_evolution: number
@@ -144,6 +145,7 @@ export interface Event {
   display_type: number
   event_expire_timestamp: number
   showcase_pokemon_id: number
+  showcase_pokemon_form_id: number
   showcase_rankings: ShowcaseDetails
   showcase_ranking_standard: number
 }
@@ -161,6 +163,7 @@ export interface Pokestop {
   pokestop_display: number
   first_seen_timestamp: number
   sponsor_id: number
+  partner_id: number
   ar_scan_eligible: boolean
   quests: Quest[]
   invasions: Invasion[]
@@ -168,6 +171,11 @@ export interface Pokestop {
   power_up_level: number
   power_up_points: number
   power_up_end_timestamp: number
+  showcase_expiry?: number
+  showcase_pokemon_id?: number
+  showcase_ranking_standard?: number
+  showcase_rankings?: ShowcaseDetails | string
+  hasShowcase: boolean
 }
 
 export type FullPokestop = FullModel<Pokestop, PokestopModel>

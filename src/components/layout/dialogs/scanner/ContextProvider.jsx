@@ -1,7 +1,7 @@
 // @ts-check
 import { createContext } from 'react'
 
-export const DEFAULT = /** @type {import('@hooks/useStore').ScanConfig} */ ({
+export const DEFAULT = /** @type {import('./store').ScanConfig} */ ({
   scannerType: '',
   showScanCount: false,
   showScanQueue: false,

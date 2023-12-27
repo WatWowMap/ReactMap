@@ -62,6 +62,18 @@ class Pokestop extends Model {
     return 'pokestop'
   }
 
+  /**
+   *
+   * @param {import('objection').QueryBuilder<Pokestop, Pokestop[]>} query
+   * @param {boolean} isMad
+   */
+  static onlyValid(query, isMad) {
+    query.andWhere('enabled', true)
+    if (!isMad) {
+      query.andWhere('deleted', false)
+    }
+  }
+
   static async getAll(
     perms,
     args,
@@ -176,7 +188,8 @@ class Pokestop extends Model {
     query
       .whereBetween(isMad ? 'latitude' : 'lat', [args.minLat, args.maxLat])
       .andWhereBetween(isMad ? 'longitude' : 'lon', [args.minLon, args.maxLon])
-      .andWhere(isMad ? 'enabled' : 'deleted', isMad)
+
+    Pokestop.onlyValid(query, isMad)
     if (!getAreaSql(query, areaRestrictions, onlyAreas, isMad)) {
       return []
     }
@@ -199,6 +212,9 @@ class Pokestop extends Model {
       Object.keys(args.filters).forEach((pokestop) => {
         switch (pokestop.charAt(0)) {
           case 'o':
+            break
+          case 'f':
+            // do nothing
             break
           case 'd':
             stardust.push(pokestop.slice(1).split('-')[0])
@@ -653,7 +669,7 @@ class Pokestop extends Model {
     const filteredResults = []
     for (let i = 0; i < queryResults.length; i += 1) {
       const pokestop = queryResults[i]
-      const filtered = {}
+      const filtered = { hasShowcase: pokestop.showcase_expiry > ts }
 
       this.fieldAssigner(filtered, pokestop, [
         'id',
@@ -694,14 +710,31 @@ class Pokestop extends Model {
           )
           .map((event) => ({
             event_expire_timestamp: event.incident_expire_timestamp,
-            showcase_pokemon_id: pokestop.showcase_pokemon_id,
-            showcase_rankings: showcaseData,
-            showcase_ranking_standard: pokestop.showcase_ranking_standard,
+            showcase_pokemon_id:
+              event.display_type === 9 ? pokestop.showcase_pokemon_id : null,
+            showcase_pokemon_form_id:
+              event.display_type === 9
+                ? pokestop.showcase_pokemon_form_id
+                : null,
+            showcase_rankings: event.display_type === 9 ? showcaseData : null,
+            showcase_ranking_standard:
+              event.display_type === 9
+                ? pokestop.showcase_ranking_standard
+                : null,
             display_type:
               isMad && !hasMultiInvasions
                 ? MAD_GRUNT_MAP[event.grunt_type] || 8
                 : event.display_type,
           }))
+          .filter((event) =>
+            event.showcase_pokemon_id
+              ? filters[
+                  `f${event.showcase_pokemon_id}-${
+                    event.showcase_pokemon_form_id ?? 0
+                  }`
+                ]
+              : true,
+          )
       }
       if (
         perms.invasions &&
@@ -965,6 +998,7 @@ class Pokestop extends Model {
     hasRewardAmount,
     hasConfirmed,
     hasShowcaseData,
+    hasShowcaseForm,
   }) {
     const ts = Math.floor(Date.now() / 1000)
     const finalList = new Set()
@@ -1340,11 +1374,15 @@ class Pokestop extends Model {
     // lures
 
     if (hasShowcaseData) {
-      queries.showcase = this.query()
-        .select('showcase_pokemon_id')
-        .distinct('showcase_pokemon_id')
-        .where('showcase_expiry', '>=', ts)
-        .orderBy('showcase_pokemon_id')
+      queries.showcase = hasShowcaseForm
+        ? this.query()
+            .distinct('showcase_pokemon_id', 'showcase_pokemon_form_id')
+            .where('showcase_expiry', '>=', ts)
+            .orderBy('showcase_pokemon_id', 'showcase_pokemon_form_id')
+        : this.query()
+            .distinct('showcase_pokemon_id')
+            .where('showcase_expiry', '>=', ts)
+            .orderBy('showcase_pokemon_id')
     }
 
     const resolved = Object.fromEntries(
@@ -1459,7 +1497,11 @@ class Pokestop extends Model {
         case 'showcase':
           if (hasShowcaseData) {
             rewards.forEach((reward) => {
-              finalList.add(`f${reward.showcase_pokemon_id}`)
+              finalList.add(
+                `f${reward.showcase_pokemon_id}-${
+                  reward.showcase_pokemon_form_id ?? 0
+                }`,
+              )
             })
           }
           break
@@ -1557,13 +1599,13 @@ class Pokestop extends Model {
         isMad ? 'image AS url' : 'url',
         distance,
       ])
-      .where(isMad ? 'enabled' : 'deleted', isMad)
       .whereRaw(`LOWER(name) LIKE '%${search}%'`)
       .limit(searchResultsLimit)
       .orderBy('distance')
     if (!getAreaSql(query, perms.areaRestrictions, onlyAreas, isMad)) {
       return []
     }
+    Pokestop.onlyValid(query, isMad)
     return query
   }
 
@@ -1606,7 +1648,6 @@ class Pokestop extends Model {
         isMad ? 'quest_reward AS quest_rewards' : 'quest_rewards',
         distance,
       ])
-      .where(isMad ? 'enabled' : 'deleted', isMad)
       .andWhere('quest_timestamp', '>=', midnight || 0)
       .andWhere((quests) => {
         quests
@@ -1628,6 +1669,8 @@ class Pokestop extends Model {
     if (!getAreaSql(query, perms.areaRestrictions, onlyAreas, isMad)) {
       return []
     }
+    Pokestop.onlyValid(query, isMad)
+
     const results = await query
     const mapped = results.map((q) => ({ ...q, with_ar: q.with_ar ?? true }))
 
@@ -1697,7 +1740,6 @@ class Pokestop extends Model {
           : 'lure_expire_timestamp',
         distance,
       ])
-      .where(isMad ? 'enabled' : 'deleted', isMad)
       .andWhere(
         isMad ? 'lure_expiration' : 'lure_expire_timestamp',
         '>=',
@@ -1709,6 +1751,8 @@ class Pokestop extends Model {
     if (!getAreaSql(query, perms.areaRestrictions, onlyAreas, isMad)) {
       return []
     }
+    Pokestop.onlyValid(query, isMad)
+
     const results = await query
     return results
   }
@@ -1723,9 +1767,9 @@ class Pokestop extends Model {
       .first()
   }
 
-  static getSubmissions(perms, args, { isMad }) {
+  static getSubmissions(perms, args, { isMad, hasShowcaseData }) {
     const {
-      filters: { onlyAreas = [] },
+      filters: { onlyAreas = [], onlyIncludeSponsored = true },
       minLat,
       minLon,
       maxLat,
@@ -1740,17 +1784,24 @@ class Pokestop extends Model {
         minLon - 0.025,
         maxLon + 0.025,
       ])
-      .andWhere(isMad ? 'enabled' : 'deleted', isMad)
     if (isMad) {
       query.select(['pokestop_id AS id', 'latitude AS lat', 'longitude AS lon'])
     } else {
-      query.select(['id', 'lat', 'lon']).andWhere((poi) => {
-        poi.whereNull('sponsor_id').orWhere('sponsor_id', 0)
-      })
+      query.select(['id', 'lat', 'lon', 'partner_id'])
+      if (!onlyIncludeSponsored) {
+        query.andWhere((poi) => {
+          poi.whereNull('partner_id').orWhere('partner_id', 0)
+        })
+      }
+      if (hasShowcaseData) {
+        query.select('showcase_expiry')
+      }
     }
     if (!getAreaSql(query, perms.areaRestrictions, onlyAreas, isMad)) {
       return []
     }
+    Pokestop.onlyValid(query, isMad)
+
     return query
   }
 }

@@ -8,8 +8,9 @@ import { setLoadingText } from '@services/functions/setLoadingText'
 import Utility from '@services/Utility'
 import { deepMerge } from '@services/functions/deepMerge'
 import { Navigate } from 'react-router-dom'
-
-const rootLoading = document.getElementById('loader')
+import { checkHoliday } from '@services/functions/checkHoliday'
+import { useHideElement } from '@hooks/useHideElement'
+import { useScannerSessionStorage } from './layout/dialogs/scanner/store'
 
 export default function Config({ children }) {
   const { t } = useTranslation()
@@ -19,11 +20,8 @@ export default function Config({ children }) {
     fetched: false,
   })
 
-  if (rootLoading) {
-    if (serverSettings.fetched) {
-      rootLoading.style.display = 'none'
-    }
-  }
+  useHideElement(serverSettings.fetched)
+
   const getServerSettings = async () => {
     const data = await Fetch.getSettings()
 
@@ -90,6 +88,9 @@ export default function Config({ children }) {
         ),
       }
 
+      useScannerSessionStorage.setState((prev) => ({
+        cooldown: Math.max(prev.cooldown, data.user.cooldown || 0),
+      }))
       useStatic.setState({
         auth: {
           strategy: data.user?.strategy || '',
@@ -109,13 +110,15 @@ export default function Config({ children }) {
           userBackupLimits: data.database.settings.userBackupLimits || 0,
         },
         theme: data.map.theme,
-        holidayEffects: data.map.holidayEffects || [],
         ui: data.ui,
         menus: data.menus,
         extraUserFields: data.database.settings.extraUserFields,
         userSettings: data.clientMenus,
         timeOfDay: Utility.timeCheck(...location),
-        config: data.map,
+        config: {
+          ...data.map,
+          holidayEffects: (data.map.holidayEffects || []).filter(checkHoliday),
+        },
         polling: data.api.polling,
         settings,
         gymValidDataLimit: data.api.gymValidDataLimit,
@@ -131,7 +134,10 @@ export default function Config({ children }) {
         userSettings: deepMerge({}, data.userSettings, prev.userSettings),
         settings: {
           ...Object.fromEntries(
-            Object.entries(settings).map(([k, v]) => [k, Object.keys(v)[0]]),
+            Object.entries(settings).map(([k, v]) => [
+              k,
+              data.map.misc[k] || Object.keys(v)[0],
+            ]),
           ),
           ...prev.settings,
         },

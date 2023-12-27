@@ -131,6 +131,8 @@ type PoI {
   id: ID
   lat: Float
   lon: Float
+  showcase: Boolean
+  partner: Boolean
 }
 
 type SubmissionCell {

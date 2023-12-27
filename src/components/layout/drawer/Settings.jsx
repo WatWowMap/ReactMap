@@ -15,6 +15,8 @@ import NavIcon from '@mui/icons-material/Navigation'
 import StyleIcon from '@mui/icons-material/Style'
 import DevicesOtherIcon from '@mui/icons-material/DevicesOther'
 import Brightness7Icon from '@mui/icons-material/Brightness7'
+import CakeIcon from '@mui/icons-material/Cake'
+import InsightsIcon from '@mui/icons-material/Insights'
 
 import { useTranslation } from 'react-i18next'
 
@@ -59,6 +61,7 @@ export default function Settings() {
   const separateDrawerActions = useStatic(
     (s) => s.config.general.separateDrawerActions,
   )
+  const holidayEffects = useStatic((s) => s.config.holidayEffects) || []
 
   const settings = useStore((s) => s.settings)
   const icons = useStore((s) => s.icons)
@@ -124,7 +127,7 @@ export default function Settings() {
             />
           }
         >
-          {Icons[category].map((option) => (
+          {[...Icons[category]].map((option) => (
             <MenuItem key={option} value={option}>
               {t(
                 `${category.toLowerCase()}_${option.toLowerCase()}`,
@@ -140,6 +143,33 @@ export default function Settings() {
           <Brightness7Icon />
         </ListItemIcon>
       </BoolToggle>
+      {holidayEffects.map(({ name, images }) => (
+        <BoolToggle
+          key={name}
+          field={`holidayEffects.${name}`}
+          label={t('disable', { name })}
+        >
+          <ListItemIcon>
+            {images?.length > 0 ? (
+              <img
+                src={images[0]}
+                alt={name}
+                width={24}
+                className={darkMode ? '' : 'darken-image'}
+              />
+            ) : (
+              <CakeIcon />
+            )}
+          </ListItemIcon>
+        </BoolToggle>
+      ))}
+      {process.env.NODE_ENV === 'development' && (
+        <BoolToggle field="profiling" label={t('profiling')}>
+          <ListItemIcon>
+            <InsightsIcon />
+          </ListItemIcon>
+        </BoolToggle>
+      )}
       {!separateDrawerActions && (
         <>
           <Divider style={{ margin: '10px 0' }} />

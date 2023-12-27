@@ -3,7 +3,7 @@ import * as React from 'react'
 import { useQuery } from '@apollo/client'
 import { useMap } from 'react-leaflet'
 
-import { basicEqualFn, useStatic, useStore } from '@hooks/useStore'
+import { useStatic, useStore } from '@hooks/useStore'
 import { usePermCheck } from '@hooks/usePermCheck'
 import Query from '@services/Query'
 import { getQueryArgs } from '@services/functions/getQueryArgs'
@@ -38,7 +38,7 @@ const trimFilters = (requestedFilters, userSettings, category, onlyAreas) => {
     onlyLegacy: userSettings?.legacyFilter,
     onlyLinkGlobal: userSettings?.linkGlobalAndAdvanced,
     onlyAllPvp: userSettings?.showAllPvpRanks,
-    onlyAreas,
+    onlyAreas: onlyAreas || [],
   }
   Object.entries(requestedFilters).forEach((topLevelFilter) => {
     const [id, specifics] = topLevelFilter
@@ -98,10 +98,8 @@ function QueryData({ category, timeout }) {
   const filters = useStore((s) => s.filters[category])
   const onlyAreas = useStore(
     (s) =>
-      (s.filters?.scanAreas?.filterByAreas &&
-        s.filters?.scanAreas?.filter?.areas) ||
-      [],
-    basicEqualFn,
+      s.filters?.scanAreas?.filterByAreas &&
+      s.filters?.scanAreas?.filter?.areas,
   )
 
   const initial = React.useMemo(

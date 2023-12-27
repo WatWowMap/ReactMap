@@ -1,6 +1,6 @@
 {
   "name": "reactmap",
-  "version": "1.25.4",
+  "version": "1.27.2",
   "private": true,
   "description": "React based frontend map.",
   "license": "MIT",
@@ -43,8 +43,8 @@
     ]
   },
   "dependencies": {
-    "@apollo/client": "^3.7.15",
-    "@apollo/server": "^4.7.4",
+    "@apollo/client": "^3.8.7",
+    "@apollo/server": "^4.9.5",
     "@emotion/react": "^11.11.1",
     "@emotion/styled": "^11.11.0",
     "@graphql-tools/graphql-file-loader": "^8.0.0",
@@ -83,7 +83,7 @@
     "express-session": "^1.17.3",
     "extend": "^3.0.2",
     "geo-tz": "^7.0.7",
-    "graphql": "^16.6.0",
+    "graphql": "^16.8.1",
     "graphql-type-json": "^0.3.2",
     "i18next": "^21.6.16",
     "i18next-browser-languagedetector": "^6.1.4",
@@ -92,7 +92,6 @@
     "knex": "^2.4.2",
     "leaflet": "1.9.4",
     "leaflet.locatecontrol": "^0.73.0",
-    "leaflet.markercluster": "1.5.3",
     "lodash.debounce": "^4.0.8",
     "moment-timezone": "^0.5.43",
     "morgan": "^1.10.0",
@@ -111,7 +110,6 @@
     "react-ga4": "^1.4.1",
     "react-i18next": "^11.16.7",
     "react-leaflet": "4.2.1",
-    "react-leaflet-cluster": "2.1.0",
     "react-router-dom": "^6.15.0",
     "react-virtualized-auto-sizer": "^1.0.20",
     "react-virtuoso": "^4.5.0",
@@ -119,12 +117,14 @@
     "rtree": "^1.4.2",
     "source-map": "^0.7.4",
     "suncalc": "^1.9.0",
-    "zustand": "^4.4.1"
+    "supercluster": "^8.0.1",
+    "zustand": "4.4.6"
   },
   "devDependencies": {
     "@rm/types": "*",
     "@sentry/vite-plugin": "2.2.1",
     "@types/dlv": "^1.1.2",
+    "@types/node": "^18",
     "@types/react": "^18.2.20",
     "@types/react-dom": "^18.0.9",
     "@vitejs/plugin-react": "4.0.0",

@@ -1,7 +1,7 @@
 /* eslint-disable no-plusplus */
 /* eslint-disable no-cond-assign */
 /* eslint-disable default-case */
-export default function checkIVFilterValid(filter) {
+export default function checkIVFilterValid(filter, dnf = true) {
   const input = filter.toUpperCase()
   const tokenizer =
     /\s*([()|&!,]|([ADSLXG]?|CP|LC|[GU]L)\s*([0-9]+(?:\.[0-9]*)?)(?:\s*-\s*([0-9]+(?:\.[0-9]*)?))?)/g
@@ -19,11 +19,14 @@ export default function checkIVFilterValid(filter) {
       } else {
         switch (match[1]) {
           case '(':
-            if (++stack > 1000000000) {
+            if (dnf || ++stack > 1000000000) {
               return null
             }
             break
           case '!':
+            if (dnf) {
+              return null
+            }
             break
           default:
             return null
@@ -37,7 +40,7 @@ export default function checkIVFilterValid(filter) {
         case '!':
           return null
         case ')':
-          if (--stack < 0) {
+          if (dnf || --stack < 0) {
             return null
           }
           break

@@ -548,6 +548,13 @@ const resolvers = {
     },
     scanner: (_, args, { req, perms }) => {
       const { category, method, data } = args
+      if (data?.cooldown) {
+        req.session.cooldown = Math.max(
+          req.session.cooldown || 0,
+          data.cooldown || 0,
+        )
+        req.session.save()
+      }
       if (category === 'getQueue') {
         return scannerApi(category, method, data, req?.user)
       }

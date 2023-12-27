@@ -31,7 +31,7 @@ export default function usePokestopMarker({
     (a, b) => Object.entries(a[0]).every(([k, v]) => b[0][k] === v),
   )
 
-  const getOpacity = useOpacity('pokestops', 'invasions')
+  const getOpacity = useOpacity('pokestops', 'invasion')
   const [showArBadge, baseIcon, baseSize] = useStore((s) => {
     const { filters, userSettings } = s
     return [
@@ -43,7 +43,9 @@ export default function usePokestopMarker({
         ar_scan_eligible &&
           (userSettings.pokestops.showArBadge || power_up_level),
         power_up_level,
-        hasEvent ? events[0].display_type?.toString() : '',
+        hasEvent
+          ? Math.max(...events.map((event) => event.display_type)).toString()
+          : '',
       ),
       hasLure
         ? Icons.getSize(
@@ -86,6 +88,7 @@ export default function usePokestopMarker({
       }
     })
   }
+
   if (hasQuest && !(hasInvasion && invasionMod?.removeQuest)) {
     quests.forEach((quest) => {
       const {

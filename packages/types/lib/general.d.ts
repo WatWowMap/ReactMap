@@ -25,6 +25,7 @@ export type RMGeoJSON = {
 }
 
 import masterfile = require('packages/masterfile/lib/data/masterfile.json')
+import { Config } from './config'
 
 export type Masterfile = typeof masterfile
 
@@ -36,6 +37,8 @@ export interface PoI {
   id: string
   lat: number
   lon: number
+  showcase: boolean
+  partner: boolean
 }
 
 export interface BaseCell {
@@ -65,4 +68,34 @@ export interface Bounds {
   maxLat: number
   minLon: number
   maxLon: number
+}
+
+export type ImageExt = 'jpg' | 'jpeg' | 'png' | 'gif' | 'webp'
+export type UiconImage = `${string}.${ImageExt}`
+export interface UICONS {
+  device: UiconImage[]
+  gym: UiconImage[]
+  invasion: UiconImage[]
+  misc: UiconImage[]
+  nest: UiconImage[]
+  pokemon: UiconImage[]
+  pokestop: UiconImage[]
+  raid: {
+    egg: UiconImage[]
+  }
+  reward: {
+    [
+      key: Masterfile['questRewardTypes'][keyof Masterfile['questRewardTypes']]
+    ]: UiconImage[]
+  }
+  spawnpoint: UiconImage[]
+  team: UiconImage[]
+  type: UiconImage[]
+  weather: UiconImage[]
+}
+
+export type UIconsClient = Config['icons']['styles'][number] & { data: UICONS }
+
+export type FullClientIcons = Omit<Config['icons'], 'styles'> & {
+  styles: (Config['icons']['styles'][number] & { data: UICONS })[]
 }

@@ -420,6 +420,10 @@ input[type='time']::-webkit-calendar-picker-indicator {
   filter: invert(100%) sepia(100%) hue-rotate(151deg) grayscale(1);
 }
 
+.disable-image {
+  filter: grayscale(1);
+}
+
 .expanded {
   transform: rotate(180deg);
 }
@@ -432,4 +436,48 @@ input[type='time']::-webkit-calendar-picker-indicator {
   padding: 2px !important;
   min-width: 25px !important;
   border-radius: 50% !important;
+}
+
+.marker-cluster-small {
+  background-color: rgba(181, 226, 140, 0.6);
+}
+
+.marker-cluster-small div {
+  background-color: rgba(110, 204, 57, 0.6);
+}
+
+.marker-cluster-medium {
+  background-color: rgba(241, 211, 87, 0.6);
+}
+
+.marker-cluster-medium div {
+  background-color: rgba(240, 194, 12, 0.6);
+}
+
+.marker-cluster-large {
+  background-color: rgba(253, 156, 115, 0.6);
+}
+
+.marker-cluster-large div {
+  background-color: rgba(241, 128, 23, 0.6);
+}
+
+.marker-cluster {
+  background-clip: padding-box;
+  border-radius: 20px;
+}
+
+.marker-cluster div {
+  width: 30px;
+  height: 30px;
+  margin-left: 5px;
+  margin-top: 5px;
+
+  text-align: center;
+  border-radius: 15px;
+  font: 12px 'Helvetica Neue', Arial, Helvetica, sans-serif;
+}
+
+.marker-cluster span {
+  line-height: 30px;
 }

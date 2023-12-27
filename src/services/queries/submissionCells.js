@@ -32,6 +32,8 @@ const getAllSubmissionCells = gql`
         id
         lat
         lon
+        showcase
+        partner
       }
     }
   }

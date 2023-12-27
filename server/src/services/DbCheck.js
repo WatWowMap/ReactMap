@@ -135,15 +135,21 @@ module.exports = class DbCheck {
         'size' in columns,
         'height' in columns,
       ])
-    const [hasRewardAmount, hasPowerUp, hasAltQuests, hasShowcaseData] =
-      await schema('pokestop')
-        .columnInfo()
-        .then((columns) => [
-          'quest_reward_amount' in columns || isMad,
-          'power_up_level' in columns,
-          'alternative_quest_type' in columns,
-          'showcase_pokemon_id' in columns,
-        ])
+    const [
+      hasRewardAmount,
+      hasPowerUp,
+      hasAltQuests,
+      hasShowcaseData,
+      hasShowcaseForm,
+    ] = await schema('pokestop')
+      .columnInfo()
+      .then((columns) => [
+        'quest_reward_amount' in columns || isMad,
+        'power_up_level' in columns,
+        'alternative_quest_type' in columns,
+        'showcase_pokemon_id' in columns,
+        'showcase_pokemon_form_id' in columns,
+      ])
     const [hasLayerColumn] = isMad
       ? await schema('trs_quest')
           .columnInfo()
@@ -187,6 +193,7 @@ module.exports = class DbCheck {
       hasAlignment,
       polygon,
       hasShowcaseData,
+      hasShowcaseForm,
     }
   }
 
@@ -357,25 +364,21 @@ module.exports = class DbCheck {
    * @returns {T[]}
    */
   static deDupeResults(results) {
+    if (results.length === 0) return []
     if (results.length === 1) return results[0]
-    if (results.length > 1) {
-      const returnObj = {}
-      const { length } = results
-      for (let i = 0; i < length; i += 1) {
-        const { length: subLength } = results[i]
-        for (let j = 0; j < subLength; j += 1) {
-          const item = results[i][j]
-          if (
-            !returnObj[item.id] ||
-            item.updated > returnObj[item.id].updated
-          ) {
-            returnObj[item.id] = item
-          }
+    const returnObj = new Map()
+    const { length } = results
+    for (let i = 0; i < length; i += 1) {
+      const { length: subLength } = results[i]
+      for (let j = 0; j < subLength; j += 1) {
+        const item = results[i][j]
+        const existing = returnObj.get(item.id)
+        if (!existing || item.updated > existing.updated) {
+          returnObj.set(item.id, item)
         }
       }
-      return Object.values(returnObj)
     }
-    return []
+    return Array.from(returnObj.values())
   }
 
   /**

@@ -1,13 +1,13 @@
 // @ts-check
 import { useQuery } from '@apollo/client'
-import { useScanStore } from '@hooks/useStore'
 import { CHECK_VALID_SCAN } from '@services/queries/scanner'
 import { useContext, useEffect } from 'react'
 import { ConfigContext } from './ContextProvider'
+import { useScanStore } from './store'
 
 /**
  * Checks the server to see if the scan location is valid, returns a color
- * @param {import('@hooks/useStore').ScanMode} mode
+ * @param {import('./store').ScanMode} mode
  * @returns
  */
 export function useCheckValid(mode) {
@@ -25,7 +25,7 @@ export function useCheckValid(mode) {
 
   useEffect(() => {
     if (data?.checkValidScan) {
-      /** @type {import('@hooks/useStore').UseScanStore['valid']} */
+      /** @type {import('./store').UseScanStore['valid']} */
       let valid = 'none'
       if (data.checkValidScan.every(Boolean)) {
         valid = 'all'

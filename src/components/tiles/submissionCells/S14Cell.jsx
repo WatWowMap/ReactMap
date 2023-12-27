@@ -42,7 +42,9 @@ const MemoS14Cell = React.memo(
     prev.cellColor === next.cellColor &&
     prev.oneStopTillNext === next.oneStopTillNext &&
     prev.twoStopsTillNext === next.twoStopsTillNext &&
-    prev.noMoreGyms === next.noMoreGyms,
+    prev.noMoreGyms === next.noMoreGyms &&
+    prev.count_gyms === next.count_gyms &&
+    prev.count_pokestops === next.count_pokestops,
 )
 
 export default MemoS14Cell
