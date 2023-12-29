@@ -663,5 +663,8 @@
   "showcase_color": "Showcasefarbe",
   "partner_color": "Partnerfarbe",
   "disable": "deaktivieren {{- name}}",
-  "profiling": "Profilbearbeitung"
+  "profiling": "Profilbearbeitung",
+  "showcase_block": "Gesperrt wegen eines Showcase",
+  "signed_in_as": "eingeloggt als",
+  "missing_map_perm": "Du hast keine Berechtigung, die Karte anzuzeigen."
 }
