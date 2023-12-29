@@ -99,7 +99,7 @@ export default function Blocked() {
           </Button>
           {discordInvite && (
             <DiscordLogin href={discordInvite} size="small">
-              join
+              {t('join')}
             </DiscordLogin>
           )}
         </CardActions>
