@@ -14,4 +14,5 @@ export default i18n
     fallbackLng: 'en',
     debug: false,
     joinArrays: '\n',
+    lowerCaseLng: true,
   })
