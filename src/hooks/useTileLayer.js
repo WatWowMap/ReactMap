@@ -5,7 +5,7 @@ import { useStatic, useStore } from '@hooks/useStore'
 
 /**
  *
- * @param {Record<string, { name: string, style: 'light' | 'dark', attribution?: string, url?: string }>} tileServers
+ * @param {Record<string, { name: string, style: 'light' | 'dark', attribution?: string, url?: string, background?: string }>} tileServers
  * @param {string} tileServer
  * @param {'day' | 'night' | 'dusk' | 'dawn'} timeOfDay
  * @returns
@@ -57,7 +57,8 @@ export default function useTileLayer() {
       .item(0)
     if (leafletContainerEl instanceof HTMLElement) {
       leafletContainerEl.style.background =
-        tileLayer.style === 'dark' ? '#0F0D0D' : '#ddd'
+        tileLayer.background ??
+        (tileLayer.style === 'dark' ? '#0F0D0D' : '#ddd')
     }
   }, [tileLayer.style])
 
