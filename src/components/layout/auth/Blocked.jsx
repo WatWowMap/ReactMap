@@ -1,73 +1,109 @@
 // @ts-check
-/* eslint-disable react/no-array-index-key */
 import React from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import Grid from '@mui/material/Unstable_Grid2'
 import Typography from '@mui/material/Typography'
 import Button from '@mui/material/Button'
+import Avatar from '@mui/material/Avatar'
+import Card from '@mui/material/Card'
+import CardActions from '@mui/material/CardActions'
+import CardContent from '@mui/material/CardContent'
+import CardHeader from '@mui/material/CardHeader'
+import Box from '@mui/material/Box'
+import List from '@mui/material/List'
+import ListItem from '@mui/material/ListItem'
+import ListItemIcon from '@mui/material/ListItemIcon'
+import ListItemText from '@mui/material/ListItemText'
+
 import { useStatic } from '@hooks/useStore'
 
 import DiscordLogin from './Discord'
+import ThemeToggle from '../general/ThemeToggle'
+import { I } from '../general/I'
 
 export default function Blocked() {
   const { t } = useTranslation()
   const { info } = useParams()
   const navigate = useNavigate()
   const discordInvite = useStatic((s) => s.config?.links?.discordInvite)
-
   const queryParams = new URLSearchParams(info)
   const blockedGuilds = queryParams.get('blockedGuilds')
+  const username = queryParams.get('username')
+  const avatar = queryParams.get('avatar')
+  const id = queryParams.get('id')
 
   return (
-    <Grid
-      container
+    <Box
+      display="flex"
       justifyContent="center"
       alignItems="center"
       height="100cqh"
-      py={10}
+      width="100%"
     >
-      <Grid xs={11}>
-        <Typography variant="h3" align="center">
-          {t('access')} {t('denied')}!
-        </Typography>
-      </Grid>
-
-      {blockedGuilds && (
-        <Grid xs={11}>
-          <Typography variant="h6" align="center">
-            {t('on_block_msg')} {blockedGuilds}
+      <Box position="absolute" top={10} right={10}>
+        <ThemeToggle />
+      </Box>
+      <Card elevation={10}>
+        {username && avatar && id && (
+          <CardHeader
+            sx={{ px: 4, pt: 4 }}
+            avatar={
+              <Avatar
+                src={`https://cdn.discordapp.com/avatars/${id}/${avatar}.webp?size=96`}
+                alt={username}
+              />
+            }
+            title={t('signed_in_as')}
+            subheader={username}
+          />
+        )}
+        <CardContent sx={{ mx: 2 }}>
+          <Typography variant="h3" align="center" pb={2}>
+            {t('access')} {t('denied')}!
           </Typography>
-        </Grid>
-      )}
-
-      {discordInvite && (
-        <Grid xs={11}>
-          <Typography variant="h6" align="center">
-            {t('on_block_join_discord')}
-          </Typography>
-        </Grid>
-      )}
-      <Grid
-        xs={discordInvite ? 6 : 11}
-        sm={discordInvite ? 4 : 11}
-        md={discordInvite ? 3 : 11}
-        textAlign="center"
-      >
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={() => navigate('/')}
-          size="large"
-        >
-          {t('go_back')}
-        </Button>
-      </Grid>
-      {discordInvite && (
-        <Grid xs={6} sm={4} md={3} textAlign="center">
-          <DiscordLogin href={discordInvite}>join</DiscordLogin>
-        </Grid>
-      )}
-    </Grid>
+          {blockedGuilds ? (
+            <>
+              <Typography variant="body1" align="center">
+                {t('on_block_msg')}:
+              </Typography>
+              <List>
+                {blockedGuilds.split(',').map((guild) => (
+                  <ListItem key={guild} sx={{ ml: 2 }}>
+                    <ListItemIcon>
+                      <I className="fab fa-discord" size="small" />
+                    </ListItemIcon>
+                    <ListItemText primary={guild} />
+                  </ListItem>
+                ))}
+              </List>
+            </>
+          ) : (
+            <Typography variant="body1" align="center">
+              {t('missing_map_perm')}
+            </Typography>
+          )}
+          {discordInvite && (
+            <Typography variant="body1" align="center">
+              {t('on_block_join_discord')}
+            </Typography>
+          )}
+        </CardContent>
+        <CardActions sx={{ p: 4 }}>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={() => navigate('/')}
+            size="small"
+          >
+            {t('go_back')}
+          </Button>
+          {discordInvite && (
+            <DiscordLogin href={discordInvite} size="small">
+              join
+            </DiscordLogin>
+          )}
+        </CardActions>
+      </Card>
+    </Box>
   )
 }
