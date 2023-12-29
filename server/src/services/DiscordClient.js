@@ -293,7 +293,12 @@ class DiscordClient {
         })
       }
       if (discordUser.perms.map === false) {
-        return done(null, undefined, { message: 'access_denied' })
+        return done(null, undefined, {
+          message: 'access_denied',
+          username: discordUser.username,
+          id: discordUser.id,
+          avatar: discordUser.avatar,
+        })
       }
       if (discordUser) {
         delete discordUser.guilds
