@@ -17,7 +17,7 @@ import { ConfigContext } from './ContextProvider'
 
 /**
  *
- * @param {{ children: React.ReactNode, mode: import('@hooks/useStore').ScanMode }} props
+ * @param {{ children: React.ReactNode, mode: import('./store').ScanMode }} props
  * @returns
  */
 export function ScanOnDemandPopup({ children, mode }) {

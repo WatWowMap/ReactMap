@@ -43,6 +43,7 @@ export interface DbContext {
   polygon: boolean
   hasAlignment: boolean
   hasShowcaseData: boolean
+  hasShowcaseForm: boolean
 }
 
 export interface ExpressUser extends User {

@@ -145,6 +145,7 @@ export interface Event {
   display_type: number
   event_expire_timestamp: number
   showcase_pokemon_id: number
+  showcase_pokemon_form_id: number
   showcase_rankings: ShowcaseDetails
   showcase_ranking_standard: number
 }
@@ -174,6 +175,7 @@ export interface Pokestop {
   showcase_pokemon_id?: number
   showcase_ranking_standard?: number
   showcase_rankings?: ShowcaseDetails | string
+  hasShowcase: boolean
 }
 
 export type FullPokestop = FullModel<Pokestop, PokestopModel>

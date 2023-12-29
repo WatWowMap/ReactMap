@@ -26,12 +26,8 @@ import { DomEvent } from 'leaflet'
 
 import { FAB_BUTTONS } from '@services/queries/config'
 import useLocation from '@hooks/useLocation'
-import {
-  useLayoutStore,
-  useScanStore,
-  useStatic,
-  useStore,
-} from '@hooks/useStore'
+import { useLayoutStore, useStatic, useStore } from '@hooks/useStore'
+import { useScanStore } from './dialogs/scanner/store'
 
 import { I } from './general/I'
 import { setModeBtn, useWebhookStore } from './dialogs/webhooks/store'

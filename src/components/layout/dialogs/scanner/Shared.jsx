@@ -10,12 +10,12 @@ import {
   Divider,
   ListSubheader,
 } from '@mui/material'
+import { Trans, useTranslation } from 'react-i18next'
 import { Circle } from 'react-leaflet'
 import PermScanWifiIcon from '@mui/icons-material/PermScanWifi'
 import ClearIcon from '@mui/icons-material/Clear'
-import { useScanStore, useStore } from '@hooks/useStore'
 
-import { Trans, useTranslation } from 'react-i18next'
+import { useScanStore, useScannerSessionStorage } from './store'
 
 const StyledListItem = styled(ListItem)(() => ({
   padding: '2px 16px',
@@ -70,26 +70,26 @@ export function ScanQueue() {
 
 /**
  *
- * @param {{ mode: import('@hooks/useStore').ScanMode }} props
+ * @param {{ mode: import('./store').ScanMode }} props
  * @returns
  */
 export function ScanConfirm({ mode }) {
   const { t } = useTranslation()
-  const scannerCooldown = useStore((s) => s.scannerCooldown)
+  const cooldown = useScannerSessionStorage((s) => s.cooldown)
   const valid = useScanStore((s) => s.valid)
   const estimatedDelay = useScanStore((s) => s.estimatedDelay)
 
-  const [remainder, setRemainder] = React.useState(scannerCooldown - Date.now())
+  const [remainder, setRemainder] = React.useState(cooldown - Date.now())
 
   React.useEffect(() => {
-    if (scannerCooldown - Date.now() > 0) {
+    if (cooldown - Date.now() > 0) {
       const interval = setTimeout(() => {
-        setRemainder(scannerCooldown - Date.now())
+        setRemainder(cooldown - Date.now())
       }, 1000)
       return () => clearTimeout(interval)
     }
     setRemainder(0)
-  }, [remainder, scannerCooldown])
+  }, [remainder, cooldown])
 
   return (
     <StyledListButton
@@ -130,7 +130,7 @@ export function InAllowedArea() {
 
 /**
  *
- * @param {{ mode: import('@hooks/useStore').ScanMode}} props
+ * @param {{ mode: import('./store').ScanMode}} props
  * @returns
  */
 export function ScanCancel({ mode }) {

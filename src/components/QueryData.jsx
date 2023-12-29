@@ -38,7 +38,7 @@ const trimFilters = (requestedFilters, userSettings, category, onlyAreas) => {
     onlyLegacy: userSettings?.legacyFilter,
     onlyLinkGlobal: userSettings?.linkGlobalAndAdvanced,
     onlyAllPvp: userSettings?.showAllPvpRanks,
-    onlyAreas,
+    onlyAreas: onlyAreas || [],
   }
   Object.entries(requestedFilters).forEach((topLevelFilter) => {
     const [id, specifics] = topLevelFilter
@@ -96,12 +96,11 @@ function QueryData({ category, timeout }) {
     (s) => s.userSettings[userSettingsCategory(category)],
   )
   const filters = useStore((s) => s.filters[category])
-  const onlyAreas =
-    useStore(
-      (s) =>
-        s.filters?.scanAreas?.filterByAreas &&
-        s.filters?.scanAreas?.filter?.areas,
-    ) || []
+  const onlyAreas = useStore(
+    (s) =>
+      s.filters?.scanAreas?.filterByAreas &&
+      s.filters?.scanAreas?.filter?.areas,
+  )
 
   const initial = React.useMemo(
     () => ({

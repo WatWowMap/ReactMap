@@ -124,6 +124,7 @@ type Event {
   display_type: Int
   event_expire_timestamp: Int
   showcase_pokemon_id: Int
+  showcase_pokemon_form_id: Int
   showcase_rankings: ShowcaseDetails
   showcase_ranking_standard: Int
 }
@@ -149,6 +150,7 @@ type Pokestop {
   power_up_level: Int
   power_up_points: Int
   power_up_end_timestamp: Int
+  hasShowcase: Boolean
 }
 
 type Pokemon {

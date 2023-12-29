@@ -13,6 +13,7 @@ const core = gql`
     power_up_level
     power_up_points
     power_up_end_timestamp
+    hasShowcase
   }
 `
 
@@ -75,6 +76,7 @@ const event = gql`
       display_type
       event_expire_timestamp
       showcase_pokemon_id
+      showcase_pokemon_form_id
       showcase_ranking_standard
       showcase_rankings {
         total_entries

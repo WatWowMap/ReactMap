@@ -676,5 +676,8 @@
   "showcase_color": "Showcase Color",
   "partner_color": "Partner Color",
   "disable": "Disable {{- name}}",
-  "profiling": "Profiling"
+  "profiling": "Profiling",
+  "showcase_block": "Blocked due to a showcase",
+  "signed_in_as": "Signed In As",
+  "missing_map_perm": "You do not have permission to view the map."
 }

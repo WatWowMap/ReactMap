@@ -20,7 +20,7 @@ async function missing() {
       const missingKeys = {}
 
       Object.keys(englishRef).forEach((key) => {
-        if (!combined[key]) {
+        if (!combined[key] && !key.startsWith('locale_selection_')) {
           missingKeys[key] = process.argv.includes('--ally')
             ? `t('${key}')`
             : englishRef[key]
