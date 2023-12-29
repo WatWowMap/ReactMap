@@ -1,11 +1,12 @@
 // @ts-check
-/* eslint-disable react/no-array-index-key */
 import React from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import Grid from '@mui/material/Unstable_Grid2'
 import Typography from '@mui/material/Typography'
 import Button from '@mui/material/Button'
+import Avatar from '@mui/material/Avatar'
+
 import { useStatic } from '@hooks/useStore'
 
 import DiscordLogin from './Discord'
@@ -15,9 +16,11 @@ export default function Blocked() {
   const { info } = useParams()
   const navigate = useNavigate()
   const discordInvite = useStatic((s) => s.config?.links?.discordInvite)
-
   const queryParams = new URLSearchParams(info)
   const blockedGuilds = queryParams.get('blockedGuilds')
+  const username = queryParams.get('username')
+  const avatar = queryParams.get('avatar')
+  const id = queryParams.get('id')
 
   return (
     <Grid
@@ -33,6 +36,18 @@ export default function Blocked() {
         </Typography>
       </Grid>
 
+      {username && avatar && id && (
+        <Grid xs={11} container alignItems="center" justifyContent="center">
+          <Avatar
+            src={`https://cdn.discordapp.com/avatars/${id}/${avatar}.webp?size=96`}
+            alt={username}
+            sx={{ mr: 2 }}
+          />
+          <Typography variant="h6" align="center">
+            {username}
+          </Typography>
+        </Grid>
+      )}
       {blockedGuilds && (
         <Grid xs={11}>
           <Typography variant="h6" align="center">
