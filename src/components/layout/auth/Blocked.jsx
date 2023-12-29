@@ -59,7 +59,7 @@ export default function Blocked() {
         )}
         <CardContent sx={{ mx: 2 }}>
           <Typography variant="h3" align="center" pb={2}>
-            {t('access')} {t('denied')}!
+            {t('access_denied')}!
           </Typography>
           {blockedGuilds ? (
             <>
