@@ -170,7 +170,7 @@ export default function FloatingButtons() {
       )}
       {fabButtons.scanNext && (
         <Fab
-          color={scanNextMode === 'setLocation' ? 'error' : 'secondary'}
+          color={scanNextMode === 'setLocation' ? 'primary' : 'secondary'}
           size={fabSize}
           onClick={handleClick('scanNextMode')}
           title={t('scan_next')}
@@ -181,7 +181,7 @@ export default function FloatingButtons() {
       )}
       {fabButtons.scanZone && (
         <Fab
-          color={scanZoneMode === 'setLocation' ? 'error' : 'secondary'}
+          color={scanZoneMode === 'setLocation' ? 'primary' : 'secondary'}
           size={fabSize}
           onClick={handleClick('scanZoneMode')}
           title={t('scan_zone')}
