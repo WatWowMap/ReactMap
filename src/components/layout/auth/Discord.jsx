@@ -6,7 +6,7 @@ import { I } from '../general/I'
 
 /**
  *
- * @param {{ children?: string, href?: string, size?: import('@mui/material').ButtonProps['size'], bgcolor?: string }} props
+ * @param {{ children?: string, bgcolor?: string } & import('@mui/material/Button').ButtonProps} props
  * @returns {JSX.Element}
  */
 export default function DiscordLogin({
@@ -14,6 +14,7 @@ export default function DiscordLogin({
   children = 'login',
   size = 'large',
   bgcolor = 'discord.main',
+  ...props
 }) {
   const { t } = useTranslation()
 
@@ -23,7 +24,8 @@ export default function DiscordLogin({
       bgcolor={bgcolor}
       size={size}
       href={href}
-      startIcon={<I className="fab fa-discord" size={size} />}
+      startIcon={<I className="fab fa-discord" size={size} color="white" />}
+      {...props}
     >
       {t(children)}
     </Button>
