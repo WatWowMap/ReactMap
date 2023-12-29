@@ -140,7 +140,9 @@ async function generate() {
 
         /** @type {I18nObject} */
         const missingKeys = Object.fromEntries(
-          Object.entries(englishRef).filter(([key]) => !(key in merged)),
+          Object.entries(englishRef).filter(
+            ([key]) => !(key in merged) && !key.startsWith('locale_selection_'),
+          ),
         )
 
         if (Object.keys(missingKeys).length === 0) return
