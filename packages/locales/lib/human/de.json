@@ -674,5 +674,14 @@
   "load_from_autosave": "Aus Autosave laden",
   "done": "Erledigt",
   "fast": "Sofort",
-  "charged": "Lade"
+  "charged": "Lade",
+  "offline_mode": "offline Modus",
+  "include_sponsored": "einschließlich gesponserte",
+  "showcase_color": "Showcasefarbe",
+  "partner_color": "Partnerfarbe",
+  "disable": "deaktivieren {{- name}}",
+  "profiling": "Profilbearbeitung",
+  "showcase_block": "Gesperrt wegen eines Showcase",
+  "signed_in_as": "eingeloggt als",
+  "missing_map_perm": "Du hast keine Berechtigung, die Karte anzuzeigen."
 }
