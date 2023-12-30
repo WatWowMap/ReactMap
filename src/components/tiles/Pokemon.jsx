@@ -9,6 +9,8 @@ import { getBadge } from '@services/functions/getBadge'
 import { basicEqualFn, useStatic, useStore } from '@hooks/useStore'
 import useOpacity from '@hooks/useOpacity'
 import useForcePopup from '@hooks/useForcePopup'
+import Utility from '@services/Utility'
+import { desktopNotifications } from '@services/desktopNotification'
 
 import PopupContent from '../popups/Pokemon'
 import { basicMarker, fancyMarker } from '../markers/pokemon'
@@ -126,6 +128,7 @@ const PokemonTile = (pkmn) => {
       s.manualParams.category === 'pokemon' && s.manualParams.id === pkmn.id,
     ]
   }, basicEqualFn)
+  const UAudio = useStatic((s) => s.Audio)
 
   /** @type {[number, number]} */
   const finalLocation = React.useMemo(
@@ -156,7 +159,23 @@ const PokemonTile = (pkmn) => {
 
   useForcePopup(pkmn.id, markerRef)
   useMarkerTimer(pkmn.expire_timestamp, markerRef)
-
+  desktopNotifications(
+    pkmn.id,
+    `poke_${pkmn.pokemon_id}${pkmn.form ? `,form_${pkmn.form}` : ''}`,
+    {
+      icon: iconUrl,
+      tag: pkmn.id,
+      body: `A${pkmn.atk_iv} | D${pkmn.def_iv} | S${pkmn.sta_iv} | L${
+        pkmn.level
+      } | CP${pkmn.cp}\n${
+        Utility.getTimeUntil(new Date(pkmn.expire_timestamp * 1000), true).str
+      }`,
+      lat: pkmn.lat,
+      lon: pkmn.lon,
+      expire: pkmn.expire_timestamp,
+      audio: UAudio.getPokemon(pkmn.pokemon_id, pkmn.form),
+    },
+  )
   if (pkmn.expire_timestamp < Date.now() / 1000 || excluded) {
     return null
   }
