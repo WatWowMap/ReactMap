@@ -1,20 +1,25 @@
 // @ts-check
 import { t } from 'i18next'
 
-import { useStatic } from '@hooks/useStore'
+import { useStatic, useStore } from '@hooks/useStore'
 import SimpleTTLCache from '@services/ttlcache'
 
 const cache = new SimpleTTLCache(1000 * 60 * 60)
 let isAudioPlaying = false
 
 /**
+ * @typedef {import('@rm/types').Config['clientSideOptions']['notifications']} RMNotificationOptions
  *
  * @param {string} key
  * @param {string} title
+ * @param {keyof Omit<RMNotificationOptions, 'enabled' | 'audio' | 'audioAlwaysOn'>} category
  * @param {NotificationOptions & { lat?: number, lon?: number, expire?: number, audio?: string }} [options]
  */
-export function desktopNotifications(key, title, options) {
-  if (!cache.has(key)) {
+export function desktopNotifications(key, title, category, options) {
+  const userSettings = /** @type {Partial<RMNotificationOptions>} */ (
+    useStore.getState().userSettings?.notifications || {}
+  )
+  if (!cache.has(key) && userSettings.enabled) {
     const { map } = useStatic.getState()
     Notification.requestPermission().then((permission) => {
       if (permission === 'granted') {
@@ -33,7 +38,11 @@ export function desktopNotifications(key, title, options) {
               localStorage.getItem('i18nextLng') || window.navigator.language,
           },
         )
-        if (audio && 'Audio' in window && !document.hasFocus()) {
+        if (
+          audio &&
+          userSettings.audio &&
+          (userSettings.audioAlwaysOn ? true : !document.hasFocus())
+        ) {
           const cry = new Audio(audio)
           cry.volume = 0.5
           if (!isAudioPlaying) {

@@ -5,8 +5,10 @@ import {
   FormControl,
   InputLabel,
   ListItem,
+  ListItemButton,
   ListItemIcon,
   ListSubheader,
+  ListItemText,
   MenuItem,
   Select,
 } from '@mui/material'
@@ -22,7 +24,7 @@ import NotificationsActiveIcon from '@mui/icons-material/NotificationsActive'
 
 import { useTranslation } from 'react-i18next'
 
-import { useStore, useStatic } from '@hooks/useStore'
+import { useStore, useStatic, toggleDialog } from '@hooks/useStore'
 import Utility from '@services/Utility'
 import DrawerActions from './Actions'
 import BoolToggle from './BoolToggle'
@@ -157,17 +159,17 @@ export default function Settings() {
         </ListItemIcon>
         <LocaleSelection />
       </ListItem>
-              )}
-            </MenuItem>
-          ))}
-        </FCSelect>
-      ))}
-      <Divider style={{ margin: '10px 0' }} />
       <BoolToggle field="darkMode" label="dark_mode">
         <ListItemIcon>
           <Brightness7Icon />
         </ListItemIcon>
       </BoolToggle>
+      <ListItemButton onClick={toggleDialog(true, 'notifications', 'options')}>
+        <ListItemIcon>
+          <NotificationsActiveIcon />
+        </ListItemIcon>
+        <ListItemText primary={t('desktop_notifications')} />
+      </ListItemButton>
       {holidayEffects.map(({ name, images }) => (
         <BoolToggle
           key={name}

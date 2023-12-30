@@ -428,6 +428,17 @@
       "clickableIcon": false,
       "darkMapBorder": "#ff0000",
       "lightMapBorder": "#246377"
+    },
+    "notifications": {
+      "enabled": false,
+      "audio": false,
+      "audioAlwaysOn": false,
+      "pokemon": false,
+      "raids": false,
+      "invasions": false,
+      "quests": false,
+      "eventStops": false,
+      "lures": false
     }
   },
   "defaultFilters": {

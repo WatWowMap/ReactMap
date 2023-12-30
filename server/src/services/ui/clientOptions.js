@@ -98,6 +98,47 @@ function clientOptions(perms) {
       lightMapBorder: { type: 'color', perm: ['weather'] },
       darkMapBorder: { type: 'color', perm: ['weather'] },
     },
+    notifications: {
+      enabled: {
+        type: 'bool',
+        perm: [
+          'pokemon',
+          'raids',
+          'invasions',
+          'quests',
+          'eventStops',
+          'lures',
+        ],
+      },
+      audio: {
+        type: 'bool',
+        perm: [
+          'pokemon',
+          'raids',
+          'invasions',
+          'quests',
+          'eventStops',
+          'lures',
+        ],
+      },
+      audioAlwaysOn: {
+        type: 'bool',
+        perm: [
+          'pokemon',
+          'raids',
+          'invasions',
+          'quests',
+          'eventStops',
+          'lures',
+        ],
+      },
+      pokemon: { type: 'bool', perm: ['pokemon'] },
+      // raids: { type: 'bool', perm: ['raids'] },
+      // invasions: { type: 'bool', perm: ['invasions'] },
+      // quests: { type: 'bool', perm: ['quests'] },
+      // eventStops: { type: 'bool', perm: ['eventStops'] },
+      // lures: { type: 'bool', perm: ['lures'] },
+    },
   }
 
   levels.forEach((level) => {

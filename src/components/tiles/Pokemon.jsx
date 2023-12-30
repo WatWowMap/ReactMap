@@ -162,6 +162,7 @@ const PokemonTile = (pkmn) => {
   desktopNotifications(
     pkmn.id,
     `poke_${pkmn.pokemon_id}${pkmn.form ? `,form_${pkmn.form}` : ''}`,
+    'pokemon',
     {
       icon: iconUrl,
       tag: pkmn.id,
