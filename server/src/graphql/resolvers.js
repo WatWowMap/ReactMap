@@ -28,6 +28,10 @@ const resolvers = {
         questConditions: perms.quests ? Db.questConditions : {},
         masterfile: { ...Event.masterfile, invasions: Event.invasions },
         filters: buildDefaultFilters(perms, Db),
+        audio: {
+          ...config.getSafe('audio'),
+          styles: Event.uaudio,
+        },
         icons: {
           ...config.getSafe('icons'),
           styles: Event.uicons,

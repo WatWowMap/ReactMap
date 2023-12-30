@@ -313,7 +313,8 @@ connection.migrate
       Event.setAvailable('nests', 'Nest', Db),
     ])
     await Promise.all([
-      Event.getUicons(config.getSafe('icons.styles')),
+      Event.getUniversalAssets(config.getSafe('icons.styles'), 'uicons'),
+      Event.getUniversalAssets(config.getSafe('audio.styles'), 'uaudio'),
       Event.getMasterfile(Db.historical, Db.rarity),
       Event.getInvasions(config.getSafe('api.pogoApiEndpoints.invasions')),
       Event.getWebhooks(),

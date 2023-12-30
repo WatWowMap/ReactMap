@@ -94,7 +94,7 @@ export interface UICONS {
   weather: UiconImage[]
 }
 
-export type UIconsClient = Config['icons']['styles'][number] & { data: UICONS }
+export type UAssetsClient = Config['icons']['styles'][number] & { data: UICONS }
 
 export type FullClientIcons = Omit<Config['icons'], 'styles'> & {
   styles: (Config['icons']['styles'][number] & { data: UICONS })[]

@@ -949,6 +949,17 @@
       }
     }
   },
+  "audio": {
+    "cacheHrs": 1,
+    "defaultAudio": {},
+    "customizable": [],
+    "styles": [
+      {
+        "name": "Default",
+        "path": "https://raw.githubusercontent.com/WatWowMap/wwm-uaudio/main"
+      }
+    ]
+  },
   "rarity": {
     "percents": {
       "uncommon": 0.25,

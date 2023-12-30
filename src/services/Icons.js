@@ -25,16 +25,18 @@
 // }
 
 // TODO: This is dumb, should be a state machine with Zustand
-class UIcons {
+class UAssets {
   /**
    *
    * @param {import("@rm/types").Config['icons']} iconsConfig
    * @param {import("@rm/types").Masterfile['questRewardTypes']} questRewardTypes
+   * @param {'uicons' | 'uaudio'} assetType
    */
-  constructor({ customizable, sizes }, questRewardTypes) {
+  constructor({ customizable, sizes }, questRewardTypes, assetType) {
     this.customizable = customizable
     this.sizes = sizes
     this.selected = {}
+    this.assetType = assetType
     this.questRewardTypes = Object.fromEntries(
       Object.entries(questRewardTypes).map(([id, category]) => [
         id,
@@ -42,7 +44,9 @@ class UIcons {
       ]),
     )
     this.fallback =
-      'https://raw.githubusercontent.com/WatWowMap/wwm-uicons-webp/main'
+      assetType === 'uicons'
+        ? 'https://raw.githubusercontent.com/WatWowMap/wwm-uicons-webp/main'
+        : 'https://raw.githubusercontent.com/WatWowMap/wwm-uaudio/main'
     this.modifiers = {
       base: {
         offsetX: 1,
@@ -53,7 +57,7 @@ class UIcons {
       },
     }
 
-    // Freezing since we don't change them in the codebase but we're exposing uicons to the global object and we don't want them to be changed in the browser console
+    // Freezing since we don't change them in the codebase but we're exposing uassets to the global object and we don't want them to be changed in the browser console
     // freezeProps(this, 'customizable')
     // freezeProps(this, 'sizes')
     // freezeProps(this, 'questRewardTypes')
@@ -61,7 +65,7 @@ class UIcons {
 
   /**
    *
-   * @param {import("@rm/types").UIconsClient[]} icons
+   * @param {import("@rm/types").UAssetsClient[]} icons
    */
   build(icons) {
     icons.forEach((icon) => {
@@ -83,14 +87,14 @@ class UIcons {
           }
           if (!path) {
             console.error(
-              '[UICONS] No path provided for',
+              `[${this.assetType}] No path provided for`,
               name,
               'using default path',
             )
             this[name].path = this.fallback
           }
           if (!path.startsWith('http')) {
-            this[name].path = `/images/uicons/${path}`
+            this[name].path = `/images/${this.assetType}/${path}`
           }
           if (!this[name].modifiers) {
             this[name].modifiers = {}
@@ -148,11 +152,16 @@ class UIcons {
           })
         }
       } catch (e) {
-        console.error('[ICONS] issue building', icon, '\n', e)
+        console.error(
+          `[${this.assetType.toUpperCase()}] issue building`,
+          icon,
+          '\n',
+          e,
+        )
       }
     })
     // for debugging purposes/viewing
-    Object.defineProperty(window, 'uicons', {
+    Object.defineProperty(window, this.assetType, {
       value: this,
       writable: true,
       enumerable: true,
@@ -294,7 +303,7 @@ class UIcons {
       }
       return this.getMisc('0')
     } catch (e) {
-      console.error('[UICONS]', e)
+      console.error(`[${this.assetType}]`, e)
       return `${this.fallback}/misc/0.webp`
     }
   }
@@ -350,7 +359,7 @@ class UIcons {
       }
       return `${baseUrl}/0.${extension}`
     } catch (e) {
-      console.error('[UICONS]', e)
+      console.error(`[${this.assetType.toUpperCase()}]`, e)
       return `${this.fallback}/pokemon/0.webp`
     }
   }
@@ -367,7 +376,7 @@ class UIcons {
       }
       return `${baseUrl}/0.${extension}`
     } catch (e) {
-      console.error('[UICONS]', e)
+      console.error(`[${this.assetType.toUpperCase()}]`, e)
       return `${this.fallback}/type/0.webp`
     }
   }
@@ -416,7 +425,7 @@ class UIcons {
       }
       return `${baseUrl}/0.${extension}`
     } catch (e) {
-      console.error('[UICONS]', e)
+      console.error(`[${this.assetType.toUpperCase()}]`, e)
       return `${this.fallback}/pokestop/0.webp`
     }
   }
@@ -447,7 +456,7 @@ class UIcons {
       }
       return `${baseUrl}/0.${extension}`
     } catch (e) {
-      console.error('[UICONS]', e)
+      console.error(`[${this.assetType.toUpperCase()}]`, e)
       return `${this.fallback}/reward/unset/0.webp`
     }
   }
@@ -474,7 +483,7 @@ class UIcons {
       }
       return `${baseUrl}/0.${extension}`
     } catch (e) {
-      console.error('[UICONS]', e)
+      console.error(`[${this.assetType.toUpperCase()}]`, e)
       return `${this.fallback}/invasion/0.webp`
     }
   }
@@ -517,7 +526,7 @@ class UIcons {
       }
       return `${baseUrl}/0.${extension}`
     } catch (e) {
-      console.error('[UICONS]', e)
+      console.error(`[${this.assetType.toUpperCase()}]`, e)
       return `${this.fallback}/gym/0.webp`
     }
   }
@@ -551,7 +560,7 @@ class UIcons {
       }
       return `${baseUrl}/0.${extension}`
     } catch (e) {
-      console.error('[UICONS]', e)
+      console.error(`[${this.assetType.toUpperCase()}]`, e)
       return `${this.fallback}/raid/egg/0.webp`
     }
   }
@@ -572,7 +581,7 @@ class UIcons {
       }
       return `${baseUrl}/0.${extension}`
     } catch (e) {
-      console.error('[UICONS]', e)
+      console.error(`[${this.assetType.toUpperCase()}]`, e)
       return `${this.fallback}/team/0.webp`
     }
   }
@@ -599,7 +608,7 @@ class UIcons {
       }
       return `${baseUrl}/0.${extension}`
     } catch (e) {
-      console.error('[UICONS]', e)
+      console.error(`[${this.assetType.toUpperCase()}]`, e)
       return `${this.fallback}/weather/0.webp`
     }
   }
@@ -620,7 +629,7 @@ class UIcons {
       }
       return `${baseUrl}/0.${extension}`
     } catch (e) {
-      console.error('[UICONS]', e)
+      console.error(`[${this.assetType.toUpperCase()}]`, e)
       return `${this.fallback}/nest/0.webp`
     }
   }
@@ -660,7 +669,7 @@ class UIcons {
       }
       return `${baseUrl}/0.${extension}`
     } catch (e) {
-      console.error('[UICONS]', e)
+      console.error(`[${this.assetType.toUpperCase()}]`, e)
       return `${this.fallback}/misc/0.webp`
     }
   }
@@ -675,7 +684,7 @@ class UIcons {
 
       return online ? `${baseUrl}/1.${extension}` : `${baseUrl}/0.${extension}`
     } catch (e) {
-      console.error('[UICONS]', e)
+      console.error(`[${this.assetType.toUpperCase()}]`, e)
       return `${this.fallback}/device/0.webp`
     }
   }
@@ -690,10 +699,10 @@ class UIcons {
 
       return hasTth ? `${baseUrl}/1.${extension}` : `${baseUrl}/0.${extension}`
     } catch (e) {
-      console.error('[UICONS]', e)
+      console.error(`[${this.assetType.toUpperCase()}]`, e)
       return `${this.fallback}/spawnpoint/0.webp`
     }
   }
 }
 
-export default UIcons
+export default UAssets
