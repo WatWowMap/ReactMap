@@ -6,6 +6,7 @@ import {
   InputLabel,
   ListItem,
   ListItemIcon,
+  ListSubheader,
   MenuItem,
   Select,
 } from '@mui/material'
@@ -17,6 +18,7 @@ import DevicesOtherIcon from '@mui/icons-material/DevicesOther'
 import Brightness7Icon from '@mui/icons-material/Brightness7'
 import CakeIcon from '@mui/icons-material/Cake'
 import InsightsIcon from '@mui/icons-material/Insights'
+import NotificationsActiveIcon from '@mui/icons-material/NotificationsActive'
 
 import { useTranslation } from 'react-i18next'
 
@@ -47,6 +49,58 @@ function FCSelect({ name, label, value, onChange, children, icon }) {
   )
 }
 
+/**
+ *
+ * @param {{ asset: 'icons' | 'audio' }} param0
+ * @returns
+ */
+function UniAssetSelect({ asset }) {
+  const instanceName = asset === 'icons' ? 'Icons' : 'Audio'
+  const { t } = useTranslation()
+  const userSettings = useStore((s) => s[asset])
+  const Asset = useStatic((s) => s[instanceName])
+  const darkMode = useStore((s) => s.darkMode)
+  const Icons = useStatic((s) => s.Icons)
+
+  return (
+    <>
+      {Asset.customizable.map((category) => (
+        <FCSelect
+          key={category}
+          name={category}
+          value={userSettings[category]}
+          label={t(`${category}_${asset}`, `${category} ${instanceName}`)}
+          onChange={({ target }) => {
+            Asset.setSelection(target.name, target.value)
+            useStatic.setState({ [instanceName]: Asset })
+            useStore.setState({
+              [asset]: { ...userSettings, [target.name]: target.value },
+            })
+          }}
+          icon={
+            <img
+              src={Icons.getMisc(category)}
+              alt={category}
+              width={24}
+              className={darkMode ? '' : 'darken-image'}
+            />
+          }
+        >
+          {[...Asset[category]].map((option) => (
+            <MenuItem key={option} value={option}>
+              {t(
+                `${category.toLowerCase()}_${option.toLowerCase()}`,
+                Utility.getProperName(option),
+              )}
+            </MenuItem>
+          ))}
+        </FCSelect>
+      ))}
+      {!!Asset.customizable.length && <Divider style={{ margin: '10px 0' }} />}
+    </>
+  )
+}
+
 const ICON_MAP = {
   navigation: NavIcon,
   navigationControls: StyleIcon,
@@ -56,7 +110,6 @@ const ICON_MAP = {
 export default function Settings() {
   const { t } = useTranslation()
 
-  const Icons = useStatic((s) => s.Icons)
   const staticSettings = useStatic((s) => s.settings)
   const separateDrawerActions = useStatic(
     (s) => s.config.general.separateDrawerActions,
@@ -64,11 +117,11 @@ export default function Settings() {
   const holidayEffects = useStatic((s) => s.config.holidayEffects) || []
 
   const settings = useStore((s) => s.settings)
-  const icons = useStore((s) => s.icons)
   const darkMode = useStore((s) => s.darkMode)
 
   return (
     <>
+      <ListSubheader>{t('general')}</ListSubheader>
       {Object.keys(staticSettings).map((setting) => {
         const Icon = ICON_MAP[setting] || DevicesOtherIcon
         return (
@@ -104,34 +157,6 @@ export default function Settings() {
         </ListItemIcon>
         <LocaleSelection />
       </ListItem>
-      <Divider style={{ margin: '10px 0' }} />
-      {Icons.customizable.map((category) => (
-        <FCSelect
-          key={category}
-          name={category}
-          value={icons[category]}
-          label={t(`${category}_icons`, `${category} Icons`)}
-          onChange={({ target }) => {
-            Icons.setSelection(target.name, target.value)
-            useStatic.setState({ Icons })
-            useStore.setState({
-              icons: { ...icons, [target.name]: target.value },
-            })
-          }}
-          icon={
-            <img
-              src={Icons.getMisc(category)}
-              alt={category}
-              width={24}
-              className={darkMode ? '' : 'darken-image'}
-            />
-          }
-        >
-          {[...Icons[category]].map((option) => (
-            <MenuItem key={option} value={option}>
-              {t(
-                `${category.toLowerCase()}_${option.toLowerCase()}`,
-                Utility.getProperName(option),
               )}
             </MenuItem>
           ))}
@@ -170,6 +195,11 @@ export default function Settings() {
           </ListItemIcon>
         </BoolToggle>
       )}
+      <Divider style={{ margin: '10px 0' }} />
+      <ListSubheader>{t('icons')}</ListSubheader>
+      <UniAssetSelect asset="icons" />
+      <ListSubheader>{t('audio')}</ListSubheader>
+      <UniAssetSelect asset="audio" />
       {!separateDrawerActions && (
         <>
           <Divider style={{ margin: '10px 0' }} />

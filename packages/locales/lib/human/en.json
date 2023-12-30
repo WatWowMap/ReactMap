@@ -680,5 +680,6 @@
   "showcase_block": "Blocked due to a showcase",
   "signed_in_as": "Signed In As",
   "missing_map_perm": "You do not have permission to view the map.",
-  "access_denied": "Access Denied"
+  "access_denied": "Access Denied",
+  "audio": "Audio"
 }
