@@ -19,7 +19,7 @@ export function desktopNotifications(key, title, category, options) {
   const userSettings = /** @type {Partial<RMNotificationOptions>} */ (
     useStore.getState().userSettings?.notifications || {}
   )
-  if (!cache.has(key) && userSettings.enabled) {
+  if (!cache.has(key) && userSettings.enabled && userSettings[category]) {
     const { map } = useStatic.getState()
     Notification.requestPermission().then((permission) => {
       if (permission === 'granted') {
