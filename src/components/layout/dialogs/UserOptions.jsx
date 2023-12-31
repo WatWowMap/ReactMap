@@ -117,6 +117,13 @@ export default function UserOptions() {
       />
       <DialogContent sx={{ minWidth: 'min(100vw, 350px)' }}>
         <List>
+          {category === 'notifications' && (
+            <ListItem>
+              <ListItemText primaryTypographyProps={{ variant: 'h6' }}>
+                {t('notifications_status')}: {t(Notification.permission)}
+              </ListItemText>
+            </ListItem>
+          )}
           {Object.entries(staticUserSettings).map(([option, values]) => (
             <React.Fragment key={option}>
               <ListItem
