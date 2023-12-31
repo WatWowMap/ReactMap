@@ -64,8 +64,10 @@ function UniAssetSelect({ asset }) {
   const darkMode = useStore((s) => s.darkMode)
   const Icons = useStatic((s) => s.Icons)
 
+  if (Asset.customizable.length === 0) return null
   return (
     <>
+      <ListSubheader>{t(asset)}</ListSubheader>
       {Asset.customizable.map((category) => (
         <FCSelect
           key={category}
@@ -98,7 +100,7 @@ function UniAssetSelect({ asset }) {
           ))}
         </FCSelect>
       ))}
-      {!!Asset.customizable.length && <Divider style={{ margin: '10px 0' }} />}
+      <Divider style={{ margin: '10px 0' }} />
     </>
   )
 }
@@ -203,9 +205,7 @@ export default function Settings() {
         </BoolToggle>
       )}
       <Divider style={{ margin: '10px 0' }} />
-      <ListSubheader>{t('icons')}</ListSubheader>
       <UniAssetSelect asset="icons" />
-      <ListSubheader>{t('audio')}</ListSubheader>
       <UniAssetSelect asset="audio" />
       {!separateDrawerActions && (
         <>
