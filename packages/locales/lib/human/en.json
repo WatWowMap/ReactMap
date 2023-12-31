@@ -697,7 +697,9 @@
   "access_denied": "Access Denied",
   "audio": "Audio",
   "desktop_notifications": "Desktop Notifications",
-  "notification_options": "Notification Options",
+  "notifications_options": "Notification Options",
   "audio_always_on": "Audio Always Plays",
-  "volume_level": "Volume Level"
+  "volume_level": "Volume Level",
+  "notifications_status": "Notifications Status",
+  "granted": "granted"
 }
