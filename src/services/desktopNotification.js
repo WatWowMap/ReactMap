@@ -51,7 +51,12 @@ export function desktopNotifications(key, title, category, options) {
             cry.addEventListener('ended', () => {
               isAudioPlaying = false
             })
-            cry.play()
+            const isPlaying = cry.play()
+            if (isPlaying !== undefined) {
+              isPlaying.catch(() => {
+                isAudioPlaying = false
+              })
+            }
           }
         }
 
