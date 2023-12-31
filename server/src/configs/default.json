@@ -433,6 +433,7 @@
       "enabled": false,
       "audio": false,
       "audioAlwaysOn": false,
+      "volumeLevel": 50,
       "pokemon": false,
       "raids": false,
       "invasions": false,

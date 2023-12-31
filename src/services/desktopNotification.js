@@ -12,7 +12,7 @@ let isAudioPlaying = false
  *
  * @param {string} key
  * @param {string} title
- * @param {keyof Omit<RMNotificationOptions, 'enabled' | 'audio' | 'audioAlwaysOn'>} category
+ * @param {keyof Omit<RMNotificationOptions, 'enabled' | 'audio' | 'audioAlwaysOn' | 'volumeLevel'>} category
  * @param {NotificationOptions & { lat?: number, lon?: number, expire?: number, audio?: string }} [options]
  */
 export function desktopNotifications(key, title, category, options) {
@@ -44,15 +44,15 @@ export function desktopNotifications(key, title, category, options) {
           userSettings.audio &&
           (userSettings.audioAlwaysOn ? true : !document.hasFocus())
         ) {
-          const cry = new Audio(audio)
-          cry.volume = 0.5
           if (!isAudioPlaying) {
             isAudioPlaying = true
+            const cry = new Audio(audio)
+            cry.volume = userSettings.volumeLevel / 100
+            cry.addEventListener('ended', () => {
+              isAudioPlaying = false
+            })
             cry.play()
           }
-          cry.addEventListener('ended', () => {
-            isAudioPlaying = false
-          })
         }
 
         notif.onclick = () => {
