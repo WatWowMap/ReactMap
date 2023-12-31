@@ -47,6 +47,7 @@ class UAssets {
       assetType === 'uicons'
         ? 'https://raw.githubusercontent.com/WatWowMap/wwm-uicons-webp/main'
         : 'https://raw.githubusercontent.com/WatWowMap/wwm-uaudio/main'
+    this.fallbackExt = assetType === 'uicons' ? 'webp' : 'wav'
     this.modifiers = {
       base: {
         offsetX: 1,
@@ -304,7 +305,7 @@ class UAssets {
       return this.getMisc('0')
     } catch (e) {
       console.error(`[${this.assetType}]`, e)
-      return `${this.fallback}/misc/0.webp`
+      return `${this.fallback}/misc/0.${this.fallbackExt}`
     }
   }
 
@@ -360,7 +361,7 @@ class UAssets {
       return `${baseUrl}/0.${extension}`
     } catch (e) {
       console.error(`[${this.assetType.toUpperCase()}]`, e)
-      return `${this.fallback}/pokemon/0.webp`
+      return `${this.fallback}/pokemon/0.${this.fallbackExt}`
     }
   }
 
@@ -377,7 +378,7 @@ class UAssets {
       return `${baseUrl}/0.${extension}`
     } catch (e) {
       console.error(`[${this.assetType.toUpperCase()}]`, e)
-      return `${this.fallback}/type/0.webp`
+      return `${this.fallback}/type/0.${this.fallbackExt}`
     }
   }
 
@@ -426,7 +427,7 @@ class UAssets {
       return `${baseUrl}/0.${extension}`
     } catch (e) {
       console.error(`[${this.assetType.toUpperCase()}]`, e)
-      return `${this.fallback}/pokestop/0.webp`
+      return `${this.fallback}/pokestop/0.${this.fallbackExt}`
     }
   }
 
@@ -457,7 +458,7 @@ class UAssets {
       return `${baseUrl}/0.${extension}`
     } catch (e) {
       console.error(`[${this.assetType.toUpperCase()}]`, e)
-      return `${this.fallback}/reward/unset/0.webp`
+      return `${this.fallback}/reward/unset/0.${this.fallbackExt}`
     }
   }
 
@@ -484,7 +485,7 @@ class UAssets {
       return `${baseUrl}/0.${extension}`
     } catch (e) {
       console.error(`[${this.assetType.toUpperCase()}]`, e)
-      return `${this.fallback}/invasion/0.webp`
+      return `${this.fallback}/invasion/0.${this.fallbackExt}`
     }
   }
 
@@ -527,7 +528,7 @@ class UAssets {
       return `${baseUrl}/0.${extension}`
     } catch (e) {
       console.error(`[${this.assetType.toUpperCase()}]`, e)
-      return `${this.fallback}/gym/0.webp`
+      return `${this.fallback}/gym/0.${this.fallbackExt}`
     }
   }
 
@@ -561,7 +562,7 @@ class UAssets {
       return `${baseUrl}/0.${extension}`
     } catch (e) {
       console.error(`[${this.assetType.toUpperCase()}]`, e)
-      return `${this.fallback}/raid/egg/0.webp`
+      return `${this.fallback}/raid/egg/0.${this.fallbackExt}`
     }
   }
 
@@ -582,7 +583,7 @@ class UAssets {
       return `${baseUrl}/0.${extension}`
     } catch (e) {
       console.error(`[${this.assetType.toUpperCase()}]`, e)
-      return `${this.fallback}/team/0.webp`
+      return `${this.fallback}/team/0.${this.fallbackExt}`
     }
   }
 
@@ -609,7 +610,7 @@ class UAssets {
       return `${baseUrl}/0.${extension}`
     } catch (e) {
       console.error(`[${this.assetType.toUpperCase()}]`, e)
-      return `${this.fallback}/weather/0.webp`
+      return `${this.fallback}/weather/0.${this.fallbackExt}`
     }
   }
 
@@ -630,7 +631,7 @@ class UAssets {
       return `${baseUrl}/0.${extension}`
     } catch (e) {
       console.error(`[${this.assetType.toUpperCase()}]`, e)
-      return `${this.fallback}/nest/0.webp`
+      return `${this.fallback}/nest/0.${this.fallbackExt}`
     }
   }
 
@@ -670,7 +671,7 @@ class UAssets {
       return `${baseUrl}/0.${extension}`
     } catch (e) {
       console.error(`[${this.assetType.toUpperCase()}]`, e)
-      return `${this.fallback}/misc/0.webp`
+      return `${this.fallback}/misc/0.${this.fallbackExt}`
     }
   }
 
@@ -685,7 +686,7 @@ class UAssets {
       return online ? `${baseUrl}/1.${extension}` : `${baseUrl}/0.${extension}`
     } catch (e) {
       console.error(`[${this.assetType.toUpperCase()}]`, e)
-      return `${this.fallback}/device/0.webp`
+      return `${this.fallback}/device/0.${this.fallbackExt}`
     }
   }
 
@@ -700,7 +701,7 @@ class UAssets {
       return hasTth ? `${baseUrl}/1.${extension}` : `${baseUrl}/0.${extension}`
     } catch (e) {
       console.error(`[${this.assetType.toUpperCase()}]`, e)
-      return `${this.fallback}/spawnpoint/0.webp`
+      return `${this.fallback}/spawnpoint/0.${this.fallbackExt}`
     }
   }
 }
