@@ -23,10 +23,11 @@ export function desktopNotifications(key, title, category, options) {
   if (userSettings.enabled && userSettings[category]) {
     Notification.requestPermission().then((permission) => {
       if (permission === 'granted') {
-        const { map } = useStatic.getState()
         const { lat, lon, audio, expire, ...rest } = options
-        const countdown = (expire ? expire * 1000 : Date.now() + 1) - Date.now()
+        const countdown = expire ? expire * 1000 - Date.now() : 1
+        if (countdown < 0) return
         cache.set(key, countdown)
+
         const notif = new Notification(
           title
             .split(',')
@@ -39,6 +40,22 @@ export function desktopNotifications(key, title, category, options) {
               localStorage.getItem('i18nextLng') || window.navigator.language,
           },
         )
+        notif.onclick = () => {
+          if (lat && lon) {
+            const { map } = useStatic.getState()
+            map.flyTo([lat, lon], 16)
+          }
+          notif.close()
+        }
+        if (expire) {
+          const timer = setTimeout(() => {
+            notif.close()
+          }, countdown)
+          notif.onclose = () => {
+            clearTimeout(timer)
+          }
+        }
+
         if (
           audio &&
           userSettings.audio &&
@@ -57,21 +74,6 @@ export function desktopNotifications(key, title, category, options) {
                 isAudioPlaying = false
               })
             }
-          }
-        }
-
-        notif.onclick = () => {
-          if (lat && lon) {
-            map.flyTo([lat, lon], 16)
-          }
-          notif.close()
-        }
-        if (expire) {
-          const timer = setTimeout(() => {
-            notif.close()
-          }, countdown)
-          notif.onclose = () => {
-            clearTimeout(timer)
           }
         }
       }
