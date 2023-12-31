@@ -41,6 +41,9 @@ export function desktopNotifications(key, title, category, options) {
           },
         )
         notif.onclick = () => {
+          if (!document.hasFocus()) {
+            window.focus()
+          }
           if (lat && lon) {
             const { map } = useStatic.getState()
             map.flyTo([lat, lon], 16)
