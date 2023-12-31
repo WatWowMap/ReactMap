@@ -164,7 +164,12 @@ export default function Settings() {
           <Brightness7Icon />
         </ListItemIcon>
       </BoolToggle>
-      <ListItemButton onClick={toggleDialog(true, 'notifications', 'options')}>
+      <ListItemButton
+        onClick={async (event) => {
+          await Notification.requestPermission()
+          toggleDialog(true, 'notifications', 'options')(event)
+        }}
+      >
         <ListItemIcon>
           <NotificationsActiveIcon />
         </ListItemIcon>
