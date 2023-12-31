@@ -21,6 +21,7 @@ import Brightness7Icon from '@mui/icons-material/Brightness7'
 import CakeIcon from '@mui/icons-material/Cake'
 import InsightsIcon from '@mui/icons-material/Insights'
 import NotificationsActiveIcon from '@mui/icons-material/NotificationsActive'
+import NotificationsOffIcon from '@mui/icons-material/NotificationsOff'
 
 import { useTranslation } from 'react-i18next'
 
@@ -173,7 +174,11 @@ export default function Settings() {
         }}
       >
         <ListItemIcon>
-          <NotificationsActiveIcon />
+          {Notification.permission === 'granted' ? (
+            <NotificationsActiveIcon />
+          ) : (
+            <NotificationsOffIcon color="error" />
+          )}
         </ListItemIcon>
         <ListItemText primary={t('desktop_notifications')} />
       </ListItemButton>
