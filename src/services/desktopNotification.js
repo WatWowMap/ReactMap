@@ -46,6 +46,7 @@ export function desktopNotifications(key, title, category, options) {
           }
           if (lat && lon) {
             const { map } = useStatic.getState()
+            useStatic.setState({ manualParams: { category, id: key } })
             map.flyTo([lat, lon], 16)
           }
           notif.close()
