@@ -173,22 +173,24 @@ export default function Settings() {
           <Brightness7Icon />
         </ListItemIcon>
       </BoolToggle>
-      <ListItemButton
-        disabled={!HAS_API}
-        onClick={async (event) => {
-          requestPermission()
-          toggleDialog(true, 'notifications', 'options')(event)
-        }}
-      >
-        <ListItemIcon>
-          {getPermission() === 'granted' ? (
-            <NotificationsActiveIcon />
-          ) : (
-            <NotificationsOffIcon color="error" />
-          )}
-        </ListItemIcon>
-        <ListItemText primary={t('desktop_notifications')} />
-      </ListItemButton>
+      {HAS_API && (
+        <ListItemButton
+          disabled={!HAS_API}
+          onClick={async (event) => {
+            await requestPermission()
+            toggleDialog(true, 'notifications', 'options')(event)
+          }}
+        >
+          <ListItemIcon>
+            {getPermission() === 'granted' ? (
+              <NotificationsActiveIcon />
+            ) : (
+              <NotificationsOffIcon color="error" />
+            )}
+          </ListItemIcon>
+          <ListItemText primary={t('desktop_notifications')} />
+        </ListItemButton>
+      )}
       {holidayEffects.map(({ name, images }) => (
         <BoolToggle
           key={name}

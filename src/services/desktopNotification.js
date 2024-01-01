@@ -21,7 +21,7 @@ export function getPermission() {
  * @returns {Promise<NotificationPermission>}
  */
 export async function requestPermission() {
-  if (!HAS_API) return
+  if (!HAS_API) return 'denied'
   return Notification.requestPermission()
 }
 
