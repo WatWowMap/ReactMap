@@ -4,8 +4,26 @@ import { t } from 'i18next'
 import { useStatic, useStore } from '@hooks/useStore'
 import SimpleTTLCache from '@services/ttlcache'
 
+export const HAS_API = 'Notification' in window
 const cache = new SimpleTTLCache(1000 * 60 * 60)
 let isAudioPlaying = false
+
+/**
+ * Wrapper to get permission, to keep API check in one module
+ * @returns {NotificationPermission}
+ */
+export function getPermission() {
+  return HAS_API ? Notification.permission : 'denied'
+}
+
+/**
+ * Wrapper to request permission, to keep API check in one module
+ * @returns {Promise<NotificationPermission>}
+ */
+export async function requestPermission() {
+  if (!HAS_API) return
+  return Notification.requestPermission()
+}
 
 /**
  * @typedef {import('@rm/types').Config['clientSideOptions']['notifications']} RMNotificationOptions
@@ -15,13 +33,13 @@ let isAudioPlaying = false
  * @param {keyof Omit<RMNotificationOptions, 'enabled' | 'audio' | 'audioAlwaysOn' | 'volumeLevel'>} category
  * @param {NotificationOptions & { lat?: number, lon?: number, expire?: number, audio?: string }} [options]
  */
-export function desktopNotifications(key, title, category, options) {
-  if (cache.has(key)) return
+export function sendNotification(key, title, category, options) {
+  if (cache.has(key) || !HAS_API) return
   const userSettings = /** @type {Partial<RMNotificationOptions>} */ (
     useStore.getState().userSettings?.notifications || {}
   )
   if (userSettings.enabled && userSettings[category]) {
-    Notification.requestPermission().then((permission) => {
+    requestPermission().then((permission) => {
       if (permission === 'granted') {
         const { lat, lon, audio, expire, ...rest } = options
         const countdown = expire ? expire * 1000 - Date.now() : 1

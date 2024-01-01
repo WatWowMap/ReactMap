@@ -27,6 +27,12 @@ import { useTranslation } from 'react-i18next'
 
 import { useStore, useStatic, toggleDialog } from '@hooks/useStore'
 import Utility from '@services/Utility'
+import {
+  HAS_API,
+  getPermission,
+  requestPermission,
+} from '@services/desktopNotification'
+
 import DrawerActions from './Actions'
 import BoolToggle from './BoolToggle'
 import LocaleSelection from '../general/LocaleSelection'
@@ -168,13 +174,14 @@ export default function Settings() {
         </ListItemIcon>
       </BoolToggle>
       <ListItemButton
+        disabled={!HAS_API}
         onClick={async (event) => {
-          await Notification.requestPermission()
+          requestPermission()
           toggleDialog(true, 'notifications', 'options')(event)
         }}
       >
         <ListItemIcon>
-          {Notification.permission === 'granted' ? (
+          {getPermission() === 'granted' ? (
             <NotificationsActiveIcon />
           ) : (
             <NotificationsOffIcon color="error" />

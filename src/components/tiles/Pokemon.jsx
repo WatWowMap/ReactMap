@@ -10,7 +10,7 @@ import { basicEqualFn, useStatic, useStore } from '@hooks/useStore'
 import useOpacity from '@hooks/useOpacity'
 import useForcePopup from '@hooks/useForcePopup'
 import Utility from '@services/Utility'
-import { desktopNotifications } from '@services/desktopNotification'
+import { sendNotification } from '@services/desktopNotification'
 
 import PopupContent from '../popups/Pokemon'
 import { basicMarker, fancyMarker } from '../markers/pokemon'
@@ -159,7 +159,7 @@ const PokemonTile = (pkmn) => {
 
   useForcePopup(pkmn.id, markerRef)
   useMarkerTimer(pkmn.expire_timestamp, markerRef)
-  desktopNotifications(
+  sendNotification(
     pkmn.id,
     `poke_${pkmn.pokemon_id}${pkmn.form ? `,form_${pkmn.form}` : ''}`,
     'pokemon',

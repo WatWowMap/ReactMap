@@ -16,6 +16,8 @@ import {
   useStore,
   toggleDialog,
 } from '@hooks/useStore'
+import { getPermission } from '@services/desktopNotification'
+
 import Header from '../general/Header'
 import Footer from '../general/Footer'
 import { DialogWrapper } from './DialogWrapper'
@@ -120,7 +122,7 @@ export default function UserOptions() {
           {category === 'notifications' && (
             <ListItem>
               <ListItemText primaryTypographyProps={{ variant: 'h6' }}>
-                {t('notifications_status')}: {t(Notification.permission)}
+                {t('notifications_status')}: {t(getPermission())}
               </ListItemText>
             </ListItem>
           )}
