@@ -39,67 +39,64 @@ export function sendNotification(key, title, category, options) {
     useStore.getState().userSettings?.notifications || {}
   )
   if (userSettings.enabled && userSettings[category]) {
-    requestPermission().then((permission) => {
-      if (permission === 'granted') {
-        const { lat, lon, audio, expire, ...rest } = options
-        const countdown = expire ? expire * 1000 - Date.now() : 1
-        if (countdown < 0) return
-        cache.set(key, countdown)
+    if (getPermission() === 'granted') {
+      const { lat, lon, audio, expire, ...rest } = options
+      const countdown = expire ? expire * 1000 - Date.now() : 1
+      if (countdown < 0) return
+      cache.set(key, countdown)
 
-        const notif = new Notification(
-          title
-            .split(',')
-            .filter(Boolean)
-            .map((w) => t(w))
-            .join(' '),
-          {
-            ...rest,
-            tag: key,
-            lang:
-              localStorage.getItem('i18nextLng') || window.navigator.language,
-          },
-        )
-        notif.onclick = () => {
-          if (!document.hasFocus()) {
-            window.focus()
-          }
-          if (lat && lon) {
-            const { map } = useStatic.getState()
-            useStatic.setState({ manualParams: { category, id: key } })
-            map.flyTo([lat, lon], 16)
-          }
+      const notif = new Notification(
+        title
+          .split(',')
+          .filter(Boolean)
+          .map((w) => t(w))
+          .join(' '),
+        {
+          ...rest,
+          tag: key,
+          lang: localStorage.getItem('i18nextLng') || window.navigator.language,
+        },
+      )
+      notif.onclick = () => {
+        if (!document.hasFocus()) {
+          window.focus()
+        }
+        if (lat && lon) {
+          const { map } = useStatic.getState()
+          useStatic.setState({ manualParams: { category, id: key } })
+          map.flyTo([lat, lon], 16)
+        }
+        notif.close()
+      }
+      if (expire) {
+        const timer = setTimeout(() => {
           notif.close()
+        }, countdown)
+        notif.onclose = () => {
+          clearTimeout(timer)
         }
-        if (expire) {
-          const timer = setTimeout(() => {
-            notif.close()
-          }, countdown)
-          notif.onclose = () => {
-            clearTimeout(timer)
-          }
-        }
+      }
 
-        if (
-          audio &&
-          userSettings.audio &&
-          (userSettings.audioAlwaysOn ? true : !document.hasFocus())
-        ) {
-          if (!isAudioPlaying) {
-            isAudioPlaying = true
-            const cry = new Audio(audio)
-            cry.volume = userSettings.volumeLevel / 100
-            cry.addEventListener('ended', () => {
+      if (
+        audio &&
+        userSettings.audio &&
+        (userSettings.audioAlwaysOn ? true : !document.hasFocus())
+      ) {
+        if (!isAudioPlaying) {
+          isAudioPlaying = true
+          const cry = new Audio(audio)
+          cry.volume = userSettings.volumeLevel / 100
+          cry.addEventListener('ended', () => {
+            isAudioPlaying = false
+          })
+          const isPlaying = cry.play()
+          if (isPlaying !== undefined) {
+            isPlaying.catch(() => {
               isAudioPlaying = false
             })
-            const isPlaying = cry.play()
-            if (isPlaying !== undefined) {
-              isPlaying.catch(() => {
-                isAudioPlaying = false
-              })
-            }
           }
         }
       }
-    })
+    }
   }
 }
