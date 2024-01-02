@@ -1,7 +1,15 @@
+// @ts-check
 import * as React from 'react'
 
 import { useStatic, useStore } from '@hooks/useStore'
 
+/**
+ *
+ * @param {Record<string, { name: string, style: 'light' | 'dark', attribution?: string, url?: string, background?: string }>} tileServers
+ * @param {string} tileServer
+ * @param {'day' | 'night' | 'dusk' | 'dawn'} timeOfDay
+ * @returns
+ */
 const getTileLayer = (tileServers, tileServer, timeOfDay) => {
   const fallbackTs = Object.values(tileServers).find(
     (server) => server.name !== 'auto',
@@ -17,8 +25,8 @@ const getTileLayer = (tileServers, tileServer, timeOfDay) => {
 }
 
 export default function useTileLayer() {
-  const timeOfDay = useStatic((state) => state.timeOfDay)
-  const userTileLayer = useStore((state) => state.settings.tileServers)
+  const timeOfDay = useStatic((s) => s.timeOfDay)
+  const userTileLayer = useStore((s) => s.settings.tileServers)
   const online = useStatic((s) => s.online)
 
   const tileLayer = React.useMemo(() => {
@@ -44,6 +52,14 @@ export default function useTileLayer() {
 
   React.useEffect(() => {
     useStatic.setState({ tileStyle: tileLayer.style })
+    const leafletContainerEl = document
+      .getElementsByClassName('leaflet-container')
+      .item(0)
+    if (leafletContainerEl instanceof HTMLElement) {
+      leafletContainerEl.style.background =
+        tileLayer.background ??
+        (tileLayer.style === 'dark' ? '#0F0D0D' : '#ddd')
+    }
   }, [tileLayer.style])
 
   return tileLayer

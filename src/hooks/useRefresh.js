@@ -4,7 +4,7 @@ import { useQuery } from '@apollo/client'
 import getAvailable from '@services/queries/available'
 
 import { deepMerge } from '@services/functions/deepMerge'
-import UIcons from '@services/Icons'
+import UAssets from '@services/Icons'
 
 import { useStatic, useStore } from './useStore'
 
@@ -33,23 +33,39 @@ export default function useRefresh() {
 
   useEffect(() => {
     if (data?.available) {
-      const { masterfile, filters, icons, ...rest } = data.available
-      const { icons: userIcons } = useStore.getState()
-      const existing = useStatic.getState().Icons
-      const Icons = existing ?? new UIcons(icons, masterfile.questRewardTypes)
+      const { masterfile, filters, icons, audio, ...rest } = data.available
+      const { icons: userIcons, audio: userAudio } = useStore.getState()
+      const existing = useStatic.getState()
 
+      const Icons =
+        existing.Icons ??
+        new UAssets(icons, masterfile.questRewardTypes, 'uicons')
+      const Audio =
+        existing.Audio ??
+        new UAssets(audio, masterfile.questRewardTypes, 'uaudio')
       Icons.build(
         typeof structuredClone === 'function'
           ? structuredClone(icons.styles)
           : JSON.parse(JSON.stringify(icons.styles)),
       )
+      Audio.build(
+        typeof structuredClone === 'function'
+          ? structuredClone(audio.styles)
+          : JSON.parse(JSON.stringify(audio.styles)),
+      )
       if (icons.defaultIcons && !existing) {
         Icons.setSelection(icons.defaultIcons)
+      }
+      if (audio.defaultAudio && !existing) {
+        Audio.setSelection(audio.defaultAudio)
       }
       if (Icons.checkValid(userIcons)) {
         Icons.setSelection(userIcons)
       }
-      useStore.setState({ icons: Icons.selection })
+      if (Audio.checkValid(userAudio)) {
+        Audio.setSelection(userAudio)
+      }
+      useStore.setState({ icons: Icons.selection, audio: Audio.selection })
       if (masterfile) {
         localStorage.setItem(
           'questRewardTypes',
@@ -61,6 +77,7 @@ export default function useRefresh() {
         masterfile,
         filters,
         Icons,
+        Audio,
       })
       useStore.setState((prev) => ({
         filters: deepMerge({}, filters, prev.filters),

@@ -2,11 +2,14 @@
 // @ts-check
 import * as React from 'react'
 import { Marker, Popup, Circle } from 'react-leaflet'
+import { t } from 'i18next'
 
 import useMarkerTimer from '@hooks/useMarkerTimer'
 import { basicEqualFn, useStatic, useStore } from '@hooks/useStore'
 import useOpacity from '@hooks/useOpacity'
 import useForcePopup from '@hooks/useForcePopup'
+import { sendNotification } from '@services/desktopNotification'
+import Utility from '@services/Utility'
 
 import gymMarker from '../markers/gym'
 import PopupContent from '../popups/Gym'
@@ -45,9 +48,10 @@ const GymTile = (gym) => {
     gymIconSize,
     raidIconUrl,
     raidIconSize,
+    audio,
   ] = useStatic((s) => {
     const newTs = Date.now() / 1000
-    const { excludeList, timerList, config, Icons } = s
+    const { excludeList, timerList, config, Icons, Audio } = s
     const { filters, userSettings } = useStore.getState()
 
     const filledSlots =
@@ -103,6 +107,16 @@ const GymTile = (gym) => {
           ? Icons.getSize('raid', filters.gyms.filter[raidFilterId]?.size)
           : Icons.getSize('raid', filters.gyms.filter[eggFilterId]?.size)
         : '',
+      hasRaidInternal
+        ? Audio.getPokemon(
+            gym.raid_pokemon_id,
+            gym.raid_pokemon_form,
+            gym.raid_pokemon_evolution,
+            gym.raid_pokemon_gender,
+            gym.raid_pokemon_costume,
+            gym.raid_pokemon_alignment,
+          )
+        : '',
     ]
   }, basicEqualFn)
 
@@ -140,7 +154,22 @@ const GymTile = (gym) => {
 
   useForcePopup(gym.id, markerRef)
   useMarkerTimer(timerToDisplay, markerRef, () => setStateChange(!stateChange))
-
+  if (hasRaid) {
+    sendNotification(`${gym.id}-${hasHatched}`, gym.name, 'raids', {
+      lat: gym.lat,
+      lon: gym.lon,
+      expire: timerToDisplay,
+      audio,
+      body: `${t(`${hasHatched ? `raid` : 'egg'}_${gym.raid_level}`)}\n${
+        gym.raid_pokemon_evolution ? t(`evo_${gym.raid_pokemon_evolution}`) : ''
+      }${gym.raid_pokemon_id ? t(`poke_${gym.raid_pokemon_id}`) : ''}${
+        gym.raid_pokemon_form ? t(`form_${gym.raid_pokemon_form}`) : ''
+      }${gym.raid_pokemon_id ? '\n' : ''}${
+        Utility.getTimeUntil(new Date(timerToDisplay * 1000), true).str
+      }`,
+      icon: raidIconUrl,
+    })
+  }
   return (
     !excludeTeam && (
       <Marker

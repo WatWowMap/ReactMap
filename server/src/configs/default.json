@@ -427,6 +427,14 @@
       "clickableIcon": false,
       "darkMapBorder": "#ff0000",
       "lightMapBorder": "#246377"
+    },
+    "notifications": {
+      "enabled": false,
+      "audio": false,
+      "audioAlwaysOn": false,
+      "volumeLevel": 50,
+      "pokemon": false,
+      "raids": false
     }
   },
   "defaultFilters": {
@@ -947,6 +955,17 @@
         "xl": 3
       }
     }
+  },
+  "audio": {
+    "cacheHrs": 1,
+    "defaultAudio": {},
+    "customizable": [],
+    "styles": [
+      {
+        "name": "Default",
+        "path": "https://raw.githubusercontent.com/WatWowMap/wwm-uaudio/main"
+      }
+    ]
   },
   "rarity": {
     "percents": {

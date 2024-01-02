@@ -11,6 +11,7 @@ const getAvailable = gql`
       filters
       questConditions
       icons
+      audio
     }
   }
 `

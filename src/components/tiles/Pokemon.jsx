@@ -2,6 +2,7 @@
 // @ts-check
 import * as React from 'react'
 import { Marker, Popup, Circle } from 'react-leaflet'
+import { t } from 'i18next'
 
 import useMarkerTimer from '@hooks/useMarkerTimer'
 import { getOffset } from '@services/functions/offset'
@@ -9,6 +10,8 @@ import { getBadge } from '@services/functions/getBadge'
 import { basicEqualFn, useStatic, useStore } from '@hooks/useStore'
 import useOpacity from '@hooks/useOpacity'
 import useForcePopup from '@hooks/useForcePopup'
+import Utility from '@services/Utility'
+import { sendNotification } from '@services/desktopNotification'
 
 import PopupContent from '../popups/Pokemon'
 import { basicMarker, fancyMarker } from '../markers/pokemon'
@@ -106,8 +109,9 @@ const PokemonTile = (pkmn) => {
     badge,
     configZoom,
     timeOfDay,
+    cry,
   ] = useStatic((s) => {
-    const { Icons, excludeList, timerList, config, map } = s
+    const { Icons, excludeList, timerList, config, map, Audio } = s
     const badgeId = getBadge(pkmn.bestPvp)
     return [
       excludeList.includes(internalId),
@@ -123,7 +127,13 @@ const PokemonTile = (pkmn) => {
       badgeId ? Icons.getMisc(badgeId) : '',
       config.general.interactionRangeZoom <= map.getZoom(),
       s.timeOfDay,
-      s.manualParams.category === 'pokemon' && s.manualParams.id === pkmn.id,
+      Audio.getPokemon(
+        pkmn.pokemon_id,
+        pkmn.form,
+        0,
+        pkmn.gender,
+        pkmn.costume,
+      ),
     ]
   }, basicEqualFn)
 
@@ -156,7 +166,25 @@ const PokemonTile = (pkmn) => {
 
   useForcePopup(pkmn.id, markerRef)
   useMarkerTimer(pkmn.expire_timestamp, markerRef)
-
+  sendNotification(
+    pkmn.id,
+    `${t(`poke_${pkmn.pokemon_id}`)}${
+      pkmn.form ? ` (${t(`form_${pkmn.form}`)})` : ''
+    }`,
+    'pokemon',
+    {
+      icon: iconUrl,
+      body: `A${pkmn.atk_iv || '?'} | D${pkmn.def_iv || '?'} | S${
+        pkmn.sta_iv || '?'
+      } | L${pkmn.level || '?'} | CP${pkmn.cp || '?'}\n${
+        Utility.getTimeUntil(new Date(pkmn.expire_timestamp * 1000), true).str
+      }`,
+      lat: pkmn.lat,
+      lon: pkmn.lon,
+      expire: pkmn.expire_timestamp,
+      audio: cry,
+    },
+  )
   if (pkmn.expire_timestamp < Date.now() / 1000 || excluded) {
     return null
   }
