@@ -14,8 +14,8 @@
     "config:check": "yarn workspace @rm/config run check",
     "config:env": "yarn workspace @rm/config run generate",
     "dev": "NODE_ENV=development nodemon server/src/index.js",
-    "eslint:check": "eslint \"**/*.{js,jsx}\"",
-    "eslint:fix": "eslint \"**/*.{js,jsx}\" --fix",
+    "lint": "eslint \"**/*.{js,jsx}\"",
+    "lint:fix": "eslint \"**/*.{js,jsx}\" --fix",
     "locales:create": "yarn workspace @rm/locales run create",
     "locales:generate": "yarn workspace @rm/locales run generate",
     "locales:missing": "yarn workspace @rm/locales run missing",
@@ -23,11 +23,12 @@
     "migrate:latest": "knex --knexfile server/src/db/knexfile.cjs migrate:latest",
     "migrate:make": "knex --knexfile server/src/db/knexfile.cjs migrate:make",
     "migrate:rollback": "knex --knexfile server/src/db/knexfile.cjs migrate:rollback",
-    "prettier:check": "prettier --check \"**/*.{css,html,js,jsx,yml}\"",
+    "prettier": "prettier --check \"**/*.{css,html,js,jsx,yml}\"",
     "prettier:fix": "prettier --write \"**/*.{css,html,js,jsx,yml}\"",
     "release": "vite build -- -r",
     "server": "node server/src/index.js",
     "start": "node .",
+    "prepare": "husky install",
     "watch": "vite"
   },
   "nodemonConfig": {
@@ -41,6 +42,62 @@
       "packages/masterfile/lib/data/*",
       "logs"
     ]
+  },
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx}": [
+      "eslint --fix"
+    ],
+    "**/*": [
+      "prettier --write --ignore-unknown"
+    ]
+  },
+  "config": {
+    "commitizen": {
+      "path": "cz-conventional-changelog"
+    }
+  },
+  "commitlint": {
+    "extends": [
+      "@commitlint/config-conventional"
+    ]
+  },
+  "release": {
+    "branches": [
+      "+([0-9])?(.{+([0-9]),x}).x",
+      "main",
+      {
+        "name": "develop",
+        "prerelease": true
+      }
+    ],
+    "plugins": [
+      "@semantic-release/commit-analyzer",
+      "@semantic-release/release-notes-generator",
+      "@semantic-release/changelog",
+      [
+        "@semantic-release/npm",
+        {
+          "npmPublish": false
+        }
+      ],
+      "@semantic-release/github",
+      [
+        "@semantic-release/git",
+        {
+          "assets": [
+            "CHANGELOG.md",
+            "package.json",
+            "yarn.lock"
+          ],
+          "message": "chore(release): ${nextRelease.gitTag} [skip ci]\n\n${nextRelease.notes}"
+        }
+      ]
+    ],
+    "preset": "angular"
+  },
+  "volta": {
+    "node": "18.18.2",
+    "yarn": "1.22.19"
   },
   "dependencies": {
     "@apollo/client": "^3.8.7",
@@ -121,13 +178,19 @@
     "zustand": "4.4.6"
   },
   "devDependencies": {
+    "@commitlint/cli": "^17.2.0",
+    "@commitlint/config-conventional": "^17.2.0",
     "@rm/types": "*",
+    "@semantic-release/changelog": "^6.0.1",
+    "@semantic-release/git": "^10.0.1",
     "@sentry/vite-plugin": "2.2.1",
     "@types/dlv": "^1.1.2",
     "@types/node": "^18",
     "@types/react": "^18.2.20",
     "@types/react-dom": "^18.0.9",
     "@vitejs/plugin-react": "4.0.0",
+    "commitizen": "^4.2.5",
+    "cz-conventional-commit": "^1.0.6",
     "eslint": "^8.44.0",
     "eslint-config-airbnb": "^19.0.4",
     "eslint-config-prettier": "^8.8.0",
@@ -136,10 +199,13 @@
     "eslint-plugin-jsx-a11y": "^6.7.1",
     "eslint-plugin-react": "^7.32.2",
     "eslint-plugin-react-hooks": "^4.6.0",
+    "husky": "^8.0.1",
+    "lint-staged": "^13.0.3",
     "monaco-editor": "^0.41.0",
     "nodemon": "^3.0.2",
     "prettier": "^2.8.8",
     "rollup-plugin-delete": "^2.0.0",
+    "semantic-release": "^19.0.5",
     "vite": "4.3.9",
     "vite-plugin-checker": "0.6.0",
     "vite-plugin-static-copy": "0.16.0"
