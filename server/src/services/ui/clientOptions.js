@@ -146,7 +146,7 @@ function clientOptions(perms) {
         max: 100,
       },
       pokemon: { type: 'bool', perm: ['pokemon'] },
-      // raids: { type: 'bool', perm: ['raids'] },
+      raids: { type: 'bool', perm: ['raids'] },
       // invasions: { type: 'bool', perm: ['invasions'] },
       // quests: { type: 'bool', perm: ['quests'] },
       // eventStops: { type: 'bool', perm: ['eventStops'] },

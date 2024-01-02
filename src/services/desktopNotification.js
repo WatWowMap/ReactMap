@@ -54,6 +54,7 @@ export function sendNotification(key, title, category, options) {
             .join(' '),
           {
             ...rest,
+            tag: key,
             lang:
               localStorage.getItem('i18nextLng') || window.navigator.language,
           },

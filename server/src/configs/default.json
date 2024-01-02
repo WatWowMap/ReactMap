@@ -435,11 +435,7 @@
       "audioAlwaysOn": false,
       "volumeLevel": 50,
       "pokemon": false,
-      "raids": false,
-      "invasions": false,
-      "quests": false,
-      "eventStops": false,
-      "lures": false
+      "raids": false
     }
   },
   "defaultFilters": {

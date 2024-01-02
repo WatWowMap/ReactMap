@@ -174,7 +174,6 @@ const PokemonTile = (pkmn) => {
     'pokemon',
     {
       icon: iconUrl,
-      tag: pkmn.id,
       body: `A${pkmn.atk_iv || '?'} | D${pkmn.def_iv || '?'} | S${
         pkmn.sta_iv || '?'
       } | L${pkmn.level || '?'} | CP${pkmn.cp || '?'}\n${
