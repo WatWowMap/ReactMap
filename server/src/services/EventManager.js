@@ -19,7 +19,9 @@ class EventManager {
       'invasions' in this.masterfile ? this.masterfile.invasions : {}
     this.available = { gyms: [], pokestops: [], pokemon: [], nests: [] }
     this.uicons = []
+    this.uaudio = []
     this.uiconsBackup = {}
+    this.uaudioBackup = {}
     this.baseUrl =
       'https://raw.githubusercontent.com/WatWowMap/wwm-uicons-webp/main'
 
@@ -110,9 +112,13 @@ class EventManager {
       }, 1000 * 60 * 60 * (config.getSafe('api.queryUpdateHours.quests') || 3))
     }
     setInterval(async () => {
-      await this.getUicons(config.getSafe('icons.styles'))
+      await this.getUniversalAssets(config.getSafe('icons.styles'), 'uicons')
       await this.chatLog({ description: 'Refreshed UICONS indexes' })
     }, 1000 * 60 * 60 * (config.getSafe('icons.cacheHrs') || 3))
+    setInterval(async () => {
+      await this.getUniversalAssets(config.getSafe('audio.styles'), 'uaudio')
+      await this.chatLog({ description: 'Refreshed UAUDIO indexes' })
+    }, 1000 * 60 * 60 * (config.getSafe('audio.cacheHrs') || 3))
     if (config.getSafe('api.pogoApiEndpoints.invasions')) {
       setInterval(async () => {
         await this.getInvasions(
@@ -198,16 +204,17 @@ class EventManager {
   /**
    *
    * @param {import("@rm/types").Config['icons']['styles']} styles
+   * @param {'uicons' | 'uaudio'} type
    */
-  async getUicons(styles) {
-    log.info(HELPERS.event, 'Fetching Latest UICONS')
+  async getUniversalAssets(styles, type) {
+    log.info(HELPERS.event, 'Fetching Latest', type.toUpperCase())
     if (!styles.some((icon) => icon.path.includes('wwm'))) {
       log.info(
         HELPERS.event,
-        'Base uicons not found in config (either remotely or locally). This may be fine, but some things might be broken, such as items from the `misc` folder.',
+        `Base ${type} not found in config (either remotely or locally). This may be fine, but some things might be broken, such as items from the 'misc' folder.`,
       )
     }
-    const uicons = await Promise.allSettled(
+    const assets = await Promise.allSettled(
       styles.map(async (style) => {
         try {
           const response = style.path.startsWith('http')
@@ -216,7 +223,7 @@ class EventManager {
                 await fs.readFile(
                   path.resolve(
                     __dirname,
-                    `../../../public/images/uicons/${style.path}/index.json`,
+                    `../../../public/images/${type}/${style.path}/index.json`,
                   ),
                   'utf-8',
                 ),
@@ -226,25 +233,25 @@ class EventManager {
         } catch (e) {
           log.warn(
             HELPERS.event,
-            'Failed to generate latest uicons for:',
+            `Failed to generate latest ${type} for:`,
             style,
             '\n',
             e,
           )
           log.warn(
             HELPERS.event,
-            `Make sure the path follows one of these two formats: \n\tRemote: ${this.baseUrl}\n\tLocal: wwm-uicons (And the uicons folder is found at /public/images/uicons/wwm-uicons/)`,
+            `Make sure the path follows one of these two formats: \n\tRemote: ${this.baseUrl}\n\tLocal: wwm-${type} (And the ${type} folder is found at /public/images/${type}/wwm-uicons/)`,
           )
         }
       }),
     )
-    for (let i = 0; i < uicons.length; i += 1) {
-      const uicon = uicons[i]
-      if (uicon.status === 'fulfilled' && uicon.value) {
-        this.uiconsBackup[uicon.value.name] = uicon.value
+    for (let i = 0; i < assets.length; i += 1) {
+      const item = assets[i]
+      if (item.status === 'fulfilled' && item.value) {
+        this[`${type}Backup`][item.value.name] = item.value
       }
     }
-    this.uicons = Object.values(this.uiconsBackup)
+    this[type] = Object.values(this[`${type}Backup`])
   }
 
   /**

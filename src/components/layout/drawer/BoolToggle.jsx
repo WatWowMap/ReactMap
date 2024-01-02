@@ -16,6 +16,7 @@ import { setDeep } from '@services/functions/setDeep'
  *  label?: string,
  *  disabled?: boolean,
  *  children?: React.ReactNode,
+ *  onChange?: import('@mui/material/Switch').SwitchProps['onChange'],
  * }} props
  * @returns {JSX.Element}
  */
@@ -24,16 +25,18 @@ export default function BoolToggle({
   label,
   disabled = false,
   children,
+  onChange,
 }) {
   const value = useStore((s) => dlv(s, field))
   const { t } = useTranslation()
 
-  const onChange = React.useCallback(
+  const onChangeWrapper = React.useCallback(
     (
       /** @type {React.ChangeEvent<HTMLInputElement>} */ _,
       /** @type {boolean} */ checked,
     ) => {
       useStore.setState((prev) => setDeep(prev, field, checked))
+      if (onChange) onChange(_, checked)
     },
     [field],
   )
@@ -45,7 +48,7 @@ export default function BoolToggle({
       </ListItemText>
       <Switch
         edge="end"
-        onChange={onChange}
+        onChange={onChangeWrapper}
         checked={!!value}
         disabled={disabled}
       />
