@@ -72,7 +72,10 @@ async function scannerApi(
       default:
         break
     }
-    const payloadObj = {}
+    const payloadObj = /** @type {{ url: string, options: RequestInit }} */ ({
+      url: '',
+      options: {},
+    })
     const cache = userCache.has(user.id)
       ? userCache.get(user.id)
       : { coordinates: 0, requests: 0 }
@@ -211,10 +214,15 @@ async function scannerApi(
         'Content-Type': 'application/json',
       })
     }
-    const scannerResponse = await fetch(payloadObj.url, {
-      ...payloadObj.options,
-      signal: controller.signal,
-    })
+    const scannerResponse = await fetch(
+      `${payloadObj.url}${payloadObj.url.includes('?') ? '&' : '?'}username=${
+        user.username
+      }`,
+      {
+        ...payloadObj.options,
+        signal: controller.signal,
+      },
+    )
 
     if (!scannerResponse) {
       throw new Error('No data returned from server')
