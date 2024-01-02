@@ -26,6 +26,8 @@ jobs:
           yarn --version
       - name: Install dependencies
         run: yarn --prefer-offline
+        env:
+          HUSKY: 0
       - name: Build app
         run: yarn build
       - name: Release
