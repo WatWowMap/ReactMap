@@ -19,9 +19,6 @@ jobs:
       - name: Install Dependencies
         run: yarn
 
-      - name: Create Locales
-        run: yarn create-locales
-
       - name: Sentry Build
         run: yarn release
         env:
