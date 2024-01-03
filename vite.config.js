@@ -71,11 +71,12 @@ const localePlugin = (isDevelopment) => ({
 
     Object.entries(localeObj).forEach(([locale, translations]) => {
       const fileName = join('locales', locale, 'translation.json')
-      this.emitFile({
+      const id = this.emitFile({
         type: 'asset',
         fileName,
         source: JSON.stringify(translations),
       })
+      this.addWatchFile(id)
     })
   },
 })

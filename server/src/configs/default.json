@@ -509,7 +509,7 @@
     },
     "pokemon": {
       "enabled": false,
-      "easyMode": false,
+      "easyMode": true,
       "onlyShowAvailable": true,
       "legacyFilter": false,
       "allPokemon": false,

@@ -30,6 +30,8 @@ import { persist, createJSONStorage } from 'zustand/middleware'
  *   profiling: boolean
  *   desktopNotifications: boolean
  *   setAreas: (areas: string | string[], validAreas: string[], unselectAll?: boolean) => void,
+ *   setPokemonFilterMode: (legacyFilter: boolean, easyMode: boolean) => void,
+ *   getPokemonFilterMode: () => 'basic' | 'intermediate' | 'expert',
  * }} UseStore
  * @type {import("zustand").UseBoundStore<import("zustand").StoreApi<UseStore>>}
  */
@@ -72,6 +74,32 @@ export const useStore = create(
             },
           })
         }
+      },
+      getPokemonFilterMode: () => {
+        const { filters, userSettings } = get()
+        return filters?.pokemon?.easyMode
+          ? 'basic'
+          : userSettings?.pokemon?.legacyFilter
+          ? 'expert'
+          : 'intermediate'
+      },
+      setPokemonFilterMode: (legacyFilter, easyMode) => {
+        set((prev) => ({
+          userSettings: {
+            ...prev.userSettings,
+            pokemon: {
+              ...prev.userSettings.pokemon,
+              legacyFilter,
+            },
+          },
+          filters: {
+            ...prev.filters,
+            pokemon: {
+              ...prev.filters.pokemon,
+              easyMode,
+            },
+          },
+        }))
       },
       holidayEffects: {},
       settings: {},

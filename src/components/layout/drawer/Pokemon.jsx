@@ -18,6 +18,10 @@ import {
   Tooltip,
   Divider,
   ListSubheader,
+  Select,
+  MenuItem,
+  FormControl,
+  InputLabel,
 } from '@mui/material'
 import { useTranslation } from 'react-i18next'
 import { VirtuosoGrid } from 'react-virtuoso'
@@ -293,13 +297,15 @@ function AvailableSelector() {
 const MemoAvailableSelector = React.memo(AvailableSelector, () => true)
 
 export default function WithSliders({ category, context }) {
-  const userSettings = useStore((state) => state.userSettings)
+  const userSettings = useStore((s) => s.userSettings[category])
   const filters = useStore((s) => s.filters)
+  const filterMode = useStore((s) => s.getPokemonFilterMode())
   const { setFilters } = useStore.getState()
 
   const { t } = useTranslation()
   const [tempLegacy, setTempLegacy] = useState(filters[category].ivOr)
   const [openTab, setOpenTab] = useState(0)
+  const selectRef = React.useRef(/** @type {HTMLDivElement | null} */ (null))
 
   useEffect(() => {
     setFilters({
@@ -341,14 +347,67 @@ export default function WithSliders({ category, context }) {
   return (
     <>
       <BoolToggle field="filters.pokemon.enabled" label="enabled" />
-      <BoolToggle field="filters.pokemon.easyMode" label="easy_mode" />
-      <Collapse in={!filters.pokemon.easyMode}>
+      <ListItem>
+        <FormControl fullWidth>
+          <InputLabel id="pokemon-filter-mode">
+            {t('pokemon_filter_mode')}
+          </InputLabel>
+          <Select
+            ref={selectRef}
+            labelId="pokemon-filter-mode"
+            id="demo-simple-select"
+            value={filterMode}
+            fullWidth
+            size="small"
+            label={t('pokemon_filter_mode')}
+            renderValue={(selected) => t(selected)}
+            onChange={(e) => {
+              const { setPokemonFilterMode } = useStore.getState()
+              switch (e.target.value) {
+                case 'basic':
+                  return setPokemonFilterMode(false, true)
+                case 'intermediate':
+                  return setPokemonFilterMode(false, false)
+                case 'expert':
+                  return setPokemonFilterMode(true, false)
+                default:
+              }
+            }}
+          >
+            {[
+              'basic',
+              'intermediate',
+              ...(context.legacy ? ['expert'] : []),
+            ].map((tier) => (
+              <MenuItem
+                key={tier}
+                dense
+                value={tier}
+                sx={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'flex-start',
+                  whiteSpace: 'normal',
+                  width: selectRef.current?.clientWidth || 'auto',
+                }}
+              >
+                <Typography variant="subtitle2">{t(tier)}</Typography>
+                <Typography variant="caption" flexWrap="wrap">
+                  {t(`${tier}_description`)}
+                </Typography>
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+      </ListItem>
+
+      <Collapse in={filterMode === 'intermediate'}>
         <BoolToggle
           field="userSettings.pokemon.linkGlobalAndAdvanced"
           label="link_global_and_advanced"
         />
       </Collapse>
-      {userSettings[category].legacyFilter && context.legacy ? (
+      {userSettings.legacyFilter && context.legacy ? (
         <ListItem>
           <StringFilter
             filterValues={tempLegacy}

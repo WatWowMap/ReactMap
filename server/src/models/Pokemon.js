@@ -236,19 +236,19 @@ class Pokemon extends Model {
     const filters = mem
       ? Object.values(filterMap).flatMap((filter) => filter.buildApiFilter())
       : []
-    if (
-      (perms.iv || perms.pvp) &&
-      mem &&
-      (globalFilter.mods.onlyLinkGlobal ? !!filters.length : true)
-    ) {
+    if ((perms.iv || perms.pvp) && mem) {
       const pokemon = Object.keys(filterMap)
         .filter((key) => key.includes('-'))
         .map((key) => {
           const [id, form] = key.split('-', 2).map(Number)
           return { id, form }
         })
-      if (!globalFilter.mods.onlyLinkGlobal) pokemon.push({ id: -1 }) // add everything else
-      filters.push(...globalFilter.buildApiFilter(pokemon))
+      if (!globalFilter.mods.onlyLinkGlobal) {
+        pokemon.push({ id: -1 }) // add everything else
+      }
+      if (globalFilter.mods.onlyLinkGlobal ? !!filters.length : true) {
+        filters.push(...globalFilter.buildApiFilter(pokemon))
+      }
       if (onlyZeroIv)
         filters.push({
           iv: { min: 0, max: 0 },

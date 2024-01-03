@@ -706,5 +706,12 @@
   "set_filtered": "Set Filtered",
   "only_show_available": "Only Show Available",
   "easy_mode": "Easy Mode",
-  "quick_select": "Global Quick Selects"
+  "quick_select": "Global Quick Selects",
+  "pokemon_filter_mode": "Pokémon Filter Mode",
+  "basic": "Basic",
+  "intermediate": "Intermediate",
+  "expert": "Expert",
+  "basic_description": "Easily select Pokémon and apply a global filter",
+  "intermediate_description": "Set individual filters globally and per Pokémon (traditional)",
+  "expert_description": "String based query creation for the most customization"
 }
