@@ -54,6 +54,8 @@ module.exports = class PkmnBackend {
 
     this.filter = filter
     this.global = global
+    this.globalHundo = mods.onlyHundoIv
+    this.globalZero = mods.onlyZeroIv
     this.filterKeys = this.getRelevantKeys(filter)
     this.globalKeys = this.getRelevantKeys(global)
     this.expertFilter = this.getCallback(id === 'global')
@@ -352,6 +354,8 @@ module.exports = class PkmnBackend {
     ) {
       if (
         !this.mods.onlyLinkGlobal ||
+        (this.globalHundo && pokemon.iv === 100) ||
+        (this.globalZero && pokemon.iv === 0) ||
         (this.pokemon === pokemon.pokemon_id && this.form === pokemon.form)
       ) {
         if (!this.expertFilter || !this.expertGlobal) return true
