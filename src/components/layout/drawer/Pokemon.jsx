@@ -260,7 +260,7 @@ function AvailableSelector() {
           )
         }}
       />
-      {!!filters.easyMode && (
+      {!filters.easyMode && (
         <Dialog open={open} onClose={onClose()} fullScreen={isMobile}>
           <AdvancedFilter
             advancedFilter={advanced}
