@@ -44,7 +44,7 @@ module.exports = class PkmnBackend {
    * @param {boolean} mods.onlyLegacy
    */
   constructor(id, filter, global, perms, mods) {
-    const [pokemon, form] = id.split('-').map(Number)
+    const [pokemon, form] = id.split('-', 2).map(Number)
     this.id = id
     this.pokemon = pokemon || 0
     this.form = form || 0
@@ -293,7 +293,7 @@ module.exports = class PkmnBackend {
     ) {
       return [{ pokemon, iv: { min: -1, max: 100 } }]
     }
-    const results = /** @type {import('../../../types').DnfFilter[]} */ ([])
+    const results = /** @type {import('@rm/types').DnfFilter[]} */ ([])
     if (
       ['iv', 'atk_iv', 'def_iv', 'sta_iv', 'cp', 'level', 'gender'].some((k) =>
         this.filterKeys.has(k),
@@ -373,13 +373,14 @@ module.exports = class PkmnBackend {
   /**
    * @param {import("@rm/types").Pokemon} pokemon
    * @param {number} [ts]
-   * @returns {{ cleanPvp: { [key in typeof LEAGUES[number]]?: number[] }, bestPvp: number }}
+   * @returns {{ cleanPvp: { [key in typeof LEAGUES[number]]?: import('@rm/types').PvpEntry[] }, bestPvp: number }}
    */
   buildPvp(pokemon, ts = Math.floor(Date.now() / 1000)) {
     const parsed = pvpConfig.reactMapHandlesPvp
       ? Pvp.resultWithCache(pokemon, ts)
       : getParsedPvp(pokemon)
-    const cleanPvp = {}
+    const cleanPvp =
+      /** @type {{ [key in typeof LEAGUES[number]]?: import('@rm/types').PvpEntry[] }} */ ({})
     let bestPvp = 4096
     Object.keys(parsed).forEach((league) => {
       if (pvpConfig.leagueObj[league]) {
@@ -420,7 +421,7 @@ module.exports = class PkmnBackend {
     if (result.pokemon_id === 132 && !result.ditto_form) {
       result.ditto_form = result.form
       result.form =
-        Event.masterfile.pokemon[result.pokemon_id]?.defaultFormId || 0
+        Event.masterfile.pokemon[result.display_pokemon_id]?.defaultFormId || 0
     }
     if (!result.seen_type) {
       if (result.spawn_id === null) {
