@@ -104,7 +104,7 @@ export default function UserOptions() {
 
   React.useEffect(() => {
     setLocalState(userSettings[category])
-  }, [category])
+  }, [category, userSettings[category]])
 
   return (
     <DialogWrapper

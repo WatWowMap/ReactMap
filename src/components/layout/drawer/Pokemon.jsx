@@ -343,7 +343,7 @@ export default function WithSliders({ category, context }) {
       <Collapse in={!filters.pokemon.easyMode}>
         <BoolToggle
           field="userSettings.pokemon.linkGlobalAndAdvanced"
-          label="global_respects_selected"
+          label="link_global_and_advanced"
         />
       </Collapse>
       {userSettings[category].legacyFilter && context.legacy ? (
