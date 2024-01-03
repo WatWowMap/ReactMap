@@ -704,5 +704,6 @@
   "granted": "granted",
   "global_respects_selected": "Global Respects Selected",
   "set_all": "Set All",
-  "only_show_available": "Only Show Available"
+  "only_show_available": "Only Show Available",
+  "easy_mode": "Easy Mode"
 }

@@ -14,6 +14,7 @@ import {
   IconButton,
   Dialog,
   ButtonGroup,
+  Collapse,
 } from '@mui/material'
 import { useTranslation } from 'react-i18next'
 import { VirtuosoGrid } from 'react-virtuoso'
@@ -44,7 +45,6 @@ function AvailableSelector() {
     tempFilters: filters.standard,
   })
   const [open, setOpen] = React.useState(false)
-  const [showAvailable, setShowAvailable] = React.useState(false)
 
   const onClose = (e, id, filter) => () => {
     if (e !== undefined) {
@@ -98,40 +98,39 @@ function AvailableSelector() {
 
   const items = React.useMemo(
     () =>
-      showAvailable
+      filters.onlyShowAvailable
         ? available
         : Object.keys(filters.filter).filter((key) => key !== 'global'),
-    [showAvailable, filters.filter, available],
+    [filters.onlyShowAvailable, filters.filter, available],
   )
 
   return (
     <List>
-      <ListItem>
-        <ListItemText>{t('only_show_available')}</ListItemText>
-        <Switch
-          onChange={(_, checked) => setShowAvailable(checked)}
-          checked={!!showAvailable}
-        />
-      </ListItem>
+      <BoolToggle
+        field="filters.pokemon.onlyShowAvailable"
+        label="only_show_available"
+      />
       <ListItem>
         <ListItemText>{t('set_all')}</ListItemText>
         <ButtonGroup variant="text" size="small" color="warning">
           <IconButton color="success" onClick={() => setAll('enable')}>
             <CheckIcon />
           </IconButton>
-          <IconButton
-            color="info"
-            onClick={() => {
-              setAdvanced((prev) => ({
-                ...prev,
-                id: 'global',
-                tempFilters: filters.filter.global,
-              }))
-              setOpen(true)
-            }}
-          >
-            <TuneIcon />
-          </IconButton>
+          <Collapse in={!filters.easyMode} orientation="horizontal">
+            <IconButton
+              color="info"
+              onClick={() => {
+                setAdvanced((prev) => ({
+                  ...prev,
+                  id: 'global',
+                  tempFilters: filters.filter.global,
+                }))
+                setOpen(true)
+              }}
+            >
+              <TuneIcon />
+            </IconButton>
+          </Collapse>
           <IconButton color="error" onClick={() => setAll('disable')}>
             <ClearIcon />
           </IconButton>
@@ -153,7 +152,7 @@ function AvailableSelector() {
           const [pokemon, form] = key.split('-', 2)
           const url = ctx.Icons.getPokemon(pokemon, form)
           const bgcolor = filters.filter[key]?.enabled
-            ? filters.filter[key]?.all
+            ? filters.filter[key]?.all || filters.easyMode
               ? 'success.main'
               : 'info.main'
             : 'error.dark'
@@ -169,7 +168,7 @@ function AvailableSelector() {
                 const filter = { ...filters.filter[key] }
                 if (filter.all) {
                   filter.all = false
-                  filter.enabled = true
+                  filter.enabled = !filters.easyMode
                 } else if (filter.enabled) {
                   filter.enabled = false
                 } else {
@@ -208,21 +207,23 @@ function AvailableSelector() {
                   zIndex: 10,
                 }}
               />
-              <IconButton
-                size="small"
-                sx={{ position: 'absolute', right: 0, top: 0 }}
-                onClick={(e) => {
-                  e.stopPropagation()
-                  setAdvanced((prev) => ({
-                    ...prev,
-                    id: key,
-                    tempFilters: filters.filter[key],
-                  }))
-                  setOpen(true)
-                }}
-              >
-                <TuneIcon fontSize="small" />
-              </IconButton>
+              <Collapse in={!filters.easyMode}>
+                <IconButton
+                  size="small"
+                  sx={{ position: 'absolute', right: 0, top: 0 }}
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    setAdvanced((prev) => ({
+                      ...prev,
+                      id: key,
+                      tempFilters: filters.filter[key],
+                    }))
+                    setOpen(true)
+                  }}
+                >
+                  <TuneIcon fontSize="small" />
+                </IconButton>
+              </Collapse>
             </Box>
           )
         }}
@@ -290,10 +291,13 @@ export default function WithSliders({ category, context }) {
   return (
     <>
       <BoolToggle field="filters.pokemon.enabled" label="enabled" />
-      <BoolToggle
-        field="userSettings.pokemon.linkGlobalAndAdvanced"
-        label="global_respects_selected"
-      />
+      <BoolToggle field="filters.pokemon.easyMode" label="easy_mode" />
+      <Collapse in={!filters.pokemon.easyMode}>
+        <BoolToggle
+          field="userSettings.pokemon.linkGlobalAndAdvanced"
+          label="global_respects_selected"
+        />
+      </Collapse>
       {userSettings[category].legacyFilter && context.legacy ? (
         <ListItem>
           <StringFilter

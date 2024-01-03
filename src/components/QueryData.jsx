@@ -34,9 +34,10 @@ const userSettingsCategory = (category) => {
 
 const trimFilters = (requestedFilters, userSettings, category, onlyAreas) => {
   const { filters: staticFilters } = useStatic.getState()
+  const easyMode = !!requestedFilters?.easyMode
   const trimmed = {
     onlyLegacy: userSettings?.legacyFilter,
-    onlyLinkGlobal: userSettings?.linkGlobalAndAdvanced,
+    onlyLinkGlobal: userSettings?.linkGlobalAndAdvanced || easyMode,
     onlyAllPvp: userSettings?.showAllPvpRanks,
     onlyAreas: onlyAreas || [],
   }
@@ -57,7 +58,7 @@ const trimFilters = (requestedFilters, userSettings, category, onlyAreas) => {
     const [id, specifics] = filter
 
     if (specifics && specifics.enabled && staticFilters[category]?.filter[id]) {
-      trimmed[id] = specifics
+      trimmed[id] = easyMode ? { ...specifics, all: true } : specifics
     }
   })
   return trimmed

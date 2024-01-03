@@ -104,6 +104,8 @@ function buildDefaultFilters(perms, database) {
       perms.pokemon && database.models.Pokemon
         ? {
             enabled: defaultFilters.pokemon.enabled,
+            easyMode: defaultFilters.pokemon.easyMode,
+            onlyShowAvailable: defaultFilters.pokemon.onlyShowAvailable,
             legacy:
               pokemonReducer && config.getSafe('map.misc.enableMapJsFilter')
                 ? defaultFilters.pokemon.legacyFilter

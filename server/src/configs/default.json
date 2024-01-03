@@ -509,6 +509,8 @@
     },
     "pokemon": {
       "enabled": false,
+      "easyMode": false,
+      "onlyShowAvailable": true,
       "legacyFilter": false,
       "allPokemon": false,
       "globalValues": {
