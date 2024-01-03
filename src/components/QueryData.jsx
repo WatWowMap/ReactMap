@@ -58,7 +58,7 @@ const trimFilters = (requestedFilters, userSettings, category, onlyAreas) => {
     const [id, specifics] = filter
 
     if (specifics && specifics.enabled && staticFilters[category]?.filter[id]) {
-      trimmed[id] = easyMode ? { ...specifics, all: true } : specifics
+      trimmed[id] = easyMode ? requestedFilters.ivOr : specifics
     }
   })
   return trimmed
