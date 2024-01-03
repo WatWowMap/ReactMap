@@ -1,3 +1,11 @@
+# [1.28.0-develop.2](https://github.com/WatWowMap/ReactMap/compare/v1.28.0-develop.1...v1.28.0-develop.2) (2024-01-03)
+
+
+### Bug Fixes
+
+* motd index setter ([f68153a](https://github.com/WatWowMap/ReactMap/commit/f68153a141ec038d48e37945772bb8da85f26a28))
+* motd types ([c4ad276](https://github.com/WatWowMap/ReactMap/commit/c4ad276f303357ac2c9b3698b7c6a07314d339c1))
+
 # [1.28.0-develop.1](https://github.com/WatWowMap/ReactMap/compare/v1.27.2...v1.28.0-develop.1) (2024-01-02)
 
 
