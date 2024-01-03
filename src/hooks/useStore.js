@@ -90,6 +90,7 @@ export const useStore = create(
             pokemon: {
               ...prev.userSettings.pokemon,
               legacyFilter,
+              linkGlobalAndAdvanced: !legacyFilter,
             },
           },
           filters: {

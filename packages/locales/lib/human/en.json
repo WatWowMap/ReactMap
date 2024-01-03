@@ -713,5 +713,5 @@
   "expert": "Expert",
   "basic_description": "Easily select Pokémon and apply a global filter",
   "intermediate_description": "Set individual filters globally and per Pokémon (traditional)",
-  "expert_description": "String based query creation for the most customization"
+  "expert_description": "Manual input queries for the most customization"
 }
