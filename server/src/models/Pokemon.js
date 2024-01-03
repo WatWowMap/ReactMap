@@ -243,7 +243,8 @@ class Pokemon extends Model {
           const [id, form] = key.split('-', 2).map(Number)
           return { id, form }
         })
-      if (!globalFilter.mods.onlyLinkGlobal) pokemon.push({ id: -1 }) // add everything else
+      // if (!globalFilter.mods.onlyLinkGlobal)
+      pokemon.push({ id: -1 }) // add everything else
       filters.push(...globalFilter.buildApiFilter(pokemon))
       if (onlyZeroIv) filters.push({ iv: { min: 0, max: 0 }, pokemon })
       if (onlyHundoIv) filters.push({ iv: { min: 100, max: 100 }, pokemon })
