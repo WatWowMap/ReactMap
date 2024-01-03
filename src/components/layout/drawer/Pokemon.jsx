@@ -49,64 +49,6 @@ function AvailableSelector() {
   })
   const [open, setOpen] = React.useState(false)
 
-  const onClose = (e, id, filter) => () => {
-    if (e !== undefined) {
-      useStore.setState((prev) => ({
-        filters: {
-          ...prev.filters,
-          pokemon: {
-            ...prev.filters.pokemon,
-            filter:
-              id === 'global'
-                ? Object.fromEntries(
-                    Object.entries(prev.filters.pokemon.filter).map(([key]) => [
-                      key,
-                      {
-                        ...filter,
-                        enabled: true,
-                        all: prev.filters.pokemon.easyMode,
-                      },
-                    ]),
-                  )
-                : {
-                    ...prev.filters.pokemon.filter,
-                    [id]: {
-                      ...filter,
-                      enabled: true,
-                      all: prev.filters.pokemon.easyMode,
-                    },
-                  },
-          },
-        },
-      }))
-    }
-    setAdvanced(filters.standard)
-    setOpen(false)
-    if (id === 'global') setAll('advanced')
-  }
-
-  /**
-   *
-   * @param {'enable' | 'disable' | 'advanced'} action
-   */
-  const setAll = (action) => {
-    useStore.setState((prev) => ({
-      filters: {
-        ...prev.filters,
-        pokemon: {
-          ...prev.filters.pokemon,
-          filter: Object.fromEntries(
-            Object.entries(prev.filters.pokemon.filter).map(([key, value]) => {
-              const enabled = action !== 'disable'
-              const all = action === 'enable'
-              return [key, { ...value, enabled, all }]
-            }),
-          ),
-        },
-      },
-    }))
-  }
-
   const items = React.useMemo(() => {
     const lowerCase = search.toLowerCase()
     return (
@@ -144,6 +86,70 @@ function AvailableSelector() {
     search,
   ])
 
+  const onClose = (e, id, filter) => () => {
+    if (e !== undefined) {
+      const keys = new Set(items.map((item) => item.key))
+      useStore.setState((prev) => ({
+        filters: {
+          ...prev.filters,
+          pokemon: {
+            ...prev.filters.pokemon,
+            filter:
+              id === 'global'
+                ? Object.fromEntries(
+                    Object.entries(prev.filters.pokemon.filter).map(
+                      ([key, oldFilter]) => [
+                        key,
+                        keys.has(key)
+                          ? {
+                              ...filter,
+                              enabled: true,
+                              all: prev.filters.pokemon.easyMode,
+                            }
+                          : oldFilter,
+                      ],
+                    ),
+                  )
+                : {
+                    ...prev.filters.pokemon.filter,
+                    [id]: {
+                      ...filter,
+                      enabled: true,
+                      all: prev.filters.pokemon.easyMode,
+                    },
+                  },
+          },
+        },
+      }))
+    }
+    setAdvanced(filters.standard)
+    setOpen(false)
+    if (id === 'global') setAll('advanced')
+  }
+
+  /**
+   *
+   * @param {'enable' | 'disable' | 'advanced'} action
+   */
+  const setAll = (action) => {
+    const keys = new Set(items.map((item) => item.key))
+    useStore.setState((prev) => ({
+      filters: {
+        ...prev.filters,
+        pokemon: {
+          ...prev.filters.pokemon,
+          filter: Object.fromEntries(
+            Object.entries(prev.filters.pokemon.filter).map(([key, value]) => {
+              const enabled = action !== 'disable'
+              const all = action === 'enable'
+              return [key, keys.has(key) ? { ...value, enabled, all } : value]
+            }),
+          ),
+        },
+      },
+    }))
+  }
+
   return (
     <List>
       <ItemSearch field="searches.pokemonQuickSelect" />
@@ -152,7 +158,7 @@ function AvailableSelector() {
         label="only_show_available"
       />
       <ListItem>
-        <ListItemText>{t('set_all')}</ListItemText>
+        <ListItemText>{t(search ? 'set_filtered' : 'set_all')}</ListItemText>
         <ButtonGroup variant="text" size="small" color="warning">
           <IconButton color="success" onClick={() => setAll('enable')}>
             <CheckIcon />

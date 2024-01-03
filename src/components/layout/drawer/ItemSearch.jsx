@@ -2,9 +2,12 @@
 import * as React from 'react'
 import ListItem from '@mui/material/ListItem'
 import TextField from '@mui/material/TextField'
+import IconButton from '@mui/material/IconButton'
+import HighlightOffIcon from '@mui/icons-material/HighlightOff'
 import { useTranslation } from 'react-i18next'
-import { useStore } from '@hooks/useStore'
 import dlv from 'dlv'
+
+import { useStore } from '@hooks/useStore'
 import { setDeep } from '@services/functions/setDeep'
 
 /**
@@ -33,6 +36,19 @@ export function ItemSearch({ field, label = 'search', disabled }) {
             setDeep(prev, field, e.target.value || ''),
           )
         }
+        InputProps={{
+          endAdornment: (
+            <IconButton
+              size="small"
+              disabled={!value}
+              onClick={() =>
+                useStore.setState((prev) => setDeep(prev, field, ''))
+              }
+            >
+              <HighlightOffIcon fontSize="small" />
+            </IconButton>
+          ),
+        }}
       />
     </ListItem>
   )
