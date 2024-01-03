@@ -61,12 +61,20 @@ function AvailableSelector() {
                 ? Object.fromEntries(
                     Object.entries(prev.filters.pokemon.filter).map(([key]) => [
                       key,
-                      { ...filter, enabled: true },
+                      {
+                        ...filter,
+                        enabled: true,
+                        all: prev.filters.pokemon.easyMode,
+                      },
                     ]),
                   )
                 : {
                     ...prev.filters.pokemon.filter,
-                    [id]: { ...filter, enabled: true },
+                    [id]: {
+                      ...filter,
+                      enabled: true,
+                      all: prev.filters.pokemon.easyMode,
+                    },
                   },
           },
         },
