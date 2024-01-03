@@ -48,6 +48,42 @@ class EventManager {
    */
   async setAvailable(category, model, Db) {
     this.available[category] = await Db.getAvailable(model)
+
+    /** @param {string} key */
+    const parseKey = (key) => {
+      const match = key.match(/([a-zA-Z]*)(\d+)(?:-(\d+))?/)
+      return {
+        letter: match[1],
+        firstNumber: parseInt(match[2], 10),
+        secondNumber: match[3] ? parseInt(match[3], 10) : null,
+      }
+    }
+
+    this.available[category].sort((a, b) => {
+      const keyA = parseKey(a)
+      const keyB = parseKey(b)
+
+      // Compare by letter
+      if (keyA.letter !== keyB.letter) {
+        if (keyA.letter === '') return 1 // No letter comes last
+        if (keyB.letter === '') return -1
+        return keyA.letter.localeCompare(keyB.letter)
+      }
+
+      // Compare by the first number
+      if (keyA.firstNumber !== keyB.firstNumber) {
+        return keyA.firstNumber - keyB.firstNumber
+      }
+
+      // Compare by the second number (if exists)
+      if (keyA.secondNumber !== null || keyB.secondNumber !== null) {
+        if (keyA.secondNumber === null) return -1
+        if (keyB.secondNumber === null) return 1
+        return keyA.secondNumber - keyB.secondNumber
+      }
+
+      return 0
+    })
   }
 
   /**

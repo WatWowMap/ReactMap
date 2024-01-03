@@ -701,5 +701,8 @@
   "audio_always_on": "Audio Always Plays",
   "volume_level": "Volume Level",
   "notifications_status": "Notifications Status",
-  "granted": "granted"
+  "granted": "granted",
+  "global_respects_selected": "Global Respects Selected",
+  "set_all": "Set All",
+  "only_show_available": "Only Show Available"
 }

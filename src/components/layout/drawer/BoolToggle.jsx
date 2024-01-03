@@ -43,11 +43,10 @@ export default function BoolToggle({
   return (
     <ListItem>
       {children}
-      <ListItemText sx={{ maxWidth: 150 }}>
+      <ListItemText>
         {t(label, fromSnakeCase(label)) ?? t(field, fromSnakeCase(field))}
       </ListItemText>
       <Switch
-        edge="end"
         onChange={onChangeWrapper}
         checked={!!value}
         disabled={disabled}

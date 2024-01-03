@@ -171,13 +171,15 @@ module.exports = class PkmnBackend {
    * @returns {Set<(typeof import("./constants").KEYS)[number]>}
    */
   getRelevantKeys(filter = this.filter) {
-    return new Set(
-      KEYS.filter(
-        (key) =>
-          (pvpConfig.leagueObj[key] ? this.perms.pvp : this.perms.iv) &&
-          this.isActive(key, filter),
-      ),
-    )
+    return this.filter.all
+      ? new Set()
+      : new Set(
+          KEYS.filter(
+            (key) =>
+              (pvpConfig.leagueObj[key] ? this.perms.pvp : this.perms.iv) &&
+              this.isActive(key, filter),
+          ),
+        )
   }
 
   /**
