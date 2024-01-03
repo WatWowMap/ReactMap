@@ -4,3 +4,4 @@ public/missing-locales
 public/images/custom
 public/images/uicons
 server/src/configs/
+packages/types/**/*.d.ts
