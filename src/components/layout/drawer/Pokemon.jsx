@@ -15,6 +15,7 @@ import {
   Dialog,
   ButtonGroup,
   Collapse,
+  Tooltip,
 } from '@mui/material'
 import { useTranslation } from 'react-i18next'
 import { VirtuosoGrid } from 'react-virtuoso'
@@ -156,6 +157,11 @@ function AvailableSelector() {
               ? 'success.main'
               : 'info.main'
             : 'error.dark'
+          const pokemonName = t(`poke_${pokemon}`)
+          const formName = +form ? t(`form_${form}`) : ''
+          const title = `${pokemonName}${
+            formName && formName !== t('form_29') ? ` ${formName}` : ''
+          }`
           return (
             <Box
               display="flex"
@@ -198,15 +204,17 @@ function AvailableSelector() {
                 left={0}
                 sx={{ opacity: 0.4 }}
               />
-              <img
-                alt={url}
-                src={url}
-                style={{
-                  maxHeight: 50,
-                  maxWidth: 50,
-                  zIndex: 10,
-                }}
-              />
+              <Tooltip title={title} arrow>
+                <img
+                  alt={title}
+                  src={url}
+                  style={{
+                    maxHeight: 50,
+                    maxWidth: 50,
+                    zIndex: 10,
+                  }}
+                />
+              </Tooltip>
               <Collapse in={!filters.easyMode}>
                 <IconButton
                   size="small"
