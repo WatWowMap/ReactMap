@@ -16,6 +16,8 @@ import {
   ButtonGroup,
   Collapse,
   Tooltip,
+  Divider,
+  ListSubheader,
 } from '@mui/material'
 import { useTranslation } from 'react-i18next'
 import { VirtuosoGrid } from 'react-virtuoso'
@@ -408,6 +410,31 @@ export default function WithSliders({ category, context }) {
                   </ListItem>
                 ) : (
                   <>
+                    <ListItem disablePadding sx={{ pt: 1 }}>
+                      <ListItemText primary={t('gender')} />
+                      <MultiSelector
+                        filterKey="gender"
+                        items={[0, 1, 2, 3]}
+                        tKey="gender_icon_"
+                        filters={filters[category].ivOr.gender}
+                        setFilters={(newValue) =>
+                          setFilters({
+                            ...filters,
+                            [category]: {
+                              ...filters[category],
+                              ivOr: {
+                                ...filters[category].ivOr,
+                                gender: newValue,
+                              },
+                            },
+                          })
+                        }
+                      />
+                    </ListItem>
+                    <Divider sx={{ mt: 2, mb: 1 }} />
+                    <ListSubheader disableGutters>
+                      {t('iv_overrides')}
+                    </ListSubheader>
                     <ListItem disablePadding>
                       <Grid container alignItems="center">
                         {['zeroIv', 'hundoIv'].map((each) => (
@@ -437,27 +464,7 @@ export default function WithSliders({ category, context }) {
                         ))}
                       </Grid>
                     </ListItem>
-                    <ListItem disablePadding sx={{ pt: 2, pr: 1 }}>
-                      <ListItemText primary={t('gender')} />
-                      <MultiSelector
-                        filterKey="gender"
-                        items={[0, 1, 2, 3]}
-                        tKey="gender_icon_"
-                        filters={filters[category].ivOr.gender}
-                        setFilters={(newValue) =>
-                          setFilters({
-                            ...filters,
-                            [category]: {
-                              ...filters[category],
-                              ivOr: {
-                                ...filters[category].ivOr,
-                                gender: newValue,
-                              },
-                            },
-                          })
-                        }
-                      />
-                    </ListItem>
+                    <Divider sx={{ mt: 2 }} />
                   </>
                 )}
               </List>
