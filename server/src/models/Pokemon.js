@@ -102,6 +102,10 @@ class Pokemon extends Model {
       }
     })
 
+    if (Object.keys(filterMap).length === 0 && mods.onlyEasyMode) {
+      // if no pokemon are present we want global filters to apply still
+      mods.onlyLinkGlobal = false
+    }
     const globalFilter = new PkmnFilter(
       'global',
       args.filters.onlyIvOr,
@@ -246,7 +250,11 @@ class Pokemon extends Model {
       if (!globalFilter.mods.onlyLinkGlobal) {
         pokemon.push({ id: -1 }) // add everything else
       }
-      if (globalFilter.mods.onlyLinkGlobal ? !!filters.length : true) {
+      if (
+        globalFilter.mods.onlyLinkGlobal
+          ? !!filters.length || globalFilter.mods.onlyEasyMode
+          : true
+      ) {
         filters.push(...globalFilter.buildApiFilter(pokemon))
       }
       if (onlyZeroIv)

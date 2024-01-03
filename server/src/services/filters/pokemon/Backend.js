@@ -40,6 +40,7 @@ module.exports = class PkmnBackend {
    * @param {boolean} mods.onlyHundoIv
    * @param {boolean} mods.onlyZeroIv
    * @param {boolean} mods.onlyAllPvp
+   * @param {boolean} mods.onlyEasyMode
    * @param {string[]} mods.onlyAreas
    * @param {boolean} mods.onlyLegacy
    */
