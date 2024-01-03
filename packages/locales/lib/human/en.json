@@ -705,5 +705,6 @@
   "set_all": "Set All",
   "set_filtered": "Set Filtered",
   "only_show_available": "Only Show Available",
-  "easy_mode": "Easy Mode"
+  "easy_mode": "Easy Mode",
+  "quick_select": "Global Quick Selects"
 }

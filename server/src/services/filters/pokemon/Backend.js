@@ -282,20 +282,19 @@ module.exports = class PkmnBackend {
       xxl,
       ...rest
     } = this.filter
-    if (this.id !== 'global' && this.isEqualToGlobal) {
-      return []
-    }
-    if (pokemon === undefined && this.id !== 'global') {
-      pokemon = [{ id: this.pokemon, form: this.form }]
+    if (this.id !== 'global') {
+      if (pokemon === undefined) {
+        pokemon = [{ id: this.pokemon, form: this.form }]
+      }
+      if (!this.filterKeys.size || (!this.perms.iv && !this.perms.pvp)) {
+        return [{ pokemon, iv: { min: -1, max: 100 } }]
+      }
+      if (this.isEqualToGlobal) {
+        return []
+      }
     }
     if (this.mods.onlyLegacy) {
       return dnfifyIvFilter(adv, pokemon)
-    }
-    if (
-      this.id !== 'global' &&
-      (!this.filterKeys.size || (!this.perms.iv && !this.perms.pvp))
-    ) {
-      return [{ pokemon, iv: { min: -1, max: 100 } }]
     }
     const results = /** @type {import('@rm/types').DnfFilter[]} */ ([])
     if (

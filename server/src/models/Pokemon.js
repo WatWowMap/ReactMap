@@ -236,7 +236,11 @@ class Pokemon extends Model {
     const filters = mem
       ? Object.values(filterMap).flatMap((filter) => filter.buildApiFilter())
       : []
-    if ((perms.iv || perms.pvp) && mem) {
+    if (
+      (perms.iv || perms.pvp) &&
+      mem &&
+      (globalFilter.mods.onlyLinkGlobal ? !!filters.length : true)
+    ) {
       const pokemon = Object.keys(filterMap)
         .filter((key) => key.includes('-'))
         .map((key) => {

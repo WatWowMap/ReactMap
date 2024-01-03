@@ -433,7 +433,7 @@ export default function WithSliders({ category, context }) {
                     </ListItem>
                     <Divider sx={{ mt: 2, mb: 1 }} />
                     <ListSubheader disableGutters>
-                      {t('iv_overrides')}
+                      {t('quick_select')}
                     </ListSubheader>
                     <ListItem disablePadding>
                       <Grid container alignItems="center">
@@ -464,7 +464,6 @@ export default function WithSliders({ category, context }) {
                         ))}
                       </Grid>
                     </ListItem>
-                    <Divider sx={{ mt: 2 }} />
                   </>
                 )}
               </List>
