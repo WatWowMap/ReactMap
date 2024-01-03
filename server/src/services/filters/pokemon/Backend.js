@@ -54,12 +54,12 @@ module.exports = class PkmnBackend {
 
     this.filter = filter
     this.global = global
-    this.globalHundo = mods.onlyHundoIv
-    this.globalZero = mods.onlyZeroIv
     this.filterKeys = this.getRelevantKeys(filter)
     this.globalKeys = this.getRelevantKeys(global)
     this.expertFilter = this.getCallback(id === 'global')
     this.expertGlobal = this.getCallback(true)
+    this.isEqualToGlobal =
+      this.expertFilter.toString() === this.expertGlobal.toString()
   }
 
   get keyArray() {
@@ -282,8 +282,12 @@ module.exports = class PkmnBackend {
       xxl,
       ...rest
     } = this.filter
-    if (pokemon === undefined && this.id !== 'global')
+    if (this.id !== 'global' && this.isEqualToGlobal) {
+      return []
+    }
+    if (pokemon === undefined && this.id !== 'global') {
       pokemon = [{ id: this.pokemon, form: this.form }]
+    }
     if (this.mods.onlyLegacy) {
       return dnfifyIvFilter(adv, pokemon)
     }
@@ -354,8 +358,8 @@ module.exports = class PkmnBackend {
     ) {
       if (
         !this.mods.onlyLinkGlobal ||
-        (this.globalHundo && pokemon.iv === 100) ||
-        (this.globalZero && pokemon.iv === 0) ||
+        (this.mods.onlyHundoIv && pokemon.iv === 100) ||
+        (this.mods.onlyZeroIv && pokemon.iv === 0) ||
         (this.pokemon === pokemon.pokemon_id && this.form === pokemon.form)
       ) {
         if (!this.expertFilter || !this.expertGlobal) return true
