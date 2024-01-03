@@ -22,14 +22,15 @@ export default function SliderTile({
   handleChange,
   filterValues,
 }) {
+  const values = disabled ? [min, max] : filterValues[name]
   const { t } = useTranslation()
-  const [tempValues, setTempValues] = useState(filterValues[name])
-  const [tempTextValues, setTempTextValues] = useState(filterValues[name])
+  const [tempValues, setTempValues] = useState(values)
+  const [tempTextValues, setTempTextValues] = useState(values)
   const [fullName, setFullName] = useState(true)
 
   useEffect(() => {
-    setTempValues(filterValues[name])
-    setTempTextValues(filterValues[name])
+    setTempValues(values)
+    setTempTextValues(values)
   }, [filterValues])
 
   const handleTempChange = (event, newValues) => {
@@ -45,10 +46,10 @@ export default function SliderTile({
       const arrValues = []
       if (id === 'min') {
         safeVal = safeVal < min ? min : safeVal
-        arrValues.push(safeVal, filterValues[name][1])
+        arrValues.push(safeVal, values[1])
       } else {
         safeVal = safeVal > max ? max : safeVal
-        arrValues.push(filterValues[name][0], safeVal)
+        arrValues.push(values[0], safeVal)
       }
       if (safeVal === '') {
         setTempTextValues(arrValues)
