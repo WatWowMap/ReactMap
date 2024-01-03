@@ -7,7 +7,6 @@ import {
   ListItemIcon,
   ListItemText,
   ListItem,
-  TextField,
   TableContainer,
   Table,
   TableBody,
@@ -22,12 +21,13 @@ import RestartAltIcon from '@mui/icons-material/RestartAlt'
 import Query from '@services/Query'
 import { useStatic, useStore } from '@hooks/useStore'
 import AreaTile from './AreaTile'
+import { ItemSearch } from './ItemSearch'
 
 export default function AreaDropDown() {
   const { data, loading, error } = useQuery(Query.scanAreasMenu())
   const { t } = useTranslation()
   const filters = useStore((s) => s.filters)
-  const { setAreas, setFilters } = useStore.getState()
+  const { setAreas } = useStore.getState()
   const { config } = useStatic.getState()
   const map = useMap()
   const [open, setOpen] = React.useState('')
@@ -52,27 +52,7 @@ export default function AreaDropDown() {
         </ListItemIcon>
         <ListItemText primary={t('reset')} />
       </ListItemButton>
-      <ListItem>
-        <TextField
-          label={t('search')}
-          variant="outlined"
-          fullWidth
-          size="small"
-          value={filters?.scanAreas?.filter?.search || ''}
-          onChange={(e) =>
-            setFilters({
-              ...filters,
-              scanAreas: {
-                ...filters.scanAreas,
-                filter: {
-                  ...filters.scanAreas.filter,
-                  search: e.target.value || '',
-                },
-              },
-            })
-          }
-        />
-      </ListItem>
+      <ItemSearch field="filters.scanAreas.filter.search" />
       <ListItem>
         <TableContainer
           component={Paper}

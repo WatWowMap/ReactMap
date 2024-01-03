@@ -32,6 +32,7 @@ import TabPanel from '../general/TabPanel'
 import MultiSelector from './MultiSelector'
 import AdvancedFilter from '../dialogs/filters/Advanced'
 import BoolToggle from './BoolToggle'
+import { ItemSearch } from './ItemSearch'
 
 function AvailableSelector() {
   const available = useStatic((s) => s.available.pokemon)
@@ -39,6 +40,7 @@ function AvailableSelector() {
   const Icons = useStatic((s) => s.Icons)
   const filters = useStore((s) => s.filters.pokemon)
   const isMobile = useStatic((s) => s.isMobile)
+  const search = useStore((s) => s.searches.pokemonQuickSelect || '')
 
   const [advanced, setAdvanced] = React.useState({
     id: '0',
@@ -97,16 +99,46 @@ function AvailableSelector() {
     }))
   }
 
-  const items = React.useMemo(
-    () =>
+  const items = React.useMemo(() => {
+    const lowerCase = search.toLowerCase()
+    return (
       filters.onlyShowAvailable
         ? available
-        : Object.keys(filters.filter).filter((key) => key !== 'global'),
-    [filters.onlyShowAvailable, filters.filter, available],
-  )
+        : Object.keys(filters.filter).filter((key) => key !== 'global')
+    )
+      .map((key) => {
+        const [pokemon, form] = key.split('-', 2)
+        const pokemonName = t(`poke_${pokemon}`)
+        const formName = +form ? t(`form_${form}`) : ''
+
+        return {
+          key,
+          pokemonName,
+          formName,
+          url: Icons.getPokemon(pokemon, form),
+          color: filters.filter[key]?.enabled
+            ? filters.filter[key]?.all || filters.easyMode
+              ? 'success.main'
+              : 'info.main'
+            : 'error.dark',
+        }
+      })
+      .filter(
+        ({ pokemonName, formName }) =>
+          pokemonName.toLowerCase().includes(lowerCase) ||
+          formName.toLowerCase().includes(lowerCase),
+      )
+  }, [
+    filters.onlyShowAvailable,
+    filters.easyMode,
+    filters.filter,
+    available,
+    search,
+  ])
 
   return (
     <List>
+      <ItemSearch field="searches.pokemonQuickSelect" />
       <BoolToggle
         field="filters.pokemon.onlyShowAvailable"
         label="only_show_available"
@@ -148,19 +180,11 @@ function AvailableSelector() {
             <Grid2 {...props} container ref={ref} />
           )),
         }}
-        context={{ Icons, t, filters }}
-        itemContent={(_, key, ctx) => {
-          const [pokemon, form] = key.split('-', 2)
-          const url = ctx.Icons.getPokemon(pokemon, form)
-          const bgcolor = filters.filter[key]?.enabled
-            ? filters.filter[key]?.all || filters.easyMode
-              ? 'success.main'
-              : 'info.main'
-            : 'error.dark'
-          const pokemonName = t(`poke_${pokemon}`)
-          const formName = +form ? t(`form_${form}`) : ''
-          const title = `${pokemonName}${
-            formName && formName !== t('form_29') ? ` ${formName}` : ''
+        itemContent={(_, item) => {
+          const title = `${item.pokemonName}${
+            item.formName && item.formName !== t('form_29')
+              ? ` ${item.formName}`
+              : ''
           }`
           return (
             <Box
@@ -171,7 +195,7 @@ function AvailableSelector() {
               outline="ButtonText 1px solid"
               sx={{ aspectRatio: '1/1' }}
               onClick={() => {
-                const filter = { ...filters.filter[key] }
+                const filter = { ...filters.filter[item.key] }
                 if (filter.all) {
                   filter.all = false
                   filter.enabled = !filters.easyMode
@@ -188,7 +212,7 @@ function AvailableSelector() {
                       ...prev.filters.pokemon,
                       filter: {
                         ...prev.filters.pokemon.filter,
-                        [key]: filter,
+                        [item.key]: filter,
                       },
                     },
                   },
@@ -198,7 +222,7 @@ function AvailableSelector() {
               <Box
                 height="100%"
                 width="100%"
-                bgcolor={bgcolor}
+                bgcolor={item.color}
                 position="absolute"
                 top={0}
                 left={0}
@@ -207,7 +231,7 @@ function AvailableSelector() {
               <Tooltip title={title} arrow>
                 <img
                   alt={title}
-                  src={url}
+                  src={item.url}
                   style={{
                     maxHeight: 50,
                     maxWidth: 50,
@@ -223,8 +247,8 @@ function AvailableSelector() {
                     e.stopPropagation()
                     setAdvanced((prev) => ({
                       ...prev,
-                      id: key,
-                      tempFilters: filters.filter[key],
+                      id: item.key,
+                      tempFilters: filters.filter[item.key],
                     }))
                     setOpen(true)
                   }}
@@ -236,14 +260,16 @@ function AvailableSelector() {
           )
         }}
       />
-      <Dialog open={open} onClose={onClose()} fullScreen={isMobile}>
-        <AdvancedFilter
-          advancedFilter={advanced}
-          toggleAdvMenu={onClose}
-          type="pokemon"
-          isMobile={isMobile}
-        />
-      </Dialog>
+      {!!filters.easyMode && (
+        <Dialog open={open} onClose={onClose()} fullScreen={isMobile}>
+          <AdvancedFilter
+            advancedFilter={advanced}
+            toggleAdvMenu={onClose}
+            type="pokemon"
+            isMobile={isMobile}
+          />
+        </Dialog>
+      )}
     </List>
   )
 }
