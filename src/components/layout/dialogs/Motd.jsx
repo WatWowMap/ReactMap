@@ -14,12 +14,14 @@ import DialogWrapper from '../custom/DialogWrapper'
 import CustomTile from '../custom/CustomTile'
 import { Loading } from '../general/Loading'
 
-const DEFAULT = {
-  settings: {},
-  components: [],
-  titles: [],
-  footerButtons: [],
-}
+const DEFAULT =
+  /** @type {import('@rm/types').Config['map']['messageOfTheDay']} */ ({
+    settings: {},
+    components: [],
+    titles: [],
+    footerButtons: [],
+    index: 0,
+  })
 
 export default function MessageOfTheDay() {
   const clientIndex = useStore((s) => s.motdIndex)
@@ -42,7 +44,7 @@ export default function MessageOfTheDay() {
 
   const handleMotdClose = React.useCallback(() => {
     if (motd.settings.permanent === false) {
-      useStore.setState({ motdIndex: motd.settings.index })
+      useStore.setState({ motdIndex: motd.index })
     }
     useLayoutStore.setState({ motd: false })
   }, [motd])

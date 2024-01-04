@@ -855,6 +855,32 @@
       },
       "darkMapBorder": "CLIENT_SIDE_OPTIONS_WEATHER_DARK_MAP_BORDER",
       "lightMapBorder": "CLIENT_SIDE_OPTIONS_WEATHER_LIGHT_MAP_BORDER"
+    },
+    "notifications": {
+      "enabled": {
+        "__name": "CLIENT_SIDE_OPTIONS_NOTIFICATIONS_ENABLED",
+        "__format": "boolean"
+      },
+      "audio": {
+        "__name": "CLIENT_SIDE_OPTIONS_NOTIFICATIONS_AUDIO",
+        "__format": "boolean"
+      },
+      "audioAlwaysOn": {
+        "__name": "CLIENT_SIDE_OPTIONS_NOTIFICATIONS_AUDIO_ALWAYS_ON",
+        "__format": "boolean"
+      },
+      "volumeLevel": {
+        "__name": "CLIENT_SIDE_OPTIONS_NOTIFICATIONS_VOLUME_LEVEL",
+        "__format": "number"
+      },
+      "pokemon": {
+        "__name": "CLIENT_SIDE_OPTIONS_NOTIFICATIONS_POKEMON",
+        "__format": "boolean"
+      },
+      "raids": {
+        "__name": "CLIENT_SIDE_OPTIONS_NOTIFICATIONS_RAIDS",
+        "__format": "boolean"
+      }
     }
   },
   "defaultFilters": {
@@ -1894,6 +1920,21 @@
           "__format": "number"
         }
       }
+    }
+  },
+  "audio": {
+    "cacheHrs": {
+      "__name": "AUDIO_CACHE_HRS",
+      "__format": "number"
+    },
+    "defaultAudio": {},
+    "customizable": {
+      "__name": "AUDIO_CUSTOMIZABLE",
+      "__format": "json"
+    },
+    "styles": {
+      "__name": "AUDIO_STYLES",
+      "__format": "json"
     }
   },
   "rarity": {

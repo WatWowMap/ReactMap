@@ -5,13 +5,10 @@ import { IconButton } from '@mui/material'
 import { useStore, useStatic } from '@hooks/useStore'
 
 export default function Navigation({ lat, lon, size = 'large' }) {
-  const { navigation } = useStore((state) => state.settings)
-  const {
-    navigation: {
-      [navigation]: { url },
-    },
-  } = useStatic.getState().settings
-
+  const url = useStore(
+    (s) =>
+      useStatic.getState().settings.navigation?.[s.settings.navigation]?.url,
+  )
   return (
     <IconButton
       href={url.replace('{x}', lat).replace('{y}', lon)}
