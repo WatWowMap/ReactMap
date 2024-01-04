@@ -257,16 +257,13 @@ class Pokemon extends Model {
       ) {
         filters.push(...globalFilter.buildApiFilter(pokemon))
       }
+      const globalPokes = globalFilter.mods.onlyLinkGlobal
+        ? [...pokemon, { id: -1 }]
+        : pokemon
       if (onlyZeroIv)
-        filters.push({
-          iv: { min: 0, max: 0 },
-          pokemon: globalFilter.mods.onlyLinkGlobal ? [{ id: -1 }] : pokemon,
-        })
+        filters.push({ iv: { min: 0, max: 0 }, pokemon: globalPokes })
       if (onlyHundoIv)
-        filters.push({
-          iv: { min: 100, max: 100 },
-          pokemon: globalFilter.mods.onlyLinkGlobal ? [{ id: -1 }] : pokemon,
-        })
+        filters.push({ iv: { min: 100, max: 100 }, pokemon: globalPokes })
     }
     /** @type {import("../types").Pokemon[]} */
     const results = await this.evalQuery(

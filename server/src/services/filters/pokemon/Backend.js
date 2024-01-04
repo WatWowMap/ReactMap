@@ -144,7 +144,7 @@ module.exports = class PkmnBackend {
       if (merged) merged = `(${merged})&`
       merged += `G${filter.gender}`
     }
-    log.debug(HELPERS.pokemon, this.id, {
+    log.trace(HELPERS.pokemon, this.id, {
       andStr,
       orStr,
       merged,
