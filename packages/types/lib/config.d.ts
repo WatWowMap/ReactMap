@@ -3,6 +3,7 @@ import config = require('server/src/configs/default.json')
 import example = require('server/src/configs/local.example.json')
 
 import type { Schema } from './server'
+import type { DialogProps } from '@mui/material'
 
 type BaseConfig = typeof config
 type ExampleConfig = typeof example
@@ -74,13 +75,14 @@ export interface Config<Client extends boolean = false>
     messageOfTheDay: {
       settings: {
         parentStyle: Record<string, string> // should be CSS properties but performance seems to die
-      } & BaseConfig['map']['messageOfTheDay']['settings']
+      } & Omit<BaseConfig['map']['messageOfTheDay']['settings'], 'parentStyle'>
       titles: string[]
       components: CustomComponent[]
       footerButtons: CustomComponent[]
+      dialogMaxWidth: DialogProps['maxWidth']
     } & Omit<
       BaseConfig['map']['messageOfTheDay'],
-      'settings' | 'titles' | 'components' | 'footerButtons'
+      'settings' | 'titles' | 'components' | 'footerButtons' | 'dialogMaxWidth'
     >
     donationPage: {
       settings: {
@@ -145,6 +147,7 @@ export interface Webhook {
 }
 
 export interface CustomComponent {
+  type?: string
   components?: CustomComponent[]
   donorOnly?: boolean
   freeloaderOnly?: boolean
