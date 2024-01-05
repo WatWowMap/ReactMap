@@ -16,7 +16,11 @@ export default function Size({ field, ...props }) {
   return (
     <ListItem {...props}>
       <ListItemText sx={{ pr: 2 }}>{t('icon_size')}</ListItemText>
-      <MultiSelector items={ICON_SIZES} field={`${field}.size`} />
+      <MultiSelector
+        items={ICON_SIZES}
+        field={`${field}.size`}
+        disabled={props.disabled}
+      />
     </ListItem>
   )
 }

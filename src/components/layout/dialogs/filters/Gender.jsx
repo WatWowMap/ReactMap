@@ -21,6 +21,7 @@ export function GenderListItem({ field, ...props }) {
         items={GENDERS}
         tKey="gender_icon_"
         field={`${field}.gender`}
+        disabled={props.disabled}
       />
     </ListItem>
   )
