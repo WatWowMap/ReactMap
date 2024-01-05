@@ -51,7 +51,6 @@ export default function SliderTile({
   const [temp, setTemp] = React.useState(filterValues || [])
   const [text, setText] = React.useState(filterValues || [])
 
-  // console.log({ name, filterValues, min, max })
   const handleSliderChange =
     /** @type {import('@mui/material').SliderProps['onChangeCommitted']} */ (
       React.useCallback(
@@ -125,6 +124,7 @@ export default function SliderTile({
       justifyContent="center"
       alignItems="center"
       minWidth={Math.min(window.innerWidth, 260)}
+      width="100%"
     >
       <Grid2 xs={noTextInput ? 12 : 4}>
         <ToggleTypography color={colorSx.sx.color} lineHeight={1.2}>
