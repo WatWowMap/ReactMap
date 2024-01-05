@@ -18,6 +18,7 @@ import { fromSnakeCase } from '@services/functions/fromSnakeCase'
  *  disabled?: boolean,
  *  children?: React.ReactNode,
  *  align?: import('@mui/material').TypographyProps['align']
+ *  switchColor?: import('@mui/material').SwitchProps['color']
  * } & import('@mui/material').ListItemProps} BoolToggleProps
  */
 
@@ -28,13 +29,14 @@ export function BoolBase({
   disabled = false,
   children,
   align,
+  switchColor,
   ...props
 }) {
   const { t } = useTranslation()
   const [value, setValue] = useDeepStore(field, false)
   const onChange =
     /** @type {import('@mui/material').SwitchProps['onChange']} */ (
-      React.useCallback((_, checked) => setValue(checked), [field])
+      React.useCallback((_, checked) => setValue(checked), [field, setValue])
     )
   return (
     <ListItem {...props}>
@@ -42,7 +44,12 @@ export function BoolBase({
       <ListItemText primaryTypographyProps={{ align }}>
         {t(label, t(Utility.camelToSnake(label), fromSnakeCase(label)))}
       </ListItemText>
-      <Switch onChange={onChange} checked={!!value} disabled={disabled} />
+      <Switch
+        color={switchColor}
+        onChange={onChange}
+        checked={!!value}
+        disabled={disabled}
+      />
     </ListItem>
   )
 }
@@ -58,15 +65,17 @@ export function DualBoolToggle({ items, field, ...props }) {
     <Grid2 container component={ListItem} disablePadding disableGutters>
       {items.map((item) => (
         <Grid2 key={item} xs={6} component={List}>
-          <BoolToggle
-            // @ts-ignore
-            field={`${field}.${item}`}
-            label={item}
-            disablePadding
-            disableGutters
-            align="center"
-            {...props}
-          />
+          {item && (
+            <BoolToggle
+              // @ts-ignore
+              field={`${field}.${item}`}
+              label={item}
+              disablePadding
+              disableGutters
+              align="center"
+              {...props}
+            />
+          )}
         </Grid2>
       ))}
     </Grid2>
