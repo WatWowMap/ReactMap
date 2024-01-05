@@ -1,34 +1,32 @@
-// @ts-check
 /* eslint-disable react/no-unstable-nested-components */
+// @ts-check
 import * as React from 'react'
-import {
-  List,
-  ListItem,
-  ListItemText,
-  Box,
-  IconButton,
-  ButtonGroup,
-  Collapse,
-  Tooltip,
-} from '@mui/material'
 import { VirtuosoGrid } from 'react-virtuoso'
 import Grid2 from '@mui/material/Unstable_Grid2/Grid2'
 import TuneIcon from '@mui/icons-material/Tune'
 import CheckIcon from '@mui/icons-material/Check'
 import ClearIcon from '@mui/icons-material/Clear'
-import { useTranslateById } from '@hooks/useTranslateById'
+import List from '@mui/material/List'
+import ListItem from '@mui/material/ListItem'
+import ListItemText from '@mui/material/ListItemText'
+import ButtonGroup from '@mui/material/ButtonGroup'
+import IconButton from '@mui/material/IconButton'
+import Collapse from '@mui/material/Collapse'
 
-import { useDeepStore, useStatic, useStore } from '@hooks/useStore'
+import { useTranslateById } from '@hooks/useTranslateById'
+import { useStatic, useStore } from '@hooks/useStore'
+
 import AdvancedFilter from '../dialogs/filters/Advanced'
 import { BoolToggle } from './BoolToggle'
 import { ItemSearchMemo } from './ItemSearch'
+import { SelectorItem } from './SelectorItem'
 
 /**
  *
  * @param {{ category: keyof import('@rm/types').Available }} props
  * @returns
  */
-function AvailableSelector({ category }) {
+function SelectorList({ category }) {
   const { t } = useTranslateById()
   const available = useStatic((s) => s.available[category])
   const allFilters = useStatic((s) => s.filters[category]?.filter)
@@ -98,7 +96,7 @@ function AvailableSelector({ category }) {
         </ButtonGroup>
       </ListItem>
       <VirtuosoGrid
-        style={{ height: 400, width: 292 }}
+        style={{ height: 400 }}
         totalCount={items.length}
         overscan={5}
         data={items}
@@ -109,7 +107,7 @@ function AvailableSelector({ category }) {
           )),
         }}
         itemContent={(_, key) => (
-          <ItemContent category={category}>{key}</ItemContent>
+          <SelectorItem category={category}>{key}</SelectorItem>
         )}
       />
       {!easyMode && (
@@ -125,90 +123,7 @@ function AvailableSelector({ category }) {
   )
 }
 
-export const MemoAvailableSelector = React.memo(AvailableSelector, () => true)
-
-/**
- * @param {{ category: keyof import('@rm/types').Available, children: string }} props
- */
-function ItemContent({ category, children }) {
-  const { t } = useTranslateById()
-  const title = t(children)
-  const [filter, setFilter] = useDeepStore(
-    `filters.${category}.filter.${children}`,
-  )
-  const url = useStatic((s) => s.Icons.getIconById(children))
-  const easyMode = useStore((s) => !!s.filters[category].easyMode)
-  const [open, setOpen] = React.useState(false)
-
-  const color = filter?.enabled
-    ? filter?.all || easyMode
-      ? 'success.main'
-      : 'info.main'
-    : 'error.dark'
-
-  return (
-    <>
-      <Box
-        display="flex"
-        justifyContent="center"
-        alignItems="center"
-        position="relative"
-        sx={{ aspectRatio: '1/1', outline: 'ButtonText 1px solid' }}
-        onClick={() => {
-          const newFilter = { ...filter }
-          if (filter.all) {
-            newFilter.all = false
-            newFilter.enabled = !easyMode
-          } else if (filter.enabled) {
-            newFilter.enabled = false
-          } else {
-            newFilter.all = true
-            newFilter.enabled = true
-          }
-          setFilter(newFilter)
-        }}
-      >
-        <Box
-          height="100%"
-          width="100%"
-          bgcolor={color}
-          position="absolute"
-          top={0}
-          left={0}
-          sx={{ opacity: 0.4 }}
-        />
-        <Tooltip title={title} arrow>
-          <img
-            alt={title}
-            src={url}
-            style={{
-              maxHeight: 50,
-              maxWidth: 50,
-              zIndex: 10,
-            }}
-          />
-        </Tooltip>
-        <Collapse in={!easyMode}>
-          <IconButton
-            size="small"
-            sx={{ position: 'absolute', right: 0, top: 0 }}
-            onClick={(e) => {
-              e.stopPropagation()
-              setOpen(true)
-            }}
-          >
-            <TuneIcon fontSize="small" />
-          </IconButton>
-        </Collapse>
-      </Box>
-      {!easyMode && (
-        <AdvancedFilter
-          id={children}
-          category={category}
-          open={open}
-          setOpen={setOpen}
-        />
-      )}
-    </>
-  )
-}
+export const MemoSelectorList = React.memo(
+  SelectorList,
+  (prev, next) => prev.category === next.category,
+)

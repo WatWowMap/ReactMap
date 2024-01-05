@@ -27,7 +27,7 @@ import SliderTile from '../dialogs/filters/SliderTile'
 import TabPanel from '../general/TabPanel'
 import { BoolToggle, DualBoolToggle } from './BoolToggle'
 import { GenderListItem } from '../dialogs/filters/Gender'
-import { MemoAvailableSelector } from './ItemSelector'
+import { MemoSelectorList } from './SelectorList'
 
 export default function WithSliders({ category, context }) {
   const userSettings = useStore((s) => s.userSettings[category])
@@ -164,7 +164,7 @@ export default function WithSliders({ category, context }) {
             </TabPanel>
           ))}
           <TabPanel value={openTab} index={2} disablePadding>
-            <MemoAvailableSelector category="pokemon" />
+            <MemoSelectorList category="pokemon" />
           </TabPanel>
         </>
       )}
