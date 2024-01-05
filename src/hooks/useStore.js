@@ -164,17 +164,23 @@ export function useDeepStore(field, defaultValue) {
     () => [
       value,
       (...args) => {
-        const first = field.split('.').at(0)
-        const path = field.split('.').slice(1).join('.')
+        const [first, ...rest] = field.split('.')
+        const corrected = rest.length ? rest.join('.') : first
         const key = typeof args[0] === 'string' && args[1] ? `.${args[0]}` : ''
+        const path = key ? `${corrected}.${key}` : corrected
         const nextValue =
           args.length === 1
             ? typeof args[0] === 'function'
               ? args[0](value)
               : args[0]
             : args[1]
+        if (process.env.NODE_ENV === 'development') {
+          // eslint-disable-next-line no-console
+          console.trace({ first, rest, corrected, key, path, nextValue })
+        }
         return useStore.setState((prev) => ({
-          [first]: setDeep(prev[first], `${path}${key}`, nextValue),
+          [first]:
+            first === path ? nextValue : setDeep(prev[first], path, nextValue),
         }))
       },
     ],
