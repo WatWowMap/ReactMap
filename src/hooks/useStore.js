@@ -31,6 +31,7 @@ import { persist, createJSONStorage } from 'zustand/middleware'
  *   audio: Record<string, string>
  *   userSettings: Record<string, any>
  *   profiling: boolean
+ *   stateLogging: boolean
  *   desktopNotifications: boolean
  *   setAreas: (areas: string | string[], validAreas: string[], unselectAll?: boolean) => void,
  *   setPokemonFilterMode: (legacyFilter: boolean, easyMode: boolean) => void,
@@ -140,7 +141,7 @@ export const useStore = create(
       },
       motdIndex: 0,
       profiling: false,
-      desktopNotifications: false,
+      stateTraceLog: false,
     }),
     {
       name: 'local-state',
@@ -174,14 +175,18 @@ export function useDeepStore(field, defaultValue) {
               ? args[0](value)
               : args[0]
             : args[1]
-        if (process.env.NODE_ENV === 'development') {
-          // eslint-disable-next-line no-console
-          console.trace({ first, rest, corrected, key, path, nextValue })
-        }
-        return useStore.setState((prev) => ({
-          [first]:
-            first === path ? nextValue : setDeep(prev[first], path, nextValue),
-        }))
+        return useStore.setState((prev) => {
+          if (process.env.NODE_ENV === 'development' && prev.stateLogging) {
+            // eslint-disable-next-line no-console
+            console.trace({ first, rest, corrected, key, path, nextValue })
+          }
+          return {
+            [first]:
+              first === path
+                ? nextValue
+                : setDeep(prev[first], path, nextValue),
+          }
+        })
       },
     ],
     [value],

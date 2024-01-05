@@ -4,7 +4,7 @@
     "packages/locales/lib/generated",
     "packages/locales/lib/data"
   ],
-  "i18n-ally.keystyle": "auto",
+  "i18n-ally.keystyle": "flat",
   "[javascript]": {
     "editor.autoClosingBrackets": "always",
     "editor.defaultFormatter": "esbenp.prettier-vscode"

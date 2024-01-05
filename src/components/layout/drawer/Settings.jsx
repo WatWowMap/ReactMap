@@ -1,17 +1,15 @@
 // @ts-check
 import * as React from 'react'
-import {
-  Divider,
-  FormControl,
-  InputLabel,
-  ListItem,
-  ListItemButton,
-  ListItemIcon,
-  ListSubheader,
-  ListItemText,
-  MenuItem,
-  Select,
-} from '@mui/material'
+import Divider from '@mui/material/Divider'
+import FormControl from '@mui/material/FormControl'
+import InputLabel from '@mui/material/InputLabel'
+import ListItem from '@mui/material/ListItem'
+import ListItemIcon from '@mui/material/ListItemIcon'
+import ListItemText from '@mui/material/ListItemText'
+import ListSubheader from '@mui/material/ListSubheader'
+import MenuItem from '@mui/material/MenuItem'
+import Select from '@mui/material/Select'
+import ListItemButton from '@mui/material/ListItemButton'
 import TranslateIcon from '@mui/icons-material/Translate'
 import MapIcon from '@mui/icons-material/Map'
 import NavIcon from '@mui/icons-material/Navigation'
@@ -22,6 +20,7 @@ import CakeIcon from '@mui/icons-material/Cake'
 import InsightsIcon from '@mui/icons-material/Insights'
 import NotificationsActiveIcon from '@mui/icons-material/NotificationsActive'
 import NotificationsOffIcon from '@mui/icons-material/NotificationsOff'
+import LogoDevIcon from '@mui/icons-material/LogoDev'
 
 import { useTranslation } from 'react-i18next'
 
@@ -211,16 +210,25 @@ export default function Settings() {
           </ListItemIcon>
         </BoolToggle>
       ))}
-      {process.env.NODE_ENV === 'development' && (
-        <BoolToggle field="profiling">
-          <ListItemIcon>
-            <InsightsIcon />
-          </ListItemIcon>
-        </BoolToggle>
-      )}
       <Divider style={{ margin: '10px 0' }} />
       <UniAssetSelect asset="icons" />
       <UniAssetSelect asset="audio" />
+      {process.env.NODE_ENV === 'development' && (
+        <>
+          <ListSubheader>{t('developer')}</ListSubheader>
+          <BoolToggle field="profiling">
+            <ListItemIcon>
+              <InsightsIcon />
+            </ListItemIcon>
+          </BoolToggle>
+          <BoolToggle field="stateLogging">
+            <ListItemIcon>
+              <LogoDevIcon />
+            </ListItemIcon>
+          </BoolToggle>
+          <Divider style={{ margin: '10px 0' }} />
+        </>
+      )}
       {!separateDrawerActions && (
         <>
           <Divider style={{ margin: '10px 0' }} />
