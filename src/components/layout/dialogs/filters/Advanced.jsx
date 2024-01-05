@@ -159,13 +159,13 @@ export default function AdvancedFilter({
                             sx={{ pr: { xs: 0, sm: i ? 0 : 2 } }}
                           >
                             <SliderTile
-                              filterSlide={{
+                              slide={{
                                 ...each,
                                 disabled: each.disabled || filters.all,
                               }}
                               // @ts-ignore
                               handleChange={handleChange}
-                              filterValues={filters[each.name]}
+                              values={filters[each.name]}
                             />
                           </ListItem>
                         ))}

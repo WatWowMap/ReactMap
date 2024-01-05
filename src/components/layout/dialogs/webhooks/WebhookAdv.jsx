@@ -124,15 +124,18 @@ export default function WebhookAdvanced({
       : { ...info.defaults, profile_no: human.current_profile_no },
   )
 
-  const handleSlider = (event, values, low, high) => {
-    setFilterValues({ ...filterValues, [event]: values })
-    setPoracleValues({
-      ...poracleValues,
-      [low]: values[0],
-      [high]: values[1],
-      pvpEntry: event.startsWith('pvp'),
-    })
-  }
+  const handleSlider = React.useCallback(
+    (low, high) => (name, values) => {
+      setFilterValues({ ...filterValues, [name]: values })
+      setPoracleValues({
+        ...poracleValues,
+        [low]: values[0],
+        [high]: values[1],
+        pvpEntry: name.startsWith('pvp'),
+      })
+    },
+    [poracleValues],
+  )
 
   const handleSwitch = (event) => {
     const { name, checked } = event.target
@@ -527,9 +530,9 @@ export default function WebhookAdvanced({
             style={isMobile ? { marginTop: i ? 'inherit' : 10 } : {}}
           >
             <SliderTile
-              filterSlide={option}
-              handleChange={handleSlider}
-              filterValues={filterValues[option.name]}
+              slide={option}
+              handleChange={handleSlider(option.low, option.high)}
+              values={filterValues[option.name]}
             />
           </Grid>
         ))

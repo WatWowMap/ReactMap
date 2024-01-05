@@ -166,7 +166,7 @@ export function useDeepStore(field, defaultValue) {
       (...args) => {
         const [first, ...rest] = field.split('.')
         const corrected = rest.length ? rest.join('.') : first
-        const key = typeof args[0] === 'string' && args[1] ? `.${args[0]}` : ''
+        const key = typeof args[0] === 'string' && args[1] ? args[0] : ''
         const path = key ? `${corrected}.${key}` : corrected
         const nextValue =
           args.length === 1

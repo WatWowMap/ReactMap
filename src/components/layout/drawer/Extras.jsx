@@ -33,9 +33,9 @@ const BaseNestSlider = () => {
   return (
     <ListItem>
       <SliderTile
-        filterSlide={slider}
+        slide={slider}
         handleChange={(_, values) => setFilters(values)}
-        filterValues={filters}
+        values={filters}
       />
     </ListItem>
   )
@@ -284,9 +284,9 @@ const BaseRouteSlider = () => {
     <CollapsibleItem open={enabled}>
       <ListItem>
         <SliderTile
-          filterSlide={slider}
+          slide={slider}
           handleChange={(_, values) => setFilters(values)}
-          filterValues={filters}
+          values={filters}
         />
       </ListItem>
     </CollapsibleItem>

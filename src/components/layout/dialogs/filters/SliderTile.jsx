@@ -22,22 +22,21 @@ const StyledTextField =
 const StyledSlider = styled(Slider)(() => ({ width: '100%' }))
 
 /**
+ * @typedef {('' | number)[]} Value
  * @param {{
- *  filterSlide: import('@rm/types').RMSliderProps,
+ *  slide: import('@rm/types').RMSliderProps,
  *  handleChange: import('@rm/types').RMSliderHandleChange,
- *  filterValues: number[]
+ *  values: number[]
  * }} props
  */
 export default function SliderTile({
-  filterSlide: {
+  slide: {
     name,
     min,
     max,
     color,
     disabled,
     label,
-    low,
-    high,
     step,
     i18nKey,
     marks,
@@ -45,49 +44,57 @@ export default function SliderTile({
     noTextInput,
   },
   handleChange,
-  filterValues,
+  values,
 }) {
   const { t } = useTranslation()
-  const [temp, setTemp] = React.useState(filterValues || [])
-  const [text, setText] = React.useState(filterValues || [])
+  const [temp, setTemp] = React.useState(values || [])
+  const [text, setText] = React.useState(/** @type {Value} */ (values || []))
 
   const handleSliderChange =
     /** @type {import('@mui/material').SliderProps['onChangeCommitted']} */ (
       React.useCallback(
-        (e, newValues) => {
+        ({ type }, newValues) => {
           if (Array.isArray(newValues)) {
-            if (e.type === 'mousemove') {
+            if (type === 'mousemove') {
               setText(newValues)
               setTemp(newValues)
-            } else if (e.type === 'mouseup') {
-              handleChange(name, newValues, low, high)
+            } else if (type === 'mouseup') {
+              handleChange(name, newValues)
             }
           }
         },
-        [name, low, high, handleChange],
+        [name, handleChange],
       )
     )
   const handleTextInputChange =
     /** @type {import('@mui/material').TextFieldProps['onChange']} */ (
       React.useCallback(
-        (event) => {
-          const safeVal = +event.target.value || ''
-          const arrValues = /** @type {number[]} */ ([])
-          if (typeof safeVal === 'number') {
-            if (event.target.name === 'min') {
-              arrValues.push(safeVal < min ? min : safeVal, text[1])
+        ({ type, target }) => {
+          const existing = text.slice()
+          const newValue = +target.value || ''
+          const targetIndex = target.id === 'min' ? 0 : 1
+
+          if (newValue === '') {
+            if (type === 'blur') {
+              existing[targetIndex] = target.id === 'min' ? min : max
             } else {
-              arrValues.push(text[0], safeVal > max ? max : safeVal)
+              existing[targetIndex] = newValue
             }
-          }
-          if (safeVal === '') {
-            setText(arrValues)
+            setText(existing)
           } else {
-            setText(arrValues)
-            handleChange(event.target.name, arrValues, low, high)
+            existing[targetIndex] = newValue
+          }
+          if (type === 'blur') {
+            existing.sort((a, b) => (a === '' ? -1 : b === '' ? 1 : a - b))
+          }
+          setText(existing)
+          if (existing.every((x) => typeof x === 'number')) {
+            // annoying but TypeScript is rude for not liking my check above
+            // @ts-ignore
+            handleChange(name, existing)
           }
         },
-        [text, name, min, max, handleChange, low, high],
+        [text, min, max, handleChange],
       )
     )
 
@@ -107,15 +114,19 @@ export default function SliderTile({
     [min, max],
   )
   const marksMemo = React.useMemo(
-    () => marks?.map((value) => ({ value, label: t(`${markI18n}${value}`) })),
+    () =>
+      marks?.map((value) => ({
+        value,
+        label: t(`${markI18n}${value}`),
+      })),
     [marks, markI18n],
   )
 
   React.useEffect(() => {
-    const values = disabled || !filterValues ? [min, max] : filterValues
-    if (values.some((v, i) => v !== temp[i])) setTemp(values)
-    if (values.some((v, i) => v !== text[i])) setText(values)
-  }, [filterValues?.[0], filterValues?.[1], disabled, min, max])
+    const safe = disabled || !values ? [min, max] : values
+    if (safe.some((v, i) => v !== temp[i])) setTemp(values)
+    if (safe.some((v, i) => v !== text[i])) setText(values)
+  }, [values?.[0], values?.[1], disabled, min, max])
 
   if (!temp || !text) return null
   return (
@@ -144,6 +155,7 @@ export default function SliderTile({
               type="number"
               textColor={colorSx.sx.color}
               onChange={handleTextInputChange}
+              onBlur={handleTextInputChange}
               disabled={disabled}
               InputLabelProps={colorSx}
               InputProps={colorSx}
@@ -161,7 +173,7 @@ export default function SliderTile({
           onChange={handleSliderChange}
           onChangeCommitted={handleSliderChange}
           disabled={disabled}
-          valueLabelFormat={marks ? (e) => t(`${markI18n}${e}`) : undefined}
+          valueLabelFormat={marksMemo ? (e) => t(`${markI18n}${e}`) : undefined}
           step={step}
           marks={marksMemo}
         />

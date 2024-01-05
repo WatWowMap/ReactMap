@@ -132,9 +132,9 @@ export default function WithSliders({ category, context }) {
                 {Object.values(context.sliders[slider]).map((subItem) => (
                   <ListItem key={subItem.name} disablePadding>
                     <SliderTile
-                      filterSlide={subItem}
+                      slide={subItem}
                       handleChange={handleChange}
-                      filterValues={ivOr[subItem.name]}
+                      values={ivOr[subItem.name]}
                     />
                   </ListItem>
                 ))}

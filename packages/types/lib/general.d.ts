@@ -118,6 +118,4 @@ export interface RMSliderProps extends SliderProps {
 export type RMSliderHandleChange<N extends string = string> = (
   name: N,
   values: number | number[],
-  low?: number,
-  high?: number,
 ) => void

@@ -62,9 +62,9 @@ export default function TutSliders() {
           {slidersToUse.map((slider) => (
             <Grid item xs={12} key={slider.name}>
               <SliderTile
-                filterSlide={slider}
+                slide={slider}
                 handleChange={handleChange}
-                filterValues={temp[slider.name]}
+                values={temp[slider.name]}
               />
             </Grid>
           ))}
