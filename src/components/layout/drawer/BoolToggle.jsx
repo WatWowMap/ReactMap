@@ -19,7 +19,8 @@ import { fromSnakeCase } from '@services/functions/fromSnakeCase'
  *  children?: React.ReactNode,
  *  align?: import('@mui/material').TypographyProps['align']
  *  switchColor?: import('@mui/material').SwitchProps['color']
- * } & import('@mui/material').ListItemProps} BoolToggleProps
+ *  onChange?: import('@mui/material').SwitchProps['onChange']
+ * } & Omit<import('@mui/material').ListItemProps, 'onChange'>} BoolToggleProps
  */
 
 /** @param {BoolToggleProps} props */
@@ -30,14 +31,20 @@ export function BoolBase({
   children,
   align,
   switchColor,
+  onChange,
   ...props
 }) {
   const { t } = useTranslation()
   const [value, setValue] = useDeepStore(field, false)
-  const onChange =
-    /** @type {import('@mui/material').SwitchProps['onChange']} */ (
-      React.useCallback((_, checked) => setValue(checked), [field, setValue])
-    )
+
+  /** @type {import('@mui/material').SwitchProps['onChange']} */
+  const onChangeWrapper = React.useCallback(
+    (e, checked) => {
+      setValue(checked)
+      if (onChange) onChange(e, checked)
+    },
+    [field, setValue],
+  )
   return (
     <ListItem {...props}>
       {children}
@@ -46,7 +53,8 @@ export function BoolBase({
       </ListItemText>
       <Switch
         color={switchColor}
-        onChange={onChange}
+        name={label}
+        onChange={onChangeWrapper}
         checked={!!value}
         disabled={disabled}
       />
@@ -54,16 +62,19 @@ export function BoolBase({
   )
 }
 
-export const BoolToggle = React.memo(
-  BoolBase,
-  (prev, next) => prev.disabled === next.disabled && prev.field === next.field,
-)
+export const BoolToggle = React.memo(BoolBase)
 
-/** @param {{ items: readonly [string, string] } & BoolToggleProps} props */
-export function DualBoolToggle({ items, field, ...props }) {
+/** @param {{ items: readonly [string, string], secondColor?: BoolToggleProps['switchColor'] } & BoolToggleProps} props */
+export function DualBoolToggle({
+  items,
+  switchColor,
+  secondColor,
+  field,
+  ...props
+}) {
   return (
     <Grid2 container component={ListItem} disablePadding disableGutters>
-      {items.map((item) => (
+      {items.map((item, i) => (
         <Grid2 key={item} xs={6} component={List}>
           {item && (
             <BoolToggle
@@ -73,6 +84,7 @@ export function DualBoolToggle({ items, field, ...props }) {
               disablePadding
               disableGutters
               align="center"
+              switchColor={i ? secondColor || switchColor : switchColor}
               {...props}
             />
           )}

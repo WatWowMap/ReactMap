@@ -264,7 +264,7 @@ const BaseRouteSlider = () => {
   const [filters, setFilters] = useDeepStore('filters.routes.distance')
   const baseDistance = useStatic.getState().filters?.routes?.distance
 
-  /** @type {import('@rm/types').RMSliderProps} */
+  /** @type {import('@rm/types').RMSlider} */
   const slider = React.useMemo(() => {
     const min = baseDistance?.[0] || 0
     const max = baseDistance?.[1] || 25

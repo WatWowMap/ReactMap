@@ -30,6 +30,9 @@ export function useTranslateById() {
         } else if (id === 'showcase') {
           id = 'b9'
         }
+        if (id === 'global' || id === 'all') {
+          return i18n.t(id)
+        }
         switch (id.charAt(0)) {
           case 'b':
             // event stops

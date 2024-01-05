@@ -1,7 +1,7 @@
 import Utility from '@services/Utility'
 import { setDeep } from '@services/functions/setDeep'
 import dlv from 'dlv'
-import { useMemo } from 'react'
+import { useCallback, useMemo } from 'react'
 import { create } from 'zustand'
 import { persist, createJSONStorage } from 'zustand/middleware'
 
@@ -37,7 +37,9 @@ import { persist, createJSONStorage } from 'zustand/middleware'
  *   setPokemonFilterMode: (legacyFilter: boolean, easyMode: boolean) => void,
  *   getPokemonFilterMode: () => 'basic' | 'intermediate' | 'expert',
  * }} UseStore
+ *
  * @typedef {import('@rm/types').Paths<UseStore>} UseStorePaths
+ * @typedef {import('@rm/types').ConfigPathValue<UseStore, UseStorePaths>} UseStoreValues
  *
  * @type {import("zustand").UseBoundStore<import("zustand").StoreApi<UseStore>>}
  */
@@ -149,36 +151,53 @@ export const useStore = create(
     },
   ),
 )
-//  * @template {U extends string ? Value[U] : undefined} V
+
+/**
+ * @template {UseStorePaths} T
+ * @param {T} field
+ * @param {import('@rm/types').ConfigPathValue<UseStore, T>} [defaultValue]
+ * @returns {import('@rm/types').ConfigPathValue<UseStore, T>}
+ */
+export function useGetDeepStore(field, defaultValue) {
+  return useStore((s) => dlv(s, field, defaultValue))
+}
 
 /**
  * @template {UseStorePaths} Paths
  * @template {import('@rm/types').ConfigPathValue<UseStore, Paths>} T
  * @template {T | ((prevValue: T) => T) | keyof T} U
- * @param {Paths} field TODO: Remove `string` in long term
+ * @template {(arg1: U, ...rest: (U extends keyof T ? [arg2: T[U]] : [arg2?: never])) => void} SetDeep
+ * @param {Paths} field
  * @param {import('@rm/types').ConfigPathValue<UseStore, Paths>} [defaultValue]
- * @returns {[import('@rm/types').ConfigPathValue<UseStore, Paths>, (arg1: U, ...rest: (U extends keyof T ? [arg2: T[U]] : [arg2?: never])) => void]}
+ * @returns {[import('@rm/types').ConfigPathValue<UseStore, Paths>, SetDeep]}
  */
 export function useDeepStore(field, defaultValue) {
-  const value = useStore((s) => dlv(s, field, defaultValue))
-  return useMemo(
-    () => [
-      value,
+  const value = useGetDeepStore(field, defaultValue)
+
+  const callback = useCallback(
+    /** @type {SetDeep} */ (
       (...args) => {
         const [first, ...rest] = field.split('.')
         const corrected = rest.length ? rest.join('.') : first
         const key = typeof args[0] === 'string' && args[1] ? args[0] : ''
         const path = key ? `${corrected}.${key}` : corrected
-        const nextValue =
-          args.length === 1
-            ? typeof args[0] === 'function'
-              ? args[0](value)
-              : args[0]
-            : args[1]
         return useStore.setState((prev) => {
+          const nextValue =
+            args.length === 1
+              ? typeof args[0] === 'function'
+                ? args[0](dlv(prev, field, defaultValue))
+                : args[0]
+              : args[1]
           if (process.env.NODE_ENV === 'development' && prev.stateLogging) {
             // eslint-disable-next-line no-console
-            console.trace({ first, rest, corrected, key, path, nextValue })
+            console.trace(field, {
+              first,
+              rest,
+              corrected,
+              key,
+              path,
+              nextValue,
+            })
           }
           return {
             [first]:
@@ -187,10 +206,11 @@ export function useDeepStore(field, defaultValue) {
                 : setDeep(prev[first], path, nextValue),
           }
         })
-      },
-    ],
-    [value],
+      }
+    ),
+    [field, defaultValue],
   )
+  return useMemo(() => [value, callback], [value, callback])
 }
 
 /**

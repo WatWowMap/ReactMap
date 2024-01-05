@@ -5,7 +5,7 @@ const { Db } = require('../initialization')
 const nestFilters = config.getSafe('defaultFilters.nests')
 const leagues = config.getSafe('api.pvp.leagues')
 
-/** @typedef {import('@rm/types').RMSliderProps} Slider */
+/** @typedef {import('@rm/types').RMSlider} Slider */
 
 const SLIDERS =
   /** @type {{ pokemon: { primary: Slider[], secondary: Slider[] }, nests: { secondary: Slider[] } }} */ ({

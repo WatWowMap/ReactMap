@@ -23,11 +23,7 @@ const StyledSlider = styled(Slider)(() => ({ width: '100%' }))
 
 /**
  * @typedef {('' | number)[]} Value
- * @param {{
- *  slide: import('@rm/types').RMSliderProps,
- *  handleChange: import('@rm/types').RMSliderHandleChange,
- *  values: number[]
- * }} props
+ * @param {import('@rm/types').RMSliderProps} props
  */
 export default function SliderTile({
   slide: {

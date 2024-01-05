@@ -101,7 +101,7 @@ export type FullClientIcons = Omit<Config['icons'], 'styles'> & {
   styles: (Config['icons']['styles'][number] & { data: UICONS })[]
 }
 
-export interface RMSliderProps extends SliderProps {
+export interface RMSlider extends SliderProps {
   label?: string
   perm?: string
   step?: number
@@ -119,3 +119,9 @@ export type RMSliderHandleChange<N extends string = string> = (
   name: N,
   values: number | number[],
 ) => void
+
+export interface RMSliderProps {
+  slide: RMSlider
+  values: number[]
+  handleChange: RMSliderHandleChange
+}

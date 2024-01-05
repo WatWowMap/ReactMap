@@ -21,7 +21,7 @@ import Backup = require('server/src/models/Backup')
 import Nest = require('server/src/models/Nest')
 import NestSubmission = require('server/src/models/NestSubmission')
 import Pokestop = require('server/src/models/Pokestop')
-import { ModelReturn } from './utility'
+import { ModelReturn, OnlyType } from './utility'
 import { Profile } from 'passport-discord'
 import { User } from './models'
 
@@ -247,4 +247,4 @@ export type AllFilters = ReturnType<
 
 export type Categories = keyof AllFilters
 
-type PokemonFilter = AllFilters['pokemon']
+// type Keys = keyof OnlyType<PokemonFilter, number[]>

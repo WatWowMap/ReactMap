@@ -10,6 +10,7 @@ import Header from '@components/layout/general/Header'
 import Footer from '@components/layout/general/Footer'
 import { DualBoolToggle } from '@components/layout/drawer/BoolToggle'
 import { ADVANCED_ALL, FILTER_SIZES } from '@assets/constants'
+import { useTranslateById } from '@hooks/useTranslateById'
 
 import { StringFilter } from './StringFilter'
 import SliderTile from './SliderTile'
@@ -25,15 +26,13 @@ const STANDARD_BACKUP = /** @type {import('@rm/types/lib').BaseFilter} */ ({
 })
 
 /**
- *
  * @param {{
  *  id: string,
  *  category: 'pokemon' | 'gyms' | 'pokestops' | 'nests',
  *  open: boolean,
- *  setOpen: (open: boolean) => void
+ *  setOpen: React.Dispatch<React.SetStateAction<boolean>>,
  *  selectedIds?: string[]
  * }} props
- * @returns
  */
 export default function AdvancedFilter({
   id,
@@ -44,7 +43,7 @@ export default function AdvancedFilter({
 }) {
   Utility.analytics(`/${category}/${id}`)
   const { t } = useTranslation()
-
+  const { t: tId } = useTranslateById()
   const ui = useStatic((s) => s.ui[category])
   const isMobile = useStatic((s) => s.isMobile)
 
@@ -52,6 +51,7 @@ export default function AdvancedFilter({
     (s) => s.userSettings[category]?.legacyFilter || false,
   )
   const [filters, setFilters] = useDeepStore(`filters.${category}.filter.${id}`)
+  const backup = React.useRef(filters)
   const standard = useStore((s) =>
     category === 'pokemon' ? s.filters[category].standard : STANDARD_BACKUP,
   )
@@ -62,78 +62,91 @@ export default function AdvancedFilter({
     category,
   )
 
-  /**
-   * @template {keyof typeof filters} T
-   * @param {T} key
-   * @param {(typeof filters)[T]} values
-   * @returns
-   */
-  const handleChange = (key, values) => setFilters(key, values)
+  const handleChange = React.useCallback(
+    /**
+     * @template {keyof typeof filters} T
+     * @param {T} key
+     * @param {(typeof filters)[T]} values
+     */
+    (key, values) => {
+      setFilters((prev) => ({
+        ...prev,
+        [key]: values,
+        enabled: prev.enabled || (key !== 'enabled' && !filters.enabled),
+      }))
+    },
+    [setFilters],
+  )
 
-  const toggleClose =
-    (save = false) =>
-    () => {
-      setOpen(!open)
-      if (!save) {
-        setFilters({ ...standard })
-      } else if (id === 'global' && selectedIds?.length) {
-        const keys = new Set(selectedIds)
-        useStore.setState((prev) => ({
-          filters: {
-            ...prev.filters,
-            [category]: {
-              ...prev.filters[category],
-              filter: Object.fromEntries(
-                Object.entries(prev.filters[category].filter).map(
-                  ([key, oldFilter]) => [
-                    key,
-                    keys.has(key)
-                      ? {
-                          ...filters,
-                          enabled: true,
-                          all: prev.filters[category].easyMode,
-                        }
-                      : oldFilter,
-                  ],
-                ),
+  const toggleClose = (save = false) => {
+    setOpen((prev) => !prev)
+    if (!save) {
+      setFilters({ ...backup.current })
+    } else if (id === 'global' && selectedIds?.length) {
+      const keys = new Set(selectedIds)
+      useStore.setState((prev) => ({
+        filters: {
+          ...prev.filters,
+          [category]: {
+            ...prev.filters[category],
+            filter: Object.fromEntries(
+              Object.entries(prev.filters[category].filter).map(
+                ([key, oldFilter]) => [
+                  key,
+                  keys.has(key)
+                    ? {
+                        ...filters,
+                        enabled: true,
+                        all: prev.filters[category].easyMode,
+                      }
+                    : oldFilter,
+                ],
               ),
-            },
+            ),
           },
-        }))
-      }
+        },
+      }))
     }
+  }
 
-  const footerOptions =
-    /** @type {import('@components/layout/general/Footer').FooterButton[]} */ (
-      React.useMemo(
-        () => [
-          {
-            name: 'reset',
-            action: () => setFilters({ ...standard }),
-            color: 'primary',
-            size: category === 'pokemon' ? 2 : null,
-          },
-          {
-            name: 'save',
-            action: () => toggleClose(true)(),
-            color: 'secondary',
-            size: category === 'pokemon' ? 3 : null,
-          },
-        ],
-        [category, filters, id],
-      )
-    )
+  /** @type {import('@components/layout/general/Footer').FooterButton[]} */
+  const footerOptions = React.useMemo(
+    () => [
+      {
+        name: 'reset',
+        action: () => setFilters({ ...standard }),
+        color: 'primary',
+        size: category === 'pokemon' ? 2 : null,
+      },
+      {
+        name: 'save',
+        action: () => toggleClose(true),
+        color: 'secondary',
+        size: category === 'pokemon' ? 3 : null,
+      },
+    ],
+    [category, standard, id],
+  )
+
+  React.useLayoutEffect(() => {
+    if (open) backup.current = filters
+  }, [open])
 
   if (!id) return null
   return (
-    <Dialog open={open} onClose={toggleClose(false)} fullScreen={isMobile}>
+    <Dialog
+      open={open}
+      onClose={() => toggleClose(false)}
+      fullScreen={isMobile}
+    >
       <Header
         titles={[
           category === 'pokemon' || (!id.startsWith('l') && !id.startsWith('i'))
             ? t('advanced')
             : t('set_size'),
+          `- ${tId(id)}`,
         ]}
-        action={toggleClose(false)}
+        action={() => toggleClose(false)}
       />
       <DialogContent sx={{ mt: 3 }}>
         <List>
@@ -199,7 +212,17 @@ export default function AdvancedFilter({
                     <DualBoolToggle
                       items={ADVANCED_ALL}
                       field={`filters.${category}.filter.${id}`}
-                      switchColor="success"
+                      switchColor="secondary"
+                      secondColor="success"
+                      onChange={({ target }, checked) => {
+                        if (
+                          target.name === 'all' &&
+                          checked &&
+                          !filters.enabled
+                        ) {
+                          setFilters('enabled', true)
+                        }
+                      }}
                     />
                   </Grid2>
                 </Grid2>
