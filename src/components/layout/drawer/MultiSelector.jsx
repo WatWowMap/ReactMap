@@ -13,15 +13,22 @@ import { setDeep } from '@services/functions/setDeep'
  *  items: readonly (string | number)[],
  *  tKey?: string,
  *  allowNone?: boolean,
+ *  disabled?: boolean
  * }} props
  * @returns
  */
-export function MultiSelector({ field, items, tKey, allowNone = false }) {
+export function MultiSelector({
+  field,
+  disabled,
+  items,
+  tKey,
+  allowNone = false,
+}) {
   const { t } = useTranslation()
   const value = useStore((s) => dlv(s, field))
 
   return (
-    <ButtonGroup size="small" sx={{ mx: 'auto' }}>
+    <ButtonGroup disabled={disabled} size="small" sx={{ mx: 'auto' }}>
       {items.map((item) => (
         <Button
           key={item}
