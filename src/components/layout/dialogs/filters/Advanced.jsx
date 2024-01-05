@@ -8,10 +8,8 @@ import Utility from '@services/Utility'
 import { useStore, useStatic, useDeepStore } from '@hooks/useStore'
 import Header from '@components/layout/general/Header'
 import Footer from '@components/layout/general/Footer'
-import {
-  BoolToggle,
-  DualBoolToggle,
-} from '@components/layout/drawer/BoolToggle'
+import { DualBoolToggle } from '@components/layout/drawer/BoolToggle'
+import { ADVANCED_ALL, FILTER_SIZES } from '@assets/constants'
 
 import { StringFilter } from './StringFilter'
 import SliderTile from './SliderTile'
@@ -70,8 +68,7 @@ export default function AdvancedFilter({
    * @param {(typeof filters)[T]} values
    * @returns
    */
-  const handleChange = (key, values) =>
-    setFilters((prev) => ({ ...prev, [key]: values, all: false }))
+  const handleChange = (key, values) => setFilters(key, values)
 
   const toggleClose =
     (save = false) =>
@@ -159,7 +156,7 @@ export default function AdvancedFilter({
                             key={`${subCat}${each.name}`}
                             disableGutters
                             disablePadding
-                            sx={{ pr: i ? 0 : 2 }}
+                            sx={{ pr: { xs: 0, sm: i ? 0 : 2 } }}
                           >
                             <SliderTile
                               filterSlide={{
@@ -185,24 +182,24 @@ export default function AdvancedFilter({
                   <Grid2 component={List} xs={12} sm={6}>
                     <GenderListItem
                       field={`filters.${category}.filter.${id}`}
-                      disableGutters
                       disabled={filters.all}
+                      disableGutters
                     />
                     <Size
                       field={`filters.${category}.filter.${id}`}
-                      disabled={filters.all}
                       disableGutters
                     />
                   </Grid2>
                   <Grid2 component={List} xs={12} sm={6}>
                     <DualBoolToggle
-                      items={['xxs', 'xxl']}
+                      items={FILTER_SIZES}
                       field={`filters.${category}.filter.${id}`}
                       disabled={filters.all}
                     />
-                    <BoolToggle
-                      field={`filters.pokemon.filter.${id}.all`}
-                      label="all"
+                    <DualBoolToggle
+                      items={ADVANCED_ALL}
+                      field={`filters.${category}.filter.${id}`}
+                      switchColor="success"
                     />
                   </Grid2>
                 </Grid2>

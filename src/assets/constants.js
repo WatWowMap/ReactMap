@@ -35,3 +35,5 @@ export const WAYFARER_OPTIONS = /** @type {const} */ ([
 export const SPAWNPOINT_TTH = /** @type {const} */ ([0, 1, 2])
 
 export const SLIDER_LABELS = /** @type {const} */ (['min', 'max'])
+
+export const ADVANCED_ALL = /** @type {const} */ (['', 'all'])
