@@ -8,7 +8,7 @@ const { Event } = require('../../initialization')
  *
  * @param {import("@rm/types").Permissions} perms
  * @param {import("@rm/types").Config['defaultFilters']['pokestops']} defaults
- * @returns
+ * @returns {Record<string, BaseFilter>}
  */
 function buildPokestops(perms, defaults) {
   const quests = { s0: new BaseFilter() }

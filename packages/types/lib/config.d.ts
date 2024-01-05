@@ -163,7 +163,7 @@ export type DeepKeys<T, P extends string = ''> = {
     : never
 }[keyof T]
 
-export type ConfigPaths = DeepKeys<Config>
+export type ConfigPaths<T extends object> = DeepKeys<T>
 
 export type PathValue<T, P> = P extends `${infer K}.${infer Rest}`
   ? K extends keyof T
@@ -175,7 +175,10 @@ export type PathValue<T, P> = P extends `${infer K}.${infer Rest}`
   ? T[P]
   : never
 
-export type ConfigPathValue<P extends ConfigPaths> = PathValue<Config, P>
+export type ConfigPathValue<
+  T extends object,
+  P extends ConfigPaths<T>,
+> = PathValue<T, P>
 
 export type Join<K, P> = K extends string | number
   ? P extends string | number
@@ -223,4 +226,4 @@ export type NestedObjectPaths = Paths<Config>
 
 export type GetSafeConfig = <P extends NestedObjectPaths>(
   path: P,
-) => ConfigPathValue<P>
+) => ConfigPathValue<Config, P>

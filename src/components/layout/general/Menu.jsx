@@ -336,10 +336,12 @@ export default function Menu({
         fullScreen={isMobile && category === 'pokemon'}
       >
         <Advanced
-          advancedFilter={advancedFilter}
-          toggleAdvMenu={toggleAdvMenu}
-          type={category}
-          isMobile={isMobile}
+          // advancedFilter={advancedFilter}
+          id={advancedFilter.id}
+          category={category}
+          // toggleAdvMenu={toggleAdvMenu}
+          // type={category}
+          // isMobile={isMobile}
         />
       </Dialog>
       <Dialog open={slotsMenu.open} onClose={toggleSlotsMenu(false)}>

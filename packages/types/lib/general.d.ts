@@ -26,6 +26,7 @@ export type RMGeoJSON = {
 
 import masterfile = require('packages/masterfile/lib/data/masterfile.json')
 import { Config } from './config'
+import { SliderProps } from '@mui/material'
 
 export type Masterfile = typeof masterfile
 
@@ -99,3 +100,24 @@ export type UAssetsClient = Config['icons']['styles'][number] & { data: UICONS }
 export type FullClientIcons = Omit<Config['icons'], 'styles'> & {
   styles: (Config['icons']['styles'][number] & { data: UICONS })[]
 }
+
+export interface RMSliderProps extends SliderProps {
+  label?: string
+  perm?: string
+  step?: number
+  i18nKey?: string
+  disabled?: boolean
+  low?: number
+  high?: number
+  i18nKey?: string
+  markI18n?: string
+  noTextInput?: boolean
+  marks?: number[]
+}
+
+export type RMSliderHandleChange<N extends string = string> = (
+  name: N,
+  values: number | number[],
+  low?: number,
+  high?: number,
+) => void

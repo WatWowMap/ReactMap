@@ -6,10 +6,9 @@ const BaseFilter = require('../Base')
  *
  * @param {import("@rm/types").Permissions} perms
  * @param {import("@rm/types").Config['defaultFilters']['gyms']} defaults
- * @returns
  */
 function buildGyms(perms, defaults) {
-  const gymFilters = {}
+  const gymFilters = /** @type {Record<string, BaseFilter>} */ ({})
 
   if (perms.gyms) {
     Object.keys(Event.masterfile.teams).forEach((team, i) => {

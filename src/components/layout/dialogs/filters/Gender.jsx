@@ -1,34 +1,27 @@
+// @ts-check
 import * as React from 'react'
-import { Grid, Typography } from '@mui/material'
+import ListItem from '@mui/material/ListItem'
+import ListItemText from '@mui/material/ListItemText'
 import { useTranslation } from 'react-i18next'
 
-import MultiSelector from '@components/layout/drawer/MultiSelector'
+import { MultiSelector } from '@components/layout/drawer/MultiSelector'
+import { GENDERS } from '@assets/constants'
 
-export default function GenderFilter({ category, filter, setFilter }) {
+/**
+ *
+ * @param {{ field: string } & import('@mui/material').ListItemProps} props
+ * @returns
+ */
+export function GenderListItem({ field, ...props }) {
   const { t } = useTranslation()
-
   return (
-    <>
-      {category && (
-        <Grid item xs={2}>
-          <Typography>{t('gender')}</Typography>
-        </Grid>
-      )}
-      <Grid
-        item
-        xs={category ? 10 : 12}
-        sm={category ? undefined : 6}
-        style={{ textAlign: category ? 'right' : 'center' }}
-      >
-        <MultiSelector
-          category={category}
-          filterKey="gender"
-          items={[0, 1, 2, 3]}
-          tKey="gender_icon_"
-          filters={filter.gender}
-          setFilters={setFilter}
-        />
-      </Grid>
-    </>
+    <ListItem {...props}>
+      <ListItemText>{t('gender')}</ListItemText>
+      <MultiSelector
+        items={GENDERS}
+        tKey="gender_icon_"
+        field={`${field}.gender`}
+      />
+    </ListItem>
   )
 }

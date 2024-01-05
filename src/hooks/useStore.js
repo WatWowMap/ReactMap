@@ -1,4 +1,7 @@
 import Utility from '@services/Utility'
+import { setDeep } from '@services/functions/setDeep'
+import dlv from 'dlv'
+import { useMemo } from 'react'
 import { create } from 'zustand'
 import { persist, createJSONStorage } from 'zustand/middleware'
 
@@ -23,7 +26,7 @@ import { persist, createJSONStorage } from 'zustand/middleware'
  *   tutorial: boolean,
  *   searchTab: string,
  *   search: string,
- *   filters: object,
+ *   filters: import('@rm/types').AllFilters,
  *   icons: Record<string, string>
  *   audio: Record<string, string>
  *   userSettings: Record<string, any>
@@ -33,6 +36,8 @@ import { persist, createJSONStorage } from 'zustand/middleware'
  *   setPokemonFilterMode: (legacyFilter: boolean, easyMode: boolean) => void,
  *   getPokemonFilterMode: () => 'basic' | 'intermediate' | 'expert',
  * }} UseStore
+ * @typedef {import('@rm/types').Paths<UseStore>} UseStorePaths
+ *
  * @type {import("zustand").UseBoundStore<import("zustand").StoreApi<UseStore>>}
  */
 export const useStore = create(
@@ -143,6 +148,39 @@ export const useStore = create(
     },
   ),
 )
+//  * @template {U extends string ? Value[U] : undefined} V
+
+/**
+ * @template {UseStorePaths} Paths
+ * @template {import('@rm/types').ConfigPathValue<UseStore, Paths>} T
+ * @template {T | ((prevValue: T) => T) | keyof T} U
+ * @param {Paths} field TODO: Remove `string` in long term
+ * @param {import('@rm/types').ConfigPathValue<UseStore, Paths>} [defaultValue]
+ * @returns {[import('@rm/types').ConfigPathValue<UseStore, Paths>, (arg1: U, ...rest: (U extends keyof T ? [arg2: T[U]] : [arg2?: never])) => void]}
+ */
+export function useDeepStore(field, defaultValue) {
+  const value = useStore((s) => dlv(s, field, defaultValue))
+  return useMemo(
+    () => [
+      value,
+      (...args) => {
+        const first = field.split('.').at(0)
+        const path = field.split('.').slice(1).join('.')
+        const key = typeof args[0] === 'string' && args[1] ? `.${args[0]}` : ''
+        const nextValue =
+          args.length === 1
+            ? typeof args[0] === 'function'
+              ? args[0](value)
+              : args[0]
+            : args[1]
+        return useStore.setState((prev) => ({
+          [first]: setDeep(prev[first], `${path}${key}`, nextValue),
+        }))
+      },
+    ],
+    [value],
+  )
+}
 
 /**
  * TODO: Finish this
@@ -155,9 +193,9 @@ export const useStore = create(
  *   Icons: InstanceType<typeof import("../services/Icons").default>,
  *   Audio: InstanceType<typeof import("../services/Icons").default>,
  *   config: import('@rm/types').Config['map'],
- *   ui: object
+ *   ui: ReturnType<typeof import('server/src/services/ui/primary')>
  *   auth: { perms: Partial<import('@rm/types').Permissions>, loggedIn: boolean, methods: string[], strategy: import('@rm/types').Strategy | '' },
- *   filters: object,
+ *   filters: import('@rm/types').AllFilters,
  *   masterfile: import('@rm/types').Masterfile
  *   polling: Record<string, number>
  *   gymValidDataLimit: number
@@ -180,12 +218,14 @@ export const useStore = create(
  *     pokemon: string[],
  *     pokestops: string[],
  *     nests: string[],
+ *     questConditions: Record<string, { title: string, target?: number }[]>,
  *   }
  *   manualParams: {
  *     category: string,
  *     id: number | string,
  *  },
  * }} UseStatic
+ *
  * @type {import("zustand").UseBoundStore<import("zustand").StoreApi<UseStatic>>}
  */
 export const useStatic = create((set) => ({

@@ -1,9 +1,19 @@
-import React from 'react'
+// @ts-check
+import * as React from 'react'
 import Clear from '@mui/icons-material/Clear'
 import { IconButton, DialogTitle } from '@mui/material'
 
 import { Trans, useTranslation } from 'react-i18next'
 
+/**
+ *
+ * @param {{
+ *  names?: string[],
+ *  titles: string[],
+ *  action?: () => void,
+ * }} props
+ * @returns
+ */
 export default function Header({ names = [], titles, action }) {
   const { t } = useTranslation()
 

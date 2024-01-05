@@ -235,3 +235,16 @@ export type DiscordVerifyFunction = (
   profile: Profile,
   done: VerifyCallback,
 ) => void
+
+export type BaseFilter = import('server/src/services/filters/Base')
+
+export type PokemonFilter =
+  import('server/src/services/filters/pokemon/Frontend')
+
+export type AllFilters = ReturnType<
+  typeof import('server/src/services/filters/builder/base')
+>
+
+export type Categories = keyof AllFilters
+
+type PokemonFilter = AllFilters['pokemon']

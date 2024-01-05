@@ -1,9 +1,8 @@
+// @ts-check
 /* eslint-disable react/no-unstable-nested-components */
-import React, { useEffect, useState, Fragment } from 'react'
+import * as React from 'react'
 import {
-  Grid,
   Typography,
-  Switch,
   AppBar,
   Tab,
   Tabs,
@@ -12,7 +11,6 @@ import {
   ListItemText,
   Box,
   IconButton,
-  Dialog,
   ButtonGroup,
   Collapse,
   Tooltip,
@@ -30,29 +28,26 @@ import TuneIcon from '@mui/icons-material/Tune'
 import CheckIcon from '@mui/icons-material/Check'
 import ClearIcon from '@mui/icons-material/Clear'
 
-import { useStatic, useStore } from '@hooks/useStore'
+import { useDeepStore, useStatic, useStore } from '@hooks/useStore'
 import Utility from '@services/Utility'
-import StringFilter from '../dialogs/filters/StringFilter'
+import { FILTER_SIZES, IV_OVERRIDES } from '@assets/constants'
+
+import { StringFilterMemo } from '../dialogs/filters/StringFilter'
 import SliderTile from '../dialogs/filters/SliderTile'
 import TabPanel from '../general/TabPanel'
-import MultiSelector from './MultiSelector'
 import AdvancedFilter from '../dialogs/filters/Advanced'
-import BoolToggle from './BoolToggle'
-import { ItemSearch } from './ItemSearch'
+import { BoolToggle, DualBoolToggle } from './BoolToggle'
+import { ItemSearchMemo } from './ItemSearch'
+import { GenderListItem } from '../dialogs/filters/Gender'
 
 function AvailableSelector() {
   const available = useStatic((s) => s.available.pokemon)
   const { t } = useTranslation()
   const Icons = useStatic((s) => s.Icons)
   const filters = useStore((s) => s.filters.pokemon)
-  const isMobile = useStatic((s) => s.isMobile)
   const search = useStore((s) => s.searches.pokemonQuickSelect || '')
 
-  const [advanced, setAdvanced] = React.useState({
-    id: '0',
-    standard: filters.standard,
-    tempFilters: filters.standard,
-  })
+  const [advanced, setAdvanced] = React.useState('global')
   const [open, setOpen] = React.useState(false)
 
   const items = React.useMemo(() => {
@@ -92,51 +87,7 @@ function AvailableSelector() {
     search,
   ])
 
-  const onClose = (e, id, filter) => () => {
-    if (e !== undefined) {
-      const keys = new Set(items.map((item) => item.key))
-      useStore.setState((prev) => ({
-        filters: {
-          ...prev.filters,
-          pokemon: {
-            ...prev.filters.pokemon,
-            filter:
-              id === 'global'
-                ? Object.fromEntries(
-                    Object.entries(prev.filters.pokemon.filter).map(
-                      ([key, oldFilter]) => [
-                        key,
-                        keys.has(key)
-                          ? {
-                              ...filter,
-                              enabled: true,
-                              all: prev.filters.pokemon.easyMode,
-                            }
-                          : oldFilter,
-                      ],
-                    ),
-                  )
-                : {
-                    ...prev.filters.pokemon.filter,
-                    [id]: {
-                      ...filter,
-                      enabled: true,
-                      all: prev.filters.pokemon.easyMode,
-                    },
-                  },
-          },
-        },
-      }))
-    }
-    setAdvanced(filters.standard)
-    setOpen(false)
-    if (id === 'global') setAll('advanced')
-  }
-
-  /**
-   *
-   * @param {'enable' | 'disable' | 'advanced'} action
-   */
+  /** @param {'enable' | 'disable' | 'advanced'} action */
   const setAll = (action) => {
     const keys = new Set(items.map((item) => item.key))
     useStore.setState((prev) => ({
@@ -158,7 +109,7 @@ function AvailableSelector() {
 
   return (
     <List>
-      <ItemSearch field="searches.pokemonQuickSelect" />
+      <ItemSearchMemo field="searches.pokemonQuickSelect" />
       <BoolToggle
         field="filters.pokemon.onlyShowAvailable"
         label="only_show_available"
@@ -173,11 +124,7 @@ function AvailableSelector() {
             <IconButton
               color="info"
               onClick={() => {
-                setAdvanced((prev) => ({
-                  ...prev,
-                  id: 'global',
-                  tempFilters: filters.filter.global,
-                }))
+                setAdvanced('global')
                 setOpen(true)
               }}
             >
@@ -212,8 +159,7 @@ function AvailableSelector() {
               justifyContent="center"
               alignItems="center"
               position="relative"
-              outline="ButtonText 1px solid"
-              sx={{ aspectRatio: '1/1' }}
+              sx={{ aspectRatio: '1/1', outline: 'ButtonText 1px solid' }}
               onClick={() => {
                 const filter = { ...filters.filter[item.key] }
                 if (filter.all) {
@@ -265,11 +211,7 @@ function AvailableSelector() {
                   sx={{ position: 'absolute', right: 0, top: 0 }}
                   onClick={(e) => {
                     e.stopPropagation()
-                    setAdvanced((prev) => ({
-                      ...prev,
-                      id: item.key,
-                      tempFilters: filters.filter[item.key],
-                    }))
+                    setAdvanced(item.key)
                     setOpen(true)
                   }}
                 >
@@ -281,14 +223,12 @@ function AvailableSelector() {
         }}
       />
       {!filters.easyMode && (
-        <Dialog open={open} onClose={onClose()} fullScreen={isMobile}>
-          <AdvancedFilter
-            advancedFilter={advanced}
-            toggleAdvMenu={onClose}
-            type="pokemon"
-            isMobile={isMobile}
-          />
-        </Dialog>
+        <AdvancedFilter
+          id={advanced}
+          category="pokemon"
+          open={open}
+          setOpen={setOpen}
+        />
       )}
     </List>
   )
@@ -298,49 +238,24 @@ const MemoAvailableSelector = React.memo(AvailableSelector, () => true)
 
 export default function WithSliders({ category, context }) {
   const userSettings = useStore((s) => s.userSettings[category])
-  const filters = useStore((s) => s.filters)
   const filterMode = useStore((s) => s.getPokemonFilterMode())
-  const { setFilters } = useStore.getState()
-
+  const [ivOr, setIvOr] = useDeepStore('filters.pokemon.ivOr')
   const { t } = useTranslation()
-  const [tempLegacy, setTempLegacy] = useState(filters[category].ivOr)
-  const [openTab, setOpenTab] = useState(0)
+  const [openTab, setOpenTab] = React.useState(0)
+
   const selectRef = React.useRef(/** @type {HTMLDivElement | null} */ (null))
 
-  useEffect(() => {
-    setFilters({
-      ...filters,
-      [category]: {
-        ...filters[category],
-        ivOr: tempLegacy,
-      },
-    })
-  }, [tempLegacy])
-
-  const handleChange = (event, values) => {
-    if (values) {
-      setTempLegacy({
-        ...tempLegacy,
-        [event]: values,
-      })
-      Utility.analytics(
-        'Global Pokemon',
-        `${event}: ${values}`,
-        `${category} Text`,
-      )
-    } else {
-      const { name, value } = event.target
-      setTempLegacy({
-        ...tempLegacy,
-        [name]: value,
-      })
-      Utility.analytics(
-        'Global Pokemon',
-        `${name}: ${value}`,
-        `${category} Sliders`,
-      )
+  /** @type {import('@rm/types').RMSliderHandleChange<keyof import('@rm/types').PokemonFilter>} */
+  const handleChange = React.useCallback((name, values) => {
+    if (name in ivOr) {
+      setIvOr(name, values)
     }
-  }
+    Utility.analytics(
+      'Global Pokemon',
+      `${name}: ${values}`,
+      `${category} Text`,
+    )
+  }, [])
 
   const handleTabChange = (_e, newValue) => setOpenTab(newValue)
 
@@ -408,12 +323,7 @@ export default function WithSliders({ category, context }) {
         />
       </Collapse>
       {userSettings.legacyFilter && context.legacy ? (
-        <ListItem>
-          <StringFilter
-            filterValues={tempLegacy}
-            setFilterValues={setTempLegacy}
-          />
-        </ListItem>
+        <StringFilterMemo field="filters.pokemon.ivOr" />
       ) : (
         <>
           <AppBar position="static">
@@ -431,98 +341,30 @@ export default function WithSliders({ category, context }) {
                     <SliderTile
                       filterSlide={subItem}
                       handleChange={handleChange}
-                      filterValues={filters[category].ivOr}
+                      filterValues={ivOr[subItem.name]}
                     />
                   </ListItem>
                 ))}
                 {index ? (
-                  <ListItem disablePadding>
-                    <Grid container alignItems="center">
-                      {['xxs', 'xxl'].map((each, i) => (
-                        <Fragment key={each}>
-                          <Grid item xs={3}>
-                            <Typography variant="subtitle2" align="center">
-                              {t(i ? 'size_5' : 'size_1')}
-                            </Typography>
-                          </Grid>
-                          <Grid item xs={3}>
-                            <Switch
-                              color="primary"
-                              checked={filters[category].ivOr[each]}
-                              onChange={() => {
-                                setFilters({
-                                  ...filters,
-                                  [category]: {
-                                    ...filters[category],
-                                    ivOr: {
-                                      ...filters[category].ivOr,
-                                      [each]: !filters[category].ivOr[each],
-                                    },
-                                  },
-                                })
-                              }}
-                            />
-                          </Grid>
-                        </Fragment>
-                      ))}
-                    </Grid>
-                  </ListItem>
+                  <DualBoolToggle
+                    items={FILTER_SIZES}
+                    field="filters.pokemon.ivOr"
+                  />
                 ) : (
                   <>
-                    <ListItem disablePadding sx={{ pt: 1 }}>
-                      <ListItemText primary={t('gender')} />
-                      <MultiSelector
-                        filterKey="gender"
-                        items={[0, 1, 2, 3]}
-                        tKey="gender_icon_"
-                        filters={filters[category].ivOr.gender}
-                        setFilters={(newValue) =>
-                          setFilters({
-                            ...filters,
-                            [category]: {
-                              ...filters[category],
-                              ivOr: {
-                                ...filters[category].ivOr,
-                                gender: newValue,
-                              },
-                            },
-                          })
-                        }
-                      />
-                    </ListItem>
+                    <GenderListItem
+                      disablePadding
+                      field="filters.pokemon.ivOr"
+                      sx={{ pt: 1 }}
+                    />
                     <Divider sx={{ mt: 2, mb: 1 }} />
                     <ListSubheader disableGutters>
                       {t('quick_select')}
                     </ListSubheader>
-                    <ListItem disablePadding>
-                      <Grid container alignItems="center">
-                        {['zeroIv', 'hundoIv'].map((each) => (
-                          <Fragment key={each}>
-                            <Grid item xs={3}>
-                              <Typography noWrap>
-                                {t(Utility.camelToSnake(each))}
-                              </Typography>
-                            </Grid>
-                            <Grid item xs={3}>
-                              <Switch
-                                color="primary"
-                                disabled={!context[each]}
-                                checked={filters[category][each]}
-                                onChange={() => {
-                                  setFilters({
-                                    ...filters,
-                                    [category]: {
-                                      ...filters[category],
-                                      [each]: !filters[category][each],
-                                    },
-                                  })
-                                }}
-                              />
-                            </Grid>
-                          </Fragment>
-                        ))}
-                      </Grid>
-                    </ListItem>
+                    <DualBoolToggle
+                      field="filters.pokemon"
+                      items={IV_OVERRIDES}
+                    />
                   </>
                 )}
               </List>

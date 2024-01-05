@@ -34,7 +34,7 @@ import {
 } from '@services/desktopNotification'
 
 import DrawerActions from './Actions'
-import BoolToggle from './BoolToggle'
+import { BoolToggle } from './BoolToggle'
 import LocaleSelection from '../general/LocaleSelection'
 
 function FCSelect({ name, label, value, onChange, children, icon }) {
@@ -168,7 +168,7 @@ export default function Settings() {
         </ListItemIcon>
         <LocaleSelection />
       </ListItem>
-      <BoolToggle field="darkMode" label="dark_mode">
+      <BoolToggle field="darkMode">
         <ListItemIcon>
           <Brightness7Icon />
         </ListItemIcon>
@@ -212,7 +212,7 @@ export default function Settings() {
         </BoolToggle>
       ))}
       {process.env.NODE_ENV === 'development' && (
-        <BoolToggle field="profiling" label={t('profiling')}>
+        <BoolToggle field="profiling">
           <ListItemIcon>
             <InsightsIcon />
           </ListItemIcon>

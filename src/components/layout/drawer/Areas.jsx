@@ -23,7 +23,7 @@ import { useStatic, useStore } from '@hooks/useStore'
 import AreaTile from './AreaTile'
 import { ItemSearch } from './ItemSearch'
 
-export default function AreaDropDown() {
+function AreaDropDown() {
   const { data, loading, error } = useQuery(Query.scanAreasMenu())
   const { t } = useTranslation()
   const filters = useStore((s) => s.filters)
@@ -167,3 +167,5 @@ export default function AreaDropDown() {
     </>
   )
 }
+
+export default React.memo(AreaDropDown)

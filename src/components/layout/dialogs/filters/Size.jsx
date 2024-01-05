@@ -1,30 +1,22 @@
-import React from 'react'
-import { ButtonGroup, Button } from '@mui/material'
+// @ts-check
+import * as React from 'react'
+import ListItem from '@mui/material/ListItem'
+import ListItemText from '@mui/material/ListItemText'
 import { useTranslation } from 'react-i18next'
 
-export default function Size({ filterValues, handleChange, btnSize }) {
-  const sizes = ['sm', 'md', 'lg', 'xl']
+import { MultiSelector } from '@components/layout/drawer/MultiSelector'
+import { ICON_SIZES } from '@assets/constants'
+
+/**
+ * @param {{ field: string } & import('@mui/material/ListItem').ListItemProps} props
+ */
+export default function Size({ field, ...props }) {
   const { t } = useTranslation()
 
   return (
-    <ButtonGroup>
-      {sizes.map((size) => {
-        const color =
-          (filterValues.size || 'md') === size ? 'primary' : 'secondary'
-        return (
-          <Button
-            key={size}
-            onClick={() => handleChange('size', size)}
-            color={color}
-            variant={
-              (filterValues.size || 'md') === size ? 'contained' : 'outlined'
-            }
-            size={btnSize}
-          >
-            {t(size)}
-          </Button>
-        )
-      })}
-    </ButtonGroup>
+    <ListItem {...props}>
+      <ListItemText sx={{ pr: 2 }}>{t('icon_size')}</ListItemText>
+      <MultiSelector items={ICON_SIZES} field={`${field}.size`} />
+    </ListItem>
   )
 }

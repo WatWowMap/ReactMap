@@ -38,11 +38,6 @@ export default function DrawerSection({ category, value }) {
     <Accordion
       expanded={sidebar === category}
       onChange={handleChange(category)}
-      TransitionProps={{
-        unmountOnExit:
-          category !== 'pokemon' &&
-          (sidebar === 'scanAreas' ? true : category === 'scanAreas'),
-      }}
     >
       <AccordionSummary expandIcon={<ExpandMoreIcon />}>
         <Typography>{t(Utility.camelToSnake(category))}</Typography>
@@ -54,10 +49,10 @@ export default function DrawerSection({ category, value }) {
           ) : category === 'settings' ? (
             <SettingsMenu />
           ) : (
-            Object.entries(value).map(([subItem, subValue]) => (
+            Object.keys(value).map((subItem) => (
               <React.Fragment key={`${category}-${subItem}`}>
                 <ItemToggle category={category} subItem={subItem} />
-                <Extras category={category} subItem={subItem} data={subValue} />
+                <Extras category={category} subItem={subItem} />
               </React.Fragment>
             ))
           )}

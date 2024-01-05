@@ -529,7 +529,7 @@ export default function WebhookAdvanced({
             <SliderTile
               filterSlide={option}
               handleChange={handleSlider}
-              filterValues={filterValues}
+              filterValues={filterValues[option.name]}
             />
           </Grid>
         ))

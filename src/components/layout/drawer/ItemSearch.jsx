@@ -1,14 +1,12 @@
 // @ts-check
 import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 import ListItem from '@mui/material/ListItem'
 import TextField from '@mui/material/TextField'
 import IconButton from '@mui/material/IconButton'
 import HighlightOffIcon from '@mui/icons-material/HighlightOff'
-import { useTranslation } from 'react-i18next'
-import dlv from 'dlv'
 
-import { useStore } from '@hooks/useStore'
-import { setDeep } from '@services/functions/setDeep'
+import { useDeepStore } from '@hooks/useStore'
 
 /**
  * @param {{
@@ -20,7 +18,24 @@ import { setDeep } from '@services/functions/setDeep'
  */
 export function ItemSearch({ field, label = 'search', disabled }) {
   const { t } = useTranslation()
-  const value = useStore((s) => dlv(s, field))
+  const [value, setValue] = useDeepStore(field, '')
+
+  const InputProps = React.useMemo(
+    () => ({
+      endAdornment: (
+        <IconButton size="small" disabled={!value} onClick={() => setValue('')}>
+          <HighlightOffIcon fontSize="small" />
+        </IconButton>
+      ),
+    }),
+    [value, setValue],
+  )
+
+  /** @type {import('@mui/material').TextFieldProps['onChange']} */
+  const onChange = React.useCallback(
+    (e) => setValue(e.target.value || ''),
+    [setValue],
+  )
 
   return (
     <ListItem>
@@ -30,26 +45,18 @@ export function ItemSearch({ field, label = 'search', disabled }) {
         fullWidth
         size="small"
         disabled={disabled}
-        value={value || ''}
-        onChange={(e) =>
-          useStore.setState((prev) =>
-            setDeep(prev, field, e.target.value || ''),
-          )
-        }
-        InputProps={{
-          endAdornment: (
-            <IconButton
-              size="small"
-              disabled={!value}
-              onClick={() =>
-                useStore.setState((prev) => setDeep(prev, field, ''))
-              }
-            >
-              <HighlightOffIcon fontSize="small" />
-            </IconButton>
-          ),
-        }}
+        value={value}
+        onChange={onChange}
+        InputProps={InputProps}
       />
     </ListItem>
   )
 }
+
+export const ItemSearchMemo = React.memo(
+  ItemSearch,
+  (prev, next) =>
+    prev.disabled === next.disabled &&
+    prev.field === next.field &&
+    prev.label === next.label,
+)

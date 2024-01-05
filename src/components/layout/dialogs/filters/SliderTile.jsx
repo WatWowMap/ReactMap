@@ -1,8 +1,33 @@
+// @ts-check
 /* eslint-disable react/jsx-no-duplicate-props */
-import React, { useState, useEffect } from 'react'
-import { Grid, Typography, Slider, TextField } from '@mui/material'
+import * as React from 'react'
+import Grid2 from '@mui/material/Unstable_Grid2/Grid2'
+import TextField from '@mui/material/TextField'
+import Slider from '@mui/material/Slider'
+import { styled } from '@mui/material/styles'
 import { useTranslation } from 'react-i18next'
+import { ToggleTypography } from '@components/layout/general/ToggleTypography'
+import { SLIDER_LABELS } from '@assets/constants'
 
+const StyledTextField =
+  /** @type {React.FC<import('@mui/material').TextFieldProps & { textColor: string }>} */ (
+    styled(TextField, { shouldForwardProp: (prop) => prop !== 'textColor' })(
+      // @ts-ignore
+      ({ textColor }) => ({
+        width: 80,
+        color: textColor,
+      }),
+    )
+  )
+const StyledSlider = styled(Slider)(() => ({ width: '100%' }))
+
+/**
+ * @param {{
+ *  filterSlide: import('@rm/types').RMSliderProps,
+ *  handleChange: import('@rm/types').RMSliderHandleChange,
+ *  filterValues: number[]
+ * }} props
+ */
 export default function SliderTile({
   filterSlide: {
     name,
@@ -22,127 +47,125 @@ export default function SliderTile({
   handleChange,
   filterValues,
 }) {
-  const values = disabled ? [min, max] : filterValues[name]
   const { t } = useTranslation()
-  const [tempValues, setTempValues] = useState(values)
-  const [tempTextValues, setTempTextValues] = useState(values)
-  const [fullName, setFullName] = useState(true)
+  const [temp, setTemp] = React.useState(filterValues || [])
+  const [text, setText] = React.useState(filterValues || [])
 
-  useEffect(() => {
-    setTempValues(values)
-    setTempTextValues(values)
-  }, [filterValues])
+  // console.log({ name, filterValues, min, max })
+  const handleSliderChange =
+    /** @type {import('@mui/material').SliderProps['onChangeCommitted']} */ (
+      React.useCallback(
+        (e, newValues) => {
+          if (Array.isArray(newValues)) {
+            if (e.type === 'mousemove') {
+              setText(newValues)
+              setTemp(newValues)
+            } else if (e.type === 'mouseup') {
+              handleChange(name, newValues, low, high)
+            }
+          }
+        },
+        [name, low, high, handleChange],
+      )
+    )
+  const handleTextInputChange =
+    /** @type {import('@mui/material').TextFieldProps['onChange']} */ (
+      React.useCallback(
+        (event) => {
+          const safeVal = +event.target.value || ''
+          const arrValues = /** @type {number[]} */ ([])
+          if (typeof safeVal === 'number') {
+            if (event.target.name === 'min') {
+              arrValues.push(safeVal < min ? min : safeVal, text[1])
+            } else {
+              arrValues.push(text[0], safeVal > max ? max : safeVal)
+            }
+          }
+          if (safeVal === '') {
+            setText(arrValues)
+          } else {
+            setText(arrValues)
+            handleChange(event.target.name, arrValues, low, high)
+          }
+        },
+        [text, name, min, max, handleChange, low, high],
+      )
+    )
 
-  const handleTempChange = (event, newValues) => {
-    if (newValues) {
-      setTempTextValues(newValues)
-      setTempValues(newValues)
-    } else {
-      const { id, value } = event.target
-      let safeVal = parseInt(value)
-      if (safeVal === undefined || Number.isNaN(safeVal)) {
-        safeVal = ''
-      }
-      const arrValues = []
-      if (id === 'min') {
-        safeVal = safeVal < min ? min : safeVal
-        arrValues.push(safeVal, values[1])
-      } else {
-        safeVal = safeVal > max ? max : safeVal
-        arrValues.push(values[0], safeVal)
-      }
-      if (safeVal === '') {
-        setTempTextValues(arrValues)
-      } else {
-        setTempTextValues(arrValues)
-        handleChange(name, arrValues, low, high)
-      }
-    }
-  }
+  const colorSx = React.useMemo(
+    () => ({
+      sx: {
+        color:
+          (temp && temp[0] === min && temp[1] === max) || disabled
+            ? 'text.disabled'
+            : 'inherit',
+      },
+    }),
+    [temp, min, max, disabled],
+  )
+  const inputProps = React.useMemo(
+    () => ({ min, max, autoFocus: false }),
+    [min, max],
+  )
+  const marksMemo = React.useMemo(
+    () => marks?.map((value) => ({ value, label: t(`${markI18n}${value}`) })),
+    [marks, markI18n],
+  )
 
-  if (!tempValues) return null
+  React.useEffect(() => {
+    const values = disabled || !filterValues ? [min, max] : filterValues
+    if (values.some((v, i) => v !== temp[i])) setTemp(values)
+    if (values.some((v, i) => v !== text[i])) setText(values)
+  }, [filterValues?.[0], filterValues?.[1], disabled, min, max])
 
-  const textColor =
-    (tempValues && tempValues[0] === min && tempValues[1] === max) || disabled
-      ? 'text.disabled'
-      : 'inherit'
-
-  const translated = t(i18nKey || `slider_${name}`)
-
+  if (!temp || !text) return null
   return (
-    <Grid
+    <Grid2
       container
-      direction="row"
       justifyContent="center"
       alignItems="center"
       minWidth={Math.min(window.innerWidth, 260)}
     >
-      <Grid item xs={noTextInput ? 12 : 4}>
-        <Typography
-          noWrap={fullName}
-          onClick={() => setFullName(!fullName)}
-          color={textColor}
-        >
-          {translated}
-        </Typography>
-      </Grid>
-      {(noTextInput ? [] : ['min', 'max']).map((each, index) => (
-        <Grid
-          item
-          xs={4}
-          key={`${name}-${each}`}
-          style={{ textAlign: index ? 'center' : 'right' }}
-        >
-          <TextField
-            sx={{ width: 80, color: textColor }}
-            id={each}
-            label={`${t(each)} ${label ? t(label) : ''}`}
-            name={name}
-            value={tempTextValues[index]}
-            onChange={handleTempChange}
-            variant="outlined"
-            size="small"
-            type="number"
-            disabled={disabled}
-            InputLabelProps={{
-              sx: { color: textColor },
-            }}
-            InputProps={{
-              sx: { color: textColor },
-            }}
-            inputProps={{
-              min,
-              max,
-              autoFocus: false,
-            }}
-          />
-        </Grid>
-      ))}
-      <Grid item xs={11} style={{ textAlign: 'center' }}>
-        <Slider
+      <Grid2 xs={noTextInput ? 12 : 4}>
+        <ToggleTypography color={colorSx.sx.color} lineHeight={1.2}>
+          {t(i18nKey || `slider_${name}`)}
+        </ToggleTypography>
+      </Grid2>
+      {!noTextInput &&
+        SLIDER_LABELS.map((each, index) => (
+          <Grid2 key={each} xs={4} textAlign={index ? 'center' : 'right'}>
+            <StyledTextField
+              id={each}
+              name={name}
+              label={`${t(each)} ${label ? t(label) : ''}`}
+              value={text[index]}
+              variant="outlined"
+              size="small"
+              type="number"
+              textColor={colorSx.sx.color}
+              onChange={handleTextInputChange}
+              disabled={disabled}
+              InputLabelProps={colorSx}
+              InputProps={colorSx}
+              inputProps={inputProps}
+            />
+          </Grid2>
+        ))}
+      <Grid2 xs={11} textAlign="center">
+        <StyledSlider
           name={name}
           min={min}
           max={max}
           color={color}
-          style={{ width: '100%' }}
-          value={tempValues}
-          onChange={handleTempChange}
-          onChangeCommitted={(_, newValues) => {
-            handleChange(name, newValues, low, high)
-          }}
+          value={temp}
+          onChange={handleSliderChange}
+          onChangeCommitted={handleSliderChange}
           disabled={disabled}
           valueLabelFormat={marks ? (e) => t(`${markI18n}${e}`) : undefined}
           step={step}
-          marks={
-            marks
-              ? marks.map((each) => ({
-                  value: each,
-                  label: t(`${markI18n}${each}`),
-                }))
-              : undefined
-          }
+          marks={marksMemo}
         />
-      </Grid>
-    </Grid>
+      </Grid2>
+    </Grid2>
   )
 }

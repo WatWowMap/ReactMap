@@ -64,7 +64,7 @@ export default function TutSliders() {
               <SliderTile
                 filterSlide={slider}
                 handleChange={handleChange}
-                filterValues={temp}
+                filterValues={temp[slider.name]}
               />
             </Grid>
           ))}
