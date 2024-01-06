@@ -5,7 +5,7 @@ import Typography from '@mui/material/Typography'
 
 /**
  * @typedef {React.ImgHTMLAttributes<HTMLImageElement>} ImgProps
- * @typedef {{ maxHeight: React.CSSProperties['maxHeight'], maxWidth: React.CSSProperties['maxWidth'], sx?: import('@mui/material').SxProps }} ExtraProps
+ * @typedef {{ maxHeight?: React.CSSProperties['maxHeight'], maxWidth?: React.CSSProperties['maxWidth'], sx?: import('@mui/material').SxProps, zIndex?: React.CSSProperties['zIndex'] }} ExtraProps
  * @typedef {ImgProps & Partial<ExtraProps>} Props
  */
 
@@ -13,10 +13,12 @@ import Typography from '@mui/material/Typography'
  * @type {React.FC<Props>}
  */
 export const Img = styled('img', {
-  shouldForwardProp: (prop) => prop !== 'maxWidth' && prop !== 'maxHeight',
-})((/** @type {Props} */ { maxWidth, maxHeight }) => ({
+  shouldForwardProp: (prop) =>
+    prop !== 'maxWidth' && prop !== 'maxHeight' && prop !== 'zIndex',
+})((/** @type {Props} */ { maxWidth, maxHeight, zIndex }) => ({
   maxWidth,
   maxHeight,
+  zIndex,
 }))
 
 /**

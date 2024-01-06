@@ -14,6 +14,7 @@ import {
   Divider,
   Button,
   Dialog,
+  Box,
 } from '@mui/material'
 
 import { useTranslation } from 'react-i18next'
@@ -21,14 +22,13 @@ import { useTranslation } from 'react-i18next'
 import Utility from '@services/Utility'
 import { useStatic } from '@hooks/useStore'
 
-import ReactWindow from '@components/layout/general/ReactWindow'
-import Tile from '../filters/MenuTile'
+import { VirtualGrid } from '@components/layout/general/VirtualGrid'
+import { SelectorItem } from '@components/layout/drawer/SelectorItem'
 import SlotSelection from '../filters/SlotSelection'
 import data from './data'
 
 export default function TutAdvanced({ toggleHelp, category }) {
   const { t } = useTranslation()
-  const Icons = useStatic((s) => s.Icons)
   const isMobile = useStatic((s) => s.isMobile)
 
   const [isPokemon, setIsPokemon] = useState(category === 'pokemon')
@@ -44,8 +44,6 @@ export default function TutAdvanced({ toggleHelp, category }) {
     open: false,
     id: 0,
   })
-
-  const columnCount = isMobile ? 1 : 2
 
   const toggleSlotsMenu = (open, id, newFilters) => (event) => {
     if (
@@ -102,25 +100,14 @@ export default function TutAdvanced({ toggleHelp, category }) {
               {t('tutorial_toggle')}
             </Typography>
           </Grid>
-          <Grid item xs={12} sm={8} style={{ textAlign: 'center' }}>
-            <div style={{ minHeight: '130px', textAlign: 'center' }}>
-              <ReactWindow
-                columnCount={columnCount}
-                length={data.tiles[category].length}
-                Tile={Tile}
-                data={{
-                  tileItem: data.tiles[category],
-                  isMobile,
-                  tempFilters,
-                  setTempFilters,
-                  toggleSlotsMenu,
-                  type: category,
-                  Utility,
-                  Icons,
-                }}
-                offset={0}
-              />
-            </div>
+          <Grid item xs={12} sm={8}>
+            <Box height={135}>
+              <VirtualGrid data={data.tiles[category]} xs={6}>
+                {(_, key) => (
+                  <SelectorItem id={key} category={category} caption />
+                )}
+              </VirtualGrid>
+            </Box>
           </Grid>
           <Grid item xs={12} style={{ textAlign: 'center' }}>
             <Typography variant="caption" style={{ whiteSpace: 'pre-line' }}>

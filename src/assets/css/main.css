@@ -481,3 +481,25 @@ input[type='time']::-webkit-calendar-picker-indicator {
 .marker-cluster span {
   line-height: 30px;
 }
+
+.container {
+  display: grid;
+  grid-template-columns: 25% 75%;
+}
+
+@media screen and (max-width: 600px) {
+  .container {
+    display: grid;
+    grid-template-columns: 100%;
+  }
+}
+
+.column-25 {
+  max-height: 75vh;
+  overflow: auto;
+}
+
+.column-75 {
+  display: grid;
+  grid-template-rows: max-content 1fr;
+}

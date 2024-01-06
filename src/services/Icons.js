@@ -222,6 +222,9 @@ class UAssets {
 
   /** @param {string} id */
   getIconById(id) {
+    if (typeof id !== 'string') {
+      return ''
+    }
     if (id === 'kecleon') {
       id = 'b8'
     } else if (id === 'gold-stop') {

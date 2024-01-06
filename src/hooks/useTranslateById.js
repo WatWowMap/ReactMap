@@ -4,14 +4,15 @@ import { useEffect, useMemo, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 
 /**
- * @typedef {{ plural?: boolean, amount?: boolean, alt?: boolean }} CustomTOptions
+ * @typedef {{ plural?: boolean, amount?: boolean, alt?: boolean, newLine?: boolean }} CustomTOptions
  * @typedef {(id: string, options?: CustomTOptions) => string} CustomT
  */
 
 /**
+ * @param {CustomTOptions} options
  * @returns {{ language: string, t: CustomT }}
  */
-export function useTranslateById() {
+export function useTranslateById(options = {}) {
   const i18n = useTranslation()
   const formsToIgnore = useRef(new Set([i18n.t('form_0'), i18n.t('form_29')]))
 
@@ -22,7 +23,10 @@ export function useTranslateById() {
   return useMemo(
     () => ({
       language: i18n.i18n.language,
-      t: (id, { plural, amount, alt } = {}) => {
+      t: (id, { plural, amount, alt, newLine } = options) => {
+        if (typeof id !== 'string') {
+          return ''
+        }
         if (id === 'kecleon') {
           id = 'b8'
         } else if (id === 'gold-stop') {
@@ -103,12 +107,12 @@ export function useTranslateById() {
             const possibleForm = i18n.t(`form_${form}`)
             const formName = formsToIgnore.current.has(possibleForm)
               ? ''
-              : ` (${possibleForm})`
+              : `${newLine ? '\n' : ' '}(${possibleForm})`
             return `${pokemonName}${formName}`
           }
         }
       },
     }),
-    [i18n],
+    [i18n, options.alt, options.amount, options.plural, options.newLine],
   )
 }

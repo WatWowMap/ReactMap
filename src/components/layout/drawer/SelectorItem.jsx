@@ -5,6 +5,7 @@ import IconButton from '@mui/material/IconButton'
 import Tooltip from '@mui/material/Tooltip'
 import Collapse from '@mui/material/Collapse'
 import Box from '@mui/material/Box'
+import Typography from '@mui/material/Typography'
 
 import { useTranslateById } from '@hooks/useTranslateById'
 import {
@@ -13,17 +14,21 @@ import {
   useStatic,
   useStore,
 } from '@hooks/useStore'
+import { Img } from '../custom/CustomImg'
 
 /**
- * @param {{ category: keyof import('@rm/types').Available, children: string }} props
+ * @param {{
+ *  id: string,
+ *  category: keyof import('@rm/types').Available,
+ *  children?: React.ReactNode
+ *  caption?: boolean
+ * }} props
  */
-export function SelectorItem({ category, children }) {
-  const { t } = useTranslateById()
-  const [filter, setFilter] = useDeepStore(
-    `filters.${category}.filter.${children}`,
-  )
-  const title = t(children)
-  const url = useStatic((s) => s.Icons.getIconById(children))
+export function SelectorItem({ id, category, caption }) {
+  const { t } = useTranslateById({ alt: true, newLine: true })
+  const [filter, setFilter] = useDeepStore(`filters.${category}.filter.${id}`)
+  const title = t(id)
+  const url = useStatic((s) => s.Icons.getIconById(id))
   const easyMode = useStore((s) => !!s.filters[category].easyMode)
   const color = filter?.enabled
     ? filter?.all || easyMode
@@ -73,14 +78,13 @@ export function SelectorItem({ category, children }) {
         })}
       />
       <Tooltip title={title} arrow>
-        <img
+        <Img
           alt={title}
           src={url}
-          style={{
-            maxHeight: 50,
-            maxWidth: 50,
-            zIndex: 10,
-          }}
+          sx={caption ? { mb: 2 } : undefined}
+          maxHeight="50%"
+          maxWidth="50%"
+          zIndex={10}
         />
       </Tooltip>
       <Collapse in={!easyMode}>
@@ -92,7 +96,7 @@ export function SelectorItem({ category, children }) {
             useLayoutStore.setState({
               advancedFilter: {
                 open: true,
-                id: children,
+                id,
                 category,
                 selectedIds: [],
               },
@@ -102,6 +106,21 @@ export function SelectorItem({ category, children }) {
           <TuneIcon fontSize="small" />
         </IconButton>
       </Collapse>
+      {caption && (
+        <Typography
+          variant={title.includes('\n') ? 'caption' : 'subtitle2'}
+          lineHeight={1.2}
+          align="center"
+          position="absolute"
+          bottom={2}
+          whiteSpace="pre-line"
+          height={33}
+          display="flex"
+          alignItems="center"
+        >
+          {title}
+        </Typography>
+      )}
     </Box>
   )
 }

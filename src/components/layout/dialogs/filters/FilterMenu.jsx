@@ -1,6 +1,5 @@
 import * as React from 'react'
 import Menu from '@components/layout/general/Menu'
-import Tile from '@components/layout/dialogs/filters/MenuTile'
 
 import { toggleDialog, useLayoutStore, useStore } from '@hooks/useStore'
 import { DialogWrapper } from '../DialogWrapper'
@@ -26,7 +25,6 @@ export default function FilterMenu() {
         title={`${category}_filters`}
         titleAction={toggleDialog(false, category, 'filters')}
         filters={filters}
-        Tile={Tile}
         tempFilters={tempFilters}
         setTempFilters={setTempFilters}
         extraButtons={[

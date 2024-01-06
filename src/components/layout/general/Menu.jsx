@@ -1,25 +1,28 @@
 import React, { useState } from 'react'
-import { Dialog, DialogContent, Drawer, Grid, Typography } from '@mui/material'
+import Box from '@mui/material/Box'
+import Dialog from '@mui/material/Dialog'
+import DialogContent from '@mui/material/DialogContent'
+import Typography from '@mui/material/Typography'
+import Drawer from '@mui/material/Drawer'
 import { useTranslation } from 'react-i18next'
 
 import Utility from '@services/Utility'
 import { useStore, useStatic, useLayoutStore } from '@hooks/useStore'
 import useFilter from '@hooks/useFilter'
-
-import ReactWindow from '@components/layout/general/ReactWindow'
 import Header from '@components/layout/general/Header'
 import Footer from '@components/layout/general/Footer'
+
 import SlotSelection from '../dialogs/filters/SlotSelection'
 import OptionsContainer from '../dialogs/filters/OptionsContainer'
 import Help from '../dialogs/tutorial/Advanced'
 import WebhookAdvanced from '../dialogs/webhooks/WebhookAdv'
-import AdvSearch from '../dialogs/filters/AdvSearch'
+import { VirtualGrid } from './VirtualGrid'
+import { SelectorItem } from '../drawer/SelectorItem'
+import { GenericSearch } from '../drawer/ItemSearch'
 
 export default function Menu({
   category,
-  Tile,
   webhookCategory,
-  filters,
   tempFilters,
   setTempFilters,
   categories,
@@ -30,21 +33,14 @@ export default function Menu({
   Utility.analytics(`/advanced/${category}`)
 
   const isMobile = useStatic((s) => s.isMobile)
-  const isTablet = useStatic((s) => s.isTablet)
-
-  const menus = useStore((state) => state.menus)
   const { t } = useTranslation()
-  const Icons = useStatic((s) => s.Icons)
-
-  let columnCount = isTablet ? 3 : 5
-  if (isMobile) columnCount = 1
+  const menus = useStore((state) => state.menus)
 
   const [filterDrawer, setFilterDrawer] = useState(false)
   const [slotsMenu, setSlotsMenu] = useState({
     open: false,
     id: 0,
   })
-  const [search, setSearch] = useState('')
   const [helpDialog, setHelpDialog] = useState(false)
   const [webhook, setWebhook] = useState({
     open: false,
@@ -54,7 +50,6 @@ export default function Menu({
   const { filteredObj, filteredArr, count } = useFilter(
     tempFilters,
     menus,
-    search,
     category,
     webhookCategory,
     categories,
@@ -220,77 +215,41 @@ export default function Menu({
         action={titleAction}
         names={[webhookCategory || category]}
       />
-      <DialogContent style={{ padding: '8px 5px', height: '100%' }}>
-        <Grid container spacing={1}>
-          {!isMobile && (
-            <Grid item sm={3} style={{ height: '75vh', overflow: 'auto' }}>
-              {Options}
-            </Grid>
-          )}
-          <Grid
-            container
-            item
-            xs={12}
-            sm={9}
-            direction="column"
-            style={isMobile ? { height: '85vh' } : {}}
-          >
-            <AdvSearch
-              search={search}
-              setSearch={setSearch}
-              category={category}
+      <DialogContent className="container" sx={{ p: 0, minHeight: '75vh' }}>
+        {!isMobile && <Box className="column-25">{Options}</Box>}
+        <Box p={1} className="column-75">
+          <Box pb={1}>
+            <GenericSearch
+              field={`searches.${category}Advanced`}
+              label={t(`search_${category}`, t(`search_${category}s`))}
             />
-            {filteredArr.length ? (
-              <div style={{ flex: '1 1 auto' }}>
-                <ReactWindow
-                  columnCount={columnCount}
-                  length={filteredArr.length}
-                  flex
-                  offset={0}
-                  data={{
-                    isMobile,
-                    tileItem: filteredArr,
-                    tempFilters,
-                    setTempFilters,
-                    toggleSlotsMenu,
-                    type: category,
-                    toggleWebhook,
-                    webhookCategory,
-                    standard: filters.standard,
-                    Icons,
-                  }}
-                  Tile={Tile}
-                />
-              </div>
-            ) : (
-              <div style={{ flex: '1 1 auto' }}>
-                <Grid
-                  container
-                  alignItems="center"
-                  justifyContent="center"
-                  direction="column"
-                  style={{ height: '100%' }}
-                >
-                  <Grid item style={{ whiteSpace: 'pre-line' }}>
-                    <Typography variant="h6" align="center">
-                      {t('no_filter_results')}
-                    </Typography>
-                  </Grid>
-                </Grid>
-              </div>
-            )}
-          </Grid>
-        </Grid>
+          </Box>
+          {filteredArr.length ? (
+            <VirtualGrid data={filteredArr} xs={4} md={2}>
+              {(_, key) => (
+                <SelectorItem id={key} category={category} caption />
+              )}
+            </VirtualGrid>
+          ) : (
+            <Box className="flex-center" flex="1 1 auto" whiteSpace="pre-line">
+              <Typography variant="h6" align="center">
+                {t('no_filter_results')}
+              </Typography>
+            </Box>
+          )}
+        </Box>
       </DialogContent>
       <Footer options={footerButtons} role="dialog_filter_footer" />
-      <Drawer
-        anchor="bottom"
-        sx={{ zIndex: 10000 }}
-        open={filterDrawer}
-        onClose={toggleDrawer(false)}
-      >
-        {Options}
-      </Drawer>
+      {!isMobile && (
+        <Drawer
+          anchor="bottom"
+          sx={{ zIndex: 10000 }}
+          open={filterDrawer}
+          onClose={toggleDrawer(false)}
+        >
+          {Options}
+        </Drawer>
+      )}
       <Dialog open={slotsMenu.open} onClose={toggleSlotsMenu(false)}>
         <SlotSelection
           teamId={slotsMenu.id}

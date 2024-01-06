@@ -9,13 +9,14 @@ import ListItemText from '@mui/material/ListItemText'
 import ButtonGroup from '@mui/material/ButtonGroup'
 import IconButton from '@mui/material/IconButton'
 import Collapse from '@mui/material/Collapse'
+import Box from '@mui/material/Box'
 import { useTranslation } from 'react-i18next'
 
 import { useTranslateById } from '@hooks/useTranslateById'
 import { useLayoutStore, useStatic, useStore } from '@hooks/useStore'
 
 import { BoolToggle } from './BoolToggle'
-import { ItemSearchMemo } from './ItemSearch'
+import { GenericSearchMemo } from './ItemSearch'
 import { SelectorItem } from './SelectorItem'
 import { VirtualGrid } from '../general/VirtualGrid'
 
@@ -77,7 +78,9 @@ function SelectorList({ category }) {
 
   return (
     <List>
-      <ItemSearchMemo field={`searches.${category}QuickSelect`} />
+      <ListItem>
+        <GenericSearchMemo field={`searches.${category}QuickSelect`} />
+      </ListItem>
       <BoolToggle
         // TODO: this will be fixed when I add more quick selects for the other categories
         // @ts-ignore
@@ -112,9 +115,11 @@ function SelectorList({ category }) {
           </IconButton>
         </ButtonGroup>
       </ListItem>
-      <VirtualGrid data={items} itemsPerRow={3}>
-        {(_, key) => <SelectorItem category={category}>{key}</SelectorItem>}
-      </VirtualGrid>
+      <Box height={400}>
+        <VirtualGrid data={items} xs={4}>
+          {(_, key) => <SelectorItem id={key} category={category} />}
+        </VirtualGrid>
+      </Box>
     </List>
   )
 }
