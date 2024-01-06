@@ -18,7 +18,7 @@ import {
   FORT_LEVELS,
   QUEST_SETS,
   S2_LEVELS,
-  SPAWNPOINT_TTH,
+  ENUM_TTH,
   WAYFARER_OPTIONS,
 } from '@assets/constants'
 
@@ -301,7 +301,7 @@ const BaseSpawnpointTTH = () => {
       <ListItem>
         <MultiSelector
           field="filters.spawnpoints.tth"
-          items={SPAWNPOINT_TTH}
+          items={ENUM_TTH}
           tKey="tth_"
         />
       </ListItem>

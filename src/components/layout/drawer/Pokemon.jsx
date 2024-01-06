@@ -20,7 +20,7 @@ import { useTranslation } from 'react-i18next'
 
 import { useDeepStore, useStore } from '@hooks/useStore'
 import Utility from '@services/Utility'
-import { FILTER_SIZES, IV_OVERRIDES } from '@assets/constants'
+import { XXS_XXL, NUNDO_HUNDO } from '@assets/constants'
 
 import { StringFilterMemo } from '../dialogs/filters/StringFilter'
 import SliderTile from '../dialogs/filters/SliderTile'
@@ -140,7 +140,7 @@ export default function WithSliders({ category, context }) {
                 ))}
                 {index ? (
                   <DualBoolToggle
-                    items={FILTER_SIZES}
+                    items={XXS_XXL}
                     field="filters.pokemon.ivOr"
                   />
                 ) : (
@@ -156,7 +156,7 @@ export default function WithSliders({ category, context }) {
                     </ListSubheader>
                     <DualBoolToggle
                       field="filters.pokemon"
-                      items={IV_OVERRIDES}
+                      items={NUNDO_HUNDO}
                     />
                   </>
                 )}

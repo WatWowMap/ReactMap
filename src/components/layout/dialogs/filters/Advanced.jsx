@@ -14,7 +14,7 @@ import {
 import Header from '@components/layout/general/Header'
 import Footer from '@components/layout/general/Footer'
 import { DualBoolToggle } from '@components/layout/drawer/BoolToggle'
-import { ADVANCED_ALL, FILTER_SIZES } from '@assets/constants'
+import { ENABLED_ALL, XXS_XXL } from '@assets/constants'
 import { useTranslateById } from '@hooks/useTranslateById'
 
 import { StringFilter } from './StringFilter'
@@ -123,6 +123,16 @@ export default function AdvancedFilter() {
     [category, standard, id],
   )
 
+  /** @type {import('@mui/material').SwitchProps['onChange']} */
+  const handleAllEnabled = React.useCallback(
+    ({ target }, checked) => {
+      if (target.name === 'all' && checked && !filters.enabled) {
+        setFilters('enabled', true)
+      }
+    },
+    [setFilters],
+  )
+
   React.useLayoutEffect(() => {
     if (open) backup.current = filters
   }, [open])
@@ -135,101 +145,75 @@ export default function AdvancedFilter() {
       fullScreen={isMobile && category === 'pokemon'}
     >
       <Header
-        titles={[
+        titles={`${
           category === 'pokemon' || (!id.startsWith('l') && !id.startsWith('i'))
             ? t('advanced')
-            : t('set_size'),
-          `- ${tId(id)}`,
-        ]}
+            : t('set_size')
+        } - ${tId(id)}`}
         action={() => toggleClose(false)}
       />
       <DialogContent sx={{ mt: 3 }}>
         <List>
-          {category === 'pokemon' ? (
-            legacyFilter && 'legacy' in ui ? (
-              <StringFilter field={`filters.${category}.filter.${id}`} />
-            ) : (
-              <>
-                <Grid2
-                  container
-                  component={ListItem}
-                  disableGutters
-                  disablePadding
-                >
-                  {Object.entries('sliders' in ui ? ui.sliders : {}).map(
-                    ([subCat, sliders], i) => (
-                      <Grid2 key={subCat} component={List} xs={12} sm={6}>
-                        {sliders.map((each) => (
-                          <ListItem
-                            key={`${subCat}${each.name}`}
-                            disableGutters
-                            disablePadding
-                            sx={{ pr: { xs: 0, sm: i ? 0 : 2 } }}
-                          >
-                            <SliderTile
-                              slide={{
-                                ...each,
-                                disabled: each.disabled || filters.all,
-                              }}
-                              // @ts-ignore
-                              handleChange={handleChange}
-                              values={filters[each.name]}
-                            />
-                          </ListItem>
-                        ))}
-                      </Grid2>
-                    ),
-                  )}
-                </Grid2>
-                <Grid2
-                  container
-                  component={ListItem}
-                  disableGutters
-                  disablePadding
-                >
-                  <Grid2 component={List} xs={12} sm={6}>
-                    <GenderListItem
-                      field={`filters.${category}.filter.${id}`}
-                      disabled={filters.all}
-                      disableGutters
-                    />
-                    <Size
-                      field={`filters.${category}.filter.${id}`}
-                      disableGutters
-                    />
-                  </Grid2>
-                  <Grid2 component={List} xs={12} sm={6}>
-                    <DualBoolToggle
-                      items={FILTER_SIZES}
-                      field={`filters.${category}.filter.${id}`}
-                      disabled={filters.all}
-                    />
-                    <DualBoolToggle
-                      items={ADVANCED_ALL}
-                      field={`filters.${category}.filter.${id}`}
-                      switchColor="secondary"
-                      secondColor="success"
-                      onChange={({ target }, checked) => {
-                        if (
-                          target.name === 'all' &&
-                          checked &&
-                          !filters.enabled
-                        ) {
-                          setFilters('enabled', true)
-                        }
-                      }}
-                    />
-                  </Grid2>
-                </Grid2>
-              </>
-            )
+          {legacyFilter && 'legacy' in ui ? (
+            <StringFilter field={`filters.${category}.filter.${id}`} />
           ) : (
-            <Size
-              field={`filters.${category}.filter.${id}`}
-              disabled={filters.all}
-            />
+            <Grid2 container component={ListItem} disableGutters disablePadding>
+              {Object.entries('sliders' in ui ? ui.sliders : {}).map(
+                ([subCat, sliders], i) => (
+                  <Grid2 key={subCat} component={List} xs={12} sm={6}>
+                    {sliders.map((each) => (
+                      <ListItem
+                        key={`${subCat}${each.name}`}
+                        disableGutters
+                        disablePadding
+                        sx={{ pr: { xs: 0, sm: i ? 0 : 2 } }}
+                      >
+                        <SliderTile
+                          slide={{
+                            ...each,
+                            disabled: each.disabled || filters.all,
+                          }}
+                          // @ts-ignore
+                          handleChange={handleChange}
+                          values={filters[each.name]}
+                        />
+                      </ListItem>
+                    ))}
+                  </Grid2>
+                ),
+              )}
+              <Grid2 component={List} xs={12} sm={6}>
+                {category === 'pokemon' && (
+                  <GenderListItem
+                    field={`filters.${category}.filter.${id}`}
+                    disabled={filters.all}
+                    disableGutters
+                  />
+                )}
+                <Size
+                  field={`filters.${category}.filter.${id}`}
+                  disableGutters
+                />
+              </Grid2>
+              <Grid2 component={List} xs={12} sm={6}>
+                {category === 'pokemon' && (
+                  <DualBoolToggle
+                    items={XXS_XXL}
+                    field={`filters.${category}.filter.${id}`}
+                    disabled={filters.all}
+                  />
+                )}
+                {category === 'pokestops' && <QuestConditionSelector id={id} />}
+                <DualBoolToggle
+                  items={ENABLED_ALL}
+                  field={`filters.${category}.filter.${id}`}
+                  switchColor="secondary"
+                  secondColor="success"
+                  onChange={handleAllEnabled}
+                />
+              </Grid2>
+            </Grid2>
           )}
-          {category === 'pokestops' && <QuestConditionSelector id={id} />}
         </List>
       </DialogContent>
       <Footer options={footerOptions} />

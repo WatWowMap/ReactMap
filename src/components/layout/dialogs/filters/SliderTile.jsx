@@ -7,7 +7,7 @@ import Slider from '@mui/material/Slider'
 import { styled } from '@mui/material/styles'
 import { useTranslation } from 'react-i18next'
 import { ToggleTypography } from '@components/layout/general/ToggleTypography'
-import { SLIDER_LABELS } from '@assets/constants'
+import { MIN_MAX } from '@assets/constants'
 
 const StyledTextField =
   /** @type {React.FC<import('@mui/material').TextFieldProps & { textColor: string }>} */ (
@@ -139,7 +139,7 @@ export default function SliderTile({
         </ToggleTypography>
       </Grid2>
       {!noTextInput &&
-        SLIDER_LABELS.map((each, index) => (
+        MIN_MAX.map((each, index) => (
           <Grid2 key={each} xs={4} textAlign={index ? 'center' : 'right'}>
             <StyledTextField
               id={each}

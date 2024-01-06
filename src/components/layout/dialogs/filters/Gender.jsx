@@ -5,7 +5,7 @@ import ListItemText from '@mui/material/ListItemText'
 import { useTranslation } from 'react-i18next'
 
 import { MultiSelector } from '@components/layout/drawer/MultiSelector'
-import { GENDERS } from '@assets/constants'
+import { ENUM_GENDER } from '@assets/constants'
 
 /**
  *
@@ -18,7 +18,7 @@ export function GenderListItem({ field, ...props }) {
     <ListItem {...props}>
       <ListItemText>{t('gender')}</ListItemText>
       <MultiSelector
-        items={GENDERS}
+        items={ENUM_GENDER}
         tKey="gender_icon_"
         field={`${field}.gender`}
         disabled={props.disabled}
