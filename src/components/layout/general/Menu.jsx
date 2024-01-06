@@ -3,13 +3,12 @@ import { Dialog, DialogContent, Drawer, Grid, Typography } from '@mui/material'
 import { useTranslation } from 'react-i18next'
 
 import Utility from '@services/Utility'
-import { useStore, useStatic } from '@hooks/useStore'
+import { useStore, useStatic, useLayoutStore } from '@hooks/useStore'
 import useFilter from '@hooks/useFilter'
 
 import ReactWindow from '@components/layout/general/ReactWindow'
 import Header from '@components/layout/general/Header'
 import Footer from '@components/layout/general/Footer'
-import Advanced from '../dialogs/filters/Advanced'
 import SlotSelection from '../dialogs/filters/SlotSelection'
 import OptionsContainer from '../dialogs/filters/OptionsContainer'
 import Help from '../dialogs/tutorial/Advanced'
@@ -26,7 +25,7 @@ export default function Menu({
   categories,
   title,
   titleAction,
-  extraButtons = [],
+  extraButtons,
 }) {
   Utility.analytics(`/advanced/${category}`)
 
@@ -41,12 +40,6 @@ export default function Menu({
   if (isMobile) columnCount = 1
 
   const [filterDrawer, setFilterDrawer] = useState(false)
-  const [advancedFilter, setAdvancedFilter] = useState({
-    open: false,
-    id: '',
-    tempFilters: {},
-    default: filters.standard,
-  })
   const [slotsMenu, setSlotsMenu] = useState({
     open: false,
     id: 0,
@@ -90,45 +83,6 @@ export default function Menu({
     },
     [],
   )
-
-  const toggleAdvMenu = (open, id, newFilters) => (event) => {
-    if (
-      event.type === 'keydown' &&
-      (event.key === 'Tab' || event.key === 'Shift')
-    ) {
-      return
-    }
-    if (open) {
-      setAdvancedFilter({
-        open,
-        id,
-        tempFilters: tempFilters[id] ?? filters.standard,
-        standard: filters.standard,
-      })
-    } else if (id === 'global') {
-      setAdvancedFilter({ open })
-      const newObj = tempFilters
-      Object.entries(filteredObj).forEach((item) => {
-        const [key, { enabled }] = item
-        newObj[key] = { ...newFilters, enabled }
-
-        // ugly patch for also changing gym slots with the apply to all
-        if (
-          (key.startsWith('t') && key.charAt(1) != 0 && category === 'gym') ||
-          webhookCategory
-        ) {
-          Object.assign(
-            newObj,
-            Utility.generateSlots(key, newFilters, tempFilters),
-          )
-        }
-      })
-      setTempFilters({ ...tempFilters, ...newObj, [id]: newFilters })
-    } else {
-      setAdvancedFilter({ open })
-      setTempFilters({ ...tempFilters, [id]: newFilters })
-    }
-  }
 
   const toggleWebhook = (open, id, newFilters) => (event) => {
     if (
@@ -211,7 +165,7 @@ export default function Menu({
         categories={categories}
       />
     ),
-    [category, categories],
+    [category, categories, count.total, count.show, toggleDrawer],
   )
 
   const footerButtons = React.useMemo(
@@ -231,7 +185,15 @@ export default function Menu({
         name: 'apply_to_all',
         action: webhookCategory
           ? toggleWebhook(true, 'global')
-          : toggleAdvMenu(true, 'global'),
+          : () =>
+              useLayoutStore.setState({
+                advancedFilter: {
+                  open: true,
+                  id: 'global',
+                  category,
+                  selectedIds: Object.keys(filteredObj),
+                },
+              }),
         icon: category === 'pokemon' || webhookCategory ? 'Tune' : 'FormatSize',
       },
       {
@@ -246,7 +208,7 @@ export default function Menu({
         icon: 'Check',
         color: 'success',
       },
-      ...extraButtons,
+      ...(extraButtons ?? []),
     ],
     [category, webhookCategory, extraButtons, filteredObj, tempFilters],
   )
@@ -254,7 +216,7 @@ export default function Menu({
   return (
     <>
       <Header
-        titles={[title]}
+        titles={title}
         action={titleAction}
         names={[webhookCategory || category]}
       />
@@ -290,7 +252,6 @@ export default function Menu({
                     tileItem: filteredArr,
                     tempFilters,
                     setTempFilters,
-                    toggleAdvMenu,
                     toggleSlotsMenu,
                     type: category,
                     toggleWebhook,
@@ -330,20 +291,6 @@ export default function Menu({
       >
         {Options}
       </Drawer>
-      <Dialog
-        open={advancedFilter.open}
-        onClose={toggleAdvMenu(false)}
-        fullScreen={isMobile && category === 'pokemon'}
-      >
-        <Advanced
-          // advancedFilter={advancedFilter}
-          id={advancedFilter.id}
-          category={category}
-          // toggleAdvMenu={toggleAdvMenu}
-          // type={category}
-          // isMobile={isMobile}
-        />
-      </Dialog>
       <Dialog open={slotsMenu.open} onClose={toggleSlotsMenu(false)}>
         <SlotSelection
           teamId={slotsMenu.id}

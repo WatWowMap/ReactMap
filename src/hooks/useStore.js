@@ -331,16 +331,31 @@ export const useStatic = create((set) => ({
   },
 }))
 
-// /**
-//  * @typedef {{
-//  *  nestSubmissions: string | number,
-//  *  motd: boolean,
-//  *  donorPage: boolean,
-//  *  search: boolean,
-//  *  userProfile: boolean,
-//  * }} UseDialog
-//  * @type {import("zustand").UseBoundStore<import("zustand").StoreApi<UseDialog>>}
-//  */
+/**
+ * @typedef {{
+ *  nestSubmissions: string | number,
+ *  motd: boolean,
+ *  donorPage: boolean,
+ *  search: boolean,
+ *  userProfile: boolean,
+ *  resetFilters: boolean,
+ *  feedback: boolean,
+ *  drawer: boolean,
+ *  advancedFilter: {
+ *    open: boolean,
+ *    category: 'pokemon' | 'gyms' | 'pokestops' | 'nests',
+ *    id: string,
+ *    selectedIds: string[],
+ *  },
+ *  dialog: {
+ *    open: boolean,
+ *    category: string,
+ *    type: string,
+ *  },
+ * }} UseLayoutStore
+ *
+ * @type {import("zustand").UseBoundStore<import("zustand").StoreApi<UseLayoutStore>>}
+ */
 export const useLayoutStore = create(() => ({
   nestSubmissions: '0',
   motd: false,
@@ -350,6 +365,12 @@ export const useLayoutStore = create(() => ({
   resetFilters: false,
   feedback: false,
   drawer: false,
+  advancedFilter: {
+    open: false,
+    category: 'pokemon',
+    id: '',
+    selectedIds: [],
+  },
   dialog: {
     open: false,
     category: '',

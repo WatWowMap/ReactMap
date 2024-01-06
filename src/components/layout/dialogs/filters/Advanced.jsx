@@ -5,7 +5,12 @@ import Grid2 from '@mui/material/Unstable_Grid2/Grid2'
 import { useTranslation } from 'react-i18next'
 
 import Utility from '@services/Utility'
-import { useStore, useStatic, useDeepStore } from '@hooks/useStore'
+import {
+  useStore,
+  useStatic,
+  useDeepStore,
+  useLayoutStore,
+} from '@hooks/useStore'
 import Header from '@components/layout/general/Header'
 import Footer from '@components/layout/general/Footer'
 import { DualBoolToggle } from '@components/layout/drawer/BoolToggle'
@@ -25,28 +30,14 @@ const STANDARD_BACKUP = /** @type {import('@rm/types/lib').BaseFilter} */ ({
   adv: '',
 })
 
-/**
- * @param {{
- *  id: string,
- *  category: 'pokemon' | 'gyms' | 'pokestops' | 'nests',
- *  open: boolean,
- *  setOpen: React.Dispatch<React.SetStateAction<boolean>>,
- *  selectedIds?: string[]
- * }} props
- */
-export default function AdvancedFilter({
-  id,
-  category,
-  open,
-  setOpen,
-  selectedIds,
-}) {
-  Utility.analytics(`/${category}/${id}`)
+export default function AdvancedFilter() {
+  const { category, id, selectedIds, open } = useLayoutStore(
+    (s) => s.advancedFilter,
+  )
   const { t } = useTranslation()
   const { t: tId } = useTranslateById()
   const ui = useStatic((s) => s.ui[category])
   const isMobile = useStatic((s) => s.isMobile)
-
   const legacyFilter = useStore(
     (s) => s.userSettings[category]?.legacyFilter || false,
   )
@@ -56,9 +47,10 @@ export default function AdvancedFilter({
     category === 'pokemon' ? s.filters[category].standard : STANDARD_BACKUP,
   )
 
+  Utility.analytics(`/${category}/${id}`)
   Utility.analytics(
     'Advanced Filtering',
-    `ID: ${id} Size: ${filters.size}`,
+    `ID: ${id} Size: ${filters?.size || 'md'}`,
     category,
   )
 
@@ -79,7 +71,9 @@ export default function AdvancedFilter({
   )
 
   const toggleClose = (save = false) => {
-    setOpen((prev) => !prev)
+    useLayoutStore.setState((prev) => ({
+      advancedFilter: { ...prev.advancedFilter, open: false, id: '' },
+    }))
     if (!save) {
       setFilters({ ...backup.current })
     } else if (id === 'global' && selectedIds?.length) {
@@ -135,9 +129,9 @@ export default function AdvancedFilter({
   if (!id) return null
   return (
     <Dialog
-      open={open}
+      open={!!open}
       onClose={() => toggleClose(false)}
-      fullScreen={isMobile}
+      fullScreen={isMobile && category === 'pokemon'}
     >
       <Header
         titles={[

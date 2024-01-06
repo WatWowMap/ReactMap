@@ -14,9 +14,8 @@ import IconButton from '@mui/material/IconButton'
 import Collapse from '@mui/material/Collapse'
 
 import { useTranslateById } from '@hooks/useTranslateById'
-import { useStatic, useStore } from '@hooks/useStore'
+import { useLayoutStore, useStatic, useStore } from '@hooks/useStore'
 
-import AdvancedFilter from '../dialogs/filters/Advanced'
 import { BoolToggle } from './BoolToggle'
 import { ItemSearchMemo } from './ItemSearch'
 import { SelectorItem } from './SelectorItem'
@@ -36,8 +35,6 @@ function SelectorList({ category }) {
   )
   const easyMode = useStore((s) => !!s.filters[category]?.easyMode)
   const search = useStore((s) => s.searches[`${category}QuickSelect`] || '')
-
-  const [open, setOpen] = React.useState(false)
 
   const items = React.useMemo(() => {
     const lowerCase = search.toLowerCase()
@@ -86,7 +83,19 @@ function SelectorList({ category }) {
             <CheckIcon />
           </IconButton>
           <Collapse in={!easyMode} orientation="horizontal">
-            <IconButton color="info" onClick={() => setOpen(true)}>
+            <IconButton
+              color="info"
+              onClick={() =>
+                useLayoutStore.setState({
+                  advancedFilter: {
+                    open: true,
+                    id: 'global',
+                    category,
+                    selectedIds: items,
+                  },
+                })
+              }
+            >
               <TuneIcon />
             </IconButton>
           </Collapse>
@@ -110,15 +119,6 @@ function SelectorList({ category }) {
           <SelectorItem category={category}>{key}</SelectorItem>
         )}
       />
-      {!easyMode && (
-        <AdvancedFilter
-          id="global"
-          category={category}
-          open={open}
-          setOpen={setOpen}
-          selectedIds={items}
-        />
-      )}
     </List>
   )
 }

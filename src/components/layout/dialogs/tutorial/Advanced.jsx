@@ -22,7 +22,6 @@ import Utility from '@services/Utility'
 import { useStatic } from '@hooks/useStore'
 
 import ReactWindow from '@components/layout/general/ReactWindow'
-import Advanced from '../filters/Advanced'
 import Tile from '../filters/MenuTile'
 import SlotSelection from '../filters/SlotSelection'
 import data from './data'
@@ -41,51 +40,12 @@ export default function TutAdvanced({ toggleHelp, category }) {
     ...data.filters[category].filter,
     ...Utility.generateSlots('t3-0', true, {}),
   })
-  const [advancedFilter, setAdvancedFilter] = useState({
-    open: false,
-    id: '',
-    tempFilters: {},
-    default: data.filters.standard,
-  })
   const [slotsMenu, setSlotsMenu] = useState({
     open: false,
     id: 0,
   })
 
-  const advObject = {
-    iv: true,
-    pvp: true,
-    sliders: {
-      primary: [data.sliders[0], data.sliders[1], data.sliders[2]],
-      secondary: [
-        data.sliders[3],
-        data.sliders[4],
-        data.sliders[5],
-        data.sliders[6],
-      ],
-    },
-  }
   const columnCount = isMobile ? 1 : 2
-
-  const toggleAdvMenu = (open, id, newFilters) => (event) => {
-    if (
-      event.type === 'keydown' &&
-      (event.key === 'Tab' || event.key === 'Shift')
-    ) {
-      return
-    }
-    if (open) {
-      setAdvancedFilter({
-        open,
-        id,
-        tempFilters: tempFilters[id],
-        standard: data.filters.pokemon.standard,
-      })
-    } else {
-      setAdvancedFilter({ open })
-      setTempFilters({ ...tempFilters, [id]: newFilters })
-    }
-  }
 
   const toggleSlotsMenu = (open, id, newFilters) => (event) => {
     if (
@@ -121,14 +81,6 @@ export default function TutAdvanced({ toggleHelp, category }) {
 
   return (
     <>
-      <Dialog open={advancedFilter.open} onClose={toggleAdvMenu(false)}>
-        <Advanced
-          advancedFilter={advancedFilter}
-          toggleAdvMenu={toggleAdvMenu}
-          type={category}
-          isTutorial={advObject}
-        />
-      </Dialog>
       <Dialog open={slotsMenu.open} onClose={toggleSlotsMenu(false)}>
         <SlotSelection
           teamId={slotsMenu.id}
@@ -161,7 +113,6 @@ export default function TutAdvanced({ toggleHelp, category }) {
                   isMobile,
                   tempFilters,
                   setTempFilters,
-                  toggleAdvMenu,
                   toggleSlotsMenu,
                   type: category,
                   Utility,

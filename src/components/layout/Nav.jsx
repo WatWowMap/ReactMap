@@ -17,6 +17,7 @@ import ScanDialog from './dialogs/scanner/ScanDialog'
 import Webhook from './dialogs/webhooks/Webhook'
 import ClientError from './dialogs/ClientError'
 import { WebhookNotification } from './dialogs/webhooks/Notification'
+import AdvancedFilter from './dialogs/filters/Advanced'
 
 export default function Nav() {
   const iconsIsReady = useStatic((s) => !!s.Icons)
@@ -38,6 +39,7 @@ export default function Nav() {
       <ScanDialog />
       <WebhookNotification />
       <ClientError />
+      <AdvancedFilter />
     </>
   )
 }
