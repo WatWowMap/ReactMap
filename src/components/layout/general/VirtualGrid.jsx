@@ -1,4 +1,3 @@
-/* eslint-disable react/no-unstable-nested-components */
 // @ts-check
 import * as React from 'react'
 import Grid2 from '@mui/material/Unstable_Grid2/Grid2'

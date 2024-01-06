@@ -1,4 +1,3 @@
-/* eslint-disable no-nested-ternary */
 // @ts-check
 import * as React from 'react'
 import Dialog from '@mui/material/Dialog'

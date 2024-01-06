@@ -3,36 +3,22 @@ import * as React from 'react'
 import Box from '@mui/material/Box'
 
 /**
- *
  * @param {{
  *  children: React.ReactNode,
  *  value: number,
  *  index: number,
- *  virtual?: boolean,
- *  disablePadding?: boolean,
+ *  disablePadding?: boolean
  * }} props
  */
-export default function TabPanel({
-  children,
-  value,
-  index,
-  virtual,
-  disablePadding,
-}) {
+export default function TabPanel({ children, value, index, disablePadding }) {
   return (
-    <div
+    <Box
       role="tabpanel"
       hidden={value !== index}
-      style={virtual ? { height: '100%' } : {}}
+      height="100%"
+      p={disablePadding ? 0 : 2}
     >
-      {value === index && (
-        <Box
-          p={disablePadding ? 0 : 2}
-          style={virtual ? { height: '95%' } : {}}
-        >
-          {children}
-        </Box>
-      )}
-    </div>
+      {children}
+    </Box>
   )
 }

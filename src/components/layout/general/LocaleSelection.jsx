@@ -1,3 +1,4 @@
+// @ts-check
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import FormControl from '@mui/material/FormControl'
@@ -7,10 +8,12 @@ import MenuItem from '@mui/material/MenuItem'
 
 import { useStore } from '@hooks/useStore'
 
+const STYLE = { margin: '3px 0' }
+
 export default function LocaleSelection() {
   const { t, i18n } = useTranslation()
   return (
-    <FormControl size="small" fullWidth style={{ margin: '3px 0' }}>
+    <FormControl size="small" fullWidth style={STYLE}>
       <InputLabel>{t('locale_selection')}</InputLabel>
       <Select
         autoFocus

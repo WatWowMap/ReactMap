@@ -24,7 +24,7 @@ export default function Feedback() {
 
   return (
     <DialogWrapper dialog="feedback" variant="small">
-      <Header titles={[t('submit_feedback_title')]} action={handleClose} />
+      <Header titles={t('submit_feedback_title')} action={handleClose} />
       <DialogContent>
         <Typography variant="subtitle1" align="center">
           {t('use_the_link_below')}

@@ -1,15 +1,19 @@
-import React from 'react'
+// @ts-check
+import * as React from 'react'
 import { Typography } from '@mui/material'
-import { useTranslation, Trans } from 'react-i18next'
+import { useTranslation } from 'react-i18next'
 
+/**
+ * @param {{ questTitle: string, questTarget: number }} props
+ */
 export default function QuestTitle({ questTitle, questTarget }) {
-  const { i18n } = useTranslation()
+  const { t, i18n } = useTranslation()
 
   const normalized = `quest_title_${questTitle.toLowerCase()}`
 
   return i18n.exists(normalized) ? (
     <Typography variant="caption">
-      <Trans i18nKey={normalized}>{{ amount_0: questTarget }}</Trans>
+      {t(normalized, { amount_0: questTarget })}
     </Typography>
   ) : null
 }
