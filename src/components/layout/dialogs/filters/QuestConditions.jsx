@@ -2,11 +2,9 @@
 import * as React from 'react'
 import ListItem from '@mui/material/ListItem'
 import { useTranslation } from 'react-i18next'
-import { useStatic, useStore } from '@hooks/useStore'
-import { setDeep } from '@services/functions/setDeep'
+import { useDeepStore, useStatic } from '@hooks/useStore'
 import { FormControl, InputLabel, Select, MenuItem } from '@mui/material'
 import Typography from '@mui/material/Typography'
-import dlv from 'dlv'
 import QuestTitle from '@components/layout/general/QuestTitle'
 
 /**
@@ -15,8 +13,9 @@ import QuestTitle from '@components/layout/general/QuestTitle'
  * @returns
  */
 export function QuestConditionSelector({ id }) {
-  const value = /** @type {string} */ (
-    useStore((s) => dlv(s, `filters.pokestops.filter.${id}.adv`) || '')
+  const [value, setValue] = useDeepStore(
+    `filters.pokestops.filter.${id}.adv`,
+    '',
   )
   const questConditions = useStatic((s) => s.available.questConditions[id])
   const hasQuests = useStatic((s) => s.ui.pokestops?.quests)
@@ -26,11 +25,12 @@ export function QuestConditionSelector({ id }) {
   // Provides a reset if that condition is no longer available
   React.useEffect(() => {
     if (hasQuests) {
+      // user has quest permissions
       if (!questConditions && value) {
-        useStore.setState((prev) =>
-          setDeep(prev, `filters.pokestops.filter.${id}.adv`, ''),
-        )
+        // condition is no longer available
+        setValue('')
       } else {
+        // check if the value is still valid
         const filtered = questConditions
           ? value
               .split(',')
@@ -38,14 +38,11 @@ export function QuestConditionSelector({ id }) {
                 questConditions.find(({ title }) => title === each),
               )
           : []
-        useStore.setState((prev) =>
-          setDeep(
-            prev,
-            `filters.pokestops.filter.${id}.adv`,
-            filtered.length ? filtered.join(',') : '',
-          ),
-        )
+        setValue(filtered.length ? filtered.join(',') : '')
       }
+    } else {
+      // user does not have quest permissions
+      setValue('')
     }
   }, [questConditions, id, hasQuests])
 
@@ -73,18 +70,12 @@ export function QuestConditionSelector({ id }) {
               'props' in child &&
               child.props.value === ''
             ) {
-              useStore.setState((prev) =>
-                setDeep(prev, `filters.pokestops.filter.${id}.adv`, ''),
-              )
+              setValue('')
             } else {
-              useStore.setState((prev) =>
-                setDeep(
-                  prev,
-                  `filters.pokestops.filter.${id}.adv`,
-                  Array.isArray(e.target.value)
-                    ? e.target.value.filter(Boolean).join(',')
-                    : e.target.value,
-                ),
+              setValue(
+                Array.isArray(e.target.value)
+                  ? e.target.value.filter(Boolean).join(',')
+                  : e.target.value,
               )
             }
           }}

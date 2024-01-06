@@ -31,8 +31,9 @@ export function SelectorItem({ id, category, caption }) {
   const title = t(id)
   const url = useStatic((s) => s.Icons.getIconById(id))
   const easyMode = useStore((s) => !!s.filters[category].easyMode)
+
   const color = filter?.enabled
-    ? filter?.all || easyMode
+    ? filter?.all || easyMode || !filter?.adv
       ? 'success.main'
       : 'info.main'
     : 'error.dark'

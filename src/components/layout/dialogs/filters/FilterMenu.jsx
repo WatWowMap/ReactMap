@@ -30,7 +30,7 @@ export default function FilterMenu() {
         extraButtons={[
           {
             name: 'save',
-            action: toggleDialog(false, category, 'filters', tempFilters),
+            action: toggleDialog(false, category, 'filters'),
             icon: 'Save',
             color: 'secondary',
           },

@@ -7,7 +7,12 @@ import Drawer from '@mui/material/Drawer'
 import { useTranslation } from 'react-i18next'
 
 import Utility from '@services/Utility'
-import { useStore, useStatic, useLayoutStore } from '@hooks/useStore'
+import {
+  useStore,
+  useStatic,
+  useLayoutStore,
+  setDeepStore,
+} from '@hooks/useStore'
 import useFilter from '@hooks/useFilter'
 import Header from '@components/layout/general/Header'
 import Footer from '@components/layout/general/Footer'
@@ -56,14 +61,28 @@ export default function Menu({
   )
 
   const selectAllOrNone = (show) => {
-    const newObj = {}
-    Object.entries(filteredObj).forEach(([key, item]) => {
-      newObj[key] = { ...item, enabled: show }
-      if (key.startsWith('t') && key.charAt(1) != 0 && !webhookCategory) {
-        Object.assign(newObj, Utility.generateSlots(key, show, tempFilters))
-      }
-    })
-    setTempFilters({ ...tempFilters, ...newObj })
+    const existing = useStore.getState().filters[category].filter ?? {}
+    const newObj = Object.fromEntries(
+      Object.entries(existing).flatMap(([key, item]) => {
+        const filters = [
+          [key, key in filteredObj ? { ...item, enabled: show } : item],
+        ]
+        if (key.startsWith('t') && key.charAt(1) != 0 && !webhookCategory) {
+          filters.push(
+            ...Object.entries(Utility.generateSlots(key, show, existing)),
+          )
+        }
+        return filters
+      }),
+    )
+    // Object.entries(filteredObj).forEach(([key, item]) => {
+    //   newObj[key] = { ...item, enabled: show }
+    //   if (key.startsWith('t') && key.charAt(1) != 0 && !webhookCategory) {
+    //     Object.assign(newObj, Utility.generateSlots(key, show, tempFilters))
+    //   }
+    // })
+    // setTempFilters({ ...tempFilters, ...newObj })
+    setDeepStore(`filters.${category}.filter`, newObj)
   }
 
   const toggleDrawer = React.useCallback(

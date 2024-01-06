@@ -163,6 +163,16 @@ export function useGetDeepStore(field, defaultValue) {
 }
 
 /**
+ * @template {UseStorePaths} T
+ * @param {T} field
+ * @param {import('@rm/types').ConfigPathValue<UseStore, T>} value
+ * @returns {void}
+ */
+export function setDeepStore(field, value) {
+  return useStore.setState((s) => setDeep(s, field, value))
+}
+
+/**
  * @template {UseStorePaths} Paths
  * @template {import('@rm/types').ConfigPathValue<UseStore, Paths>} T
  * @template {T | ((prevValue: T) => T) | keyof T} U
