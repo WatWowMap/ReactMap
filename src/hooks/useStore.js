@@ -234,7 +234,7 @@ export function useDeepStore(field, defaultValue) {
  *   Icons: InstanceType<typeof import("../services/Icons").default>,
  *   Audio: InstanceType<typeof import("../services/Icons").default>,
  *   config: import('@rm/types').Config['map'],
- *   ui: ReturnType<typeof import('server/src/services/ui/primary')>
+ *   ui: import('@rm/types').UIObject,
  *   auth: { perms: Partial<import('@rm/types').Permissions>, loggedIn: boolean, methods: string[], strategy: import('@rm/types').Strategy | '' },
  *   filters: import('@rm/types').AllFilters,
  *   masterfile: import('@rm/types').Masterfile

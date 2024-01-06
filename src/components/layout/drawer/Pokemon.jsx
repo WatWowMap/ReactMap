@@ -18,7 +18,7 @@ import {
 } from '@mui/material'
 import { useTranslation } from 'react-i18next'
 
-import { useDeepStore, useStore } from '@hooks/useStore'
+import { useDeepStore, useStatic, useStore } from '@hooks/useStore'
 import Utility from '@services/Utility'
 import { XXS_XXL, NUNDO_HUNDO } from '@assets/constants'
 
@@ -29,13 +29,13 @@ import { BoolToggle, DualBoolToggle } from './BoolToggle'
 import { GenderListItem } from '../dialogs/filters/Gender'
 import { MemoSelectorList } from './SelectorList'
 
-export default function WithSliders({ category, context }) {
-  const userSettings = useStore((s) => s.userSettings[category])
+function PokemonDrawer() {
+  const legacyFilter = useStore((s) => s.userSettings.pokemon.legacyFilter)
   const filterMode = useStore((s) => s.getPokemonFilterMode())
   const [ivOr, setIvOr] = useDeepStore('filters.pokemon.ivOr')
   const { t } = useTranslation()
   const [openTab, setOpenTab] = React.useState(0)
-
+  const ui = useStatic((s) => s.ui.pokemon)
   const selectRef = React.useRef(/** @type {HTMLDivElement | null} */ (null))
 
   /** @type {import('@rm/types').RMSliderHandleChange<keyof import('@rm/types').PokemonFilter>} */
@@ -43,11 +43,7 @@ export default function WithSliders({ category, context }) {
     if (name in ivOr) {
       setIvOr(name, values)
     }
-    Utility.analytics(
-      'Global Pokemon',
-      `${name}: ${values}`,
-      `${category} Text`,
-    )
+    Utility.analytics('Global Pokemon', `${name}: ${values}`, `Pokemon Text`)
   }, [])
 
   const handleTabChange = (_e, newValue) => setOpenTab(newValue)
@@ -82,29 +78,27 @@ export default function WithSliders({ category, context }) {
               }
             }}
           >
-            {[
-              'basic',
-              'intermediate',
-              ...(context.legacy ? ['expert'] : []),
-            ].map((tier) => (
-              <MenuItem
-                key={tier}
-                dense
-                value={tier}
-                sx={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'flex-start',
-                  whiteSpace: 'normal',
-                  width: selectRef.current?.clientWidth || 'auto',
-                }}
-              >
-                <Typography variant="subtitle2">{t(tier)}</Typography>
-                <Typography variant="caption" flexWrap="wrap">
-                  {t(`${tier}_description`)}
-                </Typography>
-              </MenuItem>
-            ))}
+            {['basic', 'intermediate', ...(ui.legacy ? ['expert'] : [])].map(
+              (tier) => (
+                <MenuItem
+                  key={tier}
+                  dense
+                  value={tier}
+                  sx={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'flex-start',
+                    whiteSpace: 'normal',
+                    width: selectRef.current?.clientWidth || 'auto',
+                  }}
+                >
+                  <Typography variant="subtitle2">{t(tier)}</Typography>
+                  <Typography variant="caption" flexWrap="wrap">
+                    {t(`${tier}_description`)}
+                  </Typography>
+                </MenuItem>
+              ),
+            )}
           </Select>
         </FormControl>
       </ListItem>
@@ -115,7 +109,7 @@ export default function WithSliders({ category, context }) {
           label="link_global_and_advanced"
         />
       </Collapse>
-      {userSettings.legacyFilter && context.legacy ? (
+      {legacyFilter && ui.legacy ? (
         <StringFilterMemo field="filters.pokemon.ivOr" />
       ) : (
         <>
@@ -126,15 +120,15 @@ export default function WithSliders({ category, context }) {
               <Tab label={t('select')} />
             </Tabs>
           </AppBar>
-          {Object.keys(context.sliders).map((slider, index) => (
-            <TabPanel value={openTab} index={index} key={slider}>
+          {Object.entries(ui.sliders).map(([sType, sliders], index) => (
+            <TabPanel value={openTab} index={index} key={sType}>
               <List>
-                {Object.values(context.sliders[slider]).map((subItem) => (
-                  <ListItem key={subItem.name} disablePadding>
+                {sliders.map((slider) => (
+                  <ListItem key={slider.name} disablePadding>
                     <SliderTile
-                      slide={subItem}
+                      slide={slider}
                       handleChange={handleChange}
-                      values={ivOr[subItem.name]}
+                      values={ivOr[slider.name]}
                     />
                   </ListItem>
                 ))}
@@ -171,3 +165,5 @@ export default function WithSliders({ category, context }) {
     </>
   )
 }
+
+export const PokemonDrawerMemo = React.memo(PokemonDrawer)

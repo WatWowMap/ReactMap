@@ -248,3 +248,7 @@ export type AllFilters = ReturnType<
 export type Categories = keyof AllFilters
 
 export type AdvCategories = 'pokemon' | 'gyms' | 'pokestops' | 'nests'
+
+export type UIObject = ReturnType<
+  typeof import('server/src/services/ui/primary')
+>
