@@ -3,6 +3,14 @@
 import { setDeepStore, useStatic, useStore } from '@hooks/useStore'
 import Utility from '@services/Utility'
 
+export const STANDARD_BACKUP =
+  /** @type {import('@rm/types/lib').BaseFilter} */ ({
+    enabled: false,
+    size: 'md',
+    all: false,
+    adv: '',
+  })
+
 /**
  * @param {boolean} show
  * @param {import('@rm/types').Categories} category
@@ -21,7 +29,7 @@ export function applyToAll(
 
   const serverFilters = useStatic.getState().filters[category]
   const staticFilters = serverFilters.filter ?? {}
-  const refFilter = serverFilters.standard
+  const refFilter = serverFilters.standard ?? STANDARD_BACKUP
 
   const idSet = new Set(selectedIds ?? [])
 
@@ -32,8 +40,8 @@ export function applyToAll(
         [
           key,
           idSet.has(key)
-            ? { ...filter[key], enabled: show, all: !!easyMode }
-            : filter[key],
+            ? { size: 'md', ...filter, enabled: show, all: !!easyMode }
+            : filter,
         ],
       ]
       if (key.startsWith('t') && +key.charAt(1) !== 0 && includeSlots) {

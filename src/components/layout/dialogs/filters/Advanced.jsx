@@ -16,20 +16,13 @@ import Footer from '@components/layout/general/Footer'
 import { DualBoolToggle } from '@components/layout/drawer/BoolToggle'
 import { ENABLED_ALL, XXS_XXL } from '@assets/constants'
 import { useTranslateById } from '@hooks/useTranslateById'
-import { applyToAll } from '@services/filtering/applyToAll'
+import { STANDARD_BACKUP, applyToAll } from '@services/filtering/applyToAll'
 
 import { StringFilter } from './StringFilter'
 import SliderTile from './SliderTile'
 import Size from './Size'
 import { GenderListItem } from './Gender'
 import { QuestConditionSelector } from './QuestConditions'
-
-const STANDARD_BACKUP = /** @type {import('@rm/types/lib').BaseFilter} */ ({
-  enabled: false,
-  size: 'md',
-  all: false,
-  adv: '',
-})
 
 export default function AdvancedFilter() {
   const { category, id, selectedIds, open } = useLayoutStore(

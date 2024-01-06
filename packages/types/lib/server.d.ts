@@ -247,4 +247,4 @@ export type AllFilters = ReturnType<
 
 export type Categories = keyof AllFilters
 
-// type Keys = keyof OnlyType<PokemonFilter, number[]>
+export type AdvCategories = 'pokemon' | 'gyms' | 'pokestops' | 'nests'

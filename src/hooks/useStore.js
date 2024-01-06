@@ -353,7 +353,7 @@ export const useStatic = create((set) => ({
  *  drawer: boolean,
  *  advancedFilter: {
  *    open: boolean,
- *    category: 'pokemon' | 'gyms' | 'pokestops' | 'nests',
+ *    category: import('@rm/types').AdvCategories,
  *    id: string,
  *    selectedIds: string[],
  *  },

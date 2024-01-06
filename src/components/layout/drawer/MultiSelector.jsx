@@ -2,18 +2,18 @@
 import * as React from 'react'
 import { ButtonGroup, Button } from '@mui/material'
 import { useTranslation } from 'react-i18next'
-import { useStore } from '@hooks/useStore'
-import dlv from 'dlv'
-import { setDeep } from '@services/functions/setDeep'
+import { useDeepStore } from '@hooks/useStore'
 
 /**
- *
+ * @template {import('@hooks/useStore').UseStorePaths} T
+ * @template {import('@rm/types').ConfigPathValue<import('@hooks/useStore').UseStore, T>} V
  * @param {{
- *  field: string,
- *  items: readonly (string | number)[],
+ *  field: T,
+ *  items: readonly V[],
  *  tKey?: string,
  *  allowNone?: boolean,
  *  disabled?: boolean
+ *  defaultValue?: V,
  * }} props
  * @returns
  */
@@ -23,19 +23,19 @@ export function MultiSelector({
   items,
   tKey,
   allowNone = false,
+  defaultValue,
 }) {
   const { t } = useTranslation()
-  const value = useStore((s) => dlv(s, field))
+  const [value, setValue] = useDeepStore(field, defaultValue)
 
   return (
     <ButtonGroup disabled={disabled} size="small" sx={{ mx: 'auto' }}>
       {items.map((item) => (
         <Button
-          key={item}
+          key={`${item}`}
           onClick={() => {
-            useStore.setState((prev) =>
-              setDeep(prev, field, item === value && allowNone ? 'none' : item),
-            )
+            // @ts-ignore // TODO: fix this
+            setValue(item === value && allowNone ? 'none' : item)
           }}
           color={item === value ? 'primary' : 'secondary'}
           variant={item === value ? 'contained' : 'outlined'}

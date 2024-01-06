@@ -8,7 +8,9 @@ import { MultiSelector } from '@components/layout/drawer/MultiSelector'
 import { ICON_SIZES } from '@assets/constants'
 
 /**
- * @param {{ field: string } & import('@mui/material/ListItem').ListItemProps} props
+ * @param {{
+ *  field: `filters.${import('@rm/types').AdvCategories}.filter.${string}`
+ * } & import('@mui/material/ListItem').ListItemProps} props
  */
 export default function Size({ field, ...props }) {
   const { t } = useTranslation()
@@ -19,6 +21,7 @@ export default function Size({ field, ...props }) {
       <MultiSelector
         items={ICON_SIZES}
         field={`${field}.size`}
+        defaultValue="md"
         disabled={props.disabled}
       />
     </ListItem>
