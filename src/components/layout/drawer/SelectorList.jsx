@@ -1,8 +1,6 @@
 /* eslint-disable react/no-unstable-nested-components */
 // @ts-check
 import * as React from 'react'
-import { VirtuosoGrid } from 'react-virtuoso'
-import Grid2 from '@mui/material/Unstable_Grid2/Grid2'
 import TuneIcon from '@mui/icons-material/Tune'
 import CheckIcon from '@mui/icons-material/Check'
 import ClearIcon from '@mui/icons-material/Clear'
@@ -12,6 +10,7 @@ import ListItemText from '@mui/material/ListItemText'
 import ButtonGroup from '@mui/material/ButtonGroup'
 import IconButton from '@mui/material/IconButton'
 import Collapse from '@mui/material/Collapse'
+import { useTranslation } from 'react-i18next'
 
 import { useTranslateById } from '@hooks/useTranslateById'
 import { useLayoutStore, useStatic, useStore } from '@hooks/useStore'
@@ -19,14 +18,19 @@ import { useLayoutStore, useStatic, useStore } from '@hooks/useStore'
 import { BoolToggle } from './BoolToggle'
 import { ItemSearchMemo } from './ItemSearch'
 import { SelectorItem } from './SelectorItem'
+import { VirtualGrid } from '../general/VirtualGrid'
 
 /**
- *
- * @param {{ category: keyof import('@rm/types').Available }} props
+ * @param {{
+ *  category: keyof import('@rm/types').Available,
+ *  itemsPerRow?: number,
+ *  children?: React.ReactNode,
+ * }} props
  * @returns
  */
 function SelectorList({ category }) {
-  const { t } = useTranslateById()
+  const { t: tId } = useTranslateById()
+  const { t } = useTranslation()
   const available = useStatic((s) => s.available[category])
   const allFilters = useStatic((s) => s.filters[category]?.filter)
 
@@ -42,8 +46,8 @@ function SelectorList({ category }) {
       onlyShowAvailable
         ? available
         : Object.keys(allFilters).filter((key) => key !== 'global')
-    ).filter((key) => t(key).toLowerCase().includes(lowerCase))
-  }, [onlyShowAvailable ? available : allFilters, search])
+    ).filter((key) => tId(key).toLowerCase().includes(lowerCase))
+  }, [onlyShowAvailable ? available : allFilters, search, tId])
 
   /** @param {'enable' | 'disable' | 'advanced'} action */
   const setAll = (action) => {
@@ -104,21 +108,9 @@ function SelectorList({ category }) {
           </IconButton>
         </ButtonGroup>
       </ListItem>
-      <VirtuosoGrid
-        style={{ height: 400 }}
-        totalCount={items.length}
-        overscan={5}
-        data={items}
-        components={{
-          Item: (props) => <Grid2 xs={4} {...props} />,
-          List: React.forwardRef((props, ref) => (
-            <Grid2 {...props} container ref={ref} />
-          )),
-        }}
-        itemContent={(_, key) => (
-          <SelectorItem category={category}>{key}</SelectorItem>
-        )}
-      />
+      <VirtualGrid data={items} itemsPerRow={3}>
+        {(_, key) => <SelectorItem category={category}>{key}</SelectorItem>}
+      </VirtualGrid>
     </List>
   )
 }
