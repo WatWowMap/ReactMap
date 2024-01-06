@@ -20,7 +20,7 @@ import { useStore, useStatic } from '@hooks/useStore'
 import useWebhook from '@hooks/useWebhook'
 import Utility from '@services/Utility'
 import ErrorBoundary from '@components/ErrorBoundary'
-import { TextWithIcon } from '@components/layout/custom/CustomImg'
+import { TextWithIcon } from '@components/layout/general/Img'
 
 import Title from './common/Title'
 import BadgeSelection from '../layout/dialogs/BadgeSelection'

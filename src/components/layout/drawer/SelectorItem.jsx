@@ -14,7 +14,7 @@ import {
   useStatic,
   useStore,
 } from '@hooks/useStore'
-import { Img } from '../custom/CustomImg'
+import { Img } from '../general/Img'
 import { ColoredTile } from '../general/ColoredTile'
 
 /**

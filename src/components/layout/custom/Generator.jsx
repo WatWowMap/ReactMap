@@ -10,7 +10,7 @@ import LocalLogin from '../auth/Local'
 import Telegram from '../auth/Telegram'
 import CustomText from './CustomText'
 import CustomButton from './CustomButton'
-import { Img } from './CustomImg'
+import { Img } from '../general/Img'
 import LocaleSelection from '../general/LocaleSelection'
 import LinkWrapper from './LinkWrapper'
 

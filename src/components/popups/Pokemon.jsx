@@ -21,7 +21,7 @@ import { useTranslation } from 'react-i18next'
 import { useStore, useStatic } from '@hooks/useStore'
 import Utility from '@services/Utility'
 import ErrorBoundary from '@components/ErrorBoundary'
-import { TextWithIcon } from '@components/layout/custom/CustomImg'
+import { TextWithIcon } from '@components/layout/general/Img'
 
 import NameTT from './common/NameTT'
 import GenderIcon from './common/GenderIcon'

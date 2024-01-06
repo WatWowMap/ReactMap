@@ -16,7 +16,7 @@ import { getQueryArgs } from '@services/functions/getQueryArgs'
 
 import Header from './Header'
 import Footer from './Footer'
-import { Img } from '../custom/CustomImg'
+import { Img } from './Img'
 
 const StyledBox = styled(Box)(({ theme }) => ({
   zIndex: 1000,
