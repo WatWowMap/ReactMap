@@ -37,3 +37,5 @@ export const ENUM_TTH = /** @type {const} */ ([0, 1, 2])
 export const MIN_MAX = /** @type {const} */ (['min', 'max'])
 
 export const ENABLED_ALL = /** @type {const} */ (['enabled', 'all'])
+
+export const RADIUS_CHOICES = /** @type {const} */ (['pokemon', 'gym'])

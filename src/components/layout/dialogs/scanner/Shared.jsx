@@ -1,15 +1,12 @@
-/* eslint-disable no-nested-ternary */
 // @ts-check
 import * as React from 'react'
-import {
-  ListItemText,
-  ListItem,
-  ListItemIcon,
-  styled,
-  ListItemButton,
-  Divider,
-  ListSubheader,
-} from '@mui/material'
+import { styled } from '@mui/material/styles'
+import ListItem from '@mui/material/ListItem'
+import ListItemText from '@mui/material/ListItemText'
+import ListItemButton from '@mui/material/ListItemButton'
+import ListItemIcon from '@mui/material/ListItemIcon'
+import ListSubheader from '@mui/material/ListSubheader'
+
 import { Trans, useTranslation } from 'react-i18next'
 import { Circle } from 'react-leaflet'
 import PermScanWifiIcon from '@mui/icons-material/PermScanWifi'
@@ -27,10 +24,6 @@ export const StyledListItemText = styled(ListItemText)(() => ({
 
 const StyledListButton = styled(ListItemButton)(() => ({
   padding: '2px 16px',
-}))
-
-export const StyledDivider = styled(Divider)(() => ({
-  margin: '10px 0',
 }))
 
 export const StyledSubHeader = styled(ListSubheader)(() => ({

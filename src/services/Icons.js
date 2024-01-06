@@ -593,7 +593,7 @@ class UAssets {
   /**
    *
    * @param {string | number} weatherId
-   * @param {'day' | 'night'} [timeOfDay]
+   * @param {import("@rm/types").TimesOfDay} [timeOfDay]
    * @returns
    */
   getWeather(weatherId, timeOfDay = 'day') {

@@ -244,7 +244,7 @@ export function useDeepStore(field, defaultValue) {
  *   userSettings: Record<string, any>
  *   clientError: string,
  *   map: import('leaflet').Map | null,
- *   timeOfDay: 'day' | 'night' | 'dusk' | 'dawn',
+ *   timeOfDay: import('@rm/types').TimesOfDay,
  *   hideList: Set<string | number>,
  *   excludeList: string[],
  *   timerList: string[],

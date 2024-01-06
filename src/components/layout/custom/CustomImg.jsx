@@ -9,9 +9,7 @@ import Typography from '@mui/material/Typography'
  * @typedef {ImgProps & Partial<ExtraProps>} Props
  */
 
-/**
- * @type {React.FC<Props>}
- */
+/** @type {React.FC<Props>} */
 export const Img = styled('img', {
   shouldForwardProp: (prop) =>
     prop !== 'maxWidth' && prop !== 'maxHeight' && prop !== 'zIndex',
@@ -24,7 +22,7 @@ export const Img = styled('img', {
 /**
  * A small wrapper around the Img component to display an icon next to text
  *
- * The image is 15x15px
+ * The image defaults to 15x15px
  * @param {import('@mui/material').TypographyProps & {
  *    src: string,
  *    alt?: string,

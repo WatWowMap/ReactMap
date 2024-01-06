@@ -1,6 +1,5 @@
 // @ts-check
 import * as React from 'react'
-import Divider from '@mui/material/Divider'
 import FormControl from '@mui/material/FormControl'
 import InputLabel from '@mui/material/InputLabel'
 import ListItem from '@mui/material/ListItem'
@@ -35,6 +34,7 @@ import {
 import DrawerActions from './Actions'
 import { BoolToggle } from './BoolToggle'
 import LocaleSelection from '../general/LocaleSelection'
+import { DividerWithMargin } from '../general/StyledDivider'
 
 function FCSelect({ name, label, value, onChange, children, icon }) {
   return (
@@ -106,7 +106,7 @@ function UniAssetSelect({ asset }) {
           ))}
         </FCSelect>
       ))}
-      <Divider style={{ margin: '10px 0' }} />
+      <DividerWithMargin />
     </>
   )
 }
@@ -210,7 +210,7 @@ export default function Settings() {
           </ListItemIcon>
         </BoolToggle>
       ))}
-      <Divider style={{ margin: '10px 0' }} />
+      <DividerWithMargin />
       <UniAssetSelect asset="icons" />
       <UniAssetSelect asset="audio" />
       {process.env.NODE_ENV === 'development' && (
@@ -226,12 +226,12 @@ export default function Settings() {
               <LogoDevIcon />
             </ListItemIcon>
           </BoolToggle>
-          <Divider style={{ margin: '10px 0' }} />
+          <DividerWithMargin />
         </>
       )}
       {!separateDrawerActions && (
         <>
-          <Divider style={{ margin: '10px 0' }} />
+          <DividerWithMargin />
           <DrawerActions />
         </>
       )}
