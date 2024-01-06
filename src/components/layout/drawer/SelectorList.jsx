@@ -1,4 +1,3 @@
-/* eslint-disable react/no-unstable-nested-components */
 // @ts-check
 import * as React from 'react'
 import TuneIcon from '@mui/icons-material/Tune'
@@ -40,14 +39,19 @@ function SelectorList({ category }) {
   const easyMode = useStore((s) => !!s.filters[category]?.easyMode)
   const search = useStore((s) => s.searches[`${category}QuickSelect`] || '')
 
+  const translated = React.useMemo(
+    () =>
+      (onlyShowAvailable ? available : Object.keys(allFilters))
+        .filter((key) => key !== 'global')
+        .map((id) => ({ id, name: tId(id).toLowerCase() })),
+    [onlyShowAvailable ? available : allFilters, tId],
+  )
   const items = React.useMemo(() => {
     const lowerCase = search.toLowerCase()
-    return (
-      onlyShowAvailable
-        ? available
-        : Object.keys(allFilters).filter((key) => key !== 'global')
-    ).filter((key) => tId(key).toLowerCase().includes(lowerCase))
-  }, [onlyShowAvailable ? available : allFilters, search, tId])
+    return translated
+      .filter((item) => item.name.includes(lowerCase))
+      .map((item) => item.id)
+  }, [translated, search])
 
   /** @param {'enable' | 'disable' | 'advanced'} action */
   const setAll = (action) => {

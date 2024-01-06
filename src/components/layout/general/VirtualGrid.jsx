@@ -5,7 +5,9 @@ import { VirtuosoGrid } from 'react-virtuoso'
 
 const STYLE = /** @type {React.CSSProperties} */ ({ height: 400 })
 
-/** @type {React.ComponentType<import('react-virtuoso').GridItemProps & { context: Record<string, any> }>} */
+/** @typedef {{ itemsPerRow?: number }} Prop */
+
+/** @type {React.ComponentType<import('react-virtuoso').GridItemProps & { context: Prop }>} */
 const Item = ({ context, ...props }) => (
   <Grid2 xs={Math.round(12 / (context?.itemsPerRow || 1))} {...props} />
 )
@@ -17,16 +19,15 @@ const components = { Item, List }
 
 /**
  * @template T
- * @template {import('react-virtuoso').VirtuosoGridProps<T, { itemsPerRow: number }>['context']} U
- * @param {{
+ * @template {Record<string, any>} U
+ * @param {Prop & {
  *  data: T[],
- *  itemsPerRow?: number,
  *  context?: U,
- *  children: import('react-virtuoso').VirtuosoGridProps<T, U>['itemContent']
+ *  children: import('react-virtuoso').VirtuosoGridProps<T, U & Prop>['itemContent']
  * }} props
  */
 export function VirtualGrid({ children, data, context, itemsPerRow = 3 }) {
-  const fulLContext = React.useMemo(
+  const fullContext = React.useMemo(
     () => ({ ...context, itemsPerRow }),
     [itemsPerRow, context],
   )
@@ -36,7 +37,7 @@ export function VirtualGrid({ children, data, context, itemsPerRow = 3 }) {
       totalCount={data.length}
       overscan={5}
       data={data}
-      context={fulLContext}
+      context={fullContext}
       components={components}
       itemContent={children}
     />

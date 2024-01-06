@@ -19,13 +19,12 @@ import {
  */
 export function SelectorItem({ category, children }) {
   const { t } = useTranslateById()
-  const title = t(children)
   const [filter, setFilter] = useDeepStore(
     `filters.${category}.filter.${children}`,
   )
+  const title = t(children)
   const url = useStatic((s) => s.Icons.getIconById(children))
   const easyMode = useStore((s) => !!s.filters[category].easyMode)
-
   const color = filter?.enabled
     ? filter?.all || easyMode
       ? 'success.main'
@@ -84,27 +83,25 @@ export function SelectorItem({ category, children }) {
           }}
         />
       </Tooltip>
-      <div>
-        <Collapse in={!easyMode} component="div">
-          <IconButton
-            size="small"
-            sx={{ position: 'absolute', right: 0, top: 0 }}
-            onClick={(e) => {
-              e.stopPropagation()
-              useLayoutStore.setState({
-                advancedFilter: {
-                  open: true,
-                  id: children,
-                  category,
-                  selectedIds: [],
-                },
-              })
-            }}
-          >
-            <TuneIcon fontSize="small" />
-          </IconButton>
-        </Collapse>
-      </div>
+      <Collapse in={!easyMode}>
+        <IconButton
+          size="small"
+          sx={{ position: 'absolute', right: 0, top: 0 }}
+          onClick={(e) => {
+            e.stopPropagation()
+            useLayoutStore.setState({
+              advancedFilter: {
+                open: true,
+                id: children,
+                category,
+                selectedIds: [],
+              },
+            })
+          }}
+        >
+          <TuneIcon fontSize="small" />
+        </IconButton>
+      </Collapse>
     </Box>
   )
 }
