@@ -54,6 +54,7 @@ function buildDefaultFilters(perms, database) {
               : undefined,
             badge: perms.gymBadges ? 'all' : undefined,
             raidTier: perms.raids ? 'all' : undefined,
+            standard: new BaseFilter(),
             filter: {
               ...buildGyms(perms, defaultFilters.gyms),
               ...pokemon.raids,
@@ -67,6 +68,7 @@ function buildDefaultFilters(perms, database) {
             pokemon: defaultFilters.nests.pokemon,
             polygons: defaultFilters.nests.polygons,
             avgFilter: defaultFilters.nests.avgFilter,
+            standard: new BaseFilter(),
             filter: pokemon.nests,
           }
         : undefined,
@@ -93,6 +95,7 @@ function buildDefaultFilters(perms, database) {
               ? defaultFilters.pokestops.invasions
               : undefined,
             arEligible: perms.pokestops ? false : undefined,
+            standard: new BaseFilter(),
             filter: {
               ...pokemon.rocket,
               ...buildPokestops(perms, defaultFilters.pokestops),
@@ -130,6 +133,7 @@ function buildDefaultFilters(perms, database) {
               0,
               Math.ceil(database.filterContext.Route.maxDistance / 1000) + 1,
             ],
+            standard: new BaseFilter(),
             filter: {
               global: new BaseFilter(),
             },
@@ -139,6 +143,7 @@ function buildDefaultFilters(perms, database) {
       perms.portals && database.models.Portal
         ? {
             enabled: defaultFilters.portals.enabled,
+            standard: new BaseFilter(),
             filter: {
               global: new BaseFilter(),
               old: new BaseFilter(),
@@ -149,6 +154,7 @@ function buildDefaultFilters(perms, database) {
     scanAreas: perms.scanAreas
       ? {
           enabled: defaultFilters.scanAreas.enabled,
+          standard: new BaseFilter(),
           filterByAreas: false,
           filter: { areas: [], search: '' },
         }
@@ -161,6 +167,7 @@ function buildDefaultFilters(perms, database) {
             s17Cells: defaultFilters.submissionCells.s17Cells,
             s14Cells: defaultFilters.submissionCells.s14Cells,
             includeSponsored: defaultFilters.submissionCells.includeSponsored,
+            standard: new BaseFilter(),
             filter: { global: new BaseFilter() },
           }
         : undefined,
@@ -168,6 +175,7 @@ function buildDefaultFilters(perms, database) {
       ? {
           enabled: defaultFilters.s2cells.enabled,
           cells: defaultFilters.s2cells.cells,
+          standard: new BaseFilter(),
           filter: { global: new BaseFilter() },
         }
       : undefined,
@@ -175,6 +183,7 @@ function buildDefaultFilters(perms, database) {
       perms.weather && database.models.Weather
         ? {
             enabled: defaultFilters.weather.enabled,
+            standard: new BaseFilter(),
             filter: { global: new BaseFilter() },
           }
         : undefined,
@@ -182,6 +191,7 @@ function buildDefaultFilters(perms, database) {
       perms.spawnpoints && database.models.Spawnpoint
         ? {
             enabled: defaultFilters.spawnpoints.enabled,
+            standard: new BaseFilter(),
             tth: defaultFilters.spawnpoints.tth,
             filter: {
               global: new BaseFilter(),
@@ -194,6 +204,7 @@ function buildDefaultFilters(perms, database) {
       perms.scanCells && database.models.ScanCell
         ? {
             enabled: defaultFilters.scanCells.enabled,
+            standard: new BaseFilter(),
             filter: { global: new BaseFilter() },
           }
         : undefined,
@@ -201,6 +212,7 @@ function buildDefaultFilters(perms, database) {
       perms.devices && database.models.Device
         ? {
             enabled: defaultFilters.devices.enabled,
+            standard: new BaseFilter(),
             filter: {
               online: new BaseFilter(),
               offline: new BaseFilter(),

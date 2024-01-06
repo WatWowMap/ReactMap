@@ -105,6 +105,7 @@ export function SelectorItem({ id, category, caption }) {
           alignItems="center"
         >
           {title}
+          {process.env.NODE_ENV === 'development' ? `\n(${id})` : ''}
         </Typography>
       )}
     </Box>

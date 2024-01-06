@@ -7,15 +7,11 @@ import Drawer from '@mui/material/Drawer'
 import { useTranslation } from 'react-i18next'
 
 import Utility from '@services/Utility'
-import {
-  useStore,
-  useStatic,
-  useLayoutStore,
-  setDeepStore,
-} from '@hooks/useStore'
+import { useStore, useStatic, useLayoutStore } from '@hooks/useStore'
 import useFilter from '@hooks/useFilter'
 import Header from '@components/layout/general/Header'
 import Footer from '@components/layout/general/Footer'
+import { applyToAll } from '@services/filtering/applyToAll'
 
 import SlotSelection from '../dialogs/filters/SlotSelection'
 import OptionsContainer from '../dialogs/filters/OptionsContainer'
@@ -59,31 +55,6 @@ export default function Menu({
     webhookCategory,
     categories,
   )
-
-  const selectAllOrNone = (show) => {
-    const existing = useStore.getState().filters[category].filter ?? {}
-    const newObj = Object.fromEntries(
-      Object.entries(existing).flatMap(([key, item]) => {
-        const filters = [
-          [key, key in filteredObj ? { ...item, enabled: show } : item],
-        ]
-        if (key.startsWith('t') && key.charAt(1) != 0 && !webhookCategory) {
-          filters.push(
-            ...Object.entries(Utility.generateSlots(key, show, existing)),
-          )
-        }
-        return filters
-      }),
-    )
-    // Object.entries(filteredObj).forEach(([key, item]) => {
-    //   newObj[key] = { ...item, enabled: show }
-    //   if (key.startsWith('t') && key.charAt(1) != 0 && !webhookCategory) {
-    //     Object.assign(newObj, Utility.generateSlots(key, show, tempFilters))
-    //   }
-    // })
-    // setTempFilters({ ...tempFilters, ...newObj })
-    setDeepStore(`filters.${category}.filter`, newObj)
-  }
 
   const toggleDrawer = React.useCallback(
     (open) => (event) => {
@@ -182,8 +153,9 @@ export default function Menu({
     [category, categories, count.total, count.show, toggleDrawer],
   )
 
-  const footerButtons = React.useMemo(
-    () => [
+  const footerButtons = React.useMemo(() => {
+    const selectedIds = Object.keys(filteredObj)
+    return [
       {
         name: 'help',
         action: () => setHelpDialog((prev) => !prev),
@@ -205,27 +177,27 @@ export default function Menu({
                   open: true,
                   id: 'global',
                   category,
-                  selectedIds: Object.keys(filteredObj),
+                  selectedIds,
                 },
               }),
         icon: category === 'pokemon' || webhookCategory ? 'Tune' : 'FormatSize',
       },
       {
         name: 'disable_all',
-        action: () => selectAllOrNone(false),
+        action: () =>
+          applyToAll(false, category, selectedIds, !webhookCategory),
         icon: 'Clear',
         color: 'error',
       },
       {
         name: 'enable_all',
-        action: () => selectAllOrNone(true),
+        action: () => applyToAll(true, category, selectedIds, !webhookCategory),
         icon: 'Check',
         color: 'success',
       },
       ...(extraButtons ?? []),
-    ],
-    [category, webhookCategory, extraButtons, filteredObj, tempFilters],
-  )
+    ]
+  }, [category, webhookCategory, extraButtons, filteredObj, tempFilters])
 
   return (
     <>

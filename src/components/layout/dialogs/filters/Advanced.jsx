@@ -16,6 +16,7 @@ import Footer from '@components/layout/general/Footer'
 import { DualBoolToggle } from '@components/layout/drawer/BoolToggle'
 import { ENABLED_ALL, XXS_XXL } from '@assets/constants'
 import { useTranslateById } from '@hooks/useTranslateById'
+import { applyToAll } from '@services/filtering/applyToAll'
 
 import { StringFilter } from './StringFilter'
 import SliderTile from './SliderTile'
@@ -39,7 +40,7 @@ export default function AdvancedFilter() {
   const ui = useStatic((s) => s.ui[category])
   const isMobile = useStatic((s) => s.isMobile)
   const legacyFilter = useStore((s) => !!s.userSettings[category]?.legacyFilter)
-  const standard = useStore((s) =>
+  const standard = useStatic((s) =>
     category === 'pokemon' ? s.filters[category].standard : STANDARD_BACKUP,
   )
   const [filters, setFilters] = useDeepStore(
@@ -78,29 +79,7 @@ export default function AdvancedFilter() {
     if (!save) {
       setFilters({ ...backup.current })
     } else if (id === 'global' && selectedIds?.length) {
-      const keys = new Set(selectedIds)
-      useStore.setState((prev) => ({
-        filters: {
-          ...prev.filters,
-          [category]: {
-            ...prev.filters[category],
-            filter: Object.fromEntries(
-              Object.entries(prev.filters[category].filter).map(
-                ([key, oldFilter]) => [
-                  key,
-                  keys.has(key)
-                    ? {
-                        ...filters,
-                        enabled: true,
-                        all: prev.filters[category].easyMode,
-                      }
-                    : oldFilter,
-                ],
-              ),
-            ),
-          },
-        },
-      }))
+      applyToAll(true, category, selectedIds, false)
     }
   }
 
