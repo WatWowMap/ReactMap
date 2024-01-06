@@ -93,7 +93,7 @@ export default function TutAdvanced({ toggleHelp, category }) {
           alignItems="center"
           justifyContent="center"
           spacing={1}
-          style={{ height: '100%' }}
+          height="100%"
         >
           <Grid item xs={12} style={{ textAlign: 'center' }}>
             <Typography variant="caption" style={{ whiteSpace: 'pre-line' }}>

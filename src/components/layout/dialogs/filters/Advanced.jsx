@@ -38,14 +38,15 @@ export default function AdvancedFilter() {
   const { t: tId } = useTranslateById()
   const ui = useStatic((s) => s.ui[category])
   const isMobile = useStatic((s) => s.isMobile)
-  const legacyFilter = useStore(
-    (s) => s.userSettings[category]?.legacyFilter || false,
-  )
-  const [filters, setFilters] = useDeepStore(`filters.${category}.filter.${id}`)
-  const backup = React.useRef(filters)
+  const legacyFilter = useStore((s) => !!s.userSettings[category]?.legacyFilter)
   const standard = useStore((s) =>
     category === 'pokemon' ? s.filters[category].standard : STANDARD_BACKUP,
   )
+  const [filters, setFilters] = useDeepStore(
+    `filters.${category}.filter.${id}`,
+    standard,
+  )
+  const backup = React.useRef(filters)
 
   Utility.analytics(`/${category}/${id}`)
   Utility.analytics(

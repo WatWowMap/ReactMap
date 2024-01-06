@@ -15,6 +15,7 @@ import {
   useStore,
 } from '@hooks/useStore'
 import { Img } from '../custom/CustomImg'
+import { ColoredTile } from '../general/ColoredTile'
 
 /**
  * @param {{
@@ -60,23 +61,7 @@ export function SelectorItem({ id, category, caption }) {
         setFilter(newFilter)
       }}
     >
-      <Box
-        height="100%"
-        width="100%"
-        bgcolor={color}
-        position="absolute"
-        top={0}
-        left={0}
-        sx={(theme) => ({
-          opacity: 0.5,
-          transition: theme.transitions.create('opacity', {
-            duration: theme.transitions.duration.shortest,
-          }),
-          '&:hover': {
-            opacity: 0.75,
-          },
-        })}
-      />
+      <ColoredTile bgcolor={color} />
       <Tooltip title={title} arrow>
         <Img
           alt={title}
