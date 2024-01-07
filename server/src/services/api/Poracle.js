@@ -784,7 +784,7 @@ class PoracleAPI {
           gym_id: null,
           byDistance: false,
           allMoves: true,
-          allForms: true,
+          allForms: false,
           everything_individually:
             this.everythingFlagPermissions ===
               'allow-and-always-individually' ||
@@ -1088,7 +1088,7 @@ class PoracleAPI {
           amount: 0,
           form: 0,
           byDistance: false,
-          allForms: true,
+          allForms: false,
         },
         ui: {
           general: {
@@ -1152,7 +1152,7 @@ class PoracleAPI {
           min_spawn_avg: 0,
           form: 0,
           byDistance: false,
-          allForms: true,
+          allForms: false,
         },
         ui: {
           general: {
