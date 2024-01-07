@@ -429,10 +429,7 @@ const GymBadges = () => {
 const BadgeTile = ({ badge, ...gym }) => {
   const { t } = useTranslation()
   const map = useMap()
-  const [local, setLocal] = React.useState(badge)
-  const badgeIcon = useStatic((s) => s.Icons.getMisc(`badge_${local}`))
-
-  React.useEffect(() => setLocal(badge), [badge])
+  const badgeIcon = useStatic((s) => s.Icons.getMisc(`badge_${badge}`))
 
   return badge ? (
     <Box className="vgrid-item">
@@ -442,7 +439,7 @@ const BadgeTile = ({ badge, ...gym }) => {
         size="small"
         onClick={() =>
           useLayoutStore.setState({
-            gymBadge: { badge: local, gymId: gym.id, open: true },
+            gymBadge: { badge, gymId: gym.id, open: true },
           })
         }
       >
@@ -461,7 +458,7 @@ const BadgeTile = ({ badge, ...gym }) => {
           width={120}
         />
         {gym.deleted && <div className="disabled-overlay badge-diamond" />}
-        {local && <Img src={badgeIcon} alt={local} width={96} zIndex={10} />}
+        {badge && <Img src={badgeIcon} alt={badge} width={96} zIndex={10} />}
       </Button>
 
       <Typography
