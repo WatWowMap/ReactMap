@@ -12,7 +12,6 @@ import {
   CardMedia,
   CardContent,
   IconButton,
-  Dialog,
   TextField,
   Button,
   ButtonGroup,
@@ -28,15 +27,15 @@ import { useLayoutStore, useStatic, useStore } from '@hooks/useStore'
 import Utility from '@services/Utility'
 import Query from '@services/Query'
 
-import BadgeSelection from './BadgeSelection'
 import Header from '../general/Header'
 import Footer from '../general/Footer'
 import TabPanel from '../general/TabPanel'
 import DiscordLogin from '../auth/Discord'
 import Telegram from '../auth/Telegram'
 import Notification from '../general/Notification'
-import ReactWindow from '../general/ReactWindow'
 import { DialogWrapper } from './DialogWrapper'
+import { VirtualGrid } from '../general/VirtualGrid'
+import { Img } from '../general/Img'
 
 export default function UserProfile() {
   Utility.analytics('/user-profile')
@@ -48,7 +47,6 @@ export default function UserProfile() {
 
   const [tab, setTab] = React.useState(0)
   const [tabsHeight, setTabsHeight] = React.useState(0)
-  const [contentHeight, setContentHeight] = React.useState(0)
   const handleTabChange = (_event, newValue) => {
     setTab(newValue)
   }
@@ -64,10 +62,7 @@ export default function UserProfile() {
         titles={['user_profile', `- ${auth.username}`]}
         action={handleClose}
       />
-      <DialogContent
-        style={{ padding: 0 }}
-        ref={(ref) => ref && setContentHeight(ref.clientHeight)}
-      >
+      <DialogContent sx={{ p: 0 }}>
         <AppBar
           position="static"
           ref={(ref) => ref && setTabsHeight(ref.clientHeight)}
@@ -80,7 +75,10 @@ export default function UserProfile() {
         </AppBar>
         <Box
           overflow="auto"
-          maxHeight={`${contentHeight - tabsHeight}px`}
+          maxHeight={{
+            xs: `calc(100% - ${tabsHeight}px)`,
+            sm: `calc(75vh - ${tabsHeight}px)`,
+          }}
           minHeight="70vh"
         >
           <TabPanel value={tab} index={0}>
@@ -375,51 +373,41 @@ const PermCard = ({ perm }) => {
 
 const GymBadges = () => {
   const { t } = useTranslation()
-  const isMobile = useStatic((s) => s.isMobile)
+  /** @type {import('@apollo/client').QueryResult<import('@rm/types').Gym>} */
   const { data } = useQuery(Query.gyms('badges'), {
     fetchPolicy: 'network-only',
   })
-  const Icons = useStatic((s) => s.Icons)
-  const map = useMap()
 
-  let gold = 0
-  let silver = 0
-  let bronze = 0
+  const counts = React.useMemo(() => {
+    const counter = { gold: 0, silver: 0, bronze: 0 }
 
-  if (data?.badges) {
-    data.badges.forEach((gym) => {
-      switch (gym.badge) {
-        case 3:
-          gold += 1
-          break
-        case 2:
-          silver += 1
-          break
-        case 1:
-          bronze += 1
-          break
-        default:
-      }
-    })
-  }
+    if (data?.badges) {
+      data.badges.forEach((gym) => {
+        switch (gym.badge) {
+          case 3:
+            counter.gold += 1
+            break
+          case 2:
+            counter.silver += 1
+            break
+          case 1:
+            counter.bronze += 1
+            break
+          default:
+        }
+      })
+    }
+    return counter
+  }, [data])
 
   return data ? (
-    <Grid
-      container
-      direction="column"
-      alignItems="center"
-      justifyContent="center"
-      height="100cqh"
-    >
-      <Grid item>
-        <Typography variant="h5" align="center" gutterBottom>
-          {t('gym_badges')}
-        </Typography>
-      </Grid>
-      <Grid item container direction="row">
-        {[bronze, silver, gold].map((count, i) => (
-          // eslint-disable-next-line react/no-array-index-key
-          <Grid key={i} item xs={4}>
+    <Box className="user-profile-badge-grid">
+      <Typography variant="h5" align="center" gutterBottom>
+        {t('gym_badges')}
+      </Typography>
+      <Grid container pt={1} pb={2}>
+        {Object.entries(counts).map(([key, count], i) => (
+          <Grid key={key} item xs={4}>
             <Typography
               variant="subtitle2"
               align="center"
@@ -430,89 +418,60 @@ const GymBadges = () => {
           </Grid>
         ))}
       </Grid>
-      <Grid item style={{ flexGrow: 1, marginTop: 10, width: '100%' }}>
-        <ReactWindow
-          columnCount={isMobile ? 2 : 3}
-          length={data.badges.length}
-          data={{ badges: data.badges, Icons, t, map }}
-          offset={0}
-          Tile={BadgeTile}
-        />
-      </Grid>
-    </Grid>
+      <VirtualGrid data={data?.badges || []} xs={4} md={3} useWindowScroll>
+        {(_, badge) => <BadgeTile {...badge} />}
+      </VirtualGrid>
+    </Box>
   ) : null
 }
 
-const BadgeTile = ({ data, rowIndex, columnIndex, style }) => {
-  const { badges, columnCount, Icons, t, map } = data
-  const item = badges[rowIndex * columnCount + columnIndex]
-  const [badge, setBadge] = React.useState(item?.badge)
-  const [badgeMenu, setBadgeMenu] = React.useState(false)
+/** @param {import('@rm/types').Gym} props */
+const BadgeTile = ({ badge, ...gym }) => {
+  const { t } = useTranslation()
+  const map = useMap()
+  const [local, setLocal] = React.useState(badge)
+  const badgeIcon = useStatic((s) => s.Icons.getMisc(`badge_${local}`))
 
-  return item && badge ? (
-    <Grid
-      container
-      style={{
-        ...style,
-        backgroundColor: Utility.getTileBackground(columnIndex, rowIndex),
-        textAlign: 'center',
-      }}
-      alignItems="center"
-      justifyContent="center"
-    >
-      {item.deleted && <div className="disabled-overlay" />}
+  React.useEffect(() => setLocal(badge), [badge])
+
+  return badge ? (
+    <Box className="vgrid-item">
       <IconButton
-        disabled={item.deleted}
+        className="vgrid-icon"
+        disabled={gym.deleted}
         size="small"
-        style={{ position: 'absolute', top: 2, right: 2 }}
-        onClick={() => setBadgeMenu(true)}
+        onClick={() =>
+          useLayoutStore.setState({
+            gymBadge: { badge: local, gymId: gym.id, open: true },
+          })
+        }
       >
         <Edit />
       </IconButton>
-      <Grid
-        item
-        xs={12}
-        style={{ maxHeight: 60 }}
-        onClick={() => map.flyTo([item.lat, item.lon], 16)}
+      <Button
+        className="vgrid-image"
+        onClick={() => map.flyTo([gym.lat, gym.lon], 16)}
+        disabled={gym.deleted}
       >
-        <img
-          src={item.url ? item.url.replace('http://', 'https://') : ''}
-          alt={item.url}
-          style={{
-            width: 48,
-            height: 48,
-            clipPath: 'polygon(50% 0%, 80% 50%, 50% 100%, 20% 50%)',
-            transform: 'translateX(50%) translateY(20%)',
-          }}
+        <Img
+          className="badge-diamond"
+          src={gym.url ? gym.url.replace('http://', 'https://') : ''}
+          alt={gym.url}
+          height={120}
+          width={120}
         />
-        {badge && (
-          <img
-            src={Icons.getMisc(`badge_${badge}`)}
-            alt={badge}
-            style={{
-              width: 40,
-              height: 'auto',
-              bottom: -1,
-              left: `${100}%`,
-              transform: 'translateX(-50%) translateY(20%)',
-            }}
-          />
-        )}
-      </Grid>
-      <Grid item xs={12} style={{ textAlign: 'center' }}>
-        <Typography variant="caption">
-          {item.name || t('unknown_gym')}
-        </Typography>
-      </Grid>
-      <Dialog open={badgeMenu} onClose={() => setBadgeMenu(false)}>
-        <BadgeSelection
-          gym={item}
-          badge={badge}
-          setBadge={setBadge}
-          setBadgeMenu={setBadgeMenu}
-        />
-      </Dialog>
-    </Grid>
+        {gym.deleted && <div className="disabled-overlay badge-diamond" />}
+        {local && <Img src={badgeIcon} alt={local} width={96} zIndex={10} />}
+      </Button>
+
+      <Typography
+        className="vgrid-caption"
+        variant="caption"
+        color={gym.deleted ? 'GrayText' : 'inherit'}
+      >
+        {gym.name || t('unknown_gym')}
+      </Typography>
+    </Box>
   ) : null
 }
 

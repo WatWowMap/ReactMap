@@ -1,69 +1,77 @@
 // @ts-check
 import * as React from 'react'
 import DialogContent from '@mui/material/DialogContent'
-import Button from '@mui/material/Button'
-import ButtonGroup from '@mui/material/ButtonGroup'
-import { useTranslation } from 'react-i18next'
+import Dialog from '@mui/material/Dialog'
 import { useMutation } from '@apollo/client'
 import { apolloClient, apolloCache } from '@services/apollo'
 
 import Query from '@services/Query'
+import { ENUM_BADGES } from '@assets/constants'
+import { useLayoutStore } from '@hooks/useStore'
 
 import Header from '../general/Header'
 import Footer from '../general/Footer'
+import { MultiSelector } from '../drawer/MultiSelector'
 
-export default function BadgeSelection({ id, setBadgeMenu, badge }) {
-  const { t } = useTranslation()
+const handleClose = () =>
+  useLayoutStore.setState({
+    gymBadge: {
+      open: false,
+      gymId: '',
+      badge: 0,
+    },
+  })
 
+const footerOptions =
+  /** @type {import('../general/Footer').FooterButton[]} */ ([
+    {
+      name: 'close',
+      action: handleClose,
+      color: 'primary',
+      align: 'right',
+    },
+  ])
+
+export default function BadgeSelection() {
+  const { gymId, badge, open } = useLayoutStore((s) => s.gymBadge)
   const [setBadgeInDb] = useMutation(Query.user('setGymBadge'), {
     refetchQueries: ['GetBadgeInfo'],
   })
 
-  return (
-    <>
-      <Header titles="gym_badge_menu" action={() => setBadgeMenu(false)} />
-      <DialogContent>
-        <ButtonGroup sx={{ pt: 2 }}>
-          {[0, 1, 2, 3].map((i) => (
-            <Button
-              key={i}
-              size="small"
-              onClick={() => {
-                setBadgeInDb({
-                  variables: {
-                    badge: i,
-                    gymId: id,
-                  },
-                })
-                apolloClient.cache.modify({
-                  id: apolloCache.identify({ __typename: 'Gym', id }),
-                  fields: {
-                    badge() {
-                      return i
-                    },
-                  },
-                })
-                setBadgeMenu(false)
-              }}
-              color={badge === i ? 'primary' : 'secondary'}
-              variant={badge === i ? 'contained' : 'outlined'}
-            >
-              {t(`badge_${i}`)}
-            </Button>
-          ))}
-        </ButtonGroup>
-      </DialogContent>
-      <Footer
-        options={[
-          {
-            name: 'close',
-            action: () => setBadgeMenu(false),
-            color: 'primary',
-            align: 'right',
+  /** @type {import('packages/types/lib').MultiSelectorProps<typeof badge>['onClick']} */
+  const onClick = React.useCallback(
+    (_, newV) => () => {
+      setBadgeInDb({
+        variables: {
+          badge: newV,
+          gymId,
+        },
+      })
+      apolloClient.cache.modify({
+        id: apolloCache.identify({ __typename: 'Gym', id: gymId }),
+        fields: {
+          badge() {
+            return newV
           },
-        ]}
-        role="webhook_footer"
-      />
-    </>
+        },
+      })
+      handleClose()
+    },
+    [setBadgeInDb, gymId],
+  )
+
+  return (
+    <Dialog open={open} onClose={handleClose}>
+      <Header titles="gym_badge_menu" action={handleClose} />
+      <DialogContent sx={{ mt: 2 }}>
+        <MultiSelector
+          items={ENUM_BADGES}
+          value={badge}
+          onClick={onClick}
+          tKey="badge_"
+        />
+      </DialogContent>
+      <Footer options={footerOptions} role="webhook_footer" />
+    </Dialog>
   )
 }

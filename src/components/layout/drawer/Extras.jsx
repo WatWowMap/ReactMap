@@ -22,7 +22,7 @@ import {
   WAYFARER_OPTIONS,
 } from '@assets/constants'
 
-import { MultiSelector } from './MultiSelector'
+import { MultiSelectorStore } from './MultiSelector'
 import SliderTile from '../dialogs/filters/SliderTile'
 import { CollapsibleItem } from './CollapsibleItem'
 
@@ -84,7 +84,7 @@ const BaseAllForts = ({ category, subItem }) => {
     <CollapsibleItem open={enabled}>
       <ListItem>
         <ListItemText primary={t('power_up')} />
-        <MultiSelector
+        <MultiSelectorStore
           field={`filters.${category}.levels`}
           items={FORT_LEVELS}
         />
@@ -99,7 +99,11 @@ const BaseGymBadges = () => {
   return (
     <CollapsibleItem open={enabled}>
       <ListItem>
-        <MultiSelector field="filters.gyms.badge" allowNone items={BADGES} />
+        <MultiSelectorStore
+          field="filters.gyms.badge"
+          allowNone
+          items={BADGES}
+        />
       </ListItem>
     </CollapsibleItem>
   )
@@ -148,7 +152,7 @@ const BaseQuestSet = () => {
   return (
     <CollapsibleItem open={enabled}>
       <ListItem>
-        <MultiSelector
+        <MultiSelectorStore
           field="filters.pokestops.showQuestSet"
           items={QUEST_SETS}
         />
@@ -299,7 +303,7 @@ const BaseSpawnpointTTH = () => {
   return (
     <CollapsibleItem open={enabled}>
       <ListItem>
-        <MultiSelector
+        <MultiSelectorStore
           field="filters.spawnpoints.tth"
           items={ENUM_TTH}
           tKey="tth_"

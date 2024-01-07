@@ -18,28 +18,33 @@ import Webhook from './dialogs/webhooks/Webhook'
 import ClientError from './dialogs/ClientError'
 import { WebhookNotification } from './dialogs/webhooks/Notification'
 import AdvancedFilter from './dialogs/filters/Advanced'
+import BadgeSelection from './dialogs/BadgeSelection'
 
-export default function Nav() {
-  const iconsIsReady = useStatic((s) => !!s.Icons)
-  if (!iconsIsReady) return null
-  return (
-    <>
-      <Sidebar />
-      <FloatingBtn />
-      <UserProfile />
-      <Tutorial />
-      <FilterMenu />
-      <UserOptions />
-      <Webhook />
-      <Search />
-      <MessageOfTheDay />
-      <DonorPage />
-      <Feedback />
-      <ResetFilters />
-      <ScanDialog />
-      <WebhookNotification />
-      <ClientError />
-      <AdvancedFilter />
-    </>
-  )
-}
+export const Nav = React.memo(
+  () => {
+    const iconsIsReady = useStatic((s) => !!s.Icons)
+    if (!iconsIsReady) return null
+    return (
+      <>
+        <Sidebar />
+        <FloatingBtn />
+        <UserProfile />
+        <Tutorial />
+        <FilterMenu />
+        <UserOptions />
+        <Webhook />
+        <Search />
+        <MessageOfTheDay />
+        <DonorPage />
+        <Feedback />
+        <ResetFilters />
+        <ScanDialog />
+        <WebhookNotification />
+        <ClientError />
+        <AdvancedFilter />
+        <BadgeSelection />
+      </>
+    )
+  },
+  () => true,
+)

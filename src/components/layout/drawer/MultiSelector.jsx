@@ -4,39 +4,20 @@ import { ButtonGroup, Button } from '@mui/material'
 import { useTranslation } from 'react-i18next'
 import { useDeepStore } from '@hooks/useStore'
 
-/**
- * @template {import('@hooks/useStore').UseStorePaths} T
- * @template {import('@rm/types').ConfigPathValue<import('@hooks/useStore').UseStore, T>} V
- * @param {{
- *  field: T,
- *  items: readonly V[],
- *  tKey?: string,
- *  allowNone?: boolean,
- *  disabled?: boolean
- *  defaultValue?: V,
- * }} props
- * @returns
- */
-export function MultiSelector({
-  field,
-  disabled,
-  items,
-  tKey,
-  allowNone = false,
-  defaultValue,
-}) {
-  const { t } = useTranslation()
-  const [value, setValue] = useDeepStore(field, defaultValue)
+const SX = /** @type {import('@mui/material').SxProps} */ ({ mx: 'auto' })
 
+/**
+ * @template T
+ * @param {import('@rm/types').MultiSelectorProps<T>} props
+ */
+export function MultiSelector({ items, value, disabled, onClick, tKey }) {
+  const { t } = useTranslation()
   return (
-    <ButtonGroup disabled={disabled} size="small" sx={{ mx: 'auto' }}>
+    <ButtonGroup disabled={disabled} size="small" sx={SX}>
       {items.map((item) => (
         <Button
           key={`${item}`}
-          onClick={() => {
-            // @ts-ignore // TODO: fix this
-            setValue(item === value && allowNone ? 'none' : item)
-          }}
+          onClick={onClick(value, item)}
           color={item === value ? 'primary' : 'secondary'}
           variant={item === value ? 'contained' : 'outlined'}
         >
@@ -45,4 +26,36 @@ export function MultiSelector({
       ))}
     </ButtonGroup>
   )
+}
+
+/**
+ * @template {import('@hooks/useStore').UseStorePaths} T
+ * @template {import('@rm/types').ConfigPathValue<import('@hooks/useStore').UseStore, T>} V
+ * @param {{
+ *  field: T,
+ *  defaultValue?: V,
+ *  onClick?: (oldValue: ReturnType<typeof useDeepStore>[0], newValue: V) => void
+ *  allowNone?: boolean
+ * } & Omit<import('@rm/types').MultiSelectorProps<V>, 'value'>} props
+ * @returns
+ */
+export function MultiSelectorStore({
+  field,
+  allowNone = false,
+  defaultValue,
+  onClick,
+  ...props
+}) {
+  const [value, setValue] = useDeepStore(field, defaultValue)
+
+  /** @type {(o: typeof value, n: V) => import('@mui/material').ButtonProps['onClick']} */
+  const onClickWrapper = React.useCallback(
+    (oldValue, newValue) => () => {
+      // @ts-ignore // TODO: fix this
+      setValue(newValue === oldValue && allowNone ? 'none' : newValue)
+      onClick?.(oldValue, newValue)
+    },
+    [setValue, onClick],
+  )
+  return <MultiSelector value={value} onClick={onClickWrapper} {...props} />
 }

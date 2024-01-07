@@ -8,7 +8,7 @@ import Map from './Map'
 import ScanOnDemand from './layout/dialogs/scanner/ScanOnDemand'
 import DraggableMarker from './layout/dialogs/webhooks/human/Draggable'
 import WebhookAreaSelection from './layout/dialogs/webhooks/human/area/AreaSelection'
-import Nav from './layout/Nav'
+import { Nav } from './layout/Nav'
 import ActiveWeather from './layout/general/ActiveWeather'
 import {
   ControlledLocate,

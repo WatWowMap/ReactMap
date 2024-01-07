@@ -26,3 +26,14 @@ export type MarginProps = {
 export type PaddingProps = {
   [Key in 'p' | 'pt' | 'pb' | 'pl' | 'pr']?: React.CSSProperties['padding']
 }
+
+export interface MultiSelectorProps<V> {
+  value: V
+  items: readonly V[]
+  tKey?: string
+  disabled?: boolean
+  onClick?: (
+    oldValue: V,
+    newValue: V,
+  ) => (e?: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void
+}

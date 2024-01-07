@@ -6,6 +6,8 @@ export const NUNDO_HUNDO = /** @type {const} */ (['zeroIv', 'hundoIv'])
 
 export const ENUM_GENDER = /** @type {const} */ ([0, 1, 2, 3])
 
+export const ENUM_BADGES = /** @type {const} */ ([0, 1, 2, 3])
+
 export const S2_LEVELS = /** @type {const} */ ([
   10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20,
 ])

@@ -362,6 +362,11 @@ export const useStatic = create((set) => ({
  *    category: string,
  *    type: string,
  *  },
+ *  gymBadge: {
+ *   open: boolean,
+ *   gymId: string,
+ *   badge: number,
+ *  },
  * }} UseLayoutStore
  *
  * @type {import("zustand").UseBoundStore<import("zustand").StoreApi<UseLayoutStore>>}
@@ -385,6 +390,11 @@ export const useLayoutStore = create(() => ({
     open: false,
     category: '',
     type: '',
+  },
+  gymBadge: {
+    open: false,
+    gymId: '',
+    badge: 0,
   },
 }))
 

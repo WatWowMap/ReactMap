@@ -4,7 +4,7 @@ import ListItem from '@mui/material/ListItem'
 import ListItemText from '@mui/material/ListItemText'
 import { useTranslation } from 'react-i18next'
 
-import { MultiSelector } from '@components/layout/drawer/MultiSelector'
+import { MultiSelectorStore } from '@components/layout/drawer/MultiSelector'
 import { ICON_SIZES } from '@assets/constants'
 
 /**
@@ -18,7 +18,7 @@ export default function Size({ field, ...props }) {
   return (
     <ListItem {...props}>
       <ListItemText sx={{ pr: 2 }}>{t('icon_size')}</ListItemText>
-      <MultiSelector
+      <MultiSelectorStore
         items={ICON_SIZES}
         field={`${field}.size`}
         defaultValue="md"

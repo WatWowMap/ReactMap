@@ -387,15 +387,6 @@ img {
   font-size: 0;
 }
 
-.disabled-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  opacity: 80%;
-}
-
 .perm-wrapper img {
   width: 100%;
 }
@@ -502,4 +493,51 @@ input[type='time']::-webkit-calendar-picker-indicator {
 .column-75 {
   display: grid;
   grid-template-rows: max-content 1fr;
+}
+
+.vgrid-item {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-rows: auto auto 20%;
+  min-height: 225px;
+}
+
+.vgrid-icon {
+  grid-column: 3;
+  grid-row: 1;
+  justify-self: end;
+  align-self: start;
+}
+
+.vgrid-image {
+  grid-column: 1 / 4;
+  grid-row: 1 / 3;
+  justify-self: center;
+  align-self: center;
+  display: relative;
+  padding: 0;
+}
+
+.vgrid-caption {
+  grid-column: 1 / 4;
+  grid-row: 3;
+  text-align: center;
+  justify-self: center;
+  align-self: center;
+}
+
+.badge-diamond {
+  clip-path: polygon(50% 0%, 85% 55%, 50% 100%, 15% 55%);
+  position: absolute;
+}
+
+.disabled-overlay {
+  position: absolute;
+  color: black;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 90%;
+  z-index: 9;
 }
