@@ -24,8 +24,10 @@ import { persist, createJSONStorage } from 'zustand/middleware'
  *   search: string,
  *   filters: object,
  *   icons: Record<string, string>
+ *   audio: Record<string, string>
  *   userSettings: Record<string, any>
  *   profiling: boolean
+ *   desktopNotifications: boolean
  *   setAreas: (areas: string | string[], validAreas: string[], unselectAll?: boolean) => void,
  * }} UseStore
  * @type {import("zustand").UseBoundStore<import("zustand").StoreApi<UseStore>>}
@@ -74,6 +76,7 @@ export const useStore = create(
       settings: {},
       userSettings: {},
       icons: {},
+      audio: {},
       menus: {},
       tutorial: true,
       sidebar: '',
@@ -101,6 +104,7 @@ export const useStore = create(
       },
       motdIndex: 0,
       profiling: false,
+      desktopNotifications: false,
     }),
     {
       name: 'local-state',
@@ -118,6 +122,7 @@ export const useStore = create(
  *   online: boolean,
  *   searchLoading: boolean,
  *   Icons: InstanceType<typeof import("../services/Icons").default>,
+ *   Audio: InstanceType<typeof import("../services/Icons").default>,
  *   config: import('@rm/types').Config['map'],
  *   ui: object
  *   auth: { perms: Partial<import('@rm/types').Permissions>, loggedIn: boolean, methods: string[], strategy: import('@rm/types').Strategy | '' },
@@ -198,7 +203,8 @@ export const useStatic = create((set) => ({
     nests: [],
     questConditions: {},
   },
-  Icons: undefined,
+  Icons: null,
+  Audio: null,
   ui: {},
   masterfile: {
     invasions: {},

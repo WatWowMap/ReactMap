@@ -16,5 +16,5 @@ COPY yarn.lock .
 RUN apk add git
 RUN npm install -g yarn
 COPY . .
-RUN yarn install --ignore-optional
+RUN yarn install
 RUN yarn build

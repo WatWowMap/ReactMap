@@ -7,6 +7,7 @@ type Available {
   filters: JSON
   questConditions: JSON
   icons: JSON
+  audio: JSON
 }
 
 type Badge {

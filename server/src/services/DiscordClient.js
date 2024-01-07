@@ -285,10 +285,20 @@ class DiscordClient {
           guildArray.length === 1
             ? `${guildArray.join(', ')} & ${lastGuild}`
             : lastGuild
-        return done(null, undefined, { blockedGuilds: guildString })
+        return done(null, undefined, {
+          blockedGuilds: guildString,
+          username: discordUser.username,
+          id: discordUser.id,
+          avatar: discordUser.avatar,
+        })
       }
       if (discordUser.perms.map === false) {
-        return done(null, undefined, { message: 'access_denied' })
+        return done(null, undefined, {
+          message: 'access_denied',
+          username: discordUser.username,
+          id: discordUser.id,
+          avatar: discordUser.avatar,
+        })
       }
       if (discordUser) {
         delete discordUser.guilds

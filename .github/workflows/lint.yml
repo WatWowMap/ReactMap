@@ -24,10 +24,10 @@ jobs:
         run: yarn masterfile
 
       - name: Lint
-        run: yarn eslint:check
+        run: yarn eslint
 
       - name: Prettier
-        run: yarn prettier:check
+        run: yarn prettier
 
       - name: Build
         run: yarn build
