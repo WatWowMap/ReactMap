@@ -1,3 +1,12 @@
+# [1.2.0-develop.2](https://github.com/ReuschelCGN/ReactMap/compare/v1.2.0-develop.1...v1.2.0-develop.2) (2024-01-07)
+
+
+### Bug Fixes
+
+* make `allForms` false by default for usability ([cff0e23](https://github.com/ReuschelCGN/ReactMap/commit/cff0e234a1d9a4069da8a4cd12b5f8a0d3f9c6a0))
+* rockruff form name issues ([188c63a](https://github.com/ReuschelCGN/ReactMap/commit/188c63a7e61e96f807458981e822f646c1c037d8))
+* subcategory viewing ([3ed2e8f](https://github.com/ReuschelCGN/ReactMap/commit/3ed2e8f53d59913138d23eb117a5340316866df1))
+
 # [1.28.0-develop.5](https://github.com/WatWowMap/ReactMap/compare/v1.28.0-develop.4...v1.28.0-develop.5) (2024-01-07)
 
 
