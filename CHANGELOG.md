@@ -1,3 +1,10 @@
+# [1.28.0-develop.5](https://github.com/WatWowMap/ReactMap/compare/v1.28.0-develop.4...v1.28.0-develop.5) (2024-01-07)
+
+
+### Bug Fixes
+
+* make `allForms` false by default for usability ([cff0e23](https://github.com/WatWowMap/ReactMap/commit/cff0e234a1d9a4069da8a4cd12b5f8a0d3f9c6a0))
+
 # [1.28.0-develop.4](https://github.com/WatWowMap/ReactMap/compare/v1.28.0-develop.3...v1.28.0-develop.4) (2024-01-07)
 
 
