@@ -89,6 +89,9 @@ leagues.forEach((league) =>
   }),
 )
 
+// TODO this will be used later in the config
+const BLOCKED = undefined
+
 /**
  *
  * @param {import('express').Request} req
@@ -101,41 +104,45 @@ function generateUi(req, perms) {
     gyms:
       (perms.gyms || perms.raids) && Db.models.Gym
         ? {
-            allGyms: true,
-            raids: perms.raids,
-            exEligible: true,
-            inBattle: true,
-            arEligible: true,
-            gymBadges: perms.gymBadges,
+            allGyms: perms.gyms || BLOCKED,
+            raids: perms.raids || BLOCKED,
+            exEligible: perms.gyms || BLOCKED,
+            inBattle: perms.gyms || BLOCKED,
+            arEligible: perms.gyms || BLOCKED,
+            gymBadges: perms.gymBadges || BLOCKED,
           }
-        : undefined,
+        : BLOCKED,
     nests:
       perms.nests && Db.models.Nest
-        ? { pokemon: true, polygons: true, sliders: SLIDERS.nests }
-        : undefined,
+        ? {
+            pokemon: true,
+            polygons: true,
+            sliders: SLIDERS.nests,
+          }
+        : BLOCKED,
     pokestops:
       (perms.pokestops || perms.lures || perms.quests || perms.invasions) &&
       Db.models.Pokestop
         ? {
-            allPokestops: perms.pokestops,
-            lures: perms.lures,
-            eventStops: perms.eventStops,
-            quests: perms.quests,
-            invasions: perms.invasions,
-            arEligible: perms.pokestops,
+            allPokestops: perms.pokestops || BLOCKED,
+            lures: perms.lures || BLOCKED,
+            eventStops: perms.eventStops || BLOCKED,
+            quests: perms.quests || BLOCKED,
+            invasions: perms.invasions || BLOCKED,
+            arEligible: perms.pokestops || BLOCKED,
           }
-        : undefined,
+        : BLOCKED,
     pokemon:
       (perms.pokemon || perms.iv || perms.pvp) && Db.models.Pokemon
         ? {
-            legacy: mapConfig.misc.enableMapJsFilter,
-            iv: perms.iv,
-            pvp: perms.pvp,
-            standard: true,
-            ivOr: true,
-            gender: true,
-            zeroIv: perms.iv,
-            hundoIv: perms.iv,
+            legacy: perms.iv && mapConfig.misc.enableMapJsFilter,
+            iv: perms.iv || BLOCKED,
+            pvp: perms.pvp || BLOCKED,
+            // standard: true,
+            // ivOr: true,
+            // gender: true,
+            zeroIv: perms.iv || BLOCKED,
+            hundoIv: perms.iv || BLOCKED,
             sliders: {
               primary: SLIDERS.pokemon.primary.map((slider) => ({
                 ...slider,
@@ -147,34 +154,34 @@ function generateUi(req, perms) {
               })),
             },
           }
-        : undefined,
-    routes: perms.routes && Db.models.Route ? { enabled: true } : undefined,
+        : BLOCKED,
+    routes: perms.routes && Db.models.Route ? { enabled: true } : BLOCKED,
     wayfarer:
       perms.portals || perms.submissionCells
         ? {
-            portals: !!(perms.portals && Db.models.Portal) || undefined,
+            portals: !!(perms.portals && Db.models.Portal) || BLOCKED,
             submissionCells:
               !!(
                 perms.submissionCells &&
                 Db.models.Pokestop &&
                 Db.models.Gym
-              ) || undefined,
+              ) || BLOCKED,
           }
         : undefined,
-    s2cells: perms.s2cells ? { enabled: true, cells: true } : undefined,
+    s2cells: perms.s2cells ? { enabled: true, cells: true } : BLOCKED,
     scanAreas: perms.scanAreas
       ? { filterByAreas: true, enabled: true }
       : undefined,
-    weather: perms.weather && Db.models.Weather ? { enabled: true } : undefined,
+    weather: perms.weather && Db.models.Weather ? { enabled: true } : BLOCKED,
     admin:
       perms.spawnpoints || perms.scanCells || perms.devices
         ? {
             spawnpoints:
-              !!(perms.spawnpoints && Db.models.Spawnpoint) || undefined,
-            scanCells: !!(perms.scanCells && Db.models.ScanCell) || undefined,
-            devices: !!(perms.devices && Db.models.Device) || undefined,
+              !!(perms.spawnpoints && Db.models.Spawnpoint) || BLOCKED,
+            scanCells: !!(perms.scanCells && Db.models.ScanCell) || BLOCKED,
+            devices: !!(perms.devices && Db.models.Device) || BLOCKED,
           }
-        : undefined,
+        : BLOCKED,
     settings: true,
   }
 
