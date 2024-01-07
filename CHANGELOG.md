@@ -1,3 +1,10 @@
+# [1.28.0-develop.4](https://github.com/WatWowMap/ReactMap/compare/v1.28.0-develop.3...v1.28.0-develop.4) (2024-01-07)
+
+
+### Bug Fixes
+
+* subcategory viewing ([3ed2e8f](https://github.com/WatWowMap/ReactMap/commit/3ed2e8f53d59913138d23eb117a5340316866df1))
+
 # [1.28.0-develop.3](https://github.com/WatWowMap/ReactMap/compare/v1.28.0-develop.2...v1.28.0-develop.3) (2024-01-06)
 
 
