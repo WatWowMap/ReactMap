@@ -244,7 +244,7 @@ export function useDeepStore(field, defaultValue) {
  *    excludeList: string[],
  *    discordId: string,
  *    telegramId: string,
- *    webhookStrategy: import('@rm/types').Strategy | '',
+ *    webhookStrategy: string,
  *    username: string,
  *    data: Record<string, any>,
  *    counts: {

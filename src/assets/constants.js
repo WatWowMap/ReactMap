@@ -41,3 +41,5 @@ export const MIN_MAX = /** @type {const} */ (['min', 'max'])
 export const ENABLED_ALL = /** @type {const} */ (['enabled', 'all'])
 
 export const RADIUS_CHOICES = /** @type {const} */ (['pokemon', 'gym'])
+
+export const METHODS = /** @type {const} */ (['discord', 'telegram'])
