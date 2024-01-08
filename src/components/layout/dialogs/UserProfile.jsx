@@ -22,6 +22,7 @@ import Edit from '@mui/icons-material/Edit'
 import { useTranslation } from 'react-i18next'
 import { useLazyQuery, useMutation, useQuery } from '@apollo/client'
 import { useMap } from 'react-leaflet'
+import Grid2 from '@mui/material/Unstable_Grid2/Grid2'
 
 import { useLayoutStore, useStatic, useStore } from '@hooks/useStore'
 import Utility from '@services/Utility'
@@ -268,22 +269,16 @@ const ExtraFields = () => {
 
 const ProfilePermissions = () => {
   const auth = useStatic((s) => s.auth)
-  const excludeList = useStatic((state) => state.config?.map?.excludeList || [])
+  const excludeList = useStatic((state) => state.config?.map?.excludeList) || []
 
   return (
-    <Grid
-      container
-      direction="row"
-      alignItems="stretch"
-      justifyContent="center"
-      spacing={2}
-      style={{ padding: 5 }}
-    >
+    <Grid2 container alignItems="stretch" justifyContent="center" spacing={2}>
       {Object.keys(auth.perms).map((perm) => {
         if (
           excludeList.includes(perm) ||
           perm === 'donor' ||
-          perm === 'blockedGuildNames'
+          perm === 'blockedGuildNames' ||
+          perm === 'admin'
         ) {
           return null
         }
@@ -297,73 +292,65 @@ const ProfilePermissions = () => {
         )
           return null
         return (
-          <Grid item xs={12} sm={6} key={perm}>
+          <Grid2 key={perm} xs={12} sm={6} alignItems="stretch">
             <PermCard perm={perm} />
-          </Grid>
+          </Grid2>
         )
       })}
-    </Grid>
+    </Grid2>
   )
 }
 
+/** @param {{ children: string | string[] }} */
+const PermMedia = ({ children }) => (
+  <Box
+    flexDirection="column"
+    minHeight={250}
+    bgcolor="grey.900"
+    className="flex-center"
+  >
+    {React.Children.toArray(children).map((child) => (
+      <Typography key={child} variant="h6" align="center" color="white">
+        {child}
+      </Typography>
+    ))}
+  </Box>
+)
+
+/** @param {{ perm: keyof import('@rm/types').Permissions }} */
 const PermCard = ({ perm }) => {
   const { t } = useTranslation()
-  const permImageDir = useStatic((state) => state.config.misc.permImageDir)
-  const permArrayImages = useStatic(
-    (state) => state.config.misc.permArrayImages,
-  )
 
+  const permImageDir = useStatic((s) => s.config.misc.permImageDir)
+  const permArrayImages = useStatic((s) => s.config.misc.permArrayImages)
   const value = useStatic((s) => s.auth.perms[perm])
 
-  return (
-    <Card className="perm-wrapper">
-      {(Array.isArray(value) ? false : !value) && (
-        <div className="disabled-overlay flex-center">
-          <Typography variant="h6" align="center" pb={4}>
-            {t('no_access')}
-          </Typography>
-        </div>
-      )}
-      {(perm !== 'areaRestrictions' &&
-        perm !== 'webhooks' &&
-        perm !== 'scanner') ||
-      permArrayImages ? (
-        <CardMedia
-          style={{
-            height: 250,
-            border: 'black 4px solid',
-            borderRadius: 4,
-          }}
-          image={`/${permImageDir}/${perm}.png`}
-          title={perm}
+  const component = React.useCallback(() => {
+    if (Array.isArray(value) && !permArrayImages)
+      return (
+        <PermMedia>
+          {value.map((item) => Utility.getProperName(item))}
+        </PermMedia>
+      )
+    if (value)
+      return (
+        <Box
+          height="250px"
+          sx={{ background: `url(/${permImageDir}/${perm}.png)` }}
         />
-      ) : (
-        <Grid
-          container
-          direction="column"
-          sx={{
-            minHeight: 260,
-            border: 'black 4px solid',
-            borderRadius: 4,
-            borderBottomLeftRadius: 0,
-            borderBottomRightRadius: 0,
-            textAlign: 'center',
-          }}
-          alignItems="center"
-          justifyContent="center"
-        >
-          {value.map((area) => (
-            <Grid key={area} item>
-              <Typography>{Utility.getProperName(area)}</Typography>
-            </Grid>
-          ))}
-        </Grid>
-      )}
+      )
+    return <PermMedia>{t('no_access')}</PermMedia>
+  }, [value, perm, permImageDir, t])
+
+  const textColor = value ? 'text.primary' : 'text.disabled'
+  return (
+    <Card elevation={2} style={{ height: '100%' }}>
+      <CardMedia component={component} title={perm} />
       <CardContent style={{ minHeight: 100 }}>
-        <Typography gutterBottom variant="h6" noWrap>
+        <Typography gutterBottom variant="h6" color={textColor}>
           {t(Utility.camelToSnake(perm))}
         </Typography>
-        <Typography variant="body2" color="textSecondary" component="p">
+        <Typography variant="body2" color={textColor}>
           {t(`${Utility.camelToSnake(perm)}_subtitle`)}
         </Typography>
       </CardContent>
@@ -373,7 +360,7 @@ const PermCard = ({ perm }) => {
 
 const GymBadges = () => {
   const { t } = useTranslation()
-  /** @type {import('@apollo/client').QueryResult<import('@rm/types').Gym>} */
+  /** @type {import('@apollo/client').QueryResult<{ badges: import('@rm/types').Gym[] }>} */
   const { data } = useQuery(Query.gyms('badges'), {
     fetchPolicy: 'network-only',
   })
