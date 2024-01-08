@@ -107,8 +107,8 @@ export interface Config<Client extends boolean = false>
   database: {
     schemas: Schema[]
     settings: {
-      extraUserFields: string[]
-    } & BaseConfig['database']['settings']
+      extraUserFields: (ExtraField | string)[]
+    } & Omit<BaseConfig['database']['settings'], 'extraUserFields'>
   } & BaseConfig['database']
   scanner: {
     scanNext: {
@@ -128,6 +128,12 @@ export interface Config<Client extends boolean = false>
     defaultIcons: Record<string, string>
   } & Omit<BaseConfig['icons'], 'customizable' | 'styles' | 'defaultIcons'>
   manualAreas: ExampleConfig['manualAreas'][number][]
+}
+
+export interface ExtraField {
+  name: string
+  database: string
+  disabled: boolean
 }
 
 export interface Webhook {

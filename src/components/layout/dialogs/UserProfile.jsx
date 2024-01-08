@@ -1,19 +1,9 @@
 import * as React from 'react'
-import {
-  Grid,
-  DialogContent,
-  AppBar,
-  Tabs,
-  Tab,
-  TextField,
-  Box,
-} from '@mui/material'
+import { DialogContent, AppBar, Tabs, Tab, Box } from '@mui/material'
 import { useTranslation } from 'react-i18next'
-import { useMutation } from '@apollo/client'
 
 import { useLayoutStore, useStatic } from '@hooks/useStore'
 import Utility from '@services/Utility'
-import Query from '@services/Query'
 
 import Header from '../general/Header'
 import Footer from '../general/Footer'
@@ -23,6 +13,7 @@ import { UserBackups } from './profile/Backups'
 import { UserPermissions } from './profile/Permissions'
 import { UserGymBadges } from './profile/GymBadges'
 import { LinkAccounts } from './profile/LinkAccounts'
+import { ExtraUserFields } from './profile/ExtraFields'
 
 export default function UserProfile() {
   Utility.analytics('/user-profile')
@@ -70,7 +61,7 @@ export default function UserProfile() {
         >
           <TabPanel value={tab} index={0}>
             <LinkAccounts />
-            <ExtraFields />
+            <ExtraUserFields />
             <UserBackups />
           </TabPanel>
           <TabPanel value={tab} index={1}>
@@ -101,62 +92,5 @@ export default function UserProfile() {
         ]}
       />
     </DialogWrapper>
-  )
-}
-
-const ExtraFields = () => {
-  const auth = useStatic((s) => s.auth)
-  const extraUserFields = useStatic((state) => state.extraUserFields)
-
-  const [setField] = useMutation(Query.user('setExtraFields'))
-
-  return (
-    <Grid
-      container
-      alignItems="center"
-      justifyContent="center"
-      style={{ marginBottom: 10 }}
-    >
-      {extraUserFields.map((field) => {
-        const locale = localStorage.getItem('i18nextLng') || 'en'
-        const label =
-          typeof field === 'string' ? field : field[locale] || field.name
-        const key = typeof field === 'string' ? field : field.database
-        if (!key || !label) return null
-        return (
-          <Grid
-            key={label}
-            item
-            xs={5}
-            align="center"
-            style={{ margin: '10px 0' }}
-          >
-            <TextField
-              disabled={field.disabled}
-              variant="outlined"
-              label={label}
-              value={auth.data?.[key] || ''}
-              onChange={({ target: { value } }) => {
-                useStatic.setState((prev) => ({
-                  auth: {
-                    ...prev.auth,
-                    data: {
-                      ...prev.auth.data,
-                      [key]: value,
-                    },
-                  },
-                }))
-                setField({
-                  variables: {
-                    key,
-                    value,
-                  },
-                })
-              }}
-            />
-          </Grid>
-        )
-      })}
-    </Grid>
   )
 }

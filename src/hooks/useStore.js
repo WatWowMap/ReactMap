@@ -281,7 +281,8 @@ export function useDeepStore(field, defaultValue) {
  *   manualParams: {
  *     category: string,
  *     id: number | string,
- *  },
+ *   },
+ *   extraUserFields: (import('@rm/types').ExtraField | string)[],
  * }} UseStatic
  *
  * @type {import("zustand").UseBoundStore<import("zustand").StoreApi<UseStatic>>}
