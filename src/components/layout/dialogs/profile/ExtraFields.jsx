@@ -9,22 +9,17 @@ import Query from '@services/Query'
 import { useTranslation } from 'react-i18next'
 
 export function ExtraUserFields() {
-  const extraUserFields = useStatic((s) => s.extraUserFields)
-  return (
-    <Grid2
-      container
-      alignItems="center"
-      justifyContent="center"
-      marginBottom={10}
-    >
-      {extraUserFields.map((field) => (
+  const fields = useStatic((s) => s.extraUserFields)
+  return fields?.length ? (
+    <Grid2 container alignItems="center" justifyContent="center">
+      {fields.map((field) => (
         <FieldValue
           key={typeof field === 'string' ? field : field.database}
           field={field}
         />
       ))}
     </Grid2>
-  )
+  ) : null
 }
 
 /** @param {{ field: import('@rm/types').ExtraField | string}} props */
