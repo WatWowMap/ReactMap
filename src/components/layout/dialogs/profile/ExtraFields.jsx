@@ -10,7 +10,6 @@ import { useTranslation } from 'react-i18next'
 
 export function ExtraUserFields() {
   const extraUserFields = useStatic((s) => s.extraUserFields)
-
   return (
     <Grid2
       container
