@@ -8,15 +8,11 @@ import {
   Tab,
   Select,
   MenuItem,
-  IconButton,
   TextField,
-  Button,
   Box,
 } from '@mui/material'
-import Edit from '@mui/icons-material/Edit'
 import { useTranslation } from 'react-i18next'
-import { useMutation, useQuery } from '@apollo/client'
-import { useMap } from 'react-leaflet'
+import { useMutation } from '@apollo/client'
 
 import { useLayoutStore, useStatic } from '@hooks/useStore'
 import Utility from '@services/Utility'
@@ -29,10 +25,9 @@ import DiscordLogin from '../auth/Discord'
 import Telegram from '../auth/Telegram'
 import Notification from '../general/Notification'
 import { DialogWrapper } from './DialogWrapper'
-import { VirtualGrid } from '../general/VirtualGrid'
-import { Img } from '../general/Img'
 import { UserBackups } from './profile/Backups'
 import { UserPermissions } from './profile/Permissions'
+import { UserGymBadges } from './profile/GymBadges'
 
 export default function UserProfile() {
   Utility.analytics('/user-profile')
@@ -84,7 +79,7 @@ export default function UserProfile() {
             <UserBackups />
           </TabPanel>
           <TabPanel value={tab} index={1}>
-            <GymBadges />
+            <UserGymBadges />
           </TabPanel>
           <TabPanel value={tab} index={2}>
             <UserPermissions />
@@ -261,105 +256,4 @@ const ExtraFields = () => {
       })}
     </Grid>
   )
-}
-
-const GymBadges = () => {
-  const { t } = useTranslation()
-  /** @type {import('@apollo/client').QueryResult<{ badges: import('@rm/types').Gym[] }>} */
-  const { data } = useQuery(Query.gyms('badges'), {
-    fetchPolicy: 'network-only',
-  })
-
-  const counts = React.useMemo(() => {
-    const counter = { gold: 0, silver: 0, bronze: 0 }
-
-    if (data?.badges) {
-      data.badges.forEach((gym) => {
-        switch (gym.badge) {
-          case 3:
-            counter.gold += 1
-            break
-          case 2:
-            counter.silver += 1
-            break
-          case 1:
-            counter.bronze += 1
-            break
-          default:
-        }
-      })
-    }
-    return counter
-  }, [data])
-
-  return data ? (
-    <Box className="user-profile-badge-grid">
-      <Typography variant="h5" align="center" gutterBottom>
-        {t('gym_badges')}
-      </Typography>
-      <Grid container pt={1} pb={2}>
-        {Object.entries(counts).map(([key, count], i) => (
-          <Grid key={key} item xs={4}>
-            <Typography
-              variant="subtitle2"
-              align="center"
-              className={`badge_${i + 1}`}
-            >
-              {t(`badge_${i + 1}`)}: {count}
-            </Typography>
-          </Grid>
-        ))}
-      </Grid>
-      <VirtualGrid data={data?.badges || []} xs={4} md={3} useWindowScroll>
-        {(_, badge) => <BadgeTile {...badge} />}
-      </VirtualGrid>
-    </Box>
-  ) : null
-}
-
-/** @param {import('@rm/types').Gym} props */
-const BadgeTile = ({ badge, ...gym }) => {
-  const { t } = useTranslation()
-  const map = useMap()
-  const badgeIcon = useStatic((s) => s.Icons.getMisc(`badge_${badge}`))
-
-  return badge ? (
-    <Box className="vgrid-item">
-      <IconButton
-        className="vgrid-icon"
-        disabled={gym.deleted}
-        size="small"
-        onClick={() =>
-          useLayoutStore.setState({
-            gymBadge: { badge, gymId: gym.id, open: true },
-          })
-        }
-      >
-        <Edit />
-      </IconButton>
-      <Button
-        className="vgrid-image"
-        onClick={() => map.flyTo([gym.lat, gym.lon], 16)}
-        disabled={gym.deleted}
-      >
-        <Img
-          className="badge-diamond"
-          src={gym.url ? gym.url.replace('http://', 'https://') : ''}
-          alt={gym.url}
-          height={120}
-          width={120}
-        />
-        {gym.deleted && <div className="disabled-overlay badge-diamond" />}
-        {badge && <Img src={badgeIcon} alt={badge} width={96} zIndex={10} />}
-      </Button>
-
-      <Typography
-        className="vgrid-caption"
-        variant="caption"
-        color={gym.deleted ? 'GrayText' : 'inherit'}
-      >
-        {gym.name || t('unknown_gym')}
-      </Typography>
-    </Box>
-  ) : null
 }
