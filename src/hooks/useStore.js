@@ -235,7 +235,24 @@ export function useDeepStore(field, defaultValue) {
  *   Audio: InstanceType<typeof import("../services/Icons").default>,
  *   config: import('@rm/types').Config['map'],
  *   ui: import('@rm/types').UIObject,
- *   auth: { perms: Partial<import('@rm/types').Permissions>, loggedIn: boolean, methods: string[], strategy: import('@rm/types').Strategy | '', userBackupLimits: number },
+ *   auth: {
+ *    perms: Partial<import('@rm/types').Permissions>,
+ *    loggedIn: boolean,
+ *    methods: string[],
+ *    strategy: import('@rm/types').Strategy | '',
+ *    userBackupLimits: number,
+ *    excludeList: string[],
+ *    discordId: string,
+ *    telegramId: string,
+ *    webhookStrategy: import('@rm/types').Strategy | '',
+ *    username: string,
+ *    data: Record<string, any>,
+ *    counts: {
+ *      areaRestrictions: number,
+ *      webhooks: number,
+ *      scanner: number,
+ *    },
+ *   },
  *   filters: import('@rm/types').AllFilters,
  *   masterfile: import('@rm/types').Masterfile
  *   polling: Record<string, number>

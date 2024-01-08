@@ -8,9 +8,6 @@ import {
   Tab,
   Select,
   MenuItem,
-  Card,
-  CardMedia,
-  CardContent,
   IconButton,
   TextField,
   Button,
@@ -20,7 +17,6 @@ import Edit from '@mui/icons-material/Edit'
 import { useTranslation } from 'react-i18next'
 import { useMutation, useQuery } from '@apollo/client'
 import { useMap } from 'react-leaflet'
-import Grid2 from '@mui/material/Unstable_Grid2/Grid2'
 
 import { useLayoutStore, useStatic } from '@hooks/useStore'
 import Utility from '@services/Utility'
@@ -36,6 +32,7 @@ import { DialogWrapper } from './DialogWrapper'
 import { VirtualGrid } from '../general/VirtualGrid'
 import { Img } from '../general/Img'
 import { UserBackups } from './profile/Backups'
+import { UserPermissions } from './profile/Permissions'
 
 export default function UserProfile() {
   Utility.analytics('/user-profile')
@@ -90,7 +87,7 @@ export default function UserProfile() {
             <GymBadges />
           </TabPanel>
           <TabPanel value={tab} index={2}>
-            <ProfilePermissions />
+            <UserPermissions />
           </TabPanel>
         </Box>
       </DialogContent>
@@ -263,97 +260,6 @@ const ExtraFields = () => {
         )
       })}
     </Grid>
-  )
-}
-
-const ProfilePermissions = () => {
-  const auth = useStatic((s) => s.auth)
-  const excludeList = useStatic((state) => state.config?.map?.excludeList) || []
-
-  return (
-    <Grid2 container alignItems="stretch" justifyContent="center" spacing={2}>
-      {Object.keys(auth.perms).map((perm) => {
-        if (
-          excludeList.includes(perm) ||
-          perm === 'donor' ||
-          perm === 'blockedGuildNames' ||
-          perm === 'admin'
-        ) {
-          return null
-        }
-        if (Array.isArray(auth.perms[perm]) && auth.counts[perm] === 0) {
-          return null
-        }
-        if (
-          perm === 'areaRestrictions' &&
-          !auth.perms[perm].length &&
-          auth.counts[perm] > 0
-        )
-          return null
-        return (
-          <Grid2 key={perm} xs={12} sm={6} alignItems="stretch">
-            <PermCard perm={perm} />
-          </Grid2>
-        )
-      })}
-    </Grid2>
-  )
-}
-
-/** @param {{ children: string | string[] }} */
-const PermMedia = ({ children }) => (
-  <Box
-    flexDirection="column"
-    minHeight={250}
-    bgcolor="grey.900"
-    className="flex-center"
-  >
-    {React.Children.toArray(children).map((child) => (
-      <Typography key={child} variant="h6" align="center" color="white">
-        {child}
-      </Typography>
-    ))}
-  </Box>
-)
-
-/** @param {{ perm: keyof import('@rm/types').Permissions }} */
-const PermCard = ({ perm }) => {
-  const { t } = useTranslation()
-
-  const permImageDir = useStatic((s) => s.config.misc.permImageDir)
-  const permArrayImages = useStatic((s) => s.config.misc.permArrayImages)
-  const value = useStatic((s) => s.auth.perms[perm])
-
-  const component = React.useCallback(() => {
-    if (Array.isArray(value) && !permArrayImages)
-      return (
-        <PermMedia>
-          {value.map((item) => Utility.getProperName(item))}
-        </PermMedia>
-      )
-    if (value)
-      return (
-        <Box
-          height="250px"
-          sx={{ background: `url(/${permImageDir}/${perm}.png)` }}
-        />
-      )
-    return <PermMedia>{t('no_access')}</PermMedia>
-  }, [value, perm, permImageDir, t])
-
-  const textColor = value ? 'text.primary' : 'text.disabled'
-  return (
-    <Card elevation={2} style={{ height: '100%' }}>
-      <CardMedia component={component} title={perm} />
-      <CardContent style={{ minHeight: 100 }}>
-        <Typography gutterBottom variant="h6" color={textColor}>
-          {t(Utility.camelToSnake(perm))}
-        </Typography>
-        <Typography variant="body2" color={textColor}>
-          {t(`${Utility.camelToSnake(perm)}_subtitle`)}
-        </Typography>
-      </CardContent>
-    </Card>
   )
 }
 
