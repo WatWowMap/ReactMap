@@ -43,7 +43,10 @@ export const GenericSearch = React.forwardRef(
     return (
       <TextField
         ref={ref}
-        label={t(label)}
+        label={t(
+          label ??
+            `search_${field.split('.').pop().replace('QuickSelect', '')}`,
+        )}
         variant="outlined"
         fullWidth
         size="small"
@@ -52,6 +55,7 @@ export const GenericSearch = React.forwardRef(
         onChange={onChange}
         InputProps={InputProps}
         {...props}
+        autoComplete="off"
       />
     )
   },
