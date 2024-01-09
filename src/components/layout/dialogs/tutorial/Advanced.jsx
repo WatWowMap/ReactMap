@@ -28,16 +28,10 @@ import data from './data'
 export default function TutAdvanced({ toggleHelp, category }) {
   const { t } = useTranslation()
   const isMobile = useStatic((s) => s.isMobile)
+  const [localCategory, setLocalCategory] = useState(category)
+  const [isPokemon, setIsPokemon] = useState(localCategory === 'pokemon')
 
-  const [isPokemon, setIsPokemon] = useState(category === 'pokemon')
-
-  if (!category) {
-    category = isPokemon ? 'pokemon' : 'gyms'
-  }
-  const [tempFilters, setTempFilters] = useState({
-    ...data.filters[category].filter,
-    ...Utility.generateSlots('t3-0', true, {}),
-  })
+  const [tempFilters, setTempFilters] = useState({})
 
   const handleSwitch = () => {
     if (isPokemon) {
@@ -48,8 +42,18 @@ export default function TutAdvanced({ toggleHelp, category }) {
     } else {
       setTempFilters(data.filters.pokemon.filter)
     }
-    setIsPokemon(!isPokemon)
+    setLocalCategory(isPokemon ? 'gyms' : 'pokemon')
+    setIsPokemon((prev) => !prev)
   }
+
+  React.useEffect(() => {
+    const newCategory = category ?? isPokemon ? 'pokemon' : 'gyms'
+    setLocalCategory(newCategory)
+    setTempFilters({
+      ...data.filters[newCategory].filter,
+      ...Utility.generateSlots('t3-0', true, {}),
+    })
+  }, [category])
 
   return (
     <DialogContent>
@@ -68,9 +72,9 @@ export default function TutAdvanced({ toggleHelp, category }) {
         </Grid>
         <Grid item xs={12} sm={8}>
           <Box height={135}>
-            <VirtualGrid data={data.tiles[category]} xs={6}>
+            <VirtualGrid data={data.tiles[localCategory]} xs={6}>
               {(_, key) => (
-                <StandardItem id={key} category={category} caption />
+                <StandardItem id={key} category={localCategory} caption />
               )}
             </VirtualGrid>
           </Box>

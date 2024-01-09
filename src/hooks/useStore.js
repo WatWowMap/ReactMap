@@ -361,6 +361,10 @@ export const useStatic = create((set) => ({
 /**
  * @typedef {{
  *  nestSubmissions: string | number,
+ *  help: {
+ *   open: boolean,
+ *   category: string,
+ *  },
  *  motd: boolean,
  *  donorPage: boolean,
  *  search: boolean,
@@ -391,6 +395,7 @@ export const useStatic = create((set) => ({
  */
 export const useLayoutStore = create(() => ({
   nestSubmissions: '0',
+  help: { open: false, category: '' },
   motd: false,
   donorPage: false,
   search: false,

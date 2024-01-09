@@ -83,7 +83,7 @@ export default function Tutorial() {
                 0: <Welcome />,
                 1: <Sidebar />,
                 2: <Sliders />,
-                3: <Advanced />,
+                3: <Advanced category="pokemon" />,
                 4: <Popups />,
                 5: <Closing />,
               }[step]

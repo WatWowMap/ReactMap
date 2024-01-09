@@ -1,6 +1,5 @@
 import React, { useState } from 'react'
 import Box from '@mui/material/Box'
-import Dialog from '@mui/material/Dialog'
 import DialogContent from '@mui/material/DialogContent'
 import Typography from '@mui/material/Typography'
 import Drawer from '@mui/material/Drawer'
@@ -14,7 +13,6 @@ import Footer from '@components/layout/general/Footer'
 import { applyToAll } from '@services/filtering/applyToAll'
 
 import OptionsContainer from '../dialogs/filters/OptionsContainer'
-import Help from '../dialogs/tutorial/Advanced'
 import { VirtualGrid } from './VirtualGrid'
 import { GenericSearch } from '../drawer/ItemSearch'
 import { useWebhookStore } from '../dialogs/webhooks/store'
@@ -48,7 +46,6 @@ export default function Menu({
   const menus = useStore((state) => state.menus)
 
   const [filterDrawer, setFilterDrawer] = useState(false)
-  const [helpDialog, setHelpDialog] = useState(false)
 
   const { filteredObj, filteredArr, count } = useFilter(
     tempFilters,
@@ -89,7 +86,8 @@ export default function Menu({
     return [
       {
         name: 'help',
-        action: () => setHelpDialog((prev) => !prev),
+        action: () =>
+          useLayoutStore.setState({ help: { open: true, category } }),
         icon: 'HelpOutline',
       },
       {
@@ -168,13 +166,6 @@ export default function Menu({
           {Options}
         </Drawer>
       )}
-      <Dialog open={helpDialog} onClose={() => setHelpDialog(false)}>
-        <Help
-          toggleHelp={() => setHelpDialog(!helpDialog)}
-          category={category}
-          isMobile={isMobile}
-        />
-      </Dialog>
     </>
   )
 }
