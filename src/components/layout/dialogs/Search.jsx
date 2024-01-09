@@ -286,7 +286,7 @@ export default function Search() {
       }}
     >
       <Box width={{ xs: 'inherit', sm: 500 }}>
-        <Header titles={['search']} action={handleClose} />
+        <Header titles="search" action={handleClose} />
         <Autocomplete
           inputValue={search}
           onInputChange={handleChange}

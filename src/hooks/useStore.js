@@ -53,7 +53,6 @@ export const useStore = create(
       ],
       zoom: CONFIG.map.general.startZoom,
       filters: {},
-      setFilters: (filters) => set({ filters }),
       setAreas: (areas = [], validAreas = [], unselectAll = false) => {
         const { filters } = get()
         const incoming = new Set(Array.isArray(areas) ? areas : [areas])

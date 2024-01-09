@@ -13,7 +13,10 @@ import {
 } from '@hooks/useStore'
 import Header from '@components/layout/general/Header'
 import Footer from '@components/layout/general/Footer'
-import { DualBoolToggle } from '@components/layout/drawer/BoolToggle'
+import {
+  BoolToggle,
+  DualBoolToggle,
+} from '@components/layout/drawer/BoolToggle'
 import { ENABLED_ALL, XXS_XXL } from '@assets/constants'
 import { useTranslateById } from '@hooks/useTranslateById'
 import { STANDARD_BACKUP, applyToAll } from '@services/filtering/applyToAll'
@@ -184,13 +187,20 @@ export default function AdvancedFilter() {
                   />
                 )}
                 {category === 'pokestops' && <QuestConditionSelector id={id} />}
-                <DualBoolToggle
-                  items={ENABLED_ALL}
-                  field={`filters.${category}.filter.${id}`}
-                  switchColor="secondary"
-                  secondColor="success"
-                  onChange={handleAllEnabled}
-                />
+                {category === 'pokemon' || category === 'pokestops' ? (
+                  <DualBoolToggle
+                    items={ENABLED_ALL}
+                    field={`filters.${category}.filter.${id}`}
+                    switchColor="secondary"
+                    secondColor="success"
+                    onChange={handleAllEnabled}
+                  />
+                ) : (
+                  <BoolToggle
+                    field={`filters.${category}.filter.${id}.enabled`}
+                    disableGutters
+                  />
+                )}
               </Grid2>
             </Grid2>
           )}

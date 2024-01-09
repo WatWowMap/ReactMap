@@ -10,8 +10,7 @@ import Typography from '@mui/material/Typography'
 
 import { useStatic } from '@hooks/useStore'
 import Utility from '@services/Utility'
-
-const ALWAYS_EXCLUDED = new Set(['donor', 'blockedGuildNames', 'admin'])
+import { ALWAYS_EXCLUDED } from '@assets/constants'
 
 export function UserPermissions() {
   const perms = useStatic((s) => s.auth.perms)

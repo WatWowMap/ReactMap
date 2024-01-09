@@ -119,12 +119,13 @@ export function SelectorItem({
   const url = useStatic((s) => s.Icons.getIconById(id))
   const easyMode = useStore((s) => !!s.filters[category]?.easyMode)
 
+  const hasAll =
+    category === 'pokemon' || category === 'pokestops' || id.startsWith('t')
   const color = filter?.enabled
-    ? filter?.all || easyMode
+    ? filter?.all || easyMode || !hasAll
       ? 'success.main'
       : 'info.main'
     : 'error.dark'
-
   return (
     <Box
       display="flex"
@@ -138,12 +139,12 @@ export function SelectorItem({
       onClick={() => {
         const newFilter = { ...filter }
         if (filter.all) {
-          newFilter.all = false
+          if (hasAll) newFilter.all = false
           newFilter.enabled = !easyMode
         } else if (filter.enabled) {
           newFilter.enabled = false
         } else {
-          newFilter.all = true
+          if (hasAll) newFilter.all = true
           newFilter.enabled = true
         }
         setFilter(newFilter)
@@ -167,14 +168,6 @@ export function SelectorItem({
           onClick={(e) => {
             e.stopPropagation()
             onClick()
-            // useLayoutStore.setState({
-            //   advancedFilter: {
-            //     open: true,
-            //     id,
-            //     category,
-            //     selectedIds: [],
-            //   },
-            // })
           }}
         >
           <TuneIcon fontSize="small" />

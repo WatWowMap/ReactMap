@@ -120,7 +120,7 @@ export default function SlotSelection() {
             />
           </Grid2>
         </Grid2>
-        <Divider sx={{ my: 1 }} />
+        {teamId !== '0' && <Divider sx={{ my: 1 }} />}
         <Grid2 container justifyContent="center" alignItems="center">
           {teamId !== '0' &&
             slots.map((each) => (

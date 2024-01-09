@@ -43,3 +43,11 @@ export const ENABLED_ALL = /** @type {const} */ (['enabled', 'all'])
 export const RADIUS_CHOICES = /** @type {const} */ (['pokemon', 'gym'])
 
 export const METHODS = /** @type {const} */ (['discord', 'telegram'])
+
+export const FILTER_SKIP_LIST = ['filter', 'enabled', 'legacy']
+
+export const ALWAYS_EXCLUDED = new Set(['donor', 'blockedGuildNames', 'admin'])
+
+export const SCAN_MODES = /** @type */ (['confirmed', 'loading', 'error'])
+
+export const SCAN_SIZES = /** @type {const} */ (['S', 'M', 'XL'])

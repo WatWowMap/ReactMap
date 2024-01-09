@@ -34,7 +34,7 @@ export function LinkAccounts() {
   return (
     <>
       <Grid2 container alignItems="center" justifyContent="center">
-        {['discord', 'telegram'].map((method, i) => {
+        {METHODS.map((method, i) => {
           if (!auth.methods.includes(method)) return null
           const Component = i ? (
             <Telegram authUrl={telegramAuthUrl} botName={telegramBotName} />

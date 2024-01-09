@@ -3,16 +3,16 @@ import * as React from 'react'
 import { Button, ButtonGroup, ListItem } from '@mui/material'
 import { useTranslation } from 'react-i18next'
 
-import { useScanStore } from '../store'
+import { SCAN_SIZES } from '@assets/constants'
 
-const SIZES = /** @type {const} */ (['S', 'M', 'XL'])
+import { useScanStore } from '../store'
 
 export function ScanNextPopup() {
   const { t } = useTranslation()
   const scanNextSize = useScanStore((s) => s.scanNextSize)
 
   const setSize = React.useCallback(
-    (/** @type {typeof SIZES[number]} */ size) => () => {
+    (/** @type {typeof SCAN_SIZES[number]} */ size) => () => {
       useScanStore.setState({ scanNextSize: size })
     },
     [],
@@ -21,7 +21,7 @@ export function ScanNextPopup() {
   return (
     <ListItem>
       <ButtonGroup size="small" fullWidth>
-        {SIZES.map((size) => (
+        {SCAN_SIZES.map((size) => (
           <Button
             key={size}
             onClick={setSize(size)}

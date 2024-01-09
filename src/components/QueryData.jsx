@@ -9,13 +9,12 @@ import Query from '@services/Query'
 import { getQueryArgs } from '@services/functions/getQueryArgs'
 import RobustTimeout from '@services/apollo/RobustTimeout'
 import Utility from '@services/Utility'
+import { FILTER_SKIP_LIST } from '@assets/constants'
 
 import * as index from './tiles/index'
 import Clustering from './Clustering'
 import Notification from './layout/general/Notification'
 import { GenerateCells } from './tiles/S2Cell'
-
-const FILTER_SKIP_LIST = ['filter', 'enabled', 'legacy']
 
 /** @param {string} category */
 const userSettingsCategory = (category) => {
