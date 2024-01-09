@@ -54,14 +54,18 @@ export function StandardItem({ id, category, ...props }) {
       filter={filter}
       setFilter={setFilter}
       onClick={() =>
-        useLayoutStore.setState({
-          advancedFilter: {
-            open: true,
-            id,
-            category,
-            selectedIds: [],
-          },
-        })
+        useLayoutStore.setState(
+          id.startsWith('t')
+            ? { slotSelection: id }
+            : {
+                advancedFilter: {
+                  open: true,
+                  id,
+                  category,
+                  selectedIds: [],
+                },
+              },
+        )
       }
     />
   )

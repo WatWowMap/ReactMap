@@ -36,7 +36,7 @@ export function MultiSelector({ items, value, disabled, onClick, tKey }) {
  *  defaultValue?: V,
  *  onClick?: (oldValue: ReturnType<typeof useDeepStore>[0], newValue: V) => void
  *  allowNone?: boolean
- * } & Omit<import('@rm/types').MultiSelectorProps<V>, 'value'>} props
+ * } & Omit<import('@rm/types').MultiSelectorProps<V>, 'value' | 'onClick'>} props
  * @returns
  */
 export function MultiSelectorStore({

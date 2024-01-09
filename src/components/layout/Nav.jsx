@@ -20,6 +20,7 @@ import { WebhookNotification } from './dialogs/webhooks/Notification'
 import AdvancedFilter from './dialogs/filters/Advanced'
 import BadgeSelection from './dialogs/BadgeSelection'
 import WebhookAdvanced from './dialogs/webhooks/WebhookAdv'
+import SlotSelection from './dialogs/filters/SlotSelection'
 
 export const Nav = React.memo(
   () => {
@@ -45,6 +46,7 @@ export const Nav = React.memo(
         <AdvancedFilter />
         <BadgeSelection />
         <WebhookAdvanced />
+        <SlotSelection />
       </>
     )
   },

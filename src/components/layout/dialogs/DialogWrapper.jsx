@@ -9,7 +9,8 @@ import { useLayoutStore, useStatic } from '@hooks/useStore'
  *  dialog?: keyof ReturnType<typeof useLayoutStore['getState']>,
  *  variant?: 'small' | 'large'
  *  children: React.ReactNode
- * } & import('@mui/material').DialogProps} props
+ *  open?: boolean
+ * } & Omit<import('@mui/material').DialogProps, 'open'>} props
  * @returns {JSX.Element}
  */
 export function DialogWrapper({

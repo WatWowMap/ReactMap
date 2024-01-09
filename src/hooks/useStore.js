@@ -385,6 +385,7 @@ export const useStatic = create((set) => ({
  *   gymId: string,
  *   badge: number,
  *  },
+ *  slotSelection: string,
  * }} UseLayoutStore
  *
  * @type {import("zustand").UseBoundStore<import("zustand").StoreApi<UseLayoutStore>>}
@@ -398,6 +399,7 @@ export const useLayoutStore = create(() => ({
   resetFilters: false,
   feedback: false,
   drawer: false,
+  slotSelection: '',
   advancedFilter: {
     open: false,
     category: 'pokemon',
@@ -453,4 +455,5 @@ export const toggleDialog = (open, category, type, filter) => (event) => {
  * @param {T[]} n
  * @returns {boolean}
  */
-export const basicEqualFn = (p, n) => p.every((v, i) => v === n[i])
+export const basicEqualFn = (p, n) =>
+  p.length === n.length && p.every((v, i) => v === n[i])
