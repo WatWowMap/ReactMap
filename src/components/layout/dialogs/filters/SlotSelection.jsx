@@ -100,7 +100,7 @@ export default function SlotSelection() {
   )
 
   return (
-    <DialogWrapper open={open}>
+    <DialogWrapper open={open} onClose={handleClose}>
       <Header
         titles={[`team_${teamId}`, 'slot_selection']}
         action={handleClose}

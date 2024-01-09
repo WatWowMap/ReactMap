@@ -13,7 +13,6 @@ import Header from '@components/layout/general/Header'
 import Footer from '@components/layout/general/Footer'
 import { applyToAll } from '@services/filtering/applyToAll'
 
-import SlotSelection from '../dialogs/filters/SlotSelection'
 import OptionsContainer from '../dialogs/filters/OptionsContainer'
 import Help from '../dialogs/tutorial/Advanced'
 import { VirtualGrid } from './VirtualGrid'
@@ -49,10 +48,6 @@ export default function Menu({
   const menus = useStore((state) => state.menus)
 
   const [filterDrawer, setFilterDrawer] = useState(false)
-  const [slotsMenu, setSlotsMenu] = useState({
-    open: false,
-    id: 0,
-  })
   const [helpDialog, setHelpDialog] = useState(false)
 
   const { filteredObj, filteredArr, count } = useFilter(
@@ -75,26 +70,6 @@ export default function Menu({
     },
     [],
   )
-
-  const toggleSlotsMenu = (open, id, newFilters) => (event) => {
-    if (
-      event.type === 'keydown' &&
-      (event.key === 'Tab' || event.key === 'Shift')
-    ) {
-      return
-    }
-    if (open) {
-      setSlotsMenu({
-        open,
-        id,
-      })
-    } else if (newFilters) {
-      setSlotsMenu({ open })
-      // setTempFilters({ ...newFilters })
-    } else {
-      setSlotsMenu({ open })
-    }
-  }
 
   const Options = React.useMemo(
     () => (
@@ -193,14 +168,6 @@ export default function Menu({
           {Options}
         </Drawer>
       )}
-      <Dialog open={slotsMenu.open} onClose={toggleSlotsMenu(false)}>
-        <SlotSelection
-          teamId={slotsMenu.id}
-          toggleSlotsMenu={toggleSlotsMenu}
-          tempFilters={tempFilters}
-          isMobile={isMobile}
-        />
-      </Dialog>
       <Dialog open={helpDialog} onClose={() => setHelpDialog(false)}>
         <Help
           toggleHelp={() => setHelpDialog(!helpDialog)}

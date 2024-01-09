@@ -154,7 +154,11 @@ export default function AdvancedFilter() {
                   </Grid2>
                 ),
               )}
-              <Grid2 component={List} xs={12} sm={6}>
+              <Grid2
+                component={List}
+                xs={12}
+                sm={category === 'pokemon' ? 6 : 12}
+              >
                 {category === 'pokemon' && (
                   <GenderListItem
                     field={`filters.${category}.filter.${id}`}
@@ -167,7 +171,11 @@ export default function AdvancedFilter() {
                   disableGutters
                 />
               </Grid2>
-              <Grid2 component={List} xs={12} sm={6}>
+              <Grid2
+                component={List}
+                xs={12}
+                sm={category === 'pokemon' ? 6 : 12}
+              >
                 {category === 'pokemon' && (
                   <DualBoolToggle
                     items={XXS_XXL}
