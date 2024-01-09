@@ -6,12 +6,13 @@ import { Virtuoso } from 'react-virtuoso'
 import Typography from '@mui/material/Typography'
 
 import Box from '@mui/material/Box'
-import { WebhookSearch } from '@components/layout/dialogs/filters/AdvSearch'
 import { Loading } from '@components/layout/general/Loading'
+import { GenericSearch } from '@components/layout/drawer/ItemSearch'
 
 import TrackedTile from './tiles/TrackedTile'
 import Selecting from './Selecting'
 import { useGetWebhookData } from './hooks'
+import { useWebhookStore } from './store'
 
 /**
  *
@@ -46,5 +47,20 @@ const Tracked = ({ category }) => {
     </>
   )
 }
+
+export const WebhookSearch = React.memo(() => {
+  const search = useWebhookStore((s) => s.trackedSearch)
+  const category = useWebhookStore((s) => s.category)
+
+  return (
+    <GenericSearch
+      value={search}
+      setValue={(newValue) =>
+        useWebhookStore.setState({ trackedSearch: newValue })
+      }
+      label={`search_${category}`}
+    />
+  )
+})
 
 export default Tracked

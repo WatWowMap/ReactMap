@@ -9,7 +9,9 @@ import { useDeepStore } from '@hooks/useStore'
 
 /**
  * @typedef {{
- *  field: import('@hooks/useStore').UseStorePaths,
+ *  field?: import('@hooks/useStore').UseStorePaths,
+ *  value?: string,
+ *  setValue?: (value: string) => void,
  *  label?: string,
  *  disabled?: boolean,
  * } & import('@mui/material').TextFieldProps} Props
@@ -17,9 +19,11 @@ import { useDeepStore } from '@hooks/useStore'
 
 /** @type {React.ForwardRefExoticComponent<Props>} */
 export const GenericSearch = React.forwardRef(
-  ({ field, label, disabled, ...props }, ref) => {
+  ({ field, label, disabled, value, setValue, ...props }, ref) => {
     const { t } = useTranslation()
-    const [value, setValue] = useDeepStore(field, '')
+    const [searchValue, setSearchValue] = field
+      ? useDeepStore(field, '')
+      : [value, setValue]
 
     const InputProps = React.useMemo(
       () => ({
@@ -27,13 +31,13 @@ export const GenericSearch = React.forwardRef(
           <IconButton
             size="small"
             disabled={!value}
-            onClick={() => setValue('')}
+            onClick={() => setSearchValue('')}
           >
             <HighlightOffIcon fontSize="small" />
           </IconButton>
         ),
       }),
-      [!!value, setValue],
+      [!!searchValue, setSearchValue],
     )
     /** @type {import('@mui/material').TextFieldProps['onChange']} */
     const onChange = React.useCallback(
@@ -51,7 +55,7 @@ export const GenericSearch = React.forwardRef(
         fullWidth
         size="small"
         disabled={disabled}
-        value={value}
+        value={searchValue}
         onChange={onChange}
         InputProps={InputProps}
         {...props}
