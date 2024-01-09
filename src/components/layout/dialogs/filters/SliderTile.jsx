@@ -48,20 +48,18 @@ export default function SliderTile({
 
   const handleSliderChange =
     /** @type {import('@mui/material').SliderProps['onChangeCommitted']} */ (
-      React.useCallback(
-        ({ type }, newValues) => {
-          if (Array.isArray(newValues)) {
-            if (type === 'mousemove') {
-              setText(newValues)
-              setTemp(newValues)
-            } else if (type === 'mouseup') {
-              handleChange(name, newValues)
-            }
-          }
-        },
-        [name, handleChange],
-      )
+      React.useCallback((_, newValues) => {
+        if (Array.isArray(newValues)) {
+          setText(newValues)
+          setTemp(newValues)
+        }
+      }, [])
     )
+  const handleSliderChangeCommitted = React.useCallback(
+    () => handleChange(name, temp),
+    [name, temp, handleChange],
+  )
+
   const handleTextInputChange =
     /** @type {import('@mui/material').TextFieldProps['onChange']} */ (
       React.useCallback(
@@ -167,7 +165,7 @@ export default function SliderTile({
           color={color}
           value={temp}
           onChange={handleSliderChange}
-          onChangeCommitted={handleSliderChange}
+          onChangeCommitted={handleSliderChangeCommitted}
           disabled={disabled}
           valueLabelFormat={marksMemo ? (e) => t(`${markI18n}${e}`) : undefined}
           step={step}

@@ -19,6 +19,7 @@ import ClientError from './dialogs/ClientError'
 import { WebhookNotification } from './dialogs/webhooks/Notification'
 import AdvancedFilter from './dialogs/filters/Advanced'
 import BadgeSelection from './dialogs/BadgeSelection'
+import WebhookAdvanced from './dialogs/webhooks/WebhookAdv'
 
 export const Nav = React.memo(
   () => {
@@ -43,6 +44,7 @@ export const Nav = React.memo(
         <ClientError />
         <AdvancedFilter />
         <BadgeSelection />
+        <WebhookAdvanced />
       </>
     )
   },

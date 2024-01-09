@@ -49,6 +49,7 @@ export default class Poracle {
   }
 
   static getId(item) {
+    if (!item) return ''
     const { invasions } = useStatic.getState().masterfile
     const { category } = useWebhookStore.getState()
 
@@ -155,6 +156,7 @@ export default class Poracle {
 
   static reactMapFriendly(values) {
     const reactMapFriendly = {}
+    if (!values) return reactMapFriendly
     Object.keys(values).forEach((key) => {
       if (key === 'min_time') {
         reactMapFriendly[key] = values[key]

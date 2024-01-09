@@ -16,16 +16,27 @@ import { applyToAll } from '@services/filtering/applyToAll'
 import SlotSelection from '../dialogs/filters/SlotSelection'
 import OptionsContainer from '../dialogs/filters/OptionsContainer'
 import Help from '../dialogs/tutorial/Advanced'
-import WebhookAdvanced from '../dialogs/webhooks/WebhookAdv'
 import { VirtualGrid } from './VirtualGrid'
-import { SelectorItem } from '../drawer/SelectorItem'
 import { GenericSearch } from '../drawer/ItemSearch'
+import { useWebhookStore } from '../dialogs/webhooks/store'
 
+/**
+ * @param {{
+ *  category: string
+ *  webhookCategory?: string
+ *  tempFilters: import('@rm/types').Filters
+ *  children: (item: import('@rm/types').MenuItem, key: string) => React.ReactNode
+ *  categories?: import('@rm/types').Available[]
+ *  title: string
+ *  titleAction: () => void
+ *  extraButtons?: import('@components/layout/general/Footer').FooterButton[]
+ * }} props
+ */
 export default function Menu({
   category,
   webhookCategory,
   tempFilters,
-  setTempFilters,
+  children,
   categories,
   title,
   titleAction,
@@ -43,10 +54,6 @@ export default function Menu({
     id: 0,
   })
   const [helpDialog, setHelpDialog] = useState(false)
-  const [webhook, setWebhook] = useState({
-    open: false,
-    id: '',
-  })
 
   const { filteredObj, filteredArr, count } = useFilter(
     tempFilters,
@@ -69,57 +76,6 @@ export default function Menu({
     [],
   )
 
-  const toggleWebhook = (open, id, newFilters) => (event) => {
-    if (
-      event.type === 'keydown' &&
-      (event.key === 'Tab' || event.key === 'Shift')
-    ) {
-      return
-    }
-    if (id === 'global' && !open && newFilters) {
-      const wildCards = (() => {
-        switch (webhookCategory) {
-          case 'raid':
-            return ['r90']
-          case 'egg':
-            return ['e90']
-          case 'gym':
-            return ['t4']
-          case 'invasion':
-            return ['i0']
-          default:
-            return ['0-0']
-        }
-      })()
-      if (newFilters.everything_individually !== false) {
-        Object.keys(filteredObj).forEach((item) => {
-          if (!wildCards.includes(item)) {
-            filteredObj[item] = {
-              ...tempFilters[item],
-              ...newFilters,
-              enabled: true,
-            }
-          }
-        })
-      } else {
-        wildCards.forEach((item) => {
-          filteredObj[item] = {
-            ...tempFilters[item],
-            ...newFilters,
-            enabled: true,
-          }
-        })
-      }
-      setTempFilters({ ...tempFilters, ...filteredObj, [id]: newFilters })
-    } else if (id && newFilters && !open) {
-      setTempFilters({
-        ...tempFilters,
-        [id]: { ...tempFilters[id], ...newFilters, enabled: true },
-      })
-    }
-    setWebhook({ open, id: id ?? '' })
-  }
-
   const toggleSlotsMenu = (open, id, newFilters) => (event) => {
     if (
       event.type === 'keydown' &&
@@ -134,7 +90,7 @@ export default function Menu({
       })
     } else if (newFilters) {
       setSlotsMenu({ open })
-      setTempFilters({ ...newFilters })
+      // setTempFilters({ ...newFilters })
     } else {
       setSlotsMenu({ open })
     }
@@ -169,17 +125,15 @@ export default function Menu({
       },
       {
         name: 'apply_to_all',
-        action: webhookCategory
-          ? toggleWebhook(true, 'global')
-          : () =>
-              useLayoutStore.setState({
-                advancedFilter: {
-                  open: true,
-                  id: 'global',
-                  category,
-                  selectedIds,
-                },
-              }),
+        action: () =>
+          (webhookCategory ? useWebhookStore : useLayoutStore).setState({
+            advancedFilter: {
+              open: true,
+              id: 'global',
+              category,
+              selectedIds,
+            },
+          }),
         icon: category === 'pokemon' || webhookCategory ? 'Tune' : 'FormatSize',
       },
       {
@@ -217,9 +171,7 @@ export default function Menu({
           </Box>
           {filteredArr.length ? (
             <VirtualGrid data={filteredArr} xs={4} md={2}>
-              {(_, key) => (
-                <SelectorItem id={key} category={category} caption />
-              )}
+              {children}
             </VirtualGrid>
           ) : (
             <Box className="flex-center" flex="1 1 auto" whiteSpace="pre-line">
@@ -254,20 +206,6 @@ export default function Menu({
           toggleHelp={() => setHelpDialog(!helpDialog)}
           category={category}
           isMobile={isMobile}
-        />
-      </Dialog>
-      <Dialog
-        open={!!(webhook.open && webhook.id)}
-        fullWidth={!isMobile}
-        fullScreen={isMobile}
-        onClose={toggleWebhook(false)}
-      >
-        <WebhookAdvanced
-          id={webhook.id}
-          category={webhookCategory}
-          isMobile={isMobile}
-          toggleWebhook={toggleWebhook}
-          tempFilters={tempFilters[webhook.id]}
         />
       </Dialog>
     </>

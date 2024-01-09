@@ -38,11 +38,9 @@ const Tracked = ({ category }) => {
           // useWindowScroll
         />
       ) : (
-        <div className="flex-center" style={{ flex: '1 1 auto' }}>
-          <Typography variant="h6" align="center">
-            {t('no_alerts')}
-          </Typography>
-        </div>
+        <Box className="flex-center" height="100%">
+          <Typography variant="h6">{t('no_alerts')}</Typography>
+        </Box>
       )}
       <Selecting />
     </>

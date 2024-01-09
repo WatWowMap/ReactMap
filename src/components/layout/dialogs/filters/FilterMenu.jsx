@@ -1,7 +1,10 @@
+// @ts-check
 import * as React from 'react'
 import Menu from '@components/layout/general/Menu'
 
 import { toggleDialog, useLayoutStore, useStore } from '@hooks/useStore'
+import { StandardItem } from '@components/layout/drawer/SelectorItem'
+
 import { DialogWrapper } from '../DialogWrapper'
 
 export default function FilterMenu() {
@@ -9,6 +12,19 @@ export default function FilterMenu() {
   const filters = useStore((s) => s.filters[category])
 
   const [tempFilters, setTempFilters] = React.useState(filters?.filter)
+
+  /** @type {import('@components/layout/general/Footer').FooterButton[]} */
+  const extraButtons = React.useMemo(
+    () => [
+      {
+        name: 'save',
+        action: toggleDialog(false, category, 'filters'),
+        icon: 'Save',
+        color: 'secondary',
+      },
+    ],
+    [category],
+  )
 
   React.useEffect(() => {
     setTempFilters(filters?.filter)
@@ -24,18 +40,11 @@ export default function FilterMenu() {
         category={category}
         title={`${category}_filters`}
         titleAction={toggleDialog(false, category, 'filters')}
-        filters={filters}
         tempFilters={tempFilters}
-        setTempFilters={setTempFilters}
-        extraButtons={[
-          {
-            name: 'save',
-            action: toggleDialog(false, category, 'filters'),
-            icon: 'Save',
-            color: 'secondary',
-          },
-        ]}
-      />
+        extraButtons={extraButtons}
+      >
+        {(_, key) => <StandardItem id={key} category={category} caption />}
+      </Menu>
     </DialogWrapper>
   )
 }

@@ -16,24 +16,107 @@ import {
 } from '@hooks/useStore'
 import { Img } from '../general/Img'
 import { ColoredTile } from '../general/ColoredTile'
+import { useWebhookStore } from '../dialogs/webhooks/store'
+
+/** @param {string} id */
+const getOtherData = (id) => {
+  switch (id.charAt(0)) {
+    case 'e':
+    case 'r':
+      return { level: id.slice(1) }
+    default:
+      return { pokemon_id: id.split('-')[0], form: id.split('-')[1] }
+  }
+}
 
 /**
- * @param {{
+ * @typedef {{
  *  id: string,
  *  category: keyof import('@rm/types').Available,
- *  children?: React.ReactNode
  *  caption?: boolean
- * }} props
+ * }} BaseProps
+ *
+ * @typedef {BaseProps & {
+ *  filter: any,
+ *  setFilter: (value: any) => void
+ *  onClick: () => void
+ * }} FullProps
  */
-export function SelectorItem({ id, category, caption }) {
-  const { t } = useTranslateById({ alt: true, newLine: true })
+
+/** @param {BaseProps} props */
+export function StandardItem({ id, category, ...props }) {
   const [filter, setFilter] = useDeepStore(`filters.${category}.filter.${id}`)
+  return (
+    <SelectorItem
+      {...props}
+      id={id}
+      category={category}
+      filter={filter}
+      setFilter={setFilter}
+      onClick={() =>
+        useLayoutStore.setState({
+          advancedFilter: {
+            open: true,
+            id,
+            category,
+            selectedIds: [],
+          },
+        })
+      }
+    />
+  )
+}
+
+/** @param {BaseProps} props */
+export function WebhookItem({ id, category, ...props }) {
+  const filter = useWebhookStore((s) => s.tempFilters[id])
+  const setFilter = () => {
+    useWebhookStore.setState((prev) => ({
+      tempFilters: {
+        ...prev.tempFilters,
+        [id]: prev.tempFilters[id]
+          ? { ...prev.tempFilters[id], enabled: !prev.tempFilters[id]?.enabled }
+          : { enabled: true, ...getOtherData(id) },
+      },
+    }))
+  }
+  return (
+    <SelectorItem
+      {...props}
+      id={id}
+      category={category}
+      filter={filter}
+      setFilter={setFilter}
+      onClick={() =>
+        useWebhookStore.setState({
+          advanced: {
+            id,
+            open: true,
+            category,
+            selectedIds: [],
+          },
+        })
+      }
+    />
+  )
+}
+
+/** @param {FullProps} props */
+export function SelectorItem({
+  id,
+  category,
+  caption,
+  filter,
+  setFilter,
+  onClick,
+}) {
+  const { t } = useTranslateById({ alt: true, newLine: true })
   const title = t(id)
   const url = useStatic((s) => s.Icons.getIconById(id))
   const easyMode = useStore((s) => !!s.filters[category].easyMode)
 
   const color = filter?.enabled
-    ? filter?.all || easyMode || !filter?.adv
+    ? filter?.all || easyMode
       ? 'success.main'
       : 'info.main'
     : 'error.dark'
@@ -79,14 +162,15 @@ export function SelectorItem({ id, category, caption }) {
           sx={{ position: 'absolute', right: 0, top: 0 }}
           onClick={(e) => {
             e.stopPropagation()
-            useLayoutStore.setState({
-              advancedFilter: {
-                open: true,
-                id,
-                category,
-                selectedIds: [],
-              },
-            })
+            onClick()
+            // useLayoutStore.setState({
+            //   advancedFilter: {
+            //     open: true,
+            //     id,
+            //     category,
+            //     selectedIds: [],
+            //   },
+            // })
           }}
         >
           <TuneIcon fontSize="small" />

@@ -17,7 +17,7 @@ import { useLayoutStore, useStatic, useStore } from '@hooks/useStore'
 
 import { BoolToggle } from './BoolToggle'
 import { GenericSearchMemo } from './ItemSearch'
-import { SelectorItem } from './SelectorItem'
+import { StandardItem } from './SelectorItem'
 import { VirtualGrid } from '../general/VirtualGrid'
 
 /**
@@ -117,7 +117,7 @@ function SelectorList({ category }) {
       </ListItem>
       <Box height={400}>
         <VirtualGrid data={items} xs={4}>
-          {(_, key) => <SelectorItem id={key} category={category} />}
+          {(_, key) => <StandardItem id={key} category={category} />}
         </VirtualGrid>
       </Box>
     </List>
