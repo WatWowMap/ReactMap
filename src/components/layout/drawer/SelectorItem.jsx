@@ -113,7 +113,7 @@ export function SelectorItem({
   const { t } = useTranslateById({ alt: true, newLine: true })
   const title = t(id)
   const url = useStatic((s) => s.Icons.getIconById(id))
-  const easyMode = useStore((s) => !!s.filters[category].easyMode)
+  const easyMode = useStore((s) => !!s.filters[category]?.easyMode)
 
   const color = filter?.enabled
     ? filter?.all || easyMode

@@ -15,13 +15,7 @@ const Item = ({ context, ...props }) => <Grid2 {...context} {...props} />
 
 /** @type {React.ComponentType<import('react-virtuoso').GridListProps & { context?: Prop }>} */
 const List = React.forwardRef((props, ref) => (
-  <Grid2
-    {...props}
-    container
-    alignItems="stretch"
-    justifyContent="center"
-    ref={ref}
-  />
+  <Grid2 {...props} container alignItems="stretch" ref={ref} />
 ))
 
 /**

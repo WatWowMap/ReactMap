@@ -90,13 +90,11 @@ export default function Manage() {
   React.useEffect(() => {
     if (!addNew && category !== 'human') {
       const { tempFilters } = useWebhookStore.getState()
-      console.log({ tempFilters })
       const values = Poracle.processor(
         category,
         Object.values(tempFilters || {}).filter((x) => x && x.enabled),
         useWebhookStore.getState().context.ui[category].defaults,
       )
-      console.log({ values })
       apolloClient.mutate({
         mutation: Query.webhook(category),
         variables: {
