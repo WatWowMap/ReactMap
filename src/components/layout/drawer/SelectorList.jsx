@@ -181,7 +181,7 @@ function SelectorList({ category, subCategory, label, height = 400 }) {
       <Box
         height={
           typeof height === 'number'
-            ? Math.min(height, Math.ceil(items.length / 3) * 86)
+            ? Math.min(height, Math.ceil(items.length / 3) * 90)
             : height
         }
       >
