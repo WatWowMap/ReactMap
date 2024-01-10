@@ -80,7 +80,8 @@ const DrawerSection = ({ category }) => {
                     category === 'wayfarer' || category === 'admin'
                       ? subItem
                       : category
-                  }.${subItem}`}
+                  }.${category === 'wayfarer' ? 'enabled' : subItem}`}
+                  label={subItem}
                 />
                 <Extras category={category} subItem={subItem} />
               </React.Fragment>
