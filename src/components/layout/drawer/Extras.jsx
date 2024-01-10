@@ -423,6 +423,23 @@ const BaseNestQuickSelector = () => {
 }
 const NestQuickSelector = React.memo(BaseNestQuickSelector)
 
+const BaseLureQuickSelector = () => {
+  const enabled = useStorage((s) => !!s.filters?.pokestops?.lures)
+  return (
+    <CollapsibleItem open={enabled}>
+      <Box px={2}>
+        <SelectorListMemo
+          category="pokestops"
+          subCategory="lures"
+          label="search_lures"
+          height={175}
+        />
+      </Box>
+    </CollapsibleItem>
+  )
+}
+const LureQuickSelector = React.memo(BaseLureQuickSelector)
+
 function Extras({ category, subItem }) {
   const { enableConfirmedInvasions, enableQuestSetSelector } =
     useMemory.getState().config.misc
@@ -446,6 +463,8 @@ function Extras({ category, subItem }) {
           return enableConfirmedInvasions ? <Invasion /> : null
         case 'eventStops':
           return <EventStops />
+        case 'lures':
+          return <LureQuickSelector />
       }
     case 'gyms':
       switch (subItem) {
