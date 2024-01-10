@@ -72,22 +72,24 @@ const DrawerSection = ({ category }) => {
           ) : category === 'settings' ? (
             <SettingsMenu />
           ) : (
-            Object.keys(value).map((subItem) => (
-              <React.Fragment key={`${category}${subItem}`}>
-                {!(category === 'nests' && subItem === 'sliders') && (
-                  <BoolToggle
-                    // @ts-ignore
-                    field={`filters.${
-                      category === 'wayfarer' || category === 'admin'
-                        ? subItem
-                        : category
-                    }.${category === 'wayfarer' ? 'enabled' : subItem}`}
-                    label={subItem}
-                  />
-                )}
-                <Extras category={category} subItem={subItem} />
-              </React.Fragment>
-            ))
+            Object.keys(value).map((subItem) => {
+              const hasSubSubCategories =
+                category === 'wayfarer' || category === 'admin'
+              return (
+                <React.Fragment key={`${category}${subItem}`}>
+                  {!(category === 'nests' && subItem === 'sliders') && (
+                    <BoolToggle
+                      // @ts-ignore
+                      field={`filters.${
+                        hasSubSubCategories ? subItem : category
+                      }.${hasSubSubCategories ? 'enabled' : subItem}`}
+                      label={subItem}
+                    />
+                  )}
+                  <Extras category={category} subItem={subItem} />
+                </React.Fragment>
+              )
+            })
           )}
           {staticUserSettings && (
             <ListItemButton onClick={toggleDialog(true, category, 'options')}>
