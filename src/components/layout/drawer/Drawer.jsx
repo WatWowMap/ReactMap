@@ -1,23 +1,55 @@
+// @ts-check
 import * as React from 'react'
 import Clear from '@mui/icons-material/Clear'
-import { Drawer, Typography, Grid, IconButton } from '@mui/material'
+import List from '@mui/material/List'
+import Drawer from '@mui/material/Drawer'
+import IconButton from '@mui/material/IconButton'
+import ListItem from '@mui/material/ListItem'
+import ListItemText from '@mui/material/ListItemText'
+import ListItemIcon from '@mui/material/ListItemIcon'
 
 import { useLayoutStore, useStatic } from '@hooks/useStore'
 
 import Actions from './Actions'
-import DrawerSection from './Section'
+import { DrawerSectionMemo } from './Section'
+import { Img } from '../general/Img'
+import { DividerWithMargin } from '../general/StyledDivider'
 
 const handleClose = () => useLayoutStore.setState({ drawer: false })
 
+const DrawerHeader = React.memo(
+  () => {
+    const title = useStatic((s) => s.config.general.title)
+    return (
+      <ListItem disablePadding>
+        <ListItemIcon sx={{ pl: 1.5 }}>
+          <Img src="/favicon.ico" alt="favicon" maxHeight={32} maxWidth={32} />
+        </ListItemIcon>
+        <ListItemText
+          primaryTypographyProps={{
+            variant: 'h5',
+            color: 'secondary',
+            fontWeight: 'bold',
+          }}
+        >
+          {title}
+        </ListItemText>
+        <IconButton onClick={handleClose} size="large">
+          <Clear />
+        </IconButton>
+      </ListItem>
+    )
+  },
+  () => true,
+)
+
+const listItemSx = /** @type {import('@mui/material').SxProps} */ ({
+  display: 'block',
+})
+
 export default function Sidebar() {
   const drawer = useLayoutStore((s) => s.drawer)
-
-  const {
-    config: {
-      general: { title, separateDrawerActions },
-    },
-    ui,
-  } = useStatic.getState()
+  const { config, ui } = useStatic.getState()
 
   return (
     <Drawer
@@ -26,39 +58,18 @@ export default function Sidebar() {
       open={drawer}
       onClose={handleClose}
     >
-      <Grid container alignItems="center" style={{ flexWrap: 'nowrap' }}>
-        <Grid
-          item
-          className="grid-item"
-          style={{
-            backgroundImage: 'url(/favicon.ico)',
-            width: 32,
-            height: 32,
-            margin: 10,
-          }}
-        />
-        <Grid item style={{ flexGrow: 1 }}>
-          <Typography
-            variant="h5"
-            color="secondary"
-            style={{
-              fontWeight: 'bold',
-              margin: 10,
-            }}
-          >
-            {title}
-          </Typography>
-        </Grid>
-        <Grid item style={{ flexGrow: 0 }}>
-          <IconButton onClick={handleClose} size="large">
-            <Clear />
-          </IconButton>
-        </Grid>
-      </Grid>
-      {Object.entries(ui).map(([category, value]) => (
-        <DrawerSection key={category} category={category} value={value} />
-      ))}
-      {separateDrawerActions && <Actions />}
+      <List disablePadding sx={{ minWidth: 290 }}>
+        <DrawerHeader />
+        {Object.entries(ui).map(([category, value]) => (
+          <React.Fragment key={category}>
+            <DividerWithMargin flexItem />
+            <ListItem disablePadding sx={listItemSx}>
+              <DrawerSectionMemo category={category} value={value} />
+            </ListItem>
+          </React.Fragment>
+        ))}
+      </List>
+      {config.general.separateDrawerActions && <Actions />}
     </Drawer>
   )
 }

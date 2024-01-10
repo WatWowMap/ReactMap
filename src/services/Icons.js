@@ -222,6 +222,9 @@ class UAssets {
 
   /** @param {string} id */
   getIconById(id) {
+    if (typeof id !== 'string') {
+      return ''
+    }
     if (id === 'kecleon') {
       id = 'b8'
     } else if (id === 'gold-stop') {
@@ -232,7 +235,7 @@ class UAssets {
     switch (id.charAt(0)) {
       case 'a':
         // rocket pokemon
-        return this.getPokemon(...id.slice(1).split('-'))
+        return this.getPokemon(...id.slice(1).split('-', 2), 0, 0, 0, 1)
       case 'b':
         // event stops
         return this.getEventStops(id.slice(1))
@@ -590,7 +593,7 @@ class UAssets {
   /**
    *
    * @param {string | number} weatherId
-   * @param {'day' | 'night'} [timeOfDay]
+   * @param {import("@rm/types").TimesOfDay} [timeOfDay]
    * @returns
    */
   getWeather(weatherId, timeOfDay = 'day') {

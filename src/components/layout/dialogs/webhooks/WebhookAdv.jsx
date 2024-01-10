@@ -1,8 +1,9 @@
 /* eslint-disable react/jsx-no-duplicate-props */
-import React, { useState } from 'react'
+import * as React from 'react'
 import ExpandMore from '@mui/icons-material/ExpandMore'
 import {
   Grid,
+  Dialog,
   DialogContent,
   Switch,
   Typography,
@@ -34,7 +35,7 @@ import Header from '@components/layout/general/Header'
 import Footer from '@components/layout/general/Footer'
 import { useWebhookStore } from './store'
 
-const skipFields = [
+const skipFields = new Set([
   'profile_no',
   'allForms',
   'pvpEntry',
@@ -68,30 +69,29 @@ const skipFields = [
   'battle_changes',
   'shiny',
   'everything_individually',
-]
+])
 
-export default function WebhookAdvanced({
-  category,
-  id,
-  toggleWebhook,
-  tempFilters,
-}) {
+const wildCards = {
+  raid: ['r90'],
+  egg: ['e90'],
+  gym: ['t4'],
+  invasion: ['i0'],
+}
+
+export default function WebhookAdvanced() {
+  const { id, category, open, selectedIds, onClose } = useWebhookStore(
+    (s) => s.advanced,
+  )
   const idObj = Poracle.getIdObj(id)
   const { t } = useTranslation()
   const location = useStore((state) => state.location)
   const webhookAdv = useStore((s) => s.webhookAdv)
-  const {
-    ui: { [category]: info },
-    templates,
-    prefix,
-    leagues,
-    pvp,
-    hasNominatim,
-    locale,
-    everything,
-  } = useWebhookStore((s) => s.context)
+  const { templates, prefix, leagues, pvp, hasNominatim, locale, everything } =
+    useWebhookStore((s) => s.context)
+  const info = useWebhookStore((s) => s.context.ui?.[category] || {})
   const human = useWebhookStore((s) => s.human)
   const profile = useWebhookStore((s) => s.profile)
+  const tempFilters = useWebhookStore((s) => s.tempFilters[id])
   const { pokemon, moves, types } = useStatic((s) => s.masterfile)
   const isMobile = useStatic((s) => s.isMobile)
 
@@ -110,7 +110,7 @@ export default function WebhookAdvanced({
     },
   )
   const fetchedData = data || previousData
-  const [filterValues, setFilterValues] = useState(
+  const [filterValues, setFilterValues] = React.useState(
     tempFilters?.template
       ? Poracle.reactMapFriendly(tempFilters)
       : {
@@ -118,21 +118,40 @@ export default function WebhookAdvanced({
           profile_no: human.current_profile_no,
         },
   )
-  const [poracleValues, setPoracleValues] = useState(
+  const [poracleValues, setPoracleValues] = React.useState(
     tempFilters?.template
       ? tempFilters
       : { ...info.defaults, profile_no: human.current_profile_no },
   )
 
-  const handleSlider = (event, values, low, high) => {
-    setFilterValues({ ...filterValues, [event]: values })
-    setPoracleValues({
-      ...poracleValues,
-      [low]: values[0],
-      [high]: values[1],
-      pvpEntry: event.startsWith('pvp'),
-    })
-  }
+  React.useEffect(() => {
+    setPoracleValues(
+      tempFilters?.template
+        ? { ...tempFilters }
+        : { ...info.defaults, profile_no: human.current_profile_no },
+    )
+    setFilterValues(
+      tempFilters?.template
+        ? Poracle.reactMapFriendly(tempFilters)
+        : {
+            ...Poracle.reactMapFriendly(info.defaults),
+            profile_no: human.current_profile_no,
+          },
+    )
+  }, [tempFilters, id, human.current_profile_no, info.defaults])
+
+  const handleSlider = React.useCallback(
+    (low, high) => (name, values) => {
+      setFilterValues((prev) => ({ ...prev, [name]: values }))
+      setPoracleValues((prev) => ({
+        ...prev,
+        [low]: values[0],
+        [high]: values[1],
+        pvpEntry: name.startsWith('pvp'),
+      }))
+    },
+    [],
+  )
 
   const handleSwitch = (event) => {
     const { name, checked } = event.target
@@ -215,14 +234,6 @@ export default function WebhookAdvanced({
       webhookAdv: { ...prev.webhookAdv, [panel]: isExpanded },
     }))
   }
-
-  const footerOptions = [
-    {
-      name: 'save',
-      action: toggleWebhook(false, id, poracleValues),
-      icon: 'Save',
-    },
-  ]
 
   const getOptions = (option) => {
     const menuItems = []
@@ -378,7 +389,7 @@ export default function WebhookAdvanced({
       poracleValues.everything_individually
     )
       return ` ${t('individually')} `
-    if (skipFields.includes(field)) return ''
+    if (skipFields.has(field)) return ''
     if (field.startsWith('pvp')) {
       if (
         poracleValues.pvpEntry &&
@@ -518,45 +529,53 @@ export default function WebhookAdvanced({
     const size = Math.floor(12 / options.length)
     switch (type) {
       case 'sliders':
-        return options.map((option, i) => (
-          <Grid
-            key={option.name}
-            item
-            xs={12}
-            sm={option.size || 6}
-            style={isMobile ? { marginTop: i ? 'inherit' : 10 } : {}}
-          >
-            <SliderTile
-              filterSlide={option}
-              handleChange={handleSlider}
-              filterValues={filterValues}
-            />
-          </Grid>
-        ))
+        return options
+          .filter((option) => filterValues[option.name] !== undefined)
+          .map((option, i) => (
+            <Grid
+              key={option.name}
+              item
+              xs={12}
+              sm={option.size || 6}
+              style={isMobile ? { marginTop: i ? 'inherit' : 10 } : {}}
+            >
+              <SliderTile
+                slide={option}
+                handleChange={handleSlider(option.low, option.high)}
+                values={filterValues[option.name]}
+              />
+            </Grid>
+          ))
       case 'selects':
-        return options.map((option) => (
-          <Grid
-            key={option.name}
-            item
-            xs={option.xs || 6}
-            sm={option.sm || size}
-            style={{ margin: '10px 0', textAlign: 'center' }}
-          >
-            <FormControl variant="outlined" size="small" sx={{ width: '80%' }}>
-              <InputLabel>{t(option.name)}</InputLabel>
-              <Select
-                autoFocus
-                name={option.name}
-                value={poracleValues[option.name]}
-                onChange={handleSelect}
-                label={t(option.name)}
-                disabled={getDisabled(option)}
+        return options
+          .filter((option) => poracleValues[option.name] !== undefined)
+          .map((option) => (
+            <Grid
+              key={option.name}
+              item
+              xs={option.xs || 6}
+              sm={option.sm || size}
+              style={{ margin: '10px 0', textAlign: 'center' }}
+            >
+              <FormControl
+                variant="outlined"
+                size="small"
+                sx={{ width: '80%' }}
               >
-                {getOptions(option)}
-              </Select>
-            </FormControl>
-          </Grid>
-        ))
+                <InputLabel>{t(option.name)}</InputLabel>
+                <Select
+                  autoFocus
+                  name={option.name}
+                  value={poracleValues[option.name]}
+                  onChange={handleSelect}
+                  label={t(option.name)}
+                  disabled={getDisabled(option)}
+                >
+                  {getOptions(option)}
+                </Select>
+              </FormControl>
+            </Grid>
+          ))
       case 'booleans':
         return options.map((option) => (
           <Grid
@@ -599,7 +618,10 @@ export default function WebhookAdvanced({
               autoComplete="off"
               name={option.name}
               label={t(option.name)}
-              value={poracleValues[option.name]}
+              value={
+                poracleValues[option.name] ||
+                (option.type === 'number' ? 0 : '')
+              }
               onChange={handleSelect}
               variant="outlined"
               disabled={getDisabled(option)}
@@ -658,7 +680,6 @@ export default function WebhookAdvanced({
                 }}
                 renderInput={(params) => (
                   <TextField
-                    // eslint-disable-next-line react/jsx-props-no-spreading
                     {...params}
                     label={
                       <Trans i18nKey="search_specific">
@@ -731,14 +752,83 @@ export default function WebhookAdvanced({
     }
   }
 
+  const handleClose = (save, filterId, filterToSave) => {
+    if (save) {
+      if (filterId === 'global' && filterToSave) {
+        const newFilters = {}
+        const wc = wildCards[category] || ['0-0']
+        if (filterToSave.everything_individually !== false) {
+          selectedIds.forEach((item) => {
+            if (!wc.includes(item)) {
+              newFilters[item] = {
+                ...tempFilters[item],
+                ...filterToSave,
+                enabled: true,
+              }
+            }
+          })
+        } else {
+          wc.forEach((item) => {
+            newFilters[item] = {
+              ...tempFilters[item],
+              ...filterToSave,
+              enabled: true,
+            }
+          })
+        }
+        useWebhookStore.setState((prev) => ({
+          tempFilters: {
+            ...prev.tempFilters,
+            ...newFilters,
+            [filterId]: { ...filterToSave },
+          },
+        }))
+      } else if (filterId && filterToSave) {
+        useWebhookStore.setState((prev) => ({
+          tempFilters: {
+            ...prev.tempFilters,
+            [filterId]: {
+              ...prev.tempFilters[id],
+              ...filterToSave,
+              enabled: true,
+            },
+          },
+        }))
+      }
+    } else {
+      useWebhookStore.setState((prev) => ({
+        tempFilters: { ...prev.tempFilters, [filterId]: { ...info.defaults } },
+      }))
+    }
+    if (onClose) onClose(poracleValues)
+    useWebhookStore.setState((prev) => ({
+      advanced: { ...prev.advanced, open: false, selectedIds: [] },
+    }))
+  }
+
+  const footerOptions = React.useMemo(
+    () => [
+      {
+        name: 'save',
+        action: () => handleClose(true, id, poracleValues),
+        icon: 'Save',
+      },
+    ],
+    [id, poracleValues],
+  )
+
+  if (!info || !tempFilters) return null
+
   return (
-    <>
-      <Header
-        titles={Poracle.getTitles(idObj)}
-        action={toggleWebhook(false, id)}
-      />
+    <Dialog
+      open={!!(open && id)}
+      fullWidth={!isMobile}
+      fullScreen={isMobile}
+      onClose={handleClose}
+    >
+      <Header titles={Poracle.getTitles(idObj)} action={handleClose} />
       <DialogContent style={{ padding: '8px 5px' }}>
-        {Object.keys(info.ui).map((type) => {
+        {Object.keys(info.ui || {}).map((type) => {
           if (human.blocked_alerts.includes(type)) return null
           if (type === 'global' && (idObj.id !== 'global' || !everything))
             return null
@@ -783,6 +873,6 @@ export default function WebhookAdvanced({
         </Paper>
       </DialogContent>
       <Footer options={footerOptions} role="webhook_advanced" />
-    </>
+    </Dialog>
   )
 }

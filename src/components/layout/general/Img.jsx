@@ -5,24 +5,24 @@ import Typography from '@mui/material/Typography'
 
 /**
  * @typedef {React.ImgHTMLAttributes<HTMLImageElement>} ImgProps
- * @typedef {{ maxHeight: React.CSSProperties['maxHeight'], maxWidth: React.CSSProperties['maxWidth'], sx?: import('@mui/material').SxProps }} ExtraProps
+ * @typedef {{ maxHeight?: React.CSSProperties['maxHeight'], maxWidth?: React.CSSProperties['maxWidth'], sx?: import('@mui/material').SxProps, zIndex?: React.CSSProperties['zIndex'] }} ExtraProps
  * @typedef {ImgProps & Partial<ExtraProps>} Props
  */
 
-/**
- * @type {React.FC<Props>}
- */
+/** @type {React.FC<Props>} */
 export const Img = styled('img', {
-  shouldForwardProp: (prop) => prop !== 'maxWidth' && prop !== 'maxHeight',
-})((/** @type {Props} */ { maxWidth, maxHeight }) => ({
+  shouldForwardProp: (prop) =>
+    prop !== 'maxWidth' && prop !== 'maxHeight' && prop !== 'zIndex',
+})((/** @type {Props} */ { maxWidth, maxHeight, zIndex }) => ({
   maxWidth,
   maxHeight,
+  zIndex,
 }))
 
 /**
  * A small wrapper around the Img component to display an icon next to text
  *
- * The image is 15x15px
+ * The image defaults to 15x15px
  * @param {import('@mui/material').TypographyProps & {
  *    src: string,
  *    alt?: string,

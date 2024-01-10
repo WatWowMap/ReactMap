@@ -21,9 +21,9 @@ import RestartAltIcon from '@mui/icons-material/RestartAlt'
 import Query from '@services/Query'
 import { useStatic, useStore } from '@hooks/useStore'
 import AreaTile from './AreaTile'
-import { ItemSearch } from './ItemSearch'
+import { GenericSearch } from './ItemSearch'
 
-export default function AreaDropDown() {
+function AreaDropDown() {
   const { data, loading, error } = useQuery(Query.scanAreasMenu())
   const { t } = useTranslation()
   const filters = useStore((s) => s.filters)
@@ -52,7 +52,9 @@ export default function AreaDropDown() {
         </ListItemIcon>
         <ListItemText primary={t('reset')} />
       </ListItemButton>
-      <ItemSearch field="filters.scanAreas.filter.search" />
+      <ListItem>
+        <GenericSearch field="filters.scanAreas.filter.search" />
+      </ListItem>
       <ListItem>
         <TableContainer
           component={Paper}
@@ -167,3 +169,5 @@ export default function AreaDropDown() {
     </>
   )
 }
+
+export default React.memo(AreaDropDown)

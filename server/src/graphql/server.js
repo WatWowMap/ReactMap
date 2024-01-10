@@ -81,6 +81,7 @@ async function startApollo(httpServer) {
         async requestDidStart(requestContext) {
           requestContext.contextValue.startTime = Date.now()
 
+          log.debug(requestContext.request?.variables?.filters)
           return {
             async willSendResponse(context) {
               const filterCount = Object.keys(
@@ -98,7 +99,6 @@ async function startApollo(httpServer) {
 
                 const data = response.body.singleResult.data?.[endpoint]
                 const returned = Array.isArray(data) ? data.length : 0
-
                 log.info(
                   HELPERS[endpoint] || `[${endpoint?.toUpperCase()}]`,
                   '|',

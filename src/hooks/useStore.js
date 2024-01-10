@@ -1,4 +1,7 @@
 import Utility from '@services/Utility'
+import { setDeep } from '@services/functions/setDeep'
+import dlv from 'dlv'
+import { useCallback, useMemo } from 'react'
 import { create } from 'zustand'
 import { persist, createJSONStorage } from 'zustand/middleware'
 
@@ -23,16 +26,21 @@ import { persist, createJSONStorage } from 'zustand/middleware'
  *   tutorial: boolean,
  *   searchTab: string,
  *   search: string,
- *   filters: object,
+ *   filters: import('@rm/types').AllFilters,
  *   icons: Record<string, string>
  *   audio: Record<string, string>
  *   userSettings: Record<string, any>
  *   profiling: boolean
+ *   stateLogging: boolean
  *   desktopNotifications: boolean
  *   setAreas: (areas: string | string[], validAreas: string[], unselectAll?: boolean) => void,
  *   setPokemonFilterMode: (legacyFilter: boolean, easyMode: boolean) => void,
  *   getPokemonFilterMode: () => 'basic' | 'intermediate' | 'expert',
  * }} UseStore
+ *
+ * @typedef {import('@rm/types').Paths<UseStore>} UseStorePaths
+ * @typedef {import('@rm/types').ConfigPathValue<UseStore, UseStorePaths>} UseStoreValues
+ *
  * @type {import("zustand").UseBoundStore<import("zustand").StoreApi<UseStore>>}
  */
 export const useStore = create(
@@ -45,7 +53,6 @@ export const useStore = create(
       ],
       zoom: CONFIG.map.general.startZoom,
       filters: {},
-      setFilters: (filters) => set({ filters }),
       setAreas: (areas = [], validAreas = [], unselectAll = false) => {
         const { filters } = get()
         const incoming = new Set(Array.isArray(areas) ? areas : [areas])
@@ -135,7 +142,7 @@ export const useStore = create(
       },
       motdIndex: 0,
       profiling: false,
-      desktopNotifications: false,
+      stateTraceLog: false,
     }),
     {
       name: 'local-state',
@@ -143,6 +150,77 @@ export const useStore = create(
     },
   ),
 )
+
+/**
+ * @template {UseStorePaths} T
+ * @param {T} field
+ * @param {import('@rm/types').ConfigPathValue<UseStore, T>} [defaultValue]
+ * @returns {import('@rm/types').ConfigPathValue<UseStore, T>}
+ */
+export function useGetDeepStore(field, defaultValue) {
+  return useStore((s) => dlv(s, field, defaultValue))
+}
+
+/**
+ * @template {UseStorePaths} T
+ * @param {T} field
+ * @param {import('@rm/types').ConfigPathValue<UseStore, T>} value
+ * @returns {void}
+ */
+export function setDeepStore(field, value) {
+  return useStore.setState((s) => setDeep(s, field, value))
+}
+
+/**
+ * @template {UseStorePaths} Paths
+ * @template {import('@rm/types').ConfigPathValue<UseStore, Paths>} T
+ * @template {T | ((prevValue: T) => T) | keyof T} U
+ * @template {(arg1: U, ...rest: (U extends keyof T ? [arg2: T[U]] : [arg2?: never])) => void} SetDeep
+ * @param {Paths} field
+ * @param {import('@rm/types').ConfigPathValue<UseStore, Paths>} [defaultValue]
+ * @returns {[import('@rm/types').ConfigPathValue<UseStore, Paths>, SetDeep]}
+ */
+export function useDeepStore(field, defaultValue) {
+  const value = useGetDeepStore(field, defaultValue)
+
+  const callback = useCallback(
+    /** @type {SetDeep} */ (
+      (...args) => {
+        const [first, ...rest] = field.split('.')
+        const corrected = rest.length ? rest.join('.') : first
+        const key = typeof args[0] === 'string' && args[1] ? args[0] : ''
+        const path = key ? `${corrected}.${key}` : corrected
+        return useStore.setState((prev) => {
+          const nextValue =
+            args.length === 1
+              ? typeof args[0] === 'function'
+                ? args[0](dlv(prev, field, defaultValue))
+                : args[0]
+              : args[1]
+          if (process.env.NODE_ENV === 'development' && prev.stateLogging) {
+            // eslint-disable-next-line no-console
+            console.trace(field, {
+              first,
+              rest,
+              corrected,
+              key,
+              path,
+              nextValue,
+            })
+          }
+          return {
+            [first]:
+              first === path
+                ? nextValue
+                : setDeep(prev[first], path, nextValue),
+          }
+        })
+      }
+    ),
+    [field, defaultValue],
+  )
+  return useMemo(() => [value, callback], [value, callback])
+}
 
 /**
  * TODO: Finish this
@@ -155,9 +233,26 @@ export const useStore = create(
  *   Icons: InstanceType<typeof import("../services/Icons").default>,
  *   Audio: InstanceType<typeof import("../services/Icons").default>,
  *   config: import('@rm/types').Config['map'],
- *   ui: object
- *   auth: { perms: Partial<import('@rm/types').Permissions>, loggedIn: boolean, methods: string[], strategy: import('@rm/types').Strategy | '' },
- *   filters: object,
+ *   ui: import('@rm/types').UIObject,
+ *   auth: {
+ *    perms: Partial<import('@rm/types').Permissions>,
+ *    loggedIn: boolean,
+ *    methods: string[],
+ *    strategy: import('@rm/types').Strategy | '',
+ *    userBackupLimits: number,
+ *    excludeList: string[],
+ *    discordId: string,
+ *    telegramId: string,
+ *    webhookStrategy: string,
+ *    username: string,
+ *    data: Record<string, any>,
+ *    counts: {
+ *      areaRestrictions: number,
+ *      webhooks: number,
+ *      scanner: number,
+ *    },
+ *   },
+ *   filters: import('@rm/types').AllFilters,
  *   masterfile: import('@rm/types').Masterfile
  *   polling: Record<string, number>
  *   gymValidDataLimit: number
@@ -165,7 +260,7 @@ export const useStore = create(
  *   userSettings: Record<string, any>
  *   clientError: string,
  *   map: import('leaflet').Map | null,
- *   timeOfDay: 'day' | 'night' | 'dusk' | 'dawn',
+ *   timeOfDay: import('@rm/types').TimesOfDay,
  *   hideList: Set<string | number>,
  *   excludeList: string[],
  *   timerList: string[],
@@ -180,12 +275,15 @@ export const useStore = create(
  *     pokemon: string[],
  *     pokestops: string[],
  *     nests: string[],
+ *     questConditions: Record<string, { title: string, target?: number }[]>,
  *   }
  *   manualParams: {
  *     category: string,
  *     id: number | string,
- *  },
+ *   },
+ *   extraUserFields: (import('@rm/types').ExtraField | string)[],
  * }} UseStatic
+ *
  * @type {import("zustand").UseBoundStore<import("zustand").StoreApi<UseStatic>>}
  */
 export const useStatic = create((set) => ({
@@ -260,18 +358,44 @@ export const useStatic = create((set) => ({
   },
 }))
 
-// /**
-//  * @typedef {{
-//  *  nestSubmissions: string | number,
-//  *  motd: boolean,
-//  *  donorPage: boolean,
-//  *  search: boolean,
-//  *  userProfile: boolean,
-//  * }} UseDialog
-//  * @type {import("zustand").UseBoundStore<import("zustand").StoreApi<UseDialog>>}
-//  */
+/**
+ * @typedef {{
+ *  nestSubmissions: string | number,
+ *  help: {
+ *   open: boolean,
+ *   category: string,
+ *  },
+ *  motd: boolean,
+ *  donorPage: boolean,
+ *  search: boolean,
+ *  userProfile: boolean,
+ *  resetFilters: boolean,
+ *  feedback: boolean,
+ *  drawer: boolean,
+ *  advancedFilter: {
+ *    open: boolean,
+ *    category: import('@rm/types').AdvCategories,
+ *    id: string,
+ *    selectedIds: string[],
+ *  },
+ *  dialog: {
+ *    open: boolean,
+ *    category: string,
+ *    type: string,
+ *  },
+ *  gymBadge: {
+ *   open: boolean,
+ *   gymId: string,
+ *   badge: number,
+ *  },
+ *  slotSelection: string,
+ * }} UseLayoutStore
+ *
+ * @type {import("zustand").UseBoundStore<import("zustand").StoreApi<UseLayoutStore>>}
+ */
 export const useLayoutStore = create(() => ({
   nestSubmissions: '0',
+  help: { open: false, category: '' },
   motd: false,
   donorPage: false,
   search: false,
@@ -279,10 +403,22 @@ export const useLayoutStore = create(() => ({
   resetFilters: false,
   feedback: false,
   drawer: false,
+  slotSelection: '',
+  advancedFilter: {
+    open: false,
+    category: 'pokemon',
+    id: '',
+    selectedIds: [],
+  },
   dialog: {
     open: false,
     category: '',
     type: '',
+  },
+  gymBadge: {
+    open: false,
+    gymId: '',
+    badge: 0,
   },
 }))
 
@@ -323,4 +459,5 @@ export const toggleDialog = (open, category, type, filter) => (event) => {
  * @param {T[]} n
  * @returns {boolean}
  */
-export const basicEqualFn = (p, n) => p.every((v, i) => v === n[i])
+export const basicEqualFn = (p, n) =>
+  p.length === n.length && p.every((v, i) => v === n[i])

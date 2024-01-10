@@ -58,7 +58,7 @@ export default function NestSubmission({ id, name }) {
 
   return (
     <Dialog open={open === id} onClose={handleClose}>
-      <Header titles={['nest_submission_menu']} action={handleClose} />
+      <Header titles="nest_submission_menu" action={handleClose} />
       <DialogContent sx={{ mt: 2 }}>
         <form noValidate autoComplete="off" onSubmit={handleSubmit}>
           <TextField

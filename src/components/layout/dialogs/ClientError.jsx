@@ -17,7 +17,7 @@ export default function ClientError() {
 
   return (
     <Dialog open={Boolean(error)}>
-      <Header titles={[`${error}_title`]} action={null} />
+      <Header titles={`${error}_title`} action={null} />
       <DialogContent style={{ textAlign: 'center', whiteSpace: 'pre-line' }}>
         <br />
         <Typography variant="h6">{t(`${error}_body`)}</Typography>

@@ -1,34 +1,30 @@
+// @ts-check
 import * as React from 'react'
-import { Grid, Typography } from '@mui/material'
+import ListItem from '@mui/material/ListItem'
+import ListItemText from '@mui/material/ListItemText'
 import { useTranslation } from 'react-i18next'
 
-import MultiSelector from '@components/layout/drawer/MultiSelector'
+import { MultiSelectorStore } from '@components/layout/drawer/MultiSelector'
+import { ENUM_GENDER } from '@assets/constants'
 
-export default function GenderFilter({ category, filter, setFilter }) {
+/**
+ *
+ * @param {{
+ *  field: `filters.pokemon.filter.${string}` | `filters.pokemon.ivOr`
+ * } & import('@mui/material').ListItemProps} props
+ * @returns
+ */
+export function GenderListItem({ field, ...props }) {
   const { t } = useTranslation()
-
   return (
-    <>
-      {category && (
-        <Grid item xs={2}>
-          <Typography>{t('gender')}</Typography>
-        </Grid>
-      )}
-      <Grid
-        item
-        xs={category ? 10 : 12}
-        sm={category ? undefined : 6}
-        style={{ textAlign: category ? 'right' : 'center' }}
-      >
-        <MultiSelector
-          category={category}
-          filterKey="gender"
-          items={[0, 1, 2, 3]}
-          tKey="gender_icon_"
-          filters={filter.gender}
-          setFilters={setFilter}
-        />
-      </Grid>
-    </>
+    <ListItem {...props}>
+      <ListItemText>{t('gender')}</ListItemText>
+      <MultiSelectorStore
+        items={ENUM_GENDER}
+        tKey="gender_icon_"
+        field={`${field}.gender`}
+        disabled={props.disabled}
+      />
+    </ListItem>
   )
 }

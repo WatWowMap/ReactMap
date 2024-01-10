@@ -28,6 +28,14 @@ import { create } from 'zustand'
  *  groupedAreas: Record<string, import('@turf/helpers').Feature[]>
  *  trackedSearch: string
  *  selected: Record<string, boolean>
+ *  tempFilters: Record<string, any>
+ *  advanced: {
+ *    id: string
+ *    category: string
+ *    selectedIds: string[]
+ *    open: boolean
+ *    onClose?: (newFilters: object) => void
+ *  }
  * }} WebhookStore
  * @type {import("zustand").UseBoundStore<import("zustand").StoreApi<WebhookStore>>}
  */
@@ -62,6 +70,14 @@ export const useWebhookStore = create(() => ({
   groupedAreas: {},
   trackedSearch: '',
   selected: {},
+  tempFilters: {},
+  advanced: {
+    id: '',
+    category: '',
+    selectedIds: [],
+    open: false,
+    onClose: () => {},
+  },
 }))
 
 /** @param {WebhookStore['location']} location */

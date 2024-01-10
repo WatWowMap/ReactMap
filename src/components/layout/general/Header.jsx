@@ -1,16 +1,26 @@
-import React from 'react'
+// @ts-check
+import * as React from 'react'
 import Clear from '@mui/icons-material/Clear'
 import { IconButton, DialogTitle } from '@mui/material'
 
 import { Trans, useTranslation } from 'react-i18next'
 
-export default function Header({ names = [], titles, action }) {
+/**
+ *
+ * @param {{
+ *  names?: string[],
+ *  titles: string | string[],
+ *  action?: () => void,
+ * }} props
+ * @returns
+ */
+export default function Header({ names, titles, action }) {
   const { t } = useTranslation()
 
   return (
     <DialogTitle sx={{ bgcolor: 'secondary.main', color: 'white' }}>
-      {titles.map((title, index) =>
-        names[index] ? (
+      {(Array.isArray(titles) ? titles : [titles]).map((title, index) =>
+        names?.[index] ? (
           <Trans i18nKey={title} key={title}>
             {{ name: t(names[index]) }}
           </Trans>

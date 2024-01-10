@@ -18,12 +18,11 @@ import Header from '@components/layout/general/Header'
 import { apolloClient } from '@services/apollo'
 import Query from '@services/Query'
 import { allProfiles } from '@services/queries/webhook'
+import { WebhookItem } from '@components/layout/drawer/SelectorItem'
 
-import NewPokemon from './tiles/WebhookTile'
 import Human from './human'
 import Tracked from './Tracked'
 import Menu from '../../general/Menu'
-// import WebhookError from './Error'
 import { setMode, setSelected, useWebhookStore } from './store'
 import { useGenFullFilters, useGetHookContext } from './hooks'
 import ProfileEditing from './human/profile'
@@ -42,10 +41,10 @@ export default function Manage() {
   /** @type {ReturnType<typeof React.useRef<HTMLElement | null>>} */
   const dialogRef = React.useRef(null)
   const [addNew, setAddNew] = React.useState(false)
-  const [tempFilters, setTempFilters] = React.useState(filters[category])
   const [height, setHeight] = React.useState(0)
 
   const footerButtons = React.useMemo(() => {
+    /** @type {import('@components/layout/general/Footer').FooterButton[]} */
     const buttons = [
       {
         name: 'feedback',
@@ -81,7 +80,7 @@ export default function Manage() {
 
   React.useEffect(() => {
     Utility.analytics('Webhook', `${category} Webhook Page`, category, true)
-    setTempFilters(filters[category])
+    useWebhookStore.setState({ tempFilters: { ...filters[category] } })
     setSelected()()
     if (dialogRef.current && !addNew) {
       setHeight(dialogRef.current.clientHeight)
@@ -90,12 +89,12 @@ export default function Manage() {
 
   React.useEffect(() => {
     if (!addNew && category !== 'human') {
+      const { tempFilters } = useWebhookStore.getState()
       const values = Poracle.processor(
         category,
         Object.values(tempFilters || {}).filter((x) => x && x.enabled),
         useWebhookStore.getState().context.ui[category].defaults,
       )
-      setTempFilters(filters[category])
       apolloClient.mutate({
         mutation: Query.webhook(category),
         variables: {
@@ -107,6 +106,7 @@ export default function Manage() {
       })
       useWebhookStore.setState((prev) => ({
         [category]: [...prev[category], ...values],
+        tempFilters: { ...filters[category] },
       }))
     }
   }, [addNew])
@@ -123,15 +123,12 @@ export default function Manage() {
 
   return category !== 'human' && addNew ? (
     <Menu
+      tempFilters={filters[category]}
       category={Poracle.getMapCategory(category)}
       categories={Poracle.getFilterCategories(category)}
       webhookCategory={category}
-      filters={filters[category]}
-      tempFilters={tempFilters}
-      setTempFilters={setTempFilters}
       title="webhook_selection"
       titleAction={() => setAddNew(false)}
-      Tile={NewPokemon}
       extraButtons={[
         {
           name: 'save',
@@ -140,7 +137,9 @@ export default function Manage() {
           color: 'secondary',
         },
       ]}
-    />
+    >
+      {(_, key) => <WebhookItem id={key} category={category} caption />}
+    </Menu>
   ) : (
     <>
       <Header

@@ -8,7 +8,6 @@ import {
   Collapse,
   IconButton,
   Divider,
-  Dialog,
   MenuItem,
   Menu,
 } from '@mui/material'
@@ -16,14 +15,13 @@ import {
 import { useTranslation } from 'react-i18next'
 
 import { useSyncData } from '@components/layout/dialogs/webhooks/hooks'
-import { useStore, useStatic } from '@hooks/useStore'
+import { useStore, useStatic, useLayoutStore } from '@hooks/useStore'
 import useWebhook from '@hooks/useWebhook'
 import Utility from '@services/Utility'
 import ErrorBoundary from '@components/ErrorBoundary'
-import { TextWithIcon } from '@components/layout/custom/CustomImg'
+import { TextWithIcon } from '@components/layout/general/Img'
 
 import Title from './common/Title'
-import BadgeSelection from '../layout/dialogs/BadgeSelection'
 import PowerUp from './common/PowerUp'
 import GenderIcon from './common/GenderIcon'
 import Navigation from './common/Navigation'
@@ -132,7 +130,6 @@ export default function GymPopup({ hasRaid, hasHatched, raidIconUrl, ...gym }) {
  */
 const MenuActions = ({ hasRaid, ...gym }) => {
   const [anchorEl, setAnchorEl] = React.useState(null)
-  const [badgeMenu, setBadgeMenu] = React.useState(false)
 
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget)
@@ -140,31 +137,14 @@ const MenuActions = ({ hasRaid, ...gym }) => {
 
   const handleClose = React.useCallback(() => setAnchorEl(null), [])
 
-  const handleCloseBadge = React.useCallback((open) => {
-    handleClose()
-    setBadgeMenu(open)
-  }, [])
-
   return (
     <Grid item xs={2} textAlign="right">
       <IconButton aria-haspopup="true" onClick={handleClick} size="large">
         <MoreVert />
       </IconButton>
       <Menu anchorEl={anchorEl} open={!!anchorEl} onClose={handleClose}>
-        <DropdownOptions
-          {...gym}
-          hasRaid={hasRaid}
-          handleClose={handleClose}
-          handleCloseBadge={handleCloseBadge}
-        />
+        <DropdownOptions {...gym} hasRaid={hasRaid} handleClose={handleClose} />
       </Menu>
-      <Dialog open={badgeMenu} onClose={handleCloseBadge}>
-        <BadgeSelection
-          id={gym.id}
-          setBadgeMenu={handleCloseBadge}
-          badge={gym.badge}
-        />
-      </Dialog>
     </Grid>
   )
 }
@@ -173,15 +153,14 @@ const MenuActions = ({ hasRaid, ...gym }) => {
  *
  * @param {{
  *  handleClose: () => void
- *  handleCloseBadge: (open: boolean) => void
  *  hasRaid: boolean
  * } & import('@rm/types').Gym} param0
  * @returns
  */
 const DropdownOptions = ({
   id,
+  badge,
   handleClose,
-  handleCloseBadge,
   updated,
   team_id,
   hasRaid,
@@ -258,7 +237,10 @@ const DropdownOptions = ({
     if (gymBadges) {
       options.push({
         name: 'gym_badge_menu',
-        action: () => handleCloseBadge(true),
+        action: () =>
+          useLayoutStore.setState({
+            gymBadge: { badge, gymId: id, open: true },
+          }),
       })
     }
   }

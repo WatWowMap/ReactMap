@@ -108,6 +108,7 @@ export default function Config({ children }) {
             : {},
           counts: data.authReferences || {},
           userBackupLimits: data.database.settings.userBackupLimits || 0,
+          excludeList: data.authentication.excludeList || [],
         },
         theme: data.map.theme,
         ui: data.ui,

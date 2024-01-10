@@ -6,6 +6,7 @@ import FormatSize from '@mui/icons-material/FormatSize'
 import Settings from '@mui/icons-material/Settings'
 import { Grid, IconButton, Typography } from '@mui/material'
 import Utility from '@services/Utility'
+import { useLayoutStore } from '@hooks/useStore'
 
 export default function MenuTile({ data, rowIndex, columnIndex, style }) {
   const [name, setName] = useState(true)
@@ -14,7 +15,6 @@ export default function MenuTile({ data, rowIndex, columnIndex, style }) {
     columnCount,
     tempFilters,
     setTempFilters,
-    toggleAdvMenu,
     isMobile,
     type,
     toggleSlotsMenu,
@@ -107,7 +107,15 @@ export default function MenuTile({ data, rowIndex, columnIndex, style }) {
       onClick={
         item.id.startsWith('t') && parseInt(item.id.charAt(1)) > 0
           ? toggleSlotsMenu(true, item.id.charAt(1))
-          : toggleAdvMenu(true, item.id)
+          : () =>
+              useLayoutStore.setState({
+                advancedFilter: {
+                  id: item.id,
+                  open: true,
+                  category: type,
+                  selectedIds: [],
+                },
+              })
       }
       size="large"
     >

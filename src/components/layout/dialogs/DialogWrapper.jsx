@@ -1,4 +1,3 @@
-/* eslint-disable no-nested-ternary */
 // @ts-check
 import * as React from 'react'
 import Dialog from '@mui/material/Dialog'
@@ -7,9 +6,10 @@ import { useLayoutStore, useStatic } from '@hooks/useStore'
 /**
  *
  * @param {{
- *  dialog: keyof ReturnType<typeof useLayoutStore['getState']>,
+ *  dialog?: keyof ReturnType<typeof useLayoutStore['getState']>,
  *  variant?: 'small' | 'large'
  *  children: React.ReactNode
+ *  open?: boolean
  * } & Omit<import('@mui/material').DialogProps, 'open'>} props
  * @returns {JSX.Element}
  */

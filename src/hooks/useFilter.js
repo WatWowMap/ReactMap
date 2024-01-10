@@ -1,7 +1,7 @@
 import { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 
-import { useStatic } from '@hooks/useStore'
+import { useGetDeepStore, useStatic } from '@hooks/useStore'
 
 const filteringPokemon = [
   'pokemon',
@@ -13,12 +13,12 @@ const filteringPokemon = [
 export default function useFilter(
   tempFilters,
   menus,
-  search,
   category,
   webhookCategory,
   reqCategories,
 ) {
   const { t } = useTranslation()
+  const search = useGetDeepStore(`searches.${category}Advanced`)
   const {
     available,
     Icons,
@@ -70,7 +70,7 @@ export default function useFilter(
     count.show += 1
     item.url = Icons.getIconById(id)
     filteredObj[id] = tempFilters[id]
-    filteredArr.push(item)
+    filteredArr.push(id)
   }
 
   const evalSearchTerms = (term) => {
@@ -106,14 +106,14 @@ export default function useFilter(
 
   if (search) {
     switchKey = 'search'
-    search = search.replace(/,/g, '|')
-    if (search.includes('|')) {
-      const orSplit = search.split('|').map((term) => term.trim())
+    const clean = search.replace(/,/g, '|')
+    if (clean.includes('|')) {
+      const orSplit = clean.split('|').map((term) => term.trim())
       orSplit.forEach((term) => {
         evalSearchTerms(term)
       })
     } else {
-      evalSearchTerms(search)
+      evalSearchTerms(clean)
     }
   }
 

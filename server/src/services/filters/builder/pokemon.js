@@ -9,8 +9,14 @@ const BaseFilter = require('../Base')
  *
  * @param {import("@rm/types").Config['defaultFilters']} defaults
  * @param {import('../pokemon/Frontend')} base
- * @param {*} custom
- * @returns
+ * @param {import('@rm/types').PokemonFilter} custom
+ * @returns {{
+ *  full: { [key: string]: import('@rm/types').PokemonFilter },
+ *  raids: { [key: string]: BaseFilter },
+ *  quests: { [key: string]: BaseFilter },
+ *  nests: { [key: string]: BaseFilter },
+ *  rocket: { [key: string]: BaseFilter },
+ * }}
  */
 function buildPokemon(defaults, base, custom) {
   const pokemon = {
@@ -39,15 +45,17 @@ function buildPokemon(defaults, base, custom) {
       }
       pokemon.nests[`${i}-${j}`] = new BaseFilter(defaults.nests.allPokemon)
     }
-    if (pkmn.family == i) {
-      pokemon.quests[`c${pkmn.family}`] = new BaseFilter(
-        defaults.pokestops.candy,
-      )
-      pokemon.quests[`x${pkmn.family}`] = new BaseFilter(
-        defaults.pokestops.candy,
-      )
+    if ('family' in pkmn) {
+      if (pkmn.family === +i) {
+        pokemon.quests[`c${pkmn.family}`] = new BaseFilter(
+          defaults.pokestops.candy,
+        )
+        pokemon.quests[`x${pkmn.family}`] = new BaseFilter(
+          defaults.pokestops.candy,
+        )
+      }
     }
-    if (pkmn.tempEvolutions) {
+    if ('tempEvolutions' in pkmn) {
       energyAmounts.forEach((a) => {
         pokemon.quests[`m${i}-${a}`] = new BaseFilter(
           defaults.pokestops.megaEnergy,

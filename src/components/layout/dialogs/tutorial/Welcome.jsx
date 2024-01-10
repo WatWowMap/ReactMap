@@ -10,32 +10,36 @@ import LocaleSelection from '@components/layout/general/LocaleSelection'
 
 export default function TutWelcome() {
   const { t } = useTranslation()
-  const { methods, loggedIn, perms, counts } = useStatic((state) => state.auth)
-  const enableUserProfile = useStatic(
-    (state) => state.config.misc.enableUserProfile,
-  )
-  const excludeList = useStatic((s) => s.tutorialExcludeList)
-  const getPerms = () => {
+  const { methods, loggedIn } = useStatic((state) => state.auth)
+  const permStatus = useStatic((s) => {
     let have = 0
     let total = 0
-
-    Object.entries(perms).forEach(([perm, value]) => {
+    Object.entries(s.auth.perms).forEach(([perm, value]) => {
       if (
-        (perm === 'areaRestrictions' && !value.length && counts[perm] > 0) ||
-        perm === 'donor'
+        (perm === 'areaRestrictions' &&
+          !value.length &&
+          s.auth.counts[perm] > 0) ||
+        perm === 'donor' ||
+        perm === 'admin' ||
+        perm === 'blockedGuildNames'
       )
         return
-      if (!excludeList.includes(perm)) {
-        have += (Array.isArray(value) ? value.length && counts[perm] : value)
+      if (!s.auth.excludeList.includes(perm)) {
+        have += (
+          Array.isArray(value) ? value.length && s.auth.counts[perm] : value
+        )
           ? 1
           : 0
-        if (counts[perm] !== 0) {
+        if (s.auth.counts[perm] !== 0) {
           total += 1
         }
       }
     })
     return `${have} / ${total}`
-  }
+  })
+  const enableUserProfile = useStatic(
+    (state) => state.config.misc.enableUserProfile,
+  )
 
   return (
     <DialogContent>
@@ -69,7 +73,7 @@ export default function TutWelcome() {
         )}
         <Grid item xs={6}>
           <Typography variant="h3" align="center">
-            {getPerms()}
+            {permStatus}
           </Typography>
         </Grid>
         <Grid item xs={6} style={{ textAlign: 'center' }}>
