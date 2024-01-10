@@ -30,7 +30,7 @@ export const GenericSearch = React.forwardRef(
         endAdornment: (
           <IconButton
             size="small"
-            disabled={!value}
+            disabled={!searchValue}
             onClick={() => setSearchValue('')}
           >
             <HighlightOffIcon fontSize="small" />
