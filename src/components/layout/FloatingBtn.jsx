@@ -65,7 +65,7 @@ const handleClick = (name) => () => {
   }
 }
 
-export default function FloatingButtons() {
+export function FloatingButtons() {
   const { t } = useTranslation()
   const { data } = useQuery(FAB_BUTTONS, {
     fetchPolicy: 'cache-first',
@@ -258,3 +258,5 @@ export default function FloatingButtons() {
     </Stack>
   )
 }
+
+export const FloatingButtonsMemo = React.memo(FloatingButtons, () => true)

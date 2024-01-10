@@ -19,6 +19,7 @@ import { setHuman } from '@services/queries/webhook'
 import { WEBHOOK_NOMINATIM } from '@services/queries/geocoder'
 import useLocation from '@hooks/useLocation'
 import { Loading } from '@components/layout/general/Loading'
+import { basicEqualFn } from '@hooks/useStore'
 
 import { setModeBtn, useWebhookStore } from '../store'
 import { useSyncData } from '../hooks'
@@ -27,7 +28,7 @@ const Location = () => {
   const { lc, color } = useLocation()
   const { t } = useTranslation()
 
-  const webhookLocation = useWebhookStore((s) => s.location)
+  const webhookLocation = useWebhookStore((s) => s.location, basicEqualFn)
   const {
     data: { latitude, longitude },
     loading: loadingHuman,
@@ -46,9 +47,11 @@ const Location = () => {
   /** @param {[number, number]} location */
   const handleLocationChange = (location) => {
     if (location.every((x) => x !== 0)) {
-      useWebhookStore.setState({
-        location: [location[0] ?? 0, location[1] ?? 0],
-      })
+      useWebhookStore.setState((prev) => ({
+        location: prev.location.some((x, i) => x !== location[i])
+          ? [location[0] ?? 0, location[1] ?? 0]
+          : prev.location,
+      }))
       save({
         variables: {
           category: 'setLocation',
@@ -194,6 +197,6 @@ const Location = () => {
   )
 }
 
-const MemoizedLocation = React.memo(Location, () => true)
+const LocationMemo = React.memo(Location, () => true)
 
-export default MemoizedLocation
+export default LocationMemo

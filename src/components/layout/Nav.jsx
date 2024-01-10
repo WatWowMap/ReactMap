@@ -2,7 +2,7 @@ import * as React from 'react'
 
 import { useStatic } from '@hooks/useStore'
 
-import FloatingBtn from './FloatingBtn'
+import { FloatingButtonsMemo } from './FloatingBtn'
 import Sidebar from './drawer/Drawer'
 import FilterMenu from './dialogs/filters/FilterMenu'
 import UserOptions from './dialogs/UserOptions'
@@ -30,7 +30,7 @@ export const Nav = React.memo(
     return (
       <>
         <Sidebar />
-        <FloatingBtn />
+        <FloatingButtonsMemo />
         <UserProfile />
         <Tutorial />
         <FilterMenu />
