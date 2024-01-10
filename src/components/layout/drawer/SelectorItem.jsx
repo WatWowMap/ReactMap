@@ -117,7 +117,10 @@ export function SelectorItem({
   const easyMode = useStorage((s) => !!s.filters[category]?.easyMode)
 
   const hasAll =
-    category === 'pokemon' || category === 'pokestops' || id.startsWith('t')
+    category === 'pokemon' ||
+    (category === 'pokestops' &&
+      !(id.startsWith('l') || id.startsWith('i') || id.startsWith('f'))) ||
+    (id.startsWith('t') && id !== 't0-0')
   const color = filter?.enabled
     ? filter?.all || easyMode || !hasAll
       ? 'success.main'
@@ -135,8 +138,8 @@ export function SelectorItem({
       }}
       onClick={() => {
         const newFilter = { ...filter }
-        if (filter.all) {
-          if (hasAll) newFilter.all = false
+        if (filter.all && hasAll) {
+          newFilter.all = false
           newFilter.enabled = !easyMode
         } else if (filter.enabled) {
           newFilter.enabled = false
