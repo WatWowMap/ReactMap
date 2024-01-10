@@ -46,7 +46,16 @@ const BaseS2Cells = () => {
   const { t } = useTranslation()
   const enabled = useStore((s) => !!s.filters.s2cells.enabled)
   const [filters, setFilters] = useDeepStore('filters.s2cells.cells')
-  const safe = React.useMemo(() => filters || [], [filters])
+  const safe = React.useMemo(
+    () =>
+      Array.isArray(filters)
+        ? filters
+        : typeof filters === 'string'
+        ? // @ts-ignore
+          filters.split(',')
+        : [],
+    [filters],
+  )
   return (
     <CollapsibleItem open={enabled}>
       <ListItem>
