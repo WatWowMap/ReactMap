@@ -126,7 +126,6 @@ function SelectorList({ category, subCategory, label, height = 400 }) {
     }))
   }
 
-  // const pokemonOrNest = category === 'pokemon' || category === 'nests'
   return (
     <List dense sx={{ width: '100%' }}>
       {translated.length > 10 && (
@@ -142,39 +141,47 @@ function SelectorList({ category, subCategory, label, height = 400 }) {
           disableGutters={category === 'nests'}
         />
       )}
-      <ListItem disableGutters={category !== 'pokemon'}>
-        <ListItemText>{t(search ? 'set_filtered' : 'set_all')}</ListItemText>
-        <ButtonGroup variant="text" size="small" color="warning">
-          <IconButton color="success" onClick={() => setAll('enable')}>
-            <CheckIcon />
-          </IconButton>
-          <Collapse in={!easyMode} orientation="horizontal">
-            <IconButton
-              color="info"
-              onClick={() =>
-                useLayoutStore.setState({
-                  advancedFilter: {
-                    open: true,
-                    id: 'global',
-                    category,
-                    selectedIds: items,
-                  },
-                })
-              }
-            >
-              <TuneIcon />
+      {!!items.length && (
+        <ListItem disableGutters={category !== 'pokemon'}>
+          <ListItemText>{t(search ? 'set_filtered' : 'set_all')}</ListItemText>
+          <ButtonGroup variant="text" size="small" color="warning">
+            <IconButton color="success" onClick={() => setAll('enable')}>
+              <CheckIcon />
             </IconButton>
-          </Collapse>
-          <IconButton
-            color="error"
-            onClick={() => setAll('disable')}
-            sx={{ pr: 0 }}
-          >
-            <ClearIcon />
-          </IconButton>
-        </ButtonGroup>
-      </ListItem>
-      <Box height={height}>
+            <Collapse in={!easyMode} orientation="horizontal">
+              <IconButton
+                color="info"
+                onClick={() =>
+                  useLayoutStore.setState({
+                    advancedFilter: {
+                      open: true,
+                      id: 'global',
+                      category,
+                      selectedIds: items,
+                    },
+                  })
+                }
+              >
+                <TuneIcon />
+              </IconButton>
+            </Collapse>
+            <IconButton
+              color="error"
+              onClick={() => setAll('disable')}
+              sx={{ pr: 0 }}
+            >
+              <ClearIcon />
+            </IconButton>
+          </ButtonGroup>
+        </ListItem>
+      )}
+      <Box
+        height={
+          typeof height === 'number'
+            ? Math.min(height, Math.ceil(items.length / 3) * 86)
+            : height
+        }
+      >
         <VirtualGrid data={items} xs={4}>
           {(_, key) => <StandardItem id={key} category={category} />}
         </VirtualGrid>
