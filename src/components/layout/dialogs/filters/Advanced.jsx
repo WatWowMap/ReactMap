@@ -188,7 +188,13 @@ export default function AdvancedFilter() {
                   />
                 )}
                 {category === 'pokestops' && <QuestConditionSelector id={id} />}
-                {category === 'pokemon' || category === 'pokestops' ? (
+                {category === 'pokemon' ||
+                (category === 'pokestops' &&
+                  !(
+                    id.startsWith('l') ||
+                    id.startsWith('i') ||
+                    id.startsWith('f')
+                  )) ? (
                   <DualBoolToggle
                     items={ENABLED_ALL}
                     field={`filters.${category}.filter.${id}`}
