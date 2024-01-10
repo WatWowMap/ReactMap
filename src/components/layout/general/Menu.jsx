@@ -2,9 +2,10 @@ import React, { useState } from 'react'
 import Box from '@mui/material/Box'
 import DialogContent from '@mui/material/DialogContent'
 import Typography from '@mui/material/Typography'
-import Drawer from '@mui/material/Drawer'
 import { useTranslation } from 'react-i18next'
-
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
+import Collapse from '@mui/material/Collapse'
+import IconButton from '@mui/material/IconButton'
 import Utility from '@services/Utility'
 import { useStore, useStatic, useLayoutStore } from '@hooks/useStore'
 import useFilter from '@hooks/useFilter'
@@ -55,30 +56,16 @@ export default function Menu({
     categories,
   )
 
-  const toggleDrawer = React.useCallback(
-    (open) => (event) => {
-      if (
-        event.type === 'keydown' &&
-        (event.key === 'Tab' || event.key === 'Shift')
-      ) {
-        return
-      }
-      setFilterDrawer(open)
-    },
-    [],
-  )
-
   const Options = React.useMemo(
     () => (
       <OptionsContainer
         countTotal={count.total}
         countShow={count.show}
         category={category}
-        toggleDrawer={toggleDrawer}
         categories={categories}
       />
     ),
-    [category, categories, count.total, count.show, toggleDrawer],
+    [category, categories, count.total, count.show],
   )
 
   const footerButtons = React.useMemo(() => {
@@ -91,10 +78,8 @@ export default function Menu({
         icon: 'HelpOutline',
       },
       {
-        name: 'openFilter',
-        action: toggleDrawer(true),
-        icon: 'Ballot',
-        mobileOnly: true,
+        name: '',
+        disabled: true,
       },
       {
         name: 'apply_to_all',
@@ -136,36 +121,40 @@ export default function Menu({
       <DialogContent className="container" sx={{ p: 0, minHeight: '75vh' }}>
         {!isMobile && <Box className="column-25">{Options}</Box>}
         <Box p={1} className="column-75">
-          <Box pb={1}>
+          <Box pb={1} display="flex">
             <GenericSearch
               field={`searches.${category}Advanced`}
               label={t(`search_${category}`, t(`search_${category}s`))}
             />
+            {isMobile && (
+              <IconButton onClick={() => setFilterDrawer((prev) => !prev)}>
+                <ExpandMoreIcon
+                  className={filterDrawer ? 'expanded' : 'closed'}
+                />
+              </IconButton>
+            )}
           </Box>
-          {filteredArr.length ? (
-            <VirtualGrid data={filteredArr} xs={4} md={2}>
-              {children}
-            </VirtualGrid>
-          ) : (
-            <Box className="flex-center" flex="1 1 auto" whiteSpace="pre-line">
-              <Typography variant="h6" align="center">
-                {t('no_filter_results')}
-              </Typography>
-            </Box>
-          )}
+          <Box>
+            {isMobile && <Collapse in={filterDrawer}>{Options}</Collapse>}
+            {filteredArr.length ? (
+              <VirtualGrid data={filteredArr} xs={4} md={2}>
+                {children}
+              </VirtualGrid>
+            ) : (
+              <Box
+                className="flex-center"
+                flex="1 1 auto"
+                whiteSpace="pre-line"
+              >
+                <Typography variant="h6" align="center">
+                  {t('no_filter_results')}
+                </Typography>
+              </Box>
+            )}
+          </Box>
         </Box>
       </DialogContent>
       <Footer options={footerButtons} role="dialog_filter_footer" />
-      {!isMobile && (
-        <Drawer
-          anchor="bottom"
-          sx={{ zIndex: 10000 }}
-          open={filterDrawer}
-          onClose={toggleDrawer(false)}
-        >
-          {Options}
-        </Drawer>
-      )}
     </>
   )
 }

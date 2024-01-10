@@ -482,6 +482,7 @@ input[type='time']::-webkit-calendar-picker-indicator {
   .container {
     display: grid;
     grid-template-columns: 100%;
+    grid-template-rows: 100%;
   }
 }
 

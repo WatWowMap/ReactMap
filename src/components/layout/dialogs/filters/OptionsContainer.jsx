@@ -1,9 +1,7 @@
 import * as React from 'react'
-import Clear from '@mui/icons-material/Clear'
 import Typography from '@mui/material/Typography'
 import Grid from '@mui/material/Grid'
 import Button from '@mui/material/Button'
-import IconButton from '@mui/material/IconButton'
 import Chip from '@mui/material/Chip'
 import { useTranslation } from 'react-i18next'
 
@@ -72,24 +70,10 @@ export default function OptionsContainer({
   category,
   countTotal,
   countShow,
-  toggleDrawer,
 }) {
   const { t } = useTranslation()
   return (
     <>
-      <Grid
-        container
-        key="close"
-        justifyContent="center"
-        alignItems="center"
-        display={{ xs: 'flex', sm: 'none' }}
-      >
-        <Grid item xs={12} textAlign="right">
-          <IconButton onClick={toggleDrawer(false)} size="large">
-            <Clear />
-          </IconButton>
-        </Grid>
-      </Grid>
       {Object.entries(useStatic.getState().menus[category].filters).map(
         ([subCategory, options]) => {
           if (
