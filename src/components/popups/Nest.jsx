@@ -13,7 +13,8 @@ import {
 
 import { useTranslation } from 'react-i18next'
 
-import { useMemory, useLayoutStore } from '@hooks/useMemory'
+import { useMemory } from '@hooks/useMemory'
+import { useLayoutStore } from '@hooks/useLayoutStore'
 import { useStorage } from '@hooks/useStorage'
 import Utility from '@services/Utility'
 import ErrorBoundary from '@components/ErrorBoundary'

@@ -1,7 +1,8 @@
 // @ts-check
 import * as React from 'react'
 import Dialog from '@mui/material/Dialog'
-import { useLayoutStore, useMemory } from '@hooks/useMemory'
+import { useMemory } from '@hooks/useMemory'
+import { useLayoutStore } from '@hooks/useLayoutStore'
 
 /**
  *

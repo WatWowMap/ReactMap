@@ -5,7 +5,8 @@ import { DialogContent, Grid, Typography, Fab } from '@mui/material'
 
 import { useTranslation } from 'react-i18next'
 
-import { useLayoutStore, useMemory } from '@hooks/useMemory'
+import { useMemory } from '@hooks/useMemory'
+import { useLayoutStore } from '@hooks/useLayoutStore'
 import LocaleSelection from '@components/layout/general/LocaleSelection'
 
 export default function TutWelcome() {

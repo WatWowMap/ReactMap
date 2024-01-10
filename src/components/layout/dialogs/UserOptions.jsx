@@ -10,7 +10,8 @@ import {
 import { useTranslation, Trans } from 'react-i18next'
 
 import Utility from '@services/Utility'
-import { useLayoutStore, useMemory, toggleDialog } from '@hooks/useMemory'
+import { useMemory } from '@hooks/useMemory'
+import { toggleDialog, useLayoutStore } from '@hooks/useLayoutStore'
 import { useStorage } from '@hooks/useStorage'
 import { getPermission } from '@services/desktopNotification'
 

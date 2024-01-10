@@ -8,7 +8,8 @@ import ListItem from '@mui/material/ListItem'
 import ListItemText from '@mui/material/ListItemText'
 import ListItemIcon from '@mui/material/ListItemIcon'
 
-import { useLayoutStore, useMemory } from '@hooks/useMemory'
+import { useMemory } from '@hooks/useMemory'
+import { useLayoutStore } from '@hooks/useLayoutStore'
 
 import Actions from './Actions'
 import { DrawerSectionMemo } from './Section'

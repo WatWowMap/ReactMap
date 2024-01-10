@@ -13,7 +13,8 @@ import Box from '@mui/material/Box'
 import { useTranslation } from 'react-i18next'
 
 import { useTranslateById } from '@hooks/useTranslateById'
-import { useLayoutStore, useMemory } from '@hooks/useMemory'
+import { useMemory } from '@hooks/useMemory'
+import { useLayoutStore } from '@hooks/useLayoutStore'
 import { useStorage } from '@hooks/useStorage'
 
 import { BoolToggle } from './BoolToggle'

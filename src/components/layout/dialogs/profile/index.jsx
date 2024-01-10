@@ -2,7 +2,8 @@ import * as React from 'react'
 import { DialogContent, AppBar, Tabs, Tab, Box } from '@mui/material'
 import { useTranslation } from 'react-i18next'
 
-import { useLayoutStore, useMemory } from '@hooks/useMemory'
+import { useMemory } from '@hooks/useMemory'
+import { useLayoutStore } from '@hooks/useLayoutStore'
 import Utility from '@services/Utility'
 
 import Header from '../../general/Header'

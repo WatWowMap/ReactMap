@@ -2,7 +2,7 @@
 import * as React from 'react'
 import Menu from '@components/layout/general/Menu'
 
-import { toggleDialog, useLayoutStore } from '@hooks/useMemory'
+import { toggleDialog, useLayoutStore } from '@hooks/useLayoutStore'
 import { useStorage } from '@hooks/useStorage'
 import { StandardItem } from '@components/layout/drawer/SelectorItem'
 

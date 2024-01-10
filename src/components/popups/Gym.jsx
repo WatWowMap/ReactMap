@@ -15,7 +15,8 @@ import {
 import { useTranslation } from 'react-i18next'
 
 import { useSyncData } from '@components/layout/dialogs/webhooks/hooks'
-import { useMemory, useLayoutStore } from '@hooks/useMemory'
+import { useMemory } from '@hooks/useMemory'
+import { useLayoutStore } from '@hooks/useLayoutStore'
 import { useStorage } from '@hooks/useStorage'
 import useWebhook from '@hooks/useWebhook'
 import Utility from '@services/Utility'

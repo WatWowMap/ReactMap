@@ -6,7 +6,7 @@ import Dialog from '@mui/material/Dialog'
 import Box from '@mui/material/Box'
 import { useQuery } from '@apollo/client'
 
-import { useLayoutStore } from '@hooks/useMemory'
+import { useLayoutStore } from '@hooks/useLayoutStore'
 import { useStorage } from '@hooks/useStorage'
 import { CUSTOM_COMPONENT, MOTD_CHECK } from '@services/queries/config'
 import Utility from '@services/Utility'

@@ -42,7 +42,7 @@ export default function Config({ children }) {
         })
       }
 
-      /** @type {{ state: import('@hooks/useMemory').UseStorage}} */
+      /** @type {{ state: import('@hooks/useStorage').UseStorage}} */
       const localState = JSON.parse(
         localStorage.getItem('local-state') || '{ "state": {} }',
       )

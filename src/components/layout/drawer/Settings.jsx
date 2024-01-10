@@ -23,7 +23,8 @@ import LogoDevIcon from '@mui/icons-material/LogoDev'
 
 import { useTranslation } from 'react-i18next'
 
-import { useMemory, toggleDialog } from '@hooks/useMemory'
+import { useMemory } from '@hooks/useMemory'
+import { toggleDialog } from '@hooks/useLayoutStore'
 import { useStorage } from '@hooks/useStorage'
 import Utility from '@services/Utility'
 import {

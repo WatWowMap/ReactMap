@@ -18,7 +18,8 @@ import FeedbackIcon from '@mui/icons-material/Feedback'
 import HeartIcon from '@mui/icons-material/Favorite'
 import { downloadJson } from '@services/functions/downloadJson'
 
-import { useMemory, useLayoutStore } from '@hooks/useMemory'
+import { useMemory } from '@hooks/useMemory'
+import { useLayoutStore } from '@hooks/useLayoutStore'
 import { useStorage } from '@hooks/useStorage'
 import { I } from '../general/I'
 

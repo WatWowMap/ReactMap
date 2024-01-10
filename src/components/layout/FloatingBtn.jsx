@@ -26,7 +26,8 @@ import { DomEvent } from 'leaflet'
 
 import { FAB_BUTTONS } from '@services/queries/config'
 import useLocation from '@hooks/useLocation'
-import { useLayoutStore, useMemory } from '@hooks/useMemory'
+import { useMemory } from '@hooks/useMemory'
+import { useLayoutStore } from '@hooks/useLayoutStore'
 import { useStorage } from '@hooks/useStorage'
 import { useScanStore } from './dialogs/scanner/store'
 

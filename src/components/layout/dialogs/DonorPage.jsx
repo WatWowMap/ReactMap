@@ -5,7 +5,8 @@ import { useQuery } from '@apollo/client'
 import Dialog from '@mui/material/Dialog'
 
 import { CUSTOM_COMPONENT } from '@services/queries/config'
-import { useLayoutStore, useMemory } from '@hooks/useMemory'
+import { useMemory } from '@hooks/useMemory'
+import { useLayoutStore } from '@hooks/useLayoutStore'
 
 import DialogWrapper from '../custom/DialogWrapper'
 import CustomTile from '../custom/CustomTile'

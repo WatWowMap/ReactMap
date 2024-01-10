@@ -19,7 +19,8 @@ import {
 
 import { useTranslation } from 'react-i18next'
 
-import { useMemory, toggleDialog } from '@hooks/useMemory'
+import { useMemory } from '@hooks/useMemory'
+import { toggleDialog } from '@hooks/useLayoutStore'
 import Utility from '@services/Utility'
 
 import data from './data'
