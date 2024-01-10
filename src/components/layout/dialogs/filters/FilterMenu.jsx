@@ -28,7 +28,7 @@ export default function FilterMenu() {
 
   React.useEffect(() => {
     setTempFilters(filters?.filter)
-  }, [category])
+  }, [category, filters?.filter])
 
   return (
     <DialogWrapper

@@ -48,7 +48,7 @@ export default function Menu({
 
   const [filterDrawer, setFilterDrawer] = useState(false)
 
-  const { filteredObj, filteredArr, count } = useFilter(
+  const { filteredArr, count } = useFilter(
     tempFilters,
     menus,
     category,
@@ -68,9 +68,8 @@ export default function Menu({
     [category, categories, count.total, count.show],
   )
 
-  const footerButtons = React.useMemo(() => {
-    const selectedIds = Object.keys(filteredObj)
-    return [
+  const footerButtons = React.useMemo(
+    () => [
       {
         name: 'help',
         action: () =>
@@ -89,7 +88,7 @@ export default function Menu({
               open: true,
               id: 'global',
               category,
-              selectedIds,
+              selectedIds: filteredArr,
             },
           }),
         icon: category === 'pokemon' || webhookCategory ? 'Tune' : 'FormatSize',
@@ -97,19 +96,20 @@ export default function Menu({
       {
         name: 'disable_all',
         action: () =>
-          applyToAll(false, category, selectedIds, !webhookCategory),
+          applyToAll(false, category, filteredArr, !webhookCategory),
         icon: 'Clear',
         color: 'error',
       },
       {
         name: 'enable_all',
-        action: () => applyToAll(true, category, selectedIds, !webhookCategory),
+        action: () => applyToAll(true, category, filteredArr, !webhookCategory),
         icon: 'Check',
         color: 'success',
       },
       ...(extraButtons ?? []),
-    ]
-  }, [category, webhookCategory, extraButtons, filteredObj, tempFilters])
+    ],
+    [category, webhookCategory, extraButtons, filteredArr, tempFilters],
+  )
 
   return (
     <>
