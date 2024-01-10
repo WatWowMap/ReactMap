@@ -10,6 +10,7 @@ import {
   ListItemText,
   ListItemIcon,
 } from '@mui/material'
+import Box from '@mui/material/Box'
 import { Trans, useTranslation } from 'react-i18next'
 
 import { useMemory } from '@hooks/useMemory'
@@ -405,13 +406,29 @@ const BaseSpawnpointTTH = () => {
 }
 const SpawnpointTTH = React.memo(BaseSpawnpointTTH)
 
+const BaseNestQuickSelector = () => {
+  const enabled = useStorage((s) => !!s.filters?.nests?.pokemon)
+  return (
+    <CollapsibleItem open={enabled}>
+      <Box px={2}>
+        <SelectorListMemo category="nests" label="search_nests" height={350} />
+      </Box>
+    </CollapsibleItem>
+  )
+}
+const NestQuickSelector = React.memo(BaseNestQuickSelector)
+
 function Extras({ category, subItem }) {
   const { enableConfirmedInvasions, enableQuestSetSelector } =
     useMemory.getState().config.misc
 
   switch (category) {
     case 'nests':
-      return subItem === 'sliders' ? <NestSlider /> : null
+      return subItem === 'sliders' ? (
+        <NestSlider />
+      ) : subItem === 'pokemon' ? (
+        <NestQuickSelector />
+      ) : null
     case 's2cells':
       return subItem === 'enabled' ? <S2Cells /> : null
     case 'pokestops':

@@ -74,15 +74,17 @@ const DrawerSection = ({ category }) => {
           ) : (
             Object.keys(value).map((subItem) => (
               <React.Fragment key={`${category}${subItem}`}>
-                <BoolToggle
-                  // @ts-ignore
-                  field={`filters.${
-                    category === 'wayfarer' || category === 'admin'
-                      ? subItem
-                      : category
-                  }.${category === 'wayfarer' ? 'enabled' : subItem}`}
-                  label={subItem}
-                />
+                {!(category === 'nests' && subItem === 'sliders') && (
+                  <BoolToggle
+                    // @ts-ignore
+                    field={`filters.${
+                      category === 'wayfarer' || category === 'admin'
+                        ? subItem
+                        : category
+                    }.${category === 'wayfarer' ? 'enabled' : subItem}`}
+                    label={subItem}
+                  />
+                )}
                 <Extras category={category} subItem={subItem} />
               </React.Fragment>
             ))
