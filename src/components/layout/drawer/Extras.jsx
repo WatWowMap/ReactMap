@@ -202,6 +202,22 @@ const BaseQuestSet = () => {
           items={QUEST_SETS}
         />
       </ListItem>
+      <MultiSelectorList>
+        <SelectorListMemo
+          key="quest_items"
+          category="pokestops"
+          subCategory="quests"
+          label="search_quests"
+          height={350}
+        />
+        <SelectorListMemo
+          key="quest_pokemon"
+          category="pokestops"
+          subCategory="pokemon"
+          label="search_quests"
+          height={350}
+        />
+      </MultiSelectorList>
     </CollapsibleItem>
   )
 }
