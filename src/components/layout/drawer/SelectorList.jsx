@@ -32,7 +32,7 @@ import TabPanel from '../general/TabPanel'
  * @template {keyof import('@rm/types').Available} T
  * @typedef {{
  *  category: T,
- *  subCategory?: T extends 'gyms' ? 'raids' | 'pokemon' : T extends 'pokestops' ? 'lures' | 'invasions' | 'quests' | 'eventStops' | 'rocketPokemon' | 'pokemon' : never
+ *  subCategory?: T extends 'gyms' ? 'raids' | 'pokemon' : T extends 'pokestops' ? 'lures' | 'invasions' | 'quests' | 'showcase' | 'rocketPokemon' | 'pokemon' : never
  *  itemsPerRow?: number,
  *  children?: React.ReactNode,
  *  label?: string
@@ -75,10 +75,11 @@ function SelectorList({ category, subCategory, label, height = 400 }) {
                 key.startsWith('m') ||
                 key.startsWith('x') ||
                 key.startsWith('c') ||
-                key.startsWith('d')
+                key.startsWith('d') ||
+                key.startsWith('p')
               )
-            case 'eventStops':
-              return key.startsWith('b')
+            case 'showcase':
+              return key.startsWith('f')
             case 'rocketPokemon':
               return key.startsWith('a')
             case 'pokemon':

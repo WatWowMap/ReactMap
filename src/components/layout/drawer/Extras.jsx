@@ -304,6 +304,20 @@ const IndividualEvent = ({ id }) => {
     </ListItem>
   )
 }
+const ShowcaseQuickSelect = () => {
+  const enabled = useStorage((s) => !!s.filters?.pokestops?.filter?.b9?.enabled)
+  return (
+    <CollapsibleItem open={enabled}>
+      <Box px={2}>
+        <SelectorListMemo
+          category="pokestops"
+          subCategory="showcase"
+          height={175}
+        />
+      </Box>
+    </CollapsibleItem>
+  )
+}
 const BaseEventStops = () => {
   const available = useMemory((s) => s.available.pokestops)
   const enabled = useStorage((s) => !!s.filters?.pokestops?.eventStops)
@@ -314,6 +328,7 @@ const BaseEventStops = () => {
         .map((event) => (
           <IndividualEvent key={event} id={event} />
         ))}
+      <ShowcaseQuickSelect />
     </CollapsibleItem>
   )
 }
