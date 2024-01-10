@@ -28,8 +28,8 @@ export function applyToAll(
   const userFilters = localFilters.filter ?? {}
 
   const serverFilters = useStatic.getState().filters[category]
-  const staticFilters = serverFilters.filter ?? {}
-  const refFilter = serverFilters.standard ?? STANDARD_BACKUP
+  const staticFilters = serverFilters?.filter ?? {}
+  const refFilter = serverFilters?.standard ?? STANDARD_BACKUP
 
   const idSet = new Set(selectedIds ?? [])
 

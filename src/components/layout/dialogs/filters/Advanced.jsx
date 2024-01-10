@@ -37,7 +37,9 @@ export default function AdvancedFilter() {
   const isMobile = useStatic((s) => s.isMobile)
   const legacyFilter = useStore((s) => !!s.userSettings[category]?.legacyFilter)
   const standard = useStatic((s) =>
-    category === 'pokemon' ? s.filters[category].standard : STANDARD_BACKUP,
+    category === 'pokemon'
+      ? s.filters[category]?.standard || STANDARD_BACKUP
+      : STANDARD_BACKUP,
   )
   const [filters, setFilters] = useDeepStore(
     `filters.${category}.filter.${id}`,
