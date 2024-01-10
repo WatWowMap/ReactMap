@@ -202,6 +202,7 @@ export default function usePokestopMarker({
             event.showcase_pokemon_id,
             event.showcase_pokemon_form_id,
           ),
+          decoration: true,
         })
         showcaseSizes.unshift(
           Icons.getSize(
@@ -347,18 +348,24 @@ export default function usePokestopMarker({
                     transform: translateX(-50%);
                   "
                 />
-                <img
-                  src="${Icons.getMisc('showcase')}"
-                  style="
-                    width: ${showcaseSizes[i] * 0.66}px;
-                    height: ${showcaseSizes[i] * 0.66}px;
-                    bottom: ${
-                      baseSize * 0.3 * eventMod.offsetY + showcaseSizes[i] * i
-                    }px;
-                    left: ${eventMod.offsetX * 50}%;
-                    transform: translateX(-50%);
-                  "
-                />
+                ${
+                  icon.decoration
+                    ? `
+                  <img
+                    src="${Icons.getMisc('showcase')}"
+                    style="
+                      width: ${showcaseSizes[i] * 0.66}px;
+                      height: ${showcaseSizes[i] * 0.66}px;
+                      bottom: ${
+                        baseSize * 0.3 * eventMod.offsetY + showcaseSizes[i] * i
+                      }px;
+                      left: ${eventMod.offsetX * 50}%;
+                      transform: translateX(-50%);
+                    "
+                  />
+                `
+                    : ''
+                }
             `,
             )
             .join('')}
