@@ -4,6 +4,7 @@ import { MapContainer } from 'react-leaflet'
 
 import { useMemory } from '@hooks/useMemory'
 import { useStorage } from '@hooks/useStorage'
+import { useMapStore } from '@hooks/useMapStore'
 import Utility from '@services/Utility'
 
 import Map from './Map'
@@ -19,7 +20,7 @@ import {
 } from './Layers'
 import { Effects } from './Effects'
 
-/** @param {{ target: import('leaflet').Map, type: string }} */
+/** @param {{ target: import('leaflet').Map, type: string }} args */
 function setLocationZoom({ target: map }) {
   const { lat, lng } = map.getCenter()
   const zoom = map.getZoom()
@@ -42,18 +43,15 @@ export default function Container() {
     <MapContainer
       tap={false}
       center={location}
-      ref={(ref) =>
-        useMemory.setState((prev) => {
-          if (ref) {
-            ref.attributionControl.setPrefix(
-              prev.config.general.attributionPrefix || '',
-            )
-            ref.on('moveend', setLocationZoom)
-            ref.on('zoomend', setLocationZoom)
-          }
-          return { map: ref }
-        })
-      }
+      ref={(ref) => {
+        if (ref) {
+          const { attributionPrefix } = useMemory.getState().config.general
+          ref.attributionControl.setPrefix(attributionPrefix || '')
+          ref.on('moveend', setLocationZoom)
+          ref.on('zoomend', setLocationZoom)
+          useMapStore.setState({ map: ref })
+        }
+      }}
       zoom={zoom}
       zoomControl={false}
       maxBounds={MAX_BOUNDS}

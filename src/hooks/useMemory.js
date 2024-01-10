@@ -37,7 +37,6 @@ import { create } from 'zustand'
  *   settings: Record<string, any>
  *   userSettings: Record<string, any>
  *   clientError: string,
- *   map: import('leaflet').Map | null,
  *   timeOfDay: import('@rm/types').TimesOfDay,
  *   hideList: Set<string | number>,
  *   excludeList: string[],
@@ -73,7 +72,6 @@ export const useMemory = create((set) => ({
   reset: false,
   tileStyle: 'light',
   clientError: '',
-  map: null,
   theme: {
     primary: '#ff5722',
     secondary: '#00b0ff',

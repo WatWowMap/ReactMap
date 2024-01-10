@@ -4,6 +4,7 @@ import { t } from 'i18next'
 import { useMemory } from '@hooks/useMemory'
 import { useStorage } from '@hooks/useStorage'
 import SimpleTTLCache from '@services/ttlcache'
+import { useMapStore } from '@hooks/useMapStore'
 
 export const HAS_API = 'Notification' in window
 const cache = new SimpleTTLCache(1000 * 60 * 60)
@@ -63,7 +64,7 @@ export function sendNotification(key, title, category, options) {
           window.focus()
         }
         if (lat && lon) {
-          const { map } = useMemory.getState()
+          const { map } = useMapStore.getState()
           useMemory.setState({ manualParams: { category, id: key } })
           map.flyTo([lat, lon], 16)
         }
