@@ -196,7 +196,7 @@ export default function usePokestopMarker({
           url: Icons.getPokemon(352),
         })
         showcaseSizes.unshift(Icons.getSize('event', filters.b7?.size))
-      } else if (event.display_type === 9) {
+      } else if (event.display_type === 9 && event.showcase_pokemon_id) {
         showcaseIcons.unshift({
           url: Icons.getPokemon(
             event.showcase_pokemon_id,
