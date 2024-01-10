@@ -47,14 +47,15 @@ const BaseS2Cells = () => {
   const enabled = useStore((s) => !!s.filters.s2cells.enabled)
   const [filters, setFilters] = useDeepStore('filters.s2cells.cells')
   const safe = React.useMemo(() => filters || [], [filters])
-  if (!filters) return null
   return (
     <CollapsibleItem open={enabled}>
       <ListItem>
         <Select
           sx={{ mx: 'auto', width: '90%' }}
           value={safe}
-          renderValue={(selected) => selected.join(', ')}
+          renderValue={(selected) =>
+            Array.isArray(selected) ? selected.join(', ') : selected
+          }
           multiple
           onChange={({ target }) =>
             setFilters(

@@ -72,8 +72,6 @@ const DrawerSection = ({ category }) => {
         <List>
           {category === 'pokemon' ? (
             <PokemonDrawerMemo />
-          ) : category === 'scanAreas' ? (
-            <Areas />
           ) : category === 'settings' ? (
             <SettingsMenu />
           ) : (
@@ -107,6 +105,7 @@ const DrawerSection = ({ category }) => {
               <ListItemText primary={t('advanced')} />
             </ListItemButton>
           )}
+          {category === 'scanAreas' && <Areas />}
         </List>
       </AccordionDetails>
     </Accordion>
