@@ -332,7 +332,7 @@ function Extras({ category, subItem }) {
     case 'nests':
       return subItem === 'sliders' ? <NestSlider /> : null
     case 's2cells':
-      return subItem === 'cells' ? <S2Cells /> : null
+      return subItem === 'enabled' ? <S2Cells /> : null
     case 'pokestops':
       switch (subItem) {
         case 'allPokestops':

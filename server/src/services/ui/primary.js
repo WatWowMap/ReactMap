@@ -168,7 +168,7 @@ function generateUi(req, perms) {
               ) || BLOCKED,
           }
         : undefined,
-    s2cells: perms.s2cells ? { enabled: true, cells: true } : BLOCKED,
+    s2cells: perms.s2cells ? { enabled: true } : BLOCKED,
     scanAreas: perms.scanAreas
       ? { filterByAreas: true, enabled: true }
       : undefined,
