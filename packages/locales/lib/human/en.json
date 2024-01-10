@@ -715,5 +715,6 @@
   "intermediate_description": "Set individual filters globally and per Pokémon (traditional)",
   "expert_description": "Manual input queries for the most customization",
   "icon_size": "Icon Size",
-  "developer": "Developer"
+  "developer": "Developer",
+  "raid_override": "Raid Override"
 }

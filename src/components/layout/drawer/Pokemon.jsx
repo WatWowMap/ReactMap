@@ -28,7 +28,7 @@ import SliderTile from '../dialogs/filters/SliderTile'
 import TabPanel from '../general/TabPanel'
 import { BoolToggle, DualBoolToggle } from './BoolToggle'
 import { GenderListItem } from '../dialogs/filters/Gender'
-import { MemoSelectorList } from './SelectorList'
+import { SelectorListMemo } from './SelectorList'
 
 function PokemonDrawer() {
   const legacyFilter = useStorage((s) => s.userSettings.pokemon.legacyFilter)
@@ -159,7 +159,7 @@ function PokemonDrawer() {
             </TabPanel>
           ))}
           <TabPanel value={openTab} index={2} disablePadding>
-            <MemoSelectorList category="pokemon" />
+            <SelectorListMemo category="pokemon" />
           </TabPanel>
         </>
       )}

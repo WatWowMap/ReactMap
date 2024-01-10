@@ -26,6 +26,7 @@ import {
 import { MultiSelectorStore } from './MultiSelector'
 import SliderTile from '../dialogs/filters/SliderTile'
 import { CollapsibleItem } from './CollapsibleItem'
+import { MultiSelectorList, SelectorListMemo } from './SelectorList'
 
 const BaseNestSlider = () => {
   const slider = useMemory((s) => s.ui.nests?.sliders?.secondary?.[0])
@@ -121,11 +122,11 @@ const BaseGymBadges = () => {
 }
 const GymBadges = React.memo(BaseGymBadges)
 
-const BaseRaids = () => {
+const RaidOverride = () => {
   const { t } = useTranslation()
   const available = useMemory((s) => s.available.gyms)
   const enabled = useStorage((s) => !!s.filters?.gyms?.raids)
-  const [filters, setFilters] = useDeepStore('filters.gyms.raidTier', '')
+  const [filters, setFilters] = useDeepStore('filters.gyms.raidTier', 'all')
   return (
     <CollapsibleItem open={enabled}>
       <ListItem
@@ -151,11 +152,44 @@ const BaseRaids = () => {
           </Select>
         }
       >
-        <ListItemText primary={t('raid_quick_select')} />
+        <ListItemText primary={t('raid_override')} />
       </ListItem>
     </CollapsibleItem>
   )
 }
+
+const RaidQuickSelect = () => {
+  const enabled = useStorage(
+    (s) => !!(s.filters?.gyms?.raids && s.filters?.gyms?.raidTier === 'all'),
+  )
+  return (
+    <CollapsibleItem open={enabled}>
+      <MultiSelectorList>
+        <SelectorListMemo
+          key="eggs"
+          category="gyms"
+          subCategory="raids"
+          label="search_eggs"
+          height={350}
+        />
+        <SelectorListMemo
+          key="raids"
+          category="gyms"
+          subCategory="pokemon"
+          label="search_raids"
+          height={350}
+        />
+      </MultiSelectorList>
+    </CollapsibleItem>
+  )
+}
+
+const BaseRaids = () => (
+  <>
+    <RaidOverride />
+    <RaidQuickSelect />
+  </>
+)
 const Raids = React.memo(BaseRaids)
 
 const BaseQuestSet = () => {

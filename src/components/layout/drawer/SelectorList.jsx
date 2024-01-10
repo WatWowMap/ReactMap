@@ -11,6 +11,10 @@ import ButtonGroup from '@mui/material/ButtonGroup'
 import IconButton from '@mui/material/IconButton'
 import Collapse from '@mui/material/Collapse'
 import Box from '@mui/material/Box'
+import AppBar from '@mui/material/AppBar'
+import Tabs from '@mui/material/Tabs'
+import Tab from '@mui/material/Tab'
+import { capitalize } from '@mui/material/utils'
 import { useTranslation } from 'react-i18next'
 
 import { useTranslateById } from '@hooks/useTranslateById'
@@ -22,28 +26,36 @@ import { BoolToggle } from './BoolToggle'
 import { GenericSearchMemo } from './ItemSearch'
 import { StandardItem } from './SelectorItem'
 import { VirtualGrid } from '../general/VirtualGrid'
+import TabPanel from '../general/TabPanel'
 
 /**
  * @template {keyof import('@rm/types').Available} T
- * @param {{
+ * @typedef {{
  *  category: T,
  *  subCategory?: T extends 'gyms' ? 'raids' | 'pokemon' : T extends 'pokestops' ? 'lures' | 'invasions' | 'quests' | 'eventStops' | 'rocketPokemon' | 'pokemon' : never
  *  itemsPerRow?: number,
  *  children?: React.ReactNode,
- * }} props
+ *  label?: string
+ *  height?: React.CSSProperties['height'],
+ * }} SelectorListProps
+ * @param {SelectorListProps<keyof import('@rm/types').Available>} props
  * @returns
  */
-function SelectorList({ category, subCategory }) {
+function SelectorList({ category, subCategory, label, height = 400 }) {
+  const searchKey = `${category}${
+    subCategory ? capitalize(subCategory) : ''
+  }QuickSelect`
+
   const { t: tId } = useTranslateById()
   const { t } = useTranslation()
   const available = useMemory((s) => s.available[category])
   const allFilters = useMemory((s) => s.filters[category]?.filter)
 
-  const onlyShowAvailable = useStorage(
-    (s) => !!s.filters[category]?.onlyShowAvailable,
+  const onlyShowAvailable = useStorage((s) =>
+    category === 'pokemon' ? !!s.filters[category]?.onlyShowAvailable : true,
   )
   const easyMode = useStorage((s) => !!s.filters[category]?.easyMode)
-  const search = useStorage((s) => s.searches[`${category}QuickSelect`] || '')
+  const search = useStorage((s) => s.searches[searchKey] || '')
 
   const translated = React.useMemo(
     () =>
@@ -69,6 +81,8 @@ function SelectorList({ category, subCategory }) {
               return key.startsWith('b')
             case 'rocketPokemon':
               return key.startsWith('a')
+            case 'pokemon':
+              return !Number.isNaN(Number(key.charAt(0)))
             default:
               switch (category) {
                 case 'gyms':
@@ -81,6 +95,7 @@ function SelectorList({ category, subCategory }) {
         .map((id) => ({ id, name: tId(id).toLowerCase() })),
     [onlyShowAvailable ? available : allFilters, tId, category, subCategory],
   )
+
   const items = React.useMemo(() => {
     const lowerCase = search.toLowerCase()
     return translated
@@ -111,17 +126,18 @@ function SelectorList({ category, subCategory }) {
   }
 
   return (
-    <List>
-      <ListItem>
-        <GenericSearchMemo field={`searches.${category}QuickSelect`} />
+    <List dense sx={{ width: '100%' }}>
+      <ListItem disableGutters={category !== 'pokemon'}>
+        <GenericSearchMemo field={`searches.${searchKey}`} label={label} />
       </ListItem>
-      <BoolToggle
-        // TODO: this will be fixed when I add more quick selects for the other categories
-        // @ts-ignore
-        field={`filters.${category}.onlyShowAvailable`}
-        label="only_show_available"
-      />
-      <ListItem>
+      {category === 'pokemon' && (
+        <BoolToggle
+          // @ts-ignore // WHY TS??
+          field={`filters.${category}.onlyShowAvailable`}
+          label="only_show_available"
+        />
+      )}
+      <ListItem disableGutters={category !== 'pokemon'}>
         <ListItemText>{t(search ? 'set_filtered' : 'set_all')}</ListItemText>
         <ButtonGroup variant="text" size="small" color="warning">
           <IconButton color="success" onClick={() => setAll('enable')}>
@@ -144,12 +160,16 @@ function SelectorList({ category, subCategory }) {
               <TuneIcon />
             </IconButton>
           </Collapse>
-          <IconButton color="error" onClick={() => setAll('disable')}>
+          <IconButton
+            color="error"
+            onClick={() => setAll('disable')}
+            sx={{ pr: 0 }}
+          >
             <ClearIcon />
           </IconButton>
         </ButtonGroup>
       </ListItem>
-      <Box height={400}>
+      <Box height={height}>
         <VirtualGrid data={items} xs={4}>
           {(_, key) => <StandardItem id={key} category={category} />}
         </VirtualGrid>
@@ -158,8 +178,36 @@ function SelectorList({ category, subCategory }) {
   )
 }
 
-export const MemoSelectorList = React.memo(
+export const SelectorListMemo = React.memo(
   SelectorList,
   (prev, next) =>
-    prev.category === next.category && prev.subCategory === next.subCategory,
+    prev.category === next.category &&
+    prev.subCategory === next.subCategory &&
+    prev.label === next.label &&
+    prev.height === next.height,
 )
+
+/** @param {{ children: React.ReactElement[] }} props */
+export function MultiSelectorList({ children }) {
+  const { t } = useTranslation()
+  const [openTab, setOpenTab] = React.useState(0)
+
+  const handleTabChange = (_e, newValue) => setOpenTab(newValue)
+
+  return (
+    <Box pt={2}>
+      <AppBar position="static">
+        <Tabs value={openTab} onChange={handleTabChange}>
+          {children.map((child) => (
+            <Tab key={child.key} label={t(child.key)} />
+          ))}
+        </Tabs>
+      </AppBar>
+      {children.map((child, index) => (
+        <TabPanel value={openTab} index={index} key={child.key}>
+          {child}
+        </TabPanel>
+      ))}
+    </Box>
+  )
+}
