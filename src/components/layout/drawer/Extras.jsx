@@ -267,13 +267,15 @@ const BaseInvasion = () => {
           />
         </MultiSelectorList>
       ) : (
-        <SelectorListMemo
-          key="invasions"
-          category="pokestops"
-          subCategory="invasions"
-          label="search_invasions"
-          height={350}
-        />
+        <Box px={2}>
+          <SelectorListMemo
+            key="invasions"
+            category="pokestops"
+            subCategory="invasions"
+            label="search_invasions"
+            height={350}
+          />
+        </Box>
       )}
     </CollapsibleItem>
   )
@@ -456,8 +458,7 @@ const BaseLureQuickSelector = () => {
 const LureQuickSelector = React.memo(BaseLureQuickSelector)
 
 function Extras({ category, subItem }) {
-  const { enableConfirmedInvasions, enableQuestSetSelector } =
-    useMemory.getState().config.misc
+  const { enableQuestSetSelector } = useMemory.getState().config.misc
 
   switch (category) {
     case 'nests':
@@ -475,7 +476,7 @@ function Extras({ category, subItem }) {
         case 'quests':
           return enableQuestSetSelector ? <QuestSet /> : null
         case 'invasions':
-          return enableConfirmedInvasions ? <Invasion /> : null
+          return <Invasion />
         case 'eventStops':
           return <EventStops />
         case 'lures':
