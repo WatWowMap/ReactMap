@@ -41,8 +41,8 @@ export const GenericSearch = React.forwardRef(
     )
     /** @type {import('@mui/material').TextFieldProps['onChange']} */
     const onChange = React.useCallback(
-      (e) => setValue(e.target.value || ''),
-      [setValue],
+      (e) => setSearchValue(e.target.value || ''),
+      [setSearchValue],
     )
     return (
       <TextField

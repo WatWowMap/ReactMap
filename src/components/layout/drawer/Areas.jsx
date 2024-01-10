@@ -53,7 +53,7 @@ function AreaDropDown() {
         <ListItemText primary={t('reset')} />
       </ListItemButton>
       <ListItem>
-        <GenericSearch field="filters.scanAreas.filter.search" />
+        <GenericSearch field="filters.scanAreas.filter.search" label="search" />
       </ListItem>
       <ListItem>
         <TableContainer
