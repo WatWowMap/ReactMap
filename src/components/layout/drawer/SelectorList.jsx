@@ -148,7 +148,10 @@ function SelectorList({ category, subCategory, label, height = 400 }) {
             <IconButton color="success" onClick={() => setAll('enable')}>
               <CheckIcon />
             </IconButton>
-            <Collapse in={!easyMode} orientation="horizontal">
+            <Collapse
+              in={!easyMode && category === 'pokemon'}
+              orientation="horizontal"
+            >
               <IconButton
                 color="info"
                 onClick={() =>
