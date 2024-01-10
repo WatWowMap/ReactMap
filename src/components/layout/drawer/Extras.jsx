@@ -170,7 +170,7 @@ const RaidQuickSelect = () => {
   )
   return (
     <CollapsibleItem open={enabled}>
-      <MultiSelectorList>
+      <MultiSelectorList tabKey="raids">
         <SelectorListMemo
           key="eggs"
           category="gyms"
@@ -208,7 +208,7 @@ const BaseQuestSet = () => {
           items={QUEST_SETS}
         />
       </ListItem>
-      <MultiSelectorList>
+      <MultiSelectorList tabKey="quests">
         <SelectorListMemo
           key="items"
           category="pokestops"
@@ -250,7 +250,7 @@ const BaseInvasion = () => {
         </ListItem>
       )}
       {hasConfirmed ? (
-        <MultiSelectorList>
+        <MultiSelectorList tabKey="invasions">
           <SelectorListMemo
             key="invasions"
             category="pokestops"

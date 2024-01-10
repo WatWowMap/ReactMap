@@ -19,6 +19,7 @@ import { persist, createJSONStorage } from 'zustand/middleware'
  *    tileServers: string
  *   },
  *   searches: Record<string, string>,
+ *   tabs: Record<string, number>,
  *   menus: Record<string, boolean>,
  *   holidayEffects: Record<string, boolean>,
  *   motdIndex: number
@@ -111,6 +112,7 @@ export const useStorage = create(
       holidayEffects: {},
       settings: {},
       searches: {},
+      tabs: {},
       userSettings: {},
       icons: {},
       audio: {},

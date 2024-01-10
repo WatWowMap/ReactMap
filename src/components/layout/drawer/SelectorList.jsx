@@ -20,7 +20,7 @@ import { useTranslation } from 'react-i18next'
 import { useTranslateById } from '@hooks/useTranslateById'
 import { useMemory } from '@hooks/useMemory'
 import { useLayoutStore } from '@hooks/useLayoutStore'
-import { useStorage } from '@hooks/useStorage'
+import { useDeepStore, useStorage } from '@hooks/useStorage'
 
 import { BoolToggle } from './BoolToggle'
 import { GenericSearchMemo } from './ItemSearch'
@@ -202,10 +202,10 @@ export const SelectorListMemo = React.memo(
     prev.height === next.height,
 )
 
-/** @param {{ children: React.ReactElement[] }} props */
-export function MultiSelectorList({ children }) {
+/** @param {{ children: React.ReactElement[], tabKey: string }} props */
+export function MultiSelectorList({ children, tabKey }) {
   const { t } = useTranslation()
-  const [openTab, setOpenTab] = React.useState(0)
+  const [openTab, setOpenTab] = useDeepStore(`tabs.${tabKey}`, 0)
 
   const handleTabChange = (_e, newValue) => setOpenTab(newValue)
 

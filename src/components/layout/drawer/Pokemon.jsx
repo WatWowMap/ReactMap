@@ -35,7 +35,7 @@ function PokemonDrawer() {
   const filterMode = useStorage((s) => s.getPokemonFilterMode())
   const [ivOr, setIvOr] = useDeepStore('filters.pokemon.ivOr')
   const { t } = useTranslation()
-  const [openTab, setOpenTab] = React.useState(0)
+  const [openTab, setOpenTab] = useDeepStore(`tabs.pokemon`, 0)
   const ui = useMemory((s) => s.ui.pokemon)
   const selectRef = React.useRef(/** @type {HTMLDivElement | null} */ (null))
 
