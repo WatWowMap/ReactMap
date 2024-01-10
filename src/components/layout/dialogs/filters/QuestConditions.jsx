@@ -2,7 +2,8 @@
 import * as React from 'react'
 import ListItem from '@mui/material/ListItem'
 import { useTranslation } from 'react-i18next'
-import { useDeepStore, useStatic } from '@hooks/useStore'
+import { useMemory } from '@hooks/useMemory'
+import { useDeepStore } from '@hooks/useStorage'
 import { FormControl, InputLabel, Select, MenuItem } from '@mui/material'
 import Typography from '@mui/material/Typography'
 import QuestTitle from '@components/layout/general/QuestTitle'
@@ -17,8 +18,8 @@ export function QuestConditionSelector({ id }) {
     `filters.pokestops.filter.${id}.adv`,
     '',
   )
-  const questConditions = useStatic((s) => s.available.questConditions[id])
-  const hasQuests = useStatic((s) => s.ui.pokestops?.quests)
+  const questConditions = useMemory((s) => s.available.questConditions[id])
+  const hasQuests = useMemory((s) => s.ui.pokestops?.quests)
 
   const { t } = useTranslation()
 

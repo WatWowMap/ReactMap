@@ -6,13 +6,14 @@ import getAvailable from '@services/queries/available'
 import { deepMerge } from '@services/functions/deepMerge'
 import UAssets from '@services/Icons'
 
-import { useStatic, useStore } from './useStore'
+import { useMemory } from './useMemory'
+import { useStorage } from './useStorage'
 
 export default function useRefresh() {
-  const active = useStatic((s) => s.active)
-  const online = useStatic((s) => s.online)
+  const active = useMemory((s) => s.active)
+  const online = useMemory((s) => s.online)
 
-  const hasIcons = useStatic((s) => !!s.Icons)
+  const hasIcons = useMemory((s) => !!s.Icons)
 
   const { data, stopPolling, startPolling, refetch } = useQuery(getAvailable, {
     fetchPolicy: active && online ? 'network-only' : 'cache-only',
@@ -34,8 +35,8 @@ export default function useRefresh() {
   useEffect(() => {
     if (data?.available) {
       const { masterfile, filters, icons, audio, ...rest } = data.available
-      const { icons: userIcons, audio: userAudio } = useStore.getState()
-      const existing = useStatic.getState()
+      const { icons: userIcons, audio: userAudio } = useStorage.getState()
+      const existing = useMemory.getState()
 
       const Icons =
         existing.Icons ??
@@ -65,21 +66,21 @@ export default function useRefresh() {
       if (Audio.checkValid(userAudio)) {
         Audio.setSelection(userAudio)
       }
-      useStore.setState({ icons: Icons.selection, audio: Audio.selection })
+      useStorage.setState({ icons: Icons.selection, audio: Audio.selection })
       if (masterfile) {
         localStorage.setItem(
           'questRewardTypes',
           JSON.stringify(masterfile.questRewardTypes),
         )
       }
-      useStatic.setState({
+      useMemory.setState({
         available: rest,
         masterfile,
         filters,
         Icons,
         Audio,
       })
-      useStore.setState((prev) => ({
+      useStorage.setState((prev) => ({
         filters: deepMerge({}, filters, prev.filters),
       }))
     }

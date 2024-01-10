@@ -10,12 +10,8 @@ import {
 import { useTranslation, Trans } from 'react-i18next'
 
 import Utility from '@services/Utility'
-import {
-  useLayoutStore,
-  useStatic,
-  useStore,
-  toggleDialog,
-} from '@hooks/useStore'
+import { useLayoutStore, useMemory, toggleDialog } from '@hooks/useMemory'
+import { useStorage } from '@hooks/useStorage'
 import { getPermission } from '@services/desktopNotification'
 
 import Header from '../general/Header'
@@ -23,7 +19,7 @@ import Footer from '../general/Footer'
 import { DialogWrapper } from './DialogWrapper'
 
 function InputType({ option, subOption, localState, handleChange, category }) {
-  const staticUserSettings = useStatic.getState().userSettings[category] || {}
+  const staticUserSettings = useMemory.getState().userSettings[category] || {}
   const fullOption = subOption
     ? staticUserSettings[option].sub[subOption]
     : staticUserSettings[option]
@@ -74,8 +70,8 @@ export default function UserOptions() {
   const { t } = useTranslation()
   const { open, category, type } = useLayoutStore((s) => s.dialog)
 
-  const staticUserSettings = useStatic((s) => s.userSettings[category] || {})
-  const userSettings = useStore((state) => state.userSettings)
+  const staticUserSettings = useMemory((s) => s.userSettings[category] || {})
+  const userSettings = useStorage((state) => state.userSettings)
 
   const [localState, setLocalState] = React.useState(userSettings[category])
 

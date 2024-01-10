@@ -12,7 +12,8 @@ import {
 } from '@mui/material'
 import { Trans, useTranslation } from 'react-i18next'
 
-import { useDeepStore, useStatic, useStore } from '@hooks/useStore'
+import { useMemory } from '@hooks/useMemory'
+import { useStorage, useDeepStore } from '@hooks/useStorage'
 import {
   BADGES,
   FORT_LEVELS,
@@ -27,7 +28,7 @@ import SliderTile from '../dialogs/filters/SliderTile'
 import { CollapsibleItem } from './CollapsibleItem'
 
 const BaseNestSlider = () => {
-  const slider = useStatic((s) => s.ui.nests?.sliders?.secondary?.[0])
+  const slider = useMemory((s) => s.ui.nests?.sliders?.secondary?.[0])
   const [filters, setFilters] = useDeepStore(`filters.nests.avgFilter`)
   if (!filters || !slider) return null
   return (
@@ -44,7 +45,7 @@ const NestSlider = React.memo(BaseNestSlider)
 
 const BaseS2Cells = () => {
   const { t } = useTranslation()
-  const enabled = useStore((s) => !!s.filters.s2cells.enabled)
+  const enabled = useStorage((s) => !!s.filters.s2cells.enabled)
   const [filters, setFilters] = useDeepStore('filters.s2cells.cells')
   const safe = React.useMemo(
     () =>
@@ -89,7 +90,7 @@ const S2Cells = React.memo(BaseS2Cells)
 /** @param {{ category: 'pokestops' | 'gyms', subItem: string }} props */
 const BaseAllForts = ({ category, subItem }) => {
   const { t } = useTranslation()
-  const enabled = useStore((s) => !!s.filters?.[category]?.[subItem])
+  const enabled = useStorage((s) => !!s.filters?.[category]?.[subItem])
   return (
     <CollapsibleItem open={enabled}>
       <ListItem>
@@ -105,7 +106,7 @@ const BaseAllForts = ({ category, subItem }) => {
 const AllForts = React.memo(BaseAllForts)
 
 const BaseGymBadges = () => {
-  const enabled = useStore((s) => !!s.filters?.gyms?.gymBadges)
+  const enabled = useStorage((s) => !!s.filters?.gyms?.gymBadges)
   return (
     <CollapsibleItem open={enabled}>
       <ListItem>
@@ -122,8 +123,8 @@ const GymBadges = React.memo(BaseGymBadges)
 
 const BaseRaids = () => {
   const { t } = useTranslation()
-  const available = useStatic((s) => s.available.gyms)
-  const enabled = useStore((s) => !!s.filters?.gyms?.raids)
+  const available = useMemory((s) => s.available.gyms)
+  const enabled = useStorage((s) => !!s.filters?.gyms?.raids)
   const [filters, setFilters] = useDeepStore('filters.gyms.raidTier', '')
   return (
     <CollapsibleItem open={enabled}>
@@ -158,7 +159,7 @@ const BaseRaids = () => {
 const Raids = React.memo(BaseRaids)
 
 const BaseQuestSet = () => {
-  const enabled = useStore((s) => !!s.filters?.pokestops?.quests)
+  const enabled = useStorage((s) => !!s.filters?.pokestops?.quests)
   return (
     <CollapsibleItem open={enabled}>
       <ListItem>
@@ -174,7 +175,7 @@ const QuestSet = React.memo(BaseQuestSet)
 
 const BaseInvasion = () => {
   const { t } = useTranslation()
-  const enabled = useStore((s) => !!s.filters?.pokestops?.invasions)
+  const enabled = useStorage((s) => !!s.filters?.pokestops?.invasions)
   const [filters, setFilters] = useDeepStore(
     'filters.pokestops.confirmed',
     false,
@@ -196,7 +197,7 @@ const Invasion = React.memo(BaseInvasion)
 /** @param {{ id: string }} props */
 const IndividualEvent = ({ id }) => {
   const { t } = useTranslation()
-  const Icons = useStatic((s) => s.Icons)
+  const Icons = useMemory((s) => s.Icons)
   const [filters, setFilters] = useDeepStore(
     `filters.pokestops.filter.${id}.enabled`,
     false,
@@ -218,8 +219,8 @@ const IndividualEvent = ({ id }) => {
   )
 }
 const BaseEventStops = () => {
-  const available = useStatic((s) => s.available.pokestops)
-  const enabled = useStore((s) => !!s.filters?.pokestops?.eventStops)
+  const available = useMemory((s) => s.available.pokestops)
+  const enabled = useStorage((s) => !!s.filters?.pokestops?.eventStops)
   return (
     <CollapsibleItem open={enabled}>
       {available
@@ -262,7 +263,7 @@ const WayfarerOption = ({ item, index, disabled }) => {
   )
 }
 const SubmissionCells = () => {
-  const enabled = useStore((s) => !!s.filters?.submissionCells?.enabled)
+  const enabled = useStorage((s) => !!s.filters?.submissionCells?.enabled)
   return (
     <CollapsibleItem open={enabled}>
       {WAYFARER_OPTIONS.map((item, i) => (
@@ -274,9 +275,9 @@ const SubmissionCells = () => {
 const BaseSubmissionCells = React.memo(SubmissionCells)
 
 const BaseRouteSlider = () => {
-  const enabled = useStore((s) => !!s.filters?.routes?.enabled)
+  const enabled = useStorage((s) => !!s.filters?.routes?.enabled)
   const [filters, setFilters] = useDeepStore('filters.routes.distance')
-  const baseDistance = useStatic.getState().filters?.routes?.distance
+  const baseDistance = useMemory.getState().filters?.routes?.distance
 
   /** @type {import('@rm/types').RMSlider} */
   const slider = React.useMemo(() => {
@@ -309,7 +310,7 @@ const BaseRouteSlider = () => {
 const RouteSlider = React.memo(BaseRouteSlider)
 
 const BaseSpawnpointTTH = () => {
-  const enabled = useStore((s) => !!s.filters?.spawnpoints?.enabled)
+  const enabled = useStorage((s) => !!s.filters?.spawnpoints?.enabled)
   return (
     <CollapsibleItem open={enabled}>
       <ListItem>
@@ -326,7 +327,7 @@ const SpawnpointTTH = React.memo(BaseSpawnpointTTH)
 
 function Extras({ category, subItem }) {
   const { enableConfirmedInvasions, enableQuestSetSelector } =
-    useStatic.getState().config.misc
+    useMemory.getState().config.misc
 
   switch (category) {
     case 'nests':

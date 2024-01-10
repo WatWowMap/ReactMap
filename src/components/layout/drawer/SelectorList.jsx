@@ -13,7 +13,8 @@ import Box from '@mui/material/Box'
 import { useTranslation } from 'react-i18next'
 
 import { useTranslateById } from '@hooks/useTranslateById'
-import { useLayoutStore, useStatic, useStore } from '@hooks/useStore'
+import { useLayoutStore, useMemory } from '@hooks/useMemory'
+import { useStorage } from '@hooks/useStorage'
 
 import { BoolToggle } from './BoolToggle'
 import { GenericSearchMemo } from './ItemSearch'
@@ -31,14 +32,14 @@ import { VirtualGrid } from '../general/VirtualGrid'
 function SelectorList({ category }) {
   const { t: tId } = useTranslateById()
   const { t } = useTranslation()
-  const available = useStatic((s) => s.available[category])
-  const allFilters = useStatic((s) => s.filters[category]?.filter)
+  const available = useMemory((s) => s.available[category])
+  const allFilters = useMemory((s) => s.filters[category]?.filter)
 
-  const onlyShowAvailable = useStore(
+  const onlyShowAvailable = useStorage(
     (s) => !!s.filters[category]?.onlyShowAvailable,
   )
-  const easyMode = useStore((s) => !!s.filters[category]?.easyMode)
-  const search = useStore((s) => s.searches[`${category}QuickSelect`] || '')
+  const easyMode = useStorage((s) => !!s.filters[category]?.easyMode)
+  const search = useStorage((s) => s.searches[`${category}QuickSelect`] || '')
 
   const translated = React.useMemo(
     () =>
@@ -57,7 +58,7 @@ function SelectorList({ category }) {
   /** @param {'enable' | 'disable' | 'advanced'} action */
   const setAll = (action) => {
     const keys = new Set(items.map((item) => item))
-    useStore.setState((prev) => ({
+    useStorage.setState((prev) => ({
       filters: {
         ...prev.filters,
         [category]: {

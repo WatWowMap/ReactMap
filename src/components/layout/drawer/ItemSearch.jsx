@@ -5,11 +5,11 @@ import TextField from '@mui/material/TextField'
 import IconButton from '@mui/material/IconButton'
 import HighlightOffIcon from '@mui/icons-material/HighlightOff'
 
-import { useDeepStore } from '@hooks/useStore'
+import { useDeepStore } from '@hooks/useStorage'
 
 /**
  * @typedef {{
- *  field?: import('@hooks/useStore').UseStorePaths,
+ *  field?: import('@hooks/useStorage').UseStoragePaths,
  *  value?: string,
  *  setValue?: (value: string) => void,
  *  label?: string,

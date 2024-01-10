@@ -8,14 +8,14 @@ import CardContent from '@mui/material/CardContent'
 import CardMedia from '@mui/material/CardMedia'
 import Typography from '@mui/material/Typography'
 
-import { useStatic } from '@hooks/useStore'
+import { useMemory } from '@hooks/useMemory'
 import Utility from '@services/Utility'
 import { ALWAYS_EXCLUDED } from '@assets/constants'
 
 export function UserPermissions() {
-  const perms = useStatic((s) => s.auth.perms)
-  const counts = useStatic((s) => s.auth.counts)
-  const excludeList = useStatic((s) => s.auth.excludeList) || []
+  const perms = useMemory((s) => s.auth.perms)
+  const counts = useMemory((s) => s.auth.counts)
+  const excludeList = useMemory((s) => s.auth.excludeList) || []
 
   return (
     <Grid2 container alignItems="stretch" justifyContent="center" spacing={2}>
@@ -69,9 +69,9 @@ function PermMedia({ children }) {
 function PermCard({ perm }) {
   const { t } = useTranslation()
 
-  const permImageDir = useStatic((s) => s.config.misc.permImageDir)
-  const permArrayImages = useStatic((s) => s.config.misc.permArrayImages)
-  const value = useStatic((s) => s.auth.perms[perm])
+  const permImageDir = useMemory((s) => s.config.misc.permImageDir)
+  const permArrayImages = useMemory((s) => s.config.misc.permArrayImages)
+  const value = useMemory((s) => s.auth.perms[perm])
 
   const component = React.useCallback(() => {
     if (Array.isArray(value) && !permArrayImages)

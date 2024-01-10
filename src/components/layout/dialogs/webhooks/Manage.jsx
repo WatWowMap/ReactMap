@@ -10,7 +10,7 @@ import Collapse from '@mui/material/Collapse'
 import Box from '@mui/material/Box'
 import { useTranslation } from 'react-i18next'
 
-import { useLayoutStore, useStatic } from '@hooks/useStore'
+import { useLayoutStore, useMemory } from '@hooks/useMemory'
 import Poracle from '@services/Poracle'
 import Utility from '@services/Utility'
 import Footer from '@components/layout/general/Footer'
@@ -34,7 +34,7 @@ export default function Manage() {
   const category = useWebhookStore((s) => s.category)
   const name = useWebhookStore((s) => s.context.name || '')
 
-  const feedbackLink = useStatic((s) => s.config.links.feedbackLink)
+  const feedbackLink = useMemory((s) => s.config.links.feedbackLink)
 
   const filters = useGenFullFilters()
 
@@ -185,7 +185,7 @@ export default function Manage() {
 
 /** @param {{ category: import('./store').WebhookStore['category'] }} props */
 function TabIcon({ category }) {
-  const Icons = useStatic((s) => s.Icons)
+  const Icons = useMemory((s) => s.Icons)
   return category === 'human' ? (
     <Person />
   ) : (

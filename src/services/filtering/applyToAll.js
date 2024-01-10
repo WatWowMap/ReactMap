@@ -1,6 +1,7 @@
 // @ts-check
 
-import { setDeepStore, useStatic, useStore } from '@hooks/useStore'
+import { useMemory } from '@hooks/useMemory'
+import { useStorage, setDeepStore } from '@hooks/useStorage'
 import Utility from '@services/Utility'
 
 export const STANDARD_BACKUP =
@@ -23,11 +24,11 @@ export function applyToAll(
   selectedIds = [],
   includeSlots = false,
 ) {
-  const localFilters = useStore.getState().filters[category]
+  const localFilters = useStorage.getState().filters[category]
   const easyMode = !!localFilters.easyMode
   const userFilters = localFilters.filter ?? {}
 
-  const serverFilters = useStatic.getState().filters[category]
+  const serverFilters = useMemory.getState().filters[category]
   const staticFilters = serverFilters?.filter ?? {}
   const refFilter = serverFilters?.standard ?? STANDARD_BACKUP
 

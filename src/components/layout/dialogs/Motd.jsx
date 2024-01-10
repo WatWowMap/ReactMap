@@ -6,7 +6,8 @@ import Dialog from '@mui/material/Dialog'
 import Box from '@mui/material/Box'
 import { useQuery } from '@apollo/client'
 
-import { useLayoutStore, useStore } from '@hooks/useStore'
+import { useLayoutStore } from '@hooks/useMemory'
+import { useStorage } from '@hooks/useStorage'
 import { CUSTOM_COMPONENT, MOTD_CHECK } from '@services/queries/config'
 import Utility from '@services/Utility'
 
@@ -24,8 +25,8 @@ const DEFAULT =
   })
 
 export default function MessageOfTheDay() {
-  const clientIndex = useStore((s) => s.motdIndex)
-  const tutorial = useStore((s) => s.tutorial)
+  const clientIndex = useStorage((s) => s.motdIndex)
+  const tutorial = useStorage((s) => s.tutorial)
 
   const open = useLayoutStore((s) => s.motd)
 
@@ -44,7 +45,7 @@ export default function MessageOfTheDay() {
 
   const handleMotdClose = React.useCallback(() => {
     if (motd.settings.permanent === false) {
-      useStore.setState({ motdIndex: motd.index })
+      useStorage.setState({ motdIndex: motd.index })
     }
     useLayoutStore.setState({ motd: false })
   }, [motd])

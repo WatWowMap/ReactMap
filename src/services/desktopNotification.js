@@ -1,7 +1,8 @@
 // @ts-check
 import { t } from 'i18next'
 
-import { useStatic, useStore } from '@hooks/useStore'
+import { useMemory } from '@hooks/useMemory'
+import { useStorage } from '@hooks/useStorage'
 import SimpleTTLCache from '@services/ttlcache'
 
 export const HAS_API = 'Notification' in window
@@ -36,7 +37,7 @@ export async function requestPermission() {
 export function sendNotification(key, title, category, options) {
   if (cache.has(key) || !HAS_API) return
   const userSettings = /** @type {Partial<RMNotificationOptions>} */ (
-    useStore.getState().userSettings?.notifications || {}
+    useStorage.getState().userSettings?.notifications || {}
   )
   if (userSettings.enabled && userSettings[category]) {
     if (getPermission() === 'granted') {
@@ -62,8 +63,8 @@ export function sendNotification(key, title, category, options) {
           window.focus()
         }
         if (lat && lon) {
-          const { map } = useStatic.getState()
-          useStatic.setState({ manualParams: { category, id: key } })
+          const { map } = useMemory.getState()
+          useMemory.setState({ manualParams: { category, id: key } })
           map.flyTo([lat, lon], 16)
         }
         notif.close()

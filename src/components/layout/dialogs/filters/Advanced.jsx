@@ -5,12 +5,8 @@ import Grid2 from '@mui/material/Unstable_Grid2/Grid2'
 import { useTranslation } from 'react-i18next'
 
 import Utility from '@services/Utility'
-import {
-  useStore,
-  useStatic,
-  useDeepStore,
-  useLayoutStore,
-} from '@hooks/useStore'
+import { useMemory, useLayoutStore } from '@hooks/useMemory'
+import { useDeepStore, useStorage } from '@hooks/useStorage'
 import Header from '@components/layout/general/Header'
 import Footer from '@components/layout/general/Footer'
 import {
@@ -33,10 +29,12 @@ export default function AdvancedFilter() {
   )
   const { t } = useTranslation()
   const { t: tId } = useTranslateById()
-  const ui = useStatic((s) => s.ui[category])
-  const isMobile = useStatic((s) => s.isMobile)
-  const legacyFilter = useStore((s) => !!s.userSettings[category]?.legacyFilter)
-  const standard = useStatic((s) =>
+  const ui = useMemory((s) => s.ui[category])
+  const isMobile = useMemory((s) => s.isMobile)
+  const legacyFilter = useStorage(
+    (s) => !!s.userSettings[category]?.legacyFilter,
+  )
+  const standard = useMemory((s) =>
     category === 'pokemon'
       ? s.filters[category]?.standard || STANDARD_BACKUP
       : STANDARD_BACKUP,

@@ -5,7 +5,7 @@ import { useQuery } from '@apollo/client'
 import Dialog from '@mui/material/Dialog'
 
 import { CUSTOM_COMPONENT } from '@services/queries/config'
-import { useLayoutStore, useStatic } from '@hooks/useStore'
+import { useLayoutStore, useMemory } from '@hooks/useMemory'
 
 import DialogWrapper from '../custom/DialogWrapper'
 import CustomTile from '../custom/CustomTile'
@@ -22,7 +22,7 @@ const handleClose = () => useLayoutStore.setState({ donorPage: false })
 
 export default function DonorPage() {
   const open = useLayoutStore((s) => s.donorPage)
-  const isMobile = useStatic((s) => s.isMobile)
+  const isMobile = useMemory((s) => s.isMobile)
 
   const { data, loading } = useQuery(CUSTOM_COMPONENT, {
     fetchPolicy: 'cache-first',

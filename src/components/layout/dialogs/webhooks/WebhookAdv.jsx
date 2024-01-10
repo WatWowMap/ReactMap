@@ -24,7 +24,8 @@ import {
 import { Trans, useTranslation } from 'react-i18next'
 import { useLazyQuery } from '@apollo/client'
 
-import { useStore, useStatic } from '@hooks/useStore'
+import { useMemory } from '@hooks/useMemory'
+import { useStorage } from '@hooks/useStorage'
 
 import Query from '@services/Query'
 import Utility from '@services/Utility'
@@ -84,16 +85,16 @@ export default function WebhookAdvanced() {
   )
   const idObj = Poracle.getIdObj(id)
   const { t } = useTranslation()
-  const location = useStore((state) => state.location)
-  const webhookAdv = useStore((s) => s.webhookAdv)
+  const location = useStorage((state) => state.location)
+  const webhookAdv = useStorage((s) => s.webhookAdv)
   const { templates, prefix, leagues, pvp, hasNominatim, locale, everything } =
     useWebhookStore((s) => s.context)
   const info = useWebhookStore((s) => s.context.ui?.[category] || {})
   const human = useWebhookStore((s) => s.human)
   const profile = useWebhookStore((s) => s.profile)
   const tempFilters = useWebhookStore((s) => s.tempFilters[id])
-  const { pokemon, moves, types } = useStatic((s) => s.masterfile)
-  const isMobile = useStatic((s) => s.isMobile)
+  const { pokemon, moves, types } = useMemory((s) => s.masterfile)
+  const isMobile = useMemory((s) => s.isMobile)
 
   Utility.analytics(`/poracle/${category}`)
 
@@ -230,7 +231,7 @@ export default function WebhookAdvanced() {
   }
 
   const handleChange = (panel) => (_, isExpanded) => {
-    useStore.setState((prev) => ({
+    useStorage.setState((prev) => ({
       webhookAdv: { ...prev.webhookAdv, [panel]: isExpanded },
     }))
   }

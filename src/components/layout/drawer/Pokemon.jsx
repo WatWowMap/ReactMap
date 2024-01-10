@@ -18,7 +18,8 @@ import {
 } from '@mui/material'
 import { useTranslation } from 'react-i18next'
 
-import { useDeepStore, useStatic, useStore } from '@hooks/useStore'
+import { useMemory } from '@hooks/useMemory'
+import { useStorage, useDeepStore } from '@hooks/useStorage'
 import Utility from '@services/Utility'
 import { XXS_XXL, NUNDO_HUNDO } from '@assets/constants'
 
@@ -30,12 +31,12 @@ import { GenderListItem } from '../dialogs/filters/Gender'
 import { MemoSelectorList } from './SelectorList'
 
 function PokemonDrawer() {
-  const legacyFilter = useStore((s) => s.userSettings.pokemon.legacyFilter)
-  const filterMode = useStore((s) => s.getPokemonFilterMode())
+  const legacyFilter = useStorage((s) => s.userSettings.pokemon.legacyFilter)
+  const filterMode = useStorage((s) => s.getPokemonFilterMode())
   const [ivOr, setIvOr] = useDeepStore('filters.pokemon.ivOr')
   const { t } = useTranslation()
   const [openTab, setOpenTab] = React.useState(0)
-  const ui = useStatic((s) => s.ui.pokemon)
+  const ui = useMemory((s) => s.ui.pokemon)
   const selectRef = React.useRef(/** @type {HTMLDivElement | null} */ (null))
 
   /** @type {import('@rm/types').RMSliderHandleChange<keyof import('@rm/types').PokemonFilter>} */
@@ -66,7 +67,7 @@ function PokemonDrawer() {
             label={t('pokemon_filter_mode')}
             renderValue={(selected) => t(selected)}
             onChange={(e) => {
-              const { setPokemonFilterMode } = useStore.getState()
+              const { setPokemonFilterMode } = useStorage.getState()
               switch (e.target.value) {
                 case 'basic':
                   return setPokemonFilterMode(false, true)

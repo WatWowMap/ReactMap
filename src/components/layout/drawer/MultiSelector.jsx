@@ -2,7 +2,7 @@
 import * as React from 'react'
 import { ButtonGroup, Button } from '@mui/material'
 import { useTranslation } from 'react-i18next'
-import { useDeepStore } from '@hooks/useStore'
+import { useDeepStore } from '@hooks/useStorage'
 
 const SX = /** @type {import('@mui/material').SxProps} */ ({ mx: 'auto' })
 
@@ -29,8 +29,8 @@ export function MultiSelector({ items, value, disabled, onClick, tKey }) {
 }
 
 /**
- * @template {import('@hooks/useStore').UseStorePaths} T
- * @template {import('@rm/types').ConfigPathValue<import('@hooks/useStore').UseStore, T>} V
+ * @template {import('@hooks/useStorage').UseStoragePaths} T
+ * @template {import('@rm/types').ConfigPathValue<import('@hooks/useStorage').UseStorage, T>} V
  * @param {{
  *  field: T,
  *  defaultValue?: V,

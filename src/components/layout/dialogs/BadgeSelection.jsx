@@ -7,7 +7,7 @@ import { apolloClient, apolloCache } from '@services/apollo'
 
 import Query from '@services/Query'
 import { ENUM_BADGES } from '@assets/constants'
-import { useLayoutStore } from '@hooks/useStore'
+import { useLayoutStore } from '@hooks/useMemory'
 
 import Header from '../general/Header'
 import Footer from '../general/Footer'

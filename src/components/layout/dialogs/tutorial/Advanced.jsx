@@ -19,7 +19,7 @@ import {
 import { useTranslation } from 'react-i18next'
 
 import Utility from '@services/Utility'
-import { useStatic } from '@hooks/useStore'
+import { useMemory } from '@hooks/useMemory'
 
 import { VirtualGrid } from '@components/layout/general/VirtualGrid'
 import { StandardItem } from '@components/layout/drawer/SelectorItem'
@@ -27,7 +27,7 @@ import data from './data'
 
 export default function TutAdvanced({ toggleHelp, category }) {
   const { t } = useTranslation()
-  const isMobile = useStatic((s) => s.isMobile)
+  const isMobile = useMemory((s) => s.isMobile)
   const [localCategory, setLocalCategory] = useState(category)
   const [isPokemon, setIsPokemon] = useState(localCategory === 'pokemon')
 

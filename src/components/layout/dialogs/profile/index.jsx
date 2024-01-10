@@ -2,7 +2,7 @@ import * as React from 'react'
 import { DialogContent, AppBar, Tabs, Tab, Box } from '@mui/material'
 import { useTranslation } from 'react-i18next'
 
-import { useLayoutStore, useStatic } from '@hooks/useStore'
+import { useLayoutStore, useMemory } from '@hooks/useMemory'
 import Utility from '@services/Utility'
 
 import Header from '../../general/Header'
@@ -18,8 +18,8 @@ import { ExtraUserFields } from './ExtraFields'
 export default function UserProfile() {
   Utility.analytics('/user-profile')
   const { t } = useTranslation()
-  const auth = useStatic((state) => state.auth)
-  const { rolesLinkName, rolesLink } = useStatic((state) => state.config.links)
+  const auth = useMemory((state) => state.auth)
+  const { rolesLinkName, rolesLink } = useMemory((state) => state.config.links)
 
   const locale = localStorage.getItem('i18nextLng') || 'en'
 

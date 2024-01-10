@@ -1,14 +1,16 @@
 // @ts-check
-import { useStatic, useStore } from '@hooks/useStore'
 import * as React from 'react'
 import { Navigate } from 'react-router-dom'
+
+import { useMemory } from '@hooks/useMemory'
+import { useStorage } from '@hooks/useStorage'
 
 export default function ClearStorage() {
   localStorage.clear()
   sessionStorage.clear()
 
   React.useEffect(() => {
-    useStore.setState({
+    useStorage.setState({
       filters: {},
       menus: {},
       location: [
@@ -17,7 +19,7 @@ export default function ClearStorage() {
       ],
       zoom: CONFIG.map.general.startZoom,
     })
-    useStatic.setState({ Icons: null })
+    useMemory.setState({ Icons: null })
   }, [])
   return <Navigate to="/" />
 }

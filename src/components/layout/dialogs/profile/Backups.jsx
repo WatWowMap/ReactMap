@@ -12,13 +12,14 @@ import ButtonGroup from '@mui/material/ButtonGroup'
 import Typography from '@mui/material/Typography'
 import Divider from '@mui/material/Divider'
 
-import { useStatic, useStore } from '@hooks/useStore'
+import { useMemory } from '@hooks/useMemory'
+import { useStorage } from '@hooks/useStorage'
 import Query from '@services/Query'
 import { Box } from '@mui/material'
 
 export function UserBackups() {
   const { t } = useTranslation()
-  const hasPerm = useStatic((s) => s.auth.perms.backups)
+  const hasPerm = useMemory((s) => s.auth.perms.backups)
 
   /** @type {import('@apollo/client').QueryResult<{ backups: import('@rm/types').Backup[] }>} */
   const { data } = useQuery(Query.user('getBackups'), {
@@ -49,7 +50,7 @@ export function UserBackups() {
 /** @param {{ backups: import('@rm/types').Backup[] }} props */
 function CreateNew({ backups }) {
   const { t } = useTranslation()
-  const userBackupLimits = useStatic((s) => s.auth.userBackupLimits)
+  const userBackupLimits = useMemory((s) => s.auth.userBackupLimits)
   const [name, setName] = React.useState('')
 
   const [create, { loading }] = useMutation(Query.user('createBackup'), {
@@ -73,7 +74,7 @@ function CreateNew({ backups }) {
         }
         onClick={() => {
           create({
-            variables: { backup: { name, data: useStore.getState() } },
+            variables: { backup: { name, data: useStorage.getState() } },
           })
           setName('')
         }}
@@ -160,7 +161,7 @@ function BackupItem({ backup }) {
                 backup: {
                   id: backup.id,
                   name,
-                  data: useStore.getState(),
+                  data: useStorage.getState(),
                 },
               },
             })

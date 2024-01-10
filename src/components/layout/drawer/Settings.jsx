@@ -23,7 +23,8 @@ import LogoDevIcon from '@mui/icons-material/LogoDev'
 
 import { useTranslation } from 'react-i18next'
 
-import { useStore, useStatic, toggleDialog } from '@hooks/useStore'
+import { useMemory, toggleDialog } from '@hooks/useMemory'
+import { useStorage } from '@hooks/useStorage'
 import Utility from '@services/Utility'
 import {
   HAS_API,
@@ -65,10 +66,10 @@ function FCSelect({ name, label, value, onChange, children, icon }) {
 function UniAssetSelect({ asset }) {
   const instanceName = asset === 'icons' ? 'Icons' : 'Audio'
   const { t } = useTranslation()
-  const userSettings = useStore((s) => s[asset])
-  const Asset = useStatic((s) => s[instanceName])
-  const darkMode = useStore((s) => s.darkMode)
-  const Icons = useStatic((s) => s.Icons)
+  const userSettings = useStorage((s) => s[asset])
+  const Asset = useMemory((s) => s[instanceName])
+  const darkMode = useStorage((s) => s.darkMode)
+  const Icons = useMemory((s) => s.Icons)
 
   if (Asset.customizable.length === 0) return null
   return (
@@ -82,8 +83,8 @@ function UniAssetSelect({ asset }) {
           label={t(`${category}_${asset}`, `${category} ${instanceName}`)}
           onChange={({ target }) => {
             Asset.setSelection(target.name, target.value)
-            useStatic.setState({ [instanceName]: Asset })
-            useStore.setState({
+            useMemory.setState({ [instanceName]: Asset })
+            useStorage.setState({
               [asset]: { ...userSettings, [target.name]: target.value },
             })
           }}
@@ -120,14 +121,14 @@ const ICON_MAP = {
 export default function Settings() {
   const { t } = useTranslation()
 
-  const staticSettings = useStatic((s) => s.settings)
-  const separateDrawerActions = useStatic(
+  const staticSettings = useMemory((s) => s.settings)
+  const separateDrawerActions = useMemory(
     (s) => s.config.general.separateDrawerActions,
   )
-  const holidayEffects = useStatic((s) => s.config.holidayEffects) || []
+  const holidayEffects = useMemory((s) => s.config.holidayEffects) || []
 
-  const settings = useStore((s) => s.settings)
-  const darkMode = useStore((s) => s.darkMode)
+  const settings = useStorage((s) => s.settings)
+  const darkMode = useStorage((s) => s.darkMode)
 
   return (
     <>
@@ -141,7 +142,7 @@ export default function Settings() {
             value={staticSettings[setting][settings[setting]]?.name || ''}
             label={t(Utility.camelToSnake(setting))}
             onChange={({ target }) => {
-              useStore.setState((prev) => ({
+              useStorage.setState((prev) => ({
                 settings: {
                   ...prev.settings,
                   [target.name]: staticSettings[target.name][target.value].name,

@@ -1,7 +1,9 @@
+// @ts-check
 import * as React from 'react'
 import { MapContainer } from 'react-leaflet'
 
-import { useStatic, useStore } from '@hooks/useStore'
+import { useMemory } from '@hooks/useMemory'
+import { useStorage } from '@hooks/useStorage'
 import Utility from '@services/Utility'
 
 import Map from './Map'
@@ -21,27 +23,27 @@ import { Effects } from './Effects'
 function setLocationZoom({ target: map }) {
   const { lat, lng } = map.getCenter()
   const zoom = map.getZoom()
-  useStore.setState({ location: [lat, lng], zoom })
-  useStatic.setState({
+  useStorage.setState({ location: [lat, lng], zoom })
+  useMemory.setState({
     timeOfDay: Utility.timeCheck(lat, lng),
   })
   if (map.hasEventListeners('fetchdata')) map.fire('fetchdata')
 }
 
-const MAX_BOUNDS = [
+const MAX_BOUNDS = /** @type {[[number, number], [number, number]]} */ ([
   [-90, -210],
   [90, 210],
-]
+])
 
 export default function Container() {
-  const { location, zoom } = useStore.getState()
+  const { location, zoom } = useStorage.getState()
 
   return (
     <MapContainer
       tap={false}
       center={location}
       ref={(ref) =>
-        useStatic.setState((prev) => {
+        useMemory.setState((prev) => {
           if (ref) {
             ref.attributionControl.setPrefix(
               prev.config.general.attributionPrefix || '',

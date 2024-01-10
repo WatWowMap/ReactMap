@@ -1,7 +1,7 @@
 // @ts-check
 import * as React from 'react'
 import Dialog from '@mui/material/Dialog'
-import { useLayoutStore, useStatic } from '@hooks/useStore'
+import { useLayoutStore, useMemory } from '@hooks/useMemory'
 
 /**
  *
@@ -21,7 +21,7 @@ export function DialogWrapper({
   ...props
 }) {
   const open = useLayoutStore((s) => s[dialog])
-  const isMobile = useStatic((s) => s.isMobile)
+  const isMobile = useMemory((s) => s.isMobile)
 
   const handleClose = React.useCallback(
     () => useLayoutStore.setState({ [dialog]: false }),

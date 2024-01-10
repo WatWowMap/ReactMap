@@ -19,16 +19,17 @@ import { useTranslation } from 'react-i18next'
 import RestartAltIcon from '@mui/icons-material/RestartAlt'
 
 import Query from '@services/Query'
-import { useStatic, useStore } from '@hooks/useStore'
+import { useMemory } from '@hooks/useMemory'
+import { useStorage } from '@hooks/useStorage'
 import AreaTile from './AreaTile'
 import { GenericSearch } from './ItemSearch'
 
 function AreaDropDown() {
   const { data, loading, error } = useQuery(Query.scanAreasMenu())
   const { t } = useTranslation()
-  const filters = useStore((s) => s.filters)
-  const { setAreas } = useStore.getState()
-  const { config } = useStatic.getState()
+  const filters = useStorage((s) => s.filters)
+  const { setAreas } = useStorage.getState()
+  const { config } = useMemory.getState()
   const map = useMap()
   const [open, setOpen] = React.useState('')
 

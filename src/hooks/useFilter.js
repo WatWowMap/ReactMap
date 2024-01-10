@@ -1,7 +1,8 @@
 import { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 
-import { useGetDeepStore, useStatic } from '@hooks/useStore'
+import { useMemory } from '@hooks/useMemory'
+import { useGetDeepStore } from '@hooks/useStorage'
 
 const filteringPokemon = [
   'pokemon',
@@ -24,7 +25,7 @@ export default function useFilter(
     auth: { perms },
     masterfile: { pokemon },
     menuFilters,
-  } = useStatic.getState()
+  } = useMemory.getState()
 
   const {
     filters: {
@@ -248,7 +249,7 @@ export default function useFilter(
     })
   })
 
-  useEffect(() => () => useStatic.setState({ excludeList: [] }))
+  useEffect(() => () => useMemory.setState({ excludeList: [] }))
 
   return { filteredArr, count }
 }

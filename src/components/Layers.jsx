@@ -3,7 +3,7 @@ import * as React from 'react'
 import { TileLayer, useMap } from 'react-leaflet'
 import { control } from 'leaflet'
 
-import { useStore } from '@hooks/useStore'
+import { useStorage } from '@hooks/useStorage'
 import useTileLayer from '@hooks/useTileLayer'
 
 export function ControlledTileLayer() {
@@ -13,7 +13,7 @@ export function ControlledTileLayer() {
 
 export function ControlledZoomLayer() {
   const map = useMap()
-  const navSetting = useStore(
+  const navSetting = useStorage(
     (state) => state.settings.navigationControls === 'leaflet',
   )
 
@@ -31,7 +31,7 @@ export function ControlledZoomLayer() {
 
 export function ControlledLocate() {
   const map = useMap()
-  const navSetting = useStore(
+  const navSetting = useStorage(
     (state) => state.settings.navigationControls === 'leaflet',
   )
 

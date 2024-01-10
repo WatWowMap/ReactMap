@@ -3,7 +3,8 @@
 import * as React from 'react'
 import { GeoJSON } from 'react-leaflet'
 
-import { basicEqualFn, useStore } from '@hooks/useStore'
+import { basicEqualFn } from '@hooks/useMemory'
+import { useStorage } from '@hooks/useStorage'
 import Utility from '@services/Utility'
 import { useWebhookStore } from '@components/layout/dialogs/webhooks/store'
 import { handleClick } from '@components/layout/dialogs/webhooks/human/area/AreaChip'
@@ -15,8 +16,8 @@ import { Polygon } from 'leaflet'
  * @returns
  */
 export function ScanAreaTile(featureCollection) {
-  const search = useStore((s) => s.filters.scanAreas?.filter?.search)
-  const [tapToToggle, alwaysShowLabels] = useStore(
+  const search = useStorage((s) => s.filters.scanAreas?.filter?.search)
+  const [tapToToggle, alwaysShowLabels] = useStorage(
     (s) => [
       s.userSettings.scanAreas.tapToToggle,
       s.userSettings.scanAreas.alwaysShowLabels,
@@ -50,7 +51,7 @@ export function ScanAreaTile(featureCollection) {
               })
             })
           } else if (!manual && tapToToggle) {
-            const { filters, setAreas } = useStore.getState()
+            const { filters, setAreas } = useStorage.getState()
             const includes = filters?.scanAreas?.filter?.areas?.includes(key)
             layer.setStyle({ fillOpacity: includes ? 0.2 : 0.8 })
             setAreas(
@@ -87,8 +88,8 @@ export function ScanAreaTile(featureCollection) {
                           (area) => area.toLowerCase() === name?.toLowerCase(),
                         )
                     : (
-                        useStore.getState().filters?.scanAreas?.filter?.areas ||
-                        []
+                        useStorage.getState().filters?.scanAreas?.filter
+                          ?.areas || []
                       ).includes(webhookMode ? name : key)
                 )
                   ? 0.8

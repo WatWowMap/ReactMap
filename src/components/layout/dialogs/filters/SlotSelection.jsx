@@ -7,13 +7,8 @@ import DialogContent from '@mui/material/DialogContent'
 import IconButton from '@mui/material/IconButton'
 import Divider from '@mui/material/Divider'
 
-import {
-  basicEqualFn,
-  useDeepStore,
-  useLayoutStore,
-  useStatic,
-  useStore,
-} from '@hooks/useStore'
+import { basicEqualFn, useLayoutStore, useMemory } from '@hooks/useMemory'
+import { useStorage, useDeepStore } from '@hooks/useStorage'
 import { Img } from '@components/layout/general/Img'
 import { DualBoolToggle } from '@components/layout/drawer/BoolToggle'
 import { ENABLED_ALL } from '@assets/constants'
@@ -28,19 +23,19 @@ export default function SlotSelection() {
     const team = s.slotSelection.slice(1).split('-', 1)[0]
     return [s.slotSelection, team, !!s.slotSelection]
   }, basicEqualFn)
-  const slots = useStatic(
+  const slots = useMemory(
     (s) =>
       Object.keys(s.filters.gyms.filter).filter(
         (g) => g.startsWith('g') && g.charAt(1) === teamId,
       ),
     basicEqualFn,
   )
-  const disabled = useStore((s) => s.filters.gyms.filter[id]?.all)
+  const disabled = useStorage((s) => s.filters.gyms.filter[id]?.all)
 
   /** @type {(value: boolean | import('packages/types/lib').BaseFilter['size'], team: string) => void} */
   const handleSizeChange = React.useCallback(
     (value, team) => {
-      useStore.setState((prev) => {
+      useStorage.setState((prev) => {
         const slotsObj = { ...prev.filters.gyms.filter }
         if (typeof value === 'boolean') {
           slotsObj[team] = { ...slotsObj[team], enabled: value }
@@ -143,7 +138,7 @@ export default function SlotSelection() {
  * @returns
  */
 function SlotAdjustor({ id, children, onClick }) {
-  const icon = useStatic((s) => s.Icons.getGyms(...id.slice(1).split('-')))
+  const icon = useMemory((s) => s.Icons.getGyms(...id.slice(1).split('-')))
   return (
     <Grid2 container xs={12} sm={6} alignItems="center">
       <Grid2 xs={2}>

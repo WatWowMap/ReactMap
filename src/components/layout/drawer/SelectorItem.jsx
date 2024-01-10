@@ -8,12 +8,8 @@ import Box from '@mui/material/Box'
 import Typography from '@mui/material/Typography'
 
 import { useTranslateById } from '@hooks/useTranslateById'
-import {
-  useDeepStore,
-  useLayoutStore,
-  useStatic,
-  useStore,
-} from '@hooks/useStore'
+import { useLayoutStore, useMemory } from '@hooks/useMemory'
+import { useStorage, useDeepStore } from '@hooks/useStorage'
 import { Img } from '../general/Img'
 import { ColoredTile } from '../general/ColoredTile'
 import { useWebhookStore } from '../dialogs/webhooks/store'
@@ -116,8 +112,8 @@ export function SelectorItem({
 }) {
   const { t } = useTranslateById({ alt: true, newLine: true })
   const title = t(id)
-  const url = useStatic((s) => s.Icons.getIconById(id))
-  const easyMode = useStore((s) => !!s.filters[category]?.easyMode)
+  const url = useMemory((s) => s.Icons.getIconById(id))
+  const easyMode = useStorage((s) => !!s.filters[category]?.easyMode)
 
   const hasAll =
     category === 'pokemon' || category === 'pokestops' || id.startsWith('t')

@@ -1,4 +1,4 @@
-import { useStatic } from '@hooks/useStore'
+import { useMemory } from '@hooks/useMemory'
 import { divIcon } from 'leaflet'
 
 export default function weatherMarker(iconUrl) {
@@ -11,7 +11,7 @@ export default function weatherMarker(iconUrl) {
       sizeMultiplier,
       disableColorShift = false,
     },
-  ] = useStatic.getState().Icons.getModifiers('weather')
+  ] = useMemory.getState().Icons.getModifiers('weather')
 
   return divIcon({
     iconAnchor: [17 * offsetX, 17 * offsetY],

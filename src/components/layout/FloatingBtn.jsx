@@ -26,7 +26,8 @@ import { DomEvent } from 'leaflet'
 
 import { FAB_BUTTONS } from '@services/queries/config'
 import useLocation from '@hooks/useLocation'
-import { useLayoutStore, useStatic, useStore } from '@hooks/useStore'
+import { useLayoutStore, useMemory } from '@hooks/useMemory'
+import { useStorage } from '@hooks/useStorage'
 import { useScanStore } from './dialogs/scanner/store'
 
 import { I } from './general/I'
@@ -73,12 +74,12 @@ export function FloatingButtons() {
   const map = useMap()
   const { lc, color } = useLocation()
 
-  const reactControls = useStore(
+  const reactControls = useStorage(
     (s) => s.settings.navigationControls === 'react',
   )
 
-  const isMobile = useStatic((s) => s.isMobile)
-  const online = useStatic((s) => s.online)
+  const isMobile = useMemory((s) => s.isMobile)
+  const online = useMemory((s) => s.online)
 
   const webhookMode = useWebhookStore((s) => s.mode)
 

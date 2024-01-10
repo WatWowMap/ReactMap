@@ -19,7 +19,7 @@ import { setHuman } from '@services/queries/webhook'
 import { WEBHOOK_NOMINATIM } from '@services/queries/geocoder'
 import useLocation from '@hooks/useLocation'
 import { Loading } from '@components/layout/general/Loading'
-import { basicEqualFn } from '@hooks/useStore'
+import { basicEqualFn } from '@hooks/useMemory'
 
 import { setModeBtn, useWebhookStore } from '../store'
 import { useSyncData } from '../hooks'

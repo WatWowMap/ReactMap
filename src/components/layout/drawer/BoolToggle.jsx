@@ -5,7 +5,7 @@ import ListItemText from '@mui/material/ListItemText'
 import Switch from '@mui/material/Switch'
 import List from '@mui/material/List'
 
-import { useDeepStore } from '@hooks/useStore'
+import { useDeepStore } from '@hooks/useStorage'
 import { useTranslation } from 'react-i18next'
 import Grid2 from '@mui/material/Unstable_Grid2/Grid2'
 import Utility from '@services/Utility'
@@ -13,7 +13,7 @@ import { fromSnakeCase } from '@services/functions/fromSnakeCase'
 
 /**
  * @typedef {{
- *  field: import('@hooks/useStore').UseStorePaths,
+ *  field: import('@hooks/useStorage').UseStoragePaths,
  *  label?: string,
  *  disabled?: boolean,
  *  children?: React.ReactNode,

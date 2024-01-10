@@ -5,7 +5,8 @@ import { Marker, Popup, Circle } from 'react-leaflet'
 import { t } from 'i18next'
 
 import useMarkerTimer from '@hooks/useMarkerTimer'
-import { basicEqualFn, useStatic, useStore } from '@hooks/useStore'
+import { basicEqualFn, useMemory } from '@hooks/useMemory'
+import { useStorage } from '@hooks/useStorage'
 import useOpacity from '@hooks/useOpacity'
 import useForcePopup from '@hooks/useForcePopup'
 import { sendNotification } from '@services/desktopNotification'
@@ -49,10 +50,10 @@ const GymTile = (gym) => {
     raidIconUrl,
     raidIconSize,
     audio,
-  ] = useStatic((s) => {
+  ] = useMemory((s) => {
     const newTs = Date.now() / 1000
     const { excludeList, timerList, config, Icons, Audio } = s
-    const { filters, userSettings } = useStore.getState()
+    const { filters, userSettings } = useStorage.getState()
 
     const filledSlots =
       gym.available_slots !== null ? 6 - gym.available_slots : 0
@@ -129,7 +130,7 @@ const GymTile = (gym) => {
     showExBadge,
     showArBadge,
     showRaidLevel,
-  ] = useStore((s) => {
+  ] = useStorage((s) => {
     const { userSettings, filters, zoom } = s
     return [
       (userSettings.gyms.raidTimers || inTimerList) && hasRaid,

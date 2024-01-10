@@ -3,7 +3,8 @@
 import * as React from 'react'
 import { Popup, Polyline, Marker } from 'react-leaflet'
 
-import { basicEqualFn, useStatic, useStore } from '@hooks/useStore'
+import { basicEqualFn, useMemory } from '@hooks/useMemory'
+import { useStorage } from '@hooks/useStorage'
 
 import weatherMarker from '../markers/weather'
 import PopupContent from '../popups/Weather'
@@ -17,14 +18,14 @@ const WeatherTile = (weather) => {
   const [popup, setPopup] = React.useState(false)
   const markerRef = React.useRef(null)
 
-  const [darkTiles, iconUrl] = useStatic(
+  const [darkTiles, iconUrl] = useMemory(
     (s) => [
       s.tileStyle === 'dark',
       s.Icons.getWeather(weather.gameplay_condition, s.timeOfDay),
     ],
     basicEqualFn,
   )
-  const color = useStore((s) =>
+  const color = useStorage((s) =>
     darkTiles
       ? s.userSettings.weather.darkMapBorder
       : s.userSettings.weather.lightMapBorder,

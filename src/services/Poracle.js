@@ -1,7 +1,7 @@
 // @ts-check
 import { t } from 'i18next'
 import { useWebhookStore } from '@components/layout/dialogs/webhooks/store'
-import { useStatic } from '@hooks/useStore'
+import { useMemory } from '@hooks/useMemory'
 
 export default class Poracle {
   static getMapCategory(poracleCategory) {
@@ -50,7 +50,7 @@ export default class Poracle {
 
   static getId(item) {
     if (!item) return ''
-    const { invasions } = useStatic.getState().masterfile
+    const { invasions } = useMemory.getState().masterfile
     const { category } = useWebhookStore.getState()
 
     switch (category) {

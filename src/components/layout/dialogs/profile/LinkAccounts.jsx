@@ -7,7 +7,7 @@ import Select from '@mui/material/Select'
 import MenuItem from '@mui/material/MenuItem'
 import Typography from '@mui/material/Typography'
 
-import { useStatic } from '@hooks/useStore'
+import { useMemory } from '@hooks/useMemory'
 import Utility from '@services/Utility'
 import Query from '@services/Query'
 import { METHODS } from '@assets/constants'
@@ -18,8 +18,8 @@ import Notification from '../../general/Notification'
 
 export function LinkAccounts() {
   const { t } = useTranslation()
-  const auth = useStatic((s) => s.auth)
-  const { discordAuthUrl, telegramAuthUrl, telegramBotName } = useStatic(
+  const auth = useMemory((s) => s.auth)
+  const { discordAuthUrl, telegramAuthUrl, telegramBotName } = useMemory(
     (state) => state.config.customRoutes,
   )
 
@@ -70,7 +70,7 @@ export function LinkAccounts() {
                       strategy: e.target.value,
                     },
                   })
-                  useStatic.setState((prev) => ({
+                  useMemory.setState((prev) => ({
                     auth: { ...prev.auth, webhookStrategy: e.target.value },
                   }))
                   setRefreshing(true)

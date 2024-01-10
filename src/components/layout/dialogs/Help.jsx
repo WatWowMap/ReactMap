@@ -1,7 +1,7 @@
 // @ts-check
 import * as React from 'react'
 
-import { useLayoutStore } from '@hooks/useStore'
+import { useLayoutStore } from '@hooks/useMemory'
 
 import Help from './tutorial/Advanced'
 import { DialogWrapper } from './DialogWrapper'

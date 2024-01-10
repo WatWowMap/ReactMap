@@ -6,7 +6,7 @@ import FormatSize from '@mui/icons-material/FormatSize'
 import Settings from '@mui/icons-material/Settings'
 import { Grid, IconButton, Typography } from '@mui/material'
 import Utility from '@services/Utility'
-import { useLayoutStore } from '@hooks/useStore'
+import { useLayoutStore } from '@hooks/useMemory'
 
 export default function MenuTile({ data, rowIndex, columnIndex, style }) {
   const [name, setName] = useState(true)

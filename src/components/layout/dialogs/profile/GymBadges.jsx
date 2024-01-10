@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next'
 import { useQuery } from '@apollo/client'
 import { useMap } from 'react-leaflet'
 
-import { useLayoutStore, useStatic } from '@hooks/useStore'
+import { useLayoutStore, useMemory } from '@hooks/useMemory'
 import Query from '@services/Query'
 
 import { VirtualGrid } from '@components/layout/general/VirtualGrid'
@@ -70,7 +70,7 @@ export function UserGymBadges() {
 function BadgeTile({ badge, ...gym }) {
   const { t } = useTranslation()
   const map = useMap()
-  const badgeIcon = useStatic((s) => s.Icons.getMisc(`badge_${badge}`))
+  const badgeIcon = useMemory((s) => s.Icons.getMisc(`badge_${badge}`))
 
   return badge ? (
     <Box className="vgrid-item">

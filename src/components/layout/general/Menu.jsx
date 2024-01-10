@@ -7,7 +7,8 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import Collapse from '@mui/material/Collapse'
 import IconButton from '@mui/material/IconButton'
 import Utility from '@services/Utility'
-import { useStore, useStatic, useLayoutStore } from '@hooks/useStore'
+import { useMemory, useLayoutStore } from '@hooks/useMemory'
+import { useStorage } from '@hooks/useStorage'
 import useFilter from '@hooks/useFilter'
 import Header from '@components/layout/general/Header'
 import Footer from '@components/layout/general/Footer'
@@ -42,9 +43,9 @@ export default function Menu({
 }) {
   Utility.analytics(`/advanced/${category}`)
 
-  const isMobile = useStatic((s) => s.isMobile)
+  const isMobile = useMemory((s) => s.isMobile)
   const { t } = useTranslation()
-  const menus = useStore((state) => state.menus)
+  const menus = useStorage((state) => state.menus)
 
   const [filterDrawer, setFilterDrawer] = useState(false)
 

@@ -2,14 +2,15 @@
 import * as React from 'react'
 import Menu from '@components/layout/general/Menu'
 
-import { toggleDialog, useLayoutStore, useStore } from '@hooks/useStore'
+import { toggleDialog, useLayoutStore } from '@hooks/useMemory'
+import { useStorage } from '@hooks/useStorage'
 import { StandardItem } from '@components/layout/drawer/SelectorItem'
 
 import { DialogWrapper } from '../DialogWrapper'
 
 export default function FilterMenu() {
   const { open, category, type } = useLayoutStore((s) => s.dialog)
-  const filters = useStore((s) => s.filters[category])
+  const filters = useStorage((s) => s.filters[category])
 
   const [tempFilters, setTempFilters] = React.useState(filters?.filter)
 

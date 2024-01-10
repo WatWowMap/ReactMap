@@ -2,7 +2,8 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { setUser } from '@sentry/react'
 
-import { useStatic, useStore } from '@hooks/useStore'
+import { useMemory } from '@hooks/useMemory'
+import { useStorage } from '@hooks/useStorage'
 import Fetch from '@services/Fetch'
 import { setLoadingText } from '@services/functions/setLoadingText'
 import Utility from '@services/Utility'
@@ -41,7 +42,7 @@ export default function Config({ children }) {
         })
       }
 
-      /** @type {{ state: import('@hooks/useStore').UseStore}} */
+      /** @type {{ state: import('@hooks/useMemory').UseStorage}} */
       const localState = JSON.parse(
         localStorage.getItem('local-state') || '{ "state": {} }',
       )
@@ -91,7 +92,7 @@ export default function Config({ children }) {
       useScannerSessionStorage.setState((prev) => ({
         cooldown: Math.max(prev.cooldown, data.user.cooldown || 0),
       }))
-      useStatic.setState({
+      useMemory.setState({
         auth: {
           strategy: data.user?.strategy || '',
           discordId: data.user?.discordId || '',
@@ -126,7 +127,7 @@ export default function Config({ children }) {
         tutorialExcludeList: data.authentication.excludeFromTutorial || [],
       })
 
-      useStore.setState((prev) => ({
+      useStorage.setState((prev) => ({
         tutorial:
           !localState?.state?.tutorial || data.user.tutorial === undefined
             ? !!localState?.state?.tutorial

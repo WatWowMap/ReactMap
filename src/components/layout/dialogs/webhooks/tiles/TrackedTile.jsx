@@ -5,7 +5,7 @@ import { Grid, Typography, IconButton, Checkbox, Box } from '@mui/material'
 
 import Utility from '@services/Utility'
 import Poracle from '@services/Poracle'
-import { useStatic } from '@hooks/useStore'
+import { useMemory } from '@hooks/useMemory'
 import { apolloClient, apolloCache } from '@services/apollo'
 import * as webhookNodes from '@services/queries/webhook'
 
@@ -58,7 +58,7 @@ export default function TrackedTile({ index }) {
     >
       <Grid item xs={2} sm={1}>
         <img
-          src={useStatic.getState().Icons.getIconById(id)}
+          src={useMemory.getState().Icons.getIconById(id)}
           alt={id}
           style={{ maxWidth: 40, maxHeight: 40 }}
         />

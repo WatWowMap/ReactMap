@@ -6,7 +6,7 @@ import { useMutation } from '@apollo/client'
 import { useTranslation } from 'react-i18next'
 
 import Query from '@services/Query'
-import { useLayoutStore, useStatic } from '@hooks/useStore'
+import { useLayoutStore, useMemory } from '@hooks/useMemory'
 
 import Header from '../general/Header'
 import Footer from '../general/Footer'
@@ -43,7 +43,7 @@ export default function NestSubmission({ id, name }) {
 
   React.useEffect(() => {
     if (error) {
-      useStatic.setState({
+      useMemory.setState({
         webhookAlert: {
           open: true,
           severity: 'error',

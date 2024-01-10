@@ -4,7 +4,7 @@ import { ListItem, TextField } from '@mui/material'
 import { useTranslation } from 'react-i18next'
 import dlv from 'dlv'
 
-import { useStore } from '@hooks/useStore'
+import { useStorage } from '@hooks/useStorage'
 import { setDeep } from '@services/functions/setDeep'
 import Utility from '@services/Utility'
 
@@ -15,7 +15,7 @@ import Utility from '@services/Utility'
  */
 export function StringFilter({ field, ...props }) {
   const { t } = useTranslation()
-  const value = useStore((s) => dlv(s, `${field}.adv`))
+  const value = useStorage((s) => dlv(s, `${field}.adv`))
 
   const [validation, setValidation] = React.useState({
     status: false,
@@ -48,7 +48,7 @@ export function StringFilter({ field, ...props }) {
               message: t('invalid_filter'),
             })
           }
-          useStore.setState((prev) => setDeep(prev, `${field}.adv`, newValue))
+          useStorage.setState((prev) => setDeep(prev, `${field}.adv`, newValue))
         },
         [field],
       )

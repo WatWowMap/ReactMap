@@ -4,12 +4,12 @@ import Grid2 from '@mui/material/Unstable_Grid2/Grid2'
 import TextField from '@mui/material/TextField'
 import { useMutation } from '@apollo/client'
 
-import { useStatic } from '@hooks/useStore'
+import { useMemory } from '@hooks/useMemory'
 import Query from '@services/Query'
 import { useTranslation } from 'react-i18next'
 
 export function ExtraUserFields() {
-  const fields = useStatic((s) => s.extraUserFields)
+  const fields = useMemory((s) => s.extraUserFields)
   return fields?.length ? (
     <Grid2 container alignItems="center" justifyContent="center">
       {fields.map((field) => (
@@ -30,7 +30,7 @@ export function FieldValue({ field }) {
   const key = typeof field === 'string' ? field : field.database
   const disabled = typeof field === 'string' ? false : field.disabled
 
-  const value = useStatic((s) => s.auth.data?.[key] || '')
+  const value = useMemory((s) => s.auth.data?.[key] || '')
   const [setField] = useMutation(Query.user('setExtraFields'))
 
   if (!key || !label) return null
@@ -42,7 +42,7 @@ export function FieldValue({ field }) {
         label={label}
         value={value}
         onChange={({ target }) => {
-          useStatic.setState((prev) => ({
+          useMemory.setState((prev) => ({
             auth: {
               ...prev.auth,
               data: {

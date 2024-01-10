@@ -10,7 +10,8 @@ import { useTheme } from '@mui/material/styles'
 import { useTranslation } from 'react-i18next'
 import { useMutation } from '@apollo/client'
 
-import { useStatic, useStore } from '@hooks/useStore'
+import { useMemory } from '@hooks/useMemory'
+import { useStorage } from '@hooks/useStorage'
 import Query from '@services/Query'
 import Header from '@components/layout/general/Header'
 
@@ -27,8 +28,8 @@ export default function Tutorial() {
   const theme = useTheme()
   const { t } = useTranslation()
   const isMobile = useMediaQuery(theme.breakpoints.only('xs'))
-  const tutorial = useStore((s) => s.tutorial)
-  const enableTutorial = useStatic((s) => s.config.misc.enableTutorial)
+  const tutorial = useStorage((s) => s.tutorial)
+  const enableTutorial = useMemory((s) => s.config.misc.enableTutorial)
 
   const [activeStep, setActiveStep] = useState(0)
   const [prevStep, setPrevStep] = useState(0)
@@ -46,7 +47,7 @@ export default function Tutorial() {
   }
 
   const handleTutClose = () => {
-    useStore.setState({ tutorial: false })
+    useStorage.setState({ tutorial: false })
     setTutorialInDb({ variables: { tutorial: true } })
   }
 

@@ -1,7 +1,8 @@
 // @ts-check
 /* eslint-disable no-nested-ternary */
 import { divIcon } from 'leaflet'
-import { basicEqualFn, useStatic, useStore } from '@hooks/useStore'
+import { basicEqualFn, useMemory } from '@hooks/useMemory'
+import { useStorage } from '@hooks/useStorage'
 import useOpacity from '@hooks/useOpacity'
 
 /**
@@ -26,13 +27,13 @@ export default function usePokestopMarker({
   invasions,
   quests,
 }) {
-  const [, Icons] = useStore(
-    (s) => [s.icons, useStatic.getState().Icons],
+  const [, Icons] = useStorage(
+    (s) => [s.icons, useMemory.getState().Icons],
     (a, b) => Object.entries(a[0]).every(([k, v]) => b[0][k] === v),
   )
 
   const getOpacity = useOpacity('pokestops', 'invasion')
-  const [showArBadge, baseIcon, baseSize] = useStore((s) => {
+  const [showArBadge, baseIcon, baseSize] = useStorage((s) => {
     const { filters, userSettings } = s
     return [
       userSettings.pokestops.showArBadge,
@@ -55,7 +56,7 @@ export default function usePokestopMarker({
         : Icons.getSize('pokestop', filters.pokestops.filter.s0?.size),
     ]
   }, basicEqualFn)
-  const filters = useStore((s) => s.filters.pokestops.filter)
+  const filters = useStorage((s) => s.filters.pokestops.filter)
 
   const [invasionMod, pokestopMod, rewardMod, eventMod] = Icons.getModifiers(
     'invasion',

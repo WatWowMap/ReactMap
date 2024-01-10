@@ -8,7 +8,7 @@ import ListItem from '@mui/material/ListItem'
 import ListItemText from '@mui/material/ListItemText'
 import ListItemIcon from '@mui/material/ListItemIcon'
 
-import { useLayoutStore, useStatic } from '@hooks/useStore'
+import { useLayoutStore, useMemory } from '@hooks/useMemory'
 
 import Actions from './Actions'
 import { DrawerSectionMemo } from './Section'
@@ -19,7 +19,7 @@ const handleClose = () => useLayoutStore.setState({ drawer: false })
 
 const DrawerHeader = React.memo(
   () => {
-    const title = useStatic((s) => s.config.general.title)
+    const title = useMemory((s) => s.config.general.title)
     return (
       <ListItem disablePadding>
         <ListItemIcon sx={{ pl: 1.5 }}>
@@ -49,7 +49,7 @@ const listItemSx = /** @type {import('@mui/material').SxProps} */ ({
 
 export default function Sidebar() {
   const drawer = useLayoutStore((s) => s.drawer)
-  const { config, ui } = useStatic.getState()
+  const { config, ui } = useMemory.getState()
 
   return (
     <Drawer

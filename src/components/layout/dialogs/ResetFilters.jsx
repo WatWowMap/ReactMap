@@ -5,7 +5,7 @@ import Button from '@mui/material/Button'
 import { Navigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 
-import { useLayoutStore } from '@hooks/useStore'
+import { useLayoutStore } from '@hooks/useMemory'
 
 import Header from '../general/Header'
 import Footer from '../general/Footer'

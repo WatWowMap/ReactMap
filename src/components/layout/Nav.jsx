@@ -1,6 +1,6 @@
 import * as React from 'react'
 
-import { useStatic } from '@hooks/useStore'
+import { useMemory } from '@hooks/useMemory'
 
 import { FloatingButtonsMemo } from './FloatingBtn'
 import Sidebar from './drawer/Drawer'
@@ -25,7 +25,7 @@ import { HelpDialog } from './dialogs/Help'
 
 export const Nav = React.memo(
   () => {
-    const iconsIsReady = useStatic((s) => !!s.Icons)
+    const iconsIsReady = useMemory((s) => !!s.Icons)
     if (!iconsIsReady) return null
     return (
       <>

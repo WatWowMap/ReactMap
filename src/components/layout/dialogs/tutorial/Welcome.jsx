@@ -5,13 +5,13 @@ import { DialogContent, Grid, Typography, Fab } from '@mui/material'
 
 import { useTranslation } from 'react-i18next'
 
-import { useLayoutStore, useStatic } from '@hooks/useStore'
+import { useLayoutStore, useMemory } from '@hooks/useMemory'
 import LocaleSelection from '@components/layout/general/LocaleSelection'
 
 export default function TutWelcome() {
   const { t } = useTranslation()
-  const { methods, loggedIn } = useStatic((state) => state.auth)
-  const permStatus = useStatic((s) => {
+  const { methods, loggedIn } = useMemory((state) => state.auth)
+  const permStatus = useMemory((s) => {
     let have = 0
     let total = 0
     Object.entries(s.auth.perms).forEach(([perm, value]) => {
@@ -37,7 +37,7 @@ export default function TutWelcome() {
     })
     return `${have} / ${total}`
   })
-  const enableUserProfile = useStatic(
+  const enableUserProfile = useMemory(
     (state) => state.config.misc.enableUserProfile,
   )
 

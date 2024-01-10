@@ -4,13 +4,13 @@ import genPokemon from '@services/filtering/genPokemon'
 import genGyms from '@services/filtering/genGyms'
 import genPokestops from '@services/filtering/genPokestops'
 
-import { useStatic } from '@hooks/useStore'
+import { useMemory } from '@hooks/useMemory'
 
 export default function useGenerate() {
-  const pokemon = useStatic((s) => s.masterfile.pokemon)
-  const gyms = useStatic((s) => s.filters.gyms)
-  const pokestops = useStatic((s) => s.filters.pokestops)
-  const staticMenus = useStatic((s) => s.menus)
+  const pokemon = useMemory((s) => s.masterfile.pokemon)
+  const gyms = useMemory((s) => s.filters.gyms)
+  const pokestops = useMemory((s) => s.filters.pokestops)
+  const staticMenus = useMemory((s) => s.menus)
 
   useEffect(() => {
     const pokeFilters = genPokemon(pokemon, staticMenus.pokemon.categories)
@@ -21,7 +21,7 @@ export default function useGenerate() {
       staticMenus.pokestops.categories,
     )
 
-    useStatic.setState({
+    useMemory.setState({
       menuFilters: { ...gymFilters, ...stopFilters, ...pokeFilters },
     })
   }, [pokemon, gyms, pokestops, staticMenus])

@@ -18,7 +18,8 @@ import FeedbackIcon from '@mui/icons-material/Feedback'
 import HeartIcon from '@mui/icons-material/Favorite'
 import { downloadJson } from '@services/functions/downloadJson'
 
-import { useStore, useStatic, useLayoutStore } from '@hooks/useStore'
+import { useMemory, useLayoutStore } from '@hooks/useMemory'
+import { useStorage } from '@hooks/useStorage'
 import { I } from '../general/I'
 
 const importSettings = (e) => {
@@ -60,7 +61,7 @@ export default function DrawerActions() {
   const {
     auth: { loggedIn, methods },
     config,
-  } = useStatic.getState()
+  } = useMemory.getState()
 
   return (
     <List>
@@ -75,7 +76,7 @@ export default function DrawerActions() {
         </ListItemButton>
       )}
       {config.misc.enableTutorial && (
-        <ListItemButton onClick={() => useStore.setState({ tutorial: true })}>
+        <ListItemButton onClick={() => useStorage.setState({ tutorial: true })}>
           <ListItemIcon>
             <HelpOutlineIcon color="secondary" />
           </ListItemIcon>

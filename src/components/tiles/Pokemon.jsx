@@ -7,7 +7,8 @@ import { t } from 'i18next'
 import useMarkerTimer from '@hooks/useMarkerTimer'
 import { getOffset } from '@services/functions/offset'
 import { getBadge } from '@services/functions/getBadge'
-import { basicEqualFn, useStatic, useStore } from '@hooks/useStore'
+import { basicEqualFn, useMemory } from '@hooks/useMemory'
+import { useStorage } from '@hooks/useStorage'
 import useOpacity from '@hooks/useOpacity'
 import useForcePopup from '@hooks/useForcePopup'
 import Utility from '@services/Utility'
@@ -33,7 +34,7 @@ const OPERATOR =
  * @returns
  */
 const getGlowStatus = (pkmn, userSettings) => {
-  const staticUserSettings = useStatic.getState().userSettings.pokemon
+  const staticUserSettings = useMemory.getState().userSettings.pokemon
   let glowCount = 0
   let glowValue
   Object.entries(staticUserSettings.glow.sub).forEach((rule) => {
@@ -77,7 +78,7 @@ const PokemonTile = (pkmn) => {
     showSize,
     showInteractionRange,
     filterSize,
-  ] = useStore((s) => {
+  ] = useStorage((s) => {
     const {
       pokemonTimers,
       glow,
@@ -110,7 +111,7 @@ const PokemonTile = (pkmn) => {
     configZoom,
     timeOfDay,
     cry,
-  ] = useStatic((s) => {
+  ] = useMemory((s) => {
     const { Icons, excludeList, timerList, config, map, Audio } = s
     const badgeId = getBadge(pkmn.bestPvp)
     return [

@@ -10,7 +10,8 @@ import { useQuery } from '@apollo/client'
 import { useTranslation } from 'react-i18next'
 
 import WeatherPopup from '@components/popups/Weather'
-import { useStatic, useStore } from '@hooks/useStore'
+import { useMemory } from '@hooks/useMemory'
+import { useStorage } from '@hooks/useStorage'
 import getAllWeather from '@services/queries/weather'
 import { getQueryArgs } from '@services/functions/getQueryArgs'
 
@@ -38,13 +39,13 @@ const ImgSx = {
 }
 
 export default function ActiveWeather() {
-  const weatherEnabled = useStore((s) => s.filters?.weather?.enabled ?? false)
-  const location = useStore((state) => state.location)
-  const Icons = useStatic((state) => state.Icons)
-  const clickable = useStore((s) => s.userSettings?.weather?.clickableIcon)
-  const timeOfDay = useStatic((s) => s.timeOfDay)
-  const zoom = useStore((s) => s.zoom)
-  const allowedZoom = useStatic((s) => s.config.general.activeWeatherZoom)
+  const weatherEnabled = useStorage((s) => s.filters?.weather?.enabled ?? false)
+  const location = useStorage((state) => state.location)
+  const Icons = useMemory((state) => state.Icons)
+  const clickable = useStorage((s) => s.userSettings?.weather?.clickableIcon)
+  const timeOfDay = useMemory((s) => s.timeOfDay)
+  const zoom = useStorage((s) => s.zoom)
+  const allowedZoom = useMemory((s) => s.config.general.activeWeatherZoom)
   const { t } = useTranslation()
 
   const { data, previousData } = useQuery(getAllWeather, {
@@ -53,7 +54,7 @@ export default function ActiveWeather() {
     variables: {
       ...getQueryArgs(),
       filters: {
-        onlyAreas: useStore.getState().filters.scanAreas?.filter?.areas || [],
+        onlyAreas: useStorage.getState().filters.scanAreas?.filter?.areas || [],
       },
     },
   })

@@ -3,7 +3,8 @@ import * as React from 'react'
 import { useQuery } from '@apollo/client'
 import { useMap } from 'react-leaflet'
 
-import { useStatic, useStore } from '@hooks/useStore'
+import { useMemory } from '@hooks/useMemory'
+import { useStorage } from '@hooks/useStorage'
 import { usePermCheck } from '@hooks/usePermCheck'
 import Query from '@services/Query'
 import { getQueryArgs } from '@services/functions/getQueryArgs'
@@ -40,7 +41,7 @@ const userSettingsCategory = (category) => {
  * @returns
  */
 const trimFilters = (requestedFilters, userSettings, category, onlyAreas) => {
-  const { filters: staticFilters } = useStatic.getState()
+  const { filters: staticFilters } = useMemory.getState()
   const easyMode = !!requestedFilters?.easyMode
   const trimmed = {
     onlyLegacy: userSettings?.legacyFilter,
@@ -76,7 +77,7 @@ const trimFilters = (requestedFilters, userSettings, category, onlyAreas) => {
 
 export default function FilterPermCheck({ category }) {
   const valid = usePermCheck(category)
-  const error = useStatic((state) => state.clientError)
+  const error = useMemory((state) => state.clientError)
 
   if (!valid || error) {
     return null
@@ -100,14 +101,14 @@ function QueryData({ category, timeout }) {
 
   const map = useMap()
 
-  const hideList = useStatic((s) => s.hideList)
-  const active = useStatic((s) => s.active)
+  const hideList = useMemory((s) => s.hideList)
+  const active = useMemory((s) => s.active)
 
-  const userSettings = useStore(
+  const userSettings = useStorage(
     (s) => s.userSettings[userSettingsCategory(category)],
   )
-  const filters = useStore((s) => s.filters[category])
-  const onlyAreas = useStore(
+  const filters = useStorage((s) => s.filters[category])
+  const onlyAreas = useStorage(
     (s) =>
       s.filters?.scanAreas?.filterByAreas &&
       s.filters?.scanAreas?.filter?.areas,
@@ -140,7 +141,7 @@ function QueryData({ category, timeout }) {
     if (active) {
       timeout.current.setupTimeout(refetch)
       return () => {
-        useStatic.setState({ excludeList: [] })
+        useMemory.setState({ excludeList: [] })
         timeout.current.off()
       }
     }
@@ -165,12 +166,12 @@ function QueryData({ category, timeout }) {
   if (error) {
     // @ts-ignore
     if (error.networkError?.statusCode === 464) {
-      useStatic.setState({ clientError: 'old_client' })
+      useMemory.setState({ clientError: 'old_client' })
       return null
     }
     // @ts-ignore
     if (error.networkError?.statusCode === 511) {
-      useStatic.setState({ clientError: 'session_expired' })
+      useMemory.setState({ clientError: 'session_expired' })
       return null
     }
   }

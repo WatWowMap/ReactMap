@@ -16,12 +16,8 @@ import {
 
 import { useTranslation } from 'react-i18next'
 
-import {
-  useStore,
-  useStatic,
-  toggleDialog,
-  useLayoutStore,
-} from '@hooks/useStore'
+import { useMemory, toggleDialog, useLayoutStore } from '@hooks/useMemory'
+import { useStorage } from '@hooks/useStorage'
 import Utility from '@services/Utility'
 
 import SettingsMenu from './Settings'
@@ -35,17 +31,17 @@ const ADV_CATEGORIES = new Set(['pokemon', 'gyms', 'pokestops', 'nests'])
 /** @param {{ category: keyof import('@rm/types').UIObject }} props */
 const DrawerSection = ({ category }) => {
   const { t } = useTranslation()
-  const sidebar = useStore((s) => s.sidebar === category)
-  const staticUserSettings = useStatic((s) => !!s.userSettings[category])
+  const sidebar = useStorage((s) => s.sidebar === category)
+  const staticUserSettings = useMemory((s) => !!s.userSettings[category])
   const drawer = useLayoutStore((s) => s.drawer)
-  const value = useStatic((s) => s.ui[category])
+  const value = useMemory((s) => s.ui[category])
 
   const [unmountOnExit, setUnmountOnExit] = React.useState(true)
 
   /** @type {(panel: string) => (e: unknown, isExpanded: boolean )=> void} */
   const handleChange = React.useCallback(
     (panel) => (_, isExpanded) =>
-      useStore.setState({ sidebar: isExpanded ? panel : '' }),
+      useStorage.setState({ sidebar: isExpanded ? panel : '' }),
     [],
   )
 
