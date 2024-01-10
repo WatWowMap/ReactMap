@@ -128,9 +128,11 @@ function SelectorList({ category, subCategory, label, height = 400 }) {
   // const pokemonOrNest = category === 'pokemon' || category === 'nests'
   return (
     <List dense sx={{ width: '100%' }}>
-      <ListItem disableGutters={category !== 'pokemon'}>
-        <GenericSearchMemo field={`searches.${searchKey}`} label={label} />
-      </ListItem>
+      {translated.length > 10 && (
+        <ListItem disableGutters={category !== 'pokemon'}>
+          <GenericSearchMemo field={`searches.${searchKey}`} label={label} />
+        </ListItem>
+      )}
       {(category === 'pokemon' || category === 'nests') && (
         <BoolToggle
           // @ts-ignore // WHY TS??

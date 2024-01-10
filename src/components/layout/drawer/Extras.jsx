@@ -102,6 +102,11 @@ const BaseAllForts = ({ category, subItem }) => {
           items={FORT_LEVELS}
         />
       </ListItem>
+      {category === 'gyms' && (
+        <Box px={2}>
+          <SelectorListMemo category={category} height={175} />
+        </Box>
+      )}
     </CollapsibleItem>
   )
 }
