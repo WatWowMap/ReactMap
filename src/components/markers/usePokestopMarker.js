@@ -57,10 +57,11 @@ export default function usePokestopMarker({
   }, basicEqualFn)
   const filters = useStore((s) => s.filters.pokestops.filter)
 
-  const [invasionMod, pokestopMod, rewardMod] = Icons.getModifiers(
+  const [invasionMod, pokestopMod, rewardMod, eventMod] = Icons.getModifiers(
     'invasion',
     'pokestop',
     'reward',
+    'event',
   )
 
   let popupYOffset = 1.3
@@ -71,6 +72,8 @@ export default function usePokestopMarker({
   const invasionSizes = []
   const questIcons = []
   const questSizes = []
+  const showcaseIcons = []
+  const showcaseSizes = []
 
   if (hasInvasion) {
     invasions.forEach((invasion) => {
@@ -185,7 +188,34 @@ export default function usePokestopMarker({
       popupY += rewardMod.popupY
     })
   }
-
+  if (hasEvent && !hasInvasion && !hasQuest) {
+    events.forEach((event) => {
+      if (event.display_type === 8) {
+        showcaseIcons.unshift({
+          url: Icons.getPokemon(352),
+        })
+        showcaseSizes.unshift(Icons.getSize('event', filters.b7?.size))
+      } else if (event.display_type === 9) {
+        showcaseIcons.unshift({
+          url: Icons.getPokemon(
+            event.showcase_pokemon_id,
+            event.showcase_pokemon_form_id,
+          ),
+        })
+        showcaseSizes.unshift(
+          Icons.getSize(
+            'event',
+            filters[
+              `f${event.showcase_pokemon_id}-${event.showcase_pokemon_form_id}`
+            ]?.size,
+          ),
+        )
+      }
+      popupYOffset += rewardMod.offsetY - 1
+      popupX += rewardMod.popupX
+      popupY += rewardMod.popupY
+    })
+  }
   const totalQuestSize = questSizes.reduce((a, b) => a + b, 0)
   const totalInvasionSize = invasionSizes.reduce((a, b) => a + b, 0)
 
@@ -284,7 +314,6 @@ export default function usePokestopMarker({
           .map(
             (invasion, i) => /* html */ `
               <img
-                key="${invasion.icon}"
                 src="${invasion.icon}"
                 alt="${invasion.icon}"
                 style="
@@ -301,6 +330,37 @@ export default function usePokestopMarker({
           `,
           )
           .join('')}
-      </div>`,
+          ${showcaseIcons
+            .map(
+              (icon, i) => `
+                <img
+                  src="${icon.url}"
+                  alt="${icon.url}"
+                  style="
+                    width: ${showcaseSizes[i]}px;
+                    height: ${showcaseSizes[i]}px;
+                    bottom: ${
+                      baseSize * 0.6 * eventMod.offsetY + showcaseSizes[i] * i
+                    }px;
+                    left: ${eventMod.offsetX * 50}%;
+                    transform: translateX(-50%);
+                  "
+                />
+                <img
+                  src="${Icons.getMisc('showcase')}"
+                  style="
+                    width: ${showcaseSizes[i] * 0.66}px;
+                    height: ${showcaseSizes[i] * 0.66}px;
+                    bottom: ${
+                      baseSize * 0.3 * eventMod.offsetY + showcaseSizes[i] * i
+                    }px;
+                    left: ${eventMod.offsetX * 50}%;
+                    transform: translateX(-50%);
+                  "
+                />
+            `,
+            )
+            .join('')}
+        </div>`,
   })
 }

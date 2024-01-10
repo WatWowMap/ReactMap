@@ -207,7 +207,7 @@ class UAssets {
    * @param {'sm' | 'md' | 'lg' | 'xl'} [size]
    */
   getSize(category, size = 'md') {
-    const baseSize = this.sizes[category][size]
+    const baseSize = this.sizes[category]?.[size] || 20
     return this.modifiers[category]
       ? baseSize * this.modifiers[category].sizeMultiplier
       : baseSize
