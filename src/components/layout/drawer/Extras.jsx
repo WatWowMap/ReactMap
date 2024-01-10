@@ -226,19 +226,49 @@ const QuestSet = React.memo(BaseQuestSet)
 const BaseInvasion = () => {
   const { t } = useTranslation()
   const enabled = useStorage((s) => !!s.filters?.pokestops?.invasions)
+  const hasConfirmed = useMemory((s) => s.config.misc.enableConfirmedInvasions)
   const [filters, setFilters] = useDeepStore(
     'filters.pokestops.confirmed',
     false,
   )
+
   return (
     <CollapsibleItem open={enabled}>
-      <ListItem>
-        <ListItemText sx={{ pl: 4 }} primary={t('only_confirmed')} />
-        <Switch
-          checked={filters}
-          onChange={() => setFilters((prev) => !prev)}
+      {hasConfirmed && (
+        <ListItem>
+          <ListItemText sx={{ pl: 4 }} primary={t('only_confirmed')} />
+          <Switch
+            checked={filters}
+            onChange={() => setFilters((prev) => !prev)}
+          />
+        </ListItem>
+      )}
+      {hasConfirmed ? (
+        <MultiSelectorList>
+          <SelectorListMemo
+            key="invasions"
+            category="pokestops"
+            subCategory="invasions"
+            label="search_invasions"
+            height={350}
+          />
+          <SelectorListMemo
+            key="rocket_pokemon"
+            category="pokestops"
+            subCategory="rocketPokemon"
+            label="search_rocket_pokemon"
+            height={350}
+          />
+        </MultiSelectorList>
+      ) : (
+        <SelectorListMemo
+          key="invasions"
+          category="pokestops"
+          subCategory="invasions"
+          label="search_invasions"
+          height={350}
         />
-      </ListItem>
+      )}
     </CollapsibleItem>
   )
 }

@@ -203,7 +203,7 @@ export function MultiSelectorList({ children }) {
           ))}
         </Tabs>
       </AppBar>
-      {children.map((child, index) => (
+      {children.filter(Boolean).map((child, index) => (
         <TabPanel value={openTab} index={index} key={child.key}>
           {child}
         </TabPanel>

@@ -716,5 +716,6 @@
   "expert_description": "Manual input queries for the most customization",
   "icon_size": "Icon Size",
   "developer": "Developer",
-  "raid_override": "Raid Override"
+  "raid_override": "Raid Override",
+  "search_rocket_pokemon": "Search Rocket Pokémon"
 }
