@@ -31,6 +31,14 @@ const userSettingsCategory = (category) => {
   }
 }
 
+/**
+ * @template {keyof import('@rm/types').AllFilters} T
+ * @param {import('@rm/types').AllFilters[T]} requestedFilters
+ * @param {Record<string, any>} userSettings
+ * @param {T} category
+ * @param {string[]} [onlyAreas]
+ * @returns
+ */
 const trimFilters = (requestedFilters, userSettings, category, onlyAreas) => {
   const { filters: staticFilters } = useStatic.getState()
   const easyMode = !!requestedFilters?.easyMode
@@ -53,11 +61,14 @@ const trimFilters = (requestedFilters, userSettings, category, onlyAreas) => {
         entryV
     }
   })
-  Object.entries(requestedFilters.filter).forEach((filter) => {
-    const [id, specifics] = filter
+  Object.entries(requestedFilters.filter).forEach(([id, specifics]) => {
+    // eslint-disable-next-line no-unused-vars
+    const { enabled, size, ...rest } = (easyMode
+      ? requestedFilters.ivOr
+      : specifics) || { all: false, adv: '' }
 
     if (specifics && specifics.enabled && staticFilters[category]?.filter[id]) {
-      trimmed[id] = easyMode ? requestedFilters.ivOr : specifics
+      trimmed[id] = rest
     }
   })
   return trimmed
