@@ -717,5 +717,8 @@
   "icon_size": "Icon Size",
   "developer": "Developer",
   "raid_override": "Raid Override",
-  "search_rocket_pokemon": "Search Rocket Pokémon"
+  "search_rocket_pokemon": "Search Rocket Pokémon",
+  "main": "Main",
+  "extra": "Extra",
+  "select": "Select"
 }

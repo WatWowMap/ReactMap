@@ -210,14 +210,14 @@ const BaseQuestSet = () => {
       </ListItem>
       <MultiSelectorList>
         <SelectorListMemo
-          key="quest_items"
+          key="items"
           category="pokestops"
           subCategory="quests"
           label="search_quests"
           height={350}
         />
         <SelectorListMemo
-          key="quest_pokemon"
+          key="pokemon"
           category="pokestops"
           subCategory="pokemon"
           label="search_quests"
