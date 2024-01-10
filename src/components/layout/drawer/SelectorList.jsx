@@ -1,3 +1,4 @@
+/* eslint-disable no-fallthrough */
 // @ts-check
 import * as React from 'react'
 import TuneIcon from '@mui/icons-material/Tune'
@@ -23,14 +24,16 @@ import { StandardItem } from './SelectorItem'
 import { VirtualGrid } from '../general/VirtualGrid'
 
 /**
+ * @template {keyof import('@rm/types').Available} T
  * @param {{
- *  category: keyof import('@rm/types').Available,
+ *  category: T,
+ *  subCategory?: T extends 'gyms' ? 'raids' | 'pokemon' : T extends 'pokestops' ? 'lures' | 'invasions' | 'quests' | 'eventStops' | 'rocketPokemon' | 'pokemon' : never
  *  itemsPerRow?: number,
  *  children?: React.ReactNode,
  * }} props
  * @returns
  */
-function SelectorList({ category }) {
+function SelectorList({ category, subCategory }) {
   const { t: tId } = useTranslateById()
   const { t } = useTranslation()
   const available = useMemory((s) => s.available[category])
@@ -45,9 +48,38 @@ function SelectorList({ category }) {
   const translated = React.useMemo(
     () =>
       (onlyShowAvailable ? available : Object.keys(allFilters))
-        .filter((key) => key !== 'global')
+        .filter((key) => {
+          if (key === 'global') return false
+          switch (subCategory) {
+            case 'raids':
+              return key.startsWith('r') || key.startsWith('e')
+            case 'lures':
+              return key.startsWith('l')
+            case 'invasions':
+              return key.startsWith('i')
+            case 'quests':
+              return (
+                key.startsWith('q') ||
+                key.startsWith('m') ||
+                key.startsWith('x') ||
+                key.startsWith('c') ||
+                key.startsWith('d')
+              )
+            case 'eventStops':
+              return key.startsWith('b')
+            case 'rocketPokemon':
+              return key.startsWith('a')
+            default:
+              switch (category) {
+                case 'gyms':
+                  return key.startsWith('t')
+                default:
+                  return !Number.isNaN(Number(key.charAt(0)))
+              }
+          }
+        })
         .map((id) => ({ id, name: tId(id).toLowerCase() })),
-    [onlyShowAvailable ? available : allFilters, tId],
+    [onlyShowAvailable ? available : allFilters, tId, category, subCategory],
   )
   const items = React.useMemo(() => {
     const lowerCase = search.toLowerCase()
@@ -128,5 +160,6 @@ function SelectorList({ category }) {
 
 export const MemoSelectorList = React.memo(
   SelectorList,
-  (prev, next) => prev.category === next.category,
+  (prev, next) =>
+    prev.category === next.category && prev.subCategory === next.subCategory,
 )
