@@ -1,5 +1,5 @@
 // @ts-check
-import { useStatic } from '@hooks/useStore'
+import { useMemory } from '@hooks/useMemory'
 import AbortableContext from './AbortableContext'
 
 export default class RobustTimeout extends AbortableContext {
@@ -12,7 +12,7 @@ export default class RobustTimeout extends AbortableContext {
     this._ms =
       (typeof category === 'number'
         ? category
-        : useStatic.getState().polling[category] || 10) * 1000
+        : useMemory.getState().polling[category] || 10) * 1000
     this._lastUpdated = 0
   }
 

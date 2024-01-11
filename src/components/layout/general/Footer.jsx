@@ -1,10 +1,35 @@
-/* eslint-disable no-nested-ternary */
-import React from 'react'
+// @ts-check
+import * as React from 'react'
 import { IconButton, Button, Typography, Grid } from '@mui/material'
 import { useTranslation } from 'react-i18next'
 
 import * as MuiIcons from './Icons'
 
+/**
+ * @typedef {{
+ *    key?: string,
+ *    name?: string,
+ *    icon?: keyof typeof MuiIcons,
+ *    color?: import('@mui/material').ButtonProps['color'],
+ *    disabled?: boolean,
+ *    link?: string,
+ *    target?: string,
+ *    action?: () => void,
+ *    component?: React.ReactNode,
+ *    size?: number,
+ *    align?: 'left' | 'center' | 'right',
+ *    mobileOnly?: boolean,
+ * }} FooterButton
+ */
+
+/**
+ *
+ * @param {{
+ *  options: FooterButton[],
+ * role?: string,
+ * }} props
+ * @returns
+ */
 export default function Footer({ options, role }) {
   const { t } = useTranslation()
 
@@ -34,7 +59,7 @@ export default function Footer({ options, role }) {
           )
         }
         const MuiIcon = button.icon ? MuiIcons[button.icon] : null
-        const color = button.disabled ? 'default' : button.color
+        const color = button.disabled ? 'inherit' : button.color
         const muiColor = ['primary', 'secondary', 'success', 'error'].includes(
           color,
         )

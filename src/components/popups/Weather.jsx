@@ -3,7 +3,7 @@ import * as React from 'react'
 import { Grid, Typography } from '@mui/material'
 import { useTranslation } from 'react-i18next'
 
-import { useStatic } from '@hooks/useStore'
+import { useMemory } from '@hooks/useMemory'
 import Utility from '@services/Utility'
 import ErrorBoundary from '@components/ErrorBoundary'
 
@@ -14,10 +14,10 @@ import ErrorBoundary from '@components/ErrorBoundary'
  */
 export default function WeatherPopup({ gameplay_condition, updated }) {
   const { t } = useTranslation()
-  const weatherTypes = useStatic(
+  const weatherTypes = useMemory(
     (state) => state.masterfile.weather[gameplay_condition]?.types || [],
   )
-  const Icons = useStatic((state) => state.Icons)
+  const Icons = useMemory((state) => state.Icons)
 
   React.useEffect(() => {
     Utility.analytics(

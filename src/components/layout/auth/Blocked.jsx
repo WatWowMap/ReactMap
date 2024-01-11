@@ -15,7 +15,7 @@ import ListItem from '@mui/material/ListItem'
 import ListItemIcon from '@mui/material/ListItemIcon'
 import ListItemText from '@mui/material/ListItemText'
 
-import { useStatic } from '@hooks/useStore'
+import { useMemory } from '@hooks/useMemory'
 
 import DiscordLogin from './Discord'
 import ThemeToggle from '../general/ThemeToggle'
@@ -25,7 +25,7 @@ export default function Blocked() {
   const { t } = useTranslation()
   const { info } = useParams()
   const navigate = useNavigate()
-  const discordInvite = useStatic((s) => s.config?.links?.discordInvite)
+  const discordInvite = useMemory((s) => s.config?.links?.discordInvite)
   const queryParams = new URLSearchParams(info)
   const blockedGuilds = queryParams.get('blockedGuilds')
   const username = queryParams.get('username')

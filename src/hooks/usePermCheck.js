@@ -1,8 +1,9 @@
-import { useStore, useStatic } from './useStore'
+import { useMemory } from './useMemory'
+import { useStorage } from './useStorage'
 
 export function usePermCheck(category) {
-  const filters = useStore((s) => s.filters[category])
-  const perms = useStatic((s) => s.auth.perms)
+  const filters = useStorage((s) => s.filters[category])
+  const perms = useMemory((s) => s.auth.perms)
 
   if (!filters || !perms.map) return false
 

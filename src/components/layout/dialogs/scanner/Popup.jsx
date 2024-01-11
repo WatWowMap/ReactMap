@@ -4,13 +4,14 @@ import List from '@mui/material/List'
 import { Popup } from 'react-leaflet'
 import { useTranslation } from 'react-i18next'
 
+import { DividerWithMargin } from '@components/layout/general/StyledDivider'
+
 import {
   InAllowedArea,
   ScanCancel,
   ScanConfirm,
   ScanQueue,
   ScanRequests,
-  StyledDivider,
   StyledListItemText,
 } from './Shared'
 import { ConfigContext } from './ContextProvider'
@@ -31,11 +32,11 @@ export function ScanOnDemandPopup({ children, mode }) {
           className="no-leaflet-margin"
           secondary={t('scan_next_choose')}
         />
-        <StyledDivider />
+        <DividerWithMargin />
         {context.scannerType !== 'mad' && children}
         {context.showScanCount && <ScanRequests />}
         {context.showScanQueue && <ScanQueue />}
-        <StyledDivider />
+        <DividerWithMargin />
         <ScanConfirm mode={mode} />
         <InAllowedArea />
         <ScanCancel mode={mode} />

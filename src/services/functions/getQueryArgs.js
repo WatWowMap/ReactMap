@@ -1,7 +1,7 @@
-import { useStatic } from '@hooks/useStore'
+import { useMapStore } from '@hooks/useMapStore'
 
 export function getQueryArgs() {
-  const { map } = useStatic.getState()
+  const { map } = useMapStore.getState()
   if (!map)
     return {
       zoom: 0,

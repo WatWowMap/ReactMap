@@ -1,7 +1,8 @@
 // @ts-check
 import * as React from 'react'
 
-import { useStatic, useStore } from '@hooks/useStore'
+import { useMemory } from '@hooks/useMemory'
+import { useStorage } from '@hooks/useStorage'
 
 /**
  *
@@ -25,12 +26,12 @@ const getTileLayer = (tileServers, tileServer, timeOfDay) => {
 }
 
 export default function useTileLayer() {
-  const timeOfDay = useStatic((s) => s.timeOfDay)
-  const userTileLayer = useStore((s) => s.settings.tileServers)
-  const online = useStatic((s) => s.online)
+  const timeOfDay = useMemory((s) => s.timeOfDay)
+  const userTileLayer = useStorage((s) => s.settings.tileServers)
+  const online = useMemory((s) => s.online)
 
   const tileLayer = React.useMemo(() => {
-    const { config, settings } = useStatic.getState() || {
+    const { config, settings } = useMemory.getState() || {
       minZoom: 10,
       maxZoom: 18,
     }
@@ -51,7 +52,7 @@ export default function useTileLayer() {
   }, [timeOfDay, userTileLayer, online])
 
   React.useEffect(() => {
-    useStatic.setState({ tileStyle: tileLayer.style })
+    useMemory.setState({ tileStyle: tileLayer.style })
     const leafletContainerEl = document
       .getElementsByClassName('leaflet-container')
       .item(0)

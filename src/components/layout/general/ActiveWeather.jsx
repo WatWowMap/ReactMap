@@ -6,17 +6,16 @@ import DialogContent from '@mui/material/DialogContent'
 import Box from '@mui/material/Box'
 import booleanPointInPolygon from '@turf/boolean-point-in-polygon'
 import { point, polygon } from '@turf/helpers'
-import { useQuery } from '@apollo/client'
 import { useTranslation } from 'react-i18next'
 
 import WeatherPopup from '@components/popups/Weather'
-import { useStatic, useStore } from '@hooks/useStore'
-import getAllWeather from '@services/queries/weather'
-import { getQueryArgs } from '@services/functions/getQueryArgs'
+import { useMemory } from '@hooks/useMemory'
+import { useStorage } from '@hooks/useStorage'
+import { apolloClient } from '@services/apollo'
 
 import Header from './Header'
 import Footer from './Footer'
-import { Img } from '../custom/CustomImg'
+import { Img } from './Img'
 
 const StyledBox = styled(Box)(({ theme }) => ({
   zIndex: 1000,
@@ -38,39 +37,36 @@ const ImgSx = {
 }
 
 export default function ActiveWeather() {
-  const weatherEnabled = useStore((s) => s.filters?.weather?.enabled ?? false)
-  const location = useStore((state) => state.location)
-  const Icons = useStatic((state) => state.Icons)
-  const clickable = useStore((s) => s.userSettings?.weather?.clickableIcon)
-  const timeOfDay = useStatic((s) => s.timeOfDay)
-  const zoom = useStore((s) => s.zoom)
-  const allowedZoom = useStatic((s) => s.config.general.activeWeatherZoom)
+  const weatherEnabled = useStorage((s) => s.filters?.weather?.enabled ?? false)
+  const location = useStorage((state) => state.location)
+  const Icons = useMemory((state) => state.Icons)
+  const clickable = useStorage((s) => s.userSettings?.weather?.clickableIcon)
+  const timeOfDay = useMemory((s) => s.timeOfDay)
+  const zoom = useStorage((s) => s.zoom)
+  const allowedZoom = useMemory((s) => s.config.general.activeWeatherZoom)
   const { t } = useTranslation()
 
-  const { data, previousData } = useQuery(getAllWeather, {
-    fetchPolicy: 'cache-only',
-    skip: !weatherEnabled,
-    variables: {
-      ...getQueryArgs(),
-      filters: {
-        onlyAreas: useStore.getState().filters.scanAreas?.filter?.areas || [],
-      },
-    },
-  })
-
+  const [active, setActive] = React.useState(
+    /** @type {import('@rm/types').Weather | null} */ (null),
+  )
   const [open, setOpen] = React.useState(false)
 
-  if (!weatherEnabled || !Icons) return null
+  React.useEffect(() => {
+    if (zoom > allowedZoom) {
+      const weatherCache = Object.values(apolloClient.cache.extract()).find(
+        (x) =>
+          x.__typename === 'Weather' &&
+          // @ts-ignore
+          booleanPointInPolygon(point(location), polygon([x.polygon])),
+      )
+      // @ts-ignore
+      if (weatherCache) setActive(weatherCache)
+    }
+  }, [location, zoom, allowedZoom])
 
-  /** @type {import('@rm/types').Weather | undefined} */
-  const active = (data || previousData)?.weather?.find(
-    (cell) =>
-      cell && booleanPointInPolygon(point(location), polygon([cell.polygon])),
-  )
-
+  if (!weatherEnabled || !Icons || !active) return null
   const [{ disableColorShift = false }] = Icons.getModifiers('weather')
-
-  return active?.gameplay_condition && zoom > allowedZoom ? (
+  return (
     <React.Fragment key={active?.gameplay_condition}>
       <StyledBox
         className="weather-icon flex-center"
@@ -108,5 +104,5 @@ export default function ActiveWeather() {
         />
       </Dialog>
     </React.Fragment>
-  ) : null
+  )
 }

@@ -1,15 +1,16 @@
-/* eslint-disable no-nested-ternary */
 // @ts-check
 import * as React from 'react'
 import Dialog from '@mui/material/Dialog'
-import { useLayoutStore, useStatic } from '@hooks/useStore'
+import { useMemory } from '@hooks/useMemory'
+import { useLayoutStore } from '@hooks/useLayoutStore'
 
 /**
  *
  * @param {{
- *  dialog: keyof ReturnType<typeof useLayoutStore['getState']>,
+ *  dialog?: keyof ReturnType<typeof useLayoutStore['getState']>,
  *  variant?: 'small' | 'large'
  *  children: React.ReactNode
+ *  open?: boolean
  * } & Omit<import('@mui/material').DialogProps, 'open'>} props
  * @returns {JSX.Element}
  */
@@ -21,7 +22,7 @@ export function DialogWrapper({
   ...props
 }) {
   const open = useLayoutStore((s) => s[dialog])
-  const isMobile = useStatic((s) => s.isMobile)
+  const isMobile = useMemory((s) => s.isMobile)
 
   const handleClose = React.useCallback(
     () => useLayoutStore.setState({ [dialog]: false }),

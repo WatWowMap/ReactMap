@@ -7,17 +7,17 @@ import ListItemIcon from '@mui/material/ListItemIcon'
 import ListItemText from '@mui/material/ListItemText'
 import { useTranslation } from 'react-i18next'
 
-import { useStore } from '@hooks/useStore'
+import { useStorage } from '@hooks/useStorage'
 
 export function ThemeMenuItem() {
   const { t } = useTranslation()
-  const darkMode = useStore((s) => s.darkMode)
+  const darkMode = useStorage((s) => s.darkMode)
 
   return (
     <MenuItem
       dense
       onClick={() =>
-        useStore.setState((prev) => ({
+        useStorage.setState((prev) => ({
           darkMode: !prev.darkMode,
         }))
       }

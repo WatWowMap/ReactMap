@@ -3,7 +3,8 @@
 import * as React from 'react'
 import { GeoJSON, Marker, Popup } from 'react-leaflet'
 
-import { basicEqualFn, useStatic, useStore } from '@hooks/useStore'
+import { basicEqualFn, useMemory } from '@hooks/useMemory'
+import { useStorage } from '@hooks/useStorage'
 import useForcePopup from '@hooks/useForcePopup'
 
 import nestMarker from '../markers/nest'
@@ -18,8 +19,10 @@ const NestTile = (nest) => {
   const recent = Date.now() / 1000 - nest.updated < 172800000
   const internalId = `${nest.pokemon_id}-${nest.pokemon_form}`
 
-  const size = useStore((s) => s.filters.nests.filter[internalId]?.size || 'md')
-  const [excluded, iconUrl, iconSize] = useStatic((s) => {
+  const size = useStorage(
+    (s) => s.filters.nests.filter[internalId]?.size || 'md',
+  )
+  const [excluded, iconUrl, iconSize] = useMemory((s) => {
     const { Icons, excludeList } = s
     return [
       excludeList.includes(internalId),
@@ -66,7 +69,7 @@ const NestTile = (nest) => {
  * @returns
  */
 const NestMarker = ({ children, icon, id, lat, lon }) => {
-  const showPokemon = useStore((s) => s.filters.nests.pokemon)
+  const showPokemon = useStorage((s) => s.filters.nests.pokemon)
   const [markerRef, setMarkerRef] = React.useState(null)
 
   useForcePopup(id, markerRef)
@@ -87,7 +90,7 @@ const NestMarker = ({ children, icon, id, lat, lon }) => {
  * @returns
  */
 const NestGeoJSON = ({ polygon_path }) => {
-  const showPolygons = useStore((s) => s.filters.nests.polygons)
+  const showPolygons = useStorage((s) => s.filters.nests.polygons)
 
   const geometry = React.useMemo(() => {
     try {

@@ -20,4 +20,6 @@ const Human = () => (
   </Grid>
 )
 
-export default Human
+const HumanMemo = React.memo(Human, () => true)
+
+export default HumanMemo

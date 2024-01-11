@@ -223,53 +223,9 @@ export default {
     },
   ],
   tiles: {
-    gyms: [
-      {
-        id: 't3-0',
-        name: 'Instinct',
-        url: 'https://raw.githubusercontent.com/WatWowMap/wwm-uicons/main/gym/3.png',
-      },
-      {
-        id: '105-80',
-        name: 'Alola',
-        url: 'https://raw.githubusercontent.com/WatWowMap/wwm-uicons/main/pokemon/105_f80.png',
-      },
-    ],
-    nests: [
-      {
-        id: '1-163',
-        name: 'Bulbasaur',
-        url: 'https://raw.githubusercontent.com/WatWowMap/wwm-uicons/main/pokemon/1.png',
-      },
-      {
-        id: '4-172',
-        name: 'Charmander',
-        url: 'https://raw.githubusercontent.com/WatWowMap/wwm-uicons/main/pokemon/4.png',
-      },
-    ],
-    pokestops: [
-      {
-        id: 'q1',
-        name: 'Poké Ball',
-        url: 'https://raw.githubusercontent.com/WatWowMap/wwm-uicons/main/reward/item/1.png',
-      },
-      {
-        id: 'm384-10',
-        name: 'Rayquaza x10',
-        url: 'https://raw.githubusercontent.com/WatWowMap/wwm-uicons/main/pokemon/384_e1.png',
-      },
-    ],
-    pokemon: [
-      {
-        id: '1-163',
-        name: 'Bulbasaur',
-        url: 'https://raw.githubusercontent.com/WatWowMap/wwm-uicons/main/pokemon/1.png',
-      },
-      {
-        id: '1-897',
-        name: 'Fall 2019',
-        url: 'https://raw.githubusercontent.com/WatWowMap/wwm-uicons/main/pokemon/1_f897.png',
-      },
-    ],
+    gyms: ['t3-0', '105-80'],
+    nests: ['1-163', '4-172'],
+    pokestops: ['q1', 'm384-10'],
+    pokemon: ['1-163', '1-897'],
   },
 }

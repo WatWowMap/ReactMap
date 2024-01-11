@@ -1,205 +1,62 @@
 import React, { useState } from 'react'
-import { Dialog, DialogContent, Drawer, Grid, Typography } from '@mui/material'
+import Box from '@mui/material/Box'
+import DialogContent from '@mui/material/DialogContent'
+import Typography from '@mui/material/Typography'
 import { useTranslation } from 'react-i18next'
-
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
+import Collapse from '@mui/material/Collapse'
+import IconButton from '@mui/material/IconButton'
 import Utility from '@services/Utility'
-import { useStore, useStatic } from '@hooks/useStore'
+import { useMemory } from '@hooks/useMemory'
+import { useLayoutStore } from '@hooks/useLayoutStore'
+import { useStorage } from '@hooks/useStorage'
 import useFilter from '@hooks/useFilter'
-
-import ReactWindow from '@components/layout/general/ReactWindow'
 import Header from '@components/layout/general/Header'
 import Footer from '@components/layout/general/Footer'
-import Advanced from '../dialogs/filters/Advanced'
-import SlotSelection from '../dialogs/filters/SlotSelection'
-import OptionsContainer from '../dialogs/filters/OptionsContainer'
-import Help from '../dialogs/tutorial/Advanced'
-import WebhookAdvanced from '../dialogs/webhooks/WebhookAdv'
-import AdvSearch from '../dialogs/filters/AdvSearch'
+import { applyToAll } from '@services/filtering/applyToAll'
 
+import OptionsContainer from '../dialogs/filters/OptionsContainer'
+import { VirtualGrid } from './VirtualGrid'
+import { GenericSearch } from '../drawer/ItemSearch'
+import { useWebhookStore } from '../dialogs/webhooks/store'
+
+/**
+ * @param {{
+ *  category: string
+ *  webhookCategory?: string
+ *  tempFilters: import('@rm/types').Filters
+ *  children: (item: import('@rm/types').MenuItem, key: string) => React.ReactNode
+ *  categories?: import('@rm/types').Available[]
+ *  title: string
+ *  titleAction: () => void
+ *  extraButtons?: import('@components/layout/general/Footer').FooterButton[]
+ * }} props
+ */
 export default function Menu({
   category,
-  Tile,
   webhookCategory,
-  filters,
   tempFilters,
-  setTempFilters,
+  children,
   categories,
   title,
   titleAction,
-  extraButtons = [],
+  extraButtons,
 }) {
   Utility.analytics(`/advanced/${category}`)
 
-  const isMobile = useStatic((s) => s.isMobile)
-  const isTablet = useStatic((s) => s.isTablet)
-
-  const menus = useStore((state) => state.menus)
+  const isMobile = useMemory((s) => s.isMobile)
   const { t } = useTranslation()
-  const Icons = useStatic((s) => s.Icons)
-
-  let columnCount = isTablet ? 3 : 5
-  if (isMobile) columnCount = 1
+  const menus = useStorage((state) => state.menus)
 
   const [filterDrawer, setFilterDrawer] = useState(false)
-  const [advancedFilter, setAdvancedFilter] = useState({
-    open: false,
-    id: '',
-    tempFilters: {},
-    default: filters.standard,
-  })
-  const [slotsMenu, setSlotsMenu] = useState({
-    open: false,
-    id: 0,
-  })
-  const [search, setSearch] = useState('')
-  const [helpDialog, setHelpDialog] = useState(false)
-  const [webhook, setWebhook] = useState({
-    open: false,
-    id: '',
-  })
 
-  const { filteredObj, filteredArr, count } = useFilter(
+  const { filteredArr, count } = useFilter(
     tempFilters,
     menus,
-    search,
     category,
     webhookCategory,
     categories,
   )
-
-  const selectAllOrNone = (show) => {
-    const newObj = {}
-    Object.entries(filteredObj).forEach(([key, item]) => {
-      newObj[key] = { ...item, enabled: show }
-      if (key.startsWith('t') && key.charAt(1) != 0 && !webhookCategory) {
-        Object.assign(newObj, Utility.generateSlots(key, show, tempFilters))
-      }
-    })
-    setTempFilters({ ...tempFilters, ...newObj })
-  }
-
-  const toggleDrawer = React.useCallback(
-    (open) => (event) => {
-      if (
-        event.type === 'keydown' &&
-        (event.key === 'Tab' || event.key === 'Shift')
-      ) {
-        return
-      }
-      setFilterDrawer(open)
-    },
-    [],
-  )
-
-  const toggleAdvMenu = (open, id, newFilters) => (event) => {
-    if (
-      event.type === 'keydown' &&
-      (event.key === 'Tab' || event.key === 'Shift')
-    ) {
-      return
-    }
-    if (open) {
-      setAdvancedFilter({
-        open,
-        id,
-        tempFilters: tempFilters[id] ?? filters.standard,
-        standard: filters.standard,
-      })
-    } else if (id === 'global') {
-      setAdvancedFilter({ open })
-      const newObj = tempFilters
-      Object.entries(filteredObj).forEach((item) => {
-        const [key, { enabled }] = item
-        newObj[key] = { ...newFilters, enabled }
-
-        // ugly patch for also changing gym slots with the apply to all
-        if (
-          (key.startsWith('t') && key.charAt(1) != 0 && category === 'gym') ||
-          webhookCategory
-        ) {
-          Object.assign(
-            newObj,
-            Utility.generateSlots(key, newFilters, tempFilters),
-          )
-        }
-      })
-      setTempFilters({ ...tempFilters, ...newObj, [id]: newFilters })
-    } else {
-      setAdvancedFilter({ open })
-      setTempFilters({ ...tempFilters, [id]: newFilters })
-    }
-  }
-
-  const toggleWebhook = (open, id, newFilters) => (event) => {
-    if (
-      event.type === 'keydown' &&
-      (event.key === 'Tab' || event.key === 'Shift')
-    ) {
-      return
-    }
-    if (id === 'global' && !open && newFilters) {
-      const wildCards = (() => {
-        switch (webhookCategory) {
-          case 'raid':
-            return ['r90']
-          case 'egg':
-            return ['e90']
-          case 'gym':
-            return ['t4']
-          case 'invasion':
-            return ['i0']
-          default:
-            return ['0-0']
-        }
-      })()
-      if (newFilters.everything_individually !== false) {
-        Object.keys(filteredObj).forEach((item) => {
-          if (!wildCards.includes(item)) {
-            filteredObj[item] = {
-              ...tempFilters[item],
-              ...newFilters,
-              enabled: true,
-            }
-          }
-        })
-      } else {
-        wildCards.forEach((item) => {
-          filteredObj[item] = {
-            ...tempFilters[item],
-            ...newFilters,
-            enabled: true,
-          }
-        })
-      }
-      setTempFilters({ ...tempFilters, ...filteredObj, [id]: newFilters })
-    } else if (id && newFilters && !open) {
-      setTempFilters({
-        ...tempFilters,
-        [id]: { ...tempFilters[id], ...newFilters, enabled: true },
-      })
-    }
-    setWebhook({ open, id: id ?? '' })
-  }
-
-  const toggleSlotsMenu = (open, id, newFilters) => (event) => {
-    if (
-      event.type === 'keydown' &&
-      (event.key === 'Tab' || event.key === 'Shift')
-    ) {
-      return
-    }
-    if (open) {
-      setSlotsMenu({
-        open,
-        id,
-      })
-    } else if (newFilters) {
-      setSlotsMenu({ open })
-      setTempFilters({ ...newFilters })
-    } else {
-      setSlotsMenu({ open })
-    }
-  }
 
   const Options = React.useMemo(
     () => (
@@ -207,170 +64,99 @@ export default function Menu({
         countTotal={count.total}
         countShow={count.show}
         category={category}
-        toggleDrawer={toggleDrawer}
         categories={categories}
       />
     ),
-    [category, categories],
+    [category, categories, count.total, count.show],
   )
 
   const footerButtons = React.useMemo(
     () => [
       {
         name: 'help',
-        action: () => setHelpDialog((prev) => !prev),
+        action: () =>
+          useLayoutStore.setState({ help: { open: true, category } }),
         icon: 'HelpOutline',
       },
       {
-        name: 'openFilter',
-        action: toggleDrawer(true),
-        icon: 'Ballot',
-        mobileOnly: true,
+        name: '',
+        disabled: true,
       },
       {
         name: 'apply_to_all',
-        action: webhookCategory
-          ? toggleWebhook(true, 'global')
-          : toggleAdvMenu(true, 'global'),
+        action: () =>
+          (webhookCategory ? useWebhookStore : useLayoutStore).setState({
+            advancedFilter: {
+              open: true,
+              id: 'global',
+              category,
+              selectedIds: filteredArr,
+            },
+          }),
         icon: category === 'pokemon' || webhookCategory ? 'Tune' : 'FormatSize',
       },
       {
         name: 'disable_all',
-        action: () => selectAllOrNone(false),
+        action: () =>
+          applyToAll(false, category, filteredArr, !webhookCategory),
         icon: 'Clear',
         color: 'error',
       },
       {
         name: 'enable_all',
-        action: () => selectAllOrNone(true),
+        action: () => applyToAll(true, category, filteredArr, !webhookCategory),
         icon: 'Check',
         color: 'success',
       },
-      ...extraButtons,
+      ...(extraButtons ?? []),
     ],
-    [category, webhookCategory, extraButtons, filteredObj, tempFilters],
+    [category, webhookCategory, extraButtons, filteredArr, tempFilters],
   )
 
   return (
     <>
       <Header
-        titles={[title]}
+        titles={title}
         action={titleAction}
         names={[webhookCategory || category]}
       />
-      <DialogContent style={{ padding: '8px 5px', height: '100%' }}>
-        <Grid container spacing={1}>
-          {!isMobile && (
-            <Grid item sm={3} style={{ height: '75vh', overflow: 'auto' }}>
-              {Options}
-            </Grid>
-          )}
-          <Grid
-            container
-            item
-            xs={12}
-            sm={9}
-            direction="column"
-            style={isMobile ? { height: '85vh' } : {}}
-          >
-            <AdvSearch
-              search={search}
-              setSearch={setSearch}
-              category={category}
+      <DialogContent className="container" sx={{ p: 0, minHeight: '75vh' }}>
+        {!isMobile && <Box className="column-25">{Options}</Box>}
+        <Box p={1} className="column-75">
+          <Box pb={1} display="flex">
+            <GenericSearch
+              field={`searches.${category}Advanced`}
+              label={t(`search_${category}`, t(`search_${category}s`))}
             />
-            {filteredArr.length ? (
-              <div style={{ flex: '1 1 auto' }}>
-                <ReactWindow
-                  columnCount={columnCount}
-                  length={filteredArr.length}
-                  flex
-                  offset={0}
-                  data={{
-                    isMobile,
-                    tileItem: filteredArr,
-                    tempFilters,
-                    setTempFilters,
-                    toggleAdvMenu,
-                    toggleSlotsMenu,
-                    type: category,
-                    toggleWebhook,
-                    webhookCategory,
-                    standard: filters.standard,
-                    Icons,
-                  }}
-                  Tile={Tile}
+            {isMobile && (
+              <IconButton onClick={() => setFilterDrawer((prev) => !prev)}>
+                <ExpandMoreIcon
+                  className={filterDrawer ? 'expanded' : 'closed'}
                 />
-              </div>
-            ) : (
-              <div style={{ flex: '1 1 auto' }}>
-                <Grid
-                  container
-                  alignItems="center"
-                  justifyContent="center"
-                  direction="column"
-                  style={{ height: '100%' }}
-                >
-                  <Grid item style={{ whiteSpace: 'pre-line' }}>
-                    <Typography variant="h6" align="center">
-                      {t('no_filter_results')}
-                    </Typography>
-                  </Grid>
-                </Grid>
-              </div>
+              </IconButton>
             )}
-          </Grid>
-        </Grid>
+          </Box>
+          <Box>
+            {isMobile && <Collapse in={filterDrawer}>{Options}</Collapse>}
+            {filteredArr.length ? (
+              <VirtualGrid data={filteredArr} xs={4} md={2}>
+                {children}
+              </VirtualGrid>
+            ) : (
+              <Box
+                className="flex-center"
+                flex="1 1 auto"
+                whiteSpace="pre-line"
+              >
+                <Typography variant="h6" align="center">
+                  {t('no_filter_results')}
+                </Typography>
+              </Box>
+            )}
+          </Box>
+        </Box>
       </DialogContent>
       <Footer options={footerButtons} role="dialog_filter_footer" />
-      <Drawer
-        anchor="bottom"
-        sx={{ zIndex: 10000 }}
-        open={filterDrawer}
-        onClose={toggleDrawer(false)}
-      >
-        {Options}
-      </Drawer>
-      <Dialog
-        open={advancedFilter.open}
-        onClose={toggleAdvMenu(false)}
-        fullScreen={isMobile && category === 'pokemon'}
-      >
-        <Advanced
-          advancedFilter={advancedFilter}
-          toggleAdvMenu={toggleAdvMenu}
-          type={category}
-          isMobile={isMobile}
-        />
-      </Dialog>
-      <Dialog open={slotsMenu.open} onClose={toggleSlotsMenu(false)}>
-        <SlotSelection
-          teamId={slotsMenu.id}
-          toggleSlotsMenu={toggleSlotsMenu}
-          tempFilters={tempFilters}
-          isMobile={isMobile}
-        />
-      </Dialog>
-      <Dialog open={helpDialog} onClose={() => setHelpDialog(false)}>
-        <Help
-          toggleHelp={() => setHelpDialog(!helpDialog)}
-          category={category}
-          isMobile={isMobile}
-        />
-      </Dialog>
-      <Dialog
-        open={!!(webhook.open && webhook.id)}
-        fullWidth={!isMobile}
-        fullScreen={isMobile}
-        onClose={toggleWebhook(false)}
-      >
-        <WebhookAdvanced
-          id={webhook.id}
-          category={webhookCategory}
-          isMobile={isMobile}
-          toggleWebhook={toggleWebhook}
-          tempFilters={tempFilters[webhook.id]}
-        />
-      </Dialog>
     </>
   )
 }

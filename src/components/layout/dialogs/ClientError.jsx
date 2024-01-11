@@ -7,17 +7,17 @@ import Typography from '@mui/material/Typography'
 import Button from '@mui/material/Button'
 
 import { useTranslation } from 'react-i18next'
-import { useStatic } from '@hooks/useStore'
+import { useMemory } from '@hooks/useMemory'
 
 import Header from '../general/Header'
 
 export default function ClientError() {
   const { t } = useTranslation()
-  const error = useStatic((s) => s.clientError)
+  const error = useMemory((s) => s.clientError)
 
   return (
     <Dialog open={Boolean(error)}>
-      <Header titles={[`${error}_title`]} action={null} />
+      <Header titles={`${error}_title`} action={null} />
       <DialogContent style={{ textAlign: 'center', whiteSpace: 'pre-line' }}>
         <br />
         <Typography variant="h6">{t(`${error}_body`)}</Typography>

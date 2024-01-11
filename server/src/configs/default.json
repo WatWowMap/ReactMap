@@ -509,6 +509,8 @@
     },
     "pokemon": {
       "enabled": false,
+      "easyMode": true,
+      "onlyShowAvailable": true,
       "legacyFilter": false,
       "allPokemon": false,
       "globalValues": {
@@ -954,6 +956,12 @@
         "md": 1,
         "lg": 2,
         "xl": 3
+      },
+      "event": {
+        "sm": 20,
+        "md": 40,
+        "lg": 60,
+        "xl": 80
       }
     }
   },

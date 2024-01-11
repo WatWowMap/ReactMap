@@ -5,12 +5,11 @@ import { useTranslation } from 'react-i18next'
 import debounce from 'lodash.debounce'
 
 import AdvancedAccordion from '@components/layout/custom/AdvancedAccordion'
+import { RADIUS_CHOICES } from '@assets/constants'
 
 import { StyledSubHeader } from '../Shared'
 import { ConfigContext } from '../ContextProvider'
 import { useScanStore } from '../store'
-
-const RADIUS_CHOICES = /** @type {const} */ (['pokemon', 'gym'])
 
 /**
  *

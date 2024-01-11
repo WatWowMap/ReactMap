@@ -1,7 +1,7 @@
 // @ts-check
 import * as React from 'react'
 import { Avatar, Link } from '@mui/material'
-import { useStatic } from '@hooks/useStore'
+import { useMemory } from '@hooks/useMemory'
 
 export default function HeaderImage({
   url,
@@ -10,7 +10,7 @@ export default function HeaderImage({
   alt,
   large = false,
 }) {
-  const Icons = useStatic((s) => s.Icons)
+  const Icons = useMemory((s) => s.Icons)
   const src = url ? url.replace('http://', 'https://') : Icons.getPokestops(0)
 
   const Image = (

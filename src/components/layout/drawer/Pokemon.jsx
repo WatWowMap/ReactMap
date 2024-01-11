@@ -1,210 +1,173 @@
-import React, { useEffect, useState, Fragment } from 'react'
+// @ts-check
+/* eslint-disable react/no-unstable-nested-components */
+import * as React from 'react'
 import {
-  Grid,
   Typography,
-  Switch,
   AppBar,
   Tab,
   Tabs,
   List,
   ListItem,
-  ListItemText,
+  Collapse,
+  Divider,
+  ListSubheader,
+  Select,
+  MenuItem,
+  FormControl,
+  InputLabel,
 } from '@mui/material'
 import { useTranslation } from 'react-i18next'
 
-import { useStore } from '@hooks/useStore'
+import { useMemory } from '@hooks/useMemory'
+import { useStorage, useDeepStore } from '@hooks/useStorage'
 import Utility from '@services/Utility'
-import StringFilter from '../dialogs/filters/StringFilter'
+import { XXS_XXL, NUNDO_HUNDO } from '@assets/constants'
+
+import { StringFilterMemo } from '../dialogs/filters/StringFilter'
 import SliderTile from '../dialogs/filters/SliderTile'
 import TabPanel from '../general/TabPanel'
-import MultiSelector from './MultiSelector'
+import { BoolToggle, DualBoolToggle } from './BoolToggle'
+import { GenderListItem } from '../dialogs/filters/Gender'
+import { SelectorListMemo } from './SelectorList'
 
-export default function WithSliders({ category, context }) {
-  const userSettings = useStore((state) => state.userSettings)
-  const filters = useStore((s) => s.filters)
-  const { setFilters } = useStore.getState()
-
+function PokemonDrawer() {
+  const legacyFilter = useStorage((s) => s.userSettings.pokemon.legacyFilter)
+  const filterMode = useStorage((s) => s.getPokemonFilterMode())
+  const [ivOr, setIvOr] = useDeepStore('filters.pokemon.ivOr')
   const { t } = useTranslation()
-  const [tempLegacy, setTempLegacy] = useState(filters[category].ivOr)
-  const [openTab, setOpenTab] = useState(0)
+  const [openTab, setOpenTab] = useDeepStore(`tabs.pokemon`, 0)
+  const ui = useMemory((s) => s.ui.pokemon)
+  const selectRef = React.useRef(/** @type {HTMLDivElement | null} */ (null))
 
-  useEffect(() => {
-    setFilters({
-      ...filters,
-      [category]: {
-        ...filters[category],
-        ivOr: tempLegacy,
-      },
-    })
-  }, [tempLegacy])
-
-  const handleChange = (event, values) => {
-    if (values) {
-      setTempLegacy({
-        ...tempLegacy,
-        [event]: values,
-      })
-      Utility.analytics(
-        'Global Pokemon',
-        `${event}: ${values}`,
-        `${category} Text`,
-      )
-    } else {
-      const { name, value } = event.target
-      setTempLegacy({
-        ...tempLegacy,
-        [name]: value,
-      })
-      Utility.analytics(
-        'Global Pokemon',
-        `${name}: ${value}`,
-        `${category} Sliders`,
-      )
+  /** @type {import('@rm/types').RMSliderHandleChange<keyof import('@rm/types').PokemonFilter>} */
+  const handleChange = React.useCallback((name, values) => {
+    if (name in ivOr) {
+      setIvOr(name, values)
     }
-  }
+    Utility.analytics('Global Pokemon', `${name}: ${values}`, `Pokemon Text`)
+  }, [])
 
-  const handleTabChange = (_e, newValue) => setOpenTab(newValue)
+  /** @type {import('@mui/material').TabsProps['onChange']} */
+  const handleTabChange = React.useCallback(
+    (_e, newValue) => setOpenTab(newValue),
+    [],
+  )
 
   return (
     <>
-      <ListItem
-        secondaryAction={
-          <Switch
-            checked={filters[category].enabled}
-            onChange={() => {
-              setFilters({
-                ...filters,
-                [category]: {
-                  ...filters[category],
-                  enabled: !filters[category].enabled,
-                },
-              })
+      <BoolToggle field="filters.pokemon.enabled" label="enabled" />
+      <ListItem>
+        <FormControl fullWidth>
+          <InputLabel id="pokemon-filter-mode">
+            {t('pokemon_filter_mode')}
+          </InputLabel>
+          <Select
+            ref={selectRef}
+            labelId="pokemon-filter-mode"
+            id="demo-simple-select"
+            value={filterMode}
+            fullWidth
+            size="small"
+            label={t('pokemon_filter_mode')}
+            renderValue={(selected) => t(selected)}
+            onChange={(e) => {
+              const { setPokemonFilterMode } = useStorage.getState()
+              switch (e.target.value) {
+                case 'basic':
+                  return setPokemonFilterMode(false, true)
+                case 'intermediate':
+                  return setPokemonFilterMode(false, false)
+                case 'expert':
+                  return setPokemonFilterMode(true, false)
+                default:
+              }
             }}
-          />
-        }
-      >
-        <ListItemText primary={t('enabled')} />
+          >
+            {['basic', 'intermediate', ...(ui.legacy ? ['expert'] : [])].map(
+              (tier) => (
+                <MenuItem
+                  key={tier}
+                  dense
+                  value={tier}
+                  sx={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'flex-start',
+                    whiteSpace: 'normal',
+                    width: selectRef.current?.clientWidth || 'auto',
+                  }}
+                >
+                  <Typography variant="subtitle2">{t(tier)}</Typography>
+                  <Typography variant="caption" flexWrap="wrap">
+                    {t(`${tier}_description`)}
+                  </Typography>
+                </MenuItem>
+              ),
+            )}
+          </Select>
+        </FormControl>
       </ListItem>
-
-      {userSettings[category].legacyFilter && context.legacy ? (
-        <ListItem>
-          <StringFilter
-            filterValues={tempLegacy}
-            setFilterValues={setTempLegacy}
-          />
-        </ListItem>
+      <Collapse in={filterMode === 'intermediate'}>
+        <BoolToggle
+          field="userSettings.pokemon.linkGlobalAndAdvanced"
+          label="link_global_and_advanced"
+        />
+      </Collapse>
+      {legacyFilter && ui.legacy ? (
+        <StringFilterMemo field="filters.pokemon.ivOr" />
       ) : (
         <>
           <AppBar position="static">
             <Tabs value={openTab} onChange={handleTabChange}>
-              {Object.keys(context.sliders).map((slider) => (
-                <Tab label={t(slider)} key={slider} />
-              ))}
+              <Tab label={t('main')} />
+              <Tab label={t('extra')} />
+              <Tab label={t('select')} />
             </Tabs>
           </AppBar>
-          {Object.keys(context.sliders).map((slider, index) => (
-            <TabPanel value={openTab} index={index} key={slider}>
+          {Object.entries(ui.sliders).map(([sType, sliders], index) => (
+            <TabPanel value={openTab} index={index} key={sType}>
               <List>
-                {Object.values(context.sliders[slider]).map((subItem) => (
-                  <ListItem key={subItem.name} disablePadding>
+                {sliders.map((slider) => (
+                  <ListItem key={slider.name} disablePadding>
                     <SliderTile
-                      filterSlide={subItem}
+                      slide={slider}
                       handleChange={handleChange}
-                      filterValues={filters[category].ivOr}
+                      values={ivOr[slider.name]}
                     />
                   </ListItem>
                 ))}
                 {index ? (
-                  <ListItem disablePadding>
-                    <Grid container alignItems="center">
-                      {['xxs', 'xxl'].map((each, i) => (
-                        <Fragment key={each}>
-                          <Grid item xs={3}>
-                            <Typography variant="subtitle2" align="center">
-                              {t(i ? 'size_5' : 'size_1')}
-                            </Typography>
-                          </Grid>
-                          <Grid item xs={3}>
-                            <Switch
-                              color="primary"
-                              checked={filters[category].ivOr[each]}
-                              onChange={() => {
-                                setFilters({
-                                  ...filters,
-                                  [category]: {
-                                    ...filters[category],
-                                    ivOr: {
-                                      ...filters[category].ivOr,
-                                      [each]: !filters[category].ivOr[each],
-                                    },
-                                  },
-                                })
-                              }}
-                            />
-                          </Grid>
-                        </Fragment>
-                      ))}
-                    </Grid>
-                  </ListItem>
+                  <DualBoolToggle
+                    items={XXS_XXL}
+                    field="filters.pokemon.ivOr"
+                  />
                 ) : (
                   <>
-                    <ListItem disablePadding>
-                      <Grid container alignItems="center">
-                        {['zeroIv', 'hundoIv'].map((each) => (
-                          <Fragment key={each}>
-                            <Grid item xs={3}>
-                              <Typography noWrap>
-                                {t(Utility.camelToSnake(each))}
-                              </Typography>
-                            </Grid>
-                            <Grid item xs={3}>
-                              <Switch
-                                color="primary"
-                                disabled={!context[each]}
-                                checked={filters[category][each]}
-                                onChange={() => {
-                                  setFilters({
-                                    ...filters,
-                                    [category]: {
-                                      ...filters[category],
-                                      [each]: !filters[category][each],
-                                    },
-                                  })
-                                }}
-                              />
-                            </Grid>
-                          </Fragment>
-                        ))}
-                      </Grid>
-                    </ListItem>
-                    <ListItem disablePadding sx={{ pt: 2, pr: 1 }}>
-                      <ListItemText primary={t('gender')} />
-                      <MultiSelector
-                        filterKey="gender"
-                        items={[0, 1, 2, 3]}
-                        tKey="gender_icon_"
-                        filters={filters[category].ivOr.gender}
-                        setFilters={(newValue) =>
-                          setFilters({
-                            ...filters,
-                            [category]: {
-                              ...filters[category],
-                              ivOr: {
-                                ...filters[category].ivOr,
-                                gender: newValue,
-                              },
-                            },
-                          })
-                        }
-                      />
-                    </ListItem>
+                    <GenderListItem
+                      disablePadding
+                      field="filters.pokemon.ivOr"
+                      sx={{ pt: 1 }}
+                    />
+                    <Divider sx={{ mt: 2, mb: 1 }} />
+                    <ListSubheader disableGutters>
+                      {t('quick_select')}
+                    </ListSubheader>
+                    <DualBoolToggle
+                      field="filters.pokemon"
+                      items={NUNDO_HUNDO}
+                    />
                   </>
                 )}
               </List>
             </TabPanel>
           ))}
+          <TabPanel value={openTab} index={2} disablePadding>
+            <SelectorListMemo category="pokemon" />
+          </TabPanel>
         </>
       )}
     </>
   )
 }
+
+export const PokemonDrawerMemo = React.memo(PokemonDrawer)

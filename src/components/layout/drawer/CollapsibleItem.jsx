@@ -1,10 +1,12 @@
-/* eslint-disable no-unused-vars */
+// @ts-check
 import * as React from 'react'
 import Collapse from '@mui/material/Collapse'
-import ListItem from '@mui/material/ListItem'
 import List from '@mui/material/List'
 
-export default function CollapsibleItem({ open, children }) {
+/**
+ * @param {{ open: boolean, children: React.ReactNode }} props
+ */
+export function CollapsibleItem({ open, children }) {
   return (
     <Collapse in={open} timeout="auto" unmountOnExit>
       <List component="div" disablePadding>

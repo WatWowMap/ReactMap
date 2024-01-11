@@ -9,7 +9,8 @@ import {
   S2Point,
 } from 'nodes2ts'
 
-import { useStatic, useStore } from '@hooks/useStore'
+import { useMemory } from '@hooks/useMemory'
+import { useStorage } from '@hooks/useStorage'
 
 import Notification from '@components/layout/general/Notification'
 import { getQueryArgs } from '@services/functions/getQueryArgs'
@@ -38,16 +39,16 @@ const MemoBaseCell = React.memo(
 export default MemoBaseCell
 
 export function GenerateCells() {
-  const darkTiles = useStatic((s) => s.tileStyle === 'dark')
-  const color = useStore((s) =>
+  const darkTiles = useMemory((s) => s.tileStyle === 'dark')
+  const color = useStorage((s) =>
     darkTiles
       ? s.userSettings.s2cells.darkMapBorder
       : s.userSettings.s2cells.lightMapBorder,
   )
   /** @type {number[]} */
-  const filter = useStore((s) => s.filters.s2cells.cells)
-  const location = useStore((s) => s.location)
-  const zoom = useStore((s) => s.zoom)
+  const filter = useStorage((s) => s.filters.s2cells.cells)
+  const location = useStorage((s) => s.location)
+  const zoom = useStorage((s) => s.zoom)
 
   const cells = React.useMemo(() => {
     const bounds = getQueryArgs()

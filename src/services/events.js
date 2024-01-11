@@ -1,11 +1,12 @@
 // @ts-check
-import { useStatic, useStore } from '@hooks/useStore'
+import { useMemory } from '@hooks/useMemory'
+import { useStorage } from '@hooks/useStorage'
 
 /** @param {KeyboardEvent} event */
 function toggleDarkMode(event) {
   // This is mostly meant for development purposes
   if (event.ctrlKey && event.key === 'd') {
-    useStore.setState((prev) => ({ darkMode: !prev.darkMode }))
+    useStorage.setState((prev) => ({ darkMode: !prev.darkMode }))
   }
 }
 window.addEventListener('keydown', toggleDarkMode)
@@ -16,23 +17,23 @@ function onFocus() {
   if (timer) {
     clearTimeout(timer)
   }
-  useStatic.setState({ active: true })
+  useMemory.setState({ active: true })
 }
 window.addEventListener('focus', onFocus)
 
 function onBlur() {
   timer = setTimeout(() => {
-    useStatic.setState({ active: false })
-  }, 1000 * 60 * useStatic.getState().config.misc.clientTimeoutMinutes)
+    useMemory.setState({ active: false })
+  }, 1000 * 60 * useMemory.getState().config.misc.clientTimeoutMinutes)
 }
 window.addEventListener('blur', onBlur)
 
 function online() {
-  useStatic.setState({ online: true })
+  useMemory.setState({ online: true })
 }
 window.addEventListener('online', online)
 
 function offline() {
-  useStatic.setState({ online: false })
+  useMemory.setState({ online: false })
 }
 window.addEventListener('offline', offline)

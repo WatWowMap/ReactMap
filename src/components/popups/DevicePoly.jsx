@@ -3,7 +3,7 @@
 import * as React from 'react'
 import { Polyline, Polygon, Circle } from 'react-leaflet'
 
-import { useStore } from '@hooks/useStore'
+import { useStorage } from '@hooks/useStorage'
 
 /**
  *
@@ -11,7 +11,7 @@ import { useStore } from '@hooks/useStore'
  * @returns
  */
 const DevicePoly = ({ route, type, radius }) => {
-  const color = useStore((s) => s.userSettings.admin.devicePathColor)
+  const color = useStorage((s) => s.userSettings.admin.devicePathColor)
 
   const safeRoute = React.useMemo(() => {
     try {
