@@ -47,14 +47,14 @@ const DrawerSection = ({ category }) => {
   )
 
   React.useEffect(() => {
-    if (drawer) {
+    if (drawer && category !== 'scanAreas') {
       const timer = setTimeout(() => {
         setUnmountOnExit(false)
       }, 250)
       return () => clearTimeout(timer)
     }
     setUnmountOnExit(true)
-  }, [drawer])
+  }, [drawer, category])
 
   return (
     <Accordion
