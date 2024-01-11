@@ -100,8 +100,8 @@
     "yarn": "1.22.19"
   },
   "dependencies": {
-    "@apollo/client": "^3.8.7",
-    "@apollo/server": "^4.9.5",
+    "@apollo/client": "^3.8.9",
+    "@apollo/server": "^4.10.0",
     "@emotion/react": "^11.11.1",
     "@emotion/styled": "^11.11.0",
     "@graphql-tools/graphql-file-loader": "^8.0.0",
