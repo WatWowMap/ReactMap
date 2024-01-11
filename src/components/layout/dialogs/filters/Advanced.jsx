@@ -41,9 +41,7 @@ export default function AdvancedFilter() {
       ? s.filters[category]?.standard || STANDARD_BACKUP
       : STANDARD_BACKUP,
   )
-  const easyMode = useStorage((s) =>
-    category === 'pokemon' ? s.filters.pokemon.easyMode : false,
-  )
+  const easyMode = useStorage((s) => !!s.filters?.[category]?.easyMode)
   const [filters, setFilters] = useDeepStore(
     `filters.${category}.filter.${id}`,
     standard,

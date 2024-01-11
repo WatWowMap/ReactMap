@@ -52,9 +52,7 @@ const getOtherData = (id) => {
 export function StandardItem({ id, category, ...props }) {
   const [filter, setFilter] = useDeepStore(`filters.${category}.filter.${id}`)
   const hasAll = checkIfHasAll(category, id)
-  const easyMode = useStorage((s) =>
-    category === 'pokemon' ? s.filters.pokemon.easyMode : false,
-  )
+  const easyMode = useStorage((s) => !!s.filters?.[category]?.easyMode)
   return (
     <SelectorItem
       {...props}
