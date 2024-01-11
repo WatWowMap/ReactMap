@@ -64,7 +64,7 @@ function SelectorList({ category, subCategory, label, height = 400 }) {
           if (key === 'global') return false
           switch (subCategory) {
             case 'raids':
-              return key.startsWith('r') || key.startsWith('e')
+              return key.startsWith('e')
             case 'lures':
               return key.startsWith('l')
             case 'invasions':
