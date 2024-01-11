@@ -1334,6 +1334,7 @@ class Pokestop extends Model {
     if (hasConfirmed) {
       queries.rocketPokemon = this.query()
         .select([
+          'character AS grunt_type',
           'slot_1_pokemon_id',
           'slot_1_form',
           'slot_2_pokemon_id',
@@ -1345,6 +1346,7 @@ class Pokestop extends Model {
         .whereNotNull('slot_2_pokemon_id')
         .whereNotNull('slot_3_pokemon_id')
         .groupBy([
+          'character',
           'slot_1_pokemon_id',
           'slot_1_form',
           'slot_2_pokemon_id',
@@ -1482,15 +1484,22 @@ class Pokestop extends Model {
         case 'rocketPokemon':
           if (hasConfirmed) {
             rewards.forEach((reward) => {
-              finalList.add(
-                `a${reward.slot_1_pokemon_id}-${reward.slot_1_form}`,
-              )
-              finalList.add(
-                `a${reward.slot_2_pokemon_id}-${reward.slot_2_form}`,
-              )
-              finalList.add(
-                `a${reward.slot_3_pokemon_id}-${reward.slot_3_form}`,
-              )
+              const fullGrunt = Event.invasions[reward.grunt_type]
+              if (fullGrunt?.firstReward) {
+                finalList.add(
+                  `a${reward.slot_1_pokemon_id}-${reward.slot_1_form}`,
+                )
+              }
+              if (fullGrunt?.secondReward) {
+                finalList.add(
+                  `a${reward.slot_2_pokemon_id}-${reward.slot_2_form}`,
+                )
+              }
+              if (fullGrunt?.thirdReward) {
+                finalList.add(
+                  `a${reward.slot_3_pokemon_id}-${reward.slot_3_form}`,
+                )
+              }
             })
           }
           break
