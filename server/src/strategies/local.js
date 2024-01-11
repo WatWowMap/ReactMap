@@ -104,6 +104,7 @@ const authHandler = async (_req, username, password, done) => {
           user.discordId = userExists.discordId
           user.telegramId = userExists.telegramId
           user.webhookStrategy = userExists.webhookStrategy
+          user.data = userExists.data
           user.status = userExists.data
             ? (typeof userExists.data === 'string'
                 ? JSON.parse(userExists.data).status
