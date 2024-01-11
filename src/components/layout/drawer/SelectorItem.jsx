@@ -11,6 +11,8 @@ import { useTranslateById } from '@hooks/useTranslateById'
 import { useMemory } from '@hooks/useMemory'
 import { useLayoutStore } from '@hooks/useLayoutStore'
 import { useStorage, useDeepStore } from '@hooks/useStorage'
+import { checkIfHasAll } from '@services/functions/hasAll'
+
 import { Img } from '../general/Img'
 import { ColoredTile } from '../general/ColoredTile'
 import { useWebhookStore } from '../dialogs/webhooks/store'
@@ -116,11 +118,7 @@ export function SelectorItem({
   const url = useMemory((s) => s.Icons.getIconById(id))
   const easyMode = useStorage((s) => !!s.filters[category]?.easyMode)
 
-  const hasAll =
-    category === 'pokemon' ||
-    (category === 'pokestops' &&
-      !(id.startsWith('l') || id.startsWith('i') || id.startsWith('f'))) ||
-    (id.startsWith('t') && id !== 't0-0')
+  const hasAll = checkIfHasAll(category, id)
   const color = filter?.enabled
     ? filter?.all || easyMode || !hasAll
       ? 'success.main'

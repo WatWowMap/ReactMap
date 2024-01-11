@@ -17,6 +17,7 @@ import {
 import { ENABLED_ALL, XXS_XXL } from '@assets/constants'
 import { useTranslateById } from '@hooks/useTranslateById'
 import { STANDARD_BACKUP, applyToAll } from '@services/filtering/applyToAll'
+import { checkIfHasAll } from '@services/functions/hasAll'
 
 import { StringFilter } from './StringFilter'
 import SliderTile from './SliderTile'
@@ -188,13 +189,7 @@ export default function AdvancedFilter() {
                   />
                 )}
                 {category === 'pokestops' && <QuestConditionSelector id={id} />}
-                {category === 'pokemon' ||
-                (category === 'pokestops' &&
-                  !(
-                    id.startsWith('l') ||
-                    id.startsWith('i') ||
-                    id.startsWith('f')
-                  )) ? (
+                {checkIfHasAll(category, id) ? (
                   <DualBoolToggle
                     items={ENABLED_ALL}
                     field={`filters.${category}.filter.${id}`}
