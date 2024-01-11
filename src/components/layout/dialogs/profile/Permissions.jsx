@@ -84,7 +84,12 @@ function PermCard({ perm }) {
       return (
         <Box
           height="250px"
-          sx={{ background: `url(/${permImageDir}/${perm}.png)` }}
+          sx={{
+            background: `url(/${permImageDir}/${perm}.png)`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            backgroundRepeat: 'no-repeat',
+          }}
         />
       )
     return <PermMedia>{t('no_access')}</PermMedia>
