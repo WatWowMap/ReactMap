@@ -3,7 +3,7 @@ import * as React from 'react'
 import ListItem from '@mui/material/ListItem'
 import { useTranslation } from 'react-i18next'
 import { useMemory } from '@hooks/useMemory'
-import { useDeepStore } from '@hooks/useStorage'
+import { useDeepStore, useStorage } from '@hooks/useStorage'
 import { FormControl, InputLabel, Select, MenuItem } from '@mui/material'
 import Typography from '@mui/material/Typography'
 import QuestTitle from '@components/layout/general/QuestTitle'
@@ -14,14 +14,16 @@ import QuestTitle from '@components/layout/general/QuestTitle'
  * @returns
  */
 export function QuestConditionSelector({ id }) {
+  const { t } = useTranslation()
   const [value, setValue] = useDeepStore(
     `filters.pokestops.filter.${id}.adv`,
     '',
   )
+  const all = useStorage((s) => !!s.filters.pokestops.filter[id].all)
   const questConditions = useMemory((s) => s.available.questConditions[id])
   const hasQuests = useMemory((s) => s.ui.pokestops?.quests)
 
-  const { t } = useTranslation()
+  const [open, setOpen] = React.useState(false)
 
   // Provides a reset if that condition is no longer available
   React.useEffect(() => {
@@ -47,6 +49,14 @@ export function QuestConditionSelector({ id }) {
     }
   }, [questConditions, id, hasQuests])
 
+  const handleClose = () => {
+    setOpen(false)
+  }
+
+  const handleOpen = () => {
+    setOpen(true)
+  }
+
   if (!questConditions) return null
 
   return (
@@ -56,7 +66,11 @@ export function QuestConditionSelector({ id }) {
         <Select
           name="adv"
           value={value.split(',')}
+          disabled={all}
           fullWidth
+          open={open}
+          onOpen={handleOpen}
+          onClose={handleClose}
           multiple
           renderValue={(selected) =>
             Array.isArray(selected)
@@ -72,6 +86,7 @@ export function QuestConditionSelector({ id }) {
               child.props.value === ''
             ) {
               setValue('')
+              handleClose()
             } else {
               setValue(
                 Array.isArray(e.target.value)
