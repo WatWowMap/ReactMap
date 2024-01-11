@@ -97,7 +97,6 @@ export const useStorage = create(
             pokemon: {
               ...prev.userSettings.pokemon,
               legacyFilter,
-              linkGlobalAndAdvanced: !legacyFilter,
             },
           },
           filters: {

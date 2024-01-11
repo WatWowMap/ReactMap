@@ -14,16 +14,16 @@ export default function FilterMenu() {
 
   const [tempFilters, setTempFilters] = React.useState(filters?.filter)
 
-  /** @type {import('@components/layout/general/Footer').FooterButton[]} */
   const extraButtons = React.useMemo(
-    () => [
-      {
-        name: 'save',
-        action: toggleDialog(false, category, 'filters'),
-        icon: 'Save',
-        color: 'secondary',
-      },
-    ],
+    () =>
+      /** @type {import('@components/layout/general/Footer').FooterButton[]} */ ([
+        {
+          name: 'close',
+          action: toggleDialog(false, category, 'filters'),
+          icon: 'Clear',
+          color: 'secondary',
+        },
+      ]),
     [category],
   )
 

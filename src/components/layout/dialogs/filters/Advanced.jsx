@@ -41,6 +41,9 @@ export default function AdvancedFilter() {
       ? s.filters[category]?.standard || STANDARD_BACKUP
       : STANDARD_BACKUP,
   )
+  const easyMode = useStorage((s) =>
+    category === 'pokemon' ? s.filters.pokemon.easyMode : false,
+  )
   const [filters, setFilters] = useDeepStore(
     `filters.${category}.filter.${id}`,
     standard,
@@ -88,16 +91,14 @@ export default function AdvancedFilter() {
         name: 'reset',
         action: () => setFilters({ ...standard }),
         color: 'primary',
-        size: category === 'pokemon' ? 2 : null,
       },
       {
-        name: 'save',
+        name: 'close',
         action: () => toggleClose(true),
         color: 'secondary',
-        size: category === 'pokemon' ? 3 : null,
       },
     ],
-    [category, standard, id],
+    [standard, setFilters],
   )
 
   /** @type {import('@mui/material').SwitchProps['onChange']} */
@@ -115,6 +116,7 @@ export default function AdvancedFilter() {
   }, [open])
 
   if (!id) return null
+  const showMoreFilters = category === 'pokemon' && !easyMode
   return (
     <Dialog
       open={!!open}
@@ -135,36 +137,32 @@ export default function AdvancedFilter() {
             <StringFilter field={`filters.${category}.filter.${id}`} />
           ) : (
             <Grid2 container component={ListItem} disableGutters disablePadding>
-              {Object.entries('sliders' in ui ? ui.sliders : {}).map(
-                ([subCat, sliders], i) => (
-                  <Grid2 key={subCat} component={List} xs={12} sm={6}>
-                    {sliders.map((each) => (
-                      <ListItem
-                        key={`${subCat}${each.name}`}
-                        disableGutters
-                        disablePadding
-                        sx={{ pr: { xs: 0, sm: i ? 0 : 2 } }}
-                      >
-                        <SliderTile
-                          slide={{
-                            ...each,
-                            disabled: each.disabled || filters.all,
-                          }}
-                          // @ts-ignore
-                          handleChange={handleChange}
-                          values={filters[each.name]}
-                        />
-                      </ListItem>
-                    ))}
-                  </Grid2>
-                ),
-              )}
-              <Grid2
-                component={List}
-                xs={12}
-                sm={category === 'pokemon' ? 6 : 12}
-              >
-                {category === 'pokemon' && (
+              {Object.entries(
+                'sliders' in ui && !easyMode ? ui.sliders : {},
+              ).map(([subCat, sliders], i) => (
+                <Grid2 key={subCat} component={List} xs={12} sm={6}>
+                  {sliders.map((each) => (
+                    <ListItem
+                      key={`${subCat}${each.name}`}
+                      disableGutters
+                      disablePadding
+                      sx={{ pr: { xs: 0, sm: i ? 0 : 2 } }}
+                    >
+                      <SliderTile
+                        slide={{
+                          ...each,
+                          disabled: each.disabled || filters.all,
+                        }}
+                        // @ts-ignore
+                        handleChange={handleChange}
+                        values={filters[each.name]}
+                      />
+                    </ListItem>
+                  ))}
+                </Grid2>
+              ))}
+              <Grid2 component={List} xs={12} sm={showMoreFilters ? 6 : 12}>
+                {showMoreFilters && (
                   <GenderListItem
                     field={`filters.${category}.filter.${id}`}
                     disabled={filters.all}
@@ -176,12 +174,8 @@ export default function AdvancedFilter() {
                   disableGutters
                 />
               </Grid2>
-              <Grid2
-                component={List}
-                xs={12}
-                sm={category === 'pokemon' ? 6 : 12}
-              >
-                {category === 'pokemon' && (
+              <Grid2 component={List} xs={12} sm={showMoreFilters ? 6 : 12}>
+                {showMoreFilters && (
                   <DualBoolToggle
                     items={XXS_XXL}
                     field={`filters.${category}.filter.${id}`}

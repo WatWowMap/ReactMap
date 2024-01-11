@@ -207,7 +207,11 @@ export function MultiSelectorList({ children, tabKey }) {
   const { t } = useTranslation()
   const [openTab, setOpenTab] = useDeepStore(`tabs.${tabKey}`, 0)
 
-  const handleTabChange = (_e, newValue) => setOpenTab(newValue)
+  /** @type {import('@mui/material').TabsProps['onChange']} */
+  const handleTabChange = React.useCallback(
+    (_e, newValue) => setOpenTab(newValue),
+    [],
+  )
 
   return (
     <Box pt={2}>

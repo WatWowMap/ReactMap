@@ -478,7 +478,7 @@ const RaidInfo = ({
   const { t } = useTranslation()
   const Icons = useMemory((state) => state.Icons)
 
-  const { moves, pokemon } = useMemory((state) => state.masterfile)
+  const moves = useMemory((state) => state.masterfile.moves)
 
   const getRaidName = (raidLevel, id) => {
     if (id) {
@@ -492,8 +492,8 @@ const RaidInfo = ({
       return t(`costume_${costume}`, 'Unknown Costume')
     }
     if (form) {
-      const raidForm = pokemon[id].forms[form]?.name
-      if (raidForm === 'Normal' || !raidForm) {
+      const raidForm = t(`form_${form}`)
+      if (raidForm === t('form_29') || !raidForm) {
         return ''
       }
       return `${raidForm} ${t('form')}`

@@ -9,7 +9,7 @@ import * as MuiIcons from './Icons'
  * @typedef {{
  *    key?: string,
  *    name?: string,
- *    icon?: string,
+ *    icon?: keyof typeof MuiIcons,
  *    color?: import('@mui/material').ButtonProps['color'],
  *    disabled?: boolean,
  *    link?: string,

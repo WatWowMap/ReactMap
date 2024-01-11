@@ -12,6 +12,7 @@ import Query from '@services/Query'
 
 import { VirtualGrid } from '@components/layout/general/VirtualGrid'
 import { Img } from '@components/layout/general/Img'
+import { ToggleTypography } from '@components/layout/general/ToggleTypography'
 
 export function UserGymBadges() {
   const { t } = useTranslation()
@@ -74,7 +75,7 @@ function BadgeTile({ badge, ...gym }) {
   const badgeIcon = useMemory((s) => s.Icons.getMisc(`badge_${badge}`))
 
   return badge ? (
-    <Box className="vgrid-item">
+    <Box className="vgrid-item" minHeight={225}>
       <IconButton
         className="vgrid-icon"
         disabled={gym.deleted}
@@ -109,13 +110,13 @@ function BadgeTile({ badge, ...gym }) {
           />
         )}
       </Button>
-      <Typography
+      <ToggleTypography
         className="vgrid-caption"
         variant="caption"
         color={gym.deleted ? 'GrayText' : 'inherit'}
       >
         {gym.name || t('unknown_gym')}
-      </Typography>
+      </ToggleTypography>
     </Box>
   ) : null
 }

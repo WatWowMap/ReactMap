@@ -47,7 +47,11 @@ function PokemonDrawer() {
     Utility.analytics('Global Pokemon', `${name}: ${values}`, `Pokemon Text`)
   }, [])
 
-  const handleTabChange = (_e, newValue) => setOpenTab(newValue)
+  /** @type {import('@mui/material').TabsProps['onChange']} */
+  const handleTabChange = React.useCallback(
+    (_e, newValue) => setOpenTab(newValue),
+    [],
+  )
 
   return (
     <>
@@ -103,7 +107,6 @@ function PokemonDrawer() {
           </Select>
         </FormControl>
       </ListItem>
-
       <Collapse in={filterMode === 'intermediate'}>
         <BoolToggle
           field="userSettings.pokemon.linkGlobalAndAdvanced"

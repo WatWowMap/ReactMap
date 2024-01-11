@@ -8,12 +8,17 @@ const STYLE = /** @type {React.CSSProperties} */ ({
   width: '100%',
 })
 
-/** @typedef {Pick<import('@mui/material').Grid2Props, 'xs' | 'sm' | 'md' | 'lg' | 'xl'>} Prop */
+export const SQUARE_ITEM = /** @type {import('@mui/material').SxProps} */ ({
+  aspectRatio: '1/1',
+  outline: 'ButtonText 1px solid',
+})
 
-/** @type {React.ComponentType<import('react-virtuoso').GridItemProps & { context?: Prop }>} */
+/** @typedef {Pick<import('@mui/material').Grid2Props, 'xs' | 'sm' | 'md' | 'lg' | 'xl'>} SomeGridProps */
+
+/** @type {React.ComponentType<import('react-virtuoso').GridItemProps & { context?: SomeGridProps }>} */
 const Item = ({ context, ...props }) => <Grid2 {...context} {...props} />
 
-/** @type {React.ComponentType<import('react-virtuoso').GridListProps & { context?: Prop }>} */
+/** @type {React.ComponentType<import('react-virtuoso').GridListProps & { context?: SomeGridProps }>} */
 const List = React.forwardRef((props, ref) => (
   <Grid2 {...props} container alignItems="stretch" ref={ref} />
 ))
@@ -21,14 +26,14 @@ const List = React.forwardRef((props, ref) => (
 /**
  * @template T
  * @template {Record<string, any>} U
- * @param {Prop & {
+ * @param {SomeGridProps & {
  *  data: T[],
  *  context?: U,
- *  children: import('react-virtuoso').VirtuosoGridProps<T, U & Prop>['itemContent'],
+ *  children: import('react-virtuoso').VirtuosoGridProps<T, U & SomeGridProps>['itemContent'],
  *  Header?: React.ComponentType<U>,
  *  Footer?: React.ComponentType<U>,
  *  useWindowScroll?: boolean
- * } & Pick<import('@mui/material').Grid2Props, 'xs' | 'sm' | 'md' | 'lg' | 'xl'>} props
+ * }} props
  */
 export function VirtualGrid({
   children,

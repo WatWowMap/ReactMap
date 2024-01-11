@@ -72,24 +72,18 @@ export default function SlotSelection() {
           name: 'disable_all',
           action: () => handleSizeChange(false, id),
           color: 'error',
-          icon: 'Clear',
-          size: 2,
           disabled: teamId === '0',
         },
         {
           name: 'enable_all',
           action: () => handleSizeChange(true, id),
           color: 'success',
-          icon: 'Check',
-          size: 2,
           disabled: teamId === '0',
         },
         {
-          name: 'save',
+          name: 'close',
           action: handleClose,
           color: 'secondary',
-          icon: 'Save',
-          size: 2,
         },
       ]),
     [id, teamId, handleSizeChange, handleClose],
@@ -113,10 +107,11 @@ export default function SlotSelection() {
               field={`filters.gyms.filter.${id}`}
               switchColor="secondary"
               secondColor="success"
+              sx={{ pt: { xs: 2, sm: 1 } }}
             />
           </Grid2>
         </Grid2>
-        {teamId !== '0' && <Divider sx={{ my: 1 }} />}
+        {teamId !== '0' && <Divider sx={{ mt: 2 }} />}
         <Grid2 container justifyContent="center" alignItems="center">
           {teamId !== '0' &&
             slots.map((each) => (
@@ -141,7 +136,7 @@ export default function SlotSelection() {
 function SlotAdjustor({ id, children, onClick }) {
   const icon = useMemory((s) => s.Icons.getGyms(...id.slice(1).split('-')))
   return (
-    <Grid2 container xs={12} sm={6} alignItems="center">
+    <Grid2 container xs={12} sm={6} alignItems="center" pt={{ xs: 2, sm: 1 }}>
       <Grid2 xs={2}>
         <Img src={icon} maxHeight={50} maxWidth={50} alt={id} />
       </Grid2>

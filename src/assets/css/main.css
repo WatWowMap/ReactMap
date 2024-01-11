@@ -504,8 +504,7 @@ input[type='time']::-webkit-calendar-picker-indicator {
 .vgrid-item {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
-  grid-template-rows: auto auto 20%;
-  min-height: 225px;
+  grid-template-rows: auto auto 10%;
 }
 
 .vgrid-icon {
@@ -530,6 +529,7 @@ input[type='time']::-webkit-calendar-picker-indicator {
   text-align: center;
   justify-self: center;
   align-self: center;
+  width: 100%;
 }
 
 .badge-diamond {

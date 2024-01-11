@@ -3,19 +3,18 @@ import * as React from 'react'
 import TuneIcon from '@mui/icons-material/Tune'
 import IconButton from '@mui/material/IconButton'
 import Tooltip from '@mui/material/Tooltip'
-import Collapse from '@mui/material/Collapse'
 import Box from '@mui/material/Box'
-import Typography from '@mui/material/Typography'
 
 import { useTranslateById } from '@hooks/useTranslateById'
 import { useMemory } from '@hooks/useMemory'
 import { useLayoutStore } from '@hooks/useLayoutStore'
-import { useStorage, useDeepStore } from '@hooks/useStorage'
+import { useDeepStore, useStorage } from '@hooks/useStorage'
 import { checkIfHasAll } from '@services/functions/hasAll'
 
-import { Img } from '../general/Img'
 import { ColoredTile } from '../general/ColoredTile'
 import { useWebhookStore } from '../dialogs/webhooks/store'
+import { ToggleTypography } from '../general/ToggleTypography'
+import { SQUARE_ITEM } from '../general/VirtualGrid'
 
 /** @param {string} id */
 const getOtherData = (id) => {
@@ -29,29 +28,41 @@ const getOtherData = (id) => {
 }
 
 /**
+ * @template {string} T
  * @typedef {{
  *  id: string,
- *  category: keyof import('@rm/types').Available,
+ *  category: T,
  *  caption?: boolean
  * }} BaseProps
- *
- * @typedef {BaseProps & {
- *  filter: any,
+ */
+
+/**
+ * @typedef {{
+ *  id: string,
+ *  filter: any, // TODO: fix this
  *  setFilter: (value: any) => void
  *  onClick: () => void
+ *  hasAll?: boolean
+ *  easyMode?: boolean
+ *  caption?: boolean
  * }} FullProps
  */
 
-/** @param {BaseProps} props */
+/** @param {BaseProps<keyof import('@rm/types').Available>} props */
 export function StandardItem({ id, category, ...props }) {
   const [filter, setFilter] = useDeepStore(`filters.${category}.filter.${id}`)
+  const hasAll = checkIfHasAll(category, id)
+  const easyMode = useStorage((s) =>
+    category === 'pokemon' ? s.filters.pokemon.easyMode : false,
+  )
   return (
     <SelectorItem
       {...props}
       id={id}
-      category={category}
       filter={filter}
       setFilter={setFilter}
+      hasAll={hasAll}
+      easyMode={easyMode}
       onClick={() =>
         useLayoutStore.setState(
           id.startsWith('t')
@@ -70,7 +81,7 @@ export function StandardItem({ id, category, ...props }) {
   )
 }
 
-/** @param {BaseProps} props */
+/** @param {BaseProps<import('../dialogs/webhooks/store').WebhookStore['category']>} props */
 export function WebhookItem({ id, category, ...props }) {
   const filter = useWebhookStore((s) => s.tempFilters[id])
   const setFilter = () => {
@@ -87,7 +98,6 @@ export function WebhookItem({ id, category, ...props }) {
     <SelectorItem
       {...props}
       id={id}
-      category={category}
       filter={filter}
       setFilter={setFilter}
       onClick={() =>
@@ -105,88 +115,77 @@ export function WebhookItem({ id, category, ...props }) {
 }
 
 /** @param {FullProps} props */
-export function SelectorItem({
-  id,
-  category,
-  caption,
-  filter,
-  setFilter,
-  onClick,
-}) {
+function SelectorItem({ id, filter, setFilter, onClick, hasAll, easyMode }) {
   const { t } = useTranslateById({ alt: true, newLine: true })
   const title = t(id)
   const url = useMemory((s) => s.Icons.getIconById(id))
-  const easyMode = useStorage((s) => !!s.filters[category]?.easyMode)
 
-  const hasAll = checkIfHasAll(category, id)
   const color = filter?.enabled
-    ? filter?.all || easyMode || !hasAll
+    ? filter?.all || !hasAll
       ? 'success.main'
       : 'info.main'
     : 'error.dark'
+
+  const handleClick = React.useCallback(() => {
+    const newFilter = { ...filter }
+    // red => green => blue => red
+    if (filter.all && hasAll) {
+      newFilter.all = false
+      newFilter.enabled = !easyMode
+    } else if (filter.enabled) {
+      newFilter.enabled = false
+    } else {
+      if (hasAll) newFilter.all = true
+      newFilter.enabled = true
+    }
+    setFilter(newFilter)
+    setFilter(newFilter)
+  }, [filter, setFilter, hasAll, easyMode])
+
+  /** @type {import('@mui/material').IconButtonProps['onClick']} */
+  const handleIconClick = React.useCallback((e) => {
+    e.stopPropagation()
+    onClick()
+  }, [])
+
   return (
     <Box
-      display="flex"
-      justifyContent="center"
-      alignItems="center"
+      className="vgrid-item"
       position="relative"
-      sx={{
-        aspectRatio: '1/1',
-        outline: 'ButtonText 1px solid',
-      }}
-      onClick={() => {
-        const newFilter = { ...filter }
-        if (filter.all && hasAll) {
-          newFilter.all = false
-          newFilter.enabled = !easyMode
-        } else if (filter.enabled) {
-          newFilter.enabled = false
-        } else {
-          if (hasAll) newFilter.all = true
-          newFilter.enabled = true
-        }
-        setFilter(newFilter)
-      }}
+      minWidth="100%"
+      minHeight="100%"
+      sx={SQUARE_ITEM}
+      onClick={handleClick}
     >
       <ColoredTile bgcolor={color} />
-      <Tooltip title={title} arrow>
-        <Img
+      <Tooltip
+        title={process.env.NODE_ENV === 'development' ? id : title}
+        arrow
+        className="vgrid-image"
+      >
+        <Box
+          component="img"
           alt={title}
           src={url}
-          sx={caption ? { mb: 2 } : undefined}
           maxHeight="50%"
           maxWidth="50%"
           zIndex={10}
+          sx={{ aspectRatio: '1/1', objectFit: 'contain' }}
         />
       </Tooltip>
-      <Collapse in={!easyMode}>
-        <IconButton
-          size="small"
-          sx={{ position: 'absolute', right: 0, top: 0 }}
-          onClick={(e) => {
-            e.stopPropagation()
-            onClick()
-          }}
-        >
-          <TuneIcon fontSize="small" />
-        </IconButton>
-      </Collapse>
-      {caption && (
-        <Typography
-          variant={title.includes('\n') ? 'caption' : 'subtitle2'}
-          lineHeight={1.2}
-          align="center"
-          position="absolute"
-          bottom={2}
-          whiteSpace="pre-line"
-          height={33}
-          display="flex"
-          alignItems="center"
-        >
-          {title}
-          {process.env.NODE_ENV === 'development' ? `\n(${id})` : ''}
-        </Typography>
-      )}
+      <IconButton className="vgrid-icon" size="small" onClick={handleIconClick}>
+        <TuneIcon fontSize="small" />
+      </IconButton>
+      <ToggleTypography
+        className="vgrid-caption"
+        variant="caption"
+        fontWeight="bold"
+        zIndex={10}
+        alignSelf="end"
+        px={1}
+      >
+        {title.split('\n').at(-1).replace(/[()]/g, '')}
+      </ToggleTypography>
     </Box>
   )
 }

@@ -99,6 +99,37 @@ export default function UserOptions() {
     return t(Utility.camelToSnake(label), Utility.getProperName(label))
   }
 
+  const footerOptions = React.useMemo(
+    () =>
+      /** @type {import('@components/layout/general/Footer').FooterButton[]} */ ([
+        {
+          name: 'reset',
+          action: () => {
+            const newSettings = { ...userSettings[category] }
+            Object.entries(staticUserSettings || {}).forEach(([key, value]) => {
+              if (value.sub) {
+                Object.entries(value.sub).forEach(([subKey, subValue]) => {
+                  newSettings[subKey] = subValue.value
+                })
+              } else {
+                newSettings[key] = value.value
+              }
+            })
+            setLocalState(newSettings)
+          },
+          icon: 'Replay',
+          color: 'primary',
+        },
+        {
+          name: 'save',
+          action: toggleDialog(false, category, 'options', localState),
+          icon: 'Save',
+          color: 'secondary',
+        },
+      ]),
+    [category, userSettings, staticUserSettings, localState],
+  )
+
   React.useEffect(() => {
     setLocalState(userSettings[category])
   }, [category, userSettings[category]])
@@ -166,34 +197,7 @@ export default function UserOptions() {
           ))}
         </List>
       </DialogContent>
-      <Footer
-        options={[
-          {
-            name: 'reset',
-            action: () => {
-              const newSettings = { ...userSettings[category] }
-              Object.entries(staticUserSettings).forEach(([key, value]) => {
-                if (value.sub) {
-                  Object.entries(value.sub).forEach(([subKey, subValue]) => {
-                    newSettings[subKey] = subValue.value
-                  })
-                } else {
-                  newSettings[key] = value.value
-                }
-              })
-              setLocalState(newSettings)
-            },
-            icon: 'Replay',
-            color: 'primary',
-          },
-          {
-            name: 'save',
-            action: toggleDialog(false, category, 'options', localState),
-            icon: 'Save',
-            color: 'secondary',
-          },
-        ]}
-      />
+      <Footer options={footerOptions} />
     </DialogWrapper>
   )
 }
