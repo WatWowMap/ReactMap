@@ -19,7 +19,9 @@ export default function useFilter(
   reqCategories,
 ) {
   const { t } = useTranslation()
-  const search = useGetDeepStore(`searches.${category}Advanced`)
+  const search = useGetDeepStore(`searches.${category}Advanced`, '')
+    .toLowerCase()
+    .trim()
   const {
     available,
     auth: { perms },
