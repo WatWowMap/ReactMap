@@ -121,7 +121,7 @@ function SelectorItem({ id, filter, setFilter, onClick, hasAll, easyMode }) {
   const url = useMemory((s) => s.Icons.getIconById(id))
 
   const color = filter?.enabled
-    ? filter?.all || !hasAll
+    ? filter?.all || !hasAll || easyMode
       ? 'success.main'
       : 'info.main'
     : 'error.dark'
