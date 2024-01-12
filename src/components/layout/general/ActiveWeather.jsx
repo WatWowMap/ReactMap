@@ -61,8 +61,22 @@ export default function ActiveWeather() {
       )
       // @ts-ignore
       if (weatherCache) setActive(weatherCache)
+    } else {
+      setActive(null)
     }
   }, [location, zoom, allowedZoom])
+
+  const footerOptions = React.useMemo(
+    () =>
+      /** @type {import('./Footer').FooterButton[]} */ ([
+        {
+          name: 'close',
+          action: () => setOpen(false),
+          color: 'primary',
+        },
+      ]),
+    [setOpen],
+  )
 
   if (!weatherEnabled || !Icons || !active) return null
   const [{ disableColorShift = false }] = Icons.getModifiers('weather')
@@ -91,17 +105,7 @@ export default function ActiveWeather() {
         >
           <WeatherPopup {...active} />
         </DialogContent>
-        <Footer
-          role=""
-          options={[
-            {
-              icon: 'Close',
-              name: 'close',
-              action: () => setOpen(false),
-              color: 'primary',
-            },
-          ]}
-        />
+        <Footer role="" options={footerOptions} />
       </Dialog>
     </React.Fragment>
   )
