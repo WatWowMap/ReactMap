@@ -1,3 +1,10 @@
+# [1.28.0-develop.8](https://github.com/WatWowMap/ReactMap/compare/v1.28.0-develop.7...v1.28.0-develop.8) (2024-01-12)
+
+
+### Bug Fixes
+
+* xxs/xxl names ([d6a8906](https://github.com/WatWowMap/ReactMap/commit/d6a890621a84242264ae35b79e204c5fc9e2bc96))
+
 # [1.28.0-develop.7](https://github.com/WatWowMap/ReactMap/compare/v1.28.0-develop.6...v1.28.0-develop.7) (2024-01-12)
 
 
