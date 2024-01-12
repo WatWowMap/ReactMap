@@ -1,3 +1,10 @@
+# [1.28.0-develop.7](https://github.com/WatWowMap/ReactMap/compare/v1.28.0-develop.6...v1.28.0-develop.7) (2024-01-12)
+
+
+### Bug Fixes
+
+* updating robust timeout refetch fn ([ff84870](https://github.com/WatWowMap/ReactMap/commit/ff84870c994136a15da7af2fe31bf947eb830e63))
+
 # [1.28.0-develop.6](https://github.com/WatWowMap/ReactMap/compare/v1.28.0-develop.5...v1.28.0-develop.6) (2024-01-11)
 
 
