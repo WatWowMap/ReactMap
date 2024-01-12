@@ -141,11 +141,13 @@ function QueryData({ category, timeout }) {
     if (active) {
       timeout.current.setupTimeout(refetch)
       return () => {
-        useMemory.setState({ excludeList: [] })
+        useMemory.setState((prev) => ({
+          excludeList: prev.excludeList.length ? [] : prev.excludeList,
+        }))
         timeout.current.off()
       }
     }
-  }, [active, refetch, timeout])
+  }, [active, refetch, timeout.current])
 
   React.useEffect(() => {
     const refetchData = () => {
@@ -161,7 +163,7 @@ function QueryData({ category, timeout }) {
     return () => {
       map.off('fetchdata', refetchData)
     }
-  }, [filters, userSettings, onlyAreas])
+  }, [filters, userSettings, onlyAreas, timeout.current.refetch])
 
   if (error) {
     // @ts-ignore

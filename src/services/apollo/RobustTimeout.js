@@ -51,5 +51,7 @@ export default class RobustTimeout extends AbortableContext {
 
   off() {
     clearTimeout(this.timeout)
+    this.refetch = null
+    delete this._pendingVariables
   }
 }
