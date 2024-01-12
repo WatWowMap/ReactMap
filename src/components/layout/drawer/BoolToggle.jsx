@@ -74,8 +74,10 @@ export function DualBoolToggle({
   switchColor,
   secondColor,
   field,
+  label,
   ...props
 }) {
+  const labels = label?.split('-') || []
   return (
     <Grid2 container component={ListItem} disablePadding disableGutters>
       {items.map((item, i) => (
@@ -84,7 +86,7 @@ export function DualBoolToggle({
             <BoolToggle
               // @ts-ignore
               field={`${field}.${item}`}
-              label={item}
+              label={labels[i] || labels[0] || item}
               disablePadding
               disableGutters
               align="center"

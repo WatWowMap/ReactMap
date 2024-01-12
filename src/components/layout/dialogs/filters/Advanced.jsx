@@ -178,6 +178,7 @@ export default function AdvancedFilter() {
                     items={XXS_XXL}
                     field={`filters.${category}.filter.${id}`}
                     disabled={filters.all}
+                    label="size_1-size_5"
                   />
                 )}
                 {category === 'pokestops' && <QuestConditionSelector id={id} />}

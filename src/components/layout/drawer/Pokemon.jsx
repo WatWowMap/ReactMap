@@ -140,6 +140,7 @@ function PokemonDrawer() {
                   <DualBoolToggle
                     items={XXS_XXL}
                     field="filters.pokemon.ivOr"
+                    label="size_1-size_5"
                   />
                 ) : (
                   <>
