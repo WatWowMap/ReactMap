@@ -26,12 +26,12 @@ export default function SlotSelection() {
   }, basicEqualFn)
   const slots = useMemory(
     (s) =>
-      Object.keys(s.filters.gyms.filter).filter(
+      Object.keys(s.filters?.gyms?.filter || {}).filter(
         (g) => g.startsWith('g') && g.charAt(1) === teamId,
       ),
     basicEqualFn,
   )
-  const disabled = useStorage((s) => s.filters.gyms.filter[id]?.all)
+  const disabled = useStorage((s) => !!s.filters?.gyms?.filter?.[id]?.all)
 
   /** @type {(value: boolean | import('packages/types/lib').BaseFilter['size'], team: string) => void} */
   const handleSizeChange = React.useCallback(
