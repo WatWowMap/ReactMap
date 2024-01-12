@@ -7,7 +7,6 @@ import {
   ListItemIcon,
   ListItemText,
   ListItem,
-  TextField,
   TableContainer,
   Table,
   TableBody,
@@ -20,15 +19,17 @@ import { useTranslation } from 'react-i18next'
 import RestartAltIcon from '@mui/icons-material/RestartAlt'
 
 import Query from '@services/Query'
-import { useStatic, useStore } from '@hooks/useStore'
+import { useMemory } from '@hooks/useMemory'
+import { useStorage } from '@hooks/useStorage'
 import AreaTile from './AreaTile'
+import { GenericSearch } from './ItemSearch'
 
-export default function AreaDropDown() {
+function AreaDropDown() {
   const { data, loading, error } = useQuery(Query.scanAreasMenu())
   const { t } = useTranslation()
-  const filters = useStore((s) => s.filters)
-  const { setAreas, setFilters } = useStore.getState()
-  const { config } = useStatic.getState()
+  const filters = useStorage((s) => s.filters)
+  const { setAreas } = useStorage.getState()
+  const { config } = useMemory.getState()
   const map = useMap()
   const [open, setOpen] = React.useState('')
 
@@ -53,25 +54,7 @@ export default function AreaDropDown() {
         <ListItemText primary={t('reset')} />
       </ListItemButton>
       <ListItem>
-        <TextField
-          label={t('search')}
-          variant="outlined"
-          fullWidth
-          size="small"
-          value={filters?.scanAreas?.filter?.search || ''}
-          onChange={(e) =>
-            setFilters({
-              ...filters,
-              scanAreas: {
-                ...filters.scanAreas,
-                filter: {
-                  ...filters.scanAreas.filter,
-                  search: e.target.value || '',
-                },
-              },
-            })
-          }
-        />
+        <GenericSearch field="filters.scanAreas.filter.search" label="search" />
       </ListItem>
       <ListItem>
         <TableContainer
@@ -187,3 +170,5 @@ export default function AreaDropDown() {
     </>
   )
 }
+
+export default React.memo(AreaDropDown)

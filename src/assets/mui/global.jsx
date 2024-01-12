@@ -1,10 +1,10 @@
 import * as React from 'react'
 import GlobalStyles from '@mui/material/GlobalStyles'
 import { darken, lighten } from '@mui/material/styles'
-import { useStatic } from '@hooks/useStore'
+import { useMemory } from '@hooks/useMemory'
 
 export function ApplyGlobal() {
-  const online = useStatic((s) => s.online)
+  const online = useMemory((s) => s.online)
 
   return (
     <GlobalStyles

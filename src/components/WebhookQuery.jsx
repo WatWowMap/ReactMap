@@ -4,7 +4,8 @@ import { useParams } from 'react-router-dom'
 import { useQuery } from '@apollo/client'
 
 import Query from '@services/Query'
-import { useStatic, useStore } from '@hooks/useStore'
+import { useMemory } from '@hooks/useMemory'
+import { useStorage } from '@hooks/useStorage'
 
 /**
  * @param {string} category
@@ -46,14 +47,14 @@ export default function WebhookQuery({ children }) {
       data?.[`${lowercase}Single`]?.lat &&
       data[`${lowercase}Single`]?.lon
     ) {
-      useStore.setState((prev) => ({
+      useStorage.setState((prev) => ({
         location: [
           data[`${lowercase}Single`].lat,
           data[`${lowercase}Single`].lon,
         ],
         zoom: +params.zoom || prev.zoom,
       }))
-      useStatic.setState({
+      useMemory.setState({
         manualParams: {
           category: params.category,
           id: params.id,

@@ -4,7 +4,8 @@ import * as React from 'react'
 import { Marker, Popup, Circle } from 'react-leaflet'
 
 import useMarkerTimer from '@hooks/useMarkerTimer'
-import { basicEqualFn, useStatic, useStore } from '@hooks/useStore'
+import { basicEqualFn, useMemory } from '@hooks/useMemory'
+import { useStorage } from '@hooks/useStorage'
 import useForcePopup from '@hooks/useForcePopup'
 
 import PopupContent from '../popups/Pokestop'
@@ -28,9 +29,9 @@ const PokestopTile = (pokestop) => {
     hasAllStops,
     showTimer,
     interactionRangeZoom,
-  ] = useStatic((s) => {
+  ] = useMemory((s) => {
     const newTs = Date.now() / 1000
-    const { filters } = useStore.getState()
+    const { filters } = useStorage.getState()
     const {
       config,
       excludeList,
@@ -73,7 +74,7 @@ const PokestopTile = (pokestop) => {
     lureRange,
     interactionRange,
     customRange,
-  ] = useStore((s) => {
+  ] = useStorage((s) => {
     const { userSettings, zoom } = s
     return [
       userSettings.pokestops.invasionTimers || showTimer,

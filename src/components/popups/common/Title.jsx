@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { Typography } from '@mui/material'
 
-import { useStore } from '@hooks/useStore'
+import { useStorage } from '@hooks/useStorage'
 
 /**
  *
@@ -14,7 +14,7 @@ import { useStore } from '@hooks/useStore'
  * @returns
  */
 export default function Title({ children, variant = 'subtitle2', backup, sx }) {
-  const names = useStore((state) => !!state.popups.names)
+  const names = useStorage((state) => !!state.popups.names)
 
   return (
     <Typography
@@ -22,7 +22,7 @@ export default function Title({ children, variant = 'subtitle2', backup, sx }) {
       align="center"
       noWrap={names}
       onClick={() =>
-        useStore.setState((prev) => ({
+        useStorage.setState((prev) => ({
           popups: {
             ...prev.popups,
             names: !prev.popups.names,

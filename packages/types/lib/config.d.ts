@@ -3,6 +3,7 @@ import config = require('server/src/configs/default.json')
 import example = require('server/src/configs/local.example.json')
 
 import type { Schema } from './server'
+import type { DialogProps } from '@mui/material'
 
 type BaseConfig = typeof config
 type ExampleConfig = typeof example
@@ -74,13 +75,14 @@ export interface Config<Client extends boolean = false>
     messageOfTheDay: {
       settings: {
         parentStyle: Record<string, string> // should be CSS properties but performance seems to die
-      } & BaseConfig['map']['messageOfTheDay']['settings']
+      } & Omit<BaseConfig['map']['messageOfTheDay']['settings'], 'parentStyle'>
       titles: string[]
       components: CustomComponent[]
       footerButtons: CustomComponent[]
+      dialogMaxWidth: DialogProps['maxWidth']
     } & Omit<
       BaseConfig['map']['messageOfTheDay'],
-      'settings' | 'titles' | 'components' | 'footerButtons'
+      'settings' | 'titles' | 'components' | 'footerButtons' | 'dialogMaxWidth'
     >
     donationPage: {
       settings: {
@@ -105,8 +107,8 @@ export interface Config<Client extends boolean = false>
   database: {
     schemas: Schema[]
     settings: {
-      extraUserFields: string[]
-    } & BaseConfig['database']['settings']
+      extraUserFields: (ExtraField | string)[]
+    } & Omit<BaseConfig['database']['settings'], 'extraUserFields'>
   } & BaseConfig['database']
   scanner: {
     scanNext: {
@@ -128,6 +130,12 @@ export interface Config<Client extends boolean = false>
   manualAreas: ExampleConfig['manualAreas'][number][]
 }
 
+export interface ExtraField {
+  name: string
+  database: string
+  disabled: boolean
+}
+
 export interface Webhook {
   enabled: boolean
   provider: 'poracle'
@@ -145,6 +153,7 @@ export interface Webhook {
 }
 
 export interface CustomComponent {
+  type?: string
   components?: CustomComponent[]
   donorOnly?: boolean
   freeloaderOnly?: boolean
@@ -160,7 +169,7 @@ export type DeepKeys<T, P extends string = ''> = {
     : never
 }[keyof T]
 
-export type ConfigPaths = DeepKeys<Config>
+export type ConfigPaths<T extends object> = DeepKeys<T>
 
 export type PathValue<T, P> = P extends `${infer K}.${infer Rest}`
   ? K extends keyof T
@@ -172,7 +181,10 @@ export type PathValue<T, P> = P extends `${infer K}.${infer Rest}`
   ? T[P]
   : never
 
-export type ConfigPathValue<P extends ConfigPaths> = PathValue<Config, P>
+export type ConfigPathValue<
+  T extends object,
+  P extends ConfigPaths<T>,
+> = PathValue<T, P>
 
 export type Join<K, P> = K extends string | number
   ? P extends string | number
@@ -220,4 +232,4 @@ export type NestedObjectPaths = Paths<Config>
 
 export type GetSafeConfig = <P extends NestedObjectPaths>(
   path: P,
-) => ConfigPathValue<P>
+) => ConfigPathValue<Config, P>

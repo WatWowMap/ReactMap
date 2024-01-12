@@ -40,11 +40,12 @@ module.exports = class PkmnBackend {
    * @param {boolean} mods.onlyHundoIv
    * @param {boolean} mods.onlyZeroIv
    * @param {boolean} mods.onlyAllPvp
+   * @param {boolean} mods.onlyEasyMode
    * @param {string[]} mods.onlyAreas
    * @param {boolean} mods.onlyLegacy
    */
   constructor(id, filter, global, perms, mods) {
-    const [pokemon, form] = id.split('-').map(Number)
+    const [pokemon, form] = id.split('-', 2).map(Number)
     this.id = id
     this.pokemon = pokemon || 0
     this.form = form || 0
@@ -58,6 +59,8 @@ module.exports = class PkmnBackend {
     this.globalKeys = this.getRelevantKeys(global)
     this.expertFilter = this.getCallback(id === 'global')
     this.expertGlobal = this.getCallback(true)
+    this.isEqualToGlobal =
+      this.expertFilter.toString() === this.expertGlobal.toString()
   }
 
   get keyArray() {
@@ -141,7 +144,7 @@ module.exports = class PkmnBackend {
       if (merged) merged = `(${merged})&`
       merged += `G${filter.gender}`
     }
-    log.debug(HELPERS.pokemon, this.id, {
+    log.trace(HELPERS.pokemon, this.id, {
       andStr,
       orStr,
       merged,
@@ -171,13 +174,15 @@ module.exports = class PkmnBackend {
    * @returns {Set<(typeof import("./constants").KEYS)[number]>}
    */
   getRelevantKeys(filter = this.filter) {
-    return new Set(
-      KEYS.filter(
-        (key) =>
-          (pvpConfig.leagueObj[key] ? this.perms.pvp : this.perms.iv) &&
-          this.isActive(key, filter),
-      ),
-    )
+    return this.filter.all
+      ? new Set()
+      : new Set(
+          KEYS.filter(
+            (key) =>
+              (pvpConfig.leagueObj[key] ? this.perms.pvp : this.perms.iv) &&
+              this.isActive(key, filter),
+          ),
+        )
   }
 
   /**
@@ -278,18 +283,21 @@ module.exports = class PkmnBackend {
       xxl,
       ...rest
     } = this.filter
-    if (pokemon === undefined && this.id !== 'global')
-      pokemon = [{ id: this.pokemon, form: this.form }]
+    if (this.id !== 'global') {
+      if (pokemon === undefined) {
+        pokemon = [{ id: this.pokemon, form: this.form }]
+      }
+      if (!this.filterKeys.size || (!this.perms.iv && !this.perms.pvp)) {
+        return [{ pokemon, iv: { min: -1, max: 100 } }]
+      }
+      if (this.isEqualToGlobal) {
+        return []
+      }
+    }
     if (this.mods.onlyLegacy) {
       return dnfifyIvFilter(adv, pokemon)
     }
-    if (
-      this.id !== 'global' &&
-      (!this.filterKeys.size || (!this.perms.iv && !this.perms.pvp))
-    ) {
-      return [{ pokemon, iv: { min: -1, max: 100 } }]
-    }
-    const results = /** @type {import('../../../types').DnfFilter[]} */ ([])
+    const results = /** @type {import('@rm/types').DnfFilter[]} */ ([])
     if (
       ['iv', 'atk_iv', 'def_iv', 'sta_iv', 'cp', 'level', 'gender'].some((k) =>
         this.filterKeys.has(k),
@@ -350,6 +358,8 @@ module.exports = class PkmnBackend {
     ) {
       if (
         !this.mods.onlyLinkGlobal ||
+        (this.mods.onlyHundoIv && pokemon.iv === 100) ||
+        (this.mods.onlyZeroIv && pokemon.iv === 0) ||
         (this.pokemon === pokemon.pokemon_id && this.form === pokemon.form)
       ) {
         if (!this.expertFilter || !this.expertGlobal) return true
@@ -367,13 +377,14 @@ module.exports = class PkmnBackend {
   /**
    * @param {import("@rm/types").Pokemon} pokemon
    * @param {number} [ts]
-   * @returns {{ cleanPvp: { [key in typeof LEAGUES[number]]?: number[] }, bestPvp: number }}
+   * @returns {{ cleanPvp: { [key in typeof LEAGUES[number]]?: import('@rm/types').PvpEntry[] }, bestPvp: number }}
    */
   buildPvp(pokemon, ts = Math.floor(Date.now() / 1000)) {
     const parsed = pvpConfig.reactMapHandlesPvp
       ? Pvp.resultWithCache(pokemon, ts)
       : getParsedPvp(pokemon)
-    const cleanPvp = {}
+    const cleanPvp =
+      /** @type {{ [key in typeof LEAGUES[number]]?: import('@rm/types').PvpEntry[] }} */ ({})
     let bestPvp = 4096
     Object.keys(parsed).forEach((league) => {
       if (pvpConfig.leagueObj[league]) {
@@ -414,7 +425,7 @@ module.exports = class PkmnBackend {
     if (result.pokemon_id === 132 && !result.ditto_form) {
       result.ditto_form = result.form
       result.form =
-        Event.masterfile.pokemon[result.pokemon_id]?.defaultFormId || 0
+        Event.masterfile.pokemon[result.display_pokemon_id]?.defaultFormId || 0
     }
     if (!result.seen_type) {
       if (result.spawn_id === null) {
@@ -442,7 +453,7 @@ module.exports = class PkmnBackend {
         'weather',
       ])
     }
-    if (this.perms.pvp && result.cp) {
+    if (this.perms.pvp && pokemon.cp) {
       const { cleanPvp, bestPvp } = this.buildPvp(pokemon)
       result.bestPvp = bestPvp
       result.cleanPvp = cleanPvp

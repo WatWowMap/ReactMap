@@ -10,12 +10,9 @@ import {
 import { useTranslation, Trans } from 'react-i18next'
 
 import Utility from '@services/Utility'
-import {
-  useLayoutStore,
-  useStatic,
-  useStore,
-  toggleDialog,
-} from '@hooks/useStore'
+import { useMemory } from '@hooks/useMemory'
+import { toggleDialog, useLayoutStore } from '@hooks/useLayoutStore'
+import { useStorage } from '@hooks/useStorage'
 import { getPermission } from '@services/desktopNotification'
 
 import Header from '../general/Header'
@@ -23,7 +20,7 @@ import Footer from '../general/Footer'
 import { DialogWrapper } from './DialogWrapper'
 
 function InputType({ option, subOption, localState, handleChange, category }) {
-  const staticUserSettings = useStatic.getState().userSettings[category] || {}
+  const staticUserSettings = useMemory.getState().userSettings[category] || {}
   const fullOption = subOption
     ? staticUserSettings[option].sub[subOption]
     : staticUserSettings[option]
@@ -74,8 +71,8 @@ export default function UserOptions() {
   const { t } = useTranslation()
   const { open, category, type } = useLayoutStore((s) => s.dialog)
 
-  const staticUserSettings = useStatic((s) => s.userSettings[category] || {})
-  const userSettings = useStore((state) => state.userSettings)
+  const staticUserSettings = useMemory((s) => s.userSettings[category] || {})
+  const userSettings = useStorage((state) => state.userSettings)
 
   const [localState, setLocalState] = React.useState(userSettings[category])
 
@@ -102,9 +99,40 @@ export default function UserOptions() {
     return t(Utility.camelToSnake(label), Utility.getProperName(label))
   }
 
+  const footerOptions = React.useMemo(
+    () =>
+      /** @type {import('@components/layout/general/Footer').FooterButton[]} */ ([
+        {
+          name: 'reset',
+          action: () => {
+            const newSettings = { ...userSettings[category] }
+            Object.entries(staticUserSettings || {}).forEach(([key, value]) => {
+              if (value.sub) {
+                Object.entries(value.sub).forEach(([subKey, subValue]) => {
+                  newSettings[subKey] = subValue.value
+                })
+              } else {
+                newSettings[key] = value.value
+              }
+            })
+            setLocalState(newSettings)
+          },
+          icon: 'Replay',
+          color: 'primary',
+        },
+        {
+          name: 'save',
+          action: toggleDialog(false, category, 'options', localState),
+          icon: 'Save',
+          color: 'secondary',
+        },
+      ]),
+    [category, userSettings, staticUserSettings, localState],
+  )
+
   React.useEffect(() => {
     setLocalState(userSettings[category])
-  }, [category])
+  }, [category, userSettings[category]])
 
   return (
     <DialogWrapper
@@ -169,34 +197,7 @@ export default function UserOptions() {
           ))}
         </List>
       </DialogContent>
-      <Footer
-        options={[
-          {
-            name: 'reset',
-            action: () => {
-              const newSettings = { ...userSettings[category] }
-              Object.entries(staticUserSettings).forEach(([key, value]) => {
-                if (value.sub) {
-                  Object.entries(value.sub).forEach(([subKey, subValue]) => {
-                    newSettings[subKey] = subValue.value
-                  })
-                } else {
-                  newSettings[key] = value.value
-                }
-              })
-              setLocalState(newSettings)
-            },
-            icon: 'Replay',
-            color: 'primary',
-          },
-          {
-            name: 'save',
-            action: toggleDialog(false, category, 'options', localState),
-            icon: 'Save',
-            color: 'secondary',
-          },
-        ]}
-      />
+      <Footer options={footerOptions} />
     </DialogWrapper>
   )
 }

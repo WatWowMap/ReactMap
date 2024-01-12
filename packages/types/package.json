@@ -6,13 +6,15 @@
   "scripts": {
     "sort": "npx sort-package-json",
     "depCheck": "npx depcheck",
-    "eslint:check": "eslint \"**/*.{js,jsx}\"",
-    "eslint:fix": "eslint \"**/*.{js,jsx}\" --fix",
-    "prettier:check": "prettier --check \"**/*.{css,html,js,jsx,yml}\"",
+    "lint": "eslint \"**/*.{js,jsx}\"",
+    "lint:fix": "eslint \"**/*.{js,jsx}\" --fix",
+    "prettier": "prettier --check \"**/*.{css,html,js,jsx,yml}\"",
     "prettier:fix": "prettier --write \"**/*.{css,html,js,jsx,yml}\""
   },
   "devDependencies": {
     "@apollo/client": "^3.7.15",
+    "@mui/material": "^5.14.0",
+    "@mui/system": "^5.15.2",
     "@sentry/node": "^7.48.0",
     "@types/config": "^3.3.0",
     "@types/node": "^20.5.1",

@@ -1,9 +1,9 @@
 // @ts-check
 import { useEffect } from 'react'
-import { useStatic } from './useStore'
+import { useMemory } from './useMemory'
 
 const cleanup = () =>
-  useStatic.setState({ manualParams: { category: '', id: '' } })
+  useMemory.setState({ manualParams: { category: '', id: '' } })
 
 /**
  *
@@ -11,7 +11,7 @@ const cleanup = () =>
  * @param {import('leaflet').Marker<any>} ref
  */
 export default function useForcePopup(id, ref) {
-  const manualParams = useStatic((s) => s.manualParams)
+  const manualParams = useMemory((s) => s.manualParams)
 
   useEffect(() => {
     if (id === manualParams.id && ref) {

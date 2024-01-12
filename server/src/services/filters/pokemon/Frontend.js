@@ -2,7 +2,7 @@
 const config = require('@rm/config')
 const BaseFilter = require('../Base')
 
-module.exports = class PokemonFilter extends BaseFilter {
+class PokemonFilter extends BaseFilter {
   /**
    * @param {boolean} [enabled]
    * @param {'sm' | 'md' | 'lg' | 'xl'} [size]
@@ -52,3 +52,5 @@ module.exports = class PokemonFilter extends BaseFilter {
       )
   }
 }
+
+module.exports = PokemonFilter

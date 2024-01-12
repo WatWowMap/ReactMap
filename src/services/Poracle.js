@@ -1,7 +1,7 @@
 // @ts-check
 import { t } from 'i18next'
 import { useWebhookStore } from '@components/layout/dialogs/webhooks/store'
-import { useStatic } from '@hooks/useStore'
+import { useMemory } from '@hooks/useMemory'
 
 export default class Poracle {
   static getMapCategory(poracleCategory) {
@@ -49,7 +49,8 @@ export default class Poracle {
   }
 
   static getId(item) {
-    const { invasions } = useStatic.getState().masterfile
+    if (!item) return ''
+    const { invasions } = useMemory.getState().masterfile
     const { category } = useWebhookStore.getState()
 
     switch (category) {
@@ -155,6 +156,7 @@ export default class Poracle {
 
   static reactMapFriendly(values) {
     const reactMapFriendly = {}
+    if (!values) return reactMapFriendly
     Object.keys(values).forEach((key) => {
       if (key === 'min_time') {
         reactMapFriendly[key] = values[key]

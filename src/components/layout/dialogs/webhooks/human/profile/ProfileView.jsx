@@ -7,14 +7,14 @@ import Grid from '@mui/material/Unstable_Grid2'
 import Typography from '@mui/material/Typography'
 import IconButton from '@mui/material/IconButton'
 
-import { useStatic } from '@hooks/useStore'
+import { useMemory } from '@hooks/useMemory'
 
 import { useWebhookStore } from '../../store'
 import { ActiveHourChip } from './ActiveHourChip'
 
 /** @param {import('./ProfileTile').Props} props */
 export const ProfileView = ({ uid, handleViewChange }) => {
-  const isMobile = useStatic((s) => s.isMobile)
+  const isMobile = useMemory((s) => s.isMobile)
   const profile = useWebhookStore((s) => s.profile.find((p) => p.uid === uid))
 
   if (!profile) return null

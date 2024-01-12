@@ -23,7 +23,8 @@ import DownloadIcon from '@mui/icons-material/Download'
 
 import Query from '@services/Query'
 import formatInterval from '@services/functions/formatInterval'
-import { useStatic, useStore } from '@hooks/useStore'
+import { useMemory } from '@hooks/useMemory'
+import { useStorage } from '@hooks/useStorage'
 
 import Title from './common/Title'
 import TimeSince from './common/Timer'
@@ -82,7 +83,7 @@ function ListItemWrapper({
  * @returns
  */
 function ExpandableWrapper({ disabled = false, children, expandKey, primary }) {
-  const expanded = useStore((s) => !!s.popups[expandKey])
+  const expanded = useStorage((s) => !!s.popups[expandKey])
   return (
     <>
       <ListItemWrapper primary={primary}>
@@ -92,7 +93,7 @@ function ExpandableWrapper({ disabled = false, children, expandKey, primary }) {
           sx={{ p: 0 }}
           className={expanded ? 'expanded' : 'closed'}
           onClick={() =>
-            useStore.setState((prev) => ({
+            useStorage.setState((prev) => ({
               popups: {
                 ...prev.popups,
                 [expandKey]: !prev.popups[expandKey],
@@ -131,7 +132,7 @@ function ExpandableWrapper({ disabled = false, children, expandKey, primary }) {
 export default function RoutePopup({ end, ...props }) {
   const [route, setRoute] = React.useState({ ...props, tags: [] })
   const { i18n } = useTranslation()
-  const { config } = useStatic.getState()
+  const { config } = useMemory.getState()
 
   const [getRoute, { data, called }] = useLazyQuery(Query.routes('getOne'), {
     variables: { id: props.id },

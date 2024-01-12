@@ -8,7 +8,6 @@ import {
   Collapse,
   IconButton,
   Divider,
-  Dialog,
   MenuItem,
   Menu,
 } from '@mui/material'
@@ -16,14 +15,15 @@ import {
 import { useTranslation } from 'react-i18next'
 
 import { useSyncData } from '@components/layout/dialogs/webhooks/hooks'
-import { useStore, useStatic } from '@hooks/useStore'
+import { useMemory } from '@hooks/useMemory'
+import { useLayoutStore } from '@hooks/useLayoutStore'
+import { useStorage } from '@hooks/useStorage'
 import useWebhook from '@hooks/useWebhook'
 import Utility from '@services/Utility'
 import ErrorBoundary from '@components/ErrorBoundary'
-import { TextWithIcon } from '@components/layout/custom/CustomImg'
+import { TextWithIcon } from '@components/layout/general/Img'
 
 import Title from './common/Title'
-import BadgeSelection from '../layout/dialogs/BadgeSelection'
 import PowerUp from './common/PowerUp'
 import GenderIcon from './common/GenderIcon'
 import Navigation from './common/Navigation'
@@ -42,8 +42,8 @@ import { ExtraInfo } from './common/ExtraInfo'
  */
 export default function GymPopup({ hasRaid, hasHatched, raidIconUrl, ...gym }) {
   const { t } = useTranslation()
-  const { perms } = useStatic((state) => state.auth)
-  const popups = useStore((state) => state.popups)
+  const { perms } = useMemory((state) => state.auth)
+  const popups = useStorage((state) => state.popups)
   const ts = Math.floor(Date.now() / 1000)
 
   React.useEffect(() => {
@@ -132,7 +132,6 @@ export default function GymPopup({ hasRaid, hasHatched, raidIconUrl, ...gym }) {
  */
 const MenuActions = ({ hasRaid, ...gym }) => {
   const [anchorEl, setAnchorEl] = React.useState(null)
-  const [badgeMenu, setBadgeMenu] = React.useState(false)
 
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget)
@@ -140,31 +139,14 @@ const MenuActions = ({ hasRaid, ...gym }) => {
 
   const handleClose = React.useCallback(() => setAnchorEl(null), [])
 
-  const handleCloseBadge = React.useCallback((open) => {
-    handleClose()
-    setBadgeMenu(open)
-  }, [])
-
   return (
     <Grid item xs={2} textAlign="right">
       <IconButton aria-haspopup="true" onClick={handleClick} size="large">
         <MoreVert />
       </IconButton>
       <Menu anchorEl={anchorEl} open={!!anchorEl} onClose={handleClose}>
-        <DropdownOptions
-          {...gym}
-          hasRaid={hasRaid}
-          handleClose={handleClose}
-          handleCloseBadge={handleCloseBadge}
-        />
+        <DropdownOptions {...gym} hasRaid={hasRaid} handleClose={handleClose} />
       </Menu>
-      <Dialog open={badgeMenu} onClose={handleCloseBadge}>
-        <BadgeSelection
-          id={gym.id}
-          setBadgeMenu={handleCloseBadge}
-          badge={gym.badge}
-        />
-      </Dialog>
     </Grid>
   )
 }
@@ -173,15 +155,14 @@ const MenuActions = ({ hasRaid, ...gym }) => {
  *
  * @param {{
  *  handleClose: () => void
- *  handleCloseBadge: (open: boolean) => void
  *  hasRaid: boolean
  * } & import('@rm/types').Gym} param0
  * @returns
  */
 const DropdownOptions = ({
   id,
+  badge,
   handleClose,
-  handleCloseBadge,
   updated,
   team_id,
   hasRaid,
@@ -191,8 +172,8 @@ const DropdownOptions = ({
 }) => {
   const { t } = useTranslation()
 
-  const { gyms, raids, gymBadges, webhooks } = useStatic((s) => s.auth.perms)
-  const gymValidDataLimit = useStatic((state) => state.gymValidDataLimit)
+  const { gyms, raids, gymBadges, webhooks } = useMemory((s) => s.auth.perms)
+  const gymValidDataLimit = useMemory((state) => state.gymValidDataLimit)
 
   const { data: raidHooks } = useSyncData('raid')
   const { data: gymHooks } = useSyncData('gym')
@@ -207,12 +188,12 @@ const DropdownOptions = ({
 
   const handleHide = () => {
     handleClose()
-    useStatic.setState((prev) => ({ hideList: new Set(prev.hideList).add(id) }))
+    useMemory.setState((prev) => ({ hideList: new Set(prev.hideList).add(id) }))
   }
 
   const handleExclude = (key) => {
     handleClose()
-    useStore.setState((prev) => ({
+    useStorage.setState((prev) => ({
       filters: {
         ...prev.filters,
         gyms: {
@@ -227,7 +208,7 @@ const DropdownOptions = ({
         },
       },
     }))
-    useStatic.setState((prev) => ({ excludeList: [...prev.excludeList, key] }))
+    useMemory.setState((prev) => ({ excludeList: [...prev.excludeList, key] }))
   }
 
   const excludeTeam = () => handleExclude(`t${team_id}-0`)
@@ -241,7 +222,7 @@ const DropdownOptions = ({
 
   const handleTimer = () => {
     handleClose()
-    useStatic.setState((prev) => {
+    useMemory.setState((prev) => {
       if (prev.timerList.includes(id)) {
         return { timerList: prev.timerList.filter((x) => x !== id) }
       }
@@ -258,7 +239,10 @@ const DropdownOptions = ({
     if (gymBadges) {
       options.push({
         name: 'gym_badge_menu',
-        action: () => handleCloseBadge(true),
+        action: () =>
+          useLayoutStore.setState({
+            gymBadge: { badge, gymId: id, open: true },
+          }),
       })
     }
   }
@@ -287,7 +271,7 @@ const DropdownOptions = ({
     })
   }
 
-  return options.map((option) => (
+  return options.filter(Boolean).map((option) => (
     <MenuItem key={option.key || option.name} onClick={option.action} dense>
       {typeof option.name === 'string' ? t(option.name) : option.name}
     </MenuItem>
@@ -300,7 +284,7 @@ const DropdownOptions = ({
  * @returns
  */
 const PoiImage = ({ url, team_id, name, badge }) => {
-  const Icons = useStatic((state) => state.Icons)
+  const Icons = useMemory((state) => state.Icons)
   const src = url ? url.replace('http://', 'https://') : Icons.getTeams(team_id)
 
   return (
@@ -333,8 +317,8 @@ const RaidImage = ({
   raid_pokemon_gender,
 }) => {
   const { t } = useTranslation()
-  const Icons = useStatic((state) => state.Icons)
-  const pokemon = useStatic((state) => state.masterfile.pokemon)
+  const Icons = useMemory((state) => state.Icons)
+  const pokemon = useMemory((state) => state.masterfile.pokemon)
 
   /**
    *
@@ -409,8 +393,8 @@ const GymInfo = ({
   badge,
 }) => {
   const { t } = useTranslation()
-  const Icons = useStatic((state) => state.Icons)
-  const gymValidDataLimit = useStatic((state) => state.gymValidDataLimit)
+  const Icons = useMemory((state) => state.Icons)
+  const gymValidDataLimit = useMemory((state) => state.gymValidDataLimit)
 
   return (
     <Grid
@@ -492,9 +476,9 @@ const RaidInfo = ({
   raid_pokemon_move_2,
 }) => {
   const { t } = useTranslation()
-  const Icons = useStatic((state) => state.Icons)
+  const Icons = useMemory((state) => state.Icons)
 
-  const { moves, pokemon } = useStatic((state) => state.masterfile)
+  const moves = useMemory((state) => state.masterfile.moves)
 
   const getRaidName = (raidLevel, id) => {
     if (id) {
@@ -508,8 +492,8 @@ const RaidInfo = ({
       return t(`costume_${costume}`, 'Unknown Costume')
     }
     if (form) {
-      const raidForm = pokemon[id].forms[form].name
-      if (raidForm === 'Normal') {
+      const raidForm = t(`form_${form}`)
+      if (raidForm === t('form_29') || !raidForm) {
         return ''
       }
       return `${raidForm} ${t('form')}`
@@ -644,12 +628,12 @@ const Timer = ({
  * @returns
  */
 const GymFooter = ({ lat, lon, hasRaid }) => {
-  const darkMode = useStore((s) => s.darkMode)
-  const popups = useStore((state) => state.popups)
-  const perms = useStatic((state) => state.auth.perms)
+  const darkMode = useStorage((s) => s.darkMode)
+  const popups = useStorage((state) => state.popups)
+  const perms = useMemory((state) => state.auth.perms)
 
   const handleExpandClick = (category) => {
-    useStore.setState((prev) => ({
+    useStorage.setState((prev) => ({
       popups: {
         ...prev.popups,
         [category]: !popups[category],
@@ -663,7 +647,7 @@ const GymFooter = ({ lat, lon, hasRaid }) => {
         <Grid item xs={4}>
           <IconButton onClick={() => handleExpandClick('raids')} size="large">
             <img
-              src={useStatic
+              src={useMemory
                 .getState()
                 .Icons.getMisc(popups.raids ? 'gyms' : 'raids')}
               alt={popups.raids ? 'gyms' : 'raids'}
@@ -706,9 +690,9 @@ const ExtraGymInfo = ({
   guarding_pokemon_id,
 }) => {
   const { t, i18n } = useTranslation()
-  const Icons = useStatic((s) => s.Icons)
-  const gymValidDataLimit = useStatic((state) => state.gymValidDataLimit)
-  const enableGymPopupCoords = useStore(
+  const Icons = useMemory((s) => s.Icons)
+  const gymValidDataLimit = useMemory((state) => state.gymValidDataLimit)
+  const enableGymPopupCoords = useStorage(
     (state) => state.userSettings.gyms.enableGymPopupCoords,
   )
 

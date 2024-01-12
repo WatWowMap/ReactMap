@@ -1,5 +1,5 @@
 // @ts-check
-import { useStatic } from '@hooks/useStore'
+import { useMemory } from '@hooks/useMemory'
 
 import getAllDevices from './queries/device'
 import * as gymIndex from './queries/gym'
@@ -24,7 +24,7 @@ export default class Query {
   }
 
   static gyms(filters) {
-    const perms = useStatic.getState().ui.gyms
+    const perms = useMemory.getState().ui.gyms
     if (filters === 'id') {
       return gymIndex.getOne
     }
@@ -65,7 +65,7 @@ export default class Query {
   }
 
   static pokestops(filters) {
-    const perms = useStatic.getState().ui.pokestops
+    const perms = useMemory.getState().ui.pokestops
     if (filters === 'id') {
       return pokestopIndex.getOne
     }
@@ -86,7 +86,7 @@ export default class Query {
   }
 
   static pokemon(filters) {
-    const perms = useStatic.getState().ui.pokemon
+    const perms = useMemory.getState().ui.pokemon
     if (filters === 'id') {
       return pokemonIndex.getOne
     }

@@ -1,58 +1,73 @@
-import React, { useState } from 'react'
-import { TextField } from '@mui/material'
+// @ts-check
+import * as React from 'react'
+import { ListItem, TextField } from '@mui/material'
 import { useTranslation } from 'react-i18next'
+import dlv from 'dlv'
 
+import { useStorage } from '@hooks/useStorage'
+import { setDeep } from '@services/functions/setDeep'
 import Utility from '@services/Utility'
 
-export default function StringFilter({ filterValues, setFilterValues }) {
+/**
+ * Expert string input field for filters
+ * @param {{ field: string } & import('@mui/material').ListItemProps} props
+ * @returns
+ */
+export function StringFilter({ field, ...props }) {
   const { t } = useTranslation()
-  const [validation, setValidation] = useState({
-    value: filterValues.adv,
+  const value = useStorage((s) => dlv(s, `${field}.adv`))
+
+  const [validation, setValidation] = React.useState({
     status: false,
     label: t('iv_or_filter'),
     message: t('overwrites'),
   })
 
-  const validationCheck = (event) => {
-    let { value } = event.target
-    Utility.analytics('Filtering', value, 'Legacy')
-    if (Utility.checkAdvFilter(value)) {
-      setValidation({
-        label: t('valid'),
-        value,
-        status: false,
-        message: t('valid_filter'),
-      })
-    } else if (value === '') {
-      setValidation({
-        label: t('iv_or_filter'),
-        value,
-        status: false,
-        message: t('overwrites'),
-      })
-    } else {
-      setValidation({
-        label: t('invalid'),
-        value,
-        status: true,
-        message: t('invalid_filter'),
-      })
-      value = ''
-    }
-    setFilterValues({ ...filterValues, adv: value })
-  }
+  const validationCheck =
+    /** @type {import('@mui/material').TextFieldProps['onChange']} */ (
+      React.useCallback(
+        (event) => {
+          const newValue = event.target.value
+          Utility.analytics('Filtering', newValue, 'Legacy')
+          if (Utility.checkAdvFilter(newValue)) {
+            setValidation({
+              label: t('valid'),
+              status: false,
+              message: t('valid_filter'),
+            })
+          } else if (newValue === '') {
+            setValidation({
+              label: t('iv_or_filter'),
+              status: false,
+              message: t('overwrites'),
+            })
+          } else {
+            setValidation({
+              label: t('invalid'),
+              status: true,
+              message: t('invalid_filter'),
+            })
+          }
+          useStorage.setState((prev) => setDeep(prev, `${field}.adv`, newValue))
+        },
+        [field],
+      )
+    )
 
   return (
-    <TextField
-      name="adv"
-      error={validation.status}
-      label={validation.label}
-      helperText={validation.message}
-      value={validation.value}
-      onChange={validationCheck}
-      color={validation.status ? 'primary' : 'secondary'}
-      fullWidth
-      autoComplete="off"
-    />
+    <ListItem {...props}>
+      <TextField
+        error={validation.status}
+        label={validation.label}
+        helperText={validation.message}
+        value={value || ''}
+        onChange={validationCheck}
+        color={validation.status ? 'primary' : 'secondary'}
+        fullWidth
+        autoComplete="off"
+      />
+    </ListItem>
   )
 }
+
+export const StringFilterMemo = React.memo(StringFilter)

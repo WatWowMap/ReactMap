@@ -3,7 +3,7 @@ import { useEffect, useMemo, useRef } from 'react'
 import { useQuery } from '@apollo/client'
 import { useTranslation } from 'react-i18next'
 
-import { useStatic } from '@hooks/useStore'
+import { useMemory } from '@hooks/useMemory'
 import {
   WEBHOOK_CATEGORIES,
   WEBHOOK_AREAS,
@@ -171,7 +171,7 @@ export function useGenFilters() {
   const {
     // masterfile: { invasions },
     filters: rmFilters,
-  } = useStatic.getState()
+  } = useMemory.getState()
   const category = useWebhookStore((s) => s.category)
   const profile_no = useWebhookStore((s) => s.human.current_profile_no) || 0
 
@@ -209,7 +209,7 @@ export function useGenFullFilters() {
     const {
       filters: rmFilters,
       masterfile: { invasions },
-    } = useStatic.getState()
+    } = useMemory.getState()
     if (!ui) return {}
     const { pokemon, egg, gym, invasion, lure, quest, nest, raid } = ui
     const filters = {

@@ -1,7 +1,8 @@
 // @ts-check
 /* eslint-disable no-nested-ternary */
 import { divIcon } from 'leaflet'
-import { basicEqualFn, useStatic, useStore } from '@hooks/useStore'
+import { basicEqualFn, useMemory } from '@hooks/useMemory'
+import { useStorage } from '@hooks/useStorage'
 import useOpacity from '@hooks/useOpacity'
 
 /**
@@ -26,13 +27,13 @@ export default function usePokestopMarker({
   invasions,
   quests,
 }) {
-  const [, Icons] = useStore(
-    (s) => [s.icons, useStatic.getState().Icons],
+  const [, Icons] = useStorage(
+    (s) => [s.icons, useMemory.getState().Icons],
     (a, b) => Object.entries(a[0]).every(([k, v]) => b[0][k] === v),
   )
 
   const getOpacity = useOpacity('pokestops', 'invasion')
-  const [showArBadge, baseIcon, baseSize] = useStore((s) => {
+  const [showArBadge, baseIcon, baseSize] = useStorage((s) => {
     const { filters, userSettings } = s
     return [
       userSettings.pokestops.showArBadge,
@@ -55,12 +56,13 @@ export default function usePokestopMarker({
         : Icons.getSize('pokestop', filters.pokestops.filter.s0?.size),
     ]
   }, basicEqualFn)
-  const filters = useStore((s) => s.filters.pokestops.filter)
+  const filters = useStorage((s) => s.filters.pokestops.filter)
 
-  const [invasionMod, pokestopMod, rewardMod] = Icons.getModifiers(
+  const [invasionMod, pokestopMod, rewardMod, eventMod] = Icons.getModifiers(
     'invasion',
     'pokestop',
     'reward',
+    'event',
   )
 
   let popupYOffset = 1.3
@@ -71,6 +73,8 @@ export default function usePokestopMarker({
   const invasionSizes = []
   const questIcons = []
   const questSizes = []
+  const showcaseIcons = []
+  const showcaseSizes = []
 
   if (hasInvasion) {
     invasions.forEach((invasion) => {
@@ -185,7 +189,35 @@ export default function usePokestopMarker({
       popupY += rewardMod.popupY
     })
   }
-
+  if (hasEvent && !hasInvasion && !hasQuest) {
+    events.forEach((event) => {
+      if (event.display_type === 8) {
+        showcaseIcons.unshift({
+          url: Icons.getPokemon(352),
+        })
+        showcaseSizes.unshift(Icons.getSize('event', filters.b7?.size))
+      } else if (event.display_type === 9 && event.showcase_pokemon_id) {
+        showcaseIcons.unshift({
+          url: Icons.getPokemon(
+            event.showcase_pokemon_id,
+            event.showcase_pokemon_form_id,
+          ),
+          decoration: true,
+        })
+        showcaseSizes.unshift(
+          Icons.getSize(
+            'event',
+            filters[
+              `f${event.showcase_pokemon_id}-${event.showcase_pokemon_form_id}`
+            ]?.size,
+          ),
+        )
+      }
+      popupYOffset += rewardMod.offsetY - 1
+      popupX += rewardMod.popupX
+      popupY += rewardMod.popupY
+    })
+  }
   const totalQuestSize = questSizes.reduce((a, b) => a + b, 0)
   const totalInvasionSize = invasionSizes.reduce((a, b) => a + b, 0)
 
@@ -284,7 +316,6 @@ export default function usePokestopMarker({
           .map(
             (invasion, i) => /* html */ `
               <img
-                key="${invasion.icon}"
                 src="${invasion.icon}"
                 alt="${invasion.icon}"
                 style="
@@ -301,6 +332,43 @@ export default function usePokestopMarker({
           `,
           )
           .join('')}
-      </div>`,
+          ${showcaseIcons
+            .map(
+              (icon, i) => `
+                <img
+                  src="${icon.url}"
+                  alt="${icon.url}"
+                  style="
+                    width: ${showcaseSizes[i]}px;
+                    height: ${showcaseSizes[i]}px;
+                    bottom: ${
+                      baseSize * 0.6 * eventMod.offsetY + showcaseSizes[i] * i
+                    }px;
+                    left: ${eventMod.offsetX * 50}%;
+                    transform: translateX(-50%);
+                  "
+                />
+                ${
+                  icon.decoration
+                    ? `
+                  <img
+                    src="${Icons.getMisc('showcase')}"
+                    style="
+                      width: ${showcaseSizes[i] * 0.66}px;
+                      height: ${showcaseSizes[i] * 0.66}px;
+                      bottom: ${
+                        baseSize * 0.3 * eventMod.offsetY + showcaseSizes[i] * i
+                      }px;
+                      left: ${eventMod.offsetX * 50}%;
+                      transform: translateX(-50%);
+                    "
+                  />
+                `
+                    : ''
+                }
+            `,
+            )
+            .join('')}
+        </div>`,
   })
 }

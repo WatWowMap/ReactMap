@@ -1,16 +1,24 @@
-import React from 'react'
-import { Box } from '@mui/material'
+// @ts-check
+import * as React from 'react'
+import Box from '@mui/material/Box'
 
-export default ({ children, value, index, virtual }) => (
-  <div
-    role="tabpanel"
-    hidden={value !== index}
-    style={virtual ? { height: '100%' } : {}}
-  >
-    {value === index && (
-      <Box p={2} style={virtual ? { height: '95%' } : {}}>
-        {children}
-      </Box>
-    )}
-  </div>
-)
+/**
+ * @param {{
+ *  children: React.ReactNode,
+ *  value: number,
+ *  index: number,
+ *  disablePadding?: boolean
+ * }} props
+ */
+export default function TabPanel({ children, value, index, disablePadding }) {
+  return (
+    <Box
+      role="tabpanel"
+      hidden={value !== index}
+      height="100%"
+      p={disablePadding ? 0 : 2}
+    >
+      {children}
+    </Box>
+  )
+}
