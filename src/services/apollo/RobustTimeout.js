@@ -22,7 +22,10 @@ export default class RobustTimeout extends AbortableContext {
    */
   doRefetch(variables) {
     const now = Date.now()
-    if (now - this._lastUpdated < (this._pendingOp ? 5000 : 500)) {
+    if (
+      now - this._lastUpdated < (this._pendingOp ? 5000 : 500) ||
+      !this.refetch
+    ) {
       if (variables !== undefined) {
         this._pendingVariables = variables
       }
