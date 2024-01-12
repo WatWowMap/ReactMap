@@ -1,3 +1,10 @@
+# [1.28.0-develop.9](https://github.com/WatWowMap/ReactMap/compare/v1.28.0-develop.8...v1.28.0-develop.9) (2024-01-12)
+
+
+### Bug Fixes
+
+* `this.refetch` check ([e57f1b0](https://github.com/WatWowMap/ReactMap/commit/e57f1b0235401a3dd90725003fb94b11c33869d3))
+
 # [1.28.0-develop.8](https://github.com/WatWowMap/ReactMap/compare/v1.28.0-develop.7...v1.28.0-develop.8) (2024-01-12)
 
 
