@@ -19,7 +19,7 @@ import { useStorage } from './useStorage'
  *  drawer: boolean,
  *  advancedFilter: {
  *    open: boolean,
- *    category: import('@rm/types').AdvCategories,
+ *    category: import('@rm/types').AdvCategories | '',
  *    id: string,
  *    selectedIds: string[],
  *  },
@@ -51,7 +51,7 @@ export const useLayoutStore = create(() => ({
   slotSelection: '',
   advancedFilter: {
     open: false,
-    category: 'pokemon',
+    category: '',
     id: '',
     selectedIds: [],
   },

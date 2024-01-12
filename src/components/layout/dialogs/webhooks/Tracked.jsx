@@ -58,7 +58,7 @@ export const WebhookSearch = React.memo(() => {
       setValue={(newValue) =>
         useWebhookStore.setState({ trackedSearch: newValue })
       }
-      label={`search_${category}`}
+      label={`search_${category}${category === 'pokemon' ? '' : 's'}`}
     />
   )
 })

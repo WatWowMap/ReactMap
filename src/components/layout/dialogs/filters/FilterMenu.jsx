@@ -10,7 +10,7 @@ import { DialogWrapper } from '../DialogWrapper'
 
 export default function FilterMenu() {
   const { open, category, type } = useLayoutStore((s) => s.dialog)
-  const filters = useStorage((s) => s.filters[category])
+  const filters = useStorage((s) => s.filters?.[category])
 
   const [tempFilters, setTempFilters] = React.useState(filters?.filter)
 
