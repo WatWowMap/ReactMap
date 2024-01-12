@@ -20,6 +20,7 @@ import { fromSnakeCase } from '@services/functions/fromSnakeCase'
  *  align?: import('@mui/material').TypographyProps['align']
  *  switchColor?: import('@mui/material').SwitchProps['color']
  *  onChange?: import('@mui/material').SwitchProps['onChange']
+ *  inset?: boolean
  * } & Omit<import('@mui/material').ListItemProps, 'onChange'>} BoolToggleProps
  */
 
@@ -32,6 +33,7 @@ export function BoolBase({
   align,
   switchColor,
   onChange,
+  inset,
   ...props
 }) {
   const { t } = useTranslation()
@@ -48,9 +50,11 @@ export function BoolBase({
   return (
     <ListItem {...props}>
       {children}
-      <ListItemText primaryTypographyProps={{ align }}>
-        {t(label, t(Utility.camelToSnake(label), fromSnakeCase(label)))}
-      </ListItemText>
+      {label && (
+        <ListItemText inset={inset} primaryTypographyProps={{ align }}>
+          {t(label, t(Utility.camelToSnake(label), fromSnakeCase(label)))}
+        </ListItemText>
+      )}
       <Switch
         color={switchColor}
         name={label}

@@ -2,16 +2,13 @@
 /* eslint-disable default-case */
 // @ts-check
 import * as React from 'react'
-import {
-  Switch,
-  Select,
-  MenuItem,
-  ListItem,
-  ListItemText,
-  ListItemIcon,
-} from '@mui/material'
 import Box from '@mui/material/Box'
-import { Trans, useTranslation } from 'react-i18next'
+import ListItem from '@mui/material/ListItem'
+import ListItemText from '@mui/material/ListItemText'
+import ListItemIcon from '@mui/material/ListItemIcon'
+import Select from '@mui/material/Select'
+import MenuItem from '@mui/material/MenuItem'
+import { useTranslation } from 'react-i18next'
 
 import { useMemory } from '@hooks/useMemory'
 import { useStorage, useDeepStore } from '@hooks/useStorage'
@@ -28,6 +25,8 @@ import { MultiSelectorStore } from './MultiSelector'
 import SliderTile from '../dialogs/filters/SliderTile'
 import { CollapsibleItem } from './CollapsibleItem'
 import { MultiSelectorList, SelectorListMemo } from './SelectorList'
+import { BoolToggle } from './BoolToggle'
+import { Img } from '../general/Img'
 
 const BaseNestSlider = () => {
   const slider = useMemory((s) => s.ui.nests?.sliders?.secondary?.[0])
@@ -230,24 +229,16 @@ const BaseQuestSet = () => {
 const QuestSet = React.memo(BaseQuestSet)
 
 const BaseInvasion = () => {
-  const { t } = useTranslation()
   const enabled = useStorage((s) => !!s.filters?.pokestops?.invasions)
   const hasConfirmed = useMemory((s) => s.config.misc.enableConfirmedInvasions)
-  const [filters, setFilters] = useDeepStore(
-    'filters.pokestops.confirmed',
-    false,
-  )
-
   return (
     <CollapsibleItem open={enabled}>
       {hasConfirmed && (
-        <ListItem>
-          <ListItemText sx={{ pl: 4 }} primary={t('only_confirmed')} />
-          <Switch
-            checked={filters}
-            onChange={() => setFilters((prev) => !prev)}
-          />
-        </ListItem>
+        <BoolToggle
+          inset
+          field="filters.pokestops.confirmed"
+          label="only_confirmed"
+        />
       )}
       {hasConfirmed ? (
         <MultiSelectorList tabKey="invasions">
@@ -285,25 +276,14 @@ const Invasion = React.memo(BaseInvasion)
 /** @param {{ id: string }} props */
 const IndividualEvent = ({ id }) => {
   const { t } = useTranslation()
-  const Icons = useMemory((s) => s.Icons)
-  const [filters, setFilters] = useDeepStore(
-    `filters.pokestops.filter.${id}.enabled`,
-    false,
-  )
+  const src = useMemory((s) => s.Icons.getIconById(id))
+  const label = t(`display_type_${id.slice(1)}`)
   return (
-    <ListItem>
+    <BoolToggle field={`filters.pokestops.filter.${id}.enabled`} label={label}>
       <ListItemIcon sx={{ justifyContent: 'center' }}>
-        <img
-          src={Icons.getIconById(id)}
-          alt={t(`display_type_${id.slice(1)}`)}
-          style={{ maxWidth: 30, maxHeight: 30 }}
-        />
+        <Img src={src} alt={label} maxHeight={30} maxWidth={30} />
       </ListItemIcon>
-      <ListItemText
-        primary={t(`display_type_${id.slice(1)}`, t('unknown_event'))}
-      />
-      <Switch checked={filters} onChange={() => setFilters((prev) => !prev)} />
-    </ListItem>
+    </BoolToggle>
   )
 }
 const ShowcaseQuickSelect = () => {
@@ -339,30 +319,18 @@ const EventStops = React.memo(BaseEventStops)
 /** @param {{ item: (typeof WAYFARER_OPTIONS)[number], index: number, disabled: boolean }} props */
 const WayfarerOption = ({ item, index, disabled }) => {
   const { t } = useTranslation()
-  const [filters, setFilters] = useDeepStore(
-    `filters.submissionCells.${item}`,
-    false,
-  )
   return (
-    <ListItem key={item}>
-      <ListItemText
-        sx={{ pl: 4 }}
-        primary={
-          index > 1 ? (
-            <Trans i18nKey="s2_cell_level">
-              {{ level: item.substring(1, 3) }}
-            </Trans>
-          ) : (
-            t(index ? 'include_sponsored' : 'poi')
-          )
-        }
-      />
-      <Switch
-        checked={filters}
-        onChange={() => setFilters((prev) => !prev)}
-        disabled={disabled}
-      />
-    </ListItem>
+    <BoolToggle
+      field={`filters.submissionCells.${item}`}
+      disabled={disabled}
+      label=""
+    >
+      <ListItemText inset>
+        {index > 1
+          ? t('s2_cell_level', { level: item.substring(1, 3) })
+          : t(index ? 'include_sponsored' : 'poi')}
+      </ListItemText>
+    </BoolToggle>
   )
 }
 const SubmissionCells = () => {

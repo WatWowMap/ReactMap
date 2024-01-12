@@ -54,6 +54,13 @@ const components = {
       }),
     },
   },
+  MuiListItemText: {
+    styleOverrides: {
+      inset: {
+        paddingLeft: 32,
+      },
+    },
+  },
   MuiAccordion: {
     defaultProps: {
       disableGutters: true,
