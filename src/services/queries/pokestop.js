@@ -77,7 +77,7 @@ const event = gql`
       event_expire_timestamp
       showcase_pokemon_id
       showcase_pokemon_form_id
-      showcase_pokemon_id_type
+      showcase_pokemon_type_id
       showcase_ranking_standard
       showcase_rankings {
         total_entries

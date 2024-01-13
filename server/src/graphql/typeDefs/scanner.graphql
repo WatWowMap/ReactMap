@@ -125,7 +125,7 @@ type Event {
   event_expire_timestamp: Int
   showcase_pokemon_id: Int
   showcase_pokemon_form_id: Int
-  showcase_pokemon_id_type: Int
+  showcase_pokemon_type_id: Int
   showcase_rankings: ShowcaseDetails
   showcase_ranking_standard: Int
 }

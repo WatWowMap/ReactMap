@@ -737,8 +737,8 @@ class Pokestop extends Model {
                     event.showcase_pokemon_form_id ?? 0
                   }`
                 ]
-              : event.showcase_pokemon_id_type
-              ? filters[`h${event.showcase_pokemon_id_type}`]
+              : event.showcase_pokemon_type_id
+              ? filters[`h${event.showcase_pokemon_type_id}`]
               : true,
           )
       }
