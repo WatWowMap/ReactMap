@@ -55,7 +55,7 @@ export function useTranslateById(options = {}) {
             return i18n.t(`egg_${id.slice(1)}${plural ? '_plural' : ''}`)
           case 'g':
           case 'h':
-            return i18n.t(`type_${id.slice(1)}`)
+            return i18n.t(`poke_type_${id.slice(1)}`)
           case 't':
             // gyms
             // teams

@@ -80,7 +80,7 @@ function buildPokestops(perms, defaults) {
     if (perms.eventStops && avail.startsWith('b')) {
       quests[avail] = new BaseFilter(defaults.eventStops)
     }
-    if (perms.eventStops && avail.startsWith('f')) {
+    if (perms.eventStops && (avail.startsWith('f') || avail.startsWith('h'))) {
       quests[avail] = new BaseFilter(defaults.showcasePokemon)
     }
   })

@@ -224,7 +224,9 @@ export default function PokestopPopup({
                             ) : event.showcase_pokemon_type_id ? (
                               <NameTT
                                 key={event.showcase_pokemon_type_id}
-                                id={[`type_${event.showcase_pokemon_type_id}`]}
+                                id={[
+                                  `poke_type_${event.showcase_pokemon_type_id}`,
+                                ]}
                               >
                                 <div className="invasion-reward">
                                   <img

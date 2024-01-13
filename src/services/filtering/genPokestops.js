@@ -53,7 +53,7 @@ export default function genPokestops(pokemon, pokestops, categories) {
           break
         case 'h':
           if (tempObj.showcase) {
-            const name = t(`type_${id.slice(1)}`)
+            const name = t(`poke_type_${id.slice(1)}`)
             tempObj.showcase[id] = {
               name,
               perms: ['eventStops'],
