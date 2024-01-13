@@ -196,22 +196,35 @@ export default function usePokestopMarker({
           url: Icons.getPokemon(352),
         })
         showcaseSizes.unshift(Icons.getSize('event', filters.b7?.size))
-      } else if (event.display_type === 9 && event.showcase_pokemon_id) {
-        showcaseIcons.unshift({
-          url: Icons.getPokemon(
-            event.showcase_pokemon_id,
-            event.showcase_pokemon_form_id,
-          ),
-          decoration: true,
-        })
-        showcaseSizes.unshift(
-          Icons.getSize(
-            'event',
-            filters[
-              `f${event.showcase_pokemon_id}-${event.showcase_pokemon_form_id}`
-            ]?.size,
-          ),
-        )
+      } else if (event.display_type === 9) {
+        if (event.showcase_pokemon_id) {
+          showcaseIcons.unshift({
+            url: Icons.getPokemon(
+              event.showcase_pokemon_id,
+              event.showcase_pokemon_form_id,
+            ),
+            decoration: true,
+          })
+          showcaseSizes.unshift(
+            Icons.getSize(
+              'event',
+              filters[
+                `f${event.showcase_pokemon_id}-${event.showcase_pokemon_form_id}`
+              ]?.size,
+            ),
+          )
+        } else if (event.showcase_pokemon_type_id) {
+          showcaseIcons.unshift({
+            url: Icons.getTypes(event.showcase_pokemon_type_id),
+            decoration: true,
+          })
+          showcaseSizes.unshift(
+            Icons.getSize(
+              'event',
+              filters[`h${event.showcase_pokemon_type_id}`]?.size,
+            ),
+          )
+        }
       }
       popupYOffset += rewardMod.offsetY - 1
       popupX += rewardMod.popupX

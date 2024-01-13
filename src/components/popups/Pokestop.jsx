@@ -188,7 +188,7 @@ export default function PokestopPopup({
                         <TimeTile
                           expireTime={event.event_expire_timestamp}
                           expandKey={
-                            event.showcase_pokemon_id
+                            event.display_type === 9
                               ? `event_${event.display_type}`
                               : undefined
                           }
@@ -210,6 +210,28 @@ export default function PokestopPopup({
                                     src={Icons.getPokemon(
                                       event.showcase_pokemon_id,
                                       event.showcase_pokemon_form_id,
+                                    )}
+                                  />
+                                  <img
+                                    className="invasion-reward-shadow"
+                                    alt="shadow"
+                                    src={Icons.getEventStops(
+                                      event.display_type,
+                                    )}
+                                  />
+                                </div>
+                              </NameTT>
+                            ) : event.showcase_pokemon_type_id ? (
+                              <NameTT
+                                key={event.showcase_pokemon_type_id}
+                                id={[`type_${event.showcase_pokemon_type_id}`]}
+                              >
+                                <div className="invasion-reward">
+                                  <img
+                                    className="invasion-reward"
+                                    alt="invasion reward"
+                                    src={Icons.getTypes(
+                                      event.showcase_pokemon_type_id,
                                     )}
                                   />
                                   <img
@@ -869,7 +891,7 @@ const NoBorderCell = styled(TableCell, {
   textAlign,
 }))
 
-const ShowcaseEntry = ({ rank, score }) => {
+const ShowcaseEntry = ({ rank, score, pokemon_id, form, costume, gender }) => {
   const Icons = useMemory((s) => s.Icons)
   return (
     <TableRow>
@@ -882,6 +904,15 @@ const ShowcaseEntry = ({ rank, score }) => {
       >
         {score.toFixed(2)}
       </NoBorderCell>
+      {pokemon_id && (
+        <NoBorderCell>
+          <img
+            src={Icons.getPokemon(pokemon_id, form, 0, gender, costume)}
+            alt="rank"
+            height={20}
+          />
+        </NoBorderCell>
+      )}
     </TableRow>
   )
 }
