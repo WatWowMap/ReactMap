@@ -65,7 +65,8 @@ export default function SliderTile({
       React.useCallback(
         ({ type, target }) => {
           const existing = text.slice()
-          const newValue = +target.value || ''
+          const num = +target.value
+          const newValue = Number.isNaN(num) ? '' : num
           const targetIndex = target.id === 'min' ? 0 : 1
 
           if (newValue === '') {
