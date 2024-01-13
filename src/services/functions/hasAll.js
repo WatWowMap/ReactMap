@@ -13,7 +13,8 @@ export function checkIfHasAll(category, id) {
         id.startsWith('l') ||
         id.startsWith('i') ||
         id.startsWith('f') ||
-        id.startsWith('a')
+        id.startsWith('a') ||
+        id.startsWith('h')
       )) ||
     (id.startsWith('t') && id !== 't0-0')
   )
