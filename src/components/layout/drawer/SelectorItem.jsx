@@ -141,10 +141,13 @@ function SelectorItem({ id, filter, setFilter, onClick, hasAll, easyMode }) {
   }, [filter, setFilter, hasAll, easyMode])
 
   /** @type {import('@mui/material').IconButtonProps['onClick']} */
-  const handleIconClick = React.useCallback((e) => {
-    e.stopPropagation()
-    onClick()
-  }, [])
+  const handleIconClick = React.useCallback(
+    (e) => {
+      e.stopPropagation()
+      onClick()
+    },
+    [id],
+  )
 
   return (
     <Box
