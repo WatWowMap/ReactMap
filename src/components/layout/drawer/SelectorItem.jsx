@@ -182,7 +182,7 @@ function SelectorItem({ id, filter, setFilter, onClick, hasAll, easyMode }) {
         alignSelf="end"
         px={1}
       >
-        {title.split('\n').at(-1).replace(/[()]/g, '')}
+        {title && title.split('\n').at(-1).replace(/[()]/g, '')}
       </ToggleTypography>
     </Box>
   )
