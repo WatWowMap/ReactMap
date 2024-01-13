@@ -1,3 +1,11 @@
+# [1.28.0-develop.10](https://github.com/WatWowMap/ReactMap/compare/v1.28.0-develop.9...v1.28.0-develop.10) (2024-01-12)
+
+
+### Bug Fixes
+
+* better regex for mapping minified errors ([cd0c28b](https://github.com/WatWowMap/ReactMap/commit/cd0c28b63d809d7c4acb08c58588c6449543c982))
+* search translations in webhook tracked ([5ef29ee](https://github.com/WatWowMap/ReactMap/commit/5ef29ee53855fc0065b465dc53915ea21efb91ab))
+
 # [1.28.0-develop.9](https://github.com/WatWowMap/ReactMap/compare/v1.28.0-develop.8...v1.28.0-develop.9) (2024-01-12)
 
 
