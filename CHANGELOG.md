@@ -1,3 +1,10 @@
+# [1.29.0-develop.2](https://github.com/WatWowMap/ReactMap/compare/v1.29.0-develop.1...v1.29.0-develop.2) (2024-01-13)
+
+
+### Bug Fixes
+
+* title check ([7f10790](https://github.com/WatWowMap/ReactMap/commit/7f10790ed15868677bc4ea1cc99a00a5fb34c9c2))
+
 # [1.29.0-develop.1](https://github.com/WatWowMap/ReactMap/compare/v1.28.0...v1.29.0-develop.1) (2024-01-13)
 
 
