@@ -70,6 +70,7 @@ const skipFields = new Set([
   'battle_changes',
   'shiny',
   'everything_individually',
+  'all',
 ])
 
 const wildCards = {
