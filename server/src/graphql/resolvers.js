@@ -324,18 +324,18 @@ const resolvers = {
             }))
             .filter((parent) => parent.children.length)
 
-          // Adds new blanks to account for area restrictions trimming some
-          filtered.forEach(({ children }) => {
-            if (children.length % 2 === 1) {
-              children.push({
-                type: 'Feature',
-                properties: {
-                  name: '',
-                  manual: !!config.getSafe('manualAreas.length'),
-                },
-              })
-            }
-          })
+          // // Adds new blanks to account for area restrictions trimming some
+          // filtered.forEach(({ children }) => {
+          //   if (children.length % 2 === 1) {
+          //     children.push({
+          //       type: 'Feature',
+          //       properties: {
+          //         name: '',
+          //         manual: !!config.getSafe('manualAreas.length'),
+          //       },
+          //     })
+          //   }
+          // })
           return filtered
         }
         return scanAreas.filter((parent) => parent.children.length)

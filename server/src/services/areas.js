@@ -255,7 +255,17 @@ const getAreas = async () => {
 
   const scanAreasMenu = Object.fromEntries(
     Object.entries(scanAreas).map(([domain, featureCollection]) => {
-      const parents = { '': { children: [], name: '' } }
+      const parents = {
+        '': {
+          children:
+            /** @type {Pick<import('@rm/types').RMFeature, 'properties'>[]} */ ([]),
+          name: '',
+          details:
+            /** @type {Pick<import('@rm/types').RMFeature, 'properties'> | null} */ (
+              null
+            ),
+        },
+      }
 
       const noHiddenFeatures = {
         ...featureCollection,

@@ -15,6 +15,9 @@ export type RMFeature = Feature<
     hidden?: boolean
     parent?: string
     manual?: boolean
+    formattedName?: string
+    zoom?: number
+    center?: [number, number]
     key: string
   }
 >
