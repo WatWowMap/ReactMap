@@ -66,7 +66,6 @@ export function ScanAreasTable() {
     [data, search],
   )
 
-  console.log(allRows)
   if (loading || error) return null
 
   return (
