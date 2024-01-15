@@ -44,6 +44,7 @@ export interface DbContext {
   hasAlignment: boolean
   hasShowcaseData: boolean
   hasShowcaseForm: boolean
+  hasShowcaseTypes: boolean
 }
 
 export interface ExpressUser extends User {

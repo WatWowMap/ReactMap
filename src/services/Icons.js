@@ -254,6 +254,8 @@ class UAssets {
       case 'g':
         // gyms
         return this.getGyms(...id.slice(1).split('-'))
+      case 'h':
+        return this.getTypes(id.slice(1))
       case 'i':
         // invasions
         return this.getInvasions(id.slice(1), true)

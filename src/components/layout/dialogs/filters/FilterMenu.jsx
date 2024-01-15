@@ -20,7 +20,6 @@ export default function FilterMenu() {
         {
           name: 'close',
           action: toggleDialog(false, category, 'filters'),
-          icon: 'Clear',
           color: 'secondary',
         },
       ]),

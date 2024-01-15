@@ -86,7 +86,7 @@ export default function usePokestopMarker({
         invasionSizes.unshift(
           Icons.getSize('invasion', filters[`i${invasion.grunt_type}`]?.size),
         )
-        popupYOffset += rewardMod.offsetY - 1
+        popupYOffset += invasionMod.offsetY - 1
         popupX += invasionMod.popupX
         popupY += invasionMod.popupY
       }
@@ -196,30 +196,44 @@ export default function usePokestopMarker({
           url: Icons.getPokemon(352),
         })
         showcaseSizes.unshift(Icons.getSize('event', filters.b7?.size))
-      } else if (event.display_type === 9 && event.showcase_pokemon_id) {
-        showcaseIcons.unshift({
-          url: Icons.getPokemon(
-            event.showcase_pokemon_id,
-            event.showcase_pokemon_form_id,
-          ),
-          decoration: true,
-        })
-        showcaseSizes.unshift(
-          Icons.getSize(
-            'event',
-            filters[
-              `f${event.showcase_pokemon_id}-${event.showcase_pokemon_form_id}`
-            ]?.size,
-          ),
-        )
+      } else if (event.display_type === 9) {
+        if (event.showcase_pokemon_id) {
+          showcaseIcons.unshift({
+            url: Icons.getPokemon(
+              event.showcase_pokemon_id,
+              event.showcase_pokemon_form_id,
+            ),
+            decoration: true,
+          })
+          showcaseSizes.unshift(
+            Icons.getSize(
+              'event',
+              filters[
+                `f${event.showcase_pokemon_id}-${event.showcase_pokemon_form_id}`
+              ]?.size,
+            ),
+          )
+        } else if (event.showcase_pokemon_type_id) {
+          showcaseIcons.unshift({
+            url: Icons.getTypes(event.showcase_pokemon_type_id),
+            decoration: true,
+          })
+          showcaseSizes.unshift(
+            Icons.getSize(
+              'event',
+              filters[`h${event.showcase_pokemon_type_id}`]?.size,
+            ),
+          )
+        }
       }
-      popupYOffset += rewardMod.offsetY - 1
-      popupX += rewardMod.popupX
-      popupY += rewardMod.popupY
+      popupYOffset += eventMod.offsetY - 1
+      popupX += eventMod.popupX
+      popupY += eventMod.popupY
     })
   }
   const totalQuestSize = questSizes.reduce((a, b) => a + b, 0)
   const totalInvasionSize = invasionSizes.reduce((a, b) => a + b, 0)
+  const totalShowcaseSize = showcaseSizes.reduce((a, b) => a + b, -3)
 
   const showAr = showArBadge && ar_scan_eligible && !baseIcon.includes('_ar')
 
@@ -230,8 +244,8 @@ export default function usePokestopMarker({
         ? pokestopMod.manualPopup -
           totalInvasionSize * 0.25 -
           totalQuestSize * 0.1
-        : -(baseSize + totalInvasionSize + totalQuestSize) / popupYOffset) +
-        popupY,
+        : -(baseSize + totalInvasionSize + totalQuestSize + totalShowcaseSize) /
+          popupYOffset) + popupY,
     ],
     className: 'pokestop-marker',
     html: /* html */ `
