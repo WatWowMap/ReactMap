@@ -1,3 +1,26 @@
+# [1.29.0-develop.3](https://github.com/WatWowMap/ReactMap/compare/v1.29.0-develop.2...v1.29.0-develop.3) (2024-01-15)
+
+
+### Bug Fixes
+
+* also show types in quick select ([c3f35dc](https://github.com/WatWowMap/ReactMap/commit/c3f35dc2aa9e21d9bb8b228ed36c07afd90700c9))
+* dyslexia? ([3c25864](https://github.com/WatWowMap/ReactMap/commit/3c25864b85f4ec712fc08caad50369d1b62c661c))
+* entering 0 on sliders ([0cb103c](https://github.com/WatWowMap/ReactMap/commit/0cb103cd297dd3e3b3baba362c60961bdacbf598))
+* forgot my own type i18n keys ([d74f239](https://github.com/WatWowMap/ReactMap/commit/d74f2398fd099817ad12a624fd53a737eb7bd45d))
+* gql types ([e1e499a](https://github.com/WatWowMap/ReactMap/commit/e1e499a52239d091e52f779e5149d8808d395be6))
+* id when searching ([1802ca6](https://github.com/WatWowMap/ReactMap/commit/1802ca6cac9215581a6097bb1cfa9ea6bfc3cdf8))
+* make showcase icons smaller by default ([b0c587a](https://github.com/WatWowMap/ReactMap/commit/b0c587aecd8126c1644a01c0fc459bc17dca0af2))
+* pokestop marker adjustments ([c81340c](https://github.com/WatWowMap/ReactMap/commit/c81340c4c1aab378af9e04dfae23677c4b3a1bd0))
+* remove `clear` icon for now ([58aed37](https://github.com/WatWowMap/ReactMap/commit/58aed3764b8c01df9f12dff680be8ec6a72380f2))
+* remove blue from types ([33ffc13](https://github.com/WatWowMap/ReactMap/commit/33ffc13bc5e4c366f74ccc1d3c1de05ea5e12e2f))
+* skip `h` filters on backend ([2020c40](https://github.com/WatWowMap/ReactMap/commit/2020c40e3f30196ca5effb9fb78d4115e3ccdd7b))
+* various webhook things ([a4b7db5](https://github.com/WatWowMap/ReactMap/commit/a4b7db515e991e0af3be8d5d42de4b4ce9cfbed4))
+
+
+### Features
+
+* showcase type id support ([45e5b1b](https://github.com/WatWowMap/ReactMap/commit/45e5b1baa73780b94bbc95e386fca924c44b989d))
+
 # [1.29.0-develop.2](https://github.com/WatWowMap/ReactMap/compare/v1.29.0-develop.1...v1.29.0-develop.2) (2024-01-13)
 
 
