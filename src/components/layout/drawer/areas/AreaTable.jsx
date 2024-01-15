@@ -35,6 +35,38 @@ export function ScanAreasTable() {
     [data],
   )
 
+  const allRows = React.useMemo(
+    () =>
+      (data?.scanAreasMenu || [])
+        .map((area) => ({
+          ...area,
+          children: area.children.filter(
+            (feature) =>
+              search === '' ||
+              feature.properties?.key?.toLowerCase()?.includes(search),
+          ),
+        }))
+        .map(({ children, ...rest }) => {
+          const rows = []
+          for (let i = 0; i < children.length; i += 1) {
+            const newRow = []
+            if (children[i]) newRow.push(children[i])
+            if (
+              children[i + 1] &&
+              (children[i]?.properties?.name?.length || 0) +
+                (children[i + 1]?.properties?.name?.length || 0) <
+                40
+            )
+              // eslint-disable-next-line no-plusplus
+              newRow.push(children[++i])
+            rows.push(newRow)
+          }
+          return { ...rest, children, rows }
+        }),
+    [data, search],
+  )
+
+  console.log(allRows)
   if (loading || error) return null
 
   return (
@@ -55,55 +87,44 @@ export function ScanAreasTable() {
         })}
       >
         <TableBody>
-          {data?.scanAreasMenu
-            ?.map((area) => ({
-              ...area,
-              children: area.children.filter(
-                (feature) =>
-                  search === '' ||
-                  feature.properties?.key?.toLowerCase()?.includes(search),
-              ),
-            }))
-            .map(({ name, details, children }) => {
-              if (!children.length) return null
-              const rows = []
-              for (let i = 0; i < children.length; i += 1) {
-                const newRow = []
-                if (children[i]) newRow.push(children[i])
-                if (
-                  children[i + 1] &&
-                  (children[i]?.properties?.name?.length || 0) +
-                    (children[i + 1]?.properties?.name?.length || 0) <
-                    40
-                )
-                  // eslint-disable-next-line no-plusplus
-                  newRow.push(children[++i])
-                rows.push(newRow)
-              }
-              return (
-                <React.Fragment key={`${name}-${children.length}`}>
-                  {name && (
-                    <TableRow>
-                      <AreaChild
-                        name={name}
-                        feature={details}
-                        allAreas={allAreas}
-                        childAreas={children}
-                        colSpan={2}
-                      />
-                    </TableRow>
-                  )}
+          {allRows.map(({ name, details, children, rows }) => {
+            if (!children.length) return null
+            return (
+              <React.Fragment key={`${name}-${children.length}`}>
+                {name && (
                   <TableRow>
-                    <AreaParent
+                    <AreaChild
                       name={name}
-                      rows={rows}
+                      feature={details}
                       allAreas={allAreas}
                       childAreas={children}
+                      colSpan={2}
                     />
                   </TableRow>
-                </React.Fragment>
-              )
-            })}
+                )}
+                <TableRow>
+                  <AreaParent name={name}>
+                    {rows.map((row, i) => (
+                      <TableRow
+                        key={`${row[0]?.properties?.key}-${row[1]?.properties?.key}`}
+                      >
+                        {row.map((feature, j) => (
+                          <AreaChild
+                            key={feature?.properties?.name || `${i}${j}`}
+                            feature={feature}
+                            allAreas={allAreas}
+                            childAreas={children}
+                            borderRight={row.length === 2 && j === 0}
+                            colSpan={row.length === 1 ? 2 : 1}
+                          />
+                        ))}
+                      </TableRow>
+                    ))}
+                  </AreaParent>
+                </TableRow>
+              </React.Fragment>
+            )
+          })}
         </TableBody>
       </Table>
     </TableContainer>
