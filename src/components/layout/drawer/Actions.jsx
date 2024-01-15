@@ -36,20 +36,8 @@ const importSettings = (e) => {
   setTimeout(() => window.location.reload(), 1500)
 }
 
-const exportSettings = () => {
-  const json = localStorage.getItem('local-state')
-  downloadJson(json, 'settings.json')
-  const el = document.createElement('a')
-  el.setAttribute(
-    'href',
-    `data:application/json;chartset=utf-8,${encodeURIComponent(json)}`,
-  )
-  el.setAttribute('download', 'settings.json')
-  el.style.display = 'none'
-  document.body.appendChild(el)
-  el.click()
-  document.body.removeChild(el)
-}
+const exportSettings = () =>
+  downloadJson(localStorage.getItem('local-state'), 'settings.json')
 
 const renderLink = React.forwardRef(({ to, ...itemProps }, ref) => (
   <Link to={to} ref={ref} {...itemProps} />
