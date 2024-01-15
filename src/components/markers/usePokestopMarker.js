@@ -86,7 +86,7 @@ export default function usePokestopMarker({
         invasionSizes.unshift(
           Icons.getSize('invasion', filters[`i${invasion.grunt_type}`]?.size),
         )
-        popupYOffset += rewardMod.offsetY - 1
+        popupYOffset += invasionMod.offsetY - 1
         popupX += invasionMod.popupX
         popupY += invasionMod.popupY
       }
@@ -226,13 +226,14 @@ export default function usePokestopMarker({
           )
         }
       }
-      popupYOffset += rewardMod.offsetY - 1
-      popupX += rewardMod.popupX
-      popupY += rewardMod.popupY
+      popupYOffset += eventMod.offsetY - 1
+      popupX += eventMod.popupX
+      popupY += eventMod.popupY
     })
   }
   const totalQuestSize = questSizes.reduce((a, b) => a + b, 0)
   const totalInvasionSize = invasionSizes.reduce((a, b) => a + b, 0)
+  const totalShowcaseSize = showcaseSizes.reduce((a, b) => a + b, -3)
 
   const showAr = showArBadge && ar_scan_eligible && !baseIcon.includes('_ar')
 
@@ -243,8 +244,8 @@ export default function usePokestopMarker({
         ? pokestopMod.manualPopup -
           totalInvasionSize * 0.25 -
           totalQuestSize * 0.1
-        : -(baseSize + totalInvasionSize + totalQuestSize) / popupYOffset) +
-        popupY,
+        : -(baseSize + totalInvasionSize + totalQuestSize + totalShowcaseSize) /
+          popupYOffset) + popupY,
     ],
     className: 'pokestop-marker',
     html: /* html */ `
