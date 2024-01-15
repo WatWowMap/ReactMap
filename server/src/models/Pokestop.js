@@ -214,6 +214,7 @@ class Pokestop extends Model {
           case 'o':
             break
           case 'f':
+          case 'h':
             // do nothing
             break
           case 'd':
