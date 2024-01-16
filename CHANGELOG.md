@@ -1,3 +1,11 @@
+# [1.29.0-develop.4](https://github.com/WatWowMap/ReactMap/compare/v1.29.0-develop.3...v1.29.0-develop.4) (2024-01-16)
+
+
+### Bug Fixes
+
+* export settings ([315508d](https://github.com/WatWowMap/ReactMap/commit/315508d841d2289c5096581c8d5afe0582516ff2))
+* remove log ([e572b3b](https://github.com/WatWowMap/ReactMap/commit/e572b3b6f405d87cfd553797f8b081cbd6812b2d))
+
 # [1.29.0-develop.3](https://github.com/WatWowMap/ReactMap/compare/v1.29.0-develop.2...v1.29.0-develop.3) (2024-01-15)
 
 
