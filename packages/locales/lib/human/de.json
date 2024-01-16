@@ -693,5 +693,7 @@
   "search_rocket_pokemon": "Crypto Pokémon suchen",
   "main": "Haupt",
   "extra": "Extra",
-  "select": "Auswählen"
+  "select": "Auswählen",
+  "searching": "suche...",
+  "no_options": "Keine Treffer..."
 }
