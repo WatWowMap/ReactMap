@@ -54,6 +54,8 @@ export function useTranslateById(options = {}) {
             // raid eggs
             return i18n.t(`egg_${id.slice(1)}${plural ? '_plural' : ''}`)
           case 'g':
+          case 'h':
+            return i18n.t(`poke_type_${id.slice(1)}`)
           case 't':
             // gyms
             // teams

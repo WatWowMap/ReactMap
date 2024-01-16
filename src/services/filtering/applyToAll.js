@@ -13,13 +13,14 @@ export const STANDARD_BACKUP =
   })
 
 /**
- * @param {boolean} show
- * @param {import('@rm/types').Categories} category
+ * @template {import('@rm/types').Categories} T
+ * @param {T extends 'pokemon' ? import('@rm/types/lib').PokemonFilter : import('@rm/types').BaseFilter} newFilter
+ * @param {T} category
  * @param {string[]} [selectedIds]
  * @param {boolean} [includeSlots]
  */
 export function applyToAll(
-  show,
+  newFilter,
   category,
   selectedIds = [],
   includeSlots = false,
@@ -41,13 +42,15 @@ export function applyToAll(
         [
           key,
           idSet.has(key)
-            ? { size: 'md', ...filter, enabled: show, all: !!easyMode }
+            ? { size: 'md', ...filter, ...newFilter, all: !!easyMode }
             : filter,
         ],
       ]
       if (key.startsWith('t') && +key.charAt(1) !== 0 && includeSlots) {
         filters.push(
-          ...Object.entries(Utility.generateSlots(key, show, userFilters)),
+          ...Object.entries(
+            Utility.generateSlots(key, newFilter.enabled, userFilters),
+          ),
         )
       }
       return filters

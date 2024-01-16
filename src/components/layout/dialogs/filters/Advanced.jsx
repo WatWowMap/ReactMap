@@ -43,7 +43,7 @@ export default function AdvancedFilter() {
   )
   const easyMode = useStorage((s) => !!s.filters?.[category]?.easyMode)
   const [filters, setFilters] = useDeepStore(
-    `filters.${category}.filter.${id}`,
+    category ? `filters.${category}.filter.${id}` : `filters.gyms.standard`,
     standard,
   )
   const backup = React.useRef(filters)
@@ -77,8 +77,8 @@ export default function AdvancedFilter() {
     }))
     if (!save) {
       setFilters({ ...backup.current })
-    } else if (id === 'global' && selectedIds?.length) {
-      applyToAll(true, category, selectedIds, false)
+    } else if (id === 'global' && selectedIds?.length && category) {
+      applyToAll(filters, category, selectedIds, false)
     }
   }
 
@@ -96,7 +96,7 @@ export default function AdvancedFilter() {
         color: 'secondary',
       },
     ],
-    [standard, setFilters],
+    [standard, filters, setFilters],
   )
 
   /** @type {import('@mui/material').SwitchProps['onChange']} */
@@ -113,7 +113,7 @@ export default function AdvancedFilter() {
     if (open) backup.current = filters
   }, [open])
 
-  if (!id) return null
+  if (!id || !category) return null
   const showMoreFilters = category === 'pokemon' && !easyMode
   return (
     <Dialog

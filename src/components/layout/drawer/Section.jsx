@@ -3,16 +3,11 @@ import * as React from 'react'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import SettingsIcon from '@mui/icons-material/Settings'
 import TuneIcon from '@mui/icons-material/Tune'
-import {
-  Typography,
-  Accordion,
-  AccordionSummary,
-  AccordionDetails,
-  ListItemButton,
-  List,
-  ListItemIcon,
-  ListItemText,
-} from '@mui/material'
+import Typography from '@mui/material/Typography'
+import Accordion from '@mui/material/Accordion'
+import AccordionSummary from '@mui/material/AccordionSummary'
+import AccordionDetails from '@mui/material/AccordionDetails'
+import List from '@mui/material/List'
 
 import { useTranslation } from 'react-i18next'
 
@@ -23,9 +18,10 @@ import Utility from '@services/Utility'
 
 import SettingsMenu from './Settings'
 import { PokemonDrawerMemo } from './Pokemon'
-import Areas from './Areas'
+import Areas from './areas'
 import Extras from './Extras'
 import { BoolToggle } from './BoolToggle'
+import { BasicListButton } from '../general/BasicListButton'
 
 const ADV_CATEGORIES = new Set(['pokemon', 'gyms', 'pokestops', 'nests'])
 
@@ -92,20 +88,20 @@ const DrawerSection = ({ category }) => {
             })
           )}
           {staticUserSettings && (
-            <ListItemButton onClick={toggleDialog(true, category, 'options')}>
-              <ListItemIcon>
-                <SettingsIcon color="secondary" />
-              </ListItemIcon>
-              <ListItemText primary={t('options')} />
-            </ListItemButton>
+            <BasicListButton
+              onClick={toggleDialog(true, category, 'options')}
+              label="options"
+            >
+              <SettingsIcon color="secondary" />
+            </BasicListButton>
           )}
           {ADV_CATEGORIES.has(category) && (
-            <ListItemButton onClick={toggleDialog(true, category, 'filters')}>
-              <ListItemIcon>
-                <TuneIcon color="primary" />
-              </ListItemIcon>
-              <ListItemText primary={t('advanced')} />
-            </ListItemButton>
+            <BasicListButton
+              onClick={toggleDialog(true, category, 'filters')}
+              label="advanced"
+            >
+              <TuneIcon color="primary" />
+            </BasicListButton>
           )}
           {category === 'scanAreas' && <Areas />}
         </List>

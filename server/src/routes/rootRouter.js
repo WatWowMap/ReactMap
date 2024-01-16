@@ -1,6 +1,6 @@
 const express = require('express')
 const fs = require('fs')
-const { resolve } = require('path')
+const { resolve, join } = require('path')
 const { SourceMapConsumer } = require('source-map')
 const config = require('@rm/config')
 const { log, HELPERS } = require('@rm/logger')
@@ -52,14 +52,14 @@ rootRouter.post('/api/error/client', async (req, res) => {
         ? await Promise.all(
             stack.split('\n').map(async (stackLine, i) => {
               const match = stackLine.match(
-                /at (.+) \(https?:\/\/([^/]+)\/(.+\.js):(\d+):(\d+)\)/,
+                /at (.+) \((\/.+\.js):(\d+):(\d+)\)/,
               )
               log.debug(HELPERS.client, { match, stackLine })
               if (match) {
-                const [full, functionName, host, file, line, column] = match
+                const [full, functionName, file, line, column] = match
                 const foundStack = await SourceMapConsumer.with(
                   await fs.promises.readFile(
-                    resolve(__dirname, '../../../dist', `${file}.map`),
+                    join(__dirname, '../../../dist', `${file}.map`),
                     'utf8',
                   ),
                   null,
@@ -81,7 +81,6 @@ rootRouter.post('/api/error/client', async (req, res) => {
                 log.warn(HELPERS.client, 'Unable to find source map', {
                   full,
                   functionName,
-                  host,
                   file,
                   line,
                   column,

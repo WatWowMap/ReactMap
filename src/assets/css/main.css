@@ -483,6 +483,13 @@ input[type='time']::-webkit-calendar-picker-indicator {
   grid-template-columns: 25% 75%;
 }
 
+.profile-container {
+  display: grid;
+  grid-template-columns: 100%;
+  grid-template-rows: 100;
+  height: 100%;
+}
+
 @media screen and (max-width: 600px) {
   .container {
     display: grid;
@@ -499,6 +506,11 @@ input[type='time']::-webkit-calendar-picker-indicator {
 .column-75 {
   display: grid;
   grid-template-rows: max-content 1fr;
+}
+
+.gym-badge-grid {
+  display: grid;
+  grid-template-rows: max-content max-content 1fr;
 }
 
 .vgrid-item {

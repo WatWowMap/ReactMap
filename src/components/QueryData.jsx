@@ -49,7 +49,7 @@ const trimFilters = (requestedFilters, userSettings, category, onlyAreas) => {
     onlyAllPvp: userSettings?.showAllPvpRanks,
     onlyAreas: onlyAreas || [],
   }
-  Object.entries(requestedFilters).forEach((topLevelFilter) => {
+  Object.entries(requestedFilters || {}).forEach((topLevelFilter) => {
     const [id, specifics] = topLevelFilter
 
     if (!FILTER_SKIP_LIST.includes(id)) {
@@ -62,7 +62,7 @@ const trimFilters = (requestedFilters, userSettings, category, onlyAreas) => {
         entryV
     }
   })
-  Object.entries(requestedFilters.filter).forEach(([id, specifics]) => {
+  Object.entries(requestedFilters?.filter || {}).forEach(([id, specifics]) => {
     // eslint-disable-next-line no-unused-vars
     const { enabled, size, ...rest } = (easyMode
       ? requestedFilters.ivOr
@@ -107,7 +107,7 @@ function QueryData({ category, timeout }) {
   const userSettings = useStorage(
     (s) => s.userSettings[userSettingsCategory(category)],
   )
-  const filters = useStorage((s) => s.filters[category])
+  const filters = useStorage((s) => s.filters?.[category])
   const onlyAreas = useStorage(
     (s) =>
       s.filters?.scanAreas?.filterByAreas &&

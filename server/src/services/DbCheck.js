@@ -141,6 +141,7 @@ module.exports = class DbCheck {
       hasAltQuests,
       hasShowcaseData,
       hasShowcaseForm,
+      hasShowcaseType,
     ] = await schema('pokestop')
       .columnInfo()
       .then((columns) => [
@@ -149,6 +150,7 @@ module.exports = class DbCheck {
         'alternative_quest_type' in columns,
         'showcase_pokemon_id' in columns,
         'showcase_pokemon_form_id' in columns,
+        'showcase_pokemon_type_id' in columns,
       ])
     const [hasLayerColumn] = isMad
       ? await schema('trs_quest')
@@ -194,6 +196,7 @@ module.exports = class DbCheck {
       polygon,
       hasShowcaseData,
       hasShowcaseForm,
+      hasShowcaseType,
     }
   }
 

@@ -183,7 +183,7 @@ export default class Poracle {
     return reactMapFriendly
   }
 
-  static processor(type, entries, defaults) {
+  static processor(category, entries, defaults) {
     const pvpFields = [
       'pvp_ranking_league',
       'pvp_ranking_best',
@@ -200,7 +200,7 @@ export default class Poracle {
       'pvpEntry',
     ]
     const dupes = {}
-    switch (type) {
+    switch (category) {
       case 'egg':
         return entries.map((egg) => ({
           ...defaults,
@@ -406,6 +406,17 @@ export default class Poracle {
         }`
       default:
         return item.description || ''
+    }
+  }
+
+  /** @param {string} id */
+  static getOtherData(id) {
+    switch (id.charAt(0)) {
+      case 'e':
+      case 'r':
+        return { level: id.slice(1) }
+      default:
+        return { pokemon_id: id.split('-')[0], form: id.split('-')[1] }
     }
   }
 }

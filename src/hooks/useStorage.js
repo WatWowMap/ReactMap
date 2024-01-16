@@ -12,6 +12,7 @@ import { persist, createJSONStorage } from 'zustand/middleware'
  *   popups: Record<string, boolean>,
  *   zoom: number,
  *   sidebar: string,
+ *   scanAreasMenu: string,
  *   selectedWebhook: string,
  *   settings: {
  *    navigationControls: 'react' | 'leaflet'
@@ -33,7 +34,7 @@ import { persist, createJSONStorage } from 'zustand/middleware'
  *   profiling: boolean
  *   stateLogging: boolean
  *   desktopNotifications: boolean
- *   setAreas: (areas: string | string[], validAreas: string[], unselectAll?: boolean) => void,
+ *   setAreas: (areas?: string | string[], validAreas?: string[], unselectAll?: boolean) => void,
  *   setPokemonFilterMode: (legacyFilter: boolean, easyMode: boolean) => void,
  *   getPokemonFilterMode: () => 'basic' | 'intermediate' | 'expert',
  * }} UseStorage
@@ -118,6 +119,7 @@ export const useStorage = create(
       menus: {},
       tutorial: true,
       sidebar: '',
+      scanAreasMenu: '',
       advMenu: {
         pokemon: 'others',
         gyms: 'categories',
