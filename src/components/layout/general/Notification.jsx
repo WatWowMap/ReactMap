@@ -18,7 +18,7 @@ const alertStyle = { textAlign: 'center', color: 'white' }
  *
  * @template T
  * @param {{
- *  open: boolean
+ *  open?: boolean
  *  severity: import('@mui/material').AlertProps['severity']
  *  i18nKey?: T
  *  messages?: T extends string ? { key: string, variables: string[] }[] : React.ReactNode

@@ -2,7 +2,8 @@
 import * as React from 'react'
 import { useQuery, useLazyQuery } from '@apollo/client'
 
-import { useStatic, useStore } from '@hooks/useStore'
+import { useMemory } from '@hooks/useMemory'
+import { useStorage } from '@hooks/useStorage'
 
 import { SCANNER_CONFIG, SCANNER_STATUS } from '@services/queries/scanner'
 
@@ -22,8 +23,8 @@ const { setScanMode } = useScanStore.getState()
  */
 function ScanOnDemand({ mode }) {
   const scanMode = useScanStore((s) => s[`${mode}Mode`])
-  const location = useStore((s) => s.location)
-  const online = useStatic((s) => s.online)
+  const location = useStorage((s) => s.location)
+  const online = useMemory((s) => s.online)
 
   const [getConfig, { data }] = useLazyQuery(SCANNER_CONFIG, {
     variables: { mode },

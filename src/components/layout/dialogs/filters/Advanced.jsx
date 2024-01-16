@@ -1,282 +1,207 @@
-import React, { Fragment, useState, useEffect } from 'react'
-import {
-  Select,
-  Typography,
-  Grid,
-  DialogContent,
-  MenuItem,
-  Switch,
-  FormControl,
-  InputLabel,
-} from '@mui/material'
+// @ts-check
+import * as React from 'react'
+import { DialogContent, List, ListItem, Dialog } from '@mui/material'
+import Grid2 from '@mui/material/Unstable_Grid2/Grid2'
 import { useTranslation } from 'react-i18next'
 
 import Utility from '@services/Utility'
-import { useStore, useStatic } from '@hooks/useStore'
-
+import { useMemory } from '@hooks/useMemory'
+import { useLayoutStore } from '@hooks/useLayoutStore'
+import { useDeepStore, useStorage } from '@hooks/useStorage'
 import Header from '@components/layout/general/Header'
 import Footer from '@components/layout/general/Footer'
-import StringFilter from './StringFilter'
+import {
+  BoolToggle,
+  DualBoolToggle,
+} from '@components/layout/drawer/BoolToggle'
+import { ENABLED_ALL, XXS_XXL } from '@assets/constants'
+import { useTranslateById } from '@hooks/useTranslateById'
+import { STANDARD_BACKUP, applyToAll } from '@services/filtering/applyToAll'
+import { checkIfHasAll } from '@services/functions/hasAll'
+
+import { StringFilter } from './StringFilter'
 import SliderTile from './SliderTile'
 import Size from './Size'
-import QuestTitle from '../../general/QuestTitle'
-import GenderFilter from './Gender'
+import { GenderListItem } from './Gender'
+import { QuestConditionSelector } from './QuestConditions'
 
-export default function AdvancedFilter({
-  toggleAdvMenu,
-  advancedFilter,
-  type,
-  isMobile,
-}) {
-  Utility.analytics(`/${type}/${advancedFilter.id}`)
-
-  const ui = useStatic((state) => state.ui)
-  const { questConditions } = useStatic((state) => state.available)
-  const [filterValues, setFilterValues] = useState(advancedFilter.tempFilters)
-  const filters = useStore((state) => state.filters)
-  const userSettings = useStore((state) => state.userSettings)
+export default function AdvancedFilter() {
+  const { category, id, selectedIds, open } = useLayoutStore(
+    (s) => s.advancedFilter,
+  )
   const { t } = useTranslation()
+  const { t: tId } = useTranslateById()
+  const ui = useMemory((s) => s.ui[category])
+  const isMobile = useMemory((s) => s.isMobile)
+  const legacyFilter = useStorage(
+    (s) => !!s.userSettings[category]?.legacyFilter,
+  )
+  const standard = useMemory((s) =>
+    category === 'pokemon'
+      ? s.filters[category]?.standard || STANDARD_BACKUP
+      : STANDARD_BACKUP,
+  )
+  const easyMode = useStorage((s) => !!s.filters?.[category]?.easyMode)
+  const [filters, setFilters] = useDeepStore(
+    category ? `filters.${category}.filter.${id}` : `filters.gyms.standard`,
+    standard,
+  )
+  const backup = React.useRef(filters)
 
+  Utility.analytics(`/${category}/${id}`)
   Utility.analytics(
     'Advanced Filtering',
-    `ID: ${advancedFilter.id} Size: ${filterValues.size}`,
-    type,
+    `ID: ${id} Size: ${filters?.size || 'md'}`,
+    category,
   )
-  const handleChange = (event, values) => {
-    if (values) {
-      if (event === 'default') {
-        setFilterValues({ ...values, enabled: filterValues.enabled })
-      } else {
-        setFilterValues({ ...filterValues, [event]: values })
-      }
-    } else {
-      const { name, value } = event.target
-      setFilterValues({
-        ...filterValues,
-        [name]:
-          Array.isArray(value) && type === 'pokestops'
-            ? value.filter(Boolean).join(',')
-            : value,
-      })
+
+  const handleChange = React.useCallback(
+    /**
+     * @template {keyof typeof filters} T
+     * @param {T} key
+     * @param {(typeof filters)[T]} values
+     */
+    (key, values) => {
+      setFilters((prev) => ({
+        ...prev,
+        [key]: values,
+        enabled: prev.enabled || (key !== 'enabled' && !filters.enabled),
+      }))
+    },
+    [setFilters],
+  )
+
+  const toggleClose = (save = false) => {
+    useLayoutStore.setState((prev) => ({
+      advancedFilter: { ...prev.advancedFilter, open: false, id: '' },
+    }))
+    if (!save) {
+      setFilters({ ...backup.current })
+    } else if (id === 'global' && selectedIds?.length && category) {
+      applyToAll(filters, category, selectedIds, false)
     }
   }
 
-  const footerOptions = [
-    {
-      name: 'reset',
-      action: () =>
-        handleChange(
-          'default',
-          advancedFilter.standard || { enabled: false, size: 'md' },
-        ),
-      color: 'primary',
-      size: type === 'pokemon' ? 2 : null,
-    },
-    {
-      name: 'save',
-      action: toggleAdvMenu(false, advancedFilter.id, filterValues),
-      color: 'secondary',
-      size: type === 'pokemon' ? 3 : null,
-    },
-  ]
+  /** @type {import('@components/layout/general/Footer').FooterButton[]} */
+  const footerOptions = React.useMemo(
+    () => [
+      {
+        name: 'reset',
+        action: () => setFilters({ ...standard }),
+        color: 'primary',
+      },
+      {
+        name: 'close',
+        action: () => toggleClose(true),
+        color: 'secondary',
+      },
+    ],
+    [standard, filters, setFilters],
+  )
 
-  if (type === 'pokemon') {
-    footerOptions.unshift({
-      key: 'size',
-      component: (
-        <Size
-          filterValues={filterValues}
-          handleChange={handleChange}
-          btnSize="medium"
-        />
-      ),
-      size: 7,
-    })
-  }
-
-  // Provides a reset if that condition is no longer available
-  useEffect(() => {
-    if (type === 'pokestops' && ui.pokestops?.quests) {
-      if (!questConditions[advancedFilter.id] && filterValues.adv) {
-        setFilterValues({ ...filterValues, adv: '' })
-      } else {
-        const filtered = questConditions[advancedFilter.id]
-          ? filterValues.adv
-              .split(',')
-              .filter((each) =>
-                questConditions[advancedFilter.id].find(
-                  ({ title }) => title === each,
-                ),
-              )
-          : []
-        setFilterValues({
-          ...filterValues,
-          adv: filtered.length ? filtered.join(',') : '',
-        })
+  /** @type {import('@mui/material').SwitchProps['onChange']} */
+  const handleAllEnabled = React.useCallback(
+    ({ target }, checked) => {
+      if (target.name === 'all' && checked && !filters.enabled) {
+        setFilters('enabled', true)
       }
-    }
-  }, [])
+    },
+    [setFilters],
+  )
 
-  return advancedFilter.id ? (
-    <>
+  React.useLayoutEffect(() => {
+    if (open) backup.current = filters
+  }, [open])
+
+  if (!id || !category) return null
+  const showMoreFilters = category === 'pokemon' && !easyMode
+  return (
+    <Dialog
+      open={!!open}
+      onClose={() => toggleClose(false)}
+      fullScreen={isMobile && category === 'pokemon'}
+    >
       <Header
-        titles={[
-          type === 'pokemon' ||
-          (!advancedFilter.id.startsWith('l') &&
-            !advancedFilter.id.startsWith('i'))
+        titles={`${
+          category === 'pokemon' || (!id.startsWith('l') && !id.startsWith('i'))
             ? t('advanced')
-            : t('set_size'),
-        ]}
-        action={toggleAdvMenu(false, type, filters.filter)}
+            : t('set_size')
+        } - ${tId(id)}`}
+        action={() => toggleClose(false)}
       />
-      <DialogContent>
-        {type === 'pokemon' ? (
-          <Grid
-            container
-            direction="row"
-            justifyContent="center"
-            alignItems="center"
-            style={{ marginTop: 10 }}
-            spacing={1}
-          >
-            {userSettings[type].legacyFilter && ui[type].legacy ? (
-              <Grid item xs={12}>
-                <StringFilter
-                  filterValues={filterValues}
-                  setFilterValues={setFilterValues}
-                />
-              </Grid>
-            ) : (
-              <>
-                {Object.entries(ui[type].sliders).map(([category, sliders]) => (
-                  <Grid item xs={12} sm={6} key={category}>
-                    {sliders.map((each) => (
+      <DialogContent sx={{ mt: 3 }}>
+        <List>
+          {legacyFilter && 'legacy' in ui ? (
+            <StringFilter field={`filters.${category}.filter.${id}`} />
+          ) : (
+            <Grid2 container component={ListItem} disableGutters disablePadding>
+              {Object.entries(
+                'sliders' in ui && !easyMode ? ui.sliders : {},
+              ).map(([subCat, sliders], i) => (
+                <Grid2 key={subCat} component={List} xs={12} sm={6}>
+                  {sliders.map((each) => (
+                    <ListItem
+                      key={`${subCat}${each.name}`}
+                      disableGutters
+                      disablePadding
+                      sx={{ pr: { xs: 0, sm: i ? 0 : 2 } }}
+                    >
                       <SliderTile
-                        key={each.name}
-                        filterSlide={each}
+                        slide={{
+                          ...each,
+                          disabled: each.disabled || filters.all,
+                        }}
+                        // @ts-ignore
                         handleChange={handleChange}
-                        filterValues={filterValues}
+                        values={filters[each.name]}
                       />
-                    ))}
-                  </Grid>
-                ))}
-                <Grid
-                  container
-                  item
-                  xs={12}
-                  style={{ marginTop: 5, marginBottom: 20 }}
-                >
-                  <GenderFilter
-                    filter={filterValues}
-                    setFilter={(newValue) =>
-                      setFilterValues({
-                        ...filterValues,
-                        gender: newValue,
-                      })
-                    }
+                    </ListItem>
+                  ))}
+                </Grid2>
+              ))}
+              <Grid2 component={List} xs={12} sm={showMoreFilters ? 6 : 12}>
+                {showMoreFilters && (
+                  <GenderListItem
+                    field={`filters.${category}.filter.${id}`}
+                    disabled={filters.all}
+                    disableGutters
                   />
-                  <Grid
-                    container
-                    item
-                    xs={12}
-                    sm={6}
-                    justifyContent="center"
-                    alignItems="center"
-                    style={{
-                      marginTop: isMobile ? 20 : undefined,
-                    }}
-                  >
-                    {['xxs', 'xxl'].map((each, i) => (
-                      <Fragment key={each}>
-                        <Grid item xs={3}>
-                          <Typography variant="subtitle2" align="center">
-                            {t(i ? 'size_5' : 'size_1')}
-                          </Typography>
-                        </Grid>
-                        <Grid item xs={3}>
-                          <Switch
-                            color="primary"
-                            checked={filterValues[each]}
-                            onChange={() => {
-                              setFilterValues({
-                                ...filterValues,
-                                [each]: !filterValues[each],
-                              })
-                            }}
-                          />
-                        </Grid>
-                      </Fragment>
-                    ))}
-                  </Grid>
-                </Grid>
-              </>
-            )}
-          </Grid>
-        ) : (
-          <Grid item xs={12} sx={{ textAlign: 'center', mt: 2 }}>
-            <Size
-              filterValues={filterValues}
-              handleChange={handleChange}
-              btnSize="medium"
-            />
-          </Grid>
-        )}
-        {type === 'pokestops' &&
-          ui.pokestops?.quests &&
-          questConditions?.[advancedFilter.id] && (
-            <Grid
-              item
-              xs={12}
-              style={{
-                textAlign: 'center',
-                marginTop: 10,
-                marginBottom: 10,
-                maxWidth: 200,
-              }}
-            >
-              <FormControl
-                variant="outlined"
-                size="small"
-                fullWidth
-                sx={{ my: 1 }}
-              >
-                <InputLabel>{t('quest_condition')}</InputLabel>
-                <Select
-                  name="adv"
-                  value={(filterValues.adv || '').split(',')}
-                  fullWidth
-                  multiple
-                  renderValue={(selected) =>
-                    Array.isArray(selected)
-                      ? `${selected.length} ${t('selected')}`
-                      : selected
-                  }
-                  size="small"
-                  label={t('quest_condition')}
-                  onChange={(e, child) => {
-                    if (child.props.value === '') {
-                      return setFilterValues((prev) => ({ ...prev, adv: '' }))
-                    }
-                    return handleChange(e)
-                  }}
-                >
-                  <MenuItem value="">
-                    <Typography variant="caption">{t('all')}</Typography>
-                  </MenuItem>
-                  {questConditions[advancedFilter.id]
-                    .slice()
-                    .sort((a, b) => a.title.localeCompare(b.title))
-                    .map(({ title, target }) => (
-                      <MenuItem key={`${title}-${target}`} value={title}>
-                        <QuestTitle questTitle={title} questTarget={target} />
-                      </MenuItem>
-                    ))}
-                </Select>
-              </FormControl>
-            </Grid>
+                )}
+                <Size
+                  field={`filters.${category}.filter.${id}`}
+                  disableGutters
+                />
+              </Grid2>
+              <Grid2 component={List} xs={12} sm={showMoreFilters ? 6 : 12}>
+                {showMoreFilters && (
+                  <DualBoolToggle
+                    items={XXS_XXL}
+                    field={`filters.${category}.filter.${id}`}
+                    disabled={filters.all}
+                    label="size_1-size_5"
+                  />
+                )}
+                {category === 'pokestops' && <QuestConditionSelector id={id} />}
+                {checkIfHasAll(category, id) ? (
+                  <DualBoolToggle
+                    items={ENABLED_ALL}
+                    field={`filters.${category}.filter.${id}`}
+                    switchColor="secondary"
+                    secondColor="success"
+                    onChange={handleAllEnabled}
+                  />
+                ) : (
+                  <BoolToggle
+                    field={`filters.${category}.filter.${id}.enabled`}
+                    disableGutters
+                  />
+                )}
+              </Grid2>
+            </Grid2>
           )}
+        </List>
       </DialogContent>
       <Footer options={footerOptions} />
-    </>
-  ) : null
+    </Dialog>
+  )
 }

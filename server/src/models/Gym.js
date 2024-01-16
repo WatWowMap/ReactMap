@@ -187,13 +187,16 @@ class Gym extends Model {
     )
 
     teams.forEach((team) => {
-      let slotCount = 0
-      slots.forEach((slot) => {
-        if (slot.team === team) {
-          slotCount += 1
-          finalSlots[team].push(+slot.slots)
-        }
-      })
+      const all = args.filters[`t${team}-0`]?.all
+      let slotCount = all ? baseGymSlotAmounts.length : 0
+      if (!all) {
+        slots.forEach((slot) => {
+          if (slot.team === team) {
+            slotCount += 1
+            finalSlots[team].push(+slot.slots)
+          }
+        })
+      }
       if (slotCount === baseGymSlotAmounts.length || team == 0) {
         delete finalSlots[team]
         finalTeams.push(+team)
@@ -436,12 +439,9 @@ class Gym extends Model {
       .then((r) => {
         const unique = new Set()
         r.forEach((result) => {
-          if (result.team) {
-            if (result.slots) {
-              unique.add(`g${result.team}-${result.slots}`)
-            } else {
-              unique.add(`t${result.team}-0`)
-            }
+          if (result.team !== null && result.slots !== null) {
+            unique.add(`t${result.team}-0`)
+            unique.add(`g${result.team}-${6 - result.slots}`)
           }
         })
         return [...unique]

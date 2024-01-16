@@ -1,5 +1,6 @@
 // @ts-check
-import { useStatic, useStore } from '@hooks/useStore'
+import { useMemory } from '@hooks/useMemory'
+import { useStorage } from '@hooks/useStorage'
 import { createTheme, responsiveFontSizes, darken } from '@mui/material/styles'
 import dlv from 'dlv'
 import { useMemo } from 'react'
@@ -51,6 +52,13 @@ const components = {
         backgroundColor: t.palette.grey[t.palette.mode === 'dark' ? 800 : 500],
         width: '100%',
       }),
+    },
+  },
+  MuiListItemText: {
+    styleOverrides: {
+      inset: {
+        paddingLeft: 32,
+      },
     },
   },
   MuiAccordion: {
@@ -144,9 +152,9 @@ const components = {
  * @returns {import('@mui/material').Theme}
  */
 export default function useCustomTheme() {
-  const primary = useStatic((s) => s.theme.primary)
-  const secondary = useStatic((s) => s.theme.secondary)
-  const darkMode = useStore((s) => s.darkMode)
+  const primary = useMemory((s) => s.theme.primary)
+  const secondary = useMemory((s) => s.theme.secondary)
+  const darkMode = useStorage((s) => s.darkMode)
 
   if (darkMode) {
     if (!document.body.classList.contains('dark')) {

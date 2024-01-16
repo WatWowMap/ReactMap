@@ -1,18 +1,38 @@
+// @ts-check
 /* eslint-disable react/jsx-no-duplicate-props */
-import React, { useState, useEffect } from 'react'
-import { Grid, Typography, Slider, TextField } from '@mui/material'
+import * as React from 'react'
+import Grid2 from '@mui/material/Unstable_Grid2/Grid2'
+import TextField from '@mui/material/TextField'
+import Slider from '@mui/material/Slider'
+import { styled } from '@mui/material/styles'
 import { useTranslation } from 'react-i18next'
+import { ToggleTypography } from '@components/layout/general/ToggleTypography'
+import { MIN_MAX } from '@assets/constants'
 
+const StyledTextField =
+  /** @type {React.FC<import('@mui/material').TextFieldProps & { textColor: string }>} */ (
+    styled(TextField, { shouldForwardProp: (prop) => prop !== 'textColor' })(
+      // @ts-ignore
+      ({ textColor }) => ({
+        width: 80,
+        color: textColor,
+      }),
+    )
+  )
+const StyledSlider = styled(Slider)(() => ({ width: '100%' }))
+
+/**
+ * @typedef {('' | number)[]} Value
+ * @param {import('@rm/types').RMSliderProps} props
+ */
 export default function SliderTile({
-  filterSlide: {
+  slide: {
     name,
     min,
     max,
     color,
     disabled,
     label,
-    low,
-    high,
     step,
     i18nKey,
     marks,
@@ -20,128 +40,139 @@ export default function SliderTile({
     noTextInput,
   },
   handleChange,
-  filterValues,
+  values,
 }) {
   const { t } = useTranslation()
-  const [tempValues, setTempValues] = useState(filterValues[name])
-  const [tempTextValues, setTempTextValues] = useState(filterValues[name])
-  const [fullName, setFullName] = useState(true)
+  const [temp, setTemp] = React.useState(values || [])
+  const [text, setText] = React.useState(/** @type {Value} */ (values || []))
 
-  useEffect(() => {
-    setTempValues(filterValues[name])
-    setTempTextValues(filterValues[name])
-  }, [filterValues])
+  const handleSliderChange =
+    /** @type {import('@mui/material').SliderProps['onChangeCommitted']} */ (
+      React.useCallback((_, newValues) => {
+        if (Array.isArray(newValues)) {
+          setText(newValues)
+          setTemp(newValues)
+        }
+      }, [])
+    )
+  const handleSliderChangeCommitted = React.useCallback(
+    () => handleChange(name, temp),
+    [name, temp, handleChange],
+  )
 
-  const handleTempChange = (event, newValues) => {
-    if (newValues) {
-      setTempTextValues(newValues)
-      setTempValues(newValues)
-    } else {
-      const { id, value } = event.target
-      let safeVal = parseInt(value)
-      if (safeVal === undefined || Number.isNaN(safeVal)) {
-        safeVal = ''
-      }
-      const arrValues = []
-      if (id === 'min') {
-        safeVal = safeVal < min ? min : safeVal
-        arrValues.push(safeVal, filterValues[name][1])
-      } else {
-        safeVal = safeVal > max ? max : safeVal
-        arrValues.push(filterValues[name][0], safeVal)
-      }
-      if (safeVal === '') {
-        setTempTextValues(arrValues)
-      } else {
-        setTempTextValues(arrValues)
-        handleChange(name, arrValues, low, high)
-      }
-    }
-  }
+  const handleTextInputChange =
+    /** @type {import('@mui/material').TextFieldProps['onChange']} */ (
+      React.useCallback(
+        ({ type, target }) => {
+          const existing = text.slice()
+          const num = +target.value
+          const newValue = Number.isNaN(num) ? '' : num
+          const targetIndex = target.id === 'min' ? 0 : 1
 
-  if (!tempValues) return null
+          if (newValue === '') {
+            if (type === 'blur') {
+              existing[targetIndex] = target.id === 'min' ? min : max
+            } else {
+              existing[targetIndex] = newValue
+            }
+            setText(existing)
+          } else {
+            existing[targetIndex] = newValue
+          }
+          if (type === 'blur') {
+            existing.sort((a, b) => (a === '' ? -1 : b === '' ? 1 : a - b))
+          }
+          setText(existing)
+          if (existing.every((x) => typeof x === 'number')) {
+            // annoying but TypeScript is rude for not liking my check above
+            // @ts-ignore
+            handleChange(name, existing)
+          }
+        },
+        [text, min, max, handleChange],
+      )
+    )
 
-  const textColor =
-    (tempValues && tempValues[0] === min && tempValues[1] === max) || disabled
-      ? 'text.disabled'
-      : 'inherit'
+  const colorSx = React.useMemo(
+    () => ({
+      sx: {
+        color:
+          (temp && temp[0] === min && temp[1] === max) || disabled
+            ? 'text.disabled'
+            : 'inherit',
+      },
+    }),
+    [temp, min, max, disabled],
+  )
+  const inputProps = React.useMemo(
+    () => ({ min, max, autoFocus: false }),
+    [min, max],
+  )
+  const marksMemo = React.useMemo(
+    () =>
+      marks?.map((value) => ({
+        value,
+        label: t(`${markI18n}${value}`),
+      })),
+    [marks, markI18n],
+  )
 
-  const translated = t(i18nKey || `slider_${name}`)
+  React.useEffect(() => {
+    const safe = disabled || !values ? [min, max] : values
+    if (safe.some((v, i) => v !== temp[i])) setTemp(values)
+    if (safe.some((v, i) => v !== text[i])) setText(values)
+  }, [values?.[0], values?.[1], disabled, min, max])
 
+  if (!temp || !text) return null
   return (
-    <Grid
+    <Grid2
       container
-      direction="row"
       justifyContent="center"
       alignItems="center"
       minWidth={Math.min(window.innerWidth, 260)}
+      width="100%"
     >
-      <Grid item xs={noTextInput ? 12 : 4}>
-        <Typography
-          noWrap={fullName}
-          onClick={() => setFullName(!fullName)}
-          color={textColor}
-        >
-          {translated}
-        </Typography>
-      </Grid>
-      {(noTextInput ? [] : ['min', 'max']).map((each, index) => (
-        <Grid
-          item
-          xs={4}
-          key={`${name}-${each}`}
-          style={{ textAlign: index ? 'center' : 'right' }}
-        >
-          <TextField
-            sx={{ width: 80, color: textColor }}
-            id={each}
-            label={`${t(each)} ${label ? t(label) : ''}`}
-            name={name}
-            value={tempTextValues[index]}
-            onChange={handleTempChange}
-            variant="outlined"
-            size="small"
-            type="number"
-            disabled={disabled}
-            InputLabelProps={{
-              sx: { color: textColor },
-            }}
-            InputProps={{
-              sx: { color: textColor },
-            }}
-            inputProps={{
-              min,
-              max,
-              autoFocus: false,
-            }}
-          />
-        </Grid>
-      ))}
-      <Grid item xs={11} style={{ textAlign: 'center' }}>
-        <Slider
+      <Grid2 xs={noTextInput ? 12 : 4}>
+        <ToggleTypography color={colorSx.sx.color} lineHeight={1.2}>
+          {t(i18nKey || `slider_${name}`)}
+        </ToggleTypography>
+      </Grid2>
+      {!noTextInput &&
+        MIN_MAX.map((each, index) => (
+          <Grid2 key={each} xs={4} textAlign={index ? 'center' : 'right'}>
+            <StyledTextField
+              id={each}
+              name={name}
+              label={`${t(each)} ${label ? t(label) : ''}`}
+              value={text[index]}
+              variant="outlined"
+              size="small"
+              type="number"
+              textColor={colorSx.sx.color}
+              onChange={handleTextInputChange}
+              onBlur={handleTextInputChange}
+              disabled={disabled}
+              InputLabelProps={colorSx}
+              InputProps={colorSx}
+              inputProps={inputProps}
+            />
+          </Grid2>
+        ))}
+      <Grid2 xs={11} textAlign="center">
+        <StyledSlider
           name={name}
           min={min}
           max={max}
           color={color}
-          style={{ width: '100%' }}
-          value={tempValues}
-          onChange={handleTempChange}
-          onChangeCommitted={(_, newValues) => {
-            handleChange(name, newValues, low, high)
-          }}
+          value={temp}
+          onChange={handleSliderChange}
+          onChangeCommitted={handleSliderChangeCommitted}
           disabled={disabled}
-          valueLabelFormat={marks ? (e) => t(`${markI18n}${e}`) : undefined}
+          valueLabelFormat={marksMemo ? (e) => t(`${markI18n}${e}`) : undefined}
           step={step}
-          marks={
-            marks
-              ? marks.map((each) => ({
-                  value: each,
-                  label: t(`${markI18n}${each}`),
-                }))
-              : undefined
-          }
+          marks={marksMemo}
         />
-      </Grid>
-    </Grid>
+      </Grid2>
+    </Grid2>
   )
 }

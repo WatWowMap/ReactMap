@@ -22,9 +22,16 @@ const resolvers = {
     available: (_, _args, { Event, Db, perms }) => {
       const data = {
         pokemon: perms.pokemon ? Event.available.pokemon : [],
-        gyms: perms.gyms ? Event.available.gyms : [],
+        gyms: perms.gyms || perms.raids ? Event.available.gyms : [],
         nests: perms.nests ? Event.available.nests : [],
-        pokestops: perms.pokestops ? Event.available.pokestops : [],
+        pokestops:
+          perms.pokestops ||
+          perms.invasions ||
+          perms.eventStops ||
+          perms.quests ||
+          perms.lures
+            ? Event.available.pokestops
+            : [],
         questConditions: perms.quests ? Db.questConditions : {},
         masterfile: { ...Event.masterfile, invasions: Event.invasions },
         filters: buildDefaultFilters(perms, Db),
@@ -317,18 +324,18 @@ const resolvers = {
             }))
             .filter((parent) => parent.children.length)
 
-          // Adds new blanks to account for area restrictions trimming some
-          filtered.forEach(({ children }) => {
-            if (children.length % 2 === 1) {
-              children.push({
-                type: 'Feature',
-                properties: {
-                  name: '',
-                  manual: !!config.getSafe('manualAreas.length'),
-                },
-              })
-            }
-          })
+          // // Adds new blanks to account for area restrictions trimming some
+          // filtered.forEach(({ children }) => {
+          //   if (children.length % 2 === 1) {
+          //     children.push({
+          //       type: 'Feature',
+          //       properties: {
+          //         name: '',
+          //         manual: !!config.getSafe('manualAreas.length'),
+          //       },
+          //     })
+          //   }
+          // })
           return filtered
         }
         return scanAreas.filter((parent) => parent.children.length)

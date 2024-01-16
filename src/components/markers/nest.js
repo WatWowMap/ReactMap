@@ -1,6 +1,6 @@
 // @ts-check
 import { divIcon } from 'leaflet'
-import { useStatic } from '@hooks/useStore'
+import { useMemory } from '@hooks/useMemory'
 
 /**
  *
@@ -20,7 +20,7 @@ export default function nestMarker({
   iconSize,
   recent,
 }) {
-  const { Icons, masterfile } = useStatic.getState()
+  const { Icons, masterfile } = useMemory.getState()
   const { types } = masterfile.pokemon[pokemonId]?.forms?.[formId]?.types
     ? masterfile.pokemon[pokemonId].forms[formId]
     : masterfile.pokemon[pokemonId]

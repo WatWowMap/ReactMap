@@ -7,11 +7,13 @@ import { t } from 'i18next'
 import useMarkerTimer from '@hooks/useMarkerTimer'
 import { getOffset } from '@services/functions/offset'
 import { getBadge } from '@services/functions/getBadge'
-import { basicEqualFn, useStatic, useStore } from '@hooks/useStore'
+import { basicEqualFn, useMemory } from '@hooks/useMemory'
+import { useStorage } from '@hooks/useStorage'
 import useOpacity from '@hooks/useOpacity'
 import useForcePopup from '@hooks/useForcePopup'
 import Utility from '@services/Utility'
 import { sendNotification } from '@services/desktopNotification'
+import { useMapStore } from '@hooks/useMapStore'
 
 import PopupContent from '../popups/Pokemon'
 import { basicMarker, fancyMarker } from '../markers/pokemon'
@@ -33,7 +35,7 @@ const OPERATOR =
  * @returns
  */
 const getGlowStatus = (pkmn, userSettings) => {
-  const staticUserSettings = useStatic.getState().userSettings.pokemon
+  const staticUserSettings = useMemory.getState().userSettings.pokemon
   let glowCount = 0
   let glowValue
   Object.entries(staticUserSettings.glow.sub).forEach((rule) => {
@@ -77,7 +79,7 @@ const PokemonTile = (pkmn) => {
     showSize,
     showInteractionRange,
     filterSize,
-  ] = useStore((s) => {
+  ] = useStorage((s) => {
     const {
       pokemonTimers,
       glow,
@@ -110,8 +112,8 @@ const PokemonTile = (pkmn) => {
     configZoom,
     timeOfDay,
     cry,
-  ] = useStatic((s) => {
-    const { Icons, excludeList, timerList, config, map, Audio } = s
+  ] = useMemory((s) => {
+    const { Icons, excludeList, timerList, config, Audio } = s
     const badgeId = getBadge(pkmn.bestPvp)
     return [
       excludeList.includes(internalId),
@@ -125,7 +127,8 @@ const PokemonTile = (pkmn) => {
       ),
       Icons.getSize('pokemon', filterSize),
       badgeId ? Icons.getMisc(badgeId) : '',
-      config.general.interactionRangeZoom <= map.getZoom(),
+      config.general.interactionRangeZoom <=
+        useMapStore.getState().map.getZoom(),
       s.timeOfDay,
       Audio.getPokemon(
         pkmn.pokemon_id,

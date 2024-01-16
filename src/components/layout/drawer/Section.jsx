@@ -3,46 +3,60 @@ import * as React from 'react'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import SettingsIcon from '@mui/icons-material/Settings'
 import TuneIcon from '@mui/icons-material/Tune'
-import {
-  Typography,
-  Accordion,
-  AccordionSummary,
-  AccordionDetails,
-  ListItemButton,
-  List,
-  ListItemIcon,
-  ListItemText,
-} from '@mui/material'
+import Typography from '@mui/material/Typography'
+import Accordion from '@mui/material/Accordion'
+import AccordionSummary from '@mui/material/AccordionSummary'
+import AccordionDetails from '@mui/material/AccordionDetails'
+import List from '@mui/material/List'
 
 import { useTranslation } from 'react-i18next'
 
-import { useStore, useStatic, toggleDialog } from '@hooks/useStore'
+import { useMemory } from '@hooks/useMemory'
+import { toggleDialog, useLayoutStore } from '@hooks/useLayoutStore'
+import { useStorage } from '@hooks/useStorage'
 import Utility from '@services/Utility'
 
 import SettingsMenu from './Settings'
-import ItemToggle from './ItemToggle'
-import PokemonSection from './Pokemon'
-import Areas from './Areas'
+import { PokemonDrawerMemo } from './Pokemon'
+import Areas from './areas'
 import Extras from './Extras'
+import { BoolToggle } from './BoolToggle'
+import { BasicListButton } from '../general/BasicListButton'
 
-export default function DrawerSection({ category, value }) {
+const ADV_CATEGORIES = new Set(['pokemon', 'gyms', 'pokestops', 'nests'])
+
+/** @param {{ category: keyof import('@rm/types').UIObject }} props */
+const DrawerSection = ({ category }) => {
   const { t } = useTranslation()
+  const sidebar = useStorage((s) => s.sidebar === category)
+  const staticUserSettings = useMemory((s) => !!s.userSettings[category])
+  const drawer = useLayoutStore((s) => s.drawer)
+  const value = useMemory((s) => s.ui[category])
 
-  const sidebar = useStore((s) => s.sidebar)
-  const staticUserSettings = useStatic((s) => s.userSettings)
+  const [unmountOnExit, setUnmountOnExit] = React.useState(true)
 
-  const handleChange = (panel) => (_, isExpanded) =>
-    useStore.setState({ sidebar: isExpanded ? panel : false })
+  /** @type {(panel: string) => (e: unknown, isExpanded: boolean )=> void} */
+  const handleChange = React.useCallback(
+    (panel) => (_, isExpanded) =>
+      useStorage.setState({ sidebar: isExpanded ? panel : '' }),
+    [],
+  )
+
+  React.useEffect(() => {
+    if (drawer && category !== 'scanAreas') {
+      const timer = setTimeout(() => {
+        setUnmountOnExit(false)
+      }, 250)
+      return () => clearTimeout(timer)
+    }
+    setUnmountOnExit(true)
+  }, [drawer, category])
 
   return (
     <Accordion
-      expanded={sidebar === category}
+      expanded={sidebar}
       onChange={handleChange(category)}
-      TransitionProps={{
-        unmountOnExit:
-          category !== 'pokemon' &&
-          (sidebar === 'scanAreas' ? true : category === 'scanAreas'),
-      }}
+      TransitionProps={{ unmountOnExit }}
     >
       <AccordionSummary expandIcon={<ExpandMoreIcon />}>
         <Typography>{t(Utility.camelToSnake(category))}</Typography>
@@ -50,35 +64,44 @@ export default function DrawerSection({ category, value }) {
       <AccordionDetails sx={{ p: 0 }}>
         <List>
           {category === 'pokemon' ? (
-            <PokemonSection category={category} context={value} />
+            <PokemonDrawerMemo />
           ) : category === 'settings' ? (
             <SettingsMenu />
           ) : (
-            Object.entries(value).map(([subItem, subValue]) => (
-              <React.Fragment key={`${category}-${subItem}`}>
-                <ItemToggle category={category} subItem={subItem} />
-                <Extras category={category} subItem={subItem} data={subValue} />
-              </React.Fragment>
-            ))
+            Object.keys(value).map((subItem) => {
+              const hasSubSubCategories =
+                category === 'wayfarer' || category === 'admin'
+              return (
+                <React.Fragment key={`${category}${subItem}`}>
+                  {!(category === 'nests' && subItem === 'sliders') && (
+                    <BoolToggle
+                      // @ts-ignore
+                      field={`filters.${
+                        hasSubSubCategories ? subItem : category
+                      }.${hasSubSubCategories ? 'enabled' : subItem}`}
+                      label={subItem}
+                    />
+                  )}
+                  <Extras category={category} subItem={subItem} />
+                </React.Fragment>
+              )
+            })
           )}
-          {staticUserSettings[category] && (
-            <ListItemButton onClick={toggleDialog(true, category, 'options')}>
-              <ListItemIcon>
-                <SettingsIcon color="secondary" />
-              </ListItemIcon>
-              <ListItemText primary={t('options')} />
-            </ListItemButton>
+          {staticUserSettings && (
+            <BasicListButton
+              onClick={toggleDialog(true, category, 'options')}
+              label="options"
+            >
+              <SettingsIcon color="secondary" />
+            </BasicListButton>
           )}
-          {(category === 'pokemon' ||
-            category === 'gyms' ||
-            category === 'pokestops' ||
-            category === 'nests') && (
-            <ListItemButton onClick={toggleDialog(true, category, 'filters')}>
-              <ListItemIcon>
-                <TuneIcon color="primary" />
-              </ListItemIcon>
-              <ListItemText primary={t('advanced')} />
-            </ListItemButton>
+          {ADV_CATEGORIES.has(category) && (
+            <BasicListButton
+              onClick={toggleDialog(true, category, 'filters')}
+              label="advanced"
+            >
+              <TuneIcon color="primary" />
+            </BasicListButton>
           )}
           {category === 'scanAreas' && <Areas />}
         </List>
@@ -86,3 +109,8 @@ export default function DrawerSection({ category, value }) {
     </Accordion>
   )
 }
+
+export const DrawerSectionMemo = React.memo(
+  DrawerSection,
+  (prev, next) => prev.category === next.category,
+)

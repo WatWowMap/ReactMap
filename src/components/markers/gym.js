@@ -1,6 +1,6 @@
 // @ts-check
 import { divIcon } from 'leaflet'
-import { useStatic } from '@hooks/useStore'
+import { useMemory } from '@hooks/useMemory'
 
 const getBadgeColor = (raidLevel) => {
   switch (raidLevel) {
@@ -50,7 +50,7 @@ export default function gymMarker({
   badge,
   ...gym
 }) {
-  const { Icons } = useStatic.getState()
+  const { Icons } = useMemory.getState()
   const [gymMod, raidMod] = Icons.getModifiers('gym', 'raid')
 
   const filledSlots = available_slots !== null ? 6 - available_slots : 0

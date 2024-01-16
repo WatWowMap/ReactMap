@@ -5,75 +5,78 @@ const { Db } = require('../initialization')
 const nestFilters = config.getSafe('defaultFilters.nests')
 const leagues = config.getSafe('api.pvp.leagues')
 
-const SLIDERS = {
-  pokemon: {
-    primary: [
-      {
-        name: 'iv',
-        label: '%',
-        min: 0,
-        max: 100,
-        perm: 'iv',
-        color: 'secondary',
-      },
-    ],
-    secondary: [
-      {
-        name: 'level',
-        label: '',
-        min: 1,
-        max: 35,
-        perm: 'iv',
-        color: 'secondary',
-      },
-      {
-        name: 'atk_iv',
-        label: '',
-        min: 0,
-        max: 15,
-        perm: 'iv',
-        color: 'secondary',
-      },
-      {
-        name: 'def_iv',
-        label: '',
-        min: 0,
-        max: 15,
-        perm: 'iv',
-        color: 'secondary',
-      },
-      {
-        name: 'sta_iv',
-        label: '',
-        min: 0,
-        max: 15,
-        perm: 'iv',
-        color: 'secondary',
-      },
-      {
-        name: 'cp',
-        label: '',
-        min: 10,
-        max: 5000,
-        perm: 'iv',
-        color: 'secondary',
-      },
-    ],
-  },
-  nests: {
-    secondary: [
-      {
-        name: 'avgFilter',
-        i18nKey: 'spawns_per_hour',
-        label: '',
-        min: nestFilters.avgFilter[0],
-        max: nestFilters.avgFilter[1],
-        perm: 'nests',
-        step: nestFilters.avgSliderStep,
-      },
-    ],
-  },
-}
+/** @typedef {import('@rm/types').RMSlider} Slider */
+
+const SLIDERS =
+  /** @type {{ pokemon: { primary: Slider[], secondary: Slider[] }, nests: { secondary: Slider[] } }} */ ({
+    pokemon: {
+      primary: [
+        {
+          name: 'iv',
+          label: '%',
+          min: 0,
+          max: 100,
+          perm: 'iv',
+          color: 'secondary',
+        },
+      ],
+      secondary: [
+        {
+          name: 'level',
+          label: '',
+          min: 1,
+          max: 35,
+          perm: 'iv',
+          color: 'secondary',
+        },
+        {
+          name: 'atk_iv',
+          label: '',
+          min: 0,
+          max: 15,
+          perm: 'iv',
+          color: 'secondary',
+        },
+        {
+          name: 'def_iv',
+          label: '',
+          min: 0,
+          max: 15,
+          perm: 'iv',
+          color: 'secondary',
+        },
+        {
+          name: 'sta_iv',
+          label: '',
+          min: 0,
+          max: 15,
+          perm: 'iv',
+          color: 'secondary',
+        },
+        {
+          name: 'cp',
+          label: '',
+          min: 10,
+          max: 5000,
+          perm: 'iv',
+          color: 'secondary',
+        },
+      ],
+    },
+    nests: {
+      secondary: [
+        {
+          name: 'avgFilter',
+          i18nKey: 'spawns_per_hour',
+          label: '',
+          min: nestFilters.avgFilter[0],
+          max: nestFilters.avgFilter[1],
+          perm: 'nests',
+          step: nestFilters.avgSliderStep,
+        },
+      ],
+    },
+  })
 
 leagues.forEach((league) =>
   SLIDERS.pokemon.primary.push({
@@ -165,7 +168,7 @@ function generateUi(req, perms) {
               ) || BLOCKED,
           }
         : undefined,
-    s2cells: perms.s2cells ? { enabled: true, cells: true } : BLOCKED,
+    s2cells: perms.s2cells ? { enabled: true } : BLOCKED,
     scanAreas: perms.scanAreas
       ? { filterByAreas: true, enabled: true }
       : undefined,

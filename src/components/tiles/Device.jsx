@@ -4,7 +4,7 @@ import ErrorBoundary from '@components/ErrorBoundary'
 import * as React from 'react'
 import { Marker, Popup } from 'react-leaflet'
 
-import { basicEqualFn, useStatic } from '@hooks/useStore'
+import { basicEqualFn, useMemory } from '@hooks/useMemory'
 
 import deviceMarker from '../markers/device'
 import PopupContent from '../popups/Device'
@@ -20,7 +20,7 @@ const DeviceTile = (device) => {
   const [poly, setPoly] = React.useState(false)
   const markerRef = React.useRef(null)
   const isOnline = ts - device.updated < 900
-  const [iconUrl, iconSize, modifiers] = useStatic(
+  const [iconUrl, iconSize, modifiers] = useMemory(
     (s) => [
       s.Icons.getDevices(isOnline),
       s.Icons.getSize('device'),

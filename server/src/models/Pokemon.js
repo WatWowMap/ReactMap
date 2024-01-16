@@ -102,6 +102,10 @@ class Pokemon extends Model {
       }
     })
 
+    if (Object.keys(filterMap).length === 0 && mods.onlyEasyMode) {
+      // if no pokemon are present we want global filters to apply still
+      mods.onlyLinkGlobal = false
+    }
     const globalFilter = new PkmnFilter(
       'global',
       args.filters.onlyIvOr,
@@ -243,10 +247,23 @@ class Pokemon extends Model {
           const [id, form] = key.split('-', 2).map(Number)
           return { id, form }
         })
-      if (!globalFilter.mods.onlyLinkGlobal) pokemon.push({ id: -1 }) // add everything else
-      filters.push(...globalFilter.buildApiFilter(pokemon))
-      if (onlyZeroIv) filters.push({ iv: { min: 0, max: 0 }, pokemon })
-      if (onlyHundoIv) filters.push({ iv: { min: 100, max: 100 }, pokemon })
+      if (!globalFilter.mods.onlyLinkGlobal) {
+        pokemon.push({ id: -1 }) // add everything else
+      }
+      if (
+        globalFilter.mods.onlyLinkGlobal
+          ? !!filters.length || globalFilter.mods.onlyEasyMode
+          : true
+      ) {
+        filters.push(...globalFilter.buildApiFilter(pokemon))
+      }
+      const globalPokes = globalFilter.mods.onlyLinkGlobal
+        ? [...pokemon, { id: -1 }]
+        : pokemon
+      if (onlyZeroIv)
+        filters.push({ iv: { min: 0, max: 0 }, pokemon: globalPokes })
+      if (onlyHundoIv)
+        filters.push({ iv: { min: 100, max: 100 }, pokemon: globalPokes })
     }
     /** @type {import("../types").Pokemon[]} */
     const results = await this.evalQuery(

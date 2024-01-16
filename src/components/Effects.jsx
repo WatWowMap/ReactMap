@@ -3,7 +3,7 @@ import useMediaQuery from '@mui/material/useMediaQuery'
 
 import useGenerate from '@hooks/useGenerate'
 import useRefresh from '@hooks/useRefresh'
-import { useStatic } from '@hooks/useStore'
+import { useMemory } from '@hooks/useMemory'
 import { useParams } from 'react-router-dom'
 import { useMap } from 'react-leaflet'
 import { useTranslation } from 'react-i18next'
@@ -18,10 +18,10 @@ export function Effects() {
 
   const isMobile = useMediaQuery((theme) => theme.breakpoints.only('xs'))
   const isTablet = useMediaQuery((theme) => theme.breakpoints.only('sm'))
-  const online = useStatic((s) => s.online)
+  const online = useMemory((s) => s.online)
 
   React.useEffect(() => {
-    useStatic.setState({ isMobile, isTablet })
+    useMemory.setState({ isMobile, isTablet })
   }, [isMobile, isTablet])
 
   React.useEffect(() => {
@@ -36,7 +36,7 @@ export function Effects() {
   React.useEffect(() => {
     map.attributionControl.setPrefix(
       online
-        ? useStatic.getState().config.general.attributionPrefix || ''
+        ? useMemory.getState().config.general.attributionPrefix || ''
         : t('offline_mode'),
     )
   }, [online])

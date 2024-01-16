@@ -62,6 +62,8 @@ export interface Gym {
   power_up_level: number
   power_up_points: number
   power_up_end_timestamp: number
+  deleted: boolean
+  enabled: boolean
 }
 
 export type FullGym = FullModel<Gym, GymModel>
@@ -146,6 +148,7 @@ export interface Event {
   event_expire_timestamp: number
   showcase_pokemon_id: number
   showcase_pokemon_form_id: number
+  showcase_pokemon_type_id: number
   showcase_rankings: ShowcaseDetails
   showcase_ranking_standard: number
 }

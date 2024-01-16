@@ -1,6 +1,6 @@
 // @ts-check
 
-import { useStatic } from '@hooks/useStore'
+import { useMemory } from '@hooks/useMemory'
 
 /** @param {Partial<import("@rm/types").Quest>} quest */
 export default function getRewardInfo({
@@ -21,7 +21,7 @@ export default function getRewardInfo({
   xl_candy_pokemon_id,
   quest_reward_type,
 }) {
-  const { Icons } = useStatic.getState()
+  const { Icons } = useMemory.getState()
   let src = ''
   let amount = 0
   let tt = /** @type {string[] | string} */ ('')

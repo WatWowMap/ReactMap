@@ -6,7 +6,8 @@ import { useMutation } from '@apollo/client'
 import { useTranslation } from 'react-i18next'
 
 import Query from '@services/Query'
-import { useLayoutStore, useStatic } from '@hooks/useStore'
+import { useMemory } from '@hooks/useMemory'
+import { useLayoutStore } from '@hooks/useLayoutStore'
 
 import Header from '../general/Header'
 import Footer from '../general/Footer'
@@ -43,7 +44,7 @@ export default function NestSubmission({ id, name }) {
 
   React.useEffect(() => {
     if (error) {
-      useStatic.setState({
+      useMemory.setState({
         webhookAlert: {
           open: true,
           severity: 'error',
@@ -58,7 +59,7 @@ export default function NestSubmission({ id, name }) {
 
   return (
     <Dialog open={open === id} onClose={handleClose}>
-      <Header titles={['nest_submission_menu']} action={handleClose} />
+      <Header titles="nest_submission_menu" action={handleClose} />
       <DialogContent sx={{ mt: 2 }}>
         <form noValidate autoComplete="off" onSubmit={handleSubmit}>
           <TextField

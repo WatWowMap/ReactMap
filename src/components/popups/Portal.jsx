@@ -6,7 +6,8 @@ import { useTranslation } from 'react-i18next'
 
 import Utility from '@services/Utility'
 import ErrorBoundary from '@components/ErrorBoundary'
-import { useStatic, useStore } from '@hooks/useStore'
+import { useMemory } from '@hooks/useMemory'
+import { useStorage } from '@hooks/useStorage'
 
 import Navigation from './common/Navigation'
 import Coords from './common/Coords'
@@ -25,8 +26,8 @@ export default function PortalPopup({
   imported,
 }) {
   const { t } = useTranslation()
-  const Icons = useStatic((s) => s.Icons)
-  const enablePortalPopupCoords = useStore(
+  const Icons = useMemory((s) => s.Icons)
+  const enablePortalPopupCoords = useStorage(
     (s) => s.userSettings?.wayfarer?.enablePortalPopupCoords,
   )
 

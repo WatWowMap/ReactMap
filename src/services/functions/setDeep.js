@@ -10,17 +10,23 @@ export function setDeep(obj, path, value) {
     path = path.split('.')
   }
   if (path.length > 1) {
-    const e = path.shift()
+    const next = path.shift()
     setDeep(
-      (obj[e] =
-        Object.prototype.toString.call(obj[e]) === '[object Object]'
-          ? { ...obj[e] }
+      (obj[next] =
+        Object.prototype.toString.call(obj[next]) === '[object Object]'
+          ? { ...obj[next] }
           : {}),
       path,
       value,
     )
   } else {
-    obj[path[0]] = value
+    obj[path[0]] =
+      typeof value === 'object'
+        ? Array.isArray(value)
+          ? value.slice()
+          : { ...value }
+        : value
   }
+
   return { ...obj }
 }

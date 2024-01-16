@@ -1,7 +1,8 @@
 // @ts-check
 import * as React from 'react'
 
-import { useStatic, useStore } from '@hooks/useStore'
+import { useMemory } from '@hooks/useMemory'
+import { useStorage } from '@hooks/useStorage'
 
 import Level14Tile from './S14Cell'
 import Level17Tile from './S17Cell'
@@ -13,19 +14,19 @@ import PoITile from './PoI'
  * @returns
  */
 const SubmissionCellTile = ({ level14Cells, level17Cells, pois }) => {
-  const poiColor = useStore((s) => s.userSettings.wayfarer.poiColor)
-  const showcaseColor = useStore((s) => s.userSettings.wayfarer.showcaseColor)
-  const partnerColor = useStore((s) => s.userSettings.wayfarer.partnerColor)
-  const cellBlocked = useStore((s) => s.userSettings.wayfarer.cellBlocked)
-  const oneStopTillNext = useStore(
+  const poiColor = useStorage((s) => s.userSettings.wayfarer.poiColor)
+  const showcaseColor = useStorage((s) => s.userSettings.wayfarer.showcaseColor)
+  const partnerColor = useStorage((s) => s.userSettings.wayfarer.partnerColor)
+  const cellBlocked = useStorage((s) => s.userSettings.wayfarer.cellBlocked)
+  const oneStopTillNext = useStorage(
     (s) => s.userSettings.wayfarer.oneStopTillNext,
   )
-  const twoStopsTillNext = useStore(
+  const twoStopsTillNext = useStorage(
     (s) => s.userSettings.wayfarer.twoStopsTillNext,
   )
-  const noMoreGyms = useStore((s) => s.userSettings.wayfarer.noMoreGyms)
-  const darkStyle = useStatic((s) => s.tileStyle === 'dark')
-  const cellColor = useStore((s) =>
+  const noMoreGyms = useStorage((s) => s.userSettings.wayfarer.noMoreGyms)
+  const darkStyle = useMemory((s) => s.tileStyle === 'dark')
+  const cellColor = useStorage((s) =>
     darkStyle
       ? s.userSettings.wayfarer.darkMapBorder
       : s.userSettings.wayfarer.lightMapBorder,

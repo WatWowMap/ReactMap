@@ -1,13 +1,9 @@
-import React, { forwardRef } from 'react'
+import * as React from 'react'
 import List from '@mui/material/List'
-import ListItemButton from '@mui/material/ListItemButton'
-import ListItemIcon from '@mui/material/ListItemIcon'
-import ListItemText from '@mui/material/ListItemText'
 import Divider from '@mui/material/Divider'
 import MuiLink from '@mui/material/Link'
 
 import { Link } from 'react-router-dom'
-import { useTranslation } from 'react-i18next'
 import AccountBoxIcon from '@mui/icons-material/AccountBox'
 import ExitToAppIcon from '@mui/icons-material/ExitToApp'
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline'
@@ -18,9 +14,13 @@ import FeedbackIcon from '@mui/icons-material/Feedback'
 import HeartIcon from '@mui/icons-material/Favorite'
 import { downloadJson } from '@services/functions/downloadJson'
 
-import { useStore, useStatic, useLayoutStore } from '@hooks/useStore'
+import { useMemory } from '@hooks/useMemory'
+import { useLayoutStore } from '@hooks/useLayoutStore'
+import { useStorage } from '@hooks/useStorage'
 import { I } from '../general/I'
+import { BasicListButton } from '../general/BasicListButton'
 
+/** @type {React.ChangeEventHandler<HTMLInputElement>} */
 const importSettings = (e) => {
   const file = e.target.files[0]
   if (!file) {
@@ -30,57 +30,42 @@ const importSettings = (e) => {
   reader.onload = function parse(newSettings) {
     const contents = newSettings.target.result
     localStorage.clear()
-    localStorage.setItem('local-state', contents)
+    localStorage.setItem('local-state', contents.toString())
   }
   reader.readAsText(file)
   setTimeout(() => window.location.reload(), 1500)
 }
 
-const exportSettings = () => {
-  const json = localStorage.getItem('local-state')
-  downloadJson(json, 'settings.json')
-  const el = document.createElement('a')
-  el.setAttribute(
-    'href',
-    `data:application/json;chartset=utf-8,${encodeURIComponent(json)}`,
-  )
-  el.setAttribute('download', 'settings.json')
-  el.style.display = 'none'
-  document.body.appendChild(el)
-  el.click()
-  document.body.removeChild(el)
-}
+const exportSettings = () =>
+  downloadJson(localStorage.getItem('local-state'), 'settings.json')
 
-const renderLink = forwardRef(({ to, ...itemProps }, ref) => (
+const renderLink = React.forwardRef(({ to, ...itemProps }, ref) => (
   <Link to={to} ref={ref} {...itemProps} />
 ))
 
 export default function DrawerActions() {
-  const { t } = useTranslation()
   const {
     auth: { loggedIn, methods },
     config,
-  } = useStatic.getState()
+  } = useMemory.getState()
 
   return (
     <List>
       {config.misc.enableUserProfile && (
-        <ListItemButton
+        <BasicListButton
           onClick={() => useLayoutStore.setState({ userProfile: true })}
+          label="profile"
         >
-          <ListItemIcon>
-            <AccountBoxIcon color="secondary" />
-          </ListItemIcon>
-          <ListItemText primary={t('profile')} />
-        </ListItemButton>
+          <AccountBoxIcon color="secondary" />
+        </BasicListButton>
       )}
       {config.misc.enableTutorial && (
-        <ListItemButton onClick={() => useStore.setState({ tutorial: true })}>
-          <ListItemIcon>
-            <HelpOutlineIcon color="secondary" />
-          </ListItemIcon>
-          <ListItemText primary={t('tutorial')} />
-        </ListItemButton>
+        <BasicListButton
+          onClick={() => useStorage.setState({ tutorial: true })}
+          label="tutorial"
+        >
+          <HelpOutlineIcon color="secondary" />
+        </BasicListButton>
       )}
       <input
         accept="application/json"
@@ -89,88 +74,76 @@ export default function DrawerActions() {
         style={{ display: 'none' }}
         onChange={importSettings}
       />
-      <ListItemButton onClick={exportSettings}>
-        <ListItemIcon>
-          <ImportExportIcon color="secondary" />
-        </ListItemIcon>
-        <ListItemText primary={t('export')} />
-      </ListItemButton>
-      <ListItemButton component="label" htmlFor="contained-button-file">
-        <ListItemIcon>
-          <ImportExportIcon color="primary" />
-        </ListItemIcon>
-        <ListItemText primary={t('import')} />
-      </ListItemButton>
-      <ListItemButton
-        onClick={() => useLayoutStore.setState({ resetFilters: true })}
+      <BasicListButton onClick={exportSettings} label="export">
+        <ImportExportIcon color="secondary" />
+      </BasicListButton>
+
+      <BasicListButton
+        component="label"
+        htmlFor="contained-button-file"
+        onClick={exportSettings}
+        label="import"
       >
-        <ListItemIcon>
-          <RotateLeftIcon color="primary" />
-        </ListItemIcon>
-        <ListItemText primary={t('reset_filters')} />
-      </ListItemButton>
+        <ImportExportIcon color="primary" />
+      </BasicListButton>
+
+      <BasicListButton
+        onClick={() => useLayoutStore.setState({ resetFilters: true })}
+        label="reset_filters"
+      >
+        <RotateLeftIcon color="primary" />
+      </BasicListButton>
+
       {!!methods.length && (
-        <ListItemButton
+        <BasicListButton
           component={loggedIn ? MuiLink : renderLink}
           to={loggedIn ? undefined : '/login'}
           href={loggedIn ? '/auth/logout' : undefined}
+          label={loggedIn ? 'logout' : 'login'}
         >
-          <ListItemIcon>
-            <ExitToAppIcon color="primary" />
-          </ListItemIcon>
-          <ListItemText primary={t(loggedIn ? 'logout' : 'login')} />
-        </ListItemButton>
+          <ExitToAppIcon color="primary" />
+        </BasicListButton>
       )}
       <Divider />
       {!config.misc.rude && (
-        <ListItemButton
+        <BasicListButton
           href="https://github.com/WatWowMap/ReactMap"
           referrerPolicy="no-referrer"
           target="_blank"
           rel="noreferrer"
+          label="contribute"
         >
-          <ListItemIcon>
-            <HeartIcon color="primary" />
-          </ListItemIcon>
-          <ListItemText primary={t('contribute')} />
-        </ListItemButton>
+          <HeartIcon color="primary" />
+        </BasicListButton>
       )}
       {config.links.statsLink && (
-        <ListItemButton
+        <BasicListButton
           component="button"
           href={config.links.statsLink}
           target="_blank"
           rel="noreferrer"
+          label="stats"
         >
-          <ListItemIcon>
-            <TrendingUpIcon color="success" />
-          </ListItemIcon>
-          <ListItemText primary={t('stats')} />
-        </ListItemButton>
+          <TrendingUpIcon color="success" />
+        </BasicListButton>
       )}
       {config.links.feedbackLink && (
-        <ListItemButton
-          component="button"
+        <BasicListButton
           onClick={() => useLayoutStore.setState({ feedback: true })}
+          label="feedback"
         >
-          <ListItemIcon>
-            <FeedbackIcon color="success" />
-          </ListItemIcon>
-          <ListItemText primary={t('feedback')} />
-        </ListItemButton>
+          <FeedbackIcon color="success" />
+        </BasicListButton>
       )}
       {config.links.discordLink && (
-        <ListItemButton
-          component="button"
+        <BasicListButton
           href={config.links.discordLink}
           target="_blank"
           rel="noreferrer"
+          label="Discord"
         >
-          <ListItemIcon>
-            <I className="fab fa-discord" color="secondary" size="small" />
-          </ListItemIcon>
-          <ListItemText primary="Discord" />
-        </ListItemButton>
+          <I className="fab fa-discord" color="secondary" size="small" />
+        </BasicListButton>
       )}
     </List>
   )

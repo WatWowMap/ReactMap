@@ -24,8 +24,12 @@ export function ProfileSelect() {
 
   const currentProfile = useWebhookStore((s) => s.human.current_profile_no || 0)
 
-  /** @type {import('@apollo/client').ApolloQueryResult<{ webhook: { profile: import("@rm/types").PoracleProfile[] } }>} */
-  const { data: profiles, loading } = useQuery(allProfiles, {
+  /** @type {import('@apollo/client').QueryResult<{ webhook: { profile: import("@rm/types").PoracleProfile[] } }>} */
+  const {
+    data: profiles,
+    previousData,
+    loading,
+  } = useQuery(allProfiles, {
     fetchPolicy: 'no-cache',
     variables: {
       category: 'profiles',
@@ -52,18 +56,20 @@ export function ProfileSelect() {
     [currentProfile],
   )
 
+  const safeProfiles = (profiles || previousData)?.webhook?.profile
+
   return (
     <FormControl sx={{ m: 1 }}>
       <InputLabel id="profile-select">{t('select_profile')}</InputLabel>
       <Select
         id="profile-select"
         label={t('select_profile')}
-        value={currentProfile || ''}
+        value={safeProfiles ? currentProfile || '' : ''}
         onChange={onChange}
         style={STYLE}
         endAdornment={loading ? <CircularProgress /> : null}
       >
-        {(profiles?.webhook?.profile || []).map((profile) => (
+        {(safeProfiles || []).map((profile) => (
           <MenuItem key={profile.profile_no} value={profile.profile_no}>
             {profile.name}
           </MenuItem>

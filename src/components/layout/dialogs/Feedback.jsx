@@ -7,7 +7,8 @@ import Button from '@mui/material/Button'
 import Divider from '@mui/material/Divider'
 import { useTranslation } from 'react-i18next'
 
-import { useLayoutStore, useStatic } from '@hooks/useStore'
+import { useMemory } from '@hooks/useMemory'
+import { useLayoutStore } from '@hooks/useLayoutStore'
 
 import Header from '../general/Header'
 import Footer from '../general/Footer'
@@ -16,7 +17,7 @@ import { DialogWrapper } from './DialogWrapper'
 export default function Feedback() {
   const { t } = useTranslation()
 
-  const link = useStatic((s) => s.config.links.feedbackLink)
+  const link = useMemory((s) => s.config.links.feedbackLink)
   const handleClose = React.useCallback(
     () => useLayoutStore.setState({ feedback: false }),
     [],
@@ -24,7 +25,7 @@ export default function Feedback() {
 
   return (
     <DialogWrapper dialog="feedback" variant="small">
-      <Header titles={[t('submit_feedback_title')]} action={handleClose} />
+      <Header titles={t('submit_feedback_title')} action={handleClose} />
       <DialogContent>
         <Typography variant="subtitle1" align="center">
           {t('use_the_link_below')}

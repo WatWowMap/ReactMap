@@ -2,14 +2,14 @@ import React from 'react'
 import { Grid, DialogContent, Typography, Divider } from '@mui/material'
 import { useTranslation } from 'react-i18next'
 
-import { useStatic } from '@hooks/useStore'
+import { useMemory } from '@hooks/useMemory'
 import PokemonPopup from '@components/popups/Pokemon'
 import data from './data'
 
 export default function TutPopup({ isMobile }) {
   const { t } = useTranslation()
-  const Icons = useStatic((state) => state.Icons)
-  const { startLat, startLon } = useStatic((state) => state.config.general)
+  const Icons = useMemory((state) => state.Icons)
+  const { startLat, startLon } = useMemory((state) => state.config.general)
   const ts = Math.floor(new Date().getTime() / 1000)
   const size = isMobile ? 'subtitle2' : 'subtitle1'
 

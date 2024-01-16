@@ -1,5 +1,5 @@
 import { Icon, divIcon } from 'leaflet'
-import { useStatic } from '@hooks/useStore'
+import { useMemory } from '@hooks/useMemory'
 
 /**
  *
@@ -25,7 +25,7 @@ export const fancyMarker = ({
   opacity,
   timeOfDay,
 }) => {
-  const { Icons } = useStatic.getState()
+  const { Icons } = useMemory.getState()
   const [pokemonMod, weatherMod] = Icons.getModifiers('pokemon', 'weather')
 
   return divIcon({

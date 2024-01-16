@@ -1,6 +1,6 @@
 // @ts-check
 import { useCallback } from 'react'
-import { useStore } from './useStore'
+import { useStorage } from './useStorage'
 
 /**
  * Returns dynamic opacity based on timestamp
@@ -10,17 +10,17 @@ import { useStore } from './useStore'
  * @returns
  */
 export default function useOpacity(category, subCategory) {
-  const enabled = useStore(
+  const enabled = useStorage(
     (s) =>
       s.userSettings[category]?.[`${subCategory || category}Opacity`] ?? false,
   )
-  const opacityOneMinute = useStore(
+  const opacityOneMinute = useStorage(
     (s) => s.userSettings[category]?.opacityOneMinute || 0.25,
   )
-  const opacityFiveMinutes = useStore(
+  const opacityFiveMinutes = useStorage(
     (s) => s.userSettings[category]?.opacityFiveMinutes || 0.5,
   )
-  const opacityTenMinutes = useStore(
+  const opacityTenMinutes = useStorage(
     (s) => s.userSettings[category]?.opacityTenMinutes || 0.75,
   )
 
