@@ -44,7 +44,7 @@ export function UserGymBadges() {
   }, [data])
 
   return data ? (
-    <Box className="user-profile-badge-grid">
+    <Box className="gym-badge-grid">
       <Typography variant="h5" align="center" gutterBottom>
         {t('gym_badges')}
       </Typography>
@@ -61,7 +61,7 @@ export function UserGymBadges() {
           </Grid>
         ))}
       </Grid>
-      <VirtualGrid data={data?.badges || []} xs={4} md={3} useWindowScroll>
+      <VirtualGrid data={data?.badges || []} xs={4} md={3}>
         {(_, badge) => <BadgeTile {...badge} />}
       </VirtualGrid>
     </Box>
@@ -75,7 +75,7 @@ function BadgeTile({ badge, ...gym }) {
   const badgeIcon = useMemory((s) => s.Icons.getMisc(`badge_${badge}`))
 
   return badge ? (
-    <Box className="vgrid-item" minHeight={225}>
+    <Box className="vgrid-item" minHeight={200}>
       <IconButton
         className="vgrid-icon"
         disabled={gym.deleted}

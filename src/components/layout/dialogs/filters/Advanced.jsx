@@ -78,7 +78,7 @@ export default function AdvancedFilter() {
     if (!save) {
       setFilters({ ...backup.current })
     } else if (id === 'global' && selectedIds?.length && category) {
-      applyToAll(true, category, selectedIds, false)
+      applyToAll(filters, category, selectedIds, false)
     }
   }
 
@@ -96,7 +96,7 @@ export default function AdvancedFilter() {
         color: 'secondary',
       },
     ],
-    [standard, setFilters],
+    [standard, filters, setFilters],
   )
 
   /** @type {import('@mui/material').SwitchProps['onChange']} */
