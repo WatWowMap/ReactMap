@@ -1,6 +1,11 @@
 import * as React from 'react'
-import { DialogContent, AppBar, Tabs, Tab, Box } from '@mui/material'
 import { useTranslation } from 'react-i18next'
+import TabContext from '@mui/lab/TabContext'
+import TabList from '@mui/lab/TabList'
+import TabPanel from '@mui/lab/TabPanel'
+import Tab from '@mui/material/Tab'
+import Box from '@mui/material/Box'
+import DialogContent from '@mui/material/DialogContent'
 
 import { useMemory } from '@hooks/useMemory'
 import { useLayoutStore } from '@hooks/useLayoutStore'
@@ -8,7 +13,6 @@ import Utility from '@services/Utility'
 
 import Header from '../../general/Header'
 import Footer from '../../general/Footer'
-import TabPanel from '../../general/TabPanel'
 import { DialogWrapper } from '../DialogWrapper'
 import { UserBackups } from './Backups'
 import { UserPermissions } from './Permissions'
@@ -24,8 +28,9 @@ export default function UserProfile() {
 
   const locale = localStorage.getItem('i18nextLng') || 'en'
 
-  const [tab, setTab] = React.useState(0)
+  const [tab, setTab] = React.useState('profile')
   const [tabsHeight, setTabsHeight] = React.useState(0)
+
   const handleTabChange = (_event, newValue) => {
     setTab(newValue)
   }
@@ -42,36 +47,37 @@ export default function UserProfile() {
         action={handleClose}
       />
       <DialogContent sx={{ p: 0 }}>
-        <AppBar
-          position="static"
-          ref={(ref) => ref && setTabsHeight(ref.clientHeight)}
-        >
-          <Tabs value={tab} onChange={handleTabChange}>
+        <TabContext value={tab}>
+          <TabList
+            onChange={handleTabChange}
+            ref={(ref) => ref && setTabsHeight(ref.clientHeight)}
+          >
             {['profile', 'badges', 'access'].map((each) => (
-              <Tab key={each} label={t(each)} />
+              <Tab key={each} label={t(each)} value={each} />
             ))}
-          </Tabs>
-        </AppBar>
-        <Box
-          overflow="auto"
-          maxHeight={{
-            xs: `calc(100% - ${tabsHeight}px)`,
-            sm: `calc(75vh - ${tabsHeight}px)`,
-          }}
-          minHeight="70vh"
-        >
-          <TabPanel value={tab} index={0}>
-            <LinkAccounts />
-            <ExtraUserFields />
-            <UserBackups />
-          </TabPanel>
-          <TabPanel value={tab} index={1}>
-            <UserGymBadges />
-          </TabPanel>
-          <TabPanel value={tab} index={2}>
-            <UserPermissions />
-          </TabPanel>
-        </Box>
+          </TabList>
+          <Box
+            overflow="auto"
+            height={{
+              xs: `calc(100% - ${tabsHeight}px)`,
+              sm: `calc(70vh - ${tabsHeight}px)`,
+            }}
+          >
+            <TabPanel value="profile">
+              <LinkAccounts />
+              <ExtraUserFields />
+              <UserBackups />
+            </TabPanel>
+            <TabPanel value="badges" sx={{ height: '100%', px: 0 }}>
+              <Box className="profile-container">
+                <UserGymBadges />
+              </Box>
+            </TabPanel>
+            <TabPanel value="access">
+              <UserPermissions />
+            </TabPanel>
+          </Box>
+        </TabContext>
       </DialogContent>
       <Footer
         options={[
