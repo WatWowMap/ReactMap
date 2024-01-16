@@ -1,63 +1,50 @@
-import React, { useState } from 'react'
+import * as React from 'react'
 import DeleteForever from '@mui/icons-material/DeleteForever'
 import Edit from '@mui/icons-material/Edit'
-import {
-  Grid,
-  Typography,
-  IconButton,
-  Dialog,
-  Checkbox,
-  Box,
-} from '@mui/material'
+import { Grid, Typography, IconButton, Checkbox, Box } from '@mui/material'
 
 import Utility from '@services/Utility'
 import Poracle from '@services/Poracle'
-import WebhookAdvanced from '@components/layout/dialogs/webhooks/WebhookAdv'
-import { useStatic } from '@hooks/useStore'
+import { useMemory } from '@hooks/useMemory'
 import { apolloClient, apolloCache } from '@services/apollo'
 import * as webhookNodes from '@services/queries/webhook'
 
 import { useWebhookStore, setSelected } from '../store'
 
 export default function TrackedTile({ index }) {
-  const [editDialog, setEditDialog] = useState(false)
-
-  const isMobile = useStatic((s) => s.isMobile)
   const category = useWebhookStore((s) => s.category)
   const item = useWebhookStore((s) => s[category][index])
+  const id = Poracle.getId(item, category)
+  const advOpen = useWebhookStore((s) => s.advanced)
   const selected = useWebhookStore((s) => (item ? s.selected[item.uid] : false))
+  const defaults = useWebhookStore((s) => s.context.ui[category].defaults)
 
-  if (!item) return <Box>&nbsp;</Box>
-
-  const toggleWebhook = (open, id, newFilters) => (event) => {
-    if (
-      event.type === 'keydown' &&
-      (event.key === 'Tab' || event.key === 'Shift')
-    ) {
-      return
+  React.useEffect(() => {
+    if (advOpen.open && advOpen.id === id) {
+      useWebhookStore.setState((prev) => ({
+        tempFilters: {
+          ...prev.tempFilters,
+          [id]: { ...item, byDistance: !!item.distance },
+        },
+      }))
     }
-    setEditDialog(open)
-    if (
-      id &&
-      newFilters &&
-      !Object.keys(newFilters).every((key) => newFilters[key] === item[key])
-    ) {
+  }, [advOpen, id])
+
+  const onClose = React.useCallback(
+    (newFilter) => {
       apolloClient.mutate({
         mutation: webhookNodes[category],
         variables: {
-          data: Poracle.processor(
-            category,
-            [newFilters],
-            useWebhookStore.getState().context.ui[category].defaults,
-          ),
+          data: Poracle.processor(category, [newFilter], defaults),
           status: 'POST',
           category,
         },
       })
-    }
-  }
+    },
+    [category, defaults],
+  )
 
-  const id = Poracle.getId(item, category)
+  if (!item) return <Box>&nbsp;</Box>
 
   return (
     <Grid
@@ -71,7 +58,7 @@ export default function TrackedTile({ index }) {
     >
       <Grid item xs={2} sm={1}>
         <img
-          src={useStatic.getState().Icons.getIconById(id)}
+          src={useMemory.getState().Icons.getIconById(id)}
           alt={id}
           style={{ maxWidth: 40, maxHeight: 40 }}
         />
@@ -85,7 +72,17 @@ export default function TrackedTile({ index }) {
         <IconButton
           size="small"
           disabled={!item.uid}
-          onClick={() => setEditDialog(true)}
+          onClick={() =>
+            useWebhookStore.setState({
+              advanced: {
+                open: true,
+                id,
+                category,
+                selectedIds: [],
+                onClose,
+              },
+            })
+          }
         >
           <Edit />
         </IconButton>
@@ -124,20 +121,6 @@ export default function TrackedTile({ index }) {
           color="secondary"
         />
       </Grid>
-      <Dialog
-        open={!!(editDialog && id)}
-        fullWidth={!isMobile}
-        fullScreen={isMobile}
-        onClose={() => setEditDialog(false)}
-      >
-        <WebhookAdvanced
-          id={id}
-          category={category}
-          // isMobile={isMobile}
-          toggleWebhook={toggleWebhook}
-          tempFilters={{ ...item, byDistance: !!item.distance }}
-        />
-      </Dialog>
     </Grid>
   )
 }

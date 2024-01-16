@@ -21,7 +21,7 @@ import Backup = require('server/src/models/Backup')
 import Nest = require('server/src/models/Nest')
 import NestSubmission = require('server/src/models/NestSubmission')
 import Pokestop = require('server/src/models/Pokestop')
-import { ModelReturn } from './utility'
+import { ModelReturn, OnlyType } from './utility'
 import { Profile } from 'passport-discord'
 import { User } from './models'
 
@@ -44,6 +44,7 @@ export interface DbContext {
   hasAlignment: boolean
   hasShowcaseData: boolean
   hasShowcaseForm: boolean
+  hasShowcaseTypes: boolean
 }
 
 export interface ExpressUser extends User {
@@ -235,3 +236,20 @@ export type DiscordVerifyFunction = (
   profile: Profile,
   done: VerifyCallback,
 ) => void
+
+export type BaseFilter = import('server/src/services/filters/Base')
+
+export type PokemonFilter =
+  import('server/src/services/filters/pokemon/Frontend')
+
+export type AllFilters = ReturnType<
+  typeof import('server/src/services/filters/builder/base')
+>
+
+export type Categories = keyof AllFilters
+
+export type AdvCategories = 'pokemon' | 'gyms' | 'pokestops' | 'nests'
+
+export type UIObject = ReturnType<
+  typeof import('server/src/services/ui/primary')
+>

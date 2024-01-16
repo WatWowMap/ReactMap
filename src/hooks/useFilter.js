@@ -1,7 +1,8 @@
 import { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 
-import { useStatic } from '@hooks/useStore'
+import { useMemory } from '@hooks/useMemory'
+import { useGetDeepStore } from '@hooks/useStorage'
 
 const filteringPokemon = [
   'pokemon',
@@ -13,19 +14,20 @@ const filteringPokemon = [
 export default function useFilter(
   tempFilters,
   menus,
-  search,
   category,
   webhookCategory,
   reqCategories,
 ) {
   const { t } = useTranslation()
+  const search = useGetDeepStore(`searches.${category}Advanced`, '')
+    .toLowerCase()
+    .trim()
   const {
     available,
-    Icons,
     auth: { perms },
     masterfile: { pokemon },
     menuFilters,
-  } = useStatic.getState()
+  } = useMemory.getState()
 
   const {
     filters: {
@@ -40,7 +42,6 @@ export default function useFilter(
   } = menus[category]
   const tempAdvFilter = {}
   const filteredArr = []
-  const filteredObj = {}
   const searchTerms = []
   const count = { total: 0, show: 0 }
   let switchKey
@@ -66,11 +67,9 @@ export default function useFilter(
     switchKey = 'available'
   }
 
-  const addItem = (id, item) => {
+  const addItem = (id) => {
     count.show += 1
-    item.url = Icons.getIconById(id)
-    filteredObj[id] = tempFilters[id]
-    filteredArr.push(item)
+    filteredArr.push(id)
   }
 
   const evalSearchTerms = (term) => {
@@ -106,14 +105,14 @@ export default function useFilter(
 
   if (search) {
     switchKey = 'search'
-    search = search.replace(/,/g, '|')
-    if (search.includes('|')) {
-      const orSplit = search.split('|').map((term) => term.trim())
+    const clean = search.replace(/,/g, '|')
+    if (clean.includes('|')) {
+      const orSplit = clean.split('|').map((term) => term.trim())
       orSplit.forEach((term) => {
         evalSearchTerms(term)
       })
     } else {
-      evalSearchTerms(search)
+      evalSearchTerms(clean)
     }
   }
 
@@ -135,13 +134,13 @@ export default function useFilter(
           item.id = id
           switch (switchKey) {
             case 'all':
-              addItem(id, item)
+              addItem(id)
               break
             case 'selected':
-              if (tempFilters[id]?.enabled) addItem(id, item)
+              if (tempFilters[id]?.enabled) addItem(id)
               break
             case 'unselected':
-              if (!tempFilters[id]?.enabled) addItem(id, item)
+              if (!tempFilters[id]?.enabled) addItem(id)
               break
             case 'reverse':
               if (filteringPokemon.includes(subCategory) || item.webhookOnly) {
@@ -161,14 +160,14 @@ export default function useFilter(
                         item.formId === item.defaultFormId))) ||
                   item.webhookOnly
                 ) {
-                  addItem(id, item)
+                  addItem(id)
                 }
               } else if (
                 tempAdvFilter.categories ||
                 categories[subCategory] ||
                 item.webhookOnly
               ) {
-                addItem(id, item)
+                addItem(id)
               }
               break
             case 'available':
@@ -196,14 +195,14 @@ export default function useFilter(
                           item.formId === item.defaultFormId))) ||
                     item.webhookOnly
                   ) {
-                    addItem(id, item)
+                    addItem(id)
                   }
                 } else if (
                   tempAdvFilter.categories ||
                   categories[subCategory] ||
                   item.webhookOnly
                 ) {
-                  addItem(id, item)
+                  addItem(id)
                 }
               }
               break
@@ -214,15 +213,15 @@ export default function useFilter(
                   case 'string':
                     term = term.trim()
                     if (meta.includes(term) || item.pokedexId == term) {
-                      addItem(id, item)
+                      addItem(id)
                     }
                     break
                   case 'number':
-                    if (item.family === term) addItem(id, item)
+                    if (item.family === term) addItem(id)
                     break
                   default:
                     if (term.every((subTerm) => meta.includes(subTerm)))
-                      addItem(id, item)
+                      addItem(id)
                 }
               })
               break
@@ -240,10 +239,10 @@ export default function useFilter(
                   categories[subCategory] ||
                   item.webhookOnly
                 ) {
-                  addItem(id, item)
+                  addItem(id)
                 }
               } else if (categories[subCategory] || item.webhookOnly) {
-                addItem(id, item)
+                addItem(id)
               }
               break
           }
@@ -252,7 +251,7 @@ export default function useFilter(
     })
   })
 
-  useEffect(() => () => useStatic.setState({ excludeList: [] }))
+  useEffect(() => () => useMemory.setState({ excludeList: [] }))
 
-  return { filteredObj, filteredArr, count }
+  return { filteredArr, count }
 }

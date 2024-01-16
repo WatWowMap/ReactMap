@@ -51,6 +51,18 @@ export default function genPokestops(pokemon, pokestops, categories) {
             ).toLowerCase()} ${t(`grunt_${id.slice(1)}`).toLowerCase()}`
           }
           break
+        case 'h':
+          if (tempObj.showcase) {
+            const name = t(`poke_type_${id.slice(1)}`)
+            tempObj.showcase[id] = {
+              name,
+              perms: ['eventStops'],
+            }
+            tempObj.showcase[id].searchMeta = `${t(
+              'showcase',
+            ).toLowerCase()} ${name.toLowerCase()}`
+          }
+          break
         case 'f':
           if (tempObj.showcase) {
             const name = t(`poke_${id.slice(1).split('-')[0]}`)

@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next'
 
 import Header from '@components/layout/general/Header'
 import Footer from '@components/layout/general/Footer'
+import { SCAN_MODES } from '@assets/constants'
 
 import { useScanStore } from './store'
 
@@ -28,7 +29,7 @@ export default function ScanDialog() {
   return (
     <Dialog
       onClose={handleClose}
-      open={['confirmed', 'loading', 'error'].includes(scanMode)}
+      open={SCAN_MODES.includes(scanMode)}
       maxWidth="xs"
     >
       <Header titles={[`scan_${scanMode}_title`]} action={handleClose} />

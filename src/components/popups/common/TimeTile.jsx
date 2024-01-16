@@ -3,7 +3,7 @@ import * as React from 'react'
 import { Collapse, Grid, IconButton, Typography } from '@mui/material'
 import ExpandMore from '@mui/icons-material/ExpandMore'
 
-import { useStore } from '@hooks/useStore'
+import { useStorage } from '@hooks/useStorage'
 
 import Timer from './Timer'
 import NameTT from './NameTT'
@@ -35,7 +35,7 @@ export default function TimeTile({
   disabled = '',
 }) {
   const endTime = new Date(expireTime * 1000)
-  const expanded = useStore((state) => !!state.popups[expandKey])
+  const expanded = useStorage((state) => !!state.popups[expandKey])
 
   return (
     <>
@@ -92,7 +92,7 @@ export default function TimeTile({
               disabled={!!disabled}
               className={expanded ? 'expanded' : 'closed'}
               onClick={() =>
-                useStore.setState((prev) => ({
+                useStorage.setState((prev) => ({
                   popups: { ...prev.popups, [expandKey]: !expanded },
                 }))
               }

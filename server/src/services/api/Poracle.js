@@ -554,6 +554,7 @@ class PoracleAPI {
       human: true,
       pokemon: {
         sortProp: 'pokemon_id',
+        identifiers: ['pokemon_id', 'form'],
         defaults: {
           clean: false,
           distance: 0,
@@ -770,6 +771,7 @@ class PoracleAPI {
         },
       },
       raid: {
+        identifiers: ['pokemon_id', 'form', 'level'],
         defaults: {
           clean: false,
           distance: 0,
@@ -784,7 +786,7 @@ class PoracleAPI {
           gym_id: null,
           byDistance: false,
           allMoves: true,
-          allForms: true,
+          allForms: false,
           everything_individually:
             this.everythingFlagPermissions ===
               'allow-and-always-individually' ||
@@ -846,6 +848,7 @@ class PoracleAPI {
         },
       },
       egg: {
+        identifiers: ['level'],
         defaults: {
           clean: false,
           distance: 0,
@@ -913,6 +916,7 @@ class PoracleAPI {
         },
       },
       gym: {
+        identifiers: ['team'],
         defaults: {
           clean: false,
           distance: 0,
@@ -982,6 +986,7 @@ class PoracleAPI {
         },
       },
       invasion: {
+        identifiers: ['grunt_type'],
         defaults: {
           clean: false,
           distance: 0,
@@ -1034,6 +1039,7 @@ class PoracleAPI {
         },
       },
       lure: {
+        identifiers: ['lure_id'],
         defaults: {
           clean: false,
           distance: 0,
@@ -1078,6 +1084,7 @@ class PoracleAPI {
         },
       },
       quest: {
+        identifiers: ['reward', 'reward_type'],
         defaults: {
           clean: false,
           distance: 0,
@@ -1088,7 +1095,7 @@ class PoracleAPI {
           amount: 0,
           form: 0,
           byDistance: false,
-          allForms: true,
+          allForms: false,
         },
         ui: {
           general: {
@@ -1144,6 +1151,7 @@ class PoracleAPI {
         },
       },
       nest: {
+        identifiers: ['pokemon_id', 'form'],
         defaults: {
           clean: false,
           distance: 0,
@@ -1152,7 +1160,7 @@ class PoracleAPI {
           min_spawn_avg: 0,
           form: 0,
           byDistance: false,
-          allForms: true,
+          allForms: false,
         },
         ui: {
           general: {

@@ -25,7 +25,9 @@ import { useTranslation } from 'react-i18next'
 import { useLazyQuery, useQuery } from '@apollo/client'
 
 import NameTT from '@components/popups/common/NameTT'
-import { useStore, useStatic, useLayoutStore } from '@hooks/useStore'
+import { useMemory } from '@hooks/useMemory'
+import { useLayoutStore } from '@hooks/useLayoutStore'
+import { useStorage } from '@hooks/useStorage'
 import Utility from '@services/Utility'
 import Query from '@services/Query'
 import { SEARCHABLE } from '@services/queries/config'
@@ -38,8 +40,8 @@ import QuestTitle from '../general/QuestTitle'
 function SearchImage({ name }) {
   const { t } = useTranslation()
 
-  const darkMode = useStore((s) => s.darkMode)
-  const Icons = useStatic((s) => s.Icons)
+  const darkMode = useStorage((s) => s.darkMode)
+  const Icons = useMemory((s) => s.Icons)
 
   return (
     <img
@@ -52,7 +54,7 @@ function SearchImage({ name }) {
 }
 
 function EndAdornment({ children }) {
-  const loading = useStatic((s) => s.searchLoading)
+  const loading = useMemory((s) => s.searchLoading)
 
   return (
     <>
@@ -84,7 +86,7 @@ function EndAdornment({ children }) {
 export function FancySearch({ InputProps, ...props }) {
   const { t } = useTranslation()
 
-  const searchTab = useStore((s) => s.searchTab)
+  const searchTab = useStorage((s) => s.searchTab)
 
   const { data } = useQuery(SEARCHABLE, {
     fetchPolicy: 'cache-first',
@@ -94,7 +96,7 @@ export function FancySearch({ InputProps, ...props }) {
 
   const handleClose = React.useCallback((selection) => {
     if (typeof selection === 'string') {
-      useStore.setState({ searchTab: selection })
+      useStorage.setState({ searchTab: selection })
     }
     setAnchorEl(null)
   }, [])
@@ -105,7 +107,7 @@ export function FancySearch({ InputProps, ...props }) {
       (typeof searchTab === 'number' || !data.searchable.includes(searchTab))
     ) {
       // searchTab value migration
-      useStore.setState({ searchTab: data?.searchable[0] })
+      useStorage.setState({ searchTab: data?.searchable[0] })
     }
   }, [searchTab, data])
 
@@ -180,12 +182,12 @@ export default function Search() {
   const { t, i18n } = useTranslation()
   const map = useMap()
 
-  const search = useStore((state) => state.search)
-  const searchTab = useStore((state) => state.searchTab)
+  const search = useStorage((state) => state.search)
+  const searchTab = useStorage((state) => state.searchTab)
 
-  const distanceUnit = useStatic((state) => state.config.misc.distanceUnit)
-  const questMessage = useStatic((state) => state.config.misc.questMessage)
-  const isMobile = useStatic((s) => s.isMobile)
+  const distanceUnit = useMemory((state) => state.config.misc.distanceUnit)
+  const questMessage = useMemory((state) => state.config.misc.questMessage)
+  const isMobile = useMemory((s) => s.isMobile)
 
   const open = useLayoutStore((s) => s.search)
 
@@ -199,7 +201,7 @@ export default function Search() {
     useLayoutStore.setState({ search: false })
     if (typeof result === 'object' && 'lat' in result && 'lon' in result) {
       map.flyTo([result.lat, result.lon], 16)
-      useStatic.setState({
+      useMemory.setState({
         manualParams: {
           category: fromSearchCategory(searchTab),
           id: result.id,
@@ -211,7 +213,7 @@ export default function Search() {
   const sendToServer = React.useCallback(
     (/** @type {string} */ newSearch) => {
       const { lat, lng } = map.getCenter()
-      const { areas } = useStore.getState().filters.scanAreas?.filter || {
+      const { areas } = useStorage.getState().filters.scanAreas?.filter || {
         areas: [],
       }
       callSearch({
@@ -239,7 +241,7 @@ export default function Search() {
         e?.type === 'change' &&
         (/^[0-9\s\p{L}]+$/u.test(newValue) || newValue === '')
       ) {
-        useStore.setState({ search: newValue.toLowerCase() })
+        useStorage.setState({ search: newValue.toLowerCase() })
         debounceChange(newValue.toLowerCase())
       }
     },
@@ -262,7 +264,7 @@ export default function Search() {
   }, [data])
 
   React.useEffect(() => {
-    useStatic.setState({ searchLoading: loading })
+    useMemory.setState({ searchLoading: loading })
   }, [loading])
 
   React.useEffect(() => {
@@ -286,7 +288,7 @@ export default function Search() {
       }}
     >
       <Box width={{ xs: 'inherit', sm: 500 }}>
-        <Header titles={['search']} action={handleClose} />
+        <Header titles="search" action={handleClose} />
         <Autocomplete
           inputValue={search}
           onInputChange={handleChange}
@@ -392,7 +394,7 @@ export default function Search() {
 }
 
 function ResultImage(props) {
-  const Icons = useStatic((s) => s.Icons)
+  const Icons = useMemory((s) => s.Icons)
 
   if (props.url) {
     return (

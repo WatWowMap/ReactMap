@@ -1060,6 +1060,14 @@
         "__name": "DEFAULT_FILTERS_POKEMON_ENABLED",
         "__format": "boolean"
       },
+      "easyMode": {
+        "__name": "DEFAULT_FILTERS_POKEMON_EASY_MODE",
+        "__format": "boolean"
+      },
+      "onlyShowAvailable": {
+        "__name": "DEFAULT_FILTERS_POKEMON_ONLY_SHOW_AVAILABLE",
+        "__format": "boolean"
+      },
       "legacyFilter": {
         "__name": "DEFAULT_FILTERS_POKEMON_LEGACY_FILTER",
         "__format": "boolean"
@@ -1917,6 +1925,24 @@
         },
         "xl": {
           "__name": "ICONS_SIZES_SPAWNPOINT_XL",
+          "__format": "number"
+        }
+      },
+      "event": {
+        "sm": {
+          "__name": "ICONS_SIZES_EVENT_SM",
+          "__format": "number"
+        },
+        "md": {
+          "__name": "ICONS_SIZES_EVENT_MD",
+          "__format": "number"
+        },
+        "lg": {
+          "__name": "ICONS_SIZES_EVENT_LG",
+          "__format": "number"
+        },
+        "xl": {
+          "__name": "ICONS_SIZES_EVENT_XL",
           "__format": "number"
         }
       }

@@ -1,9 +1,9 @@
 // @ts-check
 import * as React from 'react'
-import { TileLayer, ZoomControl, useMap } from 'react-leaflet'
+import { TileLayer, useMap } from 'react-leaflet'
 import { control } from 'leaflet'
 
-import { useStore } from '@hooks/useStore'
+import { useStorage } from '@hooks/useStorage'
 import useTileLayer from '@hooks/useTileLayer'
 
 export function ControlledTileLayer() {
@@ -12,15 +12,26 @@ export function ControlledTileLayer() {
 }
 
 export function ControlledZoomLayer() {
-  const navSetting = useStore(
+  const map = useMap()
+  const navSetting = useStorage(
     (state) => state.settings.navigationControls === 'leaflet',
   )
-  return navSetting ? <ZoomControl position="bottomright" /> : null
+
+  React.useLayoutEffect(() => {
+    if (navSetting) {
+      const zoom = control.zoom({ position: 'bottomright' }).addTo(map)
+      return () => {
+        zoom.remove()
+      }
+    }
+  }, [navSetting])
+
+  return null
 }
 
 export function ControlledLocate() {
   const map = useMap()
-  const navSetting = useStore(
+  const navSetting = useStorage(
     (state) => state.settings.navigationControls === 'leaflet',
   )
 

@@ -214,6 +214,7 @@ class Pokestop extends Model {
           case 'o':
             break
           case 'f':
+          case 'h':
             // do nothing
             break
           case 'd':
@@ -716,6 +717,10 @@ class Pokestop extends Model {
               event.display_type === 9
                 ? pokestop.showcase_pokemon_form_id
                 : null,
+            showcase_pokemon_type_id:
+              event.display_type === 9
+                ? pokestop.showcase_pokemon_type_id
+                : null,
             showcase_rankings: event.display_type === 9 ? showcaseData : null,
             showcase_ranking_standard:
               event.display_type === 9
@@ -733,6 +738,8 @@ class Pokestop extends Model {
                     event.showcase_pokemon_form_id ?? 0
                   }`
                 ]
+              : event.showcase_pokemon_type_id
+              ? filters[`h${event.showcase_pokemon_type_id}`]
               : true,
           )
       }
@@ -871,7 +878,7 @@ class Pokestop extends Model {
               quest.quest_timestamp >= midnight &&
               (filters.onlyAllPokestops ||
                 (filters[newQuest.key] &&
-                  (filters[newQuest.key].adv
+                  (filters[newQuest.key].adv && !filters[newQuest.key].all
                     ? filters[newQuest.key].adv.includes(quest.quest_title)
                     : true)) ||
                 filters[`u${quest.quest_reward_type}`])
@@ -999,6 +1006,7 @@ class Pokestop extends Model {
     hasConfirmed,
     hasShowcaseData,
     hasShowcaseForm,
+    hasShowcaseType,
   }) {
     const ts = Math.floor(Date.now() / 1000)
     const finalList = new Set()
@@ -1334,6 +1342,7 @@ class Pokestop extends Model {
     if (hasConfirmed) {
       queries.rocketPokemon = this.query()
         .select([
+          'character AS grunt_type',
           'slot_1_pokemon_id',
           'slot_1_form',
           'slot_2_pokemon_id',
@@ -1345,6 +1354,7 @@ class Pokestop extends Model {
         .whereNotNull('slot_2_pokemon_id')
         .whereNotNull('slot_3_pokemon_id')
         .groupBy([
+          'character',
           'slot_1_pokemon_id',
           'slot_1_form',
           'slot_2_pokemon_id',
@@ -1373,17 +1383,17 @@ class Pokestop extends Model {
       .orderBy(isMad ? 'active_fort_modifier' : 'lure_id')
     // lures
 
+    // showcase
     if (hasShowcaseData) {
-      queries.showcase = hasShowcaseForm
-        ? this.query()
-            .distinct('showcase_pokemon_id', 'showcase_pokemon_form_id')
-            .where('showcase_expiry', '>=', ts)
-            .orderBy('showcase_pokemon_id', 'showcase_pokemon_form_id')
-        : this.query()
-            .distinct('showcase_pokemon_id')
-            .where('showcase_expiry', '>=', ts)
-            .orderBy('showcase_pokemon_id')
+      const distinct = ['showcase_pokemon_id']
+      if (hasShowcaseForm) distinct.push('showcase_pokemon_form_id')
+      if (hasShowcaseType) distinct.push('showcase_pokemon_type_id')
+      queries.showcase = this.query()
+        .distinct(...distinct)
+        .where('showcase_expiry', '>=', ts)
+        .orderBy(...distinct)
     }
+    // showcase
 
     const resolved = Object.fromEntries(
       await Promise.all(
@@ -1482,26 +1492,37 @@ class Pokestop extends Model {
         case 'rocketPokemon':
           if (hasConfirmed) {
             rewards.forEach((reward) => {
-              finalList.add(
-                `a${reward.slot_1_pokemon_id}-${reward.slot_1_form}`,
-              )
-              finalList.add(
-                `a${reward.slot_2_pokemon_id}-${reward.slot_2_form}`,
-              )
-              finalList.add(
-                `a${reward.slot_3_pokemon_id}-${reward.slot_3_form}`,
-              )
+              const fullGrunt = Event.invasions[reward.grunt_type]
+              if (fullGrunt?.firstReward) {
+                finalList.add(
+                  `a${reward.slot_1_pokemon_id}-${reward.slot_1_form}`,
+                )
+              }
+              if (fullGrunt?.secondReward) {
+                finalList.add(
+                  `a${reward.slot_2_pokemon_id}-${reward.slot_2_form}`,
+                )
+              }
+              if (fullGrunt?.thirdReward) {
+                finalList.add(
+                  `a${reward.slot_3_pokemon_id}-${reward.slot_3_form}`,
+                )
+              }
             })
           }
           break
         case 'showcase':
           if (hasShowcaseData) {
             rewards.forEach((reward) => {
-              finalList.add(
-                `f${reward.showcase_pokemon_id}-${
-                  reward.showcase_pokemon_form_id ?? 0
-                }`,
-              )
+              if (reward.showcase_pokemon_id) {
+                finalList.add(
+                  `f${reward.showcase_pokemon_id}-${
+                    reward.showcase_pokemon_form_id ?? 0
+                  }`,
+                )
+              } else if (reward.showcase_pokemon_type_id) {
+                finalList.add(`h${reward.showcase_pokemon_type_id}`)
+              }
             })
           }
           break

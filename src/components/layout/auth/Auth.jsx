@@ -2,14 +2,14 @@
 import * as React from 'react'
 import { Navigate, useParams } from 'react-router-dom'
 
-import { useStatic } from '@hooks/useStore'
+import { useMemory } from '@hooks/useMemory'
 
 import Container from '../../Container'
 import WebhookQuery from '../../WebhookQuery'
 
 export default function Auth() {
   const params = useParams()
-  const mapPerm = useStatic((s) => s.auth.perms.map)
+  const mapPerm = useMemory((s) => s.auth.perms.map)
 
   if (!mapPerm) {
     if ((params.category && params.id) || (params.lat && params.lon)) {

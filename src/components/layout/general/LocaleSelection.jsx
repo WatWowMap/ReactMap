@@ -1,3 +1,4 @@
+// @ts-check
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import FormControl from '@mui/material/FormControl'
@@ -5,12 +6,14 @@ import InputLabel from '@mui/material/InputLabel'
 import Select from '@mui/material/Select'
 import MenuItem from '@mui/material/MenuItem'
 
-import { useStore } from '@hooks/useStore'
+import { useStorage } from '@hooks/useStorage'
+
+const STYLE = { margin: '3px 0' }
 
 export default function LocaleSelection() {
   const { t, i18n } = useTranslation()
   return (
-    <FormControl size="small" fullWidth style={{ margin: '3px 0' }}>
+    <FormControl size="small" fullWidth style={STYLE}>
       <InputLabel>{t('locale_selection')}</InputLabel>
       <Select
         autoFocus
@@ -18,7 +21,7 @@ export default function LocaleSelection() {
         value={i18n.language}
         onChange={(event) => {
           i18n.changeLanguage(event.target.value)
-          useStore.setState((prev) => ({
+          useStorage.setState((prev) => ({
             settings: { ...prev.settings, locale: event.target.value },
           }))
         }}
