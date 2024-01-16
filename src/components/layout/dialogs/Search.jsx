@@ -290,10 +290,13 @@ export default function Search() {
       <Box width={{ xs: 'inherit', sm: 500 }}>
         <Header titles="search" action={handleClose} />
         <Autocomplete
+          freeSolo={search?.length ? false : true}
           inputValue={search}
           onInputChange={handleChange}
           options={options.map((option, i) => ({ ...option, i }))}
           loading={loading}
+          loadingText={t('searching')}
+          noOptionsText={t('no_options')}
           autoComplete={false}
           clearOnBlur={false}
           ListboxProps={{
