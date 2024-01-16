@@ -1,3 +1,12 @@
+# [1.29.0-develop.5](https://github.com/WatWowMap/ReactMap/compare/v1.29.0-develop.4...v1.29.0-develop.5) (2024-01-16)
+
+
+### Bug Fixes
+
+* apply to all btns ([19997aa](https://github.com/WatWowMap/ReactMap/commit/19997aae6031b2f4b4b1bf528f24147a08eab137))
+* fr showcase translation ([c0f74fb](https://github.com/WatWowMap/ReactMap/commit/c0f74fbd003230fe3da162e9520b93e24657a42c))
+* gym badge page styling ([7016369](https://github.com/WatWowMap/ReactMap/commit/7016369f146f2aae52e72cc79db5725c43101c4c))
+
 # [1.29.0-develop.4](https://github.com/WatWowMap/ReactMap/compare/v1.29.0-develop.3...v1.29.0-develop.4) (2024-01-16)
 
 
