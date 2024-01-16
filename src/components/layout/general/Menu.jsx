@@ -98,13 +98,24 @@ export default function Menu({
       {
         name: 'disable_all',
         action: () =>
-          applyToAll(false, category, filteredArr, !webhookCategory),
+          applyToAll(
+            { enabled: false },
+            category,
+            filteredArr,
+            !webhookCategory,
+          ),
         icon: 'Clear',
         color: 'error',
       },
       {
         name: 'enable_all',
-        action: () => applyToAll(true, category, filteredArr, !webhookCategory),
+        action: () =>
+          applyToAll(
+            { enabled: true },
+            category,
+            filteredArr,
+            !webhookCategory,
+          ),
         icon: 'Check',
         color: 'success',
       },
