@@ -264,7 +264,7 @@ class UAssets {
         return this.getPokestops(id.slice(1))
       case 'm':
         // mega energy
-        return this.getPokemon(id.slice(1).split('-')[0], 0, 1)
+        return this.getRewards(12, ...id.slice(1).split('-', 2))
       case 'p':
         // experience
         return this.getRewards(1, id.slice(1))
