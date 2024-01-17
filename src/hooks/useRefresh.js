@@ -1,7 +1,7 @@
 // @ts-check
 import { useEffect } from 'react'
 import { useQuery } from '@apollo/client'
-import getAvailable from '@services/queries/available'
+import { getMapData } from '@services/queries/available'
 
 import { deepMerge } from '@services/functions/deepMerge'
 import UAssets from '@services/Icons'
@@ -15,7 +15,7 @@ export default function useRefresh() {
 
   const hasIcons = useMemory((s) => !!s.Icons)
 
-  const { data, stopPolling, startPolling, refetch } = useQuery(getAvailable, {
+  const { data, stopPolling, startPolling, refetch } = useQuery(getMapData, {
     fetchPolicy: active && online ? 'network-only' : 'cache-only',
   })
 
@@ -34,7 +34,7 @@ export default function useRefresh() {
 
   useEffect(() => {
     if (data?.available) {
-      const { masterfile, filters, icons, audio, ...rest } = data.available
+      const { masterfile, filters, icons, audio } = data.available
       const { icons: userIcons, audio: userAudio } = useStorage.getState()
       const existing = useMemory.getState()
 
@@ -74,7 +74,6 @@ export default function useRefresh() {
         )
       }
       useMemory.setState({
-        available: rest,
         masterfile,
         filters,
         Icons,

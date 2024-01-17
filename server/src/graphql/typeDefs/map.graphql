@@ -1,9 +1,5 @@
-type Available {
+type MapData {
   masterfile: JSON
-  pokestops: [String]
-  gyms: [String]
-  pokemon: [String]
-  nests: [String]
   filters: JSON
   questConditions: JSON
   icons: JSON
