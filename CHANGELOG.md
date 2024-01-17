@@ -1,3 +1,10 @@
+# [1.29.0-develop.9](https://github.com/WatWowMap/ReactMap/compare/v1.29.0-develop.8...v1.29.0-develop.9) (2024-01-17)
+
+
+### Bug Fixes
+
+* gym badge fixes ([1cadea0](https://github.com/WatWowMap/ReactMap/commit/1cadea0e4c4bfa3894ffd2629ef09c7ba2e2ed79))
+
 # [1.29.0-develop.8](https://github.com/WatWowMap/ReactMap/compare/v1.29.0-develop.7...v1.29.0-develop.8) (2024-01-17)
 
 
