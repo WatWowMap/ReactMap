@@ -1,3 +1,10 @@
+# [1.29.0-develop.7](https://github.com/WatWowMap/ReactMap/compare/v1.29.0-develop.6...v1.29.0-develop.7) (2024-01-17)
+
+
+### Performance Improvements
+
+* improve pokestop querying perf by 10x ([f696b67](https://github.com/WatWowMap/ReactMap/commit/f696b6722436bd3145b59766f3f81a08dd6151e7))
+
 # [1.29.0-develop.6](https://github.com/WatWowMap/ReactMap/compare/v1.29.0-develop.5...v1.29.0-develop.6) (2024-01-17)
 
 
