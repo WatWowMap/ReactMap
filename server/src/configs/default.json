@@ -47,10 +47,10 @@
       "pokemon": true
     },
     "queryUpdateHours": {
-      "pokemon": 0.25,
-      "quests": 0.5,
-      "raids": 0.2,
-      "nests": 1,
+      "pokemon": 0.17,
+      "quests": 0.25,
+      "raids": 0.05,
+      "nests": 0.5,
       "historicalRarity": 6
     },
     "queryOnSessionInit": {

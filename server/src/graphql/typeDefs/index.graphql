@@ -1,7 +1,11 @@
 scalar JSON
 
 type Query {
-  available: Available
+  available: MapData
+  availablePokemon: [String]
+  availablePokestops: [String]
+  availableGyms: [String]
+  availableNests: [String]
   badges: [Badge]
   backup(id: ID): Backup
   backups: [Backup]
