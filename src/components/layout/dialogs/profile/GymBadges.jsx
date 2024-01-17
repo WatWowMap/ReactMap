@@ -22,7 +22,7 @@ export function UserGymBadges() {
   })
 
   const counts = React.useMemo(() => {
-    const counter = { gold: 0, silver: 0, bronze: 0 }
+    const counter = { bronze: 0, silver: 0, gold: 0 }
 
     if (data?.badges) {
       data.badges.forEach((gym) => {
