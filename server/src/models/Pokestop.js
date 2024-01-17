@@ -1,3 +1,4 @@
+/* eslint-disable no-continue */
 const { Model, raw } = require('objection')
 const i18next = require('i18next')
 const config = require('@rm/config')
@@ -60,18 +61,6 @@ const MAD_GRUNT_MAP = {
 class Pokestop extends Model {
   static get tableName() {
     return 'pokestop'
-  }
-
-  /**
-   *
-   * @param {import('objection').QueryBuilder<Pokestop, Pokestop[]>} query
-   * @param {boolean} isMad
-   */
-  static onlyValid(query, isMad) {
-    query.andWhere('enabled', true)
-    if (!isMad) {
-      query.andWhere('deleted', false)
-    }
   }
 
   static async getAll(
@@ -189,7 +178,6 @@ class Pokestop extends Model {
       .whereBetween(isMad ? 'latitude' : 'lat', [args.minLat, args.maxLat])
       .andWhereBetween(isMad ? 'longitude' : 'lon', [args.minLon, args.maxLon])
 
-    Pokestop.onlyValid(query, isMad)
     if (!getAreaSql(query, areaRestrictions, onlyAreas, isMad)) {
       return []
     }
@@ -907,6 +895,7 @@ class Pokestop extends Model {
     const filtered = {}
     for (let i = 0; i < queryResults.length; i += 1) {
       const result = queryResults[i]
+      if (!result.enabled || result.deleted) continue
       const quest = {}
       const invasion = {}
 
@@ -954,6 +943,7 @@ class Pokestop extends Model {
     const filtered = {}
     for (let i = 0; i < queryResults.length; i += 1) {
       const result = queryResults[i]
+      if (!result.enabled || result.deleted) continue
       const quest = { with_ar: true }
       const altQuest = { with_ar: false }
       const invasion = {}
@@ -1626,7 +1616,6 @@ class Pokestop extends Model {
     if (!getAreaSql(query, perms.areaRestrictions, onlyAreas, isMad)) {
       return []
     }
-    Pokestop.onlyValid(query, isMad)
     return query
   }
 
@@ -1660,21 +1649,40 @@ class Pokestop extends Model {
           .includes(search),
     )
 
+    if (!pokemonIds.length && !itemIds.length && !rewardTypes.length) {
+      return []
+    }
     const query = this.query()
       .select([
-        '*',
         isMad ? 'pokestop_id AS id' : 'id',
         isMad ? 'latitude AS lat' : 'lat',
         isMad ? 'longitude AS lon' : 'lon',
         isMad ? 'quest_reward AS quest_rewards' : 'quest_rewards',
         distance,
+        'name',
+        'quest_pokemon_id',
+        'quest_item_id',
+        'quest_reward_type',
+        'quest_title',
+        'quest_target',
       ])
       .andWhere('quest_timestamp', '>=', midnight || 0)
       .andWhere((quests) => {
-        quests
-          .whereIn('quest_pokemon_id', pokemonIds)
-          .orWhereIn('quest_item_id', itemIds)
-          .orWhereIn('quest_reward_type', rewardTypes)
+        if (pokemonIds.length === 1) {
+          quests.where('quest_pokemon_id', pokemonIds[0])
+        } else if (pokemonIds.length > 1) {
+          quests.whereIn('quest_pokemon_id', pokemonIds)
+        }
+        if (itemIds.length === 1) {
+          quests.orWhere('quest_item_id', itemIds[0])
+        } else if (itemIds.length > 1) {
+          quests.orWhereIn('quest_item_id', itemIds)
+        }
+        if (rewardTypes.length === 1) {
+          quests.orWhere('quest_reward_type', rewardTypes[0])
+        } else if (rewardTypes.length > 1) {
+          quests.orWhereIn('quest_reward_type', rewardTypes)
+        }
       })
       .limit(searchResultsLimit)
       .orderBy('distance')
@@ -1690,21 +1698,39 @@ class Pokestop extends Model {
     if (!getAreaSql(query, perms.areaRestrictions, onlyAreas, isMad)) {
       return []
     }
-    Pokestop.onlyValid(query, isMad)
-
-    const results = await query
-    const mapped = results.map((q) => ({ ...q, with_ar: q.with_ar ?? true }))
-
+    const queries = [query]
     if (hasAltQuests) {
       const altQuestQuery = this.query()
-        .select(['*', distance])
-        .where('deleted', false)
+        .select([
+          'id',
+          'lat',
+          'lon',
+          'name',
+          'alternative_quest_rewards',
+          'alternative_quest_pokemon_id',
+          'alternative_quest_item_id',
+          'alternative_quest_reward_type',
+          'alternative_quest_title',
+          'alternative_quest_target',
+          distance,
+        ])
         .andWhere('alternative_quest_timestamp', '>=', midnight || 0)
         .andWhere((quests) => {
-          quests
-            .whereIn('alternative_quest_pokemon_id', pokemonIds)
-            .orWhereIn('alternative_quest_item_id', itemIds)
-            .orWhereIn('alternative_quest_reward_type', rewardTypes)
+          if (pokemonIds.length === 1) {
+            quests.where('alternative_quest_pokemon_id', pokemonIds[0])
+          } else if (pokemonIds.length > 1) {
+            quests.whereIn('alternative_quest_pokemon_id', pokemonIds)
+          }
+          if (itemIds.length === 1) {
+            quests.orWhere('alternative_quest_item_id', itemIds[0])
+          } else if (itemIds.length > 1) {
+            quests.orWhereIn('alternative_quest_item_id', itemIds)
+          }
+          if (rewardTypes.length === 1) {
+            quests.orWhere('alternative_quest_reward_type', rewardTypes[0])
+          } else if (rewardTypes.length > 1) {
+            quests.orWhereIn('alternative_quest_reward_type', rewardTypes)
+          }
         })
         .limit(searchResultsLimit)
         .orderBy('distance')
@@ -1713,8 +1739,13 @@ class Pokestop extends Model {
       ) {
         return []
       }
-      const altQuestResults = await altQuestQuery
-      const remapped = altQuestResults.map((result) => ({
+      queries.push(altQuestQuery)
+    }
+
+    const [withAr, withoutAr] = await Promise.all(queries)
+    const mapped = withAr.map((q) => ({ ...q, with_ar: q.with_ar ?? true }))
+    if (withoutAr) {
+      const remapped = withoutAr.map((result) => ({
         ...result,
         quest_rewards: result.alternative_quest_rewards,
         quest_reward_type: result.alternative_quest_reward_type,
@@ -1725,14 +1756,16 @@ class Pokestop extends Model {
         with_ar: false,
       }))
       mapped.push(...remapped)
-      mapped.sort((a, b) => a.distance - b.distance)
-      mapped.length = searchResultsLimit
     }
+
+    mapped.sort((a, b) => a.distance - b.distance)
+    mapped.length = searchResultsLimit
+
     return mapped
       .map((result) =>
         isMad ? this.parseMadRewards(result) : this.parseRdmRewards(result),
       )
-      .filter((x) => x)
+      .filter(Boolean)
   }
 
   static async searchLures(perms, args, { isMad }, distance) {
@@ -1772,8 +1805,6 @@ class Pokestop extends Model {
     if (!getAreaSql(query, perms.areaRestrictions, onlyAreas, isMad)) {
       return []
     }
-    Pokestop.onlyValid(query, isMad)
-
     const results = await query
     return results
   }
@@ -1788,7 +1819,7 @@ class Pokestop extends Model {
       .first()
   }
 
-  static getSubmissions(perms, args, { isMad, hasShowcaseData }) {
+  static async getSubmissions(perms, args, { isMad, hasShowcaseData }) {
     const {
       filters: { onlyAreas = [], onlyIncludeSponsored = true },
       minLat,
@@ -1806,9 +1837,14 @@ class Pokestop extends Model {
         maxLon + 0.025,
       ])
     if (isMad) {
-      query.select(['pokestop_id AS id', 'latitude AS lat', 'longitude AS lon'])
+      query.select([
+        'pokestop_id AS id',
+        'enabled',
+        'latitude AS lat',
+        'longitude AS lon',
+      ])
     } else {
-      query.select(['id', 'lat', 'lon', 'partner_id'])
+      query.select(['id', 'lat', 'lon', 'enabled', 'deleted', 'partner_id'])
       if (!onlyIncludeSponsored) {
         query.andWhere((poi) => {
           poi.whereNull('partner_id').orWhere('partner_id', 0)
@@ -1821,9 +1857,9 @@ class Pokestop extends Model {
     if (!getAreaSql(query, perms.areaRestrictions, onlyAreas, isMad)) {
       return []
     }
-    Pokestop.onlyValid(query, isMad)
+    const results = await query
 
-    return query
+    return results.filter((x) => x.enabled && !x.deleted)
   }
 }
 
