@@ -17,7 +17,14 @@ class EventManager {
     /** @type {import("@rm/types").Masterfile['invasions'] | {}} */
     this.invasions =
       'invasions' in this.masterfile ? this.masterfile.invasions : {}
-    this.available = { gyms: [], pokestops: [], pokemon: [], nests: [] }
+
+    /** @type {{[key in keyof import('@rm/types').Available]: string[] }} */
+    this.available = {
+      gyms: [],
+      pokestops: [],
+      pokemon: [],
+      nests: [],
+    }
     this.uicons = []
     this.uaudio = []
     this.uiconsBackup = {}

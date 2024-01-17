@@ -21,17 +21,6 @@ const resolvers = {
   Query: {
     available: (_, _args, { Event, Db, perms }) => {
       const data = {
-        pokemon: perms.pokemon ? Event.available.pokemon : [],
-        gyms: perms.gyms || perms.raids ? Event.available.gyms : [],
-        nests: perms.nests ? Event.available.nests : [],
-        pokestops:
-          perms.pokestops ||
-          perms.invasions ||
-          perms.eventStops ||
-          perms.quests ||
-          perms.lures
-            ? Event.available.pokestops
-            : [],
         questConditions: perms.quests ? Db.questConditions : {},
         masterfile: { ...Event.masterfile, invasions: Event.invasions },
         filters: buildDefaultFilters(perms, Db),
@@ -46,6 +35,48 @@ const resolvers = {
       }
       return data
     },
+    availablePokemon: (_, _args, { Event, perms }) =>
+      perms?.pokemon ? Event.available.pokemon : [],
+    availableGyms: (_, _args, { Event, perms }) =>
+      Event.available.gyms.filter((x) => {
+        if (x.startsWith('g') || x.startsWith('t')) {
+          return perms?.gyms
+        }
+        if (
+          x.startsWith('r') ||
+          x.startsWith('e') ||
+          Number.isInteger(Number(x.charAt(0)))
+        ) {
+          return perms?.raids
+        }
+        return false
+      }),
+    availableNests: (_, _args, { Event, perms }) =>
+      perms?.nests ? Event.available.nests : [],
+    availablePokestops: (_, _args, { Event, perms }) =>
+      Event.available.pokestops.filter((x) => {
+        if (x.startsWith('i') || x.startsWith('a')) {
+          return perms?.invasions
+        }
+        if (x.startsWith('d') || x.startsWith('f') || x.startsWith('h')) {
+          return perms?.lures
+        }
+        if (
+          x.startsWith('q') ||
+          x.startsWith('m') ||
+          x.startsWith('x') ||
+          x.startsWith('c') ||
+          x.startsWith('d') ||
+          x.startsWith('p') ||
+          Number.isInteger(Number(x.charAt(0)))
+        ) {
+          return perms?.quests
+        }
+        if (x.startsWith('l')) {
+          return perms?.lures
+        }
+        return perms?.pokestops
+      }),
     backup: (_, args, { req, perms, Db }) => {
       if (perms?.backups && req?.user?.id) {
         return Db.models.Backup.getOne(args.id, req?.user?.id)
