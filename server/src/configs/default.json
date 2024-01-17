@@ -98,6 +98,8 @@
     "portalUpdateLimit": 30,
     "weatherCellLimit": 3,
     "searchResultsLimit": 15,
+    "searchSoftKmLimit": 10,
+    "searchHardKmLimit": 100,
     "nestHemisphere": "north",
     "gymValidDataLimit": 30,
     "hideOldGyms": false,

@@ -1599,7 +1599,7 @@ class Pokestop extends Model {
     return quest
   }
 
-  static async search(perms, args, { isMad }, distance) {
+  static async search(perms, args, { isMad }, distance, bbox) {
     const { onlyAreas = [], search } = args
     const query = this.query()
       .select([
@@ -1610,6 +1610,8 @@ class Pokestop extends Model {
         isMad ? 'image AS url' : 'url',
         distance,
       ])
+      .whereBetween(isMad ? 'latitude' : 'lat', [bbox.minLat, bbox.maxLat])
+      .andWhereBetween(isMad ? 'longitude' : 'lon', [bbox.minLon, bbox.maxLon])
       .whereRaw(`LOWER(name) LIKE '%${search}%'`)
       .limit(searchResultsLimit)
       .orderBy('distance')
@@ -1619,10 +1621,15 @@ class Pokestop extends Model {
     return query
   }
 
-  static async searchQuests(perms, args, { isMad, hasAltQuests }, distance) {
+  static async searchQuests(
+    perms,
+    args,
+    { isMad, hasAltQuests },
+    distance,
+    bbox,
+  ) {
     const { search, onlyAreas = [], locale, lat, lon } = args
     const midnight = getUserMidnight({ lat, lon })
-
     const pokemonIds = Object.keys(Event.masterfile.pokemon).filter((pkmn) =>
       i18next
         .t(`poke_${pkmn}`, { lng: locale })
@@ -1666,6 +1673,8 @@ class Pokestop extends Model {
         'quest_title',
         'quest_target',
       ])
+      .whereBetween(isMad ? 'latitude' : 'lat', [bbox.minLat, bbox.maxLat])
+      .andWhereBetween(isMad ? 'longitude' : 'lon', [bbox.minLon, bbox.maxLon])
       .andWhere('quest_timestamp', '>=', midnight || 0)
       .andWhere((quests) => {
         if (pokemonIds.length === 1) {
@@ -1714,6 +1723,8 @@ class Pokestop extends Model {
           'alternative_quest_target',
           distance,
         ])
+        .whereBetween('lat', [bbox.minLat, bbox.maxLat])
+        .andWhereBetween('lon', [bbox.minLon, bbox.maxLon])
         .andWhere('alternative_quest_timestamp', '>=', midnight || 0)
         .andWhere((quests) => {
           if (pokemonIds.length === 1) {
@@ -1743,6 +1754,7 @@ class Pokestop extends Model {
     }
 
     const [withAr, withoutAr] = await Promise.all(queries)
+
     const mapped = withAr.map((q) => ({ ...q, with_ar: q.with_ar ?? true }))
     if (withoutAr) {
       const remapped = withoutAr.map((result) => ({
@@ -1759,7 +1771,7 @@ class Pokestop extends Model {
     }
 
     mapped.sort((a, b) => a.distance - b.distance)
-    mapped.length = searchResultsLimit
+    if (mapped.length > searchResultsLimit) mapped.length = searchResultsLimit
 
     return mapped
       .map((result) =>
@@ -1768,7 +1780,7 @@ class Pokestop extends Model {
       .filter(Boolean)
   }
 
-  static async searchLures(perms, args, { isMad }, distance) {
+  static async searchLures(perms, args, { isMad }, distance, bbox) {
     const { search, onlyAreas = [], locale } = args
     const ts = Math.floor(Date.now() / 1000)
 
@@ -1794,6 +1806,8 @@ class Pokestop extends Model {
           : 'lure_expire_timestamp',
         distance,
       ])
+      .whereBetween(isMad ? 'latitude' : 'lat', [bbox.minLat, bbox.maxLat])
+      .andWhereBetween(isMad ? 'longitude' : 'lon', [bbox.minLon, bbox.maxLon])
       .andWhere(
         isMad ? 'lure_expiration' : 'lure_expire_timestamp',
         '>=',

@@ -1,9 +1,11 @@
+/* eslint-disable no-await-in-loop */
 const { knex } = require('knex')
 const { raw } = require('objection')
 const extend = require('extend')
 const config = require('@rm/config')
 
 const { log, HELPERS } = require('@rm/logger')
+const { getBboxFromCenter } = require('./functions/getBbox')
 
 /**
  * @type {import("@rm/types").DbCheckClass}
@@ -433,20 +435,60 @@ module.exports = class DbCheck {
    * @param {'search' | string} method
    * @returns {Promise<T[]>}
    */
-  async search(model, perms, args, method = 'search') {
-    const data = await Promise.all(
-      this.models[model].map(async ({ SubModel, ...source }) =>
-        SubModel[method](
-          perms,
-          args,
-          source,
-          this.getDistance(args, source.isMad),
+  async search(
+    model,
+    perms,
+    args,
+    method = 'search',
+    bboxDistance = config.getSafe('api.searchSoftKmLimit'),
+  ) {
+    let deDuped = []
+    let count = 0
+    while (deDuped.length < this.searchLimit) {
+      count += 1
+      const bbox = getBboxFromCenter(args.lat, args.lon, bboxDistance)
+      const distance = bboxDistance
+      const data = await Promise.all(
+        this.models[model].map(async ({ SubModel, ...source }) =>
+          SubModel[method](
+            perms,
+            args,
+            source,
+            this.getDistance(args, source.isMad),
+            bbox,
+            distance,
+          ),
         ),
-      ),
-    )
-    const deDuped = DbCheck.deDupeResults(data).sort(
-      (a, b) => a.distance - b.distance,
-    )
+      )
+      deDuped = DbCheck.deDupeResults(data)
+      log.debug(
+        HELPERS.db,
+        'Attempt #',
+        count,
+        'and received',
+        deDuped.length,
+        'at distance',
+        bboxDistance,
+      )
+      if (
+        deDuped.length >= this.searchLimit ||
+        bboxDistance >= config.getSafe('api.searchHardKmLimit')
+      ) {
+        break
+      }
+      bboxDistance += config.getSafe('api.searchSoftKmLimit')
+    }
+    if (count > 1) {
+      log.info(
+        HELPERS.db,
+        'Searched',
+        count,
+        'time to get',
+        deDuped.length,
+        `results for ${method} on model ${model}`,
+      )
+    }
+    deDuped.sort((a, b) => a.distance - b.distance)
     if (deDuped.length > this.searchLimit) {
       deDuped.length = this.searchLimit
     }
