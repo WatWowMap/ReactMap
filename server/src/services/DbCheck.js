@@ -109,16 +109,18 @@ module.exports = class DbCheck {
    * @returns {ReturnType<typeof raw>}
    */
   getDistance(args, isMad) {
+    const radLat = args.lat * (Math.PI / 180)
+    const radLon = args.lon * (Math.PI / 180)
     return raw(
       `ROUND(( ${
         this.distanceUnit === 'mi' ? '3959' : '6371'
-      } * acos( cos( radians(${args.lat}) ) * cos( radians( ${
+      } * acos( cos( ${radLat} ) * cos( radians( ${
         isMad ? 'latitude' : 'lat'
-      } ) ) * cos( radians( ${isMad ? 'longitude' : 'lon'} ) - radians(${
-        args.lon
-      }) ) + sin( radians(${args.lat}) ) * sin( radians( ${
+      } ) ) * cos( radians( ${
+        isMad ? 'longitude' : 'lon'
+      } ) - ${radLon} ) + sin( ${radLat} ) * sin( radians( ${
         isMad ? 'latitude' : 'lat'
-      } ) ) ) ),2)`,
+      } ) ) ) ), 2)`,
     ).as('distance')
   }
 
