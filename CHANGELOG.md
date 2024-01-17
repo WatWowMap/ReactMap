@@ -1,3 +1,10 @@
+# [1.29.0-develop.8](https://github.com/WatWowMap/ReactMap/compare/v1.29.0-develop.7...v1.29.0-develop.8) (2024-01-17)
+
+
+### Bug Fixes
+
+* mega energy icons by id ([ced7d7c](https://github.com/WatWowMap/ReactMap/commit/ced7d7c51401c96e2264e7028f83abe59f2c7fd7))
+
 # [1.29.0-develop.7](https://github.com/WatWowMap/ReactMap/compare/v1.29.0-develop.6...v1.29.0-develop.7) (2024-01-17)
 
 
