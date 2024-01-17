@@ -290,7 +290,7 @@ export default function Search() {
       <Box width={{ xs: 'inherit', sm: 500 }}>
         <Header titles="search" action={handleClose} />
         <Autocomplete
-          freeSolo={search?.length ? false : true}
+          freeSolo
           inputValue={search}
           onInputChange={handleChange}
           options={options.map((option, i) => ({ ...option, i }))}

@@ -638,7 +638,7 @@ class Pokemon extends Model {
               longitude: bbox.maxLon,
             },
             maxDistance,
-            limit: searchResultsLimit * 4,
+            limit: searchResultsLimit,
             searchIds: pokemonIds.map((id) => +id),
             global: {},
             filters: {},
@@ -649,9 +649,7 @@ class Pokemon extends Model {
     )
     return results
       .filter(
-        (item, i) =>
-          i < searchResultsLimit &&
-          (!mem || filterRTree(item, perms.areaRestrictions, onlyAreas)),
+        (item) => !mem || filterRTree(item, perms.areaRestrictions, onlyAreas),
       )
       .map((poke) => ({
         ...poke,
