@@ -7,6 +7,9 @@ const config = require('@rm/config')
 const { log, HELPERS } = require('@rm/logger')
 const { getBboxFromCenter } = require('./functions/getBbox')
 
+const softLimit = config.getSafe('api.searchSoftKmLimit')
+const hardLimit = config.getSafe('api.searchHardKmLimit')
+
 /**
  * @type {import("@rm/types").DbCheckClass}
  */
@@ -435,19 +438,14 @@ module.exports = class DbCheck {
    * @param {'search' | string} method
    * @returns {Promise<T[]>}
    */
-  async search(
-    model,
-    perms,
-    args,
-    method = 'search',
-    bboxDistance = config.getSafe('api.searchSoftKmLimit'),
-  ) {
+  async search(model, perms, args, method = 'search') {
     let deDuped = []
     let count = 0
+    let distance = softLimit
     while (deDuped.length < this.searchLimit) {
       count += 1
-      const bbox = getBboxFromCenter(args.lat, args.lon, bboxDistance)
-      const distance = bboxDistance
+      const bbox = getBboxFromCenter(args.lat, args.lon, distance)
+      const local = distance
       const data = await Promise.all(
         this.models[model].map(async ({ SubModel, ...source }) =>
           SubModel[method](
@@ -456,34 +454,34 @@ module.exports = class DbCheck {
             source,
             this.getDistance(args, source.isMad),
             bbox,
-            distance,
+            local,
           ),
         ),
       )
       deDuped = DbCheck.deDupeResults(data)
       log.debug(
         HELPERS.db,
-        'Attempt #',
+        'Search attempt #',
         count,
-        'and received',
+        '| received:',
         deDuped.length,
-        'at distance',
-        bboxDistance,
+        '| distance:',
+        distance,
       )
-      if (
-        deDuped.length >= this.searchLimit ||
-        bboxDistance >= config.getSafe('api.searchHardKmLimit')
-      ) {
+      if (deDuped.length >= this.searchLimit || distance >= hardLimit) {
         break
       }
-      bboxDistance += config.getSafe('api.searchSoftKmLimit')
+      distance += softLimit
+      if (deDuped.length === 0) {
+        distance = Math.min(distance + softLimit, hardLimit)
+      }
     }
     if (count > 1) {
       log.info(
         HELPERS.db,
         'Searched',
         count,
-        'time to get',
+        '| received:',
         deDuped.length,
         `results for ${method} on model ${model}`,
       )
