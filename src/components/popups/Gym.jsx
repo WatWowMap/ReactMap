@@ -239,10 +239,12 @@ const DropdownOptions = ({
     if (gymBadges) {
       options.push({
         name: 'gym_badge_menu',
-        action: () =>
-          useLayoutStore.setState({
+        action: () => {
+          handleClose()
+          return useLayoutStore.setState({
             gymBadge: { badge, gymId: id, open: true },
-          }),
+          })
+        },
       })
     }
   }

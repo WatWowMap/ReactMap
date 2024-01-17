@@ -35,7 +35,7 @@ const footerOptions =
 export default function BadgeSelection() {
   const { gymId, badge, open } = useLayoutStore((s) => s.gymBadge)
   const [setBadgeInDb] = useMutation(Query.user('setGymBadge'), {
-    refetchQueries: ['GetBadgeInfo'],
+    refetchQueries: ['GetBadgeInfo', 'Gyms', 'Raids', 'GymsRaids'],
   })
 
   /** @type {import('packages/types/lib').MultiSelectorProps<typeof badge>['onClick']} */
@@ -66,7 +66,7 @@ export default function BadgeSelection() {
       <DialogContent sx={{ mt: 2 }}>
         <MultiSelector
           items={ENUM_BADGES}
-          value={badge}
+          value={badge || 0}
           onClick={onClick}
           tKey="badge_"
         />
