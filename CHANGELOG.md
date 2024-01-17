@@ -1,3 +1,15 @@
+# [1.29.0-develop.6](https://github.com/WatWowMap/ReactMap/compare/v1.29.0-develop.5...v1.29.0-develop.6) (2024-01-17)
+
+
+### Bug Fixes
+
+* remove old eslint heading ([768affc](https://github.com/WatWowMap/ReactMap/commit/768affc24ac06edaffdd109ce39042dfc46a732e))
+
+
+### Features
+
+* rework how often available is updated ([ed35dcd](https://github.com/WatWowMap/ReactMap/commit/ed35dcdf325becfdf408b70dfc968137c82ada36))
+
 # [1.29.0-develop.5](https://github.com/WatWowMap/ReactMap/compare/v1.29.0-develop.4...v1.29.0-develop.5) (2024-01-16)
 
 
