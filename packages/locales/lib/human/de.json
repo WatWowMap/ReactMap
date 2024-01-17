@@ -684,7 +684,7 @@
   "basic": "Einfach",
   "intermediate": "Fortgeschritten",
   "expert": "Experte",
-  "basic_description": "Wähle einfach Pokémon aus und wenden einen globalen Filter an",
+  "basic_description": "Wähle einfach Pokémon aus und wende einen globalen Filter an",
   "intermediate_description": "Lege individuelle Filter global und pro Pokémon fest (traditionell)",
   "expert_description": "Manuelle Eingabeabfragen für größtmögliche Anpassungsfähigkeit",
   "icon_size": "Icon Größe",
