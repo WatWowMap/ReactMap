@@ -465,7 +465,7 @@ const resolvers = {
     },
     searchable: (_, __, { perms }) => {
       const options = config.getSafe('api.searchable')
-      return Object.keys(options).filter((k) => options[k] && perms[k])
+      return Object.keys(options).filter((k) => perms[k] && options[k])
     },
     spawnpoints: (_, args, { perms, Db }) => {
       if (perms?.spawnpoints) {
