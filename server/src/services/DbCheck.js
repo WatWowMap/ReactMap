@@ -442,8 +442,10 @@ module.exports = class DbCheck {
     let deDuped = []
     let count = 0
     let distance = softLimit
+    const max = model === 'Pokemon' ? hardLimit / 2 : hardLimit
     const startTime = Date.now()
     while (deDuped.length < this.searchLimit) {
+      const loopTime = Date.now()
       count += 1
       const bbox = getBboxFromCenter(args.lat, args.lon, distance)
       const local = distance
@@ -468,22 +470,24 @@ module.exports = class DbCheck {
         deDuped.length,
         '| distance:',
         distance,
+        '| time:',
+        +((Date.now() - loopTime) / 1000).toFixed(2),
       )
       if (
-        deDuped.length >= this.searchLimit * 0.75 ||
-        distance >= hardLimit ||
-        Date.now() - startTime > 3_000
+        deDuped.length >= this.searchLimit * 0.5 ||
+        distance >= max ||
+        Date.now() - startTime > 2_000
       ) {
         break
       }
       if (deDuped.length === 0) {
         distance += softLimit * 4
-      } else if (deDuped.length < this.searchLimit / 2) {
+      } else if (deDuped.length < this.searchLimit / 4) {
         distance += softLimit * 2
       } else {
         distance += softLimit
       }
-      distance = Math.min(distance, hardLimit)
+      distance = Math.min(distance, max)
     }
     if (count > 1) {
       log.info(
