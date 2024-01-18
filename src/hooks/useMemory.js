@@ -39,7 +39,6 @@ import { create } from 'zustand'
  *   clientError: string,
  *   timeOfDay: import('@rm/types').TimesOfDay,
  *   hideList: Set<string | number>,
- *   excludeList: string[],
  *   timerList: string[],
  *   tileStyle: 'light' | 'dark',
  *   reset: boolean,
@@ -118,7 +117,6 @@ export const useMemory = create((set) => ({
     types: {},
   },
   hideList: new Set(),
-  excludeList: [],
   timerList: [],
   webhookAlert: {
     open: false,

@@ -1,4 +1,3 @@
-import { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { useMemory } from '@hooks/useMemory'
@@ -250,8 +249,6 @@ export default function useFilter(
       }
     })
   })
-
-  useEffect(() => () => useMemory.setState({ excludeList: [] }))
 
   return { filteredArr, count }
 }
