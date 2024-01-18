@@ -442,6 +442,7 @@ module.exports = class DbCheck {
     let deDuped = []
     let count = 0
     let distance = softLimit
+    const startTime = Date.now()
     while (deDuped.length < this.searchLimit) {
       count += 1
       const bbox = getBboxFromCenter(args.lat, args.lon, distance)
@@ -468,12 +469,16 @@ module.exports = class DbCheck {
         '| distance:',
         distance,
       )
-      if (deDuped.length >= this.searchLimit || distance >= hardLimit) {
+      if (
+        deDuped.length >= this.searchLimit ||
+        distance >= hardLimit ||
+        Date.now() - startTime > 3_000
+      ) {
         break
       }
       if (deDuped.length === 0) {
-        distance += softLimit * 3
-      } else if (deDuped.length < this.searchLimit / 4) {
+        distance += softLimit * 4
+      } else if (deDuped.length < this.searchLimit / 2) {
         distance += softLimit * 2
       } else {
         distance += softLimit
@@ -488,6 +493,8 @@ module.exports = class DbCheck {
         '| received:',
         deDuped.length,
         `results for ${method} on model ${model}`,
+        '| time:',
+        +((Date.now() - startTime) / 1000).toFixed(2),
       )
     }
     deDuped.sort((a, b) => a.distance - b.distance)
