@@ -471,10 +471,14 @@ module.exports = class DbCheck {
       if (deDuped.length >= this.searchLimit || distance >= hardLimit) {
         break
       }
-      distance += softLimit
-      if (deDuped.length === 0 && distance < hardLimit) {
+      if (deDuped.length === 0) {
+        distance += softLimit * 3
+      } else if (deDuped.length < this.searchLimit / 4) {
+        distance += softLimit * 2
+      } else {
         distance += softLimit
       }
+      distance = Math.min(distance, hardLimit)
     }
     if (count > 1) {
       log.info(
