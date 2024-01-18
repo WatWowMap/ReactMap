@@ -6,14 +6,19 @@ import { useTranslation } from 'react-i18next'
 /**
  * @param {{ questTitle: string, questTarget: number }} props
  */
-export default function QuestTitle({ questTitle, questTarget }) {
-  const { t, i18n } = useTranslation()
-
-  const normalized = `quest_title_${questTitle.toLowerCase()}`
-
-  return i18n.exists(normalized) ? (
+export default function QuestTitle(props) {
+  return (
     <Typography variant="caption">
-      {t(normalized, { amount_0: questTarget })}
+      <RawQuestTitle {...props} />
     </Typography>
-  ) : null
+  )
+}
+
+/**
+ * @param {{ questTitle: string, questTarget: number }} props
+ */
+export function RawQuestTitle({ questTitle, questTarget }) {
+  const { t, i18n } = useTranslation()
+  const normalized = `quest_title_${questTitle.toLowerCase()}`
+  return i18n.exists(normalized) ? t(normalized, { amount_0: questTarget }) : ''
 }
