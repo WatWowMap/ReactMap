@@ -720,5 +720,7 @@
   "search_rocket_pokemon": "Search Rocket Pokémon",
   "main": "Main",
   "extra": "Extra",
-  "select": "Select"
+  "select": "Select",
+  "searching": "searching...",
+  "no_options": "No Options..."
 }
