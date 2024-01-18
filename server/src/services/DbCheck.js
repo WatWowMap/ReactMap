@@ -470,7 +470,7 @@ module.exports = class DbCheck {
         distance,
       )
       if (
-        deDuped.length >= this.searchLimit ||
+        deDuped.length >= this.searchLimit * 0.75 ||
         distance >= hardLimit ||
         Date.now() - startTime > 3_000
       ) {
