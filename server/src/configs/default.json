@@ -44,7 +44,8 @@
       "gyms": true,
       "portals": true,
       "nests": true,
-      "pokemon": true
+      "pokemon": true,
+      "invasions": true
     },
     "queryUpdateHours": {
       "pokemon": 0.17,

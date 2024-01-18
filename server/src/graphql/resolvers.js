@@ -443,6 +443,16 @@ const resolvers = {
       }
       return []
     },
+    searchInvasion: (_, args, { perms, Db }) => {
+      const { category, search } = args
+      if (perms?.[category] && /^[0-9\s\p{L}]+$/u.test(search)) {
+        if (!search || !search.trim()) {
+          return []
+        }
+        return Db.search('Pokestop', perms, args, 'searchInvasions')
+      }
+      return []
+    },
     searchLure: (_, args, { perms, Db }) => {
       const { category, search } = args
       if (perms?.[category] && /^[0-9\s\p{L}]+$/u.test(search)) {

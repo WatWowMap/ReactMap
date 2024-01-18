@@ -149,13 +149,29 @@ function NestImage({ nest_pokemon_id, nest_pokemon_form }) {
   )
 }
 
+/** @param {Partial<import('@rm/types').Invasion>} props */
+function InvasionImage({ grunt_type, confirmed }) {
+  const { Icons } = useMemory.getState()
+  const { t } = useTranslateById()
+  return (
+    <NameTT id={`grunt_${grunt_type}`}>
+      <Img
+        src={Icons.getInvasions(grunt_type, confirmed)}
+        alt={t(`grunt_${grunt_type}`)}
+        maxHeight={45}
+        maxWidth={45}
+      />
+    </NameTT>
+  )
+}
+
 function Misc() {
   const { searchTab } = useStorage.getState()
   const miscIcon = useMemory((s) => s.Icons.getMisc(searchTab))
   return <Img src={miscIcon} alt={searchTab} maxHeight={45} maxWidth={45} />
 }
 
-/** @param {Partial<import('@rm/types').Quest & { id: string }> | { id: string, url?: string } | Partial<import('@rm/types').Pokemon> | Partial<import('@rm/types').Gym> | Partial<import('@rm/types').Pokestop> | { id: string, nest_pokemon_id: number, nest_pokemon_form?: number }} props */
+/** @param {Partial<import('@rm/types').Quest & { id: string }> | { id: string, url?: string } | Partial<import('@rm/types').Pokemon> | Partial<import('@rm/types').Gym> | Partial<import('@rm/types').Pokestop> | { id: string, nest_pokemon_id: number, nest_pokemon_form?: number } | Partial<import('@rm/types').Invasion> & { id: string }} props */
 function OptionImage(props) {
   if ('url' in props && props.url) return <FortImage url={props.url} />
   if ('quest_reward_type' in props) return <QuestImage {...props} />
@@ -163,6 +179,7 @@ function OptionImage(props) {
   if ('raid_pokemon_id' in props) return <RaidImage {...props} />
   if ('lure_id' in props) return <LureImage {...props} />
   if ('nest_pokemon_id' in props) return <NestImage {...props} />
+  if ('grunt_type' in props) return <InvasionImage {...props} />
   return <Misc />
 }
 
