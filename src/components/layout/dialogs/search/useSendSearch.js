@@ -27,6 +27,7 @@ export function useSendSearch(search, open) {
 
   const [callSearch, { data, previousData, loading }] = useLazyQuery(
     Query.search(searchTab),
+    { fetchPolicy: 'cache-and-network' },
   )
 
   const sendToServer = useCallback(
@@ -92,7 +93,6 @@ export function useSendSearch(search, open) {
   }, [loading])
 
   useEffect(() => {
-    // initial search
     if (search && open) sendToServer(search)
     if (open) map.closePopup()
   }, [open])
