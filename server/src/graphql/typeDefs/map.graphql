@@ -83,6 +83,24 @@ type SearchLure {
   lure_expire_timestamp: Int
 }
 
+type SearchInvasion {
+  id: ID
+  name: String
+  url: String
+  lat: Float
+  lon: Float
+  distance: Float
+  grunt_type: Int
+  incident_expire_timestamp: Int
+  confirmed: Boolean
+  slot_1_pokemon_id: Int
+  slot_1_form: Int
+  slot_2_pokemon_id: Int
+  slot_2_form: Int
+  slot_3_pokemon_id: Int
+  slot_3_form: Int
+}
+
 type SearchQuest {
   id: ID
   name: String

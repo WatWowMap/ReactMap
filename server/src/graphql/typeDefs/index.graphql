@@ -91,6 +91,14 @@ type Query {
     locale: String
     onlyAreas: [String]
   ): [SearchLure]
+  searchInvasion(
+    search: String
+    category: String
+    lat: Float
+    lon: Float
+    locale: String
+    onlyAreas: [String]
+  ): [SearchInvasion]
   searchQuest(
     search: String
     category: String

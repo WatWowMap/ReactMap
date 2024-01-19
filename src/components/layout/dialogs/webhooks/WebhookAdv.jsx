@@ -90,7 +90,7 @@ export default function WebhookAdvanced() {
   const webhookAdv = useStorage((s) => s.webhookAdv)
   const { templates, prefix, leagues, pvp, hasNominatim, locale, everything } =
     useWebhookStore((s) => s.context)
-  const info = useWebhookStore((s) => s.context.ui?.[category] || {})
+  const info = useWebhookStore((s) => s.context.ui?.[category])
   const human = useWebhookStore((s) => s.human)
   const profile = useWebhookStore((s) => s.profile)
   const tempFilters = useWebhookStore((s) => s.tempFilters[id])
@@ -116,31 +116,31 @@ export default function WebhookAdvanced() {
     tempFilters?.template
       ? Poracle.reactMapFriendly(tempFilters)
       : {
-          ...Poracle.reactMapFriendly(info.defaults),
+          ...Poracle.reactMapFriendly(info?.defaults),
           profile_no: human.current_profile_no,
         },
   )
   const [poracleValues, setPoracleValues] = React.useState(
     tempFilters?.template
       ? tempFilters
-      : { ...info.defaults, profile_no: human.current_profile_no },
+      : { ...info?.defaults, profile_no: human.current_profile_no },
   )
 
   React.useEffect(() => {
     setPoracleValues(
       tempFilters?.template
         ? { ...tempFilters }
-        : { ...info.defaults, profile_no: human.current_profile_no },
+        : { ...info?.defaults, profile_no: human.current_profile_no },
     )
     setFilterValues(
       tempFilters?.template
         ? Poracle.reactMapFriendly(tempFilters)
         : {
-            ...Poracle.reactMapFriendly(info.defaults),
+            ...Poracle.reactMapFriendly(info?.defaults),
             profile_no: human.current_profile_no,
           },
     )
-  }, [tempFilters, id, human.current_profile_no, info.defaults])
+  }, [tempFilters, id, human.current_profile_no, info?.defaults])
 
   const handleSlider = React.useCallback(
     (low, high) => (name, values) => {
@@ -163,8 +163,8 @@ export default function WebhookAdvanced() {
           ...poracleValues,
           min_weight: checked
             ? Math.ceil(pokemon[idObj.id].weight * 1.313)
-            : info.defaults.min_weight,
-          max_weight: info.defaults.max_weight,
+            : info?.defaults.min_weight,
+          max_weight: info?.defaults.max_weight,
           [name]: checked,
           xs: false,
         })
@@ -172,10 +172,10 @@ export default function WebhookAdvanced() {
       case 'xs':
         setPoracleValues({
           ...poracleValues,
-          min_weight: info.defaults.min_weight,
+          min_weight: info?.defaults.min_weight,
           max_weight: checked
             ? Math.floor(pokemon[idObj.id].weight / 1.6431924)
-            : info.defaults.max_weight,
+            : info?.defaults.max_weight,
           [name]: checked,
           xl: false,
         })
@@ -396,7 +396,7 @@ export default function WebhookAdvanced() {
       if (
         poracleValues.pvpEntry &&
         poracleValues.pvp_ranking_league &&
-        poracleValues[field] !== info.defaults[field]
+        poracleValues[field] !== info?.defaults[field]
       ) {
         const league =
           leagues.find((x) => x.cp === poracleValues.pvp_ranking_league) || {}
@@ -420,7 +420,7 @@ export default function WebhookAdvanced() {
       return ''
     }
     if (!poracleValues.pvpEntry) {
-      return poracleValues[field] === info.defaults[field]
+      return poracleValues[field] === info?.defaults[field]
         ? ''
         : `${field.replace(/_/g, '').replace('min', '')}${poracleValues[field]}`
     }
@@ -456,12 +456,14 @@ export default function WebhookAdvanced() {
         const invasion = Object.keys(types).find(
           (x) => types[x].toLowerCase() === poracleValues.grunt_type,
         )
-        return `${prefix}${t('invasion')} ${
-          invasion
-            ? t(`poke_type_${invasion}`)
-            : t(poracleValues.grunt_type.replace(' ', ''))
-        }
+        return poracleValues?.grunt_type
+          ? `${prefix}${t('invasion')} ${
+              invasion
+                ? t(`poke_type_${invasion}`)
+                : t(poracleValues.grunt_type.replace(' ', ''))
+            }
         ${Object.keys(poracleValues).map(checkDefaults).join(' ')}`
+          : ''
       }
       case 'q':
         return `${prefix}${t('quest')} ${t(`item_${idObj.id}`).replace(
@@ -746,7 +748,7 @@ export default function WebhookAdvanced() {
               flexItem
               style={{ height: 3, width: '90%', margin: '10px 0' }}
             />
-            {Object.keys(info.ui[parent][type]).map((subType) =>
+            {Object.keys(info?.ui[parent][type] || {}).map((subType) =>
               getInputs(subType, info.ui[parent][type][subType], type),
             )}
           </Grid>
@@ -799,7 +801,7 @@ export default function WebhookAdvanced() {
       }
     } else {
       useWebhookStore.setState((prev) => ({
-        tempFilters: { ...prev.tempFilters, [filterId]: { ...info.defaults } },
+        tempFilters: { ...prev.tempFilters, [filterId]: { ...info?.defaults } },
       }))
     }
     if (onClose) onClose(poracleValues)
@@ -830,7 +832,7 @@ export default function WebhookAdvanced() {
     >
       <Header titles={Poracle.getTitles(idObj)} action={handleClose} />
       <DialogContent style={{ padding: '8px 5px' }}>
-        {Object.keys(info.ui || {}).map((type) => {
+        {Object.keys(info?.ui || {}).map((type) => {
           if (human.blocked_alerts.includes(type)) return null
           if (type === 'global' && (idObj.id !== 'global' || !everything))
             return null

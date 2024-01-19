@@ -237,6 +237,7 @@ export interface Pokemon {
   pvp_rankings_great_league?: PvpEntry[]
   pvp_rankings_ultra_league?: PvpEntry[]
   distance?: number
+  shiny?: boolean
 }
 
 export type FullPokemon = FullModel<Pokemon, PokemonModel>
