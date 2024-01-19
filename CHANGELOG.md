@@ -1,3 +1,10 @@
+# [1.2.0-develop.6](https://github.com/ReuschelCGN/ReactMap/compare/v1.2.0-develop.5...v1.2.0-develop.6) (2024-01-19)
+
+
+### Bug Fixes
+
+* remove `excludeList` - no longer needed ([bc3adba](https://github.com/ReuschelCGN/ReactMap/commit/bc3adbafd16fd01000cbd2a6779244a2725615e2))
+
 # [1.29.0-develop.10](https://github.com/WatWowMap/ReactMap/compare/v1.29.0-develop.9...v1.29.0-develop.10) (2024-01-18)
 
 
