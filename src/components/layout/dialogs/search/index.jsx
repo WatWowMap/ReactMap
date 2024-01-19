@@ -76,7 +76,6 @@ const STATIC_PROPS =
     clearIcon: null,
     popupIcon: null,
     open: true,
-    freeSolo: true,
   })
 
 export default function Search() {
@@ -100,6 +99,7 @@ export default function Search() {
       <Box width={BOX_WIDTH}>
         <Header titles="search" action={handleClose} />
         <Autocomplete
+          freeSolo={!search.length}
           inputValue={search}
           onInputChange={handleInputChange}
           options={options}
