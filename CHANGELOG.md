@@ -1,3 +1,10 @@
+# [1.29.0-develop.11](https://github.com/WatWowMap/ReactMap/compare/v1.29.0-develop.10...v1.29.0-develop.11) (2024-01-19)
+
+
+### Bug Fixes
+
+* issue in webhook adv menu ([190289a](https://github.com/WatWowMap/ReactMap/commit/190289a109184ad2c5678f2951986d6b525c8254)), closes [#926](https://github.com/WatWowMap/ReactMap/issues/926)
+
 # [1.29.0-develop.10](https://github.com/WatWowMap/ReactMap/compare/v1.29.0-develop.9...v1.29.0-develop.10) (2024-01-18)
 
 
