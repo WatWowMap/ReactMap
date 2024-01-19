@@ -647,6 +647,7 @@ class Pokemon extends Model {
       'POST',
       secret,
     )
+    if (!results) return []
     return results
       .filter(
         (item) => !mem || filterRTree(item, perms.areaRestrictions, onlyAreas),

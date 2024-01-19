@@ -491,7 +491,7 @@ module.exports = class DbCheck {
     }
     if (count > 1) {
       log.info(
-        HELPERS.db,
+        HELPERS.search,
         'Searched',
         count,
         '| received:',
