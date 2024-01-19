@@ -568,17 +568,9 @@ class Pokemon extends Model {
    * @param {import("@rm/types").DbContext} ctx
    * @param {number} distance
    * @param {ReturnType<typeof import("server/src/services/functions/getBbox").getBboxFromCenter>} bbox
-   * @param {number} [maxDistance]
    * @returns {Promise<Partial<import("@rm/types").Pokemon>[]>}
    */
-  static async search(
-    perms,
-    args,
-    { isMad, mem, secret },
-    distance,
-    bbox,
-    maxDistance,
-  ) {
+  static async search(perms, args, { isMad, mem, secret }, distance, bbox) {
     const { search, locale, onlyAreas = [] } = args
     const pokemonIds = Object.keys(Event.masterfile.pokemon).filter((pkmn) =>
       i18next.t(`poke_${pkmn}`, { lng: locale }).toLowerCase().includes(search),
@@ -637,7 +629,6 @@ class Pokemon extends Model {
               latitude: bbox.maxLat,
               longitude: bbox.maxLon,
             },
-            maxDistance,
             limit: searchResultsLimit,
             searchIds: pokemonIds.map((id) => +id),
             global: {},
