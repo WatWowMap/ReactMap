@@ -22,10 +22,9 @@ const NestTile = (nest) => {
   const size = useStorage(
     (s) => s.filters.nests.filter[internalId]?.size || 'md',
   )
-  const [excluded, iconUrl, iconSize] = useMemory((s) => {
-    const { Icons, excludeList } = s
+  const [iconUrl, iconSize] = useMemory((s) => {
+    const { Icons } = s
     return [
-      excludeList.includes(internalId),
       Icons.getPokemon(nest.pokemon_id, nest.pokemon_form),
       Icons.getSize('nest', size),
     ]
@@ -42,9 +41,6 @@ const NestTile = (nest) => {
       }),
     [iconUrl, iconSize, nest.pokemon_id, recent],
   )
-  if (excluded) {
-    return null
-  }
 
   return (
     <>

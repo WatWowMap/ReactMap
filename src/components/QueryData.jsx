@@ -141,9 +141,6 @@ function QueryData({ category, timeout }) {
     if (active) {
       timeout.current.setupTimeout(refetch)
       return () => {
-        useMemory.setState((prev) => ({
-          excludeList: prev.excludeList.length ? [] : prev.excludeList,
-        }))
         timeout.current.off()
       }
     }

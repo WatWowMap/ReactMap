@@ -20,7 +20,7 @@ import { useTranslation, Trans } from 'react-i18next'
 import ErrorBoundary from '@components/ErrorBoundary'
 import { Check, Help } from '@components/layout/general/Icons'
 import { useMemory } from '@hooks/useMemory'
-import { useStorage } from '@hooks/useStorage'
+import { setDeepStore, useStorage } from '@hooks/useStorage'
 import Utility from '@services/Utility'
 import { getBadge } from '@services/functions/getBadge'
 import getRewardInfo from '@services/functions/getRewardInfo'
@@ -328,24 +328,8 @@ const MenuActions = ({
     useMemory.setState((prev) => ({ hideList: new Set(prev.hideList).add(id) }))
   }
 
-  const setState = (key) => {
-    useStorage.setState((prev) => ({
-      filters: {
-        ...prev.filters,
-        pokestops: {
-          ...prev.filters.pokestops,
-          filter: {
-            ...prev.filters.pokestops.filter,
-            [key]: {
-              ...prev.filters.pokestops.filter[key],
-              enabled: false,
-            },
-          },
-        },
-      },
-    }))
-    useMemory.setState((prev) => ({ excludeList: [...prev.excludeList, key] }))
-  }
+  const setState = (key) =>
+    setDeepStore(`filters.pokestops.filter.${key}.enabled`, false)
 
   const excludeLure = () => {
     setAnchorEl(null)
