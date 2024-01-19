@@ -448,7 +448,6 @@ module.exports = class DbCheck {
       const loopTime = Date.now()
       count += 1
       const bbox = getBboxFromCenter(args.lat, args.lon, distance)
-      const local = distance
       const data = await Promise.all(
         this.models[model].map(async ({ SubModel, ...source }) =>
           SubModel[method](
@@ -457,11 +456,13 @@ module.exports = class DbCheck {
             source,
             this.getDistance(args, source.isMad),
             bbox,
-            local,
           ),
         ),
       )
-      deDuped = DbCheck.deDupeResults(data)
+      const results = DbCheck.deDupeResults(data)
+      if (results.length > deDuped.length) {
+        deDuped = results
+      }
       log.debug(
         HELPERS.db,
         'Search attempt #',
