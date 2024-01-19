@@ -567,9 +567,10 @@ class Pokemon extends Model {
    * @param {object} args
    * @param {import("@rm/types").DbContext} ctx
    * @param {number} distance
+   * @param {ReturnType<typeof import("server/src/services/functions/getBbox").getBboxFromCenter>} bbox
    * @returns {Promise<Partial<import("@rm/types").Pokemon>[]>}
    */
-  static async search(perms, args, { isMad, mem, secret }, distance) {
+  static async search(perms, args, { isMad, mem, secret }, distance, bbox) {
     const { search, locale, onlyAreas = [] } = args
     const pokemonIds = Object.keys(Event.masterfile.pokemon).filter((pkmn) =>
       i18next.t(`poke_${pkmn}`, { lng: locale }).toLowerCase().includes(search),
@@ -578,6 +579,8 @@ class Pokemon extends Model {
     const query = this.query()
       .select(['pokemon_id', distance])
       .whereIn('pokemon_id', pokemonIds)
+      .whereBetween(isMad ? 'latitude' : 'lat', [bbox.minLat, bbox.maxLat])
+      .andWhereBetween(isMad ? 'longitude' : 'lon', [bbox.minLon, bbox.maxLon])
       .andWhere(
         isMad ? 'disappear_time' : 'expire_timestamp',
         '>=',
@@ -618,7 +621,15 @@ class Pokemon extends Model {
               latitude: args.lat,
               longitude: args.lon,
             },
-            limit: searchResultsLimit * 4,
+            min: {
+              latitude: bbox.minLat,
+              longitude: bbox.minLon,
+            },
+            max: {
+              latitude: bbox.maxLat,
+              longitude: bbox.maxLon,
+            },
+            limit: searchResultsLimit,
             searchIds: pokemonIds.map((id) => +id),
             global: {},
             filters: {},
@@ -627,11 +638,10 @@ class Pokemon extends Model {
       'POST',
       secret,
     )
+    if (!results) return []
     return results
       .filter(
-        (item, i) =>
-          i < searchResultsLimit &&
-          (!mem || filterRTree(item, perms.areaRestrictions, onlyAreas)),
+        (item) => !mem || filterRTree(item, perms.areaRestrictions, onlyAreas),
       )
       .map((poke) => ({
         ...poke,

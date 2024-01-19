@@ -218,3 +218,38 @@ export const raids = gql`
     }
   }
 `
+
+export const invasions = gql`
+  query SearchInvasions(
+    $search: String!
+    $category: String!
+    $lat: Float!
+    $lon: Float!
+    $locale: String!
+    $onlyAreas: [String]
+  ) {
+    searchInvasion(
+      search: $search
+      category: $category
+      lat: $lat
+      lon: $lon
+      locale: $locale
+      onlyAreas: $onlyAreas
+    ) {
+      id
+      name
+      lat
+      lon
+      distance
+      grunt_type
+      incident_expire_timestamp
+      confirmed
+      slot_1_pokemon_id
+      slot_1_form
+      slot_2_pokemon_id
+      slot_2_form
+      slot_3_pokemon_id
+      slot_3_form
+    }
+  }
+`

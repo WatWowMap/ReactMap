@@ -63,6 +63,54 @@ class Pokestop extends Model {
     return 'pokestop'
   }
 
+  /**
+   *
+   * @param {import('objection').QueryBuilder<Pokestop>} query
+   * @param {boolean} hasMultiInvasions
+   * @param {boolean} isMad
+   * @param {boolean} multiInvasionMs
+   */
+  static joinIncident(query, hasMultiInvasions, isMad, multiInvasionMs) {
+    if (hasMultiInvasions) {
+      if (isMad) {
+        query
+          .leftJoin('pokestop_incident', (join) => {
+            join
+              .on('pokestop.pokestop_id', '=', 'pokestop_incident.pokestop_id')
+              .andOn('incident_expiration', '>=', raw('UTC_TIMESTAMP()'))
+          })
+          .select([
+            'incident_id AS incidentId',
+            'pokestop_incident.character_display AS grunt_type',
+            'pokestop_incident.incident_display_type AS display_type',
+          ])
+      } else {
+        query
+          .leftJoin('incident', 'pokestop.id', 'incident.pokestop_id')
+          .select([
+            '*',
+            'pokestop.updated',
+            'pokestop.id AS id',
+            'incident.id AS incidentId',
+            raw(
+              multiInvasionMs
+                ? 'FLOOR(incident.updated_ms / 1000) AS incident_updated'
+                : 'incident.updated AS incident_updated',
+            ),
+            raw(
+              multiInvasionMs
+                ? 'FLOOR(incident.expiration_ms / 1000) AS incident_expire_timestamp'
+                : 'incident.expiration AS incident_expire_timestamp',
+            ),
+            'incident.character AS grunt_type',
+          ])
+      }
+    } else if (isMad) {
+      query.select('incident_grunt_type AS grunt_type')
+    }
+    return query
+  }
+
   static async getAll(
     perms,
     args,
@@ -137,43 +185,7 @@ class Pokestop extends Model {
     } else if (hideOldPokestops) {
       query.where('pokestop.updated', '>', ts - stopValidDataLimit * 86400)
     }
-    if (hasMultiInvasions) {
-      if (isMad) {
-        query
-          .leftJoin('pokestop_incident', (join) => {
-            join
-              .on('pokestop.pokestop_id', '=', 'pokestop_incident.pokestop_id')
-              .andOn('incident_expiration', '>=', raw('UTC_TIMESTAMP()'))
-          })
-          .select([
-            'incident_id AS incidentId',
-            'pokestop_incident.character_display AS grunt_type',
-            'pokestop_incident.incident_display_type AS display_type',
-          ])
-      } else {
-        query
-          .leftJoin('incident', 'pokestop.id', 'incident.pokestop_id')
-          .select([
-            '*',
-            'pokestop.updated',
-            'pokestop.id AS id',
-            'incident.id AS incidentId',
-            raw(
-              multiInvasionMs
-                ? 'FLOOR(incident.updated_ms / 1000) AS incident_updated'
-                : 'incident.updated AS incident_updated',
-            ),
-            raw(
-              multiInvasionMs
-                ? 'FLOOR(incident.expiration_ms / 1000) AS incident_expire_timestamp'
-                : 'incident.expiration AS incident_expire_timestamp',
-            ),
-            'incident.character AS grunt_type',
-          ])
-      }
-    } else if (isMad) {
-      query.select('incident_grunt_type AS grunt_type')
-    }
+    Pokestop.joinIncident(query, hasMultiInvasions, isMad, multiInvasionMs)
     query
       .whereBetween(isMad ? 'latitude' : 'lat', [args.minLat, args.maxLat])
       .andWhereBetween(isMad ? 'longitude' : 'lon', [args.minLon, args.maxLon])
@@ -1599,7 +1611,7 @@ class Pokestop extends Model {
     return quest
   }
 
-  static async search(perms, args, { isMad }, distance) {
+  static async search(perms, args, { isMad }, distance, bbox) {
     const { onlyAreas = [], search } = args
     const query = this.query()
       .select([
@@ -1610,6 +1622,8 @@ class Pokestop extends Model {
         isMad ? 'image AS url' : 'url',
         distance,
       ])
+      .whereBetween(isMad ? 'latitude' : 'lat', [bbox.minLat, bbox.maxLat])
+      .andWhereBetween(isMad ? 'longitude' : 'lon', [bbox.minLon, bbox.maxLon])
       .whereRaw(`LOWER(name) LIKE '%${search}%'`)
       .limit(searchResultsLimit)
       .orderBy('distance')
@@ -1619,10 +1633,15 @@ class Pokestop extends Model {
     return query
   }
 
-  static async searchQuests(perms, args, { isMad, hasAltQuests }, distance) {
+  static async searchQuests(
+    perms,
+    args,
+    { isMad, hasAltQuests },
+    distance,
+    bbox,
+  ) {
     const { search, onlyAreas = [], locale, lat, lon } = args
     const midnight = getUserMidnight({ lat, lon })
-
     const pokemonIds = Object.keys(Event.masterfile.pokemon).filter((pkmn) =>
       i18next
         .t(`poke_${pkmn}`, { lng: locale })
@@ -1666,6 +1685,8 @@ class Pokestop extends Model {
         'quest_title',
         'quest_target',
       ])
+      .whereBetween(isMad ? 'latitude' : 'lat', [bbox.minLat, bbox.maxLat])
+      .andWhereBetween(isMad ? 'longitude' : 'lon', [bbox.minLon, bbox.maxLon])
       .andWhere('quest_timestamp', '>=', midnight || 0)
       .andWhere((quests) => {
         if (pokemonIds.length === 1) {
@@ -1714,6 +1735,8 @@ class Pokestop extends Model {
           'alternative_quest_target',
           distance,
         ])
+        .whereBetween('lat', [bbox.minLat, bbox.maxLat])
+        .andWhereBetween('lon', [bbox.minLon, bbox.maxLon])
         .andWhere('alternative_quest_timestamp', '>=', midnight || 0)
         .andWhere((quests) => {
           if (pokemonIds.length === 1) {
@@ -1743,6 +1766,7 @@ class Pokestop extends Model {
     }
 
     const [withAr, withoutAr] = await Promise.all(queries)
+
     const mapped = withAr.map((q) => ({ ...q, with_ar: q.with_ar ?? true }))
     if (withoutAr) {
       const remapped = withoutAr.map((result) => ({
@@ -1759,7 +1783,7 @@ class Pokestop extends Model {
     }
 
     mapped.sort((a, b) => a.distance - b.distance)
-    mapped.length = searchResultsLimit
+    if (mapped.length > searchResultsLimit) mapped.length = searchResultsLimit
 
     return mapped
       .map((result) =>
@@ -1768,7 +1792,7 @@ class Pokestop extends Model {
       .filter(Boolean)
   }
 
-  static async searchLures(perms, args, { isMad }, distance) {
+  static async searchLures(perms, args, { isMad }, distance, bbox) {
     const { search, onlyAreas = [], locale } = args
     const ts = Math.floor(Date.now() / 1000)
 
@@ -1794,6 +1818,8 @@ class Pokestop extends Model {
           : 'lure_expire_timestamp',
         distance,
       ])
+      .whereBetween(isMad ? 'latitude' : 'lat', [bbox.minLat, bbox.maxLat])
+      .andWhereBetween(isMad ? 'longitude' : 'lon', [bbox.minLon, bbox.maxLon])
       .andWhere(
         isMad ? 'lure_expiration' : 'lure_expire_timestamp',
         '>=',
@@ -1807,6 +1833,87 @@ class Pokestop extends Model {
     }
     const results = await query
     return results
+  }
+
+  static async searchInvasions(
+    perms,
+    args,
+    { isMad, hasMultiInvasions, multiInvasionMs, hasConfirmed },
+    distance,
+    bbox,
+  ) {
+    const { search, onlyAreas = [], locale } = args
+    const ts = Math.floor(Date.now() / 1000)
+
+    const invasions = Object.keys(Event.invasions).filter((invasion) =>
+      i18next
+        .t(`grunt_${invasion}`, { lng: locale })
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .toLowerCase()
+        .includes(search),
+    )
+    const validMons = new Set(
+      Event.available.pokestops.filter((a) => a.startsWith('a')),
+    )
+    const pokemonIds = Object.keys(Event.masterfile.pokemon)
+      .filter(
+        (pkmn) =>
+          i18next
+            .t(`poke_${pkmn}`, { lng: locale })
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '')
+            .toLowerCase()
+            .includes(search) &&
+          (validMons.has(`a${pkmn}-0`) ||
+            Object.keys(Event.masterfile.pokemon[pkmn].forms || {}).some(
+              (form) => validMons.has(`a${pkmn}-${form}`),
+            )),
+      )
+      .map((x) => +x)
+    if (!invasions.length && !pokemonIds.length) {
+      return []
+    }
+    const query = this.query()
+      .whereBetween(isMad ? 'latitude' : 'lat', [bbox.minLat, bbox.maxLat])
+      .andWhereBetween(isMad ? 'longitude' : 'lon', [bbox.minLon, bbox.maxLon])
+      .limit(searchResultsLimit)
+      .orderBy('distance')
+
+    Pokestop.joinIncident(query, hasMultiInvasions, isMad, multiInvasionMs)
+    query.select(distance)
+
+    if (isMad) {
+      query.whereRaw('incident_expiration > UTC_TIMESTAMP()')
+    } else {
+      query.andWhere('expiration', '>=', ts)
+    }
+    if (invasions.length) {
+      query.whereIn(isMad ? 'character_display' : 'character', invasions)
+    }
+    if (hasConfirmed && pokemonIds.length) {
+      query.where((subQuery) => {
+        subQuery
+          .whereIn('slot_1_pokemon_id', pokemonIds)
+          .orWhereIn('slot_2_pokemon_id', pokemonIds)
+          .orWhereIn('slot_3_pokemon_id', pokemonIds)
+      })
+    }
+    if (!getAreaSql(query, perms.areaRestrictions, onlyAreas, isMad)) {
+      return []
+    }
+    const results = await query
+    return pokemonIds.length
+      ? results.filter(({ grunt_type }) =>
+          ['first', 'second', 'third'].some(
+            (pos) =>
+              Event.invasions[grunt_type]?.[`${pos}Reward`] &&
+              Event.invasions[grunt_type]?.encounters[pos]?.some((pkmn) =>
+                pokemonIds.includes(pkmn.id),
+              ),
+          ),
+        )
+      : results
   }
 
   static getOne(id, { isMad }) {

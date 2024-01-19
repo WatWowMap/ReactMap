@@ -1,9 +1,14 @@
+/* eslint-disable no-await-in-loop */
 const { knex } = require('knex')
 const { raw } = require('objection')
 const extend = require('extend')
 const config = require('@rm/config')
 
 const { log, HELPERS } = require('@rm/logger')
+const { getBboxFromCenter } = require('./functions/getBbox')
+
+const softLimit = config.getSafe('api.searchSoftKmLimit')
+const hardLimit = config.getSafe('api.searchHardKmLimit')
 
 /**
  * @type {import("@rm/types").DbCheckClass}
@@ -434,19 +439,70 @@ module.exports = class DbCheck {
    * @returns {Promise<T[]>}
    */
   async search(model, perms, args, method = 'search') {
-    const data = await Promise.all(
-      this.models[model].map(async ({ SubModel, ...source }) =>
-        SubModel[method](
-          perms,
-          args,
-          source,
-          this.getDistance(args, source.isMad),
+    let deDuped = []
+    let count = 0
+    let distance = softLimit
+    const max = model === 'Pokemon' ? hardLimit / 2 : hardLimit
+    const startTime = Date.now()
+    while (deDuped.length < this.searchLimit) {
+      const loopTime = Date.now()
+      count += 1
+      const bbox = getBboxFromCenter(args.lat, args.lon, distance)
+      const data = await Promise.all(
+        this.models[model].map(async ({ SubModel, ...source }) =>
+          SubModel[method](
+            perms,
+            args,
+            source,
+            this.getDistance(args, source.isMad),
+            bbox,
+          ),
         ),
-      ),
-    )
-    const deDuped = DbCheck.deDupeResults(data).sort(
-      (a, b) => a.distance - b.distance,
-    )
+      )
+      const results = DbCheck.deDupeResults(data)
+      if (results.length > deDuped.length) {
+        deDuped = results
+      }
+      log.debug(
+        HELPERS.db,
+        'Search attempt #',
+        count,
+        '| received:',
+        deDuped.length,
+        '| distance:',
+        distance,
+        '| time:',
+        +((Date.now() - loopTime) / 1000).toFixed(2),
+      )
+      if (
+        deDuped.length >= this.searchLimit * 0.5 ||
+        distance >= max ||
+        Date.now() - startTime > 2_000
+      ) {
+        break
+      }
+      if (deDuped.length === 0) {
+        distance += softLimit * 4
+      } else if (deDuped.length < this.searchLimit / 4) {
+        distance += softLimit * 2
+      } else {
+        distance += softLimit
+      }
+      distance = Math.min(distance, max)
+    }
+    if (count > 1) {
+      log.info(
+        HELPERS.search,
+        'Searched',
+        count,
+        '| received:',
+        deDuped.length,
+        `results for ${method} on model ${model}`,
+        '| time:',
+        +((Date.now() - startTime) / 1000).toFixed(2),
+      )
+    }
+    deDuped.sort((a, b) => a.distance - b.distance)
     if (deDuped.length > this.searchLimit) {
       deDuped.length = this.searchLimit
     }

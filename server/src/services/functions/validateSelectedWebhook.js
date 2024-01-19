@@ -1,7 +1,7 @@
 // @ts-check
 /**
  *
- * @param {import("@rm/types").User} user
+ * @param {import("@rm/types").ExpressUser} user
  * @param {import("@rm/types").GqlContext['Db']} Db
  * @param {import("@rm/types").GqlContext['Event']} Event
  */

@@ -443,6 +443,16 @@ const resolvers = {
       }
       return []
     },
+    searchInvasion: (_, args, { perms, Db }) => {
+      const { category, search } = args
+      if (perms?.[category] && /^[0-9\s\p{L}]+$/u.test(search)) {
+        if (!search || !search.trim()) {
+          return []
+        }
+        return Db.search('Pokestop', perms, args, 'searchInvasions')
+      }
+      return []
+    },
     searchLure: (_, args, { perms, Db }) => {
       const { category, search } = args
       if (perms?.[category] && /^[0-9\s\p{L}]+$/u.test(search)) {
@@ -465,7 +475,7 @@ const resolvers = {
     },
     searchable: (_, __, { perms }) => {
       const options = config.getSafe('api.searchable')
-      return Object.keys(options).filter((k) => options[k] && perms[k])
+      return Object.keys(options).filter((k) => perms[k] && options[k])
     },
     spawnpoints: (_, args, { perms, Db }) => {
       if (perms?.spawnpoints) {
