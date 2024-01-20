@@ -287,7 +287,7 @@ async function scannerApi(
                   `https://user-images.githubusercontent.com/58572875/167069223-745a139d-f485-45e3-a25c-93ec4d09779c.png`,
               },
               timestamp: new Date(),
-              description: `<@${user.discordId}>\n${capitalized} Size: ${data.scanSize}\nCoordinates: ${coords.length}\n`,
+              description: `<@${user.discordId}> ${new Date().toLocaleTimeString('en-US', { hour12: false })}\n${capitalized} Size: ${data.scanSize}\nCoordinates: ${coords.length}\n`,
               fields: [
                 {
                   name: `User History`,
