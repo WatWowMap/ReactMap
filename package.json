@@ -205,7 +205,7 @@
     "prettier": "^2.8.8",
     "rollup-plugin-delete": "^2.0.0",
     "semantic-release": "^19.0.5",
-    "vite": "4.3.9",
+    "vite": "4.5.2",
     "vite-plugin-checker": "0.6.0",
     "vite-plugin-static-copy": "0.16.0"
   },
