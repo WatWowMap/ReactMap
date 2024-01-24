@@ -12,7 +12,7 @@ const localePlugin = (isDevelopment) => ({
   async buildStart() {
     if (!isDevelopment) return
     const localeObj = await create()
-    await writeAll(localeObj, true, __dirname, './public/locales')
+    await writeAll(localeObj, true, __dirname, '../../../public/locales')
   },
   async generateBundle() {
     if (isDevelopment) return
