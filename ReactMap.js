@@ -1,6 +1,4 @@
 /* eslint-disable import/no-extraneous-dependencies */
-/* eslint-disable import/extensions */
-
 const { build } = require('vite')
 
 const { log, HELPERS } = require('@rm/logger')

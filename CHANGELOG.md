@@ -1,3 +1,11 @@
+# [1.29.0-develop.13](https://github.com/WatWowMap/ReactMap/compare/v1.29.0-develop.12...v1.29.0-develop.13) (2024-01-24)
+
+
+### Bug Fixes
+
+* favicon in dev ([353a7aa](https://github.com/WatWowMap/ReactMap/commit/353a7aa5e21c01d2ae5a4a59e3a1f7f8afb490ba))
+* locale dest ([8dd94c9](https://github.com/WatWowMap/ReactMap/commit/8dd94c90b112194c37403b9823171890c4d8580f))
+
 # [1.29.0-develop.12](https://github.com/WatWowMap/ReactMap/compare/v1.29.0-develop.11...v1.29.0-develop.12) (2024-01-24)
 
 

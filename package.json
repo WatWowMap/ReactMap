@@ -1,6 +1,6 @@
 {
   "name": "reactmap",
-  "version": "1.29.0-develop.12",
+  "version": "1.29.0-develop.13",
   "private": true,
   "description": "React based frontend map.",
   "license": "MIT",
@@ -180,14 +180,15 @@
     "@commitlint/cli": "^17.2.0",
     "@commitlint/config-conventional": "^17.2.0",
     "@rm/types": "*",
+    "@rm/vite-plugins": "*",
     "@semantic-release/changelog": "^6.0.1",
     "@semantic-release/git": "^10.0.1",
-    "@sentry/vite-plugin": "2.2.1",
+    "@sentry/vite-plugin": "2.10.3",
     "@types/dlv": "^1.1.2",
     "@types/node": "^18",
     "@types/react": "^18.2.20",
     "@types/react-dom": "^18.0.9",
-    "@vitejs/plugin-react": "4.0.0",
+    "@vitejs/plugin-react": "4.2.1",
     "commitizen": "^4.2.5",
     "cz-conventional-commit": "^1.0.6",
     "eslint": "^8.44.0",
@@ -205,9 +206,8 @@
     "prettier": "^2.8.8",
     "rollup-plugin-delete": "^2.0.0",
     "semantic-release": "^19.0.5",
-    "vite": "4.5.2",
-    "vite-plugin-checker": "0.6.0",
-    "vite-plugin-static-copy": "0.16.0"
+    "vite": "5.0.12",
+    "vite-plugin-checker": "0.6.0"
   },
   "engines": {
     "node": ">=18",
