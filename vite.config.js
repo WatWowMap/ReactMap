@@ -5,82 +5,22 @@
 const { defineConfig, loadEnv } = require('vite')
 const { default: react } = require('@vitejs/plugin-react')
 const { default: checker } = require('vite-plugin-checker')
-const { viteStaticCopy } = require('vite-plugin-static-copy')
 const removeFiles = require('rollup-plugin-delete')
-const { join, resolve, extname } = require('path')
+const { resolve } = require('path')
 const fs = require('fs')
 const { sentryVitePlugin } = require('@sentry/vite-plugin')
 
 const config = require('@rm/config')
 const { log, HELPERS } = require('@rm/logger')
-const { create, writeAll, locales } = require('@rm/locales')
+const { locales } = require('@rm/locales')
+const {
+  faviconPlugin,
+  customFilePlugin,
+  localePlugin,
+  muteWarningsPlugin,
+} = require('@rm/vite-plugins')
 
-/**
- * @param {boolean} isDevelopment
- * @returns {import('vite').Plugin}
- */
-const customFilePlugin = (isDevelopment) => {
-  const fileRegex = /\.(jsx?|css)$/
-  const customPaths = []
-  return {
-    name: 'vite-plugin-custom-file-checker',
-    load(id) {
-      if (fileRegex.test(id) && !/node_modules/.test(id)) {
-        const ext = extname(id)
-        const newPath = id.replace(ext, `.custom${ext}`)
-        if (fs.existsSync(newPath)) {
-          customPaths.push(newPath)
-          return {
-            code: fs.readFileSync(newPath, 'utf8'),
-            map: null,
-          }
-        }
-      }
-    },
-    buildEnd() {
-      if (customPaths.length && !isDevelopment) {
-        log.warn(`
-======================================================
-             WARNING:
-Custom files aren't officially supported
-Be sure to watch for breaking changes!
-
-${customPaths.map((x, i) => ` ${i + 1}. src/${x.split('src/')[1]}`).join('\n')}
-
-======================================================
-`)
-      }
-    },
-  }
-}
-
-/**
- * @param {boolean} isDevelopment
- * @returns {import('vite').Plugin}
- */
-const localePlugin = (isDevelopment) => ({
-  name: 'vite-plugin-locales',
-  async buildStart() {
-    if (!isDevelopment) return
-    const localeObj = await create()
-    await writeAll(localeObj, true, __dirname, './public/locales')
-  },
-  async generateBundle() {
-    if (isDevelopment) return
-    const localeObj = await create()
-
-    Object.entries(localeObj).forEach(([locale, translations]) => {
-      const fileName = join('locales', locale, 'translation.json')
-      this.emitFile({
-        type: 'asset',
-        fileName,
-        source: JSON.stringify(translations),
-      })
-    })
-  },
-})
-
-const viteConfig = defineConfig(async ({ mode }) => {
+const viteConfig = defineConfig(({ mode }) => {
   const env = loadEnv(mode, resolve(process.cwd(), './'), '')
   const isRelease = process.argv.includes('-r')
   const isDevelopment = mode === 'development'
@@ -141,17 +81,6 @@ const viteConfig = defineConfig(async ({ mode }) => {
           ]
         : []),
       ...(hasCustom ? [customFilePlugin(isDevelopment)] : []),
-      viteStaticCopy({
-        targets: [
-          {
-            src: fs.existsSync(resolve(__dirname, 'public/favicon/favicon.ico'))
-              ? resolve(__dirname, 'public/favicon/favicon.ico')
-              : resolve(__dirname, 'public/favicon/fallback.ico'),
-            dest: '.',
-            rename: 'favicon.ico',
-          },
-        ],
-      }),
       ...(sentry.authToken && sentry.org && sentry.project
         ? [
             sentryVitePlugin({
@@ -162,6 +91,10 @@ const viteConfig = defineConfig(async ({ mode }) => {
           ]
         : []),
       localePlugin(isDevelopment),
+      faviconPlugin(),
+      muteWarningsPlugin([
+        ['SOURCEMAP_ERROR', "Can't resolve original location of error"],
+      ]),
     ],
     optimizeDeps: isDevelopment ? { exclude: ['@mui/*'] } : undefined,
     publicDir: 'public',
