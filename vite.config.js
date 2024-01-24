@@ -91,7 +91,7 @@ const viteConfig = defineConfig(({ mode }) => {
           ]
         : []),
       localePlugin(isDevelopment),
-      faviconPlugin(),
+      faviconPlugin(isDevelopment),
       muteWarningsPlugin([
         ['SOURCEMAP_ERROR', "Can't resolve original location of error"],
       ]),
