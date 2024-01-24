@@ -1,3 +1,25 @@
+# [1.29.0-develop.12](https://github.com/WatWowMap/ReactMap/compare/v1.29.0-develop.11...v1.29.0-develop.12) (2024-01-24)
+
+
+### Bug Fixes
+
+* add search log tag ([fbb781a](https://github.com/WatWowMap/ReactMap/commit/fbb781add772d3d91acc039d82264523d8e55f21))
+* add time log ([3acfef4](https://github.com/WatWowMap/ReactMap/commit/3acfef4bf14ddcaec7163dde943abdcf239f7371))
+* caching ([bb74b24](https://github.com/WatWowMap/ReactMap/commit/bb74b2409db441031884d1959e6a1030b592c316))
+* compare array sizes before updating ([b088b7b](https://github.com/WatWowMap/ReactMap/commit/b088b7b2d2af2aaccbcd9b9808772b0b2e6eb312))
+* don't always have to hit the limit ([39ac769](https://github.com/WatWowMap/ReactMap/commit/39ac7690806dbedf5424515870beda64c0cb229a))
+* more limit adjustments ([6e6bbff](https://github.com/WatWowMap/ReactMap/commit/6e6bbffc162df7bbc54c9c98b546bfe3698d25a0))
+* more pokemon search refinements ([8fa91e1](https://github.com/WatWowMap/ReactMap/commit/8fa91e1691b8c52f83e7a9ce39aaafab5a5822a8))
+* remove unused ([a0d1e6c](https://github.com/WatWowMap/ReactMap/commit/a0d1e6c18f2533ac2220618ef6dce31f57949c9a))
+* searchable ([8f11741](https://github.com/WatWowMap/ReactMap/commit/8f117412c5f4e9ef5588332472d21d6f20169e76))
+* showing feedback ([50b06c3](https://github.com/WatWowMap/ReactMap/commit/50b06c3553d69539bab59e7a5c7e449984151dbe))
+* slightly more aggressive additions when there's 0 ([d062e52](https://github.com/WatWowMap/ReactMap/commit/d062e5219830039e1ae381e879c890293dd67f3f))
+
+
+### Features
+
+* invasion searching ([63549eb](https://github.com/WatWowMap/ReactMap/commit/63549eb284c72ac71e4201dff4efd84b3614e6f7))
+
 # [1.29.0-develop.11](https://github.com/WatWowMap/ReactMap/compare/v1.29.0-develop.10...v1.29.0-develop.11) (2024-01-19)
 
 
