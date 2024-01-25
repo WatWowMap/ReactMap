@@ -1,8 +1,6 @@
 // @ts-check
-const config = require('@rm/config')
-
 const BaseFilter = require('../Base')
-const { Event } = require('../../initialization')
+const { Event, Db } = require('../../initialization')
 
 /**
  *
@@ -72,7 +70,7 @@ function buildPokestops(perms, defaults) {
       }
       if (
         avail.startsWith('a') &&
-        config.getSafe('map.misc.enableConfirmedInvasions')
+        Db.filterContext.Pokestop.hasConfirmedInvasions
       ) {
         quests[avail] = new BaseFilter(defaults.invasionPokemon)
       }

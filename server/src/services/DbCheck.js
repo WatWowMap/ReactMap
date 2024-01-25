@@ -44,6 +44,7 @@ module.exports = class DbCheck {
     this.historical = getCache('historical.json', {})
     this.filterContext = getCache('filterContext.json', {
       Route: { maxDistance: 0, maxDuration: 0 },
+      Pokestop: { hasConfirmedInvasions: false },
     })
     this.reactMapDb = null
     this.connections = config
@@ -627,8 +628,8 @@ module.exports = class DbCheck {
    * Builds filter context for all models
    */
   async getFilterContext() {
-    try {
-      if (this.models.Route) {
+    if (this.models.Route) {
+      try {
         const results = await Promise.all(
           this.models.Route.map(({ SubModel, ...source }) =>
             SubModel.getFilterContext(source),
@@ -642,12 +643,22 @@ module.exports = class DbCheck {
         )
         log.info(HELPERS.db, 'Updating filter context for routes')
         await setCache('filterContext.json', this.filterContext)
+      } catch (e) {
+        log.error(
+          HELPERS.db,
+          'If you are using RDM, you likely do not have a routes table. Remove `route` from the `useFor` array in your config',
+          e,
+        )
       }
-    } catch (e) {
-      log.error(
-        HELPERS.db,
-        'If you are using RDM, you likely do not have a routes table. Remove `route` from the `useFor` array in your config',
-        e,
+    }
+    if (this.models.Pokestop) {
+      const results = await Promise.all(
+        this.models.Pokestop.map(({ SubModel, ...source }) =>
+          SubModel.getFilterContext(source),
+        ),
+      )
+      this.filterContext.Pokestop.hasConfirmedInvasions = results.some(
+        (result) => result.hasConfirmedInvasions,
       )
     }
   }

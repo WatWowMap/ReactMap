@@ -235,7 +235,6 @@
       "enableTutorial": true,
       "enableUserProfile": true,
       "enableQuestSetSelector": true,
-      "enableConfirmedInvasions": false,
       "noScanAreaOverlay": false,
       "scanAreaMenuHeight": 400,
       "permImageDir": "images/perms",

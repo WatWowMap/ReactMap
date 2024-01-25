@@ -230,7 +230,9 @@ const QuestSet = React.memo(BaseQuestSet)
 
 const BaseInvasion = () => {
   const enabled = useStorage((s) => !!s.filters?.pokestops?.invasions)
-  const hasConfirmed = useMemory((s) => s.config.misc.enableConfirmedInvasions)
+  const hasConfirmed = useMemory((s) =>
+    s.available.pokestops.some((x) => x.startsWith('a')),
+  )
   return (
     <CollapsibleItem open={enabled}>
       {hasConfirmed && (

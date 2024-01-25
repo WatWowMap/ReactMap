@@ -1968,6 +1968,21 @@ class Pokestop extends Model {
 
     return results.filter((x) => x.enabled && !x.deleted)
   }
+
+  /**
+   * returns pokestop context
+   * @param {import('@rm/types').DbContext} ctx
+   * @returns {Promise<{ hasConfirmedInvasions: boolean }>}
+   */
+  static async getFilterContext({ isMad, hasConfirmed }) {
+    if (isMad || !hasConfirmed) return { hasConfirmedInvasions: false }
+    const result = await this.query()
+      .from('incident')
+      .count('id', { as: 'total' })
+      .where('confirmed', 1)
+      .first()
+    return { hasConfirmedInvasions: result.total > 0 }
+  }
 }
 
 module.exports = Pokestop

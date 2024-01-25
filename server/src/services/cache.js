@@ -17,6 +17,11 @@ const getCache = (fileName, fallback = null) => {
     const data = JSON.parse(
       fs.readFileSync(path.resolve(CACHE_DIR, fileName), 'utf-8'),
     )
+    if (fallback) {
+      Object.entries(fallback).forEach(([key, value]) => {
+        if (!(key in data)) data[key] = value
+      })
+    }
     log.info(HELPERS.cache, 'Loaded', fileName)
     return data
   } catch (e) {

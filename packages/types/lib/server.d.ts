@@ -106,6 +106,7 @@ export interface DbCheckClass {
   reactMapDb: null | number
   filterContext: {
     Route: { maxDistance: number; maxDuration: number }
+    Pokestop: { hasConfirmedInvasions: boolean }
   }
 }
 
