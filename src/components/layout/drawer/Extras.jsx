@@ -5,7 +5,6 @@ import * as React from 'react'
 import Box from '@mui/material/Box'
 import ListItem from '@mui/material/ListItem'
 import ListItemText from '@mui/material/ListItemText'
-import ListItemIcon from '@mui/material/ListItemIcon'
 import Select from '@mui/material/Select'
 import MenuItem from '@mui/material/MenuItem'
 import { useTranslation } from 'react-i18next'
@@ -26,7 +25,6 @@ import SliderTile from '../dialogs/filters/SliderTile'
 import { CollapsibleItem } from './CollapsibleItem'
 import { MultiSelectorList, SelectorListMemo } from './SelectorList'
 import { BoolToggle } from './BoolToggle'
-import { Img } from '../general/Img'
 
 const BaseNestSlider = () => {
   const slider = useMemory((s) => s.ui.nests?.sliders?.secondary?.[0])
@@ -275,21 +273,8 @@ const BaseInvasion = () => {
 }
 const Invasion = React.memo(BaseInvasion)
 
-/** @param {{ id: string }} props */
-const IndividualEvent = ({ id }) => {
-  const { t } = useTranslation()
-  const src = useMemory((s) => s.Icons.getIconById(id))
-  const label = t(`display_type_${id.slice(1)}`)
-  return (
-    <BoolToggle field={`filters.pokestops.filter.${id}.enabled`} label={label}>
-      <ListItemIcon sx={{ justifyContent: 'center' }}>
-        <Img src={src} alt={label} maxHeight={30} maxWidth={30} />
-      </ListItemIcon>
-    </BoolToggle>
-  )
-}
-const ShowcaseQuickSelect = () => {
-  const enabled = useStorage((s) => !!s.filters?.pokestops?.filter?.b9?.enabled)
+const BaseEventStops = () => {
+  const enabled = useStorage((s) => !!s.filters?.pokestops?.eventStops)
   return (
     <CollapsibleItem open={enabled}>
       <Box px={2}>
@@ -299,20 +284,6 @@ const ShowcaseQuickSelect = () => {
           height={175}
         />
       </Box>
-    </CollapsibleItem>
-  )
-}
-const BaseEventStops = () => {
-  const available = useMemory((s) => s.available.pokestops)
-  const enabled = useStorage((s) => !!s.filters?.pokestops?.eventStops)
-  return (
-    <CollapsibleItem open={enabled}>
-      {available
-        ?.filter((event) => event.startsWith('b'))
-        .map((event) => (
-          <IndividualEvent key={event} id={event} />
-        ))}
-      <ShowcaseQuickSelect />
     </CollapsibleItem>
   )
 }

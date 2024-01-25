@@ -1320,6 +1320,7 @@ class Pokestop extends Model {
             '>=',
             ts * (multiInvasionMs ? 1000 : 1),
           )
+          .andWhereNot('incident.display_type', 9)
           .groupBy('incident.character', 'incident.display_type')
           .orderBy('incident.character', 'incident.display_type')
       }
@@ -1334,6 +1335,7 @@ class Pokestop extends Model {
         .distinct(isMad ? 'incident_grunt_type AS grunt_type' : 'grunt_type')
         .where(isMad ? 'incident_grunt_type' : 'grunt_type', '>', 0)
         .andWhere('incident_expire_timestamp', '>=', ts)
+        .andWhereNot('incident.display_type', 9)
         .orderBy('grunt_type')
     }
     if (isMad && !hasMultiInvasions) {
