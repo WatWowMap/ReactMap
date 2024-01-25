@@ -428,8 +428,6 @@ const BaseLureQuickSelector = () => {
 const LureQuickSelector = React.memo(BaseLureQuickSelector)
 
 function Extras({ category, subItem }) {
-  const { enableQuestSetSelector } = useMemory.getState().config.misc
-
   switch (category) {
     case 'nests':
       return subItem === 'sliders' ? (
@@ -444,7 +442,7 @@ function Extras({ category, subItem }) {
         case 'allPokestops':
           return <AllForts category={category} subItem={subItem} />
         case 'quests':
-          return enableQuestSetSelector ? <QuestSet /> : null
+          return <QuestSet />
         case 'invasions':
           return <Invasion />
         case 'eventStops':

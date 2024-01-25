@@ -13,7 +13,6 @@ const {
   stopValidDataLimit,
   hideOldPokestops,
 } = config.getSafe('api')
-const map = config.getSafe('map')
 
 const questProps = {
   quest_type: true,
@@ -812,8 +811,7 @@ class Pokestop extends Model {
         pokestop.quests.forEach((quest) => {
           if (
             quest.quest_reward_type &&
-            (!map.misc.enableQuestSetSelector ||
-              filters.onlyShowQuestSet === 'both' ||
+            (filters.onlyShowQuestSet === 'both' ||
               (filters.onlyShowQuestSet === 'with_ar' && quest.with_ar) ||
               (filters.onlyShowQuestSet === 'without_ar' && !quest.with_ar))
           ) {
