@@ -1,3 +1,15 @@
+# [1.29.0-develop.15](https://github.com/WatWowMap/ReactMap/compare/v1.29.0-develop.14...v1.29.0-develop.15) (2024-01-25)
+
+
+### Bug Fixes
+
+* types ([360f87c](https://github.com/WatWowMap/ReactMap/commit/360f87c8c03077ef6da583dc36ddb98600ad04ee))
+
+
+### Features
+
+* cache all remote data for quicker startup ([befbc13](https://github.com/WatWowMap/ReactMap/commit/befbc13994a93c407dd4632c035758bcd0e5a64d))
+
 # [1.29.0-develop.14](https://github.com/WatWowMap/ReactMap/compare/v1.29.0-develop.13...v1.29.0-develop.14) (2024-01-25)
 
 
