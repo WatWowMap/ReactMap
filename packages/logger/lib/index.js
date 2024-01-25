@@ -14,6 +14,7 @@ const HELPERS = /** @type {const} */ ({
   info: chalk.blue('ℹ'),
   warn: chalk.yellow('⚠'),
   error: chalk.red('✖'),
+
   telegram: chalk.hex('#26A8EA')('[TELEGRAM]'),
   discord: chalk.hex('#7289da')('[DISCORD]'),
   cache: chalk.blueBright('[CACHE]'),

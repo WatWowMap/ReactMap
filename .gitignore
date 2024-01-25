@@ -84,3 +84,7 @@ src/**/*.custom.css
 server/src/models/queries/*
 /logs/*
 !/logs/.gitkeep
+
+# Cache
+server/.cache/*
+!/server/.cache/.gitkeep

@@ -3,14 +3,14 @@ const router = require('express').Router()
 
 const config = require('@rm/config')
 const { log, HELPERS } = require('@rm/logger')
-const getAreas = require('../../../services/areas')
+const { loadLatestAreas } = require('../../../services/areas')
 
 const reactMapSecret = config.getSafe('api.reactMapSecret')
 
 router.get('/reload', async (req, res) => {
   try {
     if (reactMapSecret && req.headers['react-map-secret'] === reactMapSecret) {
-      const newAreas = await getAreas()
+      const newAreas = await loadLatestAreas()
       config.areas = newAreas
 
       res.status(200).json({ status: 'ok', message: 'reloaded areas' })
