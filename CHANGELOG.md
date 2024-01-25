@@ -1,3 +1,10 @@
+# [1.29.0-develop.14](https://github.com/WatWowMap/ReactMap/compare/v1.29.0-develop.13...v1.29.0-develop.14) (2024-01-25)
+
+
+### Bug Fixes
+
+* vite config for `yarn start` ([1b1ea4a](https://github.com/WatWowMap/ReactMap/commit/1b1ea4a874d1828c8f672275f85ab26accae38b6))
+
 # [1.29.0-develop.13](https://github.com/WatWowMap/ReactMap/compare/v1.29.0-develop.12...v1.29.0-develop.13) (2024-01-24)
 
 
