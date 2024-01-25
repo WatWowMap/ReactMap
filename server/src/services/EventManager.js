@@ -338,7 +338,7 @@ class EventManager {
   async getMasterfile(historical, dbRarity) {
     log.info(HELPERS.event, 'Fetching Latest Masterfile')
     try {
-      const newMf = await generate(false, historical, dbRarity)
+      const newMf = await generate(true, historical, dbRarity)
       this.masterfile = newMf ?? this.masterfile
       this.addAvailable()
     } catch (e) {
