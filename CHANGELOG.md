@@ -1,3 +1,10 @@
+# [1.29.0-develop.16](https://github.com/WatWowMap/ReactMap/compare/v1.29.0-develop.15...v1.29.0-develop.16) (2024-01-25)
+
+
+### Bug Fixes
+
+* always save new masterfile ([2f80d2c](https://github.com/WatWowMap/ReactMap/commit/2f80d2cff04df027d6bbef065c4a1bcc79ce2c35))
+
 # [1.29.0-develop.15](https://github.com/WatWowMap/ReactMap/compare/v1.29.0-develop.14...v1.29.0-develop.15) (2024-01-25)
 
 
