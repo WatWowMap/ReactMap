@@ -140,7 +140,7 @@ const loadScanPolygons = async (fileName, domain) => {
  */
 const loadAreas = (scanAreas) => {
   try {
-    /** @type {ReturnType<typeof loadAreas>} */
+    /** @type {import("@rm/types").RMGeoJSON} */
     const normalized = { type: 'FeatureCollection', features: [] }
     Object.values(scanAreas).forEach((area) => {
       if (area?.features.length) {
