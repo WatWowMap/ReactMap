@@ -1,6 +1,7 @@
 // @ts-check
 const config = require('@rm/config')
 
+const { Db } = require('../../initialization')
 const buildPokemon = require('./pokemon')
 const buildPokestops = require('./pokestop')
 const buildGyms = require('./gym')
@@ -26,12 +27,10 @@ const custom = new PokemonFilter(
 )
 
 /**
- *
  * @param {import("@rm/types").Permissions} perms
- * @param {import("@rm/types").DbCheckClass} database
  * @returns
  */
-function buildDefaultFilters(perms, database) {
+function buildDefaultFilters(perms) {
   const stopReducer =
     perms.pokestops || perms.lures || perms.quests || perms.invasions
   const gymReducer = perms.gyms || perms.raids
@@ -40,7 +39,7 @@ function buildDefaultFilters(perms, database) {
 
   return {
     gyms:
-      gymReducer && database.models.Gym
+      gymReducer && Db.models.Gym
         ? {
             enabled: defaultFilters.gyms.enabled,
             allGyms: perms.gyms ? defaultFilters.gyms.enabled : undefined,
@@ -62,7 +61,7 @@ function buildDefaultFilters(perms, database) {
           }
         : undefined,
     nests:
-      perms.nests && database.models.Nest
+      perms.nests && Db.models.Nest
         ? {
             enabled: defaultFilters.nests.enabled,
             pokemon: defaultFilters.nests.pokemon,
@@ -73,7 +72,7 @@ function buildDefaultFilters(perms, database) {
           }
         : undefined,
     pokestops:
-      stopReducer && database.models.Pokestop
+      stopReducer && Db.models.Pokestop
         ? {
             enabled: defaultFilters.pokestops.enabled,
             allPokestops: perms.pokestops
@@ -104,7 +103,7 @@ function buildDefaultFilters(perms, database) {
           }
         : undefined,
     pokemon:
-      perms.pokemon && database.models.Pokemon
+      perms.pokemon && Db.models.Pokemon
         ? {
             enabled: defaultFilters.pokemon.enabled,
             easyMode: defaultFilters.pokemon.easyMode,
@@ -126,12 +125,12 @@ function buildDefaultFilters(perms, database) {
           }
         : undefined,
     routes:
-      perms.routes && database.models.Route
+      perms.routes && Db.models.Route
         ? {
             enabled: defaultFilters.routes.enabled,
             distance: [
               0,
-              Math.ceil(database.filterContext.Route.maxDistance / 1000) + 1,
+              Math.ceil(Db.filterContext.Route.maxDistance / 1000) + 1,
             ],
             standard: new BaseFilter(),
             filter: {
@@ -140,7 +139,7 @@ function buildDefaultFilters(perms, database) {
           }
         : undefined,
     portals:
-      perms.portals && database.models.Portal
+      perms.portals && Db.models.Portal
         ? {
             enabled: defaultFilters.portals.enabled,
             standard: new BaseFilter(),
@@ -160,7 +159,7 @@ function buildDefaultFilters(perms, database) {
         }
       : undefined,
     submissionCells:
-      perms.submissionCells && database.models.Pokestop && database.models.Gym
+      perms.submissionCells && Db.models.Pokestop && Db.models.Gym
         ? {
             enabled: defaultFilters.submissionCells.enabled,
             rings: defaultFilters.submissionCells.rings,
@@ -180,7 +179,7 @@ function buildDefaultFilters(perms, database) {
         }
       : undefined,
     weather:
-      perms.weather && database.models.Weather
+      perms.weather && Db.models.Weather
         ? {
             enabled: defaultFilters.weather.enabled,
             standard: new BaseFilter(),
@@ -188,7 +187,7 @@ function buildDefaultFilters(perms, database) {
           }
         : undefined,
     spawnpoints:
-      perms.spawnpoints && database.models.Spawnpoint
+      perms.spawnpoints && Db.models.Spawnpoint
         ? {
             enabled: defaultFilters.spawnpoints.enabled,
             standard: new BaseFilter(),
@@ -201,7 +200,7 @@ function buildDefaultFilters(perms, database) {
           }
         : undefined,
     scanCells:
-      perms.scanCells && database.models.ScanCell
+      perms.scanCells && Db.models.ScanCell
         ? {
             enabled: defaultFilters.scanCells.enabled,
             standard: new BaseFilter(),
@@ -209,7 +208,7 @@ function buildDefaultFilters(perms, database) {
           }
         : undefined,
     devices:
-      perms.devices && database.models.Device
+      perms.devices && Db.models.Device
         ? {
             enabled: defaultFilters.devices.enabled,
             standard: new BaseFilter(),

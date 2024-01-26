@@ -1,8 +1,5 @@
 // @ts-check
-/* eslint-disable no-restricted-syntax */
-const config = require('@rm/config')
-
-const { Event } = require('../../initialization')
+const { Event, Db } = require('../../initialization')
 const BaseFilter = require('../Base')
 
 /**
@@ -33,20 +30,22 @@ function buildPokemon(defaults, base, custom) {
       .map((e) => e.split('-')[1]),
   ])
 
-  for (const [i, pkmn] of Object.entries(Event.masterfile.pokemon)) {
-    for (const j of Object.keys(pkmn.forms)) {
-      pokemon.full[`${i}-${j}`] = base
-      pokemon.raids[`${i}-${j}`] = new BaseFilter(defaults.gyms.pokemon)
-      pokemon.quests[`${i}-${j}`] = new BaseFilter(defaults.pokestops.pokemon)
-      if (config.getSafe('map.misc.enableConfirmedInvasions')) {
-        pokemon.rocket[`a${i}-${j}`] = new BaseFilter(
+  Object.entries(Event.masterfile.pokemon).forEach(([id, pkmn]) => {
+    Object.keys(pkmn.forms).forEach((form) => {
+      pokemon.full[`${id}-${form}`] = base
+      pokemon.raids[`${id}-${form}`] = new BaseFilter(defaults.gyms.pokemon)
+      pokemon.quests[`${id}-${form}`] = new BaseFilter(
+        defaults.pokestops.pokemon,
+      )
+      if (Db.filterContext.Pokestop.hasConfirmedInvasions) {
+        pokemon.rocket[`a${id}-${form}`] = new BaseFilter(
           defaults.pokestops.invasionPokemon,
         )
       }
-      pokemon.nests[`${i}-${j}`] = new BaseFilter(defaults.nests.allPokemon)
-    }
+      pokemon.nests[`${id}-${form}`] = new BaseFilter(defaults.nests.allPokemon)
+    })
     if ('family' in pkmn) {
-      if (pkmn.family === +i) {
+      if (pkmn.family === +id) {
         pokemon.quests[`c${pkmn.family}`] = new BaseFilter(
           defaults.pokestops.candy,
         )
@@ -57,12 +56,12 @@ function buildPokemon(defaults, base, custom) {
     }
     if ('tempEvolutions' in pkmn) {
       energyAmounts.forEach((a) => {
-        pokemon.quests[`m${i}-${a}`] = new BaseFilter(
+        pokemon.quests[`m${id}-${a}`] = new BaseFilter(
           defaults.pokestops.megaEnergy,
         )
       })
     }
-  }
+  })
   return pokemon
 }
 

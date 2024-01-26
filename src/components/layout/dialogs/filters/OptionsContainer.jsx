@@ -1,13 +1,15 @@
 import * as React from 'react'
-import Typography from '@mui/material/Typography'
-import Grid from '@mui/material/Grid'
-import Button from '@mui/material/Button'
 import Chip from '@mui/material/Chip'
+import List from '@mui/material/List'
+import ListItem from '@mui/material/ListItem'
+import ListItemText from '@mui/material/ListItemText'
 import { useTranslation } from 'react-i18next'
+import ReplayIcon from '@mui/icons-material/Replay'
 
 import { useMemory } from '@hooks/useMemory'
 import { useStorage } from '@hooks/useStorage'
 import Utility from '@services/Utility'
+import { BasicListButton } from '@components/layout/general/BasicListButton'
 
 import Options from './Options'
 
@@ -97,27 +99,20 @@ export default function OptionsContainer({
           return null
         },
       )}
-      <Grid
-        container
-        key="resetShowing"
-        justifyContent="center"
-        alignItems="center"
-        my={2}
-      >
-        <Grid item xs={5} sm={6} textAlign="center">
-          <Button onClick={handleReset(category)} color="primary" size="small">
-            {t('reset_filters')}
-          </Button>
-        </Grid>
-        <Grid item xs={7} sm={6} textAlign="center">
-          <Typography variant="subtitle2" align="center">
-            {t('showing')}: {countShow}/{countTotal}
-          </Typography>
-        </Grid>
-        <Grid item xs={12} className="flex-center" flexWrap="wrap">
+      <List key="resetShowing">
+        <ListItem>
+          <ListItemText
+            primary={t('showing')}
+            secondary={`${countShow}/${countTotal}`}
+          />
+        </ListItem>
+        <ListItem className="flex-center" sx={{ flexWrap: 'wrap' }}>
           <Applied category={category} />
-        </Grid>
-      </Grid>
+        </ListItem>
+        <BasicListButton label="reset_filters" onClick={handleReset(category)}>
+          <ReplayIcon color="error" />
+        </BasicListButton>
+      </List>
     </>
   )
 }
