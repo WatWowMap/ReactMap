@@ -8,6 +8,10 @@ const { GraphQLFileLoader } = require('@graphql-tools/graphql-file-loader')
 const {
   ApolloServerPluginDrainHttpServer,
 } = require('@apollo/server/plugin/drainHttpServer')
+const {
+  ApolloServerPluginLandingPageDisabled,
+} = require('@apollo/server/plugin/disabled')
+
 const config = require('@rm/config')
 
 const { log, HELPERS } = require('@rm/logger')
@@ -76,6 +80,7 @@ async function startApollo(httpServer) {
       error: (...e) => log.error(HELPERS.gql, ...e),
     },
     plugins: [
+      ApolloServerPluginLandingPageDisabled(),
       ApolloServerPluginDrainHttpServer({ httpServer }),
       {
         async requestDidStart(requestContext) {
