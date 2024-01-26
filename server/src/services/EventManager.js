@@ -9,6 +9,7 @@ const { log, HELPERS } = require('@rm/logger')
 const { generate, read } = require('@rm/masterfile')
 
 const PoracleAPI = require('./api/Poracle')
+const { getCache, setCache } = require('./cache')
 
 class EventManager {
   constructor() {
@@ -19,21 +20,33 @@ class EventManager {
       'invasions' in this.masterfile ? this.masterfile.invasions : {}
 
     /** @type {{[key in keyof import('@rm/types').Available]: string[] }} */
-    this.available = {
+    this.available = getCache('available.json', {
       gyms: [],
       pokestops: [],
       pokemon: [],
       nests: [],
-    }
-    this.uicons = []
-    this.uaudio = []
+    })
+    this.uicons = getCache('uicons.json', [])
+    this.uaudio = getCache('uaudio.json', [])
     this.uiconsBackup = {}
     this.uaudioBackup = {}
     this.baseUrl =
       'https://raw.githubusercontent.com/WatWowMap/wwm-uicons-webp/main'
 
     /** @type {Record<string, InstanceType<typeof PoracleAPI>>} */
-    this.webhookObj = {}
+    this.webhookObj = Object.fromEntries(
+      config
+        .getSafe('webhooks')
+        .filter((x) => x.enabled)
+        .map((webhook) => {
+          const api = new PoracleAPI(webhook)
+          if (api.initFromCache()) {
+            return [api.name, api]
+          }
+          return [api.name, null]
+        })
+        .filter(([, api]) => api),
+    )
     /** @type {import('./Clients').ClientObject} */
     this.Clients = {}
   }
@@ -91,6 +104,7 @@ class EventManager {
 
       return 0
     })
+    await setCache('available.json', this.available)
   }
 
   /**
@@ -295,6 +309,7 @@ class EventManager {
       }
     }
     this[type] = Object.values(this[`${type}Backup`])
+    await setCache(`${type}.json`, this[type])
   }
 
   /**
@@ -323,7 +338,7 @@ class EventManager {
   async getMasterfile(historical, dbRarity) {
     log.info(HELPERS.event, 'Fetching Latest Masterfile')
     try {
-      const newMf = await generate(false, historical, dbRarity)
+      const newMf = await generate(true, historical, dbRarity)
       this.masterfile = newMf ?? this.masterfile
       this.addAvailable()
     } catch (e) {
@@ -361,18 +376,22 @@ class EventManager {
   }
 
   async getWebhooks() {
-    await Promise.all(
+    const apis = await Promise.allSettled(
       config
         .getSafe('webhooks')
         .filter((x) => x.enabled)
         .map(async (webhook) => {
           const api = new PoracleAPI(webhook)
           await api.init()
-          Object.assign(this.webhookObj, {
-            [webhook.name]: api,
-          })
+          return api
         }),
     )
+    for (let i = 0; i < apis.length; i += 1) {
+      const item = apis[i]
+      if (item.status === 'fulfilled' && item.value) {
+        this.webhookObj[item.value.name] = item.value
+      }
+    }
   }
 }
 

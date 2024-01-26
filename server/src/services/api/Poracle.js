@@ -1,5 +1,6 @@
 const { log, HELPERS } = require('@rm/logger')
 const fetchJson = require('./fetchJson')
+const { setCache, getCache } = require('../cache')
 
 const PLATFORMS = /** @type {const} */ (['discord', 'telegram'])
 
@@ -180,6 +181,15 @@ class PoracleAPI {
     }
   }
 
+  initFromCache() {
+    const cached = getCache(`${this.name}-webhook.json`)
+    if (!cached) {
+      log.warn(HELPERS.webhooks, `${this.name} webhook not found in cache`)
+      return false
+    }
+    Object.assign(this, cached)
+  }
+
   async init() {
     try {
       await Promise.all([
@@ -190,6 +200,7 @@ class PoracleAPI {
       this.ui = this.generateUi()
       this.lastFetched = Date.now()
       log.info(HELPERS.webhooks, `${this.name} webhook initialized`)
+      await setCache(`${this.name}-webhook.json`, this)
     } catch (e) {
       log.error(HELPERS.webhooks, `Error initializing ${this.name} webhook`, e)
     }

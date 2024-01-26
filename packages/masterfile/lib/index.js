@@ -68,7 +68,7 @@ const generate = async (save = false, historicRarity = {}, dbRarity = {}) => {
     }
 
     if (save) {
-      fs.writeFileSync(
+      fs.promises.writeFile(
         resolve(`${__dirname}/data/masterfile.json`),
         JSON.stringify(newMf, null, 2),
         'utf8',

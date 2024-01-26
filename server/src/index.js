@@ -29,7 +29,7 @@ const Clients = require('./services/Clients')
 const sessionStore = require('./services/sessionStore')
 const rootRouter = require('./routes/rootRouter')
 const pkg = require('../../package.json')
-const getAreas = require('./services/areas')
+const { loadLatestAreas } = require('./services/areas')
 const { connection } = require('./db/knexfile.cjs')
 const startApollo = require('./graphql/server')
 require('./services/watcher')
@@ -302,8 +302,9 @@ startApollo(httpServer).then((server) => {
 connection.migrate
   .latest()
   .then(() => connection.destroy())
+  .then(() => Db.getDbContext())
   .then(async () => {
-    await Db.getDbContext()
+    httpServer.listen(config.getSafe('port'), config.getSafe('interface'))
     await Promise.all([
       Db.historicalRarity(),
       Db.getFilterContext(),
@@ -318,9 +319,8 @@ connection.migrate
       Event.getMasterfile(Db.historical, Db.rarity),
       Event.getInvasions(config.getSafe('api.pogoApiEndpoints.invasions')),
       Event.getWebhooks(),
-      getAreas().then((res) => (config.areas = res)),
+      loadLatestAreas().then((res) => (config.areas = res)),
     ])
-    httpServer.listen(config.getSafe('port'), config.getSafe('interface'))
     const text = rainbow(
       `ℹ ${new Date()
         .toISOString()

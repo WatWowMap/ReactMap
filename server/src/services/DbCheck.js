@@ -6,6 +6,7 @@ const config = require('@rm/config')
 
 const { log, HELPERS } = require('@rm/logger')
 const { getBboxFromCenter } = require('./functions/getBbox')
+const { setCache, getCache } = require('./cache')
 
 const softLimit = config.getSafe('api.searchSoftKmLimit')
 const hardLimit = config.getSafe('api.searchHardKmLimit')
@@ -37,13 +38,13 @@ module.exports = class DbCheck {
     this.searchLimit = config.getSafe('api.searchResultsLimit')
     this.rarityPercents = config.getSafe('rarity.percents')
     this.models = {}
-    this.questConditions = {}
     this.endpoints = {}
-    this.rarity = {}
-    this.historical = {}
-    this.filterContext = {
+    this.questConditions = getCache('questConditions.json', {})
+    this.rarity = getCache('rarity.json', {})
+    this.historical = getCache('historical.json', {})
+    this.filterContext = getCache('filterContext.json', {
       Route: { maxDistance: 0, maxDuration: 0 },
-    }
+    })
     this.reactMapDb = null
     this.connections = config
       .getSafe('database.schemas')
@@ -246,7 +247,7 @@ module.exports = class DbCheck {
    * @param {boolean} historical
    * @returns {void}
    */
-  setRarity(results, historical = false) {
+  async setRarity(results, historical = false) {
     const base = {}
     const mapKey = historical ? 'historical' : 'rarity'
     let total = 0
@@ -277,6 +278,7 @@ module.exports = class DbCheck {
         this[mapKey][id] = 'common'
       }
     })
+    await setCache(`${mapKey}.json`, this[mapKey])
   }
 
   async historicalRarity() {
@@ -292,7 +294,7 @@ module.exports = class DbCheck {
                 .groupBy('pokemon_id'),
         ),
       )
-      this.setRarity(
+      await this.setRarity(
         results.map((result) =>
           Object.fromEntries(
             result.map((pkmn) => [`${pkmn.pokemon_id}`, +pkmn.total]),
@@ -592,9 +594,10 @@ module.exports = class DbCheck {
               Object.values(titles),
             ]),
           )
+          await setCache('questConditions.json', this.questConditions)
         }
         if (model === 'Pokemon') {
-          this.setRarity(results, false)
+          await this.setRarity(results, false)
         }
         if (results.length === 1) return results[0].available
         if (results.length > 1) {
@@ -624,19 +627,28 @@ module.exports = class DbCheck {
    * Builds filter context for all models
    */
   async getFilterContext() {
-    if (this.models.Route) {
-      const results = await Promise.all(
-        this.models.Route.map(({ SubModel, ...source }) =>
-          SubModel.getFilterContext(source),
-        ),
+    try {
+      if (this.models.Route) {
+        const results = await Promise.all(
+          this.models.Route.map(({ SubModel, ...source }) =>
+            SubModel.getFilterContext(source),
+          ),
+        )
+        this.filterContext.Route.maxDistance = Math.max(
+          ...results.map((result) => result.max_distance),
+        )
+        this.filterContext.Route.maxDuration = Math.max(
+          ...results.map((result) => result.max_duration),
+        )
+        log.info(HELPERS.db, 'Updating filter context for routes')
+        await setCache('filterContext.json', this.filterContext)
+      }
+    } catch (e) {
+      log.error(
+        HELPERS.db,
+        'If you are using RDM, you likely do not have a routes table. Remove `route` from the `useFor` array in your config',
+        e,
       )
-      this.filterContext.Route.maxDistance = Math.max(
-        ...results.map((result) => result.max_distance),
-      )
-      this.filterContext.Route.maxDuration = Math.max(
-        ...results.map((result) => result.max_duration),
-      )
-      log.info(HELPERS.db, 'Updating filter context for routes')
     }
   }
 }
