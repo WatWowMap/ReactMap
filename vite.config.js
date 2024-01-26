@@ -2,7 +2,7 @@
 /* eslint-disable no-continue */
 /* eslint-disable import/no-extraneous-dependencies */
 
-const { defineConfig, loadEnv } = require('vite')
+const { defineConfig, loadEnv, createLogger } = require('vite')
 const { default: react } = require('@vitejs/plugin-react')
 const { default: checker } = require('vite-plugin-checker')
 const removeFiles = require('rollup-plugin-delete')
@@ -19,6 +19,11 @@ const {
   localePlugin,
   muteWarningsPlugin,
 } = require('@rm/vite-plugins')
+
+const defaultLogger = createLogger()
+const logLevel = config.getSafe('devOptions.logLevel')
+const viteLogLevel =
+  logLevel === 'debug' || logLevel === 'trace' ? 'info' : logLevel
 
 const viteConfig = defineConfig(({ mode }) => {
   const env = loadEnv(mode, resolve(process.cwd(), './'), '')
@@ -158,6 +163,14 @@ const viteConfig = defineConfig(({ mode }) => {
           },
         },
       },
+    },
+    logLevel: viteLogLevel,
+    customLogger: {
+      ...defaultLogger,
+      error: (message) => log.error(HELPERS.build, message),
+      warn: (message) => log.warn(HELPERS.build, message),
+      info: (message) => log.info(HELPERS.build, message),
+      // debug: (message) => log.debug(HELPERS.build, message),
     },
     server: {
       host: '0.0.0.0',
