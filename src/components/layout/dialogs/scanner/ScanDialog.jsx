@@ -26,6 +26,20 @@ export default function ScanDialog() {
     if (scanZone) return setScanMode('scanZoneMode')
   }, [scanNext, scanZone])
 
+  const footerOptions = React.useMemo(
+    () =>
+      /** @type {import('@components/layout/general/Footer').FooterButton[]} */ ([
+        {
+          name: 'close',
+          icon: 'Clear',
+          color: 'primary',
+          align: 'right',
+          action: handleClose,
+        },
+      ]),
+    [handleClose],
+  )
+
   return (
     <Dialog
       onClose={handleClose}
@@ -35,21 +49,10 @@ export default function ScanDialog() {
       <Header titles={[`scan_${scanMode}_title`]} action={handleClose} />
       <DialogContent className="flex-center" sx={{ mt: 2 }}>
         <Typography variant="subtitle1" align="center">
-          {t(`scan_${scanMode}`)}
+          {scanMode && t(`scan_${scanMode}`)}
         </Typography>
       </DialogContent>
-      <Footer
-        role="alertdialog"
-        options={[
-          {
-            name: 'close',
-            icon: 'Clear',
-            color: 'primary',
-            align: 'right',
-            action: handleClose,
-          },
-        ]}
-      />
+      <Footer role="alertdialog" options={footerOptions} />
     </Dialog>
   )
 }

@@ -28,7 +28,7 @@ async function startApollo(httpServer) {
   const apolloServer = new ApolloServer({
     typeDefs,
     resolvers,
-    introspection: config.getSafe('devOptions.enabled'),
+    introspection: config.getSafe('devOptions.graphiql'),
     formatError: (e) => {
       let customMessage = ''
       if (
@@ -80,8 +80,9 @@ async function startApollo(httpServer) {
       {
         async requestDidStart(requestContext) {
           requestContext.contextValue.startTime = Date.now()
-
-          log.debug(requestContext.request?.variables?.filters)
+          if (requestContext.request?.variables?.filters) {
+            log.debug(requestContext.request?.variables?.filters)
+          }
           return {
             async willSendResponse(context) {
               const filterCount = Object.keys(

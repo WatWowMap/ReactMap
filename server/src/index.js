@@ -62,9 +62,8 @@ if (sentry.enabled || process.env.SENTRY_DSN) {
       ...Sentry.autoDiscoverNodePerformanceMonitoringIntegrations(),
     ],
     tracesSampleRate:
-      parseFloat(
-        process.env.SENTRY_TRACES_SAMPLE_RATE || sentry.tracesSampleRate,
-      ) || 0.1,
+      +(process.env.SENTRY_TRACES_SAMPLE_RATE || sentry.tracesSampleRate) ||
+      0.1,
     release: pkg.version,
   })
 
@@ -215,10 +214,10 @@ app.use((err, req, res, next) => {
 startApollo(httpServer).then((server) => {
   app.use(
     '/graphql',
-    cors(),
+    cors({ origin: '/' }),
     json(),
     expressMiddleware(server, {
-      context: ({ req, res }) => {
+      context: async ({ req, res }) => {
         const perms = req.user ? req.user.perms : req.session.perms
         const user = req?.user?.username || ''
         const id = req?.user?.id || 0
