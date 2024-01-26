@@ -79,7 +79,11 @@ function SelectorList({ category, subCategory, label, height = 400 }) {
                 key.startsWith('p')
               )
             case 'showcase':
-              return key.startsWith('f') || key.startsWith('h')
+              return (
+                key.startsWith('f') ||
+                key.startsWith('h') ||
+                key.startsWith('b')
+              )
             case 'rocketPokemon':
               return key.startsWith('a')
             case 'pokemon':

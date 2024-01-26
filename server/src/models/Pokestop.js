@@ -13,7 +13,6 @@ const {
   stopValidDataLimit,
   hideOldPokestops,
 } = config.getSafe('api')
-const map = config.getSafe('map')
 
 const questProps = {
   quest_type: true,
@@ -812,8 +811,7 @@ class Pokestop extends Model {
         pokestop.quests.forEach((quest) => {
           if (
             quest.quest_reward_type &&
-            (!map.misc.enableQuestSetSelector ||
-              filters.onlyShowQuestSet === 'both' ||
+            (filters.onlyShowQuestSet === 'both' ||
               (filters.onlyShowQuestSet === 'with_ar' && quest.with_ar) ||
               (filters.onlyShowQuestSet === 'without_ar' && !quest.with_ar))
           ) {
@@ -1322,6 +1320,7 @@ class Pokestop extends Model {
             '>=',
             ts * (multiInvasionMs ? 1000 : 1),
           )
+          .andWhereNot('incident.display_type', 9)
           .groupBy('incident.character', 'incident.display_type')
           .orderBy('incident.character', 'incident.display_type')
       }
@@ -1336,6 +1335,7 @@ class Pokestop extends Model {
         .distinct(isMad ? 'incident_grunt_type AS grunt_type' : 'grunt_type')
         .where(isMad ? 'incident_grunt_type' : 'grunt_type', '>', 0)
         .andWhere('incident_expire_timestamp', '>=', ts)
+        .andWhereNot('incident.display_type', 9)
         .orderBy('grunt_type')
     }
     if (isMad && !hasMultiInvasions) {
@@ -1967,6 +1967,21 @@ class Pokestop extends Model {
     const results = await query
 
     return results.filter((x) => x.enabled && !x.deleted)
+  }
+
+  /**
+   * returns pokestop context
+   * @param {import('@rm/types').DbContext} ctx
+   * @returns {Promise<{ hasConfirmedInvasions: boolean }>}
+   */
+  static async getFilterContext({ isMad, hasConfirmed }) {
+    if (isMad || !hasConfirmed) return { hasConfirmedInvasions: false }
+    const result = await this.query()
+      .from('incident')
+      .count('id', { as: 'total' })
+      .where('confirmed', 1)
+      .first()
+    return { hasConfirmedInvasions: result.total > 0 }
   }
 }
 

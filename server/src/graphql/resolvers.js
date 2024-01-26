@@ -23,7 +23,7 @@ const resolvers = {
       const data = {
         questConditions: perms.quests ? Db.questConditions : {},
         masterfile: { ...Event.masterfile, invasions: Event.invasions },
-        filters: buildDefaultFilters(perms, Db),
+        filters: buildDefaultFilters(perms),
         audio: {
           ...config.getSafe('audio'),
           styles: Event.uaudio,
