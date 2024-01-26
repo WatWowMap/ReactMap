@@ -216,7 +216,7 @@ async function scannerApi(
     }
     const scannerResponse = await fetch(
       `${payloadObj.url}${payloadObj.url.includes('?') ? '&' : '?'}username=${
-        user.username
+        user.username || user.id || 'a visitor'
       }`,
       {
         ...payloadObj.options,
