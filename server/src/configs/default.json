@@ -597,6 +597,10 @@
     "backendConfig": {
       "platform": "rdm/mad",
       "apiEndpoint": "http://ip:port/api/",
+      "routes": true,
+      "showcases": true,
+      "pokemon": true,
+      "gmf": false,
       "headers": [],
       "apiUsername": "username",
       "apiPassword": "password",
