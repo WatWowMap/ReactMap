@@ -595,7 +595,7 @@
   },
   "scanner": {
     "backendConfig": {
-      "platform": "rdm/mad",
+      "platform": "rdm/mad/custom",
       "apiEndpoint": "http://ip:port/api/",
       "routes": true,
       "showcases": true,
