@@ -14,6 +14,7 @@ import useFilter from '@hooks/useFilter'
 import Header from '@components/layout/general/Header'
 import Footer from '@components/layout/general/Footer'
 import { applyToAll } from '@services/filtering/applyToAll'
+import useGetAvailable from '@hooks/useGetAvailable'
 
 import OptionsContainer from '../dialogs/filters/OptionsContainer'
 import { VirtualGrid } from './VirtualGrid'
@@ -42,6 +43,8 @@ export default function Menu({
   titleAction,
   extraButtons,
 }) {
+  useGetAvailable(category)
+
   Utility.analytics(`/advanced/${category}`)
 
   const isMobile = useMemory((s) => s.isMobile)
