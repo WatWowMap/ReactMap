@@ -10,7 +10,6 @@ const { generate, read } = require('@rm/masterfile')
 
 const PoracleAPI = require('./api/Poracle')
 const { getCache, setCache } = require('./cache')
-const DiscordClient = require('./DiscordClient')
 
 class EventManager {
   constructor() {
@@ -123,7 +122,7 @@ class EventManager {
   async chatLog(embed, clientName) {
     if (clientName) {
       const client = this.Clients[clientName]
-      if (client instanceof DiscordClient && typeof embed === 'object') {
+      if ('discordEvents' in client && typeof embed === 'object') {
         await client.sendMessage(embed, 'event')
       } else if (typeof embed === 'string') {
         await client.sendMessage(embed, 'event')
@@ -131,7 +130,7 @@ class EventManager {
     } else {
       await Promise.allSettled(
         Object.values(this.Clients).map(async (client) => {
-          if (client instanceof DiscordClient && typeof embed === 'object') {
+          if ('discordEvents' in client && typeof embed === 'object') {
             await client.sendMessage(embed, 'event')
           } else if (typeof embed === 'string') {
             await client.sendMessage(embed, 'event')
