@@ -127,3 +127,19 @@ export const setSelected = (id) => () => {
     selected: id ? { ...prev.selected, [id]: !prev.selected[id] } : {},
   }))
 }
+
+/**
+ * @param {boolean} enabled
+ * @param {string[]} ids
+ */
+export const applyToAllWebhooks = (enabled, ids) => {
+  const selected = new Set(ids)
+  useWebhookStore.setState((prev) => ({
+    tempFilters: Object.fromEntries(
+      Object.entries(prev.tempFilters).map(([k, v]) => [
+        k,
+        selected.has(k) ? { ...v, enabled } : v,
+      ]),
+    ),
+  }))
+}

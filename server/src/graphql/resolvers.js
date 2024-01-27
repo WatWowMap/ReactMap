@@ -507,16 +507,9 @@ const resolvers = {
           }))
         }
         if (category === 'invasion') {
-          const { invasions } = Event.masterfile
           result.invasion = result.invasion.map((x) => ({
             ...x,
-            real_grunt_id:
-              +Object.keys(invasions).find(
-                (key) =>
-                  invasions[key]?.type?.toLowerCase() ===
-                    x.grunt_type.toLowerCase() &&
-                  invasions[key].gender === (x.gender || 1),
-              ) || 0,
+            real_grunt_id: PoracleAPI.getRealGruntId(x, Event.invasions),
           }))
         }
         if (category === 'raid') {
@@ -525,7 +518,6 @@ const resolvers = {
             allMoves: x.move === 9000,
           }))
         }
-
         return result
       }
       return {}
@@ -664,6 +656,27 @@ const resolvers = {
           status,
           data,
         )
+        if (category === 'pokemon') {
+          result.pokemon = result.pokemon.map((x) => ({
+            ...x,
+            allForms: !x.form,
+            pvpEntry: !!x.pvp_ranking_league,
+            xs: x.max_weight !== 9000000,
+            xl: x.min_weight !== 0,
+          }))
+        }
+        if (category === 'invasion') {
+          result.invasion = result.invasion.map((x) => ({
+            ...x,
+            real_grunt_id: PoracleAPI.getRealGruntId(x, Event.invasions),
+          }))
+        }
+        if (category === 'raid') {
+          result.raid = result.raid.map((x) => ({
+            ...x,
+            allMoves: x.move === 9000,
+          }))
+        }
         return result
       }
       return {}

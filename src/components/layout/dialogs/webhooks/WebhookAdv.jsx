@@ -71,6 +71,7 @@ const skipFields = new Set([
   'shiny',
   'everything_individually',
   'all',
+  'real_grunt_id',
 ])
 
 const wildCards = {
@@ -97,6 +98,20 @@ export default function WebhookAdvanced() {
   const { pokemon, moves, types } = useMemory((s) => s.masterfile)
   const isMobile = useMemory((s) => s.isMobile)
 
+  const [filterValues, setFilterValues] = React.useState(
+    tempFilters?.template
+      ? Poracle.reactMapFriendly(tempFilters)
+      : {
+          ...Poracle.reactMapFriendly(info?.defaults),
+          profile_no: human.current_profile_no,
+        },
+  )
+  const [poracleValues, setPoracleValues] = React.useState(
+    tempFilters?.template
+      ? tempFilters
+      : { ...info?.defaults, profile_no: human.current_profile_no },
+  )
+
   Utility.analytics(`/poracle/${category}`)
 
   const [search, { data, previousData, loading }] = useLazyQuery(
@@ -112,19 +127,6 @@ export default function WebhookAdvanced() {
     },
   )
   const fetchedData = data || previousData
-  const [filterValues, setFilterValues] = React.useState(
-    tempFilters?.template
-      ? Poracle.reactMapFriendly(tempFilters)
-      : {
-          ...Poracle.reactMapFriendly(info?.defaults),
-          profile_no: human.current_profile_no,
-        },
-  )
-  const [poracleValues, setPoracleValues] = React.useState(
-    tempFilters?.template
-      ? tempFilters
-      : { ...info?.defaults, profile_no: human.current_profile_no },
-  )
 
   React.useEffect(() => {
     setPoracleValues(
@@ -141,6 +143,13 @@ export default function WebhookAdvanced() {
           },
     )
   }, [tempFilters, id, human.current_profile_no, info?.defaults])
+
+  React.useEffect(() => {
+    setPoracleValues((prev) => ({
+      ...prev,
+      everything_individually: !!selectedIds.length,
+    }))
+  }, [selectedIds])
 
   const handleSlider = React.useCallback(
     (low, high) => (name, values) => {
@@ -758,47 +767,50 @@ export default function WebhookAdvanced() {
 
   const handleClose = (save, filterId, filterToSave) => {
     if (save) {
-      if (filterId === 'global' && filterToSave) {
-        const newFilters = {}
-        const wc = wildCards[category] || ['0-0']
-        if (filterToSave.everything_individually !== false) {
-          selectedIds.forEach((item) => {
-            if (!wc.includes(item)) {
+      useWebhookStore.setState((prev) => {
+        if (filterId === 'global' && filterToSave) {
+          const newFilters = {}
+          const wc = wildCards[category] || ['0-0']
+          if (filterToSave.everything_individually !== false) {
+            selectedIds.forEach((item) => {
+              if (!wc.includes(item)) {
+                newFilters[item] = {
+                  ...prev.tempFilters[item],
+                  ...filterToSave,
+                  enabled: true,
+                }
+              }
+            })
+          } else {
+            wc.forEach((item) => {
               newFilters[item] = {
-                ...tempFilters[item],
+                ...prev.tempFilters[item],
                 ...filterToSave,
                 enabled: true,
               }
-            }
-          })
-        } else {
-          wc.forEach((item) => {
-            newFilters[item] = {
-              ...tempFilters[item],
-              ...filterToSave,
-              enabled: true,
-            }
-          })
-        }
-        useWebhookStore.setState((prev) => ({
-          tempFilters: {
-            ...prev.tempFilters,
-            ...newFilters,
-            [filterId]: { ...filterToSave },
-          },
-        }))
-      } else if (filterId && filterToSave) {
-        useWebhookStore.setState((prev) => ({
-          tempFilters: {
-            ...prev.tempFilters,
-            [filterId]: {
-              ...prev.tempFilters[id],
-              ...filterToSave,
-              enabled: true,
+            })
+          }
+          return {
+            tempFilters: {
+              ...prev.tempFilters,
+              ...newFilters,
+              [filterId]: { ...filterToSave },
             },
-          },
-        }))
-      }
+          }
+        }
+        if (filterId && filterToSave) {
+          return {
+            tempFilters: {
+              ...prev.tempFilters,
+              [filterId]: {
+                ...prev.tempFilters[id],
+                ...filterToSave,
+                enabled: true,
+              },
+            },
+          }
+        }
+      })
     } else {
       useWebhookStore.setState((prev) => ({
         tempFilters: { ...prev.tempFilters, [filterId]: { ...info?.defaults } },
@@ -818,7 +830,7 @@ export default function WebhookAdvanced() {
         icon: 'Save',
       },
     ],
-    [id, poracleValues],
+    [id, poracleValues, selectedIds],
   )
 
   if (!info || !tempFilters) return null

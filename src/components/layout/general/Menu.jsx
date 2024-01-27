@@ -18,7 +18,7 @@ import { applyToAll } from '@services/filtering/applyToAll'
 import OptionsContainer from '../dialogs/filters/OptionsContainer'
 import { VirtualGrid } from './VirtualGrid'
 import { GenericSearch } from '../drawer/ItemSearch'
-import { useWebhookStore } from '../dialogs/webhooks/store'
+import { applyToAllWebhooks, useWebhookStore } from '../dialogs/webhooks/store'
 
 /**
  * @param {{
@@ -86,10 +86,10 @@ export default function Menu({
         name: 'apply_to_all',
         action: () =>
           (webhookCategory ? useWebhookStore : useLayoutStore).setState({
-            advancedFilter: {
+            [webhookCategory ? 'advanced' : 'advancedFilter']: {
               open: true,
               id: 'global',
-              category,
+              category: webhookCategory || category,
               selectedIds: filteredArr,
             },
           }),
@@ -98,24 +98,23 @@ export default function Menu({
       {
         name: 'disable_all',
         action: () =>
-          applyToAll(
-            { enabled: false },
-            category,
-            filteredArr,
-            !webhookCategory,
-          ),
+          webhookCategory
+            ? applyToAllWebhooks(false, filteredArr)
+            : applyToAll({ enabled: false }, category, filteredArr),
         icon: 'Clear',
         color: 'error',
       },
       {
         name: 'enable_all',
         action: () =>
-          applyToAll(
-            { enabled: true },
-            category,
-            filteredArr,
-            !webhookCategory,
-          ),
+          webhookCategory
+            ? applyToAllWebhooks(true, filteredArr)
+            : applyToAll(
+                { enabled: true },
+                category,
+                filteredArr,
+                !webhookCategory,
+              ),
         icon: 'Check',
         color: 'success',
       },

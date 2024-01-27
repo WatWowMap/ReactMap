@@ -28,7 +28,7 @@ export default function TrackedTile({ index }) {
         },
       }))
     }
-  }, [advOpen, id])
+  }, [advOpen, id, item])
 
   const onClose = React.useCallback(
     (newFilter) => {
