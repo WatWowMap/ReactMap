@@ -28,10 +28,10 @@ class TelegramClient {
       'authentication.alwaysEnabledPerms',
     )
     this.loggingChannels = {
-      main: strategy.logChannelId,
-      event: strategy.eventLogChannelId,
-      scanNext: strategy.scanNextLogChannelId,
-      scanZone: strategy.scanZoneLogChannelId,
+      main: strategy.logGroupId,
+      event: strategy.eventLogGroupId,
+      scanNext: strategy.scanNextLogGroupId,
+      scanZone: strategy.scanZoneLogGroupId,
     }
   }
 

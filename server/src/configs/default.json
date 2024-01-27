@@ -682,8 +682,10 @@
       {
         "name": "telegram",
         "type": "telegram",
-        "scanNextLogChannelId": "",
-        "scanZoneLogChannelId": "",
+        "logGroupId": "",
+        "scanNextLogGroupId": "",
+        "scanZoneLogGroupId": "",
+        "eventLogGroupId": "",
         "enabled": false,
         "botToken": "",
         "groups": [],
