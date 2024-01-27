@@ -79,7 +79,12 @@ async function scannerApi(
     const cache = userCache.has(user.id)
       ? userCache.get(user.id)
       : { coordinates: 0, requests: 0 }
-
+    const options = {
+      routes: config.scanner.backendConfig.routes,
+      showcases: config.scanner.backendConfig.showcases,
+      pokemon: config.scanner.backendConfig.pokemon,
+      gmf: config.scanner.backendConfig.gmf,
+    }
     switch (category) {
       case 'scanNext':
         userCache.set(user.id, {
@@ -123,7 +128,11 @@ async function scannerApi(
               options: {
                 method: 'POST',
                 headers,
-                body: JSON.stringify(coords),
+                body: JSON.stringify({
+                  username: user.username,
+                  locations: coords,
+                  options,
+                }),
               },
             })
             break
@@ -151,7 +160,11 @@ async function scannerApi(
               options: {
                 method: 'POST',
                 headers,
-                body: JSON.stringify(coords),
+                body: JSON.stringify({
+                  username: user.username,
+                  locations: coords,
+                  options,
+                }),
               },
             })
             break
