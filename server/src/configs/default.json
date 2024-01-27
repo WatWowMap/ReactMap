@@ -598,7 +598,7 @@
       "platform": "rdm/mad/custom",
       "apiEndpoint": "http://ip:port/api/",
       "routes": true,
-      "showcases": true,
+      "showcases": false,
       "pokemon": true,
       "gmf": false,
       "headers": [],
