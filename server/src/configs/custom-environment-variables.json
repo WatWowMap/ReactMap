@@ -1242,6 +1242,10 @@
       "sendDiscordMessage": {
         "__name": "SCANNER_BACKEND_CONFIG_SEND_DISCORD_MESSAGE",
         "__format": "boolean"
+      },
+      "sendTelegramMessage": {
+        "__name": "SCANNER_BACKEND_CONFIG_SEND_TELEGRAM_MESSAGE",
+        "__format": "boolean"
       }
     },
     "scanNext": {
