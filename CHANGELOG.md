@@ -1,3 +1,20 @@
+# [1.29.0-develop.17](https://github.com/WatWowMap/ReactMap/compare/v1.29.0-develop.16...v1.29.0-develop.17) (2024-01-28)
+
+
+### Bug Fixes
+
+* bunch of poracle webhook stuff ([fa4e628](https://github.com/WatWowMap/ReactMap/commit/fa4e628beb142e5dd8153abde054d4217126697c))
+* circular ref ([0a212dd](https://github.com/WatWowMap/ReactMap/commit/0a212dd093e11bc9c0def5d5296bd9608511e715))
+* disable sandbox ([fe93cfc](https://github.com/WatWowMap/ReactMap/commit/fe93cfc6166808f8616528cf18fe65d1a4dc16e2))
+* fetch available in menus too ([55d2fc8](https://github.com/WatWowMap/ReactMap/commit/55d2fc8bdbb64d8977049b3e3d26c0028ff83394))
+* force ci? ([5026661](https://github.com/WatWowMap/ReactMap/commit/5026661dd5546ab1125482372e490d9bb570ccea))
+* poracle saving/closing ([6251b5c](https://github.com/WatWowMap/ReactMap/commit/6251b5c77a9285bb9944d1a8adfd7c32881a2361))
+* quest conditions ([92af316](https://github.com/WatWowMap/ReactMap/commit/92af31602e6cf79ba345734a25f4ba098d2f53ef))
+* revert updating leaflet locate control ([97d9e07](https://github.com/WatWowMap/ReactMap/commit/97d9e076330135f521371b002b23f19f8e941904))
+* saving and closing webhooks while editing ([ce9eb43](https://github.com/WatWowMap/ReactMap/commit/ce9eb438e0d755076e799211d9d3c57b4c2ee175))
+* showcase filtering ([8c9d08a](https://github.com/WatWowMap/ReactMap/commit/8c9d08a561d39e0891fc02a1d7e3d8c20e420fd0))
+* username fallback ([05261c1](https://github.com/WatWowMap/ReactMap/commit/05261c108236225d7e3b01d609cfbef02e769ed3))
+
 # [1.29.0-develop.16](https://github.com/WatWowMap/ReactMap/compare/v1.29.0-develop.15...v1.29.0-develop.16) (2024-01-25)
 
 
