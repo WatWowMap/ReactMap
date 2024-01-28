@@ -6,7 +6,6 @@ const config = require('@rm/config')
 
 const buildDefaultFilters = require('../services/filters/builder/base')
 const filterComponents = require('../services/functions/filterComponents')
-const { filterRTree } = require('../services/functions/filterRTree')
 const validateSelectedWebhook = require('../services/functions/validateSelectedWebhook')
 const PoracleAPI = require('../services/api/Poracle')
 const { geocoder } = require('../services/geocoder')
@@ -14,6 +13,7 @@ const scannerApi = require('../services/api/scannerApi')
 const getPolyVector = require('../services/functions/getPolyVector')
 const getPlacementCells = require('../services/functions/getPlacementCells')
 const getTypeCells = require('../services/functions/getTypeCells')
+const { getValidCoords } = require('../services/functions/getValidCoords')
 
 /** @type {import("@apollo/server").ApolloServerOptions<import("@rm/types").GqlContext>['resolvers']} */
 const resolvers = {
@@ -106,22 +106,8 @@ const resolvers = {
       return !!results.length
     },
     /** @param {unknown} _ @param {{ mode: 'scanNext' | 'scanZone' }} args */
-    checkValidScan: (_, { mode, points }, { perms }) => {
-      if (perms?.scanner.includes(mode)) {
-        const areaRestrictions =
-          config.getSafe(`scanner.${mode}.${mode}AreaRestriction`) || []
-
-        const validPoints = points.map((point) =>
-          filterRTree(
-            { lat: point[0], lon: point[1] },
-            perms.areaRestrictions,
-            areaRestrictions,
-          ),
-        )
-        return validPoints
-      }
-      return []
-    },
+    checkValidScan: (_, { mode, points }, { perms }) =>
+      getValidCoords(mode, points, perms),
     /** @param {unknown} _ @param {{ component: 'loginPage' | 'donationPage' | 'messageOfTheDay' }} args */
     customComponent: (_, { component }, { perms, req, user }) => {
       switch (component) {
@@ -521,16 +507,9 @@ const resolvers = {
           }))
         }
         if (category === 'invasion') {
-          const { invasions } = Event.masterfile
           result.invasion = result.invasion.map((x) => ({
             ...x,
-            real_grunt_id:
-              +Object.keys(invasions).find(
-                (key) =>
-                  invasions[key]?.type?.toLowerCase() ===
-                    x.grunt_type.toLowerCase() &&
-                  invasions[key].gender === (x.gender || 1),
-              ) || 0,
+            real_grunt_id: PoracleAPI.getRealGruntId(x, Event.invasions),
           }))
         }
         if (category === 'raid') {
@@ -539,7 +518,6 @@ const resolvers = {
             allMoves: x.move === 9000,
           }))
         }
-
         return result
       }
       return {}
@@ -598,20 +576,33 @@ const resolvers = {
       }
       return {}
     },
+    /** @param {unknown} _ @param {import('@rm/types').ScanOnDemandReq} args */
     scanner: (_, args, { req, perms }) => {
       const { category, method, data } = args
-      if (data?.cooldown) {
-        req.session.cooldown = Math.max(
-          req.session.cooldown || 0,
-          data.cooldown || 0,
-        )
-        req.session.save()
-      }
       if (category === 'getQueue') {
         return scannerApi(category, method, data, req?.user)
       }
-      if (perms?.scanner?.includes(category)) {
-        return scannerApi(category, method, data, req?.user)
+      if (
+        perms?.scanner?.includes(category) &&
+        (!req.session.cooldown || req.session.cooldown < Date.now())
+      ) {
+        const validCoords = getValidCoords(category, data?.scanCoords, perms)
+
+        const cooldown =
+          config.getSafe(`scanner.${category}.userCooldownSeconds`) *
+            validCoords.filter(Boolean).length *
+            1000 +
+          Date.now()
+        req.session.cooldown = cooldown
+        return scannerApi(
+          category,
+          method,
+          {
+            ...data,
+            scanCoords: data.scanCoords?.filter((__, i) => validCoords[i]),
+          },
+          req?.user,
+        )
       }
       return {}
     },
@@ -665,6 +656,27 @@ const resolvers = {
           status,
           data,
         )
+        if (category === 'pokemon') {
+          result.pokemon = result.pokemon.map((x) => ({
+            ...x,
+            allForms: !x.form,
+            pvpEntry: !!x.pvp_ranking_league,
+            xs: x.max_weight !== 9000000,
+            xl: x.min_weight !== 0,
+          }))
+        }
+        if (category === 'invasion') {
+          result.invasion = result.invasion.map((x) => ({
+            ...x,
+            real_grunt_id: PoracleAPI.getRealGruntId(x, Event.invasions),
+          }))
+        }
+        if (category === 'raid') {
+          result.raid = result.raid.map((x) => ({
+            ...x,
+            allMoves: x.move === 9000,
+          }))
+        }
         return result
       }
       return {}

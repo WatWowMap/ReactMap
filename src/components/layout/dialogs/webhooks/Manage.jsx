@@ -38,10 +38,11 @@ export default function Manage() {
   const feedbackLink = useMemory((s) => s.config.links.feedbackLink)
 
   const filters = useGenFullFilters()
+  const liveFilters = useWebhookStore((s) => s.tempFilters)
 
   /** @type {ReturnType<typeof React.useRef<HTMLElement | null>>} */
   const dialogRef = React.useRef(null)
-  const [addNew, setAddNew] = React.useState(false)
+  const [addNew, setAddNew] = React.useState({ open: false, save: false })
   const [height, setHeight] = React.useState(0)
 
   const footerButtons = React.useMemo(() => {
@@ -55,19 +56,19 @@ export default function Manage() {
         color: 'success',
       },
       {
-        name: addNew
+        name: addNew.open
           ? 'save'
           : category === 'human'
           ? t('manage_profiles')
           : t('add_new', { category: t(category) }),
-        action: () => setAddNew((prev) => !prev),
+        action: () => setAddNew({ open: true, save: false }),
         key: 'addNew',
-        icon: addNew ? 'Save' : 'Add',
+        icon: addNew.open ? 'Save' : 'Add',
         disabled: !categories.length,
         color: 'secondary',
       },
     ]
-    if (!addNew) {
+    if (!addNew.open) {
       buttons.push({
         name: 'close',
         action: setMode,
@@ -83,13 +84,13 @@ export default function Manage() {
     Utility.analytics('Webhook', `${category} Webhook Page`, category, true)
     useWebhookStore.setState({ tempFilters: { ...filters[category] } })
     setSelected()()
-    if (dialogRef.current && !addNew) {
+    if (dialogRef.current && !addNew.open) {
       setHeight(dialogRef.current.clientHeight)
     }
   }, [category])
 
   React.useEffect(() => {
-    if (!addNew && category !== 'human') {
+    if (!addNew.open && addNew.save && category !== 'human') {
       const { tempFilters } = useWebhookStore.getState()
       const values = Poracle.processor(
         category,
@@ -122,18 +123,18 @@ export default function Manage() {
 
   const tabValue = categories.findIndex((x) => x === category)
 
-  return category !== 'human' && addNew ? (
+  return category !== 'human' && addNew.open ? (
     <Menu
-      tempFilters={filters[category]}
+      tempFilters={liveFilters}
       category={Poracle.getMapCategory(category)}
       categories={Poracle.getFilterCategories(category)}
       webhookCategory={category}
       title="webhook_selection"
-      titleAction={() => setAddNew(false)}
+      titleAction={() => setAddNew({ open: false, save: false })}
       extraButtons={[
         {
           name: 'save',
-          action: () => setAddNew(false),
+          action: () => setAddNew({ open: false, save: true }),
           icon: 'Save',
           color: 'secondary',
         },
@@ -146,9 +147,12 @@ export default function Manage() {
       <Header
         names={[name]}
         action={setMode}
-        titles={[addNew ? 'manage_profiles' : 'manage_webhook']}
+        titles={[addNew.open ? 'manage_profiles' : 'manage_webhook']}
       />
-      <AppBar position="static" sx={{ display: addNew ? 'none' : 'block' }}>
+      <AppBar
+        position="static"
+        sx={{ display: addNew.open ? 'none' : 'block' }}
+      >
         <Tabs value={tabValue} onChange={changeTab}>
           {categories.map((each) => (
             <Tab
@@ -160,7 +164,7 @@ export default function Manage() {
         </Tabs>
       </AppBar>
       <DialogContent sx={{ p: 0, minHeight: '70vh' }} ref={dialogRef}>
-        <Collapse in={!addNew}>
+        <Collapse in={!addNew.open}>
           {category !== 'human' && (
             <Box role="tabpanel" height={height - 76} p={2}>
               <Tracked category={category} />
@@ -175,7 +179,7 @@ export default function Manage() {
             <Human />
           </Box>
         </Collapse>
-        <Collapse in={addNew}>
+        <Collapse in={addNew.open}>
           {category === 'human' && <ProfileEditing />}
         </Collapse>
       </DialogContent>

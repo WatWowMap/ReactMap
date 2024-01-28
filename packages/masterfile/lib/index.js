@@ -28,6 +28,7 @@ Object.entries(defaultRarity).forEach(([tier, pokemon]) => {
  * @returns
  */
 const generate = async (save = false, historicRarity = {}, dbRarity = {}) => {
+  log.info(HELPERS.masterfile, 'generating masterfile')
   try {
     if (!endpoint) throw new Error('No masterfile endpoint')
 
@@ -68,7 +69,7 @@ const generate = async (save = false, historicRarity = {}, dbRarity = {}) => {
     }
 
     if (save) {
-      fs.promises.writeFile(
+      await fs.promises.writeFile(
         resolve(`${__dirname}/data/masterfile.json`),
         JSON.stringify(newMf, null, 2),
         'utf8',
@@ -87,9 +88,7 @@ const generate = async (save = false, historicRarity = {}, dbRarity = {}) => {
 module.exports.generate = generate
 
 if (require.main === module) {
-  generate(true).then(() =>
-    log.info(HELPERS.masterfile, 'Masterfile generated'),
-  )
+  generate(true).then(() => log.info(HELPERS.masterfile, 'OK'))
 }
 
 const read = () => {

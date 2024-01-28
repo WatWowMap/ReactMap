@@ -37,6 +37,14 @@ export function useTranslateById(options = {}) {
         if (id === 'global' || id === 'all') {
           return i18n.t(id)
         }
+        if (
+          id === '0-0' ||
+          id === 'e90' ||
+          id === 'r90' ||
+          id === 't4' ||
+          id === 'i0'
+        )
+          return i18n.t('poke_global')
         switch (id.charAt(0)) {
           case 'b':
             // event stops

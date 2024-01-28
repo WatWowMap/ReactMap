@@ -1231,6 +1231,23 @@ class PoracleAPI {
     // this.disabledHooks.forEach((hook) => delete poracleUiObj[hook])
     return poracleUiObj
   }
+
+  /**
+   *
+   * @param {import('@rm/types').PoracleInvasion} item
+   * @param {import('@rm/types').Masterfile['invasions']} invasions
+   */
+  static getRealGruntId(item, invasions) {
+    return (
+      +Object.keys(invasions).find(
+        (key) =>
+          invasions[key]?.type?.toLowerCase() ===
+            item.grunt_type.toLowerCase() &&
+          (invasions[key]?.gender === 0 ||
+            invasions[key].gender === (item.gender || 1)),
+      ) || 0
+    )
+  }
 }
 
 module.exports = PoracleAPI

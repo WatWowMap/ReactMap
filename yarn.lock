@@ -3560,10 +3560,10 @@ config-chain@^1.1.11:
     ini "^1.3.4"
     proto-list "~1.2.1"
 
-config@^3.3.9:
-  version "3.3.9"
-  resolved "https://registry.yarnpkg.com/config/-/config-3.3.9.tgz#27fae95b43e0e1d5723e54143c090954d8e49572"
-  integrity sha512-G17nfe+cY7kR0wVpc49NCYvNtelm/pPy8czHoFkAgtV1lkmcp7DHtWCdDu+C9Z7gb2WVqa9Tm3uF9aKaPbCfhg==
+config@^3.3.10:
+  version "3.3.10"
+  resolved "https://registry.yarnpkg.com/config/-/config-3.3.10.tgz#effb354d15accfb6e2b50e1d626944c635ad1189"
+  integrity sha512-9Kl3LpQ6zj93KaqgfIMTcpwTpgozFOqNl/Dk7mjras1BgGIOlqxWkyIGeU1my+sRuskRYwrCATgCk1RjAnRPGA==
   dependencies:
     json5 "^2.2.3"
 
@@ -6093,10 +6093,10 @@ language-tags@^1.0.9:
   dependencies:
     language-subtag-registry "^0.3.20"
 
-leaflet.locatecontrol@^0.79.0:
-  version "0.79.0"
-  resolved "https://registry.yarnpkg.com/leaflet.locatecontrol/-/leaflet.locatecontrol-0.79.0.tgz#0236b87c699a49f9ddb2f289941fbc0d3c3f8b62"
-  integrity sha512-h64QIHFkypYdr90lkSfjKvPvvk8/b8UnP3m9WuoWdp5p2AaCWC0T1NVwyuj4rd5U4fBW3tQt4ppmZ2LceHMIDg==
+leaflet.locatecontrol@0.73.0:
+  version "0.73.0"
+  resolved "https://registry.yarnpkg.com/leaflet.locatecontrol/-/leaflet.locatecontrol-0.73.0.tgz#768d9edb0470f86c913ea6c2a70ec62380fd45c5"
+  integrity sha512-e6v6SyDU2nzG5AiH80eH7qhXw5J+EfgmEFHkuzTRC9jqCSbfAm/3HlZDuoa9WYsaZbn5ovvqNeaLW/JSMsgg5g==
 
 leaflet@1.9.4:
   version "1.9.4"

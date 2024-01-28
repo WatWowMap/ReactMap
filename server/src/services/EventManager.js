@@ -116,19 +116,23 @@ class EventManager {
 
   /**
    *
-   * @param {import('discord.js').APIEmbed} embed
+   * @param {import('discord.js').APIEmbed | string} embed
    * @param {string} [clientName]
    */
   async chatLog(embed, clientName) {
     if (clientName) {
       const client = this.Clients[clientName]
-      if ('sendMessage' in client) {
+      if ('discordEvents' in client && typeof embed === 'object') {
+        await client.sendMessage(embed, 'event')
+      } else if (typeof embed === 'string') {
         await client.sendMessage(embed, 'event')
       }
     } else {
       await Promise.allSettled(
         Object.values(this.Clients).map(async (client) => {
-          if ('sendMessage' in client) {
+          if ('discordEvents' in client && typeof embed === 'object') {
+            await client.sendMessage(embed, 'event')
+          } else if (typeof embed === 'string') {
             await client.sendMessage(embed, 'event')
           }
         }),
