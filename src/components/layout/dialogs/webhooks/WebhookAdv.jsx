@@ -766,19 +766,18 @@ export default function WebhookAdvanced() {
   }
 
   const handleClose = (save, filterId, filterToSave) => {
-    if (save) {
+    const realSave = typeof save === 'boolean' && save
+    if (realSave) {
       useWebhookStore.setState((prev) => {
         if (filterId === 'global' && filterToSave) {
           const newFilters = {}
           const wc = wildCards[category] || ['0-0']
           if (filterToSave.everything_individually !== false) {
             selectedIds.forEach((item) => {
-              if (!wc.includes(item)) {
-                newFilters[item] = {
-                  ...prev.tempFilters[item],
-                  ...filterToSave,
-                  enabled: true,
-                }
+              newFilters[item] = {
+                ...prev.tempFilters[item],
+                ...filterToSave,
+                enabled: true,
               }
             })
           } else {
@@ -810,13 +809,14 @@ export default function WebhookAdvanced() {
             },
           }
         }
+        return prev
       })
     } else {
       useWebhookStore.setState((prev) => ({
         tempFilters: { ...prev.tempFilters, [filterId]: { ...info?.defaults } },
       }))
     }
-    if (onClose) onClose(poracleValues)
+    if (onClose) onClose(poracleValues, realSave)
     useWebhookStore.setState((prev) => ({
       advanced: { ...prev.advanced, open: false, selectedIds: [] },
     }))

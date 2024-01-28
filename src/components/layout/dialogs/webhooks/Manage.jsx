@@ -38,6 +38,7 @@ export default function Manage() {
   const feedbackLink = useMemory((s) => s.config.links.feedbackLink)
 
   const filters = useGenFullFilters()
+  const liveFilters = useWebhookStore((s) => s.tempFilters)
 
   /** @type {ReturnType<typeof React.useRef<HTMLElement | null>>} */
   const dialogRef = React.useRef(null)
@@ -124,7 +125,7 @@ export default function Manage() {
 
   return category !== 'human' && addNew.open ? (
     <Menu
-      tempFilters={filters[category]}
+      tempFilters={liveFilters}
       category={Poracle.getMapCategory(category)}
       categories={Poracle.getFilterCategories(category)}
       webhookCategory={category}

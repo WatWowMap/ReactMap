@@ -34,7 +34,7 @@ import { create } from 'zustand'
  *    category: string
  *    selectedIds: string[]
  *    open: boolean
- *    onClose?: (newFilters: object) => void
+ *    onClose?: (newFilters: object, save?: boolean) => void
  *  }
  * }} WebhookStore
  * @type {import("zustand").UseBoundStore<import("zustand").StoreApi<WebhookStore>>}
