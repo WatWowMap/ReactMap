@@ -612,7 +612,7 @@
       "showScanQueue": false,
       "routes": true,
       "showcases": true,
-      "pokemon": true,
+      "pokemon": false,
       "gmf": true,
       "scanNextInstance": "scanNext",
       "scanNextDevice": "Device01",
