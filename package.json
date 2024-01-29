@@ -1,6 +1,6 @@
 {
   "name": "reactmap",
-  "version": "1.29.0-develop.16",
+  "version": "1.29.0-develop.17",
   "private": true,
   "description": "React based frontend map.",
   "license": "MIT",
@@ -149,8 +149,8 @@
     "i18next-http-backend": "^1.4.0",
     "knex": "^2.4.2",
     "leaflet": "1.9.4",
-    "leaflet.locatecontrol": "^0.79.0",
-    "lodash.debounce": "^4.0.8",
+    "leaflet.locatecontrol": "0.73.0",
+    "lodash": "^4.17.21",
     "moment-timezone": "^0.5.43",
     "morgan": "^1.10.0",
     "mysql2": "^3.4.0",

@@ -34,7 +34,7 @@ import { create } from 'zustand'
  *    category: string
  *    selectedIds: string[]
  *    open: boolean
- *    onClose?: (newFilters: object) => void
+ *    onClose?: (newFilters: object, save?: boolean) => void
  *  }
  * }} WebhookStore
  * @type {import("zustand").UseBoundStore<import("zustand").StoreApi<WebhookStore>>}
@@ -125,5 +125,21 @@ export function setTrackedSearch(trackedSearch) {
 export const setSelected = (id) => () => {
   useWebhookStore.setState((prev) => ({
     selected: id ? { ...prev.selected, [id]: !prev.selected[id] } : {},
+  }))
+}
+
+/**
+ * @param {boolean} enabled
+ * @param {string[]} ids
+ */
+export const applyToAllWebhooks = (enabled, ids) => {
+  const selected = new Set(ids)
+  useWebhookStore.setState((prev) => ({
+    tempFilters: Object.fromEntries(
+      Object.entries(prev.tempFilters).map(([k, v]) => [
+        k,
+        selected.has(k) ? { ...v, enabled } : v,
+      ]),
+    ),
   }))
 }

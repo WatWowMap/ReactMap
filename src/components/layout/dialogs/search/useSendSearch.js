@@ -1,7 +1,7 @@
 import { useState, useCallback, useMemo, useEffect } from 'react'
 import { useLazyQuery } from '@apollo/client'
 import { useTranslation } from 'react-i18next'
-import debounce from 'lodash.debounce'
+import { debounce } from 'lodash'
 
 import Query from '@services/Query'
 import Utility from '@services/Utility'

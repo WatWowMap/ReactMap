@@ -34,7 +34,8 @@ export default function useRefresh() {
 
   useEffect(() => {
     if (data?.available) {
-      const { masterfile, filters, icons, audio } = data.available
+      const { masterfile, filters, icons, audio, questConditions } =
+        data.available
       const { icons: userIcons, audio: userAudio } = useStorage.getState()
       const existing = useMemory.getState()
 
@@ -73,12 +74,16 @@ export default function useRefresh() {
           JSON.stringify(masterfile.questRewardTypes),
         )
       }
-      useMemory.setState({
+      useMemory.setState((prev) => ({
         masterfile,
         filters,
         Icons,
         Audio,
-      })
+        available: {
+          ...prev.available,
+          questConditions,
+        },
+      }))
       useStorage.setState((prev) => ({
         filters: deepMerge({}, filters, prev.filters),
       }))
