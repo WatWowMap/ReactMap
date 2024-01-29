@@ -24,7 +24,7 @@ export function ControlledZoomLayer() {
         zoom.remove()
       }
     }
-  }, [navSetting])
+  }, [navSetting, map])
 
   return null
 }
@@ -35,21 +35,25 @@ export function ControlledLocate() {
     (state) => state.settings.navigationControls === 'leaflet',
   )
 
+  const lc = React.useMemo(
+    () =>
+      control.locate({
+        position: 'bottomright',
+        icon: 'fas fa-crosshairs',
+        keepCurrentZoomLevel: true,
+        setView: 'untilPan',
+      }),
+    [],
+  )
+
   React.useEffect(() => {
     if (navSetting) {
-      const lc = control
-        .locate({
-          position: 'bottomright',
-          icon: 'fas fa-crosshairs',
-          keepCurrentZoomLevel: true,
-          setView: 'untilPan',
-        })
-        .addTo(map)
+      lc.addTo(map)
       return () => {
         lc.remove()
       }
     }
-  }, [navSetting])
+  }, [navSetting, map, lc])
 
   return null
 }

@@ -49,8 +49,8 @@ export default function Container() {
           ref.attributionControl.setPrefix(attributionPrefix || '')
           ref.on('moveend', setLocationZoom)
           ref.on('zoomend', setLocationZoom)
-          useMapStore.setState({ map: ref })
         }
+        useMapStore.setState({ map: ref })
       }}
       zoom={zoom}
       zoomControl={false}
