@@ -883,7 +883,7 @@
   "navigation": [
     {
       "name": "Google Maps",
-      "url": "https://www.google.com/maps/place/{x},{y}"
+      "url": "https://maps.google.com/maps/place/{x},{y}"
     },
     {
       "name": "Apple Maps",
