@@ -270,7 +270,7 @@ async function scannerApi(
         switch (backendConfig.platform) {
           case 'dragonite':
             Object.assign(payloadObj, {
-              url: `${config.scanner.backendConfig.apiQueueEndpoint}/queue`,
+              url: `${backendConfig.apiQueueEndpoint}/queue`,
               options: { method, headers },
             })
             break
