@@ -31,6 +31,7 @@ import { create } from 'zustand'
  *  tempFilters: Record<string, any>
  *  advanced: {
  *    id: string
+ *    uid: number
  *    category: string
  *    selectedIds: string[]
  *    open: boolean
@@ -73,6 +74,7 @@ export const useWebhookStore = create(() => ({
   tempFilters: {},
   advanced: {
     id: '',
+    uid: 0,
     category: '',
     selectedIds: [],
     open: false,

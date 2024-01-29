@@ -24,7 +24,7 @@ export default function TrackedTile({ index }) {
   const defaults = useWebhookStore((s) => s.context.ui[category].defaults)
 
   React.useEffect(() => {
-    if (advOpen.open && advOpen.id === id) {
+    if (advOpen.open && advOpen.id === id && advOpen.uid === item.uid) {
       useWebhookStore.setState((prev) => ({
         tempFilters: {
           ...prev.tempFilters,
@@ -82,6 +82,7 @@ export default function TrackedTile({ index }) {
               advanced: {
                 open: true,
                 id,
+                uid: item.uid,
                 category,
                 selectedIds: [],
                 onClose,

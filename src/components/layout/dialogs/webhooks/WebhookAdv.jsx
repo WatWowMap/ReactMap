@@ -818,7 +818,13 @@ export default function WebhookAdvanced() {
     }
     if (onClose) onClose(poracleValues, realSave)
     useWebhookStore.setState((prev) => ({
-      advanced: { ...prev.advanced, open: false, selectedIds: [] },
+      advanced: {
+        ...prev.advanced,
+        id: '',
+        uid: 0,
+        open: false,
+        selectedIds: [],
+      },
     }))
   }
 
