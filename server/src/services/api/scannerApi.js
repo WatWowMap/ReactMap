@@ -47,6 +47,20 @@ Object.entries(getCache('scanUserHistory.json', {})).forEach(([k, v]) =>
 
 const backendConfig = config.getSafe('scanner.backendConfig')
 
+const scanNextOptions = {
+  routes: config.getSafe('scanner.scanNext.routes'),
+  showcases: config.getSafe('scanner.scanNext.showcases'),
+  pokemon: config.getSafe('scanner.scanNext.pokemon'),
+  gmf: config.getSafe('scanner.scanNext.gmf'),
+}
+
+const scanZoneOptions = {
+  routes: config.getSafe('scanner.scanZone.routes'),
+  showcases: config.getSafe('scanner.scanZone.showcases'),
+  pokemon: config.getSafe('scanner.scanZone.pokemon'),
+  gmf: config.getSafe('scanner.scanZone.gmf'),
+}
+
 const dateFormat = new Intl.DateTimeFormat(undefined, {
   dateStyle: 'short',
   timeStyle: 'medium',
@@ -125,18 +139,6 @@ async function scannerApi(
     const cache = userCache.has(user.id)
       ? userCache.get(user.id)
       : { coordinates: 0, requests: 0 }
-    const scanNextOptions = {
-      routes: config.scanner.scanNext.routes,
-      showcases: config.scanner.scanNext.showcases,
-      pokemon: config.scanner.scanNext.pokemon,
-      gmf: config.scanner.scanNext.gmf,
-    }
-    const scanZoneOptions = {
-      routes: config.scanner.scanZone.routes,
-      showcases: config.scanner.scanZone.showcases,
-      pokemon: config.scanner.scanZone.pokemon,
-      gmf: config.scanner.scanZone.gmf,
-    }
 
     switch (category) {
       case 'scanNext':
@@ -177,7 +179,7 @@ async function scannerApi(
             break
           case 'dragonite':
             Object.assign(payloadObj, {
-              url: backendConfig.apiEndpoint,
+              url: `${backendConfig.apiEndpoint}/v2`,
               options: {
                 method: 'POST',
                 headers,
@@ -219,7 +221,7 @@ async function scannerApi(
         switch (backendConfig.platform) {
           case 'dragonite':
             Object.assign(payloadObj, {
-              url: backendConfig.apiEndpoint,
+              url: `${backendConfig.apiEndpoint}/v2`,
               options: {
                 method: 'POST',
                 headers,
@@ -269,11 +271,6 @@ async function scannerApi(
         log.info(HELPERS.scanner, `Getting queue for method ${data.typeName}`)
         switch (backendConfig.platform) {
           case 'dragonite':
-            Object.assign(payloadObj, {
-              url: `${backendConfig.apiQueueEndpoint}/queue`,
-              options: { method, headers },
-            })
-            break
           case 'custom':
             Object.assign(payloadObj, {
               url: `${backendConfig.apiEndpoint}/queue`,
