@@ -47,6 +47,20 @@ Object.entries(getCache('scanUserHistory.json', {})).forEach(([k, v]) =>
 
 const backendConfig = config.getSafe('scanner.backendConfig')
 
+const scanNextOptions = {
+  routes: config.getSafe('scanner.scanNext.routes'),
+  showcases: config.getSafe('scanner.scanNext.showcases'),
+  pokemon: config.getSafe('scanner.scanNext.pokemon'),
+  gmf: config.getSafe('scanner.scanNext.gmf'),
+}
+
+const scanZoneOptions = {
+  routes: config.getSafe('scanner.scanZone.routes'),
+  showcases: config.getSafe('scanner.scanZone.showcases'),
+  pokemon: config.getSafe('scanner.scanZone.pokemon'),
+  gmf: config.getSafe('scanner.scanZone.gmf'),
+}
+
 const dateFormat = new Intl.DateTimeFormat(undefined, {
   dateStyle: 'short',
   timeStyle: 'medium',
@@ -78,7 +92,7 @@ async function scannerApi(
           parseFloat(data.scanCoords[0][0].toFixed(5)),
           parseFloat(data.scanCoords[0][1].toFixed(5)),
         ]
-      : backendConfig.platform === 'custom'
+      : backendConfig.platform === 'dragonite' || backendConfig.platform === 'custom'
       ? data.scanCoords?.map((coord) => [
           parseFloat(coord[0].toFixed(5)),
           parseFloat(coord[1].toFixed(5)),
@@ -104,6 +118,7 @@ async function scannerApi(
           ).toString('base64')}`,
         })
         break
+      case 'dragonite':
       case 'custom':
         if (backendConfig.apiUsername || backendConfig.apiPassword) {
           Object.assign(headers, {
@@ -162,6 +177,20 @@ async function scannerApi(
               options: { method, headers },
             })
             break
+          case 'dragonite':
+            Object.assign(payloadObj, {
+              url: `${backendConfig.apiEndpoint}/v2`,
+              options: {
+                method: 'POST',
+                headers,
+                body: JSON.stringify({
+                  username: user.username,
+                  locations: coords,
+                  options: scanNextOptions,
+                }),
+              },
+            })
+            break
           case 'custom':
             Object.assign(payloadObj, {
               url: backendConfig.apiEndpoint,
@@ -190,6 +219,20 @@ async function scannerApi(
           )},${data.scanLocation[1].toFixed(5)}`,
         )
         switch (backendConfig.platform) {
+          case 'dragonite':
+            Object.assign(payloadObj, {
+              url: `${backendConfig.apiEndpoint}/v2`,
+              options: {
+                method: 'POST',
+                headers,
+                body: JSON.stringify({
+                  username: user.username,
+                  locations: coords,
+                  options: scanZoneOptions,
+                }),
+              },
+            })
+            break
           case 'custom':
             Object.assign(payloadObj, {
               url: backendConfig.apiEndpoint,
@@ -227,6 +270,7 @@ async function scannerApi(
         }
         log.info(HELPERS.scanner, `Getting queue for method ${data.typeName}`)
         switch (backendConfig.platform) {
+          case 'dragonite':
           case 'custom':
             Object.assign(payloadObj, {
               url: `${backendConfig.apiEndpoint}/queue`,
@@ -277,7 +321,7 @@ async function scannerApi(
       (scannerResponse.status === 200 || scannerResponse.status === 201) &&
       category === 'getQueue'
     ) {
-      if (backendConfig.platform === 'custom') {
+      if (backendConfig.platform === 'dragonite' || backendConfig.platform === 'custom') {
         const { queue } = await scannerResponse.json()
         log.info(
           HELPERS.scanner,
@@ -307,7 +351,7 @@ async function scannerApi(
       const trimmed = coords
         .filter((_c, i) => i < 25)
         .map((c) =>
-          backendConfig.platform === 'custom'
+          backendConfig.platform === 'dragonite' || backendConfig.platform === 'custom'
             ? `${c[0]}, ${c[1]}`
             : typeof c === 'object'
             ? `${'lat' in c && c.lat}, ${'lon' in c && c.lon}`
