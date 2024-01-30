@@ -597,7 +597,6 @@
     "backendConfig": {
       "platform": "rdm/mad/dragonite/custom",
       "apiEndpoint": "http://ip:port/api/",
-      "apiQueueEndpoint": "http://ip:port/api/",
       "headers": [],
       "apiUsername": "username",
       "apiPassword": "password",
