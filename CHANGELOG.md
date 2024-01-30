@@ -1,3 +1,12 @@
+# [1.29.0-develop.18](https://github.com/WatWowMap/ReactMap/compare/v1.29.0-develop.17...v1.29.0-develop.18) (2024-01-29)
+
+
+### Bug Fixes
+
+* stop crashing leaflet when map crashes ([45349be](https://github.com/WatWowMap/ReactMap/commit/45349be24075723909ee59dcfb64e14e83674a70))
+* uid for editing ([818a958](https://github.com/WatWowMap/ReactMap/commit/818a9584e4c385ec841d97beff7dee37369d40c8))
+* unknown shocases ([99cf89b](https://github.com/WatWowMap/ReactMap/commit/99cf89b911dbd7032e08f9f2bc524151ec110d7c)), closes [#941](https://github.com/WatWowMap/ReactMap/issues/941)
+
 # [1.29.0-develop.17](https://github.com/WatWowMap/ReactMap/compare/v1.29.0-develop.16...v1.29.0-develop.17) (2024-01-28)
 
 
