@@ -1265,6 +1265,22 @@
         "__name": "SCANNER_SCAN_NEXT_SHOW_SCAN_QUEUE",
         "__format": "boolean"
       },
+      "routes": {
+        "__name": "SCANNER_SCAN_NEXT_ROUTES",
+        "__format": "boolean"
+      },
+      "showcases": {
+        "__name": "SCANNER_SCAN_NEXT_SHOWCASES",
+        "__format": "boolean"
+      },
+      "pokemon": {
+        "__name": "SCANNER_SCAN_NEXT_POKEMON",
+        "__format": "boolean"
+      },
+      "gmf": {
+        "__name": "SCANNER_SCAN_NEXT_GMF",
+        "__format": "boolean"
+      },
       "scanNextInstance": "SCANNER_SCAN_NEXT_SCAN_NEXT_INSTANCE",
       "scanNextDevice": "SCANNER_SCAN_NEXT_SCAN_NEXT_DEVICE",
       "scanNextSleeptime": {
@@ -1307,6 +1323,22 @@
       },
       "showScanQueue": {
         "__name": "SCANNER_SCAN_ZONE_SHOW_SCAN_QUEUE",
+        "__format": "boolean"
+      },
+      "routes": {
+        "__name": "SCANNER_SCAN_ZONE_ROUTES",
+        "__format": "boolean"
+      },
+      "showcases": {
+        "__name": "SCANNER_SCAN_ZONE_SHOWCASES",
+        "__format": "boolean"
+      },
+      "pokemon": {
+        "__name": "SCANNER_SCAN_ZONE_POKEMON",
+        "__format": "boolean"
+      },
+      "gmf": {
+        "__name": "SCANNER_SCAN_ZONE_GMF",
         "__format": "boolean"
       },
       "scanZoneMaxSize": {
