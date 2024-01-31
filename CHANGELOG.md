@@ -1,3 +1,10 @@
+# [1.29.0-develop.19](https://github.com/WatWowMap/ReactMap/compare/v1.29.0-develop.18...v1.29.0-develop.19) (2024-01-30)
+
+
+### Features
+
+* Merge pull request [#942](https://github.com/WatWowMap/ReactMap/issues/942) from kamieniarz/patch-1 ([cc54b12](https://github.com/WatWowMap/ReactMap/commit/cc54b122a87d963c6cf1c42b9c0e4afc98cc6a40))
+
 # [1.29.0-develop.18](https://github.com/WatWowMap/ReactMap/compare/v1.29.0-develop.17...v1.29.0-develop.18) (2024-01-29)
 
 
