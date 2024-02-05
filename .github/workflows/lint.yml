@@ -3,7 +3,7 @@ on: [push]
 
 jobs:
   lint:
-    name: Run Basic Checks
+    name: Lint Check
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code

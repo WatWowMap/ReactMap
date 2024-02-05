@@ -1,28 +1,44 @@
 name: Release
-on: [release]
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+      - develop
+
+permissions: write-all
 
 jobs:
-  sentry:
+  release:
+    name: GitHub Release
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Code
-        id: checkout-code
+      - name: Wait for other CI
+        uses: lewagon/wait-on-check-action@v1.3.1
+        with:
+          ref: ${{ github.ref }}
+          check-name: 'Locales Sync'
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          wait-interval: 10
+      - name: Checkout
         uses: actions/checkout@v3
         with:
-          fetch-depth: 2
-      - name: Setup Node.js environment
-        uses: actions/setup-node@v3
-        with:
-          node-version: 18
-          cache: 'yarn'
-
-      - name: Install Dependencies
-        run: yarn
-
-      - name: Sentry Build
-        run: yarn release
+          fetch-depth: 0
+      - name: Install Volta
+        uses: volta-cli/action@v4
+      - name: Echo versions
+        run: |
+          node --version
+          yarn --version
+      - name: Install dependencies
+        run: yarn --prefer-offline
         env:
-          SENTRY_AUTH_TOKEN: ${{secrets.SENTRY_AUTH_TOKEN}}
-          SENTRY_DSN: ${{secrets.SENTRY_DSN}}
-          SENTRY_ORG: ${{secrets.SENTRY_ORG}}
-          SENTRY_PROJECT: ${{secrets.SENTRY_PROJECT}}
+          HUSKY: 0
+      - name: Build app
+        run: yarn build
+      - name: Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          HUSKY: 0
+        run: npx semantic-release
