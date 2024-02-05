@@ -1,8 +1,9 @@
 name: Locales
 on:
-  push:
-    branches:
-      - main
+  workflow_run:
+    workflows: [Config]
+    types: [completed]
+    branches: [main]
 
 env:
   REGISTRY: ghcr.io
@@ -13,13 +14,6 @@ jobs:
     name: Locales Sync
     runs-on: ubuntu-latest
     steps:
-      - name: Wait for other CI
-        uses: lewagon/wait-on-check-action@v1.3.3
-        with:
-          ref: ${{ github.ref }}
-          check-name: 'Config Sync'
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
-          wait-interval: 10
       - name: Checkout code
         id: checkout-code
         uses: actions/checkout@v3

@@ -1,0 +1,15 @@
+name: Release Main
+
+on:
+  workflow_run:
+    workflows: [Locales]
+    types: [completed]
+    branches: [main]
+
+jobs:
+  releaseDev:
+    name: Release Main
+    runs-on: ubuntu-latest
+    steps:
+      - name: Run Release Base
+        uses: WatWowMap/ReactMap/.github/workflows/release-base.yml@main

@@ -1,11 +1,5 @@
 name: Release
-
-on:
-  pull_request:
-  push:
-    branches:
-      - main
-      - develop
+on: workflow_call
 
 permissions: write-all
 
@@ -14,13 +8,6 @@ jobs:
     name: GitHub Release
     runs-on: ubuntu-latest
     steps:
-      - name: Wait for other CI
-        uses: lewagon/wait-on-check-action@v1.3.3
-        with:
-          ref: ${{ github.ref }}
-          check-name: 'Locales Sync'
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
-          wait-interval: 10
       - name: Checkout
         uses: actions/checkout@v3
         with:

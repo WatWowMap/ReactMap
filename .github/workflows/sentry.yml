@@ -1,17 +1,13 @@
 name: Sentry
-on: [release]
+on:
+  release:
+    types: [prereleased, released]
 
 jobs:
   sentry:
+    name: Sentry
     runs-on: ubuntu-latest
     steps:
-      - name: Wait for other CI
-        uses: lewagon/wait-on-check-action@v1.3.3
-        with:
-          ref: ${{ github.ref }}
-          check-name: 'Lint Check'
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
-          wait-interval: 10
       - name: Checkout Code
         id: checkout-code
         uses: actions/checkout@v3

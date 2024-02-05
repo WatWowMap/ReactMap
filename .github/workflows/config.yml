@@ -1,9 +1,9 @@
 name: Config
 on:
-  push:
-    branches:
-      - main
-      - develop
+  workflow_run:
+    workflows: [Lint]
+    types: [completed]
+    branches: [main, develop]
 
 env:
   REGISTRY: ghcr.io
@@ -14,13 +14,6 @@ jobs:
     name: Config Sync
     runs-on: ubuntu-latest
     steps:
-      - name: Wait for other CI
-        uses: lewagon/wait-on-check-action@v1.3.3
-        with:
-          ref: ${{ github.ref }}
-          check-name: 'Lint Check'
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
-          wait-interval: 10
       - name: Checkout code
         id: checkout-code
         uses: actions/checkout@v3
