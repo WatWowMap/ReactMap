@@ -9,6 +9,8 @@ env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
 
+permissions: write-all
+
 jobs:
   locales:
     name: Locales Sync
@@ -40,6 +42,9 @@ jobs:
           fi
       - name: Commit and push changes
         if: ${{ env.changes_exist == 'true' }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          HUSKY: 0
         run: |
           git add --all
           git commit --message "chore: sync locales"

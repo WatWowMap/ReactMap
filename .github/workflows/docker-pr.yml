@@ -1,0 +1,8 @@
+name: Docker Pull Request
+on:
+  workflow_run:
+    workflows: [Config]
+
+jobs:
+  build:
+    uses: WatWowMap/ReactMap/.github/workflows/docker-base.yml@main

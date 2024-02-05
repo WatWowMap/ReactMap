@@ -7,5 +7,5 @@ on:
     branches: [main]
 
 jobs:
-  release-main:
+  build:
     uses: WatWowMap/ReactMap/.github/workflows/release-base.yml@main

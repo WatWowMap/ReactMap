@@ -7,5 +7,5 @@ on:
     branches: [develop]
 
 jobs:
-  release-develop:
+  build:
     uses: WatWowMap/ReactMap/.github/workflows/release-base.yml@develop
