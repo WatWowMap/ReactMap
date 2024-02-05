@@ -7,9 +7,5 @@ on:
     branches: [develop]
 
 jobs:
-  releaseDev:
-    name: Release Develop
-    runs-on: ubuntu-latest
-    steps:
-      - name: Run Release Base
-        uses: WatWowMap/ReactMap/.github/workflows/release-base.yml@develop
+  release-develop:
+    uses: WatWowMap/ReactMap/.github/workflows/release-base.yml@develop
