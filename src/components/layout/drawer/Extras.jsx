@@ -231,16 +231,17 @@ const BaseInvasion = () => {
   const hasConfirmed = useMemory((s) =>
     s.available.pokestops.some((x) => x.startsWith('a')),
   )
+  const confirmedEnabled = useStorage((s) => !!s.filters?.pokestops?.confirmed)
   return (
     <CollapsibleItem open={enabled}>
-      {hasConfirmed && (
+      {(confirmedEnabled || hasConfirmed) && (
         <BoolToggle
           inset
           field="filters.pokestops.confirmed"
           label="only_confirmed"
         />
       )}
-      {hasConfirmed ? (
+      {confirmedEnabled || hasConfirmed ? (
         <MultiSelectorList tabKey="invasions">
           <SelectorListMemo
             key="invasions"
