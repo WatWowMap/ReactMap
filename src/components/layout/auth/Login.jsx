@@ -10,7 +10,7 @@ import { useQuery } from '@apollo/client'
 
 import { CUSTOM_COMPONENT } from '@services/queries/config'
 
-import { useStatic } from '@hooks/useStore'
+import { useMemory } from '@hooks/useMemory'
 import LocalLogin from './Local'
 import LocaleSelection from '../general/LocaleSelection'
 import DiscordLogin from './Discord'
@@ -20,19 +20,19 @@ import ThemeToggle from '../general/ThemeToggle'
 import { Loading } from '../general/Loading'
 
 export default function Login() {
-  const loggedIn = useStatic((s) => s.auth.loggedIn)
-  const loginPage = useStatic((s) => !!s.config.loginPage)
-  const headerTitle = useStatic((s) => s.config.general.headerTitle)
-  const discordInvite = useStatic((s) => s.config.links.discordInvite)
-  const discordAuthUrl = useStatic((s) => s.config.customRoutes.discordAuthUrl)
-  const telegramBotName = useStatic(
+  const loggedIn = useMemory((s) => s.auth.loggedIn)
+  const loginPage = useMemory((s) => !!s.config.loginPage)
+  const headerTitle = useMemory((s) => s.config.general.headerTitle)
+  const discordInvite = useMemory((s) => s.config.links.discordInvite)
+  const discordAuthUrl = useMemory((s) => s.config.customRoutes.discordAuthUrl)
+  const telegramBotName = useMemory(
     (s) => s.config.customRoutes.telegramBotName,
   )
-  const telegramAuthUrl = useStatic(
+  const telegramAuthUrl = useMemory(
     (s) => s.config.customRoutes.telegramAuthUrl,
   )
-  const localAuthUrl = useStatic((s) => s.config.customRoutes.localAuthUrl)
-  const authMethods = useStatic((s) => s.auth.methods)
+  const localAuthUrl = useMemory((s) => s.config.customRoutes.localAuthUrl)
+  const authMethods = useMemory((s) => s.auth.methods)
 
   const { t, i18n } = useTranslation()
   const { data, loading } = useQuery(CUSTOM_COMPONENT, {

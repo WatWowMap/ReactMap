@@ -14,6 +14,7 @@ const HELPERS = /** @type {const} */ ({
   info: chalk.blue('ℹ'),
   warn: chalk.yellow('⚠'),
   error: chalk.red('✖'),
+
   telegram: chalk.hex('#26A8EA')('[TELEGRAM]'),
   discord: chalk.hex('#7289da')('[DISCORD]'),
   cache: chalk.blueBright('[CACHE]'),
@@ -55,6 +56,7 @@ const HELPERS = /** @type {const} */ ({
   portals: chalk.hex('#795548')('[PORTALS]'),
   route: chalk.hex('#607d8b')('[ROUTE]'),
   routes: chalk.hex('#9e9e9e')('[ROUTES]'),
+  search: chalk.hex('#795548')('[SEARCH]'),
 
   custom: (text = '', color = '#64b5f6') =>
     chalk.hex(color)(`[${text.toUpperCase()}]`),

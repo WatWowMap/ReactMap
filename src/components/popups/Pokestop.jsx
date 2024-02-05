@@ -19,10 +19,12 @@ import { useTranslation, Trans } from 'react-i18next'
 
 import ErrorBoundary from '@components/ErrorBoundary'
 import { Check, Help } from '@components/layout/general/Icons'
-import { useStore, useStatic } from '@hooks/useStore'
+import { useMemory } from '@hooks/useMemory'
+import { setDeepStore, useStorage } from '@hooks/useStorage'
 import Utility from '@services/Utility'
 import { getBadge } from '@services/functions/getBadge'
 import getRewardInfo from '@services/functions/getRewardInfo'
+import { getGruntReward } from '@services/functions/getGruntReward'
 
 import Dropdown from './common/Dropdown'
 import TimeTile from './common/TimeTile'
@@ -53,7 +55,7 @@ export default function PokestopPopup({
   ...pokestop
 }) {
   const { t } = useTranslation()
-  const Icons = useStatic((state) => state.Icons)
+  const Icons = useMemory((state) => state.Icons)
   const { lure_expire_timestamp, lure_id, invasions, events } = pokestop
 
   React.useEffect(() => {
@@ -187,7 +189,7 @@ export default function PokestopPopup({
                         <TimeTile
                           expireTime={event.event_expire_timestamp}
                           expandKey={
-                            event.showcase_pokemon_id
+                            event.display_type === 9
                               ? `event_${event.display_type}`
                               : undefined
                           }
@@ -209,6 +211,30 @@ export default function PokestopPopup({
                                     src={Icons.getPokemon(
                                       event.showcase_pokemon_id,
                                       event.showcase_pokemon_form_id,
+                                    )}
+                                  />
+                                  <img
+                                    className="invasion-reward-shadow"
+                                    alt="shadow"
+                                    src={Icons.getEventStops(
+                                      event.display_type,
+                                    )}
+                                  />
+                                </div>
+                              </NameTT>
+                            ) : event.showcase_pokemon_type_id ? (
+                              <NameTT
+                                key={event.showcase_pokemon_type_id}
+                                id={[
+                                  `poke_type_${event.showcase_pokemon_type_id}`,
+                                ]}
+                              >
+                                <div className="invasion-reward">
+                                  <img
+                                    className="invasion-reward"
+                                    alt="invasion reward"
+                                    src={Icons.getTypes(
+                                      event.showcase_pokemon_type_id,
                                     )}
                                   />
                                   <img
@@ -285,8 +311,8 @@ const MenuActions = ({
   invasions,
 }) => {
   const { t } = useTranslation()
-  const masterfile = useStatic((state) => state.masterfile)
-  const filters = useStore((state) => state.filters)
+  const masterfile = useMemory((state) => state.masterfile)
+  const filters = useStorage((state) => state.filters)
 
   const [anchorEl, setAnchorEl] = React.useState(false)
 
@@ -300,27 +326,11 @@ const MenuActions = ({
 
   const handleHide = () => {
     setAnchorEl(null)
-    useStatic.setState((prev) => ({ hideList: new Set(prev.hideList).add(id) }))
+    useMemory.setState((prev) => ({ hideList: new Set(prev.hideList).add(id) }))
   }
 
-  const setState = (key) => {
-    useStore.setState((prev) => ({
-      filters: {
-        ...prev.filters,
-        pokestops: {
-          ...prev.filters.pokestops,
-          filter: {
-            ...prev.filters.pokestops.filter,
-            [key]: {
-              ...prev.filters.pokestops.filter[key],
-              enabled: false,
-            },
-          },
-        },
-      },
-    }))
-    useStatic.setState((prev) => ({ excludeList: [...prev.excludeList, key] }))
-  }
+  const setState = (key) =>
+    setDeepStore(`filters.pokestops.filter.${key}.enabled`, false)
 
   const excludeLure = () => {
     setAnchorEl(null)
@@ -339,7 +349,7 @@ const MenuActions = ({
 
   const handleTimer = () => {
     setAnchorEl(null)
-    useStatic.setState((prev) => {
+    useMemory.setState((prev) => {
       if (prev.timerList.includes(id)) {
         return { timerList: prev.timerList.filter((x) => x !== id) }
       }
@@ -474,7 +484,7 @@ const MenuActions = ({
 const RewardInfo = ({ with_ar, ...quest }) => {
   const { t } = useTranslation()
   const { src, amount, tt } = getRewardInfo(quest)
-  const questMessage = useStatic((s) => s.config.misc.questMessage)
+  const questMessage = useMemory((s) => s.config.misc.questMessage)
 
   return (
     <Grid item xs={3} style={{ textAlign: 'center', position: 'relative' }}>
@@ -520,7 +530,7 @@ const QuestConditions = ({
   quest_title,
 }) => {
   const { i18n, t } = useTranslation()
-  const madQuestText = useStore((s) => s.userSettings.pokestops.madQuestText)
+  const madQuestText = useStorage((s) => s.userSettings.pokestops.madQuestText)
 
   if (madQuestText && quest_task) {
     return (
@@ -642,7 +652,7 @@ const QuestConditions = ({
  * @returns
  */
 const Footer = ({ lat, lon }) => {
-  const open = useStore((state) => !!state.popups.extras)
+  const open = useStorage((state) => !!state.popups.extras)
 
   return (
     <Grid
@@ -659,7 +669,7 @@ const Footer = ({ lat, lon }) => {
         <IconButton
           className={open ? 'expanded' : 'closed'}
           onClick={() =>
-            useStore.setState((prev) => ({
+            useStorage.setState((prev) => ({
               popups: { ...prev.popups, extras: !open },
             }))
           }
@@ -678,8 +688,8 @@ const Footer = ({ lat, lon }) => {
  * @returns
  */
 const ExtraInfo = ({ last_modified_timestamp, updated, lat, lon }) => {
-  const open = useStore((state) => state.popups.extras)
-  const enablePokestopPopupCoords = useStore(
+  const open = useStorage((state) => state.popups.extras)
+  const enablePokestopPopupCoords = useStorage(
     (state) => state.userSettings.pokestops.enablePokestopPopupCoords,
   )
 
@@ -699,33 +709,12 @@ const ExtraInfo = ({ last_modified_timestamp, updated, lat, lon }) => {
 }
 
 /**
- * @typedef {import('@rm/types').Masterfile['invasions']} Invasions
- * @param {Invasions[keyof Invasions]} grunt
- * @returns {{ first?: string, second?: string, third?: string }}
- */
-const getRewardPercent = (grunt) => {
-  if (grunt.type.startsWith('NPC')) {
-    return {}
-  }
-  if (grunt.secondReward) {
-    return { first: '85%', second: '15%' }
-  }
-  if (grunt.thirdReward) {
-    return { third: '100%' }
-  }
-  if (grunt.firstReward) {
-    return { first: '100%' }
-  }
-  return {}
-}
-
-/**
  *
  * @param {{ id: number, form: number, gender?: number, costumeId?: number, shiny?: boolean}} param0
  * @returns
  */
 const ShadowPokemon = ({ id, form, gender, costumeId, shiny }) => {
-  const Icons = useStatic((s) => s.Icons)
+  const Icons = useMemory((s) => s.Icons)
   const src = Icons.getPokemon(id, form, 0, gender, costumeId, 1, shiny)
   return (
     <NameTT
@@ -754,9 +743,9 @@ const ENCOUNTER_NUM = { first: '#1', second: '#2', third: '#3' }
  * @returns
  */
 const Invasion = ({ grunt_type, confirmed, ...invasion }) => {
-  const Icons = useStatic((s) => s.Icons)
+  const Icons = useMemory((s) => s.Icons)
   const { t } = useTranslation()
-  const info = useStatic((state) => state.masterfile.invasions[grunt_type])
+  const info = useMemory((state) => state.masterfile.invasions[grunt_type])
 
   return (
     <Grid container>
@@ -779,6 +768,7 @@ const Invasion = ({ grunt_type, confirmed, ...invasion }) => {
               ([position, lineup], i) => {
                 const id = invasion[`slot_${i + 1}_pokemon_id`]
                 const form = invasion[`slot_${i + 1}_form`]
+                const reward = getGruntReward(info)[position]
                 return (
                   <tr key={position}>
                     <td>{ENCOUNTER_NUM[position]}</td>
@@ -795,7 +785,7 @@ const Invasion = ({ grunt_type, confirmed, ...invasion }) => {
                         ))
                       )}
                     </td>
-                    <td>{getRewardPercent(info)[position] || ''}</td>
+                    <td>{reward ? `${reward}%` : ''}</td>
                   </tr>
                 )
               },
@@ -868,8 +858,8 @@ const NoBorderCell = styled(TableCell, {
   textAlign,
 }))
 
-const ShowcaseEntry = ({ rank, score }) => {
-  const Icons = useStatic((s) => s.Icons)
+const ShowcaseEntry = ({ rank, score, pokemon_id, form, costume, gender }) => {
+  const Icons = useMemory((s) => s.Icons)
   return (
     <TableRow>
       <NoBorderCell>
@@ -881,6 +871,15 @@ const ShowcaseEntry = ({ rank, score }) => {
       >
         {score.toFixed(2)}
       </NoBorderCell>
+      {pokemon_id && (
+        <NoBorderCell>
+          <img
+            src={Icons.getPokemon(pokemon_id, form, 0, gender, costume)}
+            alt="rank"
+            height={20}
+          />
+        </NoBorderCell>
+      )}
     </TableRow>
   )
 }

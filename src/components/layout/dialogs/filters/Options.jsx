@@ -10,7 +10,8 @@ import FormControlLabel from '@mui/material/FormControlLabel'
 import Checkbox from '@mui/material/Checkbox'
 import { useTranslation } from 'react-i18next'
 
-import { useStatic, useStore } from '@hooks/useStore'
+import { useMemory } from '@hooks/useMemory'
+import { useStorage } from '@hooks/useStorage'
 import Utility from '@services/Utility'
 
 const handleChange = (category, subCategory) => (event) => {
@@ -19,7 +20,7 @@ const handleChange = (category, subCategory) => (event) => {
     `New Value: ${event.target.checked}`,
     `Category: ${category} Name: ${subCategory}.${event.target.name}`,
   )
-  useStore.setState((prev) => ({
+  useStorage.setState((prev) => ({
     menus: {
       ...prev.menus,
       [category]: {
@@ -37,7 +38,7 @@ const handleChange = (category, subCategory) => (event) => {
 }
 
 const handleAccordion = (category, subCategory) => (event, isExpanded) => {
-  useStore.setState((prev) => ({
+  useStorage.setState((prev) => ({
     advMenu: { ...prev.advMenu, [category]: isExpanded ? subCategory : false },
   }))
 }
@@ -45,7 +46,7 @@ const handleAccordion = (category, subCategory) => (event, isExpanded) => {
 export function OptionCheckbox({ category, subCategory, option }) {
   const { t } = useTranslation()
 
-  const checked = useStore(
+  const checked = useStorage(
     (state) => state.menus[category].filters[subCategory][option] || false,
   )
 
@@ -68,10 +69,10 @@ const OptionsCheckboxMemo = React.memo(OptionCheckbox, () => true)
 
 export default function OptionsGroup({ category, subCategory }) {
   const { t } = useTranslation()
-  const options = useStatic((s) =>
+  const options = useMemory((s) =>
     Object.keys(s.menus[category].filters[subCategory] || {}),
   )
-  const expanded = useStore((s) => s.advMenu[category] === subCategory)
+  const expanded = useStorage((s) => s.advMenu[category] === subCategory)
 
   return (
     <Accordion

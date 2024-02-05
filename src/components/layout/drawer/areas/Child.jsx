@@ -1,42 +1,52 @@
+// @ts-check
 import * as React from 'react'
-import {
-  Typography,
-  Checkbox,
-  TableCell,
-  Button,
-  IconButton,
-} from '@mui/material'
+import Typography from '@mui/material/Typography'
+import TableCell from '@mui/material/TableCell'
+import Checkbox from '@mui/material/Checkbox'
+import IconButton from '@mui/material/IconButton'
+import Button from '@mui/material/Button'
+import Grid2 from '@mui/material/Unstable_Grid2'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 
-import Utility from '@services/Utility'
-import Grid2 from '@mui/material/Unstable_Grid2'
+import { useDeepStore, useStorage } from '@hooks/useStorage'
+import { useMemory } from '@hooks/useMemory'
+import { useMap } from 'react-leaflet'
 
-export default function AreaTile({
+/**
+ * @param {{
+ *  name?: string
+ *  feature?: Pick<import('@rm/types').RMFeature, 'properties'>
+ *  allAreas?: string[]
+ *  childAreas?: Pick<import('@rm/types').RMFeature, 'properties'>[]
+ *  borderRight?: boolean
+ *  colSpan?: number
+ * }} props
+ */
+export function AreaChild({
   name,
   feature,
   childAreas,
-  scanAreasZoom,
   allAreas,
-  map,
   borderRight,
-  scanAreas,
-  setAreas,
   colSpan = 1,
-  open,
-  setOpen,
 }) {
+  const scanAreas = useStorage((s) => s.filters?.scanAreas?.filter?.areas)
+  const zoom = useMemory((s) => s.config.general.scanAreasZoom)
+  const expandAllScanAreas = useMemory((s) => s.config.misc.expandAllScanAreas)
+  const map = useMap()
+
+  const { setAreas } = useStorage.getState()
+  const [open, setOpen] = useDeepStore('scanAreasMenu', '')
+
   if (!scanAreas) return null
 
   const hasAll =
     childAreas &&
     childAreas.every(
-      (c) =>
-        c.properties.manual ||
-        scanAreas.filter.areas.includes(c.properties.key),
+      (c) => c.properties.manual || scanAreas.includes(c.properties.key),
     )
   const hasSome =
-    childAreas &&
-    childAreas.some((c) => scanAreas.filter.areas.includes(c.properties.key))
+    childAreas && childAreas.some((c) => scanAreas.includes(c.properties.key))
   const hasManual =
     feature?.properties?.manual || childAreas.every((c) => c.properties.manual)
   const color =
@@ -46,6 +56,7 @@ export default function AreaTile({
 
   const nameProp =
     name || feature?.properties?.formattedName || feature?.properties?.name
+  const hasExpand = name && !expandAllScanAreas
   return (
     <TableCell
       colSpan={colSpan}
@@ -72,7 +83,7 @@ export default function AreaTile({
           if (feature?.properties?.center) {
             map.flyTo(
               feature.properties.center,
-              feature.properties.zoom || scanAreasZoom,
+              feature.properties.zoom || zoom,
             )
           }
         }}
@@ -85,16 +96,12 @@ export default function AreaTile({
           },
         })}
       >
-        {!name && hasManual ? null : (
+        {!hasExpand && hasManual ? null : (
           <Checkbox
             size="small"
             color="secondary"
             indeterminate={name ? hasSome && !hasAll : false}
-            checked={
-              name
-                ? hasAll
-                : scanAreas.filter.areas.includes(feature.properties.key)
-            }
+            checked={name ? hasAll : scanAreas.includes(feature.properties.key)}
             onClick={(e) => e.stopPropagation()}
             onChange={() =>
               setAreas(
@@ -126,11 +133,9 @@ export default function AreaTile({
           align="center"
           style={{ whiteSpace: 'pre-wrap', flexGrow: 1 }}
         >
-          {feature?.properties?.reactMapFormat && nameProp
-            ? Utility.getProperName(nameProp)
-            : nameProp || <>&nbsp;</>}
+          {nameProp || <>&nbsp;</>}
         </Typography>
-        {name && setOpen && (
+        {hasExpand && (
           <IconButton
             component="span"
             className={open === name ? 'expanded' : 'collapsed'}

@@ -1,8 +1,11 @@
-name: Release
-on: [release]
+name: Sentry
+on:
+  release:
+    types: [prereleased, released]
 
 jobs:
   sentry:
+    name: Sentry
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code

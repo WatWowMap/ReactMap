@@ -3,19 +3,19 @@ import * as React from 'react'
 import { useQuery } from '@apollo/client'
 import { useMap } from 'react-leaflet'
 
-import { useStatic, useStore } from '@hooks/useStore'
+import { useMemory } from '@hooks/useMemory'
+import { useStorage } from '@hooks/useStorage'
 import { usePermCheck } from '@hooks/usePermCheck'
 import Query from '@services/Query'
 import { getQueryArgs } from '@services/functions/getQueryArgs'
 import RobustTimeout from '@services/apollo/RobustTimeout'
 import Utility from '@services/Utility'
+import { FILTER_SKIP_LIST } from '@assets/constants'
 
 import * as index from './tiles/index'
 import Clustering from './Clustering'
 import Notification from './layout/general/Notification'
 import { GenerateCells } from './tiles/S2Cell'
-
-const FILTER_SKIP_LIST = ['filter', 'enabled', 'legacy']
 
 /** @param {string} category */
 const userSettingsCategory = (category) => {
@@ -32,15 +32,24 @@ const userSettingsCategory = (category) => {
   }
 }
 
+/**
+ * @template {keyof import('@rm/types').AllFilters} T
+ * @param {import('@rm/types').AllFilters[T]} requestedFilters
+ * @param {Record<string, any>} userSettings
+ * @param {T} category
+ * @param {string[]} [onlyAreas]
+ * @returns
+ */
 const trimFilters = (requestedFilters, userSettings, category, onlyAreas) => {
-  const { filters: staticFilters } = useStatic.getState()
+  const { filters: staticFilters } = useMemory.getState()
+  const easyMode = !!requestedFilters?.easyMode
   const trimmed = {
     onlyLegacy: userSettings?.legacyFilter,
-    onlyLinkGlobal: userSettings?.linkGlobalAndAdvanced,
+    onlyLinkGlobal: userSettings?.linkGlobalAndAdvanced || easyMode,
     onlyAllPvp: userSettings?.showAllPvpRanks,
     onlyAreas: onlyAreas || [],
   }
-  Object.entries(requestedFilters).forEach((topLevelFilter) => {
+  Object.entries(requestedFilters || {}).forEach((topLevelFilter) => {
     const [id, specifics] = topLevelFilter
 
     if (!FILTER_SKIP_LIST.includes(id)) {
@@ -53,11 +62,14 @@ const trimFilters = (requestedFilters, userSettings, category, onlyAreas) => {
         entryV
     }
   })
-  Object.entries(requestedFilters.filter).forEach((filter) => {
-    const [id, specifics] = filter
+  Object.entries(requestedFilters?.filter || {}).forEach(([id, specifics]) => {
+    // eslint-disable-next-line no-unused-vars
+    const { enabled, size, ...rest } = (easyMode
+      ? requestedFilters.ivOr
+      : specifics) || { all: false, adv: '' }
 
     if (specifics && specifics.enabled && staticFilters[category]?.filter[id]) {
-      trimmed[id] = specifics
+      trimmed[id] = rest
     }
   })
   return trimmed
@@ -65,7 +77,7 @@ const trimFilters = (requestedFilters, userSettings, category, onlyAreas) => {
 
 export default function FilterPermCheck({ category }) {
   const valid = usePermCheck(category)
-  const error = useStatic((state) => state.clientError)
+  const error = useMemory((state) => state.clientError)
 
   if (!valid || error) {
     return null
@@ -89,14 +101,14 @@ function QueryData({ category, timeout }) {
 
   const map = useMap()
 
-  const hideList = useStatic((s) => s.hideList)
-  const active = useStatic((s) => s.active)
+  const hideList = useMemory((s) => s.hideList)
+  const active = useMemory((s) => s.active)
 
-  const userSettings = useStore(
+  const userSettings = useStorage(
     (s) => s.userSettings[userSettingsCategory(category)],
   )
-  const filters = useStore((s) => s.filters[category])
-  const onlyAreas = useStore(
+  const filters = useStorage((s) => s.filters?.[category])
+  const onlyAreas = useStorage(
     (s) =>
       s.filters?.scanAreas?.filterByAreas &&
       s.filters?.scanAreas?.filter?.areas,
@@ -129,11 +141,10 @@ function QueryData({ category, timeout }) {
     if (active) {
       timeout.current.setupTimeout(refetch)
       return () => {
-        useStatic.setState({ excludeList: [] })
         timeout.current.off()
       }
     }
-  }, [active, refetch, timeout])
+  }, [active, refetch, timeout.current])
 
   React.useEffect(() => {
     const refetchData = () => {
@@ -149,17 +160,17 @@ function QueryData({ category, timeout }) {
     return () => {
       map.off('fetchdata', refetchData)
     }
-  }, [filters, userSettings, onlyAreas])
+  }, [filters, userSettings, onlyAreas, timeout.current.refetch])
 
   if (error) {
     // @ts-ignore
     if (error.networkError?.statusCode === 464) {
-      useStatic.setState({ clientError: 'old_client' })
+      useMemory.setState({ clientError: 'old_client' })
       return null
     }
     // @ts-ignore
     if (error.networkError?.statusCode === 511) {
-      useStatic.setState({ clientError: 'session_expired' })
+      useMemory.setState({ clientError: 'session_expired' })
       return null
     }
   }

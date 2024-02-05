@@ -18,10 +18,11 @@ import {
 
 import { useTranslation } from 'react-i18next'
 
-import { useStore, useStatic } from '@hooks/useStore'
+import { useMemory } from '@hooks/useMemory'
+import { setDeepStore, useStorage } from '@hooks/useStorage'
 import Utility from '@services/Utility'
 import ErrorBoundary from '@components/ErrorBoundary'
-import { TextWithIcon } from '@components/layout/custom/CustomImg'
+import { TextWithIcon } from '@components/layout/general/Img'
 
 import NameTT from './common/NameTT'
 import GenderIcon from './common/GenderIcon'
@@ -56,19 +57,19 @@ const getColor = (ivPercent) => {
 export default function PokemonPopup({ pokemon, iconUrl, isTutorial = false }) {
   const { t } = useTranslation()
   const { pokemon_id, cleanPvp, iv, cp } = pokemon
-  const perms = useStatic((state) => state.auth.perms)
-  const timeOfDay = useStatic((s) => s.timeOfDay)
-  const metaData = useStatic((state) => state.masterfile.pokemon[pokemon_id])
-  const Icons = useStatic((state) => state.Icons)
+  const perms = useMemory((state) => state.auth.perms)
+  const timeOfDay = useMemory((s) => s.timeOfDay)
+  const metaData = useMemory((state) => state.masterfile.pokemon[pokemon_id])
+  const Icons = useMemory((state) => state.Icons)
 
-  const userSettings = useStore((s) => s.userSettings.pokemon)
+  const userSettings = useStorage((s) => s.userSettings.pokemon)
   const pokePerms = isTutorial
     ? {
         pvp: true,
         iv: true,
       }
     : perms
-  const popups = useStore((state) => state.popups)
+  const popups = useStorage((state) => state.popups)
 
   const hasLeagues = cleanPvp ? Object.keys(cleanPvp) : []
   const hasStats = iv || cp
@@ -166,7 +167,7 @@ const Header = ({
   userSettings,
   isTutorial,
 }) => {
-  const filters = useStore((state) => state.filters)
+  const filters = useStorage((state) => state.filters)
 
   const [anchorEl, setAnchorEl] = useState(false)
   const { id, pokemon_id, form, ditto_form, display_pokemon_id } = pokemon
@@ -181,37 +182,20 @@ const Header = ({
 
   const handleHide = () => {
     setAnchorEl(null)
-    useStatic.setState((prev) => ({ hideList: new Set(prev.hideList).add(id) }))
+    useMemory.setState((prev) => ({ hideList: new Set(prev.hideList).add(id) }))
   }
 
   const handleExclude = () => {
     setAnchorEl(null)
-    const key = `${pokemon_id}-${form}`
     if (filters?.pokemon?.filter) {
-      useStore.setState((prev) => ({
-        filters: {
-          ...prev.filters,
-          pokemon: {
-            ...prev.filters.pokemon,
-            filter: {
-              ...prev.filters.pokemon.filter,
-              [key]: {
-                ...prev.filters.pokemon.filter[key],
-                enabled: false,
-              },
-            },
-          },
-        },
-      }))
-      useStatic.setState((prev) => ({
-        excludeList: [...prev.excludeList, key],
-      }))
+      const key = `${pokemon_id}-${form}`
+      setDeepStore(`filters.pokemon.filter.${key}.enabled`, false)
     }
   }
 
   const handleTimer = () => {
     setAnchorEl(null)
-    useStatic.setState((prev) => {
+    useMemory.setState((prev) => {
       if (prev.timerList.includes(id)) {
         return { timerList: prev.timerList.filter((x) => x !== id) }
       }
@@ -329,7 +313,7 @@ const Stats = ({ pokemon, t }) => {
 const Info = ({ pokemon, metaData, perms, Icons, timeOfDay, t }) => {
   const { gender, size, weather, form } = pokemon
   const formTypes = metaData?.forms?.[form]?.types || metaData?.types || []
-  const darkMode = useStore((s) => s.darkMode)
+  const darkMode = useStorage((s) => s.darkMode)
   return (
     <Grid
       item
@@ -432,11 +416,11 @@ const Timer = ({ pokemon, hasStats, t }) => {
 
 const Footer = ({ pokemon, popups, hasPvp, Icons }) => {
   const { lat, lon } = pokemon
-  const darkMode = useStore((s) => s.darkMode)
+  const darkMode = useStorage((s) => s.darkMode)
 
   const handleExpandClick = (category) => {
     const opposite = category === 'extras' ? 'pvp' : 'extras'
-    useStore.setState((prev) => ({
+    useStorage.setState((prev) => ({
       popups: {
         ...prev.popups,
         [category]: !popups[category],
@@ -482,7 +466,7 @@ const Footer = ({ pokemon, popups, hasPvp, Icons }) => {
 }
 
 const ExtraPokemonInfo = ({ pokemon, perms, userSettings, t, Icons }) => {
-  const moves = useStatic((state) => state.masterfile.moves)
+  const moves = useMemory((state) => state.masterfile.moves)
 
   const { move_1, move_2, first_seen_timestamp, updated, iv } = pokemon
 

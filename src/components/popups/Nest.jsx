@@ -13,7 +13,9 @@ import {
 
 import { useTranslation } from 'react-i18next'
 
-import { useStore, useStatic, useLayoutStore } from '@hooks/useStore'
+import { useMemory } from '@hooks/useMemory'
+import { useLayoutStore } from '@hooks/useLayoutStore'
+import { setDeepStore } from '@hooks/useStorage'
 import Utility from '@services/Utility'
 import ErrorBoundary from '@components/ErrorBoundary'
 import NestSubmission from '@components/layout/dialogs/NestSubmission'
@@ -49,7 +51,7 @@ export default function NestPopup({
   submitted_by = '',
 }) {
   const { t } = useTranslation()
-  const { perms, loggedIn } = useStatic((s) => s.auth)
+  const { perms, loggedIn } = useMemory((s) => s.auth)
 
   const [parkName, setParkName] = useState(true)
   const [anchorEl, setAnchorEl] = useState(null)
@@ -66,28 +68,13 @@ export default function NestPopup({
 
   const handleHide = () => {
     setAnchorEl(null)
-    useStatic.setState((prev) => ({ hideList: new Set(prev.hideList).add(id) }))
+    useMemory.setState((prev) => ({ hideList: new Set(prev.hideList).add(id) }))
   }
 
   const handleExclude = () => {
     setAnchorEl(null)
     const key = `${pokemon_id}-${pokemon_form}`
-    useStore.setState((prev) => ({
-      filters: {
-        ...prev.filters,
-        nests: {
-          ...prev.filters.nests,
-          filter: {
-            ...prev.filters.nests.filter,
-            [key]: {
-              ...prev.filters.nests.filter[key],
-              enabled: false,
-            },
-          },
-        },
-      },
-    }))
-    useStatic.setState((prev) => ({ excludeList: [...prev.excludeList, key] }))
+    setDeepStore(`filters.nests.filter.${key}.enabled`, false)
   }
 
   const options = [

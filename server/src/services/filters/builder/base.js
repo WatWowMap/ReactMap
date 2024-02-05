@@ -1,6 +1,7 @@
 // @ts-check
 const config = require('@rm/config')
 
+const { Db } = require('../../initialization')
 const buildPokemon = require('./pokemon')
 const buildPokestops = require('./pokestop')
 const buildGyms = require('./gym')
@@ -26,12 +27,10 @@ const custom = new PokemonFilter(
 )
 
 /**
- *
  * @param {import("@rm/types").Permissions} perms
- * @param {import("@rm/types").DbCheckClass} database
  * @returns
  */
-function buildDefaultFilters(perms, database) {
+function buildDefaultFilters(perms) {
   const stopReducer =
     perms.pokestops || perms.lures || perms.quests || perms.invasions
   const gymReducer = perms.gyms || perms.raids
@@ -40,7 +39,7 @@ function buildDefaultFilters(perms, database) {
 
   return {
     gyms:
-      gymReducer && database.models.Gym
+      gymReducer && Db.models.Gym
         ? {
             enabled: defaultFilters.gyms.enabled,
             allGyms: perms.gyms ? defaultFilters.gyms.enabled : undefined,
@@ -54,6 +53,7 @@ function buildDefaultFilters(perms, database) {
               : undefined,
             badge: perms.gymBadges ? 'all' : undefined,
             raidTier: perms.raids ? 'all' : undefined,
+            standard: new BaseFilter(),
             filter: {
               ...buildGyms(perms, defaultFilters.gyms),
               ...pokemon.raids,
@@ -61,17 +61,18 @@ function buildDefaultFilters(perms, database) {
           }
         : undefined,
     nests:
-      perms.nests && database.models.Nest
+      perms.nests && Db.models.Nest
         ? {
             enabled: defaultFilters.nests.enabled,
             pokemon: defaultFilters.nests.pokemon,
             polygons: defaultFilters.nests.polygons,
             avgFilter: defaultFilters.nests.avgFilter,
+            standard: new BaseFilter(),
             filter: pokemon.nests,
           }
         : undefined,
     pokestops:
-      stopReducer && database.models.Pokestop
+      stopReducer && Db.models.Pokestop
         ? {
             enabled: defaultFilters.pokestops.enabled,
             allPokestops: perms.pokestops
@@ -93,6 +94,7 @@ function buildDefaultFilters(perms, database) {
               ? defaultFilters.pokestops.invasions
               : undefined,
             arEligible: perms.pokestops ? false : undefined,
+            standard: new BaseFilter(),
             filter: {
               ...pokemon.rocket,
               ...buildPokestops(perms, defaultFilters.pokestops),
@@ -101,9 +103,11 @@ function buildDefaultFilters(perms, database) {
           }
         : undefined,
     pokemon:
-      perms.pokemon && database.models.Pokemon
+      perms.pokemon && Db.models.Pokemon
         ? {
             enabled: defaultFilters.pokemon.enabled,
+            easyMode: defaultFilters.pokemon.easyMode,
+            onlyShowAvailable: defaultFilters.pokemon.onlyShowAvailable,
             legacy:
               pokemonReducer && config.getSafe('map.misc.enableMapJsFilter')
                 ? defaultFilters.pokemon.legacyFilter
@@ -121,22 +125,24 @@ function buildDefaultFilters(perms, database) {
           }
         : undefined,
     routes:
-      perms.routes && database.models.Route
+      perms.routes && Db.models.Route
         ? {
             enabled: defaultFilters.routes.enabled,
             distance: [
               0,
-              Math.ceil(database.filterContext.Route.maxDistance / 1000) + 1,
+              Math.ceil(Db.filterContext.Route.maxDistance / 1000) + 1,
             ],
+            standard: new BaseFilter(),
             filter: {
               global: new BaseFilter(),
             },
           }
         : undefined,
     portals:
-      perms.portals && database.models.Portal
+      perms.portals && Db.models.Portal
         ? {
             enabled: defaultFilters.portals.enabled,
+            standard: new BaseFilter(),
             filter: {
               global: new BaseFilter(),
               old: new BaseFilter(),
@@ -147,18 +153,20 @@ function buildDefaultFilters(perms, database) {
     scanAreas: perms.scanAreas
       ? {
           enabled: defaultFilters.scanAreas.enabled,
+          standard: new BaseFilter(),
           filterByAreas: false,
           filter: { areas: [], search: '' },
         }
       : undefined,
     submissionCells:
-      perms.submissionCells && database.models.Pokestop && database.models.Gym
+      perms.submissionCells && Db.models.Pokestop && Db.models.Gym
         ? {
             enabled: defaultFilters.submissionCells.enabled,
             rings: defaultFilters.submissionCells.rings,
             s17Cells: defaultFilters.submissionCells.s17Cells,
             s14Cells: defaultFilters.submissionCells.s14Cells,
             includeSponsored: defaultFilters.submissionCells.includeSponsored,
+            standard: new BaseFilter(),
             filter: { global: new BaseFilter() },
           }
         : undefined,
@@ -166,20 +174,23 @@ function buildDefaultFilters(perms, database) {
       ? {
           enabled: defaultFilters.s2cells.enabled,
           cells: defaultFilters.s2cells.cells,
+          standard: new BaseFilter(),
           filter: { global: new BaseFilter() },
         }
       : undefined,
     weather:
-      perms.weather && database.models.Weather
+      perms.weather && Db.models.Weather
         ? {
             enabled: defaultFilters.weather.enabled,
+            standard: new BaseFilter(),
             filter: { global: new BaseFilter() },
           }
         : undefined,
     spawnpoints:
-      perms.spawnpoints && database.models.Spawnpoint
+      perms.spawnpoints && Db.models.Spawnpoint
         ? {
             enabled: defaultFilters.spawnpoints.enabled,
+            standard: new BaseFilter(),
             tth: defaultFilters.spawnpoints.tth,
             filter: {
               global: new BaseFilter(),
@@ -189,16 +200,18 @@ function buildDefaultFilters(perms, database) {
           }
         : undefined,
     scanCells:
-      perms.scanCells && database.models.ScanCell
+      perms.scanCells && Db.models.ScanCell
         ? {
             enabled: defaultFilters.scanCells.enabled,
+            standard: new BaseFilter(),
             filter: { global: new BaseFilter() },
           }
         : undefined,
     devices:
-      perms.devices && database.models.Device
+      perms.devices && Db.models.Device
         ? {
             enabled: defaultFilters.devices.enabled,
+            standard: new BaseFilter(),
             filter: {
               online: new BaseFilter(),
               offline: new BaseFilter(),

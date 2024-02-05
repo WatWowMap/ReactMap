@@ -49,14 +49,17 @@ class Portal extends Model {
    * @param {object} args
    * @param {import("@rm/types").DbContext} context
    * @param {ReturnType<typeof import('objection').raw>} distance
+   * @param {ReturnType<typeof import("server/src/services/functions/getBbox").getBboxFromCenter>} bbox
    * @returns {Promise<import("@rm/types").FullPortal[]>}
    */
-  static async search(perms, args, { isMad }, distance) {
+  static async search(perms, args, { isMad }, distance, bbox) {
     const { areaRestrictions } = perms
     const { onlyAreas = [], search } = args
     const query = this.query()
       .select(['name', 'id', 'lat', 'lon', 'url', distance])
       .whereRaw(`LOWER(name) LIKE '%${search}%'`)
+      .whereBetween(isMad ? 'latitude' : 'lat', [bbox.minLat, bbox.maxLat])
+      .andWhereBetween(isMad ? 'longitude' : 'lon', [bbox.minLon, bbox.maxLon])
       .andWhere(
         'updated',
         '>',

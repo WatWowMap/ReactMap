@@ -34,7 +34,9 @@ export interface Config<Client extends boolean = false>
     logLevel: LogLevelNames
     skipUpdateCheck?: boolean
   } & BaseConfig['devOptions']
-  areas: Awaited<ReturnType<typeof import('server/src/services/areas')>>
+  areas: Awaited<
+    ReturnType<typeof import('server/src/services/areas')['loadLatestAreas']>
+  >
   authentication: {
     areaRestrictions: { roles: string[]; areas: string[] }[]
     excludeFromTutorial: (keyof BaseConfig['authentication']['perms'])[]
@@ -107,8 +109,8 @@ export interface Config<Client extends boolean = false>
   database: {
     schemas: Schema[]
     settings: {
-      extraUserFields: string[]
-    } & BaseConfig['database']['settings']
+      extraUserFields: (ExtraField | string)[]
+    } & Omit<BaseConfig['database']['settings'], 'extraUserFields'>
   } & BaseConfig['database']
   scanner: {
     scanNext: {
@@ -128,6 +130,12 @@ export interface Config<Client extends boolean = false>
     defaultIcons: Record<string, string>
   } & Omit<BaseConfig['icons'], 'customizable' | 'styles' | 'defaultIcons'>
   manualAreas: ExampleConfig['manualAreas'][number][]
+}
+
+export interface ExtraField {
+  name: string
+  database: string
+  disabled: boolean
 }
 
 export interface Webhook {
@@ -163,7 +171,7 @@ export type DeepKeys<T, P extends string = ''> = {
     : never
 }[keyof T]
 
-export type ConfigPaths = DeepKeys<Config>
+export type ConfigPaths<T extends object> = DeepKeys<T>
 
 export type PathValue<T, P> = P extends `${infer K}.${infer Rest}`
   ? K extends keyof T
@@ -175,7 +183,10 @@ export type PathValue<T, P> = P extends `${infer K}.${infer Rest}`
   ? T[P]
   : never
 
-export type ConfigPathValue<P extends ConfigPaths> = PathValue<Config, P>
+export type ConfigPathValue<
+  T extends object,
+  P extends ConfigPaths<T>,
+> = PathValue<T, P>
 
 export type Join<K, P> = K extends string | number
   ? P extends string | number
@@ -223,4 +234,4 @@ export type NestedObjectPaths = Paths<Config>
 
 export type GetSafeConfig = <P extends NestedObjectPaths>(
   path: P,
-) => ConfigPathValue<P>
+) => ConfigPathValue<Config, P>

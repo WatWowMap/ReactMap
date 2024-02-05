@@ -4,7 +4,7 @@ import * as React from 'react'
 import spawnpointMarker from '@components/markers/spawnpoints'
 import { Marker, Circle, Popup } from 'react-leaflet'
 
-import { useStatic } from '@hooks/useStore'
+import { useMemory } from '@hooks/useMemory'
 import PopupContent from '../popups/Spawnpoint'
 
 /**
@@ -13,7 +13,7 @@ import PopupContent from '../popups/Spawnpoint'
  * @returns
  */
 const SpawnpointTile = (item) => {
-  const Icons = useStatic((state) => state.Icons)
+  const Icons = useMemory((state) => state.Icons)
   const [modifiers] = Icons.getModifiers('spawnpoint')
   const size = Icons.getSize('spawnpoint') * modifiers.sizeMultiplier
 

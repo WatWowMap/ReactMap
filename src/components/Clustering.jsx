@@ -3,7 +3,8 @@ import * as React from 'react'
 import { useMap, GeoJSON } from 'react-leaflet'
 import Supercluster from 'supercluster'
 import { marker, divIcon, point } from 'leaflet'
-import { useStatic, useStore } from '@hooks/useStore'
+import { useMemory } from '@hooks/useMemory'
+import { useStorage } from '@hooks/useStorage'
 import Notification from './layout/general/Notification'
 
 const IGNORE_CLUSTERING = new Set([
@@ -45,7 +46,7 @@ function Clustering({ category, children }) {
   const featureRef = React.useRef(null)
 
   const map = useMap()
-  const userCluster = useStore(
+  const userCluster = useStorage(
     (s) => s.userSettings[category]?.clustering || false,
   )
   const {
@@ -53,7 +54,7 @@ function Clustering({ category, children }) {
       clustering,
       general: { minZoom: configMinZoom },
     },
-  } = useStatic.getState()
+  } = useMemory.getState()
 
   const [rules] = React.useState(
     category in clustering

@@ -1,17 +1,11 @@
-name: GitHub Release
-
-on:
-  pull_request:
-  push:
-    branches:
-      - main
-      - develop
+name: Release
+on: workflow_call
 
 permissions: write-all
 
 jobs:
   release:
-    name: Build & release
+    name: GitHub Release
     runs-on: ubuntu-latest
     steps:
       - name: Checkout

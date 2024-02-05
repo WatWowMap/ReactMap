@@ -8,6 +8,10 @@ const { GraphQLFileLoader } = require('@graphql-tools/graphql-file-loader')
 const {
   ApolloServerPluginDrainHttpServer,
 } = require('@apollo/server/plugin/drainHttpServer')
+const {
+  ApolloServerPluginLandingPageDisabled,
+} = require('@apollo/server/plugin/disabled')
+
 const config = require('@rm/config')
 
 const { log, HELPERS } = require('@rm/logger')
@@ -28,7 +32,7 @@ async function startApollo(httpServer) {
   const apolloServer = new ApolloServer({
     typeDefs,
     resolvers,
-    introspection: config.getSafe('devOptions.enabled'),
+    introspection: config.getSafe('devOptions.graphiql'),
     formatError: (e) => {
       let customMessage = ''
       if (
@@ -76,11 +80,14 @@ async function startApollo(httpServer) {
       error: (...e) => log.error(HELPERS.gql, ...e),
     },
     plugins: [
+      ApolloServerPluginLandingPageDisabled(),
       ApolloServerPluginDrainHttpServer({ httpServer }),
       {
         async requestDidStart(requestContext) {
           requestContext.contextValue.startTime = Date.now()
-
+          if (requestContext.request?.variables?.filters) {
+            log.debug(requestContext.request?.variables?.filters)
+          }
           return {
             async willSendResponse(context) {
               const filterCount = Object.keys(
@@ -98,7 +105,6 @@ async function startApollo(httpServer) {
 
                 const data = response.body.singleResult.data?.[endpoint]
                 const returned = Array.isArray(data) ? data.length : 0
-
                 log.info(
                   HELPERS[endpoint] || `[${endpoint?.toUpperCase()}]`,
                   '|',

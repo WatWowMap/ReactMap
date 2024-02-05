@@ -48,7 +48,10 @@ class ErrorBoundary extends React.Component {
       await Fetch.sendError({
         cause: error.cause,
         message: error.message,
-        stack: error?.stack,
+        stack: error?.stack?.replace(
+          /(http|https):\/\/[a-z0-9.]+(:[0-9]+)?/g,
+          '',
+        ),
         name: error.name,
         uuid: this.state.uuid,
       })

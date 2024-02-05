@@ -5,7 +5,8 @@ import { Marker, Popup, Circle } from 'react-leaflet'
 import { t } from 'i18next'
 
 import useMarkerTimer from '@hooks/useMarkerTimer'
-import { basicEqualFn, useStatic, useStore } from '@hooks/useStore'
+import { basicEqualFn, useMemory } from '@hooks/useMemory'
+import { useStorage } from '@hooks/useStorage'
 import useOpacity from '@hooks/useOpacity'
 import useForcePopup from '@hooks/useForcePopup'
 import { sendNotification } from '@services/desktopNotification'
@@ -41,7 +42,6 @@ const GymTile = (gym) => {
   const [
     hasRaid,
     hasHatched,
-    excludeTeam,
     inTimerList,
     interactionRangeZoom,
     gymIconUrl,
@@ -49,10 +49,10 @@ const GymTile = (gym) => {
     raidIconUrl,
     raidIconSize,
     audio,
-  ] = useStatic((s) => {
+  ] = useMemory((s) => {
     const newTs = Date.now() / 1000
-    const { excludeList, timerList, config, Icons, Audio } = s
-    const { filters, userSettings } = useStore.getState()
+    const { timerList, config, Icons, Audio } = s
+    const { filters, userSettings } = useStorage.getState()
 
     const filledSlots =
       gym.available_slots !== null ? 6 - gym.available_slots : 0
@@ -64,18 +64,13 @@ const GymTile = (gym) => {
     const eggFilterId = `e${gym.raid_level}`
 
     const hasRaidInternal =
-      gym.raid_end_timestamp >= newTs &&
-      gym.raid_level > 0 &&
-      (gym.raid_battle_timestamp >= newTs
-        ? !excludeList.includes(eggFilterId)
-        : !excludeList.includes(raidFilterId))
+      gym.raid_end_timestamp >= newTs && gym.raid_level > 0
     const hasHatchedInternal =
       gym.raid_end_timestamp >= newTs && gym.raid_battle_timestamp <= newTs
 
     return [
       hasRaidInternal,
       hasHatchedInternal,
-      excludeList.includes(`t${gym.team_id}-0`),
       timerList.includes(gym.id),
       config.general.interactionRangeZoom,
       Icons.getGyms(
@@ -129,7 +124,7 @@ const GymTile = (gym) => {
     showExBadge,
     showArBadge,
     showRaidLevel,
-  ] = useStore((s) => {
+  ] = useStorage((s) => {
     const { userSettings, filters, zoom } = s
     return [
       (userSettings.gyms.raidTimers || inTimerList) && hasRaid,
@@ -171,60 +166,58 @@ const GymTile = (gym) => {
     })
   }
   return (
-    !excludeTeam && (
-      <Marker
-        ref={setMarkerRef}
-        position={[gym.lat, gym.lon]}
-        icon={gymMarker({
-          showDiamond,
-          showExBadge,
-          showArBadge,
-          showRaidLevel,
-          opacity,
-          gymIconUrl,
-          gymIconSize,
-          raidIconUrl,
-          raidIconSize,
-          ...gym,
-        })}
-      >
-        <Popup position={[gym.lat, gym.lon]}>
-          <PopupContent
-            hasRaid={hasRaid}
-            hasHatched={hasHatched}
-            raidIconUrl={raidIconUrl}
-            {...gym}
-          />
-        </Popup>
-        {showTimer && (
-          <ToolTipWrapper timers={[timerToDisplay]} offset={[0, 5]} />
-        )}
-        {showInteractionRange && (
-          <Circle
-            center={[gym.lat, gym.lon]}
-            radius={80}
-            color={getColor(gym.team_id)}
-            weight={0.5}
-          />
-        )}
-        {show300mCircles && (
-          <Circle
-            center={[gym.lat, gym.lon]}
-            radius={300}
-            color={getColor(gym.team_id)}
-            weight={0.5}
-          />
-        )}
-        {!!customRange && (
-          <Circle
-            center={[gym.lat, gym.lon]}
-            radius={customRange}
-            color={getColor(gym.team_id)}
-            weight={0.5}
-          />
-        )}
-      </Marker>
-    )
+    <Marker
+      ref={setMarkerRef}
+      position={[gym.lat, gym.lon]}
+      icon={gymMarker({
+        showDiamond,
+        showExBadge,
+        showArBadge,
+        showRaidLevel,
+        opacity,
+        gymIconUrl,
+        gymIconSize,
+        raidIconUrl,
+        raidIconSize,
+        ...gym,
+      })}
+    >
+      <Popup position={[gym.lat, gym.lon]}>
+        <PopupContent
+          hasRaid={hasRaid}
+          hasHatched={hasHatched}
+          raidIconUrl={raidIconUrl}
+          {...gym}
+        />
+      </Popup>
+      {showTimer && (
+        <ToolTipWrapper timers={[timerToDisplay]} offset={[0, 5]} />
+      )}
+      {showInteractionRange && (
+        <Circle
+          center={[gym.lat, gym.lon]}
+          radius={80}
+          color={getColor(gym.team_id)}
+          weight={0.5}
+        />
+      )}
+      {show300mCircles && (
+        <Circle
+          center={[gym.lat, gym.lon]}
+          radius={300}
+          color={getColor(gym.team_id)}
+          weight={0.5}
+        />
+      )}
+      {!!customRange && (
+        <Circle
+          center={[gym.lat, gym.lon]}
+          radius={customRange}
+          color={getColor(gym.team_id)}
+          weight={0.5}
+        />
+      )}
+    </Marker>
   )
 }
 

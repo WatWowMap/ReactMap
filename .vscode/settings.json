@@ -1,7 +1,8 @@
 {
   "i18n-ally.localesPaths": [
     "packages/locales/lib/human",
-    "packages/locales/lib/generated"
+    "packages/locales/lib/generated",
+    "packages/locales/lib/data"
   ],
   "i18n-ally.keystyle": "flat",
   "[javascript]": {

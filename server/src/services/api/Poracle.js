@@ -1,5 +1,6 @@
 const { log, HELPERS } = require('@rm/logger')
 const fetchJson = require('./fetchJson')
+const { setCache, getCache } = require('../cache')
 
 const PLATFORMS = /** @type {const} */ (['discord', 'telegram'])
 
@@ -180,6 +181,15 @@ class PoracleAPI {
     }
   }
 
+  initFromCache() {
+    const cached = getCache(`${this.name}-webhook.json`)
+    if (!cached) {
+      log.warn(HELPERS.webhooks, `${this.name} webhook not found in cache`)
+      return false
+    }
+    Object.assign(this, cached)
+  }
+
   async init() {
     try {
       await Promise.all([
@@ -190,6 +200,7 @@ class PoracleAPI {
       this.ui = this.generateUi()
       this.lastFetched = Date.now()
       log.info(HELPERS.webhooks, `${this.name} webhook initialized`)
+      await setCache(`${this.name}-webhook.json`, this)
     } catch (e) {
       log.error(HELPERS.webhooks, `Error initializing ${this.name} webhook`, e)
     }
@@ -554,6 +565,7 @@ class PoracleAPI {
       human: true,
       pokemon: {
         sortProp: 'pokemon_id',
+        identifiers: ['pokemon_id', 'form'],
         defaults: {
           clean: false,
           distance: 0,
@@ -770,6 +782,7 @@ class PoracleAPI {
         },
       },
       raid: {
+        identifiers: ['pokemon_id', 'form', 'level'],
         defaults: {
           clean: false,
           distance: 0,
@@ -784,7 +797,7 @@ class PoracleAPI {
           gym_id: null,
           byDistance: false,
           allMoves: true,
-          allForms: true,
+          allForms: false,
           everything_individually:
             this.everythingFlagPermissions ===
               'allow-and-always-individually' ||
@@ -846,6 +859,7 @@ class PoracleAPI {
         },
       },
       egg: {
+        identifiers: ['level'],
         defaults: {
           clean: false,
           distance: 0,
@@ -913,6 +927,7 @@ class PoracleAPI {
         },
       },
       gym: {
+        identifiers: ['team'],
         defaults: {
           clean: false,
           distance: 0,
@@ -982,6 +997,7 @@ class PoracleAPI {
         },
       },
       invasion: {
+        identifiers: ['grunt_type'],
         defaults: {
           clean: false,
           distance: 0,
@@ -1034,6 +1050,7 @@ class PoracleAPI {
         },
       },
       lure: {
+        identifiers: ['lure_id'],
         defaults: {
           clean: false,
           distance: 0,
@@ -1078,6 +1095,7 @@ class PoracleAPI {
         },
       },
       quest: {
+        identifiers: ['reward', 'reward_type'],
         defaults: {
           clean: false,
           distance: 0,
@@ -1088,7 +1106,7 @@ class PoracleAPI {
           amount: 0,
           form: 0,
           byDistance: false,
-          allForms: true,
+          allForms: false,
         },
         ui: {
           general: {
@@ -1144,6 +1162,7 @@ class PoracleAPI {
         },
       },
       nest: {
+        identifiers: ['pokemon_id', 'form'],
         defaults: {
           clean: false,
           distance: 0,
@@ -1152,7 +1171,7 @@ class PoracleAPI {
           min_spawn_avg: 0,
           form: 0,
           byDistance: false,
-          allForms: true,
+          allForms: false,
         },
         ui: {
           general: {
@@ -1211,6 +1230,23 @@ class PoracleAPI {
     })
     // this.disabledHooks.forEach((hook) => delete poracleUiObj[hook])
     return poracleUiObj
+  }
+
+  /**
+   *
+   * @param {import('@rm/types').PoracleInvasion} item
+   * @param {import('@rm/types').Masterfile['invasions']} invasions
+   */
+  static getRealGruntId(item, invasions) {
+    return (
+      +Object.keys(invasions).find(
+        (key) =>
+          invasions[key]?.type?.toLowerCase() ===
+            item.grunt_type.toLowerCase() &&
+          (invasions[key]?.gender === 0 ||
+            invasions[key].gender === (item.gender || 1)),
+      ) || 0
+    )
   }
 }
 

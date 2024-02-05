@@ -29,7 +29,7 @@ const Clients = require('./services/Clients')
 const sessionStore = require('./services/sessionStore')
 const rootRouter = require('./routes/rootRouter')
 const pkg = require('../../package.json')
-const getAreas = require('./services/areas')
+const { loadLatestAreas } = require('./services/areas')
 const { connection } = require('./db/knexfile.cjs')
 const startApollo = require('./graphql/server')
 require('./services/watcher')
@@ -62,9 +62,8 @@ if (sentry.enabled || process.env.SENTRY_DSN) {
       ...Sentry.autoDiscoverNodePerformanceMonitoringIntegrations(),
     ],
     tracesSampleRate:
-      parseFloat(
-        process.env.SENTRY_TRACES_SAMPLE_RATE || sentry.tracesSampleRate,
-      ) || 0.1,
+      +(process.env.SENTRY_TRACES_SAMPLE_RATE || sentry.tracesSampleRate) ||
+      0.1,
     release: pkg.version,
   })
 
@@ -215,10 +214,10 @@ app.use((err, req, res, next) => {
 startApollo(httpServer).then((server) => {
   app.use(
     '/graphql',
-    cors(),
+    cors({ origin: '/' }),
     json(),
     expressMiddleware(server, {
-      context: ({ req, res }) => {
+      context: async ({ req, res }) => {
         const perms = req.user ? req.user.perms : req.session.perms
         const user = req?.user?.username || ''
         const id = req?.user?.id || 0
@@ -302,8 +301,9 @@ startApollo(httpServer).then((server) => {
 connection.migrate
   .latest()
   .then(() => connection.destroy())
+  .then(() => Db.getDbContext())
   .then(async () => {
-    await Db.getDbContext()
+    httpServer.listen(config.getSafe('port'), config.getSafe('interface'))
     await Promise.all([
       Db.historicalRarity(),
       Db.getFilterContext(),
@@ -318,9 +318,8 @@ connection.migrate
       Event.getMasterfile(Db.historical, Db.rarity),
       Event.getInvasions(config.getSafe('api.pogoApiEndpoints.invasions')),
       Event.getWebhooks(),
-      getAreas().then((res) => (config.areas = res)),
+      loadLatestAreas().then((res) => (config.areas = res)),
     ])
-    httpServer.listen(config.getSafe('port'), config.getSafe('interface'))
     const text = rainbow(
       `ℹ ${new Date()
         .toISOString()

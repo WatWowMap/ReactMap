@@ -4,7 +4,8 @@ import * as React from 'react'
 import { Marker, Popup, Circle } from 'react-leaflet'
 
 import useMarkerTimer from '@hooks/useMarkerTimer'
-import { basicEqualFn, useStatic, useStore } from '@hooks/useStore'
+import { basicEqualFn, useMemory } from '@hooks/useMemory'
+import { useStorage } from '@hooks/useStorage'
 import useForcePopup from '@hooks/useForcePopup'
 
 import PopupContent from '../popups/Pokestop'
@@ -28,32 +29,24 @@ const PokestopTile = (pokestop) => {
     hasAllStops,
     showTimer,
     interactionRangeZoom,
-  ] = useStatic((s) => {
+  ] = useMemory((s) => {
     const newTs = Date.now() / 1000
-    const { filters } = useStore.getState()
+    const { filters } = useStorage.getState()
     const {
       config,
-      excludeList,
       timerList,
       auth: { perms },
     } = s
     return [
-      pokestop.lure_expire_timestamp > newTs &&
-        perms.lures &&
-        !excludeList.includes(`l${pokestop.lure_id}`),
+      pokestop.lure_expire_timestamp > newTs && perms.lures,
       !!(
         perms.invasions &&
         pokestop.invasions?.some(
           (invasion) =>
-            invasion.grunt_type &&
-            !excludeList.includes(`i${invasion.grunt_type}`) &&
-            invasion.incident_expire_timestamp > newTs,
+            invasion.grunt_type && invasion.incident_expire_timestamp > newTs,
         )
       ),
-      !!(
-        perms.quests &&
-        pokestop.quests?.some((quest) => !excludeList.includes(quest.key))
-      ),
+      !!(perms.quests && pokestop.quests?.length),
       !!(
         perms.eventStops &&
         filters.pokestops.eventStops &&
@@ -73,7 +66,7 @@ const PokestopTile = (pokestop) => {
     lureRange,
     interactionRange,
     customRange,
-  ] = useStore((s) => {
+  ] = useStorage((s) => {
     const { userSettings, zoom } = s
     return [
       userSettings.pokestops.invasionTimers || showTimer,

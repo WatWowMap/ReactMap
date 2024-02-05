@@ -1,7 +1,8 @@
 // @ts-check
 import * as React from 'react'
 import HolidayAnimations from '@services/HolidayAnimations'
-import { useStatic, useStore } from '@hooks/useStore'
+import { useMemory } from '@hooks/useMemory'
+import { useStorage } from '@hooks/useStorage'
 
 /**
  *
@@ -12,7 +13,7 @@ export function HolidayEffect({ images, name, css, imageScale }) {
   const [element, setElement] = React.useState(
     /** @type {React.ReactNode} */ (null),
   )
-  const userDisabled = useStore((s) => s.holidayEffects[name] === true)
+  const userDisabled = useStorage((s) => s.holidayEffects[name] === true)
 
   React.useLayoutEffect(() => {
     if (userDisabled) {
@@ -56,7 +57,7 @@ export function HolidayEffect({ images, name, css, imageScale }) {
 }
 
 export default function HolidayEffects() {
-  const holidayEffects = useStatic((s) => s?.config?.holidayEffects || [])
+  const holidayEffects = useMemory((s) => s?.config?.holidayEffects || [])
 
   return (
     <>

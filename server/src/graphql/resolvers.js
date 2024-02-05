@@ -6,7 +6,6 @@ const config = require('@rm/config')
 
 const buildDefaultFilters = require('../services/filters/builder/base')
 const filterComponents = require('../services/functions/filterComponents')
-const { filterRTree } = require('../services/functions/filterRTree')
 const validateSelectedWebhook = require('../services/functions/validateSelectedWebhook')
 const PoracleAPI = require('../services/api/Poracle')
 const { geocoder } = require('../services/geocoder')
@@ -14,6 +13,7 @@ const scannerApi = require('../services/api/scannerApi')
 const getPolyVector = require('../services/functions/getPolyVector')
 const getPlacementCells = require('../services/functions/getPlacementCells')
 const getTypeCells = require('../services/functions/getTypeCells')
+const { getValidCoords } = require('../services/functions/getValidCoords')
 
 /** @type {import("@apollo/server").ApolloServerOptions<import("@rm/types").GqlContext>['resolvers']} */
 const resolvers = {
@@ -21,13 +21,9 @@ const resolvers = {
   Query: {
     available: (_, _args, { Event, Db, perms }) => {
       const data = {
-        pokemon: perms.pokemon ? Event.available.pokemon : [],
-        gyms: perms.gyms ? Event.available.gyms : [],
-        nests: perms.nests ? Event.available.nests : [],
-        pokestops: perms.pokestops ? Event.available.pokestops : [],
         questConditions: perms.quests ? Db.questConditions : {},
         masterfile: { ...Event.masterfile, invasions: Event.invasions },
-        filters: buildDefaultFilters(perms, Db),
+        filters: buildDefaultFilters(perms),
         audio: {
           ...config.getSafe('audio'),
           styles: Event.uaudio,
@@ -39,6 +35,48 @@ const resolvers = {
       }
       return data
     },
+    availablePokemon: (_, _args, { Event, perms }) =>
+      perms?.pokemon ? Event.available.pokemon : [],
+    availableGyms: (_, _args, { Event, perms }) =>
+      Event.available.gyms.filter((x) => {
+        if (x.startsWith('g') || x.startsWith('t')) {
+          return perms?.gyms
+        }
+        if (
+          x.startsWith('r') ||
+          x.startsWith('e') ||
+          Number.isInteger(Number(x.charAt(0)))
+        ) {
+          return perms?.raids
+        }
+        return false
+      }),
+    availableNests: (_, _args, { Event, perms }) =>
+      perms?.nests ? Event.available.nests : [],
+    availablePokestops: (_, _args, { Event, perms }) =>
+      Event.available.pokestops.filter((x) => {
+        if (x.startsWith('i') || x.startsWith('a')) {
+          return perms?.invasions
+        }
+        if (x.startsWith('d') || x.startsWith('f') || x.startsWith('h')) {
+          return perms?.lures
+        }
+        if (
+          x.startsWith('q') ||
+          x.startsWith('m') ||
+          x.startsWith('x') ||
+          x.startsWith('c') ||
+          x.startsWith('d') ||
+          x.startsWith('p') ||
+          Number.isInteger(Number(x.charAt(0)))
+        ) {
+          return perms?.quests
+        }
+        if (x.startsWith('l')) {
+          return perms?.lures
+        }
+        return perms?.pokestops
+      }),
     backup: (_, args, { req, perms, Db }) => {
       if (perms?.backups && req?.user?.id) {
         return Db.models.Backup.getOne(args.id, req?.user?.id)
@@ -68,22 +106,8 @@ const resolvers = {
       return !!results.length
     },
     /** @param {unknown} _ @param {{ mode: 'scanNext' | 'scanZone' }} args */
-    checkValidScan: (_, { mode, points }, { perms }) => {
-      if (perms?.scanner.includes(mode)) {
-        const areaRestrictions =
-          config.getSafe(`scanner.${mode}.${mode}AreaRestriction`) || []
-
-        const validPoints = points.map((point) =>
-          filterRTree(
-            { lat: point[0], lon: point[1] },
-            perms.areaRestrictions,
-            areaRestrictions,
-          ),
-        )
-        return validPoints
-      }
-      return []
-    },
+    checkValidScan: (_, { mode, points }, { perms }) =>
+      getValidCoords(mode, points, perms),
     /** @param {unknown} _ @param {{ component: 'loginPage' | 'donationPage' | 'messageOfTheDay' }} args */
     customComponent: (_, { component }, { perms, req, user }) => {
       switch (component) {
@@ -317,18 +341,18 @@ const resolvers = {
             }))
             .filter((parent) => parent.children.length)
 
-          // Adds new blanks to account for area restrictions trimming some
-          filtered.forEach(({ children }) => {
-            if (children.length % 2 === 1) {
-              children.push({
-                type: 'Feature',
-                properties: {
-                  name: '',
-                  manual: !!config.getSafe('manualAreas.length'),
-                },
-              })
-            }
-          })
+          // // Adds new blanks to account for area restrictions trimming some
+          // filtered.forEach(({ children }) => {
+          //   if (children.length % 2 === 1) {
+          //     children.push({
+          //       type: 'Feature',
+          //       properties: {
+          //         name: '',
+          //         manual: !!config.getSafe('manualAreas.length'),
+          //       },
+          //     })
+          //   }
+          // })
           return filtered
         }
         return scanAreas.filter((parent) => parent.children.length)
@@ -405,6 +429,16 @@ const resolvers = {
       }
       return []
     },
+    searchInvasion: (_, args, { perms, Db }) => {
+      const { category, search } = args
+      if (perms?.[category] && /^[0-9\s\p{L}]+$/u.test(search)) {
+        if (!search || !search.trim()) {
+          return []
+        }
+        return Db.search('Pokestop', perms, args, 'searchInvasions')
+      }
+      return []
+    },
     searchLure: (_, args, { perms, Db }) => {
       const { category, search } = args
       if (perms?.[category] && /^[0-9\s\p{L}]+$/u.test(search)) {
@@ -427,7 +461,7 @@ const resolvers = {
     },
     searchable: (_, __, { perms }) => {
       const options = config.getSafe('api.searchable')
-      return Object.keys(options).filter((k) => options[k] && perms[k])
+      return Object.keys(options).filter((k) => perms[k] && options[k])
     },
     spawnpoints: (_, args, { perms, Db }) => {
       if (perms?.spawnpoints) {
@@ -473,16 +507,9 @@ const resolvers = {
           }))
         }
         if (category === 'invasion') {
-          const { invasions } = Event.masterfile
           result.invasion = result.invasion.map((x) => ({
             ...x,
-            real_grunt_id:
-              +Object.keys(invasions).find(
-                (key) =>
-                  invasions[key]?.type?.toLowerCase() ===
-                    x.grunt_type.toLowerCase() &&
-                  invasions[key].gender === (x.gender || 1),
-              ) || 0,
+            real_grunt_id: PoracleAPI.getRealGruntId(x, Event.invasions),
           }))
         }
         if (category === 'raid') {
@@ -491,7 +518,6 @@ const resolvers = {
             allMoves: x.move === 9000,
           }))
         }
-
         return result
       }
       return {}
@@ -550,20 +576,33 @@ const resolvers = {
       }
       return {}
     },
+    /** @param {unknown} _ @param {import('@rm/types').ScanOnDemandReq} args */
     scanner: (_, args, { req, perms }) => {
       const { category, method, data } = args
-      if (data?.cooldown) {
-        req.session.cooldown = Math.max(
-          req.session.cooldown || 0,
-          data.cooldown || 0,
-        )
-        req.session.save()
-      }
       if (category === 'getQueue') {
         return scannerApi(category, method, data, req?.user)
       }
-      if (perms?.scanner?.includes(category)) {
-        return scannerApi(category, method, data, req?.user)
+      if (
+        perms?.scanner?.includes(category) &&
+        (!req.session.cooldown || req.session.cooldown < Date.now())
+      ) {
+        const validCoords = getValidCoords(category, data?.scanCoords, perms)
+
+        const cooldown =
+          config.getSafe(`scanner.${category}.userCooldownSeconds`) *
+            validCoords.filter(Boolean).length *
+            1000 +
+          Date.now()
+        req.session.cooldown = cooldown
+        return scannerApi(
+          category,
+          method,
+          {
+            ...data,
+            scanCoords: data.scanCoords?.filter((__, i) => validCoords[i]),
+          },
+          req?.user,
+        )
       }
       return {}
     },
@@ -617,6 +656,27 @@ const resolvers = {
           status,
           data,
         )
+        if (category === 'pokemon') {
+          result.pokemon = result.pokemon.map((x) => ({
+            ...x,
+            allForms: !x.form,
+            pvpEntry: !!x.pvp_ranking_league,
+            xs: x.max_weight !== 9000000,
+            xl: x.min_weight !== 0,
+          }))
+        }
+        if (category === 'invasion') {
+          result.invasion = result.invasion.map((x) => ({
+            ...x,
+            real_grunt_id: PoracleAPI.getRealGruntId(x, Event.invasions),
+          }))
+        }
+        if (category === 'raid') {
+          result.raid = result.raid.map((x) => ({
+            ...x,
+            allMoves: x.move === 9000,
+          }))
+        }
         return result
       }
       return {}

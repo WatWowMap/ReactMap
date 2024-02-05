@@ -28,6 +28,15 @@ import { create } from 'zustand'
  *  groupedAreas: Record<string, import('@turf/helpers').Feature[]>
  *  trackedSearch: string
  *  selected: Record<string, boolean>
+ *  tempFilters: Record<string, any>
+ *  advanced: {
+ *    id: string
+ *    uid: number
+ *    category: string
+ *    selectedIds: string[]
+ *    open: boolean
+ *    onClose?: (newFilters: object, save?: boolean) => void
+ *  }
  * }} WebhookStore
  * @type {import("zustand").UseBoundStore<import("zustand").StoreApi<WebhookStore>>}
  */
@@ -62,6 +71,15 @@ export const useWebhookStore = create(() => ({
   groupedAreas: {},
   trackedSearch: '',
   selected: {},
+  tempFilters: {},
+  advanced: {
+    id: '',
+    uid: 0,
+    category: '',
+    selectedIds: [],
+    open: false,
+    onClose: () => {},
+  },
 }))
 
 /** @param {WebhookStore['location']} location */
@@ -109,5 +127,21 @@ export function setTrackedSearch(trackedSearch) {
 export const setSelected = (id) => () => {
   useWebhookStore.setState((prev) => ({
     selected: id ? { ...prev.selected, [id]: !prev.selected[id] } : {},
+  }))
+}
+
+/**
+ * @param {boolean} enabled
+ * @param {string[]} ids
+ */
+export const applyToAllWebhooks = (enabled, ids) => {
+  const selected = new Set(ids)
+  useWebhookStore.setState((prev) => ({
+    tempFilters: Object.fromEntries(
+      Object.entries(prev.tempFilters).map(([k, v]) => [
+        k,
+        selected.has(k) ? { ...v, enabled } : v,
+      ]),
+    ),
   }))
 }

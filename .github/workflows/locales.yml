@@ -1,16 +1,17 @@
 name: Locales
 on:
-  push:
-    branches:
-      - main
+  workflow_run:
+    workflows: [Lint]
+    types: [completed]
+    branches: [main]
 
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
 
 jobs:
-  Sync:
-    name: Generate missing locales with chatgpt
+  locales:
+    name: Locales Sync
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -43,3 +44,6 @@ jobs:
           git add --all
           git commit --message "chore: sync locales"
           git push
+          git checkout develop
+          git merge main
+          git push origin develop

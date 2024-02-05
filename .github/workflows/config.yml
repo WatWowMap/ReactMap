@@ -1,17 +1,17 @@
 name: Config
 on:
-  push:
-    branches:
-      - main
-      - develop
+  workflow_run:
+    workflows: [Lint]
+    types: [completed]
+    branches: [main, develop]
 
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
 
 jobs:
-  Sync:
-    name: Check for config changes
+  config:
+    name: Config Sync
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code

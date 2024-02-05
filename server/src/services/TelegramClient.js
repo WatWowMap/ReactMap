@@ -27,6 +27,12 @@ class TelegramClient {
     this.alwaysEnabledPerms = config.getSafe(
       'authentication.alwaysEnabledPerms',
     )
+    this.loggingChannels = {
+      main: strategy.logGroupId,
+      event: strategy.eventLogGroupId,
+      scanNext: strategy.scanNextLogGroupId,
+      scanZone: strategy.scanZoneLogGroupId,
+    }
   }
 
   /** @param {TGUser} user */
@@ -189,6 +195,45 @@ class TelegramClient {
       log.error(
         HELPERS.custom(this.rmStrategy, '#26A8EA'),
         'User has failed auth.',
+        e,
+      )
+    }
+  }
+
+  /**
+   *
+   * @param {string} text
+   * @param {keyof TelegramClient['loggingChannels']} channel
+   */
+  async sendMessage(text, channel = 'main') {
+    if (!this.loggingChannels[channel]) return
+    try {
+      const response = await fetch(
+        `https://api.telegram.org/bot${this.strategy.botToken}/sendMessage`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            chat_id: this.loggingChannels[channel],
+            parse_mode: 'HTML',
+            disable_web_page_preview: true,
+            text,
+          }),
+        },
+      )
+      if (!response.ok) {
+        throw new Error(
+          `Telegram API error: ${response.status} ${response.statusText}`,
+        )
+      }
+      log.info(
+        HELPERS.custom(this.rmStrategy, '#26A8EA'),
+        `${channel} Log Sent`,
+      )
+    } catch (e) {
+      log.error(
+        HELPERS.custom(this.rmStrategy, '#26A8EA'),
+        `Error sending ${channel} Log`,
         e,
       )
     }

@@ -3,7 +3,7 @@
 import * as React from 'react'
 import { Circle, Popup } from 'react-leaflet'
 
-import { useStore } from '@hooks/useStore'
+import { useStorage } from '@hooks/useStorage'
 import useForcePopup from '@hooks/useForcePopup'
 
 import PopupContent from '../popups/Portal'
@@ -15,7 +15,7 @@ import PopupContent from '../popups/Portal'
  */
 const PortalTile = (portal) => {
   const [markerRef, setMarkerRef] = React.useState(null)
-  const color = useStore((s) =>
+  const color = useStorage((s) =>
     Date.now() / 1000 - portal.imported > 86400
       ? s.userSettings.wayfarer.oldPortals
       : s.userSettings.wayfarer.newPortals,

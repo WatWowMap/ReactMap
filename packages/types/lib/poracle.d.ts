@@ -333,3 +333,7 @@ export type APIMethod<T extends PoracleAPIInput = PoracleAPIInput> = (
 
 export type ApolloQueryReturn<T extends APIReturnType[keyof APIReturnType]> =
   ReturnType<typeof useQuery<{ webhook: T }>>
+
+export type PoracleCategories = keyof PoracleUI
+
+export type AllButHuman = Exclude<PoracleCategories, 'human'>

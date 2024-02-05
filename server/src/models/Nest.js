@@ -139,9 +139,10 @@ class Nest extends Model {
    * @param {object} args
    * @param {import("@rm/types").DbContext} ctx
    * @param {import('objection').Raw} distance
+   * @param {ReturnType<typeof import("server/src/services/functions/getBbox").getBboxFromCenter>} bbox
    * @returns {Promise<FullNest[]>}
    */
-  static async search(perms, args, { isMad }, distance) {
+  static async search(perms, args, { isMad }, distance, bbox) {
     const { search, locale, onlyAreas = [] } = args
     const pokemonIds = Object.keys(Event.masterfile.pokemon).filter((pkmn) =>
       i18next.t(`poke_${pkmn}`, { lng: locale }).toLowerCase().includes(search),
@@ -159,6 +160,8 @@ class Nest extends Model {
         'pokemon_form AS nest_pokemon_form',
         distance,
       ])
+      .whereBetween(isMad ? 'latitude' : 'lat', [bbox.minLat, bbox.maxLat])
+      .andWhereBetween(isMad ? 'longitude' : 'lon', [bbox.minLon, bbox.maxLon])
       .whereNotNull('pokemon_id')
       .where((builder) => {
         builder

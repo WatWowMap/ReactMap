@@ -1,14 +1,12 @@
 // @ts-check
-const config = require('@rm/config')
-
 const BaseFilter = require('../Base')
-const { Event } = require('../../initialization')
+const { Event, Db } = require('../../initialization')
 
 /**
  *
  * @param {import("@rm/types").Permissions} perms
  * @param {import("@rm/types").Config['defaultFilters']['pokestops']} defaults
- * @returns
+ * @returns {Record<string, BaseFilter>}
  */
 function buildPokestops(perms, defaults) {
   const quests = { s0: new BaseFilter() }
@@ -72,7 +70,7 @@ function buildPokestops(perms, defaults) {
       }
       if (
         avail.startsWith('a') &&
-        config.getSafe('map.misc.enableConfirmedInvasions')
+        Db.filterContext.Pokestop.hasConfirmedInvasions
       ) {
         quests[avail] = new BaseFilter(defaults.invasionPokemon)
       }
@@ -80,7 +78,7 @@ function buildPokestops(perms, defaults) {
     if (perms.eventStops && avail.startsWith('b')) {
       quests[avail] = new BaseFilter(defaults.eventStops)
     }
-    if (perms.eventStops && avail.startsWith('f')) {
+    if (perms.eventStops && (avail.startsWith('f') || avail.startsWith('h'))) {
       quests[avail] = new BaseFilter(defaults.showcasePokemon)
     }
   })

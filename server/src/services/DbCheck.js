@@ -1,9 +1,15 @@
+/* eslint-disable no-await-in-loop */
 const { knex } = require('knex')
 const { raw } = require('objection')
 const extend = require('extend')
 const config = require('@rm/config')
 
 const { log, HELPERS } = require('@rm/logger')
+const { getBboxFromCenter } = require('./functions/getBbox')
+const { setCache, getCache } = require('./cache')
+
+const softLimit = config.getSafe('api.searchSoftKmLimit')
+const hardLimit = config.getSafe('api.searchHardKmLimit')
 
 /**
  * @type {import("@rm/types").DbCheckClass}
@@ -32,13 +38,14 @@ module.exports = class DbCheck {
     this.searchLimit = config.getSafe('api.searchResultsLimit')
     this.rarityPercents = config.getSafe('rarity.percents')
     this.models = {}
-    this.questConditions = {}
     this.endpoints = {}
-    this.rarity = {}
-    this.historical = {}
-    this.filterContext = {
+    this.questConditions = getCache('questConditions.json', {})
+    this.rarity = getCache('rarity.json', {})
+    this.historical = getCache('historical.json', {})
+    this.filterContext = getCache('filterContext.json', {
       Route: { maxDistance: 0, maxDuration: 0 },
-    }
+      Pokestop: { hasConfirmedInvasions: false },
+    })
     this.reactMapDb = null
     this.connections = config
       .getSafe('database.schemas')
@@ -109,16 +116,18 @@ module.exports = class DbCheck {
    * @returns {ReturnType<typeof raw>}
    */
   getDistance(args, isMad) {
+    const radLat = args.lat * (Math.PI / 180)
+    const radLon = args.lon * (Math.PI / 180)
     return raw(
       `ROUND(( ${
         this.distanceUnit === 'mi' ? '3959' : '6371'
-      } * acos( cos( radians(${args.lat}) ) * cos( radians( ${
+      } * acos( cos( ${radLat} ) * cos( radians( ${
         isMad ? 'latitude' : 'lat'
-      } ) ) * cos( radians( ${isMad ? 'longitude' : 'lon'} ) - radians(${
-        args.lon
-      }) ) + sin( radians(${args.lat}) ) * sin( radians( ${
+      } ) ) * cos( radians( ${
+        isMad ? 'longitude' : 'lon'
+      } ) - ${radLon} ) + sin( ${radLat} ) * sin( radians( ${
         isMad ? 'latitude' : 'lat'
-      } ) ) ) ),2)`,
+      } ) ) ) ), 2)`,
     ).as('distance')
   }
 
@@ -141,6 +150,7 @@ module.exports = class DbCheck {
       hasAltQuests,
       hasShowcaseData,
       hasShowcaseForm,
+      hasShowcaseType,
     ] = await schema('pokestop')
       .columnInfo()
       .then((columns) => [
@@ -149,6 +159,7 @@ module.exports = class DbCheck {
         'alternative_quest_type' in columns,
         'showcase_pokemon_id' in columns,
         'showcase_pokemon_form_id' in columns,
+        'showcase_pokemon_type_id' in columns,
       ])
     const [hasLayerColumn] = isMad
       ? await schema('trs_quest')
@@ -194,6 +205,7 @@ module.exports = class DbCheck {
       polygon,
       hasShowcaseData,
       hasShowcaseForm,
+      hasShowcaseType,
     }
   }
 
@@ -236,7 +248,7 @@ module.exports = class DbCheck {
    * @param {boolean} historical
    * @returns {void}
    */
-  setRarity(results, historical = false) {
+  async setRarity(results, historical = false) {
     const base = {}
     const mapKey = historical ? 'historical' : 'rarity'
     let total = 0
@@ -267,6 +279,7 @@ module.exports = class DbCheck {
         this[mapKey][id] = 'common'
       }
     })
+    await setCache(`${mapKey}.json`, this[mapKey])
   }
 
   async historicalRarity() {
@@ -282,7 +295,7 @@ module.exports = class DbCheck {
                 .groupBy('pokemon_id'),
         ),
       )
-      this.setRarity(
+      await this.setRarity(
         results.map((result) =>
           Object.fromEntries(
             result.map((pkmn) => [`${pkmn.pokemon_id}`, +pkmn.total]),
@@ -429,19 +442,70 @@ module.exports = class DbCheck {
    * @returns {Promise<T[]>}
    */
   async search(model, perms, args, method = 'search') {
-    const data = await Promise.all(
-      this.models[model].map(async ({ SubModel, ...source }) =>
-        SubModel[method](
-          perms,
-          args,
-          source,
-          this.getDistance(args, source.isMad),
+    let deDuped = []
+    let count = 0
+    let distance = softLimit
+    const max = model === 'Pokemon' ? hardLimit / 2 : hardLimit
+    const startTime = Date.now()
+    while (deDuped.length < this.searchLimit) {
+      const loopTime = Date.now()
+      count += 1
+      const bbox = getBboxFromCenter(args.lat, args.lon, distance)
+      const data = await Promise.all(
+        this.models[model].map(async ({ SubModel, ...source }) =>
+          SubModel[method](
+            perms,
+            args,
+            source,
+            this.getDistance(args, source.isMad),
+            bbox,
+          ),
         ),
-      ),
-    )
-    const deDuped = DbCheck.deDupeResults(data).sort(
-      (a, b) => a.distance - b.distance,
-    )
+      )
+      const results = DbCheck.deDupeResults(data)
+      if (results.length > deDuped.length) {
+        deDuped = results
+      }
+      log.debug(
+        HELPERS.db,
+        'Search attempt #',
+        count,
+        '| received:',
+        deDuped.length,
+        '| distance:',
+        distance,
+        '| time:',
+        +((Date.now() - loopTime) / 1000).toFixed(2),
+      )
+      if (
+        deDuped.length >= this.searchLimit * 0.5 ||
+        distance >= max ||
+        Date.now() - startTime > 2_000
+      ) {
+        break
+      }
+      if (deDuped.length === 0) {
+        distance += softLimit * 4
+      } else if (deDuped.length < this.searchLimit / 4) {
+        distance += softLimit * 2
+      } else {
+        distance += softLimit
+      }
+      distance = Math.min(distance, max)
+    }
+    if (count > 1) {
+      log.info(
+        HELPERS.search,
+        'Searched',
+        count,
+        '| received:',
+        deDuped.length,
+        `results for ${method} on model ${model}`,
+        '| time:',
+        +((Date.now() - startTime) / 1000).toFixed(2),
+      )
+    }
+    deDuped.sort((a, b) => a.distance - b.distance)
     if (deDuped.length > this.searchLimit) {
       deDuped.length = this.searchLimit
     }
@@ -531,9 +595,10 @@ module.exports = class DbCheck {
               Object.values(titles),
             ]),
           )
+          await setCache('questConditions.json', this.questConditions)
         }
         if (model === 'Pokemon') {
-          this.setRarity(results, false)
+          await this.setRarity(results, false)
         }
         if (results.length === 1) return results[0].available
         if (results.length > 1) {
@@ -564,18 +629,37 @@ module.exports = class DbCheck {
    */
   async getFilterContext() {
     if (this.models.Route) {
+      try {
+        const results = await Promise.all(
+          this.models.Route.map(({ SubModel, ...source }) =>
+            SubModel.getFilterContext(source),
+          ),
+        )
+        this.filterContext.Route.maxDistance = Math.max(
+          ...results.map((result) => result.max_distance),
+        )
+        this.filterContext.Route.maxDuration = Math.max(
+          ...results.map((result) => result.max_duration),
+        )
+        log.info(HELPERS.db, 'Updating filter context for routes')
+        await setCache('filterContext.json', this.filterContext)
+      } catch (e) {
+        log.error(
+          HELPERS.db,
+          'If you are using RDM, you likely do not have a routes table. Remove `route` from the `useFor` array in your config',
+          e,
+        )
+      }
+    }
+    if (this.models.Pokestop) {
       const results = await Promise.all(
-        this.models.Route.map(({ SubModel, ...source }) =>
+        this.models.Pokestop.map(({ SubModel, ...source }) =>
           SubModel.getFilterContext(source),
         ),
       )
-      this.filterContext.Route.maxDistance = Math.max(
-        ...results.map((result) => result.max_distance),
+      this.filterContext.Pokestop.hasConfirmedInvasions = results.some(
+        (result) => result.hasConfirmedInvasions,
       )
-      this.filterContext.Route.maxDuration = Math.max(
-        ...results.map((result) => result.max_duration),
-      )
-      log.info(HELPERS.db, 'Updating filter context for routes')
     }
   }
 }

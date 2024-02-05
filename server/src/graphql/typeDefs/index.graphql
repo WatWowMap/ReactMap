@@ -1,7 +1,11 @@
 scalar JSON
 
 type Query {
-  available: Available
+  available: MapData
+  availablePokemon: [String]
+  availablePokestops: [String]
+  availableGyms: [String]
+  availableNests: [String]
   badges: [Badge]
   backup(id: ID): Backup
   backups: [Backup]
@@ -87,6 +91,14 @@ type Query {
     locale: String
     onlyAreas: [String]
   ): [SearchLure]
+  searchInvasion(
+    search: String
+    category: String
+    lat: Float
+    lon: Float
+    locale: String
+    onlyAreas: [String]
+  ): [SearchInvasion]
   searchQuest(
     search: String
     category: String

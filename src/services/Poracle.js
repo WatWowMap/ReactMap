@@ -1,7 +1,6 @@
 // @ts-check
 import { t } from 'i18next'
 import { useWebhookStore } from '@components/layout/dialogs/webhooks/store'
-import { useStatic } from '@hooks/useStore'
 
 export default class Poracle {
   static getMapCategory(poracleCategory) {
@@ -49,7 +48,7 @@ export default class Poracle {
   }
 
   static getId(item) {
-    const { invasions } = useStatic.getState().masterfile
+    if (!item) return ''
     const { category } = useWebhookStore.getState()
 
     switch (category) {
@@ -62,12 +61,7 @@ export default class Poracle {
           ? 'kecleon'
           : item.grunt_type === 'showcase'
           ? 'showcase'
-          : `i${Object.keys(invasions).find(
-              (x) =>
-                invasions[x].type?.toLowerCase() ===
-                  item.grunt_type.toLowerCase() &&
-                invasions[x].gender === (item.gender || 1),
-            )}`
+          : `i${item.real_grunt_id}`
       case 'lure':
         return `l${item.lure_id}`
       case 'gym':
@@ -155,6 +149,7 @@ export default class Poracle {
 
   static reactMapFriendly(values) {
     const reactMapFriendly = {}
+    if (!values) return reactMapFriendly
     Object.keys(values).forEach((key) => {
       if (key === 'min_time') {
         reactMapFriendly[key] = values[key]
@@ -181,7 +176,7 @@ export default class Poracle {
     return reactMapFriendly
   }
 
-  static processor(type, entries, defaults) {
+  static processor(category, entries, defaults) {
     const pvpFields = [
       'pvp_ranking_league',
       'pvp_ranking_best',
@@ -198,7 +193,7 @@ export default class Poracle {
       'pvpEntry',
     ]
     const dupes = {}
-    switch (type) {
+    switch (category) {
       case 'egg':
         return entries.map((egg) => ({
           ...defaults,
@@ -315,7 +310,15 @@ export default class Poracle {
     switch (category) {
       case 'invasion': {
         let name = t(
-          item.real_grunt_id ? `grunt_${item.real_grunt_id}` : 'poke_global',
+          item.grunt_type === 'gold-stop'
+            ? 'gold_stop'
+            : item.grunt_type === 'kecleon'
+            ? 'poke_352'
+            : item.grunt_type === 'showcase'
+            ? 'showcase'
+            : item.real_grunt_id
+            ? `grunt_${item.real_grunt_id}`
+            : 'poke_global',
         )
         if (!item.gender) name = name.replace(/\(.+?\)/g, `(${t('all')})`)
         return `${name}${item.clean ? ` | ${t('clean')} ` : ''}${
@@ -404,6 +407,17 @@ export default class Poracle {
         }`
       default:
         return item.description || ''
+    }
+  }
+
+  /** @param {string} id */
+  static getOtherData(id) {
+    switch (id.charAt(0)) {
+      case 'e':
+      case 'r':
+        return { level: id.slice(1) }
+      default:
+        return { pokemon_id: id.split('-')[0], form: id.split('-')[1] }
     }
   }
 }

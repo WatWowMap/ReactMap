@@ -1,18 +1,22 @@
 // @ts-check
 import * as React from 'react'
 
-import { useStatic, useStore } from '@hooks/useStore'
+import { useMemory } from '@hooks/useMemory'
+import { useStorage } from '@hooks/useStorage'
+import { useMapStore } from '@hooks/useMapStore'
 import Utility from '@services/Utility'
+
 import FilterPermCheck from './QueryData'
 
 export default function Map() {
   Utility.analytics(window.location.pathname)
 
-  const ready = useStatic((s) => !!s.map && !!s.Icons)
-  const ui = useStatic((s) => s.ui)
-  const profiling = useStore((s) => s.profiling)
+  const iconsReady = useMemory((s) => !!s.Icons)
+  const mapReady = useMapStore((s) => !!s.map)
+  const ui = useMemory((s) => s.ui)
+  const profiling = useStorage((s) => s.profiling)
 
-  if (!ready) return null
+  if (!iconsReady || !mapReady) return null
   return (
     <>
       {Object.keys({ ...ui, ...ui.wayfarer, ...ui.admin }).map((category) => {

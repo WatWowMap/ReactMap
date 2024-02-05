@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { LayerGroup, DomEvent, DomUtil, Control } from 'leaflet'
 import { useTranslation } from 'react-i18next'
 import { useMap } from 'react-leaflet'
@@ -13,7 +13,7 @@ export default function useLocation() {
   const [color, setColor] = useState('inherit')
   const { t } = useTranslation()
 
-  const [lc] = useState(() => {
+  const lc = useMemo(() => {
     const LocateFab = Control.Locate.extend({
       _setClasses(state) {
         if (state === 'requesting') setColor('secondary')
@@ -76,6 +76,6 @@ export default function useLocation() {
       },
     }).addTo(map)
     return result
-  })
+  }, [map, t])
   return { lc, color }
 }

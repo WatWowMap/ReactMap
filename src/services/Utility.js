@@ -1,4 +1,3 @@
-/* eslint-disable no-nested-ternary */
 import ReactGA from 'react-ga4'
 import SunCalc from 'suncalc'
 
