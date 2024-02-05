@@ -1,7 +1,7 @@
 name: Locales
 on:
   workflow_run:
-    workflows: [Config]
+    workflows: [Lint]
     types: [completed]
     branches: [main]
 

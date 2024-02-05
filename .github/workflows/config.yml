@@ -2,7 +2,8 @@ name: Config
 on:
   workflow_run:
     workflows: [Lint]
-    types: [completed]
+    types:
+      - completed
     branches: [main, develop]
 
 env:
