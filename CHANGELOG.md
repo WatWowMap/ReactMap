@@ -1,3 +1,11 @@
+# [1.29.0-develop.20](https://github.com/WatWowMap/ReactMap/compare/v1.29.0-develop.19...v1.29.0-develop.20) (2024-02-05)
+
+
+### Bug Fixes
+
+* fallback state ([5ea5d15](https://github.com/WatWowMap/ReactMap/commit/5ea5d15659d21a77f49496a3aea70d3d0ec29a3d))
+* show confirm switch if enabled ([2e03c50](https://github.com/WatWowMap/ReactMap/commit/2e03c500f3e6428d925dad301221c734f397171c))
+
 # [1.29.0-develop.19](https://github.com/WatWowMap/ReactMap/compare/v1.29.0-develop.18...v1.29.0-develop.19) (2024-01-30)
 
 
