@@ -1,7 +1,5 @@
 name: Sentry
-on:
-  release:
-    types: [published]
+on: release
 
 jobs:
   sentry:
