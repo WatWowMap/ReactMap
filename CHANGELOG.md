@@ -1,3 +1,10 @@
+## [1.29.3](https://github.com/WatWowMap/ReactMap/compare/v1.29.2...v1.29.3) (2024-02-06)
+
+
+### Bug Fixes
+
+* test ([cb71760](https://github.com/WatWowMap/ReactMap/commit/cb71760dfb149e82837f2d9cecda742099495750))
+
 ## [1.29.2](https://github.com/WatWowMap/ReactMap/compare/v1.29.1...v1.29.2) (2024-02-06)
 
 
