@@ -1,3 +1,10 @@
+## [1.29.6](https://github.com/WatWowMap/ReactMap/compare/v1.29.5...v1.29.6) (2024-02-06)
+
+
+### Bug Fixes
+
+* run even when prev is skipped ([78c1404](https://github.com/WatWowMap/ReactMap/commit/78c14040007a33180f5fddf270aa155136ba87c2))
+
 ## [1.29.5](https://github.com/WatWowMap/ReactMap/compare/v1.29.4...v1.29.5) (2024-02-06)
 
 
