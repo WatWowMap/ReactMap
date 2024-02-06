@@ -9,7 +9,8 @@ jobs:
   release:
     uses: ./.github/workflows/release.yml
     needs: [config, locales]
+    if: always()
   docker:
-    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.repository
+    if: (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.repository) && always()
     uses: ./.github/workflows/docker.yml
     needs: [config, locales]
