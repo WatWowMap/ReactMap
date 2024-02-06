@@ -1,18 +1,11 @@
 name: Locales
-on:
-  workflow_run:
-    workflows: [Lint]
-    types: [completed]
-    branches: [main]
-
-env:
-  REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository }}
+on: workflow_call
 
 permissions: write-all
 
 jobs:
   locales:
+    if: ${{ github.ref_name == 'main' }}
     name: Locales Sync
     runs-on: ubuntu-latest
     steps:
@@ -44,10 +37,9 @@ jobs:
         if: ${{ env.changes_exist == 'true' }}
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          HUSKY: 0
         run: |
           git add --all
-          git commit --message "chore: sync locales"
+          git commit --message "chore: sync locales [skip ci]"
           git push
           git checkout develop
           git merge main

@@ -1,16 +1,9 @@
 name: Config
-on:
-  workflow_run:
-    workflows: [Lint]
-    types: [completed]
-    branches: [main, develop]
-
-env:
-  REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository }}
+on: workflow_call
 
 jobs:
   config:
+    if: ${{ github.ref_name == 'main' || github.ref_name == 'develop'}}
     name: Config Sync
     runs-on: ubuntu-latest
     steps:
@@ -40,5 +33,5 @@ jobs:
         if: ${{ env.changes_exist == 'true' }}
         run: |
           git add --all
-          git commit --message "chore: Sync CI/CD Config Items"
+          git commit --message "chore: Sync Config [skip ci]"
           git push

@@ -5,6 +5,7 @@ permissions: write-all
 
 jobs:
   release:
+    if: ${{ github.ref_name == 'main' || github.ref_name == 'develop'}}
     name: GitHub Release
     runs-on: ubuntu-latest
     steps:

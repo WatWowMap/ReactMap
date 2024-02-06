@@ -1,8 +1,0 @@
-name: Docker Release
-on:
-  release:
-    types: [prereleased, released]
-
-jobs:
-  build:
-    uses: WatWowMap/ReactMap/.github/workflows/docker-base.yml@main

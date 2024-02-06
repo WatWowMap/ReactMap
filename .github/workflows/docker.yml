@@ -1,10 +1,5 @@
 name: Docker
-on:
-  workflow_run:
-    workflows: [Config, Locales]
-    types: [completed]
-  release:
-    types: [prereleased, released]
+on: workflow_call
 
 env:
   REGISTRY: ghcr.io

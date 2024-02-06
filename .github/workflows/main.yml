@@ -1,0 +1,12 @@
+name: Main CI
+on: [push, pull_request]
+
+jobs:
+  config:
+    uses: ./.github/workflows/config.yml
+  locales:
+    uses: ./.github/workflows/locales.yml
+  release:
+    uses: ./.github/workflows/release.yml
+  docker:
+    uses: ./.github/workflows/docker.yml
