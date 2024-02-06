@@ -1,3 +1,10 @@
+## [1.29.5](https://github.com/WatWowMap/ReactMap/compare/v1.29.4...v1.29.5) (2024-02-06)
+
+
+### Bug Fixes
+
+* needs both ([e4b7cec](https://github.com/WatWowMap/ReactMap/commit/e4b7cec18ce2b41b04c5813b7a8ece23a3bf5510))
+
 ## [1.29.4](https://github.com/WatWowMap/ReactMap/compare/v1.29.3...v1.29.4) (2024-02-06)
 
 
