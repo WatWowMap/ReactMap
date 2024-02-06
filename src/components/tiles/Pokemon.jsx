@@ -103,42 +103,33 @@ const PokemonTile = (pkmn) => {
     ]
   }, basicEqualFn)
 
-  const [
-    excluded,
-    timerOverride,
-    iconUrl,
-    iconSize,
-    badge,
-    configZoom,
-    timeOfDay,
-    cry,
-  ] = useMemory((s) => {
-    const { Icons, excludeList, timerList, config, Audio } = s
-    const badgeId = getBadge(pkmn.bestPvp)
-    return [
-      excludeList.includes(internalId),
-      timerList.includes(pkmn.id),
-      Icons.getPokemon(
-        pkmn.pokemon_id,
-        pkmn.form,
-        0,
-        pkmn.gender,
-        pkmn.costume,
-      ),
-      Icons.getSize('pokemon', filterSize),
-      badgeId ? Icons.getMisc(badgeId) : '',
-      config.general.interactionRangeZoom <=
-        useMapStore.getState().map.getZoom(),
-      s.timeOfDay,
-      Audio.getPokemon(
-        pkmn.pokemon_id,
-        pkmn.form,
-        0,
-        pkmn.gender,
-        pkmn.costume,
-      ),
-    ]
-  }, basicEqualFn)
+  const [timerOverride, iconUrl, iconSize, badge, configZoom, timeOfDay, cry] =
+    useMemory((s) => {
+      const { Icons, timerList, config, Audio } = s
+      const badgeId = getBadge(pkmn.bestPvp)
+      return [
+        timerList.includes(pkmn.id),
+        Icons.getPokemon(
+          pkmn.pokemon_id,
+          pkmn.form,
+          0,
+          pkmn.gender,
+          pkmn.costume,
+        ),
+        Icons.getSize('pokemon', filterSize),
+        badgeId ? Icons.getMisc(badgeId) : '',
+        config.general.interactionRangeZoom <=
+          useMapStore.getState().map.getZoom(),
+        s.timeOfDay,
+        Audio.getPokemon(
+          pkmn.pokemon_id,
+          pkmn.form,
+          0,
+          pkmn.gender,
+          pkmn.costume,
+        ),
+      ]
+    }, basicEqualFn)
 
   /** @type {[number, number]} */
   const finalLocation = React.useMemo(
@@ -188,7 +179,7 @@ const PokemonTile = (pkmn) => {
       audio: cry,
     },
   )
-  if (pkmn.expire_timestamp < Date.now() / 1000 || excluded) {
+  if (pkmn.expire_timestamp < Date.now() / 1000) {
     return null
   }
 

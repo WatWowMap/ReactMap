@@ -21,6 +21,7 @@ import { useTranslateById } from '@hooks/useTranslateById'
 import { useMemory } from '@hooks/useMemory'
 import { useLayoutStore } from '@hooks/useLayoutStore'
 import { useDeepStore, useStorage } from '@hooks/useStorage'
+import useGetAvailable from '@hooks/useGetAvailable'
 
 import { BoolToggle } from './BoolToggle'
 import { GenericSearchMemo } from './ItemSearch'
@@ -45,10 +46,9 @@ function SelectorList({ category, subCategory, label, height = 400 }) {
   const searchKey = `${category}${
     subCategory ? capitalize(subCategory) : ''
   }QuickSelect`
-
+  const { available } = useGetAvailable(category)
   const { t: tId } = useTranslateById()
   const { t } = useTranslation()
-  const available = useMemory((s) => s.available[category])
   const allFilters = useMemory((s) => s.filters[category]?.filter)
 
   const onlyShowAvailable = useStorage((s) =>
@@ -79,17 +79,21 @@ function SelectorList({ category, subCategory, label, height = 400 }) {
                 key.startsWith('p')
               )
             case 'showcase':
-              return key.startsWith('f') || key.startsWith('h')
+              return (
+                key.startsWith('f') ||
+                key.startsWith('h') ||
+                key.startsWith('b')
+              )
             case 'rocketPokemon':
               return key.startsWith('a')
             case 'pokemon':
-              return !Number.isNaN(Number(key.charAt(0)))
+              return Number.isInteger(Number(key.charAt(0)))
             default:
               switch (category) {
                 case 'gyms':
                   return key.startsWith('t')
                 default:
-                  return !Number.isNaN(Number(key.charAt(0)))
+                  return Number.isInteger(Number(key.charAt(0)))
               }
           }
         })

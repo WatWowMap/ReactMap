@@ -128,3 +128,20 @@ export interface RMSliderProps {
   values: number[]
   handleChange: RMSliderHandleChange
 }
+
+export type ScanTypes = 'scanNext' | 'scanZone'
+
+export interface ScanOnDemandData {
+  typeName: ScanTypes
+  type: 'scan_next'
+  scanCoords?: [number, number][]
+  scanLocation?: [number, number]
+  scanSize?: number
+  cooldown?: number
+}
+
+export interface ScanOnDemandReq {
+  category: ScanTypes | 'getQueue'
+  method: HttpMethod
+  data?: ScanOnDemandData
+}

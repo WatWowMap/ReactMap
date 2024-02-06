@@ -34,27 +34,19 @@ const PokestopTile = (pokestop) => {
     const { filters } = useStorage.getState()
     const {
       config,
-      excludeList,
       timerList,
       auth: { perms },
     } = s
     return [
-      pokestop.lure_expire_timestamp > newTs &&
-        perms.lures &&
-        !excludeList.includes(`l${pokestop.lure_id}`),
+      pokestop.lure_expire_timestamp > newTs && perms.lures,
       !!(
         perms.invasions &&
         pokestop.invasions?.some(
           (invasion) =>
-            invasion.grunt_type &&
-            !excludeList.includes(`i${invasion.grunt_type}`) &&
-            invasion.incident_expire_timestamp > newTs,
+            invasion.grunt_type && invasion.incident_expire_timestamp > newTs,
         )
       ),
-      !!(
-        perms.quests &&
-        pokestop.quests?.some((quest) => !excludeList.includes(quest.key))
-      ),
+      !!(perms.quests && pokestop.quests?.length),
       !!(
         perms.eventStops &&
         filters.pokestops.eventStops &&

@@ -71,6 +71,7 @@ const skipFields = new Set([
   'shiny',
   'everything_individually',
   'all',
+  'real_grunt_id',
 ])
 
 const wildCards = {
@@ -90,12 +91,26 @@ export default function WebhookAdvanced() {
   const webhookAdv = useStorage((s) => s.webhookAdv)
   const { templates, prefix, leagues, pvp, hasNominatim, locale, everything } =
     useWebhookStore((s) => s.context)
-  const info = useWebhookStore((s) => s.context.ui?.[category] || {})
+  const info = useWebhookStore((s) => s.context.ui?.[category])
   const human = useWebhookStore((s) => s.human)
   const profile = useWebhookStore((s) => s.profile)
   const tempFilters = useWebhookStore((s) => s.tempFilters[id])
   const { pokemon, moves, types } = useMemory((s) => s.masterfile)
   const isMobile = useMemory((s) => s.isMobile)
+
+  const [filterValues, setFilterValues] = React.useState(
+    tempFilters?.template
+      ? Poracle.reactMapFriendly(tempFilters)
+      : {
+          ...Poracle.reactMapFriendly(info?.defaults),
+          profile_no: human.current_profile_no,
+        },
+  )
+  const [poracleValues, setPoracleValues] = React.useState(
+    tempFilters?.template
+      ? tempFilters
+      : { ...info?.defaults, profile_no: human.current_profile_no },
+  )
 
   Utility.analytics(`/poracle/${category}`)
 
@@ -112,35 +127,29 @@ export default function WebhookAdvanced() {
     },
   )
   const fetchedData = data || previousData
-  const [filterValues, setFilterValues] = React.useState(
-    tempFilters?.template
-      ? Poracle.reactMapFriendly(tempFilters)
-      : {
-          ...Poracle.reactMapFriendly(info.defaults),
-          profile_no: human.current_profile_no,
-        },
-  )
-  const [poracleValues, setPoracleValues] = React.useState(
-    tempFilters?.template
-      ? tempFilters
-      : { ...info.defaults, profile_no: human.current_profile_no },
-  )
 
   React.useEffect(() => {
     setPoracleValues(
       tempFilters?.template
         ? { ...tempFilters }
-        : { ...info.defaults, profile_no: human.current_profile_no },
+        : { ...info?.defaults, profile_no: human.current_profile_no },
     )
     setFilterValues(
       tempFilters?.template
         ? Poracle.reactMapFriendly(tempFilters)
         : {
-            ...Poracle.reactMapFriendly(info.defaults),
+            ...Poracle.reactMapFriendly(info?.defaults),
             profile_no: human.current_profile_no,
           },
     )
-  }, [tempFilters, id, human.current_profile_no, info.defaults])
+  }, [tempFilters, id, human.current_profile_no, info?.defaults])
+
+  React.useEffect(() => {
+    setPoracleValues((prev) => ({
+      ...prev,
+      everything_individually: !!selectedIds.length,
+    }))
+  }, [selectedIds])
 
   const handleSlider = React.useCallback(
     (low, high) => (name, values) => {
@@ -163,8 +172,8 @@ export default function WebhookAdvanced() {
           ...poracleValues,
           min_weight: checked
             ? Math.ceil(pokemon[idObj.id].weight * 1.313)
-            : info.defaults.min_weight,
-          max_weight: info.defaults.max_weight,
+            : info?.defaults.min_weight,
+          max_weight: info?.defaults.max_weight,
           [name]: checked,
           xs: false,
         })
@@ -172,10 +181,10 @@ export default function WebhookAdvanced() {
       case 'xs':
         setPoracleValues({
           ...poracleValues,
-          min_weight: info.defaults.min_weight,
+          min_weight: info?.defaults.min_weight,
           max_weight: checked
             ? Math.floor(pokemon[idObj.id].weight / 1.6431924)
-            : info.defaults.max_weight,
+            : info?.defaults.max_weight,
           [name]: checked,
           xl: false,
         })
@@ -396,7 +405,7 @@ export default function WebhookAdvanced() {
       if (
         poracleValues.pvpEntry &&
         poracleValues.pvp_ranking_league &&
-        poracleValues[field] !== info.defaults[field]
+        poracleValues[field] !== info?.defaults[field]
       ) {
         const league =
           leagues.find((x) => x.cp === poracleValues.pvp_ranking_league) || {}
@@ -420,7 +429,7 @@ export default function WebhookAdvanced() {
       return ''
     }
     if (!poracleValues.pvpEntry) {
-      return poracleValues[field] === info.defaults[field]
+      return poracleValues[field] === info?.defaults[field]
         ? ''
         : `${field.replace(/_/g, '').replace('min', '')}${poracleValues[field]}`
     }
@@ -456,12 +465,14 @@ export default function WebhookAdvanced() {
         const invasion = Object.keys(types).find(
           (x) => types[x].toLowerCase() === poracleValues.grunt_type,
         )
-        return `${prefix}${t('invasion')} ${
-          invasion
-            ? t(`poke_type_${invasion}`)
-            : t(poracleValues.grunt_type.replace(' ', ''))
-        }
+        return poracleValues?.grunt_type
+          ? `${prefix}${t('invasion')} ${
+              invasion
+                ? t(`poke_type_${invasion}`)
+                : t(poracleValues.grunt_type.replace(' ', ''))
+            }
         ${Object.keys(poracleValues).map(checkDefaults).join(' ')}`
+          : ''
       }
       case 'q':
         return `${prefix}${t('quest')} ${t(`item_${idObj.id}`).replace(
@@ -746,7 +757,7 @@ export default function WebhookAdvanced() {
               flexItem
               style={{ height: 3, width: '90%', margin: '10px 0' }}
             />
-            {Object.keys(info.ui[parent][type]).map((subType) =>
+            {Object.keys(info?.ui[parent][type] || {}).map((subType) =>
               getInputs(subType, info.ui[parent][type][subType], type),
             )}
           </Grid>
@@ -755,56 +766,65 @@ export default function WebhookAdvanced() {
   }
 
   const handleClose = (save, filterId, filterToSave) => {
-    if (save) {
-      if (filterId === 'global' && filterToSave) {
-        const newFilters = {}
-        const wc = wildCards[category] || ['0-0']
-        if (filterToSave.everything_individually !== false) {
-          selectedIds.forEach((item) => {
-            if (!wc.includes(item)) {
+    const realSave = typeof save === 'boolean' && save
+    if (realSave) {
+      useWebhookStore.setState((prev) => {
+        if (filterId === 'global' && filterToSave) {
+          const newFilters = {}
+          const wc = wildCards[category] || ['0-0']
+          if (filterToSave.everything_individually !== false) {
+            selectedIds.forEach((item) => {
               newFilters[item] = {
-                ...tempFilters[item],
+                ...prev.tempFilters[item],
                 ...filterToSave,
                 enabled: true,
               }
-            }
-          })
-        } else {
-          wc.forEach((item) => {
-            newFilters[item] = {
-              ...tempFilters[item],
-              ...filterToSave,
-              enabled: true,
-            }
-          })
-        }
-        useWebhookStore.setState((prev) => ({
-          tempFilters: {
-            ...prev.tempFilters,
-            ...newFilters,
-            [filterId]: { ...filterToSave },
-          },
-        }))
-      } else if (filterId && filterToSave) {
-        useWebhookStore.setState((prev) => ({
-          tempFilters: {
-            ...prev.tempFilters,
-            [filterId]: {
-              ...prev.tempFilters[id],
-              ...filterToSave,
-              enabled: true,
+            })
+          } else {
+            wc.forEach((item) => {
+              newFilters[item] = {
+                ...prev.tempFilters[item],
+                ...filterToSave,
+                enabled: true,
+              }
+            })
+          }
+          return {
+            tempFilters: {
+              ...prev.tempFilters,
+              ...newFilters,
+              [filterId]: { ...filterToSave },
             },
-          },
-        }))
-      }
+          }
+        }
+        if (filterId && filterToSave) {
+          return {
+            tempFilters: {
+              ...prev.tempFilters,
+              [filterId]: {
+                ...prev.tempFilters[id],
+                ...filterToSave,
+                enabled: true,
+              },
+            },
+          }
+        }
+        return prev
+      })
     } else {
       useWebhookStore.setState((prev) => ({
-        tempFilters: { ...prev.tempFilters, [filterId]: { ...info.defaults } },
+        tempFilters: { ...prev.tempFilters, [filterId]: { ...info?.defaults } },
       }))
     }
-    if (onClose) onClose(poracleValues)
+    if (onClose) onClose(poracleValues, realSave)
     useWebhookStore.setState((prev) => ({
-      advanced: { ...prev.advanced, open: false, selectedIds: [] },
+      advanced: {
+        ...prev.advanced,
+        id: '',
+        uid: 0,
+        open: false,
+        selectedIds: [],
+      },
     }))
   }
 
@@ -816,7 +836,7 @@ export default function WebhookAdvanced() {
         icon: 'Save',
       },
     ],
-    [id, poracleValues],
+    [id, poracleValues, selectedIds],
   )
 
   if (!info || !tempFilters) return null
@@ -830,7 +850,7 @@ export default function WebhookAdvanced() {
     >
       <Header titles={Poracle.getTitles(idObj)} action={handleClose} />
       <DialogContent style={{ padding: '8px 5px' }}>
-        {Object.keys(info.ui || {}).map((type) => {
+        {Object.keys(info?.ui || {}).map((type) => {
           if (human.blocked_alerts.includes(type)) return null
           if (type === 'global' && (idObj.id !== 'global' || !everything))
             return null

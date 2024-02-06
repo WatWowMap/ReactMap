@@ -219,7 +219,10 @@ class DiscordClient {
     }
   }
 
-  /** @param {import('discord.js').APIEmbed} embed @param {string} channel */
+  /**
+   * @param {import('discord.js').APIEmbed} embed
+   * @param {keyof DiscordClient['loggingChannels']} channel
+   */
   async sendMessage(embed, channel = 'main') {
     const safeChannel = this.loggingChannels[channel]
     if (!safeChannel || typeof embed !== 'object') {

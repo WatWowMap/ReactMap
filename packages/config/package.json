@@ -15,6 +15,6 @@
     "prettier:fix": "prettier --write \"**/*.{css,html,js,jsx,yml}\""
   },
   "dependencies": {
-    "config": "^3.3.9"
+    "config": "^3.3.10"
   }
 }

@@ -19,7 +19,7 @@ import {
 import { useTranslation } from 'react-i18next'
 
 import { useMemory } from '@hooks/useMemory'
-import { useStorage } from '@hooks/useStorage'
+import { setDeepStore, useStorage } from '@hooks/useStorage'
 import Utility from '@services/Utility'
 import ErrorBoundary from '@components/ErrorBoundary'
 import { TextWithIcon } from '@components/layout/general/Img'
@@ -187,26 +187,9 @@ const Header = ({
 
   const handleExclude = () => {
     setAnchorEl(null)
-    const key = `${pokemon_id}-${form}`
     if (filters?.pokemon?.filter) {
-      useStorage.setState((prev) => ({
-        filters: {
-          ...prev.filters,
-          pokemon: {
-            ...prev.filters.pokemon,
-            filter: {
-              ...prev.filters.pokemon.filter,
-              [key]: {
-                ...prev.filters.pokemon.filter[key],
-                enabled: false,
-              },
-            },
-          },
-        },
-      }))
-      useMemory.setState((prev) => ({
-        excludeList: [...prev.excludeList, key],
-      }))
+      const key = `${pokemon_id}-${form}`
+      setDeepStore(`filters.pokemon.filter.${key}.enabled`, false)
     }
   }
 
