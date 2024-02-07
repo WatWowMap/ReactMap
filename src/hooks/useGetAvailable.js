@@ -40,7 +40,10 @@ export default function useGetAvailable(category) {
   }, [data])
 
   return useMemo(() => {
-    const available = (data || previousData)?.[`available${capitalized}`] || []
+    const available =
+      (data || previousData)?.[`available${capitalized}`] ||
+      useMemory.getState().available[category] ||
+      []
     return { available, loading, error }
   }, [data, previousData, loading, error])
 }
