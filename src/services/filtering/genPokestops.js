@@ -1,5 +1,12 @@
 import { t } from 'i18next'
 
+/**
+ *
+ * @param {import('@rm/masterfile').Masterfile} pokemon
+ * @param {*} pokestops
+ * @param {*} categories
+ * @returns
+ */
 export default function genPokestops(pokemon, pokestops, categories) {
   const tempObj = Object.fromEntries(categories.map((x) => [x, {}]))
   if (!pokestops?.filter) return {}
@@ -149,9 +156,8 @@ export default function genPokestops(pokemon, pokestops, categories) {
               tempObj.quest_reward_9 &&
               pokemon[monId]
             ) {
-              const category = [
-                id.charAt(0) === 'c' ? 'quest_reward_4' : 'quest_reward_9',
-              ]
+              const category =
+                id.charAt(0) === 'c' ? 'quest_reward_4' : 'quest_reward_9'
               tempObj[category][id] = {
                 name: `${t(`poke_${monId}`)} ${
                   id.charAt(0) === 'c' ? t('candy') : t('xl')
