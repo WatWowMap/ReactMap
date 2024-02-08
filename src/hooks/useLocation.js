@@ -10,7 +10,9 @@ import 'leaflet.locatecontrol'
  */
 export default function useLocation() {
   const map = useMap()
-  const [color, setColor] = useState('inherit')
+  const [color, setColor] = useState(
+    /** @type {import('@mui/material').ButtonProps['color']} */ ('inherit'),
+  )
   const { t } = useTranslation()
 
   const lc = useMemo(() => {

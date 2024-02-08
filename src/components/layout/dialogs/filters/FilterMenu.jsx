@@ -30,6 +30,7 @@ export default function FilterMenu() {
     setTempFilters(filters?.filter)
   }, [category, filters?.filter])
 
+  if (!category || !type) return null
   return (
     <DialogWrapper
       open={open && type === 'filters' && !!tempFilters}

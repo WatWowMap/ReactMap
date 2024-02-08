@@ -1,6 +1,11 @@
 import { t } from 'i18next'
 
-/* eslint-disable no-nested-ternary */
+/**
+ *
+ * @param {import('@rm/masterfile').Masterfile} pokemon
+ * @param {string[]} categories
+ * @returns
+ */
 export default function genPokemon(pokemon, categories) {
   const tempObj = Object.fromEntries(
     categories.map((x) => [
@@ -25,7 +30,10 @@ export default function genPokemon(pokemon, categories) {
         (x) => `poke_type_${x}`,
       )
       const name =
-        form.name && form.name !== 'Normal' && j != 0 && j != pkmn.defaultFormId
+        form.name &&
+        form.name !== 'Normal' &&
+        j !== '0' &&
+        j != pkmn.defaultFormId
           ? formName
           : pokeName
       tempObj.pokemon[id] = {

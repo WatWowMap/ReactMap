@@ -18,6 +18,10 @@
     "@rm/config": "*",
     "@rm/logger": "*",
     "dotenv": "^16.3.1",
+    "node-fetch": "2.6.7",
     "openai": "^4.24.1"
+  },
+  "devDependencies": {
+    "@types/node-fetch": "2.6.1"
   }
 }

@@ -1,4 +1,7 @@
-export default function formatInterval(intervalMs) {
+// @ts-check
+
+/** @param {number} intervalMs */
+function formatInterval(intervalMs) {
   const diff = Math.floor(intervalMs / 1000)
   const d = Math.floor(diff / 86400)
   const h = Math.floor(diff / 3600)
@@ -16,3 +19,5 @@ export default function formatInterval(intervalMs) {
 
   return { str: str.join(' '), diff }
 }
+
+export default formatInterval

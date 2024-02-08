@@ -1,29 +1,31 @@
+// @ts-check
 const path = require('path')
 const router = require('express').Router()
 const config = require('@rm/config')
 const { log, HELPERS } = require('@rm/logger')
 
+const api = config.getSafe('api')
+
 router.get('/', (req, res) => {
   try {
     if (
-      config.api.reactMapSecret &&
-      req.headers['react-map-secret'] === config.api.reactMapSecret
+      api.reactMapSecret &&
+      req.headers['react-map-secret'] === api.reactMapSecret
     ) {
       res.status(200).json({
+        ...config,
         api: {
-          ...config.api,
+          ...api,
           reactMapSecret: undefined,
         },
         ...config,
         database: {
           ...config.database,
-          schemas: config.api.showSchemasInConfigApi
-            ? config.database.schemas
-            : [],
+          schemas: api.showSchemasInConfigApi ? config.database.schemas : [],
         },
         authentication: {
           ...config.authentication,
-          strategies: config.api.showStrategiesInConfigApi
+          strategies: api.showStrategiesInConfigApi
             ? config.authentication.strategies
             : [],
         },

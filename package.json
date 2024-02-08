@@ -10,6 +10,7 @@
     "packages/*"
   ],
   "scripts": {
+    "postinstall": "yarn masterfile",
     "build": "vite build",
     "config:check": "yarn workspace @rm/config run check",
     "config:env": "yarn workspace @rm/config run generate",
@@ -45,7 +46,7 @@
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx}": [
-      "eslint --fix"
+      "eslint \"**/*.{js,jsx}\" --fix"
     ],
     "**/*": [
       "prettier --write --ignore-unknown"
@@ -155,7 +156,7 @@
     "morgan": "^1.10.0",
     "mysql2": "^3.4.0",
     "node-cache": "^5.1.2",
-    "node-fetch": "2",
+    "node-fetch": "2.6.7",
     "node-geocoder": "^4.2.0",
     "nodes2ts": "^2.0.0",
     "objection": "^3.0.1",
@@ -186,6 +187,7 @@
     "@sentry/vite-plugin": "2.10.3",
     "@types/dlv": "^1.1.2",
     "@types/node": "^18",
+    "@types/node-fetch": "2.6.1",
     "@types/react": "^18.2.20",
     "@types/react-dom": "^18.0.9",
     "@vitejs/plugin-react": "4.2.1",
@@ -206,6 +208,7 @@
     "prettier": "^2.8.8",
     "rollup-plugin-delete": "^2.0.0",
     "semantic-release": "^19.0.5",
+    "typescript": "^5.3.3",
     "vite": "5.0.12",
     "vite-plugin-checker": "0.6.0"
   },

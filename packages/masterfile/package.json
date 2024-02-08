@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "main": "./lib/index.js",
+  "types": "./lib/index.d.ts",
   "scripts": {
     "generate": "node ./lib",
     "sort": "npx sort-package-json",
@@ -15,6 +16,10 @@
   "dependencies": {
     "@rm/config": "*",
     "@rm/logger": "*",
-    "@rm/types": "*"
+    "@rm/types": "*",
+    "node-fetch": "2.6.7"
+  },
+  "devDependencies": {
+    "@types/node-fetch": "2.6.1"
   }
 }
