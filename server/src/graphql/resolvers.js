@@ -497,7 +497,7 @@ const resolvers = {
           category,
           status,
         )
-        if (category === 'pokemon') {
+        if (category === 'pokemon' && result.pokemon) {
           result.pokemon = result.pokemon.map((x) => ({
             ...x,
             allForms: !x.form,
@@ -506,13 +506,13 @@ const resolvers = {
             xl: x.min_weight !== 0,
           }))
         }
-        if (category === 'invasion') {
+        if (category === 'invasion' && result.invasion) {
           result.invasion = result.invasion.map((x) => ({
             ...x,
             real_grunt_id: PoracleAPI.getRealGruntId(x, Event.invasions),
           }))
         }
-        if (category === 'raid') {
+        if (category === 'raid' && result.raid) {
           result.raid = result.raid.map((x) => ({
             ...x,
             allMoves: x.move === 9000,
@@ -656,7 +656,7 @@ const resolvers = {
           status,
           data,
         )
-        if (category === 'pokemon') {
+        if (category === 'pokemon' && result.pokemon) {
           result.pokemon = result.pokemon.map((x) => ({
             ...x,
             allForms: !x.form,
@@ -665,13 +665,13 @@ const resolvers = {
             xl: x.min_weight !== 0,
           }))
         }
-        if (category === 'invasion') {
+        if (category === 'invasion' && result.invasion) {
           result.invasion = result.invasion.map((x) => ({
             ...x,
             real_grunt_id: PoracleAPI.getRealGruntId(x, Event.invasions),
           }))
         }
-        if (category === 'raid') {
+        if (category === 'raid' && result.raid) {
           result.raid = result.raid.map((x) => ({
             ...x,
             allMoves: x.move === 9000,
