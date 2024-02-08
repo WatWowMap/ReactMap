@@ -6,7 +6,7 @@ const config = require('@rm/config')
 
 const { log, HELPERS } = require('@rm/logger')
 const { getBboxFromCenter } = require('./functions/getBbox')
-const { setCache, getCache } = require('./cache')
+const { getCache } = require('./cache')
 
 const softLimit = config.getSafe('api.searchSoftKmLimit')
 const hardLimit = config.getSafe('api.searchHardKmLimit')
@@ -248,7 +248,7 @@ module.exports = class DbCheck {
    * @param {boolean} historical
    * @returns {void}
    */
-  async setRarity(results, historical = false) {
+  setRarity(results, historical = false) {
     const base = {}
     const mapKey = historical ? 'historical' : 'rarity'
     let total = 0
@@ -279,7 +279,6 @@ module.exports = class DbCheck {
         this[mapKey][id] = 'common'
       }
     })
-    await setCache(`${mapKey}.json`, this[mapKey])
   }
 
   async historicalRarity() {
@@ -295,7 +294,7 @@ module.exports = class DbCheck {
                 .groupBy('pokemon_id'),
         ),
       )
-      await this.setRarity(
+      this.setRarity(
         results.map((result) =>
           Object.fromEntries(
             result.map((pkmn) => [`${pkmn.pokemon_id}`, +pkmn.total]),
@@ -595,10 +594,9 @@ module.exports = class DbCheck {
               Object.values(titles),
             ]),
           )
-          await setCache('questConditions.json', this.questConditions)
         }
         if (model === 'Pokemon') {
-          await this.setRarity(results, false)
+          this.setRarity(results, false)
         }
         if (results.length === 1) return results[0].available
         if (results.length > 1) {
@@ -642,7 +640,6 @@ module.exports = class DbCheck {
           ...results.map((result) => result.max_duration),
         )
         log.info(HELPERS.db, 'Updating filter context for routes')
-        await setCache('filterContext.json', this.filterContext)
       } catch (e) {
         log.error(
           HELPERS.db,

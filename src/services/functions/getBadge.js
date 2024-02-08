@@ -1,3 +1,5 @@
+// @ts-check
+
 /**
  * Get rank badge, commonly used for pvp and contests
  * @param {number} rank

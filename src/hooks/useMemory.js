@@ -30,8 +30,9 @@ import { create } from 'zustand'
  *      scanner: number,
  *    },
  *   },
+ *   menus: Record<string, any>
  *   filters: import('@rm/types').AllFilters,
- *   masterfile: import('@rm/types').Masterfile
+ *   masterfile: import('@rm/masterfile').Masterfile
  *   polling: Record<string, number>
  *   gymValidDataLimit: number
  *   settings: Record<string, any>
@@ -96,7 +97,7 @@ export const useMemory = create((set) => ({
   },
   config: {},
   filters: {},
-  menus: undefined,
+  menus: {},
   menuFilters: {},
   userSettings: undefined,
   settings: undefined,

@@ -1,4 +1,10 @@
-export default function getProperName(word) {
+// @ts-check
+/**
+ * @param {string} word
+ */
+function getProperName(word) {
   const capital = `${word.charAt(0).toUpperCase()}${word.slice(1)}`
   return capital.replace(/([a-z0-9])([A-Z])/g, '$1 $2')
 }
+
+export default getProperName

@@ -1,3 +1,4 @@
+// @ts-check
 /* eslint-disable no-bitwise */
 
 /**
@@ -33,9 +34,11 @@ export const cyrb53 = (str, seed = 0) => {
  */
 export const getOffset = (coords, amount, id, seed = 0) => {
   const rand = cyrb53(id, seed)
-  return [0, 1].map((i) => {
-    let offset = rand[i] * (0.0002 / 4294967296) - 0.0001
-    offset += offset >= 0 ? -amount : amount
-    return coords[i] + offset
-  })
+  return /** @type {[number, number]} */ (
+    [0, 1].map((i) => {
+      let offset = rand[i] * (0.0002 / 4294967296) - 0.0001
+      offset += offset >= 0 ? -amount : amount
+      return coords[i] + offset
+    })
+  )
 }

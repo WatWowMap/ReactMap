@@ -39,6 +39,27 @@ const manualGeojson = {
 }
 
 /**
+ * @param {string} fileName
+ * @returns {import("@rm/types").RMGeoJSON}
+ */
+const loadFromFile = (fileName) => {
+  try {
+    if (fileName.startsWith('http')) {
+      return getCache(fileName, DEFAULT_RETURN)
+    }
+    if (fs.existsSync(resolve(__dirname, `../configs/${fileName}`))) {
+      return JSON.parse(
+        fs.readFileSync(resolve(__dirname, `../configs/${fileName}`), 'utf-8'),
+      )
+    }
+    return DEFAULT_RETURN
+  } catch (e) {
+    log.warn(HELPERS.areas, `Failed to load ${fileName} from file system`, e)
+    return DEFAULT_RETURN
+  }
+}
+
+/**
  * @param {string} location
  * @returns {Promise<import("@rm/types").RMGeoJSON>}
  */
@@ -57,7 +78,7 @@ const getGeojson = async (location) => {
         .then(async (res) => {
           if (res?.data) {
             log.info(HELPERS.areas, 'Caching', location, 'from Kōji')
-            await setCache(`${location.replace(/\//g, '__')}.json`, res.data)
+            await setCache(location, res.data)
             return res.data
           }
           return DEFAULT_RETURN
@@ -68,7 +89,7 @@ const getGeojson = async (location) => {
             'Failed to fetch Kōji geojson, attempting to read from backup',
             err,
           )
-          const cached = getCache(`${location.replace(/\//g, '__')}.json`)
+          const cached = getCache(location)
           if (cached) {
             log.info(HELPERS.areas, 'Reading from koji_backups for', location)
             return cached
@@ -77,11 +98,7 @@ const getGeojson = async (location) => {
           return DEFAULT_RETURN
         })
     }
-    if (fs.existsSync(resolve(__dirname, `../configs/${location}`))) {
-      return JSON.parse(
-        fs.readFileSync(resolve(__dirname, `../configs/${location}`), 'utf-8'),
-      )
-    }
+    return loadFromFile(location)
   } catch (e) {
     log.warn(HELPERS.areas, 'Issue with getting the geojson', e)
   }
@@ -111,7 +128,7 @@ const loadScanPolygons = async (fileName, domain) => {
               ? `${f.properties.parent}-${f.properties.name}`
               : f.properties.name,
             center: /** @type {[number,number]} */ (
-              center(f).geometry.coordinates.reverse()
+              center(f).geometry.coordinates.slice().reverse()
             ),
           },
         })),
@@ -335,13 +352,13 @@ const loadCachedAreas = () => {
 
   /** @type {Record<string, import("@rm/types").RMGeoJSON>} */
   const scanAreas = {
-    main: getCache(`${fileName.replace(/\//g, '__')}.json`, DEFAULT_RETURN),
+    main: loadFromFile(fileName),
     ...Object.fromEntries(
       config
         .getSafe('multiDomains')
         .map((d) => [
           d.general?.geoJsonFileName ? d.domain.replaceAll('.', '_') : 'main',
-          getCache(d.general?.geoJsonFileName || fileName, DEFAULT_RETURN),
+          loadFromFile(d.general?.geoJsonFileName || fileName),
         ]),
     ),
   }

@@ -1,3 +1,4 @@
+// @ts-check
 const config = require('@rm/config')
 
 const clientOptions = require('../ui/clientOptions')
@@ -17,43 +18,48 @@ function getServerSettings(req) {
 
   const { clientValues, clientMenus } = clientOptions(user.perms)
 
-  const validConfig = config.getMapConfig(req)
+  const mapConfig = config.getMapConfig(req)
+  const api = config.getSafe('api')
+  const authentication = config.getSafe('authentication')
+  const database = config.getSafe('database')
+
   const serverSettings = {
     api: {
-      polling: config.api.polling,
-      gymValidDataLimit:
-        Date.now() / 1000 - config.api.gymValidDataLimit * 86400,
+      polling: api.polling,
+      gymValidDataLimit: Date.now() / 1000 - api.gymValidDataLimit * 86400,
     },
     user,
     authReferences: {
-      areaRestrictions: config.authentication.areaRestrictions.length,
-      webhooks: config.webhooks.filter((w) => w.enabled).length,
-      scanner: Object.values(config.scanner).filter((s) => s.enabled).length,
+      areaRestrictions: authentication.areaRestrictions.length,
+      webhooks: config.getSafe('webhooks').filter((w) => w.enabled).length,
+      scanner: Object.values(config.getSafe('scanner')).filter(
+        (s) => 'enabled' in s && s.enabled,
+      ).length,
     },
     map: {
-      ...validConfig,
+      ...mapConfig,
       general: {
-        ...validConfig.general,
+        ...mapConfig.general,
         geoJsonFileName: undefined,
       },
-      loginPage: !!config.map.loginPage.components.length,
+      loginPage: !!mapConfig.loginPage.components.length,
       donationPage: undefined,
       messageOfTheDay: undefined,
       customFloatingIcons: undefined,
     },
     authentication: {
       loggedIn: !!req.user,
-      excludeList: config.authentication.excludeFromTutorial,
-      methods: config.authentication.methods,
+      excludeList: authentication.excludeFromTutorial,
+      methods: authentication.methods,
     },
     database: {
       settings: {
-        extraUserFields: config.database.settings.extraUserFields,
-        userBackupLimits: config.database.settings.userBackupLimits,
+        extraUserFields: database.settings.extraUserFields,
+        userBackupLimits: database.settings.userBackupLimits,
       },
     },
-    tileServers: config.tileServers,
-    navigation: config.navigation,
+    tileServers: config.getSafe('tileServers'),
+    navigation: config.getSafe('navigation'),
     menus: advMenus(),
     userSettings: clientValues,
     clientMenus,

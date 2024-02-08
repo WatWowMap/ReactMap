@@ -308,6 +308,12 @@ connection.migrate
   .then(() => Db.getDbContext())
   .then(async () => {
     httpServer.listen(config.getSafe('port'), config.getSafe('interface'))
+    log.info(
+      HELPERS.ReactMap,
+      `Server is now listening at http://${config.getSafe(
+        'interface',
+      )}:${config.getSafe('port')}`,
+    )
     await Promise.all([
       Db.historicalRarity(),
       Db.getFilterContext(),
@@ -329,11 +335,7 @@ connection.migrate
         .toISOString()
         .split('.')[0]
         .split('T')
-        .join(
-          ' ',
-        )} [ReactMap] Server is now listening at http://${config.getSafe(
-        'interface',
-      )}:${config.getSafe('port')}`,
+        .join(' ')} [ReactMap] has fully started`,
     )
     setTimeout(() => text.stop(), 1_000)
   })
