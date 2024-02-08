@@ -1,6 +1,6 @@
 // @ts-check
 /**
- * @typedef {import('@rm/types').Masterfile['invasions']} Invasions
+ * @typedef {import('@rm/masterfile').Masterfile['invasions']} Invasions
  * @param {Invasions[keyof Invasions]} grunt
  * @returns {{ first: number, second: number, third: number }}
  */
