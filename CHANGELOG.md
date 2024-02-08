@@ -1,3 +1,15 @@
+## [1.29.7-develop.1](https://github.com/WatWowMap/ReactMap/compare/v1.29.6...v1.29.7-develop.1) (2024-02-08)
+
+
+### Bug Fixes
+
+* cache most things at process exit instead ([56eb47e](https://github.com/WatWowMap/ReactMap/commit/56eb47eca6e05f78e4b0b518b6d7fb6a5c901bc2))
+* config getters ([494639a](https://github.com/WatWowMap/ReactMap/commit/494639a28289fac90e0898cf2d443ba7a2c5c41d))
+* dont log golbat 404 pokemon id errors ([7292d13](https://github.com/WatWowMap/ReactMap/commit/7292d13f9b7460a7b40d1b3bcb45c751d183b953))
+* express session augmentation ([35533e9](https://github.com/WatWowMap/ReactMap/commit/35533e9b86518d496e71ff6a3fb93f54ad51864c))
+* favicon error catching for dummies ([b6c0fae](https://github.com/WatWowMap/ReactMap/commit/b6c0fae43ef8e4312bc61c265c8c16cd4a0c1ee5))
+* more client ts checks ([5028cb2](https://github.com/WatWowMap/ReactMap/commit/5028cb2221ac44e65620927bd69a10f4958f6d9c))
+
 ## [1.29.6](https://github.com/WatWowMap/ReactMap/compare/v1.29.5...v1.29.6) (2024-02-06)
 
 
