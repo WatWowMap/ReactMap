@@ -12,7 +12,8 @@
     "prettier:fix": "prettier --write \"**/*.{css,html,js,jsx,yml}\""
   },
   "dependencies": {
-    "@rm/locales": "*"
+    "@rm/locales": "*",
+    "@rm/logger": "*"
   },
   "devDependencies": {
     "vite": "5.0.12"
