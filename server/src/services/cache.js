@@ -1,3 +1,4 @@
+// @ts-check
 const fs = require('fs')
 const path = require('path')
 
@@ -5,13 +6,18 @@ const { log, HELPERS } = require('@rm/logger')
 
 const CACHE_DIR = path.join(__dirname, '../../.cache')
 
+/** @param {string} str */
+const fsFriendlyName = (str) =>
+  str.startsWith('http') ? `${str.replace(/\//g, '__')}.json` : str
+
 /**
  * @template T
- * @param {string} fileName
+ * @param {string} unsafeName
  * @param {T} [fallback]
  * @returns {T}
  */
-const getCache = (fileName, fallback = null) => {
+const getCache = (unsafeName, fallback = null) => {
+  const fileName = fsFriendlyName(unsafeName)
   try {
     if (!fs.existsSync(path.resolve(CACHE_DIR, fileName))) return fallback
     const data = JSON.parse(
@@ -30,10 +36,11 @@ const getCache = (fileName, fallback = null) => {
 }
 
 /**
- * @param {string} fileName
+ * @param {string} unsafeName
  * @param {object | string} data
  */
-const setCache = async (fileName, data) => {
+const setCache = async (unsafeName, data) => {
+  const fileName = fsFriendlyName(unsafeName)
   try {
     if (!fs.existsSync(CACHE_DIR)) await fs.promises.mkdir(CACHE_DIR)
     await fs.promises.writeFile(
