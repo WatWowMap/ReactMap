@@ -1,3 +1,11 @@
+## [1.29.7-develop.2](https://github.com/WatWowMap/ReactMap/compare/v1.29.7-develop.1...v1.29.7-develop.2) (2024-02-10)
+
+
+### Bug Fixes
+
+* **nest:** make it compatible with previous tools ([9d97481](https://github.com/WatWowMap/ReactMap/commit/9d97481039356de2c1e6165abbb207a7d7af6cce))
+* **nest:** query only active nests ([ebb5295](https://github.com/WatWowMap/ReactMap/commit/ebb529578207e1d6a11f40a99e942030ec95c3e0))
+
 ## [1.29.7-develop.1](https://github.com/WatWowMap/ReactMap/compare/v1.29.6...v1.29.7-develop.1) (2024-02-08)
 
 
