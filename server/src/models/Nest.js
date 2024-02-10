@@ -116,6 +116,7 @@ class Nest extends Model {
     const results = /** @type {FullNest[]} */ (
       await this.query()
         .select(['pokemon_id', 'pokemon_form'])
+        .where('pokemon_id', '!=', 0)
         .whereNotNull('pokemon_id')
         .groupBy('pokemon_id', 'pokemon_form')
         .orderBy('pokemon_id', 'asc')
