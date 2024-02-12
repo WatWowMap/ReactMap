@@ -1,3 +1,11 @@
+## [1.29.7-develop.3](https://github.com/WatWowMap/ReactMap/compare/v1.29.7-develop.2...v1.29.7-develop.3) (2024-02-12)
+
+
+### Bug Fixes
+
+* `onlyShowAvailable` for nests selector ([068dac2](https://github.com/WatWowMap/ReactMap/commit/068dac25f7ffbb0594619202b85fa64801c835c8))
+* nest name memoization ([ec56d7d](https://github.com/WatWowMap/ReactMap/commit/ec56d7d79e0a5d53599307e2e3768b8dddce7852))
+
 ## [1.29.7-develop.2](https://github.com/WatWowMap/ReactMap/compare/v1.29.7-develop.1...v1.29.7-develop.2) (2024-02-10)
 
 
