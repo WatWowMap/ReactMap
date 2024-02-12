@@ -1,3 +1,10 @@
+## [1.29.7-develop.4](https://github.com/WatWowMap/ReactMap/compare/v1.29.7-develop.3...v1.29.7-develop.4) (2024-02-12)
+
+
+### Bug Fixes
+
+* respect quest layer when searching ([4b0e0cc](https://github.com/WatWowMap/ReactMap/commit/4b0e0cc273b0e3c4988d4d3f0ded13053e3c75b6)), closes [#950](https://github.com/WatWowMap/ReactMap/issues/950)
+
 ## [1.29.7-develop.3](https://github.com/WatWowMap/ReactMap/compare/v1.29.7-develop.2...v1.29.7-develop.3) (2024-02-12)
 
 
