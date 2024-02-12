@@ -1,3 +1,10 @@
+## [1.29.7-develop.5](https://github.com/WatWowMap/ReactMap/compare/v1.29.7-develop.4...v1.29.7-develop.5) (2024-02-12)
+
+
+### Bug Fixes
+
+* more consistent gender filtering ([a3b24cb](https://github.com/WatWowMap/ReactMap/commit/a3b24cb6d4625c23d8d341c4b7cad62846b184c3))
+
 ## [1.29.7-develop.4](https://github.com/WatWowMap/ReactMap/compare/v1.29.7-develop.3...v1.29.7-develop.4) (2024-02-12)
 
 
