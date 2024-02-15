@@ -1,11 +1,10 @@
 // @ts-check
 const { default: fetch } = require('node-fetch')
-const NodeCache = require('node-cache')
 
 const config = require('@rm/config')
 const { log, HELPERS } = require('@rm/logger')
 
-const { getCache, setCache } = require('../cache')
+const { userCache } = require('../initialization')
 const Clients = require('../Clients')
 const TelegramClient = require('../TelegramClient')
 const DiscordClient = require('../DiscordClient')
@@ -15,37 +14,7 @@ const scannerQueue = {
   scanZone: {},
 }
 
-const userCache = new NodeCache({ stdTTL: 60 * 60 * 24 })
-
-const onShutdown = async () => {
-  const cacheObj = {}
-  userCache.keys().forEach((key) => {
-    cacheObj[key] = userCache.get(key)
-  })
-  await setCache('scanUserHistory.json', cacheObj)
-}
-process.on('SIGINT', async () => {
-  await onShutdown()
-  process.exit(0)
-})
-process.on('SIGTERM', async () => {
-  await onShutdown()
-  process.exit(0)
-})
-process.on('SIGUSR1', async () => {
-  await onShutdown()
-  process.exit(0)
-})
-process.on('SIGUSR2', async () => {
-  await onShutdown()
-  process.exit(0)
-})
-
-Object.entries(getCache('scanUserHistory.json', {})).forEach(([k, v]) =>
-  userCache.set(k, v),
-)
-
-const backendConfig = config.getSafe('scanner.backendConfig')
+const { backendConfig, ...scanModes } = config.getSafe('scanner')
 
 const scanNextOptions = {
   routes: config.getSafe('scanner.scanNext.routes'),
@@ -84,7 +53,7 @@ async function scannerApi(
 
   const timeout = setTimeout(() => {
     controller.abort()
-  }, config.api.fetchTimeoutMs)
+  }, config.getSafe('api.fetchTimeoutMs'))
 
   const coords =
     backendConfig.platform === 'mad'
@@ -161,9 +130,9 @@ async function scannerApi(
               url: `${
                 backendConfig.apiEndpoint
               }/send_gps?origin=${encodeURIComponent(
-                config.scanner.scanNext.scanNextDevice,
+                scanModes.scanNext.scanNextDevice,
               )}&coords=${JSON.stringify(coords)}&sleeptime=${
-                config.scanner.scanNext.scanNextSleeptime
+                scanModes.scanNext.scanNextSleeptime
               }`,
               options: { method, headers },
             })
@@ -173,7 +142,7 @@ async function scannerApi(
               url: `${
                 backendConfig.apiEndpoint
               }/set_data?scan_next=true&instance=${encodeURIComponent(
-                config.scanner.scanNext.scanNextInstance,
+                scanModes.scanNext.scanNextInstance,
               )}&coords=${JSON.stringify(coords)}`,
               options: { method, headers },
             })
@@ -249,7 +218,7 @@ async function scannerApi(
               url: `${
                 backendConfig.apiEndpoint
               }/set_data?scan_next=true&instance=${encodeURIComponent(
-                config.scanner.scanZone.scanZoneInstance,
+                scanModes.scanZone.scanZoneInstance,
               )}&coords=${JSON.stringify(coords)}`,
               options: { method, headers },
             })
@@ -283,7 +252,7 @@ async function scannerApi(
               url: `${backendConfig.apiEndpoint}/get_data?${
                 data.type
               }=true&queue_size=true&instance=${encodeURIComponent(
-                config.scanner[data.typeName][`${data.typeName}Instance`],
+                scanModes[data.typeName][`${data.typeName}Instance`],
               )}`,
               options: { method, headers },
             })
@@ -395,9 +364,10 @@ async function scannerApi(
             },
             thumbnail: {
               url:
-                config.authentication.strategies.find(
-                  (strategy) => strategy.name === user.rmStrategy,
-                )?.thumbnailUrl ??
+                config
+                  .getSafe('authentication.strategies')
+                  .find((strategy) => strategy.name === user.rmStrategy)
+                  ?.thumbnailUrl ??
                 `https://user-images.githubusercontent.com/58572875/167069223-745a139d-f485-45e3-a25c-93ec4d09779c.png`,
             },
             description: `<@${user.discordId}>\n${capitalized} Size: ${data.scanSize}\nCoordinates: ${coords.length}\n`,
@@ -413,10 +383,10 @@ async function scannerApi(
                 name: 'Instance',
                 value: `${
                   backendConfig.platform === 'mad'
-                    ? `Device: ${config.scanner.scanNext.scanNextDevice}`
+                    ? `Device: ${scanModes.scanNext.scanNextDevice}`
                     : ''
                 }\nName: ${
-                  config.scanner[category]?.[`${category}Instance`] || '-'
+                  scanModes[category]?.[`${category}Instance`] || '-'
                 }\nQueue: ${scannerQueue[category]?.queue || 0}`,
                 inline: true,
               },
@@ -454,7 +424,7 @@ async function scannerApi(
         log.info(
           HELPERS.scanner,
           `Error: instance ${
-            config.scanner[category]?.[`${category}Instance`]
+            scanModes[category]?.[`${category}Instance`]
           } does not exist`,
         )
         return { status: 'error', message: 'scanner_no_instance' }
@@ -462,7 +432,7 @@ async function scannerApi(
         log.info(
           HELPERS.scanner,
           `Error: instance ${
-            config.scanner[category]?.[`${category}Instance`]
+            scanModes[category]?.[`${category}Instance`]
           } has no device assigned`,
         )
         return { status: 'error', message: 'scanner_no_device_assigned' }
@@ -470,7 +440,7 @@ async function scannerApi(
         log.info(
           HELPERS.scanner,
           `Error: device ${
-            config.scanner[category]?.[`${category}Device`]
+            scanModes[category]?.[`${category}Device`]
           } does not exist`,
         )
         return { status: 'error', message: 'scanner_no_device' }

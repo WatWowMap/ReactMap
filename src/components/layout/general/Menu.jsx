@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import * as React from 'react'
 import Box from '@mui/material/Box'
 import DialogContent from '@mui/material/DialogContent'
 import Typography from '@mui/material/Typography'
@@ -22,11 +22,12 @@ import { GenericSearch } from '../drawer/ItemSearch'
 import { applyToAllWebhooks, useWebhookStore } from '../dialogs/webhooks/store'
 
 /**
+ * @template {import('@rm/types').AdvCategories} T
  * @param {{
- *  category: string
+ *  category: T
  *  webhookCategory?: string
- *  tempFilters: import('@rm/types').Filters
- *  children: (item: import('@rm/types').MenuItem, key: string) => React.ReactNode
+ *  tempFilters: import('@rm/types').AllFilters[T]
+ *  children: (index: number, key: string) => React.ReactNode
  *  categories?: import('@rm/types').Available[]
  *  title: string
  *  titleAction: () => void
@@ -51,7 +52,7 @@ export default function Menu({
   const { t } = useTranslation()
   const menus = useStorage((state) => state.menus)
 
-  const [filterDrawer, setFilterDrawer] = useState(false)
+  const [filterDrawer, setFilterDrawer] = React.useState(false)
 
   const { filteredArr, count } = useFilter(
     tempFilters,
@@ -74,55 +75,57 @@ export default function Menu({
   )
 
   const footerButtons = React.useMemo(
-    () => [
-      {
-        name: 'help',
-        action: () =>
-          useLayoutStore.setState({ help: { open: true, category } }),
-        icon: 'HelpOutline',
-      },
-      {
-        name: '',
-        disabled: true,
-      },
-      {
-        name: 'apply_to_all',
-        action: () =>
-          (webhookCategory ? useWebhookStore : useLayoutStore).setState({
-            [webhookCategory ? 'advanced' : 'advancedFilter']: {
-              open: true,
-              id: 'global',
-              category: webhookCategory || category,
-              selectedIds: filteredArr,
-            },
-          }),
-        icon: category === 'pokemon' || webhookCategory ? 'Tune' : 'FormatSize',
-      },
-      {
-        name: 'disable_all',
-        action: () =>
-          webhookCategory
-            ? applyToAllWebhooks(false, filteredArr)
-            : applyToAll({ enabled: false }, category, filteredArr),
-        icon: 'Clear',
-        color: 'error',
-      },
-      {
-        name: 'enable_all',
-        action: () =>
-          webhookCategory
-            ? applyToAllWebhooks(true, filteredArr)
-            : applyToAll(
-                { enabled: true },
-                category,
-                filteredArr,
-                !webhookCategory,
-              ),
-        icon: 'Check',
-        color: 'success',
-      },
-      ...(extraButtons ?? []),
-    ],
+    () =>
+      /** @type {import('@components/layout/general/Footer').FooterButton[]} */ ([
+        {
+          name: 'help',
+          action: () =>
+            useLayoutStore.setState({ help: { open: true, category } }),
+          icon: 'HelpOutline',
+        },
+        {
+          name: '',
+          disabled: true,
+        },
+        {
+          name: 'apply_to_all',
+          action: () =>
+            (webhookCategory ? useWebhookStore : useLayoutStore).setState({
+              [webhookCategory ? 'advanced' : 'advancedFilter']: {
+                open: true,
+                id: 'global',
+                category: webhookCategory || category,
+                selectedIds: filteredArr,
+              },
+            }),
+          icon:
+            category === 'pokemon' || webhookCategory ? 'Tune' : 'FormatSize',
+        },
+        {
+          name: 'disable_all',
+          action: () =>
+            webhookCategory
+              ? applyToAllWebhooks(false, filteredArr)
+              : applyToAll({ enabled: false }, category, filteredArr),
+          icon: 'Clear',
+          color: 'error',
+        },
+        {
+          name: 'enable_all',
+          action: () =>
+            webhookCategory
+              ? applyToAllWebhooks(true, filteredArr)
+              : applyToAll(
+                  { enabled: true },
+                  category,
+                  filteredArr,
+                  !webhookCategory,
+                ),
+          icon: 'Check',
+          color: 'success',
+        },
+        ...(extraButtons ?? []),
+      ]),
     [category, webhookCategory, extraButtons, filteredArr, tempFilters],
   )
 

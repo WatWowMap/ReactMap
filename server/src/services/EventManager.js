@@ -3,19 +3,19 @@ const { promises: fs } = require('fs')
 const path = require('path')
 const Ohbem = require('ohbem')
 const { default: fetch } = require('node-fetch')
-const config = require('@rm/config')
 
+const config = require('@rm/config')
 const { log, HELPERS } = require('@rm/logger')
 const { generate, read } = require('@rm/masterfile')
 
 const PoracleAPI = require('./api/Poracle')
-const { getCache, setCache } = require('./cache')
+const { getCache } = require('./cache')
 
 class EventManager {
   constructor() {
-    /** @type {import("@rm/types").Masterfile} */
+    /** @type {import("@rm/masterfile").Masterfile} */
     this.masterfile = read()
-    /** @type {import("@rm/types").Masterfile['invasions'] | {}} */
+    /** @type {import("@rm/masterfile").Masterfile['invasions'] | {}} */
     this.invasions =
       'invasions' in this.masterfile ? this.masterfile.invasions : {}
 
@@ -104,7 +104,6 @@ class EventManager {
 
       return 0
     })
-    await setCache('available.json', this.available)
   }
 
   /**
@@ -313,7 +312,6 @@ class EventManager {
       }
     }
     this[type] = Object.values(this[`${type}Backup`])
-    await setCache(`${type}.json`, this[type])
   }
 
   /**
@@ -351,18 +349,23 @@ class EventManager {
   }
 
   addAvailable() {
-    Object.entries(this.available).forEach(([category, entries]) => {
+    Object.entries(this.available).forEach(([c, entries]) => {
+      const category = /** @type {keyof EventManager['available']} */ (c)
       entries.forEach((item) => {
         if (!Number.isNaN(parseInt(item.charAt(0)))) {
           const [id, form] = item.split('-')
           if (!this.masterfile.pokemon[id]) {
             this.masterfile.pokemon[id] = {
+              name: '',
               pokedexId: +id,
               types: [],
               quickMoves: [],
-              chargeMoves: [],
+              chargedMoves: [],
+              defaultFormId: +form,
+              forms: {},
+              genId: 0,
             }
-            log.info(HELPERS.event, `Added ${id} to Pokemon`)
+            log.warn(HELPERS.event, `Added ${id} to Pokemon, seems suspicious`)
           }
           if (!this.masterfile.pokemon[id].forms) {
             this.masterfile.pokemon[id].forms = {}

@@ -25,7 +25,7 @@ import { useStorage } from './useStorage'
  *  },
  *  dialog: {
  *    open: boolean,
- *    category: string,
+ *    category: import('@rm/types').AdvCategories | '',
  *    type: string,
  *  },
  *  gymBadge: {

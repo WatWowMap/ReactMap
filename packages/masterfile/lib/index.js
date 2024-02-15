@@ -1,6 +1,7 @@
 // @ts-check
 const fs = require('fs')
 const { resolve } = require('path')
+const { default: fetch } = require('node-fetch')
 
 const config = require('@rm/config')
 const { log, HELPERS } = require('@rm/logger')
@@ -20,13 +21,7 @@ Object.entries(defaultRarity).forEach(([tier, pokemon]) => {
   }
 })
 
-/**
- *
- * @param {boolean} save
- * @param {import('@rm/types').Rarity} historicRarity
- * @param {import('@rm/types').Rarity} dbRarity
- * @returns
- */
+/** @type {import('.').generate} */
 const generate = async (save = false, historicRarity = {}, dbRarity = {}) => {
   log.info(HELPERS.masterfile, 'generating masterfile')
   try {
@@ -91,6 +86,7 @@ if (require.main === module) {
   generate(true).then(() => log.info(HELPERS.masterfile, 'OK'))
 }
 
+/** @type {import('.').read} */
 const read = () => {
   try {
     return JSON.parse(
@@ -101,7 +97,7 @@ const read = () => {
       HELPERS.masterfile,
       'Unable to read masterfile, generating a new one for you now',
     )
-    return generate(true)
+    generate(true)
   }
 }
 

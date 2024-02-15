@@ -79,6 +79,9 @@ const viteConfig = defineConfig(({ mode }) => {
               overlay: {
                 initialIsOpen: false,
               },
+              // typescript: {
+              //   tsconfigPath: './jsconfig.json',
+              // },
               eslint: {
                 lintCommand: 'eslint "./src/**/*.{js,jsx}"',
               },

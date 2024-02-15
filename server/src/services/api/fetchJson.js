@@ -2,7 +2,7 @@
 const fs = require('fs')
 const { resolve } = require('path')
 
-const { default: fetch } = require('node-fetch')
+const { default: fetch, Response } = require('node-fetch')
 
 const config = require('@rm/config')
 const { log, HELPERS } = require('@rm/logger')
@@ -31,6 +31,12 @@ async function fetchJson(url, options = undefined) {
     return response.json()
   } catch (e) {
     if (e instanceof Error) {
+      if (
+        e.cause instanceof Response &&
+        e.cause.status === 404 &&
+        url.includes('/api/pokemon/id')
+      )
+        return e.cause
       log.error(HELPERS.fetch, `Unable to fetch ${url}`, '\n', e)
       if (options) {
         fs.writeFileSync(

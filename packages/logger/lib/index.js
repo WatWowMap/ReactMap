@@ -39,6 +39,7 @@ const HELPERS = /** @type {const} */ ({
   fetch: chalk.hex('#880e4f')('[FETCH]'),
   scanner: chalk.hex('#b39ddb')('[SCANNER]'),
   build: chalk.hex('#ef6c00')('[BUILD]'),
+  ReactMap: chalk.hex('#ff3d00')('[ReactMap]'),
 
   pokemon: chalk.hex('#f44336')('[POKEMON]'),
   pokestops: chalk.hex('#e91e63')('[POKESTOPS]'),

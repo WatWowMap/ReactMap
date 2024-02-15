@@ -64,6 +64,7 @@ function buildDefaultFilters(perms) {
       perms.nests && Db.models.Nest
         ? {
             enabled: defaultFilters.nests.enabled,
+            onlyShowAvailable: defaultFilters.nests.onlyShowAvailable,
             pokemon: defaultFilters.nests.pokemon,
             polygons: defaultFilters.nests.polygons,
             avgFilter: defaultFilters.nests.avgFilter,
