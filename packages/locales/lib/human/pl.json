@@ -53,5 +53,20 @@
   "pokestop": "Pokéstop",
   "pokemon_cell": "Lokalizacja Pokémona może się różnić",
   "pokemon_filter_mode": "Tryb filtru Pokémonów",
-  "search_rocket_pokemon": "Wyszukaj Pokémony Rocket"
+  "search_rocket_pokemon": "Wyszukaj Pokémony Rocket",
+  "fast": "Szybki",
+  "charged": "Ładowany",
+  "first_seen": "Pierwotnie widziany",
+  "last_seen": "Ostatnio widziany",
+  "last_modified": "Ostatnio zmodyfikowany",
+  "last_updated": "Ostatnio zaktualizowany",
+  "webhooks": "Powiadomienia",
+  "everything_individually": "Dodaj indywidualne powiadomienia",
+  "submit_nest_name": "Prześlij nazwę nesta",
+  "nest_submissions": "Przesyłanie nestów",
+  "nest_submissions_subtitle": "Pozwala na przesyłanie nowych nazw dla nestów",
+  "ar_quest_true": "AR",
+  "ar_quest_false": "Bez AR",
+  "with_ar": "AR",
+  "without_ar": "Bez AR"
 }
