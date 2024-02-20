@@ -9,7 +9,6 @@
   "spawns_per_hour": "Spawny/h",
   "event_stops": "Eventowe",
   "power_up": "PowerUp",
-  "both": "Oba",
   "enabled": "Włączone",
   "route_tags": "Etykiety scieżek",
   "routes": "Scieżki",
@@ -65,8 +64,9 @@
   "submit_nest_name": "Prześlij nazwę nesta",
   "nest_submissions": "Przesyłanie nestów",
   "nest_submissions_subtitle": "Pozwala na przesyłanie nowych nazw dla nestów",
-  "ar_quest_true": "AR",
+  "ar_quest_true": "Z AR",
   "ar_quest_false": "Bez AR",
-  "with_ar": "AR",
-  "without_ar": "Bez AR"
+  "with_ar": "Z AR",
+  "without_ar": "Bez AR",
+  "both": "Obydwa"
 }
