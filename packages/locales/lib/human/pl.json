@@ -25,7 +25,6 @@
   "search_pokestops": "Szukaj Pokéstopów",
   "pokestops": "Pokéstopy",
   "pokemon": "Pokémony",
-  "all_pokestops": "Pokéstopy",
   "unknown_pokestop": "Nieznana nazwa Pokéstopu",
   "pokemon_options": "Opcje Pokémonów",
   "pokestops_options": "Opcje Pokéstopów",
@@ -68,5 +67,7 @@
   "ar_quest_false": "Bez AR",
   "with_ar": "Z AR",
   "without_ar": "Bez AR",
-  "both": "Obydwa"
+  "both": "Obydwa",
+  "all_pokestops": "Wszystkie Pokéstopy",
+  "all_gyms": "Wszystkie Gymy"
 }
