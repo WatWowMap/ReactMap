@@ -1,3 +1,10 @@
+# [1.30.0-develop.4](https://github.com/WatWowMap/ReactMap/compare/v1.30.0-develop.3...v1.30.0-develop.4) (2024-02-21)
+
+
+### Bug Fixes
+
+* try/catch on expert filter just in case ([4e430e6](https://github.com/WatWowMap/ReactMap/commit/4e430e6e1e1729ef56095b7a414f9521c6d27d75))
+
 # [1.30.0-develop.3](https://github.com/WatWowMap/ReactMap/compare/v1.30.0-develop.2...v1.30.0-develop.3) (2024-02-21)
 
 
