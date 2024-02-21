@@ -1,3 +1,10 @@
+# [1.30.0-develop.2](https://github.com/WatWowMap/ReactMap/compare/v1.30.0-develop.1...v1.30.0-develop.2) (2024-02-21)
+
+
+### Bug Fixes
+
+* early version check ([c9d1295](https://github.com/WatWowMap/ReactMap/commit/c9d129597d00fbcc19b4f164f4ea1ca468f09fed))
+
 # [1.30.0-develop.1](https://github.com/WatWowMap/ReactMap/compare/v1.29.7-develop.5...v1.30.0-develop.1) (2024-02-21)
 
 
