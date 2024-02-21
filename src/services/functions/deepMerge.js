@@ -8,8 +8,9 @@ function isObject(item) {
 }
 
 /**
- * @param {Record<string, any>} target
- * @param {...Record<string, any>} sources
+ * @template T
+ * @param {T} target
+ * @param {...T} sources
  */
 export function deepMerge(target, ...sources) {
   if (!sources.length) return target
