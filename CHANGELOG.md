@@ -1,3 +1,10 @@
+# [1.30.0-develop.1](https://github.com/WatWowMap/ReactMap/compare/v1.29.7-develop.5...v1.30.0-develop.1) (2024-02-21)
+
+
+### Features
+
+* update polish locales ([#959](https://github.com/WatWowMap/ReactMap/issues/959)) ([d28dc0a](https://github.com/WatWowMap/ReactMap/commit/d28dc0af8445002f0f9b52e87f6eb08966182d24))
+
 ## [1.29.7-develop.5](https://github.com/WatWowMap/ReactMap/compare/v1.29.7-develop.4...v1.29.7-develop.5) (2024-02-12)
 
 
