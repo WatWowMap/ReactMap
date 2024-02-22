@@ -1,17 +1,3 @@
-# [1.2.0-develop.9](https://github.com/ReuschelCGN/ReactMap/compare/v1.2.0-develop.8...v1.2.0-develop.9) (2024-02-22)
-
-
-### Bug Fixes
-
-* early version check ([c9d1295](https://github.com/ReuschelCGN/ReactMap/commit/c9d129597d00fbcc19b4f164f4ea1ca468f09fed))
-* normal form check ([47e358b](https://github.com/ReuschelCGN/ReactMap/commit/47e358b5cc01d75eb49cfa3b4654adf09b23af28))
-* try/catch on expert filter just in case ([4e430e6](https://github.com/ReuschelCGN/ReactMap/commit/4e430e6e1e1729ef56095b7a414f9521c6d27d75))
-
-
-### Features
-
-* update polish locales ([#959](https://github.com/ReuschelCGN/ReactMap/issues/959)) ([d28dc0a](https://github.com/ReuschelCGN/ReactMap/commit/d28dc0af8445002f0f9b52e87f6eb08966182d24))
-
 # [1.30.0-develop.4](https://github.com/WatWowMap/ReactMap/compare/v1.30.0-develop.3...v1.30.0-develop.4) (2024-02-21)
 
 
