@@ -26,29 +26,32 @@ import { HelpDialog } from './dialogs/Help'
 export const Nav = React.memo(
   () => {
     const iconsIsReady = useMemory((s) => !!s.Icons)
-    if (!iconsIsReady) return null
     return (
       <>
-        <Sidebar />
-        <FloatingButtonsMemo />
-        <UserProfile />
-        <Tutorial />
-        <FilterMenu />
-        <UserOptions />
-        <Webhook />
-        <Search />
-        <MessageOfTheDay />
-        <DonorPage />
-        <Feedback />
-        <ResetFilters />
-        <ScanDialog />
-        <WebhookNotification />
         <ClientError />
-        <AdvancedFilter />
-        <BadgeSelection />
-        <WebhookAdvanced />
-        <SlotSelection />
-        <HelpDialog />
+        {iconsIsReady && (
+          <>
+            <Sidebar />
+            <FloatingButtonsMemo />
+            <UserProfile />
+            <Tutorial />
+            <FilterMenu />
+            <UserOptions />
+            <Webhook />
+            <Search />
+            <MessageOfTheDay />
+            <DonorPage />
+            <Feedback />
+            <ResetFilters />
+            <ScanDialog />
+            <WebhookNotification />
+            <AdvancedFilter />
+            <BadgeSelection />
+            <WebhookAdvanced />
+            <SlotSelection />
+            <HelpDialog />
+          </>
+        )}
       </>
     )
   },

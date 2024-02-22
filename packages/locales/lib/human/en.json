@@ -563,6 +563,8 @@
   "session_expired_body": "Your session has expired",
   "old_client_title": "Outdated",
   "old_client_body": "A new version of this map is available",
+  "early_old_client_title": "Outdated",
+  "early_old_client_body": "An old version of this app might be cached in your browser, you will need to clear your cache before you can use this app.",
   "refresh": "Refresh",
   "points": "Points",
   "day": "Day",

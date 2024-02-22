@@ -1,3 +1,31 @@
+# [1.30.0-develop.4](https://github.com/WatWowMap/ReactMap/compare/v1.30.0-develop.3...v1.30.0-develop.4) (2024-02-21)
+
+
+### Bug Fixes
+
+* try/catch on expert filter just in case ([4e430e6](https://github.com/WatWowMap/ReactMap/commit/4e430e6e1e1729ef56095b7a414f9521c6d27d75))
+
+# [1.30.0-develop.3](https://github.com/WatWowMap/ReactMap/compare/v1.30.0-develop.2...v1.30.0-develop.3) (2024-02-21)
+
+
+### Bug Fixes
+
+* normal form check ([47e358b](https://github.com/WatWowMap/ReactMap/commit/47e358b5cc01d75eb49cfa3b4654adf09b23af28))
+
+# [1.30.0-develop.2](https://github.com/WatWowMap/ReactMap/compare/v1.30.0-develop.1...v1.30.0-develop.2) (2024-02-21)
+
+
+### Bug Fixes
+
+* early version check ([c9d1295](https://github.com/WatWowMap/ReactMap/commit/c9d129597d00fbcc19b4f164f4ea1ca468f09fed))
+
+# [1.30.0-develop.1](https://github.com/WatWowMap/ReactMap/compare/v1.29.7-develop.5...v1.30.0-develop.1) (2024-02-21)
+
+
+### Features
+
+* update polish locales ([#959](https://github.com/WatWowMap/ReactMap/issues/959)) ([d28dc0a](https://github.com/WatWowMap/ReactMap/commit/d28dc0af8445002f0f9b52e87f6eb08966182d24))
+
 ## [1.29.7-develop.5](https://github.com/WatWowMap/ReactMap/compare/v1.29.7-develop.4...v1.29.7-develop.5) (2024-02-12)
 
 
