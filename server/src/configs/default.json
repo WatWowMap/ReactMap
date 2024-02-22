@@ -116,7 +116,6 @@
       "bearerToken": "KOJI_SECRET"
     }
   },
-  "multiDomains": [],
   "map": {
     "general": {
       "title": "ReactMap",

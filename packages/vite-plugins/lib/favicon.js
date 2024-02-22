@@ -10,11 +10,19 @@ const { log, HELPERS } = require('@rm/logger')
  */
 const faviconPlugin = (isDevelopment) => {
   try {
-    const favicon = fs.existsSync(
-      resolve(__dirname, '../../../public/favicon/favicon.ico'),
+    const basePath = '../../../public/favicon'
+    const fallback = resolve(__dirname, `${basePath}/fallback.ico`)
+    const singleDomainPath = resolve(`${basePath}/favicon.ico`)
+    const multiDomainPath = resolve(
+      `${basePath}/${
+        process.env.NODE_CONFIG_ENV ? `-${process.env.NODE_CONFIG_ENV}` : ''
+      }.ico`,
     )
-      ? resolve(__dirname, '../../../public/favicon/favicon.ico')
-      : resolve(__dirname, '../../../public/favicon/fallback.ico')
+    const favicon = fs.existsSync(multiDomainPath)
+      ? multiDomainPath
+      : fs.existsSync(singleDomainPath)
+      ? singleDomainPath
+      : fallback
     return {
       name: 'vite-plugin-favicon',
       generateBundle() {
