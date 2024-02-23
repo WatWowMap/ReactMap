@@ -60,10 +60,7 @@ export function useSendSearch(search, open) {
   /** @type {import('@mui/material').AutocompleteProps['onInputChange']} */
   const handleInputChange = useCallback(
     (e, newValue) => {
-      if (
-        e?.type === 'change' &&
-        (/^[0-9\s\p{L}]+$/u.test(newValue) || newValue === '')
-      ) {
+      if (e?.type === 'change') {
         useStorage.setState({ search: newValue.toLowerCase() })
         debounceChange(newValue.toLowerCase())
       }
