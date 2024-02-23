@@ -211,6 +211,8 @@ if (config.has('multiDomains')) {
       mergeMapConfig(d),
     ]),
   )
+} else {
+  config.multiDomainsObj = {}
 }
 
 // Check if empty
