@@ -1,0 +1,33 @@
+{
+  "port": 8081,
+  "map": {
+    "general": {
+      "title": "Apple Map",
+      "headerTitle": "Apple Map PoGo",
+      "geoJsonFilName": "http://koji.map.com/api/v1/geofence/feature-collection/apple"
+    },
+    "links": {
+      "discordInvite": "apple map invite",
+      "rolesLink": "apple map roles link"
+    }
+  },
+  "authentication": {
+    "strategies": [
+      {
+        "name": "this is your discord strategy for apple map",
+        "enabled": false,
+        "type": "discord",
+        "logChannelId": "",
+        "presence": "Map Status: Online",
+        "presenceType": 3,
+        "botToken": "",
+        "clientId": "",
+        "clientSecret": "",
+        "redirectUri": "http://localhost:8081/auth/discord/callback",
+        "allowedGuilds": [],
+        "blockedGuilds": [],
+        "allowedUsers": []
+      }
+    ]
+  }
+}

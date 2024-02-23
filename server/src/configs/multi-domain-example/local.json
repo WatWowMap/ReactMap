@@ -1,0 +1,150 @@
+{
+  "interface": "0.0.0.0",
+  "port": 8080,
+  "api": {
+    "reactMapSecret": "very-secure-secret",
+    "maxSessions": 5,
+    "pvp": {
+      "reactMapHandlesPvp": false
+    }
+  },
+  "map": {
+    "general": {
+      "title": "ReactMap",
+      "headerTitle": "ReactMap",
+      "startLat": 2.5014,
+      "startLon": 5.6362
+    },
+    "misc": {
+      "enableMapJsFilter": true,
+      "enablePokemonPopupCoordsSelector": true,
+      "enableGymPopupCoordsSelector": true,
+      "enablePokestopPopupCoordsSelector": true,
+      "enablePortalPopupCoordsSelector": true
+    }
+  },
+  "database": {
+    "schemas": [
+      {
+        "note": "Scanner Database",
+        "host": "127.0.0.1",
+        "port": 3306,
+        "username": "scanner_user",
+        "password": "scanner_paw",
+        "database": "scanner_db",
+        "useFor": [
+          "device",
+          "gym",
+          "pokemon",
+          "pokestop",
+          "scanCell",
+          "spawnpoint",
+          "weather",
+          "route"
+        ]
+      },
+      {
+        "type": "golbat",
+        "endpoint": "http://127.0.0.1:9001",
+        "secret": "",
+        "useFor": [
+          "pokemon",
+          "device"
+        ]
+      },
+      {
+        "host": "127.0.0.1",
+        "port": 3306,
+        "username": "reactmap_user",
+        "password": "reactmap_paw",
+        "database": "reactmap_db",
+        "useFor": [
+          "user"
+        ]
+      },
+      {
+        "host": "127.0.0.1",
+        "port": 3306,
+        "username": "manual_user",
+        "password": "manual_pw",
+        "database": "manual_db",
+        "useFor": [
+          "nest",
+          "portal"
+        ]
+      }
+    ]
+  },
+  "authentication": {
+    "strategies": [
+      {
+        "name": "this is your discord strategy for the base config (no NODE_CONFIG_ENV set)",
+        "enabled": false,
+        "type": "discord",
+        "logChannelId": "",
+        "presence": "Map Status: Online",
+        "presenceType": 3,
+        "botToken": "",
+        "clientId": "",
+        "clientSecret": "",
+        "redirectUri": "http://localhost:8080/auth/discord/callback",
+        "allowedGuilds": [],
+        "blockedGuilds": [],
+        "allowedUsers": []
+      }
+    ],
+    "alwaysEnabledPerms": [
+      "map"
+    ],
+    "perms": {
+      "map": {
+        "enabled": true,
+        "trialPeriodEligible": false,
+        "roles": []
+      },
+      "pokemon": {
+        "enabled": true,
+        "trialPeriodEligible": false,
+        "roles": [
+          "role1",
+          "role2",
+          "role3"
+        ]
+      },
+      "iv": {
+        "enabled": true,
+        "trialPeriodEligible": false,
+        "roles": [
+          "role1",
+          "role2",
+          "role3"
+        ]
+      },
+      "pvp": {
+        "enabled": true,
+        "trialPeriodEligible": false,
+        "roles": [
+          "role1",
+          "role2"
+        ]
+      },
+      "gyms": {
+        "enabled": true,
+        "trialPeriodEligible": false,
+        "roles": [
+          "role1",
+          "role2",
+          "role3",
+          "role4"
+        ]
+      },
+      "raids": {
+        "enabled": true,
+        "trialPeriodEligible": false,
+        "roles": [
+          "role3"
+        ]
+      }
+    }
+  }
+}

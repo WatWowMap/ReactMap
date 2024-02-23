@@ -11,6 +11,8 @@ server/src/configs/koji_backups/*
 !server/src/configs/areas.example.json
 !server/src/configs/local.example.json
 !server/src/configs/custom-environment-variables.json
+!server/src/configs/multi-domain-example/local.json
+!server/src/configs/multi-domain-example
 .env
 
 # Masterfile
