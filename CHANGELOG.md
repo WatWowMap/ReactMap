@@ -1,19 +1,3 @@
-# [1.2.0-develop.12](https://github.com/ReuschelCGN/ReactMap/compare/v1.2.0-develop.11...v1.2.0-develop.12) (2024-02-23)
-
-
-### Bug Fixes
-
-* importing ([89b7fce](https://github.com/ReuschelCGN/ReactMap/commit/89b7fcebca0a58959ecc29418db4a75390072ffd))
-* less strict searching for `'` ([ca08a69](https://github.com/ReuschelCGN/ReactMap/commit/ca08a690fca54f90132b4688b5700532958b60f5))
-
-# [1.2.0-develop.11](https://github.com/ReuschelCGN/ReactMap/compare/v1.2.0-develop.10...v1.2.0-develop.11) (2024-02-23)
-
-
-### Bug Fixes
-
-* Merge pull request [#963](https://github.com/ReuschelCGN/ReactMap/issues/963) from ReuschelCGN/translation ([cbc0160](https://github.com/ReuschelCGN/ReactMap/commit/cbc0160f6820a68fed04c9b7b57a287cfaf66f58))
-* refine ci ([515de64](https://github.com/ReuschelCGN/ReactMap/commit/515de64e6a7275b6b7afbdb287e18be15f373e4d))
-
 # [1.30.0-develop.6](https://github.com/WatWowMap/ReactMap/compare/v1.30.0-develop.5...v1.30.0-develop.6) (2024-02-23)
 
 
