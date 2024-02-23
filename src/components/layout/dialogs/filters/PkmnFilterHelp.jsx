@@ -109,7 +109,7 @@ export function PkmnFilterHelp() {
   if (!perms.pokemon) return null
   return (
     <DialogWrapper dialog="pkmnFilterHelp" maxWidth="md">
-      <Header titles="Filter Help" action={handleClose} />
+      <Header titles={t('filter_help')} action={handleClose} />
       <DialogContent sx={{ p: 0, height: '100%', alignItems: 'center' }}>
         <Grid2
           container
