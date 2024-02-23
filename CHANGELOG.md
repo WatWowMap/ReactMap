@@ -1,3 +1,11 @@
+# [1.2.0-develop.12](https://github.com/ReuschelCGN/ReactMap/compare/v1.2.0-develop.11...v1.2.0-develop.12) (2024-02-23)
+
+
+### Bug Fixes
+
+* importing ([89b7fce](https://github.com/ReuschelCGN/ReactMap/commit/89b7fcebca0a58959ecc29418db4a75390072ffd))
+* less strict searching for `'` ([ca08a69](https://github.com/ReuschelCGN/ReactMap/commit/ca08a690fca54f90132b4688b5700532958b60f5))
+
 # [1.2.0-develop.11](https://github.com/ReuschelCGN/ReactMap/compare/v1.2.0-develop.10...v1.2.0-develop.11) (2024-02-23)
 
 
