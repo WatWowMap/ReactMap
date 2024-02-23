@@ -7,6 +7,7 @@ const RTree = require('rtree')
 
 const config = require('@rm/config')
 const { log, HELPERS } = require('@rm/logger')
+const { setCache, getCache } = require('./cache')
 
 /** @type {import("@rm/types").RMGeoJSON} */
 const DEFAULT_RETURN = { type: 'FeatureCollection', features: [] }
@@ -37,7 +38,31 @@ const manualGeojson = {
     }),
 }
 
-/** @param {string} location */
+/**
+ * @param {string} fileName
+ * @returns {import("@rm/types").RMGeoJSON}
+ */
+const loadFromFile = (fileName) => {
+  try {
+    if (fileName.startsWith('http')) {
+      return getCache(fileName, DEFAULT_RETURN)
+    }
+    if (fs.existsSync(resolve(__dirname, `../configs/${fileName}`))) {
+      return JSON.parse(
+        fs.readFileSync(resolve(__dirname, `../configs/${fileName}`), 'utf-8'),
+      )
+    }
+    return DEFAULT_RETURN
+  } catch (e) {
+    log.warn(HELPERS.areas, `Failed to load ${fileName} from file system`, e)
+    return DEFAULT_RETURN
+  }
+}
+
+/**
+ * @param {string} location
+ * @returns {Promise<import("@rm/types").RMGeoJSON>}
+ */
 const getGeojson = async (location) => {
   try {
     if (location.startsWith('http')) {
@@ -50,16 +75,10 @@ const getGeojson = async (location) => {
         },
       })
         .then((res) => res.json())
-        .then((res) => {
+        .then(async (res) => {
           if (res?.data) {
             log.info(HELPERS.areas, 'Caching', location, 'from Kōji')
-            fs.writeFileSync(
-              resolve(
-                __dirname,
-                `../configs/koji_backups/${location.replace(/\//g, '__')}.json`,
-              ),
-              JSON.stringify(res.data),
-            )
+            await setCache(location, res.data)
             return res.data
           }
           return DEFAULT_RETURN
@@ -70,44 +89,28 @@ const getGeojson = async (location) => {
             'Failed to fetch Kōji geojson, attempting to read from backup',
             err,
           )
-          if (
-            fs.existsSync(
-              resolve(
-                __dirname,
-                `../configs/koji_backups/${location.replace(/\//g, '__')}.json`,
-              ),
-            )
-          ) {
+          const cached = getCache(location)
+          if (cached) {
             log.info(HELPERS.areas, 'Reading from koji_backups for', location)
-            return JSON.parse(
-              fs.readFileSync(
-                resolve(
-                  __dirname,
-                  `../configs/koji_backups/${location.replace(
-                    /\//g,
-                    '__',
-                  )}.json`,
-                ),
-                'utf-8',
-              ),
-            )
+            return cached
           }
           log.warn(HELPERS.areas, 'No backup found for', location)
           return DEFAULT_RETURN
         })
     }
-    if (fs.existsSync(resolve(__dirname, `../configs/${location}`))) {
-      return JSON.parse(
-        fs.readFileSync(resolve(__dirname, `../configs/${location}`), 'utf-8'),
-      )
-    }
+    return loadFromFile(location)
   } catch (e) {
     log.warn(HELPERS.areas, 'Issue with getting the geojson', e)
   }
   return DEFAULT_RETURN
 }
 
-// Load each areas.json
+/**
+ * Load each areas.json
+ * @param {string} fileName
+ * @param {string} [domain]
+ * @returns {Promise<import("@rm/types").RMGeoJSON>}
+ */
 const loadScanPolygons = async (fileName, domain) => {
   try {
     const geojson = await getGeojson(fileName)
@@ -124,7 +127,9 @@ const loadScanPolygons = async (fileName, domain) => {
             key: f.properties.parent
               ? `${f.properties.parent}-${f.properties.name}`
               : f.properties.name,
-            center: center(f).geometry.coordinates.reverse(),
+            center: /** @type {[number,number]} */ (
+              center(f).geometry.coordinates.slice().reverse()
+            ),
           },
         })),
       ].sort((a, b) =>
@@ -133,12 +138,13 @@ const loadScanPolygons = async (fileName, domain) => {
           : 0,
       ),
     }
-  } catch {
+  } catch (e) {
     log.warn(
       HELPERS.areas,
       `Failed to load ${fileName} for ${
         domain || 'map'
       }. Using empty areas.json`,
+      e,
     )
     return DEFAULT_RETURN
   }
@@ -151,7 +157,7 @@ const loadScanPolygons = async (fileName, domain) => {
  */
 const loadAreas = (scanAreas) => {
   try {
-    /** @type {ReturnType<typeof loadAreas>} */
+    /** @type {import("@rm/types").RMGeoJSON} */
     const normalized = { type: 'FeatureCollection', features: [] }
     Object.values(scanAreas).forEach((area) => {
       if (area?.features.length) {
@@ -234,25 +240,11 @@ const parseAreas = (featureCollection) => {
   return { names, withoutParents, polygons }
 }
 
-// Check if an areas.json exists
-const getAreas = async () => {
-  const main = config.getSafe('map.general.geoJsonFileName')
-
-  /** @type {Record<string, import("@rm/types").RMGeoJSON>} */
-  const scanAreas = {
-    main: await loadScanPolygons(main),
-    ...Object.fromEntries(
-      await Promise.all(
-        config
-          .getSafe('multiDomains')
-          .map(async (d) => [
-            d.general?.geoJsonFileName ? d.domain.replaceAll('.', '_') : 'main',
-            await loadScanPolygons(d.general?.geoJsonFileName || main),
-          ]),
-      ),
-    ),
-  }
-
+/**
+ * @param {Record<string, import("@rm/types").RMGeoJSON>} scanAreas
+ * @returns
+ */
+const buildAreas = (scanAreas) => {
   const scanAreasMenu = Object.fromEntries(
     Object.entries(scanAreas).map(([domain, featureCollection]) => {
       const parents = {
@@ -335,4 +327,45 @@ const getAreas = async () => {
   }
 }
 
-module.exports = getAreas
+const loadLatestAreas = async () => {
+  const fileName = config.getSafe('map.general.geoJsonFileName')
+
+  /** @type {Record<string, import("@rm/types").RMGeoJSON>} */
+  const scanAreas = {
+    main: await loadScanPolygons(fileName),
+    ...Object.fromEntries(
+      await Promise.all(
+        config
+          .getSafe('multiDomains')
+          .map(async (d) => [
+            d.general?.geoJsonFileName ? d.domain.replaceAll('.', '_') : 'main',
+            await loadScanPolygons(d.general?.geoJsonFileName || fileName),
+          ]),
+      ),
+    ),
+  }
+  return buildAreas(scanAreas)
+}
+
+const loadCachedAreas = () => {
+  const fileName = config.getSafe('map.general.geoJsonFileName')
+
+  /** @type {Record<string, import("@rm/types").RMGeoJSON>} */
+  const scanAreas = {
+    main: loadFromFile(fileName),
+    ...Object.fromEntries(
+      config
+        .getSafe('multiDomains')
+        .map((d) => [
+          d.general?.geoJsonFileName ? d.domain.replaceAll('.', '_') : 'main',
+          loadFromFile(d.general?.geoJsonFileName || fileName),
+        ]),
+    ),
+  }
+  return buildAreas(scanAreas)
+}
+
+module.exports = {
+  loadLatestAreas,
+  loadCachedAreas,
+}

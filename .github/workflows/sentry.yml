@@ -1,0 +1,31 @@
+name: Sentry
+on:
+  release:
+    types: [created, published]
+
+jobs:
+  sentry:
+    name: Sentry
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        id: checkout-code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 2
+      - name: Setup Node.js environment
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          cache: 'yarn'
+
+      - name: Install Dependencies
+        run: yarn
+
+      - name: Sentry Build
+        run: yarn release
+        env:
+          SENTRY_AUTH_TOKEN: ${{secrets.SENTRY_AUTH_TOKEN}}
+          SENTRY_DSN: ${{secrets.SENTRY_DSN}}
+          SENTRY_ORG: ${{secrets.SENTRY_ORG}}
+          SENTRY_PROJECT: ${{secrets.SENTRY_PROJECT}}

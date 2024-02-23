@@ -27,11 +27,8 @@ export type RMGeoJSON = {
   features: RMFeature[]
 }
 
-import masterfile = require('packages/masterfile/lib/data/masterfile.json')
 import { Config } from './config'
 import { SliderProps } from '@mui/material'
-
-export type Masterfile = typeof masterfile
 
 export type Strategy = 'discord' | 'telegram' | 'local'
 
@@ -88,9 +85,7 @@ export interface UICONS {
     egg: UiconImage[]
   }
   reward: {
-    [
-      key: Masterfile['questRewardTypes'][keyof Masterfile['questRewardTypes']]
-    ]: UiconImage[]
+    [key: string]: UiconImage[]
   }
   spawnpoint: UiconImage[]
   team: UiconImage[]
@@ -127,4 +122,21 @@ export interface RMSliderProps {
   slide: RMSlider
   values: number[]
   handleChange: RMSliderHandleChange
+}
+
+export type ScanTypes = 'scanNext' | 'scanZone'
+
+export interface ScanOnDemandData {
+  typeName: ScanTypes
+  type: 'scan_next'
+  scanCoords?: [number, number][]
+  scanLocation?: [number, number]
+  scanSize?: number
+  cooldown?: number
+}
+
+export interface ScanOnDemandReq {
+  category: ScanTypes | 'getQueue'
+  method: HttpMethod
+  data?: ScanOnDemandData
 }

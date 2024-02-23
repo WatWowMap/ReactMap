@@ -30,8 +30,9 @@ import { create } from 'zustand'
  *      scanner: number,
  *    },
  *   },
+ *   menus: Record<string, any>
  *   filters: import('@rm/types').AllFilters,
- *   masterfile: import('@rm/types').Masterfile
+ *   masterfile: import('@rm/masterfile').Masterfile
  *   polling: Record<string, number>
  *   gymValidDataLimit: number
  *   settings: Record<string, any>
@@ -39,7 +40,6 @@ import { create } from 'zustand'
  *   clientError: string,
  *   timeOfDay: import('@rm/types').TimesOfDay,
  *   hideList: Set<string | number>,
- *   excludeList: string[],
  *   timerList: string[],
  *   tileStyle: 'light' | 'dark',
  *   reset: boolean,
@@ -97,7 +97,7 @@ export const useMemory = create((set) => ({
   },
   config: {},
   filters: {},
-  menus: undefined,
+  menus: {},
   menuFilters: {},
   userSettings: undefined,
   settings: undefined,
@@ -118,7 +118,6 @@ export const useMemory = create((set) => ({
     types: {},
   },
   hideList: new Set(),
-  excludeList: [],
   timerList: [],
   webhookAlert: {
     open: false,

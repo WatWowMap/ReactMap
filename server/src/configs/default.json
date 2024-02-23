@@ -44,13 +44,14 @@
       "gyms": true,
       "portals": true,
       "nests": true,
-      "pokemon": true
+      "pokemon": true,
+      "invasions": true
     },
     "queryUpdateHours": {
-      "pokemon": 0.25,
-      "quests": 0.5,
-      "raids": 0.2,
-      "nests": 1,
+      "pokemon": 0.17,
+      "quests": 0.25,
+      "raids": 0.05,
+      "nests": 0.5,
       "historicalRarity": 6
     },
     "queryOnSessionInit": {
@@ -98,6 +99,8 @@
     "portalUpdateLimit": 30,
     "weatherCellLimit": 3,
     "searchResultsLimit": 15,
+    "searchSoftKmLimit": 10,
+    "searchHardKmLimit": 100,
     "nestHemisphere": "north",
     "gymValidDataLimit": 30,
     "hideOldGyms": false,
@@ -231,8 +234,6 @@
       "forceTutorial": true,
       "enableTutorial": true,
       "enableUserProfile": true,
-      "enableQuestSetSelector": true,
-      "enableConfirmedInvasions": false,
       "noScanAreaOverlay": false,
       "scanAreaMenuHeight": 400,
       "permImageDir": "images/perms",
@@ -466,6 +467,7 @@
       "polygons": false,
       "pokemon": false,
       "allPokemon": true,
+      "onlyShowAvailable": true,
       "avgFilter": [
         0,
         100
@@ -594,19 +596,24 @@
   },
   "scanner": {
     "backendConfig": {
-      "platform": "rdm/mad",
+      "platform": "rdm/mad/dragonite/custom",
       "apiEndpoint": "http://ip:port/api/",
       "headers": [],
       "apiUsername": "username",
       "apiPassword": "password",
       "queueRefreshInterval": 5,
-      "sendDiscordMessage": true
+      "sendDiscordMessage": true,
+      "sendTelegramMessage": true
     },
     "scanNext": {
       "enabled": false,
       "trialPeriodEligible": false,
       "showScanCount": false,
       "showScanQueue": false,
+      "routes": true,
+      "showcases": true,
+      "pokemon": false,
+      "gmf": true,
       "scanNextInstance": "scanNext",
       "scanNextDevice": "Device01",
       "scanNextSleeptime": 5,
@@ -621,6 +628,10 @@
       "trialPeriodEligible": false,
       "showScanCount": false,
       "showScanQueue": false,
+      "routes": false,
+      "showcases": false,
+      "pokemon": true,
+      "gmf": false,
       "scanZoneMaxSize": 10,
       "userCooldownSeconds": 0,
       "advancedScanZoneOptions": false,
@@ -680,6 +691,10 @@
       {
         "name": "telegram",
         "type": "telegram",
+        "logGroupId": "",
+        "scanNextLogGroupId": "",
+        "scanZoneLogGroupId": "",
+        "eventLogGroupId": "",
         "enabled": false,
         "botToken": "",
         "groups": [],
@@ -877,7 +892,7 @@
   "navigation": [
     {
       "name": "Google Maps",
-      "url": "https://www.google.com/maps/place/{x},{y}"
+      "url": "https://maps.google.com/maps/place/{x},{y}"
     },
     {
       "name": "Apple Maps",

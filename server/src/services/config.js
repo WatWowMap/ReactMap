@@ -5,6 +5,7 @@ const config = require('@rm/config')
 
 const { log, HELPERS } = require('@rm/logger')
 const checkConfigJsons = require('./functions/checkConfigJsons')
+const { loadCachedAreas } = require('./areas')
 
 const allowedMenuItems = [
   'gyms',
@@ -330,5 +331,7 @@ if (
   )
   config.authentication.alwaysEnabledPerms = enabled
 }
+
+config.areas = loadCachedAreas()
 
 module.exports = config

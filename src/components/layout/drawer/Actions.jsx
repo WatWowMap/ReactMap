@@ -7,7 +7,7 @@ import { Link } from 'react-router-dom'
 import AccountBoxIcon from '@mui/icons-material/AccountBox'
 import ExitToAppIcon from '@mui/icons-material/ExitToApp'
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline'
-import RotateLeftIcon from '@mui/icons-material/RotateLeft'
+import ReplayIcon from '@mui/icons-material/Replay'
 import ImportExportIcon from '@mui/icons-material/ImportExport'
 import TrendingUpIcon from '@mui/icons-material/TrendingUp'
 import FeedbackIcon from '@mui/icons-material/Feedback'
@@ -84,14 +84,14 @@ export default function DrawerActions() {
         onClick={exportSettings}
         label="import"
       >
-        <ImportExportIcon color="primary" />
+        <ImportExportIcon color="error" />
       </BasicListButton>
 
       <BasicListButton
         onClick={() => useLayoutStore.setState({ resetFilters: true })}
         label="reset_filters"
       >
-        <RotateLeftIcon color="primary" />
+        <ReplayIcon color="error" />
       </BasicListButton>
 
       {!!methods.length && (
@@ -101,7 +101,7 @@ export default function DrawerActions() {
           href={loggedIn ? '/auth/logout' : undefined}
           label={loggedIn ? 'logout' : 'login'}
         >
-          <ExitToAppIcon color="primary" />
+          <ExitToAppIcon color="error" />
         </BasicListButton>
       )}
       <Divider />
@@ -113,7 +113,7 @@ export default function DrawerActions() {
           rel="noreferrer"
           label="contribute"
         >
-          <HeartIcon color="primary" />
+          <HeartIcon color="error" />
         </BasicListButton>
       )}
       {config.links.statsLink && (

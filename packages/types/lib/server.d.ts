@@ -106,6 +106,7 @@ export interface DbCheckClass {
   reactMapDb: null | number
   filterContext: {
     Route: { maxDistance: number; maxDuration: number }
+    Pokestop: { hasConfirmedInvasions: boolean }
   }
 }
 
@@ -138,7 +139,7 @@ export interface GqlContext {
   user: string
   transaction: Transaction
   operation: 'query' | 'mutation'
-  startTime: number
+  startTime?: number
 }
 
 export interface Permissions {

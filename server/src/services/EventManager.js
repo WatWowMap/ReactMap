@@ -3,30 +3,50 @@ const { promises: fs } = require('fs')
 const path = require('path')
 const Ohbem = require('ohbem')
 const { default: fetch } = require('node-fetch')
-const config = require('@rm/config')
 
+const config = require('@rm/config')
 const { log, HELPERS } = require('@rm/logger')
 const { generate, read } = require('@rm/masterfile')
 
 const PoracleAPI = require('./api/Poracle')
+const { getCache } = require('./cache')
 
 class EventManager {
   constructor() {
-    /** @type {import("@rm/types").Masterfile} */
+    /** @type {import("@rm/masterfile").Masterfile} */
     this.masterfile = read()
-    /** @type {import("@rm/types").Masterfile['invasions'] | {}} */
+    /** @type {import("@rm/masterfile").Masterfile['invasions'] | {}} */
     this.invasions =
       'invasions' in this.masterfile ? this.masterfile.invasions : {}
-    this.available = { gyms: [], pokestops: [], pokemon: [], nests: [] }
-    this.uicons = []
-    this.uaudio = []
+
+    /** @type {{[key in keyof import('@rm/types').Available]: string[] }} */
+    this.available = getCache('available.json', {
+      gyms: [],
+      pokestops: [],
+      pokemon: [],
+      nests: [],
+    })
+    this.uicons = getCache('uicons.json', [])
+    this.uaudio = getCache('uaudio.json', [])
     this.uiconsBackup = {}
     this.uaudioBackup = {}
     this.baseUrl =
       'https://raw.githubusercontent.com/WatWowMap/wwm-uicons-webp/main'
 
     /** @type {Record<string, InstanceType<typeof PoracleAPI>>} */
-    this.webhookObj = {}
+    this.webhookObj = Object.fromEntries(
+      config
+        .getSafe('webhooks')
+        .filter((x) => x.enabled)
+        .map((webhook) => {
+          const api = new PoracleAPI(webhook)
+          if (api.initFromCache()) {
+            return [api.name, api]
+          }
+          return [api.name, null]
+        })
+        .filter(([, api]) => api),
+    )
     /** @type {import('./Clients').ClientObject} */
     this.Clients = {}
   }
@@ -95,19 +115,23 @@ class EventManager {
 
   /**
    *
-   * @param {import('discord.js').APIEmbed} embed
+   * @param {import('discord.js').APIEmbed | string} embed
    * @param {string} [clientName]
    */
   async chatLog(embed, clientName) {
     if (clientName) {
       const client = this.Clients[clientName]
-      if ('sendMessage' in client) {
+      if ('discordEvents' in client && typeof embed === 'object') {
+        await client.sendMessage(embed, 'event')
+      } else if (typeof embed === 'string') {
         await client.sendMessage(embed, 'event')
       }
     } else {
       await Promise.allSettled(
         Object.values(this.Clients).map(async (client) => {
-          if ('sendMessage' in client) {
+          if ('discordEvents' in client && typeof embed === 'object') {
+            await client.sendMessage(embed, 'event')
+          } else if (typeof embed === 'string') {
             await client.sendMessage(embed, 'event')
           }
         }),
@@ -316,7 +340,7 @@ class EventManager {
   async getMasterfile(historical, dbRarity) {
     log.info(HELPERS.event, 'Fetching Latest Masterfile')
     try {
-      const newMf = await generate(false, historical, dbRarity)
+      const newMf = await generate(true, historical, dbRarity)
       this.masterfile = newMf ?? this.masterfile
       this.addAvailable()
     } catch (e) {
@@ -325,18 +349,23 @@ class EventManager {
   }
 
   addAvailable() {
-    Object.entries(this.available).forEach(([category, entries]) => {
+    Object.entries(this.available).forEach(([c, entries]) => {
+      const category = /** @type {keyof EventManager['available']} */ (c)
       entries.forEach((item) => {
         if (!Number.isNaN(parseInt(item.charAt(0)))) {
           const [id, form] = item.split('-')
           if (!this.masterfile.pokemon[id]) {
             this.masterfile.pokemon[id] = {
+              name: '',
               pokedexId: +id,
               types: [],
               quickMoves: [],
-              chargeMoves: [],
+              chargedMoves: [],
+              defaultFormId: +form,
+              forms: {},
+              genId: 0,
             }
-            log.info(HELPERS.event, `Added ${id} to Pokemon`)
+            log.warn(HELPERS.event, `Added ${id} to Pokemon, seems suspicious`)
           }
           if (!this.masterfile.pokemon[id].forms) {
             this.masterfile.pokemon[id].forms = {}
@@ -354,18 +383,22 @@ class EventManager {
   }
 
   async getWebhooks() {
-    await Promise.all(
+    const apis = await Promise.allSettled(
       config
         .getSafe('webhooks')
         .filter((x) => x.enabled)
         .map(async (webhook) => {
           const api = new PoracleAPI(webhook)
           await api.init()
-          Object.assign(this.webhookObj, {
-            [webhook.name]: api,
-          })
+          return api
         }),
     )
+    for (let i = 0; i < apis.length; i += 1) {
+      const item = apis[i]
+      if (item.status === 'fulfilled' && item.value) {
+        this.webhookObj[item.value.name] = item.value
+      }
+    }
   }
 }
 

@@ -8,7 +8,7 @@ import FilterMenu from './dialogs/filters/FilterMenu'
 import UserOptions from './dialogs/UserOptions'
 import Tutorial from './dialogs/tutorial/Tutorial'
 import UserProfile from './dialogs/profile'
-import Search from './dialogs/Search'
+import Search from './dialogs/search'
 import MessageOfTheDay from './dialogs/Motd'
 import DonorPage from './dialogs/DonorPage'
 import Feedback from './dialogs/Feedback'
@@ -22,33 +22,38 @@ import BadgeSelection from './dialogs/BadgeSelection'
 import WebhookAdvanced from './dialogs/webhooks/WebhookAdv'
 import SlotSelection from './dialogs/filters/SlotSelection'
 import { HelpDialog } from './dialogs/Help'
+import { PkmnFilterHelp } from './dialogs/filters/PkmnFilterHelp'
 
 export const Nav = React.memo(
   () => {
     const iconsIsReady = useMemory((s) => !!s.Icons)
-    if (!iconsIsReady) return null
     return (
       <>
-        <Sidebar />
-        <FloatingButtonsMemo />
-        <UserProfile />
-        <Tutorial />
-        <FilterMenu />
-        <UserOptions />
-        <Webhook />
-        <Search />
-        <MessageOfTheDay />
-        <DonorPage />
-        <Feedback />
-        <ResetFilters />
-        <ScanDialog />
-        <WebhookNotification />
         <ClientError />
-        <AdvancedFilter />
-        <BadgeSelection />
-        <WebhookAdvanced />
-        <SlotSelection />
-        <HelpDialog />
+        {iconsIsReady && (
+          <>
+            <Sidebar />
+            <FloatingButtonsMemo />
+            <UserProfile />
+            <Tutorial />
+            <FilterMenu />
+            <UserOptions />
+            <Webhook />
+            <Search />
+            <MessageOfTheDay />
+            <DonorPage />
+            <Feedback />
+            <ResetFilters />
+            <ScanDialog />
+            <WebhookNotification />
+            <AdvancedFilter />
+            <BadgeSelection />
+            <WebhookAdvanced />
+            <SlotSelection />
+            <HelpDialog />
+            <PkmnFilterHelp />
+          </>
+        )}
       </>
     )
   },

@@ -137,6 +137,10 @@
       "pokemon": {
         "__name": "API_SEARCHABLE_POKEMON",
         "__format": "boolean"
+      },
+      "invasions": {
+        "__name": "API_SEARCHABLE_INVASIONS",
+        "__format": "boolean"
       }
     },
     "queryUpdateHours": {
@@ -251,6 +255,14 @@
     },
     "searchResultsLimit": {
       "__name": "API_SEARCH_RESULTS_LIMIT",
+      "__format": "number"
+    },
+    "searchSoftKmLimit": {
+      "__name": "API_SEARCH_SOFT_KM_LIMIT",
+      "__format": "number"
+    },
+    "searchHardKmLimit": {
+      "__name": "API_SEARCH_HARD_KM_LIMIT",
       "__format": "number"
     },
     "nestHemisphere": "API_NEST_HEMISPHERE",
@@ -401,14 +413,6 @@
       },
       "enableUserProfile": {
         "__name": "MAP_MISC_ENABLE_USER_PROFILE",
-        "__format": "boolean"
-      },
-      "enableQuestSetSelector": {
-        "__name": "MAP_MISC_ENABLE_QUEST_SET_SELECTOR",
-        "__format": "boolean"
-      },
-      "enableConfirmedInvasions": {
-        "__name": "MAP_MISC_ENABLE_CONFIRMED_INVASIONS",
         "__format": "boolean"
       },
       "noScanAreaOverlay": {
@@ -946,6 +950,10 @@
         "__name": "DEFAULT_FILTERS_NESTS_ALL_POKEMON",
         "__format": "boolean"
       },
+      "onlyShowAvailable": {
+        "__name": "DEFAULT_FILTERS_NESTS_ONLY_SHOW_AVAILABLE",
+        "__format": "boolean"
+      },
       "avgFilter": {
         "__name": "DEFAULT_FILTERS_NESTS_AVG_FILTER",
         "__format": "json"
@@ -1238,6 +1246,10 @@
       "sendDiscordMessage": {
         "__name": "SCANNER_BACKEND_CONFIG_SEND_DISCORD_MESSAGE",
         "__format": "boolean"
+      },
+      "sendTelegramMessage": {
+        "__name": "SCANNER_BACKEND_CONFIG_SEND_TELEGRAM_MESSAGE",
+        "__format": "boolean"
       }
     },
     "scanNext": {
@@ -1255,6 +1267,22 @@
       },
       "showScanQueue": {
         "__name": "SCANNER_SCAN_NEXT_SHOW_SCAN_QUEUE",
+        "__format": "boolean"
+      },
+      "routes": {
+        "__name": "SCANNER_SCAN_NEXT_ROUTES",
+        "__format": "boolean"
+      },
+      "showcases": {
+        "__name": "SCANNER_SCAN_NEXT_SHOWCASES",
+        "__format": "boolean"
+      },
+      "pokemon": {
+        "__name": "SCANNER_SCAN_NEXT_POKEMON",
+        "__format": "boolean"
+      },
+      "gmf": {
+        "__name": "SCANNER_SCAN_NEXT_GMF",
         "__format": "boolean"
       },
       "scanNextInstance": "SCANNER_SCAN_NEXT_SCAN_NEXT_INSTANCE",
@@ -1299,6 +1327,22 @@
       },
       "showScanQueue": {
         "__name": "SCANNER_SCAN_ZONE_SHOW_SCAN_QUEUE",
+        "__format": "boolean"
+      },
+      "routes": {
+        "__name": "SCANNER_SCAN_ZONE_ROUTES",
+        "__format": "boolean"
+      },
+      "showcases": {
+        "__name": "SCANNER_SCAN_ZONE_SHOWCASES",
+        "__format": "boolean"
+      },
+      "pokemon": {
+        "__name": "SCANNER_SCAN_ZONE_POKEMON",
+        "__format": "boolean"
+      },
+      "gmf": {
+        "__name": "SCANNER_SCAN_ZONE_GMF",
         "__format": "boolean"
       },
       "scanZoneMaxSize": {

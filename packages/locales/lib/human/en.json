@@ -310,6 +310,7 @@
   "global_search_nests": "Enter Nest Pokémon Name...",
   "global_search_raids": "Enter Raid Boss Name...",
   "global_search_pokemon": "Enter Pokemon Name...",
+  "global_search_invasions": "Enter Grunt Type, Name, or Pokemon reward name...",
   "raid_level_badges": "Raid Level Badges",
   "options": "Options",
   "profile": "Profile",
@@ -562,6 +563,8 @@
   "session_expired_body": "Your session has expired",
   "old_client_title": "Outdated",
   "old_client_body": "A new version of this map is available",
+  "early_old_client_title": "Outdated",
+  "early_old_client_body": "An old version of this app might be cached in your browser, you will need to clear your cache before you can use this app.",
   "refresh": "Refresh",
   "points": "Points",
   "day": "Day",
@@ -722,5 +725,14 @@
   "extra": "Extra",
   "select": "Select",
   "searching": "searching...",
-  "no_options": "No Options..."
+  "no_options": "No Options...",
+  "and": "AND",
+  "or": "OR",
+  "only_global": "Only Global",
+  "global_caption": "Ignores All Other Filters",
+  "global_and_individual": "Global & Individual Filters",
+  "gender_filters_all": "Gender Applies to All",
+  "and_caption": "Linked Together",
+  "or_caption": "Filters Independently",
+  "filter_help": "Filter Help"
 }

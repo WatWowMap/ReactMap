@@ -1,5 +1,5 @@
 name: Docker
-on: [push]
+on: workflow_call
 
 env:
   REGISTRY: ghcr.io
@@ -10,7 +10,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-
       - name: Set .gitsha
         if: github.event_name == 'push'
         run: 'echo ${{github.sha}} > .gitsha'

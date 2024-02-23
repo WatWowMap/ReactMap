@@ -1,6 +1,7 @@
 // @ts-check
 const fs = require('fs')
 const { resolve } = require('path')
+const { default: fetch } = require('node-fetch')
 
 const config = require('@rm/config')
 const { log, HELPERS } = require('@rm/logger')
@@ -20,14 +21,9 @@ Object.entries(defaultRarity).forEach(([tier, pokemon]) => {
   }
 })
 
-/**
- *
- * @param {boolean} save
- * @param {import('@rm/types').Rarity} historicRarity
- * @param {import('@rm/types').Rarity} dbRarity
- * @returns
- */
+/** @type {import('.').generate} */
 const generate = async (save = false, historicRarity = {}, dbRarity = {}) => {
+  log.info(HELPERS.masterfile, 'generating masterfile')
   try {
     if (!endpoint) throw new Error('No masterfile endpoint')
 
@@ -68,7 +64,7 @@ const generate = async (save = false, historicRarity = {}, dbRarity = {}) => {
     }
 
     if (save) {
-      fs.writeFileSync(
+      await fs.promises.writeFile(
         resolve(`${__dirname}/data/masterfile.json`),
         JSON.stringify(newMf, null, 2),
         'utf8',
@@ -87,11 +83,10 @@ const generate = async (save = false, historicRarity = {}, dbRarity = {}) => {
 module.exports.generate = generate
 
 if (require.main === module) {
-  generate(true).then(() =>
-    log.info(HELPERS.masterfile, 'Masterfile generated'),
-  )
+  generate(true).then(() => log.info(HELPERS.masterfile, 'OK'))
 }
 
+/** @type {import('.').read} */
 const read = () => {
   try {
     return JSON.parse(
@@ -102,7 +97,7 @@ const read = () => {
       HELPERS.masterfile,
       'Unable to read masterfile, generating a new one for you now',
     )
-    return generate(true)
+    generate(true)
   }
 }
 

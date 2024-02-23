@@ -34,7 +34,9 @@ export interface Config<Client extends boolean = false>
     logLevel: LogLevelNames
     skipUpdateCheck?: boolean
   } & BaseConfig['devOptions']
-  areas: Awaited<ReturnType<typeof import('server/src/services/areas')>>
+  areas: Awaited<
+    ReturnType<typeof import('server/src/services/areas')['loadLatestAreas']>
+  >
   authentication: {
     areaRestrictions: { roles: string[]; areas: string[] }[]
     excludeFromTutorial: (keyof BaseConfig['authentication']['perms'])[]

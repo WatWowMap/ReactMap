@@ -1,16 +1,12 @@
 name: Locales
-on:
-  push:
-    branches:
-      - main
+on: workflow_call
 
-env:
-  REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository }}
+permissions: write-all
 
 jobs:
-  Sync:
-    name: Generate missing locales with chatgpt
+  locales:
+    if: ${{ github.ref_name == 'main' }}
+    name: Locales Sync
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -39,7 +35,12 @@ jobs:
           fi
       - name: Commit and push changes
         if: ${{ env.changes_exist == 'true' }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           git add --all
-          git commit --message "chore: sync locales"
+          git commit --message "chore: sync locales [skip ci]"
           git push
+          git checkout develop
+          git merge main
+          git push origin develop

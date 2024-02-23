@@ -1,29 +1,20 @@
 {
   "compilerOptions": {
     "target": "ESNext",
-    "module": "CommonJS",
+    "module": "ESNext",
+    "moduleResolution": "node",
     "resolveJsonModule": true,
     "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
     "baseUrl": ".",
-    "jsx": "react",
+    "lib": ["ESNext", "dom"],
+    "jsx": "react-jsx",
     "paths": {
-      "@assets/*": [
-        "./src/assets/*"
-      ],
-      "@components/*": [
-        "./src/components/*"
-      ],
-      "@services/*": [
-        "./src/services/*"
-      ],
-      "@hooks/*": [
-        "./src/hooks/*"
-      ],
+      "@assets/*": ["./src/assets/*"],
+      "@components/*": ["./src/components/*"],
+      "@services/*": ["./src/services/*"],
+      "@hooks/*": ["./src/hooks/*"]
     }
   },
-  "exclude": [
-    "node_modules",
-    "**/node_modules/*",
-    "dist"
-  ]
+  "exclude": ["node_modules", "**/node_modules/*", "dist"]
 }

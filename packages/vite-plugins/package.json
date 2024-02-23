@@ -1,0 +1,21 @@
+{
+  "name": "@rm/vite-plugins",
+  "version": "0.1.0",
+  "private": true,
+  "main": "./lib/index.js",
+  "scripts": {
+    "sort": "npx sort-package-json",
+    "depCheck": "npx depcheck",
+    "lint": "eslint \"**/*.{js,jsx}\"",
+    "lint:fix": "eslint \"**/*.{js,jsx}\" --fix",
+    "prettier": "prettier --check \"**/*.{css,html,js,jsx,yml}\"",
+    "prettier:fix": "prettier --write \"**/*.{css,html,js,jsx,yml}\""
+  },
+  "dependencies": {
+    "@rm/locales": "*",
+    "@rm/logger": "*"
+  },
+  "devDependencies": {
+    "vite": "5.0.12"
+  }
+}

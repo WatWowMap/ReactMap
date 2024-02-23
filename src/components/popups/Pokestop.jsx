@@ -20,10 +20,11 @@ import { useTranslation, Trans } from 'react-i18next'
 import ErrorBoundary from '@components/ErrorBoundary'
 import { Check, Help } from '@components/layout/general/Icons'
 import { useMemory } from '@hooks/useMemory'
-import { useStorage } from '@hooks/useStorage'
+import { setDeepStore, useStorage } from '@hooks/useStorage'
 import Utility from '@services/Utility'
 import { getBadge } from '@services/functions/getBadge'
 import getRewardInfo from '@services/functions/getRewardInfo'
+import { getGruntReward } from '@services/functions/getGruntReward'
 
 import Dropdown from './common/Dropdown'
 import TimeTile from './common/TimeTile'
@@ -328,24 +329,8 @@ const MenuActions = ({
     useMemory.setState((prev) => ({ hideList: new Set(prev.hideList).add(id) }))
   }
 
-  const setState = (key) => {
-    useStorage.setState((prev) => ({
-      filters: {
-        ...prev.filters,
-        pokestops: {
-          ...prev.filters.pokestops,
-          filter: {
-            ...prev.filters.pokestops.filter,
-            [key]: {
-              ...prev.filters.pokestops.filter[key],
-              enabled: false,
-            },
-          },
-        },
-      },
-    }))
-    useMemory.setState((prev) => ({ excludeList: [...prev.excludeList, key] }))
-  }
+  const setState = (key) =>
+    setDeepStore(`filters.pokestops.filter.${key}.enabled`, false)
 
   const excludeLure = () => {
     setAnchorEl(null)
@@ -724,27 +709,6 @@ const ExtraInfo = ({ last_modified_timestamp, updated, lat, lon }) => {
 }
 
 /**
- * @typedef {import('@rm/types').Masterfile['invasions']} Invasions
- * @param {Invasions[keyof Invasions]} grunt
- * @returns {{ first?: string, second?: string, third?: string }}
- */
-const getRewardPercent = (grunt) => {
-  if (grunt.type.startsWith('NPC')) {
-    return {}
-  }
-  if (grunt.secondReward) {
-    return { first: '85%', second: '15%' }
-  }
-  if (grunt.thirdReward) {
-    return { third: '100%' }
-  }
-  if (grunt.firstReward) {
-    return { first: '100%' }
-  }
-  return {}
-}
-
-/**
  *
  * @param {{ id: number, form: number, gender?: number, costumeId?: number, shiny?: boolean}} param0
  * @returns
@@ -804,6 +768,7 @@ const Invasion = ({ grunt_type, confirmed, ...invasion }) => {
               ([position, lineup], i) => {
                 const id = invasion[`slot_${i + 1}_pokemon_id`]
                 const form = invasion[`slot_${i + 1}_form`]
+                const reward = getGruntReward(info)[position]
                 return (
                   <tr key={position}>
                     <td>{ENCOUNTER_NUM[position]}</td>
@@ -820,7 +785,7 @@ const Invasion = ({ grunt_type, confirmed, ...invasion }) => {
                         ))
                       )}
                     </td>
-                    <td>{getRewardPercent(info)[position] || ''}</td>
+                    <td>{reward ? `${reward}%` : ''}</td>
                   </tr>
                 )
               },

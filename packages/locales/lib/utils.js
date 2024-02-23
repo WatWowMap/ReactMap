@@ -1,6 +1,7 @@
 // @ts-check
 const { promises: fs, readdirSync } = require('fs')
 const { resolve } = require('path')
+const { default: fetch } = require('node-fetch')
 
 const { log, HELPERS } = require('@rm/logger')
 

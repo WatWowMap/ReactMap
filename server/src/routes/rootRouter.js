@@ -11,6 +11,9 @@ const { version } = require('../../../package.json')
 const areaPerms = require('../services/functions/areaPerms')
 const getServerSettings = require('../services/functions/getServerSettings')
 
+const scanner = config.getSafe('scanner')
+const api = config.getSafe('api')
+
 const rootRouter = express.Router()
 
 rootRouter.use('/', clientRouter)
@@ -116,10 +119,7 @@ rootRouter.post('/api/error/client', async (req, res) => {
 rootRouter.get('/area/:area/:zoom?', (req, res) => {
   const { area, zoom } = req.params
   try {
-    const { scanAreas } = config.areas
-    const validScanAreas = scanAreas[req.headers.host.replaceAll('.', '_')]
-      ? scanAreas[req.headers.host.replaceAll('.', '_')]
-      : scanAreas.main
+    const validScanAreas = config.getAreas(req, 'scanAreas')
     if (validScanAreas.features.length) {
       const foundArea = validScanAreas.features.find(
         (a) => a.properties.name.toLowerCase() === area.toLowerCase(),
@@ -137,30 +137,32 @@ rootRouter.get('/area/:area/:zoom?', (req, res) => {
 })
 
 rootRouter.get('/api/settings', async (req, res, next) => {
+  const authentication = config.getSafe('authentication')
+  const mapConfig = config.getMapConfig(req)
   try {
     if (
-      config.authentication.alwaysEnabledPerms.length ||
-      !config.authentication.methods.length
+      authentication.alwaysEnabledPerms.length ||
+      !authentication.methods.length
     ) {
       if (req.session.tutorial === undefined) {
-        req.session.tutorial = !config.map.forceTutorial
+        req.session.tutorial = !mapConfig.forceTutorial
       }
       req.session.perms = {
         ...Object.fromEntries(
-          Object.keys(config.authentication.perms).map((p) => [p, false]),
+          Object.keys(authentication.perms).map((p) => [p, false]),
         ),
         areaRestrictions: areaPerms(['none']),
         webhooks: [],
-        scanner: Object.keys(config.scanner).filter(
+        scanner: Object.keys(scanner).filter(
           (key) =>
             key !== 'backendConfig' &&
-            config.scanner[key].enabled &&
-            !config.scanner[key].discordRoles.length &&
-            !config.scanner[key].telegramGroups.length,
+            scanner[key].enabled &&
+            !scanner[key].discordRoles.length &&
+            !scanner[key].telegramGroups.length,
         ),
       }
-      config.authentication.alwaysEnabledPerms.forEach((perm) => {
-        if (config.authentication.perms[perm]) {
+      authentication.alwaysEnabledPerms.forEach((perm) => {
+        if (authentication.perms[perm]) {
           req.session.perms[perm] = true
         } else {
           log.warn(
@@ -175,7 +177,7 @@ rootRouter.get('/api/settings', async (req, res, next) => {
     }
     req.session.save()
 
-    if (config.authentication.methods.length && req.user) {
+    if (authentication.methods.length && req.user) {
       try {
         const user = await Db.query('User', 'getOne', req.user.id)
         if (user) {
@@ -202,20 +204,17 @@ rootRouter.get('/api/settings', async (req, res, next) => {
     const settings = getServerSettings(req)
 
     if ('perms' in settings.user) {
-      if (
-        settings.user.perms.pokemon &&
-        config.api.queryOnSessionInit.pokemon
-      ) {
+      if (settings.user.perms.pokemon && api.queryOnSessionInit.pokemon) {
         Event.setAvailable('pokemon', 'Pokemon', Db, false)
       }
       if (
-        config.api.queryOnSessionInit.raids &&
+        api.queryOnSessionInit.raids &&
         (settings.user.perms.raids || settings.user.perms.gyms)
       ) {
         Event.setAvailable('gyms', 'Gym', Db, false)
       }
       if (
-        config.api.queryOnSessionInit.quests &&
+        api.queryOnSessionInit.quests &&
         (settings.user.perms.quests ||
           settings.user.perms.pokestops ||
           settings.user.perms.invasions ||
@@ -223,10 +222,10 @@ rootRouter.get('/api/settings', async (req, res, next) => {
       ) {
         Event.setAvailable('pokestops', 'Pokestop', Db, false)
       }
-      if (settings.user.perms.nests && config.api.queryOnSessionInit.nests) {
+      if (settings.user.perms.nests && api.queryOnSessionInit.nests) {
         Event.setAvailable('nests', 'Nest', Db, false)
       }
-      if (Object.values(config.api.queryOnSessionInit).some(Boolean)) {
+      if (Object.values(api.queryOnSessionInit).some(Boolean)) {
         Event.addAvailable()
       }
     }

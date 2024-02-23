@@ -1,13 +1,9 @@
 import { gql } from '@apollo/client'
 
-const getAvailable = gql`
-  query Available {
+export const getMapData = gql`
+  query MapData {
     available {
       masterfile
-      pokestops
-      gyms
-      pokemon
-      nests
       filters
       questConditions
       icons
@@ -16,4 +12,26 @@ const getAvailable = gql`
   }
 `
 
-export default getAvailable
+export const getAvailablePokemon = gql`
+  query AvailablePokemon {
+    availablePokemon
+  }
+`
+
+export const getAvailablePokestops = gql`
+  query AvailablePokestops {
+    availablePokestops
+  }
+`
+
+export const getAvailableGyms = gql`
+  query AvailableGyms {
+    availableGyms
+  }
+`
+
+export const getAvailableNests = gql`
+  query AvailableNests {
+    availableNests
+  }
+`

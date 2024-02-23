@@ -1,7 +1,6 @@
 // @ts-check
 import { t } from 'i18next'
 import { useWebhookStore } from '@components/layout/dialogs/webhooks/store'
-import { useMemory } from '@hooks/useMemory'
 
 export default class Poracle {
   static getMapCategory(poracleCategory) {
@@ -50,7 +49,6 @@ export default class Poracle {
 
   static getId(item) {
     if (!item) return ''
-    const { invasions } = useMemory.getState().masterfile
     const { category } = useWebhookStore.getState()
 
     switch (category) {
@@ -63,12 +61,7 @@ export default class Poracle {
           ? 'kecleon'
           : item.grunt_type === 'showcase'
           ? 'showcase'
-          : `i${Object.keys(invasions).find(
-              (x) =>
-                invasions[x].type?.toLowerCase() ===
-                  item.grunt_type.toLowerCase() &&
-                invasions[x].gender === (item.gender || 1),
-            )}`
+          : `i${item.real_grunt_id}`
       case 'lure':
         return `l${item.lure_id}`
       case 'gym':
@@ -317,7 +310,15 @@ export default class Poracle {
     switch (category) {
       case 'invasion': {
         let name = t(
-          item.real_grunt_id ? `grunt_${item.real_grunt_id}` : 'poke_global',
+          item.grunt_type === 'gold-stop'
+            ? 'gold_stop'
+            : item.grunt_type === 'kecleon'
+            ? 'poke_352'
+            : item.grunt_type === 'showcase'
+            ? 'showcase'
+            : item.real_grunt_id
+            ? `grunt_${item.real_grunt_id}`
+            : 'poke_global',
         )
         if (!item.gender) name = name.replace(/\(.+?\)/g, `(${t('all')})`)
         return `${name}${item.clean ? ` | ${t('clean')} ` : ''}${

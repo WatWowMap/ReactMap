@@ -155,6 +155,7 @@ export const quests = gql`
     $lon: Float!
     $locale: String!
     $onlyAreas: [String]
+    $questLayer: String
   ) {
     searchQuest(
       search: $search
@@ -163,6 +164,7 @@ export const quests = gql`
       lon: $lon
       locale: $locale
       onlyAreas: $onlyAreas
+      questLayer: $questLayer
     ) {
       id
       name
@@ -215,6 +217,41 @@ export const raids = gql`
       raid_pokemon_costume
       raid_pokemon_evolution
       raid_pokemon_alignment
+    }
+  }
+`
+
+export const invasions = gql`
+  query SearchInvasions(
+    $search: String!
+    $category: String!
+    $lat: Float!
+    $lon: Float!
+    $locale: String!
+    $onlyAreas: [String]
+  ) {
+    searchInvasion(
+      search: $search
+      category: $category
+      lat: $lat
+      lon: $lon
+      locale: $locale
+      onlyAreas: $onlyAreas
+    ) {
+      id
+      name
+      lat
+      lon
+      distance
+      grunt_type
+      incident_expire_timestamp
+      confirmed
+      slot_1_pokemon_id
+      slot_1_form
+      slot_2_pokemon_id
+      slot_2_form
+      slot_3_pokemon_id
+      slot_3_form
     }
   }
 `

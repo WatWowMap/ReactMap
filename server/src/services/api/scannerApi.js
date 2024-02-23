@@ -1,18 +1,48 @@
-/* eslint-disable no-nested-ternary */
+// @ts-check
 const { default: fetch } = require('node-fetch')
-const NodeCache = require('node-cache')
 
 const config = require('@rm/config')
 const { log, HELPERS } = require('@rm/logger')
+
+const { userCache } = require('../initialization')
 const Clients = require('../Clients')
+const TelegramClient = require('../TelegramClient')
+const DiscordClient = require('../DiscordClient')
 
 const scannerQueue = {
   scanNext: {},
   scanZone: {},
 }
 
-const userCache = new NodeCache({ stdTTL: 60 * 60 * 24 })
+const { backendConfig, ...scanModes } = config.getSafe('scanner')
 
+const scanNextOptions = {
+  routes: config.getSafe('scanner.scanNext.routes'),
+  showcases: config.getSafe('scanner.scanNext.showcases'),
+  pokemon: config.getSafe('scanner.scanNext.pokemon'),
+  gmf: config.getSafe('scanner.scanNext.gmf'),
+}
+
+const scanZoneOptions = {
+  routes: config.getSafe('scanner.scanZone.routes'),
+  showcases: config.getSafe('scanner.scanZone.showcases'),
+  pokemon: config.getSafe('scanner.scanZone.pokemon'),
+  gmf: config.getSafe('scanner.scanZone.gmf'),
+}
+
+const dateFormat = new Intl.DateTimeFormat(undefined, {
+  dateStyle: 'short',
+  timeStyle: 'medium',
+})
+
+/**
+ *
+ * @param {import('packages/types/lib').ScanOnDemandReq['category']} category
+ * @param {import('packages/types/lib').ScanOnDemandReq['method']} method
+ * @param {import('packages/types/lib').ScanOnDemandReq['data']} data
+ * @param {Partial<import('@rm/types').ExpressUser>} user
+ * @returns
+ */
 async function scannerApi(
   category,
   method,
@@ -23,15 +53,16 @@ async function scannerApi(
 
   const timeout = setTimeout(() => {
     controller.abort()
-  }, config.api.fetchTimeoutMs)
+  }, config.getSafe('api.fetchTimeoutMs'))
 
   const coords =
-    config.scanner.backendConfig.platform === 'mad'
+    backendConfig.platform === 'mad'
       ? [
           parseFloat(data.scanCoords[0][0].toFixed(5)),
           parseFloat(data.scanCoords[0][1].toFixed(5)),
         ]
-      : config.scanner.backendConfig.platform === 'custom'
+      : backendConfig.platform === 'dragonite' ||
+        backendConfig.platform === 'custom'
       ? data.scanCoords?.map((coord) => [
           parseFloat(coord[0].toFixed(5)),
           parseFloat(coord[1].toFixed(5)),
@@ -43,28 +74,26 @@ async function scannerApi(
 
   try {
     const headers = Object.fromEntries(
-      config.scanner.backendConfig.headers.map((header) => [
+      backendConfig.headers.map((header) => [
         typeof header === 'string' ? header : header.key || header.name,
         typeof header === 'string' ? header : header.value,
       ]),
     )
-    switch (config.scanner.backendConfig.platform) {
+    switch (backendConfig.platform) {
       case 'mad':
       case 'rdm':
         Object.assign(headers, {
           Authorization: `Basic ${Buffer.from(
-            `${config.scanner.backendConfig.apiUsername}:${config.scanner.backendConfig.apiPassword}`,
+            `${backendConfig.apiUsername}:${backendConfig.apiPassword}`,
           ).toString('base64')}`,
         })
         break
+      case 'dragonite':
       case 'custom':
-        if (
-          config.scanner.backendConfig.apiUsername ||
-          config.scanner.backendConfig.apiPassword
-        ) {
+        if (backendConfig.apiUsername || backendConfig.apiPassword) {
           Object.assign(headers, {
             Authorization: `Basic ${Buffer.from(
-              `${config.scanner.backendConfig.apiUsername}:${config.scanner.backendConfig.apiPassword}`,
+              `${backendConfig.apiUsername}:${backendConfig.apiPassword}`,
             ).toString('base64')}`,
           })
         }
@@ -72,10 +101,11 @@ async function scannerApi(
       default:
         break
     }
-    const payloadObj = /** @type {{ url: string, options: RequestInit }} */ ({
-      url: '',
-      options: {},
-    })
+    const payloadObj =
+      /** @type {{ url: string, options: import('node-fetch').RequestInit }} */ ({
+        url: '',
+        options: {},
+      })
     const cache = userCache.has(user.id)
       ? userCache.get(user.id)
       : { coordinates: 0, requests: 0 }
@@ -94,15 +124,15 @@ async function scannerApi(
             5,
           )},${data.scanLocation[1].toFixed(5)}`,
         )
-        switch (config.scanner.backendConfig.platform) {
+        switch (backendConfig.platform) {
           case 'mad':
             Object.assign(payloadObj, {
               url: `${
-                config.scanner.backendConfig.apiEndpoint
+                backendConfig.apiEndpoint
               }/send_gps?origin=${encodeURIComponent(
-                config.scanner.scanNext.scanNextDevice,
+                scanModes.scanNext.scanNextDevice,
               )}&coords=${JSON.stringify(coords)}&sleeptime=${
-                config.scanner.scanNext.scanNextSleeptime
+                scanModes.scanNext.scanNextSleeptime
               }`,
               options: { method, headers },
             })
@@ -110,16 +140,30 @@ async function scannerApi(
           case 'rdm':
             Object.assign(payloadObj, {
               url: `${
-                config.scanner.backendConfig.apiEndpoint
+                backendConfig.apiEndpoint
               }/set_data?scan_next=true&instance=${encodeURIComponent(
-                config.scanner.scanNext.scanNextInstance,
+                scanModes.scanNext.scanNextInstance,
               )}&coords=${JSON.stringify(coords)}`,
               options: { method, headers },
             })
             break
+          case 'dragonite':
+            Object.assign(payloadObj, {
+              url: `${backendConfig.apiEndpoint}/v2`,
+              options: {
+                method: 'POST',
+                headers,
+                body: JSON.stringify({
+                  username: user.username,
+                  locations: coords,
+                  options: scanNextOptions,
+                }),
+              },
+            })
+            break
           case 'custom':
             Object.assign(payloadObj, {
-              url: config.scanner.backendConfig.apiEndpoint,
+              url: backendConfig.apiEndpoint,
               options: {
                 method: 'POST',
                 headers,
@@ -144,10 +188,24 @@ async function scannerApi(
             5,
           )},${data.scanLocation[1].toFixed(5)}`,
         )
-        switch (config.scanner.backendConfig.platform) {
+        switch (backendConfig.platform) {
+          case 'dragonite':
+            Object.assign(payloadObj, {
+              url: `${backendConfig.apiEndpoint}/v2`,
+              options: {
+                method: 'POST',
+                headers,
+                body: JSON.stringify({
+                  username: user.username,
+                  locations: coords,
+                  options: scanZoneOptions,
+                }),
+              },
+            })
+            break
           case 'custom':
             Object.assign(payloadObj, {
-              url: config.scanner.backendConfig.apiEndpoint,
+              url: backendConfig.apiEndpoint,
               options: {
                 method: 'POST',
                 headers,
@@ -158,9 +216,9 @@ async function scannerApi(
           default:
             Object.assign(payloadObj, {
               url: `${
-                config.scanner.backendConfig.apiEndpoint
+                backendConfig.apiEndpoint
               }/set_data?scan_next=true&instance=${encodeURIComponent(
-                config.scanner.scanZone.scanZoneInstance,
+                scanModes.scanZone.scanZoneInstance,
               )}&coords=${JSON.stringify(coords)}`,
               options: { method, headers },
             })
@@ -170,7 +228,7 @@ async function scannerApi(
       case 'getQueue':
         if (
           scannerQueue[data.typeName].timestamp >
-          Date.now() - config.scanner.backendConfig.queueRefreshInterval * 1000
+          Date.now() - backendConfig.queueRefreshInterval * 1000
         ) {
           log.info(
             HELPERS.scanner,
@@ -181,19 +239,20 @@ async function scannerApi(
           return { status: 'ok', message: scannerQueue[data.typeName].queue }
         }
         log.info(HELPERS.scanner, `Getting queue for method ${data.typeName}`)
-        switch (config.scanner.backendConfig.platform) {
+        switch (backendConfig.platform) {
+          case 'dragonite':
           case 'custom':
             Object.assign(payloadObj, {
-              url: `${config.scanner.backendConfig.apiEndpoint}/queue`,
+              url: `${backendConfig.apiEndpoint}/queue`,
               options: { method, headers },
             })
             break
           default:
             Object.assign(payloadObj, {
-              url: `${config.scanner.backendConfig.apiEndpoint}/get_data?${
+              url: `${backendConfig.apiEndpoint}/get_data?${
                 data.type
               }=true&queue_size=true&instance=${encodeURIComponent(
-                config.scanner[data.typeName][`${data.typeName}Instance`],
+                scanModes[data.typeName][`${data.typeName}Instance`],
               )}`,
               options: { method, headers },
             })
@@ -216,7 +275,7 @@ async function scannerApi(
     }
     const scannerResponse = await fetch(
       `${payloadObj.url}${payloadObj.url.includes('?') ? '&' : '?'}username=${
-        user.username
+        user.username || user.id || 'a visitor'
       }`,
       {
         ...payloadObj.options,
@@ -232,7 +291,10 @@ async function scannerApi(
       (scannerResponse.status === 200 || scannerResponse.status === 201) &&
       category === 'getQueue'
     ) {
-      if (config.scanner.backendConfig.platform === 'custom') {
+      if (
+        backendConfig.platform === 'dragonite' ||
+        backendConfig.platform === 'custom'
+      ) {
         const { queue } = await scannerResponse.json()
         log.info(
           HELPERS.scanner,
@@ -256,70 +318,89 @@ async function scannerApi(
       return { status: 'ok', message: queueData.size }
     }
 
-    if (
-      Clients[user.rmStrategy]?.sendMessage &&
-      config.scanner.backendConfig.sendDiscordMessage
-    ) {
+    if (backendConfig.sendTelegramMessage || backendConfig.sendDiscordMessage) {
       const capitalized = category.replace('scan', 'Scan ')
       const updatedCache = userCache.get(user.id)
       const trimmed = coords
         .filter((_c, i) => i < 25)
         .map((c) =>
-          config.scanner.backendConfig.platform === 'custom'
+          backendConfig.platform === 'dragonite' ||
+          backendConfig.platform === 'custom'
             ? `${c[0]}, ${c[1]}`
-            : `${c.lat}, ${c.lon}`,
+            : typeof c === 'object'
+            ? `${'lat' in c && c.lat}, ${'lon' in c && c.lon}`
+            : c,
         )
         .join('\n')
-      switch (user.strategy) {
-        case 'discord':
-          Clients[user.rmStrategy].sendMessage(
-            {
-              title: `${capitalized} Request`,
-              author: {
-                name: user.username,
-                icon_url: `https://cdn.discordapp.com/avatars/${user.discordId}/${user.avatar}.png`,
-              },
-              thumbnail: {
-                url:
-                  config.authentication.strategies.find(
-                    (strategy) => strategy.name === user.rmStrategy,
-                  )?.thumbnailUrl ??
-                  `https://user-images.githubusercontent.com/58572875/167069223-745a139d-f485-45e3-a25c-93ec4d09779c.png`,
-              },
-              timestamp: new Date(),
-              description: `<@${user.discordId}>\n${capitalized} Size: ${data.scanSize}\nCoordinates: ${coords.length}\n`,
-              fields: [
-                {
-                  name: `User History`,
-                  value: `Total Requests: ${
-                    updatedCache?.requests || 0
-                  }\nTotal Coordinates: ${updatedCache?.coordinates || 0}`,
-                  inline: true,
-                },
-                {
-                  name: 'Instance',
-                  value: `${
-                    config.scanner.backendConfig.platform === 'mad'
-                      ? `Device: ${config.scanner.scanNext.scanNextDevice}`
-                      : ''
-                  }\nName: ${
-                    config.scanner[category]?.[`${category}Instance`] || '-'
-                  }\nQueue: ${scannerQueue[category]?.queue || 0}`,
-                  inline: true,
-                },
-                {
-                  name: `Coordinates (${coords.length})`,
-                  value:
-                    coords.length > 25
-                      ? `${trimmed}\n...${coords.length - 25} more`
-                      : trimmed,
-                },
-              ],
+      const client = Clients[user.rmStrategy]
+      if (
+        client instanceof TelegramClient &&
+        backendConfig.sendTelegramMessage
+      ) {
+        client.sendMessage(
+          `<b>${capitalized} Request</b>\nSize: ${
+            data.scanSize
+          }\nCoordinates: ${coords.length}\nCenter: ${data.scanLocation
+            ?.map((c) => c.toFixed(5))
+            .join(', ')}\n\n<b>User History</b>\nUsername: ${
+            user.username || user.telegramId
+          }\nTotal Requests: ${
+            updatedCache?.requests || 0
+          }\nTotal Coordinates: ${
+            updatedCache?.coordinates || 0
+          }\n\n${dateFormat.format(Date.now())}`,
+          category === 'getQueue' ? 'main' : category,
+        )
+      } else if (
+        client instanceof DiscordClient &&
+        backendConfig.sendDiscordMessage
+      ) {
+        client.sendMessage(
+          {
+            title: `${capitalized} Request`,
+            author: {
+              name: user.username,
+              icon_url: `https://cdn.discordapp.com/avatars/${user.discordId}/${user.avatar}.png`,
             },
-            category,
-          )
-          break
-        default:
+            thumbnail: {
+              url:
+                config
+                  .getSafe('authentication.strategies')
+                  .find((strategy) => strategy.name === user.rmStrategy)
+                  ?.thumbnailUrl ??
+                `https://user-images.githubusercontent.com/58572875/167069223-745a139d-f485-45e3-a25c-93ec4d09779c.png`,
+            },
+            description: `<@${user.discordId}>\n${capitalized} Size: ${data.scanSize}\nCoordinates: ${coords.length}\n`,
+            fields: [
+              {
+                name: `User History`,
+                value: `Total Requests: ${
+                  updatedCache?.requests || 0
+                }\nTotal Coordinates: ${updatedCache?.coordinates || 0}`,
+                inline: true,
+              },
+              {
+                name: 'Instance',
+                value: `${
+                  backendConfig.platform === 'mad'
+                    ? `Device: ${scanModes.scanNext.scanNextDevice}`
+                    : ''
+                }\nName: ${
+                  scanModes[category]?.[`${category}Instance`] || '-'
+                }\nQueue: ${scannerQueue[category]?.queue || 0}`,
+                inline: true,
+              },
+              {
+                name: `Coordinates (${coords.length})`,
+                value:
+                  coords.length > 25
+                    ? `${trimmed}\n...${coords.length - 25} more`
+                    : trimmed,
+              },
+            ],
+          },
+          category === 'getQueue' ? 'main' : category,
+        )
       }
     }
 
@@ -343,7 +424,7 @@ async function scannerApi(
         log.info(
           HELPERS.scanner,
           `Error: instance ${
-            config.scanner[category]?.[`${category}Instance`]
+            scanModes[category]?.[`${category}Instance`]
           } does not exist`,
         )
         return { status: 'error', message: 'scanner_no_instance' }
@@ -351,7 +432,7 @@ async function scannerApi(
         log.info(
           HELPERS.scanner,
           `Error: instance ${
-            config.scanner[category]?.[`${category}Instance`]
+            scanModes[category]?.[`${category}Instance`]
           } has no device assigned`,
         )
         return { status: 'error', message: 'scanner_no_device_assigned' }
@@ -359,7 +440,7 @@ async function scannerApi(
         log.info(
           HELPERS.scanner,
           `Error: device ${
-            config.scanner[category]?.[`${category}Device`]
+            scanModes[category]?.[`${category}Device`]
           } does not exist`,
         )
         return { status: 'error', message: 'scanner_no_device' }

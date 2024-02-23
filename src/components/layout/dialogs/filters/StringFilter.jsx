@@ -27,28 +27,42 @@ export function StringFilter({ field, ...props }) {
     /** @type {import('@mui/material').TextFieldProps['onChange']} */ (
       React.useCallback(
         (event) => {
-          const newValue = event.target.value
-          Utility.analytics('Filtering', newValue, 'Legacy')
-          if (Utility.checkAdvFilter(newValue)) {
-            setValidation({
-              label: t('valid'),
-              status: false,
-              message: t('valid_filter'),
-            })
-          } else if (newValue === '') {
-            setValidation({
-              label: t('iv_or_filter'),
-              status: false,
-              message: t('overwrites'),
-            })
-          } else {
-            setValidation({
-              label: t('invalid'),
-              status: true,
-              message: t('invalid_filter'),
-            })
+          try {
+            const newValue = event.target.value
+            Utility.analytics('Filtering', newValue, 'Legacy')
+            if (Utility.checkAdvFilter(newValue)) {
+              setValidation({
+                label: t('valid'),
+                status: false,
+                message: t('valid_filter'),
+              })
+            } else if (newValue === '') {
+              setValidation({
+                label: t('iv_or_filter'),
+                status: false,
+                message: t('overwrites'),
+              })
+            } else {
+              setValidation({
+                label: t('invalid'),
+                status: true,
+                message: t('invalid_filter'),
+              })
+            }
+            useStorage.setState((prev) =>
+              setDeep(prev, `${field}.adv`, newValue),
+            )
+          } catch (err) {
+            // eslint-disable-next-line no-console
+            console.error(err)
+            if (err instanceof Error) {
+              setValidation({
+                label: t('invalid'),
+                status: true,
+                message: err.message,
+              })
+            }
           }
-          useStorage.setState((prev) => setDeep(prev, `${field}.adv`, newValue))
         },
         [field],
       )

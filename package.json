@@ -1,6 +1,6 @@
 {
   "name": "reactmap",
-  "version": "1.29.0-develop.5",
+  "version": "1.30.0-develop.5",
   "private": true,
   "description": "React based frontend map.",
   "license": "MIT",
@@ -10,6 +10,7 @@
     "packages/*"
   ],
   "scripts": {
+    "postinstall": "yarn masterfile",
     "build": "vite build",
     "config:check": "yarn workspace @rm/config run check",
     "config:env": "yarn workspace @rm/config run generate",
@@ -45,7 +46,7 @@
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx}": [
-      "eslint --fix"
+      "eslint \"**/*.{js,jsx}\" --fix"
     ],
     "**/*": [
       "prettier --write --ignore-unknown"
@@ -149,13 +150,13 @@
     "i18next-http-backend": "^1.4.0",
     "knex": "^2.4.2",
     "leaflet": "1.9.4",
-    "leaflet.locatecontrol": "^0.79.0",
-    "lodash.debounce": "^4.0.8",
+    "leaflet.locatecontrol": "0.73.0",
+    "lodash": "^4.17.21",
     "moment-timezone": "^0.5.43",
     "morgan": "^1.10.0",
     "mysql2": "^3.4.0",
     "node-cache": "^5.1.2",
-    "node-fetch": "2",
+    "node-fetch": "2.6.7",
     "node-geocoder": "^4.2.0",
     "nodes2ts": "^2.0.0",
     "objection": "^3.0.1",
@@ -180,14 +181,16 @@
     "@commitlint/cli": "^17.2.0",
     "@commitlint/config-conventional": "^17.2.0",
     "@rm/types": "*",
+    "@rm/vite-plugins": "*",
     "@semantic-release/changelog": "^6.0.1",
     "@semantic-release/git": "^10.0.1",
-    "@sentry/vite-plugin": "2.2.1",
+    "@sentry/vite-plugin": "2.10.3",
     "@types/dlv": "^1.1.2",
     "@types/node": "^18",
+    "@types/node-fetch": "2.6.1",
     "@types/react": "^18.2.20",
     "@types/react-dom": "^18.0.9",
-    "@vitejs/plugin-react": "4.0.0",
+    "@vitejs/plugin-react": "4.2.1",
     "commitizen": "^4.2.5",
     "cz-conventional-commit": "^1.0.6",
     "eslint": "^8.44.0",
@@ -205,9 +208,9 @@
     "prettier": "^2.8.8",
     "rollup-plugin-delete": "^2.0.0",
     "semantic-release": "^19.0.5",
-    "vite": "4.3.9",
-    "vite-plugin-checker": "0.6.0",
-    "vite-plugin-static-copy": "0.16.0"
+    "typescript": "^5.3.3",
+    "vite": "5.0.12",
+    "vite-plugin-checker": "0.6.4"
   },
   "engines": {
     "node": ">=18",

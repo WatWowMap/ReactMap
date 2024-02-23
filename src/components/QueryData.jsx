@@ -141,9 +141,6 @@ function QueryData({ category, timeout }) {
     if (active) {
       timeout.current.setupTimeout(refetch)
       return () => {
-        useMemory.setState((prev) => ({
-          excludeList: prev.excludeList.length ? [] : prev.excludeList,
-        }))
         timeout.current.off()
       }
     }
@@ -165,13 +162,11 @@ function QueryData({ category, timeout }) {
     }
   }, [filters, userSettings, onlyAreas, timeout.current.refetch])
 
-  if (error) {
-    // @ts-ignore
+  if (error && 'statusCode' in error.networkError) {
     if (error.networkError?.statusCode === 464) {
       useMemory.setState({ clientError: 'old_client' })
       return null
     }
-    // @ts-ignore
     if (error.networkError?.statusCode === 511) {
       useMemory.setState({ clientError: 'session_expired' })
       return null

@@ -17,7 +17,7 @@ import { useTranslation } from 'react-i18next'
 import { useSyncData } from '@components/layout/dialogs/webhooks/hooks'
 import { useMemory } from '@hooks/useMemory'
 import { useLayoutStore } from '@hooks/useLayoutStore'
-import { useStorage } from '@hooks/useStorage'
+import { setDeepStore, useStorage } from '@hooks/useStorage'
 import useWebhook from '@hooks/useWebhook'
 import Utility from '@services/Utility'
 import ErrorBoundary from '@components/ErrorBoundary'
@@ -193,22 +193,7 @@ const DropdownOptions = ({
 
   const handleExclude = (key) => {
     handleClose()
-    useStorage.setState((prev) => ({
-      filters: {
-        ...prev.filters,
-        gyms: {
-          ...prev.filters.gyms,
-          filter: {
-            ...prev.filters.gyms.filter,
-            [key]: {
-              ...prev.filters.gyms.filter[key],
-              enabled: false,
-            },
-          },
-        },
-      },
-    }))
-    useMemory.setState((prev) => ({ excludeList: [...prev.excludeList, key] }))
+    setDeepStore(`filters.gyms.filter.${key}.enabled`, false)
   }
 
   const excludeTeam = () => handleExclude(`t${team_id}-0`)
@@ -239,10 +224,12 @@ const DropdownOptions = ({
     if (gymBadges) {
       options.push({
         name: 'gym_badge_menu',
-        action: () =>
-          useLayoutStore.setState({
+        action: () => {
+          handleClose()
+          return useLayoutStore.setState({
             gymBadge: { badge, gymId: id, open: true },
-          }),
+          })
+        },
       })
     }
   }

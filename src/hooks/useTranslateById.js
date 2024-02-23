@@ -14,10 +14,10 @@ import { useTranslation } from 'react-i18next'
  */
 export function useTranslateById(options = {}) {
   const i18n = useTranslation()
-  const formsToIgnore = useRef(new Set([i18n.t('form_0'), i18n.t('form_29')]))
+  const formsToIgnore = useRef(new Set([i18n.t('form_0'), i18n.t('form_45')]))
 
   useEffect(() => {
-    formsToIgnore.current = new Set([i18n.t('form_0'), i18n.t('form_29')])
+    formsToIgnore.current = new Set([i18n.t('form_0'), i18n.t('form_45')])
   }, [i18n.i18n.language])
 
   return useMemo(
@@ -37,6 +37,14 @@ export function useTranslateById(options = {}) {
         if (id === 'global' || id === 'all') {
           return i18n.t(id)
         }
+        if (
+          id === '0-0' ||
+          id === 'e90' ||
+          id === 'r90' ||
+          id === 't4' ||
+          id === 'i0'
+        )
+          return i18n.t('poke_global')
         switch (id.charAt(0)) {
           case 'b':
             // event stops
