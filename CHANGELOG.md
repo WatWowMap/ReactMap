@@ -1,3 +1,10 @@
+# [1.30.0-develop.6](https://github.com/WatWowMap/ReactMap/compare/v1.30.0-develop.5...v1.30.0-develop.6) (2024-02-23)
+
+
+### Bug Fixes
+
+* refine ci ([515de64](https://github.com/WatWowMap/ReactMap/commit/515de64e6a7275b6b7afbdb287e18be15f373e4d))
+
 # [1.30.0-develop.5](https://github.com/WatWowMap/ReactMap/compare/v1.30.0-develop.4...v1.30.0-develop.5) (2024-02-23)
 
 
