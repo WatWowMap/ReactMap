@@ -4,24 +4,23 @@ on: workflow_call
 permissions: write-all
 
 jobs:
-  locales:
+  sync:
     if: ${{ github.ref_name == 'main' }}
-    name: Locales Sync
     runs-on: ubuntu-latest
+    env:
+      changes_exist: 'false'
     steps:
       - name: Checkout code
         id: checkout-code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4.1.1
         with:
           fetch-depth: 2
       - name: Install dependencies
-        run: |
-          yarn
+        run: yarn
       - name: Run generating script
-        run: |
-          yarn locales:generate
+        run: yarn locales:generate
         env:
-          OPENAI_API_KEY: ${{secrets.OPENAI_API_KEY}}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
       - name: Configure git
         run: |
           git config --global user.name "turtlesocks-bot"
@@ -39,7 +38,7 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           git add --all
-          git commit --message "chore: sync locales [skip ci]"
+          git commit --message "chore: sync locales"
           git push
           git checkout develop
           git merge main
