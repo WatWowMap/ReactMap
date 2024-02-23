@@ -1,10 +1,3 @@
-# [1.2.0-develop.10](https://github.com/ReuschelCGN/ReactMap/compare/v1.2.0-develop.9...v1.2.0-develop.10) (2024-02-23)
-
-
-### Features
-
-* pkmn filter diagram ([a40b201](https://github.com/ReuschelCGN/ReactMap/commit/a40b20123a78f3d565a47ed9266c16da3b979bdb))
-
 # [1.30.0-develop.5](https://github.com/WatWowMap/ReactMap/compare/v1.30.0-develop.4...v1.30.0-develop.5) (2024-02-23)
 
 
