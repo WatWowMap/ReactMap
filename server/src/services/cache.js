@@ -4,7 +4,9 @@ const path = require('path')
 
 const { log, HELPERS } = require('@rm/logger')
 
-const CACHE_DIR = path.join(__dirname, '../../.cache')
+const CACHE_DIR = process.env.NODE_CONFIG_ENV
+  ? path.join(__dirname, '../../.cache', process.env.NODE_CONFIG_ENV)
+  : path.join(__dirname, '../../.cache')
 
 /** @param {string} str */
 const fsFriendlyName = (str) =>
@@ -42,7 +44,9 @@ const getCache = (unsafeName, fallback = null) => {
 const setCache = async (unsafeName, data) => {
   const fileName = fsFriendlyName(unsafeName)
   try {
-    if (!fs.existsSync(CACHE_DIR)) await fs.promises.mkdir(CACHE_DIR)
+    if (!fs.existsSync(CACHE_DIR)) {
+      await fs.promises.mkdir(CACHE_DIR, { recursive: true })
+    }
     await fs.promises.writeFile(
       path.resolve(CACHE_DIR, fileName),
       typeof data === 'string' ? data : JSON.stringify(data),
