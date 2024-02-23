@@ -71,3 +71,4 @@ pm2 start ecosystem.config.js
 - The domains do not have to be subdomains of each other, they can be whatever you want, they are just used to differentitate the different configs
 - The `NODE_CONFIG_ENV` var names should not contain `/` or `.`
 - The `NODE_CONFIG_ENV` value does not have to be related to the domain its representing. The URL for the map could be `https://www.my-super-map.com` and the `NODE_CONFIG_ENV` could be `applemap` or `orangemap` or `bananamap` or whatever you want, as long as you point the nginx reverse proxy to the correct instance of the app
+- Custom favicons can be set by putting the respective `{NODE_CONFIG_ENV}.ico` in the `public/favicon` folder
