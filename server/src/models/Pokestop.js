@@ -1612,7 +1612,7 @@ class Pokestop extends Model {
   }
 
   static async search(perms, args, { isMad }, distance, bbox) {
-    const { onlyAreas = [], search } = args
+    const { onlyAreas = [], search = '' } = args
     const query = this.query()
       .select([
         'name',
@@ -1624,7 +1624,7 @@ class Pokestop extends Model {
       ])
       .whereBetween(isMad ? 'latitude' : 'lat', [bbox.minLat, bbox.maxLat])
       .andWhereBetween(isMad ? 'longitude' : 'lon', [bbox.minLon, bbox.maxLon])
-      .whereRaw(`LOWER(name) LIKE '%${search}%'`)
+      .whereILike('name', `%${search}%`)
       .limit(searchResultsLimit)
       .orderBy('distance')
     if (!getAreaSql(query, perms.areaRestrictions, onlyAreas, isMad)) {
