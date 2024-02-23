@@ -22,6 +22,7 @@ import BadgeSelection from './dialogs/BadgeSelection'
 import WebhookAdvanced from './dialogs/webhooks/WebhookAdv'
 import SlotSelection from './dialogs/filters/SlotSelection'
 import { HelpDialog } from './dialogs/Help'
+import { PkmnFilterHelp } from './dialogs/filters/PkmnFilterHelp'
 
 export const Nav = React.memo(
   () => {
@@ -50,6 +51,7 @@ export const Nav = React.memo(
             <WebhookAdvanced />
             <SlotSelection />
             <HelpDialog />
+            <PkmnFilterHelp />
           </>
         )}
       </>

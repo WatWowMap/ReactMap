@@ -725,5 +725,14 @@
   "extra": "Extra",
   "select": "Select",
   "searching": "searching...",
-  "no_options": "No Options..."
+  "no_options": "No Options...",
+  "and": "AND",
+  "or": "OR",
+  "only_global": "Only Global",
+  "global_caption": "Ignores All Other Filters",
+  "global_and_individual": "Global & Individual Filters",
+  "gender_filters_all": "Gender Applies to All",
+  "and_caption": "Linked Together",
+  "or_caption": "Filters Independently",
+  "filter_help": "Filter Help"
 }
