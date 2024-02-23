@@ -9,7 +9,8 @@ export function formatDistance(
   unit = useStorage.getState().settings.distanceUnit,
   locale = localStorage.getItem('i18nextLng') || 'en',
 ) {
-  const distance = unit === 'miles' ? meters / METERS_PER_MILE : meters / 1000
+  const safe = meters || 0
+  const distance = unit === 'miles' ? safe / METERS_PER_MILE : safe / 1000
 
   const numFormatter = new Intl.NumberFormat(locale, {
     unitDisplay: 'short',
