@@ -155,6 +155,7 @@ export const quests = gql`
     $lon: Float!
     $locale: String!
     $onlyAreas: [String]
+    $questLayer: String
   ) {
     searchQuest(
       search: $search
@@ -163,6 +164,7 @@ export const quests = gql`
       lon: $lon
       locale: $locale
       onlyAreas: $onlyAreas
+      questLayer: $questLayer
     ) {
       id
       name

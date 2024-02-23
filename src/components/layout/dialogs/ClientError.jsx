@@ -16,7 +16,7 @@ export default function ClientError() {
   const error = useMemory((s) => s.clientError)
 
   return (
-    <Dialog open={Boolean(error)}>
+    <Dialog open={!!error}>
       <Header titles={`${error}_title`} action={null} />
       <DialogContent style={{ textAlign: 'center', whiteSpace: 'pre-line' }}>
         <br />

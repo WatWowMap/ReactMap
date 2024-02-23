@@ -64,7 +64,7 @@ const NestTile = (nest) => {
  * }} props
  * @returns
  */
-const NestMarker = ({ children, icon, id, lat, lon }) => {
+const NestMarker = ({ children, icon, id, lat, lon, ...props }) => {
   const showPokemon = useStorage((s) => s.filters.nests.pokemon)
   const [markerRef, setMarkerRef] = React.useState(null)
 
@@ -74,7 +74,7 @@ const NestMarker = ({ children, icon, id, lat, lon }) => {
     return null
   }
   return (
-    <Marker ref={setMarkerRef} position={[lat, lon]} icon={icon}>
+    <Marker ref={setMarkerRef} position={[lat, lon]} icon={icon} {...props}>
       {children}
     </Marker>
   )
@@ -106,7 +106,7 @@ const NestGeoJSON = ({ polygon_path }) => {
 
 const MemoNestTile = React.memo(
   NestTile,
-  (prev, next) => prev.updated === next.updated,
+  (prev, next) => prev.updated === next.updated && prev.name === next.name,
 )
 
 export default MemoNestTile

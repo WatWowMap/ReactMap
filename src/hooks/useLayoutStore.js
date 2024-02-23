@@ -1,3 +1,4 @@
+// @ts-check
 import { create } from 'zustand'
 
 import Utility from '@services/Utility'
@@ -13,6 +14,7 @@ import { useStorage } from './useStorage'
  *  motd: boolean,
  *  donorPage: boolean,
  *  search: boolean,
+ *  pkmnFilterHelp: boolean,
  *  userProfile: boolean,
  *  resetFilters: boolean,
  *  feedback: boolean,
@@ -42,6 +44,7 @@ export const useLayoutStore = create(() => ({
   nestSubmissions: '0',
   help: { open: false, category: '' },
   motd: false,
+  pkmnFilterHelp: false,
   donorPage: false,
   search: false,
   userProfile: false,

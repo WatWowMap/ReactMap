@@ -465,6 +465,7 @@
       "polygons": false,
       "pokemon": false,
       "allPokemon": true,
+      "onlyShowAvailable": true,
       "avgFilter": [
         0,
         100

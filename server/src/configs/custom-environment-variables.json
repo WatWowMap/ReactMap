@@ -950,6 +950,10 @@
         "__name": "DEFAULT_FILTERS_NESTS_ALL_POKEMON",
         "__format": "boolean"
       },
+      "onlyShowAvailable": {
+        "__name": "DEFAULT_FILTERS_NESTS_ONLY_SHOW_AVAILABLE",
+        "__format": "boolean"
+      },
       "avgFilter": {
         "__name": "DEFAULT_FILTERS_NESTS_AVG_FILTER",
         "__format": "json"

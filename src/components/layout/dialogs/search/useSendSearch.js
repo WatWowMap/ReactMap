@@ -33,9 +33,7 @@ export function useSendSearch(search, open) {
   const sendToServer = useCallback(
     (/** @type {string} */ newSearch) => {
       const { lat, lng } = map.getCenter()
-      const { areas } = useStorage.getState().filters.scanAreas?.filter || {
-        areas: [],
-      }
+      const { filters } = useStorage.getState()
       callSearch({
         variables: {
           search: newSearch,
@@ -43,7 +41,11 @@ export function useSendSearch(search, open) {
           lat,
           lon: lng,
           locale: i18n.language,
-          onlyAreas: areas || [],
+          onlyAreas: filters?.scanAreas?.filter?.areas || [],
+          questLayer:
+            searchTab === 'quests'
+              ? filters?.pokestops?.showQuestSet || ''
+              : undefined,
         },
       })
     },
@@ -93,21 +95,21 @@ export function useSendSearch(search, open) {
   }, [loading])
 
   useEffect(() => {
-    if (search && open) sendToServer(search)
-    if (open) map.closePopup()
+    // This is just a reset upon initial open
+    if (open) {
+      map.closePopup()
+      if (search) sendToServer(search)
+    }
   }, [open])
 
   useEffect(() => {
-    if (open) {
-      sendToServer(search)
-    }
+    // Handles when a tab changes and we want to send another search
+    if (open) sendToServer(search)
   }, [searchTab])
 
   useEffect(() => {
-    if (search === '' && open) {
-      setOptions([])
-    }
-  }, [search, open])
+    if (search === '' && open) setOptions([])
+  }, [search === '', open])
 
   return { loading, options, handleInputChange }
 }

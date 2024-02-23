@@ -695,5 +695,14 @@
   "extra": "Extra",
   "select": "Auswählen",
   "searching": "suche...",
-  "no_options": "Keine Treffer..."
+  "no_options": "Keine Treffer...",
+  "and": "UND",
+  "or": "ODER",
+  "only_global": "nur Globale",
+  "global_caption": "Ignoriert alle anderen Filter",
+  "global_and_individual": "Globale & Individuelle Filter",
+  "gender_filters_all": "Geschlecht gilt für alle",
+  "and_caption": "miteinander verbunden",
+  "or_caption": "filtert unabhängig",
+  "filter_help": "Filter Hilfe"
 }

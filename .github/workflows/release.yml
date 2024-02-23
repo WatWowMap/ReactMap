@@ -4,13 +4,12 @@ on: workflow_call
 permissions: write-all
 
 jobs:
-  release:
+  run:
     if: ${{ github.ref_name == 'main' || github.ref_name == 'develop'}}
-    name: GitHub Release
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4.1.1
         with:
           fetch-depth: 0
       - name: Install Volta

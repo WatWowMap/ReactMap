@@ -1,5 +1,6 @@
 const fs = require('fs')
 const { resolve } = require('path')
+
 const sourceConfig = require('../../../../server/src/configs/default.json')
 
 const camelToSnake = (str) =>

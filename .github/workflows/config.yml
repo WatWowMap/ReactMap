@@ -2,22 +2,20 @@ name: Config
 on: workflow_call
 
 jobs:
-  config:
-    if: ${{ github.ref_name == 'main' || github.ref_name == 'develop'}}
-    name: Config Sync
+  sync:
     runs-on: ubuntu-latest
+    env:
+      changes_exist: 'false'
     steps:
       - name: Checkout code
         id: checkout-code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4.1.1
         with:
           fetch-depth: 2
       - name: Run script
-        run: |
-          yarn config:check
+        run: yarn config:check
       - name: Generate latest env vars
-        run: |
-          yarn config:env
+        run: yarn config:env
       - name: Configure git
         run: |
           git config --global user.name "turtlesocks-bot"
@@ -33,5 +31,5 @@ jobs:
         if: ${{ env.changes_exist == 'true' }}
         run: |
           git add --all
-          git commit --message "chore: Sync Config [skip ci]"
+          git commit --message "chore: Sync Config"
           git push
