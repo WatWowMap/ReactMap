@@ -54,10 +54,10 @@ class Portal extends Model {
    */
   static async search(perms, args, { isMad }, distance, bbox) {
     const { areaRestrictions } = perms
-    const { onlyAreas = [], search } = args
+    const { onlyAreas = [], search = '' } = args
     const query = this.query()
       .select(['name', 'id', 'lat', 'lon', 'url', distance])
-      .whereRaw(`LOWER(name) LIKE '%${search}%'`)
+      .whereILike('name', `%${search}%`)
       .whereBetween(isMad ? 'latitude' : 'lat', [bbox.minLat, bbox.maxLat])
       .andWhereBetween(isMad ? 'longitude' : 'lon', [bbox.minLon, bbox.maxLon])
       .andWhere(
