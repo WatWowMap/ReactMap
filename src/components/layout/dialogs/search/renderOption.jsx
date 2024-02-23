@@ -16,6 +16,7 @@ import { Divider, Typography } from '@mui/material'
 import Utility from '@services/Utility'
 import { RawTimeSince } from '@components/popups/common/Timer'
 import { getGruntReward } from '@services/functions/getGruntReward'
+import { formatDistance } from '@services/functions/formatDistance'
 
 import { OptionImageMemo } from './OptionImage'
 
@@ -92,8 +93,7 @@ const InvasionSubtitle = ({
 /** @type {import('@mui/material').AutocompleteProps['renderOption']} */
 export const renderOption = (props, option) => {
   const { searchTab } = useStorage.getState()
-  const { distanceUnit, questMessage } = useMemory.getState().config.misc
-
+  const { questMessage } = useMemory.getState().config.misc
   return (
     <ListItem
       sx={(theme) => ({
@@ -146,9 +146,7 @@ export const renderOption = (props, option) => {
         sx={{ flexGrow: 1, flexShrink: 1 }}
       />
       <ListItemText
-        primary={`${option.distance} ${
-          distanceUnit === 'mi' ? t('mi') : t('km')
-        }`}
+        primary={formatDistance(option.distance)}
         secondary={
           searchTab === 'quests' ? (
             questMessage || t(`ar_quest_${!!option.with_ar}`).toString()

@@ -87,6 +87,10 @@ export default function Config({ children }) {
         tileServers: Object.fromEntries(
           data.tileServers.map((item) => [item.name, item]),
         ),
+        distanceUnit: {
+          kilometers: { name: 'kilometers' },
+          miles: { name: 'miles' },
+        },
       }
 
       useScannerSessionStorage.setState((prev) => ({

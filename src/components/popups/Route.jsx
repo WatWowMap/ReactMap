@@ -25,6 +25,7 @@ import Query from '@services/Query'
 import formatInterval from '@services/functions/formatInterval'
 import { useMemory } from '@hooks/useMemory'
 import { useStorage } from '@hooks/useStorage'
+import { useFormatDistance } from '@hooks/useFormatDistance'
 
 import Title from './common/Title'
 import TimeSince from './common/Timer'
@@ -131,8 +132,8 @@ function ExpandableWrapper({ disabled = false, children, expandKey, primary }) {
  */
 export default function RoutePopup({ end, ...props }) {
   const [route, setRoute] = React.useState({ ...props, tags: [] })
-  const { i18n } = useTranslation()
   const { config } = useMemory.getState()
+  const formatDistance = useFormatDistance()
 
   const [getRoute, { data, called }] = useLazyQuery(Query.routes('getOne'), {
     variables: { id: props.id },
@@ -164,13 +165,6 @@ export default function RoutePopup({ end, ...props }) {
     }
     return sum
   }, [!!route.waypoints])
-
-  const numFormatter = new Intl.NumberFormat(i18n.language, {
-    unitDisplay: 'short',
-    unit: 'meter',
-    style: 'unit',
-    maximumFractionDigits: 1,
-  })
 
   const imagesAreEqual =
     route.image === (end ? route.end_image : route.start_image)
@@ -224,7 +218,7 @@ export default function RoutePopup({ end, ...props }) {
         )}
         <Grid2 xs={12} component={List}>
           <ListItemWrapper primary="distance">
-            {`${numFormatter.format(route.distance_meters || 0)}`}
+            {formatDistance(route.distance_meters)}
           </ListItemWrapper>
           <ListItemWrapper primary="duration">
             {`${formatInterval((route.duration_seconds || 0) * 1000).str}`}
@@ -237,13 +231,13 @@ export default function RoutePopup({ end, ...props }) {
             <Box display="flex" alignItems="center">
               <ArrowDropUp fontSize="small" />
               <Typography variant="caption">
-                {numFormatter.format(elevation.up)}
+                {formatDistance(elevation.up)}
               </Typography>
             </Box>
             <Box display="flex" alignItems="center">
               <ArrowDropDown fontSize="small" />
               <Typography variant="caption">
-                {numFormatter.format(elevation.down)}
+                {formatDistance(elevation.down)}
               </Typography>
             </Box>
           </ListItem>

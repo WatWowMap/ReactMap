@@ -734,5 +734,8 @@
   "gender_filters_all": "Gender Applies to All",
   "and_caption": "Linked Together",
   "or_caption": "Filters Independently",
-  "filter_help": "Filter Help"
+  "filter_help": "Filter Help",
+  "kilometers": "Kilometers",
+  "miles": "Miles",
+  "distance_unit": "Distance Unit"
 }

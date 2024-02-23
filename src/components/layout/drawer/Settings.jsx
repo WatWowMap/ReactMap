@@ -20,6 +20,7 @@ import InsightsIcon from '@mui/icons-material/Insights'
 import NotificationsActiveIcon from '@mui/icons-material/NotificationsActive'
 import NotificationsOffIcon from '@mui/icons-material/NotificationsOff'
 import LogoDevIcon from '@mui/icons-material/LogoDev'
+import SquareFootIcon from '@mui/icons-material/SquareFoot'
 
 import { useTranslation } from 'react-i18next'
 
@@ -114,55 +115,62 @@ function UniAssetSelect({ asset }) {
 }
 
 const ICON_MAP = {
-  navigation: NavIcon,
-  navigationControls: StyleIcon,
-  tileServers: MapIcon,
+  navigation: <NavIcon />,
+  navigationControls: <StyleIcon />,
+  tileServers: <MapIcon />,
+  distanceUnit: <SquareFootIcon />,
+}
+const FALLBACK = <DevicesOtherIcon />
+
+function GeneralSetting({ setting }) {
+  const { t } = useTranslation()
+  const staticSettings = useMemory((s) => s.settings)
+  const value = useStorage((s) => s.settings[setting])
+  return (
+    <FCSelect
+      key={setting}
+      name={setting}
+      value={staticSettings[setting][value]?.name || ''}
+      label={t(Utility.camelToSnake(setting))}
+      onChange={({ target }) => {
+        useStorage.setState((prev) => ({
+          settings: {
+            ...prev.settings,
+            [target.name]: staticSettings[target.name][target.value].name,
+          },
+        }))
+      }}
+      icon={ICON_MAP[setting] || FALLBACK}
+    >
+      {Object.keys(staticSettings[setting]).map((option) => (
+        <MenuItem key={option} value={option}>
+          {t(
+            `${Utility.camelToSnake(setting)}_${option.toLowerCase()}`,
+            Utility.getProperName(option),
+          )}
+        </MenuItem>
+      ))}
+    </FCSelect>
+  )
 }
 
 export default function Settings() {
   const { t } = useTranslation()
 
-  const staticSettings = useMemory((s) => s.settings)
   const separateDrawerActions = useMemory(
     (s) => s.config.general.separateDrawerActions,
   )
   const holidayEffects = useMemory((s) => s.config.holidayEffects) || []
+  const staticSettings = useMemory((s) => s.settings)
 
-  const settings = useStorage((s) => s.settings)
   const darkMode = useStorage((s) => s.darkMode)
 
   return (
     <>
       <ListSubheader>{t('general')}</ListSubheader>
-      {Object.keys(staticSettings).map((setting) => {
-        const Icon = ICON_MAP[setting] || DevicesOtherIcon
-        return (
-          <FCSelect
-            key={setting}
-            name={setting}
-            value={staticSettings[setting][settings[setting]]?.name || ''}
-            label={t(Utility.camelToSnake(setting))}
-            onChange={({ target }) => {
-              useStorage.setState((prev) => ({
-                settings: {
-                  ...prev.settings,
-                  [target.name]: staticSettings[target.name][target.value].name,
-                },
-              }))
-            }}
-            icon={<Icon />}
-          >
-            {Object.keys(staticSettings[setting]).map((option) => (
-              <MenuItem key={option} value={option}>
-                {t(
-                  `${Utility.camelToSnake(setting)}_${option.toLowerCase()}`,
-                  Utility.getProperName(option),
-                )}
-              </MenuItem>
-            ))}
-          </FCSelect>
-        )
-      })}
+      {Object.keys(staticSettings).map((setting) => (
+        <GeneralSetting key={setting} setting={setting} />
+      ))}
       <ListItem dense>
         <ListItemIcon>
           <TranslateIcon />
