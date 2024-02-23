@@ -68,7 +68,7 @@ export function BoolBase({
 
 export const BoolToggle = React.memo(BoolBase)
 
-/** @param {{ items: readonly [string, string], secondColor?: BoolToggleProps['switchColor'] } & BoolToggleProps} props */
+/** @param {{ items: readonly [string, string], secondColor?: BoolToggleProps['switchColor'], label?: `${string}-${string}` } & Omit<BoolToggleProps, 'label'>} props */
 export function DualBoolToggle({
   items,
   switchColor,
@@ -77,7 +77,7 @@ export function DualBoolToggle({
   label,
   ...props
 }) {
-  const labels = label?.split('-') || []
+  const labels = label?.split('-', 2) || []
   return (
     <Grid2 container component={ListItem} disablePadding disableGutters>
       {items.map((item, i) => (
