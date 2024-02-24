@@ -18,6 +18,7 @@ import { persist, createJSONStorage } from 'zustand/middleware'
  *    navigationControls: 'react' | 'leaflet'
  *    navigation: string,
  *    tileServers: string
+ *    distanceUnit: 'kilometers' | 'miles'
  *   },
  *   searches: Record<string, string>,
  *   tabs: Record<string, number>,
