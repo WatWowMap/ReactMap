@@ -102,7 +102,6 @@ export interface DbCheckClass {
   historical: Rarity
   questConditions: { [key: string]: string[] }
   rarityPercents: RarityPercents
-  distanceUnit: 'km' | 'mi'
   reactMapDb: null | number
   filterContext: {
     Route: { maxDistance: number; maxDuration: number }
