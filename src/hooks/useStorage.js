@@ -33,7 +33,7 @@ import { persist, createJSONStorage } from 'zustand/middleware'
  *   audio: Record<string, string>
  *   userSettings: Record<string, any>
  *   profiling: boolean
- *   stateLogging: boolean
+ *   stateTraceLog: boolean
  *   desktopNotifications: boolean
  *   setAreas: (areas?: string | string[], validAreas?: string[], unselectAll?: boolean) => void,
  *   setPokemonFilterMode: (legacyFilter: boolean, easyMode: boolean) => void,

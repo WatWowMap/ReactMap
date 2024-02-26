@@ -152,8 +152,7 @@ const components = {
  * @returns {import('@mui/material').Theme}
  */
 export default function useCustomTheme() {
-  const primary = useMemory((s) => s.theme.primary)
-  const secondary = useMemory((s) => s.theme.secondary)
+  const { primary, secondary } = useMemory((s) => s.theme)
   const darkMode = useStorage((s) => s.darkMode)
 
   if (darkMode) {
@@ -175,6 +174,10 @@ export default function useCustomTheme() {
             },
             secondary: {
               main: secondary,
+              contrastText: '#fff',
+            },
+            info: {
+              main: '#2AB5F6',
               contrastText: '#fff',
             },
             discord: {
