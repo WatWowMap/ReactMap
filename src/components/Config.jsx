@@ -11,6 +11,8 @@ import { deepMerge } from '@services/functions/deepMerge'
 import { Navigate } from 'react-router-dom'
 import { checkHoliday } from '@services/functions/checkHoliday'
 import { useHideElement } from '@hooks/useHideElement'
+import { getGlowRules } from '@services/functions/getGlowRules'
+
 import { useScannerSessionStorage } from './layout/dialogs/scanner/store'
 
 export default function Config({ children }) {
@@ -119,7 +121,9 @@ export default function Config({ children }) {
         ui: data.ui,
         menus: data.menus,
         extraUserFields: data.database.settings.extraUserFields,
-        userSettings: data.clientMenus,
+        userSettings: data.userSettings,
+        clientMenus: data.clientMenus,
+        glowRules: getGlowRules(data.clientMenus.pokemon.glow.sub),
         timeOfDay: Utility.timeCheck(...location),
         config: {
           ...data.map,

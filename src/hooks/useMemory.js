@@ -30,13 +30,15 @@ import { create } from 'zustand'
  *      scanner: number,
  *    },
  *   },
- *   menus: Record<string, any>
+ *   glowRules: ((pkmn: import('@rm/types').Pokemon) => string)[],
+ *   menus: ReturnType<import('server/src/services/ui/advMenus')>
  *   filters: import('@rm/types').AllFilters,
  *   masterfile: import('@rm/masterfile').Masterfile
  *   polling: import('@rm/types').Config['api']['polling'],
  *   gymValidDataLimit: number
  *   settings: Record<keyof import('./useStorage').UseStorage['settings'], { name: string }>
- *   userSettings: Record<string, any>
+ *   userSettings: ReturnType<import('server/src/services/ui/clientOptions')>['clientValues']
+ *   clientMenus: ReturnType<import('server/src/services/ui/clientOptions')>['clientMenus']
  *   clientError: string,
  *   timeOfDay: import('@rm/types').TimesOfDay,
  *   hideList: Set<string | number>,
@@ -95,9 +97,11 @@ export const useMemory = create((set) => ({
     },
     userBackupLimits: 0,
   },
+  glowRules: [],
   config: {},
   filters: {},
   menus: {},
+  clientMenus: {},
   menuFilters: {},
   userSettings: undefined,
   settings: undefined,
