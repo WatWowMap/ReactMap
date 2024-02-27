@@ -1,19 +1,3 @@
-# [1.2.0-develop.14](https://github.com/ReuschelCGN/ReactMap/compare/v1.2.0-develop.13...v1.2.0-develop.14) (2024-02-27)
-
-
-### Bug Fixes
-
-* 0s in gym popup ([2d9bdc1](https://github.com/ReuschelCGN/ReactMap/commit/2d9bdc1665715d7d3dfa6bd3b6f05b9471b12abe))
-* map dependency checks ([85c992d](https://github.com/ReuschelCGN/ReactMap/commit/85c992dc499f0c25dff2ba00ec75e4bb20911bab))
-* pokemon ui inconsistency ([0cb334c](https://github.com/ReuschelCGN/ReactMap/commit/0cb334c44748dbbe2a591cc5b61c466b7487f3bf))
-* various small things ([ada7947](https://github.com/ReuschelCGN/ReactMap/commit/ada7947313300864da5a524c0233bb8c31d5c1bc))
-* various text fixes ([6eb9c6a](https://github.com/ReuschelCGN/ReactMap/commit/6eb9c6aed1d0ba557220799560ec498fc6f7e6dc)), closes [#967](https://github.com/ReuschelCGN/ReactMap/issues/967)
-
-
-### Features
-
-* data management page ([561c031](https://github.com/ReuschelCGN/ReactMap/commit/561c031e0f290d7c63e17b6a645e8b145cf2e4d1))
-
 # [1.30.0-develop.11](https://github.com/WatWowMap/ReactMap/compare/v1.30.0-develop.10...v1.30.0-develop.11) (2024-02-27)
 
 
