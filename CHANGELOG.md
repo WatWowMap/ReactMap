@@ -1,3 +1,10 @@
+# [1.30.0-develop.10](https://github.com/WatWowMap/ReactMap/compare/v1.30.0-develop.9...v1.30.0-develop.10) (2024-02-27)
+
+
+### Bug Fixes
+
+* pokemon ui inconsistency ([0cb334c](https://github.com/WatWowMap/ReactMap/commit/0cb334c44748dbbe2a591cc5b61c466b7487f3bf))
+
 # [1.30.0-develop.9](https://github.com/WatWowMap/ReactMap/compare/v1.30.0-develop.8...v1.30.0-develop.9) (2024-02-27)
 
 
