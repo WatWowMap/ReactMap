@@ -27,7 +27,7 @@ export function ResetGeneral() {
 
   return (
     <ChildContainer>
-      <StyledSubHeader>General</StyledSubHeader>
+      <StyledSubHeader>{t('reset_general')}</StyledSubHeader>
       <ButtonWithNotification
         onClick={resetSettings}
         label={t('reset_settings')}
@@ -64,7 +64,7 @@ export function ResetGeneral() {
         isHovering={isHovering}
       />
       <StyledDivider />
-      <StyledSubHeader>Assets</StyledSubHeader>
+      <StyledSubHeader>{t('reset_assets')}</StyledSubHeader>
       <ButtonWithNotification
         onClick={resetIcons}
         label={t('reset_icons')}
