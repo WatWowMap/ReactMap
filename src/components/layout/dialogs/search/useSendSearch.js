@@ -1,3 +1,4 @@
+// @ts-check
 import { useState, useCallback, useMemo, useEffect } from 'react'
 import { useLazyQuery } from '@apollo/client'
 import { useTranslation } from 'react-i18next'
@@ -49,7 +50,7 @@ export function useSendSearch(search, open) {
         },
       })
     },
-    [i18n.language, searchTab],
+    [i18n.language, searchTab, map],
   )
 
   const debounceChange = useMemo(
@@ -93,11 +94,11 @@ export function useSendSearch(search, open) {
 
   useEffect(() => {
     // This is just a reset upon initial open
-    if (open) {
+    if (open && map) {
       map.closePopup()
       if (search) sendToServer(search)
     }
-  }, [open])
+  }, [open, map])
 
   useEffect(() => {
     // Handles when a tab changes and we want to send another search

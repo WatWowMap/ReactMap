@@ -24,6 +24,7 @@ import Pokestop = require('server/src/models/Pokestop')
 import { ModelReturn, OnlyType } from './utility'
 import { Profile } from 'passport-discord'
 import { User } from './models'
+import { Config } from '@rm/types'
 
 export interface DbContext {
   isMad: boolean
@@ -253,3 +254,16 @@ export type AdvCategories = 'pokemon' | 'gyms' | 'pokestops' | 'nests'
 export type UIObject = ReturnType<
   typeof import('server/src/services/ui/primary')
 >
+
+export interface PokemonGlow
+  extends Partial<Omit<Config['clientSideOptions']['pokemon'], 'glow'>> {
+  glow: boolean
+  Hundo?: string
+  Nundo?: string
+  'Top PVP Rank'?: string
+  Multiple?: string
+}
+export interface ClientOptions
+  extends Partial<Omit<Config['clientSideOptions'], 'pokemon'>> {
+  pokemon: PokemonGlow
+}

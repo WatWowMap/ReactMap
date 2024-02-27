@@ -31,6 +31,9 @@ function clientOptions(perms) {
       opacityTenMinutes: { type: 'number', perm: ['raids'] },
       opacityFiveMinutes: { type: 'number', perm: ['raids'] },
       opacityOneMinute: { type: 'number', perm: ['raids'] },
+      enableGymPopupCoords: map.misc.enableGymPopupCoordsSelector
+        ? { type: 'bool', perm: ['gyms'] }
+        : undefined,
     },
     pokestops: {
       clustering: { type: 'bool', perm: ['pokestops', 'quests', 'invasions'] },
@@ -51,6 +54,9 @@ function clientOptions(perms) {
       opacityTenMinutes: { type: 'number', perm: ['invasions'] },
       opacityFiveMinutes: { type: 'number', perm: ['invasions'] },
       opacityOneMinute: { type: 'number', perm: ['invasions'] },
+      enablePokestopPopupCoords: map.misc.enablePokestopPopupCoordsSelector
+        ? { type: 'bool', perm: ['pokestops'] }
+        : undefined,
     },
     pokemon: {
       clustering: { type: 'bool', perm: ['pokemon'] },
@@ -70,6 +76,27 @@ function clientOptions(perms) {
       opacityTenMinutes: { type: 'number', perm: ['pokemon'] },
       opacityFiveMinutes: { type: 'number', perm: ['pokemon'] },
       opacityOneMinute: { type: 'number', perm: ['pokemon'] },
+      ...Object.fromEntries(
+        levels.map((level) => [`pvp${level}`, { type: 'bool', perm: ['pvp'] }]),
+      ),
+      legacyFilter: map.misc.enableMapJsFilter
+        ? { type: 'bool', perm: ['iv'] }
+        : undefined,
+      glow: clientSideOptions.pokemon.glow.length
+        ? {
+            type: 'bool',
+            perm: ['pokemon'],
+            sub: Object.fromEntries(
+              clientSideOptions.pokemon.glow.map(({ name, ...glow }) => [
+                name,
+                { ...glow, disabled: !perms[glow.perm], type: 'color' },
+              ]),
+            ),
+          }
+        : undefined,
+      enablePokemonPopupCoords: map.misc.enablePokemonPopupCoordsSelector
+        ? { type: 'bool', perm: ['pokemon'] }
+        : undefined,
     },
     wayfarer: {
       clustering: { type: 'bool', perm: ['portals'] },
@@ -84,6 +111,9 @@ function clientOptions(perms) {
       poiColor: { type: 'color', perm: ['submissionCells'] },
       partnerColor: { type: 'color', perm: ['submissionCells'] },
       showcaseColor: { type: 'color', perm: ['submissionCells'] },
+      enablePortalPopupCoords: map.misc.enablePortalPopupCoordsSelector
+        ? { type: 'bool', perm: ['portals'] }
+        : undefined,
     },
     s2cells: {
       lightMapBorder: { type: 'color', perm: ['s2cells'] },
@@ -104,10 +134,10 @@ function clientOptions(perms) {
         perm: [
           'pokemon',
           'raids',
-          'invasions',
-          'quests',
-          'eventStops',
-          'lures',
+          // 'invasions',
+          // 'quests',
+          // 'eventStops',
+          // 'lures',
         ],
       },
       audio: {
@@ -115,10 +145,10 @@ function clientOptions(perms) {
         perm: [
           'pokemon',
           'raids',
-          'invasions',
-          'quests',
-          'eventStops',
-          'lures',
+          // 'invasions',
+          // 'quests',
+          // 'eventStops',
+          // 'lures',
         ],
       },
       audioAlwaysOn: {
@@ -126,10 +156,10 @@ function clientOptions(perms) {
         perm: [
           'pokemon',
           'raids',
-          'invasions',
-          'quests',
-          'eventStops',
-          'lures',
+          // 'invasions',
+          // 'quests',
+          // 'eventStops',
+          // 'lures',
         ],
       },
       volumeLevel: {
@@ -137,10 +167,10 @@ function clientOptions(perms) {
         perm: [
           'pokemon',
           'raids',
-          'invasions',
-          'quests',
-          'eventStops',
-          'lures',
+          // 'invasions',
+          // 'quests',
+          // 'eventStops',
+          // 'lures',
         ],
         min: 0,
         max: 100,
@@ -153,72 +183,30 @@ function clientOptions(perms) {
       // lures: { type: 'bool', perm: ['lures'] },
     },
   }
-
-  levels.forEach((level) => {
-    clientMenus.pokemon[`pvp${level}`] = {
-      type: 'bool',
-      perm: ['pvp'],
-      value: true,
-    }
-  })
-
-  // special case options that require additional checks
-  if (map.misc.enableMapJsFilter) {
-    clientMenus.pokemon.legacyFilter = { type: 'bool', perm: ['iv', 'pvp'] }
-  }
-  if (clientSideOptions.pokemon.glow.length) {
-    clientMenus.pokemon.glow = { type: 'bool', sub: {}, perm: ['pokemon'] }
-  }
-  if (map.misc.enableGymPopupCoordsSelector) {
-    clientMenus.gyms.enableGymPopupCoords = {
-      type: 'bool',
-      perm: ['gyms'],
-    }
-  }
-  if (map.misc.enablePokestopPopupCoordsSelector) {
-    clientMenus.pokestops.enablePokestopPopupCoords = {
-      type: 'bool',
-      perm: ['pokestops'],
-    }
-  }
-  if (map.misc.enablePokemonPopupCoordsSelector) {
-    clientMenus.pokemon.enablePokemonPopupCoords = {
-      type: 'bool',
-      perm: ['pokemon'],
-    }
-  }
-  if (map.misc.enablePortalPopupCoordsSelector) {
-    clientMenus.wayfarer.enablePortalPopupCoords = {
-      type: 'bool',
-      perm: ['portals'],
-    }
+  /** @type {import('@rm/types').ClientOptions} */
+  const clientValues = {
+    pokemon: {
+      glow: true,
+      ...Object.fromEntries(
+        clientSideOptions.pokemon.glow.map((glow) => [glow.name, glow.value]),
+      ),
+    },
   }
 
-  // only the keys & values are stored locally
-  const clientValues = {}
-
-  Object.entries(clientMenus).forEach((category) => {
-    const [key, options] = category
-    clientValues[key] = {}
-    Object.entries(options).forEach((option) => {
-      const [name, meta] = option
+  Object.entries(clientMenus).forEach(([key, options]) => {
+    if (!clientValues[key]) clientValues[key] = {}
+    Object.entries(options).forEach(([name, meta]) => {
+      if (!meta) return
       clientMenus[key][name].value =
         clientSideOptions[key][name] || meta.value || false
       clientMenus[key][name].disabled = !meta.perm.some((x) => perms[x])
       clientValues[key][name] = meta.value
-      if (meta.sub) clientMenus[key][name].sub = {}
       delete clientMenus[key][name].perm
     })
   })
 
   clientMenus.pokemon.glow.value = true
   clientValues.pokemon.glow = true
-  clientSideOptions.pokemon.glow.forEach((option) => {
-    clientMenus.pokemon.glow.sub[option.name] = { ...option }
-    clientMenus.pokemon.glow.sub[option.name].disabled = !perms[option.perm]
-    clientMenus.pokemon.glow.sub[option.name].type = 'color'
-    clientValues.pokemon[option.name] = option.value
-  })
 
   return { clientValues, clientMenus }
 }

@@ -1,3 +1,47 @@
+# [1.30.0-develop.11](https://github.com/WatWowMap/ReactMap/compare/v1.30.0-develop.10...v1.30.0-develop.11) (2024-02-27)
+
+
+### Bug Fixes
+
+* various text fixes ([6eb9c6a](https://github.com/WatWowMap/ReactMap/commit/6eb9c6aed1d0ba557220799560ec498fc6f7e6dc)), closes [#967](https://github.com/WatWowMap/ReactMap/issues/967)
+
+# [1.30.0-develop.10](https://github.com/WatWowMap/ReactMap/compare/v1.30.0-develop.9...v1.30.0-develop.10) (2024-02-27)
+
+
+### Bug Fixes
+
+* pokemon ui inconsistency ([0cb334c](https://github.com/WatWowMap/ReactMap/commit/0cb334c44748dbbe2a591cc5b61c466b7487f3bf))
+
+# [1.30.0-develop.9](https://github.com/WatWowMap/ReactMap/compare/v1.30.0-develop.8...v1.30.0-develop.9) (2024-02-27)
+
+
+### Bug Fixes
+
+* various small things ([ada7947](https://github.com/WatWowMap/ReactMap/commit/ada7947313300864da5a524c0233bb8c31d5c1bc))
+
+# [1.30.0-develop.8](https://github.com/WatWowMap/ReactMap/compare/v1.30.0-develop.7...v1.30.0-develop.8) (2024-02-27)
+
+
+### Bug Fixes
+
+* 0s in gym popup ([2d9bdc1](https://github.com/WatWowMap/ReactMap/commit/2d9bdc1665715d7d3dfa6bd3b6f05b9471b12abe))
+* map dependency checks ([85c992d](https://github.com/WatWowMap/ReactMap/commit/85c992dc499f0c25dff2ba00ec75e4bb20911bab))
+
+# [1.30.0-develop.7](https://github.com/WatWowMap/ReactMap/compare/v1.30.0-develop.6...v1.30.0-develop.7) (2024-02-27)
+
+
+### Bug Fixes
+
+* importing ([89b7fce](https://github.com/WatWowMap/ReactMap/commit/89b7fcebca0a58959ecc29418db4a75390072ffd))
+* less strict searching for `'` ([ca08a69](https://github.com/WatWowMap/ReactMap/commit/ca08a690fca54f90132b4688b5700532958b60f5))
+* Merge pull request [#963](https://github.com/WatWowMap/ReactMap/issues/963) from ReuschelCGN/translation ([cbc0160](https://github.com/WatWowMap/ReactMap/commit/cbc0160f6820a68fed04c9b7b57a287cfaf66f58))
+* safe 0 fallback ([45795a8](https://github.com/WatWowMap/ReactMap/commit/45795a80d114f7b638ff6a7a0d0438811dd86511))
+
+
+### Features
+
+* data management page ([561c031](https://github.com/WatWowMap/ReactMap/commit/561c031e0f290d7c63e17b6a645e8b145cf2e4d1))
+
 # [1.30.0-develop.6](https://github.com/WatWowMap/ReactMap/compare/v1.30.0-develop.5...v1.30.0-develop.6) (2024-02-23)
 
 

@@ -3,7 +3,6 @@
 import * as React from 'react'
 import { GeoJSON } from 'react-leaflet'
 
-import { basicEqualFn } from '@hooks/useMemory'
 import { useStorage } from '@hooks/useStorage'
 import Utility from '@services/Utility'
 import { useWebhookStore } from '@components/layout/dialogs/webhooks/store'
@@ -17,12 +16,9 @@ import { Polygon } from 'leaflet'
  */
 export function ScanAreaTile(featureCollection) {
   const search = useStorage((s) => s.filters.scanAreas?.filter?.search)
-  const [tapToToggle, alwaysShowLabels] = useStorage(
-    (s) => [
-      s.userSettings.scanAreas.tapToToggle,
-      s.userSettings.scanAreas.alwaysShowLabels,
-    ],
-    basicEqualFn,
+  const tapToToggle = useStorage((s) => s.userSettings.scanAreas.tapToToggle)
+  const alwaysShowLabels = useStorage(
+    (s) => s.userSettings.scanAreas.alwaysShowLabels,
   )
 
   const webhookMode = useWebhookStore((s) => s.mode)

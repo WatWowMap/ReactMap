@@ -9,13 +9,15 @@ import { useTranslation } from 'react-i18next'
 /**
  * @param {{ label?: string } & import('@mui/material').ListItemButtonProps} props
  */
-export function BasicListButton({ children, label, ...props }) {
+export function BasicListButton({ children, label, color, ...props }) {
   const { t } = useTranslation()
   return (
     <ListItem disablePadding>
       <ListItemButton {...props}>
         {children && <ListItemIcon>{children}</ListItemIcon>}
-        {label && <ListItemText primary={t(label)} />}
+        {label && (
+          <ListItemText primary={t(label)} primaryTypographyProps={{ color }} />
+        )}
       </ListItemButton>
     </ListItem>
   )

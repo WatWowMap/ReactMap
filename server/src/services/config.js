@@ -174,7 +174,7 @@ const mergeMapConfig = (input = {}) => {
   /** @type {import('@rm/types').Config['map']} */
   const merged = config.util.extendDeep({}, base, input)
   if (
-    merged.misc.distanceUnit !== 'kilometers' ||
+    merged.misc.distanceUnit !== 'kilometers' &&
     merged.misc.distanceUnit !== 'miles'
   ) {
     log.warn(
