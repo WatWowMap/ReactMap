@@ -33,9 +33,9 @@ import { create } from 'zustand'
  *   menus: Record<string, any>
  *   filters: import('@rm/types').AllFilters,
  *   masterfile: import('@rm/masterfile').Masterfile
- *   polling: Record<string, number>
+ *   polling: import('@rm/types').Config['api']['polling'],
  *   gymValidDataLimit: number
- *   settings: Record<string, any>
+ *   settings: Record<keyof import('./useStorage').UseStorage['settings'], { name: string }>
  *   userSettings: Record<string, any>
  *   clientError: string,
  *   timeOfDay: import('@rm/types').TimesOfDay,
