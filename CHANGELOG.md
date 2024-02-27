@@ -1,3 +1,10 @@
+# [1.30.0-develop.9](https://github.com/WatWowMap/ReactMap/compare/v1.30.0-develop.8...v1.30.0-develop.9) (2024-02-27)
+
+
+### Bug Fixes
+
+* various small things ([ada7947](https://github.com/WatWowMap/ReactMap/commit/ada7947313300864da5a524c0233bb8c31d5c1bc))
+
 # [1.30.0-develop.8](https://github.com/WatWowMap/ReactMap/compare/v1.30.0-develop.7...v1.30.0-develop.8) (2024-02-27)
 
 
