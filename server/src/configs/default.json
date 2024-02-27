@@ -237,7 +237,7 @@
       "permImageDir": "images/perms",
       "permArrayImages": false,
       "clientTimeoutMinutes": 30,
-      "distanceUnit": "km",
+      "distanceUnit": "kilometers",
       "enablePokemonPopupCoordsSelector": false,
       "enableGymPopupCoordsSelector": false,
       "enablePokestopPopupCoordsSelector": false,

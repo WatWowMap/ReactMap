@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 /* eslint-disable no-restricted-syntax */
 const { Model, raw, ref } = require('objection')
 const i18next = require('i18next')
@@ -24,7 +23,6 @@ const {
 } = require('../services/filters/pokemon/constants')
 const PkmnFilter = require('../services/filters/pokemon/Backend')
 
-const distanceUnit = config.getSafe('map.misc.distanceUnit')
 const searchResultsLimit = config.getSafe('api.searchResultsLimit')
 const queryLimits = config.getSafe('api.queryLimits')
 const queryDebug = config.getSafe('devOptions.queryDebug')
@@ -652,11 +650,7 @@ class Pokemon extends Model {
             point([poke.lon, poke.lat]),
             point([args.lon, args.lat]),
             {
-              units:
-                distanceUnit.toLowerCase() === 'km' ||
-                distanceUnit.toLowerCase() === 'kilometers'
-                  ? 'kilometers'
-                  : 'miles',
+              units: 'meters',
             },
           ).toFixed(2),
       }))

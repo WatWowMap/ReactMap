@@ -107,7 +107,6 @@ module.exports = class DbCheck {
       )
       process.exit(0)
     }
-    this.distanceUnit = config.getSafe('map.misc.distanceUnit')
   }
 
   /**
@@ -115,13 +114,11 @@ module.exports = class DbCheck {
    * @param {boolean} isMad
    * @returns {ReturnType<typeof raw>}
    */
-  getDistance(args, isMad) {
+  static getDistance(args, isMad) {
     const radLat = args.lat * (Math.PI / 180)
     const radLon = args.lon * (Math.PI / 180)
     return raw(
-      `ROUND(( ${
-        this.distanceUnit === 'mi' ? '3959' : '6371'
-      } * acos( cos( ${radLat} ) * cos( radians( ${
+      `ROUND(( 6371000 * acos( cos( ${radLat} ) * cos( radians( ${
         isMad ? 'latitude' : 'lat'
       } ) ) * cos( radians( ${
         isMad ? 'longitude' : 'lon'
@@ -456,7 +453,7 @@ module.exports = class DbCheck {
             perms,
             args,
             source,
-            this.getDistance(args, source.isMad),
+            DbCheck.getDistance(args, source.isMad),
             bbox,
           ),
         ),

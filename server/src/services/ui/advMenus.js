@@ -21,64 +21,115 @@ const CATEGORIES = /** @type {const} */ ({
   nests: ['pokemon'],
 })
 
-const BASE_RARITY = /** @type {const} */ ([
-  'common',
-  'uncommon',
-  'rare',
-  'ultraRare',
-  'regional',
-  'ultraBeast',
-  'legendary',
-  'mythical',
-  'never',
-])
-
 function buildMenus() {
-  const menuFilters = {}
-  const returnedItems = {}
-
   const rarityTiers = new Set(
     Object.values(Event.masterfile.pokemon).map((val) => val.rarity),
   )
   const historicalTiers = new Set(
     Object.values(Event.masterfile.pokemon).map((val) => val.historic),
   )
+  const generations = [
+    ...new Set(
+      Object.values(Event.masterfile.pokemon).map(
+        (val) => `generation_${val.genId}`,
+      ),
+    ),
+  ].filter((val) => val !== undefined)
+  const types = Object.keys(Event.masterfile.types)
+    .map((key) => `poke_type_${key}`)
+    .filter((val) => val !== 'poke_type_0')
+
+  const forms = Object.entries(
+    Object.values(Event.masterfile.pokemon).reduce((acc, val) => {
+      Object.values(val.forms || {}).forEach((form) => {
+        if (acc[form.name]) {
+          acc[form.name] += 1
+        } else {
+          acc[form.name] = 1
+        }
+      })
+      return acc
+    }, /** @type {Record<string, number>} */ ({})),
+  ).filter(([key, count]) => count > 10 && key !== 'Normal' && key !== 'Unset')
 
   const pokemonFilters = {
-    generations: [
-      ...new Set(
-        Object.values(Event.masterfile.pokemon).map(
-          (val) => `generation_${val.genId}`,
-        ),
-      ),
-    ].filter((val) => val !== undefined),
-    types: Object.keys(Event.masterfile.types)
-      .map((key) => `poke_type_${key}`)
-      .filter((val) => val !== 'poke_type_0'),
-    rarity: BASE_RARITY.filter((tier) => rarityTiers.has(tier)),
-    historicRarity: BASE_RARITY.filter((tier) => historicalTiers.has(tier)),
-    forms: ['normalForms', 'altForms', 'Alola', 'Galarian'],
-    others: ['reverse', 'selected', 'unselected', 'onlyAvailable'],
+    generations: Object.fromEntries(generations.map((gen) => [gen, false])),
+    types: Object.fromEntries(types.map((type) => [type, false])),
+    rarity: Object.fromEntries(
+      Array.from(rarityTiers).map((tier) => [tier, false]),
+    ),
+    historicRarity: Object.fromEntries(
+      Array.from(historicalTiers).map((tier) => [tier, false]),
+    ),
+    forms: {
+      normalForms: false,
+      altForms: false,
+      ...Object.fromEntries(forms.map((form) => [form[0], false])),
+    },
+    others: {
+      reverse: false,
+      selected: false,
+      unselected: false,
+      onlyAvailable: false,
+    },
   }
 
-  Object.entries(pokemonFilters).forEach(([key, items]) => {
-    menuFilters[key] = Object.fromEntries(items.map((item) => [item, false]))
-  })
-
-  Object.entries(CATEGORIES).forEach(([key, items]) => {
-    returnedItems[key] = {
-      categories: items,
+  const returnObj = {
+    gyms: {
+      categories: CATEGORIES.gyms,
       filters: {
-        ...menuFilters,
+        ...pokemonFilters,
         others: {
-          ...menuFilters.others,
+          ...pokemonFilters.others,
           onlyAvailable: true,
         },
-        categories: Object.fromEntries(items.map((item) => [item, false])),
+        categories: Object.fromEntries(
+          CATEGORIES.gyms.map((item) => [item, false]),
+        ),
       },
-    }
-  })
-  return returnedItems
+    },
+    pokestops: {
+      categories: CATEGORIES.pokestops,
+      filters: {
+        ...pokemonFilters,
+        others: {
+          ...pokemonFilters.others,
+          onlyAvailable: true,
+        },
+        categories: Object.fromEntries(
+          CATEGORIES.pokestops.map((item) => [item, false]),
+        ),
+      },
+    },
+    pokemon: {
+      categories: CATEGORIES.pokemon,
+      filters: {
+        ...pokemonFilters,
+        others: {
+          ...pokemonFilters.others,
+          onlyAvailable: true,
+        },
+        categories: Object.fromEntries(
+          CATEGORIES.pokemon.map((item) => [item, false]),
+        ),
+      },
+    },
+    nests: {
+      categories: CATEGORIES.nests,
+      filters: {
+        ...pokemonFilters,
+        others: {
+          ...pokemonFilters.others,
+          onlyAvailable: true,
+        },
+        categories: Object.fromEntries(
+          CATEGORIES.nests.map((item) => [item, false]),
+        ),
+      },
+    },
+  }
+
+  return returnObj
 }
 
 module.exports = buildMenus

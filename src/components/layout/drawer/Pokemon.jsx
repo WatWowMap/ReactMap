@@ -34,7 +34,6 @@ import { SelectorListMemo } from './SelectorList'
 import { BasicListButton } from '../general/BasicListButton'
 
 function PokemonDrawer() {
-  const legacyFilter = useStorage((s) => s.userSettings.pokemon.legacyFilter)
   const filterMode = useStorage((s) => s.getPokemonFilterMode())
   const [ivOr, setIvOr] = useDeepStore('filters.pokemon.ivOr')
   const { t } = useTranslation()
@@ -116,7 +115,7 @@ function PokemonDrawer() {
           label="link_global_and_advanced"
         />
       </Collapse>
-      {legacyFilter && ui.legacy ? (
+      {filterMode === 'expert' && ui.legacy ? (
         <StringFilterMemo field="filters.pokemon.ivOr" />
       ) : (
         <>

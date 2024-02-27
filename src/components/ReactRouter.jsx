@@ -6,8 +6,9 @@ import Auth from './layout/auth/Auth'
 import Login from './layout/auth/Login'
 import Blocked from './layout/auth/Blocked'
 import Errors from './Errors'
-import ClearStorage from './ClearStorage'
+import DataManagement from '../features/data'
 import Config from './Config'
+import ResetAll from './Reset'
 
 const Playground = React.lazy(() => import('../features/playground'))
 
@@ -21,13 +22,23 @@ const loginRoute = (
     <Login />
   </Config>
 )
-const resetRoute = <ClearStorage />
+const dataRoute = (
+  <Config>
+    <DataManagement />
+  </Config>
+)
 const blockedRoute = (
   <Config>
     <Blocked />
   </Config>
 )
+const playgroundRoute = (
+  <Config>
+    <Playground />
+  </Config>
+)
 const errorRoute = <Errors />
+const resetRoute = <ResetAll />
 
 export default function ReactRouter() {
   return (
@@ -35,14 +46,8 @@ export default function ReactRouter() {
       <Route path="/" element={authRoute} />
       <Route path="reset" element={resetRoute} />
       <Route path="login" element={loginRoute} />
-      <Route
-        path="playground"
-        element={
-          <Config>
-            <Playground />
-          </Config>
-        }
-      />
+      <Route path="data-management" element={dataRoute} />
+      <Route path="playground" element={playgroundRoute} />
       <Route path="blocked/:info" element={blockedRoute} />
       <Route path="@/:lat/:lon" element={authRoute} />
       <Route path="@/:lat/:lon/:zoom" element={authRoute} />

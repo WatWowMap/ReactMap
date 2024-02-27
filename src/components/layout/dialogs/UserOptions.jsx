@@ -20,7 +20,7 @@ import Footer from '../general/Footer'
 import { DialogWrapper } from './DialogWrapper'
 
 function InputType({ option, subOption, localState, handleChange, category }) {
-  const staticUserSettings = useMemory.getState().userSettings[category] || {}
+  const staticUserSettings = useMemory.getState().clientMenus[category] || {}
   const fullOption = subOption
     ? staticUserSettings[option].sub[subOption]
     : staticUserSettings[option]
@@ -71,8 +71,8 @@ function UserOptions() {
   const { t } = useTranslation()
   const { open, category, type } = useLayoutStore((s) => s.dialog)
 
-  const staticUserSettings = useMemory((s) => s.userSettings[category] || {})
-  const userSettings = useStorage((state) => state.userSettings)
+  const staticUserSettings = useMemory((s) => s.clientMenus[category] || {})
+  const userSettings = useStorage((s) => s.userSettings)
 
   const [localState, setLocalState] = React.useState(userSettings[category])
 
