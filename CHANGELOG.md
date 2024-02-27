@@ -1,3 +1,11 @@
+# [1.30.0-develop.8](https://github.com/WatWowMap/ReactMap/compare/v1.30.0-develop.7...v1.30.0-develop.8) (2024-02-27)
+
+
+### Bug Fixes
+
+* 0s in gym popup ([2d9bdc1](https://github.com/WatWowMap/ReactMap/commit/2d9bdc1665715d7d3dfa6bd3b6f05b9471b12abe))
+* map dependency checks ([85c992d](https://github.com/WatWowMap/ReactMap/commit/85c992dc499f0c25dff2ba00ec75e4bb20911bab))
+
 # [1.30.0-develop.7](https://github.com/WatWowMap/ReactMap/compare/v1.30.0-develop.6...v1.30.0-develop.7) (2024-02-27)
 
 
