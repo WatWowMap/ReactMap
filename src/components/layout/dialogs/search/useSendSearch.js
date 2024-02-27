@@ -1,3 +1,4 @@
+// @ts-check
 import { useState, useCallback, useMemo, useEffect } from 'react'
 import { useLazyQuery } from '@apollo/client'
 import { useTranslation } from 'react-i18next'

@@ -146,7 +146,7 @@ function GeneralSetting({ setting }) {
         <MenuItem key={option} value={option}>
           {t(
             `${Utility.camelToSnake(setting)}_${option.toLowerCase()}`,
-            Utility.getProperName(option),
+            t(option.toLowerCase(), Utility.getProperName(option)),
           )}
         </MenuItem>
       ))}
@@ -231,7 +231,7 @@ export default function Settings() {
               <InsightsIcon />
             </ListItemIcon>
           </BoolToggle>
-          <BoolToggle field="stateLogging">
+          <BoolToggle field="stateTraceLog">
             <ListItemIcon>
               <LogoDevIcon />
             </ListItemIcon>

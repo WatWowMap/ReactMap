@@ -1,5 +1,4 @@
 // @ts-check
-/* eslint-disable react/destructuring-assignment */
 import * as React from 'react'
 import { t } from 'i18next'
 import ListItem from '@mui/material/ListItem'
