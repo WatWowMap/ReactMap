@@ -1,3 +1,18 @@
+# [1.30.0-develop.7](https://github.com/WatWowMap/ReactMap/compare/v1.30.0-develop.6...v1.30.0-develop.7) (2024-02-27)
+
+
+### Bug Fixes
+
+* importing ([89b7fce](https://github.com/WatWowMap/ReactMap/commit/89b7fcebca0a58959ecc29418db4a75390072ffd))
+* less strict searching for `'` ([ca08a69](https://github.com/WatWowMap/ReactMap/commit/ca08a690fca54f90132b4688b5700532958b60f5))
+* Merge pull request [#963](https://github.com/WatWowMap/ReactMap/issues/963) from ReuschelCGN/translation ([cbc0160](https://github.com/WatWowMap/ReactMap/commit/cbc0160f6820a68fed04c9b7b57a287cfaf66f58))
+* safe 0 fallback ([45795a8](https://github.com/WatWowMap/ReactMap/commit/45795a80d114f7b638ff6a7a0d0438811dd86511))
+
+
+### Features
+
+* data management page ([561c031](https://github.com/WatWowMap/ReactMap/commit/561c031e0f290d7c63e17b6a645e8b145cf2e4d1))
+
 # [1.30.0-develop.6](https://github.com/WatWowMap/ReactMap/compare/v1.30.0-develop.5...v1.30.0-develop.6) (2024-02-23)
 
 
