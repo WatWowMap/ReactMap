@@ -1,3 +1,4 @@
+// @ts-check
 import { useState, useCallback, useMemo, useEffect } from 'react'
 import { useLazyQuery } from '@apollo/client'
 import { useTranslation } from 'react-i18next'
@@ -49,7 +50,7 @@ export function useSendSearch(search, open) {
         },
       })
     },
-    [i18n.language, searchTab],
+    [i18n.language, searchTab, map],
   )
 
   const debounceChange = useMemo(
@@ -60,10 +61,7 @@ export function useSendSearch(search, open) {
   /** @type {import('@mui/material').AutocompleteProps['onInputChange']} */
   const handleInputChange = useCallback(
     (e, newValue) => {
-      if (
-        e?.type === 'change' &&
-        (/^[0-9\s\p{L}]+$/u.test(newValue) || newValue === '')
-      ) {
+      if (e?.type === 'change') {
         useStorage.setState({ search: newValue.toLowerCase() })
         debounceChange(newValue.toLowerCase())
       }
@@ -96,11 +94,11 @@ export function useSendSearch(search, open) {
 
   useEffect(() => {
     // This is just a reset upon initial open
-    if (open) {
+    if (open && map) {
       map.closePopup()
       if (search) sendToServer(search)
     }
-  }, [open])
+  }, [open, map])
 
   useEffect(() => {
     // Handles when a tab changes and we want to send another search

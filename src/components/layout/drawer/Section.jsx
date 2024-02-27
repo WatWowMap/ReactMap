@@ -29,7 +29,7 @@ const ADV_CATEGORIES = new Set(['pokemon', 'gyms', 'pokestops', 'nests'])
 const DrawerSection = ({ category }) => {
   const { t } = useTranslation()
   const sidebar = useStorage((s) => s.sidebar === category)
-  const staticUserSettings = useMemory((s) => !!s.userSettings[category])
+  const staticUserSettings = useMemory((s) => !!s.clientMenus[category])
   const drawer = useLayoutStore((s) => s.drawer)
   const value = useMemory((s) => s.ui[category])
 

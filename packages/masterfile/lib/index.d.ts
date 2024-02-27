@@ -5,6 +5,7 @@ export interface MasterfileForm {
   rarity?: string
   isCostume?: boolean
   category?: AdvCategories
+  types?: number[]
 }
 
 export interface MasterfilePokemon {

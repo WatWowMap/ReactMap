@@ -9,13 +9,13 @@ import UAssets from '@services/Icons'
 import { useMemory } from './useMemory'
 import { useStorage } from './useStorage'
 
-export default function useRefresh() {
+export default function useRefresh(once = false) {
   const active = useMemory((s) => s.active)
   const online = useMemory((s) => s.online)
 
   const hasIcons = useMemory((s) => !!s.Icons)
 
-  const { data, stopPolling, startPolling, refetch, error } = useQuery(
+  const { data, loading, stopPolling, startPolling, refetch, error } = useQuery(
     getMapData,
     {
       fetchPolicy: active && online ? 'network-only' : 'cache-only',
@@ -23,11 +23,11 @@ export default function useRefresh() {
   )
 
   useEffect(() => {
-    if (active && online) {
+    if (active && online && !once) {
       startPolling(1000 * 60 * 60)
       return () => stopPolling()
     }
-  }, [active, online])
+  }, [active, online, once])
 
   useEffect(() => {
     if (!hasIcons && online) {
@@ -104,4 +104,6 @@ export default function useRefresh() {
       }))
     }
   }, [data])
+
+  return loading
 }

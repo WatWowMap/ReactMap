@@ -173,7 +173,22 @@ const mergeMapConfig = (input = {}) => {
 
   /** @type {import('@rm/types').Config['map']} */
   const merged = config.util.extendDeep({}, base, input)
-
+  if (
+    merged.misc.distanceUnit !== 'kilometers' &&
+    merged.misc.distanceUnit !== 'miles'
+  ) {
+    log.warn(
+      HELPERS.config,
+      `Invalid distanceUnit: ${merged.misc.distanceUnit}, only 'kilometers' OR 'miles' are allowed.`,
+    )
+    if (merged.misc.distance === 'km') {
+      merged.misc.distanceUnit = 'kilometers'
+    } else if (merged.misc.distance === 'mi') {
+      merged.misc.distanceUnit = 'miles'
+    } else {
+      merged.misc.distanceUnit = 'kilometers'
+    }
+  }
   merged.general.menuOrder = merged?.general?.menuOrder
     ? merged.general.menuOrder.filter((x) => allowedMenuItems.includes(x))
     : []
