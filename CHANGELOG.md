@@ -1,3 +1,10 @@
+# [1.30.0-develop.12](https://github.com/WatWowMap/ReactMap/compare/v1.30.0-develop.11...v1.30.0-develop.12) (2024-02-29)
+
+
+### Bug Fixes
+
+* improved jsdocs for search method ([5dcf288](https://github.com/WatWowMap/ReactMap/commit/5dcf28810be5ad1063abee7ae234993a3c42be57))
+
 # [1.30.0-develop.11](https://github.com/WatWowMap/ReactMap/compare/v1.30.0-develop.10...v1.30.0-develop.11) (2024-02-27)
 
 
