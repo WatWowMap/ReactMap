@@ -431,10 +431,16 @@ module.exports = class DbCheck {
 
   /**
    * @template {import("@rm/types").BaseRecord} T
-   * @param {import("../models").ScannerModelKeys} model
+   * @template {import("../models").ScannerModelKeys} U
+   * @param {U} model
    * @param {import("@rm/types").Permissions} perms
    * @param {object} args
-   * @param {'search' | string} method
+   * @param {U extends 'Gym' ? 'searchRaids' | 'search'
+   *  : U extends 'Pokestop' ? 'searchInvasions' | 'searchQuests' | 'searchLures' | 'search'
+   *  : U extends 'Pokemon' ? 'search'
+   *  : U extends 'Portal' ? 'search'
+   *  : U extends 'Nest' ? 'search'
+   *  : never} method
    * @returns {Promise<T[]>}
    */
   async search(model, perms, args, method = 'search') {
