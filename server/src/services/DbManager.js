@@ -436,7 +436,21 @@ class DbManager extends Logger {
     let deDuped = []
     let count = 0
     let distance = softLimit
-    const max = model === 'Pokemon' ? hardLimit / 2 : hardLimit
+    let max = hardLimit
+    switch (model) {
+      case 'Pokemon':
+        max = hardLimit / 2
+        break
+      case 'Gym':
+      case 'Nest':
+      case 'Pokestop':
+      case 'Portal':
+      case 'Route':
+        max = Infinity
+        break
+      default:
+        break
+    }
     const startTime = Date.now()
     while (deDuped.length < searchLimit) {
       const loopTime = Date.now()
