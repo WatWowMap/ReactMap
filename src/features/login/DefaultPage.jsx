@@ -9,7 +9,7 @@ import { styled } from '@mui/material/styles'
 import { useMemory } from '@hooks/useMemory'
 import LocaleSelection from '@components/layout/general/LocaleSelection'
 
-import Methods from './Methods'
+import methods from './Methods'
 
 const StyledDivider = styled(Divider)(({ theme }) => ({
   margin: theme.spacing(3, 0),
@@ -44,18 +44,12 @@ export function DefaultLoginPage() {
             {t('welcome')} {headerTitle}
           </Typography>
         </Grid>
-        {authMethods.map((method, index, { length }) => {
-          const showDivider = !!(index && length)
-          const Component = Methods[method]
-          return (
-            Component && (
-              <>
-                {showDivider && <StyledDivider />}
-                <Component />
-              </>
-            )
-          )
-        })}
+        {authMethods.map((method, index) => (
+          <React.Fragment key={method}>
+            {!!index && <StyledDivider />}
+            {methods[method] || null}
+          </React.Fragment>
+        ))}
       </Grid>
       <Grid pb={2} width="min(50%, 300px)">
         <LocaleSelection />

@@ -1,4 +1,3 @@
-/* eslint-disable react/no-array-index-key */
 // @ts-check
 import * as React from 'react'
 import { Navigate } from 'react-router-dom'

@@ -60,10 +60,10 @@ function Local() {
   )
 }
 
-const Methods = {
-  discord: Discord,
-  telegram: Telegram,
-  local: Local,
+const methods = {
+  discord: <Discord />,
+  telegram: <Telegram />,
+  local: <Local />,
 }
 
-export default Methods
+export default methods
