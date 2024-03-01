@@ -5,7 +5,7 @@ import Divider from '@mui/material/Divider'
 import Grid from '@mui/material/Unstable_Grid2'
 import Utility from '@services/Utility'
 
-import DiscordLogin from '../auth/Discord'
+import DiscordButton from '../auth/Discord'
 import LocalLogin from '../auth/Local'
 import Telegram from '../auth/Telegram'
 import CustomText from './CustomText'
@@ -47,7 +47,7 @@ export default function Generator({ block = {}, defaultReturn = null }) {
         />
       )
     case 'discord':
-      return <DiscordLogin href={block.link}>{children}</DiscordLogin>
+      return <DiscordButton href={block.link}>{children}</DiscordButton>
     case 'localLogin':
       return (
         <LocalLogin

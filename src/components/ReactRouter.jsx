@@ -3,7 +3,7 @@ import * as React from 'react'
 import { Route, Routes } from 'react-router-dom'
 
 import Auth from './layout/auth/Auth'
-import Login from './layout/auth/Login'
+import Login from '../features/login'
 import Blocked from './layout/auth/Blocked'
 import Errors from './Errors'
 import DataManagement from '../features/data'
