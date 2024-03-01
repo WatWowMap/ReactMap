@@ -1,12 +1,12 @@
 // @ts-check
 import * as React from 'react'
 import Grid from '@mui/material/Unstable_Grid2'
+import { useTranslation } from 'react-i18next'
 
 import DiscordButton from '@components/layout/auth/Discord'
-import { useMemory } from '@hooks/useMemory'
-import { useTranslation } from 'react-i18next'
 import TelegramWidget from '@components/layout/auth/Telegram'
 import LocalLogin from '@components/layout/auth/Local'
+import { useMemory } from '@hooks/useMemory'
 
 function Discord() {
   const { t } = useTranslation()
