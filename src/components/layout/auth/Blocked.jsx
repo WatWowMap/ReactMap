@@ -17,7 +17,7 @@ import ListItemText from '@mui/material/ListItemText'
 
 import { useMemory } from '@hooks/useMemory'
 
-import DiscordLogin from './Discord'
+import DiscordButton from './Discord'
 import ThemeToggle from '../general/ThemeToggle'
 import { I } from '../general/I'
 
@@ -98,9 +98,9 @@ export default function Blocked() {
             {t('go_back')}
           </Button>
           {discordInvite && (
-            <DiscordLogin href={discordInvite} size="small">
+            <DiscordButton href={discordInvite} size="small">
               {t('join')}
-            </DiscordLogin>
+            </DiscordButton>
           )}
         </CardActions>
       </Card>

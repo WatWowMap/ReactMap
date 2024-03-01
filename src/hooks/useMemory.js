@@ -15,7 +15,7 @@ import { create } from 'zustand'
  *   auth: {
  *    perms: Partial<import('@rm/types').Permissions>,
  *    loggedIn: boolean,
- *    methods: string[],
+ *    methods: import('@rm/types').Strategy[],
  *    strategy: import('@rm/types').Strategy | '',
  *    userBackupLimits: number,
  *    excludeList: string[],

@@ -1,9 +1,9 @@
-# [1.2.0-develop.15](https://github.com/ReuschelCGN/ReactMap/compare/v1.2.0-develop.14...v1.2.0-develop.15) (2024-02-29)
+# [1.30.0-develop.13](https://github.com/WatWowMap/ReactMap/compare/v1.30.0-develop.12...v1.30.0-develop.13) (2024-03-01)
 
 
 ### Bug Fixes
 
-* improved jsdocs for search method ([5dcf288](https://github.com/ReuschelCGN/ReactMap/commit/5dcf28810be5ad1063abee7ae234993a3c42be57))
+* add missing `key` prop & simplify ([05be65c](https://github.com/WatWowMap/ReactMap/commit/05be65c93537c061c91db870f9f39a59da2684d1))
 
 # [1.30.0-develop.12](https://github.com/WatWowMap/ReactMap/compare/v1.30.0-develop.11...v1.30.0-develop.12) (2024-02-29)
 
