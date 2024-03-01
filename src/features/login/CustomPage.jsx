@@ -9,7 +9,7 @@ import { CUSTOM_COMPONENT } from '@services/queries/config'
 import CustomTile from '@components/layout/custom/CustomTile'
 import { Loading } from '@components/layout/general/Loading'
 
-export default function CustomLoginPage() {
+export function CustomLoginPage() {
   const { t, i18n } = useTranslation()
   const { data, loading } = useQuery(CUSTOM_COMPONENT, {
     fetchPolicy: 'cache-first',

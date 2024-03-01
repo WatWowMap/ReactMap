@@ -6,10 +6,11 @@ import Box from '@mui/material/Box'
 
 import { useMemory } from '@hooks/useMemory'
 import ThemeToggle from '@components/layout/general/ThemeToggle'
-import CustomLoginPage from './CustomPage'
+
+import { CustomLoginPage } from './CustomPage'
 import { DefaultLoginPage } from './DefaultPage'
 
-export default function Login() {
+export default function LoginPage() {
   const loggedIn = useMemory((s) => s.auth.loggedIn)
   const loginPage = useMemory((s) => s.config.loginPage)
 
