@@ -59,9 +59,15 @@ export default function LocalLogin({ href, sx, style }) {
   return (
     <Box sx={sx} style={style}>
       <form onSubmit={handleSubmit}>
-        <Grid container justifyContent="center" alignItems="center" spacing={2}>
+        <Grid
+          container
+          justifyContent="center"
+          alignItems="center"
+          direction="column"
+          spacing={2}
+        >
           <Grid textAlign="center">
-            <FormControl variant="outlined" color="secondary">
+            <FormControl variant="outlined" color="secondary" size="small">
               <InputLabel htmlFor="username">{t('local_username')}</InputLabel>
               <OutlinedInput
                 id="username"
@@ -80,7 +86,7 @@ export default function LocalLogin({ href, sx, style }) {
             </FormControl>
           </Grid>
           <Grid textAlign="center">
-            <FormControl variant="outlined" color="secondary">
+            <FormControl variant="outlined" color="secondary" size="small">
               <InputLabel htmlFor="password">{t('local_password')}</InputLabel>
               <OutlinedInput
                 id="password"
@@ -103,7 +109,6 @@ export default function LocalLogin({ href, sx, style }) {
                         setUser({ ...user, showPassword: !user.showPassword })
                       }
                       onMouseDown={(e) => e.preventDefault()}
-                      size="large"
                     >
                       {user.showPassword ? <Visibility /> : <VisibilityOff />}
                     </IconButton>
@@ -116,7 +121,6 @@ export default function LocalLogin({ href, sx, style }) {
             <Button
               variant="contained"
               color="primary"
-              size="large"
               onClick={handleSubmit}
               disabled={!user.username || !user.password || submitted}
             >

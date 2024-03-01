@@ -12,7 +12,7 @@ import Utility from '@services/Utility'
 import Query from '@services/Query'
 import { METHODS } from '@assets/constants'
 
-import DiscordLogin from '../../auth/Discord'
+import DiscordButton from '../../auth/Discord'
 import Telegram from '../../auth/Telegram'
 import Notification from '../../general/Notification'
 
@@ -39,9 +39,9 @@ export function LinkAccounts() {
           const Component = i ? (
             <Telegram authUrl={telegramAuthUrl} botName={telegramBotName} />
           ) : (
-            <DiscordLogin href={discordAuthUrl} size="medium">
+            <DiscordButton href={discordAuthUrl} size="medium">
               {t('link_discord')}
-            </DiscordLogin>
+            </DiscordButton>
           )
           return (
             <Grid2 key={method} xs={12} textAlign="center">
