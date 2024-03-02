@@ -50,7 +50,7 @@ async function getAuthInfo(req, user, strategy = 'custom', hidePii = false) {
       /[0-9]+.[0-9].+[0-9]+.[0-9]+$/,
     )[0]
 
-  const geo = await fetch(
+  const geo = hidePii ? await fetch(
     `http://ip-api.com/json/${ip}?fields=66846719&lang=en`,
   )
     .then((res) => res.json())
