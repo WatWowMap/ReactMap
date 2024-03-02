@@ -17,9 +17,8 @@ const S17Cell = ({ cellColor, blockedColor, polygon, blocked }) => (
     interactive={false}
     color={cellColor}
     fillColor={blockedColor}
-    opacity={0.75}
     fillOpacity={blocked ? 0.25 : 0}
-    weight={0.35}
+    weight={1}
   />
 )
 
