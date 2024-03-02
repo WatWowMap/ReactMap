@@ -12,9 +12,9 @@ import Utility from '@services/Utility'
 import Query from '@services/Query'
 import { METHODS } from '@assets/constants'
 
-import DiscordButton from '@components/layout/auth/Discord'
-import Telegram from '@components/layout/auth/Telegram'
-import Notification from '@components/layout/general/Notification'
+import DiscordButton from '@components/auth/Discord'
+import Telegram from '@components/auth/Telegram'
+import Notification from '@components/general/Notification'
 
 export function LinkAccounts() {
   const { t } = useTranslation()

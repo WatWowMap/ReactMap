@@ -11,11 +11,11 @@ import { getQueryArgs } from '@services/functions/getQueryArgs'
 import RobustTimeout from '@services/apollo/RobustTimeout'
 import Utility from '@services/Utility'
 import { FILTER_SKIP_LIST } from '@assets/constants'
+import * as index from '@components/tiles/index'
+import Notification from '@components/general/Notification'
+import { GenerateCells } from '@components/tiles/S2Cell'
 
-import * as index from '../../../components/tiles/index'
 import Clustering from './Clustering'
-import Notification from '../../../components/layout/general/Notification'
-import { GenerateCells } from '../../../components/tiles/S2Cell'
 
 /** @param {string} category */
 const userSettingsCategory = (category) => {

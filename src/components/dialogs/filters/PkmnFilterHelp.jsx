@@ -7,8 +7,8 @@ import Grid2 from '@mui/material/Unstable_Grid2'
 import { useTranslation } from 'react-i18next'
 import { Chip, Divider, useMediaQuery } from '@mui/material'
 
-import Header from '@components/layout/general/Header'
-import Footer from '@components/layout/general/Footer'
+import Header from '@components/general/Header'
+import Footer from '@components/general/Footer'
 import { useMemory } from '@hooks/useMemory'
 import { useLayoutStore } from '@hooks/useLayoutStore'
 
@@ -94,7 +94,7 @@ function Card({ title, children, bgcolor, fullSize }) {
 const handleClose = () => useLayoutStore.setState({ pkmnFilterHelp: false })
 
 const OPTIONS =
-  /** @type {import('@components/layout/general/Footer').FooterButton[]} */ ([
+  /** @type {import('@components/general/Footer').FooterButton[]} */ ([
     { name: 'close', color: 'error', action: handleClose },
   ])
 

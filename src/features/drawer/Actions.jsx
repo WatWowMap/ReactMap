@@ -19,8 +19,8 @@ import { useMapStore } from '@hooks/useMapStore'
 import { useMemory } from '@hooks/useMemory'
 import { useLayoutStore } from '@hooks/useLayoutStore'
 import { useStorage } from '@hooks/useStorage'
-import { I } from '../../components/layout/general/I'
-import { BasicListButton } from '../../components/layout/general/BasicListButton'
+import { I } from '@components/general/I'
+import { BasicListButton } from '@components/general/BasicListButton'
 
 /** @type {React.ChangeEventHandler<HTMLInputElement>} */
 const importSettings = (e) => {

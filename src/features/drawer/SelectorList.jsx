@@ -22,12 +22,12 @@ import { useMemory } from '@hooks/useMemory'
 import { useLayoutStore } from '@hooks/useLayoutStore'
 import { useDeepStore, useStorage } from '@hooks/useStorage'
 import useGetAvailable from '@hooks/useGetAvailable'
+import { VirtualGrid } from '@components/general/VirtualGrid'
+import TabPanel from '@components/general/TabPanel'
 
 import { BoolToggle } from './BoolToggle'
 import { GenericSearchMemo } from './ItemSearch'
 import { StandardItem } from './SelectorItem'
-import { VirtualGrid } from '../../components/layout/general/VirtualGrid'
-import TabPanel from '../../components/layout/general/TabPanel'
 
 /**
  * @template {keyof import('@rm/types').Available} T

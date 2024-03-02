@@ -101,7 +101,7 @@ function UserOptions() {
 
   const footerOptions = React.useMemo(
     () =>
-      /** @type {import('@components/layout/general/Footer').FooterButton[]} */ ([
+      /** @type {import('@components/general/Footer').FooterButton[]} */ ([
         {
           name: 'reset',
           action: () => {

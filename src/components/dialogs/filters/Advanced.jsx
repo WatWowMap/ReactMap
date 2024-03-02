@@ -8,8 +8,8 @@ import Utility from '@services/Utility'
 import { useMemory } from '@hooks/useMemory'
 import { useLayoutStore } from '@hooks/useLayoutStore'
 import { useDeepStore, useStorage } from '@hooks/useStorage'
-import Header from '@components/layout/general/Header'
-import Footer from '@components/layout/general/Footer'
+import Header from '@components/general/Header'
+import Footer from '@components/general/Footer'
 import { BoolToggle, DualBoolToggle } from '@features/drawer/BoolToggle'
 import { ENABLED_ALL, XXS_XXL } from '@assets/constants'
 import { useTranslateById } from '@hooks/useTranslateById'
@@ -79,7 +79,7 @@ export default function AdvancedFilter() {
     }
   }
 
-  /** @type {import('@components/layout/general/Footer').FooterButton[]} */
+  /** @type {import('@components/general/Footer').FooterButton[]} */
   const footerOptions = React.useMemo(
     () => [
       {

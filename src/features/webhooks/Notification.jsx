@@ -1,6 +1,6 @@
 // @ts-check
 import * as React from 'react'
-import Notification from '@components/layout/general/Notification'
+import Notification from '@components/general/Notification'
 
 import { resetAlert, useWebhookStore } from './store'
 

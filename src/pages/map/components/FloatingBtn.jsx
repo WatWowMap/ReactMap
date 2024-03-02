@@ -31,7 +31,7 @@ import { useLayoutStore } from '@hooks/useLayoutStore'
 import { useStorage } from '@hooks/useStorage'
 import { useScanStore } from '@features/scanner/store'
 
-import { I } from '@components/layout/general/I'
+import { I } from '@components/general/I'
 import { setModeBtn, useWebhookStore } from '@features/webhooks/store'
 
 /** @typedef {keyof ReturnType<typeof useLayoutStore['getState']> | keyof ReturnType<typeof useScanStore['getState']>} Keys */

@@ -31,9 +31,9 @@ import Query from '@services/Query'
 import Utility from '@services/Utility'
 import Poracle from '@services/Poracle'
 
-import SliderTile from '@components/layout/dialogs/filters/SliderTile'
-import Header from '@components/layout/general/Header'
-import Footer from '@components/layout/general/Footer'
+import SliderTile from '@components/dialogs/filters/SliderTile'
+import Header from '@components/general/Header'
+import Footer from '@components/general/Footer'
 import { useWebhookStore } from './store'
 
 const skipFields = new Set([

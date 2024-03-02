@@ -13,7 +13,7 @@ import { useMutation } from '@apollo/client'
 import { useMemory } from '@hooks/useMemory'
 import { useStorage } from '@hooks/useStorage'
 import Query from '@services/Query'
-import Header from '@components/layout/general/Header'
+import Header from '@components/general/Header'
 
 import Welcome from './Welcome'
 import Advanced from './Advanced'

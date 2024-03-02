@@ -4,7 +4,7 @@ import { Button, ButtonGroup, Slider, List, ListItem } from '@mui/material'
 import { useTranslation } from 'react-i18next'
 import { debounce } from 'lodash'
 
-import AdvancedAccordion from '@components/layout/custom/AdvancedAccordion'
+import AdvancedAccordion from '@components/custom/AdvancedAccordion'
 import { RADIUS_CHOICES } from '@assets/constants'
 
 import { StyledSubHeader } from '../Shared'

@@ -10,9 +10,9 @@ import { useMemory } from '@hooks/useMemory'
 import { useLayoutStore } from '@hooks/useLayoutStore'
 import Query from '@services/Query'
 
-import { VirtualGrid } from '@components/layout/general/VirtualGrid'
-import { Img } from '@components/layout/general/Img'
-import { ToggleTypography } from '@components/layout/general/ToggleTypography'
+import { VirtualGrid } from '@components/general/VirtualGrid'
+import { Img } from '@components/general/Img'
+import { ToggleTypography } from '@components/general/ToggleTypography'
 
 export function UserGymBadges() {
   const { t } = useTranslation()

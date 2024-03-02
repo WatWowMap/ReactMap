@@ -21,7 +21,7 @@ import { useTranslation } from 'react-i18next'
 import Utility from '@services/Utility'
 import { useMemory } from '@hooks/useMemory'
 
-import { VirtualGrid } from '@components/layout/general/VirtualGrid'
+import { VirtualGrid } from '@components/general/VirtualGrid'
 import { StandardItem } from '@features/drawer/SelectorItem'
 import data from './data'
 

@@ -6,7 +6,7 @@ import Divider from '@mui/material/Divider'
 import Button from '@mui/material/Button'
 import { useTranslation } from 'react-i18next'
 
-import { Loading } from '@components/layout/general/Loading'
+import { Loading } from '@components/general/Loading'
 
 import { useGetAreas } from '../../hooks'
 import { MemoAreaChip, handleClick } from './AreaChip'

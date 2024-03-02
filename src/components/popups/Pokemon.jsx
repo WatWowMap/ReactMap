@@ -22,7 +22,7 @@ import { useMemory } from '@hooks/useMemory'
 import { setDeepStore, useStorage } from '@hooks/useStorage'
 import Utility from '@services/Utility'
 import ErrorBoundary from '@components/ErrorBoundary'
-import { TextWithIcon } from '@components/layout/general/Img'
+import { TextWithIcon } from '@components/general/Img'
 
 import NameTT from './common/NameTT'
 import GenderIcon from './common/GenderIcon'

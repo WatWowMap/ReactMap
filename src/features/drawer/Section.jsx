@@ -15,13 +15,13 @@ import { useMemory } from '@hooks/useMemory'
 import { toggleDialog, useLayoutStore } from '@hooks/useLayoutStore'
 import { useStorage } from '@hooks/useStorage'
 import Utility from '@services/Utility'
+import { BasicListButton } from '@components/general/BasicListButton'
 
 import SettingsMenu from './Settings'
 import { PokemonDrawerMemo } from './Pokemon'
 import Areas from './areas'
 import Extras from './Extras'
 import { BoolToggle } from './BoolToggle'
-import { BasicListButton } from '../../components/layout/general/BasicListButton'
 
 const ADV_CATEGORIES = new Set(['pokemon', 'gyms', 'pokestops', 'nests'])
 

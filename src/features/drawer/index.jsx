@@ -10,11 +10,11 @@ import ListItemIcon from '@mui/material/ListItemIcon'
 
 import { useMemory } from '@hooks/useMemory'
 import { useLayoutStore } from '@hooks/useLayoutStore'
+import { Img } from '@components/general/Img'
+import { DividerWithMargin } from '@components/general/StyledDivider'
 
 import Actions from './Actions'
 import { DrawerSectionMemo } from './Section'
-import { Img } from '../../components/layout/general/Img'
-import { DividerWithMargin } from '../../components/layout/general/StyledDivider'
 
 const handleClose = () => useLayoutStore.setState({ drawer: false })
 

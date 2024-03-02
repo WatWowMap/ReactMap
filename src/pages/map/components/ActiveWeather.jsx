@@ -12,9 +12,9 @@ import WeatherPopup from '@components/popups/Weather'
 import { useMemory } from '@hooks/useMemory'
 import { useStorage } from '@hooks/useStorage'
 import { apolloClient } from '@services/apollo'
-import Header from '@components/layout/general/Header'
-import Footer from '@components/layout/general/Footer'
-import { Img } from '@components/layout/general/Img'
+import Header from '@components/general/Header'
+import Footer from '@components/general/Footer'
+import { Img } from '@components/general/Img'
 
 const StyledBox = styled(Box)(({ theme }) => ({
   zIndex: 1000,
@@ -67,7 +67,7 @@ export default function ActiveWeather() {
 
   const footerOptions = React.useMemo(
     () =>
-      /** @type {import('../../../components/layout/general/Footer').FooterButton[]} */ ([
+      /** @type {import('../../../components/general/Footer').FooterButton[]} */ ([
         {
           name: 'close',
           action: () => setOpen(false),

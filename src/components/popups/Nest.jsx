@@ -18,7 +18,7 @@ import { useLayoutStore } from '@hooks/useLayoutStore'
 import { setDeepStore } from '@hooks/useStorage'
 import Utility from '@services/Utility'
 import ErrorBoundary from '@components/ErrorBoundary'
-import NestSubmission from '@components/layout/dialogs/NestSubmission'
+import NestSubmission from '@components/dialogs/NestSubmission'
 
 const getColor = (timeSince) => {
   let color = 'success'

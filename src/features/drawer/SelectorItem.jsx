@@ -11,11 +11,11 @@ import { useLayoutStore } from '@hooks/useLayoutStore'
 import { useDeepStore, useStorage } from '@hooks/useStorage'
 import { checkIfHasAll } from '@services/functions/hasAll'
 import Poracle from '@services/Poracle'
+import { ColoredTile } from '@components/general/ColoredTile'
+import { ToggleTypography } from '@components/general/ToggleTypography'
+import { SQUARE_ITEM } from '@components/general/VirtualGrid'
 
-import { ColoredTile } from '../../components/layout/general/ColoredTile'
 import { useWebhookStore } from '../webhooks/store'
-import { ToggleTypography } from '../../components/layout/general/ToggleTypography'
-import { SQUARE_ITEM } from '../../components/layout/general/VirtualGrid'
 
 /**
  * @template {string} T
@@ -96,6 +96,7 @@ export function WebhookItem({ id, category, ...props }) {
         useWebhookStore.setState({
           advanced: {
             id,
+            uid: 0,
             open: true,
             category,
             selectedIds: [],

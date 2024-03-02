@@ -4,7 +4,7 @@ import List from '@mui/material/List'
 import { Popup } from 'react-leaflet'
 import { useTranslation } from 'react-i18next'
 
-import { DividerWithMargin } from '@components/layout/general/StyledDivider'
+import { DividerWithMargin } from '@components/general/StyledDivider'
 
 import {
   InAllowedArea,

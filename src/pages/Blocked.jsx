@@ -17,9 +17,9 @@ import ListItemText from '@mui/material/ListItemText'
 
 import { useMemory } from '@hooks/useMemory'
 
-import DiscordButton from '@components/layout/auth/Discord'
-import ThemeToggle from '@components/layout/general/ThemeToggle'
-import { I } from '@components/layout/general/I'
+import DiscordButton from '@components/auth/Discord'
+import ThemeToggle from '@components/general/ThemeToggle'
+import { I } from '@components/general/I'
 
 export default function BlockedPage() {
   const { t } = useTranslation()

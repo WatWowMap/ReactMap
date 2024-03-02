@@ -33,11 +33,11 @@ import {
   getPermission,
   requestPermission,
 } from '@services/desktopNotification'
+import LocaleSelection from '@components/general/LocaleSelection'
+import { DividerWithMargin } from '@components/general/StyledDivider'
 
 import DrawerActions from './Actions'
 import { BoolToggle } from './BoolToggle'
-import LocaleSelection from '../../components/layout/general/LocaleSelection'
-import { DividerWithMargin } from '../../components/layout/general/StyledDivider'
 
 function FCSelect({ name, label, value, onChange, children, icon }) {
   return (

@@ -12,7 +12,7 @@ import IconButton from '@mui/material/IconButton'
 import { withTranslation } from 'react-i18next'
 
 import Fetch from '@services/Fetch'
-import Notification from './layout/general/Notification'
+import Notification from './general/Notification'
 
 /** @type {React.CSSProperties} */
 const defaultStyle = {

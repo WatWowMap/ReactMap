@@ -8,7 +8,7 @@ import { useMemory } from '@hooks/useMemory'
 import { useStorage } from '@hooks/useStorage'
 import getRewardInfo from '@services/functions/getRewardInfo'
 import { useTranslateById } from '@hooks/useTranslateById'
-import { Img } from '@components/layout/general/Img'
+import { Img } from '@components/general/Img'
 
 /** @param {Partial<import('@rm/types').Quest>} props */
 function QuestImage(props) {

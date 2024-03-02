@@ -4,8 +4,8 @@ import * as React from 'react'
 import Grid from '@mui/material/Unstable_Grid2'
 import { useTranslation } from 'react-i18next'
 
-import CustomTile from '@components/layout/custom/CustomTile'
-import DialogWrapper from '@components/layout/custom/DialogWrapper'
+import CustomTile from '@components/custom/CustomTile'
+import DialogWrapper from '@components/custom/DialogWrapper'
 import ErrorBoundary from '@components/ErrorBoundary'
 
 import { useSafeParse } from '../hooks/useSafeParse'

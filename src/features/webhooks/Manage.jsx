@@ -14,8 +14,8 @@ import { useMemory } from '@hooks/useMemory'
 import { useLayoutStore } from '@hooks/useLayoutStore'
 import Poracle from '@services/Poracle'
 import Utility from '@services/Utility'
-import Footer from '@components/layout/general/Footer'
-import Header from '@components/layout/general/Header'
+import Footer from '@components/general/Footer'
+import Header from '@components/general/Header'
 import { apolloClient } from '@services/apollo'
 import Query from '@services/Query'
 import { allProfiles } from '@services/queries/webhook'
@@ -23,7 +23,7 @@ import { WebhookItem } from '@features/drawer/SelectorItem'
 
 import Human from './human'
 import Tracked from './Tracked'
-import Menu from '../../components/layout/general/Menu'
+import Menu from '../../components/general/Menu'
 import { setMode, setSelected, useWebhookStore } from './store'
 import { useGenFullFilters, useGetHookContext } from './hooks'
 import ProfileEditing from './human/profile'
@@ -46,7 +46,7 @@ export default function Manage() {
   const [height, setHeight] = React.useState(0)
 
   const footerButtons = React.useMemo(() => {
-    /** @type {import('@components/layout/general/Footer').FooterButton[]} */
+    /** @type {import('@components/general/Footer').FooterButton[]} */
     const buttons = [
       {
         name: 'feedback',

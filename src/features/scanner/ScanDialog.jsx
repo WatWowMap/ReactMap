@@ -3,8 +3,8 @@ import * as React from 'react'
 import { Dialog, DialogContent, Typography } from '@mui/material'
 import { useTranslation } from 'react-i18next'
 
-import Header from '@components/layout/general/Header'
-import Footer from '@components/layout/general/Footer'
+import Header from '@components/general/Header'
+import Footer from '@components/general/Footer'
 import { SCAN_MODES } from '@assets/constants'
 
 import { useScanStore } from './store'
@@ -28,7 +28,7 @@ export default function ScanDialog() {
 
   const footerOptions = React.useMemo(
     () =>
-      /** @type {import('@components/layout/general/Footer').FooterButton[]} */ ([
+      /** @type {import('@components/general/Footer').FooterButton[]} */ ([
         {
           name: 'close',
           icon: 'Clear',

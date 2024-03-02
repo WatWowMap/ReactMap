@@ -1,6 +1,6 @@
 // @ts-check
 import * as React from 'react'
-import Menu from '@components/layout/general/Menu'
+import Menu from '@components/general/Menu'
 
 import { toggleDialog, useLayoutStore } from '@hooks/useLayoutStore'
 import { useStorage } from '@hooks/useStorage'
@@ -16,7 +16,7 @@ export default function FilterMenu() {
 
   const extraButtons = React.useMemo(
     () =>
-      /** @type {import('@components/layout/general/Footer').FooterButton[]} */ ([
+      /** @type {import('@components/general/Footer').FooterButton[]} */ ([
         {
           name: 'close',
           action: toggleDialog(false, category, 'filters'),

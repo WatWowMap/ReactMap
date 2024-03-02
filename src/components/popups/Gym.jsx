@@ -21,7 +21,7 @@ import { setDeepStore, useStorage } from '@hooks/useStorage'
 import useWebhook from '@hooks/useWebhook'
 import Utility from '@services/Utility'
 import ErrorBoundary from '@components/ErrorBoundary'
-import { TextWithIcon } from '@components/layout/general/Img'
+import { TextWithIcon } from '@components/general/Img'
 
 import Title from './common/Title'
 import PowerUp from './common/PowerUp'

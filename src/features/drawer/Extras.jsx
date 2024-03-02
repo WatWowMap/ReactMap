@@ -19,9 +19,9 @@ import {
   ENUM_TTH,
   WAYFARER_OPTIONS,
 } from '@assets/constants'
+import SliderTile from '@components/dialogs/filters/SliderTile'
 
 import { MultiSelectorStore } from './MultiSelector'
-import SliderTile from '../../components/layout/dialogs/filters/SliderTile'
 import { CollapsibleItem } from './CollapsibleItem'
 import { MultiSelectorList, SelectorListMemo } from './SelectorList'
 import { BoolToggle } from './BoolToggle'
