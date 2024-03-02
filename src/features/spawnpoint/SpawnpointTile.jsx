@@ -1,18 +1,19 @@
 // @ts-check
 /* eslint-disable react/destructuring-assignment */
 import * as React from 'react'
-import spawnpointMarker from '@components/markers/spawnpoints'
 import { Marker, Circle, Popup } from 'react-leaflet'
 
 import { useMemory } from '@hooks/useMemory'
-import PopupContent from '../popups/Spawnpoint'
+
+import { SpawnpointPopup } from './SpawnpointPopup'
+import { spawnpointMarker } from './spawnpointMarker'
 
 /**
  *
  * @param {import('@rm/types').Spawnpoint} item
  * @returns
  */
-const SpawnpointTile = (item) => {
+const BaseSpawnpointTile = (item) => {
   const Icons = useMemory((state) => state.Icons)
   const [modifiers] = Icons.getModifiers('spawnpoint')
   const size = Icons.getSize('spawnpoint') * modifiers.sizeMultiplier
@@ -27,7 +28,7 @@ const SpawnpointTile = (item) => {
       )}
     >
       <Popup position={[item.lat, item.lon]}>
-        <PopupContent {...item} />
+        <SpawnpointPopup {...item} />
       </Popup>
     </Marker>
   ) : (
@@ -37,15 +38,13 @@ const SpawnpointTile = (item) => {
       color={item.despawn_sec ? 'green' : 'red'}
     >
       <Popup position={[item.lat, item.lon]}>
-        <PopupContent {...item} />
+        <SpawnpointPopup {...item} />
       </Popup>
     </Circle>
   )
 }
-const MemoSpawnpoint = React.memo(
-  SpawnpointTile,
+export const SpawnpointTile = React.memo(
+  BaseSpawnpointTile,
   (prev, next) =>
     prev.despawn_sec === next.despawn_sec && prev.updated === next.updated,
 )
-
-export default MemoSpawnpoint
