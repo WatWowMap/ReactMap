@@ -15,7 +15,7 @@ import {
   WEBHOOK_USER,
   allProfiles,
 } from '@services/queries/webhook'
-import { Loading } from '@components/general/Loading'
+import { Loading } from '@components/Loading'
 
 import { useGetWebhookData } from '../../hooks'
 import { useWebhookStore } from '../../store'

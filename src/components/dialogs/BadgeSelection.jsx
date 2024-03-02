@@ -10,8 +10,8 @@ import { ENUM_BADGES } from '@assets/constants'
 import { useLayoutStore } from '@hooks/useLayoutStore'
 import { MultiSelector } from '@features/drawer/MultiSelector'
 
-import Header from '../general/Header'
-import Footer from '../general/Footer'
+import Header from '../Header'
+import Footer from '../Footer'
 
 const handleClose = () =>
   useLayoutStore.setState({
@@ -22,15 +22,14 @@ const handleClose = () =>
     },
   })
 
-const footerOptions =
-  /** @type {import('../general/Footer').FooterButton[]} */ ([
-    {
-      name: 'close',
-      action: handleClose,
-      color: 'primary',
-      align: 'right',
-    },
-  ])
+const footerOptions = /** @type {import('../Footer').FooterButton[]} */ ([
+  {
+    name: 'close',
+    action: handleClose,
+    color: 'primary',
+    align: 'right',
+  },
+])
 
 export default function BadgeSelection() {
   const { gymId, badge, open } = useLayoutStore((s) => s.gymBadge)

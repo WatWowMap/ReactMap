@@ -8,7 +8,7 @@ import { styled } from '@mui/material/styles'
 import CheckIcon from '@mui/icons-material/Check'
 import ClearIcon from '@mui/icons-material/Clear'
 
-import { BasicListButton } from '@components/general/BasicListButton'
+import { BasicListButton } from '@components/BasicListButton'
 
 import { setNotification, useDataManagementStore } from '../hooks/store'
 

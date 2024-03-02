@@ -14,7 +14,7 @@ import { METHODS } from '@assets/constants'
 
 import DiscordButton from '@components/auth/Discord'
 import Telegram from '@components/auth/Telegram'
-import Notification from '@components/general/Notification'
+import Notification from '@components/Notification'
 
 export function LinkAccounts() {
   const { t } = useTranslation()

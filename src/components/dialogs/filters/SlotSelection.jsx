@@ -10,11 +10,11 @@ import Divider from '@mui/material/Divider'
 import { basicEqualFn, useMemory } from '@hooks/useMemory'
 import { useLayoutStore } from '@hooks/useLayoutStore'
 import { useStorage, useDeepStore } from '@hooks/useStorage'
-import { Img } from '@components/general/Img'
+import { Img } from '@components/Img'
 import { DualBoolToggle } from '@features/drawer/BoolToggle'
 import { ENABLED_ALL } from '@assets/constants'
-import Header from '@components/general/Header'
-import Footer from '@components/general/Footer'
+import Header from '@components/Header'
+import Footer from '@components/Footer'
 import Size from './Size'
 
 import { DialogWrapper } from '../DialogWrapper'
@@ -67,7 +67,7 @@ export default function SlotSelection() {
 
   const footerOptions = React.useMemo(
     () =>
-      /** @type {import('@components/general/Footer').FooterButton[]} */ ([
+      /** @type {import('@components/Footer').FooterButton[]} */ ([
         {
           name: 'disable_all',
           action: () => handleSizeChange(false, id),

@@ -7,7 +7,7 @@ import { useQuery } from '@apollo/client'
 
 import { CUSTOM_COMPONENT } from '@services/queries/config'
 import CustomTile from '@components/custom/CustomTile'
-import { Loading } from '@components/general/Loading'
+import { Loading } from '@components/Loading'
 
 export function CustomLoginPage() {
   const { t, i18n } = useTranslation()

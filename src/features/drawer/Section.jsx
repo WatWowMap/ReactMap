@@ -15,7 +15,7 @@ import { useMemory } from '@hooks/useMemory'
 import { toggleDialog, useLayoutStore } from '@hooks/useLayoutStore'
 import { useStorage } from '@hooks/useStorage'
 import Utility from '@services/Utility'
-import { BasicListButton } from '@components/general/BasicListButton'
+import { BasicListButton } from '@components/BasicListButton'
 
 import SettingsMenu from './Settings'
 import { PokemonDrawerMemo } from './Pokemon'

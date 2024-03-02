@@ -9,21 +9,20 @@ import { useTranslation } from 'react-i18next'
 
 import { useLayoutStore } from '@hooks/useLayoutStore'
 
-import Header from '../general/Header'
-import Footer from '../general/Footer'
+import Header from '../Header'
+import Footer from '../Footer'
 import { DialogWrapper } from './DialogWrapper'
 
 const handleClose = () => useLayoutStore.setState({ resetFilters: false })
 
-const FOOTER_OPTIONS =
-  /** @type {import('../general/Footer').FooterButton[]} */ ([
-    {
-      name: 'close',
-      action: handleClose,
-      color: 'primary',
-      align: 'right',
-    },
-  ])
+const FOOTER_OPTIONS = /** @type {import('../Footer').FooterButton[]} */ ([
+  {
+    name: 'close',
+    action: handleClose,
+    color: 'primary',
+    align: 'right',
+  },
+])
 
 export default function ResetFilters() {
   const { t } = useTranslation()

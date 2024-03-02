@@ -3,7 +3,7 @@ import * as React from 'react'
 import Grid from '@mui/material/Unstable_Grid2'
 import { useTranslation } from 'react-i18next'
 
-import { Loading } from '@components/general/Loading'
+import { Loading } from '@components/Loading'
 
 import { useGetWebhookData } from '../../hooks'
 import { MemoNewProfile } from './NewProfile'

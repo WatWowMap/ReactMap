@@ -5,7 +5,7 @@ import Supercluster from 'supercluster'
 import { marker, divIcon, point } from 'leaflet'
 import { useMemory } from '@hooks/useMemory'
 import { useStorage } from '@hooks/useStorage'
-import Notification from '@components/general/Notification'
+import Notification from '@components/Notification'
 
 const IGNORE_CLUSTERING = new Set([
   'devices',

@@ -11,18 +11,15 @@ import { useMemory } from '@hooks/useMemory'
 import { useLayoutStore } from '@hooks/useLayoutStore'
 import { useStorage } from '@hooks/useStorage'
 import useFilter from '@hooks/useFilter'
-import Header from '@components/general/Header'
-import Footer from '@components/general/Footer'
+import Header from '@components/Header'
+import Footer from '@components/Footer'
 import { applyToAll } from '@services/filtering/applyToAll'
 import useGetAvailable from '@hooks/useGetAvailable'
 
-import OptionsContainer from '../dialogs/filters/OptionsContainer'
+import OptionsContainer from './dialogs/filters/OptionsContainer'
 import { VirtualGrid } from './VirtualGrid'
-import { GenericSearch } from '../../features/drawer/ItemSearch'
-import {
-  applyToAllWebhooks,
-  useWebhookStore,
-} from '../../features/webhooks/store'
+import { GenericSearch } from '../features/drawer/ItemSearch'
+import { applyToAllWebhooks, useWebhookStore } from '../features/webhooks/store'
 
 /**
  * @template {import('@rm/types').AdvCategories} T
@@ -34,7 +31,7 @@ import {
  *  categories?: import('@rm/types').Available[]
  *  title: string
  *  titleAction: () => void
- *  extraButtons?: import('@components/general/Footer').FooterButton[]
+ *  extraButtons?: import('@components/Footer').FooterButton[]
  * }} props
  */
 export default function Menu({
@@ -79,7 +76,7 @@ export default function Menu({
 
   const footerButtons = React.useMemo(
     () =>
-      /** @type {import('@components/general/Footer').FooterButton[]} */ ([
+      /** @type {import('@components/Footer').FooterButton[]} */ ([
         {
           name: 'help',
           action: () =>

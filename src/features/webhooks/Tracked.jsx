@@ -6,7 +6,7 @@ import { Virtuoso } from 'react-virtuoso'
 import Typography from '@mui/material/Typography'
 
 import Box from '@mui/material/Box'
-import { Loading } from '@components/general/Loading'
+import { Loading } from '@components/Loading'
 import { GenericSearch } from '@features/drawer/ItemSearch'
 
 import TrackedTile from './tiles/TrackedTile'

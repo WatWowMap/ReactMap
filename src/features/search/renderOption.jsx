@@ -6,10 +6,10 @@ import ListItemIcon from '@mui/material/ListItemIcon'
 import ListItemText from '@mui/material/ListItemText'
 import Grid2 from '@mui/material/Unstable_Grid2/Grid2'
 
-import { Img } from '@components/general/Img'
+import { Img } from '@components/Img'
 import { useMemory } from '@hooks/useMemory'
 import { useStorage } from '@hooks/useStorage'
-import { RawQuestTitle } from '@components/general/QuestTitle'
+import { RawQuestTitle } from '@components/QuestTitle'
 
 import { Divider, Typography } from '@mui/material'
 import Utility from '@services/Utility'

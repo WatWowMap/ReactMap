@@ -4,7 +4,7 @@ import { useQuery } from '@apollo/client'
 import { useTranslation } from 'react-i18next'
 
 import { WEBHOOK_GEOJSON } from '@services/queries/webhook'
-import { Loading } from '@components/general/Loading'
+import { Loading } from '@components/Loading'
 import MemoScanArea from '@components/tiles/ScanArea'
 
 import { useWebhookStore } from '../../store'

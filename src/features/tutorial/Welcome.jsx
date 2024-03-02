@@ -7,7 +7,7 @@ import { useTranslation } from 'react-i18next'
 
 import { useMemory } from '@hooks/useMemory'
 import { useLayoutStore } from '@hooks/useLayoutStore'
-import LocaleSelection from '@components/general/LocaleSelection'
+import LocaleSelection from '@components/LocaleSelection'
 
 export default function TutWelcome() {
   const { t } = useTranslation()

@@ -9,8 +9,8 @@ import Query from '@services/Query'
 import { useMemory } from '@hooks/useMemory'
 import { useLayoutStore } from '@hooks/useLayoutStore'
 
-import Header from '../general/Header'
-import Footer from '../general/Footer'
+import Header from '../Header'
+import Footer from '../Footer'
 
 export default function NestSubmission({ id, name }) {
   const open = useLayoutStore((s) => s.nestSubmissions)

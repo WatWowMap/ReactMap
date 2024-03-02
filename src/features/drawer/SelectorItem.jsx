@@ -11,9 +11,9 @@ import { useLayoutStore } from '@hooks/useLayoutStore'
 import { useDeepStore, useStorage } from '@hooks/useStorage'
 import { checkIfHasAll } from '@utils/hasAll'
 import Poracle from '@services/Poracle'
-import { ColoredTile } from '@components/general/ColoredTile'
-import { ToggleTypography } from '@components/general/ToggleTypography'
-import { SQUARE_ITEM } from '@components/general/VirtualGrid'
+import { ColoredTile } from '@components/ColoredTile'
+import { ToggleTypography } from '@components/ToggleTypography'
+import { SQUARE_ITEM } from '@components/VirtualGrid'
 
 import { useWebhookStore } from '../webhooks/store'
 

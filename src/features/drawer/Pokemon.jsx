@@ -27,9 +27,9 @@ import { useLayoutStore } from '@hooks/useLayoutStore'
 
 import { StringFilterMemo } from '@components/dialogs/filters/StringFilter'
 import SliderTile from '@components/dialogs/filters/SliderTile'
-import TabPanel from '@components/general/TabPanel'
+import TabPanel from '@components/TabPanel'
 import { GenderListItem } from '@components/dialogs/filters/Gender'
-import { BasicListButton } from '@components/general/BasicListButton'
+import { BasicListButton } from '@components/BasicListButton'
 
 import { SelectorListMemo } from './SelectorList'
 import { BoolToggle, DualBoolToggle } from './BoolToggle'

@@ -1,7 +1,7 @@
 import * as React from 'react'
 import Button from '@mui/material/Button'
 
-import { I } from '../general/I'
+import { I } from '../I'
 
 const THEME_COLORS = new Set([
   'success',

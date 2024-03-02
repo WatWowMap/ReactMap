@@ -18,7 +18,7 @@ import {
 import { useTranslation, Trans } from 'react-i18next'
 
 import ErrorBoundary from '@components/ErrorBoundary'
-import { Check, Help } from '@components/general/Icons'
+import { Check, Help } from '@components/Icons'
 import { useMemory } from '@hooks/useMemory'
 import { setDeepStore, useStorage } from '@hooks/useStorage'
 import Utility from '@services/Utility'

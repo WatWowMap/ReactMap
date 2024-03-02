@@ -13,7 +13,7 @@ import Utility from '@services/Utility'
 
 import DialogWrapper from '../custom/DialogWrapper'
 import CustomTile from '../custom/CustomTile'
-import { Loading } from '../general/Loading'
+import { Loading } from '../Loading'
 
 const DEFAULT =
   /** @type {import('@rm/types').Config['map']['messageOfTheDay']} */ ({

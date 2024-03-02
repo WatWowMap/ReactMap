@@ -6,7 +6,7 @@ import { useMemory } from '@hooks/useMemory'
 import { useDeepStore, useStorage } from '@hooks/useStorage'
 import { FormControl, InputLabel, Select, MenuItem } from '@mui/material'
 import Typography from '@mui/material/Typography'
-import QuestTitle from '@components/general/QuestTitle'
+import QuestTitle from '@components/QuestTitle'
 
 /**
  *

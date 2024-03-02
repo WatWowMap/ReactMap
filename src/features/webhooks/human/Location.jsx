@@ -18,7 +18,7 @@ import { useMapEvents } from 'react-leaflet'
 import { setHuman } from '@services/queries/webhook'
 import { WEBHOOK_NOMINATIM } from '@services/queries/geocoder'
 import useLocation from '@hooks/useLocation'
-import { Loading } from '@components/general/Loading'
+import { Loading } from '@components/Loading'
 import { basicEqualFn } from '@hooks/useMemory'
 
 import { setModeBtn, useWebhookStore } from '../store'

@@ -6,7 +6,7 @@ import TextField from '@mui/material/TextField'
 import Slider from '@mui/material/Slider'
 import { styled } from '@mui/material/styles'
 import { useTranslation } from 'react-i18next'
-import { ToggleTypography } from '@components/general/ToggleTypography'
+import { ToggleTypography } from '@components/ToggleTypography'
 import { MIN_MAX } from '@assets/constants'
 
 const StyledTextField =

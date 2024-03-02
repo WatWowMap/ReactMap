@@ -10,8 +10,8 @@ import ListItemIcon from '@mui/material/ListItemIcon'
 
 import { useMemory } from '@hooks/useMemory'
 import { useLayoutStore } from '@hooks/useLayoutStore'
-import { Img } from '@components/general/Img'
-import { DividerWithMargin } from '@components/general/StyledDivider'
+import { Img } from '@components/Img'
+import { DividerWithMargin } from '@components/StyledDivider'
 
 import Actions from './Actions'
 import { DrawerSectionMemo } from './Section'

@@ -2,7 +2,7 @@ import * as React from 'react'
 import Button from '@mui/material/Button'
 import { useTranslation } from 'react-i18next'
 
-import { I } from '../general/I'
+import { I } from '../I'
 
 /**
  *

@@ -10,7 +10,7 @@ import { useLayoutStore } from '@hooks/useLayoutStore'
 
 import DialogWrapper from '../custom/DialogWrapper'
 import CustomTile from '../custom/CustomTile'
-import { Loading } from '../general/Loading'
+import { Loading } from '../Loading'
 
 const DEFAULT = {
   settings: {},

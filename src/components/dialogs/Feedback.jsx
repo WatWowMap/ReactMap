@@ -10,8 +10,8 @@ import { useTranslation } from 'react-i18next'
 import { useMemory } from '@hooks/useMemory'
 import { useLayoutStore } from '@hooks/useLayoutStore'
 
-import Header from '../general/Header'
-import Footer from '../general/Footer'
+import Header from '../Header'
+import Footer from '../Footer'
 import { DialogWrapper } from './DialogWrapper'
 
 export default function Feedback() {
