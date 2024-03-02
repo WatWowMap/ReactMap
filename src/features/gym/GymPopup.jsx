@@ -23,13 +23,13 @@ import Utility from '@services/Utility'
 import ErrorBoundary from '@components/ErrorBoundary'
 import { TextWithIcon } from '@components/Img'
 
-import Title from './common/Title'
-import PowerUp from './common/PowerUp'
-import GenderIcon from './common/GenderIcon'
-import Navigation from './common/Navigation'
-import Coords from './common/Coords'
-import { TimeStamp } from './common/TimeStamps'
-import { ExtraInfo } from './common/ExtraInfo'
+import Title from '../../components/popups/common/Title'
+import PowerUp from '../../components/popups/common/PowerUp'
+import GenderIcon from '../../components/popups/common/GenderIcon'
+import Navigation from '../../components/popups/common/Navigation'
+import Coords from '../../components/popups/common/Coords'
+import { TimeStamp } from '../../components/popups/common/TimeStamps'
+import { ExtraInfo } from '../../components/popups/common/ExtraInfo'
 
 /**
  *
@@ -40,7 +40,7 @@ import { ExtraInfo } from './common/ExtraInfo'
  * } & import('@rm/types').Gym} props
  * @returns
  */
-export default function GymPopup({ hasRaid, hasHatched, raidIconUrl, ...gym }) {
+export function GymPopup({ hasRaid, hasHatched, raidIconUrl, ...gym }) {
   const { t } = useTranslation()
   const { perms } = useMemory((state) => state.auth)
   const popups = useStorage((state) => state.popups)

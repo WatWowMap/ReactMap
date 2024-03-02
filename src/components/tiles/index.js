@@ -1,7 +1,7 @@
 import { PokemonTile as pokemon } from '@features/pokemon'
 import { PokestopTile as pokestops } from '@features/pokestop/PokestopTile'
 import devices from './Device'
-import gyms from './Gym'
+import gyms from '../../features/gym/GymTile'
 import nests from './Nest'
 import portals from './Portal'
 import scanCells from './ScanCell'

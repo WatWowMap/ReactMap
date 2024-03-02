@@ -34,7 +34,7 @@ const getBadgeColor = (raidLevel) => {
  * } & import('@rm/types').Gym} params
  * @returns
  */
-export default function gymMarker({
+export function gymMarker({
   gymIconUrl,
   gymIconSize,
   raidIconUrl,

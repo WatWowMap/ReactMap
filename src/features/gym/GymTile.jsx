@@ -12,9 +12,9 @@ import useForcePopup from '@hooks/useForcePopup'
 import { sendNotification } from '@services/desktopNotification'
 import Utility from '@services/Utility'
 
-import gymMarker from '../markers/gym'
-import PopupContent from '../popups/Gym'
-import ToolTipWrapper from './Timer'
+import { gymMarker } from './gymMarker'
+import { GymPopup } from './GymPopup'
+import ToolTipWrapper from '../../components/tiles/Timer'
 
 /** @param {number} team */
 const getColor = (team) => {
@@ -35,7 +35,7 @@ const getColor = (team) => {
  * @param {import('@rm/types').Gym} gym
  * @returns
  */
-const GymTile = (gym) => {
+const BaseGymTile = (gym) => {
   const [markerRef, setMarkerRef] = React.useState(null)
   const [stateChange, setStateChange] = React.useState(false)
 
@@ -183,7 +183,7 @@ const GymTile = (gym) => {
       })}
     >
       <Popup position={[gym.lat, gym.lon]}>
-        <PopupContent
+        <GymPopup
           hasRaid={hasRaid}
           hasHatched={hasHatched}
           raidIconUrl={raidIconUrl}
@@ -221,8 +221,8 @@ const GymTile = (gym) => {
   )
 }
 
-const MemoGym = React.memo(
-  GymTile,
+export const GymTile = React.memo(
+  BaseGymTile,
   (prev, next) =>
     prev.raid_pokemon_id === next.raid_pokemon_id &&
     prev.raid_level === next.raid_level &&
@@ -232,5 +232,3 @@ const MemoGym = React.memo(
     prev.available_slots === next.available_slots &&
     prev.updated === next.updated,
 )
-
-export default MemoGym
