@@ -26,8 +26,8 @@ import useGetAvailable from '@hooks/useGetAvailable'
 import { BoolToggle } from './BoolToggle'
 import { GenericSearchMemo } from './ItemSearch'
 import { StandardItem } from './SelectorItem'
-import { VirtualGrid } from '../general/VirtualGrid'
-import TabPanel from '../general/TabPanel'
+import { VirtualGrid } from '../../components/layout/general/VirtualGrid'
+import TabPanel from '../../components/layout/general/TabPanel'
 
 /**
  * @template {keyof import('@rm/types').Available} T

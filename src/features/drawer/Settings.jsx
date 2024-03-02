@@ -36,8 +36,8 @@ import {
 
 import DrawerActions from './Actions'
 import { BoolToggle } from './BoolToggle'
-import LocaleSelection from '../general/LocaleSelection'
-import { DividerWithMargin } from '../general/StyledDivider'
+import LocaleSelection from '../../components/layout/general/LocaleSelection'
+import { DividerWithMargin } from '../../components/layout/general/StyledDivider'
 
 function FCSelect({ name, label, value, onChange, children, icon }) {
   return (

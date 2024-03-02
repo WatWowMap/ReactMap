@@ -12,10 +12,10 @@ import { useDeepStore, useStorage } from '@hooks/useStorage'
 import { checkIfHasAll } from '@services/functions/hasAll'
 import Poracle from '@services/Poracle'
 
-import { ColoredTile } from '../general/ColoredTile'
-import { useWebhookStore } from '../../../features/webhooks/store'
-import { ToggleTypography } from '../general/ToggleTypography'
-import { SQUARE_ITEM } from '../general/VirtualGrid'
+import { ColoredTile } from '../../components/layout/general/ColoredTile'
+import { useWebhookStore } from '../webhooks/store'
+import { ToggleTypography } from '../../components/layout/general/ToggleTypography'
+import { SQUARE_ITEM } from '../../components/layout/general/VirtualGrid'
 
 /**
  * @template {string} T

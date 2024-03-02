@@ -21,7 +21,7 @@ import { PokemonDrawerMemo } from './Pokemon'
 import Areas from './areas'
 import Extras from './Extras'
 import { BoolToggle } from './BoolToggle'
-import { BasicListButton } from '../general/BasicListButton'
+import { BasicListButton } from '../../components/layout/general/BasicListButton'
 
 const ADV_CATEGORIES = new Set(['pokemon', 'gyms', 'pokestops', 'nests'])
 

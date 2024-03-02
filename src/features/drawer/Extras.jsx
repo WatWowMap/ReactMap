@@ -21,7 +21,7 @@ import {
 } from '@assets/constants'
 
 import { MultiSelectorStore } from './MultiSelector'
-import SliderTile from '../dialogs/filters/SliderTile'
+import SliderTile from '../../components/layout/dialogs/filters/SliderTile'
 import { CollapsibleItem } from './CollapsibleItem'
 import { MultiSelectorList, SelectorListMemo } from './SelectorList'
 import { BoolToggle } from './BoolToggle'

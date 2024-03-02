@@ -4,7 +4,7 @@ import Menu from '@components/layout/general/Menu'
 
 import { toggleDialog, useLayoutStore } from '@hooks/useLayoutStore'
 import { useStorage } from '@hooks/useStorage'
-import { StandardItem } from '@components/layout/drawer/SelectorItem'
+import { StandardItem } from '@features/drawer/SelectorItem'
 
 import { DialogWrapper } from '../DialogWrapper'
 

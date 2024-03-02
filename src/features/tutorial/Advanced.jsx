@@ -22,7 +22,7 @@ import Utility from '@services/Utility'
 import { useMemory } from '@hooks/useMemory'
 
 import { VirtualGrid } from '@components/layout/general/VirtualGrid'
-import { StandardItem } from '@components/layout/drawer/SelectorItem'
+import { StandardItem } from '@features/drawer/SelectorItem'
 import data from './data'
 
 export default function TutAdvanced({ toggleHelp, category }) {

@@ -2,7 +2,7 @@
 import * as React from 'react'
 import Clear from '@mui/icons-material/Clear'
 import List from '@mui/material/List'
-import Drawer from '@mui/material/Drawer'
+import MuiDrawer from '@mui/material/Drawer'
 import IconButton from '@mui/material/IconButton'
 import ListItem from '@mui/material/ListItem'
 import ListItemText from '@mui/material/ListItemText'
@@ -13,8 +13,8 @@ import { useLayoutStore } from '@hooks/useLayoutStore'
 
 import Actions from './Actions'
 import { DrawerSectionMemo } from './Section'
-import { Img } from '../general/Img'
-import { DividerWithMargin } from '../general/StyledDivider'
+import { Img } from '../../components/layout/general/Img'
+import { DividerWithMargin } from '../../components/layout/general/StyledDivider'
 
 const handleClose = () => useLayoutStore.setState({ drawer: false })
 
@@ -48,12 +48,12 @@ const listItemSx = /** @type {import('@mui/material').SxProps} */ ({
   display: 'block',
 })
 
-export default function Sidebar() {
+export default function Drawer() {
   const drawer = useLayoutStore((s) => s.drawer)
   const { config, ui } = useMemory.getState()
 
   return (
-    <Drawer
+    <MuiDrawer
       anchor="left"
       variant="temporary"
       open={drawer}
@@ -71,6 +71,6 @@ export default function Sidebar() {
         ))}
       </List>
       {config.general.separateDrawerActions && <Actions />}
-    </Drawer>
+    </MuiDrawer>
   )
 }

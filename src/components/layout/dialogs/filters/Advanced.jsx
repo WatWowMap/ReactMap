@@ -10,10 +10,7 @@ import { useLayoutStore } from '@hooks/useLayoutStore'
 import { useDeepStore, useStorage } from '@hooks/useStorage'
 import Header from '@components/layout/general/Header'
 import Footer from '@components/layout/general/Footer'
-import {
-  BoolToggle,
-  DualBoolToggle,
-} from '@components/layout/drawer/BoolToggle'
+import { BoolToggle, DualBoolToggle } from '@features/drawer/BoolToggle'
 import { ENABLED_ALL, XXS_XXL } from '@assets/constants'
 import { useTranslateById } from '@hooks/useTranslateById'
 import { STANDARD_BACKUP, applyToAll } from '@services/filtering/applyToAll'

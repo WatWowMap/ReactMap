@@ -25,13 +25,13 @@ import Utility from '@services/Utility'
 import { XXS_XXL, NUNDO_HUNDO } from '@assets/constants'
 import { useLayoutStore } from '@hooks/useLayoutStore'
 
-import { StringFilterMemo } from '../dialogs/filters/StringFilter'
-import SliderTile from '../dialogs/filters/SliderTile'
-import TabPanel from '../general/TabPanel'
+import { StringFilterMemo } from '../../components/layout/dialogs/filters/StringFilter'
+import SliderTile from '../../components/layout/dialogs/filters/SliderTile'
+import TabPanel from '../../components/layout/general/TabPanel'
 import { BoolToggle, DualBoolToggle } from './BoolToggle'
-import { GenderListItem } from '../dialogs/filters/Gender'
+import { GenderListItem } from '../../components/layout/dialogs/filters/Gender'
 import { SelectorListMemo } from './SelectorList'
-import { BasicListButton } from '../general/BasicListButton'
+import { BasicListButton } from '../../components/layout/general/BasicListButton'
 
 function PokemonDrawer() {
   const filterMode = useStorage((s) => s.getPokemonFilterMode())

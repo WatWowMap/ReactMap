@@ -4,7 +4,7 @@ import ListItem from '@mui/material/ListItem'
 import ListItemText from '@mui/material/ListItemText'
 import { useTranslation } from 'react-i18next'
 
-import { MultiSelectorStore } from '@components/layout/drawer/MultiSelector'
+import { MultiSelectorStore } from '@features/drawer/MultiSelector'
 import { ICON_SIZES } from '@assets/constants'
 
 /**

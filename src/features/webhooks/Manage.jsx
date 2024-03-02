@@ -19,7 +19,7 @@ import Header from '@components/layout/general/Header'
 import { apolloClient } from '@services/apollo'
 import Query from '@services/Query'
 import { allProfiles } from '@services/queries/webhook'
-import { WebhookItem } from '@components/layout/drawer/SelectorItem'
+import { WebhookItem } from '@features/drawer/SelectorItem'
 
 import Human from './human'
 import Tracked from './Tracked'

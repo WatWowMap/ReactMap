@@ -2,7 +2,7 @@ import * as React from 'react'
 
 import { useMemory } from '@hooks/useMemory'
 
-import Sidebar from '@components/layout/drawer/Drawer'
+import Drawer from '@features/drawer'
 import FilterMenu from '@components/layout/dialogs/filters/FilterMenu'
 import UserOptions from '@components/layout/dialogs/UserOptions'
 import Tutorial from '@features/tutorial'
@@ -32,7 +32,7 @@ export const Nav = React.memo(
         <ClientError />
         {iconsIsReady && (
           <>
-            <Sidebar />
+            <Drawer />
             <FloatingButtonsMemo />
             <UserProfile />
             <Tutorial />

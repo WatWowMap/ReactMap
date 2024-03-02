@@ -8,10 +8,10 @@ import { apolloClient, apolloCache } from '@services/apollo'
 import Query from '@services/Query'
 import { ENUM_BADGES } from '@assets/constants'
 import { useLayoutStore } from '@hooks/useLayoutStore'
+import { MultiSelector } from '@features/drawer/MultiSelector'
 
 import Header from '../general/Header'
 import Footer from '../general/Footer'
-import { MultiSelector } from '../drawer/MultiSelector'
 
 const handleClose = () =>
   useLayoutStore.setState({
