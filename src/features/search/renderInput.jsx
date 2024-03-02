@@ -15,7 +15,7 @@ import { useQuery } from '@apollo/client'
 import { useMemory } from '@hooks/useMemory'
 import { useStorage } from '@hooks/useStorage'
 import { SEARCHABLE } from '@services/queries/config'
-import { Img } from '../../general/Img'
+import { Img } from '@components/layout/general/Img'
 
 const SearchImage = React.memo(
   /** @param {{ name: string }} props */ ({ name }) => {
