@@ -9,7 +9,7 @@
  * @param {string} noMoreGyms
  * @returns {L.PathOptions}
  */
-export default function typeStyle(
+export function getPathOptions(
   cell,
   total,
   oneStopTillNext,

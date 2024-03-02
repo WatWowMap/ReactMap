@@ -3,7 +3,7 @@ import * as React from 'react'
 import { Polygon, Popup, Tooltip } from 'react-leaflet'
 
 import { WayfarerPopup } from './WayfarerPopup'
-import typeStyle from '../../components/markers/typeCell'
+import { getPathOptions } from './typeCell'
 
 /**
  *
@@ -24,7 +24,13 @@ const S14Cell = ({
       positions={cell.polygon}
       color={cellColor}
       weight={4}
-      {...typeStyle(cell, total, oneStopTillNext, twoStopsTillNext, noMoreGyms)}
+      {...getPathOptions(
+        cell,
+        total,
+        oneStopTillNext,
+        twoStopsTillNext,
+        noMoreGyms,
+      )}
     >
       <Popup>
         <WayfarerPopup {...cell} total={total} />
