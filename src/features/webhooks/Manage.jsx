@@ -23,7 +23,7 @@ import { WebhookItem } from '@components/layout/drawer/SelectorItem'
 
 import Human from './human'
 import Tracked from './Tracked'
-import Menu from '../../general/Menu'
+import Menu from '../../components/layout/general/Menu'
 import { setMode, setSelected, useWebhookStore } from './store'
 import { useGenFullFilters, useGetHookContext } from './hooks'
 import ProfileEditing from './human/profile'

@@ -13,7 +13,7 @@ import { checkIfHasAll } from '@services/functions/hasAll'
 import Poracle from '@services/Poracle'
 
 import { ColoredTile } from '../general/ColoredTile'
-import { useWebhookStore } from '../dialogs/webhooks/store'
+import { useWebhookStore } from '../../../features/webhooks/store'
 import { ToggleTypography } from '../general/ToggleTypography'
 import { SQUARE_ITEM } from '../general/VirtualGrid'
 

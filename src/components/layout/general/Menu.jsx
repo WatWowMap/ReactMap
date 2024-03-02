@@ -19,7 +19,10 @@ import useGetAvailable from '@hooks/useGetAvailable'
 import OptionsContainer from '../dialogs/filters/OptionsContainer'
 import { VirtualGrid } from './VirtualGrid'
 import { GenericSearch } from '../drawer/ItemSearch'
-import { applyToAllWebhooks, useWebhookStore } from '../dialogs/webhooks/store'
+import {
+  applyToAllWebhooks,
+  useWebhookStore,
+} from '../../../features/webhooks/store'
 
 /**
  * @template {import('@rm/types').AdvCategories} T

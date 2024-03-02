@@ -8,8 +8,8 @@ import { useMapStore } from '@hooks/useMapStore'
 import Utility from '@services/Utility'
 
 import ScanOnDemand from '@features/scanner/ScanOnDemand'
-import DraggableMarker from '@components/layout/dialogs/webhooks/human/Draggable'
-import WebhookAreaSelection from '@components/layout/dialogs/webhooks/human/area/AreaSelection'
+import DraggableMarker from '@features/webhooks/human/Draggable'
+import WebhookAreaSelection from '@features/webhooks/human/area/AreaSelection'
 import { Effects } from './Effects'
 
 import DataView from './Data'

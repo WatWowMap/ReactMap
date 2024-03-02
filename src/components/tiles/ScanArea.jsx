@@ -5,8 +5,8 @@ import { GeoJSON } from 'react-leaflet'
 
 import { useStorage } from '@hooks/useStorage'
 import Utility from '@services/Utility'
-import { useWebhookStore } from '@components/layout/dialogs/webhooks/store'
-import { handleClick } from '@components/layout/dialogs/webhooks/human/area/AreaChip'
+import { useWebhookStore } from '@features/webhooks/store'
+import { handleClick } from '@features/webhooks/human/area/AreaChip'
 import { Polygon } from 'leaflet'
 
 /**
