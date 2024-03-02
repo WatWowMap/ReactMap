@@ -11,7 +11,7 @@ import {
   resetSettings,
   resetUI,
   resetUserSettings,
-} from '@services/functions/resetState'
+} from '@utils/resetState'
 
 import {
   ButtonWithNotification,

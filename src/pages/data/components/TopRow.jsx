@@ -6,7 +6,7 @@ import Divider from '@mui/material/Divider'
 import Button from '@mui/material/Button'
 import { useTranslation } from 'react-i18next'
 
-import { hardReset } from '@services/functions/resetState'
+import { hardReset } from '@utils/resetState'
 
 import { BORDER_SX } from './Shared'
 import { setNotification, useDataManagementStore } from '../hooks/store'

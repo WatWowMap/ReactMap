@@ -14,8 +14,8 @@ import { RawQuestTitle } from '@components/general/QuestTitle'
 import { Divider, Typography } from '@mui/material'
 import Utility from '@services/Utility'
 import { RawTimeSince } from '@components/popups/common/Timer'
-import { getGruntReward } from '@services/functions/getGruntReward'
-import { formatDistance } from '@services/functions/formatDistance'
+import { getGruntReward } from '@utils/getGruntReward'
+import { formatDistance } from '@utils/formatDistance'
 
 import { OptionImageMemo } from './OptionImage'
 

@@ -9,7 +9,7 @@ import { useDeepStore } from '@hooks/useStorage'
 import { useTranslation } from 'react-i18next'
 import Grid2 from '@mui/material/Unstable_Grid2/Grid2'
 import Utility from '@services/Utility'
-import { fromSnakeCase } from '@services/functions/fromSnakeCase'
+import { fromSnakeCase } from '@utils/fromSnakeCase'
 
 /**
  * @typedef {{

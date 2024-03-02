@@ -6,7 +6,7 @@ import Box from '@mui/material/Box'
 import NameTT from '@components/popups/common/NameTT'
 import { useMemory } from '@hooks/useMemory'
 import { useStorage } from '@hooks/useStorage'
-import getRewardInfo from '@services/functions/getRewardInfo'
+import getRewardInfo from '@utils/getRewardInfo'
 import { useTranslateById } from '@hooks/useTranslateById'
 import { Img } from '@components/general/Img'
 

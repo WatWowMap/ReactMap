@@ -3,7 +3,7 @@ import { useEffect } from 'react'
 import { useQuery } from '@apollo/client'
 import { getMapData } from '@services/queries/available'
 
-import { deepMerge } from '@services/functions/deepMerge'
+import { deepMerge } from '@utils/deepMerge'
 import UAssets from '@services/Icons'
 
 import { useMemory } from './useMemory'

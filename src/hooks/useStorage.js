@@ -1,4 +1,4 @@
-import { setDeep } from '@services/functions/setDeep'
+import { setDeep } from '@utils/setDeep'
 import dlv from 'dlv'
 import { useCallback, useMemo } from 'react'
 import { create } from 'zustand'
@@ -22,7 +22,7 @@ import { persist, createJSONStorage } from 'zustand/middleware'
  *   },
  *   searches: Record<string, string>,
  *   tabs: Record<string, number>,
- *   menus: ReturnType<import('server/src/services/ui/advMenus')>
+ *   menus: ReturnType<import('server/@services/ui/advMenus')>
  *   holidayEffects: Record<string, boolean>,
  *   motdIndex: number
  *   tutorial: boolean,
@@ -31,7 +31,7 @@ import { persist, createJSONStorage } from 'zustand/middleware'
  *   filters: import('@rm/types').AllFilters,
  *   icons: Record<string, string>
  *   audio: Record<string, string>
- *   userSettings: ReturnType<import('server/src/services/ui/clientOptions')>['clientValues']
+ *   userSettings: ReturnType<import('server/@services/ui/clientOptions')>['clientValues']
  *   profiling: boolean
  *   stateTraceLog: boolean
  *   desktopNotifications: boolean

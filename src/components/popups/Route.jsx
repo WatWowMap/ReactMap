@@ -22,7 +22,7 @@ import Typography from '@mui/material/Typography'
 import DownloadIcon from '@mui/icons-material/Download'
 
 import Query from '@services/Query'
-import formatInterval from '@services/functions/formatInterval'
+import formatInterval from '@utils/formatInterval'
 import { useMemory } from '@hooks/useMemory'
 import { useStorage } from '@hooks/useStorage'
 import { useFormatDistance } from '@hooks/useFormatDistance'

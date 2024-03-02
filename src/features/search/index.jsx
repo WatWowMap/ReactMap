@@ -10,7 +10,7 @@ import { useMemory } from '@hooks/useMemory'
 import { useLayoutStore } from '@hooks/useLayoutStore'
 import { useStorage } from '@hooks/useStorage'
 import Utility from '@services/Utility'
-import { fromSearchCategory } from '@services/functions/fromSearchCategory'
+import { fromSearchCategory } from '@utils/fromSearchCategory'
 import { useMapStore } from '@hooks/useMapStore'
 
 import Header from '@components/general/Header'

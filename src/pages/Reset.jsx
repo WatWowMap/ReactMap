@@ -2,7 +2,7 @@
 import * as React from 'react'
 import { Navigate } from 'react-router-dom'
 
-import { hardReset } from '@services/functions/resetState'
+import { hardReset } from '@utils/resetState'
 
 export default function ResetPage() {
   hardReset()

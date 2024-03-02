@@ -1,7 +1,7 @@
 // @ts-check
 import { useTranslation } from 'react-i18next'
 
-import { formatDistance } from '@services/functions/formatDistance'
+import { formatDistance } from '@utils/formatDistance'
 
 import { useStorage } from './useStorage'
 

@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next'
 import dlv from 'dlv'
 
 import { useStorage } from '@hooks/useStorage'
-import { setDeep } from '@services/functions/setDeep'
+import { setDeep } from '@utils/setDeep'
 import Utility from '@services/Utility'
 
 /**

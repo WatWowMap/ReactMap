@@ -13,7 +13,7 @@ import { useMemory } from '@hooks/useMemory'
 import { useStorage } from '@hooks/useStorage'
 
 import Notification from '@components/general/Notification'
-import { getQueryArgs } from '@services/functions/getQueryArgs'
+import { getQueryArgs } from '@utils/getQueryArgs'
 
 /**
  *

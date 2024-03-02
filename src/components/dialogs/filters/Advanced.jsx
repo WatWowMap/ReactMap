@@ -14,7 +14,7 @@ import { BoolToggle, DualBoolToggle } from '@features/drawer/BoolToggle'
 import { ENABLED_ALL, XXS_XXL } from '@assets/constants'
 import { useTranslateById } from '@hooks/useTranslateById'
 import { STANDARD_BACKUP, applyToAll } from '@services/filtering/applyToAll'
-import { checkIfHasAll } from '@services/functions/hasAll'
+import { checkIfHasAll } from '@utils/hasAll'
 
 import { StringFilter } from './StringFilter'
 import SliderTile from './SliderTile'
