@@ -6,14 +6,14 @@ import { Circle, Popup } from 'react-leaflet'
 import { useStorage } from '@hooks/useStorage'
 import useForcePopup from '@hooks/useForcePopup'
 
-import PopupContent from '../popups/Portal'
+import { PortalPopup } from './PortalPopup'
 
 /**
  *
  * @param {{ force?: boolean } & import('@rm/types').Portal} portal
  * @returns
  */
-const PortalTile = (portal) => {
+const BasePortalTile = (portal) => {
   const [markerRef, setMarkerRef] = React.useState(null)
   const color = useStorage((s) =>
     Date.now() / 1000 - portal.imported > 86400
@@ -34,15 +34,13 @@ const PortalTile = (portal) => {
       fillColor={color}
     >
       <Popup position={[portal.lat, portal.lon]}>
-        <PopupContent {...portal} />
+        <PortalPopup {...portal} />
       </Popup>
     </Circle>
   )
 }
 
-const MemoPortalTile = React.memo(
-  PortalTile,
+export const PortalTile = React.memo(
+  BasePortalTile,
   (prev, next) => prev.updated === next.updated,
 )
-
-export default MemoPortalTile

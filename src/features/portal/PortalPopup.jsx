@@ -9,22 +9,15 @@ import ErrorBoundary from '@components/ErrorBoundary'
 import { useMemory } from '@hooks/useMemory'
 import { useStorage } from '@hooks/useStorage'
 
-import Navigation from './common/Navigation'
-import Coords from './common/Coords'
+import Navigation from '../../components/popups/common/Navigation'
+import Coords from '../../components/popups/common/Coords'
 
 /**
  *
  * @param {import('@rm/types').Portal} props
  * @returns
  */
-export default function PortalPopup({
-  url,
-  name,
-  lat,
-  lon,
-  updated,
-  imported,
-}) {
+export function PortalPopup({ url, name, lat, lon, updated, imported }) {
   const { t } = useTranslation()
   const Icons = useMemory((s) => s.Icons)
   const enablePortalPopupCoords = useStorage(
