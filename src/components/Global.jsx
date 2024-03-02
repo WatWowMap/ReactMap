@@ -4,7 +4,7 @@ import GlobalStyles from '@mui/material/GlobalStyles'
 import { darken, lighten } from '@mui/material/styles'
 import { useMemory } from '@hooks/useMemory'
 
-export function ApplyGlobal() {
+function ApplyGlobal() {
   const online = useMemory((s) => s.online)
 
   return (
