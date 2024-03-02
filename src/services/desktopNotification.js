@@ -3,7 +3,7 @@ import { t } from 'i18next'
 
 import { useMemory } from '@hooks/useMemory'
 import { useStorage } from '@hooks/useStorage'
-import SimpleTTLCache from '@services/ttlcache'
+import SimpleTTLCache from '@services/SimpleTTLCache'
 import { useMapStore } from '@hooks/useMapStore'
 
 export const HAS_API = 'Notification' in window
