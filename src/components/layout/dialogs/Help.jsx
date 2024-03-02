@@ -3,7 +3,7 @@ import * as React from 'react'
 
 import { useLayoutStore } from '@hooks/useLayoutStore'
 
-import Help from './tutorial/Advanced'
+import Help from '@features/tutorial/Advanced'
 import { DialogWrapper } from './DialogWrapper'
 
 export function HelpDialog() {

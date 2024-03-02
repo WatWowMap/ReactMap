@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import { Grid, DialogContent, Typography, Divider } from '@mui/material'
 import { useTranslation, Trans } from 'react-i18next'
 
-import SliderTile from '../filters/SliderTile'
+import SliderTile from '../../components/layout/dialogs/filters/SliderTile'
 import data from './data'
 
 const relevant = ['iv', 'level', 'great', 'ultra']
