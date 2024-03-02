@@ -6,15 +6,15 @@ import { Popup, Polyline, Marker } from 'react-leaflet'
 import { basicEqualFn, useMemory } from '@hooks/useMemory'
 import { useStorage } from '@hooks/useStorage'
 
-import weatherMarker from '../markers/weather'
-import PopupContent from '../popups/Weather'
+import { weatherMarker } from './weatherMarker'
+import { WeatherPopup } from './WeatherPopup'
 
 /**
  *
  * @param {import('@rm/types').Weather} weather
  * @returns
  */
-const WeatherTile = (weather) => {
+const BaseWeatherTile = (weather) => {
   const [popup, setPopup] = React.useState(false)
   const markerRef = React.useRef(null)
 
@@ -60,18 +60,16 @@ const WeatherTile = (weather) => {
         eventHandlers={eventHandlers}
       >
         <Popup position={[weather.latitude, weather.longitude]}>
-          <PopupContent {...weather} />
+          <WeatherPopup {...weather} />
         </Popup>
       </Marker>
     </Polyline>
   )
 }
 
-const MemoWeatherTile = React.memo(
-  WeatherTile,
+export const WeatherTile = React.memo(
+  BaseWeatherTile,
   (prev, next) =>
     prev.gameplay_condition === next.gameplay_condition &&
     prev.updated === next.updated,
 )
-
-export default MemoWeatherTile

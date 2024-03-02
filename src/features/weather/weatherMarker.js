@@ -1,7 +1,7 @@
-import { useMemory } from '@hooks/useMemory'
 import { divIcon } from 'leaflet'
+import { useMemory } from '@hooks/useMemory'
 
-export default function weatherMarker(iconUrl) {
+export function weatherMarker(iconUrl) {
   const [
     {
       offsetX,

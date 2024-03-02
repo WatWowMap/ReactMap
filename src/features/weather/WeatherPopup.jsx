@@ -12,7 +12,7 @@ import ErrorBoundary from '@components/ErrorBoundary'
  * @param {import('@rm/types').Weather} props
  * @returns
  */
-export default function WeatherPopup({ gameplay_condition, updated }) {
+export function WeatherPopup({ gameplay_condition, updated }) {
   const { t } = useTranslation()
   const weatherTypes = useMemory(
     (state) => state.masterfile.weather[gameplay_condition]?.types || [],
@@ -57,7 +57,7 @@ export default function WeatherPopup({ gameplay_condition, updated }) {
             <Typography variant="caption">{t(`poke_type_${type}`)}</Typography>
             <img
               src={Icons.getTypes(type)}
-              alt={type}
+              alt={t(`weather_${gameplay_condition}`)}
               style={{
                 maxWidth: 30,
                 maxHeight: 30,

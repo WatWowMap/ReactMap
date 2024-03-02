@@ -8,7 +8,7 @@ import booleanPointInPolygon from '@turf/boolean-point-in-polygon'
 import { point, polygon } from '@turf/helpers'
 import { useTranslation } from 'react-i18next'
 
-import WeatherPopup from '@components/popups/Weather'
+import WeatherPopup from '@features/weather/WeatherPopup'
 import { useMemory } from '@hooks/useMemory'
 import { useStorage } from '@hooks/useStorage'
 import { apolloClient } from '@services/apollo'
