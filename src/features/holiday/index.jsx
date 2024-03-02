@@ -1,8 +1,9 @@
 // @ts-check
 import * as React from 'react'
-import HolidayAnimations from '@services/HolidayAnimations'
 import { useMemory } from '@hooks/useMemory'
 import { useStorage } from '@hooks/useStorage'
+
+import HolidayAnimations from './HolidayAnimations'
 
 /**
  *
@@ -57,7 +58,7 @@ export function HolidayEffect({ images, name, css, imageScale }) {
 }
 
 export default function HolidayEffects() {
-  const holidayEffects = useMemory((s) => s?.config?.holidayEffects || [])
+  const holidayEffects = useMemory((s) => s?.config?.holidayEffects)
 
   return (
     <>

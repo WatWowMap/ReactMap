@@ -16,7 +16,7 @@ import { isLocalStorageEnabled } from '@services/functions/isLocalStorageEnabled
 import { setLoadingText } from '@services/functions/setLoadingText'
 import '@services/events'
 import ErrorBoundary from '@components/ErrorBoundary'
-import HolidayEffects from '@components/HolidayEffects'
+import HolidayEffects from '@features/holiday'
 
 import ReactRouter from './pages'
 
