@@ -1,3 +1,10 @@
+# [1.30.0-develop.15](https://github.com/WatWowMap/ReactMap/compare/v1.30.0-develop.14...v1.30.0-develop.15) (2024-03-02)
+
+
+### Bug Fixes
+
+* oops, swap ternary ([bdcfaf4](https://github.com/WatWowMap/ReactMap/commit/bdcfaf4d92fc64d1776e6f87e11713736621874d))
+
 # [1.30.0-develop.14](https://github.com/WatWowMap/ReactMap/compare/v1.30.0-develop.13...v1.30.0-develop.14) (2024-03-02)
 
 
