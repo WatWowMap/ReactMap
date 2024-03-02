@@ -63,7 +63,6 @@ async function getAuthInfo(req, user, strategy = 'custom', hidePii = false) {
         })
     : {}
 
-
   const embed = {
     color: 0xff0000,
     title: 'Authentication',
