@@ -4,16 +4,16 @@ import * as React from 'react'
 import { useMemory } from '@hooks/useMemory'
 import { useStorage } from '@hooks/useStorage'
 
-import Level14Tile from './S14Cell'
-import Level17Tile from './S17Cell'
-import PoITile from './PoI'
+import { S14CellTile } from './S14Cell'
+import { S17CellTile } from './S17Cell'
+import { PoITile } from './PoI'
 
 /**
  *
  * @param {import('@rm/types').SubmissionCell} props
  * @returns
  */
-const SubmissionCellTile = ({ level14Cells, level17Cells, pois }) => {
+const Wayfarer = ({ level14Cells, level17Cells, pois }) => {
   const poiColor = useStorage((s) => s.userSettings.wayfarer.poiColor)
   const showcaseColor = useStorage((s) => s.userSettings.wayfarer.showcaseColor)
   const partnerColor = useStorage((s) => s.userSettings.wayfarer.partnerColor)
@@ -47,7 +47,7 @@ const SubmissionCellTile = ({ level14Cells, level17Cells, pois }) => {
         />
       ))}
       {level17Cells?.map((cell) => (
-        <Level17Tile
+        <S17CellTile
           key={`pc${cell.id}-${cell.polygon.join('-')}`}
           cellColor={cellColor}
           blockedColor={cellBlocked}
@@ -55,7 +55,7 @@ const SubmissionCellTile = ({ level14Cells, level17Cells, pois }) => {
         />
       ))}
       {level14Cells?.map((cell) => (
-        <Level14Tile
+        <S14CellTile
           key={`tc${cell.id}-${cell.polygon.join('-')}`}
           cellColor={cellColor}
           oneStopTillNext={oneStopTillNext}
@@ -68,6 +68,4 @@ const SubmissionCellTile = ({ level14Cells, level17Cells, pois }) => {
   )
 }
 
-const MemoSubmissionCell = React.memo(SubmissionCellTile)
-
-export default MemoSubmissionCell
+export const WayfarerTile = React.memo(Wayfarer)

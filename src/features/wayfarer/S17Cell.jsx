@@ -22,12 +22,10 @@ const S17Cell = ({ cellColor, blockedColor, polygon, blocked }) => (
   />
 )
 
-const MemoS17Cell = React.memo(
+export const S17CellTile = React.memo(
   S17Cell,
   (prev, next) =>
     prev.blocked === next.blocked &&
     prev.blockedColor === next.blockedColor &&
     prev.cellColor === next.cellColor,
 )
-
-export default MemoS17Cell

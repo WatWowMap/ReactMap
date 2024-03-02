@@ -2,8 +2,8 @@
 import * as React from 'react'
 import { Polygon, Popup, Tooltip } from 'react-leaflet'
 
-import PopupContent from '../../popups/SubmissionCell'
-import typeStyle from '../../markers/typeCell'
+import { WayfarerPopup } from './WayfarerPopup'
+import typeStyle from '../../components/markers/typeCell'
 
 /**
  *
@@ -27,7 +27,7 @@ const S14Cell = ({
       {...typeStyle(cell, total, oneStopTillNext, twoStopsTillNext, noMoreGyms)}
     >
       <Popup>
-        <PopupContent {...cell} total={total} />
+        <WayfarerPopup {...cell} total={total} />
       </Popup>
       <Tooltip direction="center" permanent className="round-tt">
         {total || '0'}
@@ -36,7 +36,7 @@ const S14Cell = ({
   )
 }
 
-const MemoS14Cell = React.memo(
+export const S14CellTile = React.memo(
   S14Cell,
   (prev, next) =>
     prev.cellColor === next.cellColor &&
@@ -46,5 +46,3 @@ const MemoS14Cell = React.memo(
     prev.count_gyms === next.count_gyms &&
     prev.count_pokestops === next.count_pokestops,
 )
-
-export default MemoS14Cell
