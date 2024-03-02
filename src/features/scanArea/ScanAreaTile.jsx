@@ -14,7 +14,7 @@ import { Polygon } from 'leaflet'
  * @param {import('@rm/types').RMGeoJSON} featureCollection
  * @returns
  */
-export function ScanAreaTile(featureCollection) {
+function ScanArea(featureCollection) {
   const search = useStorage((s) => s.filters.scanAreas?.filter?.search)
   const tapToToggle = useStorage((s) => s.userSettings.scanAreas.tapToToggle)
   const alwaysShowLabels = useStorage(
@@ -106,10 +106,8 @@ export function ScanAreaTile(featureCollection) {
   )
 }
 
-const MemoScanAreaTile = React.memo(ScanAreaTile, (prev, next) =>
+export const ScanAreaTile = React.memo(ScanArea, (prev, next) =>
   prev.features.every(
     (feat, i) => feat.properties.key === next.features[i].properties.key,
   ),
 )
-
-export default MemoScanAreaTile

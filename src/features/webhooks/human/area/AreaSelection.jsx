@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next'
 
 import { WEBHOOK_GEOJSON } from '@services/queries/webhook'
 import { Loading } from '@components/Loading'
-import MemoScanArea from '@components/tiles/ScanArea'
+import MemoScanArea from '@features/scanArea/ScanAreaTile'
 
 import { useWebhookStore } from '../../store'
 

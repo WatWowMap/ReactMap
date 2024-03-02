@@ -9,7 +9,7 @@ import { WeatherTile as weather } from '@features/weather/WeatherTile'
 import { SpawnpointTile as spawnpoints } from '@features/spawnpoint/SpawnpointTile'
 import { ScanCellTile as scanCells } from '@features/scanCell/ScanCellTile'
 import { WayfarerTile as submissionCells } from '@features/wayfarer/WayfarerTile'
-import scanAreas from './ScanArea'
+import { ScanAreaTile as scanAreas } from '../../features/scanArea/ScanAreaTile'
 import s2cells from './S2Cell'
 
 export {
