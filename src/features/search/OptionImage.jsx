@@ -3,7 +3,7 @@
 import * as React from 'react'
 import Box from '@mui/material/Box'
 
-import NameTT from '@components/popups/common/NameTT'
+import NameTT from '@components/popups/NameTT'
 import { useMemory } from '@hooks/useMemory'
 import { useStorage } from '@hooks/useStorage'
 import getRewardInfo from '@utils/getRewardInfo'

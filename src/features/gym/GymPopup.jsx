@@ -22,14 +22,13 @@ import useWebhook from '@hooks/useWebhook'
 import Utility from '@services/Utility'
 import ErrorBoundary from '@components/ErrorBoundary'
 import { TextWithIcon } from '@components/Img'
-
-import Title from '../../components/popups/common/Title'
-import PowerUp from '../../components/popups/common/PowerUp'
-import GenderIcon from '../../components/popups/common/GenderIcon'
-import Navigation from '../../components/popups/common/Navigation'
-import Coords from '../../components/popups/common/Coords'
-import { TimeStamp } from '../../components/popups/common/TimeStamps'
-import { ExtraInfo } from '../../components/popups/common/ExtraInfo'
+import Title from '@components/popups/Title'
+import PowerUp from '@components/popups/PowerUp'
+import GenderIcon from '@components/popups/GenderIcon'
+import Navigation from '@components/popups/Navigation'
+import Coords from '@components/popups/Coords'
+import { TimeStamp } from '@components/popups/TimeStamps'
+import { ExtraInfo } from '@components/popups/ExtraInfo'
 
 /**
  *

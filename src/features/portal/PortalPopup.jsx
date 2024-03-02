@@ -9,8 +9,8 @@ import ErrorBoundary from '@components/ErrorBoundary'
 import { useMemory } from '@hooks/useMemory'
 import { useStorage } from '@hooks/useStorage'
 
-import Navigation from '../../components/popups/common/Navigation'
-import Coords from '../../components/popups/common/Coords'
+import Navigation from '@components/popups/Navigation'
+import Coords from '@components/popups/Coords'
 
 /**
  *

@@ -26,10 +26,9 @@ import formatInterval from '@utils/formatInterval'
 import { useMemory } from '@hooks/useMemory'
 import { useStorage } from '@hooks/useStorage'
 import { useFormatDistance } from '@hooks/useFormatDistance'
-
-import Title from '../../components/popups/common/Title'
-import TimeSince from '../../components/popups/common/Timer'
-import Navigation from '../../components/popups/common/Navigation'
+import Title from '@components/popups/Title'
+import TimeSince from '@components/popups/Timer'
+import Navigation from '@components/popups/Navigation'
 
 const IMAGE_SIZE = 80
 

@@ -13,7 +13,7 @@ import { RawQuestTitle } from '@components/QuestTitle'
 
 import { Divider, Typography } from '@mui/material'
 import Utility from '@services/Utility'
-import { RawTimeSince } from '@components/popups/common/Timer'
+import { RawTimeSince } from '@components/popups/Timer'
 import { getGruntReward } from '@utils/getGruntReward'
 import { formatDistance } from '@utils/formatDistance'
 
