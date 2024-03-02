@@ -10,11 +10,11 @@ import Utility from '@services/Utility'
 import ScanOnDemand from '@features/scanner'
 import DraggableMarker from '@features/webhooks/human/Draggable'
 import WebhookAreaSelection from '@features/webhooks/human/area/AreaSelection'
-import { Effects } from './Effects'
+import { ActiveWeather } from '@features/weather'
 
+import { Effects } from './Effects'
 import DataView from './Data'
 import { Nav } from './Nav'
-import ActiveWeather from './ActiveWeather'
 import {
   ControlledLocate,
   ControlledTileLayer,

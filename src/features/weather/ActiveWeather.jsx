@@ -8,13 +8,14 @@ import booleanPointInPolygon from '@turf/boolean-point-in-polygon'
 import { point, polygon } from '@turf/helpers'
 import { useTranslation } from 'react-i18next'
 
-import WeatherPopup from '@features/weather/WeatherPopup'
 import { useMemory } from '@hooks/useMemory'
 import { useStorage } from '@hooks/useStorage'
 import { apolloClient } from '@services/apollo'
 import Header from '@components/Header'
 import Footer from '@components/Footer'
 import { Img } from '@components/Img'
+
+import { WeatherPopup } from './WeatherPopup'
 
 const StyledBox = styled(Box)(({ theme }) => ({
   zIndex: 1000,
@@ -35,7 +36,7 @@ const ImgSx = {
   height: { xs: 24, sm: 36 },
 }
 
-export default function ActiveWeather() {
+export function ActiveWeather() {
   const weatherEnabled = useStorage((s) => s.filters?.weather?.enabled ?? false)
   const location = useStorage((state) => state.location)
   const Icons = useMemory((state) => state.Icons)
@@ -67,7 +68,7 @@ export default function ActiveWeather() {
 
   const footerOptions = React.useMemo(
     () =>
-      /** @type {import('../../../components/Footer').FooterButton[]} */ ([
+      /** @type {import('../../components/Footer').FooterButton[]} */ ([
         {
           name: 'close',
           action: () => setOpen(false),
