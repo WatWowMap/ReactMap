@@ -10,7 +10,7 @@ import {
 } from '@mui/material'
 import { Circle, Marker, Popup, useMap } from 'react-leaflet'
 import { useTranslation } from 'react-i18next'
-import fallbackIcon from '@components/markers/fallback'
+import fallbackIcon from '@assets/fallbackMarker'
 import { useWebhookStore } from '../store'
 
 export default function DraggableMarker() {

@@ -2,7 +2,7 @@
 import * as React from 'react'
 import { Marker, useMap } from 'react-leaflet'
 
-import fallbackIcon from '@components/markers/fallback'
+import fallbackIcon from '@assets/fallbackMarker'
 import { useScanStore } from './store'
 
 /**
