@@ -29,10 +29,13 @@ import useLocation from '@hooks/useLocation'
 import { useMemory } from '@hooks/useMemory'
 import { useLayoutStore } from '@hooks/useLayoutStore'
 import { useStorage } from '@hooks/useStorage'
-import { useScanStore } from './dialogs/scanner/store'
+import { useScanStore } from '@components/layout/dialogs/scanner/store'
 
-import { I } from './general/I'
-import { setModeBtn, useWebhookStore } from './dialogs/webhooks/store'
+import { I } from '@components/layout/general/I'
+import {
+  setModeBtn,
+  useWebhookStore,
+} from '@components/layout/dialogs/webhooks/store'
 
 /** @typedef {keyof ReturnType<typeof useLayoutStore['getState']> | keyof ReturnType<typeof useScanStore['getState']>} Keys */
 

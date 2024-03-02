@@ -11,8 +11,8 @@ import DataView from './Data'
 import ScanOnDemand from '../../../components/layout/dialogs/scanner/ScanOnDemand'
 import DraggableMarker from '../../../components/layout/dialogs/webhooks/human/Draggable'
 import WebhookAreaSelection from '../../../components/layout/dialogs/webhooks/human/area/AreaSelection'
-import { Nav } from '../../../components/layout/Nav'
-import ActiveWeather from '../../../components/layout/general/ActiveWeather'
+import { Nav } from './Nav'
+import ActiveWeather from './ActiveWeather'
 import {
   ControlledLocate,
   ControlledTileLayer,
