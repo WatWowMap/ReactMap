@@ -51,7 +51,8 @@ async function getAuthInfo(req, user, strategy = 'custom', hidePii = false) {
     )[0]
 
   const geo = hidePii
-    ? await fetch(`http://ip-api.com/json/${ip}?fields=66846719&lang=en`)
+    ? {}
+    : await fetch(`http://ip-api.com/json/${ip}?fields=66846719&lang=en`)
         .then((res) => res.json())
         .catch((err) => {
           log.warn(
@@ -61,7 +62,6 @@ async function getAuthInfo(req, user, strategy = 'custom', hidePii = false) {
           )
           return {}
         })
-    : {}
 
   const embed = {
     color: 0xff0000,
