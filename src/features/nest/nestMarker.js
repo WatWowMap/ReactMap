@@ -13,13 +13,7 @@ import { useMemory } from '@hooks/useMemory'
  * }} props
  * @returns
  */
-export default function nestMarker({
-  iconUrl,
-  pokemonId,
-  formId,
-  iconSize,
-  recent,
-}) {
+export function nestMarker({ iconUrl, pokemonId, formId, iconSize, recent }) {
   const { Icons, masterfile } = useMemory.getState()
   const { types } = masterfile.pokemon[pokemonId]?.forms?.[formId]?.types
     ? masterfile.pokemon[pokemonId].forms[formId]

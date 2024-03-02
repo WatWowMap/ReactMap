@@ -7,15 +7,15 @@ import { basicEqualFn, useMemory } from '@hooks/useMemory'
 import { useStorage } from '@hooks/useStorage'
 import useForcePopup from '@hooks/useForcePopup'
 
-import nestMarker from '../markers/nest'
-import PopupContent from '../popups/Nest'
+import { nestMarker } from './nestMarker'
+import { NestPopup } from './NestPopup'
 
 /**
  *
  * @param {import('@rm/types').Nest} nest
  * @returns
  */
-const NestTile = (nest) => {
+const BaseNestTile = (nest) => {
   const recent = Date.now() / 1000 - nest.updated < 172800000
   const internalId = `${nest.pokemon_id}-${nest.pokemon_form}`
 
@@ -46,7 +46,7 @@ const NestTile = (nest) => {
     <>
       <NestMarker icon={icon} id={nest.id} lat={nest.lat} lon={nest.lon}>
         <Popup position={[nest.lat, nest.lon]}>
-          <PopupContent iconUrl={iconUrl} recent={recent} {...nest} />
+          <NestPopup iconUrl={iconUrl} recent={recent} {...nest} />
         </Popup>
       </NestMarker>
       <NestGeoJSON polygon_path={nest.polygon_path} />
@@ -104,9 +104,7 @@ const NestGeoJSON = ({ polygon_path }) => {
   return <GeoJSON data={geometry} />
 }
 
-const MemoNestTile = React.memo(
-  NestTile,
+export const NestTile = React.memo(
+  BaseNestTile,
   (prev, next) => prev.updated === next.updated && prev.name === next.name,
 )
-
-export default MemoNestTile

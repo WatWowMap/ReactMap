@@ -39,7 +39,7 @@ const getColor = (timeSince) => {
  * }} props
  * @returns
  */
-export default function NestPopup({
+export function NestPopup({
   recent,
   iconUrl,
   pokemon_id,
