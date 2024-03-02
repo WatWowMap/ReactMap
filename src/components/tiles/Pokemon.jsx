@@ -53,6 +53,7 @@ const PokemonTile = (pkmn) => {
     showWeather,
     showSize,
     showInteractionRange,
+    showSpacialRendRange,
     filterSize,
   ] = useStorage((s) => {
     const {
@@ -65,6 +66,7 @@ const PokemonTile = (pkmn) => {
       weatherIndicator,
       showSizeIndicator,
       interactionRanges,
+      spacialRendRange,
     } = s.userSettings.pokemon
     return [
       pokemonTimers,
@@ -74,6 +76,7 @@ const PokemonTile = (pkmn) => {
       !!(pkmn.weather && weatherIndicator),
       showSizeIndicator && Number.isInteger(pkmn.size) && pkmn.size !== 3,
       interactionRanges,
+      spacialRendRange,
       s.filters.pokemon.filter[internalId]?.size || 'md',
     ]
   }, basicEqualFn)
@@ -210,10 +213,15 @@ const PokemonTile = (pkmn) => {
         </ToolTipWrapper>
       )}
       {showInteractionRange && configZoom && (
+        <Circle center={finalLocation} radius={40} color="#BA42F6" weight={1} />
+      )}
+      {showSpacialRendRange && configZoom && (
         <Circle
           center={finalLocation}
-          radius={40}
-          pathOptions={{ color: '#BA42F6', weight: 1 }}
+          radius={80}
+          color="#E3B3FB"
+          dashArray="5, 5"
+          weight={1}
         />
       )}
     </Marker>

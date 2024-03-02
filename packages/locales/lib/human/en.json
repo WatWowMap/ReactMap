@@ -748,9 +748,9 @@
   "reset_options": "Reset Options",
   "reset_menus": "Reset Menus",
   "reset_settings": "Reset Settings",
-  "reset_general": "General",
+  "reset_general_title": "General",
+  "reset_filters_title": "Filters",
   "reset_assets": "Assets",
-  "reset_filters": "Filters",
   "reset_pokemon": "Reset Pokémon",
   "reset_pokestops": "Reset PokéStops",
   "reset_gyms": "Reset Gyms",
@@ -764,5 +764,6 @@
   "reset_s2cells": "Reset S2 Cells",
   "reset_spawnpoints": "Reset Spawnpoints",
   "reset_submission_cells": "Reset Submission Cells",
-  "hisuian": "Hisuian"
+  "hisuian": "Hisuian",
+  "spacial_rend_range": "Spacial Rend Range"
 }
