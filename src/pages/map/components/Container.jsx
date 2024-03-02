@@ -7,18 +7,18 @@ import { useStorage } from '@hooks/useStorage'
 import { useMapStore } from '@hooks/useMapStore'
 import Utility from '@services/Utility'
 
-import Map from './Map'
-import ScanOnDemand from './layout/dialogs/scanner/ScanOnDemand'
-import DraggableMarker from './layout/dialogs/webhooks/human/Draggable'
-import WebhookAreaSelection from './layout/dialogs/webhooks/human/area/AreaSelection'
-import { Nav } from './layout/Nav'
-import ActiveWeather from './layout/general/ActiveWeather'
+import DataView from './Data'
+import ScanOnDemand from '../../../components/layout/dialogs/scanner/ScanOnDemand'
+import DraggableMarker from '../../../components/layout/dialogs/webhooks/human/Draggable'
+import WebhookAreaSelection from '../../../components/layout/dialogs/webhooks/human/area/AreaSelection'
+import { Nav } from '../../../components/layout/Nav'
+import ActiveWeather from '../../../components/layout/general/ActiveWeather'
 import {
   ControlledLocate,
   ControlledTileLayer,
   ControlledZoomLayer,
 } from './Layers'
-import { Effects } from './Effects'
+import { Effects } from '../../../components/Effects'
 
 /** @param {{ target: import('leaflet').Map, type: string }} args */
 function setLocationZoom({ target: map }) {
@@ -61,7 +61,7 @@ export default function Container() {
       <ControlledTileLayer />
       <ControlledZoomLayer />
       <ControlledLocate />
-      <Map />
+      <DataView />
       <ScanOnDemand mode="scanNext" />
       <ScanOnDemand mode="scanZone" />
       <DraggableMarker />

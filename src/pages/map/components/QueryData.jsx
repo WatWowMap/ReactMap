@@ -12,10 +12,10 @@ import RobustTimeout from '@services/apollo/RobustTimeout'
 import Utility from '@services/Utility'
 import { FILTER_SKIP_LIST } from '@assets/constants'
 
-import * as index from './tiles/index'
+import * as index from '../../../components/tiles/index'
 import Clustering from './Clustering'
-import Notification from './layout/general/Notification'
-import { GenerateCells } from './tiles/S2Cell'
+import Notification from '../../../components/layout/general/Notification'
+import { GenerateCells } from '../../../components/tiles/S2Cell'
 
 /** @param {string} category */
 const userSettingsCategory = (category) => {
