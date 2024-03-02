@@ -8,8 +8,8 @@ import { create } from 'zustand'
  *   active: boolean,
  *   online: boolean,
  *   searchLoading: boolean,
- *   Icons: InstanceType<typeof import("../services/Icons").default>,
- *   Audio: InstanceType<typeof import("../services/Icons").default>,
+ *   Icons: InstanceType<typeof import("../services/Assets").default>,
+ *   Audio: InstanceType<typeof import("../services/Assets").default>,
  *   config: import('@rm/types').Config['map'],
  *   ui: import('@rm/types').UIObject,
  *   auth: {

@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { Config } from './config'
-import UAssets from '@services/Icons'
+import UAssets from '@services/Assets'
 import { ButtonProps, SxProps, Theme } from '@mui/material'
 import { SystemStyleObject } from '@mui/system'
 
