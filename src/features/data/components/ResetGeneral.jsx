@@ -27,7 +27,7 @@ export function ResetGeneral() {
 
   return (
     <ChildContainer>
-      <StyledSubHeader>{t('reset_general')}</StyledSubHeader>
+      <StyledSubHeader>{t('reset_general_title')}</StyledSubHeader>
       <ButtonWithNotification
         onClick={resetSettings}
         label={t('reset_settings')}
