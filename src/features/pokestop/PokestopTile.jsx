@@ -7,17 +7,17 @@ import useMarkerTimer from '@hooks/useMarkerTimer'
 import { basicEqualFn, useMemory } from '@hooks/useMemory'
 import { useStorage } from '@hooks/useStorage'
 import useForcePopup from '@hooks/useForcePopup'
+import ToolTipWrapper from '@components/tiles/Timer'
 
-import PopupContent from '../popups/Pokestop'
-import ToolTipWrapper from './Timer'
-import usePokestopMarker from '../markers/usePokestopMarker'
+import { PokestopPopup } from './PokestopPopup'
+import { usePokestopMarker } from './usePokestopMarker'
 
 /**
  *
  * @param {import('@rm/types').Pokestop} pokestop
  * @returns
  */
-const PokestopTile = (pokestop) => {
+const BasePokestopTile = (pokestop) => {
   const [stateChange, setStateChange] = React.useState(false)
   const [markerRef, setMarkerRef] = React.useState(null)
 
@@ -126,7 +126,7 @@ const PokestopTile = (pokestop) => {
       icon={icon}
     >
       <Popup position={[pokestop.lat, pokestop.lon]}>
-        <PopupContent
+        <PokestopPopup
           hasLure={hasLure}
           hasInvasion={hasInvasion}
           hasQuest={hasQuest}
@@ -162,8 +162,8 @@ const PokestopTile = (pokestop) => {
   ) : null
 }
 
-const MemoPokestopTile = React.memo(
-  PokestopTile,
+export const PokestopTile = React.memo(
+  BasePokestopTile,
   (prev, next) =>
     prev.id === next.id &&
     prev.lure_expire_timestamp === next.lure_expire_timestamp &&
@@ -182,5 +182,3 @@ const MemoPokestopTile = React.memo(
       : true) &&
     prev.events?.length === next.events?.length,
 )
-
-export default MemoPokestopTile

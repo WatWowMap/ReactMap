@@ -15,7 +15,7 @@ import useOpacity from '@hooks/useOpacity'
  * } & import('@rm/types').Pokestop} param0
  * @returns
  */
-export default function usePokestopMarker({
+export function usePokestopMarker({
   hasQuest,
   hasLure,
   hasInvasion,

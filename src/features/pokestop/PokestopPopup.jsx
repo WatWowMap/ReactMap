@@ -26,16 +26,16 @@ import { getBadge } from '@utils/getBadge'
 import getRewardInfo from '@utils/getRewardInfo'
 import { getGruntReward } from '@utils/getGruntReward'
 
-import Dropdown from './common/Dropdown'
-import TimeTile from './common/TimeTile'
-import Navigation from './common/Navigation'
-import Coords from './common/Coords'
-import Title from './common/Title'
-import HeaderImage from './common/HeaderImage'
-import Timer from './common/Timer'
-import PowerUp from './common/PowerUp'
-import NameTT from './common/NameTT'
-import { TimeStamp } from './common/TimeStamps'
+import Dropdown from '../../components/popups/common/Dropdown'
+import TimeTile from '../../components/popups/common/TimeTile'
+import Navigation from '../../components/popups/common/Navigation'
+import Coords from '../../components/popups/common/Coords'
+import Title from '../../components/popups/common/Title'
+import HeaderImage from '../../components/popups/common/HeaderImage'
+import Timer from '../../components/popups/common/Timer'
+import PowerUp from '../../components/popups/common/PowerUp'
+import NameTT from '../../components/popups/common/NameTT'
+import { TimeStamp } from '../../components/popups/common/TimeStamps'
 
 /**
  *
@@ -47,7 +47,7 @@ import { TimeStamp } from './common/TimeStamps'
  * }} props
  * @returns
  */
-export default function PokestopPopup({
+export function PokestopPopup({
   hasLure,
   hasInvasion,
   hasQuest,
@@ -329,6 +329,7 @@ const MenuActions = ({
     useMemory.setState((prev) => ({ hideList: new Set(prev.hideList).add(id) }))
   }
 
+  /** @param {string} key */
   const setState = (key) =>
     setDeepStore(`filters.pokestops.filter.${key}.enabled`, false)
 
