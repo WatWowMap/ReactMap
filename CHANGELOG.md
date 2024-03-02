@@ -1,3 +1,15 @@
+# [1.30.0-develop.14](https://github.com/WatWowMap/ReactMap/compare/v1.30.0-develop.13...v1.30.0-develop.14) (2024-03-02)
+
+
+### Bug Fixes
+
+* adjust wayfarer line weights ([e6c0696](https://github.com/WatWowMap/ReactMap/commit/e6c0696159c1feceda41aea12b9e16b2a5cd7838))
+
+
+### Features
+
+* spacial rend range ([374c5eb](https://github.com/WatWowMap/ReactMap/commit/374c5eb09986307fb5e2e59930e18a066b22df47))
+
 # [1.30.0-develop.13](https://github.com/WatWowMap/ReactMap/compare/v1.30.0-develop.12...v1.30.0-develop.13) (2024-03-01)
 
 
