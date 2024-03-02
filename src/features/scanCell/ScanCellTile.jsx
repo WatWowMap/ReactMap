@@ -3,28 +3,23 @@
 import * as React from 'react'
 import { Polygon, Popup } from 'react-leaflet'
 
-import PopupContent from '../popups/ScanCell'
-import marker from '../markers/scanCell'
+import { ScanCellPopup } from './ScanCellPopup'
+import { scanCellMarker } from './scanCellMarker'
 
 /**
  *
  * @param {import('@rm/types').ScanCell} scanCell
  * @returns
  */
-const ScanCellTile = (scanCell) => (
-  <Polygon
-    positions={scanCell.polygon}
-    pathOptions={marker(Date.now() / 1000 - scanCell.updated)}
-  >
+const BaseScanCellTile = (scanCell) => (
+  <Polygon positions={scanCell.polygon} {...scanCellMarker(scanCell.updated)}>
     <Popup position={[scanCell.center_lat, scanCell.center_lon]}>
-      <PopupContent {...scanCell} />
+      <ScanCellPopup {...scanCell} />
     </Popup>
   </Polygon>
 )
 
-const ScanCellMemo = React.memo(
-  ScanCellTile,
+export const ScanCellTile = React.memo(
+  BaseScanCellTile,
   (prev, next) => prev.updated === next.updated,
 )
-
-export default ScanCellMemo
