@@ -24,12 +24,12 @@ import Utility from '@services/Utility'
 import ErrorBoundary from '@components/ErrorBoundary'
 import { TextWithIcon } from '@components/Img'
 
-import NameTT from './common/NameTT'
-import GenderIcon from './common/GenderIcon'
-import Navigation from './common/Navigation'
-import Coords from './common/Coords'
-import { TimeStamp } from './common/TimeStamps'
-import { ExtraInfo } from './common/ExtraInfo'
+import NameTT from '../../components/popups/common/NameTT'
+import GenderIcon from '../../components/popups/common/GenderIcon'
+import Navigation from '../../components/popups/common/Navigation'
+import Coords from '../../components/popups/common/Coords'
+import { TimeStamp } from '../../components/popups/common/TimeStamps'
+import { ExtraInfo } from '../../components/popups/common/ExtraInfo'
 
 const rowClass = { width: 30, fontWeight: 'bold' }
 

@@ -6,7 +6,7 @@ import { useMemory } from '@hooks/useMemory'
  * @param {{ iconUrl: string, iconSize: number }} props
  * @returns
  */
-export const basicMarker = ({ iconUrl, iconSize }) =>
+export const basicPokemonMarker = ({ iconUrl, iconSize }) =>
   new Icon({
     iconUrl,
     iconSize: [iconSize, iconSize],
@@ -15,7 +15,7 @@ export const basicMarker = ({ iconUrl, iconSize }) =>
     className: 'marker',
   })
 
-export const fancyMarker = ({
+export const fancyPokemonMarker = ({
   pkmn,
   iconUrl,
   iconSize,

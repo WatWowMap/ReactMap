@@ -1,7 +1,7 @@
+import { PokemonTile as pokemon } from '@features/pokemon'
 import devices from './Device'
 import gyms from './Gym'
 import nests from './Nest'
-import pokemon from './Pokemon'
 import pokestops from './Pokestop'
 import portals from './Portal'
 import scanCells from './ScanCell'

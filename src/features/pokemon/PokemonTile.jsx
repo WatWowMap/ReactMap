@@ -14,10 +14,10 @@ import useForcePopup from '@hooks/useForcePopup'
 import Utility from '@services/Utility'
 import { sendNotification } from '@services/desktopNotification'
 import { useMapStore } from '@hooks/useMapStore'
+import ToolTipWrapper from '@components/tiles/Timer'
 
-import PopupContent from '../popups/Pokemon'
-import { basicMarker, fancyMarker } from '../markers/pokemon'
-import ToolTipWrapper from './Timer'
+import PopupContent from './PokemonPopup'
+import { basicPokemonMarker, fancyPokemonMarker } from './pokemonMarker'
 
 /**
  *
@@ -176,7 +176,7 @@ const PokemonTile = (pkmn) => {
         showWeather ||
         opacity < 1 ||
         pkmn.seen_type === 'nearby_cell'
-          ? fancyMarker({
+          ? fancyPokemonMarker({
               pkmn,
               iconUrl,
               iconSize,
@@ -186,7 +186,7 @@ const PokemonTile = (pkmn) => {
               opacity,
               timeOfDay,
             })
-          : basicMarker({ iconUrl, iconSize })
+          : basicPokemonMarker({ iconUrl, iconSize })
       }
     >
       <Popup position={finalLocation}>

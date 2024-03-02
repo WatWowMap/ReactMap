@@ -3,7 +3,7 @@ import { Grid, DialogContent, Typography, Divider } from '@mui/material'
 import { useTranslation } from 'react-i18next'
 
 import { useMemory } from '@hooks/useMemory'
-import PokemonPopup from '@components/popups/Pokemon'
+import PokemonPopup from '@features/pokemon/PokemonPopup'
 import data from './data'
 
 export default function TutPopup({ isMobile }) {
