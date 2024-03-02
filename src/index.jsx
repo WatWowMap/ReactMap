@@ -6,7 +6,8 @@ import ReactGA from 'react-ga4'
 // Sentry must be imported before app
 import '@services/Sentry'
 import '@services/i18n'
-import App from '@components/App'
+
+import App from './App'
 
 if (CONFIG.googleAnalyticsId) {
   ReactGA.initialize(CONFIG.googleAnalyticsId)

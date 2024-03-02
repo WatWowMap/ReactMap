@@ -15,10 +15,10 @@ import { apolloClient } from '@services/apollo'
 import { isLocalStorageEnabled } from '@services/functions/isLocalStorageEnabled'
 import { setLoadingText } from '@services/functions/setLoadingText'
 import '@services/events'
+import ErrorBoundary from '@components/ErrorBoundary'
+import HolidayEffects from '@components/HolidayEffects'
 
-import ErrorBoundary from './ErrorBoundary'
-import ReactRouter from '../pages'
-import HolidayEffects from './HolidayEffects'
+import ReactRouter from './pages'
 
 const LOADING_LOCALES = {
   de: 'Übersetzungen werden geladen',
