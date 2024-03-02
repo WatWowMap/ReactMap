@@ -3,14 +3,14 @@ import * as React from 'react'
 import { Route, Routes } from 'react-router-dom'
 
 import Auth from './layout/auth/Auth'
-import LoginPage from '../features/login'
+import LoginPage from '../pages/login'
 import Blocked from './layout/auth/Blocked'
 import Errors from './Errors'
-import DataManagement from '../features/data'
+import DataManagement from '../pages/data'
 import Config from './Config'
 import ResetAll from './Reset'
 
-const Playground = React.lazy(() => import('../features/playground'))
+const Playground = React.lazy(() => import('../pages/playground'))
 
 const authRoute = (
   <Config>
