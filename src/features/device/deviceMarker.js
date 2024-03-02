@@ -1,6 +1,6 @@
 import { Icon } from 'leaflet'
 
-export default function getDeviceMarkers(iconUrl, iconSize, modifiers) {
+export function deviceMarker(iconUrl, iconSize, modifiers) {
   const { sizeMultiplier, offsetX, offsetY, popupX, popupY } = modifiers
   return new Icon({
     iconUrl,

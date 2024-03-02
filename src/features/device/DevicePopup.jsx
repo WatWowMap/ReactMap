@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next'
 import Utility from '@services/Utility'
 import ErrorBoundary from '@components/ErrorBoundary'
 
-export default function DevicePopup({ isOnline, ts, ...device }) {
+export function DevicePopup({ isOnline, ts, ...device }) {
   const { t } = useTranslation()
 
   React.useEffect(() => {

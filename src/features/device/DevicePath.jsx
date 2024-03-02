@@ -10,7 +10,7 @@ import { useStorage } from '@hooks/useStorage'
  * @param {import('@rm/types').Device} props
  * @returns
  */
-const DevicePoly = ({ route, type, radius }) => {
+const BaseDevicePath = ({ route, type, radius }) => {
   const color = useStorage((s) => s.userSettings.admin.devicePathColor)
 
   const safeRoute = React.useMemo(() => {
@@ -59,9 +59,7 @@ const DevicePoly = ({ route, type, radius }) => {
       ))
 }
 
-const MemoDevicePoly = React.memo(
-  DevicePoly,
+export const DevicePath = React.memo(
+  BaseDevicePath,
   (prev, next) => prev.type === next.type,
 )
-
-export default MemoDevicePoly

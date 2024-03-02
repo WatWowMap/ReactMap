@@ -6,16 +6,16 @@ import { Marker, Popup } from 'react-leaflet'
 
 import { basicEqualFn, useMemory } from '@hooks/useMemory'
 
-import deviceMarker from '../markers/device'
-import PopupContent from '../popups/Device'
-import DevicePoly from '../popups/DevicePoly'
+import { deviceMarker } from './deviceMarker'
+import { DevicePath } from './DevicePath'
+import { DevicePopup } from './DevicePopup'
 
 /**
  *
  * @param {import('@rm/types').Device} device
  * @returns
  */
-const DeviceTile = (device) => {
+const BaseDeviceTile = (device) => {
   const ts = Math.floor(Date.now() / 1000)
   const [poly, setPoly] = React.useState(false)
   const markerRef = React.useRef(null)
@@ -51,20 +51,18 @@ const DeviceTile = (device) => {
       }}
     >
       <Popup position={[device.lat, device.lon]}>
-        <PopupContent {...device} isOnline={isOnline} ts={ts} />
+        <DevicePopup {...device} isOnline={isOnline} ts={ts} />
       </Popup>
       {poly && !device.isMad && (
         <ErrorBoundary>
-          <DevicePoly {...device} />
+          <DevicePath {...device} />
         </ErrorBoundary>
       )}
     </Marker>
   )
 }
 
-const MemoDevice = React.memo(
-  DeviceTile,
+export const DeviceTile = React.memo(
+  BaseDeviceTile,
   (prev, next) => prev.updated === next.updated,
 )
-
-export default MemoDevice
