@@ -17,7 +17,7 @@ import { setLoadingText } from '@services/functions/setLoadingText'
 import '@services/events'
 
 import ErrorBoundary from './ErrorBoundary'
-import ReactRouter from './ReactRouter'
+import ReactRouter from '../pages'
 import HolidayEffects from './HolidayEffects'
 
 const LOADING_LOCALES = {

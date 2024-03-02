@@ -4,7 +4,7 @@ import { Navigate } from 'react-router-dom'
 
 import { hardReset } from '@services/functions/resetState'
 
-export default function ResetAll() {
+export default function ResetPage() {
   hardReset()
   return <Navigate to="/" />
 }

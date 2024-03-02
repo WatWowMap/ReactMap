@@ -2,19 +2,19 @@
 import * as React from 'react'
 import { Route, Routes } from 'react-router-dom'
 
-import Auth from './layout/auth/Auth'
-import LoginPage from '../pages/login'
-import Blocked from './layout/auth/Blocked'
-import Errors from './Errors'
-import DataManagement from '../pages/data'
-import Config from './Config'
-import ResetAll from './Reset'
+import MapPage from './map'
+import LoginPage from './login'
+import BlockedPage from './Blocked'
+import ErrorPage from './Error'
+import DataManagement from './data'
+import Config from '../components/Config'
+import ResetPage from './Reset'
 
-const Playground = React.lazy(() => import('../pages/playground'))
+const Playground = React.lazy(() => import('./playground'))
 
-const authRoute = (
+const mapRoute = (
   <Config>
-    <Auth />
+    <MapPage />
   </Config>
 )
 const loginRoute = (
@@ -29,7 +29,7 @@ const dataRoute = (
 )
 const blockedRoute = (
   <Config>
-    <Blocked />
+    <BlockedPage />
   </Config>
 )
 const playgroundRoute = (
@@ -37,22 +37,22 @@ const playgroundRoute = (
     <Playground />
   </Config>
 )
-const errorRoute = <Errors />
-const resetRoute = <ResetAll />
+const errorRoute = <ErrorPage />
+const resetRoute = <ResetPage />
 
 export default function ReactRouter() {
   return (
     <Routes>
-      <Route path="/" element={authRoute} />
+      <Route path="/" element={mapRoute} />
       <Route path="reset" element={resetRoute} />
       <Route path="login" element={loginRoute} />
       <Route path="data-management" element={dataRoute} />
       <Route path="playground" element={playgroundRoute} />
       <Route path="blocked/:info" element={blockedRoute} />
-      <Route path="@/:lat/:lon" element={authRoute} />
-      <Route path="@/:lat/:lon/:zoom" element={authRoute} />
-      <Route path="id/:category/:id" element={authRoute} />
-      <Route path="id/:category/:id/:zoom" element={authRoute} />
+      <Route path="@/:lat/:lon" element={mapRoute} />
+      <Route path="@/:lat/:lon/:zoom" element={mapRoute} />
+      <Route path="id/:category/:id" element={mapRoute} />
+      <Route path="id/:category/:id/:zoom" element={mapRoute} />
       <Route path="*" element={errorRoute} />
     </Routes>
   )

@@ -6,7 +6,7 @@ import Button from '@mui/material/Button'
 import { useTranslation } from 'react-i18next'
 import { useHideElement } from '@hooks/useHideElement'
 
-export default function Errors() {
+export default function ErrorPage() {
   const { t } = useTranslation()
   const error = window.location.href.split('/').pop()
   useHideElement()

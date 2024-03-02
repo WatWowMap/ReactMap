@@ -4,10 +4,10 @@ import { Navigate, useParams } from 'react-router-dom'
 
 import { useMemory } from '@hooks/useMemory'
 
-import Container from '../../Container'
-import WebhookQuery from '../../WebhookQuery'
+import Container from '../../components/Container'
+import WebhookQuery from '../../components/WebhookQuery'
 
-export default function Auth() {
+export default function MapPage() {
   const params = useParams()
   const mapPerm = useMemory((s) => s.auth.perms.map)
 
