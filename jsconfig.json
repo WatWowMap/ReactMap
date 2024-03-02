@@ -12,6 +12,7 @@
     "paths": {
       "@assets/*": ["./src/assets/*"],
       "@components/*": ["./src/components/*"],
+      "@features/*": ["./src/features/*"],
       "@services/*": ["./src/services/*"],
       "@hooks/*": ["./src/hooks/*"]
     }

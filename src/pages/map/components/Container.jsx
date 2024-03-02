@@ -7,10 +7,12 @@ import { useStorage } from '@hooks/useStorage'
 import { useMapStore } from '@hooks/useMapStore'
 import Utility from '@services/Utility'
 
+import ScanOnDemand from '@features/scanner/ScanOnDemand'
+import DraggableMarker from '@components/layout/dialogs/webhooks/human/Draggable'
+import WebhookAreaSelection from '@components/layout/dialogs/webhooks/human/area/AreaSelection'
+import { Effects } from './Effects'
+
 import DataView from './Data'
-import ScanOnDemand from '../../../components/layout/dialogs/scanner/ScanOnDemand'
-import DraggableMarker from '../../../components/layout/dialogs/webhooks/human/Draggable'
-import WebhookAreaSelection from '../../../components/layout/dialogs/webhooks/human/area/AreaSelection'
 import { Nav } from './Nav'
 import ActiveWeather from './ActiveWeather'
 import {
@@ -18,7 +20,6 @@ import {
   ControlledTileLayer,
   ControlledZoomLayer,
 } from './Layers'
-import { Effects } from '../../../components/Effects'
 
 /** @param {{ target: import('leaflet').Map, type: string }} args */
 function setLocationZoom({ target: map }) {

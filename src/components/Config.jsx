@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { setUser } from '@sentry/react'
+import { Navigate } from 'react-router-dom'
 
 import { useMemory } from '@hooks/useMemory'
 import { useStorage } from '@hooks/useStorage'
@@ -8,12 +9,10 @@ import Fetch from '@services/Fetch'
 import { setLoadingText } from '@services/functions/setLoadingText'
 import Utility from '@services/Utility'
 import { deepMerge } from '@services/functions/deepMerge'
-import { Navigate } from 'react-router-dom'
 import { checkHoliday } from '@services/functions/checkHoliday'
 import { useHideElement } from '@hooks/useHideElement'
 import { getGlowRules } from '@services/functions/getGlowRules'
-
-import { useScannerSessionStorage } from './layout/dialogs/scanner/store'
+import { useScannerSessionStorage } from '@features/scanner/store'
 
 export default function Config({ children }) {
   const { t } = useTranslation()
