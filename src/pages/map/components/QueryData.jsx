@@ -13,7 +13,7 @@ import Utility from '@services/Utility'
 import { FILTER_SKIP_LIST } from '@assets/constants'
 import * as index from '@components/tiles/index'
 import Notification from '@components/Notification'
-import { GenerateCells } from '@components/tiles/S2Cell'
+import { GenerateCells } from '@features/s2cell/GenerateCells'
 
 import Clustering from './Clustering'
 

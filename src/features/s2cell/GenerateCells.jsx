@@ -1,6 +1,5 @@
 // @ts-check
 import * as React from 'react'
-import { Polyline } from 'react-leaflet'
 import {
   S2LatLng,
   S2RegionCoverer,
@@ -14,29 +13,7 @@ import { useStorage } from '@hooks/useStorage'
 
 import Notification from '@components/Notification'
 import { getQueryArgs } from '@utils/getQueryArgs'
-
-/**
- *
- * @param {{ coords: import('@rm/types').S2Polygon, color: string }} props
- * @returns
- */
-function BaseCell({ coords, color }) {
-  return (
-    <Polyline
-      key={color}
-      positions={[...coords, coords[0]]}
-      color={color}
-      weight={0.5}
-    />
-  )
-}
-
-const MemoBaseCell = React.memo(
-  BaseCell,
-  (prev, next) => prev.color === next.color,
-)
-
-export default MemoBaseCell
+import { BaseCell } from './BaseCell'
 
 export function GenerateCells() {
   const darkTiles = useMemory((s) => s.tileStyle === 'dark')
@@ -83,7 +60,7 @@ export function GenerateCells() {
       {cells
         .filter((_, i) => i < 20_000)
         .map((cell) => (
-          <MemoBaseCell key={cell.id} {...cell} color={color} />
+          <BaseCell key={cell.id} {...cell} color={color} />
         ))}
       <Notification
         open={cells.length > 20_000}
