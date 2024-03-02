@@ -11,10 +11,10 @@ import useOpacity from '@hooks/useOpacity'
 import useForcePopup from '@hooks/useForcePopup'
 import { sendNotification } from '@services/desktopNotification'
 import Utility from '@services/Utility'
+import ToolTipWrapper from '@components/ToolTipWrapper'
 
 import { gymMarker } from './gymMarker'
 import { GymPopup } from './GymPopup'
-import ToolTipWrapper from '../../components/tiles/Timer'
 
 /** @param {number} team */
 const getColor = (team) => {

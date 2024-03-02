@@ -11,11 +11,11 @@ import { getQueryArgs } from '@utils/getQueryArgs'
 import RobustTimeout from '@services/apollo/RobustTimeout'
 import Utility from '@services/Utility'
 import { FILTER_SKIP_LIST } from '@assets/constants'
-import * as index from '@components/tiles/index'
 import Notification from '@components/Notification'
 import { GenerateCells } from '@features/s2cell/GenerateCells'
 
 import Clustering from './Clustering'
+import tileObject from '../tileObject'
 
 /** @param {string} category */
 const userSettingsCategory = (category) => {
@@ -97,7 +97,7 @@ function QueryWrapper({ category }) {
 }
 
 function QueryData({ category, timeout }) {
-  const Component = React.useMemo(() => index[category], [])
+  const Component = React.useMemo(() => tileObject[category], [])
 
   const map = useMap()
 

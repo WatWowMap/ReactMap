@@ -7,7 +7,7 @@ import useMarkerTimer from '@hooks/useMarkerTimer'
 import { basicEqualFn, useMemory } from '@hooks/useMemory'
 import { useStorage } from '@hooks/useStorage'
 import useForcePopup from '@hooks/useForcePopup'
-import ToolTipWrapper from '@components/tiles/Timer'
+import ToolTipWrapper from '@components/ToolTipWrapper'
 
 import { PokestopPopup } from './PokestopPopup'
 import { usePokestopMarker } from './usePokestopMarker'

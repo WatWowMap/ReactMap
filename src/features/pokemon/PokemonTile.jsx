@@ -14,7 +14,7 @@ import useForcePopup from '@hooks/useForcePopup'
 import Utility from '@services/Utility'
 import { sendNotification } from '@services/desktopNotification'
 import { useMapStore } from '@hooks/useMapStore'
-import ToolTipWrapper from '@components/tiles/Timer'
+import ToolTipWrapper from '@components/ToolTipWrapper'
 
 import PopupContent from './PokemonPopup'
 import { basicPokemonMarker, fancyPokemonMarker } from './pokemonMarker'
