@@ -7,7 +7,7 @@ import { useMemory } from '@hooks/useMemory'
  * @param {'start' | 'end'} position
  * @returns
  */
-export default function getRouteMarker(position) {
+export function routeMarker(position) {
   const iconUrl = useMemory.getState().Icons.getMisc(`route-${position}`)
   return new Icon({
     iconUrl,

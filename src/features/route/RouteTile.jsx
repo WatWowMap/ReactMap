@@ -5,10 +5,10 @@ import * as React from 'react'
 import { Marker, Polyline, useMapEvents } from 'react-leaflet'
 import { darken } from '@mui/material'
 
-import RoutePopup from '@components/popups/Route'
 import useForcePopup from '@hooks/useForcePopup'
 
-import routeMarker from '../markers/route'
+import { routeMarker } from './routeMarker'
+import { RoutePopup } from './RoutePopup'
 
 const POSITIONS = /** @type {const} */ (['start', 'end'])
 
@@ -20,7 +20,7 @@ const MARKER_OPACITY = LINE_OPACITY * 2
  * @param {import("@rm/types").Route} route
  * @returns
  */
-const RouteTile = (route) => {
+const BaseRouteTile = (route) => {
   const [clicked, setClicked] = React.useState(false)
   const [hover, setHover] = React.useState('')
 
@@ -131,9 +131,7 @@ const RouteTile = (route) => {
   )
 }
 
-const MemoRouteTile = React.memo(
-  RouteTile,
+export const RouteTile = React.memo(
+  BaseRouteTile,
   (prev, next) => prev.updated === next.updated,
 )
-
-export default MemoRouteTile

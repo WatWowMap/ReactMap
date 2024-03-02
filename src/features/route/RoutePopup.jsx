@@ -27,9 +27,9 @@ import { useMemory } from '@hooks/useMemory'
 import { useStorage } from '@hooks/useStorage'
 import { useFormatDistance } from '@hooks/useFormatDistance'
 
-import Title from './common/Title'
-import TimeSince from './common/Timer'
-import Navigation from './common/Navigation'
+import Title from '../../components/popups/common/Title'
+import TimeSince from '../../components/popups/common/Timer'
+import Navigation from '../../components/popups/common/Navigation'
 
 const IMAGE_SIZE = 80
 
@@ -130,7 +130,7 @@ function ExpandableWrapper({ disabled = false, children, expandKey, primary }) {
  * @param {import("@rm/types").Route & { end?: boolean }} props
  * @returns
  */
-export default function RoutePopup({ end, ...props }) {
+export function RoutePopup({ end, ...props }) {
   const [route, setRoute] = React.useState({ ...props, tags: [] })
   const { config } = useMemory.getState()
   const formatDistance = useFormatDistance()
