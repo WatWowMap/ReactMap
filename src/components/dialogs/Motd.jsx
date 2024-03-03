@@ -10,9 +10,9 @@ import { useLayoutStore } from '@hooks/useLayoutStore'
 import { useStorage } from '@hooks/useStorage'
 import { CUSTOM_COMPONENT, MOTD_CHECK } from '@services/queries/config'
 import Utility from '@services/Utility'
+import { CustomDialog } from '@features/builder/CustomDialog'
+import { CustomTile } from '@features/builder/CustomTile'
 
-import DialogWrapper from '../custom/DialogWrapper'
-import CustomTile from '../custom/CustomTile'
 import { Loading } from '../Loading'
 
 const DEFAULT =
@@ -62,7 +62,7 @@ export default function MessageOfTheDay() {
       maxWidth={motd.dialogMaxWidth || 'sm'}
       onClose={handleMotdClose}
     >
-      <DialogWrapper
+      <CustomDialog
         configObj={motd}
         defaultTitle="message_of_the_day"
         handleClose={handleMotdClose}
@@ -78,7 +78,7 @@ export default function MessageOfTheDay() {
             />
           ))
         )}
-      </DialogWrapper>
+      </CustomDialog>
     </Dialog>
   )
 }

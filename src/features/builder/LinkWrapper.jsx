@@ -19,7 +19,7 @@ import Link from '@mui/material/Link'
  * }} props
  * @returns {React.ReactNode}
  */
-export default function LinkWrapper({
+export function LinkWrapper({
   link,
   href,
   target,

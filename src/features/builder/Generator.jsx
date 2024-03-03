@@ -1,24 +1,28 @@
 /* eslint-disable react/no-array-index-key */
-/* eslint-disable react/jsx-props-no-spreading */
 import React from 'react'
 import Divider from '@mui/material/Divider'
 import Grid from '@mui/material/Unstable_Grid2'
+
 import Utility from '@services/Utility'
+import DiscordButton from '@components/auth/Discord'
+import LocalLogin from '@components/auth/Local'
+import Telegram from '@components/auth/Telegram'
+import { Img } from '@components/Img'
+import LocaleSelection from '@components/LocaleSelection'
 
-import DiscordButton from '../auth/Discord'
-import LocalLogin from '../auth/Local'
-import Telegram from '../auth/Telegram'
-import CustomText from './CustomText'
-import CustomButton from './CustomButton'
-import { Img } from '../Img'
-import LocaleSelection from '../LocaleSelection'
-import LinkWrapper from './LinkWrapper'
+import { LinkWrapper } from './LinkWrapper'
+import { CustomText } from './CustomText'
+import { CustomButton } from './CustomButton'
 
-export default function Generator({ block = {}, defaultReturn = null }) {
-  // eslint-disable-next-line no-unused-vars
-  const { content = null, text = null, gridSizes, ...props } = block
+/**
+ *
+ * @param {{ block: import('@rm/types').CustomComponent, defaultReturn: React.ReactNode }} props
+ * @returns
+ */
+export function Generator({ block, defaultReturn = null }) {
+  const { content = null, text = null, gridSizes, type, ...props } = block
   const children = Utility.getBlockContent(content || text)
-  switch (block.type) {
+  switch (type) {
     case 'img':
       return (
         <LinkWrapper {...props}>
@@ -61,7 +65,7 @@ export default function Generator({ block = {}, defaultReturn = null }) {
       return (
         <Grid
           container
-          {...Utility.getSizes(block.gridSizes)}
+          {...Utility.getSizes(gridSizes)}
           className={block.className}
           alignItems={block.alignItems}
           justifyContent={block.justifyContent}

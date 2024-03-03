@@ -93,7 +93,7 @@ export default class Utility {
   }
 
   /**
-   * @param {Record<string, number>} sizeObj
+   * @param {import('@rm/types').GridSizes} sizeObj
    */
   static getSizes = (sizeObj) => ({
     xs: sizeObj?.xs || 12,

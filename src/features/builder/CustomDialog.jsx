@@ -5,10 +5,10 @@ import { useTranslation } from 'react-i18next'
 
 import Utility from '@services/Utility'
 
-import Header from '../Header'
-import Footer from '../Footer'
+import Header from '@components/Header'
+import Footer from '@components/Footer'
 
-export default function DialogWrapper({
+export function CustomDialog({
   configObj,
   defaultTitle,
   handleClose,

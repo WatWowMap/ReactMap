@@ -6,7 +6,7 @@ import Grid from '@mui/material/Unstable_Grid2'
 import { useQuery } from '@apollo/client'
 
 import { CUSTOM_COMPONENT } from '@services/queries/config'
-import CustomTile from '@components/custom/CustomTile'
+import { CustomTile } from '@features/builder/CustomTile'
 import { Loading } from '@components/Loading'
 
 export function CustomLoginPage() {

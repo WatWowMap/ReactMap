@@ -7,9 +7,9 @@ import Dialog from '@mui/material/Dialog'
 import { CUSTOM_COMPONENT } from '@services/queries/config'
 import { useMemory } from '@hooks/useMemory'
 import { useLayoutStore } from '@hooks/useLayoutStore'
+import { CustomDialog } from '@features/builder/CustomDialog'
+import { CustomTile } from '@features/builder/CustomTile'
 
-import DialogWrapper from '../custom/DialogWrapper'
-import CustomTile from '../custom/CustomTile'
 import { Loading } from '../Loading'
 
 const DEFAULT = {
@@ -37,7 +37,7 @@ export default function DonorPage() {
 
   return (
     <Dialog open={open} fullScreen={isMobile} onClose={handleClose}>
-      <DialogWrapper
+      <CustomDialog
         configObj={donorPage}
         defaultTitle="donor_page"
         handleClose={handleClose}
@@ -49,7 +49,7 @@ export default function DonorPage() {
             <CustomTile key={i} block={block} />
           ))
         )}
-      </DialogWrapper>
+      </CustomDialog>
     </Dialog>
   )
 }

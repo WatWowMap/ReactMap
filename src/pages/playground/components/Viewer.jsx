@@ -4,8 +4,8 @@ import * as React from 'react'
 import Grid from '@mui/material/Unstable_Grid2'
 import { useTranslation } from 'react-i18next'
 
-import CustomTile from '@components/custom/CustomTile'
-import DialogWrapper from '@components/custom/DialogWrapper'
+import CustomTile from '@features/builder/CustomTile'
+import CustomDialog from '@features/builder/CustomDialog'
 import ErrorBoundary from '@components/ErrorBoundary'
 
 import { useSafeParse } from '../hooks/useSafeParse'
@@ -47,7 +47,7 @@ export function Viewer() {
           </Grid>
         ) : (
           <Grid height="100%" pb={16} pt={4}>
-            <DialogWrapper
+            <CustomDialog
               configObj={configObj}
               defaultTitle={
                 component === 'donorPage' ? 'donor_page' : 'message_of_the_day'
@@ -57,7 +57,7 @@ export function Viewer() {
               {configObj.components.map((block, i) => (
                 <CustomTile key={i} block={block} />
               ))}
-            </DialogWrapper>
+            </CustomDialog>
           </Grid>
         )}
       </ErrorBoundary>

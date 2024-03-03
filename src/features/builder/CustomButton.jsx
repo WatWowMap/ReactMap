@@ -1,7 +1,7 @@
 import * as React from 'react'
 import Button from '@mui/material/Button'
 
-import { I } from '../I'
+import { I } from '@components/I'
 
 const THEME_COLORS = new Set([
   'success',
@@ -14,7 +14,7 @@ const THEME_COLORS = new Set([
 ])
 
 /** @param {import('@mui/material').ButtonProps & { icon?: string }} */
-export default function CustomButton({
+export function CustomButton({
   size,
   color = 'inherit',
   variant = 'text',
