@@ -1,10 +1,10 @@
-import React from 'react'
+// @ts-check
+import * as React from 'react'
 import ExpandMore from '@mui/icons-material/ExpandMore'
 import Accordion from '@mui/material/Accordion'
 import AccordionSummary from '@mui/material/AccordionSummary'
 import AccordionDetails from '@mui/material/AccordionDetails'
 import Typography from '@mui/material/Typography'
-import Grid from '@mui/material/Grid'
 import { styled } from '@mui/material/styles'
 import { useTranslation } from 'react-i18next'
 
@@ -34,27 +34,15 @@ const StyledAccordionSummary = styled(AccordionSummary)((/* { theme } */) => ({
   },
 }))
 
-export default function AdvancedAccordion({ block = null, children }) {
+/** @param {{ children: React.ReactNode }} props */
+export function AdvAccordion({ children }) {
   const { t } = useTranslation()
   return (
     <StyledAccordion>
       <StyledAccordionSummary expandIcon={<ExpandMore />}>
         <Typography variant="caption">{t('advanced')}</Typography>
       </StyledAccordionSummary>
-      <AccordionDetails sx={{ py: 0 }}>
-        {block ? (
-          <Grid
-            container
-            direction="row"
-            justifyContent="center"
-            alignItems="center"
-          >
-            {block}
-          </Grid>
-        ) : (
-          children
-        )}
-      </AccordionDetails>
+      <AccordionDetails sx={{ py: 0 }}>{children} </AccordionDetails>
     </StyledAccordion>
   )
 }

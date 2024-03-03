@@ -8,12 +8,12 @@ import Slider from '@mui/material/Slider'
 import { useTranslation } from 'react-i18next'
 import { debounce } from 'lodash'
 
-import AdvancedAccordion from '@components/custom/AdvancedAccordion'
 import { RADIUS_CHOICES } from '@assets/constants'
 
 import { StyledSubHeader } from '../Shared'
 import { ConfigContext } from '../ContextProvider'
 import { useScanStore } from '../store'
+import { AdvAccordion } from './AdvAccordion'
 
 /**
  *
@@ -35,7 +35,7 @@ export function ScanZonePopup() {
       </ListItem>
       {advancedOptions && (
         <ListItem style={{ padding: '10px 0' }} disableGutters disablePadding>
-          <AdvancedAccordion>
+          <AdvAccordion>
             <List
               style={{
                 textAlign: 'center',
@@ -47,7 +47,7 @@ export function ScanZonePopup() {
               <StyledSubHeader>{t('scan_zone_radius')}</StyledSubHeader>
               <ScanZoneSlider name="userRadius" min={50} max={900} />
             </List>
-          </AdvancedAccordion>
+          </AdvAccordion>
         </ListItem>
       )}
     </>
