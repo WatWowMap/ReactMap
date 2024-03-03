@@ -10,10 +10,10 @@ import { useLayoutStore } from '@hooks/useLayoutStore'
 import { useStorage } from '@hooks/useStorage'
 import { CUSTOM_COMPONENT, MOTD_CHECK } from '@services/queries/config'
 import Utility from '@services/Utility'
-import { CustomDialog } from '@features/builder/CustomDialog'
-import { CustomTile } from '@features/builder/CustomTile'
+import { CustomDialog } from '@features/builder/components/CustomDialog'
+import { CustomTile } from '@features/builder/components/CustomTile'
 
-import { Loading } from '../Loading'
+import { Loading } from '../../components/Loading'
 
 const DEFAULT =
   /** @type {import('@rm/types').Config['map']['messageOfTheDay']} */ ({
@@ -24,7 +24,7 @@ const DEFAULT =
     index: 0,
   })
 
-export default function MessageOfTheDay() {
+export function MessageOfTheDay() {
   const clientIndex = useStorage((s) => s.motdIndex)
   const tutorial = useStorage((s) => s.tutorial)
 

@@ -5,8 +5,8 @@ import Box from '@mui/material/Box'
 
 import { useMemory } from '@hooks/useMemory'
 import ThemeToggle from '@components/ThemeToggle'
+import { CustomLoginPage } from '@features/builder/LoginPage'
 
-import { CustomLoginPage } from './CustomPage'
 import { DefaultLoginPage } from './DefaultPage'
 
 export default function LoginPage() {

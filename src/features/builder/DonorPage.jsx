@@ -7,10 +7,10 @@ import Dialog from '@mui/material/Dialog'
 import { CUSTOM_COMPONENT } from '@services/queries/config'
 import { useMemory } from '@hooks/useMemory'
 import { useLayoutStore } from '@hooks/useLayoutStore'
-import { CustomDialog } from '@features/builder/CustomDialog'
-import { CustomTile } from '@features/builder/CustomTile'
+import { Loading } from '@components/Loading'
 
-import { Loading } from '../Loading'
+import { CustomDialog } from './components/CustomDialog'
+import { CustomTile } from './components/CustomTile'
 
 const DEFAULT = {
   settings: {},
@@ -21,7 +21,7 @@ const DEFAULT = {
 
 const handleClose = () => useLayoutStore.setState({ donorPage: false })
 
-export default function DonorPage() {
+export function DonorPage() {
   const open = useLayoutStore((s) => s.donorPage)
   const isMobile = useMemory((s) => s.isMobile)
 
