@@ -1,5 +1,7 @@
-import React from 'react'
-import { Menu, MenuItem } from '@mui/material'
+// @ts-check
+import * as React from 'react'
+import Menu from '@mui/material/Menu'
+import MenuItem from '@mui/material/MenuItem'
 import { useTranslation } from 'react-i18next'
 
 export default function Dropdown({ options, anchorEl, handleClose }) {

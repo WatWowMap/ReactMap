@@ -1,6 +1,10 @@
 // @ts-check
 import * as React from 'react'
-import { Grid, Typography, IconButton, Button, Box } from '@mui/material'
+import Grid from '@mui/material/Grid'
+import Box from '@mui/material/Box'
+import Typography from '@mui/material/Typography'
+import IconButton from '@mui/material/IconButton'
+import Button from '@mui/material/Button'
 import Edit from '@mui/icons-material/Edit'
 import { useTranslation } from 'react-i18next'
 import { useQuery } from '@apollo/client'

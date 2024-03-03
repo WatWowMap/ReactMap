@@ -1,5 +1,8 @@
-import React from 'react'
-import { DialogContent, Typography, Divider } from '@mui/material'
+// @ts-check
+import * as React from 'react'
+import DialogContent from '@mui/material/DialogContent'
+import Divider from '@mui/material/Divider'
+import Typography from '@mui/material/Typography'
 import { useTranslation } from 'react-i18next'
 
 export default function TutClosing() {

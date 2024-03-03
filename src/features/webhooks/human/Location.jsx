@@ -2,15 +2,13 @@
 import * as React from 'react'
 import LocationOn from '@mui/icons-material/LocationOn'
 import MyLocation from '@mui/icons-material/MyLocation'
-import {
-  Grid,
-  Button,
-  TextField,
-  Typography,
-  CircularProgress,
-  Autocomplete,
-  Box,
-} from '@mui/material'
+import Autocomplete from '@mui/material/Autocomplete'
+import Box from '@mui/material/Box'
+import Button from '@mui/material/Button'
+import CircularProgress from '@mui/material/CircularProgress'
+import Grid from '@mui/material/Grid'
+import TextField from '@mui/material/TextField'
+import Typography from '@mui/material/Typography'
 import { useLazyQuery, useMutation } from '@apollo/client'
 import { useTranslation } from 'react-i18next'
 import { useMapEvents } from 'react-leaflet'

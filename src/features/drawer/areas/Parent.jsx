@@ -1,6 +1,10 @@
 // @ts-check
 import * as React from 'react'
-import { Table, TableBody, Collapse, TableCell } from '@mui/material'
+import TableCell from '@mui/material/TableCell'
+import Collapse from '@mui/material/Collapse'
+import Table from '@mui/material/Table'
+import TableBody from '@mui/material/TableBody'
+
 import { useMemory } from '@hooks/useMemory'
 import { useStorage } from '@hooks/useStorage'
 

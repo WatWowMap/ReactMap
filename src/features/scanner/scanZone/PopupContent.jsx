@@ -1,6 +1,10 @@
 // @ts-check
 import * as React from 'react'
-import { Button, ButtonGroup, Slider, List, ListItem } from '@mui/material'
+import Button from '@mui/material/Button'
+import ButtonGroup from '@mui/material/ButtonGroup'
+import List from '@mui/material/List'
+import ListItem from '@mui/material/ListItem'
+import Slider from '@mui/material/Slider'
 import { useTranslation } from 'react-i18next'
 import { debounce } from 'lodash'
 

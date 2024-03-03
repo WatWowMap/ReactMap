@@ -1,8 +1,12 @@
 // @ts-check
 import * as React from 'react'
-import { Grid, Fab, Typography, Slide } from '@mui/material'
+import Grid from '@mui/material/Grid'
+import Fab from '@mui/material/Fab'
+import Slide from '@mui/material/Slide'
+import Typography from '@mui/material/Typography'
 import { useTranslation } from 'react-i18next'
 import { useMutation } from '@apollo/client'
+
 import { setProfile, allProfiles } from '@services/queries/webhook'
 
 import { useWebhookStore, setSelected } from './store'

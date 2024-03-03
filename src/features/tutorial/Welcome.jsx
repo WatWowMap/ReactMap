@@ -1,8 +1,10 @@
 import React from 'react'
 import Person from '@mui/icons-material/Person'
 import LockOpen from '@mui/icons-material/LockOpen'
-import { DialogContent, Grid, Typography, Fab } from '@mui/material'
-
+import Grid from '@mui/material/Grid'
+import Fab from '@mui/material/Fab'
+import Typography from '@mui/material/Typography'
+import DialogContent from '@mui/material/DialogContent'
 import { useTranslation } from 'react-i18next'
 
 import { useMemory } from '@hooks/useMemory'

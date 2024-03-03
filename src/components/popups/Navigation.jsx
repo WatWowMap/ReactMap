@@ -1,10 +1,15 @@
-import React from 'react'
+// @ts-check
+import * as React from 'react'
 import Map from '@mui/icons-material/Map'
-import { IconButton } from '@mui/material'
+import IconButton from '@mui/material/IconButton'
 
 import { useMemory } from '@hooks/useMemory'
 import { useStorage } from '@hooks/useStorage'
 
+/**
+ * @param {{ lat: number, lon: number, size?: import('@mui/material').IconButtonProps['size'] }} props
+ * @returns
+ */
 export default function Navigation({ lat, lon, size = 'large' }) {
   const nav = useStorage((s) => s.settings.navigation)
   const url = useMemory((s) => s.settings.navigation[nav]?.url)

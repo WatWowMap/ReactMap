@@ -1,26 +1,24 @@
 /* eslint-disable react/jsx-no-duplicate-props */
 import * as React from 'react'
 import ExpandMore from '@mui/icons-material/ExpandMore'
-import {
-  Grid,
-  Dialog,
-  DialogContent,
-  Switch,
-  Typography,
-  Select,
-  MenuItem,
-  TextField,
-  FormControl,
-  InputLabel,
-  InputAdornment,
-  Paper,
-  Accordion,
-  AccordionSummary,
-  AccordionDetails,
-  Divider,
-  CircularProgress,
-  Autocomplete,
-} from '@mui/material'
+import Accordion from '@mui/material/Accordion'
+import AccordionDetails from '@mui/material/AccordionDetails'
+import AccordionSummary from '@mui/material/AccordionSummary'
+import CircularProgress from '@mui/material/CircularProgress'
+import Divider from '@mui/material/Divider'
+import FormControl from '@mui/material/FormControl'
+import Grid from '@mui/material/Grid'
+import InputAdornment from '@mui/material/InputAdornment'
+import InputLabel from '@mui/material/InputLabel'
+import MenuItem from '@mui/material/MenuItem'
+import Paper from '@mui/material/Paper'
+import Select from '@mui/material/Select'
+import Switch from '@mui/material/Switch'
+import TextField from '@mui/material/TextField'
+import Typography from '@mui/material/Typography'
+import Autocomplete from '@mui/material/Autocomplete'
+import Dialog from '@mui/material/Dialog'
+import DialogContent from '@mui/material/DialogContent'
 import { Trans, useTranslation } from 'react-i18next'
 import { useLazyQuery } from '@apollo/client'
 

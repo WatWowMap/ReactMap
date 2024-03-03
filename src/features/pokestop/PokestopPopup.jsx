@@ -2,19 +2,16 @@
 import * as React from 'react'
 import ExpandMore from '@mui/icons-material/ExpandMore'
 import MoreVert from '@mui/icons-material/MoreVert'
-import {
-  Grid,
-  Typography,
-  Collapse,
-  IconButton,
-  Divider,
-  TableRow,
-  TableCell,
-  Table,
-  TableBody,
-  styled,
-} from '@mui/material'
-
+import Divider from '@mui/material/Divider'
+import Grid from '@mui/material/Grid'
+import IconButton from '@mui/material/IconButton'
+import Collapse from '@mui/material/Collapse'
+import Typography from '@mui/material/Typography'
+import TableCell from '@mui/material/TableCell'
+import TableRow from '@mui/material/TableRow'
+import Table from '@mui/material/Table'
+import TableBody from '@mui/material/TableBody'
+import styled from '@mui/material/styles/styled'
 import { useTranslation, Trans } from 'react-i18next'
 
 import ErrorBoundary from '@components/ErrorBoundary'

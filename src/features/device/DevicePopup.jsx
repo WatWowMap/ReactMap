@@ -1,11 +1,16 @@
 // @ts-check
 import * as React from 'react'
-import { Typography } from '@mui/material'
+import Typography from '@mui/material/Typography'
 import { useTranslation } from 'react-i18next'
 
 import Utility from '@services/Utility'
 import ErrorBoundary from '@components/ErrorBoundary'
 
+/**
+ *
+ * @param {{ isOnline: boolean, ts: number } & import('@rm/types').Device} props
+ * @returns
+ */
 export function DevicePopup({ isOnline, ts, ...device }) {
   const { t } = useTranslation()
 

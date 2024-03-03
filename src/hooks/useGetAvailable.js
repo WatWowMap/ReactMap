@@ -2,7 +2,7 @@
 import { useEffect, useMemo } from 'react'
 import { useQuery } from '@apollo/client'
 import * as queries from '@services/queries/available'
-import { capitalize } from '@mui/material'
+import { capitalize } from '@mui/material/utils'
 
 import { useMemory } from './useMemory'
 

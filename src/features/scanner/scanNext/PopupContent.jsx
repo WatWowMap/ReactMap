@@ -1,6 +1,8 @@
 // @ts-check
 import * as React from 'react'
-import { Button, ButtonGroup, ListItem } from '@mui/material'
+import Button from '@mui/material/Button'
+import ButtonGroup from '@mui/material/ButtonGroup'
+import ListItem from '@mui/material/ListItem'
 import { useTranslation } from 'react-i18next'
 
 import { SCAN_SIZES } from '@assets/constants'

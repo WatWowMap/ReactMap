@@ -2,16 +2,13 @@
 import * as React from 'react'
 import ExpandMore from '@mui/icons-material/ExpandMore'
 import MoreVert from '@mui/icons-material/MoreVert'
-import {
-  Grid,
-  Typography,
-  Collapse,
-  IconButton,
-  Divider,
-  MenuItem,
-  Menu,
-} from '@mui/material'
-
+import Grid from '@mui/material/Grid'
+import IconButton from '@mui/material/IconButton'
+import Menu from '@mui/material/Menu'
+import MenuItem from '@mui/material/MenuItem'
+import Divider from '@mui/material/Divider'
+import Collapse from '@mui/material/Collapse'
+import Typography from '@mui/material/Typography'
 import { useTranslation } from 'react-i18next'
 
 import { useSyncData } from '@features/webhooks/hooks'

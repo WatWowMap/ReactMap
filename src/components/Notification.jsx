@@ -3,8 +3,8 @@ import * as React from 'react'
 import Alert from '@mui/material/Alert'
 import Snackbar from '@mui/material/Snackbar'
 import Slide from '@mui/material/Slide'
+import AlertTitle from '@mui/material/AlertTitle'
 import { useTranslation, Trans } from 'react-i18next'
-import { AlertTitle } from '@mui/material'
 
 function SlideTransition(props) {
   // eslint-disable-next-line react/jsx-props-no-spreading

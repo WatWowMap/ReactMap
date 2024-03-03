@@ -1,4 +1,6 @@
+import type { SliderProps } from '@mui/material'
 import type { Feature, Polygon, MultiPolygon } from '@turf/helpers'
+import { Config } from './config'
 
 export type HttpMethod = 'GET' | 'PUT' | 'POST' | 'PATCH' | 'DELETE'
 
@@ -26,9 +28,6 @@ export type RMGeoJSON = {
   type: 'FeatureCollection'
   features: RMFeature[]
 }
-
-import { Config } from './config'
-import { SliderProps } from '@mui/material'
 
 export type Strategy = 'discord' | 'telegram' | 'local'
 

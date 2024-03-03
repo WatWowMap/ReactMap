@@ -1,5 +1,9 @@
+// @ts-check
 import React from 'react'
-import { Grid, DialogContent, Typography, Divider } from '@mui/material'
+import DialogContent from '@mui/material/DialogContent'
+import Divider from '@mui/material/Divider'
+import Typography from '@mui/material/Typography'
+import Grid from '@mui/material/Grid'
 import { useTranslation } from 'react-i18next'
 
 import { useMemory } from '@hooks/useMemory'
@@ -8,7 +12,6 @@ import data from './data'
 
 export default function TutPopup({ isMobile }) {
   const { t } = useTranslation()
-  const Icons = useMemory((state) => state.Icons)
   const { startLat, startLon } = useMemory((state) => state.config.general)
   const ts = Math.floor(new Date().getTime() / 1000)
   const size = isMobile ? 'subtitle2' : 'subtitle1'
@@ -54,9 +57,7 @@ export default function TutPopup({ isMobile }) {
                   lon: startLon,
                 }}
                 iconUrl="https://raw.githubusercontent.com/WatWowMap/wwm-uicons-webp/main/pokemon/16.webp"
-                userSettings={{ prioritizePvpInfo: false }}
                 isTutorial
-                Icons={Icons}
               />
             </div>
           </div>

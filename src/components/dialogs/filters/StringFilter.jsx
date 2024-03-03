@@ -1,6 +1,7 @@
 // @ts-check
 import * as React from 'react'
-import { ListItem, TextField } from '@mui/material'
+import ListItem from '@mui/material/ListItem'
+import TextField from '@mui/material/TextField'
 import { useTranslation } from 'react-i18next'
 import dlv from 'dlv'
 

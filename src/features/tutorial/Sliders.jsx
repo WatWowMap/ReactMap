@@ -1,5 +1,8 @@
 import React, { useState } from 'react'
-import { Grid, DialogContent, Typography, Divider } from '@mui/material'
+import DialogContent from '@mui/material/DialogContent'
+import Typography from '@mui/material/Typography'
+import Grid from '@mui/material/Grid'
+import Divider from '@mui/material/Divider'
 import { useTranslation, Trans } from 'react-i18next'
 
 import SliderTile from '@components/dialogs/filters/SliderTile'

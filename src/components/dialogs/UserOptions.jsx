@@ -1,12 +1,10 @@
 import * as React from 'react'
-import {
-  Switch,
-  Input,
-  DialogContent,
-  List,
-  ListItem,
-  ListItemText,
-} from '@mui/material'
+import DialogContent from '@mui/material/DialogContent'
+import Input from '@mui/material/Input'
+import List from '@mui/material/List'
+import ListItem from '@mui/material/ListItem'
+import ListItemText from '@mui/material/ListItemText'
+import Switch from '@mui/material/Switch'
 import { useTranslation, Trans } from 'react-i18next'
 
 import Utility from '@services/Utility'

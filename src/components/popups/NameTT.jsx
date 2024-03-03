@@ -1,7 +1,13 @@
+// @ts-check
 import * as React from 'react'
-import { Tooltip } from '@mui/material'
+import Tooltip from '@mui/material/Tooltip'
 import { useTranslation } from 'react-i18next'
 
+/**
+ *
+ * @param {{ id: string | string[], children: React.ReactElement }} props
+ * @returns
+ */
 export default function NameTT({ id, children }) {
   const { t } = useTranslation()
 

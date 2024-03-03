@@ -1,9 +1,10 @@
 import type { LogLevelNames } from 'loglevel'
+import type { DialogProps } from '@mui/material'
+
 import config = require('server/src/configs/default.json')
 import example = require('server/src/configs/local.example.json')
 
 import type { Schema } from './server'
-import type { DialogProps } from '@mui/material'
 
 type BaseConfig = typeof config
 type ExampleConfig = typeof example

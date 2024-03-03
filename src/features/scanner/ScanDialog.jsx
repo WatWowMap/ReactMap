@@ -1,6 +1,8 @@
 // @ts-check
 import * as React from 'react'
-import { Dialog, DialogContent, Typography } from '@mui/material'
+import Dialog from '@mui/material/Dialog'
+import DialogContent from '@mui/material/DialogContent'
+import Typography from '@mui/material/Typography'
 import { useTranslation } from 'react-i18next'
 
 import Header from '@components/Header'

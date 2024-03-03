@@ -1,6 +1,9 @@
+// @ts-check
 import React from 'react'
+import Typography from '@mui/material/Typography'
+import Grid from '@mui/material/Grid'
 import { useTranslation, Trans } from 'react-i18next'
-import { Grid, Typography } from '@mui/material'
+
 import { useWebhookStore } from './store'
 
 export default function WebhookError({ children }) {

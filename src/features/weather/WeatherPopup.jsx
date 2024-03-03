@@ -1,6 +1,7 @@
 // @ts-check
 import * as React from 'react'
-import { Grid, Typography } from '@mui/material'
+import Grid from '@mui/material/Grid'
+import Typography from '@mui/material/Typography'
 import { useTranslation } from 'react-i18next'
 
 import { useMemory } from '@hooks/useMemory'

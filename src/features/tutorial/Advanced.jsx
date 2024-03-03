@@ -6,15 +6,12 @@ import Clear from '@mui/icons-material/Clear'
 import Save from '@mui/icons-material/Save'
 import HelpOutline from '@mui/icons-material/HelpOutline'
 import FormatSize from '@mui/icons-material/FormatSize'
-
-import {
-  Grid,
-  DialogContent,
-  Typography,
-  Divider,
-  Button,
-  Box,
-} from '@mui/material'
+import DialogContent from '@mui/material/DialogContent'
+import Typography from '@mui/material/Typography'
+import Divider from '@mui/material/Divider'
+import Button from '@mui/material/Button'
+import Grid from '@mui/material/Grid'
+import Box from '@mui/material/Box'
 
 import { useTranslation } from 'react-i18next'
 

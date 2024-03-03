@@ -1,5 +1,5 @@
 // @ts-check
-import { capitalize } from '@mui/material'
+import { capitalize } from '@mui/material/utils'
 
 /**
  * @param {string} str

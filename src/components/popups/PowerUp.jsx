@@ -1,11 +1,19 @@
-import React from 'react'
-import { Grid, Typography, Divider } from '@mui/material'
+// @ts-check
+import * as React from 'react'
+import Divider from '@mui/material/Divider'
+import Grid from '@mui/material/Grid'
+import Typography from '@mui/material/Typography'
 import { useTranslation } from 'react-i18next'
 
 import Utility from '@services/Utility'
 
 import TimeTile from './TimeTile'
 
+/**
+ *
+ * @param {{ power_up_level: number, power_up_points: number, power_up_end_timestamp: number, divider?: boolean }} props
+ * @returns
+ */
 export default function PowerUp({
   power_up_level,
   power_up_points,

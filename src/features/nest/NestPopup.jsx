@@ -1,16 +1,13 @@
 // @ts-check
 import React, { useState, useEffect } from 'react'
 import MoreVert from '@mui/icons-material/MoreVert'
-import {
-  Grid,
-  Typography,
-  IconButton,
-  Divider,
-  Menu,
-  MenuItem,
-  Button,
-} from '@mui/material'
-
+import Grid from '@mui/material/Grid'
+import Typography from '@mui/material/Typography'
+import IconButton from '@mui/material/IconButton'
+import Menu from '@mui/material/Menu'
+import MenuItem from '@mui/material/MenuItem'
+import Divider from '@mui/material/Divider'
+import Button from '@mui/material/Button'
 import { useTranslation } from 'react-i18next'
 
 import { useMemory } from '@hooks/useMemory'

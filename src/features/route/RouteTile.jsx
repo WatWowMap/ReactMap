@@ -1,9 +1,8 @@
 /* eslint-disable react/destructuring-assignment */
-/* eslint-disable no-nested-ternary */
 // @ts-check
 import * as React from 'react'
 import { Marker, Polyline, useMapEvents } from 'react-leaflet'
-import { darken } from '@mui/material'
+import { darken } from '@mui/material/styles'
 
 import useForcePopup from '@hooks/useForcePopup'
 

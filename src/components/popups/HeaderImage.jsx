@@ -1,6 +1,8 @@
 // @ts-check
 import * as React from 'react'
-import { Avatar, Link } from '@mui/material'
+import Avatar from '@mui/material/Avatar'
+import Link from '@mui/material/Link'
+
 import { useMemory } from '@hooks/useMemory'
 
 export default function HeaderImage({

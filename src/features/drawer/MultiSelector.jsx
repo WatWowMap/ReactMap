@@ -1,7 +1,9 @@
 // @ts-check
 import * as React from 'react'
-import { ButtonGroup, Button } from '@mui/material'
+import Button from '@mui/material/Button'
+import ButtonGroup from '@mui/material/ButtonGroup'
 import { useTranslation } from 'react-i18next'
+
 import { useDeepStore } from '@hooks/useStorage'
 
 const SX = /** @type {import('@mui/material').SxProps} */ ({ mx: 'auto' })

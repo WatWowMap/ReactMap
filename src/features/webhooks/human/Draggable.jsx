@@ -1,16 +1,16 @@
 // @ts-check
 import * as React from 'react'
-import {
-  Grid,
-  Button,
-  Typography,
-  OutlinedInput,
-  InputAdornment,
-  FormControl,
-} from '@mui/material'
+import Button from '@mui/material/Button'
+import FormControl from '@mui/material/FormControl'
+import Grid from '@mui/material/Grid'
+import InputAdornment from '@mui/material/InputAdornment'
+import OutlinedInput from '@mui/material/OutlinedInput'
+import Typography from '@mui/material/Typography'
 import { Circle, Marker, Popup, useMap } from 'react-leaflet'
 import { useTranslation } from 'react-i18next'
+
 import fallbackIcon from '@assets/fallbackMarker'
+
 import { useWebhookStore } from '../store'
 
 export default function DraggableMarker() {

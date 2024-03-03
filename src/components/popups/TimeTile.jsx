@@ -1,6 +1,9 @@
 // @ts-check
 import * as React from 'react'
-import { Collapse, Grid, IconButton, Typography } from '@mui/material'
+import Collapse from '@mui/material/Collapse'
+import Grid from '@mui/material/Grid'
+import IconButton from '@mui/material/IconButton'
+import Typography from '@mui/material/Typography'
 import ExpandMore from '@mui/icons-material/ExpandMore'
 
 import { useStorage } from '@hooks/useStorage'

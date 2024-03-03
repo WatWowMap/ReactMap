@@ -1,21 +1,19 @@
 // @ts-check
 /* eslint-disable react/no-unstable-nested-components */
 import * as React from 'react'
-import {
-  Typography,
-  AppBar,
-  Tab,
-  Tabs,
-  List,
-  ListItem,
-  Collapse,
-  Divider,
-  ListSubheader,
-  Select,
-  MenuItem,
-  FormControl,
-  InputLabel,
-} from '@mui/material'
+import AppBar from '@mui/material/AppBar'
+import Divider from '@mui/material/Divider'
+import FormControl from '@mui/material/FormControl'
+import InputLabel from '@mui/material/InputLabel'
+import List from '@mui/material/List'
+import ListItem from '@mui/material/ListItem'
+import ListSubheader from '@mui/material/ListSubheader'
+import MenuItem from '@mui/material/MenuItem'
+import Select from '@mui/material/Select'
+import Tab from '@mui/material/Tab'
+import Tabs from '@mui/material/Tabs'
+import Typography from '@mui/material/Typography'
+import Collapse from '@mui/material/Collapse'
 import { useTranslation } from 'react-i18next'
 import Help from '@mui/icons-material/HelpOutline'
 
@@ -24,7 +22,6 @@ import { useStorage, useDeepStore } from '@hooks/useStorage'
 import Utility from '@services/Utility'
 import { XXS_XXL, NUNDO_HUNDO } from '@assets/constants'
 import { useLayoutStore } from '@hooks/useLayoutStore'
-
 import { StringFilterMemo } from '@components/dialogs/filters/StringFilter'
 import SliderTile from '@components/dialogs/filters/SliderTile'
 import TabPanel from '@components/TabPanel'

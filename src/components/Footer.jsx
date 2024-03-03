@@ -1,6 +1,9 @@
 // @ts-check
 import * as React from 'react'
-import { IconButton, Button, Typography, Grid } from '@mui/material'
+import IconButton from '@mui/material/IconButton'
+import Button from '@mui/material/Button'
+import Typography from '@mui/material/Typography'
+import Grid from '@mui/material/Grid'
 import { useTranslation } from 'react-i18next'
 
 import * as MuiIcons from './Icons'

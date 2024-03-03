@@ -1,21 +1,17 @@
-/* eslint-disable no-nested-ternary */
 import React, { useState, useEffect } from 'react'
 import Check from '@mui/icons-material/Check'
 import Clear from '@mui/icons-material/Clear'
 import ExpandMore from '@mui/icons-material/ExpandMore'
 import MoreVert from '@mui/icons-material/MoreVert'
-import {
-  Grid,
-  Avatar,
-  Typography,
-  Collapse,
-  IconButton,
-  Divider,
-  Menu,
-  MenuItem,
-  Tooltip,
-} from '@mui/material'
-
+import Grid from '@mui/material/Grid'
+import Typography from '@mui/material/Typography'
+import IconButton from '@mui/material/IconButton'
+import Menu from '@mui/material/Menu'
+import MenuItem from '@mui/material/MenuItem'
+import Divider from '@mui/material/Divider'
+import Avatar from '@mui/material/Avatar'
+import Tooltip from '@mui/material/Tooltip'
+import Collapse from '@mui/material/Collapse'
 import { useTranslation } from 'react-i18next'
 
 import { useMemory } from '@hooks/useMemory'

@@ -1,13 +1,11 @@
 // @ts-check
 import * as React from 'react'
 import { useQuery } from '@apollo/client'
-import {
-  TableContainer,
-  Table,
-  TableBody,
-  TableRow,
-  Paper,
-} from '@mui/material'
+import Paper from '@mui/material/Paper'
+import Table from '@mui/material/Table'
+import TableBody from '@mui/material/TableBody'
+import TableRow from '@mui/material/TableRow'
+import TableContainer from '@mui/material/TableContainer'
 
 import Query from '@services/Query'
 import { useMemory } from '@hooks/useMemory'
