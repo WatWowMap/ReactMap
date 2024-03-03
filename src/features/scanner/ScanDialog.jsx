@@ -13,7 +13,7 @@ import { useScanStore } from './store'
 
 const { setScanMode } = useScanStore.getState()
 
-export default function ScanDialog() {
+export function ScanDialog() {
   const { t } = useTranslation()
   const scanNext = useScanStore((s) => s.scanNextMode)
   const scanZone = useScanStore((s) => s.scanZoneMode)

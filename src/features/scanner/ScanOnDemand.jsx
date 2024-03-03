@@ -21,7 +21,7 @@ const { setScanMode } = useScanStore.getState()
  * @param {{ mode: 'scanNext' | 'scanZone' }} props
  * @returns {JSX.Element}
  */
-function ScanOnDemand({ mode }) {
+function BaseScanOnDemand({ mode }) {
   const scanMode = useScanStore((s) => s[`${mode}Mode`])
   const location = useStorage((s) => s.location)
   const online = useMemory((s) => s.online)
@@ -156,9 +156,7 @@ function ScanOnDemand({ mode }) {
   )
 }
 
-const MemoizedScanOnDemand = React.memo(
-  ScanOnDemand,
+export const ScanOnDemand = React.memo(
+  BaseScanOnDemand,
   (prev, next) => prev.mode === next.mode,
 )
-
-export default MemoizedScanOnDemand

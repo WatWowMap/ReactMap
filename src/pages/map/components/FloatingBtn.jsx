@@ -29,7 +29,7 @@ import useLocation from '@hooks/useLocation'
 import { useMemory } from '@hooks/useMemory'
 import { useLayoutStore } from '@hooks/useLayoutStore'
 import { useStorage } from '@hooks/useStorage'
-import { useScanStore } from '@features/scanner/store'
+import { useScanStore } from '@features/scanner'
 
 import { I } from '@components/I'
 import { setModeBtn, useWebhookStore } from '@features/webhooks/store'

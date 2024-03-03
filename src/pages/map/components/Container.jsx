@@ -7,7 +7,7 @@ import { useStorage } from '@hooks/useStorage'
 import { useMapStore } from '@hooks/useMapStore'
 import Utility from '@services/Utility'
 
-import ScanOnDemand from '@features/scanner'
+import { ScanOnDemand } from '@features/scanner'
 import DraggableMarker from '@features/webhooks/human/Draggable'
 import WebhookAreaSelection from '@features/webhooks/human/area/AreaSelection'
 import { ActiveWeather } from '@features/weather'

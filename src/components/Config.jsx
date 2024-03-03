@@ -12,7 +12,7 @@ import { deepMerge } from '@utils/deepMerge'
 import { checkHoliday } from '@utils/checkHoliday'
 import { useHideElement } from '@hooks/useHideElement'
 import { getGlowRules } from '@utils/getGlowRules'
-import { useScannerSessionStorage } from '@features/scanner/store'
+import { useScannerSessionStorage } from '@features/scanner'
 
 export default function Config({ children }) {
   const { t } = useTranslation()
