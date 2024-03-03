@@ -1,5 +1,4 @@
 // @ts-check
-/* eslint-disable no-nested-ternary */
 import { divIcon } from 'leaflet'
 import { basicEqualFn, useMemory } from '@hooks/useMemory'
 import { useStorage } from '@hooks/useStorage'
@@ -42,7 +41,7 @@ export function usePokestopMarker({
         hasInvasion,
         hasQuest && userSettings.pokestops.hasQuestIndicator,
         ar_scan_eligible &&
-          (userSettings.pokestops.showArBadge || power_up_level),
+          (userSettings.pokestops.showArBadge || !!power_up_level),
         power_up_level,
         hasEvent
           ? Math.max(...events.map((event) => event.display_type)).toString()

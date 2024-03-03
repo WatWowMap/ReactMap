@@ -1,6 +1,5 @@
-/* eslint-disable no-bitwise */
 // @ts-check
-/* eslint-disable no-console */
+/* eslint-disable no-bitwise */
 /* eslint-disable react/destructuring-assignment */
 import * as React from 'react'
 import Grid from '@mui/material/Grid'

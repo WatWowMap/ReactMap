@@ -6,7 +6,7 @@ import 'leaflet/dist/leaflet.css'
 import * as React from 'react'
 import { BrowserRouter } from 'react-router-dom'
 import CssBaseline from '@mui/material/CssBaseline'
-import { ThemeProvider } from '@mui/material/styles'
+import ThemeProvider from '@mui/material/styles/ThemeProvider'
 import { ApolloProvider } from '@apollo/client'
 
 import useCustomTheme from '@assets/theme'

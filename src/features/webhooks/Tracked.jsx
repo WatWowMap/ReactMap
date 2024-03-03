@@ -1,5 +1,5 @@
-/* eslint-disable react/no-unstable-nested-components */
 // @ts-check
+/* eslint-disable react/no-unstable-nested-components */
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { Virtuoso } from 'react-virtuoso'

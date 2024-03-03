@@ -1,5 +1,4 @@
 // @ts-check
-/* eslint-disable react/jsx-props-no-spreading */
 import * as React from 'react'
 import Grid from '@mui/material/Unstable_Grid2'
 

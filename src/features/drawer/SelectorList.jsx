@@ -1,4 +1,3 @@
-/* eslint-disable no-fallthrough */
 // @ts-check
 import * as React from 'react'
 import TuneIcon from '@mui/icons-material/Tune'
