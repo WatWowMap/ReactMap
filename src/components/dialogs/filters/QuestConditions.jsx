@@ -1,11 +1,15 @@
 // @ts-check
 import * as React from 'react'
 import ListItem from '@mui/material/ListItem'
+import Typography from '@mui/material/Typography'
+import FormControl from '@mui/material/FormControl'
+import InputLabel from '@mui/material/InputLabel'
+import Select from '@mui/material/Select'
+import MenuItem from '@mui/material/MenuItem'
 import { useTranslation } from 'react-i18next'
+
 import { useMemory } from '@hooks/useMemory'
 import { useDeepStore, useStorage } from '@hooks/useStorage'
-import { FormControl, InputLabel, Select, MenuItem } from '@mui/material'
-import Typography from '@mui/material/Typography'
 import QuestTitle from '@components/QuestTitle'
 
 /**
