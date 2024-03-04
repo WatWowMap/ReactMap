@@ -4,7 +4,7 @@ import { Navigate } from 'react-router-dom'
 import Box from '@mui/material/Box'
 
 import { useMemory } from '@hooks/useMemory'
-import ThemeToggle from '@components/ThemeToggle'
+import { ThemeToggle } from '@components/inputs/ThemeToggle'
 import { CustomLoginPage } from '@features/builder/LoginPage'
 
 import { DefaultLoginPage } from './DefaultPage'

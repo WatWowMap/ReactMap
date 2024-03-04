@@ -9,7 +9,7 @@ import { useStorage } from '@hooks/useStorage'
 const handleClick = () =>
   useStorage.setState((prev) => ({ darkMode: !prev.darkMode }))
 
-export default function ThemeToggle() {
+export function ThemeToggle() {
   const theme = useTheme()
 
   return (
