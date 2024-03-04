@@ -14,7 +14,7 @@ import Footer from '@components/Footer'
 import { useMemory } from '@hooks/useMemory'
 import { useLayoutStore } from '@hooks/useLayoutStore'
 
-import { DialogWrapper } from '../DialogWrapper'
+import { DialogWrapper } from '../../components/dialogs/DialogWrapper'
 
 const GAP = 2
 

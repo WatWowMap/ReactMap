@@ -14,7 +14,7 @@ import { useMemory } from '@hooks/useMemory'
 import { useLayoutStore } from '@hooks/useLayoutStore'
 import Query from '@services/Query'
 
-import { VirtualGrid } from '@components/VirtualGrid'
+import { VirtualGrid } from '@components/virtual/VirtualGrid'
 import { Img } from '@components/Img'
 import { ToggleTypography } from '@components/ToggleTypography'
 

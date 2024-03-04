@@ -21,7 +21,7 @@ import AdvancedFilter from '@components/dialogs/filters/Advanced'
 import BadgeSelection from '@components/dialogs/BadgeSelection'
 import SlotSelection from '@components/dialogs/filters/SlotSelection'
 import { HelpDialog } from '@components/dialogs/Help'
-import { PkmnFilterHelp } from '@components/dialogs/filters/PkmnFilterHelp'
+import { PkmnFilterHelp } from '@features/drawer/PkmnFilterHelp'
 import { useMemory } from '@hooks/useMemory'
 
 import { FloatingButtonsMemo } from './FloatingBtn'

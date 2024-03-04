@@ -1,12 +1,12 @@
 // @ts-check
 import * as React from 'react'
 
-import { SelectorItem } from '@features/drawer/SelectorItem'
+import { SelectorItem } from '@components/virtual/SelectorItem'
 
 import { useWebhookStore } from '../hooks/store'
 import { Poracle } from '../services/Poracle'
 
-/** @param {import('@features/drawer/SelectorItem').BaseProps<import('@rm/types').AllButHuman>} props */
+/** @param {import('@components/virtual/SelectorItem').BaseProps<import('@rm/types').AllButHuman>} props */
 export function WebhookItem({ id, category, ...props }) {
   const filter = useWebhookStore((s) => s.tempFilters[id])
 

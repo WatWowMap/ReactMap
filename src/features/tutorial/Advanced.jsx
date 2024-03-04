@@ -12,14 +12,13 @@ import Divider from '@mui/material/Divider'
 import Button from '@mui/material/Button'
 import Grid from '@mui/material/Grid'
 import Box from '@mui/material/Box'
-
 import { useTranslation } from 'react-i18next'
 
 import Utility from '@services/Utility'
 import { useMemory } from '@hooks/useMemory'
+import { VirtualGrid } from '@components/virtual/VirtualGrid'
+import { StandardItem } from '@components/virtual/StandardItem'
 
-import { VirtualGrid } from '@components/VirtualGrid'
-import { StandardItem } from '@features/drawer/SelectorItem'
 import data from './data'
 
 export default function TutAdvanced({ toggleHelp, category }) {

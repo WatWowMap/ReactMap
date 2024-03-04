@@ -7,12 +7,9 @@ import Box from '@mui/material/Box'
 
 import { useTranslateById } from '@hooks/useTranslateById'
 import { useMemory } from '@hooks/useMemory'
-import { useLayoutStore } from '@hooks/useLayoutStore'
-import { useDeepStore, useStorage } from '@hooks/useStorage'
-import { checkIfHasAll } from '@utils/hasAll'
 import { ColoredTile } from '@components/ColoredTile'
 import { ToggleTypography } from '@components/ToggleTypography'
-import { SQUARE_ITEM } from '@components/VirtualGrid'
+import { SQUARE_ITEM } from '@components/virtual/VirtualGrid'
 
 /**
  * @template {string} T
@@ -34,37 +31,6 @@ import { SQUARE_ITEM } from '@components/VirtualGrid'
  *  caption?: boolean
  * }} FullProps
  */
-
-/** @param {BaseProps<keyof import('@rm/types').Available>} props */
-export function StandardItem({ id, category, ...props }) {
-  const [filter, setFilter] = useDeepStore(`filters.${category}.filter.${id}`)
-  const hasAll = checkIfHasAll(category, id)
-  const easyMode = useStorage((s) => !!s.filters?.[category]?.easyMode)
-  return (
-    <SelectorItem
-      {...props}
-      id={id}
-      filter={filter}
-      setFilter={setFilter}
-      hasAll={hasAll}
-      easyMode={easyMode}
-      onClick={() =>
-        useLayoutStore.setState(
-          id.startsWith('t')
-            ? { slotSelection: id }
-            : {
-                advancedFilter: {
-                  open: true,
-                  id,
-                  category,
-                  selectedIds: [],
-                },
-              },
-        )
-      }
-    />
-  )
-}
 
 /** @param {FullProps} props */
 export function SelectorItem({
