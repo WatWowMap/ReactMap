@@ -15,7 +15,7 @@ import { DualBoolToggle } from '@components/inputs/BoolToggle'
 import { ENABLED_ALL } from '@assets/constants'
 import Header from '@components/Header'
 import Footer from '@components/Footer'
-import Size from './Size'
+import Size from '../../inputs/Size'
 
 import { DialogWrapper } from '../DialogWrapper'
 
@@ -130,7 +130,7 @@ export default function SlotSelection() {
 
 /**
  *
- * @param {{ id: string, children?: React.ReactNode, onClick?: import('./Size').SizeOnClick }} props
+ * @param {{ id: string, children?: React.ReactNode, onClick?: import('../../inputs/Size').SizeOnClick }} props
  * @returns
  */
 function SlotAdjustor({ id, children, onClick }) {

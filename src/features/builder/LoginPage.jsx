@@ -6,8 +6,9 @@ import Grid from '@mui/material/Unstable_Grid2'
 import { useQuery } from '@apollo/client'
 
 import { CUSTOM_COMPONENT } from '@services/queries/config'
-import { CustomTile } from '@features/builder/components/CustomTile'
 import { Loading } from '@components/Loading'
+
+import { CustomTile } from './components/CustomTile'
 
 export function CustomLoginPage() {
   const { t, i18n } = useTranslation()

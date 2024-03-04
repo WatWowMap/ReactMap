@@ -21,9 +21,9 @@ import { checkIfHasAll } from '@utils/hasAll'
 
 import { StringFilter } from './StringFilter'
 import { SliderTile } from '../../inputs/SliderTile'
-import Size from './Size'
-import { GenderListItem } from './Gender'
-import { QuestConditionSelector } from './QuestConditions'
+import Size from '../../inputs/Size'
+import { GenderListItem } from '../../inputs/Gender'
+import { QuestConditionSelector } from '../../inputs/QuestConditions'
 
 export default function AdvancedFilter() {
   const { category, id, selectedIds, open } = useLayoutStore(

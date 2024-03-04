@@ -16,7 +16,7 @@ import { sendNotification } from '@services/desktopNotification'
 import { useMapStore } from '@hooks/useMapStore'
 import ToolTipWrapper from '@components/ToolTipWrapper'
 
-import PopupContent from './PokemonPopup'
+import { PokemonPopup } from './PokemonPopup'
 import { basicPokemonMarker, fancyPokemonMarker } from './pokemonMarker'
 
 /**
@@ -38,7 +38,7 @@ const getGlowStatus = (pkmn, userSettings) => {
  * @param {import('@rm/types').Pokemon & { force?: boolean }} pkmn
  * @returns
  */
-const PokemonTile = (pkmn) => {
+const BasePokemonTile = (pkmn) => {
   const internalId = `${pkmn.pokemon_id}-${pkmn.form}`
 
   const [markerRef, setMarkerRef] = React.useState(null)
@@ -190,7 +190,7 @@ const PokemonTile = (pkmn) => {
       }
     >
       <Popup position={finalLocation}>
-        <PopupContent pokemon={pkmn} iconUrl={iconUrl} />
+        <PokemonPopup pokemon={pkmn} iconUrl={iconUrl} />
       </Popup>
       {(showTimer || timerOverride || extras.length > 0) && (
         <ToolTipWrapper
@@ -228,9 +228,7 @@ const PokemonTile = (pkmn) => {
   )
 }
 
-const MemoPokemonTile = React.memo(
-  PokemonTile,
+export const PokemonTile = React.memo(
+  BasePokemonTile,
   (prev, next) => prev.updated === next.updated,
 )
-
-export default MemoPokemonTile

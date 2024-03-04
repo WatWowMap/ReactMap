@@ -12,7 +12,7 @@ import RobustTimeout from '@services/apollo/RobustTimeout'
 import Utility from '@services/Utility'
 import { FILTER_SKIP_LIST } from '@assets/constants'
 import Notification from '@components/Notification'
-import { GenerateCells } from '@features/s2cell/GenerateCells'
+import { GenerateCells } from '@features/s2cell'
 
 import Clustering from './Clustering'
 import tileObject from '../tileObject'

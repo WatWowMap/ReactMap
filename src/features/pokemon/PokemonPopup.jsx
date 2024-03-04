@@ -50,7 +50,7 @@ const getColor = (ivPercent) => {
   }
 }
 
-export default function PokemonPopup({ pokemon, iconUrl, isTutorial = false }) {
+export function PokemonPopup({ pokemon, iconUrl, isTutorial = false }) {
   const { t } = useTranslation()
   const { pokemon_id, cleanPvp, iv, cp } = pokemon
   const perms = useMemory((state) => state.auth.perms)

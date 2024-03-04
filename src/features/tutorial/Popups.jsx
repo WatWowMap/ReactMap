@@ -7,7 +7,7 @@ import Grid from '@mui/material/Grid'
 import { useTranslation } from 'react-i18next'
 
 import { useMemory } from '@hooks/useMemory'
-import PokemonPopup from '@features/pokemon/PokemonPopup'
+import { PokemonPopup } from '@features/pokemon'
 import data from './data'
 
 export default function TutPopup({ isMobile }) {
