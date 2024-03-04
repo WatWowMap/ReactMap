@@ -7,7 +7,7 @@ import Divider from '@mui/material/Divider'
 import { styled } from '@mui/material/styles'
 
 import { useMemory } from '@hooks/useMemory'
-import LocaleSelection from '@components/LocaleSelection'
+import { LocaleSelection } from '@components/inputs/LocaleSelection'
 
 import methods from './Methods'
 

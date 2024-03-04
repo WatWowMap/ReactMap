@@ -33,7 +33,7 @@ import {
   getPermission,
   requestPermission,
 } from '@services/desktopNotification'
-import LocaleSelection from '@components/LocaleSelection'
+import { LocaleSelection } from '@components/inputs/LocaleSelection'
 import { DividerWithMargin } from '@components/StyledDivider'
 
 import DrawerActions from './Actions'

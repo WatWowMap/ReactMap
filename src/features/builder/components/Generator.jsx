@@ -8,7 +8,7 @@ import DiscordButton from '@components/auth/Discord'
 import LocalLogin from '@components/auth/Local'
 import Telegram from '@components/auth/Telegram'
 import { Img } from '@components/Img'
-import LocaleSelection from '@components/LocaleSelection'
+import { LocaleSelection } from '@components/inputs/LocaleSelection'
 
 import { LinkWrapper } from './LinkWrapper'
 import { CustomText } from './CustomText'

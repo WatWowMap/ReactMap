@@ -8,9 +8,10 @@ import MenuItem from '@mui/material/MenuItem'
 
 import { useStorage } from '@hooks/useStorage'
 
+/** @type {React.CSSProperties} */
 const STYLE = { margin: '3px 0' }
 
-export default function LocaleSelection() {
+export function LocaleSelection() {
   const { t, i18n } = useTranslation()
   return (
     <FormControl size="small" fullWidth style={STYLE}>
