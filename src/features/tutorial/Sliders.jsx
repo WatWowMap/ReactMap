@@ -5,7 +5,7 @@ import Grid from '@mui/material/Grid'
 import Divider from '@mui/material/Divider'
 import { useTranslation, Trans } from 'react-i18next'
 
-import SliderTile from '@components/dialogs/filters/SliderTile'
+import { SliderTile } from '@components/inputs/SliderTile'
 import data from './data'
 
 const relevant = ['iv', 'level', 'great', 'ultra']

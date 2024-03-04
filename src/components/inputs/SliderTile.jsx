@@ -25,7 +25,7 @@ const StyledSlider = styled(Slider)(() => ({ width: '100%' }))
  * @typedef {('' | number)[]} Value
  * @param {import('@rm/types').RMSliderProps} props
  */
-export default function SliderTile({
+export function SliderTile({
   slide: {
     name,
     min,

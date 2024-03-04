@@ -26,7 +26,7 @@ import { useMemory } from '@hooks/useMemory'
 import { useStorage } from '@hooks/useStorage'
 import Query from '@services/Query'
 import Utility from '@services/Utility'
-import SliderTile from '@components/dialogs/filters/SliderTile'
+import { SliderTile } from '@components/inputs/SliderTile'
 import Header from '@components/Header'
 import Footer from '@components/Footer'
 

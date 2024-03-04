@@ -19,7 +19,7 @@ import {
   ENUM_TTH,
   WAYFARER_OPTIONS,
 } from '@assets/constants'
-import SliderTile from '@components/dialogs/filters/SliderTile'
+import { SliderTile } from '@components/inputs/SliderTile'
 
 import { MultiSelectorStore } from './MultiSelector'
 import { CollapsibleItem } from './CollapsibleItem'

@@ -20,7 +20,7 @@ import { STANDARD_BACKUP, applyToAll } from '@services/filtering/applyToAll'
 import { checkIfHasAll } from '@utils/hasAll'
 
 import { StringFilter } from './StringFilter'
-import SliderTile from './SliderTile'
+import { SliderTile } from '../../inputs/SliderTile'
 import Size from './Size'
 import { GenderListItem } from './Gender'
 import { QuestConditionSelector } from './QuestConditions'
