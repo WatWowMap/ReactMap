@@ -24,7 +24,7 @@ import useGetAvailable from '@hooks/useGetAvailable'
 import { VirtualGrid } from '@components/VirtualGrid'
 import TabPanel from '@components/TabPanel'
 
-import { BoolToggle } from './BoolToggle'
+import { BoolToggle } from '../../components/inputs/BoolToggle'
 import { GenericSearchMemo } from '../../components/inputs/GenericSearch'
 import { StandardItem } from './SelectorItem'
 

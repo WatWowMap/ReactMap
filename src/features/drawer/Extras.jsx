@@ -24,7 +24,7 @@ import { SliderTile } from '@components/inputs/SliderTile'
 import { MultiSelectorStore } from '../../components/inputs/MultiSelector'
 import { CollapsibleItem } from './CollapsibleItem'
 import { MultiSelectorList, SelectorListMemo } from './SelectorList'
-import { BoolToggle } from './BoolToggle'
+import { BoolToggle } from '../../components/inputs/BoolToggle'
 
 const BaseNestSlider = () => {
   const slider = useMemory((s) => s.ui.nests?.sliders?.secondary?.[0])

@@ -29,7 +29,7 @@ import { GenderListItem } from '@components/dialogs/filters/Gender'
 import { BasicListButton } from '@components/BasicListButton'
 
 import { SelectorListMemo } from './SelectorList'
-import { BoolToggle, DualBoolToggle } from './BoolToggle'
+import { BoolToggle, DualBoolToggle } from '../../components/inputs/BoolToggle'
 
 function PokemonDrawer() {
   const filterMode = useStorage((s) => s.getPokemonFilterMode())

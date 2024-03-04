@@ -21,7 +21,7 @@ import SettingsMenu from './Settings'
 import { PokemonDrawerMemo } from './Pokemon'
 import Areas from './areas'
 import Extras from './Extras'
-import { BoolToggle } from './BoolToggle'
+import { BoolToggle } from '../../components/inputs/BoolToggle'
 
 const ADV_CATEGORIES = new Set(['pokemon', 'gyms', 'pokestops', 'nests'])
 
