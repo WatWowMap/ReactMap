@@ -4,7 +4,7 @@ import ListItem from '@mui/material/ListItem'
 import RestartAltIcon from '@mui/icons-material/RestartAlt'
 
 import { useStorage } from '@hooks/useStorage'
-import { BasicListButton } from '@components/BasicListButton'
+import { BasicListButton } from '@components/inputs/BasicListButton'
 
 import { GenericSearch } from '../../../components/inputs/GenericSearch'
 import { ScanAreasTable } from './AreaTable'

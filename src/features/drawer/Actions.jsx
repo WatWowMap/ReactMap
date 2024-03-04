@@ -20,7 +20,7 @@ import { useMemory } from '@hooks/useMemory'
 import { useLayoutStore } from '@hooks/useLayoutStore'
 import { useStorage } from '@hooks/useStorage'
 import { I } from '@components/I'
-import { BasicListButton } from '@components/BasicListButton'
+import { BasicListButton } from '@components/inputs/BasicListButton'
 
 /** @type {React.ChangeEventHandler<HTMLInputElement>} */
 const importSettings = (e) => {

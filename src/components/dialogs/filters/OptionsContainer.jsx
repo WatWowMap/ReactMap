@@ -9,7 +9,7 @@ import ReplayIcon from '@mui/icons-material/Replay'
 import { useMemory } from '@hooks/useMemory'
 import { useStorage } from '@hooks/useStorage'
 import Utility from '@services/Utility'
-import { BasicListButton } from '@components/BasicListButton'
+import { BasicListButton } from '@components/inputs/BasicListButton'
 
 import Options from './Options'
 

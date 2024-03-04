@@ -26,7 +26,7 @@ import { StringFilterMemo } from '@components/dialogs/filters/StringFilter'
 import { SliderTile } from '@components/inputs/SliderTile'
 import TabPanel from '@components/TabPanel'
 import { GenderListItem } from '@components/inputs/Gender'
-import { BasicListButton } from '@components/BasicListButton'
+import { BasicListButton } from '@components/inputs/BasicListButton'
 
 import { SelectorListMemo } from './SelectorList'
 import { BoolToggle, DualBoolToggle } from '../../components/inputs/BoolToggle'
