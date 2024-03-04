@@ -12,7 +12,7 @@ import ScanZone from './scanZone'
 import { getScanNextCoords } from './scanNext/getCoords'
 import { getScanZoneCoords } from './scanZone/getCoords'
 import { ConfigContext, DEFAULT } from './ContextProvider'
-import { useScanStore, useScannerSessionStorage } from './store'
+import { useScanStore, useScannerSessionStorage } from './hooks/store'
 
 const { setScanMode } = useScanStore.getState()
 

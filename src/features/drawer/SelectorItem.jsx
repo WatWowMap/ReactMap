@@ -10,12 +10,9 @@ import { useMemory } from '@hooks/useMemory'
 import { useLayoutStore } from '@hooks/useLayoutStore'
 import { useDeepStore, useStorage } from '@hooks/useStorage'
 import { checkIfHasAll } from '@utils/hasAll'
-import Poracle from '@services/Poracle'
 import { ColoredTile } from '@components/ColoredTile'
 import { ToggleTypography } from '@components/ToggleTypography'
 import { SQUARE_ITEM } from '@components/VirtualGrid'
-
-import { useWebhookStore } from '../webhooks/store'
 
 /**
  * @template {string} T
@@ -69,46 +66,15 @@ export function StandardItem({ id, category, ...props }) {
   )
 }
 
-/** @param {BaseProps<import('@rm/types').AllButHuman>} props */
-export function WebhookItem({ id, category, ...props }) {
-  const filter = useWebhookStore((s) => s.tempFilters[id])
-
-  const setFilter = (newFilter) => {
-    useWebhookStore.setState((prev) => ({
-      tempFilters: {
-        ...prev.tempFilters,
-        [id]: newFilter
-          ? {
-              ...newFilter,
-              enabled: newFilter.enabled,
-            }
-          : { enabled: true, ...Poracle.getOtherData(id) },
-      },
-    }))
-  }
-  return (
-    <SelectorItem
-      {...props}
-      id={id}
-      filter={filter}
-      setFilter={setFilter}
-      onClick={() =>
-        useWebhookStore.setState({
-          advanced: {
-            id,
-            uid: 0,
-            open: true,
-            category,
-            selectedIds: [],
-          },
-        })
-      }
-    />
-  )
-}
-
 /** @param {FullProps} props */
-function SelectorItem({ id, filter, setFilter, onClick, hasAll, easyMode }) {
+export function SelectorItem({
+  id,
+  filter,
+  setFilter,
+  onClick,
+  hasAll,
+  easyMode,
+}) {
   const { t } = useTranslateById({ alt: true, newLine: true })
   const title = t(id)
   const url = useMemory((s) => s.Icons.getIconById(id))

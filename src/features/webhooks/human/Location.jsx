@@ -19,8 +19,8 @@ import useLocation from '@hooks/useLocation'
 import { Loading } from '@components/Loading'
 import { basicEqualFn } from '@hooks/useMemory'
 
-import { setModeBtn, useWebhookStore } from '../store'
-import { useSyncData } from '../hooks'
+import { setModeBtn, useWebhookStore } from '../hooks/store'
+import { useSyncData } from '../hooks/useSyncData'
 
 const Location = () => {
   const { lc, color } = useLocation()

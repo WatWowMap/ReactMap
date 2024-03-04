@@ -24,15 +24,14 @@ import { useLazyQuery } from '@apollo/client'
 
 import { useMemory } from '@hooks/useMemory'
 import { useStorage } from '@hooks/useStorage'
-
 import Query from '@services/Query'
 import Utility from '@services/Utility'
-import Poracle from '@services/Poracle'
-
 import SliderTile from '@components/dialogs/filters/SliderTile'
 import Header from '@components/Header'
 import Footer from '@components/Footer'
-import { useWebhookStore } from './store'
+
+import { useWebhookStore } from './hooks/store'
+import { Poracle } from './services/Poracle'
 
 const skipFields = new Set([
   'profile_no',
@@ -79,7 +78,7 @@ const wildCards = {
   invasion: ['i0'],
 }
 
-export default function WebhookAdvanced() {
+export function WebhookAdvanced() {
   const { id, category, open, selectedIds, onClose } = useWebhookStore(
     (s) => s.advanced,
   )

@@ -9,7 +9,7 @@ import Header from '@components/Header'
 import Footer from '@components/Footer'
 import { SCAN_MODES } from '@assets/constants'
 
-import { useScanStore } from './store'
+import { useScanStore } from './hooks/store'
 
 const { setScanMode } = useScanStore.getState()
 

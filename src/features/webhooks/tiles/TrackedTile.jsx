@@ -8,12 +8,12 @@ import Checkbox from '@mui/material/Checkbox'
 import Box from '@mui/material/Box'
 
 import Utility from '@services/Utility'
-import Poracle from '@services/Poracle'
 import { useMemory } from '@hooks/useMemory'
 import { apolloClient, apolloCache } from '@services/apollo'
 import * as webhookNodes from '@services/queries/webhook'
 
-import { useWebhookStore, setSelected } from '../store'
+import { useWebhookStore, setSelected } from '../hooks/store'
+import { Poracle } from '../services/Poracle'
 
 export default function TrackedTile({ index }) {
   const category = useWebhookStore((s) => s.category)

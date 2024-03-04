@@ -11,9 +11,9 @@ import { useTranslation } from 'react-i18next'
 
 import fallbackIcon from '@assets/fallbackMarker'
 
-import { useWebhookStore } from '../store'
+import { useWebhookStore } from '../hooks/store'
 
-export default function DraggableMarker() {
+export function WebhookMarker() {
   const map = useMap()
   const { t } = useTranslation()
 

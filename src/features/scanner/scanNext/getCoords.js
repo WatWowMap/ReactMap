@@ -14,8 +14,8 @@ const DISTANCE = {
 /**
  * Get scan next coords
  * @param {[number, number]} center
- * @param {import('../store').UseScanStore['scanNextSize']} size
- * @returns {import('../store').UseScanStore['scanCoords']}
+ * @param {import('../hooks/store').UseScanStore['scanNextSize']} size
+ * @returns {import('../hooks/store').UseScanStore['scanCoords']}
  */
 export const getScanNextCoords = (center, size) => {
   const coords = [center]

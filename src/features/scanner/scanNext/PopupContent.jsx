@@ -7,7 +7,7 @@ import { useTranslation } from 'react-i18next'
 
 import { SCAN_SIZES } from '@assets/constants'
 
-import { useScanStore } from '../store'
+import { useScanStore } from '../hooks/store'
 
 export function ScanNextPopup() {
   const { t } = useTranslation()

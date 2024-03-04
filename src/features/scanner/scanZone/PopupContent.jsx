@@ -12,7 +12,7 @@ import { RADIUS_CHOICES } from '@assets/constants'
 
 import { StyledSubHeader } from '../Shared'
 import { ConfigContext } from '../ContextProvider'
-import { useScanStore } from '../store'
+import { useScanStore } from '../hooks/store'
 import { AdvAccordion } from './AdvAccordion'
 
 /**
@@ -57,7 +57,7 @@ export function ScanZonePopup() {
 /**
  *
  * @param {{
- *  name: keyof import("@rm/types").OnlyType<import('../store').UseScanStore, number>,
+ *  name: keyof import("@rm/types").OnlyType<import('../hooks/store').UseScanStore, number>,
  * } & import('@mui/material').SliderProps} props
  * @returns
  */

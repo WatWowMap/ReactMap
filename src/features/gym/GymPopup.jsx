@@ -11,7 +11,7 @@ import Collapse from '@mui/material/Collapse'
 import Typography from '@mui/material/Typography'
 import { useTranslation } from 'react-i18next'
 
-import { useSyncData } from '@features/webhooks/hooks'
+import { useSyncData } from '@features/webhooks'
 import { useMemory } from '@hooks/useMemory'
 import { useLayoutStore } from '@hooks/useLayoutStore'
 import { setDeepStore, useStorage } from '@hooks/useStorage'

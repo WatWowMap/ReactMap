@@ -4,7 +4,7 @@ import Typography from '@mui/material/Typography'
 import Grid from '@mui/material/Grid'
 import { useTranslation, Trans } from 'react-i18next'
 
-import { useWebhookStore } from './store'
+import { useWebhookStore } from './hooks/store'
 
 export default function WebhookError({ children }) {
   const { t } = useTranslation()

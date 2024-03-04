@@ -2,7 +2,7 @@ import { useEffect } from 'react'
 import { useMutation } from '@apollo/client'
 import { useTranslation } from 'react-i18next'
 import Query from '@services/Query'
-import { useWebhookStore } from '@features/webhooks/store'
+import { useWebhookStore } from '@features/webhooks'
 import { allProfiles } from '@services/queries/webhook'
 
 export default function useWebhook({ category }) {

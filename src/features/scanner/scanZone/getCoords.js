@@ -18,7 +18,7 @@ const BEARINGS = {
  * @param {[number, number]} center
  * @param {number} radius
  * @param {number} spacing
- * @param {import('../store').UseScanStore['scanZoneSize']} scanZoneSize
+ * @param {import('../hooks/store').UseScanStore['scanZoneSize']} scanZoneSize
  * @returns
  */
 export const getScanZoneCoords = (center, radius, spacing, scanZoneSize) => {

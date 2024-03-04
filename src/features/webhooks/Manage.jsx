@@ -12,21 +12,22 @@ import { useTranslation } from 'react-i18next'
 
 import { useMemory } from '@hooks/useMemory'
 import { useLayoutStore } from '@hooks/useLayoutStore'
-import Poracle from '@services/Poracle'
 import Utility from '@services/Utility'
 import Footer from '@components/Footer'
 import Header from '@components/Header'
 import { apolloClient } from '@services/apollo'
 import Query from '@services/Query'
 import { allProfiles } from '@services/queries/webhook'
-import { WebhookItem } from '@features/drawer/SelectorItem'
+import Menu from '@components/Menu'
 
 import Human from './human'
 import Tracked from './Tracked'
-import Menu from '../../components/Menu'
-import { setMode, setSelected, useWebhookStore } from './store'
-import { useGenFullFilters, useGetHookContext } from './hooks'
+import { setMode, setSelected, useWebhookStore } from './hooks/store'
+import { useGenFilters } from './hooks/useGenFilters'
+import { useGetHookContext } from './hooks/useGetHookContext'
 import ProfileEditing from './human/profile'
+import { Poracle } from './services/Poracle'
+import { WebhookItem } from './tiles/WebhookItem'
 
 export default function Manage() {
   const { t } = useTranslation()
@@ -37,7 +38,7 @@ export default function Manage() {
 
   const feedbackLink = useMemory((s) => s.config.links.feedbackLink)
 
-  const filters = useGenFullFilters()
+  const filters = useGenFilters()
   const liveFilters = useWebhookStore((s) => s.tempFilters)
 
   /** @type {ReturnType<typeof React.useRef<HTMLElement | null>>} */
@@ -188,7 +189,7 @@ export default function Manage() {
   )
 }
 
-/** @param {{ category: import('./store').WebhookStore['category'] }} props */
+/** @param {{ category: import('./hooks/store').WebhookStore['category'] }} props */
 function TabIcon({ category }) {
   const Icons = useMemory((s) => s.Icons)
   return category === 'human' ? (

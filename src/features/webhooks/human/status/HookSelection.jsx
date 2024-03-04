@@ -17,8 +17,8 @@ import {
 } from '@services/queries/webhook'
 import { Loading } from '@components/Loading'
 
-import { useGetWebhookData } from '../../hooks'
-import { useWebhookStore } from '../../store'
+import { useGetWebhookData } from '../../hooks/useGetWebhookData'
+import { useWebhookStore } from '../../hooks/store'
 
 export function HookSelection() {
   const { t } = useTranslation()

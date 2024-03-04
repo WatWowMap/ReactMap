@@ -8,8 +8,7 @@ import { useMapStore } from '@hooks/useMapStore'
 import Utility from '@services/Utility'
 
 import { ScanOnDemand } from '@features/scanner'
-import DraggableMarker from '@features/webhooks/human/Draggable'
-import WebhookAreaSelection from '@features/webhooks/human/area/AreaSelection'
+import { WebhookMarker, WebhookAreaSelection } from '@features/webhooks'
 import { ActiveWeather } from '@features/weather'
 
 import { Effects } from './Effects'
@@ -65,7 +64,7 @@ export default function Container() {
       <DataView />
       <ScanOnDemand mode="scanNext" />
       <ScanOnDemand mode="scanZone" />
-      <DraggableMarker />
+      <WebhookMarker />
       <WebhookAreaSelection />
       <Nav />
       <ActiveWeather />

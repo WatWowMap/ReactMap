@@ -2,7 +2,7 @@
 import { useQuery } from '@apollo/client'
 import { CHECK_VALID_SCAN } from '@services/queries/scanner'
 import { useContext, useEffect } from 'react'
-import { ConfigContext } from './ContextProvider'
+import { ConfigContext } from '../ContextProvider'
 import { useScanStore } from './store'
 
 /**

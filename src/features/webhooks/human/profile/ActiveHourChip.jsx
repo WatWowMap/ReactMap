@@ -7,7 +7,7 @@ import { useTranslation } from 'react-i18next'
 import { useMutation } from '@apollo/client'
 import { allProfiles, setProfile } from '@services/queries/webhook'
 
-import { useWebhookStore } from '../../store'
+import { useWebhookStore } from '../../hooks/store'
 
 const StyledChip = styled(Chip)(({ theme }) => ({
   margin: theme.spacing(0.5),

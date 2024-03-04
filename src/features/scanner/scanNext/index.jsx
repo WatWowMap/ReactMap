@@ -2,11 +2,11 @@
 import * as React from 'react'
 
 import { ScanCircle, ScanCircles } from '../Shared'
-import { useCheckValid } from '../useCheckValid'
+import { useCheckValid } from '../hooks/useCheckValid'
 import { ScanNextPopup } from './PopupContent'
 import { ScanOnDemandMarker } from '../Marker'
 import { ScanOnDemandPopup } from '../Popup'
-import { useScanStore } from '../store'
+import { useScanStore } from '../hooks/store'
 
 const POKEMON_RADIUS = 70
 const GYM_RADIUS = 750

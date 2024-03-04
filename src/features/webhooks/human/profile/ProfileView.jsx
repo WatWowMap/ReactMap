@@ -9,7 +9,7 @@ import IconButton from '@mui/material/IconButton'
 
 import { useMemory } from '@hooks/useMemory'
 
-import { useWebhookStore } from '../../store'
+import { useWebhookStore } from '../../hooks/store'
 import { ActiveHourChip } from './ActiveHourChip'
 
 /** @param {import('./ProfileTile').Props} props */

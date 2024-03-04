@@ -8,7 +8,7 @@ import { useTranslation } from 'react-i18next'
 
 import { Loading } from '@components/Loading'
 
-import { useGetAreas } from '../../hooks'
+import { useGetAreas } from '../../hooks/useGetAreas'
 import { MemoAreaChip, handleClick } from './AreaChip'
 
 export const AreaGroup = () => {

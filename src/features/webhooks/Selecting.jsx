@@ -9,7 +9,7 @@ import { useMutation } from '@apollo/client'
 
 import { setProfile, allProfiles } from '@services/queries/webhook'
 
-import { useWebhookStore, setSelected } from './store'
+import { useWebhookStore, setSelected } from './hooks/store'
 
 export default function Selecting() {
   const { t } = useTranslation()

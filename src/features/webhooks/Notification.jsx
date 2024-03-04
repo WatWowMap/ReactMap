@@ -2,7 +2,7 @@
 import * as React from 'react'
 import Notification from '@components/Notification'
 
-import { resetAlert, useWebhookStore } from './store'
+import { resetAlert, useWebhookStore } from './hooks/store'
 
 export function WebhookNotification() {
   const webhookAlert = useWebhookStore((s) => s.alert)

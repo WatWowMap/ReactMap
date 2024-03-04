@@ -5,7 +5,7 @@ import { useMutation } from '@apollo/client'
 import { useTranslation } from 'react-i18next'
 
 import { setHuman } from '@services/queries/webhook'
-import { useWebhookStore } from '../../store'
+import { useWebhookStore } from '../../hooks/store'
 
 export function EnableSwitch() {
   const { t } = useTranslation()

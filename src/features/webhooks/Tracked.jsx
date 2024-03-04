@@ -11,12 +11,12 @@ import { GenericSearch } from '@features/drawer/ItemSearch'
 
 import TrackedTile from './tiles/TrackedTile'
 import Selecting from './Selecting'
-import { useGetWebhookData } from './hooks'
-import { useWebhookStore } from './store'
+import { useGetWebhookData } from './hooks/useGetWebhookData'
+import { useWebhookStore } from './hooks/store'
 
 /**
  *
- * @param {{ category: Exclude<import('./store').WebhookStore['category'], 'human'> }} props
+ * @param {{ category: Exclude<import('./hooks/store').WebhookStore['category'], 'human'> }} props
  * @returns
  */
 const Tracked = ({ category }) => {

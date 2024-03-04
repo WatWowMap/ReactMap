@@ -1,34 +1,35 @@
-/* eslint-disable react/destructuring-assignment */
 // @ts-check
+/* eslint-disable react/destructuring-assignment */
 import * as React from 'react'
 import { GeoJSON } from 'react-leaflet'
+import { Polygon } from 'leaflet'
 
+import { useWebhookStore } from '@features/webhooks/hooks/store'
 import { useStorage } from '@hooks/useStorage'
 import Utility from '@services/Utility'
-import { useWebhookStore } from '@features/webhooks/store'
-import { handleClick } from '@features/webhooks/human/area/AreaChip'
-import { Polygon } from 'leaflet'
 
 /**
  *
- * @param {import('@rm/types').RMGeoJSON} featureCollection
+ * @param {{
+ *  geojson: import('@rm/types').RMGeoJSON,
+ *  webhook?: boolean,
+ *  handleClick?: (name: string) => () => Promise<string[]>
+ * }} featureCollection
  * @returns
  */
-function ScanArea(featureCollection) {
+function ScanArea({ geojson, webhook, handleClick }) {
   const search = useStorage((s) => s.filters.scanAreas?.filter?.search)
   const tapToToggle = useStorage((s) => s.userSettings.scanAreas.tapToToggle)
   const alwaysShowLabels = useStorage(
     (s) => s.userSettings.scanAreas.alwaysShowLabels,
   )
 
-  const webhookMode = useWebhookStore((s) => s.mode)
-
   return (
     <GeoJSON
       key={`${search}${tapToToggle}${alwaysShowLabels}`}
-      data={featureCollection}
+      data={geojson}
       filter={(f) =>
-        webhookMode ||
+        webhook ||
         search === '' ||
         f.properties.key.toLowerCase().includes(search.toLowerCase())
       }
@@ -36,7 +37,7 @@ function ScanArea(featureCollection) {
         click: ({ propagatedFrom: layer }) => {
           if (!layer.feature) return
           const { name, key, manual = false } = layer.feature.properties
-          if (webhookMode && name) {
+          if (webhook && name) {
             handleClick(name)().then((newAreas) => {
               layer.setStyle({
                 fillOpacity: newAreas.some(
@@ -52,7 +53,7 @@ function ScanArea(featureCollection) {
             layer.setStyle({ fillOpacity: includes ? 0.2 : 0.8 })
             setAreas(
               key,
-              featureCollection.features
+              geojson.features
                 .filter((f) => !f.properties.manual)
                 .map((f) => f.properties.key),
             )
@@ -77,7 +78,7 @@ function ScanArea(featureCollection) {
                   feature.properties.fill ||
                   '#3388ff',
                 fillOpacity: (
-                  webhookMode === 'areas'
+                  webhook
                     ? useWebhookStore
                         .getState()
                         .human?.area?.some(
@@ -86,13 +87,13 @@ function ScanArea(featureCollection) {
                     : (
                         useStorage.getState().filters?.scanAreas?.filter
                           ?.areas || []
-                      ).includes(webhookMode ? name : key)
+                      ).includes(webhook ? name : key)
                 )
                   ? 0.8
                   : 0.2,
               })
               .bindTooltip(popupContent, {
-                permanent: webhookMode ? true : alwaysShowLabels,
+                permanent: webhook ? true : alwaysShowLabels,
                 direction: 'top',
                 className: 'area-tooltip',
               })
@@ -106,8 +107,14 @@ function ScanArea(featureCollection) {
   )
 }
 
-export const ScanAreaTile = React.memo(ScanArea, (prev, next) =>
-  prev.features.every(
-    (feat, i) => feat.properties.key === next.features[i].properties.key,
-  ),
+export const ScanAreaTile = React.memo(
+  ScanArea,
+  (prev, next) =>
+    prev.webhook === next.webhook &&
+    prev.handleClick === next.handleClick &&
+    prev.geojson.features.length === next.geojson.features.length &&
+    prev.geojson.features.every(
+      (feat, i) =>
+        feat.properties.key === next.geojson.features[i].properties.key,
+    ),
 )

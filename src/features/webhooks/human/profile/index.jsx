@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next'
 
 import { Loading } from '@components/Loading'
 
-import { useGetWebhookData } from '../../hooks'
+import { useGetWebhookData } from '../../hooks/useGetWebhookData'
 import { MemoNewProfile } from './NewProfile'
 import { ProfileTile } from './ProfileTile'
 

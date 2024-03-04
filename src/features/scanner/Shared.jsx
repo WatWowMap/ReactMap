@@ -12,7 +12,7 @@ import { Circle } from 'react-leaflet'
 import PermScanWifiIcon from '@mui/icons-material/PermScanWifi'
 import ClearIcon from '@mui/icons-material/Clear'
 
-import { useScanStore, useScannerSessionStorage } from './store'
+import { useScanStore, useScannerSessionStorage } from './hooks/store'
 
 const StyledListItem = styled(ListItem)(() => ({
   padding: '2px 16px',
@@ -63,7 +63,7 @@ export function ScanQueue() {
 
 /**
  *
- * @param {{ mode: import('./store').ScanMode }} props
+ * @param {{ mode: import('./hooks/store').ScanMode }} props
  * @returns
  */
 export function ScanConfirm({ mode }) {
@@ -123,7 +123,7 @@ export function InAllowedArea() {
 
 /**
  *
- * @param {{ mode: import('./store').ScanMode}} props
+ * @param {{ mode: import('./hooks/store').ScanMode}} props
  * @returns
  */
 export function ScanCancel({ mode }) {

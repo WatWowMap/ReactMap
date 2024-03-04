@@ -12,7 +12,7 @@ import { useTranslation } from 'react-i18next'
 import { useMutation } from '@apollo/client'
 import { allProfiles, setProfile } from '@services/queries/webhook'
 
-import { useWebhookStore } from '../../store'
+import { useWebhookStore } from '../../hooks/store'
 
 /** @param {import('./ProfileTile').Props} props */
 export const CopyView = ({ uid, handleViewChange }) => {

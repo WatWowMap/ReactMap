@@ -5,7 +5,7 @@ import Divider from '@mui/material/Divider'
 import { ProfileSelect } from './ProfileSelect'
 import { EnableSwitch } from './EnableSwitch'
 import { HookSelection } from './HookSelection'
-import { useWebhookStore } from '../../store'
+import { useWebhookStore } from '../../hooks/store'
 
 export default function Status() {
   const multipleHooks = useWebhookStore((s) => s.multipleHooks)
