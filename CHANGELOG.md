@@ -1,3 +1,10 @@
+# [1.30.0-develop.16](https://github.com/WatWowMap/ReactMap/compare/v1.30.0-develop.15...v1.30.0-develop.16) (2024-03-04)
+
+
+### Bug Fixes
+
+* 0iv/100iv overrides in a specific scenario ([aebebf1](https://github.com/WatWowMap/ReactMap/commit/aebebf10f86a0562fd4eb098fbe0cf364453dc4b))
+
 # [1.30.0-develop.15](https://github.com/WatWowMap/ReactMap/compare/v1.30.0-develop.14...v1.30.0-develop.15) (2024-03-02)
 
 
