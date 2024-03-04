@@ -6,7 +6,7 @@ import RestartAltIcon from '@mui/icons-material/RestartAlt'
 import { useStorage } from '@hooks/useStorage'
 import { BasicListButton } from '@components/BasicListButton'
 
-import { GenericSearch } from '../ItemSearch'
+import { GenericSearch } from '../../../components/inputs/GenericSearch'
 import { ScanAreasTable } from './AreaTable'
 
 const onClick = () => useStorage.getState().setAreas()

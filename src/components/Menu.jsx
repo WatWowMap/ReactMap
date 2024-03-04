@@ -18,7 +18,7 @@ import useGetAvailable from '@hooks/useGetAvailable'
 
 import OptionsContainer from './dialogs/filters/OptionsContainer'
 import { VirtualGrid } from './VirtualGrid'
-import { GenericSearch } from '../features/drawer/ItemSearch'
+import { GenericSearch } from './inputs/GenericSearch'
 import {
   applyToAllWebhooks,
   useWebhookStore,

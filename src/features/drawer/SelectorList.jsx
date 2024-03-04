@@ -25,7 +25,7 @@ import { VirtualGrid } from '@components/VirtualGrid'
 import TabPanel from '@components/TabPanel'
 
 import { BoolToggle } from './BoolToggle'
-import { GenericSearchMemo } from './ItemSearch'
+import { GenericSearchMemo } from '../../components/inputs/GenericSearch'
 import { StandardItem } from './SelectorItem'
 
 /**

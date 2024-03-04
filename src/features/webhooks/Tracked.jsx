@@ -7,7 +7,7 @@ import Typography from '@mui/material/Typography'
 
 import Box from '@mui/material/Box'
 import { Loading } from '@components/Loading'
-import { GenericSearch } from '@features/drawer/ItemSearch'
+import { GenericSearch } from '@components/inputs/GenericSearch'
 
 import TrackedTile from './tiles/TrackedTile'
 import Selecting from './Selecting'
