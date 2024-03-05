@@ -36,35 +36,14 @@ const ImgSx = {
   height: { xs: 24, sm: 36 },
 }
 
-export function ActiveWeather() {
-  const weatherEnabled = useStorage((s) => s.filters?.weather?.enabled ?? false)
-  const location = useStorage((state) => state.location)
+/** @param {import('@rm/types').Weather} props */
+function Weather({ gameplay_condition, ...props }) {
   const Icons = useMemory((state) => state.Icons)
-  const clickable = useStorage((s) => s.userSettings?.weather?.clickableIcon)
   const timeOfDay = useMemory((s) => s.timeOfDay)
-  const zoom = useStorage((s) => s.zoom)
-  const allowedZoom = useMemory((s) => s.config.general.activeWeatherZoom)
+  const clickable = useStorage((s) => s.userSettings?.weather?.clickableIcon)
   const { t } = useTranslation()
 
-  const [active, setActive] = React.useState(
-    /** @type {import('@rm/types').Weather | null} */ (null),
-  )
   const [open, setOpen] = React.useState(false)
-
-  React.useEffect(() => {
-    if (zoom > allowedZoom) {
-      const weatherCache = Object.values(apolloClient.cache.extract()).find(
-        (x) =>
-          x.__typename === 'Weather' &&
-          // @ts-ignore
-          booleanPointInPolygon(point(location), polygon([x.polygon])),
-      )
-      // @ts-ignore
-      if (weatherCache) setActive(weatherCache)
-    } else {
-      setActive(null)
-    }
-  }, [location, zoom, allowedZoom])
 
   const footerOptions = React.useMemo(
     () =>
@@ -77,20 +56,19 @@ export function ActiveWeather() {
       ]),
     [setOpen],
   )
-
-  if (!weatherEnabled || !Icons || !active) return null
+  if (!Icons) return null
   const [{ disableColorShift = false }] = Icons.getModifiers('weather')
   return (
-    <React.Fragment key={active?.gameplay_condition}>
+    <React.Fragment key={gameplay_condition}>
       <StyledBox
         className="weather-icon flex-center"
         id="active-weather"
-        onClick={() => setOpen(Boolean(clickable))}
+        onClick={() => setOpen(!!clickable)}
       >
         <Img
           className={disableColorShift ? '' : 'fancy'}
-          src={Icons.getWeather(active.gameplay_condition, timeOfDay)}
-          alt={t(`weather_${active.gameplay_condition}`)}
+          src={Icons.getWeather(gameplay_condition, timeOfDay)}
+          alt={t(`weather_${gameplay_condition}`)}
           sx={ImgSx}
         />
       </StyledBox>
@@ -103,10 +81,49 @@ export function ActiveWeather() {
             justifyContent: 'center',
           }}
         >
-          <WeatherPopup {...active} />
+          <WeatherPopup {...props} gameplay_condition={gameplay_condition} />
         </DialogContent>
         <Footer role="" options={footerOptions} />
       </Dialog>
     </React.Fragment>
   )
+}
+
+const WeatherMemo = React.memo(
+  Weather,
+  (prev, next) => prev.gameplay_condition === next.gameplay_condition,
+)
+
+export function ActiveWeather() {
+  const weatherEnabled = useStorage((s) => s.filters?.weather?.enabled ?? false)
+  const location = useStorage((state) => state.location)
+  const zoom = useStorage((s) => s.zoom)
+  const allowedZoom = useMemory((s) => s.config.general.activeWeatherZoom)
+
+  const [active, setActive] = React.useState(
+    /** @type {import('@rm/types').Weather | null} */ (null),
+  )
+
+  React.useEffect(() => {
+    if (zoom > allowedZoom) {
+      const weatherCache = Object.values(apolloClient.cache.extract()).find(
+        (x) =>
+          x.__typename === 'Weather' &&
+          // @ts-ignore
+          booleanPointInPolygon(point(location), polygon([x.polygon])),
+      )
+      if (
+        'gameplay_condition' in weatherCache &&
+        weatherCache?.gameplay_condition !== active?.gameplay_condition
+      ) {
+        // @ts-ignore
+        setActive(weatherCache)
+      }
+    } else {
+      setActive(null)
+    }
+  }, [location, zoom, allowedZoom])
+
+  if (!weatherEnabled || !active) return null
+  return <WeatherMemo {...active} />
 }
