@@ -104,6 +104,7 @@ class EventManager {
 
       return 0
     })
+    this.addAvailable(category)
   }
 
   /**
@@ -342,44 +343,49 @@ class EventManager {
     try {
       const newMf = await generate(true, historical, dbRarity)
       this.masterfile = newMf ?? this.masterfile
-      this.addAvailable()
+      this.addAllAvailable()
     } catch (e) {
       log.warn(HELPERS.event, 'Failed to generate latest masterfile:\n', e)
     }
   }
 
-  addAvailable() {
-    Object.entries(this.available).forEach(([c, entries]) => {
-      const category = /** @type {keyof EventManager['available']} */ (c)
-      entries.forEach((item) => {
-        if (!Number.isNaN(parseInt(item.charAt(0)))) {
-          const [id, form] = item.split('-')
-          if (!this.masterfile.pokemon[id]) {
-            this.masterfile.pokemon[id] = {
-              name: '',
-              pokedexId: +id,
-              types: [],
-              quickMoves: [],
-              chargedMoves: [],
-              defaultFormId: +form,
-              forms: {},
-              genId: 0,
-            }
-            log.warn(HELPERS.event, `Added ${id} to Pokemon, seems suspicious`)
+  /** @param {keyof EventManager['available']} category */
+  addAvailable(category) {
+    this.available[category].forEach((item) => {
+      if (!Number.isNaN(parseInt(item.charAt(0)))) {
+        const [id, form] = item.split('-')
+        if (!this.masterfile.pokemon[id]) {
+          this.masterfile.pokemon[id] = {
+            name: '',
+            pokedexId: +id,
+            types: [],
+            quickMoves: [],
+            chargedMoves: [],
+            defaultFormId: +form,
+            forms: {},
+            genId: 0,
           }
-          if (!this.masterfile.pokemon[id].forms) {
-            this.masterfile.pokemon[id].forms = {}
-          }
-          if (!this.masterfile.pokemon[id].forms[form]) {
-            this.masterfile.pokemon[id].forms[form] = { name: '*', category }
-            log.info(
-              HELPERS.event,
-              `Added ${this.masterfile.pokemon[id].name} Key: ${item} to masterfile. (${category})`,
-            )
-          }
+          log.warn(HELPERS.event, `Added ${id} to Pokemon, seems suspicious`)
         }
-      })
+        if (!this.masterfile.pokemon[id].forms) {
+          this.masterfile.pokemon[id].forms = {}
+        }
+        if (!this.masterfile.pokemon[id].forms[form]) {
+          this.masterfile.pokemon[id].forms[form] = { name: '*', category }
+          log.info(
+            HELPERS.event,
+            `Added ${this.masterfile.pokemon[id].name} Key: ${item} to masterfile. (${category})`,
+          )
+        }
+      }
     })
+  }
+
+  addAllAvailable() {
+    Object.keys(this.available).forEach(
+      (/** @type {keyof EventManager['available']} */ category) =>
+        this.addAvailable(category),
+    )
   }
 
   async getWebhooks() {
