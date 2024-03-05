@@ -41,6 +41,7 @@ services:
       # ARRAY_VALUE_EXAMPLE: "[3, 4, 5]"
 
     volumes:
+      - .server/.cache:/home/node/server/.cache
       # All of these are optional - comment out whichever ones you aren't using
       - ./server/src/configs/areas.json:/home/node/server/src/configs/areas.json
       - ./server/src/configs/local.json:/home/node/server/src/configs/local.json
