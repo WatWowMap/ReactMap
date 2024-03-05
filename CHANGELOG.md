@@ -1,3 +1,10 @@
+# [1.30.0-develop.17](https://github.com/WatWowMap/ReactMap/compare/v1.30.0-develop.16...v1.30.0-develop.17) (2024-03-05)
+
+
+### Bug Fixes
+
+* attempt to keep available/masterfile more in sync ([1961af3](https://github.com/WatWowMap/ReactMap/commit/1961af3e3f1953c19f330bec3d191a3b6ef5dca3))
+
 # [1.30.0-develop.16](https://github.com/WatWowMap/ReactMap/compare/v1.30.0-develop.15...v1.30.0-develop.16) (2024-03-04)
 
 
