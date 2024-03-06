@@ -3,8 +3,10 @@ import * as React from 'react'
 import Typography from '@mui/material/Typography'
 import { useTranslation } from 'react-i18next'
 
-import { Utility } from '@services/Utility'
 import { ErrorBoundary } from '@components/ErrorBoundary'
+import { useAnalytics } from '@hooks/useAnalytics'
+import { getTimeUntil } from '@utils/getTimeUntil'
+import { dayCheck } from '@utils/dayCheck'
 
 /**
  *
@@ -14,9 +16,7 @@ import { ErrorBoundary } from '@components/ErrorBoundary'
 export function DevicePopup({ isOnline, ts, ...device }) {
   const { t } = useTranslation()
 
-  React.useEffect(() => {
-    Utility.analytics('Popup', 'Popup Clicked', 'Device')
-  }, [])
+  useAnalytics('Popup', 'Popup Clicked', 'Device')
 
   return (
     <ErrorBoundary noRefresh variant="h5">
@@ -42,19 +42,19 @@ export function DevicePopup({ isOnline, ts, ...device }) {
 
 const Timer = ({ device, t, ts }) => {
   const { updated } = device
-  const lastSeen = new Date(updated * 1000)
-  const [since, setSince] = React.useState(Utility.getTimeUntil(lastSeen))
+  const lastSeen = updated * 1000
+  const [since, setSince] = React.useState(getTimeUntil(lastSeen))
 
   React.useEffect(() => {
     const timer = setTimeout(() => {
-      setSince(Utility.getTimeUntil(lastSeen))
+      setSince(getTimeUntil(lastSeen))
     }, 1000)
     return () => clearTimeout(timer)
   })
 
   return (
     <Typography variant="caption">
-      {t('last_seen')}: {Utility.dayCheck(ts, updated)} (
+      {t('last_seen')}: {dayCheck(ts, updated)} (
       {since.str.replace('days', t('days')).replace('day', t('day'))})
     </Typography>
   )

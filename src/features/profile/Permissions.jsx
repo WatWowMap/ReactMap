@@ -9,8 +9,9 @@ import CardMedia from '@mui/material/CardMedia'
 import Typography from '@mui/material/Typography'
 
 import { useMemory } from '@store/useMemory'
-import { Utility } from '@services/Utility'
 import { ALWAYS_EXCLUDED } from '@assets/constants'
+import { getProperName } from '@utils/getProperName'
+import { camelToSnake } from '@utils/camelToSnake'
 
 export function UserPermissions() {
   const perms = useMemory((s) => s.auth.perms)
@@ -75,11 +76,7 @@ function PermCard({ perm }) {
 
   const component = React.useCallback(() => {
     if (Array.isArray(value) && !permArrayImages)
-      return (
-        <PermMedia>
-          {value.map((item) => Utility.getProperName(item))}
-        </PermMedia>
-      )
+      return <PermMedia>{value.map((item) => getProperName(item))}</PermMedia>
     if (value)
       return (
         <Box
@@ -101,10 +98,10 @@ function PermCard({ perm }) {
       <CardMedia component={component} />
       <CardContent style={{ minHeight: 100 }}>
         <Typography gutterBottom variant="h6" color={textColor}>
-          {t(Utility.camelToSnake(perm))}
+          {t(camelToSnake(perm))}
         </Typography>
         <Typography variant="body2" color={textColor}>
-          {t(`${Utility.camelToSnake(perm)}_subtitle`)}
+          {t(`${camelToSnake(perm)}_subtitle`)}
         </Typography>
       </CardContent>
     </Card>

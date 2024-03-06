@@ -3,12 +3,13 @@ import React from 'react'
 import Divider from '@mui/material/Divider'
 import Grid from '@mui/material/Unstable_Grid2'
 
-import { Utility } from '@services/Utility'
 import { DiscordButton } from '@components/auth/Discord'
 import { LocalLogin } from '@components/auth/Local'
 import { TelegramWidget } from '@components/auth/Telegram'
 import { Img } from '@components/Img'
 import { LocaleSelection } from '@components/inputs/LocaleSelection'
+import { getBlockContent } from '@utils/getBlockContent'
+import { getGridSizes } from '@utils/getGridSizes'
 
 import { LinkWrapper } from './LinkWrapper'
 import { CustomText } from './CustomText'
@@ -21,7 +22,7 @@ import { CustomButton } from './CustomButton'
  */
 export function Generator({ block, defaultReturn = null }) {
   const { content = null, text = null, gridSizes, type, ...props } = block
-  const children = Utility.getBlockContent(content || text)
+  const children = getBlockContent(content || text)
   switch (type) {
     case 'img':
       return (
@@ -65,7 +66,7 @@ export function Generator({ block, defaultReturn = null }) {
       return (
         <Grid
           container
-          {...Utility.getSizes(gridSizes)}
+          {...getGridSizes(gridSizes)}
           className={block.className}
           alignItems={block.alignItems}
           justifyContent={block.justifyContent}
@@ -84,7 +85,7 @@ export function Generator({ block, defaultReturn = null }) {
               ) : (
                 <Grid
                   key={i}
-                  {...Utility.getSizes(subBlock.gridSizes)}
+                  {...getGridSizes(subBlock.gridSizes)}
                   className={block.className}
                   style={subBlock.gridStyle}
                   sx={subBlock.gridSx}

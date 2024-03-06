@@ -12,10 +12,10 @@ import { Img } from '@components/Img'
 import { useMemory } from '@store/useMemory'
 import { useStorage } from '@store/useStorage'
 import { RawQuestTitle } from '@components/QuestTitle'
-import { Utility } from '@services/Utility'
 import { RawTimeSince } from '@components/popups/Timer'
 import { getGruntReward } from '@utils/getGruntReward'
 import { formatDistance } from '@utils/formatDistance'
+import { getTimeUntil } from '@utils/getTimeUntil'
 
 import { OptionImageMemo } from './OptionImage'
 
@@ -46,7 +46,7 @@ const InvasionSubtitle = ({
   slot_3_form,
   incident_expire_timestamp,
 }) => {
-  const expire = Utility.getTimeUntil(incident_expire_timestamp * 1000, true)
+  const expire = getTimeUntil(incident_expire_timestamp * 1000, true)
   if (!confirmed) return expire.str
   const { masterfile } = useMemory.getState()
   const reward = getGruntReward(masterfile.invasions[grunt_type])

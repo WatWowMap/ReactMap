@@ -12,7 +12,6 @@ import { useTranslation } from 'react-i18next'
 
 import { useMemory } from '@store/useMemory'
 import { useLayoutStore } from '@store/useLayoutStore'
-import { Utility } from '@services/Utility'
 import { Footer } from '@components/dialogs/Footer'
 import { Header } from '@components/dialogs/Header'
 import { apolloClient } from '@services/apollo'
@@ -20,6 +19,7 @@ import { Query } from '@services/Query'
 import { allProfiles } from '@services/queries/webhook'
 import { Menu } from '@components/Menu'
 import { setMode, setSelected, useWebhookStore } from '@store/useWebhookStore'
+import { analytics } from '@hooks/useAnalytics'
 
 import { Human } from './human'
 import { Tracked } from './Tracked'
@@ -82,7 +82,7 @@ export function Manage() {
   }, [addNew, categories, category, feedbackLink])
 
   React.useEffect(() => {
-    Utility.analytics('Webhook', `${category} Webhook Page`, category, true)
+    analytics('Webhook', `${category} Webhook Page`, category, true)
     useWebhookStore.setState({ tempFilters: { ...filters[category] } })
     setSelected()()
     if (dialogRef.current && !addNew.open) {

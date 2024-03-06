@@ -8,8 +8,8 @@ import Grid2 from '@mui/material/Unstable_Grid2/Grid2'
 import { useTranslation } from 'react-i18next'
 
 import { useDeepStore } from '@store/useStorage'
-import { Utility } from '@services/Utility'
 import { fromSnakeCase } from '@utils/fromSnakeCase'
+import { camelToSnake } from '@utils/camelToSnake'
 
 /**
  * @typedef {{
@@ -52,7 +52,7 @@ export function BoolBase({
       {children}
       {label && (
         <ListItemText inset={inset} primaryTypographyProps={{ align }}>
-          {t(label, t(Utility.camelToSnake(label), fromSnakeCase(label)))}
+          {t(label, t(camelToSnake(label), fromSnakeCase(label)))}
         </ListItemText>
       )}
       <Switch

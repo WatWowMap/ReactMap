@@ -5,10 +5,10 @@ import { useTranslation } from 'react-i18next'
 import { debounce } from 'lodash'
 
 import { Query } from '@services/Query'
-import { Utility } from '@services/Utility'
 import { useStorage } from '@store/useStorage'
 import { useMemory } from '@store/useMemory'
 import { useMapStore } from '@store/useMapStore'
+import { analytics } from '@hooks/useAnalytics'
 
 /**
  * @param {string} search
@@ -85,7 +85,7 @@ export function useSendSearch(search, open) {
           ).map((option, index) => ({ ...option, index }))
         : [],
     )
-    Utility.analytics('Global Search', `Search Value: ${search}`, searchTab)
+    analytics('Global Search', `Search Value: ${search}`, searchTab)
   }, [data])
 
   useEffect(() => {

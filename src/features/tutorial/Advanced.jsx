@@ -14,10 +14,10 @@ import Grid from '@mui/material/Grid'
 import Box from '@mui/material/Box'
 import { useTranslation } from 'react-i18next'
 
-import { Utility } from '@services/Utility'
 import { useMemory } from '@store/useMemory'
 import { VirtualGrid } from '@components/virtual/VirtualGrid'
 import { StandardItem } from '@components/virtual/StandardItem'
+import { generateSlots } from '@utils/generateSlots'
 
 import { tutorialData } from './data'
 
@@ -33,7 +33,7 @@ export function TutorialAdvanced({ toggleHelp, category }) {
     if (isPokemon) {
       setTempFilters({
         ...tutorialData.filters.gyms.filter,
-        ...Utility.generateSlots('t3-0', true, tempFilters),
+        ...generateSlots('t3-0', true, tempFilters),
       })
     } else {
       setTempFilters(tutorialData.filters.pokemon.filter)
@@ -47,7 +47,7 @@ export function TutorialAdvanced({ toggleHelp, category }) {
     setLocalCategory(newCategory)
     setTempFilters({
       ...tutorialData.filters[newCategory].filter,
-      ...Utility.generateSlots('t3-0', true, {}),
+      ...generateSlots('t3-0', true, {}),
     })
   }, [category])
 

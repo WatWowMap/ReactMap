@@ -25,11 +25,12 @@ import { useLazyQuery } from '@apollo/client'
 import { useMemory } from '@store/useMemory'
 import { useStorage } from '@store/useStorage'
 import { Query } from '@services/Query'
-import { Utility } from '@services/Utility'
 import { SliderTile } from '@components/inputs/SliderTile'
 import { Header } from '@components/dialogs/Header'
 import { Footer } from '@components/dialogs/Footer'
 import { useWebhookStore } from '@store/useWebhookStore'
+import { useAnalytics } from '@hooks/useAnalytics'
+import { camelToSnake } from '@utils/camelToSnake'
 
 import { Poracle } from './services/Poracle'
 
@@ -109,7 +110,7 @@ export function WebhookAdvanced() {
       : { ...info?.defaults, profile_no: human.current_profile_no },
   )
 
-  Utility.analytics(`/poracle/${category}`)
+  useAnalytics(`/poracle/${category}`)
 
   const [search, { data, previousData, loading }] = useLazyQuery(
     Query.search('webhook'),
@@ -601,7 +602,7 @@ export function WebhookAdvanced() {
           >
             <Grid item xs={6} style={{ textAlign: 'center' }}>
               <Typography variant="subtitle2">
-                {t(Utility.camelToSnake(option.name))}
+                {t(camelToSnake(option.name))}
               </Typography>
             </Grid>
             <Grid item xs={6} style={{ textAlign: 'center' }}>

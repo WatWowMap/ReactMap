@@ -6,7 +6,7 @@ import { Polygon } from 'leaflet'
 
 import { useWebhookStore } from '@store/useWebhookStore'
 import { useStorage } from '@store/useStorage'
-import { Utility } from '@services/Utility'
+import { getProperName } from '@utils/getProperName'
 
 /**
  *
@@ -63,7 +63,7 @@ function ScanArea({ geojson, webhook, handleClick }) {
       onEachFeature={(feature, layer) => {
         if (feature.properties?.name) {
           const { name, key } = feature.properties
-          const popupContent = Utility.getProperName(name)
+          const popupContent = getProperName(name)
           if (layer instanceof Polygon) {
             layer
               .setStyle({

@@ -17,7 +17,7 @@ import { useTranslation } from 'react-i18next'
 
 import { useMemory } from '@store/useMemory'
 import { toggleDialog } from '@store/useLayoutStore'
-import { Utility } from '@services/Utility'
+import { camelToSnake } from '@utils/camelToSnake'
 
 import { tutorialData } from './data'
 
@@ -74,7 +74,7 @@ export function TutorialSidebar() {
               }
               return (
                 <ListItem key={subItem}>
-                  <ListItemText primary={t(Utility.camelToSnake(subItem))} />
+                  <ListItemText primary={t(camelToSnake(subItem))} />
                   <Switch
                     checked={tempFilters[subItem]}
                     onChange={() => {

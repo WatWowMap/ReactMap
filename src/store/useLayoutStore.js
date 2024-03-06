@@ -1,7 +1,8 @@
 // @ts-check
 import { create } from 'zustand'
 
-import { Utility } from '@services/Utility'
+import { analytics } from '@hooks/useAnalytics'
+
 import { useStorage } from './useStorage'
 
 /**
@@ -71,7 +72,7 @@ export const useLayoutStore = create(() => ({
 }))
 
 export const toggleDialog = (open, category, type, filter) => (event) => {
-  Utility.analytics(
+  analytics(
     'Menu Toggle',
     `Open: ${open}`,
     `Category: ${category} Menu: ${type}`,

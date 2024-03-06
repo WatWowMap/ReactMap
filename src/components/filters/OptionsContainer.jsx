@@ -8,8 +8,8 @@ import ReplayIcon from '@mui/icons-material/Replay'
 
 import { useMemory } from '@store/useMemory'
 import { useStorage } from '@store/useStorage'
-import { Utility } from '@services/Utility'
 import { BasicListButton } from '@components/inputs/BasicListButton'
+import { camelToSnake } from '@utils/camelToSnake'
 
 import { OptionsGroup } from './Options'
 
@@ -28,7 +28,7 @@ function AppliedChip({ category, subCategory, option }) {
   if (!valid) return null
   return (
     <Chip
-      label={t(Utility.camelToSnake(option))}
+      label={t(camelToSnake(option))}
       variant="outlined"
       size="small"
       color={reverse ? 'secondary' : 'primary'}

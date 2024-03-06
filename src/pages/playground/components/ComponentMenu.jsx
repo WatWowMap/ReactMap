@@ -10,11 +10,11 @@ import DialogContent from '@mui/material/DialogContent'
 import DialogContentText from '@mui/material/DialogContentText'
 import DialogActions from '@mui/material/DialogActions'
 import { useTranslation } from 'react-i18next'
-
-import { Utility } from '@services/Utility'
-
 import { useQuery } from '@apollo/client'
+
 import { CUSTOM_COMPONENT } from '@services/queries/config'
+import { camelToSnake } from '@utils/camelToSnake'
+
 import { setComponent, usePlayStore } from '../hooks/store'
 
 const PAGES = ['loginPage', 'messageOfTheDay', 'donationPage']
@@ -87,7 +87,7 @@ export function ComponentMenu() {
             onClick={handleMenuClose(c)}
             selected={c === component}
           >
-            {t(`component_${Utility.camelToSnake(c)}`)}
+            {t(`component_${camelToSnake(c)}`)}
           </MenuItem>
         ))}
       </Menu>

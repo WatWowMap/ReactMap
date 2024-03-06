@@ -4,13 +4,10 @@ import * as React from 'react'
 import { useMemory } from '@store/useMemory'
 import { useStorage } from '@store/useStorage'
 import { useMapStore } from '@store/useMapStore'
-import { Utility } from '@services/Utility'
 
 import { FilterPermCheck } from './QueryData'
 
 export function DataView() {
-  Utility.analytics(window.location.pathname)
-
   const iconsReady = useMemory((s) => !!s.Icons)
   const mapReady = useMapStore((s) => !!s.map)
   const ui = useMemory((s) => s.ui)

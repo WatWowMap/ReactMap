@@ -2,17 +2,15 @@
 import * as React from 'react'
 import { Tooltip } from 'react-leaflet'
 import { useTranslation } from 'react-i18next'
-import { Utility } from '@services/Utility'
+import { getTimeUntil } from '@utils/getTimeUntil'
 
 const Timer = ({ timestamp }) => {
   const { t } = useTranslation()
-  const [timer, setTimer] = React.useState(
-    Utility.getTimeUntil(new Date(timestamp * 1000), true),
-  )
+  const [timer, setTimer] = React.useState(getTimeUntil(timestamp * 1000, true))
 
   React.useEffect(() => {
     const timer2 = setTimeout(() => {
-      setTimer(Utility.getTimeUntil(new Date(timestamp * 1000), true))
+      setTimer(getTimeUntil(timestamp * 1000, true))
     }, 1000)
     return () => clearTimeout(timer2)
   })

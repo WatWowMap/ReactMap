@@ -3,8 +3,8 @@ import * as React from 'react'
 import Typography from '@mui/material/Typography'
 import { useTranslation } from 'react-i18next'
 
-import { Utility } from '@services/Utility'
 import { ErrorBoundary } from '@components/ErrorBoundary'
+import { useAnalytics } from '@hooks/useAnalytics'
 
 const GYM_THRESHOLD = [2, 6, 20]
 
@@ -27,9 +27,7 @@ export function WayfarerPopup({ count_gyms, count_pokestops, total }) {
     untilNextGym = t('next_submission')
   }
 
-  React.useEffect(() => {
-    Utility.analytics('Popup', `Total Count: ${total}`, 'Submission Cell')
-  }, [])
+  useAnalytics('Popup', `Total Count: ${total}`, 'Submission Cell')
 
   return (
     <ErrorBoundary noRefresh style={{}} variant="h5">

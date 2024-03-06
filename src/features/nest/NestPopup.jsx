@@ -1,5 +1,5 @@
 // @ts-check
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import MoreVert from '@mui/icons-material/MoreVert'
 import Grid from '@mui/material/Grid'
 import Typography from '@mui/material/Typography'
@@ -13,9 +13,10 @@ import { useTranslation } from 'react-i18next'
 import { useMemory } from '@store/useMemory'
 import { useLayoutStore } from '@store/useLayoutStore'
 import { setDeepStore } from '@store/useStorage'
-import { Utility } from '@services/Utility'
 import { ErrorBoundary } from '@components/ErrorBoundary'
 import { NestSubmission } from '@components/dialogs/NestSubmission'
+import { getTimeUntil } from '@utils/getTimeUntil'
+import { useAnalytics } from '@hooks/useAnalytics'
 
 const getColor = (timeSince) => {
   let color = 'success'
@@ -53,7 +54,7 @@ export function NestPopup({
   const [parkName, setParkName] = useState(true)
   const [anchorEl, setAnchorEl] = useState(null)
 
-  const lastUpdated = Utility.getTimeUntil(new Date(updated * 1000))
+  const lastUpdated = getTimeUntil(updated * 1000)
 
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget)
@@ -74,13 +75,12 @@ export function NestPopup({
     setDeepStore(`filters.nests.filter.${key}.enabled`, false)
   }
 
+  useAnalytics('Popup', `Name: ${name} Pokemon: ${pokemon_id}`, 'Nest')
+
   const options = [
     { name: 'hide', action: handleHide },
     { name: 'exclude', action: handleExclude },
   ]
-  useEffect(() => {
-    Utility.analytics('Popup', `Name: ${name} Pokemon: ${pokemon_id}`, 'Nest')
-  }, [])
 
   return (
     <ErrorBoundary noRefresh variant="h5">

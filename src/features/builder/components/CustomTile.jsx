@@ -2,7 +2,7 @@
 import * as React from 'react'
 import Grid from '@mui/material/Unstable_Grid2'
 
-import { Utility } from '@services/Utility'
+import { getGridSizes } from '@utils/getGridSizes'
 
 import { Generator } from './Generator'
 
@@ -16,7 +16,7 @@ export function CustomTile({ block, defaultReturn }) {
     <Generator block={block} defaultReturn={defaultReturn} />
   ) : (
     <Grid
-      {...Utility.getSizes(block.gridSizes)}
+      {...getGridSizes(block.gridSizes)}
       className={block.className}
       style={block.gridStyle}
       sx={block.sx}

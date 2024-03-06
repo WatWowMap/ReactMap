@@ -10,9 +10,9 @@ import { useStorage } from '@store/useStorage'
 import { useOpacity } from '@hooks/useOpacity'
 import { useForcePopup } from '@hooks/useForcePopup'
 import { sendNotification } from '@services/desktopNotification'
-import { Utility } from '@services/Utility'
 import { TooltipWrapper } from '@components/ToolTipWrapper'
 
+import { getTimeUntil } from '@utils/getTimeUntil'
 import { gymMarker } from './gymMarker'
 import { GymPopup } from './GymPopup'
 
@@ -160,7 +160,7 @@ const BaseGymTile = (gym) => {
       }${gym.raid_pokemon_id ? t(`poke_${gym.raid_pokemon_id}`) : ''}${
         gym.raid_pokemon_form ? t(`form_${gym.raid_pokemon_form}`) : ''
       }${gym.raid_pokemon_id ? '\n' : ''}${
-        Utility.getTimeUntil(new Date(timerToDisplay * 1000), true).str
+        getTimeUntil(timerToDisplay * 1000, true).str
       }`,
       icon: raidIconUrl,
     })

@@ -7,12 +7,13 @@ import { useMemory } from '@store/useMemory'
 import { useStorage } from '@store/useStorage'
 import { Fetch } from '@services/Fetch'
 import { setLoadingText } from '@utils/setLoadingText'
-import { Utility } from '@services/Utility'
 import { deepMerge } from '@utils/deepMerge'
 import { checkHoliday } from '@utils/checkHoliday'
 import { useHideElement } from '@hooks/useHideElement'
 import { getGlowRules } from '@utils/getGlowRules'
 import { useScannerSessionStorage } from '@features/scanner'
+import { timeCheck } from '@utils/timeCheck'
+import { analytics } from '@hooks/useAnalytics'
 
 export function Config({ children }) {
   const { t } = useTranslation()
@@ -30,7 +31,7 @@ export function Config({ children }) {
     if (data) {
       document.title = data?.map?.general.headerTitle || document.title
 
-      Utility.analytics(
+      analytics(
         'User',
         data.user ? `${data.user.username} (${data.user.id})` : 'Not Logged In',
         'Permissions',
@@ -123,7 +124,7 @@ export function Config({ children }) {
         userSettings: data.userSettings,
         clientMenus: data.clientMenus,
         glowRules: getGlowRules(data.clientMenus.pokemon.glow.sub),
-        timeOfDay: Utility.timeCheck(...location),
+        timeOfDay: timeCheck(...location),
         config: {
           ...data.map,
           holidayEffects: (data.map.holidayEffects || []).filter(checkHoliday),

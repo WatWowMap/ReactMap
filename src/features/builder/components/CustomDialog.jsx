@@ -1,12 +1,12 @@
+// @ts-check
 import * as React from 'react'
 import Grid from '@mui/material/Unstable_Grid2'
 import DialogContent from '@mui/material/DialogContent'
 import { useTranslation } from 'react-i18next'
 
-import { Utility } from '@services/Utility'
-
 import { Header } from '@components/dialogs/Header'
 import { Footer } from '@components/dialogs/Footer'
+import { getBlockContent } from '@utils/getBlockContent'
 
 export function CustomDialog({
   configObj,
@@ -26,7 +26,7 @@ export function CustomDialog({
   const [footerOptions, setFooterOptions] = React.useState([
     ...(configObj.footerButtons || []).map((b) => ({
       ...b,
-      name: Utility.getBlockContent(b.name),
+      name: getBlockContent(b.name),
     })),
     {
       name: `${t('close')}${countdown ? ` (${countdown})` : ''}`,
@@ -40,7 +40,7 @@ export function CustomDialog({
     setFooterOptions([
       ...(configObj.footerButtons || []).map((b) => ({
         ...b,
-        name: Utility.getBlockContent(b.name),
+        name: getBlockContent(b.name),
       })),
       {
         name: `${t('close')}${countdown ? ` (${countdown})` : ''}`,
@@ -77,7 +77,7 @@ export function CustomDialog({
       <Header
         titles={
           configObj.titles?.length
-            ? configObj.titles.map((title) => Utility.getBlockContent(title))
+            ? configObj.titles.map((title) => getBlockContent(title))
             : [defaultTitle]
         }
       />

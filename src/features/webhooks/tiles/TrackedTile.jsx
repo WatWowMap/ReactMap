@@ -7,12 +7,12 @@ import IconButton from '@mui/material/IconButton'
 import Checkbox from '@mui/material/Checkbox'
 import Box from '@mui/material/Box'
 
-import { Utility } from '@services/Utility'
 import { useMemory } from '@store/useMemory'
 import { apolloClient, apolloCache } from '@services/apollo'
 import * as webhookNodes from '@services/queries/webhook'
-
+import { getTileBackground } from '@utils/getTileBackground'
 import { useWebhookStore, setSelected } from '@store/useWebhookStore'
+
 import { Poracle } from '../services/Poracle'
 
 export function TrackedTile({ index }) {
@@ -56,7 +56,7 @@ export function TrackedTile({ index }) {
     <Grid2
       container
       xs={12}
-      bgcolor={Utility.getTileBackground(1, index)}
+      bgcolor={getTileBackground(1, index)}
       justifyContent="center"
       alignItems="center"
       py={1}

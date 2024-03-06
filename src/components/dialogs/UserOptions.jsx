@@ -7,11 +7,13 @@ import ListItemText from '@mui/material/ListItemText'
 import Switch from '@mui/material/Switch'
 import { useTranslation, Trans } from 'react-i18next'
 
-import { Utility } from '@services/Utility'
 import { useMemory } from '@store/useMemory'
 import { toggleDialog, useLayoutStore } from '@store/useLayoutStore'
 import { useStorage } from '@store/useStorage'
 import { getPermission } from '@services/desktopNotification'
+import { analytics } from '@hooks/useAnalytics'
+import { camelToSnake } from '@utils/camelToSnake'
+import { getProperName } from '@utils/getProperName'
 
 import { Header } from './Header'
 import { Footer } from './Footer'
@@ -83,7 +85,7 @@ function BaseUserOptions() {
     } else {
       setLocalState((prev) => ({ ...prev, [name]: !localState[name] }))
     }
-    Utility.analytics(
+    analytics(
       'User Options',
       `Name: ${name} New Value: ${value || !localState[name]}`,
       category,
@@ -94,7 +96,7 @@ function BaseUserOptions() {
     if (label.startsWith('pvp') && !label.includes('Mega')) {
       return <Trans i18nKey="pvp_level">{{ level: label.substring(3) }}</Trans>
     }
-    return t(Utility.camelToSnake(label), Utility.getProperName(label))
+    return t(camelToSnake(label), getProperName(label))
   }
 
   const footerOptions = React.useMemo(
@@ -140,7 +142,7 @@ function BaseUserOptions() {
       fullWidth={false}
     >
       <Header
-        titles={[`${Utility.camelToSnake(category)}_options`]}
+        titles={[`${camelToSnake(category)}_options`]}
         action={toggleDialog(false, category, 'options')}
       />
       <DialogContent sx={{ minWidth: 'min(100vw, 350px)' }}>

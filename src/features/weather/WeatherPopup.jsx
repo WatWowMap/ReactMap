@@ -5,8 +5,10 @@ import Typography from '@mui/material/Typography'
 import { useTranslation } from 'react-i18next'
 
 import { useMemory } from '@store/useMemory'
-import { Utility } from '@services/Utility'
 import { ErrorBoundary } from '@components/ErrorBoundary'
+import { useAnalytics } from '@hooks/useAnalytics'
+import { getTimeUntil } from '@utils/getTimeUntil'
+import { dayCheck } from '@utils/dayCheck'
 
 /**
  *
@@ -20,13 +22,11 @@ export function WeatherPopup({ gameplay_condition, updated }) {
   )
   const Icons = useMemory((state) => state.Icons)
 
-  React.useEffect(() => {
-    Utility.analytics(
-      'Popup',
-      `Type: ${t(`weather_${gameplay_condition}`)}`,
-      'Weather',
-    )
-  }, [])
+  useAnalytics(
+    'Popup',
+    `Type: ${t(`weather_${gameplay_condition}`)}`,
+    'Weather',
+  )
 
   return (
     <ErrorBoundary noRefresh variant="h5">
@@ -71,10 +71,11 @@ export function WeatherPopup({ gameplay_condition, updated }) {
   )
 }
 
+// TODO: Why does this exist?
 const Timer = ({ updated, ts = Date.now() / 1000 }) => {
   const { t } = useTranslation()
   const lastUpdated = new Date(updated * 1000)
-  const [timer, setTimer] = React.useState(Utility.getTimeUntil(lastUpdated))
+  const [timer, setTimer] = React.useState(getTimeUntil(updated * 1000))
 
   const date = new Date()
   const currentHour = date.getHours()
@@ -82,14 +83,14 @@ const Timer = ({ updated, ts = Date.now() / 1000 }) => {
   const currentDay = date.getDate()
   const updatedDay = lastUpdated.getDate()
 
-  let color = 'error.main'
-  if (updatedHour === currentHour && updatedDay === currentDay) {
-    color = 'success.main'
-  }
+  const color =
+    updatedHour === currentHour && updatedDay === currentDay
+      ? 'success.main'
+      : 'error.main'
 
   React.useEffect(() => {
     const timer2 = setTimeout(() => {
-      setTimer(Utility.getTimeUntil(lastUpdated))
+      setTimer(getTimeUntil(updated * 1000))
     }, 1000)
     return () => clearTimeout(timer2)
   })
@@ -103,7 +104,7 @@ const Timer = ({ updated, ts = Date.now() / 1000 }) => {
           gutterBottom
           sx={{ color }}
         >
-          {Utility.dayCheck(ts, updated)}
+          {dayCheck(ts, updated)}
         </Typography>
       </Grid>
       <Grid item xs={timer.diff > 60 ? 12 : 4}>

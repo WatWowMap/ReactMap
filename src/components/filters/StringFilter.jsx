@@ -7,7 +7,8 @@ import dlv from 'dlv'
 
 import { useStorage } from '@store/useStorage'
 import { setDeep } from '@utils/setDeep'
-import { Utility } from '@services/Utility'
+import { analytics } from '@hooks/useAnalytics'
+import { checkIVFilterValid } from '@utils/checkAdvFilter'
 
 /**
  * Expert string input field for filters
@@ -30,8 +31,8 @@ export function StringFilter({ field, ...props }) {
         (event) => {
           try {
             const newValue = event.target.value
-            Utility.analytics('Filtering', newValue, 'Legacy')
-            if (Utility.checkAdvFilter(newValue)) {
+            analytics('Filtering', newValue, 'Legacy')
+            if (checkIVFilterValid(newValue)) {
               setValidation({
                 label: t('valid'),
                 status: false,

@@ -9,9 +9,9 @@ import { useQuery } from '@apollo/client'
 import { useLayoutStore } from '@store/useLayoutStore'
 import { useStorage } from '@store/useStorage'
 import { CUSTOM_COMPONENT, MOTD_CHECK } from '@services/queries/config'
-import { Utility } from '@services/Utility'
 import { Loading } from '@components/Loading'
 
+import { getBlockContent } from '@utils/getBlockContent'
 import { CustomTile } from './components/CustomTile'
 import { CustomDialog } from './components/CustomDialog'
 
@@ -91,18 +91,16 @@ const DefaultMotD = ({ block }) =>
   ) : (
     <Box whiteSpace="pre-line" margin={3} textAlign="center">
       {block.title && (
-        <Typography variant="h6">
-          {Utility.getBlockContent(block.title)}
-        </Typography>
+        <Typography variant="h6">{getBlockContent(block.title)}</Typography>
       )}
       {block.body && (
         <Typography variant="subtitle1">
-          {Utility.getBlockContent(block.body)}
+          {getBlockContent(block.body)}
         </Typography>
       )}
       {block.footer && (
         <Typography variant="caption">
-          {Utility.getBlockContent(block.footer)}
+          {getBlockContent(block.footer)}
         </Typography>
       )}
     </Box>

@@ -14,9 +14,9 @@ import { useTranslation } from 'react-i18next'
 import { useMemory } from '@store/useMemory'
 import { toggleDialog, useLayoutStore } from '@store/useLayoutStore'
 import { useStorage } from '@store/useStorage'
-import { Utility } from '@services/Utility'
 import { BasicListButton } from '@components/inputs/BasicListButton'
 import { BoolToggle } from '@components/inputs/BoolToggle'
+import { camelToSnake } from '@utils/camelToSnake'
 
 import { Settings } from './Settings'
 import { PokemonDrawerMemo } from './Pokemon'
@@ -59,7 +59,7 @@ const DrawerSection = ({ category }) => {
       TransitionProps={{ unmountOnExit }}
     >
       <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-        <Typography>{t(Utility.camelToSnake(category))}</Typography>
+        <Typography>{t(camelToSnake(category))}</Typography>
       </AccordionSummary>
       <AccordionDetails sx={{ p: 0 }}>
         <List>

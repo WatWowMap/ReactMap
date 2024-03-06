@@ -3,8 +3,8 @@ import * as React from 'react'
 import Typography from '@mui/material/Typography'
 import { useTranslation } from 'react-i18next'
 
-import { Utility } from '@services/Utility'
 import { ErrorBoundary } from '@components/ErrorBoundary'
+import { dayCheck } from '@utils/dayCheck'
 
 /**
  *
@@ -29,7 +29,7 @@ export function SpawnpointPopup({ despawn_sec, lat, lon, updated }) {
         {t('last_updated')}
       </Typography>
       <Typography variant="subtitle2" align="center">
-        {Utility.dayCheck(Date.now() / 1000, updated)}
+        {dayCheck(Date.now() / 1000, updated)}
       </Typography>
       <br />
       <Typography variant="subtitle1" align="center">

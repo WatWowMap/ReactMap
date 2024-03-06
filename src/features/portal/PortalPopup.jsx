@@ -4,12 +4,13 @@ import Grid from '@mui/material/Grid'
 import Typography from '@mui/material/Typography'
 import { useTranslation } from 'react-i18next'
 
-import { Utility } from '@services/Utility'
 import { ErrorBoundary } from '@components/ErrorBoundary'
 import { useMemory } from '@store/useMemory'
 import { useStorage } from '@store/useStorage'
 import { Navigation } from '@components/popups/Navigation'
 import { Coords } from '@components/popups/Coords'
+import { dayCheck } from '@utils/dayCheck'
+import { useAnalytics } from '@hooks/useAnalytics'
 
 /**
  *
@@ -30,17 +31,15 @@ export function PortalPopup({ url, name, lat, lon, updated, imported }) {
   const extraMetaData = [
     {
       description: t('last_updated'),
-      data: Utility.dayCheck(Date.now() / 1000, updated),
+      data: dayCheck(Date.now() / 1000, updated),
     },
     {
       description: t('imported'),
-      data: Utility.dayCheck(Date.now() / 1000, imported),
+      data: dayCheck(Date.now() / 1000, imported),
     },
   ]
 
-  React.useEffect(() => {
-    Utility.analytics('Popup', `Name: ${name}`, 'Portal')
-  }, [])
+  useAnalytics('Popup', `Name: ${name}`, 'Portal')
 
   return (
     <ErrorBoundary noRefresh style={{}} variant="h5">

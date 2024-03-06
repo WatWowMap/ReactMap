@@ -2,7 +2,7 @@
 
 import { useMemory } from '@store/useMemory'
 import { useStorage, setDeepStore } from '@store/useStorage'
-import { Utility } from '@services/Utility'
+import { generateSlots } from '@utils/generateSlots'
 
 export const STANDARD_BACKUP =
   /** @type {import('@rm/types/lib').BaseFilter} */ ({
@@ -48,9 +48,7 @@ export function applyToAll(
       ]
       if (key.startsWith('t') && +key.charAt(1) !== 0 && includeSlots) {
         filters.push(
-          ...Object.entries(
-            Utility.generateSlots(key, newFilter.enabled, userFilters),
-          ),
+          ...Object.entries(generateSlots(key, newFilter.enabled, userFilters)),
         )
       }
       return filters

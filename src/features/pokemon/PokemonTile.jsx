@@ -11,10 +11,10 @@ import { basicEqualFn, useMemory } from '@store/useMemory'
 import { useStorage } from '@store/useStorage'
 import { useOpacity } from '@hooks/useOpacity'
 import { useForcePopup } from '@hooks/useForcePopup'
-import { Utility } from '@services/Utility'
 import { sendNotification } from '@services/desktopNotification'
 import { useMapStore } from '@store/useMapStore'
 import { TooltipWrapper } from '@components/ToolTipWrapper'
+import { getTimeUntil } from '@utils/getTimeUntil'
 
 import { PokemonPopup } from './PokemonPopup'
 import { basicPokemonMarker, fancyPokemonMarker } from './pokemonMarker'
@@ -149,7 +149,7 @@ const BasePokemonTile = (pkmn) => {
       body: `A${pkmn.atk_iv || '?'} | D${pkmn.def_iv || '?'} | S${
         pkmn.sta_iv || '?'
       } | L${pkmn.level || '?'} | CP${pkmn.cp || '?'}\n${
-        Utility.getTimeUntil(new Date(pkmn.expire_timestamp * 1000), true).str
+        getTimeUntil(pkmn.expire_timestamp * 1000, true).str
       }`,
       lat: pkmn.lat,
       lon: pkmn.lon,

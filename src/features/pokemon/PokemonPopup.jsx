@@ -16,7 +16,6 @@ import { useTranslation } from 'react-i18next'
 
 import { useMemory } from '@store/useMemory'
 import { setDeepStore, useStorage } from '@store/useStorage'
-import { Utility } from '@services/Utility'
 import { ErrorBoundary } from '@components/ErrorBoundary'
 import { TextWithIcon } from '@components/Img'
 
@@ -26,6 +25,8 @@ import { Navigation } from '@components/popups/Navigation'
 import { Coords } from '@components/popups/Coords'
 import { TimeStamp } from '@components/popups/TimeStamps'
 import { ExtraInfo } from '@components/popups/ExtraInfo'
+import { useAnalytics } from '@hooks/useAnalytics'
+import { getTimeUntil } from '@utils/getTimeUntil'
 
 const rowClass = { width: 30, fontWeight: 'bold' }
 
@@ -70,13 +71,11 @@ export function PokemonPopup({ pokemon, iconUrl, isTutorial = false }) {
   const hasLeagues = cleanPvp ? Object.keys(cleanPvp) : []
   const hasStats = iv || cp
 
-  useEffect(() => {
-    Utility.analytics(
-      'Popup',
-      `ID: ${pokemon.pokemon_id} IV: ${pokemon.iv}% PVP: #${pokemon.bestPvp}`,
-      'Pokemon',
-    )
-  }, [])
+  useAnalytics(
+    'Popup',
+    `ID: ${pokemon.pokemon_id} IV: ${pokemon.iv}% PVP: #${pokemon.bestPvp}`,
+    'Pokemon',
+  )
 
   return (
     <ErrorBoundary noRefresh style={{}} variant="h5">
@@ -367,12 +366,12 @@ const Info = ({ pokemon, metaData, perms, Icons, timeOfDay, t }) => {
 
 const Timer = ({ pokemon, hasStats, t }) => {
   const { expire_timestamp, expire_timestamp_verified } = pokemon
-  const despawnTimer = new Date(expire_timestamp * 1000)
-  const [timer, setTimer] = useState(Utility.getTimeUntil(despawnTimer, true))
+  const despawnTimer = expire_timestamp * 1000
+  const [timer, setTimer] = useState(getTimeUntil(despawnTimer, true))
 
   useEffect(() => {
     const timer2 = setTimeout(() => {
-      setTimer(Utility.getTimeUntil(despawnTimer, true))
+      setTimer(getTimeUntil(despawnTimer, true))
     }, 1000)
     return () => clearTimeout(timer2)
   })

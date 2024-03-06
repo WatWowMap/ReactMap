@@ -3,8 +3,9 @@ import * as React from 'react'
 import Typography from '@mui/material/Typography'
 import { Trans, useTranslation } from 'react-i18next'
 
-import { Utility } from '@services/Utility'
 import { ErrorBoundary } from '@components/ErrorBoundary'
+import { getTimeUntil } from '@utils/getTimeUntil'
+import { dayCheck } from '@utils/dayCheck'
 
 /**
  *
@@ -13,12 +14,12 @@ import { ErrorBoundary } from '@components/ErrorBoundary'
  */
 export function ScanCellPopup({ id, updated }) {
   const { t } = useTranslation()
-  const lastUpdated = new Date(updated * 1000)
-  const [timer, setTimer] = React.useState(Utility.getTimeUntil(lastUpdated))
+  const lastUpdated = updated * 1000
+  const [timer, setTimer] = React.useState(getTimeUntil(lastUpdated))
 
   React.useEffect(() => {
     const timer2 = setTimeout(() => {
-      setTimer(Utility.getTimeUntil(lastUpdated))
+      setTimer(getTimeUntil(lastUpdated))
     }, 1000)
     return () => clearTimeout(timer2)
   })
@@ -35,7 +36,7 @@ export function ScanCellPopup({ id, updated }) {
         {t('last_updated')}:
       </Typography>
       <Typography variant="subtitle1" align="center">
-        {Utility.dayCheck(Date.now() / 1000, updated)}
+        {dayCheck(Date.now() / 1000, updated)}
       </Typography>
       <Typography variant="subtitle1" align="center">
         {t('id')}: {id}

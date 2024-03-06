@@ -7,7 +7,6 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import Collapse from '@mui/material/Collapse'
 import IconButton from '@mui/material/IconButton'
 
-import { Utility } from '@services/Utility'
 import { useMemory } from '@store/useMemory'
 import { useLayoutStore } from '@store/useLayoutStore'
 import { useStorage } from '@store/useStorage'
@@ -18,6 +17,7 @@ import { applyToAll } from '@services/filtering/applyToAll'
 import { useGetAvailable } from '@hooks/useGetAvailable'
 import { applyToAllWebhooks, useWebhookStore } from '@store/useWebhookStore'
 
+import { useAnalytics } from '@hooks/useAnalytics'
 import { OptionsContainer } from './filters/OptionsContainer'
 import { VirtualGrid } from './virtual/VirtualGrid'
 import { GenericSearch } from './inputs/GenericSearch'
@@ -47,7 +47,7 @@ export function Menu({
 }) {
   useGetAvailable(category)
 
-  Utility.analytics(`/advanced/${category}`)
+  useAnalytics(`/advanced/${category}`)
 
   const isMobile = useMemory((s) => s.isMobile)
   const { t } = useTranslation()

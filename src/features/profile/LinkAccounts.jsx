@@ -8,13 +8,13 @@ import MenuItem from '@mui/material/MenuItem'
 import Typography from '@mui/material/Typography'
 
 import { useMemory } from '@store/useMemory'
-import { Utility } from '@services/Utility'
 import { Query } from '@services/Query'
 import { METHODS } from '@assets/constants'
 
 import { DiscordButton } from '@components/auth/Discord'
 import { TelegramWidget } from '@components/auth/Telegram'
 import { Notification } from '@components/Notification'
+import { getProperName } from '@utils/getProperName'
 
 export function LinkAccounts() {
   const { t } = useTranslation()
@@ -83,7 +83,7 @@ export function LinkAccounts() {
                 {METHODS.map((x) =>
                   auth[`${x}Id`] ? (
                     <MenuItem key={x} value={x}>
-                      {Utility.getProperName(x)}
+                      {getProperName(x)}
                     </MenuItem>
                   ) : null,
                 )}

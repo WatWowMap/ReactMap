@@ -9,10 +9,10 @@ import DialogContent from '@mui/material/DialogContent'
 
 import { useMemory } from '@store/useMemory'
 import { useLayoutStore } from '@store/useLayoutStore'
-import { Utility } from '@services/Utility'
 import { Header } from '@components/dialogs/Header'
 import { Footer } from '@components/dialogs/Footer'
 import { DialogWrapper } from '@components/dialogs/DialogWrapper'
+import { useAnalytics } from '@hooks/useAnalytics'
 
 import { UserBackups } from './Backups'
 import { UserPermissions } from './Permissions'
@@ -21,7 +21,7 @@ import { LinkAccounts } from './LinkAccounts'
 import { ExtraUserFields } from './ExtraFields'
 
 export function UserProfile() {
-  Utility.analytics('/user-profile')
+  useAnalytics('/user-profile')
   const { t } = useTranslation()
   const auth = useMemory((state) => state.auth)
   const { rolesLinkName, rolesLink } = useMemory((state) => state.config.links)

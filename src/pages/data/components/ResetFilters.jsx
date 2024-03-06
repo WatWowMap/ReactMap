@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next'
 
 import { useMemory } from '@store/useMemory'
 import { resetFilter, resetFilters } from '@utils/resetState'
-import { Utility } from '@services/Utility'
+import { camelToSnake } from '@utils/camelToSnake'
 
 import {
   ButtonWithNotification,
@@ -30,7 +30,7 @@ export function ResetFilters() {
             key={key}
             onClick={() => resetFilter(key)}
             color="warning.main"
-            label={t(`reset_${Utility.camelToSnake(key)}`)}
+            label={t(`reset_${camelToSnake(key)}`)}
             category="filter"
             isHovering={isHovering}
           />

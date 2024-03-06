@@ -12,10 +12,11 @@ import { useTranslation } from 'react-i18next'
 
 import { useMemory } from '@store/useMemory'
 import { useStorage } from '@store/useStorage'
-import { Utility } from '@services/Utility'
+import { analytics } from '@hooks/useAnalytics'
+import { camelToSnake } from '@utils/camelToSnake'
 
 const handleChange = (category, subCategory) => (event) => {
-  Utility.analytics(
+  analytics(
     'Filtering Options',
     `New Value: ${event.target.checked}`,
     `Category: ${category} Name: ${subCategory}.${event.target.name}`,
@@ -60,7 +61,7 @@ export function OptionCheckbox({ category, subCategory, option }) {
         />
       }
       value={option}
-      label={t(Utility.camelToSnake(option))}
+      label={t(camelToSnake(option))}
     />
   )
 }
@@ -80,7 +81,7 @@ export function OptionsGroup({ category, subCategory }) {
       onChange={handleAccordion(category, subCategory)}
     >
       <AccordionSummary expandIcon={<ExpandMore />}>
-        <Typography>{t(Utility.camelToSnake(subCategory))}</Typography>
+        <Typography>{t(camelToSnake(subCategory))}</Typography>
       </AccordionSummary>
       <AccordionDetails>
         <FormControl component="fieldset">

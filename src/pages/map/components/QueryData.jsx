@@ -9,10 +9,10 @@ import { usePermCheck } from '@hooks/usePermCheck'
 import { Query } from '@services/Query'
 import { getQueryArgs } from '@utils/getQueryArgs'
 import { RobustTimeout } from '@services/apollo/RobustTimeout'
-import { Utility } from '@services/Utility'
 import { FILTER_SKIP_LIST } from '@assets/constants'
 import { Notification } from '@components/Notification'
 import { GenerateCells } from '@features/s2cell'
+import { useAnalytics } from '@hooks/useAnalytics'
 
 import { Clustering } from './Clustering'
 import { TILES } from '../tileObject'
@@ -91,7 +91,7 @@ export function FilterPermCheck({ category }) {
 
 function QueryWrapper({ category }) {
   const timeout = React.useRef(new RobustTimeout(category))
-  Utility.analytics('Data', `${category} being fetched`, category, true)
+  useAnalytics('Data', `${category} being fetched`, category, true)
 
   return <QueryData category={category} timeout={timeout} />
 }

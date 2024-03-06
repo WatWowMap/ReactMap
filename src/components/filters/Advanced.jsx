@@ -7,7 +7,6 @@ import List from '@mui/material/List'
 import ListItem from '@mui/material/ListItem'
 import { useTranslation } from 'react-i18next'
 
-import { Utility } from '@services/Utility'
 import { useMemory } from '@store/useMemory'
 import { useLayoutStore } from '@store/useLayoutStore'
 import { useDeepStore, useStorage } from '@store/useStorage'
@@ -18,6 +17,7 @@ import { ENABLED_ALL, XXS_XXL } from '@assets/constants'
 import { useTranslateById } from '@hooks/useTranslateById'
 import { STANDARD_BACKUP, applyToAll } from '@services/filtering/applyToAll'
 import { checkIfHasAll } from '@utils/hasAll'
+import { useAnalytics } from '@hooks/useAnalytics'
 
 import { StringFilter } from './StringFilter'
 import { SliderTile } from '../inputs/SliderTile'
@@ -48,8 +48,8 @@ export function AdvancedFilter() {
   )
   const backup = React.useRef(filters)
 
-  Utility.analytics(`/${category}/${id}`)
-  Utility.analytics(
+  useAnalytics(`/${category}/${id}`)
+  useAnalytics(
     'Advanced Filtering',
     `ID: ${id} Size: ${filters?.size || 'md'}`,
     category,

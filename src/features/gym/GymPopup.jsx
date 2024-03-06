@@ -16,7 +16,6 @@ import { useMemory } from '@store/useMemory'
 import { useLayoutStore } from '@store/useLayoutStore'
 import { setDeepStore, useStorage } from '@store/useStorage'
 import { useWebhook } from '@hooks/useWebhook'
-import { Utility } from '@services/Utility'
 import { ErrorBoundary } from '@components/ErrorBoundary'
 import { TextWithIcon } from '@components/Img'
 import { Title } from '@components/popups/Title'
@@ -26,6 +25,9 @@ import { Navigation } from '@components/popups/Navigation'
 import { Coords } from '@components/popups/Coords'
 import { TimeStamp } from '@components/popups/TimeStamps'
 import { ExtraInfo } from '@components/popups/ExtraInfo'
+import { useAnalytics } from '@hooks/useAnalytics'
+import { getTimeUntil } from '@utils/getTimeUntil'
+import { formatInterval } from '@utils/formatInterval'
 
 /**
  *
@@ -42,13 +44,7 @@ export function GymPopup({ hasRaid, hasHatched, raidIconUrl, ...gym }) {
   const popups = useStorage((state) => state.popups)
   const ts = Math.floor(Date.now() / 1000)
 
-  React.useEffect(() => {
-    Utility.analytics(
-      'Popup',
-      `Team ID: ${gym.team_id} Has Raid: ${hasRaid}`,
-      'Gym',
-    )
-  }, [])
+  useAnalytics('Popup', `Team ID: ${gym.team_id} Has Raid: ${hasRaid}`, 'Gym')
 
   return (
     <ErrorBoundary noRefresh style={{}} variant="h5">
@@ -572,8 +568,8 @@ const Timer = ({
   const target = (start ? raid_battle_timestamp : raid_end_timestamp) * 1000
   const update = () =>
     start || hasHatched || raid_pokemon_id
-      ? Utility.getTimeUntil(target, true)
-      : Utility.formatInterval(target - raid_battle_timestamp * 1000)
+      ? getTimeUntil(target, true)
+      : formatInterval(target - raid_battle_timestamp * 1000)
 
   const [display, setDisplay] = React.useState(update)
 

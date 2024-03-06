@@ -19,7 +19,6 @@ import Help from '@mui/icons-material/HelpOutline'
 
 import { useMemory } from '@store/useMemory'
 import { useStorage, useDeepStore } from '@store/useStorage'
-import { Utility } from '@services/Utility'
 import { XXS_XXL, NUNDO_HUNDO } from '@assets/constants'
 import { useLayoutStore } from '@store/useLayoutStore'
 import { StringFilterMemo } from '@components/filters/StringFilter'
@@ -28,6 +27,7 @@ import { TabPanel } from '@components/TabPanel'
 import { GenderListItem } from '@components/filters/Gender'
 import { BasicListButton } from '@components/inputs/BasicListButton'
 import { BoolToggle, DualBoolToggle } from '@components/inputs/BoolToggle'
+import { analytics } from '@hooks/useAnalytics'
 
 import { SelectorListMemo } from './SelectorList'
 
@@ -44,7 +44,7 @@ function PokemonDrawer() {
     if (name in ivOr) {
       setIvOr(name, values)
     }
-    Utility.analytics('Global Pokemon', `${name}: ${values}`, `Pokemon Text`)
+    analytics('Global Pokemon', `${name}: ${values}`, `Pokemon Text`)
   }, [])
 
   /** @type {import('@mui/material').TabsProps['onChange']} */

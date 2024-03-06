@@ -9,11 +9,11 @@ import { useTranslation } from 'react-i18next'
 import { useMemory } from '@store/useMemory'
 import { useLayoutStore } from '@store/useLayoutStore'
 import { useStorage } from '@store/useStorage'
-import { Utility } from '@services/Utility'
 import { fromSearchCategory } from '@utils/fromSearchCategory'
 import { useMapStore } from '@store/useMapStore'
-
+import { useAnalytics } from '@hooks/useAnalytics'
 import { Header } from '@components/dialogs/Header'
+
 import { renderInput } from './renderInput'
 import { renderOption } from './renderOption'
 import { useSendSearch } from './useSendSearch'
@@ -79,7 +79,7 @@ const STATIC_PROPS =
   })
 
 export function Search() {
-  Utility.analytics('/search')
+  useAnalytics('/search')
 
   const { t } = useTranslation()
 

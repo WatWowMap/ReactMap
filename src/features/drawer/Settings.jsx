@@ -27,7 +27,6 @@ import { useTranslation } from 'react-i18next'
 import { useMemory } from '@store/useMemory'
 import { toggleDialog } from '@store/useLayoutStore'
 import { useStorage } from '@store/useStorage'
-import { Utility } from '@services/Utility'
 import {
   HAS_API,
   getPermission,
@@ -37,6 +36,8 @@ import { LocaleSelection } from '@components/inputs/LocaleSelection'
 import { DividerWithMargin } from '@components/StyledDivider'
 import { BoolToggle } from '@components/inputs/BoolToggle'
 
+import { getProperName } from '@utils/getProperName'
+import { camelToSnake } from '@utils/camelToSnake'
 import { DrawerActions } from './Actions'
 
 function FCSelect({ name, label, value, onChange, children, icon }) {
@@ -103,7 +104,7 @@ function UniAssetSelect({ asset }) {
             <MenuItem key={option} value={option}>
               {t(
                 `${category.toLowerCase()}_${option.toLowerCase()}`,
-                Utility.getProperName(option),
+                getProperName(option),
               )}
             </MenuItem>
           ))}
@@ -131,7 +132,7 @@ function GeneralSetting({ setting }) {
       key={setting}
       name={setting}
       value={staticSettings[setting][value]?.name || ''}
-      label={t(Utility.camelToSnake(setting))}
+      label={t(camelToSnake(setting))}
       onChange={({ target }) => {
         useStorage.setState((prev) => ({
           settings: {
@@ -145,8 +146,8 @@ function GeneralSetting({ setting }) {
       {Object.keys(staticSettings[setting]).map((option) => (
         <MenuItem key={option} value={option}>
           {t(
-            `${Utility.camelToSnake(setting)}_${option.toLowerCase()}`,
-            t(option.toLowerCase(), Utility.getProperName(option)),
+            `${camelToSnake(setting)}_${option.toLowerCase()}`,
+            t(option.toLowerCase(), getProperName(option)),
           )}
         </MenuItem>
       ))}

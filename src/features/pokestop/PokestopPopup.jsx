@@ -19,7 +19,6 @@ import { useTranslation, Trans } from 'react-i18next'
 import { ErrorBoundary } from '@components/ErrorBoundary'
 import { useMemory } from '@store/useMemory'
 import { setDeepStore, useStorage } from '@store/useStorage'
-import { Utility } from '@services/Utility'
 import { getBadge } from '@utils/getBadge'
 import { getRewardInfo } from '@utils/getRewardInfo'
 import { getGruntReward } from '@utils/getGruntReward'
@@ -33,6 +32,8 @@ import { TimeSince } from '@components/popups/Timer'
 import { PowerUp } from '@components/popups/PowerUp'
 import { NameTT } from '@components/popups/NameTT'
 import { TimeStamp } from '@components/popups/TimeStamps'
+import { useAnalytics } from '@hooks/useAnalytics'
+import { parseQuestConditions } from '@utils/parseConditions'
 
 /**
  *
@@ -55,16 +56,14 @@ export function PokestopPopup({
   const Icons = useMemory((state) => state.Icons)
   const { lure_expire_timestamp, lure_id, invasions, events } = pokestop
 
-  React.useEffect(() => {
-    const has = { hasLure, hasQuest, hasInvasion }
-    Utility.analytics(
-      'Popup',
-      Object.keys(has)
-        .filter((a) => Boolean(has[a]))
-        .join(','),
-      'Pokestop',
-    )
-  }, [])
+  useAnalytics(
+    'Popup',
+    Object.entries({ hasLure, hasQuest, hasInvasion })
+      .filter(([, v]) => v)
+      .map(([k]) => k)
+      .join(','),
+    'Pokestop',
+  )
 
   const plainPokestop = !hasLure && !hasQuest && !hasInvasion && !hasEvent
 
@@ -551,7 +550,7 @@ const QuestConditions = ({
     }
   }
 
-  const [type1, type2] = Utility.parseConditions(quest_conditions)
+  const [type1, type2] = parseQuestConditions(quest_conditions)
   const primaryCondition = (
     <Typography variant="caption">
       <Trans i18nKey={`quest_${quest_type}`}>{{ amount: quest_target }}</Trans>
