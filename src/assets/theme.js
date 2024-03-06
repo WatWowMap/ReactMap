@@ -151,7 +151,7 @@ const components = {
 /**
  * @returns {import('@mui/material').Theme}
  */
-export default function useCustomTheme() {
+export function useCustomTheme() {
   const { primary, secondary } = useMemory((s) => s.theme)
   const darkMode = useStorage((s) => s.darkMode)
 

@@ -5,7 +5,7 @@ import Grid from '@mui/material/Unstable_Grid2'
 import { useTranslation } from 'react-i18next'
 
 import { CustomTile, CustomDialog } from '@features/builder'
-import ErrorBoundary from '@components/ErrorBoundary'
+import { ErrorBoundary } from '@components/ErrorBoundary'
 
 import { useSafeParse } from '../hooks/useSafeParse'
 import { usePlayStore } from '../hooks/store'

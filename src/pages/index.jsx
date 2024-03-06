@@ -2,13 +2,13 @@
 import * as React from 'react'
 import { Route, Routes } from 'react-router-dom'
 
+import Config from '@components/Config'
 import MapPage from './map'
-import LoginPage from './login'
-import BlockedPage from './Blocked'
-import ErrorPage from './Error'
-import DataManagement from './data'
-import Config from '../components/Config'
-import ResetPage from './Reset'
+import { LoginPage } from './login'
+import { BlockedPage } from './Blocked'
+import { ErrorPage } from './Error'
+import { DataManagerPage } from './data'
+import { ResetPage } from './Reset'
 
 const Playground = React.lazy(() => import('./playground'))
 
@@ -24,7 +24,7 @@ const loginRoute = (
 )
 const dataRoute = (
   <Config>
-    <DataManagement />
+    <DataManagerPage />
   </Config>
 )
 const blockedRoute = (
@@ -40,7 +40,7 @@ const playgroundRoute = (
 const errorRoute = <ErrorPage />
 const resetRoute = <ResetPage />
 
-export default function ReactRouter() {
+export function Pages() {
   return (
     <Routes>
       <Route path="/" element={mapRoute} />

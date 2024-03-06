@@ -4,7 +4,7 @@ import { useMemory } from '@store/useMemory'
 
 import { HolidayEffect } from './HolidayEffect'
 
-export default function HolidayEffects() {
+export function HolidayEffects() {
   const holidayEffects = useMemory((s) => s?.config?.holidayEffects)
 
   return (

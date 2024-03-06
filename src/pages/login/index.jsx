@@ -9,7 +9,7 @@ import { CustomLoginPage } from '@features/builder/LoginPage'
 
 import { DefaultLoginPage } from './DefaultPage'
 
-export default function LoginPage() {
+export function LoginPage() {
   const loggedIn = useMemory((s) => s.auth.loggedIn)
   const loginPage = useMemory((s) => s.config.loginPage)
 

@@ -6,7 +6,7 @@ import * as React from 'react'
  * @param {{ botName: string, authUrl: string }} props
  * @returns
  */
-export default function TelegramWidget({ botName, authUrl }) {
+export function TelegramWidget({ botName, authUrl }) {
   const ref = React.useRef(null)
 
   React.useEffect(() => {

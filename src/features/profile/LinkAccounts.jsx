@@ -12,8 +12,8 @@ import Utility from '@services/Utility'
 import Query from '@services/Query'
 import { METHODS } from '@assets/constants'
 
-import DiscordButton from '@components/auth/Discord'
-import Telegram from '@components/auth/Telegram'
+import { DiscordButton } from '@components/auth/Discord'
+import { TelegramWidget } from '@components/auth/Telegram'
 import Notification from '@components/Notification'
 
 export function LinkAccounts() {
@@ -37,7 +37,10 @@ export function LinkAccounts() {
         {METHODS.map((method, i) => {
           if (!auth.methods.includes(method)) return null
           const Component = i ? (
-            <Telegram authUrl={telegramAuthUrl} botName={telegramBotName} />
+            <TelegramWidget
+              authUrl={telegramAuthUrl}
+              botName={telegramBotName}
+            />
           ) : (
             <DiscordButton href={discordAuthUrl} size="medium">
               {t('link_discord')}

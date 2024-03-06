@@ -16,7 +16,7 @@ import Check from '@mui/icons-material/Check'
 import Help from '@mui/icons-material/Help'
 import { useTranslation, Trans } from 'react-i18next'
 
-import ErrorBoundary from '@components/ErrorBoundary'
+import { ErrorBoundary } from '@components/ErrorBoundary'
 import { useMemory } from '@store/useMemory'
 import { setDeepStore, useStorage } from '@store/useStorage'
 import Utility from '@services/Utility'

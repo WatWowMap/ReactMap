@@ -23,7 +23,7 @@ const defaultStyle = {
 // This component uses React Classes due to componentDidCatch() not being available in React Hooks
 // Do not use this as a base for other components
 
-class ErrorBoundary extends React.Component {
+class ErrorCatcher extends React.Component {
   static uuidv4() {
     return 'xxxxxxxx-r2m4-xxxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
       const r = (Math.random() * 16) | 0
@@ -38,7 +38,7 @@ class ErrorBoundary extends React.Component {
       message: '',
       errorCount: 0,
       reported: false,
-      uuid: ErrorBoundary.uuidv4(),
+      uuid: ErrorCatcher.uuidv4(),
     }
   }
 
@@ -137,4 +137,4 @@ class ErrorBoundary extends React.Component {
   }
 }
 
-export default withTranslation()(ErrorBoundary)
+export const ErrorBoundary = withTranslation()(ErrorCatcher)

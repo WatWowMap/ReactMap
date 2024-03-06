@@ -5,7 +5,7 @@ import Typography from '@mui/material/Typography'
 import { useTranslation } from 'react-i18next'
 
 import Utility from '@services/Utility'
-import ErrorBoundary from '@components/ErrorBoundary'
+import { ErrorBoundary } from '@components/ErrorBoundary'
 import { useMemory } from '@store/useMemory'
 import { useStorage } from '@store/useStorage'
 

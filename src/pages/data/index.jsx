@@ -12,7 +12,7 @@ import { ResetFilters } from './components/ResetFilters'
 import { DataManagementNotification } from './components/Notification'
 import { restoreDefault } from './hooks/store'
 
-export default function DataManager() {
+export function DataManagerPage() {
   const { t } = useTranslation()
   useRefresh(true)
 

@@ -17,11 +17,11 @@ import ListItemText from '@mui/material/ListItemText'
 
 import { useMemory } from '@store/useMemory'
 
-import DiscordButton from '@components/auth/Discord'
+import { DiscordButton } from '@components/auth/Discord'
 import { ThemeToggle } from '@components/inputs/ThemeToggle'
 import { I } from '@components/I'
 
-export default function BlockedPage() {
+export function BlockedPage() {
   const { t } = useTranslation()
   const { info } = useParams()
   const navigate = useNavigate()

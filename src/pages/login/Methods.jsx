@@ -3,9 +3,9 @@ import * as React from 'react'
 import Grid from '@mui/material/Unstable_Grid2'
 import { useTranslation } from 'react-i18next'
 
-import DiscordButton from '@components/auth/Discord'
-import TelegramWidget from '@components/auth/Telegram'
-import LocalLogin from '@components/auth/Local'
+import { DiscordButton } from '@components/auth/Discord'
+import { TelegramWidget } from '@components/auth/Telegram'
+import { LocalLogin } from '@components/auth/Local'
 import { useMemory } from '@store/useMemory'
 
 function Discord() {

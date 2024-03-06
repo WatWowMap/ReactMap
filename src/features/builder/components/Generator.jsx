@@ -4,9 +4,9 @@ import Divider from '@mui/material/Divider'
 import Grid from '@mui/material/Unstable_Grid2'
 
 import Utility from '@services/Utility'
-import DiscordButton from '@components/auth/Discord'
-import LocalLogin from '@components/auth/Local'
-import Telegram from '@components/auth/Telegram'
+import { DiscordButton } from '@components/auth/Discord'
+import { LocalLogin } from '@components/auth/Local'
+import { TelegramWidget } from '@components/auth/Telegram'
 import { Img } from '@components/Img'
 import { LocaleSelection } from '@components/inputs/LocaleSelection'
 
@@ -45,7 +45,7 @@ export function Generator({ block, defaultReturn = null }) {
       return <Divider {...props} />
     case 'telegram':
       return (
-        <Telegram
+        <TelegramWidget
           botName={block.telegramBotName}
           authUrl={block.telegramAuthUrl}
         />

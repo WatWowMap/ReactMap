@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next'
 
 import { useMemory } from '@store/useMemory'
 import Utility from '@services/Utility'
-import ErrorBoundary from '@components/ErrorBoundary'
+import { ErrorBoundary } from '@components/ErrorBoundary'
 
 /**
  *

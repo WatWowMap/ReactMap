@@ -9,16 +9,16 @@ import CssBaseline from '@mui/material/CssBaseline'
 import ThemeProvider from '@mui/material/styles/ThemeProvider'
 import { ApolloProvider } from '@apollo/client'
 
-import useCustomTheme from '@assets/theme'
+import { useCustomTheme } from '@assets/theme'
 import { globalStyles } from '@components/Global'
 import { apolloClient } from '@services/apollo'
 import { isLocalStorageEnabled } from '@utils/isLocalStorageEnabled'
 import { setLoadingText } from '@utils/setLoadingText'
 import '@services/events'
-import ErrorBoundary from '@components/ErrorBoundary'
-import HolidayEffects from '@features/holiday'
+import { ErrorBoundary } from '@components/ErrorBoundary'
+import { HolidayEffects } from '@features/holiday'
 
-import ReactRouter from './pages'
+import { Pages } from './pages'
 
 const LOADING_LOCALES = {
   de: 'Übersetzungen werden geladen',
@@ -61,7 +61,7 @@ export function App() {
           {globalStyles}
           <ApolloProvider client={apolloClient}>
             <BrowserRouter>
-              <ReactRouter />
+              <Pages />
             </BrowserRouter>
             <HolidayEffects />
           </ApolloProvider>

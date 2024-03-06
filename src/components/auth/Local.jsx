@@ -23,7 +23,7 @@ import Query from '@services/Query'
  * @param {{ href?: string, sx?: import("@mui/material").SxProps, style?: React.CSSProperties }} props
  * @returns
  */
-export default function LocalLogin({ href, sx, style }) {
+export function LocalLogin({ href, sx, style }) {
   const { t } = useTranslation()
   const [user, setUser] = React.useState({
     username: '',

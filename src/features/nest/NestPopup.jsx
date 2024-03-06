@@ -14,7 +14,7 @@ import { useMemory } from '@store/useMemory'
 import { useLayoutStore } from '@store/useLayoutStore'
 import { setDeepStore } from '@store/useStorage'
 import Utility from '@services/Utility'
-import ErrorBoundary from '@components/ErrorBoundary'
+import { ErrorBoundary } from '@components/ErrorBoundary'
 import NestSubmission from '@components/dialogs/NestSubmission'
 
 const getColor = (timeSince) => {
