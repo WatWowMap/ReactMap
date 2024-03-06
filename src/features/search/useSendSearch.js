@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next'
 import { debounce } from 'lodash'
 
 import Query from '@services/Query'
-import Utility from '@services/Utility'
+import { Utility } from '@services/Utility'
 import { useStorage } from '@store/useStorage'
 import { useMemory } from '@store/useMemory'
 import { useMapStore } from '@store/useMapStore'

@@ -14,7 +14,7 @@ import { useTranslation } from 'react-i18next'
 import { useMemory } from '@store/useMemory'
 import { toggleDialog, useLayoutStore } from '@store/useLayoutStore'
 import { useStorage } from '@store/useStorage'
-import Utility from '@services/Utility'
+import { Utility } from '@services/Utility'
 import { BasicListButton } from '@components/inputs/BasicListButton'
 
 import SettingsMenu from './Settings'

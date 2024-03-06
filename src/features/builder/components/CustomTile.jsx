@@ -2,7 +2,7 @@
 import * as React from 'react'
 import Grid from '@mui/material/Unstable_Grid2'
 
-import Utility from '@services/Utility'
+import { Utility } from '@services/Utility'
 
 import { Generator } from './Generator'
 

@@ -4,7 +4,7 @@ import * as React from 'react'
 import { useMemory } from '@store/useMemory'
 import { useStorage } from '@store/useStorage'
 import { useMapStore } from '@store/useMapStore'
-import Utility from '@services/Utility'
+import { Utility } from '@services/Utility'
 
 import FilterPermCheck from './QueryData'
 

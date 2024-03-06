@@ -5,7 +5,7 @@ import { MapContainer } from 'react-leaflet'
 import { useMemory } from '@store/useMemory'
 import { useStorage } from '@store/useStorage'
 import { useMapStore } from '@store/useMapStore'
-import Utility from '@services/Utility'
+import { Utility } from '@services/Utility'
 
 import { ScanOnDemand } from '@features/scanner'
 import { WebhookMarker, WebhookAreaSelection } from '@features/webhooks'

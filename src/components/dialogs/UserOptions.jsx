@@ -7,7 +7,7 @@ import ListItemText from '@mui/material/ListItemText'
 import Switch from '@mui/material/Switch'
 import { useTranslation, Trans } from 'react-i18next'
 
-import Utility from '@services/Utility'
+import { Utility } from '@services/Utility'
 import { useMemory } from '@store/useMemory'
 import { toggleDialog, useLayoutStore } from '@store/useLayoutStore'
 import { useStorage } from '@store/useStorage'

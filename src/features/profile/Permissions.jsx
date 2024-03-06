@@ -9,7 +9,7 @@ import CardMedia from '@mui/material/CardMedia'
 import Typography from '@mui/material/Typography'
 
 import { useMemory } from '@store/useMemory'
-import Utility from '@services/Utility'
+import { Utility } from '@services/Utility'
 import { ALWAYS_EXCLUDED } from '@assets/constants'
 
 export function UserPermissions() {

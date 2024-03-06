@@ -9,7 +9,7 @@ import DialogContent from '@mui/material/DialogContent'
 
 import { useMemory } from '@store/useMemory'
 import { useLayoutStore } from '@store/useLayoutStore'
-import Utility from '@services/Utility'
+import { Utility } from '@services/Utility'
 import { Header } from '@components/dialogs/Header'
 import { Footer } from '@components/dialogs/Footer'
 import { DialogWrapper } from '@components/dialogs/DialogWrapper'

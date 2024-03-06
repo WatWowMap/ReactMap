@@ -2,7 +2,7 @@
 
 import { useMemory } from '@store/useMemory'
 import { useStorage, setDeepStore } from '@store/useStorage'
-import Utility from '@services/Utility'
+import { Utility } from '@services/Utility'
 
 export const STANDARD_BACKUP =
   /** @type {import('@rm/types/lib').BaseFilter} */ ({

@@ -4,17 +4,17 @@ import * as React from 'react'
 import { Marker, Popup, Circle } from 'react-leaflet'
 import { t } from 'i18next'
 
-import useMarkerTimer from '@hooks/useMarkerTimer'
+import { useMarkerTimer } from '@hooks/useMarkerTimer'
 import { getOffset } from '@utils/offset'
 import { getBadge } from '@utils/getBadge'
 import { basicEqualFn, useMemory } from '@store/useMemory'
 import { useStorage } from '@store/useStorage'
-import useOpacity from '@hooks/useOpacity'
-import useForcePopup from '@hooks/useForcePopup'
-import Utility from '@services/Utility'
+import { useOpacity } from '@hooks/useOpacity'
+import { useForcePopup } from '@hooks/useForcePopup'
+import { Utility } from '@services/Utility'
 import { sendNotification } from '@services/desktopNotification'
 import { useMapStore } from '@store/useMapStore'
-import ToolTipWrapper from '@components/ToolTipWrapper'
+import { TooltipWrapper } from '@components/ToolTipWrapper'
 
 import { PokemonPopup } from './PokemonPopup'
 import { basicPokemonMarker, fancyPokemonMarker } from './pokemonMarker'
@@ -193,7 +193,7 @@ const BasePokemonTile = (pkmn) => {
         <PokemonPopup pokemon={pkmn} iconUrl={iconUrl} />
       </Popup>
       {(showTimer || timerOverride || extras.length > 0) && (
-        <ToolTipWrapper
+        <TooltipWrapper
           timers={showTimer || timerOverride ? [pkmn.expire_timestamp] : []}
           offset={[0, 14]}
         >
@@ -210,7 +210,7 @@ const BasePokemonTile = (pkmn) => {
               ))}
             </div>
           )}
-        </ToolTipWrapper>
+        </TooltipWrapper>
       )}
       {showInteractionRange && configZoom && (
         <Circle center={finalLocation} radius={40} color="#BA42F6" weight={1} />

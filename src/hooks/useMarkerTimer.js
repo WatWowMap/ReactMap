@@ -7,7 +7,7 @@ import { useEffect } from 'react'
  * @param {import('leaflet').Marker<any>} ref
  * @param {() => void} [callback]
  */
-export default function useMarkerTimer(itemExpire, ref, callback) {
+export function useMarkerTimer(itemExpire, ref, callback) {
   const ts = Math.floor(Date.now() / 1000)
   useEffect(() => {
     if (itemExpire > ts && itemExpire !== Infinity) {

@@ -7,7 +7,7 @@ import dlv from 'dlv'
 
 import { useStorage } from '@store/useStorage'
 import { setDeep } from '@utils/setDeep'
-import Utility from '@services/Utility'
+import { Utility } from '@services/Utility'
 
 /**
  * Expert string input field for filters

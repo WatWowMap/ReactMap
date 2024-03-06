@@ -3,7 +3,7 @@ import * as React from 'react'
 import Typography from '@mui/material/Typography'
 import { useTranslation } from 'react-i18next'
 
-import Utility from '@services/Utility'
+import { Utility } from '@services/Utility'
 
 /** @param {TimerProps} props */
 export function RawTimeSince({ expireTime, until = false }) {

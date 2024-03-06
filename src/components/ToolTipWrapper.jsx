@@ -1,15 +1,16 @@
-import React, { useState, useEffect } from 'react'
+// @ts-check
+import * as React from 'react'
 import { Tooltip } from 'react-leaflet'
 import { useTranslation } from 'react-i18next'
-import Utility from '@services/Utility'
+import { Utility } from '@services/Utility'
 
 const Timer = ({ timestamp }) => {
   const { t } = useTranslation()
-  const [timer, setTimer] = useState(
+  const [timer, setTimer] = React.useState(
     Utility.getTimeUntil(new Date(timestamp * 1000), true),
   )
 
-  useEffect(() => {
+  React.useEffect(() => {
     const timer2 = setTimeout(() => {
       setTimer(Utility.getTimeUntil(new Date(timestamp * 1000), true))
     }, 1000)
@@ -26,7 +27,7 @@ const Timer = ({ timestamp }) => {
  * @param {{ timers: number[], offset?: [number, number], children?: React.ReactNode }} props
  * @returns
  */
-export default function TooltipWrapper({ timers, offset, children }) {
+export function TooltipWrapper({ timers, offset, children }) {
   return (
     <Tooltip direction="bottom" permanent offset={offset}>
       {children}
@@ -35,7 +36,6 @@ export default function TooltipWrapper({ timers, offset, children }) {
           // eslint-disable-next-line react/no-array-index-key
           key={timer + i * 123}
           timestamp={timer}
-          multi={timers.length > 1}
         />
       ))}
     </Tooltip>

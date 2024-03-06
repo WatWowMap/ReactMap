@@ -7,7 +7,7 @@ import checkAdvFilter from '@utils/checkAdvFilter'
 import dayCheck from '@utils/dayCheck'
 import parseQuestConditions from '@utils/parseConditions'
 
-export default class Utility {
+export class Utility {
   static getProperName(word) {
     return getProperName(word)
   }

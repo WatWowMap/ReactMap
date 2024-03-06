@@ -3,7 +3,7 @@ import React from 'react'
 import Divider from '@mui/material/Divider'
 import Grid from '@mui/material/Unstable_Grid2'
 
-import Utility from '@services/Utility'
+import { Utility } from '@services/Utility'
 import { DiscordButton } from '@components/auth/Discord'
 import { LocalLogin } from '@components/auth/Local'
 import { TelegramWidget } from '@components/auth/Telegram'

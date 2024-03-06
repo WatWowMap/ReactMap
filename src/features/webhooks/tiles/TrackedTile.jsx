@@ -7,7 +7,7 @@ import IconButton from '@mui/material/IconButton'
 import Checkbox from '@mui/material/Checkbox'
 import Box from '@mui/material/Box'
 
-import Utility from '@services/Utility'
+import { Utility } from '@services/Utility'
 import { useMemory } from '@store/useMemory'
 import { apolloClient, apolloCache } from '@services/apollo'
 import * as webhookNodes from '@services/queries/webhook'

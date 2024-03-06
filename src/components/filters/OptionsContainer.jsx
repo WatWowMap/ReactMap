@@ -8,7 +8,7 @@ import ReplayIcon from '@mui/icons-material/Replay'
 
 import { useMemory } from '@store/useMemory'
 import { useStorage } from '@store/useStorage'
-import Utility from '@services/Utility'
+import { Utility } from '@services/Utility'
 import { BasicListButton } from '@components/inputs/BasicListButton'
 
 import { OptionsGroup } from './Options'

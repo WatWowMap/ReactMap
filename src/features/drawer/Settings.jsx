@@ -27,7 +27,7 @@ import { useTranslation } from 'react-i18next'
 import { useMemory } from '@store/useMemory'
 import { toggleDialog } from '@store/useLayoutStore'
 import { useStorage } from '@store/useStorage'
-import Utility from '@services/Utility'
+import { Utility } from '@services/Utility'
 import {
   HAS_API,
   getPermission,

@@ -2,7 +2,7 @@
 import { divIcon } from 'leaflet'
 import { basicEqualFn, useMemory } from '@store/useMemory'
 import { useStorage } from '@store/useStorage'
-import useOpacity from '@hooks/useOpacity'
+import { useOpacity } from '@hooks/useOpacity'
 
 /**
  *

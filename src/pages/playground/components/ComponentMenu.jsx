@@ -11,7 +11,7 @@ import DialogContentText from '@mui/material/DialogContentText'
 import DialogActions from '@mui/material/DialogActions'
 import { useTranslation } from 'react-i18next'
 
-import Utility from '@services/Utility'
+import { Utility } from '@services/Utility'
 
 import { useQuery } from '@apollo/client'
 import { CUSTOM_COMPONENT } from '@services/queries/config'

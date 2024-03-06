@@ -8,7 +8,7 @@ import MenuItem from '@mui/material/MenuItem'
 import Typography from '@mui/material/Typography'
 
 import { useMemory } from '@store/useMemory'
-import Utility from '@services/Utility'
+import { Utility } from '@services/Utility'
 import Query from '@services/Query'
 import { METHODS } from '@assets/constants'
 

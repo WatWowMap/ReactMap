@@ -4,14 +4,14 @@ import * as React from 'react'
 import { Marker, Popup, Circle } from 'react-leaflet'
 import { t } from 'i18next'
 
-import useMarkerTimer from '@hooks/useMarkerTimer'
+import { useMarkerTimer } from '@hooks/useMarkerTimer'
 import { basicEqualFn, useMemory } from '@store/useMemory'
 import { useStorage } from '@store/useStorage'
-import useOpacity from '@hooks/useOpacity'
-import useForcePopup from '@hooks/useForcePopup'
+import { useOpacity } from '@hooks/useOpacity'
+import { useForcePopup } from '@hooks/useForcePopup'
 import { sendNotification } from '@services/desktopNotification'
-import Utility from '@services/Utility'
-import ToolTipWrapper from '@components/ToolTipWrapper'
+import { Utility } from '@services/Utility'
+import { TooltipWrapper } from '@components/ToolTipWrapper'
 
 import { gymMarker } from './gymMarker'
 import { GymPopup } from './GymPopup'
@@ -191,7 +191,7 @@ const BaseGymTile = (gym) => {
         />
       </Popup>
       {showTimer && (
-        <ToolTipWrapper timers={[timerToDisplay]} offset={[0, 5]} />
+        <TooltipWrapper timers={[timerToDisplay]} offset={[0, 5]} />
       )}
       {showInteractionRange && (
         <Circle

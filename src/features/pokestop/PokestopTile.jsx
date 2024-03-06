@@ -3,11 +3,11 @@
 import * as React from 'react'
 import { Marker, Popup, Circle } from 'react-leaflet'
 
-import useMarkerTimer from '@hooks/useMarkerTimer'
+import { useMarkerTimer } from '@hooks/useMarkerTimer'
 import { basicEqualFn, useMemory } from '@store/useMemory'
 import { useStorage } from '@store/useStorage'
-import useForcePopup from '@hooks/useForcePopup'
-import ToolTipWrapper from '@components/ToolTipWrapper'
+import { useForcePopup } from '@hooks/useForcePopup'
+import { TooltipWrapper } from '@components/ToolTipWrapper'
 
 import { PokestopPopup } from './PokestopPopup'
 import { usePokestopMarker } from './usePokestopMarker'
@@ -135,7 +135,7 @@ const BasePokestopTile = (pokestop) => {
         />
       </Popup>
       {Boolean(timers.length) && (
-        <ToolTipWrapper timers={timers} offset={[0, 4]} />
+        <TooltipWrapper timers={timers} offset={[0, 4]} />
       )}
       {interactionRange && (
         <Circle

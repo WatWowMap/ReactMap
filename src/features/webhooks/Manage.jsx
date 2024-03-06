@@ -12,7 +12,7 @@ import { useTranslation } from 'react-i18next'
 
 import { useMemory } from '@store/useMemory'
 import { useLayoutStore } from '@store/useLayoutStore'
-import Utility from '@services/Utility'
+import { Utility } from '@services/Utility'
 import { Footer } from '@components/dialogs/Footer'
 import { Header } from '@components/dialogs/Header'
 import { apolloClient } from '@services/apollo'

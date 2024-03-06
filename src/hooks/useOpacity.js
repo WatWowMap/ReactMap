@@ -9,7 +9,7 @@ import { useStorage } from '@store/useStorage'
  * @param {T extends 'pokestops' ? 'invasion' : T extends 'gyms' ? 'raid' : never} [subCategory]
  * @returns
  */
-export default function useOpacity(category, subCategory) {
+export function useOpacity(category, subCategory) {
   const enabled = useStorage(
     (s) =>
       s.userSettings[category]?.[`${subCategory || category}Opacity`] ?? false,

@@ -19,7 +19,7 @@ import Help from '@mui/icons-material/HelpOutline'
 
 import { useMemory } from '@store/useMemory'
 import { useStorage, useDeepStore } from '@store/useStorage'
-import Utility from '@services/Utility'
+import { Utility } from '@services/Utility'
 import { XXS_XXL, NUNDO_HUNDO } from '@assets/constants'
 import { useLayoutStore } from '@store/useLayoutStore'
 import { StringFilterMemo } from '@components/filters/StringFilter'

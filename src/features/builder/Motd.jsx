@@ -9,7 +9,7 @@ import { useQuery } from '@apollo/client'
 import { useLayoutStore } from '@store/useLayoutStore'
 import { useStorage } from '@store/useStorage'
 import { CUSTOM_COMPONENT, MOTD_CHECK } from '@services/queries/config'
-import Utility from '@services/Utility'
+import { Utility } from '@services/Utility'
 import { Loading } from '@components/Loading'
 
 import { CustomTile } from './components/CustomTile'

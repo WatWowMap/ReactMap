@@ -4,7 +4,7 @@ import { useQuery } from '@apollo/client'
 import { useTranslation } from 'react-i18next'
 
 import { allProfiles, WEBHOOK_USER } from '@services/queries/webhook'
-import RobustTimeout from '@services/apollo/RobustTimeout'
+import { RobustTimeout } from '@services/apollo/RobustTimeout'
 import { useWebhookStore } from '@store/useWebhookStore'
 
 import { Poracle } from '../services/Poracle'

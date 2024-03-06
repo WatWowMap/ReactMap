@@ -6,7 +6,7 @@ import { Polygon } from 'leaflet'
 
 import { useWebhookStore } from '@store/useWebhookStore'
 import { useStorage } from '@store/useStorage'
-import Utility from '@services/Utility'
+import { Utility } from '@services/Utility'
 
 /**
  *

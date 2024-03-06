@@ -4,7 +4,7 @@ import * as React from 'react'
 import { Marker, Polyline, useMapEvents } from 'react-leaflet'
 import { darken } from '@mui/material/styles'
 
-import useForcePopup from '@hooks/useForcePopup'
+import { useForcePopup } from '@hooks/useForcePopup'
 
 import { routeMarker } from './routeMarker'
 import { RoutePopup } from './RoutePopup'

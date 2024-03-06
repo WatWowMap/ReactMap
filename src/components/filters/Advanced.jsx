@@ -7,7 +7,7 @@ import List from '@mui/material/List'
 import ListItem from '@mui/material/ListItem'
 import { useTranslation } from 'react-i18next'
 
-import Utility from '@services/Utility'
+import { Utility } from '@services/Utility'
 import { useMemory } from '@store/useMemory'
 import { useLayoutStore } from '@store/useLayoutStore'
 import { useDeepStore, useStorage } from '@store/useStorage'
