@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next'
 
 import { useMemory } from '@store/useMemory'
 import { resetFilter, resetFilters } from '@utils/resetState'
-import { camelToSnake } from '@utils/camelToSnake'
+import { camelToSnake } from '@utils/strings'
 
 import {
   ButtonWithNotification,

@@ -17,7 +17,7 @@ import { useTranslation } from 'react-i18next'
 
 import { useMemory } from '@store/useMemory'
 import { toggleDialog } from '@store/useLayoutStore'
-import { camelToSnake } from '@utils/camelToSnake'
+import { camelToSnake } from '@utils/strings'
 
 import { tutorialData } from './data'
 

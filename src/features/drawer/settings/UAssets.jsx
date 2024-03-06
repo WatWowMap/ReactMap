@@ -7,7 +7,7 @@ import { useTranslation } from 'react-i18next'
 import { useMemory } from '@store/useMemory'
 import { useStorage } from '@store/useStorage'
 import { DividerWithMargin } from '@components/StyledDivider'
-import { getProperName } from '@utils/getProperName'
+import { getProperName } from '@utils/strings'
 import { FCSelectListItem } from '@components/inputs/FCSelect'
 import { SettingIcon } from './Icon'
 

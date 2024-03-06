@@ -15,7 +15,7 @@ import { toggleDialog, useLayoutStore } from '@store/useLayoutStore'
 import { useStorage } from '@store/useStorage'
 import { BasicListButton } from '@components/inputs/BasicListButton'
 import { BoolToggle } from '@components/inputs/BoolToggle'
-import { camelToSnake } from '@utils/camelToSnake'
+import { camelToSnake } from '@utils/strings'
 
 import { Settings } from './settings'
 import { PokemonDrawerMemo } from './Pokemon'

@@ -27,7 +27,7 @@ import { Header } from '@components/dialogs/Header'
 import { Footer } from '@components/dialogs/Footer'
 import { useWebhookStore } from '@store/useWebhookStore'
 import { useAnalytics } from '@hooks/useAnalytics'
-import { camelToSnake } from '@utils/camelToSnake'
+import { camelToSnake } from '@utils/strings'
 import { FCSelect } from '@components/inputs/FCSelect'
 
 import { Poracle } from './services/Poracle'

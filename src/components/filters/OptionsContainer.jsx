@@ -9,7 +9,7 @@ import ReplayIcon from '@mui/icons-material/Replay'
 import { useMemory } from '@store/useMemory'
 import { useStorage } from '@store/useStorage'
 import { BasicListButton } from '@components/inputs/BasicListButton'
-import { camelToSnake } from '@utils/camelToSnake'
+import { camelToSnake } from '@utils/strings'
 
 import { OptionsGroup } from './Options'
 

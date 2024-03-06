@@ -10,8 +10,7 @@ import { useTranslation } from 'react-i18next'
 
 import { useMemory } from '@store/useMemory'
 import { useStorage } from '@store/useStorage'
-import { getProperName } from '@utils/getProperName'
-import { camelToSnake } from '@utils/camelToSnake'
+import { getProperName, camelToSnake } from '@utils/strings'
 import { FCSelectListItem } from '@components/inputs/FCSelect'
 
 const ICON_MAP = {

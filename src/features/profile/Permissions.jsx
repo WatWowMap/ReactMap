@@ -10,8 +10,7 @@ import Typography from '@mui/material/Typography'
 
 import { useMemory } from '@store/useMemory'
 import { ALWAYS_EXCLUDED } from '@assets/constants'
-import { getProperName } from '@utils/getProperName'
-import { camelToSnake } from '@utils/camelToSnake'
+import { getProperName, camelToSnake } from '@utils/strings'
 
 export function UserPermissions() {
   const perms = useMemory((s) => s.auth.perms)

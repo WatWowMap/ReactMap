@@ -13,7 +13,7 @@ import { METHODS } from '@assets/constants'
 import { DiscordButton } from '@components/auth/Discord'
 import { TelegramWidget } from '@components/auth/Telegram'
 import { Notification } from '@components/Notification'
-import { getProperName } from '@utils/getProperName'
+import { getProperName } from '@utils/strings'
 
 export function LinkAccounts() {
   const { t } = useTranslation()

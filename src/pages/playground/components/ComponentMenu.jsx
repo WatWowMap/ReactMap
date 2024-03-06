@@ -13,7 +13,7 @@ import { useTranslation } from 'react-i18next'
 import { useQuery } from '@apollo/client'
 
 import { CUSTOM_COMPONENT } from '@services/queries/config'
-import { camelToSnake } from '@utils/camelToSnake'
+import { camelToSnake } from '@utils/strings'
 
 import { setComponent, usePlayStore } from '../hooks/store'
 

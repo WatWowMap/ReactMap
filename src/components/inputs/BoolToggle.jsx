@@ -8,8 +8,7 @@ import Grid2 from '@mui/material/Unstable_Grid2/Grid2'
 import { useTranslation } from 'react-i18next'
 
 import { useDeepStore } from '@store/useStorage'
-import { fromSnakeCase } from '@utils/fromSnakeCase'
-import { camelToSnake } from '@utils/camelToSnake'
+import { camelToSnake, fromSnakeCase } from '@utils/strings'
 
 /**
  * @typedef {{
