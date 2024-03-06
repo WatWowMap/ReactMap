@@ -10,21 +10,16 @@ import { useTranslation } from 'react-i18next'
 
 import { useMemory } from '@store/useMemory'
 import { useStorage, useDeepStore } from '@store/useStorage'
-import {
-  BADGES,
-  FORT_LEVELS,
-  S2_LEVELS,
-  ENUM_TTH,
-  WAYFARER_OPTIONS,
-} from '@assets/constants'
+import { S2_LEVELS, ENUM_TTH, WAYFARER_OPTIONS } from '@assets/constants'
 import { SliderTile } from '@components/inputs/SliderTile'
 import { MultiSelectorStore } from '@components/inputs/MultiSelector'
 import { BoolToggle } from '@components/inputs/BoolToggle'
-import { FCSelect, FCSelectListItem } from '@components/inputs/FCSelect'
+import { FCSelectListItem } from '@components/inputs/FCSelect'
 
 import { CollapsibleItem } from './CollapsibleItem'
-import { MultiSelectorList, SelectorListMemo } from './SelectorList'
+import { SelectorListMemo } from './SelectorList'
 import { PokestopDrawer } from './pokestops'
+import { GymDrawer } from './gyms'
 
 const BaseNestSlider = () => {
   const slider = useMemory((s) => s.ui.nests?.sliders?.secondary?.[0])
@@ -83,115 +78,6 @@ const BaseS2Cells = () => {
   )
 }
 const S2Cells = React.memo(BaseS2Cells)
-
-/** @param {{ category: 'pokestops' | 'gyms', subItem: string }} props */
-const BaseAllForts = ({ category, subItem }) => {
-  const { t } = useTranslation()
-  const enabled = useStorage((s) => !!s.filters?.[category]?.[subItem])
-  return (
-    <CollapsibleItem open={enabled}>
-      <ListItem>
-        <ListItemText primary={t('power_up')} />
-        <MultiSelectorStore
-          field={`filters.${category}.levels`}
-          items={FORT_LEVELS}
-        />
-      </ListItem>
-      {category === 'gyms' && (
-        <Box px={2}>
-          <SelectorListMemo category={category} height={175} />
-        </Box>
-      )}
-    </CollapsibleItem>
-  )
-}
-const AllForts = React.memo(BaseAllForts)
-
-const BaseGymBadges = () => {
-  const enabled = useStorage((s) => !!s.filters?.gyms?.gymBadges)
-  return (
-    <CollapsibleItem open={enabled}>
-      <ListItem>
-        <MultiSelectorStore
-          field="filters.gyms.badge"
-          allowNone
-          items={BADGES}
-        />
-      </ListItem>
-    </CollapsibleItem>
-  )
-}
-const GymBadges = React.memo(BaseGymBadges)
-
-const RaidOverride = () => {
-  const { t } = useTranslation()
-  const available = useMemory((s) => s.available.gyms)
-  const enabled = useStorage((s) => !!s.filters?.gyms?.raids)
-  const [filters, setFilters] = useDeepStore('filters.gyms.raidTier', 'all')
-  return (
-    <CollapsibleItem open={enabled}>
-      <ListItem
-        secondaryAction={
-          <FCSelect
-            value={filters}
-            fullWidth
-            size="small"
-            onChange={(e) =>
-              setFilters(e.target.value === 'all' ? 'all' : +e.target.value)
-            }
-          >
-            {[
-              'all',
-              ...available
-                .filter((x) => x.startsWith('r'))
-                .map((y) => +y.slice(1)),
-            ].map((tier, i) => (
-              <MenuItem key={tier} dense value={tier}>
-                {t(i ? `raid_${tier}_plural` : 'disabled')}
-              </MenuItem>
-            ))}
-          </FCSelect>
-        }
-      >
-        <ListItemText primary={t('raid_override')} />
-      </ListItem>
-    </CollapsibleItem>
-  )
-}
-
-const RaidQuickSelect = () => {
-  const enabled = useStorage(
-    (s) => !!(s.filters?.gyms?.raids && s.filters?.gyms?.raidTier === 'all'),
-  )
-  return (
-    <CollapsibleItem open={enabled}>
-      <MultiSelectorList tabKey="raids">
-        <SelectorListMemo
-          key="eggs"
-          category="gyms"
-          subCategory="raids"
-          label="search_eggs"
-          height={350}
-        />
-        <SelectorListMemo
-          key="raids"
-          category="gyms"
-          subCategory="pokemon"
-          label="search_raids"
-          height={350}
-        />
-      </MultiSelectorList>
-    </CollapsibleItem>
-  )
-}
-
-const BaseRaids = () => (
-  <>
-    <RaidOverride />
-    <RaidQuickSelect />
-  </>
-)
-const Raids = React.memo(BaseRaids)
 
 /** @param {{ item: (typeof WAYFARER_OPTIONS)[number], index: number, disabled: boolean }} props */
 const WayfarerOption = ({ item, index, disabled }) => {
@@ -298,14 +184,7 @@ function ExtrasComponent({ category, subItem }) {
     case 'pokestops':
       return <PokestopDrawer subItem={subItem} />
     case 'gyms':
-      switch (subItem) {
-        case 'allGyms':
-          return <AllForts category={category} subItem={subItem} />
-        case 'gymBadges':
-          return <GymBadges />
-        case 'raids':
-          return <Raids />
-      }
+      return <GymDrawer subItem={subItem} />
     case 'wayfarer':
       return subItem === 'submissionCells' ? <BaseSubmissionCells /> : null
     case 'routes':
