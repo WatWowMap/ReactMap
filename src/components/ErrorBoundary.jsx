@@ -10,7 +10,7 @@ import CopyIcon from '@mui/icons-material/FileCopy'
 import IconButton from '@mui/material/IconButton'
 import { withTranslation } from 'react-i18next'
 
-import { Fetch } from '@services/Fetch'
+import { sendError } from '@services/fetches'
 
 import { Notification } from './Notification'
 
@@ -45,7 +45,7 @@ class ErrorCatcher extends React.Component {
 
   async componentDidCatch(error) {
     if (!this.state.reported && process.env.NODE_ENV !== 'development') {
-      await Fetch.sendError({
+      await sendError({
         cause: error.cause,
         message: error.message,
         stack: error?.stack?.replace(

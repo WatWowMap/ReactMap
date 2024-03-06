@@ -5,7 +5,7 @@ import { Navigate } from 'react-router-dom'
 
 import { useMemory } from '@store/useMemory'
 import { useStorage } from '@store/useStorage'
-import { Fetch } from '@services/Fetch'
+import { getSettings } from '@services/fetches'
 import { setLoadingText } from '@utils/setLoadingText'
 import { deepMerge } from '@utils/deepMerge'
 import { checkHoliday } from '@utils/checkHoliday'
@@ -26,7 +26,7 @@ export function Config({ children }) {
   useHideElement(serverSettings.fetched)
 
   const getServerSettings = async () => {
-    const data = await Fetch.getSettings()
+    const data = await getSettings()
 
     if (data) {
       document.title = data?.map?.general.headerTitle || document.title

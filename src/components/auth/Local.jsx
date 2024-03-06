@@ -14,7 +14,7 @@ import IconButton from '@mui/material/IconButton'
 import { useTranslation } from 'react-i18next'
 import { useLazyQuery } from '@apollo/client'
 
-import { Fetch } from '@services/Fetch'
+import { login } from '@services/fetches'
 import { Query } from '@services/Query'
 
 /**
@@ -43,7 +43,7 @@ export function LocalLogin({ href, sx, style }) {
   const handleSubmit = async (e) => {
     e.preventDefault()
     setSubmitted(true)
-    const resp = await Fetch.login(user, href)
+    const resp = await login(user, href)
     if (!resp.ok) {
       setError(t('localauth_failed'))
       setSubmitted(false)
