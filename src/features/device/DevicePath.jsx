@@ -3,7 +3,7 @@
 import * as React from 'react'
 import { Polyline, Polygon, Circle } from 'react-leaflet'
 
-import { useStorage } from '@hooks/useStorage'
+import { useStorage } from '@store/useStorage'
 
 /**
  *

@@ -8,8 +8,8 @@ import Select from '@mui/material/Select'
 import MenuItem from '@mui/material/MenuItem'
 import { useTranslation } from 'react-i18next'
 
-import { useMemory } from '@hooks/useMemory'
-import { useDeepStore, useStorage } from '@hooks/useStorage'
+import { useMemory } from '@store/useMemory'
+import { useDeepStore, useStorage } from '@store/useStorage'
 import QuestTitle from '@components/QuestTitle'
 
 /**

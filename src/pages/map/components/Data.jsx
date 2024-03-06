@@ -1,9 +1,9 @@
 // @ts-check
 import * as React from 'react'
 
-import { useMemory } from '@hooks/useMemory'
-import { useStorage } from '@hooks/useStorage'
-import { useMapStore } from '@hooks/useMapStore'
+import { useMemory } from '@store/useMemory'
+import { useStorage } from '@store/useStorage'
+import { useMapStore } from '@store/useMapStore'
 import Utility from '@services/Utility'
 
 import FilterPermCheck from './QueryData'

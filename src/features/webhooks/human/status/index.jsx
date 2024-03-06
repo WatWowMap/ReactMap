@@ -1,11 +1,11 @@
 import * as React from 'react'
 import Grid from '@mui/material/Unstable_Grid2'
 import Divider from '@mui/material/Divider'
+import { useWebhookStore } from '@store/useWebhookStore'
 
 import { ProfileSelect } from './ProfileSelect'
 import { EnableSwitch } from './EnableSwitch'
 import { HookSelection } from './HookSelection'
-import { useWebhookStore } from '../../hooks/store'
 
 export default function Status() {
   const multipleHooks = useWebhookStore((s) => s.multipleHooks)

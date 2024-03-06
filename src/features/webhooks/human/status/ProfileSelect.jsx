@@ -10,7 +10,7 @@ import { useTranslation } from 'react-i18next'
 
 import { allProfiles, setHuman } from '@services/queries/webhook'
 
-import { useWebhookStore } from '../../hooks/store'
+import { useWebhookStore } from '@store/useWebhookStore'
 
 /** @type {React.CSSProperties} */
 const STYLE = { minWidth: 100 }

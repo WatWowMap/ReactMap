@@ -10,7 +10,7 @@ import { useTranslation } from 'react-i18next'
 import { useMutation } from '@apollo/client'
 import { allProfiles, setProfile } from '@services/queries/webhook'
 
-import { useWebhookStore } from '../../hooks/store'
+import { useWebhookStore } from '@store/useWebhookStore'
 
 /** @param {import('./ProfileTile').Props} props */
 export const DeleteView = ({ handleViewChange, uid }) => {

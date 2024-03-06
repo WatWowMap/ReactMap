@@ -5,8 +5,8 @@ import Collapse from '@mui/material/Collapse'
 import Table from '@mui/material/Table'
 import TableBody from '@mui/material/TableBody'
 
-import { useMemory } from '@hooks/useMemory'
-import { useStorage } from '@hooks/useStorage'
+import { useMemory } from '@store/useMemory'
+import { useStorage } from '@store/useStorage'
 
 /**
  * @param {{

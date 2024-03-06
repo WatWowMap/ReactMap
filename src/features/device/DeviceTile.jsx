@@ -4,7 +4,7 @@ import ErrorBoundary from '@components/ErrorBoundary'
 import * as React from 'react'
 import { Marker, Popup } from 'react-leaflet'
 
-import { basicEqualFn, useMemory } from '@hooks/useMemory'
+import { basicEqualFn, useMemory } from '@store/useMemory'
 
 import { deviceMarker } from './deviceMarker'
 import { DevicePath } from './DevicePath'

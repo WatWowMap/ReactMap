@@ -4,7 +4,7 @@ import genPokemon from '@services/filtering/genPokemon'
 import genGyms from '@services/filtering/genGyms'
 import genPokestops from '@services/filtering/genPokestops'
 
-import { useMemory } from '@hooks/useMemory'
+import { useMemory } from '@store/useMemory'
 
 export default function useGenerate() {
   const pokemon = useMemory((s) => s.masterfile.pokemon)

@@ -1,8 +1,8 @@
 // @ts-check
-import { useMemory } from '@hooks/useMemory'
-import { useStorage } from '@hooks/useStorage'
+import { useMemory } from '@store/useMemory'
+import { useStorage } from '@store/useStorage'
 
-/** @param {keyof import('@hooks/useStorage').UseStorage & keyof import('@hooks/useMemory').UseMemory} key */
+/** @param {keyof import('@store/useStorage').UseStorage & keyof import('@store/useMemory').UseMemory} key */
 const resetState = (key) => {
   const state = useMemory.getState()[key]
   useStorage.setState({

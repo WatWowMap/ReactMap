@@ -7,9 +7,9 @@ import Grid from '@mui/material/Unstable_Grid2'
 import Typography from '@mui/material/Typography'
 import IconButton from '@mui/material/IconButton'
 
-import { useMemory } from '@hooks/useMemory'
+import { useMemory } from '@store/useMemory'
 
-import { useWebhookStore } from '../../hooks/store'
+import { useWebhookStore } from '@store/useWebhookStore'
 import { ActiveHourChip } from './ActiveHourChip'
 
 /** @param {import('./ProfileTile').Props} props */

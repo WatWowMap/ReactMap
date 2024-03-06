@@ -1,5 +1,5 @@
-import { useMemory } from './useMemory'
-import { useStorage } from './useStorage'
+import { useMemory } from '@store/useMemory'
+import { useStorage } from '@store/useStorage'
 
 export function usePermCheck(category) {
   const filters = useStorage((s) => s.filters[category])

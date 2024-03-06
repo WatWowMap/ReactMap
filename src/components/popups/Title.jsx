@@ -2,7 +2,7 @@
 import * as React from 'react'
 import Typography from '@mui/material/Typography'
 
-import { useStorage } from '@hooks/useStorage'
+import { useStorage } from '@store/useStorage'
 
 /**
  *

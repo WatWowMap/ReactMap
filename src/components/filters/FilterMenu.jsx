@@ -2,8 +2,8 @@
 import * as React from 'react'
 import Menu from '@components/Menu'
 
-import { toggleDialog, useLayoutStore } from '@hooks/useLayoutStore'
-import { useStorage } from '@hooks/useStorage'
+import { toggleDialog, useLayoutStore } from '@store/useLayoutStore'
+import { useStorage } from '@store/useStorage'
 import { StandardItem } from '@components/virtual/StandardItem'
 
 import { DialogWrapper } from '../dialogs/DialogWrapper'

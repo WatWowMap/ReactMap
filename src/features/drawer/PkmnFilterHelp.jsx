@@ -11,8 +11,8 @@ import Chip from '@mui/material/Chip'
 
 import { Header } from '@components/dialogs/Header'
 import { Footer } from '@components/dialogs/Footer'
-import { useMemory } from '@hooks/useMemory'
-import { useLayoutStore } from '@hooks/useLayoutStore'
+import { useMemory } from '@store/useMemory'
+import { useLayoutStore } from '@store/useLayoutStore'
 
 import { DialogWrapper } from '../../components/dialogs/DialogWrapper'
 

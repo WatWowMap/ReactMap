@@ -2,8 +2,8 @@
 import * as React from 'react'
 import { useQuery, useLazyQuery } from '@apollo/client'
 
-import { useMemory } from '@hooks/useMemory'
-import { useStorage } from '@hooks/useStorage'
+import { useMemory } from '@store/useMemory'
+import { useStorage } from '@store/useStorage'
 
 import { SCANNER_CONFIG, SCANNER_STATUS } from '@services/queries/scanner'
 

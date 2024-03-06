@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next'
 
-import { useMemory } from '@hooks/useMemory'
-import { useGetDeepStore } from '@hooks/useStorage'
+import { useMemory } from '@store/useMemory'
+import { useGetDeepStore } from '@store/useStorage'
 
 const filteringPokemon = [
   'pokemon',

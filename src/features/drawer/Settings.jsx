@@ -24,9 +24,9 @@ import SquareFootIcon from '@mui/icons-material/SquareFoot'
 
 import { useTranslation } from 'react-i18next'
 
-import { useMemory } from '@hooks/useMemory'
-import { toggleDialog } from '@hooks/useLayoutStore'
-import { useStorage } from '@hooks/useStorage'
+import { useMemory } from '@store/useMemory'
+import { toggleDialog } from '@store/useLayoutStore'
+import { useStorage } from '@store/useStorage'
 import Utility from '@services/Utility'
 import {
   HAS_API,

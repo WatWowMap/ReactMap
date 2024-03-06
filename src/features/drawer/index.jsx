@@ -8,8 +8,8 @@ import ListItem from '@mui/material/ListItem'
 import ListItemText from '@mui/material/ListItemText'
 import ListItemIcon from '@mui/material/ListItemIcon'
 
-import { useMemory } from '@hooks/useMemory'
-import { useLayoutStore } from '@hooks/useLayoutStore'
+import { useMemory } from '@store/useMemory'
+import { useLayoutStore } from '@store/useLayoutStore'
 import { Img } from '@components/Img'
 import { DividerWithMargin } from '@components/StyledDivider'
 

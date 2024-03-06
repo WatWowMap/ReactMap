@@ -8,9 +8,9 @@ import Switch from '@mui/material/Switch'
 import { useTranslation, Trans } from 'react-i18next'
 
 import Utility from '@services/Utility'
-import { useMemory } from '@hooks/useMemory'
-import { toggleDialog, useLayoutStore } from '@hooks/useLayoutStore'
-import { useStorage } from '@hooks/useStorage'
+import { useMemory } from '@store/useMemory'
+import { toggleDialog, useLayoutStore } from '@store/useLayoutStore'
+import { useStorage } from '@store/useStorage'
 import { getPermission } from '@services/desktopNotification'
 
 import { Header } from './Header'

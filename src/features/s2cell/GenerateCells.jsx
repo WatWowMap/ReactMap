@@ -8,8 +8,8 @@ import {
   S2Point,
 } from 'nodes2ts'
 
-import { useMemory } from '@hooks/useMemory'
-import { useStorage } from '@hooks/useStorage'
+import { useMemory } from '@store/useMemory'
+import { useStorage } from '@store/useStorage'
 
 import Notification from '@components/Notification'
 import { getQueryArgs } from '@utils/getQueryArgs'

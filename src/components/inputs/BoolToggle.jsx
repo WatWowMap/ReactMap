@@ -7,13 +7,13 @@ import List from '@mui/material/List'
 import Grid2 from '@mui/material/Unstable_Grid2/Grid2'
 import { useTranslation } from 'react-i18next'
 
-import { useDeepStore } from '@hooks/useStorage'
+import { useDeepStore } from '@store/useStorage'
 import Utility from '@services/Utility'
 import { fromSnakeCase } from '@utils/fromSnakeCase'
 
 /**
  * @typedef {{
- *  field: import('@hooks/useStorage').UseStoragePaths,
+ *  field: import('@store/useStorage').UseStoragePaths,
  *  label?: string,
  *  disabled?: boolean,
  *  children?: React.ReactNode,

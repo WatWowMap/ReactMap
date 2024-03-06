@@ -1,7 +1,7 @@
 // @ts-check
 import { Icon } from 'leaflet'
 
-import { useMemory } from '@hooks/useMemory'
+import { useMemory } from '@store/useMemory'
 
 /**
  * @param {'start' | 'end'} position

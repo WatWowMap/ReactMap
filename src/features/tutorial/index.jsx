@@ -12,8 +12,8 @@ import { useTheme } from '@mui/material/styles'
 import { useTranslation } from 'react-i18next'
 import { useMutation } from '@apollo/client'
 
-import { useMemory } from '@hooks/useMemory'
-import { useStorage } from '@hooks/useStorage'
+import { useMemory } from '@store/useMemory'
+import { useStorage } from '@store/useStorage'
 import Query from '@services/Query'
 import { Header } from '@components/dialogs/Header'
 

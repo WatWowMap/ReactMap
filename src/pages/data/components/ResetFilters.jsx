@@ -2,7 +2,7 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 
-import { useMemory } from '@hooks/useMemory'
+import { useMemory } from '@store/useMemory'
 import { resetFilter, resetFilters } from '@utils/resetState'
 import Utility from '@services/Utility'
 

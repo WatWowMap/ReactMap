@@ -1,6 +1,6 @@
 // @ts-check
 import { divIcon } from 'leaflet'
-import { useMemory } from '@hooks/useMemory'
+import { useMemory } from '@store/useMemory'
 
 const getBadgeColor = (raidLevel) => {
   switch (raidLevel) {

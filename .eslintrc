@@ -79,7 +79,8 @@
           ["@services", "./src/services/"],
           ["@hooks", "./src/hooks/"],
           ["@assets", "./src/assets/"],
-          ["@utils", "./src/utils/"]
+          ["@utils", "./src/utils/"],
+          ["@store", "./src/store/"]
         ],
         "extensions": [".mjs", ".js", ".jsx", ".ts", ".tsx"]
       }

@@ -20,6 +20,16 @@ export interface CustomI extends React.HTMLProps<HTMLLIElement> {
 
 export type TimesOfDay = 'day' | 'night' | 'dawn' | 'dusk'
 
+export type Theme = 'light' | 'dark'
+
+export type TileLayer = {
+  name: string
+  style: import('@rm/types').Theme
+  attribution?: string
+  url?: string
+  background?: string
+} & { [key in TimesOfDay]?: string }
+
 export type MarginProps = {
   [Key in
     | 'm'

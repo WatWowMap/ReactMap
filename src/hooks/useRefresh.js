@@ -6,8 +6,8 @@ import { getMapData } from '@services/queries/available'
 import { deepMerge } from '@utils/deepMerge'
 import UAssets from '@services/Assets'
 
-import { useMemory } from './useMemory'
-import { useStorage } from './useStorage'
+import { useMemory } from '@store/useMemory'
+import { useStorage } from '@store/useStorage'
 
 export default function useRefresh(once = false) {
   const active = useMemory((s) => s.active)

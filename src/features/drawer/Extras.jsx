@@ -9,8 +9,8 @@ import Select from '@mui/material/Select'
 import MenuItem from '@mui/material/MenuItem'
 import { useTranslation } from 'react-i18next'
 
-import { useMemory } from '@hooks/useMemory'
-import { useStorage, useDeepStore } from '@hooks/useStorage'
+import { useMemory } from '@store/useMemory'
+import { useStorage, useDeepStore } from '@store/useStorage'
 import {
   BADGES,
   FORT_LEVELS,

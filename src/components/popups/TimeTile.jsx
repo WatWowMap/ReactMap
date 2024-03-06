@@ -6,7 +6,7 @@ import IconButton from '@mui/material/IconButton'
 import Typography from '@mui/material/Typography'
 import ExpandMore from '@mui/icons-material/ExpandMore'
 
-import { useStorage } from '@hooks/useStorage'
+import { useStorage } from '@store/useStorage'
 
 import Timer from './Timer'
 import NameTT from './NameTT'

@@ -10,8 +10,8 @@ import Collapse from '@mui/material/Collapse'
 import Box from '@mui/material/Box'
 import { useTranslation } from 'react-i18next'
 
-import { useMemory } from '@hooks/useMemory'
-import { useLayoutStore } from '@hooks/useLayoutStore'
+import { useMemory } from '@store/useMemory'
+import { useLayoutStore } from '@store/useLayoutStore'
 import Utility from '@services/Utility'
 import { Footer } from '@components/dialogs/Footer'
 import { Header } from '@components/dialogs/Header'
@@ -19,10 +19,10 @@ import { apolloClient } from '@services/apollo'
 import Query from '@services/Query'
 import { allProfiles } from '@services/queries/webhook'
 import Menu from '@components/Menu'
+import { setMode, setSelected, useWebhookStore } from '@store/useWebhookStore'
 
 import Human from './human'
 import Tracked from './Tracked'
-import { setMode, setSelected, useWebhookStore } from './hooks/store'
 import { useGenFilters } from './hooks/useGenFilters'
 import { useGetHookContext } from './hooks/useGetHookContext'
 import ProfileEditing from './human/profile'
@@ -189,7 +189,7 @@ export default function Manage() {
   )
 }
 
-/** @param {{ category: import('./hooks/store').WebhookStore['category'] }} props */
+/** @param {{ category: import('@store/useWebhookStore').WebhookStore['category'] }} props */
 function TabIcon({ category }) {
   const Icons = useMemory((s) => s.Icons)
   return category === 'human' ? (

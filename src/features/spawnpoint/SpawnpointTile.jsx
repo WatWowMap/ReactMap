@@ -3,7 +3,7 @@
 import * as React from 'react'
 import { Marker, Circle, Popup } from 'react-leaflet'
 
-import { useMemory } from '@hooks/useMemory'
+import { useMemory } from '@store/useMemory'
 
 import { SpawnpointPopup } from './SpawnpointPopup'
 import { spawnpointMarker } from './spawnpointMarker'

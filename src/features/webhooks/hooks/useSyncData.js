@@ -4,10 +4,10 @@ import { useQuery } from '@apollo/client'
 
 import { allProfiles } from '@services/queries/webhook'
 
-import { useWebhookStore } from './store'
+import { useWebhookStore } from '@store/useWebhookStore'
 
 /**
- * @template {import('./store').WebhookStore['category']} T
+ * @template {import('@store/useWebhookStore').WebhookStore['category']} T
  * @param {T} category */
 export function useSyncData(category) {
   const cached = useWebhookStore((s) => s[category])

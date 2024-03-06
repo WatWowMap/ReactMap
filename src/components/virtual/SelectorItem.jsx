@@ -6,7 +6,7 @@ import Tooltip from '@mui/material/Tooltip'
 import Box from '@mui/material/Box'
 
 import { useTranslateById } from '@hooks/useTranslateById'
-import { useMemory } from '@hooks/useMemory'
+import { useMemory } from '@store/useMemory'
 import { ColoredTile } from '@components/virtual/ColoredTile'
 import { ToggleTypography } from '@components/ToggleTypography'
 import { SQUARE_ITEM } from '@components/virtual/VirtualGrid'

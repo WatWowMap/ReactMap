@@ -2,10 +2,10 @@
 import * as React from 'react'
 import Dialog from '@mui/material/Dialog'
 
-import { useMemory } from '@hooks/useMemory'
+import { useMemory } from '@store/useMemory'
+import { setMode, useWebhookStore } from '@store/useWebhookStore'
 
 import Manage from './Manage'
-import { setMode, useWebhookStore } from './hooks/store'
 
 export function Webhook() {
   const webhookMode = useWebhookStore((s) => s.mode === 'open')

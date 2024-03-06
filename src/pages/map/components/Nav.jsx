@@ -22,7 +22,7 @@ import BadgeSelection from '@components/dialogs/BadgeSelection'
 import SlotSelection from '@components/filters/SlotSelection'
 import { HelpDialog } from '@components/dialogs/Help'
 import { PkmnFilterHelp } from '@features/drawer/PkmnFilterHelp'
-import { useMemory } from '@hooks/useMemory'
+import { useMemory } from '@store/useMemory'
 
 import { FloatingButtonsMemo } from './FloatingBtn'
 

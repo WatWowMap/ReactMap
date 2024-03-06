@@ -1,10 +1,10 @@
 // @ts-check
 import { t } from 'i18next'
 
-import { useMemory } from '@hooks/useMemory'
-import { useStorage } from '@hooks/useStorage'
+import { useMemory } from '@store/useMemory'
+import { useStorage } from '@store/useStorage'
 import SimpleTTLCache from '@services/SimpleTTLCache'
-import { useMapStore } from '@hooks/useMapStore'
+import { useMapStore } from '@store/useMapStore'
 
 export const HAS_API = 'Notification' in window
 const cache = new SimpleTTLCache(1000 * 60 * 60)

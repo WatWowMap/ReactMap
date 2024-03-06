@@ -1,6 +1,6 @@
 // @ts-check
 import { t } from 'i18next'
-import { useWebhookStore } from '../hooks/store'
+import { useWebhookStore } from '@store/useWebhookStore'
 
 export class Poracle {
   static getMapCategory(poracleCategory) {
@@ -302,7 +302,7 @@ export class Poracle {
   /**
    *
    * @param {object} item
-   * @param {Exclude<import('../hooks/store').WebhookStore['category'], 'human'>} category
+   * @param {Exclude<import('@store/useWebhookStore').WebhookStore['category'], 'human'>} category
    * @returns {string}
    */
   static generateDescription(item, category) {

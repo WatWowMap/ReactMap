@@ -2,7 +2,7 @@
 import * as React from 'react'
 import { Navigate, useParams } from 'react-router-dom'
 
-import { useMemory } from '@hooks/useMemory'
+import { useMemory } from '@store/useMemory'
 
 import Container from './components/Container'
 import WebhookQuery from './components/WebhookQuery'

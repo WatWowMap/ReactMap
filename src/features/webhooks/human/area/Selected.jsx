@@ -2,7 +2,7 @@
 import * as React from 'react'
 import Typography from '@mui/material/Typography'
 import { Trans } from 'react-i18next'
-import { useWebhookStore } from '../../hooks/store'
+import { useWebhookStore } from '@store/useWebhookStore'
 
 export const Selected = () => {
   const selectedAreas = useWebhookStore((s) => s.human.area || [])

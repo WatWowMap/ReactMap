@@ -7,7 +7,7 @@ import { apolloClient, apolloCache } from '@services/apollo'
 
 import Query from '@services/Query'
 import { ENUM_BADGES } from '@assets/constants'
-import { useLayoutStore } from '@hooks/useLayoutStore'
+import { useLayoutStore } from '@store/useLayoutStore'
 import { MultiSelector } from '@components/inputs/MultiSelector'
 
 import { Header } from './Header'

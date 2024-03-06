@@ -6,7 +6,7 @@ import InputLabel from '@mui/material/InputLabel'
 import Select from '@mui/material/Select'
 import MenuItem from '@mui/material/MenuItem'
 
-import { useStorage } from '@hooks/useStorage'
+import { useStorage } from '@store/useStorage'
 
 /** @type {React.CSSProperties} */
 const STYLE = { margin: '3px 0' }

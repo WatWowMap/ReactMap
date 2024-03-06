@@ -1,5 +1,5 @@
 import { divIcon } from 'leaflet'
-import { useMemory } from '@hooks/useMemory'
+import { useMemory } from '@store/useMemory'
 
 export function weatherMarker(iconUrl) {
   const [

@@ -1,5 +1,5 @@
 // @ts-check
-import { useMapStore } from '@hooks/useMapStore'
+import { useMapStore } from '@store/useMapStore'
 
 export function getQueryArgs() {
   const { map } = useMapStore.getState()

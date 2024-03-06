@@ -11,7 +11,7 @@ import { useTranslation } from 'react-i18next'
 
 import fallbackIcon from '@assets/fallbackMarker'
 
-import { useWebhookStore } from '../hooks/store'
+import { useWebhookStore } from '@store/useWebhookStore'
 
 export function WebhookMarker() {
   const map = useMap()

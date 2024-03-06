@@ -4,9 +4,9 @@ import { useQuery } from '@apollo/client'
 
 import { WEBHOOK_CATEGORIES, WEBHOOK_CONTEXT } from '@services/queries/webhook'
 
-import { useWebhookStore } from './store'
+import { useWebhookStore } from '@store/useWebhookStore'
 
-/** @returns {import('./store').WebhookStore['category'][]} */
+/** @returns {import('@store/useWebhookStore').WebhookStore['category'][]} */
 export function useGetHookContext() {
   const mode = useWebhookStore((s) => s.mode)
 

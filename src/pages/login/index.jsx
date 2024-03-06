@@ -3,7 +3,7 @@ import * as React from 'react'
 import { Navigate } from 'react-router-dom'
 import Box from '@mui/material/Box'
 
-import { useMemory } from '@hooks/useMemory'
+import { useMemory } from '@store/useMemory'
 import { ThemeToggle } from '@components/inputs/ThemeToggle'
 import { CustomLoginPage } from '@features/builder/LoginPage'
 

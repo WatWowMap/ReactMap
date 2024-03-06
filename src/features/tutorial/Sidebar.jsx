@@ -15,8 +15,8 @@ import DialogContent from '@mui/material/DialogContent'
 import Typography from '@mui/material/Typography'
 import { useTranslation } from 'react-i18next'
 
-import { useMemory } from '@hooks/useMemory'
-import { toggleDialog } from '@hooks/useLayoutStore'
+import { useMemory } from '@store/useMemory'
+import { toggleDialog } from '@store/useLayoutStore'
 import Utility from '@services/Utility'
 
 import data from './data'

@@ -6,7 +6,7 @@ import Typography from '@mui/material/Typography'
 import Grid from '@mui/material/Grid'
 import { useTranslation } from 'react-i18next'
 
-import { useMemory } from '@hooks/useMemory'
+import { useMemory } from '@store/useMemory'
 import { PokemonPopup } from '@features/pokemon'
 import data from './data'
 

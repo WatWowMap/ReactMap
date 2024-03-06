@@ -9,8 +9,8 @@ import Divider from '@mui/material/Divider'
 import Typography from '@mui/material/Typography'
 
 import { Img } from '@components/Img'
-import { useMemory } from '@hooks/useMemory'
-import { useStorage } from '@hooks/useStorage'
+import { useMemory } from '@store/useMemory'
+import { useStorage } from '@store/useStorage'
 import { RawQuestTitle } from '@components/QuestTitle'
 
 import Utility from '@services/Utility'

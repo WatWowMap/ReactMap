@@ -1,7 +1,7 @@
 // @ts-check
 
-import { useMemory } from '@hooks/useMemory'
-import { useStorage, setDeepStore } from '@hooks/useStorage'
+import { useMemory } from '@store/useMemory'
+import { useStorage, setDeepStore } from '@store/useStorage'
 import Utility from '@services/Utility'
 
 export const STANDARD_BACKUP =

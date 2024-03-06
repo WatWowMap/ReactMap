@@ -1,6 +1,6 @@
 // @ts-check
-import { useMemory } from '@hooks/useMemory'
-import { useStorage } from '@hooks/useStorage'
+import { useMemory } from '@store/useMemory'
+import { useStorage } from '@store/useStorage'
 
 /** @param {KeyboardEvent} event */
 function toggleDarkMode(event) {

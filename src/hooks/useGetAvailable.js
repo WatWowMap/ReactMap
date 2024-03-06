@@ -4,7 +4,7 @@ import { useQuery } from '@apollo/client'
 import * as queries from '@services/queries/available'
 import { capitalize } from '@mui/material/utils'
 
-import { useMemory } from './useMemory'
+import { useMemory } from '@store/useMemory'
 
 /**
  * @param {keyof import('packages/types/lib').Available} category

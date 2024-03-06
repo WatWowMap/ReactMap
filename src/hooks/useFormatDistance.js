@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next'
 
 import { formatDistance } from '@utils/formatDistance'
 
-import { useStorage } from './useStorage'
+import { useStorage } from '@store/useStorage'
 
 /** @returns {(meters: number) => string} */
 export function useFormatDistance() {

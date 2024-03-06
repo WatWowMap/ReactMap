@@ -4,8 +4,8 @@ import * as React from 'react'
 import { GeoJSON } from 'react-leaflet'
 import { Polygon } from 'leaflet'
 
-import { useWebhookStore } from '@features/webhooks/hooks/store'
-import { useStorage } from '@hooks/useStorage'
+import { useWebhookStore } from '@store/useWebhookStore'
+import { useStorage } from '@store/useStorage'
 import Utility from '@services/Utility'
 
 /**

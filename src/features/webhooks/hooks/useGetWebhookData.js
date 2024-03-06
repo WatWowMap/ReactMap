@@ -5,13 +5,13 @@ import { useTranslation } from 'react-i18next'
 
 import { allProfiles, WEBHOOK_USER } from '@services/queries/webhook'
 import RobustTimeout from '@services/apollo/RobustTimeout'
-import { Poracle } from '../services/Poracle'
+import { useWebhookStore } from '@store/useWebhookStore'
 
-import { useWebhookStore } from './store'
+import { Poracle } from '../services/Poracle'
 
 /**
  *
- * @template {import('./store').WebhookStore['category'] | 'profile'} T
+ * @template {import('@store/useWebhookStore').WebhookStore['category'] | 'profile'} T
  * @param {T} category
  * @returns {{ data: T extends 'human' ? { webhooks: string[], selected: string } : import("@rm/types").APIReturnType[T], loading: boolean }}
  */

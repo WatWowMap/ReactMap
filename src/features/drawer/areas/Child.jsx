@@ -8,8 +8,8 @@ import Button from '@mui/material/Button'
 import Grid2 from '@mui/material/Unstable_Grid2'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 
-import { useDeepStore, useStorage } from '@hooks/useStorage'
-import { useMemory } from '@hooks/useMemory'
+import { useDeepStore, useStorage } from '@store/useStorage'
+import { useMemory } from '@store/useMemory'
 import { useMap } from 'react-leaflet'
 
 /**

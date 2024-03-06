@@ -6,8 +6,8 @@ import ListItemText from '@mui/material/ListItemText'
 import { useTranslation } from 'react-i18next'
 import ReplayIcon from '@mui/icons-material/Replay'
 
-import { useMemory } from '@hooks/useMemory'
-import { useStorage } from '@hooks/useStorage'
+import { useMemory } from '@store/useMemory'
+import { useStorage } from '@store/useStorage'
 import Utility from '@services/Utility'
 import { BasicListButton } from '@components/inputs/BasicListButton'
 

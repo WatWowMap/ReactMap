@@ -5,7 +5,7 @@ import TextField from '@mui/material/TextField'
 import { useTranslation } from 'react-i18next'
 import dlv from 'dlv'
 
-import { useStorage } from '@hooks/useStorage'
+import { useStorage } from '@store/useStorage'
 import { setDeep } from '@utils/setDeep'
 import Utility from '@services/Utility'
 

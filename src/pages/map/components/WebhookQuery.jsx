@@ -4,8 +4,8 @@ import { useParams } from 'react-router-dom'
 import { useQuery } from '@apollo/client'
 
 import Query from '@services/Query'
-import { useMemory } from '@hooks/useMemory'
-import { useStorage } from '@hooks/useStorage'
+import { useMemory } from '@store/useMemory'
+import { useStorage } from '@store/useStorage'
 
 /**
  * @param {string} category

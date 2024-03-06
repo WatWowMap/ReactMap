@@ -36,14 +36,14 @@ import { create } from 'zustand'
  *   masterfile: import('@rm/masterfile').Masterfile
  *   polling: import('@rm/types').Config['api']['polling'],
  *   gymValidDataLimit: number
- *   settings: Record<keyof import('./useStorage').UseStorage['settings'], { name: string }>
+ *   settings: { [K in keyof import('./useStorage').UseStorage['settings']]: Record<string, K extends 'tileServers' ? import('@rm/types').TileLayer : { name: string }> }
  *   userSettings: ReturnType<import('server/src/services/ui/clientOptions')>['clientValues']
  *   clientMenus: ReturnType<import('server/src/services/ui/clientOptions')>['clientMenus']
  *   clientError: string,
  *   timeOfDay: import('@rm/types').TimesOfDay,
  *   hideList: Set<string | number>,
  *   timerList: string[],
- *   tileStyle: 'light' | 'dark',
+ *   tileStyle: import('@rm/types').Theme,
  *   reset: boolean,
  *   theme: {
  *     primary: string,

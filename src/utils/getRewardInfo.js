@@ -1,6 +1,6 @@
 // @ts-check
 
-import { useMemory } from '@hooks/useMemory'
+import { useMemory } from '@store/useMemory'
 
 /** @param {Partial<import("@rm/types").Quest>} quest */
 export default function getRewardInfo({

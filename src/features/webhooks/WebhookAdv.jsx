@@ -22,15 +22,15 @@ import DialogContent from '@mui/material/DialogContent'
 import { Trans, useTranslation } from 'react-i18next'
 import { useLazyQuery } from '@apollo/client'
 
-import { useMemory } from '@hooks/useMemory'
-import { useStorage } from '@hooks/useStorage'
+import { useMemory } from '@store/useMemory'
+import { useStorage } from '@store/useStorage'
 import Query from '@services/Query'
 import Utility from '@services/Utility'
 import { SliderTile } from '@components/inputs/SliderTile'
 import { Header } from '@components/dialogs/Header'
 import { Footer } from '@components/dialogs/Footer'
 
-import { useWebhookStore } from './hooks/store'
+import { useWebhookStore } from '@store/useWebhookStore'
 import { Poracle } from './services/Poracle'
 
 const skipFields = new Set([

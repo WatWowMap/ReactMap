@@ -3,8 +3,8 @@ import * as React from 'react'
 import { useMap, GeoJSON } from 'react-leaflet'
 import Supercluster from 'supercluster'
 import { marker, divIcon, point } from 'leaflet'
-import { useMemory } from '@hooks/useMemory'
-import { useStorage } from '@hooks/useStorage'
+import { useMemory } from '@store/useMemory'
+import { useStorage } from '@store/useStorage'
 import Notification from '@components/Notification'
 
 const IGNORE_CLUSTERING = new Set([

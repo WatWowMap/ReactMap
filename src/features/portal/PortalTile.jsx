@@ -3,7 +3,7 @@
 import * as React from 'react'
 import { Circle, Popup } from 'react-leaflet'
 
-import { useStorage } from '@hooks/useStorage'
+import { useStorage } from '@store/useStorage'
 import useForcePopup from '@hooks/useForcePopup'
 
 import { PortalPopup } from './PortalPopup'

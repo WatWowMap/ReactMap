@@ -1,12 +1,12 @@
 // @ts-check
 import * as React from 'react'
 
-import { useMemory } from '@hooks/useMemory'
-import { useStorage } from '@hooks/useStorage'
+import { useMemory } from '@store/useMemory'
+import { useStorage } from '@store/useStorage'
 
 /**
  *
- * @param {Record<string, { name: string, style: 'light' | 'dark', attribution?: string, url?: string, background?: string }>} tileServers
+ * @param {import('@store/useMemory').UseMemory['settings']['tileServers']} tileServers
  * @param {string} tileServer
  * @param {'day' | 'night' | 'dusk' | 'dawn'} timeOfDay
  * @returns

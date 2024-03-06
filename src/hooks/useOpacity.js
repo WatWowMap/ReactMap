@@ -1,6 +1,6 @@
 // @ts-check
 import { useCallback } from 'react'
-import { useStorage } from './useStorage'
+import { useStorage } from '@store/useStorage'
 
 /**
  * Returns dynamic opacity based on timestamp

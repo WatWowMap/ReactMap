@@ -3,8 +3,8 @@
 import * as React from 'react'
 import { GeoJSON, Marker, Popup } from 'react-leaflet'
 
-import { basicEqualFn, useMemory } from '@hooks/useMemory'
-import { useStorage } from '@hooks/useStorage'
+import { basicEqualFn, useMemory } from '@store/useMemory'
+import { useStorage } from '@store/useStorage'
 import useForcePopup from '@hooks/useForcePopup'
 
 import { nestMarker } from './nestMarker'

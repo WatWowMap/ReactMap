@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next'
 import DiscordButton from '@components/auth/Discord'
 import TelegramWidget from '@components/auth/Telegram'
 import LocalLogin from '@components/auth/Local'
-import { useMemory } from '@hooks/useMemory'
+import { useMemory } from '@store/useMemory'
 
 function Discord() {
   const { t } = useTranslation()

@@ -1,5 +1,5 @@
 // @ts-check
-import { useMemory } from '@hooks/useMemory'
+import { useMemory } from '@store/useMemory'
 import AbortableContext from './AbortableContext'
 
 export default class RobustTimeout extends AbortableContext {

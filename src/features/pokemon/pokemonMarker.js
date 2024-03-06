@@ -1,5 +1,5 @@
 import { Icon, divIcon } from 'leaflet'
-import { useMemory } from '@hooks/useMemory'
+import { useMemory } from '@store/useMemory'
 
 /**
  *

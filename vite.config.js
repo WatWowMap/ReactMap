@@ -114,6 +114,7 @@ const viteConfig = defineConfig(({ mode }) => {
         '@hooks': resolve(__dirname, './src/hooks'),
         '@services': resolve(__dirname, './src/services'),
         '@utils': resolve(__dirname, './src/utils'),
+        '@store': resolve(__dirname, './src/store'),
       },
     },
     define: {

@@ -6,8 +6,8 @@ import { useMutation } from '@apollo/client'
 import { useTranslation } from 'react-i18next'
 
 import Query from '@services/Query'
-import { useMemory } from '@hooks/useMemory'
-import { useLayoutStore } from '@hooks/useLayoutStore'
+import { useMemory } from '@store/useMemory'
+import { useLayoutStore } from '@store/useLayoutStore'
 
 import { Header } from './Header'
 import { Footer } from './Footer'

@@ -15,7 +15,7 @@ import ListItem from '@mui/material/ListItem'
 import ListItemIcon from '@mui/material/ListItemIcon'
 import ListItemText from '@mui/material/ListItemText'
 
-import { useMemory } from '@hooks/useMemory'
+import { useMemory } from '@store/useMemory'
 
 import DiscordButton from '@components/auth/Discord'
 import { ThemeToggle } from '@components/inputs/ThemeToggle'

@@ -6,7 +6,7 @@ import useMediaQuery from '@mui/material/useMediaQuery'
 
 import useGenerate from '@hooks/useGenerate'
 import useRefresh from '@hooks/useRefresh'
-import { useMemory } from '@hooks/useMemory'
+import { useMemory } from '@store/useMemory'
 
 export function Effects() {
   const params = useParams()

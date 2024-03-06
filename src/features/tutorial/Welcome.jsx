@@ -7,8 +7,8 @@ import Typography from '@mui/material/Typography'
 import DialogContent from '@mui/material/DialogContent'
 import { useTranslation } from 'react-i18next'
 
-import { useMemory } from '@hooks/useMemory'
-import { useLayoutStore } from '@hooks/useLayoutStore'
+import { useMemory } from '@store/useMemory'
+import { useLayoutStore } from '@store/useLayoutStore'
 import { LocaleSelection } from '@components/inputs/LocaleSelection'
 
 export default function TutWelcome() {

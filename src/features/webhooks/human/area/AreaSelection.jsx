@@ -7,7 +7,7 @@ import { ScanAreaTile } from '@features/scanArea'
 import { WEBHOOK_GEOJSON } from '@services/queries/webhook'
 import { Loading } from '@components/Loading'
 
-import { useWebhookStore } from '../../hooks/store'
+import { useWebhookStore } from '@store/useWebhookStore'
 import { handleClick } from './AreaChip'
 
 const FALLBACK = {

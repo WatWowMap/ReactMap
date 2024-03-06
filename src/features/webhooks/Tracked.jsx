@@ -8,15 +8,15 @@ import Typography from '@mui/material/Typography'
 import Box from '@mui/material/Box'
 import { Loading } from '@components/Loading'
 import { GenericSearch } from '@components/inputs/GenericSearch'
+import { useWebhookStore } from '@store/useWebhookStore'
 
 import TrackedTile from './tiles/TrackedTile'
 import Selecting from './Selecting'
 import { useGetWebhookData } from './hooks/useGetWebhookData'
-import { useWebhookStore } from './hooks/store'
 
 /**
  *
- * @param {{ category: Exclude<import('./hooks/store').WebhookStore['category'], 'human'> }} props
+ * @param {{ category: Exclude<import('@store/useWebhookStore').WebhookStore['category'], 'human'> }} props
  * @returns
  */
 const Tracked = ({ category }) => {

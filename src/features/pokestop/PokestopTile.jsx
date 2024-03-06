@@ -4,8 +4,8 @@ import * as React from 'react'
 import { Marker, Popup, Circle } from 'react-leaflet'
 
 import useMarkerTimer from '@hooks/useMarkerTimer'
-import { basicEqualFn, useMemory } from '@hooks/useMemory'
-import { useStorage } from '@hooks/useStorage'
+import { basicEqualFn, useMemory } from '@store/useMemory'
+import { useStorage } from '@store/useStorage'
 import useForcePopup from '@hooks/useForcePopup'
 import ToolTipWrapper from '@components/ToolTipWrapper'
 

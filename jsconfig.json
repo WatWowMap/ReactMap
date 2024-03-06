@@ -15,7 +15,8 @@
       "@features/*": ["./src/features/*"],
       "@services/*": ["./src/services/*"],
       "@hooks/*": ["./src/hooks/*"],
-      "@utils/*": ["./src/utils/*"]
+      "@utils/*": ["./src/utils/*"],
+      "@store/*": ["./src/store/*"]
     }
   },
   "exclude": ["node_modules", "**/node_modules/*", "dist"]

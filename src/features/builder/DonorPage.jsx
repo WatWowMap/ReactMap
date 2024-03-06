@@ -5,8 +5,8 @@ import { useQuery } from '@apollo/client'
 import Dialog from '@mui/material/Dialog'
 
 import { CUSTOM_COMPONENT } from '@services/queries/config'
-import { useMemory } from '@hooks/useMemory'
-import { useLayoutStore } from '@hooks/useLayoutStore'
+import { useMemory } from '@store/useMemory'
+import { useLayoutStore } from '@store/useLayoutStore'
 import { Loading } from '@components/Loading'
 
 import { CustomDialog } from './components/CustomDialog'

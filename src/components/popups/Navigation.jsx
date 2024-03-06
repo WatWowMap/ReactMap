@@ -3,8 +3,8 @@ import * as React from 'react'
 import Map from '@mui/icons-material/Map'
 import IconButton from '@mui/material/IconButton'
 
-import { useMemory } from '@hooks/useMemory'
-import { useStorage } from '@hooks/useStorage'
+import { useMemory } from '@store/useMemory'
+import { useStorage } from '@store/useStorage'
 
 /**
  * @param {{ lat: number, lon: number, size?: import('@mui/material').IconButtonProps['size'] }} props

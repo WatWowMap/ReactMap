@@ -5,7 +5,7 @@ import Typography from '@mui/material/Typography'
 import Button from '@mui/material/Button'
 import Grid from '@mui/material/Unstable_Grid2'
 
-import { setModeBtn } from '../../hooks/store'
+import { setModeBtn } from '@store/useWebhookStore'
 import { AreaAction, AreaGroup } from './AreaGroup'
 import { Selected } from './Selected'
 

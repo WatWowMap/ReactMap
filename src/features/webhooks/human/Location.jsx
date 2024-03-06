@@ -17,9 +17,9 @@ import { setHuman } from '@services/queries/webhook'
 import { WEBHOOK_NOMINATIM } from '@services/queries/geocoder'
 import useLocation from '@hooks/useLocation'
 import { Loading } from '@components/Loading'
-import { basicEqualFn } from '@hooks/useMemory'
+import { basicEqualFn } from '@store/useMemory'
 
-import { setModeBtn, useWebhookStore } from '../hooks/store'
+import { setModeBtn, useWebhookStore } from '@store/useWebhookStore'
 import { useSyncData } from '../hooks/useSyncData'
 
 const Location = () => {

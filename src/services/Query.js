@@ -1,5 +1,5 @@
 // @ts-check
-import { useMemory } from '@hooks/useMemory'
+import { useMemory } from '@store/useMemory'
 
 import getAllDevices from './queries/device'
 import * as gymIndex from './queries/gym'

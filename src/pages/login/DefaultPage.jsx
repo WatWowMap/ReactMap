@@ -6,7 +6,7 @@ import Grid from '@mui/material/Unstable_Grid2'
 import Divider from '@mui/material/Divider'
 import { styled } from '@mui/material/styles'
 
-import { useMemory } from '@hooks/useMemory'
+import { useMemory } from '@store/useMemory'
 import { LocaleSelection } from '@components/inputs/LocaleSelection'
 
 import methods from './Methods'

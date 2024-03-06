@@ -1,7 +1,7 @@
 // @ts-check
 import * as React from 'react'
 
-import { useStorage } from '@hooks/useStorage'
+import { useStorage } from '@store/useStorage'
 
 import HolidayAnimations from './HolidayAnimations'
 

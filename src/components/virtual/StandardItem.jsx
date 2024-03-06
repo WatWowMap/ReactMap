@@ -1,7 +1,7 @@
 // @ts-check
 import * as React from 'react'
-import { useLayoutStore } from '@hooks/useLayoutStore'
-import { useDeepStore, useStorage } from '@hooks/useStorage'
+import { useLayoutStore } from '@store/useLayoutStore'
+import { useDeepStore, useStorage } from '@store/useStorage'
 import { checkIfHasAll } from '@utils/hasAll'
 
 import { SelectorItem } from './SelectorItem'

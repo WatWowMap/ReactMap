@@ -10,7 +10,7 @@ import { useTranslation } from 'react-i18next'
 import { useMutation } from '@apollo/client'
 import { allProfiles, setProfile } from '@services/queries/webhook'
 
-import { useWebhookStore } from '../../hooks/store'
+import { useWebhookStore } from '@store/useWebhookStore'
 
 export const NewProfile = () => {
   const { t } = useTranslation()

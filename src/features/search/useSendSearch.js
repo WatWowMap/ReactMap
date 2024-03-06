@@ -6,9 +6,9 @@ import { debounce } from 'lodash'
 
 import Query from '@services/Query'
 import Utility from '@services/Utility'
-import { useStorage } from '@hooks/useStorage'
-import { useMemory } from '@hooks/useMemory'
-import { useMapStore } from '@hooks/useMapStore'
+import { useStorage } from '@store/useStorage'
+import { useMemory } from '@store/useMemory'
+import { useMapStore } from '@store/useMapStore'
 
 /**
  * @param {string} search

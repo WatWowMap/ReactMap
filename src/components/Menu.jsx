@@ -7,22 +7,19 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import Collapse from '@mui/material/Collapse'
 import IconButton from '@mui/material/IconButton'
 import Utility from '@services/Utility'
-import { useMemory } from '@hooks/useMemory'
-import { useLayoutStore } from '@hooks/useLayoutStore'
-import { useStorage } from '@hooks/useStorage'
+import { useMemory } from '@store/useMemory'
+import { useLayoutStore } from '@store/useLayoutStore'
+import { useStorage } from '@store/useStorage'
 import useFilter from '@hooks/useFilter'
 import { Header } from '@components/dialogs/Header'
 import { Footer } from '@components/dialogs/Footer'
 import { applyToAll } from '@services/filtering/applyToAll'
 import useGetAvailable from '@hooks/useGetAvailable'
+import { applyToAllWebhooks, useWebhookStore } from '@store/useWebhookStore'
 
 import OptionsContainer from './filters/OptionsContainer'
 import { VirtualGrid } from './virtual/VirtualGrid'
 import { GenericSearch } from './inputs/GenericSearch'
-import {
-  applyToAllWebhooks,
-  useWebhookStore,
-} from '../features/webhooks/hooks/store'
 
 /**
  * @template {import('@rm/types').AdvCategories} T

@@ -6,7 +6,7 @@ import Chip from '@mui/material/Chip'
 import { apolloClient } from '@services/apollo'
 import { WEBHOOK_AREAS, setHuman } from '@services/queries/webhook'
 
-import { useWebhookStore } from '../../hooks/store'
+import { useWebhookStore } from '@store/useWebhookStore'
 
 /** @param {string} areaName @param {string} [groupName] */
 export const handleClick =

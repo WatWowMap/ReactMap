@@ -10,8 +10,8 @@ import { useTranslation } from 'react-i18next'
 import { useQuery } from '@apollo/client'
 import { useMap } from 'react-leaflet'
 
-import { useMemory } from '@hooks/useMemory'
-import { useLayoutStore } from '@hooks/useLayoutStore'
+import { useMemory } from '@store/useMemory'
+import { useLayoutStore } from '@store/useLayoutStore'
 import Query from '@services/Query'
 
 import { VirtualGrid } from '@components/virtual/VirtualGrid'

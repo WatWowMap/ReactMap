@@ -7,8 +7,8 @@ import Button from '@mui/material/Button'
 import Divider from '@mui/material/Divider'
 import { useTranslation } from 'react-i18next'
 
-import { useMemory } from '@hooks/useMemory'
-import { useLayoutStore } from '@hooks/useLayoutStore'
+import { useMemory } from '@store/useMemory'
+import { useLayoutStore } from '@store/useLayoutStore'
 
 import { Header } from './Header'
 import { Footer } from './Footer'

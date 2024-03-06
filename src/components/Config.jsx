@@ -3,8 +3,8 @@ import { useTranslation } from 'react-i18next'
 import { setUser } from '@sentry/react'
 import { Navigate } from 'react-router-dom'
 
-import { useMemory } from '@hooks/useMemory'
-import { useStorage } from '@hooks/useStorage'
+import { useMemory } from '@store/useMemory'
+import { useStorage } from '@store/useStorage'
 import Fetch from '@services/Fetch'
 import { setLoadingText } from '@utils/setLoadingText'
 import Utility from '@services/Utility'
@@ -43,7 +43,7 @@ export default function Config({ children }) {
         })
       }
 
-      /** @type {{ state: import('@hooks/useStorage').UseStorage}} */
+      /** @type {{ state: import('@store/useStorage').UseStorage}} */
       const localState = JSON.parse(
         localStorage.getItem('local-state') || '{ "state": {} }',
       )

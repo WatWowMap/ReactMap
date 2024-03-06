@@ -12,8 +12,8 @@ import HighlightOffIcon from '@mui/icons-material/HighlightOff'
 import { useTranslation } from 'react-i18next'
 import { useQuery } from '@apollo/client'
 
-import { useMemory } from '@hooks/useMemory'
-import { useStorage } from '@hooks/useStorage'
+import { useMemory } from '@store/useMemory'
+import { useStorage } from '@store/useStorage'
 import { SEARCHABLE } from '@services/queries/config'
 import { Img } from '@components/Img'
 

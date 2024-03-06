@@ -3,7 +3,7 @@ import * as React from 'react'
 import { TileLayer, useMap } from 'react-leaflet'
 import { control } from 'leaflet'
 
-import { useStorage } from '@hooks/useStorage'
+import { useStorage } from '@store/useStorage'
 import useTileLayer from '@hooks/useTileLayer'
 
 export function ControlledTileLayer() {

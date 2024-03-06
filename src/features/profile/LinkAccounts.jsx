@@ -7,7 +7,7 @@ import Select from '@mui/material/Select'
 import MenuItem from '@mui/material/MenuItem'
 import Typography from '@mui/material/Typography'
 
-import { useMemory } from '@hooks/useMemory'
+import { useMemory } from '@store/useMemory'
 import Utility from '@services/Utility'
 import Query from '@services/Query'
 import { METHODS } from '@assets/constants'

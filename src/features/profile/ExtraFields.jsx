@@ -4,7 +4,7 @@ import Grid2 from '@mui/material/Unstable_Grid2/Grid2'
 import TextField from '@mui/material/TextField'
 import { useMutation } from '@apollo/client'
 
-import { useMemory } from '@hooks/useMemory'
+import { useMemory } from '@store/useMemory'
 import Query from '@services/Query'
 import { useTranslation } from 'react-i18next'
 

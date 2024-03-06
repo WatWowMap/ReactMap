@@ -1,8 +1,8 @@
 // @ts-check
 import * as React from 'react'
 
-import { useMemory } from '@hooks/useMemory'
-import { useStorage } from '@hooks/useStorage'
+import { useMemory } from '@store/useMemory'
+import { useStorage } from '@store/useStorage'
 
 import { S14CellTile } from './S14Cell'
 import { S17CellTile } from './S17Cell'
