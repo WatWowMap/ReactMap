@@ -1235,7 +1235,7 @@ class PoracleAPI {
   /**
    *
    * @param {import('@rm/types').PoracleInvasion} item
-   * @param {import('@rm/types').Masterfile['invasions']} invasions
+   * @param {import('@rm/masterfile').Masterfile['invasions']} invasions
    */
   static getRealGruntId(item, invasions) {
     return (

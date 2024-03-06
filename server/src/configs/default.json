@@ -239,7 +239,7 @@
       "permImageDir": "images/perms",
       "permArrayImages": false,
       "clientTimeoutMinutes": 30,
-      "distanceUnit": "km",
+      "distanceUnit": "kilometers",
       "enablePokemonPopupCoordsSelector": false,
       "enableGymPopupCoordsSelector": false,
       "enablePokestopPopupCoordsSelector": false,
@@ -369,6 +369,7 @@
       "linkGlobalAndAdvanced": false,
       "showSizeIndicator": false,
       "enablePokemonPopupCoords": false,
+      "spacialRendRange": false,
       "glow": [
         {
           "name": "Hundo",
@@ -467,6 +468,7 @@
       "polygons": false,
       "pokemon": false,
       "allPokemon": true,
+      "onlyShowAvailable": true,
       "avgFilter": [
         0,
         100

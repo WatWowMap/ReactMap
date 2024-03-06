@@ -184,7 +184,8 @@ export default function NestPopup({
         <Grid item xs={12} style={{ textAlign: 'center' }}>
           <Button
             color="secondary"
-            variant="contained"
+            variant="outlined"
+            size="small"
             disabled={!perms.nestSubmissions || !loggedIn}
             onClick={() =>
               useLayoutStore.setState({ nestSubmissions: `${id}` })

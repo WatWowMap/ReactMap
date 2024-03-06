@@ -1,16 +1,22 @@
 name: Main CI
-on: [push, pull_request]
+on:
+  push:
+    branches:
+      - main
+      - develop
 
 jobs:
+  lint:
+    uses: ./.github/workflows/lint.yml
   config:
     uses: ./.github/workflows/config.yml
   locales:
     uses: ./.github/workflows/locales.yml
   release:
-    uses: ./.github/workflows/release.yml
-    needs: [config, locales]
     if: always()
+    uses: ./.github/workflows/release.yml
+    needs: [config, locales, lint]
   docker:
-    if: (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.repository) && always()
+    if: always()
     uses: ./.github/workflows/docker.yml
-    needs: [config, locales]
+    needs: [config, locales, lint]

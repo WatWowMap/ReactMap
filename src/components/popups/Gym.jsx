@@ -687,14 +687,14 @@ const ExtraGymInfo = ({
 
   return (
     <Grid container alignItems="center" justifyContent="center">
-      {guarding_pokemon_id && updated > gymValidDataLimit && (
+      {!!guarding_pokemon_id && updated > gymValidDataLimit && (
         <ExtraInfo title="defender">
           <TextWithIcon src={Icons.getPokemon(guarding_pokemon_id)}>
             {t(`poke_${guarding_pokemon_id}`)}
           </TextWithIcon>
         </ExtraInfo>
       )}
-      {total_cp && updated > gymValidDataLimit && (
+      {!!total_cp && updated > gymValidDataLimit && (
         <ExtraInfo title="total_cp">{numFormatter.format(total_cp)}</ExtraInfo>
       )}
       <Divider

@@ -52,7 +52,9 @@ function SelectorList({ category, subCategory, label, height = 400 }) {
   const allFilters = useMemory((s) => s.filters[category]?.filter)
 
   const onlyShowAvailable = useStorage((s) =>
-    category === 'pokemon' ? !!s.filters[category]?.onlyShowAvailable : true,
+    category === 'pokemon' || category === 'nests'
+      ? !!s.filters[category]?.onlyShowAvailable
+      : true,
   )
   const easyMode = useStorage((s) => !!s.filters[category]?.easyMode)
   const search = useStorage((s) => s.searches[searchKey] || '')
@@ -139,7 +141,6 @@ function SelectorList({ category, subCategory, label, height = 400 }) {
       )}
       {(category === 'pokemon' || category === 'nests') && (
         <BoolToggle
-          // @ts-ignore // WHY TS??
           field={`filters.${category}.onlyShowAvailable`}
           label="only_show_available"
           disableGutters={category === 'nests'}

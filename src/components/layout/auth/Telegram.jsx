@@ -1,9 +1,15 @@
-import React, { useRef, useEffect } from 'react'
+// @ts-check
+import * as React from 'react'
 
-export default function Telegram({ botName, authUrl }) {
-  const ref = useRef(null)
+/**
+ *
+ * @param {{ botName: string, authUrl: string }} props
+ * @returns
+ */
+export default function TelegramWidget({ botName, authUrl }) {
+  const ref = React.useRef(null)
 
-  useEffect(() => {
+  React.useEffect(() => {
     if (ref.current) {
       const script = document.createElement('script')
       script.src = 'https://telegram.org/js/telegram-widget.js?4'

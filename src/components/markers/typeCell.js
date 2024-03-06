@@ -7,7 +7,7 @@
  * @param {string} oneStopTillNext
  * @param {string} twoStopsTillNext
  * @param {string} noMoreGyms
- * @returns
+ * @returns {L.PathOptions}
  */
 export default function typeStyle(
   cell,
@@ -24,7 +24,6 @@ export default function typeStyle(
     return {
       fillColor: oneStopTillNext,
       fillOpacity: 0.5,
-      weight: 0.75,
     }
   }
   if (
@@ -34,15 +33,13 @@ export default function typeStyle(
     return {
       fillColor: twoStopsTillNext,
       fillOpacity: 0.5,
-      weight: 0.75,
     }
   }
   if (total >= 20) {
     return {
       fillColor: noMoreGyms,
       fillOpacity: 0.25,
-      weight: 0.8,
     }
   }
-  return { fillOpacity: 0.0, weight: 0.8 }
+  return { fillOpacity: 0.0 }
 }

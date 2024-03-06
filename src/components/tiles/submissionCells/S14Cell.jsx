@@ -23,7 +23,7 @@ const S14Cell = ({
       key={`${cellColor}${oneStopTillNext}${twoStopsTillNext}${noMoreGyms}`}
       positions={cell.polygon}
       color={cellColor}
-      opacity={0.75}
+      weight={4}
       {...typeStyle(cell, total, oneStopTillNext, twoStopsTillNext, noMoreGyms)}
     >
       <Popup>

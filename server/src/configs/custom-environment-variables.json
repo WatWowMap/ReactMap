@@ -796,6 +796,10 @@
         "__name": "CLIENT_SIDE_OPTIONS_POKEMON_ENABLE_POKEMON_POPUP_COORDS",
         "__format": "boolean"
       },
+      "spacialRendRange": {
+        "__name": "CLIENT_SIDE_OPTIONS_POKEMON_SPACIAL_REND_RANGE",
+        "__format": "boolean"
+      },
       "glow": {
         "__name": "CLIENT_SIDE_OPTIONS_POKEMON_GLOW",
         "__format": "json"
@@ -948,6 +952,10 @@
       },
       "allPokemon": {
         "__name": "DEFAULT_FILTERS_NESTS_ALL_POKEMON",
+        "__format": "boolean"
+      },
+      "onlyShowAvailable": {
+        "__name": "DEFAULT_FILTERS_NESTS_ONLY_SHOW_AVAILABLE",
         "__format": "boolean"
       },
       "avgFilter": {

@@ -18,10 +18,11 @@ import { persist, createJSONStorage } from 'zustand/middleware'
  *    navigationControls: 'react' | 'leaflet'
  *    navigation: string,
  *    tileServers: string
+ *    distanceUnit: 'kilometers' | 'miles'
  *   },
  *   searches: Record<string, string>,
  *   tabs: Record<string, number>,
- *   menus: Record<string, boolean>,
+ *   menus: ReturnType<import('server/src/services/ui/advMenus')>
  *   holidayEffects: Record<string, boolean>,
  *   motdIndex: number
  *   tutorial: boolean,
@@ -30,9 +31,9 @@ import { persist, createJSONStorage } from 'zustand/middleware'
  *   filters: import('@rm/types').AllFilters,
  *   icons: Record<string, string>
  *   audio: Record<string, string>
- *   userSettings: Record<string, any>
+ *   userSettings: ReturnType<import('server/src/services/ui/clientOptions')>['clientValues']
  *   profiling: boolean
- *   stateLogging: boolean
+ *   stateTraceLog: boolean
  *   desktopNotifications: boolean
  *   setAreas: (areas?: string | string[], validAreas?: string[], unselectAll?: boolean) => void,
  *   setPokemonFilterMode: (legacyFilter: boolean, easyMode: boolean) => void,

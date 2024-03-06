@@ -15,7 +15,7 @@ import { create } from 'zustand'
  *   auth: {
  *    perms: Partial<import('@rm/types').Permissions>,
  *    loggedIn: boolean,
- *    methods: string[],
+ *    methods: import('@rm/types').Strategy[],
  *    strategy: import('@rm/types').Strategy | '',
  *    userBackupLimits: number,
  *    excludeList: string[],
@@ -30,12 +30,15 @@ import { create } from 'zustand'
  *      scanner: number,
  *    },
  *   },
+ *   glowRules: ((pkmn: import('@rm/types').Pokemon) => string)[],
+ *   menus: ReturnType<import('server/src/services/ui/advMenus')>
  *   filters: import('@rm/types').AllFilters,
- *   masterfile: import('@rm/types').Masterfile
- *   polling: Record<string, number>
+ *   masterfile: import('@rm/masterfile').Masterfile
+ *   polling: import('@rm/types').Config['api']['polling'],
  *   gymValidDataLimit: number
- *   settings: Record<string, any>
- *   userSettings: Record<string, any>
+ *   settings: Record<keyof import('./useStorage').UseStorage['settings'], { name: string }>
+ *   userSettings: ReturnType<import('server/src/services/ui/clientOptions')>['clientValues']
+ *   clientMenus: ReturnType<import('server/src/services/ui/clientOptions')>['clientMenus']
  *   clientError: string,
  *   timeOfDay: import('@rm/types').TimesOfDay,
  *   hideList: Set<string | number>,
@@ -94,9 +97,11 @@ export const useMemory = create((set) => ({
     },
     userBackupLimits: 0,
   },
+  glowRules: [],
   config: {},
   filters: {},
-  menus: undefined,
+  menus: {},
+  clientMenus: {},
   menuFilters: {},
   userSettings: undefined,
   settings: undefined,

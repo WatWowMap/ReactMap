@@ -67,8 +67,11 @@ class Nest extends Model {
 
     /** @type {(FullNest & { submitted_by?: string })[]} */
     const withNames = results.map((x) => {
-      x.name = submittedNameMap[x.id]?.name || x.name
-      x.submitted_by = submittedNameMap[x.id]?.submitted_by
+      const submitted = submittedNameMap[x.id]?.name
+      if (submitted && submitted !== x.name) {
+        x.name = submittedNameMap[x.id]?.name || x.name
+        x.submitted_by = submittedNameMap[x.id]?.submitted_by
+      }
       return x
     })
 
@@ -116,6 +119,7 @@ class Nest extends Model {
     const results = /** @type {FullNest[]} */ (
       await this.query()
         .select(['pokemon_id', 'pokemon_form'])
+        .where('pokemon_id', '!=', 0)
         .whereNotNull('pokemon_id')
         .groupBy('pokemon_id', 'pokemon_form')
         .orderBy('pokemon_id', 'asc')

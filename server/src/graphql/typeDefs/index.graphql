@@ -106,6 +106,7 @@ type Query {
     lon: Float
     locale: String
     onlyAreas: [String]
+    questLayer: String
   ): [SearchQuest]
   spawnpoints(
     minLat: Float

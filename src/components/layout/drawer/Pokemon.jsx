@@ -17,11 +17,13 @@ import {
   InputLabel,
 } from '@mui/material'
 import { useTranslation } from 'react-i18next'
+import Help from '@mui/icons-material/HelpOutline'
 
 import { useMemory } from '@hooks/useMemory'
 import { useStorage, useDeepStore } from '@hooks/useStorage'
 import Utility from '@services/Utility'
 import { XXS_XXL, NUNDO_HUNDO } from '@assets/constants'
+import { useLayoutStore } from '@hooks/useLayoutStore'
 
 import { StringFilterMemo } from '../dialogs/filters/StringFilter'
 import SliderTile from '../dialogs/filters/SliderTile'
@@ -29,9 +31,9 @@ import TabPanel from '../general/TabPanel'
 import { BoolToggle, DualBoolToggle } from './BoolToggle'
 import { GenderListItem } from '../dialogs/filters/Gender'
 import { SelectorListMemo } from './SelectorList'
+import { BasicListButton } from '../general/BasicListButton'
 
 function PokemonDrawer() {
-  const legacyFilter = useStorage((s) => s.userSettings.pokemon.legacyFilter)
   const filterMode = useStorage((s) => s.getPokemonFilterMode())
   const [ivOr, setIvOr] = useDeepStore('filters.pokemon.ivOr')
   const { t } = useTranslation()
@@ -113,7 +115,7 @@ function PokemonDrawer() {
           label="link_global_and_advanced"
         />
       </Collapse>
-      {legacyFilter && ui.legacy ? (
+      {filterMode === 'expert' && ui.legacy ? (
         <StringFilterMemo field="filters.pokemon.ivOr" />
       ) : (
         <>
@@ -167,6 +169,12 @@ function PokemonDrawer() {
           </TabPanel>
         </>
       )}
+      <BasicListButton
+        label="filter_help"
+        onClick={() => useLayoutStore.setState({ pkmnFilterHelp: true })}
+      >
+        <Help />
+      </BasicListButton>
     </>
   )
 }

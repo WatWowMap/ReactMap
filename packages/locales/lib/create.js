@@ -1,4 +1,6 @@
 // @ts-check
+const { default: fetch } = require('node-fetch')
+
 const config = require('@rm/config')
 const { log, HELPERS } = require('@rm/logger')
 

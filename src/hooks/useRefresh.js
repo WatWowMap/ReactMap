@@ -9,28 +9,43 @@ import UAssets from '@services/Icons'
 import { useMemory } from './useMemory'
 import { useStorage } from './useStorage'
 
-export default function useRefresh() {
+export default function useRefresh(once = false) {
   const active = useMemory((s) => s.active)
   const online = useMemory((s) => s.online)
 
   const hasIcons = useMemory((s) => !!s.Icons)
 
-  const { data, stopPolling, startPolling, refetch } = useQuery(getMapData, {
-    fetchPolicy: active && online ? 'network-only' : 'cache-only',
-  })
+  const { data, loading, stopPolling, startPolling, refetch, error } = useQuery(
+    getMapData,
+    {
+      fetchPolicy: active && online ? 'network-only' : 'cache-only',
+    },
+  )
 
   useEffect(() => {
-    if (active && online) {
+    if (active && online && !once) {
       startPolling(1000 * 60 * 60)
       return () => stopPolling()
     }
-  }, [active, online])
+  }, [active, online, once])
 
   useEffect(() => {
     if (!hasIcons && online) {
       refetch()
     }
   }, [hasIcons, online])
+
+  useEffect(() => {
+    if (error && 'statusCode' in error.networkError) {
+      stopPolling()
+      if (error.networkError?.statusCode === 464) {
+        useMemory.setState({ clientError: 'early_old_client' })
+      }
+      if (error.networkError?.statusCode === 511) {
+        useMemory.setState({ clientError: 'session_expired' })
+      }
+    }
+  }, [error])
 
   useEffect(() => {
     if (data?.available) {
@@ -89,4 +104,6 @@ export default function useRefresh() {
       }))
     }
   }, [data])
+
+  return loading
 }

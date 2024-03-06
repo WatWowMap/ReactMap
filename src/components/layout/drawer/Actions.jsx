@@ -13,6 +13,8 @@ import TrendingUpIcon from '@mui/icons-material/TrendingUp'
 import FeedbackIcon from '@mui/icons-material/Feedback'
 import HeartIcon from '@mui/icons-material/Favorite'
 import { downloadJson } from '@services/functions/downloadJson'
+import { deepMerge } from '@services/functions/deepMerge'
+import { useMapStore } from '@hooks/useMapStore'
 
 import { useMemory } from '@hooks/useMemory'
 import { useLayoutStore } from '@hooks/useLayoutStore'
@@ -28,12 +30,20 @@ const importSettings = (e) => {
   }
   const reader = new FileReader()
   reader.onload = function parse(newSettings) {
-    const contents = newSettings.target.result
-    localStorage.clear()
-    localStorage.setItem('local-state', contents.toString())
+    try {
+      const { state: newState } = JSON.parse(
+        newSettings.target.result.toString(),
+      )
+      const { map } = useMapStore.getState()
+      useStorage.setState((oldState) => deepMerge({}, oldState, newState))
+      const { location, zoom } = useStorage.getState()
+      map.setView(location, zoom)
+    } catch (error) {
+      if (error instanceof Error)
+        useMemory.setState({ clientError: error.message })
+    }
   }
   reader.readAsText(file)
-  setTimeout(() => window.location.reload(), 1500)
 }
 
 const exportSettings = () =>
@@ -67,21 +77,20 @@ export default function DrawerActions() {
           <HelpOutlineIcon color="secondary" />
         </BasicListButton>
       )}
-      <input
-        accept="application/json"
-        id="contained-button-file"
-        type="file"
-        style={{ display: 'none' }}
-        onChange={importSettings}
-      />
       <BasicListButton onClick={exportSettings} label="export">
         <ImportExportIcon color="secondary" />
       </BasicListButton>
 
+      <input
+        accept="application/json"
+        id="import-settings-btn"
+        type="file"
+        style={{ display: 'none' }}
+        onChange={importSettings}
+      />
       <BasicListButton
         component="label"
-        htmlFor="contained-button-file"
-        onClick={exportSettings}
+        htmlFor="import-settings-btn"
         label="import"
       >
         <ImportExportIcon color="error" />

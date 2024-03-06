@@ -1,6 +1,10 @@
-/* eslint-disable import/prefer-default-export */
+// @ts-check
 import { capitalize } from '@mui/material'
 
+/**
+ * @param {string} str
+ * @param {string} [separator]
+ */
 export function fromSnakeCase(str, separator = ' ') {
   return capitalize(str)
     .replace(/_/g, separator)

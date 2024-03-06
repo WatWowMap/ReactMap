@@ -14,10 +14,10 @@ import { useTranslation } from 'react-i18next'
  */
 export function useTranslateById(options = {}) {
   const i18n = useTranslation()
-  const formsToIgnore = useRef(new Set([i18n.t('form_0'), i18n.t('form_29')]))
+  const formsToIgnore = useRef(new Set([i18n.t('form_0'), i18n.t('form_45')]))
 
   useEffect(() => {
-    formsToIgnore.current = new Set([i18n.t('form_0'), i18n.t('form_29')])
+    formsToIgnore.current = new Set([i18n.t('form_0'), i18n.t('form_45')])
   }, [i18n.i18n.language])
 
   return useMemo(

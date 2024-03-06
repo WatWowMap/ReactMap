@@ -19,9 +19,7 @@ import '@services/events'
 import ErrorBoundary from './ErrorBoundary'
 import ReactRouter from './ReactRouter'
 import HolidayEffects from './HolidayEffects'
-/**
- * @type {Record<string, string>}
- */
+
 const LOADING_LOCALES = {
   de: 'Übersetzungen werden geladen',
   en: 'Loading Translations',

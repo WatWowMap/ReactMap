@@ -1,4 +1,7 @@
-export default function parseQuestConditions(conditions) {
+// @ts-check
+
+/** @param {string} conditions */
+function parseQuestConditions(conditions) {
   const [type1, type2] = JSON.parse(conditions)
   const conditionsToReturn = []
   const parseMadRewards = (specifics) => {
@@ -60,3 +63,5 @@ export default function parseQuestConditions(conditions) {
   }
   return conditionsToReturn
 }
+
+export default parseQuestConditions

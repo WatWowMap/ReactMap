@@ -1,22 +1,20 @@
 name: Lint
-on: [push, pull_request]
+on: workflow_call
 
 jobs:
-  lint:
-    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.repository
-    name: Lint Check
+  run:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
         id: checkout-code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4.1.1
         with:
           fetch-depth: 2
       - name: Setup Node.js environment
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v4.0.2
         with:
           node-version: 20
-          cache: 'yarn'
+          cache: yarn
 
       - name: Install Dependencies
         run: yarn

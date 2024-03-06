@@ -1,6 +1,6 @@
 import { ButtonProps } from '@mui/material'
 import { Config, GetSafeConfig } from './config'
-import { ExpressUser } from './server'
+import { ExpressUser, Permissions } from './server'
 import { Request } from 'express'
 
 declare module 'config' {
@@ -47,6 +47,13 @@ declare module '@mui/material/styles' {
       fuchsia: string
       red: string
     }
+  }
+}
+
+declare module 'express-session' {
+  interface SessionData {
+    cooldown?: number
+    perms?: Permissions
   }
 }
 

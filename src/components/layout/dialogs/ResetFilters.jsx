@@ -1,8 +1,10 @@
+// @ts-check
 import * as React from 'react'
 import DialogContent from '@mui/material/DialogContent'
 import Typography from '@mui/material/Typography'
+import Grid2 from '@mui/material/Unstable_Grid2'
 import Button from '@mui/material/Button'
-import { Navigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 
 import { useLayoutStore } from '@hooks/useLayoutStore'
@@ -11,54 +13,64 @@ import Header from '../general/Header'
 import Footer from '../general/Footer'
 import { DialogWrapper } from './DialogWrapper'
 
+const handleClose = () => useLayoutStore.setState({ resetFilters: false })
+
+const FOOTER_OPTIONS =
+  /** @type {import('../general/Footer').FooterButton[]} */ ([
+    {
+      name: 'close',
+      action: handleClose,
+      color: 'primary',
+      align: 'right',
+    },
+  ])
+
 export default function ResetFilters() {
   const { t } = useTranslation()
-  const [redirect, setRedirect] = React.useState(false)
-
-  const handleClose = React.useCallback(
-    () => useLayoutStore.setState({ resetFilters: false }),
-    [],
-  )
-
-  if (redirect) {
-    return <Navigate push to="/reset" />
-  }
+  const navigate = useNavigate()
 
   return (
     <DialogWrapper dialog="resetFilters" variant="small">
-      <Header titles={[t('filters_reset_title')]} />
-      <DialogContent>
-        <Typography variant="subtitle1" align="center">
-          {t('filters_reset_text')}
-        </Typography>
-        <br />
-        <Typography align="center">
+      <Header titles={t('filters_reset_title')} />
+      <Grid2
+        component={DialogContent}
+        className="flex-center"
+        container
+        rowGap={2}
+      >
+        <Grid2 xs={12} mt={2}>
+          <Typography variant="subtitle1" align="center">
+            {t('reset_or_manage_text')}
+          </Typography>
+        </Grid2>
+        <Grid2 xs={12} sm={6} className="flex-center">
           <Button
-            style={{ minWidth: 100 }}
             variant="contained"
-            color="primary"
+            color="info"
             size="small"
             onClick={() => {
-              setRedirect(true)
               handleClose()
+              navigate('/data-management')
+            }}
+          >
+            {t('data_management')}
+          </Button>
+        </Grid2>
+        <Grid2 xs={12} sm={6} className="flex-center">
+          <Button
+            variant="contained"
+            color="error"
+            size="small"
+            onClick={() => {
+              handleClose()
+              navigate('/reset')
             }}
           >
             {t('confirm_filters_reset')}
           </Button>
-        </Typography>
-        <br />
-      </DialogContent>
-      <Footer
-        options={[
-          {
-            name: 'close',
-            action: handleClose,
-            color: 'primary',
-            align: 'right',
-          },
-        ]}
-        role="webhook_footer"
-      />
+        </Grid2>
+      </Grid2>
+      <Footer options={FOOTER_OPTIONS} />
     </DialogWrapper>
   )
 }

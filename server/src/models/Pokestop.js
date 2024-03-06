@@ -1612,7 +1612,7 @@ class Pokestop extends Model {
   }
 
   static async search(perms, args, { isMad }, distance, bbox) {
-    const { onlyAreas = [], search } = args
+    const { onlyAreas = [], search = '' } = args
     const query = this.query()
       .select([
         'name',
@@ -1624,7 +1624,7 @@ class Pokestop extends Model {
       ])
       .whereBetween(isMad ? 'latitude' : 'lat', [bbox.minLat, bbox.maxLat])
       .andWhereBetween(isMad ? 'longitude' : 'lon', [bbox.minLon, bbox.maxLon])
-      .whereRaw(`LOWER(name) LIKE '%${search}%'`)
+      .whereILike('name', `%${search}%`)
       .limit(searchResultsLimit)
       .orderBy('distance')
     if (!getAreaSql(query, perms.areaRestrictions, onlyAreas, isMad)) {
@@ -1640,7 +1640,7 @@ class Pokestop extends Model {
     distance,
     bbox,
   ) {
-    const { search, onlyAreas = [], locale, lat, lon } = args
+    const { search, onlyAreas = [], locale, lat, lon, questLayer } = args
     const midnight = getUserMidnight({ lat, lon })
     const pokemonIds = Object.keys(Event.masterfile.pokemon).filter((pkmn) =>
       i18next
@@ -1671,56 +1671,62 @@ class Pokestop extends Model {
     if (!pokemonIds.length && !itemIds.length && !rewardTypes.length) {
       return []
     }
-    const query = this.query()
-      .select([
-        isMad ? 'pokestop_id AS id' : 'id',
-        isMad ? 'latitude AS lat' : 'lat',
-        isMad ? 'longitude AS lon' : 'lon',
-        isMad ? 'quest_reward AS quest_rewards' : 'quest_rewards',
-        distance,
-        'name',
-        'quest_pokemon_id',
-        'quest_item_id',
-        'quest_reward_type',
-        'quest_title',
-        'quest_target',
-      ])
-      .whereBetween(isMad ? 'latitude' : 'lat', [bbox.minLat, bbox.maxLat])
-      .andWhereBetween(isMad ? 'longitude' : 'lon', [bbox.minLon, bbox.maxLon])
-      .andWhere('quest_timestamp', '>=', midnight || 0)
-      .andWhere((quests) => {
-        if (pokemonIds.length === 1) {
-          quests.where('quest_pokemon_id', pokemonIds[0])
-        } else if (pokemonIds.length > 1) {
-          quests.whereIn('quest_pokemon_id', pokemonIds)
-        }
-        if (itemIds.length === 1) {
-          quests.orWhere('quest_item_id', itemIds[0])
-        } else if (itemIds.length > 1) {
-          quests.orWhereIn('quest_item_id', itemIds)
-        }
-        if (rewardTypes.length === 1) {
-          quests.orWhere('quest_reward_type', rewardTypes[0])
-        } else if (rewardTypes.length > 1) {
-          quests.orWhereIn('quest_reward_type', rewardTypes)
-        }
-      })
-      .limit(searchResultsLimit)
-      .orderBy('distance')
-    if (isMad) {
-      query
-        .leftJoin('trs_quest', 'pokestop.pokestop_id', 'trs_quest.GUID')
+    const queries = []
+    if (questLayer !== 'without_ar') {
+      const query = this.query()
         .select([
-          'quest_stardust AS stardust_amount',
-          'quest_pokemon_form_id AS quest_form_id',
-          'quest_pokemon_costume_id AS quest_costume_id',
+          isMad ? 'pokestop_id AS id' : 'id',
+          isMad ? 'latitude AS lat' : 'lat',
+          isMad ? 'longitude AS lon' : 'lon',
+          isMad ? 'quest_reward AS quest_rewards' : 'quest_rewards',
+          distance,
+          'name',
+          'quest_pokemon_id',
+          'quest_item_id',
+          'quest_reward_type',
+          'quest_title',
+          'quest_target',
         ])
+        .whereBetween(isMad ? 'latitude' : 'lat', [bbox.minLat, bbox.maxLat])
+        .andWhereBetween(isMad ? 'longitude' : 'lon', [
+          bbox.minLon,
+          bbox.maxLon,
+        ])
+        .andWhere('quest_timestamp', '>=', midnight || 0)
+        .andWhere((quests) => {
+          if (pokemonIds.length === 1) {
+            quests.where('quest_pokemon_id', pokemonIds[0])
+          } else if (pokemonIds.length > 1) {
+            quests.whereIn('quest_pokemon_id', pokemonIds)
+          }
+          if (itemIds.length === 1) {
+            quests.orWhere('quest_item_id', itemIds[0])
+          } else if (itemIds.length > 1) {
+            quests.orWhereIn('quest_item_id', itemIds)
+          }
+          if (rewardTypes.length === 1) {
+            quests.orWhere('quest_reward_type', rewardTypes[0])
+          } else if (rewardTypes.length > 1) {
+            quests.orWhereIn('quest_reward_type', rewardTypes)
+          }
+        })
+        .limit(searchResultsLimit)
+        .orderBy('distance')
+      if (isMad) {
+        query
+          .leftJoin('trs_quest', 'pokestop.pokestop_id', 'trs_quest.GUID')
+          .select([
+            'quest_stardust AS stardust_amount',
+            'quest_pokemon_form_id AS quest_form_id',
+            'quest_pokemon_costume_id AS quest_costume_id',
+          ])
+      }
+      if (!getAreaSql(query, perms.areaRestrictions, onlyAreas, isMad)) {
+        return []
+      }
+      queries.push(query)
     }
-    if (!getAreaSql(query, perms.areaRestrictions, onlyAreas, isMad)) {
-      return []
-    }
-    const queries = [query]
-    if (hasAltQuests) {
+    if (hasAltQuests && questLayer !== 'with_ar') {
       const altQuestQuery = this.query()
         .select([
           'id',
@@ -1765,23 +1771,21 @@ class Pokestop extends Model {
       queries.push(altQuestQuery)
     }
 
-    const [withAr, withoutAr] = await Promise.all(queries)
-
-    const mapped = withAr.map((q) => ({ ...q, with_ar: q.with_ar ?? true }))
-    if (withoutAr) {
-      const remapped = withoutAr.map((result) => ({
-        ...result,
-        quest_rewards: result.alternative_quest_rewards,
-        quest_reward_type: result.alternative_quest_reward_type,
-        quest_pokemon_id: result.alternative_quest_pokemon_id,
-        quest_item_id: result.alternative_quest_item_id,
-        quest_title: result.alternative_quest_title,
-        quest_target: result.alternative_quest_target,
-        with_ar: false,
-      }))
-      mapped.push(...remapped)
-    }
-
+    const rawResults = await Promise.all(queries)
+    const mapped = rawResults.flat().map((result) =>
+      result.alternative_quest_target
+        ? {
+            ...result,
+            quest_rewards: result.alternative_quest_rewards,
+            quest_reward_type: result.alternative_quest_reward_type,
+            quest_pokemon_id: result.alternative_quest_pokemon_id,
+            quest_item_id: result.alternative_quest_item_id,
+            quest_title: result.alternative_quest_title,
+            quest_target: result.alternative_quest_target,
+            with_ar: false,
+          }
+        : { ...result, with_ar: result.with_ar ?? true },
+    )
     mapped.sort((a, b) => a.distance - b.distance)
     if (mapped.length > searchResultsLimit) mapped.length = searchResultsLimit
 

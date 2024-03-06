@@ -29,7 +29,7 @@ class UAssets {
   /**
    *
    * @param {import("@rm/types").Config['icons']} iconsConfig
-   * @param {import("@rm/types").Masterfile['questRewardTypes']} questRewardTypes
+   * @param {import("@rm/masterfile").Masterfile['questRewardTypes']} questRewardTypes
    * @param {'uicons' | 'uaudio'} assetType
    */
   constructor({ customizable, sizes }, questRewardTypes, assetType) {

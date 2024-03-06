@@ -1,7 +1,7 @@
 /* eslint-disable no-unused-vars */
 const config = require('@rm/config')
 const { log, HELPERS } = require('@rm/logger')
-const { KEYS, STANDARD, LEAGUES } = require('./constants')
+const { KEYS, AND_KEYS, STANDARD, LEAGUES } = require('./constants')
 const {
   deepCompare,
   between,
@@ -60,7 +60,7 @@ module.exports = class PkmnBackend {
     this.expertFilter = this.getCallback(id === 'global')
     this.expertGlobal = this.getCallback(true)
     this.isEqualToGlobal =
-      this.expertFilter.toString() === this.expertGlobal.toString()
+      this.expertFilter?.toString() === this.expertGlobal?.toString()
   }
 
   get keyArray() {
@@ -122,17 +122,6 @@ module.exports = class PkmnBackend {
         orStr += `LC${filter.little.join('-')}`
       }
     }
-    if (this.perms.iv) {
-      if (this.mods.onlyZeroIv) {
-        if (orStr) orStr += '|'
-        orStr += `0`
-      }
-      if (this.mods.onlyHundoIv) {
-        if (orStr) orStr += '|'
-        orStr += `100`
-      }
-    }
-
     if (andStr && !(andStr.startsWith('(') && andStr.endsWith(')')) && orStr) {
       andStr = `(${andStr})`
     }
@@ -149,7 +138,6 @@ module.exports = class PkmnBackend {
       orStr,
       merged,
     })
-
     return merged
   }
 
@@ -299,10 +287,9 @@ module.exports = class PkmnBackend {
     }
     const results = /** @type {import('@rm/types').DnfFilter[]} */ ([])
     if (
-      ['iv', 'atk_iv', 'def_iv', 'sta_iv', 'cp', 'level', 'gender'].some((k) =>
-        this.filterKeys.has(k),
-      ) &&
-      this.perms.iv
+      this.perms.iv &&
+      ((this.filterKeys.has('gender') && this.filterKeys.size === 1) ||
+        AND_KEYS.some((k) => this.filterKeys.has(k)))
     ) {
       results.push({
         pokemon,
@@ -330,20 +317,37 @@ module.exports = class PkmnBackend {
     if (this.perms.pvp) {
       Object.entries(rest).forEach(([league, values]) => {
         if (Array.isArray(values) && this.filterKeys.has(league)) {
-          results.push({
+          /** @type {import('@rm/types').DnfFilter} */
+          const pvpFilter = {
             pokemon,
             [`pvp_${league}`]: PkmnBackend.ensureSafe(
               values,
               STANDARD[league]?.[1],
             ),
-          })
+          }
+          if (this.filterKeys.has('gender')) {
+            pvpFilter.gender = { min: gender, max: gender }
+          }
+          results.push(pvpFilter)
         }
       })
     }
-    if (this.filterKeys.has('xxs'))
-      results.push({ pokemon, size: { min: 1, max: 1 } })
-    if (this.filterKeys.has('xxl'))
-      results.push({ pokemon, size: { min: 5, max: 5 } })
+    if (this.filterKeys.has('xxs')) {
+      /** @type {import('@rm/types').DnfFilter} */
+      const xxsFilter = { pokemon, size: { min: 1, max: 1 } }
+      if (this.filterKeys.has('gender')) {
+        xxsFilter.gender = { min: gender, max: gender }
+      }
+      results.push(xxsFilter)
+    }
+    if (this.filterKeys.has('xxl')) {
+      /** @type {import('@rm/types').DnfFilter} */
+      const xxlFilter = { pokemon, size: { min: 5, max: 5 } }
+      if (this.filterKeys.has('gender')) {
+        xxlFilter.gender = { min: gender, max: gender }
+      }
+      results.push(xxlFilter)
+    }
     return results
   }
 
@@ -357,9 +361,12 @@ module.exports = class PkmnBackend {
       filterRTree(pokemon, this.perms.areaRestrictions, this.mods.onlyAreas)
     ) {
       if (
-        !this.mods.onlyLinkGlobal ||
         (this.mods.onlyHundoIv && pokemon.iv === 100) ||
-        (this.mods.onlyZeroIv && pokemon.iv === 0) ||
+        (this.mods.onlyZeroIv && pokemon.iv === 0)
+      )
+        return true
+      if (
+        !this.mods.onlyLinkGlobal ||
         (this.pokemon === pokemon.pokemon_id && this.form === pokemon.form)
       ) {
         if (!this.expertFilter || !this.expertGlobal) return true
@@ -371,6 +378,7 @@ module.exports = class PkmnBackend {
         }
       }
     }
+    log.trace(pokemon)
     return false
   }
 

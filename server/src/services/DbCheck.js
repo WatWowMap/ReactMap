@@ -3,10 +3,10 @@ const { knex } = require('knex')
 const { raw } = require('objection')
 const extend = require('extend')
 const config = require('@rm/config')
-
 const { log, HELPERS } = require('@rm/logger')
+
 const { getBboxFromCenter } = require('./functions/getBbox')
-const { setCache, getCache } = require('./cache')
+const { getCache } = require('./cache')
 
 const softLimit = config.getSafe('api.searchSoftKmLimit')
 const hardLimit = config.getSafe('api.searchHardKmLimit')
@@ -107,7 +107,6 @@ module.exports = class DbCheck {
       )
       process.exit(0)
     }
-    this.distanceUnit = config.getSafe('map.misc.distanceUnit')
   }
 
   /**
@@ -115,13 +114,11 @@ module.exports = class DbCheck {
    * @param {boolean} isMad
    * @returns {ReturnType<typeof raw>}
    */
-  getDistance(args, isMad) {
+  static getDistance(args, isMad) {
     const radLat = args.lat * (Math.PI / 180)
     const radLon = args.lon * (Math.PI / 180)
     return raw(
-      `ROUND(( ${
-        this.distanceUnit === 'mi' ? '3959' : '6371'
-      } * acos( cos( ${radLat} ) * cos( radians( ${
+      `ROUND(( 6371000 * acos( cos( ${radLat} ) * cos( radians( ${
         isMad ? 'latitude' : 'lat'
       } ) ) * cos( radians( ${
         isMad ? 'longitude' : 'lon'
@@ -248,7 +245,7 @@ module.exports = class DbCheck {
    * @param {boolean} historical
    * @returns {void}
    */
-  async setRarity(results, historical = false) {
+  setRarity(results, historical = false) {
     const base = {}
     const mapKey = historical ? 'historical' : 'rarity'
     let total = 0
@@ -279,7 +276,6 @@ module.exports = class DbCheck {
         this[mapKey][id] = 'common'
       }
     })
-    await setCache(`${mapKey}.json`, this[mapKey])
   }
 
   async historicalRarity() {
@@ -295,7 +291,7 @@ module.exports = class DbCheck {
                 .groupBy('pokemon_id'),
         ),
       )
-      await this.setRarity(
+      this.setRarity(
         results.map((result) =>
           Object.fromEntries(
             result.map((pkmn) => [`${pkmn.pokemon_id}`, +pkmn.total]),
@@ -435,10 +431,16 @@ module.exports = class DbCheck {
 
   /**
    * @template {import("@rm/types").BaseRecord} T
-   * @param {import("../models").ScannerModelKeys} model
+   * @template {import("../models").ScannerModelKeys} U
+   * @param {U} model
    * @param {import("@rm/types").Permissions} perms
    * @param {object} args
-   * @param {'search' | string} method
+   * @param {U extends 'Gym' ? 'searchRaids' | 'search'
+   *  : U extends 'Pokestop' ? 'searchInvasions' | 'searchQuests' | 'searchLures' | 'search'
+   *  : U extends 'Pokemon' ? 'search'
+   *  : U extends 'Portal' ? 'search'
+   *  : U extends 'Nest' ? 'search'
+   *  : never} method
    * @returns {Promise<T[]>}
    */
   async search(model, perms, args, method = 'search') {
@@ -457,7 +459,7 @@ module.exports = class DbCheck {
             perms,
             args,
             source,
-            this.getDistance(args, source.isMad),
+            DbCheck.getDistance(args, source.isMad),
             bbox,
           ),
         ),
@@ -595,10 +597,9 @@ module.exports = class DbCheck {
               Object.values(titles),
             ]),
           )
-          await setCache('questConditions.json', this.questConditions)
         }
         if (model === 'Pokemon') {
-          await this.setRarity(results, false)
+          this.setRarity(results, false)
         }
         if (results.length === 1) return results[0].available
         if (results.length > 1) {
@@ -642,7 +643,6 @@ module.exports = class DbCheck {
           ...results.map((result) => result.max_duration),
         )
         log.info(HELPERS.db, 'Updating filter context for routes')
-        await setCache('filterContext.json', this.filterContext)
       } catch (e) {
         log.error(
           HELPERS.db,

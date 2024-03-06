@@ -3,19 +3,19 @@ const { promises: fs } = require('fs')
 const path = require('path')
 const Ohbem = require('ohbem')
 const { default: fetch } = require('node-fetch')
-const config = require('@rm/config')
 
+const config = require('@rm/config')
 const { log, HELPERS } = require('@rm/logger')
 const { generate, read } = require('@rm/masterfile')
 
 const PoracleAPI = require('./api/Poracle')
-const { getCache, setCache } = require('./cache')
+const { getCache } = require('./cache')
 
 class EventManager {
   constructor() {
-    /** @type {import("@rm/types").Masterfile} */
+    /** @type {import("@rm/masterfile").Masterfile} */
     this.masterfile = read()
-    /** @type {import("@rm/types").Masterfile['invasions'] | {}} */
+    /** @type {import("@rm/masterfile").Masterfile['invasions'] | {}} */
     this.invasions =
       'invasions' in this.masterfile ? this.masterfile.invasions : {}
 
@@ -104,7 +104,7 @@ class EventManager {
 
       return 0
     })
-    await setCache('available.json', this.available)
+    this.addAvailable(category)
   }
 
   /**
@@ -313,7 +313,6 @@ class EventManager {
       }
     }
     this[type] = Object.values(this[`${type}Backup`])
-    await setCache(`${type}.json`, this[type])
   }
 
   /**
@@ -344,39 +343,49 @@ class EventManager {
     try {
       const newMf = await generate(true, historical, dbRarity)
       this.masterfile = newMf ?? this.masterfile
-      this.addAvailable()
+      this.addAllAvailable()
     } catch (e) {
       log.warn(HELPERS.event, 'Failed to generate latest masterfile:\n', e)
     }
   }
 
-  addAvailable() {
-    Object.entries(this.available).forEach(([category, entries]) => {
-      entries.forEach((item) => {
-        if (!Number.isNaN(parseInt(item.charAt(0)))) {
-          const [id, form] = item.split('-')
-          if (!this.masterfile.pokemon[id]) {
-            this.masterfile.pokemon[id] = {
-              pokedexId: +id,
-              types: [],
-              quickMoves: [],
-              chargeMoves: [],
-            }
-            log.info(HELPERS.event, `Added ${id} to Pokemon`)
+  /** @param {keyof EventManager['available']} category */
+  addAvailable(category) {
+    this.available[category].forEach((item) => {
+      if (!Number.isNaN(parseInt(item.charAt(0)))) {
+        const [id, form] = item.split('-')
+        if (!this.masterfile.pokemon[id]) {
+          this.masterfile.pokemon[id] = {
+            name: '',
+            pokedexId: +id,
+            types: [],
+            quickMoves: [],
+            chargedMoves: [],
+            defaultFormId: +form,
+            forms: {},
+            genId: 0,
           }
-          if (!this.masterfile.pokemon[id].forms) {
-            this.masterfile.pokemon[id].forms = {}
-          }
-          if (!this.masterfile.pokemon[id].forms[form]) {
-            this.masterfile.pokemon[id].forms[form] = { name: '*', category }
-            log.info(
-              HELPERS.event,
-              `Added ${this.masterfile.pokemon[id].name} Key: ${item} to masterfile. (${category})`,
-            )
-          }
+          log.warn(HELPERS.event, `Added ${id} to Pokemon, seems suspicious`)
         }
-      })
+        if (!this.masterfile.pokemon[id].forms) {
+          this.masterfile.pokemon[id].forms = {}
+        }
+        if (!this.masterfile.pokemon[id].forms[form]) {
+          this.masterfile.pokemon[id].forms[form] = { name: '*', category }
+          log.info(
+            HELPERS.event,
+            `Added ${this.masterfile.pokemon[id].name} Key: ${item} to masterfile. (${category})`,
+          )
+        }
+      }
     })
+  }
+
+  addAllAvailable() {
+    Object.keys(this.available).forEach(
+      (/** @type {keyof EventManager['available']} */ category) =>
+        this.addAvailable(category),
+    )
   }
 
   async getWebhooks() {

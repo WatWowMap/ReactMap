@@ -390,48 +390,46 @@ const resolvers = {
     },
     search: async (_, args, { Event, perms, Db }) => {
       const { category, webhookName, search } = args
-      if (perms?.[category] && /^[0-9\s\p{L}]+$/u.test(search)) {
-        if (!search || !search.trim()) {
-          return []
-        }
-        switch (args.category) {
-          case 'pokemon':
-            return Db.search('Pokemon', perms, args)
-          case 'pokestops':
-            return Db.search('Pokestop', perms, args)
-          case 'raids':
-            return Db.search('Gym', perms, args, 'searchRaids')
-          case 'gyms': {
-            const results = await Db.search('Gym', perms, args)
-            const webhook = webhookName ? Event.webhookObj[webhookName] : null
-            if (webhook && results.length) {
-              const withFormatted = await Promise.all(
-                results.map(async (result) => ({
-                  ...result,
-                  formatted: await geocoder(
-                    webhook.nominatimUrl,
-                    { lat: result.lat, lon: result.lon },
-                    true,
-                  ),
-                })),
-              )
-              return withFormatted
-            }
-            return results
-          }
-          case 'portals':
-            return Db.search('Portal', perms, args)
-          case 'nests':
-            return Db.search('Nest', perms, args)
-          default:
-            return []
-        }
+      if (!search || !search.trim()) {
+        return []
       }
-      return []
+      switch (category) {
+        case 'pokemon':
+          return perms.pokemon ? Db.search('Pokemon', perms, args) : []
+        case 'pokestops':
+          return perms.pokestops ? Db.search('Pokestop', perms, args) : []
+        case 'raids':
+          return perms.raids ? Db.search('Gym', perms, args, 'searchRaids') : []
+        case 'gyms': {
+          if (!perms.gyms) return []
+          const results = await Db.search('Gym', perms, args)
+          const webhook = webhookName ? Event.webhookObj[webhookName] : null
+          if (webhook && results.length) {
+            const withFormatted = await Promise.all(
+              results.map(async (result) => ({
+                ...result,
+                formatted: await geocoder(
+                  webhook.nominatimUrl,
+                  { lat: result.lat, lon: result.lon },
+                  true,
+                ),
+              })),
+            )
+            return withFormatted
+          }
+          return results
+        }
+        case 'portals':
+          return perms.portals ? Db.search('Portal', perms, args) : []
+        case 'nests':
+          return perms.nests ? Db.search('Nest', perms, args) : []
+        default:
+          return []
+      }
     },
     searchInvasion: (_, args, { perms, Db }) => {
-      const { category, search } = args
-      if (perms?.[category] && /^[0-9\s\p{L}]+$/u.test(search)) {
+      const { search } = args
+      if (perms?.invasions) {
         if (!search || !search.trim()) {
           return []
         }
@@ -440,8 +438,8 @@ const resolvers = {
       return []
     },
     searchLure: (_, args, { perms, Db }) => {
-      const { category, search } = args
-      if (perms?.[category] && /^[0-9\s\p{L}]+$/u.test(search)) {
+      const { search } = args
+      if (perms.lures) {
         if (!search || !search.trim()) {
           return []
         }
@@ -450,8 +448,8 @@ const resolvers = {
       return []
     },
     searchQuest: (_, args, { perms, Db }) => {
-      const { category, search } = args
-      if (perms?.[category] && /^[0-9\s\p{L}]+$/u.test(search)) {
+      const { search } = args
+      if (perms.quests) {
         if (!search || !search.trim()) {
           return []
         }
@@ -497,7 +495,7 @@ const resolvers = {
           category,
           status,
         )
-        if (category === 'pokemon') {
+        if (category === 'pokemon' && result.pokemon) {
           result.pokemon = result.pokemon.map((x) => ({
             ...x,
             allForms: !x.form,
@@ -506,13 +504,13 @@ const resolvers = {
             xl: x.min_weight !== 0,
           }))
         }
-        if (category === 'invasion') {
+        if (category === 'invasion' && result.invasion) {
           result.invasion = result.invasion.map((x) => ({
             ...x,
             real_grunt_id: PoracleAPI.getRealGruntId(x, Event.invasions),
           }))
         }
-        if (category === 'raid') {
+        if (category === 'raid' && result.raid) {
           result.raid = result.raid.map((x) => ({
             ...x,
             allMoves: x.move === 9000,
@@ -656,7 +654,7 @@ const resolvers = {
           status,
           data,
         )
-        if (category === 'pokemon') {
+        if (category === 'pokemon' && result.pokemon) {
           result.pokemon = result.pokemon.map((x) => ({
             ...x,
             allForms: !x.form,
@@ -665,13 +663,13 @@ const resolvers = {
             xl: x.min_weight !== 0,
           }))
         }
-        if (category === 'invasion') {
+        if (category === 'invasion' && result.invasion) {
           result.invasion = result.invasion.map((x) => ({
             ...x,
             real_grunt_id: PoracleAPI.getRealGruntId(x, Event.invasions),
           }))
         }
-        if (category === 'raid') {
+        if (category === 'raid' && result.raid) {
           result.raid = result.raid.map((x) => ({
             ...x,
             allMoves: x.move === 9000,

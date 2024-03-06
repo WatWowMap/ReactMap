@@ -18,17 +18,16 @@ const LEVELS = config
   .slice()
   .sort((a, b) => a - b)
 
-const BASE_KEYS = /** @type {const} */ ([
+const AND_KEYS = /** @type {const} */ ([
   'iv',
-  'cp',
-  'level',
   'atk_iv',
   'def_iv',
   'sta_iv',
-  'gender',
-  'xxs',
-  'xxl',
+  'cp',
+  'level',
 ])
+
+const BASE_KEYS = /** @type {const} */ ([...AND_KEYS, 'gender', 'xxs', 'xxl'])
 
 const KEYS = /** @type {const} */ ([...BASE_KEYS, ...LEAGUES])
 
@@ -47,6 +46,7 @@ const STANDARD = new PokemonFilter()
 module.exports = {
   LEVELS,
   KEYS,
+  AND_KEYS,
   IV_CALC,
   LEAGUES,
   LEVEL_CALC,

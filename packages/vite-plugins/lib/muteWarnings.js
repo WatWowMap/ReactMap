@@ -7,7 +7,7 @@
 const muteWarningsPlugin = (warningsToIgnore) => {
   const mutedMessages = new Set()
   return {
-    name: 'mute-warnings',
+    name: 'vite-mute-warnings',
     enforce: 'pre',
     config: (userConfig) => ({
       build: {

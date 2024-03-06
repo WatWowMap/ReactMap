@@ -1,9 +1,17 @@
+// @ts-check
+
+/** @param {any} item */
 function isObject(item) {
   return (
     item && typeof item === 'object' && !Array.isArray(item) && item !== null
   )
 }
 
+/**
+ * @template T
+ * @param {T} target
+ * @param {...T} sources
+ */
 export function deepMerge(target, ...sources) {
   if (!sources.length) return target
   const source = sources.shift()

@@ -19,43 +19,18 @@ import PopupContent from '../popups/Pokemon'
 import { basicMarker, fancyMarker } from '../markers/pokemon'
 import ToolTipWrapper from './Timer'
 
-const OPERATOR =
-  /** @type {{ [key in '=' | '<' | '<=' | '>'| '>=']: (a: number, b: number) => boolean }} */ ({
-    '=': (a, b) => a === b,
-    '<': (a, b) => a < b,
-    '<=': (a, b) => a <= b,
-    '>': (a, b) => a > b,
-    '>=': (a, b) => a >= b,
-  })
-
 /**
  *
  * @param {import('@rm/types').Pokemon} pkmn
- * @param {object} userSettings
- * @returns
+ * @param {import('@rm/types').PokemonGlow} userSettings
+ * @returns {string}
  */
 const getGlowStatus = (pkmn, userSettings) => {
-  const staticUserSettings = useMemory.getState().userSettings.pokemon
-  let glowCount = 0
-  let glowValue
-  Object.entries(staticUserSettings.glow.sub).forEach((rule) => {
-    const [ruleKey, ruleValue] = rule
-    const statKey = ruleValue.perm === 'iv' ? 'iv' : 'bestPvp'
-    if (ruleValue.op) {
-      if (
-        ruleValue.op in OPERATOR &&
-        OPERATOR[ruleValue.op](pkmn[statKey], ruleValue.num) &&
-        pkmn[statKey] !== null
-      ) {
-        glowCount += 1
-        glowValue = userSettings[ruleKey]
-      }
-    }
-  })
-  if (glowCount > 1) {
-    return userSettings.Multiple
-  }
-  return glowValue
+  const { glowRules } = useMemory.getState()
+  const valid = glowRules
+    .map((rule) => userSettings[rule(pkmn)])
+    .filter(Boolean)
+  return valid.length > 1 ? userSettings.Multiple : valid[0]
 }
 
 /**
@@ -78,6 +53,7 @@ const PokemonTile = (pkmn) => {
     showWeather,
     showSize,
     showInteractionRange,
+    showSpacialRendRange,
     filterSize,
   ] = useStorage((s) => {
     const {
@@ -90,6 +66,7 @@ const PokemonTile = (pkmn) => {
       weatherIndicator,
       showSizeIndicator,
       interactionRanges,
+      spacialRendRange,
     } = s.userSettings.pokemon
     return [
       pokemonTimers,
@@ -99,6 +76,7 @@ const PokemonTile = (pkmn) => {
       !!(pkmn.weather && weatherIndicator),
       showSizeIndicator && Number.isInteger(pkmn.size) && pkmn.size !== 3,
       interactionRanges,
+      spacialRendRange,
       s.filters.pokemon.filter[internalId]?.size || 'md',
     ]
   }, basicEqualFn)
@@ -235,10 +213,15 @@ const PokemonTile = (pkmn) => {
         </ToolTipWrapper>
       )}
       {showInteractionRange && configZoom && (
+        <Circle center={finalLocation} radius={40} color="#BA42F6" weight={1} />
+      )}
+      {showSpacialRendRange && configZoom && (
         <Circle
           center={finalLocation}
-          radius={40}
-          pathOptions={{ color: '#BA42F6', weight: 1 }}
+          radius={80}
+          color="#E3B3FB"
+          dashArray="5, 5"
+          weight={1}
         />
       )}
     </Marker>
