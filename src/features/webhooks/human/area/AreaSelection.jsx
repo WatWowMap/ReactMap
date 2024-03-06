@@ -8,8 +8,6 @@ import { WEBHOOK_GEOJSON } from '@services/queries/webhook'
 import { Loading } from '@components/Loading'
 import { useWebhookStore } from '@store/useWebhookStore'
 
-import { handleClick } from './AreaChip'
-
 const FALLBACK = {
   type: 'FeatureCollection',
   features: [],
@@ -37,13 +35,7 @@ export function WebhookAreaSelection() {
     return <Loading>{t('loading', { category: t('areas') })}</Loading>
   }
   if (webhookMode === 'areas' && data?.webhookGeojson) {
-    return (
-      <ScanAreaTile
-        geojson={data.webhookGeojson || FALLBACK}
-        handleClick={handleClick}
-        webhook
-      />
-    )
+    return <ScanAreaTile {...(data.webhookGeojson || FALLBACK)} />
   }
   return null
 }

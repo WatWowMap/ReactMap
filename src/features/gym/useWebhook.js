@@ -3,7 +3,7 @@ import { useMutation } from '@apollo/client'
 import { useTranslation } from 'react-i18next'
 
 import { Query } from '@services/queries'
-import { useWebhookStore } from '@features/webhooks'
+import { useWebhookStore } from '@store/useWebhookStore'
 import { ALL_PROFILES } from '@services/queries/webhook'
 
 export function useWebhook({ category }) {

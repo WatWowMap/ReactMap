@@ -28,7 +28,7 @@ import { useMemory } from '@store/useMemory'
 import { useLayoutStore } from '@store/useLayoutStore'
 import { useStorage } from '@store/useStorage'
 import { useScanStore } from '@features/scanner'
-import { setModeBtn, useWebhookStore } from '@features/webhooks'
+import { setModeBtn, useWebhookStore } from '@store/useWebhookStore'
 import { I } from '@components/I'
 
 /** @typedef {keyof ReturnType<typeof useLayoutStore['getState']> | keyof ReturnType<typeof useScanStore['getState']>} Keys */

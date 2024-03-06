@@ -4,30 +4,27 @@ import * as React from 'react'
 import { GeoJSON } from 'react-leaflet'
 import { Polygon } from 'leaflet'
 
-import { useWebhookStore } from '@store/useWebhookStore'
+import { useWebhookStore, handleClick } from '@store/useWebhookStore'
 import { useStorage } from '@store/useStorage'
 import { getProperName } from '@utils/strings'
 
 /**
  *
- * @param {{
- *  geojson: import('@rm/types').RMGeoJSON,
- *  webhook?: boolean,
- *  handleClick?: (name: string) => () => Promise<string[]>
- * }} featureCollection
+ * @param {import('@rm/types').RMGeoJSON} featureCollection
  * @returns
  */
-function ScanArea({ geojson, webhook, handleClick }) {
+function ScanArea(featureCollection) {
   const search = useStorage((s) => s.filters.scanAreas?.filter?.search)
   const tapToToggle = useStorage((s) => s.userSettings.scanAreas.tapToToggle)
   const alwaysShowLabels = useStorage(
     (s) => s.userSettings.scanAreas.alwaysShowLabels,
   )
+  const webhook = useWebhookStore((s) => !!s.mode)
 
   return (
     <GeoJSON
       key={`${search}${tapToToggle}${alwaysShowLabels}`}
-      data={geojson}
+      data={featureCollection}
       filter={(f) =>
         webhook ||
         search === '' ||
@@ -37,7 +34,7 @@ function ScanArea({ geojson, webhook, handleClick }) {
         click: ({ propagatedFrom: layer }) => {
           if (!layer.feature) return
           const { name, key, manual = false } = layer.feature.properties
-          if (webhook && name) {
+          if (webhook && name && handleClick) {
             handleClick(name)().then((newAreas) => {
               layer.setStyle({
                 fillOpacity: newAreas.some(
@@ -53,7 +50,7 @@ function ScanArea({ geojson, webhook, handleClick }) {
             layer.setStyle({ fillOpacity: includes ? 0.2 : 0.8 })
             setAreas(
               key,
-              geojson.features
+              featureCollection.features
                 .filter((f) => !f.properties.manual)
                 .map((f) => f.properties.key),
             )
@@ -110,11 +107,8 @@ function ScanArea({ geojson, webhook, handleClick }) {
 export const ScanAreaTile = React.memo(
   ScanArea,
   (prev, next) =>
-    prev.webhook === next.webhook &&
-    prev.handleClick === next.handleClick &&
-    prev.geojson.features.length === next.geojson.features.length &&
-    prev.geojson.features.every(
-      (feat, i) =>
-        feat.properties.key === next.geojson.features[i].properties.key,
+    prev.features.length === next.features.length &&
+    prev.features.every(
+      (feat, i) => feat.properties.key === next.features[i].properties.key,
     ),
 )

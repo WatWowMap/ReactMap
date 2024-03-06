@@ -7,9 +7,10 @@ import Button from '@mui/material/Button'
 import { useTranslation } from 'react-i18next'
 
 import { Loading } from '@components/Loading'
+import { handleClick } from '@store/useWebhookStore'
 
 import { useGetAreas } from '../../hooks/useGetAreas'
-import { MemoAreaChip, handleClick } from './AreaChip'
+import { MemoAreaChip } from './AreaChip'
 
 export const AreaGroup = () => {
   const { data, loading } = useGetAreas()

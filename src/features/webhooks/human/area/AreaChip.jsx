@@ -4,63 +4,7 @@ import Done from '@mui/icons-material/Done'
 import Clear from '@mui/icons-material/Clear'
 import Chip from '@mui/material/Chip'
 
-import { apolloClient } from '@services/apollo'
-import { WEBHOOK_AREAS, SET_HUMAN } from '@services/queries/webhook'
-import { useWebhookStore } from '@store/useWebhookStore'
-
-/** @param {string} areaName @param {string} [groupName] */
-export const handleClick =
-  (areaName, groupName = '') =>
-  async () => {
-    /** @type {{ group: string, children: string[] }[]} */
-    const areas =
-      apolloClient.cache.readQuery({
-        query: WEBHOOK_AREAS,
-      }).webhookAreas || []
-    const incomingArea = areaName.toLowerCase()
-    const { human } = useWebhookStore.getState()
-    const existing = human.area || []
-    const foundGroup = areas.find((group) => group.group === groupName) || {
-      children: [],
-      group: '',
-    }
-    const withLowerCase = {
-      group: foundGroup.group,
-      children: foundGroup.children.map((a) => a.toLowerCase()),
-    }
-
-    let newAreas = []
-    if (incomingArea === 'all') {
-      newAreas = withLowerCase.group
-        ? [...existing, ...withLowerCase.children]
-        : areas.flatMap((group) => group.children)
-    } else if (incomingArea === 'none') {
-      newAreas = groupName
-        ? existing.filter((a) => !withLowerCase.children.includes(a))
-        : []
-    } else {
-      newAreas = existing.includes(incomingArea)
-        ? existing.filter((a) => a !== incomingArea)
-        : [...existing, incomingArea]
-    }
-    newAreas = [...new Set(newAreas)]
-
-    await apolloClient
-      .mutate({
-        mutation: SET_HUMAN,
-        variables: {
-          category: 'setAreas',
-          data: newAreas,
-          status: 'POST',
-        },
-      })
-      .then(({ data }) => {
-        if (data?.webhook?.human) {
-          useWebhookStore.setState({ human: data.webhook.human })
-        }
-      })
-    return newAreas
-  }
+import { useWebhookStore, handleClick } from '@store/useWebhookStore'
 
 const ICON = {
   true: <Done />,

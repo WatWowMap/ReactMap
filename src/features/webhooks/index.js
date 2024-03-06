@@ -1,5 +1,4 @@
 export * from './Webhook'
-export * from '@store/useWebhookStore'
 export * from './hooks/useSyncData'
 export * from './human/Draggable'
 export * from './human/area/AreaSelection'
