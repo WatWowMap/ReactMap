@@ -13,7 +13,6 @@ import { useStorage, useDeepStore } from '@store/useStorage'
 import {
   BADGES,
   FORT_LEVELS,
-  QUEST_SETS,
   S2_LEVELS,
   ENUM_TTH,
   WAYFARER_OPTIONS,
@@ -25,6 +24,7 @@ import { FCSelect, FCSelectListItem } from '@components/inputs/FCSelect'
 
 import { CollapsibleItem } from './CollapsibleItem'
 import { MultiSelectorList, SelectorListMemo } from './SelectorList'
+import { PokestopDrawer } from './pokestops'
 
 const BaseNestSlider = () => {
   const slider = useMemory((s) => s.ui.nests?.sliders?.secondary?.[0])
@@ -193,101 +193,6 @@ const BaseRaids = () => (
 )
 const Raids = React.memo(BaseRaids)
 
-const BaseQuestSet = () => {
-  const enabled = useStorage((s) => !!s.filters?.pokestops?.quests)
-  return (
-    <CollapsibleItem open={enabled}>
-      <ListItem>
-        <MultiSelectorStore
-          field="filters.pokestops.showQuestSet"
-          items={QUEST_SETS}
-        />
-      </ListItem>
-      <MultiSelectorList tabKey="quests">
-        <SelectorListMemo
-          key="items"
-          category="pokestops"
-          subCategory="quests"
-          label="search_quests"
-          height={350}
-        />
-        <SelectorListMemo
-          key="pokemon"
-          category="pokestops"
-          subCategory="pokemon"
-          label="search_quests"
-          height={350}
-        />
-      </MultiSelectorList>
-    </CollapsibleItem>
-  )
-}
-const QuestSet = React.memo(BaseQuestSet)
-
-const BaseInvasion = () => {
-  const enabled = useStorage((s) => !!s.filters?.pokestops?.invasions)
-  const hasConfirmed = useMemory((s) =>
-    s.available.pokestops.some((x) => x.startsWith('a')),
-  )
-  const confirmedEnabled = useStorage((s) => !!s.filters?.pokestops?.confirmed)
-  return (
-    <CollapsibleItem open={enabled}>
-      {(confirmedEnabled || hasConfirmed) && (
-        <BoolToggle
-          inset
-          field="filters.pokestops.confirmed"
-          label="only_confirmed"
-        />
-      )}
-      {confirmedEnabled || hasConfirmed ? (
-        <MultiSelectorList tabKey="invasions">
-          <SelectorListMemo
-            key="invasions"
-            category="pokestops"
-            subCategory="invasions"
-            label="search_invasions"
-            height={350}
-          />
-          <SelectorListMemo
-            key="rocket_pokemon"
-            category="pokestops"
-            subCategory="rocketPokemon"
-            label="search_rocket_pokemon"
-            height={350}
-          />
-        </MultiSelectorList>
-      ) : (
-        <Box px={2}>
-          <SelectorListMemo
-            key="invasions"
-            category="pokestops"
-            subCategory="invasions"
-            label="search_invasions"
-            height={350}
-          />
-        </Box>
-      )}
-    </CollapsibleItem>
-  )
-}
-const Invasion = React.memo(BaseInvasion)
-
-const BaseEventStops = () => {
-  const enabled = useStorage((s) => !!s.filters?.pokestops?.eventStops)
-  return (
-    <CollapsibleItem open={enabled}>
-      <Box px={2}>
-        <SelectorListMemo
-          category="pokestops"
-          subCategory="showcase"
-          height={175}
-        />
-      </Box>
-    </CollapsibleItem>
-  )
-}
-const EventStops = React.memo(BaseEventStops)
-
 /** @param {{ item: (typeof WAYFARER_OPTIONS)[number], index: number, disabled: boolean }} props */
 const WayfarerOption = ({ item, index, disabled }) => {
   const { t } = useTranslation()
@@ -380,23 +285,6 @@ const BaseNestQuickSelector = () => {
 }
 const NestQuickSelector = React.memo(BaseNestQuickSelector)
 
-const BaseLureQuickSelector = () => {
-  const enabled = useStorage((s) => !!s.filters?.pokestops?.lures)
-  return (
-    <CollapsibleItem open={enabled}>
-      <Box px={2}>
-        <SelectorListMemo
-          category="pokestops"
-          subCategory="lures"
-          label="search_lures"
-          height={175}
-        />
-      </Box>
-    </CollapsibleItem>
-  )
-}
-const LureQuickSelector = React.memo(BaseLureQuickSelector)
-
 function ExtrasComponent({ category, subItem }) {
   switch (category) {
     case 'nests':
@@ -408,18 +296,7 @@ function ExtrasComponent({ category, subItem }) {
     case 's2cells':
       return subItem === 'enabled' ? <S2Cells /> : null
     case 'pokestops':
-      switch (subItem) {
-        case 'allPokestops':
-          return <AllForts category={category} subItem={subItem} />
-        case 'quests':
-          return <QuestSet />
-        case 'invasions':
-          return <Invasion />
-        case 'eventStops':
-          return <EventStops />
-        case 'lures':
-          return <LureQuickSelector />
-      }
+      return <PokestopDrawer subItem={subItem} />
     case 'gyms':
       switch (subItem) {
         case 'allGyms':
