@@ -87,7 +87,7 @@ export class Query {
       Events: filters.eventStops && perms.eventStops,
     })
 
-    if (query === 'GET') query += 'POKESTOPS'
+    if (query === 'GET') query += '_POKESTOPS'
     return pokestopIndex[query]
   }
 
@@ -101,7 +101,7 @@ export class Query {
       Ivs: perms.iv,
       Pvp: perms.pvp,
     })
-    if (query === 'GET') query += 'POKEMON'
+    if (query === 'GET') query += '_POKEMON'
 
     return pokemonIndex[query]
   }

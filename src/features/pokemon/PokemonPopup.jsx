@@ -36,11 +36,14 @@ const leagueLookup = {
   master: '9000',
 }
 
+/** @param {number} ivPercent */
 const getColor = (ivPercent) => {
   switch (true) {
-    case ivPercent < 50:
-      return 'error.main'
-    case ivPercent < 80:
+    case ivPercent < 51:
+      return 'error.dark'
+    case ivPercent < 66:
+      return 'error.light'
+    case ivPercent < 82:
       return 'warning.main'
     case ivPercent < 100:
       return 'info.main'
@@ -377,7 +380,7 @@ const Timer = ({ pokemon, hasStats, t }) => {
           {timer.str}
         </Typography>
         <Typography variant="subtitle2" align="center">
-          {despawnTimer.toLocaleString(
+          {new Date(despawnTimer).toLocaleTimeString(
             localStorage.getItem('i18nextLng') || 'en',
           )}
         </Typography>
