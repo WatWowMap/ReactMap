@@ -32,6 +32,7 @@ import { create } from 'zustand'
  *   },
  *   glowRules: ((pkmn: import('@rm/types').Pokemon) => string)[],
  *   menus: ReturnType<import('server/src/services/ui/advMenus')>
+ *   menuFilters: import('@rm/types').ClientFilterObj,
  *   filters: import('@rm/types').AllFilters,
  *   masterfile: import('@rm/masterfile').Masterfile
  *   polling: import('@rm/types').Config['api']['polling'],

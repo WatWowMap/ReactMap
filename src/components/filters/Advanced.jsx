@@ -15,7 +15,7 @@ import { Footer } from '@components/dialogs/Footer'
 import { BoolToggle, DualBoolToggle } from '@components/inputs/BoolToggle'
 import { ENABLED_ALL, XXS_XXL } from '@assets/constants'
 import { useTranslateById } from '@hooks/useTranslateById'
-import { STANDARD_BACKUP, applyToAll } from '@services/filtering/applyToAll'
+import { STANDARD_BACKUP, applyToAll } from '@utils/applyToAll'
 import { checkIfHasAll } from '@utils/hasAll'
 import { useAnalytics } from '@hooks/useAnalytics'
 

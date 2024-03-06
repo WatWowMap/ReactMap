@@ -4,9 +4,12 @@ import { useMap } from 'react-leaflet'
 import { useTranslation } from 'react-i18next'
 import useMediaQuery from '@mui/material/useMediaQuery'
 
-import { useGenerate } from '@hooks/useGenerate'
 import { useMapData } from '@hooks/useMapData'
 import { useMemory } from '@store/useMemory'
+
+import { useGenGyms } from '../hooks/useGenGyms'
+import { useGenPokestops } from '../hooks/useGenPokestops'
+import { useGenPokemon } from '../hooks/useGenPokemon'
 
 export function Effects() {
   const params = useParams()
@@ -14,7 +17,9 @@ export function Effects() {
   const { t } = useTranslation()
 
   useMapData()
-  useGenerate()
+  useGenGyms()
+  useGenPokestops()
+  useGenPokemon()
 
   const isMobile = useMediaQuery((theme) => theme.breakpoints.only('xs'))
   const isTablet = useMediaQuery((theme) => theme.breakpoints.only('sm'))
