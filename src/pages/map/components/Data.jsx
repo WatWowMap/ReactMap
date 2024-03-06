@@ -8,7 +8,7 @@ import Utility from '@services/Utility'
 
 import FilterPermCheck from './QueryData'
 
-export default function DataView() {
+export function DataView() {
   Utility.analytics(window.location.pathname)
 
   const iconsReady = useMemory((s) => !!s.Icons)

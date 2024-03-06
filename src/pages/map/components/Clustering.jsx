@@ -5,7 +5,7 @@ import Supercluster from 'supercluster'
 import { marker, divIcon, point } from 'leaflet'
 import { useMemory } from '@store/useMemory'
 import { useStorage } from '@store/useStorage'
-import Notification from '@components/Notification'
+import { Notification } from '@components/Notification'
 
 const IGNORE_CLUSTERING = new Set([
   'devices',
@@ -41,7 +41,7 @@ function createClusterIcon(feature, latlng) {
  * }} props
  * @returns
  */
-function Clustering({ category, children }) {
+export function Clustering({ category, children }) {
   /** @type {ReturnType<typeof React.useRef<import('leaflet').GeoJSON>>} */
   const featureRef = React.useRef(null)
 
@@ -169,5 +169,3 @@ function Clustering({ category, children }) {
     </>
   )
 }
-
-export default Clustering

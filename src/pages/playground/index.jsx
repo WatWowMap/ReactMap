@@ -12,7 +12,7 @@ import { MuiToolbar } from './components/Toolbar'
 import { Viewer } from './components/Viewer'
 import { StatusNotification } from './components/Status'
 
-export default function PlaygroundPage() {
+export function PlaygroundPage() {
   const { data } = useQuery(VALIDATE_USER)
 
   if (data?.validateUser === undefined) return null

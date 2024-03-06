@@ -15,7 +15,7 @@ import { DualBoolToggle } from '@components/inputs/BoolToggle'
 import { ENABLED_ALL } from '@assets/constants'
 import { Header } from '@components/dialogs/Header'
 import { Footer } from '@components/dialogs/Footer'
-import Size from './Size'
+import { Size } from './Size'
 
 import { DialogWrapper } from '../dialogs/DialogWrapper'
 

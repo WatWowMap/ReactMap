@@ -12,7 +12,7 @@ import { WayfarerTile as submissionCells } from '@features/wayfarer'
 import { ScanAreaTile as scanAreas } from '@features/scanArea'
 import { BaseCell as s2cells } from '@features/s2cell'
 
-const tileObject = {
+export const TILES = {
   devices,
   gyms,
   nests,
@@ -27,5 +27,3 @@ const tileObject = {
   s2cells,
   routes,
 }
-
-export default tileObject

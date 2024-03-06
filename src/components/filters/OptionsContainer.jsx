@@ -11,7 +11,7 @@ import { useStorage } from '@store/useStorage'
 import Utility from '@services/Utility'
 import { BasicListButton } from '@components/inputs/BasicListButton'
 
-import Options from './Options'
+import { OptionsGroup } from './Options'
 
 /** @type {React.CSSProperties} */
 const CHIP_STYLE = { margin: 3 }
@@ -70,7 +70,7 @@ const handleReset = (category) => () => {
   }))
 }
 
-export default function OptionsContainer({
+export function OptionsContainer({
   categories,
   category,
   countTotal,
@@ -89,7 +89,7 @@ export default function OptionsContainer({
               : Object.keys(options).length > 1
           ) {
             return (
-              <Options
+              <OptionsGroup
                 key={subCategory}
                 category={category}
                 subCategory={subCategory}

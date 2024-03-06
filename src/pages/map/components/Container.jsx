@@ -12,7 +12,7 @@ import { WebhookMarker, WebhookAreaSelection } from '@features/webhooks'
 import { ActiveWeather } from '@features/weather'
 
 import { Effects } from './Effects'
-import DataView from './Data'
+import { DataView } from './Data'
 import { Nav } from './Nav'
 import {
   ControlledLocate,
@@ -36,7 +36,7 @@ const MAX_BOUNDS = /** @type {[[number, number], [number, number]]} */ ([
   [90, 210],
 ])
 
-export default function Container() {
+export function Container() {
   const { location, zoom } = useStorage.getState()
 
   return (

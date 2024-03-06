@@ -67,7 +67,7 @@ export function OptionCheckbox({ category, subCategory, option }) {
 
 const OptionsCheckboxMemo = React.memo(OptionCheckbox, () => true)
 
-export default function OptionsGroup({ category, subCategory }) {
+export function OptionsGroup({ category, subCategory }) {
   const { t } = useTranslation()
   const options = useMemory((s) =>
     Object.keys(s.menus[category].filters[subCategory] || {}),

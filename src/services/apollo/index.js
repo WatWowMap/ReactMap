@@ -1,7 +1,7 @@
 // @ts-check
 import { ApolloClient, InMemoryCache, createHttpLink } from '@apollo/client'
 
-import AbortableLink from './AbortableLink'
+import { AbortableLink } from './AbortableLink'
 
 const abortableLink = new AbortableLink()
 

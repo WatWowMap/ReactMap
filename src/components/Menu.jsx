@@ -17,7 +17,7 @@ import { applyToAll } from '@services/filtering/applyToAll'
 import useGetAvailable from '@hooks/useGetAvailable'
 import { applyToAllWebhooks, useWebhookStore } from '@store/useWebhookStore'
 
-import OptionsContainer from './filters/OptionsContainer'
+import { OptionsContainer } from './filters/OptionsContainer'
 import { VirtualGrid } from './virtual/VirtualGrid'
 import { GenericSearch } from './inputs/GenericSearch'
 

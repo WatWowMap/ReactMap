@@ -21,7 +21,7 @@ import { checkIfHasAll } from '@utils/hasAll'
 
 import { StringFilter } from './StringFilter'
 import { SliderTile } from '../inputs/SliderTile'
-import Size from './Size'
+import { Size } from './Size'
 import { GenderListItem } from './Gender'
 import { QuestConditionSelector } from './QuestConditions'
 

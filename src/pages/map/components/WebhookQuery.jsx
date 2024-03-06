@@ -27,7 +27,7 @@ const getLowerCase = (category) => {
   }
 }
 
-export default function WebhookQuery({ children }) {
+export function WebhookQuery({ children }) {
   const params = useParams()
   const lowercase = getLowerCase(params.category)
 

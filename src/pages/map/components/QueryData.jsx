@@ -8,14 +8,14 @@ import { useStorage } from '@store/useStorage'
 import { usePermCheck } from '@hooks/usePermCheck'
 import Query from '@services/Query'
 import { getQueryArgs } from '@utils/getQueryArgs'
-import RobustTimeout from '@services/apollo/RobustTimeout'
+import { RobustTimeout } from '@services/apollo/RobustTimeout'
 import Utility from '@services/Utility'
 import { FILTER_SKIP_LIST } from '@assets/constants'
-import Notification from '@components/Notification'
+import { Notification } from '@components/Notification'
 import { GenerateCells } from '@features/s2cell'
 
-import Clustering from './Clustering'
-import tileObject from '../tileObject'
+import { Clustering } from './Clustering'
+import { TILES } from '../tileObject'
 
 /** @param {string} category */
 const userSettingsCategory = (category) => {
@@ -97,7 +97,7 @@ function QueryWrapper({ category }) {
 }
 
 function QueryData({ category, timeout }) {
-  const Component = React.useMemo(() => tileObject[category], [])
+  const Component = React.useMemo(() => TILES[category], [])
 
   const map = useMap()
 

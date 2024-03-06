@@ -9,7 +9,7 @@ import { styled } from '@mui/material/styles'
 import { useMemory } from '@store/useMemory'
 import { LocaleSelection } from '@components/inputs/LocaleSelection'
 
-import methods from './Methods'
+import { methods } from './Methods'
 
 const StyledDivider = styled(Divider)(({ theme }) => ({
   margin: theme.spacing(3, 0),

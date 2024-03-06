@@ -60,10 +60,8 @@ function Local() {
   )
 }
 
-const methods = {
+export const methods = {
   discord: <Discord />,
   telegram: <Telegram />,
   local: <Local />,
 }
-
-export default methods

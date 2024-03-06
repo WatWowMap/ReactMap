@@ -15,7 +15,7 @@ import { ICON_SIZES } from '@assets/constants'
  *  onClick?: SizeOnClick
  * } & Omit<import('@mui/material/ListItem').ListItemProps, 'onClick'>} props
  */
-export default function Size({ field, noLabel = false, onClick, ...props }) {
+export function Size({ field, noLabel = false, onClick, ...props }) {
   const { t } = useTranslation()
 
   return (

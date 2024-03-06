@@ -1,8 +1,8 @@
 // @ts-check
 import { useMemory } from '@store/useMemory'
-import AbortableContext from './AbortableContext'
+import { AbortableContext } from './AbortableContext'
 
-export default class RobustTimeout extends AbortableContext {
+export class RobustTimeout extends AbortableContext {
   /**
    * @param {keyof import('@rm/types').Config['api']['polling'] | number} category
    */

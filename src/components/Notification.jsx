@@ -28,7 +28,7 @@ const alertStyle = { textAlign: 'center', color: 'white' }
  * }} props
  * @returns
  */
-export default function Notification({
+export function Notification({
   open,
   severity,
   i18nKey,

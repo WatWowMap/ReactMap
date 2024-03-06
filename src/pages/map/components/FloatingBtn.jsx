@@ -23,7 +23,7 @@ import { useMap } from 'react-leaflet'
 import { DomEvent } from 'leaflet'
 
 import { FAB_BUTTONS } from '@services/queries/config'
-import useLocation from '@hooks/useLocation'
+import { useLocation } from '@hooks/useLocation'
 import { useMemory } from '@store/useMemory'
 import { useLayoutStore } from '@store/useLayoutStore'
 import { useStorage } from '@store/useStorage'
