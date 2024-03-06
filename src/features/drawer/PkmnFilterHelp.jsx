@@ -10,7 +10,7 @@ import Divider from '@mui/material/Divider'
 import Chip from '@mui/material/Chip'
 
 import { Header } from '@components/dialogs/Header'
-import Footer from '@components/Footer'
+import { Footer } from '@components/dialogs/Footer'
 import { useMemory } from '@hooks/useMemory'
 import { useLayoutStore } from '@hooks/useLayoutStore'
 
@@ -95,9 +95,10 @@ function Card({ title, children, bgcolor, fullSize }) {
 
 const handleClose = () => useLayoutStore.setState({ pkmnFilterHelp: false })
 
-const OPTIONS = /** @type {import('@components/Footer').FooterButton[]} */ ([
-  { name: 'close', color: 'error', action: handleClose },
-])
+const OPTIONS =
+  /** @type {import('@components/dialogs/Footer').FooterButton[]} */ ([
+    { name: 'close', color: 'error', action: handleClose },
+  ])
 
 export function PkmnFilterHelp() {
   const { t } = useTranslation()

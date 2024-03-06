@@ -11,7 +11,7 @@ import { useLayoutStore } from '@hooks/useLayoutStore'
 import { MultiSelector } from '@components/inputs/MultiSelector'
 
 import { Header } from './Header'
-import Footer from '../Footer'
+import { Footer } from './Footer'
 
 const handleClose = () =>
   useLayoutStore.setState({
@@ -22,7 +22,7 @@ const handleClose = () =>
     },
   })
 
-const footerOptions = /** @type {import('../Footer').FooterButton[]} */ ([
+const footerOptions = /** @type {import('./Footer').FooterButton[]} */ ([
   {
     name: 'close',
     action: handleClose,

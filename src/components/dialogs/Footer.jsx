@@ -56,7 +56,7 @@ const MuiIcons = {
  * }} props
  * @returns
  */
-export default function Footer({ options, role }) {
+export function Footer({ options, role }) {
   const { t } = useTranslation()
 
   return (

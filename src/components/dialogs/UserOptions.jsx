@@ -14,7 +14,7 @@ import { useStorage } from '@hooks/useStorage'
 import { getPermission } from '@services/desktopNotification'
 
 import { Header } from './Header'
-import Footer from '../Footer'
+import { Footer } from './Footer'
 import { DialogWrapper } from './DialogWrapper'
 
 function InputType({ option, subOption, localState, handleChange, category }) {
@@ -99,7 +99,7 @@ function UserOptions() {
 
   const footerOptions = React.useMemo(
     () =>
-      /** @type {import('@components/Footer').FooterButton[]} */ ([
+      /** @type {import('@components/dialogs/Footer').FooterButton[]} */ ([
         {
           name: 'reset',
           action: () => {

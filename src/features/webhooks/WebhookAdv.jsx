@@ -28,7 +28,7 @@ import Query from '@services/Query'
 import Utility from '@services/Utility'
 import { SliderTile } from '@components/inputs/SliderTile'
 import { Header } from '@components/dialogs/Header'
-import Footer from '@components/Footer'
+import { Footer } from '@components/dialogs/Footer'
 
 import { useWebhookStore } from './hooks/store'
 import { Poracle } from './services/Poracle'

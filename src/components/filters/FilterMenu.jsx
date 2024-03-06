@@ -16,7 +16,7 @@ export default function FilterMenu() {
 
   const extraButtons = React.useMemo(
     () =>
-      /** @type {import('@components/Footer').FooterButton[]} */ ([
+      /** @type {import('@components/dialogs/Footer').FooterButton[]} */ ([
         {
           name: 'close',
           action: toggleDialog(false, category, 'filters'),

@@ -13,7 +13,7 @@ import { useTranslation } from 'react-i18next'
 import { useMemory } from '@hooks/useMemory'
 import { useLayoutStore } from '@hooks/useLayoutStore'
 import Utility from '@services/Utility'
-import Footer from '@components/Footer'
+import { Footer } from '@components/dialogs/Footer'
 import { Header } from '@components/dialogs/Header'
 import { apolloClient } from '@services/apollo'
 import Query from '@services/Query'
@@ -47,7 +47,7 @@ export default function Manage() {
   const [height, setHeight] = React.useState(0)
 
   const footerButtons = React.useMemo(() => {
-    /** @type {import('@components/Footer').FooterButton[]} */
+    /** @type {import('@components/dialogs/Footer').FooterButton[]} */
     const buttons = [
       {
         name: 'feedback',

@@ -12,7 +12,7 @@ import { useMemory } from '@hooks/useMemory'
 import { useStorage } from '@hooks/useStorage'
 import { apolloClient } from '@services/apollo'
 import { Header } from '@components/dialogs/Header'
-import Footer from '@components/Footer'
+import { Footer } from '@components/dialogs/Footer'
 import { Img } from '@components/Img'
 
 import { WeatherPopup } from './WeatherPopup'
@@ -47,7 +47,7 @@ function Weather({ gameplay_condition, ...props }) {
 
   const footerOptions = React.useMemo(
     () =>
-      /** @type {import('../../components/Footer').FooterButton[]} */ ([
+      /** @type {import('../../components/dialogs/Footer').FooterButton[]} */ ([
         {
           name: 'close',
           action: () => setOpen(false),

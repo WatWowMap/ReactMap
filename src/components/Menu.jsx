@@ -12,7 +12,7 @@ import { useLayoutStore } from '@hooks/useLayoutStore'
 import { useStorage } from '@hooks/useStorage'
 import useFilter from '@hooks/useFilter'
 import { Header } from '@components/dialogs/Header'
-import Footer from '@components/Footer'
+import { Footer } from '@components/dialogs/Footer'
 import { applyToAll } from '@services/filtering/applyToAll'
 import useGetAvailable from '@hooks/useGetAvailable'
 
@@ -34,7 +34,7 @@ import {
  *  categories?: import('@rm/types').Available[]
  *  title: string
  *  titleAction: () => void
- *  extraButtons?: import('@components/Footer').FooterButton[]
+ *  extraButtons?: import('@components/dialogs/Footer').FooterButton[]
  * }} props
  */
 export default function Menu({
@@ -79,7 +79,7 @@ export default function Menu({
 
   const footerButtons = React.useMemo(
     () =>
-      /** @type {import('@components/Footer').FooterButton[]} */ ([
+      /** @type {import('@components/dialogs/Footer').FooterButton[]} */ ([
         {
           name: 'help',
           action: () =>

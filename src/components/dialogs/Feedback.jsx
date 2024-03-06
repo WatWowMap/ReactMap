@@ -11,7 +11,7 @@ import { useMemory } from '@hooks/useMemory'
 import { useLayoutStore } from '@hooks/useLayoutStore'
 
 import { Header } from './Header'
-import Footer from '../Footer'
+import { Footer } from './Footer'
 import { DialogWrapper } from './DialogWrapper'
 
 export default function Feedback() {

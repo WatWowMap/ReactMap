@@ -14,7 +14,7 @@ import { Img } from '@components/Img'
 import { DualBoolToggle } from '@components/inputs/BoolToggle'
 import { ENABLED_ALL } from '@assets/constants'
 import { Header } from '@components/dialogs/Header'
-import Footer from '@components/Footer'
+import { Footer } from '@components/dialogs/Footer'
 import Size from './Size'
 
 import { DialogWrapper } from '../dialogs/DialogWrapper'
@@ -67,7 +67,7 @@ export default function SlotSelection() {
 
   const footerOptions = React.useMemo(
     () =>
-      /** @type {import('@components/Footer').FooterButton[]} */ ([
+      /** @type {import('@components/dialogs/Footer').FooterButton[]} */ ([
         {
           name: 'disable_all',
           action: () => handleSizeChange(false, id),

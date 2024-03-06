@@ -11,7 +11,7 @@ import { useMemory } from '@hooks/useMemory'
 import { useLayoutStore } from '@hooks/useLayoutStore'
 import Utility from '@services/Utility'
 import { Header } from '@components/dialogs/Header'
-import Footer from '@components/Footer'
+import { Footer } from '@components/dialogs/Footer'
 import { DialogWrapper } from '@components/dialogs/DialogWrapper'
 
 import { UserBackups } from './Backups'
