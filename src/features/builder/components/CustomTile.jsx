@@ -2,9 +2,8 @@
 import * as React from 'react'
 import Grid from '@mui/material/Unstable_Grid2'
 
-import { getGridSizes } from '@utils/getGridSizes'
-
 import { Generator } from './Generator'
+import { getGridSizes } from '../utils'
 
 /**
  *

@@ -6,7 +6,8 @@ import { useTranslation } from 'react-i18next'
 
 import { Header } from '@components/dialogs/Header'
 import { Footer } from '@components/dialogs/Footer'
-import { getBlockContent } from '@utils/getBlockContent'
+
+import { getBlockContent } from '../utils'
 
 export function CustomDialog({
   configObj,

@@ -8,12 +8,11 @@ import { LocalLogin } from '@components/auth/Local'
 import { TelegramWidget } from '@components/auth/Telegram'
 import { Img } from '@components/Img'
 import { LocaleSelection } from '@components/inputs/LocaleSelection'
-import { getBlockContent } from '@utils/getBlockContent'
-import { getGridSizes } from '@utils/getGridSizes'
 
 import { LinkWrapper } from './LinkWrapper'
 import { CustomText } from './CustomText'
 import { CustomButton } from './CustomButton'
+import { getGridSizes, getBlockContent } from '../utils'
 
 /**
  *

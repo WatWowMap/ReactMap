@@ -10,10 +10,10 @@ import { useLayoutStore } from '@store/useLayoutStore'
 import { useStorage } from '@store/useStorage'
 import { CUSTOM_COMPONENT, MOTD_CHECK } from '@services/queries/config'
 import { Loading } from '@components/Loading'
-import { getBlockContent } from '@utils/getBlockContent'
 
 import { CustomTile } from './components/CustomTile'
 import { CustomDialog } from './components/CustomDialog'
+import { getBlockContent } from './utils'
 
 const DEFAULT =
   /** @type {import('@rm/types').Config['map']['messageOfTheDay']} */ ({
