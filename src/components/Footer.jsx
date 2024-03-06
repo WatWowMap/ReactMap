@@ -4,9 +4,32 @@ import IconButton from '@mui/material/IconButton'
 import Button from '@mui/material/Button'
 import Typography from '@mui/material/Typography'
 import Grid from '@mui/material/Grid'
+import Replay from '@mui/icons-material/Replay'
+import Save from '@mui/icons-material/Save'
+import Add from '@mui/icons-material/Add'
+import People from '@mui/icons-material/People'
+import BugReport from '@mui/icons-material/BugReport'
+import Help from '@mui/icons-material/HelpOutline'
+import Ballot from '@mui/icons-material/Ballot'
+import Tune from '@mui/icons-material/Tune'
+import FormatSize from '@mui/icons-material/FormatSize'
+import Clear from '@mui/icons-material/Clear'
+import Check from '@mui/icons-material/Check'
 import { useTranslation } from 'react-i18next'
 
-import * as MuiIcons from './Icons'
+const MuiIcons = {
+  Replay,
+  Save,
+  Add,
+  People,
+  BugReport,
+  Help,
+  Ballot,
+  Tune,
+  FormatSize,
+  Clear,
+  Check,
+}
 
 /**
  * @typedef {{
