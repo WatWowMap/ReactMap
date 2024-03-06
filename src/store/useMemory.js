@@ -65,7 +65,7 @@ import { create } from 'zustand'
  *
  * @type {import("zustand").UseBoundStore<import("zustand").StoreApi<UseMemory>>}
  */
-export const useMemory = create((set) => ({
+export const useMemory = create(() => ({
   isMobile: false,
   isTablet: false,
   active: true,
@@ -135,12 +135,6 @@ export const useMemory = create((set) => ({
   },
   hideList: new Set(),
   timerList: [],
-  webhookAlert: {
-    open: false,
-    severity: 'info',
-    message: '',
-  },
-  setWebhookAlert: (webhookAlert) => set({ webhookAlert }),
   timeOfDay: 'day',
   extraUserFields: [],
   manualParams: {

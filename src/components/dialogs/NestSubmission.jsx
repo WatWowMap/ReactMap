@@ -1,3 +1,4 @@
+// @ts-check
 import * as React from 'react'
 import Dialog from '@mui/material/Dialog'
 import DialogContent from '@mui/material/DialogContent'
@@ -6,12 +7,16 @@ import { useMutation } from '@apollo/client'
 import { useTranslation } from 'react-i18next'
 
 import { Query } from '@services/Query'
-import { useMemory } from '@store/useMemory'
+import { useWebhookStore } from '@store/useWebhookStore'
 import { useLayoutStore } from '@store/useLayoutStore'
 
 import { Header } from './Header'
 import { Footer } from './Footer'
 
+/**
+ * @param {{ id: number, name: string }} props
+ * @returns
+ */
 export function NestSubmission({ id, name }) {
   const open = useLayoutStore((s) => s.nestSubmissions)
   const [newName, setNewName] = React.useState(name)
@@ -44,11 +49,12 @@ export function NestSubmission({ id, name }) {
 
   React.useEffect(() => {
     if (error) {
-      useMemory.setState({
-        webhookAlert: {
+      useWebhookStore.setState({
+        alert: {
           open: true,
           severity: 'error',
           message:
+            'statusCode' in error.networkError &&
             error.networkError?.statusCode === 401
               ? t('mutation_auth_error')
               : error.message,
