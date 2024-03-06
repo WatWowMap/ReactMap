@@ -2,38 +2,28 @@
 import { useMemory } from '@store/useMemory'
 import { useStorage } from '@store/useStorage'
 
-/** @param {KeyboardEvent} event */
-function toggleDarkMode(event) {
+window.addEventListener('keydown', (event) => {
   // This is mostly meant for development purposes
   if (event.ctrlKey && event.key === 'd') {
     useStorage.setState((prev) => ({ darkMode: !prev.darkMode }))
   }
-}
-window.addEventListener('keydown', toggleDarkMode)
+})
 
 let timer
 
-function onFocus() {
+window.addEventListener('focus', () => {
   if (timer) {
     clearTimeout(timer)
   }
   useMemory.setState({ active: true })
-}
-window.addEventListener('focus', onFocus)
+})
 
-function onBlur() {
+window.addEventListener('blur', () => {
   timer = setTimeout(() => {
     useMemory.setState({ active: false })
-  }, 1000 * 60 * useMemory.getState().config.misc.clientTimeoutMinutes)
-}
-window.addEventListener('blur', onBlur)
+  }, 1000 * 60 * (useMemory.getState().config?.misc?.clientTimeoutMinutes || 5))
+})
 
-function online() {
-  useMemory.setState({ online: true })
-}
-window.addEventListener('online', online)
+window.addEventListener('online', () => useMemory.setState({ online: true }))
 
-function offline() {
-  useMemory.setState({ online: false })
-}
-window.addEventListener('offline', offline)
+window.addEventListener('offline', () => useMemory.setState({ online: false }))
