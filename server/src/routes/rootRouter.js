@@ -225,9 +225,6 @@ rootRouter.get('/api/settings', async (req, res, next) => {
       if (settings.user.perms.nests && api.queryOnSessionInit.nests) {
         Event.setAvailable('nests', 'Nest', Db, false)
       }
-      if (Object.values(api.queryOnSessionInit).some(Boolean)) {
-        Event.addAvailable()
-      }
     }
 
     res.status(200).json(settings)
