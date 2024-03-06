@@ -6,8 +6,8 @@ import { useMemory } from '@store/useMemory'
 import { useStorage } from '@store/useStorage'
 import { BoolToggle } from '@components/inputs/BoolToggle'
 
-import { CollapsibleItem } from '../CollapsibleItem'
-import { MultiSelectorList, SelectorListMemo } from '../SelectorList'
+import { CollapsibleItem } from '../components/CollapsibleItem'
+import { MultiSelectorList, SelectorListMemo } from '../components/SelectorList'
 
 const BaseInvasion = () => {
   const enabled = useStorage((s) => !!s.filters?.pokestops?.invasions)

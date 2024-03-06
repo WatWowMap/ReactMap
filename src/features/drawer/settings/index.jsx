@@ -23,7 +23,7 @@ import { DividerWithMargin } from '@components/StyledDivider'
 import { BoolToggle } from '@components/inputs/BoolToggle'
 import { BasicListButton } from '@components/inputs/BasicListButton'
 
-import { DrawerActions } from '../Actions'
+import { DrawerActions } from '../components/Actions'
 import { GeneralSetting } from './General'
 import { UAssetSetting } from './UAssets'
 import { HolidaySetting } from './Holiday'

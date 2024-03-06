@@ -9,8 +9,8 @@ import { useMemory } from '@store/useMemory'
 import { useStorage, useDeepStore } from '@store/useStorage'
 import { FCSelect } from '@components/inputs/FCSelect'
 
-import { CollapsibleItem } from '../CollapsibleItem'
-import { MultiSelectorList, SelectorListMemo } from '../SelectorList'
+import { CollapsibleItem } from '../components/CollapsibleItem'
+import { MultiSelectorList, SelectorListMemo } from '../components/SelectorList'
 
 const RaidOverride = () => {
   const { t } = useTranslation()

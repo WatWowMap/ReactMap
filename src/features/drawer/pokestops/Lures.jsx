@@ -4,8 +4,8 @@ import Box from '@mui/material/Box'
 
 import { useStorage } from '@store/useStorage'
 
-import { CollapsibleItem } from '../CollapsibleItem'
-import { SelectorListMemo } from '../SelectorList'
+import { CollapsibleItem } from '../components/CollapsibleItem'
+import { SelectorListMemo } from '../components/SelectorList'
 
 const BaseLureQuickSelect = () => {
   const enabled = useStorage((s) => !!s.filters?.pokestops?.lures)

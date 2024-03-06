@@ -6,7 +6,7 @@ import { useStorage } from '@store/useStorage'
 import { BADGES } from '@assets/constants'
 import { MultiSelectorStore } from '@components/inputs/MultiSelector'
 
-import { CollapsibleItem } from '../CollapsibleItem'
+import { CollapsibleItem } from '../components/CollapsibleItem'
 
 const BaseGymBadges = () => {
   const enabled = useStorage((s) => !!s.filters?.gyms?.gymBadges)

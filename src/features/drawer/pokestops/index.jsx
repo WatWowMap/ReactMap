@@ -1,7 +1,7 @@
 // @ts-check
 import * as React from 'react'
 
-import { AllForts } from '../AllForts'
+import { AllForts } from '../components/AllForts'
 import { LureQuickSelect } from './Lures'
 import { InvasionQuickSelect } from './Invasions'
 import { QuestQuickSelect } from './Quests'

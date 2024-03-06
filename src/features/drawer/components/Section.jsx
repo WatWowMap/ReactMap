@@ -17,10 +17,10 @@ import { BasicListButton } from '@components/inputs/BasicListButton'
 import { BoolToggle } from '@components/inputs/BoolToggle'
 import { camelToSnake } from '@utils/strings'
 
-import { Settings } from './settings'
-import { PokemonDrawerMemo } from './pokemon'
-import { AreaSection } from './areas'
-import { Extras } from './Extras'
+import { Settings } from '../settings'
+import { PokemonDrawerMemo } from '../pokemon'
+import { AreaSection } from '../areas'
+import { Extras } from '../Extras'
 
 const ADV_CATEGORIES = new Set(['pokemon', 'gyms', 'pokestops', 'nests'])
 

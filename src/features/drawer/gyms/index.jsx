@@ -1,7 +1,7 @@
 // @ts-check
 import * as React from 'react'
 
-import { AllForts } from '../AllForts'
+import { AllForts } from '../components/AllForts'
 import { GymBadges } from './GymBadges'
 import { Raids } from './Raids'
 

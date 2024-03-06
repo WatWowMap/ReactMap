@@ -15,7 +15,7 @@ import { TabPanel } from '@components/TabPanel'
 import { BasicListButton } from '@components/inputs/BasicListButton'
 import { BoolToggle } from '@components/inputs/BoolToggle'
 
-import { SelectorListMemo } from '../SelectorList'
+import { SelectorListMemo } from '../components/SelectorList'
 import { PokemonTabPanel } from './PokemonTab'
 import { PokemonModeSelector } from './ModeSelector'
 

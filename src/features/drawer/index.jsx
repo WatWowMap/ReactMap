@@ -13,8 +13,8 @@ import { useLayoutStore } from '@store/useLayoutStore'
 import { Img } from '@components/Img'
 import { DividerWithMargin } from '@components/StyledDivider'
 
-import { DrawerActions } from './Actions'
-import { DrawerSectionMemo } from './Section'
+import { DrawerActions } from './components/Actions'
+import { DrawerSectionMemo } from './components/Section'
 
 const handleClose = () => useLayoutStore.setState({ drawer: false })
 

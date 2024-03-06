@@ -6,8 +6,8 @@ import { useStorage } from '@store/useStorage'
 import { QUEST_SETS } from '@assets/constants'
 import { MultiSelectorStore } from '@components/inputs/MultiSelector'
 
-import { CollapsibleItem } from '../CollapsibleItem'
-import { MultiSelectorList, SelectorListMemo } from '../SelectorList'
+import { CollapsibleItem } from '../components/CollapsibleItem'
+import { MultiSelectorList, SelectorListMemo } from '../components/SelectorList'
 
 const BaseQuestQuickSelect = () => {
   const enabled = useStorage((s) => !!s.filters?.pokestops?.quests)
