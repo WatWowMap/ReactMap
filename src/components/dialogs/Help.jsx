@@ -2,7 +2,7 @@
 import * as React from 'react'
 
 import { useLayoutStore } from '@store/useLayoutStore'
-import { TutorialAdvanced } from '@features/tutorial/Advanced'
+import { TutorialAdvanced } from '@features/tutorial'
 
 import { DialogWrapper } from './DialogWrapper'
 

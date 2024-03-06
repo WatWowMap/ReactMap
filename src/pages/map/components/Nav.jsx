@@ -3,7 +3,6 @@ import * as React from 'react'
 
 import { Tutorial } from '@features/tutorial'
 import { UserProfile } from '@features/profile'
-import { Drawer } from '@features/drawer'
 import { Search } from '@features/search'
 import {
   Webhook,
@@ -21,7 +20,7 @@ import { AdvancedFilter } from '@components/filters/Advanced'
 import { BadgeSelection } from '@components/dialogs/BadgeSelection'
 import { SlotSelection } from '@components/filters/SlotSelection'
 import { HelpDialog } from '@components/dialogs/Help'
-import { PkmnFilterHelp } from '@features/drawer/PkmnFilterHelp'
+import { Drawer, PkmnFilterHelp } from '@features/drawer'
 import { useMemory } from '@store/useMemory'
 
 import { FloatingButtonsMemo } from './FloatingBtn'

@@ -74,3 +74,5 @@ export function Drawer() {
     </MuiDrawer>
   )
 }
+
+export * from './PkmnFilterHelp'
