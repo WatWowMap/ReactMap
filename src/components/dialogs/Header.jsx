@@ -10,7 +10,7 @@ import { Trans, useTranslation } from 'react-i18next'
  * @param {{
  *  names?: string[],
  *  titles: string | string[],
- *  action?: () => void,
+ *  action?: import('@mui/material').IconButtonProps['onClick']
  * }} props
  * @returns
  */

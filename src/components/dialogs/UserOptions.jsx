@@ -138,12 +138,12 @@ function BaseUserOptions() {
     <DialogWrapper
       open={open && type === 'options'}
       maxWidth="md"
-      onClose={toggleDialog(false, category, type)}
+      onClose={toggleDialog(false)}
       fullWidth={false}
     >
       <Header
         titles={[`${camelToSnake(category)}_options`]}
-        action={toggleDialog(false, category, 'options')}
+        action={toggleDialog(false)}
       />
       <DialogContent sx={{ minWidth: 'min(100vw, 350px)' }}>
         <List>

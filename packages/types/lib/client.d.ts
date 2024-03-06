@@ -2,7 +2,7 @@ import * as React from 'react'
 import type { ButtonProps, SxProps, Theme } from '@mui/material'
 import { SystemStyleObject } from '@mui/system'
 
-import UAssets from '@services/Assets'
+import { UAssets } from '@services/Assets'
 import { Config } from './config'
 import { AdvCategories, Permissions } from '@rm/types'
 

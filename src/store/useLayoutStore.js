@@ -28,8 +28,8 @@ import { useStorage } from './useStorage'
  *  },
  *  dialog: {
  *    open: boolean,
- *    category: import('@rm/types').AdvCategories | '',
- *    type: string,
+ *    category: keyof import('@rm/types').UIObject | 'notifications' | '',
+ *    type: 'options' | 'filters' | '',
  *  },
  *  gymBadge: {
  *   open: boolean,
@@ -71,19 +71,27 @@ export const useLayoutStore = create(() => ({
   },
 }))
 
-export const toggleDialog = (open, category, type, filter) => (event) => {
+/**
+ *
+ * @param {boolean} open
+ * @param {UseLayoutStore['dialog']['category']} [category]
+ * @param {UseLayoutStore['dialog']['type']} [type]
+ * @param {import('@rm/types').BaseFilter | import('@rm/types').PokemonFilter} [filter]
+ * @returns {() => void}
+ */
+export const toggleDialog = (open, category, type, filter) => () => {
   analytics(
     'Menu Toggle',
     `Open: ${open}`,
     `Category: ${category} Menu: ${type}`,
   )
-  if (
-    event.type === 'keydown' &&
-    (event.key === 'Tab' || event.key === 'Shift')
-  ) {
-    return
-  }
-  useLayoutStore.setState({ dialog: { open, category, type } })
+  useLayoutStore.setState((prev) => ({
+    dialog: {
+      open,
+      category: category || prev.dialog.category,
+      type: type || prev.dialog.type,
+    },
+  }))
   if (filter && type === 'filters') {
     useStorage.setState((prev) => ({
       filters: {

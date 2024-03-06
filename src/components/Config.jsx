@@ -13,6 +13,7 @@ import { getGlowRules } from '@utils/getGlowRules'
 import { useScannerSessionStorage } from '@features/scanner'
 import { timeCheck } from '@utils/timeCheck'
 import { analytics } from '@utils/analytics'
+import { checkHoliday } from '@features/holiday'
 
 export function Config({ children }) {
   const { t } = useTranslation()
@@ -126,7 +127,7 @@ export function Config({ children }) {
         timeOfDay: timeCheck(...location),
         config: {
           ...data.map,
-          holidayEffects: data.map.holidayEffects || [],
+          holidayEffects: (data.map.holidayEffects || []).filter(checkHoliday),
         },
         polling: data.api.polling,
         settings,

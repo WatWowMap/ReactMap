@@ -17,7 +17,7 @@ import { BasicListButton } from '@components/inputs/BasicListButton'
 import { BoolToggle } from '@components/inputs/BoolToggle'
 import { camelToSnake } from '@utils/camelToSnake'
 
-import { Settings } from './Settings'
+import { Settings } from './settings'
 import { PokemonDrawerMemo } from './Pokemon'
 import { AreaSection } from './areas'
 import { Extras } from './Extras'

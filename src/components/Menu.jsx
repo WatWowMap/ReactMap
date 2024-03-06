@@ -31,7 +31,7 @@ import { GenericSearch } from './inputs/GenericSearch'
  *  children: (index: number, key: string) => React.ReactNode
  *  categories?: import('@rm/types').Available[]
  *  title: string
- *  titleAction: () => void
+ *  titleAction: import('@mui/material').IconButtonProps['onClick'],
  *  extraButtons?: import('@components/dialogs/Footer').FooterButton[]
  * }} props
  */

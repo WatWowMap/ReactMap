@@ -11,11 +11,11 @@ export function HolidayEffects() {
 
   return (
     <>
-      {(Array.isArray(holidayEffects) ? holidayEffects : [])
-        .filter(checkHoliday)
-        .map((holiday) => (
-          <HolidayEffect key={holiday.name} {...holiday} />
-        ))}
+      {(Array.isArray(holidayEffects) ? holidayEffects : []).map((holiday) => (
+        <HolidayEffect key={holiday.name} {...holiday} />
+      ))}
     </>
   )
 }
+
+export { checkHoliday }

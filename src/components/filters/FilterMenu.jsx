@@ -19,7 +19,7 @@ export function FilterMenu() {
       /** @type {import('@components/dialogs/Footer').FooterButton[]} */ ([
         {
           name: 'close',
-          action: toggleDialog(false, category, 'filters'),
+          action: toggleDialog(false),
           color: 'secondary',
         },
       ]),
@@ -30,17 +30,17 @@ export function FilterMenu() {
     setTempFilters(filters?.filter)
   }, [category, filters?.filter])
 
-  if (!category || !type) return null
+  if (!category || !type || !tempFilters) return null
   return (
     <DialogWrapper
       open={open && type === 'filters' && !!tempFilters}
-      onClose={toggleDialog(false, category, type)}
+      onClose={toggleDialog(false)}
       maxWidth="md"
     >
       <Menu
         category={category}
         title={`${category}_filters`}
-        titleAction={toggleDialog(false, category, 'filters')}
+        titleAction={toggleDialog(false)}
         tempFilters={tempFilters}
         extraButtons={extraButtons}
       >
