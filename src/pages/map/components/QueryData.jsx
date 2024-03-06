@@ -5,7 +5,6 @@ import { useMap } from 'react-leaflet'
 
 import { useMemory } from '@store/useMemory'
 import { useStorage } from '@store/useStorage'
-import { usePermCheck } from '@hooks/usePermCheck'
 import { Query } from '@services/queries'
 import { getQueryArgs } from '@utils/getQueryArgs'
 import { RobustTimeout } from '@services/apollo/RobustTimeout'
@@ -16,6 +15,7 @@ import { useAnalytics } from '@hooks/useAnalytics'
 
 import { Clustering } from './Clustering'
 import { TILES } from '../tileObject'
+import { usePermCheck } from '../hooks/usePermCheck'
 
 /** @param {string} category */
 const userSettingsCategory = (category) => {

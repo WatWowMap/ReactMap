@@ -15,7 +15,6 @@ import { useSyncData } from '@features/webhooks'
 import { useMemory } from '@store/useMemory'
 import { useLayoutStore } from '@store/useLayoutStore'
 import { setDeepStore, useStorage } from '@store/useStorage'
-import { useWebhook } from '@hooks/useWebhook'
 import { ErrorBoundary } from '@components/ErrorBoundary'
 import { Img, TextWithIcon } from '@components/Img'
 import { Title } from '@components/popups/Title'
@@ -28,6 +27,8 @@ import { ExtraInfo } from '@components/popups/ExtraInfo'
 import { useAnalytics } from '@hooks/useAnalytics'
 import { getTimeUntil } from '@utils/getTimeUntil'
 import { formatInterval } from '@utils/formatInterval'
+
+import { useWebhook } from './useWebhook'
 
 /**
  *

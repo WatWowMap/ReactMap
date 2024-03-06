@@ -4,7 +4,8 @@ import { TileLayer, useMap } from 'react-leaflet'
 import { control } from 'leaflet'
 
 import { useStorage } from '@store/useStorage'
-import { useTileLayer } from '@hooks/useTileLayer'
+
+import { useTileLayer } from '../hooks/useTileLayer'
 
 export function ControlledTileLayer() {
   const layer = useTileLayer()
