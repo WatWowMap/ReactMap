@@ -6,7 +6,7 @@ import Autocomplete from '@mui/material/Autocomplete'
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
 import CircularProgress from '@mui/material/CircularProgress'
-import Grid from '@mui/material/Grid'
+import Grid from '@mui/material/Unstable_Grid2'
 import TextField from '@mui/material/TextField'
 import Typography from '@mui/material/Typography'
 import { useLazyQuery, useMutation } from '@apollo/client'
@@ -101,23 +101,22 @@ const Location = () => {
   ) : (
     <Grid
       container
-      item
       xs={12}
       justifyContent="center"
       alignItems="center"
       spacing={2}
     >
-      <Grid item xs={6} sm={2}>
+      <Grid xs={6} sm={2}>
         <Typography variant="h6" pl={1}>
           {t('location')}
         </Typography>
       </Grid>
-      <Grid item xs={6} sm={4} style={{ textAlign: 'center' }}>
+      <Grid xs={6} sm={4} textAlign="center">
         <Typography variant="body2">
           {[latitude ?? 0, longitude ?? 0].map((x) => x.toFixed(6)).join(', ')}
         </Typography>
       </Grid>
-      <Grid item xs={6} sm={3} style={{ textAlign: 'center' }}>
+      <Grid xs={6} sm={3} textAlign="center">
         <Button
           size="small"
           variant="contained"
@@ -128,7 +127,7 @@ const Location = () => {
           {t('my_location')}
         </Button>
       </Grid>
-      <Grid item xs={6} sm={3} style={{ textAlign: 'center' }}>
+      <Grid xs={6} sm={3} textAlign="center">
         <Button
           size="small"
           variant="contained"
@@ -138,7 +137,7 @@ const Location = () => {
           {t('choose_on_map')}
         </Button>
       </Grid>
-      <Grid item xs={12}>
+      <Grid xs={12}>
         <Autocomplete
           style={{ width: '100%' }}
           getOptionLabel={(option) =>

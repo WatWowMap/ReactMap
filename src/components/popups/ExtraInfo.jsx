@@ -1,8 +1,7 @@
 // @ts-check
 import * as React from 'react'
-import Grid from '@mui/material/Grid'
+import Grid from '@mui/material/Unstable_Grid2'
 import Typography from '@mui/material/Typography'
-
 import { useTranslation } from 'react-i18next'
 
 /**
@@ -14,14 +13,14 @@ export const ExtraInfo = ({ title, data, children }) => {
   const { t } = useTranslation()
 
   return (
-    <Grid container item xs={6} direction="column" textAlign="center">
+    <Grid container xs={6} direction="column" textAlign="center">
       {title && (
-        <Grid item>
+        <Grid>
           <Typography variant="subtitle2">{t(title)}:</Typography>
         </Grid>
       )}
       {data && (
-        <Grid item>
+        <Grid>
           <Typography variant="caption">{data}</Typography>
         </Grid>
       )}

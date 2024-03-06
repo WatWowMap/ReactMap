@@ -1,7 +1,7 @@
 import React from 'react'
 import Person from '@mui/icons-material/Person'
 import LockOpen from '@mui/icons-material/LockOpen'
-import Grid from '@mui/material/Grid'
+import Grid from '@mui/material/Unstable_Grid2'
 import Fab from '@mui/material/Fab'
 import Typography from '@mui/material/Typography'
 import DialogContent from '@mui/material/DialogContent'
@@ -50,21 +50,21 @@ export function TutorialWelcome() {
         alignItems="center"
         justifyContent="space-evenly"
         spacing={2}
-        style={{ height: '100%' }}
+        height="100%"
       >
-        <Grid item xs={12}>
-          <Typography variant="h4" align="center" style={{ margin: 10 }}>
+        <Grid xs={12}>
+          <Typography variant="h4" align="center" margin={2}>
             {t('welcome')} {document.title}!
           </Typography>
         </Grid>
 
-        <Grid item xs={6}>
+        <Grid xs={6}>
           <Typography variant="subtitle2" align="center">
             {t('tutorial_categories')}:
           </Typography>
         </Grid>
         {enableUserProfile && (
-          <Grid item xs={6}>
+          <Grid xs={6}>
             <Typography variant="h6" gutterBottom align="center">
               {!loggedIn && methods.length
                 ? t('login_optional')
@@ -72,12 +72,12 @@ export function TutorialWelcome() {
             </Typography>
           </Grid>
         )}
-        <Grid item xs={6}>
+        <Grid xs={6}>
           <Typography variant="h3" align="center">
             {permStatus}
           </Typography>
         </Grid>
-        <Grid item xs={6} style={{ textAlign: 'center' }}>
+        <Grid xs={6} textAlign="center">
           {(() => {
             if (!loggedIn && methods.length) {
               return (
@@ -97,7 +97,7 @@ export function TutorialWelcome() {
           })()}
         </Grid>
         {enableUserProfile && (
-          <Grid item xs={12} sm={10} style={{ marginTop: 10 }}>
+          <Grid xs={12} sm={10} marginTop={2}>
             <Typography variant="subtitle1" align="center">
               {!loggedIn && methods.length
                 ? t('tutorial_logged_out')
@@ -105,15 +105,15 @@ export function TutorialWelcome() {
             </Typography>
           </Grid>
         )}
-        <Grid item xs={12} sm={10} style={{ marginTop: 10 }}>
+        <Grid xs={12} sm={10} marginTop={2}>
           <Typography variant="subtitle1" align="center">
             {t('tutorial_language')}
           </Typography>
         </Grid>
-        <Grid item xs={12} sm={10} style={{ textAlign: 'center' }}>
+        <Grid xs={12} sm={10} textAlign="center">
           <LocaleSelection />
         </Grid>
-        <Grid item xs={12} sm={10} style={{ marginTop: 10 }}>
+        <Grid xs={12} sm={10} marginTop={2}>
           <Typography variant="subtitle1" align="center">
             {t('tutorial_welcome')}
           </Typography>

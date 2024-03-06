@@ -1,6 +1,6 @@
 // @ts-check
 import * as React from 'react'
-import Grid from '@mui/material/Grid'
+import Grid from '@mui/material/Unstable_Grid2'
 import Typography from '@mui/material/Typography'
 import { useTranslation } from 'react-i18next'
 
@@ -51,7 +51,7 @@ export function PortalPopup({ url, name, lat, lon, updated, imported }) {
         alignItems="center"
         spacing={1}
       >
-        <Grid item xs={12}>
+        <Grid xs={12}>
           <Typography
             variant={name.length > 20 ? 'subtitle2' : 'h6'}
             align="center"
@@ -61,7 +61,7 @@ export function PortalPopup({ url, name, lat, lon, updated, imported }) {
             {name}
           </Typography>
         </Grid>
-        <Grid item xs={12} style={{ textAlign: 'center' }}>
+        <Grid xs={12} textAlign="center">
           <a href={url} target="_blank" rel="noreferrer">
             <img
               src={src}
@@ -74,23 +74,23 @@ export function PortalPopup({ url, name, lat, lon, updated, imported }) {
             />
           </a>
         </Grid>
-        <Grid item xs={12} style={{ textAlign: 'center' }}>
+        <Grid xs={12} textAlign="center">
           {extraMetaData.map((meta) => (
             <React.Fragment key={meta.description}>
-              <Typography variant="subtitle1" style={{ textAlign: 'center' }}>
+              <Typography variant="subtitle1" textAlign="center">
                 {meta.description}
               </Typography>
-              <Typography variant="caption" style={{ textAlign: 'center' }}>
+              <Typography variant="caption" textAlign="center">
                 {meta.data}
               </Typography>
             </React.Fragment>
           ))}
         </Grid>
-        <Grid item xs={4} style={{ textAlign: 'center' }}>
+        <Grid xs={4} textAlign="center">
           <Navigation lat={lat} lon={lon} />
         </Grid>
         {enablePortalPopupCoords && (
-          <Grid item xs={12} style={{ textAlign: 'center' }}>
+          <Grid xs={12} textAlign="center">
             <Coords lat={lat} lon={lon} />
           </Grid>
         )}

@@ -1,6 +1,6 @@
 // @ts-check
 import * as React from 'react'
-import Grid from '@mui/material/Grid'
+import Grid from '@mui/material/Unstable_Grid2'
 import Typography from '@mui/material/Typography'
 import Button from '@mui/material/Button'
 import { useTranslation } from 'react-i18next'
@@ -20,17 +20,17 @@ export function ErrorPage() {
       alignItems="center"
       minHeight="100cqh"
     >
-      <Grid item>
+      <Grid>
         <Typography variant="h1" align="center">
           {error}
         </Typography>
       </Grid>
-      <Grid item>
+      <Grid>
         <Typography variant="h6" align="center">
           {t(`errors_${error}`)}
         </Typography>
       </Grid>
-      <Grid item style={{ paddingTop: 20 }}>
+      <Grid paddingTop={3}>
         <Button
           variant="contained"
           color="secondary"

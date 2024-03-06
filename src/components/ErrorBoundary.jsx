@@ -2,7 +2,7 @@
 /* eslint-disable no-bitwise */
 /* eslint-disable react/destructuring-assignment */
 import * as React from 'react'
-import Grid from '@mui/material/Grid'
+import Grid from '@mui/material/Unstable_Grid2'
 import Typography from '@mui/material/Typography'
 import Button from '@mui/material/Button'
 import Refresh from '@mui/icons-material/Refresh'
@@ -72,7 +72,7 @@ class ErrorCatcher extends React.Component {
         alignItems="center"
         style={this.props.style ?? defaultStyle}
       >
-        <Grid item xs={12}>
+        <Grid xs={12}>
           <Typography variant={this.props.variant || 'h3'} align="center">
             {this.props.t('react_error')}
           </Typography>

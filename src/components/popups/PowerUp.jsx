@@ -1,7 +1,7 @@
 // @ts-check
 import * as React from 'react'
 import Divider from '@mui/material/Divider'
-import Grid from '@mui/material/Grid'
+import Grid from '@mui/material/Unstable_Grid2'
 import Typography from '@mui/material/Typography'
 import { useTranslation } from 'react-i18next'
 import { capitalize } from '@mui/material/utils'

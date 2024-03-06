@@ -1,6 +1,6 @@
 // @ts-check
 import * as React from 'react'
-import Grid from '@mui/material/Grid'
+import Grid from '@mui/material/Unstable_Grid2'
 import Box from '@mui/material/Box'
 import Typography from '@mui/material/Typography'
 import IconButton from '@mui/material/IconButton'
@@ -53,7 +53,7 @@ export function UserGymBadges() {
       </Typography>
       <Grid container pt={1} pb={2}>
         {Object.entries(counts).map(([key, count], i) => (
-          <Grid key={key} item xs={4}>
+          <Grid key={key} xs={4}>
             <Typography
               variant="subtitle2"
               align="center"
@@ -78,7 +78,7 @@ function BadgeTile({ badge, ...gym }) {
   const badgeIcon = useMemory((s) => s.Icons.getMisc(`badge_${badge}`))
 
   return badge ? (
-    <Box className="vgrid-item" minHeight={200}>
+    <Box className="vgrid-" minHeight={200}>
       <IconButton
         className="vgrid-icon"
         disabled={gym.deleted}

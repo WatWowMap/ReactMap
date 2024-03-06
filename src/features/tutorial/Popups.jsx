@@ -3,7 +3,7 @@ import React from 'react'
 import DialogContent from '@mui/material/DialogContent'
 import Divider from '@mui/material/Divider'
 import Typography from '@mui/material/Typography'
-import Grid from '@mui/material/Grid'
+import Grid from '@mui/material/Unstable_Grid2'
 import { useTranslation } from 'react-i18next'
 
 import { useMemory } from '@store/useMemory'
@@ -24,9 +24,9 @@ export function TutorialPopup({ isMobile }) {
         justifyContent="center"
         alignItems="center"
         spacing={2}
-        style={{ height: '100%' }}
+        height="100%"
       >
-        <Grid item xs={12} style={{ whiteSpace: 'pre-line' }}>
+        <Grid xs={12} whiteSpace="pre-line">
           <Typography variant="h6" align="center" gutterBottom>
             {t('tutorial_popup_0')}
           </Typography>
@@ -35,17 +35,7 @@ export function TutorialPopup({ isMobile }) {
             {t('tutorial_popup_1')}
           </Typography>
         </Grid>
-        <Grid
-          item
-          xs={12}
-          sm={10}
-          style={{
-            textAlign: 'center',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}
-        >
+        <Grid xs={12} sm={10} className="flex-center" textAlign="center">
           <div className="leaflet-popup-content-wrapper" style={{ width: 230 }}>
             <div className="leaflet-popup-content">
               <PokemonPopup
@@ -63,7 +53,7 @@ export function TutorialPopup({ isMobile }) {
             </div>
           </div>
         </Grid>
-        <Grid item xs={12} style={{ whiteSpace: 'pre-line' }}>
+        <Grid xs={12} whiteSpace="pre-line">
           <Typography variant={size} align="center" gutterBottom>
             {t('tutorial_popup_2')}
           </Typography>

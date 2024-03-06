@@ -10,7 +10,7 @@ import DialogContent from '@mui/material/DialogContent'
 import Typography from '@mui/material/Typography'
 import Divider from '@mui/material/Divider'
 import Button from '@mui/material/Button'
-import Grid from '@mui/material/Grid'
+import Grid from '@mui/material/Unstable_Grid2'
 import Box from '@mui/material/Box'
 import { useTranslation } from 'react-i18next'
 
@@ -61,12 +61,12 @@ export function TutorialAdvanced({ toggleHelp, category }) {
         spacing={1}
         height="100%"
       >
-        <Grid item xs={12} style={{ textAlign: 'center' }}>
-          <Typography variant="caption" style={{ whiteSpace: 'pre-line' }}>
+        <Grid xs={12} textAlign="center">
+          <Typography variant="caption" whiteSpace="pre-line">
             {t('tutorial_toggle')}
           </Typography>
         </Grid>
-        <Grid item xs={12} sm={8}>
+        <Grid xs={12} sm={8}>
           <Box height={135}>
             <VirtualGrid data={tutorialData.tiles[localCategory]} xs={6}>
               {(_, key) => (
@@ -75,42 +75,42 @@ export function TutorialAdvanced({ toggleHelp, category }) {
             </VirtualGrid>
           </Box>
         </Grid>
-        <Grid item xs={12} style={{ textAlign: 'center' }}>
-          <Typography variant="caption" style={{ whiteSpace: 'pre-line' }}>
+        <Grid xs={12} textAlign="center">
+          <Typography variant="caption" whiteSpace="pre-line">
             {isPokemon
               ? t('tutorial_pokemon_caption')
               : t('tutorial_all_caption')}
           </Typography>
         </Grid>
-        <Grid item xs={12}>
+        <Grid xs={12}>
           <Divider light />
         </Grid>
-        <Grid item xs={3} sm={4} style={{ textAlign: 'center' }}>
+        <Grid xs={3} sm={4} textAlign="center">
           {isMobile ? <HelpOutline /> : <Typography>{t('help')}</Typography>}
         </Grid>
-        <Grid item xs={9} sm={8}>
+        <Grid xs={9} sm={8}>
           <Typography variant="subtitle2" align="center">
             {t('tutorial_help')}
           </Typography>
         </Grid>
-        <Grid item xs={3} sm={4} style={{ textAlign: 'center' }}>
+        <Grid xs={3} sm={4} textAlign="center">
           <Ballot />
         </Grid>
-        <Grid item xs={9} sm={8}>
+        <Grid xs={9} sm={8}>
           <Typography variant="subtitle2" align="center">
             {t('tutorial_adv_filter')}
           </Typography>
         </Grid>
         {isPokemon ? (
           <>
-            <Grid item xs={3} sm={4} style={{ textAlign: 'center' }}>
+            <Grid xs={3} sm={4} textAlign="center">
               {isMobile ? (
                 <Tune />
               ) : (
                 <Typography>{t('apply_to_all')}</Typography>
               )}
             </Grid>
-            <Grid item xs={9} sm={8}>
+            <Grid xs={9} sm={8}>
               <Typography variant="subtitle2" align="center">
                 {t('tutorial_tune')}
               </Typography>
@@ -118,14 +118,14 @@ export function TutorialAdvanced({ toggleHelp, category }) {
           </>
         ) : (
           <>
-            <Grid item xs={3} sm={4} style={{ textAlign: 'center' }}>
+            <Grid xs={3} sm={4} textAlign="center">
               {isMobile ? (
                 <FormatSize />
               ) : (
                 <Typography>{t('apply_to_all')}</Typography>
               )}
             </Grid>
-            <Grid item xs={9} sm={8}>
+            <Grid xs={9} sm={8}>
               <Typography variant="subtitle2" align="center">
                 {t('tutorial_format_size')}
               </Typography>
@@ -133,7 +133,6 @@ export function TutorialAdvanced({ toggleHelp, category }) {
           </>
         )}
         <Grid
-          item
           xs={3}
           sm={4}
           sx={(theme) => ({
@@ -143,13 +142,12 @@ export function TutorialAdvanced({ toggleHelp, category }) {
         >
           {isMobile ? <Clear /> : <Typography>{t('disable_all')}</Typography>}
         </Grid>
-        <Grid item xs={9} sm={8}>
+        <Grid xs={9} sm={8}>
           <Typography variant="subtitle2" align="center">
             {t('tutorial_clear')}
           </Typography>
         </Grid>
         <Grid
-          item
           xs={3}
           sm={4}
           sx={(theme) => ({
@@ -159,31 +157,31 @@ export function TutorialAdvanced({ toggleHelp, category }) {
         >
           {isMobile ? <Check /> : <Typography>{t('enable_all')}</Typography>}
         </Grid>
-        <Grid item xs={9} sm={8}>
+        <Grid xs={9} sm={8}>
           <Typography variant="subtitle2" align="center">
             {t('tutorial_check')}
           </Typography>
         </Grid>
-        <Grid item xs={3} sm={4} style={{ textAlign: 'center' }}>
+        <Grid xs={3} sm={4} textAlign="center">
           {isMobile ? (
             <Save color="secondary" />
           ) : (
             <Typography color="secondary">{t('save')}</Typography>
           )}
         </Grid>
-        <Grid item xs={9} sm={8}>
+        <Grid xs={9} sm={8}>
           <Typography variant="subtitle2" align="center">
             {t('tutorial_save')}
           </Typography>
         </Grid>
         {toggleHelp ? (
-          <Grid item xs={12} style={{ textAlign: 'right' }}>
+          <Grid xs={12} textAlign="right">
             <Button onClick={toggleHelp} color="secondary" size="small">
               {t('close')}
             </Button>
           </Grid>
         ) : (
-          <Grid item xs={12} style={{ textAlign: 'center' }}>
+          <Grid xs={12} textAlign="center">
             <Button
               onClick={handleSwitch}
               variant="contained"

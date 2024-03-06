@@ -3,7 +3,7 @@ import * as React from 'react'
 import ExpandMore from '@mui/icons-material/ExpandMore'
 import MoreVert from '@mui/icons-material/MoreVert'
 import Divider from '@mui/material/Divider'
-import Grid from '@mui/material/Grid'
+import Grid from '@mui/material/Unstable_Grid2'
 import IconButton from '@mui/material/IconButton'
 import Collapse from '@mui/material/Collapse'
 import Typography from '@mui/material/Typography'
@@ -77,7 +77,7 @@ export function PokestopPopup({
         width={200}
       >
         {!plainPokestop && (
-          <Grid item xs={3} style={{ textAlign: 'center' }}>
+          <Grid xs={3} textAlign="center">
             <HeaderImage
               alt={pokestop.name}
               url={pokestop.url}
@@ -85,7 +85,7 @@ export function PokestopPopup({
             />
           </Grid>
         )}
-        <Grid item xs={plainPokestop ? 10 : 7}>
+        <Grid xs={plainPokestop ? 10 : 7}>
           <Title backup={t('unknown_pokestop')}>{pokestop.name}</Title>
         </Grid>
         <MenuActions
@@ -94,7 +94,7 @@ export function PokestopPopup({
           hasLure={hasLure}
           {...pokestop}
         />
-        <Grid item xs={12} style={{ textAlign: 'center' }}>
+        <Grid xs={12} textAlign="center">
           {plainPokestop ? (
             <>
               <HeaderImage
@@ -460,7 +460,7 @@ const MenuActions = ({
     options.push({ name: 'timer', action: handleTimer })
   }
   return (
-    <Grid item xs={2} style={{ textAlign: 'right' }}>
+    <Grid xs={2} textAlign="right">
       <IconButton aria-haspopup="true" onClick={handleClick} size="large">
         <MoreVert />
       </IconButton>
@@ -484,7 +484,7 @@ const RewardInfo = ({ with_ar, ...quest }) => {
   const questMessage = useMemory((s) => s.config.misc.questMessage)
 
   return (
-    <Grid item xs={3} style={{ textAlign: 'center', position: 'relative' }}>
+    <Grid xs={3} style={{ textAlign: 'center', position: 'relative' }}>
       <NameTT id={tt}>
         <img
           src={src}
@@ -531,7 +531,7 @@ const QuestConditions = ({
 
   if (madQuestText && quest_task) {
     return (
-      <Grid item xs={9} textAlign="center">
+      <Grid xs={9} textAlign="center">
         <Typography variant="caption">{quest_task}</Typography>
       </Grid>
     )
@@ -541,7 +541,7 @@ const QuestConditions = ({
     const normalized = `quest_title_${quest_title.toLowerCase()}`
     if (i18n.exists(normalized)) {
       return (
-        <Grid item xs={9} textAlign="center">
+        <Grid xs={9} textAlign="center">
           <Typography variant="caption">
             <Trans i18nKey={normalized}>{{ amount_0: quest_target }}</Trans>
           </Typography>
@@ -618,7 +618,6 @@ const QuestConditions = ({
   }
   return (
     <Grid
-      item
       xs={9}
       style={{ textAlign: 'center', maxHeight: 150, overflow: 'auto' }}
     >
@@ -652,17 +651,11 @@ const Footer = ({ lat, lon }) => {
   const open = useStorage((s) => !!s.popups.extras)
 
   return (
-    <Grid
-      container
-      item
-      xs={12}
-      justifyContent="space-evenly"
-      alignItems="center"
-    >
-      <Grid item xs={3}>
+    <Grid container xs={12} justifyContent="space-evenly" alignItems="center">
+      <Grid xs={3}>
         <Navigation lat={lat} lon={lon} />
       </Grid>
-      <Grid item xs={3} textAlign="center">
+      <Grid xs={3} textAlign="center">
         <IconButton
           className={open ? 'expanded' : 'closed'}
           onClick={() =>
@@ -696,7 +689,7 @@ const ExtraInfo = ({ last_modified_timestamp, updated, lat, lon }) => {
         <TimeStamp time={updated}>last_seen</TimeStamp>
         <TimeStamp time={last_modified_timestamp}>last_modified</TimeStamp>
         {enablePokestopPopupCoords && (
-          <Grid item xs={12} textAlign="center">
+          <Grid xs={12} textAlign="center">
             <Coords lat={lat} lon={lon} />
           </Grid>
         )}
@@ -746,19 +739,19 @@ const Invasion = ({ grunt_type, confirmed, ...invasion }) => {
 
   return (
     <Grid container>
-      <Grid item xs={9}>
+      <Grid xs={9}>
         <Typography variant="h6" align="center">
           {t(`grunt_a_${grunt_type}`)}
         </Typography>
       </Grid>
-      <Grid item xs={3} style={{ alignItems: 'center', display: 'flex' }}>
+      <Grid xs={3} style={{ alignItems: 'center', display: 'flex' }}>
         {confirmed ? (
           <Check fontSize="medium" color="success" />
         ) : (
           <Help fontSize="medium" />
         )}
       </Grid>
-      <Grid item xs={12}>
+      <Grid xs={12}>
         <table className="table-invasion">
           <tbody>
             {Object.entries(info?.encounters || {}).map(
@@ -813,7 +806,7 @@ const Showcase = ({
   const { t } = useTranslation()
   return (
     <Grid container>
-      <Grid item xs={12}>
+      <Grid xs={12}>
         <Typography variant="h6" align="center">
           {t(
             `context_category_${showcase_ranking_standard}`,
@@ -821,25 +814,23 @@ const Showcase = ({
           )}
         </Typography>
       </Grid>
-      <Grid item xs={12}>
-        {children}
-      </Grid>
-      <Grid item xs={6}>
+      <Grid xs={12}>{children}</Grid>
+      <Grid xs={6}>
         <Typography variant="subtitle2" align="center">
           {t(`total_entries`, 'Total Entries')}:
         </Typography>
       </Grid>
-      <Grid item xs={6}>
+      <Grid xs={6}>
         <Typography variant="subtitle2" align="center">
           {total_entries} / 200 {/* TODO: Read from GM */}
         </Typography>
       </Grid>
-      <Grid item xs={6}>
+      <Grid xs={6}>
         <Typography variant="subtitle2" align="center">
           {t(`last_updated`, 'Last Updated')}:
         </Typography>
       </Grid>
-      <Grid item xs={6}>
+      <Grid xs={6}>
         <TimeSince expireTime={last_update} />
       </Grid>
     </Grid>

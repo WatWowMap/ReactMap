@@ -6,7 +6,7 @@ import AccordionDetails from '@mui/material/AccordionDetails'
 import AccordionSummary from '@mui/material/AccordionSummary'
 import CircularProgress from '@mui/material/CircularProgress'
 import Divider from '@mui/material/Divider'
-import Grid from '@mui/material/Grid'
+import Grid from '@mui/material/Unstable_Grid2'
 import InputAdornment from '@mui/material/InputAdornment'
 import MenuItem from '@mui/material/MenuItem'
 import Paper from '@mui/material/Paper'
@@ -543,7 +543,6 @@ export function WebhookAdvanced() {
           .map((option, i) => (
             <Grid
               key={option.name}
-              item
               xs={12}
               sm={option.size || 6}
               style={isMobile ? { marginTop: i ? 'inherit' : 10 } : {}}
@@ -561,7 +560,6 @@ export function WebhookAdvanced() {
           .map((option) => (
             <Grid
               key={option.name}
-              item
               xs={option.xs || 6}
               sm={option.sm || size}
               style={{ margin: '10px 0', textAlign: 'center' }}
@@ -583,7 +581,6 @@ export function WebhookAdvanced() {
           <Grid
             key={option.name}
             container
-            item
             xs={option.xs || 6}
             sm={option.sm || size}
             justifyContent="center"
@@ -591,12 +588,12 @@ export function WebhookAdvanced() {
             direction={isMobile || option.override ? 'row' : 'column'}
             style={{ margin: '10px 0' }}
           >
-            <Grid item xs={6} style={{ textAlign: 'center' }}>
+            <Grid xs={6} textAlign="center">
               <Typography variant="subtitle2">
                 {t(camelToSnake(option.name))}
               </Typography>
             </Grid>
-            <Grid item xs={6} style={{ textAlign: 'center' }}>
+            <Grid xs={6} textAlign="center">
               <Switch
                 name={option.name}
                 color="primary"
@@ -611,7 +608,6 @@ export function WebhookAdvanced() {
         return options.map((option) => (
           <Grid
             key={option.name}
-            item
             xs={option.xs || 6}
             sm={option.sm || size}
             style={{ margin: '10px 0', textAlign: 'center' }}
@@ -658,14 +654,13 @@ export function WebhookAdvanced() {
         return options.map((option) => (
           <Grid
             key={option.name}
-            item
             container
             xs={option.xs}
             sm={option.sm}
             justifyContent="center"
             alignItems="center"
           >
-            <Grid item xs={11}>
+            <Grid xs={11}>
               <Autocomplete
                 style={{ width: '100%' }}
                 getOptionLabel={(x) => x.formatted}
@@ -713,10 +708,10 @@ export function WebhookAdvanced() {
                 )}
                 renderOption={(props, x) => (
                   <Grid container alignItems="center" spacing={1} {...props}>
-                    <Grid item xs={12}>
+                    <Grid xs={12}>
                       <Typography variant="subtitle2">{x.name}</Typography>
                     </Grid>
-                    <Grid item xs={12}>
+                    <Grid xs={12}>
                       <Typography variant="caption">{x.formatted}</Typography>
                     </Grid>
                     <Divider
@@ -736,7 +731,6 @@ export function WebhookAdvanced() {
           <Grid
             key={type}
             container
-            item
             xs={12}
             justifyContent="center"
             alignItems="center"

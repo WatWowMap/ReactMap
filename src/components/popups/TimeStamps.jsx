@@ -1,6 +1,6 @@
 // @ts-check
 import * as React from 'react'
-import Grid from '@mui/material/Grid'
+import Grid from '@mui/material/Unstable_Grid2'
 import { useTranslation } from 'react-i18next'
 
 import { TimeSince } from './Timer'
@@ -24,7 +24,7 @@ export const TimeStamp = ({ time, children }) => {
 
   return (
     <ExtraInfo title={children} data={formatter.format(time * 1000)}>
-      <Grid item>
+      <Grid>
         <TimeSince expireTime={time} />
       </Grid>
     </ExtraInfo>

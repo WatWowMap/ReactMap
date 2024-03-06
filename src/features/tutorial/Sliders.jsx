@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import DialogContent from '@mui/material/DialogContent'
 import Typography from '@mui/material/Typography'
-import Grid from '@mui/material/Grid'
+import Grid from '@mui/material/Unstable_Grid2'
 import Divider from '@mui/material/Divider'
 import { useTranslation, Trans } from 'react-i18next'
 
@@ -49,9 +49,9 @@ export function TutorialSliders() {
         direction="row"
         alignItems="center"
         justifyContent="center"
-        style={{ height: '100%' }}
+        height="100%"
       >
-        <Grid item xs={12} style={{ margin: 5 }}>
+        <Grid xs={12} m={5}>
           <Typography variant="h6" align="center" gutterBottom>
             {t('tutorial_sliders_0')}
           </Typography>
@@ -61,10 +61,10 @@ export function TutorialSliders() {
           direction="row"
           justifyContent="center"
           alignItems="center"
-          style={{ width: 300 }}
+          width={300}
         >
           {slidersToUse.map((slider) => (
-            <Grid item xs={12} key={slider.name}>
+            <Grid xs={12} key={slider.name}>
               <SliderTile
                 slide={slider}
                 handleChange={handleChange}
@@ -73,7 +73,7 @@ export function TutorialSliders() {
             </Grid>
           ))}
         </Grid>
-        <Grid item xs={12} style={{ textAlign: 'center' }}>
+        <Grid xs={12} textAlign="center">
           <Typography variant="h6">{t('tutorial_sliders_1')}</Typography>
           {fullCheck.iv && (
             <Typography variant="subtitle2" color="secondary">
@@ -127,10 +127,10 @@ export function TutorialSliders() {
             <Typography variant="caption">{t('tutorial_sliders_9')}</Typography>
           )}
         </Grid>
-        <Grid item xs={12}>
+        <Grid xs={12}>
           <Divider light style={{ margin: 10 }} />
         </Grid>
-        <Grid item xs={12} style={{ textAlign: 'center' }}>
+        <Grid xs={12} textAlign="center">
           <Typography variant="subtitle2" color="secondary">
             {t('tutorial_sliders_6')}
           </Typography>

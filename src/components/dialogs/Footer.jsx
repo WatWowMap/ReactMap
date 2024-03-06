@@ -3,7 +3,7 @@ import * as React from 'react'
 import IconButton from '@mui/material/IconButton'
 import Button from '@mui/material/Button'
 import Typography from '@mui/material/Typography'
-import Grid from '@mui/material/Grid'
+import Grid from '@mui/material/Unstable_Grid2'
 import Replay from '@mui/icons-material/Replay'
 import Save from '@mui/icons-material/Save'
 import Add from '@mui/icons-material/Add'
@@ -75,7 +75,6 @@ export function Footer({ options, role }) {
         if (button.component) {
           return (
             <Grid
-              item
               key={button.key}
               xs={actualSize}
               style={{ textAlign: button.align || 'center' }}
@@ -93,16 +92,11 @@ export function Footer({ options, role }) {
 
         return (
           <Grid
-            item
             xs={actualSize}
             sm={+t(`${role}_key_width`) || actualSize}
             key={key}
-            style={{
-              textAlign: button.align || 'center',
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'center',
-            }}
+            textAlign={button.align || 'center'}
+            className="flex-center"
           >
             {MuiIcon && (
               <IconButton

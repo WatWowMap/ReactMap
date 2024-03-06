@@ -9,7 +9,7 @@ import Typography from '@mui/material/Typography'
  */
 export function Coords({ lat, lon }) {
   return (
-    <Typography variant="caption" style={{ textAlign: 'center' }}>
+    <Typography variant="caption" textAlign="center">
       🎯 {lat}, {lon}
     </Typography>
   )

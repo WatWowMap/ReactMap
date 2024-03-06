@@ -27,7 +27,7 @@ export function FCSelect({
       <InputLabel>{label}</InputLabel>
       <Select
         autoFocus
-        value={value || ''}
+        value={value ?? ''}
         fullWidth={fullWidth}
         label={label}
         size={size}

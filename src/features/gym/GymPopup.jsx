@@ -2,7 +2,7 @@
 import * as React from 'react'
 import ExpandMore from '@mui/icons-material/ExpandMore'
 import MoreVert from '@mui/icons-material/MoreVert'
-import Grid from '@mui/material/Grid'
+import Grid from '@mui/material/Unstable_Grid2'
 import IconButton from '@mui/material/IconButton'
 import Menu from '@mui/material/Menu'
 import MenuItem from '@mui/material/MenuItem'
@@ -17,7 +17,7 @@ import { useLayoutStore } from '@store/useLayoutStore'
 import { setDeepStore, useStorage } from '@store/useStorage'
 import { useWebhook } from '@hooks/useWebhook'
 import { ErrorBoundary } from '@components/ErrorBoundary'
-import { TextWithIcon } from '@components/Img'
+import { Img, TextWithIcon } from '@components/Img'
 import { Title } from '@components/popups/Title'
 import { PowerUp } from '@components/popups/PowerUp'
 import { GenderIcon } from '@components/popups/GenderIcon'
@@ -55,12 +55,12 @@ export function GymPopup({ hasRaid, hasHatched, raidIconUrl, ...gym }) {
         alignItems="center"
         width={200}
       >
-        <Grid item xs={10}>
+        <Grid xs={10}>
           <Title backup={t('unknown_gym')}>{gym.name}</Title>
         </Grid>
         <MenuActions hasRaid={hasRaid} {...gym} />
         {perms.gyms && (
-          <Grid item xs={12}>
+          <Grid xs={12}>
             <Collapse
               in={!popups.raids || !hasRaid}
               timeout="auto"
@@ -80,7 +80,7 @@ export function GymPopup({ hasRaid, hasHatched, raidIconUrl, ...gym }) {
           </Grid>
         )}
         {perms.raids && (
-          <Grid item xs={12}>
+          <Grid xs={12}>
             <Collapse in={popups.raids && hasRaid} timeout="auto" unmountOnExit>
               <Grid
                 container
@@ -132,7 +132,7 @@ const MenuActions = ({ hasRaid, ...gym }) => {
   const handleClose = React.useCallback(() => setAnchorEl(null), [])
 
   return (
-    <Grid item xs={2} textAlign="right">
+    <Grid xs={2} textAlign="right">
       <IconButton aria-haspopup="true" onClick={handleClick} size="large">
         <MoreVert />
       </IconButton>
@@ -267,17 +267,15 @@ const PoiImage = ({ url, team_id, name, badge }) => {
   const src = url ? url.replace('http://', 'https://') : Icons.getTeams(team_id)
 
   return (
-    <Grid item xs={6}>
-      <img
+    <Grid xs={6}>
+      <Img
         src={src}
         alt={name || 'unknown'}
         className={`${
           badge ? `badge badge-${badge}` : `circle-image team-${team_id}`
         }`}
-        style={{
-          maxHeight: 75,
-          maxWidth: 75,
-        }}
+        maxHeight={75}
+        maxWidth={75}
       />
     </Grid>
   )
@@ -313,24 +311,11 @@ const RaidImage = ({
   }
 
   return (
-    <Grid container item xs={5} justifyContent="center" alignItems="center">
-      <Grid
-        item
-        xs={12}
-        style={{
-          textAlign: 'center',
-        }}
-      >
-        <img
-          src={raidIconUrl}
-          alt={raidIconUrl}
-          style={{
-            maxHeight: 50,
-            maxWidth: 50,
-          }}
-        />
+    <Grid container xs={5} justifyContent="center" alignItems="center">
+      <Grid xs={12} textAlign="center">
+        <Img src={raidIconUrl} alt={raidIconUrl} maxHeight={50} maxWidth={50} />
       </Grid>
-      <Grid item xs={12} style={{ textAlign: 'center' }}>
+      <Grid xs={12} textAlign="center">
         <Typography variant="caption">
           {t(`raid_${raid_level}`)} ({raid_level})
         </Typography>
@@ -338,19 +323,16 @@ const RaidImage = ({
       {raid_pokemon_id > 0 &&
         getRaidTypes(raid_pokemon_id, raid_pokemon_form).map((type) => (
           <Grid
-            item
             key={type}
             xs={4}
             className="grid-item"
-            style={{
-              height: 15,
-              width: 15,
-              backgroundImage: `url(${Icons.getTypes(type)})`,
-            }}
+            height={15}
+            width={15}
+            style={{ backgroundImage: `url(${Icons.getTypes(type)})` }}
           />
         ))}
       {!!raid_pokemon_gender && (
-        <Grid item xs={4} style={{ textAlign: 'center' }}>
+        <Grid xs={4} textAlign="center">
           <GenderIcon gender={raid_pokemon_gender} />
         </Grid>
       )}
@@ -377,7 +359,6 @@ const GymInfo = ({
 
   return (
     <Grid
-      item
       xs={5}
       container
       direction="row"
@@ -385,20 +366,20 @@ const GymInfo = ({
       alignItems="center"
     >
       {!!badge && (
-        <Grid item xs={12}>
+        <Grid xs={12}>
           <Typography variant="h6" align="center" className={`badge_${badge}`}>
             {t(`badge_${badge}`)}
           </Typography>
         </Grid>
       )}
       {updated > gymValidDataLimit && (
-          <Grid item xs={12}>
+          <Grid xs={12}>
             <Typography variant="h6" align="center">
               {t(`team_${team_id}`)}
             </Typography>
           </Grid>
         ) && (
-          <Grid item xs={12}>
+          <Grid xs={12}>
             <Typography variant="h6" align="center">
               {available_slots} {t('slots')}
             </Typography>
@@ -406,7 +387,6 @@ const GymInfo = ({
         )}
       {ex_raid_eligible && (
         <Grid
-          item
           xs={4}
           className="grid-item"
           style={{
@@ -418,7 +398,6 @@ const GymInfo = ({
       )}
       {ar_scan_eligible && (
         <Grid
-          item
           xs={4}
           className="grid-item"
           style={{
@@ -429,7 +408,6 @@ const GymInfo = ({
         />
       )}
       <Grid
-        item
         xs={4}
         style={{
           height: 24,
@@ -480,19 +458,13 @@ const RaidInfo = ({
   }
 
   return (
-    <Grid
-      item
-      xs={6}
-      container
-      justifyContent="space-around"
-      alignItems="center"
-    >
-      <Grid item xs={12}>
+    <Grid xs={6} container justifyContent="space-around" alignItems="center">
+      <Grid xs={12}>
         <Typography variant="h6" align="center">
           {getRaidName(raid_level, raid_pokemon_id)}
         </Typography>
       </Grid>
-      <Grid item xs={12} style={{ paddingBottom: 4, textAlign: 'center' }}>
+      <Grid xs={12} style={{ paddingBottom: 4, textAlign: 'center' }}>
         <Typography variant="caption" align="center">
           {getRaidForm(
             raid_pokemon_id,
@@ -503,7 +475,6 @@ const RaidInfo = ({
       </Grid>
       {raid_pokemon_move_1 && raid_pokemon_move_1 !== 1 && (
         <Grid
-          item
           xs={2}
           className="grid-item"
           style={{
@@ -516,14 +487,13 @@ const RaidInfo = ({
           }}
         />
       )}
-      <Grid item xs={10} style={{ textAlign: 'center' }}>
+      <Grid xs={10} textAlign="center">
         <Typography variant="caption" align="center">
           {t(`move_${raid_pokemon_move_1}`)}
         </Typography>
       </Grid>
       {raid_pokemon_move_2 && raid_pokemon_move_2 !== 2 && (
         <Grid
-          item
           xs={2}
           className="grid-item"
           style={{
@@ -536,7 +506,7 @@ const RaidInfo = ({
           }}
         />
       )}
-      <Grid item xs={10} style={{ textAlign: 'center' }}>
+      <Grid xs={10} textAlign="center">
         <Typography variant="caption" align="center">
           {t(`move_${raid_pokemon_move_2}`)}
         </Typography>
@@ -579,11 +549,7 @@ const Timer = ({
   })
 
   return target ? (
-    <Grid
-      item
-      xs={start && !raid_pokemon_id ? 6 : 12}
-      style={{ textAlign: 'center' }}
-    >
+    <Grid xs={start && !raid_pokemon_id ? 6 : 12} textAlign="center">
       <Typography variant="subtitle1">
         {t(start ? 'starts' : 'ends')}:{' '}
         {new Date(target).toLocaleTimeString(
@@ -623,7 +589,7 @@ const GymFooter = ({ lat, lon, hasRaid }) => {
   return (
     <>
       {hasRaid && perms.raids && perms.gyms && (
-        <Grid item xs={4}>
+        <Grid xs={4}>
           <IconButton onClick={() => handleExpandClick('raids')} size="large">
             <img
               src={useMemory
@@ -637,11 +603,11 @@ const GymFooter = ({ lat, lon, hasRaid }) => {
           </IconButton>
         </Grid>
       )}
-      <Grid item xs={4} style={{ textAlign: 'center' }}>
+      <Grid xs={4} textAlign="center">
         <Navigation lat={lat} lon={lon} />
       </Grid>
       {perms.gyms && (
-        <Grid item xs={4}>
+        <Grid xs={4}>
           <IconButton
             className={popups.extras ? 'expanded' : 'closed'}
             onClick={() => handleExpandClick('extras')}
@@ -696,7 +662,7 @@ const ExtraGymInfo = ({
       <TimeStamp time={updated}>last_seen</TimeStamp>
       <TimeStamp time={last_modified_timestamp}>last_modified</TimeStamp>
       {enableGymPopupCoords && (
-        <Grid item xs={12} style={{ textAlign: 'center' }}>
+        <Grid xs={12} textAlign="center">
           <Coords lat={lat} lon={lon} />
         </Grid>
       )}

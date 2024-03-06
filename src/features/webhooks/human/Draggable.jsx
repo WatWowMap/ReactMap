@@ -2,7 +2,7 @@
 import * as React from 'react'
 import Button from '@mui/material/Button'
 import FormControl from '@mui/material/FormControl'
-import Grid from '@mui/material/Grid'
+import Grid from '@mui/material/Unstable_Grid2'
 import InputAdornment from '@mui/material/InputAdornment'
 import OutlinedInput from '@mui/material/OutlinedInput'
 import Typography from '@mui/material/Typography'
@@ -71,12 +71,12 @@ export function WebhookMarker() {
             direction="column"
             spacing={2}
           >
-            <Grid item>
+            <Grid>
               <Typography variant="subtitle2" align="center">
                 {t('drag_and_drop')}
               </Typography>
             </Grid>
-            <Grid item style={{ textAlign: 'center' }}>
+            <Grid textAlign="center">
               <FormControl variant="outlined">
                 <OutlinedInput
                   value={radius}
@@ -91,7 +91,7 @@ export function WebhookMarker() {
               </FormControl>
               <Typography variant="caption">{t('distance_radius')}</Typography>
             </Grid>
-            <Grid item>
+            <Grid>
               <Button
                 color="secondary"
                 variant="contained"

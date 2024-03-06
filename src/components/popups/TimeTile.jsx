@@ -1,7 +1,7 @@
 // @ts-check
 import * as React from 'react'
 import Collapse from '@mui/material/Collapse'
-import Grid from '@mui/material/Grid'
+import Grid from '@mui/material/Unstable_Grid2'
 import IconButton from '@mui/material/IconButton'
 import Typography from '@mui/material/Typography'
 import ExpandMore from '@mui/icons-material/ExpandMore'
@@ -43,7 +43,7 @@ export function TimeTile({
   return (
     <>
       {icon && (
-        <Grid item xs={size} style={{ textAlign: 'center' }}>
+        <Grid xs={size} textAlign="center">
           {typeof icon === 'string' ? (
             <NameTT id={disabled || tt}>
               <img
@@ -69,9 +69,8 @@ export function TimeTile({
       )}
       {endTime && (
         <Grid
-          item
           xs={icon ? (children ? 10 : 12) - size : children ? 10 : 12}
-          style={{ textAlign: 'center' }}
+          textAlign="center"
         >
           <TimeSince
             expireTime={expireTime}
@@ -90,7 +89,7 @@ export function TimeTile({
       )}
       {expandKey && children && (
         <>
-          <Grid item xs={2}>
+          <Grid xs={2}>
             <IconButton
               disabled={!!disabled}
               className={expanded ? 'expanded' : 'closed'}

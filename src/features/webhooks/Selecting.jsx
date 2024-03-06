@@ -1,6 +1,6 @@
 // @ts-check
 import * as React from 'react'
-import Grid from '@mui/material/Grid'
+import Grid from '@mui/material/Unstable_Grid2'
 import Fab from '@mui/material/Fab'
 import Slide from '@mui/material/Slide'
 import Typography from '@mui/material/Typography'
@@ -58,7 +58,7 @@ export function Selecting() {
         left={0}
         right={0}
       >
-        <Grid item xs={3} sm={2} textAlign="center">
+        <Grid xs={3} sm={2} textAlign="center">
           <Fab
             size="small"
             color="secondary"
@@ -68,7 +68,7 @@ export function Selecting() {
             <Typography variant="caption">{t('cancel')}</Typography>
           </Fab>
         </Grid>
-        <Grid item xs={4} sm={3} md={2} textAlign="center">
+        <Grid xs={4} sm={3} md={2} textAlign="center">
           <Fab
             size="small"
             color="secondary"
@@ -78,7 +78,7 @@ export function Selecting() {
             <Typography variant="caption">{t('select_all')}</Typography>
           </Fab>
         </Grid>
-        <Grid item xs={5} sm={4} md={3} textAlign="center">
+        <Grid xs={5} sm={4} md={3} textAlign="center">
           <Fab
             size="small"
             color="primary"

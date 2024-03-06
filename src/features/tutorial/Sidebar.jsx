@@ -2,7 +2,7 @@ import * as React from 'react'
 import Menu from '@mui/icons-material/Menu'
 import Settings from '@mui/icons-material/Settings'
 import TuneIcon from '@mui/icons-material/Tune'
-import Grid from '@mui/material/Grid'
+import Grid from '@mui/material/Unstable_Grid2'
 import Fab from '@mui/material/Fab'
 import Divider from '@mui/material/Divider'
 import List from '@mui/material/List'
@@ -46,27 +46,27 @@ export function TutorialSidebar() {
         alignItems="center"
         justifyContent="center"
         spacing={2}
-        style={{ height: '100%' }}
+        height="100%"
       >
-        <Grid item xs={8} style={{ textAlign: 'center' }}>
+        <Grid xs={8} textAlign="center">
           <Typography variant={isMobile ? 'subtitle2' : 'h6'} align="center">
             {t('tutorial_sidebar_0')}
           </Typography>
         </Grid>
-        <Grid item xs={4} style={{ textAlign: 'center' }}>
+        <Grid xs={4} textAlign="center">
           <Fab color="primary">
             <Menu />
           </Fab>
         </Grid>
-        <Grid item xs={12}>
+        <Grid xs={12}>
           <Divider light />
         </Grid>
-        <Grid item xs={12} style={{ whiteSpace: 'pre-line' }}>
+        <Grid xs={12} whiteSpace="pre-line">
           <Typography variant="subtitle1" align="center" gutterBottom>
             {t('tutorial_sidebar_1')}
           </Typography>
         </Grid>
-        <Grid item xs={12}>
+        <Grid xs={12}>
           <List disablePadding>
             {Object.keys(tutorialData.filters).map((subItem) => {
               if (subItem === 'filter') {
@@ -107,7 +107,7 @@ export function TutorialSidebar() {
             </ListItemButton>
           </List>
         </Grid>
-        <Grid item xs={12} style={{ whiteSpace: 'pre-line' }}>
+        <Grid xs={12} whiteSpace="pre-line">
           <Typography variant="subtitle1" align="center" gutterBottom>
             {t('tutorial_sidebar_2')}
           </Typography>

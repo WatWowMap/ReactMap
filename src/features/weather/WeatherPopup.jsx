@@ -1,6 +1,6 @@
 // @ts-check
 import * as React from 'react'
-import Grid from '@mui/material/Grid'
+import Grid from '@mui/material/Unstable_Grid2'
 import Typography from '@mui/material/Typography'
 import { useTranslation } from 'react-i18next'
 
@@ -37,24 +37,24 @@ export function WeatherPopup({ gameplay_condition, updated }) {
         alignItems="center"
         style={{ width: 150 }}
       >
-        <Grid item xs={12}>
+        <Grid xs={12}>
           <Typography variant="h6" align="center">
             {t(`weather_${gameplay_condition}`)}
           </Typography>
         </Grid>
-        <Grid item xs={12}>
+        <Grid xs={12}>
           <Typography variant="subtitle2" align="center">
             {t('last_updated')}:
           </Typography>
         </Grid>
         <Timer updated={updated} />
-        <Grid item xs={12}>
+        <Grid xs={12}>
           <Typography variant="subtitle2" align="center">
             {t('boosted_types')}:
           </Typography>
         </Grid>
         {weatherTypes.map((type) => (
-          <Grid item xs={4} key={type} style={{ textAlign: 'center' }}>
+          <Grid xs={4} key={type} textAlign="center">
             <Typography variant="caption">{t(`poke_type_${type}`)}</Typography>
             <img
               src={Icons.getTypes(type)}
@@ -97,7 +97,7 @@ const Timer = ({ updated, ts = Date.now() / 1000 }) => {
 
   return (
     <>
-      <Grid item xs={timer.diff > 60 ? 12 : 8}>
+      <Grid xs={timer.diff > 60 ? 12 : 8}>
         <Typography
           variant="subtitle2"
           align="center"
@@ -107,7 +107,7 @@ const Timer = ({ updated, ts = Date.now() / 1000 }) => {
           {dayCheck(ts, updated)}
         </Typography>
       </Grid>
-      <Grid item xs={timer.diff > 60 ? 12 : 4}>
+      <Grid xs={timer.diff > 60 ? 12 : 4}>
         <Typography
           variant="subtitle2"
           align="center"

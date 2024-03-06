@@ -1,7 +1,7 @@
 // @ts-check
-import React, { useState } from 'react'
+import * as React from 'react'
 import MoreVert from '@mui/icons-material/MoreVert'
-import Grid from '@mui/material/Grid'
+import Grid from '@mui/material/Unstable_Grid2'
 import Typography from '@mui/material/Typography'
 import IconButton from '@mui/material/IconButton'
 import Menu from '@mui/material/Menu'
@@ -18,6 +18,7 @@ import { NestSubmission } from '@components/dialogs/NestSubmission'
 import { getTimeUntil } from '@utils/getTimeUntil'
 import { useAnalytics } from '@hooks/useAnalytics'
 
+/** @param {number} timeSince */
 const getColor = (timeSince) => {
   let color = 'success'
   if (timeSince > 604800) {
@@ -51,8 +52,8 @@ export function NestPopup({
   const { t } = useTranslation()
   const { perms, loggedIn } = useMemory((s) => s.auth)
 
-  const [parkName, setParkName] = useState(true)
-  const [anchorEl, setAnchorEl] = useState(null)
+  const [parkName, setParkName] = React.useState(true)
+  const [anchorEl, setAnchorEl] = React.useState(null)
 
   const lastUpdated = getTimeUntil(updated * 1000)
 
@@ -91,7 +92,7 @@ export function NestPopup({
         style={{ width: 200 }}
         spacing={1}
       >
-        <Grid item xs={9} style={{ textAlign: 'center' }}>
+        <Grid xs={9} textAlign="center">
           <Typography
             variant={name.length > 20 ? 'subtitle2' : 'h6'}
             align="center"
@@ -111,7 +112,7 @@ export function NestPopup({
             </Typography>
           )}
         </Grid>
-        <Grid item xs={3}>
+        <Grid xs={3}>
           <IconButton aria-haspopup="true" onClick={handleClick} size="large">
             <MoreVert />
           </IconButton>
@@ -134,7 +135,7 @@ export function NestPopup({
             </MenuItem>
           ))}
         </Menu>
-        <Grid item xs={6} style={{ textAlign: 'center' }}>
+        <Grid xs={6} textAlign="center">
           <img
             src={iconUrl}
             alt={iconUrl}
@@ -146,7 +147,7 @@ export function NestPopup({
           <br />
           <Typography variant="caption">{t(`poke_${pokemon_id}`)}</Typography>
         </Grid>
-        <Grid item xs={6} style={{ textAlign: 'center' }}>
+        <Grid xs={6} textAlign="center">
           <Typography variant="subtitle2">{t('last_updated')}</Typography>
           <Typography
             variant={lastUpdated.str.includes('D') ? 'h6' : 'subtitle2'}
@@ -160,10 +161,10 @@ export function NestPopup({
             ~{pokemon_avg} {t('spawns_per_hour')}
           </Typography>
         </Grid>
-        <Grid item xs={12}>
+        <Grid xs={12}>
           <Divider style={{ margin: 4 }} />
         </Grid>
-        <Grid item xs={12} style={{ textAlign: 'center' }}>
+        <Grid xs={12} textAlign="center">
           {recent ? (
             <Typography variant="caption">
               {t('nest_estimated')}
@@ -178,7 +179,7 @@ export function NestPopup({
             </Typography>
           )}
         </Grid>
-        <Grid item xs={12} style={{ textAlign: 'center' }}>
+        <Grid xs={12} textAlign="center">
           <Button
             color="secondary"
             variant="outlined"
