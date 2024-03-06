@@ -18,7 +18,7 @@ import { BoolToggle } from '@components/inputs/BoolToggle'
 import { camelToSnake } from '@utils/strings'
 
 import { Settings } from './settings'
-import { PokemonDrawerMemo } from './Pokemon'
+import { PokemonDrawerMemo } from './pokemon'
 import { AreaSection } from './areas'
 import { Extras } from './Extras'
 

@@ -75,4 +75,4 @@ export function Drawer() {
   )
 }
 
-export * from './PkmnFilterHelp'
+export * from './pokemon/FilterHelp'

@@ -10,23 +10,29 @@ import Select from '@mui/material/Select'
 const SX = { margin: '3px 0' }
 
 /**
- * @param {import('@mui/material').SelectProps & { variant?: import('@mui/material').FormControlProps['variant'], fcSx?: import('@mui/material').SxProps }} props
- * @returns
+ * @typedef {import('@mui/material').SelectProps & { variant?: import('@mui/material').FormControlProps['variant'], fcSx?: import('@mui/material').SxProps }} FCSelectProps
+ * @typedef {FCSelectProps & { icon?: React.ReactElement }} FCSelectListItemProps
  */
-export function FCSelect({
-  children,
-  value,
-  label,
-  size = 'small',
-  fcSx = SX,
-  fullWidth = true,
-  ...props
-}) {
-  return (
+
+/** @type {React.ForwardRefExoticComponent<FCSelectProps>} */
+export const FCSelect = React.forwardRef(
+  (
+    {
+      children,
+      value,
+      label,
+      size = 'small',
+      fcSx = SX,
+      fullWidth = true,
+      ...props
+    },
+    ref,
+  ) => (
     <FormControl size={size} fullWidth={fullWidth} sx={fcSx}>
       <InputLabel>{label}</InputLabel>
       <Select
         autoFocus
+        ref={ref}
         value={value ?? ''}
         fullWidth={fullWidth}
         label={label}
@@ -36,21 +42,13 @@ export function FCSelect({
         {children}
       </Select>
     </FormControl>
-  )
-}
+  ),
+)
 
-/**
- * @param {{
- *  icon?: React.ReactNode
- *  variant?: import('@mui/material').FormControlProps['variant']
- * } & import('@mui/material').SelectProps} props
- * @returns
- */
-export function FCSelectListItem({ icon, ...props }) {
-  return (
-    <ListItem dense>
-      {icon && <ListItemIcon>{icon}</ListItemIcon>}
-      <FCSelect {...props} />
-    </ListItem>
-  )
-}
+/** @type {React.ForwardRefExoticComponent<FCSelectListItemProps>} */
+export const FCSelectListItem = React.forwardRef(({ icon, ...props }, ref) => (
+  <ListItem dense>
+    {icon && <ListItemIcon>{icon}</ListItemIcon>}
+    <FCSelect {...props} ref={ref} />
+  </ListItem>
+))
