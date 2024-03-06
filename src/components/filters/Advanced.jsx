@@ -20,10 +20,10 @@ import { STANDARD_BACKUP, applyToAll } from '@services/filtering/applyToAll'
 import { checkIfHasAll } from '@utils/hasAll'
 
 import { StringFilter } from './StringFilter'
-import { SliderTile } from '../../inputs/SliderTile'
-import Size from '../../inputs/Size'
-import { GenderListItem } from '../../inputs/Gender'
-import { QuestConditionSelector } from '../../inputs/QuestConditions'
+import { SliderTile } from '../inputs/SliderTile'
+import Size from './Size'
+import { GenderListItem } from './Gender'
+import { QuestConditionSelector } from './QuestConditions'
 
 export default function AdvancedFilter() {
   const { category, id, selectedIds, open } = useLayoutStore(

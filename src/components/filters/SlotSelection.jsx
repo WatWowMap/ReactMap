@@ -15,9 +15,9 @@ import { DualBoolToggle } from '@components/inputs/BoolToggle'
 import { ENABLED_ALL } from '@assets/constants'
 import Header from '@components/Header'
 import Footer from '@components/Footer'
-import Size from '../../inputs/Size'
+import Size from './Size'
 
-import { DialogWrapper } from '../DialogWrapper'
+import { DialogWrapper } from '../dialogs/DialogWrapper'
 
 export default function SlotSelection() {
   const [id, teamId, open] = useLayoutStore((s) => {
@@ -130,7 +130,7 @@ export default function SlotSelection() {
 
 /**
  *
- * @param {{ id: string, children?: React.ReactNode, onClick?: import('../../inputs/Size').SizeOnClick }} props
+ * @param {{ id: string, children?: React.ReactNode, onClick?: import('./Size').SizeOnClick }} props
  * @returns
  */
 function SlotAdjustor({ id, children, onClick }) {

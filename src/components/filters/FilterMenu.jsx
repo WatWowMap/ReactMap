@@ -6,7 +6,7 @@ import { toggleDialog, useLayoutStore } from '@hooks/useLayoutStore'
 import { useStorage } from '@hooks/useStorage'
 import { StandardItem } from '@components/virtual/StandardItem'
 
-import { DialogWrapper } from '../DialogWrapper'
+import { DialogWrapper } from '../dialogs/DialogWrapper'
 
 export default function FilterMenu() {
   const { open, category, type } = useLayoutStore((s) => s.dialog)
