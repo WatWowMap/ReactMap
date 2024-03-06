@@ -1,16 +1,13 @@
 // @ts-check
 import * as React from 'react'
-import ListItem from '@mui/material/ListItem'
 import Typography from '@mui/material/Typography'
-import FormControl from '@mui/material/FormControl'
-import InputLabel from '@mui/material/InputLabel'
-import Select from '@mui/material/Select'
 import MenuItem from '@mui/material/MenuItem'
 import { useTranslation } from 'react-i18next'
 
 import { useMemory } from '@store/useMemory'
 import { useDeepStore, useStorage } from '@store/useStorage'
 import { QuestTitle } from '@components/QuestTitle'
+import { FCSelect } from '@components/inputs/FCSelect'
 
 /**
  *
@@ -64,55 +61,49 @@ export function QuestConditionSelector({ id }) {
   if (!questConditions) return null
 
   return (
-    <ListItem>
-      <FormControl variant="outlined" size="small" fullWidth sx={{ my: 1 }}>
-        <InputLabel>{t('quest_condition')}</InputLabel>
-        <Select
-          name="adv"
-          value={value.split(',')}
-          disabled={all}
-          fullWidth
-          open={open}
-          onOpen={handleOpen}
-          onClose={handleClose}
-          multiple
-          renderValue={(selected) =>
-            Array.isArray(selected)
-              ? `${selected.length} ${t('selected')}`
-              : selected
-          }
-          size="small"
-          label={t('quest_condition')}
-          onChange={(e, child) => {
-            if (
-              typeof child === 'object' &&
-              'props' in child &&
-              child.props.value === ''
-            ) {
-              setValue('')
-              handleClose()
-            } else {
-              setValue(
-                Array.isArray(e.target.value)
-                  ? e.target.value.filter(Boolean).join(',')
-                  : e.target.value,
-              )
-            }
-          }}
-        >
-          <MenuItem value="">
-            <Typography variant="caption">{t('all')}</Typography>
+    <FCSelect
+      label={t('quest_condition')}
+      value={value.split(',')}
+      disabled={all}
+      fullWidth
+      open={open}
+      onOpen={handleOpen}
+      onClose={handleClose}
+      multiple
+      renderValue={(selected) =>
+        Array.isArray(selected)
+          ? `${selected.length} ${t('selected')}`
+          : selected
+      }
+      onChange={(e, child) => {
+        if (
+          typeof child === 'object' &&
+          'props' in child &&
+          child.props.value === ''
+        ) {
+          setValue('')
+          handleClose()
+        } else {
+          setValue(
+            Array.isArray(e.target.value)
+              ? e.target.value.filter(Boolean).join(',')
+              : e.target.value,
+          )
+        }
+      }}
+      sx={{ my: 1 }}
+    >
+      <MenuItem value="">
+        <Typography variant="caption">{t('all')}</Typography>
+      </MenuItem>
+      {questConditions
+        .slice()
+        .sort((a, b) => a.title.localeCompare(b.title))
+        .map(({ title, target }) => (
+          <MenuItem key={`${title}-${target}`} value={title}>
+            <QuestTitle questTitle={title} questTarget={target} />
           </MenuItem>
-          {questConditions
-            .slice()
-            .sort((a, b) => a.title.localeCompare(b.title))
-            .map(({ title, target }) => (
-              <MenuItem key={`${title}-${target}`} value={title}>
-                <QuestTitle questTitle={title} questTarget={target} />
-              </MenuItem>
-            ))}
-        </Select>
-      </FormControl>
-    </ListItem>
+        ))}
+    </FCSelect>
   )
 }

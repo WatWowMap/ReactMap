@@ -6,18 +6,32 @@ import ListItem from '@mui/material/ListItem'
 import ListItemIcon from '@mui/material/ListItemIcon'
 import Select from '@mui/material/Select'
 
-/** @type {React.CSSProperties} */
-const STYLE = { margin: '3px 0' }
+/** @type {import('@mui/material').SxProps} */
+const SX = { margin: '3px 0' }
 
 /**
- * @param {import('@mui/material').SelectProps} props
+ * @param {import('@mui/material').SelectProps & { variant?: import('@mui/material').FormControlProps['variant']}} props
  * @returns
  */
-export function FCSelect({ children, value, label, ...props }) {
+export function FCSelect({
+  children,
+  value,
+  label,
+  size = 'small',
+  sx = SX,
+  ...props
+}) {
   return (
-    <FormControl size="small" fullWidth style={STYLE}>
+    <FormControl size={size} fullWidth sx={sx}>
       <InputLabel>{label}</InputLabel>
-      <Select autoFocus value={value || ''} fullWidth label={label} {...props}>
+      <Select
+        autoFocus
+        value={value || ''}
+        fullWidth
+        label={label}
+        size={size}
+        {...props}
+      >
         {children}
       </Select>
     </FormControl>
@@ -27,6 +41,7 @@ export function FCSelect({ children, value, label, ...props }) {
 /**
  * @param {{
  *  icon?: React.ReactNode
+ *  variant?: import('@mui/material').FormControlProps['variant']
  * } & import('@mui/material').SelectProps} props
  * @returns
  */
