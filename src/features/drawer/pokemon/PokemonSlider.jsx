@@ -9,7 +9,7 @@ import { analytics } from '@utils/analytics'
 
 /** @type {import('@rm/types').RMSliderHandleChange<keyof import('@rm/types').PokemonFilter>} */
 const handleChange = (name, values) => {
-  const { ivOr } = useStorage.getState().filters.pokemon
+  const { ivOr } = useMemory.getState().filters.pokemon
   if (name in ivOr) {
     setDeepStore(`filters.pokemon.ivOr.${name}`, values)
   }
@@ -18,7 +18,7 @@ const handleChange = (name, values) => {
 
 /** @param {{ slider: import('@rm/types').RMSlider }} props */
 export function PokemonSlider({ slider }) {
-  const values = useMemory((s) => s.filters.pokemon.ivOr[slider.name])
+  const values = useStorage((s) => s.filters.pokemon.ivOr[slider.name])
   return (
     <ListItem disablePadding>
       <SliderTile slide={slider} handleChange={handleChange} values={values} />
