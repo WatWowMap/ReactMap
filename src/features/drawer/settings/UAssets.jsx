@@ -56,9 +56,10 @@ function UAssetSelect({ asset, category }) {
       value={options?.has(value) ? value : ''}
       label={t(`${category}_${asset}`, `${category} ${instanceName}`)}
       onChange={({ target }) => {
-        useMemory
-          .getState()
-          [instanceName].setSelection(target.name, target.value)
+        useMemory.setState((prev) => {
+          prev[instanceName].setSelection(target.name, target.value)
+          return { [instanceName]: prev[instanceName] }
+        })
         useStorage.setState((prev) => ({
           [asset]: { ...prev[asset], [target.name]: target.value },
         }))
