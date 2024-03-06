@@ -1,12 +1,14 @@
+// @ts-check
 import { t } from 'i18next'
 
 /**
  *
- * @param {import('@rm/masterfile').Masterfile} pokemon
+ * @param {import('@rm/masterfile').Masterfile['pokemon']} pokemon
  * @param {string[]} categories
  * @returns
  */
 export function genPokemon(pokemon, categories) {
+  /** @type {import('@rm/types').ClientFilterObj} */
   const tempObj = Object.fromEntries(
     categories.map((x) => [
       x,
@@ -33,7 +35,7 @@ export function genPokemon(pokemon, categories) {
         form.name &&
         form.name !== 'Normal' &&
         j !== '0' &&
-        j != pkmn.defaultFormId
+        +j !== pkmn.defaultFormId
           ? formName
           : pokeName
       tempObj.pokemon[id] = {

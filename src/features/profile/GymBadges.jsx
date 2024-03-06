@@ -13,7 +13,6 @@ import { useMap } from 'react-leaflet'
 import { useMemory } from '@store/useMemory'
 import { useLayoutStore } from '@store/useLayoutStore'
 import { Query } from '@services/Query'
-
 import { VirtualGrid } from '@components/virtual/VirtualGrid'
 import { Img } from '@components/Img'
 import { ToggleTypography } from '@components/ToggleTypography'

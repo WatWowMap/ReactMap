@@ -10,9 +10,9 @@ import {
 
 import { useMemory } from '@store/useMemory'
 import { useStorage } from '@store/useStorage'
-
 import { Notification } from '@components/Notification'
 import { getQueryArgs } from '@utils/getQueryArgs'
+
 import { BaseCell } from './BaseCell'
 
 export function GenerateCells() {

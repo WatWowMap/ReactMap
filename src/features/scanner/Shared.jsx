@@ -6,7 +6,6 @@ import ListItemText from '@mui/material/ListItemText'
 import ListItemButton from '@mui/material/ListItemButton'
 import ListItemIcon from '@mui/material/ListItemIcon'
 import ListSubheader from '@mui/material/ListSubheader'
-
 import { Trans, useTranslation } from 'react-i18next'
 import { Circle } from 'react-leaflet'
 import PermScanWifiIcon from '@mui/icons-material/PermScanWifi'

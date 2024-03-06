@@ -3,6 +3,7 @@ import * as React from 'react'
 import { useMap, GeoJSON } from 'react-leaflet'
 import Supercluster from 'supercluster'
 import { marker, divIcon, point } from 'leaflet'
+
 import { useMemory } from '@store/useMemory'
 import { useStorage } from '@store/useStorage'
 import { Notification } from '@components/Notification'

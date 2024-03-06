@@ -6,8 +6,8 @@ import { useTranslation } from 'react-i18next'
 import { ScanAreaTile } from '@features/scanArea'
 import { WEBHOOK_GEOJSON } from '@services/queries/webhook'
 import { Loading } from '@components/Loading'
-
 import { useWebhookStore } from '@store/useWebhookStore'
+
 import { handleClick } from './AreaChip'
 
 const FALLBACK = {

@@ -7,7 +7,7 @@ import dlv from 'dlv'
 
 import { useStorage } from '@store/useStorage'
 import { setDeep } from '@utils/setDeep'
-import { analytics } from '@hooks/useAnalytics'
+import { analytics } from '@utils/analytics'
 import { checkIVFilterValid } from '@utils/checkAdvFilter'
 
 /**

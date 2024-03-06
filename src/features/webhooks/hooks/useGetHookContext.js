@@ -3,7 +3,6 @@ import { useEffect } from 'react'
 import { useQuery } from '@apollo/client'
 
 import { WEBHOOK_CATEGORIES, WEBHOOK_CONTEXT } from '@services/queries/webhook'
-
 import { useWebhookStore } from '@store/useWebhookStore'
 
 /** @returns {import('@store/useWebhookStore').WebhookStore['category'][]} */

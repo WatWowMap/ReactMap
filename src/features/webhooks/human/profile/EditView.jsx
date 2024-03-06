@@ -7,11 +7,10 @@ import Select from '@mui/material/Select'
 import MenuItem from '@mui/material/MenuItem'
 import IconButton from '@mui/material/IconButton'
 import OutlinedInput from '@mui/material/OutlinedInput'
-
 import { useTranslation } from 'react-i18next'
 import { useMutation } from '@apollo/client'
-import { ALL_PROFILES, SET_PROFILE } from '@services/queries/webhook'
 
+import { ALL_PROFILES, SET_PROFILE } from '@services/queries/webhook'
 import { useWebhookStore } from '@store/useWebhookStore'
 
 /** @param {import('./ProfileTile').Props} props */

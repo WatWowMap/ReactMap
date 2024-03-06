@@ -11,8 +11,8 @@ import { useOpacity } from '@hooks/useOpacity'
 import { useForcePopup } from '@hooks/useForcePopup'
 import { sendNotification } from '@services/desktopNotification'
 import { TooltipWrapper } from '@components/ToolTipWrapper'
-
 import { getTimeUntil } from '@utils/getTimeUntil'
+
 import { gymMarker } from './gymMarker'
 import { GymPopup } from './GymPopup'
 

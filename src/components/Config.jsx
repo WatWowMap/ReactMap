@@ -13,7 +13,7 @@ import { useHideElement } from '@hooks/useHideElement'
 import { getGlowRules } from '@utils/getGlowRules'
 import { useScannerSessionStorage } from '@features/scanner'
 import { timeCheck } from '@utils/timeCheck'
-import { analytics } from '@hooks/useAnalytics'
+import { analytics } from '@utils/analytics'
 
 export function Config({ children }) {
   const { t } = useTranslation()

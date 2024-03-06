@@ -5,6 +5,7 @@ import Grid2 from '@mui/material/Unstable_Grid2'
 import Box from '@mui/material/Box'
 import { Navigate } from 'react-router-dom'
 import { useQuery } from '@apollo/client'
+
 import { VALIDATE_USER } from '@services/queries/config'
 
 import { CodeWrapper } from './components/Editor'

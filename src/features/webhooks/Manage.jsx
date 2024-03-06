@@ -19,7 +19,7 @@ import { Query } from '@services/Query'
 import { ALL_PROFILES } from '@services/queries/webhook'
 import { Menu } from '@components/Menu'
 import { setMode, setSelected, useWebhookStore } from '@store/useWebhookStore'
-import { analytics } from '@hooks/useAnalytics'
+import { analytics } from '@utils/analytics'
 
 import { Human } from './human'
 import { Tracked } from './Tracked'

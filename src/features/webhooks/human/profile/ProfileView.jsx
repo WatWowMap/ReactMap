@@ -8,8 +8,8 @@ import Typography from '@mui/material/Typography'
 import IconButton from '@mui/material/IconButton'
 
 import { useMemory } from '@store/useMemory'
-
 import { useWebhookStore } from '@store/useWebhookStore'
+
 import { ActiveHourChip } from './ActiveHourChip'
 
 /** @param {import('./ProfileTile').Props} props */

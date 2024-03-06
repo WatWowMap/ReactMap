@@ -8,7 +8,6 @@ import { useTranslation } from 'react-i18next'
 import { useMutation } from '@apollo/client'
 
 import { SET_PROFILE, ALL_PROFILES } from '@services/queries/webhook'
-
 import { useWebhookStore, setSelected } from '@store/useWebhookStore'
 
 export function Selecting() {

@@ -5,8 +5,8 @@ import Dialog from '@mui/material/Dialog'
 import DialogContent from '@mui/material/DialogContent'
 import Typography from '@mui/material/Typography'
 import Button from '@mui/material/Button'
-
 import { useTranslation } from 'react-i18next'
+
 import { useMemory } from '@store/useMemory'
 
 import { Header } from './Header'

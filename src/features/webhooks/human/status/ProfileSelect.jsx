@@ -9,7 +9,6 @@ import { useMutation, useQuery } from '@apollo/client'
 import { useTranslation } from 'react-i18next'
 
 import { ALL_PROFILES, SET_HUMAN } from '@services/queries/webhook'
-
 import { useWebhookStore } from '@store/useWebhookStore'
 
 /** @type {React.CSSProperties} */

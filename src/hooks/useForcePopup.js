@@ -1,5 +1,6 @@
 // @ts-check
 import { useEffect } from 'react'
+
 import { useMemory } from '@store/useMemory'
 
 const cleanup = () =>

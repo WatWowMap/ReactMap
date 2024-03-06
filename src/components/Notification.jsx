@@ -6,6 +6,7 @@ import Slide from '@mui/material/Slide'
 import AlertTitle from '@mui/material/AlertTitle'
 import { useTranslation, Trans } from 'react-i18next'
 
+/** @param {import('@mui/material').SlideProps} props */
 function SlideTransition(props) {
   // eslint-disable-next-line react/jsx-props-no-spreading
   return <Slide {...props} direction="up" />

@@ -2,6 +2,7 @@
 import * as React from 'react'
 import { Tooltip } from 'react-leaflet'
 import { useTranslation } from 'react-i18next'
+
 import { getTimeUntil } from '@utils/getTimeUntil'
 
 const Timer = ({ timestamp }) => {

@@ -12,7 +12,7 @@ import { useTranslation } from 'react-i18next'
 
 import { useMemory } from '@store/useMemory'
 import { useStorage } from '@store/useStorage'
-import { analytics } from '@hooks/useAnalytics'
+import { analytics } from '@utils/analytics'
 import { camelToSnake } from '@utils/camelToSnake'
 
 const handleChange = (category, subCategory) => (event) => {

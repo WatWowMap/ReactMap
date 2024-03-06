@@ -3,6 +3,7 @@ import * as React from 'react'
 import { Marker, useMap } from 'react-leaflet'
 
 import { fallbackMarker } from '@assets/fallbackMarker'
+
 import { useScanStore } from './hooks/store'
 
 /**

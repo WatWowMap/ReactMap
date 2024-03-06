@@ -4,6 +4,7 @@ import { SystemStyleObject } from '@mui/system'
 
 import UAssets from '@services/Assets'
 import { Config } from './config'
+import { AdvCategories, Permissions } from '@rm/types'
 
 declare global {
   declare const CONFIG: Config<true>
@@ -63,8 +64,25 @@ export interface MultiSelectorProps<V> {
   ) => (e?: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void
 }
 
-type KeyCombinations<T> = `GET${T extends string ? `_${Uppercase<T>}` : ''}`
+export interface FilterObj {
+  name: string
+  perms: (keyof Permissions)[]
+  webhookOnly?: boolean
+  searchMeta?: string
+  category?: AdvCategories
+  pokedexId?: number
+  formId?: number
+  defaultFormId?: number
+  pokeName?: string
+  formName?: string
+  formTypes?: string[]
+  rarity?: string
+  historic?: string
+  legendary?: boolean
+  mythical?: boolean
+  ultraBeast?: boolean
+  genId?: string
+  family?: number
+}
 
-// Example usage with a predefined object key type
-type ObjectKeys = 'Lures' | 'Quests' | 'Invasions' | 'Events'
-type QueryTypes = KeyCombinations<ObjectKeys>
+export type ClientFilterObj = Record<string, Record<string, FilterObj>>

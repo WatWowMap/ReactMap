@@ -3,7 +3,6 @@ import { useEffect } from 'react'
 import { genPokemon } from '@services/filtering/genPokemon'
 import { genGyms } from '@services/filtering/genGyms'
 import { genPokestops } from '@services/filtering/genPokestops'
-
 import { useMemory } from '@store/useMemory'
 
 export function useGenerate() {

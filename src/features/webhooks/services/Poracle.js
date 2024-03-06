@@ -1,5 +1,6 @@
 // @ts-check
 import { t } from 'i18next'
+
 import { useWebhookStore } from '@store/useWebhookStore'
 
 export class Poracle {

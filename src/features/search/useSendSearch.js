@@ -8,7 +8,7 @@ import { Query } from '@services/Query'
 import { useStorage } from '@store/useStorage'
 import { useMemory } from '@store/useMemory'
 import { useMapStore } from '@store/useMapStore'
-import { analytics } from '@hooks/useAnalytics'
+import { analytics } from '@utils/analytics'
 
 /**
  * @param {string} search

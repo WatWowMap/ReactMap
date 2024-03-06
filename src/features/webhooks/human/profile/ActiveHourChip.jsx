@@ -5,8 +5,8 @@ import Chip from '@mui/material/Chip'
 import { styled } from '@mui/material/styles'
 import { useTranslation } from 'react-i18next'
 import { useMutation } from '@apollo/client'
-import { ALL_PROFILES, SET_PROFILE } from '@services/queries/webhook'
 
+import { ALL_PROFILES, SET_PROFILE } from '@services/queries/webhook'
 import { useWebhookStore } from '@store/useWebhookStore'
 
 const StyledChip = styled(Chip)(({ theme }) => ({

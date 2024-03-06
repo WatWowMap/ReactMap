@@ -21,7 +21,6 @@ import NotificationsActiveIcon from '@mui/icons-material/NotificationsActive'
 import NotificationsOffIcon from '@mui/icons-material/NotificationsOff'
 import LogoDevIcon from '@mui/icons-material/LogoDev'
 import SquareFootIcon from '@mui/icons-material/SquareFoot'
-
 import { useTranslation } from 'react-i18next'
 
 import { useMemory } from '@store/useMemory'
@@ -35,9 +34,9 @@ import {
 import { LocaleSelection } from '@components/inputs/LocaleSelection'
 import { DividerWithMargin } from '@components/StyledDivider'
 import { BoolToggle } from '@components/inputs/BoolToggle'
-
 import { getProperName } from '@utils/getProperName'
 import { camelToSnake } from '@utils/camelToSnake'
+
 import { DrawerActions } from './Actions'
 
 function FCSelect({ name, label, value, onChange, children, icon }) {

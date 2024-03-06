@@ -8,7 +8,6 @@ import Accordion from '@mui/material/Accordion'
 import AccordionSummary from '@mui/material/AccordionSummary'
 import AccordionDetails from '@mui/material/AccordionDetails'
 import List from '@mui/material/List'
-
 import { useTranslation } from 'react-i18next'
 
 import { useMemory } from '@store/useMemory'

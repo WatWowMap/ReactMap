@@ -27,7 +27,7 @@ import { TabPanel } from '@components/TabPanel'
 import { GenderListItem } from '@components/filters/Gender'
 import { BasicListButton } from '@components/inputs/BasicListButton'
 import { BoolToggle, DualBoolToggle } from '@components/inputs/BoolToggle'
-import { analytics } from '@hooks/useAnalytics'
+import { analytics } from '@utils/analytics'
 
 import { SelectorListMemo } from './SelectorList'
 

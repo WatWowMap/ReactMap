@@ -1,8 +1,9 @@
-import { setDeep } from '@utils/setDeep'
 import dlv from 'dlv'
 import { useCallback, useMemo } from 'react'
 import { create } from 'zustand'
 import { persist, createJSONStorage } from 'zustand/middleware'
+
+import { setDeep } from '@utils/setDeep'
 
 /**
  * TODO: Finish this

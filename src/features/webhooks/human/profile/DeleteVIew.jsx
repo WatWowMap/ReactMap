@@ -5,11 +5,10 @@ import Save from '@mui/icons-material/Save'
 import Typography from '@mui/material/Typography'
 import IconButton from '@mui/material/IconButton'
 import Grid from '@mui/material/Unstable_Grid2'
-
 import { useTranslation } from 'react-i18next'
 import { useMutation } from '@apollo/client'
-import { ALL_PROFILES, SET_PROFILE } from '@services/queries/webhook'
 
+import { ALL_PROFILES, SET_PROFILE } from '@services/queries/webhook'
 import { useWebhookStore } from '@store/useWebhookStore'
 
 /** @param {import('./ProfileTile').Props} props */

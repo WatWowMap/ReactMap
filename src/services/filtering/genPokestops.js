@@ -1,13 +1,15 @@
+// @ts-check
 import { t } from 'i18next'
 
 /**
  *
  * @param {import('@rm/masterfile').Masterfile} pokemon
- * @param {*} pokestops
- * @param {*} categories
+ * @param {import('@rm/types').AllFilters['pokestops']} pokestops
+ * @param {string[]} categories
  * @returns
  */
 export function genPokestops(pokemon, pokestops, categories) {
+  /** @type {import('@rm/types').ClientFilterObj} */
   const tempObj = Object.fromEntries(categories.map((x) => [x, {}]))
   if (!pokestops?.filter) return {}
 

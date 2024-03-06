@@ -11,7 +11,7 @@ import { useMemory } from '@store/useMemory'
 import { toggleDialog, useLayoutStore } from '@store/useLayoutStore'
 import { useStorage } from '@store/useStorage'
 import { getPermission } from '@services/desktopNotification'
-import { analytics } from '@hooks/useAnalytics'
+import { analytics } from '@utils/analytics'
 import { camelToSnake } from '@utils/camelToSnake'
 import { getProperName } from '@utils/getProperName'
 

@@ -1,7 +1,7 @@
 // @ts-check
 import { create } from 'zustand'
 
-import { analytics } from '@hooks/useAnalytics'
+import { analytics } from '@utils/analytics'
 
 import { useStorage } from './useStorage'
 

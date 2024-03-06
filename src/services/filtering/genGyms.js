@@ -1,6 +1,14 @@
+// @ts-check
 import { t } from 'i18next'
 
+/**
+ *
+ * @param {import('@rm/types').AllFilters['gyms']} gyms
+ * @param {string[]} categories
+ * @returns
+ */
 export function genGyms(gyms, categories) {
+  /** @type {import('@rm/types').ClientFilterObj} */
   const tempObj = Object.fromEntries(categories.map((x) => [x, {}]))
   if (!gyms?.filter) return {}
 

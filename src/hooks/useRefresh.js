@@ -1,11 +1,10 @@
 // @ts-check
 import { useEffect } from 'react'
 import { useQuery } from '@apollo/client'
-import { GET_MAP_DATA } from '@services/queries/available'
 
+import { GET_MAP_DATA } from '@services/queries/available'
 import { deepMerge } from '@utils/deepMerge'
 import { UAssets } from '@services/Assets'
-
 import { useMemory } from '@store/useMemory'
 import { useStorage } from '@store/useStorage'
 

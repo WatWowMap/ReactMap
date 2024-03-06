@@ -2,6 +2,7 @@
 import * as React from 'react'
 import Typography from '@mui/material/Typography'
 import { useTranslation } from 'react-i18next'
+
 import { getTimeUntil } from '@utils/getTimeUntil'
 
 /** @param {TimerProps} props */
