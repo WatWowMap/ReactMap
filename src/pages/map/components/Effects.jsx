@@ -4,8 +4,8 @@ import { useMap } from 'react-leaflet'
 import { useTranslation } from 'react-i18next'
 import useMediaQuery from '@mui/material/useMediaQuery'
 
-import useGenerate from '@hooks/useGenerate'
-import useRefresh from '@hooks/useRefresh'
+import { useGenerate } from '@hooks/useGenerate'
+import { useRefresh } from '@hooks/useRefresh'
 import { useMemory } from '@store/useMemory'
 
 export function Effects() {

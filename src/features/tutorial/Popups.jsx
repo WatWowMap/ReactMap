@@ -8,9 +8,10 @@ import { useTranslation } from 'react-i18next'
 
 import { useMemory } from '@store/useMemory'
 import { PokemonPopup } from '@features/pokemon'
-import data from './data'
 
-export default function TutPopup({ isMobile }) {
+import { tutorialData } from './data'
+
+export function TutorialPopup({ isMobile }) {
   const { t } = useTranslation()
   const { startLat, startLon } = useMemory((state) => state.config.general)
   const ts = Math.floor(new Date().getTime() / 1000)
@@ -49,7 +50,7 @@ export default function TutPopup({ isMobile }) {
             <div className="leaflet-popup-content">
               <PokemonPopup
                 pokemon={{
-                  ...data.pokemon,
+                  ...tutorialData.pokemon,
                   expire_timestamp: ts + 1800,
                   updated: ts + 100,
                   first_seen_timestamp: ts,

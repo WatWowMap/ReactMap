@@ -36,7 +36,7 @@ import { create } from 'zustand'
  *   masterfile: import('@rm/masterfile').Masterfile
  *   polling: import('@rm/types').Config['api']['polling'],
  *   gymValidDataLimit: number
- *   settings: { [K in keyof import('./useStorage').UseStorage['settings']]: Record<string, K extends 'tileServers' ? import('@rm/types').TileLayer : { name: string }> }
+ *   settings: { [K in keyof import('./useStorage').UseStorage['settings']]: Record<string, K extends 'tileServers' ? import('@rm/types').TileLayer : K extends 'navigation' ? { name: string, url: string } : { name: string }> }
  *   userSettings: ReturnType<import('server/src/services/ui/clientOptions')>['clientValues']
  *   clientMenus: ReturnType<import('server/src/services/ui/clientOptions')>['clientMenus']
  *   clientError: string,

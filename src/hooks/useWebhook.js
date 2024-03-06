@@ -1,11 +1,11 @@
 import { useEffect } from 'react'
 import { useMutation } from '@apollo/client'
 import { useTranslation } from 'react-i18next'
-import Query from '@services/Query'
+import { Query } from '@services/Query'
 import { useWebhookStore } from '@features/webhooks'
 import { allProfiles } from '@services/queries/webhook'
 
-export default function useWebhook({ category }) {
+export function useWebhook({ category }) {
   const [syncWebhook, { data, error }] = useMutation(
     Query.webhook('quickAdd'),
     {

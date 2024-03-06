@@ -6,12 +6,13 @@ import Divider from '@mui/material/Divider'
 import { useTranslation, Trans } from 'react-i18next'
 
 import { SliderTile } from '@components/inputs/SliderTile'
-import data from './data'
+
+import { tutorialData } from './data'
 
 const relevant = ['iv', 'level', 'great', 'ultra']
-const { ivOr } = data.filters.pokemon
+const { ivOr } = tutorialData.filters.pokemon
 
-export default function TutSliders() {
+export function TutorialSliders() {
   const { t } = useTranslation()
 
   const [temp, setTemp] = useState({ ...ivOr, iv: [80, 100], great: [1, 10] })
@@ -31,7 +32,7 @@ export default function TutSliders() {
     }
   }
   const fullCheck = {}
-  const slidersToUse = data.sliders.filter((slider) =>
+  const slidersToUse = tutorialData.sliders.filter((slider) =>
     relevant.includes(slider.name),
   )
   const arrayCheck = (filter, key) =>

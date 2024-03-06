@@ -7,8 +7,8 @@ import { useStorage } from '@store/useStorage'
 
 import { SCANNER_CONFIG, SCANNER_STATUS } from '@services/queries/scanner'
 
-import ScanNext from './scanNext'
-import ScanZone from './scanZone'
+import { ScanNext } from './scanNext'
+import { ScanZone } from './scanZone'
 import { getScanNextCoords } from './scanNext/getCoords'
 import { getScanZoneCoords } from './scanZone/getCoords'
 import { ConfigContext, DEFAULT } from './ContextProvider'

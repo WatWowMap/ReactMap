@@ -37,7 +37,7 @@ export function RawTimeSince({ expireTime, until = false }) {
  * @param {TimerProps & import('@mui/material').TypographyProps} props
  * @returns
  */
-export default function TimeSince({ expireTime, until = false, ...props }) {
+export function TimeSince({ expireTime, until = false, ...props }) {
   return (
     <Typography variant="subtitle2" {...props}>
       <RawTimeSince expireTime={expireTime} until={until} />

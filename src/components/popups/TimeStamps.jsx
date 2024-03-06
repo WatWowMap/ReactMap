@@ -3,7 +3,7 @@ import * as React from 'react'
 import Grid from '@mui/material/Grid'
 
 import { useTranslation } from 'react-i18next'
-import TimeSince from './Timer'
+import { TimeSince } from './Timer'
 import { ExtraInfo } from './ExtraInfo'
 
 /**

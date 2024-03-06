@@ -3,7 +3,7 @@
 import { useMemory } from '@store/useMemory'
 
 /** @param {Partial<import("@rm/types").Quest>} quest */
-export default function getRewardInfo({
+export function getRewardInfo({
   quest_pokemon_id,
   quest_form_id,
   quest_gender_id,

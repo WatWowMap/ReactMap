@@ -10,7 +10,7 @@ import { useStorage } from '@store/useStorage'
  * @param {{ lat: number, lon: number, size?: import('@mui/material').IconButtonProps['size'] }} props
  * @returns
  */
-export default function Navigation({ lat, lon, size = 'large' }) {
+export function Navigation({ lat, lon, size = 'large' }) {
   const nav = useStorage((s) => s.settings.navigation)
   const url = useMemory((s) => s.settings.navigation[nav]?.url)
   return (

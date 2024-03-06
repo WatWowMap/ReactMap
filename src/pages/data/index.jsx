@@ -4,7 +4,7 @@ import Grid from '@mui/material/Unstable_Grid2'
 import Typography from '@mui/material/Typography'
 import { useTranslation } from 'react-i18next'
 
-import useRefresh from '@hooks/useRefresh'
+import { useRefresh } from '@hooks/useRefresh'
 
 import { TopRow } from './components/TopRow'
 import { ResetGeneral } from './components/ResetGeneral'

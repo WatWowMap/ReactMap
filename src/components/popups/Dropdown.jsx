@@ -4,7 +4,7 @@ import Menu from '@mui/material/Menu'
 import MenuItem from '@mui/material/MenuItem'
 import { useTranslation } from 'react-i18next'
 
-export default function Dropdown({ options, anchorEl, handleClose }) {
+export function Dropdown({ options, anchorEl, handleClose }) {
   const { t } = useTranslation()
   return (
     <Menu

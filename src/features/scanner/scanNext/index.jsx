@@ -14,7 +14,7 @@ const GYM_RADIUS = 750
 /**
  * @returns {JSX.Element}
  */
-export default function ScanNext() {
+export function ScanNext() {
   useCheckValid('scanNext')
 
   const scanLocation = useScanStore((s) => s.scanLocation)

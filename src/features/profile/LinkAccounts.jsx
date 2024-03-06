@@ -9,7 +9,7 @@ import Typography from '@mui/material/Typography'
 
 import { useMemory } from '@store/useMemory'
 import { Utility } from '@services/Utility'
-import Query from '@services/Query'
+import { Query } from '@services/Query'
 import { METHODS } from '@assets/constants'
 
 import { DiscordButton } from '@components/auth/Discord'

@@ -8,8 +8,8 @@ import ExpandMore from '@mui/icons-material/ExpandMore'
 
 import { useStorage } from '@store/useStorage'
 
-import Timer from './Timer'
-import NameTT from './NameTT'
+import { TimeSince } from './Timer'
+import { NameTT } from './NameTT'
 
 /**
  *
@@ -26,7 +26,7 @@ import NameTT from './NameTT'
  * }} param0
  * @returns
  */
-export default function TimeTile({
+export function TimeTile({
   expireTime,
   icon,
   until,
@@ -73,7 +73,7 @@ export default function TimeTile({
           xs={icon ? (children ? 10 : 12) - size : children ? 10 : 12}
           style={{ textAlign: 'center' }}
         >
-          <Timer
+          <TimeSince
             expireTime={expireTime}
             until={until}
             color={disabled ? 'GrayText' : 'inherit'}

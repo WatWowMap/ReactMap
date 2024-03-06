@@ -15,7 +15,7 @@ import Box from '@mui/material/Box'
 
 import { useMemory } from '@store/useMemory'
 import { useStorage } from '@store/useStorage'
-import Query from '@services/Query'
+import { Query } from '@services/Query'
 
 export function UserBackups() {
   const { t } = useTranslation()

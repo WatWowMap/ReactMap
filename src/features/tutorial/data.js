@@ -1,4 +1,4 @@
-export default {
+export const tutorialData = {
   pokemon: {
     id: '1479791170343952100',
     pokemon_id: 16,

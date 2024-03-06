@@ -18,7 +18,7 @@ import * as user from './queries/user'
 import s2cell from './queries/s2cell'
 import { getRoute, getRoutes } from './queries/route'
 
-export default class Query {
+export class Query {
   static devices() {
     return getAllDevices
   }

@@ -11,7 +11,7 @@ const PATH = {
 }
 
 /** @param {{ gender: keyof typeof PATH }} props */
-export default function GenderIcon({ gender }) {
+export function GenderIcon({ gender }) {
   const theme = useTheme()
 
   return (

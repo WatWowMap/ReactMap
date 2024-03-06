@@ -16,7 +16,7 @@ import { useTranslation } from 'react-i18next'
 import { useLazyQuery } from '@apollo/client'
 
 import Fetch from '@services/Fetch'
-import Query from '@services/Query'
+import { Query } from '@services/Query'
 
 /**
  *

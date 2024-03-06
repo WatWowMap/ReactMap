@@ -21,17 +21,17 @@ import { useMemory } from '@store/useMemory'
 import { setDeepStore, useStorage } from '@store/useStorage'
 import { Utility } from '@services/Utility'
 import { getBadge } from '@utils/getBadge'
-import getRewardInfo from '@utils/getRewardInfo'
+import { getRewardInfo } from '@utils/getRewardInfo'
 import { getGruntReward } from '@utils/getGruntReward'
-import Dropdown from '@components/popups/Dropdown'
-import TimeTile from '@components/popups/TimeTile'
-import Navigation from '@components/popups/Navigation'
-import Coords from '@components/popups/Coords'
-import Title from '@components/popups/Title'
-import HeaderImage from '@components/popups/HeaderImage'
-import Timer from '@components/popups/Timer'
-import PowerUp from '@components/popups/PowerUp'
-import NameTT from '@components/popups/NameTT'
+import { Dropdown } from '@components/popups/Dropdown'
+import { TimeTile } from '@components/popups/TimeTile'
+import { Navigation } from '@components/popups/Navigation'
+import { Coords } from '@components/popups/Coords'
+import { Title } from '@components/popups/Title'
+import { HeaderImage } from '@components/popups/HeaderImage'
+import { TimeSince } from '@components/popups/Timer'
+import { PowerUp } from '@components/popups/PowerUp'
+import { NameTT } from '@components/popups/NameTT'
 import { TimeStamp } from '@components/popups/TimeStamps'
 
 /**
@@ -841,7 +841,7 @@ const Showcase = ({
         </Typography>
       </Grid>
       <Grid item xs={6}>
-        <Timer expireTime={last_update} />
+        <TimeSince expireTime={last_update} />
       </Grid>
     </Grid>
   )

@@ -3,10 +3,10 @@
 import * as React from 'react'
 import Box from '@mui/material/Box'
 
-import NameTT from '@components/popups/NameTT'
+import { NameTT } from '@components/popups/NameTT'
 import { useMemory } from '@store/useMemory'
 import { useStorage } from '@store/useStorage'
-import getRewardInfo from '@utils/getRewardInfo'
+import { getRewardInfo } from '@utils/getRewardInfo'
 import { useTranslateById } from '@hooks/useTranslateById'
 import { Img } from '@components/Img'
 

@@ -12,7 +12,6 @@ import { Img } from '@components/Img'
 import { useMemory } from '@store/useMemory'
 import { useStorage } from '@store/useStorage'
 import { RawQuestTitle } from '@components/QuestTitle'
-
 import { Utility } from '@services/Utility'
 import { RawTimeSince } from '@components/popups/Timer'
 import { getGruntReward } from '@utils/getGruntReward'

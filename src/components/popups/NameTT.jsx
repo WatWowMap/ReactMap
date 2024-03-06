@@ -8,7 +8,7 @@ import { useTranslation } from 'react-i18next'
  * @param {{ id: string | string[], children: React.ReactElement }} props
  * @returns
  */
-export default function NameTT({ id, children }) {
+export function NameTT({ id, children }) {
   const { t } = useTranslation()
 
   return (

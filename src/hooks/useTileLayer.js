@@ -25,7 +25,7 @@ const getTileLayer = (tileServers, tileServer, timeOfDay) => {
   return tileServers[tileServer] || fallbackTs
 }
 
-export default function useTileLayer() {
+export function useTileLayer() {
   const timeOfDay = useMemory((s) => s.timeOfDay)
   const userTileLayer = useStorage((s) => s.settings.tileServers)
   const online = useMemory((s) => s.online)

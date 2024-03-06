@@ -21,13 +21,13 @@ import ArrowDropUp from '@mui/icons-material/ArrowDropUp'
 import Typography from '@mui/material/Typography'
 import DownloadIcon from '@mui/icons-material/Download'
 
-import Query from '@services/Query'
-import formatInterval from '@utils/formatInterval'
+import { Query } from '@services/Query'
+import { formatInterval } from '@utils/formatInterval'
 import { useMemory } from '@store/useMemory'
 import { useStorage } from '@store/useStorage'
-import Title from '@components/popups/Title'
-import TimeSince from '@components/popups/Timer'
-import Navigation from '@components/popups/Navigation'
+import { Title } from '@components/popups/Title'
+import { TimeSince } from '@components/popups/Timer'
+import { Navigation } from '@components/popups/Navigation'
 
 import { useFormatDistance } from './useFormatDistance'
 

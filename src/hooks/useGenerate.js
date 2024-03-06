@@ -1,12 +1,12 @@
 import { useEffect } from 'react'
 
-import genPokemon from '@services/filtering/genPokemon'
-import genGyms from '@services/filtering/genGyms'
-import genPokestops from '@services/filtering/genPokestops'
+import { genPokemon } from '@services/filtering/genPokemon'
+import { genGyms } from '@services/filtering/genGyms'
+import { genPokestops } from '@services/filtering/genPokestops'
 
 import { useMemory } from '@store/useMemory'
 
-export default function useGenerate() {
+export function useGenerate() {
   const pokemon = useMemory((s) => s.masterfile.pokemon)
   const gyms = useMemory((s) => s.filters.gyms)
   const pokestops = useMemory((s) => s.filters.pokestops)

@@ -14,7 +14,7 @@ import { useStorage } from '@store/useStorage'
  * }} props
  * @returns
  */
-export default function Title({ children, variant = 'subtitle2', backup, sx }) {
+export function Title({ children, variant = 'subtitle2', backup, sx }) {
   const names = useStorage((state) => !!state.popups.names)
 
   return (

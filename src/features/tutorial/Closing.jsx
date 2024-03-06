@@ -5,7 +5,7 @@ import Divider from '@mui/material/Divider'
 import Typography from '@mui/material/Typography'
 import { useTranslation } from 'react-i18next'
 
-export default function TutClosing() {
+export function TutorialClosing() {
   const { t } = useTranslation()
 
   return (

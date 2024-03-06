@@ -6,7 +6,7 @@ import { t } from 'i18next'
  * @param {string[]} categories
  * @returns
  */
-export default function genPokemon(pokemon, categories) {
+export function genPokemon(pokemon, categories) {
   const tempObj = Object.fromEntries(
     categories.map((x) => [
       x,

@@ -19,9 +19,9 @@ import { useMemory } from '@store/useMemory'
 import { VirtualGrid } from '@components/virtual/VirtualGrid'
 import { StandardItem } from '@components/virtual/StandardItem'
 
-import data from './data'
+import { tutorialData } from './data'
 
-export default function TutAdvanced({ toggleHelp, category }) {
+export function TutorialAdvanced({ toggleHelp, category }) {
   const { t } = useTranslation()
   const isMobile = useMemory((s) => s.isMobile)
   const [localCategory, setLocalCategory] = useState(category)
@@ -32,11 +32,11 @@ export default function TutAdvanced({ toggleHelp, category }) {
   const handleSwitch = () => {
     if (isPokemon) {
       setTempFilters({
-        ...data.filters.gyms.filter,
+        ...tutorialData.filters.gyms.filter,
         ...Utility.generateSlots('t3-0', true, tempFilters),
       })
     } else {
-      setTempFilters(data.filters.pokemon.filter)
+      setTempFilters(tutorialData.filters.pokemon.filter)
     }
     setLocalCategory(isPokemon ? 'gyms' : 'pokemon')
     setIsPokemon((prev) => !prev)
@@ -46,7 +46,7 @@ export default function TutAdvanced({ toggleHelp, category }) {
     const newCategory = category ?? isPokemon ? 'pokemon' : 'gyms'
     setLocalCategory(newCategory)
     setTempFilters({
-      ...data.filters[newCategory].filter,
+      ...tutorialData.filters[newCategory].filter,
       ...Utility.generateSlots('t3-0', true, {}),
     })
   }, [category])
@@ -68,7 +68,7 @@ export default function TutAdvanced({ toggleHelp, category }) {
         </Grid>
         <Grid item xs={12} sm={8}>
           <Box height={135}>
-            <VirtualGrid data={data.tiles[localCategory]} xs={6}>
+            <VirtualGrid data={tutorialData.tiles[localCategory]} xs={6}>
               {(_, key) => (
                 <StandardItem id={key} category={localCategory} caption />
               )}

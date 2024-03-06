@@ -1,11 +1,11 @@
 import ReactGA from 'react-ga4'
 import SunCalc from 'suncalc'
 
-import formatInterval from '@utils/formatInterval'
-import getProperName from '@utils/getProperName'
-import checkAdvFilter from '@utils/checkAdvFilter'
-import dayCheck from '@utils/dayCheck'
-import parseQuestConditions from '@utils/parseConditions'
+import { formatInterval } from '@utils/formatInterval'
+import { getProperName } from '@utils/getProperName'
+import { checkIVFilterValid } from '@utils/checkAdvFilter'
+import { dayCheck } from '@utils/dayCheck'
+import { parseQuestConditions } from '@utils/parseConditions'
 
 export class Utility {
   static getProperName(word) {
@@ -13,7 +13,7 @@ export class Utility {
   }
 
   static checkAdvFilter(filter) {
-    return checkAdvFilter(filter)
+    return checkIVFilterValid(filter)
   }
 
   static formatInterval(intervalMs) {

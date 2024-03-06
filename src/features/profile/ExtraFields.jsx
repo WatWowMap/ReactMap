@@ -5,7 +5,7 @@ import TextField from '@mui/material/TextField'
 import { useMutation } from '@apollo/client'
 
 import { useMemory } from '@store/useMemory'
-import Query from '@services/Query'
+import { Query } from '@services/Query'
 import { useTranslation } from 'react-i18next'
 
 export function ExtraUserFields() {

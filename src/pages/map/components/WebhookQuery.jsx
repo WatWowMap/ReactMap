@@ -3,7 +3,7 @@ import * as React from 'react'
 import { useParams } from 'react-router-dom'
 import { useQuery } from '@apollo/client'
 
-import Query from '@services/Query'
+import { Query } from '@services/Query'
 import { useMemory } from '@store/useMemory'
 import { useStorage } from '@store/useStorage'
 

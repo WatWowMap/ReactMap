@@ -11,7 +11,7 @@ import { useMemory } from '@store/useMemory'
 import { useLayoutStore } from '@store/useLayoutStore'
 import { LocaleSelection } from '@components/inputs/LocaleSelection'
 
-export default function TutWelcome() {
+export function TutorialWelcome() {
   const { t } = useTranslation()
   const { methods, loggedIn } = useMemory((state) => state.auth)
   const permStatus = useMemory((s) => {

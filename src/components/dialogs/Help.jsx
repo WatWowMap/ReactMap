@@ -2,8 +2,8 @@
 import * as React from 'react'
 
 import { useLayoutStore } from '@store/useLayoutStore'
+import { TutorialAdvanced } from '@features/tutorial/Advanced'
 
-import Help from '@features/tutorial/Advanced'
 import { DialogWrapper } from './DialogWrapper'
 
 export function HelpDialog() {
@@ -12,7 +12,7 @@ export function HelpDialog() {
     useLayoutStore.setState({ help: { open: false, category: '' } })
   return (
     <DialogWrapper open={open} onClose={handleClose}>
-      <Help toggleHelp={handleClose} category={category} />
+      <TutorialAdvanced toggleHelp={handleClose} category={category} />
     </DialogWrapper>
   )
 }

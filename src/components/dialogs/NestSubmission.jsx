@@ -5,14 +5,14 @@ import TextField from '@mui/material/TextField'
 import { useMutation } from '@apollo/client'
 import { useTranslation } from 'react-i18next'
 
-import Query from '@services/Query'
+import { Query } from '@services/Query'
 import { useMemory } from '@store/useMemory'
 import { useLayoutStore } from '@store/useLayoutStore'
 
 import { Header } from './Header'
 import { Footer } from './Footer'
 
-export default function NestSubmission({ id, name }) {
+export function NestSubmission({ id, name }) {
   const open = useLayoutStore((s) => s.nestSubmissions)
   const [newName, setNewName] = React.useState(name)
   const { t } = useTranslation()

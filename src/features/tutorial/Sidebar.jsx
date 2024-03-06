@@ -19,16 +19,19 @@ import { useMemory } from '@store/useMemory'
 import { toggleDialog } from '@store/useLayoutStore'
 import { Utility } from '@services/Utility'
 
-import data from './data'
+import { tutorialData } from './data'
 
-export default function TutSidebar() {
+export function TutorialSidebar() {
   const { t } = useTranslation()
   const { perms } = useMemory((state) => state.auth)
   const isMobile = useMemory((state) => state.isMobile)
 
   const [tempFilters, setTempFilters] = React.useState(
     Object.fromEntries(
-      Object.keys(data.filters).map((x) => [x, !!Math.round(Math.random())]),
+      Object.keys(tutorialData.filters).map((x) => [
+        x,
+        !!Math.round(Math.random()),
+      ]),
     ),
   )
 
@@ -65,7 +68,7 @@ export default function TutSidebar() {
         </Grid>
         <Grid item xs={12}>
           <List disablePadding>
-            {Object.keys(data.filters).map((subItem) => {
+            {Object.keys(tutorialData.filters).map((subItem) => {
               if (subItem === 'filter') {
                 return null
               }

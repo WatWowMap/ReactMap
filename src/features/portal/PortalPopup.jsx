@@ -8,9 +8,8 @@ import { Utility } from '@services/Utility'
 import { ErrorBoundary } from '@components/ErrorBoundary'
 import { useMemory } from '@store/useMemory'
 import { useStorage } from '@store/useStorage'
-
-import Navigation from '@components/popups/Navigation'
-import Coords from '@components/popups/Coords'
+import { Navigation } from '@components/popups/Navigation'
+import { Coords } from '@components/popups/Coords'
 
 /**
  *

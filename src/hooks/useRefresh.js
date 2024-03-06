@@ -9,7 +9,7 @@ import UAssets from '@services/Assets'
 import { useMemory } from '@store/useMemory'
 import { useStorage } from '@store/useStorage'
 
-export default function useRefresh(once = false) {
+export function useRefresh(once = false) {
   const active = useMemory((s) => s.active)
   const online = useMemory((s) => s.online)
 

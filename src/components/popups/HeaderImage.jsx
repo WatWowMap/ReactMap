@@ -5,7 +5,7 @@ import Link from '@mui/material/Link'
 
 import { useMemory } from '@store/useMemory'
 
-export default function HeaderImage({
+export function HeaderImage({
   url,
   exEligible = false,
   arScanEligible = false,

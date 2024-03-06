@@ -14,15 +14,15 @@ import { useMutation } from '@apollo/client'
 
 import { useMemory } from '@store/useMemory'
 import { useStorage } from '@store/useStorage'
-import Query from '@services/Query'
+import { Query } from '@services/Query'
 import { Header } from '@components/dialogs/Header'
 
-import Welcome from './Welcome'
-import Advanced from './Advanced'
-import Closing from './Closing'
-import Sidebar from './Sidebar'
-import Sliders from './Sliders'
-import Popups from './Popups'
+import { TutorialWelcome } from './Welcome'
+import { TutorialAdvanced } from './Advanced'
+import { TutorialClosing } from './Closing'
+import { TutorialSidebar } from './Sidebar'
+import { TutorialSliders } from './Sliders'
+import { TutorialPopup } from './Popups'
 
 const steps = ['intro', 'sidebar', 'sliders', 'advanced', 'popups', 'closing']
 
@@ -83,12 +83,12 @@ export function Tutorial() {
           >
             {
               {
-                0: <Welcome />,
-                1: <Sidebar />,
-                2: <Sliders />,
-                3: <Advanced category="pokemon" />,
-                4: <Popups />,
-                5: <Closing />,
+                0: <TutorialWelcome />,
+                1: <TutorialSidebar />,
+                2: <TutorialSliders />,
+                3: <TutorialAdvanced category="pokemon" />,
+                4: <TutorialPopup />,
+                5: <TutorialClosing />,
               }[step]
             }
           </Box>

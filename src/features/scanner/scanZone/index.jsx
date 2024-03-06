@@ -11,7 +11,7 @@ import { ScanOnDemandPopup } from '../Popup'
  *
  * @returns
  */
-export default function ScanZone() {
+export function ScanZone() {
   useCheckValid('scanZone')
 
   return (
