@@ -91,7 +91,7 @@ export function QuestConditionSelector({ id }) {
           )
         }
       }}
-      sx={{ my: 1 }}
+      fcSx={{ my: 1 }}
     >
       <MenuItem value="">
         <Typography variant="caption">{t('all')}</Typography>

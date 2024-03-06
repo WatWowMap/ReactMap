@@ -1,9 +1,6 @@
 // @ts-check
 import * as React from 'react'
-import Select from '@mui/material/Select'
 import MenuItem from '@mui/material/MenuItem'
-import InputLabel from '@mui/material/InputLabel'
-import FormControl from '@mui/material/FormControl'
 import { useTranslation } from 'react-i18next'
 import { useMutation } from '@apollo/client'
 
@@ -17,6 +14,7 @@ import {
 } from '@services/queries/webhook'
 import { Loading } from '@components/Loading'
 import { useWebhookStore } from '@store/useWebhookStore'
+import { FCSelect } from '@components/inputs/FCSelect'
 
 import { useGetWebhookData } from '../../hooks/useGetWebhookData'
 
@@ -45,27 +43,23 @@ export function HookSelection() {
   return loading ? (
     <Loading>{t('loading', { category: t('webhooks') })}</Loading>
   ) : (
-    <FormControl sx={{ m: 1 }}>
-      <InputLabel id="hook-select">{t('select_webhook')}</InputLabel>
-      <Select
-        id="hook-select"
-        label={t('select_webhook')}
-        value={selected}
-        onChange={(e) => {
-          save({ variables: { webhook: e.target.value } }).then(
-            ({ data }) =>
-              data?.webhook?.human &&
-              useWebhookStore.setState({ human: data.webhook.human }),
-          )
-        }}
-        style={{ minWidth: 100 }}
-      >
-        {webhooks.map((webhook) => (
-          <MenuItem key={webhook} value={webhook}>
-            {webhook}
-          </MenuItem>
-        ))}
-      </Select>
-    </FormControl>
+    <FCSelect
+      label={t('select_webhook')}
+      value={selected}
+      onChange={(e) => {
+        save({ variables: { webhook: e.target.value } }).then(
+          ({ data }) =>
+            data?.webhook?.human &&
+            useWebhookStore.setState({ human: data.webhook.human }),
+        )
+      }}
+      fcSx={{ m: 1, width: '90%' }}
+    >
+      {webhooks.map((webhook) => (
+        <MenuItem key={webhook} value={webhook}>
+          {webhook}
+        </MenuItem>
+      ))}
+    </FCSelect>
   )
 }

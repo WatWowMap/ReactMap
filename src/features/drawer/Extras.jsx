@@ -5,7 +5,6 @@ import * as React from 'react'
 import Box from '@mui/material/Box'
 import ListItem from '@mui/material/ListItem'
 import ListItemText from '@mui/material/ListItemText'
-import Select from '@mui/material/Select'
 import MenuItem from '@mui/material/MenuItem'
 import { useTranslation } from 'react-i18next'
 
@@ -22,6 +21,7 @@ import {
 import { SliderTile } from '@components/inputs/SliderTile'
 import { MultiSelectorStore } from '@components/inputs/MultiSelector'
 import { BoolToggle } from '@components/inputs/BoolToggle'
+import { FCSelect, FCSelectListItem } from '@components/inputs/FCSelect'
 
 import { CollapsibleItem } from './CollapsibleItem'
 import { MultiSelectorList, SelectorListMemo } from './SelectorList'
@@ -58,29 +58,27 @@ const BaseS2Cells = () => {
   )
   return (
     <CollapsibleItem open={enabled}>
-      <ListItem>
-        <Select
-          sx={{ mx: 'auto', width: '90%' }}
-          value={safe}
-          renderValue={(selected) =>
-            Array.isArray(selected) ? selected.join(', ') : selected
-          }
-          multiple
-          onChange={({ target }) =>
-            setFilters(
-              typeof target.value === 'string'
-                ? target.value.split(',')
-                : target.value,
-            )
-          }
-        >
-          {S2_LEVELS.map((level) => (
-            <MenuItem key={level} value={level}>
-              {t('level')} {level}
-            </MenuItem>
-          ))}
-        </Select>
-      </ListItem>
+      <FCSelectListItem
+        sx={{ mx: 'auto', width: '90%' }}
+        value={safe}
+        renderValue={(selected) =>
+          Array.isArray(selected) ? selected.join(', ') : selected
+        }
+        multiple
+        onChange={({ target }) =>
+          setFilters(
+            typeof target.value === 'string'
+              ? target.value.split(',')
+              : target.value,
+          )
+        }
+      >
+        {S2_LEVELS.map((level) => (
+          <MenuItem key={level} value={level}>
+            {t('level')} {level}
+          </MenuItem>
+        ))}
+      </FCSelectListItem>
     </CollapsibleItem>
   )
 }
@@ -134,7 +132,7 @@ const RaidOverride = () => {
     <CollapsibleItem open={enabled}>
       <ListItem
         secondaryAction={
-          <Select
+          <FCSelect
             value={filters}
             fullWidth
             size="small"
@@ -152,7 +150,7 @@ const RaidOverride = () => {
                 {t(i ? `raid_${tier}_plural` : 'disabled')}
               </MenuItem>
             ))}
-          </Select>
+          </FCSelect>
         }
       >
         <ListItemText primary={t('raid_override')} />

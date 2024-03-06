@@ -3,13 +3,10 @@
 import * as React from 'react'
 import AppBar from '@mui/material/AppBar'
 import Divider from '@mui/material/Divider'
-import FormControl from '@mui/material/FormControl'
-import InputLabel from '@mui/material/InputLabel'
 import List from '@mui/material/List'
 import ListItem from '@mui/material/ListItem'
 import ListSubheader from '@mui/material/ListSubheader'
 import MenuItem from '@mui/material/MenuItem'
-import Select from '@mui/material/Select'
 import Tab from '@mui/material/Tab'
 import Tabs from '@mui/material/Tabs'
 import Typography from '@mui/material/Typography'
@@ -28,6 +25,7 @@ import { GenderListItem } from '@components/filters/Gender'
 import { BasicListButton } from '@components/inputs/BasicListButton'
 import { BoolToggle, DualBoolToggle } from '@components/inputs/BoolToggle'
 import { analytics } from '@utils/analytics'
+import { FCSelectListItem } from '@components/inputs/FCSelect'
 
 import { SelectorListMemo } from './SelectorList'
 
@@ -56,57 +54,47 @@ function PokemonDrawer() {
   return (
     <>
       <BoolToggle field="filters.pokemon.enabled" label="enabled" />
-      <ListItem>
-        <FormControl fullWidth>
-          <InputLabel id="pokemon-filter-mode">
-            {t('pokemon_filter_mode')}
-          </InputLabel>
-          <Select
-            ref={selectRef}
-            labelId="pokemon-filter-mode"
-            id="demo-simple-select"
-            value={filterMode}
-            fullWidth
-            size="small"
-            label={t('pokemon_filter_mode')}
-            renderValue={(selected) => t(selected)}
-            onChange={(e) => {
-              const { setPokemonFilterMode } = useStorage.getState()
-              switch (e.target.value) {
-                case 'basic':
-                  return setPokemonFilterMode(false, true)
-                case 'intermediate':
-                  return setPokemonFilterMode(false, false)
-                case 'expert':
-                  return setPokemonFilterMode(true, false)
-                default:
-              }
-            }}
-          >
-            {['basic', 'intermediate', ...(ui.legacy ? ['expert'] : [])].map(
-              (tier) => (
-                <MenuItem
-                  key={tier}
-                  dense
-                  value={tier}
-                  sx={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'flex-start',
-                    whiteSpace: 'normal',
-                    width: selectRef.current?.clientWidth || 'auto',
-                  }}
-                >
-                  <Typography variant="subtitle2">{t(tier)}</Typography>
-                  <Typography variant="caption" flexWrap="wrap">
-                    {t(`${tier}_description`)}
-                  </Typography>
-                </MenuItem>
-              ),
-            )}
-          </Select>
-        </FormControl>
-      </ListItem>
+      <FCSelectListItem
+        label={t('pokemon_filter_mode')}
+        value={filterMode}
+        fullWidth
+        size="small"
+        renderValue={(selected) => t(selected)}
+        onChange={(e) => {
+          const { setPokemonFilterMode } = useStorage.getState()
+          switch (e.target.value) {
+            case 'basic':
+              return setPokemonFilterMode(false, true)
+            case 'intermediate':
+              return setPokemonFilterMode(false, false)
+            case 'expert':
+              return setPokemonFilterMode(true, false)
+            default:
+          }
+        }}
+      >
+        {['basic', 'intermediate', ...(ui.legacy ? ['expert'] : [])].map(
+          (tier) => (
+            <MenuItem
+              key={tier}
+              dense
+              value={tier}
+              sx={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'flex-start',
+                whiteSpace: 'normal',
+                width: selectRef.current?.clientWidth || 'auto',
+              }}
+            >
+              <Typography variant="subtitle2">{t(tier)}</Typography>
+              <Typography variant="caption" flexWrap="wrap">
+                {t(`${tier}_description`)}
+              </Typography>
+            </MenuItem>
+          ),
+        )}
+      </FCSelectListItem>
       <Collapse in={filterMode === 'intermediate'}>
         <BoolToggle
           field="userSettings.pokemon.linkGlobalAndAdvanced"

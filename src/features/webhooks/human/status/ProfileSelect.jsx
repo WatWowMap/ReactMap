@@ -1,15 +1,13 @@
 // @ts-check
 import * as React from 'react'
-import Select from '@mui/material/Select'
 import MenuItem from '@mui/material/MenuItem'
 import CircularProgress from '@mui/material/CircularProgress'
-import InputLabel from '@mui/material/InputLabel'
-import FormControl from '@mui/material/FormControl'
 import { useMutation, useQuery } from '@apollo/client'
 import { useTranslation } from 'react-i18next'
 
 import { ALL_PROFILES, SET_HUMAN } from '@services/queries/webhook'
 import { useWebhookStore } from '@store/useWebhookStore'
+import { FCSelect } from '@components/inputs/FCSelect'
 
 /** @type {React.CSSProperties} */
 const STYLE = { minWidth: 100 }
@@ -38,6 +36,7 @@ export function ProfileSelect() {
 
   const [save] = useMutation(SET_HUMAN)
 
+  /** @type {import('@mui/material').SelectProps['onChange']} */
   const onChange = React.useCallback(
     (event) => {
       save({
@@ -58,22 +57,20 @@ export function ProfileSelect() {
   const safeProfiles = (profiles || previousData)?.webhook?.profile
 
   return (
-    <FormControl sx={{ m: 1 }}>
-      <InputLabel id="profile-select">{t('select_profile')}</InputLabel>
-      <Select
-        id="profile-select"
-        label={t('select_profile')}
-        value={safeProfiles ? currentProfile || '' : ''}
-        onChange={onChange}
-        style={STYLE}
-        endAdornment={loading ? <CircularProgress /> : null}
-      >
-        {(safeProfiles || []).map((profile) => (
-          <MenuItem key={profile.profile_no} value={profile.profile_no}>
-            {profile.name}
-          </MenuItem>
-        ))}
-      </Select>
-    </FormControl>
+    <FCSelect
+      id="profile-select"
+      label={t('select_profile')}
+      value={safeProfiles ? currentProfile || '' : ''}
+      onChange={onChange}
+      style={STYLE}
+      endAdornment={loading ? <CircularProgress /> : null}
+      fcSx={{ m: 1, width: '90%' }}
+    >
+      {(safeProfiles || []).map((profile) => (
+        <MenuItem key={profile.profile_no} value={profile.profile_no}>
+          {profile.name}
+        </MenuItem>
+      ))}
+    </FCSelect>
   )
 }

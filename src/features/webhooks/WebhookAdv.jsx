@@ -6,13 +6,10 @@ import AccordionDetails from '@mui/material/AccordionDetails'
 import AccordionSummary from '@mui/material/AccordionSummary'
 import CircularProgress from '@mui/material/CircularProgress'
 import Divider from '@mui/material/Divider'
-import FormControl from '@mui/material/FormControl'
 import Grid from '@mui/material/Grid'
 import InputAdornment from '@mui/material/InputAdornment'
-import InputLabel from '@mui/material/InputLabel'
 import MenuItem from '@mui/material/MenuItem'
 import Paper from '@mui/material/Paper'
-import Select from '@mui/material/Select'
 import Switch from '@mui/material/Switch'
 import TextField from '@mui/material/TextField'
 import Typography from '@mui/material/Typography'
@@ -31,6 +28,7 @@ import { Footer } from '@components/dialogs/Footer'
 import { useWebhookStore } from '@store/useWebhookStore'
 import { useAnalytics } from '@hooks/useAnalytics'
 import { camelToSnake } from '@utils/camelToSnake'
+import { FCSelect } from '@components/inputs/FCSelect'
 
 import { Poracle } from './services/Poracle'
 
@@ -568,23 +566,16 @@ export function WebhookAdvanced() {
               sm={option.sm || size}
               style={{ margin: '10px 0', textAlign: 'center' }}
             >
-              <FormControl
-                variant="outlined"
-                size="small"
-                sx={{ width: '80%' }}
+              <FCSelect
+                name={option.name}
+                value={poracleValues[option.name]}
+                onChange={handleSelect}
+                label={t(option.name)}
+                disabled={getDisabled(option)}
+                fcSx={{ width: '80%' }}
               >
-                <InputLabel>{t(option.name)}</InputLabel>
-                <Select
-                  autoFocus
-                  name={option.name}
-                  value={poracleValues[option.name]}
-                  onChange={handleSelect}
-                  label={t(option.name)}
-                  disabled={getDisabled(option)}
-                >
-                  {getOptions(option)}
-                </Select>
-              </FormControl>
+                {getOptions(option)}
+              </FCSelect>
             </Grid>
           ))
       case 'booleans':

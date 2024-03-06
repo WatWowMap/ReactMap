@@ -10,7 +10,7 @@ import Select from '@mui/material/Select'
 const SX = { margin: '3px 0' }
 
 /**
- * @param {import('@mui/material').SelectProps & { variant?: import('@mui/material').FormControlProps['variant']}} props
+ * @param {import('@mui/material').SelectProps & { variant?: import('@mui/material').FormControlProps['variant'], fcSx?: import('@mui/material').SxProps }} props
  * @returns
  */
 export function FCSelect({
@@ -18,16 +18,17 @@ export function FCSelect({
   value,
   label,
   size = 'small',
-  sx = SX,
+  fcSx = SX,
+  fullWidth = true,
   ...props
 }) {
   return (
-    <FormControl size={size} fullWidth sx={sx}>
+    <FormControl size={size} fullWidth={fullWidth} sx={fcSx}>
       <InputLabel>{label}</InputLabel>
       <Select
         autoFocus
         value={value || ''}
-        fullWidth
+        fullWidth={fullWidth}
         label={label}
         size={size}
         {...props}
