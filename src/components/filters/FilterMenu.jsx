@@ -8,27 +8,19 @@ import { Menu } from '@components/Menu'
 
 import { DialogWrapper } from '../dialogs/DialogWrapper'
 
+/** @type {import('@components/dialogs/Footer').FooterButton[]} */
+const EXTRA_BUTTONS = [
+  {
+    name: 'close',
+    action: toggleDialog(false),
+    color: 'secondary',
+  },
+]
+
 export function FilterMenu() {
   const { open, category, type } = useLayoutStore((s) => s.dialog)
   const filters = useStorage((s) => s.filters?.[category])
-
-  const [tempFilters, setTempFilters] = React.useState(filters?.filter)
-
-  const extraButtons = React.useMemo(
-    () =>
-      /** @type {import('@components/dialogs/Footer').FooterButton[]} */ ([
-        {
-          name: 'close',
-          action: toggleDialog(false),
-          color: 'secondary',
-        },
-      ]),
-    [category],
-  )
-
-  React.useEffect(() => {
-    setTempFilters(filters?.filter)
-  }, [category, filters?.filter])
+  const tempFilters = React.useMemo(() => filters?.filter, [filters?.filter])
 
   if (!category || !type || !tempFilters) return null
   return (
@@ -42,7 +34,7 @@ export function FilterMenu() {
         title={`${category}_filters`}
         titleAction={toggleDialog(false)}
         tempFilters={tempFilters}
-        extraButtons={extraButtons}
+        extraButtons={EXTRA_BUTTONS}
       >
         {(_, key) => <StandardItem id={key} category={category} caption />}
       </Menu>
