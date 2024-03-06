@@ -6,7 +6,7 @@ import TextField from '@mui/material/TextField'
 import { useMutation } from '@apollo/client'
 import { useTranslation } from 'react-i18next'
 
-import { Query } from '@services/Query'
+import { Query } from '@services/queries'
 import { useWebhookStore } from '@store/useWebhookStore'
 import { useLayoutStore } from '@store/useLayoutStore'
 

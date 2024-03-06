@@ -21,7 +21,7 @@ import ArrowDropUp from '@mui/icons-material/ArrowDropUp'
 import Typography from '@mui/material/Typography'
 import DownloadIcon from '@mui/icons-material/Download'
 
-import { Query } from '@services/Query'
+import { Query } from '@services/queries'
 import { formatInterval } from '@utils/formatInterval'
 import { useMemory } from '@store/useMemory'
 import { useStorage } from '@store/useStorage'

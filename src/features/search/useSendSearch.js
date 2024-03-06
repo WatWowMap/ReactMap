@@ -4,7 +4,7 @@ import { useLazyQuery } from '@apollo/client'
 import { useTranslation } from 'react-i18next'
 import { debounce } from 'lodash'
 
-import { Query } from '@services/Query'
+import { Query } from '@services/queries'
 import { useStorage } from '@store/useStorage'
 import { useMemory } from '@store/useMemory'
 import { useMapStore } from '@store/useMapStore'

@@ -8,7 +8,7 @@ import MenuItem from '@mui/material/MenuItem'
 import Typography from '@mui/material/Typography'
 
 import { useMemory } from '@store/useMemory'
-import { Query } from '@services/Query'
+import { Query } from '@services/queries'
 import { METHODS } from '@assets/constants'
 import { DiscordButton } from '@components/auth/Discord'
 import { TelegramWidget } from '@components/auth/Telegram'

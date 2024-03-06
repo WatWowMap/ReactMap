@@ -6,7 +6,7 @@ import { useMutation } from '@apollo/client'
 import { useTranslation } from 'react-i18next'
 
 import { useMemory } from '@store/useMemory'
-import { Query } from '@services/Query'
+import { Query } from '@services/queries'
 
 export function ExtraUserFields() {
   const fields = useMemory((s) => s.extraUserFields)

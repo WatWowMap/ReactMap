@@ -5,7 +5,7 @@ import Dialog from '@mui/material/Dialog'
 import { useMutation } from '@apollo/client'
 
 import { apolloClient, apolloCache } from '@services/apollo'
-import { Query } from '@services/Query'
+import { Query } from '@services/queries'
 import { ENUM_BADGES } from '@assets/constants'
 import { useLayoutStore } from '@store/useLayoutStore'
 import { MultiSelector } from '@components/inputs/MultiSelector'

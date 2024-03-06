@@ -21,7 +21,7 @@ import { useLazyQuery } from '@apollo/client'
 
 import { useMemory } from '@store/useMemory'
 import { useStorage } from '@store/useStorage'
-import { Query } from '@services/Query'
+import { Query } from '@services/queries'
 import { SliderTile } from '@components/inputs/SliderTile'
 import { Header } from '@components/dialogs/Header'
 import { Footer } from '@components/dialogs/Footer'
