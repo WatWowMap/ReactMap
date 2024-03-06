@@ -10,7 +10,7 @@ import { useMemory } from '@store/useMemory'
  * @param {keyof import('packages/types/lib').Available} category
  * @returns {{available: string[], loading: boolean, error: import('@apollo/client').ApolloError}}
  */
-export default function useGetAvailable(category) {
+export function useGetAvailable(category) {
   const capitalized = capitalize(category)
   const active = useMemory((s) => s.active)
   const online = useMemory((s) => s.online)

@@ -5,7 +5,7 @@ import Dialog from '@mui/material/Dialog'
 import { useMemory } from '@store/useMemory'
 import { setMode, useWebhookStore } from '@store/useWebhookStore'
 
-import Manage from './Manage'
+import { Manage } from './Manage'
 
 export function Webhook() {
   const webhookMode = useWebhookStore((s) => s.mode === 'open')

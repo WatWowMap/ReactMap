@@ -10,8 +10,8 @@ import { Loading } from '@components/Loading'
 import { GenericSearch } from '@components/inputs/GenericSearch'
 import { useWebhookStore } from '@store/useWebhookStore'
 
-import TrackedTile from './tiles/TrackedTile'
-import Selecting from './Selecting'
+import { TrackedTile } from './tiles/TrackedTile'
+import { Selecting } from './Selecting'
 import { useGetWebhookData } from './hooks/useGetWebhookData'
 
 /**
@@ -19,7 +19,7 @@ import { useGetWebhookData } from './hooks/useGetWebhookData'
  * @param {{ category: Exclude<import('@store/useWebhookStore').WebhookStore['category'], 'human'> }} props
  * @returns
  */
-const Tracked = ({ category }) => {
+export const Tracked = ({ category }) => {
   const { t } = useTranslation()
 
   const { data: tracked, loading } = useGetWebhookData(category)
@@ -62,5 +62,3 @@ export const WebhookSearch = React.memo(() => {
     />
   )
 })
-
-export default Tracked

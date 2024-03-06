@@ -15,7 +15,7 @@ import { useFilter } from '@hooks/useFilter'
 import { Header } from '@components/dialogs/Header'
 import { Footer } from '@components/dialogs/Footer'
 import { applyToAll } from '@services/filtering/applyToAll'
-import useGetAvailable from '@hooks/useGetAvailable'
+import { useGetAvailable } from '@hooks/useGetAvailable'
 import { applyToAllWebhooks, useWebhookStore } from '@store/useWebhookStore'
 
 import { OptionsContainer } from './filters/OptionsContainer'

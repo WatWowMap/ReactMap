@@ -69,4 +69,4 @@ const Areas = () => {
   )
 }
 
-export default React.memo(Areas, () => true)
+export const HumanArea = React.memo(Areas, () => true)

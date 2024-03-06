@@ -12,10 +12,10 @@ import ImportExportIcon from '@mui/icons-material/ImportExport'
 import TrendingUpIcon from '@mui/icons-material/TrendingUp'
 import FeedbackIcon from '@mui/icons-material/Feedback'
 import HeartIcon from '@mui/icons-material/Favorite'
+
 import { downloadJson } from '@utils/downloadJson'
 import { deepMerge } from '@utils/deepMerge'
 import { useMapStore } from '@store/useMapStore'
-
 import { useMemory } from '@store/useMemory'
 import { useLayoutStore } from '@store/useLayoutStore'
 import { useStorage } from '@store/useStorage'
@@ -53,7 +53,7 @@ const renderLink = React.forwardRef(({ to, ...itemProps }, ref) => (
   <Link to={to} ref={ref} {...itemProps} />
 ))
 
-export default function DrawerActions() {
+export function DrawerActions() {
   const {
     auth: { loggedIn, methods },
     config,

@@ -75,7 +75,7 @@ const trimFilters = (requestedFilters, userSettings, category, onlyAreas) => {
   return trimmed
 }
 
-export default function FilterPermCheck({ category }) {
+export function FilterPermCheck({ category }) {
   const valid = usePermCheck(category)
   const error = useMemory((state) => state.clientError)
 

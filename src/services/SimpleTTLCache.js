@@ -1,6 +1,6 @@
 // @ts-check
 
-class SimpleTTLCache {
+export class SimpleTTLCache {
   /**
    * @param {number} ttl
    */
@@ -35,5 +35,3 @@ class SimpleTTLCache {
     return this._cache.size
   }
 }
-
-export default SimpleTTLCache

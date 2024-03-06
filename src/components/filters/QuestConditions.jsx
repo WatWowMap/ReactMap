@@ -10,7 +10,7 @@ import { useTranslation } from 'react-i18next'
 
 import { useMemory } from '@store/useMemory'
 import { useDeepStore, useStorage } from '@store/useStorage'
-import QuestTitle from '@components/QuestTitle'
+import { QuestTitle } from '@components/QuestTitle'
 
 /**
  *

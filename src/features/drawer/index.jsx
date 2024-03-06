@@ -13,7 +13,7 @@ import { useLayoutStore } from '@store/useLayoutStore'
 import { Img } from '@components/Img'
 import { DividerWithMargin } from '@components/StyledDivider'
 
-import Actions from './Actions'
+import { DrawerActions } from './Actions'
 import { DrawerSectionMemo } from './Section'
 
 const handleClose = () => useLayoutStore.setState({ drawer: false })
@@ -70,7 +70,7 @@ export function Drawer() {
           </React.Fragment>
         ))}
       </List>
-      {config.general.separateDrawerActions && <Actions />}
+      {config.general.separateDrawerActions && <DrawerActions />}
     </MuiDrawer>
   )
 }

@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next'
 /**
  * @param {{ questTitle: string, questTarget: number }} props
  */
-export default function QuestTitle(props) {
+export function QuestTitle(props) {
   return (
     <Typography variant="caption">
       <RawQuestTitle {...props} />

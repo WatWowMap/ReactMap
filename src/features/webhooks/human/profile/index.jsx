@@ -14,7 +14,7 @@ import { ProfileTile } from './ProfileTile'
  * @typedef {{ uid: number, handleViewChange: (newView: View) => () => void}} Props
  */
 
-export default function ProfileEditing() {
+export function ProfileEditing() {
   const { data, loading } = useGetWebhookData('profile')
   const { t } = useTranslation()
 

@@ -10,7 +10,7 @@ import Box from '@mui/material/Box'
  *  disablePadding?: boolean
  * }} props
  */
-export default function TabPanel({ children, value, index, disablePadding }) {
+export function TabPanel({ children, value, index, disablePadding }) {
   return (
     <Box
       role="tabpanel"

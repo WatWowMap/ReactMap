@@ -7,7 +7,7 @@ import { ProfileSelect } from './ProfileSelect'
 import { EnableSwitch } from './EnableSwitch'
 import { HookSelection } from './HookSelection'
 
-export default function Status() {
+export function Status() {
   const multipleHooks = useWebhookStore((s) => s.multipleHooks)
 
   const sm = multipleHooks ? 4 : 6

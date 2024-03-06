@@ -3,23 +3,21 @@ import * as React from 'react'
 import Grid from '@mui/material/Unstable_Grid2'
 import Divider from '@mui/material/Divider'
 
-import Location from './Location'
-import Areas from './area'
-import Status from './status'
+import { LocationMemo } from './Location'
+import { HumanArea } from './area'
+import { Status } from './status'
 
-const Human = () => (
+const BaseHuman = () => (
   <Grid container justifyContent="flex-start" alignItems="center" spacing={2}>
     <Status />
-    <Location />
+    <LocationMemo />
     <Divider
       light
       flexItem
       sx={{ height: 5, width: '100%', margin: '15px 0px' }}
     />
-    <Areas />
+    <HumanArea />
   </Grid>
 )
 
-const HumanMemo = React.memo(Human, () => true)
-
-export default HumanMemo
+export const Human = React.memo(BaseHuman, () => true)

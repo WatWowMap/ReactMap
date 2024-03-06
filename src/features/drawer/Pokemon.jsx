@@ -24,12 +24,12 @@ import { XXS_XXL, NUNDO_HUNDO } from '@assets/constants'
 import { useLayoutStore } from '@store/useLayoutStore'
 import { StringFilterMemo } from '@components/filters/StringFilter'
 import { SliderTile } from '@components/inputs/SliderTile'
-import TabPanel from '@components/TabPanel'
+import { TabPanel } from '@components/TabPanel'
 import { GenderListItem } from '@components/filters/Gender'
 import { BasicListButton } from '@components/inputs/BasicListButton'
+import { BoolToggle, DualBoolToggle } from '@components/inputs/BoolToggle'
 
 import { SelectorListMemo } from './SelectorList'
-import { BoolToggle, DualBoolToggle } from '../../components/inputs/BoolToggle'
 
 function PokemonDrawer() {
   const filterMode = useStorage((s) => s.getPokemonFilterMode())

@@ -1,5 +1,5 @@
 // @ts-check
-class HolidayAnimations {
+export class HolidayAnimations {
   /**
    * @param {string[]} images
    * @param {number} scale
@@ -78,5 +78,3 @@ class HolidayAnimations {
     this.ctx.clearRect(0, 0, this.w, this.h)
   }
 }
-
-export default HolidayAnimations

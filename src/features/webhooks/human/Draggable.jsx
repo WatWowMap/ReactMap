@@ -10,7 +10,6 @@ import { Circle, Marker, Popup, useMap } from 'react-leaflet'
 import { useTranslation } from 'react-i18next'
 
 import { fallbackMarker } from '@assets/fallbackMarker'
-
 import { useWebhookStore } from '@store/useWebhookStore'
 
 export function WebhookMarker() {

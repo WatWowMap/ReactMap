@@ -5,13 +5,13 @@ import RestartAltIcon from '@mui/icons-material/RestartAlt'
 
 import { useStorage } from '@store/useStorage'
 import { BasicListButton } from '@components/inputs/BasicListButton'
+import { GenericSearch } from '@components/inputs/GenericSearch'
 
-import { GenericSearch } from '../../../components/inputs/GenericSearch'
 import { ScanAreasTable } from './AreaTable'
 
 const onClick = () => useStorage.getState().setAreas()
 
-function AreaDropDown() {
+function Area() {
   return (
     <>
       <BasicListButton label="reset" onClick={onClick}>
@@ -27,4 +27,4 @@ function AreaDropDown() {
   )
 }
 
-export default React.memo(AreaDropDown)
+export const AreaSection = React.memo(Area)

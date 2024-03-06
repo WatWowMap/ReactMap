@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
 
-export default class Fetch {
+export class Fetch {
   /**
    *
    * @returns {Promise<ReturnType<typeof import('../../server/src/services/functions/getServerSettings')>>}

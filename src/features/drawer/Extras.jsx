@@ -20,11 +20,11 @@ import {
   WAYFARER_OPTIONS,
 } from '@assets/constants'
 import { SliderTile } from '@components/inputs/SliderTile'
+import { MultiSelectorStore } from '@components/inputs/MultiSelector'
+import { BoolToggle } from '@components/inputs/BoolToggle'
 
-import { MultiSelectorStore } from '../../components/inputs/MultiSelector'
 import { CollapsibleItem } from './CollapsibleItem'
 import { MultiSelectorList, SelectorListMemo } from './SelectorList'
-import { BoolToggle } from '../../components/inputs/BoolToggle'
 
 const BaseNestSlider = () => {
   const slider = useMemory((s) => s.ui.nests?.sliders?.secondary?.[0])
@@ -399,7 +399,7 @@ const BaseLureQuickSelector = () => {
 }
 const LureQuickSelector = React.memo(BaseLureQuickSelector)
 
-function Extras({ category, subItem }) {
+function ExtrasComponent({ category, subItem }) {
   switch (category) {
     case 'nests':
       return subItem === 'sliders' ? (
@@ -442,8 +442,8 @@ function Extras({ category, subItem }) {
   }
 }
 
-export default React.memo(
-  Extras,
+export const Extras = React.memo(
+  ExtrasComponent,
   (prev, next) =>
     prev.category === next.category && prev.subItem === next.subItem,
 )

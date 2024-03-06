@@ -11,11 +11,10 @@ import InputLabel from '@mui/material/InputLabel'
 import OutlinedInput from '@mui/material/OutlinedInput'
 import InputAdornment from '@mui/material/InputAdornment'
 import IconButton from '@mui/material/IconButton'
-
 import { useTranslation } from 'react-i18next'
 import { useLazyQuery } from '@apollo/client'
 
-import Fetch from '@services/Fetch'
+import { Fetch } from '@services/Fetch'
 import { Query } from '@services/Query'
 
 /**

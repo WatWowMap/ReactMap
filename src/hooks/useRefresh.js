@@ -4,7 +4,7 @@ import { useQuery } from '@apollo/client'
 import { getMapData } from '@services/queries/available'
 
 import { deepMerge } from '@utils/deepMerge'
-import UAssets from '@services/Assets'
+import { UAssets } from '@services/Assets'
 
 import { useMemory } from '@store/useMemory'
 import { useStorage } from '@store/useStorage'

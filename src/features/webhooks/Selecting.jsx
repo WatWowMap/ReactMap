@@ -11,7 +11,7 @@ import { setProfile, allProfiles } from '@services/queries/webhook'
 
 import { useWebhookStore, setSelected } from '@store/useWebhookStore'
 
-export default function Selecting() {
+export function Selecting() {
   const { t } = useTranslation()
   const [save] = useMutation(setProfile, {
     refetchQueries: [allProfiles],

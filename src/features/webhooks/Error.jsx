@@ -6,7 +6,7 @@ import { useTranslation, Trans } from 'react-i18next'
 
 import { useWebhookStore } from '@store/useWebhookStore'
 
-export default function WebhookError({ children }) {
+export function WebhookError({ children }) {
   const { t } = useTranslation()
   const name = useWebhookStore((s) => s.context.name)
   return (

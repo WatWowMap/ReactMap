@@ -21,15 +21,15 @@ import { allProfiles } from '@services/queries/webhook'
 import { Menu } from '@components/Menu'
 import { setMode, setSelected, useWebhookStore } from '@store/useWebhookStore'
 
-import Human from './human'
-import Tracked from './Tracked'
+import { Human } from './human'
+import { Tracked } from './Tracked'
 import { useGenFilters } from './hooks/useGenFilters'
 import { useGetHookContext } from './hooks/useGetHookContext'
-import ProfileEditing from './human/profile'
+import { ProfileEditing } from './human/profile'
 import { Poracle } from './services/Poracle'
 import { WebhookItem } from './tiles/WebhookItem'
 
-export default function Manage() {
+export function Manage() {
   const { t } = useTranslation()
 
   const categories = useGetHookContext()

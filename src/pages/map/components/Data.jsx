@@ -6,7 +6,7 @@ import { useStorage } from '@store/useStorage'
 import { useMapStore } from '@store/useMapStore'
 import { Utility } from '@services/Utility'
 
-import FilterPermCheck from './QueryData'
+import { FilterPermCheck } from './QueryData'
 
 export function DataView() {
   Utility.analytics(window.location.pathname)

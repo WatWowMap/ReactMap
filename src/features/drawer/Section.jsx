@@ -16,12 +16,12 @@ import { toggleDialog, useLayoutStore } from '@store/useLayoutStore'
 import { useStorage } from '@store/useStorage'
 import { Utility } from '@services/Utility'
 import { BasicListButton } from '@components/inputs/BasicListButton'
+import { BoolToggle } from '@components/inputs/BoolToggle'
 
-import SettingsMenu from './Settings'
+import { Settings } from './Settings'
 import { PokemonDrawerMemo } from './Pokemon'
-import Areas from './areas'
-import Extras from './Extras'
-import { BoolToggle } from '../../components/inputs/BoolToggle'
+import { AreaSection } from './areas'
+import { Extras } from './Extras'
 
 const ADV_CATEGORIES = new Set(['pokemon', 'gyms', 'pokestops', 'nests'])
 
@@ -66,7 +66,7 @@ const DrawerSection = ({ category }) => {
           {category === 'pokemon' ? (
             <PokemonDrawerMemo />
           ) : category === 'settings' ? (
-            <SettingsMenu />
+            <Settings />
           ) : (
             Object.keys(value).map((subItem) => {
               const hasSubSubCategories =
@@ -103,7 +103,7 @@ const DrawerSection = ({ category }) => {
               <TuneIcon color="primary" />
             </BasicListButton>
           )}
-          {category === 'scanAreas' && <Areas />}
+          {category === 'scanAreas' && <AreaSection />}
         </List>
       </AccordionDetails>
     </Accordion>

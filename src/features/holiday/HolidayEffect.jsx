@@ -3,7 +3,7 @@ import * as React from 'react'
 
 import { useStorage } from '@store/useStorage'
 
-import HolidayAnimations from './HolidayAnimations'
+import { HolidayAnimations } from './HolidayAnimations'
 
 /**
  *

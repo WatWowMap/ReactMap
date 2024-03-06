@@ -47,7 +47,7 @@ function Weather({ gameplay_condition, ...props }) {
 
   const footerOptions = React.useMemo(
     () =>
-      /** @type {import('../../components/dialogs/Footer').FooterButton[]} */ ([
+      /** @type {import('@components/dialogs/Footer').FooterButton[]} */ ([
         {
           name: 'close',
           action: () => setOpen(false),

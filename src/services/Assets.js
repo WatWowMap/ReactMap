@@ -25,7 +25,7 @@
 // }
 
 // TODO: This is dumb, should be a state machine with Zustand
-class UAssets {
+export class UAssets {
   /**
    *
    * @param {import("@rm/types").Config['icons']} iconsConfig
@@ -710,5 +710,3 @@ class UAssets {
     }
   }
 }
-
-export default UAssets

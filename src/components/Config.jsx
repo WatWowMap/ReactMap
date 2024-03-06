@@ -5,7 +5,7 @@ import { Navigate } from 'react-router-dom'
 
 import { useMemory } from '@store/useMemory'
 import { useStorage } from '@store/useStorage'
-import Fetch from '@services/Fetch'
+import { Fetch } from '@services/Fetch'
 import { setLoadingText } from '@utils/setLoadingText'
 import { Utility } from '@services/Utility'
 import { deepMerge } from '@utils/deepMerge'
@@ -14,7 +14,7 @@ import { useHideElement } from '@hooks/useHideElement'
 import { getGlowRules } from '@utils/getGlowRules'
 import { useScannerSessionStorage } from '@features/scanner'
 
-export default function Config({ children }) {
+export function Config({ children }) {
   const { t } = useTranslation()
   const [serverSettings, setServerSettings] = React.useState({
     error: false,

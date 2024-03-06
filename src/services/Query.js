@@ -1,21 +1,21 @@
 // @ts-check
 import { useMemory } from '@store/useMemory'
 
-import getAllDevices from './queries/device'
 import * as gymIndex from './queries/gym'
 import * as pokestopIndex from './queries/pokestop'
 import * as pokemonIndex from './queries/pokemon'
-import getAllSpawnpoints from './queries/spawnpoint'
 import * as portalIndex from './queries/portal'
-import getAllWeather from './queries/weather'
-import getAllScanCells from './queries/scanCell'
-import getAllSubmissionCells from './queries/submissionCells'
-import { getOne, getAllNests, nestSubmission } from './queries/nest'
-import { getAllScanAreas, getScanAreasMenu } from './queries/scanAreas'
 import * as searchIndex from './queries/search'
 import * as webhookIndex from './queries/webhook'
 import * as user from './queries/user'
-import s2cell from './queries/s2cell'
+import { getAllDevices } from './queries/device'
+import { getAllSpawnpoints } from './queries/spawnpoint'
+import { getAllWeather } from './queries/weather'
+import { getAllScanCells } from './queries/scanCell'
+import { getAllSubmissionCells } from './queries/submissionCells'
+import { getOne, getAllNests, nestSubmission } from './queries/nest'
+import { getAllScanAreas, getScanAreasMenu } from './queries/scanAreas'
+import { S2_CELLS } from './queries/s2cell'
 import { getRoute, getRoutes } from './queries/route'
 
 export class Query {
@@ -161,7 +161,7 @@ export class Query {
   }
 
   static s2cells() {
-    return s2cell
+    return S2_CELLS
   }
 
   static routes(method) {

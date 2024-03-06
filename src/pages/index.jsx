@@ -2,7 +2,7 @@
 import * as React from 'react'
 import { Route, Routes } from 'react-router-dom'
 
-import Config from '@components/Config'
+import { Config } from '@components/Config'
 import { MapPage } from './map'
 import { LoginPage } from './login'
 import { BlockedPage } from './Blocked'

@@ -10,7 +10,8 @@ import CopyIcon from '@mui/icons-material/FileCopy'
 import IconButton from '@mui/material/IconButton'
 import { withTranslation } from 'react-i18next'
 
-import Fetch from '@services/Fetch'
+import { Fetch } from '@services/Fetch'
+
 import { Notification } from './Notification'
 
 /** @type {React.CSSProperties} */

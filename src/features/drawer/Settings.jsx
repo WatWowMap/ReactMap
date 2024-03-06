@@ -35,9 +35,9 @@ import {
 } from '@services/desktopNotification'
 import { LocaleSelection } from '@components/inputs/LocaleSelection'
 import { DividerWithMargin } from '@components/StyledDivider'
+import { BoolToggle } from '@components/inputs/BoolToggle'
 
-import DrawerActions from './Actions'
-import { BoolToggle } from '../../components/inputs/BoolToggle'
+import { DrawerActions } from './Actions'
 
 function FCSelect({ name, label, value, onChange, children, icon }) {
   return (
@@ -154,7 +154,7 @@ function GeneralSetting({ setting }) {
   )
 }
 
-export default function Settings() {
+export function Settings() {
   const { t } = useTranslation()
 
   const separateDrawerActions = useMemory(

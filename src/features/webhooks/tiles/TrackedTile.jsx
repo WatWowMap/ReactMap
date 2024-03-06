@@ -15,7 +15,7 @@ import * as webhookNodes from '@services/queries/webhook'
 import { useWebhookStore, setSelected } from '@store/useWebhookStore'
 import { Poracle } from '../services/Poracle'
 
-export default function TrackedTile({ index }) {
+export function TrackedTile({ index }) {
   const category = useWebhookStore((s) => s.category)
   const item = useWebhookStore((s) => s[category][index])
   const id = Poracle.getId(item)
