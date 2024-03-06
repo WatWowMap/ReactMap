@@ -25,10 +25,11 @@ import Query from '@services/Query'
 import formatInterval from '@utils/formatInterval'
 import { useMemory } from '@store/useMemory'
 import { useStorage } from '@store/useStorage'
-import { useFormatDistance } from '@hooks/useFormatDistance'
 import Title from '@components/popups/Title'
 import TimeSince from '@components/popups/Timer'
 import Navigation from '@components/popups/Navigation'
+
+import { useFormatDistance } from './useFormatDistance'
 
 const IMAGE_SIZE = 80
 
