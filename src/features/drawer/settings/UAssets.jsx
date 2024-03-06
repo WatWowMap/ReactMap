@@ -47,25 +47,25 @@ function UAssetSelect({ asset, category }) {
   const { t } = useTranslation()
   const value = useStorage((s) => s[asset][category])
   const iconUrl = useMemory((s) => s.Icons.getMisc(category))
-  const options = useMemory((s) => s.Icons[category])
-
   const instanceName = asset === 'icons' ? 'Icons' : 'Audio'
-  const setSelection = useMemory((s) => s[instanceName].setSelection)
+  const options = useMemory((s) => s[instanceName][category])
 
   return (
     <FCSelectListItem
       name={category}
-      value={value}
+      value={options?.has(value) ? value : ''}
       label={t(`${category}_${asset}`, `${category} ${instanceName}`)}
       onChange={({ target }) => {
-        setSelection(target.name, target.value)
+        useMemory
+          .getState()
+          [instanceName].setSelection(target.name, target.value)
         useStorage.setState((prev) => ({
-          [asset]: { ...prev.userSettings, [target.name]: target.value },
+          [asset]: { ...prev[asset], [target.name]: target.value },
         }))
       }}
       icon={<SettingIcon src={iconUrl} alt={category} />}
     >
-      {[...options].map((option) => (
+      {[...(options || [])].map((option) => (
         <MenuItem key={option} value={option}>
           {t(
             `${category.toLowerCase()}_${option.toLowerCase()}`,
