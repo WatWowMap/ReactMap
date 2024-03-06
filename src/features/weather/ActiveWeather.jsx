@@ -113,6 +113,7 @@ export function ActiveWeather() {
           booleanPointInPolygon(point(location), polygon([x.polygon])),
       )
       if (
+        weatherCache &&
         'gameplay_condition' in weatherCache &&
         weatherCache?.gameplay_condition !== active?.gameplay_condition
       ) {
