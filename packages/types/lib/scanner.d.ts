@@ -12,6 +12,8 @@ import WeatherModel = require('server/src/models/Weather')
 import RouteModel = require('server/src/models/Route')
 import { S2Polygon } from './general'
 
+export type Gender = 0 | 1 | 2 | 3
+
 export interface Device {
   id: string
   instance_name: string
@@ -55,7 +57,7 @@ export interface Gym {
   sponsor_id: number
   partner_id: number
   raid_pokemon_costume: number
-  raid_pokemon_gender: number
+  raid_pokemon_gender: Gender
   raid_pokemon_evolution: number
   ar_scan_eligible: boolean
   badge: number
@@ -102,7 +104,7 @@ export interface Quest {
   stardust_amount: number
   quest_pokemon_id: number
   quest_form_id: number
-  quest_gender_id: number
+  quest_gender_id: Gender
   quest_costume_id: number
   quest_shiny: number
   mega_pokemon_id: number
@@ -133,7 +135,7 @@ export interface ShowcaseEntry {
   pokemon_id: number
   form: number
   costume: number
-  gender: number
+  gender: Gender
   score: number
 }
 
@@ -207,7 +209,7 @@ export interface Pokemon {
   pokemon_id: number
   form: number
   costume: number
-  gender: number
+  gender: Gender
   display_pokemon_id: number
   ditto_form: number
   weight: number
