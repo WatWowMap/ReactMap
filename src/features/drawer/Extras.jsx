@@ -1,8 +1,5 @@
 // @ts-check
-/* eslint-disable no-fallthrough */
-/* eslint-disable default-case */
 import * as React from 'react'
-import Box from '@mui/material/Box'
 import ListItem from '@mui/material/ListItem'
 import ListItemText from '@mui/material/ListItemText'
 import MenuItem from '@mui/material/MenuItem'
@@ -17,25 +14,9 @@ import { BoolToggle } from '@components/inputs/BoolToggle'
 import { FCSelectListItem } from '@components/inputs/FCSelect'
 
 import { CollapsibleItem } from './CollapsibleItem'
-import { SelectorListMemo } from './SelectorList'
 import { PokestopDrawer } from './pokestops'
 import { GymDrawer } from './gyms'
-
-const BaseNestSlider = () => {
-  const slider = useMemory((s) => s.ui.nests?.sliders?.secondary?.[0])
-  const [filters, setFilters] = useDeepStore(`filters.nests.avgFilter`)
-  if (!filters || !slider) return null
-  return (
-    <ListItem>
-      <SliderTile
-        slide={slider}
-        handleChange={(_, values) => setFilters(values)}
-        values={filters}
-      />
-    </ListItem>
-  )
-}
-const NestSlider = React.memo(BaseNestSlider)
+import { NestsDrawer } from './nests'
 
 const BaseS2Cells = () => {
   const { t } = useTranslation()
@@ -159,26 +140,10 @@ const BaseSpawnpointTTH = () => {
 }
 const SpawnpointTTH = React.memo(BaseSpawnpointTTH)
 
-const BaseNestQuickSelector = () => {
-  const enabled = useStorage((s) => !!s.filters?.nests?.pokemon)
-  return (
-    <CollapsibleItem open={enabled}>
-      <Box px={2}>
-        <SelectorListMemo category="nests" label="search_nests" height={350} />
-      </Box>
-    </CollapsibleItem>
-  )
-}
-const NestQuickSelector = React.memo(BaseNestQuickSelector)
-
 function ExtrasComponent({ category, subItem }) {
   switch (category) {
     case 'nests':
-      return subItem === 'sliders' ? (
-        <NestSlider />
-      ) : subItem === 'pokemon' ? (
-        <NestQuickSelector />
-      ) : null
+      return <NestsDrawer subItem={subItem} />
     case 's2cells':
       return subItem === 'enabled' ? <S2Cells /> : null
     case 'pokestops':
