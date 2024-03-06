@@ -9,7 +9,7 @@ import useMediaQuery from '@mui/material/useMediaQuery'
 import Divider from '@mui/material/Divider'
 import Chip from '@mui/material/Chip'
 
-import Header from '@components/Header'
+import { Header } from '@components/dialogs/Header'
 import Footer from '@components/Footer'
 import { useMemory } from '@hooks/useMemory'
 import { useLayoutStore } from '@hooks/useLayoutStore'

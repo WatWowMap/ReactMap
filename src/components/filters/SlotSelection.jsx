@@ -13,7 +13,7 @@ import { useStorage, useDeepStore } from '@hooks/useStorage'
 import { Img } from '@components/Img'
 import { DualBoolToggle } from '@components/inputs/BoolToggle'
 import { ENABLED_ALL } from '@assets/constants'
-import Header from '@components/Header'
+import { Header } from '@components/dialogs/Header'
 import Footer from '@components/Footer'
 import Size from './Size'
 

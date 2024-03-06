@@ -9,7 +9,7 @@ import Button from '@mui/material/Button'
 import { useTranslation } from 'react-i18next'
 import { useMemory } from '@hooks/useMemory'
 
-import Header from '../Header'
+import { Header } from './Header'
 
 export default function ClientError() {
   const { t } = useTranslation()

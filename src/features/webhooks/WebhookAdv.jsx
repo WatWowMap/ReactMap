@@ -27,7 +27,7 @@ import { useStorage } from '@hooks/useStorage'
 import Query from '@services/Query'
 import Utility from '@services/Utility'
 import { SliderTile } from '@components/inputs/SliderTile'
-import Header from '@components/Header'
+import { Header } from '@components/dialogs/Header'
 import Footer from '@components/Footer'
 
 import { useWebhookStore } from './hooks/store'

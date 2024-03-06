@@ -9,7 +9,7 @@ import { useTranslation } from 'react-i18next'
 
 import { useLayoutStore } from '@hooks/useLayoutStore'
 
-import Header from '../Header'
+import { Header } from './Header'
 import Footer from '../Footer'
 import { DialogWrapper } from './DialogWrapper'
 

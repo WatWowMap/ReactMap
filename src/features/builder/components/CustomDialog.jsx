@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next'
 
 import Utility from '@services/Utility'
 
-import Header from '@components/Header'
+import { Header } from '@components/dialogs/Header'
 import Footer from '@components/Footer'
 
 export function CustomDialog({

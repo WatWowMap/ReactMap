@@ -13,7 +13,7 @@ import Utility from '@services/Utility'
 import { fromSearchCategory } from '@utils/fromSearchCategory'
 import { useMapStore } from '@hooks/useMapStore'
 
-import Header from '@components/Header'
+import { Header } from '@components/dialogs/Header'
 import { renderInput } from './renderInput'
 import { renderOption } from './renderOption'
 import { useSendSearch } from './useSendSearch'

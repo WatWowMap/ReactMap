@@ -13,7 +13,7 @@ import { toggleDialog, useLayoutStore } from '@hooks/useLayoutStore'
 import { useStorage } from '@hooks/useStorage'
 import { getPermission } from '@services/desktopNotification'
 
-import Header from '../Header'
+import { Header } from './Header'
 import Footer from '../Footer'
 import { DialogWrapper } from './DialogWrapper'
 

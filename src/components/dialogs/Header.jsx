@@ -15,7 +15,7 @@ import { Trans, useTranslation } from 'react-i18next'
  * }} props
  * @returns
  */
-export default function Header({ names, titles, action }) {
+export function Header({ names, titles, action }) {
   const { t } = useTranslation()
 
   return (

@@ -11,7 +11,7 @@ import { useTranslation } from 'react-i18next'
 import { useMemory } from '@hooks/useMemory'
 import { useStorage } from '@hooks/useStorage'
 import { apolloClient } from '@services/apollo'
-import Header from '@components/Header'
+import { Header } from '@components/dialogs/Header'
 import Footer from '@components/Footer'
 import { Img } from '@components/Img'
 

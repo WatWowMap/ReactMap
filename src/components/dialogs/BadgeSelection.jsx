@@ -10,7 +10,7 @@ import { ENUM_BADGES } from '@assets/constants'
 import { useLayoutStore } from '@hooks/useLayoutStore'
 import { MultiSelector } from '@components/inputs/MultiSelector'
 
-import Header from '../Header'
+import { Header } from './Header'
 import Footer from '../Footer'
 
 const handleClose = () =>

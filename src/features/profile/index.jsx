@@ -10,7 +10,7 @@ import DialogContent from '@mui/material/DialogContent'
 import { useMemory } from '@hooks/useMemory'
 import { useLayoutStore } from '@hooks/useLayoutStore'
 import Utility from '@services/Utility'
-import Header from '@components/Header'
+import { Header } from '@components/dialogs/Header'
 import Footer from '@components/Footer'
 import { DialogWrapper } from '@components/dialogs/DialogWrapper'
 
