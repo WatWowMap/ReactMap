@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next'
 import useMediaQuery from '@mui/material/useMediaQuery'
 
 import { useGenerate } from '@hooks/useGenerate'
-import { useRefresh } from '@hooks/useRefresh'
+import { useMapData } from '@hooks/useMapData'
 import { useMemory } from '@store/useMemory'
 
 export function Effects() {
@@ -13,7 +13,7 @@ export function Effects() {
   const map = useMap()
   const { t } = useTranslation()
 
-  useRefresh()
+  useMapData()
   useGenerate()
 
   const isMobile = useMediaQuery((theme) => theme.breakpoints.only('xs'))

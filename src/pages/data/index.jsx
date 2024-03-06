@@ -4,7 +4,7 @@ import Grid from '@mui/material/Unstable_Grid2'
 import Typography from '@mui/material/Typography'
 import { useTranslation } from 'react-i18next'
 
-import { useRefresh } from '@hooks/useRefresh'
+import { useMapData } from '@hooks/useMapData'
 
 import { TopRow } from './components/TopRow'
 import { ResetGeneral } from './components/ResetGeneral'
@@ -14,7 +14,7 @@ import { restoreDefault } from './hooks/store'
 
 export function DataManagerPage() {
   const { t } = useTranslation()
-  useRefresh(true)
+  useMapData(true)
 
   React.useEffect(() => {
     restoreDefault()
