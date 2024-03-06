@@ -8,14 +8,14 @@ import Grid from '@mui/material/Unstable_Grid2'
 
 import { useTranslation } from 'react-i18next'
 import { useMutation } from '@apollo/client'
-import { allProfiles, setProfile } from '@services/queries/webhook'
+import { ALL_PROFILES, SET_PROFILE } from '@services/queries/webhook'
 
 import { useWebhookStore } from '@store/useWebhookStore'
 
 export const NewProfile = () => {
   const { t } = useTranslation()
-  const [save] = useMutation(setProfile, {
-    refetchQueries: [allProfiles],
+  const [save] = useMutation(SET_PROFILE, {
+    refetchQueries: [ALL_PROFILES],
   })
 
   const existing = useWebhookStore((s) => s.profile || []).map((x) => x.name)

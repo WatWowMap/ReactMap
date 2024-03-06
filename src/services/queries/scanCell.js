@@ -1,6 +1,6 @@
 import { gql } from '@apollo/client'
 
-export const getAllScanCells = gql`
+export const GET_ALL_SCAN_CELLS = gql`
   query ScanCells(
     $minLat: Float!
     $minLon: Float!

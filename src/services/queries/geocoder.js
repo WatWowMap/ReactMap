@@ -1,6 +1,6 @@
 import { gql } from '@apollo/client'
 
-export const Nominatim = gql`
+export const NOMINATIM = gql`
   fragment Nominatim on Geocoder {
     latitude
     longitude

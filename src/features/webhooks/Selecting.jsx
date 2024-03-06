@@ -7,14 +7,14 @@ import Typography from '@mui/material/Typography'
 import { useTranslation } from 'react-i18next'
 import { useMutation } from '@apollo/client'
 
-import { setProfile, allProfiles } from '@services/queries/webhook'
+import { SET_PROFILE, ALL_PROFILES } from '@services/queries/webhook'
 
 import { useWebhookStore, setSelected } from '@store/useWebhookStore'
 
 export function Selecting() {
   const { t } = useTranslation()
-  const [save] = useMutation(setProfile, {
-    refetchQueries: [allProfiles],
+  const [save] = useMutation(SET_PROFILE, {
+    refetchQueries: [ALL_PROFILES],
   })
 
   const selected = useWebhookStore((s) => s.selected)

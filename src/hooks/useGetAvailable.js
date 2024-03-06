@@ -17,7 +17,7 @@ export function useGetAvailable(category) {
 
   /** @type {import('@apollo/client').QueryResult<{ [key: string]: string[] }>} */
   const { data, previousData, loading, error } = useQuery(
-    queries[`getAvailable${capitalized}`],
+    queries[`GET_AVAILABLE_${category.toUpperCase()}`],
     {
       fetchPolicy: active && online ? 'network-only' : 'cache-and-network',
     },

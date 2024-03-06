@@ -2,7 +2,7 @@
 import { useEffect } from 'react'
 import { useQuery } from '@apollo/client'
 
-import { allProfiles } from '@services/queries/webhook'
+import { ALL_PROFILES } from '@services/queries/webhook'
 
 import { useWebhookStore } from '@store/useWebhookStore'
 
@@ -12,7 +12,7 @@ import { useWebhookStore } from '@store/useWebhookStore'
 export function useSyncData(category) {
   const cached = useWebhookStore((s) => s[category])
 
-  const { data, loading } = useQuery(allProfiles, {
+  const { data, loading } = useQuery(ALL_PROFILES, {
     fetchPolicy: 'no-cache',
     variables: {
       category,

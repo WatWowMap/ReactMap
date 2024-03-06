@@ -31,7 +31,7 @@ export function FieldValue({ field }) {
   const disabled = typeof field === 'string' ? false : field.disabled
 
   const value = useMemory((s) => s.auth.data?.[key] || '')
-  const [setField] = useMutation(Query.user('setExtraFields'))
+  const [setField] = useMutation(Query.user('SET_EXTRA_FIELDS'))
 
   if (!key || !label) return null
   return (

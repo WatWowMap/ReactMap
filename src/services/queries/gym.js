@@ -44,7 +44,7 @@ const raid = gql`
   }
 `
 
-export const getGyms = gql`
+export const GET_GYMS = gql`
   ${core}
   ${gym}
   query Gyms(
@@ -67,7 +67,7 @@ export const getGyms = gql`
   }
 `
 
-export const getRaids = gql`
+export const GET_RAIDS = gql`
   ${core}
   ${raid}
   query Raids(
@@ -90,7 +90,7 @@ export const getRaids = gql`
   }
 `
 
-export const getGymsRaids = gql`
+export const GET_GYMS_RAIDS = gql`
   ${core}
   ${gym}
   ${raid}
@@ -115,7 +115,7 @@ export const getGymsRaids = gql`
   }
 `
 
-export const getOne = gql`
+export const GET_ONE_GYM = gql`
   query GetOneGym($id: ID!, $perm: String!) {
     gymsSingle(id: $id, perm: $perm) {
       lat
@@ -124,7 +124,7 @@ export const getOne = gql`
   }
 `
 
-export const getBadges = gql`
+export const GET_BADGES = gql`
   query GetBadgeInfo {
     badges {
       id

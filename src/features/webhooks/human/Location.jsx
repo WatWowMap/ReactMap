@@ -13,7 +13,7 @@ import { useLazyQuery, useMutation } from '@apollo/client'
 import { useTranslation } from 'react-i18next'
 import { useMapEvents } from 'react-leaflet'
 
-import { setHuman } from '@services/queries/webhook'
+import { SET_HUMAN } from '@services/queries/webhook'
 import { WEBHOOK_NOMINATIM } from '@services/queries/geocoder'
 import { useLocation } from '@hooks/useLocation'
 import { Loading } from '@components/Loading'
@@ -40,7 +40,7 @@ const Location = () => {
     },
   )
 
-  const [save] = useMutation(setHuman, { fetchPolicy: 'no-cache' })
+  const [save] = useMutation(SET_HUMAN, { fetchPolicy: 'no-cache' })
 
   /** @param {[number, number]} location */
   const handleLocationChange = (location) => {

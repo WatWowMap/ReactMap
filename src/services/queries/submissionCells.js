@@ -1,6 +1,6 @@
 import { gql } from '@apollo/client'
 
-export const getAllSubmissionCells = gql`
+export const GET_ALL_SUBMISSION_CELLS = gql`
   query SubmissionCells(
     $minLat: Float!
     $minLon: Float!

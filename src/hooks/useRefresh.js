@@ -1,7 +1,7 @@
 // @ts-check
 import { useEffect } from 'react'
 import { useQuery } from '@apollo/client'
-import { getMapData } from '@services/queries/available'
+import { GET_MAP_DATA } from '@services/queries/available'
 
 import { deepMerge } from '@utils/deepMerge'
 import { UAssets } from '@services/Assets'
@@ -16,7 +16,7 @@ export function useRefresh(once = false) {
   const hasIcons = useMemory((s) => !!s.Icons)
 
   const { data, loading, stopPolling, startPolling, refetch, error } = useQuery(
-    getMapData,
+    GET_MAP_DATA,
     {
       fetchPolicy: active && online ? 'network-only' : 'cache-only',
     },

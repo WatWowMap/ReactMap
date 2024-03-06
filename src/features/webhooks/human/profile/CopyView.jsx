@@ -10,14 +10,14 @@ import MenuItem from '@mui/material/MenuItem'
 
 import { useTranslation } from 'react-i18next'
 import { useMutation } from '@apollo/client'
-import { allProfiles, setProfile } from '@services/queries/webhook'
+import { ALL_PROFILES, SET_PROFILE } from '@services/queries/webhook'
 
 import { useWebhookStore } from '@store/useWebhookStore'
 
 /** @param {import('./ProfileTile').Props} props */
 export const CopyView = ({ uid, handleViewChange }) => {
-  const [save] = useMutation(setProfile, {
-    refetchQueries: [allProfiles],
+  const [save] = useMutation(SET_PROFILE, {
+    refetchQueries: [ALL_PROFILES],
   })
   const { t } = useTranslation()
 

@@ -31,7 +31,7 @@ export function LocalLogin({ href, sx, style }) {
   })
   const [error, setError] = React.useState('')
   const [submitted, setSubmitted] = React.useState(false)
-  const [checkUsername, { data }] = useLazyQuery(Query.user('checkUsername'))
+  const [checkUsername, { data }] = useLazyQuery(Query.user('CHECK_USERNAME'))
 
   const handleChange = (e) => {
     if (e.target.name === 'username') {

@@ -13,7 +13,7 @@ import {
   WEBHOOK_CHANGE,
   WEBHOOK_CONTEXT,
   WEBHOOK_USER,
-  allProfiles,
+  ALL_PROFILES,
 } from '@services/queries/webhook'
 import { Loading } from '@components/Loading'
 import { useWebhookStore } from '@store/useWebhookStore'
@@ -35,7 +35,7 @@ export function HookSelection() {
       WEBHOOK_USER,
       WEBHOOK_CATEGORIES,
       WEBHOOK_AREAS,
-      allProfiles,
+      ALL_PROFILES,
     ],
     fetchPolicy: 'no-cache',
   })

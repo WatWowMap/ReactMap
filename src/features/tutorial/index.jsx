@@ -36,7 +36,7 @@ export function Tutorial() {
   const [activeStep, setActiveStep] = useState(0)
   const [prevStep, setPrevStep] = useState(0)
 
-  const [setTutorialInDb] = useMutation(Query.user('setTutorial'))
+  const [setTutorialInDb] = useMutation(Query.user('SET_TUTORIAL'))
 
   const handleNext = () => {
     setPrevStep(activeStep)

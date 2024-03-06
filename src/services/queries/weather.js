@@ -1,6 +1,6 @@
 import { gql } from '@apollo/client'
 
-export const getAllWeather = gql`
+export const GET_ALL_WEATHER = gql`
   query Weather(
     $minLat: Float!
     $minLon: Float!

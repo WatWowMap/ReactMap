@@ -25,7 +25,7 @@ export function LinkAccounts() {
 
   const [refreshing, setRefreshing] = React.useState(false)
 
-  const [setWebhookStrategy] = useMutation(Query.user('setWebhookStrategy'))
+  const [setWebhookStrategy] = useMutation(Query.user('SET_WEBHOOK_STRATEGY'))
 
   if (refreshing) {
     setTimeout(() => window.location.reload(), 2000)

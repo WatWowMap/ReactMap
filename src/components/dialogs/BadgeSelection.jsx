@@ -33,7 +33,7 @@ const footerOptions = /** @type {import('./Footer').FooterButton[]} */ ([
 
 export function BadgeSelection() {
   const { gymId, badge, open } = useLayoutStore((s) => s.gymBadge)
-  const [setBadgeInDb] = useMutation(Query.user('setGymBadge'), {
+  const [setBadgeInDb] = useMutation(Query.user('SET_GYM_BADGE'), {
     refetchQueries: ['GetBadgeInfo', 'Gyms', 'Raids', 'GymsRaids'],
   })
 

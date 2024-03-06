@@ -16,7 +16,7 @@ import { Footer } from '@components/dialogs/Footer'
 import { Header } from '@components/dialogs/Header'
 import { apolloClient } from '@services/apollo'
 import { Query } from '@services/Query'
-import { allProfiles } from '@services/queries/webhook'
+import { ALL_PROFILES } from '@services/queries/webhook'
 import { Menu } from '@components/Menu'
 import { setMode, setSelected, useWebhookStore } from '@store/useWebhookStore'
 import { analytics } from '@hooks/useAnalytics'
@@ -99,13 +99,14 @@ export function Manage() {
         useWebhookStore.getState().context.ui[category].defaults,
       )
       apolloClient.mutate({
-        mutation: Query.webhook(category),
+        // @ts-ignore
+        mutation: Query.webhook(category.toUpperCase()),
         variables: {
           category,
           data: values,
           status: 'POST',
         },
-        refetchQueries: [allProfiles],
+        refetchQueries: [ALL_PROFILES],
       })
       useWebhookStore.setState((prev) => ({
         [category]: [...prev[category], ...values],

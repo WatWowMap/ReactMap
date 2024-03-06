@@ -3,13 +3,13 @@ import { useMutation } from '@apollo/client'
 import { useTranslation } from 'react-i18next'
 import { Query } from '@services/Query'
 import { useWebhookStore } from '@features/webhooks'
-import { allProfiles } from '@services/queries/webhook'
+import { ALL_PROFILES } from '@services/queries/webhook'
 
 export function useWebhook({ category }) {
   const [syncWebhook, { data, error }] = useMutation(
-    Query.webhook('quickAdd'),
+    Query.webhook('QUICK_ADD'),
     {
-      refetchQueries: [allProfiles],
+      refetchQueries: [ALL_PROFILES],
     },
   )
   const { t } = useTranslation()

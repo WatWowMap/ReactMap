@@ -22,7 +22,7 @@ export function UserBackups() {
   const hasPerm = useMemory((s) => s.auth.perms.backups)
 
   /** @type {import('@apollo/client').QueryResult<{ backups: import('@rm/types').Backup[] }>} */
-  const { data } = useQuery(Query.user('getBackups'), {
+  const { data } = useQuery(Query.user('GET_BACKUPS'), {
     fetchPolicy: 'no-cache',
     skip: !hasPerm,
   })
@@ -53,7 +53,7 @@ function CreateNew({ backups }) {
   const userBackupLimits = useMemory((s) => s.auth.userBackupLimits)
   const [name, setName] = React.useState('')
 
-  const [create, { loading }] = useMutation(Query.user('createBackup'), {
+  const [create, { loading }] = useMutation(Query.user('CREATE_BACKUP'), {
     refetchQueries: ['GetBackups'],
   })
   return (
@@ -91,14 +91,14 @@ function BackupItem({ backup }) {
   const [name, setName] = React.useState(backup.name)
   const [loading, setLoading] = React.useState(false)
 
-  const [update, { loading: l1 }] = useMutation(Query.user('updateBackup'), {
+  const [update, { loading: l1 }] = useMutation(Query.user('UPDATE_BACKUP'), {
     refetchQueries: ['GetBackups'],
   })
-  const [remove, { loading: l2 }] = useMutation(Query.user('deleteBackup'), {
+  const [remove, { loading: l2 }] = useMutation(Query.user('DELETE_BACKUP'), {
     refetchQueries: ['GetBackups'],
   })
   const [load, { data: fullBackup, loading: l3 }] = useLazyQuery(
-    Query.user('getFullBackup'),
+    Query.user('GET_FULL_BACKUP'),
   )
 
   React.useEffect(() => setName(backup.name), [backup])

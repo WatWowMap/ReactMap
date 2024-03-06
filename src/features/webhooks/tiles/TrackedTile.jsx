@@ -38,7 +38,7 @@ export function TrackedTile({ index }) {
     (newFilter, save) => {
       if (save) {
         apolloClient.mutate({
-          mutation: webhookNodes[category],
+          mutation: webhookNodes[category.toUpperCase()],
           variables: {
             data: Poracle.processor(category, [newFilter], defaults),
             status: 'POST',
@@ -100,7 +100,7 @@ export function TrackedTile({ index }) {
               [category]: prev[category].filter((x) => x.uid !== item.uid),
             }))
             apolloClient.mutate({
-              mutation: webhookNodes.setProfile,
+              mutation: webhookNodes.SET_PROFILE,
               variables: {
                 category,
                 data: { uid: item.uid },

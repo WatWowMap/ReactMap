@@ -62,3 +62,9 @@ export interface MultiSelectorProps<V> {
     newValue: V,
   ) => (e?: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void
 }
+
+type KeyCombinations<T> = `GET${T extends string ? `_${Uppercase<T>}` : ''}`
+
+// Example usage with a predefined object key type
+type ObjectKeys = 'Lures' | 'Quests' | 'Invasions' | 'Events'
+type QueryTypes = KeyCombinations<ObjectKeys>

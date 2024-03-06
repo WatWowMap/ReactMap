@@ -8,134 +8,138 @@ import * as portalIndex from './queries/portal'
 import * as searchIndex from './queries/search'
 import * as webhookIndex from './queries/webhook'
 import * as user from './queries/user'
-import { getAllDevices } from './queries/device'
-import { getAllSpawnpoints } from './queries/spawnpoint'
-import { getAllWeather } from './queries/weather'
-import { getAllScanCells } from './queries/scanCell'
-import { getAllSubmissionCells } from './queries/submissionCells'
-import { getOne, getAllNests, nestSubmission } from './queries/nest'
-import { getAllScanAreas, getScanAreasMenu } from './queries/scanAreas'
+import { GET_ALL_DEVICES } from './queries/device'
+import { GET_ALL_SPAWNPOINTS } from './queries/spawnpoint'
+import { GET_ALL_WEATHER } from './queries/weather'
+import { GET_ALL_SCAN_CELLS } from './queries/scanCell'
+import { GET_ALL_SUBMISSION_CELLS } from './queries/submissionCells'
+import { GET_ONE_NEST, GET_ALL_NESTS, NEST_SUBMISSION } from './queries/nest'
+import { GET_ALL_SCAN_AREAS, GET_SCAN_AREAS_MENU } from './queries/scanAreas'
 import { S2_CELLS } from './queries/s2cell'
-import { getRoute, getRoutes } from './queries/route'
+import { GET_ROUTE, GET_ROUTES } from './queries/route'
 
 export class Query {
-  static devices() {
-    return getAllDevices
+  /**
+   * @param {Record<string, boolean>} object
+   * @returns {string}
+   */
+  static build(object) {
+    let query = 'GET'
+    Object.entries(object).forEach(([key, value]) => {
+      if (value) query += `_${key.toUpperCase()}`
+    })
+    return query
   }
 
+  static devices() {
+    return GET_ALL_DEVICES
+  }
+
+  /** @param {import('@rm/types').AllFilters['gyms'] | 'id' | 'badges'} filters */
   static gyms(filters) {
     const perms = useMemory.getState().ui.gyms
     if (filters === 'id') {
-      return gymIndex.getOne
+      return gymIndex.GET_ONE_GYM
     }
     if (filters === 'badges') {
-      return gymIndex.getBadges
+      return gymIndex.GET_BADGES
     }
-    const permObj = {
+    let query = Query.build({
       Gyms: filters.raids
         ? filters.allGyms || perms.allGyms
         : filters.allGyms && perms.allGyms,
       Raids: filters.raids && perms.raids,
-    }
-    let query = 'get'
-    Object.keys(permObj).forEach((keyPerm) => {
-      if (permObj[keyPerm]) query += keyPerm
     })
     if (
-      query === 'get' &&
+      query === 'GET' &&
       (filters.exEligible ||
         filters.inBattle ||
         filters.arEligible ||
         filters.gymBadges)
     ) {
-      query += 'Gyms'
+      query += '_GYMS'
     }
 
     return gymIndex[query]
   }
 
+  /** @param {import('@rm/types').AllFilters['nests'] | 'id' | 'nestSubmission'} filters */
   static nests(filters) {
     if (filters === 'id') {
-      return getOne
+      return GET_ONE_NEST
     }
     if (filters === 'nestSubmission') {
-      return nestSubmission
+      return NEST_SUBMISSION
     }
-    return getAllNests
+    return GET_ALL_NESTS
   }
 
+  /** @param {import('@rm/types').AllFilters['pokestops'] | 'id'} filters */
   static pokestops(filters) {
     const perms = useMemory.getState().ui.pokestops
     if (filters === 'id') {
-      return pokestopIndex.getOne
+      return pokestopIndex.GET_ONE_POKESTOP
     }
-    const permObj = {
+    let query = Query.build({
       Lures: filters.lures && perms.lures,
       Quests: filters.quests && perms.quests,
       Invasions: filters.invasions && perms.invasions,
       Events: filters.eventStops && perms.eventStops,
-    }
-    let query = 'get'
-
-    Object.keys(permObj).forEach((keyPerm) => {
-      if (permObj[keyPerm]) query += keyPerm
     })
 
-    if (query === 'get') query += 'Pokestops'
+    if (query === 'GET') query += 'POKESTOPS'
     return pokestopIndex[query]
   }
 
+  /** @param {import('@rm/types').AllFilters['pokemon'] | 'id'} filters */
   static pokemon(filters) {
     const perms = useMemory.getState().ui.pokemon
     if (filters === 'id') {
-      return pokemonIndex.getOne
+      return pokemonIndex.GET_ONE_POKEMON
     }
-    const permObj = {
+    let query = Query.build({
       Ivs: perms.iv,
       Pvp: perms.pvp,
-    }
-    let query = 'get'
-
-    Object.keys(permObj).forEach((keyPerm) => {
-      if (permObj[keyPerm]) query += keyPerm
     })
-    if (query === 'get') query += 'Pokemon'
+    if (query === 'GET') query += 'POKEMON'
 
     return pokemonIndex[query]
   }
 
+  /** @param {import('@rm/types').AllFilters['portals'] | 'id'} filters */
   static portals(filters) {
     if (filters === 'id') {
-      return portalIndex.getOne
+      return portalIndex.GET_ONE_PORTAL
     }
 
-    return portalIndex.getAllPortals
+    return portalIndex.GET_ALL_PORTALS
   }
 
   static scanCells() {
-    return getAllScanCells
+    return GET_ALL_SCAN_CELLS
   }
 
   static spawnpoints() {
-    return getAllSpawnpoints
+    return GET_ALL_SPAWNPOINTS
   }
 
   static submissionCells() {
-    return getAllSubmissionCells
+    return GET_ALL_SUBMISSION_CELLS
   }
 
   static weather() {
-    return getAllWeather
+    return GET_ALL_WEATHER
   }
 
   static scanAreas() {
-    return getAllScanAreas
+    return GET_ALL_SCAN_AREAS
   }
 
   static scanAreasMenu() {
-    return getScanAreasMenu
+    return GET_SCAN_AREAS_MENU
   }
 
+  /** @param {string} category */
   static search(category) {
     switch (category) {
       case 'lures':
@@ -144,18 +148,20 @@ export class Query {
       case 'quests':
       case 'invasions':
       case 'pokemon':
-        return searchIndex[category]
+        return searchIndex[category.toUpperCase()]
       case 'webhook':
-        return searchIndex.poiWebhook
+        return searchIndex.POI_WEBHOOK
       default:
-        return searchIndex.poi
+        return searchIndex.POI
     }
   }
 
+  /** @param {keyof typeof webhookIndex} type */
   static webhook(type) {
     return webhookIndex[type]
   }
 
+  /** @param {keyof typeof user} type */
   static user(type) {
     return user[type]
   }
@@ -164,8 +170,9 @@ export class Query {
     return S2_CELLS
   }
 
+  /** @param {import('@rm/types').AllFilters['routes'] | 'getOne'} method */
   static routes(method) {
-    if (method === 'getOne') return getRoute
-    return getRoutes
+    if (method === 'getOne') return GET_ROUTE
+    return GET_ROUTES
   }
 }

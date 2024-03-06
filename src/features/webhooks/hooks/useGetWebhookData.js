@@ -3,7 +3,7 @@ import { useEffect, useMemo, useRef } from 'react'
 import { useQuery } from '@apollo/client'
 import { useTranslation } from 'react-i18next'
 
-import { allProfiles, WEBHOOK_USER } from '@services/queries/webhook'
+import { ALL_PROFILES, WEBHOOK_USER } from '@services/queries/webhook'
 import { RobustTimeout } from '@services/apollo/RobustTimeout'
 import { useWebhookStore } from '@store/useWebhookStore'
 
@@ -22,7 +22,7 @@ export function useGetWebhookData(category) {
   const profileNo = useWebhookStore((s) => s.human.current_profile_no)
   const timeout = useRef(new RobustTimeout(10_000))
 
-  const { data, previousData, loading, refetch } = useQuery(allProfiles, {
+  const { data, previousData, loading, refetch } = useQuery(ALL_PROFILES, {
     fetchPolicy: 'cache-first',
     variables: {
       category,

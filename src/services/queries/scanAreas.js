@@ -1,6 +1,6 @@
 import { gql } from '@apollo/client'
 
-export const getAllScanAreas = gql`
+export const GET_ALL_SCAN_AREAS = gql`
   query ScanAreas {
     scanAreas {
       type
@@ -9,7 +9,7 @@ export const getAllScanAreas = gql`
   }
 `
 
-export const getScanAreasMenu = gql`
+export const GET_SCAN_AREAS_MENU = gql`
   query ScanAreasMenu {
     scanAreasMenu {
       name

@@ -1,6 +1,6 @@
 import { gql } from '@apollo/client'
 
-export const getAllDevices = gql`
+export const GET_ALL_DEVICES = gql`
   query Devices($filters: JSON) {
     devices(filters: $filters) {
       id

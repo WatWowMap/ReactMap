@@ -8,7 +8,7 @@ import FormControl from '@mui/material/FormControl'
 import { useMutation, useQuery } from '@apollo/client'
 import { useTranslation } from 'react-i18next'
 
-import { allProfiles, setHuman } from '@services/queries/webhook'
+import { ALL_PROFILES, SET_HUMAN } from '@services/queries/webhook'
 
 import { useWebhookStore } from '@store/useWebhookStore'
 
@@ -29,7 +29,7 @@ export function ProfileSelect() {
     data: profiles,
     previousData,
     loading,
-  } = useQuery(allProfiles, {
+  } = useQuery(ALL_PROFILES, {
     fetchPolicy: 'no-cache',
     variables: {
       category: 'profiles',
@@ -37,7 +37,7 @@ export function ProfileSelect() {
     },
   })
 
-  const [save] = useMutation(setHuman)
+  const [save] = useMutation(SET_HUMAN)
 
   const onChange = React.useCallback(
     (event) => {
