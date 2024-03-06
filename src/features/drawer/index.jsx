@@ -48,7 +48,7 @@ const listItemSx = /** @type {import('@mui/material').SxProps} */ ({
   display: 'block',
 })
 
-export default function Drawer() {
+export function Drawer() {
   const drawer = useLayoutStore((s) => s.drawer)
   const { config, ui } = useMemory.getState()
 

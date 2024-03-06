@@ -19,7 +19,7 @@ import Size from './Size'
 
 import { DialogWrapper } from '../dialogs/DialogWrapper'
 
-export default function SlotSelection() {
+export function SlotSelection() {
   const [id, teamId, open] = useLayoutStore((s) => {
     const team = s.slotSelection.slice(1).split('-', 1)[0]
     return [s.slotSelection, team, !!s.slotSelection]

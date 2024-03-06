@@ -78,7 +78,7 @@ const STATIC_PROPS =
     open: true,
   })
 
-export default function Search() {
+export function Search() {
   Utility.analytics('/search')
 
   const { t } = useTranslation()

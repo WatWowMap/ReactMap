@@ -25,7 +25,7 @@ import Size from './Size'
 import { GenderListItem } from './Gender'
 import { QuestConditionSelector } from './QuestConditions'
 
-export default function AdvancedFilter() {
+export function AdvancedFilter() {
   const { category, id, selectedIds, open } = useLayoutStore(
     (s) => s.advancedFilter,
   )

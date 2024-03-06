@@ -24,7 +24,7 @@ const FOOTER_OPTIONS = /** @type {import('./Footer').FooterButton[]} */ ([
   },
 ])
 
-export default function ResetFilters() {
+export function ResetFilters() {
   const { t } = useTranslation()
   const navigate = useNavigate()
 

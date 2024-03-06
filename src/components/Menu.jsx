@@ -10,7 +10,7 @@ import Utility from '@services/Utility'
 import { useMemory } from '@store/useMemory'
 import { useLayoutStore } from '@store/useLayoutStore'
 import { useStorage } from '@store/useStorage'
-import useFilter from '@hooks/useFilter'
+import { useFilter } from '@hooks/useFilter'
 import { Header } from '@components/dialogs/Header'
 import { Footer } from '@components/dialogs/Footer'
 import { applyToAll } from '@services/filtering/applyToAll'
@@ -34,7 +34,7 @@ import { GenericSearch } from './inputs/GenericSearch'
  *  extraButtons?: import('@components/dialogs/Footer').FooterButton[]
  * }} props
  */
-export default function Menu({
+export function Menu({
   category,
   webhookCategory,
   tempFilters,

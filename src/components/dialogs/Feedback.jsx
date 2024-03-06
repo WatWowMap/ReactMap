@@ -14,7 +14,7 @@ import { Header } from './Header'
 import { Footer } from './Footer'
 import { DialogWrapper } from './DialogWrapper'
 
-export default function Feedback() {
+export function Feedback() {
   const { t } = useTranslation()
 
   const link = useMemory((s) => s.config.links.feedbackLink)

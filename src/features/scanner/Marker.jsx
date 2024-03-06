@@ -2,7 +2,7 @@
 import * as React from 'react'
 import { Marker, useMap } from 'react-leaflet'
 
-import fallbackIcon from '@assets/fallbackMarker'
+import { fallbackMarker } from '@assets/fallbackMarker'
 import { useScanStore } from './hooks/store'
 
 /**
@@ -25,7 +25,7 @@ export function ScanOnDemandMarker({ children }) {
           }
         },
       }}
-      icon={fallbackIcon}
+      icon={fallbackMarker}
       position={scanLocation}
       ref={(ref) => {
         if (ref && !ref.isPopupOpen()) ref.openPopup()

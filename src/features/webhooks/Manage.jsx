@@ -18,7 +18,7 @@ import { Header } from '@components/dialogs/Header'
 import { apolloClient } from '@services/apollo'
 import Query from '@services/Query'
 import { allProfiles } from '@services/queries/webhook'
-import Menu from '@components/Menu'
+import { Menu } from '@components/Menu'
 import { setMode, setSelected, useWebhookStore } from '@store/useWebhookStore'
 
 import Human from './human'

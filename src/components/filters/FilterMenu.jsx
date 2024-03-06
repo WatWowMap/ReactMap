@@ -1,14 +1,14 @@
 // @ts-check
 import * as React from 'react'
-import Menu from '@components/Menu'
 
 import { toggleDialog, useLayoutStore } from '@store/useLayoutStore'
 import { useStorage } from '@store/useStorage'
 import { StandardItem } from '@components/virtual/StandardItem'
+import { Menu } from '@components/Menu'
 
 import { DialogWrapper } from '../dialogs/DialogWrapper'
 
-export default function FilterMenu() {
+export function FilterMenu() {
   const { open, category, type } = useLayoutStore((s) => s.dialog)
   const filters = useStorage((s) => s.filters?.[category])
 

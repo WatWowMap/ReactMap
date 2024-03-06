@@ -9,7 +9,7 @@ import Typography from '@mui/material/Typography'
 import { Circle, Marker, Popup, useMap } from 'react-leaflet'
 import { useTranslation } from 'react-i18next'
 
-import fallbackIcon from '@assets/fallbackMarker'
+import { fallbackMarker } from '@assets/fallbackMarker'
 
 import { useWebhookStore } from '@store/useWebhookStore'
 
@@ -62,7 +62,7 @@ export function WebhookMarker() {
           if (ref) ref.openPopup()
         }}
         position={position}
-        icon={fallbackIcon}
+        icon={fallbackMarker}
       >
         <Popup minWidth={90} maxWidth={150}>
           <Grid

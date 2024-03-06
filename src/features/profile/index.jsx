@@ -20,7 +20,7 @@ import { UserGymBadges } from './GymBadges'
 import { LinkAccounts } from './LinkAccounts'
 import { ExtraUserFields } from './ExtraFields'
 
-export default function UserProfile() {
+export function UserProfile() {
   Utility.analytics('/user-profile')
   const { t } = useTranslation()
   const auth = useMemory((state) => state.auth)

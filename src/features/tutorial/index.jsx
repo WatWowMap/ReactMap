@@ -26,7 +26,7 @@ import Popups from './Popups'
 
 const steps = ['intro', 'sidebar', 'sliders', 'advanced', 'popups', 'closing']
 
-export default function Tutorial() {
+export function Tutorial() {
   const theme = useTheme()
   const { t } = useTranslation()
   const isMobile = useMediaQuery(theme.breakpoints.only('xs'))

@@ -44,7 +44,7 @@ function SetText() {
   return <div />
 }
 
-export default function App() {
+export function App() {
   const theme = useCustomTheme()
 
   const isValid = isLocalStorageEnabled()

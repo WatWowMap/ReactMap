@@ -65,7 +65,7 @@ const MemoInputType = React.memo(
     next.localState?.[next.subOption || next.option],
 )
 
-function UserOptions() {
+function BaseUserOptions() {
   const { t } = useTranslation()
   const { open, category, type } = useLayoutStore((s) => s.dialog)
 
@@ -200,4 +200,4 @@ function UserOptions() {
   )
 }
 
-export default React.memo(UserOptions)
+export const UserOptions = React.memo(BaseUserOptions)

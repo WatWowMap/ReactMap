@@ -10,7 +10,7 @@ const filteringPokemon = [
   'quest_reward_12',
 ]
 
-export default function useFilter(
+export function useFilter(
   tempFilters,
   menus,
   category,

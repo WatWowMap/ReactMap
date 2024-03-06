@@ -11,7 +11,7 @@ import { useMemory } from '@store/useMemory'
 
 import { Header } from './Header'
 
-export default function ClientError() {
+export function ClientError() {
   const { t } = useTranslation()
   const error = useMemory((s) => s.clientError)
 
