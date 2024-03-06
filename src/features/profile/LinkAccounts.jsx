@@ -19,7 +19,7 @@ export function LinkAccounts() {
   const { t } = useTranslation()
   const auth = useMemory((s) => s.auth)
   const { discordAuthUrl, telegramAuthUrl, telegramBotName } = useMemory(
-    (state) => state.config.customRoutes,
+    (s) => s.config.customRoutes,
   )
 
   const [refreshing, setRefreshing] = React.useState(false)

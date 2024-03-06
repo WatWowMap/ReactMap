@@ -15,7 +15,7 @@ import { useStorage } from '@store/useStorage'
  * @returns
  */
 export function Title({ children, variant = 'subtitle2', backup, sx }) {
-  const names = useStorage((state) => !!state.popups.names)
+  const names = useStorage((s) => !!s.popups.names)
 
   return (
     <Typography

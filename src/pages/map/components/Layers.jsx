@@ -14,7 +14,7 @@ export function ControlledTileLayer() {
 export function ControlledZoomLayer() {
   const map = useMap()
   const navSetting = useStorage(
-    (state) => state.settings.navigationControls === 'leaflet',
+    (s) => s.settings.navigationControls === 'leaflet',
   )
 
   React.useLayoutEffect(() => {
@@ -32,7 +32,7 @@ export function ControlledZoomLayer() {
 export function ControlledLocate() {
   const map = useMap()
   const navSetting = useStorage(
-    (state) => state.settings.navigationControls === 'leaflet',
+    (s) => s.settings.navigationControls === 'leaflet',
   )
 
   const lc = React.useMemo(

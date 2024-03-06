@@ -40,8 +40,8 @@ import { formatInterval } from '@utils/formatInterval'
  */
 export function GymPopup({ hasRaid, hasHatched, raidIconUrl, ...gym }) {
   const { t } = useTranslation()
-  const { perms } = useMemory((state) => state.auth)
-  const popups = useStorage((state) => state.popups)
+  const { perms } = useMemory((s) => s.auth)
+  const popups = useStorage((s) => s.popups)
   const ts = Math.floor(Date.now() / 1000)
 
   useAnalytics('Popup', `Team ID: ${gym.team_id} Has Raid: ${hasRaid}`, 'Gym')
@@ -165,7 +165,7 @@ const DropdownOptions = ({
   const { t } = useTranslation()
 
   const { gyms, raids, gymBadges, webhooks } = useMemory((s) => s.auth.perms)
-  const gymValidDataLimit = useMemory((state) => state.gymValidDataLimit)
+  const gymValidDataLimit = useMemory((s) => s.gymValidDataLimit)
 
   const { data: raidHooks } = useSyncData('raid')
   const { data: gymHooks } = useSyncData('gym')
@@ -263,7 +263,7 @@ const DropdownOptions = ({
  * @returns
  */
 const PoiImage = ({ url, team_id, name, badge }) => {
-  const Icons = useMemory((state) => state.Icons)
+  const Icons = useMemory((s) => s.Icons)
   const src = url ? url.replace('http://', 'https://') : Icons.getTeams(team_id)
 
   return (
@@ -296,8 +296,8 @@ const RaidImage = ({
   raid_pokemon_gender,
 }) => {
   const { t } = useTranslation()
-  const Icons = useMemory((state) => state.Icons)
-  const pokemon = useMemory((state) => state.masterfile.pokemon)
+  const Icons = useMemory((s) => s.Icons)
+  const pokemon = useMemory((s) => s.masterfile.pokemon)
 
   /**
    *
@@ -372,8 +372,8 @@ const GymInfo = ({
   badge,
 }) => {
   const { t } = useTranslation()
-  const Icons = useMemory((state) => state.Icons)
-  const gymValidDataLimit = useMemory((state) => state.gymValidDataLimit)
+  const Icons = useMemory((s) => s.Icons)
+  const gymValidDataLimit = useMemory((s) => s.gymValidDataLimit)
 
   return (
     <Grid
@@ -455,9 +455,9 @@ const RaidInfo = ({
   raid_pokemon_move_2,
 }) => {
   const { t } = useTranslation()
-  const Icons = useMemory((state) => state.Icons)
+  const Icons = useMemory((s) => s.Icons)
 
-  const moves = useMemory((state) => state.masterfile.moves)
+  const moves = useMemory((s) => s.masterfile.moves)
 
   const getRaidName = (raidLevel, id) => {
     if (id) {
@@ -608,8 +608,8 @@ const Timer = ({
  */
 const GymFooter = ({ lat, lon, hasRaid }) => {
   const darkMode = useStorage((s) => s.darkMode)
-  const popups = useStorage((state) => state.popups)
-  const perms = useMemory((state) => state.auth.perms)
+  const popups = useStorage((s) => s.popups)
+  const perms = useMemory((s) => s.auth.perms)
 
   const handleExpandClick = (category) => {
     useStorage.setState((prev) => ({
@@ -670,9 +670,9 @@ const ExtraGymInfo = ({
 }) => {
   const { t, i18n } = useTranslation()
   const Icons = useMemory((s) => s.Icons)
-  const gymValidDataLimit = useMemory((state) => state.gymValidDataLimit)
+  const gymValidDataLimit = useMemory((s) => s.gymValidDataLimit)
   const enableGymPopupCoords = useStorage(
-    (state) => state.userSettings.gyms.enableGymPopupCoords,
+    (s) => s.userSettings.gyms.enableGymPopupCoords,
   )
 
   const numFormatter = new Intl.NumberFormat(i18n.language)

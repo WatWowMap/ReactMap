@@ -83,7 +83,7 @@ export function Search() {
 
   const { t } = useTranslation()
 
-  const search = useStorage((state) => state.search)
+  const search = useStorage((s) => s.search)
   const isMobile = useMemory((s) => s.isMobile)
   const open = useLayoutStore((s) => s.search)
 

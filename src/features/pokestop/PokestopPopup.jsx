@@ -53,7 +53,7 @@ export function PokestopPopup({
   ...pokestop
 }) {
   const { t } = useTranslation()
-  const Icons = useMemory((state) => state.Icons)
+  const Icons = useMemory((s) => s.Icons)
   const { lure_expire_timestamp, lure_id, invasions, events } = pokestop
 
   useAnalytics(
@@ -307,8 +307,8 @@ const MenuActions = ({
   invasions,
 }) => {
   const { t } = useTranslation()
-  const masterfile = useMemory((state) => state.masterfile)
-  const filters = useStorage((state) => state.filters)
+  const masterfile = useMemory((s) => s.masterfile)
+  const filters = useStorage((s) => s.filters)
 
   const [anchorEl, setAnchorEl] = React.useState(false)
 
@@ -649,7 +649,7 @@ const QuestConditions = ({
  * @returns
  */
 const Footer = ({ lat, lon }) => {
-  const open = useStorage((state) => !!state.popups.extras)
+  const open = useStorage((s) => !!s.popups.extras)
 
   return (
     <Grid
@@ -685,9 +685,9 @@ const Footer = ({ lat, lon }) => {
  * @returns
  */
 const ExtraInfo = ({ last_modified_timestamp, updated, lat, lon }) => {
-  const open = useStorage((state) => state.popups.extras)
+  const open = useStorage((s) => s.popups.extras)
   const enablePokestopPopupCoords = useStorage(
-    (state) => state.userSettings.pokestops.enablePokestopPopupCoords,
+    (s) => s.userSettings.pokestops.enablePokestopPopupCoords,
   )
 
   return (
@@ -742,7 +742,7 @@ const ENCOUNTER_NUM = { first: '#1', second: '#2', third: '#3' }
 const Invasion = ({ grunt_type, confirmed, ...invasion }) => {
   const Icons = useMemory((s) => s.Icons)
   const { t } = useTranslation()
-  const info = useMemory((state) => state.masterfile.invasions[grunt_type])
+  const info = useMemory((s) => s.masterfile.invasions[grunt_type])
 
   return (
     <Grid container>

@@ -23,8 +23,8 @@ import { tutorialData } from './data'
 
 export function TutorialSidebar() {
   const { t } = useTranslation()
-  const { perms } = useMemory((state) => state.auth)
-  const isMobile = useMemory((state) => state.isMobile)
+  const { perms } = useMemory((s) => s.auth)
+  const isMobile = useMemory((s) => s.isMobile)
 
   const [tempFilters, setTempFilters] = React.useState(
     Object.fromEntries(

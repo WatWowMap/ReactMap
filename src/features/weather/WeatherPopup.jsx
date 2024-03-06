@@ -18,9 +18,9 @@ import { dayCheck } from '@utils/dayCheck'
 export function WeatherPopup({ gameplay_condition, updated }) {
   const { t } = useTranslation()
   const weatherTypes = useMemory(
-    (state) => state.masterfile.weather[gameplay_condition]?.types || [],
+    (s) => s.masterfile.weather[gameplay_condition]?.types || [],
   )
-  const Icons = useMemory((state) => state.Icons)
+  const Icons = useMemory((s) => s.Icons)
 
   useAnalytics(
     'Popup',

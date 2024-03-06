@@ -38,7 +38,7 @@ const ImgSx = {
 
 /** @param {import('@rm/types').Weather} props */
 function Weather({ gameplay_condition, ...props }) {
-  const Icons = useMemory((state) => state.Icons)
+  const Icons = useMemory((s) => s.Icons)
   const timeOfDay = useMemory((s) => s.timeOfDay)
   const clickable = useStorage((s) => s.userSettings?.weather?.clickableIcon)
   const { t } = useTranslation()
@@ -96,7 +96,7 @@ const WeatherMemo = React.memo(
 
 export function ActiveWeather() {
   const weatherEnabled = useStorage((s) => s.filters?.weather?.enabled ?? false)
-  const location = useStorage((state) => state.location)
+  const location = useStorage((s) => s.location)
   const zoom = useStorage((s) => s.zoom)
   const allowedZoom = useMemory((s) => s.config.general.activeWeatherZoom)
 

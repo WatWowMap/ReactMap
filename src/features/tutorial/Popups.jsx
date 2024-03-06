@@ -13,7 +13,7 @@ import { tutorialData } from './data'
 
 export function TutorialPopup({ isMobile }) {
   const { t } = useTranslation()
-  const { startLat, startLon } = useMemory((state) => state.config.general)
+  const { startLat, startLon } = useMemory((s) => s.config.general)
   const ts = Math.floor(new Date().getTime() / 1000)
   const size = isMobile ? 'subtitle2' : 'subtitle1'
 

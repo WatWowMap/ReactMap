@@ -48,7 +48,7 @@ export function OptionCheckbox({ category, subCategory, option }) {
   const { t } = useTranslation()
 
   const checked = useStorage(
-    (state) => state.menus[category].filters[subCategory][option] || false,
+    (s) => s.menus[category].filters[subCategory][option] || false,
   )
 
   return (

@@ -13,7 +13,7 @@ import { LocaleSelection } from '@components/inputs/LocaleSelection'
 
 export function TutorialWelcome() {
   const { t } = useTranslation()
-  const { methods, loggedIn } = useMemory((state) => state.auth)
+  const { methods, loggedIn } = useMemory((s) => s.auth)
   const permStatus = useMemory((s) => {
     let have = 0
     let total = 0
@@ -40,9 +40,7 @@ export function TutorialWelcome() {
     })
     return `${have} / ${total}`
   })
-  const enableUserProfile = useMemory(
-    (state) => state.config.misc.enableUserProfile,
-  )
+  const enableUserProfile = useMemory((s) => s.config.misc.enableUserProfile)
 
   return (
     <DialogContent>

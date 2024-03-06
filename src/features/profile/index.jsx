@@ -23,8 +23,8 @@ import { ExtraUserFields } from './ExtraFields'
 export function UserProfile() {
   useAnalytics('/user-profile')
   const { t } = useTranslation()
-  const auth = useMemory((state) => state.auth)
-  const { rolesLinkName, rolesLink } = useMemory((state) => state.config.links)
+  const auth = useMemory((s) => s.auth)
+  const { rolesLinkName, rolesLink } = useMemory((s) => s.config.links)
 
   const locale = localStorage.getItem('i18nextLng') || 'en'
 

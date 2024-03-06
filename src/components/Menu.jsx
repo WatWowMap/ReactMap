@@ -51,7 +51,7 @@ export function Menu({
 
   const isMobile = useMemory((s) => s.isMobile)
   const { t } = useTranslation()
-  const menus = useStorage((state) => state.menus)
+  const menus = useStorage((s) => s.menus)
 
   const [filterDrawer, setFilterDrawer] = React.useState(false)
 

@@ -85,7 +85,7 @@ export function WebhookAdvanced() {
   )
   const idObj = Poracle.getIdObj(id)
   const { t } = useTranslation()
-  const location = useStorage((state) => state.location)
+  const location = useStorage((s) => s.location)
   const webhookAdv = useStorage((s) => s.webhookAdv)
   const { templates, prefix, leagues, pvp, hasNominatim, locale, everything } =
     useWebhookStore((s) => s.context)

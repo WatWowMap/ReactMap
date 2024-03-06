@@ -53,10 +53,10 @@ const getColor = (ivPercent) => {
 export function PokemonPopup({ pokemon, iconUrl, isTutorial = false }) {
   const { t } = useTranslation()
   const { pokemon_id, cleanPvp, iv, cp } = pokemon
-  const perms = useMemory((state) => state.auth.perms)
+  const perms = useMemory((s) => s.auth.perms)
   const timeOfDay = useMemory((s) => s.timeOfDay)
-  const metaData = useMemory((state) => state.masterfile.pokemon[pokemon_id])
-  const Icons = useMemory((state) => state.Icons)
+  const metaData = useMemory((s) => s.masterfile.pokemon[pokemon_id])
+  const Icons = useMemory((s) => s.Icons)
 
   const userSettings = useStorage((s) => s.userSettings.pokemon)
   const pokePerms = isTutorial
@@ -65,7 +65,7 @@ export function PokemonPopup({ pokemon, iconUrl, isTutorial = false }) {
         iv: true,
       }
     : perms
-  const popups = useStorage((state) => state.popups)
+  const popups = useStorage((s) => s.popups)
 
   const hasLeagues = cleanPvp ? Object.keys(cleanPvp) : []
   const hasStats = iv || cp
@@ -161,7 +161,7 @@ const Header = ({
   userSettings,
   isTutorial,
 }) => {
-  const filters = useStorage((state) => state.filters)
+  const filters = useStorage((s) => s.filters)
 
   const [anchorEl, setAnchorEl] = useState(false)
   const { id, pokemon_id, form, ditto_form, display_pokemon_id } = pokemon
@@ -460,7 +460,7 @@ const Footer = ({ pokemon, popups, hasPvp, Icons }) => {
 }
 
 const ExtraPokemonInfo = ({ pokemon, perms, userSettings, t, Icons }) => {
-  const moves = useMemory((state) => state.masterfile.moves)
+  const moves = useMemory((s) => s.masterfile.moves)
 
   const { move_1, move_2, first_seen_timestamp, updated, iv } = pokemon
 

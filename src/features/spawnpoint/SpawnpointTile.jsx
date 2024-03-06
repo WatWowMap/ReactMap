@@ -14,7 +14,7 @@ import { spawnpointMarker } from './spawnpointMarker'
  * @returns
  */
 const BaseSpawnpointTile = (item) => {
-  const Icons = useMemory((state) => state.Icons)
+  const Icons = useMemory((s) => s.Icons)
   const [modifiers] = Icons.getModifiers('spawnpoint')
   const size = Icons.getSize('spawnpoint') * modifiers.sizeMultiplier
 

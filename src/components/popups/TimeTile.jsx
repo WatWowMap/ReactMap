@@ -38,7 +38,7 @@ export function TimeTile({
   disabled = '',
 }) {
   const endTime = new Date(expireTime * 1000)
-  const expanded = useStorage((state) => !!state.popups[expandKey])
+  const expanded = useStorage((s) => !!s.popups[expandKey])
 
   return (
     <>
