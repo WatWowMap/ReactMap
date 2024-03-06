@@ -8,7 +8,6 @@ import { useStorage } from '@store/useStorage'
 import { getSettings } from '@services/fetches'
 import { setLoadingText } from '@utils/setLoadingText'
 import { deepMerge } from '@utils/deepMerge'
-import { checkHoliday } from '@utils/checkHoliday'
 import { useHideElement } from '@hooks/useHideElement'
 import { getGlowRules } from '@utils/getGlowRules'
 import { useScannerSessionStorage } from '@features/scanner'
@@ -127,7 +126,7 @@ export function Config({ children }) {
         timeOfDay: timeCheck(...location),
         config: {
           ...data.map,
-          holidayEffects: (data.map.holidayEffects || []).filter(checkHoliday),
+          holidayEffects: data.map.holidayEffects || [],
         },
         polling: data.api.polling,
         settings,
