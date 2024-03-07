@@ -9,9 +9,7 @@ import IconButton from '@mui/material/IconButton'
 
 import { useMemory } from '@store/useMemory'
 import { useLayoutStore } from '@store/useLayoutStore'
-import { useStorage } from '@store/useStorage'
 import { useFilter } from '@hooks/useFilter'
-import { Header } from '@components/dialogs/Header'
 import { Footer } from '@components/dialogs/Footer'
 import { applyToAll } from '@utils/applyToAll'
 import { useGetAvailable } from '@hooks/useGetAvailable'
@@ -27,53 +25,24 @@ import { GenericSearch } from './inputs/GenericSearch'
  * @param {{
  *  category: T
  *  webhookCategory?: string
- *  tempFilters: import('@rm/types').AllFilters[T]
  *  children: (index: number, key: string) => React.ReactNode
  *  categories?: import('@rm/types').Available[]
- *  title: string
- *  titleAction: import('@mui/material').IconButtonProps['onClick'],
  *  extraButtons?: import('@components/dialogs/Footer').FooterButton[]
  * }} props
  */
 export function Menu({
   category,
   webhookCategory,
-  tempFilters,
   children,
   categories,
-  title,
-  titleAction,
   extraButtons,
 }) {
   useGetAvailable(category)
-
   useAnalytics(`/advanced/${category}`)
-
   const isMobile = useMemory((s) => s.isMobile)
   const { t } = useTranslation()
-  const menus = useStorage((s) => s.menus)
 
   const [filterDrawer, setFilterDrawer] = React.useState(false)
-
-  const { filteredArr, count } = useFilter(
-    tempFilters,
-    menus,
-    category,
-    webhookCategory,
-    categories,
-  )
-
-  const Options = React.useMemo(
-    () => (
-      <OptionsContainer
-        countTotal={count.total}
-        countShow={count.show}
-        category={category}
-        categories={categories}
-      />
-    ),
-    [category, categories, count.total, count.show],
-  )
 
   const footerButtons = React.useMemo(
     () =>
@@ -96,7 +65,7 @@ export function Menu({
                 open: true,
                 id: 'global',
                 category: webhookCategory || category,
-                selectedIds: filteredArr,
+                selectedIds: useMemory.getState().advMenuFiltered[category],
               },
             }),
           icon:
@@ -106,8 +75,15 @@ export function Menu({
           name: 'disable_all',
           action: () =>
             webhookCategory
-              ? applyToAllWebhooks(false, filteredArr)
-              : applyToAll({ enabled: false }, category, filteredArr),
+              ? applyToAllWebhooks(
+                  false,
+                  useMemory.getState().advMenuFiltered[category],
+                )
+              : applyToAll(
+                  { enabled: false },
+                  category,
+                  useMemory.getState().advMenuFiltered[category],
+                ),
           icon: 'Clear',
           color: 'error',
         },
@@ -115,11 +91,14 @@ export function Menu({
           name: 'enable_all',
           action: () =>
             webhookCategory
-              ? applyToAllWebhooks(true, filteredArr)
+              ? applyToAllWebhooks(
+                  true,
+                  useMemory.getState().advMenuFiltered[category],
+                )
               : applyToAll(
                   { enabled: true },
                   category,
-                  filteredArr,
+                  useMemory.getState().advMenuFiltered[category],
                   !webhookCategory,
                 ),
           icon: 'Check',
@@ -127,18 +106,17 @@ export function Menu({
         },
         ...(extraButtons ?? []),
       ]),
-    [category, webhookCategory, extraButtons, filteredArr, tempFilters],
+    [category, webhookCategory, extraButtons],
   )
 
   return (
     <>
-      <Header
-        titles={title}
-        action={titleAction}
-        names={[webhookCategory || category]}
-      />
       <DialogContent className="container" sx={{ p: 0, minHeight: '75vh' }}>
-        {!isMobile && <Box className="column-25">{Options}</Box>}
+        {!isMobile && (
+          <Box className="column-25">
+            <OptionsContainer category={category} categories={categories} />
+          </Box>
+        )}
         <Box p={1} className="column-75">
           <Box pb={1} display="flex">
             <GenericSearch
@@ -154,26 +132,38 @@ export function Menu({
             )}
           </Box>
           <Box>
-            {isMobile && <Collapse in={filterDrawer}>{Options}</Collapse>}
-            {filteredArr.length ? (
-              <VirtualGrid data={filteredArr} xs={4} md={2}>
-                {children}
-              </VirtualGrid>
-            ) : (
-              <Box
-                className="flex-center"
-                flex="1 1 auto"
-                whiteSpace="pre-line"
-              >
-                <Typography variant="h6" align="center">
-                  {t('no_filter_results')}
-                </Typography>
-              </Box>
+            {isMobile && (
+              <Collapse in={filterDrawer}>
+                <OptionsContainer category={category} categories={categories} />
+              </Collapse>
             )}
+            <Results
+              category={category}
+              webhookCategory={webhookCategory}
+              categories={categories}
+            >
+              {children}
+            </Results>
           </Box>
         </Box>
       </DialogContent>
       <Footer options={footerButtons} role="dialog_filter_footer" />
     </>
+  )
+}
+
+function Results({ category, webhookCategory, categories, children }) {
+  const { t } = useTranslation()
+  const filteredArr = useFilter(category, webhookCategory, categories)
+  return filteredArr.length ? (
+    <VirtualGrid data={filteredArr} xs={4} md={2}>
+      {children}
+    </VirtualGrid>
+  ) : (
+    <Box className="flex-center" flex="1 1 auto" whiteSpace="pre-line">
+      <Typography variant="h6" align="center">
+        {t('no_filter_results')}
+      </Typography>
+    </Box>
   )
 }

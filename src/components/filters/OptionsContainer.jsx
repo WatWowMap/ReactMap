@@ -1,3 +1,4 @@
+// @ts-check
 import * as React from 'react'
 import Chip from '@mui/material/Chip'
 import List from '@mui/material/List'
@@ -16,6 +17,15 @@ import { OptionsGroup } from './Options'
 /** @type {React.CSSProperties} */
 const CHIP_STYLE = { margin: 3 }
 
+/**
+ *
+ * @param {{
+ *  category: import('./Options').MenuCategories
+ *  subCategory: import('./Options').MenuSubcategories
+ *  option: string
+ * }} props
+ * @returns
+ */
 function AppliedChip({ category, subCategory, option }) {
   const { t } = useTranslation()
   const reverse = useStorage(
@@ -39,6 +49,11 @@ function AppliedChip({ category, subCategory, option }) {
 
 const AppliedChipMemo = React.memo(AppliedChip, () => true)
 
+/**
+ *
+ * @param {{ category: import('./Options').MenuCategories }} props
+ * @returns
+ */
 function Applied({ category }) {
   return Object.entries(useStorage.getState().menus[category].filters).map(
     ([subCategory, options]) =>
@@ -46,6 +61,7 @@ function Applied({ category }) {
         <AppliedChipMemo
           key={`${subCategory}-${option}`}
           category={category}
+          // @ts-ignore
           subCategory={subCategory}
           option={option}
         />
@@ -53,6 +69,11 @@ function Applied({ category }) {
   )
 }
 
+/**
+ *
+ * @param {import('./Options').MenuCategories} category
+ * @returns
+ */
 const handleReset = (category) => () => {
   const { menus } = useStorage.getState()
   const resetPayload = {}
@@ -70,13 +91,13 @@ const handleReset = (category) => () => {
   }))
 }
 
-export function OptionsContainer({
-  categories,
-  category,
-  countTotal,
-  countShow,
-}) {
-  const { t } = useTranslation()
+/**
+ * @param {{
+ *  category: import('./Options').MenuCategories,
+ *  categories: string[],
+ * }} props
+ */
+function OptContainer({ categories, category }) {
   return (
     <>
       {Object.entries(useMemory.getState().menus[category].filters).map(
@@ -92,6 +113,7 @@ export function OptionsContainer({
               <OptionsGroup
                 key={subCategory}
                 category={category}
+                // @ts-ignore
                 subCategory={subCategory}
               />
             )
@@ -99,13 +121,8 @@ export function OptionsContainer({
           return null
         },
       )}
-      <List key="resetShowing">
-        <ListItem>
-          <ListItemText
-            primary={t('showing')}
-            secondary={`${countShow}/${countTotal}`}
-          />
-        </ListItem>
+      <List>
+        <CountDisplay category={category} />
         <ListItem className="flex-center" sx={{ flexWrap: 'wrap' }}>
           <Applied category={category} />
         </ListItem>
@@ -114,5 +131,26 @@ export function OptionsContainer({
         </BasicListButton>
       </List>
     </>
+  )
+}
+
+export const OptionsContainer = React.memo(
+  OptContainer,
+  (prev, next) => prev.category === next.category,
+)
+
+/**
+ *
+ * @param {{ category: import('./Options').MenuCategories }} props
+ * @returns
+ */
+function CountDisplay({ category }) {
+  const { t } = useTranslation()
+  const show = useMemory((s) => s.advMenuCounts[category]?.show || 0)
+  const total = useMemory((s) => s.advMenuCounts[category]?.total || 0)
+  return (
+    <ListItem>
+      <ListItemText primary={t('showing')} secondary={`${show}/${total}`} />
+    </ListItem>
   )
 }

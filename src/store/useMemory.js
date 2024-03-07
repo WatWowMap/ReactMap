@@ -62,6 +62,8 @@ import { create } from 'zustand'
  *     id: number | string,
  *   },
  *   extraUserFields: (import('@rm/types').ExtraField | string)[],
+ *   advMenuCounts: { [K in keyof import('./useStorage').UseStorage['advMenu']]: { total: number, show: number } }
+ *   advMenuFiltered: { [K in keyof import('./useStorage').UseStorage['advMenu']]: string[] }
  * }} UseMemory
  *
  * @type {import("zustand").UseBoundStore<import("zustand").StoreApi<UseMemory>>}
@@ -141,6 +143,18 @@ export const useMemory = create(() => ({
   manualParams: {
     category: '',
     id: '',
+  },
+  advMenuCounts: {
+    pokemon: { count: 0, show: 0 },
+    gyms: { count: 0, show: 0 },
+    pokestops: { count: 0, show: 0 },
+    nests: { count: 0, show: 0 },
+  },
+  advMenuFiltered: {
+    gyms: [],
+    pokestops: [],
+    pokemon: [],
+    nests: [],
   },
 }))
 

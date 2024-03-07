@@ -10,7 +10,7 @@ import { Trans, useTranslation } from 'react-i18next'
  * @param {{
  *  names?: string[],
  *  titles: string | string[],
- *  action?: import('@mui/material').IconButtonProps['onClick']
+ *  action?: () => void
  * }} props
  * @returns
  */
@@ -20,7 +20,7 @@ export function Header({ names, titles, action }) {
   return (
     <DialogTitle sx={{ bgcolor: 'secondary.main', color: 'white' }}>
       {(Array.isArray(titles) ? titles : [titles]).map((title, index) =>
-        names?.[index] ? (
+        names?.[index] !== undefined ? (
           <Trans i18nKey={title} key={title}>
             {{ name: t(names[index]) }}
           </Trans>

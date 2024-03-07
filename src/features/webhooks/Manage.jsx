@@ -39,7 +39,6 @@ export function Manage() {
   const feedbackLink = useMemory((s) => s.config.links.feedbackLink)
 
   const filters = useGenFilters()
-  const liveFilters = useWebhookStore((s) => s.tempFilters)
 
   /** @type {ReturnType<typeof React.useRef<HTMLElement | null>>} */
   const dialogRef = React.useRef(null)
@@ -125,25 +124,34 @@ export function Manage() {
 
   const tabValue = categories.findIndex((x) => x === category)
 
-  return category !== 'human' && addNew.open ? (
-    <Menu
-      tempFilters={liveFilters}
-      category={Poracle.getMapCategory(category)}
-      categories={Poracle.getFilterCategories(category)}
-      webhookCategory={category}
-      title="webhook_selection"
-      titleAction={() => setAddNew({ open: false, save: false })}
-      extraButtons={[
+  const buttons = React.useMemo(
+    () =>
+      /** @type {import('@components/dialogs/Footer').FooterButton[]} */ ([
         {
           name: 'save',
           action: () => setAddNew({ open: false, save: true }),
           icon: 'Save',
           color: 'secondary',
         },
-      ]}
-    >
-      {(_, key) => <WebhookItem id={key} category={category} caption />}
-    </Menu>
+      ]),
+    [setAddNew],
+  )
+  return category !== 'human' && addNew.open ? (
+    <>
+      <Header
+        titles="webhook_selection"
+        action={() => setAddNew({ open: false, save: false })}
+        names={[category]}
+      />
+      <Menu
+        category={Poracle.getMapCategory(category)}
+        categories={Poracle.getFilterCategories(category)}
+        webhookCategory={category}
+        extraButtons={buttons}
+      >
+        {(_, key) => <WebhookItem id={key} category={category} caption />}
+      </Menu>
+    </>
   ) : (
     <>
       <Header

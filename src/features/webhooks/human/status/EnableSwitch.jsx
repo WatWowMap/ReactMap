@@ -1,3 +1,4 @@
+// @ts-check
 import * as React from 'react'
 import Switch from '@mui/material/Switch'
 import FormControlLabel from '@mui/material/FormControlLabel'
@@ -10,7 +11,7 @@ import { useWebhookStore } from '@store/useWebhookStore'
 export function EnableSwitch() {
   const { t } = useTranslation()
 
-  const human = useWebhookStore((s) => s.human)
+  const enabled = useWebhookStore((s) => !!s.human.enabled)
   const [save] = useMutation(SET_HUMAN, { fetchPolicy: 'no-cache' })
 
   return (
@@ -18,11 +19,11 @@ export function EnableSwitch() {
       control={
         <Switch
           color="secondary"
-          checked={!!human.enabled}
+          checked={enabled}
           onChange={() => {
             save({
               variables: {
-                category: human.enabled ? 'stop' : 'start',
+                category: enabled ? 'stop' : 'start',
                 status: 'POST',
               },
             }).then(({ data }) =>

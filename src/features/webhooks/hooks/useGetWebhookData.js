@@ -23,7 +23,7 @@ export function useGetWebhookData(category) {
   const timeout = useRef(new RobustTimeout(10_000))
 
   const { data, previousData, loading, refetch } = useQuery(ALL_PROFILES, {
-    fetchPolicy: 'cache-first',
+    fetchPolicy: 'cache-and-network',
     variables: {
       category,
       status: 'GET',
@@ -45,7 +45,7 @@ export function useGetWebhookData(category) {
         timeout.current.off()
       }
     }
-  }, [category, realCategory])
+  }, [category, realCategory, refetch, timeout.current])
 
   const filtererData = useMemo(() => {
     const source = data ?? previousData
@@ -77,7 +77,7 @@ export function useGetWebhookData(category) {
         useWebhookStore.setState({ [category]: filtererData })
       }
     }
-  }, [data, search])
+  }, [data, filtererData, search])
 
   useEffect(() => {
     if (category === 'human') {
@@ -89,7 +89,7 @@ export function useGetWebhookData(category) {
 
   useEffect(() => {
     refetch()
-  }, [category, profileNo])
+  }, [profileNo])
 
   return {
     data:

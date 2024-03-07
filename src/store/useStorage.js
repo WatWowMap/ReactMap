@@ -21,6 +21,12 @@ import { setDeep } from '@utils/setDeep'
  *    tileServers: string
  *    distanceUnit: 'kilometers' | 'miles'
  *   },
+ *   advMenu: {
+ *    pokemon: string,
+ *    gyms: string,
+ *    pokestops: string,
+ *    nests: string,
+ *   }
  *   searches: Record<string, string>,
  *   tabs: Record<string, number>,
  *   menus: ReturnType<import('server/src/services/ui/advMenus')>
