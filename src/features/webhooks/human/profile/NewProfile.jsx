@@ -32,6 +32,15 @@ export const NewProfile = () => {
     })
   }, [newProfile, save])
 
+  /** @type {React.FormEventHandler<HTMLFormElement>} */
+  const handleSubmit = React.useCallback(
+    (event) => {
+      event.preventDefault()
+      handleAddProfile()
+    },
+    [handleAddProfile],
+  )
+
   const handleChange = React.useCallback(
     (
       /** @type {React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>} */ event,
@@ -41,11 +50,10 @@ export const NewProfile = () => {
     [setNewProfile],
   )
 
-  const invalid =
-    existing.includes(newProfile) || newProfile === 'all' || !newProfile
+  const invalid = existing.includes(newProfile) || newProfile === 'all'
 
   return (
-    <Grid container xs={12}>
+    <Grid container xs={12} component="form" onSubmit={handleSubmit}>
       <Grid xs={12} sm={4}>
         <Typography variant="h6" align="center" pb={{ xs: 2, sm: 0 }}>
           {t('add_new_profile')}
@@ -68,7 +76,7 @@ export const NewProfile = () => {
           variant="contained"
           color="primary"
           onClick={handleAddProfile}
-          disabled={invalid}
+          disabled={invalid || !newProfile}
         >
           {t('save')}
         </Button>

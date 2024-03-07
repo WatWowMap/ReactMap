@@ -31,6 +31,7 @@ import { create } from 'zustand'
  *  trackedSearch: string
  *  selected: Record<string, boolean>
  *  tempFilters: Record<string, any>
+ *  profileLoading: null | number
  *  advanced: {
  *    id: string
  *    uid: number
@@ -74,6 +75,7 @@ export const useWebhookStore = create(() => ({
   trackedSearch: '',
   selected: {},
   tempFilters: {},
+  profileLoading: null,
   advanced: {
     id: '',
     uid: 0,

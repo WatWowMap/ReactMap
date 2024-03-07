@@ -2,7 +2,10 @@
 import * as React from 'react'
 import Grid from '@mui/material/Unstable_Grid2'
 import Divider from '@mui/material/Divider'
+import CircularProgress from '@mui/material/CircularProgress'
 import { styled } from '@mui/material/styles'
+
+import { useWebhookStore } from '@store/useWebhookStore'
 
 import { ProfileView } from './ProfileView'
 import { EditView } from './EditView'
@@ -23,6 +26,7 @@ const StyledDivider = styled(Divider)(({ theme }) => ({
 /** @param {Pick<Props, 'uid'>} props */
 export const ProfileTile = ({ uid }) => {
   const [view, setView] = React.useState(/** @type {View} */ ('profile'))
+  const isLoading = useWebhookStore((s) => s.profileLoading === uid)
 
   const handleViewChange = React.useCallback(
     (/** @type {View} */ newView) => () => setView(newView),
@@ -31,7 +35,9 @@ export const ProfileTile = ({ uid }) => {
   return (
     <Grid container xs={12} justifyContent="center" alignItems="center">
       <StyledDivider flexItem />
-      {
+      {isLoading ? (
+        <CircularProgress />
+      ) : (
         {
           profile: (
             <ProfileView uid={uid} handleViewChange={handleViewChange} />
@@ -40,7 +46,7 @@ export const ProfileTile = ({ uid }) => {
           delete: <DeleteView uid={uid} handleViewChange={handleViewChange} />,
           copy: <CopyView uid={uid} handleViewChange={handleViewChange} />,
         }[view]
-      }
+      )}
     </Grid>
   )
 }

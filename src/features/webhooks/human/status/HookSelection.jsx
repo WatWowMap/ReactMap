@@ -1,6 +1,7 @@
 // @ts-check
 import * as React from 'react'
 import MenuItem from '@mui/material/MenuItem'
+import CircularProgress from '@mui/material/CircularProgress'
 import { useTranslation } from 'react-i18next'
 import { useMutation } from '@apollo/client'
 
@@ -12,7 +13,6 @@ import {
   WEBHOOK_USER,
   ALL_PROFILES,
 } from '@services/queries/webhook'
-import { Loading } from '@components/Loading'
 import { useWebhookStore } from '@store/useWebhookStore'
 import { FCSelect } from '@components/inputs/FCSelect'
 
@@ -41,7 +41,7 @@ export function HookSelection() {
   if (!multipleHooks) return null
 
   return loading ? (
-    <Loading>{t('loading', { category: t('webhooks') })}</Loading>
+    <CircularProgress />
   ) : (
     <FCSelect
       label={t('select_webhook')}

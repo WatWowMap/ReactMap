@@ -13,6 +13,8 @@ import { useMutation } from '@apollo/client'
 import { ALL_PROFILES, SET_PROFILE } from '@services/queries/webhook'
 import { useWebhookStore } from '@store/useWebhookStore'
 
+import { handleUpdate } from './handleUpdate'
+
 /** @param {import('./ProfileTile').Props} props */
 export const CopyView = ({ uid, handleViewChange }) => {
   const [save] = useMutation(SET_PROFILE, {
@@ -27,6 +29,7 @@ export const CopyView = ({ uid, handleViewChange }) => {
 
   const handleCopyProfile = () => {
     if (copyTo !== 0) {
+      useWebhookStore.setState({ profileLoading: profile.uid })
       handleViewChange('profile')()
       save({
         variables: {
@@ -37,7 +40,7 @@ export const CopyView = ({ uid, handleViewChange }) => {
           },
           status: 'POST',
         },
-      })
+      }).then(handleUpdate)
     }
   }
 

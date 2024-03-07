@@ -13,6 +13,8 @@ import { useMutation } from '@apollo/client'
 import { ALL_PROFILES, SET_PROFILE } from '@services/queries/webhook'
 import { useWebhookStore } from '@store/useWebhookStore'
 
+import { handleUpdate } from './handleUpdate'
+
 /** @param {import('./ProfileTile').Props} props */
 export const EditView = ({ handleViewChange, uid }) => {
   const { t } = useTranslation()
@@ -44,15 +46,16 @@ export const EditView = ({ handleViewChange, uid }) => {
         { ...newActiveHours, id: `${uid}_${active.active_hours.length}` },
       ],
     }
+    useWebhookStore.setState({ profileLoading: uid })
     save({
       variables: {
         category: 'profiles-update',
         data: editedProfile,
         status: 'POST',
       },
-    })
+    }).then(handleUpdate)
     handleViewChange('profile')()
-  }, [newActiveHours])
+  }, [newActiveHours, uid])
 
   return (
     <>

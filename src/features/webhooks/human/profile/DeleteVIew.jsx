@@ -11,6 +11,8 @@ import { useMutation } from '@apollo/client'
 import { ALL_PROFILES, SET_PROFILE } from '@services/queries/webhook'
 import { useWebhookStore } from '@store/useWebhookStore'
 
+import { handleUpdate } from './handleUpdate'
+
 /** @param {import('./ProfileTile').Props} props */
 export const DeleteView = ({ handleViewChange, uid }) => {
   const { t } = useTranslation()
@@ -23,13 +25,14 @@ export const DeleteView = ({ handleViewChange, uid }) => {
   )
 
   const handleRemove = () => {
+    useWebhookStore.setState({ profileLoading: uid })
     save({
       variables: {
         category: 'profiles-byProfileNo',
         data: profileNo,
         status: 'DELETE',
       },
-    })
+    }).then(handleUpdate)
   }
 
   return (

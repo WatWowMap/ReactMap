@@ -19,7 +19,6 @@ export function useGetWebhookData(category) {
   const { t } = useTranslation()
   const search = useWebhookStore((s) => s.trackedSearch)
   const realCategory = useWebhookStore((s) => s.category)
-  const profileNo = useWebhookStore((s) => s.human.current_profile_no)
   const timeout = useRef(new RobustTimeout(10_000))
 
   const { data, previousData, loading, refetch } = useQuery(ALL_PROFILES, {
@@ -34,7 +33,7 @@ export function useGetWebhookData(category) {
     skip: category !== realCategory && category !== 'profile',
   })
   const { data: userConfig } = useQuery(WEBHOOK_USER, {
-    fetchPolicy: 'no-cache',
+    fetchPolicy: 'cache-and-network',
     skip: category !== 'human',
   })
 
@@ -86,10 +85,6 @@ export function useGetWebhookData(category) {
       })
     }
   }, [userConfig])
-
-  useEffect(() => {
-    refetch()
-  }, [profileNo])
 
   return {
     data:

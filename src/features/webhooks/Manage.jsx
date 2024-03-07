@@ -61,7 +61,7 @@ export function Manage() {
           : category === 'human'
           ? t('manage_profiles')
           : t('add_new', { category: t(category) }),
-        action: () => setAddNew({ open: true, save: false }),
+        action: () => setAddNew((prev) => ({ open: !prev.open, save: false })),
         key: 'addNew',
         icon: addNew.open ? 'Save' : 'Add',
         disabled: !categories.length,

@@ -9,6 +9,8 @@ import { useMutation } from '@apollo/client'
 import { ALL_PROFILES, SET_PROFILE } from '@services/queries/webhook'
 import { useWebhookStore } from '@store/useWebhookStore'
 
+import { handleUpdate } from './handleUpdate'
+
 const StyledChip = styled(Chip)(({ theme }) => ({
   margin: theme.spacing(0.5),
 }))
@@ -32,7 +34,7 @@ export const ActiveHourChip = ({ day, hours, mins, uid, id }) => {
       .getState()
       .profile.find((p) => p.uid === uid)
     if (!profile) return
-
+    useWebhookStore.setState({ profileLoading: profile.uid })
     save({
       variables: {
         category: 'profiles-update',
@@ -44,7 +46,7 @@ export const ActiveHourChip = ({ day, hours, mins, uid, id }) => {
         },
         status: 'POST',
       },
-    })
+    }).then(handleUpdate)
   }, [id, uid])
 
   return (
