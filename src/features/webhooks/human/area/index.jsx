@@ -7,7 +7,7 @@ import Grid from '@mui/material/Unstable_Grid2'
 
 import { setModeBtn } from '@store/useWebhookStore'
 
-import { AreaAction, AreaGroup } from './AreaGroup'
+import { AreaGroup } from './AreaGroup'
 import { Selected } from './Selected'
 
 const Areas = () => {
@@ -15,28 +15,15 @@ const Areas = () => {
 
   return (
     <Grid container xs={12} justifyContent="center" alignItems="center">
-      <Grid xs={6} sm={3} pb={{ xs: 2, sm: 0 }}>
+      <Grid xs={6} sm={3}>
         <Typography variant="h6" pl={1}>
           {t('areas')}
         </Typography>
       </Grid>
-      <Grid
-        xs={6}
-        sm={3}
-        textAlign="center"
-        display={{ xs: 'block', sm: 'none' }}
-        pb={{ xs: 2, sm: 0 }}
-      >
-        <Button
-          size="small"
-          variant="contained"
-          color="primary"
-          onClick={setModeBtn('areas')}
-        >
-          {t('choose_on_map')}
-        </Button>
+      <Grid xs={6} display={{ xs: 'none', sm: 'block' }}>
+        <Selected />
       </Grid>
-      <Grid xs={6} sm={3} textAlign="center">
+      {/* <Grid xs={6} sm={3} textAlign="center">
         <AreaAction color="primary" action="none">
           {t('disable_all')}
         </AreaAction>
@@ -45,13 +32,8 @@ const Areas = () => {
         <AreaAction color="secondary" action="all">
           {t('enable_all')}
         </AreaAction>
-      </Grid>
-      <Grid
-        xs={6}
-        sm={3}
-        textAlign="center"
-        display={{ xs: 'none', sm: 'block' }}
-      >
+      </Grid> */}
+      <Grid xs={6} sm={3} textAlign="center">
         <Button
           size="small"
           variant="contained"
@@ -61,11 +43,10 @@ const Areas = () => {
           {t('choose_on_map')}
         </Button>
       </Grid>
-      <AreaGroup />
-      <Grid container xs={12} alignItems="center" justifyContent="center" />
-      <Grid xs={12}>
+      <Grid xs={12} display={{ xs: 'block', sm: 'none' }} pt={2}>
         <Selected />
       </Grid>
+      <AreaGroup />
     </Grid>
   )
 }

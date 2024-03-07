@@ -29,6 +29,7 @@ import { setDeep } from '@utils/setDeep'
  *   }
  *   searches: Record<string, string>,
  *   tabs: Record<string, number>,
+ *   expanded: Record<string, boolean>,
  *   menus: ReturnType<import('server/src/services/ui/advMenus')>
  *   holidayEffects: Record<string, boolean>,
  *   motdIndex: number
@@ -121,6 +122,7 @@ export const useStorage = create(
       settings: {},
       searches: {},
       tabs: {},
+      expanded: {},
       userSettings: {},
       icons: {},
       audio: {},
