@@ -7,6 +7,9 @@ const { log, HELPERS } = require('@rm/logger')
 const checkConfigJsons = require('./functions/checkConfigJsons')
 const { loadCachedAreas } = require('./areas')
 
+if (process.env.NODE_CONFIG_ENV) {
+  log.info(HELPERS.config, `Using config for ${process.env.NODE_CONFIG_ENV}`)
+}
 const allowedMenuItems = [
   'gyms',
   'nests',
