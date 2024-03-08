@@ -19,7 +19,6 @@
       "__name": "DEV_OPTIONS_QUERY_DEBUG",
       "__format": "boolean"
     },
-    "clientPath": "DEV_OPTIONS_CLIENT_PATH",
     "logLevel": "DEV_OPTIONS_LOG_LEVEL",
     "skipMinified": {
       "__name": "DEV_OPTIONS_SKIP_MINIFIED",
@@ -298,10 +297,6 @@
     "kojiOptions": {
       "bearerToken": "API_KOJI_OPTIONS_BEARER_TOKEN"
     }
-  },
-  "multiDomains": {
-    "__name": "MULTI_DOMAINS",
-    "__format": "json"
   },
   "map": {
     "general": {
