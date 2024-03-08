@@ -1,21 +1,21 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { setUser } from '@sentry/react'
-
-import { useMemory } from '@hooks/useMemory'
-import { useStorage } from '@hooks/useStorage'
-import Fetch from '@services/Fetch'
-import { setLoadingText } from '@services/functions/setLoadingText'
-import Utility from '@services/Utility'
-import { deepMerge } from '@services/functions/deepMerge'
 import { Navigate } from 'react-router-dom'
-import { checkHoliday } from '@services/functions/checkHoliday'
+
+import { useMemory } from '@store/useMemory'
+import { useStorage } from '@store/useStorage'
+import { getSettings } from '@services/fetches'
+import { setLoadingText } from '@utils/setLoadingText'
+import { deepMerge } from '@utils/deepMerge'
 import { useHideElement } from '@hooks/useHideElement'
-import { getGlowRules } from '@services/functions/getGlowRules'
+import { getGlowRules } from '@utils/getGlowRules'
+import { useScannerSessionStorage } from '@features/scanner'
+import { timeCheck } from '@utils/timeCheck'
+import { analytics } from '@utils/analytics'
+import { checkHoliday } from '@features/holiday'
 
-import { useScannerSessionStorage } from './layout/dialogs/scanner/store'
-
-export default function Config({ children }) {
+export function Config({ children }) {
   const { t } = useTranslation()
   const [serverSettings, setServerSettings] = React.useState({
     error: false,
@@ -26,12 +26,12 @@ export default function Config({ children }) {
   useHideElement(serverSettings.fetched)
 
   const getServerSettings = async () => {
-    const data = await Fetch.getSettings()
+    const data = await getSettings()
 
     if (data) {
       document.title = data?.map?.general.headerTitle || document.title
 
-      Utility.analytics(
+      analytics(
         'User',
         data.user ? `${data.user.username} (${data.user.id})` : 'Not Logged In',
         'Permissions',
@@ -44,7 +44,7 @@ export default function Config({ children }) {
         })
       }
 
-      /** @type {{ state: import('@hooks/useStorage').UseStorage}} */
+      /** @type {{ state: import('@store/useStorage').UseStorage}} */
       const localState = JSON.parse(
         localStorage.getItem('local-state') || '{ "state": {} }',
       )
@@ -124,7 +124,7 @@ export default function Config({ children }) {
         userSettings: data.userSettings,
         clientMenus: data.clientMenus,
         glowRules: getGlowRules(data.clientMenus.pokemon.glow.sub),
-        timeOfDay: Utility.timeCheck(...location),
+        timeOfDay: timeCheck(...location),
         config: {
           ...data.map,
           holidayEffects: (data.map.holidayEffects || []).filter(checkHoliday),

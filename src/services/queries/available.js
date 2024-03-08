@@ -1,6 +1,6 @@
 import { gql } from '@apollo/client'
 
-export const getMapData = gql`
+export const GET_MAP_DATA = gql`
   query MapData {
     available {
       masterfile
@@ -12,25 +12,25 @@ export const getMapData = gql`
   }
 `
 
-export const getAvailablePokemon = gql`
+export const GET_AVAILABLE_POKEMON = gql`
   query AvailablePokemon {
     availablePokemon
   }
 `
 
-export const getAvailablePokestops = gql`
+export const GET_AVAILABLE_POKESTOPS = gql`
   query AvailablePokestops {
     availablePokestops
   }
 `
 
-export const getAvailableGyms = gql`
+export const GET_AVAILABLE_GYMS = gql`
   query AvailableGyms {
     availableGyms
   }
 `
 
-export const getAvailableNests = gql`
+export const GET_AVAILABLE_NESTS = gql`
   query AvailableNests {
     availableNests
   }

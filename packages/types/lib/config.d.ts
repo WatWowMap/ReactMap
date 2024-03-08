@@ -1,9 +1,19 @@
 import type { LogLevelNames } from 'loglevel'
+import type {
+  ButtonProps,
+  DialogProps,
+  DividerProps,
+  Grid2Props,
+  SxProps,
+} from '@mui/material'
+
 import config = require('server/src/configs/default.json')
 import example = require('server/src/configs/local.example.json')
 
 import type { Schema } from './server'
-import type { DialogProps } from '@mui/material'
+import { TypographyProps } from '@mui/system'
+import { OnlyType } from './utility'
+import { Props as ImgProps } from '@components/Img'
 
 type BaseConfig = typeof config
 type ExampleConfig = typeof example
@@ -154,14 +164,86 @@ export interface Webhook {
   local: []
 }
 
-export interface CustomComponent {
-  type?: string
-  components?: CustomComponent[]
+export interface GridSizes {
+  xs?: number
+  sm?: number
+  md?: number
+  lg?: number
+  xl?: number
+}
+
+export interface BaseBlock {
+  gridSizes?: GridSizes
+  gridStyle?: React.CSSProperties
+  gridSx?: SxProps
   donorOnly?: boolean
   freeloaderOnly?: boolean
   loggedInOnly?: boolean
   loggedOutOnly?: boolean
+  text?: string | null
+  content?: string | null
+  link?: string | null
+  href?: string | null
 }
+export interface CustomText
+  extends Omit<OnlyType<TypographyProps, Function, false>>,
+    BaseBlock {
+  type: 'text'
+}
+
+export interface CustomDivider
+  extends Omit<OnlyDType<DividerProps, Function, false>>,
+    BaseBlock {
+  type: 'divider'
+}
+
+export interface CustomButton
+  extends Omit<OnlyType<ButtonProps, Function, false>>,
+    BaseBlock {
+  type: 'button'
+}
+
+export interface CustomImg extends ImgProps, BaseBlock {
+  type: 'img'
+}
+
+export interface CustomDiscord extends BaseBlock {
+  type: 'discord'
+  link: string
+}
+
+export interface CustomTelegram extends BaseBlock {
+  type: 'telegram'
+  telegramBotName: string
+  telegramAuthUrl: string
+}
+
+export interface CustomLocal extends BaseBlock {
+  type: 'localLogin'
+  localAuthUrl: string
+  link: string
+  style: React.CSSProperties
+}
+
+export interface CustomLocale extends BaseBlock {
+  type: 'localeSelection'
+}
+
+export interface ParentBlock extends BaseBlock, Grid2Props {
+  type: 'parent'
+  components: CustomComponent[]
+}
+
+export type CustomComponent =
+  | CustomText
+  | CustomDivider
+  | CustomButton
+  | CustomImg
+  | CustomDiscord
+  | CustomTelegram
+  | CustomLocal
+  | CustomLocale
+  | ParentBlock
 
 export type DeepKeys<T, P extends string = ''> = {
   [K in keyof T]-?: K extends string

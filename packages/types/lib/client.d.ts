@@ -1,8 +1,10 @@
 import * as React from 'react'
-import { Config } from './config'
-import UAssets from '@services/Icons'
-import { ButtonProps, SxProps, Theme } from '@mui/material'
+import type { ButtonProps, SxProps, Theme } from '@mui/material'
 import { SystemStyleObject } from '@mui/system'
+
+import { UAssets } from '@services/Assets'
+import { Config } from './config'
+import { AdvCategories, Permissions } from '@rm/types'
 
 declare global {
   declare const CONFIG: Config<true>
@@ -18,6 +20,16 @@ export interface CustomI extends React.HTMLProps<HTMLLIElement> {
 }
 
 export type TimesOfDay = 'day' | 'night' | 'dawn' | 'dusk'
+
+export type Theme = 'light' | 'dark'
+
+export type TileLayer = {
+  name: string
+  style: import('@rm/types').Theme
+  attribution?: string
+  url?: string
+  background?: string
+} & { [key in TimesOfDay]?: string }
 
 export type MarginProps = {
   [Key in
@@ -51,3 +63,26 @@ export interface MultiSelectorProps<V> {
     newValue: V,
   ) => (e?: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void
 }
+
+export interface FilterObj {
+  name: string
+  perms: (keyof Permissions)[]
+  webhookOnly?: boolean
+  searchMeta?: string
+  category?: AdvCategories
+  pokedexId?: number
+  formId?: number
+  defaultFormId?: number
+  pokeName?: string
+  formName?: string
+  formTypes?: string[]
+  rarity?: string
+  historic?: string
+  legendary?: boolean
+  mythical?: boolean
+  ultraBeast?: boolean
+  genId?: string
+  family?: number
+}
+
+export type ClientFilterObj = Record<string, Record<string, FilterObj>>

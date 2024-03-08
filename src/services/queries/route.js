@@ -10,7 +10,7 @@ const core = gql`
   }
 `
 
-export const getRoute = gql`
+export const GET_ROUTE = gql`
   ${core}
   query Route($id: ID) {
     route(id: $id) {
@@ -32,7 +32,7 @@ export const getRoute = gql`
   }
 `
 
-export const getRoutes = gql`
+export const GET_ROUTES = gql`
   ${core}
   query Routes(
     $minLat: Float!

@@ -1,6 +1,6 @@
 import { gql } from '@apollo/client'
 
-export default gql`
+export const S2_CELLS = gql`
   query S2Cells(
     $minLat: Float!
     $minLon: Float!

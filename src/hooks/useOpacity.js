@@ -1,6 +1,7 @@
 // @ts-check
 import { useCallback } from 'react'
-import { useStorage } from './useStorage'
+
+import { useStorage } from '@store/useStorage'
 
 /**
  * Returns dynamic opacity based on timestamp
@@ -9,7 +10,7 @@ import { useStorage } from './useStorage'
  * @param {T extends 'pokestops' ? 'invasion' : T extends 'gyms' ? 'raid' : never} [subCategory]
  * @returns
  */
-export default function useOpacity(category, subCategory) {
+export function useOpacity(category, subCategory) {
   const enabled = useStorage(
     (s) =>
       s.userSettings[category]?.[`${subCategory || category}Opacity`] ?? false,

@@ -1,7 +1,8 @@
-import { ButtonProps } from '@mui/material'
+import { Request } from 'express'
+import type { ButtonProps } from '@mui/material'
+
 import { Config, GetSafeConfig } from './config'
 import { ExpressUser, Permissions } from './server'
-import { Request } from 'express'
 
 declare module 'config' {
   interface IConfig extends Config {

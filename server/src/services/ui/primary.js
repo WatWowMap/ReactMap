@@ -90,7 +90,7 @@ leagues.forEach((league) =>
 )
 
 // TODO this will be used later in the config
-const BLOCKED = undefined
+const BLOCKED = /** @type {undefined} */ (undefined)
 
 /**
  *

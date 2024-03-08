@@ -1,23 +1,23 @@
 // @ts-check
 import { useEffect, useMemo } from 'react'
 import { useQuery } from '@apollo/client'
-import * as queries from '@services/queries/available'
-import { capitalize } from '@mui/material'
+import { capitalize } from '@mui/material/utils'
 
-import { useMemory } from './useMemory'
+import * as queries from '@services/queries/available'
+import { useMemory } from '@store/useMemory'
 
 /**
  * @param {keyof import('packages/types/lib').Available} category
  * @returns {{available: string[], loading: boolean, error: import('@apollo/client').ApolloError}}
  */
-export default function useGetAvailable(category) {
+export function useGetAvailable(category) {
   const capitalized = capitalize(category)
   const active = useMemory((s) => s.active)
   const online = useMemory((s) => s.online)
 
   /** @type {import('@apollo/client').QueryResult<{ [key: string]: string[] }>} */
   const { data, previousData, loading, error } = useQuery(
-    queries[`getAvailable${capitalized}`],
+    queries[`GET_AVAILABLE_${category.toUpperCase()}`],
     {
       fetchPolicy: active && online ? 'network-only' : 'cache-and-network',
     },

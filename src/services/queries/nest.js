@@ -8,7 +8,7 @@ const core = gql`
   }
 `
 
-export const getAllNests = gql`
+export const GET_ALL_NESTS = gql`
   ${core}
   query Nests(
     $minLat: Float!
@@ -36,7 +36,7 @@ export const getAllNests = gql`
   }
 `
 
-export const getOne = gql`
+export const GET_ONE_NEST = gql`
   ${core}
   query GetOneNest($id: ID!, $perm: String!) {
     nestsSingle(id: $id, perm: $perm) {
@@ -45,7 +45,7 @@ export const getOne = gql`
   }
 `
 
-export const nestSubmission = gql`
+export const NEST_SUBMISSION = gql`
   mutation NestSubmission($id: ID!, $name: String!) {
     nestSubmission(id: $id, name: $name)
   }
