@@ -1,3 +1,21 @@
+# [1.30.0-develop.18](https://github.com/WatWowMap/ReactMap/compare/v1.30.0-develop.17...v1.30.0-develop.18) (2024-03-08)
+
+
+### Bug Fixes
+
+* alert state ([a39154d](https://github.com/WatWowMap/ReactMap/commit/a39154d5014d66a5c1a91e6e36e888e5e0c8440c))
+* area selected translation ([bbe49e1](https://github.com/WatWowMap/ReactMap/commit/bbe49e1dc45b93ba52d96c7cf8f70a1b088a27c1))
+* asset options ([e56b0dd](https://github.com/WatWowMap/ReactMap/commit/e56b0dd81e06af23226db73f86481c41cd804bf7))
+* asset updating ([a8f1e9c](https://github.com/WatWowMap/ReactMap/commit/a8f1e9c1ca0ea9df7da4e12a0c48e080a97556c4))
+* couple of queries ([460f66e](https://github.com/WatWowMap/ReactMap/commit/460f66e0cc6c76d854bf47bce948d91be841b960))
+* feedback from naji ([72344a0](https://github.com/WatWowMap/ReactMap/commit/72344a024fff3387fc22c5de9b2780d8264afd93))
+* scan areas ([8dbc1f3](https://github.com/WatWowMap/ReactMap/commit/8dbc1f374bfae204db79d30b9f8989aa86e15d9c))
+* some clipped imports ([ed65bc0](https://github.com/WatWowMap/ReactMap/commit/ed65bc059e63c93afa31cf4d84edc9782230c4d8))
+* some incorrect feature imports ([a36ea7c](https://github.com/WatWowMap/ReactMap/commit/a36ea7ccb79684738d43ab7995cb171c03726d18))
+* swapped ivOr stores ([98fe335](https://github.com/WatWowMap/ReactMap/commit/98fe3358815b7316ccdd98343390217886b7dd26))
+* types ([4b78846](https://github.com/WatWowMap/ReactMap/commit/4b78846a7b8636031e015902007f9e5f2212821b))
+* user options state ([1e23a55](https://github.com/WatWowMap/ReactMap/commit/1e23a5571c7ef945f7204092628591541ae835f9))
+
 # [1.30.0-develop.17](https://github.com/WatWowMap/ReactMap/compare/v1.30.0-develop.16...v1.30.0-develop.17) (2024-03-05)
 
 
