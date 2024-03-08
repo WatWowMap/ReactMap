@@ -1,6 +1,7 @@
 // @ts-check
 import { useEffect } from 'react'
-import { useMemory } from './useMemory'
+
+import { useMemory } from '@store/useMemory'
 
 const cleanup = () =>
   useMemory.setState({ manualParams: { category: '', id: '' } })
@@ -10,7 +11,7 @@ const cleanup = () =>
  * @param {string | number} id
  * @param {import('leaflet').Marker<any>} ref
  */
-export default function useForcePopup(id, ref) {
+export function useForcePopup(id, ref) {
   const manualParams = useMemory((s) => s.manualParams)
 
   useEffect(() => {

@@ -1,7 +1,9 @@
 import { useTranslation } from 'react-i18next'
 
-import { useMemory } from '@hooks/useMemory'
-import { useGetDeepStore } from '@hooks/useStorage'
+import { useMemory } from '@store/useMemory'
+import { useGetDeepStore, useStorage } from '@store/useStorage'
+import { useEffect } from 'react'
+import { useWebhookStore } from '@store/useWebhookStore'
 
 const filteringPokemon = [
   'pokemon',
@@ -10,14 +12,12 @@ const filteringPokemon = [
   'quest_reward_12',
 ]
 
-export default function useFilter(
-  tempFilters,
-  menus,
-  category,
-  webhookCategory,
-  reqCategories,
-) {
+export function useFilter(category, webhookCategory, reqCategories) {
   const { t } = useTranslation()
+  const tempFilters = webhookCategory
+    ? useWebhookStore((s) => s.tempFilters)
+    : useStorage((s) => s.filters[category].filter)
+
   const search = useGetDeepStore(`searches.${category}Advanced`, '')
     .toLowerCase()
     .trim()
@@ -27,28 +27,27 @@ export default function useFilter(
     masterfile: { pokemon },
     menuFilters,
   } = useMemory.getState()
-
+  const menus = useStorage((s) => s.menus[category].filters)
   const {
-    filters: {
-      generations,
-      types,
-      rarity,
-      historicRarity,
-      forms,
-      others,
-      categories,
-    },
-  } = menus[category]
+    generations,
+    types,
+    rarity,
+    historicRarity,
+    forms,
+    others,
+    categories,
+  } = menus
+
   const tempAdvFilter = {}
   const filteredArr = []
   const searchTerms = []
   const count = { total: 0, show: 0 }
   let switchKey
 
-  Object.keys(menus[category].filters).forEach((subCategory) => {
-    tempAdvFilter[subCategory] = Object.values(
-      menus[category].filters[subCategory],
-    ).every((val) => val === false)
+  Object.keys(menus).forEach((subCategory) => {
+    tempAdvFilter[subCategory] = Object.values(menus[subCategory]).every(
+      (val) => val === false,
+    )
   })
 
   if (
@@ -250,5 +249,18 @@ export default function useFilter(
     })
   })
 
-  return { filteredArr, count }
+  useEffect(() => {
+    useMemory.setState((prev) => ({
+      advMenuCounts: {
+        ...prev.advMenuCounts,
+        [category]: count,
+      },
+      advMenuFiltered: {
+        ...prev.advMenuFiltered,
+        [category]: filteredArr,
+      },
+    }))
+  }, [count, filteredArr])
+
+  return filteredArr
 }

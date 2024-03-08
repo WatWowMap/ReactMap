@@ -1,5 +1,5 @@
 import { gql } from '@apollo/client'
-import { Nominatim } from './geocoder'
+import { NOMINATIM } from './geocoder'
 
 const core = gql`
   fragment CoreSearch on Search {
@@ -12,7 +12,7 @@ const core = gql`
   }
 `
 
-export const poi = gql`
+export const POI = gql`
   ${core}
   query SearchPoi(
     $search: String!
@@ -35,7 +35,7 @@ export const poi = gql`
   }
 `
 
-export const lures = gql`
+export const LURES = gql`
   query SearchLures(
     $search: String!
     $category: String!
@@ -63,8 +63,8 @@ export const lures = gql`
   }
 `
 
-export const poiWebhook = gql`
-  ${Nominatim}
+export const POI_WEBHOOK = gql`
+  ${NOMINATIM}
   query SearchWebhook(
     $search: String!
     $category: String!
@@ -92,7 +92,7 @@ export const poiWebhook = gql`
   }
 `
 
-export const nests = gql`
+export const NESTS = gql`
   ${core}
   query SearchNests(
     $search: String!
@@ -117,7 +117,7 @@ export const nests = gql`
   }
 `
 
-export const pokemon = gql`
+export const POKEMON = gql`
   ${core}
   query SearchPokemon(
     $search: String!
@@ -147,7 +147,7 @@ export const pokemon = gql`
   }
 `
 
-export const quests = gql`
+export const QUESTS = gql`
   query SearchQuests(
     $search: String!
     $category: String!
@@ -192,7 +192,7 @@ export const quests = gql`
   }
 `
 
-export const raids = gql`
+export const RAIDS = gql`
   ${core}
   query SearchRaids(
     $search: String!
@@ -221,7 +221,7 @@ export const raids = gql`
   }
 `
 
-export const invasions = gql`
+export const INVASIONS = gql`
   query SearchInvasions(
     $search: String!
     $category: String!

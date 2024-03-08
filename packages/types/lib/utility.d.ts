@@ -13,7 +13,9 @@ export type SpecificValueType<T, U, V> = {
 /*
  * OnlyType<T, U, V> - returns a type with only the keys of T that have a value of U
  */
-export type OnlyType<T, U, V = true> = { [k in SpecificValueType<T, U, V>]: U }
+export type OnlyType<T, U, V = true> = {
+  [K in SpecificValueType<T, U, V>]: T[K]
+}
 
 export type StoreNoFn<T> = keyof OnlyType<T, Function, false>
 

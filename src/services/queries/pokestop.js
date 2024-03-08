@@ -95,7 +95,7 @@ const event = gql`
   }
 `
 
-export const getPokestops = gql`
+export const GET_POKESTOPS = gql`
   ${core}
   query Pokestops(
     $minLat: Float!
@@ -116,7 +116,7 @@ export const getPokestops = gql`
   }
 `
 
-export const getLures = gql`
+export const GET_LURES = gql`
   ${core}
   ${lure}
   query Lures(
@@ -139,7 +139,7 @@ export const getLures = gql`
   }
 `
 
-export const getQuests = gql`
+export const GET_QUESTS = gql`
   ${core}
   ${quest}
   query Quests(
@@ -162,7 +162,7 @@ export const getQuests = gql`
   }
 `
 
-export const getInvasions = gql`
+export const GET_INVASIONS = gql`
   ${core}
   ${invasion}
   query Invasions(
@@ -185,7 +185,7 @@ export const getInvasions = gql`
   }
 `
 
-export const getEvents = gql`
+export const GET_EVENTS = gql`
   ${core}
   ${event}
   query Events(
@@ -208,7 +208,7 @@ export const getEvents = gql`
   }
 `
 
-export const getLuresQuests = gql`
+export const GET_LURES_QUESTS = gql`
   ${core}
   ${lure}
   ${quest}
@@ -233,7 +233,7 @@ export const getLuresQuests = gql`
   }
 `
 
-export const getLuresInvasions = gql`
+export const GET_LURES_INVASIONS = gql`
   ${core}
   ${lure}
   ${invasion}
@@ -258,7 +258,7 @@ export const getLuresInvasions = gql`
   }
 `
 
-export const getLuresEvents = gql`
+export const GET_LURES_EVENTS = gql`
   ${core}
   ${lure}
   ${event}
@@ -283,7 +283,7 @@ export const getLuresEvents = gql`
   }
 `
 
-export const getQuestsInvasions = gql`
+export const GET_QUESTS_INVASIONS = gql`
   ${core}
   ${quest}
   ${invasion}
@@ -308,7 +308,7 @@ export const getQuestsInvasions = gql`
   }
 `
 
-export const getQuestsEvents = gql`
+export const GET_QUESTS_EVENTS = gql`
   ${core}
   ${quest}
   ${event}
@@ -333,7 +333,7 @@ export const getQuestsEvents = gql`
   }
 `
 
-export const getInvasionsEvents = gql`
+export const GET_INVASIONS_EVENTS = gql`
   ${core}
   ${invasion}
   ${event}
@@ -358,7 +358,7 @@ export const getInvasionsEvents = gql`
   }
 `
 
-export const getLuresQuestsInvasions = gql`
+export const GET_LURES_QUESTS_INVASIONS = gql`
   ${core}
   ${lure}
   ${quest}
@@ -385,7 +385,7 @@ export const getLuresQuestsInvasions = gql`
   }
 `
 
-export const getLuresQuestsEvents = gql`
+export const GET_LURES_QUESTS_EVENTS = gql`
   ${core}
   ${lure}
   ${quest}
@@ -412,7 +412,7 @@ export const getLuresQuestsEvents = gql`
   }
 `
 
-export const getLuresInvasionsEvents = gql`
+export const GET_LURES_INVASIONS_EVENTS = gql`
   ${core}
   ${lure}
   ${invasion}
@@ -439,7 +439,7 @@ export const getLuresInvasionsEvents = gql`
   }
 `
 
-export const getQuestsInvasionsEvents = gql`
+export const GET_QUESTS_INVASIONS_EVENTS = gql`
   ${core}
   ${quest}
   ${invasion}
@@ -466,7 +466,7 @@ export const getQuestsInvasionsEvents = gql`
   }
 `
 
-export const getLuresQuestsInvasionsEvents = gql`
+export const GET_LURES_QUESTS_INVASIONS_EVENTS = gql`
   ${core}
   ${lure}
   ${quest}
@@ -495,7 +495,7 @@ export const getLuresQuestsInvasionsEvents = gql`
   }
 `
 
-export const getOne = gql`
+export const GET_ONE_POKESTOP = gql`
   query GetOnePokestop($id: ID!, $perm: String!) {
     pokestopsSingle(id: $id, perm: $perm) {
       lat

@@ -6,7 +6,7 @@ import { ApolloLink } from '@apollo/client'
  * @author Mygod
  * @see AbortableContext
  */
-export default class AbortableLink extends ApolloLink {
+export class AbortableLink extends ApolloLink {
   /**
    * @param {import("@apollo/client").Operation} operation
    * @param {import("@apollo/client").NextLink} [forward]

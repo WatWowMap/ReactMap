@@ -1,3 +1,50 @@
+# [1.30.0-develop.17](https://github.com/WatWowMap/ReactMap/compare/v1.30.0-develop.16...v1.30.0-develop.17) (2024-03-05)
+
+
+### Bug Fixes
+
+* attempt to keep available/masterfile more in sync ([1961af3](https://github.com/WatWowMap/ReactMap/commit/1961af3e3f1953c19f330bec3d191a3b6ef5dca3))
+
+# [1.30.0-develop.16](https://github.com/WatWowMap/ReactMap/compare/v1.30.0-develop.15...v1.30.0-develop.16) (2024-03-04)
+
+
+### Bug Fixes
+
+* 0iv/100iv overrides in a specific scenario ([aebebf1](https://github.com/WatWowMap/ReactMap/commit/aebebf10f86a0562fd4eb098fbe0cf364453dc4b))
+
+# [1.30.0-develop.15](https://github.com/WatWowMap/ReactMap/compare/v1.30.0-develop.14...v1.30.0-develop.15) (2024-03-02)
+
+
+### Bug Fixes
+
+* oops, swap ternary ([bdcfaf4](https://github.com/WatWowMap/ReactMap/commit/bdcfaf4d92fc64d1776e6f87e11713736621874d))
+
+# [1.30.0-develop.14](https://github.com/WatWowMap/ReactMap/compare/v1.30.0-develop.13...v1.30.0-develop.14) (2024-03-02)
+
+
+### Bug Fixes
+
+* adjust wayfarer line weights ([e6c0696](https://github.com/WatWowMap/ReactMap/commit/e6c0696159c1feceda41aea12b9e16b2a5cd7838))
+
+
+### Features
+
+* spacial rend range ([374c5eb](https://github.com/WatWowMap/ReactMap/commit/374c5eb09986307fb5e2e59930e18a066b22df47))
+
+# [1.30.0-develop.13](https://github.com/WatWowMap/ReactMap/compare/v1.30.0-develop.12...v1.30.0-develop.13) (2024-03-01)
+
+
+### Bug Fixes
+
+* add missing `key` prop & simplify ([05be65c](https://github.com/WatWowMap/ReactMap/commit/05be65c93537c061c91db870f9f39a59da2684d1))
+
+# [1.30.0-develop.12](https://github.com/WatWowMap/ReactMap/compare/v1.30.0-develop.11...v1.30.0-develop.12) (2024-02-29)
+
+
+### Bug Fixes
+
+* improved jsdocs for search method ([5dcf288](https://github.com/WatWowMap/ReactMap/commit/5dcf28810be5ad1063abee7ae234993a3c42be57))
+
 # [1.30.0-develop.11](https://github.com/WatWowMap/ReactMap/compare/v1.30.0-develop.10...v1.30.0-develop.11) (2024-02-27)
 
 

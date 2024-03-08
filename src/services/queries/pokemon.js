@@ -43,7 +43,7 @@ const pvp = gql`
   }
 `
 
-export const getPokemon = gql`
+export const GET_POKEMON = gql`
   ${core}
   query Pokemon(
     $minLat: Float!
@@ -64,7 +64,7 @@ export const getPokemon = gql`
   }
 `
 
-export const getIvs = gql`
+export const GET_IVS = gql`
   ${core}
   ${ivs}
   query PokemonIVs(
@@ -87,7 +87,7 @@ export const getIvs = gql`
   }
 `
 
-export const getPvp = gql`
+export const GET_PVP = gql`
   ${core}
   ${pvp}
   query PokemonPVP(
@@ -110,7 +110,7 @@ export const getPvp = gql`
   }
 `
 
-export const getIvsPvp = gql`
+export const GET_IVS_PVP = gql`
   ${core}
   ${ivs}
   ${pvp}
@@ -135,7 +135,7 @@ export const getIvsPvp = gql`
   }
 `
 
-export const getOne = gql`
+export const GET_ONE_POKEMON = gql`
   query GetOnePokemon($id: ID!, $perm: String!) {
     pokemonSingle(id: $id, perm: $perm) {
       lat

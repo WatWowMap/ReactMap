@@ -361,14 +361,14 @@ module.exports = class PkmnBackend {
       filterRTree(pokemon, this.perms.areaRestrictions, this.mods.onlyAreas)
     ) {
       if (
+        (this.mods.onlyHundoIv && pokemon.iv === 100) ||
+        (this.mods.onlyZeroIv && pokemon.iv === 0)
+      )
+        return true
+      if (
         !this.mods.onlyLinkGlobal ||
         (this.pokemon === pokemon.pokemon_id && this.form === pokemon.form)
       ) {
-        if (
-          (this.mods.onlyHundoIv && pokemon.iv === 100) ||
-          (this.mods.onlyZeroIv && pokemon.iv === 0)
-        )
-          return true
         if (!this.expertFilter || !this.expertGlobal) return true
         if (this.expertFilter(pokemon)) {
           return true

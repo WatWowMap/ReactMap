@@ -67,6 +67,7 @@ function clientOptions(perms) {
       levelCircles: { type: 'bool', perm: ['iv'] },
       minLevelCircle: { type: 'number', perm: ['iv'] },
       interactionRanges: { type: 'bool', perm: ['pokemon'] },
+      spacialRendRange: { type: 'bool', perm: ['pokemon'] },
       showDexNumInPopup: { type: 'bool', perm: ['pokemon'] },
       weatherIndicator: { type: 'bool', perm: ['pokemon'] },
       pvpMega: { type: 'bool', perm: ['pvp'] },

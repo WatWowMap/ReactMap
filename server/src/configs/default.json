@@ -367,6 +367,7 @@
       "linkGlobalAndAdvanced": false,
       "showSizeIndicator": false,
       "enablePokemonPopupCoords": false,
+      "spacialRendRange": false,
       "glow": [
         {
           "name": "Hundo",

@@ -8,7 +8,7 @@ import 'leaflet.locatecontrol'
  * Use location hook
  * @returns {{ lc: any, color: import('@mui/material').ButtonProps['color'] }}
  */
-export default function useLocation() {
+export function useLocation() {
   const map = useMap()
   const [color, setColor] = useState(
     /** @type {import('@mui/material').ButtonProps['color']} */ ('inherit'),

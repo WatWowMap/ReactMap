@@ -399,8 +399,8 @@
   "non_registered_human_title": "Oops, something is not right!",
   "non_registered_human_desc": "You may not be registered with {{webhook}}\nOr the server is currently unreachable",
   "try_again_later": "Please try again later",
-  "selected_areas": "{{amount}} Area Selected",
-  "selected_areas_plural": "{{amount}} Areas Selected",
+  "selected_areas_one": "{{count}} Area Selected",
+  "selected_areas_other": "{{count}} Areas Selected",
   "webhook_selection": "{{name}} Selection",
   "message_of_the_day": "Message of the Day",
   "has_quest_indicator": "Alternative Color for Stops with Quests",
@@ -748,6 +748,9 @@
   "reset_options": "Reset Options",
   "reset_menus": "Reset Menus",
   "reset_settings": "Reset Settings",
+  "reset_general_title": "General",
+  "reset_filters_title": "Filters",
+  "reset_assets": "Assets",
   "reset_pokemon": "Reset Pokémon",
   "reset_pokestops": "Reset PokéStops",
   "reset_gyms": "Reset Gyms",
@@ -761,5 +764,6 @@
   "reset_s2cells": "Reset S2 Cells",
   "reset_spawnpoints": "Reset Spawnpoints",
   "reset_submission_cells": "Reset Submission Cells",
-  "hisuian": "Hisuian"
+  "hisuian": "Hisuian",
+  "spacial_rend_range": "Spacial Rend Range"
 }
