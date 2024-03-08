@@ -59,7 +59,8 @@ process.on('SIGUSR2', async (e) => {
   await onShutdown(e)
   process.exit(0)
 })
-process.on('uncaughtException', async () => {
+process.on('uncaughtException', async (e) => {
+  log.error(HELPERS.ReactMap, e)
   await onShutdown('SIGBREAK')
   process.exit(99)
 })
