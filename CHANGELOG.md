@@ -1,3 +1,24 @@
+# [1.30.0-develop.20](https://github.com/WatWowMap/ReactMap/compare/v1.30.0-develop.19...v1.30.0-develop.20) (2024-03-08)
+
+
+### Bug Fixes
+
+* add log to indicate config env var ([ba25048](https://github.com/WatWowMap/ReactMap/commit/ba2504890e755aa5a805710be6602e16ec17a051))
+* add new dist folders to lint ignores ([9a870cd](https://github.com/WatWowMap/ReactMap/commit/9a870cd0a8f2ec9669163488cab0d2f77aa163e9))
+* check for multidomains in areas ([e5b8a9c](https://github.com/WatWowMap/ReactMap/commit/e5b8a9ccaf2bf00af5784107768dffc68fa2673e))
+* custom favicons for each domain ([f470f53](https://github.com/WatWowMap/ReactMap/commit/f470f53fe3995e72391012a54c02ff5661660f5c))
+* favicon instructions ([1851505](https://github.com/WatWowMap/ReactMap/commit/185150552e47980f91a5a257906ccb9b478a4dce))
+* file caching for multi ([2acf34a](https://github.com/WatWowMap/ReactMap/commit/2acf34a2f014d8b362184554061b709c2bf6abba))
+* reading other config files ([ef30f33](https://github.com/WatWowMap/ReactMap/commit/ef30f33c18146b2f14584e3639162cce16cc78a0))
+* simplify ([b48bcb3](https://github.com/WatWowMap/ReactMap/commit/b48bcb31d329b8027fdbfef397fb89ef56c34a5a))
+* still define obj though ([e98bb92](https://github.com/WatWowMap/ReactMap/commit/e98bb9280e1f9be998aa59d8003c6949a9bee408))
+
+
+### Features
+
+* lots of docs & examples ([1a33c5e](https://github.com/WatWowMap/ReactMap/commit/1a33c5ece9605e4a9c6fc0a10ae0fc2e554962f7))
+* new approach to multi domain ([aa5602b](https://github.com/WatWowMap/ReactMap/commit/aa5602b36bd78f88c75e9f2b0f367ff8da4b997d))
+
 # [1.30.0-develop.19](https://github.com/WatWowMap/ReactMap/compare/v1.30.0-develop.18...v1.30.0-develop.19) (2024-03-08)
 
 
