@@ -9,9 +9,11 @@ const { log, HELPERS } = require('@rm/logger')
 
 const { readAndParseJson, readLocaleDirectory, writeAll } = require('./utils')
 
-const openAI = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-})
+const openAI = process.env.OPENAI_API_KEY
+  ? new OpenAI({
+      apiKey: process.env.OPENAI_API_KEY,
+    })
+  : null
 
 /**
  * @typedef {Record<string, string>} I18nObject
@@ -189,6 +191,7 @@ async function generate() {
 module.exports.generate = generate
 
 if (require.main === module) {
+  if (!process.env.OPENAI_API_KEY) throw new Error('OpenAI API key is missing')
   generate()
     .then((locales) => writeAll(locales, false, __dirname, './generated'))
     .then(() =>
