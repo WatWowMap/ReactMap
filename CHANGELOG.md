@@ -1,3 +1,10 @@
+# [1.30.0-develop.19](https://github.com/WatWowMap/ReactMap/compare/v1.30.0-develop.18...v1.30.0-develop.19) (2024-03-08)
+
+
+### Bug Fixes
+
+* fallback obj ([b6470f4](https://github.com/WatWowMap/ReactMap/commit/b6470f43ca5118c11951fec24e7dc735aca4c463))
+
 # [1.30.0-develop.18](https://github.com/WatWowMap/ReactMap/compare/v1.30.0-develop.17...v1.30.0-develop.18) (2024-03-08)
 
 
