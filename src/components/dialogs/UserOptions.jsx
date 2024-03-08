@@ -166,7 +166,7 @@ function BaseUserOptions() {
               </ListItemText>
             </ListItem>
           )}
-          {Object.entries(staticUserSettings).map(([option, values]) => (
+          {Object.entries(staticUserSettings || {}).map(([option, values]) => (
             <React.Fragment key={option}>
               <ListItem
                 key={option}
