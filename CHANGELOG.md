@@ -116,108 +116,94 @@
 
 # [1.30.0-develop.6](https://github.com/WatWowMap/ReactMap/compare/v1.30.0-develop.5...v1.30.0-develop.6) (2024-02-23)
 
-
 ### Bug Fixes
 
-* refine ci ([515de64](https://github.com/WatWowMap/ReactMap/commit/515de64e6a7275b6b7afbdb287e18be15f373e4d))
+- refine ci ([515de64](https://github.com/WatWowMap/ReactMap/commit/515de64e6a7275b6b7afbdb287e18be15f373e4d))
 
 # [1.30.0-develop.5](https://github.com/WatWowMap/ReactMap/compare/v1.30.0-develop.4...v1.30.0-develop.5) (2024-02-23)
 
-
 ### Features
 
-* pkmn filter diagram ([a40b201](https://github.com/WatWowMap/ReactMap/commit/a40b20123a78f3d565a47ed9266c16da3b979bdb))
+- pkmn filter diagram ([a40b201](https://github.com/WatWowMap/ReactMap/commit/a40b20123a78f3d565a47ed9266c16da3b979bdb))
 
 # [1.30.0-develop.4](https://github.com/WatWowMap/ReactMap/compare/v1.30.0-develop.3...v1.30.0-develop.4) (2024-02-21)
 
-
 ### Bug Fixes
 
-* try/catch on expert filter just in case ([4e430e6](https://github.com/WatWowMap/ReactMap/commit/4e430e6e1e1729ef56095b7a414f9521c6d27d75))
+- try/catch on expert filter just in case ([4e430e6](https://github.com/WatWowMap/ReactMap/commit/4e430e6e1e1729ef56095b7a414f9521c6d27d75))
 
 # [1.30.0-develop.3](https://github.com/WatWowMap/ReactMap/compare/v1.30.0-develop.2...v1.30.0-develop.3) (2024-02-21)
 
-
 ### Bug Fixes
 
-* normal form check ([47e358b](https://github.com/WatWowMap/ReactMap/commit/47e358b5cc01d75eb49cfa3b4654adf09b23af28))
+- normal form check ([47e358b](https://github.com/WatWowMap/ReactMap/commit/47e358b5cc01d75eb49cfa3b4654adf09b23af28))
 
 # [1.30.0-develop.2](https://github.com/WatWowMap/ReactMap/compare/v1.30.0-develop.1...v1.30.0-develop.2) (2024-02-21)
 
-
 ### Bug Fixes
 
-* early version check ([c9d1295](https://github.com/WatWowMap/ReactMap/commit/c9d129597d00fbcc19b4f164f4ea1ca468f09fed))
+- early version check ([c9d1295](https://github.com/WatWowMap/ReactMap/commit/c9d129597d00fbcc19b4f164f4ea1ca468f09fed))
 
 # [1.30.0-develop.1](https://github.com/WatWowMap/ReactMap/compare/v1.29.7-develop.5...v1.30.0-develop.1) (2024-02-21)
 
-
 ### Features
 
-* update polish locales ([#959](https://github.com/WatWowMap/ReactMap/issues/959)) ([d28dc0a](https://github.com/WatWowMap/ReactMap/commit/d28dc0af8445002f0f9b52e87f6eb08966182d24))
+- update polish locales ([#959](https://github.com/WatWowMap/ReactMap/issues/959)) ([d28dc0a](https://github.com/WatWowMap/ReactMap/commit/d28dc0af8445002f0f9b52e87f6eb08966182d24))
 
 ## [1.29.7-develop.5](https://github.com/WatWowMap/ReactMap/compare/v1.29.7-develop.4...v1.29.7-develop.5) (2024-02-12)
 
-
 ### Bug Fixes
 
-* more consistent gender filtering ([a3b24cb](https://github.com/WatWowMap/ReactMap/commit/a3b24cb6d4625c23d8d341c4b7cad62846b184c3))
+- more consistent gender filtering ([a3b24cb](https://github.com/WatWowMap/ReactMap/commit/a3b24cb6d4625c23d8d341c4b7cad62846b184c3))
 
 ## [1.29.7-develop.4](https://github.com/WatWowMap/ReactMap/compare/v1.29.7-develop.3...v1.29.7-develop.4) (2024-02-12)
 
-
 ### Bug Fixes
 
-* respect quest layer when searching ([4b0e0cc](https://github.com/WatWowMap/ReactMap/commit/4b0e0cc273b0e3c4988d4d3f0ded13053e3c75b6)), closes [#950](https://github.com/WatWowMap/ReactMap/issues/950)
+- respect quest layer when searching ([4b0e0cc](https://github.com/WatWowMap/ReactMap/commit/4b0e0cc273b0e3c4988d4d3f0ded13053e3c75b6)), closes [#950](https://github.com/WatWowMap/ReactMap/issues/950)
 
 ## [1.29.7-develop.3](https://github.com/WatWowMap/ReactMap/compare/v1.29.7-develop.2...v1.29.7-develop.3) (2024-02-12)
 
-
 ### Bug Fixes
 
-* `onlyShowAvailable` for nests selector ([068dac2](https://github.com/WatWowMap/ReactMap/commit/068dac25f7ffbb0594619202b85fa64801c835c8))
-* nest name memoization ([ec56d7d](https://github.com/WatWowMap/ReactMap/commit/ec56d7d79e0a5d53599307e2e3768b8dddce7852))
+- `onlyShowAvailable` for nests selector ([068dac2](https://github.com/WatWowMap/ReactMap/commit/068dac25f7ffbb0594619202b85fa64801c835c8))
+- nest name memoization ([ec56d7d](https://github.com/WatWowMap/ReactMap/commit/ec56d7d79e0a5d53599307e2e3768b8dddce7852))
 
 ## [1.29.7-develop.2](https://github.com/WatWowMap/ReactMap/compare/v1.29.7-develop.1...v1.29.7-develop.2) (2024-02-10)
 
-
 ### Bug Fixes
 
-* **nest:** make it compatible with previous tools ([9d97481](https://github.com/WatWowMap/ReactMap/commit/9d97481039356de2c1e6165abbb207a7d7af6cce))
-* **nest:** query only active nests ([ebb5295](https://github.com/WatWowMap/ReactMap/commit/ebb529578207e1d6a11f40a99e942030ec95c3e0))
+- **nest:** make it compatible with previous tools ([9d97481](https://github.com/WatWowMap/ReactMap/commit/9d97481039356de2c1e6165abbb207a7d7af6cce))
+- **nest:** query only active nests ([ebb5295](https://github.com/WatWowMap/ReactMap/commit/ebb529578207e1d6a11f40a99e942030ec95c3e0))
 
 ## [1.29.7-develop.1](https://github.com/WatWowMap/ReactMap/compare/v1.29.6...v1.29.7-develop.1) (2024-02-08)
 
-
 ### Bug Fixes
 
-* cache most things at process exit instead ([56eb47e](https://github.com/WatWowMap/ReactMap/commit/56eb47eca6e05f78e4b0b518b6d7fb6a5c901bc2))
-* config getters ([494639a](https://github.com/WatWowMap/ReactMap/commit/494639a28289fac90e0898cf2d443ba7a2c5c41d))
-* dont log golbat 404 pokemon id errors ([7292d13](https://github.com/WatWowMap/ReactMap/commit/7292d13f9b7460a7b40d1b3bcb45c751d183b953))
-* express session augmentation ([35533e9](https://github.com/WatWowMap/ReactMap/commit/35533e9b86518d496e71ff6a3fb93f54ad51864c))
-* favicon error catching for dummies ([b6c0fae](https://github.com/WatWowMap/ReactMap/commit/b6c0fae43ef8e4312bc61c265c8c16cd4a0c1ee5))
-* more client ts checks ([5028cb2](https://github.com/WatWowMap/ReactMap/commit/5028cb2221ac44e65620927bd69a10f4958f6d9c))
+- cache most things at process exit instead ([56eb47e](https://github.com/WatWowMap/ReactMap/commit/56eb47eca6e05f78e4b0b518b6d7fb6a5c901bc2))
+- config getters ([494639a](https://github.com/WatWowMap/ReactMap/commit/494639a28289fac90e0898cf2d443ba7a2c5c41d))
+- dont log golbat 404 pokemon id errors ([7292d13](https://github.com/WatWowMap/ReactMap/commit/7292d13f9b7460a7b40d1b3bcb45c751d183b953))
+- express session augmentation ([35533e9](https://github.com/WatWowMap/ReactMap/commit/35533e9b86518d496e71ff6a3fb93f54ad51864c))
+- favicon error catching for dummies ([b6c0fae](https://github.com/WatWowMap/ReactMap/commit/b6c0fae43ef8e4312bc61c265c8c16cd4a0c1ee5))
+- more client ts checks ([5028cb2](https://github.com/WatWowMap/ReactMap/commit/5028cb2221ac44e65620927bd69a10f4958f6d9c))
 
 ## [1.29.6](https://github.com/WatWowMap/ReactMap/compare/v1.29.5...v1.29.6) (2024-02-06)
 
-
 ### Bug Fixes
 
-* run even when prev is skipped ([78c1404](https://github.com/WatWowMap/ReactMap/commit/78c14040007a33180f5fddf270aa155136ba87c2))
+- run even when prev is skipped ([78c1404](https://github.com/WatWowMap/ReactMap/commit/78c14040007a33180f5fddf270aa155136ba87c2))
 
 ## [1.29.5](https://github.com/WatWowMap/ReactMap/compare/v1.29.4...v1.29.5) (2024-02-06)
 
-
 ### Bug Fixes
 
-* needs both ([e4b7cec](https://github.com/WatWowMap/ReactMap/commit/e4b7cec18ce2b41b04c5813b7a8ece23a3bf5510))
+- needs both ([e4b7cec](https://github.com/WatWowMap/ReactMap/commit/e4b7cec18ce2b41b04c5813b7a8ece23a3bf5510))
 
 ## [1.29.4](https://github.com/WatWowMap/ReactMap/compare/v1.29.3...v1.29.4) (2024-02-06)
 
-
 ### Bug Fixes
 
-* needs & attempt to not run double ([abcaaab](https://github.com/WatWowMap/ReactMap/commit/abcaaab5d65d68b98570727f21879e31f81f622e))
+- needs & attempt to not run double ([abcaaab](https://github.com/WatWowMap/ReactMap/commit/abcaaab5d65d68b98570727f21879e31f81f622e))
 
 ## [1.29.3](https://github.com/WatWowMap/ReactMap/compare/v1.29.2...v1.29.3) (2024-02-06)
 

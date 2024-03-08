@@ -10,7 +10,10 @@ const { log, HELPERS } = require('@rm/logger')
  * @param {string} [domain]
  * @returns
  */
-function checkConfigJsons(fileName, domain = '') {
+function checkConfigJsons(
+  fileName,
+  domain = process.env.NODE_CONFIG_ENV || '',
+) {
   const generalJson = fs.existsSync(
     resolve(`${__dirname}/../../configs/${fileName}.json`),
   )

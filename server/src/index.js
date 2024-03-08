@@ -141,9 +141,13 @@ app.use(compression())
 
 app.use(express.json({ limit: '50mb' }))
 
-app.use(
-  express.static(path.join(__dirname, config.getSafe('devOptions.clientPath'))),
+const distDir = path.join(
+  __dirname,
+  '../../',
+  `dist${process.env.NODE_CONFIG_ENV ? `-${process.env.NODE_CONFIG_ENV}` : ''}`,
 )
+
+app.use(express.static(distDir))
 
 app.use(
   session({
@@ -172,7 +176,7 @@ passport.deserializeUser(async (user, done) => {
   }
 })
 
-const localePath = path.resolve(__dirname, '../../dist/locales')
+const localePath = path.resolve(distDir, 'locales')
 if (fs.existsSync(localePath)) {
   require('./services/i18n')
 } else {

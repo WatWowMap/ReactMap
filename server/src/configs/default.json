@@ -7,7 +7,6 @@
     "enabled": false,
     "graphiql": false,
     "queryDebug": false,
-    "clientPath": "../../dist",
     "logLevel": "info",
     "skipMinified": false
   },
@@ -117,7 +116,6 @@
       "bearerToken": "KOJI_SECRET"
     }
   },
-  "multiDomains": [],
   "map": {
     "general": {
       "title": "ReactMap",

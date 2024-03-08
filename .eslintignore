@@ -1,4 +1,5 @@
 dist
+dist-*
 node_modules
 public/missing-locales
 public/images/custom
