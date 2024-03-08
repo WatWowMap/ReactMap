@@ -1,3 +1,10 @@
+# [1.30.0-develop.22](https://github.com/WatWowMap/ReactMap/compare/v1.30.0-develop.21...v1.30.0-develop.22) (2024-03-08)
+
+
+### Bug Fixes
+
+* logging uncaughtException error ([6848cdc](https://github.com/WatWowMap/ReactMap/commit/6848cdce4d858b2a0e39b33e7998751416c8c3d0))
+
 # [1.30.0-develop.21](https://github.com/WatWowMap/ReactMap/compare/v1.30.0-develop.20...v1.30.0-develop.21) (2024-03-08)
 
 
