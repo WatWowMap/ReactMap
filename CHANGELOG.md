@@ -1,3 +1,11 @@
+# [1.30.0-develop.21](https://github.com/WatWowMap/ReactMap/compare/v1.30.0-develop.20...v1.30.0-develop.21) (2024-03-08)
+
+
+### Bug Fixes
+
+* throw error at a different point ([825b2d9](https://github.com/WatWowMap/ReactMap/commit/825b2d90494fa354366fdcb8a2b5f683a1d7f4bb))
+* throw error if missing openai key ([de939e2](https://github.com/WatWowMap/ReactMap/commit/de939e2de5e910ea51fad425ce336c9e2ec926f6))
+
 # [1.30.0-develop.20](https://github.com/WatWowMap/ReactMap/compare/v1.30.0-develop.19...v1.30.0-develop.20) (2024-03-08)
 
 
