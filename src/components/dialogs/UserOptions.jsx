@@ -5,11 +5,11 @@ import List from '@mui/material/List'
 import ListItem from '@mui/material/ListItem'
 import ListItemText from '@mui/material/ListItemText'
 import Switch from '@mui/material/Switch'
-import { useTranslation, Trans } from 'react-i18next'
+import { useTranslation } from 'react-i18next'
 
 import { useMemory } from '@store/useMemory'
 import { toggleDialog, useLayoutStore } from '@store/useLayoutStore'
-import { useStorage } from '@store/useStorage'
+import { setDeepStore, useDeepStore, useStorage } from '@store/useStorage'
 import { getPermission } from '@services/desktopNotification'
 import { analytics } from '@utils/analytics'
 import { getProperName, camelToSnake } from '@utils/strings'
@@ -18,42 +18,72 @@ import { Header } from './Header'
 import { Footer } from './Footer'
 import { DialogWrapper } from './DialogWrapper'
 
-function InputType({ option, subOption, localState, handleChange, category }) {
-  const staticUserSettings = useMemory.getState().clientMenus[category] || {}
-  const fullOption = subOption
-    ? staticUserSettings[option].sub[subOption]
-    : staticUserSettings[option]
+/**
+ * @template {keyof import('@store/useStorage').UseStorage['userSettings']} T
+ * @param {{
+ *  category: T
+ *  option: keyof import('@store/useStorage').UseStorage['userSettings'][T]
+ *  subOption?: string
+ *  localState: Record<string, any>
+ *  handleChange: (event: React.ChangeEvent<HTMLInputElement>) => void
+ * }} props
+ */
+function InputType({ option, subOption, category }) {
+  const staticSetting = useMemory((s) =>
+    subOption
+      ? s.clientMenus[category]?.[option]?.sub?.[subOption]
+      : s.clientMenus[category]?.[option],
+  )
+  const [userValue, setUserValue] = useDeepStore(
+    `userSettings.${category}.${subOption || option}`,
+    staticSetting?.type === 'bool',
+  )
+  const handleChange = ({ target }) => {
+    if (target.type === 'checkbox') {
+      setUserValue(target.checked)
+    } else {
+      setUserValue(
+        staticSetting?.type === 'number'
+          ? +target.value || 0
+          : target.value || '',
+      )
+    }
+    analytics(
+      'User Options',
+      `Name: ${option} New Value: ${target.checked ?? target.value}`,
+      category,
+    )
+  }
 
-  switch (fullOption.type) {
+  switch (staticSetting.type) {
     case 'bool':
       return (
         <Switch
           color="secondary"
-          checked={!!localState?.[subOption || option] || false}
-          name={subOption || option}
+          checked={!!userValue}
           onChange={handleChange}
-          disabled={fullOption.disabled}
+          disabled={staticSetting?.disabled}
         />
       )
     default:
       return (
         <Input
           color="secondary"
-          id={subOption || option}
-          label={subOption || option}
-          name={subOption || option}
           style={{ width: 50 }}
-          value={localState?.[subOption || option] || ''}
+          value={userValue ?? ''}
           onChange={handleChange}
-          variant="outlined"
           size="small"
-          type={fullOption.type}
-          disabled={fullOption.disabled}
-          endAdornment={fullOption.label || ''}
-          inputProps={{
-            min: fullOption.min || 0,
-            max: fullOption.max || 100,
-          }}
+          type={staticSetting.type}
+          disabled={staticSetting.disabled}
+          endAdornment={staticSetting.label || ''}
+          inputProps={
+            staticSetting.type === 'number'
+              ? {
+                  min: staticSetting.min || 0,
+                  max: staticSetting.max || 100,
+                }
+              : undefined
+          }
         />
       )
   }
@@ -70,30 +100,12 @@ function BaseUserOptions() {
   const { t } = useTranslation()
   const { open, category, type } = useLayoutStore((s) => s.dialog)
 
-  const staticUserSettings = useMemory((s) => s.clientMenus[category] || {})
-  const userSettings = useStorage((s) => s.userSettings)
+  const staticUserSettings = useMemory((s) => s.clientMenus[category])
 
-  const [localState, setLocalState] = React.useState(userSettings[category])
-
-  const handleChange = (event) => {
-    const { name, value, checked, type: eType } = event.target
-    if (eType === 'checkbox') {
-      setLocalState((prev) => ({ ...prev, [name]: checked }))
-    } else if (value) {
-      setLocalState((prev) => ({ ...prev, [name]: value }))
-    } else {
-      setLocalState((prev) => ({ ...prev, [name]: !localState[name] }))
-    }
-    analytics(
-      'User Options',
-      `Name: ${name} New Value: ${value || !localState[name]}`,
-      category,
-    )
-  }
-
+  /** @param {string} label */
   const getLabel = (label) => {
     if (label.startsWith('pvp') && !label.includes('Mega')) {
-      return <Trans i18nKey="pvp_level">{{ level: label.substring(3) }}</Trans>
+      return t('pvp_level', { level: label.substring(3) })
     }
     return t(camelToSnake(label), getProperName(label))
   }
@@ -104,34 +116,35 @@ function BaseUserOptions() {
         {
           name: 'reset',
           action: () => {
-            const newSettings = { ...userSettings[category] }
-            Object.entries(staticUserSettings || {}).forEach(([key, value]) => {
-              if (value.sub) {
-                Object.entries(value.sub).forEach(([subKey, subValue]) => {
-                  newSettings[subKey] = subValue.value
-                })
-              } else {
-                newSettings[key] = value.value
+            const existing = useStorage.getState().userSettings
+            if (category in existing) {
+              const newSettings = {
+                ...existing[category],
               }
-            })
-            setLocalState(newSettings)
+              Object.entries(staticUserSettings || {}).forEach(
+                ([key, value]) => {
+                  if (value.sub) {
+                    Object.entries(value.sub).forEach(([subKey, subValue]) => {
+                      newSettings[subKey] = subValue.value
+                    })
+                  } else {
+                    newSettings[key] = value.value
+                  }
+                },
+              )
+              setDeepStore(`userSettings.${category}`, newSettings)
+            }
           },
-          icon: 'Replay',
           color: 'primary',
         },
         {
-          name: 'save',
-          action: toggleDialog(false, category, 'options', localState),
-          icon: 'Save',
+          name: 'close',
+          action: toggleDialog(false),
           color: 'secondary',
         },
       ]),
-    [category, userSettings, staticUserSettings, localState],
+    [category, staticUserSettings],
   )
-
-  React.useEffect(() => {
-    setLocalState(userSettings[category])
-  }, [category, userSettings[category]])
 
   return (
     <DialogWrapper
@@ -144,7 +157,7 @@ function BaseUserOptions() {
         titles={[`${camelToSnake(category)}_options`]}
         action={toggleDialog(false)}
       />
-      <DialogContent sx={{ minWidth: 'min(100vw, 350px)' }}>
+      <DialogContent sx={{ minWidth: 'min(100%, 350px)' }}>
         <List>
           {category === 'notifications' && (
             <ListItem>
@@ -167,12 +180,7 @@ function BaseUserOptions() {
                     style: { maxWidth: '80%' },
                   }}
                 />
-                <MemoInputType
-                  option={option}
-                  localState={localState}
-                  handleChange={handleChange}
-                  category={category}
-                />
+                <MemoInputType category={category} option={option} />
               </ListItem>
               {values.sub &&
                 Object.keys(values.sub).map((subOption) => (
@@ -184,11 +192,9 @@ function BaseUserOptions() {
                   >
                     <ListItemText primary={getLabel(subOption)} />
                     <MemoInputType
+                      category={category}
                       option={option}
                       subOption={subOption}
-                      localState={localState}
-                      handleChange={handleChange}
-                      category={category}
                     />
                   </ListItem>
                 ))}
