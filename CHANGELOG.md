@@ -1,3 +1,10 @@
+# [1.30.0-develop.23](https://github.com/WatWowMap/ReactMap/compare/v1.30.0-develop.22...v1.30.0-develop.23) (2024-03-09)
+
+
+### Bug Fixes
+
+* webhook gym searching ([dc8ff8b](https://github.com/WatWowMap/ReactMap/commit/dc8ff8bc489bfd55fbd207d71c381ce01a25eb05))
+
 # [1.30.0-develop.22](https://github.com/WatWowMap/ReactMap/compare/v1.30.0-develop.21...v1.30.0-develop.22) (2024-03-08)
 
 
