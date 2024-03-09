@@ -14,22 +14,18 @@ const FALLBACK = {
 }
 export function WebhookAreaSelection() {
   const webhookMode = useWebhookStore((s) => s.mode)
-  const webhookName = useWebhookStore((s) => s.context.name)
 
   const { t } = useTranslation()
   const { data, loading, refetch } = useQuery(WEBHOOK_GEOJSON, {
     fetchPolicy: 'cache-first',
     skip: webhookMode !== 'areas',
-    variables: {
-      webhookName,
-    },
   })
 
   React.useEffect(() => {
     if (webhookMode === 'areas') {
       refetch()
     }
-  }, [webhookName, webhookMode])
+  }, [webhookMode])
 
   if (loading) {
     return <Loading>{t('loading', { category: t('areas') })}</Loading>

@@ -388,8 +388,8 @@ const resolvers = {
       }
       return null
     },
-    search: async (_, args, { Event, perms, Db }) => {
-      const { category, webhookName, search } = args
+    search: async (_, args, { Event, perms, Db, req }) => {
+      const { category, search } = args
       if (!search || !search.trim()) {
         return []
       }
@@ -403,8 +403,8 @@ const resolvers = {
         case 'gyms': {
           if (!perms.gyms) return []
           const results = await Db.search('Gym', perms, args)
-          const webhook = webhookName ? Event.webhookObj[webhookName] : null
-          if (webhook && results.length) {
+          const webhook = Event.webhookObj[req.user.selectedWebhook]
+          if (webhook?.nominatimUrl && results.length) {
             const withFormatted = await Promise.all(
               results.map(async (result) => ({
                 ...result,
@@ -412,6 +412,7 @@ const resolvers = {
                   webhook.nominatimUrl,
                   { lat: result.lat, lon: result.lon },
                   true,
+                  webhook.addressFormat,
                 ),
               })),
             )

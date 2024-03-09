@@ -16,8 +16,9 @@ import Typography from '@mui/material/Typography'
 import Autocomplete from '@mui/material/Autocomplete'
 import Dialog from '@mui/material/Dialog'
 import DialogContent from '@mui/material/DialogContent'
-import { Trans, useTranslation } from 'react-i18next'
+import { useTranslation } from 'react-i18next'
 import { useLazyQuery } from '@apollo/client'
+import { debounce } from 'lodash'
 
 import { useMemory } from '@store/useMemory'
 import { useStorage } from '@store/useStorage'
@@ -122,6 +123,22 @@ export function WebhookAdvanced() {
       },
     },
   )
+  const sendSearch = React.useCallback(
+    (e, searchCategory) =>
+      search({
+        variables: {
+          search: e.target.value,
+          category: searchCategory,
+          ts: Math.floor(Date.now() / 1000),
+        },
+      }),
+    [search],
+  )
+  const debounceChange = React.useMemo(
+    () => debounce(sendSearch, 250),
+    [sendSearch],
+  )
+
   const fetchedData = data || previousData
 
   React.useEffect(() => {
@@ -678,21 +695,9 @@ export function WebhookAdvanced() {
                 renderInput={(params) => (
                   <TextField
                     {...params}
-                    label={
-                      <Trans i18nKey="search_specific">
-                        {{ category: t(option.label) }}
-                      </Trans>
-                    }
+                    label={t('search_specific', { category: t(option.label) })}
                     variant="outlined"
-                    onChange={(e) =>
-                      search({
-                        variables: {
-                          search: e.target.value,
-                          category: option.searchCategory,
-                          ts: Math.floor(Date.now() / 1000),
-                        },
-                      })
-                    }
+                    onChange={(e) => debounceChange(e, option.searchCategory)}
                     InputProps={{
                       ...params.InputProps,
                       endAdornment: (
@@ -707,17 +712,17 @@ export function WebhookAdvanced() {
                   />
                 )}
                 renderOption={(props, x) => (
-                  <Grid container alignItems="center" spacing={1} {...props}>
+                  <Grid container alignItems="center" rowSpacing={1} {...props}>
                     <Grid xs={12}>
                       <Typography variant="subtitle2">{x.name}</Typography>
                     </Grid>
-                    <Grid xs={12}>
+                    <Grid xs={12} maxWidth="100%">
                       <Typography variant="caption">{x.formatted}</Typography>
                     </Grid>
                     <Divider
                       light
                       flexItem
-                      style={{ height: 2, width: '90%', margin: '5px 0' }}
+                      style={{ height: 2, width: '100%', margin: '5px 0' }}
                     />
                   </Grid>
                 )}

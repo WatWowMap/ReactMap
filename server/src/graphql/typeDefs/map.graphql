@@ -55,7 +55,7 @@ type Search {
   lat: Float
   lon: Float
   distance: Float
-  formatted: Geocoder
+  formatted: String
   nest_pokemon_id: Int
   nest_pokemon_form: Int
   raid_pokemon_id: Int

@@ -1,12 +1,15 @@
-/* eslint-disable no-nested-ternary */
 const NodeGeocoder = require('node-geocoder')
 const { log, HELPERS } = require('@rm/logger')
 
+/**
+ * @param {string} addressFormat
+ * @param {NodeGeocoder.Entry} result
+ */
 function formatter(addressFormat, result) {
   return addressFormat
     .replace(
       /{{(streetNumber|streetName|city|state|country|zipcode|latitude|longitude|countryCode|neighborhoods|suburb|town|village)}}/g,
-      (_, p1) => result[p1] || '',
+      (a, b) => result[b] || '',
     )
     .trim()
     .replace(/^,|,$/g, '')
@@ -14,10 +17,10 @@ function formatter(addressFormat, result) {
 }
 
 /**
- *
+ * @template {boolean} T
  * @param {string} nominatimUrl
- * @param {string} search
- * @param {boolean} reverse
+ * @param {T extends true ? { lat: number, lon: number } : string} search
+ * @param {T} reverse
  * @param {string} format
  * @returns
  */
@@ -37,11 +40,12 @@ async function geocoder(nominatimUrl, search, reverse, format) {
       town: result.address.town || '',
       village: result.address.village || '',
     }))(stockGeocoder._geocoder._formatResult)
-    const results = reverse
-      ? await stockGeocoder.reverse(search)
-      : await stockGeocoder.geocode(search)
+    const results =
+      typeof search === 'object'
+        ? await stockGeocoder.reverse(search)
+        : await stockGeocoder.geocode(search)
     return reverse
-      ? results[0]
+      ? formatter(format, results[0])
       : format
       ? results.map((result) => ({
           formatted: formatter(format, result),
