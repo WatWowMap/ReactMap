@@ -1,3 +1,10 @@
+# [1.30.0-develop.24](https://github.com/WatWowMap/ReactMap/compare/v1.30.0-develop.23...v1.30.0-develop.24) (2024-03-10)
+
+
+### Bug Fixes
+
+* css className that got clipped ([1abe5e3](https://github.com/WatWowMap/ReactMap/commit/1abe5e3cce0b111a4a616e530e2ed768f0efb656))
+
 # [1.30.0-develop.23](https://github.com/WatWowMap/ReactMap/compare/v1.30.0-develop.22...v1.30.0-develop.23) (2024-03-09)
 
 
