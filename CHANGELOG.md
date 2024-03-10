@@ -1,3 +1,10 @@
+# [1.30.0-develop.25](https://github.com/WatWowMap/ReactMap/compare/v1.30.0-develop.24...v1.30.0-develop.25) (2024-03-10)
+
+
+### Bug Fixes
+
+* check for networkError null ([e8bcb79](https://github.com/WatWowMap/ReactMap/commit/e8bcb797ac4122ed281981d3aee97009dbcfd5b2))
+
 # [1.30.0-develop.24](https://github.com/WatWowMap/ReactMap/compare/v1.30.0-develop.23...v1.30.0-develop.24) (2024-03-10)
 
 
