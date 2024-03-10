@@ -320,7 +320,7 @@ const Info = ({ pokemon, metaData, perms, Icons, timeOfDay, t }) => {
     >
       {weather != 0 && perms.iv && (
         <Grid
-          className={`grid- ${darkMode ? '' : 'darken-image'}`}
+          className={`grid-item ${darkMode ? '' : 'darken-image'}`}
           style={{
             height: 24,
             width: 24,
