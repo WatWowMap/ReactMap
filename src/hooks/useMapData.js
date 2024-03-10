@@ -35,7 +35,7 @@ export function useMapData(once = false) {
   }, [hasIcons, online])
 
   useEffect(() => {
-    if (error && 'statusCode' in error.networkError) {
+    if (error?.networkError && 'statusCode' in error.networkError) {
       stopPolling()
       if (error.networkError?.statusCode === 464) {
         useMemory.setState({ clientError: 'early_old_client' })

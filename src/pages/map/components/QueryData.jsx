@@ -162,7 +162,7 @@ function QueryData({ category, timeout }) {
     }
   }, [filters, userSettings, onlyAreas, timeout.current.refetch])
 
-  if (error && 'statusCode' in error.networkError) {
+  if (error?.networkError && 'statusCode' in error.networkError) {
     if (error.networkError?.statusCode === 464) {
       useMemory.setState({ clientError: 'old_client' })
       return null

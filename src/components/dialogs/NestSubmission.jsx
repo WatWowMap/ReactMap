@@ -54,6 +54,7 @@ export function NestSubmission({ id, name }) {
           open: true,
           severity: 'error',
           message:
+            error?.networkError &&
             'statusCode' in error.networkError &&
             error.networkError?.statusCode === 401
               ? t('mutation_auth_error')
