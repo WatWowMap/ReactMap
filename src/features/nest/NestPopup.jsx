@@ -179,7 +179,7 @@ export function NestPopup({
             </Typography>
           )}
         </Grid>
-        {perms.nestSubmissions &&
+        {perms.nestSubmissions && (
           <Grid xs={12} textAlign="center">
             <Button
               color="secondary"
@@ -193,7 +193,7 @@ export function NestPopup({
               {t('submit_nest_name')}
             </Button>
           </Grid>
-        }
+        )}
       </Grid>
       <NestSubmission id={id} name={name} />
     </ErrorBoundary>
