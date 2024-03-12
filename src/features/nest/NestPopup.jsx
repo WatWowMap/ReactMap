@@ -50,7 +50,7 @@ export function NestPopup({
   submitted_by = '',
 }) {
   const { t } = useTranslation()
-  const { perms, loggedIn } = useMemory((s) => s.auth)
+  const { perms } = useMemory((s) => s.auth)
 
   const [parkName, setParkName] = React.useState(true)
   const [anchorEl, setAnchorEl] = React.useState(null)
@@ -158,7 +158,7 @@ export function NestPopup({
               .replace('day', t('day'))}
           </Typography>
           <Typography variant="subtitle2">
-            ~{pokemon_avg} {t('spawns_per_hour')}
+            ~{pokemon_avg?.toFixed(2) || 0} {t('spawns_per_hour')}
           </Typography>
         </Grid>
         <Grid xs={12}>
@@ -179,19 +179,20 @@ export function NestPopup({
             </Typography>
           )}
         </Grid>
-        <Grid xs={12} textAlign="center">
-          <Button
-            color="secondary"
-            variant="outlined"
-            size="small"
-            disabled={!perms.nestSubmissions || !loggedIn}
-            onClick={() =>
-              useLayoutStore.setState({ nestSubmissions: `${id}` })
-            }
-          >
-            {t('submit_nest_name')}
-          </Button>
-        </Grid>
+        {perms.nestSubmissions && (
+          <Grid xs={12} textAlign="center">
+            <Button
+              color="secondary"
+              variant="outlined"
+              size="small"
+              onClick={() =>
+                useLayoutStore.setState({ nestSubmissions: `${id}` })
+              }
+            >
+              {t('submit_nest_name')}
+            </Button>
+          </Grid>
+        )}
       </Grid>
       <NestSubmission id={id} name={name} />
     </ErrorBoundary>
