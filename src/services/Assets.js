@@ -163,7 +163,6 @@ export class UAssets {
       enumerable: true,
       configurable: false,
     })
-    console.log(this)
   }
 
   get selection() {
