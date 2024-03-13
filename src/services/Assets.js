@@ -1,5 +1,6 @@
 // @ts-check
 /* eslint-disable no-console */
+import { UICONS } from 'uicons.js'
 
 // /**
 //  *
@@ -71,7 +72,7 @@ export class UAssets {
   build(icons) {
     icons.forEach((icon) => {
       try {
-        const { data, name: dirtyName, path: dirtyPath } = icon
+        const { data, name: dirtyName, path: dirtyPath, ...rest } = icon
         const name = dirtyName.endsWith('/')
           ? dirtyName?.slice(0, -1)
           : dirtyName
@@ -83,9 +84,12 @@ export class UAssets {
           const indexes = Object.keys(data)
           this[name] = {
             ...this[name],
-            ...icon,
+            ...rest,
+            name,
             path,
+            class: new UICONS(path, name),
           }
+          this[name].class.init(data)
           if (!path) {
             console.error(
               `[${this.assetType}] No path provided for`,
@@ -108,19 +112,10 @@ export class UAssets {
               category !== 'lastFetched'
             ) {
               if (Array.isArray(data[category])) {
-                this[name][category] = new Set(data[category])
                 isValid = true
-                this[name].extension =
-                  data[category][0]?.split('.')[1] || this[name].extension
               } else {
                 Object.keys(data[category]).forEach((subCategory) => {
                   if (Array.isArray(data[category][subCategory])) {
-                    this[name].extension =
-                      data[category][subCategory][0]?.split('.')[1] ||
-                      this[name].extension
-                    this[name][subCategory] = new Set(
-                      data[category][subCategory],
-                    )
                     isValid = true
                   }
                 })
@@ -168,6 +163,7 @@ export class UAssets {
       enumerable: true,
       configurable: false,
     })
+    console.log(this)
   }
 
   get selection() {
@@ -335,35 +331,15 @@ export class UAssets {
     shiny = false,
   ) {
     try {
-      const baseUrl = `${
-        this[this.selected.pokemon]?.path || this.fallback
-      }/pokemon`
-      const extension = this[this.selected.pokemon]?.extension || 'png'
-
-      const evolutionSuffixes = evolution ? [`_e${evolution}`, ''] : ['']
-      const formSuffixes = form ? [`_f${form}`, ''] : ['']
-      const costumeSuffixes = costume ? [`_c${costume}`, ''] : ['']
-      const genderSuffixes = gender ? [`_g${gender}`, ''] : ['']
-      const alignmentSuffixes = alignment ? [`_a${alignment}`, ''] : ['']
-      const shinySuffixes = shiny ? ['_s', ''] : ['']
-
-      for (let e = 0; e < evolutionSuffixes.length; e += 1) {
-        for (let f = 0; f < formSuffixes.length; f += 1) {
-          for (let c = 0; c < costumeSuffixes.length; c += 1) {
-            for (let g = 0; g < genderSuffixes.length; g += 1) {
-              for (let a = 0; a < alignmentSuffixes.length; a += 1) {
-                for (let s = 0; s < shinySuffixes.length; s += 1) {
-                  const result = `${pokemonId}${evolutionSuffixes[e]}${formSuffixes[f]}${costumeSuffixes[c]}${genderSuffixes[g]}${alignmentSuffixes[a]}${shinySuffixes[s]}.${extension}`
-                  if (this[this.selected.pokemon].pokemon.has(result)) {
-                    return `${baseUrl}/${result}`
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-      return `${baseUrl}/0.${extension}`
+      return this[this.selected.pokemon]?.class?.pokemon(
+        pokemonId,
+        form,
+        evolution,
+        gender,
+        costume,
+        alignment,
+        shiny,
+      )
     } catch (e) {
       console.error(`[${this.assetType.toUpperCase()}]`, e)
       return `${this.fallback}/pokemon/0.${this.fallbackExt}`
@@ -373,14 +349,7 @@ export class UAssets {
   /** @param {number | string} [typeId] */
   getTypes(typeId = 0) {
     try {
-      const baseUrl = `${this[this.selected.type]?.path || this.fallback}/type`
-      const extension = this[this.selected.type]?.extension || 'png'
-
-      const result = `${typeId}.${extension}`
-      if (this[this.selected.type].type.has(result)) {
-        return `${baseUrl}/${result}`
-      }
-      return `${baseUrl}/0.${extension}`
+      return this[this.selected.type]?.class?.type(typeId)
     } catch (e) {
       console.error(`[${this.assetType.toUpperCase()}]`, e)
       return `${this.fallback}/type/0.${this.fallbackExt}`
@@ -406,30 +375,14 @@ export class UAssets {
     display = '',
   ) {
     try {
-      const baseUrl = `${
-        this[this.selected.pokestop]?.path || this.fallback
-      }/pokestop`
-      const extension = this[this.selected.pokestop]?.extension || 'png'
-
-      const invasionSuffixes =
-        invasionActive || display ? [`_i${display}`, ''] : ['']
-      const questSuffixes = questActive ? ['_q', ''] : ['']
-      const arSuffixes = ar ? ['_ar', ''] : ['']
-      const powerUpSuffixes = power ? [`_p${power}`, ''] : ['']
-
-      for (let i = 0; i < invasionSuffixes.length; i += 1) {
-        for (let q = 0; q < questSuffixes.length; q += 1) {
-          for (let a = 0; a < arSuffixes.length; a += 1) {
-            for (let p = 0; p < powerUpSuffixes.length; p += 1) {
-              const result = `${lureId}${invasionSuffixes[i]}${questSuffixes[q]}${arSuffixes[a]}${powerUpSuffixes[p]}.${extension}`
-              if (this[this.selected.pokestop].pokestop.has(result)) {
-                return `${baseUrl}/${result}`
-              }
-            }
-          }
-        }
-      }
-      return `${baseUrl}/0.${extension}`
+      return this[this.selected.pokestop]?.class?.pokestop(
+        lureId,
+        power,
+        display,
+        invasionActive,
+        questActive,
+        ar,
+      )
     } catch (e) {
       console.error(`[${this.assetType.toUpperCase()}]`, e)
       return `${this.fallback}/pokestop/0.${this.fallbackExt}`
@@ -445,22 +398,8 @@ export class UAssets {
    */
   getRewards(rewardType, id, amount = 0) {
     try {
-      const category = this.questRewardTypes[rewardType] || 'unset'
-      const baseUrl = `${
-        this[this.selected.reward]?.path || this.fallback
-      }/reward/${category}`
-      const extension = this[this.selected.reward]?.extension || 'png'
-
-      if (this[this.selected.reward][category]) {
-        const amountSuffixes = amount > 1 ? [`_a${amount}`, ''] : ['']
-        for (let a = 0; a < amountSuffixes.length; a += 1) {
-          const result = `${id}${amountSuffixes[a]}.${extension}`
-          if (this[this.selected.reward][category].has(result)) {
-            return `${baseUrl}/${result}`
-          }
-        }
-      }
-      return `${baseUrl}/0.${extension}`
+      const reward = this.questRewardTypes[rewardType]
+      return this[this.selected.reward]?.class?.reward(reward, id, amount)
     } catch (e) {
       console.error(`[${this.assetType.toUpperCase()}]`, e)
       return `${this.fallback}/reward/unset/0.${this.fallbackExt}`
@@ -475,19 +414,7 @@ export class UAssets {
    */
   getInvasions(gruntType, confirmed = false) {
     try {
-      const baseUrl = `${
-        this[this.selected.invasion]?.path || this.fallback
-      }/invasion`
-      const extension = this[this.selected.invasion]?.extension || 'png'
-
-      const confirmedSuffixes = confirmed ? [''] : ['_u', '']
-      for (let c = 0; c < confirmedSuffixes.length; c += 1) {
-        const result = `${gruntType}${confirmedSuffixes[c]}.${extension}`
-        if (this[this.selected.invasion].invasion.has(result)) {
-          return `${baseUrl}/${result}`
-        }
-      }
-      return `${baseUrl}/0.${extension}`
+      return this[this.selected.invasion]?.class?.invasion(gruntType, confirmed)
     } catch (e) {
       console.error(`[${this.assetType.toUpperCase()}]`, e)
       return `${this.fallback}/invasion/0.${this.fallbackExt}`
@@ -511,26 +438,13 @@ export class UAssets {
     ar = false,
   ) {
     try {
-      const baseUrl = `${this[this.selected.gym]?.path || this.fallback}/gym`
-      const extension = this[this.selected.gym]?.extension || 'png'
-
-      const trainerSuffixes = trainerCount ? [`_t${trainerCount}`, ''] : ['']
-      const inBattleSuffixes = inBattle ? ['_b', ''] : ['']
-      const exSuffixes = ex ? ['_ex', ''] : ['']
-      const arSuffixes = ar ? ['_ar', ''] : ['']
-      for (let t = 0; t < trainerSuffixes.length; t += 1) {
-        for (let b = 0; b < inBattleSuffixes.length; b += 1) {
-          for (let e = 0; e < exSuffixes.length; e += 1) {
-            for (let a = 0; a < arSuffixes.length; a += 1) {
-              const result = `${teamId}${trainerSuffixes[t]}${inBattleSuffixes[b]}${exSuffixes[e]}${arSuffixes[a]}.${extension}`
-              if (this[this.selected.gym].gym.has(result)) {
-                return `${baseUrl}/${result}`
-              }
-            }
-          }
-        }
-      }
-      return `${baseUrl}/0.${extension}`
+      return this[this.selected.gym]?.class?.gym(
+        teamId,
+        trainerCount,
+        inBattle,
+        ex,
+        ar,
+      )
     } catch (e) {
       console.error(`[${this.assetType.toUpperCase()}]`, e)
       return `${this.fallback}/gym/0.${this.fallbackExt}`
@@ -546,25 +460,7 @@ export class UAssets {
    */
   getEggs(level, hatched = false, ex = false) {
     try {
-      const baseUrl = `${
-        this[this.selected.raid]?.path || this.fallback
-      }/raid/egg`
-      const extension = this[this.selected.raid]?.extension || 'png'
-
-      const hatchedSuffixes = hatched ? ['_h', ''] : ['']
-      const exSuffixes = ex ? ['_ex', ''] : ['']
-      for (let h = 0; h < hatchedSuffixes.length; h += 1) {
-        for (let e = 0; e < exSuffixes.length; e += 1) {
-          const result = `${level}${hatchedSuffixes[h]}${exSuffixes[e]}.${extension}`
-          if (
-            this[this.selected.raid].egg &&
-            this[this.selected.raid].egg.has(result)
-          ) {
-            return `${baseUrl}/${result}`
-          }
-        }
-      }
-      return `${baseUrl}/0.${extension}`
+      return this[this.selected.raid]?.class?.raidEgg(level, hatched, ex)
     } catch (e) {
       console.error(`[${this.assetType.toUpperCase()}]`, e)
       return `${this.fallback}/raid/egg/0.${this.fallbackExt}`
@@ -578,14 +474,7 @@ export class UAssets {
    */
   getTeams(teamId = 0) {
     try {
-      const baseUrl = `${this[this.selected.team]?.path || this.fallback}/team`
-      const extension = this[this.selected.team]?.extension || 'png'
-
-      const result = `${teamId}.${extension}`
-      if (this[this.selected.team].team.has(result)) {
-        return `${baseUrl}/${result}`
-      }
-      return `${baseUrl}/0.${extension}`
+      return this[this.selected.team]?.class?.team(teamId)
     } catch (e) {
       console.error(`[${this.assetType.toUpperCase()}]`, e)
       return `${this.fallback}/team/0.${this.fallbackExt}`
@@ -600,19 +489,7 @@ export class UAssets {
    */
   getWeather(weatherId, timeOfDay = 'day') {
     try {
-      const baseUrl = `${
-        this[this.selected.weather]?.path || this.fallback
-      }/weather`
-      const extension = this[this.selected.weather]?.extension || 'png'
-
-      const timeSuffixes = timeOfDay === 'night' ? ['_n', ''] : ['_d', '']
-      for (let t = 0; t < timeSuffixes.length; t += 1) {
-        const result = `${weatherId}${timeSuffixes[t]}.${extension}`
-        if (this[this.selected.weather].weather.has(result)) {
-          return `${baseUrl}/${result}`
-        }
-      }
-      return `${baseUrl}/0.${extension}`
+      return this[this.selected.weather]?.class?.weather(weatherId, timeOfDay)
     } catch (e) {
       console.error(`[${this.assetType.toUpperCase()}]`, e)
       return `${this.fallback}/weather/0.${this.fallbackExt}`
@@ -626,14 +503,7 @@ export class UAssets {
    */
   getNests(typeId) {
     try {
-      const baseUrl = `${this[this.selected.nest]?.path || this.fallback}/nest`
-      const extension = this[this.selected.nest]?.extension || 'png'
-
-      const result = `${typeId}.${extension}`
-      if (this[this.selected.nest].nest.has(result)) {
-        return `${baseUrl}/${result}`
-      }
-      return `${baseUrl}/0.${extension}`
+      return this[this.selected.nest]?.class?.nest(typeId)
     } catch (e) {
       console.error(`[${this.assetType.toUpperCase()}]`, e)
       return `${this.fallback}/nest/0.${this.fallbackExt}`
@@ -641,39 +511,29 @@ export class UAssets {
   }
 
   /** @param {string} fileName */
-  doesMiscHave(fileName) {
-    return this[this.selected.misc].misc.has(
-      `${fileName}.${this[this.selected.misc].extension || 'png'}`,
-    )
-  }
-
-  /** @param {string} fileName */
   getMisc(fileName = '') {
     try {
-      const baseUrl = `${this[this.selected.misc]?.path || this.fallback}/misc`
-      const extension = this[this.selected.misc]?.extension || 'png'
+      const miscClass = this[this.selected.misc]?.class
 
-      if (this.doesMiscHave(fileName)) {
-        return `${baseUrl}/${fileName}.${extension}`
-      }
-      if (fileName.endsWith('s') && this.doesMiscHave(fileName.slice(0, -1))) {
-        return `${baseUrl}/${fileName.slice(0, -1)}.${extension}`
+      if (miscClass.has('misc', fileName)) {
+        return miscClass.misc(fileName)
       }
       if (
-        !fileName.endsWith('s') &&
-        this.doesMiscHave(`${fileName}s.${extension}`)
+        fileName.endsWith('s') &&
+        miscClass.has('misc', fileName.slice(0, -1))
       ) {
-        return `${baseUrl}/${fileName}s.${extension}`
+        return miscClass.misc(fileName)
+      }
+      if (!fileName.endsWith('s') && miscClass.has('misc', `${fileName}s`)) {
+        return miscClass.misc(`${fileName}s`)
       }
       if (
         this[this.selected[fileName]]?.path &&
-        this[this.selected[fileName]][fileName]?.has(`0.${extension}`)
+        this[this.selected[fileName]].class.has(fileName, `0`)
       ) {
-        return `${
-          this[this.selected[fileName]]?.path
-        }/${fileName}/0.${extension}`
+        return this[this.selected[fileName]].class[fileName]('0')
       }
-      return `${baseUrl}/0.${extension}`
+      return miscClass.misc('0')
     } catch (e) {
       console.error(`[${this.assetType.toUpperCase()}]`, e)
       return `${this.fallback}/misc/0.${this.fallbackExt}`
@@ -683,12 +543,7 @@ export class UAssets {
   /** @param {boolean} [online] */
   getDevices(online = false) {
     try {
-      const baseUrl = `${
-        this[this.selected.device]?.path || this.fallback
-      }/device`
-      const extension = this[this.selected.device]?.extension || 'png'
-
-      return online ? `${baseUrl}/1.${extension}` : `${baseUrl}/0.${extension}`
+      return this[this.selected.device]?.class?.device(online)
     } catch (e) {
       console.error(`[${this.assetType.toUpperCase()}]`, e)
       return `${this.fallback}/device/0.${this.fallbackExt}`
@@ -698,12 +553,7 @@ export class UAssets {
   /** @param {boolean} [hasTth] */
   getSpawnpoints(hasTth = false) {
     try {
-      const baseUrl = `${
-        this[this.selected.spawnpoint]?.path || this.fallback
-      }/spawnpoint`
-      const extension = this[this.selected.spawnpoint]?.extension || 'png'
-
-      return hasTth ? `${baseUrl}/1.${extension}` : `${baseUrl}/0.${extension}`
+      return this[this.selected.spawnpoint]?.class?.spawnpoint(hasTth)
     } catch (e) {
       console.error(`[${this.assetType.toUpperCase()}]`, e)
       return `${this.fallback}/spawnpoint/0.${this.fallbackExt}`

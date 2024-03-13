@@ -9266,6 +9266,11 @@ uglify-js@^3.1.4:
   resolved "https://registry.yarnpkg.com/uglify-js/-/uglify-js-3.17.4.tgz#61678cf5fa3f5b7eb789bb345df29afb8257c22c"
   integrity sha512-T9q82TJI9e/C1TAxYvfb16xO120tMVFZrGA3f9/P4424DNu6ypK103y0GPFVa17yotwSyZW5iYXgjYHkGrJW/g==
 
+uicons.js@^1.1.1:
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/uicons.js/-/uicons.js-1.1.1.tgz#37340b5cdcfc9043c6c1e21e3f4311c641cf0df1"
+  integrity sha512-1Zt3BKiGobef55FqGgD8FQs7xTZmPLbeHm25QIaQH1cw+oYaphvMStv5K93Aq6XYvei7mw82gKvprvLD5ZNhtw==
+
 uid-safe@~2.1.5:
   version "2.1.5"
   resolved "https://registry.yarnpkg.com/uid-safe/-/uid-safe-2.1.5.tgz#2b3d5c7240e8fc2e58f8aa269e5ee49c0857bd3a"
