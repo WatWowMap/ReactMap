@@ -1,3 +1,10 @@
+# [1.30.0-develop.26](https://github.com/WatWowMap/ReactMap/compare/v1.30.0-develop.25...v1.30.0-develop.26) (2024-03-13)
+
+
+### Bug Fixes
+
+* remove log ([86c5854](https://github.com/WatWowMap/ReactMap/commit/86c585472061d9a27d380a335787165c7580f3ea))
+
 # [1.30.0-develop.25](https://github.com/WatWowMap/ReactMap/compare/v1.30.0-develop.24...v1.30.0-develop.25) (2024-03-10)
 
 
