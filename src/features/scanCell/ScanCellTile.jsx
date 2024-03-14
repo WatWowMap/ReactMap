@@ -12,7 +12,10 @@ import { scanCellMarker } from './scanCellMarker'
  * @returns
  */
 const BaseScanCellTile = (scanCell) => (
-  <Polygon positions={scanCell.polygon} {...scanCellMarker(scanCell.updated)}>
+  <Polygon
+    positions={scanCell.polygon}
+    {...scanCellMarker(Date.now() / 1000 - scanCell.updated)}
+  >
     <Popup position={[scanCell.center_lat, scanCell.center_lon]}>
       <ScanCellPopup {...scanCell} />
     </Popup>

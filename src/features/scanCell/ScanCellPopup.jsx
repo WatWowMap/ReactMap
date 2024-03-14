@@ -1,7 +1,7 @@
 // @ts-check
 import * as React from 'react'
 import Typography from '@mui/material/Typography'
-import { Trans, useTranslation } from 'react-i18next'
+import { useTranslation } from 'react-i18next'
 
 import { ErrorBoundary } from '@components/ErrorBoundary'
 import { getTimeUntil } from '@utils/getTimeUntil'
@@ -27,7 +27,7 @@ export function ScanCellPopup({ id, updated }) {
   return (
     <ErrorBoundary noRefresh variant="h5">
       <Typography variant="h6" align="center">
-        <Trans i18nKey="s2_cell_level">{{ level: 15 }}</Trans>
+        {t('s2_cell_level', { level: 15 })}
       </Typography>
       <Typography variant="subtitle2" align="center">
         {timer.str.replace('days', t('days')).replace('day', t('day'))}
