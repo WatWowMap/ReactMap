@@ -1,3 +1,10 @@
+# [1.30.0-develop.28](https://github.com/WatWowMap/ReactMap/compare/v1.30.0-develop.27...v1.30.0-develop.28) (2024-03-14)
+
+
+### Bug Fixes
+
+* scan cells ([b6b45ca](https://github.com/WatWowMap/ReactMap/commit/b6b45ca1057ebaad06ef794d20fdc486a4ceda0f))
+
 # [1.30.0-develop.27](https://github.com/WatWowMap/ReactMap/compare/v1.30.0-develop.26...v1.30.0-develop.27) (2024-03-14)
 
 
