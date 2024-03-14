@@ -1,3 +1,10 @@
+# [1.30.0-develop.27](https://github.com/WatWowMap/ReactMap/compare/v1.30.0-develop.26...v1.30.0-develop.27) (2024-03-14)
+
+
+### Bug Fixes
+
+* misc icons ([f4423a9](https://github.com/WatWowMap/ReactMap/commit/f4423a9e05f47bf1f59baf0d0d6f753f787ba2b4))
+
 # [1.30.0-develop.26](https://github.com/WatWowMap/ReactMap/compare/v1.30.0-develop.25...v1.30.0-develop.26) (2024-03-13)
 
 
