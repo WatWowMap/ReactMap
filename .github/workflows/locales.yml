@@ -1,5 +1,10 @@
 name: Locales
-on: workflow_call
+on:
+  workflow_call:
+    secrets:
+      OPENAI_API_KEY:
+        required: true
+        description: The API key for OpenAI
 
 permissions: write-all
 
