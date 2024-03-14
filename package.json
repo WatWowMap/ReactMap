@@ -1,6 +1,6 @@
 {
   "name": "reactmap",
-  "version": "1.31.0-develop.1",
+  "version": "1.31.0-develop.2",
   "private": true,
   "description": "React based frontend map.",
   "license": "MIT",

@@ -1,3 +1,10 @@
+# [1.31.0-develop.2](https://github.com/WatWowMap/ReactMap/compare/v1.31.0-develop.1...v1.31.0-develop.2) (2024-03-14)
+
+
+### Bug Fixes
+
+* maybe fix missing ci secret ([15058dc](https://github.com/WatWowMap/ReactMap/commit/15058dc77045fd1db99b543f2c42da724ff54aa7))
+
 # [1.31.0-develop.1](https://github.com/WatWowMap/ReactMap/compare/v1.30.0...v1.31.0-develop.1) (2024-03-14)
 
 
