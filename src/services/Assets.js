@@ -521,7 +521,7 @@ export class UAssets {
         fileName.endsWith('s') &&
         miscClass.has('misc', fileName.slice(0, -1))
       ) {
-        return miscClass.misc(fileName)
+        return miscClass.misc(fileName.slice(0, -1))
       }
       if (!fileName.endsWith('s') && miscClass.has('misc', `${fileName}s`)) {
         return miscClass.misc(`${fileName}s`)
