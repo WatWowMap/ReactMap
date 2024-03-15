@@ -1,5 +1,5 @@
 // @ts-check
-const { promises: fs, readdirSync } = require('fs')
+const { promises: fs, readdirSync, readFileSync } = require('fs')
 const { resolve } = require('path')
 const { default: fetch } = require('node-fetch')
 
@@ -99,9 +99,43 @@ async function writeAll(locales, i18nFormat, ...directories) {
   )
 }
 
+function getStatus() {
+  const english = JSON.parse(
+    readFileSync(resolve(__dirname, HUMAN_LOCALES, 'en.json'), 'utf-8'),
+  )
+  const filtered = Object.fromEntries(
+    Object.entries(english).filter(
+      ([key, value]) =>
+        typeof value !== 'number' && !key.startsWith('locale_selection_'),
+    ),
+  )
+
+  const locales = readLocaleDirectory(true)
+
+  return Object.fromEntries(
+    locales.map((locale) => {
+      const human = JSON.parse(
+        readFileSync(resolve(__dirname, HUMAN_LOCALES, locale), 'utf-8'),
+      )
+      const ai = JSON.parse(
+        readFileSync(resolve(__dirname, AI_LOCALES, locale), 'utf-8'),
+      )
+      return [
+        locale.replace('.json', ''),
+        {
+          human: !Object.keys(filtered).filter((key) => !(key in human)).length,
+          ai: !Object.keys(filtered).filter((key) => !(key in ai)).length,
+          partial: !!Object.keys(human).length,
+        },
+      ]
+    }),
+  )
+}
+
 module.exports = {
   fetchRemote,
   readAndParseJson,
   readLocaleDirectory,
   writeAll,
+  getStatus,
 }

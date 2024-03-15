@@ -35,6 +35,10 @@ export interface Config<Client extends boolean = false>
     ? {
         version: string
         locales: string[]
+        localeStatus: Record<
+          string,
+          { ai: boolean; human: boolean; partial: boolean }
+        >
         hasCustom: boolean
         title: string
       }

@@ -1,7 +1,5 @@
 // @ts-check
 import * as React from 'react'
-import Check from '@mui/icons-material/Check'
-import Clear from '@mui/icons-material/Clear'
 import ExpandMore from '@mui/icons-material/ExpandMore'
 import MoreVert from '@mui/icons-material/MoreVert'
 import Grid from '@mui/material/Unstable_Grid2'
@@ -27,6 +25,7 @@ import { TimeStamp } from '@components/popups/TimeStamps'
 import { ExtraInfo } from '@components/popups/ExtraInfo'
 import { useAnalytics } from '@hooks/useAnalytics'
 import { getTimeUntil } from '@utils/getTimeUntil'
+import { StatusIcon } from '@components/StatusIcon'
 
 const rowClass = { width: 30, fontWeight: 'bold' }
 
@@ -395,11 +394,7 @@ const Timer = ({ pokemon, hasStats, t }) => {
           arrow
           enterTouchDelay={0}
         >
-          {expire_timestamp_verified ? (
-            <Check fontSize="large" color="success" />
-          ) : (
-            <Clear fontSize="large" color="error" />
-          )}
+          <StatusIcon status={expire_timestamp_verified} />
         </Tooltip>
       </Grid>
     </>

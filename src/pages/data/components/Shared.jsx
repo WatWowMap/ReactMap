@@ -5,10 +5,9 @@ import Divider from '@mui/material/Divider'
 import List from '@mui/material/List'
 import ListSubheader from '@mui/material/ListSubheader'
 import { styled } from '@mui/material/styles'
-import CheckIcon from '@mui/icons-material/Check'
-import ClearIcon from '@mui/icons-material/Clear'
 
 import { BasicListButton } from '@components/inputs/BasicListButton'
+import { StatusIcon } from '@components/StatusIcon'
 
 import { setNotification, useDataManagementStore } from '../hooks/store'
 
@@ -77,11 +76,7 @@ export function ButtonWithNotification({
       sx={{ bgcolor: isHovering ? 'rgba(255, 255, 255, 0.08)' : 'inherit' }}
       {...props}
     >
-      {hasBeenReset ? (
-        <CheckIcon color="success" />
-      ) : (
-        <ClearIcon color="error" />
-      )}
+      <StatusIcon status={hasBeenReset} />
     </BasicListButton>
   )
 }

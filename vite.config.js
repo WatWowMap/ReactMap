@@ -12,7 +12,7 @@ const { sentryVitePlugin } = require('@sentry/vite-plugin')
 
 const config = require('@rm/config')
 const { log, HELPERS } = require('@rm/logger')
-const { locales } = require('@rm/locales')
+const { locales, status } = require('@rm/locales')
 const {
   faviconPlugin,
   customFilePlugin,
@@ -122,6 +122,7 @@ const viteConfig = defineConfig(({ mode }) => {
         client: {
           version,
           locales,
+          localeStatus: status,
           hasCustom,
           title: config.getSafe('map.general.headerTitle'),
         },
