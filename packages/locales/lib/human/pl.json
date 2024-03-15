@@ -69,5 +69,12 @@
   "without_ar": "Bez AR",
   "both": "Obydwa",
   "all_pokestops": "Wszystkie Pokéstopy",
-  "all_gyms": "Wszystkie Gymy"
+  "all_gyms": "Wszystkie Gymy",
+  "only_global": "Tylko globalne",
+  "global_and_individual": "Globalne oraz indiwidualne filtry",
+  "gender_filters_all": "Płeć dotyczy wszystkich",
+  "and_caption": "Filtrowane razem",
+  "or_caption": "Filtrowane osobno",
+  "filter_help": "Pomoc",
+  "global_caption": "Ignoruje wszystkie inne filtry"
 }
