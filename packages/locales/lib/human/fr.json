@@ -1,4 +1,6 @@
 {
+  "selected_areas": "{{amount}} zone sélectionnée",
+  "selected_areas_plural": "{{amount}} zones sélectionnées",
   "login": "Connexion",
   "click_once": "Ne cliquer 'Autoriser' qu'une fois",
   "save": "Enregistrer",
