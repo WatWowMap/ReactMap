@@ -99,33 +99,47 @@ async function writeAll(locales, i18nFormat, ...directories) {
   )
 }
 
-function getStatus() {
-  const english = JSON.parse(
-    readFileSync(resolve(__dirname, HUMAN_LOCALES, 'en.json'), 'utf-8'),
-  )
-  const filtered = Object.fromEntries(
-    Object.entries(english).filter(
+/** @param {import('./generate').I18nObject} json */
+function filter(json) {
+  return Object.fromEntries(
+    Object.entries(json).filter(
       ([key, value]) =>
         typeof value !== 'number' && !key.startsWith('locale_selection_'),
     ),
   )
+}
 
-  const locales = readLocaleDirectory(true)
+function getStatus() {
+  const humanEnglish = JSON.parse(
+    readFileSync(resolve(__dirname, HUMAN_LOCALES, 'en.json'), 'utf-8'),
+  )
+  const filtered = filter(humanEnglish)
+  const total = Object.keys(filtered).length
 
   return Object.fromEntries(
-    locales.map((locale) => {
-      const human = JSON.parse(
-        readFileSync(resolve(__dirname, HUMAN_LOCALES, locale), 'utf-8'),
+    readLocaleDirectory(true).map((locale) => {
+      const humanJson = filter(
+        JSON.parse(
+          readFileSync(resolve(__dirname, HUMAN_LOCALES, locale), 'utf-8'),
+        ),
       )
-      const ai = JSON.parse(
-        readFileSync(resolve(__dirname, AI_LOCALES, locale), 'utf-8'),
+      const humanHas = Object.keys(filtered).filter(
+        (key) => key in humanJson,
+      ).length
+      const aiJson = filter(
+        JSON.parse(
+          readFileSync(resolve(__dirname, AI_LOCALES, locale), 'utf-8'),
+        ),
       )
+      const mergedSize = Object.keys({ ...aiJson, ...humanJson }).length
+      const human = +(humanHas / total).toFixed(2) * 100
+      const localeTotal = Math.min(1, +(mergedSize / total).toFixed(2)) * 100
       return [
         locale.replace('.json', ''),
         {
-          human: !Object.keys(filtered).filter((key) => !(key in human)).length,
-          ai: !Object.keys(filtered).filter((key) => !(key in ai)).length,
-          partial: !!Object.keys(human).length,
+          human,
+          ai: localeTotal - human,
+          total: localeTotal,
         },
       ]
     }),
