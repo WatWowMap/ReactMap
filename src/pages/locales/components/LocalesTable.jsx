@@ -6,19 +6,34 @@ import TableCell from '@mui/material/TableCell'
 import TableRow from '@mui/material/TableRow'
 import Box from '@mui/material/Box'
 import ClearIcon from '@mui/icons-material/Clear'
+import useMediaQuery from '@mui/material/useMediaQuery'
+import Grid2 from '@mui/material/Unstable_Grid2'
+import Typography from '@mui/material/Typography'
+import Divider from '@mui/material/Divider'
 
 import { LOCALES_STATUS } from '@services/queries/config'
 import { VirtualTable } from '@components/virtual/Table'
 
-import { setScrolling, useLocalesStore } from '../hooks/store'
+import { useLocalesStore } from '../hooks/store'
 import { EditLocale } from './EditLocale'
 
+/**
+ * @typedef {{
+ *  name: string,
+ *  english?: string,
+ *  ai?: string,
+ *  missing: boolean,
+ *  type: string
+ * }} Row
+ */
 const clear = <ClearIcon color="error" fontSize="small" />
 
 /** @type {import('react-virtuoso').TableVirtuosoProps['fixedHeaderContent']} */
 function fixedHeaderContent() {
   const { t } = useTranslation()
-  return (
+  // @ts-ignore
+  const isMobile = useMediaQuery((theme) => theme.breakpoints.down('sm'))
+  return isMobile ? null : (
     <TableRow sx={{ bgcolor: 'background.paper' }}>
       <TableCell>{t('key')}</TableCell>
       <TableCell>{t('locale_selection_en')}</TableCell>
@@ -28,11 +43,25 @@ function fixedHeaderContent() {
   )
 }
 
-/** @type {import('react-virtuoso').TableVirtuosoProps['itemContent']} */
-function itemContent(_index, row) {
-  return (
+/** @type {import('react-virtuoso').TableVirtuosoProps<Row, { isMobile: boolean }>['itemContent']} */
+function itemContent(_index, row, ctx) {
+  return ctx?.isMobile ? (
+    <TableCell>
+      <Grid2 className="flex-center" container direction="column">
+        <Typography component={Grid2}>{row.name}</Typography>
+        <Divider flexItem sx={{ my: 2, width: '100%' }} />
+        <Typography component={Grid2} mb={2}>
+          {row.english}
+        </Typography>
+        <EditLocale
+          name={row.name}
+          type={typeof row.english === 'number' ? 'number' : 'text'}
+        />
+      </Grid2>
+    </TableCell>
+  ) : (
     <>
-      <TableCell>{row.name}</TableCell>
+      <TableCell sx={{ overflow: 'hidden' }}>{row.name}</TableCell>
       <TableCell>{row.english || clear}</TableCell>
       <TableCell>{row.ai || clear}</TableCell>
       <TableCell width="40%">
@@ -48,6 +77,8 @@ function itemContent(_index, row) {
 export function LocalesTable() {
   const { i18n } = useTranslation()
   const all = useLocalesStore((s) => s.all)
+  // @ts-ignore
+  const isMobile = useMediaQuery((theme) => theme.breakpoints.down('sm'))
 
   const { data, loading } = useQuery(LOCALES_STATUS, {
     fetchPolicy: 'network-only',
@@ -66,6 +97,7 @@ export function LocalesTable() {
     ignorePunctuation: true,
   })
 
+  /** @type {Row[]} */
   const rows = React.useMemo(() => {
     if (data?.locales && enData?.locales) {
       const { missing, ai } = data.locales
@@ -99,7 +131,7 @@ export function LocalesTable() {
         data={loading || enLoading ? [] : rows}
         fixedHeaderContent={fixedHeaderContent}
         itemContent={itemContent}
-        isScrolling={setScrolling}
+        context={{ isMobile }}
       />
     </Box>
   )

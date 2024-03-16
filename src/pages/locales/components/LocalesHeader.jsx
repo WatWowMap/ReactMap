@@ -18,10 +18,10 @@ export function LocalesHeader() {
   const instructions = useLocalesStore((s) => s.instructions)
   return (
     <Grid component="header" container className="flex-center" p={2}>
-      <Grid xs={6} sm={4}>
+      <Grid xs={4} sm={4}>
         <Typography variant="h4">{t('locales')}</Typography>
       </Grid>
-      <Grid xs={6} sm={4}>
+      <Grid xs={8} sm={4}>
         <LocaleSelection />
       </Grid>
       <Grid xs={12} sm={4} textAlign="right">

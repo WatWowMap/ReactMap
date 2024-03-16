@@ -7,7 +7,7 @@ import TableRow from '@mui/material/TableRow'
 import Paper from '@mui/material/Paper'
 import { TableVirtuoso } from 'react-virtuoso'
 
-const VirtuosoTableComponents = {
+const COMPONENTS = {
   Scroller: React.forwardRef((props, ref) => (
     <TableContainer component={Paper} {...props} ref={ref} />
   )),
@@ -27,5 +27,5 @@ const VirtuosoTableComponents = {
 
 /** @param {import('react-virtuoso').TableVirtuosoProps} props */
 export function VirtualTable(props) {
-  return <TableVirtuoso components={VirtuosoTableComponents} {...props} />
+  return <TableVirtuoso components={COMPONENTS} {...props} />
 }

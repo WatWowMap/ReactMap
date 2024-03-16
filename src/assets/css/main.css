@@ -558,5 +558,5 @@ input[type='time']::-webkit-calendar-picker-indicator {
 .locales-layout {
   display: grid;
   grid-template-rows: auto 1fr auto; /* Header, table, footer */
-  min-height: 100vh;
+  min-height: 100svh;
 }

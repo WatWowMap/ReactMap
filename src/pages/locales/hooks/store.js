@@ -9,7 +9,6 @@ import { downloadJson } from '@utils/downloadJson'
  *  existingHuman: Record<string, string | number>
  *  all: boolean
  *  instructions: boolean
- *  isScrolling: boolean
  * }} LocalesStore
  * @type {import("zustand").UseBoundStore<import("zustand").StoreApi<LocalesStore>>}
  */
@@ -29,7 +28,3 @@ export const downloadLocales = () => {
   )
   return downloadJson({ ...existingHuman, ...filtered }, `${locale}.json`)
 }
-
-/** @param {boolean} isScrolling */
-export const setScrolling = (isScrolling) =>
-  useLocalesStore.setState({ isScrolling })
