@@ -35,6 +35,9 @@ export interface Config<Client extends boolean = false>
     ? {
         version: string
         locales: string[]
+        localeStatus: ReturnType<
+          typeof import('@rm/locales/lib/utils')['getStatus']
+        >
         hasCustom: boolean
         title: string
       }

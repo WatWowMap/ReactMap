@@ -1,7 +1,5 @@
 // @ts-check
 import * as React from 'react'
-import Clear from '@mui/icons-material/Clear'
-import Check from '@mui/icons-material/Check'
 import Grid2 from '@mui/material/Unstable_Grid2/Grid2'
 import DialogContent from '@mui/material/DialogContent'
 import IconButton from '@mui/material/IconButton'
@@ -15,6 +13,7 @@ import { DualBoolToggle } from '@components/inputs/BoolToggle'
 import { ENABLED_ALL } from '@assets/constants'
 import { Header } from '@components/dialogs/Header'
 import { Footer } from '@components/dialogs/Footer'
+import { StatusIcon } from '@components/StatusIcon'
 
 import { Size } from './Size'
 import { DialogWrapper } from '../dialogs/DialogWrapper'
@@ -164,11 +163,10 @@ function Enabled({ id, disabled }) {
       onClick={() => setFilter((prev) => !prev)}
       size="large"
     >
-      {filter || disabled ? (
-        <Check color={disabled ? 'disabled' : 'success'} />
-      ) : (
-        <Clear color="error" />
-      )}
+      <StatusIcon
+        status={filter}
+        checkColor={disabled ? 'disabled' : 'success'}
+      />
     </IconButton>
   )
 }
