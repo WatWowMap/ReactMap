@@ -78,7 +78,7 @@ function BadgeTile({ badge, ...gym }) {
   const badgeIcon = useMemory((s) => s.Icons.getMisc(`badge_${badge}`))
 
   return badge ? (
-    <Box className="vgrid-" minHeight={200}>
+    <Box className="vgrid-item" minHeight={200}>
       <IconButton
         className="vgrid-icon"
         disabled={gym.deleted}
