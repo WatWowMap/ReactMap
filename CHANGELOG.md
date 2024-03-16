@@ -1,3 +1,10 @@
+# [1.31.0-develop.4](https://github.com/WatWowMap/ReactMap/compare/v1.31.0-develop.3...v1.31.0-develop.4) (2024-03-16)
+
+
+### Bug Fixes
+
+* ai generated locales ([2d0e7fb](https://github.com/WatWowMap/ReactMap/commit/2d0e7fb2ab9b33b020a016ce9654338975c18dd7))
+
 # [1.31.0-develop.3](https://github.com/WatWowMap/ReactMap/compare/v1.31.0-develop.2...v1.31.0-develop.3) (2024-03-16)
 
 
