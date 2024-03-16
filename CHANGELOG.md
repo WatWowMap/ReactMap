@@ -1,3 +1,11 @@
+# [1.31.0-develop.5](https://github.com/WatWowMap/ReactMap/compare/v1.31.0-develop.4...v1.31.0-develop.5) (2024-03-16)
+
+
+### Bug Fixes
+
+* local assets ([615c3b8](https://github.com/WatWowMap/ReactMap/commit/615c3b81244925c1860ea7c48b00f8ee38c697d1))
+* pass ref props for tooltip ([9d55d4c](https://github.com/WatWowMap/ReactMap/commit/9d55d4c445c106626149319df1db8dd3017e99b6))
+
 # [1.31.0-develop.4](https://github.com/WatWowMap/ReactMap/compare/v1.31.0-develop.3...v1.31.0-develop.4) (2024-03-16)
 
 
