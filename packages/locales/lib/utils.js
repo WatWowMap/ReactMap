@@ -137,9 +137,9 @@ function getStatus() {
       return [
         locale.replace('.json', ''),
         {
-          human: +human.toFixed(2),
-          ai: +(localeTotal - human).toFixed(2),
-          total: +localeTotal.toFixed(2),
+          human: Math.round(human),
+          ai: Math.round(localeTotal - human),
+          total: Math.round(localeTotal),
         },
       ]
     }),
