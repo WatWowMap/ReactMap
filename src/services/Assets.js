@@ -76,10 +76,18 @@ export class UAssets {
         const name = dirtyName.endsWith('/')
           ? dirtyName?.slice(0, -1)
           : dirtyName
-        const path = dirtyPath?.endsWith('/')
-          ? dirtyPath.slice(0, -1)
-          : dirtyPath
-
+        let path = dirtyPath?.endsWith('/') ? dirtyPath.slice(0, -1) : dirtyPath
+        if (!path) {
+          console.error(
+            `[${this.assetType}] No path provided for`,
+            name,
+            'using default path',
+          )
+          this[name].path = this.fallback
+        }
+        if (!path.startsWith('http')) {
+          path = `/images/${this.assetType}/${path}`
+        }
         if (data) {
           const indexes = Object.keys(data)
           this[name] = {
@@ -90,17 +98,6 @@ export class UAssets {
             class: new UICONS(path, name),
           }
           this[name].class.init(data)
-          if (!path) {
-            console.error(
-              `[${this.assetType}] No path provided for`,
-              name,
-              'using default path',
-            )
-            this[name].path = this.fallback
-          }
-          if (!path.startsWith('http')) {
-            this[name].path = `/images/${this.assetType}/${path}`
-          }
           if (!this[name].modifiers) {
             this[name].modifiers = {}
           }
