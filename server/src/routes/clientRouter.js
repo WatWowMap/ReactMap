@@ -15,6 +15,8 @@ const CLIENT_ROUTES = [
   '/500',
   '/reset',
   '/playground',
+  '/locales',
+  '/data-management',
 ]
 
 router.get(CLIENT_ROUTES, (req, res) => {
