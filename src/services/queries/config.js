@@ -51,3 +51,13 @@ export const SAVE_COMPONENT = gql`
     saveComponent(component: $component, code: $code)
   }
 `
+
+export const LOCALES_STATUS = gql`
+  query Locales($locale: String!) {
+    locales(locale: $locale) {
+      human
+      ai
+      missing
+    }
+  }
+`

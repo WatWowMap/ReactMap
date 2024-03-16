@@ -3,6 +3,7 @@ const { resolve } = require('path')
 const { GraphQLJSON } = require('graphql-type-json')
 const { S2LatLng, S2RegionCoverer, S2LatLngRect } = require('nodes2ts')
 const config = require('@rm/config')
+const { missing, readAndParseJson } = require('@rm/locales')
 
 const buildDefaultFilters = require('../services/filters/builder/base')
 const filterComponents = require('../services/functions/filterComponents')
@@ -197,6 +198,16 @@ const resolvers = {
         return Db.getOne('Gym', args.id)
       }
       return {}
+    },
+    locales: async (_, { locale }) => {
+      const missingLocales = await missing(`${locale}.json`)
+      return locale
+        ? {
+            missing: Object.keys(missingLocales),
+            human: await readAndParseJson(`${locale}.json`, true),
+            ai: await readAndParseJson(`${locale}.json`, false),
+          }
+        : { missing: null, human: null, ai: null }
     },
     motdCheck: (_, { clientIndex }, { req, perms }) => {
       const motd = config.getMapConfig(req).messageOfTheDay

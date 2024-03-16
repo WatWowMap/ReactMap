@@ -9,7 +9,9 @@ export function downloadJson(json, fileName) {
     const el = document.createElement('a')
     el.setAttribute(
       'href',
-      `data:application/json;charset=utf-8,${encodeURIComponent(json)}`,
+      `data:application/json;charset=utf-8,${encodeURIComponent(
+        typeof json === 'string' ? json : JSON.stringify(json, null, 2),
+      )}`,
     )
     el.setAttribute('download', fileName)
     el.style.display = 'none'

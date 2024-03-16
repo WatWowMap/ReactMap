@@ -10,6 +10,7 @@ import { BlockedPage } from './Blocked'
 import { ErrorPage } from './Error'
 import { DataManagerPage } from './data'
 import { ResetPage } from './Reset'
+import { LocalesPage } from './locales'
 
 const Playground = React.lazy(() =>
   import('./playground').then(({ PlaygroundPage }) => ({
@@ -44,6 +45,7 @@ const playgroundRoute = (
 )
 const errorRoute = <ErrorPage />
 const resetRoute = <ResetPage />
+const localesPage = <LocalesPage />
 
 export function Pages() {
   return (
@@ -52,6 +54,7 @@ export function Pages() {
       <Route path="reset" element={resetRoute} />
       <Route path="login" element={loginRoute} />
       <Route path="data-management" element={dataRoute} />
+      <Route path="locales" element={localesPage} />
       <Route path="playground" element={playgroundRoute} />
       <Route path="blocked/:info" element={blockedRoute} />
       <Route path="@/:lat/:lon" element={mapRoute} />

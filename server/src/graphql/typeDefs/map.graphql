@@ -216,3 +216,9 @@ type ValidUserObj {
   loggedIn: Boolean
   admin: Boolean
 }
+
+type Locales {
+  human: JSON
+  ai: JSON
+  missing: JSON
+}
