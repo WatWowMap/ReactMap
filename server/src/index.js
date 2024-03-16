@@ -244,12 +244,13 @@ startApollo(httpServer).then((server) => {
         const definition = parse(req.body.query).definitions.find(
           (d) => d.kind === 'OperationDefinition',
         )
+        const endpoint = definition?.name?.value || ''
         const errorCtx = {
           id,
           user,
           clientV,
           serverV,
-          endpoint: definition.name?.value || '',
+          endpoint,
         }
 
         if (clientV && serverV && clientV !== serverV) {
@@ -262,7 +263,7 @@ startApollo(httpServer).then((server) => {
           })
         }
 
-        if (!perms) {
+        if (!perms && endpoint !== 'Locales') {
           throw new GraphQLError('session_expired', {
             extensions: {
               ...errorCtx,
@@ -275,7 +276,7 @@ startApollo(httpServer).then((server) => {
         if (
           definition?.operation === 'mutation' &&
           !id &&
-          definition?.name?.value !== 'SetTutorial'
+          endpoint !== 'SetTutorial'
         ) {
           throw new GraphQLError('unauthenticated', {
             extensions: {

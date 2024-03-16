@@ -5,12 +5,15 @@ import { useQuery } from '@apollo/client'
 import TableCell from '@mui/material/TableCell'
 import TableRow from '@mui/material/TableRow'
 import Box from '@mui/material/Box'
+import ClearIcon from '@mui/icons-material/Clear'
 
 import { LOCALES_STATUS } from '@services/queries/config'
 import { VirtualTable } from '@components/virtual/Table'
 
 import { setScrolling, useLocalesStore } from '../hooks/store'
 import { EditLocale } from './EditLocale'
+
+const clear = <ClearIcon color="error" fontSize="small" />
 
 /** @type {import('react-virtuoso').TableVirtuosoProps['fixedHeaderContent']} */
 function fixedHeaderContent() {
@@ -30,8 +33,8 @@ function itemContent(_index, row) {
   return (
     <>
       <TableCell>{row.name}</TableCell>
-      <TableCell>{row.english}</TableCell>
-      <TableCell>{row.ai}</TableCell>
+      <TableCell>{row.english || clear}</TableCell>
+      <TableCell>{row.ai || clear}</TableCell>
       <TableCell width="40%">
         <EditLocale
           name={row.name}

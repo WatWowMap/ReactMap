@@ -132,14 +132,14 @@ function getStatus() {
         ),
       )
       const mergedSize = Object.keys({ ...aiJson, ...humanJson }).length
-      const human = +(humanHas / total).toFixed(2) * 100
-      const localeTotal = Math.min(1, +(mergedSize / total).toFixed(2)) * 100
+      const human = (humanHas / total) * 100
+      const localeTotal = (mergedSize / total) * 100
       return [
         locale.replace('.json', ''),
         {
-          human,
-          ai: localeTotal - human,
-          total: localeTotal,
+          human: +human.toFixed(2),
+          ai: +(localeTotal - human).toFixed(2),
+          total: +localeTotal.toFixed(2),
         },
       ]
     }),
