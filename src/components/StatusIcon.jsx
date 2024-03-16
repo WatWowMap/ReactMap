@@ -13,10 +13,10 @@ import ClearIcon from '@mui/icons-material/Clear'
 
 /** @type {React.ForwardRefExoticComponent<StatusIconProps>} */
 export const StatusIcon = React.forwardRef(
-  ({ status, checkColor = 'success', clearColor = 'error' }, ref) =>
+  ({ status, checkColor = 'success', clearColor = 'error', ...props }, ref) =>
     status ? (
-      <CheckIcon color={checkColor} ref={ref} />
+      <CheckIcon color={checkColor} ref={ref} {...props} />
     ) : (
-      <ClearIcon color={clearColor} ref={ref} />
+      <ClearIcon color={clearColor} ref={ref} {...props} />
     ),
 )
