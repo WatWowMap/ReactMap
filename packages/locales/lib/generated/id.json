@@ -714,20 +714,5 @@
   "reset_spawnpoints": "Reset Lokasi Muncul",
   "reset_submission_cells": "Reset Sel Pengajuan",
   "hisuian": "Hisuian",
-  "spacial_rend_range": "Jarak Renggut Spasial",
-  "key": "Kunci",
-  "ai": "AI",
-  "human": "Manusia",
-  "locales": "Lokal",
-  "instructions": "Instruksi",
-  "locale_instructions_1": "Pilih bahasa dari dropdown",
-  "locale_instructions_2": "Masukkan terjemahan yang diinginkan di kolom \"Manusia\"",
-  "locale_instructions_3": "Klik tombol \"$t(download)\" untuk mengunduh file JSON",
-  "locale_instructions_4": "Fork link repo GitHub di bawah ini",
-  "locale_instructions_5": "Buat cabang baru dan namai dengan bahasa yang Anda terjemahkan",
-  "locale_instructions_6": "Ganti isi dari \"packages/locales/lib/human/{{lng}}.json\" dengan file yang Anda unduh",
-  "locale_instructions_7": "Buat permintaan tarik",
-  "locale_instructions_8": "Tunggu hingga permintaan tarik ditinjau dan digabung",
-  "enter_translation": "Masukkan Terjemahan",
-  "individual_filters": "Terfilter Sebagian"
+  "spacial_rend_range": "Jarak Renggut Spasial"
 }

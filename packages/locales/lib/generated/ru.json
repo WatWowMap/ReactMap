@@ -714,20 +714,5 @@
   "reset_spawnpoints": "Сбросить точки появления",
   "reset_submission_cells": "Сбросить ячейки подачи заявок",
   "hisuian": "Хисуийский",
-  "spacial_rend_range": "Диапазон Пространственного Разрыва",
-  "key": "Ключ",
-  "ai": "ИИ",
-  "human": "Человек",
-  "locales": "Локализации",
-  "instructions": "Инструкции",
-  "locale_instructions_1": "Выберите язык из выпадающего списка",
-  "locale_instructions_2": "Введите желаемый перевод в колонку \"Человек\"",
-  "locale_instructions_3": "Нажмите кнопку \"$t(скачать)\" для скачивания файла JSON",
-  "locale_instructions_4": "Сделайте форк ссылки на GitHub репозиторий ниже",
-  "locale_instructions_5": "Создайте новую ветку и назовите ее языком, на который вы переводите",
-  "locale_instructions_6": "Замените содержимое \"packages/locales/lib/human/{{lng}}.json\" на файл, который вы скачали",
-  "locale_instructions_7": "Создайте pull request",
-  "locale_instructions_8": "Ожидайте просмотра pull request и его слияния",
-  "enter_translation": "Введите перевод",
-  "individual_filters": "Частично отфильтровано"
+  "spacial_rend_range": "Диапазон Пространственного Разрыва"
 }
