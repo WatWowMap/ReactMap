@@ -1,3 +1,10 @@
+# [1.31.0-develop.7](https://github.com/WatWowMap/ReactMap/compare/v1.31.0-develop.6...v1.31.0-develop.7) (2024-03-17)
+
+
+### Bug Fixes
+
+* better selector tiles for colorblind users ([0256b5b](https://github.com/WatWowMap/ReactMap/commit/0256b5b9b0db60ef9ab1b9e1b922db2030f2575d))
+
 # [1.31.0-develop.6](https://github.com/WatWowMap/ReactMap/compare/v1.31.0-develop.5...v1.31.0-develop.6) (2024-03-16)
 
 
