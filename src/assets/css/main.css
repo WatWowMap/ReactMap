@@ -521,6 +521,15 @@ input[type='time']::-webkit-calendar-picker-indicator {
   align-self: start;
 }
 
+.vgrid-color-blind-icon {
+  margin: 3px;
+  grid-column: 1;
+  grid-row: 1;
+  justify-self: start;
+  align-self: start;
+  z-index: 500;
+}
+
 .vgrid-image {
   grid-column: 1 / 4;
   grid-row: 1 / 3;

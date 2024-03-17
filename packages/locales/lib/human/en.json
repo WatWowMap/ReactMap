@@ -779,5 +779,6 @@
   "locale_instructions_6": "Replace the contents of \"packages/locales/lib/human/{{lng}}.json\" with the file you downloaded",
   "locale_instructions_7": "Create a pull request",
   "locale_instructions_8": "Wait for the pull request to be reviewed and merged",
-  "enter_translation": "Enter Translation"
+  "enter_translation": "Enter Translation",
+  "individual_filters": "Partially Filtered"
 }

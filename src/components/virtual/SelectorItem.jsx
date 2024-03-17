@@ -10,6 +10,8 @@ import { useMemory } from '@store/useMemory'
 import { ColoredTile } from '@components/virtual/ColoredTile'
 import { ToggleTypography } from '@components/ToggleTypography'
 import { SQUARE_ITEM } from '@components/virtual/VirtualGrid'
+import { StatusIcon } from '@components/StatusIcon'
+import { useTranslation } from 'react-i18next'
 
 /**
  * @template {string} T
@@ -75,6 +77,15 @@ export function SelectorItem({
     [onClick],
   )
 
+  const status =
+    hasAll && !easyMode
+      ? filter?.all || filter.enabled
+        ? filter?.all && filter?.enabled
+          ? true
+          : null
+        : false
+      : filter?.enabled
+
   return (
     <Box
       className="vgrid-item"
@@ -103,6 +114,7 @@ export function SelectorItem({
       <IconButton className="vgrid-icon" size="small" onClick={handleIconClick}>
         <TuneIcon fontSize="small" />
       </IconButton>
+      <Status status={status} />
       <ToggleTypography
         className="vgrid-caption"
         variant="caption"
@@ -114,5 +126,28 @@ export function SelectorItem({
         {title && title.split('\n').at(-1).replace(/[()]/g, '')}
       </ToggleTypography>
     </Box>
+  )
+}
+
+/** @param {{ status: null | boolean }} props */
+function Status({ status }) {
+  const { t } = useTranslation()
+  return (
+    <Tooltip
+      title={
+        status === null
+          ? t('individual_filters')
+          : status
+          ? t('enabled')
+          : t('disabled')
+      }
+    >
+      <StatusIcon
+        className="vgrid-color-blind-icon"
+        fontSize="small"
+        color="action"
+        status={status}
+      />
+    </Tooltip>
   )
 }
