@@ -714,5 +714,20 @@
   "reset_spawnpoints": "รีเซ็ตจุดปรากฏ",
   "reset_submission_cells": "รีเซ็ตเซลส่งข้อมูล",
   "hisuian": "ฮิสุเอี้ยน",
-  "spacial_rend_range": "ระยะห่าง Spacial Rend"
+  "spacial_rend_range": "ระยะห่าง Spacial Rend",
+  "key": "คีย์",
+  "ai": "AI",
+  "human": "มนุษย์",
+  "locales": "ตำแหน่งที่ตั้ง",
+  "instructions": "คำแนะนำ",
+  "locale_instructions_1": "เลือกภาษาจากเมนูแบบดึงลง",
+  "locale_instructions_2": "กรอกคำแปลที่ต้องการในคอลัมน์ \"มนุษย์\"",
+  "locale_instructions_3": "คลิกปุ่ม \"$t(download)\" เพื่อดาวน์โหลดไฟล์ JSON",
+  "locale_instructions_4": "Fork ลิงค์ GitHub repo ด้านล่าง",
+  "locale_instructions_5": "สร้าง branch ใหม่และตั้งชื่อตามภาษาที่คุณกำลังแปล",
+  "locale_instructions_6": "แทนที่เนื้อหาของ \"packages/locales/lib/human/{{lng}}.json\" ด้วยไฟล์ที่คุณดาวน์โหลด",
+  "locale_instructions_7": "สร้าง pull request",
+  "locale_instructions_8": "รอ pull request ได้รับการตรวจสอบและผสาน",
+  "enter_translation": "กรอกคำแปล",
+  "individual_filters": "กรองบางส่วน"
 }

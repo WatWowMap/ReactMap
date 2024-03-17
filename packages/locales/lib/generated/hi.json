@@ -714,5 +714,20 @@
   "reset_spawnpoints": "स्पानपॉइंट्स रीसेट करें",
   "reset_submission_cells": "सबमिशन सेल्स रीसेट करें",
   "hisuian": "हिसुइयन",
-  "spacial_rend_range": "स्पेशल रेंड रेंज"
+  "spacial_rend_range": "स्पेशल रेंड रेंज",
+  "key": "कुंजी",
+  "ai": "कृत्रिम बुद्धिमत्ता",
+  "human": "मानव",
+  "locales": "स्थानों",
+  "instructions": "निर्देश",
+  "locale_instructions_1": "ड्रॉपडाउन से एक भाषा चुनें",
+  "locale_instructions_2": "\"मानव\" कॉलम में वांछित अनुवाद दर्ज करें",
+  "locale_instructions_3": "\"$t(download)\" बटन पर क्लिक करके एक JSON फाइल डाउनलोड करें",
+  "locale_instructions_4": "नीचे दिए गए GitHub रेपो लिंक को फोर्क करें",
+  "locale_instructions_5": "एक नई शाखा बनाएँ और इसे आपके द्वारा अनुवादित भाषा के नाम से नामित करें",
+  "locale_instructions_6": "\"packages/locales/lib/human/{{lng}}.json\" की सामग्री को आपने डाउनलोड की गई फाइल से बदलें",
+  "locale_instructions_7": "एक पुल रिक्वेस्ट बनाएं",
+  "locale_instructions_8": "पुल रिक्वेस्ट की समीक्षा होने और मर्ज होने का इंतजार करें",
+  "enter_translation": "अनुवाद दर्ज करें",
+  "individual_filters": "आंशिक रूप से फ़िल्टर्ड"
 }

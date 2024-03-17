@@ -714,5 +714,20 @@
   "reset_spawnpoints": "Återställ spawnpoints",
   "reset_submission_cells": "Återställ inskickningsceller",
   "hisuian": "Hisuian",
-  "spacial_rend_range": "Räckvidd för rymdbristning"
+  "spacial_rend_range": "Räckvidd för rymdbristning",
+  "key": "Nyckel",
+  "ai": "AI",
+  "human": "Människa",
+  "locales": "Lokaliseringar",
+  "instructions": "Instruktioner",
+  "locale_instructions_1": "Välj ett språk från rullgardinsmenyn",
+  "locale_instructions_2": "Ange önskade översättningar i kolumnen \"Människa\"",
+  "locale_instructions_3": "Klicka på \"$t(ladda ned)\"-knappen för att ladda ned en JSON-fil",
+  "locale_instructions_4": "Forka GitHub-repolänken nedan",
+  "locale_instructions_5": "Skapa en ny gren och namnge den efter det språk du översätter till",
+  "locale_instructions_6": "Ersätt innehållet i \"packages/locales/lib/human/{{lng}}.json\" med filen du laddade ned",
+  "locale_instructions_7": "Skapa en pull-förfrågan",
+  "locale_instructions_8": "Vänta på att pull-förfrågan granskas och sammanfogas",
+  "enter_translation": "Skriv in översättning",
+  "individual_filters": "Delvis filtrerade"
 }
