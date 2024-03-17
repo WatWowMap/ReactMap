@@ -1,9 +1,11 @@
+/* eslint-disable prefer-template */
 // @ts-check
 /* eslint-disable no-restricted-syntax */
 /* eslint-disable guard-for-in */
 
 require('dotenv').config()
 const { OpenAI } = require('openai')
+const { encode } = require('gpt-tokenizer')
 
 const { log, HELPERS } = require('@rm/logger')
 
@@ -15,33 +17,15 @@ const openAI = process.env.OPENAI_API_KEY
     })
   : null
 
+const TOKEN_LIMIT = 1024
+
 /**
  * @typedef {Record<string, string>} I18nObject
  * @typedef {I18nObject | string} Node
  */
 
 /**
- * Recursively estimates the token size of a {@link Node}
- * @param {Node} content
- * @returns {number}
- */
-function estimateTokenCount(content) {
-  if (typeof content === 'string') {
-    return content.split(/[\s.'_A-Z0-9]/).length * 2
-  }
-  if (typeof content === 'object') {
-    let count = 0
-    for (const key in content) {
-      count += estimateTokenCount(content[key])
-      count += key.split(/[_A-Z0-9]/).length * 2
-    }
-    return count
-  }
-  return 1
-}
-
-/**
- * Splits the json into 2048 token chunks
+ * Splits the json into token chunks
  * @param {I18nObject} json
  * @returns {I18nObject[]}
  */
@@ -49,22 +33,33 @@ function splitJson(json) {
   /** @type {I18nObject[]} */
   const chunks = []
   /** @type {I18nObject} */
-  let pool = {}
-  let poolSize = 0
-  for (const key in json) {
-    const nodeSize = estimateTokenCount(json[key]) + estimateTokenCount(key)
-    if (nodeSize + poolSize < 2048) {
-      poolSize += nodeSize
-      pool[key] = json[key]
-    } else {
-      chunks.push(pool)
-      pool = { [key]: json[key] }
-      poolSize = nodeSize
+  let currentChunk = {}
+  let currentTokenCount = 2
+
+  for (const [key, value] of Object.entries(json)) {
+    const string = `  "${key}": ${
+      typeof value === 'string'
+        ? `"${value}"`
+        : typeof value === 'number'
+        ? value
+        : `${value}`
+    },\n`
+    const newLineCount = (string.match(/\n/g) || []).length - 1
+    const tokenCount = encode(string).length
+    const totalTokenCount = tokenCount + newLineCount
+
+    if (currentTokenCount + totalTokenCount >= TOKEN_LIMIT) {
+      chunks.push(currentChunk)
+      currentChunk = {}
+      currentTokenCount = 2
     }
+    currentChunk[key] = value
+    currentTokenCount =
+      newLineCount > 0
+        ? encode(JSON.stringify(currentChunk, null, 2)).length
+        : currentTokenCount + totalTokenCount
   }
-  if (Object.keys(pool).length > 0) {
-    chunks.push(pool)
-  }
+  if (Object.keys(currentChunk).length > 0) chunks.push(currentChunk)
   return chunks
 }
 
@@ -96,18 +91,18 @@ function matchJSON(str) {
 }
 
 /**
- * Sends the result to OpenAI gpt-3.5-turbo model
+ * Sends the result to OpenAI gpt-4-turbo model
  * @param {string} locale
  * @param {Node} missingKeys
  * @returns
  */
 async function sendToGPT(locale, missingKeys) {
   return openAI.chat.completions.create({
-    model: 'gpt-3.5-turbo',
+    model: 'gpt-4-turbo-preview',
     messages: [
       {
         role: 'system',
-        content: `Translate an i18n locale json content to ${locale}. It's a key-value structure, don't translate the key. Consider the context of all of the values together to make better translation. All translations should be related to a Pokemon GO context.`,
+        content: `Translate an i18n English locale json content to ${locale}. It's a key-value structure, don't translate the key. Consider the context of all of the values together to make better translation. All translations should be related to a Pokemon GO context. Ensure that all key value pairs are matched correctly.`,
       },
       {
         role: 'user',
@@ -141,7 +136,10 @@ async function generate() {
         /** @type {I18nObject} */
         const missingKeys = Object.fromEntries(
           Object.entries(englishRef).filter(
-            ([key]) => !(key in merged) && !key.startsWith('locale_selection_'),
+            ([key]) =>
+              !(key in merged) &&
+              !key.startsWith('locale_selection_') &&
+              typeof englishRef[key] !== 'number',
           ),
         )
 
@@ -167,6 +165,7 @@ async function generate() {
               } catch (e) {
                 log.error(e, '\nUnable to parse returned translations\n', {
                   locale,
+                  reason: raw.choices[0].finish_reason,
                   content,
                   clean,
                 })
@@ -174,6 +173,7 @@ async function generate() {
               }
             }),
           )
+
           return [locale, result.reduce((acc, x) => ({ ...acc, ...x }), merged)]
         } catch (error) {
           log.error(HELPERS.locales, error)
@@ -191,6 +191,7 @@ async function generate() {
 module.exports.generate = generate
 
 if (require.main === module) {
+  if (!process.env.OPENAI_API_KEY) throw new Error('OpenAI API key is missing')
   generate()
     .then((locales) => writeAll(locales, false, __dirname, './generated'))
     .then(() =>

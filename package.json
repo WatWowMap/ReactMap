@@ -1,6 +1,6 @@
 {
   "name": "reactmap",
-  "version": "1.30.0",
+  "version": "1.31.0-develop.7",
   "private": true,
   "description": "React based frontend map.",
   "license": "MIT",
@@ -175,6 +175,7 @@
     "source-map": "^0.7.4",
     "suncalc": "^1.9.0",
     "supercluster": "^8.0.1",
+    "uicons.js": "^1.1.1",
     "zustand": "4.4.6"
   },
   "devDependencies": {

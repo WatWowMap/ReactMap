@@ -6,7 +6,7 @@ import { Observable } from '@apollo/client/utilities/observables/Observable'
  * @see AbortableLink
  * @author Mygod
  */
-export default class AbortableContext {
+export class AbortableContext {
   constructor(error = 'Request aborted') {
     this._pendingOp = null
     this._error = error

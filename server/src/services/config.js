@@ -7,6 +7,9 @@ const { log, HELPERS } = require('@rm/logger')
 const checkConfigJsons = require('./functions/checkConfigJsons')
 const { loadCachedAreas } = require('./areas')
 
+if (process.env.NODE_CONFIG_ENV) {
+  log.info(HELPERS.config, `Using config for ${process.env.NODE_CONFIG_ENV}`)
+}
 const allowedMenuItems = [
   'gyms',
   'nests',
@@ -214,13 +217,21 @@ const mergeMapConfig = (input = {}) => {
 
 config.map = mergeMapConfig()
 
-// Create multiDomain Objects
-config.multiDomainsObj = Object.fromEntries(
-  config.multiDomains.map((d) => [
-    d.domain.replaceAll('.', '_'),
-    mergeMapConfig(d),
-  ]),
-)
+if (config.has('multiDomains')) {
+  log.warn(
+    HELPERS.config,
+    '`multiDomains` has been deprecated and will be removed in the next major release. Please switch to the new format that makes use of `NODE_CONFIG_ENV`',
+  )
+  // Create multiDomain Objects
+  config.multiDomainsObj = Object.fromEntries(
+    config.multiDomains.map((d) => [
+      d.domain.replaceAll('.', '_'),
+      mergeMapConfig(d),
+    ]),
+  )
+} else {
+  config.multiDomainsObj = {}
+}
 
 // Check if empty
 ;['tileServers', 'navigation'].forEach((opt) => {

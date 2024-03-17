@@ -12,7 +12,7 @@ const { sentryVitePlugin } = require('@sentry/vite-plugin')
 
 const config = require('@rm/config')
 const { log, HELPERS } = require('@rm/logger')
-const { locales } = require('@rm/locales')
+const { locales, status } = require('@rm/locales')
 const {
   faviconPlugin,
   customFilePlugin,
@@ -108,10 +108,13 @@ const viteConfig = defineConfig(({ mode }) => {
     publicDir: 'public',
     resolve: {
       alias: {
-        '@components': resolve(__dirname, './src/components'),
         '@assets': resolve(__dirname, './src/assets'),
+        '@components': resolve(__dirname, './src/components'),
+        '@features': resolve(__dirname, './src/features'),
         '@hooks': resolve(__dirname, './src/hooks'),
         '@services': resolve(__dirname, './src/services'),
+        '@utils': resolve(__dirname, './src/utils'),
+        '@store': resolve(__dirname, './src/store'),
       },
     },
     define: {
@@ -119,6 +122,7 @@ const viteConfig = defineConfig(({ mode }) => {
         client: {
           version,
           locales,
+          localeStatus: status,
           hasCustom,
           title: config.getSafe('map.general.headerTitle'),
         },
@@ -139,7 +143,12 @@ const viteConfig = defineConfig(({ mode }) => {
     },
     build: {
       target: ['safari11.1', 'chrome64', 'firefox66', 'edge88'],
-      outDir: resolve(__dirname, './dist'),
+      outDir: resolve(
+        __dirname,
+        `./dist${
+          process.env.NODE_CONFIG_ENV ? `-${process.env.NODE_CONFIG_ENV}` : ''
+        }`,
+      ),
       sourcemap: isRelease || isDevelopment ? true : 'hidden',
       minify:
         isDevelopment || config.getSafe('devOptions.skipMinified')

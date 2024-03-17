@@ -141,9 +141,13 @@ app.use(compression())
 
 app.use(express.json({ limit: '50mb' }))
 
-app.use(
-  express.static(path.join(__dirname, config.getSafe('devOptions.clientPath'))),
+const distDir = path.join(
+  __dirname,
+  '../../',
+  `dist${process.env.NODE_CONFIG_ENV ? `-${process.env.NODE_CONFIG_ENV}` : ''}`,
 )
+
+app.use(express.static(distDir))
 
 app.use(
   session({
@@ -172,7 +176,7 @@ passport.deserializeUser(async (user, done) => {
   }
 })
 
-const localePath = path.resolve(__dirname, '../../dist/locales')
+const localePath = path.resolve(distDir, 'locales')
 if (fs.existsSync(localePath)) {
   require('./services/i18n')
 } else {
@@ -240,12 +244,13 @@ startApollo(httpServer).then((server) => {
         const definition = parse(req.body.query).definitions.find(
           (d) => d.kind === 'OperationDefinition',
         )
+        const endpoint = definition?.name?.value || ''
         const errorCtx = {
           id,
           user,
           clientV,
           serverV,
-          endpoint: definition.name?.value || '',
+          endpoint,
         }
 
         if (clientV && serverV && clientV !== serverV) {
@@ -258,7 +263,7 @@ startApollo(httpServer).then((server) => {
           })
         }
 
-        if (!perms) {
+        if (!perms && endpoint !== 'Locales') {
           throw new GraphQLError('session_expired', {
             extensions: {
               ...errorCtx,
@@ -271,7 +276,7 @@ startApollo(httpServer).then((server) => {
         if (
           definition?.operation === 'mutation' &&
           !id &&
-          definition?.name?.value !== 'SetTutorial'
+          endpoint !== 'SetTutorial'
         ) {
           throw new GraphQLError('unauthenticated', {
             extensions: {

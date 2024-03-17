@@ -12,6 +12,8 @@ jobs:
     uses: ./.github/workflows/config.yml
   locales:
     uses: ./.github/workflows/locales.yml
+    secrets:
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
   release:
     if: always()
     uses: ./.github/workflows/release.yml

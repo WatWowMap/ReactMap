@@ -18,8 +18,9 @@
     "@rm/config": "*",
     "@rm/logger": "*",
     "dotenv": "^16.3.1",
+    "gpt-tokenizer": "^2.1.2",
     "node-fetch": "2.6.7",
-    "openai": "^4.24.1"
+    "openai": "4.29.0"
   },
   "devDependencies": {
     "@types/node-fetch": "2.6.1"

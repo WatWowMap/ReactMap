@@ -12,6 +12,15 @@ if (!process.env.NODE_CONFIG_DIR) {
   process.env.ALLOW_CONFIG_MUTATIONS = 'true'
 }
 
+if (process.env.NODE_CONFIG_ENV) {
+  if (
+    process.env.NODE_CONFIG_ENV.includes('.') ||
+    process.env.NODE_CONFIG_ENV.includes('/')
+  ) {
+    throw new Error('Invalid NODE_CONFIG_ENV, must not contain "." or "/"')
+  }
+}
+
 const config = require('config')
 
 config.getSafe = config.get

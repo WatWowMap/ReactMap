@@ -3,6 +3,7 @@ const { resolve } = require('path')
 const { GraphQLJSON } = require('graphql-type-json')
 const { S2LatLng, S2RegionCoverer, S2LatLngRect } = require('nodes2ts')
 const config = require('@rm/config')
+const { missing, readAndParseJson } = require('@rm/locales')
 
 const buildDefaultFilters = require('../services/filters/builder/base')
 const filterComponents = require('../services/functions/filterComponents')
@@ -198,6 +199,16 @@ const resolvers = {
       }
       return {}
     },
+    locales: async (_, { locale }) => {
+      const missingLocales = await missing(`${locale}.json`)
+      return locale
+        ? {
+            missing: Object.keys(missingLocales),
+            human: await readAndParseJson(`${locale}.json`, true),
+            ai: await readAndParseJson(`${locale}.json`, false),
+          }
+        : { missing: null, human: null, ai: null }
+    },
     motdCheck: (_, { clientIndex }, { req, perms }) => {
       const motd = config.getMapConfig(req).messageOfTheDay
       return (
@@ -388,8 +399,8 @@ const resolvers = {
       }
       return null
     },
-    search: async (_, args, { Event, perms, Db }) => {
-      const { category, webhookName, search } = args
+    search: async (_, args, { Event, perms, Db, req }) => {
+      const { category, search } = args
       if (!search || !search.trim()) {
         return []
       }
@@ -403,8 +414,8 @@ const resolvers = {
         case 'gyms': {
           if (!perms.gyms) return []
           const results = await Db.search('Gym', perms, args)
-          const webhook = webhookName ? Event.webhookObj[webhookName] : null
-          if (webhook && results.length) {
+          const webhook = Event.webhookObj[req.user.selectedWebhook]
+          if (webhook?.nominatimUrl && results.length) {
             const withFormatted = await Promise.all(
               results.map(async (result) => ({
                 ...result,
@@ -412,6 +423,7 @@ const resolvers = {
                   webhook.nominatimUrl,
                   { lat: result.lat, lon: result.lon },
                   true,
+                  webhook.addressFormat,
                 ),
               })),
             )

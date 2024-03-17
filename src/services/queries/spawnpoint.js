@@ -1,6 +1,6 @@
 import { gql } from '@apollo/client'
 
-const getAllSpawnpoints = gql`
+export const GET_ALL_SPAWNPOINTS = gql`
   query Spawnpoints(
     $minLat: Float!
     $minLon: Float!
@@ -23,5 +23,3 @@ const getAllSpawnpoints = gql`
     }
   }
 `
-
-export default getAllSpawnpoints

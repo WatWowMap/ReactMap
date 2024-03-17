@@ -1,9 +1,8 @@
-/* eslint-disable no-bitwise */
 // @ts-check
-/* eslint-disable no-console */
+/* eslint-disable no-bitwise */
 /* eslint-disable react/destructuring-assignment */
 import * as React from 'react'
-import Grid from '@mui/material/Grid'
+import Grid from '@mui/material/Unstable_Grid2'
 import Typography from '@mui/material/Typography'
 import Button from '@mui/material/Button'
 import Refresh from '@mui/icons-material/Refresh'
@@ -11,8 +10,9 @@ import CopyIcon from '@mui/icons-material/FileCopy'
 import IconButton from '@mui/material/IconButton'
 import { withTranslation } from 'react-i18next'
 
-import Fetch from '@services/Fetch'
-import Notification from './layout/general/Notification'
+import { sendError } from '@services/fetches'
+
+import { Notification } from './Notification'
 
 /** @type {React.CSSProperties} */
 const defaultStyle = {
@@ -24,7 +24,7 @@ const defaultStyle = {
 // This component uses React Classes due to componentDidCatch() not being available in React Hooks
 // Do not use this as a base for other components
 
-class ErrorBoundary extends React.Component {
+class ErrorCatcher extends React.Component {
   static uuidv4() {
     return 'xxxxxxxx-r2m4-xxxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
       const r = (Math.random() * 16) | 0
@@ -39,13 +39,13 @@ class ErrorBoundary extends React.Component {
       message: '',
       errorCount: 0,
       reported: false,
-      uuid: ErrorBoundary.uuidv4(),
+      uuid: ErrorCatcher.uuidv4(),
     }
   }
 
   async componentDidCatch(error) {
     if (!this.state.reported && process.env.NODE_ENV !== 'development') {
-      await Fetch.sendError({
+      await sendError({
         cause: error.cause,
         message: error.message,
         stack: error?.stack?.replace(
@@ -72,7 +72,7 @@ class ErrorBoundary extends React.Component {
         alignItems="center"
         style={this.props.style ?? defaultStyle}
       >
-        <Grid item xs={12}>
+        <Grid xs={12}>
           <Typography variant={this.props.variant || 'h3'} align="center">
             {this.props.t('react_error')}
           </Typography>
@@ -138,4 +138,4 @@ class ErrorBoundary extends React.Component {
   }
 }
 
-export default withTranslation()(ErrorBoundary)
+export const ErrorBoundary = withTranslation()(ErrorCatcher)

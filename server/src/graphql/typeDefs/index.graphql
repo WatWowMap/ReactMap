@@ -23,6 +23,7 @@ type Query {
     filters: JSON
   ): [Gym]
   gymsSingle(id: ID, perm: String): Gym
+  locales(locale: String): Locales
   motdCheck(clientIndex: Int): Boolean
   nests(
     minLat: Float

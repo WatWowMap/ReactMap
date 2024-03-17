@@ -1,7 +1,6 @@
 // @ts-check
 const express = require('express')
 const path = require('path')
-const config = require('@rm/config')
 
 const router = express.Router()
 
@@ -16,13 +15,17 @@ const CLIENT_ROUTES = [
   '/500',
   '/reset',
   '/playground',
+  '/locales',
+  '/data-management',
 ]
 
 router.get(CLIENT_ROUTES, (req, res) => {
   res.sendFile(
     path.join(
       __dirname,
-      `../${config.getSafe('devOptions.clientPath')}/index.html`,
+      `../../../dist${
+        process.env.NODE_CONFIG_ENV ? `-${process.env.NODE_CONFIG_ENV}` : ''
+      }/index.html`,
     ),
   )
 })

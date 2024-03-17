@@ -333,16 +333,20 @@ const loadLatestAreas = async () => {
   /** @type {Record<string, import("@rm/types").RMGeoJSON>} */
   const scanAreas = {
     main: await loadScanPolygons(fileName),
-    ...Object.fromEntries(
-      await Promise.all(
-        config
-          .getSafe('multiDomains')
-          .map(async (d) => [
-            d.general?.geoJsonFileName ? d.domain.replaceAll('.', '_') : 'main',
-            await loadScanPolygons(d.general?.geoJsonFileName || fileName),
-          ]),
-      ),
-    ),
+    ...(config.has('multiDomains')
+      ? Object.fromEntries(
+          await Promise.all(
+            config
+              .getSafe('multiDomains')
+              .map(async (d) => [
+                d.general?.geoJsonFileName
+                  ? d.domain.replaceAll('.', '_')
+                  : 'main',
+                await loadScanPolygons(d.general?.geoJsonFileName || fileName),
+              ]),
+          ),
+        )
+      : {}),
   }
   return buildAreas(scanAreas)
 }
@@ -353,14 +357,18 @@ const loadCachedAreas = () => {
   /** @type {Record<string, import("@rm/types").RMGeoJSON>} */
   const scanAreas = {
     main: loadFromFile(fileName),
-    ...Object.fromEntries(
-      config
-        .getSafe('multiDomains')
-        .map((d) => [
-          d.general?.geoJsonFileName ? d.domain.replaceAll('.', '_') : 'main',
-          loadFromFile(d.general?.geoJsonFileName || fileName),
-        ]),
-    ),
+    ...(config.has('multiDomains')
+      ? Object.fromEntries(
+          config
+            .getSafe('multiDomains')
+            .map((d) => [
+              d.general?.geoJsonFileName
+                ? d.domain.replaceAll('.', '_')
+                : 'main',
+              loadFromFile(d.general?.geoJsonFileName || fileName),
+            ]),
+        )
+      : {}),
   }
   return buildAreas(scanAreas)
 }

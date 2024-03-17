@@ -8,7 +8,7 @@
  */
 function filterComponents(components, loggedIn, donor) {
   return (Array.isArray(components) ? components : []).filter((component) => {
-    if (component.components) {
+    if ('components' in component && Array.isArray(component.components)) {
       return filterComponents(component.components, loggedIn, donor).length > 0
     }
     if (

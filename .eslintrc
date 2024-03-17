@@ -1,10 +1,5 @@
 {
-  "extends": [
-    "airbnb",
-    "airbnb/rules/react",
-    "eslint:recommended",
-    "prettier"
-  ],
+  "extends": ["airbnb", "airbnb/rules/react", "eslint:recommended", "prettier"],
   "parserOptions": {
     "ecmaVersion": "latest"
   },
@@ -74,41 +69,20 @@
   },
   "settings": {
     "node": {
-      "extensions": [
-        ".mjs",
-        ".js",
-        ".jsx",
-        ".ts",
-        ".tsx"
-      ]
+      "extensions": [".mjs", ".js", ".jsx", ".ts", ".tsx"]
     },
     "import/resolver": {
       "alias": {
         "map": [
-          [
-            "@components",
-            "./src/components/"
-          ],
-          [
-            "@services",
-            "./src/services/"
-          ],
-          [
-            "@hooks",
-            "./src/hooks/"
-          ],
-          [
-            "@assets",
-            "./src/assets/"
-          ]
+          ["@components", "./src/components/"],
+          ["@features", "./src/features/"],
+          ["@services", "./src/services/"],
+          ["@hooks", "./src/hooks/"],
+          ["@assets", "./src/assets/"],
+          ["@utils", "./src/utils/"],
+          ["@store", "./src/store/"]
         ],
-        "extensions": [
-          ".mjs",
-          ".js",
-          ".jsx",
-          ".ts",
-          ".tsx"
-        ]
+        "extensions": [".mjs", ".js", ".jsx", ".ts", ".tsx"]
       }
     }
   }
