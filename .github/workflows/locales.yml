@@ -48,4 +48,4 @@ jobs:
           git add --all
           git commit --message "chore: sync locales [skip ci]"
           git push
-          echo "::set-output name=made_commit::true"
+          echo "made_commit=true" >> $GITHUB_OUTPUT
