@@ -15,10 +15,10 @@ jobs:
     secrets:
       OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
   release:
-    if: always()
+    needs: [config, locales, lint]
+    if: needs.locales.outputs.made_commit != 'true' && needs.config.outputs.made_commit != 'true'
     uses: ./.github/workflows/release.yml
-    needs: [config, locales, lint]
   docker:
-    if: always()
-    uses: ./.github/workflows/docker.yml
     needs: [config, locales, lint]
+    if: needs.locales.outputs.made_commit != 'true' && needs.config.outputs.made_commit != 'true'
+    uses: ./.github/workflows/docker.yml

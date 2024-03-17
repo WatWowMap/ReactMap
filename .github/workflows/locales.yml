@@ -12,6 +12,8 @@ jobs:
   sync:
     if: ${{ github.ref_name == 'main' }}
     runs-on: ubuntu-latest
+    outputs:
+      made_commit: ${{ steps.commit.outputs.made_commit }}
     env:
       changes_exist: 'false'
     steps:
@@ -19,7 +21,7 @@ jobs:
         id: checkout-code
         uses: actions/checkout@v4.1.1
         with:
-          fetch-depth: 2
+          fetch-depth: 0
       - name: Install dependencies
         run: yarn
       - name: Run generating script
@@ -38,13 +40,12 @@ jobs:
             echo "changes_exist=true" >> $GITHUB_ENV
           fi
       - name: Commit and push changes
+        id: commit
         if: ${{ env.changes_exist == 'true' }}
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           git add --all
-          git commit --message "chore: sync locales"
+          git commit --message "chore: sync locales [skip ci]"
           git push
-          git checkout develop
-          git merge main
-          git push origin develop
+          echo "::set-output name=made_commit::true"

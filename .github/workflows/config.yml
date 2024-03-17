@@ -4,6 +4,8 @@ on: workflow_call
 jobs:
   sync:
     runs-on: ubuntu-latest
+    outputs:
+      made_commit: ${{ steps.commit.outputs.made_commit }}
     env:
       changes_exist: 'false'
     steps:
@@ -28,8 +30,10 @@ jobs:
             echo "changes_exist=true" >> $GITHUB_ENV
           fi
       - name: Commit and push changes
+        id: commit
         if: ${{ env.changes_exist == 'true' }}
         run: |
           git add --all
-          git commit --message "chore: Sync Config"
+          git commit --message "chore: sync config [skip ci]"
           git push
+          echo "::set-output name=made_commit::true"

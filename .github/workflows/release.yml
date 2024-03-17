@@ -29,3 +29,11 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           HUSKY: 0
         run: npx semantic-release
+      - name: Sync Dev to Main
+        if: ${{ github.ref_name == 'main'}}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git checkout develop
+          git merge main
+          git push origin develop

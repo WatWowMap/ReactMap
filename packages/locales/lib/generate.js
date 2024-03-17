@@ -142,7 +142,6 @@ async function generate() {
               typeof englishRef[key] !== 'number',
           ),
         )
-
         if (Object.keys(missingKeys).length === 0) return
 
         try {
@@ -174,7 +173,10 @@ async function generate() {
             }),
           )
 
-          return [locale, result.reduce((acc, x) => ({ ...acc, ...x }), merged)]
+          return [
+            locale,
+            result.reduce((acc, x) => ({ ...acc, ...x }), generated),
+          ]
         } catch (error) {
           log.error(HELPERS.locales, error)
         }
