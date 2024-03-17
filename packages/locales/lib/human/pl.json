@@ -634,7 +634,7 @@
   "spawnpoint": "Spawnpoint",
   "spawnpoint_audio": "Dźwięk w okolicy punktu zrespawnowania",
   "spawnpoint_icons": "Ikony Spawnpointów",
-  "spawnpoints": "Spawnpointy"
+  "spawnpoints": "Spawnpointy",
   "spawnpoints_subtitle": "Pokazuje spawnpointy oraz ich przybliżone czasy despawnu",
   "spawns_per_hour": "Spawny/h",
   "specific_gym": "Określony Gym",
