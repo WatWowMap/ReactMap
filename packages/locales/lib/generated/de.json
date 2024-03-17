@@ -714,5 +714,20 @@
   "reset_spawnpoints": "Spawnpunkte zurücksetzen",
   "reset_submission_cells": "Einreichungszellen zurücksetzen",
   "hisuian": "Hisui-Art",
-  "spacial_rend_range": "Raum-Zeit-Riss-Bereich"
+  "spacial_rend_range": "Raum-Zeit-Riss-Bereich",
+  "key": "Schlüssel",
+  "ai": "KI",
+  "human": "Mensch",
+  "locales": "Sprachversionen",
+  "instructions": "Anweisungen",
+  "locale_instructions_1": "Wählen Sie eine Sprache aus dem Dropdown-Menü",
+  "locale_instructions_2": "Geben Sie die gewünschten Übersetzungen in die Spalte „Mensch“ ein",
+  "locale_instructions_3": "Klicken Sie auf die Schaltfläche „$t(download)“, um eine JSON-Datei herunterzuladen",
+  "locale_instructions_4": "Forken Sie den GitHub-Repo-Link unten",
+  "locale_instructions_5": "Erstellen Sie einen neuen Zweig und benennen Sie ihn mit der Sprache, in die Sie übersetzen",
+  "locale_instructions_6": "Ersetzen Sie den Inhalt von \"packages/locales/lib/human/{{lng}}.json\" mit der Datei, die Sie heruntergeladen haben",
+  "locale_instructions_7": "Erstellen Sie einen Pull-Request",
+  "locale_instructions_8": "Warten Sie darauf, dass der Pull-Request überprüft und zusammengeführt wird",
+  "enter_translation": "Übersetzung eingeben",
+  "individual_filters": "Teilweise gefiltert"
 }

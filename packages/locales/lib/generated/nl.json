@@ -714,5 +714,20 @@
   "reset_spawnpoints": "Reset Spawnpunten",
   "reset_submission_cells": "Reset Indieningscellen",
   "hisuian": "Hisuian",
-  "spacial_rend_range": "Ruimtelijke Scheur Bereik"
+  "spacial_rend_range": "Ruimtelijke Scheur Bereik",
+  "key": "Sleutel",
+  "ai": "KI",
+  "human": "Mens",
+  "locales": "Taalinstellingen",
+  "instructions": "Instructies",
+  "locale_instructions_1": "Selecteer een taal uit het dropdownmenu",
+  "locale_instructions_2": "Voer de gewenste vertalingen in de kolom \"Mens\" in",
+  "locale_instructions_3": "Klik op de \"$t(download)\" knop om een JSON-bestand te downloaden",
+  "locale_instructions_4": "Fork de GitHub repo link hieronder",
+  "locale_instructions_5": "Maak een nieuwe branch en noem het de taal waarin je vertaalt",
+  "locale_instructions_6": "Vervang de inhoud van \"packages/locales/lib/human/{{lng}}.json\" met het bestand dat je hebt gedownload",
+  "locale_instructions_7": "Maak een pull-verzoek aan",
+  "locale_instructions_8": "Wacht tot het pull-verzoek is beoordeeld en samengevoegd",
+  "enter_translation": "Voer Vertaling In",
+  "individual_filters": "Gedeeltelijk Gefilterd"
 }

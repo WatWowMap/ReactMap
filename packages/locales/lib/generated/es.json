@@ -714,5 +714,20 @@
   "reset_spawnpoints": "Restablecer Puntos de Aparición",
   "reset_submission_cells": "Restablecer Celdas de Envío",
   "hisuian": "Hisui",
-  "spacial_rend_range": "Rango de Corte Espacial"
+  "spacial_rend_range": "Rango de Corte Espacial",
+  "key": "Clave",
+  "ai": "IA",
+  "human": "Humano",
+  "locales": "Localizaciones",
+  "instructions": "Instrucciones",
+  "locale_instructions_1": "Selecciona un idioma del menú desplegable",
+  "locale_instructions_2": "Introduce las traducciones deseadas en la columna \"Humano\"",
+  "locale_instructions_3": "Haz clic en el botón \"$t(descargar)\" para descargar un archivo JSON",
+  "locale_instructions_4": "Haz fork al enlace del repositorio de GitHub abajo",
+  "locale_instructions_5": "Crea una nueva rama y nómbrala con el idioma al que estás traduciendo",
+  "locale_instructions_6": "Reemplaza el contenido de \"packages/locales/lib/human/{{lng}}.json\" con el archivo que descargaste",
+  "locale_instructions_7": "Crea una solicitud de extracción",
+  "locale_instructions_8": "Espera a que la solicitud de extracción sea revisada y fusionada",
+  "enter_translation": "Introduce la Traducción",
+  "individual_filters": "Filtrado Parcial"
 }

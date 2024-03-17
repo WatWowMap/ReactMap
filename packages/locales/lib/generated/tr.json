@@ -714,5 +714,20 @@
   "reset_spawnpoints": "Doğuş Noktalarını Sıfırla",
   "reset_submission_cells": "Gönderim Hücrelerini Sıfırla",
   "hisuian": "Hisuian",
-  "spacial_rend_range": "Uzaysal Yırtma Menzili"
+  "spacial_rend_range": "Uzaysal Yırtma Menzili",
+  "key": "Anahtar",
+  "ai": "Yapay Zeka",
+  "human": "İnsan",
+  "locales": "Yerel Ayarlar",
+  "instructions": "Talimatlar",
+  "locale_instructions_1": "Açılır menüden bir dil seçin",
+  "locale_instructions_2": "\"İnsan\" sütununa istenilen çevirileri girin",
+  "locale_instructions_3": "JSON dosyasını indirmek için \"$t(indir)\" butonuna tıklayın",
+  "locale_instructions_4": "Aşağıdaki GitHub repo bağlantısını çatallayın",
+  "locale_instructions_5": "Yeni bir dal oluşturun ve adını çevirdiğiniz dil olarak adlandırın",
+  "locale_instructions_6": "\"packages/locales/lib/human/{{lng}}.json\" içeriğini indirdiğiniz dosya ile değiştirin",
+  "locale_instructions_7": "Bir çekme isteği oluşturun",
+  "locale_instructions_8": "Çekme isteğinin incelenip birleştirilmesini bekleyin",
+  "enter_translation": "Çeviri Gir",
+  "individual_filters": "Kısmen Filtrelenmiş"
 }

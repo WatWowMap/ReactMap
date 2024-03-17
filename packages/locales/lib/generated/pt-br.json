@@ -714,5 +714,20 @@
   "reset_spawnpoints": "Resetar Pontos de Aparecimento",
   "reset_submission_cells": "Resetar Células de Submissão",
   "hisuian": "Hisuiano",
-  "spacial_rend_range": "Alcance de Corte Espacial"
+  "spacial_rend_range": "Alcance de Corte Espacial",
+  "key": "Chave",
+  "ai": "IA",
+  "human": "Humano",
+  "locales": "Idiomas",
+  "instructions": "Instruções",
+  "locale_instructions_1": "Selecione um idioma no menu suspenso",
+  "locale_instructions_2": "Insira as traduções desejadas na coluna \"Humano\"",
+  "locale_instructions_3": "Clique no botão \"$t(download)\" para baixar um arquivo JSON",
+  "locale_instructions_4": "Faça um fork do link do repositório no GitHub abaixo",
+  "locale_instructions_5": "Crie uma nova branch e nomeie-a com o idioma para o qual está traduzindo",
+  "locale_instructions_6": "Substitua o conteúdo de \"packages/locales/lib/human/{{lng}}.json\" com o arquivo que você baixou",
+  "locale_instructions_7": "Crie um pull request",
+  "locale_instructions_8": "Aguarde a revisão e a fusão do pull request",
+  "enter_translation": "Insira a Tradução",
+  "individual_filters": "Filtrados Parcialmente"
 }

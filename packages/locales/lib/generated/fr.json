@@ -714,5 +714,20 @@
   "reset_spawnpoints": "Réinitialiser les Points de Spawn",
   "reset_submission_cells": "Réinitialiser les Cellules de Soumission",
   "hisuian": "Hisui",
-  "spacial_rend_range": "Portée de Spatio-Rift"
+  "spacial_rend_range": "Portée de Spatio-Rift",
+  "key": "Clé",
+  "ai": "IA",
+  "human": "Humain",
+  "locales": "Langues",
+  "instructions": "Instructions",
+  "locale_instructions_1": "Sélectionnez une langue dans le menu déroulant",
+  "locale_instructions_2": "Entrez les traductions désirées dans la colonne \"Humain\"",
+  "locale_instructions_3": "Cliquez sur le bouton \"$t(télécharger)\" pour télécharger un fichier JSON",
+  "locale_instructions_4": "Forkez le lien du repo GitHub ci-dessous",
+  "locale_instructions_5": "Créez une nouvelle branche et nommez-la avec la langue que vous traduisez",
+  "locale_instructions_6": "Remplacez le contenu de \"packages/locales/lib/human/{{lng}}.json\" par le fichier que vous avez téléchargé",
+  "locale_instructions_7": "Créez une demande de tirage",
+  "locale_instructions_8": "Attendez que la demande de tirage soit examinée et fusionnée",
+  "enter_translation": "Entrez la Traduction",
+  "individual_filters": "Filtré Partiellement"
 }
