@@ -23,27 +23,26 @@
   "database": {
     "schemas": [
       {
-        "note": "Scanner Database",
+        "note": "Golbat Database",
         "host": "127.0.0.1",
         "port": 3306,
-        "username": "scanner_user",
-        "password": "scanner_paw",
-        "database": "scanner_db",
+        "username": "golbat_user",
+        "password": "golbat_pw",
+        "database": "golbat_db",
         "useFor": [
-          "device",
           "gym",
-          "pokemon",
           "pokestop",
           "scanCell",
           "spawnpoint",
           "weather",
-          "route"
+          "route",
+          "nest"
         ]
       },
       {
-        "note": "This is only if you are using golbat and in memory, if you do not know what that is, remove this whole section. If you are using it, you should remove 'device' and 'pokemon' from the scanner database useFor array",
+        "note": "This is only if you are using golbat and in memory, if you do not know what that is, remove this whole section.",
         "type": "golbat",
-        "endpoint": "http://127.0.0.1:9001",
+        "endpoint": "http://{golbat_address}:{golbat_port}",
         "secret": "",
         "useFor": [
           "pokemon",
@@ -62,14 +61,13 @@
         ]
       },
       {
-        "note": "Manual Database generally used for storing nests or portal tables, more info on the Wiki",
+        "note": "Manual Database generally used for storing external nests or portal tables, more info on the Wiki",
         "host": "127.0.0.1",
         "port": 3306,
         "username": "manual_user",
         "password": "manual_pw",
         "database": "manual_db",
         "useFor": [
-          "nest",
           "portal"
         ]
       }
