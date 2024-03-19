@@ -754,7 +754,7 @@
   "locale_instructions_4": "Fork den GitHub-Repo-Link unten",
   "locale_instructions_5": "Erstelle einen neuen Branch und benennen ihn mit der Sprache, die übersetzt werden soll.",
   "locale_instructions_6": "Ersetze den Inhalt von \"packages/locales/lib/human/{{lng}}.json\" durch die heruntergeladene Datei.",
-  "locale_instructions_7": "Erstellen eine neue Pull-Anfrage auf den \"develop\" Branch.",
+  "locale_instructions_7": "Erstellen eine neue Pull Request auf den \"develop\" Branch.",
   "locale_instructions_8": "Warte bis die Pull-Anfrage überprüft und gemerged wurde.",
   "enter_translation": "Übersetzung eingeben",
   "individual_filters": "Teilweise gefiltert"
