@@ -210,7 +210,7 @@ const DropdownOptions = ({
   }
 
   const copyId = () => {
-    setAnchorEl(null)
+    handleClose()
     navigator.clipboard.writeText(id)
   }
 
