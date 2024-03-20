@@ -164,6 +164,7 @@ const DropdownOptions = ({
   raid_level,
 }) => {
   const { t } = useTranslation()
+  const { perms } = useMemory((s) => s.auth)
 
   const { gyms, raids, gymBadges, webhooks } = useMemory((s) => s.auth.perms)
   const gymValidDataLimit = useMemory((s) => s.gymValidDataLimit)
@@ -208,6 +209,11 @@ const DropdownOptions = ({
     })
   }
 
+  const copyId = () => {
+    setAnchorEl(null)
+    navigator.clipboard.writeText(id)
+  }
+
   const options = [{ name: 'hide', action: handleHide }]
 
   if (gyms) {
@@ -249,6 +255,10 @@ const DropdownOptions = ({
       },
       key: 'wehbhook',
     })
+  }
+
+  if (perms.admin) {
+    options.push({ name: 'Copy ID', action: copyId })
   }
 
   return options.filter(Boolean).map((option) => (
