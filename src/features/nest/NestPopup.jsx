@@ -76,12 +76,21 @@ export function NestPopup({
     setDeepStore(`filters.nests.filter.${key}.enabled`, false)
   }
 
+  const copyId = () => {
+    setAnchorEl(null)
+    navigator.clipboard.writeText(id)
+  }
+
   useAnalytics('Popup', `Name: ${name} Pokemon: ${pokemon_id}`, 'Nest')
 
   const options = [
     { name: 'hide', action: handleHide },
     { name: 'exclude', action: handleExclude },
   ]
+
+  if (perms.admin) {
+    options.push({ name: 'Copy ID', action: copyId })
+  }
 
   return (
     <ErrorBoundary noRefresh variant="h5">
