@@ -11,14 +11,48 @@ import { dayCheck } from '@utils/dayCheck'
  * @param {import('@rm/types').Spawnpoint} props
  * @returns
  */
-export function SpawnpointPopup({ despawn_sec, lat, lon, updated }) {
+export function SpawnpointPopup({ id, despawn_sec, lat, lon, updated }) {
   const { t } = useTranslation()
+  const { perms } = useMemory((s) => s.auth)
 
   const minute = despawn_sec > 60 ? Math.round(despawn_sec / 60) : despawn_sec
   const minuteFixed = minute < 10 ? `0${minute}` : minute
 
+  const handleClose = () => {
+    setAnchorEl(null)
+  }
+  
+  const copyId = () => {
+    setAnchorEl(null)
+    navigator.clipboard.writeText(id)
+  }
+
+  const options = []
+
+  if (perms.admin) {
+    options.push({ name: 'Copy ID', action: copyId })
+  }
+
   return (
     <ErrorBoundary noRefresh style={{}} variant="h5">
+      <Menu
+          anchorEl={anchorEl}
+          keepMounted
+          open={!!anchorEl}
+          onClose={handleClose}
+          PaperProps={{
+            style: {
+              maxHeight: 216,
+              minWidth: '20ch',
+            },
+          }}
+        >
+          {options.map((option) => (
+            <MenuItem key={option.key || option.name} onClick={option.action}>
+              {typeof option.name === 'string' ? t(option.name) : option.name}
+            </MenuItem>
+          ))}
+        </Menu>
       <Typography variant="h5" align="center">
         {t('spawnpoint')}
       </Typography>
