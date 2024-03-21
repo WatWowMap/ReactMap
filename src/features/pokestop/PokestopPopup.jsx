@@ -307,7 +307,7 @@ const MenuActions = ({
   invasions,
 }) => {
   const { t } = useTranslation()
-  const { perms } = useMemory((s) => s.auth)
+  const admin = useMemory((s) => s.auth.perms.admin)
   const masterfile = useMemory((s) => s.masterfile)
   const filters = useStorage((s) => s.filters)
 
@@ -466,8 +466,8 @@ const MenuActions = ({
     options.push({ name: 'timer', action: handleTimer })
   }
 
-  if (perms.admin) {
-    options.push({ name: 'Copy ID', action: copyId })
+  if (admin) {
+    options.push({ name: 'copy_id', action: copyId })
   }
 
   return (

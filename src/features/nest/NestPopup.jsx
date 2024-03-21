@@ -50,7 +50,9 @@ export function NestPopup({
   submitted_by = '',
 }) {
   const { t } = useTranslation()
-  const { perms } = useMemory((s) => s.auth)
+
+  const admin = useMemory((s) => s.auth.perms.admin)
+  const nestSubmissions = useMemory((s) => s.auth.perms.nestSubmissions)
 
   const [parkName, setParkName] = React.useState(true)
   const [anchorEl, setAnchorEl] = React.useState(null)
@@ -88,8 +90,8 @@ export function NestPopup({
     { name: 'exclude', action: handleExclude },
   ]
 
-  if (perms.admin) {
-    options.push({ name: 'Copy ID', action: copyId })
+  if (admin) {
+    options.push({ name: 'copy_id', action: copyId })
   }
 
   return (
@@ -188,7 +190,7 @@ export function NestPopup({
             </Typography>
           )}
         </Grid>
-        {perms.nestSubmissions && (
+        {nestSubmissions && (
           <Grid xs={12} textAlign="center">
             <Button
               color="secondary"

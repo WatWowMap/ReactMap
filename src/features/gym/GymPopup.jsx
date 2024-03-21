@@ -164,7 +164,7 @@ const DropdownOptions = ({
   raid_level,
 }) => {
   const { t } = useTranslation()
-  const { perms } = useMemory((s) => s.auth)
+  const admin = useMemory((s) => s.auth.perms.admin)
 
   const { gyms, raids, gymBadges, webhooks } = useMemory((s) => s.auth.perms)
   const gymValidDataLimit = useMemory((s) => s.gymValidDataLimit)
@@ -257,8 +257,8 @@ const DropdownOptions = ({
     })
   }
 
-  if (perms.admin) {
-    options.push({ name: 'Copy ID', action: copyId })
+  if (admin) {
+    options.push({ name: 'copy_id', action: copyId })
   }
 
   return options.filter(Boolean).map((option) => (
