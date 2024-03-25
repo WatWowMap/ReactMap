@@ -79,12 +79,13 @@ function PermCard({ perm }) {
     if (value)
       return (
         <Box
-          height="250px"
+          minHeight="250px"
           sx={{
             background: `url(/${permImageDir}/${perm}.png)`,
-            backgroundSize: 'cover',
+            backgroundSize: 'contain',
             backgroundPosition: 'center',
             backgroundRepeat: 'no-repeat',
+            aspectRatio: '1/1',
           }}
         />
       )
