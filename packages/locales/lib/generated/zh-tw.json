@@ -714,5 +714,20 @@
   "reset_spawnpoints": "重置生成點",
   "reset_submission_cells": "重置提交單元",
   "hisuian": "洗翠",
-  "spacial_rend_range": "空間裂痕範圍"
+  "spacial_rend_range": "空間裂痕範圍",
+  "key": "鑰匙",
+  "ai": "人工智能",
+  "human": "人類",
+  "locales": "地區設定",
+  "instructions": "指南",
+  "locale_instructions_1": "從下拉選單中選擇一種語言",
+  "locale_instructions_2": "在「人類」欄中輸入所需的翻譯",
+  "locale_instructions_3": "點擊「$t(下載)」按鈕下載JSON文件",
+  "locale_instructions_4": "從下方的GitHub儲存庫連接中分支",
+  "locale_instructions_5": "創建一個新分支並將其命名為您正在翻譯的語言",
+  "locale_instructions_6": "用您下載的文件替換「packages/locales/lib/human/{{lng}}.json」中的內容",
+  "locale_instructions_7": "創建一個拉取請求",
+  "locale_instructions_8": "等待拉取請求被審核和合併",
+  "enter_translation": "輸入翻譯",
+  "individual_filters": "部分過濾"
 }

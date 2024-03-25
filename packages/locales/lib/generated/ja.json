@@ -714,5 +714,20 @@
   "reset_spawnpoints": "スポーンポイントをリセット",
   "reset_submission_cells": "提出セルをリセット",
   "hisuian": "ヒスイアン",
-  "spacial_rend_range": "時空のひび割れ範囲"
+  "spacial_rend_range": "時空のひび割れ範囲",
+  "key": "キー",
+  "ai": "AI",
+  "human": "人間",
+  "locales": "ロケール",
+  "instructions": "指示",
+  "locale_instructions_1": "ドロップダウンから言語を選択してください",
+  "locale_instructions_2": "「人間」列に必要な翻訳を入力してください",
+  "locale_instructions_3": "\"$t(download)\"ボタンをクリックしてJSONファイルをダウンロードしてください",
+  "locale_instructions_4": "以下のGitHubリポジトリのリンクをフォークしてください",
+  "locale_instructions_5": "新しいブランチを作成し、翻訳する言語で名前を付けてください",
+  "locale_instructions_6": "ダウンロードしたファイルで\"packages/locales/lib/human/{{lng}}.json\"の内容を置き換えてください",
+  "locale_instructions_7": "プルリクエストを作成してください",
+  "locale_instructions_8": "プルリクエストがレビューされ、マージされるのを待ってください",
+  "enter_translation": "翻訳を入力",
+  "individual_filters": "部分的にフィルターされています"
 }
