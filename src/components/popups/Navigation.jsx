@@ -15,7 +15,9 @@ export function Navigation({ lat, lon, size = 'large' }) {
   const url = useMemory((s) => s.settings.navigation[nav]?.url)
   return (
     <IconButton
-      href={url.replaceAll('{x}', lat.toString()).replaceAll('{y}', lon.toString())}
+      href={url
+        .replaceAll('{x}', lat.toString())
+        .replaceAll('{y}', lon.toString())}
       target="_blank"
       rel="noreferrer"
       size={size}
