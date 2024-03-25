@@ -307,6 +307,7 @@ const MenuActions = ({
   invasions,
 }) => {
   const { t } = useTranslation()
+  const admin = useMemory((s) => s.auth.perms.admin)
   const masterfile = useMemory((s) => s.masterfile)
   const filters = useStorage((s) => s.filters)
 
@@ -352,6 +353,11 @@ const MenuActions = ({
       }
       return { timerList: [...prev.timerList, id] }
     })
+  }
+
+  const copyId = () => {
+    setAnchorEl(null)
+    navigator.clipboard.writeText(id)
   }
 
   const options = [{ name: 'hide', action: handleHide }]
@@ -459,6 +465,11 @@ const MenuActions = ({
     }
     options.push({ name: 'timer', action: handleTimer })
   }
+
+  if (admin) {
+    options.push({ name: 'copy_id', action: copyId })
+  }
+
   return (
     <Grid xs={2} textAlign="right">
       <IconButton aria-haspopup="true" onClick={handleClick} size="large">
