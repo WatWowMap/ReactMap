@@ -907,7 +907,7 @@
     },
     {
       "name": "GeoURI",
-      "url": "geo:{x},{y}"
+      "url": "geo:{x},{y}?q={x},{y}"
     }
   ],
   "icons": {
