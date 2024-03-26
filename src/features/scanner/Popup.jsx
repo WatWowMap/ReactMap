@@ -21,7 +21,7 @@ import { ConfigContext } from './ContextProvider'
  * @param {{ children: React.ReactNode, mode: import('./hooks/store').ScanMode }} props
  * @returns
  */
-export function ScanOnDemandPopup({ children, mode }) {
+export function ScanNextOnDemandPopup({ children, mode }) {
   const { t } = useTranslation()
   const context = React.useContext(ConfigContext)
 
@@ -31,6 +31,30 @@ export function ScanOnDemandPopup({ children, mode }) {
         <StyledListItemText
           className="no-leaflet-margin"
           secondary={t('scan_next_choose')}
+        />
+        <DividerWithMargin />
+        {context.scannerType !== 'mad' && children}
+        {context.showScanCount && <ScanRequests />}
+        {context.showScanQueue && <ScanQueue />}
+        <DividerWithMargin />
+        <ScanConfirm mode={mode} />
+        <InAllowedArea />
+        <ScanCancel mode={mode} />
+      </List>
+    </Popup>
+  )
+}
+
+export function ScanZoneOnDemandPopup({ children, mode }) {
+  const { t } = useTranslation()
+  const context = React.useContext(ConfigContext)
+
+  return (
+    <Popup minWidth={90} maxWidth={200} autoPan={false}>
+      <List>
+        <StyledListItemText
+          className="no-leaflet-margin"
+          secondary={t('scan_zone_choose')}
         />
         <DividerWithMargin />
         {context.scannerType !== 'mad' && children}
