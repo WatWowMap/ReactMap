@@ -5,7 +5,7 @@ import { ScanCircles } from '../Shared'
 import { useCheckValid } from '../hooks/useCheckValid'
 import { ScanZonePopup } from './PopupContent'
 import { ScanOnDemandMarker } from '../Marker'
-import { ScanZoneOnDemandPopup } from '../Popup'
+import { ScanOnDemandPopup } from '../Popup'
 
 /**
  *
@@ -17,9 +17,9 @@ export function ScanZone() {
   return (
     <>
       <ScanOnDemandMarker>
-        <ScanZoneOnDemandPopup mode="scanZone">
+        <ScanOnDemandPopup mode="scanZone">
           <ScanZonePopup />
-        </ScanZoneOnDemandPopup>
+        </ScanOnDemandPopup>
       </ScanOnDemandMarker>
       <ScanCircles />
     </>
