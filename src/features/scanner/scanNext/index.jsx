@@ -5,7 +5,7 @@ import { ScanCircle, ScanCircles } from '../Shared'
 import { useCheckValid } from '../hooks/useCheckValid'
 import { ScanNextPopup } from './PopupContent'
 import { ScanOnDemandMarker } from '../Marker'
-import { ScanNextOnDemandPopup } from '../Popup'
+import { ScanOnDemandPopup } from '../Popup'
 import { useScanStore } from '../hooks/store'
 
 const POKEMON_RADIUS = 70
@@ -22,9 +22,9 @@ export function ScanNext() {
   return (
     <>
       <ScanOnDemandMarker>
-        <ScanNextOnDemandPopup mode="scanNext">
+        <ScanOnDemandPopup mode="scanNext">
           <ScanNextPopup />
-        </ScanNextOnDemandPopup>
+        </ScanOnDemandPopup>
       </ScanOnDemandMarker>
       {scanNextSize === 'M' ? (
         <ScanCircle
