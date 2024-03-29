@@ -92,7 +92,7 @@
       "minCp": {
         "little": 400,
         "great": 1400,
-        "ultra": 2400
+        "ultra": 2350
       }
     },
     "portalUpdateLimit": 30,
