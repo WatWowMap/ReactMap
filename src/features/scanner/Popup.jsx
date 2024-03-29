@@ -30,7 +30,9 @@ export function ScanOnDemandPopup({ children, mode }) {
       <List>
         <StyledListItemText
           className="no-leaflet-margin"
+          secondary={t(
             mode === 'scanZone' ? 'scan_zone_choose' : 'scan_next_choose',
+          )}
         />
         <DividerWithMargin />
         {context.scannerType !== 'mad' && children}
