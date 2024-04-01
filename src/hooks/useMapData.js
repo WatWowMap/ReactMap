@@ -81,6 +81,12 @@ export function useMapData(once = false) {
       if (Audio.checkValid(userAudio)) {
         Audio.setSelection(userAudio)
       }
+      if (icons.overrides) {
+        Icons.setSelection(icons.overrides)
+      }
+      if (audio.overrides) {
+        Audio.setSelection(audio.overrides)
+      }
       useStorage.setState({ icons: Icons.selection, audio: Audio.selection })
       if (masterfile) {
         localStorage.setItem(
