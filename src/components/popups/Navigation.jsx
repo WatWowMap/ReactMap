@@ -7,17 +7,18 @@ import { useMemory } from '@store/useMemory'
 import { useStorage } from '@store/useStorage'
 
 /**
- * @param {{ lat: number, lon: number, size?: import('@mui/material').IconButtonProps['size'] }} props
+ * @param {{ lat?: number, lon?: number, id?: number, size?: import('@mui/material').IconButtonProps['size'] }} props
  * @returns
  */
-export function Navigation({ lat, lon, size = 'large' }) {
+export function Navigation({ lat, lon, id, size = 'large' }) {
   const nav = useStorage((s) => s.settings.navigation)
   const url = useMemory((s) => s.settings.navigation[nav]?.url)
   return (
     <IconButton
       href={url
         .replaceAll('{x}', lat.toString())
-        .replaceAll('{y}', lon.toString())}
+        .replaceAll('{y}', lon.toString())
+        .replaceAll('{id}', id.toString())}
       target="_blank"
       rel="noreferrer"
       size={size}
