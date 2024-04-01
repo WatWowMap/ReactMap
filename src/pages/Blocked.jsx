@@ -25,6 +25,8 @@ export function BlockedPage() {
   const { info } = useParams()
   const navigate = useNavigate()
   const discordInvite = useMemory((s) => s.config?.links?.discordInvite)
+  const roleLink = useMemory((s) => s.config?.links?.rolesLink)
+  const roleLinkName = useMemory((s) => s.config?.links?.rolesLinkName)
   const queryParams = new URLSearchParams(info)
   const blockedGuilds = queryParams.get('blockedGuilds')
   const username = queryParams.get('username')
@@ -96,6 +98,18 @@ export function BlockedPage() {
           >
             {t('go_back')}
           </Button>
+	  {roleLink && roleLinkName && (
+            <Button
+              variant="contained"
+              color="success"
+              target="_blank"
+              href={roleLink}
+              sx={{ color: 'white' }}
+              size="small"
+            >
+              {roleLinkName}
+            </Button>
+          )}
           {discordInvite && (
             <DiscordButton href={discordInvite} size="small">
               {t('join')}
