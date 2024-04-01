@@ -7,7 +7,7 @@ import { useMemory } from '@store/useMemory'
 import { useStorage } from '@store/useStorage'
 
 /**
- * @param {{ lat?: number, lon?: number, id?: number, size?: import('@mui/material').IconButtonProps['size'] }} props
+ * @param {{ lat: number, lon: number, id: number, size?: import('@mui/material').IconButtonProps['size'] }} props
  * @returns
  */
 export function Navigation({ lat, lon, id, size = 'large' }) {
