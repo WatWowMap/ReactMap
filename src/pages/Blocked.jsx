@@ -98,7 +98,7 @@ export function BlockedPage() {
           >
             {t('go_back')}
           </Button>
-	  {roleLink && roleLinkName && (
+          {roleLink && roleLinkName && (
             <Button
               variant="contained"
               color="success"
