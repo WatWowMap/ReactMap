@@ -91,7 +91,7 @@ const Location = () => {
       lc.stop()
       useWebhookStore.setState({ location: [0, 0] })
     },
-    [lc],
+    [],
   )
 
   const fetchedData = data || previousData || { geocoder: [] }
