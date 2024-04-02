@@ -88,7 +88,6 @@ const Location = () => {
 
   React.useEffect(
     () => () => {
-      lc.stop()
       useWebhookStore.setState({ location: [0, 0] })
     },
     [],
