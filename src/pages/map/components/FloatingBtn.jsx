@@ -113,7 +113,7 @@ export function FloatingButtons() {
           break
       }
     },
-    [map],
+    [map, lc],
   )
 
   React.useEffect(() => {
