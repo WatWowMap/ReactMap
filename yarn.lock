@@ -1752,7 +1752,7 @@
     express "^4.18.2"
     passport-strategy "^1.0.0"
 
-"@react-leaflet/core@^2.1.0":
+"@react-leaflet/core@^2", "@react-leaflet/core@^2.1.0":
   version "2.1.0"
   resolved "https://registry.yarnpkg.com/@react-leaflet/core/-/core-2.1.0.tgz#383acd31259d7c9ae8fb1b02d5e18fe613c2a13d"
   integrity sha512-Qk7Pfu8BSarKGqILj4x7bCSZ1pjuAPZ+qmRwH5S7mDS91VSbVVsJSrW4qA+GPrro8t69gFYVMWb1Zc4yFmPiVg==
@@ -2315,6 +2315,13 @@
     "@turf/invariant" "^6.5.0"
     "@turf/line-intersect" "^6.5.0"
     "@turf/meta" "^6.5.0"
+
+"@turtlesocks/react-leaflet.locatecontrol@^0.1.1":
+  version "0.1.1"
+  resolved "https://registry.yarnpkg.com/@turtlesocks/react-leaflet.locatecontrol/-/react-leaflet.locatecontrol-0.1.1.tgz#4e53d752c5dccfe46df76f0c5e1aff7d394b741d"
+  integrity sha512-O1NzVHds9JaIe4NEdzNwraQ1Bt5JCrjGsutd7tLHCVOjWWjJq/MJKgE+26D3cZubHjFUpCEPrIFgXvP6CZvWVQ==
+  dependencies:
+    "@react-leaflet/core" "^2"
 
 "@types/babel__core@^7.20.5":
   version "7.20.5"

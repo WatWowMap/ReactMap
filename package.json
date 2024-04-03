@@ -125,6 +125,7 @@
     "@turf/destination": "^6.5.0",
     "@turf/distance": "^6.5.0",
     "@turf/helpers": "^6.5.0",
+    "@turtlesocks/react-leaflet.locatecontrol": "^0.1.1",
     "bcrypt": "^5.0.1",
     "body-parser": "^1.20.2",
     "chalkercli": "https://github.com/TurtIeSocks/chalkercli.git",

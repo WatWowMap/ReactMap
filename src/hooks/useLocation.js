@@ -28,6 +28,13 @@ export function useLocation() {
       _cleanClasses() {
         setColor('inherit')
       },
+      stop() {
+        if (!this._map) return
+        this._deactivate()
+        this._cleanClasses()
+        this._resetVariables()
+        this._removeMarker()
+      },
       onAdd() {
         const container = DomUtil.create(
           'div',
