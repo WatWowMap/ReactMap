@@ -28,6 +28,10 @@ export function useLocation() {
       _cleanClasses() {
         setColor('inherit')
       },
+      _unload() {
+        this.stop()
+        if (this._map) this._map.off('unload', this._unload, this)
+      },
       stop() {
         if (!this._map) return
         this._deactivate()
