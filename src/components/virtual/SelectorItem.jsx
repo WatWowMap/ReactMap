@@ -54,12 +54,12 @@ export function SelectorItem({
     : 'error.dark'
 
   const handleClick = React.useCallback(() => {
-    const newFilter = { ...filter }
+    const newFilter = { all: false, enabled: false, ...filter }
     // red => green => blue => red
-    if (filter.all && hasAll) {
+    if (newFilter.all && hasAll) {
       newFilter.all = false
       newFilter.enabled = !easyMode
-    } else if (filter.enabled) {
+    } else if (newFilter.enabled) {
       newFilter.enabled = false
     } else {
       if (hasAll) newFilter.all = true
@@ -79,7 +79,7 @@ export function SelectorItem({
 
   const status =
     hasAll && !easyMode
-      ? filter?.all || filter.enabled
+      ? filter?.all || filter?.enabled
         ? filter?.all && filter?.enabled
           ? true
           : null
