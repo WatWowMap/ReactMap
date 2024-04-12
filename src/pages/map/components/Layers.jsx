@@ -1,8 +1,8 @@
 // @ts-check
 import * as React from 'react'
 import { TileLayer, useMap } from 'react-leaflet'
+import { useTranslation } from 'react-i18next'
 import { control } from 'leaflet'
-
 import { useStorage } from '@store/useStorage'
 
 import { useTileLayer } from '../hooks/useTileLayer'
@@ -31,30 +31,42 @@ export function ControlledZoomLayer() {
 }
 
 export function ControlledLocate() {
-  const map = useMap()
+  const { t } = useTranslation()
   const navSetting = useStorage(
     (s) => s.settings.navigationControls === 'leaflet',
   )
+  const metric = useStorage((s) => s.settings.distanceUnit === 'kilometers')
+  const map = useMap()
 
   const lc = React.useMemo(
     () =>
       control.locate({
         position: 'bottomright',
+        metric,
         icon: 'fas fa-crosshairs',
-        keepCurrentZoomLevel: true,
         setView: 'untilPan',
+        keepCurrentZoomLevel: true,
+        locateOptions: { maximumAge: 5000 },
+        strings: {
+          metersUnit: t('lc_metersUnit'),
+          feetUnit: t('lc_feetUnit'),
+          popup: t('lc_popup'),
+          outsideMapBoundsMsg: t('lc_outsideMapBoundsMsg'),
+          title: t('lc_title'),
+        },
       }),
-    [],
+    [metric, navSetting, t],
   )
 
   React.useEffect(() => {
-    if (navSetting) {
+    if (lc && navSetting) {
       lc.addTo(map)
       return () => {
+        lc.stop()
         lc.remove()
       }
     }
-  }, [navSetting, map, lc])
+  }, [lc, navSetting, map])
 
   return null
 }

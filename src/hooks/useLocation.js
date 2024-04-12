@@ -1,19 +1,23 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { LayerGroup, DomEvent, DomUtil, Control } from 'leaflet'
 import { useTranslation } from 'react-i18next'
 import { useMap } from 'react-leaflet'
 import 'leaflet.locatecontrol'
 
+import { useStorage } from '@store/useStorage'
+
 /**
  * Use location hook
  * @returns {{ lc: any, color: import('@mui/material').ButtonProps['color'] }}
  */
-export function useLocation() {
+export function useLocation(dependency = false) {
   const map = useMap()
   const [color, setColor] = useState(
-    /** @type {import('@mui/material').ButtonProps['color']} */ ('inherit'),
+    /** @type {import('@mui/material').ButtonProps['color']} */ ('secondary'),
   )
+  const [requesting, setRequesting] = useState(false)
   const { t } = useTranslation()
+  const metric = useStorage((s) => s.settings.distanceUnit === 'kilometers')
 
   const lc = useMemo(() => {
     const LocateFab = Control.Locate.extend({
@@ -21,9 +25,22 @@ export function useLocation() {
         if (state === 'requesting') setColor('secondary')
         else if (state === 'active') setColor('success')
         else if (state === 'following') setColor('primary')
+        setRequesting(state === 'requesting')
       },
       _cleanClasses() {
-        setColor('inherit')
+        setColor('secondary')
+        setRequesting(false)
+      },
+      _unload() {
+        this.stop()
+        if (this._map) this._map.off('unload', this._unload, this)
+      },
+      stop() {
+        if (!this._map) return
+        this._deactivate()
+        this._cleanClasses()
+        this._resetVariables()
+        this._removeMarker()
       },
       onAdd() {
         const container = DomUtil.create(
@@ -31,9 +48,8 @@ export function useLocation() {
           'react-locate-control leaflet-bar leaflet-control',
         )
         this._container = container
-        this._map = map
         this._layer = this.options.layer || new LayerGroup()
-        this._layer.addTo(map)
+        this._layer.addTo(this._map)
         this._event = undefined
         this._compassHeading = null
         this._prevBounds = null
@@ -66,18 +82,30 @@ export function useLocation() {
     const result = new LocateFab({
       keepCurrentZoomLevel: true,
       setView: 'untilPan',
-      options: {
-        title: t('lc_title'),
+      metric,
+      locateOptions: {
+        maximumAge: 5000,
+      },
+      strings: {
         metersUnit: t('lc_metersUnit'),
         feetUnit: t('lc_feetUnit'),
         popup: t('lc_popup'),
         outsideMapBoundsMsg: t('lc_outsideMapBoundsMsg'),
-        locateOptions: {
-          maximumAge: 5000,
-        },
+        title: t('lc_title'),
       },
-    }).addTo(map)
+    })
     return result
-  }, [map, t])
-  return { lc, color }
+  }, [t, metric])
+
+  useEffect(() => {
+    if (lc) {
+      lc.addTo(map)
+      return () => {
+        lc.stop()
+        lc.remove()
+      }
+    }
+  }, [lc, map, dependency])
+
+  return { lc, requesting, color }
 }

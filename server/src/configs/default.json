@@ -907,7 +907,7 @@
     },
     {
       "name": "GeoURI",
-      "url": "geo:{x},{y}"
+      "url": "geo:{x},{y}?q={x},{y}"
     }
   ],
   "icons": {
@@ -915,6 +915,7 @@
     "customizable": [],
     "styles": [],
     "defaultIcons": {},
+    "overrides": {},
     "cacheHrs": 1,
     "sizes": {
       "device": {
@@ -982,6 +983,7 @@
   "audio": {
     "cacheHrs": 1,
     "defaultAudio": {},
+    "overrides": {},
     "customizable": [],
     "styles": [
       {

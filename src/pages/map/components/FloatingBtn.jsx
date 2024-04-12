@@ -21,6 +21,7 @@ import { useQuery } from '@apollo/client'
 import { useTranslation } from 'react-i18next'
 import { useMap } from 'react-leaflet'
 import { DomEvent } from 'leaflet'
+import CircularProgress from '@mui/material/CircularProgress'
 
 import { FAB_BUTTONS } from '@services/queries/config'
 import { useLocation } from '@hooks/useLocation'
@@ -70,11 +71,11 @@ export function FloatingButtons() {
     fetchPolicy: 'cache-first',
   })
   const map = useMap()
-  const { lc, color } = useLocation()
 
   const reactControls = useStorage(
     (s) => s.settings.navigationControls === 'react',
   )
+  const { lc, requesting, color } = useLocation(reactControls)
 
   const isMobile = useMemory((s) => s.isMobile)
   const online = useMemory((s) => s.online)
@@ -113,7 +114,7 @@ export function FloatingButtons() {
           break
       }
     },
-    [map],
+    [map, lc],
   )
 
   React.useEffect(() => {
@@ -203,12 +204,20 @@ export function FloatingButtons() {
       {reactControls && (
         <>
           <Fab
-            color="secondary"
+            color={color}
             size={fabSize}
             onClick={handleNavBtn('locate')}
             title={t('use_my_location')}
           >
-            <MyLocationIcon color={color} fontSize={iconSize} />
+            {requesting ? (
+              <CircularProgress
+                size={20}
+                thickness={5}
+                sx={{ color: 'white' }}
+              />
+            ) : (
+              <MyLocationIcon fontSize={iconSize} sx={{ color: 'white' }} />
+            )}
           </Fab>
           <Fab
             color="secondary"
