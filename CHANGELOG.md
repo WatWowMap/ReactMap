@@ -1,3 +1,10 @@
+## [1.32.1-develop.1](https://github.com/WatWowMap/ReactMap/compare/v1.32.0...v1.32.1-develop.1) (2024-04-12)
+
+
+### Bug Fixes
+
+* ci ([6b4fa8a](https://github.com/WatWowMap/ReactMap/commit/6b4fa8a5316454d2da32c1999271835f83822a99))
+
 # [1.32.0](https://github.com/WatWowMap/ReactMap/compare/v1.31.0...v1.32.0) (2024-04-12)
 
 
