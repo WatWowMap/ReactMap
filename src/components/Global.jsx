@@ -7,7 +7,6 @@ import { useMemory } from '@store/useMemory'
 
 function ApplyGlobal() {
   const online = useMemory((s) => s.online)
-
   return (
     <GlobalStyles
       styles={(theme) => {
@@ -70,6 +69,7 @@ function ApplyGlobal() {
               duration: theme.transitions.duration.standard,
               easing: theme.transitions.easing.easeInOut,
             }),
+            fontSize: 17,
           },
           '.leaflet-bar a:active, .leaflet-bar a:focus, .leaflet-bar a:hover': {
             backgroundColor: darken(
@@ -77,16 +77,25 @@ function ApplyGlobal() {
               darkMode ? 0.2 : 0.1,
             ),
           },
+          '.leaflet-control-locate.requesting span': {
+            color: theme.palette.text.primary,
+            animation: 'leaflet-control-locate-spin 2s linear infinite',
+          },
+          '.leaflet-control-locate.active a': {
+            color: 'rgb(32, 116, 182)',
+          },
+          '.leaflet-control-locate.active.following a': {
+            color: 'rgb(252, 132, 40)',
+          },
+          '.leaflet-control-locate a .leaflet-control-locate-spinner': {
+            backgroundImage: `url('data:image/svg+xml;charset=UTF-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path fill="${encodeURIComponent(
+              theme.palette.text.primary,
+            )}" d="M304 48a48 48 0 1 1-96 0 48 48 0 0 1 96 0zm-48 368a48 48 0 1 0 0 96 48 48 0 0 0 0-96zm208-208a48 48 0 1 0 0 96 48 48 0 0 0 0-96zM96 256a48 48 0 1 0-96 0 48 48 0 0 0 96 0zm13 99a48 48 0 1 0 0 96 48 48 0 0 0 0-96zm294 0a48 48 0 1 0 0 96 48 48 0 0 0 0-96zM109 61a48 48 0 1 0 0 96 48 48 0 0 0 0-96z"/></svg>')`,
+          },
           '.leaflet-touch .leaflet-control-zoom-in, .leaflet-touch .leaflet-control-zoom-out':
             {
               lineHeight: '25px !important',
             },
-          [theme.breakpoints.down('sm')]: {
-            '.leaflet-touch .leaflet-control-zoom-in, .leaflet-touch .leaflet-control-zoom-out':
-              {
-                lineHeight: '30px !important',
-              },
-          },
           '.leaflet-bar a.leaflet-disabled': {
             backgroundColor: lighten(theme.palette.grey[grey], 0.2),
           },

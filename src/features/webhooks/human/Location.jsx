@@ -119,9 +119,9 @@ const Location = () => {
         <Button
           size="small"
           variant="contained"
-          color="secondary"
+          color={color}
           onClick={() => lc._onClick()}
-          startIcon={<MyLocation color={color} />}
+          startIcon={<MyLocation sx={{ color: 'white' }} />}
         >
           {t('my_location')}
         </Button>

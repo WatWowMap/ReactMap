@@ -6106,10 +6106,10 @@ language-tags@^1.0.9:
   dependencies:
     language-subtag-registry "^0.3.20"
 
-leaflet.locatecontrol@0.73.0:
-  version "0.73.0"
-  resolved "https://registry.yarnpkg.com/leaflet.locatecontrol/-/leaflet.locatecontrol-0.73.0.tgz#768d9edb0470f86c913ea6c2a70ec62380fd45c5"
-  integrity sha512-e6v6SyDU2nzG5AiH80eH7qhXw5J+EfgmEFHkuzTRC9jqCSbfAm/3HlZDuoa9WYsaZbn5ovvqNeaLW/JSMsgg5g==
+leaflet.locatecontrol@0.81.0:
+  version "0.81.0"
+  resolved "https://registry.yarnpkg.com/leaflet.locatecontrol/-/leaflet.locatecontrol-0.81.0.tgz#75e92d07c19edade910a2b5a177ac24cef7d10e7"
+  integrity sha512-5Dqj6VXVFl1vPquYZW95hQYegvzqSI4eLIpZrBMuHuyoAo5i9y6js3z02TF//XXZByIyTI/XBtlxlZLUM08Pcg==
 
 leaflet@1.9.4:
   version "1.9.4"

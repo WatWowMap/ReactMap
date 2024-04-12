@@ -10,11 +10,12 @@ import { useStorage } from '@store/useStorage'
  * Use location hook
  * @returns {{ lc: any, color: import('@mui/material').ButtonProps['color'] }}
  */
-export function useLocation() {
+export function useLocation(dependency = false) {
   const map = useMap()
   const [color, setColor] = useState(
-    /** @type {import('@mui/material').ButtonProps['color']} */ ('inherit'),
+    /** @type {import('@mui/material').ButtonProps['color']} */ ('secondary'),
   )
+  const [requesting, setRequesting] = useState(false)
   const { t } = useTranslation()
   const metric = useStorage((s) => s.settings.distanceUnit === 'kilometers')
 
@@ -24,9 +25,11 @@ export function useLocation() {
         if (state === 'requesting') setColor('secondary')
         else if (state === 'active') setColor('success')
         else if (state === 'following') setColor('primary')
+        setRequesting(state === 'requesting')
       },
       _cleanClasses() {
-        setColor('inherit')
+        setColor('secondary')
+        setRequesting(false)
       },
       _unload() {
         this.stop()
@@ -102,7 +105,7 @@ export function useLocation() {
         lc.remove()
       }
     }
-  }, [lc, map])
+  }, [lc, map, dependency])
 
-  return { lc, color }
+  return { lc, requesting, color }
 }

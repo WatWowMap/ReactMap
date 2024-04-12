@@ -1,9 +1,8 @@
 // @ts-check
 import * as React from 'react'
-import { TileLayer, ZoomControl } from 'react-leaflet'
+import { TileLayer, useMap } from 'react-leaflet'
 import { useTranslation } from 'react-i18next'
-import { LocateControl } from '@turtlesocks/react-leaflet.locatecontrol'
-
+import { control } from 'leaflet'
 import { useStorage } from '@store/useStorage'
 
 import { useTileLayer } from '../hooks/useTileLayer'
@@ -14,10 +13,21 @@ export function ControlledTileLayer() {
 }
 
 export function ControlledZoomLayer() {
+  const map = useMap()
   const navSetting = useStorage(
     (s) => s.settings.navigationControls === 'leaflet',
   )
-  return navSetting ? <ZoomControl position="bottomright" /> : null
+
+  React.useLayoutEffect(() => {
+    if (navSetting) {
+      const zoom = control.zoom({ position: 'bottomright' }).addTo(map)
+      return () => {
+        zoom.remove()
+      }
+    }
+  }, [navSetting, map])
+
+  return null
 }
 
 export function ControlledLocate() {
@@ -26,27 +36,37 @@ export function ControlledLocate() {
     (s) => s.settings.navigationControls === 'leaflet',
   )
   const metric = useStorage((s) => s.settings.distanceUnit === 'kilometers')
+  const map = useMap()
 
-  const strings = React.useMemo(
+  const lc = React.useMemo(
     () =>
-      /** @type {import('@turtlesocks/react-leaflet.locatecontrol').LocateControlProps['strings']} */ ({
-        metersUnit: t('lc_metersUnit'),
-        feetUnit: t('lc_feetUnit'),
-        popup: t('lc_popup'),
-        outsideMapBoundsMsg: t('lc_outsideMapBoundsMsg'),
-        title: t('lc_title'),
+      control.locate({
+        position: 'bottomright',
+        metric,
+        icon: 'fas fa-crosshairs',
+        setView: 'untilPan',
+        keepCurrentZoomLevel: true,
+        locateOptions: { maximumAge: 5000 },
+        strings: {
+          metersUnit: t('lc_metersUnit'),
+          feetUnit: t('lc_feetUnit'),
+          popup: t('lc_popup'),
+          outsideMapBoundsMsg: t('lc_outsideMapBoundsMsg'),
+          title: t('lc_title'),
+        },
       }),
-    [t],
+    [metric, navSetting, t],
   )
-  return navSetting ? (
-    <LocateControl
-      position="bottomright"
-      metric={metric}
-      icon="fas fa-crosshairs"
-      setView="untilPan"
-      keepCurrentZoomLevel
-      locateOptions={{ maximumAge: 5000 }}
-      strings={strings}
-    />
-  ) : null
+
+  React.useEffect(() => {
+    if (lc && navSetting) {
+      lc.addTo(map)
+      return () => {
+        lc.stop()
+        lc.remove()
+      }
+    }
+  }, [lc, navSetting, map])
+
+  return null
 }
