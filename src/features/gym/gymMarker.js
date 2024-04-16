@@ -86,8 +86,9 @@ export function gymMarker({
                   "
                 ></div>
                 ${
-                  badge != '4'
-                    ? `<img
+                  badge == 4
+                    ? ''
+                    : `<img
                     src="${Icons.getMisc(`badge_${badge}`)}"\
                     alt="${badge}"
                     style="
@@ -98,7 +99,6 @@ export function gymMarker({
                       transform: translateX(-50%);
                     "
                   />`
-                    : ''
                 }`
               : /* html */
                 `<img

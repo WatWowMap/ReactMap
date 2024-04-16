@@ -104,7 +104,7 @@ function BadgeTile({ badge, ...gym }) {
           width={120}
         />
         {gym.deleted && <div className="disabled-overlay badge-diamond" />}
-        {badge && (
+        {badge && badge != 4 && (
           <Img
             src={badgeIcon}
             alt={t(`badge_${badge}`)}
