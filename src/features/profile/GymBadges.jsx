@@ -25,7 +25,7 @@ export function UserGymBadges() {
   })
 
   const counts = React.useMemo(() => {
-    const counter = { bronze: 0, silver: 0, gold: 0 }
+    const counter = { basic: 0, bronze: 0, silver: 0, gold: 0 }
 
     if (data?.badges) {
       data.badges.forEach((gym) => {
@@ -53,7 +53,7 @@ export function UserGymBadges() {
       </Typography>
       <Grid container pt={1} pb={2}>
         {Object.entries(counts).map(([key, count], i) => (
-          <Grid key={key} xs={4}>
+          <Grid key={key} xs={3}>
             <Typography
               variant="subtitle2"
               align="center"
@@ -75,7 +75,7 @@ export function UserGymBadges() {
 function BadgeTile({ badge, ...gym }) {
   const { t } = useTranslation()
   const map = useMap()
-  const badgeIcon = useMemory((s) => s.Icons.getMisc(`badge_${badge}`))
+  const badgeIcon = useMemory((s) => s.Icons.getMisc(`badge_${badge - 1}`))
 
   return badge ? (
     <Box className="vgrid-item" minHeight={200}>
@@ -104,7 +104,7 @@ function BadgeTile({ badge, ...gym }) {
           width={120}
         />
         {gym.deleted && <div className="disabled-overlay badge-diamond" />}
-        {badge && badge != 4 && (
+        {badge && badge > 1 && (
           <Img
             src={badgeIcon}
             alt={t(`badge_${badge}`)}

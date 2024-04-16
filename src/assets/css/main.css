@@ -132,7 +132,7 @@ body {
   -moz-box-shadow: 0 0 10px rgba(0, 0, 0, 1);
 }
 
-.badge-1 {
+.badge-2 {
   background: linear-gradient(
     to right,
     #cd7f32,
@@ -142,7 +142,8 @@ body {
     #cd7f32
   );
 }
-.badge-2 {
+
+.badge-3 {
   background: linear-gradient(
     to right,
     #c0c0c0,
@@ -152,7 +153,8 @@ body {
     #c0c0c0
   );
 }
-.badge-3 {
+
+.badge-4 {
   background: linear-gradient(
     to right,
     #bf953f,
@@ -395,15 +397,15 @@ input[type='time']::-webkit-calendar-picker-indicator {
   filter: invert(100%);
 }
 
-.badge_3 {
+.badge_4 {
   color: #ffd700;
 }
 
-.badge_2 {
+.badge_3 {
   color: #c0c0c0;
 }
 
-.badge_1 {
+.badge_2 {
   color: #cd7f32;
 }
 

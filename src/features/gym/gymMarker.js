@@ -86,19 +86,19 @@ export function gymMarker({
                   "
                 ></div>
                 ${
-                  badge == 4
-                    ? ''
-                    : `<img
-                    src="${Icons.getMisc(`badge_${badge}`)}"\
-                    alt="${badge}"
-                    style="
-                      width: 48px;
-                      height: 48px;
-                      bottom: ${2 + gymMod.offsetY}px;
-                      left: ${gymMod.offsetX * 50}%;
-                      transform: translateX(-50%);
-                    "
-                  />`
+                  badge > 1
+                    ? `<img
+                        src="${Icons.getMisc(`badge_${badge - 1}`)}"\
+                        alt="${badge}"
+                        style="
+                          width: 48px;
+                          height: 48px;
+                          bottom: ${2 + gymMod.offsetY}px;
+                          left: ${gymMod.offsetX * 50}%;
+                          transform: translateX(-50%);
+                        "
+                      />`
+                    : ''
                 }`
               : /* html */
                 `<img
