@@ -43,7 +43,7 @@ const GroupTile = ({ children, group, areas }) => {
   )
   if (children.length === 0) return null
   return (
-    <Grid2 container xs={12}>
+    <Grid2 xs={12}>
       {group ? (
         <BasicAccordion
           title={`${group} - ${count} / ${areas.length}`}
