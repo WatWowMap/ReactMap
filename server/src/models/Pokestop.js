@@ -671,7 +671,13 @@ class Pokestop extends Model {
     const filteredResults = []
     for (let i = 0; i < queryResults.length; i += 1) {
       const pokestop = queryResults[i]
-      const filtered = { hasShowcase: pokestop.showcase_expiry > ts }
+      const filtered = {
+        hasShowcase: !!pokestop.invasions?.some(
+          (incident) =>
+            incident.display_type === 9 &&
+            incident.incident_expire_timestamp > ts,
+        ),
+      }
 
       this.fieldAssigner(filtered, pokestop, [
         'id',
