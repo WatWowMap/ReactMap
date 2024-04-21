@@ -259,7 +259,7 @@ export function FloatingButtons() {
             target={icon.target || '_blank'}
             disabled={disabled}
           >
-            <I className={icon.icon} size={iconSize} />
+            <I className={icon.icon} size={iconSize} color="white" />
           </Fab>
         ),
       )}
