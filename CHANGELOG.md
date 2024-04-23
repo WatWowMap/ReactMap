@@ -1,3 +1,10 @@
+# [1.33.0-develop.2](https://github.com/WatWowMap/ReactMap/compare/v1.33.0-develop.1...v1.33.0-develop.2) (2024-04-23)
+
+
+### Bug Fixes
+
+* gym badge counts ([67f3b0d](https://github.com/WatWowMap/ReactMap/commit/67f3b0de9837924b0e6e37645a199f2b0b54e795))
+
 # [1.33.0-develop.1](https://github.com/WatWowMap/ReactMap/compare/v1.32.1-develop.1...v1.33.0-develop.1) (2024-04-21)
 
 
