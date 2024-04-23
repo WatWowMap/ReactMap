@@ -30,14 +30,17 @@ export function UserGymBadges() {
     if (data?.badges) {
       data.badges.forEach((gym) => {
         switch (gym.badge) {
-          case 3:
+          case 4:
             counter.gold += 1
             break
-          case 2:
+          case 3:
             counter.silver += 1
             break
-          case 1:
+          case 2:
             counter.bronze += 1
+            break
+          case 1:
+            counter.basic += 1
             break
           default:
         }
