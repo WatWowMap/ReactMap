@@ -226,7 +226,7 @@ module.exports = class PkmnBackend {
    */
   getRanks(league, data) {
     const filtered =
-      this.mods.onlyAllPvp || this.mods.onlyLegacy
+      this.mods.onlyAllPvp || this.mods.onlyLegacy || this.filter.all
         ? data
         : data.filter((entry) => {
             const valid =
