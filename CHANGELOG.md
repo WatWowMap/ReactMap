@@ -1,3 +1,10 @@
+# [1.33.0-develop.3](https://github.com/WatWowMap/ReactMap/compare/v1.33.0-develop.2...v1.33.0-develop.3) (2024-04-27)
+
+
+### Bug Fixes
+
+* pvp filter in when `all` is set ([2acf75f](https://github.com/WatWowMap/ReactMap/commit/2acf75fb107f2b06f31a9e195b1d3ae158c8368a))
+
 # [1.33.0-develop.2](https://github.com/WatWowMap/ReactMap/compare/v1.33.0-develop.1...v1.33.0-develop.2) (2024-04-23)
 
 
