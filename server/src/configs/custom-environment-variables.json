@@ -1804,6 +1804,7 @@
       "__format": "json"
     },
     "defaultIcons": {},
+    "overrides": {},
     "cacheHrs": {
       "__name": "ICONS_CACHE_HRS",
       "__format": "number"
@@ -1997,6 +1998,7 @@
       "__format": "number"
     },
     "defaultAudio": {},
+    "overrides": {},
     "customizable": {
       "__name": "AUDIO_CUSTOMIZABLE",
       "__format": "json"
