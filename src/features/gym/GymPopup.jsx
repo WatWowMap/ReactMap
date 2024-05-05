@@ -644,7 +644,7 @@ const ExtraGymInfo = ({
   )
 
   const numFormatter = new Intl.NumberFormat(i18n.language)
-  guarding_pokemon_display = guarding_pokemon_display || {}
+  const gpd = guarding_pokemon_display || {}
 
   return (
     <Grid container alignItems="center" justifyContent="center">
@@ -653,12 +653,12 @@ const ExtraGymInfo = ({
           <TextWithIcon
             src={Icons.getPokemon(
               guarding_pokemon_id,
-              guarding_pokemon_display.form,
-              guarding_pokemon_display.temp_evolution,
-              guarding_pokemon_display.gender,
-              guarding_pokemon_display.costume,
-              guarding_pokemon_display.alignment,
-              guarding_pokemon_display.shiny,
+              gpd.form,
+              gpd.temp_evolution,
+              gpd.gender,
+              gpd.costume,
+              gpd.alignment,
+              gpd.shiny,
             )}
           >
             {t(`poke_${guarding_pokemon_id}`)}
