@@ -644,7 +644,7 @@ const ExtraGymInfo = ({
   )
 
   const numFormatter = new Intl.NumberFormat(i18n.language)
-  guarding_pokemon_display ||= {}
+  guarding_pokemon_display = guarding_pokemon_display || {}
 
   return (
     <Grid container alignItems="center" justifyContent="center">
