@@ -28,6 +28,7 @@ const gymFields = [
   'team_id',
   'in_battle',
   'guarding_pokemon_id',
+  'guarding_pokemon_display',
   'total_cp',
   'power_up_points',
   'power_up_level',

@@ -28,6 +28,17 @@ export interface Device {
 
 export type FullDevice = FullModel<Device, DeviceModel>
 
+export interface PokemonDisplay {
+  form: number
+  costume: number
+  gender: number
+  shiny: boolean
+  temp_evolution: number
+  alignment: number
+  badge: number
+  location_card: number
+}
+
 export interface Gym {
   id: string
   lat: number
@@ -41,6 +52,7 @@ export interface Gym {
   raid_pokemon_id: number
   updated: number
   guarding_pokemon_id: number
+  guarding_pokemon_display: PokemonDisplay
   available_slots: number
   team_id: number
   raid_level: number
