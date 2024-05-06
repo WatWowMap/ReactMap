@@ -370,7 +370,10 @@ class Gym extends Model {
           if (gym.updated > ts - gymValidDataLimit * 86400) {
             gymFields.forEach((field) => (newGym[field] = gym[field]))
           }
-          if (gym.guarding_pokemon_display !== undefined) {
+          if (
+            gym.guarding_pokemon_display !== undefined &&
+            gym.guarding_pokemon_display !== null
+          ) {
             gym.guarding_pokemon_display = JSON.parse(
               gym.guarding_pokemon_display,
             )
