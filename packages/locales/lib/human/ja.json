@@ -1,1 +1,26 @@
-{}
+{
+    "locale_selection": "言語選択",
+    "invasions": "ロケット団",
+    "total_cp": "合計CP",
+    "selected": "選択済み",
+    "alt_forms": "他のフォルム",
+    "wayfarer_options": "Wayfarerオプション",
+    "raid_timers": "レイドタイマー",
+    "invasion_timers": "ロケット団タイマー",
+    "lure_timers": "ルアータイマー",
+    "candy": "アメ",
+    "invasion": "ロケット団",
+    "nest": "巣",
+    "stardust": "ほしのすな",
+    "all_gyms": "全てのジム",
+    "event_stops_subtitle": "カクレオンのような特別なイベントポケストップを表示",
+    "rocket_pokemon": "シャドウポケモン",
+    "showcase": "おひろめ",
+    "contribute": "貢献",
+    "level_circles": "レベルインジケータ",
+    "showcase_rankings": "おひろめランキング",
+    "showcase_rankings_subtitle": "ポケストップのおひろめのトップランキングのリストを表示",
+    "hisuian": "ヒスイ",
+    "spacial_rend_range": "あくうせつだんの範囲",
+    "individual_filters": "部分的にフィルターされています"
+}
