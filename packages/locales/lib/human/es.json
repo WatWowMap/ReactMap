@@ -615,5 +615,6 @@
   "show_editor": "Mostrar Editor",
   "hide_editor": "Ocultar Editor",
   "reported_error": "Este error ha sido reportado al servidor con el identificador",
-  "dark_mode": "Modo Oscuro"
+  "dark_mode": "Modo Oscuro",
+  "copy_id": "Copiar ID"
 }
