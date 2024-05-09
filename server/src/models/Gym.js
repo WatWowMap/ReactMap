@@ -371,10 +371,10 @@ class Gym extends Model {
             gymFields.forEach((field) => (newGym[field] = gym[field]))
           }
           if (
-            gym.guarding_pokemon_display !== undefined &&
-            gym.guarding_pokemon_display !== null
+            typeof gym.guarding_pokemon_display === 'string' &&
+            gym.guarding_pokemon_display
           ) {
-            gym.guarding_pokemon_display = JSON.parse(
+            newGym.guarding_pokemon_display = JSON.parse(
               gym.guarding_pokemon_display,
             )
           }
