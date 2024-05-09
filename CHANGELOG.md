@@ -1,3 +1,20 @@
+# [1.33.0-develop.4](https://github.com/WatWowMap/ReactMap/compare/v1.33.0-develop.3...v1.33.0-develop.4) (2024-05-09)
+
+
+### Bug Fixes
+
+* add JSON.parse as requested ([cadf5e9](https://github.com/WatWowMap/ReactMap/commit/cadf5e98accef4bc5ba3cd7dea65fefbbd8872ec))
+* add temp_evo to display as well ([02ce747](https://github.com/WatWowMap/ReactMap/commit/02ce747811a4c8ac3d505403e95ee475da1e234d))
+* assign to the correct object ([fffb64f](https://github.com/WatWowMap/ReactMap/commit/fffb64f164cc7ae13e8a70ea5ab7673e4f89e30b))
+* fix nullability as requested ([9e6692a](https://github.com/WatWowMap/ReactMap/commit/9e6692af8f75d145fe776154460652ea481d642d))
+* new variable just4u ([6fdc152](https://github.com/WatWowMap/ReactMap/commit/6fdc15267734fd247d98ebde4a38b4bac902e99d))
+* tyie ([0634d89](https://github.com/WatWowMap/ReactMap/commit/0634d8959a3543933a3f31e0817589c53e68272a))
+
+
+### Features
+
+* add support for guarding_pokemon_display ([0579fc4](https://github.com/WatWowMap/ReactMap/commit/0579fc451f48795aa41f7253cb17592aa669ed31))
+
 # [1.33.0-develop.3](https://github.com/WatWowMap/ReactMap/compare/v1.33.0-develop.2...v1.33.0-develop.3) (2024-04-27)
 
 
