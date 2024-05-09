@@ -634,6 +634,7 @@ const ExtraGymInfo = ({
   updated,
   total_cp,
   guarding_pokemon_id,
+  guarding_pokemon_display,
 }) => {
   const { t, i18n } = useTranslation()
   const Icons = useMemory((s) => s.Icons)
@@ -643,12 +644,23 @@ const ExtraGymInfo = ({
   )
 
   const numFormatter = new Intl.NumberFormat(i18n.language)
+  const gpd = guarding_pokemon_display || {}
 
   return (
     <Grid container alignItems="center" justifyContent="center">
       {!!guarding_pokemon_id && updated > gymValidDataLimit && (
         <ExtraInfo title="defender">
-          <TextWithIcon src={Icons.getPokemon(guarding_pokemon_id)}>
+          <TextWithIcon
+            src={Icons.getPokemon(
+              guarding_pokemon_id,
+              gpd.form,
+              gpd.temp_evolution,
+              gpd.gender,
+              gpd.costume,
+              gpd.alignment,
+              gpd.shiny,
+            )}
+          >
             {t(`poke_${guarding_pokemon_id}`)}
           </TextWithIcon>
         </ExtraInfo>
