@@ -622,6 +622,19 @@ const GymFooter = ({ lat, lon, hasRaid }) => {
   )
 }
 
+const BestBuddyBadge = () => {
+  const { t } = useTranslation()
+  const Icons = useMemory((s) => s.Icons)
+  return (
+    <Img
+      src={Icons.getMisc('bestbuddy')}
+      alt={t('best_buddy')}
+      maxHeight="15"
+      maxWidth="15"
+    />
+  )
+}
+
 /**
  *
  * @param {import('@rm/types').Gym} props
@@ -661,6 +674,7 @@ const ExtraGymInfo = ({
               gpd.shiny,
             )}
           >
+            {gpd.badge === 1 && BestBuddyBadge()}
             {t(`poke_${guarding_pokemon_id}`)}
           </TextWithIcon>
         </ExtraInfo>
