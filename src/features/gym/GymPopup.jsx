@@ -644,6 +644,7 @@ const ExtraGymInfo = ({
   )
 
   const numFormatter = new Intl.NumberFormat(i18n.language)
+  /** @type {Partial<import('@rm/types').PokemonDisplay>} */
   const gpd = guarding_pokemon_display || {}
 
   return (
@@ -661,6 +662,17 @@ const ExtraGymInfo = ({
               gpd.shiny,
             )}
           >
+            {gpd.badge === 1 && (
+              <>
+                <Img
+                  src={Icons.getMisc('bestbuddy')}
+                  alt={t('best_buddy')}
+                  maxHeight={15}
+                  maxWidth={15}
+                />
+                &nbsp;
+              </>
+            )}
             {t(`poke_${guarding_pokemon_id}`)}
           </TextWithIcon>
         </ExtraInfo>
