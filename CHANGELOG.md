@@ -1,3 +1,18 @@
+# [1.33.0-develop.6](https://github.com/WatWowMap/ReactMap/compare/v1.33.0-develop.5...v1.33.0-develop.6) (2024-05-11)
+
+
+### Bug Fixes
+
+* add &nbsp; ([0cd5f0f](https://github.com/WatWowMap/ReactMap/commit/0cd5f0f3fc77464b6a175e277ef5fe6341c72b42))
+* add type to gpd object ([0501b8d](https://github.com/WatWowMap/ReactMap/commit/0501b8d8c531a46cc794760291b8a81f9240eea4))
+* no more react components ([1469280](https://github.com/WatWowMap/ReactMap/commit/1469280d98c2c530ec008b9555e02cd891ba7228))
+* use number instead ([38c3542](https://github.com/WatWowMap/ReactMap/commit/38c3542e4faff6507b3273cb68dee59e4fac064a))
+
+
+### Features
+
+* support displaying best buddy badge in gym defenders ([5f53b8f](https://github.com/WatWowMap/ReactMap/commit/5f53b8f512539a971a9ffbe1c3561e40a901b660))
+
 # [1.33.0-develop.5](https://github.com/WatWowMap/ReactMap/compare/v1.33.0-develop.4...v1.33.0-develop.5) (2024-05-11)
 
 
