@@ -5,7 +5,7 @@ const passport = require('passport')
 const config = require('@rm/config')
 
 const { log, HELPERS } = require('@rm/logger')
-const { Db } = require('./initialization')
+const { Db, Event } = require('./initialization')
 const areaPerms = require('./functions/areaPerms')
 const webhookPerms = require('./functions/webhookPerms')
 const scannerPerms = require('./functions/scannerPerms')
@@ -139,6 +139,9 @@ class TelegramClient {
         .findOne({ telegramId: user.id })
         .then(
           async (/** @type {import('@rm/types').FullUser} */ userExists) => {
+            const selectedWebhook = Object.keys(Event.webhookObj).find((x) =>
+              user?.perms?.webhooks.includes(x),
+            )
             if (req.user && userExists?.strategy === 'local') {
               await Db.models.User.query()
                 .update({
@@ -158,6 +161,7 @@ class TelegramClient {
                 'Authenticated successfully.',
               )
               return done(null, {
+                selectedWebhook,
                 ...user,
                 ...req.user,
                 username: userExists.username || user.username,
@@ -170,6 +174,7 @@ class TelegramClient {
                 telegramId: user.id,
                 strategy: user.provider,
                 tutorial: !config.getSafe('map.misc.forceTutorial'),
+                selectedWebhook,
               })
             }
             if (userExists.strategy !== 'telegram') {
@@ -177,6 +182,12 @@ class TelegramClient {
                 .update({ strategy: 'telegram' })
                 .where('id', userExists.id)
               userExists.strategy = 'telegram'
+            }
+            if (!userExists.selectedWebhook && selectedWebhook) {
+              await Db.models.User.query()
+                .update({ selectedWebhook })
+                .where('id', userExists.id)
+              userExists.selectedWebhook = selectedWebhook
             }
             log.info(
               HELPERS.custom(this.rmStrategy, '#26A8EA'),
