@@ -1,3 +1,10 @@
+# [1.33.0-develop.7](https://github.com/WatWowMap/ReactMap/compare/v1.33.0-develop.6...v1.33.0-develop.7) (2024-05-11)
+
+
+### Bug Fixes
+
+* update uicons lib ([8c82e8d](https://github.com/WatWowMap/ReactMap/commit/8c82e8dfe93f3341fdf76a8b925dda02e3519a1f))
+
 # [1.33.0-develop.6](https://github.com/WatWowMap/ReactMap/compare/v1.33.0-develop.5...v1.33.0-develop.6) (2024-05-11)
 
 
