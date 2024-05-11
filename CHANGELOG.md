@@ -1,3 +1,10 @@
+# [1.33.0-develop.5](https://github.com/WatWowMap/ReactMap/compare/v1.33.0-develop.4...v1.33.0-develop.5) (2024-05-11)
+
+
+### Bug Fixes
+
+* possible fix edgecase scenario for missing `selectedWebhook` ([5f8d1c9](https://github.com/WatWowMap/ReactMap/commit/5f8d1c9a2ade62959894f1dda6d71e8d659aeefa))
+
 # [1.33.0-develop.4](https://github.com/WatWowMap/ReactMap/compare/v1.33.0-develop.3...v1.33.0-develop.4) (2024-05-09)
 
 
