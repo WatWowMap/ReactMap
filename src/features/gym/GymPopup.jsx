@@ -644,6 +644,7 @@ const ExtraGymInfo = ({
   )
 
   const numFormatter = new Intl.NumberFormat(i18n.language)
+  /** @type {Partial<import('@rm/types').PokemonDisplay>} */
   const gpd = guarding_pokemon_display || {}
 
   return (
