@@ -665,8 +665,8 @@ const ExtraGymInfo = ({
               <Img
                 src={Icons.getMisc('bestbuddy')}
                 alt={t('best_buddy')}
-                maxHeight="15"
-                maxWidth="15"
+                maxHeight={15}
+                maxWidth={15}
               />
             )}
             {t(`poke_${guarding_pokemon_id}`)}
