@@ -1001,6 +1001,10 @@
         "__name": "DEFAULT_FILTERS_POKESTOPS_CANDY",
         "__format": "boolean"
       },
+      "xlCandy": {
+        "__name": "DEFAULT_FILTERS_POKESTOPS_XL_CANDY",
+        "__format": "boolean"
+      },
       "pokemon": {
         "__name": "DEFAULT_FILTERS_POKESTOPS_POKEMON",
         "__format": "boolean"
