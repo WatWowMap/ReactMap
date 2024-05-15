@@ -730,5 +730,6 @@
   "locale_instructions_7": "Создайте запрос на слияние",
   "locale_instructions_8": "Ожидайте, пока ваш запрос на слияние будет рассмотрен и смержен",
   "enter_translation": "Введите перевод",
-  "individual_filters": "Частичная фильтрация"
+  "individual_filters": "Частичная фильтрация",
+  "best_buddy": "Лучший друг"
 }

@@ -730,5 +730,6 @@
   "locale_instructions_7": "創建一個拉取請求",
   "locale_instructions_8": "等待拉取請求被審核和合併",
   "enter_translation": "輸入翻譯",
-  "individual_filters": "部分過濾"
+  "individual_filters": "部分過濾",
+  "best_buddy": "最佳夥伴"
 }
