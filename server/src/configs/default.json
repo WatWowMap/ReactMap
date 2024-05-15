@@ -485,6 +485,7 @@
       "items": true,
       "megaEnergy": true,
       "candy": true,
+      "xlCandy": true,
       "pokemon": true,
       "invasions": false,
       "allInvasions": true,

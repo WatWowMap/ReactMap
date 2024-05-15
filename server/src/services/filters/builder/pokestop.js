@@ -1,4 +1,6 @@
 // @ts-check
+const { log, HELPERS } = require('@rm/logger')
+
 const BaseFilter = require('../Base')
 const { Event, Db } = require('../../initialization')
 
@@ -56,12 +58,32 @@ function buildPokestops(perms, defaults) {
     if (perms.quests) {
       if (avail.startsWith('q')) {
         quests[avail] = new BaseFilter(defaults.items)
-      }
-      if (avail.startsWith('d')) {
+      } else if (avail.startsWith('d')) {
         quests[avail] = new BaseFilter(defaults.stardust.enabled)
-      }
-      if (avail.startsWith('u')) {
+      } else if (avail.startsWith('u')) {
         quests[avail] = new BaseFilter(defaults.rewardTypes)
+      } else if (avail.startsWith('p')) {
+        quests[avail] = new BaseFilter(defaults.xp.enabled)
+      } else if (avail.startsWith('c')) {
+        quests[avail] = new BaseFilter(defaults.candy)
+      } else if (avail.startsWith('x')) {
+        quests[avail] = new BaseFilter(defaults.xlCandy)
+      } else if (avail.startsWith('m')) {
+        quests[avail] = new BaseFilter(defaults.megaEnergy)
+      } else if (
+        !avail.startsWith('i') &&
+        !avail.startsWith('l') &&
+        !avail.startsWith('a') &&
+        !avail.startsWith('b') &&
+        !avail.startsWith('f') &&
+        !avail.startsWith('h') &&
+        !Number.isInteger(+avail.charAt(0))
+      ) {
+        log.warn(
+          HELPERS.available,
+          `Unknown quest type: ${avail} probably should open a PR or issue`,
+        )
+        quests[avail] = new BaseFilter(true)
       }
     }
     if (perms.invasions) {
