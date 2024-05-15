@@ -7,7 +7,7 @@ const passport = require('passport')
 const config = require('@rm/config')
 
 const { log, HELPERS } = require('@rm/logger')
-const { Db } = require('./initialization')
+const { Db, Event } = require('./initialization')
 const logUserAuth = require('./logUserAuth')
 const areaPerms = require('./functions/areaPerms')
 const webhookPerms = require('./functions/webhookPerms')
@@ -311,6 +311,9 @@ class DiscordClient {
         .findOne(req.user ? { id: req.user.id } : { discordId: discordUser.id })
         .then(
           async (/** @type {import('@rm/types').FullUser} */ userExists) => {
+            const selectedWebhook = Object.keys(Event.webhookObj).find((x) =>
+              discordUser?.perms?.webhooks.includes(x),
+            )
             if (req.user && userExists?.strategy === 'local') {
               await Db.models.User.query()
                 .update({
@@ -343,6 +346,7 @@ class DiscordClient {
                 .whereNot('id', req.user.id)
                 .delete()
               return done(null, {
+                selectedWebhook,
                 ...discordUser,
                 ...req.user,
                 username: userExists.username || discordUser.username,
@@ -350,11 +354,13 @@ class DiscordClient {
                 perms: mergePerms(req.user.perms, discordUser.perms),
               })
             }
+
             if (!userExists) {
               userExists = await Db.models.User.query().insertAndFetch({
                 discordId: discordUser.id,
                 strategy: 'discord',
                 tutorial: !config.getSafe('map.misc.forceTutorial'),
+                selectedWebhook,
               })
             }
             if (userExists.strategy !== 'discord') {
@@ -362,6 +368,12 @@ class DiscordClient {
                 .update({ strategy: 'discord' })
                 .where('id', userExists.id)
               userExists.strategy = 'discord'
+            }
+            if (!userExists.selectedWebhook && selectedWebhook) {
+              await Db.models.User.query()
+                .update({ selectedWebhook })
+                .where('id', userExists.id)
+              userExists.selectedWebhook = selectedWebhook
             }
             return done(null, {
               ...discordUser,

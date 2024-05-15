@@ -1,6 +1,6 @@
 {
   "name": "reactmap",
-  "version": "1.32.0",
+  "version": "1.33.0-develop.7",
   "private": true,
   "description": "React based frontend map.",
   "license": "MIT",
@@ -155,7 +155,7 @@
     "lodash": "^4.17.21",
     "moment-timezone": "^0.5.43",
     "morgan": "^1.10.0",
-    "mysql2": "^3.4.0",
+    "mysql2": "^3.9.7",
     "node-cache": "^5.1.2",
     "node-fetch": "2.6.7",
     "node-geocoder": "^4.2.0",
@@ -176,7 +176,7 @@
     "source-map": "^0.7.4",
     "suncalc": "^1.9.0",
     "supercluster": "^8.0.1",
-    "uicons.js": "^1.1.1",
+    "uicons.js": "^1.1.4",
     "zustand": "4.4.6"
   },
   "devDependencies": {
