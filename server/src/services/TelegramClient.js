@@ -112,10 +112,28 @@ class TelegramClient {
         areaRestrictions: areaPerms(groups),
         webhooks: webhookPerms(groups, 'telegramGroups', trialActive),
         scanner: scannerPerms(groups, 'telegramGroups', trialActive),
+        scannerCooldowns: {},
       },
     }
     if (this.strategy.allowedUsers?.includes(newUserObj.id)) {
       newUserObj.perms.admin = true
+      Object.keys(newUserObj.perms.scanner).forEach((x) => {
+        newUserObj.perms.scannerCooldowns[x] = 0
+      })
+    } else {
+      const scanner = config.getSafe('scanner')
+
+      Object.keys(newUserObj.perms.scanner).forEach((mode) => {
+        newUserObj.perms.scannerCooldowns[mode] = scanner[mode].rules.reduce(
+          (acc, rule) => {
+            if (rule.cooldown < acc) {
+              return rule.cooldown
+            }
+            return acc
+          },
+          scanner[mode].userCooldownSeconds,
+        )
+      })
     }
     return newUserObj
   }

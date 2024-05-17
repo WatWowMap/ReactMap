@@ -340,6 +340,14 @@ if (Array.isArray(config.webhooks)) {
 }
 Object.keys(config.scanner || {}).forEach((key) => {
   config.scanner[key] = replaceBothAliases(config.scanner[key] || {})
+  config.scanner[key]?.rules?.forEach((rule) => {
+    rule.role = replaceAliases(rule.role)
+  })
+  if (config.scanner[key]?.rules) {
+    config.scanner[key].rulesObj = Object.fromEntries(
+      config.scanner[key]?.rules?.map((rule) => [rule.role, rule.cooldown]),
+    )
+  }
 })
 
 if (
