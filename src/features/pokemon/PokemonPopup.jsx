@@ -437,7 +437,7 @@ const Footer = ({ pokemon, popups, hasPvp, Icons }) => {
         </Grid>
       )}
       <Grid xs={4} textAlign="center">
-        <Navigation lat={lat} lon={lon} />
+        <Navigation lat={lat} lon={lon} id={pokemon.id} />
       </Grid>
       <Grid xs={4}>
         <IconButton
