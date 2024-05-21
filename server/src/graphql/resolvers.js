@@ -384,7 +384,9 @@ const resolvers = {
               gymRadius: scanner.scanZone.scanZoneRadius.gym,
               spacing: scanner.scanZone.scanZoneSpacing,
               maxSize: scanner.scanZone.scanZoneMaxSize,
-              cooldown: scanner.scanZone.userCooldownSeconds,
+              cooldown:
+                perms?.scannerCooldowns?.[mode] ??
+                scanner.scanZone.userCooldownSeconds,
               refreshQueue: scanner.backendConfig.queueRefreshInterval,
               enabled: scanner[mode].enabled,
             }
@@ -392,7 +394,9 @@ const resolvers = {
               scannerType: scanner.backendConfig.platform,
               showScanCount: scanner.scanNext.showScanCount,
               showScanQueue: scanner.scanNext.showScanQueue,
-              cooldown: scanner.scanNext.userCooldownSeconds,
+              cooldown:
+                perms?.scannerCooldowns?.[mode] ??
+                scanner.scanNext.userCooldownSeconds,
               refreshQueue: scanner.backendConfig.queueRefreshInterval,
               enabled: scanner[mode].enabled,
             }
@@ -597,11 +601,11 @@ const resolvers = {
         (!req.session.cooldown || req.session.cooldown < Date.now())
       ) {
         const validCoords = getValidCoords(category, data?.scanCoords, perms)
-
+        const cooldownSeconds =
+          perms?.scannerCooldowns?.[category] ||
+          config.getSafe(`scanner.${category}.userCooldownSeconds`)
         const cooldown =
-          config.getSafe(`scanner.${category}.userCooldownSeconds`) *
-            validCoords.filter(Boolean).length *
-            1000 +
+          cooldownSeconds * validCoords.filter(Boolean).length * 1000 +
           Date.now()
         req.session.cooldown = cooldown
         return scannerApi(
