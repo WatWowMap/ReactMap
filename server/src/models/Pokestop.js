@@ -864,8 +864,11 @@ class Pokestop extends Model {
                 fields.push('candy_pokemon_id', 'candy_amount')
                 break
               case 7:
-                quest.quest_form_id = quest.quest_form_id ?? 0
-                newQuest.key = `${quest.quest_pokemon_id}-${quest.quest_form_id}`
+                newQuest.key =
+                  quest.quest_form_id === undefined ||
+                  quest.quest_form_id === null
+                    ? `${quest.quest_pokemon_id}`
+                    : `${quest.quest_pokemon_id}-${quest.quest_form_id}`
                 fields.push(
                   'quest_pokemon_id',
                   'quest_form_id',
@@ -1545,7 +1548,9 @@ class Pokestop extends Model {
         default:
           rewards.forEach((reward) =>
             process(
-              `${reward.quest_pokemon_id}-${reward.form ?? 0}`,
+              reward.form === undefined || reward.form === null
+                ? `${reward.quest_pokemon_id}`
+                : `${reward.quest_pokemon_id}-${reward.form}`,
               reward.quest_title,
               reward.quest_target,
             ),
