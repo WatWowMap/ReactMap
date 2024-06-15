@@ -23,6 +23,10 @@
     "skipMinified": {
       "__name": "DEV_OPTIONS_SKIP_MINIFIED",
       "__format": "boolean"
+    },
+    "skipUpdateCheck": {
+      "__name": "DEV_OPTIONS_SKIP_UPDATE_CHECK",
+      "__format": "boolean"
     }
   },
   "api": {
