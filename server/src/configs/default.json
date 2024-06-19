@@ -482,6 +482,8 @@
       "showcasePokemon": true,
       "questSet": "both",
       "confirmed": false,
+      "excludeGrunts": false,
+      "excludeLeaders": false,
       "items": true,
       "megaEnergy": true,
       "candy": true,

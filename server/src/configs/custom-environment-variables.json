@@ -989,6 +989,14 @@
         "__name": "DEFAULT_FILTERS_POKESTOPS_CONFIRMED",
         "__format": "boolean"
       },
+      "excludeGrunts": {
+        "__name": "DEFAULT_FILTERS_POKESTOPS_EXCLUDE_GRUNTS",
+        "__format": "boolean"
+      },
+      "excludeLeaders": {
+        "__name": "DEFAULT_FILTERS_POKESTOPS_EXCLUDE_LEADERS",
+        "__format": "boolean"
+      },
       "items": {
         "__name": "DEFAULT_FILTERS_POKESTOPS_ITEMS",
         "__format": "boolean"
