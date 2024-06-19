@@ -730,5 +730,6 @@
   "locale_instructions_7": "プルリクエストを作成してください",
   "locale_instructions_8": "プルリクエストがレビューされ、マージされるのを待ってください",
   "enter_translation": "翻訳を入力",
-  "individual_filters": "部分的にフィルターされています"
+  "individual_filters": "部分的にフィルターされています",
+  "best_buddy": "最高の相棒"
 }

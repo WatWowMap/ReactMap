@@ -155,7 +155,7 @@
     "lodash": "^4.17.21",
     "moment-timezone": "^0.5.43",
     "morgan": "^1.10.0",
-    "mysql2": "^3.9.7",
+    "mysql2": "^3.9.8",
     "node-cache": "^5.1.2",
     "node-fetch": "2.6.7",
     "node-geocoder": "^4.2.0",
