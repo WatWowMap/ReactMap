@@ -579,11 +579,17 @@ class Pokestop extends Model {
                 }
               })
               if (onlyExcludeGrunts) {
-                invasion.whereNotIn('character', rocketGruntIDs)
+                invasion.whereNotIn(
+                  isMad ? 'character_display' : 'character',
+                  rocketGruntIDs
+                )
               }
           
               if (onlyExcludeLeaders) {
-                invasion.whereNotIn('character', rocketLeaderIDs)
+                invasion.whereNotIn(
+                  isMad ? 'character_display' : 'character',
+                  rocketLeaderIDs
+                )
               }
             })
           } else {
@@ -605,11 +611,17 @@ class Pokestop extends Model {
                 invasion.andWhere('confirmed', onlyConfirmed)
               }
               if (onlyExcludeGrunts) {
-                invasion.whereNotIn('character', rocketGruntIDs)
+                invasion.whereNotIn(
+                  isMad ? 'character_display' : 'character',
+                  rocketGruntIDs
+                )
               }
           
               if (onlyExcludeLeaders) {
-                invasion.whereNotIn('character', rocketLeaderIDs)
+                invasion.whereNotIn(
+                  isMad ? 'character_display' : 'character',
+                  rocketLeaderIDs
+                )
               }
             })
           }
