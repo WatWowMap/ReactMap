@@ -1,3 +1,10 @@
+# [1.33.0-develop.8](https://github.com/WatWowMap/ReactMap/compare/v1.33.0-develop.7...v1.33.0-develop.8) (2024-06-19)
+
+
+### Bug Fixes
+
+* avail quest filters ([fb4498e](https://github.com/WatWowMap/ReactMap/commit/fb4498e94f25f670cbac5e16f1878bac2985cf51))
+
 # [1.33.0-develop.7](https://github.com/WatWowMap/ReactMap/compare/v1.33.0-develop.6...v1.33.0-develop.7) (2024-05-11)
 
 
