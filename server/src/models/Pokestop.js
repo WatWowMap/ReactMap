@@ -852,8 +852,10 @@ class Pokestop extends Model {
                 fields.push('candy_pokemon_id', 'candy_amount')
                 break
               case 7:
-                quest.quest_form_id = quest.quest_form_id ?? 0
-                newQuest.key = `${quest.quest_pokemon_id}-${quest.quest_form_id}`
+                newQuest.key =
+                  quest.quest_form_id === null
+                    ? `${quest.quest_pokemon_id}`
+                    : `${quest.quest_pokemon_id}-${quest.quest_form_id}`
                 fields.push(
                   'quest_pokemon_id',
                   'quest_form_id',
