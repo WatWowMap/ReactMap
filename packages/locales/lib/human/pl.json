@@ -395,6 +395,8 @@
   "online": "Online",
   "only_available": "Dostępne",
   "only_confirmed": "Tylko potwierdzone",
+  "only_exclude_grunts": "Wykluczyć chrząknięcia",
+  "only_exclude_leaders": "Wykluczyć liderów",
   "only_global": "Tylko globalne",
   "only_show_available": "Pokaż tylko dostępne",
   "opacity_five_minutes": "Przezroczystość po 5 minutach",

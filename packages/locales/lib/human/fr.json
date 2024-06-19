@@ -571,6 +571,8 @@
   "delete": "Supprimer",
   "name": "Nom",
   "only_confirmed": "Confirmé seulement",
+  "only_exclude_grunts": "Exclure les grognements",
+  "only_exclude_leaders": "Exclure les dirigeants",
   "rocket_pokemon": "Pokémon Rocket",
   "decoy": "Leurre",
   "s2_cell_limit_0": "Vous avez essayé de générer plus de 20 000 cellules ({{variable_0}})",

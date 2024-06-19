@@ -615,6 +615,8 @@
   "delete": "Delete",
   "name": "Name",
   "only_confirmed": "Only Confirmed",
+  "only_exclude_grunts": "Exclude  Grunts",
+  "only_exclude_leaders": "Exclude Leaders",
   "rocket_pokemon": "Rocket Pokémon",
   "decoy": "Decoy",
   "s2_cell_limit_0": "You attempted to generate more than 20,000 cells ({{variable_0}})",
