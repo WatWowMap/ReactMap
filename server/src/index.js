@@ -36,7 +36,7 @@ require('./services/watcher')
 
 Event.clients = Clients
 
-if (!config.has('devOptions.skipUpdateCheck')) {
+if (!config.getSafe('devOptions.skipUpdateCheck')) {
   require('./services/checkForUpdates')
 }
 
