@@ -24,6 +24,16 @@ const BaseInvasion = () => {
           label="only_confirmed"
         />
       )}
+      <BoolToggle
+        inset
+        field="filters.pokestops.excludeGrunts"
+        label="only_exclude_grunts"
+      />
+      <BoolToggle
+        inset
+        field="filters.pokestops.excludeLeaders"
+        label="only_exclude_leaders"
+      />
       {confirmedEnabled || hasConfirmed ? (
         <MultiSelectorList tabKey="invasions">
           <SelectorListMemo

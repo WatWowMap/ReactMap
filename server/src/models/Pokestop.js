@@ -135,6 +135,8 @@ class Pokestop extends Model {
         onlyEventStops,
         onlyConfirmed,
         onlyAreas = [],
+        onlyExcludeGrunts,
+        onlyExcludeLeaders,
       },
     } = args
     const midnight = getUserMidnight(args)
@@ -573,6 +575,19 @@ class Pokestop extends Model {
                   )
                 }
               })
+              if (onlyExcludeGrunts) {
+                invasion.whereNotIn(
+                  isMad ? 'character_display' : 'character',
+                  Event.rocketGruntIDs,
+                )
+              }
+
+              if (onlyExcludeLeaders) {
+                invasion.whereNotIn(
+                  isMad ? 'character_display' : 'character',
+                  Event.rocketLeaderIDs,
+                )
+              }
             })
           } else {
             stops.orWhere((invasion) => {

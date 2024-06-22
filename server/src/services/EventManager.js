@@ -325,6 +325,23 @@ class EventManager {
       try {
         const newInvasions = await fetch(endpoint).then((res) => res.json())
         if (newInvasions) {
+          this.rocketGruntIDs = Object.keys(newInvasions)
+            .filter(
+              (key) =>
+                newInvasions[key].grunt &&
+                newInvasions[key].grunt.includes('Grunt'),
+            )
+            .map(Number)
+
+          this.rocketLeaderIDs = Object.keys(newInvasions)
+            .filter(
+              (key) =>
+                newInvasions[key].grunt &&
+                (newInvasions[key].grunt.includes('Executive') ||
+                  newInvasions[key].grunt.includes('Giovanni')),
+            )
+            .map(Number)
+
           this.invasions = newInvasions
         }
       } catch (e) {

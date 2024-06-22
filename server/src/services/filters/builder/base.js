@@ -91,6 +91,12 @@ function buildDefaultFilters(perms) {
             confirmed: perms.invasions
               ? defaultFilters.pokestops.confirmed
               : undefined,
+            excludeGrunts: perms.invasions
+              ? defaultFilters.pokestops.excludeGrunts
+              : undefined,
+            excludeLeaders: perms.invasions
+              ? defaultFilters.pokestops.excludeLeaders
+              : undefined,
             invasions: perms.invasions
               ? defaultFilters.pokestops.invasions
               : undefined,

@@ -544,6 +544,8 @@
   "delete": "Eliminar",
   "name": "Nombre",
   "only_confirmed": "Solo confirmados",
+  "only_exclude_grunts": "Excluir gruñidos",
+  "only_exclude_leaders": "Excluir a los dirigentes",
   "rocket_pokemon": "Pokémon del Equipo Rocket",
   "decoy": "Señuelo",
   "s2_cell_limit_0": "Has intentado generar más de 20,000 celdas ({{variable_0}})",
