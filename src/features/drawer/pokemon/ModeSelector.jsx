@@ -11,7 +11,7 @@ import { FCSelectListItem } from '@components/inputs/FCSelect'
 export function PokemonModeSelector() {
   const filterMode = useStorage((s) => s.getPokemonFilterMode())
   const { t } = useTranslation()
-  const ui = useMemory((s) => s.ui.pokemon)
+  const isLegacyEnabled = useMemory((s) => !!s.ui.pokemon?.legacy)
   const selectRef = React.useRef(/** @type {HTMLDivElement | null} */ (null))
 
   return (
@@ -35,7 +35,7 @@ export function PokemonModeSelector() {
         }
       }}
     >
-      {['basic', 'intermediate', ...(ui.legacy ? ['expert'] : [])].map(
+      {['basic', 'intermediate', ...(isLegacyEnabled ? ['expert'] : [])].map(
         (tier) => (
           <MenuItem
             key={tier}
