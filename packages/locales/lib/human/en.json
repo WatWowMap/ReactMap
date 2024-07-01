@@ -620,6 +620,7 @@
   "rocket_pokemon": "Rocket Pokémon",
   "decoy": "Decoy",
   "s2_cell_limit_0": "You attempted to generate more than 20,000 cells ({{variable_0}})",
+  "s2_cell_zoom_limit": "Some cells are too small to be displayed at this zoom level",
   "show_all_pvp_ranks": "Show All PVP Ranks",
   "enable_pokemon_popup_coords": "Show Pokémon Coords",
   "enable_gym_popup_coords": "Show Gym Coords",
