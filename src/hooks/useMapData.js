@@ -104,9 +104,30 @@ export function useMapData(once = false) {
           questConditions,
         },
       }))
-      useStorage.setState((prev) => ({
-        filters: deepMerge({}, filters, prev.filters),
-      }))
+      useStorage.setState((prev) => {
+        const newFilters = deepMerge({}, filters, prev.filters)
+
+        // Migration for quest conditions to use target as well
+        Object.entries(newFilters?.pokestops?.filter || {}).forEach(
+          ([key, filter]) => {
+            if (filter.adv && questConditions[key]) {
+              const newAdv = filter.adv
+                .split(',')
+                .flatMap((each) =>
+                  questConditions[key]
+                    .filter(({ title }) => title === each)
+                    .map(({ target }) => `${each}__${target}`),
+                )
+              if (newAdv.length) {
+                filter.adv = newAdv.join(',')
+              }
+            }
+          },
+        )
+        return {
+          filters: newFilters,
+        }
+      })
     }
   }, [data])
 

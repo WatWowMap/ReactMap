@@ -26,6 +26,10 @@ export function QuestConditionSelector({ id }) {
 
   const [open, setOpen] = React.useState(false)
 
+  const handleClose = () => setOpen(false)
+
+  const handleOpen = () => setOpen(true)
+
   // Provides a reset if that condition is no longer available
   React.useEffect(() => {
     if (hasQuests) {
@@ -39,7 +43,9 @@ export function QuestConditionSelector({ id }) {
           ? value
               .split(',')
               .filter((each) =>
-                questConditions.find(({ title }) => title === each),
+                questConditions.find(
+                  ({ title, target }) => `${title}__${target}` === each,
+                ),
               )
           : []
         setValue(filtered.length ? filtered.join(',') : '')
@@ -49,14 +55,6 @@ export function QuestConditionSelector({ id }) {
       setValue('')
     }
   }, [questConditions, id, hasQuests])
-
-  const handleClose = () => {
-    setOpen(false)
-  }
-
-  const handleOpen = () => {
-    setOpen(true)
-  }
 
   if (!questConditions) return null
 
@@ -89,6 +87,7 @@ export function QuestConditionSelector({ id }) {
               ? e.target.value.filter(Boolean).join(',')
               : e.target.value,
           )
+          if (e.target.value.length === 0) handleClose()
         }
       }}
       fcSx={{ my: 1 }}
@@ -100,7 +99,7 @@ export function QuestConditionSelector({ id }) {
         .slice()
         .sort((a, b) => a.title.localeCompare(b.title))
         .map(({ title, target }) => (
-          <MenuItem key={`${title}-${target}`} value={title}>
+          <MenuItem key={`${title}-${target}`} value={`${title}__${target}`}>
             <QuestTitle questTitle={title} questTarget={target} />
           </MenuItem>
         ))}
