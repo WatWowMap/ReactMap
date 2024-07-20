@@ -1,3 +1,11 @@
+# [1.33.0-develop.9](https://github.com/WatWowMap/ReactMap/compare/v1.33.0-develop.8...v1.33.0-develop.9) (2024-07-20)
+
+
+### Bug Fixes
+
+* **config:** Add missing environment variable for devOptions.skipUpdateCheck parameter ([14eca4c](https://github.com/WatWowMap/ReactMap/commit/14eca4cc3a1e7cbd6193b80dd06f21413fa008ee))
+* prevent users from loading too many s2 cells ([8f8a03d](https://github.com/WatWowMap/ReactMap/commit/8f8a03dfbdcdad5d79e9c9c4e6e199bafdf64429))
+
 # [1.33.0-develop.8](https://github.com/WatWowMap/ReactMap/compare/v1.33.0-develop.7...v1.33.0-develop.8) (2024-06-19)
 
 
