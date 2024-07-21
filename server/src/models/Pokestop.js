@@ -894,7 +894,9 @@ class Pokestop extends Model {
               (filters.onlyAllPokestops ||
                 (filters[newQuest.key] &&
                   (filters[newQuest.key].adv && !filters[newQuest.key].all
-                    ? filters[newQuest.key].adv.includes(quest.quest_title)
+                    ? filters[newQuest.key].adv.includes(
+                        `${quest.quest_title}__${quest.quest_target}`,
+                      )
                     : true)) ||
                 filters[`u${quest.quest_reward_type}`])
             ) {
