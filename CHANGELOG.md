@@ -1,3 +1,10 @@
+# [1.33.0-develop.10](https://github.com/WatWowMap/ReactMap/compare/v1.33.0-develop.9...v1.33.0-develop.10) (2024-07-21)
+
+
+### Bug Fixes
+
+* quest conditions with similar quest titles ([af0efbe](https://github.com/WatWowMap/ReactMap/commit/af0efbebe90d0ab50fe269769a3401e0916be4d9))
+
 # [1.33.0-develop.9](https://github.com/WatWowMap/ReactMap/compare/v1.33.0-develop.8...v1.33.0-develop.9) (2024-07-20)
 
 
