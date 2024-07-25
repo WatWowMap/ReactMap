@@ -12,6 +12,7 @@ import { FILTER_SKIP_LIST } from '@assets/constants'
 import { Notification } from '@components/Notification'
 import { GenerateCells } from '@features/s2cell'
 import { useAnalytics } from '@hooks/useAnalytics'
+import { useProcessError } from '@hooks/useProcessError'
 
 import { Clustering } from './Clustering'
 import { TILES } from '../tileObject'
@@ -162,18 +163,11 @@ function QueryData({ category, timeout }) {
     }
   }, [filters, userSettings, onlyAreas, timeout.current.refetch])
 
-  if (error?.networkError && 'statusCode' in error.networkError) {
-    if (error.networkError?.statusCode === 464) {
-      useMemory.setState({ clientError: 'old_client' })
-      return null
-    }
-    if (error.networkError?.statusCode === 511) {
-      useMemory.setState({ clientError: 'session_expired' })
-      return null
-    }
-  }
+  const errorState = useProcessError(error)
 
-  const returnData = (data || previousData || { [category]: [] })[category]
+  const returnData = errorState
+    ? []
+    : (data || previousData || { [category]: [] })[category]
 
   if (!returnData) {
     return error && process.env.NODE_ENV === 'development' ? (

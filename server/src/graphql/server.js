@@ -50,12 +50,16 @@ async function startApollo(httpServer) {
         customMessage =
           'user is not authenticated, forcing logout, no need to report this error unless it continues to happen'
       } else if (e.message === 'data_limit_reached') {
-        customMessage =
-          'user has reached the data limit, blocking future requests for a while'
+        customMessage = `user has reached the data limit, blocking future requests for ${Math.ceil(
+          (Number(e?.extensions?.until || 0) - Date.now()) / 1000,
+        )} seconds`
       }
 
       const key = `${e.extensions.id || e.extensions.user}-${e.message}`
       if (errorCache.has(key)) {
+        if (e?.extensions?.stacktrace) {
+          delete e.extensions.stacktrace
+        }
         return e
       }
       if (!config.getSafe('devOptions.enabled')) {
@@ -76,6 +80,9 @@ async function startApollo(httpServer) {
         // e.extensions.id || '',
         customMessage || e,
       )
+      if (e?.extensions?.stacktrace) {
+        delete e.extensions.stacktrace
+      }
       return e
     },
     logger: {
@@ -112,14 +119,14 @@ async function startApollo(httpServer) {
                 const returned = Array.isArray(data) ? data.length : 0
 
                 if (contextValue.user) {
+                  const now = Date.now()
                   userRequestCache.get(contextValue.user).push({
                     count: returned,
-                    timestamp: Date.now(),
+                    timestamp: now,
                     category: endpoint,
                   })
 
                   const entries = userRequestCache.get(contextValue.user)
-                  const now = Date.now()
                   userRequestCache.set(
                     contextValue.user,
                     entries.filter(

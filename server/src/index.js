@@ -292,6 +292,15 @@ startApollo(httpServer).then((server) => {
         if (!userRequestCache.has(user)) {
           userRequestCache.set(user, [])
         }
+        const now = Date.now()
+        const userCache = userRequestCache
+          .get(user)
+          .filter(
+            (entry) =>
+              now - entry.timestamp <=
+              config.getSafe('api.dataRequestLimits.time') * 1000,
+          )
+
         let reqEndpoint =
           req.body.query.split(' on ')[1]?.split(' ')[0]?.toLowerCase() ||
           'unknown'
@@ -302,30 +311,32 @@ startApollo(httpServer).then((server) => {
         ) {
           reqEndpoint += 's'
         }
+        const categoryCache = userCache.filter(
+          (r) => r.category === reqEndpoint,
+        )
+        const userCategoryCount = categoryCache.reduce((a, b) => a + b.count, 0)
 
         const limit =
           reqEndpoint in requestLimits && requestLimits[reqEndpoint] > 0
             ? requestLimits[reqEndpoint]
             : Infinity
 
-        const userCount = userRequestCache
-          .get(user)
-          .filter((r) => r.category === reqEndpoint)
-          .reduce((a, b) => a + b.count, 0)
-
         log.debug(
           HELPERS[reqEndpoint] || `[${reqEndpoint?.toUpperCase()}]`,
           user,
           '|',
-          userCount,
+          userCategoryCount,
           '|',
           limit,
         )
 
-        if (userCount >= limit) {
+        if (userCategoryCount >= limit && categoryCache.length > 0) {
           throw new GraphQLError('data_limit_reached', {
             extensions: {
               ...errorCtx,
+              until:
+                categoryCache[0].timestamp +
+                config.getSafe('api.dataRequestLimits.time') * 1000,
               http: { status: 429 },
               code: ApolloServerErrorCode.BAD_REQUEST,
             },

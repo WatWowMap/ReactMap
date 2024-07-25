@@ -7,6 +7,7 @@ import { deepMerge } from '@utils/deepMerge'
 import { UAssets } from '@services/Assets'
 import { useMemory } from '@store/useMemory'
 import { useStorage } from '@store/useStorage'
+import { useProcessError } from '@hooks/useProcessError'
 
 export function useMapData(once = false) {
   const active = useMemory((s) => s.active)
@@ -34,17 +35,7 @@ export function useMapData(once = false) {
     }
   }, [hasIcons, online])
 
-  useEffect(() => {
-    if (error?.networkError && 'statusCode' in error.networkError) {
-      stopPolling()
-      if (error.networkError?.statusCode === 464) {
-        useMemory.setState({ clientError: 'early_old_client' })
-      }
-      if (error.networkError?.statusCode === 511) {
-        useMemory.setState({ clientError: 'session_expired' })
-      }
-    }
-  }, [error])
+  useProcessError(error)
 
   useEffect(() => {
     if (data?.available) {
