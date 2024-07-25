@@ -16,9 +16,13 @@ const Pvp = config.getSafe('api.pvp.reactMapHandlesPvp')
 const Event = new EventManager()
 
 const userCache = new NodeCache({ stdTTL: 60 * 60 * 24 })
-
 Object.entries(getCache('scanUserHistory.json', {})).forEach(([k, v]) =>
   userCache.set(k, v),
+)
+
+/** @type {Map<string, { count: number, timestamp: number, category: string }[]>} */
+const userRequestCache = new Map(
+  Object.entries(getCache('userDataLimitCache.json', {})),
 )
 
 Event.setTimers(Db, Pvp)
@@ -26,12 +30,17 @@ Event.setTimers(Db, Pvp)
 /** @param {NodeJS.Signals} e */
 const onShutdown = async (e) => {
   log.info(HELPERS.ReactMap, 'received signal', e, 'writing cache...')
-  const cacheObj = {}
+  const scannerCacheObj = {}
   userCache.keys().forEach((key) => {
-    cacheObj[key] = userCache.get(key)
+    scannerCacheObj[key] = userCache.get(key)
+  })
+  const userRequestCacheObj = {}
+  userRequestCache.forEach((v, k) => {
+    userRequestCacheObj[k] = v
   })
   await Promise.all([
-    setCache('scanUserHistory.json', cacheObj),
+    setCache('scanUserHistory.json', scannerCacheObj),
+    setCache('userDataLimitCache.json', userRequestCacheObj),
     setCache('rarity.json', Db.rarity),
     setCache('historical.json', Db.historical),
     setCache('available.json', Event.available),
@@ -70,4 +79,5 @@ module.exports = {
   Pvp,
   Event,
   userCache,
+  userRequestCache,
 }

@@ -23,7 +23,7 @@ const { log, HELPERS } = require('@rm/logger')
 const { create, writeAll } = require('@rm/locales')
 
 const config = require('./services/config')
-const { Db, Event } = require('./services/initialization')
+const { Db, Event, userRequestCache } = require('./services/initialization')
 require('./models')
 const Clients = require('./services/Clients')
 const sessionStore = require('./services/sessionStore')
@@ -215,6 +215,8 @@ app.use((err, req, res, next) => {
   }
 })
 
+const requestLimits = config.getSafe('api.dataRequestLimits.categories')
+
 startApollo(httpServer).then((server) => {
   app.use(
     '/graphql',
@@ -287,6 +289,49 @@ startApollo(httpServer).then((server) => {
           })
         }
 
+        if (!userRequestCache.has(user)) {
+          userRequestCache.set(user, [])
+        }
+        let reqEndpoint =
+          req.body.query.split('on ')[1]?.split(' ')[0]?.toLowerCase() ||
+          'unknown'
+        if (
+          reqEndpoint !== 'pokemon' &&
+          reqEndpoint !== 'weather' &&
+          reqEndpoint !== 'unknown'
+        ) {
+          reqEndpoint += 's'
+        }
+
+        const limit =
+          reqEndpoint in requestLimits && requestLimits[reqEndpoint] > 0
+            ? requestLimits[reqEndpoint]
+            : Infinity
+
+        const userCount = userRequestCache
+          .get(user)
+          .filter((r) => r.category === reqEndpoint)
+          .reduce((a, b) => a + b.count, 0)
+
+        log.debug(
+          HELPERS[reqEndpoint] || `[${reqEndpoint?.toUpperCase()}]`,
+          user,
+          '|',
+          userCount,
+          '|',
+          limit,
+        )
+
+        if (userCount >= limit) {
+          throw new GraphQLError('data_limit_reached', {
+            extensions: {
+              ...errorCtx,
+              http: { status: 429 },
+              code: ApolloServerErrorCode.BAD_REQUEST,
+            },
+          })
+        }
+
         return {
           req,
           res,
@@ -297,6 +342,7 @@ startApollo(httpServer).then((server) => {
           transaction,
           token: req.headers.token,
           operation: definition?.operation,
+          endpoint,
         }
       },
     }),

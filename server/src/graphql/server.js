@@ -2,6 +2,7 @@
 // @ts-check
 const path = require('path')
 const { ApolloServer } = require('@apollo/server')
+
 const NodeCache = require('node-cache')
 const { loadTypedefs } = require('@graphql-tools/load')
 const { GraphQLFileLoader } = require('@graphql-tools/graphql-file-loader')
@@ -13,9 +14,10 @@ const {
 } = require('@apollo/server/plugin/disabled')
 
 const config = require('@rm/config')
-
 const { log, HELPERS } = require('@rm/logger')
+
 const resolvers = require('./resolvers')
+const { userRequestCache } = require('../services/initialization')
 
 /** @param {import('http').Server} httpServer */
 async function startApollo(httpServer) {
@@ -47,6 +49,9 @@ async function startApollo(httpServer) {
       } else if (e.message === 'unauthenticated') {
         customMessage =
           'user is not authenticated, forcing logout, no need to report this error unless it continues to happen'
+      } else if (e.message === 'data_limit_reached') {
+        customMessage =
+          'user has reached the data limit, blocking future requests for a while'
       }
 
       const key = `${e.extensions.id || e.extensions.user}-${e.message}`
@@ -105,6 +110,28 @@ async function startApollo(httpServer) {
 
                 const data = response.body.singleResult.data?.[endpoint]
                 const returned = Array.isArray(data) ? data.length : 0
+
+                if (contextValue.user) {
+                  userRequestCache.get(contextValue.user).push({
+                    count: returned,
+                    timestamp: Date.now(),
+                    category: endpoint,
+                  })
+
+                  const entries = userRequestCache.get(contextValue.user)
+                  const now = Date.now()
+                  userRequestCache.set(
+                    contextValue.user,
+                    entries.filter(
+                      (entry) =>
+                        now - entry.timestamp <=
+                        config.getSafe('api.dataRequestLimits.time') *
+                          1000 *
+                          60,
+                    ),
+                  )
+                }
+
                 log.info(
                   HELPERS[endpoint] || `[${endpoint?.toUpperCase()}]`,
                   '|',
