@@ -293,7 +293,7 @@ startApollo(httpServer).then((server) => {
           userRequestCache.set(user, [])
         }
         let reqEndpoint =
-          req.body.query.split('on ')[1]?.split(' ')[0]?.toLowerCase() ||
+          req.body.query.split(' on ')[1]?.split(' ')[0]?.toLowerCase() ||
           'unknown'
         if (
           reqEndpoint !== 'pokemon' &&

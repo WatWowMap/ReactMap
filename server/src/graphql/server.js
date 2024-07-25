@@ -73,7 +73,7 @@ async function startApollo(httpServer) {
         e.extensions.serverV || 'Unknown',
         'User:',
         e.extensions.user || 'Not Logged In',
-        e.extensions.id || '',
+        // e.extensions.id || '',
         customMessage || e,
       )
       return e
