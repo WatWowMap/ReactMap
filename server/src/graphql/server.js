@@ -125,9 +125,7 @@ async function startApollo(httpServer) {
                     entries.filter(
                       (entry) =>
                         now - entry.timestamp <=
-                        config.getSafe('api.dataRequestLimits.time') *
-                          1000 *
-                          60,
+                        config.getSafe('api.dataRequestLimits.time') * 1000,
                     ),
                   )
                 }
