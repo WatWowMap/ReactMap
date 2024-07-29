@@ -1,10 +1,10 @@
+/* eslint-disable prefer-rest-params */
 process.title = 'ReactMap'
 
 require('dotenv').config()
 const fs = require('fs')
 const path = require('path')
 const express = require('express')
-const logger = require('morgan')
 const compression = require('compression')
 const session = require('express-session')
 const passport = require('passport')
@@ -18,8 +18,9 @@ const http = require('http')
 const { GraphQLError } = require('graphql')
 const { ApolloServerErrorCode } = require('@apollo/server/errors')
 const { parse } = require('graphql')
+const bytes = require('bytes')
 
-const { log, HELPERS } = require('@rm/logger')
+const { log, HELPERS, getTimeStamp } = require('@rm/logger')
 const { create, writeAll } = require('@rm/locales')
 
 const config = require('./services/config')
@@ -74,29 +75,6 @@ if (sentry.enabled || process.env.SENTRY_DSN) {
   app.use(Sentry.Handlers.tracingHandler())
 }
 
-if (
-  config.getSafe('devOptions.logLevel') === 'debug' ||
-  config.getSafe('devOptions.logLevel') === 'trace' ||
-  config.getSafe('devOptions.enabled')
-) {
-  app.use(
-    logger((tokens, req, res) =>
-      [
-        HELPERS.info,
-        HELPERS.express,
-        tokens.method(req, res),
-        tokens.url(req, res),
-        tokens.status(req, res),
-        tokens['response-time'](req, res),
-        'ms',
-        req.user ? `- ${req.user.username}` : 'Not Logged In',
-        '-',
-        req.headers['x-forwarded-for'],
-      ].join(' '),
-    ),
-  )
-}
-
 app.use((req, res, next) => {
   if (req.url.endsWith('.map')) {
     res.status(403).send('Naughty!')
@@ -139,7 +117,14 @@ const requestRateLimiter = rateLimit(rateLimitOptions)
 
 app.use(compression())
 
-app.use(express.json({ limit: '50mb' }))
+app.use(
+  express.json({
+    limit: '50mb',
+    verify: (req, res, buf) => {
+      req.bodySize = (req.bodySize || 0) + buf.length
+    },
+  }),
+)
 
 const distDir = path.join(
   __dirname,
@@ -192,6 +177,48 @@ app.use(rootRouter, requestRateLimiter)
 if (sentry.enabled || process.env.SENTRY_DSN) {
   app.use(Sentry.Handlers.errorHandler())
 }
+
+app.use((req, res, next) => {
+  const start = process.hrtime()
+
+  const oldWrite = res.write
+  const oldEnd = res.end
+  let resBodySize = 0
+
+  res.write = function write(chunk) {
+    resBodySize += chunk.length
+    oldWrite.apply(res, arguments)
+  }
+
+  res.end = function end(chunk) {
+    if (chunk) {
+      resBodySize += chunk.length
+    }
+    oldEnd.apply(res, arguments)
+  }
+
+  res.on('finish', () => {
+    const [seconds, nanoseconds] = process.hrtime(start)
+    const responseTime = (seconds * 1000 + nanoseconds / 1e6).toFixed(3) // in milliseconds
+    log.info(
+      HELPERS.express,
+      req.method,
+      req.originalUrl,
+      HELPERS.statusCode(res.statusCode),
+      `${responseTime}ms`,
+      '|',
+      HELPERS.download(bytes(req.bodySize)),
+      HELPERS.upload(bytes(resBodySize)),
+      '|',
+      req.user ? req.user.username : 'Not Logged In',
+      req.headers['x-forwarded-for']
+        ? `| ${req.headers['x-forwarded-for']}`
+        : '',
+    )
+  })
+
+  next()
+})
 
 // eslint-disable-next-line no-unused-vars
 app.use((err, req, res, next) => {
@@ -388,13 +415,7 @@ connection.migrate
       Event.getWebhooks(),
       loadLatestAreas().then((res) => (config.areas = res)),
     ])
-    const text = rainbow(
-      `ℹ ${new Date()
-        .toISOString()
-        .split('.')[0]
-        .split('T')
-        .join(' ')} [ReactMap] has fully started`,
-    )
+    const text = rainbow(`ℹ ${getTimeStamp()} [ReactMap] has fully started`)
     setTimeout(() => text.stop(), 1_000)
   })
 
