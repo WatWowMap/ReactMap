@@ -59,21 +59,34 @@ const HELPERS = /** @type {const} */ ({
   routes: chalk.hex('#9e9e9e')('[ROUTES]'),
   search: chalk.hex('#795548')('[SEARCH]'),
 
+  upload: (size = '0B') => chalk.greenBright(`↑ ${size}`),
+  download: (size = '0B') => chalk.redBright(`↓ ${size}`),
+  statusCode: (code = 200) => {
+    if (code >= 500) {
+      return chalk.red(code)
+    }
+    if (code >= 400) {
+      return chalk.yellow(code)
+    }
+    if (code >= 300) {
+      return chalk.cyan(code)
+    }
+    return chalk.green(code)
+  },
   custom: (text = '', color = '#64b5f6') =>
     chalk.hex(color)(`[${text.toUpperCase()}]`),
 })
 
 const log = logger.getLogger('logger')
 
+const getTimestamp = () =>
+  new Date().toISOString().split('.')[0].split('T').join(' ')
+
 /** @type {typeof log['methodFactory']} */
 log.methodFactory = (methodName, logLevel, loggerName) => {
   const rawMethod = logger.methodFactory(methodName, logLevel, loggerName)
   return (...args) => {
-    rawMethod(
-      HELPERS[methodName] ?? '',
-      new Date().toISOString().split('.')[0].split('T').join(' '),
-      ...args,
-    )
+    rawMethod(HELPERS[methodName] ?? '', getTimestamp(), ...args)
   }
 }
 
@@ -87,3 +100,5 @@ if (
 module.exports.log = log
 
 module.exports.HELPERS = HELPERS
+
+module.exports.getTimeStamp = getTimestamp
