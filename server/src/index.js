@@ -19,6 +19,7 @@ const { GraphQLError } = require('graphql')
 const { ApolloServerErrorCode } = require('@apollo/server/errors')
 const { parse } = require('graphql')
 const bytes = require('bytes')
+const NodeCache = require('node-cache')
 
 const { log, HELPERS, getTimeStamp } = require('@rm/logger')
 const { create, writeAll } = require('@rm/locales')
@@ -33,6 +34,9 @@ const pkg = require('../../package.json')
 const { loadLatestAreas } = require('./services/areas')
 const { connection } = require('./db/knexfile.cjs')
 const startApollo = require('./graphql/server')
+const TelegramClient = require('./services/TelegramClient')
+const DiscordClient = require('./services/DiscordClient')
+
 require('./services/watcher')
 
 Event.clients = Clients
@@ -244,6 +248,8 @@ app.use((err, req, res, next) => {
 
 const requestLimits = config.getSafe('api.dataRequestLimits.categories')
 
+const clientErrorLogCache = new NodeCache({ stdTTL: 60 })
+
 startApollo(httpServer).then((server) => {
   app.use(
     '/graphql',
@@ -358,16 +364,55 @@ startApollo(httpServer).then((server) => {
         )
 
         if (userCategoryCount >= limit && categoryCache.length > 0) {
+          const until =
+            categoryCache[0].timestamp +
+            config.getSafe('api.dataRequestLimits.time') * 1000
+
+          if (!clientErrorLogCache.has(user)) {
+            const client = Clients[req?.user.rmStrategy]
+            if (client instanceof TelegramClient) {
+              client.sendMessage(
+                `<b>Data Limit Reached</b>\n\nHas reached the data limit for ${reqEndpoint} requests (${userCategoryCount}/${limit}) \nBlocked for ${Math.ceil(
+                  (until - Date.now()) / 1000,
+                )} seconds.`,
+              )
+            } else if (client instanceof DiscordClient) {
+              client.sendMessage(
+                {
+                  title: `Data Limit Reached`,
+                  author: {
+                    name: user,
+                    icon_url: `https://cdn.discordapp.com/avatars/${req.user.discordId}/${req.user.avatar}.png`,
+                  },
+                  thumbnail: {
+                    url:
+                      config
+                        .getSafe('authentication.strategies')
+                        .find((strategy) => strategy.name === user.rmStrategy)
+                        ?.thumbnailUrl ??
+                      `https://user-images.githubusercontent.com/58572875/167069223-745a139d-f485-45e3-a25c-93ec4d09779c.png`,
+                  },
+                  description: `Has reached the data limit for ${reqEndpoint} requests (${userCategoryCount}/${limit}). They will be able to make requests again <t:${Math.ceil(
+                    until / 1000,
+                  )}:R> (${new Date(until).toLocaleTimeString()})`,
+                },
+                'main',
+              )
+            }
+            clientErrorLogCache.set(user, true)
+          }
+
           throw new GraphQLError('data_limit_reached', {
             extensions: {
               ...errorCtx,
-              until:
-                categoryCache[0].timestamp +
-                config.getSafe('api.dataRequestLimits.time') * 1000,
+              until,
               http: { status: 429 },
               code: ApolloServerErrorCode.BAD_REQUEST,
             },
           })
+        }
+        if (clientErrorLogCache.has(user)) {
+          clientErrorLogCache.del(user)
         }
 
         return {
