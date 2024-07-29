@@ -59,6 +59,8 @@ const HELPERS = /** @type {const} */ ({
   routes: chalk.hex('#9e9e9e')('[ROUTES]'),
   search: chalk.hex('#795548')('[SEARCH]'),
 
+  upload: (size = '0B') => chalk.greenBright(`↑ ${size}`),
+  download: (size = '0B') => chalk.redBright(`↓ ${size}`),
   statusCode: (code = 200) => {
     if (code >= 500) {
       return chalk.red(code)

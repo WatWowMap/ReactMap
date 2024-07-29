@@ -207,8 +207,8 @@ app.use((req, res, next) => {
       HELPERS.statusCode(res.statusCode),
       `${responseTime}ms`,
       '|',
-      `${bytes(req.bodySize)} ↓`,
-      `${bytes(resBodySize)} ↑`,
+      HELPERS.download(bytes(req.bodySize)),
+      HELPERS.upload(bytes(resBodySize)),
       '|',
       req.user ? req.user.username : 'Not Logged In',
       req.headers['x-forwarded-for']
