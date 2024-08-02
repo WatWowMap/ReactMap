@@ -8,7 +8,7 @@ import type {
 } from 'server/src/models'
 import { Knex } from 'knex'
 import { Model } from 'objection'
-import { Request, Response } from 'express'
+import { NextFunction, Request, Response } from 'express'
 import { Transaction } from '@sentry/node'
 import { VerifyCallback } from 'passport-oauth2'
 
@@ -267,3 +267,9 @@ export interface ClientOptions
   extends Partial<Omit<Config['clientSideOptions'], 'pokemon'>> {
   pokemon: PokemonGlow
 }
+
+export type ExpressMiddleware = (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => any

@@ -32,7 +32,7 @@ const { loadLatestAreas } = require('./services/areas')
 const { connection } = require('./db/knexfile.cjs')
 const startApollo = require('./graphql/server')
 const { rateLimitingMiddleware } = require('./middleware/rateLimiting')
-const { sentryMiddleware, sentryTransaction } = require('./middleware/sentry')
+const { initSentry, sentryMiddleware } = require('./middleware/sentry')
 require('./services/watcher')
 
 Event.clients = Clients
@@ -44,7 +44,7 @@ if (!config.getSafe('devOptions.skipUpdateCheck')) {
 const app = express()
 const httpServer = http.createServer(app)
 
-sentryMiddleware(app)
+initSentry(app)
 
 app.disable('x-powered-by')
 
@@ -184,6 +184,7 @@ startApollo(httpServer).then((server) => {
     '/graphql',
     cors({ origin: '/' }),
     json(),
+    sentryMiddleware,
     expressMiddleware(server, {
       context: async ({ req, res }) => {
         const perms = req.user ? req.user.perms : req.session.perms
@@ -194,7 +195,6 @@ startApollo(httpServer).then((server) => {
           pkg.version ||
           1
         const serverV = pkg.version || 1
-        const transaction = sentryTransaction(res)
 
         const definition = parse(req.body.query).definitions.find(
           (d) => d.kind === 'OperationDefinition',
@@ -249,7 +249,6 @@ startApollo(httpServer).then((server) => {
           Event,
           perms,
           user,
-          transaction,
           token: req.headers.token,
           operation: definition?.operation,
         }

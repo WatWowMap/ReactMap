@@ -9,7 +9,7 @@ const pkg = require('../../../package.json')
  *
  * @param {import('express').Application} app
  */
-function sentryMiddleware(app) {
+function initSentry(app) {
   const sentry = config.getSafe('sentry.server')
   if (sentry.enabled || process.env.SENTRY_DSN) {
     Sentry.init({
@@ -44,11 +44,8 @@ function sentryMiddleware(app) {
   }
 }
 
-/**
- * @param {import('express').Response} res
- * @returns {import('@sentry/node').Transaction | null}
- */
-function sentryTransaction(res) {
+/** @type {import('@rm/types').ExpressMiddleware} */
+function sentryMiddleware(_req, res, next) {
   const sentry = config.getSafe('sentry.server')
 
   if (sentry.enabled || process.env.SENTRY_DSN) {
@@ -59,9 +56,9 @@ function sentryTransaction(res) {
     Sentry.configureScope((scope) => {
       scope.setSpan(transaction)
     })
-    return transaction
   }
-  return null
+
+  next()
 }
 
-module.exports = { sentryMiddleware, sentryTransaction }
+module.exports = { initSentry, sentryMiddleware }

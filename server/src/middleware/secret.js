@@ -2,13 +2,7 @@
 const config = require('@rm/config')
 const { log, HELPERS } = require('@rm/logger')
 
-/**
- * Middleware to check for the x-react-map header.
- *
- * @param {import('express').Request} req - The request object.
- * @param {import('express').Response} res - The response object.
- * @param {import('express').NextFunction} next - The next middleware function.
- */
+/** @type {import('@rm/types').ExpressMiddleware} */
 function secretMiddleware(req, res, next) {
   const reactMapSecret = config.getSafe('api.reactMapSecret')
   const secret = req.headers['react-map-secret'] ?? req.headers['x-react-map']
@@ -25,7 +19,7 @@ function secretMiddleware(req, res, next) {
     return res.status(403).json({ message: 'Forbidden: Invalid secret key' })
   }
 
-  next() // Proceed to the next middleware or route handler
+  next()
 }
 
 module.exports = { secretMiddleware }

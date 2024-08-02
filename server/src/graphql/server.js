@@ -89,26 +89,30 @@ async function startApollo(httpServer) {
             log.debug(requestContext.request?.variables?.filters)
           }
           return {
-            async willSendResponse(context) {
+            async willSendResponse({
+              response,
+              contextValue,
+              operation,
+              operationName,
+            }) {
               const filterCount = Object.keys(
                 requestContext.request?.variables?.filters || {},
               ).length
 
-              const { response, contextValue } = context
               if (
                 response.body.kind === 'single' &&
                 'data' in response.body.singleResult
               ) {
                 const endpoint =
                   // @ts-ignore
-                  context?.operation?.selectionSet?.selections?.[0]?.name?.value
+                  operation?.selectionSet?.selections?.[0]?.name?.value
 
                 const data = response.body.singleResult.data?.[endpoint]
                 const returned = Array.isArray(data) ? data.length : 0
                 log.info(
                   HELPERS[endpoint] || `[${endpoint?.toUpperCase()}]`,
                   '|',
-                  context.operationName,
+                  operationName,
                   '|',
                   returned || 0,
                   '|',
@@ -120,8 +124,10 @@ async function startApollo(httpServer) {
                   filterCount || 0,
                 )
 
-                if (returned && config.getSafe('sentry.server.enabled')) {
-                  contextValue.transaction.setMeasurement(
+                // @ts-ignore
+                if (returned && response.__sentry_transaction) {
+                  // @ts-ignore
+                  response.__sentry_transaction.setMeasurement(
                     `${endpoint}.returned`,
                     returned,
                     'kilobyte',

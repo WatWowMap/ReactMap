@@ -29,7 +29,7 @@ function rateLimitingMiddleware() {
         req?.user?.username || 'user',
         'is being rate limited',
       )
-      res.redirect('/429')
+      res.sendStatus(429)
     },
   })
 }
