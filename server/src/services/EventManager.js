@@ -1,5 +1,5 @@
 // @ts-check
-const { promises: fs } = require('fs')
+const { promises: fs, existsSync } = require('fs')
 const path = require('path')
 const Ohbem = require('ohbem')
 const { default: fetch } = require('node-fetch')
@@ -10,6 +10,11 @@ const { generate, read } = require('@rm/masterfile')
 
 const PoracleAPI = require('./api/Poracle')
 const { getCache } = require('./cache')
+
+/**
+ * @typedef {import('./DiscordClient') | import('./TelegramClient') | null} Client
+ * @typedef {Record<string, Client>} ClientObject
+ */
 
 class EventManager {
   constructor() {
@@ -47,8 +52,36 @@ class EventManager {
         })
         .filter(([, api]) => api),
     )
-    /** @type {import('./Clients').ClientObject} */
-    this.Clients = {}
+    /** @type {ClientObject} */
+    this.authClients = Object.fromEntries(
+      config
+        .getSafe('authentication.strategies')
+        .filter(({ name, enabled }) => {
+          log.info(
+            HELPERS.auth,
+            `Strategy ${name} ${enabled ? '' : 'was not '}initialized`,
+          )
+          return !!enabled
+        })
+        .map(({ name, type }, i) => {
+          try {
+            const buildStrategy = existsSync(
+              path.resolve(__dirname, `../strategies/${name}.js`),
+            )
+              ? require(path.resolve(__dirname, `../strategies/${name}.js`))
+              : require(path.resolve(__dirname, `../strategies/${type}.js`))
+            return [
+              name ?? `${type}-${i}}`,
+              typeof buildStrategy === 'function'
+                ? buildStrategy(name)
+                : buildStrategy,
+            ]
+          } catch (e) {
+            log.error(HELPERS.auth, e)
+            return [name, null]
+          }
+        }),
+    )
   }
 
   /**
@@ -108,32 +141,26 @@ class EventManager {
   }
 
   /**
-   * @param {import('./Clients').ClientObject} clients
-   */
-  set clients(clients) {
-    this.Clients = clients
-  }
-
-  /**
    *
    * @param {import('discord.js').APIEmbed | string} embed
    * @param {string} [clientName]
+   * @param {keyof import('./DiscordClient')['loggingChannels']} [channel]
    */
-  async chatLog(embed, clientName) {
+  async chatLog(embed, clientName, channel = 'event') {
     if (clientName) {
-      const client = this.Clients[clientName]
+      const client = this.authClients[clientName]
       if ('discordEvents' in client && typeof embed === 'object') {
-        await client.sendMessage(embed, 'event')
+        await client.sendMessage(embed, channel)
       } else if (typeof embed === 'string') {
-        await client.sendMessage(embed, 'event')
+        await client.sendMessage(embed, channel)
       }
     } else {
       await Promise.allSettled(
-        Object.values(this.Clients).map(async (client) => {
+        Object.values(this.authClients).map(async (client) => {
           if ('discordEvents' in client && typeof embed === 'object') {
-            await client.sendMessage(embed, 'event')
+            await client.sendMessage(embed, channel)
           } else if (typeof embed === 'string') {
-            await client.sendMessage(embed, 'event')
+            await client.sendMessage(embed, channel)
           }
         }),
       )
