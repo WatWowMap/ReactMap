@@ -6,7 +6,6 @@ const path = require('path')
 const express = require('express')
 const compression = require('compression')
 const session = require('express-session')
-const passport = require('passport')
 const { rainbow } = require('chalkercli')
 const { expressMiddleware } = require('@apollo/server/express4')
 const cors = require('cors')
@@ -33,6 +32,7 @@ const { rateLimitingMiddleware } = require('./middleware/rateLimiting')
 const { initSentry, sentryMiddleware } = require('./middleware/sentry')
 const { loggerMiddleware } = require('./middleware/logger')
 const { noSourceMapMiddleware } = require('./middleware/noSourceMap')
+const { initPassport } = require('./middleware/passport')
 require('./services/watcher')
 
 Event.clients = Clients
@@ -45,6 +45,7 @@ const app = express()
 const httpServer = http.createServer(app)
 
 initSentry(app)
+initPassport(app)
 
 app.disable('x-powered-by')
 
@@ -79,22 +80,6 @@ app.use(
     cookie: { maxAge: 86400000 * config.getSafe('api.cookieAgeDays') },
   }),
 )
-
-app.use(passport.initialize())
-
-app.use(passport.session())
-
-passport.serializeUser(async (user, done) => {
-  done(null, user)
-})
-
-passport.deserializeUser(async (user, done) => {
-  if (user.perms.map) {
-    done(null, user)
-  } else {
-    done('User does not have map permissions', null)
-  }
-})
 
 const localePath = path.resolve(distDir, 'locales')
 if (fs.existsSync(localePath)) {
