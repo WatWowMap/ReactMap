@@ -3,11 +3,11 @@
 // @ts-check
 const router = require('express').Router()
 const { log, HELPERS } = require('@rm/logger')
-const { Db } = require('../../../services/state')
+const state = require('../../../services/state')
 
 router.get('/', async (req, res) => {
   try {
-    res.status(200).json(await Db.models.User.query())
+    res.status(200).json(await state.db.models.User.query())
     log.info(HELPERS.api, 'api/v1/users')
   } catch (e) {
     log.error(HELPERS.api, 'api/v1/sessions', e)
@@ -18,12 +18,12 @@ router.get('/', async (req, res) => {
 router.get('/export', async (req, res) => {
   try {
     /** @type {import('@rm/types').FullUser[]} */
-    const users = await Db.models.User.query()
+    const users = await state.db.models.User.query()
 
     const badges = {}
 
     /** @type {import('@rm/types').FullGymBadge[]} */
-    const rawBadges = await Db.models.Badge.query()
+    const rawBadges = await state.db.models.Badge.query()
     // eslint-disable-next-line no-unused-vars
     rawBadges.forEach(({ userId, id, ...rest }) => {
       if (!badges[userId]) {
@@ -34,7 +34,7 @@ router.get('/export', async (req, res) => {
 
     const backups = {}
     /** @type {import('@rm/types').FullBackup[]} */
-    const rawBackups = await Db.models.Backup.query()
+    const rawBackups = await state.db.models.Backup.query()
 
     // eslint-disable-next-line no-unused-vars
     rawBackups.forEach(({ userId, id, ...rest }) => {
@@ -68,24 +68,24 @@ router.post('/import', async (req, res) => {
      */
     const getUser = async (user) => {
       if (user.username) {
-        const found = await Db.models.User.query().select().findOne({
+        const found = await state.db.models.User.query().select().findOne({
           username: user.username,
         })
         if (found) return found
       }
       if (user.discordId) {
-        const found = await Db.models.User.query().select().findOne({
+        const found = await state.db.models.User.query().select().findOne({
           discordId: user.discordId,
         })
         if (found) return found
       }
       if (user.telegramId) {
-        const found = await Db.models.User.query().select().findOne({
+        const found = await state.db.models.User.query().select().findOne({
           telegramId: user.telegramId,
         })
         if (found) return found
       }
-      return Db.models.User.query().insert(user)
+      return state.db.models.User.query().insert(user)
     }
 
     for (const { backups, badges, ...user } of bodyArray) {
@@ -100,7 +100,7 @@ router.post('/import', async (req, res) => {
 
       if (badges) {
         for (const badge of badges) {
-          await Db.models.Badge.query().insert({
+          await state.db.models.Badge.query().insert({
             ...badge,
             userId: userEntry.id,
           })
@@ -108,7 +108,7 @@ router.post('/import', async (req, res) => {
       }
       if (backups) {
         for (const backup of backups) {
-          await Db.models.Backup.query().insert({
+          await state.db.models.Backup.query().insert({
             ...backup,
             userId: userEntry.id,
           })
@@ -125,7 +125,7 @@ router.post('/import', async (req, res) => {
 
 router.get('/:id', async (req, res) => {
   try {
-    const user = await Db.models.User.query().findById(req.params.id)
+    const user = await state.db.models.User.query().findById(req.params.id)
     res.status(200).json(user || { status: 'error', reason: 'User Not Found' })
     log.info(HELPERS.api, `api/v1/users/${req.params.id}`)
   } catch (e) {
@@ -136,7 +136,7 @@ router.get('/:id', async (req, res) => {
 
 router.get('/discord/:id', async (req, res) => {
   try {
-    const user = await Db.models.User.query()
+    const user = await state.db.models.User.query()
       .where('discordId', req.params.id)
       .first()
     res.status(200).json(user || { status: 'error', reason: 'User Not Found' })
@@ -149,7 +149,7 @@ router.get('/discord/:id', async (req, res) => {
 
 router.get('/telegram/:id', async (req, res) => {
   try {
-    const user = await Db.models.User.query()
+    const user = await state.db.models.User.query()
       .where('telegramId', req.params.id)
       .first()
     res.status(200).json(user || { status: 'error', reason: 'User Not Found' })

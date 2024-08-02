@@ -4,7 +4,8 @@ const passport = require('passport')
 
 const config = require('@rm/config')
 const { log, HELPERS } = require('@rm/logger')
-const { Db } = require('../services/state')
+
+const state = require('../services/state')
 
 // Loads up the base auth routes and any custom ones
 
@@ -37,12 +38,15 @@ config.getSafe('authentication.strategies').forEach((strategy, i) => {
           try {
             return req.login(user, async () => {
               const { id } = user
-              if (!(await Db.models.Session.isValidSession(id))) {
+              if (!(await state.db.models.Session.isValidSession(id))) {
                 log.info(
                   HELPERS.auth,
                   'Detected multiple sessions, clearing old ones...',
                 )
-                await Db.models.Session.clearOtherSessions(id, req.sessionID)
+                await state.db.models.Session.clearOtherSessions(
+                  id,
+                  req.sessionID,
+                )
               }
               return res.redirect('/')
             })

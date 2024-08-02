@@ -1,6 +1,6 @@
 // @ts-check
 const config = require('@rm/config')
-const { Db } = require('../state')
+const state = require('../state')
 
 /** @typedef {import('@rm/types').RMSlider} Slider */
 
@@ -20,7 +20,7 @@ function generateUi(req, perms) {
 
   const ui = {
     gyms:
-      (perms.gyms || perms.raids) && Db.models.Gym
+      (perms.gyms || perms.raids) && state.db.models.Gym
         ? {
             allGyms: perms.gyms || BLOCKED,
             raids: perms.raids || BLOCKED,
@@ -31,7 +31,7 @@ function generateUi(req, perms) {
           }
         : BLOCKED,
     nests:
-      perms.nests && Db.models.Nest
+      perms.nests && state.db.models.Nest
         ? {
             pokemon: true,
             polygons: true,
@@ -52,7 +52,7 @@ function generateUi(req, perms) {
         : BLOCKED,
     pokestops:
       (perms.pokestops || perms.lures || perms.quests || perms.invasions) &&
-      Db.models.Pokestop
+      state.db.models.Pokestop
         ? {
             allPokestops: perms.pokestops || BLOCKED,
             lures: perms.lures || BLOCKED,
@@ -63,7 +63,7 @@ function generateUi(req, perms) {
           }
         : BLOCKED,
     pokemon:
-      (perms.pokemon || perms.iv || perms.pvp) && Db.models.Pokemon
+      (perms.pokemon || perms.iv || perms.pvp) && state.db.models.Pokemon
         ? {
             legacy: perms.iv && mapConfig.misc.enableMapJsFilter,
             iv: perms.iv || BLOCKED,
@@ -143,16 +143,16 @@ function generateUi(req, perms) {
             },
           }
         : BLOCKED,
-    routes: perms.routes && Db.models.Route ? { enabled: true } : BLOCKED,
+    routes: perms.routes && state.db.models.Route ? { enabled: true } : BLOCKED,
     wayfarer:
       perms.portals || perms.submissionCells
         ? {
-            portals: !!(perms.portals && Db.models.Portal) || BLOCKED,
+            portals: !!(perms.portals && state.db.models.Portal) || BLOCKED,
             submissionCells:
               !!(
                 perms.submissionCells &&
-                Db.models.Pokestop &&
-                Db.models.Gym
+                state.db.models.Pokestop &&
+                state.db.models.Gym
               ) || BLOCKED,
           }
         : undefined,
@@ -160,14 +160,16 @@ function generateUi(req, perms) {
     scanAreas: perms.scanAreas
       ? { filterByAreas: true, enabled: true }
       : undefined,
-    weather: perms.weather && Db.models.Weather ? { enabled: true } : BLOCKED,
+    weather:
+      perms.weather && state.db.models.Weather ? { enabled: true } : BLOCKED,
     admin:
       perms.spawnpoints || perms.scanCells || perms.devices
         ? {
             spawnpoints:
-              !!(perms.spawnpoints && Db.models.Spawnpoint) || BLOCKED,
-            scanCells: !!(perms.scanCells && Db.models.ScanCell) || BLOCKED,
-            devices: !!(perms.devices && Db.models.Device) || BLOCKED,
+              !!(perms.spawnpoints && state.db.models.Spawnpoint) || BLOCKED,
+            scanCells:
+              !!(perms.scanCells && state.db.models.ScanCell) || BLOCKED,
+            devices: !!(perms.devices && state.db.models.Device) || BLOCKED,
           }
         : BLOCKED,
     settings: true,

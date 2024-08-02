@@ -11,7 +11,7 @@ const {
   dnfifyIvFilter,
 } = require('./functions')
 const { filterRTree } = require('../../functions/filterRTree')
-const { Event, Pvp } = require('../../state')
+const state = require('../../state')
 
 module.exports = class PkmnBackend {
   /**
@@ -391,7 +391,7 @@ module.exports = class PkmnBackend {
    */
   buildPvp(pokemon, ts = Math.floor(Date.now() / 1000)) {
     const parsed = this.pvpConfig.reactMapHandlesPvp
-      ? Pvp.resultWithCache(pokemon, ts)
+      ? state.pvp.resultWithCache(pokemon, ts)
       : getParsedPvp(pokemon)
     const cleanPvp = /** @type {import('@rm/types').CleanPvp} */ ({})
     let bestPvp = 4096
@@ -434,7 +434,8 @@ module.exports = class PkmnBackend {
     if (result.pokemon_id === 132 && !result.ditto_form) {
       result.ditto_form = result.form
       result.form =
-        Event.masterfile.pokemon[result.display_pokemon_id]?.defaultFormId || 0
+        state.event.masterfile.pokemon[result.display_pokemon_id]
+          ?.defaultFormId || 0
     }
     if (!result.seen_type) {
       if (result.spawn_id === null) {

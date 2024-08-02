@@ -9,7 +9,7 @@ const { point } = require('@turf/helpers')
 const { log, HELPERS } = require('@rm/logger')
 const config = require('@rm/config')
 
-const { Event } = require('../services/state')
+const state = require('../services/state')
 const getAreaSql = require('../services/functions/getAreaSql')
 const { filterRTree } = require('../services/functions/filterRTree')
 const fetchJson = require('../services/api/fetchJson')
@@ -573,8 +573,12 @@ class Pokemon extends Model {
    */
   static async search(perms, args, { isMad, mem, secret }, distance, bbox) {
     const { search, locale, onlyAreas = [] } = args
-    const pokemonIds = Object.keys(Event.masterfile.pokemon).filter((pkmn) =>
-      i18next.t(`poke_${pkmn}`, { lng: locale }).toLowerCase().includes(search),
+    const pokemonIds = Object.keys(state.event.masterfile.pokemon).filter(
+      (pkmn) =>
+        i18next
+          .t(`poke_${pkmn}`, { lng: locale })
+          .toLowerCase()
+          .includes(search),
     )
     const searchLimit = config.getSafe('api.searchResultsLimit')
     const ts = Math.floor(Date.now() / 1000)

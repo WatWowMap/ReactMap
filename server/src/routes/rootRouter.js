@@ -4,7 +4,7 @@ const { join } = require('path')
 const { SourceMapConsumer } = require('source-map')
 const config = require('@rm/config')
 const { log, HELPERS } = require('@rm/logger')
-const { Event, Db } = require('../services/state')
+const state = require('../services/state')
 const { version } = require('../../../package.json')
 const areaPerms = require('../services/functions/areaPerms')
 const getServerSettings = require('../services/functions/getServerSettings')
@@ -169,13 +169,13 @@ rootRouter.get('/api/settings', async (req, res, next) => {
 
     if (authentication.methods.length && req.user) {
       try {
-        const user = await Db.query('User', 'getOne', req.user.id)
+        const user = await state.db.query('User', 'getOne', req.user.id)
         if (user) {
           if (!user.selectedWebhook) {
             const newWebhook = req.user.perms.webhooks.find(
-              (n) => n in Event.webhookObj,
+              (n) => n in state.event.webhookObj,
             )
-            await Db.query('User', 'updateWebhook', user.id, newWebhook)
+            await state.db.query('User', 'updateWebhook', user.id, newWebhook)
             if (req.session?.user) {
               req.session.user.selectedWebhook = newWebhook
               req.session.save()
@@ -195,13 +195,13 @@ rootRouter.get('/api/settings', async (req, res, next) => {
 
     if ('perms' in settings.user) {
       if (settings.user.perms.pokemon && api.queryOnSessionInit.pokemon) {
-        Event.setAvailable('pokemon', 'Pokemon', Db, false)
+        state.event.setAvailable('pokemon', 'Pokemon', state.db, false)
       }
       if (
         api.queryOnSessionInit.raids &&
         (settings.user.perms.raids || settings.user.perms.gyms)
       ) {
-        Event.setAvailable('gyms', 'Gym', Db, false)
+        state.event.setAvailable('gyms', 'Gym', state.db, false)
       }
       if (
         api.queryOnSessionInit.quests &&
@@ -210,10 +210,10 @@ rootRouter.get('/api/settings', async (req, res, next) => {
           settings.user.perms.invasions ||
           settings.user.perms.lures)
       ) {
-        Event.setAvailable('pokestops', 'Pokestop', Db, false)
+        state.event.setAvailable('pokestops', 'Pokestop', state.db, false)
       }
       if (settings.user.perms.nests && api.queryOnSessionInit.nests) {
-        Event.setAvailable('nests', 'Nest', Db, false)
+        state.event.setAvailable('nests', 'Nest', state.db, false)
       }
     }
 

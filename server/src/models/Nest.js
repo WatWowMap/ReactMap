@@ -4,7 +4,7 @@ const { Model } = require('objection')
 const i18next = require('i18next')
 const config = require('@rm/config')
 
-const { Event, Db } = require('../services/state')
+const state = require('../services/state')
 const getAreaSql = require('../services/functions/getAreaSql')
 
 /** @typedef {Nest & Partial<import("@rm/types").Nest>} FullNest */
@@ -58,13 +58,15 @@ class Nest extends Model {
       await query.limit(config.getSafe('api.queryLimits.nests'))
     )
 
-    const submittedNameMap = await Db.query(
-      'NestSubmission',
-      'getAllByIds',
-      results.map((x) => x.id),
-    ).then((submissions) =>
-      Object.fromEntries(submissions.map((x) => [x.nest_id, x])),
-    )
+    const submittedNameMap = await state.db
+      .query(
+        'NestSubmission',
+        'getAllByIds',
+        results.map((x) => x.id),
+      )
+      .then((submissions) =>
+        Object.fromEntries(submissions.map((x) => [x.nest_id, x])),
+      )
 
     /** @type {(FullNest & { submitted_by?: string })[]} */
     const withNames = results.map((x) => {
@@ -90,7 +92,8 @@ class Nest extends Model {
     const returnedResults = []
     queryResults.forEach((pkmn) => {
       if (pkmn.pokemon_form == 0 || pkmn.pokemon_form === null) {
-        const formId = Event.masterfile.pokemon[pkmn.pokemon_id].defaultFormId
+        const formId =
+          state.event.masterfile.pokemon[pkmn.pokemon_id].defaultFormId
         if (formId) pkmn.pokemon_form = formId
       }
       if (filters[`${pkmn.pokemon_id}-${pkmn.pokemon_form}`]) {
@@ -130,7 +133,8 @@ class Nest extends Model {
       available: results.map((pokemon) => {
         if (pokemon.pokemon_form == 0 || pokemon.pokemon_form === null) {
           return `${pokemon.pokemon_id}-${
-            Event.masterfile.pokemon[pokemon.pokemon_id].defaultFormId || 0
+            state.event.masterfile.pokemon[pokemon.pokemon_id].defaultFormId ||
+            0
           }`
         }
         return `${pokemon.pokemon_id}-${pokemon.pokemon_form || 0}`
@@ -149,11 +153,19 @@ class Nest extends Model {
    */
   static async search(perms, args, { isMad }, distance, bbox) {
     const { search, locale, onlyAreas = [] } = args
-    const pokemonIds = Object.keys(Event.masterfile.pokemon).filter((pkmn) =>
-      i18next.t(`poke_${pkmn}`, { lng: locale }).toLowerCase().includes(search),
+    const pokemonIds = Object.keys(state.event.masterfile.pokemon).filter(
+      (pkmn) =>
+        i18next
+          .t(`poke_${pkmn}`, { lng: locale })
+          .toLowerCase()
+          .includes(search),
     )
 
-    const submittedNests = await Db.query('NestSubmission', 'search', search)
+    const submittedNests = await state.db.query(
+      'NestSubmission',
+      'search',
+      search,
+    )
 
     const query = this.query()
       .select([

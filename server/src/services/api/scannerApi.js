@@ -4,8 +4,7 @@ const { default: fetch } = require('node-fetch')
 const config = require('@rm/config')
 const { log, HELPERS } = require('@rm/logger')
 
-const { userCache } = require('../state')
-const Clients = require('../Clients')
+const state = require('../state')
 const TelegramClient = require('../TelegramClient')
 const DiscordClient = require('../DiscordClient')
 
@@ -106,13 +105,13 @@ async function scannerApi(
         url: '',
         options: {},
       })
-    const cache = userCache.has(user.id)
-      ? userCache.get(user.id)
+    const cache = state.userCache.has(user.id)
+      ? state.userCache.get(user.id)
       : { coordinates: 0, requests: 0 }
 
     switch (category) {
       case 'scanNext':
-        userCache.set(user.id, {
+        state.userCache.set(user.id, {
           coordinates: cache.coordinates + coords.length,
           requests: cache.requests + 1,
         })
@@ -176,7 +175,7 @@ async function scannerApi(
         }
         break
       case 'scanZone':
-        userCache.set(user.id, {
+        state.userCache.set(user.id, {
           coordinates: cache.coordinates + coords.length,
           requests: cache.requests + 1,
         })
@@ -320,7 +319,7 @@ async function scannerApi(
 
     if (backendConfig.sendTelegramMessage || backendConfig.sendDiscordMessage) {
       const capitalized = category.replace('scan', 'Scan ')
-      const updatedCache = userCache.get(user.id)
+      const updatedCache = state.userCache.get(user.id)
       const trimmed = coords
         .filter((_c, i) => i < 25)
         .map((c) =>
@@ -332,12 +331,11 @@ async function scannerApi(
             : c,
         )
         .join('\n')
-      const client = Clients[user.rmStrategy]
       if (
-        client instanceof TelegramClient &&
+        state.event.authClients[user.rmStrategy] instanceof TelegramClient &&
         backendConfig.sendTelegramMessage
       ) {
-        client.sendMessage(
+        await state.event.chatLog(
           `<b>${capitalized} Request</b>\nSize: ${
             data.scanSize
           }\nCoordinates: ${coords.length}\nCenter: ${data.scanLocation
@@ -349,13 +347,14 @@ async function scannerApi(
           }\nTotal Coordinates: ${
             updatedCache?.coordinates || 0
           }\n\n${dateFormat.format(Date.now())}`,
+          user.rmStrategy,
           category === 'getQueue' ? 'main' : category,
         )
       } else if (
-        client instanceof DiscordClient &&
+        state.event.authClients[user.rmStrategy] instanceof DiscordClient &&
         backendConfig.sendDiscordMessage
       ) {
-        client.sendMessage(
+        await state.event.chatLog(
           {
             title: `${capitalized} Request`,
             author: {
@@ -399,6 +398,7 @@ async function scannerApi(
               },
             ],
           },
+          user.rmStrategy,
           category === 'getQueue' ? 'main' : category,
         )
       }

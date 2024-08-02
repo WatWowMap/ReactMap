@@ -4,7 +4,7 @@ const { Model, raw } = require('objection')
 const i18next = require('i18next')
 const config = require('@rm/config')
 
-const { Event, Db } = require('../services/state')
+const state = require('../services/state')
 const getAreaSql = require('../services/functions/getAreaSql')
 
 const coreFields = [
@@ -144,7 +144,7 @@ class Gym extends Model {
 
     const userBadges =
       onlyGymBadges && gymBadges && userId
-        ? await Db.query(
+        ? await state.db.query(
             'Badge',
             'getAll',
             userId,
@@ -183,7 +183,7 @@ class Gym extends Model {
 
     const finalTeams = []
     const finalSlots = Object.fromEntries(
-      Object.keys(Event.masterfile.teams).map((team) => [team, []]),
+      Object.keys(state.event.masterfile.teams).map((team) => [team, []]),
     )
 
     teams.forEach((team) => {
@@ -504,8 +504,12 @@ class Gym extends Model {
     bbox,
   ) {
     const { search, locale, onlyAreas = [] } = args
-    const pokemonIds = Object.keys(Event.masterfile.pokemon).filter((pkmn) =>
-      i18next.t(`poke_${pkmn}`, { lng: locale }).toLowerCase().includes(search),
+    const pokemonIds = Object.keys(state.event.masterfile.pokemon).filter(
+      (pkmn) =>
+        i18next
+          .t(`poke_${pkmn}`, { lng: locale })
+          .toLowerCase()
+          .includes(search),
     )
     const ts = Math.floor(Date.now() / 1000)
 

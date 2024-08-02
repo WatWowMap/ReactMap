@@ -21,8 +21,7 @@ const startApollo = require('./graphql/server')
 const { bindConnections } = require('./models')
 
 const config = require('./services/config')
-const { Db, Event } = require('./services/state')
-const Clients = require('./services/Clients')
+const state = require('./services/state')
 const { starti18n } = require('./services/i18n')
 const { checkForUpdates } = require('./services/checkForUpdates')
 const { loadLatestAreas } = require('./services/areas')
@@ -43,10 +42,11 @@ const startServer = async () => {
     await checkForUpdates()
     log.info(HELPERS.update, 'Completed')
   }
-  bindConnections(Db)
-  startWatcher()
+  state.setTimers()
+  state.setAuthClients()
 
-  Event.clients = Clients
+  bindConnections(state.db)
+  startWatcher()
 
   const distDir = path.join(
     __dirname,
@@ -95,7 +95,7 @@ const startServer = async () => {
 
   await migrate()
 
-  await Db.getDbContext()
+  await state.db.getDbContext()
 
   const serverInterface = config.getSafe('interface')
   const serverPort = config.getSafe('port')
@@ -106,19 +106,19 @@ const startServer = async () => {
   )
 
   await Promise.all([
-    Db.historicalRarity(),
-    Db.getFilterContext(),
-    Event.setAvailable('gyms', 'Gym', Db),
-    Event.setAvailable('pokestops', 'Pokestop', Db),
-    Event.setAvailable('pokemon', 'Pokemon', Db),
-    Event.setAvailable('nests', 'Nest', Db),
+    state.db.historicalRarity(),
+    state.db.getFilterContext(),
+    state.event.setAvailable('gyms', 'Gym', state.db),
+    state.event.setAvailable('pokestops', 'Pokestop', state.db),
+    state.event.setAvailable('pokemon', 'Pokemon', state.db),
+    state.event.setAvailable('nests', 'Nest', state.db),
   ])
   await Promise.all([
-    Event.getUniversalAssets(config.getSafe('icons.styles'), 'uicons'),
-    Event.getUniversalAssets(config.getSafe('audio.styles'), 'uaudio'),
-    Event.getMasterfile(Db.historical, Db.rarity),
-    Event.getInvasions(config.getSafe('api.pogoApiEndpoints.invasions')),
-    Event.getWebhooks(),
+    state.event.getUniversalAssets(config.getSafe('icons.styles'), 'uicons'),
+    state.event.getUniversalAssets(config.getSafe('audio.styles'), 'uaudio'),
+    state.event.getMasterfile(state.db.historical, state.db.rarity),
+    state.event.getInvasions(config.getSafe('api.pogoApiEndpoints.invasions')),
+    state.event.getWebhooks(),
     loadLatestAreas().then((res) => (config.areas = res)),
   ])
 

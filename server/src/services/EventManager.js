@@ -1,5 +1,5 @@
 // @ts-check
-const { promises: fs, existsSync } = require('fs')
+const { promises: fs } = require('fs')
 const path = require('path')
 const Ohbem = require('ohbem')
 const { default: fetch } = require('node-fetch')
@@ -53,35 +53,7 @@ class EventManager {
         .filter(([, api]) => api),
     )
     /** @type {ClientObject} */
-    this.authClients = Object.fromEntries(
-      config
-        .getSafe('authentication.strategies')
-        .filter(({ name, enabled }) => {
-          log.info(
-            HELPERS.auth,
-            `Strategy ${name} ${enabled ? '' : 'was not '}initialized`,
-          )
-          return !!enabled
-        })
-        .map(({ name, type }, i) => {
-          try {
-            const buildStrategy = existsSync(
-              path.resolve(__dirname, `../strategies/${name}.js`),
-            )
-              ? require(path.resolve(__dirname, `../strategies/${name}.js`))
-              : require(path.resolve(__dirname, `../strategies/${type}.js`))
-            return [
-              name ?? `${type}-${i}}`,
-              typeof buildStrategy === 'function'
-                ? buildStrategy(name)
-                : buildStrategy,
-            ]
-          } catch (e) {
-            log.error(HELPERS.auth, e)
-            return [name, null]
-          }
-        }),
-    )
+    this.authClients = {}
   }
 
   /**

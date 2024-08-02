@@ -8,7 +8,7 @@ const { name } = path.parse(__filename)
 const { log, HELPERS } = require('@rm/logger')
 const config = require('@rm/config')
 
-const { Db } = require('../services/state')
+const state = require('../services/state')
 const areaPerms = require('../services/functions/areaPerms')
 const mergePerms = require('../services/functions/mergePerms')
 const webhookPerms = require('../services/functions/webhookPerms')
@@ -41,12 +41,12 @@ const authHandler = async (_req, username, password, done) => {
   }
 
   try {
-    await Db.models.User.query()
+    await state.db.models.User.query()
       .findOne({ username })
       .then(async (userExists) => {
         if (!userExists) {
           try {
-            const newUser = await Db.models.User.query().insertAndFetch({
+            const newUser = await state.db.models.User.query().insertAndFetch({
               username,
               password: await bcrypt.hash(password, 10),
               strategy: 'local',
@@ -90,7 +90,7 @@ const authHandler = async (_req, username, password, done) => {
             }
           })
           if (userExists.strategy !== 'local') {
-            await Db.models.User.query()
+            await state.db.models.User.query()
               .update({ strategy: 'local' })
               .where('id', userExists.id)
             userExists.strategy = 'local'

@@ -3,14 +3,14 @@ const router = require('express').Router()
 
 const { log, HELPERS } = require('@rm/logger')
 
-const { Db } = require('../../../services/state')
+const state = require('../../../services/state')
 
 router.get('/', async (req, res) => {
   try {
     const ts = Math.floor(new Date().getTime() / 1000)
     res
       .status(200)
-      .json(await Db.models.Session.query().where('expires', '>=', ts))
+      .json(await state.db.models.Session.query().where('expires', '>=', ts))
     log.info(HELPERS.api, 'api/v1/sessions')
   } catch (e) {
     log.error(HELPERS.api, 'api/v1/sessions/', e)
@@ -19,7 +19,7 @@ router.get('/', async (req, res) => {
 })
 router.get('/hasValid/:id', async (req, res) => {
   try {
-    const results = await Db.models.Session.query().whereRaw(
+    const results = await state.db.models.Session.query().whereRaw(
       `json_extract(data, '$.passport.user.id') = ${req.params.id}
           OR json_extract(data, '$.passport.user.discordId') = "${req.params.id}"
           OR json_extract(data, '$.passport.user.telegramId') = "${req.params.id}"`,
@@ -37,7 +37,7 @@ router.get('/hasValid/:id', async (req, res) => {
 
 router.get('/clearSessions/:id', async (req, res) => {
   try {
-    const results = await Db.models.Session.query()
+    const results = await state.db.models.Session.query()
       .whereRaw(
         `json_extract(data, '$.passport.user.id') = ${req.params.id}
             OR json_extract(data, '$.passport.user.discordId') = "${req.params.id}"

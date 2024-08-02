@@ -4,7 +4,7 @@ const { GraphQLError } = require('graphql')
 const { ApolloServerErrorCode } = require('@apollo/server/errors')
 const { parse } = require('graphql')
 
-const { Db, Event } = require('../services/state')
+const state = require('../services/state')
 const pkg = require('../../../package.json')
 
 /**
@@ -78,8 +78,8 @@ function apolloMiddleware(server) {
       return {
         req,
         res,
-        Db,
-        Event,
+        Db: state.db,
+        Event: state.event,
         perms,
         user,
         token: req.headers.token,
