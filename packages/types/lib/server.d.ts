@@ -9,7 +9,6 @@ import type {
 import { Knex } from 'knex'
 import { Model } from 'objection'
 import { NextFunction, Request, Response } from 'express'
-import { Transaction } from '@sentry/node'
 import { VerifyCallback } from 'passport-oauth2'
 
 import DbCheck = require('server/src/services/DbCheck')
@@ -25,6 +24,7 @@ import { ModelReturn, OnlyType } from './utility'
 import { Profile } from 'passport-discord'
 import { User } from './models'
 import { Config } from '@rm/types'
+import { OperationTypeNode } from 'graphql'
 
 export interface DbContext {
   isMad: boolean
@@ -137,8 +137,7 @@ export interface GqlContext {
   Event: EventManager
   perms: Permissions
   user: string
-  transaction: Transaction
-  operation: 'query' | 'mutation'
+  operation: OperationTypeNode
   startTime?: number
 }
 

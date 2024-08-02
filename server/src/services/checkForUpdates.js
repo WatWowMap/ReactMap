@@ -87,6 +87,4 @@ async function checkForUpdates() {
   }
 }
 
-module.exports = checkForUpdates().then(() =>
-  log.info(HELPERS.update, 'Completed'),
-)
+module.exports = { checkForUpdates }
