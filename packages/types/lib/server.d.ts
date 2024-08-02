@@ -1,4 +1,3 @@
-import { LEAGUES } from 'server/src/services/filters/pokemon/constants'
 import type {
   ScannerModels,
   ScannerModelKeys,

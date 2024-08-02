@@ -14,10 +14,8 @@ const getAreaSql = require('../services/functions/getAreaSql')
 const { filterRTree } = require('../services/functions/filterRTree')
 const fetchJson = require('../services/api/fetchJson')
 const {
-  LEVELS,
   IV_CALC,
   LEVEL_CALC,
-  LEAGUES,
   MAD_KEY_MAP,
   BASE_KEYS,
 } = require('../services/filters/pokemon/constants')
@@ -75,7 +73,9 @@ class Pokemon extends Model {
       onlyAreas: args.filters.onlyAreas || [],
       ...ctx,
       ...Object.fromEntries(
-        LEVELS.map((x) => [`onlyPvp${x}`, args.filters[`onlyPvp${x}`]]),
+        config
+          .getSafe('api.pvp.levels')
+          .map((x) => [`onlyPvp${x}`, args.filters[`onlyPvp${x}`]]),
       ),
     }
     /** @type {Record<string, PkmnFilter>} */
@@ -124,7 +124,10 @@ class Pokemon extends Model {
     const { onlyIvOr, onlyHundoIv, onlyZeroIv, onlyAreas = [] } = args.filters
     const { hasSize, hasHeight, isMad, mem, secret, pvpV2 } = ctx
     const { filterMap, globalFilter } = this.getFilters(perms, args, ctx)
-    let queryPvp = LEAGUES.some((league) => globalFilter.filterKeys.has(league))
+
+    let queryPvp = config
+      .getSafe('api.pvp.leagues')
+      .some((league) => globalFilter.filterKeys.has(league.name))
     const ts = Math.floor(Date.now() / 1000)
     const queryLimits = config.getSafe('api.queryLimits')
     const reactMapHandlesPvp = config.getSafe('api.pvp.reactMapHandlesPvp')
@@ -146,7 +149,9 @@ class Pokemon extends Model {
       pokemonForms.push(filter.form)
       if (
         !queryPvp &&
-        LEAGUES.some((league) => filter.filterKeys.has(league))
+        config
+          .getSafe('api.pvp.leagues')
+          .some((league) => filter.filterKeys.has(league.name))
       ) {
         queryPvp = true
       }

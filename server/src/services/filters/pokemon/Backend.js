@@ -1,7 +1,7 @@
 /* eslint-disable no-unused-vars */
 const config = require('@rm/config')
 const { log, HELPERS } = require('@rm/logger')
-const { KEYS, AND_KEYS, STANDARD, LEAGUES } = require('./constants')
+const { AND_KEYS, STANDARD } = require('./constants')
 const {
   deepCompare,
   between,
@@ -53,6 +53,7 @@ module.exports = class PkmnBackend {
     this.perms = perms
     this.mods = mods
 
+    this.allKeys = [...AND_KEYS, ...this.pvpConfig.leagues.map((l) => l.name)]
     this.filter = filter
     this.global = global
     this.filterKeys = this.getRelevantKeys(filter)
@@ -159,13 +160,13 @@ module.exports = class PkmnBackend {
 
   /**
    * @param {import("./Frontend")} filter
-   * @returns {Set<(typeof import("./constants").KEYS)[number]>}
+   * @returns {Set<string>}
    */
   getRelevantKeys(filter = this.filter) {
     return this.filter.all
       ? new Set()
       : new Set(
-          KEYS.filter(
+          this.allKeys.filter(
             (key) =>
               (this.pvpConfig.leagueObj[key]
                 ? this.perms.pvp
@@ -175,7 +176,7 @@ module.exports = class PkmnBackend {
   }
 
   /**
-   * @param {(typeof import("./constants").KEYS)[number]} key
+   * @param {string} key
    * @returns {boolean}
    */
   isActive(key, filter = this.filter) {
@@ -193,7 +194,7 @@ module.exports = class PkmnBackend {
 
   /**
    * @param {import("@rm/types").PvpEntry} entry
-   * @param {typeof import("./constants").LEAGUES[number]} league
+   * @param {string} league
    * @returns {boolean}
    */
   pvpCheck(entry, league) {
@@ -221,7 +222,7 @@ module.exports = class PkmnBackend {
   }
 
   /**
-   * @param {typeof import("./constants").LEAGUES[number]} league
+   * @param {string} league
    * @param {import("@rm/types").PvpEntry[]} data
    * @returns {{ best: number; filtered: import("@rm/types").PvpEntry[]}}
    */
@@ -386,14 +387,13 @@ module.exports = class PkmnBackend {
   /**
    * @param {import("@rm/types").Pokemon} pokemon
    * @param {number} [ts]
-   * @returns {{ cleanPvp: { [key in typeof LEAGUES[number]]?: import('@rm/types').PvpEntry[] }, bestPvp: number }}
+   * @returns {{ cleanPvp: import('@rm/types').CleanPvp, bestPvp: number }}
    */
   buildPvp(pokemon, ts = Math.floor(Date.now() / 1000)) {
     const parsed = this.pvpConfig.reactMapHandlesPvp
       ? Pvp.resultWithCache(pokemon, ts)
       : getParsedPvp(pokemon)
-    const cleanPvp =
-      /** @type {{ [key in typeof LEAGUES[number]]?: import('@rm/types').PvpEntry[] }} */ ({})
+    const cleanPvp = /** @type {import('@rm/types').CleanPvp} */ ({})
     let bestPvp = 4096
     Object.keys(parsed).forEach((league) => {
       if (this.pvpConfig.leagueObj[league]) {

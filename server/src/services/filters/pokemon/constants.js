@@ -1,6 +1,5 @@
 // @ts-check
 const { raw } = require('objection')
-const config = require('@rm/config')
 const PokemonFilter = require('./Frontend')
 
 const LEVEL_CALC =
@@ -8,15 +7,6 @@ const LEVEL_CALC =
 
 const IV_CALC =
   'IFNULL((individual_attack + individual_defense + individual_stamina) / 0.45, NULL)'
-
-const LEAGUES = /** @type {['great', 'ultra', 'little']} */ (
-  config.getSafe('api.pvp.leagues').map((league) => league.name)
-)
-
-const LEVELS = config
-  .getSafe('api.pvp.levels')
-  .slice()
-  .sort((a, b) => a - b)
 
 const AND_KEYS = /** @type {const} */ ([
   'iv',
@@ -28,8 +18,6 @@ const AND_KEYS = /** @type {const} */ ([
 ])
 
 const BASE_KEYS = /** @type {const} */ ([...AND_KEYS, 'gender', 'xxs', 'xxl'])
-
-const KEYS = /** @type {const} */ ([...BASE_KEYS, ...LEAGUES])
 
 const MAD_KEY_MAP = /** @type {const} */ ({
   iv: raw(IV_CALC),
@@ -44,11 +32,8 @@ const MAD_KEY_MAP = /** @type {const} */ ({
 const STANDARD = new PokemonFilter()
 
 module.exports = {
-  LEVELS,
-  KEYS,
   AND_KEYS,
   IV_CALC,
-  LEAGUES,
   LEVEL_CALC,
   MAD_KEY_MAP,
   STANDARD,
