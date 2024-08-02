@@ -9,7 +9,6 @@ const compression = require('compression')
 const session = require('express-session')
 const passport = require('passport')
 const { rainbow } = require('chalkercli')
-const Sentry = require('@sentry/node')
 const { expressMiddleware } = require('@apollo/server/express4')
 const cors = require('cors')
 const { json } = require('body-parser')
@@ -33,6 +32,7 @@ const { loadLatestAreas } = require('./services/areas')
 const { connection } = require('./db/knexfile.cjs')
 const startApollo = require('./graphql/server')
 const { rateLimitingMiddleware } = require('./middleware/rateLimiting')
+const { sentryMiddleware, sentryTransaction } = require('./middleware/sentry')
 require('./services/watcher')
 
 Event.clients = Clients
@@ -44,37 +44,9 @@ if (!config.getSafe('devOptions.skipUpdateCheck')) {
 const app = express()
 const httpServer = http.createServer(app)
 
-app.disable('x-powered-by')
-const sentry = config.getSafe('sentry.server')
-if (sentry.enabled || process.env.SENTRY_DSN) {
-  Sentry.init({
-    dsn: sentry.dsn || process.env.SENTRY_DSN,
-    debug: sentry.debug || !!process.env.SENTRY_DEBUG,
-    environment: process.env.NODE_ENV || 'production',
-    integrations: [
-      // enable HTTP calls tracing
-      new Sentry.Integrations.Http({ tracing: true }),
-      // enable Express.js middleware tracing
-      new Sentry.Integrations.Express({
-        // to trace all requests to the default router
-        app,
-        // alternatively, you can specify the routes you want to trace:
-        // router: someRouter,
-      }),
-      ...Sentry.autoDiscoverNodePerformanceMonitoringIntegrations(),
-    ],
-    tracesSampleRate:
-      +(process.env.SENTRY_TRACES_SAMPLE_RATE || sentry.tracesSampleRate) ||
-      0.1,
-    release: pkg.version,
-  })
+sentryMiddleware(app)
 
-  // RequestHandler creates a separate execution context, so that all
-  // transactions/spans/breadcrumbs are isolated across requests
-  app.use(Sentry.Handlers.requestHandler())
-  // TracingHandler creates a trace for every incoming request
-  app.use(Sentry.Handlers.tracingHandler())
-}
+app.disable('x-powered-by')
 
 app.use((req, res, next) => {
   if (req.url.endsWith('.map')) {
@@ -141,11 +113,7 @@ if (fs.existsSync(localePath)) {
   )
 }
 
-app.use(rootRouter, rateLimitingMiddleware)
-
-if (sentry.enabled || process.env.SENTRY_DSN) {
-  app.use(Sentry.Handlers.errorHandler())
-}
+app.use(rootRouter, rateLimitingMiddleware())
 
 app.use((req, res, next) => {
   const start = process.hrtime()
@@ -226,16 +194,7 @@ startApollo(httpServer).then((server) => {
           pkg.version ||
           1
         const serverV = pkg.version || 1
-        let transaction
-        if (sentry.enabled || process.env.SENTRY_DSN) {
-          transaction = res.__sentry_transaction
-          if (!transaction) {
-            transaction = Sentry.startTransaction({ name: 'POST /graphql' })
-          }
-          Sentry.configureScope((scope) => {
-            scope.setSpan(transaction)
-          })
-        }
+        const transaction = sentryTransaction(res)
 
         const definition = parse(req.body.query).definitions.find(
           (d) => d.kind === 'OperationDefinition',
