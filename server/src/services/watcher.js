@@ -4,7 +4,6 @@ const chokidar = require('chokidar')
 
 const config = require('@rm/config')
 const { log, HELPERS } = require('@rm/logger')
-
 const { validateJsons } = require('@rm/config/lib/validateJsons')
 
 const configDir = resolve(__dirname, '../configs')

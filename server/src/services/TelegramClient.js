@@ -2,9 +2,10 @@
 const { default: fetch } = require('node-fetch')
 const { TelegramStrategy } = require('@rainb0w-clwn/passport-telegram-official')
 const passport = require('passport')
-const config = require('@rm/config')
 
+const config = require('@rm/config')
 const { log, HELPERS } = require('@rm/logger')
+
 const state = require('./state')
 const areaPerms = require('./functions/areaPerms')
 const webhookPerms = require('./functions/webhookPerms')

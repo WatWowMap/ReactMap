@@ -4,9 +4,10 @@ const { resolve } = require('path')
 const { Client } = require('discord.js')
 const { Strategy: DiscordStrategy } = require('passport-discord')
 const passport = require('passport')
-const config = require('@rm/config')
 
+const config = require('@rm/config')
 const { log, HELPERS } = require('@rm/logger')
+
 const state = require('./state')
 const logUserAuth = require('./logUserAuth')
 const areaPerms = require('./functions/areaPerms')
