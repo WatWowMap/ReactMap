@@ -25,7 +25,6 @@ const Clients = require('./services/Clients')
 const { starti18n } = require('./services/i18n')
 const { checkForUpdates } = require('./services/checkForUpdates')
 const { loadLatestAreas } = require('./services/areas')
-require('./services/watcher')
 
 const { rateLimitingMiddleware } = require('./middleware/rateLimiting')
 const { initSentry, sentryMiddleware } = require('./middleware/sentry')
@@ -35,12 +34,15 @@ const { initPassport } = require('./middleware/passport')
 const { errorMiddleware } = require('./middleware/error')
 const { sessionMiddleware } = require('./middleware/session')
 const { apolloMiddleware } = require('./middleware/apollo')
+const { startWatcher } = require('./services/watcher')
 
 const startServer = async () => {
   if (!config.getSafe('devOptions.skipUpdateCheck')) {
     await checkForUpdates()
     log.info(HELPERS.update, 'Completed')
   }
+
+  startWatcher()
 
   Event.clients = Clients
 

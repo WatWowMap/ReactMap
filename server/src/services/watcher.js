@@ -4,15 +4,10 @@ const chokidar = require('chokidar')
 
 const config = require('@rm/config')
 const { log, HELPERS } = require('@rm/logger')
+
 const checkConfigJsons = require('./functions/checkConfigJsons')
 
 const configDir = resolve(__dirname, '../configs')
-
-const watcher = chokidar.watch(configDir, {
-  ignored: /(^|[/\\])\../,
-  persistent: true,
-  ignoreInitial: true,
-})
 
 /**
  * Replace base path, remove .json, and split into array
@@ -55,15 +50,26 @@ const handle = (event, rawFile, domain) => {
       break
   }
 }
-watcher.on('change', (path) => {
-  const [rawFile, domain] = clean(path)
-  handle('CHANGE', rawFile, domain)
-})
 
-watcher.on('add', (path) => {
-  const [rawFile, domain] = clean(path)
-  if (domain && domain.split('_').length > 1) return
-  handle('ADD', rawFile, domain)
-})
+const startWatcher = () => {
+  const watcher = chokidar.watch(configDir, {
+    ignored: /(^|[/\\])\../,
+    persistent: true,
+    ignoreInitial: true,
+  })
 
-module.exports.watcher = watcher
+  watcher.on('change', (path) => {
+    const [rawFile, domain] = clean(path)
+    handle('CHANGE', rawFile, domain)
+  })
+
+  watcher.on('add', (path) => {
+    const [rawFile, domain] = clean(path)
+    if (domain && domain.split('_').length > 1) return
+    handle('ADD', rawFile, domain)
+  })
+
+  return watcher
+}
+
+module.exports = { startWatcher }
