@@ -14,7 +14,7 @@ class NestSubmission extends Model {
 
   static get relationMappings() {
     // eslint-disable-next-line global-require
-    const { Db } = require('../services/initialization')
+    const { Db } = require('../services/state')
     return {
       user: {
         relation: Model.BelongsToOneRelation,

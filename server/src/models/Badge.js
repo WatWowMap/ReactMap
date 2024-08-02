@@ -17,7 +17,7 @@ class Badge extends Model {
   }
 
   static get relationMappings() {
-    const { Db } = require('../services/initialization')
+    const { Db } = require('../services/state')
     return {
       user: {
         relation: Model.BelongsToOneRelation,

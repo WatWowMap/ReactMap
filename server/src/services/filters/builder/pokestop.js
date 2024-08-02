@@ -2,7 +2,7 @@
 const { log, HELPERS } = require('@rm/logger')
 
 const BaseFilter = require('../Base')
-const { Event, Db } = require('../../initialization')
+const { Event, Db } = require('../../state')
 
 /**
  *

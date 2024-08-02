@@ -5,7 +5,7 @@ const passport = require('passport')
 const config = require('@rm/config')
 
 const { log, HELPERS } = require('@rm/logger')
-const { Db, Event } = require('./initialization')
+const { Db, Event } = require('./state')
 const areaPerms = require('./functions/areaPerms')
 const webhookPerms = require('./functions/webhookPerms')
 const scannerPerms = require('./functions/scannerPerms')

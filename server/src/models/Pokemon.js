@@ -9,7 +9,7 @@ const { point } = require('@turf/helpers')
 const { log, HELPERS } = require('@rm/logger')
 const config = require('@rm/config')
 
-const { Event } = require('../services/initialization')
+const { Event } = require('../services/state')
 const getAreaSql = require('../services/functions/getAreaSql')
 const { filterRTree } = require('../services/functions/filterRTree')
 const fetchJson = require('../services/api/fetchJson')

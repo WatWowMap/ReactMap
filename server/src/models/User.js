@@ -11,7 +11,7 @@ class User extends Model {
 
   static get relationMappings() {
     // eslint-disable-next-line global-require
-    const { Db } = require('../services/initialization')
+    const { Db } = require('../services/state')
     return {
       badges: {
         relation: Model.HasManyRelation,

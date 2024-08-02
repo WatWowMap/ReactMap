@@ -3,7 +3,7 @@ const { Model, raw } = require('objection')
 const i18next = require('i18next')
 const config = require('@rm/config')
 
-const { Event } = require('../services/initialization')
+const { Event } = require('../services/state')
 const getAreaSql = require('../services/functions/getAreaSql')
 const { getUserMidnight } = require('../services/functions/getClientTime')
 

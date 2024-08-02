@@ -4,7 +4,7 @@ const { default: fetch } = require('node-fetch')
 const config = require('@rm/config')
 const { log, HELPERS } = require('@rm/logger')
 
-const { userCache } = require('../initialization')
+const { userCache } = require('../state')
 const Clients = require('../Clients')
 const TelegramClient = require('../TelegramClient')
 const DiscordClient = require('../DiscordClient')

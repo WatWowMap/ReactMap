@@ -2,7 +2,7 @@
 const config = require('@rm/config')
 
 const { log, HELPERS } = require('@rm/logger')
-const { Db } = require('../initialization')
+const { Db } = require('../state')
 
 /**
  *

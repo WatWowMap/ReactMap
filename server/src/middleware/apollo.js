@@ -4,7 +4,7 @@ const { GraphQLError } = require('graphql')
 const { ApolloServerErrorCode } = require('@apollo/server/errors')
 const { parse } = require('graphql')
 
-const { Db, Event } = require('../services/initialization')
+const { Db, Event } = require('../services/state')
 const pkg = require('../../../package.json')
 
 /**

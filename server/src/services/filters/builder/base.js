@@ -1,7 +1,7 @@
 // @ts-check
 const config = require('@rm/config')
 
-const { Db } = require('../../initialization')
+const { Db } = require('../../state')
 const buildPokemon = require('./pokemon')
 const buildPokestops = require('./pokestop')
 const buildGyms = require('./gym')

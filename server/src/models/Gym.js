@@ -4,7 +4,7 @@ const { Model, raw } = require('objection')
 const i18next = require('i18next')
 const config = require('@rm/config')
 
-const { Event, Db } = require('../services/initialization')
+const { Event, Db } = require('../services/state')
 const getAreaSql = require('../services/functions/getAreaSql')
 
 const coreFields = [

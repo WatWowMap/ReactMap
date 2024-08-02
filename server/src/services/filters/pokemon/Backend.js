@@ -11,7 +11,7 @@ const {
   dnfifyIvFilter,
 } = require('./functions')
 const { filterRTree } = require('../../functions/filterRTree')
-const { Event, Pvp } = require('../../initialization')
+const { Event, Pvp } = require('../../state')
 
 module.exports = class PkmnBackend {
   /**

@@ -3,7 +3,7 @@
 // @ts-check
 const router = require('express').Router()
 const { log, HELPERS } = require('@rm/logger')
-const { Db } = require('../../../services/initialization')
+const { Db } = require('../../../services/state')
 
 router.get('/', async (req, res) => {
   try {

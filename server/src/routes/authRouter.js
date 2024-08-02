@@ -4,7 +4,7 @@ const passport = require('passport')
 
 const config = require('@rm/config')
 const { log, HELPERS } = require('@rm/logger')
-const { Db } = require('../services/initialization')
+const { Db } = require('../services/state')
 
 // Loads up the base auth routes and any custom ones
 

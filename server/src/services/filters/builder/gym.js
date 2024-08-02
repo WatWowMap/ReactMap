@@ -1,5 +1,5 @@
 // @ts-check
-const { Event } = require('../../initialization')
+const { Event } = require('../../state')
 const BaseFilter = require('../Base')
 
 /**

@@ -8,7 +8,7 @@ const { name } = path.parse(__filename)
 const { log, HELPERS } = require('@rm/logger')
 const config = require('@rm/config')
 
-const { Db } = require('../services/initialization')
+const { Db } = require('../services/state')
 const areaPerms = require('../services/functions/areaPerms')
 const mergePerms = require('../services/functions/mergePerms')
 const webhookPerms = require('../services/functions/webhookPerms')
