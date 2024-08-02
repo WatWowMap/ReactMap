@@ -50,6 +50,25 @@ const serverState = {
         }),
     )
   },
+  async loadLocalContexts() {
+    await Promise.all([
+      this.db.historicalRarity(),
+      this.db.getFilterContext(),
+      this.event.setAvailable('gyms', 'Gym', this.db),
+      this.event.setAvailable('pokestops', 'Pokestop', this.db),
+      this.event.setAvailable('pokemon', 'Pokemon', this.db),
+      this.event.setAvailable('nests', 'Nest', this.db),
+    ])
+  },
+  async loadExternalContexts() {
+    await Promise.all([
+      this.event.getUniversalAssets(config.getSafe('icons.styles'), 'uicons'),
+      this.event.getUniversalAssets(config.getSafe('audio.styles'), 'uaudio'),
+      this.event.getMasterfile(this.db.historical, this.db.rarity),
+      this.event.getInvasions(config.getSafe('api.pogoApiEndpoints.invasions')),
+      this.event.getWebhooks(),
+    ])
+  },
   reload() {
     this.db = new DbCheck()
     this.pvp = config.getSafe('api.pvp.reactMapHandlesPvp')
@@ -58,6 +77,26 @@ const serverState = {
     this.event = new EventManager()
     this.setTimers()
     this.setAuthClients()
+    return this
+  },
+  /** @param {NodeJS.Signals} e */
+  async shutdown(e) {
+    log.info(HELPERS.ReactMap, 'received signal', e, 'writing cache...')
+    const cacheObj = {}
+    this.userCache.keys().forEach((key) => {
+      cacheObj[key] = this.userCache.get(key)
+    })
+    await Promise.all([
+      setCache('scanUserHistory.json', cacheObj),
+      setCache('rarity.json', this.db.rarity),
+      setCache('historical.json', this.db.historical),
+      setCache('available.json', this.event.available),
+      setCache('filterContext.json', this.db.filterContext),
+      setCache('questConditions.json', this.db.questConditions),
+      setCache('uaudio.json', this.event.uaudio),
+      setCache('uicons.json', this.event.uicons),
+    ])
+    log.info(HELPERS.ReactMap, 'exiting...')
   },
 }
 
@@ -65,48 +104,25 @@ Object.entries(getCache('scanUserHistory.json', {})).forEach(([k, v]) =>
   serverState.userCache.set(k, v),
 )
 
-/**
- * @param {NodeJS.Signals} e
- * @param {typeof serverState} state
- */
-const onShutdown = async (e, state) => {
-  log.info(HELPERS.ReactMap, 'received signal', e, 'writing cache...')
-  const cacheObj = {}
-  state.userCache.keys().forEach((key) => {
-    cacheObj[key] = state.userCache.get(key)
-  })
-  await Promise.all([
-    setCache('scanUserHistory.json', cacheObj),
-    setCache('rarity.json', state.db.rarity),
-    setCache('historical.json', state.db.historical),
-    setCache('available.json', state.event.available),
-    setCache('filterContext.json', state.db.filterContext),
-    setCache('questConditions.json', state.db.questConditions),
-    setCache('uaudio.json', state.event.uaudio),
-    setCache('uicons.json', state.event.uicons),
-  ])
-  log.info(HELPERS.ReactMap, 'exiting...')
-}
-
 process.on('SIGINT', async (e) => {
-  await onShutdown(e, serverState)
+  await serverState.shutdown(e)
   process.exit(0)
 })
 process.on('SIGTERM', async (e) => {
-  await onShutdown(e, serverState)
+  await serverState.shutdown(e)
   process.exit(0)
 })
 process.on('SIGUSR1', async (e) => {
-  await onShutdown(e, serverState)
+  await serverState.shutdown(e)
   process.exit(0)
 })
 process.on('SIGUSR2', async (e) => {
-  await onShutdown(e, serverState)
+  await serverState.shutdown(e)
   process.exit(0)
 })
 process.on('uncaughtException', async (e) => {
   log.error(HELPERS.ReactMap, e)
-  await onShutdown('SIGBREAK', serverState)
+  await serverState.shutdown('SIGBREAK')
   process.exit(99)
 })
 

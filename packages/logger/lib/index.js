@@ -6,8 +6,6 @@ if (!process.env.FORCE_COLOR) {
 const logger = require('loglevel')
 const chalk = require('chalk')
 
-const config = require('@rm/config')
-
 const HELPERS = /** @type {const} */ ({
   trace: chalk.gray('☰'),
   debug: chalk.green('☯'),
@@ -90,16 +88,8 @@ log.methodFactory = (methodName, logLevel, loggerName) => {
   }
 }
 
-const setLogLevel = () => {
-  if (
-    config.has('devOptions.logLevel') &&
-    config.getSafe('devOptions.logLevel').toUpperCase() in logger.levels
-  ) {
-    log.setLevel(config.getSafe('devOptions.logLevel'))
-  }
-}
-
-setLogLevel()
+/** @param {import('loglevel').LogLevelNames} logLevel */
+const setLogLevel = (logLevel = 'info') => log.setLevel(logLevel)
 
 module.exports.log = log
 

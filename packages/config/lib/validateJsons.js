@@ -10,18 +10,15 @@ const { log, HELPERS } = require('@rm/logger')
  * @param {string} [domain]
  * @returns
  */
-function checkConfigJsons(
-  fileName,
-  domain = process.env.NODE_CONFIG_ENV || '',
-) {
-  const generalJson = fs.existsSync(
-    resolve(`${__dirname}/../../configs/${fileName}.json`),
-  )
+function validateJsons(fileName, domain = process.env.NODE_CONFIG_ENV || '') {
+  const configDir = process.env.NODE_CONFIG_DIR || ''
+
+  if (!configDir) {
+    throw new Error('Invalid NODE_CONFIG_DIR')
+  }
+  const generalJson = fs.existsSync(resolve(configDir, `${fileName}.json`))
     ? JSON.parse(
-        fs.readFileSync(
-          resolve(__dirname, `../../configs/${fileName}.json`),
-          'utf8',
-        ),
+        fs.readFileSync(resolve(configDir, `${fileName}.json`), 'utf8'),
       )
     : {}
   if (Object.keys(generalJson).length && !domain) {
@@ -32,14 +29,12 @@ function checkConfigJsons(
   }
   if (
     domain &&
-    fs.existsSync(
-      resolve(`${__dirname}/../../configs/${fileName}/${domain}.json`),
-    )
+    fs.existsSync(resolve(configDir, `${fileName}/${domain}.json`))
   ) {
     const domainJson =
       JSON.parse(
         fs.readFileSync(
-          resolve(__dirname, `../../configs/${fileName}/${domain}.json`),
+          resolve(configDir, `${fileName}/${domain}.json`),
           'utf8',
         ),
       ) || {}
@@ -58,4 +53,4 @@ function checkConfigJsons(
   return generalJson
 }
 
-module.exports = checkConfigJsons
+module.exports = { validateJsons }

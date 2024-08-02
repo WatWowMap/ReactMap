@@ -15,16 +15,16 @@ const http = require('http')
 const { default: helmet } = require('helmet')
 
 const { log, HELPERS, getTimeStamp } = require('@rm/logger')
+const config = require('@rm/config')
 
 const rootRouter = require('./routes/rootRouter')
 const startApollo = require('./graphql/server')
 const { bindConnections } = require('./models')
 
-const config = require('./services/config')
 const state = require('./services/state')
 const { starti18n } = require('./services/i18n')
 const { checkForUpdates } = require('./services/checkForUpdates')
-const { loadLatestAreas } = require('./services/areas')
+const { loadLatestAreas, loadCachedAreas } = require('./services/areas')
 
 const { rateLimitingMiddleware } = require('./middleware/rateLimiting')
 const { initSentry, sentryMiddleware } = require('./middleware/sentry')
@@ -42,6 +42,8 @@ const startServer = async () => {
     await checkForUpdates()
     log.info(HELPERS.update, 'Completed')
   }
+  config.setAreas(loadCachedAreas())
+
   state.setTimers()
   state.setAuthClients()
 
@@ -105,22 +107,10 @@ const startServer = async () => {
     `Server is now listening at http://${serverInterface}:${serverPort}`,
   )
 
-  await Promise.all([
-    state.db.historicalRarity(),
-    state.db.getFilterContext(),
-    state.event.setAvailable('gyms', 'Gym', state.db),
-    state.event.setAvailable('pokestops', 'Pokestop', state.db),
-    state.event.setAvailable('pokemon', 'Pokemon', state.db),
-    state.event.setAvailable('nests', 'Nest', state.db),
-  ])
-  await Promise.all([
-    state.event.getUniversalAssets(config.getSafe('icons.styles'), 'uicons'),
-    state.event.getUniversalAssets(config.getSafe('audio.styles'), 'uaudio'),
-    state.event.getMasterfile(state.db.historical, state.db.rarity),
-    state.event.getInvasions(config.getSafe('api.pogoApiEndpoints.invasions')),
-    state.event.getWebhooks(),
-    loadLatestAreas().then((res) => (config.areas = res)),
-  ])
+  await state.loadLocalContexts()
+  await state.loadExternalContexts()
+  const newAreas = await loadLatestAreas()
+  config.areas = newAreas
 
   const text = rainbow(`ℹ ${getTimeStamp()} [ReactMap] has fully started`)
   setTimeout(() => text.stop(), 1_000)

@@ -87,6 +87,7 @@ export interface Config<Client extends boolean = false>
     } & BaseConfig['api']['pvp']
   } & BaseConfig['api']
   map: {
+    domain?: string
     messageOfTheDay: {
       settings: {
         parentStyle: Record<string, string> // should be CSS properties but performance seems to die

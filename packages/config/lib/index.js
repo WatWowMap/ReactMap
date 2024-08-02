@@ -1,3 +1,4 @@
+/* eslint-disable import/order */
 // @ts-check
 if (!process.env.NODE_CONFIG_DIR) {
   process.env.NODE_CONFIG_DIR = require('path').resolve(
@@ -21,24 +22,73 @@ if (process.env.NODE_CONFIG_ENV) {
   }
 }
 
+const path = require('path')
+
+const { setLogLevel, HELPERS, log } = require('@rm/logger')
+const { applyMutations } = require('./mutations')
+
+function directory() {
+  if (process.env.NODE_CONFIG_DIR) {
+    return process.env.NODE_CONFIG_DIR
+  }
+  return path.join(process.cwd(), 'config')
+}
+
+function purge() {
+  Object.keys(require.cache).forEach((fileName) => {
+    if (fileName.indexOf(directory()) === -1) {
+      return
+    }
+    delete require.cache[fileName]
+  })
+  delete require.cache[require.resolve('config')]
+  delete require.cache[require.resolve('@rm/config')]
+}
+
+/** @param {import('config').IConfig} c */
+function setup(c) {
+  c.reload = () => {
+    try {
+      purge()
+      const newConfig = require('config')
+      setup(newConfig)
+
+      log.info(HELPERS.config, 'Config reloaded')
+      return newConfig
+    } catch (e) {
+      log.error(HELPERS.config, 'error reloading config', e)
+      return c
+    }
+  }
+
+  c.getSafe = (key) => require('config').get(key)
+
+  c.getMapConfig = (req) => {
+    const domain = /** @type {const} */ (
+      `multiDomainsObj.${req.headers.host.replaceAll('.', '_')}`
+    )
+    return c.has(domain) ? c.getSafe(domain) : c.getSafe('map')
+  }
+
+  c.getAreas = (req, key) => {
+    const location = /** @type {const} */ (
+      `areas.${key}.${req.headers.host.replaceAll('.', '_')}`
+    )
+    return c.has(location)
+      ? c.getSafe(location)
+      : c.getSafe(`areas.${key}.main`)
+  }
+
+  c.setAreas = (areas) => {
+    c.areas = areas
+  }
+
+  setLogLevel(c.getSafe('devOptions.logLevel'))
+  applyMutations(c)
+}
+
 const config = require('config')
 
-config.getSafe = config.get
-
-config.getMapConfig = (req) => {
-  const domain = /** @type {const} */ (
-    `multiDomainsObj.${req.headers.host.replaceAll('.', '_')}`
-  )
-  return config.has(domain) ? config.getSafe(domain) : config.getSafe('map')
-}
-
-config.getAreas = (req, key) => {
-  const location = /** @type {const} */ (
-    `areas.${key}.${req.headers.host.replaceAll('.', '_')}`
-  )
-  return config.has(location)
-    ? config.getSafe(location)
-    : config.getSafe(`areas.${key}.main`)
-}
+setup(config)
 
 module.exports = config

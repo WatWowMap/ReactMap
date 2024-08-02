@@ -7,6 +7,7 @@ import { ExpressUser, Permissions } from './server'
 declare module 'config' {
   interface IConfig extends Config {
     getSafe: GetSafeConfig
+    reload: () => IConfig
     getMapConfig: (request: Request) => Config['map']
     getAreas: <T extends 'scanAreas' | 'scanAreasMenu'>(
       request: Request,
@@ -14,6 +15,13 @@ declare module 'config' {
     ) => T extends 'scanAreas'
       ? Config['areas']['scanAreas'][string]
       : Config['areas']['scanAreasMenu'][string]
+    setAreas: (
+      newAreas: Awaited<
+        ReturnType<
+          typeof import('server/src/services/areas')['loadLatestAreas']
+        >
+      >,
+    ) => void
   }
 }
 

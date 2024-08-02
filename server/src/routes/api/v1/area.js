@@ -7,7 +7,7 @@ const { loadLatestAreas } = require('../../../services/areas')
 router.get('/reload', async (req, res) => {
   try {
     const newAreas = await loadLatestAreas()
-    config.areas = newAreas
+    config.setAreas(newAreas)
 
     res.status(200).json({ status: 'ok', message: 'reloaded areas' })
   } catch (e) {

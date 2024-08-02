@@ -5,7 +5,7 @@ const chokidar = require('chokidar')
 const config = require('@rm/config')
 const { log, HELPERS } = require('@rm/logger')
 
-const checkConfigJsons = require('./functions/checkConfigJsons')
+const { validateJsons } = require('@rm/config/lib/validateJsons')
 
 const configDir = resolve(__dirname, '../configs')
 
@@ -35,7 +35,7 @@ const handle = (event, rawFile, domain) => {
           multiDomainsObj[domainKey][rawFile] = config.util.extendDeep(
             {},
             multiDomainsObj[domainKey][rawFile],
-            checkConfigJsons(rawFile, domain),
+            validateJsons(rawFile, domain),
           )
         }
       } else {
@@ -43,7 +43,7 @@ const handle = (event, rawFile, domain) => {
         config.map[rawFile] = config.util.extendDeep(
           {},
           config.map[rawFile],
-          checkConfigJsons(rawFile),
+          validateJsons(rawFile),
         )
       }
       break

@@ -644,11 +644,7 @@ module.exports = class DbCheck {
         )
         log.info(HELPERS.db, 'Updating filter context for routes')
       } catch (e) {
-        log.error(
-          HELPERS.db,
-          'If you are using RDM, you likely do not have a routes table. Remove `route` from the `useFor` array in your config',
-          e,
-        )
+        log.error(HELPERS.db, e)
       }
     }
     if (this.models.Pokestop) {

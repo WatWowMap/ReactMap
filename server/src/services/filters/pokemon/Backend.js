@@ -1,7 +1,7 @@
 /* eslint-disable no-unused-vars */
 const config = require('@rm/config')
 const { log, HELPERS } = require('@rm/logger')
-const { AND_KEYS, STANDARD } = require('./constants')
+const { AND_KEYS } = require('./constants')
 const {
   deepCompare,
   between,
@@ -12,6 +12,7 @@ const {
 } = require('./functions')
 const { filterRTree } = require('../../functions/filterRTree')
 const state = require('../../state')
+const PokemonFilter = require('./Frontend')
 
 module.exports = class PkmnBackend {
   /**
@@ -52,7 +53,7 @@ module.exports = class PkmnBackend {
 
     this.perms = perms
     this.mods = mods
-
+    this.standard = new PokemonFilter()
     this.allKeys = [...AND_KEYS, ...this.pvpConfig.leagues.map((l) => l.name)]
     this.filter = filter
     this.global = global
@@ -180,15 +181,15 @@ module.exports = class PkmnBackend {
    * @returns {boolean}
    */
   isActive(key, filter = this.filter) {
-    switch (typeof STANDARD[key]) {
+    switch (typeof this.standard[key]) {
       case 'boolean':
       case 'string':
       case 'number':
-        return filter[key] !== STANDARD[key]
+        return filter[key] !== this.standard[key]
       default:
         return Array.isArray(filter[key])
-          ? filter[key].some((v, i) => v !== STANDARD[key][i])
-          : !deepCompare(filter[key], STANDARD[key])
+          ? filter[key].some((v, i) => v !== this.standard[key][i])
+          : !deepCompare(filter[key], this.standard[key])
     }
   }
 
@@ -306,7 +307,7 @@ module.exports = class PkmnBackend {
           ? PkmnBackend.ensureSafe(sta_iv, 15)
           : undefined,
         cp: this.filterKeys.has('cp')
-          ? PkmnBackend.ensureSafe(cp, STANDARD.cp[1])
+          ? PkmnBackend.ensureSafe(cp, this.standard.cp[1])
           : undefined,
         level: this.filterKeys.has('level')
           ? PkmnBackend.ensureSafe(level, 35)
@@ -324,7 +325,7 @@ module.exports = class PkmnBackend {
             pokemon,
             [`pvp_${league}`]: PkmnBackend.ensureSafe(
               values,
-              STANDARD[league]?.[1],
+              this.standard[league]?.[1],
             ),
           }
           if (this.filterKeys.has('gender')) {
