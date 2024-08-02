@@ -36,7 +36,6 @@ function loggerMiddleware(req, res, next) {
       HELPERS.statusCode(res.statusCode),
       `${responseTime}ms`,
       '|',
-      // @ts-ignore
       HELPERS.download(bytes(req.bodySize || 0)),
       HELPERS.upload(bytes(resBodySize || 0)),
       '|',

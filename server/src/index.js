@@ -1,3 +1,4 @@
+// @ts-check
 require('dotenv').config()
 
 process.title = process.env.NODE_CONFIG_ENV
