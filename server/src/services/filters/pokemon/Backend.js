@@ -13,9 +13,6 @@ const {
 const { filterRTree } = require('../../functions/filterRTree')
 const { Event, Pvp } = require('../../initialization')
 
-/** @type {import("@rm/types").Config['api']['pvp']} */
-const pvpConfig = config.getSafe('api.pvp')
-
 module.exports = class PkmnBackend {
   /**
    * @param {`${number}-${number}` | 'global'} id
@@ -45,6 +42,9 @@ module.exports = class PkmnBackend {
    * @param {boolean} mods.onlyLegacy
    */
   constructor(id, filter, global, perms, mods) {
+    /** @type {import("@rm/types").Config['api']['pvp']} */
+    this.pvpConfig = config.getSafe('api.pvp')
+
     const [pokemon, form] = id.split('-', 2).map(Number)
     this.id = id
     this.pokemon = pokemon || 0
@@ -167,8 +167,9 @@ module.exports = class PkmnBackend {
       : new Set(
           KEYS.filter(
             (key) =>
-              (pvpConfig.leagueObj[key] ? this.perms.pvp : this.perms.iv) &&
-              this.isActive(key, filter),
+              (this.pvpConfig.leagueObj[key]
+                ? this.perms.pvp
+                : this.perms.iv) && this.isActive(key, filter),
           ),
         )
   }
@@ -203,15 +204,15 @@ module.exports = class PkmnBackend {
 
     const cpCheck =
       this.mods.pvpV2 ||
-      pvpConfig.reactMapHandlesPvp ||
-      entry.cp >= pvpConfig.minCp[league]
+      this.pvpConfig.reactMapHandlesPvp ||
+      entry.cp >= this.pvpConfig.minCp[league]
     if (!cpCheck) return false
 
     const megaCheck = !entry.evolution || this.mods.onlyPvpMega
     if (!megaCheck) return false
 
     const capCheck =
-      this.mods.pvpV2 || pvpConfig.reactMapHandlesPvp
+      this.mods.pvpV2 || this.pvpConfig.reactMapHandlesPvp
         ? entry.capped || this.mods[`onlyPvp${entry.cap}`]
         : true
     if (!capCheck) return false
@@ -388,14 +389,14 @@ module.exports = class PkmnBackend {
    * @returns {{ cleanPvp: { [key in typeof LEAGUES[number]]?: import('@rm/types').PvpEntry[] }, bestPvp: number }}
    */
   buildPvp(pokemon, ts = Math.floor(Date.now() / 1000)) {
-    const parsed = pvpConfig.reactMapHandlesPvp
+    const parsed = this.pvpConfig.reactMapHandlesPvp
       ? Pvp.resultWithCache(pokemon, ts)
       : getParsedPvp(pokemon)
     const cleanPvp =
       /** @type {{ [key in typeof LEAGUES[number]]?: import('@rm/types').PvpEntry[] }} */ ({})
     let bestPvp = 4096
     Object.keys(parsed).forEach((league) => {
-      if (pvpConfig.leagueObj[league]) {
+      if (this.pvpConfig.leagueObj[league]) {
         const { filtered, best } = this.getRanks(league, parsed[league])
         if (filtered.length) {
           cleanPvp[league] = filtered

@@ -7,10 +7,6 @@ const config = require('@rm/config')
 const { Event, Db } = require('../services/initialization')
 const getAreaSql = require('../services/functions/getAreaSql')
 
-const { searchResultsLimit, queryLimits, gymValidDataLimit, hideOldGyms } =
-  config.getSafe('api')
-const { baseGymSlotAmounts } = config.getSafe('defaultFilters.gyms')
-
 const coreFields = [
   'id',
   'name',
@@ -87,6 +83,9 @@ class Gym extends Model {
     } = args.filters
     const ts = Math.floor(Date.now() / 1000)
     const query = this.query()
+    const { queryLimits, gymValidDataLimit, hideOldGyms } =
+      config.getSafe('api')
+    const { baseGymSlotAmounts } = config.getSafe('defaultFilters.gyms')
 
     if (isMad) {
       query
@@ -471,6 +470,7 @@ class Gym extends Model {
   static async search(perms, args, { isMad }, distance, bbox) {
     const { areaRestrictions } = perms
     const { onlyAreas = [], search = '' } = args
+
     const query = this.query()
       .select([
         'name',
@@ -483,7 +483,7 @@ class Gym extends Model {
       .whereBetween(isMad ? 'latitude' : 'lat', [bbox.minLat, bbox.maxLat])
       .andWhereBetween(isMad ? 'longitude' : 'lon', [bbox.minLon, bbox.maxLon])
       .whereILike('name', `%${search}%`)
-      .limit(searchResultsLimit)
+      .limit(config.getSafe('api.searchResultsLimit'))
       .orderBy('distance')
     if (isMad) {
       query.leftJoin('gymdetails', 'gym.gym_id', 'gymdetails.gym_id')
@@ -527,7 +527,7 @@ class Gym extends Model {
       .whereBetween(isMad ? 'latitude' : 'lat', [bbox.minLat, bbox.maxLat])
       .andWhereBetween(isMad ? 'longitude' : 'lon', [bbox.minLon, bbox.maxLon])
       .whereIn(isMad ? 'pokemon_id' : 'raid_pokemon_id', pokemonIds)
-      .limit(searchResultsLimit)
+      .limit(config.getSafe('api.searchResultsLimit'))
       .orderBy('distance')
       .andWhere(
         isMad ? 'start' : 'raid_battle_timestamp',

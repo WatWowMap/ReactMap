@@ -14,22 +14,6 @@ const scannerQueue = {
   scanZone: {},
 }
 
-const { backendConfig, ...scanModes } = config.getSafe('scanner')
-
-const scanNextOptions = {
-  routes: config.getSafe('scanner.scanNext.routes'),
-  showcases: config.getSafe('scanner.scanNext.showcases'),
-  pokemon: config.getSafe('scanner.scanNext.pokemon'),
-  gmf: config.getSafe('scanner.scanNext.gmf'),
-}
-
-const scanZoneOptions = {
-  routes: config.getSafe('scanner.scanZone.routes'),
-  showcases: config.getSafe('scanner.scanZone.showcases'),
-  pokemon: config.getSafe('scanner.scanZone.pokemon'),
-  gmf: config.getSafe('scanner.scanZone.gmf'),
-}
-
 const dateFormat = new Intl.DateTimeFormat(undefined, {
   dateStyle: 'short',
   timeStyle: 'medium',
@@ -49,6 +33,22 @@ async function scannerApi(
   data = null,
   user = { id: 0, username: 'a visitor' },
 ) {
+  const { backendConfig, ...scanModes } = config.getSafe('scanner')
+
+  const scanNextOptions = {
+    routes: scanModes.scanNext.routes,
+    showcases: scanModes.scanNext.showcases,
+    pokemon: scanModes.scanNext.pokemon,
+    gmf: scanModes.scanNext.gmf,
+  }
+
+  const scanZoneOptions = {
+    routes: scanModes.scanZone.routes,
+    showcases: scanModes.scanZone.showcases,
+    pokemon: scanModes.scanZone.pokemon,
+    gmf: scanModes.scanZone.gmf,
+  }
+
   const controller = new AbortController()
 
   const timeout = setTimeout(() => {

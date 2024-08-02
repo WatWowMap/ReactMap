@@ -11,9 +11,6 @@ const { version } = require('../../../package.json')
 const areaPerms = require('../services/functions/areaPerms')
 const getServerSettings = require('../services/functions/getServerSettings')
 
-const scanner = config.getSafe('scanner')
-const api = config.getSafe('api')
-
 const rootRouter = express.Router()
 
 rootRouter.use('/', clientRouter)
@@ -138,7 +135,10 @@ rootRouter.get('/area/:area/:zoom?', (req, res) => {
 
 rootRouter.get('/api/settings', async (req, res, next) => {
   const authentication = config.getSafe('authentication')
+  const scanner = config.getSafe('scanner')
+  const api = config.getSafe('api')
   const mapConfig = config.getMapConfig(req)
+
   try {
     if (
       authentication.alwaysEnabledPerms.length ||

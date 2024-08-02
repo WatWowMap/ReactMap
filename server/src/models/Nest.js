@@ -7,9 +7,6 @@ const config = require('@rm/config')
 const { Event, Db } = require('../services/initialization')
 const getAreaSql = require('../services/functions/getAreaSql')
 
-const { searchResultsLimit, queryLimits } = config.getSafe('api')
-const { avgFilter } = config.getSafe('defaultFilters.nests')
-
 /** @typedef {Nest & Partial<import("@rm/types").Nest>} FullNest */
 
 class Nest extends Model {
@@ -43,7 +40,11 @@ class Nest extends Model {
       .whereBetween('lat', [minLat, maxLat])
       .andWhereBetween('lon', [minLon, maxLon])
       .whereIn('pokemon_id', pokemon)
-    if (!avgFilter.every((x, i) => x === filters.onlyAvgFilter[i])) {
+    if (
+      !config
+        .getSafe('defaultFilters.nests.avgFilter')
+        .every((x, i) => x === filters.onlyAvgFilter[i])
+    ) {
       query.andWhereBetween('pokemon_avg', filters.onlyAvgFilter)
     }
     if (polygon) {
@@ -54,7 +55,7 @@ class Nest extends Model {
     }
 
     const results = /** @type {FullNest[]} */ (
-      await query.limit(queryLimits.nests)
+      await query.limit(config.getSafe('api.queryLimits.nests'))
     )
 
     const submittedNameMap = await Db.query(
@@ -176,7 +177,7 @@ class Nest extends Model {
           )
           .orWhere('name', 'like', `%${search}%`)
       })
-      .limit(searchResultsLimit)
+      .limit(config.getSafe('api.searchResultsLimit'))
       .orderBy('distance')
     if (!getAreaSql(query, perms.areaRestrictions, onlyAreas, isMad)) {
       return []

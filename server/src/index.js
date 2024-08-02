@@ -44,6 +44,7 @@ if (!config.getSafe('devOptions.skipUpdateCheck')) {
 const app = express()
 const httpServer = http.createServer(app)
 
+app.disable('x-powered-by')
 const sentry = config.getSafe('sentry.server')
 if (sentry.enabled || process.env.SENTRY_DSN) {
   Sentry.init({

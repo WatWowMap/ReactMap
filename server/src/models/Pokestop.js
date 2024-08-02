@@ -7,13 +7,6 @@ const { Event } = require('../services/initialization')
 const getAreaSql = require('../services/functions/getAreaSql')
 const { getUserMidnight } = require('../services/functions/getClientTime')
 
-const {
-  searchResultsLimit,
-  queryLimits,
-  stopValidDataLimit,
-  hideOldPokestops,
-} = config.getSafe('api')
-
 const questProps = {
   quest_type: true,
   quest_timestamp: true,
@@ -141,6 +134,8 @@ class Pokestop extends Model {
     } = args
     const midnight = getUserMidnight(args)
     const ts = Math.floor(Date.now() / 1000)
+    const { queryLimits, stopValidDataLimit, hideOldPokestops } =
+      config.getSafe('api')
 
     const {
       lures: lurePerms,
@@ -1642,7 +1637,7 @@ class Pokestop extends Model {
       .whereBetween(isMad ? 'latitude' : 'lat', [bbox.minLat, bbox.maxLat])
       .andWhereBetween(isMad ? 'longitude' : 'lon', [bbox.minLon, bbox.maxLon])
       .whereILike('name', `%${search}%`)
-      .limit(searchResultsLimit)
+      .limit(config.getSafe('api.searchResultsLimit'))
       .orderBy('distance')
     if (!getAreaSql(query, perms.areaRestrictions, onlyAreas, isMad)) {
       return []
@@ -1658,6 +1653,7 @@ class Pokestop extends Model {
     bbox,
   ) {
     const { search, onlyAreas = [], locale, lat, lon, questLayer } = args
+    const searchResultsLimit = config.getSafe('api.searchResultsLimit')
     const midnight = getUserMidnight({ lat, lon })
     const pokemonIds = Object.keys(Event.masterfile.pokemon).filter((pkmn) =>
       i18next
@@ -1727,7 +1723,7 @@ class Pokestop extends Model {
             quests.orWhereIn('quest_reward_type', rewardTypes)
           }
         })
-        .limit(searchResultsLimit)
+        .limit(config.getSafe('api.searchResultsLimit'))
         .orderBy('distance')
       if (isMad) {
         query
@@ -1847,7 +1843,7 @@ class Pokestop extends Model {
         isMad ? this.knex().fn.now() : ts,
       )
       .whereIn(isMad ? 'active_fort_modifier' : 'lure_id', lureIds)
-      .limit(searchResultsLimit)
+      .limit(config.getSafe('api.searchResultsLimit'))
       .orderBy('distance')
     if (!getAreaSql(query, perms.areaRestrictions, onlyAreas, isMad)) {
       return []
@@ -1898,7 +1894,7 @@ class Pokestop extends Model {
     const query = this.query()
       .whereBetween(isMad ? 'latitude' : 'lat', [bbox.minLat, bbox.maxLat])
       .andWhereBetween(isMad ? 'longitude' : 'lon', [bbox.minLon, bbox.maxLon])
-      .limit(searchResultsLimit)
+      .limit(config.getSafe('api.searchResultsLimit'))
       .orderBy('distance')
 
     Pokestop.joinIncident(query, hasMultiInvasions, isMad, multiInvasionMs)

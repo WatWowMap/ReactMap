@@ -23,11 +23,6 @@ const {
 } = require('../services/filters/pokemon/constants')
 const PkmnFilter = require('../services/filters/pokemon/Backend')
 
-const searchResultsLimit = config.getSafe('api.searchResultsLimit')
-const queryLimits = config.getSafe('api.queryLimits')
-const queryDebug = config.getSafe('devOptions.queryDebug')
-const reactMapHandlesPvp = config.getSafe('api.pvp.reactMapHandlesPvp')
-
 class Pokemon extends Model {
   static get tableName() {
     return 'pokemon'
@@ -131,6 +126,8 @@ class Pokemon extends Model {
     const { filterMap, globalFilter } = this.getFilters(perms, args, ctx)
     let queryPvp = LEAGUES.some((league) => globalFilter.filterKeys.has(league))
     const ts = Math.floor(Date.now() / 1000)
+    const queryLimits = config.getSafe('api.queryLimits')
+    const reactMapHandlesPvp = config.getSafe('api.pvp.reactMapHandlesPvp')
 
     // quick check to make sure no Pokemon are returned when none are enabled for users with only Pokemon perms
     if (!ivs && !pvp) {
@@ -383,7 +380,7 @@ class Pokemon extends Model {
    * @returns {Promise<T>}
    */
   static async evalQuery(mem, query, method = 'POST', secret = '') {
-    if (queryDebug) {
+    if (config.getSafe('devOptions.queryDebug')) {
       if (!fs.existsSync(resolve(__dirname, './queries'))) {
         fs.mkdirSync(resolve(__dirname, './queries'), { recursive: true })
       }
@@ -424,6 +421,7 @@ class Pokemon extends Model {
     const { isMad, hasSize, hasHeight, mem, secret } = ctx
     const ts = Math.floor(Date.now() / 1000)
     const { filterMap, globalFilter } = this.getFilters(perms, args, ctx)
+    const queryLimits = config.getSafe('api.queryLimits')
 
     if (!perms.iv && !perms.pvp) {
       const noPokemonSelect = Object.keys(args.filters).find(
@@ -573,6 +571,7 @@ class Pokemon extends Model {
     const pokemonIds = Object.keys(Event.masterfile.pokemon).filter((pkmn) =>
       i18next.t(`poke_${pkmn}`, { lng: locale }).toLowerCase().includes(search),
     )
+    const searchLimit = config.getSafe('api.searchResultsLimit')
     const ts = Math.floor(Date.now() / 1000)
     const query = this.query()
       .select(['pokemon_id', distance])
@@ -584,7 +583,7 @@ class Pokemon extends Model {
         '>=',
         isMad ? this.knex().fn.now() : ts,
       )
-      .limit(searchResultsLimit)
+      .limit(searchLimit)
       .orderBy('distance')
     if (isMad) {
       query.select([
@@ -627,7 +626,7 @@ class Pokemon extends Model {
               latitude: bbox.maxLat,
               longitude: bbox.maxLon,
             },
-            limit: searchResultsLimit,
+            limit: searchLimit,
             searchIds: pokemonIds.map((id) => +id),
             global: {},
             filters: {},

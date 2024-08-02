@@ -13,8 +13,6 @@ const queryObj = /** @type {const} */ ({
   nests: { model: 'Nest', category: 'nests' },
 })
 
-const api = config.getSafe('api')
-
 /** @param {string} category */
 const resolveCategory = (category) => {
   switch (category) {
@@ -57,14 +55,14 @@ const getAll = async (compare) => {
 }
 
 router.get(['/', '/:category'], async (req, res) => {
-  const { model, category } =
-    queryObj[resolveCategory(req.params.category)] || {}
-  const { current, equal } = req.query
+  const reactMapSecret = config.getSafe('api.reactMapSecret')
+
   try {
-    if (
-      api.reactMapSecret &&
-      req.headers['react-map-secret'] === api.reactMapSecret
-    ) {
+    if (reactMapSecret && req.headers['react-map-secret'] === reactMapSecret) {
+      const { model, category } =
+        queryObj[resolveCategory(req.params.category)] || {}
+      const { current, equal } = req.query
+
       if (model && category) {
         const available =
           current !== undefined
@@ -118,13 +116,12 @@ router.get(['/', '/:category'], async (req, res) => {
 })
 
 router.put('/:category', async (req, res) => {
-  const { model, category } =
-    queryObj[resolveCategory(req.params.category)] || {}
+  const reactMapSecret = config.getSafe('api.reactMapSecret')
   try {
-    if (
-      api.reactMapSecret &&
-      req.headers['react-map-secret'] === api.reactMapSecret
-    ) {
+    if (reactMapSecret && req.headers['react-map-secret'] === reactMapSecret) {
+      const { model, category } =
+        queryObj[resolveCategory(req.params.category)] || {}
+
       if (model && category) {
         await Event.setAvailable(category, model, Db)
       } else {
@@ -135,18 +132,18 @@ router.put('/:category', async (req, res) => {
           Event.setAvailable('nests', 'Nest', Db),
         ])
       }
+      log.info(
+        HELPERS.api,
+        `api/v1/${path.parse(__filename).name} - updated availabled for ${
+          category || 'all'
+        }`,
+      )
       res
         .status(200)
         .json({ status: `updated available for ${category || 'all'}` })
     } else {
       throw new Error('Incorrect or missing API secret')
     }
-    log.info(
-      HELPERS.api,
-      `api/v1/${path.parse(__filename).name} - updated availabled for ${
-        category || 'all'
-      }`,
-    )
   } catch (e) {
     log.error(HELPERS.api, `api/v1/${path.parse(__filename).name}`, e)
     res.status(500).json({ status: 'ServerError', reason: e.message })

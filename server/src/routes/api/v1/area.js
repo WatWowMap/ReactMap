@@ -5,10 +5,9 @@ const config = require('@rm/config')
 const { log, HELPERS } = require('@rm/logger')
 const { loadLatestAreas } = require('../../../services/areas')
 
-const reactMapSecret = config.getSafe('api.reactMapSecret')
-
 router.get('/reload', async (req, res) => {
   try {
+    const reactMapSecret = config.getSafe('api.reactMapSecret')
     if (reactMapSecret && req.headers['react-map-secret'] === reactMapSecret) {
       const newAreas = await loadLatestAreas()
       config.areas = newAreas

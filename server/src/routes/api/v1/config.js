@@ -4,28 +4,26 @@ const router = require('express').Router()
 const config = require('@rm/config')
 const { log, HELPERS } = require('@rm/logger')
 
-const api = config.getSafe('api')
-
 router.get('/', (req, res) => {
+  const reactMapSecret = config.getSafe('api.reactMapSecret')
   try {
-    if (
-      api.reactMapSecret &&
-      req.headers['react-map-secret'] === api.reactMapSecret
-    ) {
+    if (reactMapSecret && req.headers['react-map-secret'] === reactMapSecret) {
       res.status(200).json({
         ...config,
         api: {
-          ...api,
+          ...config.api,
           reactMapSecret: undefined,
         },
         ...config,
         database: {
           ...config.database,
-          schemas: api.showSchemasInConfigApi ? config.database.schemas : [],
+          schemas: config.api.showSchemasInConfigApi
+            ? config.database.schemas
+            : [],
         },
         authentication: {
           ...config.authentication,
-          strategies: api.showStrategiesInConfigApi
+          strategies: config.api.showStrategiesInConfigApi
             ? config.authentication.strategies
             : [],
         },

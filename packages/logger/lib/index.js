@@ -90,15 +90,21 @@ log.methodFactory = (methodName, logLevel, loggerName) => {
   }
 }
 
-if (
-  config.has('devOptions.logLevel') &&
-  config.getSafe('devOptions.logLevel').toUpperCase() in logger.levels
-) {
-  log.setLevel(config.getSafe('devOptions.logLevel'))
+const setLogLevel = () => {
+  if (
+    config.has('devOptions.logLevel') &&
+    config.getSafe('devOptions.logLevel').toUpperCase() in logger.levels
+  ) {
+    log.setLevel(config.getSafe('devOptions.logLevel'))
+  }
 }
+
+setLogLevel()
 
 module.exports.log = log
 
 module.exports.HELPERS = HELPERS
 
 module.exports.getTimeStamp = getTimestamp
+
+module.exports.setLogLevel = setLogLevel

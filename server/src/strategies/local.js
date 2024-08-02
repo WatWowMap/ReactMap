@@ -8,24 +8,20 @@ const { name } = path.parse(__filename)
 const { log, HELPERS } = require('@rm/logger')
 const config = require('@rm/config')
 
-const forceTutorial = config.getSafe('map.misc.forceTutorial')
-const {
-  [name]: strategyConfig,
-  alwaysEnabledPerms,
-  perms,
-} = config.getSafe('authentication')
-
 const { Db } = require('../services/initialization')
 const areaPerms = require('../services/functions/areaPerms')
 const mergePerms = require('../services/functions/mergePerms')
 const webhookPerms = require('../services/functions/webhookPerms')
 const scannerPerms = require('../services/functions/scannerPerms')
 
-if (strategyConfig.doNothing) {
-  // This is for nothing other than demonstrating a custom property you can add if you need it
-}
-
 const authHandler = async (_req, username, password, done) => {
+  const forceTutorial = config.getSafe('map.misc.forceTutorial')
+  const {
+    [name]: strategyConfig,
+    alwaysEnabledPerms,
+    perms,
+  } = config.getSafe('authentication')
+
   const date = new Date()
   const trialActive =
     strategyConfig.trialPeriod &&

@@ -8,9 +8,6 @@ const { log, HELPERS } = require('@rm/logger')
 const { getBboxFromCenter } = require('./functions/getBbox')
 const { getCache } = require('./cache')
 
-const softLimit = config.getSafe('api.searchSoftKmLimit')
-const hardLimit = config.getSafe('api.searchHardKmLimit')
-
 /**
  * @type {import("@rm/types").DbCheckClass}
  */
@@ -444,6 +441,9 @@ module.exports = class DbCheck {
    * @returns {Promise<T[]>}
    */
   async search(model, perms, args, method = 'search') {
+    const softLimit = config.getSafe('api.searchSoftKmLimit')
+    const hardLimit = config.getSafe('api.searchHardKmLimit')
+
     let deDuped = []
     let count = 0
     let distance = softLimit
