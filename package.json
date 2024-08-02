@@ -146,6 +146,7 @@
     "geo-tz": "^7.0.7",
     "graphql": "^16.8.1",
     "graphql-type-json": "^0.3.2",
+    "helmet": "7.1.0",
     "i18next": "^21.6.16",
     "i18next-browser-languagedetector": "^6.1.4",
     "i18next-fs-backend": "^1.1.4",

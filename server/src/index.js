@@ -12,15 +12,16 @@ const { rainbow } = require('chalkercli')
 const cors = require('cors')
 const { json } = require('body-parser')
 const http = require('http')
+const { default: helmet } = require('helmet')
 
 const { log, HELPERS, getTimeStamp } = require('@rm/logger')
 
-require('./models')
 const rootRouter = require('./routes/rootRouter')
 const startApollo = require('./graphql/server')
+const { bindConnections } = require('./models')
 
 const config = require('./services/config')
-const { Db, Event } = require('./services/initialization')
+const { Db, Event } = require('./services/state')
 const Clients = require('./services/Clients')
 const { starti18n } = require('./services/i18n')
 const { checkForUpdates } = require('./services/checkForUpdates')
@@ -42,7 +43,7 @@ const startServer = async () => {
     await checkForUpdates()
     log.info(HELPERS.update, 'Completed')
   }
-
+  bindConnections(Db)
   startWatcher()
 
   Event.clients = Clients
@@ -59,12 +60,11 @@ const startServer = async () => {
 
   const app = express()
 
-  app.disable('x-powered-by')
-
   app.use(
     loggerMiddleware,
     noSourceMapMiddleware,
     errorMiddleware,
+    helmet(),
     compression(),
     express.json({
       limit: '50mb',
@@ -77,11 +77,10 @@ const startServer = async () => {
     rateLimitingMiddleware(),
   )
 
-  initSentry(app)
-  initPassport(app)
-
   app.use(rootRouter)
 
+  initSentry(app)
+  initPassport(app)
   const httpServer = http.createServer(app)
   const server = await startApollo(httpServer)
 
@@ -125,7 +124,7 @@ const startServer = async () => {
   const text = rainbow(`ℹ ${getTimeStamp()} [ReactMap] has fully started`)
   setTimeout(() => text.stop(), 1_000)
 
-  return app
+  return httpServer
 }
 
 startServer()
