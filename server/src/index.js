@@ -16,7 +16,6 @@ const { log, HELPERS, getTimeStamp } = require('@rm/logger')
 
 require('./models')
 const rootRouter = require('./routes/rootRouter')
-const { connection } = require('./db/knexfile.cjs')
 const startApollo = require('./graphql/server')
 
 const config = require('./services/config')
@@ -35,6 +34,7 @@ const { errorMiddleware } = require('./middleware/error')
 const { sessionMiddleware } = require('./middleware/session')
 const { apolloMiddleware } = require('./middleware/apollo')
 const { startWatcher } = require('./services/watcher')
+const { migrate } = require('./db/migrate')
 
 const startServer = async () => {
   if (!config.getSafe('devOptions.skipUpdateCheck')) {
@@ -92,37 +92,37 @@ const startServer = async () => {
     apolloMiddleware(server),
   )
 
-  connection.migrate
-    .latest()
-    .then(() => connection.destroy())
-    .then(() => Db.getDbContext())
-    .then(async () => {
-      httpServer.listen(config.getSafe('port'), config.getSafe('interface'))
-      log.info(
-        HELPERS.ReactMap,
-        `Server is now listening at http://${config.getSafe(
-          'interface',
-        )}:${config.getSafe('port')}`,
-      )
-      await Promise.all([
-        Db.historicalRarity(),
-        Db.getFilterContext(),
-        Event.setAvailable('gyms', 'Gym', Db),
-        Event.setAvailable('pokestops', 'Pokestop', Db),
-        Event.setAvailable('pokemon', 'Pokemon', Db),
-        Event.setAvailable('nests', 'Nest', Db),
-      ])
-      await Promise.all([
-        Event.getUniversalAssets(config.getSafe('icons.styles'), 'uicons'),
-        Event.getUniversalAssets(config.getSafe('audio.styles'), 'uaudio'),
-        Event.getMasterfile(Db.historical, Db.rarity),
-        Event.getInvasions(config.getSafe('api.pogoApiEndpoints.invasions')),
-        Event.getWebhooks(),
-        loadLatestAreas().then((res) => (config.areas = res)),
-      ])
-      const text = rainbow(`ℹ ${getTimeStamp()} [ReactMap] has fully started`)
-      setTimeout(() => text.stop(), 1_000)
-    })
+  await migrate()
+
+  await Db.getDbContext()
+
+  const serverInterface = config.getSafe('interface')
+  const serverPort = config.getSafe('port')
+  httpServer.listen(serverPort, serverInterface)
+  log.info(
+    HELPERS.ReactMap,
+    `Server is now listening at http://${serverInterface}:${serverPort}`,
+  )
+
+  await Promise.all([
+    Db.historicalRarity(),
+    Db.getFilterContext(),
+    Event.setAvailable('gyms', 'Gym', Db),
+    Event.setAvailable('pokestops', 'Pokestop', Db),
+    Event.setAvailable('pokemon', 'Pokemon', Db),
+    Event.setAvailable('nests', 'Nest', Db),
+  ])
+  await Promise.all([
+    Event.getUniversalAssets(config.getSafe('icons.styles'), 'uicons'),
+    Event.getUniversalAssets(config.getSafe('audio.styles'), 'uaudio'),
+    Event.getMasterfile(Db.historical, Db.rarity),
+    Event.getInvasions(config.getSafe('api.pogoApiEndpoints.invasions')),
+    Event.getWebhooks(),
+    loadLatestAreas().then((res) => (config.areas = res)),
+  ])
+
+  const text = rainbow(`ℹ ${getTimeStamp()} [ReactMap] has fully started`)
+  setTimeout(() => text.stop(), 1_000)
 
   return app
 }
