@@ -32,6 +32,7 @@ const startApollo = require('./graphql/server')
 const { rateLimitingMiddleware } = require('./middleware/rateLimiting')
 const { initSentry, sentryMiddleware } = require('./middleware/sentry')
 const { loggerMiddleware } = require('./middleware/logger')
+const { noSourceMapMiddleware } = require('./middleware/noSourceMap')
 require('./services/watcher')
 
 Event.clients = Clients
@@ -47,13 +48,7 @@ initSentry(app)
 
 app.disable('x-powered-by')
 
-app.use((req, res, next) => {
-  if (req.url.endsWith('.map')) {
-    res.status(403).send('Naughty!')
-  } else {
-    next()
-  }
-})
+app.use(noSourceMapMiddleware)
 
 app.use(compression())
 
