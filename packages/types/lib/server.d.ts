@@ -273,3 +273,10 @@ export type ExpressMiddleware = (
   res: Response,
   next: NextFunction,
 ) => any
+
+export type ExpressErrorMiddleware = (
+  err: Error,
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => any

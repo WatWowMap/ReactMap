@@ -33,6 +33,7 @@ const { initSentry, sentryMiddleware } = require('./middleware/sentry')
 const { loggerMiddleware } = require('./middleware/logger')
 const { noSourceMapMiddleware } = require('./middleware/noSourceMap')
 const { initPassport } = require('./middleware/passport')
+const { errorMiddleware } = require('./middleware/error')
 require('./services/watcher')
 
 Event.clients = Clients
@@ -40,6 +41,12 @@ Event.clients = Clients
 if (!config.getSafe('devOptions.skipUpdateCheck')) {
   require('./services/checkForUpdates')
 }
+
+const distDir = path.join(
+  __dirname,
+  '../../',
+  `dist${process.env.NODE_CONFIG_ENV ? `-${process.env.NODE_CONFIG_ENV}` : ''}`,
+)
 
 const app = express()
 const httpServer = http.createServer(app)
@@ -49,26 +56,19 @@ initPassport(app)
 
 app.disable('x-powered-by')
 
-app.use(noSourceMapMiddleware)
-
-app.use(compression())
-
 app.use(
+  loggerMiddleware,
+  noSourceMapMiddleware,
+  errorMiddleware,
+  compression(),
   express.json({
     limit: '50mb',
     verify: (req, res, buf) => {
       req.bodySize = (req.bodySize || 0) + buf.length
     },
   }),
+  express.static(distDir),
 )
-
-const distDir = path.join(
-  __dirname,
-  '../../',
-  `dist${process.env.NODE_CONFIG_ENV ? `-${process.env.NODE_CONFIG_ENV}` : ''}`,
-)
-
-app.use(express.static(distDir))
 
 app.use(
   session({
@@ -93,30 +93,6 @@ if (fs.existsSync(localePath)) {
 }
 
 app.use(rootRouter, rateLimitingMiddleware())
-
-app.use(loggerMiddleware)
-
-// eslint-disable-next-line no-unused-vars
-app.use((err, req, res, next) => {
-  log.error(
-    HELPERS.express,
-    HELPERS.custom(req.originalUrl, '#00d7ac'),
-    req.user ? `- ${req.user.username}` : 'Not Logged In',
-    '|',
-    req.headers['x-forwarded-for'],
-    '|',
-    err,
-  )
-
-  switch (err.message) {
-    case 'NoCodeProvided':
-      return res.redirect('/404')
-    case "Failed to fetch user's guilds":
-      return res.redirect('/login')
-    default:
-      return res.redirect('/')
-  }
-})
 
 startApollo(httpServer).then((server) => {
   app.use(
