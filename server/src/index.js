@@ -77,10 +77,11 @@ const startServer = async () => {
     rateLimitingMiddleware(),
   )
 
-  app.use(rootRouter)
-
   initSentry(app)
   initPassport(app)
+
+  app.use(rootRouter)
+
   const httpServer = http.createServer(app)
   const server = await startApollo(httpServer)
 
