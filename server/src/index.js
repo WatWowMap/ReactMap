@@ -1,4 +1,3 @@
-/* eslint-disable prefer-rest-params */
 process.title = 'ReactMap'
 
 require('dotenv').config()
@@ -16,7 +15,6 @@ const http = require('http')
 const { GraphQLError } = require('graphql')
 const { ApolloServerErrorCode } = require('@apollo/server/errors')
 const { parse } = require('graphql')
-const bytes = require('bytes')
 
 const { log, HELPERS, getTimeStamp } = require('@rm/logger')
 const { create, writeAll } = require('@rm/locales')
@@ -33,6 +31,7 @@ const { connection } = require('./db/knexfile.cjs')
 const startApollo = require('./graphql/server')
 const { rateLimitingMiddleware } = require('./middleware/rateLimiting')
 const { initSentry, sentryMiddleware } = require('./middleware/sentry')
+const { loggerMiddleware } = require('./middleware/logger')
 require('./services/watcher')
 
 Event.clients = Clients
@@ -115,47 +114,7 @@ if (fs.existsSync(localePath)) {
 
 app.use(rootRouter, rateLimitingMiddleware())
 
-app.use((req, res, next) => {
-  const start = process.hrtime()
-
-  const oldWrite = res.write
-  const oldEnd = res.end
-  let resBodySize = 0
-
-  res.write = function write(chunk) {
-    resBodySize += chunk.length
-    oldWrite.apply(res, arguments)
-  }
-
-  res.end = function end(chunk) {
-    if (chunk) {
-      resBodySize += chunk.length
-    }
-    oldEnd.apply(res, arguments)
-  }
-
-  res.on('finish', () => {
-    const [seconds, nanoseconds] = process.hrtime(start)
-    const responseTime = (seconds * 1000 + nanoseconds / 1e6).toFixed(3) // in milliseconds
-    log.info(
-      HELPERS.express,
-      req.method,
-      req.originalUrl,
-      HELPERS.statusCode(res.statusCode),
-      `${responseTime}ms`,
-      '|',
-      HELPERS.download(bytes(req.bodySize)),
-      HELPERS.upload(bytes(resBodySize)),
-      '|',
-      req.user ? req.user.username : 'Not Logged In',
-      req.headers['x-forwarded-for']
-        ? `| ${req.headers['x-forwarded-for']}`
-        : '',
-    )
-  })
-
-  next()
-})
+app.use(loggerMiddleware)
 
 // eslint-disable-next-line no-unused-vars
 app.use((err, req, res, next) => {
