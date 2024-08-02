@@ -5,7 +5,6 @@ const fs = require('fs')
 const path = require('path')
 const express = require('express')
 const compression = require('compression')
-const session = require('express-session')
 const { rainbow } = require('chalkercli')
 const { expressMiddleware } = require('@apollo/server/express4')
 const cors = require('cors')
@@ -22,7 +21,6 @@ const config = require('./services/config')
 const { Db, Event } = require('./services/initialization')
 require('./models')
 const Clients = require('./services/Clients')
-const sessionStore = require('./services/sessionStore')
 const rootRouter = require('./routes/rootRouter')
 const pkg = require('../../package.json')
 const { loadLatestAreas } = require('./services/areas')
@@ -34,6 +32,7 @@ const { loggerMiddleware } = require('./middleware/logger')
 const { noSourceMapMiddleware } = require('./middleware/noSourceMap')
 const { initPassport } = require('./middleware/passport')
 const { errorMiddleware } = require('./middleware/error')
+const { sessionMiddleware } = require('./middleware/session')
 require('./services/watcher')
 
 Event.clients = Clients
@@ -47,6 +46,7 @@ const distDir = path.join(
   '../../',
   `dist${process.env.NODE_CONFIG_ENV ? `-${process.env.NODE_CONFIG_ENV}` : ''}`,
 )
+const localePath = path.resolve(distDir, 'locales')
 
 const app = express()
 const httpServer = http.createServer(app)
@@ -68,20 +68,9 @@ app.use(
     },
   }),
   express.static(distDir),
+  sessionMiddleware(),
 )
 
-app.use(
-  session({
-    name: 'reactmap1',
-    secret: config.getSafe('api.sessionSecret'),
-    store: sessionStore,
-    resave: true,
-    saveUninitialized: false,
-    cookie: { maxAge: 86400000 * config.getSafe('api.cookieAgeDays') },
-  }),
-)
-
-const localePath = path.resolve(distDir, 'locales')
 if (fs.existsSync(localePath)) {
   require('./services/i18n')
 } else {
