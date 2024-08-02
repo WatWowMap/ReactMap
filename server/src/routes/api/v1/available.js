@@ -1,7 +1,6 @@
 // @ts-check
 const path = require('path')
 const router = require('express').Router()
-const config = require('@rm/config')
 
 const { log, HELPERS } = require('@rm/logger')
 const { Db, Event } = require('../../../services/initialization')
@@ -55,58 +54,50 @@ const getAll = async (compare) => {
 }
 
 router.get(['/', '/:category'], async (req, res) => {
-  const reactMapSecret = config.getSafe('api.reactMapSecret')
-
   try {
-    if (reactMapSecret && req.headers['react-map-secret'] === reactMapSecret) {
-      const { model, category } =
-        queryObj[resolveCategory(req.params.category)] || {}
-      const { current, equal } = req.query
+    const { model, category } =
+      queryObj[resolveCategory(req.params.category)] || {}
+    const { current, equal } = req.query
 
-      if (model && category) {
-        const available =
+    if (model && category) {
+      const available =
+        current !== undefined
+          ? await Db.getAvailable(model)
+          : Event.available[category]
+      available.sort((a, b) => a.localeCompare(b))
+
+      if (equal !== undefined) {
+        const compare =
           current !== undefined
-            ? await Db.getAvailable(model)
-            : Event.available[category]
-        available.sort((a, b) => a.localeCompare(b))
-
-        if (equal !== undefined) {
-          const compare =
-            current !== undefined
-              ? Event.available[category]
-              : await Db.getAvailable(model)
-          compare.sort((a, b) => a.localeCompare(b))
-          res
-            .status(200)
-            .json(available.every((item, i) => item === compare[i]))
-        } else {
-          res.status(200).json(available)
-        }
+            ? Event.available[category]
+            : await Db.getAvailable(model)
+        compare.sort((a, b) => a.localeCompare(b))
+        res.status(200).json(available.every((item, i) => item === compare[i]))
       } else {
-        const available = await getAll(!!current)
-        Object.values(available).forEach((c) =>
+        res.status(200).json(available)
+      }
+    } else {
+      const available = await getAll(!!current)
+      Object.values(available).forEach((c) =>
+        c.sort((a, b) => a.localeCompare(b)),
+      )
+
+      if (equal !== undefined) {
+        const compare = await getAll(!current)
+        Object.values(compare).forEach((c) =>
           c.sort((a, b) => a.localeCompare(b)),
         )
 
-        if (equal !== undefined) {
-          const compare = await getAll(!current)
-          Object.values(compare).forEach((c) =>
-            c.sort((a, b) => a.localeCompare(b)),
+        res
+          .status(200)
+          .json(
+            Object.keys(available).every((cat) =>
+              available[cat].every((item, j) => item === compare[cat][j]),
+            ),
           )
-
-          res
-            .status(200)
-            .json(
-              Object.keys(available).every((cat) =>
-                available[cat].every((item, j) => item === compare[cat][j]),
-              ),
-            )
-        } else {
-          res.status(200).json(available)
-        }
+      } else {
+        res.status(200).json(available)
       }
-    } else {
-      throw new Error('Incorrect or missing API secret')
     }
     log.info(HELPERS.api, `api/v1/${path.parse(__filename).name}`)
   } catch (e) {
@@ -116,34 +107,29 @@ router.get(['/', '/:category'], async (req, res) => {
 })
 
 router.put('/:category', async (req, res) => {
-  const reactMapSecret = config.getSafe('api.reactMapSecret')
   try {
-    if (reactMapSecret && req.headers['react-map-secret'] === reactMapSecret) {
-      const { model, category } =
-        queryObj[resolveCategory(req.params.category)] || {}
+    const { model, category } =
+      queryObj[resolveCategory(req.params.category)] || {}
 
-      if (model && category) {
-        await Event.setAvailable(category, model, Db)
-      } else {
-        await Promise.all([
-          Event.setAvailable('pokemon', 'Pokemon', Db),
-          Event.setAvailable('pokestops', 'Pokestop', Db),
-          Event.setAvailable('gyms', 'Gym', Db),
-          Event.setAvailable('nests', 'Nest', Db),
-        ])
-      }
-      log.info(
-        HELPERS.api,
-        `api/v1/${path.parse(__filename).name} - updated availabled for ${
-          category || 'all'
-        }`,
-      )
-      res
-        .status(200)
-        .json({ status: `updated available for ${category || 'all'}` })
+    if (model && category) {
+      await Event.setAvailable(category, model, Db)
     } else {
-      throw new Error('Incorrect or missing API secret')
+      await Promise.all([
+        Event.setAvailable('pokemon', 'Pokemon', Db),
+        Event.setAvailable('pokestops', 'Pokestop', Db),
+        Event.setAvailable('gyms', 'Gym', Db),
+        Event.setAvailable('nests', 'Nest', Db),
+      ])
     }
+    log.info(
+      HELPERS.api,
+      `api/v1/${path.parse(__filename).name} - updated availabled for ${
+        category || 'all'
+      }`,
+    )
+    res
+      .status(200)
+      .json({ status: `updated available for ${category || 'all'}` })
   } catch (e) {
     log.error(HELPERS.api, `api/v1/${path.parse(__filename).name}`, e)
     res.status(500).json({ status: 'ServerError', reason: e.message })

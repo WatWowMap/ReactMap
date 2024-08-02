@@ -7,15 +7,10 @@ const { loadLatestAreas } = require('../../../services/areas')
 
 router.get('/reload', async (req, res) => {
   try {
-    const reactMapSecret = config.getSafe('api.reactMapSecret')
-    if (reactMapSecret && req.headers['react-map-secret'] === reactMapSecret) {
-      const newAreas = await loadLatestAreas()
-      config.areas = newAreas
+    const newAreas = await loadLatestAreas()
+    config.areas = newAreas
 
-      res.status(200).json({ status: 'ok', message: 'reloaded areas' })
-    } else {
-      throw new Error('Incorrect or missing API secret')
-    }
+    res.status(200).json({ status: 'ok', message: 'reloaded areas' })
     log.info(HELPERS.api, `api/v1/${path.parse(__filename).name}/reload`)
   } catch (e) {
     log.error(HELPERS.api, `api/v1/${path.parse(__filename).name}/reload`, e)

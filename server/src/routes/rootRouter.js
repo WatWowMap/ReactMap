@@ -1,15 +1,18 @@
 const express = require('express')
 const fs = require('fs')
-const { resolve, join } = require('path')
+const { join } = require('path')
 const { SourceMapConsumer } = require('source-map')
 const config = require('@rm/config')
 const { log, HELPERS } = require('@rm/logger')
-const authRouter = require('./authRouter')
-const clientRouter = require('./clientRouter')
 const { Event, Db } = require('../services/initialization')
 const { version } = require('../../../package.json')
 const areaPerms = require('../services/functions/areaPerms')
 const getServerSettings = require('../services/functions/getServerSettings')
+
+const authRouter = require('./authRouter')
+const clientRouter = require('./clientRouter')
+const apiRouter = require('./api')
+const { secretMiddleware } = require('../middleware/secret')
 
 const rootRouter = express.Router()
 
@@ -17,20 +20,7 @@ rootRouter.use('/', clientRouter)
 
 rootRouter.use('/auth', authRouter)
 
-fs.readdir(resolve(__dirname, './api/v1/'), (e, files) => {
-  if (e) return log.error(HELPERS.api, 'Error initializing an API endpoint', e)
-  files.forEach((file) => {
-    try {
-      rootRouter.use(
-        `/api/v1/${file.replace('.js', '')}`,
-        require(resolve(__dirname, './api/v1/', file)),
-      )
-      log.info(HELPERS.api, `Loaded ${file}`)
-    } catch (err) {
-      log.warn(HELPERS.api, 'Unable to load API endpoint:', file, '\n', err)
-    }
-  })
-})
+rootRouter.use('/api', secretMiddleware, apiRouter)
 
 rootRouter.get('/api/health', async (req, res) =>
   res.status(200).json({ status: 'ok' }),
