@@ -10,7 +10,7 @@ fs.readdir(resolve(__dirname, './v1/'), (e, files) => {
   files.forEach((file) => {
     try {
       apiRouter.use(
-        `/v1/${file.replace('.js', '')}`,
+        file.replace('.js', ''),
         require(resolve(__dirname, './v1/', file)),
       )
       log.info(HELPERS.api, `Loaded ${file}`)

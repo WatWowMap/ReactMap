@@ -20,7 +20,7 @@ rootRouter.use('/', clientRouter)
 
 rootRouter.use('/auth', authRouter)
 
-rootRouter.use('/api', secretMiddleware, apiRouter)
+rootRouter.use('/api/v1', secretMiddleware, apiRouter)
 
 rootRouter.get('/api/health', async (req, res) =>
   res.status(200).json({ status: 'ok' }),

@@ -12,18 +12,18 @@ function loggerMiddleware(req, res, next) {
   const oldEnd = res.end
   let resBodySize = 0
 
+  // @ts-ignore
   res.write = function write(chunk) {
     resBodySize += chunk.length
     oldWrite.apply(res, arguments)
-    return false
   }
 
+  // @ts-ignore
   res.end = function end(chunk) {
     if (chunk) {
       resBodySize += chunk.length
     }
     oldEnd.apply(res, arguments)
-    return res
   }
 
   res.on('finish', () => {
@@ -37,8 +37,8 @@ function loggerMiddleware(req, res, next) {
       `${responseTime}ms`,
       '|',
       // @ts-ignore
-      HELPERS.download(bytes(req.bodySize)),
-      HELPERS.upload(bytes(resBodySize)),
+      HELPERS.download(bytes(req.bodySize || 0)),
+      HELPERS.upload(bytes(resBodySize || 0)),
       '|',
       req.user ? req.user.username : 'Not Logged In',
       req.headers['x-forwarded-for']

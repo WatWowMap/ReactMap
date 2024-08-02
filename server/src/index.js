@@ -1,7 +1,9 @@
-process.title = 'ReactMap'
-
 require('dotenv').config()
-const fs = require('fs')
+
+process.title = process.env.NODE_CONFIG_ENV
+  ? `ReactMap-${process.env.NODE_CONFIG_ENV}`
+  : 'ReactMap'
+
 const path = require('path')
 const express = require('express')
 const compression = require('compression')
@@ -15,7 +17,6 @@ const { ApolloServerErrorCode } = require('@apollo/server/errors')
 const { parse } = require('graphql')
 
 const { log, HELPERS, getTimeStamp } = require('@rm/logger')
-const { create, writeAll } = require('@rm/locales')
 
 const config = require('./services/config')
 const { Db, Event } = require('./services/initialization')
@@ -33,6 +34,7 @@ const { noSourceMapMiddleware } = require('./middleware/noSourceMap')
 const { initPassport } = require('./middleware/passport')
 const { errorMiddleware } = require('./middleware/error')
 const { sessionMiddleware } = require('./middleware/session')
+const { starti18n } = require('./services/i18n')
 require('./services/watcher')
 
 Event.clients = Clients
@@ -46,13 +48,11 @@ const distDir = path.join(
   '../../',
   `dist${process.env.NODE_CONFIG_ENV ? `-${process.env.NODE_CONFIG_ENV}` : ''}`,
 )
-const localePath = path.resolve(distDir, 'locales')
+
+starti18n(path.resolve(distDir, 'locales'))
 
 const app = express()
 const httpServer = http.createServer(app)
-
-initSentry(app)
-initPassport(app)
 
 app.disable('x-powered-by')
 
@@ -63,7 +63,7 @@ app.use(
   compression(),
   express.json({
     limit: '50mb',
-    verify: (req, res, buf) => {
+    verify: (req, _res, buf) => {
       req.bodySize = (req.bodySize || 0) + buf.length
     },
   }),
@@ -72,15 +72,8 @@ app.use(
   rateLimitingMiddleware(),
 )
 
-if (fs.existsSync(localePath)) {
-  require('./services/i18n')
-} else {
-  create().then((newLocales) =>
-    writeAll(newLocales, true, localePath).then(() =>
-      require('./services/i18n'),
-    ),
-  )
-}
+initSentry(app)
+initPassport(app)
 
 app.use(rootRouter)
 
