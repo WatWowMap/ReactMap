@@ -8,7 +8,6 @@ const express = require('express')
 const compression = require('compression')
 const session = require('express-session')
 const passport = require('passport')
-const rateLimit = require('express-rate-limit')
 const { rainbow } = require('chalkercli')
 const Sentry = require('@sentry/node')
 const { expressMiddleware } = require('@apollo/server/express4')
@@ -33,6 +32,7 @@ const pkg = require('../../package.json')
 const { loadLatestAreas } = require('./services/areas')
 const { connection } = require('./db/knexfile.cjs')
 const startApollo = require('./graphql/server')
+const { rateLimitingMiddleware } = require('./middleware/rateLimiting')
 require('./services/watcher')
 
 Event.clients = Clients
@@ -83,38 +83,6 @@ app.use((req, res, next) => {
     next()
   }
 })
-
-const RateLimitTime = config.getSafe('api.rateLimit.time') * 60 * 1000
-const MaxRequestsPerHour =
-  config.getSafe('api.rateLimit.requests') * (RateLimitTime / 1000)
-
-const rateLimitOptions = {
-  windowMs: RateLimitTime, // Time window in milliseconds
-  max: MaxRequestsPerHour, // Start blocking after x requests
-  headers: true,
-  message: {
-    status: 429, // optional, of course
-    limiter: true,
-    type: 'error',
-    message: `Too many requests from this IP, please try again in ${config.getSafe(
-      'api.rateLimit.time',
-    )} minutes.`,
-  },
-  /**
-   *
-   * @param {import('express').Request} req
-   * @param {import('express').Response} res
-   */
-  onLimitReached: (req, res) => {
-    log.info(
-      HELPERS.express,
-      req?.user?.username || 'user',
-      'is being rate limited',
-    )
-    res.redirect('/429')
-  },
-}
-const requestRateLimiter = rateLimit(rateLimitOptions)
 
 app.use(compression())
 
@@ -173,7 +141,7 @@ if (fs.existsSync(localePath)) {
   )
 }
 
-app.use(rootRouter, requestRateLimiter)
+app.use(rootRouter, rateLimitingMiddleware)
 
 if (sentry.enabled || process.env.SENTRY_DSN) {
   app.use(Sentry.Handlers.errorHandler())
