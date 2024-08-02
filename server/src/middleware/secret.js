@@ -8,17 +8,22 @@ function secretMiddleware(req, res, next) {
   const secret = req.headers['react-map-secret'] ?? req.headers['x-react-map']
 
   if (!secret) {
-    log.error(HELPERS.api, req.url, 'Forbidden: secret header is missing')
+    log.error(
+      HELPERS.api,
+      req.originalUrl,
+      'Forbidden: secret header is missing',
+    )
     return res
       .status(403)
       .json({ message: 'Forbidden: x-react-map header is missing' })
   }
 
   if (secret !== reactMapSecret) {
-    log.error(HELPERS.api, req.url, 'Forbidden: Invalid secret key')
+    log.error(HELPERS.api, req.originalUrl, 'Forbidden: Invalid secret key')
     return res.status(403).json({ message: 'Forbidden: Invalid secret key' })
   }
 
+  log.info(HELPERS.api, req.originalUrl)
   next()
 }
 

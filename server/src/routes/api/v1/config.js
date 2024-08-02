@@ -1,10 +1,9 @@
 // @ts-check
-const path = require('path')
 const router = require('express').Router()
-const config = require('@rm/config')
 const { log, HELPERS } = require('@rm/logger')
 
 router.get('/', (req, res) => {
+  const config = require('@rm/config')
   try {
     res.status(200).json({
       ...config,
@@ -26,9 +25,8 @@ router.get('/', (req, res) => {
           : [],
       },
     })
-    log.info(HELPERS.api, `api/v1/${path.parse(__filename).name}`)
   } catch (e) {
-    log.error(HELPERS.api, `api/v1/${path.parse(__filename).name}`, e)
+    log.error(HELPERS.api, req.originalUrl, e)
     res.status(500).json({ status: 'error', reason: e.message })
   }
 })

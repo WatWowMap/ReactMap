@@ -11,9 +11,8 @@ router.get('/', async (req, res) => {
     res
       .status(200)
       .json(await state.db.models.Session.query().where('expires', '>=', ts))
-    log.info(HELPERS.api, 'api/v1/sessions')
   } catch (e) {
-    log.error(HELPERS.api, 'api/v1/sessions/', e)
+    log.error(HELPERS.api, req.originalUrl, e)
     res.status(500).json({ status: 'ServerError', reason: e.message })
   }
 })
@@ -28,9 +27,8 @@ router.get('/hasValid/:id', async (req, res) => {
       valid: !!results.length,
       length: results.length,
     })
-    log.info(HELPERS.api, `api/v1/sessions/hasValid/${req.params.id}`)
   } catch (e) {
-    log.error(HELPERS.api, `api/v1/sessions/hasValid/${req.params.id}`, e)
+    log.error(HELPERS.api, req.originalUrl, e)
     res.status(500).json({ status: 'ServerError', reason: e.message })
   }
 })
@@ -45,9 +43,8 @@ router.get('/clearSessions/:id', async (req, res) => {
       )
       .delete()
     res.status(200).json({ results })
-    log.info(HELPERS.api, `api/v1/sessions/clearSessions/${req.params.id}`)
   } catch (e) {
-    log.error(HELPERS.api, `api/v1/sessions/clearSessions/${req.params.id}`, e)
+    log.error(HELPERS.api, req.originalUrl, e)
     res.status(500).json({ status: 'ServerError', reason: e.message })
   }
 })

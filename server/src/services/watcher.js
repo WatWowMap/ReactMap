@@ -29,11 +29,12 @@ const handle = (event, rawFile, domain) => {
     case 'messageOfTheDay':
       if (domain) {
         const domainKey = domain.replaceAll('.', '_')
-        if (config.multiDomainsObj[domainKey]?.[rawFile]) {
+        const multiDomainsObj = config.getSafe('multiDomainsObj')
+        if (multiDomainsObj[domainKey]?.[rawFile]) {
           log.info(HELPERS.config, `[${event}]`, rawFile, domain)
-          config.multiDomainsObj[domainKey][rawFile] = config.util.extendDeep(
+          multiDomainsObj[domainKey][rawFile] = config.util.extendDeep(
             {},
-            config.multiDomainsObj[domainKey][rawFile],
+            multiDomainsObj[domainKey][rawFile],
             checkConfigJsons(rawFile, domain),
           )
         }

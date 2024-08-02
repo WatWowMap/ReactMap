@@ -1,5 +1,4 @@
 // @ts-check
-const path = require('path')
 const router = require('express').Router()
 
 const { log, HELPERS } = require('@rm/logger')
@@ -99,9 +98,8 @@ router.get(['/', '/:category'], async (req, res) => {
         res.status(200).json(available)
       }
     }
-    log.info(HELPERS.api, `api/v1/${path.parse(__filename).name}`)
   } catch (e) {
-    log.error(HELPERS.api, `api/v1/${path.parse(__filename).name}`, e)
+    log.error(HELPERS.api, req.originalUrl, e)
     res.status(500).json({ status: 'ServerError', reason: e.message })
   }
 })
@@ -121,17 +119,11 @@ router.put('/:category', async (req, res) => {
         state.event.setAvailable('nests', 'Nest', state.db),
       ])
     }
-    log.info(
-      HELPERS.api,
-      `api/v1/${path.parse(__filename).name} - updated availabled for ${
-        category || 'all'
-      }`,
-    )
     res
       .status(200)
       .json({ status: `updated available for ${category || 'all'}` })
   } catch (e) {
-    log.error(HELPERS.api, `api/v1/${path.parse(__filename).name}`, e)
+    log.error(HELPERS.api, req.originalUrl, e)
     res.status(500).json({ status: 'ServerError', reason: e.message })
   }
 })
