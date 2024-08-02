@@ -5,11 +5,12 @@ const { log, HELPERS } = require('@rm/logger')
 const config = require('@rm/config')
 
 function rateLimitingMiddleware() {
-  const windowMs = config.getSafe('api.rateLimit.time') * 60 * 1000
   return rateLimit({
-    windowMs,
-    max: config.getSafe('api.rateLimit.requests') * (windowMs / 1000),
-    headers: true,
+    windowMs: config.getSafe('api.rateLimit.time') * 60 * 1000,
+    max: config.getSafe('api.rateLimit.requests'),
+    headers: false,
+    standardHeaders: false,
+    legacyHeaders: false,
     message: {
       status: 429,
       limiter: true,

@@ -69,6 +69,7 @@ app.use(
   }),
   express.static(distDir),
   sessionMiddleware(),
+  rateLimitingMiddleware(),
 )
 
 if (fs.existsSync(localePath)) {
@@ -81,7 +82,7 @@ if (fs.existsSync(localePath)) {
   )
 }
 
-app.use(rootRouter, rateLimitingMiddleware())
+app.use(rootRouter)
 
 startApollo(httpServer).then((server) => {
   app.use(
