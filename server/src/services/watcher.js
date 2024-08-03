@@ -50,6 +50,7 @@ const handle = async (event, rawFile, domain) => {
       }
       break
     case 'local':
+    case `local-${process.env.NODE_CONFIG_ENV}`:
       if (config.reloadConfigOnSave) {
         await reloadConfig()
       }
