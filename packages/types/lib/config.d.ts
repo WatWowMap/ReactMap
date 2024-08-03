@@ -19,6 +19,10 @@ import { OnlyType, DeepMerge } from './utility'
 type BaseConfig = typeof config
 type ExampleConfig = typeof example
 
+export type ConfigAreas = Awaited<
+  ReturnType<typeof import('server/src/services/areas')['loadLatestAreas']>
+>
+
 export type Config<Client extends boolean = false> = DeepMerge<
   Omit<BaseConfig, 'icons' | 'manualAreas'>,
   {
@@ -38,9 +42,7 @@ export type Config<Client extends boolean = false> = DeepMerge<
       logLevel: LogLevelNames
       skipUpdateCheck?: boolean
     }
-    areas: Awaited<
-      ReturnType<typeof import('server/src/services/areas')['loadLatestAreas']>
-    >
+    areas: ConfigAreas
     authentication: {
       areaRestrictions: { roles: string[]; areas: string[] }[]
       // Unfortunately these types are not convenient for looping the `perms` object...
@@ -109,8 +111,8 @@ export type Config<Client extends boolean = false> = DeepMerge<
         components: CustomComponent[]
       }
     }
-    multiDomains: { domain: string }[]
-    multiDomainsObj: Record<string, Config['map'] & { domain: string }>
+    multiDomains: MultiDomain[]
+    multiDomainsObj: Record<string, MultiDomain>
     database: {
       schemas: Schema[]
       settings: {
@@ -133,6 +135,13 @@ export type Config<Client extends boolean = false> = DeepMerge<
     manualAreas: ExampleConfig['manualAreas'][number][]
   }
 >
+
+// unclear why this is needed, but it is for the MultiDomain type to parse...
+type Map = Config['map']
+
+export interface MultiDomain extends Map {
+  domain: string
+}
 
 export interface Icons extends Omit<BaseConfig['icons'], 'styles'> {
   customizable: string[]

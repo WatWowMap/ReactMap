@@ -1,7 +1,7 @@
 import { Request } from 'express'
 import type { ButtonProps } from '@mui/material'
 
-import { Config, GetSafeConfig } from './config'
+import { Config, ConfigAreas, GetSafeConfig } from './config'
 import { ExpressUser, Permissions } from './server'
 
 declare module 'config' {
@@ -15,13 +15,7 @@ declare module 'config' {
     ) => T extends 'scanAreas'
       ? Config['areas']['scanAreas'][string]
       : Config['areas']['scanAreasMenu'][string]
-    setAreas: (
-      newAreas: Awaited<
-        ReturnType<
-          typeof import('server/src/services/areas')['loadLatestAreas']
-        >
-      >,
-    ) => void
+    setAreas: (newAreas: ConfigAreas) => void
   }
 }
 
