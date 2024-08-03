@@ -16,6 +16,9 @@ const serverState = {
   pvp: config.getSafe('api.pvp.reactMapHandlesPvp') ? new PvpWrapper() : null,
   event: new EventManager(),
   userCache: new NodeCache({ stdTTL: 60 * 60 * 24 }),
+  userRequestCache: new Map(
+    Object.entries(getCache('userDataLimitCache.json', {})),
+  ),
   setTimers() {
     this.event.setTimers(this.db, this.pvp)
   },
@@ -86,8 +89,13 @@ const serverState = {
     this.userCache.keys().forEach((key) => {
       cacheObj[key] = this.userCache.get(key)
     })
+    const userRequestCacheObj = {}
+    this.userRequestCache.forEach((v, k) => {
+      userRequestCacheObj[k] = v
+    })
     await Promise.all([
       setCache('scanUserHistory.json', cacheObj),
+      setCache('userDataLimitCache.json', userRequestCacheObj),
       setCache('rarity.json', this.db.rarity),
       setCache('historical.json', this.db.historical),
       setCache('available.json', this.event.available),

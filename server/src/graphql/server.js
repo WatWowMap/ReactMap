@@ -17,7 +17,7 @@ const config = require('@rm/config')
 const { log, HELPERS } = require('@rm/logger')
 
 const resolvers = require('./resolvers')
-const { userRequestCache } = require('../services/initialization')
+const state = require('../services/state')
 
 /** @param {import('http').Server} httpServer */
 async function startApollo(httpServer) {
@@ -124,14 +124,14 @@ async function startApollo(httpServer) {
 
                 if (contextValue.user) {
                   const now = Date.now()
-                  userRequestCache.get(contextValue.user).push({
+                  state.userRequestCache.get(contextValue.user).push({
                     count: returned,
                     timestamp: now,
                     category: endpoint,
                   })
 
-                  const entries = userRequestCache.get(contextValue.user)
-                  userRequestCache.set(
+                  const entries = state.userRequestCache.get(contextValue.user)
+                  state.userRequestCache.set(
                     contextValue.user,
                     entries.filter(
                       (entry) =>
