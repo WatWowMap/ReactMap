@@ -7,6 +7,36 @@ const { loadLatestAreas } = require('../areas')
 const { loadAuthStrategies } = require('../../routes/authRouter')
 const { deepCompare } = require('./deepCompare')
 
+const NO_RELOAD = new Set([
+  'interface',
+  'port',
+  'googleAnalyticsId',
+  'devOptions.skipMinified',
+  'devOptions.skipUpdateCheck',
+  'devOptions.graphiql',
+  'api.cookieAgeDays',
+  'api.sessionSecret',
+  'api.rateLimit',
+  'api.rateLimit.time',
+  'api.rateLimit.requests',
+  'api.sessionCheckIntervalMs',
+  'database.settings.sessionTableName',
+  'sentry',
+  'sentry.client',
+  'sentry.client.enabled',
+  'sentry.client.debug',
+  'sentry.client.dsn',
+  'sentry.client.tracesSampleRate',
+  'sentry.client.authToken',
+  'sentry.client.org',
+  'sentry.client.project',
+  'sentry.server',
+  'sentry.server.enabled',
+  'sentry.server.debug',
+  'sentry.server.dsn',
+  'sentry.server.tracesSampleRate',
+])
+
 /**
  * Reloads the configuration and updates the state
  * @returns {Promise<null | Error>}
@@ -33,7 +63,19 @@ async function reloadConfig() {
       return null
     }
 
-    log.info(HELPERS.config, 'updating the following config values:', changed)
+    const valid = changed.filter((key) => !NO_RELOAD.has(key))
+    const invalid = changed.filter((key) => NO_RELOAD.has(key))
+
+    if (valid.length) {
+      log.info(HELPERS.config, 'updating the following config values:', valid)
+    }
+    if (invalid.length) {
+      log.warn(
+        HELPERS.config,
+        'unfortunately the following config values cannot be hot reloaded and will require a full process restart:',
+        invalid,
+      )
+    }
 
     const stateReport = /** @type {import('@rm/types').StateReportObj} */ ({
       database:
