@@ -110,7 +110,7 @@ const startServer = async () => {
   await state.loadLocalContexts()
   await state.loadExternalContexts()
   const newAreas = await loadLatestAreas()
-  config.areas = newAreas
+  config.setAreas(newAreas)
 
   const text = rainbow(`ℹ ${getTimeStamp()} [ReactMap] has fully started`)
   setTimeout(() => text.stop(), 1_000)

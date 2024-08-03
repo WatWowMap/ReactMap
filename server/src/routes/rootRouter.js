@@ -2,17 +2,18 @@ const express = require('express')
 const fs = require('fs')
 const { join } = require('path')
 const { SourceMapConsumer } = require('source-map')
+
 const config = require('@rm/config')
 const { log, HELPERS } = require('@rm/logger')
-const state = require('../services/state')
-const { version } = require('../../../package.json')
-const areaPerms = require('../services/functions/areaPerms')
-const getServerSettings = require('../services/functions/getServerSettings')
 
-const authRouter = require('./authRouter')
+const { authRouter } = require('./authRouter')
 const clientRouter = require('./clientRouter')
 const apiRouter = require('./api')
+const state = require('../services/state')
+const areaPerms = require('../services/functions/areaPerms')
+const getServerSettings = require('../services/functions/getServerSettings')
 const { secretMiddleware } = require('../middleware/secret')
+const { version } = require('../../../package.json')
 
 const rootRouter = express.Router()
 

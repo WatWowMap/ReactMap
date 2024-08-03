@@ -13,8 +13,8 @@ const {
 } = require('@apollo/server/plugin/disabled')
 
 const config = require('@rm/config')
-
 const { log, HELPERS } = require('@rm/logger')
+
 const resolvers = require('./resolvers')
 
 /** @param {import('http').Server} httpServer */

@@ -1,9 +1,12 @@
 // @ts-check
 const router = require('express').Router()
+
 const { log, HELPERS } = require('@rm/logger')
+
 const state = require('../../../services/state')
 const { bindConnections } = require('../../../models')
 const { loadLatestAreas } = require('../../../services/areas')
+const { loadAuthStrategies } = require('../../authRouter')
 
 router.get('/', (req, res) => {
   const config = require('@rm/config')
@@ -45,6 +48,8 @@ router.get('/reload', async (req, res) => {
     await newState.db.getDbContext()
     await newState.loadLocalContexts()
     await newState.loadExternalContexts()
+    loadAuthStrategies()
+
     newConfig.setAreas(await loadLatestAreas())
 
     res.status(200).json({ status: 'ok' })

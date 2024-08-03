@@ -2,6 +2,7 @@ const fs = require('fs')
 const { resolve } = require('path')
 const { GraphQLJSON } = require('graphql-type-json')
 const { S2LatLng, S2RegionCoverer, S2LatLngRect } = require('nodes2ts')
+
 const config = require('@rm/config')
 const { missing, readAndParseJson } = require('@rm/locales')
 
