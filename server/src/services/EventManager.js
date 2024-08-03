@@ -277,6 +277,7 @@ class EventManager {
     const assets = await Promise.allSettled(
       styles.map(async (style) => {
         try {
+          /** @type {import('uicons.js').UiconsIndex} */
           const response = style.path.startsWith('http')
             ? await fetch(`${style.path}/index.json`).then((res) => res.json())
             : JSON.parse(
@@ -288,7 +289,6 @@ class EventManager {
                   'utf-8',
                 ),
               )
-
           return { ...style, data: response }
         } catch (e) {
           log.warn(
@@ -322,22 +322,18 @@ class EventManager {
     if (endpoint) {
       log.info(HELPERS.event, 'Fetching Latest Invasions')
       try {
+        /** @type {import('@rm/masterfile').Masterfile['invasions']} */
         const newInvasions = await fetch(endpoint).then((res) => res.json())
         if (newInvasions) {
           this.rocketGruntIDs = Object.keys(newInvasions)
-            .filter(
-              (key) =>
-                newInvasions[key].grunt &&
-                newInvasions[key].grunt.includes('Grunt'),
-            )
+            .filter((key) => newInvasions[key].grunt === 'Grunt')
             .map(Number)
 
           this.rocketLeaderIDs = Object.keys(newInvasions)
             .filter(
               (key) =>
-                newInvasions[key].grunt &&
-                (newInvasions[key].grunt.includes('Executive') ||
-                  newInvasions[key].grunt.includes('Giovanni')),
+                newInvasions[key].grunt === 'Executive' ||
+                newInvasions[key].grunt === 'Giovanni',
             )
             .map(Number)
 

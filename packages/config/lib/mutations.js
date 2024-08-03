@@ -1,3 +1,5 @@
+// @ts-check
+
 const fs = require('fs')
 const { resolve } = require('path')
 
@@ -313,9 +315,11 @@ const applyMutations = (config) => {
       trialPeriod: {
         ...strategy.trialPeriod,
         start: {
+          ...strategy?.trialPeriod?.start,
           js: getJsDate(strategy?.trialPeriod?.start),
         },
         end: {
+          ...strategy?.trialPeriod?.end,
           js: getJsDate(strategy?.trialPeriod?.end),
         },
         roles: Array.isArray(strategy?.trialPeriod?.roles)
@@ -350,9 +354,12 @@ const applyMutations = (config) => {
     (!config.authentication.strategies.length ||
       !config.authentication.strategies.find((strategy) => strategy.enabled))
   ) {
-    const enabled = Object.keys(config.authentication.perms).filter(
-      (perm) => config.authentication.perms[perm].enabled,
-    )
+    const enabled =
+      /** @type {(keyof import('@rm/types').Config['authentication']['perms'])[]} */ (
+        Object.keys(config.authentication.perms).filter(
+          (perm) => config.authentication.perms[perm].enabled,
+        )
+      )
     log.warn(
       HELPERS.config,
       'No authentication strategies enabled, adding the following perms to alwaysEnabledPerms array:\n',

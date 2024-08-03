@@ -1,7 +1,7 @@
 /* eslint-disable import/order */
 // @ts-check
 if (!process.env.NODE_CONFIG_DIR) {
-  process.env.NODE_CONFIG_DIR = require('path').resolve(
+  process.env.NODE_CONFIG_DIR = require('path').join(
     __dirname,
     '..',
     '..',
@@ -22,21 +22,12 @@ if (process.env.NODE_CONFIG_ENV) {
   }
 }
 
-const path = require('path')
-
 const { setLogLevel, HELPERS, log } = require('@rm/logger')
 const { applyMutations } = require('./mutations')
 
-function directory() {
-  if (process.env.NODE_CONFIG_DIR) {
-    return process.env.NODE_CONFIG_DIR
-  }
-  return path.join(process.cwd(), 'config')
-}
-
 function purge() {
   Object.keys(require.cache).forEach((fileName) => {
-    if (fileName.indexOf(directory()) === -1) {
+    if (fileName.indexOf(process.env.NODE_CONFIG_DIR) === -1) {
       return
     }
     delete require.cache[fileName]
@@ -47,40 +38,42 @@ function purge() {
 
 /** @param {import('config').IConfig} c */
 function setup(c) {
-  c.reload = () => {
+  c.reload = function reload() {
     try {
       purge()
       const newConfig = require('config')
       setup(newConfig)
 
-      log.info(HELPERS.config, 'Config reloaded')
+      log.info(HELPERS.config, 'config reloaded')
       return newConfig
     } catch (e) {
       log.error(HELPERS.config, 'error reloading config', e)
-      return c
+      return this
     }
   }
 
-  c.getSafe = (key) => require('config').get(key)
+  c.getSafe = function getSafe(key) {
+    return require('config').get(key)
+  }
 
-  c.getMapConfig = (req) => {
+  c.getMapConfig = function getMapConfig(req) {
     const domain = /** @type {const} */ (
       `multiDomainsObj.${req.headers.host.replaceAll('.', '_')}`
     )
-    return c.has(domain) ? c.getSafe(domain) : c.getSafe('map')
+    return this.has(domain) ? this.getSafe(domain) : this.getSafe('map')
   }
 
-  c.getAreas = (req, key) => {
+  c.getAreas = function getAreas(req, key) {
     const location = /** @type {const} */ (
       `areas.${key}.${req.headers.host.replaceAll('.', '_')}`
     )
-    return c.has(location)
-      ? c.getSafe(location)
-      : c.getSafe(`areas.${key}.main`)
+    return this.has(location)
+      ? this.getSafe(location)
+      : this.getSafe(`areas.${key}.main`)
   }
 
-  c.setAreas = (areas) => {
-    c.areas = areas
+  c.setAreas = function setAreas(newAreas) {
+    this.areas = newAreas
   }
 
   setLogLevel(c.getSafe('devOptions.logLevel'))

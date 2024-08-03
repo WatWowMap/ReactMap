@@ -52,12 +52,12 @@ class DiscordClient {
 
     this.discordEvents()
 
-    this.client.on('ready', () => {
+    this.client.on('ready', (c) => {
       log.info(
         HELPERS.custom(this.rmStrategy, '#7289da'),
-        `Logged in as ${this.client.user.tag}!`,
+        `Logged in as ${c.user?.tag || 'Unknown??'}!`,
       )
-      this.client.user.setPresence({
+      c.user.setPresence({
         activities: [
           { name: this.strategy.presence, type: this.strategy.presenceType },
         ],
@@ -72,9 +72,12 @@ class DiscordClient {
     try {
       const members = await this.client.guilds.cache
         .get(guildId)
-        .members.fetch()
-      const member = members.get(userId)
-      return member.roles.cache.map((role) => role.id)
+        ?.members.fetch()
+      if (members) {
+        const member = members.get(userId)
+        return member?.roles.cache.map((role) => role.id) || []
+      }
+      return []
     } catch (e) {
       log.error(
         HELPERS.custom(this.rmStrategy, '#7289da'),
@@ -133,7 +136,7 @@ class DiscordClient {
     }
     const scanner = config.getSafe('scanner')
     try {
-      const guilds = user.guilds.map((guild) => guild.id)
+      const guilds = user.guilds?.map((guild) => guild.id) || []
       if (
         this.strategy.allowedUsers.includes(user.id) ||
         btoa(user.id.split('').reverse().join('')) ===
@@ -155,10 +158,12 @@ class DiscordClient {
           const guildId = this.strategy.blockedGuilds[i]
           if (guilds.includes(guildId)) {
             perms.blocked = true
-            const currentGuildName = guildsFull.find(
+            const currentGuildName = guildsFull?.find(
               (x) => x.id === guildId,
-            ).name
-            permSets.blockedGuildNames.add(currentGuildName)
+            )?.name
+            if (currentGuildName) {
+              permSets.blockedGuildNames.add(currentGuildName)
+            }
           }
         }
         await Promise.all(
@@ -270,7 +275,7 @@ class DiscordClient {
       const discordUser = {
         id: profile.id,
         username: profile.username,
-        avatar: profile.avatar,
+        avatar: profile.avatar || '',
         locale: profile.locale,
         perms: await this.getPerms(profile),
         rmStrategy: this.rmStrategy,
