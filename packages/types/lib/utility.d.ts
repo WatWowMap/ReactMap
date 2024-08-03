@@ -68,3 +68,13 @@ export type DeepMerge<T, U> = {
     ? T[K]
     : never
 }
+
+export type ComparisonReport<T> = T extends Array<infer U>
+  ? { areEqual: boolean; report: ComparisonReport<U>[]; changed: string[] }
+  : T extends object
+  ? {
+      areEqual: boolean
+      report: { [K in StoreNoFn<T>]: ComparisonReport<T[K]> }
+      changed: string[]
+    }
+  : boolean

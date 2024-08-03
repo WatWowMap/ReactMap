@@ -7,6 +7,10 @@ import { ExpressUser, Permissions } from './server'
 declare module 'config' {
   interface IConfig extends Config {
     getSafe: GetSafeConfig
+    /**
+     * Due to the complexity of how the config package is cached, it's better to return the old config with this method and get the new config with a separate `require` call.
+     * @returns The old config object.
+     */
     reload: () => IConfig
     getMapConfig: (request: Request) => Config['map']
     getAreas: <T extends 'scanAreas' | 'scanAreasMenu'>(

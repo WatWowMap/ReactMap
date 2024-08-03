@@ -36,52 +36,44 @@ function purge() {
   delete require.cache[require.resolve('@rm/config')]
 }
 
-/** @param {import('config').IConfig} c */
-function setup(c) {
-  c.reload = function reload() {
-    try {
-      purge()
-      const newConfig = require('config')
-      setup(newConfig)
-
-      log.info(HELPERS.config, 'config reloaded')
-      return newConfig
-    } catch (e) {
-      log.error(HELPERS.config, 'error reloading config', e)
-      return this
-    }
-  }
-
-  c.getSafe = function getSafe(key) {
-    return require('config').get(key)
-  }
-
-  c.getMapConfig = function getMapConfig(req) {
-    const domain = /** @type {const} */ (
-      `multiDomainsObj.${req.headers.host.replaceAll('.', '_')}`
-    )
-    return this.has(domain) ? this.getSafe(domain) : this.getSafe('map')
-  }
-
-  c.getAreas = function getAreas(req, key) {
-    const location = /** @type {const} */ (
-      `areas.${key}.${req.headers.host.replaceAll('.', '_')}`
-    )
-    return this.has(location)
-      ? this.getSafe(location)
-      : this.getSafe(`areas.${key}.main`)
-  }
-
-  c.setAreas = function setAreas(newAreas) {
-    this.areas = newAreas
-  }
-
-  setLogLevel(c.getSafe('devOptions.logLevel'))
-  applyMutations(c)
-}
-
 const config = require('config')
 
-setup(config)
+config.reload = function reload() {
+  try {
+    purge()
+    log.info(HELPERS.config, 'config purged, returning old reference')
+    return this
+  } catch (e) {
+    log.error(HELPERS.config, 'error reloading config', e)
+    return this
+  }
+}
+
+config.getSafe = function getSafe(key) {
+  return require('config').get(key)
+}
+
+config.getMapConfig = function getMapConfig(req) {
+  const domain = /** @type {const} */ (
+    `multiDomainsObj.${req.headers.host.replaceAll('.', '_')}`
+  )
+  return this.has(domain) ? this.getSafe(domain) : this.getSafe('map')
+}
+
+config.getAreas = function getAreas(req, key) {
+  const location = /** @type {const} */ (
+    `areas.${key}.${req.headers.host.replaceAll('.', '_')}`
+  )
+  return this.has(location)
+    ? this.getSafe(location)
+    : this.getSafe(`areas.${key}.main`)
+}
+
+config.setAreas = function setAreas(newAreas) {
+  this.areas = newAreas
+}
+
+setLogLevel(config.getSafe('devOptions.logLevel'))
+applyMutations(config)
 
 module.exports = config

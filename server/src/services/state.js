@@ -19,10 +19,12 @@ const serverState = {
   userRequestCache: new Map(
     Object.entries(getCache('userDataLimitCache.json', {})),
   ),
-  setTimers() {
-    this.event.setTimers(this.db, this.pvp)
+  startTimers() {
+    this.event.startIntervals(this.db, this.pvp)
+    this.event.loadTrial(this.db)
   },
   setAuthClients() {
+    log.info(HELPERS.auth, 'setting authentication clients')
     this.event.authClients = Object.fromEntries(
       config
         .getSafe('authentication.strategies')
@@ -53,38 +55,73 @@ const serverState = {
         }),
     )
   },
-  async loadLocalContexts() {
-    await Promise.all([
-      this.db.historicalRarity(),
-      this.db.getFilterContext(),
-      this.event.setAvailable('gyms', 'Gym', this.db),
-      this.event.setAvailable('pokestops', 'Pokestop', this.db),
-      this.event.setAvailable('pokemon', 'Pokemon', this.db),
-      this.event.setAvailable('nests', 'Nest', this.db),
-    ])
+  /** @param {import('@rm/types').StateReportObj} [reloadReport] */
+  async loadLocalContexts(reloadReport) {
+    const promises = []
+    if (!reloadReport || reloadReport.database) {
+      if (!reloadReport || reloadReport.historical) {
+        promises.push(this.db.historicalRarity())
+      }
+      promises.push(
+        this.db.getFilterContext(),
+        this.event.setAvailable('gyms', 'Gym', this.db),
+        this.event.setAvailable('pokestops', 'Pokestop', this.db),
+        this.event.setAvailable('pokemon', 'Pokemon', this.db),
+        this.event.setAvailable('nests', 'Nest', this.db),
+      )
+    }
+    await Promise.all(promises)
   },
-  async loadExternalContexts() {
-    await Promise.all([
-      this.event.getUniversalAssets(config.getSafe('icons.styles'), 'uicons'),
-      this.event.getUniversalAssets(config.getSafe('audio.styles'), 'uaudio'),
-      this.event.getMasterfile(this.db.historical, this.db.rarity),
-      this.event.getInvasions(config.getSafe('api.pogoApiEndpoints.invasions')),
-      this.event.getWebhooks(),
-    ])
+  /** @param {import('@rm/types').StateReportObj} [reloadReport] */
+  async loadExternalContexts(reloadReport) {
+    const promises = []
+    if (!reloadReport || reloadReport.icons) {
+      promises.push(this.event.getUniversalAssets('uicons'))
+    }
+    if (!reloadReport || reloadReport.audio) {
+      promises.push(this.event.getUniversalAssets('uaudio'))
+    }
+    if (!reloadReport || reloadReport.masterfile) {
+      promises.push(
+        this.event.getMasterfile(this.db.historical, this.db.rarity),
+      )
+    }
+    if (!reloadReport || reloadReport.invasions) {
+      promises.push(this.event.getInvasions())
+    }
+    if (!reloadReport || reloadReport.webhooks) {
+      promises.push(this.event.getWebhooks())
+    }
+    await Promise.all(promises)
   },
-  reload() {
-    this.db = new DbCheck()
-    this.pvp = config.getSafe('api.pvp.reactMapHandlesPvp')
-      ? new PvpWrapper()
-      : null
-    this.event = new EventManager()
-    this.setTimers()
-    this.setAuthClients()
+  /** @param {import('@rm/types').StateReportObj} reloadReport */
+  async reload(reloadReport) {
+    if (reloadReport.database) {
+      await this.writeCache()
+      this.db = new DbCheck()
+    }
+    if (reloadReport.pvp) {
+      this.pvp = config.getSafe('api.pvp.reactMapHandlesPvp')
+        ? new PvpWrapper()
+        : null
+    }
+    if (reloadReport.strategies) {
+      this.setAuthClients()
+      this.event.loadTrial(this.db)
+    }
+    if (reloadReport.events) {
+      this.event.startIntervals(this.db, this.pvp)
+    }
     return this
   },
-  /** @param {NodeJS.Signals} e */
-  async shutdown(e) {
-    log.info(HELPERS.ReactMap, 'received signal', e, 'writing cache...')
+  /** @param {NodeJS.Signals} [e] */
+  async writeCache(e) {
+    if (e) {
+      log.info(HELPERS.ReactMap, 'received signal', e, 'writing cache...')
+    } else {
+      log.info(HELPERS.ReactMap, 'writing cache...')
+    }
+
     const cacheObj = {}
     this.userCache.keys().forEach((key) => {
       cacheObj[key] = this.userCache.get(key)
@@ -93,6 +130,7 @@ const serverState = {
     this.userRequestCache.forEach((v, k) => {
       userRequestCacheObj[k] = v
     })
+
     await Promise.all([
       setCache('scanUserHistory.json', cacheObj),
       setCache('userDataLimitCache.json', userRequestCacheObj),
@@ -104,7 +142,11 @@ const serverState = {
       setCache('uaudio.json', this.event.uaudio),
       setCache('uicons.json', this.event.uicons),
     ])
-    log.info(HELPERS.ReactMap, 'exiting...')
+    if (e) {
+      log.info(HELPERS.ReactMap, 'exiting...')
+    } else {
+      log.info(HELPERS.ReactMap, 'cache written')
+    }
   },
 }
 
@@ -113,24 +155,24 @@ Object.entries(getCache('scanUserHistory.json', {})).forEach(([k, v]) =>
 )
 
 process.on('SIGINT', async (e) => {
-  await serverState.shutdown(e)
+  await serverState.writeCache(e)
   process.exit(0)
 })
 process.on('SIGTERM', async (e) => {
-  await serverState.shutdown(e)
+  await serverState.writeCache(e)
   process.exit(0)
 })
 process.on('SIGUSR1', async (e) => {
-  await serverState.shutdown(e)
+  await serverState.writeCache(e)
   process.exit(0)
 })
 process.on('SIGUSR2', async (e) => {
-  await serverState.shutdown(e)
+  await serverState.writeCache(e)
   process.exit(0)
 })
 process.on('uncaughtException', async (e) => {
   log.error(HELPERS.ReactMap, e)
-  await serverState.shutdown('SIGBREAK')
+  await serverState.writeCache('SIGBREAK')
   process.exit(99)
 })
 

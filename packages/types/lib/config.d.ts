@@ -14,7 +14,7 @@ import config = require('server/src/configs/default.json')
 import example = require('server/src/configs/local.example.json')
 
 import type { Schema } from './server'
-import { OnlyType, DeepMerge } from './utility'
+import { OnlyType, DeepMerge, ComparisonReport } from './utility'
 
 type BaseConfig = typeof config
 type ExampleConfig = typeof example
@@ -326,3 +326,5 @@ export type NestedObjectPaths = Paths<Config>
 export type GetSafeConfig = <P extends NestedObjectPaths>(
   path: P,
 ) => ConfigPathValue<Config, P>
+
+export type ConfigEqualReport = ComparisonReport<Omit<Config, 'areas'>>

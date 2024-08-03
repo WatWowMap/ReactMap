@@ -44,7 +44,7 @@ const startServer = async () => {
   }
   config.setAreas(loadCachedAreas())
 
-  state.setTimers()
+  state.startTimers()
   state.setAuthClients()
 
   bindConnections(state.db)

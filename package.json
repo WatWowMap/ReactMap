@@ -34,8 +34,9 @@
   },
   "nodemonConfig": {
     "watch": [
-      "server/src",
-      "packages"
+      "server/src/**/*.js",
+      "server/src/configs/default.json",
+      "packages/**/*"
     ],
     "ignore": [
       "server/src/configs/koji_backups/**",

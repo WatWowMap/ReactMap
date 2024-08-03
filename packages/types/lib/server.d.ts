@@ -278,3 +278,16 @@ export type ExpressErrorMiddleware = (
   res: Response,
   next: NextFunction,
 ) => any
+
+export interface StateReportObj {
+  database: boolean
+  pvp: boolean
+  icons: boolean
+  audio: boolean
+  historical: boolean
+  masterfile: boolean
+  invasions: boolean
+  webhooks: boolean
+  events: boolean
+  strategies: boolean
+}
