@@ -2,6 +2,7 @@
 // @ts-check
 const path = require('path')
 const { ApolloServer } = require('@apollo/server')
+
 const NodeCache = require('node-cache')
 const { loadTypedefs } = require('@graphql-tools/load')
 const { GraphQLFileLoader } = require('@graphql-tools/graphql-file-loader')
@@ -16,6 +17,7 @@ const config = require('@rm/config')
 const { log, HELPERS } = require('@rm/logger')
 
 const resolvers = require('./resolvers')
+const { userRequestCache } = require('../services/initialization')
 
 /** @param {import('http').Server} httpServer */
 async function startApollo(httpServer) {
@@ -47,10 +49,17 @@ async function startApollo(httpServer) {
       } else if (e.message === 'unauthenticated') {
         customMessage =
           'user is not authenticated, forcing logout, no need to report this error unless it continues to happen'
+      } else if (e.message === 'data_limit_reached') {
+        customMessage = `user has reached the data limit, blocking future requests for ${Math.ceil(
+          (Number(e?.extensions?.until || 0) - Date.now()) / 1000,
+        )} seconds`
       }
 
       const key = `${e.extensions.id || e.extensions.user}-${e.message}`
       if (errorCache.has(key)) {
+        if (e?.extensions?.stacktrace) {
+          delete e.extensions.stacktrace
+        }
         return e
       }
       if (!config.getSafe('devOptions.enabled')) {
@@ -68,9 +77,12 @@ async function startApollo(httpServer) {
         e.extensions.serverV || 'Unknown',
         'User:',
         e.extensions.user || 'Not Logged In',
-        e.extensions.id || '',
+        // e.extensions.id || '',
         customMessage || e,
       )
+      if (e?.extensions?.stacktrace) {
+        delete e.extensions.stacktrace
+      }
       return e
     },
     logger: {
@@ -109,6 +121,26 @@ async function startApollo(httpServer) {
 
                 const data = response.body.singleResult.data?.[endpoint]
                 const returned = Array.isArray(data) ? data.length : 0
+
+                if (contextValue.user) {
+                  const now = Date.now()
+                  userRequestCache.get(contextValue.user).push({
+                    count: returned,
+                    timestamp: now,
+                    category: endpoint,
+                  })
+
+                  const entries = userRequestCache.get(contextValue.user)
+                  userRequestCache.set(
+                    contextValue.user,
+                    entries.filter(
+                      (entry) =>
+                        now - entry.timestamp <=
+                        config.getSafe('api.dataRequestLimits.time') * 1000,
+                    ),
+                  )
+                }
+
                 log.info(
                   HELPERS[endpoint] || `[${endpoint?.toUpperCase()}]`,
                   '|',

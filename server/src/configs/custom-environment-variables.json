@@ -186,6 +186,46 @@
         "__format": "boolean"
       }
     },
+    "dataRequestLimits": {
+      "categories": {
+        "devices": {
+          "__name": "API_DATA_REQUEST_LIMITS_CATEGORIES_DEVICES",
+          "__format": "number"
+        },
+        "gyms": {
+          "__name": "API_DATA_REQUEST_LIMITS_CATEGORIES_GYMS",
+          "__format": "number"
+        },
+        "nests": {
+          "__name": "API_DATA_REQUEST_LIMITS_CATEGORIES_NESTS",
+          "__format": "number"
+        },
+        "pokemon": {
+          "__name": "API_DATA_REQUEST_LIMITS_CATEGORIES_POKEMON",
+          "__format": "number"
+        },
+        "pokestops": {
+          "__name": "API_DATA_REQUEST_LIMITS_CATEGORIES_POKESTOPS",
+          "__format": "number"
+        },
+        "portals": {
+          "__name": "API_DATA_REQUEST_LIMITS_CATEGORIES_PORTALS",
+          "__format": "number"
+        },
+        "routes": {
+          "__name": "API_DATA_REQUEST_LIMITS_CATEGORIES_ROUTES",
+          "__format": "number"
+        },
+        "weather": {
+          "__name": "API_DATA_REQUEST_LIMITS_CATEGORIES_WEATHER",
+          "__format": "number"
+        }
+      },
+      "time": {
+        "__name": "API_DATA_REQUEST_LIMITS_TIME",
+        "__format": "number"
+      }
+    },
     "queryLimits": {
       "pokemon": {
         "__name": "API_QUERY_LIMITS_POKEMON",

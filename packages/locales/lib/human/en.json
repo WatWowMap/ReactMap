@@ -785,5 +785,6 @@
   "locale_instructions_7": "Create a pull request",
   "locale_instructions_8": "Wait for the pull request to be reviewed and merged",
   "enter_translation": "Enter Translation",
-  "individual_filters": "Partially Filtered"
+  "individual_filters": "Partially Filtered",
+  "data_limit_reached": "You have requested too much data recently and are on cooldown until {{until}}"
 }

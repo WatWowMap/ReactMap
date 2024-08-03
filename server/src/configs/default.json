@@ -61,6 +61,19 @@
       "raids": true,
       "nests": false
     },
+    "dataRequestLimits": {
+      "categories": {
+        "devices": 0,
+        "gyms": 0,
+        "nests": 0,
+        "pokemon": 0,
+        "pokestops": 0,
+        "portals": 0,
+        "routes": 0,
+        "weather": 0
+      },
+      "time": 60
+    },
     "queryLimits": {
       "pokemon": 10000,
       "pokemonPvp": 25000,
