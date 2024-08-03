@@ -17,14 +17,11 @@ const { default: helmet } = require('helmet')
 const { log, HELPERS, getTimeStamp } = require('@rm/logger')
 const config = require('@rm/config')
 
-const rootRouter = require('./routes/rootRouter')
-const startApollo = require('./graphql/server')
-const { bindConnections } = require('./models')
-
 const state = require('./services/state')
 const { starti18n } = require('./services/i18n')
 const { checkForUpdates } = require('./services/checkForUpdates')
 const { loadLatestAreas, loadCachedAreas } = require('./services/areas')
+const { startWatcher } = require('./services/watcher')
 
 const { rateLimitingMiddleware } = require('./middleware/rateLimiting')
 const { initSentry, sentryMiddleware } = require('./middleware/sentry')
@@ -34,8 +31,11 @@ const { initPassport } = require('./middleware/passport')
 const { errorMiddleware } = require('./middleware/error')
 const { sessionMiddleware } = require('./middleware/session')
 const { apolloMiddleware } = require('./middleware/apollo')
-const { startWatcher } = require('./services/watcher')
+
+const startApollo = require('./graphql/server')
+const { bindConnections } = require('./models')
 const { migrate } = require('./db/migrate')
+const rootRouter = require('./routes/rootRouter')
 
 const startServer = async () => {
   if (!config.getSafe('devOptions.skipUpdateCheck')) {
@@ -65,7 +65,6 @@ const startServer = async () => {
   app.use(
     loggerMiddleware,
     noSourceMapMiddleware,
-    errorMiddleware,
     helmet(),
     compression(),
     express.json({
@@ -79,7 +78,7 @@ const startServer = async () => {
     rateLimitingMiddleware(),
   )
 
-  initSentry(app)
+  const sentryErrorMiddleware = initSentry(app)
   initPassport(app)
 
   app.use(rootRouter)
@@ -94,6 +93,12 @@ const startServer = async () => {
     sentryMiddleware,
     apolloMiddleware(server),
   )
+
+  app.use(errorMiddleware)
+
+  if (sentryErrorMiddleware) {
+    app.use(sentryErrorMiddleware)
+  }
 
   await migrate()
 

@@ -7,10 +7,9 @@ const { log, HELPERS } = require('@rm/logger')
 function errorMiddleware(err, req, res, next) {
   log.error(
     HELPERS.express,
-    HELPERS.custom(req.originalUrl, '#00d7ac'),
-    req.user ? `- ${req.user.username}` : 'Not Logged In',
-    '|',
-    req.headers['x-forwarded-for'],
+    HELPERS.url(req.originalUrl),
+    req.user ? `| ${req.user.username}` : 'Not Logged In',
+    req.headers['x-forwarded-for'] ? `| ${req.headers['x-forwarded-for']}` : '',
     '|',
     err,
   )

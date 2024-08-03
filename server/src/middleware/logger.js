@@ -32,7 +32,7 @@ function loggerMiddleware(req, res, next) {
     log.debug(
       HELPERS.express,
       req.method,
-      req.originalUrl,
+      HELPERS.url(req.originalUrl),
       HELPERS.statusCode(res.statusCode),
       `${responseTime}ms`,
       '|',

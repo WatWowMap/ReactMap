@@ -6,8 +6,9 @@ const config = require('@rm/config')
 const pkg = require('../../../package.json')
 
 /**
- *
+ * Inits Sentry and returns the error handler middleware that should then be applied last
  * @param {import('express').Application} app
+ * @returns {ReturnType<typeof Sentry.Handlers.errorHandler> | null}
  */
 function initSentry(app) {
   const sentry = config.getSafe('sentry.server')
@@ -40,8 +41,9 @@ function initSentry(app) {
     // TracingHandler creates a trace for every incoming request
     app.use(Sentry.Handlers.tracingHandler())
 
-    app.use(Sentry.Handlers.errorHandler())
+    return Sentry.Handlers.errorHandler()
   }
+  return null
 }
 
 /** @type {import('@rm/types').ExpressMiddleware} */

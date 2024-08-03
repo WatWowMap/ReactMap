@@ -59,6 +59,7 @@ const HELPERS = /** @type {const} */ ({
 
   upload: (size = '0B') => chalk.greenBright(`↑ ${size}`),
   download: (size = '0B') => chalk.redBright(`↓ ${size}`),
+  url: (url = '') => chalk.hex('#00d7ac')(`[${url.toUpperCase()}]`),
   statusCode: (code = 200) => {
     if (code >= 500) {
       return chalk.red(code)

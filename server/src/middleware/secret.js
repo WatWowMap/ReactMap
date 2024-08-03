@@ -23,7 +23,12 @@ function secretMiddleware(req, res, next) {
     return res.status(403).json({ message: 'Forbidden: Invalid secret key' })
   }
 
-  log.info(HELPERS.api, req.originalUrl)
+  log.info(
+    HELPERS.api,
+    HELPERS.url(req.originalUrl),
+    req.user?.username || 'Unknown User',
+    req.headers['x-forwarded-for'] ? `| ${req.headers['x-forwarded-for']}` : '',
+  )
   next()
 }
 
