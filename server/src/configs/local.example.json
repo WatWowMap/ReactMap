@@ -2,6 +2,7 @@
   "READ_ME": "https://github.com/WatWowMap/ReactMap/wiki/04.-Full-Config-Explanation",
   "interface": "0.0.0.0",
   "port": 8080,
+  "reloadConfigOnSave": false,
   "api": {
     "reactMapSecret": "You Should Change Me",
     "maxSessions": 5,

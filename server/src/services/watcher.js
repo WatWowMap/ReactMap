@@ -5,6 +5,7 @@ const chokidar = require('chokidar')
 const config = require('@rm/config')
 const { log, HELPERS } = require('@rm/logger')
 const { validateJsons } = require('@rm/config/lib/validateJsons')
+const { reloadConfig } = require('./functions/reloadConfig')
 
 const configDir = resolve(__dirname, '../configs')
 
@@ -21,7 +22,9 @@ const clean = (path) =>
  * @param {string} rawFile
  * @param {string} [domain]
  */
-const handle = (event, rawFile, domain) => {
+const handle = async (event, rawFile, domain) => {
+  log.debug(HELPERS.config, `[${event}]`, rawFile)
+
   switch (rawFile) {
     case 'loginPage':
     case 'donationPage':
@@ -46,6 +49,11 @@ const handle = (event, rawFile, domain) => {
         )
       }
       break
+    case 'local':
+      if (config.reloadConfigOnSave) {
+        await reloadConfig()
+      }
+      break
     default:
       break
   }
@@ -58,15 +66,15 @@ const startWatcher = () => {
     ignoreInitial: true,
   })
 
-  watcher.on('change', (path) => {
+  watcher.on('change', async (path) => {
     const [rawFile, domain] = clean(path)
-    handle('CHANGE', rawFile, domain)
+    await handle('CHANGE', rawFile, domain)
   })
 
-  watcher.on('add', (path) => {
+  watcher.on('add', async (path) => {
     const [rawFile, domain] = clean(path)
     if (domain && domain.split('_').length > 1) return
-    handle('ADD', rawFile, domain)
+    await handle('ADD', rawFile, domain)
   })
 
   return watcher

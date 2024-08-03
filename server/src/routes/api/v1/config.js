@@ -3,10 +3,7 @@ const router = require('express').Router()
 
 const { log, HELPERS } = require('@rm/logger')
 
-const state = require('../../../services/state')
-const { bindConnections } = require('../../../models')
-const { loadLatestAreas } = require('../../../services/areas')
-const { loadAuthStrategies } = require('../../authRouter')
+const { reloadConfig } = require('../../../services/functions/reloadConfig')
 
 router.get('/', (req, res) => {
   const config = require('@rm/config')
@@ -38,24 +35,11 @@ router.get('/', (req, res) => {
 })
 
 router.get('/reload', async (req, res) => {
-  try {
-    const newConfig = require('@rm/config').reload()
-
-    const newState = state.reload()
-
-    bindConnections(newState.db)
-
-    await newState.db.getDbContext()
-    await newState.loadLocalContexts()
-    await newState.loadExternalContexts()
-    loadAuthStrategies()
-
-    newConfig.setAreas(await loadLatestAreas())
-
+  const error = await reloadConfig()
+  if (error) {
+    res.status(500).json({ status: 'error', reason: error.message })
+  } else {
     res.status(200).json({ status: 'ok' })
-  } catch (e) {
-    log.error(HELPERS.api, req.originalUrl, e)
-    res.status(500).json({ status: 'error', reason: e.message })
   }
 })
 
