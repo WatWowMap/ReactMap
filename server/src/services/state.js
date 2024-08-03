@@ -10,6 +10,7 @@ const DbCheck = require('./DbCheck')
 const EventManager = require('./EventManager')
 const PvpWrapper = require('./PvpWrapper')
 const { getCache, setCache } = require('./cache')
+const { migrate } = require('../db/migrate')
 
 const serverState = {
   db: new DbCheck(),
@@ -98,6 +99,7 @@ const serverState = {
   async reload(reloadReport) {
     if (reloadReport.database) {
       await this.writeCache()
+      await migrate()
       this.db = new DbCheck()
     }
     if (reloadReport.pvp) {

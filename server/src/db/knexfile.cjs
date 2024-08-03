@@ -1,6 +1,5 @@
 // @ts-check
 const path = require('path')
-const { knex } = require('knex')
 const config = require('@rm/config')
 const { log, HELPERS } = require('@rm/logger')
 
@@ -8,7 +7,7 @@ const { log, HELPERS } = require('@rm/logger')
  *
  * @returns {import('knex').Knex.Config}
  */
-const getConnection = () => {
+const getConfig = () => {
   const database = config.getSafe('database')
   const migrationUrl = path.resolve(__dirname, 'migrations')
   const selectedDb = database.schemas.find((db) => db.useFor.includes('user'))
@@ -40,7 +39,7 @@ const getConnection = () => {
 }
 
 if (require.main?.path?.includes('knex')) {
-  module.exports.default = getConnection()
+  module.exports.default = getConfig()
 } else {
-  module.exports.connection = knex(getConnection())
+  module.exports.knexConfig = getConfig()
 }
