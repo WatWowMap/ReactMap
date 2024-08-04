@@ -27,7 +27,7 @@ function rateLimitingMiddleware() {
     onLimitReached: (req, res) => {
       log.info(
         HELPERS.express,
-        req?.user?.username || 'user',
+        req?.user?.username || 'Unknown user',
         'is being rate limited',
       )
       res.sendStatus(429)
