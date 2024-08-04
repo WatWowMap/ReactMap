@@ -1,3 +1,17 @@
+# [1.33.0-develop.13](https://github.com/WatWowMap/ReactMap/compare/v1.33.0-develop.12...v1.33.0-develop.13) (2024-08-04)
+
+
+### Bug Fixes
+
+* update middleware deps ([eb30cbf](https://github.com/WatWowMap/ReactMap/commit/eb30cbfa2831e46049e42c68f6eb84cd7cb417af))
+
+# [1.33.0-develop.12](https://github.com/WatWowMap/ReactMap/compare/v1.33.0-develop.11...v1.33.0-develop.12) (2024-08-04)
+
+
+### Bug Fixes
+
+* setting res headers ([fb63ddc](https://github.com/WatWowMap/ReactMap/commit/fb63ddc47760d4ac03cc93e70ff0c7be5f282e16))
+
 # [1.33.0-develop.11](https://github.com/WatWowMap/ReactMap/compare/v1.33.0-develop.10...v1.33.0-develop.11) (2024-08-04)
 
 

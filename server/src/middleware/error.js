@@ -1,10 +1,10 @@
 // @ts-check
-/* eslint-disable prefer-rest-params */
 
 const { log, HELPERS } = require('@rm/logger')
 
 /** @type {import('@rm/types').ExpressErrorMiddleware} */
-function errorMiddleware(err, req, res, next) {
+// eslint-disable-next-line no-unused-vars
+function errorMiddleware(err, req, res, _next) {
   log.error(
     HELPERS.express,
     HELPERS.url(req.originalUrl),
@@ -22,7 +22,7 @@ function errorMiddleware(err, req, res, next) {
     case "Failed to fetch user's guilds":
       return res.redirect('/login')
     default:
-      next(err)
+      // next(err)
       return res.redirect(`/error/${encodeURIComponent(err.message)}`)
   }
 }

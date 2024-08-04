@@ -74,7 +74,6 @@ const startServer = async () => {
         req.bodySize = (req.bodySize || 0) + buf.length
       },
     }),
-    rateLimitingMiddleware(),
     helmet(),
   )
   initPassport(app)
@@ -92,6 +91,7 @@ const startServer = async () => {
     json(),
     sentryMiddleware,
     apolloMiddleware(server),
+    rateLimitingMiddleware(),
   )
 
   if (sentryErrorMiddleware) {
