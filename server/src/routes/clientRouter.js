@@ -17,6 +17,8 @@ const CLIENT_ROUTES = [
   '/playground',
   '/locales',
   '/data-management',
+  '/error',
+  '/error/:message',
 ]
 
 router.get(CLIENT_ROUTES, (req, res) => {

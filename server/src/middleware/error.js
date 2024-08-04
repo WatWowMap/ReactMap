@@ -9,7 +9,9 @@ function errorMiddleware(err, req, res, next) {
     HELPERS.express,
     HELPERS.url(req.originalUrl),
     req.user ? `| ${req.user.username}` : 'Not Logged In',
-    req.headers['x-forwarded-for'] ? `| ${req.headers['x-forwarded-for']}` : '',
+    req.headers?.['x-forwarded-for']
+      ? `| ${req.headers['x-forwarded-for']}`
+      : '',
     '|',
     err,
   )
@@ -21,6 +23,7 @@ function errorMiddleware(err, req, res, next) {
       return res.redirect('/login')
     default:
       next(err)
+      return res.redirect(`/error/${encodeURIComponent(err.message)}`)
   }
 }
 
