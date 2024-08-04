@@ -1,5 +1,6 @@
 import './augmentations'
 
+export * from './blocks'
 export * from './client'
 export * from './config'
 export * from './general'
