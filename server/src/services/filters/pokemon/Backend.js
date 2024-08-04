@@ -1,7 +1,7 @@
 /* eslint-disable no-unused-vars */
 const config = require('@rm/config')
 const { log, HELPERS } = require('@rm/logger')
-const { AND_KEYS } = require('./constants')
+const { AND_KEYS, BASE_KEYS } = require('./constants')
 const {
   deepCompare,
   between,
@@ -54,7 +54,7 @@ module.exports = class PkmnBackend {
     this.perms = perms
     this.mods = mods
     this.standard = new PokemonFilter()
-    this.allKeys = [...AND_KEYS, ...this.pvpConfig.leagues.map((l) => l.name)]
+    this.allKeys = [...BASE_KEYS, ...this.pvpConfig.leagues.map((l) => l.name)]
     this.filter = filter
     this.global = global
     this.filterKeys = this.getRelevantKeys(filter)
