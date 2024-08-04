@@ -4,6 +4,10 @@
     "__name": "PORT",
     "__format": "number"
   },
+  "reloadConfigOnSave": {
+    "__name": "RELOAD_CONFIG_ON_SAVE",
+    "__format": "boolean"
+  },
   "packageSource": "PACKAGE_SOURCE",
   "googleAnalyticsId": "GOOGLE_ANALYTICS_ID",
   "devOptions": {
