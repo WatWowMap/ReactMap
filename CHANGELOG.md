@@ -1,3 +1,10 @@
+# [1.33.0-develop.13](https://github.com/WatWowMap/ReactMap/compare/v1.33.0-develop.12...v1.33.0-develop.13) (2024-08-04)
+
+
+### Bug Fixes
+
+* update middleware deps ([eb30cbf](https://github.com/WatWowMap/ReactMap/commit/eb30cbfa2831e46049e42c68f6eb84cd7cb417af))
+
 # [1.33.0-develop.12](https://github.com/WatWowMap/ReactMap/compare/v1.33.0-develop.11...v1.33.0-develop.12) (2024-08-04)
 
 
