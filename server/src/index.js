@@ -65,7 +65,8 @@ const startServer = async () => {
   app.use(
     loggerMiddleware,
     noSourceMapMiddleware,
-    helmet(),
+    express.static(distDir),
+    sessionMiddleware(),
     compression(),
     express.json({
       limit: '50mb',
@@ -73,13 +74,12 @@ const startServer = async () => {
         req.bodySize = (req.bodySize || 0) + buf.length
       },
     }),
-    express.static(distDir),
-    sessionMiddleware(),
     rateLimitingMiddleware(),
+    helmet(),
   )
+  initPassport(app)
 
   const sentryErrorMiddleware = initSentry(app)
-  initPassport(app)
 
   app.use(rootRouter)
 
@@ -94,11 +94,10 @@ const startServer = async () => {
     apolloMiddleware(server),
   )
 
-  app.use(errorMiddleware)
-
   if (sentryErrorMiddleware) {
     app.use(sentryErrorMiddleware)
   }
+  app.use(errorMiddleware)
 
   await migrate()
 
