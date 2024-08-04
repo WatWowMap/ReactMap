@@ -1,10 +1,8 @@
 // @ts-check
-const path = require('path')
 const router = require('express').Router()
-const config = require('@rm/config')
 
 const { log, HELPERS } = require('@rm/logger')
-const { Db, Event } = require('../../../services/initialization')
+const state = require('../../../services/state')
 
 const queryObj = /** @type {const} */ ({
   pokemon: { model: 'Pokemon', category: 'pokemon' },
@@ -12,8 +10,6 @@ const queryObj = /** @type {const} */ ({
   raids: { model: 'Gym', category: 'gyms' },
   nests: { model: 'Nest', category: 'nests' },
 })
-
-const api = config.getSafe('api')
 
 /** @param {string} category */
 const resolveCategory = (category) => {
@@ -40,16 +36,16 @@ const resolveCategory = (category) => {
 const getAll = async (compare) => {
   const available = compare
     ? await Promise.all([
-        Db.getAvailable('Pokemon'),
-        Db.getAvailable('Pokestop'),
-        Db.getAvailable('Gym'),
-        Db.getAvailable('Nest'),
+        state.db.getAvailable('Pokemon'),
+        state.db.getAvailable('Pokestop'),
+        state.db.getAvailable('Gym'),
+        state.db.getAvailable('Nest'),
       ])
     : [
-        Event.available.pokemon,
-        Event.available.pokestops,
-        Event.available.gyms,
-        Event.available.nests,
+        state.event.available.pokemon,
+        state.event.available.pokestops,
+        state.event.available.gyms,
+        state.event.available.nests,
       ]
   return Object.fromEntries(
     Object.keys(queryObj).map((key, i) => [key, available[i]]),
@@ -57,98 +53,77 @@ const getAll = async (compare) => {
 }
 
 router.get(['/', '/:category'], async (req, res) => {
-  const { model, category } =
-    queryObj[resolveCategory(req.params.category)] || {}
-  const { current, equal } = req.query
   try {
-    if (
-      api.reactMapSecret &&
-      req.headers['react-map-secret'] === api.reactMapSecret
-    ) {
-      if (model && category) {
-        const available =
-          current !== undefined
-            ? await Db.getAvailable(model)
-            : Event.available[category]
-        available.sort((a, b) => a.localeCompare(b))
+    const { model, category } =
+      queryObj[resolveCategory(req.params.category)] || {}
+    const { current, equal } = req.query
 
-        if (equal !== undefined) {
-          const compare =
-            current !== undefined
-              ? Event.available[category]
-              : await Db.getAvailable(model)
-          compare.sort((a, b) => a.localeCompare(b))
-          res
-            .status(200)
-            .json(available.every((item, i) => item === compare[i]))
-        } else {
-          res.status(200).json(available)
-        }
+    if (model && category) {
+      const available =
+        current !== undefined
+          ? await state.db.getAvailable(model)
+          : state.event.available[category]
+      available.sort((a, b) => a.localeCompare(b))
+
+      if (equal !== undefined) {
+        const compare =
+          current !== undefined
+            ? state.event.available[category]
+            : await state.db.getAvailable(model)
+        compare.sort((a, b) => a.localeCompare(b))
+        res.status(200).json(available.every((item, i) => item === compare[i]))
       } else {
-        const available = await getAll(!!current)
-        Object.values(available).forEach((c) =>
+        res.status(200).json(available)
+      }
+    } else {
+      const available = await getAll(!!current)
+      Object.values(available).forEach((c) =>
+        c.sort((a, b) => a.localeCompare(b)),
+      )
+
+      if (equal !== undefined) {
+        const compare = await getAll(!current)
+        Object.values(compare).forEach((c) =>
           c.sort((a, b) => a.localeCompare(b)),
         )
 
-        if (equal !== undefined) {
-          const compare = await getAll(!current)
-          Object.values(compare).forEach((c) =>
-            c.sort((a, b) => a.localeCompare(b)),
+        res
+          .status(200)
+          .json(
+            Object.keys(available).every((cat) =>
+              available[cat].every((item, j) => item === compare[cat][j]),
+            ),
           )
-
-          res
-            .status(200)
-            .json(
-              Object.keys(available).every((cat) =>
-                available[cat].every((item, j) => item === compare[cat][j]),
-              ),
-            )
-        } else {
-          res.status(200).json(available)
-        }
+      } else {
+        res.status(200).json(available)
       }
-    } else {
-      throw new Error('Incorrect or missing API secret')
     }
-    log.info(HELPERS.api, `api/v1/${path.parse(__filename).name}`)
   } catch (e) {
-    log.error(HELPERS.api, `api/v1/${path.parse(__filename).name}`, e)
+    log.error(HELPERS.api, req.originalUrl, e)
     res.status(500).json({ status: 'ServerError', reason: e.message })
   }
 })
 
 router.put('/:category', async (req, res) => {
-  const { model, category } =
-    queryObj[resolveCategory(req.params.category)] || {}
   try {
-    if (
-      api.reactMapSecret &&
-      req.headers['react-map-secret'] === api.reactMapSecret
-    ) {
-      if (model && category) {
-        await Event.setAvailable(category, model, Db)
-      } else {
-        await Promise.all([
-          Event.setAvailable('pokemon', 'Pokemon', Db),
-          Event.setAvailable('pokestops', 'Pokestop', Db),
-          Event.setAvailable('gyms', 'Gym', Db),
-          Event.setAvailable('nests', 'Nest', Db),
-        ])
-      }
-      res
-        .status(200)
-        .json({ status: `updated available for ${category || 'all'}` })
+    const { model, category } =
+      queryObj[resolveCategory(req.params.category)] || {}
+
+    if (model && category) {
+      await state.event.setAvailable(category, model, state.db)
     } else {
-      throw new Error('Incorrect or missing API secret')
+      await Promise.all([
+        state.event.setAvailable('pokemon', 'Pokemon', state.db),
+        state.event.setAvailable('pokestops', 'Pokestop', state.db),
+        state.event.setAvailable('gyms', 'Gym', state.db),
+        state.event.setAvailable('nests', 'Nest', state.db),
+      ])
     }
-    log.info(
-      HELPERS.api,
-      `api/v1/${path.parse(__filename).name} - updated availabled for ${
-        category || 'all'
-      }`,
-    )
+    res
+      .status(200)
+      .json({ status: `updated available for ${category || 'all'}` })
   } catch (e) {
-    log.error(HELPERS.api, `api/v1/${path.parse(__filename).name}`, e)
+    log.error(HELPERS.api, req.originalUrl, e)
     res.status(500).json({ status: 'ServerError', reason: e.message })
   }
 })

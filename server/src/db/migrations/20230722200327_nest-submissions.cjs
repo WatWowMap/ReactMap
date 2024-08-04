@@ -1,7 +1,5 @@
 const config = require('@rm/config')
 
-const userTableName = config.getSafe('database.settings.userTableName')
-
 /**
  * @param {import("knex").Knex} knex
  */
@@ -10,7 +8,7 @@ exports.up = async (knex) =>
     table.bigInteger('nest_id').primary()
     table
       .bigInteger('user_id')
-      .references(`${userTableName}.id`)
+      .references(`${config.getSafe('database.settings.userTableName')}.id`)
       .unsigned()
       .notNullable()
       .index()

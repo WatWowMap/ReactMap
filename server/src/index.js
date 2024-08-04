@@ -1,467 +1,125 @@
-/* eslint-disable prefer-rest-params */
-process.title = 'ReactMap'
-
+// @ts-check
 require('dotenv').config()
-const fs = require('fs')
+
+process.title = process.env.NODE_CONFIG_ENV
+  ? `ReactMap-${process.env.NODE_CONFIG_ENV}`
+  : 'ReactMap'
+
 const path = require('path')
 const express = require('express')
 const compression = require('compression')
-const session = require('express-session')
-const passport = require('passport')
-const rateLimit = require('express-rate-limit')
 const { rainbow } = require('chalkercli')
-const Sentry = require('@sentry/node')
-const { expressMiddleware } = require('@apollo/server/express4')
 const cors = require('cors')
 const { json } = require('body-parser')
 const http = require('http')
-const { GraphQLError } = require('graphql')
-const { ApolloServerErrorCode } = require('@apollo/server/errors')
-const { parse } = require('graphql')
-const bytes = require('bytes')
-const NodeCache = require('node-cache')
+const { default: helmet } = require('helmet')
 
 const { log, HELPERS, getTimeStamp } = require('@rm/logger')
-const { create, writeAll } = require('@rm/locales')
+const config = require('@rm/config')
 
-const config = require('./services/config')
-const { Db, Event, userRequestCache } = require('./services/initialization')
-require('./models')
-const Clients = require('./services/Clients')
-const sessionStore = require('./services/sessionStore')
-const rootRouter = require('./routes/rootRouter')
-const pkg = require('../../package.json')
-const { loadLatestAreas } = require('./services/areas')
-const { connection } = require('./db/knexfile.cjs')
+const state = require('./services/state')
+const { starti18n } = require('./services/i18n')
+const { checkForUpdates } = require('./services/checkForUpdates')
+const { loadLatestAreas, loadCachedAreas } = require('./services/areas')
+const { startWatcher } = require('./services/watcher')
+
+const { rateLimitingMiddleware } = require('./middleware/rateLimiting')
+const { initSentry, sentryMiddleware } = require('./middleware/sentry')
+const { loggerMiddleware } = require('./middleware/logger')
+const { noSourceMapMiddleware } = require('./middleware/noSourceMap')
+const { initPassport } = require('./middleware/passport')
+const { errorMiddleware } = require('./middleware/error')
+const { sessionMiddleware } = require('./middleware/session')
+const { apolloMiddleware } = require('./middleware/apollo')
+
 const startApollo = require('./graphql/server')
-const TelegramClient = require('./services/TelegramClient')
-const DiscordClient = require('./services/DiscordClient')
+const { bindConnections } = require('./models')
+const { migrate } = require('./db/migrate')
+const rootRouter = require('./routes/rootRouter')
 
-require('./services/watcher')
-
-Event.clients = Clients
-
-if (!config.getSafe('devOptions.skipUpdateCheck')) {
-  require('./services/checkForUpdates')
-}
-
-const app = express()
-const httpServer = http.createServer(app)
-
-const sentry = config.getSafe('sentry.server')
-if (sentry.enabled || process.env.SENTRY_DSN) {
-  Sentry.init({
-    dsn: sentry.dsn || process.env.SENTRY_DSN,
-    debug: sentry.debug || !!process.env.SENTRY_DEBUG,
-    environment: process.env.NODE_ENV || 'production',
-    integrations: [
-      // enable HTTP calls tracing
-      new Sentry.Integrations.Http({ tracing: true }),
-      // enable Express.js middleware tracing
-      new Sentry.Integrations.Express({
-        // to trace all requests to the default router
-        app,
-        // alternatively, you can specify the routes you want to trace:
-        // router: someRouter,
-      }),
-      ...Sentry.autoDiscoverNodePerformanceMonitoringIntegrations(),
-    ],
-    tracesSampleRate:
-      +(process.env.SENTRY_TRACES_SAMPLE_RATE || sentry.tracesSampleRate) ||
-      0.1,
-    release: pkg.version,
-  })
-
-  // RequestHandler creates a separate execution context, so that all
-  // transactions/spans/breadcrumbs are isolated across requests
-  app.use(Sentry.Handlers.requestHandler())
-  // TracingHandler creates a trace for every incoming request
-  app.use(Sentry.Handlers.tracingHandler())
-}
-
-app.use((req, res, next) => {
-  if (req.url.endsWith('.map')) {
-    res.status(403).send('Naughty!')
-  } else {
-    next()
+const startServer = async () => {
+  if (!config.getSafe('devOptions.skipUpdateCheck')) {
+    await checkForUpdates()
+    log.info(HELPERS.update, 'Completed')
   }
-})
+  config.setAreas(loadCachedAreas())
 
-const RateLimitTime = config.getSafe('api.rateLimit.time') * 60 * 1000
-const MaxRequestsPerHour =
-  config.getSafe('api.rateLimit.requests') * (RateLimitTime / 1000)
+  state.startTimers()
+  state.setAuthClients()
 
-const rateLimitOptions = {
-  windowMs: RateLimitTime, // Time window in milliseconds
-  max: MaxRequestsPerHour, // Start blocking after x requests
-  headers: true,
-  message: {
-    status: 429, // optional, of course
-    limiter: true,
-    type: 'error',
-    message: `Too many requests from this IP, please try again in ${config.getSafe(
-      'api.rateLimit.time',
-    )} minutes.`,
-  },
-  /**
-   *
-   * @param {import('express').Request} req
-   * @param {import('express').Response} res
-   */
-  onLimitReached: (req, res) => {
-    log.info(
-      HELPERS.express,
-      req?.user?.username || 'user',
-      'is being rate limited',
-    )
-    res.redirect('/429')
-  },
-}
-const requestRateLimiter = rateLimit(rateLimitOptions)
+  bindConnections(state.db)
+  startWatcher()
 
-app.use(compression())
-
-app.use(
-  express.json({
-    limit: '50mb',
-    verify: (req, res, buf) => {
-      req.bodySize = (req.bodySize || 0) + buf.length
-    },
-  }),
-)
-
-const distDir = path.join(
-  __dirname,
-  '../../',
-  `dist${process.env.NODE_CONFIG_ENV ? `-${process.env.NODE_CONFIG_ENV}` : ''}`,
-)
-
-app.use(express.static(distDir))
-
-app.use(
-  session({
-    name: 'reactmap1',
-    secret: config.getSafe('api.sessionSecret'),
-    store: sessionStore,
-    resave: true,
-    saveUninitialized: false,
-    cookie: { maxAge: 86400000 * config.getSafe('api.cookieAgeDays') },
-  }),
-)
-
-app.use(passport.initialize())
-
-app.use(passport.session())
-
-passport.serializeUser(async (user, done) => {
-  done(null, user)
-})
-
-passport.deserializeUser(async (user, done) => {
-  if (user.perms.map) {
-    done(null, user)
-  } else {
-    done('User does not have map permissions', null)
-  }
-})
-
-const localePath = path.resolve(distDir, 'locales')
-if (fs.existsSync(localePath)) {
-  require('./services/i18n')
-} else {
-  create().then((newLocales) =>
-    writeAll(newLocales, true, localePath).then(() =>
-      require('./services/i18n'),
-    ),
-  )
-}
-
-app.use(rootRouter, requestRateLimiter)
-
-if (sentry.enabled || process.env.SENTRY_DSN) {
-  app.use(Sentry.Handlers.errorHandler())
-}
-
-app.use((req, res, next) => {
-  const start = process.hrtime()
-
-  const oldWrite = res.write
-  const oldEnd = res.end
-  let resBodySize = 0
-
-  res.write = function write(chunk) {
-    resBodySize += chunk.length
-    oldWrite.apply(res, arguments)
-  }
-
-  res.end = function end(chunk) {
-    if (chunk) {
-      resBodySize += chunk.length
-    }
-    oldEnd.apply(res, arguments)
-  }
-
-  res.on('finish', () => {
-    const [seconds, nanoseconds] = process.hrtime(start)
-    const responseTime = (seconds * 1000 + nanoseconds / 1e6).toFixed(3) // in milliseconds
-    log.info(
-      HELPERS.express,
-      req.method,
-      req.originalUrl,
-      HELPERS.statusCode(res.statusCode),
-      `${responseTime}ms`,
-      '|',
-      HELPERS.download(bytes(req.bodySize)),
-      HELPERS.upload(bytes(resBodySize)),
-      '|',
-      req.user ? req.user.username : 'Not Logged In',
-      req.headers['x-forwarded-for']
-        ? `| ${req.headers['x-forwarded-for']}`
-        : '',
-    )
-  })
-
-  next()
-})
-
-// eslint-disable-next-line no-unused-vars
-app.use((err, req, res, next) => {
-  log.error(
-    HELPERS.express,
-    HELPERS.custom(req.originalUrl, '#00d7ac'),
-    req.user ? `- ${req.user.username}` : 'Not Logged In',
-    '|',
-    req.headers['x-forwarded-for'],
-    '|',
-    err,
+  const distDir = path.join(
+    __dirname,
+    '../../',
+    `dist${
+      process.env.NODE_CONFIG_ENV ? `-${process.env.NODE_CONFIG_ENV}` : ''
+    }`,
   )
 
-  switch (err.message) {
-    case 'NoCodeProvided':
-      return res.redirect('/404')
-    case "Failed to fetch user's guilds":
-      return res.redirect('/login')
-    default:
-      return res.redirect('/')
-  }
-})
+  await starti18n(path.resolve(distDir, 'locales'))
 
-const requestLimits = config.getSafe('api.dataRequestLimits.categories')
+  const app = express()
 
-const clientErrorLogCache = new NodeCache({ stdTTL: 60 })
+  app.use(
+    loggerMiddleware,
+    noSourceMapMiddleware,
+    express.static(distDir),
+    sessionMiddleware(),
+    compression(),
+    express.json({
+      limit: '50mb',
+      verify: (req, _res, buf) => {
+        req.bodySize = (req.bodySize || 0) + buf.length
+      },
+    }),
+    rateLimitingMiddleware(),
+    helmet(),
+  )
+  initPassport(app)
 
-startApollo(httpServer).then((server) => {
+  const sentryErrorMiddleware = initSentry(app)
+
+  app.use(rootRouter)
+
+  const httpServer = http.createServer(app)
+  const server = await startApollo(httpServer)
+
   app.use(
     '/graphql',
     cors({ origin: '/' }),
     json(),
-    expressMiddleware(server, {
-      context: async ({ req, res }) => {
-        const perms = req.user ? req.user.perms : req.session.perms
-        const user = req?.user?.username || ''
-        const id = req?.user?.id || 0
-        const clientV =
-          req.headers['apollographql-client-version']?.trim() ||
-          pkg.version ||
-          1
-        const serverV = pkg.version || 1
-        let transaction
-        if (sentry.enabled || process.env.SENTRY_DSN) {
-          transaction = res.__sentry_transaction
-          if (!transaction) {
-            transaction = Sentry.startTransaction({ name: 'POST /graphql' })
-          }
-          Sentry.configureScope((scope) => {
-            scope.setSpan(transaction)
-          })
-        }
-
-        const definition = parse(req.body.query).definitions.find(
-          (d) => d.kind === 'OperationDefinition',
-        )
-        const endpoint = definition?.name?.value || ''
-        const errorCtx = {
-          id,
-          user,
-          clientV,
-          serverV,
-          endpoint,
-        }
-
-        if (clientV && serverV && clientV !== serverV) {
-          throw new GraphQLError('old_client', {
-            extensions: {
-              ...errorCtx,
-              http: { status: 464 },
-              code: ApolloServerErrorCode.BAD_USER_INPUT,
-            },
-          })
-        }
-
-        if (!perms && endpoint !== 'Locales') {
-          throw new GraphQLError('session_expired', {
-            extensions: {
-              ...errorCtx,
-              http: { status: 511 },
-              code: 'EXPIRED',
-            },
-          })
-        }
-
-        if (
-          definition?.operation === 'mutation' &&
-          !id &&
-          endpoint !== 'SetTutorial'
-        ) {
-          throw new GraphQLError('unauthenticated', {
-            extensions: {
-              ...errorCtx,
-              http: { status: 401 },
-              code: 'UNAUTHENTICATED',
-            },
-          })
-        }
-
-        if (!userRequestCache.has(user)) {
-          userRequestCache.set(user, [])
-        }
-        const now = Date.now()
-        const userCache = userRequestCache
-          .get(user)
-          .filter(
-            (entry) =>
-              now - entry.timestamp <=
-              config.getSafe('api.dataRequestLimits.time') * 1000,
-          )
-
-        let reqEndpoint =
-          req.body.query.split(' on ')[1]?.split(' ')[0]?.toLowerCase() ||
-          'unknown'
-        if (
-          reqEndpoint !== 'pokemon' &&
-          reqEndpoint !== 'weather' &&
-          reqEndpoint !== 'unknown'
-        ) {
-          reqEndpoint += 's'
-        }
-        const categoryCache = userCache.filter(
-          (r) => r.category === reqEndpoint,
-        )
-        const userCategoryCount = categoryCache.reduce((a, b) => a + b.count, 0)
-
-        const limit =
-          reqEndpoint in requestLimits && requestLimits[reqEndpoint] > 0
-            ? requestLimits[reqEndpoint]
-            : Infinity
-
-        log.debug(
-          HELPERS[reqEndpoint] || `[${reqEndpoint?.toUpperCase()}]`,
-          user,
-          '|',
-          userCategoryCount,
-          '|',
-          limit,
-        )
-
-        if (userCategoryCount >= limit && categoryCache.length > 0) {
-          const until =
-            categoryCache[0].timestamp +
-            config.getSafe('api.dataRequestLimits.time') * 1000
-
-          if (!clientErrorLogCache.has(user)) {
-            const client = Clients[req?.user.rmStrategy]
-            if (client instanceof TelegramClient) {
-              client.sendMessage(
-                `<b>Data Limit Reached</b>\n\nHas reached the data limit for ${reqEndpoint} requests (${userCategoryCount}/${limit}) \nBlocked for ${Math.ceil(
-                  (until - Date.now()) / 1000,
-                )} seconds.`,
-              )
-            } else if (client instanceof DiscordClient) {
-              client.sendMessage(
-                {
-                  title: `Data Limit Reached`,
-                  author: {
-                    name: user,
-                    icon_url: `https://cdn.discordapp.com/avatars/${req.user.discordId}/${req.user.avatar}.png`,
-                  },
-                  thumbnail: {
-                    url:
-                      config
-                        .getSafe('authentication.strategies')
-                        .find((strategy) => strategy.name === user.rmStrategy)
-                        ?.thumbnailUrl ??
-                      `https://user-images.githubusercontent.com/58572875/167069223-745a139d-f485-45e3-a25c-93ec4d09779c.png`,
-                  },
-                  description: `Has reached the data limit for ${reqEndpoint} requests (${userCategoryCount}/${limit}). They will be able to make requests again <t:${Math.ceil(
-                    until / 1000,
-                  )}:R> (${new Date(until).toLocaleTimeString()})`,
-                },
-                'main',
-              )
-            }
-            clientErrorLogCache.set(user, true)
-          }
-
-          throw new GraphQLError('data_limit_reached', {
-            extensions: {
-              ...errorCtx,
-              until,
-              http: { status: 429 },
-              code: ApolloServerErrorCode.BAD_REQUEST,
-            },
-          })
-        }
-        if (clientErrorLogCache.has(user)) {
-          clientErrorLogCache.del(user)
-        }
-
-        return {
-          req,
-          res,
-          Db,
-          Event,
-          perms,
-          user,
-          transaction,
-          token: req.headers.token,
-          operation: definition?.operation,
-          endpoint,
-        }
-      },
-    }),
+    sentryMiddleware,
+    apolloMiddleware(server),
   )
-})
 
-connection.migrate
-  .latest()
-  .then(() => connection.destroy())
-  .then(() => Db.getDbContext())
-  .then(async () => {
-    httpServer.listen(config.getSafe('port'), config.getSafe('interface'))
-    log.info(
-      HELPERS.ReactMap,
-      `Server is now listening at http://${config.getSafe(
-        'interface',
-      )}:${config.getSafe('port')}`,
-    )
-    await Promise.all([
-      Db.historicalRarity(),
-      Db.getFilterContext(),
-      Event.setAvailable('gyms', 'Gym', Db),
-      Event.setAvailable('pokestops', 'Pokestop', Db),
-      Event.setAvailable('pokemon', 'Pokemon', Db),
-      Event.setAvailable('nests', 'Nest', Db),
-    ])
-    await Promise.all([
-      Event.getUniversalAssets(config.getSafe('icons.styles'), 'uicons'),
-      Event.getUniversalAssets(config.getSafe('audio.styles'), 'uaudio'),
-      Event.getMasterfile(Db.historical, Db.rarity),
-      Event.getInvasions(config.getSafe('api.pogoApiEndpoints.invasions')),
-      Event.getWebhooks(),
-      loadLatestAreas().then((res) => (config.areas = res)),
-    ])
-    const text = rainbow(`ℹ ${getTimeStamp()} [ReactMap] has fully started`)
-    setTimeout(() => text.stop(), 1_000)
-  })
+  if (sentryErrorMiddleware) {
+    app.use(sentryErrorMiddleware)
+  }
+  app.use(errorMiddleware)
 
-module.exports = app
+  await migrate()
+
+  await state.db.getDbContext()
+
+  const serverInterface = config.getSafe('interface')
+  const serverPort = config.getSafe('port')
+  httpServer.listen(serverPort, serverInterface)
+  log.info(
+    HELPERS.ReactMap,
+    `Server is now listening at http://${serverInterface}:${serverPort}`,
+  )
+
+  await state.loadLocalContexts()
+  await state.loadExternalContexts()
+  const newAreas = await loadLatestAreas()
+  config.setAreas(newAreas)
+
+  const text = rainbow(`ℹ ${getTimeStamp()} [ReactMap] has fully started`)
+  setTimeout(() => text.stop(), 1_000)
+
+  return httpServer
+}
+
+startServer()

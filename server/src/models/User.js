@@ -11,11 +11,11 @@ class User extends Model {
 
   static get relationMappings() {
     // eslint-disable-next-line global-require
-    const { Db } = require('../services/initialization')
+    const state = require('../services/state')
     return {
       badges: {
         relation: Model.HasManyRelation,
-        modelClass: Db.models.Badge,
+        modelClass: state.db.models.Badge,
         join: {
           from: `${config.getSafe('database.settings.userTableName')}.id`,
           to: `${config.getSafe('database.settings.gymBadgeTableName')}.userId`,
@@ -23,7 +23,7 @@ class User extends Model {
       },
       nestSubmissions: {
         relation: Model.HasManyRelation,
-        modelClass: Db.models.NestSubmission,
+        modelClass: state.db.models.NestSubmission,
         join: {
           from: `${config.getSafe('database.settings.userTableName')}.id`,
           to: `nest_submissions.userId`,

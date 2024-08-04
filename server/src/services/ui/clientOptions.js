@@ -1,12 +1,12 @@
 // @ts-check
 const config = require('@rm/config')
 
-const clientSideOptions = config.getSafe('clientSideOptions')
-const map = config.getSafe('map')
-const levels = config.getSafe('api.pvp.levels')
-
 /** @param {import("@rm/types").Permissions} perms */
 function clientOptions(perms) {
+  const clientSideOptions = config.getSafe('clientSideOptions')
+  const map = config.getSafe('map')
+  const levels = config.getSafe('api.pvp.levels')
+
   // the values here are the relevant perms to use them, they are looped through and the values are set based on your config, then the type is set based off of those values in the above function
   const clientMenus = {
     admin: {

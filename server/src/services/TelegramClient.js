@@ -2,10 +2,11 @@
 const { default: fetch } = require('node-fetch')
 const { TelegramStrategy } = require('@rainb0w-clwn/passport-telegram-official')
 const passport = require('passport')
-const config = require('@rm/config')
 
+const config = require('@rm/config')
 const { log, HELPERS } = require('@rm/logger')
-const { Db, Event } = require('./initialization')
+
+const state = require('./state')
 const areaPerms = require('./functions/areaPerms')
 const webhookPerms = require('./functions/webhookPerms')
 const scannerPerms = require('./functions/scannerPerms')
@@ -135,22 +136,22 @@ class TelegramClient {
       return done(null, false, { message: 'access_denied' })
     }
     try {
-      await Db.models.User.query()
+      await state.db.models.User.query()
         .findOne({ telegramId: user.id })
         .then(
           async (/** @type {import('@rm/types').FullUser} */ userExists) => {
-            const selectedWebhook = Object.keys(Event.webhookObj).find((x) =>
-              user?.perms?.webhooks.includes(x),
+            const selectedWebhook = Object.keys(state.event.webhookObj).find(
+              (x) => user?.perms?.webhooks.includes(x),
             )
             if (req.user && userExists?.strategy === 'local') {
-              await Db.models.User.query()
+              await state.db.models.User.query()
                 .update({
                   telegramId: user.id,
                   telegramPerms: JSON.stringify(user.perms),
                   webhookStrategy: 'telegram',
                 })
                 .where('id', req.user.id)
-              await Db.models.User.query()
+              await state.db.models.User.query()
                 .where('telegramId', user.id)
                 .whereNot('id', req.user.id)
                 .delete()
@@ -170,7 +171,7 @@ class TelegramClient {
               })
             }
             if (!userExists) {
-              userExists = await Db.models.User.query().insertAndFetch({
+              userExists = await state.db.models.User.query().insertAndFetch({
                 telegramId: user.id,
                 strategy: user.provider,
                 tutorial: !config.getSafe('map.misc.forceTutorial'),
@@ -178,13 +179,13 @@ class TelegramClient {
               })
             }
             if (userExists.strategy !== 'telegram') {
-              await Db.models.User.query()
+              await state.db.models.User.query()
                 .update({ strategy: 'telegram' })
                 .where('id', userExists.id)
               userExists.strategy = 'telegram'
             }
             if (!userExists.selectedWebhook && selectedWebhook) {
-              await Db.models.User.query()
+              await state.db.models.User.query()
                 .update({ selectedWebhook })
                 .where('id', userExists.id)
               userExists.selectedWebhook = selectedWebhook

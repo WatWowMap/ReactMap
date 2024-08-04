@@ -74,7 +74,14 @@ const getGeojson = async (location) => {
           )}`,
         },
       })
-        .then((res) => res.json())
+        .then((res) => {
+          if (!res.ok) {
+            throw new Error(
+              `Failed to fetch Kōji geojson: ${res.status} - ${res.statusText}`,
+            )
+          }
+          return res.json()
+        })
         .then(async (res) => {
           if (res?.data) {
             log.info(HELPERS.areas, 'Caching', location, 'from Kōji')

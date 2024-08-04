@@ -1,5 +1,5 @@
 // @ts-check
-const { Event } = require('../initialization')
+const state = require('../state')
 
 const CATEGORIES = /** @type {const} */ ({
   gyms: ['teams', 'eggs', 'raids', 'pokemon'],
@@ -23,24 +23,24 @@ const CATEGORIES = /** @type {const} */ ({
 
 function buildMenus() {
   const rarityTiers = new Set(
-    Object.values(Event.masterfile.pokemon).map((val) => val.rarity),
+    Object.values(state.event.masterfile.pokemon).map((val) => val.rarity),
   )
   const historicalTiers = new Set(
-    Object.values(Event.masterfile.pokemon).map((val) => val.historic),
+    Object.values(state.event.masterfile.pokemon).map((val) => val.historic),
   )
   const generations = [
     ...new Set(
-      Object.values(Event.masterfile.pokemon).map(
+      Object.values(state.event.masterfile.pokemon).map(
         (val) => `generation_${val.genId}`,
       ),
     ),
   ].filter((val) => val !== undefined)
-  const types = Object.keys(Event.masterfile.types)
+  const types = Object.keys(state.event.masterfile.types)
     .map((key) => `poke_type_${key}`)
     .filter((val) => val !== 'poke_type_0')
 
   const forms = Object.entries(
-    Object.values(Event.masterfile.pokemon).reduce((acc, val) => {
+    Object.values(state.event.masterfile.pokemon).reduce((acc, val) => {
       Object.values(val.forms || {}).forEach((form) => {
         if (acc[form.name]) {
           acc[form.name] += 1

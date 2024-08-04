@@ -1,4 +1,3 @@
-import { LEAGUES } from 'server/src/services/filters/pokemon/constants'
 import type {
   ScannerModels,
   ScannerModelKeys,
@@ -8,8 +7,7 @@ import type {
 } from 'server/src/models'
 import { Knex } from 'knex'
 import { Model } from 'objection'
-import { Request, Response } from 'express'
-import { Transaction } from '@sentry/node'
+import { NextFunction, Request, Response } from 'express'
 import { VerifyCallback } from 'passport-oauth2'
 
 import DbCheck = require('server/src/services/DbCheck')
@@ -25,6 +23,7 @@ import { ModelReturn, OnlyType } from './utility'
 import { Profile } from 'passport-discord'
 import { User } from './models'
 import { Config } from '@rm/types'
+import { OperationTypeNode } from 'graphql'
 
 export interface DbContext {
   isMad: boolean
@@ -137,8 +136,7 @@ export interface GqlContext {
   Event: EventManager
   perms: Permissions
   user: string
-  transaction: Transaction
-  operation: 'query' | 'mutation'
+  operation: OperationTypeNode
   startTime?: number
 }
 
@@ -266,4 +264,30 @@ export interface PokemonGlow
 export interface ClientOptions
   extends Partial<Omit<Config['clientSideOptions'], 'pokemon'>> {
   pokemon: PokemonGlow
+}
+
+export type ExpressMiddleware = (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => any
+
+export type ExpressErrorMiddleware = (
+  err: Error,
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => any
+
+export interface StateReportObj {
+  database: boolean
+  pvp: boolean
+  icons: boolean
+  audio: boolean
+  historical: boolean
+  masterfile: boolean
+  invasions: boolean
+  webhooks: boolean
+  events: boolean
+  strategies: boolean
 }

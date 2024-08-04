@@ -11,7 +11,7 @@ const { log, HELPERS } = require('@rm/logger')
 
 /**
  * @param {object} pokemon
- * @returns {{ [key in typeof import("./constants").LEAGUES[number]]: import('@rm/types').PvpEntry[] }}
+ * @returns {Record<string, import('@rm/types').PvpEntry[]>}
  */
 function getParsedPvp(pokemon) {
   if (pokemon.pvp)

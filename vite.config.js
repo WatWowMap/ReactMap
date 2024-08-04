@@ -126,7 +126,14 @@ const viteConfig = defineConfig(({ mode }) => {
           hasCustom,
           title: config.getSafe('map.general.headerTitle'),
         },
-        sentry: { client: sentry },
+        sentry: {
+          client: {
+            enabled: sentry.enabled,
+            dsn: sentry.dsn,
+            tracesSampleRate: sentry.tracesSampleRate,
+            debug: sentry.debug,
+          },
+        },
         googleAnalyticsId:
           config.getSafe('googleAnalyticsId') || env.GOOGLE_ANALYTICS_ID || '',
         map: {

@@ -2,7 +2,7 @@
 const config = require('@rm/config')
 
 const { log, HELPERS } = require('@rm/logger')
-const { Db } = require('../initialization')
+const state = require('../state')
 
 /**
  *
@@ -25,11 +25,11 @@ module.exports = async (client, oldPresence, newPresence) => {
     .concat(rolesAfter.filter((x) => !rolesBefore.includes(x)))
   try {
     if (perms.includes(roleDiff[0])) {
-      await Db.models.Session.clearDiscordSessions(
+      await state.db.models.Session.clearDiscordSessions(
         oldPresence.user.id,
         client.user.username,
       )
-      await Db.models.User.clearPerms(
+      await state.db.models.User.clearPerms(
         oldPresence.user.id,
         'discord',
         client.user.username,

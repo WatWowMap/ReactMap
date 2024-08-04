@@ -9,24 +9,17 @@ const { point } = require('@turf/helpers')
 const { log, HELPERS } = require('@rm/logger')
 const config = require('@rm/config')
 
-const { Event } = require('../services/initialization')
+const state = require('../services/state')
 const getAreaSql = require('../services/functions/getAreaSql')
 const { filterRTree } = require('../services/functions/filterRTree')
 const fetchJson = require('../services/api/fetchJson')
 const {
-  LEVELS,
   IV_CALC,
   LEVEL_CALC,
-  LEAGUES,
   MAD_KEY_MAP,
   BASE_KEYS,
 } = require('../services/filters/pokemon/constants')
 const PkmnFilter = require('../services/filters/pokemon/Backend')
-
-const searchResultsLimit = config.getSafe('api.searchResultsLimit')
-const queryLimits = config.getSafe('api.queryLimits')
-const queryDebug = config.getSafe('devOptions.queryDebug')
-const reactMapHandlesPvp = config.getSafe('api.pvp.reactMapHandlesPvp')
 
 class Pokemon extends Model {
   static get tableName() {
@@ -80,7 +73,9 @@ class Pokemon extends Model {
       onlyAreas: args.filters.onlyAreas || [],
       ...ctx,
       ...Object.fromEntries(
-        LEVELS.map((x) => [`onlyPvp${x}`, args.filters[`onlyPvp${x}`]]),
+        config
+          .getSafe('api.pvp.levels')
+          .map((x) => [`onlyPvp${x}`, args.filters[`onlyPvp${x}`]]),
       ),
     }
     /** @type {Record<string, PkmnFilter>} */
@@ -129,8 +124,13 @@ class Pokemon extends Model {
     const { onlyIvOr, onlyHundoIv, onlyZeroIv, onlyAreas = [] } = args.filters
     const { hasSize, hasHeight, isMad, mem, secret, pvpV2 } = ctx
     const { filterMap, globalFilter } = this.getFilters(perms, args, ctx)
-    let queryPvp = LEAGUES.some((league) => globalFilter.filterKeys.has(league))
+
+    let queryPvp = config
+      .getSafe('api.pvp.leagues')
+      .some((league) => globalFilter.filterKeys.has(league.name))
     const ts = Math.floor(Date.now() / 1000)
+    const queryLimits = config.getSafe('api.queryLimits')
+    const reactMapHandlesPvp = config.getSafe('api.pvp.reactMapHandlesPvp')
 
     // quick check to make sure no Pokemon are returned when none are enabled for users with only Pokemon perms
     if (!ivs && !pvp) {
@@ -149,7 +149,9 @@ class Pokemon extends Model {
       pokemonForms.push(filter.form)
       if (
         !queryPvp &&
-        LEAGUES.some((league) => filter.filterKeys.has(league))
+        config
+          .getSafe('api.pvp.leagues')
+          .some((league) => filter.filterKeys.has(league.name))
       ) {
         queryPvp = true
       }
@@ -383,7 +385,7 @@ class Pokemon extends Model {
    * @returns {Promise<T>}
    */
   static async evalQuery(mem, query, method = 'POST', secret = '') {
-    if (queryDebug) {
+    if (config.getSafe('devOptions.queryDebug')) {
       if (!fs.existsSync(resolve(__dirname, './queries'))) {
         fs.mkdirSync(resolve(__dirname, './queries'), { recursive: true })
       }
@@ -424,6 +426,7 @@ class Pokemon extends Model {
     const { isMad, hasSize, hasHeight, mem, secret } = ctx
     const ts = Math.floor(Date.now() / 1000)
     const { filterMap, globalFilter } = this.getFilters(perms, args, ctx)
+    const queryLimits = config.getSafe('api.queryLimits')
 
     if (!perms.iv && !perms.pvp) {
       const noPokemonSelect = Object.keys(args.filters).find(
@@ -570,9 +573,14 @@ class Pokemon extends Model {
    */
   static async search(perms, args, { isMad, mem, secret }, distance, bbox) {
     const { search, locale, onlyAreas = [] } = args
-    const pokemonIds = Object.keys(Event.masterfile.pokemon).filter((pkmn) =>
-      i18next.t(`poke_${pkmn}`, { lng: locale }).toLowerCase().includes(search),
+    const pokemonIds = Object.keys(state.event.masterfile.pokemon).filter(
+      (pkmn) =>
+        i18next
+          .t(`poke_${pkmn}`, { lng: locale })
+          .toLowerCase()
+          .includes(search),
     )
+    const searchLimit = config.getSafe('api.searchResultsLimit')
     const ts = Math.floor(Date.now() / 1000)
     const query = this.query()
       .select(['pokemon_id', distance])
@@ -584,7 +592,7 @@ class Pokemon extends Model {
         '>=',
         isMad ? this.knex().fn.now() : ts,
       )
-      .limit(searchResultsLimit)
+      .limit(searchLimit)
       .orderBy('distance')
     if (isMad) {
       query.select([
@@ -627,7 +635,7 @@ class Pokemon extends Model {
               latitude: bbox.maxLat,
               longitude: bbox.maxLon,
             },
-            limit: searchResultsLimit,
+            limit: searchLimit,
             searchIds: pokemonIds.map((id) => +id),
             global: {},
             filters: {},

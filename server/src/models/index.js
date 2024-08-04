@@ -1,5 +1,4 @@
 // @ts-check
-const { Db } = require('../services/initialization')
 const Backup = require('./Backup')
 const Badge = require('./Badge')
 const Device = require('./Device')
@@ -47,10 +46,13 @@ const scannerModels = {
  * @typedef {keyof Models} ModelKeys
  */
 
-Db.bindConnections({ ...rmModels, ...scannerModels })
+/** @param {import('../services/DbCheck')} db */
+const bindConnections = (db) =>
+  db.bindConnections({ ...rmModels, ...scannerModels })
 
 module.exports = {
   ...rmModels,
   ...scannerModels,
+  bindConnections,
   PoI,
 }

@@ -8,9 +8,6 @@ const { log, HELPERS } = require('@rm/logger')
 const { getBboxFromCenter } = require('./functions/getBbox')
 const { getCache } = require('./cache')
 
-const softLimit = config.getSafe('api.searchSoftKmLimit')
-const hardLimit = config.getSafe('api.searchHardKmLimit')
-
 /**
  * @type {import("@rm/types").DbCheckClass}
  */
@@ -35,8 +32,6 @@ module.exports = class DbCheck {
       'Session',
       'User',
     ])
-    this.searchLimit = config.getSafe('api.searchResultsLimit')
-    this.rarityPercents = config.getSafe('rarity.percents')
     this.models = {}
     this.endpoints = {}
     this.questConditions = getCache('questConditions.json', {})
@@ -248,6 +243,7 @@ module.exports = class DbCheck {
   setRarity(results, historical = false) {
     const base = {}
     const mapKey = historical ? 'historical' : 'rarity'
+    const rarityPercents = config.getSafe('rarity.percents')
     let total = 0
     results.forEach((result) => {
       Object.entries(historical ? result : result.rarity).forEach(
@@ -266,11 +262,11 @@ module.exports = class DbCheck {
       const percent = (count / total) * 100
       if (percent === 0) {
         this[mapKey][id] = 'never'
-      } else if (percent < this.rarityPercents.ultraRare) {
+      } else if (percent < rarityPercents.ultraRare) {
         this[mapKey][id] = 'ultraRare'
-      } else if (percent < this.rarityPercents.rare) {
+      } else if (percent < rarityPercents.rare) {
         this[mapKey][id] = 'rare'
-      } else if (percent < this.rarityPercents.uncommon) {
+      } else if (percent < rarityPercents.uncommon) {
         this[mapKey][id] = 'uncommon'
       } else {
         this[mapKey][id] = 'common'
@@ -444,12 +440,16 @@ module.exports = class DbCheck {
    * @returns {Promise<T[]>}
    */
   async search(model, perms, args, method = 'search') {
+    const softLimit = config.getSafe('api.searchSoftKmLimit')
+    const hardLimit = config.getSafe('api.searchHardKmLimit')
+    const searchLimit = config.getSafe('api.searchResultsLimit')
+
     let deDuped = []
     let count = 0
     let distance = softLimit
     const max = model === 'Pokemon' ? hardLimit / 2 : hardLimit
     const startTime = Date.now()
-    while (deDuped.length < this.searchLimit) {
+    while (deDuped.length < searchLimit) {
       const loopTime = Date.now()
       count += 1
       const bbox = getBboxFromCenter(args.lat, args.lon, distance)
@@ -480,7 +480,7 @@ module.exports = class DbCheck {
         +((Date.now() - loopTime) / 1000).toFixed(2),
       )
       if (
-        deDuped.length >= this.searchLimit * 0.5 ||
+        deDuped.length >= searchLimit * 0.5 ||
         distance >= max ||
         Date.now() - startTime > 2_000
       ) {
@@ -488,7 +488,7 @@ module.exports = class DbCheck {
       }
       if (deDuped.length === 0) {
         distance += softLimit * 4
-      } else if (deDuped.length < this.searchLimit / 4) {
+      } else if (deDuped.length < searchLimit / 4) {
         distance += softLimit * 2
       } else {
         distance += softLimit
@@ -508,8 +508,8 @@ module.exports = class DbCheck {
       )
     }
     deDuped.sort((a, b) => a.distance - b.distance)
-    if (deDuped.length > this.searchLimit) {
-      deDuped.length = this.searchLimit
+    if (deDuped.length > searchLimit) {
+      deDuped.length = searchLimit
     }
     return deDuped
   }
@@ -644,11 +644,7 @@ module.exports = class DbCheck {
         )
         log.info(HELPERS.db, 'Updating filter context for routes')
       } catch (e) {
-        log.error(
-          HELPERS.db,
-          'If you are using RDM, you likely do not have a routes table. Remove `route` from the `useFor` array in your config',
-          e,
-        )
+        log.error(HELPERS.db, e)
       }
     }
     if (this.models.Pokestop) {

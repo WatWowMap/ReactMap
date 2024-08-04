@@ -6,8 +6,6 @@ if (!process.env.FORCE_COLOR) {
 const logger = require('loglevel')
 const chalk = require('chalk')
 
-const config = require('@rm/config')
-
 const HELPERS = /** @type {const} */ ({
   trace: chalk.gray('☰'),
   debug: chalk.green('☯'),
@@ -61,6 +59,7 @@ const HELPERS = /** @type {const} */ ({
 
   upload: (size = '0B') => chalk.greenBright(`↑ ${size}`),
   download: (size = '0B') => chalk.redBright(`↓ ${size}`),
+  url: (url = '') => chalk.hex('#00d7ac')(`[${url.toUpperCase()}]`),
   statusCode: (code = 200) => {
     if (code >= 500) {
       return chalk.red(code)
@@ -90,15 +89,13 @@ log.methodFactory = (methodName, logLevel, loggerName) => {
   }
 }
 
-if (
-  config.has('devOptions.logLevel') &&
-  config.getSafe('devOptions.logLevel').toUpperCase() in logger.levels
-) {
-  log.setLevel(config.getSafe('devOptions.logLevel'))
-}
+/** @param {import('loglevel').LogLevelNames} logLevel */
+const setLogLevel = (logLevel = 'info') => log.setLevel(logLevel)
 
 module.exports.log = log
 
 module.exports.HELPERS = HELPERS
 
 module.exports.getTimeStamp = getTimestamp
+
+module.exports.setLogLevel = setLogLevel

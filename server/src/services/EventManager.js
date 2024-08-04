@@ -11,6 +11,11 @@ const { generate, read } = require('@rm/masterfile')
 const PoracleAPI = require('./api/Poracle')
 const { getCache } = require('./cache')
 
+/**
+ * @typedef {import('./DiscordClient') | import('./TelegramClient') | null} Client
+ * @typedef {Record<string, Client>} ClientObject
+ */
+
 class EventManager {
   constructor() {
     /** @type {import("@rm/masterfile").Masterfile} */
@@ -30,6 +35,12 @@ class EventManager {
     this.uaudio = getCache('uaudio.json', [])
     this.uiconsBackup = {}
     this.uaudioBackup = {}
+
+    /** @type {Record<string, NodeJS.Timeout>} */
+    this.intervals = {}
+    /** @type {Record<string, NodeJS.Timeout>} */
+    this.timeouts = {}
+
     this.baseUrl =
       'https://raw.githubusercontent.com/WatWowMap/wwm-uicons-webp/main'
 
@@ -47,8 +58,8 @@ class EventManager {
         })
         .filter(([, api]) => api),
     )
-    /** @type {import('./Clients').ClientObject} */
-    this.Clients = {}
+    /** @type {ClientObject} */
+    this.authClients = {}
   }
 
   /**
@@ -108,36 +119,45 @@ class EventManager {
   }
 
   /**
-   * @param {import('./Clients').ClientObject} clients
-   */
-  set clients(clients) {
-    this.Clients = clients
-  }
-
-  /**
    *
    * @param {import('discord.js').APIEmbed | string} embed
    * @param {string} [clientName]
+   * @param {keyof import('./DiscordClient')['loggingChannels']} [channel]
    */
-  async chatLog(embed, clientName) {
+  async chatLog(embed, clientName, channel = 'event') {
     if (clientName) {
-      const client = this.Clients[clientName]
+      const client = this.authClients[clientName]
       if ('discordEvents' in client && typeof embed === 'object') {
-        await client.sendMessage(embed, 'event')
+        await client.sendMessage(embed, channel)
       } else if (typeof embed === 'string') {
-        await client.sendMessage(embed, 'event')
+        await client.sendMessage(embed, channel)
       }
     } else {
       await Promise.allSettled(
-        Object.values(this.Clients).map(async (client) => {
+        Object.values(this.authClients).map(async (client) => {
           if ('discordEvents' in client && typeof embed === 'object') {
-            await client.sendMessage(embed, 'event')
+            await client.sendMessage(embed, channel)
           } else if (typeof embed === 'string') {
-            await client.sendMessage(embed, 'event')
+            await client.sendMessage(embed, channel)
           }
         }),
       )
     }
+  }
+
+  clearAll() {
+    this.clearIntervals()
+    this.clearTimeouts()
+  }
+
+  clearIntervals() {
+    log.info(HELPERS.event, 'clearing intervals')
+    Object.values(this.intervals).forEach((interval) => clearInterval(interval))
+  }
+
+  clearTimeouts() {
+    log.info(HELPERS.event, 'clearing timeouts')
+    Object.values(this.timeouts).forEach((timeout) => clearTimeout(timeout))
   }
 
   /**
@@ -145,78 +165,86 @@ class EventManager {
    * @param {import('./DbCheck')} Db
    * @param {import('./PvpWrapper')} Pvp
    */
-  setTimers(Db, Pvp) {
+  startIntervals(Db, Pvp) {
+    this.clearIntervals()
+    log.info(HELPERS.event, 'starting intervals')
+
     if (!config.getSafe('api.queryOnSessionInit.raids')) {
-      setInterval(async () => {
+      this.intervals.raidUpdate = setInterval(async () => {
         await this.setAvailable('gyms', 'Gym', Db)
         await this.chatLog({ description: 'Refreshed available raids' })
       }, 1000 * 60 * 60 * (config.getSafe('api.queryUpdateHours.raids') || 1))
     }
     if (!config.getSafe('api.queryOnSessionInit.nests')) {
-      setInterval(async () => {
+      this.intervals.nestUpdate = setInterval(async () => {
         await this.setAvailable('nests', 'Nest', Db)
         await this.chatLog({ description: 'Refreshed available nests' })
       }, 1000 * 60 * 60 * (config.getSafe('api.queryUpdateHours.nests') || 6))
     }
     if (!config.getSafe('api.queryOnSessionInit.pokemon')) {
-      setInterval(async () => {
+      this.intervals.pokemonUpdate = setInterval(async () => {
         await this.setAvailable('pokemon', 'Pokemon', Db)
         await this.chatLog({ description: 'Refreshed available pokemon' })
       }, 1000 * 60 * 60 * (config.getSafe('api.queryUpdateHours.pokemon') || 1))
     }
     if (!config.getSafe('api.queryOnSessionInit.quests')) {
-      setInterval(async () => {
+      this.intervals.questUpdate = setInterval(async () => {
         await this.setAvailable('pokestops', 'Pokestop', Db)
         await this.chatLog({
           description: 'Refreshed available quests & invasions',
         })
       }, 1000 * 60 * 60 * (config.getSafe('api.queryUpdateHours.quests') || 3))
     }
-    setInterval(async () => {
-      await this.getUniversalAssets(config.getSafe('icons.styles'), 'uicons')
+    this.intervals.uicons = setInterval(async () => {
+      await this.getUniversalAssets('uicons')
       await this.chatLog({ description: 'Refreshed UICONS indexes' })
     }, 1000 * 60 * 60 * (config.getSafe('icons.cacheHrs') || 3))
-    setInterval(async () => {
-      await this.getUniversalAssets(config.getSafe('audio.styles'), 'uaudio')
+    this.intervals.uaudio = setInterval(async () => {
+      await this.getUniversalAssets('uaudio')
       await this.chatLog({ description: 'Refreshed UAUDIO indexes' })
     }, 1000 * 60 * 60 * (config.getSafe('audio.cacheHrs') || 3))
     if (config.getSafe('api.pogoApiEndpoints.invasions')) {
-      setInterval(async () => {
-        await this.getInvasions(
-          config.getSafe('api.pogoApiEndpoints.invasions'),
-        )
-        await this.chatLog({ description: 'Refreshed invasions masterfile' })
+      this.intervals.invasions = setInterval(async () => {
+        await this.getInvasions()
+        await this.chatLog({ description: 'Refreshed invasions' })
       }, 1000 * 60 * 60 * (config.getSafe('map.misc.invasionCacheHrs') || 1))
     }
-    setInterval(async () => {
+    this.intervals.historical = setInterval(async () => {
       await Db.historicalRarity()
       await this.chatLog({
         description: 'Refreshed db historical rarity tiers',
       })
     }, 1000 * 60 * 60 * (config.getSafe('api.queryUpdateHours.historicalRarity') || 6))
     if (config.getSafe('api.pogoApiEndpoints.masterfile')) {
-      setInterval(async () => {
+      this.intervals.masterfile = setInterval(async () => {
         await this.getMasterfile(Db.historical, Db.rarity)
         await this.chatLog({ description: 'Refreshed masterfile' })
       }, 1000 * 60 * 60 * (config.getSafe('map.misc.masterfileCacheHrs') || 6))
     }
     if (Pvp) {
-      setInterval(async () => {
-        log.info(HELPERS.event, 'Fetching Latest PVP Masterfile')
+      this.intervals.pvp = setInterval(async () => {
         Pvp.updatePokemonData(await Ohbem.fetchPokemonData())
         await this.chatLog({ description: 'Refreshed PVP masterfile' })
       }, 1000 * 60 * 60 * (config.getSafe('map.misc.masterfileCacheHrs') || 6))
     }
-    setInterval(async () => {
+    this.intervals.webhooks = setInterval(async () => {
       await this.getWebhooks()
       await this.chatLog({ description: 'Refreshed webhook settings' })
     }, 1000 * 60 * 60 * (config.getSafe('map.misc.webhookCacheHrs') || 1))
 
-    setInterval(async () => {
+    this.intervals.filterCxt = setInterval(async () => {
       await Db.getFilterContext()
       await this.chatLog({ description: 'Updated filter contexts' })
     }, 1000 * 60 * 30)
+  }
 
+  /**
+   *
+   * @param {import('./DbCheck')} Db
+   */
+  loadTrial(Db) {
+    this.clearTimeouts()
+    log.info(HELPERS.event, 'setting up trials if any are scheduled')
     const newDate = new Date()
     config.getSafe('authentication.strategies').forEach((strategy) => {
       if (strategy.enabled) {
@@ -231,7 +259,7 @@ class EventManager {
             ).toFixed(2),
             `minutes for ${strategy.name}`,
           )
-          setTimeout(async () => {
+          this.timeouts.startTrial = setTimeout(async () => {
             await Db.models.Session.clear()
             this.chatLog(
               { description: `Trial period has started.` },
@@ -250,7 +278,7 @@ class EventManager {
             ).toFixed(2),
             `minutes for ${strategy.name}`,
           )
-          setTimeout(async () => {
+          this.timeouts.endTrial = setTimeout(async () => {
             await Db.models.Session.clear()
             this.chatLog(
               { description: `Trial period has ended.` },
@@ -264,10 +292,13 @@ class EventManager {
 
   /**
    *
-   * @param {import("@rm/types").Config['icons']['styles']} styles
    * @param {'uicons' | 'uaudio'} type
    */
-  async getUniversalAssets(styles, type) {
+  async getUniversalAssets(type) {
+    const styles =
+      type === 'uicons'
+        ? config.getSafe('icons.styles')
+        : config.getSafe('audio.styles')
     log.info(HELPERS.event, 'Fetching Latest', type.toUpperCase())
     if (!styles.some((icon) => icon.path.includes('wwm'))) {
       log.info(
@@ -278,6 +309,7 @@ class EventManager {
     const assets = await Promise.allSettled(
       styles.map(async (style) => {
         try {
+          /** @type {import('uicons.js').UiconsIndex} */
           const response = style.path.startsWith('http')
             ? await fetch(`${style.path}/index.json`).then((res) => res.json())
             : JSON.parse(
@@ -289,7 +321,6 @@ class EventManager {
                   'utf-8',
                 ),
               )
-
           return { ...style, data: response }
         } catch (e) {
           log.warn(
@@ -315,30 +346,23 @@ class EventManager {
     this[type] = Object.values(this[`${type}Backup`])
   }
 
-  /**
-   *
-   * @param {import("@rm/types").Config['api']['pogoApiEndpoints']['invasions']} endpoint
-   */
-  async getInvasions(endpoint) {
+  async getInvasions() {
+    const endpoint = config.getSafe('api.pogoApiEndpoints.invasions')
     if (endpoint) {
       log.info(HELPERS.event, 'Fetching Latest Invasions')
       try {
+        /** @type {import('@rm/masterfile').Masterfile['invasions']} */
         const newInvasions = await fetch(endpoint).then((res) => res.json())
         if (newInvasions) {
           this.rocketGruntIDs = Object.keys(newInvasions)
-            .filter(
-              (key) =>
-                newInvasions[key].grunt &&
-                newInvasions[key].grunt.includes('Grunt'),
-            )
+            .filter((key) => newInvasions[key].grunt === 'Grunt')
             .map(Number)
 
           this.rocketLeaderIDs = Object.keys(newInvasions)
             .filter(
               (key) =>
-                newInvasions[key].grunt &&
-                (newInvasions[key].grunt.includes('Executive') ||
-                  newInvasions[key].grunt.includes('Giovanni')),
+                newInvasions[key].grunt === 'Executive' ||
+                newInvasions[key].grunt === 'Giovanni',
             )
             .map(Number)
 

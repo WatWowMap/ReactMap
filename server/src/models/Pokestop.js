@@ -3,16 +3,9 @@ const { Model, raw } = require('objection')
 const i18next = require('i18next')
 const config = require('@rm/config')
 
-const { Event } = require('../services/initialization')
+const state = require('../services/state')
 const getAreaSql = require('../services/functions/getAreaSql')
 const { getUserMidnight } = require('../services/functions/getClientTime')
-
-const {
-  searchResultsLimit,
-  queryLimits,
-  stopValidDataLimit,
-  hideOldPokestops,
-} = config.getSafe('api')
 
 const questProps = {
   quest_type: true,
@@ -141,6 +134,8 @@ class Pokestop extends Model {
     } = args
     const midnight = getUserMidnight(args)
     const ts = Math.floor(Date.now() / 1000)
+    const { queryLimits, stopValidDataLimit, hideOldPokestops } =
+      config.getSafe('api')
 
     const {
       lures: lurePerms,
@@ -578,14 +573,14 @@ class Pokestop extends Model {
               if (onlyExcludeGrunts) {
                 invasion.whereNotIn(
                   isMad ? 'character_display' : 'character',
-                  Event.rocketGruntIDs,
+                  state.event.rocketGruntIDs,
                 )
               }
 
               if (onlyExcludeLeaders) {
                 invasion.whereNotIn(
                   isMad ? 'character_display' : 'character',
-                  Event.rocketLeaderIDs,
+                  state.event.rocketLeaderIDs,
                 )
               }
             })
@@ -764,7 +759,7 @@ class Pokestop extends Model {
         (filters.onlyAllPokestops || filters.onlyInvasions)
       ) {
         filtered.invasions = pokestop.invasions.filter((invasion) => {
-          const info = Event.invasions[invasion.grunt_type]
+          const info = state.event.invasions[invasion.grunt_type]
           if (!info) return false
           if (
             info.firstReward &&
@@ -1511,7 +1506,7 @@ class Pokestop extends Model {
         case 'rocketPokemon':
           if (hasConfirmed) {
             rewards.forEach((reward) => {
-              const fullGrunt = Event.invasions[reward.grunt_type]
+              const fullGrunt = state.event.invasions[reward.grunt_type]
               if (fullGrunt?.firstReward) {
                 finalList.add(
                   `a${reward.slot_1_pokemon_id}-${reward.slot_1_form}`,
@@ -1642,7 +1637,7 @@ class Pokestop extends Model {
       .whereBetween(isMad ? 'latitude' : 'lat', [bbox.minLat, bbox.maxLat])
       .andWhereBetween(isMad ? 'longitude' : 'lon', [bbox.minLon, bbox.maxLon])
       .whereILike('name', `%${search}%`)
-      .limit(searchResultsLimit)
+      .limit(config.getSafe('api.searchResultsLimit'))
       .orderBy('distance')
     if (!getAreaSql(query, perms.areaRestrictions, onlyAreas, isMad)) {
       return []
@@ -1658,16 +1653,18 @@ class Pokestop extends Model {
     bbox,
   ) {
     const { search, onlyAreas = [], locale, lat, lon, questLayer } = args
+    const searchResultsLimit = config.getSafe('api.searchResultsLimit')
     const midnight = getUserMidnight({ lat, lon })
-    const pokemonIds = Object.keys(Event.masterfile.pokemon).filter((pkmn) =>
-      i18next
-        .t(`poke_${pkmn}`, { lng: locale })
-        .normalize('NFD')
-        .replace(/[\u0300-\u036f]/g, '')
-        .toLowerCase()
-        .includes(search),
+    const pokemonIds = Object.keys(state.event.masterfile.pokemon).filter(
+      (pkmn) =>
+        i18next
+          .t(`poke_${pkmn}`, { lng: locale })
+          .normalize('NFD')
+          .replace(/[\u0300-\u036f]/g, '')
+          .toLowerCase()
+          .includes(search),
     )
-    const itemIds = Object.keys(Event.masterfile.items).filter((item) =>
+    const itemIds = Object.keys(state.event.masterfile.items).filter((item) =>
       i18next
         .t(`item_${item}`, { lng: locale })
         .normalize('NFD')
@@ -1675,14 +1672,15 @@ class Pokestop extends Model {
         .toLowerCase()
         .includes(search),
     )
-    const rewardTypes = Object.keys(Event.masterfile.questRewardTypes).filter(
-      (rType) =>
-        i18next
-          .t(`quest_reward_${rType}`, { lng: locale })
-          .normalize('NFD')
-          .replace(/[\u0300-\u036f]/g, '')
-          .toLowerCase()
-          .includes(search),
+    const rewardTypes = Object.keys(
+      state.event.masterfile.questRewardTypes,
+    ).filter((rType) =>
+      i18next
+        .t(`quest_reward_${rType}`, { lng: locale })
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .toLowerCase()
+        .includes(search),
     )
 
     if (!pokemonIds.length && !itemIds.length && !rewardTypes.length) {
@@ -1727,7 +1725,7 @@ class Pokestop extends Model {
             quests.orWhereIn('quest_reward_type', rewardTypes)
           }
         })
-        .limit(searchResultsLimit)
+        .limit(config.getSafe('api.searchResultsLimit'))
         .orderBy('distance')
       if (isMad) {
         query
@@ -1817,8 +1815,10 @@ class Pokestop extends Model {
     const { search, onlyAreas = [], locale } = args
     const ts = Math.floor(Date.now() / 1000)
 
-    const lureIds = Object.keys(Event.masterfile.items)
-      .filter((item) => Event.masterfile.items[item].startsWith('Troy Disk'))
+    const lureIds = Object.keys(state.event.masterfile.items)
+      .filter((item) =>
+        state.event.masterfile.items[item].startsWith('Troy Disk'),
+      )
       .filter((lure) =>
         i18next
           .t(`lure_${lure}`, { lng: locale })
@@ -1847,7 +1847,7 @@ class Pokestop extends Model {
         isMad ? this.knex().fn.now() : ts,
       )
       .whereIn(isMad ? 'active_fort_modifier' : 'lure_id', lureIds)
-      .limit(searchResultsLimit)
+      .limit(config.getSafe('api.searchResultsLimit'))
       .orderBy('distance')
     if (!getAreaSql(query, perms.areaRestrictions, onlyAreas, isMad)) {
       return []
@@ -1866,7 +1866,7 @@ class Pokestop extends Model {
     const { search, onlyAreas = [], locale } = args
     const ts = Math.floor(Date.now() / 1000)
 
-    const invasions = Object.keys(Event.invasions).filter((invasion) =>
+    const invasions = Object.keys(state.event.invasions).filter((invasion) =>
       i18next
         .t(`grunt_${invasion}`, { lng: locale })
         .normalize('NFD')
@@ -1875,9 +1875,9 @@ class Pokestop extends Model {
         .includes(search),
     )
     const validMons = new Set(
-      Event.available.pokestops.filter((a) => a.startsWith('a')),
+      state.event.available.pokestops.filter((a) => a.startsWith('a')),
     )
-    const pokemonIds = Object.keys(Event.masterfile.pokemon)
+    const pokemonIds = Object.keys(state.event.masterfile.pokemon)
       .filter(
         (pkmn) =>
           i18next
@@ -1887,7 +1887,7 @@ class Pokestop extends Model {
             .toLowerCase()
             .includes(search) &&
           (validMons.has(`a${pkmn}-0`) ||
-            Object.keys(Event.masterfile.pokemon[pkmn].forms || {}).some(
+            Object.keys(state.event.masterfile.pokemon[pkmn].forms || {}).some(
               (form) => validMons.has(`a${pkmn}-${form}`),
             )),
       )
@@ -1898,7 +1898,7 @@ class Pokestop extends Model {
     const query = this.query()
       .whereBetween(isMad ? 'latitude' : 'lat', [bbox.minLat, bbox.maxLat])
       .andWhereBetween(isMad ? 'longitude' : 'lon', [bbox.minLon, bbox.maxLon])
-      .limit(searchResultsLimit)
+      .limit(config.getSafe('api.searchResultsLimit'))
       .orderBy('distance')
 
     Pokestop.joinIncident(query, hasMultiInvasions, isMad, multiInvasionMs)
@@ -1928,8 +1928,8 @@ class Pokestop extends Model {
       ? results.filter(({ grunt_type }) =>
           ['first', 'second', 'third'].some(
             (pos) =>
-              Event.invasions[grunt_type]?.[`${pos}Reward`] &&
-              Event.invasions[grunt_type]?.encounters[pos]?.some((pkmn) =>
+              state.event.invasions[grunt_type]?.[`${pos}Reward`] &&
+              state.event.invasions[grunt_type]?.encounters[pos]?.some((pkmn) =>
                 pokemonIds.includes(pkmn.id),
               ),
           ),

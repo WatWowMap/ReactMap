@@ -8,21 +8,20 @@ const { log, HELPERS } = require('@rm/logger')
 
 const defaultRarity = require('./data/defaultRarity.json')
 
-const rarityObj = {}
-
-const rarityConfig = config.getSafe('rarity')
-const endpoint = config.getSafe('api.pogoApiEndpoints.masterfile')
-
-Object.entries(defaultRarity).forEach(([tier, pokemon]) => {
-  if (rarityConfig?.[tier]?.length) {
-    rarityConfig[tier].forEach((mon) => (rarityObj[mon] = tier))
-  } else {
-    pokemon.forEach((mon) => (rarityObj[mon] = tier))
-  }
-})
-
 /** @type {import('.').generate} */
 const generate = async (save = false, historicRarity = {}, dbRarity = {}) => {
+  const rarityConfig = config.getSafe('rarity')
+  const endpoint = config.getSafe('api.pogoApiEndpoints.masterfile')
+  const rarityObj = {}
+
+  Object.entries(defaultRarity).forEach(([tier, pokemon]) => {
+    if (rarityConfig?.[tier]?.length) {
+      rarityConfig[tier].forEach((mon) => (rarityObj[mon] = tier))
+    } else {
+      pokemon.forEach((mon) => (rarityObj[mon] = tier))
+    }
+  })
+
   log.info(HELPERS.masterfile, 'generating masterfile')
   try {
     if (!endpoint) throw new Error('No masterfile endpoint')

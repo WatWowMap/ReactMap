@@ -1,6 +1,7 @@
+/* eslint-disable import/order */
 // @ts-check
 if (!process.env.NODE_CONFIG_DIR) {
-  process.env.NODE_CONFIG_DIR = require('path').resolve(
+  process.env.NODE_CONFIG_DIR = require('path').join(
     __dirname,
     '..',
     '..',
@@ -21,24 +22,58 @@ if (process.env.NODE_CONFIG_ENV) {
   }
 }
 
+const { setLogLevel, HELPERS, log } = require('@rm/logger')
+const { applyMutations } = require('./mutations')
+
+function purge() {
+  Object.keys(require.cache).forEach((fileName) => {
+    if (fileName.indexOf(process.env.NODE_CONFIG_DIR) === -1) {
+      return
+    }
+    delete require.cache[fileName]
+  })
+  delete require.cache[require.resolve('config')]
+  delete require.cache[require.resolve('@rm/config')]
+}
+
 const config = require('config')
 
-config.getSafe = config.get
+config.reload = function reload() {
+  try {
+    purge()
+    log.info(HELPERS.config, 'config purged, returning old reference')
+    return this
+  } catch (e) {
+    log.error(HELPERS.config, 'error reloading config', e)
+    return this
+  }
+}
 
-config.getMapConfig = (req) => {
+config.getSafe = function getSafe(key) {
+  return require('config').get(key)
+}
+
+config.getMapConfig = function getMapConfig(req) {
   const domain = /** @type {const} */ (
     `multiDomainsObj.${req.headers.host.replaceAll('.', '_')}`
   )
-  return config.has(domain) ? config.getSafe(domain) : config.getSafe('map')
+  return this.has(domain) ? this.getSafe(domain) : this.getSafe('map')
 }
 
-config.getAreas = (req, key) => {
+config.getAreas = function getAreas(req, key) {
   const location = /** @type {const} */ (
     `areas.${key}.${req.headers.host.replaceAll('.', '_')}`
   )
-  return config.has(location)
-    ? config.getSafe(location)
-    : config.getSafe(`areas.${key}.main`)
+  return this.has(location)
+    ? this.getSafe(location)
+    : this.getSafe(`areas.${key}.main`)
 }
+
+config.setAreas = function setAreas(newAreas) {
+  this.areas = newAreas
+}
+
+setLogLevel(config.getSafe('devOptions.logLevel'))
+applyMutations(config)
 
 module.exports = config

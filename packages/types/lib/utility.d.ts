@@ -42,3 +42,39 @@ export type ModelReturn<T extends Model, U extends keyof T> = Awaited<
 >
 
 export type FullModel<T, U extends Model> = Partial<T> & U
+
+export type IsAny<T> = 0 extends 1 & T ? true : false
+
+export type DeepMerge<T, U> = {
+  [K in keyof T | keyof U]: K extends keyof U
+    ? IsAny<T[K]> extends true
+      ? U[K] // If T[K] is any, override with U[K]
+      : U[K] extends any[]
+      ? T[K] extends any[]
+        ? T[K] extends object[]
+          ? U[K] extends object[]
+            ? Array<DeepMerge<T[K][number], U[K][number]>> // Merge arrays of objects
+            : U[K] // If U is not an array of objects, override
+          : U[K] // If T is not an array of objects, override
+        : U[K] // If T is not an array, override
+      : U[K] extends object
+      ? K extends keyof T
+        ? T[K] extends object
+          ? DeepMerge<T[K], U[K]> // Recursively merge objects
+          : U[K] // Otherwise, use U's value
+        : U[K] // If the key exists only in U
+      : U[K] // If U[K] is not an object, use U's value
+    : K extends keyof T
+    ? T[K]
+    : never
+}
+
+export type ComparisonReport<T> = T extends Array<infer U>
+  ? { areEqual: boolean; report: ComparisonReport<U>[]; changed: string[] }
+  : T extends object
+  ? {
+      areEqual: boolean
+      report: { [K in StoreNoFn<T>]: ComparisonReport<T[K]> }
+      changed: string[]
+    }
+  : boolean

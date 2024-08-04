@@ -1,93 +1,8 @@
 // @ts-check
 const config = require('@rm/config')
-const { Db } = require('../initialization')
-
-const nestFilters = config.getSafe('defaultFilters.nests')
-const leagues = config.getSafe('api.pvp.leagues')
+const state = require('../state')
 
 /** @typedef {import('@rm/types').RMSlider} Slider */
-
-const SLIDERS =
-  /** @type {{ pokemon: { primary: Slider[], secondary: Slider[] }, nests: { secondary: Slider[] } }} */ ({
-    pokemon: {
-      primary: [
-        {
-          name: 'iv',
-          label: '%',
-          min: 0,
-          max: 100,
-          perm: 'iv',
-          color: 'secondary',
-        },
-      ],
-      secondary: [
-        {
-          name: 'level',
-          label: '',
-          min: 1,
-          max: 35,
-          perm: 'iv',
-          color: 'secondary',
-        },
-        {
-          name: 'atk_iv',
-          label: '',
-          min: 0,
-          max: 15,
-          perm: 'iv',
-          color: 'secondary',
-        },
-        {
-          name: 'def_iv',
-          label: '',
-          min: 0,
-          max: 15,
-          perm: 'iv',
-          color: 'secondary',
-        },
-        {
-          name: 'sta_iv',
-          label: '',
-          min: 0,
-          max: 15,
-          perm: 'iv',
-          color: 'secondary',
-        },
-        {
-          name: 'cp',
-          label: '',
-          min: 10,
-          max: 5000,
-          perm: 'iv',
-          color: 'secondary',
-        },
-      ],
-    },
-    nests: {
-      secondary: [
-        {
-          name: 'avgFilter',
-          i18nKey: 'spawns_per_hour',
-          label: '',
-          min: nestFilters.avgFilter[0],
-          max: nestFilters.avgFilter[1],
-          perm: 'nests',
-          step: nestFilters.avgSliderStep,
-        },
-      ],
-    },
-  })
-
-leagues.forEach((league) =>
-  SLIDERS.pokemon.primary.push({
-    name: league.name,
-    label: 'rank',
-    min: league.minRank || 1,
-    max: league.maxRank || 100,
-    perm: 'pvp',
-    color: 'primary',
-  }),
-)
 
 // TODO this will be used later in the config
 const BLOCKED = /** @type {undefined} */ (undefined)
@@ -100,9 +15,12 @@ const BLOCKED = /** @type {undefined} */ (undefined)
  */
 function generateUi(req, perms) {
   const mapConfig = config.getMapConfig(req)
+  const nestFilters = config.getSafe('defaultFilters.nests')
+  const leagues = config.getSafe('api.pvp.leagues')
+
   const ui = {
     gyms:
-      (perms.gyms || perms.raids) && Db.models.Gym
+      (perms.gyms || perms.raids) && state.db.models.Gym
         ? {
             allGyms: perms.gyms || BLOCKED,
             raids: perms.raids || BLOCKED,
@@ -113,16 +31,28 @@ function generateUi(req, perms) {
           }
         : BLOCKED,
     nests:
-      perms.nests && Db.models.Nest
+      perms.nests && state.db.models.Nest
         ? {
             pokemon: true,
             polygons: true,
-            sliders: SLIDERS.nests,
+            sliders: {
+              secondary: [
+                {
+                  name: 'avgFilter',
+                  i18nKey: 'spawns_per_hour',
+                  label: '',
+                  min: nestFilters.avgFilter[0],
+                  max: nestFilters.avgFilter[1],
+                  perm: 'nests',
+                  step: nestFilters.avgSliderStep,
+                },
+              ],
+            },
           }
         : BLOCKED,
     pokestops:
       (perms.pokestops || perms.lures || perms.quests || perms.invasions) &&
-      Db.models.Pokestop
+      state.db.models.Pokestop
         ? {
             allPokestops: perms.pokestops || BLOCKED,
             lures: perms.lures || BLOCKED,
@@ -133,7 +63,7 @@ function generateUi(req, perms) {
           }
         : BLOCKED,
     pokemon:
-      (perms.pokemon || perms.iv || perms.pvp) && Db.models.Pokemon
+      (perms.pokemon || perms.iv || perms.pvp) && state.db.models.Pokemon
         ? {
             legacy: perms.iv && mapConfig.misc.enableMapJsFilter,
             iv: perms.iv || BLOCKED,
@@ -144,27 +74,85 @@ function generateUi(req, perms) {
             zeroIv: perms.iv || BLOCKED,
             hundoIv: perms.iv || BLOCKED,
             sliders: {
-              primary: SLIDERS.pokemon.primary.map((slider) => ({
+              primary: [
+                {
+                  name: 'iv',
+                  label: '%',
+                  min: 0,
+                  max: 100,
+                  perm: 'iv',
+                  color: 'secondary',
+                },
+                ...leagues.map((league) => ({
+                  name: league.name,
+                  label: 'rank',
+                  min: league.minRank || 1,
+                  max: league.maxRank || 100,
+                  perm: 'pvp',
+                  color: 'primary',
+                })),
+              ].map((slider) => ({
                 ...slider,
                 disabled: !perms[slider.perm],
               })),
-              secondary: SLIDERS.pokemon.secondary.map((slider) => ({
+              secondary: [
+                {
+                  name: 'level',
+                  label: '',
+                  min: 1,
+                  max: 35,
+                  perm: 'iv',
+                  color: 'secondary',
+                },
+                {
+                  name: 'atk_iv',
+                  label: '',
+                  min: 0,
+                  max: 15,
+                  perm: 'iv',
+                  color: 'secondary',
+                },
+                {
+                  name: 'def_iv',
+                  label: '',
+                  min: 0,
+                  max: 15,
+                  perm: 'iv',
+                  color: 'secondary',
+                },
+                {
+                  name: 'sta_iv',
+                  label: '',
+                  min: 0,
+                  max: 15,
+                  perm: 'iv',
+                  color: 'secondary',
+                },
+                {
+                  name: 'cp',
+                  label: '',
+                  min: 10,
+                  max: 5000,
+                  perm: 'iv',
+                  color: 'secondary',
+                },
+              ].map((slider) => ({
                 ...slider,
                 disabled: !perms[slider.perm],
               })),
             },
           }
         : BLOCKED,
-    routes: perms.routes && Db.models.Route ? { enabled: true } : BLOCKED,
+    routes: perms.routes && state.db.models.Route ? { enabled: true } : BLOCKED,
     wayfarer:
       perms.portals || perms.submissionCells
         ? {
-            portals: !!(perms.portals && Db.models.Portal) || BLOCKED,
+            portals: !!(perms.portals && state.db.models.Portal) || BLOCKED,
             submissionCells:
               !!(
                 perms.submissionCells &&
-                Db.models.Pokestop &&
-                Db.models.Gym
+                state.db.models.Pokestop &&
+                state.db.models.Gym
               ) || BLOCKED,
           }
         : undefined,
@@ -172,14 +160,16 @@ function generateUi(req, perms) {
     scanAreas: perms.scanAreas
       ? { filterByAreas: true, enabled: true }
       : undefined,
-    weather: perms.weather && Db.models.Weather ? { enabled: true } : BLOCKED,
+    weather:
+      perms.weather && state.db.models.Weather ? { enabled: true } : BLOCKED,
     admin:
       perms.spawnpoints || perms.scanCells || perms.devices
         ? {
             spawnpoints:
-              !!(perms.spawnpoints && Db.models.Spawnpoint) || BLOCKED,
-            scanCells: !!(perms.scanCells && Db.models.ScanCell) || BLOCKED,
-            devices: !!(perms.devices && Db.models.Device) || BLOCKED,
+              !!(perms.spawnpoints && state.db.models.Spawnpoint) || BLOCKED,
+            scanCells:
+              !!(perms.scanCells && state.db.models.ScanCell) || BLOCKED,
+            devices: !!(perms.devices && state.db.models.Device) || BLOCKED,
           }
         : BLOCKED,
     settings: true,
