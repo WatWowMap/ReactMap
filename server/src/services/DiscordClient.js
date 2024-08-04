@@ -115,12 +115,7 @@ class DiscordClient {
    * @returns {Promise<import("@rm/types").Permissions>}
    */
   async getPerms(user) {
-    const date = new Date()
-    const trialActive =
-      this.strategy.trialPeriod &&
-      date >= this.strategy.trialPeriod.start.js &&
-      date <= this.strategy.trialPeriod.end.js
-
+    const trialActive = state.event.getTrialStatus(this.rmStrategy)
     /** @type {import("@rm/types").Permissions} */
     // @ts-ignore
     const perms = Object.fromEntries(

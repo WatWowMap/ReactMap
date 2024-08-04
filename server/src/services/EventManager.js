@@ -36,6 +36,9 @@ class EventManager {
     this.uiconsBackup = {}
     this.uaudioBackup = {}
 
+    /** @type {Record<string, boolean>} */
+    this.trialActive = {}
+
     /** @type {Record<string, NodeJS.Timeout>} */
     this.intervals = {}
     /** @type {Record<string, NodeJS.Timeout>} */
@@ -153,11 +156,13 @@ class EventManager {
   clearIntervals() {
     log.info(HELPERS.event, 'clearing intervals')
     Object.values(this.intervals).forEach((interval) => clearInterval(interval))
+    this.intervals = {}
   }
 
   clearTimeouts() {
     log.info(HELPERS.event, 'clearing timeouts')
     Object.values(this.timeouts).forEach((timeout) => clearTimeout(timeout))
+    this.timeouts = {}
   }
 
   /**
@@ -238,6 +243,32 @@ class EventManager {
     }, 1000 * 60 * 30)
   }
 
+  /** @param {string} strategy */
+  getTrialStatus(strategy) {
+    return this.trialActive[strategy]
+  }
+
+  /**
+   *
+   * @param {import('./DbCheck')} Db
+   * @param {boolean} [active]
+   * @param {string} [strategy]
+   */
+  async setTrial(Db, active, strategy) {
+    await Db.models.Session.clearNonDonor()
+    this.chatLog(
+      { description: `Trial period has ${active ? 'ended' : 'started'}.` },
+      strategy,
+    )
+    if (strategy) {
+      this.trialActive[strategy] = !!active
+    } else {
+      config.getSafe('authentication.strategies').forEach((strat) => {
+        this.trialActive[strat.name] = active
+      })
+    }
+  }
+
   /**
    *
    * @param {import('./DbCheck')} Db
@@ -249,42 +280,32 @@ class EventManager {
     config.getSafe('authentication.strategies').forEach((strategy) => {
       if (strategy.enabled) {
         if (strategy.trialPeriod.start.js >= newDate) {
+          const startMs =
+            strategy.trialPeriod.start.js.getTime() - newDate.getTime()
           log.info(
             HELPERS.event,
             'Trial period starting in',
-            +(
-              (strategy.trialPeriod.start.js.getTime() - newDate.getTime()) /
-              1000 /
-              60
-            ).toFixed(2),
+            +(startMs / 1000 / 60).toFixed(2),
             `minutes for ${strategy.name}`,
           )
-          this.timeouts.startTrial = setTimeout(async () => {
-            await Db.models.Session.clear()
-            this.chatLog(
-              { description: `Trial period has started.` },
-              strategy.name,
-            )
-          }, strategy.trialPeriod.start.js.getTime() - newDate.getTime())
+          this.timeouts[`${strategy.name}Start`] = setTimeout(
+            () => this.setTrial(Db, true, strategy.name),
+            startMs,
+          )
         }
         if (strategy.trialPeriod.end.js >= newDate) {
+          const endMs =
+            strategy.trialPeriod.end.js.getTime() - newDate.getTime()
           log.info(
             HELPERS.event,
             'Trial period ending in',
-            +(
-              (strategy.trialPeriod.end.js.getTime() - newDate.getTime()) /
-              1000 /
-              60
-            ).toFixed(2),
+            +(endMs / 1000 / 60).toFixed(2),
             `minutes for ${strategy.name}`,
           )
-          this.timeouts.endTrial = setTimeout(async () => {
-            await Db.models.Session.clear()
-            this.chatLog(
-              { description: `Trial period has ended.` },
-              strategy.name,
-            )
-          }, strategy.trialPeriod.end.js.getTime() - newDate.getTime())
+          this.timeouts[`${strategy.name}End`] = setTimeout(
+            () => this.setTrial(Db, false, strategy.name),
+            endMs,
+          )
         }
       }
     })

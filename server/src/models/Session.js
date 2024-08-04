@@ -14,6 +14,14 @@ class Session extends Model {
     return results
   }
 
+  static async clearNonDonor() {
+    const results = await this.query()
+      .whereRaw(`json_extract(data, '$.passport.user.perms.donor') = false`)
+      .delete()
+    log.info(HELPERS.session, 'Clear Result:', results)
+    return results
+  }
+
   /**
    *
    * @param {number} userId

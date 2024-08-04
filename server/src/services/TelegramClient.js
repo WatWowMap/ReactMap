@@ -85,12 +85,7 @@ class TelegramClient {
    * @returns {TGUser & { perms: import("@rm/types").Permissions }}
    */
   getUserPerms(user, groups) {
-    const date = new Date()
-    const trialActive =
-      this.strategy.trialPeriod &&
-      date >= this.strategy.trialPeriod.start.js &&
-      date <= this.strategy.trialPeriod.end.js
-
+    const trialActive = state.event.getTrialStatus(this.rmStrategy)
     /** @type { TGUser & { perms: import("@rm/types").Permissions }} */
     const newUserObj = {
       ...user,
