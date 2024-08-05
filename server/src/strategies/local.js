@@ -5,7 +5,7 @@ const path = require('path')
 
 const { name } = path.parse(__filename)
 
-const { log, HELPERS } = require('@rm/logger')
+const { log, TAGS } = require('@rm/logger')
 const config = require('@rm/config')
 
 const state = require('../services/state')
@@ -68,7 +68,7 @@ const authHandler = async (_req, username, password, done) => {
               }
             })
             log.info(
-              HELPERS.custom(name),
+              TAGS.custom(name),
               user.username,
               `(${user.id})`,
               'Authenticated successfully.',
@@ -126,7 +126,7 @@ const authHandler = async (_req, username, password, done) => {
             user.perms.scanner.push(x),
           )
           log.info(
-            HELPERS.custom(name),
+            TAGS.custom(name),
             user.username,
             `(${user.id})`,
             'Authenticated successfully.',
@@ -136,7 +136,7 @@ const authHandler = async (_req, username, password, done) => {
         return done(null, false, { message: 'invalid_credentials' })
       })
   } catch (e) {
-    log.error(HELPERS.custom(name), 'User has failed authentication.', e)
+    log.error(TAGS.custom(name), 'User has failed authentication.', e)
   }
 }
 

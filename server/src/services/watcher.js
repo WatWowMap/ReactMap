@@ -3,7 +3,7 @@ const { resolve } = require('path')
 const chokidar = require('chokidar')
 
 const config = require('@rm/config')
-const { log, HELPERS } = require('@rm/logger')
+const { log, TAGS } = require('@rm/logger')
 const { validateJsons } = require('@rm/config/lib/validateJsons')
 const { reloadConfig } = require('./functions/reloadConfig')
 
@@ -23,7 +23,7 @@ const clean = (path) =>
  * @param {string} [domain]
  */
 const handle = async (event, rawFile, domain) => {
-  log.debug(HELPERS.config, `[${event}]`, rawFile)
+  log.debug(TAGS.config, `[${event}]`, rawFile)
 
   switch (rawFile) {
     case 'loginPage':
@@ -33,7 +33,7 @@ const handle = async (event, rawFile, domain) => {
         const domainKey = domain.replaceAll('.', '_')
         const multiDomainsObj = config.getSafe('multiDomainsObj')
         if (multiDomainsObj[domainKey]?.[rawFile]) {
-          log.info(HELPERS.config, `[${event}]`, rawFile, domain)
+          log.info(TAGS.config, `[${event}]`, rawFile, domain)
           multiDomainsObj[domainKey][rawFile] = config.util.extendDeep(
             {},
             multiDomainsObj[domainKey][rawFile],
@@ -41,7 +41,7 @@ const handle = async (event, rawFile, domain) => {
           )
         }
       } else {
-        log.info(HELPERS.config, `[${event}]`, rawFile)
+        log.info(TAGS.config, `[${event}]`, rawFile)
         config.map[rawFile] = config.util.extendDeep(
           {},
           config.map[rawFile],

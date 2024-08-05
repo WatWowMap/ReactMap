@@ -12,7 +12,7 @@ module.exports = (strategy) => {
     .getSafe('authentication.strategies')
     .find((s) => s.name === strategy)
   if (strategyConfig) {
-    const Client = new TelegramClient(strategyConfig, strategy)
+    const Client = new TelegramClient(strategy, strategyConfig)
     Client.initPassport()
 
     return Client

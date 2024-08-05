@@ -4,7 +4,7 @@ const { promisify } = require('util')
 const path = require('path')
 const fs = require('fs')
 
-const { log, HELPERS } = require('@rm/logger')
+const { log, TAGS } = require('@rm/logger')
 
 const execPromise = promisify(exec)
 
@@ -19,7 +19,7 @@ async function getCurrentBranch() {
     return { branch: stdout.trim(), isDocker: false }
   } catch (e) {
     log.info(
-      HELPERS.update,
+      TAGS.update,
       'Unable to determine the local git branch, upgrading your version of git will likely resolve this issue:',
       e.message,
       '\nProceeding normally...',
@@ -39,7 +39,7 @@ async function getCurrentSha() {
     return stdout.trim()
   } catch (e) {
     log.info(
-      HELPERS.update,
+      TAGS.update,
       'Unable to get current SHA:',
       e.message,
       '\nProceeding normally...',
@@ -57,7 +57,7 @@ async function getRemoteSha(branch) {
     return stdout.split('\t')[0]
   } catch (e) {
     log.info(
-      HELPERS.update,
+      TAGS.update,
       'Unable to get remote SHA:',
       e.message,
       '\nBranch:',
@@ -75,7 +75,7 @@ async function checkForUpdates() {
     const remoteSha = await getRemoteSha(branch)
     if (remoteSha !== sha) {
       log.info(
-        HELPERS.update,
+        TAGS.update,
         'There is a new version available: ',
         remoteSha,
         isDocker ? 'docker-compose pull' : 'git pull',
@@ -83,7 +83,7 @@ async function checkForUpdates() {
       )
     }
   } catch (e) {
-    log.warn(HELPERS.update, e)
+    log.warn(TAGS.update, e)
   }
 }
 

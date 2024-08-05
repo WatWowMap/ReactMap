@@ -2,15 +2,15 @@
 /* eslint-disable no-await-in-loop */
 // @ts-check
 const router = require('express').Router()
-const { log, HELPERS } = require('@rm/logger')
+const { log, TAGS } = require('@rm/logger')
 const state = require('../../../services/state')
 
 router.get('/', async (req, res) => {
   try {
     res.status(200).json(await state.db.models.User.query())
-    log.info(HELPERS.api, 'api/v1/users')
+    log.info(TAGS.api, 'api/v1/users')
   } catch (e) {
-    log.error(HELPERS.api, 'api/v1/sessions', e)
+    log.error(TAGS.api, 'api/v1/sessions', e)
     res.status(500).json({ status: 'error', reason: e.message })
   }
 })
@@ -50,9 +50,9 @@ router.get('/export', async (req, res) => {
       backups: backups[id] || [],
     }))
     res.status(200).json(data)
-    log.info(HELPERS.api, 'api/v1/users')
+    log.info(TAGS.api, 'api/v1/users')
   } catch (e) {
-    log.error(HELPERS.api, 'api/v1/users/export', e)
+    log.error(TAGS.api, 'api/v1/users/export', e)
     res.status(500).json({ status: 'error', reason: e.message })
   }
 })
@@ -92,7 +92,7 @@ router.post('/import', async (req, res) => {
       const userEntry = await getUser(user)
 
       log.info(
-        HELPERS.api,
+        TAGS.api,
         'Inserted User',
         userEntry.id,
         userEntry.username || userEntry.discordId || userEntry.telegramId,
@@ -116,9 +116,9 @@ router.post('/import', async (req, res) => {
       }
     }
     res.status(200).json({ status: 'success' })
-    log.info(HELPERS.api, 'api/v1/users/import')
+    log.info(TAGS.api, 'api/v1/users/import')
   } catch (e) {
-    log.error(HELPERS.api, 'api/v1/users/import', e)
+    log.error(TAGS.api, 'api/v1/users/import', e)
     res.status(500).json({ status: 'error', reason: e.message })
   }
 })
@@ -127,9 +127,9 @@ router.get('/:id', async (req, res) => {
   try {
     const user = await state.db.models.User.query().findById(req.params.id)
     res.status(200).json(user || { status: 'error', reason: 'User Not Found' })
-    log.info(HELPERS.api, `api/v1/users/${req.params.id}`)
+    log.info(TAGS.api, `api/v1/users/${req.params.id}`)
   } catch (e) {
-    log.error(HELPERS.api, `api/v1/users/${req.params.id}`, e)
+    log.error(TAGS.api, `api/v1/users/${req.params.id}`, e)
     res.status(500).json({ status: 'error', reason: e.message })
   }
 })
@@ -140,9 +140,9 @@ router.get('/discord/:id', async (req, res) => {
       .where('discordId', req.params.id)
       .first()
     res.status(200).json(user || { status: 'error', reason: 'User Not Found' })
-    log.info(HELPERS.api, `api/v1/users/discord/${req.params.id}`)
+    log.info(TAGS.api, `api/v1/users/discord/${req.params.id}`)
   } catch (e) {
-    log.error(HELPERS.api, `api/v1/users/discord/${req.params.id}`, e)
+    log.error(TAGS.api, `api/v1/users/discord/${req.params.id}`, e)
     res.status(500).json({ status: 'error', reason: e.message })
   }
 })
@@ -153,9 +153,9 @@ router.get('/telegram/:id', async (req, res) => {
       .where('telegramId', req.params.id)
       .first()
     res.status(200).json(user || { status: 'error', reason: 'User Not Found' })
-    log.info(HELPERS.api, `api/v1/users/telegram/${req.params.id}`)
+    log.info(TAGS.api, `api/v1/users/telegram/${req.params.id}`)
   } catch (e) {
-    log.error(HELPERS.api, `api/v1/users/telegram/${req.params.id}`, e)
+    log.error(TAGS.api, `api/v1/users/telegram/${req.params.id}`, e)
     res.status(500).json({ status: 'error', reason: e.message })
   }
 })

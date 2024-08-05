@@ -1,7 +1,7 @@
 // @ts-check
 const path = require('path')
 const config = require('@rm/config')
-const { log, HELPERS } = require('@rm/logger')
+const { log, TAGS } = require('@rm/logger')
 
 /**
  *
@@ -14,7 +14,7 @@ const getConfig = () => {
 
   if (!selectedDb || 'endpoint' in selectedDb) {
     log.error(
-      HELPERS.db,
+      TAGS.db,
       'No database selected for React Map Tables, one schema must contain "user" in its useFor array',
     )
     process.exit(9)

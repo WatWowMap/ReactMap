@@ -2,7 +2,7 @@
 const { Model, raw } = require('objection')
 const config = require('@rm/config')
 
-const { log, HELPERS } = require('@rm/logger')
+const { log, TAGS } = require('@rm/logger')
 const getAreaSql = require('../services/functions/getAreaSql')
 
 class Spawnpoint extends Model {
@@ -42,7 +42,7 @@ class Spawnpoint extends Model {
     if (onlyTth !== 0) {
       if (isMad) {
         log.warn(
-          HELPERS.spawnpoints,
+          TAGS.spawnpoints,
           'this feature is not currently supported for MAD, PRs will be accepted',
         )
       } else if (onlyTth === 1) {

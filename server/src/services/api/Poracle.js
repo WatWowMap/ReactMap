@@ -1,4 +1,4 @@
-const { log, HELPERS } = require('@rm/logger')
+const { log, TAGS } = require('@rm/logger')
 const fetchJson = require('./fetchJson')
 const { setCache, getCache } = require('../cache')
 
@@ -44,7 +44,7 @@ class PoracleAPI {
   constructor(webhook) {
     if (!webhook.name)
       throw new Error('PoracleAPI: name is required', { cause: webhook })
-    log.info(HELPERS.webhooks, `Initializing PoracleAPI for ${webhook.name}`)
+    log.info(TAGS.webhooks, `Initializing PoracleAPI for ${webhook.name}`)
 
     this.name = webhook.name
     this.provider = webhook.provider
@@ -184,7 +184,7 @@ class PoracleAPI {
   initFromCache() {
     const cached = getCache(`${this.name}-webhook.json`)
     if (!cached) {
-      log.warn(HELPERS.webhooks, `${this.name} webhook not found in cache`)
+      log.warn(TAGS.webhooks, `${this.name} webhook not found in cache`)
       return false
     }
     Object.assign(this, cached)
@@ -199,10 +199,10 @@ class PoracleAPI {
       ])
       this.ui = this.generateUi()
       this.lastFetched = Date.now()
-      log.info(HELPERS.webhooks, `${this.name} webhook initialized`)
+      log.info(TAGS.webhooks, `${this.name} webhook initialized`)
       await setCache(`${this.name}-webhook.json`, this)
     } catch (e) {
-      log.error(HELPERS.webhooks, `Error initializing ${this.name} webhook`, e)
+      log.error(TAGS.webhooks, `Error initializing ${this.name} webhook`, e)
     }
   }
 
@@ -258,7 +258,7 @@ class PoracleAPI {
         (x) => !this.areasToSkip.includes(x.properties.name.toLowerCase()),
       )
     } else {
-      log.warn(HELPERS.webhooks, 'No geofences found')
+      log.warn(TAGS.webhooks, 'No geofences found')
     }
   }
 

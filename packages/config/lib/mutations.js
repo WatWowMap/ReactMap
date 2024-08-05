@@ -3,14 +3,14 @@
 const fs = require('fs')
 const { resolve } = require('path')
 
-const { log, HELPERS } = require('@rm/logger')
+const { log, TAGS } = require('@rm/logger')
 
 const { validateJsons } = require('./validateJsons')
 
 /** @param {import('config').IConfig} config */
 const applyMutations = (config) => {
   if (process.env.NODE_CONFIG_ENV) {
-    log.info(HELPERS.config, `Using config for ${process.env.NODE_CONFIG_ENV}`)
+    log.info(TAGS.config, `Using config for ${process.env.NODE_CONFIG_ENV}`)
   }
   const nodeConfigDir = process.env.NODE_CONFIG_DIR || ''
 
@@ -40,13 +40,13 @@ const applyMutations = (config) => {
 
     if (refLength !== defaultLength) {
       log.warn(
-        HELPERS.config,
+        TAGS.config,
         'It looks like you have modified the `default.json` file, you should not do this! Make all of your config changes in your `local.json` file.',
       )
     }
   } catch (e) {
     log.error(
-      HELPERS.config,
+      TAGS.config,
       'Error trying to read either the default.json or .ref file',
       e,
     )
@@ -111,7 +111,7 @@ const applyMutations = (config) => {
       })
     } else {
       log.error(
-        HELPERS.config,
+        TAGS.config,
         'Missing scanner database config! \nCheck to make sure you have SCANNER_DB_HOST,SCANNER_DB_PORT, SCANNER_DB_NAME, SCANNER_DB_USERNAME, and SCANNER_DB_PASSWORD',
       )
     }
@@ -126,7 +126,7 @@ const applyMutations = (config) => {
       })
     } else {
       log.info(
-        HELPERS.config,
+        TAGS.config,
         'Missing ReactMap specific table, attempting to use the manual database instead.',
       )
     }
@@ -141,14 +141,14 @@ const applyMutations = (config) => {
       })
     } else if (!hasReactMapDb) {
       log.error(
-        HELPERS.config,
+        TAGS.config,
         'Neither a ReactMap database or Manual database was found, you will need one of these to proceed.',
       )
     }
   }
   if (fs.existsSync(resolve(nodeConfigDir, `config.json`))) {
     log.info(
-      HELPERS.config,
+      TAGS.config,
       'Config v1 (config.json) found, it is fine to leave it but make sure you are using and updating local.json instead.',
     )
   }
@@ -186,7 +186,7 @@ const applyMutations = (config) => {
       merged.misc.distanceUnit !== 'miles'
     ) {
       log.warn(
-        HELPERS.config,
+        TAGS.config,
         `Invalid distanceUnit: ${merged.misc.distanceUnit}, only 'kilometers' OR 'miles' are allowed.`,
       )
       if (merged.misc.distance === 'km') {
@@ -224,7 +224,7 @@ const applyMutations = (config) => {
 
   if (config.has('multiDomains')) {
     log.warn(
-      HELPERS.config,
+      TAGS.config,
       '`multiDomains` has been deprecated and will be removed in the next major release. Please switch to the new format that makes use of `NODE_CONFIG_ENV`',
     )
     // Create multiDomain Objects
@@ -262,19 +262,8 @@ const applyMutations = (config) => {
   const aliasObj = Object.fromEntries(
     config.authentication.aliases.map((alias) => [alias.name, alias.role]),
   )
-
+  /** @param {string} role */
   const replaceAliases = (role) => aliasObj[role] ?? role
-
-  const getJsDate = (dataObj = {}) =>
-    new Date(
-      dataObj.year,
-      dataObj.month - 1,
-      dataObj.day,
-      dataObj.hour || 0,
-      dataObj.minute || 0,
-      dataObj.second || 0,
-      dataObj.millisecond || 0,
-    )
 
   const replaceBothAliases = (incomingObj) => ({
     ...incomingObj,
@@ -314,14 +303,6 @@ const applyMutations = (config) => {
         : [],
       trialPeriod: {
         ...strategy.trialPeriod,
-        start: {
-          ...strategy?.trialPeriod?.start,
-          js: getJsDate(strategy?.trialPeriod?.start),
-        },
-        end: {
-          ...strategy?.trialPeriod?.end,
-          js: getJsDate(strategy?.trialPeriod?.end),
-        },
         roles: Array.isArray(strategy?.trialPeriod?.roles)
           ? strategy.trialPeriod.roles.map(replaceAliases)
           : [],
@@ -361,7 +342,7 @@ const applyMutations = (config) => {
         )
       )
     log.warn(
-      HELPERS.config,
+      TAGS.config,
       'No authentication strategies enabled, adding the following perms to alwaysEnabledPerms array:\n',
       enabled,
     )

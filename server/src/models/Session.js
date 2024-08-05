@@ -1,7 +1,7 @@
 // @ts-check
 const { Model } = require('objection')
 const config = require('@rm/config')
-const { log, HELPERS } = require('@rm/logger')
+const { log, TAGS } = require('@rm/logger')
 
 class Session extends Model {
   static get tableName() {
@@ -10,16 +10,26 @@ class Session extends Model {
 
   static async clear() {
     const results = await this.query().delete()
-    log.info(HELPERS.session, 'Clear Result:', results)
+    log.info(TAGS.session, 'Clear Result:', results)
     return results
   }
 
-  static async clearNonDonor() {
-    const results = await this.query()
+  /** @param {string} strategy */
+  static async clearNonDonor(strategy) {
+    const result = await this.query()
       .whereRaw(`json_extract(data, '$.passport.user.perms.donor') = false`)
+      .andWhereRaw(
+        `json_extract(data, '$.passport.user.rmStrategy') = '${strategy}'`,
+      )
       .delete()
-    log.info(HELPERS.session, 'Clear Result:', results)
-    return results
+    log.info(
+      TAGS.session,
+      'Cleared',
+      result,
+      'non-donor sessions for',
+      strategy,
+    )
+    return result
   }
 
   /**
@@ -36,7 +46,7 @@ class Session extends Model {
         .andWhere('expires', '>=', ts)
       return results.length <= config.getSafe('api.maxSessions')
     } catch (e) {
-      log.error(HELPERS.session, 'Unable to validate session', e)
+      log.error(TAGS.session, 'Unable to validate session', e)
       return false
     }
   }
@@ -53,10 +63,10 @@ class Session extends Model {
         .whereRaw(`json_extract(data, '$.passport.user.id') = ${userId}`)
         .andWhere('session_id', '!=', currentSessionId || '')
         .delete()
-      log.info(HELPERS.session, 'Clear Result:', results)
+      log.info(TAGS.session, 'Clear Result:', results)
       return results
     } catch (e) {
-      log.error(HELPERS.session, 'Unable to clear other sessions', e)
+      log.error(TAGS.session, 'Unable to clear other sessions', e)
     }
     return 0
   }
@@ -76,14 +86,14 @@ class Session extends Model {
         .orWhereRaw(`json_extract(data, '$.passport.user.id') = '${discordId}'`)
         .delete()
       log.info(
-        HELPERS.session,
-        botName ? HELPERS.custom(botName) : '',
+        TAGS.session,
+        botName ? TAGS.custom(botName) : '',
         'Clear Result:',
         results,
       )
       return results
     } catch (e) {
-      log.error(HELPERS.session, 'Unable to clear Discord sessions', e)
+      log.error(TAGS.session, 'Unable to clear Discord sessions', e)
     }
     return 0
   }

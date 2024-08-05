@@ -10,7 +10,7 @@ export type SpecificValueType<T, U, V> = {
     : k
 }[keyof T]
 
-/*
+/**
  * OnlyType<T, U, V> - returns a type with only the keys of T that have a value of U
  */
 export type OnlyType<T, U, V = true> = {

@@ -2,7 +2,7 @@
 const fs = require('fs')
 const { resolve } = require('path')
 
-const { log, HELPERS } = require('@rm/logger')
+const { log, TAGS } = require('@rm/logger')
 
 /**
  *
@@ -23,7 +23,7 @@ function validateJsons(fileName, domain = process.env.NODE_CONFIG_ENV || '') {
     : {}
   if (Object.keys(generalJson).length && !domain) {
     log.info(
-      HELPERS.config,
+      TAGS.config,
       `${fileName}.json found, overwriting your config.map.${fileName} with the found data.`,
     )
   }
@@ -40,7 +40,7 @@ function validateJsons(fileName, domain = process.env.NODE_CONFIG_ENV || '') {
       ) || {}
     if (Object.keys(domainJson).length) {
       log.info(
-        HELPERS.config,
+        TAGS.config,
         `${fileName}/${domain}.json found, overwriting your config.map.${fileName} for ${domain} with the found data.`,
       )
     }

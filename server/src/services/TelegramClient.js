@@ -4,38 +4,20 @@ const { TelegramStrategy } = require('@rainb0w-clwn/passport-telegram-official')
 const passport = require('passport')
 
 const config = require('@rm/config')
-const { log, HELPERS } = require('@rm/logger')
+const { log, TAGS } = require('@rm/logger')
 
 const state = require('./state')
 const areaPerms = require('./functions/areaPerms')
 const webhookPerms = require('./functions/webhookPerms')
 const scannerPerms = require('./functions/scannerPerms')
 const mergePerms = require('./functions/mergePerms')
+const AuthClient = require('./AuthClient')
 
 /**
  * @typedef {import('@rainb0w-clwn/passport-telegram-official/dist/types').PassportTelegramUser} TGUser
  */
-class TelegramClient {
-  /**
-   *
-   * @param {import("@rm/types").Config['authentication']['strategies'][number]} strategy
-   * @param {string} rmStrategy
-   */
-  constructor(strategy, rmStrategy) {
-    this.strategy = strategy
-    this.rmStrategy = rmStrategy
-    this.perms = config.getSafe('authentication.perms')
-    this.alwaysEnabledPerms = config.getSafe(
-      'authentication.alwaysEnabledPerms',
-    )
-    this.loggingChannels = {
-      main: strategy.logGroupId,
-      event: strategy.eventLogGroupId,
-      scanNext: strategy.scanNextLogGroupId,
-      scanZone: strategy.scanZoneLogGroupId,
-    }
-  }
 
+class TelegramClient extends AuthClient {
   /** @param {TGUser} user */
   async getUserGroups(user) {
     if (!user || !user.id) return []
@@ -66,7 +48,7 @@ class TelegramClient {
           }
         } catch (e) {
           log.error(
-            HELPERS.custom(this.rmStrategy, '#26A8EA'),
+            TAGS.custom(this.rmStrategy, '#26A8EA'),
             e,
             `Telegram Group: ${group}`,
             `User: ${user.id} (${user.username})`,
@@ -85,7 +67,7 @@ class TelegramClient {
    * @returns {TGUser & { perms: import("@rm/types").Permissions }}
    */
   getUserPerms(user, groups) {
-    const trialActive = state.event.getTrialStatus(this.rmStrategy)
+    const trialActive = this.trialManager.active()
     /** @type { TGUser & { perms: import("@rm/types").Permissions }} */
     const newUserObj = {
       ...user,
@@ -124,7 +106,7 @@ class TelegramClient {
 
     if (!user.perms.map) {
       log.warn(
-        HELPERS.custom(this.rmStrategy, '#26A8EA'),
+        TAGS.custom(this.rmStrategy, '#26A8EA'),
         user.username,
         'was not given map perms',
       )
@@ -151,7 +133,7 @@ class TelegramClient {
                 .whereNot('id', req.user.id)
                 .delete()
               log.info(
-                HELPERS.custom(this.rmStrategy, '#26A8EA'),
+                TAGS.custom(this.rmStrategy, '#26A8EA'),
                 user.username,
                 `(${user.id})`,
                 'Authenticated successfully.',
@@ -186,7 +168,7 @@ class TelegramClient {
               userExists.selectedWebhook = selectedWebhook
             }
             log.info(
-              HELPERS.custom(this.rmStrategy, '#26A8EA'),
+              TAGS.custom(this.rmStrategy, '#26A8EA'),
               user.username,
               `(${user.id})`,
               'Authenticated successfully.',
@@ -200,7 +182,7 @@ class TelegramClient {
         )
     } catch (e) {
       log.error(
-        HELPERS.custom(this.rmStrategy, '#26A8EA'),
+        TAGS.custom(this.rmStrategy, '#26A8EA'),
         'User has failed auth.',
         e,
       )
@@ -208,12 +190,14 @@ class TelegramClient {
   }
 
   /**
+   * Send a message to a Telegram Group
    *
-   * @param {string} text
-   * @param {keyof TelegramClient['loggingChannels']} channel
+   * @param {import('./AuthClient').MessageEmbed} embed
+   * @param {keyof AuthClient['loggingChannels']} channel
    */
-  async sendMessage(text, channel = 'main') {
+  async sendMessage(embed, channel) {
     if (!this.loggingChannels[channel]) return
+    const text = AuthClient.getHtml(embed)
     try {
       const response = await fetch(
         `https://api.telegram.org/bot${this.strategy.botToken}/sendMessage`,
@@ -233,13 +217,10 @@ class TelegramClient {
           `Telegram API error: ${response.status} ${response.statusText}`,
         )
       }
-      log.info(
-        HELPERS.custom(this.rmStrategy, '#26A8EA'),
-        `${channel} Log Sent`,
-      )
+      log.info(TAGS.custom(this.rmStrategy, '#26A8EA'), `${channel} Log Sent`)
     } catch (e) {
       log.error(
-        HELPERS.custom(this.rmStrategy, '#26A8EA'),
+        TAGS.custom(this.rmStrategy, '#26A8EA'),
         `Error sending ${channel} Log`,
         e,
       )

@@ -2,21 +2,14 @@
 const { default: fetch } = require('node-fetch')
 
 const config = require('@rm/config')
-const { log, HELPERS } = require('@rm/logger')
+const { log, TAGS } = require('@rm/logger')
 
 const state = require('../state')
-const TelegramClient = require('../TelegramClient')
-const DiscordClient = require('../DiscordClient')
 
 const scannerQueue = {
   scanNext: {},
   scanZone: {},
 }
-
-const dateFormat = new Intl.DateTimeFormat(undefined, {
-  dateStyle: 'short',
-  timeStyle: 'medium',
-})
 
 /**
  *
@@ -116,7 +109,7 @@ async function scannerApi(
           requests: cache.requests + 1,
         })
         log.info(
-          HELPERS.scanner,
+          TAGS.scanner,
           `Request to scan new location by ${user.username}${
             user.id ? ` (${user.id})` : ''
           } - type ${data.scanSize}: ${data.scanLocation[0].toFixed(
@@ -180,7 +173,7 @@ async function scannerApi(
           requests: cache.requests + 1,
         })
         log.info(
-          HELPERS.scanner,
+          TAGS.scanner,
           `Request to scan new zone by ${user.username}${
             user.id ? ` (${user.id})` : ''
           } - size ${data.scanSize}: ${data.scanLocation[0].toFixed(
@@ -230,14 +223,14 @@ async function scannerApi(
           Date.now() - backendConfig.queueRefreshInterval * 1000
         ) {
           log.info(
-            HELPERS.scanner,
+            TAGS.scanner,
             `Returning queue from memory for method ${data.typeName}: ${
               scannerQueue[data.typeName].queue
             }`,
           )
           return { status: 'ok', message: scannerQueue[data.typeName].queue }
         }
-        log.info(HELPERS.scanner, `Getting queue for method ${data.typeName}`)
+        log.info(TAGS.scanner, `Getting queue for method ${data.typeName}`)
         switch (backendConfig.platform) {
           case 'dragonite':
           case 'custom':
@@ -259,7 +252,7 @@ async function scannerApi(
         }
         break
       default:
-        log.warn(HELPERS.scanner, 'Api call without category')
+        log.warn(TAGS.scanner, 'Api call without category')
         break
     }
 
@@ -296,7 +289,7 @@ async function scannerApi(
       ) {
         const { queue } = await scannerResponse.json()
         log.info(
-          HELPERS.scanner,
+          TAGS.scanner,
           `Returning received queue for method ${data.typeName}: ${queue}`,
         )
         scannerQueue[data.typeName] = {
@@ -307,7 +300,7 @@ async function scannerApi(
       }
       const { data: queueData } = await scannerResponse.json()
       log.info(
-        HELPERS.scanner,
+        TAGS.scanner,
         `Returning received queue for method ${data.typeName}: ${queueData.size}`,
       )
       scannerQueue[data.typeName] = {
@@ -331,84 +324,60 @@ async function scannerApi(
             : c,
         )
         .join('\n')
-      if (
-        state.event.authClients[user.rmStrategy] instanceof TelegramClient &&
-        backendConfig.sendTelegramMessage
-      ) {
-        await state.event.chatLog(
-          `<b>${capitalized} Request</b>\nSize: ${
-            data.scanSize
-          }\nCoordinates: ${coords.length}\nCenter: ${data.scanLocation
-            ?.map((c) => c.toFixed(5))
-            .join(', ')}\n\n<b>User History</b>\nUsername: ${
-            user.username || user.telegramId
-          }\nTotal Requests: ${
-            updatedCache?.requests || 0
-          }\nTotal Coordinates: ${
-            updatedCache?.coordinates || 0
-          }\n\n${dateFormat.format(Date.now())}`,
-          user.rmStrategy,
-          category === 'getQueue' ? 'main' : category,
-        )
-      } else if (
-        state.event.authClients[user.rmStrategy] instanceof DiscordClient &&
-        backendConfig.sendDiscordMessage
-      ) {
-        await state.event.chatLog(
-          {
-            title: `${capitalized} Request`,
-            author: {
-              name: user.username,
-              icon_url: `https://cdn.discordapp.com/avatars/${user.discordId}/${user.avatar}.png`,
-            },
-            thumbnail: {
-              url:
-                config
-                  .getSafe('authentication.strategies')
-                  .find((strategy) => strategy.name === user.rmStrategy)
-                  ?.thumbnailUrl ??
-                `https://user-images.githubusercontent.com/58572875/167069223-745a139d-f485-45e3-a25c-93ec4d09779c.png`,
-            },
-            description: `<@${user.discordId}>\n${capitalized} Size: ${data.scanSize}\nCoordinates: ${coords.length}\n`,
-            fields: [
-              {
-                name: `User History`,
-                value: `Total Requests: ${
-                  updatedCache?.requests || 0
-                }\nTotal Coordinates: ${updatedCache?.coordinates || 0}`,
-                inline: true,
-              },
-              {
-                name: 'Instance',
-                value: `${
-                  backendConfig.platform === 'mad'
-                    ? `Device: ${scanModes.scanNext.scanNextDevice}`
-                    : ''
-                }\nName: ${
-                  scanModes[category]?.[`${category}Instance`] || '-'
-                }\nQueue: ${scannerQueue[category]?.queue || 0}`,
-                inline: true,
-              },
-              {
-                name: `Coordinates (${coords.length})`,
-                value:
-                  coords.length > 25
-                    ? `${trimmed}\n...${coords.length - 25} more`
-                    : trimmed,
-              },
-            ],
+      await state.event.chatLog(
+        category === 'getQueue' ? 'main' : category,
+        {
+          title: `${capitalized} Request`,
+          author: {
+            name: user.username,
+            icon_url: `https://cdn.discordapp.com/avatars/${user.discordId}/${user.avatar}.png`,
           },
-          user.rmStrategy,
-          category === 'getQueue' ? 'main' : category,
-        )
-      }
+          thumbnail: {
+            url:
+              config
+                .getSafe('authentication.strategies')
+                .find((strategy) => strategy.name === user.rmStrategy)
+                ?.thumbnailUrl ??
+              `https://user-images.githubusercontent.com/58572875/167069223-745a139d-f485-45e3-a25c-93ec4d09779c.png`,
+          },
+          description: `<@${user.discordId}>\n${capitalized} Size: ${data.scanSize}\nCoordinates: ${coords.length}\n`,
+          fields: [
+            {
+              name: `User History`,
+              value: `Total Requests: ${
+                updatedCache?.requests || 0
+              }\nTotal Coordinates: ${updatedCache?.coordinates || 0}`,
+              inline: true,
+            },
+            {
+              name: 'Instance',
+              value: `${
+                backendConfig.platform === 'mad'
+                  ? `Device: ${scanModes.scanNext.scanNextDevice}`
+                  : ''
+              }\nName: ${
+                scanModes[category]?.[`${category}Instance`] || '-'
+              }\nQueue: ${scannerQueue[category]?.queue || 0}`,
+              inline: true,
+            },
+            {
+              name: `Coordinates (${coords.length})`,
+              value:
+                coords.length > 25
+                  ? `${trimmed}\n...${coords.length - 25} more`
+                  : trimmed,
+            },
+          ],
+        },
+        user.rmStrategy,
+      )
     }
 
     switch (scannerResponse.status) {
       case 200:
       case 201:
         log.info(
-          HELPERS.scanner,
+          TAGS.scanner,
           `Request from ${user.username || 'a visitor'}${
             user.id ? ` (${user.id})` : ''
           } successful`,
@@ -416,13 +385,13 @@ async function scannerApi(
         return { status: 'ok', message: 'scanner_ok' }
       case 401:
         log.info(
-          HELPERS.scanner,
+          TAGS.scanner,
           'Wrong credentials - check your scanner API settings in config',
         )
         return { status: 'error', message: 'scanner_wrong_credentials' }
       case 404:
         log.info(
-          HELPERS.scanner,
+          TAGS.scanner,
           `Error: instance ${
             scanModes[category]?.[`${category}Instance`]
           } does not exist`,
@@ -430,7 +399,7 @@ async function scannerApi(
         return { status: 'error', message: 'scanner_no_instance' }
       case 416:
         log.info(
-          HELPERS.scanner,
+          TAGS.scanner,
           `Error: instance ${
             scanModes[category]?.[`${category}Instance`]
           } has no device assigned`,
@@ -438,7 +407,7 @@ async function scannerApi(
         return { status: 'error', message: 'scanner_no_device_assigned' }
       case 500:
         log.info(
-          HELPERS.scanner,
+          TAGS.scanner,
           `Error: device ${
             scanModes[category]?.[`${category}Device`]
           } does not exist`,
@@ -450,7 +419,7 @@ async function scannerApi(
   } catch (e) {
     if (e instanceof Error) {
       log.error(
-        HELPERS.scanner,
+        TAGS.scanner,
         'There was a problem processing that scanner request',
         e,
       )

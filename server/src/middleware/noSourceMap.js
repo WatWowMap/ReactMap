@@ -1,11 +1,11 @@
 // @ts-check
-const { log, HELPERS } = require('@rm/logger')
+const { log, TAGS } = require('@rm/logger')
 
 /** @type {import('@rm/types').ExpressMiddleware} */
 function noSourceMapMiddleware(req, res, next) {
   if (req.url.endsWith('.map')) {
     log.warn(
-      HELPERS.express,
+      TAGS.express,
       req.url,
       'Forbidden: Source map requested from',
       req.user?.username,

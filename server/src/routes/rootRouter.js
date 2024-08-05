@@ -4,7 +4,7 @@ const { join } = require('path')
 const { SourceMapConsumer } = require('source-map')
 
 const config = require('@rm/config')
-const { log, HELPERS } = require('@rm/logger')
+const { log, TAGS } = require('@rm/logger')
 
 const { authRouter } = require('./authRouter')
 const clientRouter = require('./clientRouter')
@@ -45,7 +45,7 @@ rootRouter.post('/api/error/client', async (req, res) => {
               const match = stackLine.match(
                 /at (.+) \((\/.+\.js):(\d+):(\d+)\)/,
               )
-              log.debug(HELPERS.client, { match, stackLine })
+              log.debug(TAGS.client, { match, stackLine })
               if (match) {
                 const [full, functionName, file, line, column] = match
                 const foundStack = await SourceMapConsumer.with(
@@ -69,7 +69,7 @@ rootRouter.post('/api/error/client', async (req, res) => {
                 if (foundStack) {
                   return foundStack
                 }
-                log.warn(HELPERS.client, 'Unable to find source map', {
+                log.warn(TAGS.client, 'Unable to find source map', {
                   full,
                   functionName,
                   file,
@@ -78,18 +78,14 @@ rootRouter.post('/api/error/client', async (req, res) => {
                 })
               }
               if (i > 0) {
-                log.warn(
-                  HELPERS.client,
-                  'Regex missed for stack line:',
-                  stackLine,
-                )
+                log.warn(TAGS.client, 'Regex missed for stack line:', stackLine)
               }
               return stackLine
             }),
           ).then((lines) => lines.join('\n'))
         : cause || message
 
-    log.error(HELPERS.client, {
+    log.error(TAGS.client, {
       client_version: req.headers.version,
       server_version: version,
       username,
@@ -119,7 +115,7 @@ rootRouter.get('/area/:area/:zoom?', (req, res) => {
       return res.redirect('/404')
     }
   } catch (e) {
-    log.error(HELPERS.express, `Error navigating to ${area}`, e)
+    log.error(TAGS.express, `Error navigating to ${area}`, e)
     res.redirect('/404')
   }
 })
@@ -157,7 +153,7 @@ rootRouter.get('/api/settings', async (req, res, next) => {
           req.session.perms[perm] = true
         } else {
           log.warn(
-            HELPERS.auth,
+            TAGS.auth,
             'Invalid Perm in "alwaysEnabledPerms" array:',
             perm,
           )
@@ -184,12 +180,7 @@ rootRouter.get('/api/settings', async (req, res, next) => {
           }
         }
       } catch (e) {
-        log.warn(
-          HELPERS.session,
-          'Issue finding user, User ID:',
-          req?.user?.id,
-          e,
-        )
+        log.warn(TAGS.session, 'Issue finding user, User ID:', req?.user?.id, e)
       }
     }
     const settings = getServerSettings(req)

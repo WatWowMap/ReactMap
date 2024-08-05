@@ -16,6 +16,7 @@ import {
   Paths,
   ObjectPathValue,
 } from './utility'
+import { Strategy } from './general'
 
 type BaseConfig = typeof config
 type ExampleConfig = typeof example
@@ -54,6 +55,7 @@ export type Config<Client extends boolean = false> = DeepMerge<
       aliases: { role: string; name: string }[]
       methods: string[]
       strategies: {
+        type: Strategy
         trialPeriod: {
           start: TrialPeriodDate
           end: TrialPeriodDate
@@ -148,10 +150,9 @@ export interface Icons extends Omit<BaseConfig['icons'], 'styles'> {
   defaultIcons: Record<string, string>
 }
 
-type BaseTrial =
-  BaseConfig['authentication']['strategies'][number]['trialPeriod']['start']
+export type StrategyConfig = Config['authentication']['strategies'][number]
 
-export interface TrialPeriodDate extends BaseTrial {
+export interface TrialPeriodDate {
   year?: number
   month?: number
   day?: number
@@ -159,7 +160,6 @@ export interface TrialPeriodDate extends BaseTrial {
   minute?: number
   second?: number
   millisecond?: number
-  js?: Date
 }
 
 export interface ExtraField {

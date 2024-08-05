@@ -4,7 +4,7 @@ const fs = require('fs')
 const path = require('path')
 
 const config = require('@rm/config')
-const { log, HELPERS } = require('@rm/logger')
+const { log, TAGS } = require('@rm/logger')
 
 const DbCheck = require('./DbCheck')
 const EventManager = require('./EventManager')
@@ -22,22 +22,25 @@ const serverState = {
   ),
   startTimers() {
     this.event.startIntervals(this.db, this.pvp)
-    this.event.loadTrial(this.db)
   },
   setAuthClients() {
-    log.info(HELPERS.auth, 'setting authentication clients')
+    log.info(TAGS.auth, 'setting authentication clients')
     this.event.authClients = Object.fromEntries(
       config
         .getSafe('authentication.strategies')
         .filter(({ name, enabled }) => {
           log.info(
-            HELPERS.auth,
+            TAGS.auth,
             `Strategy ${name} ${enabled ? '' : 'was not '}initialized`,
           )
           return !!enabled
         })
         .map(({ name, type }, i) => {
           try {
+            if (this.event.authClients[name]) {
+              // Clear any existing trials before we reinitialize
+              this.event.authClients[name].trialManager.end()
+            }
             const buildStrategy = fs.existsSync(
               path.resolve(__dirname, `../strategies/${name}.js`),
             )
@@ -50,11 +53,28 @@ const serverState = {
                 : buildStrategy,
             ]
           } catch (e) {
-            log.error(HELPERS.auth, e)
+            log.error(TAGS.auth, e)
             return [name, null]
           }
         }),
     )
+  },
+  /**
+   * @param {boolean} active
+   * @param {string} [strategy]
+   */
+  setTrials(active, strategy) {
+    if (strategy) {
+      if (strategy in this.event.authClients) {
+        this.event.authClients[strategy].trialManager.setActive(active)
+      } else {
+        throw new Error(`Strategy ${strategy} not found`)
+      }
+    } else {
+      Object.values(this.event.authClients).forEach((client) => {
+        client.trialManager.setActive(active)
+      })
+    }
   },
   /** @param {import('@rm/types').StateReportObj} [reloadReport] */
   async loadLocalContexts(reloadReport) {
@@ -109,7 +129,6 @@ const serverState = {
     }
     if (reloadReport.strategies) {
       this.setAuthClients()
-      this.event.loadTrial(this.db)
     }
     if (reloadReport.events) {
       this.event.startIntervals(this.db, this.pvp)
@@ -119,9 +138,9 @@ const serverState = {
   /** @param {NodeJS.Signals} [e] */
   async writeCache(e) {
     if (e) {
-      log.info(HELPERS.ReactMap, 'received signal', e, 'writing cache...')
+      log.info(TAGS.ReactMap, 'received signal', e, 'writing cache...')
     } else {
-      log.info(HELPERS.ReactMap, 'writing cache...')
+      log.info(TAGS.ReactMap, 'writing cache...')
     }
 
     const cacheObj = {}
@@ -145,9 +164,9 @@ const serverState = {
       setCache('uicons.json', this.event.uicons),
     ])
     if (e) {
-      log.info(HELPERS.ReactMap, 'exiting...')
+      log.info(TAGS.ReactMap, 'exiting...')
     } else {
-      log.info(HELPERS.ReactMap, 'cache written')
+      log.info(TAGS.ReactMap, 'cache written')
     }
   },
 }
@@ -173,7 +192,7 @@ process.on('SIGUSR2', async (e) => {
   process.exit(0)
 })
 process.on('uncaughtException', async (e) => {
-  log.error(HELPERS.ReactMap, e)
+  log.error(TAGS.ReactMap, e)
   await serverState.writeCache('SIGBREAK')
   process.exit(99)
 })

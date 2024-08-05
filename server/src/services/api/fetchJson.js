@@ -5,7 +5,7 @@ const { resolve } = require('path')
 const { default: fetch, Response } = require('node-fetch')
 
 const config = require('@rm/config')
-const { log, HELPERS } = require('@rm/logger')
+const { log, TAGS } = require('@rm/logger')
 
 /**
  * fetch wrapper with timeout and error handling
@@ -21,7 +21,7 @@ async function fetchJson(url, options = undefined) {
   }, config.getSafe('api.fetchTimeoutMs'))
 
   try {
-    log.debug(HELPERS.fetch, url, options || '')
+    log.debug(TAGS.fetch, url, options || '')
     const response = await fetch(url, { ...options, signal: controller.signal })
     if (!response.ok) {
       throw new Error(`${response.status} (${response.statusText})`, {
@@ -37,7 +37,7 @@ async function fetchJson(url, options = undefined) {
         url.includes('/api/pokemon/id')
       )
         return e.cause
-      log.error(HELPERS.fetch, `Unable to fetch ${url}`, '\n', e)
+      log.error(TAGS.fetch, `Unable to fetch ${url}`, '\n', e)
       if (options) {
         fs.writeFileSync(
           resolve(

@@ -3,7 +3,7 @@ const router = require('express').Router()
 const passport = require('passport')
 
 const config = require('@rm/config')
-const { log, HELPERS } = require('@rm/logger')
+const { log, TAGS } = require('@rm/logger')
 
 const state = require('../services/state')
 
@@ -50,7 +50,7 @@ const loadAuthStrategies = () => {
                   const { id } = user
                   if (!(await state.db.models.Session.isValidSession(id))) {
                     log.info(
-                      HELPERS.auth,
+                      TAGS.auth,
                       'Detected multiple sessions, clearing old ones...',
                     )
                     await state.db.models.Session.clearOtherSessions(
@@ -61,7 +61,7 @@ const loadAuthStrategies = () => {
                   return res.redirect('/')
                 })
               } catch (error) {
-                log.error(HELPERS.auth, error)
+                log.error(TAGS.auth, error)
                 res.redirect('/')
                 next(error)
               }
@@ -70,7 +70,7 @@ const loadAuthStrategies = () => {
         )(req, res, next),
       )
       log.info(
-        HELPERS.auth,
+        TAGS.auth,
         `${method.toUpperCase()} /auth/${name}/callback route initialized`,
       )
     }
@@ -78,13 +78,13 @@ const loadAuthStrategies = () => {
 
   router.get('/logout', (req, res) => {
     req.logout((err) => {
-      if (err) log.error(HELPERS.auth, 'Unable to logout', err)
+      if (err) log.error(TAGS.auth, 'Unable to logout', err)
     })
     // req.session.destroy()
     res.redirect('/')
   })
 
-  log.debug(HELPERS.auth, 'Auth Router Stack Size:', router.stack.length)
+  log.debug(TAGS.auth, 'Auth Router Stack Size:', router.stack.length)
 }
 
 loadAuthStrategies()

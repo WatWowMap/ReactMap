@@ -1,5 +1,5 @@
 // @ts-check
-const { log, HELPERS } = require('@rm/logger')
+const { log, TAGS } = require('@rm/logger')
 
 const BaseFilter = require('../Base')
 const state = require('../../state')
@@ -83,7 +83,7 @@ function buildPokestops(perms, defaults) {
         !Number.isInteger(+avail.charAt(0))
       ) {
         log.warn(
-          HELPERS.available,
+          TAGS.available,
           `Unknown quest type: ${avail} probably should open a PR or issue`,
         )
         quests[avail] = new BaseFilter(true)
