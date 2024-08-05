@@ -10,9 +10,31 @@ class Timer extends Logger {
   constructor(dateObj, intervalHours, ...tags) {
     super(...(tags.length ? tags : ['timer']))
 
+    /** @type {number} */
+    this._intervalHours = intervalHours || 0
+    /** @type {Date} */
     this._date = this.#getJsDate(dateObj)
-    this.intervalHours = intervalHours
+    /** @type {NodeJS.Timeout | null} */
     this._timer = null
+
+    this.generator = this.dateGenerator()
+
+    if (this._date.getTime() < Date.now() && this._intervalHours > 0) {
+      this.log.warn(
+        'date is in the past (',
+        this._date,
+        ') and interval hours are greater than 0, the date will fast forward to the next valid time!',
+      )
+      while (this._date.getTime() < Date.now()) {
+        const nextDate = this.generator.next().value
+        if (!nextDate) {
+          this.log.error('could not find the next valid date')
+          break
+        }
+        this._date = nextDate
+        this.log.debug('fast forwarded to', this._date)
+      }
+    }
   }
 
   /**
@@ -53,6 +75,14 @@ class Timer extends Logger {
     return this._timer !== null && this.ms > 0
   }
 
+  *dateGenerator() {
+    while (true) {
+      yield new Date(
+        this._date.getTime() + this._intervalHours * 60 * 60 * 1000,
+      )
+    }
+  }
+
   /**
    * Set when the timer should start
    * @param {Date | import("@rm/types").TrialPeriodDate} newDate
@@ -74,10 +104,12 @@ class Timer extends Logger {
     this.clear()
     this.log.info('activating at', this._date)
     this._timer = setTimeout(() => {
-      if (this.intervalHours) {
-        this._date = new Date(
-          this._date.getTime() + this.intervalHours * 3600000,
-        )
+      if (this._intervalHours) {
+        const nextDate = this.generator.next().value
+        if (nextDate instanceof Date) {
+          this._date = nextDate
+          this.log.info('setting the next interval for', this._date)
+        }
         this.activate(cb)
       }
       return cb()
