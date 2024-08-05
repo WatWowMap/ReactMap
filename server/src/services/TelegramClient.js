@@ -4,7 +4,6 @@ const { TelegramStrategy } = require('@rainb0w-clwn/passport-telegram-official')
 const passport = require('passport')
 
 const config = require('@rm/config')
-const { log, TAGS } = require('@rm/logger')
 
 const state = require('./state')
 const areaPerms = require('./functions/areaPerms')
@@ -47,8 +46,7 @@ class TelegramClient extends AuthClient {
             groups.push(group)
           }
         } catch (e) {
-          log.error(
-            TAGS.custom(this.rmStrategy, '#26A8EA'),
+          this.log.error(
             e,
             `Telegram Group: ${group}`,
             `User: ${user.id} (${user.username})`,
@@ -105,11 +103,7 @@ class TelegramClient extends AuthClient {
     const user = this.getUserPerms(baseUser, groups)
 
     if (!user.perms.map) {
-      log.warn(
-        TAGS.custom(this.rmStrategy, '#26A8EA'),
-        user.username,
-        'was not given map perms',
-      )
+      this.log.warn(user.username, 'was not given map perms')
       return done(null, false, { message: 'access_denied' })
     }
     try {
@@ -132,8 +126,7 @@ class TelegramClient extends AuthClient {
                 .where('telegramId', user.id)
                 .whereNot('id', req.user.id)
                 .delete()
-              log.info(
-                TAGS.custom(this.rmStrategy, '#26A8EA'),
+              this.log.info(
                 user.username,
                 `(${user.id})`,
                 'Authenticated successfully.',
@@ -167,8 +160,7 @@ class TelegramClient extends AuthClient {
                 .where('id', userExists.id)
               userExists.selectedWebhook = selectedWebhook
             }
-            log.info(
-              TAGS.custom(this.rmStrategy, '#26A8EA'),
+            this.log.info(
               user.username,
               `(${user.id})`,
               'Authenticated successfully.',
@@ -181,11 +173,7 @@ class TelegramClient extends AuthClient {
           },
         )
     } catch (e) {
-      log.error(
-        TAGS.custom(this.rmStrategy, '#26A8EA'),
-        'User has failed auth.',
-        e,
-      )
+      this.log.error('User has failed auth.', e)
     }
   }
 
@@ -217,13 +205,9 @@ class TelegramClient extends AuthClient {
           `Telegram API error: ${response.status} ${response.statusText}`,
         )
       }
-      log.info(TAGS.custom(this.rmStrategy, '#26A8EA'), `${channel} Log Sent`)
+      this.log.info(`${channel} Log Sent`)
     } catch (e) {
-      log.error(
-        TAGS.custom(this.rmStrategy, '#26A8EA'),
-        `Error sending ${channel} Log`,
-        e,
-      )
+      this.log.error(`Error sending ${channel} Log`, e)
     }
   }
 
