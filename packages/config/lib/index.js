@@ -39,7 +39,7 @@ function purge() {
 const config = require('config')
 
 config.getSafe = function getSafe(key) {
-  return this.get(key)
+  return require('config').get(key)
 }
 
 setGlobalLogLevel(config.getSafe('devOptions.logLevel'))

@@ -1,5 +1,5 @@
 // @ts-check
-const { Logger } = require('@rm/logger')
+const { Logger, log } = require('@rm/logger')
 
 const { Timer } = require('./Timer')
 const state = require('./state')
@@ -12,39 +12,80 @@ class Trial extends Logger {
     this._name = strategy.name
     this._type = strategy.type
     this._trial = strategy.trialPeriod
+
+    this._forceActive = false
+
+    let startDate = Trial.getJsDate(this._trial.start)
+    let endDate = Trial.getJsDate(this._trial.end)
+
+    if (this._trial.intervalHours > 0) {
+      if (startDate.getTime() < Date.now()) {
+        this.log.warn(
+          'start date is in the past (',
+          startDate,
+          ') and interval hours are greater than 0, the start and dates will fast forward to the next valid time!',
+        )
+      }
+      const diff = endDate.getTime() - startDate.getTime()
+      while (startDate.getTime() < Date.now()) {
+        startDate = new Date(
+          startDate.getTime() + this._trial.intervalHours * 60 * 60 * 1000,
+        )
+        endDate = new Date(startDate.getTime() + diff)
+        this.log.debug('new start:', startDate, 'new end:', endDate)
+      }
+    }
+
     this._startTimer = new Timer(
-      this._trial.start,
+      startDate,
       this._trial.intervalHours,
-      strategy.type,
-      strategy.name,
+      this._type,
+      this._name,
       'trial',
       'start',
     )
     this._endTimer = new Timer(
-      this._trial.end,
+      endDate,
       this._trial.intervalHours,
-      strategy.type,
-      strategy.name,
+      this._type,
+      this._name,
       'trial',
       'end',
     )
 
-    this._forceActive = false
+    if (this._startTimer._date > this._endTimer._date) {
+      this.log.warn(
+        'start date is greater than end date, the trial will not behave as expected',
+      )
+    }
 
     if (strategy.enabled) this.start()
   }
 
   /**
-   * Update the trial period dates
+   * Get a JavaScript Date object from a @see TrialPeriodDate object
+   *
    * @param {import("@rm/types").TrialPeriodDate} dateObj
-   * @param {boolean} start
+   * @returns {Date}
    */
-  #update(dateObj, start) {
-    if (start) {
-      this._startTimer.setJsDate(dateObj)
-    } else {
-      this._endTimer.setJsDate(dateObj)
+  static getJsDate(dateObj) {
+    if (!dateObj) {
+      log.debug('date object is null')
+      return new Date(0)
     }
+    if (!dateObj.year || !dateObj.month || !dateObj.day) {
+      log.debug('date object is missing required fields')
+      return new Date(0)
+    }
+    return new Date(
+      dateObj.year,
+      dateObj.month - 1,
+      dateObj.day,
+      dateObj.hour || 0,
+      dateObj.minute || 0,
+      dateObj.second || 0,
+      dateObj.millisecond || 0,
+    )
   }
 
   #getClearFn(start = false) {
@@ -84,22 +125,6 @@ class Trial extends Logger {
   end() {
     this._startTimer.clear()
     this._endTimer.clear()
-  }
-
-  /**
-   * Set the trial start date
-   * @param {import("@rm/types").TrialPeriodDate} dateObj
-   */
-  setStart(dateObj) {
-    this.#update(dateObj, true)
-  }
-
-  /**
-   * Set the trial end date
-   * @param {import("@rm/types").TrialPeriodDate} dateObj
-   */
-  setEnd(dateObj) {
-    this.#update(dateObj, false)
   }
 
   /**
