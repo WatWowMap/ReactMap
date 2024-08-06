@@ -12,28 +12,30 @@ const { getCache } = require('./cache')
  * @type {import("@rm/types").DbCheckClass}
  */
 module.exports = class DbCheck extends Logger {
+  static validModels = /** @type {const} */ ([
+    'Device',
+    'Gym',
+    'Nest',
+    'Pokestop',
+    'Pokemon',
+    'Portal',
+    'Route',
+    'ScanCell',
+    'Spawnpoint',
+    'Weather',
+  ])
+
+  static singleModels = /** @type {const} */ ([
+    'Backup',
+    'Badge',
+    'NestSubmission',
+    'Session',
+    'User',
+  ])
+
   constructor() {
     super('db')
 
-    this.validModels = /** @type {const} */ ([
-      'Device',
-      'Gym',
-      'Nest',
-      'Pokestop',
-      'Pokemon',
-      'Portal',
-      'Route',
-      'ScanCell',
-      'Spawnpoint',
-      'Weather',
-    ])
-    this.singleModels = /** @type {const} */ ([
-      'Backup',
-      'Badge',
-      'NestSubmission',
-      'Session',
-      'User',
-    ])
     this.models = {}
     this.endpoints = {}
     this.questConditions = getCache('questConditions.json', {})
@@ -53,7 +55,7 @@ module.exports = class DbCheck extends Logger {
           const capital = `${category.charAt(0).toUpperCase()}${category.slice(
             1,
           )}`
-          if (this.singleModels.includes(capital)) {
+          if (DbCheck.singleModels.includes(capital)) {
             this.models[capital] = {}
             if (capital === 'User') {
               this.reactMapDb = i
@@ -98,7 +100,7 @@ module.exports = class DbCheck extends Logger {
         })
       })
     if (this.reactMapDb === null) {
-      this.this.log.error('No database connection was found for the User model')
+      this.log.error('No database connection was found for the User model')
       process.exit(0)
     }
   }
@@ -304,7 +306,7 @@ module.exports = class DbCheck extends Logger {
   bindConnections(models) {
     try {
       Object.entries(this.models).forEach(([modelName, sources]) => {
-        if (this.singleModels.includes(modelName)) {
+        if (DbCheck.singleModels.includes(modelName)) {
           /** @type {import('../models').RmModelKeys} */
           const model = modelName
           if (sources.length > 1) {
@@ -347,7 +349,7 @@ module.exports = class DbCheck extends Logger {
     } catch (e) {
       this.log.error(
         e,
-        `\n\nOnly ${[...this.validModels, ...this.singleModels].join(
+        `\n\nOnly ${[...DbCheck.validModels, ...DbCheck.singleModels].join(
           ', ',
         )} are valid options in the useFor arrays`,
       )
