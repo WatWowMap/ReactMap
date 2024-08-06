@@ -172,6 +172,7 @@ export interface Permissions {
   scanner: string[]
   areaRestrictions: string[]
   webhooks: string[]
+  trial: boolean
 }
 
 export interface Waypoint {

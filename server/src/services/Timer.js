@@ -40,10 +40,6 @@ class Timer extends Logger {
     return +(this.ms / 60000).toFixed(2)
   }
 
-  active() {
-    return this._timer !== null && this.ms > 0
-  }
-
   relative() {
     const seconds = Math.floor(this.ms / 1000)
     for (let i = UNITS.length - 1; i >= 0; i--) {
@@ -76,7 +72,7 @@ class Timer extends Logger {
       return false
     }
     this.clear()
-    this.log.info('activating in', this.relative())
+    this.log.info('activating', this.relative())
 
     this._timer = setTimeout(() => {
       if (this._intervalHours > 0) {

@@ -32,6 +32,16 @@ class Session extends Model {
     return result
   }
 
+  /** @param {string} strategy */
+  static async clearTrial(strategy) {
+    return this.query()
+      .whereRaw(`json_extract(data, '$.passport.user.perms.trial') = true`)
+      .andWhereRaw(
+        `json_extract(data, '$.passport.user.rmStrategy') = '${strategy}'`,
+      )
+      .delete()
+  }
+
   /**
    *
    * @param {number} userId

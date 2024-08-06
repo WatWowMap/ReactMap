@@ -60,6 +60,24 @@ const serverState = {
     )
   },
   /**
+   * @param {string} [strategy]
+   */
+  getTrialStatus(strategy) {
+    if (strategy) {
+      if (strategy in this.event.authClients) {
+        return this.event.authClients[strategy].trialManager.active()
+      }
+      throw new Error(`Strategy ${strategy} not found`)
+    } else {
+      return Object.fromEntries(
+        Object.entries(this.event.authClients).map(([k, v]) => [
+          k,
+          v.trialManager.active(),
+        ]),
+      )
+    }
+  },
+  /**
    * @param {boolean} active
    * @param {string} [strategy]
    */
@@ -78,7 +96,7 @@ const serverState = {
   },
   /** @param {import('@rm/types').StateReportObj} [reloadReport] */
   async loadLocalContexts(reloadReport) {
-    const promises = []
+    const promises = [this.event.cleanupTrials()]
     if (!reloadReport || reloadReport.database) {
       if (!reloadReport || reloadReport.historical) {
         promises.push(this.db.historicalRarity())

@@ -113,15 +113,16 @@ function apolloMiddleware(server) {
           ? requestLimits[reqEndpoint]
           : Infinity
 
-      log.debug(
-        TAGS[reqEndpoint] || `[${reqEndpoint?.toUpperCase()}]`,
-        user,
-        '| current count:',
-        userCategoryCount,
-        '| config limit:',
-        limit,
-      )
-
+      if (reqEndpoint !== 'unknown') {
+        log.debug(
+          TAGS[reqEndpoint] || `[${reqEndpoint?.toUpperCase()}]`,
+          user,
+          '| current count:',
+          userCategoryCount,
+          '| config limit:',
+          limit,
+        )
+      }
       if (userCategoryCount >= limit && categoryCache.length > 0) {
         const until =
           categoryCache[0].timestamp +

@@ -122,6 +122,7 @@ class DiscordClient extends AuthClient {
       Object.keys(this.perms).map((key) => [key, false]),
     )
     perms.admin = false
+    perms.trial = false
 
     const permSets = {
       areaRestrictions: new Set(),
@@ -130,7 +131,6 @@ class DiscordClient extends AuthClient {
       blockedGuildNames: new Set(),
     }
     const scanner = config.getSafe('scanner')
-    let gainedAccessViaTrial = false
     try {
       const guilds = user.guilds?.map((guild) => guild.id) || []
       if (
@@ -181,7 +181,7 @@ class DiscordClient extends AuthClient {
                         this.strategy.trialPeriod.roles.includes(userRoles[j])
                       ) {
                         perms[perm] = true
-                        gainedAccessViaTrial = true
+                        perms.trial = true
                         return
                       }
                     }
@@ -207,8 +207,13 @@ class DiscordClient extends AuthClient {
     Object.entries(permSets).forEach(([key, value]) => {
       perms[key] = [...value]
     })
-    if (gainedAccessViaTrial) {
-      this.log.info(user.username, 'gained access via trial')
+    if (perms.trial) {
+      this.log.info(
+        user.username,
+        'gained access via',
+        this.trialManager._forceActive ? 'manually activated' : '',
+        'trial',
+      )
     }
     this.log.debug({ perms })
     return perms

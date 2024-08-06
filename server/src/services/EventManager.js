@@ -156,6 +156,15 @@ class EventManager extends Logger {
     )
   }
 
+  async cleanupTrials() {
+    this.log.info('cleaning up session for possibly expired trials')
+    await Promise.allSettled(
+      Object.values(this.authClients).map((client) =>
+        client.trialManager.cleanup(),
+      ),
+    )
+  }
+
   /**
    *
    * @param {import('./DbCheck')} Db

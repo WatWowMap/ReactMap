@@ -66,30 +66,53 @@ class TelegramClient extends AuthClient {
    */
   getUserPerms(user, groups) {
     const trialActive = this.trialManager.active()
+    let gainedAccessViaTrial = false
+
+    const perms = Object.fromEntries(
+      Object.entries(this.perms).map(([perm, info]) => [
+        perm,
+        info.enabled &&
+          (this.alwaysEnabledPerms.includes(perm) ||
+            info.roles.some((role) => {
+              if (groups.includes(role)) {
+                return true
+              }
+              if (
+                trialActive &&
+                info.trialPeriodEligible &&
+                this.strategy.trialPeriod.roles.some((trialRole) =>
+                  groups.includes(trialRole),
+                )
+              ) {
+                gainedAccessViaTrial = true
+                return true
+              }
+              return false
+            })),
+      ]),
+    )
     /** @type { TGUser & { perms: import("@rm/types").Permissions }} */
     const newUserObj = {
       ...user,
       // @ts-ignore
       perms: {
-        ...Object.fromEntries(
-          Object.entries(this.perms).map(([perm, info]) => [
-            perm,
-            info.enabled &&
-              (this.alwaysEnabledPerms.includes(perm) ||
-                info.roles.some((role) => groups.includes(role)) ||
-                (trialActive &&
-                  info.trialPeriodEligible &&
-                  this.strategy.trialPeriod.roles.some((role) =>
-                    groups.includes(role),
-                  ))),
-          ]),
-        ),
+        ...perms,
+        trial: gainedAccessViaTrial,
         admin: false,
         areaRestrictions: areaPerms(groups),
         webhooks: webhookPerms(groups, 'telegramGroups', trialActive),
         scanner: scannerPerms(groups, 'telegramGroups', trialActive),
       },
     }
+    if (newUserObj.perms.trial) {
+      this.log.info(
+        user.username,
+        'gained access via',
+        this.trialManager._forceActive ? 'manually activated' : '',
+        'trial',
+      )
+    }
+
     if (this.strategy.allowedUsers?.includes(newUserObj.id)) {
       newUserObj.perms.admin = true
     }

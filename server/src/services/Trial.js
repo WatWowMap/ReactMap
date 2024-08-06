@@ -36,7 +36,7 @@ class Trial extends Logger {
         endDate = new Date(startDate.getTime() + diff)
         this.log.debug('next start:', startDate, 'next end:', endDate)
       }
-      this.log.info('new start:', startDate, 'new end:', endDate)
+      this.log.info('next start:', startDate, 'next end:', endDate)
     }
 
     this._startTimer = new Timer(
@@ -108,7 +108,7 @@ class Trial extends Logger {
 
   active() {
     return (
-      this._forceActive || this._startTimer.active() || this._endTimer.active()
+      this._forceActive || (this._startTimer.ms <= 0 && this._endTimer.ms > 0)
     )
   }
 
@@ -124,6 +124,15 @@ class Trial extends Logger {
     this._endTimer.clear()
   }
 
+  async cleanup() {
+    if (!this.active()) {
+      const result = await state.db.models.Session.clearTrial(this._name)
+      if (result > 0) {
+        this.log.info('cleaned up', result, 'sessions')
+      }
+    }
+  }
+
   /**
    * Force the trial to be active regardless of the dates
    * @param {boolean} force
@@ -131,7 +140,7 @@ class Trial extends Logger {
   setActive(force) {
     this._forceActive = force
     this.log.info('force', force ? 'starting' : 'stopping')
-    return this.#getClearFn()()
+    return this.#getClearFn(force)()
   }
 }
 
