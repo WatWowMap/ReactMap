@@ -10,5 +10,5 @@ declare module '@rm/logger' {
   const TAGS: Helpers
   const log: Logger<['logger']>['log']
   function setGlobalLogLevel(level: LogLevelNames): void
-  export { TAGS as TAGS, log, Logger, setGlobalLogLevel }
+  export { TAGS, log, Logger, setGlobalLogLevel }
 }
