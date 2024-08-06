@@ -1,6 +1,18 @@
 // @ts-check
 const { Logger } = require('@rm/logger')
 
+const rtf = new Intl.RelativeTimeFormat('en', { numeric: 'auto' })
+
+const UNITS = /** @type {const} */ ([
+  { unit: 'second', value: 1 },
+  { unit: 'minute', value: 60 },
+  { unit: 'hour', value: 3600 },
+  { unit: 'day', value: 86400 },
+  { unit: 'week', value: 604800 },
+  { unit: 'month', value: 2592000 },
+  { unit: 'year', value: 31536000 },
+])
+
 class Timer extends Logger {
   /**
    * @param {Date} date
@@ -32,6 +44,19 @@ class Timer extends Logger {
     return this._timer !== null && this.ms > 0
   }
 
+  relative() {
+    const seconds = Math.floor(this.ms / 1000)
+    for (let i = UNITS.length - 1; i >= 0; i--) {
+      const { unit, value } = UNITS[i]
+      if (Math.abs(seconds) >= value) {
+        const count = Math.floor(seconds / value)
+        return rtf.format(count, unit)
+      }
+    }
+
+    return rtf.format(seconds, 'second')
+  }
+
   /**
    * Set when the timer should start
    * @param {Date} newDate
@@ -51,7 +76,7 @@ class Timer extends Logger {
       return false
     }
     this.clear()
-    this.log.info('activating at', this._date)
+    this.log.info('activating in', this.relative())
 
     this._timer = setTimeout(() => {
       if (this._intervalHours > 0) {
@@ -67,11 +92,12 @@ class Timer extends Logger {
   }
 
   async clear() {
-    this.log.info('clearing timer')
     if (this._timer) {
+      this.log.info('clearing timer')
       clearTimeout(this._timer)
     }
     if (this._interval) {
+      this.log.info('clearing interval')
       clearInterval(this._interval)
     }
   }

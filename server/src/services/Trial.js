@@ -23,7 +23,9 @@ class Trial extends Logger {
         this.log.warn(
           'start date is in the past (',
           startDate,
-          ') and interval hours are greater than 0, the start and dates will fast forward to the next valid time!',
+          ') and interval hours are greater than 0 (',
+          this._trial.intervalHours,
+          '), the start and end dates will fast forward to the next valid time!',
         )
       }
       const diff = endDate.getTime() - startDate.getTime()
@@ -32,8 +34,9 @@ class Trial extends Logger {
           startDate.getTime() + this._trial.intervalHours * 60 * 60 * 1000,
         )
         endDate = new Date(startDate.getTime() + diff)
-        this.log.debug('new start:', startDate, 'new end:', endDate)
+        this.log.debug('next start:', startDate, 'next end:', endDate)
       }
+      this.log.info('new start:', startDate, 'new end:', endDate)
     }
 
     this._startTimer = new Timer(
@@ -111,14 +114,8 @@ class Trial extends Logger {
 
   start() {
     if (this._endTimer.ms > 0) {
-      const started = this._startTimer.activate(this.#getClearFn(true))
-      if (started) {
-        this.log.info('starting in', this._startTimer.minutes, 'minutes')
-      }
-      const ended = this._endTimer.activate(this.#getClearFn())
-      if (ended) {
-        this.log.info('ending in', this._endTimer.minutes, 'minutes')
-      }
+      this._startTimer.activate(this.#getClearFn(true))
+      this._endTimer.activate(this.#getClearFn())
     }
   }
 
