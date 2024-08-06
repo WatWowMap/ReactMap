@@ -32,6 +32,8 @@ const TAGS = /** @type {const} */ ({
   build: chalk.hex('#ef6c00')('[BUILD]'),
   ReactMap: chalk.hex('#ff3d00')('[ReactMap]'),
   trial: chalk.hex('#fff320')('[TRIAL]'),
+  start: chalk.greenBright('[START]'),
+  end: chalk.redBright('[END]'),
 
   pokemon: chalk.hex('#f44336')('[POKEMON]'),
   pokestops: chalk.hex('#e91e63')('[POKESTOPS]'),
