@@ -63,7 +63,6 @@ class Timer extends Logger {
    */
   setInterval(cb) {
     if (this._intervalMs > 0) {
-      this.setNextDate()
       this._interval = setInterval(() => {
         this.setNextDate()
         return cb()
