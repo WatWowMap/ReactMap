@@ -23,7 +23,7 @@ class Timer extends Logger {
     super(...(tags.length ? tags : ['timer']))
 
     /** @type {number} */
-    this._intervalHours = intervalHours || 0
+    this._intervalMs = (intervalHours || 0) * 60 * 60 * 1000
     /** @type {Date} */
     this._date = date
     /** @type {NodeJS.Timeout | null} */
@@ -53,12 +53,9 @@ class Timer extends Logger {
     return rtf.format(seconds, 'second')
   }
 
-  /**
-   * Set when the timer should start
-   * @param {Date} newDate
-   */
-  setJsDate(newDate) {
-    this._date = newDate
+  setNextDate() {
+    this._date = new Date(this._date.getTime() + this._intervalMs)
+    this.log.info('next activation', this.relative())
   }
 
   /**
@@ -75,11 +72,12 @@ class Timer extends Logger {
     this.log.info('activating', this.relative())
 
     this._timer = setTimeout(() => {
-      if (this._intervalHours > 0) {
-        this._interval = setInterval(
-          () => cb(),
-          this._intervalHours * 60 * 60 * 1000,
-        )
+      if (this._intervalMs > 0) {
+        this.setNextDate()
+        this._interval = setInterval(() => {
+          this.setNextDate()
+          return cb()
+        }, this._intervalMs)
       }
       return cb()
     }, this._date.getTime() - now)
