@@ -19,9 +19,9 @@ class Trial extends Logger {
     let endDate = Trial.getJsDate(this._trial.end)
 
     if (this._trial.intervalHours > 0) {
-      if (startDate.getTime() < Date.now()) {
+      if (startDate.getTime() < Date.now() && endDate.getTime() < Date.now()) {
         this.log.warn(
-          'start date is in the past (',
+          'start and end date are in the past (',
           startDate,
           ') and interval hours are greater than 0 (',
           this._trial.intervalHours,
@@ -29,7 +29,10 @@ class Trial extends Logger {
         )
       }
       const diff = endDate.getTime() - startDate.getTime()
-      while (startDate.getTime() < Date.now()) {
+      while (
+        startDate.getTime() < Date.now() &&
+        endDate.getTime() < Date.now()
+      ) {
         startDate = new Date(
           startDate.getTime() + this._trial.intervalHours * 60 * 60 * 1000,
         )
