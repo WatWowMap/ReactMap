@@ -60,25 +60,33 @@ class Timer extends Logger {
 
   /**
    * @param {() => any | Promise<any>} cb
-   * @returns {boolean}
+   */
+  setInterval(cb) {
+    if (this._intervalMs > 0) {
+      this.setNextDate()
+      this._interval = setInterval(() => {
+        this.setNextDate()
+        return cb()
+      }, this._intervalMs)
+    }
+  }
+
+  /**
+   * @param {() => any | Promise<any>} cb
    */
   activate(cb) {
     const now = Date.now()
+    this.clear()
+
     if (now >= this._date.getTime()) {
-      this.log.info('date is in the past - not activating')
+      this.setInterval(cb)
       return false
     }
     this.clear()
     this.log.info('activating', this.relative())
 
     this._timer = setTimeout(() => {
-      if (this._intervalMs > 0) {
-        this.setNextDate()
-        this._interval = setInterval(() => {
-          this.setNextDate()
-          return cb()
-        }, this._intervalMs)
-      }
+      this.setInterval(cb)
       return cb()
     }, this._date.getTime() - now)
 
