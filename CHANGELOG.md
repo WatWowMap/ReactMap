@@ -1,3 +1,10 @@
+# [1.33.0-develop.15](https://github.com/WatWowMap/ReactMap/compare/v1.33.0-develop.14...v1.33.0-develop.15) (2024-08-09)
+
+
+### Bug Fixes
+
+* playground editor w/ helmet ([33fa336](https://github.com/WatWowMap/ReactMap/commit/33fa3368904cca6ff345303e29bd8a582b8cff54))
+
 # [1.33.0-develop.14](https://github.com/WatWowMap/ReactMap/compare/v1.33.0-develop.13...v1.33.0-develop.14) (2024-08-09)
 
 
