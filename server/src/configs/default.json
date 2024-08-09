@@ -10,7 +10,8 @@
     "queryDebug": false,
     "logLevel": "info",
     "skipMinified": false,
-    "skipUpdateCheck": false
+    "skipUpdateCheck": false,
+    "disableHelmet": false
   },
   "api": {
     "sessionSecret": "98ki^e72~!@#(85o3kXLI*#c9wu5l!Z",

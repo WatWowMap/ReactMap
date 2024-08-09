@@ -74,7 +74,7 @@ const startServer = async () => {
         req.bodySize = (req.bodySize || 0) + buf.length
       },
     }),
-    helmet(),
+    ...(config.getSafe('devOptions.disableHelmet') ? [] : [helmet()]),
   )
   initPassport(app)
 
