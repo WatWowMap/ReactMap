@@ -4,13 +4,13 @@ const { Logger } = require('@rm/logger')
 const rtf = new Intl.RelativeTimeFormat('en', { numeric: 'auto' })
 
 const UNITS = /** @type {const} */ ([
-  { unit: 'second', value: 1 },
-  { unit: 'minute', value: 60 },
-  { unit: 'hour', value: 3600 },
-  { unit: 'day', value: 86400 },
-  { unit: 'week', value: 604800 },
-  { unit: 'month', value: 2592000 },
   { unit: 'year', value: 31536000 },
+  { unit: 'month', value: 2592000 },
+  { unit: 'week', value: 604800 },
+  { unit: 'day', value: 86400 },
+  { unit: 'hour', value: 3600 },
+  { unit: 'minute', value: 60 },
+  { unit: 'second', value: 1 },
 ])
 
 class Timer extends Logger {
@@ -26,6 +26,7 @@ class Timer extends Logger {
     this._intervalMs = (intervalHours || 0) * 60 * 60 * 1000
     /** @type {Date} */
     this._date = date
+
     /** @type {NodeJS.Timeout | null} */
     this._timer = null
     /** @type {NodeJS.Timeout | null} */
@@ -41,21 +42,35 @@ class Timer extends Logger {
   }
 
   relative() {
-    const seconds = Math.floor(this.ms / 1000)
-    for (let i = UNITS.length - 1; i >= 0; i--) {
+    let seconds = Math.floor(this.ms / 1000)
+    const isNegative = seconds < 0
+    seconds = Math.abs(seconds)
+    const result = []
+
+    for (let i = 0; i < UNITS.length; i++) {
       const { unit, value } = UNITS[i]
-      if (Math.abs(seconds) >= value) {
-        const count = Math.floor(seconds / value)
-        return rtf.format(count, unit)
+      const count = Math.floor(seconds / value)
+      if (count > 0) {
+        result.push(rtf.format(isNegative ? -count : count, unit))
+        seconds -= count * value
       }
     }
 
-    return rtf.format(seconds, 'second')
+    return result.length > 1
+      ? `${result
+          .slice(0, -1)
+          .map((r, i) => {
+            if (i === 0) return r
+            const [, ...n] = r.split(' ')
+            return n.join(' ')
+          })
+          .join(', ')} and ${result[result.length - 1].replaceAll('in ', '')}`
+      : result[0]
   }
 
   setNextDate() {
     this._date = new Date(this._date.getTime() + this._intervalMs)
-    this.log.info('next activation', this.relative())
+    this.log.info('next', this.relative())
   }
 
   /**
@@ -63,9 +78,10 @@ class Timer extends Logger {
    */
   setInterval(cb) {
     if (this._intervalMs > 0) {
-      this._interval = setInterval(() => {
+      this.setNextDate()
+      this._interval = setInterval(async () => {
+        await cb()
         this.setNextDate()
-        return cb()
       }, this._intervalMs)
     }
   }
@@ -79,17 +95,16 @@ class Timer extends Logger {
 
     if (now >= this._date.getTime()) {
       this.setInterval(cb)
-      return false
+      return true
     }
-    this.clear()
-    this.log.info('activating', this.relative())
+    this.log.info(this.relative())
 
-    this._timer = setTimeout(() => {
+    this._timer = setTimeout(async () => {
+      await cb()
       this.setInterval(cb)
-      return cb()
     }, this._date.getTime() - now)
 
-    return true
+    return false
   }
 
   async clear() {

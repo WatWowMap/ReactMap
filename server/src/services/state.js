@@ -65,14 +65,14 @@ const serverState = {
   getTrialStatus(strategy) {
     if (strategy) {
       if (strategy in this.event.authClients) {
-        return this.event.authClients[strategy].trialManager.active()
+        return this.event.authClients[strategy].trialManager.status()
       }
       throw new Error(`Strategy ${strategy} not found`)
     } else {
       return Object.fromEntries(
         Object.entries(this.event.authClients).map(([k, v]) => [
           k,
-          v.trialManager.active(),
+          v.trialManager.status(),
         ]),
       )
     }

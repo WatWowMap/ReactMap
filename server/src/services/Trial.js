@@ -42,6 +42,11 @@ class Trial extends Logger {
       this.log.info('next start:', startDate, 'next end:', endDate)
     }
 
+    const now = Date.now()
+    this._active = startDate.getTime() < now && endDate.getTime() > now
+    if (this._active) {
+      this.log.info('found active trial')
+    }
     this._startTimer = new Timer(
       startDate,
       this._trial.intervalHours,
@@ -98,6 +103,7 @@ class Trial extends Logger {
     return async () => {
       this.log.info('is', start ? 'starting' : 'ending')
       await state.db.models.Session.clearNonDonor(this._name)
+      this._active = start
     }
   }
 
@@ -110,9 +116,24 @@ class Trial extends Logger {
   }
 
   active() {
-    return (
-      this._forceActive || (this._startTimer.ms <= 0 && this._endTimer.ms > 0)
-    )
+    return this._forceActive || this._active
+  }
+
+  status() {
+    const now = Date.now()
+    return {
+      active: this.active(),
+      start: {
+        raw: now + this._startTimer.ms,
+        date: this._startTimer._date.toISOString(),
+        relative: this._startTimer.relative(),
+      },
+      end: {
+        raw: now + this._endTimer.ms,
+        date: this._endTimer._date.toISOString(),
+        relative: this._endTimer.relative(),
+      },
+    }
   }
 
   start() {
