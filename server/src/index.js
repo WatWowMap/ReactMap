@@ -74,7 +74,15 @@ const startServer = async () => {
         req.bodySize = (req.bodySize || 0) + buf.length
       },
     }),
-    helmet(),
+    helmet({
+      hidePoweredBy: true,
+      contentSecurityPolicy: {
+        directives: {
+          scriptSrc: ["'self'", 'https://cdn.jsdelivr.net'],
+          workerSrc: ["'self'", 'blob:'],
+        },
+      },
+    }),
   )
   initPassport(app)
 
