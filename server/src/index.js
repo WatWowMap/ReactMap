@@ -78,7 +78,7 @@ const startServer = async () => {
       hidePoweredBy: true,
       contentSecurityPolicy: {
         directives: {
-          scriptSrc: ["'self'", 'https://cdn.jsdelivr.net'],
+          scriptSrc: ["'self'", 'https://cdn.jsdelivr.net', 'https://telegram.org', 'https://static.cloudflareinsights.com'],
           workerSrc: ["'self'", 'blob:'],
         },
       },
