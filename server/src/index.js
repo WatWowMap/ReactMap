@@ -82,7 +82,7 @@ const startServer = async () => {
             "'self'",
             'https://cdn.jsdelivr.net',
             'https://telegram.org',
-            'https://static.cloudflareinsights.com'
+            'https://static.cloudflareinsights.com',
           ],
           frameSrc: ["'self'", 'https://*.telegram.org'],
           workerSrc: ["'self'", 'blob:'],
