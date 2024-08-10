@@ -1,3 +1,14 @@
+# [1.33.0-develop.16](https://github.com/WatWowMap/ReactMap/compare/v1.33.0-develop.15...v1.33.0-develop.16) (2024-08-10)
+
+
+### Bug Fixes
+
+* lint ([adbaec6](https://github.com/WatWowMap/ReactMap/commit/adbaec677a48be2e89efec09d9c75ff6b9a0453f))
+* lint ([081c153](https://github.com/WatWowMap/ReactMap/commit/081c15360a4c0d84e2d66d751bdae7d47d7e3040))
+* oauth telegram /w helmet ([d892000](https://github.com/WatWowMap/ReactMap/commit/d892000f8adaf1b5e70b21d22258e1239b1f485c))
+* telegram frame source /w helmet ([26c12de](https://github.com/WatWowMap/ReactMap/commit/26c12de6d9cdfcd4db68c1c0804fd32e90477f24))
+* telegram login w/ helmet ([7c0e925](https://github.com/WatWowMap/ReactMap/commit/7c0e925b309c87068f4a6a07944b4af686f7bbd0))
+
 # [1.33.0-develop.15](https://github.com/WatWowMap/ReactMap/compare/v1.33.0-develop.14...v1.33.0-develop.15) (2024-08-09)
 
 
