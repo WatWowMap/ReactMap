@@ -36,6 +36,10 @@
   "api": {
     "sessionSecret": "API_SESSION_SECRET",
     "reactMapSecret": "API_REACT_MAP_SECRET",
+    "enableHelmet": {
+      "__name": "API_ENABLE_HELMET",
+      "__format": "boolean"
+    },
     "showSchemasInConfigApi": {
       "__name": "API_SHOW_SCHEMAS_IN_CONFIG_API",
       "__format": "boolean"
