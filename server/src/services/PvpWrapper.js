@@ -1,7 +1,7 @@
 const Ohbem = require('ohbem')
 const NodeCache = require('node-cache')
 const config = require('@rm/config')
-const { log, HELPERS } = require('@rm/logger')
+const { log, TAGS } = require('@rm/logger')
 
 module.exports = class PvpWrapper extends Ohbem {
   constructor() {
@@ -42,7 +42,7 @@ module.exports = class PvpWrapper extends Ohbem {
       return result
     } catch (e) {
       log.error(
-        HELPERS.pokemon,
+        TAGS.pokemon,
         'Unable to process PVP Stats for Pokemon with ID#: ',
         pokemon.id,
         `${pokemon.pokemon_id}-${pokemon.form}`,

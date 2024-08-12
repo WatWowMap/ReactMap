@@ -1,7 +1,7 @@
 // @ts-check
 const router = require('express').Router()
 
-const { log, HELPERS } = require('@rm/logger')
+const { log, TAGS } = require('@rm/logger')
 
 const state = require('../../../services/state')
 
@@ -12,7 +12,7 @@ router.get('/', async (req, res) => {
       .status(200)
       .json(await state.db.models.Session.query().where('expires', '>=', ts))
   } catch (e) {
-    log.error(HELPERS.api, req.originalUrl, e)
+    log.error(TAGS.api, req.originalUrl, e)
     res.status(500).json({ status: 'ServerError', reason: e.message })
   }
 })
@@ -28,7 +28,7 @@ router.get('/hasValid/:id', async (req, res) => {
       length: results.length,
     })
   } catch (e) {
-    log.error(HELPERS.api, req.originalUrl, e)
+    log.error(TAGS.api, req.originalUrl, e)
     res.status(500).json({ status: 'ServerError', reason: e.message })
   }
 })
@@ -44,7 +44,7 @@ router.get('/clearSessions/:id', async (req, res) => {
       .delete()
     res.status(200).json({ results })
   } catch (e) {
-    log.error(HELPERS.api, req.originalUrl, e)
+    log.error(TAGS.api, req.originalUrl, e)
     res.status(500).json({ status: 'ServerError', reason: e.message })
   }
 })

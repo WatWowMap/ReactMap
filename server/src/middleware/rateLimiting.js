@@ -1,7 +1,7 @@
 // @ts-check
 const { rateLimit } = require('express-rate-limit')
 
-const { log, HELPERS } = require('@rm/logger')
+const { log, TAGS } = require('@rm/logger')
 const config = require('@rm/config')
 
 function rateLimitingMiddleware() {
@@ -20,7 +20,7 @@ function rateLimitingMiddleware() {
     },
     handler: (req, res, next, options) => {
       log.info(
-        HELPERS.express,
+        TAGS.express,
         req?.user?.username || 'Unknown user',
         'is being rate limited',
       )

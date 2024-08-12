@@ -3,7 +3,7 @@ const { knex } = require('knex')
 const { raw } = require('objection')
 const extend = require('extend')
 const config = require('@rm/config')
-const { log, HELPERS } = require('@rm/logger')
+const { Logger, TAGS } = require('@rm/logger')
 
 const { getBboxFromCenter } = require('./functions/getBbox')
 const { getCache } = require('./cache')
@@ -11,27 +11,31 @@ const { getCache } = require('./cache')
 /**
  * @type {import("@rm/types").DbCheckClass}
  */
-module.exports = class DbCheck {
+module.exports = class DbCheck extends Logger {
+  static validModels = /** @type {const} */ ([
+    'Device',
+    'Gym',
+    'Nest',
+    'Pokestop',
+    'Pokemon',
+    'Portal',
+    'Route',
+    'ScanCell',
+    'Spawnpoint',
+    'Weather',
+  ])
+
+  static singleModels = /** @type {const} */ ([
+    'Backup',
+    'Badge',
+    'NestSubmission',
+    'Session',
+    'User',
+  ])
+
   constructor() {
-    this.validModels = /** @type {const} */ ([
-      'Device',
-      'Gym',
-      'Nest',
-      'Pokestop',
-      'Pokemon',
-      'Portal',
-      'Route',
-      'ScanCell',
-      'Spawnpoint',
-      'Weather',
-    ])
-    this.singleModels = /** @type {const} */ ([
-      'Backup',
-      'Badge',
-      'NestSubmission',
-      'Session',
-      'User',
-    ])
+    super('db')
+
     this.models = {}
     this.endpoints = {}
     this.questConditions = getCache('questConditions.json', {})
@@ -51,7 +55,7 @@ module.exports = class DbCheck {
           const capital = `${category.charAt(0).toUpperCase()}${category.slice(
             1,
           )}`
-          if (this.singleModels.includes(capital)) {
+          if (DbCheck.singleModels.includes(capital)) {
             this.models[capital] = {}
             if (capital === 'User') {
               this.reactMapDb = i
@@ -67,6 +71,7 @@ module.exports = class DbCheck {
           this.endpoints[i] = schema
           return null
         }
+        const logger = new Logger('knex', schema.database)
         return knex({
           client: 'mysql2',
           connection: {
@@ -84,22 +89,18 @@ module.exports = class DbCheck {
               conn.query('SET time_zone="+00:00";', (err) => done(err, conn)),
           },
           log: {
-            warn: (message) => log.warn(HELPERS.knex, message),
-            error: (message) => log.error(HELPERS.knex, message),
+            warn: (message) => logger.warn(message),
+            error: (message) => logger.error(message),
             debug: (message) =>
-              log[config.getSafe('devOptions.queryDebug') ? 'info' : 'debug'](
-                HELPERS.knex,
-                message,
-              ),
+              logger[
+                config.getSafe('devOptions.queryDebug') ? 'info' : 'debug'
+              ](message),
             enableColors: true,
           },
         })
       })
     if (this.reactMapDb === null) {
-      log.error(
-        HELPERS.db,
-        'No database connection was found for the User model',
-      )
+      this.log.error('No database connection was found for the User model')
       process.exit(0)
     }
   }
@@ -202,8 +203,7 @@ module.exports = class DbCheck {
   }
 
   async getDbContext() {
-    log.info(
-      HELPERS.db,
+    this.log.info(
       `Determining database types for ${this.connections.length} connection${
         this.connections.length > 1 ? 's' : ''
       }`,
@@ -229,7 +229,7 @@ module.exports = class DbCheck {
             }
           })
         } catch (e) {
-          log.error(HELPERS.db, e)
+          this.log.error(e)
         }
       }),
     )
@@ -275,7 +275,7 @@ module.exports = class DbCheck {
   }
 
   async historicalRarity() {
-    log.info(HELPERS.db, 'Setting historical rarity stats')
+    this.log.info('Setting historical rarity stats')
     try {
       const results = await Promise.all(
         (this.models.Pokemon ?? []).map(async (source) =>
@@ -296,7 +296,7 @@ module.exports = class DbCheck {
         true,
       )
     } catch (e) {
-      log.error(HELPERS.db, 'Failed to set historical rarity stats', e)
+      this.log.error('Failed to set historical rarity stats', e)
     }
   }
 
@@ -306,15 +306,11 @@ module.exports = class DbCheck {
   bindConnections(models) {
     try {
       Object.entries(this.models).forEach(([modelName, sources]) => {
-        if (this.singleModels.includes(modelName)) {
+        if (DbCheck.singleModels.includes(modelName)) {
           /** @type {import('../models').RmModelKeys} */
           const model = modelName
           if (sources.length > 1) {
-            log.error(
-              HELPERS.db,
-              model,
-              `only supports one database connection`,
-            )
+            this.log.error(model, `only supports one database connection`)
             process.exit(0)
           }
           if (model === 'User') {
@@ -342,20 +338,18 @@ module.exports = class DbCheck {
             }
           })
         } else {
-          log.warn(HELPERS.db, modelName, 'something unexpected happened')
+          this.log.warn(modelName, 'something unexpected happened')
         }
-        log.info(
-          HELPERS.db,
+        this.log.info(
           `Bound ${modelName} to ${sources.length ?? 1} connection${
             sources.length > 1 ? 's' : ''
           }`,
         )
       })
     } catch (e) {
-      log.error(
-        HELPERS.db,
+      this.log.error(
         e,
-        `\n\nOnly ${[...this.validModels, ...this.singleModels].join(
+        `\n\nOnly ${[...DbCheck.validModels, ...DbCheck.singleModels].join(
           ', ',
         )} are valid options in the useFor arrays`,
       )
@@ -404,7 +398,7 @@ module.exports = class DbCheck {
       )
       return DbCheck.deDupeResults(data)
     } catch (e) {
-      log.error(HELPERS.db, HELPERS[model.toLowerCase()], e)
+      this.log.error(TAGS[model.toLowerCase()], e)
       throw e
     }
   }
@@ -468,8 +462,7 @@ module.exports = class DbCheck {
       if (results.length > deDuped.length) {
         deDuped = results
       }
-      log.debug(
-        HELPERS.db,
+      this.log.debug(
         'Search attempt #',
         count,
         '| received:',
@@ -496,8 +489,8 @@ module.exports = class DbCheck {
       distance = Math.min(distance, max)
     }
     if (count > 1) {
-      log.info(
-        HELPERS.search,
+      this.log.info(
+        TAGS.search,
         'Searched',
         count,
         '| received:',
@@ -573,14 +566,14 @@ module.exports = class DbCheck {
    */
   async getAvailable(model) {
     if (this.models[model]) {
-      log.info(HELPERS.db, `Querying available for ${model}`)
+      this.log.info(`Querying available for ${model}`)
       try {
         const results = await Promise.all(
           this.models[model].map(async ({ SubModel, ...source }) =>
             SubModel.getAvailable(source),
           ),
         )
-        log.info(HELPERS.db, `Setting available for ${model}`)
+        this.log.info(`Setting available for ${model}`)
         if (model === 'Pokestop') {
           results.forEach((result) => {
             if ('conditions' in result) {
@@ -612,10 +605,9 @@ module.exports = class DbCheck {
           return [...returnSet]
         }
       } catch (e) {
-        log.warn(HELPERS.db, 'Unable to query available for:', model, '\n', e)
+        this.log.warn('Unable to query available for:', model, '\n', e)
         if (model === 'Nest') {
-          log.warn(
-            HELPERS.db,
+          this.log.warn(
             'This is likely due to "nest" being in a useFor array but not in the database',
           )
         }
@@ -642,9 +634,9 @@ module.exports = class DbCheck {
         this.filterContext.Route.maxDuration = Math.max(
           ...results.map((result) => result.max_duration),
         )
-        log.info(HELPERS.db, 'Updating filter context for routes')
+        this.log.info('Updating filter context for routes')
       } catch (e) {
-        log.error(HELPERS.db, e)
+        this.log.error(e)
       }
     }
     if (this.models.Pokestop) {

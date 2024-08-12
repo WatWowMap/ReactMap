@@ -2,7 +2,7 @@
 const { Model } = require('objection')
 const config = require('@rm/config')
 
-const { log, HELPERS } = require('@rm/logger')
+const { log, TAGS } = require('@rm/logger')
 
 class User extends Model {
   static get tableName() {
@@ -44,7 +44,7 @@ class User extends Model {
       .where({ [`${strategy}Id`]: userId })
       .then(() =>
         log.info(
-          HELPERS.custom(botName, '#fff2cc'),
+          TAGS.custom(botName, '#fff2cc'),
           `Cleared ${strategy} perms for user ${userId}`,
         ),
       )

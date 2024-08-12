@@ -1,6 +1,6 @@
 /* eslint-disable no-unused-vars */
 const config = require('@rm/config')
-const { log, HELPERS } = require('@rm/logger')
+const { log, TAGS } = require('@rm/logger')
 const { AND_KEYS, BASE_KEYS } = require('./constants')
 const {
   deepCompare,
@@ -135,7 +135,7 @@ module.exports = class PkmnBackend {
       if (merged) merged = `(${merged})&`
       merged += `G${filter.gender}`
     }
-    log.trace(HELPERS.pokemon, this.id, {
+    log.trace(TAGS.pokemon, this.id, {
       andStr,
       orStr,
       merged,

@@ -2,7 +2,7 @@
 /* eslint-disable prefer-rest-params */
 const bytes = require('bytes')
 
-const { log, HELPERS } = require('@rm/logger')
+const { log, TAGS } = require('@rm/logger')
 
 /** @type {import('@rm/types').ExpressMiddleware} */
 function loggerMiddleware(req, res, next) {
@@ -30,14 +30,14 @@ function loggerMiddleware(req, res, next) {
     const [seconds, nanoseconds] = process.hrtime(start)
     const responseTime = (seconds * 1000 + nanoseconds / 1e6).toFixed(3) // in milliseconds
     log.debug(
-      HELPERS.express,
+      TAGS.express,
       req.method,
-      HELPERS.url(req.originalUrl),
-      HELPERS.statusCode(res.statusCode),
+      TAGS.url(req.originalUrl.split('?', 1)[0]),
+      TAGS.statusCode(res.statusCode),
       `${responseTime}ms`,
       '|',
-      HELPERS.download(bytes(req.bodySize || 0)),
-      HELPERS.upload(bytes(resBodySize || 0)),
+      TAGS.download(bytes(req.bodySize || 0)),
+      TAGS.upload(bytes(resBodySize || 0)),
       '|',
       req.user ? req.user.username : 'Not Logged In',
       req.headers['x-forwarded-for']

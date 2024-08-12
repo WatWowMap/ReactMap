@@ -22,7 +22,7 @@ if (process.env.NODE_CONFIG_ENV) {
   }
 }
 
-const { setLogLevel, HELPERS, log } = require('@rm/logger')
+const { setGlobalLogLevel, TAGS, log } = require('@rm/logger')
 const { applyMutations } = require('./mutations')
 
 function purge() {
@@ -38,19 +38,21 @@ function purge() {
 
 const config = require('config')
 
+config.getSafe = function getSafe(key) {
+  return require('config').get(key)
+}
+
+setGlobalLogLevel(config.getSafe('devOptions.logLevel'))
+
 config.reload = function reload() {
   try {
     purge()
-    log.info(HELPERS.config, 'config purged, returning old reference')
+    log.info(TAGS.config, 'config purged, returning old reference')
     return this
   } catch (e) {
-    log.error(HELPERS.config, 'error reloading config', e)
+    log.error(TAGS.config, 'error reloading config', e)
     return this
   }
-}
-
-config.getSafe = function getSafe(key) {
-  return require('config').get(key)
 }
 
 config.getMapConfig = function getMapConfig(req) {
@@ -70,10 +72,10 @@ config.getAreas = function getAreas(req, key) {
 }
 
 config.setAreas = function setAreas(newAreas) {
+  log.info(TAGS.config, 'updating areas')
   this.areas = newAreas
 }
 
-setLogLevel(config.getSafe('devOptions.logLevel'))
 applyMutations(config)
 
 module.exports = config

@@ -1,12 +1,9 @@
 // @ts-check
-const fs = require('fs')
-const { resolve } = require('path')
 const { Client } = require('discord.js')
-const { Strategy: DiscordStrategy } = require('passport-discord')
+const { Strategy } = require('passport-discord')
 const passport = require('passport')
 
 const config = require('@rm/config')
-const { log, HELPERS } = require('@rm/logger')
 
 const state = require('./state')
 const logUserAuth = require('./logUserAuth')
@@ -14,54 +11,77 @@ const areaPerms = require('./functions/areaPerms')
 const webhookPerms = require('./functions/webhookPerms')
 const scannerPerms = require('./functions/scannerPerms')
 const mergePerms = require('./functions/mergePerms')
+const AuthClient = require('./AuthClient')
 
-class DiscordClient {
-  /**
-   *
-   * @param {import("@rm/types").Config['authentication']['strategies'][number]} strategy
-   * @param {string} rmStrategy
-   */
-  constructor(strategy, rmStrategy) {
+class DiscordClient extends AuthClient {
+  /** @type {import('./AuthClient').ClientConstructor} */
+  constructor(rmStrategy, strategy) {
+    super(rmStrategy, strategy)
+
     if (strategy instanceof Client || typeof rmStrategy !== 'string') {
-      log.error(
-        HELPERS.custom(this.rmStrategy, '#7289da'),
+      this.log.error(
         'You are using an outdated strategy, please update your custom strategy to reflect the newest changes found in `server/src/strategies/discord.js`',
       )
       process.exit(1)
     }
+
     this.client = new Client({
       intents: ['GuildMessages', 'GuildMembers', 'Guilds'],
     })
-    this.strategy = {
-      thumbnailUrl:
-        'https://user-images.githubusercontent.com/58572875/167069223-745a139d-f485-45e3-a25c-93ec4d09779c.png',
-      ...strategy,
-    }
-    this.rmStrategy = rmStrategy || 'custom'
-    this.loggingChannels = {
-      main: strategy.logChannelId,
-      event: strategy.eventLogChannelId,
-      scanNext: strategy.scanNextLogChannelId,
-      scanZone: strategy.scanZoneLogChannelId,
-    }
-    this.loggingChannelHidePii = strategy.logChannelHidePii
-    this.perms = config.getSafe('authentication.perms')
-    this.alwaysEnabledPerms = config.getSafe(
-      'authentication.alwaysEnabledPerms',
-    )
-
-    this.discordEvents()
 
     this.client.on('ready', (c) => {
-      log.info(
-        HELPERS.custom(this.rmStrategy, '#7289da'),
-        `Logged in as ${c.user?.tag || 'Unknown??'}!`,
-      )
+      this.log.info(`Logged in as ${c.user?.tag || 'Unknown??'}!`)
       c.user.setPresence({
         activities: [
           { name: this.strategy.presence, type: this.strategy.presenceType },
         ],
       })
+    })
+
+    this.client.on('guildMemberRemove', async (member) => {
+      try {
+        await state.db.models.Session.clearDiscordSessions(
+          member.id,
+          this.client.user.username,
+        )
+        await state.db.models.User.clearPerms(
+          member.id,
+          'discord',
+          this.client.user.username,
+        )
+      } catch (e) {
+        this.log.error(`Could not clear sessions for ${member.user.username}`)
+      }
+    })
+
+    this.client.on('guildMemberUpdate', async (prev, next) => {
+      const rolesBefore = prev.roles.cache.map((x) => x.id)
+      const rolesAfter = next.roles.cache.map((x) => x.id)
+      const perms = [
+        ...new Set(
+          Object.values(config.getSafe('authentication.perms')).flatMap(
+            (x) => x.roles,
+          ),
+        ),
+      ]
+      const roleDiff = rolesBefore
+        .filter((x) => !rolesAfter.includes(x))
+        .concat(rolesAfter.filter((x) => !rolesBefore.includes(x)))
+      try {
+        if (perms.includes(roleDiff[0])) {
+          await state.db.models.Session.clearDiscordSessions(
+            prev.user.id,
+            this.client.user.username,
+          )
+          await state.db.models.User.clearPerms(
+            prev.user.id,
+            'discord',
+            this.client.user.username,
+          )
+        }
+      } catch (e) {
+        this.log.error(`Could not clear sessions for ${prev.user.username}`)
+      }
     })
 
     this.client.login(this.strategy.botToken)
@@ -79,8 +99,7 @@ class DiscordClient {
       }
       return []
     } catch (e) {
-      log.error(
-        HELPERS.custom(this.rmStrategy, '#7289da'),
+      this.log.error(
         'Failed to get roles in guild',
         guildId,
         'for user',
@@ -90,43 +109,20 @@ class DiscordClient {
     return []
   }
 
-  discordEvents() {
-    try {
-      fs.readdir(resolve(__dirname, 'events'), (err, files) => {
-        if (err) log.error(HELPERS.custom(this.rmStrategy, '#7289da'), err)
-        files.forEach((file) => {
-          const event = require(resolve(__dirname, 'events', file))
-          const eventName = file.split('.')[0]
-          this.client.on(eventName, event.bind(null, this.client))
-        })
-      })
-    } catch (e) {
-      log.error(
-        HELPERS.custom(this.rmStrategy, '#7289da'),
-        'Failed to activate an event',
-        e,
-      )
-    }
-  }
-
   /**
    *
    * @param {import('passport-discord').Profile} user
    * @returns {Promise<import("@rm/types").Permissions>}
    */
   async getPerms(user) {
-    const date = new Date()
-    const trialActive =
-      this.strategy.trialPeriod &&
-      date >= this.strategy.trialPeriod.start.js &&
-      date <= this.strategy.trialPeriod.end.js
-
+    const trialActive = this.trialManager.active()
     /** @type {import("@rm/types").Permissions} */
     // @ts-ignore
     const perms = Object.fromEntries(
       Object.keys(this.perms).map((key) => [key, false]),
     )
     perms.admin = false
+    perms.trial = false
 
     const permSets = {
       areaRestrictions: new Set(),
@@ -148,8 +144,7 @@ class DiscordClient {
         Object.keys(scanner).forEach(
           (x) => scanner[x]?.enabled && permSets.scanner.add(x),
         )
-        log.debug(
-          HELPERS.custom(this.rmStrategy, '#7289da'),
+        this.log.debug(
           `User ${user.username} (${user.id}) in allowed users list, skipping guild and role check.`,
         )
       } else {
@@ -176,15 +171,17 @@ class DiscordClient {
                     perms[perm] = true
                   } else {
                     for (let j = 0; j < userRoles.length; j += 1) {
+                      if (info.roles.includes(userRoles[j])) {
+                        perms[perm] = true
+                        return
+                      }
                       if (
-                        info.roles.includes(userRoles[j]) ||
-                        (trialActive &&
-                          info.trialPeriodEligible &&
-                          this.strategy.trialPeriod.roles.includes(
-                            userRoles[j],
-                          ))
+                        trialActive &&
+                        info.trialPeriodEligible &&
+                        this.strategy.trialPeriod.roles.includes(userRoles[j])
                       ) {
                         perms[perm] = true
+                        perms.trial = true
                         return
                       }
                     }
@@ -205,17 +202,20 @@ class DiscordClient {
         )
       }
     } catch (e) {
-      log.warn(
-        HELPERS.custom(this.rmStrategy, '#7289da'),
-        'Failed to get perms for user',
-        user.id,
-        e,
-      )
+      this.log.warn('Failed to get perms for user', user.id, e)
     }
     Object.entries(permSets).forEach(([key, value]) => {
       perms[key] = [...value]
     })
-    log.debug(HELPERS.custom(this.rmStrategy, '#7289da'), { perms })
+    if (perms.trial) {
+      this.log.info(
+        user.username,
+        'gained access via',
+        this.trialManager._forceActive ? 'manually activated' : '',
+        'trial',
+      )
+    }
+    this.log.debug({ perms })
     return perms
   }
 
@@ -230,10 +230,12 @@ class DiscordClient {
   }
 
   /**
+   * Send a message to a discord channel
+   *
    * @param {import('discord.js').APIEmbed} embed
-   * @param {keyof DiscordClient['loggingChannels']} channel
+   * @param {keyof AuthClient['loggingChannels']} channel
    */
-  async sendMessage(embed, channel = 'main') {
+  async sendMessage(embed, channel) {
     const safeChannel = this.loggingChannels[channel]
     if (!safeChannel || typeof embed !== 'object') {
       return
@@ -251,21 +253,10 @@ class DiscordClient {
         })
       }
     } catch (e) {
-      log.error(
-        HELPERS.custom(this.rmStrategy, '#7289da'),
-        'Failed to send message to discord',
-        e,
-      )
+      this.log.error('Failed to send message to discord', e)
     }
   }
 
-  /**
-   * @param {import('express').Request} req
-   * @param {string} _accessToken
-   * @param {string} _refreshToken
-   * @param {import('passport-discord').Profile} profile
-   * @param {(err: Error | null, user?: import("@rm/types").User, info?: { message: string }) => void} done
-   */
   /** @type {import("@rm/types").DiscordVerifyFunction} */
   async authHandler(req, _accessToken, _refreshToken, profile, done) {
     if (!req.query.code) {
@@ -289,7 +280,7 @@ class DiscordClient {
         'Discord',
         this.loggingChannelHidePii,
       )
-      await this.sendMessage(embed)
+      await this.sendMessage(embed, 'main')
 
       if (discordUser.perms.blocked) {
         const guildArray = discordUser.perms.blockedGuildNames
@@ -394,18 +385,14 @@ class DiscordClient {
           },
         )
     } catch (e) {
-      log.error(
-        HELPERS.custom(this.rmStrategy, '#7289da'),
-        'User has failed auth.',
-        e,
-      )
+      this.log.error('User has failed auth.', e)
     }
   }
 
   initPassport() {
     passport.use(
       this.rmStrategy,
-      new DiscordStrategy(
+      new Strategy(
         {
           clientID: this.strategy.clientId,
           clientSecret: this.strategy.clientSecret,

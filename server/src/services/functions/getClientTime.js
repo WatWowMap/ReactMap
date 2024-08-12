@@ -4,7 +4,7 @@ const { tz } = require('moment-timezone')
 const { utcToZonedTime } = require('date-fns-tz')
 const { format } = require('date-fns')
 
-const { log, HELPERS } = require('@rm/logger')
+const { log, TAGS } = require('@rm/logger')
 
 /** @typedef {import('@rm/types').Bounds | { lat: number, lon: number }} BoundsEnum */
 
@@ -33,7 +33,7 @@ function getUserTimeZone(bounds) {
           lon: (bounds.minLon + bounds.maxLon) / 2,
         }
   const timezone = find(lat, lon)
-  log.debug(HELPERS.client, `timezone: ${timezone}`)
+  log.debug(TAGS.client, `timezone: ${timezone}`)
   return timezone[0]
 }
 
@@ -52,7 +52,7 @@ function getUserDate(boundsOrTimezone) {
   const utcDate = new Date()
   const clientDate = utcToZonedTime(utcDate, timezone)
   log.debug(
-    HELPERS.client,
+    TAGS.client,
     `time: ${format(clientDate, 'yyyy-MM-dd HH:mm:ss.SSS')}`,
     getEpoch(clientDate),
   )
@@ -71,7 +71,7 @@ function getUserMidnight(bounds) {
 
   const userMidnight = tz(new Date(), userTimeZone).startOf('day')
   log.debug(
-    HELPERS.client,
+    TAGS.client,
     `midnight: ${userMidnight.format('yyyy-MM-DD HH:mm:ss.SSS')}`,
     userMidnight.unix(),
   )

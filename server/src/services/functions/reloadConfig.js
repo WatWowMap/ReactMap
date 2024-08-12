@@ -1,5 +1,5 @@
 // @ts-check
-const { log, HELPERS } = require('@rm/logger')
+const { log, TAGS } = require('@rm/logger')
 
 const state = require('../state')
 const { bindConnections } = require('../../models')
@@ -44,7 +44,7 @@ const NO_RELOAD = new Set([
 async function reloadConfig() {
   const startTime = process.hrtime()
   try {
-    log.info(HELPERS.config, 'starting config reload...')
+    log.info(TAGS.config, 'starting config reload...')
     const oldConfig = require('@rm/config').reload()
     const newConfig = require('@rm/config')
 
@@ -56,9 +56,19 @@ async function reloadConfig() {
     )
     const [seconds, nanoseconds] = process.hrtime(startTime)
     log.debug(
-      HELPERS.config,
+      TAGS.config,
       `deep comparing took ${seconds}.${nanoseconds} seconds`,
     )
+
+    if (
+      !report.api.report.kojiOptions.areEqual ||
+      !report.map.report.general.report.geoJsonFileName
+    ) {
+      newConfig.setAreas(await loadLatestAreas())
+    } else {
+      newConfig.setAreas(areas)
+    }
+
     if (areEqual) {
       return null
     }
@@ -67,11 +77,11 @@ async function reloadConfig() {
     const invalid = changed.filter((key) => NO_RELOAD.has(key))
 
     if (valid.length) {
-      log.info(HELPERS.config, 'updating the following config values:', valid)
+      log.info(TAGS.config, 'updating the following config values:', valid)
     }
     if (invalid.length) {
       log.warn(
-        HELPERS.config,
+        TAGS.config,
         'unfortunately the following config values cannot be hot reloaded and will require a full process restart:',
         invalid,
       )
@@ -115,22 +125,14 @@ async function reloadConfig() {
     if (stateReport.strategies) {
       loadAuthStrategies()
     }
-    if (
-      !report.api.report.kojiOptions.areEqual ||
-      !report.map.report.general.report.geoJsonFileName
-    ) {
-      newConfig.setAreas(await loadLatestAreas())
-    } else {
-      newConfig.setAreas(areas)
-    }
     return null
   } catch (e) {
-    log.error(HELPERS.config, e)
+    log.error(TAGS.config, e)
     return e
   } finally {
     const [seconds, nanoseconds] = process.hrtime(startTime)
     log.debug(
-      HELPERS.config,
+      TAGS.config,
       `configuration reload completed in ${seconds}.${nanoseconds} seconds`,
     )
   }

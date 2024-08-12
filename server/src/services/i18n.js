@@ -6,7 +6,7 @@ const i18next = require('i18next')
 const Backend = require('i18next-fs-backend')
 
 const { locales } = require('@rm/locales')
-const { log, HELPERS } = require('@rm/logger')
+const { log, TAGS } = require('@rm/logger')
 const { create, writeAll } = require('@rm/locales')
 
 /** @param {string} localePath */
@@ -27,7 +27,7 @@ const starti18n = async (localePath) => {
       backend: { loadPath: path.resolve(localePath, '{{lng}}/{{ns}}.json') },
     },
     (err) => {
-      if (err) return log.error(HELPERS.i18n, err)
+      if (err) return log.error(TAGS.i18n, err)
     },
   )
 }

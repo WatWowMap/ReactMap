@@ -7,7 +7,7 @@
 const vm = require('vm')
 const NodeCache = require('node-cache')
 
-const { log, HELPERS } = require('@rm/logger')
+const { log, TAGS } = require('@rm/logger')
 
 /**
  * @param {object} pokemon
@@ -194,7 +194,7 @@ function jsifyIvFilter(filter) {
   if (expectClause || stack !== 0 || lastIndex < filter.length) {
     return null
   }
-  log.debug(HELPERS.pokemon, result)
+  log.trace(TAGS.pokemon, result)
   const fn = vm.runInNewContext(`(pokemon) => ${result};`)
   jsFnCache.set(filter, fn)
   return fn

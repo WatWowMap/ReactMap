@@ -6,7 +6,7 @@ const { default: fetch } = require('node-fetch')
 const RTree = require('rtree')
 
 const config = require('@rm/config')
-const { log, HELPERS } = require('@rm/logger')
+const { log, TAGS } = require('@rm/logger')
 const { setCache, getCache } = require('./cache')
 
 /** @type {import("@rm/types").RMGeoJSON} */
@@ -54,7 +54,7 @@ const loadFromFile = (fileName) => {
     }
     return DEFAULT_RETURN
   } catch (e) {
-    log.warn(HELPERS.areas, `Failed to load ${fileName} from file system`, e)
+    log.warn(TAGS.areas, `Failed to load ${fileName} from file system`, e)
     return DEFAULT_RETURN
   }
 }
@@ -66,7 +66,7 @@ const loadFromFile = (fileName) => {
 const getGeojson = async (location) => {
   try {
     if (location.startsWith('http')) {
-      log.info(HELPERS.areas, 'Loading Kōji URL', location)
+      log.info(TAGS.areas, 'Loading Kōji URL', location)
       return fetch(location, {
         headers: {
           Authorization: `Bearer ${config.getSafe(
@@ -84,7 +84,7 @@ const getGeojson = async (location) => {
         })
         .then(async (res) => {
           if (res?.data) {
-            log.info(HELPERS.areas, 'Caching', location, 'from Kōji')
+            log.info(TAGS.areas, 'Caching', location, 'from Kōji')
             await setCache(location, res.data)
             return res.data
           }
@@ -92,22 +92,22 @@ const getGeojson = async (location) => {
         })
         .catch((err) => {
           log.error(
-            HELPERS.areas,
+            TAGS.areas,
             'Failed to fetch Kōji geojson, attempting to read from backup',
             err,
           )
           const cached = getCache(location)
           if (cached) {
-            log.info(HELPERS.areas, 'Reading from koji_backups for', location)
+            log.info(TAGS.areas, 'Reading from koji_backups for', location)
             return cached
           }
-          log.warn(HELPERS.areas, 'No backup found for', location)
+          log.warn(TAGS.areas, 'No backup found for', location)
           return DEFAULT_RETURN
         })
     }
     return loadFromFile(location)
   } catch (e) {
-    log.warn(HELPERS.areas, 'Issue with getting the geojson', e)
+    log.warn(TAGS.areas, 'Issue with getting the geojson', e)
   }
   return DEFAULT_RETURN
 }
@@ -147,7 +147,7 @@ const loadScanPolygons = async (fileName, domain) => {
     }
   } catch (e) {
     log.warn(
-      HELPERS.areas,
+      TAGS.areas,
       `Failed to load ${fileName} for ${
         domain || 'map'
       }. Using empty areas.json`,
@@ -181,7 +181,7 @@ const loadAreas = (scanAreas) => {
         .some((rule) => rule.roles.length)
     ) {
       log.warn(
-        HELPERS.areas,
+        TAGS.areas,
         'Area restrictions disabled - `areas.json` file is missing or broken.',
       )
     }
@@ -211,7 +211,7 @@ const parseAreas = (featureCollection) => {
             polygon[0][0] !== polygon[polygon.length - 1][0] ||
             polygon[0][1] !== polygon[polygon.length - 1][1]
           ) {
-            log.warn(HELPERS.areas, 'Polygon not closed', name, `Index (${i})`)
+            log.warn(TAGS.areas, 'Polygon not closed', name, `Index (${i})`)
             polygon.push(polygon[0])
           }
         })
@@ -223,7 +223,7 @@ const parseAreas = (featureCollection) => {
               polygon[0][1] !== polygon[polygon.length - 1][1]
             ) {
               log.warn(
-                HELPERS.areas,
+                TAGS.areas,
                 'MultiPolygon contains unclosed Polygon',
                 name,
                 `Polygon (${i})`,
@@ -323,7 +323,7 @@ const buildAreas = (scanAreas) => {
   })
 
   const raw = loadAreas(scanAreas)
-  log.info(HELPERS.areas, 'Loaded areas')
+  log.info(TAGS.areas, 'Loaded areas')
   return {
     scanAreas,
     scanAreasMenu,

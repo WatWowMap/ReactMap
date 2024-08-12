@@ -1,7 +1,7 @@
 // @ts-check
 const router = require('express').Router()
 
-const { log, HELPERS } = require('@rm/logger')
+const { log, TAGS } = require('@rm/logger')
 
 const { reloadConfig } = require('../../../services/functions/reloadConfig')
 
@@ -29,7 +29,7 @@ router.get('/', (req, res) => {
       },
     })
   } catch (e) {
-    log.error(HELPERS.api, req.originalUrl, e)
+    log.error(TAGS.api, req.originalUrl, e)
     res.status(500).json({ status: 'error', reason: e.message })
   }
 })

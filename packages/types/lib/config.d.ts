@@ -1,20 +1,22 @@
 import type { LogLevelNames } from 'loglevel'
-import type {
-  ButtonProps,
-  DialogProps,
-  DividerProps,
-  Grid2Props,
-  SxProps,
-  TypographyProps,
-} from '@mui/material'
+import type { DialogProps } from '@mui/material'
 import type { UiconsIndex } from 'uicons.js'
+
 import { Props as ImgProps } from '@components/Img'
 
+import type { CustomComponent } from './blocks'
 import config = require('server/src/configs/default.json')
 import example = require('server/src/configs/local.example.json')
 
 import type { Schema } from './server'
-import { OnlyType, DeepMerge, ComparisonReport } from './utility'
+import {
+  OnlyType,
+  DeepMerge,
+  ComparisonReport,
+  Paths,
+  ObjectPathValue,
+} from './utility'
+import { Strategy } from './general'
 
 type BaseConfig = typeof config
 type ExampleConfig = typeof example
@@ -53,13 +55,10 @@ export type Config<Client extends boolean = false> = DeepMerge<
       aliases: { role: string; name: string }[]
       methods: string[]
       strategies: {
+        type: Strategy
         trialPeriod: {
-          start: {
-            js: Date
-          }
-          end: {
-            js: Date
-          }
+          start: TrialPeriodDate
+          end: TrialPeriodDate
           roles: string[]
         }
         allowedGuilds: string[]
@@ -151,6 +150,18 @@ export interface Icons extends Omit<BaseConfig['icons'], 'styles'> {
   defaultIcons: Record<string, string>
 }
 
+export type StrategyConfig = Config['authentication']['strategies'][number]
+
+export interface TrialPeriodDate {
+  year?: number
+  month?: number
+  day?: number
+  hour?: number
+  minute?: number
+  second?: number
+  millisecond?: number
+}
+
 export interface ExtraField {
   name: string
   database: string
@@ -181,150 +192,8 @@ export interface GridSizes {
   xl?: number
 }
 
-export interface BaseBlock {
-  gridSizes?: GridSizes
-  gridStyle?: React.CSSProperties
-  gridSx?: SxProps
-  donorOnly?: boolean
-  freeloaderOnly?: boolean
-  loggedInOnly?: boolean
-  loggedOutOnly?: boolean
-  text?: string | null
-  content?: string | null
-  link?: string | null
-  href?: string | null
-}
-export interface CustomText
-  extends Omit<OnlyType<TypographyProps, Function, false>>,
-    BaseBlock {
-  type: 'text'
-}
-
-export interface CustomDivider
-  extends Omit<OnlyDType<DividerProps, Function, false>>,
-    BaseBlock {
-  type: 'divider'
-}
-
-export interface CustomButton
-  extends Omit<OnlyType<ButtonProps, Function, false>>,
-    BaseBlock {
-  type: 'button'
-}
-
-export interface CustomImg extends ImgProps, BaseBlock {
-  type: 'img'
-}
-
-export interface CustomDiscord extends BaseBlock {
-  type: 'discord'
-  link: string
-}
-
-export interface CustomTelegram extends BaseBlock {
-  type: 'telegram'
-  telegramBotName: string
-  telegramAuthUrl: string
-}
-
-export interface CustomLocal extends BaseBlock {
-  type: 'localLogin'
-  localAuthUrl: string
-  link: string
-  style: React.CSSProperties
-}
-
-export interface CustomLocale extends BaseBlock {
-  type: 'localeSelection'
-}
-
-export interface ParentBlock extends BaseBlock, Grid2Props {
-  type: 'parent'
-  components: CustomComponent[]
-}
-
-export type CustomComponent =
-  | CustomText
-  | CustomDivider
-  | CustomButton
-  | CustomImg
-  | CustomDiscord
-  | CustomTelegram
-  | CustomLocal
-  | CustomLocale
-  | ParentBlock
-
-export type DeepKeys<T, P extends string = ''> = {
-  [K in keyof T]-?: K extends string
-    ? P extends ''
-      ? `${K}` | `${K}.${DeepKeys<T[K], K>}`
-      : `${P}.${K}.${DeepKeys<T[K], P & K>}`
-    : never
-}[keyof T]
-
-export type ConfigPaths<T extends object> = DeepKeys<T>
-
-export type PathValue<T, P> = P extends `${infer K}.${infer Rest}`
-  ? K extends keyof T
-    ? Rest extends DeepKeys<T[K]>
-      ? PathValue<T[K], Rest>
-      : never
-    : never
-  : P extends keyof T
-  ? T[P]
-  : never
-
-export type ConfigPathValue<
-  T extends object,
-  P extends ConfigPaths<T>,
-> = PathValue<T, P>
-
-export type Join<K, P> = K extends string | number
-  ? P extends string | number
-    ? `${K}${'' extends P ? '' : '.'}${P}`
-    : never
-  : never
-
-export type Prev = [
-  never,
-  0,
-  1,
-  2,
-  3,
-  4,
-  5,
-  6,
-  7,
-  8,
-  9,
-  10,
-  11,
-  12,
-  13,
-  14,
-  15,
-  16,
-  17,
-  18,
-  19,
-  20,
-  ...0[],
-]
-
-export type Paths<T, D extends number = 10> = [D] extends [never]
-  ? never
-  : T extends object
-  ? {
-      [K in keyof T]-?: K extends string | number
-        ? `${K}` | Join<K, Paths<T[K], Prev[D]>>
-        : never
-    }[keyof T]
-  : ''
-
-export type NestedObjectPaths = Paths<Config>
-
-export type GetSafeConfig = <P extends NestedObjectPaths>(
+export type GetSafeConfig = <P extends Paths<Config>>(
   path: P,
-) => ConfigPathValue<Config, P>
+) => ObjectPathValue<Config, P>
 
 export type ConfigEqualReport = ComparisonReport<Omit<Config, 'areas'>>

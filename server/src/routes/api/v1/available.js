@@ -1,7 +1,7 @@
 // @ts-check
 const router = require('express').Router()
 
-const { log, HELPERS } = require('@rm/logger')
+const { log, TAGS } = require('@rm/logger')
 const state = require('../../../services/state')
 
 const queryObj = /** @type {const} */ ({
@@ -99,7 +99,7 @@ router.get(['/', '/:category'], async (req, res) => {
       }
     }
   } catch (e) {
-    log.error(HELPERS.api, req.originalUrl, e)
+    log.error(TAGS.api, req.originalUrl, e)
     res.status(500).json({ status: 'ServerError', reason: e.message })
   }
 })
@@ -123,7 +123,7 @@ router.put('/:category', async (req, res) => {
       .status(200)
       .json({ status: `updated available for ${category || 'all'}` })
   } catch (e) {
-    log.error(HELPERS.api, req.originalUrl, e)
+    log.error(TAGS.api, req.originalUrl, e)
     res.status(500).json({ status: 'ServerError', reason: e.message })
   }
 })

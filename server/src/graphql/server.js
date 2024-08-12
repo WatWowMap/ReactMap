@@ -14,7 +14,7 @@ const {
 } = require('@apollo/server/plugin/disabled')
 
 const config = require('@rm/config')
-const { log, HELPERS } = require('@rm/logger')
+const { log, TAGS } = require('@rm/logger')
 
 const resolvers = require('./resolvers')
 const state = require('../services/state')
@@ -69,8 +69,8 @@ async function startApollo(httpServer) {
       const endpoint = /** @type {string} */ (e.extensions.endpoint)
 
       log[customMessage ? 'info' : 'error'](
-        HELPERS.gql,
-        HELPERS[endpoint] || `[${endpoint?.toUpperCase()}]`,
+        TAGS.gql,
+        TAGS[endpoint] || `[${endpoint?.toUpperCase()}]`,
         'Client:',
         e.extensions.clientV || 'Unknown',
         'Server:',
@@ -86,10 +86,10 @@ async function startApollo(httpServer) {
       return e
     },
     logger: {
-      debug: (...e) => log.debug(HELPERS.gql, ...e),
-      info: (...e) => log.info(HELPERS.gql, ...e),
-      warn: (...e) => log.warn(HELPERS.gql, ...e),
-      error: (...e) => log.error(HELPERS.gql, ...e),
+      debug: (...e) => log.debug(TAGS.gql, ...e),
+      info: (...e) => log.info(TAGS.gql, ...e),
+      warn: (...e) => log.warn(TAGS.gql, ...e),
+      error: (...e) => log.error(TAGS.gql, ...e),
     },
     plugins: [
       ApolloServerPluginLandingPageDisabled(),
@@ -98,7 +98,7 @@ async function startApollo(httpServer) {
         async requestDidStart(requestContext) {
           requestContext.contextValue.startTime = Date.now()
           if (requestContext.request?.variables?.filters) {
-            log.debug(requestContext.request?.variables?.filters)
+            log.trace(requestContext.request?.variables?.filters)
           }
           return {
             async willSendResponse({
@@ -142,7 +142,7 @@ async function startApollo(httpServer) {
                 }
 
                 log.info(
-                  HELPERS[endpoint] || `[${endpoint?.toUpperCase()}]`,
+                  TAGS[endpoint] || `[${endpoint?.toUpperCase()}]`,
                   '|',
                   operationName,
                   '|',

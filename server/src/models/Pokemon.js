@@ -6,7 +6,7 @@ const { resolve } = require('path')
 const { default: getDistance } = require('@turf/distance')
 const { point } = require('@turf/helpers')
 
-const { log, HELPERS } = require('@rm/logger')
+const { log, TAGS } = require('@rm/logger')
 const config = require('@rm/config')
 
 const state = require('../services/state')
@@ -412,7 +412,7 @@ class Pokemon extends Model {
           body: query,
         })
       : query)
-    log.debug(HELPERS.pokemon, 'raw result length', results?.length || 0)
+    log.debug(TAGS.pokemon, 'raw result length', results?.length || 0)
     return results || []
   }
 

@@ -2,7 +2,7 @@
 const { resolve } = require('path')
 const fs = require('fs')
 
-const { log, HELPERS } = require('@rm/logger')
+const { log, TAGS } = require('@rm/logger')
 
 /**
  * @param {boolean} isDevelopment
@@ -26,7 +26,7 @@ const faviconPlugin = (isDevelopment) => {
           source: fs.readFileSync(favicon),
         })
       } catch (e) {
-        log.error(HELPERS.build, 'Error loading favicon', e)
+        log.error(TAGS.build, 'Error loading favicon', e)
       }
     },
     configureServer(server) {
