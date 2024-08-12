@@ -15,6 +15,7 @@
   "api": {
     "sessionSecret": "98ki^e72~!@#(85o3kXLI*#c9wu5l!Z",
     "reactMapSecret": "",
+    "enableHelmet": false,
     "showSchemasInConfigApi": false,
     "showStrategiesInConfigApi": false,
     "maxSessions": 5,
