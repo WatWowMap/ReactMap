@@ -1,3 +1,27 @@
+# [1.33.0-develop.17](https://github.com/WatWowMap/ReactMap/compare/v1.33.0-develop.16...v1.33.0-develop.17) (2024-08-13)
+
+
+### Bug Fixes
+
+* add `start` & `end` tags ([303e28c](https://github.com/WatWowMap/ReactMap/commit/303e28c24062baa5dcf2972759e68352de1af4bd))
+* clear users who received access via trial if trial is over and process was restarted ([13f49b2](https://github.com/WatWowMap/ReactMap/commit/13f49b2a07eac6b1bc8bf2b00d2d38d78e27b7cc))
+* date generation ([783e22c](https://github.com/WatWowMap/ReactMap/commit/783e22c3bcb17bc40c928c92da76e3cd77157586))
+* helmet middleware opt in ([a82238a](https://github.com/WatWowMap/ReactMap/commit/a82238a793e9559320e5add6f9c90aadcd533e87))
+* hot reload manual areas ([abcf36b](https://github.com/WatWowMap/ReactMap/commit/abcf36b1586b1a3425a10b9e1e044a56bbeccedf))
+* log next start time ([09caed9](https://github.com/WatWowMap/ReactMap/commit/09caed95a3b4ad08961f0e49dcaf40002f59673b))
+* more consistent timing intervals ([6e67fab](https://github.com/WatWowMap/ReactMap/commit/6e67fab92fcad93aa3cdc6331dc56f331f6e2013))
+* more interval logic ([570eba2](https://github.com/WatWowMap/ReactMap/commit/570eba2f1e573a9810e0348f0a76434a01252088))
+* remove extra setNextDate ([067f639](https://github.com/WatWowMap/ReactMap/commit/067f639ef6add2a73146c4565b4561eee9a0f075))
+* start future start date if start is before present time at startup ([46c005c](https://github.com/WatWowMap/ReactMap/commit/46c005c7f07e28ed92a9272af24fd2280c956a62))
+* tg logging ([49aa473](https://github.com/WatWowMap/ReactMap/commit/49aa473887f610c953882a22711956622120a9cd))
+* trial not resuming after process restart ([0829926](https://github.com/WatWowMap/ReactMap/commit/08299264cfc562ed38d7b272d7fed9d66427addc))
+
+
+### Features
+
+* trial apis ([79943ce](https://github.com/WatWowMap/ReactMap/commit/79943ce018fc8d1ca700816f027066c3a50dac8d))
+* trial apis & interval support ([118aec2](https://github.com/WatWowMap/ReactMap/commit/118aec2a635998d7bc316efb011b0a0a01f08ae4))
+
 # [1.33.0-develop.16](https://github.com/WatWowMap/ReactMap/compare/v1.33.0-develop.15...v1.33.0-develop.16) (2024-08-10)
 
 
