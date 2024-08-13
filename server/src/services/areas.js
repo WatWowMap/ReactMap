@@ -12,8 +12,8 @@ const { setCache, getCache } = require('./cache')
 /** @type {import("@rm/types").RMGeoJSON} */
 const DEFAULT_RETURN = { type: 'FeatureCollection', features: [] }
 
-/** @type {import("@rm/types").RMGeoJSON} */
-const manualGeojson = {
+/** @returns {import("@rm/types").RMGeoJSON} */
+const getManualGeojson = () => ({
   type: 'FeatureCollection',
   features: config
     .getSafe('manualAreas')
@@ -36,7 +36,7 @@ const manualGeojson = {
         },
       }
     }),
-}
+})
 
 /**
  * @param {string} fileName
@@ -124,7 +124,7 @@ const loadScanPolygons = async (fileName, domain) => {
     return {
       ...geojson,
       features: [
-        ...manualGeojson.features.filter(
+        ...getManualGeojson().features.filter(
           (f) => !f.properties.domain || f.properties.domain === domain,
         ),
         ...geojson.features.map((f) => ({

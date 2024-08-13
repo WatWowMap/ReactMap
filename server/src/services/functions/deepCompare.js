@@ -9,8 +9,8 @@
  * @template T
  * @param {T} a - The first value to compare.
  * @param {T} b - The second value to compare.
- * @param {boolean} [first=true] - Whether this is the first comparison.
- * @param {string} [changedKey=[]] - An array of keys that have changed.
+ * @param {boolean} [first] - Whether this is the first comparison.
+ * @param {string} [changedKey] - The key of the changed value.
  * @returns {import('@rm/types').ComparisonReport<T>} An object containing the comparison result and a report object.
  */
 function deepCompare(a, b, first = true, changedKey = '') {

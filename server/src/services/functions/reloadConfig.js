@@ -63,7 +63,8 @@ async function reloadConfig() {
 
     if (
       !report.api.report.kojiOptions.areEqual ||
-      !report.map.report.general.report.geoJsonFileName
+      !report.map.report.general.report.geoJsonFileName ||
+      !report.manualAreas.areEqual
     ) {
       newConfig.setAreas(await loadLatestAreas())
     } else {
