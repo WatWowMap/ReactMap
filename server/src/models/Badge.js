@@ -17,11 +17,11 @@ class Badge extends Model {
   }
 
   static get relationMappings() {
-    const { Db } = require('../services/initialization')
+    const state = require('../services/state')
     return {
       user: {
         relation: Model.BelongsToOneRelation,
-        modelClass: Db.models.User,
+        modelClass: state.db.models.User,
         join: {
           from: `${config.getSafe(
             'database.settings.gymBadgeTableName',

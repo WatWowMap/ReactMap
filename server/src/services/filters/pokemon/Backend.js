@@ -1,7 +1,7 @@
 /* eslint-disable no-unused-vars */
 const config = require('@rm/config')
-const { log, HELPERS } = require('@rm/logger')
-const { KEYS, AND_KEYS, STANDARD, LEAGUES } = require('./constants')
+const { log, TAGS } = require('@rm/logger')
+const { AND_KEYS, BASE_KEYS } = require('./constants')
 const {
   deepCompare,
   between,
@@ -11,10 +11,8 @@ const {
   dnfifyIvFilter,
 } = require('./functions')
 const { filterRTree } = require('../../functions/filterRTree')
-const { Event, Pvp } = require('../../initialization')
-
-/** @type {import("@rm/types").Config['api']['pvp']} */
-const pvpConfig = config.getSafe('api.pvp')
+const state = require('../../state')
+const PokemonFilter = require('./Frontend')
 
 module.exports = class PkmnBackend {
   /**
@@ -45,6 +43,9 @@ module.exports = class PkmnBackend {
    * @param {boolean} mods.onlyLegacy
    */
   constructor(id, filter, global, perms, mods) {
+    /** @type {import("@rm/types").Config['api']['pvp']} */
+    this.pvpConfig = config.getSafe('api.pvp')
+
     const [pokemon, form] = id.split('-', 2).map(Number)
     this.id = id
     this.pokemon = pokemon || 0
@@ -52,7 +53,8 @@ module.exports = class PkmnBackend {
 
     this.perms = perms
     this.mods = mods
-
+    this.standard = new PokemonFilter()
+    this.allKeys = [...BASE_KEYS, ...this.pvpConfig.leagues.map((l) => l.name)]
     this.filter = filter
     this.global = global
     this.filterKeys = this.getRelevantKeys(filter)
@@ -133,7 +135,7 @@ module.exports = class PkmnBackend {
       if (merged) merged = `(${merged})&`
       merged += `G${filter.gender}`
     }
-    log.trace(HELPERS.pokemon, this.id, {
+    log.trace(TAGS.pokemon, this.id, {
       andStr,
       orStr,
       merged,
@@ -159,40 +161,41 @@ module.exports = class PkmnBackend {
 
   /**
    * @param {import("./Frontend")} filter
-   * @returns {Set<(typeof import("./constants").KEYS)[number]>}
+   * @returns {Set<string>}
    */
   getRelevantKeys(filter = this.filter) {
     return this.filter.all
       ? new Set()
       : new Set(
-          KEYS.filter(
+          this.allKeys.filter(
             (key) =>
-              (pvpConfig.leagueObj[key] ? this.perms.pvp : this.perms.iv) &&
-              this.isActive(key, filter),
+              (this.pvpConfig.leagueObj[key]
+                ? this.perms.pvp
+                : this.perms.iv) && this.isActive(key, filter),
           ),
         )
   }
 
   /**
-   * @param {(typeof import("./constants").KEYS)[number]} key
+   * @param {string} key
    * @returns {boolean}
    */
   isActive(key, filter = this.filter) {
-    switch (typeof STANDARD[key]) {
+    switch (typeof this.standard[key]) {
       case 'boolean':
       case 'string':
       case 'number':
-        return filter[key] !== STANDARD[key]
+        return filter[key] !== this.standard[key]
       default:
         return Array.isArray(filter[key])
-          ? filter[key].some((v, i) => v !== STANDARD[key][i])
-          : !deepCompare(filter[key], STANDARD[key])
+          ? filter[key].some((v, i) => v !== this.standard[key][i])
+          : !deepCompare(filter[key], this.standard[key])
     }
   }
 
   /**
    * @param {import("@rm/types").PvpEntry} entry
-   * @param {typeof import("./constants").LEAGUES[number]} league
+   * @param {string} league
    * @returns {boolean}
    */
   pvpCheck(entry, league) {
@@ -203,15 +206,15 @@ module.exports = class PkmnBackend {
 
     const cpCheck =
       this.mods.pvpV2 ||
-      pvpConfig.reactMapHandlesPvp ||
-      entry.cp >= pvpConfig.minCp[league]
+      this.pvpConfig.reactMapHandlesPvp ||
+      entry.cp >= this.pvpConfig.minCp[league]
     if (!cpCheck) return false
 
     const megaCheck = !entry.evolution || this.mods.onlyPvpMega
     if (!megaCheck) return false
 
     const capCheck =
-      this.mods.pvpV2 || pvpConfig.reactMapHandlesPvp
+      this.mods.pvpV2 || this.pvpConfig.reactMapHandlesPvp
         ? entry.capped || this.mods[`onlyPvp${entry.cap}`]
         : true
     if (!capCheck) return false
@@ -220,13 +223,13 @@ module.exports = class PkmnBackend {
   }
 
   /**
-   * @param {typeof import("./constants").LEAGUES[number]} league
+   * @param {string} league
    * @param {import("@rm/types").PvpEntry[]} data
    * @returns {{ best: number; filtered: import("@rm/types").PvpEntry[]}}
    */
   getRanks(league, data) {
     const filtered =
-      this.mods.onlyAllPvp || this.mods.onlyLegacy
+      this.mods.onlyAllPvp || this.mods.onlyLegacy || this.filter.all
         ? data
         : data.filter((entry) => {
             const valid =
@@ -304,7 +307,7 @@ module.exports = class PkmnBackend {
           ? PkmnBackend.ensureSafe(sta_iv, 15)
           : undefined,
         cp: this.filterKeys.has('cp')
-          ? PkmnBackend.ensureSafe(cp, STANDARD.cp[1])
+          ? PkmnBackend.ensureSafe(cp, this.standard.cp[1])
           : undefined,
         level: this.filterKeys.has('level')
           ? PkmnBackend.ensureSafe(level, 35)
@@ -322,7 +325,7 @@ module.exports = class PkmnBackend {
             pokemon,
             [`pvp_${league}`]: PkmnBackend.ensureSafe(
               values,
-              STANDARD[league]?.[1],
+              this.standard[league]?.[1],
             ),
           }
           if (this.filterKeys.has('gender')) {
@@ -385,17 +388,16 @@ module.exports = class PkmnBackend {
   /**
    * @param {import("@rm/types").Pokemon} pokemon
    * @param {number} [ts]
-   * @returns {{ cleanPvp: { [key in typeof LEAGUES[number]]?: import('@rm/types').PvpEntry[] }, bestPvp: number }}
+   * @returns {{ cleanPvp: import('@rm/types').CleanPvp, bestPvp: number }}
    */
   buildPvp(pokemon, ts = Math.floor(Date.now() / 1000)) {
-    const parsed = pvpConfig.reactMapHandlesPvp
-      ? Pvp.resultWithCache(pokemon, ts)
+    const parsed = this.pvpConfig.reactMapHandlesPvp
+      ? state.pvp.resultWithCache(pokemon, ts)
       : getParsedPvp(pokemon)
-    const cleanPvp =
-      /** @type {{ [key in typeof LEAGUES[number]]?: import('@rm/types').PvpEntry[] }} */ ({})
+    const cleanPvp = /** @type {import('@rm/types').CleanPvp} */ ({})
     let bestPvp = 4096
     Object.keys(parsed).forEach((league) => {
-      if (pvpConfig.leagueObj[league]) {
+      if (this.pvpConfig.leagueObj[league]) {
         const { filtered, best } = this.getRanks(league, parsed[league])
         if (filtered.length) {
           cleanPvp[league] = filtered
@@ -433,7 +435,8 @@ module.exports = class PkmnBackend {
     if (result.pokemon_id === 132 && !result.ditto_form) {
       result.ditto_form = result.form
       result.form =
-        Event.masterfile.pokemon[result.display_pokemon_id]?.defaultFormId || 0
+        state.event.masterfile.pokemon[result.display_pokemon_id]
+          ?.defaultFormId || 0
     }
     if (!result.seen_type) {
       if (result.spawn_id === null) {

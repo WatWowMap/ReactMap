@@ -1,4 +1,3 @@
-import { LEAGUES } from 'server/src/services/filters/pokemon/constants'
 import { FullModel } from './utility'
 import DeviceModel = require('server/src/models/Device')
 import GymModel = require('server/src/models/Gym')
@@ -28,6 +27,17 @@ export interface Device {
 
 export type FullDevice = FullModel<Device, DeviceModel>
 
+export interface PokemonDisplay {
+  form: number
+  costume: number
+  gender: number
+  shiny: boolean
+  temp_evolution: number
+  alignment: number
+  badge: number
+  location_card: number
+}
+
 export interface Gym {
   id: string
   lat: number
@@ -41,6 +51,7 @@ export interface Gym {
   raid_pokemon_id: number
   updated: number
   guarding_pokemon_id: number
+  guarding_pokemon_display: PokemonDisplay
   available_slots: number
   team_id: number
   raid_level: number
@@ -198,7 +209,7 @@ export interface PvpEntry {
   evolution: number
 }
 
-export type CleanPvp = { [league in (typeof LEAGUES)[number]]?: PvpEntry }
+export type CleanPvp = Record<string, PvpEntry[]>
 
 export interface Pokemon {
   id: string
@@ -235,7 +246,7 @@ export interface Pokemon {
   first_seen_timestamp: number
   expire_timestamp_verified: boolean
   updated: number
-  pvp: { [league in (typeof LEAGUES)[number]]?: PvpEntry[] }
+  pvp: CleanPvp
   pvp_rankings_great_league?: PvpEntry[]
   pvp_rankings_ultra_league?: PvpEntry[]
   distance?: number

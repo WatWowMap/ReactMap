@@ -2,7 +2,7 @@
 const { default: fetch } = require('node-fetch')
 
 const config = require('@rm/config')
-const { log, HELPERS } = require('@rm/logger')
+const { log, TAGS } = require('@rm/logger')
 
 const {
   fetchRemote,
@@ -19,7 +19,7 @@ async function create() {
   const endpoint = config.getSafe('api.pogoApiEndpoints.translations')
 
   if (!endpoint) {
-    log.error(HELPERS.locales, 'No translations endpoint')
+    log.error(TAGS.locales, 'No translations endpoint')
     return
   }
   const localTranslations = readLocaleDirectory(true)
@@ -39,7 +39,7 @@ async function create() {
 
       if (!availableRemote.has(fileName)) {
         log.warn(
-          HELPERS.locales,
+          TAGS.locales,
           'No remote translation found for',
           fileName,
           'using English',
@@ -59,7 +59,7 @@ async function create() {
         ...humanLocales,
       }
 
-      log.info(HELPERS.locales, fileName, 'done.')
+      log.info(TAGS.locales, fileName, 'done.')
       return [locale, finalTranslations]
     }),
   )
@@ -75,5 +75,5 @@ if (require.main === module) {
     .then((locales) =>
       writeAll(locales, true, __dirname, '../../../dist/locales'),
     )
-    .then(() => log.info(HELPERS.locales, 'locales have finished'))
+    .then(() => log.info(TAGS.locales, 'locales have finished'))
 }

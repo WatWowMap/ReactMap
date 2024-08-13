@@ -4,6 +4,10 @@
     "__name": "PORT",
     "__format": "number"
   },
+  "reloadConfigOnSave": {
+    "__name": "RELOAD_CONFIG_ON_SAVE",
+    "__format": "boolean"
+  },
   "packageSource": "PACKAGE_SOURCE",
   "googleAnalyticsId": "GOOGLE_ANALYTICS_ID",
   "devOptions": {
@@ -23,11 +27,19 @@
     "skipMinified": {
       "__name": "DEV_OPTIONS_SKIP_MINIFIED",
       "__format": "boolean"
+    },
+    "skipUpdateCheck": {
+      "__name": "DEV_OPTIONS_SKIP_UPDATE_CHECK",
+      "__format": "boolean"
     }
   },
   "api": {
     "sessionSecret": "API_SESSION_SECRET",
     "reactMapSecret": "API_REACT_MAP_SECRET",
+    "enableHelmet": {
+      "__name": "API_ENABLE_HELMET",
+      "__format": "boolean"
+    },
     "showSchemasInConfigApi": {
       "__name": "API_SHOW_SCHEMAS_IN_CONFIG_API",
       "__format": "boolean"
@@ -180,6 +192,46 @@
       "nests": {
         "__name": "API_QUERY_ON_SESSION_INIT_NESTS",
         "__format": "boolean"
+      }
+    },
+    "dataRequestLimits": {
+      "categories": {
+        "devices": {
+          "__name": "API_DATA_REQUEST_LIMITS_CATEGORIES_DEVICES",
+          "__format": "number"
+        },
+        "gyms": {
+          "__name": "API_DATA_REQUEST_LIMITS_CATEGORIES_GYMS",
+          "__format": "number"
+        },
+        "nests": {
+          "__name": "API_DATA_REQUEST_LIMITS_CATEGORIES_NESTS",
+          "__format": "number"
+        },
+        "pokemon": {
+          "__name": "API_DATA_REQUEST_LIMITS_CATEGORIES_POKEMON",
+          "__format": "number"
+        },
+        "pokestops": {
+          "__name": "API_DATA_REQUEST_LIMITS_CATEGORIES_POKESTOPS",
+          "__format": "number"
+        },
+        "portals": {
+          "__name": "API_DATA_REQUEST_LIMITS_CATEGORIES_PORTALS",
+          "__format": "number"
+        },
+        "routes": {
+          "__name": "API_DATA_REQUEST_LIMITS_CATEGORIES_ROUTES",
+          "__format": "number"
+        },
+        "weather": {
+          "__name": "API_DATA_REQUEST_LIMITS_CATEGORIES_WEATHER",
+          "__format": "number"
+        }
+      },
+      "time": {
+        "__name": "API_DATA_REQUEST_LIMITS_TIME",
+        "__format": "number"
       }
     },
     "queryLimits": {
@@ -989,6 +1041,14 @@
         "__name": "DEFAULT_FILTERS_POKESTOPS_CONFIRMED",
         "__format": "boolean"
       },
+      "excludeGrunts": {
+        "__name": "DEFAULT_FILTERS_POKESTOPS_EXCLUDE_GRUNTS",
+        "__format": "boolean"
+      },
+      "excludeLeaders": {
+        "__name": "DEFAULT_FILTERS_POKESTOPS_EXCLUDE_LEADERS",
+        "__format": "boolean"
+      },
       "items": {
         "__name": "DEFAULT_FILTERS_POKESTOPS_ITEMS",
         "__format": "boolean"
@@ -999,6 +1059,10 @@
       },
       "candy": {
         "__name": "DEFAULT_FILTERS_POKESTOPS_CANDY",
+        "__format": "boolean"
+      },
+      "xlCandy": {
+        "__name": "DEFAULT_FILTERS_POKESTOPS_XL_CANDY",
         "__format": "boolean"
       },
       "pokemon": {
@@ -1804,6 +1868,7 @@
       "__format": "json"
     },
     "defaultIcons": {},
+    "overrides": {},
     "cacheHrs": {
       "__name": "ICONS_CACHE_HRS",
       "__format": "number"
@@ -1997,6 +2062,7 @@
       "__format": "number"
     },
     "defaultAudio": {},
+    "overrides": {},
     "customizable": {
       "__name": "AUDIO_CUSTOMIZABLE",
       "__format": "json"

@@ -32,7 +32,7 @@ export function MultiSelector({ items, value, disabled, onClick, tKey }) {
 
 /**
  * @template {import('@store/useStorage').UseStoragePaths} T
- * @template {import('@rm/types').ConfigPathValue<import('@store/useStorage').UseStorage, T>} V
+ * @template {import('@rm/types').ObjectPathValue<import('@store/useStorage').UseStorage, T>} V
  * @param {{
  *  field: T,
  *  defaultValue?: V,

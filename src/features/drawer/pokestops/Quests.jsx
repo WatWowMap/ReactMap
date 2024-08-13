@@ -38,4 +38,5 @@ const BaseQuestQuickSelect = () => {
     </CollapsibleItem>
   )
 }
+
 export const QuestQuickSelect = React.memo(BaseQuestQuickSelect)

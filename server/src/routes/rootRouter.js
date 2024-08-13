@@ -1,18 +1,19 @@
 const express = require('express')
 const fs = require('fs')
-const { resolve, join } = require('path')
+const { join } = require('path')
 const { SourceMapConsumer } = require('source-map')
+
 const config = require('@rm/config')
-const { log, HELPERS } = require('@rm/logger')
-const authRouter = require('./authRouter')
+const { log, TAGS } = require('@rm/logger')
+
+const { authRouter } = require('./authRouter')
 const clientRouter = require('./clientRouter')
-const { Event, Db } = require('../services/initialization')
-const { version } = require('../../../package.json')
+const apiRouter = require('./api')
+const state = require('../services/state')
 const areaPerms = require('../services/functions/areaPerms')
 const getServerSettings = require('../services/functions/getServerSettings')
-
-const scanner = config.getSafe('scanner')
-const api = config.getSafe('api')
+const { secretMiddleware } = require('../middleware/secret')
+const { version } = require('../../../package.json')
 
 const rootRouter = express.Router()
 
@@ -20,20 +21,7 @@ rootRouter.use('/', clientRouter)
 
 rootRouter.use('/auth', authRouter)
 
-fs.readdir(resolve(__dirname, './api/v1/'), (e, files) => {
-  if (e) return log.error(HELPERS.api, 'Error initializing an API endpoint', e)
-  files.forEach((file) => {
-    try {
-      rootRouter.use(
-        `/api/v1/${file.replace('.js', '')}`,
-        require(resolve(__dirname, './api/v1/', file)),
-      )
-      log.info(HELPERS.api, `Loaded ${file}`)
-    } catch (err) {
-      log.warn(HELPERS.api, 'Unable to load API endpoint:', file, '\n', err)
-    }
-  })
-})
+rootRouter.use('/api/v1', secretMiddleware, apiRouter)
 
 rootRouter.get('/api/health', async (req, res) =>
   res.status(200).json({ status: 'ok' }),
@@ -57,7 +45,7 @@ rootRouter.post('/api/error/client', async (req, res) => {
               const match = stackLine.match(
                 /at (.+) \((\/.+\.js):(\d+):(\d+)\)/,
               )
-              log.debug(HELPERS.client, { match, stackLine })
+              log.debug(TAGS.client, { match, stackLine })
               if (match) {
                 const [full, functionName, file, line, column] = match
                 const foundStack = await SourceMapConsumer.with(
@@ -81,7 +69,7 @@ rootRouter.post('/api/error/client', async (req, res) => {
                 if (foundStack) {
                   return foundStack
                 }
-                log.warn(HELPERS.client, 'Unable to find source map', {
+                log.warn(TAGS.client, 'Unable to find source map', {
                   full,
                   functionName,
                   file,
@@ -90,18 +78,14 @@ rootRouter.post('/api/error/client', async (req, res) => {
                 })
               }
               if (i > 0) {
-                log.warn(
-                  HELPERS.client,
-                  'Regex missed for stack line:',
-                  stackLine,
-                )
+                log.warn(TAGS.client, 'Regex missed for stack line:', stackLine)
               }
               return stackLine
             }),
           ).then((lines) => lines.join('\n'))
         : cause || message
 
-    log.error(HELPERS.client, {
+    log.error(TAGS.client, {
       client_version: req.headers.version,
       server_version: version,
       username,
@@ -131,14 +115,17 @@ rootRouter.get('/area/:area/:zoom?', (req, res) => {
       return res.redirect('/404')
     }
   } catch (e) {
-    log.error(HELPERS.express, `Error navigating to ${area}`, e)
+    log.error(TAGS.express, `Error navigating to ${area}`, e)
     res.redirect('/404')
   }
 })
 
 rootRouter.get('/api/settings', async (req, res, next) => {
   const authentication = config.getSafe('authentication')
+  const scanner = config.getSafe('scanner')
+  const api = config.getSafe('api')
   const mapConfig = config.getMapConfig(req)
+
   try {
     if (
       authentication.alwaysEnabledPerms.length ||
@@ -166,7 +153,7 @@ rootRouter.get('/api/settings', async (req, res, next) => {
           req.session.perms[perm] = true
         } else {
           log.warn(
-            HELPERS.auth,
+            TAGS.auth,
             'Invalid Perm in "alwaysEnabledPerms" array:',
             perm,
           )
@@ -179,13 +166,13 @@ rootRouter.get('/api/settings', async (req, res, next) => {
 
     if (authentication.methods.length && req.user) {
       try {
-        const user = await Db.query('User', 'getOne', req.user.id)
+        const user = await state.db.query('User', 'getOne', req.user.id)
         if (user) {
           if (!user.selectedWebhook) {
             const newWebhook = req.user.perms.webhooks.find(
-              (n) => n in Event.webhookObj,
+              (n) => n in state.event.webhookObj,
             )
-            await Db.query('User', 'updateWebhook', user.id, newWebhook)
+            await state.db.query('User', 'updateWebhook', user.id, newWebhook)
             if (req.session?.user) {
               req.session.user.selectedWebhook = newWebhook
               req.session.save()
@@ -193,25 +180,20 @@ rootRouter.get('/api/settings', async (req, res, next) => {
           }
         }
       } catch (e) {
-        log.warn(
-          HELPERS.session,
-          'Issue finding user, User ID:',
-          req?.user?.id,
-          e,
-        )
+        log.warn(TAGS.session, 'Issue finding user, User ID:', req?.user?.id, e)
       }
     }
     const settings = getServerSettings(req)
 
     if ('perms' in settings.user) {
       if (settings.user.perms.pokemon && api.queryOnSessionInit.pokemon) {
-        Event.setAvailable('pokemon', 'Pokemon', Db, false)
+        state.event.setAvailable('pokemon', 'Pokemon', state.db, false)
       }
       if (
         api.queryOnSessionInit.raids &&
         (settings.user.perms.raids || settings.user.perms.gyms)
       ) {
-        Event.setAvailable('gyms', 'Gym', Db, false)
+        state.event.setAvailable('gyms', 'Gym', state.db, false)
       }
       if (
         api.queryOnSessionInit.quests &&
@@ -220,10 +202,10 @@ rootRouter.get('/api/settings', async (req, res, next) => {
           settings.user.perms.invasions ||
           settings.user.perms.lures)
       ) {
-        Event.setAvailable('pokestops', 'Pokestop', Db, false)
+        state.event.setAvailable('pokestops', 'Pokestop', state.db, false)
       }
       if (settings.user.perms.nests && api.queryOnSessionInit.nests) {
-        Event.setAvailable('nests', 'Nest', Db, false)
+        state.event.setAvailable('nests', 'Nest', state.db, false)
       }
     }
 

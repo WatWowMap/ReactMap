@@ -49,7 +49,7 @@ import { setDeep } from '@utils/setDeep'
  * }} UseStorage
  *
  * @typedef {import('@rm/types').Paths<UseStorage>} UseStoragePaths
- * @typedef {import('@rm/types').ConfigPathValue<UseStorage, UseStoragePaths>} UseStorageValues
+ * @typedef {import('@rm/types').ObjectPathValue<UseStorage, UseStoragePaths>} UseStorageValues
  *
  * @type {import("zustand").UseBoundStore<import("zustand").StoreApi<UseStorage>>}
  */
@@ -166,8 +166,8 @@ export const useStorage = create(
 /**
  * @template {UseStoragePaths} T
  * @param {T} field
- * @param {import('@rm/types').ConfigPathValue<UseStorage, T>} [defaultValue]
- * @returns {import('@rm/types').ConfigPathValue<UseStorage, T>}
+ * @param {import('@rm/types').ObjectPathValue<UseStorage, T>} [defaultValue]
+ * @returns {import('@rm/types').ObjectPathValue<UseStorage, T>}
  */
 export function useGetDeepStore(field, defaultValue) {
   return useStorage((s) => dlv(s, field, defaultValue))
@@ -176,7 +176,7 @@ export function useGetDeepStore(field, defaultValue) {
 /**
  * @template {UseStoragePaths} T
  * @param {T} field
- * @param {import('@rm/types').ConfigPathValue<UseStorage, T>} value
+ * @param {import('@rm/types').ObjectPathValue<UseStorage, T>} value
  * @returns {void}
  */
 export function setDeepStore(field, value) {
@@ -185,12 +185,12 @@ export function setDeepStore(field, value) {
 
 /**
  * @template {UseStoragePaths} Paths
- * @template {import('@rm/types').ConfigPathValue<UseStorage, Paths>} T
+ * @template {import('@rm/types').ObjectPathValue<UseStorage, Paths>} T
  * @template {T | ((prevValue: T) => T) | keyof T} U
  * @template {(arg1: U, ...rest: (U extends keyof T ? [arg2: T[U]] : [arg2?: never])) => void} SetDeep
  * @param {Paths} field
- * @param {import('@rm/types').ConfigPathValue<UseStorage, Paths>} [defaultValue]
- * @returns {[import('@rm/types').ConfigPathValue<UseStorage, Paths>, SetDeep]}
+ * @param {import('@rm/types').ObjectPathValue<UseStorage, Paths>} [defaultValue]
+ * @returns {[import('@rm/types').ObjectPathValue<UseStorage, Paths>, SetDeep]}
  */
 export function useDeepStore(field, defaultValue) {
   const value = useGetDeepStore(field, defaultValue)

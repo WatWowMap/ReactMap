@@ -7,6 +7,7 @@ import { deepMerge } from '@utils/deepMerge'
 import { UAssets } from '@services/Assets'
 import { useMemory } from '@store/useMemory'
 import { useStorage } from '@store/useStorage'
+import { useProcessError } from '@hooks/useProcessError'
 
 export function useMapData(once = false) {
   const active = useMemory((s) => s.active)
@@ -34,17 +35,7 @@ export function useMapData(once = false) {
     }
   }, [hasIcons, online])
 
-  useEffect(() => {
-    if (error?.networkError && 'statusCode' in error.networkError) {
-      stopPolling()
-      if (error.networkError?.statusCode === 464) {
-        useMemory.setState({ clientError: 'early_old_client' })
-      }
-      if (error.networkError?.statusCode === 511) {
-        useMemory.setState({ clientError: 'session_expired' })
-      }
-    }
-  }, [error])
+  useProcessError(error)
 
   useEffect(() => {
     if (data?.available) {
@@ -81,6 +72,12 @@ export function useMapData(once = false) {
       if (Audio.checkValid(userAudio)) {
         Audio.setSelection(userAudio)
       }
+      if (icons.overrides) {
+        Icons.setSelection(icons.overrides)
+      }
+      if (audio.overrides) {
+        Audio.setSelection(audio.overrides)
+      }
       useStorage.setState({ icons: Icons.selection, audio: Audio.selection })
       if (masterfile) {
         localStorage.setItem(
@@ -98,9 +95,30 @@ export function useMapData(once = false) {
           questConditions,
         },
       }))
-      useStorage.setState((prev) => ({
-        filters: deepMerge({}, filters, prev.filters),
-      }))
+      useStorage.setState((prev) => {
+        const newFilters = deepMerge({}, filters, prev.filters)
+
+        // Migration for quest conditions to use target as well
+        Object.entries(newFilters?.pokestops?.filter || {}).forEach(
+          ([key, filter]) => {
+            if (filter.adv && questConditions[key]) {
+              const newAdv = filter.adv
+                .split(',')
+                .flatMap((each) =>
+                  questConditions[key]
+                    .filter(({ title }) => title === each)
+                    .map(({ target }) => `${each}__${target}`),
+                )
+              if (newAdv.length) {
+                filter.adv = newAdv.join(',')
+              }
+            }
+          },
+        )
+        return {
+          filters: newFilters,
+        }
+      })
     }
   }, [data])
 

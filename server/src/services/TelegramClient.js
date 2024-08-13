@@ -2,39 +2,21 @@
 const { default: fetch } = require('node-fetch')
 const { TelegramStrategy } = require('@rainb0w-clwn/passport-telegram-official')
 const passport = require('passport')
+
 const config = require('@rm/config')
 
-const { log, HELPERS } = require('@rm/logger')
-const { Db } = require('./initialization')
+const state = require('./state')
 const areaPerms = require('./functions/areaPerms')
 const webhookPerms = require('./functions/webhookPerms')
 const scannerPerms = require('./functions/scannerPerms')
 const mergePerms = require('./functions/mergePerms')
+const AuthClient = require('./AuthClient')
 
 /**
  * @typedef {import('@rainb0w-clwn/passport-telegram-official/dist/types').PassportTelegramUser} TGUser
  */
-class TelegramClient {
-  /**
-   *
-   * @param {import("@rm/types").Config['authentication']['strategies'][number]} strategy
-   * @param {string} rmStrategy
-   */
-  constructor(strategy, rmStrategy) {
-    this.strategy = strategy
-    this.rmStrategy = rmStrategy
-    this.perms = config.getSafe('authentication.perms')
-    this.alwaysEnabledPerms = config.getSafe(
-      'authentication.alwaysEnabledPerms',
-    )
-    this.loggingChannels = {
-      main: strategy.logGroupId,
-      event: strategy.eventLogGroupId,
-      scanNext: strategy.scanNextLogGroupId,
-      scanZone: strategy.scanZoneLogGroupId,
-    }
-  }
 
+class TelegramClient extends AuthClient {
   /** @param {TGUser} user */
   async getUserGroups(user) {
     if (!user || !user.id) return []
@@ -64,8 +46,7 @@ class TelegramClient {
             groups.push(group)
           }
         } catch (e) {
-          log.error(
-            HELPERS.custom(this.rmStrategy, '#26A8EA'),
+          this.log.error(
             e,
             `Telegram Group: ${group}`,
             `User: ${user.id} (${user.username})`,
@@ -84,36 +65,54 @@ class TelegramClient {
    * @returns {TGUser & { perms: import("@rm/types").Permissions }}
    */
   getUserPerms(user, groups) {
-    const date = new Date()
-    const trialActive =
-      this.strategy.trialPeriod &&
-      date >= this.strategy.trialPeriod.start.js &&
-      date <= this.strategy.trialPeriod.end.js
+    const trialActive = this.trialManager.active()
+    let gainedAccessViaTrial = false
 
+    const perms = Object.fromEntries(
+      Object.entries(this.perms).map(([perm, info]) => [
+        perm,
+        info.enabled &&
+          (this.alwaysEnabledPerms.includes(perm) ||
+            info.roles.some((role) => {
+              if (groups.includes(role)) {
+                return true
+              }
+              if (
+                trialActive &&
+                info.trialPeriodEligible &&
+                this.strategy.trialPeriod.roles.some((trialRole) =>
+                  groups.includes(trialRole),
+                )
+              ) {
+                gainedAccessViaTrial = true
+                return true
+              }
+              return false
+            })),
+      ]),
+    )
     /** @type { TGUser & { perms: import("@rm/types").Permissions }} */
     const newUserObj = {
       ...user,
       // @ts-ignore
       perms: {
-        ...Object.fromEntries(
-          Object.entries(this.perms).map(([perm, info]) => [
-            perm,
-            info.enabled &&
-              (this.alwaysEnabledPerms.includes(perm) ||
-                info.roles.some((role) => groups.includes(role)) ||
-                (trialActive &&
-                  info.trialPeriodEligible &&
-                  this.strategy.trialPeriod.roles.some((role) =>
-                    groups.includes(role),
-                  ))),
-          ]),
-        ),
+        ...perms,
+        trial: gainedAccessViaTrial,
         admin: false,
         areaRestrictions: areaPerms(groups),
         webhooks: webhookPerms(groups, 'telegramGroups', trialActive),
         scanner: scannerPerms(groups, 'telegramGroups', trialActive),
       },
     }
+    if (newUserObj.perms.trial) {
+      this.log.info(
+        user.username,
+        'gained access via',
+        this.trialManager._forceActive ? 'manually activated' : '',
+        'trial',
+      )
+    }
+
     if (this.strategy.allowedUsers?.includes(newUserObj.id)) {
       newUserObj.perms.admin = true
     }
@@ -127,37 +126,36 @@ class TelegramClient {
     const user = this.getUserPerms(baseUser, groups)
 
     if (!user.perms.map) {
-      log.warn(
-        HELPERS.custom(this.rmStrategy, '#26A8EA'),
-        user.username,
-        'was not given map perms',
-      )
+      this.log.warn(user.username, 'was not given map perms')
       return done(null, false, { message: 'access_denied' })
     }
     try {
-      await Db.models.User.query()
+      await state.db.models.User.query()
         .findOne({ telegramId: user.id })
         .then(
           async (/** @type {import('@rm/types').FullUser} */ userExists) => {
+            const selectedWebhook = Object.keys(state.event.webhookObj).find(
+              (x) => user?.perms?.webhooks.includes(x),
+            )
             if (req.user && userExists?.strategy === 'local') {
-              await Db.models.User.query()
+              await state.db.models.User.query()
                 .update({
                   telegramId: user.id,
                   telegramPerms: JSON.stringify(user.perms),
                   webhookStrategy: 'telegram',
                 })
                 .where('id', req.user.id)
-              await Db.models.User.query()
+              await state.db.models.User.query()
                 .where('telegramId', user.id)
                 .whereNot('id', req.user.id)
                 .delete()
-              log.info(
-                HELPERS.custom(this.rmStrategy, '#26A8EA'),
+              this.log.info(
                 user.username,
                 `(${user.id})`,
                 'Authenticated successfully.',
               )
               return done(null, {
+                selectedWebhook,
                 ...user,
                 ...req.user,
                 username: userExists.username || user.username,
@@ -166,20 +164,26 @@ class TelegramClient {
               })
             }
             if (!userExists) {
-              userExists = await Db.models.User.query().insertAndFetch({
+              userExists = await state.db.models.User.query().insertAndFetch({
                 telegramId: user.id,
                 strategy: user.provider,
                 tutorial: !config.getSafe('map.misc.forceTutorial'),
+                selectedWebhook,
               })
             }
             if (userExists.strategy !== 'telegram') {
-              await Db.models.User.query()
+              await state.db.models.User.query()
                 .update({ strategy: 'telegram' })
                 .where('id', userExists.id)
               userExists.strategy = 'telegram'
             }
-            log.info(
-              HELPERS.custom(this.rmStrategy, '#26A8EA'),
+            if (!userExists.selectedWebhook && selectedWebhook) {
+              await state.db.models.User.query()
+                .update({ selectedWebhook })
+                .where('id', userExists.id)
+              userExists.selectedWebhook = selectedWebhook
+            }
+            this.log.info(
               user.username,
               `(${user.id})`,
               'Authenticated successfully.',
@@ -192,21 +196,21 @@ class TelegramClient {
           },
         )
     } catch (e) {
-      log.error(
-        HELPERS.custom(this.rmStrategy, '#26A8EA'),
-        'User has failed auth.',
-        e,
-      )
+      this.log.error('User has failed auth.', e)
     }
   }
 
   /**
+   * Send a message to a Telegram Group
    *
-   * @param {string} text
-   * @param {keyof TelegramClient['loggingChannels']} channel
+   * @param {import('./AuthClient').MessageEmbed} embed
+   * @param {keyof AuthClient['loggingChannels']} channel
    */
-  async sendMessage(text, channel = 'main') {
+  async sendMessage(embed, channel) {
     if (!this.loggingChannels[channel]) return
+    const text = AuthClient.getHtml(
+      typeof embed === 'string' ? embed : { ...this.getBaseEmbed(), ...embed },
+    )
     try {
       const response = await fetch(
         `https://api.telegram.org/bot${this.strategy.botToken}/sendMessage`,
@@ -226,16 +230,9 @@ class TelegramClient {
           `Telegram API error: ${response.status} ${response.statusText}`,
         )
       }
-      log.info(
-        HELPERS.custom(this.rmStrategy, '#26A8EA'),
-        `${channel} Log Sent`,
-      )
+      this.log.info(`${channel} Log Sent`)
     } catch (e) {
-      log.error(
-        HELPERS.custom(this.rmStrategy, '#26A8EA'),
-        `Error sending ${channel} Log`,
-        e,
-      )
+      this.log.error(`Error sending ${channel} Log`, e)
     }
   }
 

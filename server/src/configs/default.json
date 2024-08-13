@@ -1,6 +1,7 @@
 {
   "interface": "0.0.0.0",
   "port": 8080,
+  "reloadConfigOnSave": false,
   "packageSource": "git",
   "googleAnalyticsId": "",
   "devOptions": {
@@ -8,11 +9,13 @@
     "graphiql": false,
     "queryDebug": false,
     "logLevel": "info",
-    "skipMinified": false
+    "skipMinified": false,
+    "skipUpdateCheck": false
   },
   "api": {
     "sessionSecret": "98ki^e72~!@#(85o3kXLI*#c9wu5l!Z",
     "reactMapSecret": "",
+    "enableHelmet": false,
     "showSchemasInConfigApi": false,
     "showStrategiesInConfigApi": false,
     "maxSessions": 5,
@@ -58,6 +61,19 @@
       "quests": false,
       "raids": true,
       "nests": false
+    },
+    "dataRequestLimits": {
+      "categories": {
+        "devices": 0,
+        "gyms": 0,
+        "nests": 0,
+        "pokemon": 0,
+        "pokestops": 0,
+        "portals": 0,
+        "routes": 0,
+        "weather": 0
+      },
+      "time": 60
     },
     "queryLimits": {
       "pokemon": 10000,
@@ -482,9 +498,12 @@
       "showcasePokemon": true,
       "questSet": "both",
       "confirmed": false,
+      "excludeGrunts": false,
+      "excludeLeaders": false,
       "items": true,
       "megaEnergy": true,
       "candy": true,
+      "xlCandy": true,
       "pokemon": true,
       "invasions": false,
       "allInvasions": true,
@@ -684,6 +703,7 @@
             "hour": 14,
             "minute": 0
           },
+          "intervalHours": 0,
           "roles": []
         }
       },
@@ -907,7 +927,7 @@
     },
     {
       "name": "GeoURI",
-      "url": "geo:{x},{y}"
+      "url": "geo:{x},{y}?q={x},{y}"
     }
   ],
   "icons": {
@@ -915,6 +935,7 @@
     "customizable": [],
     "styles": [],
     "defaultIcons": {},
+    "overrides": {},
     "cacheHrs": 1,
     "sizes": {
       "device": {
@@ -982,6 +1003,7 @@
   "audio": {
     "cacheHrs": 1,
     "defaultAudio": {},
+    "overrides": {},
     "customizable": [],
     "styles": [
       {

@@ -1,5 +1,5 @@
 // @ts-check
-const { Event, Db } = require('../../initialization')
+const state = require('../../state')
 const BaseFilter = require('../Base')
 
 /**
@@ -25,19 +25,20 @@ function buildPokemon(defaults, base, custom) {
   }
   const energyAmounts = new Set([
     ...defaults.pokestops.baseMegaEnergyAmounts,
-    ...Event.getAvailable('pokestops')
+    ...state.event
+      .getAvailable('pokestops')
       .filter((e) => e.startsWith('m'))
       .map((e) => e.split('-')[1]),
   ])
 
-  Object.entries(Event.masterfile.pokemon).forEach(([id, pkmn]) => {
+  Object.entries(state.event.masterfile.pokemon).forEach(([id, pkmn]) => {
     Object.keys(pkmn.forms).forEach((form) => {
       pokemon.full[`${id}-${form}`] = base
       pokemon.raids[`${id}-${form}`] = new BaseFilter(defaults.gyms.pokemon)
       pokemon.quests[`${id}-${form}`] = new BaseFilter(
         defaults.pokestops.pokemon,
       )
-      if (Db.filterContext.Pokestop.hasConfirmedInvasions) {
+      if (state.db.filterContext.Pokestop.hasConfirmedInvasions) {
         pokemon.rocket[`a${id}-${form}`] = new BaseFilter(
           defaults.pokestops.invasionPokemon,
         )

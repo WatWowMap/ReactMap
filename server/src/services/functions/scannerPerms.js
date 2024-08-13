@@ -1,8 +1,6 @@
 // @ts-check
 const config = require('@rm/config')
 
-const scanner = config.getSafe('scanner')
-
 /**
  *
  * @param {string[]} roles
@@ -11,6 +9,8 @@ const scanner = config.getSafe('scanner')
  * @returns {string[]}
  */
 function scannerPerms(roles, provider, trialActive = false) {
+  const scanner = config.getSafe('scanner')
+
   const perms = []
   roles.forEach((role) => {
     Object.keys(scanner).forEach((mode) => {

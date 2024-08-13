@@ -4,9 +4,6 @@ const config = require('@rm/config')
 
 const getAreaSql = require('../services/functions/getAreaSql')
 
-const { searchResultsLimit, portalUpdateLimit, queryLimits } =
-  config.getSafe('api')
-
 class Portal extends Model {
   static get tableName() {
     return 'ingress_portals'
@@ -21,6 +18,8 @@ class Portal extends Model {
    */
   // eslint-disable-next-line no-unused-vars
   static async getAll(perms, args, _ctx) {
+    const { portalUpdateLimit, queryLimits } = config.getSafe('api')
+
     const { areaRestrictions } = perms
     const {
       filters: { onlyAreas = [] },
@@ -55,6 +54,8 @@ class Portal extends Model {
   static async search(perms, args, { isMad }, distance, bbox) {
     const { areaRestrictions } = perms
     const { onlyAreas = [], search = '' } = args
+    const { searchResultsLimit, portalUpdateLimit } = config.getSafe('api')
+
     const query = this.query()
       .select(['name', 'id', 'lat', 'lon', 'url', distance])
       .whereILike('name', `%${search}%`)

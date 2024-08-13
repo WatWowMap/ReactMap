@@ -44,6 +44,7 @@ server/src/routes/api/v1/*
 !server/src/routes/api/v1/available.js
 !server/src/routes/api/v1/config.js
 !server/src/routes/api/v1/area.js
+!server/src/routes/api/v1/trial.js
 
 # custom model
 server/src/models/Custom.js

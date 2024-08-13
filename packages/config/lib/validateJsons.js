@@ -2,7 +2,7 @@
 const fs = require('fs')
 const { resolve } = require('path')
 
-const { log, HELPERS } = require('@rm/logger')
+const { log, TAGS } = require('@rm/logger')
 
 /**
  *
@@ -10,42 +10,37 @@ const { log, HELPERS } = require('@rm/logger')
  * @param {string} [domain]
  * @returns
  */
-function checkConfigJsons(
-  fileName,
-  domain = process.env.NODE_CONFIG_ENV || '',
-) {
-  const generalJson = fs.existsSync(
-    resolve(`${__dirname}/../../configs/${fileName}.json`),
-  )
+function validateJsons(fileName, domain = process.env.NODE_CONFIG_ENV || '') {
+  const configDir = process.env.NODE_CONFIG_DIR || ''
+
+  if (!configDir) {
+    throw new Error('Invalid NODE_CONFIG_DIR')
+  }
+  const generalJson = fs.existsSync(resolve(configDir, `${fileName}.json`))
     ? JSON.parse(
-        fs.readFileSync(
-          resolve(__dirname, `../../configs/${fileName}.json`),
-          'utf8',
-        ),
+        fs.readFileSync(resolve(configDir, `${fileName}.json`), 'utf8'),
       )
     : {}
   if (Object.keys(generalJson).length && !domain) {
     log.info(
-      HELPERS.config,
+      TAGS.config,
       `${fileName}.json found, overwriting your config.map.${fileName} with the found data.`,
     )
   }
   if (
     domain &&
-    fs.existsSync(
-      resolve(`${__dirname}/../../configs/${fileName}/${domain}.json`),
-    )
+    fs.existsSync(resolve(configDir, `${fileName}/${domain}.json`))
   ) {
     const domainJson =
       JSON.parse(
         fs.readFileSync(
-          resolve(__dirname, `../../configs/${fileName}/${domain}.json`),
+          resolve(configDir, `${fileName}/${domain}.json`),
           'utf8',
         ),
       ) || {}
     if (Object.keys(domainJson).length) {
       log.info(
-        HELPERS.config,
+        TAGS.config,
         `${fileName}/${domain}.json found, overwriting your config.map.${fileName} for ${domain} with the found data.`,
       )
     }
@@ -58,4 +53,4 @@ function checkConfigJsons(
   return generalJson
 }
 
-module.exports = checkConfigJsons
+module.exports = { validateJsons }

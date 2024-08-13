@@ -10,7 +10,7 @@ const PoI = require('../../models/PoI')
 
 /**
  *
- * @param {import('@rm/types').Bounds & { filters: { onlyRings: boolean, onlyS17Cells: boolean }}} filters
+ * @param {import('@rm/types').BBox & { filters: { onlyRings: boolean, onlyS17Cells: boolean }}} filters
  * @param {import("@rm/types").Pokestop[]} pokestops
  * @param {import("@rm/types").Gym[]} gyms
  * @returns {{ level17Cells: import('@rm/types').Level17Cell[], pois: import('@rm/types').PoI[] }}}

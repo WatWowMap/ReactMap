@@ -3,40 +3,39 @@ const { knex } = require('knex')
 const { raw } = require('objection')
 const extend = require('extend')
 const config = require('@rm/config')
-const { log, HELPERS } = require('@rm/logger')
+const { Logger, TAGS } = require('@rm/logger')
 
 const { getBboxFromCenter } = require('./functions/getBbox')
 const { getCache } = require('./cache')
 
-const softLimit = config.getSafe('api.searchSoftKmLimit')
-const hardLimit = config.getSafe('api.searchHardKmLimit')
-
 /**
  * @type {import("@rm/types").DbCheckClass}
  */
-module.exports = class DbCheck {
+module.exports = class DbCheck extends Logger {
+  static validModels = /** @type {const} */ ([
+    'Device',
+    'Gym',
+    'Nest',
+    'Pokestop',
+    'Pokemon',
+    'Portal',
+    'Route',
+    'ScanCell',
+    'Spawnpoint',
+    'Weather',
+  ])
+
+  static singleModels = /** @type {const} */ ([
+    'Backup',
+    'Badge',
+    'NestSubmission',
+    'Session',
+    'User',
+  ])
+
   constructor() {
-    this.validModels = /** @type {const} */ ([
-      'Device',
-      'Gym',
-      'Nest',
-      'Pokestop',
-      'Pokemon',
-      'Portal',
-      'Route',
-      'ScanCell',
-      'Spawnpoint',
-      'Weather',
-    ])
-    this.singleModels = /** @type {const} */ ([
-      'Backup',
-      'Badge',
-      'NestSubmission',
-      'Session',
-      'User',
-    ])
-    this.searchLimit = config.getSafe('api.searchResultsLimit')
-    this.rarityPercents = config.getSafe('rarity.percents')
+    super('db')
+
     this.models = {}
     this.endpoints = {}
     this.questConditions = getCache('questConditions.json', {})
@@ -56,7 +55,7 @@ module.exports = class DbCheck {
           const capital = `${category.charAt(0).toUpperCase()}${category.slice(
             1,
           )}`
-          if (this.singleModels.includes(capital)) {
+          if (DbCheck.singleModels.includes(capital)) {
             this.models[capital] = {}
             if (capital === 'User') {
               this.reactMapDb = i
@@ -72,6 +71,7 @@ module.exports = class DbCheck {
           this.endpoints[i] = schema
           return null
         }
+        const logger = new Logger('knex', schema.database)
         return knex({
           client: 'mysql2',
           connection: {
@@ -89,22 +89,18 @@ module.exports = class DbCheck {
               conn.query('SET time_zone="+00:00";', (err) => done(err, conn)),
           },
           log: {
-            warn: (message) => log.warn(HELPERS.knex, message),
-            error: (message) => log.error(HELPERS.knex, message),
+            warn: (message) => logger.warn(message),
+            error: (message) => logger.error(message),
             debug: (message) =>
-              log[config.getSafe('devOptions.queryDebug') ? 'info' : 'debug'](
-                HELPERS.knex,
-                message,
-              ),
+              logger[
+                config.getSafe('devOptions.queryDebug') ? 'info' : 'debug'
+              ](message),
             enableColors: true,
           },
         })
       })
     if (this.reactMapDb === null) {
-      log.error(
-        HELPERS.db,
-        'No database connection was found for the User model',
-      )
+      this.log.error('No database connection was found for the User model')
       process.exit(0)
     }
   }
@@ -207,8 +203,7 @@ module.exports = class DbCheck {
   }
 
   async getDbContext() {
-    log.info(
-      HELPERS.db,
+    this.log.info(
       `Determining database types for ${this.connections.length} connection${
         this.connections.length > 1 ? 's' : ''
       }`,
@@ -234,7 +229,7 @@ module.exports = class DbCheck {
             }
           })
         } catch (e) {
-          log.error(HELPERS.db, e)
+          this.log.error(e)
         }
       }),
     )
@@ -248,6 +243,7 @@ module.exports = class DbCheck {
   setRarity(results, historical = false) {
     const base = {}
     const mapKey = historical ? 'historical' : 'rarity'
+    const rarityPercents = config.getSafe('rarity.percents')
     let total = 0
     results.forEach((result) => {
       Object.entries(historical ? result : result.rarity).forEach(
@@ -266,11 +262,11 @@ module.exports = class DbCheck {
       const percent = (count / total) * 100
       if (percent === 0) {
         this[mapKey][id] = 'never'
-      } else if (percent < this.rarityPercents.ultraRare) {
+      } else if (percent < rarityPercents.ultraRare) {
         this[mapKey][id] = 'ultraRare'
-      } else if (percent < this.rarityPercents.rare) {
+      } else if (percent < rarityPercents.rare) {
         this[mapKey][id] = 'rare'
-      } else if (percent < this.rarityPercents.uncommon) {
+      } else if (percent < rarityPercents.uncommon) {
         this[mapKey][id] = 'uncommon'
       } else {
         this[mapKey][id] = 'common'
@@ -279,7 +275,7 @@ module.exports = class DbCheck {
   }
 
   async historicalRarity() {
-    log.info(HELPERS.db, 'Setting historical rarity stats')
+    this.log.info('Setting historical rarity stats')
     try {
       const results = await Promise.all(
         (this.models.Pokemon ?? []).map(async (source) =>
@@ -300,7 +296,7 @@ module.exports = class DbCheck {
         true,
       )
     } catch (e) {
-      log.error(HELPERS.db, 'Failed to set historical rarity stats', e)
+      this.log.error('Failed to set historical rarity stats', e)
     }
   }
 
@@ -310,15 +306,11 @@ module.exports = class DbCheck {
   bindConnections(models) {
     try {
       Object.entries(this.models).forEach(([modelName, sources]) => {
-        if (this.singleModels.includes(modelName)) {
+        if (DbCheck.singleModels.includes(modelName)) {
           /** @type {import('../models').RmModelKeys} */
           const model = modelName
           if (sources.length > 1) {
-            log.error(
-              HELPERS.db,
-              model,
-              `only supports one database connection`,
-            )
+            this.log.error(model, `only supports one database connection`)
             process.exit(0)
           }
           if (model === 'User') {
@@ -346,20 +338,18 @@ module.exports = class DbCheck {
             }
           })
         } else {
-          log.warn(HELPERS.db, modelName, 'something unexpected happened')
+          this.log.warn(modelName, 'something unexpected happened')
         }
-        log.info(
-          HELPERS.db,
+        this.log.info(
           `Bound ${modelName} to ${sources.length ?? 1} connection${
             sources.length > 1 ? 's' : ''
           }`,
         )
       })
     } catch (e) {
-      log.error(
-        HELPERS.db,
+      this.log.error(
         e,
-        `\n\nOnly ${[...this.validModels, ...this.singleModels].join(
+        `\n\nOnly ${[...DbCheck.validModels, ...DbCheck.singleModels].join(
           ', ',
         )} are valid options in the useFor arrays`,
       )
@@ -408,7 +398,7 @@ module.exports = class DbCheck {
       )
       return DbCheck.deDupeResults(data)
     } catch (e) {
-      log.error(HELPERS.db, HELPERS[model.toLowerCase()], e)
+      this.log.error(TAGS[model.toLowerCase()], e)
       throw e
     }
   }
@@ -444,12 +434,16 @@ module.exports = class DbCheck {
    * @returns {Promise<T[]>}
    */
   async search(model, perms, args, method = 'search') {
+    const softLimit = config.getSafe('api.searchSoftKmLimit')
+    const hardLimit = config.getSafe('api.searchHardKmLimit')
+    const searchLimit = config.getSafe('api.searchResultsLimit')
+
     let deDuped = []
     let count = 0
     let distance = softLimit
     const max = model === 'Pokemon' ? hardLimit / 2 : hardLimit
     const startTime = Date.now()
-    while (deDuped.length < this.searchLimit) {
+    while (deDuped.length < searchLimit) {
       const loopTime = Date.now()
       count += 1
       const bbox = getBboxFromCenter(args.lat, args.lon, distance)
@@ -468,8 +462,7 @@ module.exports = class DbCheck {
       if (results.length > deDuped.length) {
         deDuped = results
       }
-      log.debug(
-        HELPERS.db,
+      this.log.debug(
         'Search attempt #',
         count,
         '| received:',
@@ -480,7 +473,7 @@ module.exports = class DbCheck {
         +((Date.now() - loopTime) / 1000).toFixed(2),
       )
       if (
-        deDuped.length >= this.searchLimit * 0.5 ||
+        deDuped.length >= searchLimit * 0.5 ||
         distance >= max ||
         Date.now() - startTime > 2_000
       ) {
@@ -488,7 +481,7 @@ module.exports = class DbCheck {
       }
       if (deDuped.length === 0) {
         distance += softLimit * 4
-      } else if (deDuped.length < this.searchLimit / 4) {
+      } else if (deDuped.length < searchLimit / 4) {
         distance += softLimit * 2
       } else {
         distance += softLimit
@@ -496,8 +489,8 @@ module.exports = class DbCheck {
       distance = Math.min(distance, max)
     }
     if (count > 1) {
-      log.info(
-        HELPERS.search,
+      this.log.info(
+        TAGS.search,
         'Searched',
         count,
         '| received:',
@@ -508,8 +501,8 @@ module.exports = class DbCheck {
       )
     }
     deDuped.sort((a, b) => a.distance - b.distance)
-    if (deDuped.length > this.searchLimit) {
-      deDuped.length = this.searchLimit
+    if (deDuped.length > searchLimit) {
+      deDuped.length = searchLimit
     }
     return deDuped
   }
@@ -573,14 +566,14 @@ module.exports = class DbCheck {
    */
   async getAvailable(model) {
     if (this.models[model]) {
-      log.info(HELPERS.db, `Querying available for ${model}`)
+      this.log.info(`Querying available for ${model}`)
       try {
         const results = await Promise.all(
           this.models[model].map(async ({ SubModel, ...source }) =>
             SubModel.getAvailable(source),
           ),
         )
-        log.info(HELPERS.db, `Setting available for ${model}`)
+        this.log.info(`Setting available for ${model}`)
         if (model === 'Pokestop') {
           results.forEach((result) => {
             if ('conditions' in result) {
@@ -612,10 +605,9 @@ module.exports = class DbCheck {
           return [...returnSet]
         }
       } catch (e) {
-        log.warn(HELPERS.db, 'Unable to query available for:', model, '\n', e)
+        this.log.warn('Unable to query available for:', model, '\n', e)
         if (model === 'Nest') {
-          log.warn(
-            HELPERS.db,
+          this.log.warn(
             'This is likely due to "nest" being in a useFor array but not in the database',
           )
         }
@@ -642,13 +634,9 @@ module.exports = class DbCheck {
         this.filterContext.Route.maxDuration = Math.max(
           ...results.map((result) => result.max_duration),
         )
-        log.info(HELPERS.db, 'Updating filter context for routes')
+        this.log.info('Updating filter context for routes')
       } catch (e) {
-        log.error(
-          HELPERS.db,
-          'If you are using RDM, you likely do not have a routes table. Remove `route` from the `useFor` array in your config',
-          e,
-        )
+        this.log.error(e)
       }
     }
     if (this.models.Pokestop) {

@@ -42,7 +42,10 @@ export function useSendSearch(search, open) {
           lat,
           lon: lng,
           locale: i18n.language,
-          onlyAreas: filters?.scanAreas?.filter?.areas || [],
+          onlyAreas:
+            (filters?.scanAreas?.filterByAreas &&
+              filters?.scanAreas?.filter?.areas) ||
+            [],
           questLayer:
             searchTab === 'quests'
               ? filters?.pokestops?.showQuestSet || ''

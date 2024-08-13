@@ -2,7 +2,7 @@
 const fs = require('fs')
 const path = require('path')
 
-const { log, HELPERS } = require('@rm/logger')
+const { log, TAGS } = require('@rm/logger')
 
 const CACHE_DIR = process.env.NODE_CONFIG_ENV
   ? path.join(__dirname, '../../.cache', process.env.NODE_CONFIG_ENV)
@@ -30,7 +30,7 @@ const getCache = (unsafeName, fallback = null) => {
         if (!(key in data)) data[key] = value
       })
     }
-    log.info(HELPERS.cache, 'Loaded', fileName)
+    log.info(TAGS.cache, 'Loaded', fileName)
     return data
   } catch (e) {
     return fallback
@@ -51,9 +51,9 @@ const setCache = async (unsafeName, data) => {
       path.resolve(CACHE_DIR, fileName),
       typeof data === 'string' ? data : JSON.stringify(data),
     )
-    log.info(HELPERS.cache, 'Cached', fileName)
+    log.info(TAGS.cache, 'Cached', fileName)
   } catch (e) {
-    log.error(HELPERS.cache, e)
+    log.error(TAGS.cache, e)
   }
 }
 

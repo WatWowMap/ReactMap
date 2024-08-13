@@ -2,7 +2,7 @@
 const { promises: fs } = require('fs')
 const { resolve } = require('path')
 
-const { log, HELPERS } = require('@rm/logger')
+const { log, TAGS } = require('@rm/logger')
 const { readAndParseJson, readLocaleDirectory } = require('./utils')
 
 /**
@@ -43,7 +43,7 @@ async function missingAll() {
         ),
         JSON.stringify(missingKeys, null, 2),
       )
-      log.info(HELPERS.locales, fileName, 'file saved.')
+      log.info(TAGS.locales, fileName, 'file saved.')
     }),
   )
 }

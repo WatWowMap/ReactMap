@@ -1,6 +1,6 @@
 // @ts-check
 const { default: destination } = require('@turf/destination')
-const { point } = require('@turf/helpers')
+const { point, polygon } = require('@turf/helpers')
 
 /**
  *
@@ -26,6 +26,23 @@ function getBboxFromCenter(centerLat, centerLon, distanceKm) {
   }
 }
 
+/**
+ *
+ * @param {import('@rm/types/lib').BBox} args
+ */
+function getPolygonBbox(args) {
+  return polygon([
+    [
+      [args.minLon, args.minLat],
+      [args.maxLon, args.minLat],
+      [args.maxLon, args.maxLat],
+      [args.minLon, args.maxLat],
+      [args.minLon, args.minLat],
+    ],
+  ])
+}
+
 module.exports = {
   getBboxFromCenter,
+  getPolygonBbox,
 }

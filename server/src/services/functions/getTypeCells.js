@@ -9,7 +9,7 @@ const getPolyVector = require('./getPolyVector')
 
 /**
  *
- * @param {import('@rm/types').Bounds & { filters: { onlyS14Cells: boolean }}} filters
+ * @param {import('@rm/types').BBox & { filters: { onlyS14Cells: boolean }}} filters
  * @param {import("@rm/types").Pokestop[]} pokestops
  * @param {import("@rm/types").Gym[]} gyms
  * @returns {import('@rm/types').Level14Cell[]}
