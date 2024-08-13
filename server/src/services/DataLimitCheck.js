@@ -15,6 +15,9 @@ class DataLimitCheck extends Logger {
 
     this.user = req.user
     this.category = category
+
+    if (!req.user) return
+
     this.limit = DataLimitCheck.getLimit(this.category)
     this.entries = state.stats.getValidApiEntries(this.user.id, this.category)
     this.totalCount = this.entries.reduce((a, b) => a + b.count, 0)
@@ -79,9 +82,11 @@ class DataLimitCheck extends Logger {
    * @returns {Promise<boolean>}
    */
   async isOverLimit() {
+    if (!this.user) return false
+
     const result = this.totalCount > this.limit
     if (result) {
-      await this.clientAlert()
+      await this.#clientAlert()
     } else {
       state.stats.delAlertEntry(this.user.id)
     }
@@ -91,7 +96,7 @@ class DataLimitCheck extends Logger {
   /**
    * Sends an alert to the user's strategy client
    */
-  async clientAlert() {
+  async #clientAlert() {
     if (!state.stats.hasAlertEntry(this.user.id)) {
       await state.event.chatLog('main', {
         title: `Data Limit Reached`,
