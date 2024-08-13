@@ -208,7 +208,9 @@ class TelegramClient extends AuthClient {
    */
   async sendMessage(embed, channel) {
     if (!this.loggingChannels[channel]) return
-    const text = AuthClient.getHtml(embed)
+    const text = AuthClient.getHtml(
+      typeof embed === 'string' ? embed : { ...this.getBaseEmbed(), ...embed },
+    )
     try {
       const response = await fetch(
         `https://api.telegram.org/bot${this.strategy.botToken}/sendMessage`,

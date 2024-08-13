@@ -5,8 +5,9 @@ const { utcToZonedTime } = require('date-fns-tz')
 const { format } = require('date-fns')
 
 const { log, TAGS } = require('@rm/logger')
+const { getCenter } = require('./getCenter')
 
-/** @typedef {import('@rm/types').Bounds | { lat: number, lon: number }} BoundsEnum */
+/** @typedef {import('@rm/types').BBox | { lat: number, lon: number }} BoundsEnum */
 
 /**
  *
@@ -25,13 +26,7 @@ function getEpoch(date = new Date()) {
  * @returns {string}
  */
 function getUserTimeZone(bounds) {
-  const { lat, lon } =
-    'lat' in bounds
-      ? bounds
-      : {
-          lat: (bounds.minLat + bounds.maxLat) / 2,
-          lon: (bounds.minLon + bounds.maxLon) / 2,
-        }
+  const { lat, lon } = getCenter(bounds)
   const timezone = find(lat, lon)
   log.debug(TAGS.client, `timezone: ${timezone}`)
   return timezone[0]

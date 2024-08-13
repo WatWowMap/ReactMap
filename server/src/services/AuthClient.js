@@ -39,6 +39,16 @@ class AuthClient extends Logger {
     )
   }
 
+  getBaseEmbed() {
+    return {
+      author: {
+        name: this.rmStrategy,
+        icon_url: this.strategy.thumbnailUrl,
+      },
+      timestamp: new Date().toISOString(),
+    }
+  }
+
   /**
    *
    * @param {MessageEmbed} embed

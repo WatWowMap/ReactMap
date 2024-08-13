@@ -130,12 +130,13 @@ export interface BaseRecord {
 }
 
 export interface GqlContext {
+  userId: number
   req: Request
   res: Response
   Db: DbCheck
   Event: EventManager
   perms: Permissions
-  user: string
+  username: string
   operation: OperationTypeNode
   startTime?: number
 }

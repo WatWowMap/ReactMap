@@ -31,7 +31,7 @@ function loggerMiddleware(req, res, next) {
     const responseTime = (seconds * 1000 + nanoseconds / 1e6).toFixed(3) // in milliseconds
     log.debug(
       TAGS.express,
-      req.method,
+      TAGS.method(req.method),
       TAGS.url(req.originalUrl.split('?', 1)[0]),
       TAGS.statusCode(res.statusCode),
       `${responseTime}ms`,
