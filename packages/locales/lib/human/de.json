@@ -590,7 +590,7 @@
   "rocket_pokemon": "Crypto-Pokemon",
   "decoy": "Täusch-Rüpel",
   "s2_cell_limit_0": "Sie haben versucht, mehr als 20.000 Zellen zu generieren ({{variable_0}})",
-  "s2_cell_zoom_limit": "Einige Zellen sind zu klein, um in dieser Zoomstufe angezeigt zu werden.",
+  "s2_cell_zoom_limit": "Einige Zellen sind zu klein, um in diesem Zoomlevel angezeigt zu werden.",
   "show_all_pvp_ranks": "alle PVP Ränge anzeigen",
   "enable_pokemon_popup_coords": "Pokémon Koordinaten anzeigen",
   "enable_gym_popup_coords": "Arena Koordinaten anzeigen",
