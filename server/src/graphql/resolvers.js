@@ -111,7 +111,7 @@ const resolvers = {
     checkValidScan: (_, { mode, points }, { perms }) =>
       getValidCoords(mode, points, perms),
     /** @param {unknown} _ @param {{ component: 'loginPage' | 'donationPage' | 'messageOfTheDay' }} args */
-    customComponent: (_, { component }, { perms, req, user }) => {
+    customComponent: (_, { component }, { perms, req, username }) => {
       switch (component) {
         case 'messageOfTheDay':
         case 'donationPage':
@@ -126,10 +126,10 @@ const resolvers = {
               ...rest,
               footerButtons: filterComponents(
                 footerButtons,
-                !!user,
+                !!username,
                 perms.donor,
               ),
-              components: filterComponents(components, !!user, perms.donor),
+              components: filterComponents(components, !!username, perms.donor),
             }
           }
           return null
@@ -143,7 +143,7 @@ const resolvers = {
       }
       return []
     },
-    fabButtons: async (_, _args, { perms, user, req, Db, Event }) => {
+    fabButtons: async (_, _args, { perms, username, req, Db, Event }) => {
       const { donationPage, misc } = config.getMapConfig(req)
 
       const scanner = config.getSafe('scanner')
@@ -161,7 +161,7 @@ const resolvers = {
           (perms.donor ? donationPage.showToDonors : true)
             ? donationPage.fabIcon
             : '',
-        profileButton: !!(user && misc.enableFloatingProfileButton),
+        profileButton: !!(username && misc.enableFloatingProfileButton),
         scanZone:
           scanner.backendConfig.platform !== 'mad' &&
           scanner.scanZone.enabled &&
@@ -617,8 +617,8 @@ const resolvers = {
       }
       return {}
     },
-    validateUser: (_, __, { user, perms }) => ({
-      loggedIn: !!user,
+    validateUser: (_, __, { username, perms }) => ({
+      loggedIn: !!username,
       admin: perms?.admin,
     }),
   },
@@ -638,7 +638,7 @@ const resolvers = {
         await Db.models.Backup.update(args.backup, req.user.id)
       }
     },
-    nestSubmission: async (_, args, { req, perms, Db, user }) => {
+    nestSubmission: async (_, args, { req, perms, Db, username }) => {
       if (perms?.nestSubmissions && req.user?.id) {
         return Db.query(
           'NestSubmission',
@@ -648,7 +648,7 @@ const resolvers = {
             nest_id: args.id,
           },
           {
-            submitted_by: user,
+            submitted_by: username,
             user_id: req.user.id,
           },
         )

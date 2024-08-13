@@ -3,7 +3,6 @@
 const path = require('path')
 const { ApolloServer } = require('@apollo/server')
 
-const NodeCache = require('node-cache')
 const { loadTypedefs } = require('@graphql-tools/load')
 const { GraphQLFileLoader } = require('@graphql-tools/graphql-file-loader')
 const {
@@ -14,15 +13,13 @@ const {
 } = require('@apollo/server/plugin/disabled')
 
 const config = require('@rm/config')
-const { log, TAGS } = require('@rm/logger')
+const { Logger, TAGS, log } = require('@rm/logger')
 
 const resolvers = require('./resolvers')
 const state = require('../services/state')
 
 /** @param {import('http').Server} httpServer */
 async function startApollo(httpServer) {
-  const errorCache = new NodeCache({ stdTTL: 60 * 60 })
-
   const documents = await loadTypedefs(
     path.join(__dirname, './typeDefs', '*.graphql'),
     {
@@ -30,6 +27,7 @@ async function startApollo(httpServer) {
     },
   )
   const typeDefs = documents.map((d) => d.document.definitions.slice())
+  const gqlLogger = new Logger('gql')
 
   const apolloServer = new ApolloServer({
     typeDefs,
@@ -56,28 +54,30 @@ async function startApollo(httpServer) {
       }
 
       const key = `${e.extensions.id || e.extensions.user}-${e.message}`
-      if (errorCache.has(key)) {
+      if (state.stats.hasApolloEntry(key)) {
         if (e?.extensions?.stacktrace) {
           delete e.extensions.stacktrace
         }
         return e
       }
       if (!config.getSafe('devOptions.enabled')) {
-        errorCache.set(key, true)
+        state.stats.setApolloEntry(key)
       }
 
       const endpoint = /** @type {string} */ (e.extensions.endpoint)
 
-      log[customMessage ? 'info' : 'error'](
-        TAGS.gql,
+      gqlLogger.log[customMessage ? 'info' : 'warn'](
         TAGS[endpoint] || `[${endpoint?.toUpperCase()}]`,
         'Client:',
         e.extensions.clientV || 'Unknown',
+        '|',
         'Server:',
         e.extensions.serverV || 'Unknown',
+        '|',
         'User:',
         e.extensions.user || 'Not Logged In',
         // e.extensions.id || '',
+        '|',
         customMessage || e,
       )
       if (e?.extensions?.stacktrace) {
@@ -86,10 +86,10 @@ async function startApollo(httpServer) {
       return e
     },
     logger: {
-      debug: (...e) => log.debug(TAGS.gql, ...e),
-      info: (...e) => log.info(TAGS.gql, ...e),
-      warn: (...e) => log.warn(TAGS.gql, ...e),
-      error: (...e) => log.error(TAGS.gql, ...e),
+      debug: (...e) => gqlLogger.log.debug(...e),
+      info: (...e) => gqlLogger.log.info(...e),
+      warn: (...e) => gqlLogger.log.warn(...e),
+      error: (...e) => gqlLogger.log.error(...e),
     },
     plugins: [
       ApolloServerPluginLandingPageDisabled(),
@@ -107,9 +107,9 @@ async function startApollo(httpServer) {
               operation,
               operationName,
             }) {
-              const filterCount = Object.keys(
-                requestContext.request?.variables?.filters || {},
-              ).length
+              const filterCount =
+                Object.keys(requestContext.request?.variables?.filters || {})
+                  .length || 0
 
               if (
                 response.body.kind === 'single' &&
@@ -120,24 +120,13 @@ async function startApollo(httpServer) {
                   operation?.selectionSet?.selections?.[0]?.name?.value
 
                 const data = response.body.singleResult.data?.[endpoint]
-                const returned = Array.isArray(data) ? data.length : 0
+                const returned = (Array.isArray(data) ? data.length : 0) || 0
 
-                if (contextValue.user) {
-                  const now = Date.now()
-                  state.userRequestCache.get(contextValue.user).push({
-                    count: returned,
-                    timestamp: now,
-                    category: endpoint,
-                  })
-
-                  const entries = state.userRequestCache.get(contextValue.user)
-                  state.userRequestCache.set(
-                    contextValue.user,
-                    entries.filter(
-                      (entry) =>
-                        now - entry.timestamp <=
-                        config.getSafe('api.dataRequestLimits.time') * 1000,
-                    ),
+                if (contextValue.userId) {
+                  state.stats.pushApiEntry(
+                    contextValue.userId,
+                    endpoint,
+                    returned,
                   )
                 }
 
@@ -146,14 +135,14 @@ async function startApollo(httpServer) {
                   '|',
                   operationName,
                   '|',
-                  returned || 0,
+                  returned,
                   '|',
                   `${Date.now() - contextValue.startTime}ms`,
                   '|',
-                  contextValue.user || 'Not Logged In',
+                  contextValue.username || 'Not Logged In',
                   '|',
                   'Filters:',
-                  filterCount || 0,
+                  filterCount,
                 )
 
                 // @ts-ignore

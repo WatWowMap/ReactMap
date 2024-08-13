@@ -52,6 +52,7 @@ const TAGS = /** @type {const} */ ({
   route: chalk.hex('#607d8b')('[ROUTE]'),
   routes: chalk.hex('#9e9e9e')('[ROUTES]'),
   search: chalk.hex('#795548')('[SEARCH]'),
+  stats: chalk.hex('#456l2a')('[STATS]'),
 
   telegram: (label = '[TELEGRAM]') => chalk.hex('#26A8EA')(label),
   discord: (label = '[DISCORD]') => chalk.hex('#7289da')(label),
@@ -71,6 +72,22 @@ const TAGS = /** @type {const} */ ({
       return chalk.cyan(code)
     }
     return chalk.green(code)
+  },
+  method: (method = 'GET') => {
+    const tag = `[${method}]`
+    if (method === 'GET') {
+      return chalk.green(tag)
+    }
+    if (method === 'POST') {
+      return chalk.blue(tag)
+    }
+    if (method === 'PUT') {
+      return chalk.yellow(tag)
+    }
+    if (method === 'DELETE') {
+      return chalk.red(tag)
+    }
+    return chalk.hex('#00d7ac')(tag)
   },
   custom: (text = '', color = '#64b5f6') =>
     chalk.hex(color)(`[${text.toUpperCase()}]`),

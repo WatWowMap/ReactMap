@@ -1,5 +1,4 @@
 // @ts-check
-const NodeCache = require('node-cache')
 const fs = require('fs')
 const path = require('path')
 
@@ -9,17 +8,15 @@ const { log, TAGS } = require('@rm/logger')
 const DbCheck = require('./DbCheck')
 const EventManager = require('./EventManager')
 const PvpWrapper = require('./PvpWrapper')
-const { getCache, setCache } = require('./cache')
+const { setCache } = require('./cache')
 const { migrate } = require('../db/migrate')
+const { Stats } = require('./Stats')
 
 const serverState = {
   db: new DbCheck(),
   pvp: config.getSafe('api.pvp.reactMapHandlesPvp') ? new PvpWrapper() : null,
   event: new EventManager(),
-  userCache: new NodeCache({ stdTTL: 60 * 60 * 24 }),
-  userRequestCache: new Map(
-    Object.entries(getCache('userDataLimitCache.json', {})),
-  ),
+  stats: new Stats(),
   startTimers() {
     this.event.startIntervals(this.db, this.pvp)
   },
@@ -160,19 +157,9 @@ const serverState = {
     } else {
       log.info(TAGS.ReactMap, 'writing cache...')
     }
-
-    const cacheObj = {}
-    this.userCache.keys().forEach((key) => {
-      cacheObj[key] = this.userCache.get(key)
-    })
-    const userRequestCacheObj = {}
-    this.userRequestCache.forEach((v, k) => {
-      userRequestCacheObj[k] = v
-    })
-
     await Promise.all([
-      setCache('scanUserHistory.json', cacheObj),
-      setCache('userDataLimitCache.json', userRequestCacheObj),
+      setCache('scanUserHistory.json', this.stats.serializeScanCache()),
+      setCache('userDataLimitCache.json', this.stats.serializeApiCache()),
       setCache('rarity.json', this.db.rarity),
       setCache('historical.json', this.db.historical),
       setCache('available.json', this.event.available),
@@ -188,10 +175,6 @@ const serverState = {
     }
   },
 }
-
-Object.entries(getCache('scanUserHistory.json', {})).forEach(([k, v]) =>
-  serverState.userCache.set(k, v),
-)
 
 process.on('SIGINT', async (e) => {
   await serverState.writeCache(e)

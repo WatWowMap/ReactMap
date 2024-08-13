@@ -219,16 +219,6 @@ class DiscordClient extends AuthClient {
     return perms
   }
 
-  getBaseEmbed() {
-    return {
-      author: {
-        name: this.rmStrategy,
-        icon_url: this.strategy.thumbnailUrl,
-      },
-      timestamp: new Date().toISOString(),
-    }
-  }
-
   /**
    * Send a message to a discord channel
    *

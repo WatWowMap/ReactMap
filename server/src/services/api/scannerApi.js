@@ -98,16 +98,9 @@ async function scannerApi(
         url: '',
         options: {},
       })
-    const cache = state.userCache.has(user.id)
-      ? state.userCache.get(user.id)
-      : { coordinates: 0, requests: 0 }
-
     switch (category) {
       case 'scanNext':
-        state.userCache.set(user.id, {
-          coordinates: cache.coordinates + coords.length,
-          requests: cache.requests + 1,
-        })
+        state.stats.setScanHistory(user.id, coords.length)
         log.info(
           TAGS.scanner,
           `Request to scan new location by ${user.username}${
@@ -168,10 +161,7 @@ async function scannerApi(
         }
         break
       case 'scanZone':
-        state.userCache.set(user.id, {
-          coordinates: cache.coordinates + coords.length,
-          requests: cache.requests + 1,
-        })
+        state.stats.setScanHistory(user.id, coords.length)
         log.info(
           TAGS.scanner,
           `Request to scan new zone by ${user.username}${
@@ -312,7 +302,7 @@ async function scannerApi(
 
     if (backendConfig.sendTelegramMessage || backendConfig.sendDiscordMessage) {
       const capitalized = category.replace('scan', 'Scan ')
-      const updatedCache = state.userCache.get(user.id)
+      const updatedCache = state.stats.getScanHistory(user.id)
       const trimmed = coords
         .filter((_c, i) => i < 25)
         .map((c) =>
@@ -331,14 +321,6 @@ async function scannerApi(
           author: {
             name: user.username,
             icon_url: `https://cdn.discordapp.com/avatars/${user.discordId}/${user.avatar}.png`,
-          },
-          thumbnail: {
-            url:
-              config
-                .getSafe('authentication.strategies')
-                .find((strategy) => strategy.name === user.rmStrategy)
-                ?.thumbnailUrl ??
-              `https://user-images.githubusercontent.com/58572875/167069223-745a139d-f485-45e3-a25c-93ec4d09779c.png`,
           },
           description: `<@${user.discordId}>\n${capitalized} Size: ${data.scanSize}\nCoordinates: ${coords.length}\n`,
           fields: [
