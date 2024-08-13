@@ -1,3 +1,10 @@
+# [1.33.0-develop.18](https://github.com/WatWowMap/ReactMap/compare/v1.33.0-develop.17...v1.33.0-develop.18) (2024-08-13)
+
+
+### Bug Fixes
+
+* check for user ([3ed7991](https://github.com/WatWowMap/ReactMap/commit/3ed79913320dc58891adc685071ba39e0db60f38))
+
 # [1.33.0-develop.17](https://github.com/WatWowMap/ReactMap/compare/v1.33.0-develop.16...v1.33.0-develop.17) (2024-08-13)
 
 
