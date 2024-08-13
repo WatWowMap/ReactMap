@@ -585,11 +585,12 @@
   "delete": "löschen",
   "name": "Name",
   "only_confirmed": "nur bestätigte",
-  "only_exclude_grunts": "Grunzer ausschließen",
-  "only_exclude_leaders": "EAnführer ausschließen",
+  "only_exclude_grunts": "Rüpel ausschließen",
+  "only_exclude_leaders": "Bosse ausschließen",
   "rocket_pokemon": "Crypto-Pokemon",
   "decoy": "Täusch-Rüpel",
   "s2_cell_limit_0": "Sie haben versucht, mehr als 20.000 Zellen zu generieren ({{variable_0}})",
+  "s2_cell_zoom_limit": "Einige Zellen sind zu klein, um in diesem Zoomlevel angezeigt zu werden.",
   "show_all_pvp_ranks": "alle PVP Ränge anzeigen",
   "enable_pokemon_popup_coords": "Pokémon Koordinaten anzeigen",
   "enable_gym_popup_coords": "Arena Koordinaten anzeigen",
@@ -760,5 +761,7 @@
   "locale_instructions_7": "Erstellen eine neue Pull Request auf den \"develop\" Branch.",
   "locale_instructions_8": "Warte bis die Pull-Anfrage überprüft und gemerged wurde.",
   "enter_translation": "Übersetzung eingeben",
-  "individual_filters": "Teilweise gefiltert"
+  "individual_filters": "individuell gefiltert",
+  "best_buddy": "Bester Kumpel",
+  "data_limit_reached": "Du hast kürzlich zu viele Daten angefordert und befindest dich im Cooldown bis {{until}}"
 }
