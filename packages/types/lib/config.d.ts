@@ -6,7 +6,7 @@ import { Props as ImgProps } from '@components/Img'
 
 import type { CustomComponent } from './blocks'
 import config = require('server/src/configs/default.json')
-import example = require('server/src/configs/local.example.json')
+import example = require('../../../config/local.example.json')
 
 import type { Schema } from './server'
 import {

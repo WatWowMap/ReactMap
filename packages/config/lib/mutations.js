@@ -1,7 +1,7 @@
 // @ts-check
 
 const fs = require('fs')
-const { resolve } = require('path')
+const path = require('path')
 
 const { log, TAGS } = require('@rm/logger')
 
@@ -12,7 +12,9 @@ const applyMutations = (config) => {
   if (process.env.NODE_CONFIG_ENV) {
     log.info(TAGS.config, `Using config for ${process.env.NODE_CONFIG_ENV}`)
   }
-  const nodeConfigDir = process.env.NODE_CONFIG_DIR || ''
+  const [rootConfigDir, serverConfigDir] = (
+    process.env.NODE_CONFIG_DIR || ''
+  ).split(path.delimiter)
 
   const allowedMenuItems = [
     'gyms',
@@ -30,11 +32,11 @@ const applyMutations = (config) => {
 
   try {
     const refLength = +fs.readFileSync(
-      resolve(__dirname, '../.configref'),
+      path.join(__dirname, '../.configref'),
       'utf8',
     )
     const defaultLength = fs.readFileSync(
-      resolve(nodeConfigDir, 'default.json'),
+      path.join(rootConfigDir, 'default.json'),
       'utf8',
     ).length
 
@@ -52,7 +54,7 @@ const applyMutations = (config) => {
     )
   }
 
-  if (!fs.existsSync(resolve(nodeConfigDir, `local.json`))) {
+  if (!fs.existsSync(path.join(serverConfigDir, `local.json`))) {
     // add database env variables from .env or docker-compose
     const {
       SCANNER_DB_HOST,
@@ -146,7 +148,7 @@ const applyMutations = (config) => {
       )
     }
   }
-  if (fs.existsSync(resolve(nodeConfigDir, `config.json`))) {
+  if (fs.existsSync(path.join(serverConfigDir, `config.json`))) {
     log.info(
       TAGS.config,
       'Config v1 (config.json) found, it is fine to leave it but make sure you are using and updating local.json instead.',

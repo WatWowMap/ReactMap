@@ -1,8 +1,12 @@
 // @ts-check
 const fs = require('fs')
-const { resolve } = require('path')
+const path = require('path')
 
 const { log, TAGS } = require('@rm/logger')
+
+const [, serverConfigDir] = (process.env.NODE_CONFIG_DIR || '').split(
+  path.delimiter,
+)
 
 /**
  *
@@ -11,14 +15,14 @@ const { log, TAGS } = require('@rm/logger')
  * @returns
  */
 function validateJsons(fileName, domain = process.env.NODE_CONFIG_ENV || '') {
-  const configDir = process.env.NODE_CONFIG_DIR || ''
-
-  if (!configDir) {
+  if (!serverConfigDir) {
     throw new Error('Invalid NODE_CONFIG_DIR')
   }
-  const generalJson = fs.existsSync(resolve(configDir, `${fileName}.json`))
+  const generalJson = fs.existsSync(
+    path.join(serverConfigDir, `${fileName}.json`),
+  )
     ? JSON.parse(
-        fs.readFileSync(resolve(configDir, `${fileName}.json`), 'utf8'),
+        fs.readFileSync(path.join(serverConfigDir, `${fileName}.json`), 'utf8'),
       )
     : {}
   if (Object.keys(generalJson).length && !domain) {
@@ -29,12 +33,12 @@ function validateJsons(fileName, domain = process.env.NODE_CONFIG_ENV || '') {
   }
   if (
     domain &&
-    fs.existsSync(resolve(configDir, `${fileName}/${domain}.json`))
+    fs.existsSync(path.join(serverConfigDir, `${fileName}/${domain}.json`))
   ) {
     const domainJson =
       JSON.parse(
         fs.readFileSync(
-          resolve(configDir, `${fileName}/${domain}.json`),
+          path.join(serverConfigDir, `${fileName}/${domain}.json`),
           'utf8',
         ),
       ) || {}

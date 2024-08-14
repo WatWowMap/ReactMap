@@ -100,10 +100,7 @@
           "cp": 2500
         }
       ],
-      "levels": [
-        50,
-        51
-      ],
+      "levels": [50, 51],
       "reactMapHandlesPvp": false,
       "minCp": {
         "little": 400,
@@ -468,14 +465,7 @@
       "eggs": true,
       "pokemon": true,
       "gymBadges": false,
-      "baseGymSlotAmounts": [
-        1,
-        2,
-        3,
-        4,
-        5,
-        6
-      ]
+      "baseGymSlotAmounts": [1, 2, 3, 4, 5, 6]
     },
     "nests": {
       "enabled": false,
@@ -483,10 +473,7 @@
       "pokemon": false,
       "allPokemon": true,
       "onlyShowAvailable": true,
-      "avgFilter": [
-        0,
-        100
-      ],
+      "avgFilter": [0, 100],
       "avgSliderStep": 1
     },
     "pokestops": {
@@ -509,11 +496,7 @@
       "allInvasions": true,
       "invasionPokemon": true,
       "rewardTypes": false,
-      "baseMegaEnergyAmounts": [
-        10,
-        20,
-        25
-      ],
+      "baseMegaEnergyAmounts": [10, 20, 25],
       "stardust": {
         "min": 100,
         "max": 2500,
@@ -534,35 +517,14 @@
       "legacyFilter": false,
       "allPokemon": false,
       "globalValues": {
-        "iv": [
-          80,
-          100
-        ],
-        "level": [
-          1,
-          35
-        ],
-        "atk_iv": [
-          0,
-          15
-        ],
-        "def_iv": [
-          0,
-          15
-        ],
-        "sta_iv": [
-          0,
-          15
-        ],
-        "pvp": [
-          1,
-          10
-        ],
+        "iv": [80, 100],
+        "level": [1, 35],
+        "atk_iv": [0, 15],
+        "def_iv": [0, 15],
+        "sta_iv": [0, 15],
+        "pvp": [1, 10],
         "gender": 0,
-        "cp": [
-          10,
-          5000
-        ],
+        "cp": [10, 5000],
         "xxs": false,
         "xxl": false
       }
