@@ -1,7 +1,7 @@
 // @ts-check
 const { promises: fs } = require('fs')
 const path = require('path')
-const { default: Ohbem } = require('ohbem')
+const Ohbem = require('ohbem')
 const { default: fetch } = require('node-fetch')
 
 const config = require('@rm/config')
