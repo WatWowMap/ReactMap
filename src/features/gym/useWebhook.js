@@ -20,8 +20,8 @@ export function useWebhook({ category }) {
       const message = error
         ? error.message
         : data?.webhook
-        ? t(`webhook_success_${category.replace('quick', '').toLowerCase()}`)
-        : t('success')
+          ? t(`webhook_success_${category.replace('quick', '').toLowerCase()}`)
+          : t('success')
       useWebhookStore.setState({
         alert: {
           open: true,

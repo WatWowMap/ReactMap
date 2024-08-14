@@ -43,7 +43,7 @@ export function TutorialAdvanced({ toggleHelp, category }) {
   }
 
   React.useEffect(() => {
-    const newCategory = category ?? isPokemon ? 'pokemon' : 'gyms'
+    const newCategory = (category ?? isPokemon) ? 'pokemon' : 'gyms'
     setLocalCategory(newCategory)
     setTempFilters({
       ...tutorialData.filters[newCategory].filter,

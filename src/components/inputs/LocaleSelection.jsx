@@ -62,8 +62,8 @@ export function LocaleSelection() {
               {status.total === 100
                 ? success
                 : status.total > 50
-                ? partial
-                : error}
+                  ? partial
+                  : error}
               &nbsp;{status.total}%&nbsp;{human}&nbsp;{status.human}
               %&nbsp;{ai}&nbsp;{status.ai}%
             </Typography>

@@ -59,10 +59,10 @@ export class Poracle {
         return item.grunt_type === 'gold-stop'
           ? 'gold-stop'
           : item.grunt_type === 'kecleon'
-          ? 'kecleon'
-          : item.grunt_type === 'showcase'
-          ? 'showcase'
-          : `i${item.real_grunt_id}`
+            ? 'kecleon'
+            : item.grunt_type === 'showcase'
+              ? 'showcase'
+              : `i${item.real_grunt_id}`
       case 'lure':
         return `l${item.lure_id}`
       case 'gym':
@@ -314,12 +314,12 @@ export class Poracle {
           item.grunt_type === 'gold-stop'
             ? 'gold_stop'
             : item.grunt_type === 'kecleon'
-            ? 'poke_352'
-            : item.grunt_type === 'showcase'
-            ? 'showcase'
-            : item.real_grunt_id
-            ? `grunt_${item.real_grunt_id}`
-            : 'poke_global',
+              ? 'poke_352'
+              : item.grunt_type === 'showcase'
+                ? 'showcase'
+                : item.real_grunt_id
+                  ? `grunt_${item.real_grunt_id}`
+                  : 'poke_global',
         )
         if (!item.gender) name = name.replace(/\(.+?\)/g, `(${t('all')})`)
         return `${name}${item.clean ? ` | ${t('clean')} ` : ''}${
@@ -391,10 +391,10 @@ export class Poracle {
                 item.max_level
               }
       A${item.atk}-${item.max_atk} | D${item.def}-${item.max_def} | S${
-                item.sta
-              }-${item.max_sta}${item.clean ? ` | ${t('clean')} ` : ''}${
-                item.distance ? ` | d${item.distance}` : ''
-              }`
+        item.sta
+      }-${item.max_sta}${item.clean ? ` | ${t('clean')} ` : ''}${
+        item.distance ? ` | d${item.distance}` : ''
+      }`
         }${
           item.size > 1 || item.max_size < 5
             ? ` | ${t('size', 'Size')}:${

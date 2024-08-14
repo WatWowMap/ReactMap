@@ -114,8 +114,8 @@ export function Footer({ options, role }) {
                     color: muiColor
                       ? null
                       : second
-                      ? theme.palette[first][second]
-                      : first,
+                        ? theme.palette[first][second]
+                        : first,
                   })}
                 />
               </IconButton>
@@ -135,8 +135,8 @@ export function Footer({ options, role }) {
                 color: muiColor
                   ? null
                   : second
-                  ? theme.palette[first][second]
-                  : first,
+                    ? theme.palette[first][second]
+                    : first,
               })}
             >
               <Typography variant="caption">

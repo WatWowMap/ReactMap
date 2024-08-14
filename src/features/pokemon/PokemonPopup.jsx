@@ -508,8 +508,8 @@ const PvpInfo = ({ pokemon, league, data, t, Icons }) => {
                   each.evolution
                     ? `evo_${each.evolution}`
                     : each.form
-                    ? `form_${each.form}`
-                    : '',
+                      ? `form_${each.form}`
+                      : '',
                   `poke_${each.pokemon}`,
                 ]}
               >

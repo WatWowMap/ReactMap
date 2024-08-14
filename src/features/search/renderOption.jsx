@@ -115,8 +115,8 @@ export const renderOption = (props, option) => {
                   : ''
               }${option.iv ? ` - ${option.iv}%` : ''}`
             : option.grunt_type
-            ? t(`grunt_${option.grunt_type}`).toString()
-            : option.name || t(getBackupName(searchTab))
+              ? t(`grunt_${option.grunt_type}`).toString()
+              : option.name || t(getBackupName(searchTab))
         }
         secondary={
           option.quest_title && option.quest_target ? (
