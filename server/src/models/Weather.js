@@ -6,8 +6,8 @@ const { default: pointInPolygon } = require('@turf/boolean-point-in-polygon')
 const { default: booleanContains } = require('@turf/boolean-contains')
 const config = require('@rm/config')
 
-const getPolyVector = require('../services/functions/getPolyVector')
-const { getPolygonBbox } = require('../services/functions/getBbox')
+const getPolyVector = require('../utils/getPolyVector')
+const { getPolygonBbox } = require('../utils/getBbox')
 
 class Weather extends Model {
   static get tableName() {

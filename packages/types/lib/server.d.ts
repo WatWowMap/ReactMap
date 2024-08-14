@@ -238,22 +238,19 @@ export type DiscordVerifyFunction = (
   done: VerifyCallback,
 ) => void
 
-export type BaseFilter = import('server/src/services/filters/Base')
+export type BaseFilter = import('server/src/filters/Base')
 
-export type PokemonFilter =
-  import('server/src/services/filters/pokemon/Frontend')
+export type PokemonFilter = import('server/src/filters/pokemon/Frontend')
 
 export type AllFilters = ReturnType<
-  typeof import('server/src/services/filters/builder/base')
+  typeof import('server/src/filters/builder/base')
 >
 
 export type Categories = keyof AllFilters
 
 export type AdvCategories = 'pokemon' | 'gyms' | 'pokestops' | 'nests'
 
-export type UIObject = ReturnType<
-  typeof import('server/src/services/ui/primary')
->
+export type UIObject = ReturnType<typeof import('server/src/ui/primary')>
 
 export interface PokemonGlow
   extends Partial<Omit<Config['clientSideOptions']['pokemon'], 'glow'>> {

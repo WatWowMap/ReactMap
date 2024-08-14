@@ -1,6 +1,6 @@
 // @ts-check
 const config = require('@rm/config')
-const state = require('../state')
+const state = require('../services/state')
 
 /** @typedef {import('@rm/types').RMSlider} Slider */
 

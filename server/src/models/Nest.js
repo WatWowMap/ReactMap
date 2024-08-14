@@ -5,7 +5,7 @@ const i18next = require('i18next')
 const config = require('@rm/config')
 
 const state = require('../services/state')
-const getAreaSql = require('../services/functions/getAreaSql')
+const getAreaSql = require('../utils/getAreaSql')
 
 /** @typedef {Nest & Partial<import("@rm/types").Nest>} FullNest */
 
@@ -148,7 +148,7 @@ class Nest extends Model {
    * @param {object} args
    * @param {import("@rm/types").DbContext} ctx
    * @param {import('objection').Raw} distance
-   * @param {ReturnType<typeof import("server/src/services/functions/getBbox").getBboxFromCenter>} bbox
+   * @param {ReturnType<typeof import("server/src/utils/getBbox").getBboxFromCenter>} bbox
    * @returns {Promise<FullNest[]>}
    */
   static async search(perms, args, { isMad }, distance, bbox) {

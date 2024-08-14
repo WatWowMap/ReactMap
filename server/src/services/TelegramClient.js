@@ -6,10 +6,10 @@ const passport = require('passport')
 const config = require('@rm/config')
 
 const state = require('./state')
-const areaPerms = require('./functions/areaPerms')
-const webhookPerms = require('./functions/webhookPerms')
-const scannerPerms = require('./functions/scannerPerms')
-const mergePerms = require('./functions/mergePerms')
+const areaPerms = require('../utils/areaPerms')
+const webhookPerms = require('../utils/webhookPerms')
+const scannerPerms = require('../utils/scannerPerms')
+const mergePerms = require('../utils/mergePerms')
 const AuthClient = require('./AuthClient')
 
 /**

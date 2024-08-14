@@ -5,7 +5,7 @@ const i18next = require('i18next')
 const config = require('@rm/config')
 
 const state = require('../services/state')
-const getAreaSql = require('../services/functions/getAreaSql')
+const getAreaSql = require('../utils/getAreaSql')
 
 const coreFields = [
   'id',

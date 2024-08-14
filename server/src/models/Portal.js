@@ -2,7 +2,7 @@
 const { Model } = require('objection')
 const config = require('@rm/config')
 
-const getAreaSql = require('../services/functions/getAreaSql')
+const getAreaSql = require('../utils/getAreaSql')
 
 class Portal extends Model {
   static get tableName() {
@@ -48,7 +48,7 @@ class Portal extends Model {
    * @param {object} args
    * @param {import("@rm/types").DbContext} context
    * @param {ReturnType<typeof import('objection').raw>} distance
-   * @param {ReturnType<typeof import("server/src/services/functions/getBbox").getBboxFromCenter>} bbox
+   * @param {ReturnType<typeof import("server/src/utils/getBbox").getBboxFromCenter>} bbox
    * @returns {Promise<import("@rm/types").FullPortal[]>}
    */
   static async search(perms, args, { isMad }, distance, bbox) {

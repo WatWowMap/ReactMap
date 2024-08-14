@@ -2,7 +2,7 @@
 const { log, TAGS } = require('@rm/logger')
 
 const BaseFilter = require('../Base')
-const state = require('../../state')
+const state = require('../../services/state')
 
 /**
  *
