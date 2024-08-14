@@ -160,7 +160,7 @@
     "node-cache": "^5.1.2",
     "node-fetch": "2.6.7",
     "node-geocoder": "^4.2.0",
-    "nodes2ts": "^2.0.0",
+    "nodes2ts": "3.0.0",
     "objection": "^3.0.1",
     "ohbem": "^1.4.1",
     "passport": "^0.6.0",
