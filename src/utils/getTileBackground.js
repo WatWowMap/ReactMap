@@ -11,6 +11,6 @@ export function getTileBackground(columnIndex, rowIndex) {
       ? 'rgba(1, 1, 1, 0.01)'
       : 'rgba(240, 240, 240, 0.01)'
     : rowIndex % 2
-    ? 'rgba(1, 1, 1, 0.01)'
-    : 'rgba(240, 240, 240, 0.01)'
+      ? 'rgba(1, 1, 1, 0.01)'
+      : 'rgba(240, 240, 240, 0.01)'
 }

@@ -97,8 +97,8 @@ export const useStorage = create(
         return filters?.pokemon?.easyMode
           ? 'basic'
           : userSettings?.pokemon?.legacyFilter
-          ? 'expert'
-          : 'intermediate'
+            ? 'expert'
+            : 'intermediate'
       },
       setPokemonFilterMode: (legacyFilter, easyMode) => {
         set((prev) => ({

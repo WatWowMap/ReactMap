@@ -59,8 +59,8 @@ export function Manage() {
         name: addNew.open
           ? 'save'
           : category === 'human'
-          ? t('manage_profiles')
-          : t('add_new', { category: t(category) }),
+            ? t('manage_profiles')
+            : t('add_new', { category: t(category) }),
         action: () => setAddNew((prev) => ({ open: !prev.open, save: false })),
         key: 'addNew',
         icon: addNew.open ? 'Save' : 'Add',
