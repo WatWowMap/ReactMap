@@ -10,16 +10,16 @@ const { log, TAGS } = require('@rm/logger')
 const config = require('@rm/config')
 
 const state = require('../services/state')
-const getAreaSql = require('../services/functions/getAreaSql')
-const { filterRTree } = require('../services/functions/filterRTree')
-const fetchJson = require('../services/api/fetchJson')
+const getAreaSql = require('../utils/getAreaSql')
+const { filterRTree } = require('../utils/filterRTree')
+const fetchJson = require('../utils/fetchJson')
 const {
   IV_CALC,
   LEVEL_CALC,
   MAD_KEY_MAP,
   BASE_KEYS,
-} = require('../services/filters/pokemon/constants')
-const PkmnFilter = require('../services/filters/pokemon/Backend')
+} = require('../filters/pokemon/constants')
+const PkmnFilter = require('../filters/pokemon/Backend')
 
 class Pokemon extends Model {
   static get tableName() {
@@ -568,7 +568,7 @@ class Pokemon extends Model {
    * @param {object} args
    * @param {import("@rm/types").DbContext} ctx
    * @param {number} distance
-   * @param {ReturnType<typeof import("server/src/services/functions/getBbox").getBboxFromCenter>} bbox
+   * @param {ReturnType<typeof import("server/src/utils/getBbox").getBboxFromCenter>} bbox
    * @returns {Promise<Partial<import("@rm/types").Pokemon>[]>}
    */
   static async search(perms, args, { isMad, mem, secret }, distance, bbox) {

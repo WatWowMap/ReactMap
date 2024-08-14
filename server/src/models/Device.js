@@ -1,8 +1,8 @@
 // @ts-check
 const { Model, raw } = require('objection')
-const getAreaSql = require('../services/functions/getAreaSql')
-const fetchJson = require('../services/api/fetchJson')
-const { filterRTree } = require('../services/functions/filterRTree')
+const getAreaSql = require('../utils/getAreaSql')
+const fetchJson = require('../utils/fetchJson')
+const { filterRTree } = require('../utils/filterRTree')
 
 class Device extends Model {
   static get tableName() {

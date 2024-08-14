@@ -2,8 +2,8 @@
 const { Model, raw } = require('objection')
 const config = require('@rm/config')
 
-const getAreaSql = require('../services/functions/getAreaSql')
-const { getEpoch } = require('../services/functions/getClientTime')
+const getAreaSql = require('../utils/getAreaSql')
+const { getEpoch } = require('../utils/getClientTime')
 
 const GET_ALL_SELECT = /** @type {const} */ ([
   'id',

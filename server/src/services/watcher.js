@@ -5,7 +5,7 @@ const chokidar = require('chokidar')
 const config = require('@rm/config')
 const { log, TAGS } = require('@rm/logger')
 const { validateJsons } = require('@rm/config/lib/validateJsons')
-const { reloadConfig } = require('./functions/reloadConfig')
+const { reloadConfig } = require('../utils/reloadConfig')
 
 const configDir = resolve(__dirname, '../configs')
 

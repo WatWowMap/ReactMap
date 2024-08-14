@@ -6,7 +6,7 @@ const {
   S2LatLngRect,
 } = require('nodes2ts')
 const getPolyVector = require('./getPolyVector')
-const PoI = require('../../models/PoI')
+const PoI = require('../models/PoI')
 
 /**
  *

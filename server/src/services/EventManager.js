@@ -8,7 +8,7 @@ const config = require('@rm/config')
 const { Logger } = require('@rm/logger')
 const { generate, read } = require('@rm/masterfile')
 
-const PoracleAPI = require('./api/Poracle')
+const PoracleAPI = require('./Poracle')
 const { getCache } = require('./cache')
 
 /**

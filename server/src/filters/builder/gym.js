@@ -1,5 +1,5 @@
 // @ts-check
-const state = require('../../state')
+const state = require('../../services/state')
 const BaseFilter = require('../Base')
 
 /**

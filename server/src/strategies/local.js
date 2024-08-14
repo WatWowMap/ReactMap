@@ -9,10 +9,10 @@ const { log, TAGS } = require('@rm/logger')
 const config = require('@rm/config')
 
 const state = require('../services/state')
-const areaPerms = require('../services/functions/areaPerms')
-const mergePerms = require('../services/functions/mergePerms')
-const webhookPerms = require('../services/functions/webhookPerms')
-const scannerPerms = require('../services/functions/scannerPerms')
+const areaPerms = require('../utils/areaPerms')
+const mergePerms = require('../utils/mergePerms')
+const webhookPerms = require('../utils/webhookPerms')
+const scannerPerms = require('../utils/scannerPerms')
 
 const authHandler = async (_req, username, password, done) => {
   const forceTutorial = config.getSafe('map.misc.forceTutorial')

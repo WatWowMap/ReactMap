@@ -1,10 +1,10 @@
 // @ts-check
 const { log, TAGS } = require('@rm/logger')
 
-const state = require('../state')
-const { bindConnections } = require('../../models')
-const { loadLatestAreas } = require('../areas')
-const { loadAuthStrategies } = require('../../routes/authRouter')
+const state = require('../services/state')
+const { bindConnections } = require('../models')
+const { loadLatestAreas } = require('../services/areas')
+const { loadAuthStrategies } = require('../routes/authRouter')
 const { deepCompare } = require('./deepCompare')
 
 const NO_RELOAD = new Set([

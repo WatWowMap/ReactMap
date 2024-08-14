@@ -5,7 +5,7 @@ const extend = require('extend')
 const config = require('@rm/config')
 const { Logger, TAGS } = require('@rm/logger')
 
-const { getBboxFromCenter } = require('./functions/getBbox')
+const { getBboxFromCenter } = require('../utils/getBbox')
 const { getCache } = require('./cache')
 
 /**

@@ -2,8 +2,8 @@
 const { Model, ref } = require('objection')
 const config = require('@rm/config')
 
-const getPolyVector = require('../services/functions/getPolyVector')
-const getAreaSql = require('../services/functions/getAreaSql')
+const getPolyVector = require('../utils/getPolyVector')
+const getAreaSql = require('../utils/getAreaSql')
 
 class ScanCell extends Model {
   static get tableName() {

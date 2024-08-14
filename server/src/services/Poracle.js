@@ -1,6 +1,6 @@
 const { log, TAGS } = require('@rm/logger')
-const fetchJson = require('./fetchJson')
-const { setCache, getCache } = require('../cache')
+const fetchJson = require('../utils/fetchJson')
+const { setCache, getCache } = require('./cache')
 
 const PLATFORMS = /** @type {const} */ (['discord', 'telegram'])
 

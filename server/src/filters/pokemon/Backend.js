@@ -10,8 +10,8 @@ const {
   jsifyIvFilter,
   dnfifyIvFilter,
 } = require('./functions')
-const { filterRTree } = require('../../functions/filterRTree')
-const state = require('../../state')
+const { filterRTree } = require('../../utils/filterRTree')
+const state = require('../../services/state')
 const PokemonFilter = require('./Frontend')
 
 module.exports = class PkmnBackend {

@@ -3,7 +3,7 @@ const router = require('express').Router()
 
 const { log, TAGS } = require('@rm/logger')
 
-const { reloadConfig } = require('../../../services/functions/reloadConfig')
+const { reloadConfig } = require('../../../utils/reloadConfig')
 
 router.get('/', (req, res) => {
   const config = require('@rm/config')
