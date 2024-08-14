@@ -189,7 +189,7 @@
     "@semantic-release/git": "^10.0.1",
     "@sentry/vite-plugin": "2.10.3",
     "@types/dlv": "^1.1.2",
-    "@types/node": "22",
+    "@types/node": "^18",
     "@types/node-fetch": "2.6.1",
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
@@ -210,7 +210,7 @@
     "nodemon": "3.1.4",
     "prettier": "3.3.3",
     "rollup-plugin-delete": "^2.0.0",
-    "semantic-release": "^24.0.0",
+    "semantic-release": "^22",
     "typescript": "5.5.4",
     "vite": "5.4.0",
     "vite-plugin-checker": "0.7.2"
