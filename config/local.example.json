@@ -45,10 +45,7 @@
         "type": "golbat",
         "endpoint": "http://{golbat_address}:{golbat_port}",
         "secret": "",
-        "useFor": [
-          "pokemon",
-          "device"
-        ]
+        "useFor": ["pokemon", "device"]
       },
       {
         "note": "React Map Database, where the migrations are ran through this app",
@@ -57,9 +54,7 @@
         "username": "reactmap_user",
         "password": "reactmap_paw",
         "database": "reactmap_db",
-        "useFor": [
-          "user"
-        ]
+        "useFor": ["user"]
       },
       {
         "note": "Manual Database generally used for storing external nests or portal tables, more info on the Wiki",
@@ -68,9 +63,7 @@
         "username": "manual_user",
         "password": "manual_pw",
         "database": "manual_db",
-        "useFor": [
-          "portal"
-        ]
+        "useFor": ["portal"]
       }
     ]
   },
@@ -248,13 +241,7 @@
   },
   "icons": {
     "Read_More_Here": "https://github.com/WatWowMap/ReactMap/wiki/06.-Icons-Configuration",
-    "customizable": [
-      "pokemon",
-      "pokestop",
-      "gym",
-      "invasion",
-      "reward"
-    ],
+    "customizable": ["pokemon", "pokestop", "gym", "invasion", "reward"],
     "styles": [
       {
         "name": "Default",

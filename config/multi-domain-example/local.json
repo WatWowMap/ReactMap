@@ -47,10 +47,7 @@
         "type": "golbat",
         "endpoint": "http://127.0.0.1:9001",
         "secret": "",
-        "useFor": [
-          "pokemon",
-          "device"
-        ]
+        "useFor": ["pokemon", "device"]
       },
       {
         "host": "127.0.0.1",
@@ -58,9 +55,7 @@
         "username": "reactmap_user",
         "password": "reactmap_paw",
         "database": "reactmap_db",
-        "useFor": [
-          "user"
-        ]
+        "useFor": ["user"]
       },
       {
         "host": "127.0.0.1",
@@ -68,10 +63,7 @@
         "username": "manual_user",
         "password": "manual_pw",
         "database": "manual_db",
-        "useFor": [
-          "nest",
-          "portal"
-        ]
+        "useFor": ["nest", "portal"]
       }
     ]
   },
@@ -93,9 +85,7 @@
         "allowedUsers": []
       }
     ],
-    "alwaysEnabledPerms": [
-      "map"
-    ],
+    "alwaysEnabledPerms": ["map"],
     "perms": {
       "map": {
         "enabled": true,
@@ -105,45 +95,27 @@
       "pokemon": {
         "enabled": true,
         "trialPeriodEligible": false,
-        "roles": [
-          "role1",
-          "role2",
-          "role3"
-        ]
+        "roles": ["role1", "role2", "role3"]
       },
       "iv": {
         "enabled": true,
         "trialPeriodEligible": false,
-        "roles": [
-          "role1",
-          "role2",
-          "role3"
-        ]
+        "roles": ["role1", "role2", "role3"]
       },
       "pvp": {
         "enabled": true,
         "trialPeriodEligible": false,
-        "roles": [
-          "role1",
-          "role2"
-        ]
+        "roles": ["role1", "role2"]
       },
       "gyms": {
         "enabled": true,
         "trialPeriodEligible": false,
-        "roles": [
-          "role1",
-          "role2",
-          "role3",
-          "role4"
-        ]
+        "roles": ["role1", "role2", "role3", "role4"]
       },
       "raids": {
         "enabled": true,
         "trialPeriodEligible": false,
-        "roles": [
-          "role3"
-        ]
+        "roles": ["role3"]
       }
     }
   }
