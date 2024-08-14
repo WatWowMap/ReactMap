@@ -162,7 +162,7 @@
     "node-geocoder": "^4.2.0",
     "nodes2ts": "3.0.0",
     "objection": "^3.0.1",
-    "ohbem": "^1.4.1",
+    "ohbem": "1.5.3",
     "passport": "^0.6.0",
     "passport-discord": "https://github.com/tonestrike/passport-discord.git",
     "passport-local": "^1.0.0",

@@ -1,4 +1,4 @@
-const Ohbem = require('ohbem')
+const { default: Ohbem } = require('ohbem')
 const NodeCache = require('node-cache')
 const config = require('@rm/config')
 const { log, TAGS } = require('@rm/logger')
