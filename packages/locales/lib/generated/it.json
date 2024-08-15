@@ -731,5 +731,9 @@
   "locale_instructions_8": "Espere pela revisão e fusão da solicitação de pull",
   "enter_translation": "Digite a Tradução",
   "individual_filters": "Filtrado Parcialmente",
-  "best_buddy": "Melhor companheiro"
+  "best_buddy": "Melhor companheiro",
+  "only_exclude_grunts": "Excluir Recrutas",
+  "only_exclude_leaders": "Excluir Líderes",
+  "s2_cell_zoom_limit": "Algumas células são pequenas demais para serem exibidas neste nível de zoom",
+  "data_limit_reached": "Você solicitou muitos dados recentemente e está em espera até {{until}}"
 }

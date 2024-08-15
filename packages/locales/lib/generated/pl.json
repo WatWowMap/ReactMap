@@ -716,5 +716,7 @@
   "reset_submission_cells": "Resetuj Komórki Wysyłania",
   "hisuian": "Hisuiański",
   "spacial_rend_range": "Zasięg Pęknięcia Przestrzeni",
-  "best_buddy": "Najlepszy przyjaciel"
+  "best_buddy": "Najlepszy przyjaciel",
+  "s2_cell_zoom_limit": "Niektóre komórki są za małe, aby być wyświetlone na tym poziomie powiększenia",
+  "data_limit_reached": "Ostatnio zażądałeś zbyt dużej ilości danych i jesteś na przerwie do {{until}}"
 }

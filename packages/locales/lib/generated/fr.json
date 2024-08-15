@@ -731,5 +731,7 @@
   "locale_instructions_8": "Attendez que la demande de tirage soit examinée et fusionnée",
   "enter_translation": "Entrez la Traduction",
   "individual_filters": "Filtré Partiellement",
-  "best_buddy": "Meilleur ami"
+  "best_buddy": "Meilleur ami",
+  "s2_cell_zoom_limit": "Certaines cellules sont trop petites pour être affichées à ce niveau de zoom",
+  "data_limit_reached": "Vous avez demandé trop de données récemment et êtes en période de refroidissement jusqu'à {{until}}"
 }

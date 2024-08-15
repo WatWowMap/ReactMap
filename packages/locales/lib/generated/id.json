@@ -731,5 +731,9 @@
   "locale_instructions_8": "Tunggu permintaan tarik untuk ditinjau dan digabung",
   "enter_translation": "Masukkan Terjemahan",
   "individual_filters": "Terfilter Sebagian",
-  "best_buddy": "Sahabat terbaik"
+  "best_buddy": "Sahabat terbaik",
+  "only_exclude_grunts": "Kecualikan Grunt",
+  "only_exclude_leaders": "Kecualikan Pemimpin",
+  "s2_cell_zoom_limit": "Beberapa sel terlalu kecil untuk ditampilkan di level zoom ini",
+  "data_limit_reached": "Anda telah meminta terlalu banyak data baru-baru ini dan sedang dalam masa pendinginan hingga {{until}}"
 }

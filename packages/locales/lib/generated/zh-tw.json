@@ -731,5 +731,9 @@
   "locale_instructions_8": "等待拉取請求被審核和合併",
   "enter_translation": "輸入翻譯",
   "individual_filters": "部分過濾",
-  "best_buddy": "最佳夥伴"
+  "best_buddy": "最佳夥伴",
+  "only_exclude_grunts": "排除小兵",
+  "only_exclude_leaders": "排除領袖",
+  "s2_cell_zoom_limit": "某些細胞在此縮放級別太小無法顯示",
+  "data_limit_reached": "您最近請求的數據過多，需等待至 {{until}} 方可繼續"
 }

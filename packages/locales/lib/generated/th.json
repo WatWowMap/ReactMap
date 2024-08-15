@@ -731,5 +731,9 @@
   "locale_instructions_8": "รอการตรวจสอบและผสาน pull request",
   "enter_translation": "ป้อนการแปล",
   "individual_filters": "กรองบางส่วน",
-  "best_buddy": "เพื่อนซี้ที่ดีที่สุด"
+  "best_buddy": "เพื่อนซี้ที่ดีที่สุด",
+  "only_exclude_grunts": "ไม่รวม Grunts",
+  "only_exclude_leaders": "ไม่รวม Leaders",
+  "s2_cell_zoom_limit": "บางเซลล์มีขนาดเล็กเกินไปที่จะแสดงในระดับการซูมนี้",
+  "data_limit_reached": "คุณขอข้อมูลมากเกินไปเมื่อเร็ว ๆ นี้และจะต้องรอจนถึง {{until}}"
 }

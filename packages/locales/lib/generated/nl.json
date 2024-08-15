@@ -731,5 +731,9 @@
   "locale_instructions_8": "Wacht tot het pull-verzoek is beoordeeld en samengevoegd",
   "enter_translation": "Voer Vertaling In",
   "individual_filters": "Gedeeltelijk Gefilterd",
-  "best_buddy": "Beste maatje"
+  "best_buddy": "Beste maatje",
+  "only_exclude_grunts": "Sluit Grunts uit",
+  "only_exclude_leaders": "Sluit Leiders uit",
+  "s2_cell_zoom_limit": "Sommige cellen zijn te klein om te worden getoond op dit zoomniveau",
+  "data_limit_reached": "Je hebt recent te veel data opgevraagd en zit in een afkoelperiode tot {{until}}"
 }

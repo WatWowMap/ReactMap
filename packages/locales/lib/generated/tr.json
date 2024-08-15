@@ -731,5 +731,9 @@
   "locale_instructions_8": "Çekme isteğinin incelenip birleştirilmesini bekleyin",
   "enter_translation": "Çeviri Gir",
   "individual_filters": "Kısmen Filtrelenmiş",
-  "best_buddy": "En iyi arkadaş"
+  "best_buddy": "En iyi arkadaş",
+  "only_exclude_grunts": "Grunt'ları Hariç Tut",
+  "only_exclude_leaders": "Liderleri Hariç Tut",
+  "s2_cell_zoom_limit": "Bazı hücreler bu yakınlaştırma seviyesinde görüntülenemeyecek kadar küçük",
+  "data_limit_reached": "Son zamanlarda çok fazla veri talebinde bulundunuz ve {{until}} tarihine kadar beklemedesiniz"
 }
