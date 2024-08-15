@@ -41,8 +41,8 @@ const Wayfarer = ({ level14Cells, level17Cells, pois }) => {
             ring.showcase
               ? showcaseColor
               : ring.partner
-              ? partnerColor
-              : poiColor
+                ? partnerColor
+                : poiColor
           }
         />
       ))}

@@ -1,7 +1,6 @@
 /* eslint-disable no-await-in-loop */
 const { knex } = require('knex')
 const { raw } = require('objection')
-const extend = require('extend')
 const config = require('@rm/config')
 const { Logger, TAGS } = require('@rm/logger')
 
@@ -575,17 +574,14 @@ module.exports = class DbCheck extends Logger {
         )
         this.log.info(`Setting available for ${model}`)
         if (model === 'Pokestop') {
+          const newQuestConditions = {}
           results.forEach((result) => {
             if ('conditions' in result) {
-              this.questConditions = extend(
-                true,
-                this.questConditions,
-                result.conditions,
-              )
+              config.util.extendDeep(newQuestConditions, result.conditions)
             }
           })
           this.questConditions = Object.fromEntries(
-            Object.entries(this.questConditions).map(([key, titles]) => [
+            Object.entries(newQuestConditions).map(([key, titles]) => [
               key,
               Object.values(titles),
             ]),

@@ -18,9 +18,9 @@ const S2Cells = () => {
       Array.isArray(filters)
         ? filters
         : typeof filters === 'string'
-        ? // @ts-ignore
-          filters.split(',')
-        : [],
+          ? // @ts-ignore
+            filters.split(',')
+          : [],
     [filters],
   )
   return (

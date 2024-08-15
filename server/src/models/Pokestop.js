@@ -709,7 +709,7 @@ class Pokestop extends Model {
         const showcaseData =
           typeof pokestop.showcase_rankings === 'string'
             ? JSON.parse(pokestop.showcase_rankings)
-            : pokestop.showcase_rankings ?? {}
+            : (pokestop.showcase_rankings ?? {})
         if (!perms.showcaseRankings) {
           showcaseData.contest_entries = []
         }
@@ -750,8 +750,8 @@ class Pokestop extends Model {
                   }`
                 ]
               : event.showcase_pokemon_type_id
-              ? filters[`h${event.showcase_pokemon_type_id}`]
-              : filters[`b${event.display_type}`],
+                ? filters[`h${event.showcase_pokemon_type_id}`]
+                : filters[`b${event.display_type}`],
           )
       }
       if (

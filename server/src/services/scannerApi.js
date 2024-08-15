@@ -54,15 +54,15 @@ async function scannerApi(
           parseFloat(data.scanCoords[0][1].toFixed(5)),
         ]
       : backendConfig.platform === 'dragonite' ||
-        backendConfig.platform === 'custom'
-      ? data.scanCoords?.map((coord) => [
-          parseFloat(coord[0].toFixed(5)),
-          parseFloat(coord[1].toFixed(5)),
-        ]) || []
-      : data.scanCoords?.map((coord) => ({
-          lat: parseFloat(coord[0].toFixed(5)),
-          lon: parseFloat(coord[1].toFixed(5)),
-        })) || []
+          backendConfig.platform === 'custom'
+        ? data.scanCoords?.map((coord) => [
+            parseFloat(coord[0].toFixed(5)),
+            parseFloat(coord[1].toFixed(5)),
+          ]) || []
+        : data.scanCoords?.map((coord) => ({
+            lat: parseFloat(coord[0].toFixed(5)),
+            lon: parseFloat(coord[1].toFixed(5)),
+          })) || []
 
   try {
     const headers = Object.fromEntries(
@@ -310,8 +310,8 @@ async function scannerApi(
           backendConfig.platform === 'custom'
             ? `${c[0]}, ${c[1]}`
             : typeof c === 'object'
-            ? `${'lat' in c && c.lat}, ${'lon' in c && c.lon}`
-            : c,
+              ? `${'lat' in c && c.lat}, ${'lon' in c && c.lon}`
+              : c,
         )
         .join('\n')
       await state.event.chatLog(

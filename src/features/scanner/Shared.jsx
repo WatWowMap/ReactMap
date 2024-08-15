@@ -172,8 +172,8 @@ export function ScanCircles({ radius }) {
           ? COLORS.orange
           : COLORS.purple
         : validCoords[i]
-        ? COLORS.blue
-        : COLORS.red
+          ? COLORS.blue
+          : COLORS.red
     return (
       <ScanCircle
         key={`${coords.join('')}${finalColor}`}

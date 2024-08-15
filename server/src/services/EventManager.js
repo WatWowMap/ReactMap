@@ -175,78 +175,121 @@ class EventManager extends Logger {
     this.log.info('starting intervals')
 
     if (!config.getSafe('api.queryOnSessionInit.raids')) {
-      this.intervals.raidUpdate = setInterval(async () => {
-        await this.setAvailable('gyms', 'Gym', Db)
-        await this.chatLog('event', {
-          description: 'Refreshed available raids',
-        })
-      }, 1000 * 60 * 60 * (config.getSafe('api.queryUpdateHours.raids') || 1))
+      this.intervals.raidUpdate = setInterval(
+        async () => {
+          await this.setAvailable('gyms', 'Gym', Db)
+          await this.chatLog('event', {
+            description: 'Refreshed available raids',
+          })
+        },
+        1000 * 60 * 60 * (config.getSafe('api.queryUpdateHours.raids') || 1),
+      )
     }
     if (!config.getSafe('api.queryOnSessionInit.nests')) {
-      this.intervals.nestUpdate = setInterval(async () => {
-        await this.setAvailable('nests', 'Nest', Db)
-        await this.chatLog('event', {
-          description: 'Refreshed available nests',
-        })
-      }, 1000 * 60 * 60 * (config.getSafe('api.queryUpdateHours.nests') || 6))
+      this.intervals.nestUpdate = setInterval(
+        async () => {
+          await this.setAvailable('nests', 'Nest', Db)
+          await this.chatLog('event', {
+            description: 'Refreshed available nests',
+          })
+        },
+        1000 * 60 * 60 * (config.getSafe('api.queryUpdateHours.nests') || 6),
+      )
     }
     if (!config.getSafe('api.queryOnSessionInit.pokemon')) {
-      this.intervals.pokemonUpdate = setInterval(async () => {
-        await this.setAvailable('pokemon', 'Pokemon', Db)
-        await this.chatLog('event', {
-          description: 'Refreshed available pokemon',
-        })
-      }, 1000 * 60 * 60 * (config.getSafe('api.queryUpdateHours.pokemon') || 1))
+      this.intervals.pokemonUpdate = setInterval(
+        async () => {
+          await this.setAvailable('pokemon', 'Pokemon', Db)
+          await this.chatLog('event', {
+            description: 'Refreshed available pokemon',
+          })
+        },
+        1000 * 60 * 60 * (config.getSafe('api.queryUpdateHours.pokemon') || 1),
+      )
     }
     if (!config.getSafe('api.queryOnSessionInit.quests')) {
-      this.intervals.questUpdate = setInterval(async () => {
-        await this.setAvailable('pokestops', 'Pokestop', Db)
-        await this.chatLog('event', {
-          description: 'Refreshed available quests & invasions',
-        })
-      }, 1000 * 60 * 60 * (config.getSafe('api.queryUpdateHours.quests') || 3))
+      this.intervals.questUpdate = setInterval(
+        async () => {
+          await this.setAvailable('pokestops', 'Pokestop', Db)
+          await this.chatLog('event', {
+            description: 'Refreshed available quests & invasions',
+          })
+        },
+        1000 * 60 * 60 * (config.getSafe('api.queryUpdateHours.quests') || 3),
+      )
     }
-    this.intervals.uicons = setInterval(async () => {
-      await this.getUniversalAssets('uicons')
-      await this.chatLog('event', { description: 'Refreshed UICONS indexes' })
-    }, 1000 * 60 * 60 * (config.getSafe('icons.cacheHrs') || 3))
-    this.intervals.uaudio = setInterval(async () => {
-      await this.getUniversalAssets('uaudio')
-      await this.chatLog('event', { description: 'Refreshed UAUDIO indexes' })
-    }, 1000 * 60 * 60 * (config.getSafe('audio.cacheHrs') || 3))
+    this.intervals.uicons = setInterval(
+      async () => {
+        await this.getUniversalAssets('uicons')
+        await this.chatLog('event', { description: 'Refreshed UICONS indexes' })
+      },
+      1000 * 60 * 60 * (config.getSafe('icons.cacheHrs') || 3),
+    )
+    this.intervals.uaudio = setInterval(
+      async () => {
+        await this.getUniversalAssets('uaudio')
+        await this.chatLog('event', { description: 'Refreshed UAUDIO indexes' })
+      },
+      1000 * 60 * 60 * (config.getSafe('audio.cacheHrs') || 3),
+    )
     if (config.getSafe('api.pogoApiEndpoints.invasions')) {
-      this.intervals.invasions = setInterval(async () => {
-        await this.getInvasions()
-        await this.chatLog('event', { description: 'Refreshed invasions' })
-      }, 1000 * 60 * 60 * (config.getSafe('map.misc.invasionCacheHrs') || 1))
+      this.intervals.invasions = setInterval(
+        async () => {
+          await this.getInvasions()
+          await this.chatLog('event', { description: 'Refreshed invasions' })
+        },
+        1000 * 60 * 60 * (config.getSafe('map.misc.invasionCacheHrs') || 1),
+      )
     }
-    this.intervals.historical = setInterval(async () => {
-      await Db.historicalRarity()
-      await this.chatLog('event', {
-        description: 'Refreshed db historical rarity tiers',
-      })
-    }, 1000 * 60 * 60 * (config.getSafe('api.queryUpdateHours.historicalRarity') || 6))
+    this.intervals.historical = setInterval(
+      async () => {
+        await Db.historicalRarity()
+        await this.chatLog('event', {
+          description: 'Refreshed db historical rarity tiers',
+        })
+      },
+      1000 *
+        60 *
+        60 *
+        (config.getSafe('api.queryUpdateHours.historicalRarity') || 6),
+    )
     if (config.getSafe('api.pogoApiEndpoints.masterfile')) {
-      this.intervals.masterfile = setInterval(async () => {
-        await this.getMasterfile(Db.historical, Db.rarity)
-        await this.chatLog('event', { description: 'Refreshed masterfile' })
-      }, 1000 * 60 * 60 * (config.getSafe('map.misc.masterfileCacheHrs') || 6))
+      this.intervals.masterfile = setInterval(
+        async () => {
+          await this.getMasterfile(Db.historical, Db.rarity)
+          await this.chatLog('event', { description: 'Refreshed masterfile' })
+        },
+        1000 * 60 * 60 * (config.getSafe('map.misc.masterfileCacheHrs') || 6),
+      )
     }
     if (Pvp) {
-      this.intervals.pvp = setInterval(async () => {
-        Pvp.updatePokemonData(await Ohbem.fetchPokemonData())
-        await this.chatLog('event', { description: 'Refreshed PVP masterfile' })
-      }, 1000 * 60 * 60 * (config.getSafe('map.misc.masterfileCacheHrs') || 6))
+      this.intervals.pvp = setInterval(
+        async () => {
+          Pvp.updatePokemonData(await Ohbem.fetchPokemonData())
+          await this.chatLog('event', {
+            description: 'Refreshed PVP masterfile',
+          })
+        },
+        1000 * 60 * 60 * (config.getSafe('map.misc.masterfileCacheHrs') || 6),
+      )
     }
-    this.intervals.webhooks = setInterval(async () => {
-      await this.getWebhooks()
-      await this.chatLog('event', { description: 'Refreshed webhook settings' })
-    }, 1000 * 60 * 60 * (config.getSafe('map.misc.webhookCacheHrs') || 1))
+    this.intervals.webhooks = setInterval(
+      async () => {
+        await this.getWebhooks()
+        await this.chatLog('event', {
+          description: 'Refreshed webhook settings',
+        })
+      },
+      1000 * 60 * 60 * (config.getSafe('map.misc.webhookCacheHrs') || 1),
+    )
 
-    this.intervals.filterCxt = setInterval(async () => {
-      await Db.getFilterContext()
-      await this.chatLog('event', { description: 'Updated filter contexts' })
-    }, 1000 * 60 * 30)
+    this.intervals.filterCxt = setInterval(
+      async () => {
+        await Db.getFilterContext()
+        await this.chatLog('event', { description: 'Updated filter contexts' })
+      },
+      1000 * 60 * 30,
+    )
   }
 
   /**

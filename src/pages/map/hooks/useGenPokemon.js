@@ -63,10 +63,10 @@ export function useGenPokemon() {
             Array.isArray(v)
               ? v.map((y) => t(y))
               : typeof v === 'boolean'
-              ? v
-                ? t(k)
-                : ''
-              : t(v),
+                ? v
+                  ? t(k)
+                  : ''
+                : t(v),
           )
           .join(' ')
           .toLowerCase()} ${t('pokemon').toLowerCase()}`
