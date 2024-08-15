@@ -10,7 +10,7 @@ const OPERATOR =
 
 /**
  *
- * @param {ReturnType<import('server/src/services/ui/clientOptions')>['clientMenus']['pokemon']['glow']['sub']} glowRules
+ * @param {ReturnType<import('server/src/ui/clientOptions')>['clientMenus']['pokemon']['glow']['sub']} glowRules
  * @returns {((pkmn: import('@rm/types').Pokemon) => string | null)[]}
  */
 export function getGlowRules(glowRules) {

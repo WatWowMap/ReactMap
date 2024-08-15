@@ -4,26 +4,25 @@ const { resolve } = require('path')
 const { default: fetch } = require('node-fetch')
 
 const config = require('@rm/config')
-const { log, HELPERS } = require('@rm/logger')
+const { log, TAGS } = require('@rm/logger')
 
 const defaultRarity = require('./data/defaultRarity.json')
 
-const rarityObj = {}
-
-const rarityConfig = config.getSafe('rarity')
-const endpoint = config.getSafe('api.pogoApiEndpoints.masterfile')
-
-Object.entries(defaultRarity).forEach(([tier, pokemon]) => {
-  if (rarityConfig?.[tier]?.length) {
-    rarityConfig[tier].forEach((mon) => (rarityObj[mon] = tier))
-  } else {
-    pokemon.forEach((mon) => (rarityObj[mon] = tier))
-  }
-})
-
 /** @type {import('.').generate} */
 const generate = async (save = false, historicRarity = {}, dbRarity = {}) => {
-  log.info(HELPERS.masterfile, 'generating masterfile')
+  const rarityConfig = config.getSafe('rarity')
+  const endpoint = config.getSafe('api.pogoApiEndpoints.masterfile')
+  const rarityObj = {}
+
+  Object.entries(defaultRarity).forEach(([tier, pokemon]) => {
+    if (rarityConfig?.[tier]?.length) {
+      rarityConfig[tier].forEach((mon) => (rarityObj[mon] = tier))
+    } else {
+      pokemon.forEach((mon) => (rarityObj[mon] = tier))
+    }
+  })
+
+  log.info(TAGS.masterfile, 'generating masterfile')
   try {
     if (!endpoint) throw new Error('No masterfile endpoint')
 
@@ -73,7 +72,7 @@ const generate = async (save = false, historicRarity = {}, dbRarity = {}) => {
     return newMf
   } catch (e) {
     log.warn(
-      HELPERS.masterfile,
+      TAGS.masterfile,
       'Unable to generate new masterfile, using existing.',
       e,
     )
@@ -83,7 +82,7 @@ const generate = async (save = false, historicRarity = {}, dbRarity = {}) => {
 module.exports.generate = generate
 
 if (require.main === module) {
-  generate(true).then(() => log.info(HELPERS.masterfile, 'OK'))
+  generate(true).then(() => log.info(TAGS.masterfile, 'OK'))
 }
 
 /** @type {import('.').read} */
@@ -94,7 +93,7 @@ const read = () => {
     )
   } catch (e) {
     log.warn(
-      HELPERS.masterfile,
+      TAGS.masterfile,
       'Unable to read masterfile, generating a new one for you now',
     )
     generate(true)

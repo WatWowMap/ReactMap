@@ -291,14 +291,14 @@ export interface PoracleAPIRef {
 }
 
 export type PoracleUI = ReturnType<
-  import('server/src/services/api/Poracle')['generateUi']
+  import('server/src/services/Poracle')['generateUi']
 >
 
 export type PoracleDefault<T extends keyof Omit<PoracleUI, 'human'>> =
   PoracleUI[T]['defaults']
 
 export type PoracleClientContext = Omit<
-  ReturnType<import('server/src/services/api/Poracle')['getClientContext']>,
+  ReturnType<import('server/src/services/Poracle')['getClientContext']>,
   'ui'
 > & {
   ui: PoracleUI

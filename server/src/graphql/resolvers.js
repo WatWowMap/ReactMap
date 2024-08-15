@@ -2,19 +2,20 @@ const fs = require('fs')
 const { resolve } = require('path')
 const { GraphQLJSON } = require('graphql-type-json')
 const { S2LatLng, S2RegionCoverer, S2LatLngRect } = require('nodes2ts')
+
 const config = require('@rm/config')
 const { missing, readAndParseJson } = require('@rm/locales')
 
-const buildDefaultFilters = require('../services/filters/builder/base')
-const filterComponents = require('../services/functions/filterComponents')
-const validateSelectedWebhook = require('../services/functions/validateSelectedWebhook')
-const PoracleAPI = require('../services/api/Poracle')
+const buildDefaultFilters = require('../filters/builder/base')
+const filterComponents = require('../utils/filterComponents')
+const validateSelectedWebhook = require('../utils/validateSelectedWebhook')
+const PoracleAPI = require('../services/Poracle')
 const { geocoder } = require('../services/geocoder')
-const scannerApi = require('../services/api/scannerApi')
-const getPolyVector = require('../services/functions/getPolyVector')
-const getPlacementCells = require('../services/functions/getPlacementCells')
-const getTypeCells = require('../services/functions/getTypeCells')
-const { getValidCoords } = require('../services/functions/getValidCoords')
+const scannerApi = require('../services/scannerApi')
+const getPolyVector = require('../utils/getPolyVector')
+const getPlacementCells = require('../utils/getPlacementCells')
+const getTypeCells = require('../utils/getTypeCells')
+const { getValidCoords } = require('../utils/getValidCoords')
 
 /** @type {import("@apollo/server").ApolloServerOptions<import("@rm/types").GqlContext>['resolvers']} */
 const resolvers = {
@@ -110,7 +111,7 @@ const resolvers = {
     checkValidScan: (_, { mode, points }, { perms }) =>
       getValidCoords(mode, points, perms),
     /** @param {unknown} _ @param {{ component: 'loginPage' | 'donationPage' | 'messageOfTheDay' }} args */
-    customComponent: (_, { component }, { perms, req, user }) => {
+    customComponent: (_, { component }, { perms, req, username }) => {
       switch (component) {
         case 'messageOfTheDay':
         case 'donationPage':
@@ -125,10 +126,10 @@ const resolvers = {
               ...rest,
               footerButtons: filterComponents(
                 footerButtons,
-                !!user,
+                !!username,
                 perms.donor,
               ),
-              components: filterComponents(components, !!user, perms.donor),
+              components: filterComponents(components, !!username, perms.donor),
             }
           }
           return null
@@ -142,7 +143,7 @@ const resolvers = {
       }
       return []
     },
-    fabButtons: async (_, _args, { perms, user, req, Db, Event }) => {
+    fabButtons: async (_, _args, { perms, username, req, Db, Event }) => {
       const { donationPage, misc } = config.getMapConfig(req)
 
       const scanner = config.getSafe('scanner')
@@ -160,7 +161,7 @@ const resolvers = {
           (perms.donor ? donationPage.showToDonors : true)
             ? donationPage.fabIcon
             : '',
-        profileButton: !!(user && misc.enableFloatingProfileButton),
+        profileButton: !!(username && misc.enableFloatingProfileButton),
         scanZone:
           scanner.backendConfig.platform !== 'mad' &&
           scanner.scanZone.enabled &&
@@ -616,8 +617,8 @@ const resolvers = {
       }
       return {}
     },
-    validateUser: (_, __, { user, perms }) => ({
-      loggedIn: !!user,
+    validateUser: (_, __, { username, perms }) => ({
+      loggedIn: !!username,
       admin: perms?.admin,
     }),
   },
@@ -637,7 +638,7 @@ const resolvers = {
         await Db.models.Backup.update(args.backup, req.user.id)
       }
     },
-    nestSubmission: async (_, args, { req, perms, Db, user }) => {
+    nestSubmission: async (_, args, { req, perms, Db, username }) => {
       if (perms?.nestSubmissions && req.user?.id) {
         return Db.query(
           'NestSubmission',
@@ -647,7 +648,7 @@ const resolvers = {
             nest_id: args.id,
           },
           {
-            submitted_by: user,
+            submitted_by: username,
             user_id: req.user.id,
           },
         )

@@ -2,7 +2,7 @@
 
 /**
  *
- * @returns {Promise<ReturnType<typeof import('../../server/src/services/functions/getServerSettings')>>}
+ * @returns {Promise<ReturnType<typeof import('../../server/src/utils/getServerSettings')>>}
  */
 export async function getSettings() {
   try {

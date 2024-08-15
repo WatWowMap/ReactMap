@@ -5,27 +5,23 @@ const path = require('path')
 
 const { name } = path.parse(__filename)
 
-const { log, HELPERS } = require('@rm/logger')
+const { log, TAGS } = require('@rm/logger')
 const config = require('@rm/config')
 
-const forceTutorial = config.getSafe('map.misc.forceTutorial')
-const {
-  [name]: strategyConfig,
-  alwaysEnabledPerms,
-  perms,
-} = config.getSafe('authentication')
-
-const { Db } = require('../services/initialization')
-const areaPerms = require('../services/functions/areaPerms')
-const mergePerms = require('../services/functions/mergePerms')
-const webhookPerms = require('../services/functions/webhookPerms')
-const scannerPerms = require('../services/functions/scannerPerms')
-
-if (strategyConfig.doNothing) {
-  // This is for nothing other than demonstrating a custom property you can add if you need it
-}
+const state = require('../services/state')
+const areaPerms = require('../utils/areaPerms')
+const mergePerms = require('../utils/mergePerms')
+const webhookPerms = require('../utils/webhookPerms')
+const scannerPerms = require('../utils/scannerPerms')
 
 const authHandler = async (_req, username, password, done) => {
+  const forceTutorial = config.getSafe('map.misc.forceTutorial')
+  const {
+    [name]: strategyConfig,
+    alwaysEnabledPerms,
+    perms,
+  } = config.getSafe('authentication')
+
   const date = new Date()
   const trialActive =
     strategyConfig.trialPeriod &&
@@ -45,12 +41,12 @@ const authHandler = async (_req, username, password, done) => {
   }
 
   try {
-    await Db.models.User.query()
+    await state.db.models.User.query()
       .findOne({ username })
       .then(async (userExists) => {
         if (!userExists) {
           try {
-            const newUser = await Db.models.User.query().insertAndFetch({
+            const newUser = await state.db.models.User.query().insertAndFetch({
               username,
               password: await bcrypt.hash(password, 10),
               strategy: 'local',
@@ -72,7 +68,7 @@ const authHandler = async (_req, username, password, done) => {
               }
             })
             log.info(
-              HELPERS.custom(name),
+              TAGS.custom(name),
               user.username,
               `(${user.id})`,
               'Authenticated successfully.',
@@ -94,7 +90,7 @@ const authHandler = async (_req, username, password, done) => {
             }
           })
           if (userExists.strategy !== 'local') {
-            await Db.models.User.query()
+            await state.db.models.User.query()
               .update({ strategy: 'local' })
               .where('id', userExists.id)
             userExists.strategy = 'local'
@@ -130,7 +126,7 @@ const authHandler = async (_req, username, password, done) => {
             user.perms.scanner.push(x),
           )
           log.info(
-            HELPERS.custom(name),
+            TAGS.custom(name),
             user.username,
             `(${user.id})`,
             'Authenticated successfully.',
@@ -140,7 +136,7 @@ const authHandler = async (_req, username, password, done) => {
         return done(null, false, { message: 'invalid_credentials' })
       })
   } catch (e) {
-    log.error(HELPERS.custom(name), 'User has failed authentication.', e)
+    log.error(TAGS.custom(name), 'User has failed authentication.', e)
   }
 }
 

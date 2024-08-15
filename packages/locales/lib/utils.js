@@ -3,7 +3,7 @@ const { promises: fs, readdirSync, readFileSync } = require('fs')
 const { resolve } = require('path')
 const { default: fetch } = require('node-fetch')
 
-const { log, HELPERS } = require('@rm/logger')
+const { log, TAGS } = require('@rm/logger')
 
 const HUMAN_LOCALES = resolve(__dirname, './human')
 
@@ -35,7 +35,7 @@ async function fetchRemote(locale, endpoint) {
         }),
     )
   } catch (e) {
-    log.error(HELPERS.locales, `[${locale}]`, e)
+    log.error(TAGS.locales, `[${locale}]`, e)
   }
 }
 
@@ -70,9 +70,9 @@ async function writeJson(translations, ...directories) {
         : JSON.stringify(translations, null, 2)
 
     await fs.writeFile(resolved, file, 'utf8')
-    log.info(HELPERS.locales, 'wrote file', `${resolved.split('/').pop()}`)
+    log.info(TAGS.locales, 'wrote file', `${resolved.split('/').pop()}`)
   } catch (e) {
-    log.error(HELPERS.locales, '[writeJson]', e)
+    log.error(TAGS.locales, '[writeJson]', e)
   }
 }
 

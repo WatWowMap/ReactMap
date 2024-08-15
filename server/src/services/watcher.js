@@ -3,16 +3,11 @@ const { resolve } = require('path')
 const chokidar = require('chokidar')
 
 const config = require('@rm/config')
-const { log, HELPERS } = require('@rm/logger')
-const checkConfigJsons = require('./functions/checkConfigJsons')
+const { log, TAGS } = require('@rm/logger')
+const { validateJsons } = require('@rm/config/lib/validateJsons')
+const { reloadConfig } = require('../utils/reloadConfig')
 
 const configDir = resolve(__dirname, '../configs')
-
-const watcher = chokidar.watch(configDir, {
-  ignored: /(^|[/\\])\../,
-  persistent: true,
-  ignoreInitial: true,
-})
 
 /**
  * Replace base path, remove .json, and split into array
@@ -27,43 +22,63 @@ const clean = (path) =>
  * @param {string} rawFile
  * @param {string} [domain]
  */
-const handle = (event, rawFile, domain) => {
+const handle = async (event, rawFile, domain) => {
+  log.debug(TAGS.config, `[${event}]`, rawFile)
+
   switch (rawFile) {
     case 'loginPage':
     case 'donationPage':
     case 'messageOfTheDay':
       if (domain) {
         const domainKey = domain.replaceAll('.', '_')
-        if (config.multiDomainsObj[domainKey]?.[rawFile]) {
-          log.info(HELPERS.config, `[${event}]`, rawFile, domain)
-          config.multiDomainsObj[domainKey][rawFile] = config.util.extendDeep(
+        const multiDomainsObj = config.getSafe('multiDomainsObj')
+        if (multiDomainsObj[domainKey]?.[rawFile]) {
+          log.info(TAGS.config, `[${event}]`, rawFile, domain)
+          multiDomainsObj[domainKey][rawFile] = config.util.extendDeep(
             {},
-            config.multiDomainsObj[domainKey][rawFile],
-            checkConfigJsons(rawFile, domain),
+            multiDomainsObj[domainKey][rawFile],
+            validateJsons(rawFile, domain),
           )
         }
       } else {
-        log.info(HELPERS.config, `[${event}]`, rawFile)
+        log.info(TAGS.config, `[${event}]`, rawFile)
         config.map[rawFile] = config.util.extendDeep(
           {},
           config.map[rawFile],
-          checkConfigJsons(rawFile),
+          validateJsons(rawFile),
         )
+      }
+      break
+    case 'local':
+    case `local-${process.env.NODE_CONFIG_ENV}`:
+      if (config.reloadConfigOnSave) {
+        await reloadConfig()
       }
       break
     default:
       break
   }
 }
-watcher.on('change', (path) => {
-  const [rawFile, domain] = clean(path)
-  handle('CHANGE', rawFile, domain)
-})
 
-watcher.on('add', (path) => {
-  const [rawFile, domain] = clean(path)
-  if (domain && domain.split('_').length > 1) return
-  handle('ADD', rawFile, domain)
-})
+const startWatcher = () => {
+  const watcher = chokidar.watch(configDir, {
+    ignored: /(^|[/\\])\../,
+    persistent: true,
+    ignoreInitial: true,
+  })
 
-module.exports.watcher = watcher
+  watcher.on('change', async (path) => {
+    const [rawFile, domain] = clean(path)
+    await handle('CHANGE', rawFile, domain)
+  })
+
+  watcher.on('add', async (path) => {
+    const [rawFile, domain] = clean(path)
+    if (domain && domain.split('_').length > 1) return
+    await handle('ADD', rawFile, domain)
+  })
+
+  return watcher
+}
+
+module.exports = { startWatcher }

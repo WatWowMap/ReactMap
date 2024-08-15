@@ -1,4 +1,3 @@
-import { LEAGUES } from 'server/src/services/filters/pokemon/constants'
 import type {
   ScannerModels,
   ScannerModelKeys,
@@ -8,8 +7,7 @@ import type {
 } from 'server/src/models'
 import { Knex } from 'knex'
 import { Model } from 'objection'
-import { Request, Response } from 'express'
-import { Transaction } from '@sentry/node'
+import { NextFunction, Request, Response } from 'express'
 import { VerifyCallback } from 'passport-oauth2'
 
 import DbCheck = require('server/src/services/DbCheck')
@@ -25,6 +23,7 @@ import { ModelReturn, OnlyType } from './utility'
 import { Profile } from 'passport-discord'
 import { User } from './models'
 import { Config } from '@rm/types'
+import { OperationTypeNode } from 'graphql'
 
 export interface DbContext {
   isMad: boolean
@@ -131,14 +130,14 @@ export interface BaseRecord {
 }
 
 export interface GqlContext {
+  userId: number
   req: Request
   res: Response
   Db: DbCheck
   Event: EventManager
   perms: Permissions
-  user: string
-  transaction: Transaction
-  operation: 'query' | 'mutation'
+  username: string
+  operation: OperationTypeNode
   startTime?: number
 }
 
@@ -174,6 +173,7 @@ export interface Permissions {
   scanner: string[]
   areaRestrictions: string[]
   webhooks: string[]
+  trial: boolean
 }
 
 export interface Waypoint {
@@ -238,22 +238,19 @@ export type DiscordVerifyFunction = (
   done: VerifyCallback,
 ) => void
 
-export type BaseFilter = import('server/src/services/filters/Base')
+export type BaseFilter = import('server/src/filters/Base')
 
-export type PokemonFilter =
-  import('server/src/services/filters/pokemon/Frontend')
+export type PokemonFilter = import('server/src/filters/pokemon/Frontend')
 
 export type AllFilters = ReturnType<
-  typeof import('server/src/services/filters/builder/base')
+  typeof import('server/src/filters/builder/base')
 >
 
 export type Categories = keyof AllFilters
 
 export type AdvCategories = 'pokemon' | 'gyms' | 'pokestops' | 'nests'
 
-export type UIObject = ReturnType<
-  typeof import('server/src/services/ui/primary')
->
+export type UIObject = ReturnType<typeof import('server/src/ui/primary')>
 
 export interface PokemonGlow
   extends Partial<Omit<Config['clientSideOptions']['pokemon'], 'glow'>> {
@@ -266,4 +263,30 @@ export interface PokemonGlow
 export interface ClientOptions
   extends Partial<Omit<Config['clientSideOptions'], 'pokemon'>> {
   pokemon: PokemonGlow
+}
+
+export type ExpressMiddleware = (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => any
+
+export type ExpressErrorMiddleware = (
+  err: Error,
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => any
+
+export interface StateReportObj {
+  database: boolean
+  pvp: boolean
+  icons: boolean
+  audio: boolean
+  historical: boolean
+  masterfile: boolean
+  invasions: boolean
+  webhooks: boolean
+  events: boolean
+  strategies: boolean
 }

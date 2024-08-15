@@ -63,7 +63,7 @@ export interface SubmissionCell {
   pois: PoI[]
 }
 
-export interface Bounds {
+export interface BBox {
   minLat: number
   maxLat: number
   minLon: number

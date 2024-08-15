@@ -1,6 +1,6 @@
 /* eslint-disable no-unused-vars */
 const config = require('@rm/config')
-const { log, HELPERS } = require('@rm/logger')
+const { log, TAGS } = require('@rm/logger')
 
 /**
  * @param {import("knex").Knex} knex
@@ -18,7 +18,7 @@ exports.up = async (knex) =>
         )
       }
       log.warn(
-        HELPERS.db,
+        TAGS.db,
         `${config.getSafe(
           'database.settings.userTableName',
         )} already exists in your db, you may need to choose a new name in the config file.`,

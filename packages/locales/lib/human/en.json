@@ -615,9 +615,12 @@
   "delete": "Delete",
   "name": "Name",
   "only_confirmed": "Only Confirmed",
+  "only_exclude_grunts": "Exclude  Grunts",
+  "only_exclude_leaders": "Exclude Leaders",
   "rocket_pokemon": "Rocket Pokémon",
   "decoy": "Decoy",
   "s2_cell_limit_0": "You attempted to generate more than 20,000 cells ({{variable_0}})",
+  "s2_cell_zoom_limit": "Some cells are too small to be displayed at this zoom level",
   "show_all_pvp_ranks": "Show All PVP Ranks",
   "enable_pokemon_popup_coords": "Show Pokémon Coords",
   "enable_gym_popup_coords": "Show Gym Coords",
@@ -782,5 +785,6 @@
   "locale_instructions_7": "Create a pull request",
   "locale_instructions_8": "Wait for the pull request to be reviewed and merged",
   "enter_translation": "Enter Translation",
-  "individual_filters": "Partially Filtered"
+  "individual_filters": "Partially Filtered",
+  "data_limit_reached": "You have requested too much data recently and are on cooldown until {{until}}"
 }

@@ -8,8 +8,8 @@ import { useTranslation } from 'react-i18next'
 import { useHideElement } from '@hooks/useHideElement'
 
 export function ErrorPage() {
-  const { t } = useTranslation()
-  const error = window.location.href.split('/').pop()
+  const { t, i18n } = useTranslation()
+  const error = decodeURIComponent(window.location.href.split('/').pop())
   useHideElement()
 
   return (
@@ -21,14 +21,16 @@ export function ErrorPage() {
       minHeight="100cqh"
     >
       <Grid>
-        <Typography variant="h1" align="center">
+        <Typography variant={error.length > 4 ? 'h3' : 'h1'} align="center">
           {error}
         </Typography>
       </Grid>
       <Grid>
-        <Typography variant="h6" align="center">
-          {t(`errors_${error}`)}
-        </Typography>
+        {i18n.exists(`errors_${error}`) && (
+          <Typography variant="h6" align="center">
+            {t(`errors_${error}`)}
+          </Typography>
+        )}
       </Grid>
       <Grid paddingTop={3}>
         <Button

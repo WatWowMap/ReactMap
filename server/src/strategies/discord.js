@@ -12,7 +12,7 @@ module.exports = (strategy) => {
     .getSafe('authentication.strategies')
     .find((s) => s.name === strategy)
   if (strategyConfig) {
-    const Client = new DiscordClient(strategyConfig, strategy)
+    const Client = new DiscordClient(strategy, strategyConfig)
     Client.initPassport()
 
     return Client

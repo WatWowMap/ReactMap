@@ -31,15 +31,15 @@ import { create } from 'zustand'
  *    },
  *   },
  *   glowRules: ((pkmn: import('@rm/types').Pokemon) => string)[],
- *   menus: ReturnType<import('server/src/services/ui/advMenus')>
+ *   menus: ReturnType<import('server/src/ui/advMenus')>
  *   menuFilters: import('@rm/types').ClientFilterObj,
  *   filters: import('@rm/types').AllFilters,
  *   masterfile: import('@rm/masterfile').Masterfile
  *   polling: import('@rm/types').Config['api']['polling'],
  *   gymValidDataLimit: number
  *   settings: { [K in keyof import('./useStorage').UseStorage['settings']]: Record<string, K extends 'tileServers' ? import('@rm/types').TileLayer : K extends 'navigation' ? { name: string, url: string } : { name: string }> }
- *   userSettings: ReturnType<import('server/src/services/ui/clientOptions')>['clientValues']
- *   clientMenus: ReturnType<import('server/src/services/ui/clientOptions')>['clientMenus']
+ *   userSettings: ReturnType<import('server/src/ui/clientOptions')>['clientValues']
+ *   clientMenus: ReturnType<import('server/src/ui/clientOptions')>['clientMenus']
  *   clientError: string,
  *   timeOfDay: import('@rm/types').TimesOfDay,
  *   hideList: Set<string | number>,
