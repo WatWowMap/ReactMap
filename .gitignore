@@ -4,6 +4,8 @@ dist-*
 
 # Config files
 server/src/configs/**/*
+config/local.json
+config/areas.json
 !server/src/configs/.gitkeep
 .env
 
