@@ -6,6 +6,19 @@
 
 # [1.33.0-develop.19](https://github.com/WatWowMap/ReactMap/compare/v1.33.0-develop.18...v1.33.0-develop.19) (2024-08-15)
 
+### Bug Fixes
+
+- docker hot reload ([2c6ba77](https://github.com/WatWowMap/ReactMap/commit/2c6ba772285dae11f64cf8d3abea18790672ec16))
+- latest version of node for docker ([fb988ca](https://github.com/WatWowMap/ReactMap/commit/fb988ca3555721552bc72617d01f3c208abb7286))
+
+# [1.33.0-develop.18](https://github.com/WatWowMap/ReactMap/compare/v1.33.0-develop.17...v1.33.0-develop.18) (2024-08-13)
+
+### Bug Fixes
+
+- trial fallbacks for local strategies ([0744d1c](https://github.com/WatWowMap/ReactMap/commit/0744d1cd9344c483ab5f553d0d5479f0d39410c3))
+
+# [1.33.0-develop.19](https://github.com/WatWowMap/ReactMap/compare/v1.33.0-develop.18...v1.33.0-develop.19) (2024-08-15)
+
 # [1.33.0](https://github.com/WatWowMap/ReactMap/compare/v1.32.0...v1.33.0) (2024-08-15)
 
 ### Bug Fixes
