@@ -1,6 +1,12 @@
-# [1.33.0](https://github.com/WatWowMap/ReactMap/compare/v1.32.0...v1.33.0) (2024-08-15)
+# [1.33.0-develop.20](https://github.com/WatWowMap/ReactMap/compare/v1.33.0-develop.19...v1.33.0-develop.20) (2024-08-17)
+
+### Bug Fixes
+
+- trial fallbacks for local strategies ([0744d1c](https://github.com/WatWowMap/ReactMap/commit/0744d1cd9344c483ab5f553d0d5479f0d39410c3))
 
 # [1.33.0-develop.19](https://github.com/WatWowMap/ReactMap/compare/v1.33.0-develop.18...v1.33.0-develop.19) (2024-08-15)
+
+# [1.33.0](https://github.com/WatWowMap/ReactMap/compare/v1.32.0...v1.33.0) (2024-08-15)
 
 ### Bug Fixes
 
