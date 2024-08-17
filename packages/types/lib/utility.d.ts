@@ -6,8 +6,8 @@ export type SpecificValueType<T, U, V> = {
       ? k
       : never
     : V extends true
-    ? never
-    : k
+      ? never
+      : k
 }[keyof T]
 
 /**
@@ -22,10 +22,10 @@ export type StoreNoFn<T> = keyof OnlyType<T, Function, false>
 export type Split<S extends string, D extends string> = string extends S
   ? string[]
   : S extends ''
-  ? []
-  : S extends `${infer T}${D}${infer U}`
-  ? [T, ...Split<U, D>]
-  : [S]
+    ? []
+    : S extends `${infer T}${D}${infer U}`
+      ? [T, ...Split<U, D>]
+      : [S]
 
 export type PickMatching<T, V> = {
   [K in keyof T as T[K] extends V ? K : never]: T[K]
@@ -50,34 +50,35 @@ export type DeepMerge<T, U> = {
     ? IsAny<T[K]> extends true
       ? U[K] // If T[K] is any, override with U[K]
       : U[K] extends any[]
-      ? T[K] extends any[]
-        ? T[K] extends object[]
-          ? U[K] extends object[]
-            ? Array<DeepMerge<T[K][number], U[K][number]>> // Merge arrays of objects
-            : U[K] // If U is not an array of objects, override
-          : U[K] // If T is not an array of objects, override
-        : U[K] // If T is not an array, override
-      : U[K] extends object
-      ? K extends keyof T
-        ? T[K] extends object
-          ? DeepMerge<T[K], U[K]> // Recursively merge objects
-          : U[K] // Otherwise, use U's value
-        : U[K] // If the key exists only in U
-      : U[K] // If U[K] is not an object, use U's value
+        ? T[K] extends any[]
+          ? T[K] extends object[]
+            ? U[K] extends object[]
+              ? Array<DeepMerge<T[K][number], U[K][number]>> // Merge arrays of objects
+              : U[K] // If U is not an array of objects, override
+            : U[K] // If T is not an array of objects, override
+          : U[K] // If T is not an array, override
+        : U[K] extends object
+          ? K extends keyof T
+            ? T[K] extends object
+              ? DeepMerge<T[K], U[K]> // Recursively merge objects
+              : U[K] // Otherwise, use U's value
+            : U[K] // If the key exists only in U
+          : U[K] // If U[K] is not an object, use U's value
     : K extends keyof T
-    ? T[K]
-    : never
+      ? T[K]
+      : never
 }
 
-export type ComparisonReport<T> = T extends Array<infer U>
-  ? { areEqual: boolean; report: ComparisonReport<U>[]; changed: string[] }
-  : T extends object
-  ? {
-      areEqual: boolean
-      report: { [K in StoreNoFn<T>]: ComparisonReport<T[K]> }
-      changed: string[]
-    }
-  : boolean
+export type ComparisonReport<T> =
+  T extends Array<infer U>
+    ? { areEqual: boolean; report: ComparisonReport<U>[]; changed: Paths<T>[] }
+    : T extends object
+      ? {
+          areEqual: boolean
+          report: { [K in StoreNoFn<T>]: ComparisonReport<T[K]> }
+          changed: Paths<T>[]
+        }
+      : boolean
 
 export type DeepKeys<T, P extends string = ''> = {
   [K in keyof T]-?: K extends string
@@ -94,8 +95,8 @@ export type PathValue<T, P> = P extends `${infer K}.${infer Rest}`
       : never
     : never
   : P extends keyof T
-  ? T[P]
-  : never
+    ? T[P]
+    : never
 
 export type ObjectPathValue<T extends object, P extends Paths<T>> = PathValue<
   T,
@@ -137,9 +138,9 @@ export type Prev = [
 export type Paths<T, D extends number = 10> = [D] extends [never]
   ? never
   : T extends object
-  ? {
-      [K in keyof T]-?: K extends string | number
-        ? `${K}` | Join<K, Paths<T[K], Prev[D]>>
-        : never
-    }[keyof T]
-  : ''
+    ? {
+        [K in keyof T]-?: K extends string | number
+          ? `${K}` | Join<K, Paths<T[K], Prev[D]>>
+          : never
+      }[keyof T]
+    : ''
