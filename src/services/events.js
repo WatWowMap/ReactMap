@@ -19,9 +19,12 @@ window.addEventListener('focus', () => {
 })
 
 window.addEventListener('blur', () => {
-  timer = setTimeout(() => {
-    useMemory.setState({ active: false })
-  }, 1000 * 60 * (useMemory.getState().config?.misc?.clientTimeoutMinutes || 5))
+  timer = setTimeout(
+    () => {
+      useMemory.setState({ active: false })
+    },
+    1000 * 60 * (useMemory.getState().config?.misc?.clientTimeoutMinutes || 5),
+  )
 })
 
 window.addEventListener('online', () => useMemory.setState({ online: true }))

@@ -280,8 +280,13 @@ img {
   transform: translateX(-25%);
   min-width: 100%;
   color: white;
-  text-shadow: #000 0 0 1px, #000 0 0 1px, #000 0 0 1px, #000 0 0 1px,
-    #000 0 0 1px, #000 0 0 1px;
+  text-shadow:
+    #000 0 0 1px,
+    #000 0 0 1px,
+    #000 0 0 1px,
+    #000 0 0 1px,
+    #000 0 0 1px,
+    #000 0 0 1px;
   font-weight: 700;
 }
 
@@ -294,8 +299,13 @@ img {
   font-size: x-large;
   font-family: Roboto;
   color: white;
-  text-shadow: #000 0 0 2px, #000 0 0 2px, #000 0 0 2px, #000 0 0 2px,
-    #000 0 0 2px, #000 0 0 2px;
+  text-shadow:
+    #000 0 0 2px,
+    #000 0 0 2px,
+    #000 0 0 2px,
+    #000 0 0 2px,
+    #000 0 0 2px,
+    #000 0 0 2px;
   font-weight: 700;
 }
 
@@ -468,7 +478,11 @@ input[type='time']::-webkit-calendar-picker-indicator {
 
   text-align: center;
   border-radius: 15px;
-  font: 12px 'Helvetica Neue', Arial, Helvetica, sans-serif;
+  font:
+    12px 'Helvetica Neue',
+    Arial,
+    Helvetica,
+    sans-serif;
 }
 
 .marker-cluster span {

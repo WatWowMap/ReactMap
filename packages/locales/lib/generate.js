@@ -41,8 +41,8 @@ function splitJson(json) {
       typeof value === 'string'
         ? `"${value}"`
         : typeof value === 'number'
-        ? value
-        : `${value}`
+          ? value
+          : `${value}`
     },\n`
     const newLineCount = (string.match(/\n/g) || []).length - 1
     const tokenCount = encode(string).length
