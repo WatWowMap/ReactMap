@@ -731,5 +731,9 @@
   "locale_instructions_8": "Vänta på att pull-begäran granskas och sammanfogas",
   "enter_translation": "Ange Översättning",
   "individual_filters": "Delvis Filtrerad",
-  "best_buddy": "Bästa kompis"
+  "best_buddy": "Bästa kompis",
+  "only_exclude_grunts": "Uteslut Gruntar",
+  "only_exclude_leaders": "Uteslut Ledare",
+  "s2_cell_zoom_limit": "Vissa celler är för små för att visas vid denna zoomnivå",
+  "data_limit_reached": "Du har begärt för mycket data nyligen och är i nedkylning tills {{until}}"
 }

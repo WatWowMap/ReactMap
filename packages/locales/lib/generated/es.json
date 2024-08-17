@@ -731,5 +731,7 @@
   "locale_instructions_8": "Espera a que la solicitud de extracción sea revisada y fusionada",
   "enter_translation": "Introduce la Traducción",
   "individual_filters": "Filtrado Parcial",
-  "best_buddy": "Mejor amigo"
+  "best_buddy": "Mejor amigo",
+  "s2_cell_zoom_limit": "Algunas celdas son demasiado pequeñas para ser mostradas en este nivel de zoom",
+  "data_limit_reached": "Has solicitado demasiados datos recientemente y estás en enfriamiento hasta {{until}}"
 }

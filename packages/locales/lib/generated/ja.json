@@ -731,5 +731,9 @@
   "locale_instructions_8": "プルリクエストがレビューされ、マージされるのを待ってください",
   "enter_translation": "翻訳を入力",
   "individual_filters": "部分的にフィルターされています",
-  "best_buddy": "最高の相棒"
+  "best_buddy": "最高の相棒",
+  "only_exclude_grunts": "グラントを除外する",
+  "only_exclude_leaders": "リーダーを除外する",
+  "s2_cell_zoom_limit": "一部のセルはこのズームレベルでは小さすぎて表示されません",
+  "data_limit_reached": "最近要求されたデータ量が多すぎるため、{{until}}までクールダウン中です"
 }

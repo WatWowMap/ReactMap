@@ -731,5 +731,9 @@
   "locale_instructions_8": "풀 리퀘스트가 리뷰되어 병합될 때까지 기다리세요",
   "enter_translation": "번역 입력",
   "individual_filters": "부분 필터링",
-  "best_buddy": "최고의 친구"
+  "best_buddy": "최고의 친구",
+  "only_exclude_grunts": "그런트 제외",
+  "only_exclude_leaders": "리더 제외",
+  "s2_cell_zoom_limit": "일부 셀은 이 줌 레벨에서 너무 작아 표시할 수 없습니다",
+  "data_limit_reached": "최근에 너무 많은 데이터를 요청했으며 {{until}}까지 쿨다운 상태입니다"
 }
