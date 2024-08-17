@@ -1,5 +1,6 @@
 // @ts-check
 const { Logger, log } = require('@rm/logger')
+const config = require('@rm/config')
 
 const { Timer } = require('./Timer')
 const state = require('./state')
@@ -11,7 +12,16 @@ class Trial extends Logger {
 
     this._name = strategy.name
     this._type = strategy.type
-    this._trial = strategy.trialPeriod
+    /** @type {import("@rm/types").StrategyConfig['trialPeriod']} */
+    this._trial = config.util.extendDeep(
+      {
+        start: null,
+        end: null,
+        intervalHours: 0,
+        roles: [],
+      },
+      strategy.trialPeriod,
+    )
 
     this._forceActive = false
 
