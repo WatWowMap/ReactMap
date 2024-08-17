@@ -800,7 +800,7 @@
 * refine dnf filter generation ([875b961](https://github.com/WatWowMap/ReactMap/commit/875b961dd9bc4cb17ab297f8e2da517e21f04baa))
 * release workflows ([6e8fa3c](https://github.com/WatWowMap/ReactMap/commit/6e8fa3cafe146dc6de085d3eea83c9257626fe51))
 * remove `clear` icon for now ([58aed37](https://github.com/WatWowMap/ReactMap/commit/58aed3764b8c01df9f12dff680be8ec6a72380f2))
-* remove `excludeList` * no longer needed ([bc3adba](https://github.com/WatWowMap/ReactMap/commit/bc3adbafd16fd01000cbd2a6779244a2725615e2))
+* remove `excludeList` - no longer needed ([bc3adba](https://github.com/WatWowMap/ReactMap/commit/bc3adbafd16fd01000cbd2a6779244a2725615e2))
 * remove blue from types ([33ffc13](https://github.com/WatWowMap/ReactMap/commit/33ffc13bc5e4c366f74ccc1d3c1de05ea5e12e2f))
 * remove log ([e572b3b](https://github.com/WatWowMap/ReactMap/commit/e572b3b6f405d87cfd553797f8b081cbd6812b2d))
 * remove old eslint heading ([768affc](https://github.com/WatWowMap/ReactMap/commit/768affc24ac06edaffdd109ce39042dfc46a732e))
@@ -974,7 +974,7 @@
 
 ### Bug Fixes
 
-* remove `excludeList` * no longer needed ([bc3adba](https://github.com/WatWowMap/ReactMap/commit/bc3adbafd16fd01000cbd2a6779244a2725615e2))
+* remove `excludeList` - no longer needed ([bc3adba](https://github.com/WatWowMap/ReactMap/commit/bc3adbafd16fd01000cbd2a6779244a2725615e2))
 
 # [1.29.0-develop.9](https://github.com/WatWowMap/ReactMap/compare/v1.29.0-develop.8...v1.29.0-develop.9) (2024-01-17)
 
