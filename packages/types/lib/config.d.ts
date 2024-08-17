@@ -5,7 +5,7 @@ import type { UiconsIndex } from 'uicons.js'
 import { Props as ImgProps } from '@components/Img'
 
 import type { CustomComponent } from './blocks'
-import config = require('server/src/configs/default.json')
+import config = require('../../../config/default.json')
 import example = require('../../../config/local.example.json')
 
 import type { Schema } from './server'
@@ -22,7 +22,7 @@ type BaseConfig = typeof config
 type ExampleConfig = typeof example
 
 export type ConfigAreas = Awaited<
-  ReturnType<typeof import('server/src/services/areas')['loadLatestAreas']>
+  ReturnType<(typeof import('server/src/services/areas'))['loadLatestAreas']>
 >
 
 export type Config<Client extends boolean = false> = DeepMerge<
@@ -33,7 +33,7 @@ export type Config<Client extends boolean = false> = DeepMerge<
           version: string
           locales: string[]
           localeStatus: ReturnType<
-            typeof import('@rm/locales/lib/utils')['getStatus']
+            (typeof import('@rm/locales/lib/utils'))['getStatus']
           >
           hasCustom: boolean
           title: string

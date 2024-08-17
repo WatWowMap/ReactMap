@@ -126,13 +126,13 @@ class EventManager extends Logger {
   async chatLog(channel, embed, strategy) {
     if (strategy) {
       if (strategy in this.authClients) {
-        return this.authClients[strategy].sendMessage(embed, channel)
+        return this.authClients[strategy]?.sendMessage(embed, channel)
       }
       this.log.warn(`Strategy ${strategy} not found in authClients`)
     } else {
       await Promise.allSettled(
         Object.values(this.authClients).map(async (client) =>
-          client.sendMessage(embed, channel),
+          client?.sendMessage(embed, channel),
         ),
       )
     }
@@ -152,7 +152,7 @@ class EventManager extends Logger {
   clearTrialTimers() {
     this.log.info('clearing trial timers')
     Object.values(this.authClients).forEach((client) =>
-      client.trialManager.end(),
+      client?.trialManager?.end(),
     )
   }
 
@@ -160,7 +160,7 @@ class EventManager extends Logger {
     this.log.info('cleaning up session for possibly expired trials')
     await Promise.allSettled(
       Object.values(this.authClients).map((client) =>
-        client.trialManager.cleanup(),
+        client?.trialManager?.cleanup(),
       ),
     )
   }
