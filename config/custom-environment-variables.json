@@ -1012,7 +1012,8 @@
       "avgSliderStep": {
         "__name": "DEFAULT_FILTERS_NESTS_AVG_SLIDER_STEP",
         "__format": "number"
-      }
+      },
+      "active": "DEFAULT_FILTERS_NESTS_ACTIVE"
     },
     "pokestops": {
       "enabled": {
