@@ -29,7 +29,7 @@ const S2Cells = () => {
         sx={{ mx: 'auto', width: '90%' }}
         value={safe}
         renderValue={(selected) =>
-          Array.isArray(selected) ? selected.join(', ') : selected
+          Array.isArray(selected) ? selected.join(', ') : `${selected}`
         }
         multiple
         onChange={({ target }) =>

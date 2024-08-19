@@ -72,7 +72,10 @@ const DrawerSection = ({ category }) => {
                 category === 'wayfarer' || category === 'admin'
               return (
                 <React.Fragment key={`${category}${subItem}`}>
-                  {!(category === 'nests' && subItem === 'sliders') && (
+                  {!(
+                    category === 'nests' &&
+                    (subItem === 'sliders' || subItem === 'active')
+                  ) && (
                     <BoolToggle
                       // @ts-ignore
                       field={`filters.${

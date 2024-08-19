@@ -1,5 +1,4 @@
 // @ts-check
-/* eslint-disable no-nested-ternary */
 const { Model } = require('objection')
 const i18next = require('i18next')
 const config = require('@rm/config')
@@ -28,18 +27,29 @@ class Nest extends Model {
   static async getAll(perms, args, { polygon }) {
     const { areaRestrictions } = perms
     const { minLat, minLon, maxLat, maxLon, filters } = args
-    const pokemon = []
-    Object.keys(filters).forEach((pkmn) => {
-      if (!pkmn.startsWith('o')) {
-        pokemon.push(pkmn.split('-')[0])
-      }
-    })
     const query = this.query()
       .select(['*', 'nest_id AS id'])
-      .whereNotNull('pokemon_id')
+      // .whereNotNull('pokemon_id')
       .whereBetween('lat', [minLat, maxLat])
       .andWhereBetween('lon', [minLon, maxLon])
-      .whereIn('pokemon_id', pokemon)
+
+    const pokemon = []
+    if (filters.onlyPokemon) {
+      Object.keys(filters).forEach((pkmn) => {
+        if (!pkmn.startsWith('o')) {
+          pokemon.push(pkmn.split('-')[0])
+        }
+      })
+    }
+
+    if (pokemon.length) {
+      query.whereIn('pokemon_id', pokemon)
+    }
+    if (filters.onlyActive === 'inactive') {
+      query.where('active', false)
+    } else if (filters.onlyActive === 'active') {
+      query.where('active', true)
+    }
     if (
       !config
         .getSafe('defaultFilters.nests.avgFilter')
@@ -91,24 +101,27 @@ class Nest extends Model {
   static secondaryFilter(queryResults, filters, polygon) {
     const returnedResults = []
     queryResults.forEach((pkmn) => {
-      if (pkmn.pokemon_form == 0 || pkmn.pokemon_form === null) {
-        const formId =
-          state.event.masterfile.pokemon[pkmn.pokemon_id].defaultFormId
-        if (formId) pkmn.pokemon_form = formId
-      }
-      if (filters[`${pkmn.pokemon_id}-${pkmn.pokemon_form}`]) {
-        pkmn.polygon_path = polygon
-          ? typeof pkmn.polygon === 'string' && pkmn.polygon
-            ? pkmn.polygon
-            : JSON.stringify(
-                pkmn.polygon || { type: 'Polygon', coordinates: [] },
-              )
-          : JSON.stringify({
-              type: 'Polygon',
-              coordinates: JSON.parse(pkmn.polygon_path || '[]').map((line) =>
-                line.map((point) => [point[1], point[0]]),
-              ),
-            })
+      pkmn.polygon_path = polygon
+        ? typeof pkmn.polygon === 'string' && pkmn.polygon
+          ? pkmn.polygon
+          : JSON.stringify(pkmn.polygon || { type: 'Polygon', coordinates: [] })
+        : JSON.stringify({
+            type: 'Polygon',
+            coordinates: JSON.parse(pkmn.polygon_path || '[]').map((line) =>
+              line.map((point) => [point[1], point[0]]),
+            ),
+          })
+
+      if (pkmn.pokemon_id && filters.onlyPokemon) {
+        if (pkmn.pokemon_form == 0 || pkmn.pokemon_form === null) {
+          const formId =
+            state.event.masterfile.pokemon[pkmn.pokemon_id].defaultFormId
+          if (formId) pkmn.pokemon_form = formId
+        }
+        if (filters[`${pkmn.pokemon_id}-${pkmn.pokemon_form}`]) {
+          returnedResults.push(pkmn)
+        }
+      } else {
         returnedResults.push(pkmn)
       }
     })

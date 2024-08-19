@@ -34,7 +34,6 @@ function generateUi(req, perms) {
       perms.nests && state.db.models.Nest
         ? {
             pokemon: true,
-            polygons: true,
             sliders: {
               secondary: [
                 {
@@ -48,6 +47,8 @@ function generateUi(req, perms) {
                 },
               ],
             },
+            polygons: true,
+            active: true,
           }
         : BLOCKED,
     pokestops:
