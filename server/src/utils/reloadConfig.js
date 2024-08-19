@@ -81,15 +81,21 @@ async function reloadConfig() {
     const invalid = changed.filter((key) => NO_RELOAD.has(key))
 
     /** @param {string} key */
-    const print = (key) =>
-      log.info(
-        TAGS.config,
-        `'${key}' -`,
-        'old:',
-        dlv(oldWithoutAreas, key),
-        'new:',
-        newConfig.getSafe(key),
-      )
+    const print = (key) => {
+      let newValue
+      let oldValue
+      try {
+        oldValue = dlv(oldWithoutAreas, key)
+      } catch {
+        // do nothing
+      }
+      try {
+        newValue = newConfig.get(key)
+      } catch {
+        // do nothing
+      }
+      log.info(TAGS.config, `'${key}' -`, 'old:', oldValue, 'new:', newValue)
+    }
 
     if (valid.length) {
       log.info(TAGS.config, 'updating the following config values:')

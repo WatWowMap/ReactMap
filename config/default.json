@@ -474,7 +474,8 @@
       "allPokemon": true,
       "onlyShowAvailable": true,
       "avgFilter": [0, 100],
-      "avgSliderStep": 1
+      "avgSliderStep": 1,
+      "active": "active"
     },
     "pokestops": {
       "enabled": false,

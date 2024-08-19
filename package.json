@@ -35,7 +35,7 @@
   "nodemonConfig": {
     "watch": [
       "server/src/**/*.js",
-      "server/src/configs/default.json",
+      "config/default.json",
       "packages/**/*"
     ],
     "ignore": [

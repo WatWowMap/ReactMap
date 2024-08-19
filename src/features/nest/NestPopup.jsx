@@ -13,10 +13,10 @@ import { useTranslation } from 'react-i18next'
 import { useMemory } from '@store/useMemory'
 import { useLayoutStore } from '@store/useLayoutStore'
 import { setDeepStore } from '@store/useStorage'
-import { ErrorBoundary } from '@components/ErrorBoundary'
 import { NestSubmission } from '@components/dialogs/NestSubmission'
 import { getTimeUntil } from '@utils/getTimeUntil'
 import { useAnalytics } from '@hooks/useAnalytics'
+import { Popup } from 'react-leaflet'
 
 /** @param {number} timeSince */
 const getColor = (timeSince) => {
@@ -48,6 +48,8 @@ export function NestPopup({
   updated = 0,
   pokemon_avg = 0,
   submitted_by = '',
+  lat,
+  lon,
 }) {
   const { t } = useTranslation()
   const { perms } = useMemory((s) => s.auth)
@@ -57,14 +59,8 @@ export function NestPopup({
 
   const lastUpdated = getTimeUntil(updated * 1000)
 
-  const handleClick = (event) => {
-    setAnchorEl(event.currentTarget)
-  }
-
-  const handleClose = () => {
-    setAnchorEl(null)
-  }
-
+  const handleClick = (event) => setAnchorEl(event.currentTarget)
+  const handleClose = () => setAnchorEl(null)
   const handleHide = () => {
     setAnchorEl(null)
     useMemory.setState((prev) => ({ hideList: new Set(prev.hideList).add(id) }))
@@ -84,7 +80,7 @@ export function NestPopup({
   ]
 
   return (
-    <ErrorBoundary noRefresh variant="h5">
+    <Popup position={[lat, lon]}>
       <Grid
         container
         justifyContent="center"
@@ -92,7 +88,7 @@ export function NestPopup({
         style={{ width: 200 }}
         spacing={1}
       >
-        <Grid xs={9} textAlign="center">
+        <Grid xs={pokemon_id ? 9 : 12} textAlign="center">
           <Typography
             variant={name.length > 20 ? 'subtitle2' : 'h6'}
             align="center"
@@ -112,11 +108,13 @@ export function NestPopup({
             </Typography>
           )}
         </Grid>
-        <Grid xs={3}>
-          <IconButton aria-haspopup="true" onClick={handleClick} size="large">
-            <MoreVert />
-          </IconButton>
-        </Grid>
+        {!!pokemon_id && (
+          <Grid xs={3}>
+            <IconButton aria-haspopup="true" onClick={handleClick} size="large">
+              <MoreVert />
+            </IconButton>
+          </Grid>
+        )}
         <Menu
           anchorEl={anchorEl}
           keepMounted
@@ -135,19 +133,21 @@ export function NestPopup({
             </MenuItem>
           ))}
         </Menu>
-        <Grid xs={6} textAlign="center">
-          <img
-            src={iconUrl}
-            alt={iconUrl}
-            style={{
-              maxHeight: 75,
-              maxWidth: 75,
-            }}
-          />
-          <br />
-          <Typography variant="caption">{t(`poke_${pokemon_id}`)}</Typography>
-        </Grid>
-        <Grid xs={6} textAlign="center">
+        {!!pokemon_id && (
+          <Grid xs={6} textAlign="center">
+            <img
+              src={iconUrl}
+              alt={iconUrl}
+              style={{
+                maxHeight: 75,
+                maxWidth: 75,
+              }}
+            />
+            <br />
+            <Typography variant="caption">{t(`poke_${pokemon_id}`)}</Typography>
+          </Grid>
+        )}
+        <Grid xs={pokemon_id ? 6 : 12} textAlign="center">
           <Typography variant="subtitle2">{t('last_updated')}</Typography>
           <Typography
             variant={lastUpdated.str.includes('D') ? 'h6' : 'subtitle2'}
@@ -195,6 +195,6 @@ export function NestPopup({
         )}
       </Grid>
       <NestSubmission id={id} name={name} />
-    </ErrorBoundary>
+    </Popup>
   )
 }
