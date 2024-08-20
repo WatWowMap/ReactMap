@@ -7,7 +7,7 @@ const { log, TAGS } = require('@rm/logger')
 
 const DbCheck = require('./DbCheck')
 const EventManager = require('./EventManager')
-const PvpWrapper = require('./PvpWrapper')
+const { PvpWrapper } = require('./PvpWrapper')
 const { setCache } = require('./cache')
 const { migrate } = require('../db/migrate')
 const { Stats } = require('./Stats')
@@ -121,6 +121,9 @@ const serverState = {
       promises.push(
         this.event.getMasterfile(this.db.historical, this.db.rarity),
       )
+    }
+    if ((!reloadReport || reloadReport.pvp) && this.pvp) {
+      promises.push(this.pvp.fetchLatestPokemon())
     }
     if (!reloadReport || reloadReport.invasions) {
       promises.push(this.event.getInvasions())

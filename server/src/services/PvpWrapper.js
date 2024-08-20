@@ -3,7 +3,7 @@ const NodeCache = require('node-cache')
 const config = require('@rm/config')
 const { log, TAGS } = require('@rm/logger')
 
-module.exports = class PvpWrapper extends Ohbem {
+class PvpWrapper extends Ohbem {
   constructor() {
     super({
       leagues: config.getSafe('api.pvp.leagueObj'),
@@ -12,9 +12,11 @@ module.exports = class PvpWrapper extends Ohbem {
       cachingStrategy: Ohbem.cachingStrategies.memoryHeavy,
     })
     this.rmCache = new NodeCache({ stdTTL: 60 * 60 * 1.5 })
-    ;(async () => {
-      this.updatePokemonData(await Ohbem.fetchPokemonData())
-    })()
+  }
+
+  async fetchLatestPokemon() {
+    const data = await Ohbem.fetchPokemonData()
+    this.updatePokemonData(data)
   }
 
   /**
@@ -54,3 +56,5 @@ module.exports = class PvpWrapper extends Ohbem {
     }
   }
 }
+
+module.exports = { PvpWrapper }
