@@ -66,10 +66,11 @@ function buildDefaultFilters(perms) {
             enabled: defaultFilters.nests.enabled,
             onlyShowAvailable: defaultFilters.nests.onlyShowAvailable,
             pokemon: defaultFilters.nests.pokemon,
-            polygons: defaultFilters.nests.polygons,
             avgFilter: defaultFilters.nests.avgFilter,
+            polygons: defaultFilters.nests.polygons,
             standard: new BaseFilter(),
             filter: pokemon.nests,
+            active: defaultFilters.nests.active,
           }
         : undefined,
     pokestops:

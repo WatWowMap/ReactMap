@@ -1,7 +1,6 @@
 // @ts-check
 const { promises: fs } = require('fs')
 const path = require('path')
-const Ohbem = require('ohbem')
 const { default: fetch } = require('node-fetch')
 
 const config = require('@rm/config')
@@ -168,7 +167,7 @@ class EventManager extends Logger {
   /**
    *
    * @param {import('./DbCheck')} Db
-   * @param {import('./PvpWrapper')} Pvp
+   * @param {import('./PvpWrapper').PvpWrapper | null} Pvp
    */
   startIntervals(Db, Pvp) {
     this.clearIntervals()
@@ -265,7 +264,7 @@ class EventManager extends Logger {
     if (Pvp) {
       this.intervals.pvp = setInterval(
         async () => {
-          Pvp.updatePokemonData(await Ohbem.fetchPokemonData())
+          await Pvp.fetchLatestPokemon()
           await this.chatLog('event', {
             description: 'Refreshed PVP masterfile',
           })

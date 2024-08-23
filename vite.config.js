@@ -3,7 +3,7 @@
 /* eslint-disable import/no-extraneous-dependencies */
 
 const { defineConfig, loadEnv, createLogger } = require('vite')
-const { default: react } = require('@vitejs/plugin-react')
+const { default: react } = require('@vitejs/plugin-react-swc')
 const { default: checker } = require('vite-plugin-checker')
 const removeFiles = require('rollup-plugin-delete')
 const { resolve } = require('path')
@@ -70,9 +70,7 @@ const viteConfig = defineConfig(({ mode }) => {
 
   return {
     plugins: [
-      react({
-        jsxRuntime: 'classic',
-      }),
+      react(),
       ...(isDevelopment
         ? [
             checker({

@@ -1,3 +1,15 @@
+# [1.34.0-develop.1](https://github.com/WatWowMap/ReactMap/compare/v1.33.1...v1.34.0-develop.1) (2024-08-20)
+
+
+### Bug Fixes
+
+* `GET /api/v1/trial/status/:strategy` endpoint ([78862b6](https://github.com/WatWowMap/ReactMap/commit/78862b60237c103de91bdeca6f04d93c9566bc86))
+
+
+### Features
+
+* more nest viewing options ([959116d](https://github.com/WatWowMap/ReactMap/commit/959116db9caffd7ffa0236237397b18d36a36559))
+
 ## [1.33.1](https://github.com/WatWowMap/ReactMap/compare/v1.33.0...v1.33.1) (2024-08-17)
 
 
