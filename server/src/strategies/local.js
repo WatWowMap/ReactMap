@@ -1,5 +1,7 @@
+// @ts-check
+
 const passport = require('passport')
-const Strategy = require('passport-local')
+const { Strategy } = require('passport-local')
 const bcrypt = require('bcrypt')
 const path = require('path')
 
@@ -33,7 +35,7 @@ const authHandler = async (_req, username, password, done) => {
   const user = {
     perms: {
       ...Object.fromEntries(Object.keys(perms).map((x) => [x, false])),
-      areaRestrictions: areaPerms(localPerms, 'local'),
+      areaRestrictions: areaPerms(localPerms),
       webhooks: [],
       scanner: [],
     },

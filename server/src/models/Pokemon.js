@@ -1,3 +1,5 @@
+// @ts-check
+
 /* eslint-disable no-restricted-syntax */
 const { Model, raw, ref } = require('objection')
 const i18next = require('i18next')
@@ -265,7 +267,7 @@ class Pokemon extends Model {
       if (onlyHundoIv)
         filters.push({ iv: { min: 100, max: 100 }, pokemon: globalPokes })
     }
-    /** @type {import("../types").Pokemon[]} */
+    /** @type {import("@rm/types").Pokemon[]} */
     const results = await this.evalQuery(
       mem ? `${mem}/api/pokemon/v2/scan` : null,
       mem
@@ -377,7 +379,7 @@ class Pokemon extends Model {
   }
 
   /**
-   * @template [T=import("@rm/types").Pokemon[]]
+   * @template T
    * @param {string} mem
    * @param {string | import("objection").QueryBuilder<Pokemon>} query
    * @param {'GET' | 'POST' | 'PATCH' | 'DELETE'} method

@@ -1,3 +1,5 @@
+// @ts-check
+
 /* eslint-disable no-unused-vars */
 const config = require('@rm/config')
 const { log, TAGS } = require('@rm/logger')
@@ -243,7 +245,7 @@ module.exports = class PkmnBackend {
 
   /**
    *
-   * @param {[number, number]} filter
+   * @param {number[]} filter
    * @param {number} [limit]
    * @returns DnfMinMax
    */

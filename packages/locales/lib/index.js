@@ -1,3 +1,5 @@
+// @ts-check
+
 const { create } = require('./create')
 const { missing } = require('./missing')
 const { generate } = require('./generate')

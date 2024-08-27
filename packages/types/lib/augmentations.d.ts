@@ -29,6 +29,12 @@ declare global {
   }
 }
 
+declare module 'express-session' {
+  interface SessionData {
+    tutorial: boolean
+  }
+}
+
 declare module 'passport-discord' {
   interface StrategyOptionsWithRequest {
     prompt?: string | undefined

@@ -75,7 +75,7 @@ class Backup extends Model {
       count['count(*)'] < config.getSafe('database.settings.userBackupLimits')
     ) {
       // @ts-ignore
-      return this.query().insert({
+      await this.query().insert({
         // @ts-ignore
         userId,
         name: backup.name,

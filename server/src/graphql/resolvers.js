@@ -1,3 +1,5 @@
+// @ts-check
+
 const fs = require('fs')
 const { resolve } = require('path')
 const { GraphQLJSON } = require('graphql-type-json')
@@ -107,7 +109,7 @@ const resolvers = {
       )
       return !!results.length
     },
-    /** @param {unknown} _ @param {{ mode: 'scanNext' | 'scanZone' }} args */
+    /** @param {unknown} _ @param {{ mode: 'scanNext' | 'scanZone', points: [number, number][] }} args */
     checkValidScan: (_, { mode, points }, { perms }) =>
       getValidCoords(mode, points, perms),
     /** @param {unknown} _ @param {{ component: 'loginPage' | 'donationPage' | 'messageOfTheDay' }} args */
@@ -778,23 +780,7 @@ const resolvers = {
     },
     setGymBadge: async (_, args, { req, Db, perms }) => {
       if (perms?.gymBadges && req?.user?.id) {
-        if (
-          await Db.models.Badge.query()
-            .where('gymId', args.gymId)
-            .andWhere('userId', req.user.id)
-            .first()
-        ) {
-          await Db.models.Badge.query()
-            .where('gymId', args.gymId)
-            .andWhere('userId', req.user.id)
-            .update({ badge: args.badge })
-        } else {
-          await Db.models.Badge.query().insert({
-            badge: args.badge,
-            gymId: args.gymId,
-            userId: req.user.id,
-          })
-        }
+        await Db.models.Badge.insert(args.badge, args.gymId, req.user.id)
         return true
       }
       return false
