@@ -4,7 +4,7 @@ const config = require('@rm/config')
 /**
  *
  * @param {string[]} roles
- * @param {'discordRoles' | 'telegramGroups'} provider
+ * @param {'discordRoles' | 'telegramGroups' | 'local'} provider
  * @param {boolean} [trialActive]
  * @returns {string[]}
  */

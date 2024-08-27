@@ -10,11 +10,12 @@ const generateUi = require('../ui/primary')
  * @param {import("express").Request} req
  */
 function getServerSettings(req) {
-  const user = {
-    ...(req.user ? req.user : req.session),
-    loggedIn: !!req.user,
-    cooldown: req.session?.cooldown || 0,
-  }
+  const user =
+    /** @type {import('@rm/types').ExpressUser & { loggedIn: boolean; cooldown: number }} */ ({
+      ...(req.user ? req.user : req.session),
+      loggedIn: !!req.user,
+      cooldown: req.session?.cooldown || 0,
+    })
 
   const { clientValues, clientMenus } = clientOptions(user.perms)
 

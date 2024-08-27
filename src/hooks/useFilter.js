@@ -1,3 +1,5 @@
+// @ts-check
+
 import { useTranslation } from 'react-i18next'
 
 import { useMemory } from '@store/useMemory'
@@ -12,6 +14,13 @@ const filteringPokemon = [
   'quest_reward_12',
 ]
 
+/**
+ *
+ * @param {string} category
+ * @param {string} webhookCategory
+ * @param {string[]} reqCategories
+ * @returns
+ */
 export function useFilter(category, webhookCategory, reqCategories) {
   const { t } = useTranslation()
   const tempFilters = webhookCategory
@@ -129,7 +138,6 @@ export function useFilter(category, webhookCategory, reqCategories) {
           (item.name.endsWith('*') && category === item.category)
         ) {
           count.total += 1
-          item.id = id
           switch (switchKey) {
             case 'all':
               addItem(id)

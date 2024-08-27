@@ -1,3 +1,5 @@
+// @ts-check
+
 /* eslint-disable no-await-in-loop */
 const { knex } = require('knex')
 const { raw } = require('objection')
@@ -50,10 +52,9 @@ module.exports = class DbCheck extends Logger {
       .filter((s) => s.useFor.length)
       .map((schema, i) => {
         schema.useFor.forEach((category) => {
-          /** @type {import('../models').ModelKeys} */
-          const capital = `${category.charAt(0).toUpperCase()}${category.slice(
-            1,
-          )}`
+          const capital = /** @type {import('../models').ModelKeys} */ (
+            `${category.charAt(0).toUpperCase()}${category.slice(1)}`
+          )
           if (DbCheck.singleModels.includes(capital)) {
             this.models[capital] = {}
             if (capital === 'User') {
@@ -510,8 +511,8 @@ module.exports = class DbCheck extends Logger {
    * @param {import("@rm/types").Permissions} perms
    * @param {object} args
    * @returns {Promise<[
-   *  import("@rm/types").BaseRecord[],
-   *  import("@rm/types").BaseRecord[]
+   *  import("@rm/types").Pokestop[],
+   *  import("@rm/types").Gym[]
    * ]>}
    */
   async submissionCells(perms, args) {

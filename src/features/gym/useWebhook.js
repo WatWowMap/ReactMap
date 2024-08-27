@@ -1,3 +1,5 @@
+// @ts-check
+
 import { useEffect } from 'react'
 import { useMutation } from '@apollo/client'
 import { useTranslation } from 'react-i18next'
@@ -6,6 +8,10 @@ import { Query } from '@services/queries'
 import { useWebhookStore } from '@store/useWebhookStore'
 import { ALL_PROFILES } from '@services/queries/webhook'
 
+/**
+ *
+ * @param {{ category: string }} props
+ */
 export function useWebhook({ category }) {
   const [syncWebhook, { data, error }] = useMutation(
     Query.webhook('QUICK_ADD'),

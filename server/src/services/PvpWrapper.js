@@ -1,3 +1,5 @@
+// @ts-check
+
 const Ohbem = require('ohbem')
 const NodeCache = require('node-cache')
 const config = require('@rm/config')

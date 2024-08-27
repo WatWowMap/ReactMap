@@ -53,11 +53,10 @@ function deepCompare(incoming, reference) {
 
 /**
  * @param {number} value
- * @param {number} min
- * @param {number} max
+ * @param {...number} args
  */
-function between(value, min, max) {
-  return value >= min && value <= max
+function between(value, ...args) {
+  return value >= args[0] && value <= args[1]
 }
 
 /**
@@ -203,7 +202,7 @@ function jsifyIvFilter(filter) {
 /**
  *
  * @param {string} filter
- * @param {import('@rm/types').FilterId} pokemon
+ * @param {import('@rm/types').FilterId[]} pokemon
  * @returns
  */
 function dnfifyIvFilter(filter, pokemon) {

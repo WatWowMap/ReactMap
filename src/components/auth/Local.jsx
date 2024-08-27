@@ -1,3 +1,5 @@
+// @ts-check
+
 import * as React from 'react'
 import Visibility from '@mui/icons-material/Visibility'
 import VisibilityOff from '@mui/icons-material/VisibilityOff'
@@ -44,10 +46,10 @@ export function LocalLogin({ href, sx, style }) {
     e.preventDefault()
     setSubmitted(true)
     const resp = await login(user, href)
-    if (!resp.ok) {
+    if ('ok' in resp && !resp.ok) {
       setError(t('localauth_failed'))
       setSubmitted(false)
-    } else if (resp.url.includes('invalid_credentials')) {
+    } else if ('url' in resp && resp.url.includes('invalid_credentials')) {
       setError(t('invalid_credentials'))
       setSubmitted(false)
     } else {

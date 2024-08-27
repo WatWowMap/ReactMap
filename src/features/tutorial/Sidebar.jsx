@@ -1,3 +1,5 @@
+// @ts-check
+
 import * as React from 'react'
 import Menu from '@mui/icons-material/Menu'
 import Settings from '@mui/icons-material/Settings'

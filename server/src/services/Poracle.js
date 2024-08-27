@@ -1,3 +1,5 @@
+// @ts-check
+
 const { log, TAGS } = require('@rm/logger')
 const fetchJson = require('../utils/fetchJson')
 const { setCache, getCache } = require('./cache')

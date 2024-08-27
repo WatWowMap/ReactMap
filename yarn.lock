@@ -8439,10 +8439,10 @@ react-transition-group@^4.4.5:
     loose-envify "^1.4.0"
     prop-types "^15.6.2"
 
-react-virtuoso@^4.6.2:
-  version "4.6.2"
-  resolved "https://registry.yarnpkg.com/react-virtuoso/-/react-virtuoso-4.6.2.tgz#74b59ebe3260e1f73e92340ffec84a6853285a12"
-  integrity sha512-vvlqvzPif+MvBrJ09+hJJrVY0xJK9yran+A+/1iwY78k0YCVKsyoNPqoLxOxzYPggspNBNXqUXEcvckN29OxyQ==
+react-virtuoso@4.10.1:
+  version "4.10.1"
+  resolved "https://registry.yarnpkg.com/react-virtuoso/-/react-virtuoso-4.10.1.tgz#868a40073e497777f49c052eb24be55171ce8639"
+  integrity sha512-vDBt9AarmCjPNshw3VxPXW355ZQKSO0p9vrAJ0pi04TB6aXk+qHWTu8NuaQ3ppcd/Ub1r5ryRA4fJ2QGuH0H0g==
 
 react@18.3.1:
   version "18.3.1"
@@ -9743,10 +9743,10 @@ uglify-js@^3.1.4:
   resolved "https://registry.yarnpkg.com/uglify-js/-/uglify-js-3.17.4.tgz#61678cf5fa3f5b7eb789bb345df29afb8257c22c"
   integrity sha512-T9q82TJI9e/C1TAxYvfb16xO120tMVFZrGA3f9/P4424DNu6ypK103y0GPFVa17yotwSyZW5iYXgjYHkGrJW/g==
 
-uicons.js@^1.1.4:
-  version "1.1.4"
-  resolved "https://registry.yarnpkg.com/uicons.js/-/uicons.js-1.1.4.tgz#8c7eb94c80286f0a04d194e3cafff5d85f773c7f"
-  integrity sha512-dsn8sGHF+IaHXngd556JxFVP5VYEp67uKOTPC6ximDpRoCaPxwRu3LBp7ue0ot3V5iX8J3B9VfeH1/jhnIe3sA==
+uicons.js@1.2.0:
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/uicons.js/-/uicons.js-1.2.0.tgz#6ac9d220d958cb52c3e96c8b1874d6cb612d8500"
+  integrity sha512-EjCqDAsdQ+krTEUDKfW/SzANY1HkczC0G0/bRMdhN+nQ96s3t8i4fq6rrJj4PwKok0ROJ3NcAkmKg+qJTIj+rg==
 
 uid-safe@~2.1.5:
   version "2.1.5"

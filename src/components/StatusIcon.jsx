@@ -13,10 +13,9 @@ import RuleIcon from '@mui/icons-material/Rule'
  * } & import('@mui/material').SvgIconProps} StatusIconProps
  */
 
-/** @type {React.ForwardRefExoticComponent<StatusIconProps>} */
 export const StatusIcon = React.forwardRef(
   (
-    {
+    /** @type {StatusIconProps} */ {
       status,
       color,
       partialColor = color || 'info',

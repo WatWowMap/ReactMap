@@ -44,7 +44,7 @@ export interface DbContext {
   hasAlignment: boolean
   hasShowcaseData: boolean
   hasShowcaseForm: boolean
-  hasShowcaseTypes: boolean
+  hasShowcaseType: boolean
 }
 
 export interface ExpressUser extends User {
@@ -216,7 +216,7 @@ export interface DnfMinMax {
 }
 
 export interface DnfFilter {
-  pokemon?: FilterId
+  pokemon?: FilterId | FilterId[]
   iv?: DnfMinMax
   level?: DnfMinMax
   cp?: DnfMinMax

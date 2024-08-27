@@ -21,6 +21,11 @@ const ICON_MAP = {
 }
 const FALLBACK = <DevicesOtherIcon />
 
+/**
+ *
+ * @param {{ setting: keyof import('@store/useMemory').UseMemory['settings']}} props
+ * @returns
+ */
 export function GeneralSetting({ setting }) {
   const { t } = useTranslation()
   const staticSettings = useMemory((s) => s.settings)

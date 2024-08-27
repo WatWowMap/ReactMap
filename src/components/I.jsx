@@ -1,4 +1,8 @@
+// @ts-check
+
 import { styled } from '@mui/material/styles'
+
+// TODO: Figure out how to type this
 
 /** @type {import('react').FC<import("@rm/types").CustomI>} */
 export const I = styled('i', {

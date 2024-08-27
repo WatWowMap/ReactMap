@@ -1,3 +1,5 @@
+// @ts-check
+
 /* eslint-disable no-continue */
 const { Model, raw } = require('objection')
 const i18next = require('i18next')

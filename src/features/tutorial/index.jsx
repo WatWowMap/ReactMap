@@ -1,3 +1,5 @@
+// @ts-check
+
 import React, { useState } from 'react'
 import KeyboardArrowLeft from '@mui/icons-material/KeyboardArrowLeft'
 import KeyboardArrowRight from '@mui/icons-material/KeyboardArrowRight'
@@ -87,7 +89,7 @@ export function Tutorial() {
                 1: <TutorialSidebar />,
                 2: <TutorialSliders />,
                 3: <TutorialAdvanced category="pokemon" />,
-                4: <TutorialPopup />,
+                4: <TutorialPopup isMobile={isMobile} />,
                 5: <TutorialClosing />,
               }[step]
             }

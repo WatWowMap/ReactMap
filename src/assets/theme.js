@@ -181,6 +181,7 @@ export function useCustomTheme() {
               main: '#2AB5F6',
               contrastText: '#fff',
             },
+            // TODO: Augment Mui Types
             discord: {
               main: '#5865F2',
               green: '#57F287',

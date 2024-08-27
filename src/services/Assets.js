@@ -205,7 +205,10 @@ export class UAssets {
       : baseSize
   }
 
-  /** @param {string[]} categories */
+  /**
+   * @param {string[]} categories
+   * @returns {(UAssets['modifiers']['base'])[]}
+   */
   getModifiers(...categories) {
     return categories.map(
       (category) => this.modifiers[category] ?? this.modifiers.base,
