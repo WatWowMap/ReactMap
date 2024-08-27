@@ -69,16 +69,3 @@ declare module 'http' {
     bodySize?: number
   }
 }
-
-// declare module '@apollo/server' {
-//   interface GraphQLInProgressResponse {
-//     __sentry_transaction?: string
-//   }
-// }
-
-// TODO
-// declare module '@mui/material/Button' {
-//   interface ExtendButtonTypeMap {
-//     bgcolor?: string
-//   }
-// }

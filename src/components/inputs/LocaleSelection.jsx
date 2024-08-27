@@ -21,11 +21,11 @@ const success = <CheckIcon fontSize="small" color="success" />
 
 export function LocaleSelection() {
   const { t, i18n } = useTranslation()
-  const selectRef = React.useRef(/** @type {HTMLDivElement | null} */ (null))
+  const [width, setWidth] = React.useState(0)
 
   return (
     <FCSelect
-      ref={selectRef}
+      setWidth={setWidth}
       renderValue={(v) => t(`locale_selection_${v}`)}
       label={t('locale_selection')}
       value={i18n.language}
@@ -49,7 +49,7 @@ export function LocaleSelection() {
               flexDirection: 'column',
               alignItems: 'flex-start',
               whiteSpace: 'normal',
-              width: selectRef.current?.clientWidth || 'auto',
+              width: width || 'auto',
             }}
           >
             {t(`locale_selection_${option}`)}

@@ -1,3 +1,5 @@
+// @ts-check
+
 export const ICON_SIZES = /** @type {const} */ (['sm', 'md', 'lg', 'xl'])
 
 export const XXS_XXL = /** @type {const} */ (['xxs', 'xxl'])

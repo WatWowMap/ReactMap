@@ -1,3 +1,5 @@
+// @ts-check
+
 export * from './Webhook'
 export * from './hooks/useSyncData'
 export * from './human/Draggable'

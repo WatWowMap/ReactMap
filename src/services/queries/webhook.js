@@ -1,3 +1,5 @@
+// @ts-check
+
 import { gql } from '@apollo/client'
 
 const base = gql`

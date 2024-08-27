@@ -1,3 +1,6 @@
+// @ts-check
+// TODO: Fix the types, somehow
+
 import * as React from 'react'
 import DialogContent from '@mui/material/DialogContent'
 import Input from '@mui/material/Input'

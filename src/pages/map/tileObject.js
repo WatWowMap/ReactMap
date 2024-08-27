@@ -1,3 +1,5 @@
+// @ts-check
+
 import { PokemonTile as pokemon } from '@features/pokemon'
 import { PokestopTile as pokestops } from '@features/pokestop'
 import { GymTile as gyms } from '@features/gym'

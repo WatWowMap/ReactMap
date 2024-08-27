@@ -1,3 +1,5 @@
+// @ts-check
+
 import React, { useState } from 'react'
 import DialogContent from '@mui/material/DialogContent'
 import Typography from '@mui/material/Typography'
@@ -37,6 +39,7 @@ export function TutorialSliders() {
   )
   const arrayCheck = (filter, key) =>
     filter[key].every((v, i) => v === ivOr[key][i])
+
   Object.keys(temp).forEach((key) => (fullCheck[key] = !arrayCheck(temp, key)))
   const disabled = Object.keys(fullCheck).filter(
     (key) => fullCheck[key] === false,

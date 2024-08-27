@@ -7,7 +7,8 @@ import ListItemText from '@mui/material/ListItemText'
 import { useTranslation } from 'react-i18next'
 
 /**
- * @param {{ label?: string } & import('@mui/material').ListItemButtonProps} props
+ * @template {React.ElementType} [T="div"]
+ * @param {import('@mui/material').ListItemButtonProps<T, { label?: string }> & { component?: T }} props
  */
 export function BasicListButton({ children, label, color, ...props }) {
   const { t } = useTranslation()

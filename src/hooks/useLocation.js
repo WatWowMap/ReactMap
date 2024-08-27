@@ -1,3 +1,6 @@
+// @ts-check
+// TODO: Not sure if this is possible to actually type correctly with how the leaflet.locatecontrol library is written
+
 import { useEffect, useMemo, useState } from 'react'
 import { LayerGroup, DomEvent, DomUtil, Control } from 'leaflet'
 import { useTranslation } from 'react-i18next'
@@ -8,7 +11,7 @@ import { useStorage } from '@store/useStorage'
 
 /**
  * Use location hook
- * @returns {{ lc: any, color: import('@mui/material').ButtonProps['color'] }}
+ * @returns {{ lc: Control.Locate & { _onClick: () => void }, requesting: boolean, color: import('@mui/material').ButtonProps['color'] }}
  */
 export function useLocation(dependency = false) {
   const map = useMap()
@@ -33,13 +36,18 @@ export function useLocation(dependency = false) {
       },
       _unload() {
         this.stop()
+        // @ts-ignore
         if (this._map) this._map.off('unload', this._unload, this)
       },
       stop() {
+        // @ts-ignore
         if (!this._map) return
+        // @ts-ignore
         this._deactivate()
         this._cleanClasses()
+        // @ts-ignore
         this._resetVariables()
+        // @ts-ignore
         this._removeMarker()
       },
       onAdd() {
@@ -47,21 +55,32 @@ export function useLocation(dependency = false) {
           'div',
           'react-locate-control leaflet-bar leaflet-control',
         )
+        // @ts-ignore
         this._container = container
+        // @ts-ignore
         this._layer = this.options.layer || new LayerGroup()
+        // @ts-ignore
         this._layer.addTo(this._map)
+        // @ts-ignore
         this._event = undefined
+        // @ts-ignore
         this._compassHeading = null
+        // @ts-ignore
         this._prevBounds = null
 
+        // @ts-ignore
         const linkAndIcon = this.options.createButtonCallback(
           container,
+          // @ts-ignore
           this.options,
         )
+        // @ts-ignore
         this._link = linkAndIcon.link
+        // @ts-ignore
         this._icon = linkAndIcon.icon
 
         DomEvent.on(
+          // @ts-ignore
           this._link,
           'click',
           function stuff(ev) {
@@ -70,16 +89,20 @@ export function useLocation(dependency = false) {
             this._onClick()
           },
           this,
+          // @ts-ignore
         ).on(this._link, 'dblclick', DomEvent.stopPropagation)
 
+        // @ts-ignore
         this._resetVariables()
 
+        // @ts-ignore
         this._map.on('unload', this._unload, this)
 
         return container
       },
     })
     const result = new LocateFab({
+      // @ts-ignore
       keepCurrentZoomLevel: true,
       setView: 'untilPan',
       metric,
@@ -107,5 +130,6 @@ export function useLocation(dependency = false) {
     }
   }, [lc, map, dependency])
 
+  // @ts-ignore
   return { lc, requesting, color }
 }

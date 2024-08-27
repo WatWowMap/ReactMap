@@ -29,6 +29,7 @@ export interface User {
   strategy?: Strategy
   data?: string | object
   selectedWebhook?: string
+  tutorial?: boolean
 }
 
 export type FullUser = FullModel<User, UserModel>
