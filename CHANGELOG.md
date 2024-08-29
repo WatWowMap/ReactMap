@@ -1,3 +1,11 @@
+## [1.34.1-develop.3](https://github.com/WatWowMap/ReactMap/compare/v1.34.1-develop.2...v1.34.1-develop.3) (2024-08-29)
+
+
+### Bug Fixes
+
+* backup if a user has an invalid nav option ([744ca90](https://github.com/WatWowMap/ReactMap/commit/744ca90a86dcd89d679c8e605f0b1061e8d611cb))
+* the travesty that was the nest popup ([d19fc74](https://github.com/WatWowMap/ReactMap/commit/d19fc74edbd4f83f736273f38e2da08bb3739dec))
+
 ## [1.34.1-develop.2](https://github.com/WatWowMap/ReactMap/compare/v1.34.1-develop.1...v1.34.1-develop.2) (2024-08-29)
 
 
