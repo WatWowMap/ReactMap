@@ -1,3 +1,10 @@
+## [1.34.1-develop.2](https://github.com/WatWowMap/ReactMap/compare/v1.34.1-develop.1...v1.34.1-develop.2) (2024-08-29)
+
+
+### Bug Fixes
+
+* order of items for the `scanAreas` section of the drawer ([6be6b3b](https://github.com/WatWowMap/ReactMap/commit/6be6b3b339daf01d7c953053755ffdd65f246123))
+
 ## [1.34.1-develop.1](https://github.com/WatWowMap/ReactMap/compare/v1.34.0...v1.34.1-develop.1) (2024-08-29)
 
 
