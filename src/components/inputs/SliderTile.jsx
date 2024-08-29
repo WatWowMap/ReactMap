@@ -1,7 +1,7 @@
 // @ts-check
 /* eslint-disable react/jsx-no-duplicate-props */
 import * as React from 'react'
-import Grid2 from '@mui/material/Unstable_Grid2/Grid2'
+import Grid2 from '@mui/material/Unstable_Grid2'
 import TextField from '@mui/material/TextField'
 import Slider from '@mui/material/Slider'
 import { styled } from '@mui/material/styles'

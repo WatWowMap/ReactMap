@@ -3,7 +3,7 @@
 import * as React from 'react'
 import DeleteForever from '@mui/icons-material/DeleteForever'
 import Edit from '@mui/icons-material/Edit'
-import Grid2 from '@mui/material/Unstable_Grid2/Grid2'
+import Grid2 from '@mui/material/Unstable_Grid2'
 import Typography from '@mui/material/Typography'
 import IconButton from '@mui/material/IconButton'
 import Checkbox from '@mui/material/Checkbox'

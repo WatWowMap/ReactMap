@@ -75,3 +75,7 @@ declare module 'http' {
     bodySize?: number
   }
 }
+
+declare module 'ohbem' {
+  export = Ohbem
+}

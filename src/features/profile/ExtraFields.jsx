@@ -1,6 +1,6 @@
 // @ts-check
 import * as React from 'react'
-import Grid2 from '@mui/material/Unstable_Grid2/Grid2'
+import Grid2 from '@mui/material/Unstable_Grid2'
 import TextField from '@mui/material/TextField'
 import { useMutation } from '@apollo/client'
 import { useTranslation } from 'react-i18next'

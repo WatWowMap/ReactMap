@@ -196,7 +196,7 @@ module.exports = class PkmnBackend {
   }
 
   /**
-   * @param {import("@rm/types").PvpEntry} entry
+   * @param {import("ohbem").PvPRankEntry} entry
    * @param {string} league
    * @returns {boolean}
    */
@@ -226,8 +226,8 @@ module.exports = class PkmnBackend {
 
   /**
    * @param {string} league
-   * @param {import("@rm/types").PvpEntry[]} data
-   * @returns {{ best: number; filtered: import("@rm/types").PvpEntry[]}}
+   * @param {import("ohbem").PvPRankEntry[]} data
+   * @returns {{ best: number; filtered: import("ohbem").PvPRankEntry[]}}
    */
   getRanks(league, data) {
     const filtered =

@@ -196,20 +196,7 @@ export interface Pokestop {
 
 export type FullPokestop = FullModel<Pokestop, PokestopModel>
 
-export interface PvpEntry {
-  pokemon: number
-  form: number
-  cap: number
-  value: number
-  level: number
-  cp: number
-  percentage: number
-  rank: number
-  capped: boolean
-  evolution: number
-}
-
-export type CleanPvp = Record<string, PvpEntry[]>
+export type CleanPvp = Record<string, import('ohbem').PvPRankEntry[]>
 
 export interface Pokemon {
   id: string
@@ -247,8 +234,8 @@ export interface Pokemon {
   expire_timestamp_verified: boolean
   updated: number
   pvp: CleanPvp
-  pvp_rankings_great_league?: PvpEntry[]
-  pvp_rankings_ultra_league?: PvpEntry[]
+  pvp_rankings_great_league?: import('ohbem').PvPRankEntry[]
+  pvp_rankings_ultra_league?: import('ohbem').PvPRankEntry[]
   distance?: number
   shiny?: boolean
 }
