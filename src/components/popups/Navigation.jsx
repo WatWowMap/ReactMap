@@ -13,11 +13,24 @@ import { useStorage } from '@store/useStorage'
 export function Navigation({ lat, lon, size = 'large' }) {
   const nav = useStorage((s) => s.settings.navigation)
   const url = useMemory((s) => s.settings.navigation[nav]?.url)
+
+  React.useEffect(() => {
+    const navOptions = useMemory.getState().settings.navigation
+    if (!url || !(nav in navOptions)) {
+      useStorage.setState((prev) => ({
+        settings: {
+          ...prev.settings,
+          navigation: Object.keys(navOptions)[0],
+        },
+      }))
+    }
+  }, [url])
+
   return (
     <IconButton
       href={url
-        .replaceAll('{x}', lat.toString())
-        .replaceAll('{y}', lon.toString())}
+        .replace(/\{x\}/g, lat.toString())
+        .replace(/\{y\}/g, lon.toString())}
       target="_blank"
       rel="noreferrer"
       size={size}
