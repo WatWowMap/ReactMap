@@ -3,8 +3,8 @@ const { Model } = require('objection')
 const i18next = require('i18next')
 const config = require('@rm/config')
 
-const state = require('../services/state')
-const getAreaSql = require('../utils/getAreaSql')
+const { state } = require('../services/state')
+const { getAreaSql } = require('../utils/getAreaSql')
 
 /** @typedef {Nest & Partial<import("@rm/types").Nest>} FullNest */
 
@@ -221,4 +221,4 @@ class Nest extends Model {
   }
 }
 
-module.exports = Nest
+module.exports = { Nest }

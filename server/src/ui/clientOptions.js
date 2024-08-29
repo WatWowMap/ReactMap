@@ -212,4 +212,4 @@ function clientOptions(perms) {
   return { clientValues, clientMenus }
 }
 
-module.exports = clientOptions
+module.exports = { clientOptions }

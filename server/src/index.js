@@ -12,12 +12,11 @@ const { rainbow } = require('chalkercli')
 const cors = require('cors')
 const { json } = require('body-parser')
 const http = require('http')
-const { default: helmet } = require('helmet')
 
 const { log, TAGS, Logger } = require('@rm/logger')
 const config = require('@rm/config')
 
-const state = require('./services/state')
+const { state } = require('./services/state')
 const { starti18n } = require('./services/i18n')
 const { checkForUpdates } = require('./services/checkForUpdates')
 const { loadLatestAreas, loadCachedAreas } = require('./services/areas')
@@ -31,11 +30,12 @@ const { initPassport } = require('./middleware/passport')
 const { errorMiddleware } = require('./middleware/error')
 const { sessionMiddleware } = require('./middleware/session')
 const { apolloMiddleware } = require('./middleware/apollo')
+const { helmetMiddleware } = require('./middleware/helmet')
 
-const startApollo = require('./graphql/server')
+const { startApollo } = require('./graphql/server')
 const { bindConnections } = require('./models')
 const { migrate } = require('./db/migrate')
-const rootRouter = require('./routes/rootRouter')
+const { rootRouter } = require('./routes/rootRouter')
 
 const startServer = async () => {
   if (!config.getSafe('devOptions.skipUpdateCheck')) {
@@ -77,23 +77,7 @@ const startServer = async () => {
   )
 
   if (config.getSafe('api.enableHelmet')) {
-    app.use(
-      helmet({
-        hidePoweredBy: true,
-        contentSecurityPolicy: {
-          directives: {
-            scriptSrc: [
-              "'self'",
-              'https://cdn.jsdelivr.net',
-              'https://telegram.org',
-              'https://static.cloudflareinsights.com',
-            ],
-            frameSrc: ["'self'", 'https://*.telegram.org'],
-            workerSrc: ["'self'", 'blob:'],
-          },
-        },
-      }),
-    )
+    app.use(helmetMiddleware())
   }
 
   initPassport(app)

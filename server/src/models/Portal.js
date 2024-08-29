@@ -2,7 +2,7 @@
 const { Model } = require('objection')
 const config = require('@rm/config')
 
-const getAreaSql = require('../utils/getAreaSql')
+const { getAreaSql } = require('../utils/getAreaSql')
 
 class Portal extends Model {
   static get tableName() {
@@ -84,4 +84,4 @@ class Portal extends Model {
   }
 }
 
-module.exports = Portal
+module.exports = { Portal }

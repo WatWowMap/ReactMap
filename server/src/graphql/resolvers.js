@@ -8,15 +8,15 @@ const { S2LatLng, S2RegionCoverer, S2LatLngRect } = require('nodes2ts')
 const config = require('@rm/config')
 const { missing, readAndParseJson } = require('@rm/locales')
 
-const buildDefaultFilters = require('../filters/builder/base')
-const filterComponents = require('../utils/filterComponents')
-const validateSelectedWebhook = require('../utils/validateSelectedWebhook')
-const PoracleAPI = require('../services/Poracle')
+const { buildDefaultFilters } = require('../filters/builder/base')
+const { filterComponents } = require('../utils/filterComponents')
+const { validateSelectedWebhook } = require('../utils/validateSelectedWebhook')
+const { PoracleAPI } = require('../services/Poracle')
 const { geocoder } = require('../services/geocoder')
-const scannerApi = require('../services/scannerApi')
-const getPolyVector = require('../utils/getPolyVector')
-const getPlacementCells = require('../utils/getPlacementCells')
-const getTypeCells = require('../utils/getTypeCells')
+const { scannerApi } = require('../services/scannerApi')
+const { getPolyVector } = require('../utils/getPolyVector')
+const { getPlacementCells } = require('../utils/getPlacementCells')
+const { getTypeCells } = require('../utils/getTypeCells')
 const { getValidCoords } = require('../utils/getValidCoords')
 
 /** @type {import("@apollo/server").ApolloServerOptions<import("@rm/types").GqlContext>['resolvers']} */
@@ -788,4 +788,4 @@ const resolvers = {
   },
 }
 
-module.exports = resolvers
+module.exports = { resolvers }

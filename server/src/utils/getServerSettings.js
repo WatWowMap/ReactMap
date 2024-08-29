@@ -1,9 +1,9 @@
 // @ts-check
 const config = require('@rm/config')
 
-const clientOptions = require('../ui/clientOptions')
-const advMenus = require('../ui/advMenus')
-const generateUi = require('../ui/primary')
+const { clientOptions } = require('../ui/clientOptions')
+const { advMenus } = require('../ui/advMenus')
+const { drawer } = require('../ui/drawer')
 
 /**
  *
@@ -64,10 +64,10 @@ function getServerSettings(req) {
     menus: advMenus(),
     userSettings: clientValues,
     clientMenus,
-    ui: generateUi(req, user.perms),
+    ui: drawer(req, user.perms),
   }
 
   return serverSettings
 }
 
-module.exports = getServerSettings
+module.exports = { getServerSettings }

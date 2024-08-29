@@ -3,7 +3,7 @@ const dlv = require('dlv')
 
 const { log, TAGS } = require('@rm/logger')
 
-const state = require('../services/state')
+const { state } = require('../services/state')
 const { bindConnections } = require('../models')
 const { loadLatestAreas } = require('../services/areas')
 const { loadAuthStrategies } = require('../routes/authRouter')

@@ -30,7 +30,7 @@ declare global {
   }
 }
 
-export interface CustomI extends React.HTMLProps<HTMLLIElement> {
+export interface CustomI extends React.HTMLAttributes<HTMLLIElement> {
   size?: ButtonProps['size']
 }
 

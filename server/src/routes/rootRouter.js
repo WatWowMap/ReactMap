@@ -7,13 +7,13 @@ const config = require('@rm/config')
 const { log, TAGS } = require('@rm/logger')
 
 const { authRouter } = require('./authRouter')
-const clientRouter = require('./clientRouter')
-const apiRouter = require('./api')
-const state = require('../services/state')
-const areaPerms = require('../utils/areaPerms')
-const getServerSettings = require('../utils/getServerSettings')
+const { clientRouter } = require('./clientRouter')
+const { apiRouter } = require('./api')
+const { areaPerms } = require('../utils/areaPerms')
+const { getServerSettings } = require('../utils/getServerSettings')
 const { secretMiddleware } = require('../middleware/secret')
 const { version } = require('../../../package.json')
+const { state } = require('../services/state')
 
 const rootRouter = express.Router()
 
@@ -216,4 +216,4 @@ rootRouter.get('/api/settings', async (req, res, next) => {
   }
 })
 
-module.exports = rootRouter
+module.exports = { rootRouter }

@@ -1,5 +1,5 @@
 // @ts-check
-const state = require('../services/state')
+const { state } = require('../services/state')
 
 const CATEGORIES = /** @type {const} */ ({
   gyms: ['teams', 'eggs', 'raids', 'pokemon'],
@@ -21,7 +21,7 @@ const CATEGORIES = /** @type {const} */ ({
   nests: ['pokemon'],
 })
 
-function buildMenus() {
+function advMenus() {
   const rarityTiers = new Set(
     Object.values(state.event.masterfile.pokemon).map((val) => val.rarity),
   )
@@ -132,4 +132,4 @@ function buildMenus() {
   return returnObj
 }
 
-module.exports = buildMenus
+module.exports = { advMenus }

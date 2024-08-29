@@ -1,6 +1,6 @@
 // @ts-check
 const config = require('@rm/config')
-const DiscordClient = require('../services/DiscordClient')
+const { DiscordClient } = require('../services/DiscordClient')
 
 /**
  *

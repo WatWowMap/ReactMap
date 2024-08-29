@@ -55,4 +55,4 @@ async function fetchJson(url, options = undefined) {
   }
 }
 
-module.exports = fetchJson
+module.exports = { fetchJson }

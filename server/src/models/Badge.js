@@ -17,7 +17,7 @@ class Badge extends Model {
   }
 
   static get relationMappings() {
-    const state = require('../services/state')
+    const { state } = require('../services/state')
     return {
       user: {
         relation: Model.BelongsToOneRelation,
@@ -76,4 +76,4 @@ class Badge extends Model {
   }
 }
 
-module.exports = Badge
+module.exports = { Badge }

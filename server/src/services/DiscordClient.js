@@ -5,13 +5,13 @@ const passport = require('passport')
 
 const config = require('@rm/config')
 
-const state = require('./state')
-const logUserAuth = require('./logUserAuth')
-const areaPerms = require('../utils/areaPerms')
-const webhookPerms = require('../utils/webhookPerms')
-const scannerPerms = require('../utils/scannerPerms')
-const mergePerms = require('../utils/mergePerms')
-const AuthClient = require('./AuthClient')
+const { logUserAuth } = require('./logUserAuth')
+const { areaPerms } = require('../utils/areaPerms')
+const { webhookPerms } = require('../utils/webhookPerms')
+const { scannerPerms } = require('../utils/scannerPerms')
+const { mergePerms } = require('../utils/mergePerms')
+const { AuthClient } = require('./AuthClient')
+const { state } = require('./state')
 
 class DiscordClient extends AuthClient {
   /** @type {import('./AuthClient').ClientConstructor} */
@@ -397,4 +397,4 @@ class DiscordClient extends AuthClient {
   }
 }
 
-module.exports = DiscordClient
+module.exports = { DiscordClient }

@@ -28,4 +28,4 @@ function scannerPerms(roles, provider, trialActive = false) {
   return [...new Set(perms)]
 }
 
-module.exports = scannerPerms
+module.exports = { scannerPerms }

@@ -2,7 +2,7 @@
 const express = require('express')
 const path = require('path')
 
-const router = express.Router()
+const clientRouter = express.Router()
 
 const CLIENT_ROUTES = [
   '/',
@@ -21,7 +21,7 @@ const CLIENT_ROUTES = [
   '/error/:message',
 ]
 
-router.get(CLIENT_ROUTES, (req, res) => {
+clientRouter.get(CLIENT_ROUTES, (req, res) => {
   res.sendFile(
     path.join(
       __dirname,
@@ -32,4 +32,4 @@ router.get(CLIENT_ROUTES, (req, res) => {
   )
 })
 
-module.exports = router
+module.exports = { clientRouter }
