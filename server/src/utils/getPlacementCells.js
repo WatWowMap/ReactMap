@@ -5,8 +5,8 @@ const {
   S2CellId,
   S2LatLngRect,
 } = require('nodes2ts')
-const getPolyVector = require('./getPolyVector')
-const PoI = require('../models/PoI')
+const { getPolyVector } = require('./getPolyVector')
+const { PoI } = require('../models/PoI')
 
 /**
  *
@@ -73,4 +73,4 @@ function getPlacementCells(filters, pokestops, gyms) {
   }
 }
 
-module.exports = getPlacementCells
+module.exports = { getPlacementCells }

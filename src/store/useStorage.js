@@ -31,7 +31,7 @@ import { setDeep } from '@utils/setDeep'
  *   searches: Record<string, string>,
  *   tabs: Record<string, number>,
  *   expanded: Record<string, boolean>,
- *   menus: Partial<ReturnType<import('server/src/ui/advMenus')>>
+ *   menus: Partial<ReturnType<import('server/src/ui/advMenus')['advMenus']>>
  *   holidayEffects: Record<string, boolean>,
  *   motdIndex: number
  *   tutorial: boolean,
@@ -40,7 +40,7 @@ import { setDeep } from '@utils/setDeep'
  *   filters: Partial<import('@rm/types').AllFilters>,
  *   icons: Record<string, string>
  *   audio: Record<string, string>
- *   userSettings: Partial<ReturnType<import('server/src/ui/clientOptions')>['clientValues']>
+ *   userSettings: Partial<ReturnType<import('server/src/ui/clientOptions')['clientOptions']>['clientValues']>
  *   profiling: boolean
  *   stateTraceLog: boolean
  *   desktopNotifications: boolean

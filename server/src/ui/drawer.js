@@ -1,6 +1,6 @@
 // @ts-check
 const config = require('@rm/config')
-const state = require('../services/state')
+const { state } = require('../services/state')
 
 /** @typedef {import('@rm/types').RMSlider} Slider */
 
@@ -13,7 +13,7 @@ const BLOCKED = /** @type {undefined} */ (undefined)
  * @param {import("@rm/types").Permissions} perms
  * @returns
  */
-function generateUi(req, perms) {
+function drawer(req, perms) {
   const mapConfig = config.getMapConfig(req)
   const nestFilters = config.getSafe('defaultFilters.nests')
   const leagues = config.getSafe('api.pvp.leagues')
@@ -194,4 +194,4 @@ function generateUi(req, perms) {
   return { ...sortedUi, ...ui }
 }
 
-module.exports = generateUi
+module.exports = { drawer }

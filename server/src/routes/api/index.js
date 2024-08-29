@@ -22,4 +22,4 @@ fs.readdir(resolve(__dirname, './v1/'), (e, files) => {
   })
 })
 
-module.exports = apiRouter
+module.exports = { apiRouter }

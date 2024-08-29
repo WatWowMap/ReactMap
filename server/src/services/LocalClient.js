@@ -5,12 +5,12 @@ const bcrypt = require('bcrypt')
 
 const config = require('@rm/config')
 
-const state = require('./state')
-const areaPerms = require('../utils/areaPerms')
-const webhookPerms = require('../utils/webhookPerms')
-const scannerPerms = require('../utils/scannerPerms')
-const mergePerms = require('../utils/mergePerms')
-const AuthClient = require('./AuthClient')
+const { areaPerms } = require('../utils/areaPerms')
+const { webhookPerms } = require('../utils/webhookPerms')
+const { scannerPerms } = require('../utils/scannerPerms')
+const { mergePerms } = require('../utils/mergePerms')
+const { AuthClient } = require('./AuthClient')
+const { state } = require('./state')
 
 class LocalClient extends AuthClient {
   getPerms(trialActive = false) {
@@ -145,4 +145,4 @@ class LocalClient extends AuthClient {
   }
 }
 
-module.exports = LocalClient
+module.exports = { LocalClient }

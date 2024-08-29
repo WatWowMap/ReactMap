@@ -5,15 +5,15 @@ const path = require('path')
 const config = require('@rm/config')
 const { log, TAGS } = require('@rm/logger')
 
-const DbCheck = require('./DbCheck')
-const EventManager = require('./EventManager')
+const { DbManager } = require('./DbManager')
+const { EventManager } = require('./EventManager')
 const { PvpWrapper } = require('./PvpWrapper')
 const { setCache } = require('./cache')
 const { migrate } = require('../db/migrate')
 const { Stats } = require('./Stats')
 
-const serverState = {
-  db: new DbCheck(),
+const state = {
+  db: new DbManager(),
   pvp: config.getSafe('api.pvp.reactMapHandlesPvp') ? new PvpWrapper() : null,
   event: new EventManager(),
   stats: new Stats(),
@@ -138,7 +138,7 @@ const serverState = {
     if (reloadReport.database) {
       await this.writeCache()
       await migrate()
-      this.db = new DbCheck()
+      this.db = new DbManager()
     }
     if (reloadReport.pvp) {
       this.pvp = config.getSafe('api.pvp.reactMapHandlesPvp')
@@ -180,25 +180,25 @@ const serverState = {
 }
 
 process.on('SIGINT', async (e) => {
-  await serverState.writeCache(e)
+  await state.writeCache(e)
   process.exit(0)
 })
 process.on('SIGTERM', async (e) => {
-  await serverState.writeCache(e)
+  await state.writeCache(e)
   process.exit(0)
 })
 process.on('SIGUSR1', async (e) => {
-  await serverState.writeCache(e)
+  await state.writeCache(e)
   process.exit(0)
 })
 process.on('SIGUSR2', async (e) => {
-  await serverState.writeCache(e)
+  await state.writeCache(e)
   process.exit(0)
 })
 process.on('uncaughtException', async (e) => {
   log.error(TAGS.ReactMap, e)
-  await serverState.writeCache('SIGBREAK')
+  await state.writeCache('SIGBREAK')
   process.exit(99)
 })
 
-module.exports = serverState
+module.exports = { state }

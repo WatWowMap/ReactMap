@@ -2,7 +2,7 @@
 const { Model, raw } = require('objection')
 const config = require('@rm/config')
 
-const getAreaSql = require('../utils/getAreaSql')
+const { getAreaSql } = require('../utils/getAreaSql')
 const { getEpoch } = require('../utils/getClientTime')
 
 const GET_ALL_SELECT = /** @type {const} */ ([
@@ -176,4 +176,4 @@ class Route extends Model {
   }
 }
 
-module.exports = Route
+module.exports = { Route }

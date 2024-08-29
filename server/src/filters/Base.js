@@ -14,4 +14,4 @@ class BaseFilter {
   }
 }
 
-module.exports = BaseFilter
+module.exports = { BaseFilter }

@@ -1,8 +1,8 @@
 // @ts-check
 const { log, TAGS } = require('@rm/logger')
 
-const BaseFilter = require('../Base')
-const state = require('../../services/state')
+const { state } = require('../../services/state')
+const { BaseFilter } = require('../Base')
 
 /**
  *
@@ -110,4 +110,4 @@ function buildPokestops(perms, defaults) {
   return quests
 }
 
-module.exports = buildPokestops
+module.exports = { buildPokestops }

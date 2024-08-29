@@ -1,5 +1,6 @@
 // @ts-check
 const { Model } = require('objection')
+
 const config = require('@rm/config')
 const { log, TAGS } = require('@rm/logger')
 
@@ -14,7 +15,7 @@ class NestSubmission extends Model {
 
   static get relationMappings() {
     // eslint-disable-next-line global-require
-    const state = require('../services/state')
+    const { state } = require('../services/state')
     return {
       user: {
         relation: Model.BelongsToOneRelation,
@@ -92,4 +93,4 @@ class NestSubmission extends Model {
   }
 }
 
-module.exports = NestSubmission
+module.exports = { NestSubmission }

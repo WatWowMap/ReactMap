@@ -36,4 +36,4 @@ function getPolyVector(s2cellId, polyline = false) {
   return result
 }
 
-module.exports = getPolyVector
+module.exports = { getPolyVector }

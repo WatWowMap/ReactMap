@@ -22,7 +22,7 @@ class Backup extends Model {
   }
 
   static get relationMappings() {
-    const state = require('../services/state')
+    const { state } = require('../services/state')
     return {
       user: {
         relation: Model.BelongsToOneRelation,
@@ -116,4 +116,4 @@ class Backup extends Model {
   }
 }
 
-module.exports = Backup
+module.exports = { Backup }

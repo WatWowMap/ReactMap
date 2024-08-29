@@ -3,7 +3,7 @@ const { Model, raw } = require('objection')
 const config = require('@rm/config')
 
 const { log, TAGS } = require('@rm/logger')
-const getAreaSql = require('../utils/getAreaSql')
+const { getAreaSql } = require('../utils/getAreaSql')
 
 class Spawnpoint extends Model {
   static get tableName() {
@@ -60,4 +60,4 @@ class Spawnpoint extends Model {
   }
 }
 
-module.exports = Spawnpoint
+module.exports = { Spawnpoint }

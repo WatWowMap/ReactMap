@@ -42,7 +42,7 @@ const mapPerms = (perms, userPerms) =>
  * @param {boolean} hidePii
  * @returns {Promise<import('discord.js').APIEmbed>}
  */
-async function getAuthInfo(req, user, strategy = 'custom', hidePii = false) {
+async function logUserAuth(req, user, strategy = 'custom', hidePii = false) {
   const ip =
     req.headers['cf-connecting-ip'] ||
     `${req.headers['x-forwarded-for'] || ''}`.split(', ')[0] ||
@@ -216,4 +216,4 @@ async function getAuthInfo(req, user, strategy = 'custom', hidePii = false) {
   return embed
 }
 
-module.exports = getAuthInfo
+module.exports = { logUserAuth }

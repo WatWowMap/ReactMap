@@ -5,12 +5,12 @@ const passport = require('passport')
 
 const config = require('@rm/config')
 
-const state = require('./state')
-const areaPerms = require('../utils/areaPerms')
-const webhookPerms = require('../utils/webhookPerms')
-const scannerPerms = require('../utils/scannerPerms')
-const mergePerms = require('../utils/mergePerms')
-const AuthClient = require('./AuthClient')
+const { state } = require('./state')
+const { areaPerms } = require('../utils/areaPerms')
+const { webhookPerms } = require('../utils/webhookPerms')
+const { scannerPerms } = require('../utils/scannerPerms')
+const { mergePerms } = require('../utils/mergePerms')
+const { AuthClient } = require('./AuthClient')
 
 /**
  * @typedef {import('@rainb0w-clwn/passport-telegram-official/dist/types').PassportTelegramUser} TGUser
@@ -250,4 +250,4 @@ class TelegramClient extends AuthClient {
   }
 }
 
-module.exports = TelegramClient
+module.exports = { TelegramClient }

@@ -18,4 +18,4 @@ function mergePerms(existingPerms, incomingPerms) {
   )
 }
 
-module.exports = mergePerms
+module.exports = { mergePerms }

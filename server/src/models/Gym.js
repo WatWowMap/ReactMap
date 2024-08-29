@@ -3,10 +3,11 @@
 /* eslint-disable no-restricted-syntax */
 const { Model, raw } = require('objection')
 const i18next = require('i18next')
+
 const config = require('@rm/config')
 
-const state = require('../services/state')
-const getAreaSql = require('../utils/getAreaSql')
+const { getAreaSql } = require('../utils/getAreaSql')
+const { state } = require('../services/state')
 
 const coreFields = [
   'id',
@@ -644,4 +645,4 @@ class Gym extends Model {
   }
 }
 
-module.exports = Gym
+module.exports = { Gym }

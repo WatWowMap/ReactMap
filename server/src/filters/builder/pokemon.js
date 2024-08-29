@@ -1,6 +1,6 @@
 // @ts-check
-const state = require('../../services/state')
-const BaseFilter = require('../Base')
+const { state } = require('../../services/state')
+const { BaseFilter } = require('../Base')
 
 /**
  *
@@ -66,4 +66,4 @@ function buildPokemon(defaults, base, custom) {
   return pokemon
 }
 
-module.exports = buildPokemon
+module.exports = { buildPokemon }

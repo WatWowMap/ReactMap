@@ -28,4 +28,4 @@ function filterComponents(components, loggedIn, donor) {
   })
 }
 
-module.exports = filterComponents
+module.exports = { filterComponents }

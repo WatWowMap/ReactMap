@@ -16,4 +16,4 @@ class PoI {
   }
 }
 
-module.exports = PoI
+module.exports = { PoI }

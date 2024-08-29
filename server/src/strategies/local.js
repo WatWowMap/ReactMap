@@ -1,6 +1,6 @@
 // @ts-check
 const config = require('@rm/config')
-const LocalClient = require('../services/LocalClient')
+const { LocalClient } = require('../services/LocalClient')
 
 /**
  *

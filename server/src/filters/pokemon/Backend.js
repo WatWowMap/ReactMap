@@ -13,14 +13,14 @@ const {
   dnfifyIvFilter,
 } = require('./functions')
 const { filterRTree } = require('../../utils/filterRTree')
-const state = require('../../services/state')
-const PokemonFilter = require('./Frontend')
+const { PokemonFilter } = require('./Frontend')
+const { state } = require('../../services/state')
 
-module.exports = class PkmnBackend {
+class PkmnBackend {
   /**
    * @param {`${number}-${number}` | 'global'} id
-   * @param {import("./Frontend")} filter
-   * @param {import("./Frontend")} global
+   * @param {import("./Frontend").PokemonFilter} filter
+   * @param {import("./Frontend").PokemonFilter} global
    * @param {object} perms
    * @param {boolean} perms.pokemon
    * @param {boolean} perms.iv
@@ -162,7 +162,7 @@ module.exports = class PkmnBackend {
   }
 
   /**
-   * @param {import("./Frontend")} filter
+   * @param {import("./Frontend").PokemonFilter} filter
    * @returns {Set<string>}
    */
   getRelevantKeys(filter = this.filter) {
@@ -476,3 +476,5 @@ module.exports = class PkmnBackend {
     return result
   }
 }
+
+module.exports = { PkmnBackend }

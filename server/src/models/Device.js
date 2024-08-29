@@ -1,7 +1,7 @@
 // @ts-check
 const { Model, raw } = require('objection')
-const getAreaSql = require('../utils/getAreaSql')
-const fetchJson = require('../utils/fetchJson')
+const { getAreaSql } = require('../utils/getAreaSql')
+const { fetchJson } = require('../utils/fetchJson')
 const { filterRTree } = require('../utils/filterRTree')
 
 class Device extends Model {
@@ -77,4 +77,4 @@ class Device extends Model {
   }
 }
 
-module.exports = Device
+module.exports = { Device }

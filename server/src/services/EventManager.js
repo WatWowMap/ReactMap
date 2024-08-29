@@ -7,12 +7,11 @@ const config = require('@rm/config')
 const { Logger } = require('@rm/logger')
 const { generate, read } = require('@rm/masterfile')
 
-const PoracleAPI = require('./Poracle')
+const { PoracleAPI } = require('./Poracle')
 const { getCache } = require('./cache')
 
 /**
- * @typedef {import('./DiscordClient') | import('./TelegramClient') | null} Client
- * @typedef {Record<string, Client>} ClientObject
+ * @typedef {Record<string, import('./AuthClient').AuthClient>} ClientObject
  */
 
 class EventManager extends Logger {
@@ -73,7 +72,7 @@ class EventManager extends Logger {
    *
    * @param {keyof EventManager['available']} category
    * @param {import('../models').ScannerModelKeys} model
-   * @param {import('./DbCheck')} Db
+   * @param {import('./DbManager').DbManager} Db
    */
   async setAvailable(category, model, Db) {
     this.available[category] = await Db.getAvailable(model)
@@ -118,7 +117,7 @@ class EventManager extends Logger {
 
   /**
    *
-   * @param {keyof import('./AuthClient')['loggingChannels']} channel
+   * @param {keyof (import('./AuthClient').AuthClient['loggingChannels'])} channel
    * @param {import('discord.js').APIEmbed} embed
    * @param {keyof EventManager['authClients']} [strategy]
    */
@@ -166,7 +165,7 @@ class EventManager extends Logger {
 
   /**
    *
-   * @param {import('./DbCheck')} Db
+   * @param {import('./DbManager').DbManager} Db
    * @param {import('./PvpWrapper').PvpWrapper | null} Pvp
    */
   startIntervals(Db, Pvp) {
@@ -446,4 +445,4 @@ class EventManager extends Logger {
   }
 }
 
-module.exports = EventManager
+module.exports = { EventManager }

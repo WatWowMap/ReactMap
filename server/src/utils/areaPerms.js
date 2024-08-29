@@ -30,4 +30,4 @@ function areaPerms(roles) {
   return [...new Set(perms)]
 }
 
-module.exports = areaPerms
+module.exports = { areaPerms }

@@ -33,15 +33,15 @@ import { create } from 'zustand'
  *    },
  *   },
  *   glowRules: ((pkmn: import('@rm/types').Pokemon) => string)[],
- *   menus: Partial<ReturnType<import('server/src/ui/advMenus')>>
+ *   menus: Partial<ReturnType<import('server/src/ui/advMenus')['advMenus']>>
  *   menuFilters: import('@rm/types').ClientFilterObj,
  *   filters: Partial<import('@rm/types').AllFilters>,
  *   masterfile: { [K in keyof import('@rm/masterfile').Masterfile]: Partial<import('@rm/masterfile').Masterfile[K]> },
  *   polling: import('@rm/types').Config['api']['polling'],
  *   gymValidDataLimit: number
  *   settings: { [K in keyof import('./useStorage').UseStorage['settings']]: Record<string, K extends 'tileServers' ? import('@rm/types').TileLayer : K extends 'navigation' ? { name: string, url: string } : { name: string }> }
- *   userSettings: Partial<ReturnType<import('server/src/ui/clientOptions')>['clientValues']>
- *   clientMenus: Partial<ReturnType<import('server/src/ui/clientOptions')>['clientMenus']>
+ *   userSettings: Partial<ReturnType<import('server/src/ui/clientOptions')['clientOptions']>['clientValues']>
+ *   clientMenus: Partial<ReturnType<import('server/src/ui/clientOptions')['clientOptions']>['clientMenus']>
  *   clientError: string,
  *   timeOfDay: import('@rm/types').TimesOfDay,
  *   hideList: Set<string | number>,
