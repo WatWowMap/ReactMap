@@ -1,3 +1,10 @@
+## [1.34.1-develop.1](https://github.com/WatWowMap/ReactMap/compare/v1.34.0...v1.34.1-develop.1) (2024-08-29)
+
+
+### Bug Fixes
+
+* various type adjustments ([ab51750](https://github.com/WatWowMap/ReactMap/commit/ab51750d93411cf959af8a3b556c81f4da50f91d))
+
 # [1.34.0](https://github.com/WatWowMap/ReactMap/compare/v1.33.1...v1.34.0) (2024-08-23)
 
 
