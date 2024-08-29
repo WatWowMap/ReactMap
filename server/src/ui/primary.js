@@ -159,7 +159,7 @@ function generateUi(req, perms) {
         : undefined,
     s2cells: perms.s2cells ? { enabled: true } : BLOCKED,
     scanAreas: perms.scanAreas
-      ? { filterByAreas: true, enabled: true }
+      ? { enabled: true, filterByAreas: true }
       : undefined,
     weather:
       perms.weather && state.db.models.Weather ? { enabled: true } : BLOCKED,
