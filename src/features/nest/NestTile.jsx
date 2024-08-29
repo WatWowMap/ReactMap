@@ -2,7 +2,7 @@
 /* eslint-disable react/destructuring-assignment */
 
 import * as React from 'react'
-import { GeoJSON, Marker } from 'react-leaflet'
+import { GeoJSON, Marker, Popup } from 'react-leaflet'
 
 import { basicEqualFn, useMemory } from '@store/useMemory'
 import { useStorage } from '@store/useStorage'
@@ -40,11 +40,15 @@ const BaseNestTile = (nest) => {
           recent={recent}
           nest={nest}
         >
-          <NestPopup iconUrl={iconUrl} recent={recent} {...nest} />
+          <Popup>
+            <NestPopup iconUrl={iconUrl} recent={recent} {...nest} />
+          </Popup>
         </NestMarker>
       )}
       <NestGeoJSON polygon_path={nest.polygon_path}>
-        <NestPopup iconUrl={iconUrl} recent={recent} {...nest} />
+        <Popup>
+          <NestPopup iconUrl={iconUrl} recent={recent} {...nest} />
+        </Popup>
       </NestGeoJSON>
     </>
   )

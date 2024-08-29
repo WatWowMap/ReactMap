@@ -13,12 +13,8 @@ import { useLayoutStore } from '@store/useLayoutStore'
 import { Header } from './Header'
 import { Footer } from './Footer'
 
-/**
- * @param {{ id: number, name: string }} props
- * @returns
- */
-export function NestSubmission({ id, name }) {
-  const open = useLayoutStore((s) => s.nestSubmissions)
+export function NestSubmission() {
+  const { id, name } = useLayoutStore((s) => s.nestSubmissions)
   const [newName, setNewName] = React.useState(name)
   const { t } = useTranslation()
 
@@ -29,7 +25,13 @@ export function NestSubmission({ id, name }) {
     },
   )
 
-  const handleClose = () => useLayoutStore.setState({ nestSubmissions: '0' })
+  const handleClose = () =>
+    useLayoutStore.setState({
+      nestSubmissions: {
+        id: 0,
+        name: '',
+      },
+    })
 
   const handleSubmit = (e) => {
     if (e) e.preventDefault()
@@ -44,7 +46,7 @@ export function NestSubmission({ id, name }) {
   }
 
   React.useEffect(() => {
-    if (name !== newName && open === id) setNewName(name)
+    if (name !== newName && id) setNewName(name)
   }, [id, name])
 
   React.useEffect(() => {
@@ -65,7 +67,7 @@ export function NestSubmission({ id, name }) {
   }, [error])
 
   return (
-    <Dialog open={open === id} onClose={handleClose}>
+    <Dialog open={!!id} onClose={handleClose}>
       <Header titles="nest_submission_menu" action={handleClose} />
       <DialogContent sx={{ mt: 2 }}>
         <form noValidate autoComplete="off" onSubmit={handleSubmit}>
