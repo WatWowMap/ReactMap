@@ -1,3 +1,10 @@
+## [1.34.1-develop.4](https://github.com/WatWowMap/ReactMap/compare/v1.34.1-develop.3...v1.34.1-develop.4) (2024-08-30)
+
+
+### Bug Fixes
+
+* revert url fallback in navigation ([eddf8bd](https://github.com/WatWowMap/ReactMap/commit/eddf8bd478d47221eb85ae2b50b7a8e709dbe6b7))
+
 ## [1.34.1-develop.3](https://github.com/WatWowMap/ReactMap/compare/v1.34.1-develop.2...v1.34.1-develop.3) (2024-08-29)
 
 
