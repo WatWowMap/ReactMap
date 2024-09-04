@@ -104,6 +104,7 @@ const state = {
         this.event.setAvailable('pokestops', 'Pokestop', this.db),
         this.event.setAvailable('pokemon', 'Pokemon', this.db),
         this.event.setAvailable('nests', 'Nest', this.db),
+        this.event.setAvailable('stations', 'Station', this.db),
       )
     }
     await Promise.all(promises)

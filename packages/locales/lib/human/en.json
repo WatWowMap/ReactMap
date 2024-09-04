@@ -786,5 +786,12 @@
   "locale_instructions_8": "Wait for the pull request to be reviewed and merged",
   "enter_translation": "Enter Translation",
   "individual_filters": "Partially Filtered",
-  "data_limit_reached": "You have requested too much data recently and are on cooldown until {{until}}"
+  "data_limit_reached": "You have requested too much data recently and are on cooldown until {{until}}",
+  "unknown_station": "Unknown Power Spot",
+  "exclude_battle": "Exclude Battle",
+  "station": "Power Spot",
+  "stations": "Power Spots",
+  "stations_options": "Power Spot Options",
+  "all_stations": "All Power Spots",
+  "search_battles": "Search Battles"
 }

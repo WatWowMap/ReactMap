@@ -564,6 +564,12 @@ input[type='time']::-webkit-calendar-picker-indicator {
   width: 100%;
 }
 
+.popup-card-media {
+  display: grid;
+  grid-template-columns: 3fr 1fr;
+  object-fit: contain;
+}
+
 .badge-diamond {
   clip-path: polygon(50% 0%, 85% 55%, 50% 100%, 15% 55%);
   position: absolute;

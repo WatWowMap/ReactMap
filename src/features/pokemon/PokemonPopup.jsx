@@ -504,7 +504,7 @@ const PvpInfo = ({ pokemon, league, data, t, Icons }) => {
             id: `${league}-${each.pokemon}-${each.form}-${each.evolution}-${each.gender}-${each.rank}-${each.cp}-${each.lvl}-${each.cap}`,
             img: (
               <NameTT
-                id={[
+                title={[
                   each.evolution
                     ? `evo_${each.evolution}`
                     : each.form

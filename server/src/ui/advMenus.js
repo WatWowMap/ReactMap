@@ -17,6 +17,7 @@ const CATEGORIES = /** @type {const} */ ({
     'quest_reward_1',
     'general',
   ],
+  stations: ['pokemon'],
   pokemon: ['pokemon'],
   nests: ['pokemon'],
 })
@@ -98,6 +99,19 @@ function advMenus() {
         },
         categories: Object.fromEntries(
           CATEGORIES.pokestops.map((item) => [item, false]),
+        ),
+      },
+    },
+    stations: {
+      categories: CATEGORIES.stations,
+      filters: {
+        ...pokemonFilters,
+        others: {
+          ...pokemonFilters.others,
+          onlyAvailable: true,
+        },
+        categories: Object.fromEntries(
+          CATEGORIES.stations.map((item) => [item, false]),
         ),
       },
     },

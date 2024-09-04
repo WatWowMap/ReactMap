@@ -1,3 +1,5 @@
+// @ts-check
+
 const express = require('express')
 const fs = require('fs')
 const { join } = require('path')
@@ -132,7 +134,7 @@ rootRouter.get('/api/settings', async (req, res, next) => {
       !authentication.methods.length
     ) {
       if (req.session.tutorial === undefined) {
-        req.session.tutorial = !mapConfig.forceTutorial
+        req.session.tutorial = !mapConfig.misc.forceTutorial
       }
       req.session.perms = {
         ...Object.fromEntries(
@@ -187,13 +189,13 @@ rootRouter.get('/api/settings', async (req, res, next) => {
 
     if ('perms' in settings.user) {
       if (settings.user.perms.pokemon && api.queryOnSessionInit.pokemon) {
-        state.event.setAvailable('pokemon', 'Pokemon', state.db, false)
+        state.event.setAvailable('pokemon', 'Pokemon', state.db)
       }
       if (
         api.queryOnSessionInit.raids &&
         (settings.user.perms.raids || settings.user.perms.gyms)
       ) {
-        state.event.setAvailable('gyms', 'Gym', state.db, false)
+        state.event.setAvailable('gyms', 'Gym', state.db)
       }
       if (
         api.queryOnSessionInit.quests &&
@@ -202,10 +204,13 @@ rootRouter.get('/api/settings', async (req, res, next) => {
           settings.user.perms.invasions ||
           settings.user.perms.lures)
       ) {
-        state.event.setAvailable('pokestops', 'Pokestop', state.db, false)
+        state.event.setAvailable('pokestops', 'Pokestop', state.db)
       }
       if (settings.user.perms.nests && api.queryOnSessionInit.nests) {
-        state.event.setAvailable('nests', 'Nest', state.db, false)
+        state.event.setAvailable('nests', 'Nest', state.db)
+      }
+      if (settings.user.perms.stations && api.queryOnSessionInit.stations) {
+        state.event.setAvailable('stations', 'Station', state.db)
       }
     }
 

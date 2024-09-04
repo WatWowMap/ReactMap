@@ -5,7 +5,7 @@ const { BaseFilter } = require('../Base')
 /**
  *
  * @param {import("@rm/types").Config['defaultFilters']} defaults
- * @param {import('../pokemon/Frontend')} base
+ * @param {import('../pokemon/Frontend').PokemonFilter} base
  * @param {import('@rm/types').PokemonFilter} custom
  * @returns {{
  *  full: { [key: string]: import('@rm/types').PokemonFilter },
@@ -13,12 +13,14 @@ const { BaseFilter } = require('../Base')
  *  quests: { [key: string]: BaseFilter },
  *  nests: { [key: string]: BaseFilter },
  *  rocket: { [key: string]: BaseFilter },
+ *  stations: { [key: string]: BaseFilter },
  * }}
  */
 function buildPokemon(defaults, base, custom) {
   const pokemon = {
     full: { global: custom },
     raids: { global: new BaseFilter() },
+    stations: { global: new BaseFilter() },
     quests: { global: new BaseFilter() },
     nests: { global: new BaseFilter() },
     rocket: { global: new BaseFilter() },
@@ -35,6 +37,9 @@ function buildPokemon(defaults, base, custom) {
     Object.keys(pkmn.forms).forEach((form) => {
       pokemon.full[`${id}-${form}`] = base
       pokemon.raids[`${id}-${form}`] = new BaseFilter(defaults.gyms.pokemon)
+      pokemon.stations[`${id}-${form}`] = new BaseFilter(
+        defaults.stations.pokemon,
+      )
       pokemon.quests[`${id}-${form}`] = new BaseFilter(
         defaults.pokestops.pokemon,
       )

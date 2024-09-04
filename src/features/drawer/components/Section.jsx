@@ -22,7 +22,13 @@ import { PokemonDrawerMemo } from '../pokemon'
 import { AreaSection } from '../areas'
 import { Extras } from '../Extras'
 
-const ADV_CATEGORIES = new Set(['pokemon', 'gyms', 'pokestops', 'nests'])
+const ADV_CATEGORIES = new Set([
+  'pokemon',
+  'gyms',
+  'pokestops',
+  'nests',
+  'stations',
+])
 
 /** @param {{ category: keyof import('@rm/types').UIObject }} props */
 const DrawerSection = ({ category }) => {
