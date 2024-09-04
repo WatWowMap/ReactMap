@@ -574,7 +574,7 @@ export class UAssets {
   getStation(active = false) {
     try {
       // TODO: replace with lib method when it has been updated
-      return `${this[this.selected.station]?.path}/station/${active ? 1 : 0}.webp`
+      return `${this.fallback}/station/${active ? 1 : 0}.${this.fallbackExt}`
     } catch (e) {
       console.error(`[${this.assetType.toUpperCase()}]`, e)
       return `${this.fallback}/station/0.${this.fallbackExt}`
