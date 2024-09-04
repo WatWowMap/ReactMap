@@ -23,7 +23,6 @@ class Station extends Model {
     const select = ['id', 'name', 'lat', 'lon', 'updated']
 
     const query = this.query()
-      .select(select)
       .whereBetween('lat', [args.minLat, args.maxLat])
       .andWhereBetween('lon', [args.minLon, args.maxLon])
     // .where('is_inactive', false)
@@ -71,6 +70,8 @@ class Station extends Model {
         query.andWhere('battle_level', 'in', [...battleLevels])
       }
     }
+
+    query.select(select)
 
     if (!getAreaSql(query, areaRestrictions, onlyAreas, isMad)) {
       return []

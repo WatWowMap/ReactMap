@@ -567,14 +567,14 @@ export class UAssets {
     }
   }
 
-  // eslint-disable-next-line class-methods-use-this
-  getStation() {
-    // try {
-    return 'https://raw.githubusercontent.com/RetroJohn86/PoGo-Unpacked-APK/main/Unpacked%20APK/Sprite/bread_station_battle_icon.png'
-    // return this[this.selected.station]?.class?.station(level)
-    // } catch (e) {
-    //   console.error(`[${this.assetType.toUpperCase()}]`, e)
-    //   return `${this.fallback}/station/0.${this.fallbackExt}`
-    // }
+  /** @param {boolean} [active] */
+  getStation(active = false) {
+    try {
+      // TODO: replace with lib method when it has been updated
+      return `${this[this.selected.station]?.path}/station/${active ? 1 : 0}.webp`
+    } catch (e) {
+      console.error(`[${this.assetType.toUpperCase()}]`, e)
+      return `${this.fallback}/station/0.${this.fallbackExt}`
+    }
   }
 }
