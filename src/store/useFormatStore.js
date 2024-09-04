@@ -24,8 +24,8 @@ const getFormatters = (locale) => ({
     second: 'numeric',
   }),
   relativeFormat: new Intl.RelativeTimeFormat(locale, {
-    numeric: 'auto',
-    style: 'narrow',
+    numeric: 'always',
+    style: 'short',
   }),
   numberFormat: new Intl.NumberFormat(locale),
   collator: new Intl.Collator(locale, {
@@ -63,19 +63,26 @@ export const useFormatStore = create((set, get) => ({
     let seconds = Math.ceil((epoch * 1000 - Date.now()) / 1000)
     const rtf = get().relativeFormat
     const isNegative = seconds < 0
+    seconds = Math.abs(seconds)
     const result = []
 
     for (let i = 0; i < UNITS.length; i++) {
       const { unit, value } = UNITS[i]
       const count = Math.floor(seconds / value)
-      if (count !== 0) {
-        result.push(rtf.format(isNegative ? -count : count, unit))
+      if (count > 0) {
+        result.push(
+          rtf.format(isNegative ? -count : count, unit).replace('.', ''),
+        )
         seconds -= count * value
       }
     }
+
+    if (isNegative && result.length) return result[0]
+
     return result
-      .filter((_, i) => i < 3)
-      .map((r) => {
+      .filter((_, i) => i < 2)
+      .map((r, i) => {
+        if (i === 0) return r
         const [first, ...rest] = r.split(' ')
         if (+first) return r
         return rest.join(' ')

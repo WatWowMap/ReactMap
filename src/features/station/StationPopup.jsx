@@ -215,31 +215,33 @@ function StationContent({
   battle_level,
   start_time,
   end_time,
-  is_battle_available,
 }) {
   const { t } = useTranslation()
-  if (!battle_pokemon_id) return null
   return (
     <CardContent>
       <Stack alignItems="center" justifyContent="center" spacing={1}>
-        <Rating value={battle_level} max={Math.max(5, battle_level)} />
-        <Box textAlign="center">
-          <Typography variant="h6">{t(`poke_${battle_pokemon_id}`)}</Typography>
-          {!!battle_pokemon_form && (
-            <Typography variant="subtitle2">
-              {t(`form_${battle_pokemon_form}`)}
+        {!!battle_level && (
+          <Rating value={battle_level} max={Math.max(5, battle_level)} />
+        )}
+        {!!battle_pokemon_id && (
+          <Box textAlign="center">
+            <Typography variant="h6">
+              {t(`poke_${battle_pokemon_id}`)}
             </Typography>
-          )}
-          {!!battle_pokemon_costume && (
-            <Typography variant="subtitle2">
-              {t(`costume_${battle_pokemon_costume}`)}
-            </Typography>
-          )}
-        </Box>
-        <TimeStamp
-          start={!is_battle_available}
-          epoch={is_battle_available ? end_time : start_time}
-        />
+            {!!battle_pokemon_form && (
+              <Typography variant="subtitle2">
+                {t(`form_${battle_pokemon_form}`)}
+              </Typography>
+            )}
+            {!!battle_pokemon_costume && (
+              <Typography variant="subtitle2">
+                {t(`costume_${battle_pokemon_costume}`)}
+              </Typography>
+            )}
+          </Box>
+        )}
+        {start_time && <TimeStamp start epoch={start_time} />}
+        {end_time && <TimeStamp epoch={end_time} />}
       </Stack>
     </CardContent>
   )
@@ -254,11 +256,14 @@ function TimeStamp({ start = false, date = false, epoch }) {
   const { t } = useTranslation()
   const formatter = useFormatStore((s) => (date ? s.dateFormat : s.timeFormat))
   const relativeTime = useRelativeTimer(epoch || 0)
-
+  const pastTense = epoch * 1000 < Date.now()
   return (
     <Stack alignItems="center" justifyContent="space-around">
-      <Typography variant="h6">
-        {start ? t('starts') : t('ends')}:&nbsp;
+      <Typography variant="subtitle2">
+        {start
+          ? t(pastTense ? 'started' : 'starts')
+          : t(pastTense ? 'ended' : 'ends')}
+        &nbsp;
         {relativeTime}
       </Typography>
       <Typography variant="subtitle1">

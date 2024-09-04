@@ -18,6 +18,7 @@ export function stationMarker({
   battle_pokemon_gender,
   battle_pokemon_id,
   is_battle_available,
+  is_inactive,
 }) {
   const [, Icons] = useStorage(
     (s) => [s.icons, useMemory.getState().Icons],
@@ -26,7 +27,7 @@ export function stationMarker({
   const [baseIcon, baseSize, battleIcon, battleSize] = useStorage((s) => {
     const { filter } = s.filters.stations
     return [
-      Icons.getStation(),
+      Icons.getStation(!is_inactive),
       Icons.getSize('station', filter[`j${battle_level}`]?.size),
       Icons.getPokemon(
         battle_pokemon_id,

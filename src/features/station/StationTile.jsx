@@ -58,5 +58,11 @@ const BaseStationTile = (station) => {
 
 export const StationTile = React.memo(
   BaseStationTile,
-  (prev, next) => prev.id === next.id,
+  (prev, next) =>
+    prev.id === next.id &&
+    prev.battle_level === next.battle_level &&
+    prev.battle_pokemon_id === next.battle_pokemon_id &&
+    prev.battle_pokemon_form === next.battle_pokemon_form &&
+    prev.start_time === next.start_time &&
+    prev.end_time === next.end_time,
 )
