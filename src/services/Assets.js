@@ -56,6 +56,7 @@ export class UAssets {
         sizeMultiplier: 1,
         popupX: 0,
         popupY: 0,
+        manualPopup: 0,
       },
     }
 
@@ -197,6 +198,7 @@ export class UAssets {
   /**
    * @param {string} category
    * @param {'sm' | 'md' | 'lg' | 'xl'} [size]
+   * @returns {number}
    */
   getSize(category, size = 'md') {
     const baseSize = this.sizes[category]?.[size] || 20
@@ -254,6 +256,9 @@ export class UAssets {
       case 'i':
         // invasions
         return this.getInvasions(id.slice(1), true)
+      case 'j':
+        // stations
+        return this.getStation()
       case 'l':
         // lures
         return this.getPokestops(id.slice(1))
@@ -318,7 +323,7 @@ export class UAssets {
    * @param {string | number} [costume]
    * @param {string | number} [alignment]
    * @param {boolean} [shiny]
-   * @returns
+   * @returns {string}
    */
   getPokemon(
     pokemonId = 0,
@@ -345,7 +350,10 @@ export class UAssets {
     }
   }
 
-  /** @param {number | string} [typeId] */
+  /**
+   * @param {number | string} [typeId]
+   * @returns {string}
+   */
   getTypes(typeId = 0) {
     try {
       return this[this.selected.type]?.class?.type(typeId)
@@ -557,5 +565,16 @@ export class UAssets {
       console.error(`[${this.assetType.toUpperCase()}]`, e)
       return `${this.fallback}/spawnpoint/0.${this.fallbackExt}`
     }
+  }
+
+  // eslint-disable-next-line class-methods-use-this
+  getStation() {
+    // try {
+    return 'https://raw.githubusercontent.com/RetroJohn86/PoGo-Unpacked-APK/main/Unpacked%20APK/Sprite/bread_station_battle_icon.png'
+    // return this[this.selected.station]?.class?.station(level)
+    // } catch (e) {
+    //   console.error(`[${this.assetType.toUpperCase()}]`, e)
+    //   return `${this.fallback}/station/0.${this.fallbackExt}`
+    // }
   }
 }

@@ -3,14 +3,12 @@ import { useStorage } from '@store/useStorage'
 
 const METERS_PER_MILE = 1609.344
 
-/** @param {number} meters */
 export function formatDistance(
-  meters,
+  meters = 0,
   unit = useStorage.getState().settings.distanceUnit,
   locale = localStorage.getItem('i18nextLng') || 'en',
 ) {
-  const safe = meters || 0
-  const distance = unit === 'miles' ? safe / METERS_PER_MILE : safe / 1000
+  const distance = unit === 'miles' ? meters / METERS_PER_MILE : meters / 1000
 
   const numFormatter = new Intl.NumberFormat(locale, {
     unitDisplay: 'short',

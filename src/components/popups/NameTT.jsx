@@ -5,10 +5,10 @@ import { useTranslation } from 'react-i18next'
 
 /**
  *
- * @param {{ id: string | string[], children: React.ReactElement }} props
+ * @param {{ title: string | string[] } & Omit<import('@mui/material').TooltipProps, 'title'>} props
  * @returns
  */
-export function NameTT({ id, children }) {
+export function NameTT({ title, children }) {
   const { t } = useTranslation()
 
   return (
@@ -17,12 +17,12 @@ export function NameTT({ id, children }) {
       enterTouchDelay={0}
       placement="left-start"
       title={
-        Array.isArray(id)
-          ? id
+        Array.isArray(title)
+          ? title
               .filter(Boolean)
               .map((i) => t(i))
               .join(' ')
-          : t(id)
+          : t(title)
       }
     >
       {children}

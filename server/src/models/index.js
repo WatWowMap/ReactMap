@@ -13,6 +13,7 @@ const { Route } = require('./Route')
 const { ScanCell } = require('./ScanCell')
 const { Session } = require('./Session')
 const { Spawnpoint } = require('./Spawnpoint')
+const { Station } = require('./Station')
 const { User } = require('./User')
 const { Weather } = require('./Weather')
 
@@ -34,6 +35,7 @@ const scannerModels = {
   Route,
   ScanCell,
   Spawnpoint,
+  Station,
   Weather,
 }
 

@@ -18,22 +18,10 @@ const components = {
       },
     },
   },
-  MuiStack: {
-    defaultProps: {
-      direction: 'column',
-      justifyContent: 'flex-start',
-      alignItems: 'flex-start',
-      sx: (t) => ({
-        width: { xs: 50, sm: 65 },
-        zIndex: 5000,
-        '& > *': {
-          margin: `${t.spacing(1)} !important`,
-          position: 'sticky',
-          top: 0,
-          left: 5,
-          zIndex: 1000,
-          width: 10,
-        },
+  MuiRating: {
+    styleOverrides: {
+      iconFilled: ({ theme }) => ({
+        color: theme.palette.secondary.main,
       }),
     },
   },
@@ -71,6 +59,13 @@ const components = {
         '&.Mui-expanded:before': {
           opacity: 1,
         },
+      },
+    },
+  },
+  MuiCardActions: {
+    styleOverrides: {
+      root: {
+        padding: '0px 8px',
       },
     },
   },

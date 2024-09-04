@@ -16,7 +16,7 @@ function QuestImage(props) {
   const { Icons } = useMemory.getState()
   return (
     <Box maxHeight={45} maxWidth={45}>
-      <NameTT id={tt}>
+      <NameTT title={tt}>
         <Img
           src={src}
           maxHeight={45}
@@ -65,7 +65,7 @@ function PokemonImage({ pokemon_id, form, gender, costume, shiny }) {
   const { Icons } = useMemory.getState()
   const { t } = useTranslateById()
   return (
-    <NameTT id={[form ? `form_${form}` : '', `poke_${pokemon_id}`]}>
+    <NameTT title={[form ? `form_${form}` : '', `poke_${pokemon_id}`]}>
       <Img
         src={Icons.getPokemon(pokemon_id, form, 0, gender, costume, 0, shiny)}
         alt={t(`${pokemon_id}-${form}`)}
@@ -89,7 +89,7 @@ function RaidImage({
   const { t } = useTranslateById()
   return (
     <NameTT
-      id={[
+      title={[
         raid_pokemon_form ? `form_${raid_pokemon_form}` : '',
         raid_pokemon_evolution ? `evo_${raid_pokemon_evolution}` : '',
         `poke_${raid_pokemon_id}`,
@@ -117,7 +117,7 @@ function LureImage({ lure_id }) {
   const { Icons } = useMemory.getState()
   const { t } = useTranslateById()
   return (
-    <NameTT id={`lure_${lure_id}`}>
+    <NameTT title={`lure_${lure_id}`}>
       <Img
         src={Icons.getPokestops(lure_id)}
         alt={t(`lure_${lure_id}`)}
@@ -134,7 +134,7 @@ function NestImage({ nest_pokemon_id, nest_pokemon_form }) {
   const { t } = useTranslateById()
   return (
     <NameTT
-      id={[
+      title={[
         nest_pokemon_form ? `form_${nest_pokemon_form}` : '',
         `poke_${nest_pokemon_id}`,
       ]}
@@ -154,7 +154,7 @@ function InvasionImage({ grunt_type, confirmed }) {
   const { Icons } = useMemory.getState()
   const { t } = useTranslateById()
   return (
-    <NameTT id={`grunt_${grunt_type}`}>
+    <NameTT title={`grunt_${grunt_type}`}>
       <Img
         src={Icons.getInvasions(grunt_type, confirmed)}
         alt={t(`grunt_${grunt_type}`)}

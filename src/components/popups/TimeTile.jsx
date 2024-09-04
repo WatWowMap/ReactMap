@@ -8,7 +8,7 @@ import ExpandMore from '@mui/icons-material/ExpandMore'
 
 import { useStorage } from '@store/useStorage'
 
-import { TimeSince } from './Timer'
+import { Timer } from './Timer'
 import { NameTT } from './NameTT'
 
 /**
@@ -16,7 +16,6 @@ import { NameTT } from './NameTT'
  * @param {{
  *  expireTime: number
  *  icon?: string | React.ReactNode
- *  until?: boolean
  *  size?: number
  *  tt?: string[] | string
  *  expandKey?: string
@@ -29,7 +28,6 @@ import { NameTT } from './NameTT'
 export function TimeTile({
   expireTime,
   icon,
-  until,
   size = 3,
   tt = [],
   expandKey,
@@ -45,7 +43,7 @@ export function TimeTile({
       {icon && (
         <Grid xs={size} textAlign="center">
           {typeof icon === 'string' ? (
-            <NameTT id={disabled || tt}>
+            <NameTT title={disabled || tt}>
               <img
                 src={icon}
                 className={`quest-popup-img ${disabled ? 'disable-image' : ''}`}
@@ -72,9 +70,8 @@ export function TimeTile({
           xs={icon ? (children ? 10 : 12) - size : children ? 10 : 12}
           textAlign="center"
         >
-          <TimeSince
+          <Timer
             expireTime={expireTime}
-            until={until}
             color={disabled ? 'GrayText' : 'inherit'}
           />
           <Typography

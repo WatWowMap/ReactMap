@@ -4,7 +4,7 @@ import type {
   FormControlProps,
   SxProps,
   Theme,
-  SelectProps,
+  BaseSelectProps,
 } from '@mui/material'
 import type { SelectInputProps } from '@mui/material/Select/SelectInput'
 import { SystemStyleObject } from '@mui/system'
@@ -124,7 +124,7 @@ export type useDeepStore = <
   (arg1: V, ...rest: V extends keyof U ? [arg2: U[V]] : [arg2?: never]) => void,
 ]
 
-export interface FCSelectProps<Value = unknown> extends SelectProps<Value> {
+export interface FCSelectProps<Value = unknown> extends BaseSelectProps<Value> {
   fcSx?: SxProps
   setWidth?: (width: number) => void
 }

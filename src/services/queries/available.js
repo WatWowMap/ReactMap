@@ -37,3 +37,9 @@ export const GET_AVAILABLE_NESTS = gql`
     availableNests
   }
 `
+
+export const GET_AVAILABLE_STATIONS = gql`
+  query AvailableStations {
+    availableStations
+  }
+`

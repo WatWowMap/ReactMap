@@ -66,6 +66,7 @@ export interface Available {
   gyms: ModelReturn<typeof Gym, 'getAvailable'>
   pokestops: ModelReturn<typeof Pokestop, 'getAvailable'>
   nests: ModelReturn<typeof Nest, 'getAvailable'>
+  stations: ModelReturn<typeof Badge, 'getAvailable'>
 }
 
 export interface ApiEndpoint {
@@ -141,69 +142,14 @@ export interface GqlContext {
   startTime?: number
 }
 
-export interface Permissions {
-  map: boolean
-  pokemon: boolean
-  iv: boolean
-  pvp: boolean
-  gyms: boolean
-  raids: boolean
-  pokestops: boolean
-  eventStops: boolean
-  quests: boolean
-  lures: boolean
-  portals: boolean
-  submissionCells: boolean
-  invasions: boolean
-  nests: boolean
-  nestSubmissions: boolean
-  scanAreas: boolean
-  weather: boolean
-  spawnpoints: boolean
-  s2cells: boolean
-  scanCells: boolean
-  devices: boolean
-  donor: boolean
-  gymBadges: boolean
-  backups: boolean
-  routes: boolean
-  blocked: boolean
-  admin: boolean
+type BasePerms = { [K in keyof Config['authentication']['perms']]: boolean }
+
+export interface Permissions extends BasePerms {
   blockedGuildNames: string[]
   scanner: string[]
   areaRestrictions: string[]
   webhooks: string[]
   trial: boolean
-}
-
-export interface Waypoint {
-  lat_degrees: number
-  lng_degrees: number
-  elevation_in_meters: number
-}
-
-export interface Route {
-  id: string
-  name: string
-  description: string
-  distance_meters: number
-  duration_seconds: number
-  start_fort_id: string
-  start_lat: number
-  start_lon: number
-  start_image: string
-  end_fort_id: string
-  end_lat: number
-  end_lon: number
-  end_image: string
-  image: string
-  image_border_color: string
-  reversible: boolean
-  tags?: string[]
-  type: number
-  updated: number
-  version: number
-  waypoints: Waypoint[]
 }
 
 export interface FilterId {
@@ -249,7 +195,12 @@ export type AllFilters = ReturnType<
 
 export type Categories = keyof AllFilters
 
-export type AdvCategories = 'pokemon' | 'gyms' | 'pokestops' | 'nests'
+export type AdvCategories =
+  | 'pokemon'
+  | 'gyms'
+  | 'pokestops'
+  | 'nests'
+  | 'stations'
 
 export type UIObject = ReturnType<
   (typeof import('server/src/ui/drawer'))['drawer']

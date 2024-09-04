@@ -29,6 +29,7 @@ class EventManager extends Logger {
       pokestops: [],
       pokemon: [],
       nests: [],
+      stations: [],
     })
     this.uicons = getCache('uicons.json', [])
     this.uaudio = getCache('uaudio.json', [])
@@ -214,6 +215,17 @@ class EventManager extends Logger {
           })
         },
         1000 * 60 * 60 * (config.getSafe('api.queryUpdateHours.quests') || 3),
+      )
+    }
+    if (!config.getSafe('api.queryOnSessionInit.stations')) {
+      this.intervals.stationUpdate = setInterval(
+        async () => {
+          await this.setAvailable('stations', 'Station', Db)
+          await this.chatLog('event', {
+            description: 'Refreshed available stations',
+          })
+        },
+        1000 * 60 * 60 * (config.getSafe('api.queryUpdateHours.stations') || 1),
       )
     }
     this.intervals.uicons = setInterval(

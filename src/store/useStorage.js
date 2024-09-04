@@ -27,6 +27,7 @@ import { setDeep } from '@utils/setDeep'
  *    gyms: string,
  *    pokestops: string,
  *    nests: string,
+ *    stations: string,
  *   }
  *   searches: Record<string, string>,
  *   tabs: Record<string, number>,
@@ -143,6 +144,7 @@ export const useStorage = create(
         gyms: 'categories',
         pokestops: 'categories',
         nests: 'others',
+        stations: 'others',
       },
       search: '',
       searchTab: '',

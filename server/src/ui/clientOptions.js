@@ -58,6 +58,17 @@ function clientOptions(perms) {
         ? { type: 'bool', perm: ['pokestops'] }
         : undefined,
     },
+    stations: {
+      clustering: { type: 'bool', perm: ['stations', 'dynamax'] },
+      battleTimers: { type: 'bool', perm: ['dynamax'] },
+      battleOpacity: { type: 'bool', perm: ['dynamax'] },
+      opacityTenMinutes: { type: 'number', perm: ['dynamax'] },
+      opacityFiveMinutes: { type: 'number', perm: ['dynamax'] },
+      opacityOneMinute: { type: 'number', perm: ['dynamax'] },
+      enableStationPopupCoords: map.misc.enableStationPopupCoordsSelector
+        ? { type: 'bool', perm: ['stations', 'dynamax'] }
+        : undefined,
+    },
     pokemon: {
       clustering: { type: 'bool', perm: ['pokemon'] },
       linkGlobalAndAdvanced: { type: 'bool', perm: ['pokemon'] },
