@@ -48,7 +48,8 @@
       "portals": true,
       "nests": true,
       "pokemon": true,
-      "invasions": true
+      "invasions": true,
+      "stations": true
     },
     "queryUpdateHours": {
       "pokemon": 0.17,
@@ -115,6 +116,7 @@
     },
     "portalUpdateLimit": 30,
     "weatherCellLimit": 3,
+    "stationUpdateLimit": 30,
     "searchResultsLimit": 15,
     "searchSoftKmLimit": 10,
     "searchHardKmLimit": 100,

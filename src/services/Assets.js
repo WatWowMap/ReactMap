@@ -521,15 +521,12 @@ export class UAssets {
   getMisc(fileName = '') {
     try {
       const miscClass = this[this.selected.misc]?.class
-
+      const singular = fileName.slice(0, -1)
       if (miscClass.has('misc', fileName)) {
         return miscClass.misc(fileName)
       }
-      if (
-        fileName.endsWith('s') &&
-        miscClass.has('misc', fileName.slice(0, -1))
-      ) {
-        return miscClass.misc(fileName.slice(0, -1))
+      if (fileName.endsWith('s') && miscClass.has('misc', singular)) {
+        return miscClass.misc(singular)
       }
       if (!fileName.endsWith('s') && miscClass.has('misc', `${fileName}s`)) {
         return miscClass.misc(`${fileName}s`)
@@ -539,6 +536,12 @@ export class UAssets {
         this[this.selected[fileName]].class.has(fileName, `0`)
       ) {
         return this[this.selected[fileName]].class[fileName]('0')
+      }
+      if (
+        this[this.selected[singular]]?.path &&
+        this[this.selected[singular]].class.has(singular, `0`)
+      ) {
+        return this[this.selected[singular]].class[singular]('0')
       }
       return miscClass.misc('0')
     } catch (e) {
