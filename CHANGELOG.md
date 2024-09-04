@@ -1,3 +1,11 @@
+## [1.34.1-develop.5](https://github.com/WatWowMap/ReactMap/compare/v1.34.1-develop.4...v1.34.1-develop.5) (2024-09-04)
+
+
+### Bug Fixes
+
+* properly support gym defender temp evolutions ([4595820](https://github.com/WatWowMap/ReactMap/commit/45958204c9de795d12cb0a0e241982edcd1f5973))
+* set proper type for compat golbat ([0d5b5f7](https://github.com/WatWowMap/ReactMap/commit/0d5b5f79128887fca18e3032773504784e5365d0))
+
 ## [1.34.1-develop.4](https://github.com/WatWowMap/ReactMap/compare/v1.34.1-develop.3...v1.34.1-develop.4) (2024-08-30)
 
 
