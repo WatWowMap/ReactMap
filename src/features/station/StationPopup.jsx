@@ -37,7 +37,7 @@ export function StationPopup(station) {
   useAnalytics('Popup', 'Station')
 
   return (
-    <Card sx={{ width: 200 }}>
+    <Card sx={{ width: 200 }} elevation={0}>
       <StationHeader {...station} />
       <StationMedia {...station} />
       <StationContent {...station} />
@@ -48,6 +48,7 @@ export function StationPopup(station) {
         justifyContent="space-evenly"
       >
         <Navigation lat={station.lat} lon={station.lon} />
+        <StationMenu {...station} />
       </Box>
     </Card>
   )
@@ -58,17 +59,40 @@ export function StationPopup(station) {
  * @param {import('@rm/types').Station} station
  * @returns
  */
-function StationHeader({
+function StationHeader({ name, updated }) {
+  const { t } = useTranslation()
+  const dateFormatter = useFormatStore((s) => s.dateFormat)
+
+  return (
+    <CardHeader
+      title={
+        <Title
+          align="left"
+          variant="subtitle1"
+          fontWeight="bold"
+          backup={t('unknown_station')}
+          maxWidth={168}
+        >
+          {name}
+        </Title>
+      }
+      subheader={
+        <Typography variant="caption">
+          {dateFormatter.format(new Date(updated * 1000))}
+        </Typography>
+      }
+    />
+  )
+}
+
+function StationMenu({
   id,
-  name,
-  updated,
   battle_level,
   battle_pokemon_id,
   battle_pokemon_form,
 }) {
   const [anchorEl, setAnchorEl] = React.useState(null)
   const { t } = useTranslation()
-  const dateFormatter = useFormatStore((s) => s.dateFormat)
 
   const handleClick = React.useCallback(
     (event) => setAnchorEl(event.currentTarget),
@@ -113,23 +137,9 @@ function StationHeader({
 
   return (
     <>
-      <CardHeader
-        action={
-          <IconButton aria-label="actions" onClick={handleClick}>
-            <MoreVertIcon />
-          </IconButton>
-        }
-        title={
-          <Box overflow="none" width={130}>
-            <Title backup={t('unknown_station')}>{name}</Title>
-          </Box>
-        }
-        subheader={
-          <Typography variant="caption">
-            {dateFormatter.format(new Date(updated * 1000))}
-          </Typography>
-        }
-      />
+      <IconButton aria-label="actions" onClick={handleClick}>
+        <MoreVertIcon />
+      </IconButton>
       <Menu anchorEl={anchorEl} open={!!anchorEl} onClose={handleClose}>
         {options.map((option) => (
           <MenuItem
@@ -147,7 +157,6 @@ function StationHeader({
     </>
   )
 }
-
 /**
  *
  * @param {import('@rm/types').Station} station
@@ -240,8 +249,8 @@ function StationContent({
             )}
           </Box>
         )}
-        {start_time && <TimeStamp start epoch={start_time} />}
-        {end_time && <TimeStamp epoch={end_time} />}
+        {start_time && <TimeStamp start date epoch={start_time} />}
+        {end_time && <TimeStamp date epoch={end_time} />}
       </Stack>
     </CardContent>
   )
@@ -257,8 +266,9 @@ function TimeStamp({ start = false, date = false, epoch }) {
   const formatter = useFormatStore((s) => (date ? s.dateFormat : s.timeFormat))
   const relativeTime = useRelativeTimer(epoch || 0)
   const pastTense = epoch * 1000 < Date.now()
+
   return (
-    <Stack alignItems="center" justifyContent="space-around">
+    <Stack alignItems="center" justifyContent="center">
       <Typography variant="subtitle2">
         {start
           ? t(pastTense ? 'started' : 'starts')
@@ -266,7 +276,7 @@ function TimeStamp({ start = false, date = false, epoch }) {
         &nbsp;
         {relativeTime}
       </Typography>
-      <Typography variant="subtitle1">
+      <Typography variant="caption">
         {formatter.format(new Date(epoch * 1000))}
       </Typography>
     </Stack>
