@@ -69,8 +69,8 @@ export function stationMarker({
         "
       />
      ${
-       is_battle_available &&
-       /* html */ `
+       is_battle_available
+         ? /* html */ `
         <img
             src="${battleIcon}"
             alt="${battleIcon}"
@@ -84,6 +84,7 @@ export function stationMarker({
           "
         />
       `
+         : ''
      }
     </div>
 `,
