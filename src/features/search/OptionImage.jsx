@@ -167,7 +167,11 @@ function InvasionImage({ grunt_type, confirmed }) {
 
 function Misc() {
   const { searchTab } = useStorage.getState()
-  const miscIcon = useMemory((s) => s.Icons.getMisc(searchTab))
+  const miscIcon = useMemory((s) =>
+    searchTab === 'stations'
+      ? s.Icons.getStation()
+      : s.Icons.getMisc(searchTab),
+  )
   return <Img src={miscIcon} alt={searchTab} maxHeight={45} maxWidth={45} />
 }
 

@@ -440,6 +440,8 @@ const resolvers = {
           return perms.portals ? Db.search('Portal', perms, args) : []
         case 'nests':
           return perms.nests ? Db.search('Nest', perms, args) : []
+        case 'stations':
+          return perms.stations ? Db.search('Station', perms, args) : []
         default:
           return []
       }

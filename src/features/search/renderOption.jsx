@@ -22,6 +22,8 @@ import { OptionImageMemo } from './OptionImage'
 /** @param {string} tab */
 const getBackupName = (tab) => {
   switch (tab) {
+    case 'stations':
+      return 'unknown_station'
     case 'quests':
     case 'pokestops':
       return 'unknown_pokestop'

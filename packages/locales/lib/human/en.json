@@ -795,5 +795,6 @@
   "all_stations": "All Power Spots",
   "search_battles": "Search Battles",
   "started": "Started",
-  "ended": "Ended"
+  "ended": "Ended",
+  "global_search_stations": "Search Power Spots"
 }
