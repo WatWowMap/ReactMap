@@ -291,6 +291,10 @@
       "spawnpoints": {
         "zoomLevel": 12,
         "forcedLimit": 5000
+      },
+      "stations": {
+        "zoomLevel": 14,
+        "forcedLimit": 2500
       }
     },
     "messageOfTheDay": {
