@@ -11,7 +11,7 @@ const { getCenter } = require('./getCenter')
 
 /**
  *
- * @param {Date} date
+ * @param {Date} [date]
  * @returns
  */
 function getEpoch(date = new Date()) {

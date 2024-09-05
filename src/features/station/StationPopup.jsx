@@ -1,6 +1,7 @@
 /* eslint-disable react/destructuring-assignment */
 // @ts-check
 import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 import Card from '@mui/material/Card'
 import CardMedia from '@mui/material/CardMedia'
 import CardContent from '@mui/material/CardContent'
@@ -15,9 +16,8 @@ import Typography from '@mui/material/Typography'
 import Stack from '@mui/material/Stack'
 import Box from '@mui/material/Box'
 
-import { useTranslation } from 'react-i18next'
 import { useMemory } from '@store/useMemory'
-import { setDeepStore } from '@store/useStorage'
+import { setDeepStore, useStorage } from '@store/useStorage'
 import { Navigation } from '@components/popups/Navigation'
 import { useTranslateById } from '@hooks/useTranslateById'
 import { PokeType } from '@components/popups/PokeType'
@@ -27,6 +27,7 @@ import { useFormatStore } from '@store/useFormatStore'
 import { useRelativeTimer } from '@hooks/useRelativeTime'
 import { useAnalytics } from '@hooks/useAnalytics'
 import { Title } from '@components/popups/Title'
+import { VisibleToggle } from '@components/inputs/VisibleToggle'
 
 /**
  *
@@ -81,6 +82,7 @@ function StationHeader({ name, updated }) {
           {dateFormatter.format(new Date(updated * 1000))}
         </Typography>
       }
+      sx={{ p: 0 }}
     />
   )
 }
@@ -180,6 +182,7 @@ function StationMedia({
       battle_pokemon_alignment,
     ),
   )
+  const stationImage = useMemory((s) => s.Icons.getStation(true))
   const pokemon = useMemory((s) => {
     if (!battle_pokemon_id) return null
     const poke = s.masterfile.pokemon[battle_pokemon_id]
@@ -189,8 +192,7 @@ function StationMedia({
     return poke
   })
 
-  if (!battle_pokemon_id) return null
-  return (
+  return battle_pokemon_id ? (
     <CardMedia>
       <Box className="popup-card-media">
         <Box className="flex-center">
@@ -209,6 +211,14 @@ function StationMedia({
         </Stack>
       </Box>
     </CardMedia>
+  ) : (
+    <Box width="100%" className="flex-center">
+      <CardMedia
+        component="img"
+        src={stationImage}
+        sx={{ maxWidth: 100, maxHeight: 100 }}
+      />
+    </Box>
   )
 }
 
@@ -224,10 +234,11 @@ function StationContent({
   battle_level,
   start_time,
   end_time,
+  id,
 }) {
   const { t } = useTranslation()
   return (
-    <CardContent>
+    <CardContent sx={{ p: 0 }}>
       <Stack alignItems="center" justifyContent="center" spacing={1}>
         {!!battle_level && (
           <Rating value={battle_level} max={Math.max(5, battle_level)} />
@@ -249,8 +260,11 @@ function StationContent({
             )}
           </Box>
         )}
-        {start_time && <TimeStamp start date epoch={start_time} />}
-        {end_time && <TimeStamp date epoch={end_time} />}
+        {start_time > Date.now() / 1000 ? (
+          <TimeStamp start date epoch={start_time || 0} id={id} />
+        ) : (
+          <TimeStamp date epoch={end_time || 0} id={id} />
+        )}
       </Stack>
     </CardContent>
   )
@@ -258,27 +272,45 @@ function StationContent({
 
 /**
  *
- * @param {{ start?: boolean, date?: boolean, epoch: number }} props
+ * @param {{ start?: boolean, date?: boolean, epoch: number, id: string }} props
  * @returns
  */
-function TimeStamp({ start = false, date = false, epoch }) {
+function TimeStamp({ start = false, date = false, epoch, id }) {
   const { t } = useTranslation()
   const formatter = useFormatStore((s) => (date ? s.dateFormat : s.timeFormat))
   const relativeTime = useRelativeTimer(epoch || 0)
   const pastTense = epoch * 1000 < Date.now()
+  const timerIsAlwaysVisible = useStorage(
+    (s) => s.userSettings.stations.battleTimers,
+  )
+  const timerAlreadyVisible = useMemory((s) => s.timerList.includes(id))
 
   return (
-    <Stack alignItems="center" justifyContent="center">
-      <Typography variant="subtitle2">
-        {start
-          ? t(pastTense ? 'started' : 'starts')
-          : t(pastTense ? 'ended' : 'ends')}
-        &nbsp;
-        {relativeTime}
-      </Typography>
-      <Typography variant="caption">
-        {formatter.format(new Date(epoch * 1000))}
-      </Typography>
+    <Stack justifyContent="space-evenly" direction="row" width="100%">
+      <VisibleToggle
+        visible={timerIsAlwaysVisible || timerAlreadyVisible}
+        disabled={timerIsAlwaysVisible}
+        onClick={() =>
+          useMemory.setState((prev) => {
+            if (prev.timerList.includes(id)) {
+              return { timerList: prev.timerList.filter((x) => x !== id) }
+            }
+            return { timerList: [...prev.timerList, id] }
+          })
+        }
+      />
+      <Stack alignItems="center" justifyContent="center">
+        <Typography variant="subtitle2">
+          {start
+            ? t(pastTense ? 'started' : 'starts')
+            : t(pastTense ? 'ended' : 'ends')}
+          &nbsp;
+          {relativeTime}
+        </Typography>
+        <Typography variant="caption">
+          {formatter.format(new Date(epoch * 1000))}
+        </Typography>
+      </Stack>
     </Stack>
   )
 }

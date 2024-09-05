@@ -10,7 +10,7 @@ import { useForcePopup } from '@hooks/useForcePopup'
 import { TooltipWrapper } from '@components/ToolTipWrapper'
 
 import { StationPopup } from './StationPopup'
-import { stationMarker } from './stationMarker'
+import { useStationMarker } from './useStationMarker'
 
 /**
  *
@@ -48,7 +48,7 @@ const BaseStationTile = (station) => {
     <Marker
       ref={setMarkerRef}
       position={[station.lat, station.lon]}
-      icon={stationMarker(station)}
+      icon={useStationMarker(station)}
     >
       <Popup position={[station.lat, station.lon]}>
         <StationPopup {...station} />
