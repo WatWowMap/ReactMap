@@ -22,7 +22,7 @@ class Station extends Model {
     const { onlyAreas } = args.filters
     const ts = getEpoch()
 
-    const select = ['id', 'name', 'lat', 'lon', 'updated']
+    const select = ['id', 'name', 'lat', 'lon', 'updated', 'start_time', 'end_time',]
 
     const query = this.query()
       .whereBetween('lat', [args.minLat, args.maxLat])
@@ -32,8 +32,6 @@ class Station extends Model {
 
     if (perms.dynamax) {
       select.push(
-        'start_time',
-        'end_time',
         'battle_level',
         'battle_pokemon_id',
         'battle_pokemon_form',
