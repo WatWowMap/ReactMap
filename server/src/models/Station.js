@@ -3,6 +3,7 @@ const { Model } = require('objection')
 const config = require('@rm/config')
 
 const { getAreaSql } = require('../utils/getAreaSql')
+const { getEpoch } = require('../utils/getClientTime')
 
 class Station extends Model {
   static get tableName() {
@@ -19,12 +20,14 @@ class Station extends Model {
   static async getAll(perms, args, { isMad }) {
     const { areaRestrictions } = perms
     const { onlyAreas } = args.filters
+    const ts = getEpoch()
 
     const select = ['id', 'name', 'lat', 'lon', 'updated']
 
     const query = this.query()
       .whereBetween('lat', [args.minLat, args.maxLat])
       .andWhereBetween('lon', [args.minLon, args.maxLon])
+      .andWhere('end_time', '>', ts)
     // .where('is_inactive', false)
 
     if (perms.dynamax) {

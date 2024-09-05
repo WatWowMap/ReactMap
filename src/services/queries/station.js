@@ -9,14 +9,14 @@ const core = gql`
     lat
     lon
     updated
-    is_inactive
+    start_time
+    end_time
   }
 `
 
 const battle = gql`
   fragment Battle on Station {
-    start_time
-    end_time
+    is_inactive
     is_battle_available
     battle_level
     battle_pokemon_id

@@ -10,7 +10,7 @@ import { useOpacity } from '@hooks/useOpacity'
  * @param {import('@rm/types').Station} param0
  * @returns
  */
-export function stationMarker({
+export function useStationMarker({
   battle_level,
   battle_pokemon_alignment,
   battle_pokemon_costume,
@@ -18,7 +18,7 @@ export function stationMarker({
   battle_pokemon_gender,
   battle_pokemon_id,
   is_battle_available,
-  is_inactive,
+  start_time,
 }) {
   const [, Icons] = useStorage(
     (s) => [s.icons, useMemory.getState().Icons],
@@ -27,7 +27,7 @@ export function stationMarker({
   const [baseIcon, baseSize, battleIcon, battleSize] = useStorage((s) => {
     const { filter } = s.filters.stations
     return [
-      Icons.getStation(!is_inactive),
+      Icons.getStation(start_time < Date.now() / 1000),
       Icons.getSize('station', filter[`j${battle_level}`]?.size),
       Icons.getPokemon(
         battle_pokemon_id,
@@ -49,7 +49,7 @@ export function stationMarker({
   return divIcon({
     popupAnchor: [
       0 + stationMod.popupX + stationMod.offsetX,
-      (-baseSize - battleSize) * 0.67 +
+      (-baseSize - (is_battle_available ? battleSize : 0)) * 0.67 +
         stationMod.popupY +
         stationMod.offsetY +
         (battleMod.offsetY + battleMod.popupY),
