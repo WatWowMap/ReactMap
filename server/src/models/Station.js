@@ -22,7 +22,15 @@ class Station extends Model {
     const { onlyAreas } = args.filters
     const ts = getEpoch()
 
-    const select = ['id', 'name', 'lat', 'lon', 'updated', 'start_time', 'end_time',]
+    const select = [
+      'id',
+      'name',
+      'lat',
+      'lon',
+      'updated',
+      'start_time',
+      'end_time',
+    ]
 
     const query = this.query()
       .whereBetween('lat', [args.minLat, args.maxLat])
