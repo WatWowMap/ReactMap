@@ -13,6 +13,10 @@ export const useProcessError = (error) => {
   const [errorState, setErrorState] = React.useState(false)
 
   React.useEffect(() => {
+    if (error) {
+      // eslint-disable-next-line no-console
+      console.error(error)
+    }
     if (error?.networkError && 'statusCode' in error.networkError) {
       if (error.networkError?.statusCode === 464) {
         useMemory.setState({ clientError: 'old_client' })
