@@ -655,7 +655,9 @@ const ExtraGymInfo = ({
             src={Icons.getPokemon(
               guarding_pokemon_id,
               gpd.form,
-              gpd.temp_evolution,
+              Date.now() > gpd.temp_evolution_finish_ms
+                ? 0
+                : gpd.temp_evolution,
               gpd.gender,
               gpd.costume,
               gpd.alignment,

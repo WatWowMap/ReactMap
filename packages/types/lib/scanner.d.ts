@@ -35,6 +35,7 @@ export interface PokemonDisplay {
   gender: number
   shiny: boolean
   temp_evolution: number
+  temp_evolution_finish_ms?: number
   alignment: number
   badge: number
   location_card: number

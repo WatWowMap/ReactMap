@@ -130,7 +130,6 @@ export function Config({ children }) {
         timeOfDay: timeCheck(...location),
         config: {
           ...data.map,
-          loginPage: null,
           holidayEffects: (data.map.holidayEffects || []).filter(checkHoliday),
         },
         polling: data.api.polling,
