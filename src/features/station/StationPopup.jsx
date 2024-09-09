@@ -17,7 +17,7 @@ import Stack from '@mui/material/Stack'
 import Box from '@mui/material/Box'
 
 import { useMemory } from '@store/useMemory'
-import { setDeepStore, useStorage } from '@store/useStorage'
+import { setDeepStore } from '@store/useStorage'
 import { Navigation } from '@components/popups/Navigation'
 import { useTranslateById } from '@hooks/useTranslateById'
 import { PokeType } from '@components/popups/PokeType'
@@ -27,7 +27,6 @@ import { useFormatStore } from '@store/useFormatStore'
 import { useRelativeTimer } from '@hooks/useRelativeTime'
 import { useAnalytics } from '@hooks/useAnalytics'
 import { Title } from '@components/popups/Title'
-import { VisibleToggle } from '@components/inputs/VisibleToggle'
 
 /**
  *
@@ -275,19 +274,19 @@ function StationContent({
  * @param {{ start?: boolean, date?: boolean, epoch: number, id: string }} props
  * @returns
  */
-function TimeStamp({ start = false, date = false, epoch, id }) {
+function TimeStamp({ start = false, date = false, epoch }) {
   const { t } = useTranslation()
   const formatter = useFormatStore((s) => (date ? s.dateFormat : s.timeFormat))
   const relativeTime = useRelativeTimer(epoch || 0)
   const pastTense = epoch * 1000 < Date.now()
-  const timerIsAlwaysVisible = useStorage(
-    (s) => s.userSettings.stations.battleTimers,
-  )
-  const timerAlreadyVisible = useMemory((s) => s.timerList.includes(id))
+  // const timerIsAlwaysVisible = useStorage(
+  //   (s) => s.userSettings.stations.battleTimers,
+  // )
+  // const timerAlreadyVisible = useMemory((s) => s.timerList.includes(id))
 
   return (
     <Stack justifyContent="space-evenly" direction="row" width="100%">
-      <VisibleToggle
+      {/* <VisibleToggle
         visible={timerIsAlwaysVisible || timerAlreadyVisible}
         disabled={timerIsAlwaysVisible}
         onClick={() =>
@@ -298,7 +297,7 @@ function TimeStamp({ start = false, date = false, epoch, id }) {
             return { timerList: [...prev.timerList, id] }
           })
         }
-      />
+      /> */}
       <Stack alignItems="center" justifyContent="center">
         <Typography variant="subtitle2">
           {start
