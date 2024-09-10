@@ -379,7 +379,7 @@
     },
     "stations": {
       "clustering": true,
-      "battleTimers": false,
+      "stationTimers": false,
       "battleOpacity": true,
       "enableStationPopupCoords": false,
       "opacityTenMinutes": 0.75,

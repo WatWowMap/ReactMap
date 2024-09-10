@@ -288,7 +288,7 @@ function TimeStamp({ start = false, date = false, epoch }) {
   const relativeTime = useRelativeTimer(epoch || 0)
   const pastTense = epoch * 1000 < Date.now()
   // const timerIsAlwaysVisible = useStorage(
-  //   (s) => s.userSettings.stations.battleTimers,
+  //   (s) => s.userSettings.stations.stationTimers,
   // )
   // const timerAlreadyVisible = useMemory((s) => s.timerList.includes(id))
 

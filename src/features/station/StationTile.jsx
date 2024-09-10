@@ -24,7 +24,7 @@ const BaseStationTile = (station) => {
   const individualTimer = useMemory((s) => s.timerList.includes(station.id))
 
   const showTimer = useStorage(
-    (s) => s?.userSettings?.stations?.battleTimers || individualTimer,
+    (s) => s?.userSettings?.stations?.stationTimers || individualTimer,
   )
 
   const timers = React.useMemo(() => {
