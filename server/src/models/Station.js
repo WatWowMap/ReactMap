@@ -53,6 +53,7 @@ class Station extends Model {
       )
 
       if (!onlyAllStations) {
+        query.whereNotNull('battle_pokemon_id')
         if (onlyBattleTier === 'all') {
           const battleBosses = new Set()
           const battleForms = new Set()
@@ -90,25 +91,30 @@ class Station extends Model {
       }
     }
 
-    query.select(select)
-
     if (!getAreaSql(query, areaRestrictions, onlyAreas, isMad)) {
       return []
     }
     /** @type {import("@rm/types").FullStation[]} */
-    const results = await query
+    const results = await query.select(select)
 
-    return results.filter(
-      (station) =>
-        onlyAllStations ||
-        !perms.dynamax ||
-        args.filters[`j${station.battle_level}`] ||
-        args.filters[
-          `${station.battle_pokemon_id}-${station.battle_pokemon_form}`
-        ] ||
-        onlyBattleTier === 'all' ||
-        onlyBattleTier === station.battle_level,
-    )
+    return results
+      .filter(
+        (station) =>
+          onlyAllStations ||
+          !perms.dynamax ||
+          args.filters[`j${station.battle_level}`] ||
+          args.filters[
+            `${station.battle_pokemon_id}-${station.battle_pokemon_form}`
+          ] ||
+          onlyBattleTier === 'all' ||
+          onlyBattleTier === station.battle_level,
+      )
+      .map((station) => {
+        if (station.is_battle_available && station.battle_pokemon_id === null) {
+          station.is_battle_available = false
+        }
+        return station
+      })
   }
 
   /**

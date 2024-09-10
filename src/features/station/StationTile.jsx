@@ -60,13 +60,16 @@ const BaseStationTile = (station) => {
   )
 }
 
+function compareValueOrFalsy(prev, next) {
+  return prev === next || (!prev && !next)
+}
+
 export const StationTile = React.memo(
   BaseStationTile,
   (prev, next) =>
     prev.id === next.id &&
-    prev.battle_level === next.battle_level &&
-    prev.battle_pokemon_id === next.battle_pokemon_id &&
-    prev.battle_pokemon_form === next.battle_pokemon_form &&
+    compareValueOrFalsy(prev.battle_level, next.battle_level) &&
+    compareValueOrFalsy(prev.battle_pokemon_id, next.battle_pokemon_id) &&
     prev.start_time === next.start_time &&
     prev.end_time === next.end_time,
 )
