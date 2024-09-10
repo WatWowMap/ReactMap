@@ -75,6 +75,7 @@ export type UiconImage = `${string}.${ImageExt}`
 export interface UICONS {
   device: UiconImage[]
   gym: UiconImage[]
+  station: UiconImage[]
   invasion: UiconImage[]
   misc: UiconImage[]
   nest: UiconImage[]
