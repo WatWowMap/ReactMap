@@ -4,21 +4,21 @@ import type {
   RmModels,
   RmModelKeys,
   ModelKeys,
+  Station,
+  Backup,
+  Nest,
+  NestSubmission,
+  Pokestop,
+  Gym,
+  Pokemon,
 } from 'server/src/models'
 import { Knex } from 'knex'
 import { Model } from 'objection'
 import { NextFunction, Request, Response } from 'express'
 import { VerifyCallback } from 'passport-oauth2'
 
-import DbManager = require('server/src/services/DbManager')
-import EventManager = require('server/src/services/EventManager')
-import Pokemon = require('server/src/models/Pokemon')
-import Gym = require('server/src/models/Gym')
-import Badge = require('server/src/models/Badge')
-import Backup = require('server/src/models/Backup')
-import Nest = require('server/src/models/Nest')
-import NestSubmission = require('server/src/models/NestSubmission')
-import Pokestop = require('server/src/models/Pokestop')
+import type { DbManager } from 'server/src/services/DbManager'
+import type { EventManager } from 'server/src/services/EventManager'
 import { ModelReturn, OnlyType } from './utility'
 import { Profile } from 'passport-discord'
 import { User } from './models'
@@ -66,7 +66,7 @@ export interface Available {
   gyms: ModelReturn<typeof Gym, 'getAvailable'>
   pokestops: ModelReturn<typeof Pokestop, 'getAvailable'>
   nests: ModelReturn<typeof Nest, 'getAvailable'>
-  stations: ModelReturn<typeof Badge, 'getAvailable'>
+  stations: ModelReturn<typeof Station, 'getAvailable'>
 }
 
 export interface ApiEndpoint {
@@ -134,8 +134,8 @@ export interface GqlContext {
   userId: number
   req: Request
   res: Response
-  Db: DbManager.DbManager
-  Event: EventManager.EventManager
+  Db: DbManager
+  Event: EventManager
   perms: Permissions
   username: string
   operation: OperationTypeNode
