@@ -25,7 +25,6 @@ class Station extends Model {
       args.filters
     const ts = getEpoch()
 
-    console.log(onlyBattleTier)
     const select = [
       'id',
       'name',
