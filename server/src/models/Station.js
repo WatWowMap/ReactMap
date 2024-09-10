@@ -53,7 +53,10 @@ class Station extends Model {
       )
 
       if (!onlyAllStations) {
-        query.whereNotNull('battle_pokemon_id')
+        query
+          .whereNotNull('battle_pokemon_id')
+          .andWhere('is_battle_available', true)
+
         if (onlyBattleTier === 'all') {
           const battleBosses = new Set()
           const battleForms = new Set()

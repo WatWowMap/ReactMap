@@ -164,6 +164,7 @@ function StationMenu({
  * @returns
  */
 function StationMedia({
+  is_battle_available,
   battle_pokemon_id,
   battle_pokemon_form,
   battle_pokemon_alignment,
@@ -191,7 +192,7 @@ function StationMedia({
     return poke?.types || []
   })
 
-  return battle_pokemon_id ? (
+  return is_battle_available ? (
     <CardMedia>
       <Box className="popup-card-media">
         <Box className="flex-center" py={2}>
