@@ -60,11 +60,11 @@ function clientOptions(perms) {
     },
     stations: {
       clustering: { type: 'bool', perm: ['stations', 'dynamax'] },
-      battleTimers: { type: 'bool', perm: ['dynamax'] },
-      battleOpacity: { type: 'bool', perm: ['dynamax'] },
-      opacityTenMinutes: { type: 'number', perm: ['dynamax'] },
-      opacityFiveMinutes: { type: 'number', perm: ['dynamax'] },
-      opacityOneMinute: { type: 'number', perm: ['dynamax'] },
+      stationTimers: { type: 'bool', perm: ['stations', 'dynamax'] },
+      stationOpacity: { type: 'bool', perm: ['stations', 'dynamax'] },
+      opacityTenMinutes: { type: 'number', perm: ['stations', 'dynamax'] },
+      opacityFiveMinutes: { type: 'number', perm: ['stations', 'dynamax'] },
+      opacityOneMinute: { type: 'number', perm: ['stations', 'dynamax'] },
       enableStationPopupCoords: map.misc.enableStationPopupCoordsSelector
         ? { type: 'bool', perm: ['stations', 'dynamax'] }
         : undefined,

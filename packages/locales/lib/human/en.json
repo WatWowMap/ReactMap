@@ -788,13 +788,16 @@
   "individual_filters": "Partially Filtered",
   "data_limit_reached": "You have requested too much data recently and are on cooldown until {{until}}",
   "unknown_station": "Unknown Power Spot",
-  "exclude_battle": "Exclude Battle",
+  "exclude_battle": "Exclude Max Battle",
   "station": "Power Spot",
   "stations": "Power Spots",
   "stations_options": "Power Spot Options",
   "all_stations": "All Power Spots",
-  "search_battles": "Search Battles",
+  "search_battles": "Search Max Battles",
   "started": "Started",
   "ended": "Ended",
-  "global_search_stations": "Search Power Spots"
+  "global_search_stations": "Search Power Spots",
+  "station_timers": "Power Spot Timers",
+  "station_opacity": "Power Spot Opacity",
+  "max_battles": "Max Battles"
 }

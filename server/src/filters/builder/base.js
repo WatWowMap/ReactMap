@@ -122,7 +122,7 @@ function buildDefaultFilters(perms) {
             battleTier: perms.dynamax
               ? defaultFilters.stations.battleTier
               : undefined,
-            battles: perms.stations
+            maxBattles: perms.stations
               ? defaultFilters.stations.battles
               : undefined,
             filter: pokemon.stations,

@@ -144,7 +144,7 @@ export class Query {
   static stations(filters) {
     const { perms } = useMemory.getState().auth
     let query = 'GET_ALL_STATIONS'
-    if (filters.battles && perms.dynamax) {
+    if (filters.maxBattles && perms.dynamax) {
       query += '_BATTLE'
     }
     return stationIndex[query]
@@ -152,6 +152,7 @@ export class Query {
 
   /** @param {string} category */
   static search(category) {
+    const { perms } = useMemory.getState().auth
     switch (category) {
       case 'lures':
       case 'raids':
@@ -162,6 +163,8 @@ export class Query {
         return searchIndex[category.toUpperCase()]
       case 'webhook':
         return searchIndex.POI_WEBHOOK
+      case 'stations':
+        return perms.dynamax ? searchIndex.MAX_BATTLES : searchIndex.POI
       default:
         return searchIndex.POI
     }

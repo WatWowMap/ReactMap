@@ -1,5 +1,6 @@
 // @ts-check
 import * as React from 'react'
+import Box from '@mui/material/Box'
 // import ListItem from '@mui/material/ListItem'
 // import ListItemText from '@mui/material/ListItemText'
 // import MenuItem from '@mui/material/MenuItem'
@@ -52,14 +53,16 @@ import { SelectorListMemo } from './components/SelectorList'
 // }
 
 function StationsQuickSelect() {
-  const enabled = useStorage((s) => !!s.filters?.stations?.battles)
+  const enabled = useStorage((s) => !!s.filters?.stations?.maxBattles)
   return (
     <CollapsibleItem open={enabled}>
-      <SelectorListMemo
-        category="stations"
-        label="search_battles"
-        height={350}
-      />
+      <Box px={2}>
+        <SelectorListMemo
+          category="stations"
+          label="search_battles"
+          height={350}
+        />
+      </Box>
     </CollapsibleItem>
   )
 }

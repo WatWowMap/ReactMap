@@ -175,7 +175,7 @@ function Misc() {
   return <Img src={miscIcon} alt={searchTab} maxHeight={45} maxWidth={45} />
 }
 
-/** @param {Partial<import('@rm/types').Quest & { id: string }> | { id: string, url?: string } | Partial<import('@rm/types').Pokemon> | Partial<import('@rm/types').Gym> | Partial<import('@rm/types').Pokestop> | { id: string, nest_pokemon_id: number, nest_pokemon_form?: number } | Partial<import('@rm/types').Invasion> & { id: string }} props */
+/** @param {Partial<import('@rm/types').Quest & { id: string }> | { id: string, url?: string } | Partial<import('@rm/types').Pokemon> | Partial<import('@rm/types').Gym> | Partial<import('@rm/types').Pokestop> | { id: string, nest_pokemon_id: number, nest_pokemon_form?: number } | Partial<import('@rm/types').Invasion> & { id: string } | Partial<import('@rm/types').Station} props */
 function OptionImage(props) {
   if ('url' in props && props.url) return <FortImage url={props.url} />
   if ('quest_reward_type' in props) return <QuestImage {...props} />
@@ -184,6 +184,15 @@ function OptionImage(props) {
   if ('lure_id' in props) return <LureImage {...props} />
   if ('nest_pokemon_id' in props) return <NestImage {...props} />
   if ('grunt_type' in props) return <InvasionImage {...props} />
+  if ('battle_pokemon_id' in props && props.battle_pokemon_id)
+    return (
+      <PokemonImage
+        pokemon_id={props.battle_pokemon_id}
+        form={props.battle_pokemon_form}
+        gender={props.battle_pokemon_gender}
+        costume={props.battle_pokemon_costume}
+      />
+    )
   return <Misc />
 }
 

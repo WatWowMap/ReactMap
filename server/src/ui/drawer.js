@@ -67,7 +67,7 @@ function drawer(req, perms) {
       (perms.stations || perms.dynamax) && state.db.models.Station
         ? {
             allStations: perms.stations || BLOCKED,
-            battles: perms.dynamax || BLOCKED,
+            maxBattles: perms.dynamax || BLOCKED,
           }
         : BLOCKED,
     pokemon:

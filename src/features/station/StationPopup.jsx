@@ -182,19 +182,19 @@ function StationMedia({
     ),
   )
   const stationImage = useMemory((s) => s.Icons.getStation(true))
-  const pokemon = useMemory((s) => {
-    if (!battle_pokemon_id) return null
+  const types = useMemory((s) => {
+    if (!battle_pokemon_id) return []
     const poke = s.masterfile.pokemon[battle_pokemon_id]
-    if (poke?.forms?.[battle_pokemon_form]) {
-      return poke.forms[battle_pokemon_form]
+    if (poke?.forms?.[battle_pokemon_form]?.types) {
+      return poke.forms[battle_pokemon_form]?.types || []
     }
-    return poke
+    return poke?.types || []
   })
 
   return battle_pokemon_id ? (
     <CardMedia>
       <Box className="popup-card-media">
-        <Box className="flex-center">
+        <Box className="flex-center" py={2}>
           <Img
             src={monImage}
             alt={t(`${battle_pokemon_id}-${battle_pokemon_form}`)}
@@ -203,10 +203,12 @@ function StationMedia({
           />
         </Box>
         <Stack alignItems="center" justifyContent="center" spacing={2}>
-          {pokemon?.types?.map((type) => (
+          {types.map((type) => (
             <PokeType key={type} id={type} size="medium" />
           ))}
-          <GenderIcon gender={battle_pokemon_gender} fontSize="medium" />
+          {!!battle_pokemon_gender && (
+            <GenderIcon gender={battle_pokemon_gender} fontSize="medium" />
+          )}
         </Stack>
       </Box>
     </CardMedia>
@@ -228,6 +230,7 @@ function StationMedia({
  */
 function StationContent({
   battle_pokemon_id,
+  is_battle_available,
   battle_pokemon_form,
   battle_pokemon_costume,
   battle_level,
@@ -240,9 +243,14 @@ function StationContent({
     <CardContent sx={{ p: 0 }}>
       <Stack alignItems="center" justifyContent="center" spacing={1}>
         {!!battle_level && (
-          <Rating value={battle_level} max={Math.max(5, battle_level)} />
+          <Rating
+            value={battle_level}
+            max={Math.max(5, battle_level)}
+            readOnly
+            size="large"
+          />
         )}
-        {!!battle_pokemon_id && (
+        {!!is_battle_available && (
           <Box textAlign="center">
             <Typography variant="h6">
               {t(`poke_${battle_pokemon_id}`)}

@@ -1,9 +1,11 @@
 // @ts-check
 const { Model } = require('objection')
 const config = require('@rm/config')
+const i18next = require('i18next')
 
 const { getAreaSql } = require('../utils/getAreaSql')
 const { getEpoch } = require('../utils/getClientTime')
+const { state } = require('../services/state')
 
 class Station extends Model {
   static get tableName() {
@@ -19,7 +21,7 @@ class Station extends Model {
    */
   static async getAll(perms, args, { isMad }) {
     const { areaRestrictions } = perms
-    const { onlyAreas } = args.filters
+    const { onlyAreas, onlyAllStations, onlyMaxBattles } = args.filters
     const ts = getEpoch()
 
     const select = [
@@ -38,8 +40,9 @@ class Station extends Model {
       .andWhere('end_time', '>', ts)
     // .where('is_inactive', false)
 
-    if (perms.dynamax) {
+    if (perms.dynamax && onlyMaxBattles) {
       select.push(
+        'is_battle_available',
         'battle_level',
         'battle_pokemon_id',
         'battle_pokemon_form',
@@ -48,35 +51,37 @@ class Station extends Model {
         'battle_pokemon_alignment',
       )
 
-      const battleBosses = new Set()
-      const battleForms = new Set()
-      const battleLevels = new Set()
+      if (!onlyAllStations) {
+        const battleBosses = new Set()
+        const battleForms = new Set()
+        const battleLevels = new Set()
 
-      Object.keys(args.filters).forEach((key) => {
-        switch (key.charAt(0)) {
-          case 'o':
-            break
-          case 'j':
-            battleLevels.add(key.slice(1))
-            break
-          default:
-            {
-              const [id, form] = key.split('-')
-              if (id) battleBosses.add(id)
-              if (form) battleForms.add(form)
-            }
-            break
+        Object.keys(args.filters).forEach((key) => {
+          switch (key.charAt(0)) {
+            case 'o':
+              break
+            case 'j':
+              battleLevels.add(key.slice(1))
+              break
+            default:
+              {
+                const [id, form] = key.split('-')
+                if (id) battleBosses.add(id)
+                if (form) battleForms.add(form)
+              }
+              break
+          }
+        })
+
+        if (battleBosses.size) {
+          query.andWhere('battle_pokemon_id', 'in', [...battleBosses])
         }
-      })
-
-      if (battleBosses.size) {
-        query.andWhere('battle_pokemon_id', 'in', [...battleBosses])
-      }
-      if (battleForms.size) {
-        query.andWhere('battle_pokemon_form', 'in', [...battleForms])
-      }
-      if (battleLevels.size) {
-        query.andWhere('battle_level', 'in', [...battleLevels])
+        if (battleForms.size) {
+          query.andWhere('battle_pokemon_form', 'in', [...battleForms])
+        }
+        if (battleLevels.size) {
+          query.andWhere('battle_level', 'in', [...battleLevels])
+        }
       }
     }
 
@@ -137,12 +142,31 @@ class Station extends Model {
    */
   static async search(perms, args, { isMad }, distance, bbox) {
     const { areaRestrictions } = perms
-    const { onlyAreas = [], search = '' } = args
+    const { onlyAreas = [], search = '', locale } = args
     const { searchResultsLimit, stationUpdateLimit } = config.getSafe('api')
 
+    const pokemonIds = Object.keys(state.event.masterfile.pokemon).filter(
+      (pkmn) =>
+        i18next
+          .t(`poke_${pkmn}`, { lng: locale })
+          .toLowerCase()
+          .includes(search),
+    )
+
+    const select = ['id', 'name', 'lat', 'lon', distance]
+    if (perms.dynamax) {
+      select.push(
+        'battle_level',
+        'battle_pokemon_id',
+        'battle_pokemon_form',
+        'battle_pokemon_costume',
+        'battle_pokemon_gender',
+        'battle_pokemon_alignment',
+      )
+    }
+
     const query = this.query()
-      .select(['name', 'id', 'lat', 'lon', distance])
-      .whereILike('name', `%${search}%`)
+      .select(select)
       .whereBetween('lat', [bbox.minLat, bbox.maxLat])
       .andWhereBetween('lon', [bbox.minLon, bbox.maxLon])
       .andWhere(
@@ -150,6 +174,14 @@ class Station extends Model {
         '>',
         Date.now() / 1000 - stationUpdateLimit * 60 * 60 * 24,
       )
+      .andWhere((builder) => {
+        if (perms.stations) {
+          builder.orWhereILike('name', `%${search}%`)
+        }
+        if (perms.dynamax) {
+          builder.orWhereIn('battle_pokemon_id', pokemonIds)
+        }
+      })
       .limit(searchResultsLimit)
       .orderBy('distance')
     if (!getAreaSql(query, areaRestrictions, onlyAreas, isMad)) {

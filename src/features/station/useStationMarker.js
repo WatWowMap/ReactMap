@@ -78,7 +78,7 @@ export function useStationMarker({
             opacity: ${getOpacity(0)};
             width: ${battleSize}px;
             height: ${battleSize}px;
-            bottom: ${baseSize * 0.4 * battleMod.offsetY}px;
+            bottom: ${baseSize * 0.8 * battleMod.offsetY}px;
             left: ${battleMod.offsetX * 55}%;
             transform: translateX(-50%);
           "
