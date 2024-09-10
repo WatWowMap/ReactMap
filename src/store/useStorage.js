@@ -97,7 +97,8 @@ export const useStorage = create(
       },
       getPokemonFilterMode: () => {
         const { filters, userSettings } = get()
-        return filters?.pokemon?.easyMode
+        return filters?.pokemon?.easyMode &&
+          !userSettings?.pokemon?.legacyFilter
           ? 'basic'
           : userSettings?.pokemon?.legacyFilter
             ? 'expert'

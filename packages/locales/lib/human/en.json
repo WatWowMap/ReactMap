@@ -811,5 +811,9 @@
   "battle_bonus": "Battle Bonus",
   "copy_coordinates": "Copy Coordinates",
   "enable_station_popup_coords": "Show Power Spot Coords",
-  "station_icons": "Power Spot Icons"
+  "station_icons": "Power Spot Icons",
+  "dynamic_opacity": "Dynamic Opacity",
+  "tooltips": "Tooltips",
+  "markers": "Markers",
+  "filters": "Filters"
 }

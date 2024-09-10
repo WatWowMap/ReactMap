@@ -8,7 +8,13 @@ import List from '@mui/material/List'
 import ListItem from '@mui/material/ListItem'
 import ListItemText from '@mui/material/ListItemText'
 import Switch from '@mui/material/Switch'
+import ListSubheader from '@mui/material/ListSubheader'
 import { useTranslation } from 'react-i18next'
+import RoomIcon from '@mui/icons-material/Room'
+import FeedIcon from '@mui/icons-material/Feed'
+import OpacityIcon from '@mui/icons-material/Opacity'
+import TuneIcon from '@mui/icons-material/Tune'
+import TipsAndUpdatesIcon from '@mui/icons-material/TipsAndUpdates'
 
 import { useMemory } from '@store/useMemory'
 import { toggleDialog, useLayoutStore } from '@store/useLayoutStore'
@@ -20,6 +26,14 @@ import { getProperName, camelToSnake } from '@utils/strings'
 import { Header } from './Header'
 import { Footer } from './Footer'
 import { DialogWrapper } from './DialogWrapper'
+
+const ICONS = {
+  markers: RoomIcon,
+  popups: FeedIcon,
+  dynamic_opacity: OpacityIcon,
+  filters: TuneIcon,
+  tooltips: TipsAndUpdatesIcon,
+}
 
 /**
  * @template {keyof import('@store/useStorage').UseStorage['userSettings']} T
@@ -72,7 +86,7 @@ function InputType({ option, subOption, category }) {
       return (
         <Input
           color="secondary"
-          style={{ width: 50 }}
+          style={{ width: 50, minHeight: 38 }}
           value={userValue ?? ''}
           onChange={handleChange}
           size="small"
@@ -149,18 +163,37 @@ function BaseUserOptions() {
     [category, staticUserSettings],
   )
 
+  const staticByCategory = /** @type {[string, string[]][]} */ (
+    React.useMemo(() => {
+      if (!staticUserSettings) return []
+      const reduced = Object.entries(staticUserSettings).reduce(
+        (acc, [key, value]) => {
+          if (!acc[value.category || '']) {
+            acc[value.category || ''] = []
+          }
+          acc[value.category || ''].push(key)
+          return acc
+        },
+        /** @type {Record<string, string[]>} */ ({}),
+      )
+      return Object.entries(reduced)
+        .sort(([a], [b]) => t(a).localeCompare(t(b)))
+        .map(([key, value]) => [key, value])
+    }, [staticUserSettings])
+  )
+
   return (
     <DialogWrapper
       open={open && type === 'options'}
-      maxWidth="md"
+      maxWidth="sm"
       onClose={toggleDialog(false)}
-      fullWidth={false}
+      variant="large"
     >
       <Header
         titles={[`${camelToSnake(category)}_options`]}
         action={toggleDialog(false)}
       />
-      <DialogContent sx={{ minWidth: 'min(100%, 350px)' }}>
+      <DialogContent>
         <List>
           {category === 'notifications' && (
             <ListItem>
@@ -169,40 +202,48 @@ function BaseUserOptions() {
               </ListItemText>
             </ListItem>
           )}
-          {Object.entries(staticUserSettings || {}).map(([option, values]) => (
-            <React.Fragment key={option}>
-              <ListItem
-                key={option}
-                disableGutters
-                disablePadding
-                style={{ minHeight: 38 }}
-              >
-                <ListItemText
-                  primary={getLabel(option)}
-                  primaryTypographyProps={{
-                    style: { maxWidth: '80%' },
-                  }}
-                />
-                <MemoInputType category={category} option={option} />
-              </ListItem>
-              {values.sub &&
-                Object.keys(values.sub).map((subOption) => (
-                  <ListItem
-                    key={subOption}
+          {staticByCategory.map(([key, values]) => {
+            const Icon = ICONS[key]
+            return (
+              <React.Fragment key={key}>
+                {key && (
+                  <ListSubheader
                     disableGutters
-                    disablePadding
-                    style={{ minHeight: 38 }}
+                    className="flex-center"
+                    sx={{ justifyContent: 'flex-start' }}
                   >
-                    <ListItemText primary={getLabel(subOption)} />
-                    <MemoInputType
-                      category={category}
-                      option={option}
-                      subOption={subOption}
-                    />
-                  </ListItem>
+                    {key in ICONS && <Icon sx={{ mr: 2 }} />}
+                    {t(key)}
+                  </ListSubheader>
+                )}
+                {values.map((option) => (
+                  <React.Fragment key={option}>
+                    <ListItem key={option} disableGutters disablePadding>
+                      <ListItemText sx={{ pl: 2 }} primary={getLabel(option)} />
+                      <MemoInputType category={category} option={option} />
+                    </ListItem>
+                    {!!staticUserSettings[option]?.sub &&
+                      Object.keys(staticUserSettings[option].sub).map(
+                        (subOption) => (
+                          <ListItem
+                            key={subOption}
+                            disableGutters
+                            disablePadding
+                          >
+                            <ListItemText primary={getLabel(subOption)} inset />
+                            <MemoInputType
+                              category={category}
+                              option={option}
+                              subOption={subOption}
+                            />
+                          </ListItem>
+                        ),
+                      )}
+                  </React.Fragment>
                 ))}
-            </React.Fragment>
-          ))}
+              </React.Fragment>
+            )
+          })}
         </List>
       </DialogContent>
       <Footer options={footerOptions} />
