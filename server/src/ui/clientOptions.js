@@ -61,7 +61,7 @@ function clientOptions(perms) {
     stations: {
       clustering: { type: 'bool', perm: ['stations', 'dynamax'] },
       stationTimers: { type: 'bool', perm: ['stations', 'dynamax'] },
-      stationOpacity: { type: 'bool', perm: ['stations', 'dynamax'] },
+      stationsOpacity: { type: 'bool', perm: ['stations', 'dynamax'] },
       opacityTenMinutes: { type: 'number', perm: ['stations', 'dynamax'] },
       opacityFiveMinutes: { type: 'number', perm: ['stations', 'dynamax'] },
       opacityOneMinute: { type: 'number', perm: ['stations', 'dynamax'] },

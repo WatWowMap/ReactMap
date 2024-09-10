@@ -380,7 +380,7 @@
     "stations": {
       "clustering": true,
       "stationTimers": false,
-      "battleOpacity": true,
+      "stationsOpacity": true,
       "enableStationPopupCoords": false,
       "opacityTenMinutes": 0.75,
       "opacityFiveMinutes": 0.5,
