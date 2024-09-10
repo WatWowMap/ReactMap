@@ -700,7 +700,7 @@
   "expert_description": "Manuelle Eingabeabfragen für größtmögliche Anpassungsfähigkeit",
   "icon_size": "Icon Größe",
   "developer": "Entwickler",
-  "raid_override": "Raid Filter",
+  "raid_override": "Raid Override",
   "search_rocket_pokemon": "Crypto Pokémon suchen",
   "main": "Haupt",
   "extra": "Extra",
@@ -780,5 +780,5 @@
   "dynamax": "Dynamax",
   "stations_subtitle": "Kraftquellen auf der Map anzeigen",
   "dynamax_subtitle": "Dyna-Raids auf der Map anzeigen",
-  "override": "Dyna-Raid Filter"
+  "override": "Dyna-Raid Override"
 }
