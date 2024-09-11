@@ -66,7 +66,7 @@
   "settings": "Einstellungen",
   "advanced": "erweitert",
   "icons": "Symbole",
-  "navigation": "navigation",
+  "navigation": "Navigation",
   "drawer": "Drawer",
   "iconsDefault": "Standard",
   "drawer_temporary": "Vorübergehend",
@@ -783,5 +783,6 @@
   "stations_subtitle": "Kraftquellen auf der Map anzeigen",
   "dynamax_subtitle": "Dyna-Raids auf der Map anzeigen",
   "override": "Dyna-Raid Override",
-  "enable_station_popup_coords": "Kraftquellen Koordinaten anzeigen"
+  "enable_station_popup_coords": "Kraftquellen Koordinaten anzeigen",
+  "station_icons": "Kraftquellen Icons"
 }
