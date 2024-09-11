@@ -791,6 +791,7 @@
   "exclude_battle": "Exclude Max Battle",
   "station": "Power Spot",
   "stations": "Power Spots",
+  "stations_filters": "Power Spots Filter Settings",
   "stations_options": "Power Spot Options",
   "all_stations": "All Power Spots",
   "search_battles": "Search Max Battles",
