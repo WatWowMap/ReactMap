@@ -11,6 +11,7 @@ const core = gql`
     updated
     start_time
     end_time
+    total_stationed_pokemon
   }
 `
 
@@ -67,6 +68,18 @@ export const GET_ALL_STATIONS_BATTLE = gql`
     ) {
       ...CoreStation
       ...Battle
+    }
+  }
+`
+
+export const GET_STATION_POKEMON = gql`
+  query StationPokemon($id: ID!) {
+    stationPokemon(id: $id) {
+      pokemon_id
+      form
+      costume
+      gender
+      bread_mode
     }
   }
 `

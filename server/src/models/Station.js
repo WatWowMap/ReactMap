@@ -33,6 +33,7 @@ class Station extends Model {
       'updated',
       'start_time',
       'end_time',
+      'total_stationed_pokemon',
     ]
 
     const query = this.query()
@@ -116,6 +117,9 @@ class Station extends Model {
         if (station.is_battle_available && station.battle_pokemon_id === null) {
           station.is_battle_available = false
         }
+        if (station.total_stationed_pokemon === null) {
+          station.total_stationed_pokemon = 0
+        }
         return station
       })
   }
@@ -128,6 +132,24 @@ class Station extends Model {
     /** @type {import('@rm/types').FullStation} */
     const result = await this.query().findById(id)
     return result
+  }
+
+  /**
+   * Returns the stationed mons for a given station
+   * @param {number} id
+   * @param {import('@rm/types').DbContext} _ctx
+   * @returns {Promise<import('@rm/types').StationPokemon[]>}
+   */
+  // eslint-disable-next-line no-unused-vars
+  static async getDynamaxMons(id, _ctx) {
+    /** @type {import('@rm/types').FullStation} */
+    const result = await this.query().findById(id).select('stationed_pokemon')
+    if (!result) {
+      return []
+    }
+    return typeof result.stationed_pokemon === 'string'
+      ? JSON.parse(result.stationed_pokemon)
+      : result.stationed_pokemon || []
   }
 
   static async getAvailable() {

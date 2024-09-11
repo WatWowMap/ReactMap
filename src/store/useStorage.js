@@ -54,7 +54,6 @@ import { setDeep } from '@utils/setDeep'
  * @typedef {import('@rm/types').OnlyType<UseStorage, Function, false>} UseStorageNoFn
  * @typedef {import('@rm/types').Paths<UseStorageNoFn>} UseStoragePaths
  * @typedef {import('@rm/types').ObjectPathValue<UseStorageNoFn, UseStoragePaths>} UseStorageValues
- *
  * @type {import("zustand").UseBoundStore<import("zustand").StoreApi<UseStorage>>}
  */
 export const useStorage = create(

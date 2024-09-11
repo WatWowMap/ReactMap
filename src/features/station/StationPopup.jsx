@@ -15,6 +15,8 @@ import Rating from '@mui/material/Rating'
 import Typography from '@mui/material/Typography'
 import Stack from '@mui/material/Stack'
 import Box from '@mui/material/Box'
+import LockOpenIcon from '@mui/icons-material/LockOpen'
+import LockIcon from '@mui/icons-material/Lock'
 
 import { useMemory } from '@store/useMemory'
 import { setDeepStore } from '@store/useStorage'
@@ -27,19 +29,41 @@ import { useFormatStore } from '@store/useFormatStore'
 import { useRelativeTimer } from '@hooks/useRelativeTime'
 import { useAnalytics } from '@hooks/useAnalytics'
 import { Title } from '@components/popups/Title'
+import {
+  CollapseWithState,
+  ExpandCollapse,
+  ExpandWithState,
+} from '@components/inputs/ExpandCollapse'
+import { VirtualGrid } from '@components/virtual/VirtualGrid'
+import { getStationAttackBonus } from '@utils/getAttackBonus'
 
-/**
- *
- * @param {import('@rm/types').Station} station
- * @returns
- */
+import { useGetStationMons } from './useGetStationMons'
+
+/** @param {import('@rm/types').Station} station */
 export function StationPopup(station) {
   useAnalytics('Popup', 'Station')
 
   return (
     <Card sx={{ width: 200 }} elevation={0}>
       <StationHeader {...station} />
+      {!!station.battle_level && <StationRating {...station} />}
       <StationMedia {...station} />
+      {!!station.is_battle_available && (
+        <ExpandCollapse>
+          <StationAttackBonus {...station} />
+          <ExpandWithState
+            field="popups.stationExtras"
+            disabled={!station.total_stationed_pokemon}
+          />
+
+          <CollapseWithState
+            field="popups.stationExtras"
+            in={!!station.total_stationed_pokemon}
+          >
+            <StationMons {...station} />
+          </CollapseWithState>
+        </ExpandCollapse>
+      )}
       <StationContent {...station} />
       <Box
         component={CardActions}
@@ -54,11 +78,7 @@ export function StationPopup(station) {
   )
 }
 
-/**
- *
- * @param {import('@rm/types').Station} station
- * @returns
- */
+/** @param {import('@rm/types').Station} props */
 function StationHeader({ name, updated }) {
   const { t } = useTranslation()
   const dateFormatter = useFormatStore((s) => s.dateFormat)
@@ -86,6 +106,22 @@ function StationHeader({ name, updated }) {
   )
 }
 
+/** @param {import('@rm/types').Station} props */
+function StationRating({ battle_level }) {
+  const { t } = useTranslation()
+  return (
+    <CardContent sx={{ p: 0, py: 1 }}>
+      <Stack alignItems="center" justifyContent="center">
+        <Rating value={battle_level} max={Math.max(5, battle_level)} readOnly />
+        <Typography variant="caption">
+          {t(`max_battle_${battle_level}`)}
+        </Typography>
+      </Stack>
+    </CardContent>
+  )
+}
+
+/** @param {import('@rm/types').Station} props */
 function StationMenu({
   id,
   battle_level,
@@ -158,11 +194,8 @@ function StationMenu({
     </>
   )
 }
-/**
- *
- * @param {import('@rm/types').Station} station
- * @returns
- */
+
+/** @param {import('@rm/types').Station} props */
 function StationMedia({
   is_battle_available,
   battle_pokemon_id,
@@ -195,14 +228,24 @@ function StationMedia({
   return is_battle_available ? (
     <CardMedia>
       <Box className="popup-card-media">
-        <Box className="flex-center" py={2}>
+        <Stack className="flex-center" py={1}>
           <Img
             src={monImage}
             alt={t(`${battle_pokemon_id}-${battle_pokemon_form}`)}
-            maxHeight={100}
+            maxHeight={75}
             maxWidth="100%"
           />
-        </Box>
+          <Box textAlign="center">
+            <Typography variant="subtitle2" component="span">
+              {t(`${battle_pokemon_id}-${battle_pokemon_form || 0}`)}
+            </Typography>
+            {!!battle_pokemon_costume && (
+              <Typography variant="caption">
+                &nbsp;({t(`costume_${battle_pokemon_costume}`)})
+              </Typography>
+            )}
+          </Box>
+        </Stack>
         <Stack alignItems="center" justifyContent="center" spacing={2}>
           {types.map((type) => (
             <PokeType key={type} id={type} size="medium" />
@@ -218,95 +261,101 @@ function StationMedia({
       <CardMedia
         component="img"
         src={stationImage}
-        sx={{ maxWidth: 100, maxHeight: 100 }}
+        sx={{ maxWidth: 75, maxHeight: 75 }}
       />
     </Box>
   )
 }
 
-/**
- *
- * @param {import('@rm/types').Station} station
- * @returns
- */
-function StationContent({
-  battle_pokemon_id,
-  is_battle_available,
-  battle_pokemon_form,
-  battle_pokemon_costume,
-  battle_level,
-  start_time,
-  end_time,
-  id,
-}) {
+/** @param {import('@rm/types').Station} station */
+function StationAttackBonus({ total_stationed_pokemon }) {
   const { t } = useTranslation()
   return (
+    <Stack alignItems="center">
+      <Rating
+        value={getStationAttackBonus(total_stationed_pokemon)}
+        readOnly
+        icon={<LockOpenIcon fontSize="inherit" />}
+        emptyIcon={<LockIcon fontSize="inherit" />}
+        max={4}
+      />
+      <Typography variant="caption">
+        {t('battle_bonus')} &nbsp;({total_stationed_pokemon})
+      </Typography>
+    </Stack>
+  )
+}
+
+/** @param {import('@rm/types').Station} station */
+function StationContent({ start_time, end_time, id }) {
+  return (
     <CardContent sx={{ p: 0 }}>
-      <Stack alignItems="center" justifyContent="center" spacing={1}>
-        {!!battle_level && (
-          <Rating
-            value={battle_level}
-            max={Math.max(5, battle_level)}
-            readOnly
-            size="large"
-          />
-        )}
-        {!!is_battle_available && (
-          <Box textAlign="center">
-            <Typography variant="h6">
-              {t(`poke_${battle_pokemon_id}`)}
-            </Typography>
-            {!!battle_pokemon_form && (
-              <Typography variant="subtitle2">
-                {t(`form_${battle_pokemon_form}`)}
-              </Typography>
-            )}
-            {!!battle_pokemon_costume && (
-              <Typography variant="subtitle2">
-                {t(`costume_${battle_pokemon_costume}`)}
-              </Typography>
-            )}
-          </Box>
-        )}
-        {start_time > Date.now() / 1000 ? (
-          <TimeStamp start date epoch={start_time || 0} id={id} />
-        ) : (
-          <TimeStamp date epoch={end_time || 0} id={id} />
-        )}
-      </Stack>
+      {start_time > Date.now() / 1000 ? (
+        <TimeStamp start date epoch={start_time || 0} id={id} />
+      ) : (
+        <TimeStamp date epoch={end_time || 0} id={id} />
+      )}
+    </CardContent>
+  )
+}
+
+/** @param {import('@rm/types').Station} props */
+function StationMons({ id }) {
+  const { t: tId } = useTranslateById()
+  const { t } = useTranslation()
+  const mons = useGetStationMons(id)
+  const icons = useMemory((s) => s.Icons)
+
+  return (
+    <CardContent sx={{ my: 1, p: 0, height: 130 }}>
+      <Typography variant="h6" align="center">
+        {t('stationed_pokemon')}
+      </Typography>
+      <VirtualGrid data={mons} xs={6}>
+        {(index, mon) => {
+          const caption = tId(`${mon.pokemon_id}-${mon.form}`)
+          return (
+            <Box
+              display="flex"
+              flexDirection="column"
+              alignItems="center"
+              justifyContent="space-between"
+              p={1}
+              height="100%"
+            >
+              <Img
+                key={index}
+                src={icons.getPokemon(
+                  mon.pokemon_id,
+                  mon.form,
+                  0,
+                  mon.gender,
+                  mon.costume,
+                )}
+                alt={caption}
+                maxHeight="100%"
+                maxWidth={50}
+              />
+              <Typography variant="caption">{caption}</Typography>
+            </Box>
+          )
+        }}
+      </VirtualGrid>
     </CardContent>
   )
 }
 
 /**
- *
  * @param {{ start?: boolean, date?: boolean, epoch: number, id: string }} props
- * @returns
  */
 function TimeStamp({ start = false, date = false, epoch }) {
   const { t } = useTranslation()
   const formatter = useFormatStore((s) => (date ? s.dateFormat : s.timeFormat))
   const relativeTime = useRelativeTimer(epoch || 0)
   const pastTense = epoch * 1000 < Date.now()
-  // const timerIsAlwaysVisible = useStorage(
-  //   (s) => s.userSettings.stations.stationTimers,
-  // )
-  // const timerAlreadyVisible = useMemory((s) => s.timerList.includes(id))
 
   return (
     <Stack justifyContent="space-evenly" direction="row" width="100%">
-      {/* <VisibleToggle
-        visible={timerIsAlwaysVisible || timerAlreadyVisible}
-        disabled={timerIsAlwaysVisible}
-        onClick={() =>
-          useMemory.setState((prev) => {
-            if (prev.timerList.includes(id)) {
-              return { timerList: prev.timerList.filter((x) => x !== id) }
-            }
-            return { timerList: [...prev.timerList, id] }
-          })
-        }
-      /> */}
       <Stack alignItems="center" justifyContent="center">
         <Typography variant="subtitle2">
           {start

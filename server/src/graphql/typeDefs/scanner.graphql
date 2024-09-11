@@ -283,6 +283,7 @@ type Station {
   start_time: Int
   end_time: Int
   cooldown_complete: Int
+  total_stationed_pokemon: Int
   is_battle_available: Boolean
   is_inactive: Boolean
   battle_level: Int
@@ -291,4 +292,12 @@ type Station {
   battle_pokemon_costume: Int
   battle_pokemon_gender: Int
   battle_pokemon_alignment: Int
+}
+
+type StationPokemon {
+  pokemon_id: Int
+  form: Int
+  costume: Int
+  gender: Int
+  bread_mode: Int
 }

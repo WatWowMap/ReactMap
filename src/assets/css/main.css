@@ -591,3 +591,14 @@ input[type='time']::-webkit-calendar-picker-indicator {
   grid-template-rows: auto 1fr auto; /* Header, table, footer */
   min-height: 100svh;
 }
+
+.expand-collapse-layout {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  grid-template-rows: 1fr auto;
+  padding: 12px 0;
+}
+
+.expand-collapse-layout > :nth-child(3) {
+  grid-column: 1 / span 2;
+}

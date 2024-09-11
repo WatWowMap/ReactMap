@@ -337,7 +337,15 @@ export interface Route {
 
 export type FullRoute = FullModel<Route, RouteModel.Route>
 
-export interface Station {
+export interface StationPokemon {
+  pokemon_id: number
+  form: number
+  costume: number
+  gender: number
+  bread_mode: number
+}
+
+export interface Station<Parsed extends boolean = false> {
   id: string
   lat: number
   lon: number
@@ -356,6 +364,10 @@ export interface Station {
   battle_pokemon_gender: Gender
   battle_pokemon_alignment: number
 
+  total_stationed_pokemon: number
+  stationed_pokemon: Parsed extends true
+    ? StationPokemon[]
+    : string | StationPokemon[]
   updated: number
 }
 

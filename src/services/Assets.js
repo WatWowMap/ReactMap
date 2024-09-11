@@ -573,8 +573,7 @@ export class UAssets {
   /** @param {boolean} [active] */
   getStation(active = false) {
     try {
-      // TODO: replace with lib method when it has been updated
-      return `${this.fallback}/station/${active ? 1 : 0}.${this.fallbackExt}`
+      return this[this.selected.station]?.class?.station(active)
     } catch (e) {
       console.error(`[${this.assetType.toUpperCase()}]`, e)
       return `${this.fallback}/station/0.${this.fallbackExt}`

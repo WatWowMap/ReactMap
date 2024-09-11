@@ -492,6 +492,12 @@ const resolvers = {
       }
       return []
     },
+    stationPokemon: (_, { id }, { perms, Db }) => {
+      if (perms?.stations) {
+        return Db.query('Station', 'getDynamaxMons', id)
+      }
+      return []
+    },
     submissionCells: async (_, args, { req, perms, Db }) => {
       const { submissionZoom } = config.getMapConfig(req).general
       if (perms?.submissionCells && args.zoom >= submissionZoom - 1) {

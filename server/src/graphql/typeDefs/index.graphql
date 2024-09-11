@@ -65,6 +65,7 @@ type Query {
     maxLon: Float
     filters: JSON
   ): [Station]
+  stationPokemon(id: ID): [StationPokemon]
   s2cells(
     minLat: Float
     maxLat: Float
