@@ -783,6 +783,10 @@
   "stations_subtitle": "Kraftquellen auf der Map anzeigen",
   "dynamax_subtitle": "Dyna-Raids auf der Map anzeigen",
   "override": "Dyna-Raid Override",
-  "enable_station_popup_coords": "Kraftquellen Koordinaten anzeigen",
-  "station_icons": "Kraftquellen Icons"
+  "station_icons": "Kraftquellen Icons",
+  "stationed_pokemon": "stationierte Pokémon",
+  "attack_bonus": "Angriffsbonus",
+  "no_stationed_pokemon": "Keine Pokémon platziert",
+  "battle_bonus": "Kampfbonus",
+  "copy_coordinates": "Koordinaten kopieren"
 }
