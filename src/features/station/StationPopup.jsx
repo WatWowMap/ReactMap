@@ -196,7 +196,7 @@ function StationMenu({
             {t(option.name)}
           </MenuItem>
         ))}
-        {copyCoords && <CopyCoords lat={lat} lon={lon} />}
+        {copyCoords && <CopyCoords lat={lat} lon={lon} onClick={handleClose} />}
       </Menu>
     </>
   )
@@ -316,7 +316,7 @@ function StationMons({ id }) {
   return (
     <CardContent sx={{ my: 1, p: 0, height: 130 }}>
       <Typography variant="h6" align="center">
-        {t('stationed_pokemon')}
+        {t('placed_pokemon')}
       </Typography>
       <VirtualGrid data={mons} xs={6}>
         {(index, mon) => {

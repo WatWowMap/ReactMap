@@ -17,16 +17,24 @@ export function Coords({ lat, lon }) {
   )
 }
 
-export function CopyCoords({ lat, lon }) {
+/**
+ *
+ * @param {{ lat: number, lon: number } & import('@mui/material').MenuItemProps} props
+ * @returns
+ */
+export function CopyCoords({ lat, lon, onClick, ...props }) {
   const { t } = useTranslation()
 
-  const copy = React.useCallback(
-    () => navigator.clipboard.writeText(`${lat}, ${lon}`),
-    [lat, lon],
+  const onClickWithCopy = React.useCallback(
+    (/** @type {React.MouseEvent<HTMLLIElement, MouseEvent>} */ e) => {
+      navigator.clipboard.writeText(`${lat}, ${lon}`)
+      if (onClick) onClick(e)
+    },
+    [lat, lon, onClick],
   )
 
   return (
-    <MenuItem dense onClick={copy}>
+    <MenuItem dense onClick={onClickWithCopy} {...props}>
       {t('copy_coordinates')}
     </MenuItem>
   )
