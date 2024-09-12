@@ -791,6 +791,7 @@
   "exclude_battle": "Exclude Max Battle",
   "station": "Power Spot",
   "stations": "Power Spots",
+  "stations_filters": "Power Spots Filter Settings",
   "stations_options": "Power Spot Options",
   "all_stations": "All Power Spots",
   "search_battles": "Search Max Battles",
@@ -809,5 +810,6 @@
   "attack_bonus": "Attack Bonus",
   "battle_bonus": "Battle Bonus",
   "copy_coordinates": "Copy Coordinates",
-  "enable_station_popup_coords": "Show Power Spot Coords"
+  "enable_station_popup_coords": "Show Power Spot Coords",
+  "station_icons": "Power Spot Icons"
 }
