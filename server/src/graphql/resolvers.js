@@ -82,7 +82,7 @@ const resolvers = {
         return perms?.pokestops
       }),
     availableStations: (_, _args, { Event, perms }) =>
-      perms?.stations ? Event.available.stations : [],
+      perms?.dynamax ? Event.available.stations : [],
     backup: (_, args, { req, perms, Db }) => {
       if (perms?.backups && req?.user?.id) {
         return Db.models.Backup.getOne(args.id, req?.user?.id)
