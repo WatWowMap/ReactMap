@@ -25,5 +25,9 @@ export function CopyCoords({ lat, lon }) {
     [lat, lon],
   )
 
-  return <MenuItem onClick={copy}>{t('copy_coordinates')}</MenuItem>
+  return (
+    <MenuItem dense onClick={copy}>
+      {t('copy_coordinates')}
+    </MenuItem>
+  )
 }
