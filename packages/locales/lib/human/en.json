@@ -808,5 +808,6 @@
   "stationed_pokemon": "Stationed Pokémon",
   "attack_bonus": "Attack Bonus",
   "no_stationed_pokemon": "No Pokémon Have Been Set",
-  "battle_bonus": "Battle Bonus"
+  "battle_bonus": "Battle Bonus",
+  "copy_coordinates": "Copy Coordinates"
 }

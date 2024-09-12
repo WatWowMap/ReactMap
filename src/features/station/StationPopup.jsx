@@ -19,7 +19,7 @@ import LockOpenIcon from '@mui/icons-material/LockOpen'
 import LockIcon from '@mui/icons-material/Lock'
 
 import { useMemory } from '@store/useMemory'
-import { setDeepStore } from '@store/useStorage'
+import { setDeepStore, useGetDeepStore } from '@store/useStorage'
 import { Navigation } from '@components/popups/Navigation'
 import { useTranslateById } from '@hooks/useTranslateById'
 import { PokeType } from '@components/popups/PokeType'
@@ -36,6 +36,7 @@ import {
 } from '@components/inputs/ExpandCollapse'
 import { VirtualGrid } from '@components/virtual/VirtualGrid'
 import { getStationAttackBonus } from '@utils/getAttackBonus'
+import { CopyCoords } from '@components/popups/Coords'
 
 import { useGetStationMons } from './useGetStationMons'
 
@@ -55,7 +56,6 @@ export function StationPopup(station) {
             field="popups.stationExtras"
             disabled={!station.total_stationed_pokemon}
           />
-
           <CollapseWithState
             field="popups.stationExtras"
             in={!!station.total_stationed_pokemon}
@@ -127,7 +127,13 @@ function StationMenu({
   battle_level,
   battle_pokemon_id,
   battle_pokemon_form,
+  lat,
+  lon,
 }) {
+  const copyCoords = useGetDeepStore(
+    'userSettings.stations.enableStationPopupCoords',
+    false,
+  )
   const [anchorEl, setAnchorEl] = React.useState(null)
   const { t } = useTranslation()
 
@@ -190,6 +196,7 @@ function StationMenu({
             {t(option.name)}
           </MenuItem>
         ))}
+        {copyCoords && <CopyCoords lat={lat} lon={lon} />}
       </Menu>
     </>
   )
@@ -280,7 +287,7 @@ function StationAttackBonus({ total_stationed_pokemon }) {
         max={4}
       />
       <Typography variant="caption">
-        {t('battle_bonus')} &nbsp;({total_stationed_pokemon})
+        {t('battle_bonus')} &nbsp;({total_stationed_pokemon} / 40)
       </Typography>
     </Stack>
   )

@@ -50,7 +50,7 @@ export async function login(user, endpoint = '/auth/local/callback') {
 
 /**
  *
- * @param {Error} error
+ * @param {Error & { uuid: string }} error
  * @returns {Promise<Response | FetchError>}
  */
 export async function sendError(error) {

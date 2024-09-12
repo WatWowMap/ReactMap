@@ -88,7 +88,11 @@ export function CollapseWithState({
 }
 
 /**
- * @param {import('@mui/material').BoxProps} props
+ * Wrapper for a layout that can be expanded or collapsed. Intended to be used with 3 children.
+ *
+ * @param {{
+ *  children: [React.ReactNode, React.ReactNode, React.ReactNode]
+ * } & Omit<import('@mui/material').BoxProps, 'children'>} props
  */
 export function ExpandCollapse({ children, ...props }) {
   return (
