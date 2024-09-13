@@ -323,6 +323,7 @@ export class UAssets {
    * @param {string | number} [costume]
    * @param {string | number} [alignment]
    * @param {boolean} [shiny]
+   * @param {string | number} [bread]
    * @returns {string}
    */
   getPokemon(
@@ -333,15 +334,17 @@ export class UAssets {
     costume = 0,
     alignment = 0,
     shiny = false,
+    bread = 0,
   ) {
     try {
       return this[this.selected.pokemon]?.class?.pokemon(
         pokemonId,
-        form,
         evolution,
-        gender,
+        form,
         costume,
+        gender,
         alignment,
+        bread,
         shiny,
       )
     } catch (e) {
@@ -384,11 +387,10 @@ export class UAssets {
     try {
       return this[this.selected.pokestop]?.class?.pokestop(
         lureId,
-        power,
-        display,
-        invasionActive,
+        display || !!invasionActive,
         questActive,
         ar,
+        power,
       )
     } catch (e) {
       console.error(`[${this.assetType.toUpperCase()}]`, e)
@@ -435,6 +437,7 @@ export class UAssets {
    * @param {boolean} [inBattle]
    * @param {boolean} [ex]
    * @param {boolean} [ar]
+   * @param {string | number | boolean} [power]
    * @returns
    */
   getGyms(
@@ -443,6 +446,7 @@ export class UAssets {
     inBattle = false,
     ex = false,
     ar = false,
+    power = false,
   ) {
     try {
       return this[this.selected.gym]?.class?.gym(
@@ -451,6 +455,7 @@ export class UAssets {
         inBattle,
         ex,
         ar,
+        power,
       )
     } catch (e) {
       console.error(`[${this.assetType.toUpperCase()}]`, e)
@@ -496,7 +501,11 @@ export class UAssets {
    */
   getWeather(weatherId, timeOfDay = 'day') {
     try {
-      return this[this.selected.weather]?.class?.weather(weatherId, timeOfDay)
+      return this[this.selected.weather]?.class?.weather(
+        weatherId,
+        0,
+        timeOfDay,
+      )
     } catch (e) {
       console.error(`[${this.assetType.toUpperCase()}]`, e)
       return `${this.fallback}/weather/0.${this.fallbackExt}`

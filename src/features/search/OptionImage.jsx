@@ -60,14 +60,23 @@ function FortImage({ url }) {
   )
 }
 
-/** @param {Partial<import('@rm/types').Pokemon>} props */
-function PokemonImage({ pokemon_id, form, gender, costume, shiny }) {
+/** @param {Partial<import('@rm/types').Pokemon> & { bread?: number }} props */
+function PokemonImage({ pokemon_id, form, gender, costume, shiny, bread }) {
   const { Icons } = useMemory.getState()
   const { t } = useTranslateById()
   return (
     <NameTT title={[form ? `form_${form}` : '', `poke_${pokemon_id}`]}>
       <Img
-        src={Icons.getPokemon(pokemon_id, form, 0, gender, costume, 0, shiny)}
+        src={Icons.getPokemon(
+          pokemon_id,
+          form,
+          0,
+          gender,
+          costume,
+          0,
+          shiny,
+          bread,
+        )}
         alt={t(`${pokemon_id}-${form}`)}
         maxHeight={45}
         maxWidth={45}
@@ -191,6 +200,7 @@ function OptionImage(props) {
         form={props.battle_pokemon_form}
         gender={props.battle_pokemon_gender}
         costume={props.battle_pokemon_costume}
+        bread={1}
       />
     )
   return <Misc />

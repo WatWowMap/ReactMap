@@ -220,6 +220,8 @@ function StationMedia({
       battle_pokemon_gender,
       battle_pokemon_costume,
       battle_pokemon_alignment,
+      false,
+      1,
     ),
   )
   const stationImage = useMemory((s) => s.Icons.getStation(true))
@@ -338,6 +340,9 @@ function StationMons({ id }) {
                   0,
                   mon.gender,
                   mon.costume,
+                  0,
+                  false,
+                  mon.bread_mode,
                 )}
                 alt={caption}
                 maxHeight="100%"

@@ -37,6 +37,8 @@ export function useStationMarker({
         battle_pokemon_gender,
         battle_pokemon_costume,
         battle_pokemon_alignment,
+        false,
+        1,
       ),
       Icons.getSize(
         'dynamax',
