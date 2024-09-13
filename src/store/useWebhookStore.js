@@ -27,7 +27,7 @@ import { create } from 'zustand'
  *  gym: import("@rm/types").PoracleGym[]
  *  category: keyof import("@rm/types").PoracleUI
  *  context: Partial<import("@rm/types").PoracleClientContext>
- *  groupedAreas: Record<string, import('@turf/helpers').Feature[]>
+ *  groupedAreas: Record<string, import('geojson').Feature[]>
  *  trackedSearch: string
  *  selected: Record<string, boolean>
  *  tempFilters: Record<string, any>
