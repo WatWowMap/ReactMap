@@ -34,6 +34,7 @@ import { NameTT } from '@components/popups/NameTT'
 import { TimeStamp } from '@components/popups/TimeStamps'
 import { useAnalytics } from '@hooks/useAnalytics'
 import { parseQuestConditions } from '@utils/parseConditions'
+import { Img } from '@components/Img'
 
 /**
  *
@@ -846,8 +847,10 @@ const NoBorderCell = styled(TableCell, {
   textAlign,
 }))
 
-const ShowcaseEntry = ({ rank, score, pokemon_id, form, costume, gender }) => {
+const ShowcaseEntry = (entry) => {
+  const { rank, score, pokemon_id, badge } = entry
   const Icons = useMemory((s) => s.Icons)
+  const { t } = useTranslation()
   return (
     <TableRow>
       <NoBorderCell>
@@ -862,10 +865,18 @@ const ShowcaseEntry = ({ rank, score, pokemon_id, form, costume, gender }) => {
       {pokemon_id && (
         <NoBorderCell>
           <img
-            src={Icons.getPokemon(pokemon_id, form, 0, gender, costume)}
+            src={Icons.getPokemonByDisplay(pokemon_id, entry)}
             alt="rank"
             height={20}
           />
+          {badge === 1 && (
+            <Img
+              src={Icons.getMisc('bestbuddy')}
+              alt={t('best_buddy')}
+              maxHeight={15}
+              maxWidth={15}
+            />
+          )}
         </NoBorderCell>
       )}
     </TableRow>
