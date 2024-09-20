@@ -358,11 +358,17 @@ export interface Station<Parsed extends boolean = false> {
   is_inactive: boolean
 
   battle_level: number
+  battle_start?: number
+  battle_end?: number
+
   battle_pokemon_id: number
   battle_pokemon_form: number
   battle_pokemon_costume: number
   battle_pokemon_gender: Gender
   battle_pokemon_alignment: number
+  battle_pokemon_bread_mode: number
+  battle_pokemon_move_1: number
+  battle_pokemon_move_2: number
 
   total_stationed_pokemon: number
   stationed_pokemon: Parsed extends true

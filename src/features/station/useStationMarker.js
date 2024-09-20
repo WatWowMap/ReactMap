@@ -18,6 +18,7 @@ export function useStationMarker({
   battle_pokemon_gender,
   battle_pokemon_id,
   is_battle_available,
+  battle_pokemon_bread_mode,
   start_time,
   end_time,
 }) {
@@ -38,7 +39,7 @@ export function useStationMarker({
         battle_pokemon_costume,
         battle_pokemon_alignment,
         false,
-        1,
+        battle_pokemon_bread_mode,
       ),
       Icons.getSize(
         'dynamax',

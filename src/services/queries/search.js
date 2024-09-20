@@ -277,6 +277,7 @@ export const MAX_BATTLES = gql`
       battle_pokemon_costume
       # battle_pokemon_evolution
       battle_pokemon_alignment
+      battle_pokemon_bread_mode
     }
   }
 `

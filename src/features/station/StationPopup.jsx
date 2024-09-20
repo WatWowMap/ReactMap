@@ -37,6 +37,7 @@ import {
 import { VirtualGrid } from '@components/virtual/VirtualGrid'
 import { getStationAttackBonus } from '@utils/getAttackBonus'
 import { CopyCoords } from '@components/popups/Coords'
+import { PokeMove } from '@components/popups/PokeMove'
 
 import { useGetStationMons } from './useGetStationMons'
 
@@ -107,8 +108,10 @@ function StationHeader({ name, updated }) {
 }
 
 /** @param {import('@rm/types').Station} props */
-function StationRating({ battle_level }) {
+function StationRating({ battle_level, battle_start, battle_end }) {
   const { t } = useTranslation()
+  const isStarting = battle_start > Date.now() / 1000
+  const epoch = isStarting ? battle_start : battle_end
   return (
     <CardContent sx={{ p: 0, py: 1 }}>
       <Stack alignItems="center" justifyContent="center">
@@ -116,6 +119,7 @@ function StationRating({ battle_level }) {
         <Typography variant="caption">
           {t(`max_battle_${battle_level}`)}
         </Typography>
+        <LiveTimeStamp start={isStarting} epoch={epoch} variant="caption" />
       </Stack>
     </CardContent>
   )
@@ -210,6 +214,9 @@ function StationMedia({
   battle_pokemon_alignment,
   battle_pokemon_costume,
   battle_pokemon_gender,
+  battle_pokemon_bread_mode,
+  battle_pokemon_move_1,
+  battle_pokemon_move_2,
 }) {
   const { t } = useTranslateById()
   const monImage = useMemory((s) =>
@@ -221,7 +228,7 @@ function StationMedia({
       battle_pokemon_costume,
       battle_pokemon_alignment,
       false,
-      1,
+      battle_pokemon_bread_mode,
     ),
   )
   const stationImage = useMemory((s) => s.Icons.getStation(true))
@@ -264,6 +271,10 @@ function StationMedia({
           )}
         </Stack>
       </Box>
+      <Stack direction="row" justifyContent="center">
+        {battle_pokemon_move_1 && <PokeMove id={battle_pokemon_move_1} />}
+        {battle_pokemon_move_2 && <PokeMove id={battle_pokemon_move_2} />}
+      </Stack>
     </CardMedia>
   ) : (
     <Box width="100%" className="flex-center">
@@ -297,13 +308,17 @@ function StationAttackBonus({ total_stationed_pokemon }) {
 
 /** @param {import('@rm/types').Station} station */
 function StationContent({ start_time, end_time, id }) {
+  const epoch = (start_time > Date.now() / 1000 ? start_time : end_time) || 0
   return (
     <CardContent sx={{ p: 0 }}>
-      {start_time > Date.now() / 1000 ? (
-        <TimeStamp start date epoch={start_time || 0} id={id} />
-      ) : (
-        <TimeStamp date epoch={end_time || 0} id={id} />
-      )}
+      <Stack alignItems="center" justifyContent="center">
+        {start_time > Date.now() / 1000 ? (
+          <LiveTimeStamp start epoch={epoch} id={id} />
+        ) : (
+          <LiveTimeStamp epoch={epoch} id={id} />
+        )}
+        <StaticTimeStamp date epoch={epoch} />
+      </Stack>
     </CardContent>
   )
 }
@@ -358,28 +373,32 @@ function StationMons({ id }) {
 }
 
 /**
- * @param {{ start?: boolean, date?: boolean, epoch: number, id: string }} props
+ * @param {{ start?: boolean, epoch: number } & import('@mui/material').TypographyProps} props
  */
-function TimeStamp({ start = false, date = false, epoch }) {
+function LiveTimeStamp({ start = false, epoch, ...props }) {
   const { t } = useTranslation()
-  const formatter = useFormatStore((s) => (date ? s.dateFormat : s.timeFormat))
   const relativeTime = useRelativeTimer(epoch || 0)
   const pastTense = epoch * 1000 < Date.now()
 
   return (
-    <Stack justifyContent="space-evenly" direction="row" width="100%">
-      <Stack alignItems="center" justifyContent="center">
-        <Typography variant="subtitle2">
-          {start
-            ? t(pastTense ? 'started' : 'starts')
-            : t(pastTense ? 'ended' : 'ends')}
-          &nbsp;
-          {relativeTime}
-        </Typography>
-        <Typography variant="caption">
-          {formatter.format(new Date(epoch * 1000))}
-        </Typography>
-      </Stack>
-    </Stack>
+    <Typography variant="subtitle2" {...props}>
+      {start
+        ? t(pastTense ? 'started' : 'starts')
+        : t(pastTense ? 'ended' : 'ends')}
+      &nbsp;
+      {relativeTime}
+    </Typography>
+  )
+}
+
+/**
+ * @param {{ start?: boolean, date?: boolean, epoch: number } & import('@mui/material').TypographyProps} props
+ */
+function StaticTimeStamp({ date = false, epoch, ...props }) {
+  const formatter = useFormatStore((s) => (date ? s.dateFormat : s.timeFormat))
+  return (
+    <Typography variant="caption" {...props}>
+      {formatter.format(new Date(epoch * 1000))}
+    </Typography>
   )
 }

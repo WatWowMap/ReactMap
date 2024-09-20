@@ -200,7 +200,7 @@ function OptionImage(props) {
         form={props.battle_pokemon_form}
         gender={props.battle_pokemon_gender}
         costume={props.battle_pokemon_costume}
-        bread={1}
+        bread={props.battle_pokemon_bread_mode}
       />
     )
   return <Misc />

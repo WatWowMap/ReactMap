@@ -287,11 +287,16 @@ type Station {
   is_battle_available: Boolean
   is_inactive: Boolean
   battle_level: Int
+  battle_start: Int
+  battle_end: Int
   battle_pokemon_id: Int
   battle_pokemon_form: Int
   battle_pokemon_costume: Int
   battle_pokemon_gender: Int
   battle_pokemon_alignment: Int
+  battle_pokemon_bread_mode: Int
+  battle_pokemon_move_1: Int
+  battle_pokemon_move_2: Int
 }
 
 type StationPokemon {

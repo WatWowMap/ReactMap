@@ -46,11 +46,16 @@ class Station extends Model {
       select.push(
         'is_battle_available',
         'battle_level',
+        'battle_start',
+        'battle_end',
         'battle_pokemon_id',
         'battle_pokemon_form',
         'battle_pokemon_costume',
         'battle_pokemon_gender',
         'battle_pokemon_alignment',
+        'battle_pokemon_bread_mode',
+        'battle_pokemon_move_1',
+        'battle_pokemon_move_2',
       )
 
       if (!onlyAllStations) {
@@ -204,6 +209,7 @@ class Station extends Model {
         'battle_pokemon_costume',
         'battle_pokemon_gender',
         'battle_pokemon_alignment',
+        'battle_pokemon_bread_mode',
       )
     }
 
@@ -221,7 +227,11 @@ class Station extends Model {
           builder.orWhereILike('name', `%${search}%`)
         }
         if (perms.dynamax) {
-          builder.orWhereIn('battle_pokemon_id', pokemonIds)
+          builder.orWhere((builder2) => {
+            builder2
+              .whereIn('battle_pokemon_id', pokemonIds)
+              .andWhere('is_battle_available', true)
+          })
         }
       })
       .limit(searchResultsLimit)

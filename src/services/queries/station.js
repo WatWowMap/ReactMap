@@ -20,11 +20,16 @@ const battle = gql`
     is_inactive
     is_battle_available
     battle_level
+    battle_start
+    battle_end
     battle_pokemon_id
     battle_pokemon_form
     battle_pokemon_costume
     battle_pokemon_gender
     battle_pokemon_alignment
+    battle_pokemon_bread_mode
+    battle_pokemon_move_1
+    battle_pokemon_move_2
   }
 `
 
