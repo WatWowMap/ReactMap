@@ -347,7 +347,7 @@ export class UAssets {
 
   /**
    * @param {string|number} pokemonId
-   * @param {PokemonDisplay} pokemonDisplay
+   * @param {import('@rm/types').PokemonDisplay} pokemonDisplay
    */
   getPokemonByDisplay(pokemonId, pokemonDisplay) {
     return this.getPokemon(
