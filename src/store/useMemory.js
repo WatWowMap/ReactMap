@@ -57,6 +57,7 @@ import { create } from 'zustand'
  *     pokemon: string[],
  *     pokestops: string[],
  *     nests: string[],
+ *     stations: string[],
  *     questConditions: Record<string, { title: string, target?: number }[]>,
  *   }
  *   manualParams: {
@@ -125,6 +126,7 @@ export const useMemory = create(() => ({
     pokemon: [],
     pokestops: [],
     nests: [],
+    stations: [],
     questConditions: {},
   },
   Icons: null,
@@ -155,12 +157,14 @@ export const useMemory = create(() => ({
     gyms: { count: 0, show: 0, total: 0 },
     pokestops: { count: 0, show: 0, total: 0 },
     nests: { count: 0, show: 0, total: 0 },
+    stations: { count: 0, show: 0, total: 0 },
   },
   advMenuFiltered: {
     gyms: [],
     pokestops: [],
     pokemon: [],
     nests: [],
+    stations: [],
   },
 }))
 

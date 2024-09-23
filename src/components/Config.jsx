@@ -145,13 +145,15 @@ export function Config({ children }) {
         menus: deepMerge({}, data.menus, prev.menus),
         userSettings: deepMerge({}, data.userSettings, prev.userSettings),
         settings: {
+          ...prev.settings,
           ...Object.fromEntries(
             Object.entries(settings).map(([k, v]) => [
               k,
-              data.map.misc[k] || Object.keys(v)[0],
+              prev.settings[k] in v
+                ? prev.settings[k]
+                : data.map.misc[k] || Object.keys(v)[0],
             ]),
           ),
-          ...prev.settings,
         },
         zoom: safeZoom,
         location,

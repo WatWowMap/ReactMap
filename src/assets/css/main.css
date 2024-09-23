@@ -564,6 +564,13 @@ input[type='time']::-webkit-calendar-picker-indicator {
   width: 100%;
 }
 
+.popup-card-media {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  object-fit: contain;
+  column-gap: 8px;
+}
+
 .badge-diamond {
   clip-path: polygon(50% 0%, 85% 55%, 50% 100%, 15% 55%);
   position: absolute;
@@ -584,4 +591,15 @@ input[type='time']::-webkit-calendar-picker-indicator {
   display: grid;
   grid-template-rows: auto 1fr auto; /* Header, table, footer */
   min-height: 100svh;
+}
+
+.expand-collapse-layout {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  grid-template-rows: 1fr auto;
+  padding: 12px 0;
+}
+
+.expand-collapse-layout > :nth-child(3) {
+  grid-column: 1 / span 2;
 }

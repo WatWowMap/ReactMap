@@ -63,6 +63,13 @@ function drawer(req, perms) {
             arEligible: perms.pokestops || BLOCKED,
           }
         : BLOCKED,
+    stations:
+      (perms.stations || perms.dynamax) && state.db.models.Station
+        ? {
+            allStations: perms.stations || BLOCKED,
+            maxBattles: perms.dynamax || BLOCKED,
+          }
+        : BLOCKED,
     pokemon:
       (perms.pokemon || perms.iv || perms.pvp) && state.db.models.Pokemon
         ? {

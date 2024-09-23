@@ -11,7 +11,20 @@ export const ENUM_GENDER = /** @type {const} */ ([0, 1, 2, 3])
 export const ENUM_BADGES = /** @type {const} */ ([0, 1, 2, 3, 4])
 
 export const S2_LEVELS = /** @type {const} */ ([
-  10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20,
+  ...(process.env.NODE_ENV === 'development'
+    ? [1, 2, 3, 4, 5, 6, 7, 8, 9]
+    : []),
+  10,
+  11,
+  12,
+  13,
+  14,
+  15,
+  16,
+  17,
+  18,
+  19,
+  20,
 ])
 
 export const FORT_LEVELS = /** @type {const} */ (['all', '1', '2', '3'])

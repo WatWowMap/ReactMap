@@ -27,6 +27,7 @@ import { setDeep } from '@utils/setDeep'
  *    gyms: string,
  *    pokestops: string,
  *    nests: string,
+ *    stations: string,
  *   }
  *   searches: Record<string, string>,
  *   tabs: Record<string, number>,
@@ -53,7 +54,6 @@ import { setDeep } from '@utils/setDeep'
  * @typedef {import('@rm/types').OnlyType<UseStorage, Function, false>} UseStorageNoFn
  * @typedef {import('@rm/types').Paths<UseStorageNoFn>} UseStoragePaths
  * @typedef {import('@rm/types').ObjectPathValue<UseStorageNoFn, UseStoragePaths>} UseStorageValues
- *
  * @type {import("zustand").UseBoundStore<import("zustand").StoreApi<UseStorage>>}
  */
 export const useStorage = create(
@@ -97,7 +97,8 @@ export const useStorage = create(
       },
       getPokemonFilterMode: () => {
         const { filters, userSettings } = get()
-        return filters?.pokemon?.easyMode
+        return filters?.pokemon?.easyMode &&
+          !userSettings?.pokemon?.legacyFilter
           ? 'basic'
           : userSettings?.pokemon?.legacyFilter
             ? 'expert'
@@ -123,10 +124,10 @@ export const useStorage = create(
       },
       holidayEffects: {},
       settings: {
-        distanceUnit: 'kilometers',
-        navigation: 'leaflet',
-        navigationControls: 'leaflet',
-        tileServers: 'default',
+        // distanceUnit: 'kilometers',
+        // navigation: 'leaflet',
+        // navigationControls: 'leaflet',
+        // tileServers: 'default',
       },
       searches: {},
       tabs: {},
@@ -143,6 +144,7 @@ export const useStorage = create(
         gyms: 'categories',
         pokestops: 'categories',
         nests: 'others',
+        stations: 'others',
       },
       search: '',
       searchTab: '',

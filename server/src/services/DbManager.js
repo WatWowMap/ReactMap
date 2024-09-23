@@ -23,6 +23,7 @@ class DbManager extends Logger {
     'Route',
     'ScanCell',
     'Spawnpoint',
+    'Station',
     'Weather',
   ])
 

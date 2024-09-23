@@ -35,6 +35,7 @@ function buildDefaultFilters(perms) {
     perms.pokestops || perms.lures || perms.quests || perms.invasions
   const gymReducer = perms.gyms || perms.raids
   const pokemonReducer = perms.iv || perms.pvp
+  const stationReducer = perms.stations || perms.dynamax
   const pokemon = buildPokemon(defaultFilters, base, custom)
 
   return {
@@ -108,6 +109,23 @@ function buildDefaultFilters(perms) {
               ...buildPokestops(perms, defaultFilters.pokestops),
               ...pokemon.quests,
             },
+          }
+        : undefined,
+    stations:
+      stationReducer && state.db.models.Station
+        ? {
+            enabled: defaultFilters.stations.enabled,
+            allStations: perms.stations
+              ? defaultFilters.stations.enabled
+              : undefined,
+            standard: new BaseFilter(),
+            battleTier: perms.dynamax
+              ? defaultFilters.stations.battleTier
+              : undefined,
+            maxBattles: perms.stations
+              ? defaultFilters.stations.battles
+              : undefined,
+            filter: pokemon.stations,
           }
         : undefined,
     pokemon:

@@ -117,6 +117,7 @@ router.put('/:category', async (req, res) => {
         state.event.setAvailable('pokestops', 'Pokestop', state.db),
         state.event.setAvailable('gyms', 'Gym', state.db),
         state.event.setAvailable('nests', 'Nest', state.db),
+        state.event.setAvailable('stations', 'Station', state.db),
       ])
     }
     res

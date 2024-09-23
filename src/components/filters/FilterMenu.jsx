@@ -23,7 +23,8 @@ export function FilterMenu() {
   return (category === 'pokemon' ||
     category === 'gyms' ||
     category === 'pokestops' ||
-    category === 'nests') &&
+    category === 'nests' ||
+    category === 'stations') &&
     type === 'filters' ? (
     <DialogWrapper
       open={open && type === 'filters'}

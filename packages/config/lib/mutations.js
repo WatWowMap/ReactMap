@@ -21,6 +21,7 @@ const applyMutations = (config) => {
     'nests',
     'pokestops',
     'pokemon',
+    'stations',
     'routes',
     'wayfarer',
     's2cells',

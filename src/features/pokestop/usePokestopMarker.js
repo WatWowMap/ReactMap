@@ -44,9 +44,7 @@ export function usePokestopMarker({
         ar_scan_eligible &&
           (userSettings.pokestops.showArBadge || !!power_up_level),
         power_up_level,
-        hasEvent
-          ? Math.max(...events.map((event) => event.display_type)).toString()
-          : '',
+        hasEvent ? Math.max(...events.map((event) => event.display_type)) : 0,
       ),
       hasLure
         ? Icons.getSize(

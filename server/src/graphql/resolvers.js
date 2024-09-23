@@ -81,6 +81,8 @@ const resolvers = {
         }
         return perms?.pokestops
       }),
+    availableStations: (_, _args, { Event, perms }) =>
+      perms?.dynamax ? Event.available.stations : [],
     backup: (_, args, { req, perms, Db }) => {
       if (perms?.backups && req?.user?.id) {
         return Db.models.Backup.getOne(args.id, req?.user?.id)
@@ -438,6 +440,8 @@ const resolvers = {
           return perms.portals ? Db.search('Portal', perms, args) : []
         case 'nests':
           return perms.nests ? Db.search('Nest', perms, args) : []
+        case 'stations':
+          return perms.stations ? Db.search('Station', perms, args) : []
         default:
           return []
       }
@@ -479,6 +483,18 @@ const resolvers = {
     spawnpoints: (_, args, { perms, Db }) => {
       if (perms?.spawnpoints) {
         return Db.query('Spawnpoint', 'getAll', perms, args)
+      }
+      return []
+    },
+    stations: (_, args, { perms, Db }) => {
+      if (perms?.stations || perms?.dynamax) {
+        return Db.query('Station', 'getAll', perms, args)
+      }
+      return []
+    },
+    stationPokemon: (_, { id }, { perms, Db }) => {
+      if (perms?.stations) {
+        return Db.query('Station', 'getDynamaxMons', id)
       }
       return []
     },

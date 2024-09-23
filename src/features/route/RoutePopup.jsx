@@ -26,7 +26,7 @@ import { formatInterval } from '@utils/formatInterval'
 import { useMemory } from '@store/useMemory'
 import { useStorage } from '@store/useStorage'
 import { Title } from '@components/popups/Title'
-import { TimeSince } from '@components/popups/Timer'
+import { Timer } from '@components/popups/Timer'
 import { Navigation } from '@components/popups/Navigation'
 
 import { useFormatDistance } from './useFormatDistance'
@@ -279,7 +279,7 @@ export function RoutePopup({ end, ...props }) {
                 {route.version || 0}
               </ListItemWrapper>
               <ListItemWrapper primary={t('last_updated')}>
-                <TimeSince expireTime={route.updated} fontWeight={400} />
+                <Timer expireTime={route.updated} fontWeight={400} />
               </ListItemWrapper>
             </List>
           </ExpandableWrapper>

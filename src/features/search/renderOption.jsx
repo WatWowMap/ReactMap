@@ -12,16 +12,18 @@ import { Img } from '@components/Img'
 import { useMemory } from '@store/useMemory'
 import { useStorage } from '@store/useStorage'
 import { RawQuestTitle } from '@components/QuestTitle'
-import { RawTimeSince } from '@components/popups/Timer'
 import { getGruntReward } from '@utils/getGruntReward'
 import { formatDistance } from '@utils/formatDistance'
 import { getTimeUntil } from '@utils/getTimeUntil'
+import { useRelativeTimer } from '@hooks/useRelativeTime'
 
 import { OptionImageMemo } from './OptionImage'
 
 /** @param {string} tab */
 const getBackupName = (tab) => {
   switch (tab) {
+    case 'stations':
+      return 'unknown_station'
     case 'quests':
     case 'pokestops':
       return 'unknown_pokestop'
@@ -89,12 +91,19 @@ const InvasionSubtitle = ({
   )
 }
 
+const Timer = ({ expireTime }) => {
+  const time = useRelativeTimer(expireTime || 0)
+  return time
+}
+
 /** @type {import('@mui/material').AutocompleteProps['renderOption']} */
-export const renderOption = (props, option) => {
+export const renderOption = ({ key, ...props }, option) => {
   const { searchTab } = useStorage.getState()
   const { questMessage } = useMemory.getState().config.misc
+
   return (
     <ListItem
+      key={key}
       sx={(theme) => ({
         backgroundColor:
           option.index % 2
@@ -150,9 +159,9 @@ export const renderOption = (props, option) => {
           searchTab === 'quests' ? (
             questMessage || t(`ar_quest_${!!option.with_ar}`).toString()
           ) : searchTab === 'invasions' ? (
-            <RawTimeSince expireTime={option.incident_expire_timestamp} until />
+            <Timer expireTime={option.incident_expire_timestamp} />
           ) : searchTab === 'lures' ? (
-            <RawTimeSince expireTime={option.lure_expire_timestamp} until />
+            <Timer expireTime={option.lure_expire_timestamp} />
           ) : (
             ''
           )

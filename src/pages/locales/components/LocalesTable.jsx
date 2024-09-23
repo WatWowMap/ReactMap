@@ -13,6 +13,7 @@ import Divider from '@mui/material/Divider'
 
 import { LOCALES_STATUS } from '@services/queries/config'
 import { VirtualTable } from '@components/virtual/Table'
+import { useFormatStore } from '@store/useFormatStore'
 
 import { useLocalesStore } from '../hooks/store'
 import { EditLocale } from './EditLocale'
@@ -79,6 +80,7 @@ export function LocalesTable() {
   const all = useLocalesStore((s) => s.all)
   // @ts-ignore
   const isMobile = useMediaQuery((theme) => theme.breakpoints.down('sm'))
+  const stringSorter = useFormatStore((s) => s.collator)
 
   const { data, loading } = useQuery(LOCALES_STATUS, {
     fetchPolicy: 'network-only',
@@ -90,11 +92,6 @@ export function LocalesTable() {
     fetchPolicy: 'network-only',
     nextFetchPolicy: 'cache-only',
     variables: { locale: 'en' },
-  })
-
-  const stringSorter = new Intl.Collator(i18n.language, {
-    sensitivity: 'base',
-    ignorePunctuation: true,
   })
 
   /** @type {Row[]} */

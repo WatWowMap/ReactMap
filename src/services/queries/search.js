@@ -251,3 +251,33 @@ export const INVASIONS = gql`
     }
   }
 `
+
+export const MAX_BATTLES = gql`
+  ${core}
+  query SearchMaxBattles(
+    $search: String!
+    $category: String!
+    $lat: Float!
+    $lon: Float!
+    $locale: String!
+    $onlyAreas: [String]
+  ) {
+    search(
+      search: $search
+      category: $category
+      lat: $lat
+      lon: $lon
+      locale: $locale
+      onlyAreas: $onlyAreas
+    ) {
+      ...CoreSearch
+      battle_pokemon_id
+      battle_pokemon_form
+      battle_pokemon_gender
+      battle_pokemon_costume
+      # battle_pokemon_evolution
+      battle_pokemon_alignment
+      battle_pokemon_bread_mode
+    }
+  }
+`

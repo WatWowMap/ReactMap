@@ -16,7 +16,7 @@ function QuestImage(props) {
   const { Icons } = useMemory.getState()
   return (
     <Box maxHeight={45} maxWidth={45}>
-      <NameTT id={tt}>
+      <NameTT title={tt}>
         <Img
           src={src}
           maxHeight={45}
@@ -60,14 +60,23 @@ function FortImage({ url }) {
   )
 }
 
-/** @param {Partial<import('@rm/types').Pokemon>} props */
-function PokemonImage({ pokemon_id, form, gender, costume, shiny }) {
+/** @param {Partial<import('@rm/types').Pokemon> & { bread?: number }} props */
+function PokemonImage({ pokemon_id, form, gender, costume, shiny, bread }) {
   const { Icons } = useMemory.getState()
   const { t } = useTranslateById()
   return (
-    <NameTT id={[form ? `form_${form}` : '', `poke_${pokemon_id}`]}>
+    <NameTT title={[form ? `form_${form}` : '', `poke_${pokemon_id}`]}>
       <Img
-        src={Icons.getPokemon(pokemon_id, form, 0, gender, costume, 0, shiny)}
+        src={Icons.getPokemon(
+          pokemon_id,
+          form,
+          0,
+          gender,
+          costume,
+          0,
+          shiny,
+          bread,
+        )}
         alt={t(`${pokemon_id}-${form}`)}
         maxHeight={45}
         maxWidth={45}
@@ -89,7 +98,7 @@ function RaidImage({
   const { t } = useTranslateById()
   return (
     <NameTT
-      id={[
+      title={[
         raid_pokemon_form ? `form_${raid_pokemon_form}` : '',
         raid_pokemon_evolution ? `evo_${raid_pokemon_evolution}` : '',
         `poke_${raid_pokemon_id}`,
@@ -117,7 +126,7 @@ function LureImage({ lure_id }) {
   const { Icons } = useMemory.getState()
   const { t } = useTranslateById()
   return (
-    <NameTT id={`lure_${lure_id}`}>
+    <NameTT title={`lure_${lure_id}`}>
       <Img
         src={Icons.getPokestops(lure_id)}
         alt={t(`lure_${lure_id}`)}
@@ -134,7 +143,7 @@ function NestImage({ nest_pokemon_id, nest_pokemon_form }) {
   const { t } = useTranslateById()
   return (
     <NameTT
-      id={[
+      title={[
         nest_pokemon_form ? `form_${nest_pokemon_form}` : '',
         `poke_${nest_pokemon_id}`,
       ]}
@@ -154,7 +163,7 @@ function InvasionImage({ grunt_type, confirmed }) {
   const { Icons } = useMemory.getState()
   const { t } = useTranslateById()
   return (
-    <NameTT id={`grunt_${grunt_type}`}>
+    <NameTT title={`grunt_${grunt_type}`}>
       <Img
         src={Icons.getInvasions(grunt_type, confirmed)}
         alt={t(`grunt_${grunt_type}`)}
@@ -167,11 +176,15 @@ function InvasionImage({ grunt_type, confirmed }) {
 
 function Misc() {
   const { searchTab } = useStorage.getState()
-  const miscIcon = useMemory((s) => s.Icons.getMisc(searchTab))
+  const miscIcon = useMemory((s) =>
+    searchTab === 'stations'
+      ? s.Icons.getStation()
+      : s.Icons.getMisc(searchTab),
+  )
   return <Img src={miscIcon} alt={searchTab} maxHeight={45} maxWidth={45} />
 }
 
-/** @param {Partial<import('@rm/types').Quest & { id: string }> | { id: string, url?: string } | Partial<import('@rm/types').Pokemon> | Partial<import('@rm/types').Gym> | Partial<import('@rm/types').Pokestop> | { id: string, nest_pokemon_id: number, nest_pokemon_form?: number } | Partial<import('@rm/types').Invasion> & { id: string }} props */
+/** @param {Partial<import('@rm/types').Quest & { id: string }> | { id: string, url?: string } | Partial<import('@rm/types').Pokemon> | Partial<import('@rm/types').Gym> | Partial<import('@rm/types').Pokestop> | { id: string, nest_pokemon_id: number, nest_pokemon_form?: number } | Partial<import('@rm/types').Invasion> & { id: string } | Partial<import('@rm/types').Station>} props */
 function OptionImage(props) {
   if ('url' in props && props.url) return <FortImage url={props.url} />
   if ('quest_reward_type' in props) return <QuestImage {...props} />
@@ -180,6 +193,16 @@ function OptionImage(props) {
   if ('lure_id' in props) return <LureImage {...props} />
   if ('nest_pokemon_id' in props) return <NestImage {...props} />
   if ('grunt_type' in props) return <InvasionImage {...props} />
+  if ('battle_pokemon_id' in props && props.battle_pokemon_id)
+    return (
+      <PokemonImage
+        pokemon_id={props.battle_pokemon_id}
+        form={props.battle_pokemon_form}
+        gender={props.battle_pokemon_gender}
+        costume={props.battle_pokemon_costume}
+        bread={props.battle_pokemon_bread_mode}
+      />
+    )
   return <Misc />
 }
 

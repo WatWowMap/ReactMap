@@ -4,21 +4,21 @@ import type {
   RmModels,
   RmModelKeys,
   ModelKeys,
+  Station,
+  Backup,
+  Nest,
+  NestSubmission,
+  Pokestop,
+  Gym,
+  Pokemon,
 } from 'server/src/models'
 import { Knex } from 'knex'
 import { Model } from 'objection'
 import { NextFunction, Request, Response } from 'express'
 import { VerifyCallback } from 'passport-oauth2'
 
-import DbManager = require('server/src/services/DbManager')
-import EventManager = require('server/src/services/EventManager')
-import Pokemon = require('server/src/models/Pokemon')
-import Gym = require('server/src/models/Gym')
-import Badge = require('server/src/models/Badge')
-import Backup = require('server/src/models/Backup')
-import Nest = require('server/src/models/Nest')
-import NestSubmission = require('server/src/models/NestSubmission')
-import Pokestop = require('server/src/models/Pokestop')
+import type { DbManager } from 'server/src/services/DbManager'
+import type { EventManager } from 'server/src/services/EventManager'
 import { ModelReturn, OnlyType } from './utility'
 import { Profile } from 'passport-discord'
 import { User } from './models'
@@ -66,6 +66,7 @@ export interface Available {
   gyms: ModelReturn<typeof Gym, 'getAvailable'>
   pokestops: ModelReturn<typeof Pokestop, 'getAvailable'>
   nests: ModelReturn<typeof Nest, 'getAvailable'>
+  stations: ModelReturn<typeof Station, 'getAvailable'>
 }
 
 export interface ApiEndpoint {
@@ -133,77 +134,22 @@ export interface GqlContext {
   userId: number
   req: Request
   res: Response
-  Db: DbManager.DbManager
-  Event: EventManager.EventManager
+  Db: DbManager
+  Event: EventManager
   perms: Permissions
   username: string
   operation: OperationTypeNode
   startTime?: number
 }
 
-export interface Permissions {
-  map: boolean
-  pokemon: boolean
-  iv: boolean
-  pvp: boolean
-  gyms: boolean
-  raids: boolean
-  pokestops: boolean
-  eventStops: boolean
-  quests: boolean
-  lures: boolean
-  portals: boolean
-  submissionCells: boolean
-  invasions: boolean
-  nests: boolean
-  nestSubmissions: boolean
-  scanAreas: boolean
-  weather: boolean
-  spawnpoints: boolean
-  s2cells: boolean
-  scanCells: boolean
-  devices: boolean
-  donor: boolean
-  gymBadges: boolean
-  backups: boolean
-  routes: boolean
-  blocked: boolean
-  admin: boolean
+type BasePerms = { [K in keyof Config['authentication']['perms']]: boolean }
+
+export interface Permissions extends BasePerms {
   blockedGuildNames: string[]
   scanner: string[]
   areaRestrictions: string[]
   webhooks: string[]
   trial: boolean
-}
-
-export interface Waypoint {
-  lat_degrees: number
-  lng_degrees: number
-  elevation_in_meters: number
-}
-
-export interface Route {
-  id: string
-  name: string
-  description: string
-  distance_meters: number
-  duration_seconds: number
-  start_fort_id: string
-  start_lat: number
-  start_lon: number
-  start_image: string
-  end_fort_id: string
-  end_lat: number
-  end_lon: number
-  end_image: string
-  image: string
-  image_border_color: string
-  reversible: boolean
-  tags?: string[]
-  type: number
-  updated: number
-  version: number
-  waypoints: Waypoint[]
 }
 
 export interface FilterId {
@@ -249,7 +195,12 @@ export type AllFilters = ReturnType<
 
 export type Categories = keyof AllFilters
 
-export type AdvCategories = 'pokemon' | 'gyms' | 'pokestops' | 'nests'
+export type AdvCategories =
+  | 'pokemon'
+  | 'gyms'
+  | 'pokestops'
+  | 'nests'
+  | 'stations'
 
 export type UIObject = ReturnType<
   (typeof import('server/src/ui/drawer'))['drawer']

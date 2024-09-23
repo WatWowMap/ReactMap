@@ -61,7 +61,7 @@ function getServerSettings(req) {
     },
     tileServers: config.getSafe('tileServers'),
     navigation: config.getSafe('navigation'),
-    menus: advMenus(),
+    menus: advMenus(user.perms),
     userSettings: clientValues,
     clientMenus,
     ui: drawer(req, user.perms),

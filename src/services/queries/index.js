@@ -8,6 +8,7 @@ import * as portalIndex from './portal'
 import * as searchIndex from './search'
 import * as webhookIndex from './webhook'
 import * as user from './user'
+import * as stationIndex from './station'
 import { GET_ALL_DEVICES } from './device'
 import { GET_ALL_SPAWNPOINTS } from './spawnpoint'
 import { GET_ALL_WEATHER } from './weather'
@@ -139,8 +140,19 @@ export class Query {
     return GET_SCAN_AREAS_MENU
   }
 
+  /** @param {import('@rm/types').AllFilters['stations']} filters */
+  static stations(filters) {
+    const { perms } = useMemory.getState().auth
+    let query = 'GET_ALL_STATIONS'
+    if (filters.maxBattles && perms.dynamax) {
+      query += '_BATTLE'
+    }
+    return stationIndex[query]
+  }
+
   /** @param {string} category */
   static search(category) {
+    const { perms } = useMemory.getState().auth
     switch (category) {
       case 'lures':
       case 'raids':
@@ -151,6 +163,8 @@ export class Query {
         return searchIndex[category.toUpperCase()]
       case 'webhook':
         return searchIndex.POI_WEBHOOK
+      case 'stations':
+        return perms.dynamax ? searchIndex.MAX_BATTLES : searchIndex.POI
       default:
         return searchIndex.POI
     }
