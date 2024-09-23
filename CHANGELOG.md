@@ -1,3 +1,51 @@
+# [1.35.0-develop.2](https://github.com/WatWowMap/ReactMap/compare/v1.35.0-develop.1...v1.35.0-develop.2) (2024-09-23)
+
+
+### Bug Fixes
+
+* `battleOpacity` => `stationsOpacity` ([f720aa3](https://github.com/WatWowMap/ReactMap/commit/f720aa3ed58b4c97277486dd78861d3917148bf4))
+* a slightly better temporary image hack ([29b9eb6](https://github.com/WatWowMap/ReactMap/commit/29b9eb670dcd7f83b18ac998d4def81d042b2104))
+* a slightly better temporary image hack ([fd2e7c4](https://github.com/WatWowMap/ReactMap/commit/fd2e7c4f18925f7982915f26619b39fde7ebf415))
+* add missing copy coords menu item ([32b22ff](https://github.com/WatWowMap/ReactMap/commit/32b22ff23a3f1bd4699afa2659351b6fbc43b9d7))
+* add types & onClose callback to `CopyCoords` ([7eaf43d](https://github.com/WatWowMap/ReactMap/commit/7eaf43d036520a8a202be7fc9312ee688f81a5de))
+* encode title in apollo client ([5b7b58f](https://github.com/WatWowMap/ReactMap/commit/5b7b58f7a07d0eebc436fa7535359cd031208fdf))
+* forgot to rename from `battleTimers` => `stationTimers` ([cd32477](https://github.com/WatWowMap/ReactMap/commit/cd32477cfe82e681029497f3f5e70a72c2eb8567))
+* just a lot of things :dango: ([421b06e](https://github.com/WatWowMap/ReactMap/commit/421b06e90fa1704c37fafc51389c3983f1194088))
+* just a lot of things :dango: ([7879a7f](https://github.com/WatWowMap/ReactMap/commit/7879a7f01975325192ea0a173ea255f6a9e7ee15))
+* local.example.json additions ([89706eb](https://github.com/WatWowMap/ReactMap/commit/89706ebaeca95dc887b6adc5623a60e6f61b6c0a))
+* local.example.json additions ([a200e50](https://github.com/WatWowMap/ReactMap/commit/a200e50243432953d8a1240e7e4709d3b4ea524e))
+* memo comparison ([dd66d03](https://github.com/WatWowMap/ReactMap/commit/dd66d039cf91af9034b90a3915b197863befea17))
+* missing > ([0352204](https://github.com/WatWowMap/ReactMap/commit/0352204608526d99759b3f9c01fca1fe73bc6864))
+* missing translation ([d676875](https://github.com/WatWowMap/ReactMap/commit/d676875cb26c2b017220922cc144ee93f567c898))
+* missing translations ([abb047a](https://github.com/WatWowMap/ReactMap/commit/abb047a64303deca2231972d033f6d26025a5e3f))
+* more consistent `is_battle_available` usage ([0a565ed](https://github.com/WatWowMap/ReactMap/commit/0a565ed265db65bf0a5668bc47e0103165792796))
+* optimize dynamax code ([a1cfb57](https://github.com/WatWowMap/ReactMap/commit/a1cfb570f2022eb6d3195e5a59949e90e673b5fd))
+* remove log ([6e35170](https://github.com/WatWowMap/ReactMap/commit/6e3517006f3cf7459681a8774dd6b3ceefff6a6d))
+* select query ([cac8eab](https://github.com/WatWowMap/ReactMap/commit/cac8eab24fcce4830bc97cca89e9d2153b2f4f7e))
+* select query ([4dd8b2c](https://github.com/WatWowMap/ReactMap/commit/4dd8b2c7988c50185d9fd216f25d8973795fd185))
+* some client side perm stuff ([73fd35a](https://github.com/WatWowMap/ReactMap/commit/73fd35abaac4f16a0a4b905396bc2de91060dd1a))
+* some type imports ([19ae836](https://github.com/WatWowMap/ReactMap/commit/19ae8361256165021a46c91836a4411b6b483773))
+* station and dynamax perms on profile page ([dcd994a](https://github.com/WatWowMap/ReactMap/commit/dcd994a7ecc39aef6509cd811efb4143f0db562e))
+* station clustering in config ([d87dd0e](https://github.com/WatWowMap/ReactMap/commit/d87dd0e647b4b977bd3d8092807660232ea0c038))
+* station clustering in config ([7037c46](https://github.com/WatWowMap/ReactMap/commit/7037c469ac15cfbcf60a2ef6f0b4d888110fecff))
+* uicons 1.4.1 ([a1776f1](https://github.com/WatWowMap/ReactMap/commit/a1776f16e3a51b6be38047a5432e0a791e65b887))
+* undefined/null issue in marker ([48ee917](https://github.com/WatWowMap/ReactMap/commit/48ee917a1e2c8e8f0ec6f1b6b537935a8c41383c))
+* undefined/null issue in marker ([9f7532f](https://github.com/WatWowMap/ReactMap/commit/9f7532f6330762b260c3ba9e473153b6ece3469a))
+
+
+### Features
+
+* bread mode uicons support ([4c5dfcc](https://github.com/WatWowMap/ReactMap/commit/4c5dfcc311b90f31faf4ca80f4a98a498e79748b))
+* categories in options menus ([3bffd7e](https://github.com/WatWowMap/ReactMap/commit/3bffd7e455cd43c46809aed16dde7ba1a89bd94c))
+* german translations for dynamax ([a1f527a](https://github.com/WatWowMap/ReactMap/commit/a1f527ac46ffbbb6239018f5faf3cce5929f2a51))
+* station override dropdown ([5ba34c9](https://github.com/WatWowMap/ReactMap/commit/5ba34c9d373bbb233fc657aabfcdd72f46b931e3))
+* station searching ([fbf3b6d](https://github.com/WatWowMap/ReactMap/commit/fbf3b6d078a559cc09532f28955a8f106a49a44c))
+* station searching ([7bd4c50](https://github.com/WatWowMap/ReactMap/commit/7bd4c50e2b592e59d6b2b40925e2942e7292392b))
+* station timers + bread mon moves ([70316d6](https://github.com/WatWowMap/ReactMap/commit/70316d6f86b1ac287103daf61e3ba89e30255a3a))
+* stationed pokemon ([553ab86](https://github.com/WatWowMap/ReactMap/commit/553ab864785ab3bab67f03ac4f463a50a645e2a1))
+* stations ([6e61dca](https://github.com/WatWowMap/ReactMap/commit/6e61dca891c7dd4fb5e120119159d66ba608e6d5))
+* stations ([f6a479b](https://github.com/WatWowMap/ReactMap/commit/f6a479b4ae02088461cea7570fc48e18a6423d7b))
+
 # [1.35.0-develop.1](https://github.com/WatWowMap/ReactMap/compare/v1.34.1-develop.5...v1.35.0-develop.1) (2024-09-23)
 
 
