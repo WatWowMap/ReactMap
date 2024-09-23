@@ -111,6 +111,10 @@
         "__name": "API_POLLING_SUBMISSION_CELLS",
         "__format": "number"
       },
+      "stations": {
+        "__name": "API_POLLING_STATIONS",
+        "__format": "number"
+      },
       "weather": {
         "__name": "API_POLLING_WEATHER",
         "__format": "number"
@@ -152,6 +156,10 @@
       "invasions": {
         "__name": "API_SEARCHABLE_INVASIONS",
         "__format": "boolean"
+      },
+      "stations": {
+        "__name": "API_SEARCHABLE_STATIONS",
+        "__format": "boolean"
       }
     },
     "queryUpdateHours": {
@@ -174,6 +182,10 @@
       "historicalRarity": {
         "__name": "API_QUERY_UPDATE_HOURS_HISTORICAL_RARITY",
         "__format": "number"
+      },
+      "stations": {
+        "__name": "API_QUERY_UPDATE_HOURS_STATIONS",
+        "__format": "number"
       }
     },
     "queryOnSessionInit": {
@@ -191,6 +203,10 @@
       },
       "nests": {
         "__name": "API_QUERY_ON_SESSION_INIT_NESTS",
+        "__format": "boolean"
+      },
+      "stations": {
+        "__name": "API_QUERY_ON_SESSION_INIT_STATIONS",
         "__format": "boolean"
       }
     },
@@ -226,6 +242,10 @@
         },
         "weather": {
           "__name": "API_DATA_REQUEST_LIMITS_CATEGORIES_WEATHER",
+          "__format": "number"
+        },
+        "stations": {
+          "__name": "API_DATA_REQUEST_LIMITS_CATEGORIES_STATIONS",
           "__format": "number"
         }
       },
@@ -266,6 +286,10 @@
       "scanCells": {
         "__name": "API_QUERY_LIMITS_SCAN_CELLS",
         "__format": "number"
+      },
+      "stations": {
+        "__name": "API_QUERY_LIMITS_STATIONS",
+        "__format": "number"
       }
     },
     "pvp": {
@@ -302,6 +326,10 @@
     },
     "weatherCellLimit": {
       "__name": "API_WEATHER_CELL_LIMIT",
+      "__format": "number"
+    },
+    "stationUpdateLimit": {
+      "__name": "API_STATION_UPDATE_LIMIT",
       "__format": "number"
     },
     "searchResultsLimit": {
@@ -496,6 +524,10 @@
         "__name": "MAP_MISC_ENABLE_PORTAL_POPUP_COORDS_SELECTOR",
         "__format": "boolean"
       },
+      "enableStationPopupCoordsSelector": {
+        "__name": "MAP_MISC_ENABLE_STATION_POPUP_COORDS_SELECTOR",
+        "__format": "boolean"
+      },
       "customFloatingIcons": {
         "__name": "MAP_MISC_CUSTOM_FLOATING_ICONS",
         "__format": "json"
@@ -562,6 +594,16 @@
         },
         "forcedLimit": {
           "__name": "MAP_CLUSTERING_SPAWNPOINTS_FORCED_LIMIT",
+          "__format": "number"
+        }
+      },
+      "stations": {
+        "zoomLevel": {
+          "__name": "MAP_CLUSTERING_STATIONS_ZOOM_LEVEL",
+          "__format": "number"
+        },
+        "forcedLimit": {
+          "__name": "MAP_CLUSTERING_STATIONS_FORCED_LIMIT",
           "__format": "number"
         }
       }
@@ -779,6 +821,36 @@
       },
       "opacityOneMinute": {
         "__name": "CLIENT_SIDE_OPTIONS_POKESTOPS_OPACITY_ONE_MINUTE",
+        "__format": "number"
+      }
+    },
+    "stations": {
+      "clustering": {
+        "__name": "CLIENT_SIDE_OPTIONS_STATIONS_CLUSTERING",
+        "__format": "boolean"
+      },
+      "stationTimers": {
+        "__name": "CLIENT_SIDE_OPTIONS_STATIONS_STATION_TIMERS",
+        "__format": "boolean"
+      },
+      "stationsOpacity": {
+        "__name": "CLIENT_SIDE_OPTIONS_STATIONS_STATIONS_OPACITY",
+        "__format": "boolean"
+      },
+      "enableStationPopupCoords": {
+        "__name": "CLIENT_SIDE_OPTIONS_STATIONS_ENABLE_STATION_POPUP_COORDS",
+        "__format": "boolean"
+      },
+      "opacityTenMinutes": {
+        "__name": "CLIENT_SIDE_OPTIONS_STATIONS_OPACITY_TEN_MINUTES",
+        "__format": "number"
+      },
+      "opacityFiveMinutes": {
+        "__name": "CLIENT_SIDE_OPTIONS_STATIONS_OPACITY_FIVE_MINUTES",
+        "__format": "number"
+      },
+      "opacityOneMinute": {
+        "__name": "CLIENT_SIDE_OPTIONS_STATIONS_OPACITY_ONE_MINUTE",
         "__format": "number"
       }
     },
@@ -1244,6 +1316,21 @@
       },
       "includeSponsored": {
         "__name": "DEFAULT_FILTERS_SUBMISSION_CELLS_INCLUDE_SPONSORED",
+        "__format": "boolean"
+      }
+    },
+    "stations": {
+      "enabled": {
+        "__name": "DEFAULT_FILTERS_STATIONS_ENABLED",
+        "__format": "boolean"
+      },
+      "pokemon": {
+        "__name": "DEFAULT_FILTERS_STATIONS_POKEMON",
+        "__format": "boolean"
+      },
+      "battleTier": "DEFAULT_FILTERS_STATIONS_BATTLE_TIER",
+      "battles": {
+        "__name": "DEFAULT_FILTERS_STATIONS_BATTLES",
         "__format": "boolean"
       }
     },
@@ -1847,6 +1934,34 @@
           "__name": "AUTHENTICATION_PERMS_SHOWCASE_RANKINGS_ROLES",
           "__format": "json"
         }
+      },
+      "stations": {
+        "enabled": {
+          "__name": "AUTHENTICATION_PERMS_STATIONS_ENABLED",
+          "__format": "boolean"
+        },
+        "trialPeriodEligible": {
+          "__name": "AUTHENTICATION_PERMS_STATIONS_TRIAL_PERIOD_ELIGIBLE",
+          "__format": "boolean"
+        },
+        "roles": {
+          "__name": "AUTHENTICATION_PERMS_STATIONS_ROLES",
+          "__format": "json"
+        }
+      },
+      "dynamax": {
+        "enabled": {
+          "__name": "AUTHENTICATION_PERMS_DYNAMAX_ENABLED",
+          "__format": "boolean"
+        },
+        "trialPeriodEligible": {
+          "__name": "AUTHENTICATION_PERMS_DYNAMAX_TRIAL_PERIOD_ELIGIBLE",
+          "__format": "boolean"
+        },
+        "roles": {
+          "__name": "AUTHENTICATION_PERMS_DYNAMAX_ROLES",
+          "__format": "json"
+        }
       }
     }
   },
@@ -2052,6 +2167,42 @@
         },
         "xl": {
           "__name": "ICONS_SIZES_EVENT_XL",
+          "__format": "number"
+        }
+      },
+      "station": {
+        "sm": {
+          "__name": "ICONS_SIZES_STATION_SM",
+          "__format": "number"
+        },
+        "md": {
+          "__name": "ICONS_SIZES_STATION_MD",
+          "__format": "number"
+        },
+        "lg": {
+          "__name": "ICONS_SIZES_STATION_LG",
+          "__format": "number"
+        },
+        "xl": {
+          "__name": "ICONS_SIZES_STATION_XL",
+          "__format": "number"
+        }
+      },
+      "dynamax": {
+        "sm": {
+          "__name": "ICONS_SIZES_DYNAMAX_SM",
+          "__format": "number"
+        },
+        "md": {
+          "__name": "ICONS_SIZES_DYNAMAX_MD",
+          "__format": "number"
+        },
+        "lg": {
+          "__name": "ICONS_SIZES_DYNAMAX_LG",
+          "__format": "number"
+        },
+        "xl": {
+          "__name": "ICONS_SIZES_DYNAMAX_XL",
           "__format": "number"
         }
       }
