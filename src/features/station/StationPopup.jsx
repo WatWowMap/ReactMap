@@ -24,7 +24,7 @@ import { Navigation } from '@components/popups/Navigation'
 import { useTranslateById } from '@hooks/useTranslateById'
 import { PokeType } from '@components/popups/PokeType'
 import { GenderIcon } from '@components/popups/GenderIcon'
-import { Img } from '@components/Img'
+import { Img, PokemonImg } from '@components/Img'
 import { useFormatStore } from '@store/useFormatStore'
 import { useRelativeTimer } from '@hooks/useRelativeTime'
 import { useAnalytics } from '@hooks/useAnalytics'
@@ -219,18 +219,6 @@ function StationMedia({
   battle_pokemon_move_2,
 }) {
   const { t } = useTranslateById()
-  const monImage = useMemory((s) =>
-    s.Icons.getPokemon(
-      battle_pokemon_id,
-      battle_pokemon_form,
-      0,
-      battle_pokemon_gender,
-      battle_pokemon_costume,
-      battle_pokemon_alignment,
-      false,
-      battle_pokemon_bread_mode,
-    ),
-  )
   const stationImage = useMemory((s) => s.Icons.getStation(true))
   const types = useMemory((s) => {
     if (!battle_pokemon_id) return []
@@ -244,37 +232,43 @@ function StationMedia({
   return is_battle_available ? (
     <CardMedia>
       <Box className="popup-card-media">
-        <Stack className="flex-center" py={1}>
-          <Img
-            src={monImage}
-            alt={t(`${battle_pokemon_id}-${battle_pokemon_form}`)}
-            maxHeight={75}
+        <Stack className="flex-center">
+          <PokemonImg
+            id={battle_pokemon_id}
+            form={battle_pokemon_form}
+            costume={battle_pokemon_costume}
+            bread={battle_pokemon_bread_mode}
+            alignment={battle_pokemon_alignment}
+            gender={battle_pokemon_gender}
+            maxHeight="80%"
             maxWidth="100%"
           />
-          <Box textAlign="center">
-            <Typography variant="subtitle2" component="span">
-              {t(`${battle_pokemon_id}-${battle_pokemon_form || 0}`)}
-            </Typography>
-            {!!battle_pokemon_costume && (
+          {!!battle_pokemon_costume && (
+            <Box textAlign="center">
               <Typography variant="caption">
                 &nbsp;({t(`costume_${battle_pokemon_costume}`)})
               </Typography>
-            )}
-          </Box>
-        </Stack>
-        <Stack alignItems="center" justifyContent="center" spacing={2}>
-          {types.map((type) => (
-            <PokeType key={type} id={type} size="medium" />
-          ))}
-          {!!battle_pokemon_gender && (
-            <GenderIcon gender={battle_pokemon_gender} fontSize="medium" />
+            </Box>
           )}
         </Stack>
+        <Stack alignItems="center" justifyContent="center" spacing={0.5}>
+          <Stack
+            direction="row"
+            justifyContent="space-evenly"
+            width="100%"
+            pb={0.5}
+          >
+            {!!battle_pokemon_gender && (
+              <GenderIcon gender={battle_pokemon_gender} fontSize="medium" />
+            )}
+            {types.map((type) => (
+              <PokeType key={type} id={type} size="medium" />
+            ))}
+          </Stack>
+          {battle_pokemon_move_1 && <PokeMove id={battle_pokemon_move_1} />}
+          {battle_pokemon_move_2 && <PokeMove id={battle_pokemon_move_2} />}
+        </Stack>
       </Box>
-      <Stack direction="row" justifyContent="center">
-        {battle_pokemon_move_1 && <PokeMove id={battle_pokemon_move_1} />}
-        {battle_pokemon_move_2 && <PokeMove id={battle_pokemon_move_2} />}
-      </Stack>
     </CardMedia>
   ) : (
     <Box width="100%" className="flex-center">

@@ -566,8 +566,9 @@ input[type='time']::-webkit-calendar-picker-indicator {
 
 .popup-card-media {
   display: grid;
-  grid-template-columns: 3fr 1fr;
+  grid-template-columns: 1fr 1fr;
   object-fit: contain;
+  column-gap: 8px;
 }
 
 .badge-diamond {

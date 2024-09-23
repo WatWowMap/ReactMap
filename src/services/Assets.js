@@ -390,7 +390,7 @@ export class UAssets {
         display || !!invasionActive,
         questActive,
         ar,
-        power,
+        power || false,
       )
     } catch (e) {
       console.error(`[${this.assetType.toUpperCase()}]`, e)

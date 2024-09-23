@@ -9560,10 +9560,10 @@ uglify-js@^3.1.4:
   resolved "https://registry.yarnpkg.com/uglify-js/-/uglify-js-3.17.4.tgz#61678cf5fa3f5b7eb789bb345df29afb8257c22c"
   integrity sha512-T9q82TJI9e/C1TAxYvfb16xO120tMVFZrGA3f9/P4424DNu6ypK103y0GPFVa17yotwSyZW5iYXgjYHkGrJW/g==
 
-uicons.js@2.0.0:
-  version "2.0.0"
-  resolved "https://registry.yarnpkg.com/uicons.js/-/uicons.js-2.0.0.tgz#54d97d24bc998f4547d5a2270af8fb7cda3a762c"
-  integrity sha512-OCguuXPU4NpRDwfLbqXAZfDYjkKdERbcALmVqubmHTG4exqOX1iN9Ur9DvlcfXTrwBTm6bCffHBqcMHeIpTgeg==
+uicons.js@2.0.1:
+  version "2.0.1"
+  resolved "https://registry.yarnpkg.com/uicons.js/-/uicons.js-2.0.1.tgz#e619ea36a184992b5e01d2f310d1dccee2dfa8e7"
+  integrity sha512-gP5Xjb/qSf0L42MJ7KiTy3qhhHhNL5Y8t+91+DwWfAhlWS0FfhHsbbe2wZA9j7kcJHfvkJ13C7okrt+rrchASg==
 
 uid-safe@~2.1.5:
   version "2.1.5"

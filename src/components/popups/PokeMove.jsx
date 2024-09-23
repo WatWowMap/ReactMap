@@ -1,3 +1,4 @@
+// @ts-check
 import * as React from 'react'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
@@ -18,12 +19,17 @@ export function PokeMove({ id, size = 'small' }) {
     <Stack
       direction="row"
       width="100%"
-      justifyContent="space-evenly"
+      justifyContent="space-between"
       alignItems="center"
     >
       <PokeType id={move.type} size={size} />
-      &nbsp;
-      <Typography variant="caption" align="center">
+      <Typography
+        variant="caption"
+        align="center"
+        width="100%"
+        pl={1}
+        lineHeight={1.25}
+      >
         {t(`move_${id}`)}
       </Typography>
     </Stack>
