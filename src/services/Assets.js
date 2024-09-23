@@ -354,9 +354,24 @@ export class UAssets {
   }
 
   /**
-   * @param {number | string} [typeId]
-   * @returns {string}
+   * @param {string|number} pokemonId
+   * @param {import('@rm/types').PokemonDisplay} pokemonDisplay
    */
+  getPokemonByDisplay(pokemonId, pokemonDisplay) {
+    return this.getPokemon(
+      pokemonId,
+      pokemonDisplay.form,
+      Date.now() > pokemonDisplay.temp_evolution_finish_ms
+        ? 0
+        : pokemonDisplay.temp_evolution,
+      pokemonDisplay.gender,
+      pokemonDisplay.costume,
+      pokemonDisplay.alignment,
+      pokemonDisplay.shiny,
+    )
+  }
+
+  /** @param {number | string} [typeId] */
   getTypes(typeId = 0) {
     try {
       return this[this.selected.type]?.class?.type(typeId)

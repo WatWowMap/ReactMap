@@ -144,12 +144,9 @@ export interface Invasion {
   slot_3_form: number
 }
 
-export interface ShowcaseEntry {
+export interface ShowcaseEntry extends PokemonDisplay {
   rank: number
   pokemon_id: number
-  form: number
-  costume: number
-  gender: Gender
   score: number
 }
 

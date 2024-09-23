@@ -17,9 +17,9 @@
     "@rm/config": "*",
     "@rm/logger": "*",
     "@rm/types": "*",
-    "node-fetch": "2.6.7"
+    "node-fetch": "2.7.0"
   },
   "devDependencies": {
-    "@types/node-fetch": "2.6.1"
+    "@types/node-fetch": "2.6.11"
   }
 }
