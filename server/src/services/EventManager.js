@@ -422,7 +422,7 @@ class EventManager extends Logger {
         }
         if (!this.masterfile.pokemon[id].forms[form]) {
           this.masterfile.pokemon[id].forms[form] = { name: '*', category }
-          this.log.info(
+          this.log.debug(
             `Added ${this.masterfile.pokemon[id].name} Key: ${item} to masterfile. (${category})`,
           )
         }
