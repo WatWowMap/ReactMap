@@ -1,3 +1,15 @@
+# [1.35.0-develop.1](https://github.com/WatWowMap/ReactMap/compare/v1.34.1-develop.5...v1.35.0-develop.1) (2024-09-23)
+
+
+### Bug Fixes
+
+* jsdoc types ([4316fff](https://github.com/WatWowMap/ReactMap/commit/4316fff7b13f98390d4d4be6f98002a4d84f9957))
+
+
+### Features
+
+* support pokemon display in showcases ([d39ebab](https://github.com/WatWowMap/ReactMap/commit/d39ebab569d8d3cba7ceadf95d7b2179f0663673))
+
 ## [1.34.1-develop.5](https://github.com/WatWowMap/ReactMap/compare/v1.34.1-develop.4...v1.34.1-develop.5) (2024-09-04)
 
 
