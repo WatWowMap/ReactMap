@@ -1,3 +1,10 @@
+# [1.35.0-develop.3](https://github.com/WatWowMap/ReactMap/compare/v1.35.0-develop.2...v1.35.0-develop.3) (2024-09-23)
+
+
+### Bug Fixes
+
+* uicons.js 2.0.2 ([1153035](https://github.com/WatWowMap/ReactMap/commit/1153035919ba0eec3a47035dc9b7153ab6d1b7a0))
+
 # [1.35.0-develop.2](https://github.com/WatWowMap/ReactMap/compare/v1.35.0-develop.1...v1.35.0-develop.2) (2024-09-23)
 
 
