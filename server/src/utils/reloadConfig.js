@@ -94,11 +94,17 @@ async function reloadConfig() {
       } catch {
         // do nothing
       }
-      log.info(TAGS.config, `'${key}' -`, 'old:', oldValue, 'new:', newValue)
+      log.info(
+        TAGS.config,
+        `updated '${key}' -`,
+        'old:',
+        oldValue,
+        'new:',
+        newValue,
+      )
     }
 
     if (valid.length) {
-      log.info(TAGS.config, 'updating the following config values:')
       valid.forEach(print)
     }
     if (invalid.length) {
