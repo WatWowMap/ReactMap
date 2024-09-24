@@ -731,5 +731,11 @@
   "locale_instructions_8": "Warten Sie darauf, dass der Pull-Request überprüft und zusammengeführt wird",
   "enter_translation": "Übersetzung eingeben",
   "individual_filters": "Teilweise gefiltert",
-  "best_buddy": "Bester Kumpel"
+  "best_buddy": "Bester Kumpel",
+  "placed_pokemon": "Platzierte Pokémon",
+  "enable_station_popup_coords": "Zeige Power-Spot-Koordinaten",
+  "dynamic_opacity": "Dynamische Opazität",
+  "tooltips": "Tooltips",
+  "markers": "Marker",
+  "filters": "Filter"
 }
