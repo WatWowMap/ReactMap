@@ -1,4 +1,3 @@
-/* eslint-disable import/order */
 // @ts-check
 const path = require('path')
 
@@ -73,7 +72,6 @@ config.setAreas = function setAreas(newAreas) {
   log.info(TAGS.config, 'updating areas')
   this.areas = newAreas
 }
-
 applyMutations(config)
 
 module.exports = config

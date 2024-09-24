@@ -1,12 +1,13 @@
 import { Request } from 'express'
 import type { ButtonProps } from '@mui/material'
-
-import { Config, ConfigAreas, GetSafeConfig } from './config'
+import type { IConfig } from 'config'
+import { Config, ConfigAreas } from './config'
 import { ExpressUser, Permissions } from './server'
 
 declare module 'config' {
   interface IConfig extends Config {
-    getSafe: GetSafeConfig
+    // getSafe: GetSafeConfig
+    getSafe: IConfig['get']
     /**
      * Due to the complexity of how the config package is cached, it's better to return the old config with this method and get the new config with a separate `require` call.
      * @returns The old config object.
@@ -22,6 +23,8 @@ declare module 'config' {
     setAreas: (newAreas: ConfigAreas) => void
   }
 }
+
+type X = IConfig['areas']
 
 declare global {
   namespace Express {

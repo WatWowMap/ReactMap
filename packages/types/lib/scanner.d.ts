@@ -1,15 +1,5 @@
 import { FullModel } from './utility'
-import DeviceModel = require('server/src/models/Device')
-import GymModel = require('server/src/models/Gym')
-import NestModel = require('server/src/models/Nest')
-import PokestopModel = require('server/src/models/Pokestop')
-import PokemonModel = require('server/src/models/Pokemon')
-import PortalModel = require('server/src/models/Portal')
-import ScanCellModel = require('server/src/models/ScanCell')
-import SpawnpointModel = require('server/src/models/Spawnpoint')
-import WeatherModel = require('server/src/models/Weather')
-import RouteModel = require('server/src/models/Route')
-import StationModel = require('server/src/models/Station')
+import type { Models } from '@rm/server/src/models'
 
 import { S2Polygon } from './general'
 
@@ -27,7 +17,7 @@ export interface Device {
   radius: number
 }
 
-export type FullDevice = FullModel<Device, DeviceModel.Device>
+export type FullDevice = FullModel<Device, Models['Device']>
 
 export interface PokemonDisplay {
   form: number
@@ -82,7 +72,7 @@ export interface Gym {
   enabled: boolean
 }
 
-export type FullGym = FullModel<Gym, GymModel.Gym>
+export type FullGym = FullModel<Gym, Models['Gym']>
 
 export interface Nest {
   id: number
@@ -101,7 +91,7 @@ export interface Nest {
   submitted_by: string
 }
 
-export type FullNest = FullModel<Nest, NestModel.Nest>
+export type FullNest = FullModel<Nest, Models['Nest']>
 
 export interface Quest {
   quest_type: number
@@ -194,7 +184,7 @@ export interface Pokestop {
   hasShowcase: boolean
 }
 
-export type FullPokestop = FullModel<Pokestop, PokestopModel.Pokestop>
+export type FullPokestop = FullModel<Pokestop, Models['Pokestop']>
 
 export type CleanPvp = Record<string, import('ohbem').PvPRankEntry[]>
 
@@ -240,7 +230,7 @@ export interface Pokemon {
   shiny?: boolean
 }
 
-export type FullPokemon = FullModel<Pokemon, PokemonModel.Pokemon>
+export type FullPokemon = FullModel<Pokemon, Models['Pokemon']>
 
 export interface Portal {
   id: string
@@ -253,7 +243,7 @@ export interface Portal {
   updated: number
 }
 
-export type FullPortal = FullModel<Portal, PortalModel.Portal>
+export type FullPortal = FullModel<Portal, Models['Portal']>
 
 export interface ScanCell {
   id?: string
@@ -264,7 +254,7 @@ export interface ScanCell {
   polygon?: S2Polygon
 }
 
-export type FullScanCell = FullModel<ScanCell, ScanCellModel.ScanCell>
+export type FullScanCell = FullModel<ScanCell, Models['ScanCell']>
 
 export interface Spawnpoint {
   id: string
@@ -274,7 +264,7 @@ export interface Spawnpoint {
   despawn_sec: number
 }
 
-export type FullSpawnpoint = FullModel<Spawnpoint, SpawnpointModel.Spawnpoint>
+export type FullSpawnpoint = FullModel<Spawnpoint, Models['Spawnpoint']>
 
 export interface Weather {
   id: string
@@ -295,7 +285,7 @@ export interface Weather {
   polygon: S2Polygon
 }
 
-export type FullWeather = FullModel<Weather, WeatherModel.Weather>
+export type FullWeather = FullModel<Weather, Models['Weather']>
 
 export interface ScannerApi {
   status: string
@@ -332,7 +322,7 @@ export interface Route {
   waypoints: Waypoint[]
 }
 
-export type FullRoute = FullModel<Route, RouteModel.Route>
+export type FullRoute = FullModel<Route, Models['Route']>
 
 export interface StationPokemon {
   pokemon_id: number
@@ -374,4 +364,4 @@ export interface Station<Parsed extends boolean = false> {
   updated: number
 }
 
-export type FullStation = FullModel<Station, StationModel.Station>
+export type FullStation = FullModel<Station, Models['Station']>

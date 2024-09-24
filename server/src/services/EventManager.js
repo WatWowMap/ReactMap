@@ -327,7 +327,7 @@ class EventManager extends Logger {
                 await fs.readFile(
                   path.resolve(
                     __dirname,
-                    `../../../public/images/${type}/${style.path}/index.json`,
+                    `../../../dist/images/${type}/${style.path}/index.json`,
                   ),
                   'utf-8',
                 ),

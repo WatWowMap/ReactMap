@@ -13,9 +13,9 @@ const scannerQueue = {
 
 /**
  *
- * @param {import('packages/types/lib').ScanOnDemandReq['category']} category
- * @param {import('packages/types/lib').ScanOnDemandReq['method']} method
- * @param {import('packages/types/lib').ScanOnDemandReq['data']} data
+ * @param {import('@rm/types').ScanOnDemandReq['category']} category
+ * @param {import('@rm/types').ScanOnDemandReq['method']} method
+ * @param {import('@rm/types').ScanOnDemandReq['data']} data
  * @param {Partial<import('@rm/types').ExpressUser>} user
  * @returns
  */

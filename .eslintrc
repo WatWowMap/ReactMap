@@ -1,43 +1,35 @@
 {
-  "extends": ["airbnb", "airbnb/rules/react", "eslint:recommended", "prettier"],
+  "root": true,
+  "extends": [
+    "eslint:recommended",
+    "prettier"
+  ],
   "parserOptions": {
     "ecmaVersion": "latest"
   },
   "env": {
-    "browser": true,
-    "jest": true,
-    "node": true
-  },
-  "globals": {
-    "document": true,
-    "window": true,
-    "CONFIG": true
+    "node": true,
+    "es6": true
   },
   "rules": {
+    "no-console": "warn",
     "global-require": 0,
     "lines-between-class-members": 0,
     "no-continue": 0,
     "no-plusplus": 0,
     "import/no-dynamic-require": 0,
     "camelcase": 0,
-    "react/jsx-props-no-spreading": 0,
     "linebreak-style": 0,
-    "react/prop-types": 0,
     "no-confusing-arrow": 0,
     "no-restricting-syntax": 0,
     "semi": 0,
     "allowForLoopAfterthoughts": 0,
     "radix": 0,
     "eqeqeq": 0,
-    "jsx-a11y/aria-role": 0,
     "consistent-return": 0,
     "no-use-before-define": 0,
     "no-param-reassign": 0,
     "arrow-parens": 0,
-    "react/jsx-one-expression-per-line": 0,
-    "jsx-a11y/no-noninteractive-element-interactions": 0,
-    "jsx-a11y/click-events-have-key-events": 0,
-    "react/function-component-definition": 0,
     "no-underscore-dangle": 0,
     "no-return-assign": 0,
     "no-nested-ternary": "off",
@@ -69,24 +61,5 @@
         }
       }
     ]
-  },
-  "settings": {
-    "node": {
-      "extensions": [".mjs", ".js", ".jsx", ".ts", ".tsx"]
-    },
-    "import/resolver": {
-      "alias": {
-        "map": [
-          ["@components", "./src/components/"],
-          ["@features", "./src/features/"],
-          ["@services", "./src/services/"],
-          ["@hooks", "./src/hooks/"],
-          ["@assets", "./src/assets/"],
-          ["@utils", "./src/utils/"],
-          ["@store", "./src/store/"]
-        ],
-        "extensions": [".mjs", ".js", ".jsx", ".ts", ".tsx"]
-      }
-    }
   }
 }
