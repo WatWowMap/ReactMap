@@ -2,7 +2,7 @@
 const router = require('express').Router()
 
 const { log, TAGS } = require('@rm/logger')
-const state = require('../../../services/state')
+const { state } = require('../../../services/state')
 
 const queryObj = /** @type {const} */ ({
   pokemon: { model: 'Pokemon', category: 'pokemon' },
@@ -117,6 +117,7 @@ router.put('/:category', async (req, res) => {
         state.event.setAvailable('pokestops', 'Pokestop', state.db),
         state.event.setAvailable('gyms', 'Gym', state.db),
         state.event.setAvailable('nests', 'Nest', state.db),
+        state.event.setAvailable('stations', 'Station', state.db),
       ])
     }
     res

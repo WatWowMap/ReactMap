@@ -1,3 +1,5 @@
+// @ts-check
+
 /* eslint-disable no-unused-vars */
 const config = require('@rm/config')
 const { log, TAGS } = require('@rm/logger')
@@ -11,14 +13,14 @@ const {
   dnfifyIvFilter,
 } = require('./functions')
 const { filterRTree } = require('../../utils/filterRTree')
-const state = require('../../services/state')
-const PokemonFilter = require('./Frontend')
+const { PokemonFilter } = require('./Frontend')
+const { state } = require('../../services/state')
 
-module.exports = class PkmnBackend {
+class PkmnBackend {
   /**
    * @param {`${number}-${number}` | 'global'} id
-   * @param {import("./Frontend")} filter
-   * @param {import("./Frontend")} global
+   * @param {import("./Frontend").PokemonFilter} filter
+   * @param {import("./Frontend").PokemonFilter} global
    * @param {object} perms
    * @param {boolean} perms.pokemon
    * @param {boolean} perms.iv
@@ -160,7 +162,7 @@ module.exports = class PkmnBackend {
   }
 
   /**
-   * @param {import("./Frontend")} filter
+   * @param {import("./Frontend").PokemonFilter} filter
    * @returns {Set<string>}
    */
   getRelevantKeys(filter = this.filter) {
@@ -194,7 +196,7 @@ module.exports = class PkmnBackend {
   }
 
   /**
-   * @param {import("@rm/types").PvpEntry} entry
+   * @param {import("ohbem").PvPRankEntry} entry
    * @param {string} league
    * @returns {boolean}
    */
@@ -224,8 +226,8 @@ module.exports = class PkmnBackend {
 
   /**
    * @param {string} league
-   * @param {import("@rm/types").PvpEntry[]} data
-   * @returns {{ best: number; filtered: import("@rm/types").PvpEntry[]}}
+   * @param {import("ohbem").PvPRankEntry[]} data
+   * @returns {{ best: number; filtered: import("ohbem").PvPRankEntry[]}}
    */
   getRanks(league, data) {
     const filtered =
@@ -243,7 +245,7 @@ module.exports = class PkmnBackend {
 
   /**
    *
-   * @param {[number, number]} filter
+   * @param {number[]} filter
    * @param {number} [limit]
    * @returns DnfMinMax
    */
@@ -474,3 +476,5 @@ module.exports = class PkmnBackend {
     return result
   }
 }
+
+module.exports = { PkmnBackend }

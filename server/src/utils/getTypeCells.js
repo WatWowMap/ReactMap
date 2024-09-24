@@ -5,7 +5,7 @@ const {
   S2CellId,
   S2LatLngRect,
 } = require('nodes2ts')
-const getPolyVector = require('./getPolyVector')
+const { getPolyVector } = require('./getPolyVector')
 
 /**
  *
@@ -68,4 +68,4 @@ function getTypeCells(filters, pokestops, gyms) {
   return Object.values(indexedCells)
 }
 
-module.exports = getTypeCells
+module.exports = { getTypeCells }

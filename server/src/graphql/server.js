@@ -15,8 +15,8 @@ const {
 const config = require('@rm/config')
 const { Logger, TAGS, log } = require('@rm/logger')
 
-const resolvers = require('./resolvers')
-const state = require('../services/state')
+const { resolvers } = require('./resolvers')
+const { state } = require('../services/state')
 
 /** @param {import('http').Server} httpServer */
 async function startApollo(httpServer) {
@@ -167,4 +167,4 @@ async function startApollo(httpServer) {
   return apolloServer
 }
 
-module.exports = startApollo
+module.exports = { startApollo }

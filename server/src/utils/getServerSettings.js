@@ -1,20 +1,21 @@
 // @ts-check
 const config = require('@rm/config')
 
-const clientOptions = require('../ui/clientOptions')
-const advMenus = require('../ui/advMenus')
-const generateUi = require('../ui/primary')
+const { clientOptions } = require('../ui/clientOptions')
+const { advMenus } = require('../ui/advMenus')
+const { drawer } = require('../ui/drawer')
 
 /**
  *
  * @param {import("express").Request} req
  */
 function getServerSettings(req) {
-  const user = {
-    ...(req.user ? req.user : req.session),
-    loggedIn: !!req.user,
-    cooldown: req.session?.cooldown || 0,
-  }
+  const user =
+    /** @type {import('@rm/types').ExpressUser & { loggedIn: boolean; cooldown: number }} */ ({
+      ...(req.user ? req.user : req.session),
+      loggedIn: !!req.user,
+      cooldown: req.session?.cooldown || 0,
+    })
 
   const { clientValues, clientMenus } = clientOptions(user.perms)
 
@@ -60,13 +61,13 @@ function getServerSettings(req) {
     },
     tileServers: config.getSafe('tileServers'),
     navigation: config.getSafe('navigation'),
-    menus: advMenus(),
+    menus: advMenus(user.perms),
     userSettings: clientValues,
     clientMenus,
-    ui: generateUi(req, user.perms),
+    ui: drawer(req, user.perms),
   }
 
   return serverSettings
 }
 
-module.exports = getServerSettings
+module.exports = { getServerSettings }

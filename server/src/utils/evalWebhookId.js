@@ -16,4 +16,4 @@ function evalWebhookId(user) {
   }
 }
 
-module.exports = evalWebhookId
+module.exports = { evalWebhookId }

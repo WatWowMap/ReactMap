@@ -2,7 +2,7 @@
 const config = require('@rm/config')
 const { Logger } = require('@rm/logger')
 
-const state = require('./state')
+const { state } = require('./state')
 
 class DataLimitCheck extends Logger {
   /**

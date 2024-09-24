@@ -1,7 +1,8 @@
+// @ts-check
 import * as React from 'react'
 import List from '@mui/material/List'
 import Divider from '@mui/material/Divider'
-import MuiLink from '@mui/material/Link'
+import { styled } from '@mui/material/styles'
 
 import { Link } from 'react-router-dom'
 import AccountBoxIcon from '@mui/icons-material/AccountBox'
@@ -49,9 +50,29 @@ const importSettings = (e) => {
 const exportSettings = () =>
   downloadJson(localStorage.getItem('local-state'), 'settings.json')
 
-const renderLink = React.forwardRef(({ to, ...itemProps }, ref) => (
-  <Link to={to} ref={ref} {...itemProps} />
-))
+const LogoutButton = (
+  <BasicListButton component="a" href="/auth/logout" label="logout">
+    <ExitToAppIcon color="error" />
+  </BasicListButton>
+)
+
+const LoginButton = (
+  <BasicListButton component={Link} to="/login" label="login">
+    <ExitToAppIcon color="error" />
+  </BasicListButton>
+)
+
+const VisuallyHiddenInput = styled('input')({
+  clip: 'rect(0 0 0 0)',
+  clipPath: 'inset(50%)',
+  height: 1,
+  overflow: 'hidden',
+  position: 'absolute',
+  bottom: 0,
+  left: 0,
+  whiteSpace: 'nowrap',
+  width: 1,
+})
 
 export function DrawerActions() {
   const {
@@ -81,19 +102,13 @@ export function DrawerActions() {
         <ImportExportIcon color="secondary" />
       </BasicListButton>
 
-      <input
-        accept="application/json"
-        id="import-settings-btn"
-        type="file"
-        style={{ display: 'none' }}
-        onChange={importSettings}
-      />
-      <BasicListButton
-        component="label"
-        htmlFor="import-settings-btn"
-        label="import"
-      >
+      <BasicListButton component="label" label="import">
         <ImportExportIcon color="error" />
+        <VisuallyHiddenInput
+          accept="application/json"
+          type="file"
+          onChange={importSettings}
+        />
       </BasicListButton>
 
       <BasicListButton
@@ -103,19 +118,14 @@ export function DrawerActions() {
         <ReplayIcon color="error" />
       </BasicListButton>
 
-      {!!methods.length && (
-        <BasicListButton
-          component={loggedIn ? MuiLink : renderLink}
-          to={loggedIn ? undefined : '/login'}
-          href={loggedIn ? '/auth/logout' : undefined}
-          label={loggedIn ? 'logout' : 'login'}
-        >
-          <ExitToAppIcon color="error" />
-        </BasicListButton>
-      )}
+      {!!methods.length && (loggedIn ? LogoutButton : LoginButton)}
       <Divider />
-      {!config.misc.rude && (
+      {!(
+        // @ts-ignore
+        config.misc.rude
+      ) && (
         <BasicListButton
+          component="a"
           href="https://github.com/WatWowMap/ReactMap"
           referrerPolicy="no-referrer"
           target="_blank"
@@ -127,7 +137,7 @@ export function DrawerActions() {
       )}
       {config.links.statsLink && (
         <BasicListButton
-          component="button"
+          component="a"
           href={config.links.statsLink}
           target="_blank"
           rel="noreferrer"
@@ -146,6 +156,7 @@ export function DrawerActions() {
       )}
       {config.links.discordLink && (
         <BasicListButton
+          component="a"
           href={config.links.discordLink}
           target="_blank"
           rel="noreferrer"

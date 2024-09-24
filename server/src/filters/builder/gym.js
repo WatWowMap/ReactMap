@@ -1,6 +1,6 @@
 // @ts-check
-const state = require('../../services/state')
-const BaseFilter = require('../Base')
+const { state } = require('../../services/state')
+const { BaseFilter } = require('../Base')
 
 /**
  *
@@ -44,4 +44,4 @@ function buildGyms(perms, defaults) {
   return gymFilters
 }
 
-module.exports = buildGyms
+module.exports = { buildGyms }

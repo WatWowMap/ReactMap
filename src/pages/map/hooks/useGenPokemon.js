@@ -18,7 +18,7 @@ export function useGenPokemon() {
           '0-0': {
             webhookOnly: true,
             name: t('poke_global'),
-            perms: ['pokemon', 'raids', 'quests', 'nests'],
+            perms: ['pokemon', 'raids', 'quests', 'nests', 'dynamax'],
             formTypes: [],
           },
         },
@@ -55,7 +55,7 @@ export function useGenPokemon() {
           mythical: pkmn.mythical,
           ultraBeast: pkmn.ultraBeast,
           genId: `generation_${pkmn.genId}`,
-          perms: ['pokemon', 'raids', 'quests', 'nests'],
+          perms: ['pokemon', 'raids', 'quests', 'nests', 'dynamax'],
           family: pkmn.family,
         }
         tempObj.pokemon[id].searchMeta = `${Object.entries(tempObj.pokemon[id])

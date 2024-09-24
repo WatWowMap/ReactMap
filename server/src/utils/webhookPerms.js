@@ -24,4 +24,4 @@ function webhookPerms(roles, provider, trialActive = false) {
   return [...new Set(perms)]
 }
 
-module.exports = webhookPerms
+module.exports = { webhookPerms }

@@ -1,5 +1,7 @@
+// @ts-check
+
 const { log, TAGS } = require('@rm/logger')
-const fetchJson = require('../utils/fetchJson')
+const { fetchJson } = require('../utils/fetchJson')
 const { setCache, getCache } = require('./cache')
 
 const PLATFORMS = /** @type {const} */ (['discord', 'telegram'])
@@ -1250,4 +1252,4 @@ class PoracleAPI {
   }
 }
 
-module.exports = PoracleAPI
+module.exports = { PoracleAPI }

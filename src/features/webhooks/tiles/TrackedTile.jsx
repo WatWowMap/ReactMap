@@ -1,7 +1,9 @@
+// @ts-check
+
 import * as React from 'react'
 import DeleteForever from '@mui/icons-material/DeleteForever'
 import Edit from '@mui/icons-material/Edit'
-import Grid2 from '@mui/material/Unstable_Grid2/Grid2'
+import Grid2 from '@mui/material/Unstable_Grid2'
 import Typography from '@mui/material/Typography'
 import IconButton from '@mui/material/IconButton'
 import Checkbox from '@mui/material/Checkbox'
@@ -21,7 +23,9 @@ export function TrackedTile({ index }) {
   const id = Poracle.getId(item)
   const advOpen = useWebhookStore((s) => s.advanced)
   const selected = useWebhookStore((s) => (item ? s.selected[item.uid] : false))
-  const defaults = useWebhookStore((s) => s.context.ui[category].defaults)
+  const defaults = useWebhookStore((s) =>
+    category === 'human' ? null : s.context.ui[category].defaults,
+  )
 
   React.useEffect(() => {
     if (advOpen.open && advOpen.id === id && advOpen.uid === item.uid) {
@@ -50,7 +54,7 @@ export function TrackedTile({ index }) {
     [category, defaults],
   )
 
-  if (!item) return <Box>&nbsp;</Box>
+  if (!item || category === 'human') return <Box>&nbsp;</Box>
 
   return (
     <Grid2

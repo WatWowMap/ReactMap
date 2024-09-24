@@ -3,7 +3,7 @@ import * as React from 'react'
 import Grid from '@mui/material/Unstable_Grid2'
 import { useTranslation } from 'react-i18next'
 
-import { TimeSince } from './Timer'
+import { Timer } from './Timer'
 import { ExtraInfo } from './ExtraInfo'
 
 /**
@@ -25,7 +25,7 @@ export const TimeStamp = ({ time, children }) => {
   return (
     <ExtraInfo title={children} data={formatter.format(time * 1000)}>
       <Grid>
-        <TimeSince expireTime={time} />
+        <Timer expireTime={time} />
       </Grid>
     </ExtraInfo>
   )

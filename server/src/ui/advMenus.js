@@ -1,5 +1,5 @@
 // @ts-check
-const state = require('../services/state')
+const { state } = require('../services/state')
 
 const CATEGORIES = /** @type {const} */ ({
   gyms: ['teams', 'eggs', 'raids', 'pokemon'],
@@ -17,11 +17,17 @@ const CATEGORIES = /** @type {const} */ ({
     'quest_reward_1',
     'general',
   ],
+  stations: ['pokemon'],
   pokemon: ['pokemon'],
   nests: ['pokemon'],
 })
 
-function buildMenus() {
+/**
+ *
+ * @param {import('@rm/types').Permissions} perms
+ * @returns
+ */
+function advMenus(perms) {
   const rarityTiers = new Set(
     Object.values(state.event.masterfile.pokemon).map((val) => val.rarity),
   )
@@ -70,7 +76,7 @@ function buildMenus() {
       reverse: false,
       selected: false,
       unselected: false,
-      onlyAvailable: false,
+      onlyAvailable: true,
     },
   }
 
@@ -79,10 +85,6 @@ function buildMenus() {
       categories: CATEGORIES.gyms,
       filters: {
         ...pokemonFilters,
-        others: {
-          ...pokemonFilters.others,
-          onlyAvailable: true,
-        },
         categories: Object.fromEntries(
           CATEGORIES.gyms.map((item) => [item, false]),
         ),
@@ -92,23 +94,26 @@ function buildMenus() {
       categories: CATEGORIES.pokestops,
       filters: {
         ...pokemonFilters,
-        others: {
-          ...pokemonFilters.others,
-          onlyAvailable: true,
-        },
         categories: Object.fromEntries(
           CATEGORIES.pokestops.map((item) => [item, false]),
         ),
       },
     },
+    stations: {
+      categories: perms?.dynamax ? CATEGORIES.stations : [],
+      filters: perms.dynamax
+        ? {
+            ...pokemonFilters,
+            categories: Object.fromEntries(
+              CATEGORIES.stations.map((item) => [item, false]),
+            ),
+          }
+        : {},
+    },
     pokemon: {
       categories: CATEGORIES.pokemon,
       filters: {
         ...pokemonFilters,
-        others: {
-          ...pokemonFilters.others,
-          onlyAvailable: true,
-        },
         categories: Object.fromEntries(
           CATEGORIES.pokemon.map((item) => [item, false]),
         ),
@@ -118,10 +123,6 @@ function buildMenus() {
       categories: CATEGORIES.nests,
       filters: {
         ...pokemonFilters,
-        others: {
-          ...pokemonFilters.others,
-          onlyAvailable: true,
-        },
         categories: Object.fromEntries(
           CATEGORIES.nests.map((item) => [item, false]),
         ),
@@ -132,4 +133,4 @@ function buildMenus() {
   return returnObj
 }
 
-module.exports = buildMenus
+module.exports = { advMenus }

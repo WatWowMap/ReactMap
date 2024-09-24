@@ -76,8 +76,8 @@ export interface Masterfile {
   moves: Record<string, MasterfileMove>
   invasions: Record<string, Invasion>
   weather: Record<string, MasterfileWeather>
-  teams: mfjson['teams']
-  raids: mfjson['raids']
+  teams: (typeof mfjson)['teams']
+  raids: (typeof mfjson)['raids']
 }
 
 export declare function generate(

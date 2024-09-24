@@ -2,7 +2,7 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { useMutation } from '@apollo/client'
-import Grid2 from '@mui/material/Unstable_Grid2/Grid2'
+import Grid2 from '@mui/material/Unstable_Grid2'
 import Select from '@mui/material/Select'
 import MenuItem from '@mui/material/MenuItem'
 import Typography from '@mui/material/Typography'

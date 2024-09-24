@@ -7,28 +7,27 @@ const { log, TAGS } = require('@rm/logger')
 
 const { validateJsons } = require('./validateJsons')
 
+let firstRun = true
+
 /** @param {import('config').IConfig} config */
 const applyMutations = (config) => {
+  const defaults = /** @type {import('@rm/types').Config} */ (
+    config.util
+      .getConfigSources()
+      .find(({ name }) => name.endsWith('default.json'))?.parsed
+  )
+  if (!defaults) {
+    log.error(TAGS.config, 'Could not find default.json')
+    return
+  }
+
   if (process.env.NODE_CONFIG_ENV) {
-    log.info(TAGS.config, `Using config for ${process.env.NODE_CONFIG_ENV}`)
+    if (firstRun)
+      log.info(TAGS.config, `Using config for ${process.env.NODE_CONFIG_ENV}`)
   }
   const [rootConfigDir, serverConfigDir] = (
     process.env.NODE_CONFIG_DIR || ''
   ).split(path.delimiter)
-
-  const allowedMenuItems = [
-    'gyms',
-    'nests',
-    'pokestops',
-    'pokemon',
-    'routes',
-    'wayfarer',
-    's2cells',
-    'scanAreas',
-    'weather',
-    'admin',
-    'settings',
-  ]
 
   try {
     const refLength = +fs.readFileSync(
@@ -40,7 +39,7 @@ const applyMutations = (config) => {
       'utf8',
     ).length
 
-    if (refLength !== defaultLength) {
+    if (refLength !== defaultLength && firstRun) {
       log.warn(
         TAGS.config,
         'It looks like you have modified the `default.json` file, you should not do this! Make all of your config changes in your `local.json` file.',
@@ -187,10 +186,11 @@ const applyMutations = (config) => {
       merged.misc.distanceUnit !== 'kilometers' &&
       merged.misc.distanceUnit !== 'miles'
     ) {
-      log.warn(
-        TAGS.config,
-        `Invalid distanceUnit: ${merged.misc.distanceUnit}, only 'kilometers' OR 'miles' are allowed.`,
-      )
+      if (firstRun)
+        log.warn(
+          TAGS.config,
+          `Invalid distanceUnit: ${merged.misc.distanceUnit}, only 'kilometers' OR 'miles' are allowed.`,
+        )
       if (merged.misc.distance === 'km') {
         merged.misc.distanceUnit = 'kilometers'
       } else if (merged.misc.distance === 'mi') {
@@ -200,8 +200,20 @@ const applyMutations = (config) => {
       }
     }
     merged.general.menuOrder = merged?.general?.menuOrder
-      ? merged.general.menuOrder.filter((x) => allowedMenuItems.includes(x))
+      ? merged.general.menuOrder.filter((x) =>
+          defaults.map.general.menuOrder.includes(x),
+        )
       : []
+
+    defaults.map.general.menuOrder.forEach((item) => {
+      if (!merged.general.menuOrder.includes(item)) {
+        log.warn(
+          TAGS.config,
+          `Missing menu item: ${item} in map.general.menuOrder, adding it to the end of the list.`,
+        )
+        merged.general.menuOrder.push(item)
+      }
+    })
 
     merged.loginPage = config.util.extendDeep(
       {},
@@ -225,10 +237,11 @@ const applyMutations = (config) => {
   config.map = mergeMapConfig()
 
   if (config.has('multiDomains')) {
-    log.warn(
-      TAGS.config,
-      '`multiDomains` has been deprecated and will be removed in the next major release. Please switch to the new format that makes use of `NODE_CONFIG_ENV`',
-    )
+    if (firstRun)
+      log.warn(
+        TAGS.config,
+        '`multiDomains` has been deprecated and will be removed in the next major release. Please switch to the new format that makes use of `NODE_CONFIG_ENV`',
+      )
     // Create multiDomain Objects
     config.multiDomainsObj = Object.fromEntries(
       config.multiDomains.map((d) => [
@@ -343,13 +356,15 @@ const applyMutations = (config) => {
           (perm) => config.authentication.perms[perm].enabled,
         )
       )
-    log.warn(
-      TAGS.config,
-      'No authentication strategies enabled, adding the following perms to alwaysEnabledPerms array:\n',
-      enabled,
-    )
+    if (firstRun)
+      log.warn(
+        TAGS.config,
+        'No authentication strategies enabled, adding the following perms to alwaysEnabledPerms array:\n',
+        enabled,
+      )
     config.authentication.alwaysEnabledPerms = enabled
   }
+  firstRun = false
 }
 
 module.exports = { applyMutations }

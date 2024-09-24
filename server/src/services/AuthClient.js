@@ -3,7 +3,7 @@
 const { Logger } = require('@rm/logger')
 const config = require('@rm/config')
 
-const { Trial: TrialManager } = require('./Trial')
+const { Trial } = require('./Trial')
 
 /**
  * @typedef {(rmStrategy: string, strategy: import("@rm/types").StrategyConfig) => void} ClientConstructor
@@ -20,7 +20,7 @@ class AuthClient extends Logger {
   constructor(rmStrategy, strategy) {
     super(strategy.type, rmStrategy)
     this.rmStrategy = rmStrategy || 'custom'
-    this.trialManager = new TrialManager(strategy)
+    this.trialManager = new Trial(strategy)
     this.loggingChannels = {
       main: strategy.logChannelId,
       event: strategy.eventLogChannelId,
@@ -99,4 +99,4 @@ class AuthClient extends Logger {
   }
 }
 
-module.exports = AuthClient
+module.exports = { AuthClient }

@@ -1,20 +1,21 @@
 // @ts-check
-const Backup = require('./Backup')
-const Badge = require('./Badge')
-const Device = require('./Device')
-const Gym = require('./Gym')
-const Nest = require('./Nest')
-const NestSubmission = require('./NestSubmission')
-const Pokestop = require('./Pokestop')
-const Pokemon = require('./Pokemon')
-const Portal = require('./Portal')
-const PoI = require('./PoI')
-const Route = require('./Route')
-const ScanCell = require('./ScanCell')
-const Session = require('./Session')
-const Spawnpoint = require('./Spawnpoint')
-const User = require('./User')
-const Weather = require('./Weather')
+const { Backup } = require('./Backup')
+const { Badge } = require('./Badge')
+const { Device } = require('./Device')
+const { Gym } = require('./Gym')
+const { Nest } = require('./Nest')
+const { NestSubmission } = require('./NestSubmission')
+const { Pokestop } = require('./Pokestop')
+const { Pokemon } = require('./Pokemon')
+const { Portal } = require('./Portal')
+const { PoI } = require('./PoI')
+const { Route } = require('./Route')
+const { ScanCell } = require('./ScanCell')
+const { Session } = require('./Session')
+const { Spawnpoint } = require('./Spawnpoint')
+const { Station } = require('./Station')
+const { User } = require('./User')
+const { Weather } = require('./Weather')
 
 const rmModels = {
   Backup,
@@ -34,6 +35,7 @@ const scannerModels = {
   Route,
   ScanCell,
   Spawnpoint,
+  Station,
   Weather,
 }
 
@@ -46,7 +48,7 @@ const scannerModels = {
  * @typedef {keyof Models} ModelKeys
  */
 
-/** @param {import('../services/DbCheck')} db */
+/** @param {import('../services/DbManager').DbManager} db */
 const bindConnections = (db) =>
   db.bindConnections({ ...rmModels, ...scannerModels })
 

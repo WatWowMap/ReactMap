@@ -3,7 +3,7 @@ const { Logger, log } = require('@rm/logger')
 const config = require('@rm/config')
 
 const { Timer } = require('./Timer')
-const state = require('./state')
+const { state } = require('./state')
 
 class Trial extends Logger {
   /** @param {import("@rm/types").StrategyConfig} strategy  */

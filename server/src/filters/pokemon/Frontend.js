@@ -1,6 +1,6 @@
 // @ts-check
 const config = require('@rm/config')
-const BaseFilter = require('../Base')
+const { BaseFilter } = require('../Base')
 
 class PokemonFilter extends BaseFilter {
   /**
@@ -53,4 +53,4 @@ class PokemonFilter extends BaseFilter {
   }
 }
 
-module.exports = PokemonFilter
+module.exports = { PokemonFilter }

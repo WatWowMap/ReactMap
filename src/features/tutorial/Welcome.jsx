@@ -1,3 +1,5 @@
+// @ts-check
+
 import React from 'react'
 import Person from '@mui/icons-material/Person'
 import LockOpen from '@mui/icons-material/LockOpen'
@@ -20,6 +22,7 @@ export function TutorialWelcome() {
     Object.entries(s.auth.perms).forEach(([perm, value]) => {
       if (
         (perm === 'areaRestrictions' &&
+          Array.isArray(value) &&
           !value.length &&
           s.auth.counts[perm] > 0) ||
         perm === 'donor' ||

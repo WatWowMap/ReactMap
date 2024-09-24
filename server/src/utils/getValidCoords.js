@@ -29,6 +29,4 @@ function getValidCoords(mode, points, perms) {
   return []
 }
 
-module.exports = {
-  getValidCoords,
-}
+module.exports = { getValidCoords }

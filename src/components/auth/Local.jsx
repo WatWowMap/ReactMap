@@ -1,6 +1,6 @@
+// @ts-check
+
 import * as React from 'react'
-import Visibility from '@mui/icons-material/Visibility'
-import VisibilityOff from '@mui/icons-material/VisibilityOff'
 import Grid from '@mui/material/Unstable_Grid2'
 import Box from '@mui/material/Box'
 import Typography from '@mui/material/Typography'
@@ -16,6 +16,7 @@ import { useLazyQuery } from '@apollo/client'
 
 import { login } from '@services/fetches'
 import { Query } from '@services/queries'
+import { VisibleToggle } from '@components/inputs/VisibleToggle'
 
 /**
  *
@@ -44,10 +45,10 @@ export function LocalLogin({ href, sx, style }) {
     e.preventDefault()
     setSubmitted(true)
     const resp = await login(user, href)
-    if (!resp.ok) {
+    if ('ok' in resp && !resp.ok) {
       setError(t('localauth_failed'))
       setSubmitted(false)
-    } else if (resp.url.includes('invalid_credentials')) {
+    } else if ('url' in resp && resp.url.includes('invalid_credentials')) {
       setError(t('invalid_credentials'))
       setSubmitted(false)
     } else {
@@ -109,7 +110,7 @@ export function LocalLogin({ href, sx, style }) {
                       }
                       onMouseDown={(e) => e.preventDefault()}
                     >
-                      {user.showPassword ? <Visibility /> : <VisibilityOff />}
+                      <VisibleToggle visible={user.showPassword} />
                     </IconButton>
                   </InputAdornment>
                 }

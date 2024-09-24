@@ -13,80 +13,230 @@ function clientOptions(perms) {
       devicePathColor: { type: 'color', perm: ['devices'] },
     },
     gyms: {
-      clustering: { type: 'bool', perm: ['gyms', 'raids'] },
-      raidTimers: { type: 'bool', perm: ['raids'] },
-      interactionRanges: { type: 'bool', perm: ['gyms', 'raids'] },
-      '300mRange': { type: 'bool', perm: ['raids'] },
+      clustering: {
+        type: 'bool',
+        perm: ['gyms', 'raids'],
+        category: 'markers',
+      },
+      raidTimers: { type: 'bool', perm: ['raids'], category: 'tooltips' },
+      interactionRanges: {
+        type: 'bool',
+        perm: ['gyms', 'raids'],
+        category: 'markers',
+      },
+      '300mRange': { type: 'bool', perm: ['raids'], category: 'markers' },
       customRange: {
         type: 'number',
         perm: ['raids', 'gyms'],
         min: 0,
         max: 5000,
+        category: 'markers',
       },
-      showExBadge: { type: 'bool', perm: ['gyms'] },
-      showArBadge: { type: 'bool', perm: ['gyms'] },
-      raidLevelBadges: { type: 'bool', perm: ['raids'] },
-      gymBadgeDiamonds: { type: 'bool', perm: ['gymBadges'] },
-      raidOpacity: { type: 'bool', perm: ['raids'] },
-      opacityTenMinutes: { type: 'number', perm: ['raids'] },
-      opacityFiveMinutes: { type: 'number', perm: ['raids'] },
-      opacityOneMinute: { type: 'number', perm: ['raids'] },
+      showExBadge: { type: 'bool', perm: ['gyms'], category: 'markers' },
+      showArBadge: { type: 'bool', perm: ['gyms'], category: 'markers' },
+      raidLevelBadges: { type: 'bool', perm: ['raids'], category: 'markers' },
+      gymBadgeDiamonds: {
+        type: 'bool',
+        perm: ['gymBadges'],
+        category: 'markers',
+      },
+      raidOpacity: {
+        type: 'bool',
+        perm: ['raids'],
+        category: 'dynamic_opacity',
+      },
+      opacityTenMinutes: {
+        type: 'number',
+        perm: ['raids'],
+        category: 'dynamic_opacity',
+      },
+      opacityFiveMinutes: {
+        type: 'number',
+        perm: ['raids'],
+        category: 'dynamic_opacity',
+      },
+      opacityOneMinute: {
+        type: 'number',
+        perm: ['raids'],
+        category: 'dynamic_opacity',
+      },
       enableGymPopupCoords: map.misc.enableGymPopupCoordsSelector
-        ? { type: 'bool', perm: ['gyms'] }
+        ? { type: 'bool', perm: ['gyms'], category: 'popups' }
         : undefined,
     },
     pokestops: {
-      clustering: { type: 'bool', perm: ['pokestops', 'quests', 'invasions'] },
-      invasionTimers: { type: 'bool', perm: ['invasions'] },
-      lureTimers: { type: 'bool', perm: ['lures'] },
-      eventStopTimers: { type: 'bool', perm: ['pokestops'] },
-      interactionRanges: { type: 'bool', perm: ['pokestops'] },
-      lureRange: { type: 'bool', perm: ['lures'] },
+      clustering: {
+        type: 'bool',
+        perm: ['pokestops', 'quests', 'invasions'],
+        category: 'markers',
+      },
+      invasionTimers: {
+        type: 'bool',
+        perm: ['invasions'],
+        category: 'tooltips',
+      },
+      lureTimers: { type: 'bool', perm: ['lures'], category: 'tooltips' },
+      eventStopTimers: {
+        type: 'bool',
+        perm: ['pokestops'],
+        category: 'tooltips',
+      },
+      interactionRanges: {
+        type: 'bool',
+        perm: ['pokestops'],
+        category: 'markers',
+      },
+      lureRange: { type: 'bool', perm: ['lures'], category: 'markers' },
       customRange: {
         type: 'number',
         perm: ['raids', 'gyms'],
         min: 0,
         max: 5000,
+        category: 'markers',
       },
-      hasQuestIndicator: { type: 'bool', perm: ['quests'] },
-      showArBadge: { type: 'bool', perm: ['pokestops'] },
-      invasionOpacity: { type: 'bool', perm: ['invasions'] },
-      opacityTenMinutes: { type: 'number', perm: ['invasions'] },
-      opacityFiveMinutes: { type: 'number', perm: ['invasions'] },
-      opacityOneMinute: { type: 'number', perm: ['invasions'] },
+      hasQuestIndicator: {
+        type: 'bool',
+        perm: ['quests'],
+        category: 'markers',
+      },
+      showArBadge: { type: 'bool', perm: ['pokestops'], category: 'markers' },
+      invasionOpacity: {
+        type: 'bool',
+        perm: ['invasions'],
+        category: 'dynamic_opacity',
+      },
+      opacityTenMinutes: {
+        type: 'number',
+        perm: ['invasions'],
+        category: 'dynamic_opacity',
+      },
+      opacityFiveMinutes: {
+        type: 'number',
+        perm: ['invasions'],
+        category: 'dynamic_opacity',
+      },
+      opacityOneMinute: {
+        type: 'number',
+        perm: ['invasions'],
+        category: 'dynamic_opacity',
+      },
       enablePokestopPopupCoords: map.misc.enablePokestopPopupCoordsSelector
-        ? { type: 'bool', perm: ['pokestops'] }
+        ? { type: 'bool', perm: ['pokestops'], category: 'popups' }
+        : undefined,
+    },
+    stations: {
+      clustering: {
+        type: 'bool',
+        perm: ['stations', 'dynamax'],
+        category: 'markers',
+      },
+      stationTimers: {
+        type: 'bool',
+        perm: ['stations', 'dynamax'],
+        category: 'tooltips',
+      },
+      stationsOpacity: {
+        type: 'bool',
+        perm: ['stations', 'dynamax'],
+        category: 'dynamic_opacity',
+      },
+      opacityTenMinutes: {
+        type: 'number',
+        perm: ['stations', 'dynamax'],
+        category: 'dynamic_opacity',
+      },
+      opacityFiveMinutes: {
+        type: 'number',
+        perm: ['stations', 'dynamax'],
+        category: 'dynamic_opacity',
+      },
+      opacityOneMinute: {
+        type: 'number',
+        perm: ['stations', 'dynamax'],
+        category: 'dynamic_opacity',
+      },
+      enableStationPopupCoords: map.misc.enableStationPopupCoordsSelector
+        ? { type: 'bool', perm: ['stations', 'dynamax'], category: 'popups' }
         : undefined,
     },
     pokemon: {
-      clustering: { type: 'bool', perm: ['pokemon'] },
-      linkGlobalAndAdvanced: { type: 'bool', perm: ['pokemon'] },
-      pokemonTimers: { type: 'bool', perm: ['pokemon'] },
-      ivCircles: { type: 'bool', perm: ['iv'] },
-      minIvCircle: { type: 'number', perm: ['iv'], label: '%' },
-      levelCircles: { type: 'bool', perm: ['iv'] },
-      minLevelCircle: { type: 'number', perm: ['iv'] },
-      interactionRanges: { type: 'bool', perm: ['pokemon'] },
-      spacialRendRange: { type: 'bool', perm: ['pokemon'] },
-      showDexNumInPopup: { type: 'bool', perm: ['pokemon'] },
-      weatherIndicator: { type: 'bool', perm: ['pokemon'] },
-      pvpMega: { type: 'bool', perm: ['pvp'] },
-      showAllPvpRanks: { type: 'bool', perm: ['pvp'] },
-      showSizeIndicator: { type: 'bool', perm: ['pokemon'] },
-      pokemonOpacity: { type: 'bool', perm: ['pokemon'] },
-      opacityTenMinutes: { type: 'number', perm: ['pokemon'] },
-      opacityFiveMinutes: { type: 'number', perm: ['pokemon'] },
-      opacityOneMinute: { type: 'number', perm: ['pokemon'] },
+      clustering: { type: 'bool', perm: ['pokemon'], category: 'markers' },
+      linkGlobalAndAdvanced: {
+        type: 'bool',
+        perm: ['pokemon'],
+        category: 'filters',
+      },
+      pokemonTimers: { type: 'bool', perm: ['pokemon'], category: 'tooltips' },
+      ivCircles: { type: 'bool', perm: ['iv'], category: 'tooltips' },
+      minIvCircle: {
+        type: 'number',
+        perm: ['iv'],
+        label: '%',
+        category: 'tooltips',
+      },
+      levelCircles: { type: 'bool', perm: ['iv'], category: 'tooltips' },
+      minLevelCircle: { type: 'number', perm: ['iv'], category: 'tooltips' },
+      interactionRanges: {
+        type: 'bool',
+        perm: ['pokemon'],
+        category: 'markers',
+      },
+      spacialRendRange: {
+        type: 'bool',
+        perm: ['pokemon'],
+        category: 'markers',
+      },
+      showDexNumInPopup: {
+        type: 'bool',
+        perm: ['pokemon'],
+        category: 'popups',
+      },
+      weatherIndicator: {
+        type: 'bool',
+        perm: ['pokemon'],
+        category: 'tooltips',
+      },
+      pvpMega: { type: 'bool', perm: ['pvp'], category: 'filters' },
+      showAllPvpRanks: { type: 'bool', perm: ['pvp'], category: 'filters' },
+      showSizeIndicator: {
+        type: 'bool',
+        perm: ['pokemon'],
+        category: 'tooltips',
+      },
+      pokemonOpacity: {
+        type: 'bool',
+        perm: ['pokemon'],
+        category: 'dynamic_opacity',
+      },
+      opacityTenMinutes: {
+        type: 'number',
+        perm: ['pokemon'],
+        category: 'dynamic_opacity',
+      },
+      opacityFiveMinutes: {
+        type: 'number',
+        perm: ['pokemon'],
+        category: 'dynamic_opacity',
+      },
+      opacityOneMinute: {
+        type: 'number',
+        perm: ['pokemon'],
+        category: 'dynamic_opacity',
+      },
       ...Object.fromEntries(
-        levels.map((level) => [`pvp${level}`, { type: 'bool', perm: ['pvp'] }]),
+        levels.map((level) => [
+          `pvp${level}`,
+          { type: 'bool', perm: ['pvp'], category: 'filters' },
+        ]),
       ),
       legacyFilter: map.misc.enableMapJsFilter
-        ? { type: 'bool', perm: ['iv'] }
+        ? { type: 'bool', perm: ['iv'], category: 'filters' }
         : undefined,
       glow: clientSideOptions.pokemon.glow.length
         ? {
             type: 'bool',
             perm: ['pokemon'],
+            category: 'markers',
             sub: Object.fromEntries(
               clientSideOptions.pokemon.glow.map(({ name, ...glow }) => [
                 name,
@@ -96,24 +246,60 @@ function clientOptions(perms) {
           }
         : undefined,
       enablePokemonPopupCoords: map.misc.enablePokemonPopupCoordsSelector
-        ? { type: 'bool', perm: ['pokemon'] }
+        ? { type: 'bool', perm: ['pokemon'], category: 'popups' }
         : undefined,
     },
     wayfarer: {
-      clustering: { type: 'bool', perm: ['portals'] },
-      oldPortals: { type: 'color', perm: ['portals'] },
-      newPortals: { type: 'color', perm: ['portals'] },
-      oneStopTillNext: { type: 'color', perm: ['submissionCells'] },
-      twoStopsTillNext: { type: 'color', perm: ['submissionCells'] },
-      noMoreGyms: { type: 'color', perm: ['submissionCells'] },
-      lightMapBorder: { type: 'color', perm: ['submissionCells'] },
-      darkMapBorder: { type: 'color', perm: ['submissionCells'] },
-      cellBlocked: { type: 'color', perm: ['submissionCells'] },
-      poiColor: { type: 'color', perm: ['submissionCells'] },
-      partnerColor: { type: 'color', perm: ['submissionCells'] },
-      showcaseColor: { type: 'color', perm: ['submissionCells'] },
+      clustering: { type: 'bool', perm: ['portals'], category: 'markers' },
+      oldPortals: { type: 'color', perm: ['portals'], category: 'filters' },
+      newPortals: { type: 'color', perm: ['portals'], category: 'filters' },
+      oneStopTillNext: {
+        type: 'color',
+        perm: ['submissionCells'],
+        category: 'markers',
+      },
+      twoStopsTillNext: {
+        type: 'color',
+        perm: ['submissionCells'],
+        category: 'markers',
+      },
+      noMoreGyms: {
+        type: 'color',
+        perm: ['submissionCells'],
+        category: 'markers',
+      },
+      lightMapBorder: {
+        type: 'color',
+        perm: ['submissionCells'],
+        category: 'markers',
+      },
+      darkMapBorder: {
+        type: 'color',
+        perm: ['submissionCells'],
+        category: 'markers',
+      },
+      cellBlocked: {
+        type: 'color',
+        perm: ['submissionCells'],
+        category: 'markers',
+      },
+      poiColor: {
+        type: 'color',
+        perm: ['submissionCells'],
+        category: 'markers',
+      },
+      partnerColor: {
+        type: 'color',
+        perm: ['submissionCells'],
+        category: 'markers',
+      },
+      showcaseColor: {
+        type: 'color',
+        perm: ['submissionCells'],
+        category: 'markers',
+      },
       enablePortalPopupCoords: map.misc.enablePortalPopupCoordsSelector
-        ? { type: 'bool', perm: ['portals'] }
+        ? { type: 'bool', perm: ['portals'], category: 'popups' }
         : undefined,
     },
     s2cells: {
@@ -212,4 +398,4 @@ function clientOptions(perms) {
   return { clientValues, clientMenus }
 }
 
-module.exports = clientOptions
+module.exports = { clientOptions }

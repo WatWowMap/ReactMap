@@ -29,6 +29,12 @@ declare global {
   }
 }
 
+declare module 'express-session' {
+  interface SessionData {
+    tutorial: boolean
+  }
+}
+
 declare module 'passport-discord' {
   interface StrategyOptionsWithRequest {
     prompt?: string | undefined
@@ -70,15 +76,6 @@ declare module 'http' {
   }
 }
 
-// declare module '@apollo/server' {
-//   interface GraphQLInProgressResponse {
-//     __sentry_transaction?: string
-//   }
-// }
-
-// TODO
-// declare module '@mui/material/Button' {
-//   interface ExtendButtonTypeMap {
-//     bgcolor?: string
-//   }
-// }
+declare module 'ohbem' {
+  export = Ohbem
+}

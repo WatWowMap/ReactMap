@@ -1,3 +1,5 @@
+// @ts-check
+
 /* eslint-disable no-await-in-loop */
 const { knex } = require('knex')
 const { raw } = require('objection')
@@ -8,9 +10,9 @@ const { getBboxFromCenter } = require('../utils/getBbox')
 const { getCache } = require('./cache')
 
 /**
- * @type {import("@rm/types").DbCheckClass}
+ * @type {import("@rm/types").DbManagerClass}
  */
-module.exports = class DbCheck extends Logger {
+class DbManager extends Logger {
   static validModels = /** @type {const} */ ([
     'Device',
     'Gym',
@@ -21,6 +23,7 @@ module.exports = class DbCheck extends Logger {
     'Route',
     'ScanCell',
     'Spawnpoint',
+    'Station',
     'Weather',
   ])
 
@@ -50,11 +53,10 @@ module.exports = class DbCheck extends Logger {
       .filter((s) => s.useFor.length)
       .map((schema, i) => {
         schema.useFor.forEach((category) => {
-          /** @type {import('../models').ModelKeys} */
-          const capital = `${category.charAt(0).toUpperCase()}${category.slice(
-            1,
-          )}`
-          if (DbCheck.singleModels.includes(capital)) {
+          const capital = /** @type {import('../models').ModelKeys} */ (
+            `${category.charAt(0).toUpperCase()}${category.slice(1)}`
+          )
+          if (DbManager.singleModels.includes(capital)) {
             this.models[capital] = {}
             if (capital === 'User') {
               this.reactMapDb = i
@@ -211,7 +213,7 @@ module.exports = class DbCheck extends Logger {
       this.connections.map(async (schema, i) => {
         try {
           const schemaContext = schema
-            ? await DbCheck.schemaCheck(schema)
+            ? await DbManager.schemaCheck(schema)
             : {
                 mem: this.endpoints[i].endpoint,
                 secret: this.endpoints[i].secret,
@@ -305,9 +307,8 @@ module.exports = class DbCheck extends Logger {
   bindConnections(models) {
     try {
       Object.entries(this.models).forEach(([modelName, sources]) => {
-        if (DbCheck.singleModels.includes(modelName)) {
-          /** @type {import('../models').RmModelKeys} */
-          const model = modelName
+        const model = /** @type {import('../models').RmModelKeys} */ (modelName)
+        if (DbManager.singleModels.includes(model)) {
           if (sources.length > 1) {
             this.log.error(model, `only supports one database connection`)
             process.exit(0)
@@ -325,8 +326,6 @@ module.exports = class DbCheck extends Logger {
           this.models[model] = models[model]
           this.models[model].knex(this.connections[this.reactMapDb])
         } else if (Array.isArray(sources)) {
-          /** @type {import('../models').ScannerModelKeys} */
-          const model = modelName
           sources.forEach((source, i) => {
             if (this.connections[source.connection]) {
               this.models[model][i].SubModel = models[model].bindKnex(
@@ -348,7 +347,7 @@ module.exports = class DbCheck extends Logger {
     } catch (e) {
       this.log.error(
         e,
-        `\n\nOnly ${[...DbCheck.validModels, ...DbCheck.singleModels].join(
+        `\n\nOnly ${[...DbManager.validModels, ...DbManager.singleModels].join(
           ', ',
         )} are valid options in the useFor arrays`,
       )
@@ -395,7 +394,7 @@ module.exports = class DbCheck extends Logger {
           SubModel[method](perms, args, source, userId),
         ),
       )
-      return DbCheck.deDupeResults(data)
+      return DbManager.deDupeResults(data)
     } catch (e) {
       this.log.error(TAGS[model.toLowerCase()], e)
       throw e
@@ -414,22 +413,19 @@ module.exports = class DbCheck extends Logger {
         SubModel.getOne(id, source),
       ),
     )
-    const cleaned = DbCheck.deDupeResults(data.filter(Boolean))
+    const cleaned = DbManager.deDupeResults(data.filter(Boolean))
     return cleaned || {}
   }
 
   /**
    * @template {import("@rm/types").BaseRecord} T
-   * @template {import("../models").ScannerModelKeys} U
+   * @template {Exclude<import("../models").ScannerModelKeys, 'Device' | 'Route' | 'ScanCell' | 'Spawnpoint' | 'Weather'>} U
    * @param {U} model
    * @param {import("@rm/types").Permissions} perms
    * @param {object} args
    * @param {U extends 'Gym' ? 'searchRaids' | 'search'
    *  : U extends 'Pokestop' ? 'searchInvasions' | 'searchQuests' | 'searchLures' | 'search'
-   *  : U extends 'Pokemon' ? 'search'
-   *  : U extends 'Portal' ? 'search'
-   *  : U extends 'Nest' ? 'search'
-   *  : never} method
+   *  : 'search'} method
    * @returns {Promise<T[]>}
    */
   async search(model, perms, args, method = 'search') {
@@ -452,12 +448,12 @@ module.exports = class DbCheck extends Logger {
             perms,
             args,
             source,
-            DbCheck.getDistance(args, source.isMad),
+            DbManager.getDistance(args, source.isMad),
             bbox,
           ),
         ),
       )
-      const results = DbCheck.deDupeResults(data)
+      const results = DbManager.deDupeResults(data)
       if (results.length > deDuped.length) {
         deDuped = results
       }
@@ -510,8 +506,8 @@ module.exports = class DbCheck extends Logger {
    * @param {import("@rm/types").Permissions} perms
    * @param {object} args
    * @returns {Promise<[
-   *  import("@rm/types").BaseRecord[],
-   *  import("@rm/types").BaseRecord[]
+   *  import("@rm/types").Pokestop[],
+   *  import("@rm/types").Gym[]
    * ]>}
    */
   async submissionCells(perms, args) {
@@ -525,7 +521,7 @@ module.exports = class DbCheck extends Logger {
         SubModel.getSubmissions(perms, args, source),
       ),
     )
-    return [DbCheck.deDupeResults(stopData), DbCheck.deDupeResults(gymData)]
+    return [DbManager.deDupeResults(stopData), DbManager.deDupeResults(gymData)]
   }
 
   /**
@@ -553,7 +549,7 @@ module.exports = class DbCheck extends Logger {
           SubModel[method](...args, source),
         ),
       )
-      return DbCheck.deDupeResults(data.filter(Boolean))
+      return DbManager.deDupeResults(data.filter(Boolean))
     }
     return this.models[model][method](...args)
   }
@@ -647,3 +643,5 @@ module.exports = class DbCheck extends Logger {
     }
   }
 }
+
+module.exports = { DbManager }

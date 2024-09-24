@@ -1,6 +1,6 @@
 // @ts-check
 const config = require('@rm/config')
-const state = require('../services/state')
+const { state } = require('../services/state')
 
 /** @typedef {import('@rm/types').RMSlider} Slider */
 
@@ -13,7 +13,7 @@ const BLOCKED = /** @type {undefined} */ (undefined)
  * @param {import("@rm/types").Permissions} perms
  * @returns
  */
-function generateUi(req, perms) {
+function drawer(req, perms) {
   const mapConfig = config.getMapConfig(req)
   const nestFilters = config.getSafe('defaultFilters.nests')
   const leagues = config.getSafe('api.pvp.leagues')
@@ -61,6 +61,13 @@ function generateUi(req, perms) {
             quests: perms.quests || BLOCKED,
             invasions: perms.invasions || BLOCKED,
             arEligible: perms.pokestops || BLOCKED,
+          }
+        : BLOCKED,
+    stations:
+      (perms.stations || perms.dynamax) && state.db.models.Station
+        ? {
+            allStations: perms.stations || BLOCKED,
+            maxBattles: perms.dynamax || BLOCKED,
           }
         : BLOCKED,
     pokemon:
@@ -159,7 +166,7 @@ function generateUi(req, perms) {
         : undefined,
     s2cells: perms.s2cells ? { enabled: true } : BLOCKED,
     scanAreas: perms.scanAreas
-      ? { filterByAreas: true, enabled: true }
+      ? { enabled: true, filterByAreas: true }
       : undefined,
     weather:
       perms.weather && state.db.models.Weather ? { enabled: true } : BLOCKED,
@@ -194,4 +201,4 @@ function generateUi(req, perms) {
   return { ...sortedUi, ...ui }
 }
 
-module.exports = generateUi
+module.exports = { drawer }

@@ -109,4 +109,4 @@ class Session extends Model {
   }
 }
 
-module.exports = Session
+module.exports = { Session }

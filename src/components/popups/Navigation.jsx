@@ -13,14 +13,16 @@ import { useStorage } from '@store/useStorage'
 export function Navigation({ lat, lon, size = 'large' }) {
   const nav = useStorage((s) => s.settings.navigation)
   const url = useMemory((s) => s.settings.navigation[nav]?.url)
+
   return (
     <IconButton
       href={url
-        .replaceAll('{x}', lat.toString())
-        .replaceAll('{y}', lon.toString())}
+        ?.replace(/\{x\}/g, lat.toString())
+        .replace(/\{y\}/g, lon.toString())}
       target="_blank"
       rel="noreferrer"
       size={size}
+      disabled={!url}
       style={{ color: 'inherit' }}
     >
       <Map />

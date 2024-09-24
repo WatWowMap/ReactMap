@@ -28,12 +28,13 @@ import { Navigation } from '@components/popups/Navigation'
 import { Coords } from '@components/popups/Coords'
 import { Title } from '@components/popups/Title'
 import { HeaderImage } from '@components/popups/HeaderImage'
-import { TimeSince } from '@components/popups/Timer'
+import { Timer } from '@components/popups/Timer'
 import { PowerUp } from '@components/popups/PowerUp'
 import { NameTT } from '@components/popups/NameTT'
 import { TimeStamp } from '@components/popups/TimeStamps'
 import { useAnalytics } from '@hooks/useAnalytics'
 import { parseQuestConditions } from '@utils/parseConditions'
+import { Img } from '@components/Img'
 
 /**
  *
@@ -131,7 +132,6 @@ export function PokestopPopup({
                     expandKey={`l${lure_id}`}
                     expireTime={lure_expire_timestamp}
                     icon={Icons.getPokestops(lure_id)}
-                    until
                     caption={t(`lure_${lure_id}`)}
                     tt={`lure_${lure_id}`}
                   />
@@ -154,7 +154,6 @@ export function PokestopPopup({
                           invasion.confirmed,
                         )}
                         disabled={pokestop.hasShowcase ? 'showcase_block' : ''}
-                        until
                         tt={
                           invasion.grunt_type === 44 && !invasion.confirmed
                             ? [`grunt_a_${invasion.grunt_type}`, ' / ', 'decoy']
@@ -198,7 +197,7 @@ export function PokestopPopup({
                             event.showcase_pokemon_id ? (
                               <NameTT
                                 key={event.showcase_pokemon_id}
-                                id={[`poke_${event.showcase_pokemon_id}`]}
+                                title={[`poke_${event.showcase_pokemon_id}`]}
                               >
                                 <div className="invasion-reward">
                                   <img
@@ -221,7 +220,7 @@ export function PokestopPopup({
                             ) : event.showcase_pokemon_type_id ? (
                               <NameTT
                                 key={event.showcase_pokemon_type_id}
-                                id={[
+                                title={[
                                   `poke_type_${event.showcase_pokemon_type_id}`,
                                 ]}
                               >
@@ -246,7 +245,6 @@ export function PokestopPopup({
                               Icons.getEventStops(event.display_type)
                             )
                           }
-                          until
                           tt={t(
                             `display_type_${event.display_type}`,
                             t('unknown_event'),
@@ -485,7 +483,7 @@ const RewardInfo = ({ with_ar, ...quest }) => {
 
   return (
     <Grid xs={3} style={{ textAlign: 'center', position: 'relative' }}>
-      <NameTT id={tt}>
+      <NameTT title={tt}>
         <img
           src={src}
           style={{ maxWidth: 35, maxHeight: 35 }}
@@ -709,7 +707,7 @@ const ShadowPokemon = ({ id, form, gender, costumeId, shiny }) => {
   return (
     <NameTT
       key={`${id}_${form}`}
-      id={[form ? `form_${form}` : '', `poke_${id}`]}
+      title={[form ? `form_${form}` : '', `poke_${id}`]}
     >
       <div className="invasion-reward">
         <img className="invasion-reward" alt="invasion reward" src={src} />
@@ -831,7 +829,7 @@ const Showcase = ({
         </Typography>
       </Grid>
       <Grid xs={6}>
-        <TimeSince expireTime={last_update} />
+        <Timer expireTime={last_update} />
       </Grid>
     </Grid>
   )
@@ -846,8 +844,10 @@ const NoBorderCell = styled(TableCell, {
   textAlign,
 }))
 
-const ShowcaseEntry = ({ rank, score, pokemon_id, form, costume, gender }) => {
+const ShowcaseEntry = (entry) => {
+  const { rank, score, pokemon_id, badge } = entry
   const Icons = useMemory((s) => s.Icons)
+  const { t } = useTranslation()
   return (
     <TableRow>
       <NoBorderCell>
@@ -862,10 +862,18 @@ const ShowcaseEntry = ({ rank, score, pokemon_id, form, costume, gender }) => {
       {pokemon_id && (
         <NoBorderCell>
           <img
-            src={Icons.getPokemon(pokemon_id, form, 0, gender, costume)}
+            src={Icons.getPokemonByDisplay(pokemon_id, entry)}
             alt="rank"
             height={20}
           />
+          {badge === 1 && (
+            <Img
+              src={Icons.getMisc('bestbuddy')}
+              alt={t('best_buddy')}
+              maxHeight={15}
+              maxWidth={15}
+            />
+          )}
         </NoBorderCell>
       )}
     </TableRow>

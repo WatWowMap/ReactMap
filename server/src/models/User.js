@@ -11,7 +11,7 @@ class User extends Model {
 
   static get relationMappings() {
     // eslint-disable-next-line global-require
-    const state = require('../services/state')
+    const { state } = require('../services/state')
     return {
       badges: {
         relation: Model.HasManyRelation,
@@ -71,4 +71,4 @@ class User extends Model {
   }
 }
 
-module.exports = User
+module.exports = { User }

@@ -1,3 +1,5 @@
+// @ts-check
+
 import * as React from 'react'
 import Box from '@mui/material/Box'
 import DialogContent from '@mui/material/DialogContent'
@@ -26,7 +28,7 @@ import { GenericSearch } from './inputs/GenericSearch'
  *  category: T
  *  webhookCategory?: string
  *  children: (index: number, key: string) => React.ReactNode
- *  categories?: import('@rm/types').Available[]
+ *  categories?: (keyof import('@rm/types').Available)[]
  *  extraButtons?: import('@components/dialogs/Footer').FooterButton[]
  * }} props
  */

@@ -1,8 +1,12 @@
+// @ts-check
 /* eslint-disable no-console */
 
 /**
+ * @typedef {{ error: boolean, status: number }} FetchError
+ */
+/**
  *
- * @returns {Promise<ReturnType<typeof import('../../server/src/utils/getServerSettings')>>}
+ * @returns {Promise<ReturnType<typeof import('../../server/src/utils/getServerSettings')> | FetchError>}
  */
 export async function getSettings() {
   try {
@@ -21,6 +25,11 @@ export async function getSettings() {
   }
 }
 
+/**
+ * @param {{ username: string, password: string }} user
+ * @param {string} endpoint
+ * @returns {Promise<Response | FetchError>}
+ */
 export async function login(user, endpoint = '/auth/local/callback') {
   try {
     return fetch(endpoint, {
@@ -39,6 +48,11 @@ export async function login(user, endpoint = '/auth/local/callback') {
   }
 }
 
+/**
+ *
+ * @param {Error & { uuid: string }} error
+ * @returns {Promise<Response | FetchError>}
+ */
 export async function sendError(error) {
   try {
     return fetch('/api/error/client', {

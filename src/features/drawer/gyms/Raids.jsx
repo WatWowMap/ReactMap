@@ -26,7 +26,7 @@ const RaidOverride = () => {
             fullWidth
             size="small"
             onChange={(e) =>
-              setFilters(e.target.value === 'all' ? 'all' : +e.target.value)
+              setFilters(e.target.value === 'all' ? 'all' : e.target.value)
             }
           >
             {[

@@ -11,7 +11,7 @@ const { consolidateAreas } = require('./consolidateAreas')
  * @param {string} [category]
  * @returns
  */
-function getAreaRestrictionSql(
+function getAreaSql(
   query,
   areaRestrictions,
   onlyAreas,
@@ -71,4 +71,4 @@ function getAreaRestrictionSql(
   return true
 }
 
-module.exports = getAreaRestrictionSql
+module.exports = { getAreaSql }

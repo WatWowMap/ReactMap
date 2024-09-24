@@ -1,16 +1,16 @@
 // @ts-check
-const router = require('express').Router()
+const authRouter = require('express').Router()
 const passport = require('passport')
 
 const config = require('@rm/config')
 const { log, TAGS } = require('@rm/logger')
 
-const state = require('../services/state')
+const { state } = require('../services/state')
 
 // Loads up the base auth routes and any custom ones
 
 const loadAuthStrategies = () => {
-  router.stack = []
+  authRouter.stack = []
   config.getSafe('authentication.strategies').forEach((strategy, i) => {
     const method =
       strategy.type === 'discord' || strategy.type === 'telegram'
@@ -26,11 +26,11 @@ const loadAuthStrategies = () => {
       if (strategy.type === 'discord') {
         callbackOptions.prompt = strategy.clientPrompt
       }
-      router[method](
+      authRouter[method](
         `/${name}`,
         passport.authenticate(name, authenticateOptions),
       )
-      router[method](`/${name}/callback`, async (req, res, next) =>
+      authRouter[method](`/${name}/callback`, async (req, res, next) =>
         passport.authenticate(
           name,
           callbackOptions,
@@ -76,7 +76,7 @@ const loadAuthStrategies = () => {
     }
   })
 
-  router.get('/logout', (req, res) => {
+  authRouter.get('/logout', (req, res) => {
     req.logout((err) => {
       if (err) log.error(TAGS.auth, 'Unable to logout', err)
     })
@@ -84,9 +84,9 @@ const loadAuthStrategies = () => {
     res.redirect('/')
   })
 
-  log.debug(TAGS.auth, 'Auth Router Stack Size:', router.stack.length)
+  log.debug(TAGS.auth, 'Auth Router Stack Size:', authRouter.stack.length)
 }
 
 loadAuthStrategies()
 
-module.exports = { loadAuthStrategies, authRouter: router }
+module.exports = { loadAuthStrategies, authRouter }

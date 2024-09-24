@@ -1,3 +1,5 @@
+// @ts-check
+
 import dlv from 'dlv'
 import { useCallback, useMemo } from 'react'
 import { create } from 'zustand'
@@ -6,7 +8,6 @@ import { persist, createJSONStorage } from 'zustand/middleware'
 import { setDeep } from '@utils/setDeep'
 
 /**
- * TODO: Finish this
  * @typedef {{
  *   darkMode: boolean,
  *   location: [number, number],
@@ -26,31 +27,33 @@ import { setDeep } from '@utils/setDeep'
  *    gyms: string,
  *    pokestops: string,
  *    nests: string,
+ *    stations: string,
  *   }
  *   searches: Record<string, string>,
  *   tabs: Record<string, number>,
  *   expanded: Record<string, boolean>,
- *   menus: ReturnType<import('server/src/ui/advMenus')>
+ *   menus: Partial<ReturnType<import('server/src/ui/advMenus')['advMenus']>>
  *   holidayEffects: Record<string, boolean>,
  *   motdIndex: number
  *   tutorial: boolean,
  *   searchTab: string,
  *   search: string,
- *   filters: import('@rm/types').AllFilters,
+ *   filters: Partial<import('@rm/types').AllFilters>,
  *   icons: Record<string, string>
  *   audio: Record<string, string>
- *   userSettings: ReturnType<import('server/src/ui/clientOptions')>['clientValues']
+ *   userSettings: Partial<ReturnType<import('server/src/ui/clientOptions')['clientOptions']>['clientValues']>
  *   profiling: boolean
  *   stateTraceLog: boolean
  *   desktopNotifications: boolean
  *   setAreas: (areas?: string | string[], validAreas?: string[], unselectAll?: boolean) => void,
  *   setPokemonFilterMode: (legacyFilter: boolean, easyMode: boolean) => void,
  *   getPokemonFilterMode: () => 'basic' | 'intermediate' | 'expert',
+ *   webhookAdv: Record<string, boolean>,
  * }} UseStorage
  *
- * @typedef {import('@rm/types').Paths<UseStorage>} UseStoragePaths
- * @typedef {import('@rm/types').ObjectPathValue<UseStorage, UseStoragePaths>} UseStorageValues
- *
+ * @typedef {import('@rm/types').OnlyType<UseStorage, Function, false>} UseStorageNoFn
+ * @typedef {import('@rm/types').Paths<UseStorageNoFn>} UseStoragePaths
+ * @typedef {import('@rm/types').ObjectPathValue<UseStorageNoFn, UseStoragePaths>} UseStorageValues
  * @type {import("zustand").UseBoundStore<import("zustand").StoreApi<UseStorage>>}
  */
 export const useStorage = create(
@@ -94,7 +97,8 @@ export const useStorage = create(
       },
       getPokemonFilterMode: () => {
         const { filters, userSettings } = get()
-        return filters?.pokemon?.easyMode
+        return filters?.pokemon?.easyMode &&
+          !userSettings?.pokemon?.legacyFilter
           ? 'basic'
           : userSettings?.pokemon?.legacyFilter
             ? 'expert'
@@ -119,7 +123,12 @@ export const useStorage = create(
         }))
       },
       holidayEffects: {},
-      settings: {},
+      settings: {
+        // distanceUnit: 'kilometers',
+        // navigation: 'leaflet',
+        // navigationControls: 'leaflet',
+        // tileServers: 'default',
+      },
       searches: {},
       tabs: {},
       expanded: {},
@@ -135,6 +144,7 @@ export const useStorage = create(
         gyms: 'categories',
         pokestops: 'categories',
         nests: 'others',
+        stations: 'others',
       },
       search: '',
       searchTab: '',
@@ -155,6 +165,8 @@ export const useStorage = create(
       motdIndex: 0,
       profiling: false,
       stateTraceLog: false,
+      desktopNotifications: false,
+      selectedWebhook: '',
     }),
     {
       name: 'local-state',
@@ -163,53 +175,39 @@ export const useStorage = create(
   ),
 )
 
-/**
- * @template {UseStoragePaths} T
- * @param {T} field
- * @param {import('@rm/types').ObjectPathValue<UseStorage, T>} [defaultValue]
- * @returns {import('@rm/types').ObjectPathValue<UseStorage, T>}
- */
+/** @type {import('@rm/types').useGetDeepStore} */
 export function useGetDeepStore(field, defaultValue) {
   return useStorage((s) => dlv(s, field, defaultValue))
 }
 
-/**
- * @template {UseStoragePaths} T
- * @param {T} field
- * @param {import('@rm/types').ObjectPathValue<UseStorage, T>} value
- * @returns {void}
- */
+/** @type {import('@rm/types').useSetDeepStore} */
 export function setDeepStore(field, value) {
   return useStorage.setState((s) => setDeep(s, field, value))
 }
 
-/**
- * @template {UseStoragePaths} Paths
- * @template {import('@rm/types').ObjectPathValue<UseStorage, Paths>} T
- * @template {T | ((prevValue: T) => T) | keyof T} U
- * @template {(arg1: U, ...rest: (U extends keyof T ? [arg2: T[U]] : [arg2?: never])) => void} SetDeep
- * @param {Paths} field
- * @param {import('@rm/types').ObjectPathValue<UseStorage, Paths>} [defaultValue]
- * @returns {[import('@rm/types').ObjectPathValue<UseStorage, Paths>, SetDeep]}
- */
+/** @type {import('@rm/types').useDeepStore} */
 export function useDeepStore(field, defaultValue) {
   const value = useGetDeepStore(field, defaultValue)
 
   const callback = useCallback(
-    /** @type {SetDeep} */ (
+    /** @type {ReturnType<import('@rm/types').useDeepStore>[1]} */ (
       (...args) => {
         const [first, ...rest] = field.split('.')
         const corrected = rest.length ? rest.join('.') : first
         const key = typeof args[0] === 'string' && args[1] ? args[0] : ''
         const path = key ? `${corrected}.${key}` : corrected
+
         return useStorage.setState((prev) => {
+          const prevValue = dlv(prev, field, defaultValue)
+
           const nextValue =
             args.length === 1
               ? typeof args[0] === 'function'
-                ? args[0](dlv(prev, field, defaultValue))
+                ? args[0](prevValue)
                 : args[0]
               : args[1]
-          if (process.env.NODE_ENV === 'development' && prev.stateLogging) {
+
+          if (process.env.NODE_ENV === 'development' && prev.stateTraceLog) {
             // eslint-disable-next-line no-console
             console.trace(field, {
               first,
@@ -220,6 +218,7 @@ export function useDeepStore(field, defaultValue) {
               nextValue,
             })
           }
+
           return {
             [first]:
               first === path
@@ -231,5 +230,7 @@ export function useDeepStore(field, defaultValue) {
     ),
     [field, defaultValue],
   )
+
+  // @ts-ignore
   return useMemo(() => [value, callback], [value, callback])
 }

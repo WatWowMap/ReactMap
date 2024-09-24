@@ -4,13 +4,13 @@ const { ApolloServerErrorCode } = require('@apollo/server/errors')
 const { GraphQLError } = require('graphql')
 const { parse } = require('graphql')
 
-const state = require('../services/state')
-const pkg = require('../../../package.json')
+const { state } = require('../services/state')
+const { version } = require('../../../package.json')
 const { DataLimitCheck } = require('../services/DataLimitCheck')
 
 /**
  *
- * @param {Awaited<ReturnType<import('../graphql/server')>>} server
+ * @param {Awaited<ReturnType<import('../graphql/server')['startApollo']>>} server
  * @returns
  */
 function apolloMiddleware(server) {
@@ -23,9 +23,9 @@ function apolloMiddleware(server) {
       const clientVHeader = req.headers['apollographql-client-version']
       const clientV =
         (typeof clientVHeader === 'string' && clientVHeader.trim()) ||
-        pkg.version ||
+        version ||
         1
-      const serverV = pkg.version || 1
+      const serverV = version || 1
 
       const definition =
         /** @type {import('graphql').OperationDefinitionNode} */ (

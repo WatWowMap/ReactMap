@@ -140,6 +140,10 @@ const viteConfig = defineConfig(({ mode }) => {
             startLon: config.getSafe('map.general.startLon'),
             startZoom: config.getSafe('map.general.startZoom'),
           },
+          theme: config.getSafe('map.theme'),
+        },
+        api: {
+          polling: config.getSafe('api.polling'),
         },
       },
     },

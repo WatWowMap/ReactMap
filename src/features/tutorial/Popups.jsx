@@ -11,6 +11,11 @@ import { PokemonPopup } from '@features/pokemon'
 
 import { tutorialData } from './data'
 
+/**
+ *
+ * @param {{ isMobile: boolean }} props
+ * @returns
+ */
 export function TutorialPopup({ isMobile }) {
   const { t } = useTranslation()
   const { startLat, startLon } = useMemory((s) => s.config.general)

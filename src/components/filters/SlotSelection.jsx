@@ -1,6 +1,6 @@
 // @ts-check
 import * as React from 'react'
-import Grid2 from '@mui/material/Unstable_Grid2/Grid2'
+import Grid2 from '@mui/material/Unstable_Grid2'
 import DialogContent from '@mui/material/DialogContent'
 import IconButton from '@mui/material/IconButton'
 import Divider from '@mui/material/Divider'

@@ -273,3 +273,36 @@ type Route {
   version: Int
   waypoints: [Waypoint]
 }
+
+type Station {
+  id: ID
+  name: String
+  lat: Float
+  lon: Float
+  updated: Int
+  start_time: Int
+  end_time: Int
+  cooldown_complete: Int
+  total_stationed_pokemon: Int
+  is_battle_available: Boolean
+  is_inactive: Boolean
+  battle_level: Int
+  battle_start: Int
+  battle_end: Int
+  battle_pokemon_id: Int
+  battle_pokemon_form: Int
+  battle_pokemon_costume: Int
+  battle_pokemon_gender: Int
+  battle_pokemon_alignment: Int
+  battle_pokemon_bread_mode: Int
+  battle_pokemon_move_1: Int
+  battle_pokemon_move_2: Int
+}
+
+type StationPokemon {
+  pokemon_id: Int
+  form: Int
+  costume: Int
+  gender: Int
+  bread_mode: Int
+}

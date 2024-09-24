@@ -2,8 +2,8 @@
 const { Model, ref } = require('objection')
 const config = require('@rm/config')
 
-const getPolyVector = require('../utils/getPolyVector')
-const getAreaSql = require('../utils/getAreaSql')
+const { getPolyVector } = require('../utils/getPolyVector')
+const { getAreaSql } = require('../utils/getAreaSql')
 
 class ScanCell extends Model {
   static get tableName() {
@@ -51,4 +51,4 @@ class ScanCell extends Model {
   }
 }
 
-module.exports = ScanCell
+module.exports = { ScanCell }

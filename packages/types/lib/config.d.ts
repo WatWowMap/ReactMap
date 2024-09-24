@@ -17,6 +17,7 @@ import {
   ObjectPathValue,
 } from './utility'
 import { Strategy } from './general'
+import { TileLayer } from './client'
 
 type BaseConfig = typeof config
 type ExampleConfig = typeof example
@@ -40,9 +41,15 @@ export type Config<Client extends boolean = false> = DeepMerge<
         }
       : never
     webhooks: Webhook[]
+    tileServers: TileLayer[]
     devOptions: {
       logLevel: LogLevelNames
       skipUpdateCheck?: boolean
+    }
+    defaultFilters: {
+      s2cells: {
+        cells: number[]
+      }
     }
     areas: ConfigAreas
     authentication: {
@@ -53,7 +60,7 @@ export type Config<Client extends boolean = false> = DeepMerge<
       excludeFromTutorial: string[]
       alwaysEnabledPerms: string[]
       aliases: { role: string; name: string }[]
-      methods: string[]
+      methods: Strategy[]
       strategies: {
         type: Strategy
         trialPeriod: {
@@ -65,6 +72,12 @@ export type Config<Client extends boolean = false> = DeepMerge<
         blockedGuilds: string[]
         allowedUsers: string[]
       }[]
+      perms: {
+        [K in keyof BaseConfig['authentication']['perms']]: Omit<
+          BaseConfig['authentication']['perms'][K],
+          'roles'
+        > & { roles: string[] }
+      }
     }
     api: {
       pvp: {

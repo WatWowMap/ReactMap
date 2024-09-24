@@ -7,12 +7,11 @@ const config = require('@rm/config')
 const { Logger } = require('@rm/logger')
 const { generate, read } = require('@rm/masterfile')
 
-const PoracleAPI = require('./Poracle')
+const { PoracleAPI } = require('./Poracle')
 const { getCache } = require('./cache')
 
 /**
- * @typedef {import('./DiscordClient') | import('./TelegramClient') | null} Client
- * @typedef {Record<string, Client>} ClientObject
+ * @typedef {Record<string, import('./AuthClient').AuthClient>} ClientObject
  */
 
 class EventManager extends Logger {
@@ -30,6 +29,7 @@ class EventManager extends Logger {
       pokestops: [],
       pokemon: [],
       nests: [],
+      stations: [],
     })
     this.uicons = getCache('uicons.json', [])
     this.uaudio = getCache('uaudio.json', [])
@@ -73,7 +73,7 @@ class EventManager extends Logger {
    *
    * @param {keyof EventManager['available']} category
    * @param {import('../models').ScannerModelKeys} model
-   * @param {import('./DbCheck')} Db
+   * @param {import('./DbManager').DbManager} Db
    */
   async setAvailable(category, model, Db) {
     this.available[category] = await Db.getAvailable(model)
@@ -118,7 +118,7 @@ class EventManager extends Logger {
 
   /**
    *
-   * @param {keyof import('./AuthClient')['loggingChannels']} channel
+   * @param {keyof (import('./AuthClient').AuthClient['loggingChannels'])} channel
    * @param {import('discord.js').APIEmbed} embed
    * @param {keyof EventManager['authClients']} [strategy]
    */
@@ -166,7 +166,7 @@ class EventManager extends Logger {
 
   /**
    *
-   * @param {import('./DbCheck')} Db
+   * @param {import('./DbManager').DbManager} Db
    * @param {import('./PvpWrapper').PvpWrapper | null} Pvp
    */
   startIntervals(Db, Pvp) {
@@ -215,6 +215,17 @@ class EventManager extends Logger {
           })
         },
         1000 * 60 * 60 * (config.getSafe('api.queryUpdateHours.quests') || 3),
+      )
+    }
+    if (!config.getSafe('api.queryOnSessionInit.stations')) {
+      this.intervals.stationUpdate = setInterval(
+        async () => {
+          await this.setAvailable('stations', 'Station', Db)
+          await this.chatLog('event', {
+            description: 'Refreshed available stations',
+          })
+        },
+        1000 * 60 * 60 * (config.getSafe('api.queryUpdateHours.stations') || 1),
       )
     }
     this.intervals.uicons = setInterval(
@@ -411,7 +422,7 @@ class EventManager extends Logger {
         }
         if (!this.masterfile.pokemon[id].forms[form]) {
           this.masterfile.pokemon[id].forms[form] = { name: '*', category }
-          this.log.info(
+          this.log.debug(
             `Added ${this.masterfile.pokemon[id].name} Key: ${item} to masterfile. (${category})`,
           )
         }
@@ -446,4 +457,4 @@ class EventManager extends Logger {
   }
 }
 
-module.exports = EventManager
+module.exports = { EventManager }

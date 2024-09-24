@@ -652,15 +652,7 @@ const ExtraGymInfo = ({
       {!!guarding_pokemon_id && updated > gymValidDataLimit && (
         <ExtraInfo title="defender">
           <TextWithIcon
-            src={Icons.getPokemon(
-              guarding_pokemon_id,
-              gpd.form,
-              gpd.temp_evolution,
-              gpd.gender,
-              gpd.costume,
-              gpd.alignment,
-              gpd.shiny,
-            )}
+            src={Icons.getPokemonByDisplay(guarding_pokemon_id, gpd)}
           >
             {gpd.badge === 1 && (
               <>

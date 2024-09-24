@@ -4,7 +4,7 @@ const { default: fetch } = require('node-fetch')
 const config = require('@rm/config')
 const { log, TAGS } = require('@rm/logger')
 
-const state = require('./state')
+const { state } = require('./state')
 
 const scannerQueue = {
   scanNext: {},
@@ -412,4 +412,4 @@ async function scannerApi(
   }
 }
 
-module.exports = scannerApi
+module.exports = { scannerApi }

@@ -8,6 +8,7 @@ import { RoutesDrawer } from './Routes'
 import { WayfarerDrawer } from './Wayfarer'
 import { S2CellsDrawer } from './S2Cells'
 import { AdminDrawer } from './Admin'
+import { StationsDrawer } from './Stations'
 
 function ExtrasComponent({ category, subItem }) {
   switch (category) {
@@ -25,6 +26,8 @@ function ExtrasComponent({ category, subItem }) {
       return <RoutesDrawer subItem={subItem} />
     case 'admin':
       return <AdminDrawer subItem={subItem} />
+    case 'stations':
+      return subItem === 'maxBattles' && <StationsDrawer />
     default:
       return null
   }

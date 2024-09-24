@@ -3,7 +3,7 @@ const Sentry = require('@sentry/node')
 
 const config = require('@rm/config')
 
-const pkg = require('../../../package.json')
+const { version } = require('../../../package.json')
 
 /**
  * Inits Sentry and returns the error handler middleware that should then be applied last
@@ -32,7 +32,7 @@ function initSentry(app) {
       tracesSampleRate:
         +(process.env.SENTRY_TRACES_SAMPLE_RATE || sentry.tracesSampleRate) ||
         0.1,
-      release: pkg.version,
+      release: version,
     })
 
     // RequestHandler creates a separate execution context, so that all

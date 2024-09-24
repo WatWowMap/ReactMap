@@ -1,3 +1,5 @@
+// @ts-check
+
 /* eslint-disable no-restricted-syntax */
 const { Model, raw, ref } = require('objection')
 const i18next = require('i18next')
@@ -9,17 +11,17 @@ const { point } = require('@turf/helpers')
 const { log, TAGS } = require('@rm/logger')
 const config = require('@rm/config')
 
-const state = require('../services/state')
-const getAreaSql = require('../utils/getAreaSql')
+const { getAreaSql } = require('../utils/getAreaSql')
 const { filterRTree } = require('../utils/filterRTree')
-const fetchJson = require('../utils/fetchJson')
+const { fetchJson } = require('../utils/fetchJson')
 const {
   IV_CALC,
   LEVEL_CALC,
   MAD_KEY_MAP,
   BASE_KEYS,
 } = require('../filters/pokemon/constants')
-const PkmnFilter = require('../filters/pokemon/Backend')
+const { PkmnBackend } = require('../filters/pokemon/Backend')
+const { state } = require('../services/state')
 
 class Pokemon extends Model {
   static get tableName() {
@@ -66,7 +68,7 @@ class Pokemon extends Model {
    * @param {import("@rm/types").Permissions} perms
    * @param {object} args
    * @param {import("@rm/types").DbContext} ctx
-   * @returns {{ filterMap: Record<string, PkmnFilter>, globalFilter: PkmnFilter }}
+   * @returns {{ filterMap: Record<string, PkmnBackend>, globalFilter: PkmnBackend }}
    */
   static getFilters(perms, args, ctx) {
     const mods = {
@@ -78,12 +80,12 @@ class Pokemon extends Model {
           .map((x) => [`onlyPvp${x}`, args.filters[`onlyPvp${x}`]]),
       ),
     }
-    /** @type {Record<string, PkmnFilter>} */
+    /** @type {Record<string, PkmnBackend>} */
     const filterMap = {}
 
     Object.entries(args.filters).forEach(([key, filter]) => {
       if (key.includes('-')) {
-        filterMap[key] = new PkmnFilter(
+        filterMap[key] = new PkmnBackend(
           key,
           filter,
           args.filters.onlyIvOr,
@@ -99,7 +101,7 @@ class Pokemon extends Model {
       // if no pokemon are present we want global filters to apply still
       mods.onlyLinkGlobal = false
     }
-    const globalFilter = new PkmnFilter(
+    const globalFilter = new PkmnBackend(
       'global',
       args.filters.onlyIvOr,
       args.filters.onlyIvOr,
@@ -265,7 +267,7 @@ class Pokemon extends Model {
       if (onlyHundoIv)
         filters.push({ iv: { min: 100, max: 100 }, pokemon: globalPokes })
     }
-    /** @type {import("../types").Pokemon[]} */
+    /** @type {import("@rm/types").Pokemon[]} */
     const results = await this.evalQuery(
       mem ? `${mem}/api/pokemon/v2/scan` : null,
       mem
@@ -377,7 +379,7 @@ class Pokemon extends Model {
   }
 
   /**
-   * @template [T=import("@rm/types").Pokemon[]]
+   * @template T
    * @param {string} mem
    * @param {string | import("objection").QueryBuilder<Pokemon>} query
    * @param {'GET' | 'POST' | 'PATCH' | 'DELETE'} method
@@ -665,4 +667,4 @@ class Pokemon extends Model {
   }
 }
 
-module.exports = Pokemon
+module.exports = { Pokemon }

@@ -47,7 +47,7 @@ export const apolloCache = new InMemoryCache({
 export const apolloClient = new ApolloClient({
   uri: '/graphql',
   link: abortableLink.concat(createHttpLink()),
-  name: CONFIG.client.title,
+  name: encodeURIComponent(CONFIG.client.title),
   version: CONFIG.client.version,
   cache: apolloCache,
 })

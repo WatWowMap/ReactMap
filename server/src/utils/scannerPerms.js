@@ -4,7 +4,7 @@ const config = require('@rm/config')
 /**
  *
  * @param {string[]} roles
- * @param {'discordRoles' | 'telegramGroups'} provider
+ * @param {'discordRoles' | 'telegramGroups' | 'local'} provider
  * @param {boolean} [trialActive]
  * @returns {string[]}
  */
@@ -28,4 +28,4 @@ function scannerPerms(roles, provider, trialActive = false) {
   return [...new Set(perms)]
 }
 
-module.exports = scannerPerms
+module.exports = { scannerPerms }

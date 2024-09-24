@@ -3,7 +3,7 @@ const dlv = require('dlv')
 
 const { log, TAGS } = require('@rm/logger')
 
-const state = require('../services/state')
+const { state } = require('../services/state')
 const { bindConnections } = require('../models')
 const { loadLatestAreas } = require('../services/areas')
 const { loadAuthStrategies } = require('../routes/authRouter')
@@ -94,11 +94,17 @@ async function reloadConfig() {
       } catch {
         // do nothing
       }
-      log.info(TAGS.config, `'${key}' -`, 'old:', oldValue, 'new:', newValue)
+      log.info(
+        TAGS.config,
+        `updated '${key}' -`,
+        'old:',
+        oldValue,
+        'new:',
+        newValue,
+      )
     }
 
     if (valid.length) {
-      log.info(TAGS.config, 'updating the following config values:')
       valid.forEach(print)
     }
     if (invalid.length) {

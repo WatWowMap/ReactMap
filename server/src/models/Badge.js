@@ -17,7 +17,7 @@ class Badge extends Model {
   }
 
   static get relationMappings() {
-    const state = require('../services/state')
+    const { state } = require('../services/state')
     return {
       user: {
         relation: Model.BelongsToOneRelation,
@@ -44,6 +44,36 @@ class Badge extends Model {
       .where('userId', userId)
       .andWhere('badge', operator, badge)
   }
+
+  /**
+   * Returns all badges for a gym
+   * @param {number} badge
+   * @param {number} gymId
+   * @param {number} userId
+   */
+  static async insert(badge, gymId, userId) {
+    // @ts-ignore
+    if (
+      await this.query()
+        .where('gymId', gymId)
+        .andWhere('userId', userId)
+        .first()
+    ) {
+      await this.query()
+        .where('gymId', gymId)
+        .andWhere('userId', userId)
+        // @ts-ignore
+        .update({ badge })
+    } else {
+      // @ts-ignore
+      await this.query().insert({
+        // @ts-ignore
+        badge,
+        gymId,
+        userId,
+      })
+    }
+  }
 }
 
-module.exports = Badge
+module.exports = { Badge }

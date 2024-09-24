@@ -86,3 +86,6 @@ server/src/models/queries/*
 # Cache
 server/.cache/*
 !/server/.cache/.gitkeep
+
+# Misc
+ts-check.js

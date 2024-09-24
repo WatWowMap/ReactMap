@@ -2,6 +2,7 @@
 import { divIcon } from 'leaflet'
 import { useMemory } from '@store/useMemory'
 
+/** @param {number} raidLevel */
 const getBadgeColor = (raidLevel) => {
   switch (raidLevel) {
     case 1:

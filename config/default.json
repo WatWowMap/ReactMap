@@ -36,6 +36,7 @@
       "scanAreas": 10000,
       "scanCells": 10,
       "submissionCells": 500,
+      "stations": 15,
       "weather": 30
     },
     "searchable": {
@@ -47,20 +48,23 @@
       "portals": true,
       "nests": true,
       "pokemon": true,
-      "invasions": true
+      "invasions": true,
+      "stations": true
     },
     "queryUpdateHours": {
       "pokemon": 0.17,
       "quests": 0.25,
       "raids": 0.05,
       "nests": 0.5,
-      "historicalRarity": 6
+      "historicalRarity": 6,
+      "stations": 0.05
     },
     "queryOnSessionInit": {
       "pokemon": false,
       "quests": false,
       "raids": true,
-      "nests": false
+      "nests": false,
+      "stations": false
     },
     "dataRequestLimits": {
       "categories": {
@@ -71,7 +75,8 @@
         "pokestops": 0,
         "portals": 0,
         "routes": 0,
-        "weather": 0
+        "weather": 0,
+        "stations": 0
       },
       "time": 60
     },
@@ -83,7 +88,8 @@
       "portals": 5000,
       "spawnpoints": 10000,
       "nests": 2500,
-      "scanCells": 5000
+      "scanCells": 5000,
+      "stations": 5000
     },
     "pvp": {
       "leagues": [
@@ -110,6 +116,7 @@
     },
     "portalUpdateLimit": 30,
     "weatherCellLimit": 3,
+    "stationUpdateLimit": 30,
     "searchResultsLimit": 15,
     "searchSoftKmLimit": 10,
     "searchHardKmLimit": 100,
@@ -150,6 +157,7 @@
         "gyms",
         "nests",
         "pokestops",
+        "stations",
         "pokemon",
         "routes",
         "wayfarer",
@@ -255,6 +263,7 @@
       "enableGymPopupCoordsSelector": false,
       "enablePokestopPopupCoordsSelector": false,
       "enablePortalPopupCoordsSelector": false,
+      "enableStationPopupCoordsSelector": false,
       "customFloatingIcons": [],
       "expandAllScanAreas": false,
       "enableRouteDownload": false
@@ -284,6 +293,10 @@
       "spawnpoints": {
         "zoomLevel": 12,
         "forcedLimit": 5000
+      },
+      "stations": {
+        "zoomLevel": 14,
+        "forcedLimit": 2500
       }
     },
     "messageOfTheDay": {
@@ -360,6 +373,15 @@
       "showArBadge": false,
       "enablePokestopPopupCoords": false,
       "invasionOpacity": true,
+      "opacityTenMinutes": 0.75,
+      "opacityFiveMinutes": 0.5,
+      "opacityOneMinute": 0.25
+    },
+    "stations": {
+      "clustering": true,
+      "stationTimers": false,
+      "stationsOpacity": true,
+      "enableStationPopupCoords": false,
       "opacityTenMinutes": 0.75,
       "opacityFiveMinutes": 0.5,
       "opacityOneMinute": 0.25
@@ -552,6 +574,12 @@
       "s17Cells": true,
       "s14Cells": true,
       "includeSponsored": true
+    },
+    "stations": {
+      "enabled": false,
+      "pokemon": false,
+      "battleTier": "all",
+      "battles": false
     },
     "s2cells": {
       "enabled": false,
@@ -839,6 +867,16 @@
         "enabled": true,
         "trialPeriodEligible": false,
         "roles": []
+      },
+      "stations": {
+        "enabled": true,
+        "trialPeriodEligible": false,
+        "roles": []
+      },
+      "dynamax": {
+        "enabled": true,
+        "trialPeriodEligible": false,
+        "roles": []
       }
     }
   },
@@ -956,6 +994,18 @@
         "xl": 3
       },
       "event": {
+        "sm": 15,
+        "md": 25,
+        "lg": 35,
+        "xl": 45
+      },
+      "station": {
+        "sm": 15,
+        "md": 25,
+        "lg": 35,
+        "xl": 45
+      },
+      "dynamax": {
         "sm": 15,
         "md": 25,
         "lg": 35,

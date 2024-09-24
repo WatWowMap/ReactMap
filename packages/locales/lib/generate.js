@@ -98,7 +98,7 @@ function matchJSON(str) {
  */
 async function sendToGPT(locale, missingKeys) {
   return openAI.chat.completions.create({
-    model: 'gpt-4-turbo-preview',
+    model: 'gpt-4o-mini',
     messages: [
       {
         role: 'system',

@@ -1,3 +1,5 @@
+// @ts-check
+
 const NodeGeocoder = require('node-geocoder')
 const { log, TAGS } = require('@rm/logger')
 

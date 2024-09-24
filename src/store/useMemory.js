@@ -1,3 +1,5 @@
+// @ts-check
+
 import { create } from 'zustand'
 
 /**
@@ -10,8 +12,8 @@ import { create } from 'zustand'
  *   searchLoading: boolean,
  *   Icons: InstanceType<typeof import("../services/Assets").UAssets>,
  *   Audio: InstanceType<typeof import("../services/Assets").UAssets>,
- *   config: import('@rm/types').Config['map'],
- *   ui: import('@rm/types').UIObject,
+ *   config: { [K in keyof Omit<import('@rm/types').Config['map'], 'domain'>]: Partial<Omit<import('@rm/types').Config['map'], 'domain'>[K]> },
+ *   ui: Partial<import('@rm/types').UIObject>,
  *   auth: {
  *    perms: Partial<import('@rm/types').Permissions>,
  *    loggedIn: boolean,
@@ -31,15 +33,15 @@ import { create } from 'zustand'
  *    },
  *   },
  *   glowRules: ((pkmn: import('@rm/types').Pokemon) => string)[],
- *   menus: ReturnType<import('server/src/ui/advMenus')>
+ *   menus: Partial<ReturnType<import('server/src/ui/advMenus')['advMenus']>>
  *   menuFilters: import('@rm/types').ClientFilterObj,
- *   filters: import('@rm/types').AllFilters,
- *   masterfile: import('@rm/masterfile').Masterfile
+ *   filters: Partial<import('@rm/types').AllFilters>,
+ *   masterfile: { [K in keyof import('@rm/masterfile').Masterfile]: Partial<import('@rm/masterfile').Masterfile[K]> },
  *   polling: import('@rm/types').Config['api']['polling'],
  *   gymValidDataLimit: number
  *   settings: { [K in keyof import('./useStorage').UseStorage['settings']]: Record<string, K extends 'tileServers' ? import('@rm/types').TileLayer : K extends 'navigation' ? { name: string, url: string } : { name: string }> }
- *   userSettings: ReturnType<import('server/src/ui/clientOptions')>['clientValues']
- *   clientMenus: ReturnType<import('server/src/ui/clientOptions')>['clientMenus']
+ *   userSettings: Partial<ReturnType<import('server/src/ui/clientOptions')['clientOptions']>['clientValues']>
+ *   clientMenus: Partial<ReturnType<import('server/src/ui/clientOptions')['clientOptions']>['clientMenus']>
  *   clientError: string,
  *   timeOfDay: import('@rm/types').TimesOfDay,
  *   hideList: Set<string | number>,
@@ -55,6 +57,7 @@ import { create } from 'zustand'
  *     pokemon: string[],
  *     pokestops: string[],
  *     nests: string[],
+ *     stations: string[],
  *     questConditions: Record<string, { title: string, target?: number }[]>,
  *   }
  *   manualParams: {
@@ -77,11 +80,8 @@ export const useMemory = create(() => ({
   reset: false,
   tileStyle: 'light',
   clientError: '',
-  theme: {
-    primary: '#ff5722',
-    secondary: '#00b0ff',
-  },
-  polling: {},
+  theme: CONFIG.map.theme,
+  polling: CONFIG.api.polling,
   gymValidDataLimit: 0,
   auth: {
     strategy: '',
@@ -98,6 +98,7 @@ export const useMemory = create(() => ({
       webhooks: 0,
       scanner: 0,
     },
+    excludeList: [],
     userBackupLimits: 0,
   },
   glowRules: [],
@@ -125,6 +126,7 @@ export const useMemory = create(() => ({
     pokemon: [],
     pokestops: [],
     nests: [],
+    stations: [],
     questConditions: {},
   },
   Icons: null,
@@ -135,6 +137,12 @@ export const useMemory = create(() => ({
     pokemon: {},
     questRewardTypes: {},
     types: {},
+    items: {},
+    moves: {},
+    quests: {},
+    weather: {},
+    raids: {},
+    teams: {},
   },
   hideList: new Set(),
   timerList: [],
@@ -145,16 +153,18 @@ export const useMemory = create(() => ({
     id: '',
   },
   advMenuCounts: {
-    pokemon: { count: 0, show: 0 },
-    gyms: { count: 0, show: 0 },
-    pokestops: { count: 0, show: 0 },
-    nests: { count: 0, show: 0 },
+    pokemon: { count: 0, show: 0, total: 0 },
+    gyms: { count: 0, show: 0, total: 0 },
+    pokestops: { count: 0, show: 0, total: 0 },
+    nests: { count: 0, show: 0, total: 0 },
+    stations: { count: 0, show: 0, total: 0 },
   },
   advMenuFiltered: {
     gyms: [],
     pokestops: [],
     pokemon: [],
     nests: [],
+    stations: [],
   },
 }))
 

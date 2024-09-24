@@ -1,3 +1,5 @@
+// @ts-check
+
 const { localePlugin } = require('./locale')
 const { faviconPlugin } = require('./favicon')
 const { muteWarningsPlugin } = require('./muteWarnings')

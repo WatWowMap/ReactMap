@@ -1,11 +1,13 @@
+// @ts-check
+
 /* eslint-disable no-continue */
 const { Model, raw } = require('objection')
 const i18next = require('i18next')
 const config = require('@rm/config')
 
-const state = require('../services/state')
-const getAreaSql = require('../utils/getAreaSql')
+const { getAreaSql } = require('../utils/getAreaSql')
 const { getUserMidnight } = require('../utils/getClientTime')
+const { state } = require('../services/state')
 
 const questProps = {
   quest_type: true,
@@ -2006,4 +2008,4 @@ class Pokestop extends Model {
   }
 }
 
-module.exports = Pokestop
+module.exports = { Pokestop }

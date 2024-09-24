@@ -1,3 +1,5 @@
+// @ts-check
+
 import { Icon, divIcon } from 'leaflet'
 
 import { useMemory } from '@store/useMemory'
@@ -16,6 +18,18 @@ export const basicPokemonMarker = ({ iconUrl, iconSize }) =>
     className: 'marker',
   })
 
+/**
+ * @typedef {Object} FancyPokemonMarkerProps
+ * @property {import('@rm/types').Pokemon} pkmn
+ * @property {string} iconUrl
+ * @property {number} iconSize
+ * @property {string} showGlow
+ * @property {boolean} showWeather
+ * @property {string} badge
+ * @property {number} opacity
+ * @property {import('@rm/types').TimesOfDay} timeOfDay
+ * @param {FancyPokemonMarkerProps} props
+ */
 export const fancyPokemonMarker = ({
   pkmn,
   iconUrl,

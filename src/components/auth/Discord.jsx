@@ -1,3 +1,5 @@
+// @ts-check
+
 import * as React from 'react'
 import Button from '@mui/material/Button'
 import { useTranslation } from 'react-i18next'
@@ -19,6 +21,7 @@ export function DiscordButton({
   const { t } = useTranslation()
 
   return (
+    // TODO: Augment Mui Types
     <Button
       variant="contained"
       bgcolor={bgcolor}

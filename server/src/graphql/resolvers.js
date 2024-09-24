@@ -1,3 +1,5 @@
+// @ts-check
+
 const fs = require('fs')
 const { resolve } = require('path')
 const { GraphQLJSON } = require('graphql-type-json')
@@ -6,15 +8,15 @@ const { S2LatLng, S2RegionCoverer, S2LatLngRect } = require('nodes2ts')
 const config = require('@rm/config')
 const { missing, readAndParseJson } = require('@rm/locales')
 
-const buildDefaultFilters = require('../filters/builder/base')
-const filterComponents = require('../utils/filterComponents')
-const validateSelectedWebhook = require('../utils/validateSelectedWebhook')
-const PoracleAPI = require('../services/Poracle')
+const { buildDefaultFilters } = require('../filters/builder/base')
+const { filterComponents } = require('../utils/filterComponents')
+const { validateSelectedWebhook } = require('../utils/validateSelectedWebhook')
+const { PoracleAPI } = require('../services/Poracle')
 const { geocoder } = require('../services/geocoder')
-const scannerApi = require('../services/scannerApi')
-const getPolyVector = require('../utils/getPolyVector')
-const getPlacementCells = require('../utils/getPlacementCells')
-const getTypeCells = require('../utils/getTypeCells')
+const { scannerApi } = require('../services/scannerApi')
+const { getPolyVector } = require('../utils/getPolyVector')
+const { getPlacementCells } = require('../utils/getPlacementCells')
+const { getTypeCells } = require('../utils/getTypeCells')
 const { getValidCoords } = require('../utils/getValidCoords')
 
 /** @type {import("@apollo/server").ApolloServerOptions<import("@rm/types").GqlContext>['resolvers']} */
@@ -79,6 +81,8 @@ const resolvers = {
         }
         return perms?.pokestops
       }),
+    availableStations: (_, _args, { Event, perms }) =>
+      perms?.dynamax ? Event.available.stations : [],
     backup: (_, args, { req, perms, Db }) => {
       if (perms?.backups && req?.user?.id) {
         return Db.models.Backup.getOne(args.id, req?.user?.id)
@@ -107,7 +111,7 @@ const resolvers = {
       )
       return !!results.length
     },
-    /** @param {unknown} _ @param {{ mode: 'scanNext' | 'scanZone' }} args */
+    /** @param {unknown} _ @param {{ mode: 'scanNext' | 'scanZone', points: [number, number][] }} args */
     checkValidScan: (_, { mode, points }, { perms }) =>
       getValidCoords(mode, points, perms),
     /** @param {unknown} _ @param {{ component: 'loginPage' | 'donationPage' | 'messageOfTheDay' }} args */
@@ -436,6 +440,8 @@ const resolvers = {
           return perms.portals ? Db.search('Portal', perms, args) : []
         case 'nests':
           return perms.nests ? Db.search('Nest', perms, args) : []
+        case 'stations':
+          return perms.stations ? Db.search('Station', perms, args) : []
         default:
           return []
       }
@@ -477,6 +483,18 @@ const resolvers = {
     spawnpoints: (_, args, { perms, Db }) => {
       if (perms?.spawnpoints) {
         return Db.query('Spawnpoint', 'getAll', perms, args)
+      }
+      return []
+    },
+    stations: (_, args, { perms, Db }) => {
+      if (perms?.stations || perms?.dynamax) {
+        return Db.query('Station', 'getAll', perms, args)
+      }
+      return []
+    },
+    stationPokemon: (_, { id }, { perms, Db }) => {
+      if (perms?.stations) {
+        return Db.query('Station', 'getDynamaxMons', id)
       }
       return []
     },
@@ -778,23 +796,7 @@ const resolvers = {
     },
     setGymBadge: async (_, args, { req, Db, perms }) => {
       if (perms?.gymBadges && req?.user?.id) {
-        if (
-          await Db.models.Badge.query()
-            .where('gymId', args.gymId)
-            .andWhere('userId', req.user.id)
-            .first()
-        ) {
-          await Db.models.Badge.query()
-            .where('gymId', args.gymId)
-            .andWhere('userId', req.user.id)
-            .update({ badge: args.badge })
-        } else {
-          await Db.models.Badge.query().insert({
-            badge: args.badge,
-            gymId: args.gymId,
-            userId: req.user.id,
-          })
-        }
+        await Db.models.Badge.insert(args.badge, args.gymId, req.user.id)
         return true
       }
       return false
@@ -802,4 +804,4 @@ const resolvers = {
   },
 }
 
-module.exports = resolvers
+module.exports = { resolvers }

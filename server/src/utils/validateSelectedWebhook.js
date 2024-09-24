@@ -28,4 +28,4 @@ async function validateSelectedWebhook(user, Db, Event) {
   return null
 }
 
-module.exports = validateSelectedWebhook
+module.exports = { validateSelectedWebhook }
