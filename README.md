@@ -21,6 +21,7 @@ Pokemon GO Map frontend built with React.
 - Devices
 - Weather
 - Portals
+- Stations
 - Nests (Only compatible with latest [NestWatcher](https://github.com/M4d40/nestwatcher))
 - Submissions Cells
 - Last Scanned Cells
