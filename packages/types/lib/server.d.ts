@@ -11,14 +11,14 @@ import type {
   Pokestop,
   Gym,
   Pokemon,
-} from 'server/src/models'
+} from '@rm/server/src/models'
 import { Knex } from 'knex'
 import { Model } from 'objection'
 import { NextFunction, Request, Response } from 'express'
 import { VerifyCallback } from 'passport-oauth2'
 
-import type { DbManager } from 'server/src/services/DbManager'
-import type { EventManager } from 'server/src/services/EventManager'
+import type { DbManager } from '@rm/server/src/services/DbManager'
+import type { EventManager } from '@rm/server/src/services/EventManager'
 import { ModelReturn, OnlyType } from './utility'
 import { Profile } from 'passport-discord'
 import { User } from './models'
@@ -150,6 +150,8 @@ export interface Permissions extends BasePerms {
   areaRestrictions: string[]
   webhooks: string[]
   trial: boolean
+  admin?: boolean
+  blocked?: boolean
 }
 
 export interface FilterId {
@@ -184,13 +186,13 @@ export type DiscordVerifyFunction = (
   done: VerifyCallback,
 ) => void
 
-export type BaseFilter = import('server/src/filters/Base').BaseFilter
+export type BaseFilter = import('@rm/server/src/filters/Base').BaseFilter
 
 export type PokemonFilter =
-  import('server/src/filters/pokemon/Frontend').PokemonFilter
+  import('@rm/server/src/filters/pokemon/Frontend').PokemonFilter
 
 export type AllFilters = ReturnType<
-  (typeof import('server/src/filters/builder/base'))['buildDefaultFilters']
+  (typeof import('@rm/server/src/filters/builder/base'))['buildDefaultFilters']
 >
 
 export type Categories = keyof AllFilters
@@ -203,7 +205,7 @@ export type AdvCategories =
   | 'stations'
 
 export type UIObject = ReturnType<
-  (typeof import('server/src/ui/drawer'))['drawer']
+  (typeof import('@rm/server/src/ui/drawer'))['drawer']
 >
 
 export interface PokemonGlow

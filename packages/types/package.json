@@ -2,6 +2,7 @@
   "name": "@rm/types",
   "version": "1.0.0",
   "private": true,
+  "main": "./lib/index.d.ts",
   "types": "./lib/index.d.ts",
   "scripts": {
     "sort": "npx sort-package-json",
@@ -16,16 +17,19 @@
     "@mui/material": "5.16.7",
     "@mui/system": "5.16.7",
     "@sentry/node": "^7.65.0",
-    "@types/config": "^3.3.4",
+    "@types/config": "^3.3.5",
     "@types/node": "^18",
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
-    "express": "^4.19.2",
+    "express": "4.21.0",
     "geojson": "0.5.0",
+    "graphql": "16.9.0",
     "knex": "3.1.0",
     "loglevel": "^1.8.1",
     "objection": "3.1.4",
     "passport-discord": "https://github.com/tonestrike/passport-discord.git",
-    "passport-oauth2": "^1.7.0"
+    "passport-oauth2": "^1.7.0",
+    "react": "18.3.1",
+    "react-dom": "18.3.1"
   }
 }

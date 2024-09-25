@@ -5,19 +5,9 @@
     "moduleResolution": "node",
     "resolveJsonModule": true,
     "esModuleInterop": true,
-    "allowSyntheticDefaultImports": true,
-    "baseUrl": ".",
-    "lib": ["ESNext", "dom"],
-    "jsx": "react-jsx",
-    "paths": {
-      "@assets/*": ["./src/assets/*"],
-      "@components/*": ["./src/components/*"],
-      "@features/*": ["./src/features/*"],
-      "@services/*": ["./src/services/*"],
-      "@hooks/*": ["./src/hooks/*"],
-      "@utils/*": ["./src/utils/*"],
-      "@store/*": ["./src/store/*"]
-    }
+    "allowSyntheticDefaultImports": true
   },
+  "lib": ["ESNext"],
+  "include": ["client", "packages", "server"],
   "exclude": ["node_modules", "**/node_modules/*", "dist", "dist-*"]
 }

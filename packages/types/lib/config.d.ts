@@ -5,8 +5,8 @@ import type { UiconsIndex } from 'uicons.js'
 import { Props as ImgProps } from '@components/Img'
 
 import type { CustomComponent } from './blocks'
-import config = require('../../../config/default.json')
-import example = require('../../../config/local.example.json')
+import config from '../../../config/default.json'
+import example from '../../../config/example/standard/local.json'
 
 import type { Schema } from './server'
 import {
@@ -23,7 +23,9 @@ type BaseConfig = typeof config
 type ExampleConfig = typeof example
 
 export type ConfigAreas = Awaited<
-  ReturnType<(typeof import('server/src/services/areas'))['loadLatestAreas']>
+  ReturnType<
+    (typeof import('@rm/server/src/services/areas'))['loadLatestAreas']
+  >
 >
 
 export type Config<Client extends boolean = false> = DeepMerge<
@@ -123,8 +125,6 @@ export type Config<Client extends boolean = false> = DeepMerge<
         components: CustomComponent[]
       }
     }
-    multiDomains: MultiDomain[]
-    multiDomainsObj: Record<string, MultiDomain>
     database: {
       schemas: Schema[]
       settings: {
@@ -147,13 +147,6 @@ export type Config<Client extends boolean = false> = DeepMerge<
     manualAreas: ExampleConfig['manualAreas'][number][]
   }
 >
-
-// unclear why this is needed, but it is for the MultiDomain type to parse...
-type Map = Config['map']
-
-export interface MultiDomain extends Map {
-  domain: string
-}
 
 export interface Icons extends Omit<BaseConfig['icons'], 'styles'> {
   customizable: string[]
@@ -205,8 +198,8 @@ export interface GridSizes {
   xl?: number
 }
 
-export type GetSafeConfig = <P extends Paths<Config>>(
-  path: P,
-) => ObjectPathValue<Config, P>
+// export type GetSafeConfig = <P extends Paths<Config>>(
+//   path: P,
+// ) => ObjectPathValue<Config, P>
 
 export type ConfigEqualReport = ComparisonReport<Omit<Config, 'areas'>>

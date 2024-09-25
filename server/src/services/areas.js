@@ -1,7 +1,7 @@
 // @ts-check
 const { default: center } = require('@turf/center')
 const fs = require('fs')
-const { resolve } = require('path')
+const path = require('path')
 const { default: fetch } = require('node-fetch')
 const RTree = require('rtree')
 
@@ -11,6 +11,8 @@ const { setCache, getCache } = require('./cache')
 
 /** @type {import("@rm/types").RMGeoJSON} */
 const DEFAULT_RETURN = { type: 'FeatureCollection', features: [] }
+
+const configDir = path.join(__dirname, '../../../config/user')
 
 /** @returns {import("@rm/types").RMGeoJSON} */
 const getManualGeojson = () => ({
@@ -47,10 +49,9 @@ const loadFromFile = (fileName) => {
     if (fileName.startsWith('http')) {
       return getCache(fileName, DEFAULT_RETURN)
     }
-    if (fs.existsSync(resolve(__dirname, `../configs/${fileName}`))) {
-      return JSON.parse(
-        fs.readFileSync(resolve(__dirname, `../configs/${fileName}`), 'utf-8'),
-      )
+    const filePath = path.join(configDir, fileName)
+    if (fs.existsSync(filePath)) {
+      return JSON.parse(fs.readFileSync(filePath, 'utf-8'))
     }
     return DEFAULT_RETURN
   } catch (e) {
@@ -157,38 +158,6 @@ const loadScanPolygons = async (fileName, domain) => {
   }
 }
 
-/**
- *
- * @param {Record<string, import("@rm/types").RMGeoJSON>} scanAreas
- * @returns {import("@rm/types").RMGeoJSON}
- */
-const loadAreas = (scanAreas) => {
-  try {
-    /** @type {import("@rm/types").RMGeoJSON} */
-    const normalized = { type: 'FeatureCollection', features: [] }
-    Object.values(scanAreas).forEach((area) => {
-      if (area?.features.length) {
-        normalized.features.push(
-          ...area.features.filter((f) => !f.properties.manual),
-        )
-      }
-    })
-    return normalized
-  } catch (err) {
-    if (
-      config
-        .getSafe('authentication.areaRestrictions')
-        .some((rule) => rule.roles.length)
-    ) {
-      log.warn(
-        TAGS.areas,
-        'Area restrictions disabled - `areas.json` file is missing or broken.',
-      )
-    }
-    return DEFAULT_RETURN
-  }
-}
-
 /** @param {import("@rm/types").RMGeoJSON} featureCollection */
 const parseAreas = (featureCollection) => {
   /** @type {Record<string, import("@rm/types").RMGeoJSON['features'][number]['geometry']>} */
@@ -248,67 +217,44 @@ const parseAreas = (featureCollection) => {
 }
 
 /**
- * @param {Record<string, import("@rm/types").RMGeoJSON>} scanAreas
+ * @param {import("@rm/types").RMGeoJSON} scanAreas
  * @returns
  */
 const buildAreas = (scanAreas) => {
-  const scanAreasMenu = Object.fromEntries(
-    Object.entries(scanAreas).map(([domain, featureCollection]) => {
-      const parents = {
-        '': {
-          children:
-            /** @type {Pick<import('@rm/types').RMFeature, 'properties'>[]} */ ([]),
-          name: '',
-          details:
-            /** @type {Pick<import('@rm/types').RMFeature, 'properties'> | null} */ (
-              null
-            ),
-        },
-      }
-
-      const noHiddenFeatures = {
-        ...featureCollection,
-        features: featureCollection.features.filter(
-          (f) => !f.properties.hidden,
-        ),
-      }
-      // Finds unique parents and determines if the parents have their own properties
-      noHiddenFeatures.features.forEach((feature) => {
-        if (feature.properties.parent) {
-          const found = featureCollection.features.find(
-            (area) => area.properties.name === feature.properties.parent,
-          )
-          parents[feature.properties.parent] = {
-            name: feature.properties.parent,
-            details: found && {
-              properties: found.properties,
-            },
-            children: [],
-          }
-        }
-      })
-
-      // Finds the children of each parent
-      noHiddenFeatures.features.forEach((feature) => {
-        if (feature.properties.parent) {
-          parents[feature.properties.parent].children.push({
-            properties: feature.properties,
-          })
-        } else if (!parents[feature.properties.name]) {
-          parents[''].children.push({ properties: feature.properties })
-        }
-      })
-
-      return [
-        domain,
-        Object.values(parents).sort((a, b) => a.name.localeCompare(b.name)),
-      ]
-    }),
-  )
+  /** @type {Record<string, { children: Pick<import('@rm/types').RMFeature, 'properties'>[], name: string, details: Pick<import('@rm/types').RMFeature, 'properties'> | null }>} */
+  const parents = {
+    '': {
+      children: [],
+      name: '',
+      details: null,
+    },
+  }
   const scanAreasObj = Object.fromEntries(
-    Object.values(scanAreas)
-      .flatMap((areas) => areas.features)
-      .map((feature) => [feature.properties.key, feature]),
+    scanAreas.features.map((feature) => [feature.properties.key, feature]),
+  )
+
+  scanAreas.features.forEach((feature) => {
+    if (feature.properties.hidden) return
+    if (feature.properties.parent) {
+      const found = scanAreasObj[feature.properties.parent]
+      parents[feature.properties.parent] = {
+        name: feature.properties.parent,
+        details: found && {
+          properties: found.properties,
+        },
+        children: [],
+      }
+    }
+    if (feature.properties.parent) {
+      parents[feature.properties.parent].children.push({
+        properties: feature.properties,
+      })
+    } else if (!parents[feature.properties.name]) {
+      parents[''].children.push({ properties: feature.properties })
+    }
+  })
+  const scanAreasMenu = Object.values(parents).sort((a, b) =>
+    a.name.localeCompare(b.name),
   )
 
   const myRTree = RTree()
@@ -322,7 +268,13 @@ const buildAreas = (scanAreas) => {
     ),
   })
 
-  const raw = loadAreas(scanAreas)
+  /** @type {import("@rm/types").RMGeoJSON} */
+  const raw = {
+    type: 'FeatureCollection',
+    features: scanAreas.features
+      .filter((f) => !f.properties.manual)
+      .map((f) => f),
+  }
   log.info(TAGS.areas, 'Loaded areas')
   return {
     scanAreas,
@@ -336,47 +288,13 @@ const buildAreas = (scanAreas) => {
 
 const loadLatestAreas = async () => {
   const fileName = config.getSafe('map.general.geoJsonFileName')
-
-  /** @type {Record<string, import("@rm/types").RMGeoJSON>} */
-  const scanAreas = {
-    main: await loadScanPolygons(fileName),
-    ...(config.has('multiDomains')
-      ? Object.fromEntries(
-          await Promise.all(
-            config
-              .getSafe('multiDomains')
-              .map(async (d) => [
-                d.general?.geoJsonFileName
-                  ? d.domain.replaceAll('.', '_')
-                  : 'main',
-                await loadScanPolygons(d.general?.geoJsonFileName || fileName),
-              ]),
-          ),
-        )
-      : {}),
-  }
+  const scanAreas = await loadScanPolygons(fileName)
   return buildAreas(scanAreas)
 }
 
 const loadCachedAreas = () => {
   const fileName = config.getSafe('map.general.geoJsonFileName')
-
-  /** @type {Record<string, import("@rm/types").RMGeoJSON>} */
-  const scanAreas = {
-    main: loadFromFile(fileName),
-    ...(config.has('multiDomains')
-      ? Object.fromEntries(
-          config
-            .getSafe('multiDomains')
-            .map((d) => [
-              d.general?.geoJsonFileName
-                ? d.domain.replaceAll('.', '_')
-                : 'main',
-              loadFromFile(d.general?.geoJsonFileName || fileName),
-            ]),
-        )
-      : {}),
-  }
+  const scanAreas = loadFromFile(fileName)
   return buildAreas(scanAreas)
 }
 

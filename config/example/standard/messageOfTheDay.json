@@ -1,0 +1,17 @@
+{
+  "dialogMaxWidth": "sm",
+  "index": 0,
+  "settings": {
+    "parentSpacing": 0,
+    "parentAlignItems": "center",
+    "parentJustifyContent": "center",
+    "parentStyle": {},
+    "permanent": false,
+    "freeloaderOnly": false,
+    "donorOnly": false,
+    "timeoutSeconds": 0
+  },
+  "titles": [],
+  "components": [],
+  "footerButtons": []
+}

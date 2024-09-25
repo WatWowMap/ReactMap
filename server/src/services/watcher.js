@@ -7,50 +7,35 @@ const { log, TAGS } = require('@rm/logger')
 const { validateJsons } = require('@rm/config/lib/validateJsons')
 const { reloadConfig } = require('../utils/reloadConfig')
 
-const configDir = resolve(__dirname, '../configs')
+const configDir = resolve(__dirname, '../../../config/user')
 
 /**
  * Replace base path, remove .json, and split into array
  * @param {string} path
  */
 const clean = (path) =>
-  path.replace(`${configDir}/`, '').replace('.json', '').split('/', 2)
+  path.replace(`${configDir}/`, '').replace('.json', '').split('-', 1).at(0)
 
 /**
  *
  * @param {string} event
  * @param {string} rawFile
- * @param {string} [domain]
  */
-const handle = async (event, rawFile, domain) => {
+const handle = async (event, rawFile) => {
   log.debug(TAGS.config, `[${event}]`, rawFile)
 
   switch (rawFile) {
     case 'loginPage':
     case 'donationPage':
     case 'messageOfTheDay':
-      if (domain) {
-        const domainKey = domain.replaceAll('.', '_')
-        const multiDomainsObj = config.getSafe('multiDomainsObj')
-        if (multiDomainsObj[domainKey]?.[rawFile]) {
-          log.info(TAGS.config, `[${event}]`, rawFile, domain)
-          multiDomainsObj[domainKey][rawFile] = config.util.extendDeep(
-            {},
-            multiDomainsObj[domainKey][rawFile],
-            validateJsons(rawFile, domain),
-          )
-        }
-      } else {
-        log.info(TAGS.config, `[${event}]`, rawFile)
-        config.map[rawFile] = config.util.extendDeep(
-          {},
-          config.map[rawFile],
-          validateJsons(rawFile),
-        )
-      }
+      log.info(TAGS.config, `[${event}]`, rawFile)
+      config.map[rawFile] = config.util.extendDeep(
+        {},
+        config.map[rawFile],
+        validateJsons(rawFile),
+      )
       break
     case 'local':
-    case `local-${process.env.NODE_CONFIG_ENV}`:
       if (config.reloadConfigOnSave) {
         await reloadConfig()
       }
@@ -68,14 +53,11 @@ const startWatcher = () => {
   })
 
   watcher.on('change', async (path) => {
-    const [rawFile, domain] = clean(path)
-    await handle('CHANGE', rawFile, domain)
+    await handle('CHANGE', clean(path))
   })
 
   watcher.on('add', async (path) => {
-    const [rawFile, domain] = clean(path)
-    if (domain && domain.split('_').length > 1) return
-    await handle('ADD', rawFile, domain)
+    await handle('ADD', clean(path))
   })
 
   return watcher

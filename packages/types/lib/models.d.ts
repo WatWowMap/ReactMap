@@ -1,11 +1,12 @@
-import UserModel = require('server/src/models/NestSubmission')
-import BackupModel = require('server/src/models/Backup')
-import SessionModel = require('server/src/models/Session')
-import NestSubmissionModel = require('server/src/models/NestSubmission')
-import GymBadgeModel = require('server/src/models/Badge')
+import type { User as UserModel } from '@rm/server/src/models/User'
+import type { Backup as BackupModel } from '@rm/server/src/models/Backup'
+import type { Session as SessionModel } from '@rm/server/src/models/Session'
+import type { NestSubmission as NestSubmissionModel } from '@rm/server/src/models/NestSubmission'
+import type { Badge as BadgeModel } from '@rm/server/src/models/Badge'
+
 import type { FullModel } from './utility'
 import type { Permissions } from './server'
-import { Strategy } from './general'
+import type { Strategy } from './general'
 
 export interface Backup {
   id: number
@@ -49,7 +50,10 @@ export interface NestSubmission {
   submitted_by: string
 }
 
-export type FullNestSubmission = FullModel<NestSubmission, NestSubmissionModel>
+export type FullNestSubmission = FullModel<
+  NestSubmission,
+  Models['NestSubmission']
+>
 
 export interface GymBadge {
   id: number
@@ -60,4 +64,4 @@ export interface GymBadge {
   updatedAt: number
 }
 
-export type FullGymBadge = FullModel<GymBadge, GymBadgeModel>
+export type FullGymBadge = FullModel<GymBadge, BadgeModel>

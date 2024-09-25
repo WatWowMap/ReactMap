@@ -9,6 +9,10 @@ const { validateJsons } = require('./validateJsons')
 
 let firstRun = true
 
+const [defaultConfigDir, userConfigDir] = (
+  process.env.NODE_CONFIG_DIR || ''
+).split(path.delimiter)
+
 /** @param {import('config').IConfig} config */
 const applyMutations = (config) => {
   const defaults = /** @type {import('@rm/types').Config} */ (
@@ -25,9 +29,6 @@ const applyMutations = (config) => {
     if (firstRun)
       log.info(TAGS.config, `Using config for ${process.env.NODE_CONFIG_ENV}`)
   }
-  const [rootConfigDir, serverConfigDir] = (
-    process.env.NODE_CONFIG_DIR || ''
-  ).split(path.delimiter)
 
   try {
     const refLength = +fs.readFileSync(
@@ -35,7 +36,7 @@ const applyMutations = (config) => {
       'utf8',
     )
     const defaultLength = fs.readFileSync(
-      path.join(rootConfigDir, 'default.json'),
+      path.join(defaultConfigDir, 'default.json'),
       'utf8',
     ).length
 
@@ -53,7 +54,7 @@ const applyMutations = (config) => {
     )
   }
 
-  if (!fs.existsSync(path.join(serverConfigDir, `local.json`))) {
+  if (!fs.existsSync(path.join(userConfigDir, `local.json`))) {
     // add database env variables from .env or docker-compose
     const {
       SCANNER_DB_HOST,
@@ -147,7 +148,7 @@ const applyMutations = (config) => {
       )
     }
   }
-  if (fs.existsSync(path.join(serverConfigDir, `config.json`))) {
+  if (fs.existsSync(path.join(userConfigDir, `config.json`))) {
     log.info(
       TAGS.config,
       'Config v1 (config.json) found, it is fine to leave it but make sure you are using and updating local.json instead.',
@@ -235,23 +236,6 @@ const applyMutations = (config) => {
   }
 
   config.map = mergeMapConfig()
-
-  if (config.has('multiDomains')) {
-    if (firstRun)
-      log.warn(
-        TAGS.config,
-        '`multiDomains` has been deprecated and will be removed in the next major release. Please switch to the new format that makes use of `NODE_CONFIG_ENV`',
-      )
-    // Create multiDomain Objects
-    config.multiDomainsObj = Object.fromEntries(
-      config.multiDomains.map((d) => [
-        d.domain.replaceAll('.', '_'),
-        mergeMapConfig(d),
-      ]),
-    )
-  } else {
-    config.multiDomainsObj = {}
-  }
 
   // Check if empty
   ;['tileServers', 'navigation'].forEach((opt) => {
