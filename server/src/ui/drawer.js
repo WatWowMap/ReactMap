@@ -13,7 +13,7 @@ const BLOCKED = /** @type {undefined} */ (undefined)
  * @returns
  */
 function drawer(perms) {
-  const mapConfig = config.get('map')
+  const mapConfig = config.getSafe('map')
   const nestFilters = config.getSafe('defaultFilters.nests')
   const leagues = config.getSafe('api.pvp.leagues')
 

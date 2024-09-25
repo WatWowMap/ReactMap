@@ -53,7 +53,7 @@ const viteConfig = defineConfig(({ mode }) => {
     )
   }
 
-  const sentry = config.get('sentry.client')
+  const sentry = config.getSafe('sentry.client')
   sentry.enabled = sentry.enabled || !!env.SENTRY_DSN
   if (env.SENTRY_AUTH_TOKEN) sentry.authToken = env.SENTRY_AUTH_TOKEN
   if (env.SENTRY_ORG) sentry.org = env.SENTRY_ORG

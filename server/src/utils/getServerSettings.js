@@ -19,7 +19,7 @@ function getServerSettings(req) {
 
   const { clientValues, clientMenus } = clientOptions(user.perms)
 
-  const mapConfig = config.get('map')
+  const mapConfig = config.getSafe('map')
   const api = config.getSafe('api')
   const authentication = config.getSafe('authentication')
   const database = config.getSafe('database')

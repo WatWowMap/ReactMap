@@ -54,6 +54,11 @@ const publicPlugin = () => {
           res.end(fs.readFileSync(markerPath))
           return
         }
+        if (req.url.startsWith('/images/u')) {
+          res.writeHead(200, { 'Content-Type': 'image/png' })
+          res.end(fs.readFileSync(path.join(configDir, req.url)))
+          return
+        }
         next()
       })
     },

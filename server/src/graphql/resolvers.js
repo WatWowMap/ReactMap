@@ -123,7 +123,7 @@ const resolvers = {
               footerButtons = [],
               components = [],
               ...rest
-            } = config.get(`map.${component}`)[component]
+            } = config.getSafe(`map.${component}`)[component]
             return {
               ...rest,
               footerButtons: filterComponents(
@@ -146,7 +146,7 @@ const resolvers = {
       return []
     },
     fabButtons: async (_, _args, { perms, username, req, Db, Event }) => {
-      const { donationPage, misc } = config.get('map')
+      const { donationPage, misc } = config.getSafe('map')
 
       const scanner = config.getSafe('scanner')
 
@@ -213,7 +213,7 @@ const resolvers = {
         : { missing: null, human: null, ai: null }
     },
     motdCheck: (_, { clientIndex }, { perms }) => {
-      const motd = config.get('map.messageOfTheDay')
+      const motd = config.getSafe('map.messageOfTheDay')
       return (
         motd.components.length &&
         (motd.index > clientIndex || motd.settings.permanent) &&
@@ -316,7 +316,7 @@ const resolvers = {
     scanCells: (_, args, { perms, Db }) => {
       if (
         perms?.scanCells &&
-        args.zoom >= config.get('map.general.scanCellsZoom')
+        args.zoom >= config.getSafe('map.general.scanCellsZoom')
       ) {
         return Db.query('ScanCell', 'getAll', perms, args)
       }
@@ -324,7 +324,7 @@ const resolvers = {
     },
     scanAreas: (_, _args, { perms }) => {
       if (perms?.scanAreas) {
-        const scanAreas = config.get('areas.scanAreas')
+        const scanAreas = config.getSafe('areas.scanAreas')
         return [
           {
             ...scanAreas,
@@ -342,7 +342,7 @@ const resolvers = {
     },
     scanAreasMenu: (_, _args, { perms }) => {
       if (perms?.scanAreas) {
-        const scanAreas = config.get('areas.scanAreasMenu')
+        const scanAreas = config.getSafe('areas.scanAreasMenu')
         if (perms.areaRestrictions.length) {
           const filtered = scanAreas
             .map((parent) => ({
@@ -497,7 +497,7 @@ const resolvers = {
       return []
     },
     submissionCells: async (_, args, { perms, Db }) => {
-      const submissionZoom = config.get('map.general.submissionZoom')
+      const submissionZoom = config.getSafe('map.general.submissionZoom')
       if (perms?.submissionCells && args.zoom >= submissionZoom - 1) {
         const [pokestops, gyms] = await Db.submissionCells(perms, args)
         return [

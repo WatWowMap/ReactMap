@@ -90,7 +90,7 @@ async function reloadConfig() {
         // do nothing
       }
       try {
-        newValue = newConfig.get(key)
+        newValue = newConfig.getSafe(key)
       } catch {
         // do nothing
       }

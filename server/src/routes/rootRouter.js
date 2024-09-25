@@ -105,7 +105,7 @@ rootRouter.post('/api/error/client', async (req, res) => {
 rootRouter.get('/area/:area/:zoom?', (req, res) => {
   const { area, zoom } = req.params
   try {
-    const validScanAreas = config.get('areas.scanAreas')
+    const validScanAreas = config.getSafe('areas.scanAreas')
     if (validScanAreas.features.length) {
       const foundArea = validScanAreas.features.find(
         (a) => a.properties.name.toLowerCase() === area.toLowerCase(),
@@ -126,7 +126,7 @@ rootRouter.get('/api/settings', async (req, res, next) => {
   const authentication = config.getSafe('authentication')
   const scanner = config.getSafe('scanner')
   const api = config.getSafe('api')
-  const mapConfig = config.get('map')
+  const mapConfig = config.getSafe('map')
 
   try {
     if (
