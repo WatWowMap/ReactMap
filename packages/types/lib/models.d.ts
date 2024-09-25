@@ -1,4 +1,8 @@
-import type { Models } from '@rm/server/src/models'
+import type { User as UserModel } from '@rm/server/src/models/User'
+import type { Backup as BackupModel } from '@rm/server/src/models/Backup'
+import type { Session as SessionModel } from '@rm/server/src/models/Session'
+import type { NestSubmission as NestSubmissionModel } from '@rm/server/src/models/NestSubmission'
+import type { Badge as BadgeModel } from '@rm/server/src/models/Badge'
 
 import type { FullModel } from './utility'
 import type { Permissions } from './server'
@@ -12,7 +16,7 @@ export interface Backup {
   createdAt: number
   updatedAt: number
 }
-export type FullBackup = FullModel<Backup, Models['Backup']>
+export type FullBackup = FullModel<Backup, BackupModel>
 
 export interface User {
   id: number
@@ -29,7 +33,7 @@ export interface User {
   tutorial?: boolean
 }
 
-export type FullUser = FullModel<User, Models['User']>
+export type FullUser = FullModel<User, UserModel>
 
 export interface Session {
   session_id: string
@@ -37,7 +41,7 @@ export interface Session {
   data: string | object
 }
 
-export type FullSession = FullModel<Session, Models['Session']>
+export type FullSession = FullModel<Session, SessionModel>
 
 export interface NestSubmission {
   nest_id: number
@@ -60,4 +64,4 @@ export interface GymBadge {
   updatedAt: number
 }
 
-export type FullGymBadge = FullModel<GymBadge, Models['Badge']>
+export type FullGymBadge = FullModel<GymBadge, BadgeModel>

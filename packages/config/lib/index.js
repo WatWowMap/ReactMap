@@ -5,7 +5,7 @@ if (!process.env.NODE_CONFIG_DIR) {
   process.env.NODE_CONFIG_DIR =
     path.join(__dirname, '..', '..', '..', 'config') +
     path.delimiter +
-    path.join(__dirname, '..', '..', '..', 'server', 'src', 'configs')
+    path.join(__dirname, '..', '..', '..', 'config', 'user')
   process.env.ALLOW_CONFIG_MUTATIONS = 'true'
   process.env.SUPPRESS_NO_CONFIG_WARNING = 'true'
 }
@@ -50,22 +50,6 @@ config.reload = function reload() {
     log.error(TAGS.config, 'error reloading config', e)
     return this
   }
-}
-
-config.getMapConfig = function getMapConfig(req) {
-  const domain = /** @type {const} */ (
-    `multiDomainsObj.${req.headers.host.replaceAll('.', '_')}`
-  )
-  return this.has(domain) ? this.getSafe(domain) : this.getSafe('map')
-}
-
-config.getAreas = function getAreas(req, key) {
-  const location = /** @type {const} */ (
-    `areas.${key}.${req.headers.host.replaceAll('.', '_')}`
-  )
-  return this.has(location)
-    ? this.getSafe(location)
-    : this.getSafe(`areas.${key}.main`)
 }
 
 config.setAreas = function setAreas(newAreas) {

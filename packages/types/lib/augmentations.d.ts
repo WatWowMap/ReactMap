@@ -13,13 +13,6 @@ declare module 'config' {
      * @returns The old config object.
      */
     reload: () => IConfig
-    getMapConfig: (request: Request) => Config['map']
-    getAreas: <T extends 'scanAreas' | 'scanAreasMenu'>(
-      request: Request,
-      key: T,
-    ) => T extends 'scanAreas'
-      ? Config['areas']['scanAreas'][string]
-      : Config['areas']['scanAreasMenu'][string]
     setAreas: (newAreas: ConfigAreas) => void
   }
 }

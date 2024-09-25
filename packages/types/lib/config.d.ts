@@ -6,7 +6,7 @@ import { Props as ImgProps } from '@components/Img'
 
 import type { CustomComponent } from './blocks'
 import config from '../../../config/default.json'
-import example from '../../../config/local.example.json'
+import example from '../../../config/example/standard/local.json'
 
 import type { Schema } from './server'
 import {
@@ -125,8 +125,6 @@ export type Config<Client extends boolean = false> = DeepMerge<
         components: CustomComponent[]
       }
     }
-    multiDomains: MultiDomain[]
-    multiDomainsObj: Record<string, MultiDomain>
     database: {
       schemas: Schema[]
       settings: {
@@ -149,13 +147,6 @@ export type Config<Client extends boolean = false> = DeepMerge<
     manualAreas: ExampleConfig['manualAreas'][number][]
   }
 >
-
-// unclear why this is needed, but it is for the MultiDomain type to parse...
-type Map = Config['map']
-
-export interface MultiDomain extends Map {
-  domain: string
-}
 
 export interface Icons extends Omit<BaseConfig['icons'], 'styles'> {
   customizable: string[]

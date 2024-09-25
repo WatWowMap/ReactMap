@@ -4,45 +4,45 @@ const fs = require('fs')
 
 const { log, TAGS } = require('@rm/logger')
 
+const configDir = path.join(__dirname, '../../config/user/public')
+
 /**
- * @param {boolean} isDevelopment
  * @returns {import('vite').Plugin}
  */
-const faviconPlugin = (isDevelopment) => {
-  const basePath = fs.existsSync(
-    path.join(__dirname, '../../public/favicon/favicon.ico'),
-  )
-    ? path.join(__dirname, '../../public/favicon')
-    : path.join(__dirname, '../public/favicon')
+const publicPlugin = () => {
   const markerPath = path.join(
     __dirname,
     '../../node_modules/leaflet/dist/images/marker-icon.png',
   )
-  const fallback = path.join(basePath, `fallback.ico`)
-  const custom = process.env.NODE_CONFIG_ENV
-    ? path.join(basePath, `${process.env.NODE_CONFIG_ENV}.ico`)
-    : path.join(basePath, `favicon.ico`)
-  const favicon = fs.existsSync(custom) ? custom : fallback
+  let outDir = ''
   return {
-    name: 'vite-plugin-favicon',
+    name: 'vite-plugin-public',
+    configResolved(config) {
+      outDir = config.build.outDir
+    },
     generateBundle() {
       this.emitFile({
         type: 'asset',
         fileName: 'images/fallback-marker.png',
         source: fs.readFileSync(markerPath),
       })
-      if (isDevelopment) return
-      try {
-        this.emitFile({
-          type: 'asset',
-          fileName: 'favicon.ico',
-          source: fs.readFileSync(favicon),
+    },
+    async closeBundle() {
+      if (fs.existsSync(configDir)) {
+        log.info(TAGS.build, 'copying public folder from config')
+        await fs.promises.cp(configDir, outDir, {
+          recursive: true,
         })
-      } catch (e) {
-        log.error(TAGS.build, 'Error loading favicon', e)
       }
     },
     configureServer(server) {
+      const customPath = process.env.NODE_CONFIG_ENV
+        ? path.join(configDir, `favicon-${process.env.NODE_CONFIG_ENV}.ico`)
+        : path.join(configDir, `favicon.ico`)
+      const favicon = fs.existsSync(customPath)
+        ? customPath
+        : path.join(__dirname, '../public/favicon.ico')
+
       server.middlewares.use((req, res, next) => {
         if (req.url === '/favicon.ico') {
           res.writeHead(200, { 'Content-Type': 'image/x-icon' })
@@ -60,6 +60,4 @@ const faviconPlugin = (isDevelopment) => {
   }
 }
 
-module.exports = {
-  faviconPlugin,
-}
+module.exports = { publicPlugin }

@@ -11,12 +11,10 @@ const { sentryVitePlugin } = require('@sentry/vite-plugin')
 const config = require('@rm/config')
 const { log, TAGS } = require('@rm/logger')
 const { locales, status } = require('@rm/locales')
-const {
-  faviconPlugin,
-  customFilePlugin,
-  localePlugin,
-  muteWarningsPlugin,
-} = require('./plugins')
+const { customFilePlugin } = require('./plugins/customFile')
+const { localePlugin } = require('./plugins/locale')
+const { publicPlugin } = require('./plugins/public')
+const { muteWarningsPlugin } = require('./plugins/muteWarnings')
 
 const defaultLogger = createLogger()
 const logLevel = config.getSafe('devOptions.logLevel')
@@ -103,7 +101,7 @@ const viteConfig = defineConfig(({ mode }) => {
           ]
         : []),
       localePlugin(isDevelopment),
-      faviconPlugin(isDevelopment),
+      publicPlugin(),
       muteWarningsPlugin([
         ['SOURCEMAP_ERROR', "Can't resolve original location of error"],
       ]),

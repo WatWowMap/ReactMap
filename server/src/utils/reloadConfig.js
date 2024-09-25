@@ -80,7 +80,7 @@ async function reloadConfig() {
     const valid = changed.filter((key) => !NO_RELOAD.has(key))
     const invalid = changed.filter((key) => NO_RELOAD.has(key))
 
-    /** @param {string} key */
+    /** @param {(typeof changed)[number]} key */
     const print = (key) => {
       let newValue
       let oldValue

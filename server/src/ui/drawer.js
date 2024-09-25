@@ -9,12 +9,11 @@ const BLOCKED = /** @type {undefined} */ (undefined)
 
 /**
  *
- * @param {import('express').Request} req
  * @param {import("@rm/types").Permissions} perms
  * @returns
  */
-function drawer(req, perms) {
-  const mapConfig = config.getMapConfig(req)
+function drawer(perms) {
+  const mapConfig = config.get('map')
   const nestFilters = config.getSafe('defaultFilters.nests')
   const leagues = config.getSafe('api.pvp.leagues')
 

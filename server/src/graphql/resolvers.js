@@ -1,7 +1,4 @@
 // @ts-check
-
-const fs = require('fs')
-const { resolve } = require('path')
 const { GraphQLJSON } = require('graphql-type-json')
 const { S2LatLng, S2RegionCoverer, S2LatLngRect } = require('nodes2ts')
 
@@ -18,6 +15,7 @@ const { getPolyVector } = require('../utils/getPolyVector')
 const { getPlacementCells } = require('../utils/getPlacementCells')
 const { getTypeCells } = require('../utils/getTypeCells')
 const { getValidCoords } = require('../utils/getValidCoords')
+const { writeConfigFile } = require('../utils/writeConfigFiles')
 
 /** @type {import("@apollo/server").ApolloServerOptions<import("@rm/types").GqlContext>['resolvers']} */
 const resolvers = {
@@ -115,7 +113,7 @@ const resolvers = {
     checkValidScan: (_, { mode, points }, { perms }) =>
       getValidCoords(mode, points, perms),
     /** @param {unknown} _ @param {{ component: 'loginPage' | 'donationPage' | 'messageOfTheDay' }} args */
-    customComponent: (_, { component }, { perms, req, username }) => {
+    customComponent: (_, { component }, { perms, username }) => {
       switch (component) {
         case 'messageOfTheDay':
         case 'donationPage':
@@ -125,7 +123,7 @@ const resolvers = {
               footerButtons = [],
               components = [],
               ...rest
-            } = config.getMapConfig(req)[component]
+            } = config.get(`map.${component}`)[component]
             return {
               ...rest,
               footerButtons: filterComponents(
@@ -148,7 +146,7 @@ const resolvers = {
       return []
     },
     fabButtons: async (_, _args, { perms, username, req, Db, Event }) => {
-      const { donationPage, misc } = config.getMapConfig(req)
+      const { donationPage, misc } = config.get('map')
 
       const scanner = config.getSafe('scanner')
 
@@ -214,8 +212,8 @@ const resolvers = {
           }
         : { missing: null, human: null, ai: null }
     },
-    motdCheck: (_, { clientIndex }, { req, perms }) => {
-      const motd = config.getMapConfig(req).messageOfTheDay
+    motdCheck: (_, { clientIndex }, { perms }) => {
+      const motd = config.get('map.messageOfTheDay')
       return (
         motd.components.length &&
         (motd.index > clientIndex || motd.settings.permanent) &&
@@ -315,18 +313,18 @@ const resolvers = {
       }
       return []
     },
-    scanCells: (_, args, { perms, Db, req }) => {
+    scanCells: (_, args, { perms, Db }) => {
       if (
         perms?.scanCells &&
-        args.zoom >= config.getMapConfig(req).general.scanCellsZoom
+        args.zoom >= config.get('map.general.scanCellsZoom')
       ) {
         return Db.query('ScanCell', 'getAll', perms, args)
       }
       return []
     },
-    scanAreas: (_, _args, { req, perms }) => {
+    scanAreas: (_, _args, { perms }) => {
       if (perms?.scanAreas) {
-        const scanAreas = config.getAreas(req, 'scanAreas')
+        const scanAreas = config.get('areas.scanAreas')
         return [
           {
             ...scanAreas,
@@ -342,9 +340,9 @@ const resolvers = {
       }
       return [{ features: [] }]
     },
-    scanAreasMenu: (_, _args, { req, perms }) => {
+    scanAreasMenu: (_, _args, { perms }) => {
       if (perms?.scanAreas) {
-        const scanAreas = config.getAreas(req, 'scanAreasMenu')
+        const scanAreas = config.get('areas.scanAreasMenu')
         if (perms.areaRestrictions.length) {
           const filtered = scanAreas
             .map((parent) => ({
@@ -498,8 +496,8 @@ const resolvers = {
       }
       return []
     },
-    submissionCells: async (_, args, { req, perms, Db }) => {
-      const { submissionZoom } = config.getMapConfig(req).general
+    submissionCells: async (_, args, { perms, Db }) => {
+      const submissionZoom = config.get('map.general.submissionZoom')
       if (perms?.submissionCells && args.zoom >= submissionZoom - 1) {
         const [pokestops, gyms] = await Db.submissionCells(perms, args)
         return [
@@ -741,32 +739,9 @@ const resolvers = {
       }
       return false
     },
-    saveComponent: async (_, { code, component }, { perms, req }) => {
+    saveComponent: async (_, { code, component }, { perms }) => {
       if (perms.admin && code && component) {
-        const configFolder = resolve(__dirname, '../configs')
-        const ts = Math.floor(Date.now() / 1000)
-        if (
-          fs.existsSync(`${configFolder}/${component}/${req.headers.host}.json`)
-        ) {
-          fs.copyFileSync(
-            `${configFolder}/${component}/${req.headers.host}.json`,
-            `${configFolder}/${component}/${req.headers.host}_${ts}.json`,
-          )
-          fs.writeFileSync(
-            `${configFolder}/${component}/${req.headers.host}.json`,
-            code,
-            'utf8',
-          )
-          return `Saved to ${configFolder}/${component}/${req.headers.host}.json`
-        }
-        if (fs.existsSync(`${configFolder}/${component}.json`)) {
-          fs.copyFileSync(
-            `${configFolder}/${component}.json`,
-            `${configFolder}/${component}_${ts}.json`,
-          )
-        }
-        fs.writeFileSync(`${configFolder}/${component}.json`, code, 'utf8')
-        return `Saved to ${configFolder}/${component}.json`
+        return writeConfigFile(component, code)
       }
       return null
     },
