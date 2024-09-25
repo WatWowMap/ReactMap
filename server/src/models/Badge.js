@@ -1,10 +1,9 @@
 // @ts-check
 const { Model } = require('objection')
-const config = require('@rm/config')
 
 class Badge extends Model {
   static get tableName() {
-    return config.getSafe('database.settings.gymBadgeTableName')
+    return 'gymBadges'
   }
 
   $beforeInsert() {
@@ -23,10 +22,8 @@ class Badge extends Model {
         relation: Model.BelongsToOneRelation,
         modelClass: state.db.models.User,
         join: {
-          from: `${config.getSafe(
-            'database.settings.gymBadgeTableName',
-          )}.userId`,
-          to: `${config.getSafe('database.settings.userTableName')}.id`,
+          from: `gymBadges.userId`,
+          to: `${'users'}.id`,
         },
       },
     }

@@ -20,7 +20,7 @@ function sessionMiddleware() {
           createDatabaseTable: true,
           endConnectionOnClose: true,
           schema: {
-            tableName: config.getSafe('database.settings.sessionTableName'),
+            tableName: 'session',
           },
           host: dbSelection.host,
           port: dbSelection.port,

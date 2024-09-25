@@ -23,7 +23,6 @@ const NO_RELOAD = new Set([
   'api.rateLimit.requests',
   'api.sessionCheckIntervalMs',
   'api.enableHelmet',
-  'database.settings.sessionTableName',
   'sentry',
   'sentry.client',
   'sentry.client.enabled',

@@ -9,7 +9,7 @@ const jsonSize = (s) => bytes(JSON.stringify(s))
 
 class Backup extends Model {
   static get tableName() {
-    return config.getSafe('database.settings.backupTableName')
+    return 'backups'
   }
 
   $beforeInsert() {
@@ -28,8 +28,8 @@ class Backup extends Model {
         relation: Model.BelongsToOneRelation,
         modelClass: state.db.models.User,
         join: {
-          from: `${config.getSafe('database.settings.backupTableName')}.userId`,
-          to: `${config.getSafe('database.settings.userTableName')}.id`,
+          from: `${'backups'}.userId`,
+          to: `${'users'}.id`,
         },
       },
     }

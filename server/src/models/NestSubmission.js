@@ -1,7 +1,6 @@
 // @ts-check
 const { Model } = require('objection')
 
-const config = require('@rm/config')
 const { log, TAGS } = require('@rm/logger')
 
 class NestSubmission extends Model {
@@ -22,7 +21,7 @@ class NestSubmission extends Model {
         modelClass: state.db.models.User,
         join: {
           from: `nest_submissions.user_id`,
-          to: `${config.getSafe('database.settings.userTableName')}.id`,
+          to: `${'users'}.id`,
         },
       },
     }

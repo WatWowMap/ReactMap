@@ -5,7 +5,7 @@ const { log, TAGS } = require('@rm/logger')
 
 class Session extends Model {
   static get tableName() {
-    return config.getSafe('database.settings.sessionTableName')
+    return 'session'
   }
 
   static async clear() {
