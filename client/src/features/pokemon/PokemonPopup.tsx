@@ -1,4 +1,3 @@
-// @ts-check
 import * as React from 'react'
 import ExpandMore from '@mui/icons-material/ExpandMore'
 import MoreVert from '@mui/icons-material/MoreVert'
@@ -26,6 +25,7 @@ import { ExtraInfo } from '@components/popups/ExtraInfo'
 import { useAnalytics } from '@hooks/useAnalytics'
 import { getTimeUntil } from '@utils/getTimeUntil'
 import { StatusIcon } from '@components/StatusIcon'
+import { Pokemon } from '@rm/types'
 
 const rowClass = { width: 30, fontWeight: 'bold' }
 
@@ -33,10 +33,9 @@ const leagueLookup = {
   great: '1500',
   ultra: '2500',
   master: '9000',
-}
+} as const
 
-/** @param {number} ivPercent */
-const getColor = (ivPercent) => {
+const getColor = (ivPercent: number) => {
   switch (true) {
     case ivPercent < 51:
       return 'error.dark'
@@ -53,25 +52,25 @@ const getColor = (ivPercent) => {
   }
 }
 
-export function PokemonPopup({ pokemon, iconUrl, isTutorial = false }) {
+export function PokemonPopup({
+  pokemon,
+  iconUrl,
+  isTutorial = false,
+}: {
+  pokemon: import('@rm/types').Pokemon
+  iconUrl: string
+  isTutorial?: boolean
+}) {
   const { t } = useTranslation()
-  const { pokemon_id, cleanPvp, iv, cp } = pokemon
-  const perms = useMemory((s) => s.auth.perms)
-  const timeOfDay = useMemory((s) => s.timeOfDay)
-  const metaData = useMemory((s) => s.masterfile.pokemon[pokemon_id])
-  const Icons = useMemory((s) => s.Icons)
+  const { cleanPvp, iv, cp } = pokemon
+  const ivPerm = useMemory((s) => s.auth?.perms?.iv || isTutorial)
+  const pvpPerm = useMemory((s) => s.auth?.perms?.pvp || isTutorial)
 
-  const userSettings = useStorage((s) => s.userSettings.pokemon)
-  const pokePerms = isTutorial
-    ? {
-        pvp: true,
-        iv: true,
-      }
-    : perms
-  const popups = useStorage((s) => s.popups)
+  const pvpPopup = useStorage((s) => s.popups.pvp)
+  const extraPopup = useStorage((s) => s.popups.extras)
 
   const hasLeagues = cleanPvp ? Object.keys(cleanPvp) : []
-  const hasStats = iv || cp
+  const hasStats = !!(iv || cp)
 
   useAnalytics(
     'Popup',
@@ -88,14 +87,7 @@ export function PokemonPopup({ pokemon, iconUrl, isTutorial = false }) {
         justifyContent="center"
         spacing={1}
       >
-        <Header
-          pokemon={pokemon}
-          metaData={metaData}
-          iconUrl={iconUrl}
-          t={t}
-          userSettings={userSettings}
-          isTutorial={isTutorial}
-        />
+        <Header pokemon={pokemon} iconUrl={iconUrl} isTutorial={isTutorial} />
         {pokemon.seen_type !== 'encounter' && (
           <Grid xs={12} textAlign="center">
             <Typography variant="caption">
@@ -107,48 +99,23 @@ export function PokemonPopup({ pokemon, iconUrl, isTutorial = false }) {
           <Typography>{t('pokemon_cell')}</Typography>
         )}
         {!!pokemon.expire_timestamp && (
-          <Timer pokemon={pokemon} hasStats={hasStats} t={t} />
+          <Timer pokemon={pokemon} hasStats={hasStats} />
         )}
-        {hasStats && pokePerms.iv && (
+        {hasStats && ivPerm && (
           <>
-            <Stats pokemon={pokemon} t={t} />
+            <Stats pokemon={pokemon} />
             <Divider orientation="vertical" flexItem />
           </>
         )}
-        <Info
-          pokemon={pokemon}
-          metaData={metaData}
-          perms={pokePerms}
-          Icons={Icons}
-          timeOfDay={timeOfDay}
-          t={t}
-        />
-        <Footer
-          pokemon={pokemon}
-          popups={popups}
-          hasPvp={!!hasLeagues.length}
-          Icons={Icons}
-        />
-        <Collapse in={popups.pvp && perms.pvp} timeout="auto" unmountOnExit>
+        <Info pokemon={pokemon} isTutorial={isTutorial} />
+        <Footer pokemon={pokemon} hasPvp={!!hasLeagues.length} />
+        <Collapse in={pvpPopup && pvpPerm} timeout="auto" unmountOnExit>
           {hasLeagues.map((league) => (
-            <PvpInfo
-              key={league}
-              league={league}
-              data={cleanPvp[league]}
-              t={t}
-              Icons={Icons}
-              pokemon={pokemon}
-            />
+            <PvpInfo key={league} league={league} pokemon={pokemon} />
           ))}
         </Collapse>
-        <Collapse in={popups.extras} timeout="auto" unmountOnExit>
-          <ExtraPokemonInfo
-            pokemon={pokemon}
-            perms={pokePerms}
-            userSettings={userSettings}
-            t={t}
-            Icons={Icons}
-          />
+        <Collapse in={extraPopup} timeout="auto" unmountOnExit>
+          <ExtraPokemonInfo pokemon={pokemon} isTutorial={isTutorial} />
         </Collapse>
       </Grid>
     </ErrorBoundary>
@@ -157,13 +124,17 @@ export function PokemonPopup({ pokemon, iconUrl, isTutorial = false }) {
 
 const Header = ({
   pokemon,
-  metaData,
-  t,
   iconUrl,
-  userSettings,
   isTutorial,
+}: {
+  pokemon: import('@rm/types').Pokemon
+  iconUrl: string
+  isTutorial: boolean
 }) => {
+  const { t } = useTranslation()
   const filters = useStorage((s) => s.filters)
+  const metaData = useMemory((s) => s.masterfile.pokemon[pokemon.pokemon_id])
+  const userSettings = useStorage((s) => s.userSettings.pokemon)
 
   const [anchorEl, setAnchorEl] = React.useState(null)
   const { id, pokemon_id, form, ditto_form, display_pokemon_id } = pokemon
@@ -224,7 +195,7 @@ const Header = ({
           <img
             src={iconUrl}
             style={{ maxWidth: 40, maxHeight: 40 }}
-            alt={pokemon.pokemon_id}
+            alt={t(`poke_${display_pokemon_id}`)}
           />
         )}
       </Grid>
@@ -258,7 +229,7 @@ const Header = ({
         }}
       >
         {options.map((option) => (
-          <MenuItem key={option.key || option.name} onClick={option.action}>
+          <MenuItem key={option.name} onClick={option.action}>
             {typeof option.name === 'string' ? t(option.name) : option.name}
           </MenuItem>
         ))}
@@ -267,7 +238,8 @@ const Header = ({
   )
 }
 
-const Stats = ({ pokemon, t }) => {
+const Stats = ({ pokemon }: { pokemon: Pokemon }) => {
+  const { t } = useTranslation()
   const { cp, iv, atk_iv, def_iv, sta_iv, level, inactive_stats } = pokemon
 
   return (
@@ -305,19 +277,31 @@ const Stats = ({ pokemon, t }) => {
   )
 }
 
-const Info = ({ pokemon, metaData, perms, Icons, timeOfDay, t }) => {
+const Info = ({
+  pokemon,
+  isTutorial,
+}: {
+  pokemon: Pokemon
+  isTutorial: boolean
+}) => {
+  const { t } = useTranslation()
+  const Icons = useMemory((s) => s.Icons)
+  const timeOfDay = useMemory((s) => s.timeOfDay)
+  const metaData = useMemory((s) => s.masterfile.pokemon[pokemon.pokemon_id])
+  const darkMode = useStorage((s) => s.darkMode)
+  const ivPerm = useMemory((s) => s.auth?.perms?.iv || isTutorial)
+
   const { gender, size, weather, form } = pokemon
   const formTypes = metaData?.forms?.[form]?.types || metaData?.types || []
-  const darkMode = useStorage((s) => s.darkMode)
   return (
     <Grid
-      xs={perms.iv ? 3 : 11}
+      xs={ivPerm ? 3 : 11}
       container
-      direction={perms.iv ? 'column' : 'row'}
+      direction={ivPerm ? 'column' : 'row'}
       justifyContent="space-around"
       alignItems="center"
     >
-      {weather != 0 && perms.iv && (
+      {weather != 0 && ivPerm && (
         <Grid
           className={`grid-item ${darkMode ? '' : 'darken-image'}`}
           style={{
@@ -360,7 +344,14 @@ const Info = ({ pokemon, metaData, perms, Icons, timeOfDay, t }) => {
   )
 }
 
-const Timer = ({ pokemon, hasStats, t }) => {
+const Timer = ({
+  pokemon,
+  hasStats,
+}: {
+  pokemon: Pokemon
+  hasStats: boolean
+}) => {
+  const { t } = useTranslation()
   const { expire_timestamp, expire_timestamp_verified } = pokemon
   const despawnTimer = expire_timestamp * 1000
   const [timer, setTimer] = React.useState(getTimeUntil(despawnTimer, true))
@@ -401,16 +392,19 @@ const Timer = ({ pokemon, hasStats, t }) => {
   )
 }
 
-const Footer = ({ pokemon, popups, hasPvp, Icons }) => {
+const Footer = ({ pokemon, hasPvp }: { pokemon: Pokemon; hasPvp: boolean }) => {
   const { lat, lon } = pokemon
   const darkMode = useStorage((s) => s.darkMode)
+  const Icons = useMemory((s) => s.Icons)
+  const pvpPopup = useStorage((s) => s.popups.pvp)
+  const extraPopup = useStorage((s) => s.popups.extras)
 
-  const handleExpandClick = (category) => {
+  const handleExpandClick = (category: string) => {
     const opposite = category === 'extras' ? 'pvp' : 'extras'
     useStorage.setState((prev) => ({
       popups: {
         ...prev.popups,
-        [category]: !popups[category],
+        [category]: !prev[category],
         [opposite]: false,
       },
     }))
@@ -421,7 +415,7 @@ const Footer = ({ pokemon, popups, hasPvp, Icons }) => {
       {hasPvp && (
         <Grid xs={4}>
           <IconButton
-            className={popups.pvp ? 'expanded' : 'closed'}
+            className={pvpPopup ? 'expanded' : 'closed'}
             name="pvp"
             onClick={() => handleExpandClick('pvp')}
             size="large"
@@ -441,7 +435,7 @@ const Footer = ({ pokemon, popups, hasPvp, Icons }) => {
       </Grid>
       <Grid xs={4}>
         <IconButton
-          className={popups.extras ? 'expanded' : 'closed'}
+          className={extraPopup ? 'expanded' : 'closed'}
           onClick={() => handleExpandClick('extras')}
           size="large"
         >
@@ -452,14 +446,24 @@ const Footer = ({ pokemon, popups, hasPvp, Icons }) => {
   )
 }
 
-const ExtraPokemonInfo = ({ pokemon, perms, userSettings, t, Icons }) => {
+const ExtraPokemonInfo = ({
+  pokemon,
+  isTutorial,
+}: {
+  pokemon: Pokemon
+  isTutorial: boolean
+}) => {
   const moves = useMemory((s) => s.masterfile.moves)
+  const Icons = useMemory((s) => s.Icons)
+  const { t } = useTranslation()
+  const userSettings = useStorage((s) => s.userSettings.pokemon)
+  const ivPerm = useMemory((s) => s.auth?.perms?.iv || isTutorial)
 
   const { move_1, move_2, first_seen_timestamp, updated, iv } = pokemon
 
   return (
     <Grid container alignItems="center" justifyContent="center">
-      {perms.iv &&
+      {ivPerm &&
         iv !== null &&
         [move_1, move_2].map((move, i) => {
           if (!move) return null
@@ -494,48 +498,53 @@ const ExtraPokemonInfo = ({ pokemon, perms, userSettings, t, Icons }) => {
   )
 }
 
-const PvpInfo = ({ pokemon, league, data, t, Icons }) => {
-  if (data === null) return ''
+const PvpInfo = ({ pokemon, league }: { pokemon: Pokemon; league: string }) => {
+  const { t } = useTranslation()
+  const Icons = useMemory((s) => s.Icons)
 
-  const rows = data
-    .map((each) =>
-      each.rank !== null && each.cp !== null
-        ? {
-            id: `${league}-${each.pokemon}-${each.form}-${each.evolution}-${each.gender}-${each.rank}-${each.cp}-${each.lvl}-${each.cap}`,
-            img: (
-              <NameTT
-                title={[
-                  each.evolution
-                    ? `evo_${each.evolution}`
-                    : each.form
-                      ? `form_${each.form}`
-                      : '',
-                  `poke_${each.pokemon}`,
-                ]}
-              >
-                <img
-                  src={Icons.getPokemon(
-                    each.pokemon,
-                    each.form,
-                    each.evolution,
-                    each.gender,
-                    pokemon.costume,
-                  )}
-                  style={{ maxWidth: 40, maxHeight: 20 }}
-                  alt={t(`poke_${each.pokemon}`)}
-                />
-              </NameTT>
-            ),
-            rank: each.rank || 0,
-            cp: each.cp || 0,
-            lvl: `${each.level || ''}${
-              each.cap && !each.capped ? `/${each.cap}` : ''
-            }`,
-            percent: (each.percentage * 100).toFixed(1) || 0,
-          }
-        : null,
-    )
-    .filter(Boolean)
+  const rows = React.useMemo(
+    () =>
+      pokemon.cleanPvp[league]
+        ?.map((each) =>
+          each.rank !== null && each.cp !== null
+            ? {
+                id: `${league}-${each.pokemon}-${each.form}-${each.evolution}-${each.rank}-${each.cp}-${each.level}-${each.cap}`,
+                img: (
+                  <NameTT
+                    title={[
+                      each.evolution
+                        ? `evo_${each.evolution}`
+                        : each.form
+                          ? `form_${each.form}`
+                          : '',
+                      `poke_${each.pokemon}`,
+                    ]}
+                  >
+                    <img
+                      src={Icons.getPokemon(
+                        each.pokemon,
+                        each.form,
+                        each.evolution,
+                        0,
+                        pokemon.costume,
+                      )}
+                      style={{ maxWidth: 40, maxHeight: 20 }}
+                      alt={t(`poke_${each.pokemon}`)}
+                    />
+                  </NameTT>
+                ),
+                rank: each.rank || 0,
+                cp: each.cp || 0,
+                lvl: `${each.level || ''}${
+                  each.cap && !each.capped ? `/${each.cap}` : ''
+                }`,
+                percent: (each.percentage * 100).toFixed(1) || 0,
+              }
+            : null,
+        )
+        .filter(Boolean),
+    [pokemon, league],
+  )
 
   return (
     <table className="table-pvp">

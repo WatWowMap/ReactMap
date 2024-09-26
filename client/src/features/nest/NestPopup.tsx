@@ -1,4 +1,3 @@
-// @ts-check
 import * as React from 'react'
 import MoreVert from '@mui/icons-material/MoreVert'
 import Grid from '@mui/material/Unstable_Grid2'
@@ -17,8 +16,7 @@ import { getTimeUntil } from '@utils/getTimeUntil'
 import { useAnalytics } from '@hooks/useAnalytics'
 import { Navigation } from '@components/popups/Navigation'
 
-/** @param {number} timeSince */
-const getColor = (timeSince) => {
+const getColor = (timeSince: number) => {
   let color = 'success'
   if (timeSince > 604800) {
     color = '#ffeb3b'
@@ -29,14 +27,6 @@ const getColor = (timeSince) => {
   return color
 }
 
-/**
- *
- * @param {import('@rm/types').Nest & {
- *  recent: boolean,
- *  iconUrl: string
- * }} props
- * @returns
- */
 export function NestPopup({
   recent,
   iconUrl,
@@ -49,6 +39,9 @@ export function NestPopup({
   submitted_by = '',
   lat,
   lon,
+}: import('@rm/types').Nest & {
+  recent: boolean
+  iconUrl: string
 }) {
   const { t } = useTranslation()
   const submissionPerm = useMemory((s) => s.auth.perms.nestSubmissions)
@@ -126,7 +119,7 @@ export function NestPopup({
         }}
       >
         {options.map((option) => (
-          <MenuItem key={option.key || option.name} onClick={option.action}>
+          <MenuItem key={option.name} onClick={option.action}>
             {typeof option.name === 'string' ? t(option.name) : option.name}
           </MenuItem>
         ))}

@@ -1,11 +1,4 @@
-// @ts-check
-
-/**
- *
- * @param {number} columnIndex
- * @param {number} rowIndex
- */
-export function getTileBackground(columnIndex, rowIndex) {
+export function getTileBackground(columnIndex: number, rowIndex: number) {
   return columnIndex % 2
     ? rowIndex % 2 === 0
       ? 'rgba(1, 1, 1, 0.01)'

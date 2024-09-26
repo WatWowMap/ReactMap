@@ -2,6 +2,13 @@
 /* eslint-disable no-console */
 import { UICONS } from 'uicons.js'
 
+declare global {
+  interface Window {
+    uicons?: UAssets
+    uaudio?: UAssets
+  }
+}
+
 // /**
 //  *
 //  * @template {object} T
@@ -33,7 +40,11 @@ export class UAssets {
    * @param {import("@rm/masterfile").Masterfile['questRewardTypes']} questRewardTypes
    * @param {'uicons' | 'uaudio'} assetType
    */
-  constructor({ customizable, sizes }, questRewardTypes, assetType) {
+  constructor(
+    { customizable, sizes }: import('@rm/types').Config['icons'],
+    questRewardTypes: import('@rm/masterfile').Masterfile['questRewardTypes'],
+    assetType: 'uicons' | 'uaudio',
+  ) {
     this.customizable = customizable
     this.sizes = sizes
     this.selected = {}
@@ -70,7 +81,7 @@ export class UAssets {
    *
    * @param {import("@rm/types").UAssetsClient[]} icons
    */
-  build(icons) {
+  build(icons: import('@rm/types').UAssetsClient[]) {
     icons.forEach((icon) => {
       try {
         const { data, name: dirtyName, path: dirtyPath, ...rest } = icon
@@ -168,7 +179,7 @@ export class UAssets {
   }
 
   /** @param {Record<string, string>} localIconObj */
-  checkValid(localIconObj) {
+  checkValid(localIconObj: Record<string, string>) {
     return Object.values(localIconObj || {}).every((icon) => this[icon])
   }
 
@@ -177,7 +188,7 @@ export class UAssets {
    * @param {Record<string, string> | string} categories
    * @param {string} [value]
    */
-  setSelection(categories, value) {
+  setSelection(categories: Record<string, string> | string, value: string) {
     if (typeof categories === 'object') {
       Object.keys(categories).forEach((category) => {
         if (this[categories[category]]) {
@@ -200,7 +211,7 @@ export class UAssets {
    * @param {'sm' | 'md' | 'lg' | 'xl'} [size]
    * @returns {number}
    */
-  getSize(category, size = 'md') {
+  getSize(category: string, size: 'sm' | 'md' | 'lg' | 'xl' = 'md'): number {
     const baseSize = this.sizes[category]?.[size] || 20
     return this.modifiers[category]
       ? baseSize * this.modifiers[category].sizeMultiplier
@@ -211,14 +222,14 @@ export class UAssets {
    * @param {string[]} categories
    * @returns {(UAssets['modifiers']['base'])[]}
    */
-  getModifiers(...categories) {
+  getModifiers(...categories: string[]): UAssets['modifiers']['base'][] {
     return categories.map(
       (category) => this.modifiers[category] ?? this.modifiers.base,
     )
   }
 
   /** @param {string} id */
-  getIconById(id) {
+  getIconById(id: string) {
     if (typeof id !== 'string') {
       return ''
     }
@@ -293,7 +304,7 @@ export class UAssets {
   }
 
   /** @param {number | string} [displayType] */
-  getEventStops(displayType = 0) {
+  getEventStops(displayType: number | string = 0) {
     try {
       switch (+displayType) {
         case 7:
@@ -327,15 +338,15 @@ export class UAssets {
    * @returns {string}
    */
   getPokemon(
-    pokemonId = 0,
-    form = 0,
-    evolution = 0,
-    gender = 0,
-    costume = 0,
-    alignment = 0,
-    shiny = false,
-    bread = 0,
-  ) {
+    pokemonId: string | number = 0,
+    form: string | number = 0,
+    evolution: string | number = 0,
+    gender: string | number = 0,
+    costume: string | number = 0,
+    alignment: string | number = 0,
+    shiny: boolean = false,
+    bread: string | number = 0,
+  ): string {
     try {
       return this[this.selected.pokemon]?.class?.pokemon(
         pokemonId,
@@ -357,7 +368,10 @@ export class UAssets {
    * @param {string|number} pokemonId
    * @param {import('@rm/types').PokemonDisplay} pokemonDisplay
    */
-  getPokemonByDisplay(pokemonId, pokemonDisplay) {
+  getPokemonByDisplay(
+    pokemonId: string | number,
+    pokemonDisplay: import('@rm/types').PokemonDisplay,
+  ) {
     return this.getPokemon(
       pokemonId,
       pokemonDisplay.form,
@@ -372,7 +386,7 @@ export class UAssets {
   }
 
   /** @param {number | string} [typeId] */
-  getTypes(typeId = 0) {
+  getTypes(typeId: number | string = 0) {
     try {
       return this[this.selected.type]?.class?.type(typeId)
     } catch (e) {
@@ -392,12 +406,12 @@ export class UAssets {
    * @returns
    */
   getPokestops(
-    lureId = 0,
-    invasionActive = false,
-    questActive = false,
-    ar = false,
-    power = 0,
-    display = '',
+    lureId: string | number = 0,
+    invasionActive: boolean = false,
+    questActive: boolean = false,
+    ar: boolean = false,
+    power: string | number = 0,
+    display: string | number = '',
   ) {
     try {
       return this[this.selected.pokestop]?.class?.pokestop(
@@ -420,7 +434,11 @@ export class UAssets {
    * @param {number} [amount]
    * @returns
    */
-  getRewards(rewardType, id, amount = 0) {
+  getRewards(
+    rewardType: string | number,
+    id: string | number = 0,
+    amount: number = 0,
+  ) {
     try {
       const reward = this.questRewardTypes[rewardType]
       return this[this.selected.reward]?.class?.reward(reward, id, amount)
@@ -436,7 +454,7 @@ export class UAssets {
    * @param {boolean} [confirmed]
    * @returns
    */
-  getInvasions(gruntType, confirmed = false) {
+  getInvasions(gruntType: string | number, confirmed: boolean = false) {
     try {
       return this[this.selected.invasion]?.class?.invasion(gruntType, confirmed)
     } catch (e) {
@@ -456,12 +474,12 @@ export class UAssets {
    * @returns
    */
   getGyms(
-    teamId = 0,
-    trainerCount = 0,
-    inBattle = false,
-    ex = false,
-    ar = false,
-    power = false,
+    teamId: string | number = 0,
+    trainerCount: string | number = 0,
+    inBattle: boolean = false,
+    ex: boolean = false,
+    ar: boolean = false,
+    power: string | number | boolean = false,
   ) {
     try {
       return this[this.selected.gym]?.class?.gym(
@@ -485,7 +503,11 @@ export class UAssets {
    * @param {boolean} [ex]
    * @returns
    */
-  getEggs(level, hatched = false, ex = false) {
+  getEggs(
+    level: string | number,
+    hatched: boolean = false,
+    ex: boolean = false,
+  ) {
     try {
       return this[this.selected.raid]?.class?.raidEgg(level, hatched, ex)
     } catch (e) {
@@ -499,7 +521,7 @@ export class UAssets {
    * @param {string | number} [teamId]
    * @returns
    */
-  getTeams(teamId = 0) {
+  getTeams(teamId: string | number = 0) {
     try {
       return this[this.selected.team]?.class?.team(teamId)
     } catch (e) {
@@ -514,7 +536,10 @@ export class UAssets {
    * @param {import("@rm/types").TimesOfDay} [timeOfDay]
    * @returns
    */
-  getWeather(weatherId, timeOfDay = 'day') {
+  getWeather(
+    weatherId: string | number,
+    timeOfDay: import('@rm/types').TimesOfDay = 'day',
+  ) {
     try {
       return this[this.selected.weather]?.class?.weather(
         weatherId,
@@ -532,7 +557,7 @@ export class UAssets {
    * @param {string | number} typeId
    * @returns
    */
-  getNests(typeId) {
+  getNests(typeId: string | number) {
     try {
       return this[this.selected.nest]?.class?.nest(typeId)
     } catch (e) {
@@ -542,7 +567,7 @@ export class UAssets {
   }
 
   /** @param {string} fileName */
-  getMisc(fileName = '') {
+  getMisc(fileName: string = '') {
     try {
       const miscClass = this[this.selected.misc]?.class
       const singular = fileName.slice(0, -1)
@@ -575,7 +600,7 @@ export class UAssets {
   }
 
   /** @param {boolean} [online] */
-  getDevices(online = false) {
+  getDevices(online: boolean = false) {
     try {
       return this[this.selected.device]?.class?.device(online)
     } catch (e) {
@@ -585,7 +610,7 @@ export class UAssets {
   }
 
   /** @param {boolean} [hasTth] */
-  getSpawnpoints(hasTth = false) {
+  getSpawnpoints(hasTth: boolean = false) {
     try {
       return this[this.selected.spawnpoint]?.class?.spawnpoint(hasTth)
     } catch (e) {
@@ -595,7 +620,7 @@ export class UAssets {
   }
 
   /** @param {boolean} [active] */
-  getStation(active = false) {
+  getStation(active: boolean = false) {
     try {
       return this[this.selected.station]?.class?.station(active)
     } catch (e) {

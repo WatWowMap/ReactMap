@@ -1,6 +1,4 @@
-// @ts-check
-
-import React, { useState } from 'react'
+import * as React from 'react'
 import KeyboardArrowLeft from '@mui/icons-material/KeyboardArrowLeft'
 import KeyboardArrowRight from '@mui/icons-material/KeyboardArrowRight'
 import Box from '@mui/material/Box'
@@ -35,8 +33,8 @@ export function Tutorial() {
   const tutorial = useStorage((s) => s.tutorial)
   const enableTutorial = useMemory((s) => s.config.misc.enableTutorial)
 
-  const [activeStep, setActiveStep] = useState(0)
-  const [prevStep, setPrevStep] = useState(0)
+  const [activeStep, setActiveStep] = React.useState(0)
+  const [prevStep, setPrevStep] = React.useState(0)
 
   const [setTutorialInDb] = useMutation(Query.user('SET_TUTORIAL'))
 

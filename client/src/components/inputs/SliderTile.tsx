@@ -1,5 +1,4 @@
 // @ts-check
-/* eslint-disable react/jsx-no-duplicate-props */
 import * as React from 'react'
 import Grid2 from '@mui/material/Unstable_Grid2'
 import TextField from '@mui/material/TextField'
@@ -10,22 +9,16 @@ import { useTranslation } from 'react-i18next'
 import { ToggleTypography } from '@components/ToggleTypography'
 import { MIN_MAX } from '@assets/constants'
 
-const StyledTextField =
-  /** @type {React.FC<import('@mui/material').TextFieldProps & { textColor: string }>} */ (
-    styled(TextField, { shouldForwardProp: (prop) => prop !== 'textColor' })(
-      // @ts-ignore
-      ({ textColor }) => ({
-        width: 80,
-        color: textColor,
-      }),
-    )
-  )
+const StyledTextField = styled(TextField, {
+  shouldForwardProp: (prop) => prop !== 'textColor',
+})<{ textColor: string }>(({ textColor }) => ({
+  width: 80,
+  color: textColor,
+}))
 const StyledSlider = styled(Slider)(() => ({ width: '100%' }))
 
-/**
- * @typedef {('' | number)[]} Value
- * @param {import('@rm/types').RMSliderProps} props
- */
+type Value = ('' | number)[]
+
 export function SliderTile({
   slide: {
     name,
@@ -42,56 +35,50 @@ export function SliderTile({
   },
   handleChange,
   values,
-}) {
+}: import('@rm/types').RMSliderProps) {
   const { t } = useTranslation()
   const [temp, setTemp] = React.useState(values || [])
-  const [text, setText] = React.useState(/** @type {Value} */ (values || []))
+  const [text, setText] = React.useState<Value>(values || [])
 
-  const handleSliderChange =
-    /** @type {import('@mui/material').SliderProps['onChangeCommitted']} */ (
-      React.useCallback((_, newValues) => {
-        if (Array.isArray(newValues)) {
-          setText(newValues)
-          setTemp(newValues)
-        }
-      }, [])
-    )
+  const handleSliderChange: import('@mui/material').SliderProps['onChangeCommitted'] =
+    React.useCallback((_, newValues) => {
+      if (Array.isArray(newValues)) {
+        setText(newValues)
+        setTemp(newValues)
+      }
+    }, [])
   const handleSliderChangeCommitted = React.useCallback(
     () => handleChange(name, temp),
     [name, temp, handleChange],
   )
 
-  const handleTextInputChange =
-    /** @type {import('@mui/material').TextFieldProps['onChange']} */ (
-      React.useCallback(
-        ({ type, target }) => {
-          const existing = text.slice()
-          const num = +target.value
-          const newValue = Number.isNaN(num) ? '' : num
-          const targetIndex = target.id === 'min' ? 0 : 1
+  const handleTextInputChange: import('@mui/material').TextFieldProps['onChange'] =
+    React.useCallback(
+      ({ type, target }) => {
+        const existing = text.slice()
+        const num = +target.value
+        const newValue = Number.isNaN(num) ? '' : num
+        const targetIndex = target.id === 'min' ? 0 : 1
 
-          if (newValue === '') {
-            if (type === 'blur') {
-              existing[targetIndex] = target.id === 'min' ? min : max
-            } else {
-              existing[targetIndex] = newValue
-            }
-            setText(existing)
+        if (newValue === '') {
+          if (type === 'blur') {
+            existing[targetIndex] = target.id === 'min' ? min : max
           } else {
             existing[targetIndex] = newValue
           }
-          if (type === 'blur') {
-            existing.sort((a, b) => (a === '' ? -1 : b === '' ? 1 : a - b))
-          }
           setText(existing)
-          if (existing.every((x) => typeof x === 'number')) {
-            // annoying but TypeScript is rude for not liking my check above
-            // @ts-ignore
-            handleChange(name, existing)
-          }
-        },
-        [text, min, max, handleChange],
-      )
+        } else {
+          existing[targetIndex] = newValue
+        }
+        if (type === 'blur') {
+          existing.sort((a, b) => (a === '' ? -1 : b === '' ? 1 : a - b))
+        }
+        setText(existing)
+        if (existing.every((x) => typeof x === 'number')) {
+          handleChange(name, existing)
+        }
+      },
+      [text, min, max, handleChange],
     )
 
   const colorSx = React.useMemo(

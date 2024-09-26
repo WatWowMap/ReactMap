@@ -1,4 +1,3 @@
-// @ts-check
 import * as React from 'react'
 import LocationOn from '@mui/icons-material/LocationOn'
 import MyLocation from '@mui/icons-material/MyLocation'
@@ -33,17 +32,15 @@ const Location = () => {
   } = useSyncData('human')
   const hasNominatim = useWebhookStore((s) => !!s.context.hasNominatim)
 
-  const [execSearch, { data, previousData, loading }] = useLazyQuery(
-    WEBHOOK_NOMINATIM,
-    {
-      variables: { search: '' },
-    },
-  )
+  const [execSearch, { data, previousData, loading }] = useLazyQuery<{
+    geocoder: { latitude: number; longitude: number; formatted: string }[]
+  }>(WEBHOOK_NOMINATIM, {
+    variables: { search: '' },
+  })
 
   const [save] = useMutation(SET_HUMAN, { fetchPolicy: 'no-cache' })
 
-  /** @param {[number, number]} location */
-  const handleLocationChange = (location) => {
+  const handleLocationChange = (location: [number, number]) => {
     if (location.every((x) => x !== 0)) {
       useWebhookStore.setState((prev) => ({
         location: prev.location.some((x, i) => x !== location[i])
@@ -140,7 +137,9 @@ const Location = () => {
         <Autocomplete
           style={{ width: '100%' }}
           getOptionLabel={(option) =>
-            `${option.formatted} (${option.latitude}, ${option.longitude})`
+            typeof option === 'string'
+              ? option
+              : `${option.formatted} (${option.latitude}, ${option.longitude})`
           }
           filterOptions={(x) => x}
           options={fetchedData.geocoder}
@@ -152,7 +151,7 @@ const Location = () => {
             execSearch({ variables: { search: newValue } })
           }
           onChange={(_, newValue) => {
-            if (newValue) {
+            if (newValue && typeof newValue !== 'string') {
               const { latitude: lat, longitude: lng } = newValue
               map.panTo([lat, lng])
               handleLocationChange([lat, lng])

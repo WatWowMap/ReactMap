@@ -1,6 +1,3 @@
-// @ts-check
-// TODO: Not sure if this is possible to actually type correctly with how the leaflet.locatecontrol library is written
-
 import { useEffect, useMemo, useState } from 'react'
 import { LayerGroup, DomEvent, DomUtil, Control } from 'leaflet'
 import { useTranslation } from 'react-i18next'
@@ -9,14 +6,14 @@ import 'leaflet.locatecontrol'
 
 import { useStorage } from '@store/useStorage'
 
-/**
- * Use location hook
- * @returns {{ lc: Control.Locate & { _onClick: () => void }, requesting: boolean, color: import('@mui/material').ButtonProps['color'] }}
- */
-export function useLocation(dependency = false) {
+export function useLocation(dependency = false): {
+  lc: Control.Locate & { _onClick: () => void }
+  requesting: boolean
+  color: import('@mui/material').ButtonProps['color']
+} {
   const map = useMap()
   const [color, setColor] = useState(
-    /** @type {import('@mui/material').ButtonProps['color']} */ ('secondary'),
+    /** @type {import('@mui/material').ButtonProps['color']} */ 'secondary',
   )
   const [requesting, setRequesting] = useState(false)
   const { t } = useTranslation()

@@ -1,5 +1,3 @@
-// @ts-check
-
 import { useTranslation } from 'react-i18next'
 
 import { useMemory } from '@store/useMemory'
@@ -14,14 +12,11 @@ const filteringPokemon = [
   'quest_reward_12',
 ]
 
-/**
- *
- * @param {string} category
- * @param {string} webhookCategory
- * @param {string[]} reqCategories
- * @returns
- */
-export function useFilter(category, webhookCategory, reqCategories) {
+export function useFilter(
+  category: string,
+  webhookCategory: string,
+  reqCategories: string[],
+) {
   const { t } = useTranslation()
   const tempFilters = webhookCategory
     ? useWebhookStore((s) => s.tempFilters)

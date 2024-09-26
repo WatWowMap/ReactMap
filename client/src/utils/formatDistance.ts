@@ -1,4 +1,3 @@
-// @ts-check
 import { useStorage } from '@store/useStorage'
 
 const METERS_PER_MILE = 1609.344

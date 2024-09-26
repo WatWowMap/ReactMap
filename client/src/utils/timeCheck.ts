@@ -1,13 +1,6 @@
-// @ts-check
 import SunCalc from 'suncalc'
 
-/**
- *
- * @param {number} lat
- * @param {number} lon
- * @returns
- */
-export function timeCheck(lat, lon) {
+export function timeCheck(lat: number, lon: number) {
   const date = new Date()
   const times = SunCalc.getTimes(date, lat, lon)
   switch (true) {

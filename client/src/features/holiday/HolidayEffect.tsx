@@ -1,16 +1,15 @@
-// @ts-check
 import * as React from 'react'
 
 import { useStorage } from '@store/useStorage'
 
 import { HolidayAnimations } from './HolidayAnimations'
 
-/**
- *
- * @param {import("@rm/types").Config['map']['holidayEffects'][number]} props
- * @returns
- */
-export function HolidayEffect({ images, name, css, imageScale }) {
+export function HolidayEffect({
+  images,
+  name,
+  css,
+  imageScale,
+}: import('@rm/types').Config['map']['holidayEffects'][number]) {
   const userDisabled = useStorage((s) => s.holidayEffects[name] === true)
 
   React.useLayoutEffect(() => {

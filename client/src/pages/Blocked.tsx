@@ -1,5 +1,3 @@
-// @ts-check
-import React from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import Typography from '@mui/material/Typography'

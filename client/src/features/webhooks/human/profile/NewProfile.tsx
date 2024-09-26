@@ -1,4 +1,3 @@
-// @ts-check
 import * as React from 'react'
 import Typography from '@mui/material/Typography'
 import Button from '@mui/material/Button'
@@ -32,19 +31,17 @@ export const NewProfile = () => {
     })
   }, [newProfile, save])
 
-  /** @type {React.FormEventHandler<HTMLFormElement>} */
-  const handleSubmit = React.useCallback(
-    (event) => {
-      event.preventDefault()
-      handleAddProfile()
-    },
-    [handleAddProfile],
-  )
+  const handleSubmit: React.FormEventHandler<HTMLFormElement> =
+    React.useCallback(
+      (event) => {
+        event.preventDefault()
+        handleAddProfile()
+      },
+      [handleAddProfile],
+    )
 
   const handleChange = React.useCallback(
-    (
-      /** @type {React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>} */ event,
-    ) => {
+    (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
       setNewProfile(event.target.value?.toLowerCase() || '')
     },
     [setNewProfile],

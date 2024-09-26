@@ -1,16 +1,9 @@
-// @ts-check
-
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { useFormatStore } from '@store/useFormatStore'
 
-/**
- *
- * @param {number} epochTime
- * @returns
- */
-export function useRelativeTimer(epochTime) {
+export function useRelativeTimer(epochTime: number) {
   const { t } = useTranslation()
   const relativeFormat = useFormatStore((s) => s.getRelative)
   const [relative, setRelative] = useState(relativeFormat(epochTime))

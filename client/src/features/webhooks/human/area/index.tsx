@@ -1,4 +1,3 @@
-// @ts-check
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import Typography from '@mui/material/Typography'
@@ -23,16 +22,6 @@ const Areas = () => {
       <Grid xs={6} display={{ xs: 'none', sm: 'block' }}>
         <Selected />
       </Grid>
-      {/* <Grid xs={6} sm={3} textAlign="center">
-        <AreaAction color="primary" action="none">
-          {t('disable_all')}
-        </AreaAction>
-      </Grid>
-      <Grid xs={6} sm={3} textAlign="center">
-        <AreaAction color="secondary" action="all">
-          {t('enable_all')}
-        </AreaAction>
-      </Grid> */}
       <Grid xs={6} sm={3} textAlign="center">
         <Button
           size="small"

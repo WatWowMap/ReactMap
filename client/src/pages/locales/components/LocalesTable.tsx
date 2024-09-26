@@ -1,4 +1,3 @@
-// @ts-check
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { useQuery } from '@apollo/client'
@@ -17,23 +16,20 @@ import { useFormatStore } from '@store/useFormatStore'
 
 import { useLocalesStore } from '../hooks/store'
 import { EditLocale } from './EditLocale'
+import type { Theme } from '@mui/material'
 
-/**
- * @typedef {{
- *  name: string,
- *  english?: string,
- *  ai?: string,
- *  missing: boolean,
- *  type: string
- * }} Row
- */
+export type Row = {
+  name: string
+  english?: string
+  ai?: string
+  missing: boolean
+  type: string
+}
 const clear = <ClearIcon color="error" fontSize="small" />
 
-/** @type {import('react-virtuoso').TableVirtuosoProps['fixedHeaderContent']} */
 function fixedHeaderContent() {
   const { t } = useTranslation()
-  // @ts-ignore
-  const isMobile = useMediaQuery((theme) => theme.breakpoints.down('sm'))
+  const isMobile = useMediaQuery((theme: Theme) => theme.breakpoints.down('sm'))
   return isMobile ? null : (
     <TableRow sx={{ bgcolor: 'background.paper' }}>
       <TableCell>{t('key')}</TableCell>
@@ -44,8 +40,7 @@ function fixedHeaderContent() {
   )
 }
 
-/** @type {import('react-virtuoso').TableVirtuosoProps<Row, { isMobile: boolean }>['itemContent']} */
-function itemContent(_index, row, ctx) {
+function itemContent(_index: number, row: Row, ctx: { isMobile?: boolean }) {
   return ctx?.isMobile ? (
     <TableCell>
       <Grid2 className="flex-center" container direction="column">
@@ -78,8 +73,7 @@ function itemContent(_index, row, ctx) {
 export function LocalesTable() {
   const { i18n } = useTranslation()
   const all = useLocalesStore((s) => s.all)
-  // @ts-ignore
-  const isMobile = useMediaQuery((theme) => theme.breakpoints.down('sm'))
+  const isMobile = useMediaQuery((theme: Theme) => theme.breakpoints.down('sm'))
   const stringSorter = useFormatStore((s) => s.collator)
 
   const { data, loading } = useQuery(LOCALES_STATUS, {
@@ -94,12 +88,10 @@ export function LocalesTable() {
     variables: { locale: 'en' },
   })
 
-  /** @type {Row[]} */
-  const rows = React.useMemo(() => {
+  const rows: Row[] = React.useMemo(() => {
     if (data?.locales && enData?.locales) {
       const { missing, ai } = data.locales
-      /** @type {string[]} */
-      const source = all ? Object.keys(enData.locales.human) : missing
+      const source: string[] = all ? Object.keys(enData.locales.human) : missing
       return source.toSorted(stringSorter.compare).map((key) => ({
         name: key,
         english: enData.locales.human[key],

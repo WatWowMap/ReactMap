@@ -1,10 +1,10 @@
-// @ts-check
-import * as React from 'react'
-
 import { useStorage } from '@store/useStorage'
 
-/** @param {React.ImgHTMLAttributes<HTMLImageElement>} props */
-export function SettingIcon({ src, alt, ...props }) {
+export function SettingIcon({
+  src,
+  alt,
+  ...props
+}: React.ImgHTMLAttributes<HTMLImageElement>) {
   const darkMode = useStorage((s) => s.darkMode)
   return (
     <img

@@ -1,5 +1,3 @@
-// @ts-check
-/* eslint-disable react/no-unstable-nested-components */
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { Virtuoso } from 'react-virtuoso'
@@ -14,12 +12,14 @@ import { TrackedTile } from './tiles/TrackedTile'
 import { Selecting } from './Selecting'
 import { useGetWebhookData } from './hooks/useGetWebhookData'
 
-/**
- *
- * @param {{ category: Exclude<import('@store/useWebhookStore').WebhookStore['category'], 'human'> }} props
- * @returns
- */
-export const Tracked = ({ category }) => {
+export const Tracked = ({
+  category,
+}: {
+  category: Exclude<
+    import('@store/useWebhookStore').WebhookStore['category'],
+    'human'
+  >
+}) => {
   const { t } = useTranslation()
 
   const { data: tracked, loading } = useGetWebhookData(category)

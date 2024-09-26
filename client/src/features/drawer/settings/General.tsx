@@ -1,5 +1,3 @@
-// @ts-check
-import * as React from 'react'
 import MenuItem from '@mui/material/MenuItem'
 import MapIcon from '@mui/icons-material/Map'
 import NavIcon from '@mui/icons-material/Navigation'
@@ -21,12 +19,11 @@ const ICON_MAP = {
 }
 const FALLBACK = <DevicesOtherIcon />
 
-/**
- *
- * @param {{ setting: keyof import('@store/useMemory').UseMemory['settings']}} props
- * @returns
- */
-export function GeneralSetting({ setting }) {
+export function GeneralSetting({
+  setting,
+}: {
+  setting: keyof import('@store/useMemory').UseMemory['settings']
+}) {
   const { t } = useTranslation()
   const staticSettings = useMemory((s) => s.settings)
   const value = useStorage((s) => s.settings[setting])

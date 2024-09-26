@@ -1,4 +1,3 @@
-// @ts-check
 import * as React from 'react'
 
 import { PokestopDrawer } from './pokestops'
@@ -10,7 +9,13 @@ import { S2CellsDrawer } from './S2Cells'
 import { AdminDrawer } from './Admin'
 import { StationsDrawer } from './Stations'
 
-function ExtrasComponent({ category, subItem }) {
+function ExtrasComponent({
+  category,
+  subItem,
+}: {
+  category: string
+  subItem: string
+}) {
   switch (category) {
     case 'nests':
       return <NestsDrawer subItem={subItem} />

@@ -1,4 +1,3 @@
-// @ts-check
 import * as React from 'react'
 import ListItemText from '@mui/material/ListItemText'
 import { useTranslation } from 'react-i18next'
@@ -9,8 +8,15 @@ import { BoolToggle } from '@components/inputs/BoolToggle'
 
 import { CollapsibleItem } from './components/CollapsibleItem'
 
-/** @param {{ item: (typeof WAYFARER_OPTIONS)[number], index: number, disabled: boolean }} props */
-const WayfarerOption = ({ item, index, disabled }) => {
+const WayfarerOption = ({
+  item,
+  index,
+  disabled,
+}: {
+  item: (typeof WAYFARER_OPTIONS)[number]
+  index: number
+  disabled: boolean
+}) => {
   const { t } = useTranslation()
   return (
     <BoolToggle

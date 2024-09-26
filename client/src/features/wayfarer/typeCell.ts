@@ -1,21 +1,10 @@
-// @ts-check
-
-/**
- *
- * @param {import("@rm/types/lib").Level14Cell} cell
- * @param {number} total
- * @param {string} oneStopTillNext
- * @param {string} twoStopsTillNext
- * @param {string} noMoreGyms
- * @returns {L.PathOptions}
- */
 export function getPathOptions(
-  cell,
-  total,
-  oneStopTillNext,
-  twoStopsTillNext,
-  noMoreGyms,
-) {
+  cell: import('@rm/types/lib').Level14Cell,
+  total: number,
+  oneStopTillNext: string,
+  twoStopsTillNext: string,
+  noMoreGyms: string,
+): L.PathOptions {
   if (
     (total === 1 && cell.count_gyms < 1) ||
     (total === 5 && cell.count_gyms < 2) ||

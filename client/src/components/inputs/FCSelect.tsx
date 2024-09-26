@@ -1,19 +1,18 @@
-// @ts-check
-import * as React from 'react'
 import FormControl from '@mui/material/FormControl'
 import InputLabel from '@mui/material/InputLabel'
 import ListItem from '@mui/material/ListItem'
 import ListItemIcon from '@mui/material/ListItemIcon'
-import Select from '@mui/material/Select'
+import Select, { SelectProps } from '@mui/material/Select'
+import { SxProps } from '@mui/material'
 
-const SX = /** @type {import('@mui/material').SxProps} */ ({ margin: '3px 0' })
+const SX: SxProps = { margin: '3px 0' }
 
-/**
- * @template {unknown} T
- * @param {import('@rm/types').FCSelectProps<T>} props
- * @returns
- */
-export function FCSelect({
+type ExtraProps = {
+  fcSx?: SxProps
+  setWidth?: (width: number) => void
+}
+
+export function FCSelect<Value = unknown>({
   children,
   value,
   label,
@@ -21,11 +20,10 @@ export function FCSelect({
   setWidth,
   fullWidth = true,
   ...props
-}) {
+}: SelectProps<Value> & ExtraProps) {
   return (
     <FormControl size={size} fullWidth={fullWidth} sx={SX}>
       <InputLabel>{label}</InputLabel>
-      {/* @ts-ignore */}
       <Select
         autoFocus
         ref={(ref) => {
@@ -45,12 +43,10 @@ export function FCSelect({
   )
 }
 
-/**
- * @template {unknown} T
- * @param {import('@rm/types').FCSelectListItemProps<T>} props
- * @returns
- */
-export function FCSelectListItem({ icon, ...props }) {
+export function FCSelectListItem<Value extends unknown>({
+  icon,
+  ...props
+}: SelectProps<Value> & ExtraProps & { icon?: React.ReactElement }) {
   return (
     <ListItem dense>
       {icon && <ListItemIcon>{icon}</ListItemIcon>}

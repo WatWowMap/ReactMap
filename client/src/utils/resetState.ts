@@ -1,9 +1,10 @@
-// @ts-check
 import { useMemory } from '@store/useMemory'
 import { useStorage } from '@store/useStorage'
 
-/** @param {keyof import('@store/useStorage').UseStorage & keyof import('@store/useMemory').UseMemory} key */
-const resetState = (key) => {
+const resetState = (
+  key: keyof import('@store/useStorage').UseStorage &
+    keyof import('@store/useMemory').UseMemory,
+) => {
   const state = useMemory.getState()[key]
   useStorage.setState({
     [key]:
@@ -15,8 +16,7 @@ const resetState = (key) => {
   })
 }
 
-/** @param {'Audio' | 'Icons'} key */
-const resetAssets = (key) => {
+const resetAssets = (key: 'Audio' | 'Icons') => {
   useMemory.setState({ [key]: null })
   useStorage.setState({ [key.toLowerCase()]: {} })
 }
@@ -69,7 +69,7 @@ export const resetAllGeneral = () => {
 }
 
 /** @param {import('@rm/types').Categories} key */
-export const resetFilter = (key) => {
+export const resetFilter = (key: import('@rm/types').Categories) => {
   const reference = useMemory.getState().filters[key]
   useStorage.setState((prev) => ({
     filters: { ...prev.filters, [key]: structuredClone(reference) },

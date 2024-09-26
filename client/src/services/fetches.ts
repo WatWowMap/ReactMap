@@ -1,14 +1,8 @@
-// @ts-check
 /* eslint-disable no-console */
+import type { GetServerSettings } from '@rm/server/src/utils/getServerSettings'
+type FetchError = { error: boolean; status: number }
 
-/**
- * @typedef {{ error: boolean, status: number }} FetchError
- */
-/**
- *
- * @returns {Promise<ReturnType<typeof import('@rm/server/src/utils/getServerSettings')> | FetchError>}
- */
-export async function getSettings() {
+export async function getSettings(): Promise<GetServerSettings | FetchError> {
   try {
     const response = await fetch('/api/settings')
     if (!response.ok) {
@@ -25,12 +19,10 @@ export async function getSettings() {
   }
 }
 
-/**
- * @param {{ username: string, password: string }} user
- * @param {string} endpoint
- * @returns {Promise<Response | FetchError>}
- */
-export async function login(user, endpoint = '/auth/local/callback') {
+export async function login(
+  user: { username: string; password: string },
+  endpoint: string = '/auth/local/callback',
+): Promise<Response | FetchError> {
   try {
     return fetch(endpoint, {
       method: 'POST',
@@ -48,12 +40,9 @@ export async function login(user, endpoint = '/auth/local/callback') {
   }
 }
 
-/**
- *
- * @param {Error & { uuid: string }} error
- * @returns {Promise<Response | FetchError>}
- */
-export async function sendError(error) {
+export async function sendError(
+  error: Error & { uuid: string },
+): Promise<Response | FetchError> {
   try {
     return fetch('/api/error/client', {
       method: 'POST',

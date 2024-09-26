@@ -1,4 +1,3 @@
-// @ts-check
 import * as React from 'react'
 import Box from '@mui/material/Box'
 
@@ -9,8 +8,7 @@ import { getRewardInfo } from '@utils/getRewardInfo'
 import { useTranslateById } from '@hooks/useTranslateById'
 import { Img } from '@components/Img'
 
-/** @param {Partial<import('@rm/types').Quest>} props */
-function QuestImage(props) {
+function QuestImage(props: Partial<import('@rm/types').Quest>) {
   const { src, amount, tt } = getRewardInfo(props)
   const { Icons } = useMemory.getState()
   return (
@@ -34,8 +32,7 @@ function QuestImage(props) {
   )
 }
 
-/** @param {{ url: string }} props */
-function FortImage({ url }) {
+function FortImage({ url }: { url: string }) {
   const { searchTab } = useStorage.getState()
   const { Icons } = useMemory.getState()
   return (
@@ -59,8 +56,14 @@ function FortImage({ url }) {
   )
 }
 
-/** @param {Partial<import('@rm/types').Pokemon> & { bread?: number }} props */
-function PokemonImage({ pokemon_id, form, gender, costume, shiny, bread }) {
+function PokemonImage({
+  pokemon_id,
+  form,
+  gender,
+  costume,
+  shiny,
+  bread,
+}: Partial<import('@rm/types').Pokemon> & { bread?: number }) {
   const { Icons } = useMemory.getState()
   const { t } = useTranslateById()
   return (
@@ -84,7 +87,6 @@ function PokemonImage({ pokemon_id, form, gender, costume, shiny, bread }) {
   )
 }
 
-/** @param {Partial<import('@rm/types').Gym>} props */
 function RaidImage({
   raid_pokemon_id,
   raid_pokemon_form,
@@ -92,7 +94,7 @@ function RaidImage({
   raid_pokemon_costume,
   raid_pokemon_evolution,
   raid_pokemon_alignment,
-}) {
+}: Partial<import('@rm/types').Gym>) {
   const { Icons } = useMemory.getState()
   const { t } = useTranslateById()
   return (
@@ -120,8 +122,7 @@ function RaidImage({
   )
 }
 
-/** @param {Partial<import('@rm/types').Pokestop>} props */
-function LureImage({ lure_id }) {
+function LureImage({ lure_id }: Partial<import('@rm/types').Pokestop>) {
   const { Icons } = useMemory.getState()
   const { t } = useTranslateById()
   return (
@@ -136,8 +137,13 @@ function LureImage({ lure_id }) {
   )
 }
 
-/** @param {{ nest_pokemon_id: number, nest_pokemon_form?: number }} props */
-function NestImage({ nest_pokemon_id, nest_pokemon_form }) {
+function NestImage({
+  nest_pokemon_id,
+  nest_pokemon_form,
+}: {
+  nest_pokemon_id: number
+  nest_pokemon_form?: number
+}) {
   const { Icons } = useMemory.getState()
   const { t } = useTranslateById()
   return (
@@ -157,8 +163,10 @@ function NestImage({ nest_pokemon_id, nest_pokemon_form }) {
   )
 }
 
-/** @param {Partial<import('@rm/types').Invasion>} props */
-function InvasionImage({ grunt_type, confirmed }) {
+function InvasionImage({
+  grunt_type,
+  confirmed,
+}: Partial<import('@rm/types').Invasion>) {
   const { Icons } = useMemory.getState()
   const { t } = useTranslateById()
   return (
@@ -183,8 +191,17 @@ function Misc() {
   return <Img src={miscIcon} alt={searchTab} maxHeight={45} maxWidth={45} />
 }
 
-/** @param {Partial<import('@rm/types').Quest & { id: string }> | { id: string, url?: string } | Partial<import('@rm/types').Pokemon> | Partial<import('@rm/types').Gym> | Partial<import('@rm/types').Pokestop> | { id: string, nest_pokemon_id: number, nest_pokemon_form?: number } | Partial<import('@rm/types').Invasion> & { id: string } | Partial<import('@rm/types').Station>} props */
-function OptionImage(props) {
+function OptionImage(
+  props:
+    | Partial<import('@rm/types').Quest & { id: string }>
+    | { id: string; url?: string }
+    | Partial<import('@rm/types').Pokemon>
+    | Partial<import('@rm/types').Gym>
+    | Partial<import('@rm/types').Pokestop>
+    | { id: string; nest_pokemon_id: number; nest_pokemon_form?: number }
+    | (Partial<import('@rm/types').Invasion> & { id: string })
+    | Partial<import('@rm/types').Station>,
+) {
   if ('url' in props && props.url) return <FortImage url={props.url} />
   if ('quest_reward_type' in props) return <QuestImage {...props} />
   if ('pokemon_id' in props) return <PokemonImage {...props} />

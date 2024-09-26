@@ -1,5 +1,3 @@
-// @ts-check
-import * as React from 'react'
 import MenuItem from '@mui/material/MenuItem'
 import CircularProgress from '@mui/material/CircularProgress'
 import { useTranslation } from 'react-i18next'

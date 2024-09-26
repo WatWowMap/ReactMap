@@ -10,7 +10,142 @@ const { PokemonFilter } = require('../pokemon/Frontend')
 
 /**
  * @param {import("@rm/types").Permissions} perms
- * @returns
+ * @returns {{
+ *  gyms?: {
+ *    enabled: boolean
+ *    allGyms?: boolean
+ *    levels?: string
+ *    raids?: boolean
+ *    exEligible?: boolean
+ *    inBattle?: boolean
+ *    arEligible?: boolean
+ *    gymBadges?: boolean
+ *    badge?: string
+ *    raidTier?: string
+ *    standard: BaseFilter
+ *    filter: Record<string, BaseFilter>
+ *  }
+ *  nests?: {
+ *    enabled: boolean
+ *    onlyShowAvailable: boolean
+ *    pokemon: boolean
+ *    avgFilter: number[]
+ *    polygons: boolean
+ *    standard: BaseFilter
+ *    filter: Record<string, BaseFilter>
+ *    active: string
+ *  }
+ *  pokestops?: {
+ *    enabled: boolean
+ *    allPokestops?: boolean
+ *    levels?: string
+ *    lures?: boolean
+ *    eventStops?: boolean
+ *    quests?: boolean
+ *    showQuestSet: string
+ *    confirmed?: boolean
+ *    excludeGrunts?: boolean
+ *    excludeLeaders?: boolean
+ *    invasions?: boolean
+ *    arEligible?: boolean
+ *    standard: BaseFilter
+ *    filter: Record<string, BaseFilter>
+ *  }
+ *  stations?: {
+ *    enabled: boolean
+ *    allStations?: boolean
+ *    standard: BaseFilter
+ *    battleTier?: string
+ *    maxBattles?: boolean
+ *    filter: Record<string, BaseFilter>
+ *  }
+ *  pokemon?: {
+ *    enabled: boolean
+ *    easyMode: boolean
+ *    onlyShowAvailable: boolean
+ *    legacy?: boolean
+ *    iv?: boolean
+ *    pvp?: boolean
+ *    standard: PokemonFilter
+ *    ivOr: PokemonFilter
+ *    gender: number
+ *    zeroIv?: boolean
+ *    hundoIv?: boolean
+ *    filter: Record<string, BaseFilter>
+ *  }
+ *  routes?: {
+ *    enabled: boolean
+ *    distance: number[]
+ *    standard: BaseFilter
+ *    filter: Record<string, BaseFilter>
+ *  }
+ *  portals?: {
+ *    enabled: boolean
+ *    standard: BaseFilter
+ *    filter: Record<string, BaseFilter>
+ *  }
+ *  scanAreas?: {
+ *    enabled: boolean
+ *    standard: BaseFilter
+ *    filterByAreas: boolean
+ *    filter: {
+ *      areas: string[]
+ *      search: string
+ *    }
+ *  }
+ *  submissionCells?: {
+ *    enabled: boolean
+ *    rings: boolean
+ *    s17Cells: boolean
+ *    s14Cells: boolean
+ *    includeSponsored: boolean
+ *    standard: BaseFilter
+ *    filter: {
+ *      global: BaseFilter
+ *    }
+ *  }
+ *  s2cells?: {
+ *    enabled: boolean
+ *    cells: number[]
+ *    standard: BaseFilter
+ *    filter: {
+ *      global: BaseFilter
+ *    }
+ *  }
+ *  weather?: {
+ *    enabled: boolean
+ *    standard: BaseFilter
+ *    filter: {
+ *      global: BaseFilter
+ *    }
+ *  }
+ *  spawnpoints?: {
+ *    enabled: boolean
+ *    standard: BaseFilter
+ *    tth: number
+ *    filter: {
+ *      global: BaseFilter
+ *      confirmed: BaseFilter
+ *      unconfirmed: BaseFilter
+ *    }
+ *  }
+ *  scanCells?: {
+ *    enabled: boolean
+ *    standard: BaseFilter
+ *    filter: {
+ *      global: BaseFilter
+ *    }
+ *  }
+ *  devices?: {
+ *    enabled: boolean
+ *    standard: BaseFilter
+ *    filter: {
+ *      online: BaseFilter
+ *      offline: BaseFilter
+ *      global: BaseFilter
+ *    }
+ *  }
+ * }}
  */
 function buildDefaultFilters(perms) {
   const defaultFilters = config.getSafe('defaultFilters')
@@ -142,8 +277,6 @@ function buildDefaultFilters(perms) {
             pvp: perms.pvp ? true : undefined,
             standard: base,
             ivOr: custom,
-            // xsRat: defaultFilters.pokemon.xsRat,
-            // xlKarp: defaultFilters.pokemon.xlKarp,
             gender: defaultFilters.pokemon.globalValues.gender,
             zeroIv: perms.iv ? false : undefined,
             hundoIv: perms.iv ? true : undefined,

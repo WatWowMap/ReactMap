@@ -1,4 +1,3 @@
-// @ts-check
 import * as React from 'react'
 import DialogContent from '@mui/material/DialogContent'
 import Dialog from '@mui/material/Dialog'
@@ -8,10 +7,13 @@ import { apolloClient, apolloCache } from '@services/apollo'
 import { Query } from '@services/queries'
 import { ENUM_BADGES } from '@assets/constants'
 import { useLayoutStore } from '@store/useLayoutStore'
-import { MultiSelector } from '@components/inputs/MultiSelector'
+import {
+  MultiSelector,
+  MultiSelectorProps,
+} from '@components/inputs/MultiSelector'
 
 import { Header } from './Header'
-import { Footer } from './Footer'
+import { Footer, FooterButton } from './Footer'
 
 const handleClose = () =>
   useLayoutStore.setState({
@@ -22,14 +24,14 @@ const handleClose = () =>
     },
   })
 
-const footerOptions = /** @type {import('./Footer').FooterButton[]} */ ([
+const footerOptions: FooterButton[] = [
   {
     name: 'close',
     action: handleClose,
     color: 'primary',
     align: 'right',
   },
-])
+]
 
 export function BadgeSelection() {
   const { gymId, badge, open } = useLayoutStore((s) => s.gymBadge)
@@ -37,27 +39,27 @@ export function BadgeSelection() {
     refetchQueries: ['GetBadgeInfo', 'Gyms', 'Raids', 'GymsRaids'],
   })
 
-  /** @type {import('@rm/types').MultiSelectorProps<typeof badge>['onClick']} */
-  const onClick = React.useCallback(
-    (_, newV) => () => {
-      setBadgeInDb({
-        variables: {
-          badge: newV,
-          gymId,
-        },
-      })
-      apolloClient.cache.modify({
-        id: apolloCache.identify({ __typename: 'Gym', id: gymId }),
-        fields: {
-          badge() {
-            return newV
+  const onClick: MultiSelectorProps<typeof badge>['onClick'] =
+    React.useCallback(
+      (_, newV) => () => {
+        setBadgeInDb({
+          variables: {
+            badge: newV,
+            gymId,
           },
-        },
-      })
-      handleClose()
-    },
-    [setBadgeInDb, gymId],
-  )
+        })
+        apolloClient.cache.modify({
+          id: apolloCache.identify({ __typename: 'Gym', id: gymId }),
+          fields: {
+            badge() {
+              return newV
+            },
+          },
+        })
+        handleClose()
+      },
+      [setBadgeInDb, gymId],
+    )
 
   return (
     <Dialog open={open} onClose={handleClose}>

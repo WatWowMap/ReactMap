@@ -1,4 +1,3 @@
-// @ts-check
 import * as React from 'react'
 import Box from '@mui/material/Box'
 import ListItem from '@mui/material/ListItem'
@@ -12,8 +11,13 @@ import { MultiSelectorStore } from '@components/inputs/MultiSelector'
 import { CollapsibleItem } from './CollapsibleItem'
 import { SelectorListMemo } from './SelectorList'
 
-/** @param {{ category: 'pokestops' | 'gyms', subItem: string }} props */
-const BaseAllForts = ({ category, subItem }) => {
+function BaseAllForts({
+  category,
+  subItem,
+}: {
+  category: 'pokestops' | 'gyms'
+  subItem: string
+}) {
   const { t } = useTranslation()
   const enabled = useStorage((s) => !!s.filters?.[category]?.[subItem])
   return (

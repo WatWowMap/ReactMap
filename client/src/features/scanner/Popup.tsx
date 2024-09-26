@@ -1,4 +1,3 @@
-// @ts-check
 import * as React from 'react'
 import List from '@mui/material/List'
 import { Popup } from 'react-leaflet'
@@ -16,12 +15,13 @@ import {
 } from './Shared'
 import { ConfigContext } from './ContextProvider'
 
-/**
- *
- * @param {{ children: React.ReactNode, mode: import('./hooks/store').ScanMode }} props
- * @returns
- */
-export function ScanOnDemandPopup({ children, mode }) {
+export function ScanOnDemandPopup({
+  children,
+  mode,
+}: {
+  children: React.ReactNode
+  mode: import('./hooks/store').ScanMode
+}) {
   const { t } = useTranslation()
   const context = React.useContext(ConfigContext)
 

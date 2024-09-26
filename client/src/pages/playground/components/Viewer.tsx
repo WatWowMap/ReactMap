@@ -1,5 +1,3 @@
-// @ts-check
-/* eslint-disable react/no-array-index-key */
 import * as React from 'react'
 import Grid from '@mui/material/Unstable_Grid2'
 import { useTranslation } from 'react-i18next'

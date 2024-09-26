@@ -1,4 +1,3 @@
-// @ts-check
 import * as React from 'react'
 import Typography from '@mui/material/Typography'
 import { useTranslation } from 'react-i18next'
@@ -7,12 +6,7 @@ import { ErrorBoundary } from '@components/ErrorBoundary'
 import { getTimeUntil } from '@utils/getTimeUntil'
 import { dayCheck } from '@utils/dayCheck'
 
-/**
- *
- * @param {import('@rm/types').ScanCell} props
- * @returns
- */
-export function ScanCellPopup({ id, updated }) {
+export function ScanCellPopup({ id, updated }: import('@rm/types').ScanCell) {
   const { t } = useTranslation()
   const lastUpdated = updated * 1000
   const [timer, setTimer] = React.useState(getTimeUntil(lastUpdated))

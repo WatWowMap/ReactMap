@@ -1,6 +1,6 @@
 import type { SliderProps } from '@mui/material'
 import type { Feature, Polygon, MultiPolygon } from 'geojson'
-import { Config } from './config'
+import type { Config } from './config'
 
 export type HttpMethod = 'GET' | 'PUT' | 'POST' | 'PATCH' | 'DELETE'
 
@@ -99,11 +99,10 @@ export type FullClientIcons = Omit<Config['icons'], 'styles'> & {
   styles: (Config['icons']['styles'][number] & { data: UICONS })[]
 }
 
-export interface RMSlider extends SliderProps {
+export interface RMSlider extends Omit<SliderProps, 'marks'> {
   label?: string
   perm?: string
   step?: number
-  i18nKey?: string
   disabled?: boolean
   low?: number
   high?: number

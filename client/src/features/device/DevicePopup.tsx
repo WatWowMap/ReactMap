@@ -1,4 +1,3 @@
-// @ts-check
 import * as React from 'react'
 import Typography from '@mui/material/Typography'
 import { useTranslation } from 'react-i18next'
@@ -8,12 +7,11 @@ import { useAnalytics } from '@hooks/useAnalytics'
 import { getTimeUntil } from '@utils/getTimeUntil'
 import { dayCheck } from '@utils/dayCheck'
 
-/**
- *
- * @param {{ isOnline: boolean, ts: number } & import('@rm/types').Device} props
- * @returns
- */
-export function DevicePopup({ isOnline, ts, ...device }) {
+export function DevicePopup({
+  isOnline,
+  ts,
+  ...device
+}: { isOnline: boolean; ts: number } & import('@rm/types').Device) {
   const { t } = useTranslation()
 
   useAnalytics('Popup', 'Popup Clicked', 'Device')

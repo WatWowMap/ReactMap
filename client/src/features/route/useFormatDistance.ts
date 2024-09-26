@@ -1,11 +1,9 @@
-// @ts-check
 import { useTranslation } from 'react-i18next'
 
 import { formatDistance } from '@utils/formatDistance'
 import { useStorage } from '@store/useStorage'
 
-/** @returns {(meters: number) => string} */
-export function useFormatDistance() {
+export function useFormatDistance(): (meters: number) => string {
   const { i18n } = useTranslation()
   const unit = useStorage((s) => s.settings.distanceUnit)
 

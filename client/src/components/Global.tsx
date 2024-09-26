@@ -1,5 +1,3 @@
-// @ts-check
-import * as React from 'react'
 import GlobalStyles from '@mui/material/GlobalStyles'
 import { darken, lighten } from '@mui/material/styles'
 

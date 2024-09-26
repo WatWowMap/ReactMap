@@ -1,5 +1,3 @@
-// @ts-check
-/* eslint-disable react/destructuring-assignment */
 import * as React from 'react'
 import { Marker, Circle, Popup } from 'react-leaflet'
 
@@ -8,12 +6,7 @@ import { useMemory } from '@store/useMemory'
 import { SpawnpointPopup } from './SpawnpointPopup'
 import { spawnpointMarker } from './spawnpointMarker'
 
-/**
- *
- * @param {import('@rm/types').Spawnpoint} item
- * @returns
- */
-const BaseSpawnpointTile = (item) => {
+const BaseSpawnpointTile = (item: import('@rm/types').Spawnpoint) => {
   const Icons = useMemory((s) => s.Icons)
   const [modifiers] = Icons.getModifiers('spawnpoint')
   const size = Icons.getSize('spawnpoint') * modifiers.sizeMultiplier

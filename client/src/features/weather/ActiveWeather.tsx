@@ -1,4 +1,3 @@
-// @ts-check
 import * as React from 'react'
 import { styled } from '@mui/material/styles'
 import Dialog from '@mui/material/Dialog'
@@ -30,14 +29,15 @@ const StyledBox = styled(Box)(({ theme }) => ({
   },
 }))
 
-/** @type {import('@mui/material').SxProps} */
-const ImgSx = {
+const ImgSx: import('@mui/material').SxProps = {
   width: { xs: 24, sm: 36 },
   height: { xs: 24, sm: 36 },
 }
 
-/** @param {import('@rm/types').Weather} props */
-function Weather({ gameplay_condition, ...props }) {
+function Weather({
+  gameplay_condition,
+  ...props
+}: import('@rm/types').Weather) {
   const Icons = useMemory((s) => s.Icons)
   const timeOfDay = useMemory((s) => s.timeOfDay)
   const clickable = useStorage((s) => s.userSettings?.weather?.clickableIcon)
@@ -45,17 +45,17 @@ function Weather({ gameplay_condition, ...props }) {
 
   const [open, setOpen] = React.useState(false)
 
-  const footerOptions = React.useMemo(
-    () =>
-      /** @type {import('@components/dialogs/Footer').FooterButton[]} */ ([
+  const footerOptions: import('@components/dialogs/Footer').FooterButton[] =
+    React.useMemo(
+      () => [
         {
           name: 'close',
           action: () => setOpen(false),
           color: 'primary',
         },
-      ]),
-    [setOpen],
-  )
+      ],
+      [setOpen],
+    )
   if (!Icons) return null
   const [{ disableColorShift = false }] = Icons.getModifiers('weather')
   return (
@@ -100,9 +100,9 @@ export function ActiveWeather() {
   const zoom = useStorage((s) => s.zoom)
   const allowedZoom = useMemory((s) => s.config.general.activeWeatherZoom)
 
-  const [active, setActive] = React.useState(
-    /** @type {import('@rm/types').Weather | null} */ (null),
-  )
+  const [active, setActive] = React.useState<
+    import('@rm/types').Weather | null
+  >(null)
 
   React.useEffect(() => {
     if (zoom > allowedZoom) {

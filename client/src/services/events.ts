@@ -1,4 +1,3 @@
-// @ts-check
 import { useMemory } from '@store/useMemory'
 import { useStorage } from '@store/useStorage'
 
@@ -9,7 +8,7 @@ window.addEventListener('keydown', (event) => {
   }
 })
 
-let timer
+let timer: NodeJS.Timeout
 
 window.addEventListener('focus', () => {
   if (timer) {

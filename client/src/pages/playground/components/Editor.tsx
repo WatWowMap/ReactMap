@@ -1,4 +1,3 @@
-// @ts-check
 import * as React from 'react'
 import { useTheme } from '@mui/material/styles'
 import Grid2 from '@mui/material/Unstable_Grid2'

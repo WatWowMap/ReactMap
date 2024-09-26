@@ -1,4 +1,3 @@
-// @ts-check
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { useLazyQuery, useMutation, useQuery } from '@apollo/client'
@@ -21,11 +20,13 @@ export function UserBackups() {
   const { t } = useTranslation()
   const hasPerm = useMemory((s) => s.auth.perms.backups)
 
-  /** @type {import('@apollo/client').QueryResult<{ backups: import('@rm/types').Backup[] }>} */
-  const { data } = useQuery(Query.user('GET_BACKUPS'), {
-    fetchPolicy: 'no-cache',
-    skip: !hasPerm,
-  })
+  const { data } = useQuery<{ backups: import('@rm/types').Backup[] }>(
+    Query.user('GET_BACKUPS'),
+    {
+      fetchPolicy: 'no-cache',
+      skip: !hasPerm,
+    },
+  )
 
   return data && hasPerm ? (
     <Box className="flex-center">
@@ -47,8 +48,7 @@ export function UserBackups() {
   ) : null
 }
 
-/** @param {{ backups: import('@rm/types').Backup[] }} props */
-function CreateNew({ backups }) {
+function CreateNew({ backups }: { backups: import('@rm/types').Backup[] }) {
   const { t } = useTranslation()
   const userBackupLimits = useMemory((s) => s.auth.userBackupLimits)
   const [name, setName] = React.useState('')
@@ -85,8 +85,7 @@ function CreateNew({ backups }) {
   )
 }
 
-/** @param {{ backup: import('@rm/types').Backup }} props */
-function BackupItem({ backup }) {
+function BackupItem({ backup }: { backup: import('@rm/types').Backup }) {
   const { t } = useTranslation()
   const [name, setName] = React.useState(backup.name)
   const [loading, setLoading] = React.useState(false)

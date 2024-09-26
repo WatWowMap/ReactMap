@@ -1,4 +1,3 @@
-// @ts-check
 import * as React from 'react'
 import Grid2 from '@mui/material/Unstable_Grid2'
 import Divider from '@mui/material/Divider'
@@ -36,8 +35,15 @@ export const AreaGroup = () => {
   )
 }
 
-/** @param {{ children: React.ReactNode[], group: string, areas: string[] }} props */
-const GroupTile = ({ children, group, areas }) => {
+const GroupTile = ({
+  children,
+  group,
+  areas,
+}: {
+  children: React.ReactNode[]
+  group: string
+  areas: string[]
+}) => {
   const count = useWebhookStore(
     (s) => s.human.area?.filter((a) => areas.includes(a)).length,
   )
@@ -54,48 +60,6 @@ const GroupTile = ({ children, group, areas }) => {
       ) : (
         children
       )}
-      {/* <Grid2 xs={group ? 4 : 12} textAlign="center">
-        <Typography variant="h4" gutterBottom>
-          {group}
-        </Typography>
-      </Grid2>
-
-      {group && (
-        <Grid2 xs={4} textAlign="center">
-          <AreaAction action="none" group={group} color="primary">
-            {t('disable_all')}
-          </AreaAction>
-        </Grid2>
-      )}
-
-      {group && (
-        <Grid2 xs={4} textAlign="center">
-          <AreaAction action="all" group={group} color="secondary">
-            {t('enable_all')}
-          </AreaAction>
-        </Grid2>
-      )} */}
     </Grid2>
   )
 }
-
-// /**
-//  *
-//  * @param {{
-//  *  action: string,
-//  *  children: React.ReactNode,
-//  *  color: import('@mui/material').ButtonProps['color']
-//  *  group?: string
-//  * }} props
-//  * @returns
-//  */
-// export const AreaAction = ({ action, children, color, group }) => (
-//   <Button
-//     size="small"
-//     variant="contained"
-//     color={color}
-//     onClick={handleClick(action, group)}
-//   >
-//     {children}
-//   </Button>
-// )

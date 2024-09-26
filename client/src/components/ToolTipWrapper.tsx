@@ -1,4 +1,3 @@
-// @ts-check
 import * as React from 'react'
 import { Tooltip } from 'react-leaflet'
 import { useTranslation } from 'react-i18next'
@@ -21,21 +20,20 @@ const Timer = ({ timestamp }) => {
   )
 }
 
-/**
- * TODO: Come back and makes timers only accept 1 timer
- * @param {{ timers: number[], offset?: [number, number], children?: React.ReactNode }} props
- * @returns
- */
-export function TooltipWrapper({ timers, offset, children }) {
+export function TooltipWrapper({
+  timers,
+  offset,
+  children,
+}: {
+  timers: number[]
+  offset?: [number, number]
+  children?: React.ReactNode
+}) {
   return (
     <Tooltip direction="bottom" permanent offset={offset}>
       {children}
       {[...new Set(timers)].map((timer, i) => (
-        <Timer
-          // eslint-disable-next-line react/no-array-index-key
-          key={timer + i * 123}
-          timestamp={timer}
-        />
+        <Timer key={timer + i * 123} timestamp={timer} />
       ))}
     </Tooltip>
   )

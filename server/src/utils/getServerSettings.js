@@ -6,6 +6,10 @@ const { advMenus } = require('../ui/advMenus')
 const { drawer } = require('../ui/drawer')
 
 /**
+ * @typedef {ReturnType<typeof getServerSettings>} GetServerSettings
+ */
+
+/**
  *
  * @param {import("express").Request} req
  */

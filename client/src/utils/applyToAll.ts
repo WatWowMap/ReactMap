@@ -1,29 +1,19 @@
-// @ts-check
-
 import { useMemory } from '@store/useMemory'
 import { useStorage, setDeepStore } from '@store/useStorage'
 import { generateSlots } from '@utils/generateSlots'
 
-export const STANDARD_BACKUP =
-  /** @type {import('@rm/types/lib').BaseFilter} */ ({
-    enabled: false,
-    size: 'md',
-    all: false,
-    adv: '',
-  })
+export const STANDARD_BACKUP: import('@rm/types/lib').BaseFilter = {
+  enabled: false,
+  size: 'md',
+  all: false,
+  adv: '',
+}
 
-/**
- * @template {import('@rm/types').Categories} T
- * @param {import('@rm/types').ClientFilters<T>} newFilter
- * @param {T} category
- * @param {string[]} [selectedIds]
- * @param {boolean} [includeSlots]
- */
-export function applyToAll(
-  newFilter,
-  category,
-  selectedIds = [],
-  includeSlots = false,
+export function applyToAll<T extends import('@rm/types').Categories>(
+  newFilter: import('@rm/types').ClientFilters<T>,
+  category: T,
+  selectedIds: string[] = [],
+  includeSlots: boolean = false,
 ) {
   const localFilters = useStorage.getState().filters[category]
   const easyMode = !!localFilters.easyMode

@@ -1,6 +1,3 @@
-// @ts-check
-
-import * as React from 'react'
 import FormControlLabel from '@mui/material/FormControlLabel'
 import Switch from '@mui/material/Switch'
 import { useTranslation } from 'react-i18next'

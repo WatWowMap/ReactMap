@@ -1,4 +1,3 @@
-// @ts-check
 import * as React from 'react'
 import IconButton from '@mui/material/IconButton'
 import Button from '@mui/material/Button'
@@ -16,6 +15,7 @@ import FormatSize from '@mui/icons-material/FormatSize'
 import Clear from '@mui/icons-material/Clear'
 import Check from '@mui/icons-material/Check'
 import { useTranslation } from 'react-i18next'
+import { ButtonBaseProps } from '@mui/material'
 
 const MuiIcons = {
   Replay,
@@ -31,32 +31,28 @@ const MuiIcons = {
   Check,
 }
 
-/**
- * @typedef {{
- *    key?: string,
- *    name?: string,
- *    icon?: keyof typeof MuiIcons,
- *    color?: import('@mui/material').ButtonProps['color'],
- *    disabled?: boolean,
- *    link?: string,
- *    target?: string,
- *    action?: () => void,
- *    component?: React.ReactNode,
- *    size?: number,
- *    align?: 'left' | 'center' | 'right',
- *    mobileOnly?: boolean,
- * }} FooterButton
- */
+export interface FooterButton {
+  key?: string
+  name?: string
+  icon?: keyof typeof MuiIcons
+  color?: import('@mui/material').ButtonProps['color']
+  disabled?: boolean
+  link?: string
+  target?: string
+  action?: ButtonBaseProps['onClick']
+  component?: React.ReactNode
+  size?: number
+  align?: 'left' | 'center' | 'right'
+  mobileOnly?: boolean
+}
 
-/**
- *
- * @param {{
- *  options: FooterButton[],
- * role?: string,
- * }} props
- * @returns
- */
-export function Footer({ options, role }) {
+export function Footer({
+  options,
+  role,
+}: {
+  options: FooterButton[]
+  role?: string
+}) {
   const { t } = useTranslation()
 
   return (

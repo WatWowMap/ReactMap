@@ -13,28 +13,22 @@ import { SQUARE_ITEM } from '@components/virtual/VirtualGrid'
 import { StatusIcon } from '@components/StatusIcon'
 import { useTranslation } from 'react-i18next'
 
-/**
- * @template {string} T
- * @typedef {{
- *  id: string,
- *  category: T,
- *  caption?: boolean
- * }} BaseProps
- */
+export type BaseProps<T extends string> = {
+  id: string
+  category: T
+  caption?: boolean
+}
 
-/**
- * @typedef {{
- *  id: string,
- *  filter: any, // TODO: fix this
- *  setFilter: (value: any) => void
- *  onClick: () => void
- *  hasAll?: boolean
- *  easyMode?: boolean
- *  caption?: boolean
- * }} FullProps
- */
+type FullProps = {
+  id: string
+  filter: any // TODO: fix this
+  setFilter: (value: any) => void
+  onClick: () => void
+  hasAll?: boolean
+  easyMode?: boolean
+  caption?: boolean
+}
 
-/** @param {FullProps} props */
 export function SelectorItem({
   id,
   filter,
@@ -42,7 +36,7 @@ export function SelectorItem({
   onClick,
   hasAll,
   easyMode,
-}) {
+}: FullProps) {
   const { t } = useTranslateById({ alt: true, newLine: true })
   const title = t(id)
   const url = useMemory((s) => s.Icons.getIconById(id))
@@ -68,14 +62,14 @@ export function SelectorItem({
     setFilter(newFilter)
   }, [filter, setFilter, hasAll, easyMode])
 
-  /** @type {import('@mui/material').IconButtonProps['onClick']} */
-  const handleIconClick = React.useCallback(
-    (e) => {
-      e.stopPropagation()
-      onClick()
-    },
-    [onClick],
-  )
+  const handleIconClick: import('@mui/material').IconButtonProps['onClick'] =
+    React.useCallback(
+      (e) => {
+        e.stopPropagation()
+        onClick()
+      },
+      [onClick],
+    )
 
   const status =
     hasAll && !easyMode
@@ -129,8 +123,7 @@ export function SelectorItem({
   )
 }
 
-/** @param {{ status: null | boolean }} props */
-function Status({ status }) {
+function Status({ status }: { status: null | boolean }) {
   const { t } = useTranslation()
   return (
     <Tooltip

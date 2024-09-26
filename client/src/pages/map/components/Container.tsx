@@ -1,5 +1,3 @@
-// @ts-check
-import * as React from 'react'
 import { MapContainer } from 'react-leaflet'
 
 import { useMemory } from '@store/useMemory'
@@ -19,8 +17,12 @@ import {
   ControlledZoomLayer,
 } from './Layers'
 
-/** @param {{ target: import('leaflet').Map, type: string }} args */
-function setLocationZoom({ target: map }) {
+function setLocationZoom({
+  target: map,
+}: {
+  target: import('leaflet').Map
+  type: string
+}) {
   const { lat, lng } = map.getCenter()
   const zoom = map.getZoom()
   useStorage.setState({ location: [lat, lng], zoom })
@@ -30,10 +32,10 @@ function setLocationZoom({ target: map }) {
   if (map.hasEventListeners('fetchdata')) map.fire('fetchdata')
 }
 
-const MAX_BOUNDS = /** @type {[[number, number], [number, number]]} */ ([
+const MAX_BOUNDS: [[number, number], [number, number]] = [
   [-90, -210],
   [90, 210],
-])
+]
 
 export function Container() {
   const { location, zoom } = useStorage.getState()

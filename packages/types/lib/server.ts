@@ -1,29 +1,27 @@
+import type { DbManager } from '@rm/server/src/services/DbManager'
+import type { EventManager } from '@rm/server/src/services/EventManager'
 import type {
   ScannerModels,
   ScannerModelKeys,
   RmModels,
   RmModelKeys,
   ModelKeys,
-  Station,
-  Backup,
-  Nest,
-  NestSubmission,
-  Pokestop,
   Gym,
   Pokemon,
+  Pokestop,
+  Nest,
+  Station,
 } from '@rm/server/src/models'
-import { Knex } from 'knex'
-import { Model } from 'objection'
-import { NextFunction, Request, Response } from 'express'
-import { VerifyCallback } from 'passport-oauth2'
+import type { Knex } from 'knex'
+import type { NextFunction, Request, Response } from 'express'
+import type { VerifyCallback } from 'passport-oauth2'
 
-import type { DbManager } from '@rm/server/src/services/DbManager'
-import type { EventManager } from '@rm/server/src/services/EventManager'
-import { ModelReturn, OnlyType } from './utility'
-import { Profile } from 'passport-discord'
-import { User } from './models'
-import { Config } from '@rm/types'
-import { OperationTypeNode } from 'graphql'
+import type { ModelReturn } from './utility'
+import type { Profile } from 'passport-discord'
+import type { User } from './models'
+import type { Config } from './config'
+import type { Strategy } from './general'
+import type { OperationTypeNode } from 'graphql'
 
 export interface DbContext {
   isMad: boolean

@@ -1,12 +1,12 @@
-// @ts-check
 import * as React from 'react'
 
-/**
- *
- * @param {{ botName: string, authUrl: string }} props
- * @returns
- */
-export function TelegramWidget({ botName, authUrl }) {
+export function TelegramWidget({
+  botName,
+  authUrl,
+}: {
+  botName: string
+  authUrl: string
+}) {
   const ref = React.useRef(null)
 
   React.useEffect(() => {

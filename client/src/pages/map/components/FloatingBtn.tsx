@@ -1,4 +1,3 @@
-// @ts-check
 import * as React from 'react'
 import MenuIcon from '@mui/icons-material/Menu'
 import MyLocationIcon from '@mui/icons-material/MyLocation'
@@ -33,7 +32,9 @@ import { useScanStore } from '@features/scanner'
 import { setModeBtn, useWebhookStore } from '@store/useWebhookStore'
 import { I } from '@components/I'
 
-/** @typedef {keyof ReturnType<typeof useLayoutStore['getState']> | keyof ReturnType<typeof useScanStore['getState']>} Keys */
+type Keys =
+  | keyof ReturnType<(typeof useLayoutStore)['getState']>
+  | keyof ReturnType<(typeof useScanStore)['getState']>
 
 const StyledStack = styled(Stack)(({ theme }) => ({
   width: 50,
@@ -69,8 +70,7 @@ const DEFAULT = {
   search: false,
 }
 
-/** @param {Keys} name */
-const handleClick = (name) => () => {
+const handleClick = (name: Keys) => () => {
   switch (name) {
     case 'scanZoneMode':
     case 'scanNextMode':
@@ -104,7 +104,7 @@ export function FloatingButtons() {
 
   const ref = React.useRef(null)
 
-  const fabButtons = /** @type {typeof DEFAULT} */ (data?.fabButtons || DEFAULT)
+  const fabButtons: typeof DEFAULT = data?.fabButtons || DEFAULT
 
   const DonorIcon = React.useMemo(
     () =>
@@ -119,7 +119,7 @@ export function FloatingButtons() {
   const disabled = !!webhookMode || !!scanNextMode || !!scanZoneMode || !online
 
   const handleNavBtn = React.useCallback(
-    (/** @type {'zoomIn' | 'zoomOut' | 'locate'} */ name) => () => {
+    (name: 'zoomIn' | 'zoomOut' | 'locate') => () => {
       switch (name) {
         case 'zoomIn':
           return map.zoomIn()

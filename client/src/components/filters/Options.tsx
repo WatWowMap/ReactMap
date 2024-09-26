@@ -1,4 +1,3 @@
-// @ts-check
 import * as React from 'react'
 import ExpandMore from '@mui/icons-material/ExpandMore'
 import Typography from '@mui/material/Typography'
@@ -16,44 +15,59 @@ import { setDeepStore, useStorage } from '@store/useStorage'
 import { analytics } from '@utils/analytics'
 import { camelToSnake } from '@utils/strings'
 
-/**
- * @typedef {keyof import('@store/useStorage').UseStorage['menus']} MenuCategories
- * @typedef {'others' | 'categories' | 'generations' | 'types' | 'rarity' | 'historicRarity' | 'forms'} MenuSubcategories
- */
+export type MenuCategories =
+  keyof import('@store/useStorage').UseStorage['menus']
 
-/**
- * @param {MenuCategories} category
- * @param {MenuSubcategories} subCategory
- * @returns {import('@mui/material').CheckboxProps['onChange']}
- */
-const handleChange = (category, subCategory) => (event) => {
-  analytics(
-    'Filtering Options',
-    `New Value: ${event.target.checked}`,
-    `Category: ${category} Name: ${subCategory}.${event.target.name}`,
-  )
-  setDeepStore(
-    // @ts-ignore
-    `menus.${category}.filters.${subCategory}.${event.target.name}`,
-    event.target.checked,
-  )
-}
+export type MenuSubcategories =
+  | 'others'
+  | 'categories'
+  | 'generations'
+  | 'types'
+  | 'rarity'
+  | 'historicRarity'
+  | 'forms'
 
-/**
- * @param {MenuCategories} category
- * @param {MenuSubcategories} subCategory
- * @returns {import('@mui/material').AccordionProps['onChange']}
- */
-const handleAccordion = (category, subCategory) => (_, isExpanded) => {
-  useStorage.setState((prev) => ({
-    advMenu: { ...prev.advMenu, [category]: isExpanded ? subCategory : false },
-  }))
-}
+const handleChange =
+  (
+    category: MenuCategories,
+    subCategory: MenuSubcategories,
+  ): import('@mui/material').CheckboxProps['onChange'] =>
+  (event) => {
+    analytics(
+      'Filtering Options',
+      `New Value: ${event.target.checked}`,
+      `Category: ${category} Name: ${subCategory}.${event.target.name}`,
+    )
+    setDeepStore(
+      // @ts-ignore
+      `menus.${category}.filters.${subCategory}.${event.target.name}`,
+      event.target.checked,
+    )
+  }
 
-/**
- * @param {{ category: MenuCategories, subCategory: MenuSubcategories, option: string }} props
- */
-export function OptionCheckbox({ category, subCategory, option }) {
+const handleAccordion =
+  (
+    category: MenuCategories,
+    subCategory: MenuSubcategories,
+  ): import('@mui/material').AccordionProps['onChange'] =>
+  (_, isExpanded) => {
+    useStorage.setState((prev) => ({
+      advMenu: {
+        ...prev.advMenu,
+        [category]: isExpanded ? subCategory : false,
+      },
+    }))
+  }
+
+export function OptionCheckbox({
+  category,
+  subCategory,
+  option,
+}: {
+  category: MenuCategories
+  subCategory: MenuSubcategories
+  option: string
+}) {
   const { t } = useTranslation()
   const checked = useStorage(
     (s) => s.menus[category].filters[subCategory][option] || false,
@@ -77,10 +91,13 @@ export function OptionCheckbox({ category, subCategory, option }) {
 
 const OptionsCheckboxMemo = React.memo(OptionCheckbox, () => true)
 
-/**
- * @param {{ category: MenuCategories, subCategory: MenuSubcategories }} props
- */
-export function OptionsGroup({ category, subCategory }) {
+export function OptionsGroup({
+  category,
+  subCategory,
+}: {
+  category: MenuCategories
+  subCategory: MenuSubcategories
+}) {
   const { t } = useTranslation()
   const options = useMemory((s) => s.menus[category].filters[subCategory])
   const expanded = useStorage((s) => s.advMenu[category] === subCategory)

@@ -1,4 +1,3 @@
-// @ts-check
 import * as React from 'react'
 import { useParams } from 'react-router-dom'
 import { useQuery } from '@apollo/client'
@@ -7,11 +6,7 @@ import { Query } from '@services/queries'
 import { useMemory } from '@store/useMemory'
 import { useStorage } from '@store/useStorage'
 
-/**
- * @param {string} category
- * @returns {string | null}
- */
-const getLowerCase = (category) => {
+const getLowerCase = (category: string): string | null => {
   if (!category) return null
   const lowercase = category.toLowerCase()
   switch (lowercase) {
@@ -27,7 +22,7 @@ const getLowerCase = (category) => {
   }
 }
 
-export function WebhookQuery({ children }) {
+export function WebhookQuery({ children }: { children: React.ReactNode }) {
   const params = useParams()
   const lowercase = getLowerCase(params.category)
 

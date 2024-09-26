@@ -1,5 +1,3 @@
-// @ts-check
-
 import * as React from 'react'
 import Box from '@mui/material/Box'
 import DialogContent from '@mui/material/DialogContent'
@@ -12,33 +10,32 @@ import IconButton from '@mui/material/IconButton'
 import { useMemory } from '@store/useMemory'
 import { useLayoutStore } from '@store/useLayoutStore'
 import { useFilter } from '@hooks/useFilter'
-import { Footer } from '@components/dialogs/Footer'
+import { Footer, FooterButton } from '@components/dialogs/Footer'
 import { applyToAll } from '@utils/applyToAll'
 import { useGetAvailable } from '@hooks/useGetAvailable'
 import { applyToAllWebhooks, useWebhookStore } from '@store/useWebhookStore'
 import { useAnalytics } from '@hooks/useAnalytics'
+import type { AdvCategories, Available } from '@rm/types'
 
 import { OptionsContainer } from './filters/OptionsContainer'
 import { VirtualGrid } from './virtual/VirtualGrid'
 import { GenericSearch } from './inputs/GenericSearch'
 
-/**
- * @template {import('@rm/types').AdvCategories} T
- * @param {{
- *  category: T
- *  webhookCategory?: string
- *  children: (index: number, key: string) => React.ReactNode
- *  categories?: (keyof import('@rm/types').Available)[]
- *  extraButtons?: import('@components/dialogs/Footer').FooterButton[]
- * }} props
- */
-export function Menu({
+interface Props<T extends AdvCategories> {
+  category: T
+  webhookCategory?: string
+  children: (index: number, key: string) => React.ReactNode
+  categories?: (keyof Available)[]
+  extraButtons?: FooterButton[]
+}
+
+export function Menu<T extends AdvCategories>({
   category,
   webhookCategory,
   children,
   categories,
   extraButtons,
-}) {
+}: Props<T>) {
   useGetAvailable(category)
   useAnalytics(`/advanced/${category}`)
   const isMobile = useMemory((s) => s.isMobile)
@@ -46,68 +43,66 @@ export function Menu({
 
   const [filterDrawer, setFilterDrawer] = React.useState(false)
 
-  const footerButtons = React.useMemo(
-    () =>
-      /** @type {import('@components/dialogs/Footer').FooterButton[]} */ ([
-        {
-          name: 'help',
-          action: () =>
-            useLayoutStore.setState({ help: { open: true, category } }),
-          icon: 'HelpOutline',
-        },
-        {
-          name: '',
-          disabled: true,
-        },
-        {
-          name: 'apply_to_all',
-          action: () =>
-            (webhookCategory ? useWebhookStore : useLayoutStore).setState({
-              [webhookCategory ? 'advanced' : 'advancedFilter']: {
-                open: true,
-                id: 'global',
-                category: webhookCategory || category,
+  const footerButtons: FooterButton[] = React.useMemo(
+    () => [
+      {
+        name: 'help',
+        action: () =>
+          useLayoutStore.setState({ help: { open: true, category } }),
+        icon: 'Help',
+      },
+      {
+        name: '',
+        disabled: true,
+      },
+      {
+        name: 'apply_to_all',
+        action: () =>
+          (webhookCategory ? useWebhookStore : useLayoutStore).setState({
+            [webhookCategory ? 'advanced' : 'advancedFilter']: {
+              open: true,
+              id: 'global',
+              category: webhookCategory || category,
+              selectedIds: useMemory.getState().advMenuFiltered[category],
+            },
+          }),
+        icon: category === 'pokemon' || webhookCategory ? 'Tune' : 'FormatSize',
+      },
+      {
+        name: 'disable_all',
+        action: () =>
+          webhookCategory
+            ? applyToAllWebhooks(
+                false,
+                useMemory.getState().advMenuFiltered[category],
+              )
+            : applyToAll({
+                newFilter: { enabled: false },
+                category,
                 selectedIds: useMemory.getState().advMenuFiltered[category],
-              },
-            }),
-          icon:
-            category === 'pokemon' || webhookCategory ? 'Tune' : 'FormatSize',
-        },
-        {
-          name: 'disable_all',
-          action: () =>
-            webhookCategory
-              ? applyToAllWebhooks(
-                  false,
-                  useMemory.getState().advMenuFiltered[category],
-                )
-              : applyToAll(
-                  { enabled: false },
-                  category,
-                  useMemory.getState().advMenuFiltered[category],
-                ),
-          icon: 'Clear',
-          color: 'error',
-        },
-        {
-          name: 'enable_all',
-          action: () =>
-            webhookCategory
-              ? applyToAllWebhooks(
-                  true,
-                  useMemory.getState().advMenuFiltered[category],
-                )
-              : applyToAll(
-                  { enabled: true },
-                  category,
-                  useMemory.getState().advMenuFiltered[category],
-                  !webhookCategory,
-                ),
-          icon: 'Check',
-          color: 'success',
-        },
-        ...(extraButtons ?? []),
-      ]),
+              }),
+        icon: 'Clear',
+        color: 'error',
+      },
+      {
+        name: 'enable_all',
+        action: () =>
+          webhookCategory
+            ? applyToAllWebhooks(
+                true,
+                useMemory.getState().advMenuFiltered[category],
+              )
+            : applyToAll({
+                newFilter: { enabled: true },
+                category,
+                selectedIds: useMemory.getState().advMenuFiltered[category],
+                includeSlots: !webhookCategory,
+              }),
+        icon: 'Check',
+        color: 'success',
+      },
+      ...(extraButtons ?? []),
+    ],
     [category, webhookCategory, extraButtons],
   )
 
@@ -154,7 +149,12 @@ export function Menu({
   )
 }
 
-function Results({ category, webhookCategory, categories, children }) {
+function Results<T extends AdvCategories>({
+  category,
+  webhookCategory,
+  categories,
+  children,
+}: Props<T>) {
   const { t } = useTranslation()
   const filteredArr = useFilter(category, webhookCategory, categories)
   return filteredArr.length ? (

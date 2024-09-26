@@ -1,6 +1,4 @@
-// @ts-check
-
-export const tutorialData = /** @type {const} */ ({
+export const tutorialData = {
   pokemon: {
     id: '1479791170343952100',
     pokemon_id: 16,
@@ -229,5 +227,6 @@ export const tutorialData = /** @type {const} */ ({
     nests: ['1-163', '4-172'],
     pokestops: ['q1', 'm384-10'],
     pokemon: ['1-163', '1-897'],
+    stations: [],
   },
-})
+} as const

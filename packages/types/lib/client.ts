@@ -1,37 +1,17 @@
 import * as React from 'react'
-import type {
-  ButtonProps,
-  FormControlProps,
-  SxProps,
-  Theme,
-  BaseSelectProps,
-} from '@mui/material'
-import type { SelectInputProps } from '@mui/material/Select/SelectInput'
-import { SystemStyleObject } from '@mui/system'
+import type { SxProps, BaseSelectProps } from '@mui/material'
 
-import { UAssets } from '@services/Assets'
-import { Config } from './config'
-import {
+import type { Config } from './config'
+import type {
   AdvCategories,
   BaseFilter,
   Categories,
-  ObjectPathValue,
   Permissions,
   PokemonFilter,
-} from '@rm/types'
-import { UseStorage, UseStoragePaths } from '@store/useStorage'
+} from './server'
 
 declare global {
-  declare const CONFIG: Config<true>
-
-  interface Window {
-    uicons?: UAssets
-    uaudio?: UAssets
-  }
-}
-
-export interface CustomI extends React.HTMLAttributes<HTMLLIElement> {
-  size?: ButtonProps['size']
+  const CONFIG: Config<true>
 }
 
 export type TimesOfDay = 'day' | 'night' | 'dawn' | 'dusk'
@@ -40,7 +20,7 @@ export type Theme = 'light' | 'dark'
 
 export type TileLayer = {
   name: string
-  style?: import('@rm/types').Theme
+  style?: Theme
   attribution?: string
   url?: string
   background?: string
@@ -68,17 +48,6 @@ export type PaddingProps = {
     | 'py']?: React.CSSProperties['padding']
 }
 
-export interface MultiSelectorProps<V> {
-  value: V
-  items: readonly V[]
-  tKey?: string
-  disabled?: boolean
-  onClick?: (
-    oldValue: V,
-    newValue: V,
-  ) => (e?: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void
-}
-
 export interface FilterObj {
   name: string
   perms: (keyof Permissions)[]
@@ -101,28 +70,6 @@ export interface FilterObj {
 }
 
 export type ClientFilterObj = Record<string, Record<string, FilterObj>>
-
-export type useGetDeepStore = <T extends UseStoragePaths>(
-  field: T,
-  defaultValue?: ObjectPathValue<UseStorage, T>,
-) => ObjectPathValue<UseStorage, T>
-
-export type useSetDeepStore = <T extends UseStoragePaths>(
-  field: T,
-  value: ObjectPathValue<UseStorage, T>,
-) => void
-
-export type useDeepStore = <
-  T extends UseStoragePaths,
-  U extends ObjectPathValue<UseStorage, T>,
-  V extends U | ((prevValue: U) => U) | (U extends object ? keyof U : never),
->(
-  field: T,
-  defaultValue?: ObjectPathValue<UseStorage, T>,
-) => [
-  U,
-  (arg1: V, ...rest: V extends keyof U ? [arg2: U[V]] : [arg2?: never]) => void,
-]
 
 export interface FCSelectProps<Value = unknown> extends BaseSelectProps<Value> {
   fcSx?: SxProps

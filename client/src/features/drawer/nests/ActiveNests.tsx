@@ -1,6 +1,3 @@
-// @ts-check
-
-import * as React from 'react'
 import ListItem from '@mui/material/ListItem'
 
 import { MultiSelectorStore } from '@components/inputs/MultiSelector'

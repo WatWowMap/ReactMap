@@ -1,5 +1,3 @@
-// @ts-check
-import * as React from 'react'
 import DialogContent from '@mui/material/DialogContent'
 import Box from '@mui/material/Box'
 import Typography from '@mui/material/Typography'
@@ -10,27 +8,30 @@ import Divider from '@mui/material/Divider'
 import Chip from '@mui/material/Chip'
 
 import { Header } from '@components/dialogs/Header'
-import { Footer } from '@components/dialogs/Footer'
+import { Footer, FooterButton } from '@components/dialogs/Footer'
 import { useMemory } from '@store/useMemory'
 import { useLayoutStore } from '@store/useLayoutStore'
 import { DialogWrapper } from '@components/dialogs/DialogWrapper'
 
 const GAP = 2
 
-/** @type {(theme: import('@mui/material').Theme) => import('@mui/system').SystemStyleObject<import('@mui/material').Theme>} */
-const SX_PROPS = (theme) => ({
+const SX_PROPS: (
+  theme: import('@mui/material').Theme,
+) => import('@mui/system').SystemStyleObject<import('@mui/material').Theme> = (
+  theme,
+): import('@mui/system').SystemStyleObject<import('@mui/material').Theme> => ({
   borderColor: theme.palette.grey[theme.palette.mode === 'dark' ? 600 : 300],
   border: '3px solid',
   borderRadius: 4,
 })
 
-const SUB_SX_PROPS = /** @type {typeof SX_PROPS} */ (
-  (theme) => ({
-    borderColor: theme.palette.grey[theme.palette.mode === 'dark' ? 600 : 300],
-    borderBottom: '3px solid',
-    p: 0.5,
-  })
-)
+const SUB_SX_PROPS: typeof SX_PROPS = /** @type {typeof SX_PROPS} */ (
+  theme,
+) => ({
+  borderColor: theme.palette.grey[theme.palette.mode === 'dark' ? 600 : 300],
+  borderBottom: '3px solid',
+  p: 0.5,
+})
 
 const AND_ITEMS = [
   'iv',
@@ -50,7 +51,10 @@ const OR_ITEMS = [
 ]
 
 /** @param {{ children: string } & import('@mui/material').TypographyProps} props */
-function ChildText({ children, ...props }) {
+function ChildText({
+  children,
+  ...props
+}: { children: string } & import('@mui/material').TypographyProps) {
   const { t } = useTranslation()
   return (
     <Typography variant="h6" align="center" width="100%" {...props}>
@@ -60,7 +64,17 @@ function ChildText({ children, ...props }) {
 }
 
 /** @param {{ title: string, children: React.ReactNode, bgcolor: import('@mui/material').BoxProps['bgcolor'], fullSize?: boolean }} props */
-function Card({ title, children, bgcolor, fullSize }) {
+function Card({
+  title,
+  children,
+  bgcolor,
+  fullSize,
+}: {
+  title: string
+  children: React.ReactNode
+  bgcolor: import('@mui/material').BoxProps['bgcolor']
+  fullSize?: boolean
+}) {
   const { t, i18n } = useTranslation()
   return (
     <Grid2
@@ -94,17 +108,17 @@ function Card({ title, children, bgcolor, fullSize }) {
 
 const handleClose = () => useLayoutStore.setState({ pkmnFilterHelp: false })
 
-const OPTIONS =
-  /** @type {import('@components/dialogs/Footer').FooterButton[]} */ ([
-    { name: 'close', color: 'error', action: handleClose },
-  ])
+const OPTIONS: FooterButton[] = [
+  { name: 'close', color: 'error', action: handleClose },
+]
 
 export function PkmnFilterHelp() {
   const { t } = useTranslation()
   const perms = useMemory((s) => s.auth.perms)
   const isMobile = useMediaQuery(
-    (/** @type {import('@mui/material').Theme} */ theme) =>
-      theme.breakpoints.down('md'),
+    (
+      /** @type {import('@mui/material').Theme} */ theme: import('@mui/material').Theme,
+    ) => theme.breakpoints.down('md'),
   )
 
   if (!perms.pokemon) return null

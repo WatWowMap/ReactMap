@@ -1,16 +1,9 @@
-// @ts-check
-import * as React from 'react'
-
 import { ScanCircles } from '../Shared'
 import { useCheckValid } from '../hooks/useCheckValid'
 import { ScanZonePopup } from './PopupContent'
 import { ScanOnDemandMarker } from '../Marker'
 import { ScanOnDemandPopup } from '../Popup'
 
-/**
- *
- * @returns
- */
 export function ScanZone() {
   useCheckValid('scanZone')
 

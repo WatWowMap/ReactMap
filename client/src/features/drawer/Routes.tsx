@@ -1,4 +1,3 @@
-// @ts-check
 import * as React from 'react'
 import ListItem from '@mui/material/ListItem'
 
@@ -13,8 +12,7 @@ const RouteSlider = () => {
   const [filters, setFilters] = useDeepStore('filters.routes.distance')
   const baseDistance = useMemory.getState().filters?.routes?.distance
 
-  /** @type {import('@rm/types').RMSlider} */
-  const slider = React.useMemo(() => {
+  const slider: import('@rm/types').RMSlider = React.useMemo(() => {
     const min = baseDistance?.[0] || 0
     const max = baseDistance?.[1] || 25
     return {

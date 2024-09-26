@@ -1,11 +1,4 @@
-// @ts-check
-/**
- *
- * @param {object} obj
- * @param {string | string[]} path
- * @param {any} value
- */
-export function setDeep(obj, path, value) {
+export function setDeep(obj: object, path: string | string[], value: any) {
   if (typeof path === 'string') {
     path = path.split('.')
   }

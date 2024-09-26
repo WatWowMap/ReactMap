@@ -1,4 +1,3 @@
-// @ts-check
 import * as React from 'react'
 import { TileLayer, useMap } from 'react-leaflet'
 import { useTranslation } from 'react-i18next'

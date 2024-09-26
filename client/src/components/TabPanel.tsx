@@ -1,16 +1,17 @@
-// @ts-check
 import * as React from 'react'
 import Box from '@mui/material/Box'
 
-/**
- * @param {{
- *  children: React.ReactNode,
- *  value: number,
- *  index: number,
- *  disablePadding?: boolean
- * }} props
- */
-export function TabPanel({ children, value, index, disablePadding }) {
+export function TabPanel({
+  children,
+  value,
+  index,
+  disablePadding,
+}: {
+  children: React.ReactNode
+  value: number
+  index: number
+  disablePadding?: boolean
+}) {
   return (
     <Box
       role="tabpanel"

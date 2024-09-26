@@ -1,4 +1,3 @@
-// @ts-check
 import * as React from 'react'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import SettingsIcon from '@mui/icons-material/Settings'
@@ -30,8 +29,11 @@ const ADV_CATEGORIES = new Set([
   'stations',
 ])
 
-/** @param {{ category: keyof import('@rm/types').UIObject }} props */
-const DrawerSection = ({ category }) => {
+const DrawerSection = ({
+  category,
+}: {
+  category: keyof import('@rm/types').UIObject
+}) => {
   const { t } = useTranslation()
   const sidebar = useStorage((s) => s.sidebar === category)
   const staticUserSettings = useMemory((s) => !!s.clientMenus[category])
@@ -41,7 +43,9 @@ const DrawerSection = ({ category }) => {
   const [unmountOnExit, setUnmountOnExit] = React.useState(true)
 
   /** @type {(panel: string) => (e: unknown, isExpanded: boolean )=> void} */
-  const handleChange = React.useCallback(
+  const handleChange: (
+    panel: string,
+  ) => (e: unknown, isExpanded: boolean) => void = React.useCallback(
     (panel) => (_, isExpanded) =>
       useStorage.setState({ sidebar: isExpanded ? panel : '' }),
     [],

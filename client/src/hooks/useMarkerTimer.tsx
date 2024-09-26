@@ -1,13 +1,10 @@
-// @ts-check
 import { useEffect } from 'react'
 
-/**
- *
- * @param {number} itemExpire
- * @param {import('leaflet').Marker<any>} ref
- * @param {() => void} [callback]
- */
-export function useMarkerTimer(itemExpire, ref, callback) {
+export function useMarkerTimer(
+  itemExpire: number,
+  ref: import('leaflet').Marker<any>,
+  callback?: () => void,
+) {
   const ts = Math.floor(Date.now() / 1000)
   useEffect(() => {
     if (itemExpire > ts && itemExpire !== Infinity) {

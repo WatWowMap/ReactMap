@@ -1,4 +1,3 @@
-// @ts-check
 import { useEffect, useMemo } from 'react'
 import { useQuery } from '@apollo/client'
 import { capitalize } from '@mui/material/utils'
@@ -6,22 +5,22 @@ import { capitalize } from '@mui/material/utils'
 import * as queries from '@services/queries/available'
 import { useMemory } from '@store/useMemory'
 
-/**
- * @param {keyof import('@rm/types').Available} category
- * @returns {{available: string[], loading: boolean, error: import('@apollo/client').ApolloError}}
- */
-export function useGetAvailable(category) {
+export function useGetAvailable(
+  category: keyof import('@rm/types').Available,
+): {
+  available: string[]
+  loading: boolean
+  error: import('@apollo/client').ApolloError
+} {
   const capitalized = capitalize(category)
   const active = useMemory((s) => s.active)
   const online = useMemory((s) => s.online)
 
-  /** @type {import('@apollo/client').QueryResult<{ [key: string]: string[] }>} */
-  const { data, previousData, loading, error } = useQuery(
-    queries[`GET_AVAILABLE_${category.toUpperCase()}`],
-    {
-      fetchPolicy: active && online ? 'network-only' : 'cache-and-network',
-    },
-  )
+  const { data, previousData, loading, error } = useQuery<{
+    [key: string]: string[]
+  }>(queries[`GET_AVAILABLE_${category.toUpperCase()}`], {
+    fetchPolicy: active && online ? 'network-only' : 'cache-and-network',
+  })
 
   useEffect(() => {
     if (data?.[`available${capitalized}`]) {

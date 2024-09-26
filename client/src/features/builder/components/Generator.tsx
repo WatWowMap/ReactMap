@@ -1,6 +1,6 @@
-// @ts-check
-/* eslint-disable react/no-array-index-key */
-import React from 'react'
+// @ts-nocheck
+// TODO: Remove ts-nocheck and fix types
+
 import Divider from '@mui/material/Divider'
 import Grid from '@mui/material/Unstable_Grid2'
 
@@ -15,12 +15,13 @@ import { CustomText } from './CustomText'
 import { CustomButton } from './CustomButton'
 import { getGridSizes, getBlockContent } from '../utils'
 
-/**
- *
- * @param {{ block: import('@rm/types').CustomComponent, defaultReturn: React.ReactNode }} props
- * @returns
- */
-export function Generator({ block, defaultReturn = null }) {
+export function Generator({
+  block,
+  defaultReturn = null,
+}: {
+  block: import('@rm/types').CustomComponent
+  defaultReturn: React.ReactNode
+}) {
   const { content = null, text = null, gridSizes, type, ...props } = block
   const children = getBlockContent(content || text)
   switch (type) {

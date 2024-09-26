@@ -1,12 +1,19 @@
-// @ts-check
 import { useMemory } from '@store/useMemory'
 import { AbortableContext } from './AbortableContext'
 
 export class RobustTimeout extends AbortableContext {
-  /**
-   * @param {keyof import('@rm/types').Config['api']['polling'] | number} category
-   */
-  constructor(category) {
+  _category: keyof import('@rm/types').Config['api']['polling'] | number
+  _ms: number
+  _lastUpdated: number
+  _pendingVariables: Partial<import('@apollo/client').OperationVariables>
+  timeout: NodeJS.Timeout
+  refetch: (
+    variables?: import('@apollo/client').OperationVariables,
+  ) => Promise<import('@apollo/client').ApolloQueryResult<any>>
+
+  constructor(
+    category: keyof import('@rm/types').Config['api']['polling'] | number,
+  ) {
     super(null)
     this._category = category
     this._ms =
@@ -20,7 +27,9 @@ export class RobustTimeout extends AbortableContext {
    * @param {Partial<import("@apollo/client").OperationVariables>} [variables]
    * @returns {void}
    */
-  doRefetch(variables) {
+  doRefetch(
+    variables?: Partial<import('@apollo/client').OperationVariables>,
+  ): void {
     const now = Date.now()
     if (now - this._lastUpdated < (this._pendingOp ? 5000 : 500)) {
       if (variables !== undefined) {
@@ -37,11 +46,11 @@ export class RobustTimeout extends AbortableContext {
     delete this._pendingVariables
   }
 
-  /**
-   * @param {(variables?: import("@apollo/client").OperationVariables) => Promise<import("@apollo/client").ApolloQueryResult<any>>} refetch
-   * @returns {void}
-   */
-  setupTimeout(refetch) {
+  setupTimeout(
+    refetch: (
+      variables?: import('@apollo/client').OperationVariables,
+    ) => Promise<import('@apollo/client').ApolloQueryResult<any>>,
+  ): void {
     this.refetch = refetch
     if (this._ms) {
       clearTimeout(this.timeout)

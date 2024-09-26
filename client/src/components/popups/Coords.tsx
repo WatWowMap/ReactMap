@@ -1,15 +1,14 @@
-// @ts-check
 import * as React from 'react'
 import Typography from '@mui/material/Typography'
-import MenuItem from '@mui/material/MenuItem'
+import MenuItem, { MenuItemProps } from '@mui/material/MenuItem'
 import { useTranslation } from 'react-i18next'
 
-/**
- *
- * @param {{ lat: number, lon: number }} props
- * @returns
- */
-export function Coords({ lat, lon }) {
+interface Props {
+  lat: number | string
+  lon: number | string
+}
+
+export function Coords({ lat, lon }: Props) {
   return (
     <Typography variant="caption" textAlign="center">
       🎯 {lat}, {lon}
@@ -17,16 +16,16 @@ export function Coords({ lat, lon }) {
   )
 }
 
-/**
- *
- * @param {{ lat: number, lon: number } & import('@mui/material').MenuItemProps} props
- * @returns
- */
-export function CopyCoords({ lat, lon, onClick, ...props }) {
+export function CopyCoords({
+  lat,
+  lon,
+  onClick,
+  ...props
+}: Props & import('@mui/material').MenuItemProps) {
   const { t } = useTranslation()
 
-  const onClickWithCopy = React.useCallback(
-    (/** @type {React.MouseEvent<HTMLLIElement, MouseEvent>} */ e) => {
+  const onClickWithCopy: MenuItemProps['onClick'] = React.useCallback(
+    (e) => {
       navigator.clipboard.writeText(`${lat}, ${lon}`)
       if (onClick) onClick(e)
     },

@@ -1,6 +1,3 @@
-// @ts-check
-
-/* eslint-disable react/jsx-no-duplicate-props */
 import * as React from 'react'
 import ExpandMore from '@mui/icons-material/ExpandMore'
 import Accordion from '@mui/material/Accordion'
@@ -761,7 +758,7 @@ export function WebhookAdvanced() {
     }
   }
 
-  const handleClose = (save, filterId, filterToSave) => {
+  const handleClose = (save = false, filterId = '', filterToSave = null) => {
     const realSave = typeof save === 'boolean' && save
     if (realSave) {
       useWebhookStore.setState((prev) => {
@@ -824,16 +821,17 @@ export function WebhookAdvanced() {
     }))
   }
 
-  const footerOptions = React.useMemo(
-    () => [
-      /** @type {import('@components/dialogs/Footer').FooterButton} */ ({
-        name: 'save',
-        action: () => handleClose(true, id, poracleValues),
-        icon: 'Save',
-      }),
-    ],
-    [id, poracleValues, selectedIds],
-  )
+  const footerOptions: import('@components/dialogs/Footer').FooterButton[] =
+    React.useMemo(
+      () => [
+        {
+          name: 'save',
+          action: () => handleClose(true, id, poracleValues),
+          icon: 'Save',
+        },
+      ],
+      [id, poracleValues, selectedIds],
+    )
 
   if (!info || !tempFilters) return null
 

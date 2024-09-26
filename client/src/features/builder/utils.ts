@@ -1,11 +1,4 @@
-// @ts-check
-
-/**
- *
- * @param {string | Record<string, string>} content
- * @returns
- */
-export function getBlockContent(content) {
+export function getBlockContent(content: string | Record<string, string>) {
   if (!content) return ''
   if (typeof content === 'string') return content
   return typeof content === 'object'
@@ -14,7 +7,7 @@ export function getBlockContent(content) {
 }
 
 /** @param {import("@rm/types").GridSizes} sizeObj */
-export function getGridSizes(sizeObj) {
+export function getGridSizes(sizeObj: import('@rm/types').GridSizes) {
   return {
     xs: sizeObj?.xs || 12,
     sm: sizeObj?.sm || sizeObj?.xs || 12,

@@ -1,5 +1,3 @@
-/* eslint-disable react/destructuring-assignment */
-// @ts-check
 import * as React from 'react'
 import { Popup, Polyline, Marker } from 'react-leaflet'
 
@@ -9,12 +7,7 @@ import { useStorage } from '@store/useStorage'
 import { weatherMarker } from './weatherMarker'
 import { WeatherPopup } from './WeatherPopup'
 
-/**
- *
- * @param {import('@rm/types').Weather} weather
- * @returns
- */
-const BaseWeatherTile = (weather) => {
+const BaseWeatherTile = (weather: import('@rm/types').Weather) => {
   const [popup, setPopup] = React.useState(false)
   const markerRef = React.useRef(null)
 

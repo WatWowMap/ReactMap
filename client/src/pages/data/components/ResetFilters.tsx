@@ -1,5 +1,3 @@
-// @ts-check
-import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { useMemory } from '@store/useMemory'
@@ -25,7 +23,7 @@ export function ResetFilters() {
       <StyledSubHeader>{t('reset_filters_title')}</StyledSubHeader>
       {Object.keys(filters)
         .filter((perm) => perms[perm])
-        .map((/** @type {import('@rm/types').Categories} */ key) => (
+        .map((key: import('@rm/types').Categories) => (
           <ButtonWithNotification
             key={key}
             onClick={() => resetFilter(key)}

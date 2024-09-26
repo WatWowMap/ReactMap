@@ -1,8 +1,5 @@
-// @ts-check
-
 import { useMemory } from '@store/useMemory'
 
-/** @param {Partial<import("@rm/types").Quest>} quest */
 export function getRewardInfo({
   quest_pokemon_id,
   quest_form_id,
@@ -20,11 +17,11 @@ export function getRewardInfo({
   candy_pokemon_id,
   xl_candy_pokemon_id,
   quest_reward_type,
-}) {
+}: Partial<import('@rm/types').Quest>) {
   const { Icons } = useMemory.getState()
   let src = ''
   let amount = 0
-  let tt = /** @type {string[] | string} */ ('')
+  let tt: string | string[] = ''
 
   switch (quest_reward_type) {
     case 1:

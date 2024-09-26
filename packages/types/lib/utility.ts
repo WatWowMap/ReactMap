@@ -37,9 +37,10 @@ export type Head<T extends any[]> = T extends [...infer Head, any]
   ? Head
   : any[]
 
-export type ModelReturn<T extends Model, U extends keyof T> = Awaited<
-  ReturnType<T[U]>
->
+export type ModelReturn<
+  T extends object,
+  U extends keyof OnlyType<T, Function, true>,
+> = T[U] extends (...args: any) => any ? Awaited<ReturnType<T[U]>> : never
 
 export type FullModel<T, U extends Model> = Partial<T> & U
 
@@ -47,16 +48,18 @@ export type IsAny<T> = 0 extends 1 & T ? true : false
 
 export type DeepMerge<T, U> = {
   [K in keyof T | keyof U]: K extends keyof U
-    ? IsAny<T[K]> extends true
+    ? IsAny<K extends keyof T ? T[K] : never> extends true
       ? U[K] // If T[K] is any, override with U[K]
       : U[K] extends any[]
-        ? T[K] extends any[]
-          ? T[K] extends object[]
-            ? U[K] extends object[]
-              ? Array<DeepMerge<T[K][number], U[K][number]>> // Merge arrays of objects
-              : U[K] // If U is not an array of objects, override
-            : U[K] // If T is not an array of objects, override
-          : U[K] // If T is not an array, override
+        ? K extends keyof T
+          ? T[K] extends any[]
+            ? T[K] extends object[]
+              ? U[K] extends object[]
+                ? Array<DeepMerge<T[K][number], U[K][number]>> // Merge arrays of objects
+                : U[K] // If U is not an array of objects, override
+              : U[K] // If T is not an array of objects, override
+            : U[K] // If T is not an array, override
+          : U[K] // If T does not have the key, use U's value
         : U[K] extends object
           ? K extends keyof T
             ? T[K] extends object

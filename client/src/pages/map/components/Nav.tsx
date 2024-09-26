@@ -1,4 +1,3 @@
-// @ts-check
 import * as React from 'react'
 
 import { Tutorial } from '@features/tutorial'

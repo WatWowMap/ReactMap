@@ -1,4 +1,3 @@
-// @ts-check
 import * as React from 'react'
 import Chip from '@mui/material/Chip'
 import List from '@mui/material/List'
@@ -14,8 +13,7 @@ import { camelToSnake } from '@utils/strings'
 
 import { OptionsGroup } from './Options'
 
-/** @type {React.CSSProperties} */
-const CHIP_STYLE = { margin: 3 }
+const CHIP_STYLE: React.CSSProperties = { margin: 3 }
 
 /**
  *
@@ -26,9 +24,18 @@ const CHIP_STYLE = { margin: 3 }
  * }} props
  * @returns
  */
-function AppliedChip({ category, subCategory, option }) {
+function AppliedChip({
+  category,
+  subCategory,
+  option,
+}: {
+  category: import('./Options').MenuCategories
+  subCategory: import('./Options').MenuSubcategories
+  option: string
+}) {
   const { t } = useTranslation()
   const reverse = useStorage(
+    // @ts-ignore
     (s) => !!s.menus[category]?.filters?.others?.reverse,
   )
   const valid = useStorage(
@@ -49,12 +56,11 @@ function AppliedChip({ category, subCategory, option }) {
 
 const AppliedChipMemo = React.memo(AppliedChip, () => true)
 
-/**
- *
- * @param {{ category: import('./Options').MenuCategories }} props
- * @returns
- */
-function Applied({ category }) {
+function Applied({
+  category,
+}: {
+  category: import('./Options').MenuCategories
+}) {
   return Object.entries(useStorage.getState().menus[category].filters).map(
     ([subCategory, options]) =>
       Object.keys(options).map((option) => (
@@ -69,12 +75,7 @@ function Applied({ category }) {
   )
 }
 
-/**
- *
- * @param {import('./Options').MenuCategories} category
- * @returns
- */
-const handleReset = (category) => () => {
+const handleReset = (category: import('./Options').MenuCategories) => () => {
   const { menus } = useStorage.getState()
   const resetPayload = {}
   Object.keys(menus[category].filters).forEach((cat) => {
@@ -91,13 +92,13 @@ const handleReset = (category) => () => {
   }))
 }
 
-/**
- * @param {{
- *  category: import('./Options').MenuCategories,
- *  categories: string[],
- * }} props
- */
-function OptContainer({ categories, category }) {
+function OptContainer({
+  categories,
+  category,
+}: {
+  category: import('./Options').MenuCategories
+  categories: string[]
+}) {
   return (
     <>
       {Object.entries(useMemory.getState().menus[category].filters).map(
@@ -139,12 +140,11 @@ export const OptionsContainer = React.memo(
   (prev, next) => prev.category === next.category,
 )
 
-/**
- *
- * @param {{ category: import('./Options').MenuCategories }} props
- * @returns
- */
-function CountDisplay({ category }) {
+function CountDisplay({
+  category,
+}: {
+  category: import('./Options').MenuCategories
+}) {
   const { t } = useTranslation()
   const show = useMemory((s) => s.advMenuCounts[category]?.show || 0)
   const total = useMemory((s) => s.advMenuCounts[category]?.total || 0)

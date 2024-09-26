@@ -1,4 +1,3 @@
-// @ts-check
 import * as React from 'react'
 import MenuItem from '@mui/material/MenuItem'
 import Button from '@mui/material/Button'
@@ -32,11 +31,7 @@ export function ComponentMenu() {
   const [anchorEl, setAnchorEl] = React.useState(null)
   const [pendingComponent, setPendingComponent] = React.useState(null)
 
-  /**
-   *
-   * @param {string} [newComponent]
-   */
-  const handleMenuClose = (newComponent) => () => {
+  const handleMenuClose = (newComponent?: string) => () => {
     const { original, code } = usePlayStore.getState()
     setAnchorEl(null)
     if (newComponent) {

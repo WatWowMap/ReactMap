@@ -1,13 +1,11 @@
-// @ts-check
 import * as React from 'react'
 import { Circle } from 'react-leaflet'
 
-/**
- *
- * @param {import('@rm/types').PoI & { color: string }} param0
- * @returns
- */
-const PoI = ({ lat, lon, color }) => (
+const PoI = ({
+  lat,
+  lon,
+  color,
+}: import('@rm/types').PoI & { color: string }) => (
   <Circle
     key={color}
     center={[lat, lon]}

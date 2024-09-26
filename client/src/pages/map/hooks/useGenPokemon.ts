@@ -10,8 +10,7 @@ export function useGenPokemon() {
   const categories = useMemory((s) => s.menus.pokemon.categories)
 
   useEffect(() => {
-    /** @type {import('@rm/types').ClientFilterObj} */
-    const tempObj = Object.fromEntries(
+    const tempObj: import('@rm/types').ClientFilterObj = Object.fromEntries(
       categories.map((x) => [
         x,
         {

@@ -1,19 +1,13 @@
-// @ts-check
-
 export class SimpleTTLCache {
-  /**
-   * @param {number} ttl
-   */
-  constructor(ttl) {
+  private _ttl: number
+  private _cache: Map<string, NodeJS.Timeout>
+
+  constructor(ttl: number) {
     this._ttl = ttl
     this._cache = new Map()
   }
 
-  /**
-   * @param {string} key
-   * @param {number} [expire]
-   */
-  set(key, expire = this._ttl) {
+  set(key: string, expire: number = this._ttl) {
     if (this._cache.has(key)) {
       clearTimeout(this._cache.get(key))
     }
@@ -23,11 +17,7 @@ export class SimpleTTLCache {
     )
   }
 
-  /**
-   * @param {string} key
-   * @returns
-   */
-  has(key) {
+  has(key: string) {
     return !!this._cache.has(key)
   }
 

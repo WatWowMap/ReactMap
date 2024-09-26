@@ -1,4 +1,3 @@
-// @ts-check
 import * as React from 'react'
 import Clear from '@mui/icons-material/Clear'
 import List from '@mui/material/List'
@@ -44,9 +43,9 @@ const DrawerHeader = React.memo(
   () => true,
 )
 
-const listItemSx = /** @type {import('@mui/material').SxProps} */ ({
+const listItemSx = /** @type {import('@mui/material').SxProps} */ {
   display: 'block',
-})
+}
 
 export function Drawer() {
   const drawer = useLayoutStore((s) => s.drawer)

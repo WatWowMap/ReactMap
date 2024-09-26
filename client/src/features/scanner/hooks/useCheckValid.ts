@@ -1,4 +1,3 @@
-// @ts-check
 import { useContext, useEffect } from 'react'
 import { useQuery } from '@apollo/client'
 
@@ -9,10 +8,8 @@ import { useScanStore } from './store'
 
 /**
  * Checks the server to see if the scan location is valid, returns a color
- * @param {import('./store').ScanMode} mode
- * @returns
  */
-export function useCheckValid(mode) {
+export function useCheckValid(mode: import('./store').ScanMode) {
   const { cooldown } = useContext(ConfigContext)
   const skip = useScanStore((s) => !s[`${mode}Mode`])
   const points = useScanStore((s) => s.scanCoords)
@@ -27,8 +24,7 @@ export function useCheckValid(mode) {
 
   useEffect(() => {
     if (data?.checkValidScan) {
-      /** @type {import('./store').UseScanStore['valid']} */
-      let valid = 'none'
+      let valid: import('./store').UseScanStore['valid'] = 'none'
       if (data.checkValidScan.every(Boolean)) {
         valid = 'all'
       } else if (data.checkValidScan.some(Boolean)) {

@@ -1,4 +1,3 @@
-// @ts-check
 import * as React from 'react'
 import DialogContent from '@mui/material/DialogContent'
 import Typography from '@mui/material/Typography'
@@ -10,19 +9,19 @@ import { useTranslation } from 'react-i18next'
 import { useLayoutStore } from '@store/useLayoutStore'
 
 import { Header } from './Header'
-import { Footer } from './Footer'
+import { Footer, FooterButton } from './Footer'
 import { DialogWrapper } from './DialogWrapper'
 
 const handleClose = () => useLayoutStore.setState({ resetFilters: false })
 
-const FOOTER_OPTIONS = /** @type {import('./Footer').FooterButton[]} */ ([
+const FOOTER_OPTIONS: FooterButton[] = [
   {
     name: 'close',
     action: handleClose,
     color: 'primary',
     align: 'right',
   },
-])
+]
 
 export function ResetFilters() {
   const { t } = useTranslation()

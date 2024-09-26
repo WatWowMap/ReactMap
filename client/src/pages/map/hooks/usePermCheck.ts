@@ -1,13 +1,7 @@
-// @ts-check
-
 import { useMemory } from '@store/useMemory'
 import { useStorage } from '@store/useStorage'
 
-/**
- * @param {string} category
- * @returns {boolean}
- */
-export function usePermCheck(category) {
+export function usePermCheck(category: string): boolean {
   const filters = useStorage((s) => s.filters[category])
   const perms = useMemory((s) => s.auth.perms)
 

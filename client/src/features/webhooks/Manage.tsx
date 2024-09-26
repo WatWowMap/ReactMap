@@ -1,4 +1,3 @@
-// @ts-check
 import * as React from 'react'
 import Person from '@mui/icons-material/Person'
 import DialogContent from '@mui/material/DialogContent'
@@ -40,14 +39,13 @@ export function Manage() {
 
   const filters = useGenFilters()
 
-  /** @type {ReturnType<typeof React.useRef<HTMLElement | null>>} */
-  const dialogRef = React.useRef(null)
+  const dialogRef: ReturnType<typeof React.useRef<HTMLElement | null>> =
+    React.useRef(null)
   const [addNew, setAddNew] = React.useState({ open: false, save: false })
   const [height, setHeight] = React.useState(0)
 
   const footerButtons = React.useMemo(() => {
-    /** @type {import('@components/dialogs/Footer').FooterButton[]} */
-    const buttons = [
+    const buttons: import('@components/dialogs/Footer').FooterButton[] = [
       {
         name: 'feedback',
         action: () => useLayoutStore.setState({ feedback: true }),
@@ -116,7 +114,7 @@ export function Manage() {
 
   const changeTab = React.useCallback(
     /** @param {React.SyntheticEvent<Element, Event>} _ @param {typeof category} newCategory */
-    (_, newCategory) => {
+    (_: React.SyntheticEvent<Element, Event>, newCategory: typeof category) => {
       useWebhookStore.setState({ category: categories[newCategory] })
     },
     [categories],
@@ -124,18 +122,18 @@ export function Manage() {
 
   const tabValue = categories.findIndex((x) => x === category)
 
-  const buttons = React.useMemo(
-    () =>
-      /** @type {import('@components/dialogs/Footer').FooterButton[]} */ ([
+  const buttons: import('@components/dialogs/Footer').FooterButton[] =
+    React.useMemo(
+      () => [
         {
           name: 'save',
           action: () => setAddNew({ open: false, save: true }),
           icon: 'Save',
           color: 'secondary',
         },
-      ]),
-    [setAddNew],
-  )
+      ],
+      [setAddNew],
+    )
   return category !== 'human' && addNew.open ? (
     <>
       <Header
@@ -199,7 +197,11 @@ export function Manage() {
 }
 
 /** @param {{ category: import('@store/useWebhookStore').WebhookStore['category'] }} props */
-function TabIcon({ category }) {
+function TabIcon({
+  category,
+}: {
+  category: import('@store/useWebhookStore').WebhookStore['category']
+}) {
   const Icons = useMemory((s) => s.Icons)
   return category === 'human' ? (
     <Person />

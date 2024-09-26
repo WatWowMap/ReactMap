@@ -1,4 +1,3 @@
-// @ts-check
 import * as React from 'react'
 import Typography from '@mui/material/Typography'
 import MenuItem from '@mui/material/MenuItem'
@@ -9,12 +8,7 @@ import { useDeepStore, useStorage } from '@store/useStorage'
 import { QuestTitle } from '@components/QuestTitle'
 import { FCSelect } from '@components/inputs/FCSelect'
 
-/**
- *
- * @param {{ id: string }} props
- * @returns
- */
-export function QuestConditionSelector({ id }) {
+export function QuestConditionSelector({ id }: { id: string }) {
   const { t } = useTranslation()
   const [value, setValue] = useDeepStore(
     `filters.pokestops.filter.${id}.adv`,

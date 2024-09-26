@@ -13,7 +13,7 @@
       "ESNext",
       "DOM"
     ],
-    "skipLibCheck": true,
+    "skipLibCheck": false,
     "jsx": "react-jsx",
     "allowJs": true,
     "paths": {

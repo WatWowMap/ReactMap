@@ -3,16 +3,14 @@ import { create } from 'zustand'
 
 import { downloadJson } from '@utils/downloadJson'
 
-/**
- * @typedef {{
- *  custom: Record<string, string | number>
- *  existingHuman: Record<string, string | number>
- *  all: boolean
- *  instructions: boolean
- * }} LocalesStore
- * @type {import("zustand").UseBoundStore<import("zustand").StoreApi<LocalesStore>>}
- */
-export const useLocalesStore = create(() => ({
+export type LocalesStore = {
+  custom: Record<string, string | number>
+  existingHuman: Record<string, string | number>
+  all: boolean
+  instructions: boolean
+}
+
+export const useLocalesStore = create<LocalesStore>(() => ({
   custom: {},
   existingHuman: {},
   all: false,

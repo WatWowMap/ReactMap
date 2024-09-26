@@ -1,15 +1,12 @@
-// @ts-check
-import * as React from 'react'
-
 import { toggleDialog, useLayoutStore } from '@store/useLayoutStore'
 import { StandardItem } from '@components/virtual/StandardItem'
 import { Menu } from '@components/Menu'
 import { Header } from '@components/dialogs/Header'
 
 import { DialogWrapper } from '../dialogs/DialogWrapper'
+import { FooterButton } from '@components/dialogs/Footer'
 
-/** @type {import('@components/dialogs/Footer').FooterButton[]} */
-const EXTRA_BUTTONS = [
+const EXTRA_BUTTONS: FooterButton[] = [
   {
     name: 'close',
     action: toggleDialog(false),

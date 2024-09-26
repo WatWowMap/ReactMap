@@ -11,20 +11,6 @@ import { useStorage } from '@store/useStorage'
 import { Timer } from './Timer'
 import { NameTT } from './NameTT'
 
-/**
- *
- * @param {{
- *  expireTime: number
- *  icon?: string | React.ReactNode
- *  size?: number
- *  tt?: string[] | string
- *  expandKey?: string
- *  caption?: string
- *  children?: React.ReactNode
- *  disabled?: string
- * }} param0
- * @returns
- */
 export function TimeTile({
   expireTime,
   icon,
@@ -34,6 +20,15 @@ export function TimeTile({
   caption,
   children,
   disabled = '',
+}: {
+  expireTime: number
+  icon?: string | React.ReactNode
+  size?: number
+  tt?: string[] | string
+  expandKey?: string
+  caption?: string
+  children?: React.ReactNode
+  disabled?: string
 }) {
   const endTime = new Date(expireTime * 1000)
   const expanded = useStorage((s) => !!s.popups[expandKey])

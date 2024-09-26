@@ -1,8 +1,6 @@
-// @ts-check
-
 import { create } from 'zustand'
 
-const UNITS = /** @type {const} */ ([
+const UNITS = [
   { unit: 'year', value: 31536000 },
   { unit: 'month', value: 2592000 },
   { unit: 'week', value: 604800 },
@@ -10,10 +8,9 @@ const UNITS = /** @type {const} */ ([
   { unit: 'hour', value: 3600 },
   { unit: 'minute', value: 60 },
   { unit: 'second', value: 1 },
-])
+] as const
 
-/** @param {string} locale */
-const getFormatters = (locale) => ({
+const getFormatters = (locale: string) => ({
   dateFormat: new Intl.DateTimeFormat(locale, {
     dateStyle: 'medium',
     timeStyle: 'short',
@@ -32,8 +29,7 @@ const getFormatters = (locale) => ({
     sensitivity: 'base',
     ignorePunctuation: true,
   }),
-  /** @param {string} unit */
-  distanceFormat: (unit) =>
+  distanceFormat: (unit: string) =>
     new Intl.NumberFormat(locale, {
       unitDisplay: 'short',
       unit: unit.replace(/s$/, ''),
@@ -42,21 +38,19 @@ const getFormatters = (locale) => ({
     }),
 })
 
-/**
- * @typedef {{
- *  locale: string
- *  dateFormat: Intl.DateTimeFormat
- *  timeFormat: Intl.DateTimeFormat
- *  relativeFormat: Intl.RelativeTimeFormat
- *  numberFormat: Intl.NumberFormat
- *  collator: Intl.Collator
- *  distanceFormat: (unit: string) => Intl.NumberFormat
- *  setLocale: (locale: string) => void
- *  getRelative: (epoch: number) => string
- * }} UseMapStore
- * @type {import("zustand").UseBoundStore<import("zustand").StoreApi<UseMapStore>>}
- */
-export const useFormatStore = create((set, get) => ({
+type UseFormatStore = {
+  locale: string
+  dateFormat: Intl.DateTimeFormat
+  timeFormat: Intl.DateTimeFormat
+  relativeFormat: Intl.RelativeTimeFormat
+  numberFormat: Intl.NumberFormat
+  collator: Intl.Collator
+  distanceFormat: (unit: string) => Intl.NumberFormat
+  setLocale: (locale: string) => void
+  getRelative: (epoch: number) => string
+}
+
+export const useFormatStore = create<UseFormatStore>((set, get) => ({
   locale: window.navigator.language,
   ...getFormatters(window.navigator.language),
   getRelative: (epoch) => {

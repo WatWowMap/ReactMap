@@ -1,43 +1,35 @@
-// @ts-check
 import * as React from 'react'
 import Grid2 from '@mui/material/Unstable_Grid2'
 import { VirtuosoGrid } from 'react-virtuoso'
 
-const STYLE = /** @type {React.CSSProperties} */ ({
+const STYLE: React.CSSProperties = {
   height: '100%',
   width: '100%',
-})
+}
 
-export const SQUARE_ITEM = /** @type {import('@mui/material').SxProps} */ ({
+export const SQUARE_ITEM: import('@mui/material').SxProps = {
   aspectRatio: '1/1',
   outline: 'ButtonText 1px solid',
-})
+}
 
-/** @typedef {Pick<import('@mui/material').Grid2Props, 'xs' | 'sm' | 'md' | 'lg' | 'xl'>} SomeGridProps */
+type SomeGridProps = Pick<
+  import('@mui/material').Grid2Props,
+  'xs' | 'sm' | 'md' | 'lg' | 'xl'
+>
 
-/** @type {React.ComponentType<import('react-virtuoso').GridItemProps & { context?: SomeGridProps }>} */
-const Item = React.forwardRef(({ context, ...props }, ref) => (
+const Item: React.ComponentType<
+  import('react-virtuoso').GridItemProps & { context?: SomeGridProps }
+> = React.forwardRef(({ context, ...props }, ref) => (
   <Grid2 {...context} {...props} ref={ref} />
 ))
 
-/** @type {React.ComponentType<import('react-virtuoso').GridListProps & { context?: SomeGridProps }>} */
-const List = React.forwardRef((props, ref) => (
+const List: React.ComponentType<
+  import('react-virtuoso').GridListProps & { context?: SomeGridProps }
+> = React.forwardRef((props, ref) => (
   <Grid2 {...props} container alignItems="stretch" ref={ref} />
 ))
 
-/**
- * @template T
- * @template {Record<string, any>} U
- * @param {SomeGridProps & {
- *  data: T[],
- *  context?: U,
- *  children: import('react-virtuoso').VirtuosoGridProps<T, U & SomeGridProps>['itemContent'],
- *  Header?: React.ComponentType<U>,
- *  Footer?: React.ComponentType<U>,
- *  useWindowScroll?: boolean
- * }} props
- */
-export function VirtualGrid({
+export function VirtualGrid<T, U extends Record<string, any>>({
   children,
   data,
   context,
@@ -49,6 +41,16 @@ export function VirtualGrid({
   Header,
   Footer,
   useWindowScroll,
+}: SomeGridProps & {
+  data: T[]
+  context?: U
+  children: import('react-virtuoso').VirtuosoGridProps<
+    T,
+    U & SomeGridProps
+  >['itemContent']
+  Header?: React.ComponentType<U>
+  Footer?: React.ComponentType<U>
+  useWindowScroll?: boolean
 }) {
   const fullContext = React.useMemo(
     () => ({ ...context, xs, sm, md, lg, xl }),

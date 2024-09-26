@@ -1,4 +1,3 @@
-// @ts-check
 import * as React from 'react'
 import ExpandMore from '@mui/icons-material/ExpandMore'
 import MoreVert from '@mui/icons-material/MoreVert'
@@ -36,22 +35,17 @@ import { useAnalytics } from '@hooks/useAnalytics'
 import { parseQuestConditions } from '@utils/parseConditions'
 import { Img } from '@components/Img'
 
-/**
- *
- * @param {import('@rm/types').Pokestop & {
- *   hasLure: boolean
- *   hasInvasion: boolean
- *   hasQuest: boolean
- *   hasEvent: boolean
- * }} props
- * @returns
- */
 export function PokestopPopup({
   hasLure,
   hasInvasion,
   hasQuest,
   hasEvent,
   ...pokestop
+}: import('@rm/types').Pokestop & {
+  hasLure: boolean
+  hasInvasion: boolean
+  hasQuest: boolean
+  hasEvent: boolean
 }) {
   const { t } = useTranslation()
   const Icons = useMemory((s) => s.Icons)
@@ -303,12 +297,16 @@ const MenuActions = ({
   lure_id,
   quests,
   invasions,
+}: import('@rm/types').Pokestop & {
+  hasLure: boolean
+  hasInvasion: boolean
+  hasQuest: boolean
 }) => {
   const { t } = useTranslation()
   const masterfile = useMemory((s) => s.masterfile)
   const filters = useStorage((s) => s.filters)
 
-  const [anchorEl, setAnchorEl] = React.useState(false)
+  const [anchorEl, setAnchorEl] = React.useState<HTMLElement | null>(null)
 
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget)
@@ -323,8 +321,7 @@ const MenuActions = ({
     useMemory.setState((prev) => ({ hideList: new Set(prev.hideList).add(id) }))
   }
 
-  /** @param {string} key */
-  const setState = (key) =>
+  const setState = (key: string) =>
     setDeepStore(`filters.pokestops.filter.${key}.enabled`, false)
 
   const excludeLure = () => {
@@ -332,12 +329,12 @@ const MenuActions = ({
     setState(`l${lure_id}`)
   }
 
-  const excludeQuest = (i) => {
+  const excludeQuest = (i: number) => {
     setAnchorEl(null)
     setState(quests[i].key)
   }
 
-  const excludeInvasion = (i) => {
+  const excludeInvasion = (i: number) => {
     setAnchorEl(null)
     setState(`i${invasions[i].grunt_type}`)
   }
@@ -352,7 +349,9 @@ const MenuActions = ({
     })
   }
 
-  const options = [{ name: 'hide', action: handleHide }]
+  const options: { name: string; action: () => void; key?: string }[] = [
+    { name: 'hide', action: handleHide },
+  ]
 
   if (hasQuest) {
     quests.forEach((quest, i) => {
@@ -402,7 +401,7 @@ const MenuActions = ({
         }
         const reference = masterfile.invasions[invasion.grunt_type]
         if (reference) {
-          const encounters = new Set()
+          const encounters = new Set<string>()
           if (
             invasion.slot_1_pokemon_id &&
             reference.firstReward &&
@@ -462,11 +461,7 @@ const MenuActions = ({
       <IconButton aria-haspopup="true" onClick={handleClick} size="large">
         <MoreVert />
       </IconButton>
-      <Dropdown
-        anchorEl={anchorEl}
-        handleClose={handleClose}
-        options={options}
-      />
+      <Dropdown anchorEl={anchorEl} onClose={handleClose} options={options} />
     </Grid>
   )
 }
@@ -476,7 +471,10 @@ const MenuActions = ({
  * @param {Omit<import('@rm/types').Quest, 'key'>} props
  * @returns
  */
-const RewardInfo = ({ with_ar, ...quest }) => {
+const RewardInfo = ({
+  with_ar,
+  ...quest
+}: Omit<import('@rm/types').Quest, 'key'>) => {
   const { t } = useTranslation()
   const { src, amount, tt } = getRewardInfo(quest)
   const questMessage = useMemory((s) => s.config.misc.questMessage)
@@ -523,7 +521,7 @@ const QuestConditions = ({
   quest_target,
   quest_conditions,
   quest_title,
-}) => {
+}: Omit<import('@rm/types').Quest, 'key'>) => {
   const { i18n, t } = useTranslation()
   const madQuestText = useStorage((s) => s.userSettings.pokestops.madQuestText)
 
@@ -645,7 +643,10 @@ const QuestConditions = ({
  * @param {Pick<import('@rm/types').Pokestop, 'lat' | 'lon'>} props
  * @returns
  */
-const Footer = ({ lat, lon }) => {
+const Footer = ({
+  lat,
+  lon,
+}: Pick<import('@rm/types').Pokestop, 'lat' | 'lon'>) => {
   const open = useStorage((s) => !!s.popups.extras)
 
   return (
@@ -675,7 +676,12 @@ const Footer = ({ lat, lon }) => {
  * @param {import('@rm/types').Pokestop} props
  * @returns
  */
-const ExtraInfo = ({ last_modified_timestamp, updated, lat, lon }) => {
+const ExtraInfo = ({
+  last_modified_timestamp,
+  updated,
+  lat,
+  lon,
+}: import('@rm/types').Pokestop) => {
   const open = useStorage((s) => s.popups.extras)
   const enablePokestopPopupCoords = useStorage(
     (s) => s.userSettings.pokestops.enablePokestopPopupCoords,
@@ -701,7 +707,19 @@ const ExtraInfo = ({ last_modified_timestamp, updated, lat, lon }) => {
  * @param {{ id: number, form: number, gender?: number, costumeId?: number, shiny?: boolean}} param0
  * @returns
  */
-const ShadowPokemon = ({ id, form, gender, costumeId, shiny }) => {
+const ShadowPokemon = ({
+  id,
+  form,
+  gender,
+  costumeId,
+  shiny,
+}: {
+  id: number
+  form: number
+  gender?: number
+  costumeId?: number
+  shiny?: boolean
+}) => {
   const Icons = useMemory((s) => s.Icons)
   const src = Icons.getPokemon(id, form, 0, gender, costumeId, 1, shiny)
   return (
@@ -730,7 +748,11 @@ const ENCOUNTER_NUM = { first: '#1', second: '#2', third: '#3' }
  * @param {import('@rm/types').Invasion} props
  * @returns
  */
-const Invasion = ({ grunt_type, confirmed, ...invasion }) => {
+const Invasion = ({
+  grunt_type,
+  confirmed,
+  ...invasion
+}: import('@rm/types').Invasion) => {
   const Icons = useMemory((s) => s.Icons)
   const { t } = useTranslation()
   const info = useMemory((s) => s.masterfile.invasions[grunt_type])
@@ -800,6 +822,11 @@ const Showcase = ({
   total_entries,
   last_update,
   children,
+}: {
+  last_update?: number
+  total_entries?: number
+  showcase_ranking_standard: number
+  children: React.ReactNode
 }) => {
   const { t } = useTranslation()
   return (

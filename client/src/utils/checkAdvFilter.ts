@@ -1,13 +1,4 @@
-// @ts-check
-/* eslint-disable no-plusplus */
-/* eslint-disable no-cond-assign */
-/* eslint-disable default-case */
-
-/**
- * @param {string} filter
- * @param {boolean} [dnf]
- */
-export function checkIVFilterValid(filter, dnf = true) {
+export function checkIVFilterValid(filter: string, dnf: boolean = true) {
   const input = filter.toUpperCase()
   const tokenizer =
     /\s*([()|&!,]|([ADSLXG]?|CP|LC|[GU]L)\s*([0-9]+(?:\.[0-9]*)?)(?:\s*-\s*([0-9]+(?:\.[0-9]*)?))?)/g

@@ -1,5 +1,3 @@
-// @ts-check
-
 export function isLocalStorageEnabled() {
   const test = 'test'
 

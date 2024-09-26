@@ -1,5 +1,3 @@
-// @ts-check
-/* eslint-disable react/destructuring-assignment */
 import * as React from 'react'
 import { Marker, Popup } from 'react-leaflet'
 
@@ -10,12 +8,7 @@ import { deviceMarker } from './deviceMarker'
 import { DevicePath } from './DevicePath'
 import { DevicePopup } from './DevicePopup'
 
-/**
- *
- * @param {import('@rm/types').Device} device
- * @returns
- */
-const BaseDeviceTile = (device) => {
+const BaseDeviceTile = (device: import('@rm/types').Device) => {
   const ts = Math.floor(Date.now() / 1000)
   const [poly, setPoly] = React.useState(false)
   const markerRef = React.useRef(null)

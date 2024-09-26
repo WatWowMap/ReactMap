@@ -1,4 +1,3 @@
-// @ts-check
 import * as React from 'react'
 import { useMap, GeoJSON } from 'react-leaflet'
 import Supercluster from 'supercluster'
@@ -15,13 +14,10 @@ const IGNORE_CLUSTERING = new Set([
   'weather',
 ])
 
-/**
- *
- * @param {import('geojson').Feature<import('geojson').Point>} feature
- * @param {import('leaflet').LatLng} latlng
- * @returns
- */
-function createClusterIcon(feature, latlng) {
+function createClusterIcon(
+  feature: import('geojson').Feature<import('geojson').Point>,
+  latlng: import('leaflet').LatLng,
+) {
   if (!feature.properties.cluster) return null
 
   const count = feature.properties.point_count
@@ -34,17 +30,15 @@ function createClusterIcon(feature, latlng) {
   return marker(latlng, { icon })
 }
 
-/**
- *
- * @param {{
- *  category: keyof import('@rm/types').Config['api']['polling'],
- *  children: React.ReactElement<{ lat: number, lon: number }>[]
- * }} props
- * @returns
- */
-export function Clustering({ category, children }) {
-  /** @type {ReturnType<typeof React.useRef<import('leaflet').GeoJSON>>} */
-  const featureRef = React.useRef(null)
+export function Clustering({
+  category,
+  children,
+}: {
+  category: keyof import('@rm/types').Config['api']['polling']
+  children: React.ReactElement<{ lat: number; lon: number }>[]
+}) {
+  const featureRef: ReturnType<typeof React.useRef<import('leaflet').GeoJSON>> =
+    React.useRef(null)
 
   const map = useMap()
   const userCluster = useStorage(
@@ -66,8 +60,8 @@ export function Clustering({ category, children }) {
         },
   )
   const [markers, setMarkers] = React.useState(new Set())
-  const [superCluster, setSuperCluster] = React.useState(
-    /** @type {InstanceType<typeof Supercluster> | null} */ (null),
+  const [superCluster, setSuperCluster] = React.useState<Supercluster | null>(
+    null,
   )
   const [limitHit, setLimitHit] = React.useState(
     children.length > rules.forcedLimit && !IGNORE_CLUSTERING.has(category),
@@ -98,22 +92,21 @@ export function Clustering({ category, children }) {
 
   React.useEffect(() => {
     if (superCluster) {
-      /** @type {import('geojson').Feature<import('geojson').Point>[]} */
-      const features = children.filter(Boolean).map((reactEl) => ({
-        type: 'Feature',
-        id: reactEl?.key,
-        properties: {},
-        geometry: {
-          type: 'Point',
-          coordinates: [reactEl.props.lon, reactEl.props.lat],
-        },
-      }))
+      const features: import('geojson').Feature<import('geojson').Point>[] =
+        children.filter(Boolean).map((reactEl) => ({
+          type: 'Feature',
+          id: reactEl?.key,
+          properties: {},
+          geometry: {
+            type: 'Point',
+            coordinates: [reactEl.props.lon, reactEl.props.lat],
+          },
+        }))
 
       superCluster.load(features)
 
       const bounds = map.getBounds()
-      /** @type {[number, number, number, number]} */
-      const bbox = [
+      const bbox: [number, number, number, number] = [
         bounds.getWest(),
         bounds.getSouth(),
         bounds.getEast(),
@@ -123,7 +116,7 @@ export function Clustering({ category, children }) {
 
       const rawClusters = superCluster.getClusters(bbox, zoom)
 
-      const newClusters = []
+      const newClusters: typeof rawClusters = []
       const newMarkers = new Set()
       for (let i = 0; i < rawClusters.length; i += 1) {
         const cluster = rawClusters[i]
@@ -133,7 +126,6 @@ export function Clustering({ category, children }) {
           newMarkers.add(cluster.id)
         }
       }
-      // @ts-ignore
       featureRef?.current?.addData(newClusters)
       setMarkers(newMarkers)
     } else {

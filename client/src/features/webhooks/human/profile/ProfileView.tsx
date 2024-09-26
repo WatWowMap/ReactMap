@@ -1,5 +1,3 @@
-// @ts-check
-import * as React from 'react'
 import DeleteForever from '@mui/icons-material/DeleteForever'
 import MoreTimeIcon from '@mui/icons-material/MoreTime'
 import FileCopy from '@mui/icons-material/FileCopy'
@@ -12,8 +10,10 @@ import { useWebhookStore } from '@store/useWebhookStore'
 
 import { ActiveHourChip } from './ActiveHourChip'
 
-/** @param {import('./ProfileTile').Props} props */
-export const ProfileView = ({ uid, handleViewChange }) => {
+export const ProfileView = ({
+  uid,
+  handleViewChange,
+}: import('./ProfileTile').Props) => {
   const isMobile = useMemory((s) => s.isMobile)
   const profile = useWebhookStore((s) => s.profile.find((p) => p.uid === uid))
 
@@ -44,8 +44,10 @@ export const ProfileView = ({ uid, handleViewChange }) => {
   )
 }
 
-/** @param {Omit<import('./ProfileTile').Props, 'uid'> & { profileNo: number }} props */
-const Inputs = ({ profileNo, handleViewChange }) => {
+const Inputs = ({
+  profileNo,
+  handleViewChange,
+}: Omit<import('./ProfileTile').Props, 'uid'> & { profileNo: number }) => {
   const currentProfileNo = useWebhookStore((s) => s.human.current_profile_no)
 
   return (

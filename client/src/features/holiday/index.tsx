@@ -1,6 +1,3 @@
-// @ts-check
-import * as React from 'react'
-
 import { useMemory } from '@store/useMemory'
 
 import { HolidayEffect } from './HolidayEffect'

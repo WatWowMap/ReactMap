@@ -1,4 +1,3 @@
-// @ts-check
 import { ApolloClient, InMemoryCache, createHttpLink } from '@apollo/client'
 
 import { AbortableLink } from './AbortableLink'

@@ -1,4 +1,3 @@
-// @ts-check
 import * as React from 'react'
 import Button from '@mui/material/Button'
 import FormControl from '@mui/material/FormControl'
@@ -19,25 +18,25 @@ export function WebhookMarker() {
   const webhookLocation = useWebhookStore((s) => s.location)
   const webhookMode = useWebhookStore((s) => s.mode)
 
-  const [radius, setRadius] = React.useState(/** @type {number | ''} */ (1000))
+  const [radius, setRadius] = React.useState<number | ''>(1000)
   const [position, setPosition] = React.useState(webhookLocation)
 
-  /** @type {import('react-leaflet').MarkerProps['eventHandlers']} */
-  const eventHandlers = React.useMemo(
-    () => ({
-      dragend({ target }) {
-        if (target) {
-          const { lat, lng } = target.getLatLng()
-          map.flyTo([lat, lng])
-          setPosition([lat, lng])
-        }
-      },
-      add({ target }) {
-        if (target) target.openPopup()
-      },
-    }),
-    [map],
-  )
+  const eventHandlers: import('react-leaflet').MarkerProps['eventHandlers'] =
+    React.useMemo(
+      () => ({
+        dragend({ target }) {
+          if (target) {
+            const { lat, lng } = target.getLatLng()
+            map.flyTo([lat, lng])
+            setPosition([lat, lng])
+          }
+        },
+        add({ target }) {
+          if (target) target.openPopup()
+        },
+      }),
+      [map],
+    )
 
   React.useEffect(() => {
     if (webhookLocation.every((x) => x !== 0)) {

@@ -1,4 +1,3 @@
-// @ts-check
 import * as React from 'react'
 import Done from '@mui/icons-material/Done'
 import Clear from '@mui/icons-material/Clear'
@@ -11,7 +10,7 @@ const ICON = {
   false: <Clear />,
 }
 
-const AreaChip = ({ name }) => {
+const AreaChip = ({ name }: { name: string }) => {
   const selected = useWebhookStore((s) =>
     s.human.area.includes(name.toLowerCase()),
   )
@@ -20,7 +19,7 @@ const AreaChip = ({ name }) => {
       label={name}
       clickable
       variant={selected ? 'filled' : 'outlined'}
-      deleteIcon={ICON[selected]}
+      deleteIcon={ICON[`${selected}`]}
       size="small"
       color={selected ? 'secondary' : 'primary'}
       onClick={handleClick(name)}

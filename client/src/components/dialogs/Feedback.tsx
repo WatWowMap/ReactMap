@@ -1,4 +1,3 @@
-// @ts-check
 import * as React from 'react'
 import Create from '@mui/icons-material/Create'
 import DialogContent from '@mui/material/DialogContent'

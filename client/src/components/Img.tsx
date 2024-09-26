@@ -6,13 +6,15 @@ import { useMemory } from '@store/useMemory'
 import { useTranslateById } from '@hooks/useTranslateById'
 import { NameTT } from './popups/NameTT'
 
-/**
- * @typedef {React.ImgHTMLAttributes<HTMLImageElement>} ImgProps
- * @typedef {Pick<React.CSSProperties, 'maxWidth' | 'minWidth' | 'maxHeight' | 'minHeight' | 'zIndex'> & { sx?: import('@mui/material').SxProps }} ExtraProps
- * @typedef {ImgProps & Partial<ExtraProps>} Props
- */
+export interface ImgProps extends React.ImgHTMLAttributes<HTMLImageElement> {}
 
-/** @type {React.FC<Props>} */
+type ExtraProps = Pick<
+  React.CSSProperties,
+  'maxWidth' | 'minWidth' | 'maxHeight' | 'minHeight' | 'zIndex'
+> & { sx?: import('@mui/material').SxProps }
+
+type Props = ImgProps & Partial<ExtraProps>
+
 export const Img = styled('img', {
   shouldForwardProp: (prop) =>
     prop !== 'maxWidth' &&
@@ -20,59 +22,46 @@ export const Img = styled('img', {
     prop !== 'zIndex' &&
     prop !== 'minHeight' &&
     prop !== 'minWidth',
-})(
-  (
-    /** @type {Props} */ { maxWidth, maxHeight, minHeight, minWidth, zIndex },
-  ) => ({
-    maxWidth,
-    maxHeight,
-    minHeight,
-    minWidth,
-    zIndex,
-  }),
-)
+})<Props>(({ maxWidth, maxHeight, minHeight, minWidth, zIndex }) => ({
+  maxWidth,
+  maxHeight,
+  minHeight,
+  minWidth,
+  zIndex,
+}))
 
 /**
  * A small wrapper around the Img component to display an icon next to text
  *
  * The image defaults to 15x15px
- * @param {import('@mui/material').TypographyProps & {
- *    src: string,
- *    alt?: string,
- *    imgMaxWidth?: number,
- *    imgMaxHeight?: number
- * }} props
- * @returns
  */
-export const TextWithIcon = ({
+export function TextWithIcon({
   children,
   src,
   alt = typeof children === 'string' ? children : src,
   imgMaxHeight = 15,
   imgMaxWidth = 15,
   ...props
-}) => (
-  <Typography variant="caption" className="flex-center" {...props}>
-    {children}
-    &nbsp;
-    <Img src={src} alt={alt} maxHeight={imgMaxHeight} maxWidth={imgMaxWidth} />
-  </Typography>
-)
+}: import('@mui/material').TypographyProps & {
+  src: string
+  alt?: string
+  imgMaxWidth?: number
+  imgMaxHeight?: number
+}) {
+  return (
+    <Typography variant="caption" className="flex-center" {...props}>
+      {children}
+      &nbsp;
+      <Img
+        src={src}
+        alt={alt}
+        maxHeight={imgMaxHeight}
+        maxWidth={imgMaxWidth}
+      />
+    </Typography>
+  )
+}
 
-/**
- *
- * @param {{
- *  id: number,
- *  form?: number,
- *  evolution?: number,
- *  gender?: number,
- *  costume?: number,
- *  alignment?: number,
- *  shiny?: boolean,
- *  bread?: number,
- * } & Omit<Props, 'id'>} props
- * @returns
- */
 export const PokemonImg = ({
   id,
   form = 0,
@@ -83,7 +72,16 @@ export const PokemonImg = ({
   shiny = false,
   bread = 0,
   ...props
-}) => {
+}: {
+  id: number
+  form?: number
+  evolution?: number
+  gender?: number
+  costume?: number
+  alignment?: number
+  shiny?: boolean
+  bread?: number
+} & Omit<Props, 'id'>) => {
   const src = useMemory((s) =>
     s.Icons.getPokemon(
       id,

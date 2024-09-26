@@ -1,4 +1,3 @@
-// @ts-check
 import * as React from 'react'
 import Clear from '@mui/icons-material/Clear'
 import Chip from '@mui/material/Chip'
@@ -15,15 +14,20 @@ const StyledChip = styled(Chip)(({ theme }) => ({
   margin: theme.spacing(0.5),
 }))
 
-StyledChip.defaultProps = /** @type {const} */ ({
+StyledChip.defaultProps = {
   clickable: true,
   deleteIcon: <Clear />,
   size: 'small',
   color: 'secondary',
-})
+}
 
-/** @param {import("@rm/types").PoracleActiveHours & { uid: number }} props */
-export const ActiveHourChip = ({ day, hours, mins, uid, id }) => {
+export const ActiveHourChip = ({
+  day,
+  hours,
+  mins,
+  uid,
+  id,
+}: import('@rm/types').PoracleActiveHours & { uid: number }) => {
   const { t } = useTranslation()
   const [save] = useMutation(SET_PROFILE, {
     refetchQueries: [ALL_PROFILES],

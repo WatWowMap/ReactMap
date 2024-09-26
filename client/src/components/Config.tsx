@@ -45,10 +45,8 @@ export function Config({ children }) {
         })
       }
 
-      /** @type {{ state: import('@store/useStorage').UseStorage}} */
-      const localState = JSON.parse(
-        localStorage.getItem('local-state') || '{ "state": {} }',
-      )
+      const localState: { state: import('@store/useStorage').UseStorage } =
+        JSON.parse(localStorage.getItem('local-state') || '{ "state": {} }')
 
       /**
        * @template T
@@ -56,24 +54,21 @@ export function Config({ children }) {
        * @param {string} category
        * @returns {T}
        */
-      const updatePositionState = (defaults, category) => {
+      function updatePositionState<T>(defaults: T, category: string): T {
         if (localState?.state?.[category]) {
           return localState.state[category]
         }
         return defaults
       }
 
-      const defaultLocation = /** @type {const} */ ([
-        data.map.general.startLat,
-        data.map.general.startLon,
-      ])
-      const location = /** @type {[number, number]} */ (
-        updatePositionState(defaultLocation, 'location').map(
-          (x, i) =>
-            x ||
-            (i === 0 ? data.map.general.startLat : data.map.general.startLon),
-        )
-      )
+      const location = updatePositionState(
+        [data.map.general.startLat, data.map.general.startLon],
+        'location',
+      ).map(
+        (x, i) =>
+          x ||
+          (i === 0 ? data.map.general.startLat : data.map.general.startLon),
+      ) as [number, number]
 
       const zoom = updatePositionState(data.map.general.startZoom, 'zoom')
       const safeZoom =

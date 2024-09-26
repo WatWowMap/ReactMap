@@ -1,4 +1,3 @@
-// @ts-check
 import * as React from 'react'
 import Clear from '@mui/icons-material/Clear'
 import Save from '@mui/icons-material/Save'
@@ -15,8 +14,10 @@ import { useWebhookStore } from '@store/useWebhookStore'
 
 import { handleUpdate } from './handleUpdate'
 
-/** @param {import('./ProfileTile').Props} props */
-export const CopyView = ({ uid, handleViewChange }) => {
+export const CopyView = ({
+  uid,
+  handleViewChange,
+}: import('./ProfileTile').Props) => {
   const [save] = useMutation(SET_PROFILE, {
     refetchQueries: [ALL_PROFILES],
   })

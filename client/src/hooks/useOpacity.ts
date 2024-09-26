@@ -1,16 +1,17 @@
-// @ts-check
 import { useCallback } from 'react'
 
 import { useStorage } from '@store/useStorage'
 
-/**
- * Returns dynamic opacity based on timestamp
- * @template {'pokemon' | 'gyms' | 'pokestops' | 'stations'} T
- * @param {T} category
- * @param {T extends 'pokestops' ? 'invasion' : T extends 'gyms' ? 'raid' : never} [subCategory]
- * @returns
- */
-export function useOpacity(category, subCategory) {
+export function useOpacity<
+  T extends 'pokemon' | 'gyms' | 'pokestops' | 'stations',
+>(
+  category: T,
+  subCategory?: T extends 'pokestops'
+    ? 'invasion'
+    : T extends 'gyms'
+      ? 'raid'
+      : never,
+) {
   const enabled = useStorage(
     (s) =>
       s.userSettings[category]?.[`${subCategory || category}Opacity`] ?? false,
@@ -25,8 +26,7 @@ export function useOpacity(category, subCategory) {
     (s) => s.userSettings[category]?.opacityTenMinutes || 0.75,
   )
 
-  /** @type {(time: number) => number} */
-  const getOpacity = useCallback(
+  const getOpacity: (time: number) => number = useCallback(
     (time) => {
       if (!enabled) return 1
       const now = Math.floor(Date.now() / 1000)

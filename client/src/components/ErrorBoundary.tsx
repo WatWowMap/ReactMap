@@ -14,17 +14,28 @@ import { sendError } from '@services/fetches'
 
 import { Notification } from './Notification'
 
-/** @type {React.CSSProperties} */
-const defaultStyle = {
+const defaultStyle: React.CSSProperties = {
   height: '100vh',
   width: '100vw',
   textAlign: 'center',
 }
 
-// This component uses React Classes due to componentDidCatch() not being available in React Hooks
-// Do not use this as a base for other components
-
-class ErrorCatcher extends React.Component {
+/**
+ * This component uses React Classes due to componentDidCatch() not being available in React Hooks
+ *
+ * Do not use this as a base for other components
+ */
+class ErrorCatcher extends React.Component<
+  {
+    children?: React.ReactNode
+    style?: React.CSSProperties
+    noRefresh?: boolean
+    resettable?: boolean
+    variant?: 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6'
+    t: (key: string) => string
+  },
+  { message: string; errorCount: number; reported: boolean; uuid: string }
+> {
   static uuidv4() {
     return 'xxxxxxxx-r2m4-xxxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
       const r = (Math.random() * 16) | 0

@@ -1,19 +1,16 @@
-// @ts-check
-const OPERATOR =
-  /** @type {Record<string, (a: number, b: number) => boolean>} */ ({
-    '=': (a, b) => a === b,
-    '<': (a, b) => a < b,
-    '<=': (a, b) => a <= b,
-    '>': (a, b) => a > b,
-    '>=': (a, b) => a >= b,
-  })
+const OPERATOR: Record<string, (a: number, b: number) => boolean> = {
+  '=': (a, b) => a === b,
+  '<': (a, b) => a < b,
+  '<=': (a, b) => a <= b,
+  '>': (a, b) => a > b,
+  '>=': (a, b) => a >= b,
+}
 
-/**
- *
- * @param {ReturnType<import('@rm/server/src/ui/clientOptions')['clientOptions']>['clientMenus']['pokemon']['glow']['sub']} glowRules
- * @returns {((pkmn: import('@rm/types').Pokemon) => string | null)[]}
- */
-export function getGlowRules(glowRules) {
+export function getGlowRules(
+  glowRules: ReturnType<
+    (typeof import('@rm/server/src/ui/clientOptions'))['clientOptions']
+  >['clientMenus']['pokemon']['glow']['sub'],
+): ((pkmn: import('@rm/types').Pokemon) => string | null)[] {
   return Object.entries(glowRules)
     .filter(([, value]) => value.op && value.op in OPERATOR)
     .map(([key, { perm, op, num }]) => {

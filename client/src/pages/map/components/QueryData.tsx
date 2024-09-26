@@ -1,4 +1,3 @@
-// @ts-check
 import * as React from 'react'
 import { useQuery } from '@apollo/client'
 import { useMap } from 'react-leaflet'
@@ -18,8 +17,7 @@ import { Clustering } from './Clustering'
 import { TILES } from '../tileObject'
 import { usePermCheck } from '../hooks/usePermCheck'
 
-/** @param {string} category */
-const userSettingsCategory = (category) => {
+const userSettingsCategory = (category: string) => {
   switch (category) {
     case 'devices':
     case 'spawnpoints':
@@ -33,15 +31,12 @@ const userSettingsCategory = (category) => {
   }
 }
 
-/**
- * @template {keyof import('@rm/types').AllFilters} T
- * @param {import('@rm/types').AllFilters[T]} requestedFilters
- * @param {Record<string, any>} userSettings
- * @param {T} category
- * @param {string[]} [onlyAreas]
- * @returns
- */
-const trimFilters = (requestedFilters, userSettings, category, onlyAreas) => {
+function trimFilters<T extends keyof import('@rm/types').AllFilters>(
+  requestedFilters: import('@rm/types').AllFilters[T],
+  userSettings: Record<string, any>,
+  category: T,
+  onlyAreas: string[],
+) {
   const { filters: staticFilters } = useMemory.getState()
   const easyMode = !!requestedFilters?.easyMode
   const trimmed = {
@@ -90,14 +85,24 @@ export function FilterPermCheck({ category }) {
   )
 }
 
-function QueryWrapper({ category }) {
+function QueryWrapper({
+  category,
+}: {
+  category: keyof import('@rm/types').Config['api']['polling']
+}) {
   const timeout = React.useRef(new RobustTimeout(category))
   useAnalytics('Data', `${category} being fetched`, category, true)
 
   return <QueryData category={category} timeout={timeout} />
 }
 
-function QueryData({ category, timeout }) {
+function QueryData({
+  category,
+  timeout,
+}: {
+  category: keyof import('@rm/types').Config['api']['polling']
+  timeout: React.MutableRefObject<RobustTimeout>
+}) {
   const Component = React.useMemo(() => TILES[category], [])
 
   const map = useMap()

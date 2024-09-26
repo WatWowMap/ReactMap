@@ -1,4 +1,3 @@
-// @ts-check
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import Grid2 from '@mui/material/Unstable_Grid2'
@@ -19,7 +18,7 @@ export function UserPermissions() {
 
   return (
     <Grid2 container alignItems="stretch" justifyContent="center" spacing={2}>
-      {Object.keys(perms).map((/** @type {keyof typeof perms} */ perm) => {
+      {Object.keys(perms).map((perm: keyof typeof perms) => {
         if (excludeList.includes(perm) || ALWAYS_EXCLUDED.has(perm)) {
           return null
         }
@@ -43,7 +42,7 @@ export function UserPermissions() {
 }
 
 /** @param {{ children: string | string[] }} props */
-function PermMedia({ children }) {
+function PermMedia({ children }: { children: string | string[] }) {
   return (
     <Box
       flexDirection="column"
@@ -65,8 +64,7 @@ function PermMedia({ children }) {
   )
 }
 
-/** @param {{ perm: keyof import('@rm/types').Permissions }} props */
-function PermCard({ perm }) {
+function PermCard({ perm }: { perm: keyof import('@rm/types').Permissions }) {
   const { t } = useTranslation()
 
   const permImageDir = useMemory((s) => s.config.misc.permImageDir)

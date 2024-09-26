@@ -1,8 +1,7 @@
-// @ts-check
 import { point } from '@turf/helpers'
 import destination from '@turf/destination'
 
-const OPTIONS = /** @type {const} */ ({ units: 'kilometers' })
+const OPTIONS = { units: 'kilometers' } as const
 
 const BEARINGS = {
   1: 30,
@@ -13,15 +12,12 @@ const BEARINGS = {
   6: 330,
 }
 
-/**
- *
- * @param {[number, number]} center
- * @param {number} radius
- * @param {number} spacing
- * @param {import('../hooks/store').UseScanStore['scanZoneSize']} scanZoneSize
- * @returns
- */
-export const getScanZoneCoords = (center, radius, spacing, scanZoneSize) => {
+export const getScanZoneCoords = (
+  center: [number, number],
+  radius: number,
+  spacing: number,
+  scanZoneSize: import('../hooks/store').UseScanStore['scanZoneSize'],
+) => {
   const coords = [center]
   let currentPoint = point([center[1], center[0]])
   const distance = radius * 2 * Math.cos(30 * (Math.PI / 180))

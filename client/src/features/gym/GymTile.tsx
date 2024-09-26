@@ -1,5 +1,3 @@
-/* eslint-disable react/destructuring-assignment */
-// @ts-check
 import * as React from 'react'
 import { Marker, Popup, Circle } from 'react-leaflet'
 import { t } from 'i18next'
@@ -16,8 +14,7 @@ import { getTimeUntil } from '@utils/getTimeUntil'
 import { gymMarker } from './gymMarker'
 import { GymPopup } from './GymPopup'
 
-/** @param {number} team */
-const getColor = (team) => {
+const getColor = (team: number) => {
   switch (team) {
     case 1:
       return '#0030C8'
@@ -30,12 +27,7 @@ const getColor = (team) => {
   }
 }
 
-/**
- *
- * @param {import('@rm/types').Gym} gym
- * @returns
- */
-const BaseGymTile = (gym) => {
+const BaseGymTile = (gym: import('@rm/types').Gym) => {
   const [markerRef, setMarkerRef] = React.useState(null)
   const [stateChange, setStateChange] = React.useState(false)
 

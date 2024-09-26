@@ -1,9 +1,7 @@
-// @ts-check
-
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import TabContext from '@mui/lab/TabContext'
-import TabList from '@mui/lab/TabList'
+import TabList, { TabListProps } from '@mui/lab/TabList'
 import TabPanel from '@mui/lab/TabPanel'
 import Tab from '@mui/material/Tab'
 import Box from '@mui/material/Box'
@@ -33,7 +31,7 @@ export function UserProfile() {
   const [tab, setTab] = React.useState('profile')
   const [tabsHeight, setTabsHeight] = React.useState(0)
 
-  const handleTabChange = (_event, newValue) => {
+  const handleTabChange: TabListProps['onChange'] = (_event, newValue) => {
     setTab(newValue)
   }
 

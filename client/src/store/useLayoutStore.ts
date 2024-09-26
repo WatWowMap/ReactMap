@@ -1,50 +1,46 @@
-// @ts-check
 import { create } from 'zustand'
 
 import { analytics } from '@utils/analytics'
 
 import { useStorage } from './useStorage'
 
-/**
- * @typedef {{
- *  nestSubmissions: {
- *    id: string | number,
- *    name: string,
- *  },
- *  help: {
- *   open: boolean,
- *   category: string,
- *  },
- *  motd: boolean,
- *  donorPage: boolean,
- *  search: boolean,
- *  pkmnFilterHelp: boolean,
- *  userProfile: boolean,
- *  resetFilters: boolean,
- *  feedback: boolean,
- *  drawer: boolean,
- *  advancedFilter: {
- *    open: boolean,
- *    category: import('@rm/types').AdvCategories | '',
- *    id: string,
- *    selectedIds: string[],
- *  },
- *  dialog: {
- *    open: boolean,
- *    category: keyof import('@rm/types').UIObject | 'notifications' | '',
- *    type: 'options' | 'filters' | '',
- *  },
- *  gymBadge: {
- *   open: boolean,
- *   gymId: string,
- *   badge: number,
- *  },
- *  slotSelection: string,
- * }} UseLayoutStore
- *
- * @type {import("zustand").UseBoundStore<import("zustand").StoreApi<UseLayoutStore>>}
- */
-export const useLayoutStore = create(() => ({
+export interface UseLayoutStore {
+  nestSubmissions: {
+    id: string | number
+    name: string
+  }
+  help: {
+    open: boolean
+    category: string
+  }
+  motd: boolean
+  donorPage: boolean
+  search: boolean
+  pkmnFilterHelp: boolean
+  userProfile: boolean
+  resetFilters: boolean
+  feedback: boolean
+  drawer: boolean
+  advancedFilter: {
+    open: boolean
+    category: import('@rm/types').AdvCategories | ''
+    id: string
+    selectedIds: string[]
+  }
+  dialog: {
+    open: boolean
+    category: keyof import('@rm/types').UIObject | 'notifications' | ''
+    type: 'options' | 'filters' | ''
+  }
+  gymBadge: {
+    open: boolean
+    gymId: string
+    badge: number
+  }
+  slotSelection: string
+}
+
+export const useLayoutStore = create<UseLayoutStore>(() => ({
   nestSubmissions: {
     id: '',
     name: '',
@@ -77,41 +73,40 @@ export const useLayoutStore = create(() => ({
   },
 }))
 
-/**
- *
- * @param {boolean} open
- * @param {UseLayoutStore['dialog']['category']} [category]
- * @param {UseLayoutStore['dialog']['type']} [type]
- * @param {import('@rm/types').BaseFilter | import('@rm/types').PokemonFilter} [filter]
- * @returns {() => void}
- */
-export const toggleDialog = (open, category, type, filter) => () => {
-  analytics(
-    'Menu Toggle',
-    `Open: ${open}`,
-    `Category: ${category} Menu: ${type}`,
-  )
-  useLayoutStore.setState((prev) => ({
-    dialog: {
-      open,
-      category: category || prev.dialog.category,
-      type: type || prev.dialog.type,
-    },
-  }))
-  if (filter && type === 'filters') {
-    useStorage.setState((prev) => ({
-      filters: {
-        ...prev.filters,
-        [category]: { ...prev.filters[category], filter },
+export const toggleDialog =
+  (
+    open: boolean,
+    category?: UseLayoutStore['dialog']['category'],
+    type?: UseLayoutStore['dialog']['type'],
+    filter?: import('@rm/types').BaseFilter | import('@rm/types').PokemonFilter,
+  ): (() => void) =>
+  () => {
+    analytics(
+      'Menu Toggle',
+      `Open: ${open}`,
+      `Category: ${category} Menu: ${type}`,
+    )
+    useLayoutStore.setState((prev) => ({
+      dialog: {
+        open,
+        category: category || prev.dialog.category,
+        type: type || prev.dialog.type,
       },
     }))
+    if (filter && type === 'filters') {
+      useStorage.setState((prev) => ({
+        filters: {
+          ...prev.filters,
+          [category]: { ...prev.filters[category], filter },
+        },
+      }))
+    }
+    if (filter && type === 'options') {
+      useStorage.setState((prev) => ({
+        userSettings: {
+          ...prev.userSettings,
+          [category]: filter,
+        },
+      }))
+    }
   }
-  if (filter && type === 'options') {
-    useStorage.setState((prev) => ({
-      userSettings: {
-        ...prev.userSettings,
-        [category]: filter,
-      },
-    }))
-  }
-}

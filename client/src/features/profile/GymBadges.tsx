@@ -1,4 +1,3 @@
-// @ts-check
 import * as React from 'react'
 import Grid from '@mui/material/Unstable_Grid2'
 import Box from '@mui/material/Box'
@@ -19,10 +18,12 @@ import { ToggleTypography } from '@components/ToggleTypography'
 
 export function UserGymBadges() {
   const { t } = useTranslation()
-  /** @type {import('@apollo/client').QueryResult<{ badges: import('@rm/types').Gym[] }>} */
-  const { data } = useQuery(Query.gyms('badges'), {
-    fetchPolicy: 'network-only',
-  })
+  const { data } = useQuery<{ badges: import('@rm/types').Gym[] }>(
+    Query.gyms('badges'),
+    {
+      fetchPolicy: 'network-only',
+    },
+  )
 
   const counts = React.useMemo(() => {
     const counter = { basic: 0, bronze: 0, silver: 0, gold: 0 }
@@ -74,8 +75,7 @@ export function UserGymBadges() {
   ) : null
 }
 
-/** @param {import('@rm/types').Gym} props */
-function BadgeTile({ badge, ...gym }) {
+function BadgeTile({ badge, ...gym }: import('@rm/types').Gym) {
   const { t } = useTranslation()
   const map = useMap()
   const badgeIcon = useMemory((s) => s.Icons.getMisc(`badge_${badge - 1}`))

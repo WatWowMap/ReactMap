@@ -4,13 +4,15 @@ import Grid from '@mui/material/Unstable_Grid2'
 
 import { Generator } from './Generator'
 import { getGridSizes } from '../utils'
+import type { CustomComponent } from '@rm/types'
 
-/**
- *
- * @param {{ block: object, defaultReturn?: React.ReactNode | null }} props
- * @returns
- */
-export function CustomTile({ block, defaultReturn }) {
+export function CustomTile({
+  block,
+  defaultReturn,
+}: {
+  block: CustomComponent
+  defaultReturn?: React.ReactNode
+}) {
   return block.type === 'parent' ? (
     <Generator block={block} defaultReturn={defaultReturn} />
   ) : (

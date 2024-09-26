@@ -27,20 +27,31 @@ import { BoolToggle } from '@components/inputs/BoolToggle'
 import { GenericSearchMemo } from '@components/inputs/GenericSearch'
 import { StandardItem } from '@components/virtual/StandardItem'
 
-/**
- * @template {keyof import('@rm/types').Available} T
- * @typedef {{
- *  category: T,
- *  subCategory?: T extends 'gyms' ? 'raids' | 'pokemon' : T extends 'pokestops' ? 'lures' | 'invasions' | 'quests' | 'showcase' | 'rocketPokemon' | 'pokemon' : never
- *  itemsPerRow?: number,
- *  children?: React.ReactNode,
- *  label?: string
- *  height?: React.CSSProperties['height'],
- * }} SelectorListProps
- * @param {SelectorListProps<keyof import('@rm/types').Available>} props
- * @returns
- */
-function SelectorList({ category, subCategory, label, height = 400 }) {
+type SelectorListProps<T extends keyof import('@rm/types').Available> = {
+  category: T
+  subCategory?: T extends 'gyms'
+    ? 'raids' | 'pokemon'
+    : T extends 'pokestops'
+      ?
+          | 'lures'
+          | 'invasions'
+          | 'quests'
+          | 'showcase'
+          | 'rocketPokemon'
+          | 'pokemon'
+      : never
+  itemsPerRow?: number
+  children?: React.ReactNode
+  label?: string
+  height?: React.CSSProperties['height']
+}
+
+function SelectorList({
+  category,
+  subCategory,
+  label,
+  height = 400,
+}: SelectorListProps<keyof import('@rm/types').Available>) {
   const searchKey = `${category}${
     subCategory ? capitalize(subCategory) : ''
   }QuickSelect`
@@ -108,8 +119,7 @@ function SelectorList({ category, subCategory, label, height = 400 }) {
       .map((item) => item.id)
   }, [translated, search])
 
-  /** @param {'enable' | 'disable' | 'advanced'} action */
-  const setAll = (action) => {
+  const setAll = (action: 'enable' | 'disable' | 'advanced') => {
     const keys = new Set(items.map((item) => item))
     useStorage.setState((prev) => ({
       filters: {
@@ -205,16 +215,18 @@ export const SelectorListMemo = React.memo(
     prev.height === next.height,
 )
 
-/** @param {{ children: React.ReactElement[], tabKey: string }} props */
-export function MultiSelectorList({ children, tabKey }) {
+export function MultiSelectorList({
+  children,
+  tabKey,
+}: {
+  children: React.ReactElement[]
+  tabKey: string
+}) {
   const { t } = useTranslation()
   const [openTab, setOpenTab] = useDeepStore(`tabs.${tabKey}`, 0)
 
-  /** @type {import('@mui/material').TabsProps['onChange']} */
-  const handleTabChange = React.useCallback(
-    (_e, newValue) => setOpenTab(newValue),
-    [],
-  )
+  const handleTabChange: import('@mui/material').TabsProps['onChange'] =
+    React.useCallback((_e, newValue) => setOpenTab(newValue), [])
 
   return (
     <Box pt={2}>

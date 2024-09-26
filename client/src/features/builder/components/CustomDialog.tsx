@@ -1,4 +1,3 @@
-// @ts-check
 import * as React from 'react'
 import Grid from '@mui/material/Unstable_Grid2'
 import DialogContent from '@mui/material/DialogContent'
@@ -8,17 +7,25 @@ import { Header } from '@components/dialogs/Header'
 import { Footer } from '@components/dialogs/Footer'
 
 import { getBlockContent } from '../utils'
+import { Config } from '@rm/types'
 
 export function CustomDialog({
   configObj,
   defaultTitle,
   handleClose,
   children,
+}: {
+  configObj: Config['map']['messageOfTheDay'] | Config['map']['donationPage']
+  defaultTitle: string
+  handleClose: () => void
+  children: React.ReactNode
 }) {
   const { t, i18n } = useTranslation()
   const [countdown, setCountdown] = React.useState(
     Math.floor(
-      typeof configObj.settings?.timeoutSeconds === 'number'
+      configObj.settings &&
+        'timeoutSeconds' in configObj.settings &&
+        typeof configObj.settings?.timeoutSeconds === 'number'
         ? configObj.settings?.timeoutSeconds
         : 0,
     ),

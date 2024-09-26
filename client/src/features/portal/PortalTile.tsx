@@ -1,5 +1,3 @@
-/* eslint-disable react/destructuring-assignment */
-// @ts-check
 import * as React from 'react'
 import { Circle, Popup } from 'react-leaflet'
 
@@ -8,12 +6,9 @@ import { useForcePopup } from '@hooks/useForcePopup'
 
 import { PortalPopup } from './PortalPopup'
 
-/**
- *
- * @param {{ force?: boolean } & import('@rm/types').Portal} portal
- * @returns
- */
-const BasePortalTile = (portal) => {
+const BasePortalTile = (
+  portal: { force?: boolean } & import('@rm/types').Portal,
+) => {
   const [markerRef, setMarkerRef] = React.useState(null)
   const color = useStorage((s) =>
     Date.now() / 1000 - portal.imported > 86400

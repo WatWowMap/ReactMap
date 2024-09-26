@@ -1,5 +1,3 @@
-// @ts-check
-/* eslint-disable class-methods-use-this */
 import { ApolloLink } from '@apollo/client'
 
 /**
@@ -7,12 +5,12 @@ import { ApolloLink } from '@apollo/client'
  * @see AbortableContext
  */
 export class AbortableLink extends ApolloLink {
-  /**
-   * @param {import("@apollo/client").Operation} operation
-   * @param {import("@apollo/client").NextLink} [forward]
-   * @returns {import("@apollo/client").Observable<import("@apollo/client").FetchResult> | null}
-   */
-  request(operation, forward) {
+  request(
+    operation: import('@apollo/client').Operation,
+    forward: import('@apollo/client').NextLink,
+  ):
+    | import('@apollo/client').Observable<import('@apollo/client').FetchResult>
+    | null {
     const context = operation.getContext()
     return context.abortableContext
       ? context.abortableContext.handle(operation, forward)

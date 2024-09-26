@@ -2,8 +2,7 @@
 import { divIcon } from 'leaflet'
 import { useMemory } from '@store/useMemory'
 
-/** @param {number} raidLevel */
-const getBadgeColor = (raidLevel) => {
+const getBadgeColor = (raidLevel: number) => {
   switch (raidLevel) {
     case 1:
     case 2:
@@ -20,21 +19,6 @@ const getBadgeColor = (raidLevel) => {
   }
 }
 
-/**
- *
- * @param {{
- *  gymIconUrl: string,
- *  gymIconSize: number,
- *  raidIconUrl: string,
- *  raidIconSize: number,
- *  showDiamond: boolean,
- *  showExBadge: boolean,
- *  showArBadge: boolean,
- *  showRaidLevel: boolean,
- *  opacity: number,
- * } & import('@rm/types').Gym} params
- * @returns
- */
 export function gymMarker({
   gymIconUrl,
   gymIconSize,
@@ -50,7 +34,17 @@ export function gymMarker({
   raid_level,
   badge,
   ...gym
-}) {
+}: {
+  gymIconUrl: string
+  gymIconSize: number
+  raidIconUrl: string
+  raidIconSize: number
+  showDiamond: boolean
+  showExBadge: boolean
+  showArBadge: boolean
+  showRaidLevel: boolean
+  opacity: number
+} & import('@rm/types').Gym) {
   const { Icons } = useMemory.getState()
   const [gymMod, raidMod] = Icons.getModifiers('gym', 'raid')
 

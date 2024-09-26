@@ -1,6 +1,6 @@
 import { useQuery } from '@apollo/client'
-import { HttpMethod } from './general'
-import { Split } from './utility'
+import type { Split } from './utility'
+import type { HttpMethod } from './general'
 
 export interface PoracleHuman<Parsed extends boolean = true> {
   id: string
@@ -51,7 +51,6 @@ export interface PoracleGym {
   team: number
   slot_changes: number
   gym_id: string
-  description: string
   description?: string
 }
 
@@ -273,18 +272,15 @@ export interface PoracleAPIRef {
   tracking: <Suffix extends string = ''>(
     userId: number,
     category: PoracleCategory,
-    suffix?: Suffix = '' as const,
+    suffix?: Suffix,
   ) => `/api/tracking/${typeof category}/${number}${Suffix extends ''
     ? ''
     : `/${Suffix}`}}`
   profiles: (userId: number) => `/api/profiles/${number}`
-  profileAction: <
-    Action extends PoracleAction = '',
-    Suffix extends string = '',
-  >(
+  profileAction: <Action extends PoracleAction, Suffix extends string = ''>(
     userId: number,
-    action?: Action = '' as const,
-    suffix?: Suffix = '' as const,
+    action?: Action,
+    suffix?: Suffix,
   ) => `/api/profiles/${number}/${Action extends ''
     ? ''
     : `/${Action}`}${Suffix extends '' ? '' : `/${Suffix}`}`
@@ -306,7 +302,8 @@ export type PoracleClientContext = Omit<
   ui: PoracleUI
 }
 
-interface APIReturnType {
+export interface APIReturnType {
+  human: PoracleHuman
   humans: PoracleHuman
   oneHuman: PoracleHuman
   switchProfile: PoracleHuman

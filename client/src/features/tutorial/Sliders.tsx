@@ -1,6 +1,4 @@
-// @ts-check
-
-import React, { useState } from 'react'
+import * as React from 'react'
 import DialogContent from '@mui/material/DialogContent'
 import Typography from '@mui/material/Typography'
 import Grid from '@mui/material/Unstable_Grid2'
@@ -10,6 +8,7 @@ import { useTranslation, Trans } from 'react-i18next'
 import { SliderTile } from '@components/inputs/SliderTile'
 
 import { tutorialData } from './data'
+import { RMSliderHandleChange } from '@rm/types'
 
 const relevant = ['iv', 'level', 'great', 'ultra']
 const { ivOr } = tutorialData.filters.pokemon
@@ -17,23 +16,21 @@ const { ivOr } = tutorialData.filters.pokemon
 export function TutorialSliders() {
   const { t } = useTranslation()
 
-  const [temp, setTemp] = useState({ ...ivOr, iv: [80, 100], great: [1, 10] })
+  const [temp, setTemp] = React.useState({
+    ...ivOr,
+    iv: [80, 100],
+    great: [1, 10],
+  })
 
-  const handleChange = (event, values) => {
+  const handleChange: RMSliderHandleChange = (event, values) => {
     if (values) {
       setTemp({
         ...temp,
         [event]: values,
       })
-    } else {
-      const { name, value } = event.target
-      setTemp({
-        ...temp,
-        [name]: value,
-      })
     }
   }
-  const fullCheck = {}
+  const fullCheck: Record<string, boolean> = {}
   const slidersToUse = tutorialData.sliders.filter((slider) =>
     relevant.includes(slider.name),
   )

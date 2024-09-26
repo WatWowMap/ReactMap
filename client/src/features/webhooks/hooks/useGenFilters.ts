@@ -1,4 +1,6 @@
-// @ts-check
+// @ts-nocheck
+// TODO
+
 import { useMemo } from 'react'
 import { useMemory } from '@store/useMemory'
 

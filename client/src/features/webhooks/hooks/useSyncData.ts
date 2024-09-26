@@ -1,14 +1,12 @@
-// @ts-check
 import { useEffect } from 'react'
 import { useQuery } from '@apollo/client'
 
 import { ALL_PROFILES } from '@services/queries/webhook'
 import { useWebhookStore } from '@store/useWebhookStore'
 
-/**
- * @template {import('@store/useWebhookStore').WebhookStore['category']} T
- * @param {T} category */
-export function useSyncData(category) {
+export function useSyncData<
+  T extends import('@store/useWebhookStore').WebhookStore['category'],
+>(category: T) {
   const cached = useWebhookStore((s) => s[category])
 
   const { data, loading } = useQuery(ALL_PROFILES, {

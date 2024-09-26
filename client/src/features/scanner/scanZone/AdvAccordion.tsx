@@ -1,5 +1,3 @@
-// @ts-check
-import * as React from 'react'
 import ExpandMore from '@mui/icons-material/ExpandMore'
 import Accordion from '@mui/material/Accordion'
 import AccordionSummary from '@mui/material/AccordionSummary'
@@ -34,8 +32,7 @@ const StyledAccordionSummary = styled(AccordionSummary)((/* { theme } */) => ({
   },
 }))
 
-/** @param {{ children: React.ReactNode }} props */
-export function AdvAccordion({ children }) {
+export function AdvAccordion({ children }: { children: React.ReactNode }) {
   const { t } = useTranslation()
   return (
     <StyledAccordion>

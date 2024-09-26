@@ -1,5 +1,3 @@
-// @ts-check
-import * as React from 'react'
 import Grid from '@mui/material/Unstable_Grid2'
 import Fab from '@mui/material/Fab'
 import Slide from '@mui/material/Slide'

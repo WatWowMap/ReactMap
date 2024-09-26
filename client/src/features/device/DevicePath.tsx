@@ -1,16 +1,13 @@
-// @ts-check
-/* eslint-disable react/no-array-index-key */
 import * as React from 'react'
 import { Polyline, Polygon, Circle } from 'react-leaflet'
 
 import { useStorage } from '@store/useStorage'
 
-/**
- *
- * @param {import('@rm/types').Device} props
- * @returns
- */
-const BaseDevicePath = ({ route, type, radius }) => {
+const BaseDevicePath = ({
+  route,
+  type,
+  radius,
+}: import('@rm/types').Device) => {
   const color = useStorage((s) => s.userSettings.admin.devicePathColor)
 
   const safeRoute = React.useMemo(() => {

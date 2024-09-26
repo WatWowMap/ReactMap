@@ -1,11 +1,10 @@
-// @ts-check
 import * as React from 'react'
 
 import { NestSlider } from './AvgSlider'
 import { NestQuickSelect } from './NestSelector'
 import { ActiveNests } from './ActiveNests'
 
-function BaseNestDrawer({ subItem }) {
+function BaseNestDrawer({ subItem }: { subItem: string }) {
   switch (subItem) {
     case 'sliders':
       return <NestSlider />

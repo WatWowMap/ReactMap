@@ -1,13 +1,7 @@
-// @ts-check
-
 import { divIcon } from 'leaflet'
 import { useMemory } from '@store/useMemory'
 
-/**
- *
- * @param {string} iconUrl
- */
-export function weatherMarker(iconUrl) {
+export function weatherMarker(iconUrl: string) {
   const [
     {
       offsetX,

@@ -1,5 +1,3 @@
-// @ts-check
-import * as React from 'react'
 import Clear from '@mui/icons-material/Clear'
 import Save from '@mui/icons-material/Save'
 import Typography from '@mui/material/Typography'
@@ -13,8 +11,10 @@ import { useWebhookStore } from '@store/useWebhookStore'
 
 import { handleUpdate } from './handleUpdate'
 
-/** @param {import('./ProfileTile').Props} props */
-export const DeleteView = ({ handleViewChange, uid }) => {
+export const DeleteView = ({
+  handleViewChange,
+  uid,
+}: import('./ProfileTile').Props) => {
   const { t } = useTranslation()
   const [save] = useMutation(SET_PROFILE, {
     refetchQueries: [ALL_PROFILES],

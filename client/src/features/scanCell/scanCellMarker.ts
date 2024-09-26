@@ -1,10 +1,4 @@
-// @ts-check
-
-/**
- * @param {number} ago
- * @returns {L.PathOptions}
- */
-export function scanCellMarker(ago) {
+export function scanCellMarker(ago: number): L.PathOptions {
   const value = ago <= 1050 ? 0 : Math.min((ago - 1050) / 750, 1)
   const hue = ((1 - value) * 120).toString(10)
   return {

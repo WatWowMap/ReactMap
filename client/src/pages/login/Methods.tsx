@@ -1,5 +1,3 @@
-// @ts-check
-import * as React from 'react'
 import Grid from '@mui/material/Unstable_Grid2'
 import { useTranslation } from 'react-i18next'
 
@@ -22,14 +20,14 @@ function Discord() {
       xs={12}
     >
       <Grid
-        xs={discordInvite ? t('login_button') : 10}
+        xs={discordInvite ? +t('login_button') : 10}
         sm={discordInvite ? 6 : 10}
         textAlign="center"
       >
         <DiscordButton href={discordAuthUrl} bgcolor="success.dark" />
       </Grid>
       {discordInvite && (
-        <Grid xs={t('join_button')} sm={6} textAlign="center">
+        <Grid xs={+t('join_button')} sm={6} textAlign="center">
           <DiscordButton href={discordInvite}>join</DiscordButton>
         </Grid>
       )}

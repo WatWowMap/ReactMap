@@ -1,4 +1,3 @@
-// @ts-check
 import * as React from 'react'
 import MenuItem from '@mui/material/MenuItem'
 import { useTranslation } from 'react-i18next'
@@ -13,17 +12,15 @@ const S2Cells = () => {
   const { t } = useTranslation()
   const enabled = useStorage((s) => !!s.filters.s2cells.enabled)
   const [filters, setFilters] = useDeepStore('filters.s2cells.cells')
-  const safe = /** @type {number[]} */ (
-    React.useMemo(
-      () =>
-        Array.isArray(filters)
-          ? filters
-          : typeof filters === 'string'
-            ? // @ts-ignore
-              filters.split(',').map((v) => +v)
-            : [],
-      [filters],
-    )
+  const safe: number[] = React.useMemo(
+    () =>
+      Array.isArray(filters)
+        ? filters
+        : typeof filters === 'string'
+          ? // @ts-ignore
+            filters.split(',').map((v) => +v)
+          : [],
+    [filters],
   )
   return (
     <CollapsibleItem open={enabled}>

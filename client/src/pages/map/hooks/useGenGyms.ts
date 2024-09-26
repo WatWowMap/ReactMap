@@ -1,4 +1,3 @@
-// @ts-check
 import { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 
@@ -10,8 +9,9 @@ export function useGenGyms() {
   const categories = useMemory((s) => s.menus.gyms.categories)
 
   useEffect(() => {
-    /** @type {import('@rm/types').ClientFilterObj} */
-    const tempObj = Object.fromEntries(categories.map((x) => [x, {}]))
+    const tempObj: import('@rm/types').ClientFilterObj = Object.fromEntries(
+      categories.map((x) => [x, {}]),
+    )
     if (!gyms?.filter) return
 
     if (tempObj.eggs) {

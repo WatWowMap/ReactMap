@@ -1,4 +1,3 @@
-// @ts-check
 import { useMapStore } from '@store/useMapStore'
 
 export function getQueryArgs() {

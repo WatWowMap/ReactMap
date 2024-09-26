@@ -1,17 +1,16 @@
-// @ts-check
-import * as React from 'react'
 import Grid from '@mui/material/Unstable_Grid2'
 import { useTranslation } from 'react-i18next'
 
 import { Timer } from './Timer'
 import { ExtraInfo } from './ExtraInfo'
 
-/**
- *
- * @param {{ time?: number, children: string }} props
- * @returns
- */
-export const TimeStamp = ({ time, children }) => {
+export function TimeStamp({
+  time,
+  children,
+}: {
+  time?: number
+  children: string
+}) {
   const { i18n } = useTranslation()
 
   if (!time) return null

@@ -1,7 +1,17 @@
-import { FullModel } from './utility'
-import type { Models } from '@rm/server/src/models'
+import type { Device as DeviceModel } from '@rm/server/src/models/Device'
+import type { Gym as GymModel } from '@rm/server/src/models/Gym'
+import type { Nest as NestModel } from '@rm/server/src/models/Nest'
+import type { Pokestop as PokestopModel } from '@rm/server/src/models/Pokestop'
+import type { Pokemon as PokemonModel } from '@rm/server/src/models/Pokemon'
+import type { Portal as PortalModel } from '@rm/server/src/models/Portal'
+import type { ScanCell as ScanCellModel } from '@rm/server/src/models/ScanCell'
+import type { Spawnpoint as SpawnpointModel } from '@rm/server/src/models/Spawnpoint'
+import type { Weather as WeatherModel } from '@rm/server/src/models/Weather'
+import type { Route as RouteModel } from '@rm/server/src/models/Route'
+import type { Station as StationModel } from '@rm/server/src/models/Station'
 
-import { S2Polygon } from './general'
+import type { S2Polygon } from './general'
+import type { FullModel } from './utility'
 
 export type Gender = 0 | 1 | 2 | 3
 
@@ -17,7 +27,7 @@ export interface Device {
   radius: number
 }
 
-export type FullDevice = FullModel<Device, Models['Device']>
+export type FullDevice = FullModel<Device, DeviceModel>
 
 export interface PokemonDisplay {
   form: number
@@ -72,7 +82,7 @@ export interface Gym {
   enabled: boolean
 }
 
-export type FullGym = FullModel<Gym, Models['Gym']>
+export type FullGym = FullModel<Gym, GymModel>
 
 export interface Nest {
   id: number
@@ -91,7 +101,7 @@ export interface Nest {
   submitted_by: string
 }
 
-export type FullNest = FullModel<Nest, Models['Nest']>
+export type FullNest = FullModel<Nest, NestModel>
 
 export interface Quest {
   quest_type: number
@@ -184,7 +194,7 @@ export interface Pokestop {
   hasShowcase: boolean
 }
 
-export type FullPokestop = FullModel<Pokestop, Models['Pokestop']>
+export type FullPokestop = FullModel<Pokestop, PokestopModel>
 
 export type CleanPvp = Record<string, import('ohbem').PvPRankEntry[]>
 
@@ -222,6 +232,7 @@ export interface Pokemon {
   expire_timestamp: number
   first_seen_timestamp: number
   expire_timestamp_verified: boolean
+  inactive_stats?: number
   updated: number
   pvp: CleanPvp
   pvp_rankings_great_league?: import('ohbem').PvPRankEntry[]
@@ -230,7 +241,7 @@ export interface Pokemon {
   shiny?: boolean
 }
 
-export type FullPokemon = FullModel<Pokemon, Models['Pokemon']>
+export type FullPokemon = FullModel<Pokemon, PokemonModel>
 
 export interface Portal {
   id: string
@@ -243,7 +254,7 @@ export interface Portal {
   updated: number
 }
 
-export type FullPortal = FullModel<Portal, Models['Portal']>
+export type FullPortal = FullModel<Portal, PortalModel>
 
 export interface ScanCell {
   id?: string
@@ -254,7 +265,7 @@ export interface ScanCell {
   polygon?: S2Polygon
 }
 
-export type FullScanCell = FullModel<ScanCell, Models['ScanCell']>
+export type FullScanCell = FullModel<ScanCell, ScanCellModel>
 
 export interface Spawnpoint {
   id: string
@@ -264,7 +275,7 @@ export interface Spawnpoint {
   despawn_sec: number
 }
 
-export type FullSpawnpoint = FullModel<Spawnpoint, Models['Spawnpoint']>
+export type FullSpawnpoint = FullModel<Spawnpoint, SpawnpointModel>
 
 export interface Weather {
   id: string
@@ -285,7 +296,7 @@ export interface Weather {
   polygon: S2Polygon
 }
 
-export type FullWeather = FullModel<Weather, Models['Weather']>
+export type FullWeather = FullModel<Weather, WeatherModel>
 
 export interface ScannerApi {
   status: string
@@ -322,7 +333,7 @@ export interface Route {
   waypoints: Waypoint[]
 }
 
-export type FullRoute = FullModel<Route, Models['Route']>
+export type FullRoute = FullModel<Route, RouteModel>
 
 export interface StationPokemon {
   pokemon_id: number
@@ -364,4 +375,4 @@ export interface Station<Parsed extends boolean = false> {
   updated: number
 }
 
-export type FullStation = FullModel<Station, Models['Station']>
+export type FullStation = FullModel<Station, StationModel>

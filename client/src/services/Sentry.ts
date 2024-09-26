@@ -1,4 +1,3 @@
-// @ts-check
 import { init, BrowserTracing } from '@sentry/react'
 
 if (CONFIG.sentry.client.enabled) {

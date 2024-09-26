@@ -1,4 +1,3 @@
-// @ts-check
 import * as React from 'react'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import Typography from '@mui/material/Typography'
@@ -12,29 +11,28 @@ const expandIcon = <ExpandMoreIcon />
 
 /**
  * A basic accordion component that already has the expand icon and state management
- * @param {{
- *  stateKey?: string
- *  title: string
- *  children: React.ReactNode
- * } & import('@mui/material').AccordionDetailsProps} props
- * @returns
  */
 export function BasicAccordion({
   title,
   stateKey = title,
   children,
   ...props
-}) {
+}: {
+  stateKey?: string
+  title: string
+  children: React.ReactNode
+} & import('@mui/material').AccordionDetailsProps) {
   const expanded = useStorage((s) => !!s.expanded[stateKey])
 
   /** @type {(e: unknown, isExpanded: boolean )=> void} */
-  const handleChange = React.useCallback(
-    (_, isExpanded) =>
-      useStorage.setState((prev) => ({
-        expanded: { ...prev.expanded, [stateKey]: isExpanded },
-      })),
-    [stateKey],
-  )
+  const handleChange: (e: unknown, isExpanded: boolean) => void =
+    React.useCallback(
+      (_, isExpanded) =>
+        useStorage.setState((prev) => ({
+          expanded: { ...prev.expanded, [stateKey]: isExpanded },
+        })),
+      [stateKey],
+    )
   return (
     <Accordion expanded={expanded} onChange={handleChange}>
       <AccordionSummary expandIcon={expandIcon}>

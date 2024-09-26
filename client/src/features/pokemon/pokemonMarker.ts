@@ -1,15 +1,14 @@
-// @ts-check
-
 import { Icon, divIcon } from 'leaflet'
 
 import { useMemory } from '@store/useMemory'
 
-/**
- *
- * @param {{ iconUrl: string, iconSize: number }} props
- * @returns
- */
-export const basicPokemonMarker = ({ iconUrl, iconSize }) =>
+export const basicPokemonMarker = ({
+  iconUrl,
+  iconSize,
+}: {
+  iconUrl: string
+  iconSize: number
+}) =>
   new Icon({
     iconUrl,
     iconSize: [iconSize, iconSize],
@@ -18,18 +17,17 @@ export const basicPokemonMarker = ({ iconUrl, iconSize }) =>
     className: 'marker',
   })
 
-/**
- * @typedef {Object} FancyPokemonMarkerProps
- * @property {import('@rm/types').Pokemon} pkmn
- * @property {string} iconUrl
- * @property {number} iconSize
- * @property {string} showGlow
- * @property {boolean} showWeather
- * @property {string} badge
- * @property {number} opacity
- * @property {import('@rm/types').TimesOfDay} timeOfDay
- * @param {FancyPokemonMarkerProps} props
- */
+interface FancyPokemonMarkerProps {
+  pkmn: import('@rm/types').Pokemon
+  iconUrl: string
+  iconSize: number
+  showGlow: string
+  showWeather: boolean
+  badge: string
+  opacity: number
+  timeOfDay: import('@rm/types').TimesOfDay
+}
+
 export const fancyPokemonMarker = ({
   pkmn,
   iconUrl,
@@ -39,7 +37,7 @@ export const fancyPokemonMarker = ({
   badge,
   opacity,
   timeOfDay,
-}) => {
+}: FancyPokemonMarkerProps) => {
   const { Icons } = useMemory.getState()
   const [pokemonMod, weatherMod] = Icons.getModifiers('pokemon', 'weather')
 

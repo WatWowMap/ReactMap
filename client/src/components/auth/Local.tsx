@@ -1,14 +1,12 @@
-// @ts-check
-
 import * as React from 'react'
 import Grid from '@mui/material/Unstable_Grid2'
 import Box from '@mui/material/Box'
 import Typography from '@mui/material/Typography'
-import Button from '@mui/material/Button'
+import Button, { ButtonProps } from '@mui/material/Button'
 import Collapse from '@mui/material/Collapse'
 import FormControl from '@mui/material/FormControl'
 import InputLabel from '@mui/material/InputLabel'
-import OutlinedInput from '@mui/material/OutlinedInput'
+import OutlinedInput, { OutlinedInputProps } from '@mui/material/OutlinedInput'
 import InputAdornment from '@mui/material/InputAdornment'
 import IconButton from '@mui/material/IconButton'
 import { useTranslation } from 'react-i18next'
@@ -18,12 +16,15 @@ import { login } from '@services/fetches'
 import { Query } from '@services/queries'
 import { VisibleToggle } from '@components/inputs/VisibleToggle'
 
-/**
- *
- * @param {{ href?: string, sx?: import("@mui/material").SxProps, style?: React.CSSProperties }} props
- * @returns
- */
-export function LocalLogin({ href, sx, style }) {
+export function LocalLogin({
+  href,
+  sx,
+  style,
+}: {
+  href?: string
+  sx?: import('@mui/material').SxProps
+  style?: React.CSSProperties
+}) {
   const { t } = useTranslation()
   const [user, setUser] = React.useState({
     username: '',
@@ -34,7 +35,7 @@ export function LocalLogin({ href, sx, style }) {
   const [submitted, setSubmitted] = React.useState(false)
   const [checkUsername, { data }] = useLazyQuery(Query.user('CHECK_USERNAME'))
 
-  const handleChange = (e) => {
+  const handleChange: OutlinedInputProps['onChange'] = (e) => {
     if (e.target.name === 'username') {
       checkUsername({ variables: { username: e.target.value } })
     }

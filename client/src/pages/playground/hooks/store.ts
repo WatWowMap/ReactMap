@@ -3,21 +3,19 @@ import { create } from 'zustand'
 
 import { downloadJson } from '@utils/downloadJson'
 
-/**
- * @typedef {{
- *  code: string
- *  original: string
- *  hideEditor: boolean
- *  component: string
- *  valid: boolean
- *  success: string | null
- *  loading: boolean
- *  error: import('@apollo/client').ApolloError
- *  menuAnchorEl: null | HTMLElement
- * }} PlayStore
- * @type {import("zustand").UseBoundStore<import("zustand").StoreApi<PlayStore>>}
- */
-export const usePlayStore = create(() => ({
+export type PlayStore = {
+  code: string
+  original: string
+  hideEditor: boolean
+  component: string
+  valid: boolean
+  success: string | null
+  loading: boolean
+  error: import('@apollo/client').ApolloError
+  menuAnchorEl: null | HTMLElement
+}
+
+export const usePlayStore = create<PlayStore>(() => ({
   code: '{}',
   original: '{}',
   hideEditor: false,
@@ -31,9 +29,8 @@ export const usePlayStore = create(() => ({
 
 /**
  * Sets the code in the editor, accepts either an object or a string
- * @param {string | object} code
  */
-export const setCode = (code) => {
+export const setCode = (code: string | object) => {
   if (typeof code === 'object') {
     return usePlayStore.setState({ code: JSON.stringify(code, null, 2) })
   }
@@ -44,9 +41,8 @@ export const setCode = (code) => {
 
 /**
  * Opens the main menu
- * @param {React.MouseEvent<HTMLButtonElement, MouseEvent>} e
  */
-export const openMenu = (e) =>
+export const openMenu = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) =>
   usePlayStore.setState({ menuAnchorEl: e.currentTarget })
 
 /**
@@ -56,9 +52,10 @@ export const closeMenu = () => usePlayStore.setState({ menuAnchorEl: null })
 
 /**
  * Sets the component to be used in the editor
- * @param {ReturnType<typeof usePlayStore['getState']>['component']} component
  */
-export const setComponent = (component) => usePlayStore.setState({ component })
+export const setComponent = (
+  component: ReturnType<(typeof usePlayStore)['getState']>['component'],
+) => usePlayStore.setState({ component })
 
 /**
  * Shows or hides the editor to enable fullscreen viewing of what's being worked on

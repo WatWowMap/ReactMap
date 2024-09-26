@@ -1,5 +1,5 @@
-// @ts-check
-// TODO: Fix the types, somehow
+// @ts-nocheck
+// TODO: Remove @ts-nocheck
 
 import * as React from 'react'
 import DialogContent from '@mui/material/DialogContent'
@@ -16,15 +16,20 @@ import OpacityIcon from '@mui/icons-material/Opacity'
 import TuneIcon from '@mui/icons-material/Tune'
 import TipsAndUpdatesIcon from '@mui/icons-material/TipsAndUpdates'
 
-import { useMemory } from '@store/useMemory'
+import { UseMemory, useMemory } from '@store/useMemory'
 import { toggleDialog, useLayoutStore } from '@store/useLayoutStore'
-import { setDeepStore, useDeepStore, useStorage } from '@store/useStorage'
+import {
+  setDeepStore,
+  useDeepStore,
+  UseStorage,
+  useStorage,
+} from '@store/useStorage'
 import { getPermission } from '@services/desktopNotification'
 import { analytics } from '@utils/analytics'
 import { getProperName, camelToSnake } from '@utils/strings'
 
 import { Header } from './Header'
-import { Footer } from './Footer'
+import { Footer, FooterButton } from './Footer'
 import { DialogWrapper } from './DialogWrapper'
 
 const ICONS = {
@@ -35,17 +40,17 @@ const ICONS = {
   tooltips: TipsAndUpdatesIcon,
 }
 
-/**
- * @template {keyof import('@store/useStorage').UseStorage['userSettings']} T
- * @param {{
- *  category: T
- *  option: keyof import('@store/useStorage').UseStorage['userSettings'][T]
- *  subOption?: string
- *  localState: Record<string, any>
- *  handleChange: (event: React.ChangeEvent<HTMLInputElement>) => void
- * }} props
- */
-function InputType({ option, subOption, category }) {
+function InputType<T extends keyof UseStorage['userSettings']>({
+  option,
+  subOption,
+  category,
+}: {
+  category: T
+  option: keyof import('@store/useStorage').UseStorage['userSettings'][T]
+  subOption?: string
+  localState: Record<string, any>
+  handleChange: (event: React.ChangeEvent<HTMLInputElement>) => void
+}) {
   const staticSetting = useMemory((s) =>
     subOption
       ? s.clientMenus[category]?.[option]?.sub?.[subOption]
@@ -117,70 +122,67 @@ function BaseUserOptions() {
   const { t } = useTranslation()
   const { open, category, type } = useLayoutStore((s) => s.dialog)
 
-  const staticUserSettings = useMemory((s) => s.clientMenus[category])
+  const staticUserSettings = useMemory(
+    (s) => s.clientMenus[category as keyof UseMemory['clientMenus']],
+  )
 
   /** @param {string} label */
-  const getLabel = (label) => {
+  const getLabel = (label: string) => {
     if (label.startsWith('pvp') && !label.includes('Mega')) {
       return t('pvp_level', { level: label.substring(3) })
     }
     return t(camelToSnake(label), getProperName(label))
   }
 
-  const footerOptions = React.useMemo(
-    () =>
-      /** @type {import('@components/dialogs/Footer').FooterButton[]} */ ([
-        {
-          name: 'reset',
-          action: () => {
-            const existing = useStorage.getState().userSettings
-            if (category in existing) {
-              const newSettings = {
-                ...existing[category],
-              }
-              Object.entries(staticUserSettings || {}).forEach(
-                ([key, value]) => {
-                  if (value.sub) {
-                    Object.entries(value.sub).forEach(([subKey, subValue]) => {
-                      newSettings[subKey] = subValue.value
-                    })
-                  } else {
-                    newSettings[key] = value.value
-                  }
-                },
-              )
-              setDeepStore(`userSettings.${category}`, newSettings)
+  const footerOptions: FooterButton[] = React.useMemo(
+    () => [
+      {
+        name: 'reset',
+        action: () => {
+          const existing = useStorage.getState().userSettings
+          if (category in existing) {
+            const newSettings = {
+              ...existing[category],
             }
-          },
-          color: 'primary',
+            Object.entries(staticUserSettings || {}).forEach(([key, value]) => {
+              if (value.sub) {
+                Object.entries(value.sub).forEach(([subKey, subValue]) => {
+                  newSettings[subKey] = subValue.value
+                })
+              } else {
+                newSettings[key] = value.value
+              }
+            })
+            setDeepStore(`userSettings.${category}`, newSettings)
+          }
         },
-        {
-          name: 'close',
-          action: toggleDialog(false),
-          color: 'secondary',
-        },
-      ]),
+        color: 'primary',
+      },
+      {
+        name: 'close',
+        action: toggleDialog(false),
+        color: 'secondary',
+      },
+    ],
     [category, staticUserSettings],
   )
 
-  const staticByCategory = /** @type {[string, string[]][]} */ (
-    React.useMemo(() => {
-      if (!staticUserSettings) return []
-      const reduced = Object.entries(staticUserSettings).reduce(
-        (acc, [key, value]) => {
-          if (!acc[value.category || '']) {
-            acc[value.category || ''] = []
-          }
-          acc[value.category || ''].push(key)
-          return acc
-        },
-        /** @type {Record<string, string[]>} */ ({}),
-      )
-      return Object.entries(reduced)
-        .sort(([a], [b]) => t(a).localeCompare(t(b)))
-        .map(([key, value]) => [key, value])
-    }, [staticUserSettings])
-  )
+  const staticByCategory: [string, string[]][] = React.useMemo(() => {
+    if (!staticUserSettings) return []
+    const reduced = Object.entries(staticUserSettings).reduce(
+      (acc, [key, value]) => {
+        if (!acc[value.category || '']) {
+          acc[value.category || ''] = []
+        }
+        acc[value.category || ''].push(key)
+        return acc
+      },
+      {} as Record<string, string[]>,
+    )
+    return Object.entries(reduced)
+      .sort(([a], [b]) => t(a).localeCompare(t(b)))
+      .map(([key, value]) => [key, value])
+  }, [staticUserSettings])
 
   return (
     <DialogWrapper

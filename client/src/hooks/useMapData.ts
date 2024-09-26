@@ -1,4 +1,3 @@
-// @ts-check
 import { useEffect } from 'react'
 import { useQuery } from '@apollo/client'
 
@@ -8,6 +7,7 @@ import { UAssets } from '@services/Assets'
 import { useMemory } from '@store/useMemory'
 import { useStorage } from '@store/useStorage'
 import { useProcessError } from '@hooks/useProcessError'
+import { AllFilters } from '@rm/types'
 
 export function useMapData(once = false) {
   const active = useMemory((s) => s.active)
@@ -96,7 +96,7 @@ export function useMapData(once = false) {
         },
       }))
       useStorage.setState((prev) => {
-        const newFilters = deepMerge({}, filters, prev.filters)
+        const newFilters: AllFilters = deepMerge({}, filters, prev.filters)
 
         // Migration for quest conditions to use target as well
         Object.entries(newFilters?.pokestops?.filter || {}).forEach(

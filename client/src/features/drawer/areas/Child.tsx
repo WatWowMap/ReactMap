@@ -12,16 +12,6 @@ import { useMap } from 'react-leaflet'
 import { useDeepStore, useStorage } from '@store/useStorage'
 import { useMemory } from '@store/useMemory'
 
-/**
- * @param {{
- *  name?: string
- *  feature?: Pick<import('@rm/types').RMFeature, 'properties'>
- *  allAreas?: string[]
- *  childAreas?: Pick<import('@rm/types').RMFeature, 'properties'>[]
- *  borderRight?: boolean
- *  colSpan?: number
- * }} props
- */
 export function AreaChild({
   name,
   feature,
@@ -29,6 +19,13 @@ export function AreaChild({
   allAreas,
   borderRight,
   colSpan = 1,
+}: {
+  name?: string
+  feature?: Pick<import('@rm/types').RMFeature, 'properties'>
+  allAreas?: string[]
+  childAreas?: Pick<import('@rm/types').RMFeature, 'properties'>[]
+  borderRight?: boolean
+  colSpan?: number
 }) {
   const scanAreas = useStorage((s) => s.filters?.scanAreas?.filter?.areas)
   const zoom = useMemory((s) => s.config.general.scanAreasZoom)

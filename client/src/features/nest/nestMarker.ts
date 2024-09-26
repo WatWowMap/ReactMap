@@ -1,20 +1,20 @@
-// @ts-check
 import { divIcon } from 'leaflet'
 
 import { useMemory } from '@store/useMemory'
 
-/**
- *
- * @param {{
- *  iconUrl: string,
- *  pokemonId: number,
- *  formId?: number,
- *  iconSize: number,
- *  recent: boolean,
- * }} props
- * @returns
- */
-export function nestMarker({ iconUrl, pokemonId, formId, iconSize, recent }) {
+export function nestMarker({
+  iconUrl,
+  pokemonId,
+  formId,
+  iconSize,
+  recent,
+}: {
+  iconUrl: string
+  pokemonId: number
+  formId?: number
+  iconSize: number
+  recent: boolean
+}) {
   const { Icons, masterfile } = useMemory.getState()
   const { types } = masterfile.pokemon[pokemonId]?.forms?.[formId]?.types
     ? masterfile.pokemon[pokemonId].forms[formId]

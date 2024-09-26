@@ -1,5 +1,3 @@
-// @ts-check
-import * as React from 'react'
 import Dialog from '@mui/material/Dialog'
 
 import { useMemory } from '@store/useMemory'

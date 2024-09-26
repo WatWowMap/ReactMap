@@ -1,5 +1,3 @@
-// @ts-check
-import * as React from 'react'
 import ListItemIcon from '@mui/material/ListItemIcon'
 import CakeIcon from '@mui/icons-material/Cake'
 import { useTranslation } from 'react-i18next'

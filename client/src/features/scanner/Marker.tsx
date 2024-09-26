@@ -1,16 +1,14 @@
-// @ts-check
-import * as React from 'react'
 import { Marker, useMap } from 'react-leaflet'
 
 import { fallbackMarker } from '@assets/fallbackMarker'
 
 import { useScanStore } from './hooks/store'
 
-/**
- * @param {{ children: React.ReactNode }} props
- * @returns
- */
-export function ScanOnDemandMarker({ children }) {
+export function ScanOnDemandMarker({
+  children,
+}: {
+  children: React.ReactNode
+}) {
   const map = useMap()
   const scanLocation = useScanStore((s) => s.scanLocation)
 

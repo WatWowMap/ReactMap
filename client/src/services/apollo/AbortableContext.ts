@@ -1,4 +1,3 @@
-// @ts-check
 import { Observable } from '@apollo/client/utilities/observables/Observable'
 
 /**
@@ -7,6 +6,8 @@ import { Observable } from '@apollo/client/utilities/observables/Observable'
  * @author Mygod
  */
 export class AbortableContext {
+  _pendingOp = null
+  _error: string
   constructor(error = 'Request aborted') {
     this._pendingOp = null
     this._error = error
@@ -38,18 +39,18 @@ export class AbortableContext {
     subscription.unsubscribe()
   }
 
-  /**
-   * @param {import("@apollo/client").Operation} operation
-   * @param {import("@apollo/client").NextLink} [forward]
-   * @returns {import("@apollo/client").Observable<import("@apollo/client").FetchResult> | null}
-   */
-  handle(operation, forward) {
+  handle(
+    operation: import('@apollo/client').Operation,
+    forward: import('@apollo/client').NextLink,
+  ):
+    | import('@apollo/client').Observable<import('@apollo/client').FetchResult>
+    | null {
     // add abort controller and signal object to fetchOptions if they don't already exist
     const context = operation.getContext()
     let fetchOptions = context.fetchOptions || {}
 
-    /** @type {AbortController} */
-    const controller = fetchOptions.controller || new AbortController()
+    const controller: AbortController =
+      fetchOptions.controller || new AbortController()
 
     fetchOptions = { ...fetchOptions, controller, signal: controller.signal }
     operation.setContext({ ...context, fetchOptions })
@@ -64,15 +65,14 @@ export class AbortableContext {
     // create local observable with timeout functionality (unsubscibe from chain observable and
     // return an error if the timeout expires before chain observable resolves)
     return new Observable((observer) => {
-      /**
-       * @type {{
-       *  controller: AbortController,
-       *  operation: import("@apollo/client").Operation,
-       *  observer: import("@apollo/client/utilities/observables/Observable").Observer<import("@apollo/client").FetchResult>,
-       *  subscription?: import("zen-observable-ts").Subscription
-       * }}
-       */
-      const op = {
+      const op: {
+        controller: AbortController
+        operation: import('@apollo/client').Operation
+        observer: import('@apollo/client/utilities/observables/Observable').Observer<
+          import('@apollo/client').FetchResult
+        >
+        subscription?: import('zen-observable-ts').Subscription
+      } = {
         controller,
         operation,
         observer,

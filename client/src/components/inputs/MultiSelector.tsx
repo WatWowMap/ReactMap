@@ -4,15 +4,30 @@ import Button from '@mui/material/Button'
 import ButtonGroup from '@mui/material/ButtonGroup'
 import { useTranslation } from 'react-i18next'
 
-import { useDeepStore } from '@store/useStorage'
+import { useDeepStore, UseStorage, UseStoragePaths } from '@store/useStorage'
+import { SxProps } from '@mui/material'
+import { ObjectPathValue } from '@rm/types'
 
-const SX = /** @type {import('@mui/material').SxProps} */ ({ mx: 'auto' })
+const SX: SxProps = { mx: 'auto' }
 
-/**
- * @template T
- * @param {import('@rm/types').MultiSelectorProps<T>} props
- */
-export function MultiSelector({ items, value, disabled, onClick, tKey }) {
+export interface MultiSelectorProps<V> {
+  value: V
+  items: readonly V[]
+  tKey?: string
+  disabled?: boolean
+  onClick?: (
+    oldValue: V,
+    newValue: V,
+  ) => (e?: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void
+}
+
+export function MultiSelector<T>({
+  items,
+  value,
+  disabled,
+  onClick,
+  tKey,
+}: MultiSelectorProps<T>) {
   const { t } = useTranslation()
   return (
     <ButtonGroup disabled={disabled} size="small" sx={SX}>
@@ -30,30 +45,29 @@ export function MultiSelector({ items, value, disabled, onClick, tKey }) {
   )
 }
 
-/**
- * @template {import('@store/useStorage').UseStoragePaths} T
- * @template {import('@rm/types').ObjectPathValue<import('@store/useStorage').UseStorage, T>} V
- * @param {{
- *  field: T,
- *  defaultValue?: V,
- *  onClick?: (oldValue: V, newValue: V) => void
- *  allowNone?: boolean
- * } & Omit<import('@rm/types').MultiSelectorProps<V>, 'value' | 'onClick'>} props
- * @returns
- */
-export function MultiSelectorStore({
+export function MultiSelectorStore<
+  T extends UseStoragePaths,
+  V extends ObjectPathValue<UseStorage, T>,
+>({
   field,
   allowNone = false,
   defaultValue,
   onClick,
   ...props
-}) {
+}: {
+  field: T
+  defaultValue?: V
+  onClick?: (oldValue: V, newValue: V) => void
+  allowNone?: boolean
+} & Omit<MultiSelectorProps<V>, 'value' | 'onClick'>) {
   const [value, setValue] = useDeepStore(field, defaultValue)
 
-  /** @type {(o: V, n: V) => import('@mui/material').ButtonProps['onClick']} */
-  const onClickWrapper = React.useCallback(
+  const onClickWrapper: (
+    o: V,
+    n: V,
+  ) => import('@mui/material').ButtonProps['onClick'] = React.useCallback(
     (oldValue, newValue) => () => {
-      // @ts-ignore // TODO: fix this
+      // @ts-ignore
       setValue(newValue === oldValue && allowNone ? 'none' : newValue)
       onClick?.(oldValue, newValue)
     },

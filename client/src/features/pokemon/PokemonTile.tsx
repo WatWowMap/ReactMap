@@ -1,5 +1,3 @@
-/* eslint-disable react/destructuring-assignment */
-// @ts-check
 import * as React from 'react'
 import { Marker, Popup, Circle } from 'react-leaflet'
 import { t } from 'i18next'
@@ -19,13 +17,10 @@ import { getTimeUntil } from '@utils/getTimeUntil'
 import { PokemonPopup } from './PokemonPopup'
 import { basicPokemonMarker, fancyPokemonMarker } from './pokemonMarker'
 
-/**
- *
- * @param {import('@rm/types').Pokemon} pkmn
- * @param {import('@rm/types').PokemonGlow} userSettings
- * @returns {string}
- */
-const getGlowStatus = (pkmn, userSettings) => {
+const getGlowStatus = (
+  pkmn: import('@rm/types').Pokemon,
+  userSettings: import('@rm/types').PokemonGlow,
+): string => {
   const { glowRules } = useMemory.getState()
   const valid = glowRules
     .map((rule) => userSettings[rule(pkmn)])
@@ -33,12 +28,9 @@ const getGlowStatus = (pkmn, userSettings) => {
   return valid.length > 1 ? userSettings.Multiple : valid[0]
 }
 
-/**
- *
- * @param {import('@rm/types').Pokemon & { force?: boolean }} pkmn
- * @returns
- */
-const BasePokemonTile = (pkmn) => {
+const BasePokemonTile = (
+  pkmn: import('@rm/types').Pokemon & { force?: boolean },
+) => {
   const internalId = `${pkmn.pokemon_id}-${pkmn.form}`
 
   const [markerRef, setMarkerRef] = React.useState(null)
@@ -109,8 +101,7 @@ const BasePokemonTile = (pkmn) => {
       ]
     }, basicEqualFn)
 
-  /** @type {[number, number]} */
-  const finalLocation = React.useMemo(
+  const finalLocation: [number, number] = React.useMemo(
     () =>
       pkmn.seen_type?.startsWith('nearby') || pkmn.seen_type?.includes('lure')
         ? getOffset(
@@ -123,18 +114,19 @@ const BasePokemonTile = (pkmn) => {
   )
 
   /** @type {(string | import('react').ReactElement)[]} */
-  const extras = React.useMemo(() => {
-    const decorators = []
-    if (showIv) decorators.push(`${Math.round(pkmn.iv)}%`)
-    if (showLevel) decorators.push(`L${Math.round(pkmn.level)}`)
-    if (showSize)
-      decorators.push({ 1: 'XXS', 2: 'XS', 4: 'XL', 5: 'XXL' }[pkmn.size])
-    if (badge && decorators.length > 0)
-      decorators.push(
-        <img key={badge} src={badge} alt={badge} style={{ height: 12 }} />,
-      )
-    return decorators
-  }, [showIv, showLevel, showSize, badge])
+  const extras: (string | import('react').ReactElement)[] =
+    React.useMemo(() => {
+      const decorators = []
+      if (showIv) decorators.push(`${Math.round(pkmn.iv)}%`)
+      if (showLevel) decorators.push(`L${Math.round(pkmn.level)}`)
+      if (showSize)
+        decorators.push({ 1: 'XXS', 2: 'XS', 4: 'XL', 5: 'XXL' }[pkmn.size])
+      if (badge && decorators.length > 0)
+        decorators.push(
+          <img key={badge} src={badge} alt={badge} style={{ height: 12 }} />,
+        )
+      return decorators
+    }, [showIv, showLevel, showSize, badge])
 
   useForcePopup(pkmn.id, markerRef)
   useMarkerTimer(pkmn.expire_timestamp, markerRef)

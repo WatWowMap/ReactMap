@@ -1,4 +1,3 @@
-// @ts-check
 import * as React from 'react'
 import Button from '@mui/material/Button'
 import ButtonGroup from '@mui/material/ButtonGroup'
@@ -15,10 +14,6 @@ import { ConfigContext } from '../ContextProvider'
 import { useScanStore } from '../hooks/store'
 import { AdvAccordion } from './AdvAccordion'
 
-/**
- *
- * @returns
- */
 export function ScanZonePopup() {
   const { t } = useTranslation()
   const { advancedOptions, maxSize } = React.useContext(ConfigContext)
@@ -54,14 +49,15 @@ export function ScanZonePopup() {
   )
 }
 
-/**
- *
- * @param {{
- *  name: keyof import("@rm/types").OnlyType<import('../hooks/store').UseScanStore, number>,
- * } & import('@mui/material').SliderProps} props
- * @returns
- */
-function ScanZoneSlider({ name, ...props }) {
+function ScanZoneSlider({
+  name,
+  ...props
+}: {
+  name: keyof import('@rm/types').OnlyType<
+    import('../hooks/store').UseScanStore,
+    number
+  >
+} & import('@mui/material').SliderProps) {
   const value = useScanStore((s) => s[name])
 
   const handleChange = React.useCallback(

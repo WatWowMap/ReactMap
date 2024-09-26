@@ -1,5 +1,3 @@
-// @ts-check
-import * as React from 'react'
 import Grid2 from '@mui/material/Unstable_Grid2'
 import TextField from '@mui/material/TextField'
 import { useMutation } from '@apollo/client'
@@ -22,8 +20,11 @@ export function ExtraUserFields() {
   ) : null
 }
 
-/** @param {{ field: import('@rm/types').ExtraField | string}} props */
-export function FieldValue({ field }) {
+export function FieldValue({
+  field,
+}: {
+  field: import('@rm/types').ExtraField | string
+}) {
   const { i18n } = useTranslation()
   const label =
     typeof field === 'string' ? field : field[i18n.language] || field.name

@@ -1,5 +1,3 @@
-// @ts-check
-import * as React from 'react'
 import Grid from '@mui/material/Unstable_Grid2'
 import { useTranslation } from 'react-i18next'
 
@@ -9,10 +7,12 @@ import { useGetWebhookData } from '../../hooks/useGetWebhookData'
 import { MemoNewProfile } from './NewProfile'
 import { ProfileTile } from './ProfileTile'
 
-/**
- * @typedef {'profile' | 'edit' | 'delete' | 'copy'} View
- * @typedef {{ uid: number, handleViewChange: (newView: View) => () => void}} Props
- */
+export type View = 'profile' | 'edit' | 'delete' | 'copy'
+
+export type Props = {
+  uid: number
+  handleViewChange: (newView: View) => () => void
+}
 
 export function ProfileEditing() {
   const { data, loading } = useGetWebhookData('profile')

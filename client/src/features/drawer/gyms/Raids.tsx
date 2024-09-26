@@ -1,4 +1,3 @@
-// @ts-check
 import * as React from 'react'
 import ListItem from '@mui/material/ListItem'
 import ListItemText from '@mui/material/ListItemText'
@@ -17,6 +16,7 @@ const RaidOverride = () => {
   const available = useMemory((s) => s.available.gyms)
   const enabled = useStorage((s) => !!s.filters?.gyms?.raids)
   const [filters, setFilters] = useDeepStore('filters.gyms.raidTier', 'all')
+
   return (
     <CollapsibleItem open={enabled}>
       <ListItem

@@ -1,10 +1,7 @@
-// @ts-check
-
-/**
- * @param {object} json
- * @param {`${string}.json`} fileName
- */
-export function downloadJson(json, fileName) {
+export function downloadJson(
+  json: object | string,
+  fileName: `${string}.json`,
+) {
   if (json) {
     const el = document.createElement('a')
     el.setAttribute(

@@ -1,4 +1,3 @@
-// @ts-check
 import * as React from 'react'
 
 import { AllForts } from '../components/AllForts'
@@ -7,7 +6,7 @@ import { InvasionQuickSelect } from './Invasions'
 import { QuestQuickSelect } from './Quests'
 import { EventsQuickSelect } from './EventStops'
 
-function ExtrasComponent({ subItem }) {
+function ExtrasComponent({ subItem }: { subItem: string }) {
   switch (subItem) {
     case 'allPokestops':
       return <AllForts category="pokestops" subItem={subItem} />

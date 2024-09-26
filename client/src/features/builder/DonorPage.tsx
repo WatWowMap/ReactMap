@@ -1,5 +1,3 @@
-// @ts-check
-/* eslint-disable react/no-array-index-key */
 import * as React from 'react'
 import { useQuery } from '@apollo/client'
 import Dialog from '@mui/material/Dialog'
@@ -31,9 +29,8 @@ export function DonorPage() {
     skip: !open,
   })
 
-  const donorPage = /** @type {typeof DEFAULT} */ (
-    data?.customComponent || DEFAULT
-  )
+  const donorPage =
+    /** @type {typeof DEFAULT} */ data?.customComponent || DEFAULT
 
   return (
     <Dialog open={open} fullScreen={isMobile} onClose={handleClose}>

@@ -1,77 +1,105 @@
-// @ts-check
-
 import { create } from 'zustand'
 
-/**
- * TODO: Finish this
- * @typedef {{
- *   isMobile: boolean,
- *   isTablet: boolean,
- *   active: boolean,
- *   online: boolean,
- *   searchLoading: boolean,
- *   Icons: InstanceType<typeof import("../services/Assets").UAssets>,
- *   Audio: InstanceType<typeof import("../services/Assets").UAssets>,
- *   config: { [K in keyof Omit<import('@rm/types').Config['map'], 'domain'>]: Partial<Omit<import('@rm/types').Config['map'], 'domain'>[K]> },
- *   ui: Partial<import('@rm/types').UIObject>,
- *   auth: {
- *    perms: Partial<import('@rm/types').Permissions>,
- *    loggedIn: boolean,
- *    methods: import('@rm/types').Strategy[],
- *    strategy: import('@rm/types').Strategy | '',
- *    userBackupLimits: number,
- *    excludeList: string[],
- *    discordId: string,
- *    telegramId: string,
- *    webhookStrategy: string,
- *    username: string,
- *    data: Record<string, any>,
- *    counts: {
- *      areaRestrictions: number,
- *      webhooks: number,
- *      scanner: number,
- *    },
- *   },
- *   glowRules: ((pkmn: import('@rm/types').Pokemon) => string)[],
- *   menus: Partial<ReturnType<import('@rm/server/src/ui/advMenus')['advMenus']>>
- *   menuFilters: import('@rm/types').ClientFilterObj,
- *   filters: Partial<import('@rm/types').AllFilters>,
- *   masterfile: { [K in keyof import('@rm/masterfile').Masterfile]: Partial<import('@rm/masterfile').Masterfile[K]> },
- *   polling: import('@rm/types').Config['api']['polling'],
- *   gymValidDataLimit: number
- *   settings: { [K in keyof import('./useStorage').UseStorage['settings']]: Record<string, K extends 'tileServers' ? import('@rm/types').TileLayer : K extends 'navigation' ? { name: string, url: string } : { name: string }> }
- *   userSettings: Partial<ReturnType<import('@rm/server/src/ui/clientOptions')['clientOptions']>['clientValues']>
- *   clientMenus: Partial<ReturnType<import('@rm/server/src/ui/clientOptions')['clientOptions']>['clientMenus']>
- *   clientError: string,
- *   timeOfDay: import('@rm/types').TimesOfDay,
- *   hideList: Set<string | number>,
- *   timerList: string[],
- *   tileStyle: import('@rm/types').Theme,
- *   reset: boolean,
- *   theme: {
- *     primary: string,
- *     secondary: string,
- *   },
- *   available: {
- *     gyms: string[],
- *     pokemon: string[],
- *     pokestops: string[],
- *     nests: string[],
- *     stations: string[],
- *     questConditions: Record<string, { title: string, target?: number }[]>,
- *   }
- *   manualParams: {
- *     category: string,
- *     id: number | string,
- *   },
- *   extraUserFields: (import('@rm/types').ExtraField | string)[],
- *   advMenuCounts: { [K in keyof import('./useStorage').UseStorage['advMenu']]: { total: number, show: number } }
- *   advMenuFiltered: { [K in keyof import('./useStorage').UseStorage['advMenu']]: string[] }
- * }} UseMemory
- *
- * @type {import("zustand").UseBoundStore<import("zustand").StoreApi<UseMemory>>}
- */
-export const useMemory = create(() => ({
+export interface UseMemory {
+  isMobile: boolean
+  isTablet: boolean
+  active: boolean
+  online: boolean
+  searchLoading: boolean
+  Icons: InstanceType<typeof import('../services/Assets').UAssets>
+  Audio: InstanceType<typeof import('../services/Assets').UAssets>
+  config: {
+    [K in keyof Omit<import('@rm/types').Config['map'], 'domain'>]: Partial<
+      Omit<import('@rm/types').Config['map'], 'domain'>[K]
+    >
+  }
+  ui: Partial<import('@rm/types').UIObject>
+  auth: {
+    perms: Partial<import('@rm/types').Permissions>
+    loggedIn: boolean
+    methods: import('@rm/types').Strategy[]
+    strategy: import('@rm/types').Strategy | ''
+    userBackupLimits: number
+    excludeList: string[]
+    discordId: string
+    telegramId: string
+    webhookStrategy: string
+    username: string
+    data: Record<string, any>
+    counts: {
+      areaRestrictions: number
+      webhooks: number
+      scanner: number
+    }
+  }
+  glowRules: ((pkmn: import('@rm/types').Pokemon) => string)[]
+  menus: Partial<
+    ReturnType<(typeof import('@rm/server/src/ui/advMenus'))['advMenus']>
+  >
+  menuFilters: import('@rm/types').ClientFilterObj
+  filters: Partial<import('@rm/types').AllFilters>
+  masterfile: {
+    [K in keyof import('@rm/masterfile').Masterfile]: Partial<
+      import('@rm/masterfile').Masterfile[K]
+    >
+  }
+  polling: import('@rm/types').Config['api']['polling']
+  gymValidDataLimit: number
+  settings: {
+    [K in keyof import('./useStorage').UseStorage['settings']]: Record<
+      string,
+      K extends 'tileServers'
+        ? import('@rm/types').TileLayer
+        : K extends 'navigation'
+          ? { name: string; url: string }
+          : { name: string }
+    >
+  }
+  userSettings: Partial<
+    ReturnType<
+      (typeof import('@rm/server/src/ui/clientOptions'))['clientOptions']
+    >['clientValues']
+  >
+  clientMenus: Partial<
+    ReturnType<
+      (typeof import('@rm/server/src/ui/clientOptions'))['clientOptions']
+    >['clientMenus']
+  >
+  clientError: string
+  timeOfDay: import('@rm/types').TimesOfDay
+  hideList: Set<string | number>
+  timerList: string[]
+  tileStyle: import('@rm/types').Theme
+  reset: boolean
+  theme: {
+    primary: string
+    secondary: string
+  }
+  available: {
+    gyms: string[]
+    pokemon: string[]
+    pokestops: string[]
+    nests: string[]
+    stations: string[]
+    questConditions: Record<string, { title: string; target?: number }[]>
+  }
+  manualParams: {
+    category: string
+    id: number | string
+  }
+  extraUserFields: (import('@rm/types').ExtraField | string)[]
+  advMenuCounts: {
+    [K in keyof import('./useStorage').UseStorage['advMenu']]: {
+      total: number
+      show: number
+    }
+  }
+  advMenuFiltered: {
+    [K in keyof import('./useStorage').UseStorage['advMenu']]: string[]
+  }
+}
+
+export const useMemory = create<UseMemory>(() => ({
   isMobile: false,
   isTablet: false,
   active: true,
@@ -168,11 +196,5 @@ export const useMemory = create(() => ({
   },
 }))
 
-/**
- * @template {string | number | boolean} T
- * @param {T[]} p
- * @param {T[]} n
- * @returns {boolean}
- */
-export const basicEqualFn = (p, n) =>
+export const basicEqualFn = <T>(p: T[], n: T[]): boolean =>
   p.length === n.length && p.every((v, i) => v === n[i])

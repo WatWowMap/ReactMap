@@ -1,4 +1,3 @@
-// @ts-check
 import * as React from 'react'
 import {
   S2LatLng,
@@ -22,7 +21,6 @@ export function GenerateCells() {
       ? s.userSettings.s2cells.darkMapBorder
       : s.userSettings.s2cells.lightMapBorder,
   )
-  /** @type {number[]} */
   const filter = useStorage((s) => s.filters?.s2cells?.cells)
   const location = useStorage((s) => s.location)
   const zoom = useStorage((s) => s.zoom)

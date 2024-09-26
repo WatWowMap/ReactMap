@@ -1,5 +1,3 @@
-// @ts-check
-import * as React from 'react'
 import ListItem from '@mui/material/ListItem'
 import ListItemText from '@mui/material/ListItemText'
 import { useTranslation } from 'react-i18next'
@@ -7,15 +5,21 @@ import { useTranslation } from 'react-i18next'
 import { MultiSelectorStore } from '@components/inputs/MultiSelector'
 import { ICON_SIZES } from '@assets/constants'
 
-/**
- * @typedef {(oldValue: (typeof ICON_SIZES)[number], newValue: (typeof ICON_SIZES)[number]) => void} SizeOnClick
- * @param {{
- *  field: `filters.${import('@rm/types').AdvCategories}.filter.${string}`
- *  noLabel?: boolean
- *  onClick?: SizeOnClick
- * } & Omit<import('@mui/material/ListItem').ListItemProps, 'onClick'>} props
- */
-export function Size({ field, noLabel = false, onClick, ...props }) {
+export type SizeOnClick = (
+  oldValue: (typeof ICON_SIZES)[number],
+  newValue: (typeof ICON_SIZES)[number],
+) => void
+
+export function Size({
+  field,
+  noLabel = false,
+  onClick,
+  ...props
+}: {
+  field: `filters.${import('@rm/types').AdvCategories}.filter.${string}`
+  noLabel?: boolean
+  onClick?: SizeOnClick
+} & Omit<import('@mui/material/ListItem').ListItemProps, 'onClick'>) {
   const { t } = useTranslation()
 
   return (

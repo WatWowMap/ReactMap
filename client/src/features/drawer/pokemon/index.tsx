@@ -1,4 +1,3 @@
-// @ts-check
 import * as React from 'react'
 import AppBar from '@mui/material/AppBar'
 import Tab from '@mui/material/Tab'
@@ -25,11 +24,8 @@ function PokemonDrawer() {
   const [openTab, setOpenTab] = useDeepStore(`tabs.pokemon`, 0)
   const ui = useMemory((s) => s.ui.pokemon)
 
-  /** @type {import('@mui/material').TabsProps['onChange']} */
-  const handleTabChange = React.useCallback(
-    (_e, newValue) => setOpenTab(newValue),
-    [],
-  )
+  const handleTabChange: import('@mui/material').TabsProps['onChange'] =
+    React.useCallback((_e, newValue) => setOpenTab(newValue), [])
 
   return (
     <>

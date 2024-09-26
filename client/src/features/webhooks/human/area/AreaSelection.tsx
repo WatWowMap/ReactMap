@@ -1,4 +1,3 @@
-// @ts-check
 import * as React from 'react'
 import { useQuery } from '@apollo/client'
 import { useTranslation } from 'react-i18next'

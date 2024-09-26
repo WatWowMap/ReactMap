@@ -1,21 +1,20 @@
-// @ts-check
 import * as React from 'react'
 import { Polygon, Popup, Tooltip } from 'react-leaflet'
 
 import { WayfarerPopup } from './WayfarerPopup'
 import { getPathOptions } from './typeCell'
 
-/**
- *
- * @param {import('@rm/types').Level14Cell & { cellColor: string, oneStopTillNext: string, twoStopsTillNext: string, noMoreGyms: string }} props
- * @returns
- */
 const S14Cell = ({
   cellColor,
   oneStopTillNext,
   twoStopsTillNext,
   noMoreGyms,
   ...cell
+}: import('@rm/types').Level14Cell & {
+  cellColor: string
+  oneStopTillNext: string
+  twoStopsTillNext: string
+  noMoreGyms: string
 }) => {
   const total = cell.count_pokestops + cell.count_gyms
   return (

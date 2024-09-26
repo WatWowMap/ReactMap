@@ -1,5 +1,3 @@
-/* eslint-disable react/destructuring-assignment */
-// @ts-check
 import * as React from 'react'
 import { Marker, Popup, Circle } from 'react-leaflet'
 
@@ -12,12 +10,7 @@ import { TooltipWrapper } from '@components/ToolTipWrapper'
 import { PokestopPopup } from './PokestopPopup'
 import { usePokestopMarker } from './usePokestopMarker'
 
-/**
- *
- * @param {import('@rm/types').Pokestop} pokestop
- * @returns
- */
-const BasePokestopTile = (pokestop) => {
+const BasePokestopTile = (pokestop: import('@rm/types').Pokestop) => {
   const [stateChange, setStateChange] = React.useState(false)
   const [markerRef, setMarkerRef] = React.useState(null)
 
@@ -82,7 +75,7 @@ const BasePokestopTile = (pokestop) => {
   }, basicEqualFn)
 
   const timers = React.useMemo(() => {
-    const internalTimers = /** @type {number[]} */ ([])
+    const internalTimers = /** @type {number[]} */ []
     if (invasionTimers && hasInvasion) {
       pokestop.invasions.forEach((invasion) =>
         internalTimers.push(invasion.incident_expire_timestamp),

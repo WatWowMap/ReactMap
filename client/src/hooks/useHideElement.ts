@@ -1,5 +1,3 @@
-// @ts-check
-
 import { useEffect } from 'react'
 
 const rootLoading = document.getElementById('loader')

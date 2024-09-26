@@ -10,16 +10,7 @@ import { useMemory } from '@store/useMemory'
 import { useMapStore } from '@store/useMapStore'
 import { analytics } from '@utils/analytics'
 
-/**
- * @param {string} search
- * @param {boolean} open
- * @returns {{
- *  loading: boolean
- *  options: import('@mui/material').AutocompleteProps['options'],
- *  handleInputChange: import('@mui/material').AutocompleteProps['onInputChange']
- * }}
- */
-export function useSendSearch(search, open) {
+export function useSendSearch(search: string, open: boolean) {
   const [options, setOptions] = useState([])
   const searchTab = useStorage((s) => s.searchTab)
 
@@ -32,7 +23,7 @@ export function useSendSearch(search, open) {
   )
 
   const sendToServer = useCallback(
-    (/** @type {string} */ newSearch) => {
+    (/** @type {string} */ newSearch: string) => {
       const { lat, lng } = map.getCenter()
       const { filters } = useStorage.getState()
       callSearch({
@@ -61,8 +52,12 @@ export function useSendSearch(search, open) {
     [sendToServer],
   )
 
-  /** @type {import('@mui/material').AutocompleteProps['onInputChange']} */
-  const handleInputChange = useCallback(
+  const handleInputChange: import('@mui/material').AutocompleteProps<
+    any,
+    false,
+    false,
+    boolean
+  >['onInputChange'] = useCallback(
     (e, newValue) => {
       if (e?.type === 'change') {
         useStorage.setState({ search: newValue.toLowerCase() })

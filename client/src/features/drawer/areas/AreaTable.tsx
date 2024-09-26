@@ -1,4 +1,3 @@
-// @ts-check
 import * as React from 'react'
 import { useQuery } from '@apollo/client'
 import Paper from '@mui/material/Paper'
@@ -15,8 +14,9 @@ import { AreaParent } from './Parent'
 import { AreaChild } from './Child'
 
 export function ScanAreasTable() {
-  /** @type {import('@apollo/client').QueryResult<{ scanAreasMenu: import('@rm/types').Config['areas']['scanAreasMenu'][string] }>} */
-  const { data, loading, error } = useQuery(Query.scanAreasMenu())
+  const { data, loading, error } = useQuery<{
+    scanAreasMenu: import('@rm/types').Config['areas']['scanAreasMenu']
+  }>(Query.scanAreasMenu())
   const search = useStorage(
     (s) => s.filters.scanAreas?.filter?.search?.toLowerCase() || '',
   )

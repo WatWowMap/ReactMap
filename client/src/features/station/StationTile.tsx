@@ -1,5 +1,3 @@
-/* eslint-disable react/destructuring-assignment */
-// @ts-check
 import * as React from 'react'
 import { Marker, Popup } from 'react-leaflet'
 
@@ -12,12 +10,7 @@ import { TooltipWrapper } from '@components/ToolTipWrapper'
 import { StationPopup } from './StationPopup'
 import { useStationMarker } from './useStationMarker'
 
-/**
- *
- * @param {import('@rm/types').Station} station
- * @returns
- */
-const BaseStationTile = (station) => {
+const BaseStationTile = (station: import('@rm/types').Station) => {
   const [stateChange, setStateChange] = React.useState(false)
   const [markerRef, setMarkerRef] = React.useState(null)
 
@@ -29,7 +22,7 @@ const BaseStationTile = (station) => {
 
   const timers = React.useMemo(() => {
     const now = Date.now() / 1000
-    const internalTimers = /** @type {number[]} */ ([])
+    const internalTimers = /** @type {number[]} */ []
     if (showTimer && station.start_time && station.start_time > now) {
       internalTimers.push(station.start_time)
     }

@@ -1,4 +1,3 @@
-// @ts-check
 import * as React from 'react'
 import Grid from '@mui/material/Unstable_Grid2'
 import Typography from '@mui/material/Typography'
@@ -10,12 +9,10 @@ import { useAnalytics } from '@hooks/useAnalytics'
 import { getTimeUntil } from '@utils/getTimeUntil'
 import { dayCheck } from '@utils/dayCheck'
 
-/**
- *
- * @param {import('@rm/types').Weather} props
- * @returns
- */
-export function WeatherPopup({ gameplay_condition, updated }) {
+export function WeatherPopup({
+  gameplay_condition,
+  updated,
+}: import('@rm/types').Weather) {
   const { t } = useTranslation()
   const weatherTypes = useMemory(
     (s) => s.masterfile.weather[gameplay_condition]?.types || [],
@@ -71,8 +68,13 @@ export function WeatherPopup({ gameplay_condition, updated }) {
   )
 }
 
-// TODO: Why does this exist?
-const Timer = ({ updated, ts = Date.now() / 1000 }) => {
+const Timer = ({
+  updated,
+  ts = Date.now() / 1000,
+}: {
+  updated: number
+  ts?: number
+}) => {
   const { t } = useTranslation()
   const lastUpdated = new Date(updated * 1000)
   const [timer, setTimer] = React.useState(getTimeUntil(updated * 1000))

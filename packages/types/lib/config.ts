@@ -1,23 +1,15 @@
 import type { LogLevelNames } from 'loglevel'
-import type { DialogProps } from '@mui/material'
+import type { DialogProps, SxProps } from '@mui/material'
 import type { UiconsIndex } from 'uicons.js'
-
-import { Props as ImgProps } from '@components/Img'
 
 import type { CustomComponent } from './blocks'
 import config from '../../../config/default.json'
 import example from '../../../config/example/standard/local.json'
 
 import type { Schema } from './server'
-import {
-  OnlyType,
-  DeepMerge,
-  ComparisonReport,
-  Paths,
-  ObjectPathValue,
-} from './utility'
-import { Strategy } from './general'
-import { TileLayer } from './client'
+import type { DeepMerge, ComparisonReport } from './utility'
+import type { Strategy } from './general'
+import type { TileLayer } from './client'
 
 type BaseConfig = typeof config
 type ExampleConfig = typeof example
@@ -103,6 +95,7 @@ export type Config<Client extends boolean = false> = DeepMerge<
       }
       messageOfTheDay: {
         settings: {
+          parentSx?: SxProps
           parentStyle: Record<string, string> // should be CSS properties but performance seems to die
         }
         titles: string[]
@@ -112,6 +105,7 @@ export type Config<Client extends boolean = false> = DeepMerge<
       }
       donationPage: {
         settings: {
+          parentSx?: SxProps
           parentStyle: Record<string, string> // should be CSS properties but performance seems to die
         }
         titles: string[]
@@ -120,6 +114,7 @@ export type Config<Client extends boolean = false> = DeepMerge<
       }
       loginPage: {
         settings: {
+          parentSx?: SxProps
           parentStyle: Record<string, string> // should be CSS properties but performance seems to die
         }
         components: CustomComponent[]
@@ -148,7 +143,8 @@ export type Config<Client extends boolean = false> = DeepMerge<
   }
 >
 
-export interface Icons extends Omit<BaseConfig['icons'], 'styles'> {
+export interface Icons
+  extends Omit<BaseConfig['icons'], 'styles' | 'customizable'> {
   customizable: string[]
   styles: (ExampleConfig['icons']['styles'][number] & {
     data?: UiconsIndex
@@ -188,14 +184,6 @@ export interface Webhook {
   discordRoles: []
   telegramGroups: []
   local: []
-}
-
-export interface GridSizes {
-  xs?: number
-  sm?: number
-  md?: number
-  lg?: number
-  xl?: number
 }
 
 // export type GetSafeConfig = <P extends Paths<Config>>(

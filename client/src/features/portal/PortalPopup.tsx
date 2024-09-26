@@ -1,4 +1,3 @@
-// @ts-check
 import * as React from 'react'
 import Grid from '@mui/material/Unstable_Grid2'
 import Typography from '@mui/material/Typography'
@@ -12,12 +11,14 @@ import { Coords } from '@components/popups/Coords'
 import { dayCheck } from '@utils/dayCheck'
 import { useAnalytics } from '@hooks/useAnalytics'
 
-/**
- *
- * @param {import('@rm/types').Portal} props
- * @returns
- */
-export function PortalPopup({ url, name, lat, lon, updated, imported }) {
+export function PortalPopup({
+  url,
+  name,
+  lat,
+  lon,
+  updated,
+  imported,
+}: import('@rm/types').Portal) {
   const { t } = useTranslation()
   const Icons = useMemory((s) => s.Icons)
   const enablePortalPopupCoords = useStorage(

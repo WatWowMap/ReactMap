@@ -1,14 +1,15 @@
-// @ts-check
 import { Icon } from 'leaflet'
 
-/**
- *
- * @param {string} iconUrl
- * @param {number} size
- * @param {{ offsetX: number, offsetY: number, popupX: number, popupY: number }} modifiers
- * @returns
- */
-export function spawnpointMarker(iconUrl, size, modifiers) {
+export function spawnpointMarker(
+  iconUrl: string,
+  size: number,
+  modifiers: {
+    offsetX: number
+    offsetY: number
+    popupX: number
+    popupY: number
+  },
+) {
   return new Icon({
     iconUrl,
     iconSize: [size, size],

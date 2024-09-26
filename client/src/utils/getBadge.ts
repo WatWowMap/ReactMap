@@ -1,11 +1,7 @@
-// @ts-check
-
 /**
  * Get rank badge, commonly used for pvp and contests
- * @param {number} rank
- * @returns
  */
-export const getBadge = (rank) => {
+export const getBadge = (rank: number) => {
   switch (rank) {
     case 1:
       return 'first'

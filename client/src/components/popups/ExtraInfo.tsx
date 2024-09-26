@@ -1,15 +1,16 @@
-// @ts-check
-import * as React from 'react'
 import Grid from '@mui/material/Unstable_Grid2'
 import Typography from '@mui/material/Typography'
 import { useTranslation } from 'react-i18next'
 
-/**
- *
- * @param {{ title?: string, data?: React.ReactNode, children?: React.ReactNode }} props
- * @returns
- */
-export const ExtraInfo = ({ title, data, children }) => {
+export function ExtraInfo({
+  title,
+  data,
+  children,
+}: {
+  title?: string
+  data?: React.ReactNode
+  children?: React.ReactNode
+}) {
   const { t } = useTranslation()
 
   return (

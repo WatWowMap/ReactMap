@@ -34,7 +34,7 @@ function drawer(perms) {
         ? {
             pokemon: true,
             sliders: {
-              secondary: [
+              secondary: /** @type {import('@rm/types').RMSlider[]}*/ ([
                 {
                   name: 'avgFilter',
                   i18nKey: 'spawns_per_hour',
@@ -44,7 +44,7 @@ function drawer(perms) {
                   perm: 'nests',
                   step: nestFilters.avgSliderStep,
                 },
-              ],
+              ]),
             },
             polygons: true,
             active: true,
@@ -81,72 +81,76 @@ function drawer(perms) {
             zeroIv: perms.iv || BLOCKED,
             hundoIv: perms.iv || BLOCKED,
             sliders: {
-              primary: [
-                {
-                  name: 'iv',
-                  label: '%',
-                  min: 0,
-                  max: 100,
-                  perm: 'iv',
-                  color: 'secondary',
-                },
-                ...leagues.map((league) => ({
-                  name: league.name,
-                  label: 'rank',
-                  min: league.minRank || 1,
-                  max: league.maxRank || 100,
-                  perm: 'pvp',
-                  color: 'primary',
-                })),
-              ].map((slider) => ({
-                ...slider,
-                disabled: !perms[slider.perm],
-              })),
-              secondary: [
-                {
-                  name: 'level',
-                  label: '',
-                  min: 1,
-                  max: 35,
-                  perm: 'iv',
-                  color: 'secondary',
-                },
-                {
-                  name: 'atk_iv',
-                  label: '',
-                  min: 0,
-                  max: 15,
-                  perm: 'iv',
-                  color: 'secondary',
-                },
-                {
-                  name: 'def_iv',
-                  label: '',
-                  min: 0,
-                  max: 15,
-                  perm: 'iv',
-                  color: 'secondary',
-                },
-                {
-                  name: 'sta_iv',
-                  label: '',
-                  min: 0,
-                  max: 15,
-                  perm: 'iv',
-                  color: 'secondary',
-                },
-                {
-                  name: 'cp',
-                  label: '',
-                  min: 10,
-                  max: 5000,
-                  perm: 'iv',
-                  color: 'secondary',
-                },
-              ].map((slider) => ({
-                ...slider,
-                disabled: !perms[slider.perm],
-              })),
+              primary: /** @type {import('@rm/types').RMSlider[]}*/ (
+                [
+                  {
+                    name: 'iv',
+                    label: '%',
+                    min: 0,
+                    max: 100,
+                    perm: 'iv',
+                    color: 'secondary',
+                  },
+                  ...leagues.map((league) => ({
+                    name: league.name,
+                    label: 'rank',
+                    min: league.minRank || 1,
+                    max: league.maxRank || 100,
+                    perm: 'pvp',
+                    color: 'primary',
+                  })),
+                ].map((slider) => ({
+                  ...slider,
+                  disabled: !perms[slider.perm],
+                }))
+              ),
+              secondary: /** @type {import('@rm/types').RMSlider[]}*/ (
+                [
+                  {
+                    name: 'level',
+                    label: '',
+                    min: 1,
+                    max: 35,
+                    perm: 'iv',
+                    color: 'secondary',
+                  },
+                  {
+                    name: 'atk_iv',
+                    label: '',
+                    min: 0,
+                    max: 15,
+                    perm: 'iv',
+                    color: 'secondary',
+                  },
+                  {
+                    name: 'def_iv',
+                    label: '',
+                    min: 0,
+                    max: 15,
+                    perm: 'iv',
+                    color: 'secondary',
+                  },
+                  {
+                    name: 'sta_iv',
+                    label: '',
+                    min: 0,
+                    max: 15,
+                    perm: 'iv',
+                    color: 'secondary',
+                  },
+                  {
+                    name: 'cp',
+                    label: '',
+                    min: 10,
+                    max: 5000,
+                    perm: 'iv',
+                    color: 'secondary',
+                  },
+                ].map((slider) => ({
+                  ...slider,
+                  disabled: !perms[slider.perm],
+                }))
+              ),
             },
           }
         : BLOCKED,

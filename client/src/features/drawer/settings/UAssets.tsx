@@ -1,5 +1,3 @@
-// @ts-check
-import * as React from 'react'
 import ListSubheader from '@mui/material/ListSubheader'
 import MenuItem from '@mui/material/MenuItem'
 import { useTranslation } from 'react-i18next'
@@ -11,12 +9,7 @@ import { getProperName } from '@utils/strings'
 import { FCSelectListItem } from '@components/inputs/FCSelect'
 import { SettingIcon } from './Icon'
 
-/**
- *
- * @param {{ asset: 'icons' | 'audio' }} param0
- * @returns
- */
-export function UAssetSetting({ asset }) {
+export function UAssetSetting({ asset }: { asset: 'icons' | 'audio' }) {
   const { t } = useTranslation()
   const customizable = useMemory(
     (s) => s[asset === 'icons' ? 'Icons' : 'Audio'].customizable,
@@ -38,12 +31,13 @@ export function UAssetSetting({ asset }) {
   )
 }
 
-/**
- *
- * @param {{ asset: 'icons' | 'audio', category: string }} props
- * @returns
- */
-function UAssetSelect({ asset, category }) {
+function UAssetSelect({
+  asset,
+  category,
+}: {
+  asset: 'icons' | 'audio'
+  category: string
+}) {
   const { t } = useTranslation()
   const value = useStorage((s) => s[asset][category])
   const iconUrl = useMemory((s) => s.Icons.getMisc(category))

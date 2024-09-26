@@ -1,5 +1,3 @@
-// @ts-check
-import * as React from 'react'
 import Avatar from '@mui/material/Avatar'
 import Link from '@mui/material/Link'
 
@@ -11,6 +9,12 @@ export function HeaderImage({
   arScanEligible = false,
   alt,
   large = false,
+}: {
+  url: string
+  exEligible?: boolean
+  arScanEligible?: boolean
+  alt: string
+  large?: boolean
 }) {
   const Icons = useMemory((s) => s.Icons)
   const src = url ? url.replace('http://', 'https://') : Icons.getPokestops(0)

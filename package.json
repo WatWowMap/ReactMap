@@ -131,12 +131,10 @@
     "eslint-plugin-react-hooks": "^4.6.2",
     "husky": "^8.0.1",
     "lint-staged": "^15.2.9",
-    "monaco-editor": "^0.41.0",
     "prettier": "3.3.3",
     "rollup-plugin-delete": "^2.0.0",
     "semantic-release": "^22",
-    "ts-migrate": "0.1.35",
-    "typescript": "5.5.4"
+    "typescript": "5.6.2"
   },
   "engines": {
     "node": ">=18",

@@ -1,16 +1,15 @@
-// @ts-check
 import * as React from 'react'
 import { Polygon } from 'react-leaflet'
 
-/**
- *
- * @param {{
- *  cellColor: string,
- *  blockedColor: string,
- * } & import('@rm/types').Level17Cell} props
- * @returns
- */
-const S17Cell = ({ cellColor, blockedColor, polygon, blocked }) => (
+const S17Cell = ({
+  cellColor,
+  blockedColor,
+  polygon,
+  blocked,
+}: {
+  cellColor: string
+  blockedColor: string
+} & import('@rm/types').Level17Cell) => (
   <Polygon
     key={`${cellColor}${blockedColor}${blocked}`}
     positions={polygon}

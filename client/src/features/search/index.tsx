@@ -1,8 +1,6 @@
-// @ts-check
-import * as React from 'react'
 import Dialog from '@mui/material/Dialog'
 import Box from '@mui/material/Box'
-import Popper from '@mui/material/Popper'
+import Popper, { PopperProps } from '@mui/material/Popper'
 import Autocomplete from '@mui/material/Autocomplete'
 import { useTranslation } from 'react-i18next'
 
@@ -18,8 +16,10 @@ import { renderInput } from './renderInput'
 import { renderOption } from './renderOption'
 import { useSendSearch } from './useSendSearch'
 
-/** @type {import('@mui/material').AutocompleteProps['PopperComponent']} */
-const PopperComponent = ({ children, ...props }) => (
+const PopperComponent: React.JSXElementConstructor<PopperProps> = ({
+  children,
+  ...props
+}) => (
   <Popper
     {...props}
     placement="bottom"
@@ -31,52 +31,51 @@ const PopperComponent = ({ children, ...props }) => (
 
 const handleClose = () => useLayoutStore.setState({ search: false })
 
-/** @type {import('@mui/material').AutocompleteProps['onChange']} */
-const handleChange = (_, result) => {
-  const { map } = useMapStore.getState()
-  const { searchTab } = useStorage.getState()
-  handleClose()
-  if (typeof result === 'object' && 'lat' in result && 'lon' in result) {
-    map.flyTo([result.lat, result.lon], 16)
-    useMemory.setState({
-      manualParams: {
-        category: fromSearchCategory(searchTab),
-        id: result.id,
-      },
-    })
-  }
-}
-
-const DIALOG_SX = /** @type {import('@mui/material').DialogProps['sx']} */ ({
+const DIALOG_SX: import('@mui/material').DialogProps['sx'] = {
   '& .MuiDialog-container': {
     alignItems: 'flex-start',
   },
-})
+}
 
-const BOX_WIDTH = /** @type {import('@mui/material').BoxProps['width']} */ ({
+const BOX_WIDTH: import('@mui/material').BoxProps['width'] = {
   xs: 'inherit',
   sm: 500,
-})
+}
 
-const STATIC_PROPS =
-  /** @type {Omit<import('@mui/material').AutocompleteProps, 'options'>} */ ({
-    sx: { p: 2 },
-    getOptionLabel: (option) => `${option.id}-${option.with_ar}`,
-    filterOptions: (o) => o,
-    ListboxProps: {
-      sx: { maxHeight: '80cqh' },
-    },
-    PopperComponent,
-    onChange: handleChange,
-    renderInput,
-    renderOption,
-    autoComplete: false,
-    clearOnBlur: false,
-    fullWidth: true,
-    clearIcon: null,
-    popupIcon: null,
-    open: true,
-  })
+const STATIC_PROPS: Omit<
+  import('@mui/material').AutocompleteProps<any, false, false, boolean>,
+  'options'
+> = {
+  sx: { p: 2 },
+  getOptionLabel: (option) => `${option.id}-${option.with_ar}`,
+  filterOptions: (o) => o,
+  ListboxProps: {
+    sx: { maxHeight: '80cqh' },
+  },
+  PopperComponent,
+  onChange: (_, result) => {
+    const { map } = useMapStore.getState()
+    const { searchTab } = useStorage.getState()
+    handleClose()
+    if (typeof result === 'object' && 'lat' in result && 'lon' in result) {
+      map.flyTo([result.lat, result.lon], 16)
+      useMemory.setState({
+        manualParams: {
+          category: fromSearchCategory(searchTab),
+          id: result.id,
+        },
+      })
+    }
+  },
+  renderInput,
+  renderOption,
+  autoComplete: false,
+  clearOnBlur: false,
+  fullWidth: true,
+  clearIcon: null,
+  popupIcon: null,
+  open: true,
+}
 
 export function Search() {
   useAnalytics('/search')

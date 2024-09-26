@@ -1,4 +1,3 @@
-// @ts-check
 import * as React from 'react'
 import { useQuery, useLazyQuery } from '@apollo/client'
 
@@ -16,12 +15,11 @@ import { useScanStore, useScannerSessionStorage } from './hooks/store'
 
 const { setScanMode } = useScanStore.getState()
 
-/**
- *
- * @param {{ mode: 'scanNext' | 'scanZone' }} props
- * @returns {JSX.Element}
- */
-function BaseScanOnDemand({ mode }) {
+function BaseScanOnDemand({
+  mode,
+}: {
+  mode: 'scanNext' | 'scanZone'
+}): JSX.Element {
   const scanMode = useScanStore((s) => s[`${mode}Mode`])
   const location = useStorage((s) => s.location)
   const online = useMemory((s) => s.online)
@@ -32,8 +30,10 @@ function BaseScanOnDemand({ mode }) {
     nextFetchPolicy: 'cache-first',
   })
 
-  /** @type {typeof DEFAULT} */
-  const config = React.useMemo(() => data?.scannerConfig || DEFAULT, [data])
+  const config: typeof DEFAULT = React.useMemo(
+    () => data?.scannerConfig || DEFAULT,
+    [data],
+  )
 
   const [scan, { error: scannerError, data: scannerResponse }] = useLazyQuery(
     SCANNER_STATUS,

@@ -1,5 +1,3 @@
-// @ts-check
-import * as React from 'react'
 import { Navigate } from 'react-router-dom'
 import Box from '@mui/material/Box'
 

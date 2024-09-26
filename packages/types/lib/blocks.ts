@@ -1,11 +1,19 @@
 import type {
   ButtonProps,
-  DialogProps,
   DividerProps,
   Grid2Props,
   SxProps,
   TypographyProps,
 } from '@mui/material'
+import type { OnlyType } from './utility'
+
+export interface GridSizes {
+  xs?: number
+  sm?: number
+  md?: number
+  lg?: number
+  xl?: number
+}
 
 interface BaseBlock {
   gridSizes?: GridSizes
@@ -22,24 +30,26 @@ interface BaseBlock {
 }
 
 interface CustomText
-  extends Omit<OnlyType<TypographyProps, Function, false>>,
+  extends Omit<OnlyType<TypographyProps, Function, false>, 'content'>,
     BaseBlock {
   type: 'text'
 }
 
 interface CustomDivider
-  extends Omit<OnlyDType<DividerProps, Function, false>>,
+  extends Omit<OnlyType<DividerProps, Function, false>, 'content'>,
     BaseBlock {
   type: 'divider'
 }
 
 interface CustomButton
-  extends Omit<OnlyType<ButtonProps, Function, false>>,
+  extends Omit<OnlyType<ButtonProps, Function, false>, 'content' | 'href'>,
     BaseBlock {
   type: 'button'
 }
 
-interface CustomImg extends ImgProps, BaseBlock {
+interface CustomImg
+  extends Omit<React.ImgHTMLAttributes<HTMLImageElement>, 'content'>,
+    BaseBlock {
   type: 'img'
 }
 
@@ -65,7 +75,7 @@ interface CustomLocale extends BaseBlock {
   type: 'localeSelection'
 }
 
-interface ParentBlock extends BaseBlock, Grid2Props {
+interface ParentBlock extends BaseBlock, Omit<Grid2Props, 'content'> {
   type: 'parent'
   components: CustomComponent[]
 }

@@ -1,5 +1,3 @@
-// @ts-check
-import * as React from 'react'
 import Typography from '@mui/material/Typography'
 import { useTranslation } from 'react-i18next'
 
@@ -8,12 +6,11 @@ import { useAnalytics } from '@hooks/useAnalytics'
 
 const GYM_THRESHOLD = [2, 6, 20]
 
-/**
- *
- * @param {import('@rm/types/lib').Level14Cell & { total: number }} props
- * @returns
- */
-export function WayfarerPopup({ count_gyms, count_pokestops, total }) {
+export function WayfarerPopup({
+  count_gyms,
+  count_pokestops,
+  total,
+}: import('@rm/types/lib').Level14Cell & { total: number }) {
   const { t } = useTranslation()
   let untilNextGym =
     count_gyms < 3

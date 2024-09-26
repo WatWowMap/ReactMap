@@ -1,5 +1,3 @@
-// @ts-check
-
 import React, { useState } from 'react'
 import Tune from '@mui/icons-material/Tune'
 import Ballot from '@mui/icons-material/Ballot'
@@ -23,10 +21,13 @@ import { generateSlots } from '@utils/generateSlots'
 
 import { tutorialData } from './data'
 
-/**
- * @param {{ toggleHelp?: () => void, category?: keyof import('@rm/types').Available }} props
- */
-export function TutorialAdvanced({ toggleHelp, category }) {
+export function TutorialAdvanced({
+  toggleHelp,
+  category,
+}: {
+  toggleHelp?: () => void
+  category?: keyof import('@rm/types').Available
+}) {
   const { t } = useTranslation()
   const isMobile = useMemory((s) => s.isMobile)
   const [localCategory, setLocalCategory] = useState(category)

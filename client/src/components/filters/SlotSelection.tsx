@@ -1,4 +1,3 @@
-// @ts-check
 import * as React from 'react'
 import Grid2 from '@mui/material/Unstable_Grid2'
 import DialogContent from '@mui/material/DialogContent'
@@ -12,7 +11,7 @@ import { Img } from '@components/Img'
 import { DualBoolToggle } from '@components/inputs/BoolToggle'
 import { ENABLED_ALL } from '@assets/constants'
 import { Header } from '@components/dialogs/Header'
-import { Footer } from '@components/dialogs/Footer'
+import { Footer, FooterButton } from '@components/dialogs/Footer'
 import { StatusIcon } from '@components/StatusIcon'
 
 import { Size } from './Size'
@@ -32,8 +31,10 @@ export function SlotSelection() {
   )
   const disabled = useStorage((s) => !!s.filters?.gyms?.filter?.[id]?.all)
 
-  /** @type {(value: boolean | import('@rm/types').BaseFilter['size'], team: string) => void} */
-  const handleSizeChange = React.useCallback(
+  const handleSizeChange: (
+    value: boolean | import('@rm/types').BaseFilter['size'],
+    team: string,
+  ) => void = React.useCallback(
     (value, team) => {
       useStorage.setState((prev) => {
         const slotsObj = { ...prev.filters.gyms.filter }
@@ -64,27 +65,26 @@ export function SlotSelection() {
     [],
   )
 
-  const footerOptions = React.useMemo(
-    () =>
-      /** @type {import('@components/dialogs/Footer').FooterButton[]} */ ([
-        {
-          name: 'disable_all',
-          action: () => handleSizeChange(false, id),
-          color: 'error',
-          disabled: teamId === '0',
-        },
-        {
-          name: 'enable_all',
-          action: () => handleSizeChange(true, id),
-          color: 'success',
-          disabled: teamId === '0',
-        },
-        {
-          name: 'close',
-          action: handleClose,
-          color: 'secondary',
-        },
-      ]),
+  const footerOptions: FooterButton[] = React.useMemo(
+    () => [
+      {
+        name: 'disable_all',
+        action: () => handleSizeChange(false, id),
+        color: 'error',
+        disabled: teamId === '0',
+      },
+      {
+        name: 'enable_all',
+        action: () => handleSizeChange(true, id),
+        color: 'success',
+        disabled: teamId === '0',
+      },
+      {
+        name: 'close',
+        action: handleClose,
+        color: 'secondary',
+      },
+    ],
     [id, teamId, handleSizeChange, handleClose],
   )
 
@@ -127,13 +127,18 @@ export function SlotSelection() {
   )
 }
 
-/**
- *
- * @param {{ id: string, children?: React.ReactNode, onClick?: import('./Size').SizeOnClick }} props
- * @returns
- */
-function SlotAdjustor({ id, children, onClick }) {
-  const icon = useMemory((s) => s.Icons.getGyms(...id.slice(1).split('-')))
+function SlotAdjustor({
+  id,
+  children,
+  onClick,
+}: {
+  id: string
+  children?: React.ReactNode
+  onClick?: import('./Size').SizeOnClick
+}) {
+  const icon = useMemory((s) =>
+    s.Icons.getGyms(...(id.slice(1).split('-') as [string, string])),
+  )
   return (
     <Grid2 container xs={12} sm={6} alignItems="center" pt={{ xs: 2, sm: 1 }}>
       <Grid2 xs={2}>
@@ -152,7 +157,7 @@ function SlotAdjustor({ id, children, onClick }) {
  * @param {{ id: string, disabled?: boolean }} props
  * @returns
  */
-function Enabled({ id, disabled }) {
+function Enabled({ id, disabled }: { id: string; disabled?: boolean }) {
   const [filter, setFilter] = useDeepStore(
     `filters.gyms.filter.${id}.enabled`,
     false,

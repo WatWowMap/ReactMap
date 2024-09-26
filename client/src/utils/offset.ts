@@ -1,13 +1,10 @@
-// @ts-check
-/* eslint-disable no-bitwise */
-
 /**
  * cyrb53 hash function
  * @param {string} str
  * @param {number} [seed]
  * @returns {[number, number]}
  */
-export const cyrb53 = (str, seed = 0) => {
+export const cyrb53 = (str: string, seed: number = 0): [number, number] => {
   let h1 = 0xdeadbeef ^ seed
   let h2 = 0x41c6ce57 ^ seed
   for (let i = 0, ch; i < str.length; i += 1) {
@@ -24,21 +21,16 @@ export const cyrb53 = (str, seed = 0) => {
   return [h1, h2]
 }
 
-/**
- * Get offset coordinates
- * @param {[number, number]} coords
- * @param {number} amount
- * @param {string} id
- * @param {number} [seed]
- * @returns {[number, number]}
- */
-export const getOffset = (coords, amount, id, seed = 0) => {
+export const getOffset = (
+  coords: [number, number],
+  amount: number,
+  id: string,
+  seed: number = 0,
+): [number, number] => {
   const rand = cyrb53(id, seed)
-  return /** @type {[number, number]} */ (
-    [0, 1].map((i) => {
-      let offset = rand[i] * (0.0002 / 4294967296) - 0.0001
-      offset += offset >= 0 ? -amount : amount
-      return coords[i] + offset
-    })
-  )
+  return [0, 1].map((i) => {
+    let offset = rand[i] * (0.0002 / 4294967296) - 0.0001
+    offset += offset >= 0 ? -amount : amount
+    return coords[i] + offset
+  }) as [number, number]
 }

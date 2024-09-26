@@ -1,18 +1,19 @@
-/* eslint-disable no-fallthrough */
-// @ts-check
 import { useEffect, useMemo, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 
-/**
- * @typedef {{ plural?: boolean, amount?: boolean, alt?: boolean, newLine?: boolean }} CustomTOptions
- * @typedef {(id: string, options?: CustomTOptions) => string} CustomT
- */
+type CustomTOptions = {
+  plural?: boolean
+  amount?: boolean
+  alt?: boolean
+  newLine?: boolean
+}
 
-/**
- * @param {CustomTOptions} options
- * @returns {{ language: string, t: CustomT }}
- */
-export function useTranslateById(options = {}) {
+type CustomT = (id: string, options?: CustomTOptions) => string
+
+export function useTranslateById(options: CustomTOptions = {}): {
+  language: string
+  t: CustomT
+} {
   const i18n = useTranslation()
   const formsToIgnore = useRef(new Set([i18n.t('form_0'), i18n.t('form_45')]))
 

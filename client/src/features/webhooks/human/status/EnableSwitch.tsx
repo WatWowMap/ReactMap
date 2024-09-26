@@ -1,5 +1,3 @@
-// @ts-check
-import * as React from 'react'
 import Switch from '@mui/material/Switch'
 import FormControlLabel from '@mui/material/FormControlLabel'
 import { useMutation } from '@apollo/client'

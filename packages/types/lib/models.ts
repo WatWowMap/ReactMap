@@ -50,10 +50,7 @@ export interface NestSubmission {
   submitted_by: string
 }
 
-export type FullNestSubmission = FullModel<
-  NestSubmission,
-  Models['NestSubmission']
->
+export type FullNestSubmission = FullModel<NestSubmission, NestSubmissionModel>
 
 export interface GymBadge {
   id: number

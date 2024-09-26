@@ -1,27 +1,18 @@
-// @ts-check
-
-import * as React from 'react'
-import Button from '@mui/material/Button'
+import Button, { ButtonProps } from '@mui/material/Button'
 import { useTranslation } from 'react-i18next'
 
 import { I } from '../I'
 
-/**
- *
- * @param {{ children?: string, bgcolor?: string } & import('@mui/material/Button').ButtonProps} props
- * @returns {JSX.Element}
- */
 export function DiscordButton({
   href = '/auth/discord/callback',
   children = 'login',
   size = 'large',
   bgcolor = 'discord.main',
   ...props
-}) {
+}: ButtonProps & { children?: string; bgcolor?: string }) {
   const { t } = useTranslation()
 
   return (
-    // TODO: Augment Mui Types
     <Button
       variant="contained"
       bgcolor={bgcolor}

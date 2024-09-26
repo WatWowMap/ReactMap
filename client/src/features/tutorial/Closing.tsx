@@ -1,4 +1,3 @@
-// @ts-check
 import * as React from 'react'
 import DialogContent from '@mui/material/DialogContent'
 import Divider from '@mui/material/Divider'

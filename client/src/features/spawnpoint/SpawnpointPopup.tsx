@@ -1,17 +1,15 @@
-// @ts-check
-import * as React from 'react'
 import Typography from '@mui/material/Typography'
 import { useTranslation } from 'react-i18next'
 
 import { ErrorBoundary } from '@components/ErrorBoundary'
 import { dayCheck } from '@utils/dayCheck'
 
-/**
- *
- * @param {import('@rm/types').Spawnpoint} props
- * @returns
- */
-export function SpawnpointPopup({ despawn_sec, lat, lon, updated }) {
+export function SpawnpointPopup({
+  despawn_sec,
+  lat,
+  lon,
+  updated,
+}: import('@rm/types').Spawnpoint) {
   const { t } = useTranslation()
 
   const minute = despawn_sec > 60 ? Math.round(despawn_sec / 60) : despawn_sec

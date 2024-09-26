@@ -1,5 +1,3 @@
-// @ts-check
-
 import * as React from 'react'
 import DeleteForever from '@mui/icons-material/DeleteForever'
 import Edit from '@mui/icons-material/Edit'

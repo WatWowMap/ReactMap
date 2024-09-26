@@ -1,17 +1,13 @@
-// @ts-check
 import * as React from 'react'
 
 import { useMemory } from '@store/useMemory'
 import { useStorage } from '@store/useStorage'
 
-/**
- *
- * @param {import('@store/useMemory').UseMemory['settings']['tileServers']} tileServers
- * @param {string} tileServer
- * @param {'day' | 'night' | 'dusk' | 'dawn'} timeOfDay
- * @returns
- */
-const getTileLayer = (tileServers, tileServer, timeOfDay) => {
+function getTileLayer(
+  tileServers: import('@store/useMemory').UseMemory['settings']['tileServers'],
+  tileServer: string,
+  timeOfDay: 'day' | 'night' | 'dusk' | 'dawn',
+) {
   const fallbackTs = Object.values(tileServers).find(
     (server) => server.name !== 'auto',
   )

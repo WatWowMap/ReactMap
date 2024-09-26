@@ -1,4 +1,3 @@
-// @ts-check
 import * as React from 'react'
 import ExpandMore from '@mui/icons-material/ExpandMore'
 import MoreVert from '@mui/icons-material/MoreVert'
@@ -30,16 +29,16 @@ import { formatInterval } from '@utils/formatInterval'
 
 import { useWebhook } from './useWebhook'
 
-/**
- *
- * @param {{
- *  hasRaid: boolean
- *  hasHatched: boolean
- *  raidIconUrl: string
- * } & import('@rm/types').Gym} props
- * @returns
- */
-export function GymPopup({ hasRaid, hasHatched, raidIconUrl, ...gym }) {
+export function GymPopup({
+  hasRaid,
+  hasHatched,
+  raidIconUrl,
+  ...gym
+}: {
+  hasRaid: boolean
+  hasHatched: boolean
+  raidIconUrl: string
+} & import('@rm/types').Gym) {
   const { t } = useTranslation()
   const { perms } = useMemory((s) => s.auth)
   const popups = useStorage((s) => s.popups)
@@ -123,7 +122,12 @@ export function GymPopup({ hasRaid, hasHatched, raidIconUrl, ...gym }) {
  * } & import('@rm/types').Gym} param0
  * @returns
  */
-const MenuActions = ({ hasRaid, ...gym }) => {
+const MenuActions = ({
+  hasRaid,
+  ...gym
+}: {
+  hasRaid: boolean
+} & import('@rm/types').Gym) => {
   const [anchorEl, setAnchorEl] = React.useState(null)
 
   const handleClick = (event) => {
@@ -162,7 +166,10 @@ const DropdownOptions = ({
   raid_pokemon_id,
   raid_pokemon_form,
   raid_level,
-}) => {
+}: {
+  handleClose: () => void
+  hasRaid: boolean
+} & import('@rm/types').Gym) => {
   const { t } = useTranslation()
 
   const { gyms, raids, gymBadges, webhooks } = useMemory((s) => s.auth.perms)
@@ -208,7 +215,9 @@ const DropdownOptions = ({
     })
   }
 
-  const options = [{ name: 'hide', action: handleHide }]
+  const options: { name?: string; action: () => void; key?: string }[] = [
+    { name: 'hide', action: handleHide },
+  ]
 
   if (gyms) {
     if (updated > gymValidDataLimit) {
@@ -263,7 +272,7 @@ const DropdownOptions = ({
  * @param {import('@rm/types').Gym} props
  * @returns
  */
-const PoiImage = ({ url, team_id, name, badge }) => {
+const PoiImage = ({ url, team_id, name, badge }: import('@rm/types').Gym) => {
   const Icons = useMemory((s) => s.Icons)
   const src = url ? url.replace('http://', 'https://') : Icons.getTeams(team_id)
 
@@ -293,7 +302,7 @@ const RaidImage = ({
   raid_pokemon_id,
   raid_pokemon_form,
   raid_pokemon_gender,
-}) => {
+}: import('@rm/types').Gym & { raidIconUrl: string }) => {
   const { t } = useTranslation()
   const Icons = useMemory((s) => s.Icons)
   const pokemon = useMemory((s) => s.masterfile.pokemon)
@@ -304,7 +313,7 @@ const RaidImage = ({
    * @param {number} form
    * @returns
    */
-  const getRaidTypes = (id, form) => {
+  const getRaidTypes = (id: number, form: number) => {
     if (pokemon[id].forms?.[form]?.types) {
       return pokemon[id].forms[form].types
     }
@@ -353,7 +362,7 @@ const GymInfo = ({
   ar_scan_eligible,
   updated,
   badge,
-}) => {
+}: import('@rm/types').Gym) => {
   const { t } = useTranslation()
   const Icons = useMemory((s) => s.Icons)
   const gymValidDataLimit = useMemory((s) => s.gymValidDataLimit)
@@ -432,7 +441,7 @@ const RaidInfo = ({
   raid_pokemon_costume,
   raid_pokemon_move_1,
   raid_pokemon_move_2,
-}) => {
+}: import('@rm/types').Gym) => {
   const { t } = useTranslation()
   const Icons = useMemory((s) => s.Icons)
 
@@ -533,6 +542,12 @@ const Timer = ({
   raid_battle_timestamp,
   raid_end_timestamp,
   raid_pokemon_id,
+}: {
+  start?: boolean
+  hasHatched?: boolean
+  raid_battle_timestamp: number
+  raid_end_timestamp: number
+  raid_pokemon_id: number
 }) => {
   const { t } = useTranslation()
 
@@ -573,7 +588,15 @@ const Timer = ({
  * }} param0
  * @returns
  */
-const GymFooter = ({ lat, lon, hasRaid }) => {
+const GymFooter = ({
+  lat,
+  lon,
+  hasRaid,
+}: {
+  lat: number
+  lon: number
+  hasRaid: boolean
+}) => {
   const darkMode = useStorage((s) => s.darkMode)
   const popups = useStorage((s) => s.popups)
   const perms = useMemory((s) => s.auth.perms)
@@ -635,7 +658,7 @@ const ExtraGymInfo = ({
   total_cp,
   guarding_pokemon_id,
   guarding_pokemon_display,
-}) => {
+}: import('@rm/types').Gym) => {
   const { t, i18n } = useTranslation()
   const Icons = useMemory((s) => s.Icons)
   const gymValidDataLimit = useMemory((s) => s.gymValidDataLimit)
@@ -644,8 +667,8 @@ const ExtraGymInfo = ({
   )
 
   const numFormatter = new Intl.NumberFormat(i18n.language)
-  /** @type {Partial<import('@rm/types').PokemonDisplay>} */
-  const gpd = guarding_pokemon_display || {}
+  const gpd: Partial<import('@rm/types').PokemonDisplay> =
+    guarding_pokemon_display || {}
 
   return (
     <Grid container alignItems="center" justifyContent="center">

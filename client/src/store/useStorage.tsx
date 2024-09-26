@@ -1,62 +1,71 @@
-// @ts-check
-
 import dlv from 'dlv'
-import { useCallback, useMemo } from 'react'
+import { useMemo } from 'react'
 import { create } from 'zustand'
 import { persist, createJSONStorage } from 'zustand/middleware'
 
 import { setDeep } from '@utils/setDeep'
+import type { AllFilters, ObjectPathValue, OnlyType, Paths } from '@rm/types'
 
-/**
- * @typedef {{
- *   darkMode: boolean,
- *   location: [number, number],
- *   popups: Record<string, boolean>,
- *   zoom: number,
- *   sidebar: string,
- *   scanAreasMenu: string,
- *   selectedWebhook: string,
- *   settings: {
- *    navigationControls: 'react' | 'leaflet'
- *    navigation: string,
- *    tileServers: string
- *    distanceUnit: 'kilometers' | 'miles'
- *   },
- *   advMenu: {
- *    pokemon: string,
- *    gyms: string,
- *    pokestops: string,
- *    nests: string,
- *    stations: string,
- *   }
- *   searches: Record<string, string>,
- *   tabs: Record<string, number>,
- *   expanded: Record<string, boolean>,
- *   menus: Partial<ReturnType<import('@rm/server/src/ui/advMenus')['advMenus']>>
- *   holidayEffects: Record<string, boolean>,
- *   motdIndex: number
- *   tutorial: boolean,
- *   searchTab: string,
- *   search: string,
- *   filters: Partial<import('@rm/types').AllFilters>,
- *   icons: Record<string, string>
- *   audio: Record<string, string>
- *   userSettings: Partial<ReturnType<import('@rm/server/src/ui/clientOptions')['clientOptions']>['clientValues']>
- *   profiling: boolean
- *   stateTraceLog: boolean
- *   desktopNotifications: boolean
- *   setAreas: (areas?: string | string[], validAreas?: string[], unselectAll?: boolean) => void,
- *   setPokemonFilterMode: (legacyFilter: boolean, easyMode: boolean) => void,
- *   getPokemonFilterMode: () => 'basic' | 'intermediate' | 'expert',
- *   webhookAdv: Record<string, boolean>,
- * }} UseStorage
- *
- * @typedef {import('@rm/types').OnlyType<UseStorage, Function, false>} UseStorageNoFn
- * @typedef {import('@rm/types').Paths<UseStorageNoFn>} UseStoragePaths
- * @typedef {import('@rm/types').ObjectPathValue<UseStorageNoFn, UseStoragePaths>} UseStorageValues
- * @type {import("zustand").UseBoundStore<import("zustand").StoreApi<UseStorage>>}
- */
-export const useStorage = create(
+export interface UseStorage {
+  darkMode: boolean
+  location: [number, number]
+  popups: Record<string, boolean>
+  zoom: number
+  sidebar: string
+  scanAreasMenu: string
+  selectedWebhook: string
+  settings: {
+    navigationControls: 'react' | 'leaflet'
+    navigation: string
+    tileServers: string
+    distanceUnit: 'kilometers' | 'miles'
+  }
+  advMenu: {
+    pokemon: string
+    gyms: string
+    pokestops: string
+    nests: string
+    stations: string
+  }
+  searches: Record<string, string>
+  tabs: Record<string, number>
+  expanded: Record<string, boolean>
+  menus: Partial<
+    ReturnType<(typeof import('@rm/server/src/ui/advMenus'))['advMenus']>
+  >
+  holidayEffects: Record<string, boolean>
+  motdIndex: number
+  tutorial: boolean
+  searchTab: string
+  search: string
+  filters: Partial<AllFilters>
+  icons: Record<string, string>
+  audio: Record<string, string>
+  userSettings: Partial<
+    ReturnType<
+      (typeof import('@rm/server/src/ui/clientOptions'))['clientOptions']
+    >['clientValues']
+  >
+  profiling: boolean
+  stateTraceLog: boolean
+  desktopNotifications: boolean
+  setAreas: (
+    areas?: string | string[],
+    validAreas?: string[],
+    unselectAll?: boolean,
+  ) => void
+  setPokemonFilterMode: (legacyFilter: boolean, easyMode: boolean) => void
+  getPokemonFilterMode: () => 'basic' | 'intermediate' | 'expert'
+  webhookAdv: Record<string, boolean>
+}
+
+export type UseStorageNoFn = OnlyType<UseStorage, Function, false>
+
+export type UseStoragePaths = Paths<UseStorageNoFn>
+
+export type UseStorageValues = ObjectPathValue<UseStorageNoFn, UseStoragePaths>
+
+export const useStorage = create<UseStorage>()(
   persist(
     (set, get) => ({
       darkMode: !!window?.matchMedia('(prefers-color-scheme: dark)').matches,
@@ -124,10 +133,10 @@ export const useStorage = create(
       },
       holidayEffects: {},
       settings: {
-        // distanceUnit: 'kilometers',
-        // navigation: 'leaflet',
-        // navigationControls: 'leaflet',
-        // tileServers: 'default',
+        distanceUnit: 'kilometers',
+        navigation: '',
+        navigationControls: 'leaflet',
+        tileServers: '',
       },
       searches: {},
       tabs: {},
@@ -175,22 +184,36 @@ export const useStorage = create(
   ),
 )
 
-/** @type {import('@rm/types').useGetDeepStore} */
-export function useGetDeepStore(field, defaultValue) {
+export function useGetDeepStore<T extends UseStoragePaths>(
+  field: T,
+  defaultValue: ObjectPathValue<UseStorageNoFn, T>,
+): ObjectPathValue<UseStorageNoFn, T> {
   return useStorage((s) => dlv(s, field, defaultValue))
 }
 
-/** @type {import('@rm/types').useSetDeepStore} */
-export function setDeepStore(field, value) {
+export function setDeepStore<T extends UseStoragePaths>(
+  field: T,
+  value: ObjectPathValue<UseStorageNoFn, T>,
+) {
   return useStorage.setState((s) => setDeep(s, field, value))
 }
 
-/** @type {import('@rm/types').useDeepStore} */
-export function useDeepStore(field, defaultValue) {
+export function useDeepStore<
+  T extends UseStoragePaths,
+  U extends ObjectPathValue<UseStorageNoFn, T>,
+  V extends U | ((prevValue: U) => U) | (U extends object ? keyof U : never),
+>(
+  field: T,
+  defaultValue?: ObjectPathValue<UseStorageNoFn, T>,
+): [
+  ObjectPathValue<UseStorageNoFn, T>,
+  (arg1: V, ...rest: V extends keyof U ? [arg2: U[V]] : [arg2?: never]) => void,
+] {
   const value = useGetDeepStore(field, defaultValue)
 
-  const callback = useCallback(
-    /** @type {ReturnType<import('@rm/types').useDeepStore>[1]} */ (
+  return useMemo(
+    () => [
+      value,
       (...args) => {
         const [first, ...rest] = field.split('.')
         const corrected = rest.length ? rest.join('.') : first
@@ -198,7 +221,7 @@ export function useDeepStore(field, defaultValue) {
         const path = key ? `${corrected}.${key}` : corrected
 
         return useStorage.setState((prev) => {
-          const prevValue = dlv(prev, field, defaultValue)
+          const prevValue = dlv(prev, field, value)
 
           const nextValue =
             args.length === 1
@@ -208,7 +231,6 @@ export function useDeepStore(field, defaultValue) {
               : args[1]
 
           if (process.env.NODE_ENV === 'development' && prev.stateTraceLog) {
-            // eslint-disable-next-line no-console
             console.trace(field, {
               first,
               rest,
@@ -226,11 +248,8 @@ export function useDeepStore(field, defaultValue) {
                 : setDeep(prev[first], path, nextValue),
           }
         })
-      }
-    ),
-    [field, defaultValue],
+      },
+    ],
+    [value, field],
   )
-
-  // @ts-ignore
-  return useMemo(() => [value, callback], [value, callback])
 }

@@ -1,4 +1,3 @@
-// @ts-check
 import * as React from 'react'
 
 import { useMemory } from '@store/useMemory'
@@ -8,12 +7,11 @@ import { S14CellTile } from './S14Cell'
 import { S17CellTile } from './S17Cell'
 import { PoITile } from './PoI'
 
-/**
- *
- * @param {import('@rm/types').SubmissionCell} props
- * @returns
- */
-const Wayfarer = ({ level14Cells, level17Cells, pois }) => {
+const Wayfarer = ({
+  level14Cells,
+  level17Cells,
+  pois,
+}: import('@rm/types').SubmissionCell) => {
   const poiColor = useStorage((s) => s.userSettings.wayfarer.poiColor)
   const showcaseColor = useStorage((s) => s.userSettings.wayfarer.showcaseColor)
   const partnerColor = useStorage((s) => s.userSettings.wayfarer.partnerColor)

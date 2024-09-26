@@ -1,17 +1,16 @@
-// @ts-check
 import { useMemo } from 'react'
 import { useQuery } from '@apollo/client'
 
 import { GET_STATION_POKEMON } from '@services/queries/station'
+import { StationPokemon } from '@rm/types'
 
-/**
- * @param {string} id
- * @returns {import('@rm/types').StationPokemon[]}
- */
-export function useGetStationMons(id) {
-  const { data } = useQuery(GET_STATION_POKEMON, {
-    variables: { id },
-  })
+export function useGetStationMons(id: string) {
+  const { data } = useQuery<{ stationPokemon?: StationPokemon[] }>(
+    GET_STATION_POKEMON,
+    {
+      variables: { id },
+    },
+  )
 
   return useMemo(() => data?.stationPokemon || [], [data])
 }

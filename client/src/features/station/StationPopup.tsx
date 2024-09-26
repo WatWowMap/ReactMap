@@ -1,5 +1,3 @@
-/* eslint-disable react/destructuring-assignment */
-// @ts-check
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import Card from '@mui/material/Card'
@@ -41,8 +39,7 @@ import { PokeMove } from '@components/popups/PokeMove'
 
 import { useGetStationMons } from './useGetStationMons'
 
-/** @param {import('@rm/types').Station} station */
-export function StationPopup(station) {
+export function StationPopup(station: import('@rm/types').Station) {
   useAnalytics('Popup', 'Station')
 
   return (
@@ -79,8 +76,7 @@ export function StationPopup(station) {
   )
 }
 
-/** @param {import('@rm/types').Station} props */
-function StationHeader({ name, updated }) {
+function StationHeader({ name, updated }: import('@rm/types').Station) {
   const { t } = useTranslation()
   const dateFormatter = useFormatStore((s) => s.dateFormat)
 
@@ -107,8 +103,11 @@ function StationHeader({ name, updated }) {
   )
 }
 
-/** @param {import('@rm/types').Station} props */
-function StationRating({ battle_level, battle_start, battle_end }) {
+function StationRating({
+  battle_level,
+  battle_start,
+  battle_end,
+}: import('@rm/types').Station) {
   const { t } = useTranslation()
   const isStarting = battle_start > Date.now() / 1000
   const epoch = isStarting ? battle_start : battle_end
@@ -125,7 +124,6 @@ function StationRating({ battle_level, battle_start, battle_end }) {
   )
 }
 
-/** @param {import('@rm/types').Station} props */
 function StationMenu({
   id,
   battle_level,
@@ -133,7 +131,7 @@ function StationMenu({
   battle_pokemon_form,
   lat,
   lon,
-}) {
+}: import('@rm/types').Station) {
   const copyCoords = useGetDeepStore(
     'userSettings.stations.enableStationPopupCoords',
     false,
@@ -206,7 +204,6 @@ function StationMenu({
   )
 }
 
-/** @param {import('@rm/types').Station} props */
 function StationMedia({
   is_battle_available,
   battle_pokemon_id,
@@ -217,7 +214,7 @@ function StationMedia({
   battle_pokemon_bread_mode,
   battle_pokemon_move_1,
   battle_pokemon_move_2,
-}) {
+}: import('@rm/types').Station) {
   const { t } = useTranslateById()
   const stationImage = useMemory((s) => s.Icons.getStation(true))
   const types = useMemory((s) => {
@@ -281,8 +278,9 @@ function StationMedia({
   )
 }
 
-/** @param {import('@rm/types').Station} station */
-function StationAttackBonus({ total_stationed_pokemon }) {
+function StationAttackBonus({
+  total_stationed_pokemon,
+}: import('@rm/types').Station) {
   const { t } = useTranslation()
   return (
     <Stack alignItems="center">
@@ -300,8 +298,11 @@ function StationAttackBonus({ total_stationed_pokemon }) {
   )
 }
 
-/** @param {import('@rm/types').Station} station */
-function StationContent({ start_time, end_time, id }) {
+function StationContent({
+  start_time,
+  end_time,
+  id,
+}: import('@rm/types').Station) {
   const epoch = (start_time > Date.now() / 1000 ? start_time : end_time) || 0
   return (
     <CardContent sx={{ p: 0 }}>
@@ -317,8 +318,7 @@ function StationContent({ start_time, end_time, id }) {
   )
 }
 
-/** @param {import('@rm/types').Station} props */
-function StationMons({ id }) {
+function StationMons({ id }: import('@rm/types').Station) {
   const { t: tId } = useTranslateById()
   const { t } = useTranslation()
   const mons = useGetStationMons(id)
@@ -369,7 +369,14 @@ function StationMons({ id }) {
 /**
  * @param {{ start?: boolean, epoch: number } & import('@mui/material').TypographyProps} props
  */
-function LiveTimeStamp({ start = false, epoch, ...props }) {
+function LiveTimeStamp({
+  start = false,
+  epoch,
+  ...props
+}: {
+  start?: boolean
+  epoch: number
+} & import('@mui/material').TypographyProps) {
   const { t } = useTranslation()
   const relativeTime = useRelativeTimer(epoch || 0)
   const pastTense = epoch * 1000 < Date.now()
@@ -388,7 +395,15 @@ function LiveTimeStamp({ start = false, epoch, ...props }) {
 /**
  * @param {{ start?: boolean, date?: boolean, epoch: number } & import('@mui/material').TypographyProps} props
  */
-function StaticTimeStamp({ date = false, epoch, ...props }) {
+function StaticTimeStamp({
+  date = false,
+  epoch,
+  ...props
+}: {
+  start?: boolean
+  date?: boolean
+  epoch: number
+} & import('@mui/material').TypographyProps) {
   const formatter = useFormatStore((s) => (date ? s.dateFormat : s.timeFormat))
   return (
     <Typography variant="caption" {...props}>

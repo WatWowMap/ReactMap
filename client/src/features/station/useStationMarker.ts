@@ -1,15 +1,9 @@
-// @ts-check
 import { divIcon } from 'leaflet'
 
 import { basicEqualFn, useMemory } from '@store/useMemory'
 import { useStorage } from '@store/useStorage'
 import { useOpacity } from '@hooks/useOpacity'
 
-/**
- *
- * @param {import('@rm/types').Station} param0
- * @returns
- */
 export function useStationMarker({
   battle_level,
   battle_pokemon_alignment,
@@ -21,7 +15,7 @@ export function useStationMarker({
   battle_pokemon_bread_mode,
   start_time,
   end_time,
-}) {
+}: import('@rm/types').Station) {
   const [, Icons] = useStorage(
     (s) => [s.icons, useMemory.getState().Icons],
     (a, b) => Object.entries(a[0]).every(([k, v]) => b[0][k] === v),

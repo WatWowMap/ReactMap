@@ -1,4 +1,3 @@
-// @ts-check
 import * as React from 'react'
 import Grid2 from '@mui/material/Unstable_Grid2'
 import Dialog from '@mui/material/Dialog'
@@ -78,7 +77,12 @@ export function AdvancedFilter() {
     if (!save) {
       setFilters({ ...backup.current })
     } else if (id === 'global' && selectedIds?.length && category) {
-      applyToAll(filters, category, selectedIds, false)
+      applyToAll({
+        newFilter: filters,
+        category,
+        selectedIds,
+        includeSlots: false,
+      })
     }
   }
 

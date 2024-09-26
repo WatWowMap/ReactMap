@@ -1,4 +1,3 @@
-// @ts-check
 import * as React from 'react'
 import Dialog from '@mui/material/Dialog'
 import DialogContent from '@mui/material/DialogContent'
@@ -28,9 +27,9 @@ export function ScanDialog() {
     if (scanZone) return setScanMode('scanZoneMode')
   }, [scanNext, scanZone])
 
-  const footerOptions = React.useMemo(
-    () =>
-      /** @type {import('@components/dialogs/Footer').FooterButton[]} */ ([
+  const footerOptions: import('@components/dialogs/Footer').FooterButton[] =
+    React.useMemo(
+      () => [
         {
           name: 'close',
           icon: 'Clear',
@@ -38,14 +37,14 @@ export function ScanDialog() {
           align: 'right',
           action: handleClose,
         },
-      ]),
-    [handleClose],
-  )
+      ],
+      [handleClose],
+    )
 
   return (
     <Dialog
       onClose={handleClose}
-      open={SCAN_MODES.includes(scanMode)}
+      open={SCAN_MODES.includes(scanMode as (typeof SCAN_MODES)[number])}
       maxWidth="xs"
     >
       <Header titles={[`scan_${scanMode}_title`]} action={handleClose} />

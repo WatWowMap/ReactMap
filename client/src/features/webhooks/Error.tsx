@@ -1,12 +1,11 @@
-// @ts-check
-import React from 'react'
+import * as React from 'react'
 import Typography from '@mui/material/Typography'
 import Grid from '@mui/material/Unstable_Grid2'
 import { useTranslation, Trans } from 'react-i18next'
 
 import { useWebhookStore } from '@store/useWebhookStore'
 
-export function WebhookError({ children }) {
+export function WebhookError({ children }: { children: React.ReactNode }) {
   const { t } = useTranslation()
   const name = useWebhookStore((s) => s.context.name)
   return (

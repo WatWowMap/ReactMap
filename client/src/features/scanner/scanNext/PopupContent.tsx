@@ -1,4 +1,3 @@
-// @ts-check
 import * as React from 'react'
 import Button from '@mui/material/Button'
 import ButtonGroup from '@mui/material/ButtonGroup'
@@ -14,7 +13,7 @@ export function ScanNextPopup() {
   const scanNextSize = useScanStore((s) => s.scanNextSize)
 
   const setSize = React.useCallback(
-    (/** @type {typeof SCAN_SIZES[number]} */ size) => () => {
+    (size: (typeof SCAN_SIZES)[number]) => () => {
       useScanStore.setState({ scanNextSize: size })
     },
     [],

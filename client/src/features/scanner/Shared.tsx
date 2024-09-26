@@ -1,4 +1,3 @@
-// @ts-check
 import * as React from 'react'
 import { styled } from '@mui/material/styles'
 import ListItem from '@mui/material/ListItem'
@@ -31,12 +30,12 @@ export const StyledSubHeader = styled(ListSubheader)(() => ({
 
 const { setScanMode } = useScanStore.getState()
 
-export const COLORS = /** @type {const} */ ({
+export const COLORS = {
   blue: 'rgb(90, 145, 255)',
   orange: 'rgb(255, 165, 0)',
   red: 'rgb(255, 100, 90)',
   purple: 'rgb(200, 100, 255)',
-})
+} as const
 
 export function ScanRequests() {
   const { t } = useTranslation()
@@ -60,12 +59,11 @@ export function ScanQueue() {
   )
 }
 
-/**
- *
- * @param {{ mode: import('./hooks/store').ScanMode }} props
- * @returns
- */
-export function ScanConfirm({ mode }) {
+export function ScanConfirm({
+  mode,
+}: {
+  mode: import('./hooks/store').ScanMode
+}) {
   const { t } = useTranslation()
   const cooldown = useScannerSessionStorage((s) => s.cooldown)
   const valid = useScanStore((s) => s.valid)
@@ -120,12 +118,11 @@ export function InAllowedArea() {
   }[valid]
 }
 
-/**
- *
- * @param {{ mode: import('./hooks/store').ScanMode}} props
- * @returns
- */
-export function ScanCancel({ mode }) {
+export function ScanCancel({
+  mode,
+}: {
+  mode: import('./hooks/store').ScanMode
+}) {
   const { t } = useTranslation()
   return (
     <StyledListButton onClick={() => setScanMode(`${mode}Mode`, '')}>
@@ -137,12 +134,17 @@ export function ScanCancel({ mode }) {
   )
 }
 
-/**
- *
- * @param {{ radius: number, lat: number, lon: number, color?: string }} props
- * @returns
- */
-export function ScanCircle({ lat, lon, radius, color = COLORS.blue }) {
+export function ScanCircle({
+  lat,
+  lon,
+  radius,
+  color = COLORS.blue,
+}: {
+  radius: number
+  lat: number
+  lon: number
+  color?: string
+}) {
   return (
     <Circle
       radius={radius}
@@ -154,12 +156,7 @@ export function ScanCircle({ lat, lon, radius, color = COLORS.blue }) {
   )
 }
 
-/**
- *
- * @param {{ radius?: number }} props
- * @returns
- */
-export function ScanCircles({ radius }) {
+export function ScanCircles({ radius }: { radius?: number }) {
   const scanCoords = useScanStore((s) => s.scanCoords)
   const userRadius = useScanStore((s) => s.userRadius)
   const validCoords = useScanStore((s) => s.validCoords)

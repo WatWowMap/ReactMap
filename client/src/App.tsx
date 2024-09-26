@@ -1,4 +1,3 @@
-// @ts-check
 import '@assets/css/main.css'
 import 'leaflet.locatecontrol/dist/L.Control.Locate.css'
 import 'leaflet/dist/leaflet.css'

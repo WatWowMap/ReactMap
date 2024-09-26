@@ -1,16 +1,15 @@
-// @ts-check
-import * as React from 'react'
 import Snackbar from '@mui/material/Snackbar'
 import Alert from '@mui/material/Alert'
 import { useTranslation } from 'react-i18next'
 
 import { handleReset, usePlayStore } from '../hooks/store'
 
-/** @type {import('@mui/material').SnackbarProps['anchorOrigin']} */
-const anchorOrigin = { vertical: 'bottom', horizontal: 'right' }
+const anchorOrigin: import('@mui/material').SnackbarProps['anchorOrigin'] = {
+  vertical: 'bottom',
+  horizontal: 'right',
+}
 
-/** @type {React.CSSProperties} */
-const alertStyle = { textAlign: 'center', color: 'white' }
+const alertStyle: React.CSSProperties = { textAlign: 'center', color: 'white' }
 
 export function StatusNotification() {
   const { t } = useTranslation()

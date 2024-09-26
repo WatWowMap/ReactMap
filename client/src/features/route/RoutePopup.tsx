@@ -1,5 +1,3 @@
-// @ts-check
-/* eslint-disable react/destructuring-assignment */
 import * as React from 'react'
 import { Popup } from 'react-leaflet'
 import { useLazyQuery } from '@apollo/client'
@@ -33,16 +31,13 @@ import { useFormatDistance } from './useFormatDistance'
 
 const IMAGE_SIZE = 80
 
-/**
- *
- * @param {Exclude<import('@mui/material').ListItemTextProps, 'primary'> & { primary: string }} props
- * @returns
- */
 function ListItemWrapper({
   primary,
   primaryTypographyProps,
   children = null,
   ...props
+}: Exclude<import('@mui/material').ListItemTextProps, 'primary'> & {
+  primary: string
 }) {
   const { t } = useTranslation()
 
@@ -74,16 +69,17 @@ function ListItemWrapper({
   )
 }
 
-/**
- * @param {{
- *  disabled?: boolean
- *  children: React.ReactNode
- *  expandKey: string
- *  primary: string
- * }} props
- * @returns
- */
-function ExpandableWrapper({ disabled = false, children, expandKey, primary }) {
+function ExpandableWrapper({
+  disabled = false,
+  children,
+  expandKey,
+  primary,
+}: {
+  disabled?: boolean
+  children: React.ReactNode
+  expandKey: string
+  primary: string
+}) {
   const expanded = useStorage((s) => !!s.popups[expandKey])
   return (
     <>
@@ -125,12 +121,10 @@ function ExpandableWrapper({ disabled = false, children, expandKey, primary }) {
   )
 }
 
-/**
- *
- * @param {import("@rm/types").Route & { end?: boolean }} props
- * @returns
- */
-export function RoutePopup({ end, ...props }) {
+export function RoutePopup({
+  end,
+  ...props
+}: import('@rm/types').Route & { end?: boolean }) {
   const [route, setRoute] = React.useState({ ...props, tags: [] })
   const { config } = useMemory.getState()
   const formatDistance = useFormatDistance()
@@ -299,7 +293,7 @@ export function RoutePopup({ end, ...props }) {
   )
 }
 
-function DownloadRouteGPX({ route }) {
+function DownloadRouteGPX({ route }: { route: import('@rm/types').Route }) {
   const GPXContent = React.useMemo(() => {
     if (!route.waypoints.length) {
       return null

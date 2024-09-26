@@ -1,4 +1,3 @@
-// @ts-check
 import { useEffect, useMemo, useRef } from 'react'
 import { useQuery } from '@apollo/client'
 import { useTranslation } from 'react-i18next'
@@ -9,13 +8,18 @@ import { useWebhookStore } from '@store/useWebhookStore'
 
 import { Poracle } from '../services/Poracle'
 
-/**
- *
- * @template {import('@store/useWebhookStore').WebhookStore['category'] | 'profile'} T
- * @param {T} category
- * @returns {{ data: T extends 'human' ? { webhooks: string[], selected: string } : import("@rm/types").APIReturnType[T], loading: boolean }}
- */
-export function useGetWebhookData(category) {
+export function useGetWebhookData<
+  T extends
+    | import('@store/useWebhookStore').WebhookStore['category']
+    | 'profile',
+>(
+  category: T,
+): {
+  data: T extends 'human'
+    ? { webhooks: string[]; selected: string }
+    : import('@rm/types').APIReturnType[T]
+  loading: boolean
+} {
   const { t } = useTranslation()
   const search = useWebhookStore((s) => s.trackedSearch)
   const realCategory = useWebhookStore((s) => s.category)

@@ -1,11 +1,4 @@
-// @ts-check
-
-/**
- * @param {string} category
- * @param {string} id
- * @returns {boolean}
- */
-export function checkIfHasAll(category, id) {
+export function checkIfHasAll(category: string, id: string): boolean {
   return (
     category === 'pokemon' ||
     (category === 'pokestops' &&

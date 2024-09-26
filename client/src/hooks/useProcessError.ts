@@ -1,15 +1,12 @@
-// @ts-check
 import { t } from 'i18next'
 
 import { useMemory } from '@store/useMemory'
 import { useWebhookStore } from '@store/useWebhookStore'
 import React from 'react'
 
-/**
- *
- * @param {import('@apollo/client').ApolloError} error
- */
-export const useProcessError = (error) => {
+export const useProcessError = (
+  error: import('@apollo/client').ApolloError,
+) => {
   const [errorState, setErrorState] = React.useState(false)
 
   React.useEffect(() => {

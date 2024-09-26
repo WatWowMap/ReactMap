@@ -1,4 +1,3 @@
-// @ts-check
 import { t } from 'i18next'
 
 import { useMemory } from '@store/useMemory'
@@ -12,34 +11,40 @@ let isAudioPlaying = false
 
 /**
  * Wrapper to get permission, to keep API check in one module
- * @returns {NotificationPermission}
  */
-export function getPermission() {
+export function getPermission(): NotificationPermission {
   return HAS_API ? Notification.permission : 'denied'
 }
 
 /**
  * Wrapper to request permission, to keep API check in one module
- * @returns {Promise<NotificationPermission>}
  */
-export async function requestPermission() {
+export async function requestPermission(): Promise<NotificationPermission> {
   if (!HAS_API) return 'denied'
   return Notification.requestPermission()
 }
 
-/**
- * @typedef {import('@rm/types').Config['clientSideOptions']['notifications']} RMNotificationOptions
- *
- * @param {string} key
- * @param {string} title
- * @param {keyof Omit<RMNotificationOptions, 'enabled' | 'audio' | 'audioAlwaysOn' | 'volumeLevel'>} category
- * @param {NotificationOptions & { lat?: number, lon?: number, expire?: number, audio?: string }} [options]
- */
-export function sendNotification(key, title, category, options) {
+type RMNotificationOptions =
+  import('@rm/types').Config['clientSideOptions']['notifications']
+
+export function sendNotification(
+  key: string,
+  title: string,
+  category: keyof Omit<
+    RMNotificationOptions,
+    'enabled' | 'audio' | 'audioAlwaysOn' | 'volumeLevel'
+  >,
+  options: NotificationOptions & {
+    lat?: number
+    lon?: number
+    expire?: number
+    audio?: string
+  },
+) {
   if (cache.has(key) || !HAS_API) return
-  const userSettings = /** @type {Partial<RMNotificationOptions>} */ (
-    useStorage.getState().userSettings?.notifications || {}
-  )
+  const userSettings = useStorage.getState().userSettings?.notifications || {
+    enabled: false,
+  }
   if (userSettings.enabled && userSettings[category]) {
     if (getPermission() === 'granted') {
       const { lat, lon, audio, expire, ...rest } = options

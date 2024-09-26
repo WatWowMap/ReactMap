@@ -1,20 +1,14 @@
-// @ts-check
-
-import * as React from 'react'
 import Snackbar from '@mui/material/Snackbar'
 import Alert from '@mui/material/Alert'
 
 import { useDataManagementStore } from '../hooks/store'
 
-const handleClose =
-  /** @type {(e: React.SyntheticEvent, reason?: string ) => void} */ (
-    (_, reason) => {
-      if (reason === 'clickaway') {
-        return
-      }
-      useDataManagementStore.setState({ notification: false })
-    }
-  )
+const handleClose = (_: React.SyntheticEvent, reason?: string) => {
+  if (reason === 'clickaway') {
+    return
+  }
+  useDataManagementStore.setState({ notification: false })
+}
 
 export function DataManagementNotification() {
   const open = useDataManagementStore((s) => s.notification)

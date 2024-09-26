@@ -1,6 +1,7 @@
 // @ts-check
 import { useEffect, useState } from 'react'
 import { usePlayStore } from './store'
+import { Config } from '@rm/types'
 
 const DEFAULT = {
   settings: { parentStyle: {} },
@@ -9,7 +10,10 @@ const DEFAULT = {
   titles: [],
 }
 
-export function useSafeParse() {
+export function useSafeParse():
+  | Partial<Config['map']['messageOfTheDay']>
+  | Partial<Config['map']['loginPage']>
+  | Partial<Config['map']['donationPage']> {
   const code = usePlayStore((s) => s.code)
   const component = usePlayStore((s) => s.component)
 

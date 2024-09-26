@@ -1,5 +1,3 @@
-// @ts-check
-/* eslint-disable react/destructuring-assignment */
 import * as React from 'react'
 import { GeoJSON } from 'react-leaflet'
 import { Polygon } from 'leaflet'
@@ -8,12 +6,7 @@ import { useWebhookStore, handleClick } from '@store/useWebhookStore'
 import { useStorage } from '@store/useStorage'
 import { getProperName } from '@utils/strings'
 
-/**
- *
- * @param {import('@rm/types').RMGeoJSON} featureCollection
- * @returns
- */
-function ScanArea(featureCollection) {
+function ScanArea(featureCollection: import('@rm/types').RMGeoJSON) {
   const search = useStorage((s) => s.filters.scanAreas?.filter?.search)
   const tapToToggle = useStorage((s) => s.userSettings.scanAreas.tapToToggle)
   const alwaysShowLabels = useStorage(

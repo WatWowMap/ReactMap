@@ -1,27 +1,22 @@
 // @ts-check
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import TextField from '@mui/material/TextField'
+import TextField, { TextFieldProps } from '@mui/material/TextField'
 import IconButton from '@mui/material/IconButton'
 import HighlightOffIcon from '@mui/icons-material/HighlightOff'
 
-import { useDeepStore } from '@store/useStorage'
+import { useDeepStore, UseStoragePaths } from '@store/useStorage'
 
-/**
- * @typedef {{
- *  field?: import('@store/useStorage').UseStoragePaths,
- *  value?: string,
- *  setValue?: (value: string) => void,
- *  label?: string,
- *  disabled?: boolean,
- * } & import('@mui/material').TextFieldProps} Props
- */
+type Props = {
+  field?: UseStoragePaths
+  value?: string
+  setValue?: (value: string) => void
+  label?: string
+  disabled?: boolean
+} & TextFieldProps
 
-export const GenericSearch = React.forwardRef(
-  (
-    /** @type {Props} */ { field, label, disabled, value, setValue, ...props },
-    ref,
-  ) => {
+export const GenericSearch = React.forwardRef<HTMLDivElement, Props>(
+  ({ field, label, disabled, value, setValue, ...props }, ref) => {
     const { t } = useTranslation()
     const [searchValue, setSearchValue] = field
       ? useDeepStore(field, '')
@@ -41,8 +36,8 @@ export const GenericSearch = React.forwardRef(
       }),
       [!!searchValue, setSearchValue],
     )
-    /** @type {import('@mui/material').TextFieldProps['onChange']} */
-    const onChange = React.useCallback(
+
+    const onChange: TextFieldProps['onChange'] = React.useCallback(
       (e) => setSearchValue(e.target.value || ''),
       [setSearchValue],
     )

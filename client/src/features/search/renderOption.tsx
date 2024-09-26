@@ -1,5 +1,3 @@
-// @ts-check
-import * as React from 'react'
 import { t } from 'i18next'
 import ListItem from '@mui/material/ListItem'
 import ListItemIcon from '@mui/material/ListItemIcon'
@@ -19,8 +17,7 @@ import { useRelativeTimer } from '@hooks/useRelativeTime'
 
 import { OptionImageMemo } from './OptionImage'
 
-/** @param {string} tab */
-const getBackupName = (tab) => {
+const getBackupName = (tab: string) => {
   switch (tab) {
     case 'stations':
       return 'unknown_station'
@@ -32,11 +29,11 @@ const getBackupName = (tab) => {
   }
 }
 
-const MiniInvasion = ({ id, form }) => {
+const MiniInvasion = ({ id, form }: { id: number; form: number }) => {
   const { Icons } = useMemory.getState()
   return <Img src={Icons.getPokemon(id, form)} maxWidth={20} maxHeight={20} />
 }
-/** @param {import('@rm/types').Invasion} props */
+
 const InvasionSubtitle = ({
   confirmed,
   grunt_type,
@@ -47,7 +44,7 @@ const InvasionSubtitle = ({
   slot_3_pokemon_id,
   slot_3_form,
   incident_expire_timestamp,
-}) => {
+}: import('@rm/types').Invasion) => {
   const expire = getTimeUntil(incident_expire_timestamp * 1000, true)
   if (!confirmed) return expire.str
   const { masterfile } = useMemory.getState()
@@ -96,8 +93,12 @@ const Timer = ({ expireTime }) => {
   return time
 }
 
-/** @type {import('@mui/material').AutocompleteProps['renderOption']} */
-export const renderOption = ({ key, ...props }, option) => {
+export const renderOption: import('@mui/material').AutocompleteProps<
+  any,
+  false,
+  false,
+  boolean
+>['renderOption'] = ({ key, ...props }, option) => {
   const { searchTab } = useStorage.getState()
   const { questMessage } = useMemory.getState().config.misc
 

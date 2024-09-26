@@ -1,17 +1,10 @@
-// @ts-check
-/* eslint-disable react/destructuring-assignment */
 import * as React from 'react'
 import { Polygon, Popup } from 'react-leaflet'
 
 import { ScanCellPopup } from './ScanCellPopup'
 import { scanCellMarker } from './scanCellMarker'
 
-/**
- *
- * @param {import('@rm/types').ScanCell} scanCell
- * @returns
- */
-const BaseScanCellTile = (scanCell) => (
+const BaseScanCellTile = (scanCell: import('@rm/types').ScanCell) => (
   <Polygon
     positions={scanCell.polygon}
     {...scanCellMarker(Date.now() / 1000 - scanCell.updated)}

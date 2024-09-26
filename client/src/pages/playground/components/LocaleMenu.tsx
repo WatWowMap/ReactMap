@@ -1,4 +1,3 @@
-// @ts-check
 import * as React from 'react'
 import MenuItem from '@mui/material/MenuItem'
 import Button from '@mui/material/Button'
@@ -13,11 +12,7 @@ export function LocaleMenu() {
 
   const [anchorEl, setAnchorEl] = React.useState(null)
 
-  /**
-   *
-   * @param {string} [value]
-   */
-  const handleClose = (value) => () => {
+  const handleClose = (value?: string) => () => {
     if (value) i18n.changeLanguage(value)
     setAnchorEl(null)
   }

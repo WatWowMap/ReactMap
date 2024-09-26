@@ -1,10 +1,7 @@
-// @ts-check
-
-/**
- * @param {import("@rm/types").Config['map']['holidayEffects'][number]} holiday
- * @param {Date} [now]
- */
-function getStart(holiday, now = new Date()) {
+function getStart(
+  holiday: import('@rm/types').Config['map']['holidayEffects'][number],
+  now: Date = new Date(),
+) {
   return new Date(
     now.getFullYear() - (holiday.startMonth > holiday.endMonth ? 1 : 0),
     holiday.startMonth - 1,
@@ -15,11 +12,10 @@ function getStart(holiday, now = new Date()) {
   )
 }
 
-/**
- * @param {import("@rm/types").Config['map']['holidayEffects'][number]} holiday
- * @param {Date} [now]
- */
-function getEnd(holiday, now = new Date()) {
+function getEnd(
+  holiday: import('@rm/types').Config['map']['holidayEffects'][number],
+  now: Date = new Date(),
+) {
   return new Date(
     now.getFullYear(),
     holiday.endMonth - 1,
@@ -30,10 +26,9 @@ function getEnd(holiday, now = new Date()) {
   )
 }
 
-/**
- * @param {import("@rm/types").Config['map']['holidayEffects'][number]} holiday
- */
-export function checkHoliday(holiday) {
+export function checkHoliday(
+  holiday: import('@rm/types').Config['map']['holidayEffects'][number],
+) {
   if (!holiday.enabled) return false
   const date = new Date()
   const start = getStart(holiday, date)
@@ -41,10 +36,9 @@ export function checkHoliday(holiday) {
   return date >= start && date <= end
 }
 
-/**
- * @param {import("@rm/types").Config['map']['holidayEffects'][number]} holiday
- */
-export function countdownUntilEnd(holiday) {
+export function countdownUntilEnd(
+  holiday: import('@rm/types').Config['map']['holidayEffects'][number],
+) {
   const date = new Date()
   const end = getEnd(holiday, date)
   return end.getMilliseconds() - date.getMilliseconds()

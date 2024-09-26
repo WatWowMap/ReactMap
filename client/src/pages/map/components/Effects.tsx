@@ -1,5 +1,3 @@
-// @ts-check
-
 import * as React from 'react'
 import { useParams } from 'react-router-dom'
 import { useMap } from 'react-leaflet'
@@ -12,6 +10,7 @@ import { useMemory } from '@store/useMemory'
 import { useGenGyms } from '../hooks/useGenGyms'
 import { useGenPokestops } from '../hooks/useGenPokestops'
 import { useGenPokemon } from '../hooks/useGenPokemon'
+import { Theme } from '@mui/material'
 
 export function Effects() {
   const params = useParams()
@@ -23,14 +22,8 @@ export function Effects() {
   useGenPokestops()
   useGenPokemon()
 
-  const isMobile = useMediaQuery(
-    (/** @type {import('@mui/system').Theme} */ theme) =>
-      theme.breakpoints.only('xs'),
-  )
-  const isTablet = useMediaQuery(
-    (/** @type {import('@mui/system').Theme} */ theme) =>
-      theme.breakpoints.only('sm'),
-  )
+  const isMobile = useMediaQuery((theme: Theme) => theme.breakpoints.only('xs'))
+  const isTablet = useMediaQuery((theme: Theme) => theme.breakpoints.only('sm'))
   const online = useMemory((s) => s.online)
 
   React.useEffect(() => {

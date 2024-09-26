@@ -1,11 +1,4 @@
-// @ts-check
-
-/**
- *
- * @param {string} searchCategory
- * @returns {string}
- */
-export function fromSearchCategory(searchCategory) {
+export function fromSearchCategory(searchCategory: string): string {
   switch (searchCategory) {
     case 'lures':
     case 'nests':

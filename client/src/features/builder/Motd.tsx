@@ -1,5 +1,3 @@
-// @ts-check
-/* eslint-disable react/no-array-index-key */
 import * as React from 'react'
 import Typography from '@mui/material/Typography'
 import Dialog from '@mui/material/Dialog'
@@ -14,15 +12,25 @@ import { Loading } from '@components/Loading'
 import { CustomTile } from './components/CustomTile'
 import { CustomDialog } from './components/CustomDialog'
 import { getBlockContent } from './utils'
+import { Config } from '@rm/types'
 
-const DEFAULT =
-  /** @type {import('@rm/types').Config['map']['messageOfTheDay']} */ ({
-    settings: {},
-    components: [],
-    titles: [],
-    footerButtons: [],
-    index: 0,
-  })
+const DEFAULT: Config['map']['messageOfTheDay'] = {
+  settings: {
+    donorOnly: false,
+    permanent: false,
+    timeoutSeconds: 0,
+    freeloaderOnly: false,
+    parentAlignItems: 'center',
+    parentJustifyContent: 'center',
+    parentSpacing: 0,
+    parentStyle: {},
+  },
+  dialogMaxWidth: 'md',
+  components: [],
+  titles: [],
+  footerButtons: [],
+  index: 0,
+}
 
 export function MessageOfTheDay() {
   const clientIndex = useStorage((s) => s.motdIndex)
@@ -41,7 +49,7 @@ export function MessageOfTheDay() {
     skip: !open,
   })
 
-  const motd = /** @type {typeof DEFAULT} */ (data?.customComponent || DEFAULT)
+  const motd: typeof DEFAULT = data?.customComponent || DEFAULT
 
   const handleMotdClose = React.useCallback(() => {
     if (motd.settings.permanent === false) {

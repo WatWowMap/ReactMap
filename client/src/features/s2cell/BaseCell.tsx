@@ -1,13 +1,13 @@
-// @ts-check
 import * as React from 'react'
 import { Polyline } from 'react-leaflet'
 
-/**
- *
- * @param {{ coords: import('@rm/types').S2Polygon, color: string }} props
- * @returns
- */
-function Cell({ coords, color }) {
+function Cell({
+  coords,
+  color,
+}: {
+  coords: import('@rm/types').S2Polygon
+  color: string
+}) {
   return (
     <Polyline
       key={color}

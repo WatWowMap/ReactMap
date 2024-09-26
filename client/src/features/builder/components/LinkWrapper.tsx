@@ -1,24 +1,7 @@
-// @ts-check
 import * as React from 'react'
 import { Link as RouterLink } from 'react-router-dom'
 import Link from '@mui/material/Link'
 
-/**
- * Wraps div in a link if the block has one, otherwise returns children
- * @param {{
- *  link?: string,
- *  href?: string,
- *  target?: string,
- *  color?: string,
- *  underline?: import("@mui/material/Link").LinkProps['underline'],
- *  style?: import('react').CSSProperties,
- *  referrerPolicy?: import('react-router-dom').LinkProps['referrerPolicy'],
- *  sx?: import("@mui/system").SxProps,
- *  children: React.ReactNode
- *  className?: string
- * }} props
- * @returns {React.ReactNode}
- */
 export function LinkWrapper({
   link,
   href,
@@ -29,7 +12,18 @@ export function LinkWrapper({
   sx,
   children,
   className,
-}) {
+}: {
+  link?: string
+  href?: string
+  target?: string
+  color?: string
+  underline?: import('@mui/material/Link').LinkProps['underline']
+  style?: import('react').CSSProperties
+  referrerPolicy?: import('react-router-dom').LinkProps['referrerPolicy']
+  sx?: import('@mui/system').SxProps
+  children: React.ReactNode
+  className?: string
+}): React.ReactNode {
   const url = link || href
   if (!url) return children
   const external = url.startsWith('http') || url.startsWith('/auth')

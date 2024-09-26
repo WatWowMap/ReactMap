@@ -1,4 +1,3 @@
-// @ts-check
 import * as React from 'react'
 import Divider from '@mui/material/Divider'
 import IconButton from '@mui/material/IconButton'
@@ -18,7 +17,7 @@ import { SEARCHABLE } from '@services/queries/config'
 import { Img } from '@components/Img'
 
 const SearchImage = React.memo(
-  /** @param {{ name: string }} props */ ({ name }) => {
+  ({ name }: { name: string }) => {
     const { t } = useTranslation()
 
     const darkMode = useStorage((s) => s.darkMode)
@@ -38,9 +37,12 @@ const SearchImage = React.memo(
 )
 
 const EndAdornment = React.memo(
-  /** @param {{ children: React.ReactNode, disabled: boolean }} props */ ({
+  ({
     children,
     disabled,
+  }: {
+    children: React.ReactNode
+    disabled: boolean
   }) => {
     const loading = useMemory((s) => s.searchLoading)
     return (
@@ -70,8 +72,10 @@ const EndAdornment = React.memo(
   },
 )
 
-/** @param {import('@mui/material').AutocompleteRenderInputParams} props */
-export function renderInput({ InputProps, ...props }) {
+export function renderInput({
+  InputProps,
+  ...props
+}: import('@mui/material').AutocompleteRenderInputParams) {
   const { t } = useTranslation()
 
   const searchTab = useStorage((s) => s.searchTab)
@@ -82,12 +86,15 @@ export function renderInput({ InputProps, ...props }) {
 
   const [anchorEl, setAnchorEl] = React.useState(null)
 
-  const handleClose = React.useCallback((/** @type {string} */ selection) => {
-    if (typeof selection === 'string') {
-      useStorage.setState({ searchTab: selection })
-    }
-    setAnchorEl(null)
-  }, [])
+  const handleClose = React.useCallback(
+    (/** @type {string} */ selection: string) => {
+      if (typeof selection === 'string') {
+        useStorage.setState({ searchTab: selection })
+      }
+      setAnchorEl(null)
+    },
+    [],
+  )
 
   React.useEffect(() => {
     if (

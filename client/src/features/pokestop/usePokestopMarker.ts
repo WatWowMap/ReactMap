@@ -1,20 +1,9 @@
-// @ts-check
 import { divIcon } from 'leaflet'
 
 import { basicEqualFn, useMemory } from '@store/useMemory'
 import { useStorage } from '@store/useStorage'
 import { useOpacity } from '@hooks/useOpacity'
 
-/**
- *
- * @param {{
- *  hasQuest: boolean,
- *  hasLure: boolean,
- *  hasInvasion: boolean,
- *  hasEvent: boolean,
- * } & import('@rm/types').Pokestop} param0
- * @returns
- */
 export function usePokestopMarker({
   hasQuest,
   hasLure,
@@ -26,7 +15,12 @@ export function usePokestopMarker({
   events,
   invasions,
   quests,
-}) {
+}: {
+  hasQuest: boolean
+  hasLure: boolean
+  hasInvasion: boolean
+  hasEvent: boolean
+} & import('@rm/types').Pokestop) {
   const [, Icons] = useStorage(
     (s) => [s.icons, useMemory.getState().Icons],
     (a, b) => Object.entries(a[0]).every(([k, v]) => b[0][k] === v),

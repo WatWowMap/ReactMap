@@ -1,15 +1,9 @@
-// @ts-check
 import * as React from 'react'
-import Box from '@mui/material/Box'
+import Box, { BoxProps } from '@mui/material/Box'
 import CircularProgress from '@mui/material/CircularProgress'
 import Typography from '@mui/material/Typography'
 
-/**
- * A basic loading component with a circular progress bar and a message.
- * @param {import('@mui/material').BoxProps} props
- * @returns
- */
-export function Loading({ children, ...props }) {
+export function Loading({ children, ...props }: BoxProps) {
   return (
     <Box
       className="flex-center"

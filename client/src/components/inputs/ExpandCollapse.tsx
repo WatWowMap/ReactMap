@@ -1,5 +1,3 @@
-// @ts-check
-
 import * as React from 'react'
 import { styled } from '@mui/material/styles'
 import IconButton from '@mui/material/IconButton'
@@ -8,18 +6,12 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import { useDeepStore } from '@store/useStorage'
 import Box from '@mui/material/Box'
 
-/**
- * @typedef {import('@mui/material').IconButtonProps & { expand?: boolean }} RotatingIconButtonProps
- */
+type RotatingIconButtonProps = import('@mui/material').IconButtonProps & {
+  expand?: boolean
+}
 
 export const RotatingIconButton = styled(
-  (
-    /** @type {RotatingIconButtonProps} */ {
-      // eslint-disable-next-line no-unused-vars
-      expand,
-      ...props
-    },
-  ) => <IconButton {...props} />,
+  ({ expand, ...props }: RotatingIconButtonProps) => <IconButton {...props} />,
 )(({ theme }) => ({
   marginLeft: 'auto',
   transition: theme.transitions.create('transform', {
@@ -41,15 +33,14 @@ export const RotatingIconButton = styled(
   ],
 }))
 
-/**
- *
- * @param {{
- *  fontSize?: import('@mui/material').SvgIconProps['fontSize'],
- *  field: import('@store/useStorage').UseStoragePaths
- * } & RotatingIconButtonProps} props
- * @returns
- */
-export function ExpandWithState({ fontSize = 'medium', field, ...props }) {
+export function ExpandWithState({
+  fontSize = 'medium',
+  field,
+  ...props
+}: {
+  fontSize?: import('@mui/material').SvgIconProps['fontSize']
+  field: import('@store/useStorage').UseStoragePaths
+} & RotatingIconButtonProps) {
   const [expand, setExpand] = useDeepStore(field, false)
 
   const onClick = React.useCallback(() => {
@@ -63,16 +54,14 @@ export function ExpandWithState({ fontSize = 'medium', field, ...props }) {
   )
 }
 
-/**
- *
- * @param {{ field: import('@store/useStorage').UseStoragePaths } & import('@mui/material').CollapseProps} props
- */
 export function CollapseWithState({
   children,
   field,
   in: extraLogic = true,
   ...props
-}) {
+}: {
+  field: import('@store/useStorage').UseStoragePaths
+} & import('@mui/material').CollapseProps) {
   const [expand] = useDeepStore(field, false)
 
   return (
@@ -89,12 +78,13 @@ export function CollapseWithState({
 
 /**
  * Wrapper for a layout that can be expanded or collapsed. Intended to be used with 3 children.
- *
- * @param {{
- *  children: [React.ReactNode, React.ReactNode, React.ReactNode]
- * } & Omit<import('@mui/material').BoxProps, 'children'>} props
  */
-export function ExpandCollapse({ children, ...props }) {
+export function ExpandCollapse({
+  children,
+  ...props
+}: {
+  children: [React.ReactNode, React.ReactNode, React.ReactNode]
+} & Omit<import('@mui/material').BoxProps, 'children'>) {
   return (
     <Box className="expand-collapse-layout" {...props}>
       {children}

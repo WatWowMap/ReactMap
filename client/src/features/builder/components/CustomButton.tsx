@@ -1,6 +1,3 @@
-// @ts-check
-
-import * as React from 'react'
 import Button from '@mui/material/Button'
 
 import { I } from '@components/I'
@@ -15,7 +12,6 @@ const THEME_COLORS = new Set([
   'inherit',
 ])
 
-/** @param {import('@mui/material').ButtonProps & { icon?: string }} */
 export function CustomButton({
   size,
   color = 'inherit',
@@ -25,7 +21,7 @@ export function CustomButton({
   icon = null,
   children,
   className,
-}) {
+}: import('@mui/material').ButtonProps & { icon?: string }) {
   const isMuiColor = THEME_COLORS.has(color)
   return (
     // TODO: Augment Mui Types

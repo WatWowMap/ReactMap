@@ -1,10 +1,8 @@
-// @ts-check
-/**
- * @typedef {import('@rm/masterfile').Masterfile['invasions']} Invasions
- * @param {Invasions[keyof Invasions]} grunt
- * @returns {{ first: number, second: number, third: number }}
- */
-export const getGruntReward = (grunt) => {
+type Invasions = import('@rm/masterfile').Masterfile['invasions']
+
+export const getGruntReward = (
+  grunt: Invasions[keyof Invasions],
+): { first: number; second: number; third: number } => {
   const base = { first: 0, second: 0, third: 0 }
   if (!grunt || grunt.type.startsWith('NPC')) {
     return base

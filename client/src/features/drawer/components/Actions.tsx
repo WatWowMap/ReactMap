@@ -1,5 +1,3 @@
-// @ts-check
-import * as React from 'react'
 import List from '@mui/material/List'
 import Divider from '@mui/material/Divider'
 import { styled } from '@mui/material/styles'
@@ -23,8 +21,7 @@ import { useStorage } from '@store/useStorage'
 import { I } from '@components/I'
 import { BasicListButton } from '@components/inputs/BasicListButton'
 
-/** @type {React.ChangeEventHandler<HTMLInputElement>} */
-const importSettings = (e) => {
+const importSettings: React.ChangeEventHandler<HTMLInputElement> = (e) => {
   const file = e.target.files[0]
   if (!file) {
     return

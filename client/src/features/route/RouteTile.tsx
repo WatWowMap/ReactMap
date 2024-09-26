@@ -1,5 +1,3 @@
-/* eslint-disable react/destructuring-assignment */
-// @ts-check
 import * as React from 'react'
 import { Marker, Polyline, useMapEvents } from 'react-leaflet'
 import { darken } from '@mui/material/styles'
@@ -9,22 +7,18 @@ import { useForcePopup } from '@hooks/useForcePopup'
 import { routeMarker } from './routeMarker'
 import { RoutePopup } from './RoutePopup'
 
-const POSITIONS = /** @type {const} */ (['start', 'end'])
+const POSITIONS = ['start', 'end'] as const
 
 const LINE_OPACITY = 0.33
 const MARKER_OPACITY = LINE_OPACITY * 2
 
-/**
- *
- * @param {import("@rm/types").Route} route
- * @returns
- */
-const BaseRouteTile = (route) => {
+const BaseRouteTile = (route: import('@rm/types').Route) => {
   const [clicked, setClicked] = React.useState(false)
   const [hover, setHover] = React.useState('')
 
   /** @type {React.MutableRefObject<import("leaflet").Polyline>} */
-  const lineRef = React.useRef()
+  const lineRef: React.MutableRefObject<import('leaflet').Polyline> =
+    React.useRef()
   const [markerRef, setMarkerRef] = React.useState(null)
 
   const waypoints = React.useMemo(

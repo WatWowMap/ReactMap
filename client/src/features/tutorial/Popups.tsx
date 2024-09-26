@@ -1,5 +1,3 @@
-// @ts-check
-import React from 'react'
 import DialogContent from '@mui/material/DialogContent'
 import Divider from '@mui/material/Divider'
 import Typography from '@mui/material/Typography'
@@ -11,12 +9,7 @@ import { PokemonPopup } from '@features/pokemon'
 
 import { tutorialData } from './data'
 
-/**
- *
- * @param {{ isMobile: boolean }} props
- * @returns
- */
-export function TutorialPopup({ isMobile }) {
+export function TutorialPopup({ isMobile }: { isMobile: boolean }) {
   const { t } = useTranslation()
   const { startLat, startLon } = useMemory((s) => s.config.general)
   const ts = Math.floor(new Date().getTime() / 1000)

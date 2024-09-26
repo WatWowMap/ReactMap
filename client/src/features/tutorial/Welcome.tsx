@@ -1,6 +1,3 @@
-// @ts-check
-
-import React from 'react'
 import Person from '@mui/icons-material/Person'
 import LockOpen from '@mui/icons-material/LockOpen'
 import Grid from '@mui/material/Unstable_Grid2'

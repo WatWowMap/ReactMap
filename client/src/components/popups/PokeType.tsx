@@ -1,24 +1,26 @@
-// @ts-check
 import * as React from 'react'
 
 import { useMemory } from '@store/useMemory'
 import { NameTT } from '@components/popups/NameTT'
 import { Img } from '@components/Img'
 
-const DIMENSIONS = /** @type {const} */ ({
+const DIMENSIONS = {
   small: 20,
   medium: 24,
   large: 35,
-})
+} as const
 
-const STYLE = {
+const STYLE: React.CSSProperties = {
   imageRendering: 'crisp-edges',
 }
 
-/**
- * @param {{ id: number, size?: 'small' | 'medium' | 'large' }} props
- */
-export function PokeType({ id, size = 'small' }) {
+export function PokeType({
+  id,
+  size = 'small',
+}: {
+  id: number
+  size?: keyof typeof DIMENSIONS
+}) {
   const url = useMemory((s) => s.Icons.getTypes(id))
 
   return (

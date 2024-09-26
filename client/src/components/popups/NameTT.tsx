@@ -1,14 +1,13 @@
-// @ts-check
-import * as React from 'react'
 import Tooltip from '@mui/material/Tooltip'
 import { useTranslation } from 'react-i18next'
 
-/**
- *
- * @param {{ title: string | string[] } & Omit<import('@mui/material').TooltipProps, 'title'>} props
- * @returns
- */
-export function NameTT({ title, children }) {
+export function NameTT({
+  title,
+  children,
+}: { title: string | string[] } & Omit<
+  import('@mui/material').TooltipProps,
+  'title'
+>) {
   const { t } = useTranslation()
 
   return (

@@ -1,19 +1,33 @@
-// @ts-check
 export class HolidayAnimations {
-  /**
-   * @param {string[]} images
-   * @param {number} scale
-   */
-  constructor(images, scale = 1) {
+  imageHeight: number
+  imageWidth: number
+  baseImages: string[]
+  images: {
+    x: number
+    xs: number
+    y: number
+    ys: number
+    height: number
+    width: number
+    opacity: number
+    src: string
+    image?: HTMLImageElement
+  }[]
+  minScale: number
+  interval: NodeJS.Timeout | null
+  canvas: HTMLCanvasElement
+  ctx: CanvasRenderingContext2D
+  w: number
+  h: number
+
+  constructor(images: string[], scale = 1) {
     this.imageHeight = 15 * scale
     this.imageWidth = 15 * scale
     this.baseImages = images
     this.images = []
     this.minScale = 0.3
     this.interval = null
-    this.canvas = /** @type {HTMLCanvasElement} */ (
-      document.getElementById('holiday-canvas')
-    )
+    this.canvas = document.getElementById('holiday-canvas') as HTMLCanvasElement
     this.ctx = this.canvas ? this.canvas.getContext('2d') : null
   }
 
@@ -40,8 +54,8 @@ export class HolidayAnimations {
     this.ctx.clearRect(0, 0, this.w, this.h)
     this.images.forEach((item) => {
       item.image = new Image()
-      item.image.style.height = item.height
-      item.image.style.width = item.width
+      item.image.style.height = `${item.height}px`
+      item.image.style.width = `${item.width}px`
       item.image.src = item.src
       this.ctx.globalAlpha = item.opacity
       this.ctx.drawImage(item.image, item.x, item.y, item.width, item.height)

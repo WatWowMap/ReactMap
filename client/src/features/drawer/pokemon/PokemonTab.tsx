@@ -1,5 +1,3 @@
-// @ts-check
-import * as React from 'react'
 import Divider from '@mui/material/Divider'
 import List from '@mui/material/List'
 import ListSubheader from '@mui/material/ListSubheader'
@@ -11,16 +9,15 @@ import { GenderListItem } from '@components/filters/Gender'
 import { DualBoolToggle } from '@components/inputs/BoolToggle'
 import { PokemonSlider } from './PokemonSlider'
 
-/**
- *
- * @param {{
- *  openTab: number,
- *  index: number,
- *  sliders: import('@rm/types').RMSlider[],
- * }} param0
- * @returns
- */
-export function PokemonTabPanel({ openTab, index, sliders }) {
+export function PokemonTabPanel({
+  openTab,
+  index,
+  sliders,
+}: {
+  openTab: number
+  index: number
+  sliders: import('@rm/types').RMSlider[]
+}) {
   const { t } = useTranslation()
   return (
     <TabPanel value={openTab} index={index}>
