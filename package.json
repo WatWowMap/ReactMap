@@ -135,6 +135,7 @@
     "prettier": "3.3.3",
     "rollup-plugin-delete": "^2.0.0",
     "semantic-release": "^22",
+    "ts-migrate": "0.1.35",
     "typescript": "5.5.4"
   },
   "engines": {
