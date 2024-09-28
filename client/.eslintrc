@@ -1,74 +1,51 @@
 {
-  "extends": [
-    "../.eslintrc",
-    "plugin:react/recommended"
-  ],
-  "parserOptions": {
-    "sourceType": "module",
-    "allowImportExportEverywhere": true
-  },
-  "rules": {
-    "react/jsx-props-no-spreading": 0,
-    "react/prop-types": 0,
-    "react/jsx-one-expression-per-line": 0,
-    "jsx-a11y/no-noninteractive-element-interactions": 0,
-    "jsx-a11y/click-events-have-key-events": 0,
-    "react/function-component-definition": 0,
-    "react/display-name": 0
-  },
-  "globals": {
-    "document": true,
-    "window": true,
-    "CONFIG": true
-  },
+  "$schema": "https://json.schemastore.org/eslintrc.json",
   "env": {
     "browser": true,
-    "es6": true
+    "es2021": true,
+    "node": false
+  },
+  "globals": {
+    "CONFIG": true
+  },
+  "extends": [
+    "plugin:react/recommended",
+    "plugin:react-hooks/recommended",
+    "plugin:jsx-a11y/recommended",
+    "../.eslintrc"
+  ],
+  "plugins": [
+    "react",
+    "jsx-a11y"
+  ],
+  "parser": "@typescript-eslint/parser",
+  "parserOptions": {
+    "ecmaFeatures": {
+      "jsx": true
+    },
+    "ecmaVersion": 12
   },
   "settings": {
     "react": {
       "version": "detect"
-    },
-    "import/resolver": {
-      "alias": {
-        "map": [
-          [
-            "@components",
-            "./src/components/"
-          ],
-          [
-            "@features",
-            "./src/features/"
-          ],
-          [
-            "@services",
-            "./src/services/"
-          ],
-          [
-            "@hooks",
-            "./src/hooks/"
-          ],
-          [
-            "@assets",
-            "./src/assets/"
-          ],
-          [
-            "@utils",
-            "./src/utils/"
-          ],
-          [
-            "@store",
-            "./src/store/"
-          ]
-        ],
-        "extensions": [
-          ".mjs",
-          ".js",
-          ".jsx",
-          ".ts",
-          ".tsx"
-        ]
-      }
     }
+  },
+  "rules": {
+    "react/prop-types": "off",
+    "react/jsx-uses-react": "off",
+    "react/react-in-jsx-scope": "off",
+    "react-hooks/exhaustive-deps": "off",
+    "jsx-a11y/click-events-have-key-events": "warn",
+    "jsx-a11y/interactive-supports-focus": "warn",
+    "react/self-closing-comp": "warn",
+    "react/jsx-sort-props": [
+      "warn",
+      {
+        "callbacksLast": true,
+        "shorthandFirst": true,
+        "noSortAlphabetically": false,
+        "reservedFirst": true
+      }
+    ]
   }
 }

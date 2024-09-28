@@ -53,7 +53,7 @@ const viteConfig = defineConfig(({ mode }) => {
     )
   }
 
-  const sentry = config.getSafe('sentry.client')
+  const sentry = config.sentry.client
   sentry.enabled = sentry.enabled || !!env.SENTRY_DSN
   if (env.SENTRY_AUTH_TOKEN) sentry.authToken = env.SENTRY_AUTH_TOKEN
   if (env.SENTRY_ORG) sentry.org = env.SENTRY_ORG
@@ -81,11 +81,11 @@ const viteConfig = defineConfig(({ mode }) => {
               overlay: {
                 initialIsOpen: false,
               },
-              // typescript: {
-              //   tsconfigPath: './jsconfig.json',
-              // },
+              typescript: {
+                tsconfigPath: './tsconfig.json',
+              },
               eslint: {
-                lintCommand: 'eslint "./src/**/*.{js,jsx}"',
+                lintCommand: 'eslint "./src/**/*.{ts,tsx}"',
               },
             }),
           ]

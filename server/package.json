@@ -81,6 +81,8 @@
   },
   "devDependencies": {
     "@rm/types": "*",
+    "@types/compression": "1.7.5",
+    "@types/cors": "2.8.17",
     "@types/node-fetch": "2.6.11",
     "nodemon": "3.1.4"
   }

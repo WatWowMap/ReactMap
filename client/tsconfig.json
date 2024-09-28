@@ -16,6 +16,9 @@
     "skipLibCheck": false,
     "jsx": "react-jsx",
     "allowJs": true,
+    "types": [
+      "@rm/types"
+    ],
     "paths": {
       "@assets/*": [
         "./assets/*"
@@ -41,10 +44,11 @@
     }
   },
   "include": [
-    "src",
+    "client/src",
     "vite.config.js"
   ],
   "exclude": [
+    "server",
     "node_modules",
     "dist"
   ]

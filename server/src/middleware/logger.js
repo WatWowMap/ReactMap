@@ -36,8 +36,8 @@ function loggerMiddleware(req, res, next) {
       TAGS.statusCode(res.statusCode),
       `${responseTime}ms`,
       '|',
-      TAGS.download(bytes(req.bodySize || 0)),
-      TAGS.upload(bytes(resBodySize || 0)),
+      TAGS.download(bytes(req.bodySize || 0).toString()),
+      TAGS.upload(bytes(resBodySize || 0).toString()),
       '|',
       req.user ? req.user.username : 'Not Logged In',
       req.headers['x-forwarded-for']
