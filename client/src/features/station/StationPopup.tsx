@@ -15,7 +15,6 @@ import Stack from '@mui/material/Stack'
 import Box from '@mui/material/Box'
 import LockOpenIcon from '@mui/icons-material/LockOpen'
 import LockIcon from '@mui/icons-material/Lock'
-
 import { useMemory } from '@store/useMemory'
 import { setDeepStore, useGetDeepStore } from '@store/useStorage'
 import { Navigation } from '@components/popups/Navigation'
@@ -43,7 +42,7 @@ export function StationPopup(station: import('@rm/types').Station) {
   useAnalytics('Popup', 'Station')
 
   return (
-    <Card sx={{ width: 200 }} elevation={0}>
+    <Card elevation={0} sx={{ width: 200 }}>
       <StationHeader {...station} />
       {!!station.battle_level && <StationRating {...station} />}
       <StationMedia {...station} />
@@ -51,8 +50,8 @@ export function StationPopup(station: import('@rm/types').Station) {
         <ExpandCollapse>
           <StationAttackBonus {...station} />
           <ExpandWithState
-            field="popups.stationExtras"
             disabled={!station.total_stationed_pokemon}
+            field="popups.stationExtras"
           />
           <CollapseWithState
             field="popups.stationExtras"
@@ -64,9 +63,9 @@ export function StationPopup(station: import('@rm/types').Station) {
       )}
       <StationContent {...station} />
       <Box
+        alignItems="center"
         component={CardActions}
         display="flex"
-        alignItems="center"
         justifyContent="space-evenly"
       >
         <Navigation lat={station.lat} lon={station.lon} />
@@ -82,23 +81,23 @@ function StationHeader({ name, updated }: import('@rm/types').Station) {
 
   return (
     <CardHeader
-      title={
-        <Title
-          align="left"
-          variant="subtitle1"
-          fontWeight="bold"
-          backup={t('unknown_station')}
-          maxWidth={168}
-        >
-          {name}
-        </Title>
-      }
       subheader={
         <Typography variant="caption">
           {dateFormatter.format(new Date(updated * 1000))}
         </Typography>
       }
       sx={{ p: 0 }}
+      title={
+        <Title
+          align="left"
+          backup={t('unknown_station')}
+          fontWeight="bold"
+          maxWidth={168}
+          variant="subtitle1"
+        >
+          {name}
+        </Title>
+      }
     />
   )
 }
@@ -111,14 +110,15 @@ function StationRating({
   const { t } = useTranslation()
   const isStarting = battle_start > Date.now() / 1000
   const epoch = isStarting ? battle_start : battle_end
+
   return (
     <CardContent sx={{ p: 0, py: 1 }}>
       <Stack alignItems="center" justifyContent="center">
-        <Rating value={battle_level} max={Math.max(5, battle_level)} readOnly />
+        <Rating readOnly max={Math.max(5, battle_level)} value={battle_level} />
         <Typography variant="caption">
           {t(`max_battle_${battle_level}`)}
         </Typography>
-        <LiveTimeStamp start={isStarting} epoch={epoch} variant="caption" />
+        <LiveTimeStamp epoch={epoch} start={isStarting} variant="caption" />
       </Stack>
     </CardContent>
   )
@@ -173,6 +173,7 @@ function StationMenu({
             if (prev.timerList.includes(id)) {
               return { timerList: prev.timerList.filter((x) => x !== id) }
             }
+
             return { timerList: [...prev.timerList, id] }
           }),
       },
@@ -189,11 +190,11 @@ function StationMenu({
         {options.map((option) => (
           <MenuItem
             key={option.name}
+            dense
             onClick={() => {
               handleClose()
               option.action()
             }}
-            dense
           >
             {t(option.name)}
           </MenuItem>
@@ -220,9 +221,11 @@ function StationMedia({
   const types = useMemory((s) => {
     if (!battle_pokemon_id) return []
     const poke = s.masterfile.pokemon[battle_pokemon_id]
+
     if (poke?.forms?.[battle_pokemon_form]?.types) {
       return poke.forms[battle_pokemon_form]?.types || []
     }
+
     return poke?.types || []
   })
 
@@ -231,12 +234,12 @@ function StationMedia({
       <Box className="popup-card-media">
         <Stack className="flex-center">
           <PokemonImg
-            id={battle_pokemon_id}
-            form={battle_pokemon_form}
-            costume={battle_pokemon_costume}
-            bread={battle_pokemon_bread_mode}
             alignment={battle_pokemon_alignment}
+            bread={battle_pokemon_bread_mode}
+            costume={battle_pokemon_costume}
+            form={battle_pokemon_form}
             gender={battle_pokemon_gender}
+            id={battle_pokemon_id}
             maxHeight="80%"
             maxWidth="100%"
           />
@@ -252,11 +255,11 @@ function StationMedia({
           <Stack
             direction="row"
             justifyContent="space-evenly"
-            width="100%"
             pb={0.5}
+            width="100%"
           >
             {!!battle_pokemon_gender && (
-              <GenderIcon gender={battle_pokemon_gender} fontSize="medium" />
+              <GenderIcon fontSize="medium" gender={battle_pokemon_gender} />
             )}
             {types.map((type) => (
               <PokeType key={type} id={type} size="medium" />
@@ -268,7 +271,7 @@ function StationMedia({
       </Box>
     </CardMedia>
   ) : (
-    <Box width="100%" className="flex-center">
+    <Box className="flex-center" width="100%">
       <CardMedia
         component="img"
         src={stationImage}
@@ -282,14 +285,15 @@ function StationAttackBonus({
   total_stationed_pokemon,
 }: import('@rm/types').Station) {
   const { t } = useTranslation()
+
   return (
     <Stack alignItems="center">
       <Rating
-        value={getStationAttackBonus(total_stationed_pokemon)}
         readOnly
-        icon={<LockOpenIcon fontSize="inherit" />}
         emptyIcon={<LockIcon fontSize="inherit" />}
+        icon={<LockOpenIcon fontSize="inherit" />}
         max={4}
+        value={getStationAttackBonus(total_stationed_pokemon)}
       />
       <Typography variant="caption">
         {t('battle_bonus')} &nbsp;({total_stationed_pokemon} / 40)
@@ -304,6 +308,7 @@ function StationContent({
   id,
 }: import('@rm/types').Station) {
   const epoch = (start_time > Date.now() / 1000 ? start_time : end_time) || 0
+
   return (
     <CardContent sx={{ p: 0 }}>
       <Stack alignItems="center" justifyContent="center">
@@ -326,23 +331,27 @@ function StationMons({ id }: import('@rm/types').Station) {
 
   return (
     <CardContent sx={{ my: 1, p: 0, height: 130 }}>
-      <Typography variant="h6" align="center">
+      <Typography align="center" variant="h6">
         {t('placed_pokemon')}
       </Typography>
       <VirtualGrid data={mons} xs={6}>
         {(index, mon) => {
           const caption = tId(`${mon.pokemon_id}-${mon.form}`)
+
           return (
             <Box
+              alignItems="center"
               display="flex"
               flexDirection="column"
-              alignItems="center"
+              height="100%"
               justifyContent="space-between"
               p={1}
-              height="100%"
             >
               <Img
                 key={index}
+                alt={caption}
+                maxHeight="100%"
+                maxWidth={50}
                 src={icons.getPokemon(
                   mon.pokemon_id,
                   mon.form,
@@ -353,9 +362,6 @@ function StationMons({ id }: import('@rm/types').Station) {
                   false,
                   mon.bread_mode,
                 )}
-                alt={caption}
-                maxHeight="100%"
-                maxWidth={50}
               />
               <Typography variant="caption">{caption}</Typography>
             </Box>
@@ -405,6 +411,7 @@ function StaticTimeStamp({
   epoch: number
 } & import('@mui/material').TypographyProps) {
   const formatter = useFormatStore((s) => (date ? s.dateFormat : s.timeFormat))
+
   return (
     <Typography variant="caption" {...props}>
       {formatter.format(new Date(epoch * 1000))}

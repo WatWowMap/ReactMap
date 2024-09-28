@@ -1,5 +1,4 @@
 import ListItem from '@mui/material/ListItem'
-
 import { useMemory } from '@store/useMemory'
 import { useStorage, setDeepStore } from '@store/useStorage'
 import { SliderTile } from '@components/inputs/SliderTile'
@@ -9,6 +8,7 @@ const handleChange: import('@rm/types').RMSliderHandleChange<
   keyof import('@rm/types').PokemonFilter
 > = (name, values) => {
   const { ivOr } = useMemory.getState().filters.pokemon
+
   if (name in ivOr) {
     setDeepStore(`filters.pokemon.ivOr.${name}`, values)
   }
@@ -21,9 +21,10 @@ export function PokemonSlider({
   slider: import('@rm/types').RMSlider
 }) {
   const values = useStorage((s) => s.filters.pokemon.ivOr[slider.name])
+
   return (
     <ListItem disablePadding>
-      <SliderTile slide={slider} handleChange={handleChange} values={values} />
+      <SliderTile handleChange={handleChange} slide={slider} values={values} />
     </ListItem>
   )
 }

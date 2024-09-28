@@ -3,7 +3,6 @@ import { useTranslation } from 'react-i18next'
 import { Virtuoso } from 'react-virtuoso'
 import Typography from '@mui/material/Typography'
 import Box from '@mui/material/Box'
-
 import { Loading } from '@components/Loading'
 import { GenericSearch } from '@components/inputs/GenericSearch'
 import { useWebhookStore } from '@store/useWebhookStore'
@@ -54,11 +53,13 @@ export const WebhookSearch = React.memo(() => {
 
   return (
     <GenericSearch
-      value={search}
+      label={`search_${category}${category === 'pokemon' ? '' : 's'}`}
       setValue={(newValue) =>
         useWebhookStore.setState({ trackedSearch: newValue })
       }
-      label={`search_${category}${category === 'pokemon' ? '' : 's'}`}
+      value={search}
     />
   )
 })
+
+WebhookSearch.displayName = 'WebhookSearch'

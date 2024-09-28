@@ -30,6 +30,7 @@ const madQuestProps = {
   with_ar: true,
   stardust_amount: true,
 }
+
 Object.keys(questProps).forEach((key) => {
   questPropsAlt[`alternative_${key}`] = true
   madQuestProps[key] = true
@@ -102,6 +103,7 @@ class Pokestop extends Model {
     } else if (isMad) {
       query.select('incident_grunt_type AS grunt_type')
     }
+
     return query
   }
 
@@ -149,6 +151,7 @@ class Pokestop extends Model {
     } = perms
 
     const query = this.query()
+
     if (isMad) {
       query
         .leftJoin('trs_quest', 'pokestop.pokestop_id', 'trs_quest.GUID')
@@ -207,6 +210,7 @@ class Pokestop extends Model {
       const rocketPokemon = []
       const displayTypes = []
       let hasShowcase = false
+
       // preps arrays for interested objects
       Object.keys(args.filters).forEach((pokestop) => {
         switch (pokestop.charAt(0)) {
@@ -372,6 +376,7 @@ class Pokestop extends Model {
               }
               energy.forEach((megaEnergy) => {
                 const [pokeId, amount] = megaEnergy.split('-')
+
                 if (hasRewardAmount) {
                   questTypes.orWhere((mega) => {
                     mega
@@ -650,6 +655,7 @@ class Pokestop extends Model {
     const normalized = isMad
       ? this.mapMAD(results, ts)
       : this.mapRDM(results, ts)
+
     if (normalized.length > queryLimits.pokestops)
       normalized.length = queryLimits.pokestops
     const finalResults = this.secondaryFilter(
@@ -662,6 +668,7 @@ class Pokestop extends Model {
       hasMultiInvasions,
       hasConfirmed,
     )
+
     return finalResults
   }
 
@@ -681,6 +688,7 @@ class Pokestop extends Model {
     hasConfirmed,
   ) {
     const filteredResults = []
+
     for (let i = 0; i < queryResults.length; i += 1) {
       const pokestop = queryResults[i]
       const filtered = { hasShowcase: pokestop.showcase_expiry > ts }
@@ -712,6 +720,7 @@ class Pokestop extends Model {
           typeof pokestop.showcase_rankings === 'string'
             ? JSON.parse(pokestop.showcase_rankings)
             : (pokestop.showcase_rankings ?? {})
+
         if (!perms.showcaseRankings) {
           showcaseData.contest_entries = []
         }
@@ -762,6 +771,7 @@ class Pokestop extends Model {
       ) {
         filtered.invasions = pokestop.invasions.filter((invasion) => {
           const info = state.event.invasions[invasion.grunt_type]
+
           if (!info) return false
           if (
             info.firstReward &&
@@ -797,6 +807,7 @@ class Pokestop extends Model {
                 ))
           )
             return true
+
           return (
             filters[`i${invasion.grunt_type}`] ||
             (filters.onlyAllPokestops &&
@@ -830,6 +841,7 @@ class Pokestop extends Model {
               (filters.onlyShowQuestSet === 'without_ar' && !quest.with_ar))
           ) {
             const newQuest = {}
+
             if (isMad) {
               this.parseMadRewards(quest)
             } else {
@@ -846,6 +858,7 @@ class Pokestop extends Model {
               'with_ar',
               'quest_title',
             ]
+
             switch (quest.quest_reward_type) {
               case 1:
                 newQuest.key = `p${quest.xp_amount}`
@@ -914,13 +927,16 @@ class Pokestop extends Model {
         filteredResults.push(filtered)
       }
     }
+
     return filteredResults
   }
 
   static mapMAD(queryResults, ts) {
     const filtered = {}
+
     for (let i = 0; i < queryResults.length; i += 1) {
       const result = queryResults[i]
+
       if (!result.enabled || result.deleted) continue
       const quest = {}
       const invasion = {}
@@ -962,13 +978,16 @@ class Pokestop extends Model {
         filtered[result.id].quests.push(quest)
       }
     }
+
     return Object.values(filtered)
   }
 
   static mapRDM(queryResults, ts) {
     const filtered = {}
+
     for (let i = 0; i < queryResults.length; i += 1) {
       const result = queryResults[i]
+
       if (!result.enabled || result.deleted) continue
       const quest = { with_ar: true }
       const altQuest = { with_ar: false }
@@ -1005,6 +1024,7 @@ class Pokestop extends Model {
         filtered[result.id].invasions.push(invasion)
       }
     }
+
     return Object.values(filtered)
   }
 
@@ -1402,6 +1422,7 @@ class Pokestop extends Model {
     // showcase
     if (hasShowcaseData) {
       const distinct = ['showcase_pokemon_id']
+
       if (hasShowcaseForm) distinct.push('showcase_pokemon_form_id')
       if (hasShowcaseType) distinct.push('showcase_pokemon_type_id')
       queries.showcase = this.query()
@@ -1509,6 +1530,7 @@ class Pokestop extends Model {
           if (hasConfirmed) {
             rewards.forEach((reward) => {
               const fullGrunt = state.event.invasions[reward.grunt_type]
+
               if (fullGrunt?.firstReward) {
                 finalList.add(
                   `a${reward.slot_1_pokemon_id}-${reward.slot_1_form}`,
@@ -1564,6 +1586,7 @@ class Pokestop extends Model {
   static parseRdmRewards = (quest) => {
     if (quest.quest_reward_type) {
       const { info } = JSON.parse(quest.quest_rewards)[0]
+
       switch (quest.quest_reward_type) {
         case 1:
           Object.keys(info).forEach((x) => (quest[`xp_${x}`] = info[x]))
@@ -1590,6 +1613,7 @@ class Pokestop extends Model {
           break
       }
     }
+
     return quest
   }
 
@@ -1598,6 +1622,7 @@ class Pokestop extends Model {
       const { item, exp, candy, xl_candy, mega_resource } = JSON.parse(
         quest.quest_rewards,
       )[0]
+
       switch (quest.quest_reward_type) {
         case 1:
           quest.xp_amount = exp
@@ -1622,6 +1647,7 @@ class Pokestop extends Model {
           break
       }
     }
+
     return quest
   }
 
@@ -1641,9 +1667,11 @@ class Pokestop extends Model {
       .whereILike('name', `%${search}%`)
       .limit(config.getSafe('api.searchResultsLimit'))
       .orderBy('distance')
+
     if (!getAreaSql(query, perms.areaRestrictions, onlyAreas, isMad)) {
       return []
     }
+
     return query
   }
 
@@ -1689,6 +1717,7 @@ class Pokestop extends Model {
       return []
     }
     const queries = []
+
     if (questLayer !== 'without_ar') {
       const query = this.query()
         .select([
@@ -1729,6 +1758,7 @@ class Pokestop extends Model {
         })
         .limit(config.getSafe('api.searchResultsLimit'))
         .orderBy('distance')
+
       if (isMad) {
         query
           .leftJoin('trs_quest', 'pokestop.pokestop_id', 'trs_quest.GUID')
@@ -1780,6 +1810,7 @@ class Pokestop extends Model {
         })
         .limit(searchResultsLimit)
         .orderBy('distance')
+
       if (
         !getAreaSql(altQuestQuery, perms.areaRestrictions, onlyAreas, isMad)
       ) {
@@ -1803,6 +1834,7 @@ class Pokestop extends Model {
           }
         : { ...result, with_ar: result.with_ar ?? true },
     )
+
     mapped.sort((a, b) => a.distance - b.distance)
     if (mapped.length > searchResultsLimit) mapped.length = searchResultsLimit
 
@@ -1851,10 +1883,12 @@ class Pokestop extends Model {
       .whereIn(isMad ? 'active_fort_modifier' : 'lure_id', lureIds)
       .limit(config.getSafe('api.searchResultsLimit'))
       .orderBy('distance')
+
     if (!getAreaSql(query, perms.areaRestrictions, onlyAreas, isMad)) {
       return []
     }
     const results = await query
+
     return results
   }
 
@@ -1894,6 +1928,7 @@ class Pokestop extends Model {
             )),
       )
       .map((x) => +x)
+
     if (!invasions.length && !pokemonIds.length) {
       return []
     }
@@ -1926,6 +1961,7 @@ class Pokestop extends Model {
       return []
     }
     const results = await query
+
     return pokemonIds.length
       ? results.filter(({ grunt_type }) =>
           ['first', 'second', 'third'].some(
@@ -1966,6 +2002,7 @@ class Pokestop extends Model {
         minLon - 0.025,
         maxLon + 0.025,
       ])
+
     if (isMad) {
       query.select([
         'pokestop_id AS id',
@@ -2004,6 +2041,7 @@ class Pokestop extends Model {
       .count('id', { as: 'total' })
       .where('confirmed', 1)
       .first()
+
     return { hasConfirmedInvasions: result.total > 0 }
   }
 }

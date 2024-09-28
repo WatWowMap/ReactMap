@@ -1,6 +1,5 @@
 import * as React from 'react'
 import Box from '@mui/material/Box'
-
 import { NameTT } from '@components/popups/NameTT'
 import { useMemory } from '@store/useMemory'
 import { useStorage } from '@store/useStorage'
@@ -11,14 +10,15 @@ import { Img } from '@components/Img'
 function QuestImage(props: Partial<import('@rm/types').Quest>) {
   const { src, amount, tt } = getRewardInfo(props)
   const { Icons } = useMemory.getState()
+
   return (
     <Box maxHeight={45} maxWidth={45}>
       <NameTT title={tt}>
         <Img
-          src={src}
+          alt={typeof tt === 'string' ? tt : tt.join(' ')}
           maxHeight={45}
           maxWidth={45}
-          alt={typeof tt === 'string' ? tt : tt.join(' ')}
+          src={src}
           onError={(e) => {
             if (e.target instanceof HTMLImageElement) {
               e.target.onerror = null
@@ -35,13 +35,17 @@ function QuestImage(props: Partial<import('@rm/types').Quest>) {
 function FortImage({ url }: { url: string }) {
   const { searchTab } = useStorage.getState()
   const { Icons } = useMemory.getState()
+
   return (
     <Img
+      alt={url}
+      height={45}
       src={
         url.includes('http')
           ? url.replace(/^http:\/\//, 'https://')
           : Icons.getMisc(searchTab)
       }
+      width={45}
       onError={(e) => {
         if (e.target instanceof HTMLImageElement) {
           e.target.onerror = null
@@ -49,9 +53,6 @@ function FortImage({ url }: { url: string }) {
             searchTab === 'pokestops' ? Icons.getPokestops(0) : Icons.getGyms(0)
         }
       }}
-      alt={url}
-      height={45}
-      width={45}
     />
   )
 }
@@ -66,9 +67,13 @@ function PokemonImage({
 }: Partial<import('@rm/types').Pokemon> & { bread?: number }) {
   const { Icons } = useMemory.getState()
   const { t } = useTranslateById()
+
   return (
     <NameTT title={[form ? `form_${form}` : '', `poke_${pokemon_id}`]}>
       <Img
+        alt={t(`${pokemon_id}-${form}`)}
+        maxHeight={45}
+        maxWidth={45}
         src={Icons.getPokemon(
           pokemon_id,
           form,
@@ -79,9 +84,6 @@ function PokemonImage({
           shiny,
           bread,
         )}
-        alt={t(`${pokemon_id}-${form}`)}
-        maxHeight={45}
-        maxWidth={45}
       />
     </NameTT>
   )
@@ -97,6 +99,7 @@ function RaidImage({
 }: Partial<import('@rm/types').Gym>) {
   const { Icons } = useMemory.getState()
   const { t } = useTranslateById()
+
   return (
     <NameTT
       title={[
@@ -106,6 +109,9 @@ function RaidImage({
       ]}
     >
       <Img
+        alt={t(`${raid_pokemon_id}-${raid_pokemon_form}`)}
+        maxHeight={45}
+        maxWidth={45}
         src={Icons.getPokemon(
           raid_pokemon_id,
           raid_pokemon_form,
@@ -114,9 +120,6 @@ function RaidImage({
           raid_pokemon_costume,
           raid_pokemon_alignment,
         )}
-        alt={t(`${raid_pokemon_id}-${raid_pokemon_form}`)}
-        maxHeight={45}
-        maxWidth={45}
       />
     </NameTT>
   )
@@ -125,13 +128,14 @@ function RaidImage({
 function LureImage({ lure_id }: Partial<import('@rm/types').Pokestop>) {
   const { Icons } = useMemory.getState()
   const { t } = useTranslateById()
+
   return (
     <NameTT title={`lure_${lure_id}`}>
       <Img
-        src={Icons.getPokestops(lure_id)}
         alt={t(`lure_${lure_id}`)}
         maxHeight={45}
         maxWidth={45}
+        src={Icons.getPokestops(lure_id)}
       />
     </NameTT>
   )
@@ -146,6 +150,7 @@ function NestImage({
 }) {
   const { Icons } = useMemory.getState()
   const { t } = useTranslateById()
+
   return (
     <NameTT
       title={[
@@ -154,10 +159,10 @@ function NestImage({
       ]}
     >
       <Img
-        src={Icons.getPokemon(nest_pokemon_id, nest_pokemon_form)}
         alt={t(`${nest_pokemon_id}-${nest_pokemon_form || 0}`)}
         maxHeight={45}
         maxWidth={45}
+        src={Icons.getPokemon(nest_pokemon_id, nest_pokemon_form)}
       />
     </NameTT>
   )
@@ -169,13 +174,14 @@ function InvasionImage({
 }: Partial<import('@rm/types').Invasion>) {
   const { Icons } = useMemory.getState()
   const { t } = useTranslateById()
+
   return (
     <NameTT title={`grunt_${grunt_type}`}>
       <Img
-        src={Icons.getInvasions(grunt_type, confirmed)}
         alt={t(`grunt_${grunt_type}`)}
         maxHeight={45}
         maxWidth={45}
+        src={Icons.getInvasions(grunt_type, confirmed)}
       />
     </NameTT>
   )
@@ -188,7 +194,8 @@ function Misc() {
       ? s.Icons.getStation()
       : s.Icons.getMisc(searchTab),
   )
-  return <Img src={miscIcon} alt={searchTab} maxHeight={45} maxWidth={45} />
+
+  return <Img alt={searchTab} maxHeight={45} maxWidth={45} src={miscIcon} />
 }
 
 function OptionImage(
@@ -212,13 +219,14 @@ function OptionImage(
   if ('battle_pokemon_id' in props && props.battle_pokemon_id)
     return (
       <PokemonImage
-        pokemon_id={props.battle_pokemon_id}
+        bread={props.battle_pokemon_bread_mode}
+        costume={props.battle_pokemon_costume}
         form={props.battle_pokemon_form}
         gender={props.battle_pokemon_gender}
-        costume={props.battle_pokemon_costume}
-        bread={props.battle_pokemon_bread_mode}
+        pokemon_id={props.battle_pokemon_id}
       />
     )
+
   return <Misc />
 }
 

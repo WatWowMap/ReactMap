@@ -14,11 +14,11 @@ export function DiscordButton({
 
   return (
     <Button
-      variant="contained"
       bgcolor={bgcolor}
-      size={size}
       href={href}
-      startIcon={<I className="fab fa-discord" size={size} color="white" />}
+      size={size}
+      startIcon={<I className="fab fa-discord" color="white" size={size} />}
+      variant="contained"
       {...props}
     >
       {t(children)}

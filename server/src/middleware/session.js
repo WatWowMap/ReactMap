@@ -1,7 +1,6 @@
 // @ts-check
 const session = require('express-session')
 const mysqlSession = require('express-mysql-session')
-
 const config = require('@rm/config')
 
 function sessionMiddleware() {

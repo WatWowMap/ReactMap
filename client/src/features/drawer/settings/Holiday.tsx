@@ -1,7 +1,6 @@
 import ListItemIcon from '@mui/material/ListItemIcon'
 import CakeIcon from '@mui/icons-material/Cake'
 import { useTranslation } from 'react-i18next'
-
 import { useMemory } from '@store/useMemory'
 import { BoolToggle } from '@components/inputs/BoolToggle'
 
@@ -19,7 +18,7 @@ export function HolidaySetting() {
     >
       <ListItemIcon>
         {images?.length > 0 ? (
-          <SettingIcon src={images[0]} alt={name} />
+          <SettingIcon alt={name} src={images[0]} />
         ) : (
           <CakeIcon />
         )}

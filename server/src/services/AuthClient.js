@@ -57,6 +57,7 @@ class AuthClient extends Logger {
   static getHtml(embed) {
     if (typeof embed === 'string') return embed
     const { title, author, thumbnail, description, fields, footer } = embed
+
     return `
       ${title ? `<h2>${title}</h2>` : ''}
       ${author ? `<p><strong>${author.name}</strong></p>` : ''}
@@ -83,9 +84,9 @@ class AuthClient extends Logger {
 
   /**
    * @param {MessageEmbed} embed
-   * @param {keyof AuthClient['loggingChannels']} [channel]
+   * @param {keyof AuthClient['loggingChannels']} [_channel]
    */
-  async sendMessage(embed, channel = 'main') {
+  async sendMessage(embed, _channel = 'main') {
     this.log.info(
       '`message` is not implemented for base AuthClient - you probably should not be seeing this',
     )

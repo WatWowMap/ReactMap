@@ -89,6 +89,7 @@ export class UAssets {
           ? dirtyName?.slice(0, -1)
           : dirtyName
         let path = dirtyPath?.endsWith('/') ? dirtyPath.slice(0, -1) : dirtyPath
+
         if (!path) {
           console.error(
             `[${this.assetType}] No path provided for`,
@@ -102,6 +103,7 @@ export class UAssets {
         }
         if (data) {
           const indexes = Object.keys(data)
+
           this[name] = {
             ...this[name],
             ...rest,
@@ -115,6 +117,7 @@ export class UAssets {
           }
           indexes.forEach((category) => {
             let isValid = false
+
             if (
               !parseInt(category) &&
               category !== '0' &&
@@ -213,6 +216,7 @@ export class UAssets {
    */
   getSize(category: string, size: 'sm' | 'md' | 'lg' | 'xl' = 'md'): number {
     const baseSize = this.sizes[category]?.[size] || 20
+
     return this.modifiers[category]
       ? baseSize * this.modifiers[category].sizeMultiplier
       : baseSize
@@ -318,9 +322,11 @@ export class UAssets {
           return this.getMisc('showcase')
         default:
       }
+
       return this.getMisc('0')
     } catch (e) {
       console.error(`[${this.assetType}]`, e)
+
       return `${this.fallback}/misc/0.${this.fallbackExt}`
     }
   }
@@ -360,6 +366,7 @@ export class UAssets {
       )
     } catch (e) {
       console.error(`[${this.assetType.toUpperCase()}]`, e)
+
       return `${this.fallback}/pokemon/0.${this.fallbackExt}`
     }
   }
@@ -391,6 +398,7 @@ export class UAssets {
       return this[this.selected.type]?.class?.type(typeId)
     } catch (e) {
       console.error(`[${this.assetType.toUpperCase()}]`, e)
+
       return `${this.fallback}/type/0.${this.fallbackExt}`
     }
   }
@@ -423,6 +431,7 @@ export class UAssets {
       )
     } catch (e) {
       console.error(`[${this.assetType.toUpperCase()}]`, e)
+
       return `${this.fallback}/pokestop/0.${this.fallbackExt}`
     }
   }
@@ -441,9 +450,11 @@ export class UAssets {
   ) {
     try {
       const reward = this.questRewardTypes[rewardType]
+
       return this[this.selected.reward]?.class?.reward(reward, id, amount)
     } catch (e) {
       console.error(`[${this.assetType.toUpperCase()}]`, e)
+
       return `${this.fallback}/reward/unset/0.${this.fallbackExt}`
     }
   }
@@ -459,6 +470,7 @@ export class UAssets {
       return this[this.selected.invasion]?.class?.invasion(gruntType, confirmed)
     } catch (e) {
       console.error(`[${this.assetType.toUpperCase()}]`, e)
+
       return `${this.fallback}/invasion/0.${this.fallbackExt}`
     }
   }
@@ -492,6 +504,7 @@ export class UAssets {
       )
     } catch (e) {
       console.error(`[${this.assetType.toUpperCase()}]`, e)
+
       return `${this.fallback}/gym/0.${this.fallbackExt}`
     }
   }
@@ -512,6 +525,7 @@ export class UAssets {
       return this[this.selected.raid]?.class?.raidEgg(level, hatched, ex)
     } catch (e) {
       console.error(`[${this.assetType.toUpperCase()}]`, e)
+
       return `${this.fallback}/raid/egg/0.${this.fallbackExt}`
     }
   }
@@ -526,6 +540,7 @@ export class UAssets {
       return this[this.selected.team]?.class?.team(teamId)
     } catch (e) {
       console.error(`[${this.assetType.toUpperCase()}]`, e)
+
       return `${this.fallback}/team/0.${this.fallbackExt}`
     }
   }
@@ -548,6 +563,7 @@ export class UAssets {
       )
     } catch (e) {
       console.error(`[${this.assetType.toUpperCase()}]`, e)
+
       return `${this.fallback}/weather/0.${this.fallbackExt}`
     }
   }
@@ -562,6 +578,7 @@ export class UAssets {
       return this[this.selected.nest]?.class?.nest(typeId)
     } catch (e) {
       console.error(`[${this.assetType.toUpperCase()}]`, e)
+
       return `${this.fallback}/nest/0.${this.fallbackExt}`
     }
   }
@@ -571,6 +588,7 @@ export class UAssets {
     try {
       const miscClass = this[this.selected.misc]?.class
       const singular = fileName.slice(0, -1)
+
       if (miscClass.has('misc', fileName)) {
         return miscClass.misc(fileName)
       }
@@ -592,9 +610,11 @@ export class UAssets {
       ) {
         return this[this.selected[singular]].class[singular]('0')
       }
+
       return miscClass.misc('0')
     } catch (e) {
       console.error(`[${this.assetType.toUpperCase()}]`, e)
+
       return `${this.fallback}/misc/0.${this.fallbackExt}`
     }
   }
@@ -605,6 +625,7 @@ export class UAssets {
       return this[this.selected.device]?.class?.device(online)
     } catch (e) {
       console.error(`[${this.assetType.toUpperCase()}]`, e)
+
       return `${this.fallback}/device/0.${this.fallbackExt}`
     }
   }
@@ -615,6 +636,7 @@ export class UAssets {
       return this[this.selected.spawnpoint]?.class?.spawnpoint(hasTth)
     } catch (e) {
       console.error(`[${this.assetType.toUpperCase()}]`, e)
+
       return `${this.fallback}/spawnpoint/0.${this.fallbackExt}`
     }
   }
@@ -625,6 +647,7 @@ export class UAssets {
       return this[this.selected.station]?.class?.station(active)
     } catch (e) {
       console.error(`[${this.assetType.toUpperCase()}]`, e)
+
       return `${this.fallback}/station/0.${this.fallbackExt}`
     }
   }

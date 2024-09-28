@@ -44,7 +44,7 @@
     }
   },
   "include": [
-    "client/src",
+    "./src",
     "vite.config.js"
   ],
   "exclude": [

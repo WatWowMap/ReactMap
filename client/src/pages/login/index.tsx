@@ -1,6 +1,5 @@
 import { Navigate } from 'react-router-dom'
 import Box from '@mui/material/Box'
-
 import { useMemory } from '@store/useMemory'
 import { ThemeToggle } from '@components/inputs/ThemeToggle'
 import { CustomLoginPage } from '@features/builder'
@@ -14,9 +13,10 @@ export function LoginPage() {
   if (loggedIn && process.env.NODE_ENV !== 'development') {
     return <Navigate to="/" />
   }
+
   return (
     <>
-      <Box position="absolute" top={10} right={10}>
+      <Box position="absolute" right={10} top={10}>
         <ThemeToggle />
       </Box>
       {loginPage ? <CustomLoginPage /> : <DefaultLoginPage />}

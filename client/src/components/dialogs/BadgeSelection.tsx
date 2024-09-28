@@ -2,7 +2,6 @@ import * as React from 'react'
 import DialogContent from '@mui/material/DialogContent'
 import Dialog from '@mui/material/Dialog'
 import { useMutation } from '@apollo/client'
-
 import { apolloClient, apolloCache } from '@services/apollo'
 import { Query } from '@services/queries'
 import { ENUM_BADGES } from '@assets/constants'
@@ -63,16 +62,16 @@ export function BadgeSelection() {
 
   return (
     <Dialog open={open} onClose={handleClose}>
-      <Header titles="gym_badge_menu" action={handleClose} />
+      <Header action={handleClose} titles="gym_badge_menu" />
       <DialogContent sx={{ mt: 2 }}>
         <MultiSelector
           items={ENUM_BADGES}
+          tKey="badge_"
           value={badge || 0}
           onClick={onClick}
-          tKey="badge_"
         />
       </DialogContent>
-      <Footer options={footerOptions} role="webhook_footer" />
+      <Footer i18nKey="webhook_footer" options={footerOptions} />
     </Dialog>
   )
 }

@@ -25,6 +25,7 @@ function validateJsons(fileName, domain = process.env.NODE_CONFIG_ENV || '') {
         fs.readFileSync(path.join(userConfigDir, `${fileName}.json`), 'utf8'),
       )
     : {}
+
   if (Object.keys(generalJson).length && !domain) {
     log.info(
       TAGS.config,
@@ -42,18 +43,21 @@ function validateJsons(fileName, domain = process.env.NODE_CONFIG_ENV || '') {
           'utf8',
         ),
       ) || {}
+
     if (Object.keys(domainJson).length) {
       log.info(
         TAGS.config,
         `${fileName}-${domain}.json found, overwriting your config.map.${fileName} for ${domain} with the found data.`,
       )
     }
+
     return {
       components: [],
       ...generalJson,
       ...domainJson,
     }
   }
+
   return generalJson
 }
 

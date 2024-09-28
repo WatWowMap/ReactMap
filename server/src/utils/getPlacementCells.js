@@ -5,8 +5,10 @@ const {
   S2CellId,
   S2LatLngRect,
 } = require('nodes2ts')
-const { getPolyVector } = require('./getPolyVector')
+
 const { PoI } = require('../models/PoI')
+
+const { getPolyVector } = require('./getPolyVector')
 
 /**
  *
@@ -22,6 +24,7 @@ function getPlacementCells(filters, pokestops, gyms) {
   )
 
   const regionCoverer = new S2RegionCoverer()
+
   regionCoverer.setMinLevel(17)
   regionCoverer.setMaxLevel(17)
 
@@ -31,10 +34,12 @@ function getPlacementCells(filters, pokestops, gyms) {
   )
   const indexedCells = {}
   const coveringCells = regionCoverer.getCoveringCells(region)
+
   for (let i = 0; i < coveringCells.length; i += 1) {
     const cell = coveringCells[i]
     const { polygon } = getPolyVector(cell.id)
     const cellId = cell.id.toString()
+
     indexedCells[cellId] = {
       id: cellId,
       level: 17,
@@ -49,6 +54,7 @@ function getPlacementCells(filters, pokestops, gyms) {
     ).parentL(17)
     const cellId = level17Cell.id.toString()
     const cell = indexedCells[cellId]
+
     if (cell) {
       cell.blocked = true
     }

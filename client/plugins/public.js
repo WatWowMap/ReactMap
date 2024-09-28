@@ -15,6 +15,7 @@ const publicPlugin = () => {
     '../../node_modules/leaflet/dist/images/marker-icon.png',
   )
   let outDir = ''
+
   return {
     name: 'vite-plugin-public',
     configResolved(config) {
@@ -47,16 +48,19 @@ const publicPlugin = () => {
         if (req.url === '/favicon.ico') {
           res.writeHead(200, { 'Content-Type': 'image/x-icon' })
           res.end(fs.readFileSync(favicon))
+
           return
         }
         if (req.url === '/images/fallback-marker.png') {
           res.writeHead(200, { 'Content-Type': 'image/png' })
           res.end(fs.readFileSync(markerPath))
+
           return
         }
         if (req.url.startsWith('/images/u')) {
           res.writeHead(200, { 'Content-Type': 'image/png' })
           res.end(fs.readFileSync(path.join(configDir, req.url)))
+
           return
         }
         next()

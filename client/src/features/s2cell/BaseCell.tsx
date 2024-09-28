@@ -11,8 +11,8 @@ function Cell({
   return (
     <Polyline
       key={color}
-      positions={[...coords, coords[0]]}
       color={color}
+      positions={[...coords, coords[0]]}
       weight={0.5}
     />
   )

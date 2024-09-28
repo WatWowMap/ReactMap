@@ -2,12 +2,12 @@ import Grid2 from '@mui/material/Unstable_Grid2'
 import TextField from '@mui/material/TextField'
 import { useMutation } from '@apollo/client'
 import { useTranslation } from 'react-i18next'
-
 import { useMemory } from '@store/useMemory'
 import { Query } from '@services/queries'
 
 export function ExtraUserFields() {
   const fields = useMemory((s) => s.extraUserFields)
+
   return fields?.length ? (
     <Grid2 container alignItems="center" justifyContent="center">
       {fields.map((field) => (
@@ -35,13 +35,14 @@ export function FieldValue({
   const [setField] = useMutation(Query.user('SET_EXTRA_FIELDS'))
 
   if (!key || !label) return null
+
   return (
-    <Grid2 key={label} xs={5} textAlign="center" margin="10px 0">
+    <Grid2 key={label} margin="10px 0" textAlign="center" xs={5}>
       <TextField
         disabled={disabled}
-        variant="outlined"
         label={label}
         value={value}
+        variant="outlined"
         onChange={({ target }) => {
           useMemory.setState((prev) => ({
             auth: {

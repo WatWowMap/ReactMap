@@ -8,7 +8,6 @@ import Select from '@mui/material/Select'
 import MenuItem from '@mui/material/MenuItem'
 import { useTranslation } from 'react-i18next'
 import { useMutation } from '@apollo/client'
-
 import { ALL_PROFILES, SET_PROFILE } from '@services/queries/webhook'
 import { useWebhookStore } from '@store/useWebhookStore'
 
@@ -46,19 +45,20 @@ export const CopyView = ({
   }
 
   if (!profile) return null
+
   return (
     <>
-      <Grid xs={8} sm={7}>
-        <Typography variant="subtitle2" align="center">
+      <Grid sm={7} xs={8}>
+        <Typography align="center" variant="subtitle2">
           {t('confirm_copy', { profile: profile.name })}
         </Typography>
       </Grid>
-      <Grid container xs={4} alignItems="center" justifyContent="center">
-        <Grid xs={12} sm={6}>
+      <Grid container alignItems="center" justifyContent="center" xs={4}>
+        <Grid sm={6} xs={12}>
           <Select
+            fullWidth
             value={copyTo || ''}
             onChange={(e) => setCopyTo(+e.target.value)}
-            fullWidth
           >
             {profiles
               .filter((prof) => profile.profile_no !== prof.profile_no)
@@ -69,14 +69,14 @@ export const CopyView = ({
               ))}
           </Select>
         </Grid>
-        <Grid xs={12} sm={6}>
-          <IconButton onClick={handleViewChange('profile')} size="large">
+        <Grid sm={6} xs={12}>
+          <IconButton size="large" onClick={handleViewChange('profile')}>
             <Clear />
           </IconButton>
           <IconButton
-            onClick={handleCopyProfile}
             disabled={profile.profile_no === copyTo}
             size="large"
+            onClick={handleCopyProfile}
           >
             <Save />
           </IconButton>

@@ -1,8 +1,8 @@
 /* eslint-disable prefer-destructuring */
 // @ts-check
 const path = require('path')
-const { ApolloServer } = require('@apollo/server')
 
+const { ApolloServer } = require('@apollo/server')
 const { loadTypedefs } = require('@graphql-tools/load')
 const { GraphQLFileLoader } = require('@graphql-tools/graphql-file-loader')
 const {
@@ -11,12 +11,12 @@ const {
 const {
   ApolloServerPluginLandingPageDisabled,
 } = require('@apollo/server/plugin/disabled')
-
 const config = require('@rm/config')
 const { Logger, TAGS, log } = require('@rm/logger')
 
-const { resolvers } = require('./resolvers')
 const { state } = require('../services/state')
+
+const { resolvers } = require('./resolvers')
 
 /** @param {import('http').Server} httpServer */
 async function startApollo(httpServer) {
@@ -35,6 +35,7 @@ async function startApollo(httpServer) {
     introspection: config.getSafe('devOptions.graphiql'),
     formatError: (e) => {
       let customMessage = ''
+
       if (
         e?.message.includes('skipUndefined()') ||
         e?.message === 'old_client'
@@ -54,10 +55,12 @@ async function startApollo(httpServer) {
       }
 
       const key = `${e.extensions.id || e.extensions.user}-${e.message}`
+
       if (state.stats.hasApolloEntry(key)) {
         if (e?.extensions?.stacktrace) {
           delete e.extensions.stacktrace
         }
+
         return e
       }
       if (!config.getSafe('devOptions.enabled')) {
@@ -83,6 +86,7 @@ async function startApollo(httpServer) {
       if (e?.extensions?.stacktrace) {
         delete e.extensions.stacktrace
       }
+
       return e
     },
     logger: {
@@ -100,6 +104,7 @@ async function startApollo(httpServer) {
           if (requestContext.request?.variables?.filters) {
             log.trace(requestContext.request?.variables?.filters)
           }
+
           return {
             async willSendResponse({
               response,

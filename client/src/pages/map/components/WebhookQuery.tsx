@@ -1,7 +1,6 @@
 import * as React from 'react'
 import { useParams } from 'react-router-dom'
 import { useQuery } from '@apollo/client'
-
 import { Query } from '@services/queries'
 import { useMemory } from '@store/useMemory'
 import { useStorage } from '@store/useStorage'
@@ -9,6 +8,7 @@ import { useStorage } from '@store/useStorage'
 const getLowerCase = (category: string): string | null => {
   if (!category) return null
   const lowercase = category.toLowerCase()
+
   switch (lowercase) {
     case 'gyms':
     case 'raids':

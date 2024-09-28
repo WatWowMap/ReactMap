@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useRef } from 'react'
 import { useQuery } from '@apollo/client'
 import { useTranslation } from 'react-i18next'
-
 import { ALL_PROFILES, WEBHOOK_USER } from '@services/queries/webhook'
 import { RobustTimeout } from '@services/apollo/RobustTimeout'
 import { useWebhookStore } from '@store/useWebhookStore'
@@ -44,6 +43,7 @@ export function useGetWebhookData<
   useEffect(() => {
     if (category === realCategory) {
       timeout.current.setupTimeout(refetch)
+
       return () => {
         timeout.current.off()
       }
@@ -52,6 +52,7 @@ export function useGetWebhookData<
 
   const filtererData = useMemo(() => {
     const source = data ?? previousData
+
     return category === 'human' || category === 'profile'
       ? source?.webhook?.[category]
       : (source?.webhook?.[category] || []).filter(
@@ -69,6 +70,7 @@ export function useGetWebhookData<
     if (!loading && data?.webhook) {
       if (data.webhook.status === 'error') {
         const { context } = useWebhookStore.getState()
+
         useWebhookStore.setState({
           alert: {
             open: true,

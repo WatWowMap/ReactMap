@@ -12,7 +12,6 @@ import List from '@mui/material/List'
 import ListItem from '@mui/material/ListItem'
 import ListItemIcon from '@mui/material/ListItemIcon'
 import ListItemText from '@mui/material/ListItemText'
-
 import { useMemory } from '@store/useMemory'
 import { DiscordButton } from '@components/auth/Discord'
 import { ThemeToggle } from '@components/inputs/ThemeToggle'
@@ -33,36 +32,36 @@ export function BlockedPage() {
 
   return (
     <Box
-      display="flex"
-      justifyContent="center"
       alignItems="center"
+      display="flex"
       height="100cqh"
+      justifyContent="center"
       width="100%"
     >
-      <Box position="absolute" top={10} right={10}>
+      <Box position="absolute" right={10} top={10}>
         <ThemeToggle />
       </Box>
       <Card elevation={10}>
         {username && avatar && id && (
           <CardHeader
-            sx={{ px: 4, pt: 4 }}
             avatar={
               <Avatar
-                src={`https://cdn.discordapp.com/avatars/${id}/${avatar}.webp?size=96`}
                 alt={username}
+                src={`https://cdn.discordapp.com/avatars/${id}/${avatar}.webp?size=96`}
               />
             }
-            title={t('signed_in_as')}
             subheader={username}
+            sx={{ px: 4, pt: 4 }}
+            title={t('signed_in_as')}
           />
         )}
         <CardContent sx={{ mx: 2 }}>
-          <Typography variant="h3" align="center" pb={2}>
+          <Typography align="center" pb={2} variant="h3">
             {t('access_denied')}!
           </Typography>
           {blockedGuilds ? (
             <>
-              <Typography variant="body1" align="center">
+              <Typography align="center" variant="body1">
                 {t('on_block_msg')}:
               </Typography>
               <List>
@@ -77,33 +76,33 @@ export function BlockedPage() {
               </List>
             </>
           ) : (
-            <Typography variant="body1" align="center">
+            <Typography align="center" variant="body1">
               {t('missing_map_perm')}
             </Typography>
           )}
           {discordInvite && (
-            <Typography variant="body1" align="center">
+            <Typography align="center" variant="body1">
               {t('on_block_join_discord')}
             </Typography>
           )}
         </CardContent>
         <CardActions sx={{ p: 4 }}>
           <Button
-            variant="contained"
             color="primary"
-            onClick={() => navigate('/')}
             size="small"
+            variant="contained"
+            onClick={() => navigate('/')}
           >
             {t('go_back')}
           </Button>
           {roleLink && roleLinkName && (
             <Button
-              variant="contained"
               color="success"
-              target="_blank"
               href={roleLink}
-              sx={{ color: 'white' }}
               size="small"
+              sx={{ color: 'white' }}
+              target="_blank"
+              variant="contained"
             >
               {roleLinkName}
             </Button>

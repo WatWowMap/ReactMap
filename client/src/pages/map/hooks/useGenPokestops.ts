@@ -12,6 +12,7 @@ export function useGenPokestops() {
     const tempObj: import('@rm/types').ClientFilterObj = Object.fromEntries(
       categories.map((x) => [x, {}]),
     )
+
     if (!pokestops?.filter) return
 
     if (tempObj.invasions) {
@@ -43,6 +44,7 @@ export function useGenPokestops() {
           case 'a':
             if (tempObj.rocket_pokemon) {
               const name = t(`poke_${id.slice(1).split('-')[0]}`)
+
               tempObj.rocket_pokemon[id] = {
                 name,
                 perms: ['invasions'],
@@ -64,6 +66,7 @@ export function useGenPokestops() {
           case 'h':
             if (tempObj.showcase) {
               const name = t(`poke_type_${id.slice(1)}`)
+
               tempObj.showcase[id] = {
                 name,
                 perms: ['eventStops'],
@@ -76,6 +79,7 @@ export function useGenPokestops() {
           case 'f':
             if (tempObj.showcase) {
               const name = t(`poke_${id.slice(1).split('-')[0]}`)
+
               tempObj.showcase[id] = {
                 name,
                 perms: ['eventStops'],
@@ -99,6 +103,7 @@ export function useGenPokestops() {
           case 'm':
             {
               const monId = id && id.slice(1).split('-')[0]
+
               if (tempObj.quest_reward_12 && pokemon[monId]) {
                 tempObj.quest_reward_12[id] = {
                   name: `${t(`poke_${monId}`)} x${id.split('-')[1]}`,
@@ -154,6 +159,7 @@ export function useGenPokestops() {
           case 'c':
             {
               const monId = id && id.slice(1)
+
               if (
                 tempObj.quest_reward_4 &&
                 tempObj.quest_reward_9 &&
@@ -161,6 +167,7 @@ export function useGenPokestops() {
               ) {
                 const category =
                   id.charAt(0) === 'c' ? 'quest_reward_4' : 'quest_reward_9'
+
                 tempObj[category][id] = {
                   name: `${t(`poke_${monId}`)} ${
                     id.charAt(0) === 'c' ? t('candy') : t('xl')

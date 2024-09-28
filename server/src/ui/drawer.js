@@ -1,5 +1,6 @@
 // @ts-check
 const config = require('@rm/config')
+
 const { state } = require('../services/state')
 
 /** @typedef {import('@rm/types').RMSlider} Slider */
@@ -196,11 +197,13 @@ function drawer(perms) {
 
   // sorts the menus
   const sortedUi = {}
+
   mapConfig.general.menuOrder.forEach((category) => {
     if (ui[category]) {
       sortedUi[category] = ui[category]
     }
   })
+
   return { ...sortedUi, ...ui }
 }
 

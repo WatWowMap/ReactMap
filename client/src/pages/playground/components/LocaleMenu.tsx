@@ -21,24 +21,24 @@ export function LocaleMenu() {
     <>
       <Button
         color="inherit"
-        onClick={(e) => setAnchorEl(e.currentTarget)}
         startIcon={startIcon}
+        onClick={(e) => setAnchorEl(e.currentTarget)}
       >
         {t('locale')}
       </Button>
       <Menu
-        transitionDuration={200}
         anchorEl={anchorEl}
         open={!!anchorEl}
+        transitionDuration={200}
         onClose={handleClose()}
       >
         {CONFIG.client.locales.map((c) => (
           <MenuItem
             key={c}
-            value={c}
             dense
-            onClick={handleClose(c)}
             selected={c === i18n.language}
+            value={c}
+            onClick={handleClose(c)}
           >
             {t(`locale_selection_${c}`)}
           </MenuItem>

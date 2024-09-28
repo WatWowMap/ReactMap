@@ -6,7 +6,6 @@ import {
   S2Cell,
   S2Point,
 } from 'nodes2ts'
-
 import { useMemory } from '@store/useMemory'
 import { useStorage } from '@store/useStorage'
 import { Notification } from '@components/Notification'
@@ -27,6 +26,7 @@ export function GenerateCells() {
 
   const cells = React.useMemo(() => {
     const bounds = getQueryArgs()
+
     return filter?.flatMap((level) => {
       if (level > zoom) return []
 
@@ -35,18 +35,23 @@ export function GenerateCells() {
         S2LatLng.fromDegrees(bounds.minLat, bounds.minLon),
         S2LatLng.fromDegrees(bounds.maxLat, bounds.maxLon),
       )
+
       regionCoverer.setMinLevel(level)
       regionCoverer.setMaxLevel(level)
+
       return regionCoverer.getCoveringCells(region).map((cell) => {
         const s2cell = new S2Cell(cell)
         /** @type {import('@rm/types').S2Polygon} */
         const poly = []
+
         for (let i = 0; i <= 3; i += 1) {
           const coordinate = s2cell.getVertex(i)
           const point = new S2Point(coordinate.x, coordinate.y, coordinate.z)
           const latLng = S2LatLng.fromPoint(point)
+
           poly.push([latLng.latDegrees, latLng.lngDegrees])
         }
+
         return {
           id: cell.id.toString(),
           coords: poly,
@@ -63,8 +68,6 @@ export function GenerateCells() {
           <BaseCell key={cell.id} {...cell} color={color} />
         ))}
       <Notification
-        open={cells.length > 20_000}
-        severity="warning"
         i18nKey="s2_cell_limit"
         messages={[
           {
@@ -72,6 +75,8 @@ export function GenerateCells() {
             variables: [cells.length.toLocaleString()],
           },
         ]}
+        open={cells.length > 20_000}
+        severity="warning"
       />
       <Notification
         open={filter.some((x) => x > zoom)}

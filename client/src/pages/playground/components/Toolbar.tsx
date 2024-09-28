@@ -12,17 +12,17 @@ export function MuiToolbar() {
   const { t } = useTranslation()
 
   return (
-    <AppBar position="static" enableColorOnDark color="secondary">
+    <AppBar enableColorOnDark color="secondary" position="static">
       <Toolbar variant="dense">
         <MainMenu />
         <ComponentMenu />
         <LocaleMenu />
         <Box flexGrow={1} />
         <Typography
-          variant="h6"
           color="inherit"
           component="div"
           display={{ xs: 'none', sm: 'block' }}
+          variant="h6"
         >
           {t('playground')}
         </Typography>

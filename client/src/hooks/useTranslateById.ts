@@ -57,6 +57,7 @@ export function useTranslateById(options: CustomTOptions = {}): {
             )})`
           case 'd': {
             const a = amount ? id.slice(1) : ''
+
             return `${i18n.t('quest_reward_3')}${a}`
           }
           case 'e':
@@ -80,16 +81,19 @@ export function useTranslateById(options: CustomTOptions = {}): {
           case 'm': {
             // mega energy
             const a = amount ? `(${id.slice(1).split('-')[1]})` : ''
+
             return `${i18n.t(`poke_${id.slice(1).split('-')[0]}`)} ${a}`
           }
           case 'p': {
             // experience
             const a = amount ? id.slice(1) : ''
+
             return `${i18n.t('quest_reward_1')}${a}`
           }
           case 'q': {
             // items
             const a = amount ? `(${id.slice(1).split('-')[1]})` : ''
+
             return `${i18n.t(`item_${id.slice(1).split('-')[0]}`)}${a}`
           }
           case 'r':
@@ -119,6 +123,7 @@ export function useTranslateById(options: CustomTOptions = {}): {
             const formName = formsToIgnore.current.has(possibleForm)
               ? ''
               : `${newLine ? '\n' : ' '}(${possibleForm})`
+
             return `${pokemonName}${formName}`
           }
         }

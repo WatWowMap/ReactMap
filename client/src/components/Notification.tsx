@@ -45,21 +45,22 @@ export function Notification<T>({
       const timer = setTimeout(() => {
         handleClose()
       }, 5000)
+
       return () => clearTimeout(timer)
     }
   }, [open])
 
   return (
     <Snackbar
+      TransitionComponent={SlideTransition}
       open={alert}
       onClose={handleClose}
-      TransitionComponent={SlideTransition}
     >
       <Alert
-        onClose={handleClose}
         severity={severity}
-        variant="filled"
         style={alertStyle}
+        variant="filled"
+        onClose={handleClose}
       >
         {title && <AlertTitle>{t(title)}</AlertTitle>}
         {typeof i18nKey === 'string' && Array.isArray(messages)

@@ -1,8 +1,8 @@
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
-
 import { useMemory } from '@store/useMemory'
 import { useTranslation } from 'react-i18next'
+
 import { PokeType } from './PokeType'
 
 export function PokeMove({
@@ -16,20 +16,21 @@ export function PokeMove({
   const { t } = useTranslation()
 
   if (!move) return null
+
   return (
     <Stack
-      direction="row"
-      width="100%"
-      justifyContent="space-between"
       alignItems="center"
+      direction="row"
+      justifyContent="space-between"
+      width="100%"
     >
       <PokeType id={move.type} size={size} />
       <Typography
-        variant="caption"
         align="center"
-        width="100%"
-        pl={1}
         lineHeight={1.25}
+        pl={1}
+        variant="caption"
+        width="100%"
       >
         {t(`move_${id}`)}
       </Typography>

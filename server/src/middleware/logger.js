@@ -1,7 +1,6 @@
 // @ts-check
 /* eslint-disable prefer-rest-params */
 const bytes = require('bytes')
-
 const { log, TAGS } = require('@rm/logger')
 
 /** @type {import('@rm/types').ExpressMiddleware} */
@@ -29,6 +28,7 @@ function loggerMiddleware(req, res, next) {
   res.on('finish', () => {
     const [seconds, nanoseconds] = process.hrtime(start)
     const responseTime = (seconds * 1000 + nanoseconds / 1e6).toFixed(3) // in milliseconds
+
     log.debug(
       TAGS.express,
       TAGS.method(req.method),

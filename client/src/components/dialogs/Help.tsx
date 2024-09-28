@@ -11,7 +11,7 @@ export function HelpDialog() {
 
   return (
     <DialogWrapper open={open} onClose={handleClose}>
-      <TutorialAdvanced toggleHelp={handleClose} category={category} />
+      <TutorialAdvanced category={category} toggleHelp={handleClose} />
     </DialogWrapper>
   )
 }

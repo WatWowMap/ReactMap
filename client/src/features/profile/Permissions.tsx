@@ -6,7 +6,6 @@ import Card from '@mui/material/Card'
 import CardContent from '@mui/material/CardContent'
 import CardMedia from '@mui/material/CardMedia'
 import Typography from '@mui/material/Typography'
-
 import { useMemory } from '@store/useMemory'
 import { ALWAYS_EXCLUDED } from '@assets/constants'
 import { getProperName, camelToSnake } from '@utils/strings'
@@ -31,8 +30,9 @@ export function UserPermissions() {
           counts[perm] > 0
         )
           return null
+
         return (
-          <Grid2 key={perm} xs={12} sm={6} alignItems="stretch">
+          <Grid2 key={perm} alignItems="stretch" sm={6} xs={12}>
             <PermCard perm={perm} />
           </Grid2>
         )
@@ -45,17 +45,17 @@ export function UserPermissions() {
 function PermMedia({ children }: { children: string | string[] }) {
   return (
     <Box
-      flexDirection="column"
-      minHeight={250}
       bgcolor="grey.900"
       className="flex-center"
+      flexDirection="column"
+      minHeight={250}
     >
       {React.Children.toArray(children).map((child) => (
         <Typography
           key={child.toString()}
-          variant="h6"
           align="center"
           color="white"
+          variant="h6"
         >
           {child}
         </Typography>
@@ -87,18 +87,20 @@ function PermCard({ perm }: { perm: keyof import('@rm/types').Permissions }) {
           }}
         />
       )
+
     return <PermMedia>{t('no_access')}</PermMedia>
   }, [value, perm, permImageDir, t])
 
   const textColor = value ? 'text.primary' : 'text.disabled'
+
   return (
     <Card elevation={2} style={{ height: '100%' }}>
       <CardMedia component={component} />
       <CardContent style={{ minHeight: 100 }}>
-        <Typography gutterBottom variant="h6" color={textColor}>
+        <Typography gutterBottom color={textColor} variant="h6">
           {t(camelToSnake(perm))}
         </Typography>
-        <Typography variant="body2" color={textColor}>
+        <Typography color={textColor} variant="body2">
           {t(`${camelToSnake(perm)}_subtitle`)}
         </Typography>
       </CardContent>

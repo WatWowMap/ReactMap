@@ -1,7 +1,6 @@
 import * as React from 'react'
 import { useQuery } from '@apollo/client'
 import { useMap } from 'react-leaflet'
-
 import { useMemory } from '@store/useMemory'
 import { useStorage } from '@store/useStorage'
 import { Query } from '@services/queries'
@@ -13,9 +12,10 @@ import { GenerateCells } from '@features/s2cell'
 import { useAnalytics } from '@hooks/useAnalytics'
 import { useProcessError } from '@hooks/useProcessError'
 
-import { Clustering } from './Clustering'
 import { TILES } from '../tileObject'
 import { usePermCheck } from '../hooks/usePermCheck'
+
+import { Clustering } from './Clustering'
 
 const userSettingsCategory = (category: string) => {
   switch (category) {
@@ -45,6 +45,7 @@ function trimFilters<T extends keyof import('@rm/types').AllFilters>(
     onlyAllPvp: userSettings?.showAllPvpRanks,
     onlyAreas: onlyAreas || [],
   }
+
   Object.entries(requestedFilters || {}).forEach((topLevelFilter) => {
     const [id, specifics] = topLevelFilter
 
@@ -59,15 +60,18 @@ function trimFilters<T extends keyof import('@rm/types').AllFilters>(
     }
   })
   Object.entries(requestedFilters?.filter || {}).forEach(([id, specifics]) => {
-    // eslint-disable-next-line no-unused-vars
     const { enabled, size, ...rest } = (easyMode
       ? requestedFilters.ivOr
-      : specifics) || { all: false, adv: '' }
+      : specifics) || {
+      all: false,
+      adv: '',
+    }
 
     if (specifics && specifics.enabled && staticFilters[category]?.filter[id]) {
       trimmed[id] = rest
     }
   })
+
   return trimmed
 }
 
@@ -78,6 +82,7 @@ export function FilterPermCheck({ category }) {
   if (!valid || error) {
     return null
   }
+
   return category === 's2cells' ? (
     <GenerateCells />
   ) : (
@@ -91,6 +96,7 @@ function QueryWrapper({
   category: keyof import('@rm/types').Config['api']['polling']
 }) {
   const timeout = React.useRef(new RobustTimeout(category))
+
   useAnalytics('Data', `${category} being fetched`, category, true)
 
   return <QueryData category={category} timeout={timeout} />
@@ -146,6 +152,7 @@ function QueryData({
   React.useEffect(() => {
     if (active) {
       timeout.current.setupTimeout(refetch)
+
       return () => {
         timeout.current.off()
       }
@@ -161,8 +168,10 @@ function QueryData({
         })
       }
     }
+
     map.on('fetchdata', refetchData)
     refetchData()
+
     return () => {
       map.off('fetchdata', refetchData)
     }
@@ -178,7 +187,6 @@ function QueryData({
     return error && process.env.NODE_ENV === 'development' ? (
       <Notification
         open
-        severity="error"
         i18nKey="server_dev_error_0"
         messages={[
           {
@@ -186,6 +194,7 @@ function QueryData({
             variables: [error?.message],
           },
         ]}
+        severity="error"
       />
     ) : null
   }
@@ -196,6 +205,7 @@ function QueryData({
         if (!hideList.has(each.id)) {
           return <Component key={each.id || category} {...each} />
         }
+
         return null
       })}
     </Clustering>

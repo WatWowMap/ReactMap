@@ -10,7 +10,7 @@ interface Props {
 
 export function Coords({ lat, lon }: Props) {
   return (
-    <Typography variant="caption" textAlign="center">
+    <Typography textAlign="center" variant="caption">
       🎯 {lat}, {lon}
     </Typography>
   )

@@ -5,7 +5,6 @@ import Grid2 from '@mui/material/Unstable_Grid2'
 import Button from '@mui/material/Button'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-
 import { useLayoutStore } from '@store/useLayoutStore'
 
 import { Header } from './Header'
@@ -31,21 +30,21 @@ export function ResetFilters() {
     <DialogWrapper dialog="resetFilters" variant="small">
       <Header titles={t('filters_reset_title')} />
       <Grid2
-        component={DialogContent}
-        className="flex-center"
         container
+        className="flex-center"
+        component={DialogContent}
         rowGap={2}
       >
-        <Grid2 xs={12} mt={2}>
-          <Typography variant="subtitle1" align="center">
+        <Grid2 mt={2} xs={12}>
+          <Typography align="center" variant="subtitle1">
             {t('reset_or_manage_text')}
           </Typography>
         </Grid2>
-        <Grid2 xs={12} sm={6} className="flex-center">
+        <Grid2 className="flex-center" sm={6} xs={12}>
           <Button
-            variant="contained"
             color="info"
             size="small"
+            variant="contained"
             onClick={() => {
               handleClose()
               navigate('/data-management')
@@ -54,11 +53,11 @@ export function ResetFilters() {
             {t('data_management')}
           </Button>
         </Grid2>
-        <Grid2 xs={12} sm={6} className="flex-center">
+        <Grid2 className="flex-center" sm={6} xs={12}>
           <Button
-            variant="contained"
             color="error"
             size="small"
+            variant="contained"
             onClick={() => {
               handleClose()
               navigate('/reset')

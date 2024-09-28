@@ -1,9 +1,9 @@
 import Grid from '@mui/material/Unstable_Grid2'
 import { useTranslation } from 'react-i18next'
-
 import { Loading } from '@components/Loading'
 
 import { useGetWebhookData } from '../../hooks/useGetWebhookData'
+
 import { MemoNewProfile } from './NewProfile'
 import { ProfileTile } from './ProfileTile'
 
@@ -21,7 +21,7 @@ export function ProfileEditing() {
   return loading ? (
     <Loading>{t('loading', { category: t('profile') })}</Loading>
   ) : (
-    <Grid container alignItems="center" justifyContent="center" py={2} px={4}>
+    <Grid container alignItems="center" justifyContent="center" px={4} py={2}>
       <MemoNewProfile />
       {data.map(({ uid }) => (
         <ProfileTile key={uid} uid={uid} />

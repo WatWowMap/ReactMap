@@ -1,5 +1,4 @@
 import { useTranslation } from 'react-i18next'
-
 import {
   resetAllGeneral,
   resetAudio,
@@ -11,13 +10,14 @@ import {
   resetUserSettings,
 } from '@utils/resetState'
 
+import { useDataManagementStore } from '../hooks/store'
+
 import {
   ButtonWithNotification,
   ChildContainer,
   StyledDivider,
   StyledSubHeader,
 } from './Shared'
-import { useDataManagementStore } from '../hooks/store'
 
 export function ResetGeneral() {
   const { t } = useTranslation()
@@ -27,63 +27,63 @@ export function ResetGeneral() {
     <ChildContainer>
       <StyledSubHeader>{t('reset_general_title')}</StyledSubHeader>
       <ButtonWithNotification
-        onClick={resetSettings}
+        category="general"
+        color="warning.main"
+        isHovering={isHovering}
         label={t('reset_settings')}
-        color="warning.main"
-        category="general"
-        isHovering={isHovering}
+        onClick={resetSettings}
       />
       <ButtonWithNotification
-        onClick={resetMenus}
+        category="general"
+        color="warning.main"
+        isHovering={isHovering}
         label={t('reset_menus')}
-        color="warning.main"
-        category="general"
-        isHovering={isHovering}
+        onClick={resetMenus}
       />
       <ButtonWithNotification
-        onClick={resetUserSettings}
+        category="general"
+        color="warning.main"
+        isHovering={isHovering}
         label={t('reset_options')}
-        color="warning.main"
-        category="general"
-        isHovering={isHovering}
+        onClick={resetUserSettings}
       />
       <ButtonWithNotification
-        onClick={resetUI}
+        category="general"
+        color="warning.main"
+        isHovering={isHovering}
         label={t('reset_ui')}
-        color="warning.main"
-        category="general"
-        isHovering={isHovering}
+        onClick={resetUI}
       />
       <ButtonWithNotification
-        onClick={resetLocation}
-        label={t('reset_position')}
-        color="warning.main"
         category="general"
+        color="warning.main"
         isHovering={isHovering}
+        label={t('reset_position')}
+        onClick={resetLocation}
       />
       <StyledDivider />
       <StyledSubHeader>{t('reset_assets')}</StyledSubHeader>
       <ButtonWithNotification
-        onClick={resetIcons}
-        label={t('reset_icons')}
-        color="warning.main"
         category="general"
+        color="warning.main"
         isHovering={isHovering}
+        label={t('reset_icons')}
+        onClick={resetIcons}
       />
       <ButtonWithNotification
-        onClick={resetAudio}
-        label={t('reset_audio')}
-        color="warning.main"
         category="general"
+        color="warning.main"
         isHovering={isHovering}
+        label={t('reset_audio')}
+        onClick={resetAudio}
       />
       <StyledDivider />
       <ButtonWithNotification
-        onClick={resetAllGeneral}
-        label={t('reset_all')}
-        color="error.main"
-        category="general"
         all
+        category="general"
+        color="error.main"
+        label={t('reset_all')}
+        onClick={resetAllGeneral}
         onMouseEnter={() =>
           useDataManagementStore.setState({ resetGeneralHover: true })
         }

@@ -13,5 +13,6 @@ export function fromSnakeCase(str: string, separator: string = ' ') {
 
 export function getProperName(str: string) {
   const capital = `${str.charAt(0).toUpperCase()}${str.slice(1)}`
+
   return capital.replace(/([a-z0-9])([A-Z])/g, '$1 $2')
 }

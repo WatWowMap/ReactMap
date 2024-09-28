@@ -10,7 +10,9 @@ class Session extends Model {
 
   static async clear() {
     const results = await this.query().delete()
+
     log.info(TAGS.session, 'Clear Result:', results)
+
     return results
   }
 
@@ -22,6 +24,7 @@ class Session extends Model {
         `json_extract(data, '$.passport.user.rmStrategy') = '${strategy}'`,
       )
       .delete()
+
     log.info(
       TAGS.session,
       'Cleared',
@@ -29,6 +32,7 @@ class Session extends Model {
       'non-donor sessions for',
       strategy,
     )
+
     return result
   }
 
@@ -54,9 +58,11 @@ class Session extends Model {
         .select('session_id')
         .whereRaw(`json_extract(data, '$.passport.user.id') = ${userId}`)
         .andWhere('expires', '>=', ts)
+
       return results.length <= config.getSafe('api.maxSessions')
     } catch (e) {
       log.error(TAGS.session, 'Unable to validate session', e)
+
       return false
     }
   }
@@ -73,11 +79,14 @@ class Session extends Model {
         .whereRaw(`json_extract(data, '$.passport.user.id') = ${userId}`)
         .andWhere('session_id', '!=', currentSessionId || '')
         .delete()
+
       log.info(TAGS.session, 'Clear Result:', results)
+
       return results
     } catch (e) {
       log.error(TAGS.session, 'Unable to clear other sessions', e)
     }
+
     return 0
   }
 
@@ -95,16 +104,19 @@ class Session extends Model {
         )
         .orWhereRaw(`json_extract(data, '$.passport.user.id') = '${discordId}'`)
         .delete()
+
       log.info(
         TAGS.session,
         botName ? TAGS.custom(botName) : '',
         'Clear Result:',
         results,
       )
+
       return results
     } catch (e) {
       log.error(TAGS.session, 'Unable to clear Discord sessions', e)
     }
+
     return 0
   }
 }

@@ -1,4 +1,3 @@
-import type { IConfig } from 'config'
 import type { Config, ConfigAreas } from './config'
 import type { ExpressUser, Permissions } from './server'
 
@@ -14,8 +13,6 @@ declare module 'config' {
     setAreas: (newAreas: ConfigAreas) => void
   }
 }
-
-type X = IConfig['areas']
 
 declare global {
   namespace Express {

@@ -30,5 +30,6 @@ export function getPathOptions(
       fillOpacity: 0.25,
     }
   }
+
   return { fillOpacity: 0.0 }
 }

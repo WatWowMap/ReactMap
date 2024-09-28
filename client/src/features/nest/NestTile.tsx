@@ -1,6 +1,5 @@
 import * as React from 'react'
 import { GeoJSON, Marker, Popup } from 'react-leaflet'
-
 import { basicEqualFn, useMemory } from '@store/useMemory'
 import { useStorage } from '@store/useStorage'
 import { useForcePopup } from '@hooks/useForcePopup'
@@ -17,6 +16,7 @@ const BaseNestTile = (nest: import('@rm/types').Nest) => {
   )
   const [iconUrl, iconSize] = useMemory((s) => {
     const { Icons } = s
+
     return [
       Icons.getPokemon(nest.pokemon_id, nest.pokemon_form),
       Icons.getSize('nest', size),
@@ -27,10 +27,10 @@ const BaseNestTile = (nest: import('@rm/types').Nest) => {
     <>
       {nest.pokemon_id && (
         <NestMarker
-          iconUrl={iconUrl}
           iconSize={iconSize}
-          recent={recent}
+          iconUrl={iconUrl}
           nest={nest}
+          recent={recent}
         >
           <Popup>
             <NestPopup iconUrl={iconUrl} recent={recent} {...nest} />
@@ -80,11 +80,12 @@ const NestMarker = ({
   if (!showPokemon) {
     return null
   }
+
   return (
     <Marker
       ref={setMarkerRef}
-      position={[nest.lat, nest.lon]}
       icon={icon}
+      position={[nest.lat, nest.lon]}
       {...props}
     >
       {children}
@@ -106,7 +107,7 @@ const NestGeoJSON = ({
       return typeof polygon_path === 'string'
         ? JSON.parse(polygon_path)
         : polygon_path
-    } catch (e) {
+    } catch {
       return null
     }
   }, [polygon_path])
@@ -114,6 +115,7 @@ const NestGeoJSON = ({
   if (!showPolygons) {
     return null
   }
+
   return <GeoJSON data={geometry}>{children}</GeoJSON>
 }
 

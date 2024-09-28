@@ -6,7 +6,6 @@ import { useTranslation } from 'react-i18next'
 import useMediaQuery from '@mui/material/useMediaQuery'
 import Divider from '@mui/material/Divider'
 import Chip from '@mui/material/Chip'
-
 import { Header } from '@components/dialogs/Header'
 import { Footer, FooterButton } from '@components/dialogs/Footer'
 import { useMemory } from '@store/useMemory'
@@ -56,8 +55,9 @@ function ChildText({
   ...props
 }: { children: string } & import('@mui/material').TypographyProps) {
   const { t } = useTranslation()
+
   return (
-    <Typography variant="h6" align="center" width="100%" {...props}>
+    <Typography align="center" variant="h6" width="100%" {...props}>
       {t(children)}
     </Typography>
   )
@@ -76,26 +76,27 @@ function Card({
   fullSize?: boolean
 }) {
   const { t, i18n } = useTranslation()
+
   return (
     <Grid2
       direction="column"
-      sx={SX_PROPS}
       m={GAP}
       overflow="hidden"
-      xs={12}
       sm={fullSize ? 12 : 6}
+      sx={SX_PROPS}
+      xs={12}
     >
-      <Box width="100%" bgcolor={`${bgcolor}.main`} sx={SUB_SX_PROPS}>
-        <Typography variant="h5" color="white" align="center">
+      <Box bgcolor={`${bgcolor}.main`} sx={SUB_SX_PROPS} width="100%">
+        <Typography align="center" color="white" variant="h5">
           {t(title)}
         </Typography>
         {i18n.exists(`${title}_caption`) && (
           <Typography
-            variant="caption"
             color="white"
-            width="100%"
-            textAlign="center"
             component="p"
+            textAlign="center"
+            variant="caption"
+            width="100%"
           >
             {t(`${title}_caption`)}
           </Typography>
@@ -122,31 +123,32 @@ export function PkmnFilterHelp() {
   )
 
   if (!perms.pokemon) return null
+
   return (
     <DialogWrapper dialog="pkmnFilterHelp" maxWidth="md">
-      <Header titles={t('filter_help')} action={handleClose} />
+      <Header action={handleClose} titles={t('filter_help')} />
       <DialogContent sx={{ p: 0, height: '100%', alignItems: 'center' }}>
         <Grid2
           container
           alignItems="stretch"
-          justifyContent="space-around"
-          height="100%"
-          p={GAP}
           columns={13}
+          height="100%"
+          justifyContent="space-around"
+          p={GAP}
         >
-          <Grid2 xs={12} md={8} my={GAP / 2}>
+          <Grid2 md={8} my={GAP / 2} xs={12}>
             <Typography
-              variant="h4"
-              px={GAP}
-              pt={GAP}
               pb={{ xs: 0, md: GAP + 0.5 }}
+              pt={GAP}
+              px={GAP}
+              variant="h4"
             >
               {t('global_and_individual')}
             </Typography>
             <Divider flexItem sx={{ my: 2, borderColor: 'darkgrey' }} />
-            <Card title="gender_filters_all" bgcolor="success" fullSize>
+            <Card fullSize bgcolor="success" title="gender_filters_all">
               <Grid2 container columns={16} justifyContent="center">
-                <Card title="and" bgcolor="primary">
+                <Card bgcolor="primary" title="and">
                   {AND_ITEMS.map((child) => (
                     <ChildText
                       key={child}
@@ -156,7 +158,7 @@ export function PkmnFilterHelp() {
                     </ChildText>
                   ))}
                 </Card>
-                <Card title="or" bgcolor="secondary">
+                <Card bgcolor="secondary" title="or">
                   <Box py={1} />
                   {OR_ITEMS.map((child) => (
                     <ChildText
@@ -176,29 +178,29 @@ export function PkmnFilterHelp() {
           </Grid2>
           {!isMobile && (
             <Divider
-              orientation="vertical"
               flexItem
+              orientation="vertical"
               sx={{ borderColor: 'darkgrey' }}
             />
           )}
-          <Grid2 xs={12} md={4} my={GAP / 2} container direction="column">
-            <Typography variant="h4" px={GAP} pt={GAP}>
+          <Grid2 container direction="column" md={4} my={GAP / 2} xs={12}>
+            <Typography pt={GAP} px={GAP} variant="h4">
               {t('only_global')}
             </Typography>
-            <Typography variant="caption" width="100%" component="p" px={GAP}>
+            <Typography component="p" px={GAP} variant="caption" width="100%">
               {t('global_caption')}
             </Typography>
             <Divider flexItem sx={{ my: 2, borderColor: 'darkgrey' }} />
             <Chip
-              label={t('zero_iv')}
               color="primary"
               disabled={!perms.iv}
+              label={t('zero_iv')}
               sx={[SX_PROPS, { my: 1, mx: GAP }]}
             />
             <Chip
-              label={t('hundo_iv')}
               color="primary"
               disabled={!perms.iv}
+              label={t('hundo_iv')}
               sx={[SX_PROPS, { my: 1, mx: GAP }]}
             />
           </Grid2>

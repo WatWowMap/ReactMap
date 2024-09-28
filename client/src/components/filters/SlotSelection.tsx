@@ -3,7 +3,6 @@ import Grid2 from '@mui/material/Unstable_Grid2'
 import DialogContent from '@mui/material/DialogContent'
 import IconButton from '@mui/material/IconButton'
 import Divider from '@mui/material/Divider'
-
 import { basicEqualFn, useMemory } from '@store/useMemory'
 import { useLayoutStore } from '@store/useLayoutStore'
 import { useStorage, useDeepStore } from '@store/useStorage'
@@ -14,12 +13,14 @@ import { Header } from '@components/dialogs/Header'
 import { Footer, FooterButton } from '@components/dialogs/Footer'
 import { StatusIcon } from '@components/StatusIcon'
 
-import { Size } from './Size'
 import { DialogWrapper } from '../dialogs/DialogWrapper'
+
+import { Size } from './Size'
 
 export function SlotSelection() {
   const [id, teamId, open] = useLayoutStore((s) => {
     const team = s.slotSelection.slice(1).split('-', 1)[0]
+
     return [s.slotSelection, team, !!s.slotSelection]
   }, basicEqualFn)
   const slots = useMemory(
@@ -38,6 +39,7 @@ export function SlotSelection() {
     (value, team) => {
       useStorage.setState((prev) => {
         const slotsObj = { ...prev.filters.gyms.filter }
+
         if (typeof value === 'boolean') {
           slotsObj[team] = { ...slotsObj[team], enabled: value }
           slots.forEach(
@@ -49,6 +51,7 @@ export function SlotSelection() {
             (slot) => (slotsObj[slot] = { ...slotsObj[slot], size: value }),
           )
         }
+
         return {
           filters: {
             ...prev.filters,
@@ -91,32 +94,32 @@ export function SlotSelection() {
   return (
     <DialogWrapper open={open} onClose={handleClose}>
       <Header
-        titles={[`team_${teamId}`, 'slot_selection']}
         action={handleClose}
+        titles={[`team_${teamId}`, 'slot_selection']}
       />
       <DialogContent>
-        <Grid2 container pt={2} alignItems="center" justifyContent="center">
+        <Grid2 container alignItems="center" justifyContent="center" pt={2}>
           <SlotAdjustor
             id={id}
             onClick={(_, newValue) => handleSizeChange(newValue, id)}
           />
-          <Grid2 xs={12} sm={6}>
+          <Grid2 sm={6} xs={12}>
             <DualBoolToggle
-              items={ENABLED_ALL}
               field={`filters.gyms.filter.${id}`}
-              switchColor="secondary"
+              items={ENABLED_ALL}
               secondColor="success"
+              switchColor="secondary"
               sx={{ pt: { xs: 2, sm: 1 } }}
             />
           </Grid2>
         </Grid2>
         {teamId !== '0' && <Divider sx={{ mt: 2 }} />}
-        <Grid2 container justifyContent="center" alignItems="center">
+        <Grid2 container alignItems="center" justifyContent="center">
           {teamId !== '0' &&
             slots.map((each) => (
               <SlotAdjustor key={each} id={each}>
                 <Grid2 xs={2}>
-                  <Enabled id={each} disabled={disabled} />
+                  <Enabled disabled={disabled} id={each} />
                 </Grid2>
               </SlotAdjustor>
             ))}
@@ -139,13 +142,14 @@ function SlotAdjustor({
   const icon = useMemory((s) =>
     s.Icons.getGyms(...(id.slice(1).split('-') as [string, string])),
   )
+
   return (
-    <Grid2 container xs={12} sm={6} alignItems="center" pt={{ xs: 2, sm: 1 }}>
+    <Grid2 container alignItems="center" pt={{ xs: 2, sm: 1 }} sm={6} xs={12}>
       <Grid2 xs={2}>
-        <Img src={icon} maxHeight={50} maxWidth={50} alt={id} />
+        <Img alt={id} maxHeight={50} maxWidth={50} src={icon} />
       </Grid2>
       <Grid2 xs={children ? 8 : 10}>
-        <Size field={`filters.gyms.filter.${id}`} noLabel onClick={onClick} />
+        <Size noLabel field={`filters.gyms.filter.${id}`} onClick={onClick} />
       </Grid2>
       {children}
     </Grid2>
@@ -162,15 +166,16 @@ function Enabled({ id, disabled }: { id: string; disabled?: boolean }) {
     `filters.gyms.filter.${id}.enabled`,
     false,
   )
+
   return (
     <IconButton
       disabled={disabled}
-      onClick={() => setFilter((prev) => !prev)}
       size="large"
+      onClick={() => setFilter((prev) => !prev)}
     >
       <StatusIcon
-        status={filter}
         checkColor={disabled ? 'disabled' : 'success'}
+        status={filter}
       />
     </IconButton>
   )

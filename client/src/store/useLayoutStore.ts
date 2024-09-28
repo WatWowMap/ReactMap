@@ -1,5 +1,4 @@
 import { create } from 'zustand'
-
 import { analytics } from '@utils/analytics'
 
 import { useStorage } from './useStorage'

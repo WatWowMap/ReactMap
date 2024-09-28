@@ -5,7 +5,6 @@ import Divider from '@mui/material/Divider'
 import List from '@mui/material/List'
 import ListSubheader from '@mui/material/ListSubheader'
 import { styled } from '@mui/material/styles'
-
 import { BasicListButton } from '@components/inputs/BasicListButton'
 import { StatusIcon } from '@components/StatusIcon'
 
@@ -31,7 +30,7 @@ export const BORDER_SX = /** @type {import('@mui/material').SxProps} */ {
 
 export function ChildContainer({ children }: { children: React.ReactNode }) {
   return (
-    <Grid container xs={12} sm={6}>
+    <Grid container sm={6} xs={12}>
       <List sx={BORDER_SX}>{children}</List>
     </Grid>
   )
@@ -61,11 +60,12 @@ export function ButtonWithNotification({
       },
       [onClick, label, category, all],
     )
+
   return (
     <BasicListButton
-      onClick={fullOnClick}
       label={label}
       sx={{ bgcolor: isHovering ? 'rgba(255, 255, 255, 0.08)' : 'inherit' }}
+      onClick={fullOnClick}
       {...props}
     >
       <StatusIcon status={hasBeenReset} />

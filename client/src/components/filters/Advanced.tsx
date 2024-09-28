@@ -5,7 +5,6 @@ import DialogContent from '@mui/material/DialogContent'
 import List from '@mui/material/List'
 import ListItem from '@mui/material/ListItem'
 import { useTranslation } from 'react-i18next'
-
 import { useMemory } from '@store/useMemory'
 import { useLayoutStore } from '@store/useLayoutStore'
 import { useDeepStore, useStorage } from '@store/useStorage'
@@ -18,8 +17,9 @@ import { STANDARD_BACKUP, applyToAll } from '@utils/applyToAll'
 import { checkIfHasAll } from '@utils/hasAll'
 import { useAnalytics } from '@hooks/useAnalytics'
 
-import { StringFilter } from './StringFilter'
 import { SliderTile } from '../inputs/SliderTile'
+
+import { StringFilter } from './StringFilter'
 import { Size } from './Size'
 import { GenderListItem } from './Gender'
 import { QuestConditionSelector } from './QuestConditions'
@@ -55,12 +55,10 @@ export function AdvancedFilter() {
   )
 
   const handleChange = React.useCallback(
-    /**
-     * @template {keyof typeof filters} T
-     * @param {T} key
-     * @param {(typeof filters)[T]} values
-     */
-    (key, values) => {
+    function <T extends keyof typeof filters>(
+      key: T,
+      values: (typeof filters)[T],
+    ) {
       setFilters((prev) => ({
         ...prev,
         [key]: values,
@@ -77,41 +75,36 @@ export function AdvancedFilter() {
     if (!save) {
       setFilters({ ...backup.current })
     } else if (id === 'global' && selectedIds?.length && category) {
-      applyToAll({
-        newFilter: filters,
-        category,
-        selectedIds,
-        includeSlots: false,
-      })
+      applyToAll(filters, category, selectedIds, false)
     }
   }
 
-  /** @type {import('@components/dialogs/Footer').FooterButton[]} */
-  const footerOptions = React.useMemo(
-    () => [
-      {
-        name: 'reset',
-        action: () => setFilters({ ...standard }),
-        color: 'primary',
-      },
-      {
-        name: 'close',
-        action: () => toggleClose(true),
-        color: 'secondary',
-      },
-    ],
-    [standard, filters, setFilters],
-  )
+  const footerOptions: import('@components/dialogs/Footer').FooterButton[] =
+    React.useMemo(
+      () => [
+        {
+          name: 'reset',
+          action: () => setFilters({ ...standard }),
+          color: 'primary',
+        },
+        {
+          name: 'close',
+          action: () => toggleClose(true),
+          color: 'secondary',
+        },
+      ],
+      [standard, filters, setFilters],
+    )
 
-  /** @type {import('@mui/material').SwitchProps['onChange']} */
-  const handleAllEnabled = React.useCallback(
-    ({ target }, checked) => {
-      if (target.name === 'all' && checked && !filters.enabled) {
-        setFilters('enabled', true)
-      }
-    },
-    [setFilters],
-  )
+  const handleAllEnabled: import('@mui/material').SwitchProps['onChange'] =
+    React.useCallback(
+      ({ target }, checked) => {
+        if (target.name === 'all' && checked && !filters.enabled) {
+          setFilters('enabled', true)
+        }
+      },
+      [setFilters],
+    )
 
   React.useLayoutEffect(() => {
     if (open) backup.current = filters
@@ -119,30 +112,31 @@ export function AdvancedFilter() {
 
   if (!id || !category) return null
   const showMoreFilters = category === 'pokemon' && !easyMode
+
   return (
     <Dialog
+      fullScreen={isMobile && category === 'pokemon'}
       open={!!open}
       onClose={() => toggleClose(false)}
-      fullScreen={isMobile && category === 'pokemon'}
     >
       <Header
+        action={() => toggleClose(false)}
         titles={`${
           category === 'pokemon' || (!id.startsWith('l') && !id.startsWith('i'))
             ? t('advanced')
             : t('set_size')
         } - ${tId(id)}`}
-        action={() => toggleClose(false)}
       />
       <DialogContent sx={{ mt: 3 }}>
         <List>
           {legacyFilter && 'legacy' in ui ? (
             <StringFilter field={`filters.${category}.filter.${id}`} />
           ) : (
-            <Grid2 container component={ListItem} disableGutters disablePadding>
+            <Grid2 container disableGutters disablePadding component={ListItem}>
               {Object.entries(
                 'sliders' in ui && !easyMode ? ui.sliders : {},
               ).map(([subCat, sliders], i) => (
-                <Grid2 key={subCat} component={List} xs={12} sm={6}>
+                <Grid2 key={subCat} component={List} sm={6} xs={12}>
                   {sliders.map((each) => (
                     <ListItem
                       key={`${subCat}${each.name}`}
@@ -151,53 +145,52 @@ export function AdvancedFilter() {
                       sx={{ pr: { xs: 0, sm: i ? 0 : 2 } }}
                     >
                       <SliderTile
+                        handleChange={handleChange}
                         slide={{
                           ...each,
                           disabled: each.disabled || filters.all,
                         }}
-                        // @ts-ignore
-                        handleChange={handleChange}
                         values={filters[each.name]}
                       />
                     </ListItem>
                   ))}
                 </Grid2>
               ))}
-              <Grid2 component={List} xs={12} sm={showMoreFilters ? 6 : 12}>
+              <Grid2 component={List} sm={showMoreFilters ? 6 : 12} xs={12}>
                 {showMoreFilters && (
                   <GenderListItem
-                    field={`filters.${category}.filter.${id}`}
-                    disabled={filters.all}
                     disableGutters
+                    disabled={filters.all}
+                    field={`filters.${category}.filter.${id}`}
                   />
                 )}
                 <Size
-                  field={`filters.${category}.filter.${id}`}
                   disableGutters
+                  field={`filters.${category}.filter.${id}`}
                 />
               </Grid2>
-              <Grid2 component={List} xs={12} sm={showMoreFilters ? 6 : 12}>
+              <Grid2 component={List} sm={showMoreFilters ? 6 : 12} xs={12}>
                 {showMoreFilters && (
                   <DualBoolToggle
-                    items={XXS_XXL}
-                    field={`filters.${category}.filter.${id}`}
                     disabled={filters.all}
+                    field={`filters.${category}.filter.${id}`}
+                    items={XXS_XXL}
                     label="size_1-size_5"
                   />
                 )}
                 {category === 'pokestops' && <QuestConditionSelector id={id} />}
                 {checkIfHasAll(category, id) ? (
                   <DualBoolToggle
-                    items={ENABLED_ALL}
                     field={`filters.${category}.filter.${id}`}
-                    switchColor="secondary"
+                    items={ENABLED_ALL}
                     secondColor="success"
+                    switchColor="secondary"
                     onChange={handleAllEnabled}
                   />
                 ) : (
                   <BoolToggle
-                    field={`filters.${category}.filter.${id}.enabled`}
                     disableGutters
+                    field={`filters.${category}.filter.${id}.enabled`}
                   />
                 )}
               </Grid2>

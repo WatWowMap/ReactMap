@@ -1,6 +1,7 @@
 // @ts-check
 
 const { build } = require('vite')
+
 const viteConfig = require('./vite.config')
 
 process.env.SKIP_CONFIG = 'true'

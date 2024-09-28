@@ -1,10 +1,12 @@
 // @ts-check
+import type { CustomComponent } from '@rm/types'
+
 import * as React from 'react'
 import Grid from '@mui/material/Unstable_Grid2'
 
-import { Generator } from './Generator'
 import { getGridSizes } from '../utils'
-import type { CustomComponent } from '@rm/types'
+
+import { Generator } from './Generator'
 
 export function CustomTile({
   block,

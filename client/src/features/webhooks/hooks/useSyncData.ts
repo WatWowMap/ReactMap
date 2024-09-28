@@ -1,6 +1,5 @@
 import { useEffect } from 'react'
 import { useQuery } from '@apollo/client'
-
 import { ALL_PROFILES } from '@services/queries/webhook'
 import { useWebhookStore } from '@store/useWebhookStore'
 
@@ -24,5 +23,6 @@ export function useSyncData<
       })
     }
   }, [data])
+
   return { data: cached, loading }
 }

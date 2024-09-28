@@ -2,12 +2,12 @@ import * as React from 'react'
 import Grid2 from '@mui/material/Unstable_Grid2'
 import Divider from '@mui/material/Divider'
 import { useTranslation } from 'react-i18next'
-
 import { Loading } from '@components/Loading'
 import { BasicAccordion } from '@components/BasicAccordion'
 import { useWebhookStore } from '@store/useWebhookStore'
 
 import { useGetAreas } from '../../hooks/useGetAreas'
+
 import { MemoAreaChip } from './AreaChip'
 
 export const AreaGroup = () => {
@@ -25,7 +25,7 @@ export const AreaGroup = () => {
             style={{ margin: '20px 0', width: '100%', height: 2 }}
           />
         )}
-        <GroupTile key={group} group={group} areas={children}>
+        <GroupTile key={group} areas={children} group={group}>
           {children.map((child) => (
             <MemoAreaChip key={`${group}_${child}`} name={child} />
           ))}
@@ -47,13 +47,15 @@ const GroupTile = ({
   const count = useWebhookStore(
     (s) => s.human.area?.filter((a) => areas.includes(a)).length,
   )
+
   if (children.length === 0) return null
+
   return (
     <Grid2 xs={12}>
       {group ? (
         <BasicAccordion
-          title={`${group} - ${count} / ${areas.length}`}
           stateKey={group}
+          title={`${group} - ${count} / ${areas.length}`}
         >
           {children}
         </BasicAccordion>

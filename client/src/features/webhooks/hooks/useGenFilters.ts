@@ -3,7 +3,6 @@
 
 import { useMemo } from 'react'
 import { useMemory } from '@store/useMemory'
-
 import { useWebhookStore } from '@store/useWebhookStore'
 
 export function useGenFilters() {
@@ -15,6 +14,7 @@ export function useGenFilters() {
       filters: rmFilters,
       masterfile: { invasions },
     } = useMemory.getState()
+
     if (!ui) return {}
     const { pokemon, egg, gym, invasion, lure, quest, nest, raid } = ui
     const filters = {
@@ -88,6 +88,7 @@ export function useGenFilters() {
         global: quest ? { ...quest.defaults, profile_no } : {},
       },
     }
+
     Object.keys(rmFilters.pokemon?.filter || {}).forEach((key) => {
       if (pokemon)
         filters.pokemon[key] = {
@@ -251,6 +252,7 @@ export function useGenFilters() {
         if (gym) delete filters.gym[key].team
       }
     })
+
     return filters
   }, [ui, profile_no])
 

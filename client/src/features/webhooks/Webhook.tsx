@@ -1,5 +1,4 @@
 import Dialog from '@mui/material/Dialog'
-
 import { useMemory } from '@store/useMemory'
 import { setMode, useWebhookStore } from '@store/useWebhookStore'
 
@@ -11,8 +10,8 @@ export function Webhook() {
 
   return (
     <Dialog
-      fullWidth={!isMobile}
       fullScreen={isMobile}
+      fullWidth={!isMobile}
       maxWidth="md"
       open={webhookMode}
       onClose={setMode}

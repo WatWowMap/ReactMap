@@ -33,6 +33,7 @@ export function checkHoliday(
   const date = new Date()
   const start = getStart(holiday, date)
   const end = getEnd(holiday, date)
+
   return date >= start && date <= end
 }
 
@@ -41,5 +42,6 @@ export function countdownUntilEnd(
 ) {
   const date = new Date()
   const end = getEnd(holiday, date)
+
   return end.getMilliseconds() - date.getMilliseconds()
 }

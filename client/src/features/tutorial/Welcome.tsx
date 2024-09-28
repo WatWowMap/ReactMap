@@ -5,7 +5,6 @@ import Fab from '@mui/material/Fab'
 import Typography from '@mui/material/Typography'
 import DialogContent from '@mui/material/DialogContent'
 import { useTranslation } from 'react-i18next'
-
 import { useMemory } from '@store/useMemory'
 import { useLayoutStore } from '@store/useLayoutStore'
 import { LocaleSelection } from '@components/inputs/LocaleSelection'
@@ -16,6 +15,7 @@ export function TutorialWelcome() {
   const permStatus = useMemory((s) => {
     let have = 0
     let total = 0
+
     Object.entries(s.auth.perms).forEach(([perm, value]) => {
       if (
         (perm === 'areaRestrictions' &&
@@ -38,6 +38,7 @@ export function TutorialWelcome() {
         }
       }
     })
+
     return `${have} / ${total}`
   })
   const enableUserProfile = useMemory((s) => s.config.misc.enableUserProfile)
@@ -46,26 +47,26 @@ export function TutorialWelcome() {
     <DialogContent>
       <Grid
         container
-        direction="row"
         alignItems="center"
+        direction="row"
+        height="100%"
         justifyContent="space-evenly"
         spacing={2}
-        height="100%"
       >
         <Grid xs={12}>
-          <Typography variant="h4" align="center" margin={2}>
+          <Typography align="center" margin={2} variant="h4">
             {t('welcome')} {document.title}!
           </Typography>
         </Grid>
 
         <Grid xs={6}>
-          <Typography variant="subtitle2" align="center">
+          <Typography align="center" variant="subtitle2">
             {t('tutorial_categories')}:
           </Typography>
         </Grid>
         {enableUserProfile && (
           <Grid xs={6}>
-            <Typography variant="h6" gutterBottom align="center">
+            <Typography gutterBottom align="center" variant="h6">
               {!loggedIn && methods.length
                 ? t('login_optional')
                 : t('view_profile')}
@@ -73,11 +74,11 @@ export function TutorialWelcome() {
           </Grid>
         )}
         <Grid xs={6}>
-          <Typography variant="h3" align="center">
+          <Typography align="center" variant="h3">
             {permStatus}
           </Typography>
         </Grid>
-        <Grid xs={6} textAlign="center">
+        <Grid textAlign="center" xs={6}>
           {(() => {
             if (!loggedIn && methods.length) {
               return (
@@ -86,6 +87,7 @@ export function TutorialWelcome() {
                 </Fab>
               )
             }
+
             return enableUserProfile ? (
               <Fab
                 color="primary"
@@ -97,24 +99,24 @@ export function TutorialWelcome() {
           })()}
         </Grid>
         {enableUserProfile && (
-          <Grid xs={12} sm={10} marginTop={2}>
-            <Typography variant="subtitle1" align="center">
+          <Grid marginTop={2} sm={10} xs={12}>
+            <Typography align="center" variant="subtitle1">
               {!loggedIn && methods.length
                 ? t('tutorial_logged_out')
                 : t('tutorial_logged_in')}
             </Typography>
           </Grid>
         )}
-        <Grid xs={12} sm={10} marginTop={2}>
-          <Typography variant="subtitle1" align="center">
+        <Grid marginTop={2} sm={10} xs={12}>
+          <Typography align="center" variant="subtitle1">
             {t('tutorial_language')}
           </Typography>
         </Grid>
-        <Grid xs={12} sm={10} textAlign="center">
+        <Grid sm={10} textAlign="center" xs={12}>
           <LocaleSelection />
         </Grid>
-        <Grid xs={12} sm={10} marginTop={2}>
-          <Typography variant="subtitle1" align="center">
+        <Grid marginTop={2} sm={10} xs={12}>
+          <Typography align="center" variant="subtitle1">
             {t('tutorial_welcome')}
           </Typography>
         </Grid>

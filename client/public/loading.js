@@ -2,8 +2,10 @@
 
 try {
   const localState = window?.localStorage?.getItem('local-state')
+
   if (localState) {
     const { state } = JSON.parse(localState)
+
     if (state.darkMode) {
       document.body.classList.add('dark')
     }
@@ -28,6 +30,7 @@ try {
   }
   const locale = window?.localStorage?.getItem('i18nextLng') || 'en'
   const element = document.getElementById('loading-text')
+
   if (element) {
     element.innerText = locales[locale.toLowerCase()] || locales.en
   }

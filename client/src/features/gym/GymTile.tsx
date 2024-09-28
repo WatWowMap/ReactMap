@@ -1,7 +1,6 @@
 import * as React from 'react'
 import { Marker, Popup, Circle } from 'react-leaflet'
 import { t } from 'i18next'
-
 import { useMarkerTimer } from '@hooks/useMarkerTimer'
 import { basicEqualFn, useMemory } from '@store/useMemory'
 import { useStorage } from '@store/useStorage'
@@ -118,6 +117,7 @@ const BaseGymTile = (gym: import('@rm/types').Gym) => {
     showRaidLevel,
   ] = useStorage((s) => {
     const { userSettings, filters, zoom } = s
+
     return [
       (userSettings.gyms.raidTimers || inTimerList) && hasRaid,
       !!userSettings.gyms.interactionRanges && zoom >= interactionRangeZoom,
@@ -157,10 +157,10 @@ const BaseGymTile = (gym: import('@rm/types').Gym) => {
       icon: raidIconUrl,
     })
   }
+
   return (
     <Marker
       ref={setMarkerRef}
-      position={[gym.lat, gym.lon]}
       icon={gymMarker({
         showDiamond,
         showExBadge,
@@ -173,39 +173,40 @@ const BaseGymTile = (gym: import('@rm/types').Gym) => {
         raidIconSize,
         ...gym,
       })}
+      position={[gym.lat, gym.lon]}
     >
       <Popup position={[gym.lat, gym.lon]}>
         <GymPopup
-          hasRaid={hasRaid}
           hasHatched={hasHatched}
+          hasRaid={hasRaid}
           raidIconUrl={raidIconUrl}
           {...gym}
         />
       </Popup>
       {showTimer && (
-        <TooltipWrapper timers={[timerToDisplay]} offset={[0, 5]} />
+        <TooltipWrapper offset={[0, 5]} timers={[timerToDisplay]} />
       )}
       {showInteractionRange && (
         <Circle
           center={[gym.lat, gym.lon]}
-          radius={80}
           color={getColor(gym.team_id)}
+          radius={80}
           weight={0.5}
         />
       )}
       {show300mCircles && (
         <Circle
           center={[gym.lat, gym.lon]}
-          radius={300}
           color={getColor(gym.team_id)}
+          radius={300}
           weight={0.5}
         />
       )}
       {!!customRange && (
         <Circle
           center={[gym.lat, gym.lon]}
-          radius={customRange}
           color={getColor(gym.team_id)}
+          radius={customRange}
           weight={0.5}
         />
       )}

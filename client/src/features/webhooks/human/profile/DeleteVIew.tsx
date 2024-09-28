@@ -5,7 +5,6 @@ import IconButton from '@mui/material/IconButton'
 import Grid from '@mui/material/Unstable_Grid2'
 import { useTranslation } from 'react-i18next'
 import { useMutation } from '@apollo/client'
-
 import { ALL_PROFILES, SET_PROFILE } from '@services/queries/webhook'
 import { useWebhookStore } from '@store/useWebhookStore'
 
@@ -37,16 +36,16 @@ export const DeleteView = ({
 
   return (
     <>
-      <Grid xs={6} sm={8}>
-        <Typography variant="subtitle2" align="center">
+      <Grid sm={8} xs={6}>
+        <Typography align="center" variant="subtitle2">
           {t('confirm_delete')}
         </Typography>
       </Grid>
-      <Grid xs={4} sm={2}>
-        <IconButton onClick={handleViewChange('profile')} size="large">
+      <Grid sm={2} xs={4}>
+        <IconButton size="large" onClick={handleViewChange('profile')}>
           <Clear />
         </IconButton>
-        <IconButton onClick={handleRemove} size="large">
+        <IconButton size="large" onClick={handleRemove}>
           <Save />
         </IconButton>
       </Grid>

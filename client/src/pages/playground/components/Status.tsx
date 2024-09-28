@@ -18,17 +18,18 @@ export function StatusNotification() {
   const success = usePlayStore((s) => s.success)
 
   const open = loading || !!error || !!success
+
   return (
     <Snackbar
-      open={open}
-      autoHideDuration={5000}
-      onClose={handleReset}
       anchorOrigin={anchorOrigin}
+      autoHideDuration={5000}
+      open={open}
+      onClose={handleReset}
     >
       <Alert
         severity={error ? 'error' : success ? 'success' : 'info'}
-        variant="filled"
         style={alertStyle}
+        variant="filled"
       >
         {error
           ? error.message || t('react_error')

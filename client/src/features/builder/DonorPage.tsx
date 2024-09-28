@@ -1,7 +1,6 @@
 import * as React from 'react'
 import { useQuery } from '@apollo/client'
 import Dialog from '@mui/material/Dialog'
-
 import { CUSTOM_COMPONENT } from '@services/queries/config'
 import { useMemory } from '@store/useMemory'
 import { useLayoutStore } from '@store/useLayoutStore'
@@ -33,7 +32,7 @@ export function DonorPage() {
     /** @type {typeof DEFAULT} */ data?.customComponent || DEFAULT
 
   return (
-    <Dialog open={open} fullScreen={isMobile} onClose={handleClose}>
+    <Dialog fullScreen={isMobile} open={open} onClose={handleClose}>
       <CustomDialog
         configObj={donorPage}
         defaultTitle="donor_page"

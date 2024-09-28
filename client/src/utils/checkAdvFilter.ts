@@ -6,6 +6,7 @@ export function checkIVFilterValid(filter: string, dnf: boolean = true) {
   let stack = 0
   let lastIndex = 0
   let match
+
   while ((match = tokenizer.exec(input)) !== null) {
     if (match.index > lastIndex) {
       return null
@@ -53,5 +54,6 @@ export function checkIVFilterValid(filter: string, dnf: boolean = true) {
   if (expectClause || stack !== 0 || lastIndex < filter.length) {
     return null
   }
+
   return true
 }

@@ -4,7 +4,6 @@ import Collapse from '@mui/material/Collapse'
 import Button from '@mui/material/Button'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import { useTranslation } from 'react-i18next'
-
 import { LocaleSelection } from '@components/inputs/LocaleSelection'
 
 import { useLocalesStore } from '../hooks/store'
@@ -14,28 +13,29 @@ const expandMore = <ExpandMoreIcon />
 export function LocalesHeader() {
   const { t, i18n } = useTranslation()
   const instructions = useLocalesStore((s) => s.instructions)
+
   return (
-    <Grid component="header" container className="flex-center" p={2}>
-      <Grid xs={4} sm={4}>
+    <Grid container className="flex-center" component="header" p={2}>
+      <Grid sm={4} xs={4}>
         <Typography variant="h4">{t('locales')}</Typography>
       </Grid>
-      <Grid xs={8} sm={4}>
+      <Grid sm={4} xs={8}>
         <LocaleSelection />
       </Grid>
-      <Grid xs={12} sm={4} textAlign="right">
+      <Grid sm={4} textAlign="right" xs={12}>
         <Button
           color="secondary"
+          endIcon={expandMore}
           onClick={() =>
             useLocalesStore.setState((prev) => ({
               instructions: !prev.instructions,
             }))
           }
-          endIcon={expandMore}
         >
           {t('instructions')}
         </Button>
       </Grid>
-      <Grid component={Collapse} in={instructions} xs={12} sm={8}>
+      <Grid component={Collapse} in={instructions} sm={8} xs={12}>
         <ol>
           {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
             <Typography key={i} component="li">

@@ -6,7 +6,6 @@ import IconButton from '@mui/material/IconButton'
 import ListItem from '@mui/material/ListItem'
 import ListItemText from '@mui/material/ListItemText'
 import ListItemIcon from '@mui/material/ListItemIcon'
-
 import { useMemory } from '@store/useMemory'
 import { useLayoutStore } from '@store/useLayoutStore'
 import { Img } from '@components/Img'
@@ -20,10 +19,11 @@ const handleClose = () => useLayoutStore.setState({ drawer: false })
 const DrawerHeader = React.memo(
   () => {
     const title = useMemory((s) => s.config.general.title)
+
     return (
       <ListItem disablePadding>
         <ListItemIcon sx={{ pl: 1.5 }}>
-          <Img src="/favicon.ico" alt="favicon" maxHeight={32} maxWidth={32} />
+          <Img alt="favicon" maxHeight={32} maxWidth={32} src="/favicon.ico" />
         </ListItemIcon>
         <ListItemText
           primaryTypographyProps={{
@@ -34,7 +34,7 @@ const DrawerHeader = React.memo(
         >
           {title}
         </ListItemText>
-        <IconButton onClick={handleClose} size="large">
+        <IconButton size="large" onClick={handleClose}>
           <Clear />
         </IconButton>
       </ListItem>
@@ -42,6 +42,8 @@ const DrawerHeader = React.memo(
   },
   () => true,
 )
+
+DrawerHeader.displayName = 'DrawerHeader'
 
 const listItemSx = /** @type {import('@mui/material').SxProps} */ {
   display: 'block',
@@ -54,8 +56,8 @@ export function Drawer() {
   return (
     <MuiDrawer
       anchor="left"
-      variant="temporary"
       open={drawer}
+      variant="temporary"
       onClose={handleClose}
     >
       <List disablePadding sx={{ minWidth: 290 }}>

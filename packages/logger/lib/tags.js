@@ -71,10 +71,12 @@ const TAGS = /** @type {const} */ ({
     if (code >= 300) {
       return chalk.cyan(code)
     }
+
     return chalk.green(code)
   },
   method: (method = 'GET') => {
     const tag = `[${method}]`
+
     if (method === 'GET') {
       return chalk.green(tag)
     }
@@ -87,6 +89,7 @@ const TAGS = /** @type {const} */ ({
     if (method === 'DELETE') {
       return chalk.red(tag)
     }
+
     return chalk.hex('#00d7ac')(tag)
   },
   custom: (text = '', color = '#64b5f6') =>

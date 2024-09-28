@@ -6,6 +6,7 @@ export function deviceMarker(
   modifiers: import('../../services/Assets').UAssets['modifiers']['base'],
 ) {
   const { sizeMultiplier, offsetX, offsetY, popupX, popupY } = modifiers
+
   return new Icon({
     iconUrl,
     iconSize: [iconSize * sizeMultiplier, iconSize * sizeMultiplier],

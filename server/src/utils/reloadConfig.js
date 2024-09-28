@@ -1,12 +1,12 @@
 // @ts-check
 const dlv = require('dlv')
-
 const { log, TAGS } = require('@rm/logger')
 
 const { state } = require('../services/state')
 const { bindConnections } = require('../models')
 const { loadLatestAreas } = require('../services/areas')
 const { loadAuthStrategies } = require('../routes/authRouter')
+
 const { deepCompare } = require('./deepCompare')
 
 const NO_RELOAD = new Set([
@@ -45,6 +45,7 @@ const NO_RELOAD = new Set([
  */
 async function reloadConfig() {
   const startTime = process.hrtime()
+
   try {
     log.info(TAGS.config, 'starting config reload...')
     const oldConfig = require('@rm/config').reload()
@@ -57,6 +58,7 @@ async function reloadConfig() {
       newConfig,
     )
     const [seconds, nanoseconds] = process.hrtime(startTime)
+
     log.debug(
       TAGS.config,
       `deep comparing took ${seconds}.${nanoseconds} seconds`,
@@ -83,6 +85,7 @@ async function reloadConfig() {
     const print = (key) => {
       let newValue
       let oldValue
+
       try {
         oldValue = dlv(oldWithoutAreas, key)
       } catch {
@@ -152,12 +155,15 @@ async function reloadConfig() {
     if (stateReport.strategies) {
       loadAuthStrategies()
     }
+
     return null
   } catch (e) {
     log.error(TAGS.config, e)
+
     return e
   } finally {
     const [seconds, nanoseconds] = process.hrtime(startTime)
+
     log.debug(
       TAGS.config,
       `configuration reload completed in ${seconds}.${nanoseconds} seconds`,

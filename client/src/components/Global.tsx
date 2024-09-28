@@ -1,15 +1,16 @@
 import GlobalStyles from '@mui/material/GlobalStyles'
 import { darken, lighten } from '@mui/material/styles'
-
 import { useMemory } from '@store/useMemory'
 
 function ApplyGlobal() {
   const online = useMemory((s) => s.online)
+
   return (
     <GlobalStyles
       styles={(theme) => {
         const darkMode = theme.palette.mode === 'dark'
         const grey = darkMode ? 900 : 50
+
         return {
           // Global
           body: {

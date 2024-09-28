@@ -3,5 +3,6 @@ export function getStationAttackBonus(stationedPokemon: number) {
   if (stationedPokemon > 3) return 3
   if (stationedPokemon > 1) return 2
   if (stationedPokemon > 0) return 1
+
   return 0
 }

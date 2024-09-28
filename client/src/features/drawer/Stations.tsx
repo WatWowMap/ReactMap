@@ -3,7 +3,6 @@ import ListItem from '@mui/material/ListItem'
 import ListItemText from '@mui/material/ListItemText'
 import MenuItem from '@mui/material/MenuItem'
 import { useTranslation } from 'react-i18next'
-
 import { useMemory } from '@store/useMemory'
 import { useDeepStore, useStorage } from '@store/useStorage'
 import { FCSelect } from '@components/inputs/FCSelect'
@@ -22,14 +21,15 @@ function StationLevels() {
     'filters.stations.battleTier',
     'all',
   )
+
   return (
     <CollapsibleItem open={enabled}>
       <ListItem
         secondaryAction={
           <FCSelect
-            value={filters}
             fullWidth
             size="small"
+            value={filters}
             onChange={(e) =>
               setFilters(e.target.value === 'all' ? 'all' : e.target.value)
             }
@@ -60,13 +60,14 @@ function StationsQuickSelect() {
       s.filters?.stations?.battleTier === 'all' &&
       !s.filters?.stations?.allStations,
   )
+
   return (
     <CollapsibleItem open={enabled}>
       <Box px={2}>
         <SelectorListMemo
           category="stations"
-          label="search_battles"
           height={350}
+          label="search_battles"
         />
       </Box>
     </CollapsibleItem>

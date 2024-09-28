@@ -6,7 +6,6 @@ import Switch from '@mui/material/Switch'
 import List from '@mui/material/List'
 import Grid2 from '@mui/material/Unstable_Grid2'
 import { useTranslation } from 'react-i18next'
-
 import { useDeepStore } from '@store/useStorage'
 import { camelToSnake, fromSnakeCase } from '@utils/strings'
 
@@ -44,6 +43,7 @@ export function BoolBase({
       },
       [field, setValue],
     )
+
   return (
     <ListItem {...props}>
       {children}
@@ -53,11 +53,11 @@ export function BoolBase({
         </ListItemText>
       )}
       <Switch
+        checked={!!value}
         color={switchColor}
+        disabled={disabled}
         name={label}
         onChange={onChangeWrapper}
-        checked={!!value}
-        disabled={disabled}
       />
     </ListItem>
   )
@@ -78,18 +78,19 @@ export function DualBoolToggle({
   label?: `${string}-${string}`
 } & Omit<BoolToggleProps, 'label'>) {
   const labels = label?.split('-', 2) || []
+
   return (
-    <Grid2 container component={ListItem} disablePadding disableGutters>
+    <Grid2 container disableGutters disablePadding component={ListItem}>
       {items.map((item, i) => (
-        <Grid2 key={item} xs={6} component={List}>
+        <Grid2 key={item} component={List} xs={6}>
           {item && (
             <BoolToggle
               // @ts-ignore
+              disableGutters
+              disablePadding
+              align="center"
               field={`${field}.${item}`}
               label={labels[i] || labels[0] || item}
-              disablePadding
-              disableGutters
-              align="center"
               switchColor={i ? secondColor || switchColor : switchColor}
               {...props}
             />

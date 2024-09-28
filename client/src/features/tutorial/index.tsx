@@ -11,7 +11,6 @@ import Slide from '@mui/material/Slide'
 import { useTheme } from '@mui/material/styles'
 import { useTranslation } from 'react-i18next'
 import { useMutation } from '@apollo/client'
-
 import { useMemory } from '@store/useMemory'
 import { useStorage } from '@store/useStorage'
 import { Query } from '@services/queries'
@@ -61,16 +60,16 @@ export function Tutorial() {
       onClose={handleTutClose}
     >
       <Header
-        titles={['tutorial', steps[activeStep] || 'closing']}
         action={handleTutClose}
+        titles={['tutorial', steps[activeStep] || 'closing']}
       />
       {[0, 1, 2, 3, 4, 5].map((step) => (
         <Slide
           key={step}
-          in={activeStep === step}
-          direction={step > prevStep ? 'left' : 'right'}
           mountOnEnter
           unmountOnExit
+          direction={step > prevStep ? 'left' : 'right'}
+          in={activeStep === step}
         >
           <Box
             display={activeStep === step ? 'block' : 'none'}
@@ -96,30 +95,12 @@ export function Tutorial() {
       ))}
       <DialogActions>
         <MobileStepper
-          variant="text"
-          steps={steps.length}
-          position="static"
           activeStep={activeStep}
-          style={{ flexGrow: 1 }}
-          nextButton={
-            <Button
-              size="small"
-              onClick={activeStep === 5 ? handleTutClose : handleNext}
-              name="open"
-            >
-              {activeStep === 5 ? t('finish') : t('next')}
-              {theme.direction === 'rtl' ? (
-                <KeyboardArrowLeft />
-              ) : (
-                <KeyboardArrowRight />
-              )}
-            </Button>
-          }
           backButton={
             <Button
+              disabled={activeStep === 0}
               size="small"
               onClick={handleBack}
-              disabled={activeStep === 0}
             >
               {theme.direction === 'rtl' ? (
                 <KeyboardArrowRight />
@@ -129,6 +110,24 @@ export function Tutorial() {
               {t('back')}
             </Button>
           }
+          nextButton={
+            <Button
+              name="open"
+              size="small"
+              onClick={activeStep === 5 ? handleTutClose : handleNext}
+            >
+              {activeStep === 5 ? t('finish') : t('next')}
+              {theme.direction === 'rtl' ? (
+                <KeyboardArrowLeft />
+              ) : (
+                <KeyboardArrowRight />
+              )}
+            </Button>
+          }
+          position="static"
+          steps={steps.length}
+          style={{ flexGrow: 1 }}
+          variant="text"
         />
       </DialogActions>
     </Dialog>

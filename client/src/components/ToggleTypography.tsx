@@ -9,6 +9,7 @@ export function ToggleTypography(
   const onClick: import('@mui/material').TypographyProps['onClick'] =
     React.useCallback((e) => {
       e.stopPropagation()
+
       return setNoWrap((prev) => !prev)
     }, [])
 

@@ -4,11 +4,10 @@ import Typography from '@mui/material/Typography'
 import Grid from '@mui/material/Unstable_Grid2'
 import Divider from '@mui/material/Divider'
 import { useTranslation, Trans } from 'react-i18next'
-
 import { SliderTile } from '@components/inputs/SliderTile'
+import { RMSliderHandleChange } from '@rm/types'
 
 import { tutorialData } from './data'
-import { RMSliderHandleChange } from '@rm/types'
 
 const relevant = ['iv', 'level', 'great', 'ultra']
 const { ivOr } = tutorialData.filters.pokemon
@@ -46,37 +45,37 @@ export function TutorialSliders() {
     <DialogContent>
       <Grid
         container
-        direction="row"
         alignItems="center"
-        justifyContent="center"
+        direction="row"
         height="100%"
+        justifyContent="center"
       >
-        <Grid xs={12} m={5}>
-          <Typography variant="h6" align="center" gutterBottom>
+        <Grid m={5} xs={12}>
+          <Typography gutterBottom align="center" variant="h6">
             {t('tutorial_sliders_0')}
           </Typography>
         </Grid>
         <Grid
           container
+          alignItems="center"
           direction="row"
           justifyContent="center"
-          alignItems="center"
           width={300}
         >
           {slidersToUse.map((slider) => (
-            <Grid xs={12} key={slider.name}>
+            <Grid key={slider.name} xs={12}>
               <SliderTile
-                slide={slider}
                 handleChange={handleChange}
+                slide={slider}
                 values={temp[slider.name]}
               />
             </Grid>
           ))}
         </Grid>
-        <Grid xs={12} textAlign="center">
+        <Grid textAlign="center" xs={12}>
           <Typography variant="h6">{t('tutorial_sliders_1')}</Typography>
           {fullCheck.iv && (
-            <Typography variant="subtitle2" color="secondary">
+            <Typography color="secondary" variant="subtitle2">
               <Trans i18nKey="tutorial_sliders_2">
                 {{ iv0: temp.iv[0] }}
                 {{ iv1: temp.iv[1] }}
@@ -84,7 +83,7 @@ export function TutorialSliders() {
             </Typography>
           )}
           {fullCheck.level && (
-            <Typography variant="subtitle2" color="secondary">
+            <Typography color="secondary" variant="subtitle2">
               <Trans
                 i18nKey={
                   fullCheck.iv ? 'tutorial_sliders_3alt' : 'tutorial_sliders_3'
@@ -96,7 +95,7 @@ export function TutorialSliders() {
             </Typography>
           )}
           {fullCheck.great && (
-            <Typography variant="subtitle2" color="primary">
+            <Typography color="primary" variant="subtitle2">
               <Trans
                 i18nKey={
                   fullCheck.iv || fullCheck.level
@@ -110,7 +109,7 @@ export function TutorialSliders() {
             </Typography>
           )}
           {fullCheck.ultra && (
-            <Typography variant="subtitle2" color="primary">
+            <Typography color="primary" variant="subtitle2">
               <Trans
                 i18nKey={
                   fullCheck.iv || fullCheck.level || fullCheck.great
@@ -130,11 +129,11 @@ export function TutorialSliders() {
         <Grid xs={12}>
           <Divider light style={{ margin: 10 }} />
         </Grid>
-        <Grid xs={12} textAlign="center">
-          <Typography variant="subtitle2" color="secondary">
+        <Grid textAlign="center" xs={12}>
+          <Typography color="secondary" variant="subtitle2">
             {t('tutorial_sliders_6')}
           </Typography>
-          <Typography variant="subtitle2" color="primary">
+          <Typography color="primary" variant="subtitle2">
             {t('tutorial_sliders_7')}
           </Typography>
           <Typography variant="subtitle2">{t('tutorial_sliders_8')}</Typography>

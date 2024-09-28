@@ -25,11 +25,12 @@ export function WebhookItem({
       },
     }))
   }
+
   return (
     <SelectorItem
       {...props}
-      id={id}
       filter={filter}
+      id={id}
       setFilter={setFilter}
       onClick={() =>
         useWebhookStore.setState({

@@ -1,6 +1,5 @@
 import Grid from '@mui/material/Unstable_Grid2'
 import { useTranslation } from 'react-i18next'
-
 import { DiscordButton } from '@components/auth/Discord'
 import { TelegramWidget } from '@components/auth/Telegram'
 import { LocalLogin } from '@components/auth/Local'
@@ -14,20 +13,20 @@ function Discord() {
   return (
     <Grid
       container
-      justifyContent="center"
       alignItems="center"
       direction="row"
+      justifyContent="center"
       xs={12}
     >
       <Grid
-        xs={discordInvite ? +t('login_button') : 10}
         sm={discordInvite ? 6 : 10}
         textAlign="center"
+        xs={discordInvite ? +t('login_button') : 10}
       >
-        <DiscordButton href={discordAuthUrl} bgcolor="success.dark" />
+        <DiscordButton bgcolor="success.dark" href={discordAuthUrl} />
       </Grid>
       {discordInvite && (
-        <Grid xs={+t('join_button')} sm={6} textAlign="center">
+        <Grid sm={6} textAlign="center" xs={+t('join_button')}>
           <DiscordButton href={discordInvite}>join</DiscordButton>
         </Grid>
       )}
@@ -42,15 +41,17 @@ function Telegram() {
   const telegramAuthUrl = useMemory(
     (s) => s.config.customRoutes.telegramAuthUrl,
   )
+
   return (
     <Grid>
-      <TelegramWidget botName={telegramBotName} authUrl={telegramAuthUrl} />
+      <TelegramWidget authUrl={telegramAuthUrl} botName={telegramBotName} />
     </Grid>
   )
 }
 
 function Local() {
   const localAuthUrl = useMemory((s) => s.config.customRoutes.localAuthUrl)
+
   return (
     <Grid>
       <LocalLogin href={localAuthUrl} />

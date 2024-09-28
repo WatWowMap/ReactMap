@@ -1,9 +1,9 @@
 import { useContext, useEffect } from 'react'
 import { useQuery } from '@apollo/client'
-
 import { CHECK_VALID_SCAN } from '@services/queries/scanner'
 
 import { ConfigContext } from '../ContextProvider'
+
 import { useScanStore } from './store'
 
 /**
@@ -25,6 +25,7 @@ export function useCheckValid(mode: import('./store').ScanMode) {
   useEffect(() => {
     if (data?.checkValidScan) {
       let valid: import('./store').UseScanStore['valid'] = 'none'
+
       if (data.checkValidScan.every(Boolean)) {
         valid = 'all'
       } else if (data.checkValidScan.some(Boolean)) {

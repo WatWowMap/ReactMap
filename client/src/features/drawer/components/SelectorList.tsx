@@ -15,7 +15,6 @@ import Tabs from '@mui/material/Tabs'
 import Tab from '@mui/material/Tab'
 import { capitalize } from '@mui/material/utils'
 import { useTranslation } from 'react-i18next'
-
 import { useTranslateById } from '@hooks/useTranslateById'
 import { useMemory } from '@store/useMemory'
 import { useLayoutStore } from '@store/useLayoutStore'
@@ -114,6 +113,7 @@ function SelectorList({
 
   const items = React.useMemo(() => {
     const lowerCase = search.toLowerCase()
+
     return translated
       .filter((item) => item.name.includes(lowerCase))
       .map((item) => item.id)
@@ -121,6 +121,7 @@ function SelectorList({
 
   const setAll = (action: 'enable' | 'disable' | 'advanced') => {
     const keys = new Set(items.map((item) => item))
+
     useStorage.setState((prev) => ({
       filters: {
         ...prev.filters,
@@ -131,6 +132,7 @@ function SelectorList({
               ([key, value]) => {
                 const enabled = action !== 'disable'
                 const all = action === 'enable'
+
                 return [key, keys.has(key) ? { ...value, enabled, all } : value]
               },
             ),
@@ -149,15 +151,15 @@ function SelectorList({
       )}
       {(category === 'pokemon' || category === 'nests') && (
         <BoolToggle
+          disableGutters={category === 'nests'}
           field={`filters.${category}.onlyShowAvailable`}
           label="only_show_available"
-          disableGutters={category === 'nests'}
         />
       )}
       {!!items.length && (
         <ListItem disableGutters={category !== 'pokemon'}>
           <ListItemText>{t(search ? 'set_filtered' : 'set_all')}</ListItemText>
-          <ButtonGroup variant="text" size="small" color="warning">
+          <ButtonGroup color="warning" size="small" variant="text">
             <IconButton color="success" onClick={() => setAll('enable')}>
               <CheckIcon />
             </IconButton>
@@ -183,8 +185,8 @@ function SelectorList({
             </Collapse>
             <IconButton
               color="error"
-              onClick={() => setAll('disable')}
               sx={{ pr: 0 }}
+              onClick={() => setAll('disable')}
             >
               <ClearIcon />
             </IconButton>
@@ -199,7 +201,7 @@ function SelectorList({
         }
       >
         <VirtualGrid data={items} xs={4}>
-          {(_, key) => <StandardItem id={key} category={category} />}
+          {(_, key) => <StandardItem category={category} id={key} />}
         </VirtualGrid>
       </Box>
     </List>
@@ -238,7 +240,7 @@ export function MultiSelectorList({
         </Tabs>
       </AppBar>
       {children.filter(Boolean).map((child, index) => (
-        <TabPanel value={openTab} index={index} key={child.key}>
+        <TabPanel key={child.key} index={index} value={openTab}>
           {child}
         </TabPanel>
       ))}

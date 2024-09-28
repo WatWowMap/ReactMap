@@ -73,5 +73,6 @@ export function getRewardInfo({
       tt = `quest_reward_${quest_reward_type}`
       src = Icons.getRewards(quest_reward_type)
   }
+
   return { src, tt, amount }
 }

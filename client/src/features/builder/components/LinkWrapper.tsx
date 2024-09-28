@@ -25,20 +25,21 @@ export function LinkWrapper({
   className?: string
 }): React.ReactNode {
   const url = link || href
+
   if (!url) return children
   const external = url.startsWith('http') || url.startsWith('/auth')
 
   return (
     <Link
       className={className}
-      href={external ? url : null}
-      to={external ? null : url}
       component={external ? 'a' : RouterLink}
+      href={external ? url : null}
       referrerPolicy={referrerPolicy}
-      target={target}
-      underline={underline}
       style={style}
       sx={sx}
+      target={target}
+      to={external ? null : url}
+      underline={underline}
     >
       {children}
     </Link>

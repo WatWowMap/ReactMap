@@ -1,6 +1,5 @@
 // @ts-check
 import { create } from 'zustand'
-
 import { downloadJson } from '@utils/downloadJson'
 
 export type PlayStore = {
@@ -69,6 +68,7 @@ export const toggleEditor = () =>
 export const handleDownload = () => {
   try {
     const { code, component } = usePlayStore.getState()
+
     downloadJson(code, `${component}.json`)
     usePlayStore.setState({ original: code, menuAnchorEl: null })
   } catch (e) {

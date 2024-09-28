@@ -1,6 +1,5 @@
 import * as React from 'react'
 import { Marker, Popup, Circle } from 'react-leaflet'
-
 import { useMarkerTimer } from '@hooks/useMarkerTimer'
 import { basicEqualFn, useMemory } from '@store/useMemory'
 import { useStorage } from '@store/useStorage'
@@ -30,6 +29,7 @@ const BasePokestopTile = (pokestop: import('@rm/types').Pokestop) => {
       timerList,
       auth: { perms },
     } = s
+
     return [
       pokestop.lure_expire_timestamp > newTs && perms.lures,
       !!(
@@ -61,6 +61,7 @@ const BasePokestopTile = (pokestop: import('@rm/types').Pokestop) => {
     customRange,
   ] = useStorage((s) => {
     const { userSettings, zoom } = s
+
     return [
       userSettings.pokestops.invasionTimers || showTimer,
       userSettings.pokestops.lureTimers || showTimer,
@@ -76,6 +77,7 @@ const BasePokestopTile = (pokestop: import('@rm/types').Pokestop) => {
 
   const timers = React.useMemo(() => {
     const internalTimers = /** @type {number[]} */ []
+
     if (invasionTimers && hasInvasion) {
       pokestop.invasions.forEach((invasion) =>
         internalTimers.push(invasion.incident_expire_timestamp),
@@ -89,6 +91,7 @@ const BasePokestopTile = (pokestop: import('@rm/types').Pokestop) => {
         internalTimers.push(event.event_expire_timestamp)
       })
     }
+
     return internalTimers
   }, [
     invasionTimers,
@@ -115,40 +118,40 @@ const BasePokestopTile = (pokestop: import('@rm/types').Pokestop) => {
   return hasQuest || hasLure || hasInvasion || hasEvent || hasAllStops ? (
     <Marker
       ref={setMarkerRef}
-      position={[pokestop.lat, pokestop.lon]}
       icon={icon}
+      position={[pokestop.lat, pokestop.lon]}
     >
       <Popup position={[pokestop.lat, pokestop.lon]}>
         <PokestopPopup
-          hasLure={hasLure}
-          hasInvasion={hasInvasion}
-          hasQuest={hasQuest}
           hasEvent={hasEvent}
+          hasInvasion={hasInvasion}
+          hasLure={hasLure}
+          hasQuest={hasQuest}
           {...pokestop}
         />
       </Popup>
       {Boolean(timers.length) && (
-        <TooltipWrapper timers={timers} offset={[0, 4]} />
+        <TooltipWrapper offset={[0, 4]} timers={timers} />
       )}
       {interactionRange && (
         <Circle
           center={[pokestop.lat, pokestop.lon]}
-          radius={80}
           pathOptions={{ color: '#0DA8E7', weight: 1 }}
+          radius={80}
         />
       )}
       {lureRange && (
         <Circle
           center={[pokestop.lat, pokestop.lon]}
-          radius={40}
           pathOptions={{ color: '#32cd32', weight: 1 }}
+          radius={40}
         />
       )}
       {!!customRange && (
         <Circle
           center={[pokestop.lat, pokestop.lon]}
-          radius={customRange}
           pathOptions={{ color: 'purple', weight: 0.5 }}
+          radius={customRange}
         />
       )}
     </Marker>

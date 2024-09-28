@@ -70,6 +70,7 @@ export class HolidayAnimations {
     this.setCanvasSize()
     for (let a = 0; a < 30; a += 1) {
       const scale = Math.random() * (1 - this.minScale) + this.minScale
+
       this.images.push({
         x: Math.random() * this.w,
         xs: Math.random() * 2 - 1,

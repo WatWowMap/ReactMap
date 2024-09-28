@@ -1,6 +1,5 @@
 import * as React from 'react'
 import { Circle, Popup } from 'react-leaflet'
-
 import { useStorage } from '@store/useStorage'
 import { useForcePopup } from '@hooks/useForcePopup'
 
@@ -23,10 +22,10 @@ const BasePortalTile = (
       key={color}
       ref={setMarkerRef}
       center={[portal.lat, portal.lon]}
-      radius={20}
-      fillOpacity={0.25}
       color={color}
       fillColor={color}
+      fillOpacity={0.25}
+      radius={20}
     >
       <Popup position={[portal.lat, portal.lon]}>
         <PortalPopup {...portal} />

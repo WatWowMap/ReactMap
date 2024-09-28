@@ -1,5 +1,4 @@
 import { divIcon } from 'leaflet'
-
 import { basicEqualFn, useMemory } from '@store/useMemory'
 import { useStorage } from '@store/useStorage'
 import { useOpacity } from '@hooks/useOpacity'
@@ -22,6 +21,7 @@ export function useStationMarker({
   )
   const [baseIcon, baseSize, battleIcon, battleSize] = useStorage((s) => {
     const { filter } = s.filters.stations
+
     return [
       Icons.getStation(start_time < Date.now() / 1000),
       Icons.getSize('station', filter[`j${battle_level}`]?.size),

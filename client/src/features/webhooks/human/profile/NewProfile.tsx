@@ -5,7 +5,6 @@ import TextField from '@mui/material/TextField'
 import Grid from '@mui/material/Unstable_Grid2'
 import { useTranslation } from 'react-i18next'
 import { useMutation } from '@apollo/client'
-
 import { ALL_PROFILES, SET_PROFILE } from '@services/queries/webhook'
 import { useWebhookStore } from '@store/useWebhookStore'
 
@@ -50,30 +49,30 @@ export const NewProfile = () => {
   const invalid = existing.includes(newProfile) || newProfile === 'all'
 
   return (
-    <Grid container xs={12} component="form" onSubmit={handleSubmit}>
-      <Grid xs={12} sm={4}>
-        <Typography variant="h6" align="center" pb={{ xs: 2, sm: 0 }}>
+    <Grid container component="form" xs={12} onSubmit={handleSubmit}>
+      <Grid sm={4} xs={12}>
+        <Typography align="center" pb={{ xs: 2, sm: 0 }} variant="h6">
           {t('add_new_profile')}
         </Typography>
       </Grid>
-      <Grid xs={9} sm={5}>
+      <Grid sm={5} xs={9}>
         <TextField
-          size="small"
           autoComplete="off"
-          label={invalid && interacted ? t('profile_error') : t('profile_name')}
-          value={newProfile}
-          onChange={handleChange}
-          variant="outlined"
           error={invalid && interacted}
+          label={invalid && interacted ? t('profile_error') : t('profile_name')}
+          size="small"
+          value={newProfile}
+          variant="outlined"
+          onChange={handleChange}
           onFocus={() => !interacted && setInteracted(true)}
         />
       </Grid>
       <Grid xs={3}>
         <Button
-          variant="contained"
           color="primary"
-          onClick={handleAddProfile}
           disabled={invalid || !newProfile}
+          variant="contained"
+          onClick={handleAddProfile}
         >
           {t('save')}
         </Button>

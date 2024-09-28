@@ -1,8 +1,9 @@
 {
   "$schema": "https://json.schemastore.org/eslintrc.json",
+  "root": true,
   "env": {
     "browser": false,
-    "es2021": true,
+    "es2023": true,
     "node": true
   },
   "extends": [
@@ -10,8 +11,8 @@
   ],
   "plugins": [
     "unused-imports",
-    "import",
     "@typescript-eslint",
+    "import",
     "prettier"
   ],
   "parser": "@typescript-eslint/parser",

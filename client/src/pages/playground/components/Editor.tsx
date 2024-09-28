@@ -10,11 +10,11 @@ export function CodeWrapper() {
 
   return (
     <Grid2
-      xs={hideEditor ? 0 : 12}
-      sm={hideEditor ? 0 : 6}
       display={hideEditor ? 'none' : 'block'}
-      overflow="auto"
       height="calc(100vh - 48px)"
+      overflow="auto"
+      sm={hideEditor ? 0 : 6}
+      xs={hideEditor ? 0 : 12}
     >
       <CodeEditor />
     </Grid2>
@@ -27,8 +27,8 @@ export function CodeEditor() {
 
   return (
     <Editor
-      theme={theme.palette.mode === 'dark' ? 'vs-dark' : 'vs-light'}
       defaultLanguage="json"
+      theme={theme.palette.mode === 'dark' ? 'vs-dark' : 'vs-light'}
       value={code}
       onChange={setCode}
     />

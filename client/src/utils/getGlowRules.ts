@@ -16,6 +16,7 @@ export function getGlowRules(
     .map(([key, { perm, op, num }]) => {
       const statKey = perm === 'iv' ? 'iv' : 'bestPvp'
       const func = OPERATOR[op]
+
       return (pkmn) =>
         Number.isInteger(pkmn[statKey]) && func(pkmn[statKey], num) ? key : null
     })

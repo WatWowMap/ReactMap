@@ -7,13 +7,13 @@ export function Loading({ children, ...props }: BoxProps) {
   return (
     <Box
       className="flex-center"
+      flexDirection="column"
       height="100%"
       width="100%"
-      flexDirection="column"
       {...props}
     >
-      <CircularProgress size={60} color="primary" />
-      <Typography variant="h4" color="secondary" pt={2}>
+      <CircularProgress color="primary" size={60} />
+      <Typography color="secondary" pt={2} variant="h4">
         {children}
       </Typography>
     </Box>

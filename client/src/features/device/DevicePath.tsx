@@ -1,6 +1,5 @@
 import * as React from 'react'
 import { Polyline, Polygon, Circle } from 'react-leaflet'
-
 import { useStorage } from '@store/useStorage'
 
 const BaseDevicePath = ({
@@ -16,13 +15,16 @@ const BaseDevicePath = ({
       if (!route) return null
       // check for mariadb or mysql route
       const parsed = typeof route === 'string' ? JSON.parse(route) : route
+
       // Leveling
       if (!Array.isArray(parsed)) return parsed
+
       // Normalizing
       return parsed[0].lat ? [parsed] : parsed
     } catch (e) {
       // eslint-disable-next-line no-console
       console.warn(e)
+
       return route
     }
   }, [route])
@@ -32,8 +34,8 @@ const BaseDevicePath = ({
   if (type === 'leveling') {
     return (
       <>
-        <Circle center={safeRoute} radius={5} color={color} />
-        <Circle center={safeRoute} radius={radius} color={color} />
+        <Circle center={safeRoute} color={color} radius={5} />
+        <Circle center={safeRoute} color={color} radius={radius} />
       </>
     )
   }
@@ -43,15 +45,15 @@ const BaseDevicePath = ({
     ? safeRoute.map((polygon, i) => (
         <Polyline
           key={i}
-          positions={polygon.map((poly) => [poly.lat, poly.lon])}
           color={color}
+          positions={polygon.map((poly) => [poly.lat, poly.lon])}
         />
       ))
     : safeRoute.map((polygon, i) => (
         <Polygon
           key={i}
-          positions={polygon.map((poly) => [poly.lat, poly.lon])}
           color={color}
+          positions={polygon.map((poly) => [poly.lat, poly.lon])}
         />
       ))
 }

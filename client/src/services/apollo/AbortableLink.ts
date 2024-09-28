@@ -12,6 +12,7 @@ export class AbortableLink extends ApolloLink {
     | import('@apollo/client').Observable<import('@apollo/client').FetchResult>
     | null {
     const context = operation.getContext()
+
     return context.abortableContext
       ? context.abortableContext.handle(operation, forward)
       : forward(operation)

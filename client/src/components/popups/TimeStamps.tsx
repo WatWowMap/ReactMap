@@ -22,7 +22,7 @@ export function TimeStamp({
   })
 
   return (
-    <ExtraInfo title={children} data={formatter.format(time * 1000)}>
+    <ExtraInfo data={formatter.format(time * 1000)} title={children}>
       <Grid>
         <Timer expireTime={time} />
       </Grid>

@@ -4,6 +4,7 @@ import { styled } from '@mui/material/styles'
 import Typography from '@mui/material/Typography'
 import { useMemory } from '@store/useMemory'
 import { useTranslateById } from '@hooks/useTranslateById'
+
 import { NameTT } from './popups/NameTT'
 
 export interface ImgProps extends React.ImgHTMLAttributes<HTMLImageElement> {}
@@ -49,14 +50,14 @@ export function TextWithIcon({
   imgMaxHeight?: number
 }) {
   return (
-    <Typography variant="caption" className="flex-center" {...props}>
+    <Typography className="flex-center" variant="caption" {...props}>
       {children}
       &nbsp;
       <Img
-        src={src}
         alt={alt}
         maxHeight={imgMaxHeight}
         maxWidth={imgMaxWidth}
+        src={src}
       />
     </Typography>
   )

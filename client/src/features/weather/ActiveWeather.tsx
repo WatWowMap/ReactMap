@@ -6,7 +6,6 @@ import Box from '@mui/material/Box'
 import booleanPointInPolygon from '@turf/boolean-point-in-polygon'
 import { point, polygon } from '@turf/helpers'
 import { useTranslation } from 'react-i18next'
-
 import { useMemory } from '@store/useMemory'
 import { useStorage } from '@store/useStorage'
 import { apolloClient } from '@services/apollo'
@@ -56,8 +55,10 @@ function Weather({
       ],
       [setOpen],
     )
+
   if (!Icons) return null
   const [{ disableColorShift = false }] = Icons.getModifiers('weather')
+
   return (
     <React.Fragment key={gameplay_condition}>
       <StyledBox
@@ -66,14 +67,14 @@ function Weather({
         onClick={() => setOpen(!!clickable)}
       >
         <Img
+          alt={t(`weather_${gameplay_condition}`)}
           className={disableColorShift ? '' : 'fancy'}
           src={Icons.getWeather(gameplay_condition, timeOfDay)}
-          alt={t(`weather_${gameplay_condition}`)}
           sx={ImgSx}
         />
       </StyledBox>
-      <Dialog open={open} onClose={() => setOpen(false)} maxWidth="xs">
-        <Header titles={['weather']} action={() => setOpen(false)} />
+      <Dialog maxWidth="xs" open={open} onClose={() => setOpen(false)}>
+        <Header action={() => setOpen(false)} titles={['weather']} />
         <DialogContent
           style={{
             display: 'flex',
@@ -83,7 +84,7 @@ function Weather({
         >
           <WeatherPopup {...props} gameplay_condition={gameplay_condition} />
         </DialogContent>
-        <Footer role="" options={footerOptions} />
+        <Footer i18nKey="" options={footerOptions} />
       </Dialog>
     </React.Fragment>
   )
@@ -112,6 +113,7 @@ export function ActiveWeather() {
           // @ts-ignore
           booleanPointInPolygon(point(location), polygon([x.polygon])),
       )
+
       if (
         weatherCache &&
         'gameplay_condition' in weatherCache &&
@@ -126,5 +128,6 @@ export function ActiveWeather() {
   }, [location, zoom, allowedZoom])
 
   if (!weatherEnabled || !active) return null
+
   return <WeatherMemo {...active} />
 }

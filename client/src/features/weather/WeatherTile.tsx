@@ -1,6 +1,5 @@
 import * as React from 'react'
 import { Popup, Polyline, Marker } from 'react-leaflet'
-
 import { basicEqualFn, useMemory } from '@store/useMemory'
 import { useStorage } from '@store/useStorage'
 
@@ -23,6 +22,7 @@ const BaseWeatherTile = (weather: import('@rm/types').Weather) => {
       ? s.userSettings.weather.darkMapBorder
       : s.userSettings.weather.lightMapBorder,
   )
+
   React.useEffect(() => {
     if (popup && markerRef) {
       markerRef.current.openPopup()
@@ -41,16 +41,16 @@ const BaseWeatherTile = (weather: import('@rm/types').Weather) => {
   return (
     <Polyline
       key={color}
-      positions={weather.polygon}
       color={color}
       opacity={0.25}
+      positions={weather.polygon}
     >
       <Marker
         ref={markerRef}
+        eventHandlers={eventHandlers}
         icon={weatherMarker(iconUrl)}
         position={[weather.latitude, weather.longitude]}
         zIndexOffset={10000}
-        eventHandlers={eventHandlers}
       >
         <Popup position={[weather.latitude, weather.longitude]}>
           <WeatherPopup {...weather} />

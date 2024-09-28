@@ -11,7 +11,9 @@ type RotatingIconButtonProps = import('@mui/material').IconButtonProps & {
 }
 
 export const RotatingIconButton = styled(
-  ({ expand, ...props }: RotatingIconButtonProps) => <IconButton {...props} />,
+  ({ expand: _, ...props }: RotatingIconButtonProps) => (
+    <IconButton {...props} />
+  ),
 )(({ theme }) => ({
   marginLeft: 'auto',
   transition: theme.transitions.create('transform', {

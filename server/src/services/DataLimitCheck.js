@@ -11,6 +11,7 @@ class DataLimitCheck extends Logger {
    */
   constructor(req) {
     const category = DataLimitCheck.getCategory(req)
+
     super(category)
 
     this.user = req.user
@@ -42,6 +43,7 @@ class DataLimitCheck extends Logger {
     let category =
       req.body?.query?.split(' on ')[1]?.split(' ')[0]?.toLowerCase() ||
       'unknown'
+
     if (
       category !== 'pokemon' &&
       category !== 'weather' &&
@@ -50,6 +52,7 @@ class DataLimitCheck extends Logger {
     ) {
       category += 's'
     }
+
     return category
   }
 
@@ -60,6 +63,7 @@ class DataLimitCheck extends Logger {
    */
   static getLimit(category) {
     const requestLimits = config.getSafe('api.dataRequestLimits.categories')
+
     return category in requestLimits && requestLimits[category] > 0
       ? requestLimits[category]
       : Infinity
@@ -85,11 +89,13 @@ class DataLimitCheck extends Logger {
     if (!this.user) return false
 
     const result = this.totalCount > this.limit
+
     if (result) {
       await this.#clientAlert()
     } else {
       state.stats.delAlertEntry(this.user.id)
     }
+
     return result
   }
 

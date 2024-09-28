@@ -2,13 +2,13 @@
 const { Strategy } = require('passport-local')
 const passport = require('passport')
 const bcrypt = require('bcrypt')
-
 const config = require('@rm/config')
 
 const { areaPerms } = require('../utils/areaPerms')
 const { webhookPerms } = require('../utils/webhookPerms')
 const { scannerPerms } = require('../utils/scannerPerms')
 const { mergePerms } = require('../utils/mergePerms')
+
 const { AuthClient } = require('./AuthClient')
 const { state } = require('./state')
 
@@ -27,6 +27,7 @@ class LocalClient extends AuthClient {
             return [perm, true]
           }
         }
+
         return [perm, false]
       }),
     )
@@ -64,6 +65,7 @@ class LocalClient extends AuthClient {
                     strategy: 'local',
                     tutorial: !forceTutorial,
                   })
+
                 user.id = newUser.id
                 user.username = newUser.username
                 user.perms = { ...user.perms, ...this.getPerms(trialActive) }
@@ -73,8 +75,11 @@ class LocalClient extends AuthClient {
                   `(${user.id})`,
                   'Authenticated successfully.',
                 )
+
                 return done(null, user)
               } catch (e) {
+                this.log.error('Error creating user', e)
+
                 return done(null, user, { message: 'error_creating_user' })
               }
             }
@@ -120,8 +125,10 @@ class LocalClient extends AuthClient {
                 `(${user.id})`,
                 'Authenticated successfully.',
               )
+
               return done(null, user)
             }
+
             return done(null, false, { message: 'invalid_credentials' })
           },
         )

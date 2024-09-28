@@ -20,6 +20,7 @@ function consolidateAreas(areaRestrictions = [], onlyAreas = []) {
         areaRestrictions.includes(areas.scanAreasObj[area].properties.parent)
       : true,
   )
+
   return new Set(
     cleanedValidUserAreas.length
       ? cleanedValidUserAreas

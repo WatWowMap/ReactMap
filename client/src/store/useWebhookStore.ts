@@ -129,6 +129,7 @@ export const setSelected = (id?: string) => () => {
 
 export const applyToAllWebhooks = (enabled: boolean, ids: string[]) => {
   const selected = new Set(ids)
+
   useWebhookStore.setState((prev) => ({
     tempFilters: Object.fromEntries(
       Object.entries(prev.tempFilters).map(([k, v]) => [
@@ -159,6 +160,7 @@ export const handleClick =
     }
 
     let newAreas = []
+
     if (incomingArea === 'all') {
       newAreas = withLowerCase.group
         ? [...existing, ...withLowerCase.children]
@@ -188,5 +190,6 @@ export const handleClick =
           useWebhookStore.setState({ human: data.webhook.human })
         }
       })
+
     return newAreas
   }

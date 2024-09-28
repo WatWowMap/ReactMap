@@ -1,7 +1,6 @@
 import * as React from 'react'
 import { Marker, Polyline, useMapEvents } from 'react-leaflet'
 import { darken } from '@mui/material/styles'
-
 import { useForcePopup } from '@hooks/useForcePopup'
 
 import { routeMarker } from './routeMarker'
@@ -63,10 +62,6 @@ const BaseRouteTile = (route: import('@rm/types').Route) => {
         <Marker
           key={position}
           ref={position === 'start' ? setMarkerRef : undefined}
-          opacity={hover || clicked ? 1 : MARKER_OPACITY}
-          zIndexOffset={hover === position ? 2000 : hover || clicked ? 1000 : 0}
-          position={[route[`${position}_lat`], route[`${position}_lon`]]}
-          icon={routeMarker(position)}
           eventHandlers={{
             popupopen: () => setClicked(true),
             popupclose: () => setClicked(false),
@@ -83,16 +78,21 @@ const BaseRouteTile = (route: import('@rm/types').Route) => {
               setHover('')
             },
           }}
+          icon={routeMarker(position)}
+          opacity={hover || clicked ? 1 : MARKER_OPACITY}
+          position={[route[`${position}_lat`], route[`${position}_lon`]]}
+          zIndexOffset={hover === position ? 2000 : hover || clicked ? 1000 : 0}
         >
           <RoutePopup
             {...route}
-            waypoints={waypoints}
             end={position === 'end'}
+            waypoints={waypoints}
           />
         </Marker>
       ))}
       <Polyline
         ref={lineRef}
+        dashArray={route.reversible ? undefined : '5, 5'}
         eventHandlers={{
           click: ({ originalEvent }) => {
             originalEvent.preventDefault()
@@ -109,16 +109,15 @@ const BaseRouteTile = (route: import('@rm/types').Route) => {
             }
           },
         }}
-        dashArray={route.reversible ? undefined : '5, 5'}
-        positions={waypoints.map((waypoint) => [
-          waypoint.lat_degrees,
-          waypoint.lng_degrees,
-        ])}
         pathOptions={{
           color: clicked || hover ? darkened : color,
           opacity: clicked || hover ? 1 : LINE_OPACITY,
           weight: 4,
         }}
+        positions={waypoints.map((waypoint) => [
+          waypoint.lat_degrees,
+          waypoint.lng_degrees,
+        ])}
       />
     </>
   )

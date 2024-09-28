@@ -6,6 +6,7 @@ function evalWebhookId(user) {
     return ''
   }
   const { strategy, webhookStrategy, discordId, telegramId } = user
+
   switch (strategy) {
     case 'discord':
       return discordId

@@ -5,7 +5,6 @@ import Typography from '@mui/material/Typography'
 import Button from '@mui/material/Button'
 import Divider from '@mui/material/Divider'
 import { useTranslation } from 'react-i18next'
-
 import { useMemory } from '@store/useMemory'
 import { useLayoutStore } from '@store/useLayoutStore'
 
@@ -24,33 +23,34 @@ export function Feedback() {
 
   return (
     <DialogWrapper dialog="feedback" variant="small">
-      <Header titles={t('submit_feedback_title')} action={handleClose} />
+      <Header action={handleClose} titles={t('submit_feedback_title')} />
       <DialogContent>
-        <Typography variant="subtitle1" align="center">
+        <Typography align="center" variant="subtitle1">
           {t('use_the_link_below')}
         </Typography>
         <br />
         <Divider />
         <br />
-        <Typography variant="body2" align="center">
+        <Typography align="center" variant="body2">
           <em>{t('feedback_to_devs')}</em>
         </Typography>
         <br />
         <Typography align="center">
           <Button
-            variant="contained"
             color="secondary"
-            startIcon={<Create />}
             href={link}
-            target="_blank"
             rel="noreferrer"
+            startIcon={<Create />}
             style={{ justifyContent: 'center' }}
+            target="_blank"
+            variant="contained"
           >
             {t('feedback_form')}
           </Button>
         </Typography>
       </DialogContent>
       <Footer
+        i18nKey="webhook_footer"
         options={[
           {
             name: 'close',
@@ -59,7 +59,6 @@ export function Feedback() {
             align: 'right',
           },
         ]}
-        role="webhook_footer"
       />
     </DialogWrapper>
   )

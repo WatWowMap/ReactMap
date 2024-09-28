@@ -1,7 +1,8 @@
 // @ts-check
 import { useEffect, useState } from 'react'
-import { usePlayStore } from './store'
 import { Config } from '@rm/types'
+
+import { usePlayStore } from './store'
 
 const DEFAULT = {
   settings: { parentStyle: {} },
@@ -22,6 +23,7 @@ export function useSafeParse():
   useEffect(() => {
     try {
       const parsed = JSON.parse(code)
+
       if (!parsed.settings) {
         parsed.settings = {}
       }

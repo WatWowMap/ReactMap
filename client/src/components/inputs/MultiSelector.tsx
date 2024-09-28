@@ -3,7 +3,6 @@ import * as React from 'react'
 import Button from '@mui/material/Button'
 import ButtonGroup from '@mui/material/ButtonGroup'
 import { useTranslation } from 'react-i18next'
-
 import { useDeepStore, UseStorage, UseStoragePaths } from '@store/useStorage'
 import { SxProps } from '@mui/material'
 import { ObjectPathValue } from '@rm/types'
@@ -29,14 +28,15 @@ export function MultiSelector<T>({
   tKey,
 }: MultiSelectorProps<T>) {
   const { t } = useTranslation()
+
   return (
     <ButtonGroup disabled={disabled} size="small" sx={SX}>
       {items.map((item) => (
         <Button
           key={`${item}`}
-          onClick={onClick(value, item)}
           color={item === value ? 'primary' : 'secondary'}
           variant={item === value ? 'contained' : 'outlined'}
+          onClick={onClick(value, item)}
         >
           {t(tKey ? `${tKey}${item}` : `${item}`).trim() || t('any')}
         </Button>
@@ -73,5 +73,6 @@ export function MultiSelectorStore<
     },
     [setValue, onClick],
   )
+
   return <MultiSelector value={value} onClick={onClickWrapper} {...props} />
 }

@@ -18,7 +18,7 @@ export function Header({
     <DialogTitle sx={{ bgcolor: 'secondary.main', color: 'white' }}>
       {(Array.isArray(titles) ? titles : [titles]).map((title, index) =>
         names?.[index] !== undefined ? (
-          <Trans i18nKey={title} key={title}>
+          <Trans key={title} i18nKey={title}>
             {{ name: t(names[index]) }}
           </Trans>
         ) : (
@@ -27,9 +27,9 @@ export function Header({
       )}
       {Boolean(action) && (
         <IconButton
-          onClick={action}
-          style={{ position: 'absolute', right: 5, top: 2, color: 'white' }}
           size="large"
+          style={{ position: 'absolute', right: 5, top: 2, color: 'white' }}
+          onClick={action}
         >
           <Clear />
         </IconButton>

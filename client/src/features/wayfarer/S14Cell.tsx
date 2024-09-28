@@ -17,11 +17,12 @@ const S14Cell = ({
   noMoreGyms: string
 }) => {
   const total = cell.count_pokestops + cell.count_gyms
+
   return (
     <Polygon
       key={`${cellColor}${oneStopTillNext}${twoStopsTillNext}${noMoreGyms}`}
-      positions={cell.polygon}
       color={cellColor}
+      positions={cell.polygon}
       weight={4}
       {...getPathOptions(
         cell,
@@ -34,7 +35,7 @@ const S14Cell = ({
       <Popup>
         <WayfarerPopup {...cell} total={total} />
       </Popup>
-      <Tooltip direction="center" permanent className="round-tt">
+      <Tooltip permanent className="round-tt" direction="center">
         {total || '0'}
       </Tooltip>
     </Polygon>

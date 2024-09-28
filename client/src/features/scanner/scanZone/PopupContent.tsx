@@ -6,12 +6,12 @@ import ListItem from '@mui/material/ListItem'
 import Slider from '@mui/material/Slider'
 import { useTranslation } from 'react-i18next'
 import { debounce } from 'lodash'
-
 import { RADIUS_CHOICES } from '@assets/constants'
 
 import { StyledSubHeader } from '../Shared'
 import { ConfigContext } from '../ContextProvider'
 import { useScanStore } from '../hooks/store'
+
 import { AdvAccordion } from './AdvAccordion'
 
 export function ScanZonePopup() {
@@ -22,14 +22,14 @@ export function ScanZonePopup() {
     <>
       <StyledSubHeader>{t('scan_zone_size')}</StyledSubHeader>
       <ListItem style={{ padding: 0 }}>
-        <ScanZoneSlider name="scanZoneSize" min={1} max={maxSize} step={1} />
+        <ScanZoneSlider max={maxSize} min={1} name="scanZoneSize" step={1} />
       </ListItem>
       <StyledSubHeader>{t('scan_zone_range')}</StyledSubHeader>
       <ListItem style={{ padding: 2 }}>
         <SizeSelection />
       </ListItem>
       {advancedOptions && (
-        <ListItem style={{ padding: '10px 0' }} disableGutters disablePadding>
+        <ListItem disableGutters disablePadding style={{ padding: '10px 0' }}>
           <AdvAccordion>
             <List
               style={{
@@ -38,9 +38,9 @@ export function ScanZonePopup() {
               }}
             >
               <StyledSubHeader>{t('scan_zone_spacing')}</StyledSubHeader>
-              <ScanZoneSlider name="userSpacing" min={1} max={2} step={0.01} />
+              <ScanZoneSlider max={2} min={1} name="userSpacing" step={0.01} />
               <StyledSubHeader>{t('scan_zone_radius')}</StyledSubHeader>
-              <ScanZoneSlider name="userRadius" min={50} max={900} />
+              <ScanZoneSlider max={900} min={50} name="userRadius" />
             </List>
           </AdvAccordion>
         </ListItem>
@@ -70,9 +70,9 @@ function ScanZoneSlider({
   return (
     <Slider
       value={value}
+      valueLabelDisplay="auto"
       onChange={debouncedHandleChange}
       onChangeCommitted={handleChange}
-      valueLabelDisplay="auto"
       {...props}
     />
   )
@@ -89,15 +89,16 @@ function SizeSelection() {
   )
 
   return (
-    <ButtonGroup size="small" fullWidth>
+    <ButtonGroup fullWidth size="small">
       {RADIUS_CHOICES.map((item) => {
         const radius = item === 'pokemon' ? pokemonRadius : gymRadius
+
         return (
           <Button
             key={item}
-            onClick={handleRadiusChange(radius)}
             color={radius === userRadius ? 'primary' : 'secondary'}
             variant={radius === userRadius ? 'contained' : 'outlined'}
+            onClick={handleRadiusChange(radius)}
           >
             {t(item)}
           </Button>

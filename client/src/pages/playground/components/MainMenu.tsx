@@ -10,11 +10,12 @@ import ListItemIcon from '@mui/material/ListItemIcon'
 import ListItemText from '@mui/material/ListItemText'
 import { useTranslation } from 'react-i18next'
 
+import { closeMenu, openMenu, usePlayStore } from '../hooks/store'
+
 import { ToggleEditor } from './ToggleEditor'
 import { Download } from './Download'
 import { ThemeMenuItem } from './Theme'
 import { Save } from './Save'
-import { closeMenu, openMenu, usePlayStore } from '../hooks/store'
 
 const startIcon = <MenuIcon />
 
@@ -28,9 +29,9 @@ export function MainMenu() {
         {t('menu')}
       </Button>
       <Menu
-        transitionDuration={200}
-        open={!!anchorEl}
         anchorEl={anchorEl}
+        open={!!anchorEl}
+        transitionDuration={200}
         onClose={closeMenu}
       >
         <ToggleEditor />
@@ -40,6 +41,7 @@ export function MainMenu() {
           dense
           onClick={() => {
             const lastSaved = localStorage.getItem('playground')
+
             if (lastSaved) {
               usePlayStore.setState({ code: lastSaved })
             }
@@ -52,7 +54,7 @@ export function MainMenu() {
         </MenuItem>
         <Download />
         <Save />
-        <MenuItem component={Link} to="/" dense>
+        <MenuItem dense component={Link} to="/">
           <ListItemIcon>
             <ClearIcon fontSize="small" />
           </ListItemIcon>

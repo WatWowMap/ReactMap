@@ -7,6 +7,7 @@ import { useLocalesStore } from '../hooks/store'
 export function AllSwitch() {
   const { t } = useTranslation()
   const all = useLocalesStore((s) => s.all)
+
   return (
     <FormControlLabel
       control={

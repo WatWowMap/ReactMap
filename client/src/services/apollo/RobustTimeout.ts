@@ -1,4 +1,5 @@
 import { useMemory } from '@store/useMemory'
+
 import { AbortableContext } from './AbortableContext'
 
 export class RobustTimeout extends AbortableContext {
@@ -31,10 +32,12 @@ export class RobustTimeout extends AbortableContext {
     variables?: Partial<import('@apollo/client').OperationVariables>,
   ): void {
     const now = Date.now()
+
     if (now - this._lastUpdated < (this._pendingOp ? 5000 : 500)) {
       if (variables !== undefined) {
         this._pendingVariables = variables
       }
+
       return
     }
     this._lastUpdated = now

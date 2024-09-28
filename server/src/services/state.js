@@ -5,11 +5,12 @@ const path = require('path')
 const config = require('@rm/config')
 const { log, TAGS } = require('@rm/logger')
 
+const { migrate } = require('../db/migrate')
+
 const { DbManager } = require('./DbManager')
 const { EventManager } = require('./EventManager')
 const { PvpWrapper } = require('./PvpWrapper')
 const { setCache } = require('./cache')
-const { migrate } = require('../db/migrate')
 const { Stats } = require('./Stats')
 
 const state = {
@@ -30,6 +31,7 @@ const state = {
             TAGS.auth,
             `Strategy ${name} ${enabled ? '' : 'was not '}initialized`,
           )
+
           return !!enabled
         })
         .map(({ name, type }, i) => {
@@ -43,6 +45,7 @@ const state = {
             )
               ? require(path.resolve(__dirname, `../strategies/${name}.js`))
               : require(path.resolve(__dirname, `../strategies/${type}.js`))
+
             return [
               name ?? `${type}-${i}}`,
               typeof buildStrategy === 'function'
@@ -51,6 +54,7 @@ const state = {
             ]
           } catch (e) {
             log.error(TAGS.auth, e)
+
             return [name, null]
           }
         }),
@@ -94,6 +98,7 @@ const state = {
   /** @param {import('@rm/types').StateReportObj} [reloadReport] */
   async loadLocalContexts(reloadReport) {
     const promises = [this.event.cleanupTrials()]
+
     if (!reloadReport || reloadReport.database) {
       if (!reloadReport || reloadReport.historical) {
         promises.push(this.db.historicalRarity())
@@ -112,6 +117,7 @@ const state = {
   /** @param {import('@rm/types').StateReportObj} [reloadReport] */
   async loadExternalContexts(reloadReport) {
     const promises = []
+
     if (!reloadReport || reloadReport.icons) {
       promises.push(this.event.getUniversalAssets('uicons'))
     }
@@ -152,6 +158,7 @@ const state = {
     if (reloadReport.events) {
       this.event.startIntervals(this.db, this.pvp)
     }
+
     return this
   },
   /** @param {NodeJS.Signals} [e] */

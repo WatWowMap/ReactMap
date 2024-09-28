@@ -22,7 +22,6 @@ import { useMap } from 'react-leaflet'
 import { DomEvent } from 'leaflet'
 import CircularProgress from '@mui/material/CircularProgress'
 import { styled } from '@mui/material/styles'
-
 import { FAB_BUTTONS } from '@services/queries/config'
 import { useLocation } from '@hooks/useLocation'
 import { useMemory } from '@store/useMemory'
@@ -139,23 +138,23 @@ export function FloatingButtons() {
   }, [])
 
   return (
-    <StyledStack ref={ref} justifyContent="flex-start" alignItems="flex-start">
+    <StyledStack ref={ref} alignItems="flex-start" justifyContent="flex-start">
       <Fab
         color="primary"
-        size={fabSize}
-        onClick={handleClick('drawer')}
-        title={t('open_menu')}
         disabled={disabled}
+        size={fabSize}
+        title={t('open_menu')}
+        onClick={handleClick('drawer')}
       >
         <MenuIcon fontSize={iconSize} />
       </Fab>
       {fabButtons.profileButton && (
         <Fab
           color="primary"
-          size={fabSize}
-          onClick={handleClick('userProfile')}
-          title={t('user_profile')}
           disabled={disabled}
+          size={fabSize}
+          title={t('user_profile')}
+          onClick={handleClick('userProfile')}
         >
           <Person fontSize={iconSize} />
         </Fab>
@@ -163,10 +162,10 @@ export function FloatingButtons() {
       {fabButtons.search && (
         <Fab
           color={reactControls ? 'primary' : 'secondary'}
-          size={fabSize}
-          onClick={handleClick('search')}
-          title={t('search')}
           disabled={disabled}
+          size={fabSize}
+          title={t('search')}
+          onClick={handleClick('search')}
         >
           <SearchIcon fontSize={iconSize} sx={{ color: 'white' }} />
         </Fab>
@@ -174,10 +173,10 @@ export function FloatingButtons() {
       {fabButtons.webhooks && (
         <Fab
           color="secondary"
-          size={fabSize}
-          onClick={setModeBtn('open')}
           disabled={disabled}
+          size={fabSize}
           title={t('alert_manager')}
+          onClick={setModeBtn('open')}
         >
           <NotificationsActiveIcon
             fontSize={iconSize}
@@ -188,10 +187,10 @@ export function FloatingButtons() {
       {fabButtons.scanNext && (
         <Fab
           color={scanNextMode === 'setLocation' ? 'primary' : 'secondary'}
-          size={fabSize}
-          onClick={handleClick('scanNextMode')}
-          title={t('scan_next')}
           disabled={!!webhookMode || !!scanZoneMode || !online}
+          size={fabSize}
+          title={t('scan_next')}
+          onClick={handleClick('scanNextMode')}
         >
           <TrackChanges fontSize={iconSize} sx={{ color: 'white' }} />
         </Fab>
@@ -199,10 +198,10 @@ export function FloatingButtons() {
       {fabButtons.scanZone && (
         <Fab
           color={scanZoneMode === 'setLocation' ? 'primary' : 'secondary'}
-          size={fabSize}
-          onClick={handleClick('scanZoneMode')}
-          title={t('scan_zone')}
           disabled={!!webhookMode || !!scanNextMode || !online}
+          size={fabSize}
+          title={t('scan_zone')}
+          onClick={handleClick('scanZoneMode')}
         >
           <BlurOn fontSize={iconSize} sx={{ color: 'white' }} />
         </Fab>
@@ -210,10 +209,10 @@ export function FloatingButtons() {
       {!!DonorIcon && (
         <Fab
           color="secondary"
-          size={fabSize}
-          onClick={handleClick('donorPage')}
-          title={t('donor_menu')}
           disabled={disabled}
+          size={fabSize}
+          title={t('donor_menu')}
+          onClick={handleClick('donorPage')}
         >
           <DonorIcon fontSize={iconSize} sx={{ color: 'white' }} />
         </Fab>
@@ -223,14 +222,14 @@ export function FloatingButtons() {
           <Fab
             color={color}
             size={fabSize}
-            onClick={handleNavBtn('locate')}
             title={t('use_my_location')}
+            onClick={handleNavBtn('locate')}
           >
             {requesting ? (
               <CircularProgress
                 size={20}
-                thickness={5}
                 sx={{ color: 'white' }}
+                thickness={5}
               />
             ) : (
               <MyLocationIcon fontSize={iconSize} sx={{ color: 'white' }} />
@@ -239,16 +238,16 @@ export function FloatingButtons() {
           <Fab
             color="secondary"
             size={fabSize}
-            onClick={handleNavBtn('zoomIn')}
             title={t('zoom_in')}
+            onClick={handleNavBtn('zoomIn')}
           >
             <ZoomInIcon fontSize={iconSize} sx={{ color: 'white' }} />
           </Fab>
           <Fab
             color="secondary"
             size={fabSize}
-            onClick={handleNavBtn('zoomOut')}
             title={t('zoom_out')}
+            onClick={handleNavBtn('zoomOut')}
           >
             <ZoomOutIcon fontSize={iconSize} sx={{ color: 'white' }} />
           </Fab>
@@ -259,8 +258,8 @@ export function FloatingButtons() {
           <Fab
             color="primary"
             size={fabSize}
-            onClick={setModeBtn('open')}
             title={t('done')}
+            onClick={setModeBtn('open')}
           >
             <CheckIcon fontSize={iconSize} sx={{ color: 'white' }} />
           </Fab>
@@ -270,13 +269,13 @@ export function FloatingButtons() {
           <Fab
             key={`${icon.color}${icon.href}${icon.icon}`}
             color={icon.color || 'secondary'}
-            size={fabSize}
+            disabled={disabled}
             href={icon.href}
             referrerPolicy="no-referrer"
+            size={fabSize}
             target={icon.target || '_blank'}
-            disabled={disabled}
           >
-            <I className={icon.icon} size={iconSize} color="white" />
+            <I className={icon.icon} color="white" size={iconSize} />
           </Fab>
         ),
       )}

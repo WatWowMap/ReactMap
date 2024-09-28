@@ -24,8 +24,10 @@ function getValidCoords(mode, points, perms) {
         areaRestrictions,
       ),
     )
+
     return validPoints
   }
+
   return []
 }
 

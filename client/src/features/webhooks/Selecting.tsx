@@ -4,7 +4,6 @@ import Slide from '@mui/material/Slide'
 import Typography from '@mui/material/Typography'
 import { useTranslation } from 'react-i18next'
 import { useMutation } from '@apollo/client'
-
 import { SET_PROFILE, ALL_PROFILES } from '@services/queries/webhook'
 import { useWebhookStore, setSelected } from '@store/useWebhookStore'
 
@@ -22,12 +21,14 @@ export function Selecting() {
 
     if (Array.isArray(tracked)) {
       const selectedObj = Object.fromEntries(tracked.map((x) => [x.uid, true]))
+
       useWebhookStore.setState({ selected: selectedObj })
     }
   }
 
   const deleteAll = () => {
     const { category } = useWebhookStore.getState()
+
     save({
       variables: {
         category: `${category}-delete`,
@@ -40,46 +41,46 @@ export function Selecting() {
 
   return (
     <Slide
-      in={Object.values(selected).some(Boolean)}
-      direction="up"
       mountOnEnter
       unmountOnExit
+      direction="up"
+      in={Object.values(selected).some(Boolean)}
     >
       <Grid
         container
-        justifyContent="center"
         alignItems="center"
-        position="absolute"
-        mx="auto"
-        width="100%"
         bottom={70}
+        justifyContent="center"
         left={0}
+        mx="auto"
+        position="absolute"
         right={0}
+        width="100%"
       >
-        <Grid xs={3} sm={2} textAlign="center">
+        <Grid sm={2} textAlign="center" xs={3}>
           <Fab
-            size="small"
             color="secondary"
+            size="small"
             variant="extended"
             onClick={setSelected()}
           >
             <Typography variant="caption">{t('cancel')}</Typography>
           </Fab>
         </Grid>
-        <Grid xs={4} sm={3} md={2} textAlign="center">
+        <Grid md={2} sm={3} textAlign="center" xs={4}>
           <Fab
-            size="small"
             color="secondary"
+            size="small"
             variant="extended"
             onClick={handleAll}
           >
             <Typography variant="caption">{t('select_all')}</Typography>
           </Fab>
         </Grid>
-        <Grid xs={5} sm={4} md={3} textAlign="center">
+        <Grid md={3} sm={4} textAlign="center" xs={5}>
           <Fab
-            size="small"
             color="primary"
+            size="small"
             variant="extended"
             onClick={deleteAll}
           >

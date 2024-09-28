@@ -3,7 +3,6 @@ import { useState, useCallback, useMemo, useEffect } from 'react'
 import { useLazyQuery } from '@apollo/client'
 import { useTranslation } from 'react-i18next'
 import { debounce } from 'lodash'
-
 import { Query } from '@services/queries'
 import { useStorage } from '@store/useStorage'
 import { useMemory } from '@store/useMemory'
@@ -26,6 +25,7 @@ export function useSendSearch(search: string, open: boolean) {
     (/** @type {string} */ newSearch: string) => {
       const { lat, lng } = map.getCenter()
       const { filters } = useStorage.getState()
+
       callSearch({
         variables: {
           search: newSearch,

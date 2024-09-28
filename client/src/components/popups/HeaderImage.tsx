@@ -1,6 +1,5 @@
 import Avatar from '@mui/material/Avatar'
 import Link from '@mui/material/Link'
-
 import { useMemory } from '@store/useMemory'
 
 export function HeaderImage({
@@ -30,10 +29,11 @@ export function HeaderImage({
       }}
     />
   )
+
   return (
     <div className="ar-eligible">
       {large ? (
-        <Link href={src} target="_blank" rel="noreferrer">
+        <Link href={src} rel="noreferrer" target="_blank">
           {Image}
         </Link>
       ) : (
@@ -41,8 +41,8 @@ export function HeaderImage({
       )}
       {!!arScanEligible && (
         <img
-          className="ar-logo"
           alt="ar"
+          className="ar-logo"
           src={Icons.getMisc('ar')}
           style={{
             width: large ? 32 : 16,
@@ -52,8 +52,8 @@ export function HeaderImage({
       )}
       {!!exEligible && (
         <img
-          className="ex-logo"
           alt="ex"
+          className="ex-logo"
           src={Icons.getMisc('ex')}
           style={{
             width: large ? 32 : 16,

@@ -25,15 +25,16 @@ export function EditLocale({
       },
       [name],
     )
+
   return (
     <TextField
       fullWidth
+      multiline={type === 'text'}
+      placeholder={t('enter_translation')}
+      size="small"
       type={type}
       value={value}
       onChange={onChange}
-      multiline={type === 'text'}
-      size="small"
-      placeholder={t('enter_translation')}
       {...props}
     />
   )

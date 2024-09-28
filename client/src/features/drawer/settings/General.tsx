@@ -5,7 +5,6 @@ import StyleIcon from '@mui/icons-material/Style'
 import DevicesOtherIcon from '@mui/icons-material/DevicesOther'
 import SquareFootIcon from '@mui/icons-material/SquareFoot'
 import { useTranslation } from 'react-i18next'
-
 import { useMemory } from '@store/useMemory'
 import { useStorage } from '@store/useStorage'
 import { getProperName, camelToSnake } from '@utils/strings'
@@ -27,12 +26,14 @@ export function GeneralSetting({
   const { t } = useTranslation()
   const staticSettings = useMemory((s) => s.settings)
   const value = useStorage((s) => s.settings[setting])
+
   return (
     <FCSelectListItem
       key={setting}
+      icon={ICON_MAP[setting] || FALLBACK}
+      label={t(camelToSnake(setting))}
       name={setting}
       value={staticSettings[setting][value]?.name || ''}
-      label={t(camelToSnake(setting))}
       onChange={({ target }) => {
         useStorage.setState((prev) => ({
           settings: {
@@ -41,7 +42,6 @@ export function GeneralSetting({
           },
         }))
       }}
-      icon={ICON_MAP[setting] || FALLBACK}
     >
       {Object.keys(staticSettings[setting]).map((option) => (
         <MenuItem key={option} value={option}>

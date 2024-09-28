@@ -10,6 +10,7 @@ function areaPerms(roles) {
   const areas = config.getSafe('areas')
 
   const perms = []
+
   for (let i = 0; i < roles.length; i += 1) {
     for (let j = 0; j < areaRestrictions.length; j += 1) {
       if (areaRestrictions[j].roles.includes(roles[i])) {
@@ -27,6 +28,7 @@ function areaPerms(roles) {
       }
     }
   }
+
   return [...new Set(perms)]
 }
 

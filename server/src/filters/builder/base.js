@@ -2,11 +2,12 @@
 const config = require('@rm/config')
 
 const { state } = require('../../services/state')
+const { BaseFilter } = require('../Base')
+const { PokemonFilter } = require('../pokemon/Frontend')
+
 const { buildPokemon } = require('./pokemon')
 const { buildPokestops } = require('./pokestop')
 const { buildGyms } = require('./gym')
-const { BaseFilter } = require('../Base')
-const { PokemonFilter } = require('../pokemon/Frontend')
 
 /**
  * @param {import("@rm/types").Permissions} perms

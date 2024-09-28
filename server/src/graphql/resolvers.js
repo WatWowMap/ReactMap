@@ -1,7 +1,6 @@
 // @ts-check
 const { GraphQLJSON } = require('graphql-type-json')
 const { S2LatLng, S2RegionCoverer, S2LatLngRect } = require('nodes2ts')
-
 const config = require('@rm/config')
 const { missing, readAndParseJson } = require('@rm/locales')
 
@@ -35,6 +34,7 @@ const resolvers = {
           styles: Event.uicons,
         },
       }
+
       return data
     },
     availablePokemon: (_, _args, { Event, perms }) =>
@@ -51,6 +51,7 @@ const resolvers = {
         ) {
           return perms?.raids
         }
+
         return false
       }),
     availableNests: (_, _args, { Event, perms }) =>
@@ -77,6 +78,7 @@ const resolvers = {
         if (x.startsWith('l')) {
           return perms?.lures
         }
+
         return perms?.pokestops
       }),
     availableStations: (_, _args, { Event, perms }) =>
@@ -85,21 +87,26 @@ const resolvers = {
       if (perms?.backups && req?.user?.id) {
         return Db.models.Backup.getOne(args.id, req?.user?.id)
       }
+
       return {}
     },
     backups: async (_, _args, { req, perms, Db }) => {
       if (perms?.backups) {
         const records = await Db.query('Backup', 'getAll', req.user?.id)
+
         return records
       }
+
       return []
     },
     badges: async (_, _args, { req, perms, Db }) => {
       if (perms?.gymBadges) {
         const badges = await Db.query('Badge', 'getAll', req.user?.id)
         const gyms = await Db.query('Gym', 'getBadges', badges)
+
         return gyms
       }
+
       return []
     },
     checkUsername: async (_, args, { Db }) => {
@@ -107,6 +114,7 @@ const resolvers = {
         'username',
         args.username,
       )
+
       return !!results.length
     },
     /** @param {unknown} _ @param {{ mode: 'scanNext' | 'scanZone', points: [number, number][] }} args */
@@ -124,6 +132,7 @@ const resolvers = {
               components = [],
               ...rest
             } = config.getSafe(`map.${component}`)[component]
+
             return {
               ...rest,
               footerButtons: filterComponents(
@@ -134,6 +143,7 @@ const resolvers = {
               components: filterComponents(components, !!username, perms.donor),
             }
           }
+
           return null
         default:
           return null
@@ -143,6 +153,7 @@ const resolvers = {
       if (perms?.devices) {
         return Db.query('Device', 'getAll', perms, args)
       }
+
       return []
     },
     fabButtons: async (_, _args, { perms, username, req, Db, Event }) => {
@@ -151,6 +162,7 @@ const resolvers = {
       const scanner = config.getSafe('scanner')
 
       const selectedWebhook = await validateSelectedWebhook(req.user, Db, Event)
+
       if (selectedWebhook) {
         req.user.selectedWebhook = selectedWebhook
         req.session.save()
@@ -179,6 +191,7 @@ const resolvers = {
     geocoder: (_, { search }, { perms, Event, req }) => {
       if (perms?.webhooks) {
         const webhook = Event.webhookObj[req.user?.selectedWebhook]
+
         if (webhook) {
           return geocoder(
             webhook.nominatimUrl,
@@ -188,22 +201,26 @@ const resolvers = {
           )
         }
       }
+
       return []
     },
     gyms: (_, args, { req, perms, Db }) => {
       if (perms?.gyms || perms?.raids) {
         return Db.getAll('Gym', perms, args, req?.user?.id)
       }
+
       return []
     },
     gymsSingle: (_, args, { perms, Db }) => {
       if (perms?.[args.perm]) {
         return Db.getOne('Gym', args.id)
       }
+
       return {}
     },
     locales: async (_, { locale }) => {
       const missingLocales = await missing(`${locale}.json`)
+
       return locale
         ? {
             missing: Object.keys(missingLocales),
@@ -214,6 +231,7 @@ const resolvers = {
     },
     motdCheck: (_, { clientIndex }, { perms }) => {
       const motd = config.getSafe('map.messageOfTheDay')
+
       return (
         motd.components.length &&
         (motd.index > clientIndex || motd.settings.permanent) &&
@@ -227,12 +245,14 @@ const resolvers = {
       if (perms?.nests) {
         return Db.query('Nest', 'getAll', perms, args)
       }
+
       return []
     },
     nestsSingle: (_, args, { perms, Db }) => {
       if (perms?.[args.perm]) {
         return Db.getOne('Nest', args.id)
       }
+
       return {}
     },
     pokestops: (_, args, { perms, Db }) => {
@@ -244,12 +264,14 @@ const resolvers = {
       ) {
         return Db.query('Pokestop', 'getAll', perms, args)
       }
+
       return []
     },
     pokestopsSingle: (_, args, { perms, Db }) => {
       if (perms?.[args.perm]) {
         return Db.getOne('Pokestop', args.id)
       }
+
       return {}
     },
     pokemon: (_, args, { perms, Db }) => {
@@ -257,53 +279,64 @@ const resolvers = {
         if (args.filters.onlyLegacy) {
           return Db.query('Pokemon', 'getLegacy', perms, args)
         }
+
         return Db.query('Pokemon', 'getAll', perms, args)
       }
+
       return []
     },
     pokemonSingle: (_, args, { perms, Db }) => {
       if (perms?.[args.perm]) {
         return Db.getOne('Pokemon', args.id)
       }
+
       return {}
     },
     portals: (_, args, { perms, Db }) => {
       if (perms?.portals) {
         return Db.query('Portal', 'getAll', perms, args)
       }
+
       return []
     },
     portalsSingle: (_, args, { perms, Db }) => {
       if (perms?.[args.perm]) {
         return Db.getOne('Portal', args.id)
       }
+
       return {}
     },
     route: (_, args, { perms, Db }) => {
       if (perms?.routes) {
         return Db.query('Route', 'getOne', args.id)
       }
+
       return {}
     },
     routes: (_, args, { perms, Db }) => {
       if (perms?.routes) {
         return Db.query('Route', 'getAll', perms, args)
       }
+
       return []
     },
     s2cells: (_, args, { perms }) => {
       if (perms?.s2cells) {
         const { onlyCells } = args.filters
+
         return onlyCells.flatMap((level) => {
           const regionCoverer = new S2RegionCoverer()
           const region = S2LatLngRect.fromLatLng(
             S2LatLng.fromDegrees(args.minLat, args.minLon),
             S2LatLng.fromDegrees(args.maxLat, args.maxLon),
           )
+
           regionCoverer.setMinLevel(level)
           regionCoverer.setMaxLevel(level)
+
           return regionCoverer.getCoveringCells(region).map((cell) => {
             const id = cell.id.toString()
+
             return {
               id,
               coords: getPolyVector(id).polygon,
@@ -311,6 +344,7 @@ const resolvers = {
           })
         })
       }
+
       return []
     },
     scanCells: (_, args, { perms, Db }) => {
@@ -320,11 +354,13 @@ const resolvers = {
       ) {
         return Db.query('ScanCell', 'getAll', perms, args)
       }
+
       return []
     },
     scanAreas: (_, _args, { perms }) => {
       if (perms?.scanAreas) {
         const scanAreas = config.getSafe('areas.scanAreas')
+
         return [
           {
             ...scanAreas,
@@ -338,11 +374,13 @@ const resolvers = {
           },
         ]
       }
+
       return [{ features: [] }]
     },
     scanAreasMenu: (_, _args, { perms }) => {
       if (perms?.scanAreas) {
         const scanAreas = config.getSafe('areas.scanAreasMenu')
+
         if (perms.areaRestrictions.length) {
           const filtered = scanAreas
             .map((parent) => ({
@@ -369,8 +407,10 @@ const resolvers = {
           // })
           return filtered
         }
+
         return scanAreas.filter((parent) => parent.children.length)
       }
+
       return []
     },
     scannerConfig: (_, { mode }, { perms }) => {
@@ -400,10 +440,12 @@ const resolvers = {
               enabled: scanner[mode].enabled,
             }
       }
+
       return null
     },
     search: async (_, args, { Event, perms, Db, req }) => {
       const { category, search } = args
+
       if (!search || !search.trim()) {
         return []
       }
@@ -418,6 +460,7 @@ const resolvers = {
           if (!perms.gyms) return []
           const results = await Db.search('Gym', perms, args)
           const webhook = Event.webhookObj[req.user.selectedWebhook]
+
           if (webhook?.nominatimUrl && results.length) {
             const withFormatted = await Promise.all(
               results.map(async (result) => ({
@@ -430,8 +473,10 @@ const resolvers = {
                 ),
               })),
             )
+
             return withFormatted
           }
+
           return results
         }
         case 'portals':
@@ -446,60 +491,75 @@ const resolvers = {
     },
     searchInvasion: (_, args, { perms, Db }) => {
       const { search } = args
+
       if (perms?.invasions) {
         if (!search || !search.trim()) {
           return []
         }
+
         return Db.search('Pokestop', perms, args, 'searchInvasions')
       }
+
       return []
     },
     searchLure: (_, args, { perms, Db }) => {
       const { search } = args
+
       if (perms.lures) {
         if (!search || !search.trim()) {
           return []
         }
+
         return Db.search('Pokestop', perms, args, 'searchLures')
       }
+
       return []
     },
     searchQuest: (_, args, { perms, Db }) => {
       const { search } = args
+
       if (perms.quests) {
         if (!search || !search.trim()) {
           return []
         }
+
         return Db.search('Pokestop', perms, args, 'searchQuests')
       }
+
       return []
     },
     searchable: (_, __, { perms }) => {
       const options = config.getSafe('api.searchable')
+
       return Object.keys(options).filter((k) => perms[k] && options[k])
     },
     spawnpoints: (_, args, { perms, Db }) => {
       if (perms?.spawnpoints) {
         return Db.query('Spawnpoint', 'getAll', perms, args)
       }
+
       return []
     },
     stations: (_, args, { perms, Db }) => {
       if (perms?.stations || perms?.dynamax) {
         return Db.query('Station', 'getAll', perms, args)
       }
+
       return []
     },
     stationPokemon: (_, { id }, { perms, Db }) => {
       if (perms?.stations) {
         return Db.query('Station', 'getDynamaxMons', id)
       }
+
       return []
     },
     submissionCells: async (_, args, { perms, Db }) => {
       const submissionZoom = config.getSafe('map.general.submissionZoom')
+
       if (perms?.submissionCells && args.zoom >= submissionZoom - 1) {
         const [pokestops, gyms] = await Db.submissionCells(perms, args)
+
         return [
           {
             ...(args.zoom >= submissionZoom
@@ -509,12 +569,14 @@ const resolvers = {
           },
         ]
       }
+
       return [{ level17Cells: [], level14Cells: [], pois: [] }]
     },
     weather: (_, args, { perms, Db }) => {
       if (perms?.weather) {
         return Db.query('Weather', 'getAll', perms, args)
       }
+
       return []
     },
     webhook: async (_, { status, category }, { req, perms, Event }) => {
@@ -524,6 +586,7 @@ const resolvers = {
           category,
           status,
         )
+
         if (category === 'pokemon' && result.pokemon) {
           result.pokemon = result.pokemon.map((x) => ({
             ...x,
@@ -545,8 +608,10 @@ const resolvers = {
             allMoves: x.move === 9000,
           }))
         }
+
         return result
       }
+
       return {}
     },
     webhookAreas: async (_, __, { req, perms, Event }) => {
@@ -555,6 +620,7 @@ const resolvers = {
           PoracleAPI.getWebhookId(req.user),
         )
       }
+
       return []
     },
     webhookCategories: async (_, __, { req, perms, Event }) => {
@@ -564,10 +630,12 @@ const resolvers = {
           'oneHuman',
           'GET',
         )
+
         return Event.webhookObj[req.user?.selectedWebhook].getAllowedCategories(
           human.blocked_alerts,
         )
       }
+
       return []
     },
     webhookContext: async (_, __, { req, perms, Event }) => {
@@ -586,6 +654,7 @@ const resolvers = {
           PoracleAPI.getWebhookId(req.user),
         )
       }
+
       return null
     },
     webhookUser: async (_, __, { req, perms }) => {
@@ -594,6 +663,7 @@ const resolvers = {
           .getSafe('webhooks')
           .filter((hook) => hook.enabled)
           .map((x) => x.name)
+
         return {
           webhooks: (perms.webhooks || []).filter((x) =>
             enabledHooks.includes(x),
@@ -601,11 +671,13 @@ const resolvers = {
           selected: req.user?.selectedWebhook,
         }
       }
+
       return {}
     },
     /** @param {unknown} _ @param {import('@rm/types').ScanOnDemandReq} args */
     scanner: (_, args, { req, perms }) => {
       const { category, method, data } = args
+
       if (category === 'getQueue') {
         return scannerApi(category, method, data, req?.user)
       }
@@ -620,7 +692,9 @@ const resolvers = {
             validCoords.filter(Boolean).length *
             1000 +
           Date.now()
+
         req.session.cooldown = cooldown
+
         return scannerApi(
           category,
           method,
@@ -631,6 +705,7 @@ const resolvers = {
           req?.user,
         )
       }
+
       return {}
     },
     validateUser: (_, __, { username, perms }) => ({
@@ -669,6 +744,7 @@ const resolvers = {
           },
         )
       }
+
       return false
     },
     webhook: async (_, args, { req, Event, perms }) => {
@@ -683,6 +759,7 @@ const resolvers = {
           status,
           data,
         )
+
         if (category === 'pokemon' && result.pokemon) {
           result.pokemon = result.pokemon.map((x) => ({
             ...x,
@@ -704,8 +781,10 @@ const resolvers = {
             allMoves: x.move === 9000,
           }))
         }
+
         return result
       }
+
       return {}
     },
     webhookChange: async (_, args, { req, Db, perms, Event }) => {
@@ -716,14 +795,17 @@ const resolvers = {
           req.user.id,
           args.webhook,
         )
+
         req.user.selectedWebhook = user.selectedWebhook
         req.session.save()
+
         return Event.webhookObj[user.selectedWebhook].api(
           PoracleAPI.getWebhookId(req.user),
           'oneHuman',
           'GET',
         )
       }
+
       return ''
     },
     tutorial: async (_, args, { req, Db }) => {
@@ -731,18 +813,21 @@ const resolvers = {
         await Db.models.User.query()
           .update({ tutorial: args.tutorial })
           .where('id', req.user.id)
+
         return true
       }
       if (req.session) {
         req.session.tutorial = true
         req.session.save()
       }
+
       return false
     },
     saveComponent: async (_, { code, component }, { perms }) => {
       if (perms.admin && code && component) {
         return writeConfigFile(component, code)
       }
+
       return null
     },
     strategy: async (_, args, { req, Db }) => {
@@ -750,30 +835,38 @@ const resolvers = {
         await Db.models.User.query()
           .update({ webhookStrategy: args.strategy })
           .where('id', req.user.id)
+
         return true
       }
+
       return false
     },
     setExtraFields: async (_, { key, value }, { req, Db }) => {
       if (req.user?.id) {
         const user = await Db.query('User', 'getOne', req.user.id)
+
         if (user) {
           const data =
             typeof user.data === 'string'
               ? JSON.parse(user.data)
               : user.data || {}
+
           data[key] = value
           await user.$query().update({ data: JSON.stringify(data) })
         }
+
         return true
       }
+
       return false
     },
     setGymBadge: async (_, args, { req, Db, perms }) => {
       if (perms?.gymBadges && req?.user?.id) {
         await Db.models.Badge.insert(args.badge, args.gymId, req.user.id)
+
         return true
       }
+
       return false
     },
   },

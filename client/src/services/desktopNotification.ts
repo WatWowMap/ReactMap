@@ -1,5 +1,4 @@
 import { t } from 'i18next'
-
 import { useMemory } from '@store/useMemory'
 import { useStorage } from '@store/useStorage'
 import { SimpleTTLCache } from '@services/SimpleTTLCache'
@@ -21,6 +20,7 @@ export function getPermission(): NotificationPermission {
  */
 export async function requestPermission(): Promise<NotificationPermission> {
   if (!HAS_API) return 'denied'
+
   return Notification.requestPermission()
 }
 
@@ -45,10 +45,12 @@ export function sendNotification(
   const userSettings = useStorage.getState().userSettings?.notifications || {
     enabled: false,
   }
+
   if (userSettings.enabled && userSettings[category]) {
     if (getPermission() === 'granted') {
       const { lat, lon, audio, expire, ...rest } = options
       const countdown = expire ? expire * 1000 - Date.now() : 1
+
       if (countdown < 0) return
       cache.set(key, countdown)
 
@@ -64,12 +66,14 @@ export function sendNotification(
           lang: localStorage.getItem('i18nextLng') || window.navigator.language,
         },
       )
+
       notif.onclick = () => {
         if (!document.hasFocus()) {
           window.focus()
         }
         if (lat && lon) {
           const { map } = useMapStore.getState()
+
           useMemory.setState({ manualParams: { category, id: key } })
           map.flyTo([lat, lon], 16)
         }
@@ -79,6 +83,7 @@ export function sendNotification(
         const timer = setTimeout(() => {
           notif.close()
         }, countdown)
+
         notif.onclose = () => {
           clearTimeout(timer)
         }
@@ -92,11 +97,13 @@ export function sendNotification(
         if (!isAudioPlaying) {
           isAudioPlaying = true
           const cry = new Audio(audio)
+
           cry.volume = userSettings.volumeLevel / 100
           cry.addEventListener('ended', () => {
             isAudioPlaying = false
           })
           const isPlaying = cry.play()
+
           if (isPlaying !== undefined) {
             isPlaying.catch(() => {
               isAudioPlaying = false

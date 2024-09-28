@@ -9,14 +9,17 @@ const fs = require('fs')
 const customFilePlugin = (isDevelopment) => {
   const fileRegex = /\.(jsx?|css)$/
   const customPaths = []
+
   return {
     name: 'vite-plugin-custom-file-checker',
     load(id) {
       if (fileRegex.test(id) && !/node_modules/.test(id)) {
         const ext = extname(id)
         const newPath = id.replace(ext, `.custom${ext}`)
+
         if (fs.existsSync(newPath)) {
           customPaths.push(newPath)
+
           return {
             code: fs.readFileSync(newPath, 'utf8'),
             map: null,

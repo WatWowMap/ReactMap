@@ -1,6 +1,5 @@
 import * as React from 'react'
 import ListItem from '@mui/material/ListItem'
-
 import { useStorage } from '@store/useStorage'
 import { QUEST_SETS } from '@assets/constants'
 import { MultiSelectorStore } from '@components/inputs/MultiSelector'
@@ -10,6 +9,7 @@ import { MultiSelectorList, SelectorListMemo } from '../components/SelectorList'
 
 const BaseQuestQuickSelect = () => {
   const enabled = useStorage((s) => !!s.filters?.pokestops?.quests)
+
   return (
     <CollapsibleItem open={enabled}>
       <ListItem>
@@ -22,16 +22,16 @@ const BaseQuestQuickSelect = () => {
         <SelectorListMemo
           key="items"
           category="pokestops"
-          subCategory="quests"
-          label="search_quests"
           height={350}
+          label="search_quests"
+          subCategory="quests"
         />
         <SelectorListMemo
           key="pokemon"
           category="pokestops"
-          subCategory="pokemon"
-          label="search_quests"
           height={350}
+          label="search_quests"
+          subCategory="pokemon"
         />
       </MultiSelectorList>
     </CollapsibleItem>

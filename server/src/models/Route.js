@@ -87,6 +87,7 @@ class Route extends Model {
       } else if (result.waypoints === null) {
         result.waypoints = []
       }
+
       return result
     })
   }
@@ -147,6 +148,7 @@ class Route extends Model {
     if (typeof result.end_image === 'string') {
       result.end_image = result.end_image.replace('http://', 'https://')
     }
+
     return result
   }
 

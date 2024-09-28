@@ -4,7 +4,6 @@ import FileCopy from '@mui/icons-material/FileCopy'
 import Grid from '@mui/material/Unstable_Grid2'
 import Typography from '@mui/material/Typography'
 import IconButton from '@mui/material/IconButton'
-
 import { useMemory } from '@store/useMemory'
 import { useWebhookStore } from '@store/useWebhookStore'
 
@@ -18,9 +17,10 @@ export const ProfileView = ({
   const profile = useWebhookStore((s) => s.profile.find((p) => p.uid === uid))
 
   if (!profile) return null
+
   return (
     <>
-      <Grid xs={6} sm={2}>
+      <Grid sm={2} xs={6}>
         <Typography variant="h6">{profile.name}</Typography>
       </Grid>
       {isMobile && (
@@ -29,7 +29,7 @@ export const ProfileView = ({
           profileNo={profile.profile_no}
         />
       )}
-      <Grid xs={12} sm={6}>
+      <Grid sm={6} xs={12}>
         {profile.active_hours.map((schedule) => (
           <ActiveHourChip key={schedule.id} uid={uid} {...schedule} />
         ))}
@@ -52,17 +52,17 @@ const Inputs = ({
 
   return (
     <Grid sm={4} textAlign="right">
-      <IconButton onClick={handleViewChange('edit')} size="large">
+      <IconButton size="large" onClick={handleViewChange('edit')}>
         <MoreTimeIcon />
       </IconButton>
       <IconButton
-        onClick={handleViewChange('delete')}
         disabled={profileNo === currentProfileNo}
         size="large"
+        onClick={handleViewChange('delete')}
       >
         <DeleteForever />
       </IconButton>
-      <IconButton onClick={handleViewChange('copy')} size="large">
+      <IconButton size="large" onClick={handleViewChange('copy')}>
         <FileCopy />
       </IconButton>
     </Grid>

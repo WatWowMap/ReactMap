@@ -14,10 +14,10 @@ export function TabPanel({
 }) {
   return (
     <Box
-      role="tabpanel"
-      hidden={value !== index}
       height="100%"
+      hidden={value !== index}
       p={disablePadding ? 0 : 2}
+      role="tabpanel"
     >
       {children}
     </Box>

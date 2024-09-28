@@ -39,6 +39,7 @@ class Trial extends Logger {
         )
       }
       const diff = endDate.getTime() - startDate.getTime()
+
       while (
         startDate.getTime() < Date.now() &&
         endDate.getTime() < Date.now()
@@ -53,6 +54,7 @@ class Trial extends Logger {
     }
 
     const now = Date.now()
+
     this._active = startDate.getTime() < now && endDate.getTime() > now
     if (this._active) {
       this.log.info('found active trial')
@@ -92,12 +94,15 @@ class Trial extends Logger {
   static getJsDate(dateObj) {
     if (!dateObj) {
       log.debug('date object is null')
+
       return new Date(0)
     }
     if (!dateObj.year || !dateObj.month || !dateObj.day) {
       log.debug('date object is missing required fields')
+
       return new Date(0)
     }
+
     return new Date(
       dateObj.year,
       dateObj.month - 1,
@@ -131,6 +136,7 @@ class Trial extends Logger {
 
   status() {
     const now = Date.now()
+
     return {
       active: this.active(),
       start: {
@@ -161,6 +167,7 @@ class Trial extends Logger {
   async cleanup() {
     if (!this.active()) {
       const result = await state.db.models.Session.clearTrial(this._name)
+
       if (result > 0) {
         this.log.info('cleaned up', result, 'sessions')
       }
@@ -174,6 +181,7 @@ class Trial extends Logger {
   setActive(force) {
     this._forceActive = force
     this.log.info('force', force ? 'starting' : 'stopping')
+
     return this.#getClearFn(force)()
   }
 }

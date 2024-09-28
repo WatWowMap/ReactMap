@@ -20,6 +20,7 @@ if (process.env.NODE_CONFIG_ENV) {
 }
 
 const { setGlobalLogLevel, TAGS, log } = require('@rm/logger')
+
 const { applyMutations } = require('./mutations')
 
 function purge() {
@@ -33,6 +34,7 @@ function purge() {
   delete require.cache[require.resolve('@rm/config')]
 }
 
+// eslint-disable-next-line import/order
 const config = require('config')
 
 config.getSafe = function getSafe(key) {
@@ -45,9 +47,11 @@ config.reload = function reload() {
   try {
     purge()
     log.info(TAGS.config, 'config purged, returning old reference')
+
     return this
   } catch (e) {
     log.error(TAGS.config, 'error reloading config', e)
+
     return this
   }
 }

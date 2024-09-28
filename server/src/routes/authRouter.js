@@ -1,7 +1,6 @@
 // @ts-check
 const authRouter = require('express').Router()
 const passport = require('passport')
-
 const config = require('@rm/config')
 const { log, TAGS } = require('@rm/logger')
 
@@ -16,6 +15,7 @@ const loadAuthStrategies = () => {
       strategy.type === 'discord' || strategy.type === 'telegram'
         ? 'get'
         : 'post'
+
     if (strategy.enabled) {
       const name = strategy.name ?? `${strategy.type}-${i}`
       const callbackOptions = {}
@@ -23,6 +23,7 @@ const loadAuthStrategies = () => {
         failureRedirect: '/',
         successRedirect: '/',
       }
+
       if (strategy.type === 'discord') {
         callbackOptions.prompt = strategy.clientPrompt
       }
@@ -48,6 +49,7 @@ const loadAuthStrategies = () => {
               try {
                 return req.login(user, async () => {
                   const { id } = user
+
                   if (!(await state.db.models.Session.isValidSession(id))) {
                     log.info(
                       TAGS.auth,
@@ -58,6 +60,7 @@ const loadAuthStrategies = () => {
                       req.sessionID,
                     )
                   }
+
                   return res.redirect('/')
                 })
               } catch (error) {

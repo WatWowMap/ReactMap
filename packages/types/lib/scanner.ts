@@ -9,7 +9,6 @@ import type { Spawnpoint as SpawnpointModel } from '@rm/server/src/models/Spawnp
 import type { Weather as WeatherModel } from '@rm/server/src/models/Weather'
 import type { Route as RouteModel } from '@rm/server/src/models/Route'
 import type { Station as StationModel } from '@rm/server/src/models/Station'
-
 import type { S2Polygon } from './general'
 import type { FullModel } from './utility'
 

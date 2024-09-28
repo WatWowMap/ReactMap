@@ -3,7 +3,6 @@ import ListItem from '@mui/material/ListItem'
 import ListItemText from '@mui/material/ListItemText'
 import MenuItem from '@mui/material/MenuItem'
 import { useTranslation } from 'react-i18next'
-
 import { useMemory } from '@store/useMemory'
 import { useStorage, useDeepStore } from '@store/useStorage'
 import { FCSelect } from '@components/inputs/FCSelect'
@@ -22,9 +21,9 @@ const RaidOverride = () => {
       <ListItem
         secondaryAction={
           <FCSelect
-            value={filters}
             fullWidth
             size="small"
+            value={filters}
             onChange={(e) =>
               setFilters(e.target.value === 'all' ? 'all' : e.target.value)
             }
@@ -52,22 +51,23 @@ const RaidQuickSelect = () => {
   const enabled = useStorage(
     (s) => !!(s.filters?.gyms?.raids && s.filters?.gyms?.raidTier === 'all'),
   )
+
   return (
     <CollapsibleItem open={enabled}>
       <MultiSelectorList tabKey="raids">
         <SelectorListMemo
           key="eggs"
           category="gyms"
-          subCategory="raids"
-          label="search_eggs"
           height={350}
+          label="search_eggs"
+          subCategory="raids"
         />
         <SelectorListMemo
           key="raids"
           category="gyms"
-          subCategory="pokemon"
-          label="search_raids"
           height={350}
+          label="search_raids"
+          subCategory="pokemon"
         />
       </MultiSelectorList>
     </CollapsibleItem>

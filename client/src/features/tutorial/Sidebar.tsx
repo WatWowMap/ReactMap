@@ -14,7 +14,6 @@ import Switch from '@mui/material/Switch'
 import DialogContent from '@mui/material/DialogContent'
 import Typography from '@mui/material/Typography'
 import { useTranslation } from 'react-i18next'
-
 import { useMemory } from '@store/useMemory'
 import { toggleDialog } from '@store/useLayoutStore'
 import { camelToSnake } from '@utils/strings'
@@ -42,18 +41,18 @@ export function TutorialSidebar() {
     <DialogContent>
       <Grid
         container
-        direction="row"
         alignItems="center"
+        direction="row"
+        height="100%"
         justifyContent="center"
         spacing={2}
-        height="100%"
       >
-        <Grid xs={8} textAlign="center">
-          <Typography variant={isMobile ? 'subtitle2' : 'h6'} align="center">
+        <Grid textAlign="center" xs={8}>
+          <Typography align="center" variant={isMobile ? 'subtitle2' : 'h6'}>
             {t('tutorial_sidebar_0')}
           </Typography>
         </Grid>
-        <Grid xs={4} textAlign="center">
+        <Grid textAlign="center" xs={4}>
           <Fab color="primary">
             <Menu />
           </Fab>
@@ -61,8 +60,8 @@ export function TutorialSidebar() {
         <Grid xs={12}>
           <Divider light />
         </Grid>
-        <Grid xs={12} whiteSpace="pre-line">
-          <Typography variant="subtitle1" align="center" gutterBottom>
+        <Grid whiteSpace="pre-line" xs={12}>
+          <Typography gutterBottom align="center" variant="subtitle1">
             {t('tutorial_sidebar_1')}
           </Typography>
         </Grid>
@@ -72,6 +71,7 @@ export function TutorialSidebar() {
               if (subItem === 'filter') {
                 return null
               }
+
               return (
                 <ListItem key={subItem}>
                   <ListItemText primary={t(camelToSnake(subItem))} />
@@ -88,8 +88,8 @@ export function TutorialSidebar() {
               )
             })}
             <ListItemButton
-              onClick={toggleDialog(true, 'pokestops', 'options')}
               disabled={!permCheck}
+              onClick={toggleDialog(true, 'pokestops', 'options')}
             >
               <ListItemIcon>
                 <Settings color="secondary" />
@@ -97,8 +97,8 @@ export function TutorialSidebar() {
               <ListItemText primary={t('options')} />
             </ListItemButton>
             <ListItemButton
-              onClick={toggleDialog(true, 'pokestops', 'filters')}
               disabled={!permCheck}
+              onClick={toggleDialog(true, 'pokestops', 'filters')}
             >
               <ListItemIcon>
                 <TuneIcon color="primary" />
@@ -107,8 +107,8 @@ export function TutorialSidebar() {
             </ListItemButton>
           </List>
         </Grid>
-        <Grid xs={12} whiteSpace="pre-line">
-          <Typography variant="subtitle1" align="center" gutterBottom>
+        <Grid whiteSpace="pre-line" xs={12}>
+          <Typography gutterBottom align="center" variant="subtitle1">
             {t('tutorial_sidebar_2')}
           </Typography>
         </Grid>

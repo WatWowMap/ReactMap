@@ -1,9 +1,7 @@
 import * as React from 'react'
 import { useQuery, useLazyQuery } from '@apollo/client'
-
 import { useMemory } from '@store/useMemory'
 import { useStorage } from '@store/useStorage'
-
 import { SCANNER_CONFIG, SCANNER_STATUS } from '@services/queries/scanner'
 
 import { ScanNext } from './scanNext'
@@ -64,6 +62,7 @@ function BaseScanOnDemand({
         validCoords.filter(Boolean).length *
         1000 +
       Date.now()
+
     useScannerSessionStorage.setState({ cooldown })
     setScanMode(`${mode}Mode`, 'loading')
     scan({
@@ -107,6 +106,7 @@ function BaseScanOnDemand({
 
   React.useEffect(() => {
     const { scanNextMode, scanZoneMode } = useScanStore.getState()
+
     if (scanNextMode === '' && scanZoneMode === '') {
       useScanStore.setState({ scanLocation: location })
     }
@@ -139,9 +139,11 @@ function BaseScanOnDemand({
                 next.scanZoneSize,
               )
             : getScanNextCoords(next.scanLocation, next.scanNextSize)
+
         useScanStore.setState({ scanCoords })
       }
     })
+
     return () => {
       subscription()
     }

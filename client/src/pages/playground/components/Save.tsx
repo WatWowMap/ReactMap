@@ -5,7 +5,6 @@ import ListItemText from '@mui/material/ListItemText'
 import SaveIcon from '@mui/icons-material/Save'
 import { useMutation } from '@apollo/client'
 import { useTranslation } from 'react-i18next'
-
 import { SAVE_COMPONENT } from '@services/queries/config'
 
 import { usePlayStore } from '../hooks/store'
@@ -19,6 +18,7 @@ export function Save() {
 
   const handleSave = () => {
     const { code, component } = usePlayStore.getState()
+
     sendSave({ variables: { code, component } })
   }
 
@@ -35,7 +35,7 @@ export function Save() {
   }, [loading, error, data])
 
   return (
-    <MenuItem dense onClick={handleSave} disabled={!valid}>
+    <MenuItem dense disabled={!valid} onClick={handleSave}>
       <ListItemIcon>
         <SaveIcon />
       </ListItemIcon>

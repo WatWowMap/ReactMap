@@ -2,7 +2,6 @@ import MenuItem from '@mui/material/MenuItem'
 import CircularProgress from '@mui/material/CircularProgress'
 import { useTranslation } from 'react-i18next'
 import { useMutation } from '@apollo/client'
-
 import {
   WEBHOOK_AREAS,
   WEBHOOK_CATEGORIES,
@@ -42,6 +41,7 @@ export function HookSelection() {
     <CircularProgress />
   ) : (
     <FCSelect
+      fcSx={{ m: 1, width: '90%' }}
       label={t('select_webhook')}
       value={selected}
       onChange={(e) => {
@@ -51,7 +51,6 @@ export function HookSelection() {
             useWebhookStore.setState({ human: data.webhook.human }),
         )
       }}
-      fcSx={{ m: 1, width: '90%' }}
     >
       {webhooks.map((webhook) => (
         <MenuItem key={webhook} value={webhook}>

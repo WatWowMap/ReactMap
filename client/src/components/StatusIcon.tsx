@@ -25,10 +25,12 @@ export const StatusIcon = React.forwardRef<SVGSVGElement, StatusIconProps>(
     ref,
   ) =>
     status === null ? (
-      <RuleIcon color={partialColor} ref={ref} {...props} />
+      <RuleIcon ref={ref} color={partialColor} {...props} />
     ) : status ? (
-      <CheckIcon color={checkColor} ref={ref} {...props} />
+      <CheckIcon ref={ref} color={checkColor} {...props} />
     ) : (
-      <ClearIcon color={clearColor} ref={ref} {...props} />
+      <ClearIcon ref={ref} color={clearColor} {...props} />
     ),
 )
+
+StatusIcon.displayName = 'StatusIcon'

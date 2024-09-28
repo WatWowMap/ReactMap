@@ -1,5 +1,4 @@
 import { Navigate, useParams } from 'react-router-dom'
-
 import { useMemory } from '@store/useMemory'
 
 import { Container } from './components/Container'
@@ -13,9 +12,11 @@ export function MapPage() {
     if ((params.category && params.id) || (params.lat && params.lon)) {
       localStorage.setItem('params', JSON.stringify(params))
     }
+
     return <Navigate to="/login" />
   }
   const cachedParams = JSON.parse(localStorage.getItem('params'))
+
   if (cachedParams) {
     localStorage.removeItem('params')
     const url = cachedParams.category
@@ -23,6 +24,7 @@ export function MapPage() {
           cachedParams.zoom || 18
         }`
       : `/@/${cachedParams.lat}/${cachedParams.lon}/${cachedParams.zoom || 18}`
+
     return <Navigate to={url} />
   }
   if (params.category) {
@@ -32,5 +34,6 @@ export function MapPage() {
       </WebhookQuery>
     )
   }
+
   return <Container />
 }

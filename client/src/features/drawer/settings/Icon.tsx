@@ -6,12 +6,13 @@ export function SettingIcon({
   ...props
 }: React.ImgHTMLAttributes<HTMLImageElement>) {
   const darkMode = useStorage((s) => s.darkMode)
+
   return (
     <img
-      src={src}
       alt={alt}
-      width={24}
       className={darkMode ? '' : 'darken-image'}
+      src={src}
+      width={24}
       {...props}
     />
   )

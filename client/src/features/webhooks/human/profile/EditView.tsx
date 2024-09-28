@@ -8,7 +8,6 @@ import IconButton from '@mui/material/IconButton'
 import OutlinedInput from '@mui/material/OutlinedInput'
 import { useTranslation } from 'react-i18next'
 import { useMutation } from '@apollo/client'
-
 import { ALL_PROFILES, SET_PROFILE } from '@services/queries/webhook'
 import { useWebhookStore } from '@store/useWebhookStore'
 
@@ -30,10 +29,12 @@ export const EditView = ({
   })
   const handleEdit = React.useCallback((event) => {
     const { name, value } = event.target
+
     if (name === 'day') {
       setNewActiveHours((prev) => ({ ...prev, day: +value }))
     } else {
       const [hours, mins] = value.split(':')
+
       setNewActiveHours((prev) => ({ ...prev, hours, mins }))
     }
   }, [])
@@ -47,6 +48,7 @@ export const EditView = ({
         { ...newActiveHours, id: `${uid}_${active.active_hours.length}` },
       ],
     }
+
     useWebhookStore.setState({ profileLoading: uid })
     save({
       variables: {
@@ -62,33 +64,33 @@ export const EditView = ({
     <>
       <Grid xs={4}>
         <Select
+          fullWidth
           name="day"
           value={newActiveHours.day}
           onChange={handleEdit}
-          fullWidth
         >
           {[1, 2, 3, 4, 5, 6, 7].map((day) => (
-            <MenuItem key={day} value={day} dense>
+            <MenuItem key={day} dense value={day}>
               {t(`day_${day}`)}
             </MenuItem>
           ))}
         </Select>
       </Grid>
-      <Grid xs={4} pl={3}>
+      <Grid pl={3} xs={4}>
         <OutlinedInput
-          name="time"
           color="secondary"
-          value={`${newActiveHours.hours}:${newActiveHours.mins}`}
-          onChange={handleEdit}
+          name="time"
           size="small"
           type="time"
+          value={`${newActiveHours.hours}:${newActiveHours.mins}`}
+          onChange={handleEdit}
         />
       </Grid>
-      <Grid xs={4} sm={2} textAlign="right">
-        <IconButton onClick={handleViewChange('profile')} size="large">
+      <Grid sm={2} textAlign="right" xs={4}>
+        <IconButton size="large" onClick={handleViewChange('profile')}>
           <Clear />
         </IconButton>
-        <IconButton onClick={handleAdd} size="large">
+        <IconButton size="large" onClick={handleAdd}>
           <Save />
         </IconButton>
       </Grid>

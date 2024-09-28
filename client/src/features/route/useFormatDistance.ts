@@ -1,5 +1,4 @@
 import { useTranslation } from 'react-i18next'
-
 import { formatDistance } from '@utils/formatDistance'
 import { useStorage } from '@store/useStorage'
 

@@ -1,5 +1,4 @@
 import { Icon, divIcon } from 'leaflet'
-
 import { useMemory } from '@store/useMemory'
 
 export const basicPokemonMarker = ({

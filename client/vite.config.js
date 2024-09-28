@@ -1,16 +1,17 @@
 // @ts-check
 
+const path = require('path')
+const fs = require('fs')
+
 const { defineConfig, loadEnv, createLogger } = require('vite')
 const { default: react } = require('@vitejs/plugin-react-swc')
 const { default: checker } = require('vite-plugin-checker')
 const removeFiles = require('rollup-plugin-delete')
-const path = require('path')
-const fs = require('fs')
 const { sentryVitePlugin } = require('@sentry/vite-plugin')
-
 const config = require('@rm/config')
 const { log, TAGS } = require('@rm/logger')
 const { locales, status } = require('@rm/locales')
+
 const { customFilePlugin } = require('./plugins/customFile')
 const { localePlugin } = require('./plugins/locale')
 const { publicPlugin } = require('./plugins/public')
@@ -32,6 +33,7 @@ const viteConfig = defineConfig(({ mode }) => {
   )
   const hasCustom = (function checkFolders(folder, isCustom = false) {
     const files = fs.readdirSync(folder)
+
     for (let i = 0; i < files.length; i += 1) {
       if (isCustom) return true
       if (files[i].startsWith('.')) continue
@@ -39,6 +41,7 @@ const viteConfig = defineConfig(({ mode }) => {
         isCustom = checkFolders(`${folder}/${files[i]}`, isCustom)
       if (/\.custom.(jsx?|css)$/.test(files[i])) return true
     }
+
     return isCustom
   })(path.join(__dirname, 'src'))
 
@@ -54,6 +57,7 @@ const viteConfig = defineConfig(({ mode }) => {
   }
 
   const sentry = config.sentry.client
+
   sentry.enabled = sentry.enabled || !!env.SENTRY_DSN
   if (env.SENTRY_AUTH_TOKEN) sentry.authToken = env.SENTRY_AUTH_TOKEN
   if (env.SENTRY_ORG) sentry.org = env.SENTRY_ORG
@@ -69,6 +73,7 @@ const viteConfig = defineConfig(({ mode }) => {
       process.env.NODE_CONFIG_ENV ? `-${process.env.NODE_CONFIG_ENV}` : ''
     }`,
   )
+
   return {
     root: __dirname,
     mode,

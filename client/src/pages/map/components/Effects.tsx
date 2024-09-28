@@ -3,14 +3,13 @@ import { useParams } from 'react-router-dom'
 import { useMap } from 'react-leaflet'
 import { useTranslation } from 'react-i18next'
 import useMediaQuery from '@mui/material/useMediaQuery'
-
 import { useMapData } from '@hooks/useMapData'
 import { useMemory } from '@store/useMemory'
+import { Theme } from '@mui/material'
 
 import { useGenGyms } from '../hooks/useGenGyms'
 import { useGenPokestops } from '../hooks/useGenPokestops'
 import { useGenPokemon } from '../hooks/useGenPokemon'
-import { Theme } from '@mui/material'
 
 export function Effects() {
   const params = useParams()
@@ -35,6 +34,7 @@ export function Effects() {
       const lat = Number(params.lat) || map.getCenter().lat
       const lon = Number(params.lon) || map.getCenter().lng
       const zoom = Number(params.zoom) || map.getZoom()
+
       map.setView([lat, lon], zoom)
     }
   }, [params.lat, params.lon, params.zoom])

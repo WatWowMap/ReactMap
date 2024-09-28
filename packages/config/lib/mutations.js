@@ -20,8 +20,10 @@ const applyMutations = (config) => {
       .getConfigSources()
       .find(({ name }) => name.endsWith('default.json'))?.parsed
   )
+
   if (!defaults) {
     log.error(TAGS.config, 'Could not find default.json')
+
     return
   }
 
@@ -183,6 +185,7 @@ const applyMutations = (config) => {
 
     /** @type {import('@rm/types').Config['map']} */
     const merged = config.util.extendDeep({}, base, input)
+
     if (
       merged.misc.distanceUnit !== 'kilometers' &&
       merged.misc.distanceUnit !== 'miles'
@@ -252,6 +255,7 @@ const applyMutations = (config) => {
   const hasLittle = config.api.pvp.leagues.find(
     (league) => league.name === 'little',
   )
+
   if (hasLittle) {
     config.api.pvp.leagueObj.little = hasLittle.littleCupRules
       ? 500
@@ -317,6 +321,7 @@ const applyMutations = (config) => {
         .filter((strategy) => strategy.enabled)
         .map((strategy) => {
           config.authentication[strategy.name] = strategy
+
           return strategy.type
         }),
     ),
@@ -340,6 +345,7 @@ const applyMutations = (config) => {
           (perm) => config.authentication.perms[perm].enabled,
         )
       )
+
     if (firstRun)
       log.warn(
         TAGS.config,

@@ -1,6 +1,5 @@
 import Map from '@mui/icons-material/Map'
 import IconButton from '@mui/material/IconButton'
-
 import { useMemory } from '@store/useMemory'
 import { useStorage } from '@store/useStorage'
 
@@ -18,14 +17,14 @@ export function Navigation({
 
   return (
     <IconButton
+      disabled={!url}
       href={url
         ?.replace(/\{x\}/g, lat.toString())
         .replace(/\{y\}/g, lon.toString())}
-      target="_blank"
       rel="noreferrer"
       size={size}
-      disabled={!url}
       style={{ color: 'inherit' }}
+      target="_blank"
     >
       <Map />
     </IconButton>

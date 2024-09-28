@@ -40,8 +40,9 @@ export const COLORS = {
 export function ScanRequests() {
   const { t } = useTranslation()
   const amount = useScanStore((s) => s.scanCoords.length)
+
   return (
-    <StyledListItem style={{ margin: 0 }} className="no-leaflet-margin">
+    <StyledListItem className="no-leaflet-margin" style={{ margin: 0 }}>
       <ListItemText secondary={`${t('scan_requests')}:`} />
       <StyledListItemText secondary={amount} />
     </StyledListItem>
@@ -51,6 +52,7 @@ export function ScanRequests() {
 export function ScanQueue() {
   const { t } = useTranslation()
   const queue = useScanStore((s) => s.queue)
+
   return (
     <StyledListItem className="no-leaflet-margin">
       <ListItemText secondary={`${t('scan_queue')}:`} />
@@ -76,6 +78,7 @@ export function ScanConfirm({
       const interval = setTimeout(() => {
         setRemainder(cooldown - Date.now())
       }, 1000)
+
       return () => clearTimeout(interval)
     }
     setRemainder(0)
@@ -111,6 +114,7 @@ export function ScanConfirm({
 export function InAllowedArea() {
   const { t } = useTranslation()
   const valid = useScanStore((s) => s.valid)
+
   return {
     none: <StyledListItemText secondary={t('scan_outside_area')} />,
     some: <StyledListItemText secondary={t('scan_some_outside_area')} />,
@@ -124,6 +128,7 @@ export function ScanCancel({
   mode: import('./hooks/store').ScanMode
 }) {
   const { t } = useTranslation()
+
   return (
     <StyledListButton onClick={() => setScanMode(`${mode}Mode`, '')}>
       <ListItemIcon>
@@ -147,11 +152,11 @@ export function ScanCircle({
 }) {
   return (
     <Circle
-      radius={radius}
       center={[lat, lon]}
-      fillOpacity={0.1}
       color={color}
       fillColor={color}
+      fillOpacity={0.1}
+      radius={radius}
     />
   )
 }
@@ -162,6 +167,7 @@ export function ScanCircles({ radius }: { radius?: number }) {
   const validCoords = useScanStore((s) => s.validCoords)
 
   const finalRadius = radius || userRadius
+
   return scanCoords.map((coords, i) => {
     const finalColor =
       finalRadius <= 70
@@ -171,13 +177,14 @@ export function ScanCircles({ radius }: { radius?: number }) {
         : validCoords[i]
           ? COLORS.blue
           : COLORS.red
+
     return (
       <ScanCircle
         key={`${coords.join('')}${finalColor}`}
-        radius={finalRadius}
+        color={finalColor}
         lat={coords[0]}
         lon={coords[1]}
-        color={finalColor}
+        radius={finalRadius}
       />
     )
   })

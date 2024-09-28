@@ -2,7 +2,6 @@ import * as React from 'react'
 import { useMap, GeoJSON } from 'react-leaflet'
 import Supercluster from 'supercluster'
 import { marker, divIcon, point } from 'leaflet'
-
 import { useMemory } from '@store/useMemory'
 import { useStorage } from '@store/useStorage'
 import { Notification } from '@components/Notification'
@@ -27,6 +26,7 @@ function createClusterIcon(
     className: `marker-cluster marker-cluster-${size}`,
     iconSize: point(40, 40),
   })
+
   return marker(latlng, { icon })
 }
 
@@ -118,8 +118,10 @@ export function Clustering({
 
       const newClusters: typeof rawClusters = []
       const newMarkers = new Set()
+
       for (let i = 0; i < rawClusters.length; i += 1) {
         const cluster = rawClusters[i]
+
         if (cluster.properties.cluster) {
           newClusters.push(cluster)
         } else {
@@ -131,6 +133,7 @@ export function Clustering({
     } else {
       setMarkers(new Set())
     }
+
     return () => {
       featureRef.current?.clearLayers()
     }
@@ -144,8 +147,6 @@ export function Clustering({
         : children}
       {limitHit && (
         <Notification
-          open={!!limitHit}
-          severity="warning"
           i18nKey="cluster_limit"
           messages={[
             {
@@ -157,6 +158,8 @@ export function Clustering({
               variables: [],
             },
           ]}
+          open={!!limitHit}
+          severity="warning"
         />
       )}
     </>

@@ -3,7 +3,6 @@ import Button from '@mui/material/Button'
 import ButtonGroup from '@mui/material/ButtonGroup'
 import ListItem from '@mui/material/ListItem'
 import { useTranslation } from 'react-i18next'
-
 import { SCAN_SIZES } from '@assets/constants'
 
 import { useScanStore } from '../hooks/store'
@@ -21,13 +20,13 @@ export function ScanNextPopup() {
 
   return (
     <ListItem>
-      <ButtonGroup size="small" fullWidth>
+      <ButtonGroup fullWidth size="small">
         {SCAN_SIZES.map((size) => (
           <Button
             key={size}
-            onClick={setSize(size)}
             color={size === scanNextSize ? 'primary' : 'secondary'}
             variant={size === scanNextSize ? 'contained' : 'outlined'}
+            onClick={setSize(size)}
           >
             {t(size)}
           </Button>

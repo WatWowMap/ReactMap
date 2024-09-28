@@ -6,7 +6,6 @@ import Typography from '@mui/material/Typography'
 import IconButton from '@mui/material/IconButton'
 import Checkbox from '@mui/material/Checkbox'
 import Box from '@mui/material/Box'
-
 import { useMemory } from '@store/useMemory'
 import { apolloClient, apolloCache } from '@services/apollo'
 import * as webhookNodes from '@services/queries/webhook'
@@ -57,28 +56,28 @@ export function TrackedTile({ index }) {
   return (
     <Grid2
       container
-      xs={12}
+      alignItems="center"
       bgcolor={getTileBackground(1, index)}
       justifyContent="center"
-      alignItems="center"
       py={1}
+      xs={12}
     >
-      <Grid2 xs={2} sm={1}>
+      <Grid2 sm={1} xs={2}>
         <img
-          src={useMemory.getState().Icons.getIconById(id)}
           alt={id}
+          src={useMemory.getState().Icons.getIconById(id)}
           style={{ maxWidth: 40, maxHeight: 40 }}
         />
       </Grid2>
-      <Grid2 xs={6} sm={8} md={9}>
+      <Grid2 md={9} sm={8} xs={6}>
         <Typography variant="caption">
           {item.description || Poracle.generateDescription(item, category)}
         </Typography>
       </Grid2>
-      <Grid2 xs={4} sm={3} md={2} textAlign="right">
+      <Grid2 md={2} sm={3} textAlign="right" xs={4}>
         <IconButton
-          size="small"
           disabled={!item.uid}
+          size="small"
           onClick={() =>
             useWebhookStore.setState({
               advanced: {
@@ -95,8 +94,8 @@ export function TrackedTile({ index }) {
           <Edit />
         </IconButton>
         <IconButton
-          size="small"
           disabled={!item.uid}
+          size="small"
           onClick={() => {
             useWebhookStore.setState((prev) => ({
               [category]: prev[category].filter((x) => x.uid !== item.uid),
@@ -122,11 +121,11 @@ export function TrackedTile({ index }) {
           <DeleteForever />
         </IconButton>
         <Checkbox
-          size="small"
-          disabled={!item.uid}
           checked={!!selected}
-          onChange={setSelected(item.uid)}
           color="secondary"
+          disabled={!item.uid}
+          size="small"
+          onChange={setSelected(item.uid)}
         />
       </Grid2>
     </Grid2>

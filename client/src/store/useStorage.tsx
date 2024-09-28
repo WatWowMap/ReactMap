@@ -1,10 +1,10 @@
+import type { AllFilters, ObjectPathValue, OnlyType, Paths } from '@rm/types'
+
 import dlv from 'dlv'
 import { useMemo } from 'react'
 import { create } from 'zustand'
 import { persist, createJSONStorage } from 'zustand/middleware'
-
 import { setDeep } from '@utils/setDeep'
-import type { AllFilters, ObjectPathValue, OnlyType, Paths } from '@rm/types'
 
 export interface UseStorage {
   darkMode: boolean
@@ -106,6 +106,7 @@ export const useStorage = create<UseStorage>()(
       },
       getPokemonFilterMode: () => {
         const { filters, userSettings } = get()
+
         return filters?.pokemon?.easyMode &&
           !userSettings?.pokemon?.legacyFilter
           ? 'basic'
@@ -231,6 +232,7 @@ export function useDeepStore<
               : args[1]
 
           if (process.env.NODE_ENV === 'development' && prev.stateTraceLog) {
+            // eslint-disable-next-line no-console
             console.trace(field, {
               first,
               rest,

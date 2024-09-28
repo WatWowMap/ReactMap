@@ -7,7 +7,6 @@ import OutlinedInput from '@mui/material/OutlinedInput'
 import Typography from '@mui/material/Typography'
 import { Circle, Marker, Popup, useMap } from 'react-leaflet'
 import { useTranslation } from 'react-i18next'
-
 import { fallbackMarker } from '@assets/fallbackMarker'
 import { useWebhookStore } from '@store/useWebhookStore'
 
@@ -27,6 +26,7 @@ export function WebhookMarker() {
         dragend({ target }) {
           if (target) {
             const { lat, lng } = target.getLatLng()
+
             map.flyTo([lat, lng])
             setPosition([lat, lng])
           }
@@ -51,40 +51,41 @@ export function WebhookMarker() {
   }, [webhookMode])
 
   if (webhookMode !== 'location') return null
+
   return (
     <>
       <Marker
-        draggable
-        eventHandlers={eventHandlers}
         ref={(ref) => {
           if (ref) ref.openPopup()
         }}
-        position={position}
+        draggable
+        eventHandlers={eventHandlers}
         icon={fallbackMarker}
+        position={position}
       >
-        <Popup minWidth={90} maxWidth={150}>
+        <Popup maxWidth={150} minWidth={90}>
           <Grid
             container
             alignItems="center"
-            justifyContent="center"
             direction="column"
+            justifyContent="center"
             spacing={2}
           >
             <Grid>
-              <Typography variant="subtitle2" align="center">
+              <Typography align="center" variant="subtitle2">
                 {t('drag_and_drop')}
               </Typography>
             </Grid>
             <Grid textAlign="center">
               <FormControl variant="outlined">
                 <OutlinedInput
-                  value={radius}
-                  type="number"
-                  onChange={(e) =>
-                    setRadius(+e.target.value.replace(/[^0-9.]/g, '') || '')
-                  }
                   endAdornment={
                     <InputAdornment position="end">{t('m')}</InputAdornment>
+                  }
+                  type="number"
+                  value={radius}
+                  onChange={(e) =>
+                    setRadius(+e.target.value.replace(/[^0-9.]/g, '') || '')
                   }
                 />
               </FormControl>
@@ -107,7 +108,7 @@ export function WebhookMarker() {
           </Grid>
         </Popup>
       </Marker>
-      <Circle radius={radius || 0} center={position} />
+      <Circle center={position} radius={radius || 0} />
     </>
   )
 }

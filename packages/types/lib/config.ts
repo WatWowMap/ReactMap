@@ -1,9 +1,7 @@
 import type { LogLevelNames } from 'loglevel'
-import type { DialogProps, SxProps } from '@mui/material'
+import type { DialogProps } from '@mui/material'
 import type { UiconsIndex } from 'uicons.js'
-
 import type { CustomComponent } from './blocks'
-
 import type { Schema } from './server'
 import type { DeepMerge, ComparisonReport } from './utility'
 import type { Strategy } from './general'

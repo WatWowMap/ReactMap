@@ -1,7 +1,6 @@
 import * as React from 'react'
 import Typography from '@mui/material/Typography'
 import { useTranslation } from 'react-i18next'
-
 import { ErrorBoundary } from '@components/ErrorBoundary'
 import { useAnalytics } from '@hooks/useAnalytics'
 import { getTimeUntil } from '@utils/getTimeUntil'
@@ -18,7 +17,7 @@ export function DevicePopup({
 
   return (
     <ErrorBoundary noRefresh variant="h5">
-      <Typography variant="h6" align="center">
+      <Typography align="center" variant="h6">
         {device.id}
       </Typography>
       <Typography variant="subtitle2">
@@ -28,9 +27,9 @@ export function DevicePopup({
       </Typography>
       <Timer device={device} t={t} ts={ts} />
       <Typography
-        variant="subtitle1"
-        color={isOnline ? 'success' : 'error'}
         align="center"
+        color={isOnline ? 'success' : 'error'}
+        variant="subtitle1"
       >
         {t(isOnline ? 'online' : 'offline')}
       </Typography>
@@ -47,6 +46,7 @@ const Timer = ({ device, t, ts }) => {
     const timer = setTimeout(() => {
       setSince(getTimeUntil(lastSeen))
     }, 1000)
+
     return () => clearTimeout(timer)
   })
 

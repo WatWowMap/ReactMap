@@ -12,6 +12,7 @@ function scannerPerms(roles, provider, trialActive = false) {
   const scanner = config.getSafe('scanner')
 
   const perms = []
+
   roles.forEach((role) => {
     Object.keys(scanner).forEach((mode) => {
       if (
@@ -25,6 +26,7 @@ function scannerPerms(roles, provider, trialActive = false) {
       }
     })
   })
+
   return [...new Set(perms)]
 }
 

@@ -1,5 +1,4 @@
 import { t } from 'i18next'
-
 import { useWebhookStore } from '@store/useWebhookStore'
 
 export class Poracle {
@@ -131,6 +130,7 @@ export class Poracle {
         if (idObj.id === 'gold-stop') return ['gold_stop']
         if (idObj.id === 'kecleon') return ['poke_352']
         if (idObj.id === 'showcase') return ['showcase']
+
         return idObj.id === '0' ? ['poke_global'] : [`grunt_a_${idObj.id}`]
       case 'lure':
         return [`lure_${idObj.id}`]
@@ -149,12 +149,14 @@ export class Poracle {
 
   static reactMapFriendly(values) {
     const reactMapFriendly = {}
+
     if (!values) return reactMapFriendly
     Object.keys(values).forEach((key) => {
       if (key === 'min_time') {
         reactMapFriendly[key] = values[key]
       } else if (key.startsWith('min')) {
         const trim = key.replace('min_', '')
+
         reactMapFriendly[trim] = [values[`min_${trim}`], values[`max_${trim}`]]
       } else if (key.startsWith('max')) {
         // do nothing, handled above
@@ -173,6 +175,7 @@ export class Poracle {
         reactMapFriendly[key] = values[key]
       }
     })
+
     return reactMapFriendly
   }
 
@@ -193,6 +196,7 @@ export class Poracle {
       'pvpEntry',
     ]
     const dupes = {}
+
     switch (category) {
       case 'egg':
         return entries.map((egg) => ({
@@ -232,6 +236,7 @@ export class Poracle {
             if (boss.byDistance === false) {
               boss.distance = 0
             }
+
             return { ...defaults, ...boss }
           })
           .filter((boss) => boss)
@@ -245,6 +250,7 @@ export class Poracle {
               }
               dupes[quest.reward] = true
             }
+
             return {
               ...defaults,
               ...quest,
@@ -271,6 +277,7 @@ export class Poracle {
               'max_size',
             ]
             const newPokemon = {}
+
             if (pkmn.allForms) {
               pkmn.form = 0
               if (dupes[pkmn.pokemon_id]) {
@@ -293,6 +300,7 @@ export class Poracle {
                 (newPokemon[field] =
                   pkmn[field] === undefined ? defaults[field] : pkmn[field]),
             )
+
             return newPokemon
           })
           .filter((pokemon) => pokemon)
@@ -307,6 +315,7 @@ export class Poracle {
    */
   static generateDescription(item, category) {
     const { leagues } = useWebhookStore.getState().context
+
     switch (category) {
       case 'invasion': {
         let name = t(
@@ -320,7 +329,9 @@ export class Poracle {
                   ? `grunt_${item.real_grunt_id}`
                   : 'poke_global',
         )
+
         if (!item.gender) name = name.replace(/\(.+?\)/g, `(${t('all')})`)
+
         return `${name}${item.clean ? ` | ${t('clean')} ` : ''}${
           item.distance ? ` | d${item.distance}` : ''
         }`

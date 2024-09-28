@@ -9,7 +9,6 @@ import Refresh from '@mui/icons-material/Refresh'
 import CopyIcon from '@mui/icons-material/FileCopy'
 import IconButton from '@mui/material/IconButton'
 import { withTranslation } from 'react-i18next'
-
 import { sendError } from '@services/fetches'
 
 import { Notification } from './Notification'
@@ -40,6 +39,7 @@ class ErrorCatcher extends React.Component<
     return 'xxxxxxxx-r2m4-xxxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
       const r = (Math.random() * 16) | 0
       const v = c == 'x' ? r : (r & 0x3) | 0x8
+
       return v.toString(16)
     })
   }
@@ -79,19 +79,19 @@ class ErrorCatcher extends React.Component<
       (process.env.NODE_ENV === 'development' ? 1 : 3) ? (
       <Grid
         container
-        justifyContent="center"
         alignItems="center"
+        justifyContent="center"
         style={this.props.style ?? defaultStyle}
       >
         <Grid xs={12}>
-          <Typography variant={this.props.variant || 'h3'} align="center">
+          <Typography align="center" variant={this.props.variant || 'h3'}>
             {this.props.t('react_error')}
           </Typography>
-          <Typography variant="subtitle2" align="center">
+          <Typography align="center" variant="subtitle2">
             {this.state.message}
           </Typography>
           {this.state.reported && (
-            <Typography variant="subtitle2" align="center">
+            <Typography align="center" variant="subtitle2">
               <br />
               {this.props.t('reported_error')}:
               <br />
@@ -109,10 +109,10 @@ class ErrorCatcher extends React.Component<
               <br />
               <br />
               <Button
-                onClick={() => window.location.reload()}
-                variant="contained"
                 color="primary"
                 startIcon={<Refresh />}
+                variant="contained"
+                onClick={() => window.location.reload()}
               >
                 {this.props.t('refresh')}
               </Button>
@@ -123,9 +123,9 @@ class ErrorCatcher extends React.Component<
               <br />
               <br />
               <Button
-                onClick={() => this.setState({ errorCount: 0 })}
-                variant="contained"
                 color="primary"
+                variant="contained"
+                onClick={() => this.setState({ errorCount: 0 })}
               >
                 {this.props.t('reset')}
               </Button>
@@ -136,8 +136,8 @@ class ErrorCatcher extends React.Component<
     ) : (
       <>
         <Notification
-          open={this.state.errorCount > 0}
           cb={() => this.setState({ errorCount: 0 })}
+          open={this.state.errorCount > 0}
           severity="error"
           title="react_error"
         >

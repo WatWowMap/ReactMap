@@ -11,8 +11,8 @@ export function CollapsibleItem({
   children: React.ReactNode
 } & import('@mui/material').CollapseProps) {
   return (
-    <Collapse in={open} timeout="auto" unmountOnExit {...props}>
-      <List component="div" disablePadding>
+    <Collapse unmountOnExit in={open} timeout="auto" {...props}>
+      <List disablePadding component="div">
         {children}
       </List>
     </Collapse>

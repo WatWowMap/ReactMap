@@ -23,11 +23,15 @@ const Item: React.ComponentType<
   <Grid2 {...context} {...props} ref={ref} />
 ))
 
+Item.displayName = 'Item'
+
 const List: React.ComponentType<
   import('react-virtuoso').GridListProps & { context?: SomeGridProps }
 > = React.forwardRef((props, ref) => (
-  <Grid2 {...props} container alignItems="stretch" ref={ref} />
+  <Grid2 {...props} ref={ref} container alignItems="stretch" />
 ))
+
+List.displayName = 'List'
 
 export function VirtualGrid<T, U extends Record<string, any>>({
   children,
@@ -60,15 +64,16 @@ export function VirtualGrid<T, U extends Record<string, any>>({
     () => ({ List, Item, Header, Footer }),
     [Header, Footer],
   )
+
   return (
     <VirtuosoGrid
+      components={components}
+      context={fullContext}
+      data={data}
+      itemContent={children}
+      overscan={Math.max(1, Math.round(data.length * 0.1))}
       style={STYLE}
       totalCount={data.length}
-      overscan={Math.max(1, Math.round(data.length * 0.1))}
-      data={data}
-      context={fullContext}
-      components={components}
-      itemContent={children}
       useWindowScroll={useWindowScroll}
     />
   )

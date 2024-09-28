@@ -1,5 +1,4 @@
 import Button from '@mui/material/Button'
-
 import { I } from '@components/I'
 
 const THEME_COLORS = new Set([
@@ -23,19 +22,20 @@ export function CustomButton({
   className,
 }: import('@mui/material').ButtonProps & { icon?: string }) {
   const isMuiColor = THEME_COLORS.has(color)
+
   return (
     // TODO: Augment Mui Types
     <Button
-      className={className}
-      size={size}
-      color={isMuiColor ? color : undefined}
       bgcolor={isMuiColor ? undefined : color}
-      variant={variant}
-      style={style}
-      sx={sx}
+      className={className}
+      color={isMuiColor ? color : undefined}
+      size={size}
       startIcon={
         icon ? <I className={icon} style={{ fontSize: 30 }} /> : undefined
       }
+      style={style}
+      sx={sx}
+      variant={variant}
     >
       {children}
     </Button>

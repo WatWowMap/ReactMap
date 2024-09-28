@@ -9,7 +9,6 @@ import Checkbox from '@mui/material/Checkbox'
 import ListItem from '@mui/material/ListItem'
 import List from '@mui/material/List'
 import { useTranslation } from 'react-i18next'
-
 import { useMemory } from '@store/useMemory'
 import { setDeepStore, useStorage } from '@store/useStorage'
 import { analytics } from '@utils/analytics'
@@ -72,18 +71,19 @@ export function OptionCheckbox({
   const checked = useStorage(
     (s) => s.menus[category].filters[subCategory][option] || false,
   )
+
   return (
-    <ListItem disablePadding disableGutters>
+    <ListItem disableGutters disablePadding>
       <FormControlLabel
         control={
           <Checkbox
             checked={checked}
-            onChange={handleChange(category, subCategory)}
             name={option}
+            onChange={handleChange(category, subCategory)}
           />
         }
-        value={option}
         label={t(camelToSnake(option))}
+        value={option}
       />
     </ListItem>
   )
@@ -116,8 +116,8 @@ export function OptionsGroup({
             <OptionsCheckboxMemo
               key={`${category}-${subCategory}-${option}`}
               category={category}
-              subCategory={subCategory}
               option={option}
+              subCategory={subCategory}
             />
           ))}
         </List>

@@ -7,12 +7,12 @@ import { HumanArea } from './area'
 import { Status } from './status'
 
 const BaseHuman = () => (
-  <Grid container justifyContent="flex-start" alignItems="center" spacing={2}>
+  <Grid container alignItems="center" justifyContent="flex-start" spacing={2}>
     <Status />
     <LocationMemo />
     <Divider
-      light
       flexItem
+      light
       sx={{ height: 5, width: '100%', margin: '15px 0px' }}
     />
     <HumanArea />

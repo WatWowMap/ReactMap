@@ -5,10 +5,8 @@ import AppBar from '@mui/material/AppBar'
 import Tabs from '@mui/material/Tabs'
 import Tab from '@mui/material/Tab'
 import Collapse from '@mui/material/Collapse'
-
 import Box from '@mui/material/Box'
 import { useTranslation } from 'react-i18next'
-
 import { useMemory } from '@store/useMemory'
 import { useLayoutStore } from '@store/useLayoutStore'
 import { Footer } from '@components/dialogs/Footer'
@@ -66,6 +64,7 @@ export function Manage() {
         color: 'secondary',
       },
     ]
+
     if (!addNew.open) {
       buttons.push({
         name: 'close',
@@ -75,6 +74,7 @@ export function Manage() {
         color: 'primary',
       })
     }
+
     return buttons
   }, [addNew, categories, category, feedbackLink])
 
@@ -95,6 +95,7 @@ export function Manage() {
         Object.values(tempFilters || {}).filter((x) => x && x.enabled),
         useWebhookStore.getState().context.ui[category].defaults,
       )
+
       apolloClient.mutate({
         // @ts-ignore
         mutation: Query.webhook(category.toUpperCase()),
@@ -134,27 +135,28 @@ export function Manage() {
       ],
       [setAddNew],
     )
+
   return category !== 'human' && addNew.open ? (
     <>
       <Header
-        titles="webhook_selection"
         action={() => setAddNew({ open: false, save: false })}
         names={[category]}
+        titles="webhook_selection"
       />
       <Menu
-        category={Poracle.getMapCategory(category)}
         categories={Poracle.getFilterCategories(category)}
-        webhookCategory={category}
+        category={Poracle.getMapCategory(category)}
         extraButtons={buttons}
+        webhookCategory={category}
       >
-        {(_, key) => <WebhookItem id={key} category={category} caption />}
+        {(_, key) => <WebhookItem caption category={category} id={key} />}
       </Menu>
     </>
   ) : (
     <>
       <Header
-        names={[name]}
         action={setMode}
+        names={[name]}
         titles={[addNew.open ? 'manage_profiles' : 'manage_webhook']}
       />
       <AppBar
@@ -171,18 +173,18 @@ export function Manage() {
           ))}
         </Tabs>
       </AppBar>
-      <DialogContent sx={{ p: 0, minHeight: '70vh' }} ref={dialogRef}>
+      <DialogContent ref={dialogRef} sx={{ p: 0, minHeight: '70vh' }}>
         <Collapse in={!addNew.open}>
           {category !== 'human' && (
-            <Box role="tabpanel" height={height - 76} p={2}>
+            <Box height={height - 76} p={2} role="tabpanel">
               <Tracked category={category} />
             </Box>
           )}
           <Box
-            role="tabpanel"
             height={height - 76}
-            p={4}
             hidden={category !== 'human'}
+            p={4}
+            role="tabpanel"
           >
             <Human />
           </Box>
@@ -191,7 +193,7 @@ export function Manage() {
           {category === 'human' && <ProfileEditing />}
         </Collapse>
       </DialogContent>
-      <Footer options={footerButtons} role="webhook_footer" />
+      <Footer i18nKey="webhook_footer" options={footerButtons} />
     </>
   )
 }
@@ -203,13 +205,14 @@ function TabIcon({
   category: import('@store/useWebhookStore').WebhookStore['category']
 }) {
   const Icons = useMemory((s) => s.Icons)
+
   return category === 'human' ? (
     <Person />
   ) : (
     <img
+      alt={category}
       src={Icons.getMisc(category)}
       style={{ maxWidth: 20, height: 'auto' }}
-      alt={category}
     />
   )
 }

@@ -1,5 +1,4 @@
 import * as React from 'react'
-
 import { useMemory } from '@store/useMemory'
 import { NameTT } from '@components/popups/NameTT'
 import { Img } from '@components/Img'
@@ -26,9 +25,9 @@ export function PokeType({
   return (
     <NameTT title={`poke_type_${id}`}>
       <Img
-        src={url}
         maxHeight={DIMENSIONS[size]}
         maxWidth={DIMENSIONS[size]}
+        src={url}
         sx={STYLE}
       />
     </NameTT>

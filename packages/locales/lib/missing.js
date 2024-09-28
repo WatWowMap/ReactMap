@@ -3,6 +3,7 @@ const { promises: fs } = require('fs')
 const { resolve } = require('path')
 
 const { log, TAGS } = require('@rm/logger')
+
 const { readAndParseJson, readLocaleDirectory } = require('./utils')
 
 /**
@@ -25,14 +26,17 @@ async function missing(fileName) {
           : englishRef[key]
       }
     })
+
   return missingKeys
 }
 
 async function missingAll() {
   const localTranslations = readLocaleDirectory(true)
+
   await Promise.allSettled(
     localTranslations.map(async (fileName) => {
       const missingKeys = await missing(fileName)
+
       await fs.writeFile(
         resolve(
           __dirname,

@@ -1,5 +1,4 @@
 import * as React from 'react'
-
 import { useMemory } from '@store/useMemory'
 import { useStorage } from '@store/useStorage'
 
@@ -29,6 +28,7 @@ const Wayfarer = ({
       ? s.userSettings.wayfarer.darkMapBorder
       : s.userSettings.wayfarer.lightMapBorder,
   )
+
   return (
     <>
       {pois?.map((ring) => (
@@ -47,8 +47,8 @@ const Wayfarer = ({
       {level17Cells?.map((cell) => (
         <S17CellTile
           key={`pc${cell.id}-${cell.polygon.join('-')}`}
-          cellColor={cellColor}
           blockedColor={cellBlocked}
+          cellColor={cellColor}
           {...cell}
         />
       ))}
@@ -56,9 +56,9 @@ const Wayfarer = ({
         <S14CellTile
           key={`tc${cell.id}-${cell.polygon.join('-')}`}
           cellColor={cellColor}
+          noMoreGyms={noMoreGyms}
           oneStopTillNext={oneStopTillNext}
           twoStopsTillNext={twoStopsTillNext}
-          noMoreGyms={noMoreGyms}
           {...cell}
         />
       ))}

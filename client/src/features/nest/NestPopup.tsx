@@ -8,7 +8,6 @@ import MenuItem from '@mui/material/MenuItem'
 import Divider from '@mui/material/Divider'
 import Button from '@mui/material/Button'
 import { useTranslation } from 'react-i18next'
-
 import { useMemory } from '@store/useMemory'
 import { useLayoutStore } from '@store/useLayoutStore'
 import { setDeepStore } from '@store/useStorage'
@@ -18,12 +17,14 @@ import { Navigation } from '@components/popups/Navigation'
 
 const getColor = (timeSince: number) => {
   let color = 'success'
+
   if (timeSince > 604800) {
     color = '#ffeb3b'
   }
   if (timeSince > 1209600) {
     color = 'error'
   }
+
   return color
 }
 
@@ -61,6 +62,7 @@ export function NestPopup({
   const handleExclude = () => {
     setAnchorEl(null)
     const key = `${pokemon_id}-${pokemon_form}`
+
     setDeepStore(`filters.nests.filter.${key}.enabled`, false)
   }
 
@@ -74,25 +76,25 @@ export function NestPopup({
   return (
     <Grid
       container
-      justifyContent="center"
       alignItems="center"
-      style={{ width: 200 }}
+      justifyContent="center"
       spacing={1}
+      style={{ width: 200 }}
     >
-      <Grid xs={pokemon_id ? 9 : 12} textAlign="center">
+      <Grid textAlign="center" xs={pokemon_id ? 9 : 12}>
         <Typography
-          variant={name.length > 20 ? 'subtitle2' : 'h6'}
           align="center"
           noWrap={parkName}
+          variant={name.length > 20 ? 'subtitle2' : 'h6'}
           onClick={() => setParkName(!parkName)}
         >
           {name}
         </Typography>
         {submitted_by && (
           <Typography
-            variant="caption"
             fontSize={10}
             noWrap={parkName}
+            variant="caption"
             onClick={() => setParkName(!parkName)}
           >
             {t('submitted_by')}: {submitted_by}
@@ -101,22 +103,22 @@ export function NestPopup({
       </Grid>
       {!!pokemon_id && (
         <Grid xs={3}>
-          <IconButton aria-haspopup="true" onClick={handleClick} size="large">
+          <IconButton aria-haspopup="true" size="large" onClick={handleClick}>
             <MoreVert />
           </IconButton>
         </Grid>
       )}
       <Menu
-        anchorEl={anchorEl}
         keepMounted
-        open={!!anchorEl}
-        onClose={handleClose}
         PaperProps={{
           style: {
             maxHeight: 216,
             minWidth: '20ch',
           },
         }}
+        anchorEl={anchorEl}
+        open={!!anchorEl}
+        onClose={handleClose}
       >
         {options.map((option) => (
           <MenuItem key={option.name} onClick={option.action}>
@@ -125,10 +127,10 @@ export function NestPopup({
         ))}
       </Menu>
       {!!pokemon_id && (
-        <Grid xs={6} textAlign="center">
+        <Grid textAlign="center" xs={6}>
           <img
-            src={iconUrl}
             alt={iconUrl}
+            src={iconUrl}
             style={{
               maxHeight: 75,
               maxWidth: 75,
@@ -138,11 +140,11 @@ export function NestPopup({
           <Typography variant="caption">{t(`poke_${pokemon_id}`)}</Typography>
         </Grid>
       )}
-      <Grid xs={pokemon_id ? 6 : 12} textAlign="center">
+      <Grid textAlign="center" xs={pokemon_id ? 6 : 12}>
         <Typography variant="subtitle2">{t('last_updated')}</Typography>
         <Typography
-          variant={lastUpdated.str.includes('D') ? 'h6' : 'subtitle2'}
           color={getColor(lastUpdated.diff)}
+          variant={lastUpdated.str.includes('D') ? 'h6' : 'subtitle2'}
         >
           {lastUpdated.str.replace('days', t('days')).replace('day', t('day'))}
         </Typography>
@@ -153,7 +155,7 @@ export function NestPopup({
       <Grid xs={12}>
         <Divider style={{ margin: 4 }} />
       </Grid>
-      <Grid xs={12} textAlign="center">
+      <Grid textAlign="center" xs={12}>
         {recent ? (
           <Typography variant="caption">
             {t('nest_estimated')}
@@ -169,11 +171,11 @@ export function NestPopup({
         )}
       </Grid>
       {submissionPerm && (
-        <Grid xs={9} textAlign="center">
+        <Grid textAlign="center" xs={9}>
           <Button
             color="secondary"
-            variant="outlined"
             size="small"
+            variant="outlined"
             onClick={() =>
               useLayoutStore.setState({
                 nestSubmissions: {
@@ -188,10 +190,10 @@ export function NestPopup({
         </Grid>
       )}
       <Grid
-        xs={submissionPerm ? 3 : 12}
         container
         alignItems="center"
         justifyContent="center"
+        xs={submissionPerm ? 3 : 12}
       >
         <Navigation lat={lat} lon={lon} />
       </Grid>

@@ -1,6 +1,5 @@
 import Grid from '@mui/material/Unstable_Grid2'
 import Divider from '@mui/material/Divider'
-
 import { useWebhookStore } from '@store/useWebhookStore'
 
 import { ProfileSelect } from './ProfileSelect'
@@ -11,20 +10,21 @@ export function Status() {
   const multipleHooks = useWebhookStore((s) => s.multipleHooks)
 
   const sm = multipleHooks ? 4 : 6
+
   return (
-    <Grid container xs={12} justifyContent="space-between" alignItems="center">
-      <Grid xs={multipleHooks ? 12 : 6} sm={sm} textAlign="center">
+    <Grid container alignItems="center" justifyContent="space-between" xs={12}>
+      <Grid sm={sm} textAlign="center" xs={multipleHooks ? 12 : 6}>
         <EnableSwitch />
       </Grid>
-      <Grid xs={6} sm={sm} textAlign="center">
+      <Grid sm={sm} textAlign="center" xs={6}>
         <ProfileSelect />
       </Grid>
-      <Grid xs={6} sm={sm} textAlign="center">
+      <Grid sm={sm} textAlign="center" xs={6}>
         <HookSelection />
       </Grid>
       <Divider
-        light
         flexItem
+        light
         sx={{ height: 5, width: '100%', margin: '15px 0px' }}
       />
     </Grid>

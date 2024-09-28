@@ -18,7 +18,6 @@ import ArrowDropDown from '@mui/icons-material/ArrowDropDown'
 import ArrowDropUp from '@mui/icons-material/ArrowDropUp'
 import Typography from '@mui/material/Typography'
 import DownloadIcon from '@mui/icons-material/Download'
-
 import { Query } from '@services/queries'
 import { formatInterval } from '@utils/formatInterval'
 import { useMemory } from '@store/useMemory'
@@ -81,14 +80,15 @@ function ExpandableWrapper({
   primary: string
 }) {
   const expanded = useStorage((s) => !!s.popups[expandKey])
+
   return (
     <>
       <ListItemWrapper primary={primary}>
         <IconButton
+          className={expanded ? 'expanded' : 'closed'}
           disabled={disabled}
           size="small"
           sx={{ p: 0 }}
-          className={expanded ? 'expanded' : 'closed'}
           onClick={() =>
             useStorage.setState((prev) => ({
               popups: {
@@ -101,7 +101,7 @@ function ExpandableWrapper({
           <ExpandMore />
         </IconButton>
       </ListItemWrapper>
-      <ListItem disablePadding disableGutters>
+      <ListItem disableGutters disablePadding>
         <Collapse
           in={expanded}
           sx={{
@@ -147,16 +147,19 @@ export function RoutePopup({
 
   const elevation = React.useMemo(() => {
     const sum = { down: 0, up: 0 }
+
     for (let i = 1; i < route.waypoints.length - 2; i += 1) {
       const diff =
         route.waypoints[i + 1].elevation_in_meters -
         route.waypoints[i].elevation_in_meters
+
       if (diff > 0) {
         sum.up += diff
       } else {
         sum.down += Math.abs(diff)
       }
     }
+
     return sum
   }, [!!route.waypoints])
 
@@ -172,20 +175,20 @@ export function RoutePopup({
       }}
     >
       <Grid2
+        container
         alignItems="center"
         justifyContent="center"
-        container
         sx={{ width: 200 }}
       >
         <Grid2 xs={12}>
           <Title>{route.name}</Title>
         </Grid2>
         <Grid2
-          xs={imagesAreEqual ? 12 : 6}
           container
           alignItems="center"
           justifyContent="center"
           sx={{ py: 2 }}
+          xs={imagesAreEqual ? 12 : 6}
         >
           <Avatar
             alt={route.name}
@@ -198,7 +201,7 @@ export function RoutePopup({
           />
         </Grid2>
         {!imagesAreEqual && (end ? route.end_image : route.start_image) && (
-          <Grid2 xs={6} container alignItems="center" justifyContent="center">
+          <Grid2 container alignItems="center" justifyContent="center" xs={6}>
             <Avatar
               alt={route.name}
               src={end ? route.end_image : route.start_image}
@@ -210,7 +213,7 @@ export function RoutePopup({
             />
           </Grid2>
         )}
-        <Grid2 xs={12} component={List}>
+        <Grid2 component={List} xs={12}>
           <ListItemWrapper primary="distance">
             {formatDistance(route.distance_meters)}
           </ListItemWrapper>
@@ -222,13 +225,13 @@ export function RoutePopup({
               primary={`${t('elevation')}:`}
               primaryTypographyProps={{ variant: 'subtitle2' }}
             />
-            <Box display="flex" alignItems="center">
+            <Box alignItems="center" display="flex">
               <ArrowDropUp fontSize="small" />
               <Typography variant="caption">
                 {formatDistance(elevation.up)}
               </Typography>
             </Box>
-            <Box display="flex" alignItems="center">
+            <Box alignItems="center" display="flex">
               <ArrowDropDown fontSize="small" />
               <Typography variant="caption">
                 {formatDistance(elevation.down)}
@@ -236,34 +239,34 @@ export function RoutePopup({
             </Box>
           </ListItem>
           <ExpandableWrapper
-            primary="route_tags"
-            expandKey="tags"
             disabled={!route.tags.length}
+            expandKey="tags"
+            primary="route_tags"
           >
             {route.tags.map((tag) => (
               <Chip
                 key={tag}
+                color="secondary"
                 label={t(tag)}
                 size="small"
-                color="secondary"
                 sx={{ m: 0.25 }}
               />
             ))}
           </ExpandableWrapper>
           <ExpandableWrapper
-            primary="description"
-            expandKey="routeDescription"
             disabled={!route.description}
+            expandKey="routeDescription"
+            primary="description"
           >
             {route.description}
           </ExpandableWrapper>
-          <ExpandableWrapper primary="additional_info" expandKey="extraInfo">
+          <ExpandableWrapper expandKey="extraInfo" primary="additional_info">
             <List disablePadding>
               <ListItemWrapper primary="reversible">
                 {route.reversible ? (
-                  <CheckIcon fontSize="small" color="success" />
+                  <CheckIcon color="success" fontSize="small" />
                 ) : (
-                  <CloseIcon fontSize="small" color="error" />
+                  <CloseIcon color="error" fontSize="small" />
                 )}
               </ListItemWrapper>
               <ListItemWrapper primary="route_type">
@@ -278,7 +281,7 @@ export function RoutePopup({
             </List>
           </ExpandableWrapper>
         </Grid2>
-        <Grid2 xs={12} container justifyContent="center">
+        <Grid2 container justifyContent="center" xs={12}>
           <Navigation
             lat={end ? route.end_lat : route.start_lat}
             lon={end ? route.end_lon : route.start_lon}
@@ -320,10 +323,10 @@ function DownloadRouteGPX({ route }: { route: import('@rm/types').Route }) {
 
   return (
     <IconButton
+      download={`${route.name}.gpx`}
       href={`data:application/gpx;charset=utf-8,${encodeURIComponent(
         GPXContent,
       )}`}
-      download={`${route.name}.gpx`}
       size="small"
       style={{ color: 'inherit' }}
     >

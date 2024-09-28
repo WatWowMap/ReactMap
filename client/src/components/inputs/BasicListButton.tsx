@@ -23,6 +23,7 @@ export function BasicListButton<
   component?: T
 }) {
   const { t } = useTranslation()
+
   return (
     <ListItem disablePadding>
       <ListItemButton {...props}>

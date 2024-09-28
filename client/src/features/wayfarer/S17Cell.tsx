@@ -12,11 +12,11 @@ const S17Cell = ({
 } & import('@rm/types').Level17Cell) => (
   <Polygon
     key={`${cellColor}${blockedColor}${blocked}`}
-    positions={polygon}
-    interactive={false}
     color={cellColor}
     fillColor={blockedColor}
     fillOpacity={blocked ? 0.25 : 0}
+    interactive={false}
+    positions={polygon}
     weight={1}
   />
 )

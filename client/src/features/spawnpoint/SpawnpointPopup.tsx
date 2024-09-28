@@ -1,6 +1,5 @@
 import Typography from '@mui/material/Typography'
 import { useTranslation } from 'react-i18next'
-
 import { ErrorBoundary } from '@components/ErrorBoundary'
 import { dayCheck } from '@utils/dayCheck'
 
@@ -17,23 +16,23 @@ export function SpawnpointPopup({
 
   return (
     <ErrorBoundary noRefresh style={{}} variant="h5">
-      <Typography variant="h5" align="center">
+      <Typography align="center" variant="h5">
         {t('spawnpoint')}
       </Typography>
-      <Typography variant="h6" align="center">
+      <Typography align="center" variant="h6">
         {despawn_sec ? `00:${minuteFixed}` : '?'}
       </Typography>
-      <Typography variant="subtitle1" align="center">
+      <Typography align="center" variant="subtitle1">
         {t('last_updated')}
       </Typography>
-      <Typography variant="subtitle2" align="center">
+      <Typography align="center" variant="subtitle2">
         {dayCheck(Date.now() / 1000, updated)}
       </Typography>
       <br />
-      <Typography variant="subtitle1" align="center">
+      <Typography align="center" variant="subtitle1">
         {t('location')}
       </Typography>
-      <Typography variant="subtitle2" align="center">
+      <Typography align="center" variant="subtitle2">
         {lat},<br />
         {lon}
       </Typography>

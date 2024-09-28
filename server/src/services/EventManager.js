@@ -1,8 +1,8 @@
 // @ts-check
 const { promises: fs } = require('fs')
 const path = require('path')
-const { default: fetch } = require('node-fetch')
 
+const { default: fetch } = require('node-fetch')
 const config = require('@rm/config')
 const { Logger } = require('@rm/logger')
 const { generate, read } = require('@rm/masterfile')
@@ -49,9 +49,11 @@ class EventManager extends Logger {
         .filter((x) => x.enabled)
         .map((webhook) => {
           const api = new PoracleAPI(webhook)
+
           if (api.initFromCache()) {
             return [api.name, api]
           }
+
           return [api.name, null]
         })
         .filter(([, api]) => api),
@@ -81,6 +83,7 @@ class EventManager extends Logger {
     /** @param {string} key */
     const parseKey = (key) => {
       const match = key.match(/([a-zA-Z]*)(\d+)(?:-(\d+))?/)
+
       return {
         letter: match[1],
         firstNumber: parseInt(match[2], 10),
@@ -96,6 +99,7 @@ class EventManager extends Logger {
       if (keyA.letter !== keyB.letter) {
         if (keyA.letter === '') return 1 // No letter comes last
         if (keyB.letter === '') return -1
+
         return keyA.letter.localeCompare(keyB.letter)
       }
 
@@ -108,6 +112,7 @@ class EventManager extends Logger {
       if (keyA.secondNumber !== null || keyB.secondNumber !== null) {
         if (keyA.secondNumber === null) return -1
         if (keyB.secondNumber === null) return 1
+
         return keyA.secondNumber - keyB.secondNumber
       }
 
@@ -311,6 +316,7 @@ class EventManager extends Logger {
       type === 'uicons'
         ? config.getSafe('icons.styles')
         : config.getSafe('audio.styles')
+
     this.log.info('Fetching Latest', type.toUpperCase())
     if (!styles.some((icon) => icon.path.includes('wwm'))) {
       this.log.info(
@@ -332,6 +338,7 @@ class EventManager extends Logger {
                   'utf-8',
                 ),
               )
+
           return { ...style, data: response }
         } catch (e) {
           this.log.warn(
@@ -346,8 +353,10 @@ class EventManager extends Logger {
         }
       }),
     )
+
     for (let i = 0; i < assets.length; i += 1) {
       const item = assets[i]
+
       if (item.status === 'fulfilled' && item.value) {
         this[`${type}Backup`][item.value.name] = item.value
       }
@@ -357,11 +366,13 @@ class EventManager extends Logger {
 
   async getInvasions() {
     const endpoint = config.getSafe('api.pogoApiEndpoints.invasions')
+
     if (endpoint) {
       this.log.info('Fetching Latest Invasions')
       try {
         /** @type {import('@rm/masterfile').Masterfile['invasions']} */
         const newInvasions = await fetch(endpoint).then((res) => res.json())
+
         if (newInvasions) {
           this.rocketGruntIDs = Object.keys(newInvasions)
             .filter((key) => newInvasions[key].grunt === 'Grunt')
@@ -392,6 +403,7 @@ class EventManager extends Logger {
     this.log.info('Fetching Latest Masterfile')
     try {
       const newMf = await generate(true, historical, dbRarity)
+
       this.masterfile = newMf ?? this.masterfile
       this.addAllAvailable()
     } catch (e) {
@@ -404,6 +416,7 @@ class EventManager extends Logger {
     this.available[category].forEach((item) => {
       if (!Number.isNaN(parseInt(item.charAt(0)))) {
         const [id, form] = item.split('-')
+
         if (!this.masterfile.pokemon[id]) {
           this.masterfile.pokemon[id] = {
             name: '',
@@ -444,12 +457,16 @@ class EventManager extends Logger {
         .filter((x) => x.enabled)
         .map(async (webhook) => {
           const api = new PoracleAPI(webhook)
+
           await api.init()
+
           return api
         }),
     )
+
     for (let i = 0; i < apis.length; i += 1) {
       const item = apis[i]
+
       if (item.status === 'fulfilled' && item.value) {
         this.webhookObj[item.value.name] = item.value
       }

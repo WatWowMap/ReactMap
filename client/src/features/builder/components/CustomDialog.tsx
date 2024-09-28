@@ -2,12 +2,11 @@ import * as React from 'react'
 import Grid from '@mui/material/Unstable_Grid2'
 import DialogContent from '@mui/material/DialogContent'
 import { useTranslation } from 'react-i18next'
-
 import { Header } from '@components/dialogs/Header'
 import { Footer } from '@components/dialogs/Footer'
+import { Config } from '@rm/types'
 
 import { getBlockContent } from '../utils'
-import { Config } from '@rm/types'
 
 export function CustomDialog({
   configObj,
@@ -63,9 +62,11 @@ export function CustomDialog({
     if (countdown > 0) {
       const timeout = setTimeout(() => {
         const newTime = countdown - 1
+
         setCountdown(newTime)
         setFooterOptions((prev) => {
           const last = prev.at(-1)
+
           return [
             ...prev.slice(0, prev.length - 1),
             {
@@ -76,6 +77,7 @@ export function CustomDialog({
           ]
         })
       }, 1000)
+
       return () => clearTimeout(timeout)
     }
   }, [countdown])
@@ -92,9 +94,9 @@ export function CustomDialog({
       <DialogContent key={i18n.language}>
         <Grid
           container
-          spacing={configObj.settings.parentSpacing || 0}
           alignItems={configObj.settings.parentAlignItems || 'center'}
           justifyContent={configObj.settings.parentJustifyContent || 'center'}
+          spacing={configObj.settings.parentSpacing || 0}
           style={configObj.settings.parentStyle || {}}
         >
           {children}

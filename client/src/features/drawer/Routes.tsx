@@ -1,6 +1,5 @@
 import * as React from 'react'
 import ListItem from '@mui/material/ListItem'
-
 import { useMemory } from '@store/useMemory'
 import { useStorage, useDeepStore } from '@store/useStorage'
 import { SliderTile } from '@components/inputs/SliderTile'
@@ -15,6 +14,7 @@ const RouteSlider = () => {
   const slider: import('@rm/types').RMSlider = React.useMemo(() => {
     const min = baseDistance?.[0] || 0
     const max = baseDistance?.[1] || 25
+
     return {
       color: 'secondary',
       disabled: false,
@@ -31,8 +31,8 @@ const RouteSlider = () => {
     <CollapsibleItem open={enabled}>
       <ListItem>
         <SliderTile
-          slide={slider}
           handleChange={(_, values) => setFilters(values)}
+          slide={slider}
           values={filters}
         />
       </ListItem>

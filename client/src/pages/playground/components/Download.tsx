@@ -14,8 +14,8 @@ export function Download() {
     <MenuItem
       dense
       color="secondary"
-      onClick={handleDownload}
       disabled={!valid}
+      onClick={handleDownload}
     >
       <ListItemIcon>
         <DownloadIcon fontSize="small" />

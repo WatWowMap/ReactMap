@@ -3,7 +3,6 @@ import type { Backup as BackupModel } from '@rm/server/src/models/Backup'
 import type { Session as SessionModel } from '@rm/server/src/models/Session'
 import type { NestSubmission as NestSubmissionModel } from '@rm/server/src/models/NestSubmission'
 import type { Badge as BadgeModel } from '@rm/server/src/models/Badge'
-
 import type { FullModel } from './utility'
 import type { Permissions } from './server'
 import type { Strategy } from './general'

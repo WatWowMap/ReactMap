@@ -1,7 +1,6 @@
 // @ts-check
 import { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
-
 import { useMemory } from '@store/useMemory'
 
 export function useGenPokemon() {
@@ -26,6 +25,7 @@ export function useGenPokemon() {
 
     Object.entries(pokemon).forEach(([i, pkmn]) => {
       const pokeName = t(`poke_${i}`)
+
       Object.entries(pkmn.forms).forEach(([j, form]) => {
         const formName = t(`form_${j}`)
         const id = `${i}-${j}`
@@ -39,6 +39,7 @@ export function useGenPokemon() {
           +j !== pkmn.defaultFormId
             ? formName
             : pokeName
+
         tempObj.pokemon[id] = {
           name: form.name === '*' ? `${name}*` : name,
           category: form.name === '*' ? form.category : undefined,

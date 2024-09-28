@@ -26,9 +26,11 @@ export class Query {
    */
   static build(object) {
     let query = 'GET'
+
     Object.entries(object).forEach(([key, value]) => {
       if (value) query += `_${key.toUpperCase()}`
     })
+
     return query
   }
 
@@ -39,6 +41,7 @@ export class Query {
   /** @param {import('@rm/types').AllFilters['gyms'] | 'id' | 'badges'} filters */
   static gyms(filters) {
     const perms = useMemory.getState().ui.gyms
+
     if (filters === 'id') {
       return gymIndex.GET_ONE_GYM
     }
@@ -51,6 +54,7 @@ export class Query {
         : filters.allGyms && perms.allGyms,
       Raids: filters.raids && perms.raids,
     })
+
     if (
       query === 'GET' &&
       (filters.exEligible ||
@@ -72,12 +76,14 @@ export class Query {
     if (filters === 'nestSubmission') {
       return NEST_SUBMISSION
     }
+
     return GET_ALL_NESTS
   }
 
   /** @param {import('@rm/types').AllFilters['pokestops'] | 'id'} filters */
   static pokestops(filters) {
     const perms = useMemory.getState().ui.pokestops
+
     if (filters === 'id') {
       return pokestopIndex.GET_ONE_POKESTOP
     }
@@ -89,12 +95,14 @@ export class Query {
     })
 
     if (query === 'GET') query += '_POKESTOPS'
+
     return pokestopIndex[query]
   }
 
   /** @param {import('@rm/types').AllFilters['pokemon'] | 'id'} filters */
   static pokemon(filters) {
     const perms = useMemory.getState().ui.pokemon
+
     if (filters === 'id') {
       return pokemonIndex.GET_ONE_POKEMON
     }
@@ -102,6 +110,7 @@ export class Query {
       Ivs: perms.iv,
       Pvp: perms.pvp,
     })
+
     if (query === 'GET') query += '_POKEMON'
 
     return pokemonIndex[query]
@@ -144,15 +153,18 @@ export class Query {
   static stations(filters) {
     const { perms } = useMemory.getState().auth
     let query = 'GET_ALL_STATIONS'
+
     if (filters.maxBattles && perms.dynamax) {
       query += '_BATTLE'
     }
+
     return stationIndex[query]
   }
 
   /** @param {string} category */
   static search(category) {
     const { perms } = useMemory.getState().auth
+
     switch (category) {
       case 'lures':
       case 'raids':
@@ -187,6 +199,7 @@ export class Query {
   /** @param {import('@rm/types').AllFilters['routes'] | 'getOne'} method */
   static routes(method) {
     if (method === 'getOne') return GET_ROUTE
+
     return GET_ROUTES
   }
 }

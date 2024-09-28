@@ -6,6 +6,7 @@
  */
 const muteWarningsPlugin = (warningsToIgnore) => {
   const mutedMessages = new Set()
+
   return {
     name: 'vite-mute-warnings',
     enforce: 'pre',
@@ -21,6 +22,7 @@ const muteWarningsPlugin = (warningsToIgnore) => {
 
               if (muted) {
                 mutedMessages.add(muted.join())
+
                 return
               }
             }
@@ -36,6 +38,7 @@ const muteWarningsPlugin = (warningsToIgnore) => {
     }),
     closeBundle() {
       const diff = warningsToIgnore.filter((x) => !mutedMessages.has(x.join()))
+
       if (diff.length > 0) {
         this.warn(
           'Some of your muted warnings never appeared during the build process:',

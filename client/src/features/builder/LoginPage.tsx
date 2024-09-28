@@ -1,7 +1,6 @@
 import { useTranslation } from 'react-i18next'
 import Grid from '@mui/material/Unstable_Grid2'
 import { useQuery } from '@apollo/client'
-
 import { CUSTOM_COMPONENT } from '@services/queries/config'
 import { Loading } from '@components/Loading'
 
@@ -22,13 +21,14 @@ export function CustomLoginPage() {
     settings: {},
     components: [],
   }
+
   return (
     <Grid
-      container
       key={i18n.language}
-      spacing={settings.parentSpacing || 0}
+      container
       alignItems={settings.parentAlignItems || 'center'}
       justifyContent={settings.parentJustifyContent || 'center'}
+      spacing={settings.parentSpacing || 0}
       style={settings.parentStyle || {}}
       sx={settings.parentSx || {}}
     >

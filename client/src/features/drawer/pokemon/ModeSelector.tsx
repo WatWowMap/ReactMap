@@ -2,7 +2,6 @@ import * as React from 'react'
 import MenuItem from '@mui/material/MenuItem'
 import Typography from '@mui/material/Typography'
 import { useTranslation } from 'react-i18next'
-
 import { useMemory } from '@store/useMemory'
 import { useStorage } from '@store/useStorage'
 import { FCSelectListItem } from '@components/inputs/FCSelect'
@@ -15,14 +14,15 @@ export function PokemonModeSelector() {
 
   return (
     <FCSelectListItem
-      label={t('pokemon_filter_mode')}
-      setWidth={setWidth}
-      value={filterMode}
       fullWidth
-      size="small"
+      label={t('pokemon_filter_mode')}
       renderValue={(selected) => t(selected)}
+      setWidth={setWidth}
+      size="small"
+      value={filterMode}
       onChange={(e) => {
         const { setPokemonFilterMode } = useStorage.getState()
+
         switch (e.target.value) {
           case 'basic':
             return setPokemonFilterMode(false, true)
@@ -39,7 +39,6 @@ export function PokemonModeSelector() {
           <MenuItem
             key={tier}
             dense
-            value={tier}
             sx={{
               display: 'flex',
               flexDirection: 'column',
@@ -47,9 +46,10 @@ export function PokemonModeSelector() {
               whiteSpace: 'normal',
               width: width || 'auto',
             }}
+            value={tier}
           >
             <Typography variant="subtitle2">{t(tier)}</Typography>
-            <Typography variant="caption" flexWrap="wrap">
+            <Typography flexWrap="wrap" variant="caption">
               {t(`${tier}_description`)}
             </Typography>
           </MenuItem>

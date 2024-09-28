@@ -5,7 +5,6 @@ import Grid from '@mui/material/Unstable_Grid2'
 import IconButton from '@mui/material/IconButton'
 import Typography from '@mui/material/Typography'
 import ExpandMore from '@mui/icons-material/ExpandMore'
-
 import { useStorage } from '@store/useStorage'
 
 import { Timer } from './Timer'
@@ -36,13 +35,13 @@ export function TimeTile({
   return (
     <>
       {icon && (
-        <Grid xs={size} textAlign="center">
+        <Grid textAlign="center" xs={size}>
           {typeof icon === 'string' ? (
             <NameTT title={disabled || tt}>
               <img
-                src={icon}
-                className={`quest-popup-img ${disabled ? 'disable-image' : ''}`}
                 alt={icon}
+                className={`quest-popup-img ${disabled ? 'disable-image' : ''}`}
+                src={icon}
               />
             </NameTT>
           ) : (
@@ -50,10 +49,10 @@ export function TimeTile({
           )}
           {caption && (
             <Typography
-              variant="caption"
-              className="ar-task"
               noWrap
+              className="ar-task"
               color={disabled ? 'GrayText' : 'inherit'}
+              variant="caption"
             >
               {caption}
             </Typography>
@@ -62,16 +61,16 @@ export function TimeTile({
       )}
       {endTime && (
         <Grid
-          xs={icon ? (children ? 10 : 12) - size : children ? 10 : 12}
           textAlign="center"
+          xs={icon ? (children ? 10 : 12) - size : children ? 10 : 12}
         >
           <Timer
-            expireTime={expireTime}
             color={disabled ? 'GrayText' : 'inherit'}
+            expireTime={expireTime}
           />
           <Typography
-            variant="caption"
             color={disabled ? 'GrayText' : 'inherit'}
+            variant="caption"
           >
             {new Date(endTime).toLocaleTimeString(
               localStorage.getItem('i18nextLng') || 'en',
@@ -83,19 +82,19 @@ export function TimeTile({
         <>
           <Grid xs={2}>
             <IconButton
-              disabled={!!disabled}
               className={expanded ? 'expanded' : 'closed'}
+              disabled={!!disabled}
+              size="large"
               onClick={() =>
                 useStorage.setState((prev) => ({
                   popups: { ...prev.popups, [expandKey]: !expanded },
                 }))
               }
-              size="large"
             >
               <ExpandMore />
             </IconButton>
           </Grid>
-          <Collapse timeout="auto" unmountOnExit in={expanded}>
+          <Collapse unmountOnExit in={expanded} timeout="auto">
             {children}
           </Collapse>
         </>

@@ -9,7 +9,6 @@ import Divider from '@mui/material/Divider'
 import Collapse from '@mui/material/Collapse'
 import Typography from '@mui/material/Typography'
 import { useTranslation } from 'react-i18next'
-
 import { useSyncData } from '@features/webhooks'
 import { useMemory } from '@store/useMemory'
 import { useLayoutStore } from '@store/useLayoutStore'
@@ -50,9 +49,9 @@ export function GymPopup({
     <ErrorBoundary noRefresh style={{}} variant="h5">
       <Grid
         container
+        alignItems="center"
         direction="row"
         justifyContent="space-evenly"
-        alignItems="center"
         width={200}
       >
         <Grid xs={10}>
@@ -62,9 +61,9 @@ export function GymPopup({
         {perms.gyms && (
           <Grid xs={12}>
             <Collapse
+              unmountOnExit
               in={!popups.raids || !hasRaid}
               timeout="auto"
-              unmountOnExit
             >
               <Grid
                 container
@@ -73,7 +72,7 @@ export function GymPopup({
                 spacing={1}
               >
                 <PoiImage {...gym} />
-                <Divider orientation="vertical" flexItem />
+                <Divider flexItem orientation="vertical" />
                 <GymInfo {...gym} />
               </Grid>
             </Collapse>
@@ -81,7 +80,7 @@ export function GymPopup({
         )}
         {perms.raids && (
           <Grid xs={12}>
-            <Collapse in={popups.raids && hasRaid} timeout="auto" unmountOnExit>
+            <Collapse unmountOnExit in={popups.raids && hasRaid} timeout="auto">
               <Grid
                 container
                 alignItems="center"
@@ -89,7 +88,7 @@ export function GymPopup({
                 spacing={1}
               >
                 <RaidImage raidIconUrl={raidIconUrl} {...gym} />
-                <Divider orientation="vertical" flexItem />
+                <Divider flexItem orientation="vertical" />
                 {gym.raid_pokemon_id ? (
                   <RaidInfo {...gym} />
                 ) : (
@@ -106,7 +105,7 @@ export function GymPopup({
         <PowerUp {...gym} />
         <GymFooter hasRaid={hasRaid} lat={gym.lat} lon={gym.lon} />
         {perms.gyms && (
-          <Collapse in={popups.extras} timeout="auto" unmountOnExit>
+          <Collapse unmountOnExit in={popups.extras} timeout="auto">
             <ExtraGymInfo {...gym} />
           </Collapse>
         )}
@@ -137,12 +136,12 @@ const MenuActions = ({
   const handleClose = React.useCallback(() => setAnchorEl(null), [])
 
   return (
-    <Grid xs={2} textAlign="right">
-      <IconButton aria-haspopup="true" onClick={handleClick} size="large">
+    <Grid textAlign="right" xs={2}>
+      <IconButton aria-haspopup="true" size="large" onClick={handleClick}>
         <MoreVert />
       </IconButton>
       <Menu anchorEl={anchorEl} open={!!anchorEl} onClose={handleClose}>
-        <DropdownOptions {...gym} hasRaid={hasRaid} handleClose={handleClose} />
+        <DropdownOptions {...gym} handleClose={handleClose} hasRaid={hasRaid} />
       </Menu>
     </Grid>
   )
@@ -211,6 +210,7 @@ const DropdownOptions = ({
       if (prev.timerList.includes(id)) {
         return { timerList: prev.timerList.filter((x) => x !== id) }
       }
+
       return { timerList: [...prev.timerList, id] }
     })
   }
@@ -228,6 +228,7 @@ const DropdownOptions = ({
         name: 'gym_badge_menu',
         action: () => {
           handleClose()
+
           return useLayoutStore.setState({
             gymBadge: { badge, gymId: id, open: true },
           })
@@ -261,7 +262,7 @@ const DropdownOptions = ({
   }
 
   return options.filter(Boolean).map((option) => (
-    <MenuItem key={option.key || option.name} onClick={option.action} dense>
+    <MenuItem key={option.key || option.name} dense onClick={option.action}>
       {typeof option.name === 'string' ? t(option.name) : option.name}
     </MenuItem>
   ))
@@ -279,13 +280,13 @@ const PoiImage = ({ url, team_id, name, badge }: import('@rm/types').Gym) => {
   return (
     <Grid xs={6}>
       <Img
-        src={src}
         alt={name || 'unknown'}
         className={`${
           badge ? `badge badge-${badge}` : `circle-image team-${team_id}`
         }`}
         maxHeight={75}
         maxWidth={75}
+        src={src}
       />
     </Grid>
   )
@@ -317,15 +318,16 @@ const RaidImage = ({
     if (pokemon[id].forms?.[form]?.types) {
       return pokemon[id].forms[form].types
     }
+
     return pokemon[id]?.types || []
   }
 
   return (
-    <Grid container xs={5} justifyContent="center" alignItems="center">
-      <Grid xs={12} textAlign="center">
-        <Img src={raidIconUrl} alt={raidIconUrl} maxHeight={50} maxWidth={50} />
+    <Grid container alignItems="center" justifyContent="center" xs={5}>
+      <Grid textAlign="center" xs={12}>
+        <Img alt={raidIconUrl} maxHeight={50} maxWidth={50} src={raidIconUrl} />
       </Grid>
-      <Grid xs={12} textAlign="center">
+      <Grid textAlign="center" xs={12}>
         <Typography variant="caption">
           {t(`raid_${raid_level}`)} ({raid_level})
         </Typography>
@@ -334,15 +336,15 @@ const RaidImage = ({
         getRaidTypes(raid_pokemon_id, raid_pokemon_form).map((type) => (
           <Grid
             key={type}
-            xs={4}
             className="grid-item"
             height={15}
-            width={15}
             style={{ backgroundImage: `url(${Icons.getTypes(type)})` }}
+            width={15}
+            xs={4}
           />
         ))}
       {!!raid_pokemon_gender && (
-        <Grid xs={4} textAlign="center">
+        <Grid textAlign="center" xs={4}>
           <GenderIcon gender={raid_pokemon_gender} />
         </Grid>
       )}
@@ -369,56 +371,55 @@ const GymInfo = ({
 
   return (
     <Grid
-      xs={5}
       container
+      alignItems="center"
       direction="row"
       justifyContent="space-around"
-      alignItems="center"
+      xs={5}
     >
       {!!badge && (
         <Grid xs={12}>
-          <Typography variant="h6" align="center" className={`badge_${badge}`}>
+          <Typography align="center" className={`badge_${badge}`} variant="h6">
             {t(`badge_${badge}`)}
           </Typography>
         </Grid>
       )}
       {updated > gymValidDataLimit && (
           <Grid xs={12}>
-            <Typography variant="h6" align="center">
+            <Typography align="center" variant="h6">
               {t(`team_${team_id}`)}
             </Typography>
           </Grid>
         ) && (
           <Grid xs={12}>
-            <Typography variant="h6" align="center">
+            <Typography align="center" variant="h6">
               {available_slots} {t('slots')}
             </Typography>
           </Grid>
         )}
       {ex_raid_eligible && (
         <Grid
-          xs={4}
           className="grid-item"
           style={{
             height: 24,
             backgroundImage: `url(${Icons.getMisc('ex')})`,
             backgroundSize: 'contain',
           }}
+          xs={4}
         />
       )}
       {ar_scan_eligible && (
         <Grid
-          xs={4}
           className="grid-item"
           style={{
             height: 24,
             backgroundImage: `url(${Icons.getMisc('ar')})`,
             backgroundSize: 'contain',
           }}
+          xs={4}
         />
       )}
       <Grid
-        xs={4}
         style={{
           height: 24,
           backgroundImage: `url(${Icons.getTeams(team_id)})`,
@@ -426,6 +427,7 @@ const GymInfo = ({
           backgroundRepeat: 'no-repeat',
           backgroundPosition: 'center',
         }}
+        xs={4}
       />
     </Grid>
   )
@@ -451,6 +453,7 @@ const RaidInfo = ({
     if (id) {
       return t(`poke_${raid_pokemon_id}`)
     }
+
     return `${t('tier')} ${raidLevel}`
   }
 
@@ -460,22 +463,24 @@ const RaidInfo = ({
     }
     if (form) {
       const raidForm = t(`form_${form}`)
+
       if (raidForm === t('form_29') || !raidForm) {
         return ''
       }
+
       return `${raidForm} ${t('form')}`
     }
   }
 
   return (
-    <Grid xs={6} container justifyContent="space-around" alignItems="center">
+    <Grid container alignItems="center" justifyContent="space-around" xs={6}>
       <Grid xs={12}>
-        <Typography variant="h6" align="center">
+        <Typography align="center" variant="h6">
           {getRaidName(raid_level, raid_pokemon_id)}
         </Typography>
       </Grid>
-      <Grid xs={12} style={{ paddingBottom: 4, textAlign: 'center' }}>
-        <Typography variant="caption" align="center">
+      <Grid style={{ paddingBottom: 4, textAlign: 'center' }} xs={12}>
+        <Typography align="center" variant="caption">
           {getRaidForm(
             raid_pokemon_id,
             raid_pokemon_form,
@@ -485,7 +490,6 @@ const RaidInfo = ({
       </Grid>
       {raid_pokemon_move_1 && raid_pokemon_move_1 !== 1 && (
         <Grid
-          xs={2}
           className="grid-item"
           style={{
             textAlign: 'center',
@@ -495,16 +499,16 @@ const RaidInfo = ({
               moves[raid_pokemon_move_1].type,
             )})`,
           }}
+          xs={2}
         />
       )}
-      <Grid xs={10} textAlign="center">
-        <Typography variant="caption" align="center">
+      <Grid textAlign="center" xs={10}>
+        <Typography align="center" variant="caption">
           {t(`move_${raid_pokemon_move_1}`)}
         </Typography>
       </Grid>
       {raid_pokemon_move_2 && raid_pokemon_move_2 !== 2 && (
         <Grid
-          xs={2}
           className="grid-item"
           style={{
             textAlign: 'center',
@@ -514,10 +518,11 @@ const RaidInfo = ({
               moves[raid_pokemon_move_2].type,
             )})`,
           }}
+          xs={2}
         />
       )}
-      <Grid xs={10} textAlign="center">
-        <Typography variant="caption" align="center">
+      <Grid textAlign="center" xs={10}>
+        <Typography align="center" variant="caption">
           {t(`move_${raid_pokemon_move_2}`)}
         </Typography>
       </Grid>
@@ -561,11 +566,12 @@ const Timer = ({
 
   React.useEffect(() => {
     const timer = setTimeout(() => setDisplay(update()), 1000)
+
     return () => clearTimeout(timer)
   })
 
   return target ? (
-    <Grid xs={start && !raid_pokemon_id ? 6 : 12} textAlign="center">
+    <Grid textAlign="center" xs={start && !raid_pokemon_id ? 6 : 12}>
       <Typography variant="subtitle1">
         {t(start ? 'starts' : 'ends')}:{' '}
         {new Date(target).toLocaleTimeString(
@@ -614,28 +620,28 @@ const GymFooter = ({
     <>
       {hasRaid && perms.raids && perms.gyms && (
         <Grid xs={4}>
-          <IconButton onClick={() => handleExpandClick('raids')} size="large">
+          <IconButton size="large" onClick={() => handleExpandClick('raids')}>
             <img
-              src={useMemory
-                .getState()
-                .Icons.getMisc(popups.raids ? 'gyms' : 'raids')}
               alt={popups.raids ? 'gyms' : 'raids'}
               className={darkMode ? '' : 'darken-image'}
               height={20}
+              src={useMemory
+                .getState()
+                .Icons.getMisc(popups.raids ? 'gyms' : 'raids')}
               width="auto"
             />
           </IconButton>
         </Grid>
       )}
-      <Grid xs={4} textAlign="center">
+      <Grid textAlign="center" xs={4}>
         <Navigation lat={lat} lon={lon} />
       </Grid>
       {perms.gyms && (
         <Grid xs={4}>
           <IconButton
             className={popups.extras ? 'expanded' : 'closed'}
-            onClick={() => handleExpandClick('extras')}
             size="large"
+            onClick={() => handleExpandClick('extras')}
           >
             <ExpandMore />
           </IconButton>
@@ -680,10 +686,10 @@ const ExtraGymInfo = ({
             {gpd.badge === 1 && (
               <>
                 <Img
-                  src={Icons.getMisc('bestbuddy')}
                   alt={t('best_buddy')}
                   maxHeight={15}
                   maxWidth={15}
+                  src={Icons.getMisc('bestbuddy')}
                 />
                 &nbsp;
               </>
@@ -702,7 +708,7 @@ const ExtraGymInfo = ({
       <TimeStamp time={updated}>last_seen</TimeStamp>
       <TimeStamp time={last_modified_timestamp}>last_modified</TimeStamp>
       {enableGymPopupCoords && (
-        <Grid xs={12} textAlign="center">
+        <Grid textAlign="center" xs={12}>
           <Coords lat={lat} lon={lon} />
         </Grid>
       )}

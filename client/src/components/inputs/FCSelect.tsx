@@ -22,19 +22,18 @@ export function FCSelect<Value = unknown>({
   ...props
 }: SelectProps<Value> & ExtraProps) {
   return (
-    <FormControl size={size} fullWidth={fullWidth} sx={SX}>
+    <FormControl fullWidth={fullWidth} size={size} sx={SX}>
       <InputLabel>{label}</InputLabel>
       <Select
-        autoFocus
         ref={(ref) => {
           if (setWidth && ref instanceof HTMLDivElement) {
             setWidth(ref.clientWidth)
           }
         }}
-        value={value ?? ''}
         fullWidth={fullWidth}
         label={label}
         size={size}
+        value={value ?? ''}
         {...props}
       >
         {children}

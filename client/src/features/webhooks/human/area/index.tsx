@@ -3,7 +3,6 @@ import { useTranslation } from 'react-i18next'
 import Typography from '@mui/material/Typography'
 import Button from '@mui/material/Button'
 import Grid from '@mui/material/Unstable_Grid2'
-
 import { setModeBtn } from '@store/useWebhookStore'
 
 import { AreaGroup } from './AreaGroup'
@@ -13,26 +12,26 @@ const Areas = () => {
   const { t } = useTranslation()
 
   return (
-    <Grid container xs={12} justifyContent="center" alignItems="center">
-      <Grid xs={6} sm={3}>
-        <Typography variant="h6" pl={1}>
+    <Grid container alignItems="center" justifyContent="center" xs={12}>
+      <Grid sm={3} xs={6}>
+        <Typography pl={1} variant="h6">
           {t('areas')}
         </Typography>
       </Grid>
-      <Grid xs={6} display={{ xs: 'none', sm: 'block' }}>
+      <Grid display={{ xs: 'none', sm: 'block' }} xs={6}>
         <Selected />
       </Grid>
-      <Grid xs={6} sm={3} textAlign="center">
+      <Grid sm={3} textAlign="center" xs={6}>
         <Button
+          color="primary"
           size="small"
           variant="contained"
-          color="primary"
           onClick={setModeBtn('areas')}
         >
           {t('choose_on_map')}
         </Button>
       </Grid>
-      <Grid xs={12} display={{ xs: 'block', sm: 'none' }} pt={2}>
+      <Grid display={{ xs: 'block', sm: 'none' }} pt={2} xs={12}>
         <Selected />
       </Grid>
       <AreaGroup />

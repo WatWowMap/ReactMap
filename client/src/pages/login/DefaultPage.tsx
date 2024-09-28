@@ -4,7 +4,6 @@ import Typography from '@mui/material/Typography'
 import Grid from '@mui/material/Unstable_Grid2'
 import Divider from '@mui/material/Divider'
 import { styled } from '@mui/material/styles'
-
 import { useMemory } from '@store/useMemory'
 import { LocaleSelection } from '@components/inputs/LocaleSelection'
 
@@ -13,33 +12,35 @@ import { methods } from './Methods'
 const StyledDivider = styled(Divider)(({ theme }) => ({
   margin: theme.spacing(3, 0),
 }))
+
 StyledDivider.defaultProps = { flexItem: true }
 
 export function DefaultLoginPage() {
   const { t } = useTranslation()
   const headerTitle = useMemory((s) => s.config.general.headerTitle)
   const authMethods = useMemory((s) => s.auth.methods)
+
   return (
     <Grid
-      alignItems="center"
-      justifyContent="center"
-      height="100cqh"
-      width="100%"
       container
+      alignItems="center"
       direction="column"
+      height="100cqh"
+      justifyContent="center"
+      width="100%"
     >
       <Grid
         container
-        direction="column"
-        justifyContent="center"
         alignItems="center"
-        my={4}
-        minWidth="min(90%, 400px)"
-        maxWidth={500}
+        direction="column"
         flexGrow={1}
+        justifyContent="center"
+        maxWidth={500}
+        minWidth="min(90%, 400px)"
+        my={4}
       >
         <Grid pb={8}>
-          <Typography variant="h3" align="center">
+          <Typography align="center" variant="h3">
             {t('welcome')} {headerTitle}
           </Typography>
         </Grid>

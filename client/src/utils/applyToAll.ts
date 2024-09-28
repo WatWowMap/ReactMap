@@ -36,13 +36,16 @@ export function applyToAll<T extends import('@rm/types').Categories>(
             : filter,
         ],
       ]
+
       if (key.startsWith('t') && +key.charAt(1) !== 0 && includeSlots) {
         filters.push(
           ...Object.entries(generateSlots(key, newFilter.enabled, userFilters)),
         )
       }
+
       return filters
     }),
   )
+
   setDeepStore(`filters.${category}.filter`, newObj)
 }

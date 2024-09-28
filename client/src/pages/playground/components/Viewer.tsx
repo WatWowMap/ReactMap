@@ -1,7 +1,6 @@
 import * as React from 'react'
 import Grid from '@mui/material/Unstable_Grid2'
 import { useTranslation } from 'react-i18next'
-
 import { CustomTile, CustomDialog } from '@features/builder'
 import { ErrorBoundary } from '@components/ErrorBoundary'
 
@@ -18,10 +17,10 @@ export function Viewer() {
 
   return (
     <Grid
-      xs={12}
-      sm={hideEditor ? 12 : 6}
-      overflow="auto"
       height="calc(100vh - 48px)"
+      overflow="auto"
+      sm={hideEditor ? 12 : 6}
+      xs={12}
     >
       <ErrorBoundary
         noRefresh
@@ -32,9 +31,9 @@ export function Viewer() {
           <Grid
             key={i18n.language}
             container
-            spacing={configObj.settings.parentSpacing || 0}
             alignItems={configObj.settings.parentAlignItems || 'center'}
             justifyContent={configObj.settings.parentJustifyContent || 'center'}
+            spacing={configObj.settings.parentSpacing || 0}
             style={configObj.settings.parentStyle || {}}
             sx={configObj.settings.parentSx || {}}
           >

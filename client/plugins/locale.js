@@ -20,6 +20,7 @@ const localePlugin = (isDevelopment) => ({
 
     Object.entries(localeObj).forEach(([locale, translations]) => {
       const fileName = join('locales', locale, 'translation.json')
+
       this.emitFile({
         type: 'asset',
         fileName,

@@ -7,16 +7,15 @@ import PrecisionManufacturingIcon from '@mui/icons-material/PrecisionManufacturi
 import RuleIcon from '@mui/icons-material/Rule'
 import ClearIcon from '@mui/icons-material/Clear'
 import CheckIcon from '@mui/icons-material/Check'
-
 import { useStorage } from '@store/useStorage'
 
 import { FCSelect } from './FCSelect'
 
-const human = <PermIdentityIcon fontSize="small" color="info" />
-const ai = <PrecisionManufacturingIcon fontSize="small" color="error" />
-const partial = <RuleIcon fontSize="small" color="warning" />
-const error = <ClearIcon fontSize="small" color="error" />
-const success = <CheckIcon fontSize="small" color="success" />
+const human = <PermIdentityIcon color="info" fontSize="small" />
+const ai = <PrecisionManufacturingIcon color="error" fontSize="small" />
+const partial = <RuleIcon color="warning" fontSize="small" />
+const error = <ClearIcon color="error" fontSize="small" />
+const success = <CheckIcon color="success" fontSize="small" />
 
 export function LocaleSelection() {
   const { t, i18n } = useTranslation()
@@ -24,9 +23,9 @@ export function LocaleSelection() {
 
   return (
     <FCSelect
-      setWidth={setWidth}
-      renderValue={(v) => t(`locale_selection_${v}`)}
       label={t('locale_selection')}
+      renderValue={(v) => t(`locale_selection_${v}`)}
+      setWidth={setWidth}
       value={i18n.language}
       onChange={(event) => {
         i18n.changeLanguage(event.target.value)
@@ -37,10 +36,10 @@ export function LocaleSelection() {
     >
       {CONFIG.client.locales.map((option) => {
         const status = CONFIG.client.localeStatus[option]
+
         return (
           <MenuItem
             key={option}
-            value={option}
             dense
             className="flex-center"
             sx={{
@@ -50,12 +49,13 @@ export function LocaleSelection() {
               whiteSpace: 'normal',
               width: width || 'auto',
             }}
+            value={option}
           >
             {t(`locale_selection_${option}`)}
             <Typography
-              variant="caption"
               className="flex-center"
               justifyContent="space-between"
+              variant="caption"
               width="100%"
             >
               {status.total === 100

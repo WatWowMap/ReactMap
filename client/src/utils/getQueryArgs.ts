@@ -2,6 +2,7 @@ import { useMapStore } from '@store/useMapStore'
 
 export function getQueryArgs() {
   const { map } = useMapStore.getState()
+
   if (!map)
     return {
       zoom: 0,
@@ -13,6 +14,7 @@ export function getQueryArgs() {
   const mapBounds = map.getBounds()
   const northEast = mapBounds.getNorthEast()
   const southWest = mapBounds.getSouthWest()
+
   return {
     minLat: +southWest.lat.toFixed(5),
     maxLat: +northEast.lat.toFixed(5),

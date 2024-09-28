@@ -1,7 +1,6 @@
 import * as React from 'react'
 import { GeoJSON } from 'react-leaflet'
 import { Polygon } from 'leaflet'
-
 import { useWebhookStore, handleClick } from '@store/useWebhookStore'
 import { useStorage } from '@store/useStorage'
 import { getProperName } from '@utils/strings'
@@ -18,15 +17,11 @@ function ScanArea(featureCollection: import('@rm/types').RMGeoJSON) {
     <GeoJSON
       key={`${search}${tapToToggle}${alwaysShowLabels}`}
       data={featureCollection}
-      filter={(f) =>
-        webhook ||
-        search === '' ||
-        f.properties.key.toLowerCase().includes(search.toLowerCase())
-      }
       eventHandlers={{
         click: ({ propagatedFrom: layer }) => {
           if (!layer.feature) return
           const { name, key, manual = false } = layer.feature.properties
+
           if (webhook && name && handleClick) {
             handleClick(name)().then((newAreas) => {
               layer.setStyle({
@@ -40,6 +35,7 @@ function ScanArea(featureCollection: import('@rm/types').RMGeoJSON) {
           } else if (!manual && tapToToggle) {
             const { filters, setAreas } = useStorage.getState()
             const includes = filters?.scanAreas?.filter?.areas?.includes(key)
+
             layer.setStyle({ fillOpacity: includes ? 0.2 : 0.8 })
             setAreas(
               key,
@@ -50,10 +46,16 @@ function ScanArea(featureCollection: import('@rm/types').RMGeoJSON) {
           }
         },
       }}
+      filter={(f) =>
+        webhook ||
+        search === '' ||
+        f.properties.key.toLowerCase().includes(search.toLowerCase())
+      }
       onEachFeature={(feature, layer) => {
         if (feature.properties?.name) {
           const { name, key } = feature.properties
           const popupContent = getProperName(name)
+
           if (layer instanceof Polygon) {
             layer
               .setStyle({

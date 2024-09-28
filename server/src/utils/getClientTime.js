@@ -3,8 +3,8 @@ const { find } = require('geo-tz')
 const { tz } = require('moment-timezone')
 const { utcToZonedTime } = require('date-fns-tz')
 const { format } = require('date-fns')
-
 const { log, TAGS } = require('@rm/logger')
+
 const { getCenter } = require('./getCenter')
 
 /** @typedef {import('@rm/types').BBox | { lat: number, lon: number }} BoundsEnum */
@@ -28,7 +28,9 @@ function getEpoch(date = new Date()) {
 function getUserTimeZone(bounds) {
   const { lat, lon } = getCenter(bounds)
   const timezone = find(lat, lon)
+
   log.debug(TAGS.client, `timezone: ${timezone}`)
+
   return timezone[0]
 }
 
@@ -46,11 +48,13 @@ function getUserDate(boundsOrTimezone) {
       : getUserTimeZone(boundsOrTimezone)
   const utcDate = new Date()
   const clientDate = utcToZonedTime(utcDate, timezone)
+
   log.debug(
     TAGS.client,
     `time: ${format(clientDate, 'yyyy-MM-dd HH:mm:ss.SSS')}`,
     getEpoch(clientDate),
   )
+
   return clientDate
 }
 
@@ -65,11 +69,13 @@ function getUserMidnight(bounds) {
   const userTimeZone = getUserTimeZone(bounds)
 
   const userMidnight = tz(new Date(), userTimeZone).startOf('day')
+
   log.debug(
     TAGS.client,
     `midnight: ${userMidnight.format('yyyy-MM-DD HH:mm:ss.SSS')}`,
     userMidnight.unix(),
   )
+
   return userMidnight.unix()
 }
 

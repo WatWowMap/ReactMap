@@ -1,6 +1,5 @@
 import * as React from 'react'
 import { Marker, Popup } from 'react-leaflet'
-
 import { basicEqualFn, useMemory } from '@store/useMemory'
 import { ErrorBoundary } from '@components/ErrorBoundary'
 
@@ -35,13 +34,13 @@ const BaseDeviceTile = (device: import('@rm/types').Device) => {
 
   return (
     <Marker
-      position={[device.lat, device.lon]}
-      icon={icon}
       ref={markerRef}
       eventHandlers={{
         popupopen: () => setPoly(true),
         popupclose: () => setPoly(false),
       }}
+      icon={icon}
+      position={[device.lat, device.lon]}
     >
       <Popup position={[device.lat, device.lon]}>
         <DevicePopup {...device} isOnline={isOnline} ts={ts} />

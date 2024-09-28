@@ -1,6 +1,5 @@
 // @ts-check
 const { Model } = require('objection')
-
 const { log, TAGS } = require('@rm/logger')
 
 class User extends Model {
@@ -11,6 +10,7 @@ class User extends Model {
   static get relationMappings() {
     // eslint-disable-next-line global-require
     const { state } = require('../services/state')
+
     return {
       badges: {
         relation: Model.HasManyRelation,
@@ -66,6 +66,7 @@ class User extends Model {
    */
   static async updateWebhook(id, selectedWebhook) {
     await this.query().update({ selectedWebhook }).where({ id })
+
     return this.getOne(id)
   }
 }

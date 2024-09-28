@@ -1,6 +1,4 @@
-import * as React from 'react'
 import type { SxProps, BaseSelectProps } from '@mui/material'
-
 import type { Config } from './config'
 import type {
   AdvCategories,
@@ -9,6 +7,8 @@ import type {
   Permissions,
   PokemonFilter,
 } from './server'
+
+import * as React from 'react'
 
 declare global {
   const CONFIG: Config<true>

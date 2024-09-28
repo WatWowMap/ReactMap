@@ -1,7 +1,6 @@
 import * as React from 'react'
 import { Marker, Popup, Circle } from 'react-leaflet'
 import { t } from 'i18next'
-
 import { useMarkerTimer } from '@hooks/useMarkerTimer'
 import { getOffset } from '@utils/offset'
 import { getBadge } from '@utils/getBadge'
@@ -25,6 +24,7 @@ const getGlowStatus = (
   const valid = glowRules
     .map((rule) => userSettings[rule(pkmn)])
     .filter(Boolean)
+
   return valid.length > 1 ? userSettings.Multiple : valid[0]
 }
 
@@ -60,6 +60,7 @@ const BasePokemonTile = (
       interactionRanges,
       spacialRendRange,
     } = s.userSettings.pokemon
+
     return [
       pokemonTimers,
       glow ? getGlowStatus(pkmn, s.userSettings.pokemon) : undefined,
@@ -77,6 +78,7 @@ const BasePokemonTile = (
     useMemory((s) => {
       const { Icons, timerList, config, Audio } = s
       const badgeId = getBadge(pkmn.bestPvp)
+
       return [
         timerList.includes(pkmn.id),
         Icons.getPokemon(
@@ -117,14 +119,16 @@ const BasePokemonTile = (
   const extras: (string | import('react').ReactElement)[] =
     React.useMemo(() => {
       const decorators = []
+
       if (showIv) decorators.push(`${Math.round(pkmn.iv)}%`)
       if (showLevel) decorators.push(`L${Math.round(pkmn.level)}`)
       if (showSize)
         decorators.push({ 1: 'XXS', 2: 'XS', 4: 'XL', 5: 'XXL' }[pkmn.size])
       if (badge && decorators.length > 0)
         decorators.push(
-          <img key={badge} src={badge} alt={badge} style={{ height: 12 }} />,
+          <img key={badge} alt={badge} src={badge} style={{ height: 12 }} />,
         )
+
       return decorators
     }, [showIv, showLevel, showSize, badge])
 
@@ -156,12 +160,6 @@ const BasePokemonTile = (
   return (
     <Marker
       ref={setMarkerRef}
-      zIndexOffset={
-        (typeof pkmn.iv === 'number' ? pkmn.iv || 99 : 0) * 100 +
-        40.96 -
-        pkmn.bestPvp
-      }
-      position={finalLocation}
       icon={
         (pkmn.bestPvp !== null && pkmn.bestPvp < 4 && extras.length === 0) ||
         showGlow ||
@@ -180,14 +178,20 @@ const BasePokemonTile = (
             })
           : basicPokemonMarker({ iconUrl, iconSize })
       }
+      position={finalLocation}
+      zIndexOffset={
+        (typeof pkmn.iv === 'number' ? pkmn.iv || 99 : 0) * 100 +
+        40.96 -
+        pkmn.bestPvp
+      }
     >
       <Popup position={finalLocation}>
-        <PokemonPopup pokemon={pkmn} iconUrl={iconUrl} />
+        <PokemonPopup iconUrl={iconUrl} pokemon={pkmn} />
       </Popup>
       {(showTimer || timerOverride || extras.length > 0) && (
         <TooltipWrapper
-          timers={showTimer || timerOverride ? [pkmn.expire_timestamp] : []}
           offset={[0, 14]}
+          timers={showTimer || timerOverride ? [pkmn.expire_timestamp] : []}
         >
           {extras.length > 0 && (
             <div className="iv-badge flex-center">
@@ -205,14 +209,14 @@ const BasePokemonTile = (
         </TooltipWrapper>
       )}
       {showInteractionRange && configZoom && (
-        <Circle center={finalLocation} radius={40} color="#BA42F6" weight={1} />
+        <Circle center={finalLocation} color="#BA42F6" radius={40} weight={1} />
       )}
       {showSpacialRendRange && configZoom && (
         <Circle
           center={finalLocation}
-          radius={80}
           color="#E3B3FB"
           dashArray="5, 5"
+          radius={80}
           weight={1}
         />
       )}

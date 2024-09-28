@@ -11,7 +11,6 @@ import ButtonGroup from '@mui/material/ButtonGroup'
 import Typography from '@mui/material/Typography'
 import Divider from '@mui/material/Divider'
 import Box from '@mui/material/Box'
-
 import { useMemory } from '@store/useMemory'
 import { useStorage } from '@store/useStorage'
 import { Query } from '@services/queries'
@@ -32,7 +31,7 @@ export function UserBackups() {
     <Box className="flex-center">
       <List>
         <ListSubheader>
-          <Typography variant="h6" align="center" py={2}>
+          <Typography align="center" py={2} variant="h6">
             {t('profile_backups')}
           </Typography>
         </ListSubheader>
@@ -56,15 +55,16 @@ function CreateNew({ backups }: { backups: import('@rm/types').Backup[] }) {
   const [create, { loading }] = useMutation(Query.user('CREATE_BACKUP'), {
     refetchQueries: ['GetBackups'],
   })
+
   return (
     <ListItem>
       <TextField
-        label={t('new_backup')}
         fullWidth
+        label={t('new_backup')}
         size="small"
         value={name || ''}
-        onChange={(e) => setName(e.target.value)}
         variant="outlined"
+        onChange={(e) => setName(e.target.value)}
       />
       <ListItemButton
         disabled={
@@ -136,15 +136,15 @@ function BackupItem({ backup }: { backup: import('@rm/types').Backup }) {
           localStorage.getItem('last-loaded') === backup.name ? '*' : ''
         }`}
         size="small"
-        value={name || ''}
-        onChange={(e) => setName(e.target.value)}
-        variant="outlined"
         sx={{ mr: 2 }}
+        value={name || ''}
+        variant="outlined"
+        onChange={(e) => setName(e.target.value)}
       />
-      <ButtonGroup variant="outlined" size="small">
+      <ButtonGroup size="small" variant="outlined">
         <Button
-          disabled={loading}
           color="secondary"
+          disabled={loading}
           onClick={() => {
             load({ variables: { id: backup.id } })
           }}
@@ -152,8 +152,8 @@ function BackupItem({ backup }: { backup: import('@rm/types').Backup }) {
           {t('load')}
         </Button>
         <Button
-          disabled={loading}
           color="secondary"
+          disabled={loading}
           onClick={() => {
             update({
               variables: {
@@ -169,8 +169,8 @@ function BackupItem({ backup }: { backup: import('@rm/types').Backup }) {
           {t('update')}
         </Button>
         <Button
-          disabled={loading}
           color="primary"
+          disabled={loading}
           onClick={() => {
             remove({ variables: { id: backup.id } })
           }}

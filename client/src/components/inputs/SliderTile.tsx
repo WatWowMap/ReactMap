@@ -5,7 +5,6 @@ import TextField from '@mui/material/TextField'
 import Slider from '@mui/material/Slider'
 import { styled } from '@mui/material/styles'
 import { useTranslation } from 'react-i18next'
-
 import { ToggleTypography } from '@components/ToggleTypography'
 import { MIN_MAX } from '@assets/constants'
 
@@ -107,16 +106,18 @@ export function SliderTile({
 
   React.useEffect(() => {
     const safe = disabled || !values ? [min, max] : values
+
     if (safe.some((v, i) => v !== temp[i])) setTemp(values)
     if (safe.some((v, i) => v !== text[i])) setText(values)
   }, [values?.[0], values?.[1], disabled, min, max])
 
   if (!temp || !text) return null
+
   return (
     <Grid2
       container
-      justifyContent="center"
       alignItems="center"
+      justifyContent="center"
       minWidth={Math.min(window.innerWidth, 260)}
       width="100%"
     >
@@ -127,38 +128,38 @@ export function SliderTile({
       </Grid2>
       {!noTextInput &&
         MIN_MAX.map((each, index) => (
-          <Grid2 key={each} xs={4} textAlign={index ? 'center' : 'right'}>
+          <Grid2 key={each} textAlign={index ? 'center' : 'right'} xs={4}>
             <StyledTextField
-              id={each}
-              name={name}
-              label={`${t(each)} ${label ? t(label) : ''}`}
-              value={text[index]}
-              variant="outlined"
-              size="small"
-              type="number"
-              textColor={colorSx.sx.color}
-              onChange={handleTextInputChange}
-              onBlur={handleTextInputChange}
-              disabled={disabled}
               InputLabelProps={colorSx}
               InputProps={colorSx}
+              disabled={disabled}
+              id={each}
               inputProps={inputProps}
+              label={`${t(each)} ${label ? t(label) : ''}`}
+              name={name}
+              size="small"
+              textColor={colorSx.sx.color}
+              type="number"
+              value={text[index]}
+              variant="outlined"
+              onBlur={handleTextInputChange}
+              onChange={handleTextInputChange}
             />
           </Grid2>
         ))}
-      <Grid2 xs={11} textAlign="center">
+      <Grid2 textAlign="center" xs={11}>
         <StyledSlider
-          name={name}
-          min={min}
-          max={max}
           color={color}
+          disabled={disabled}
+          marks={marksMemo}
+          max={max}
+          min={min}
+          name={name}
+          step={step}
           value={temp}
+          valueLabelFormat={marksMemo ? (e) => t(`${markI18n}${e}`) : undefined}
           onChange={handleSliderChange}
           onChangeCommitted={handleSliderChangeCommitted}
-          disabled={disabled}
-          valueLabelFormat={marksMemo ? (e) => t(`${markI18n}${e}`) : undefined}
-          step={step}
-          marks={marksMemo}
         />
       </Grid2>
     </Grid2>

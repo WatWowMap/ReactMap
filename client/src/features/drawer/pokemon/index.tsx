@@ -5,7 +5,6 @@ import Tabs from '@mui/material/Tabs'
 import Collapse from '@mui/material/Collapse'
 import { useTranslation } from 'react-i18next'
 import Help from '@mui/icons-material/HelpOutline'
-
 import { useMemory } from '@store/useMemory'
 import { useStorage, useDeepStore } from '@store/useStorage'
 import { useLayoutStore } from '@store/useLayoutStore'
@@ -15,6 +14,7 @@ import { BasicListButton } from '@components/inputs/BasicListButton'
 import { BoolToggle } from '@components/inputs/BoolToggle'
 
 import { SelectorListMemo } from '../components/SelectorList'
+
 import { PokemonTabPanel } from './PokemonTab'
 import { PokemonModeSelector } from './ModeSelector'
 
@@ -51,12 +51,12 @@ function PokemonDrawer() {
         {Object.entries(ui.sliders).map(([sType, sliders], index) => (
           <PokemonTabPanel
             key={sType}
-            openTab={openTab}
             index={index}
+            openTab={openTab}
             sliders={sliders}
           />
         ))}
-        <TabPanel value={openTab} index={2} disablePadding>
+        <TabPanel disablePadding index={2} value={openTab}>
           <SelectorListMemo category="pokemon" />
         </TabPanel>
       </Collapse>

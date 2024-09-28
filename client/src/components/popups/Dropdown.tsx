@@ -14,11 +14,10 @@ export function Dropdown({
   }[]
 } & Omit<MenuProps, 'open'>) {
   const { t } = useTranslation()
+
   return (
     <Menu
-      anchorEl={anchorEl}
       keepMounted
-      open={Boolean(anchorEl)}
       PaperProps={{
         style: {
           maxHeight: 216,
@@ -26,6 +25,8 @@ export function Dropdown({
           margin: '10px 0px',
         },
       }}
+      anchorEl={anchorEl}
+      open={Boolean(anchorEl)}
       {...props}
     >
       {options.map((option, i) => (
@@ -33,8 +34,8 @@ export function Dropdown({
           key={
             option.key || (typeof option.name === 'string' ? option.name : i)
           }
-          onClick={option.action}
           dense
+          onClick={option.action}
         >
           {typeof option.name === 'string' ? t(option.name) : option.name}
         </MenuItem>

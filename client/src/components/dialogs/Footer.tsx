@@ -48,18 +48,18 @@ export interface FooterButton {
 
 export function Footer({
   options,
-  role,
+  i18nKey,
 }: {
   options: FooterButton[]
-  role?: string
+  i18nKey?: string
 }) {
   const { t } = useTranslation()
 
   return (
     <Grid
       container
-      justifyContent="flex-end"
       alignItems="center"
+      justifyContent="flex-end"
       sx={(theme) => ({
         minHeight: 50,
         borderTop: `1px solid ${theme.palette.divider}`,
@@ -68,12 +68,13 @@ export function Footer({
       {options.map((button) => {
         const key = button.key || button.name
         const actualSize = button.size || Math.floor(12 / options.length)
+
         if (button.component) {
           return (
             <Grid
               key={button.key}
-              xs={actualSize}
               style={{ textAlign: button.align || 'center' }}
+              xs={actualSize}
             >
               {button.component}
             </Grid>
@@ -88,21 +89,21 @@ export function Footer({
 
         return (
           <Grid
-            xs={actualSize}
-            sm={+t(`${role}_key_width`) || actualSize}
             key={key}
-            textAlign={button.align || 'center'}
             className="flex-center"
+            sm={+t(`${i18nKey}_key_width`) || actualSize}
+            textAlign={button.align || 'center'}
+            xs={actualSize}
           >
             {MuiIcon && (
               <IconButton
+                disabled={button.disabled}
                 href={button.link || undefined}
                 rel={button.link ? 'noreferrer' : undefined}
+                size="large"
+                sx={{ display: { xs: 'block', sm: 'none' } }}
                 target={button.link ? button.target || '_blank' : undefined}
                 onClick={button.action || undefined}
-                disabled={button.disabled}
-                sx={{ display: { xs: 'block', sm: 'none' } }}
-                size="large"
               >
                 <MuiIcon
                   color={muiColor ? color : 'inherit'}
@@ -117,12 +118,10 @@ export function Footer({
               </IconButton>
             )}
             <Button
-              href={button.link}
-              rel={button.link ? 'noreferrer' : undefined}
-              target={button.link ? button.target || '_blank' : undefined}
-              onClick={button.action}
               color={muiColor ? color : 'inherit'}
               disabled={button.disabled}
+              href={button.link}
+              rel={button.link ? 'noreferrer' : undefined}
               sx={(theme) => ({
                 display: {
                   xs: MuiIcon ? 'none' : 'block',
@@ -134,6 +133,8 @@ export function Footer({
                     ? theme.palette[first][second]
                     : first,
               })}
+              target={button.link ? button.target || '_blank' : undefined}
+              onClick={button.action}
             >
               <Typography variant="caption">
                 {typeof button.name === 'string' ? t(button.name) : button.name}

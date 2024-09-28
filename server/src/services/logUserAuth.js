@@ -60,6 +60,7 @@ async function logUserAuth(req, user, strategy = 'custom', hidePii = false) {
             'failed to fetch user information',
             err,
           )
+
           return {}
         })
 
@@ -155,11 +156,13 @@ async function logUserAuth(req, user, strategy = 'custom', hidePii = false) {
     ],
     timestamp: new Date().toISOString(),
   }
+
   if (user.perms.areaRestrictions.length) {
     const trimmed = user.perms.areaRestrictions
       .filter((_f, i) => i < 15)
       .map((f) => capCamel(f))
       .join('\n')
+
     embed.fields.push({
       name: `(${user.perms.areaRestrictions.length}) Area Restrictions`,
       value:
@@ -193,6 +196,7 @@ async function logUserAuth(req, user, strategy = 'custom', hidePii = false) {
     embed.color = 0x00ff00
   } else if (user.perms?.blocked) {
     const blockedGuilds = user.perms.blockedGuildNames.join(', ')
+
     log.warn(
       TAGS.custom(strategy, '#7289da'),
       user.id,
@@ -213,6 +217,7 @@ async function logUserAuth(req, user, strategy = 'custom', hidePii = false) {
       (field) => !PII_FIELDS.includes(field.name),
     )
   }
+
   return embed
 }
 

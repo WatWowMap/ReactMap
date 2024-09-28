@@ -1,8 +1,8 @@
 // @ts-check
 const { promises: fs, readdirSync, readFileSync } = require('fs')
 const { resolve } = require('path')
-const { default: fetch } = require('node-fetch')
 
+const { default: fetch } = require('node-fetch')
 const { log, TAGS } = require('@rm/logger')
 
 const HUMAN_LOCALES = resolve(__dirname, './human')
@@ -31,6 +31,7 @@ async function fetchRemote(locale, endpoint) {
           if (key.startsWith('quest_') || key.startsWith('challenge_')) {
             return [key, value.replace(/%\{/g, '{{').replace(/\}/g, '}}')]
           }
+
           return [key, value]
         }),
     )
@@ -50,6 +51,7 @@ async function readAndParseJson(fileName, human = false) {
     resolve(__dirname, human ? HUMAN_LOCALES : AI_LOCALES, fileName),
     'utf-8',
   )
+
   return JSON.parse(file)
 }
 
@@ -85,15 +87,18 @@ async function writeAll(locales, i18nFormat, ...directories) {
   const resolved = directories.length
     ? resolve(...directories)
     : resolve(__dirname, 'data')
+
   await fs.mkdir(resolved, { recursive: true })
   await Promise.all(
     Object.entries(locales).map(async ([locale, translations]) => {
       const finalLocation = i18nFormat
         ? resolve(resolved, locale, 'translation.json')
         : resolve(resolved, `${locale}.json`)
+
       if (i18nFormat) {
         await fs.mkdir(resolve(resolved, locale), { recursive: true })
       }
+
       return writeJson(translations, finalLocation)
     }),
   )
@@ -134,6 +139,7 @@ function getStatus() {
       const mergedSize = Object.keys({ ...aiJson, ...humanJson }).length
       const human = (humanHas / total) * 100
       const localeTotal = (mergedSize / total) * 100
+
       return [
         locale.replace('.json', ''),
         {

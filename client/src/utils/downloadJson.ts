@@ -4,6 +4,7 @@ export function downloadJson(
 ) {
   if (json) {
     const el = document.createElement('a')
+
     el.setAttribute(
       'href',
       `data:application/json;charset=utf-8,${encodeURIComponent(

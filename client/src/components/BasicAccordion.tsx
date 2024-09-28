@@ -4,7 +4,6 @@ import Typography from '@mui/material/Typography'
 import Accordion from '@mui/material/Accordion'
 import AccordionSummary from '@mui/material/AccordionSummary'
 import AccordionDetails from '@mui/material/AccordionDetails'
-
 import { useStorage } from '@store/useStorage'
 
 const expandIcon = <ExpandMoreIcon />
@@ -33,6 +32,7 @@ export function BasicAccordion({
         })),
       [stateKey],
     )
+
   return (
     <Accordion expanded={expanded} onChange={handleChange}>
       <AccordionSummary expandIcon={expandIcon}>

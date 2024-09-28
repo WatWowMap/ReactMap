@@ -15,7 +15,6 @@ import FeedIcon from '@mui/icons-material/Feed'
 import OpacityIcon from '@mui/icons-material/Opacity'
 import TuneIcon from '@mui/icons-material/Tune'
 import TipsAndUpdatesIcon from '@mui/icons-material/TipsAndUpdates'
-
 import { UseMemory, useMemory } from '@store/useMemory'
 import { toggleDialog, useLayoutStore } from '@store/useLayoutStore'
 import {
@@ -81,21 +80,16 @@ function InputType<T extends keyof UseStorage['userSettings']>({
     case 'bool':
       return (
         <Switch
-          color="secondary"
           checked={!!userValue}
-          onChange={handleChange}
+          color="secondary"
           disabled={staticSetting?.disabled}
+          onChange={handleChange}
         />
       )
     default:
       return (
         <Input
           color="secondary"
-          style={{ width: 50, minHeight: 38 }}
-          value={userValue ?? ''}
-          onChange={handleChange}
-          size="small"
-          type={staticSetting.type}
           disabled={staticSetting.disabled}
           endAdornment={staticSetting.label || ''}
           inputProps={
@@ -106,6 +100,11 @@ function InputType<T extends keyof UseStorage['userSettings']>({
                 }
               : undefined
           }
+          size="small"
+          style={{ width: 50, minHeight: 38 }}
+          type={staticSetting.type}
+          value={userValue ?? ''}
+          onChange={handleChange}
         />
       )
   }
@@ -131,6 +130,7 @@ function BaseUserOptions() {
     if (label.startsWith('pvp') && !label.includes('Mega')) {
       return t('pvp_level', { level: label.substring(3) })
     }
+
     return t(camelToSnake(label), getProperName(label))
   }
 
@@ -140,10 +140,12 @@ function BaseUserOptions() {
         name: 'reset',
         action: () => {
           const existing = useStorage.getState().userSettings
+
           if (category in existing) {
             const newSettings = {
               ...existing[category],
             }
+
             Object.entries(staticUserSettings || {}).forEach(([key, value]) => {
               if (value.sub) {
                 Object.entries(value.sub).forEach(([subKey, subValue]) => {
@@ -175,10 +177,12 @@ function BaseUserOptions() {
           acc[value.category || ''] = []
         }
         acc[value.category || ''].push(key)
+
         return acc
       },
       {} as Record<string, string[]>,
     )
+
     return Object.entries(reduced)
       .sort(([a], [b]) => t(a).localeCompare(t(b)))
       .map(([key, value]) => [key, value])
@@ -186,14 +190,14 @@ function BaseUserOptions() {
 
   return (
     <DialogWrapper
-      open={open && type === 'options'}
       maxWidth="sm"
-      onClose={toggleDialog(false)}
+      open={open && type === 'options'}
       variant="large"
+      onClose={toggleDialog(false)}
     >
       <Header
-        titles={[`${camelToSnake(category)}_options`]}
         action={toggleDialog(false)}
+        titles={[`${camelToSnake(category)}_options`]}
       />
       <DialogContent>
         <List>
@@ -206,6 +210,7 @@ function BaseUserOptions() {
           )}
           {staticByCategory.map(([key, values]) => {
             const Icon = ICONS[key]
+
             return (
               <React.Fragment key={key}>
                 {key && (
@@ -221,7 +226,7 @@ function BaseUserOptions() {
                 {values.map((option) => (
                   <React.Fragment key={option}>
                     <ListItem key={option} disableGutters disablePadding>
-                      <ListItemText sx={{ pl: 2 }} primary={getLabel(option)} />
+                      <ListItemText primary={getLabel(option)} sx={{ pl: 2 }} />
                       <MemoInputType category={category} option={option} />
                     </ListItem>
                     {!!staticUserSettings[option]?.sub &&
@@ -232,7 +237,7 @@ function BaseUserOptions() {
                             disableGutters
                             disablePadding
                           >
-                            <ListItemText primary={getLabel(subOption)} inset />
+                            <ListItemText inset primary={getLabel(subOption)} />
                             <MemoInputType
                               category={category}
                               option={option}

@@ -12,7 +12,7 @@ export function ToggleEditor() {
   const hideEditor = usePlayStore((s) => s.hideEditor)
 
   return (
-    <MenuItem onClick={toggleEditor} dense>
+    <MenuItem dense onClick={toggleEditor}>
       <ListItemIcon>
         {hideEditor ? <VisibilityOff /> : <Visibility />}
       </ListItemIcon>

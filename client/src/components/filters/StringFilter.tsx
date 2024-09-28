@@ -3,7 +3,6 @@ import ListItem from '@mui/material/ListItem'
 import TextField from '@mui/material/TextField'
 import { useTranslation } from 'react-i18next'
 import dlv from 'dlv'
-
 import { useStorage } from '@store/useStorage'
 import { setDeep } from '@utils/setDeep'
 import { analytics } from '@utils/analytics'
@@ -27,6 +26,7 @@ export function StringFilter({
       (event) => {
         try {
           const newValue = event.target.value
+
           analytics('Filtering', newValue, 'Legacy')
           if (checkIVFilterValid(newValue)) {
             setValidation({
@@ -66,14 +66,14 @@ export function StringFilter({
   return (
     <ListItem {...props}>
       <TextField
-        error={validation.status}
-        label={validation.label}
-        helperText={validation.message}
-        value={value || ''}
-        onChange={validationCheck}
-        color={validation.status ? 'primary' : 'secondary'}
         fullWidth
         autoComplete="off"
+        color={validation.status ? 'primary' : 'secondary'}
+        error={validation.status}
+        helperText={validation.message}
+        label={validation.label}
+        value={value || ''}
+        onChange={validationCheck}
       />
     </ListItem>
   )

@@ -57,12 +57,14 @@ export const useFormatStore = create<UseFormatStore>((set, get) => ({
     let seconds = Math.ceil((epoch * 1000 - Date.now()) / 1000)
     const rtf = get().relativeFormat
     const isNegative = seconds < 0
+
     seconds = Math.abs(seconds)
     const result = []
 
     for (let i = 0; i < UNITS.length; i++) {
       const { unit, value } = UNITS[i]
       const count = Math.floor(seconds / value)
+
       if (count > 0) {
         result.push(
           rtf.format(isNegative ? -count : count, unit).replace('.', ''),
@@ -78,7 +80,9 @@ export const useFormatStore = create<UseFormatStore>((set, get) => ({
       .map((r, i) => {
         if (i === 0) return r
         const [first, ...rest] = r.split(' ')
+
         if (+first) return r
+
         return rest.join(' ')
       })
       .join(', ')

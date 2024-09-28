@@ -1,7 +1,6 @@
 import * as React from 'react'
 import MenuItem from '@mui/material/MenuItem'
 import { useTranslation } from 'react-i18next'
-
 import { useStorage, useDeepStore } from '@store/useStorage'
 import { S2_LEVELS } from '@assets/constants'
 import { FCSelectListItem } from '@components/inputs/FCSelect'
@@ -22,15 +21,16 @@ const S2Cells = () => {
           : [],
     [filters],
   )
+
   return (
     <CollapsibleItem open={enabled}>
       <FCSelectListItem
-        sx={{ mx: 'auto', width: '90%' }}
-        value={safe}
+        multiple
         renderValue={(selected) =>
           Array.isArray(selected) ? selected.join(', ') : `${selected}`
         }
-        multiple
+        sx={{ mx: 'auto', width: '90%' }}
+        value={safe}
         onChange={({ target }) =>
           setFilters(
             typeof target.value === 'string'

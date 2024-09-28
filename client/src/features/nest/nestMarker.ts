@@ -1,5 +1,4 @@
 import { divIcon } from 'leaflet'
-
 import { useMemory } from '@store/useMemory'
 
 export function nestMarker({

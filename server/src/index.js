@@ -6,13 +6,13 @@ process.title = process.env.NODE_CONFIG_ENV
   : 'ReactMap'
 
 const path = require('path')
+const http = require('http')
+
 const express = require('express')
 const compression = require('compression')
 const { rainbow } = require('chalkercli')
 const cors = require('cors')
 const { json } = require('body-parser')
-const http = require('http')
-
 const { log, TAGS, Logger } = require('@rm/logger')
 const config = require('@rm/config')
 
@@ -21,7 +21,6 @@ const { starti18n } = require('./services/i18n')
 const { checkForUpdates } = require('./services/checkForUpdates')
 const { loadLatestAreas, loadCachedAreas } = require('./services/areas')
 const { startWatcher } = require('./services/watcher')
-
 const { rateLimitingMiddleware } = require('./middleware/rateLimiting')
 const { initSentry, sentryMiddleware } = require('./middleware/sentry')
 const { loggerMiddleware } = require('./middleware/logger')
@@ -31,7 +30,6 @@ const { errorMiddleware } = require('./middleware/error')
 const { sessionMiddleware } = require('./middleware/session')
 const { apolloMiddleware } = require('./middleware/apollo')
 const { helmetMiddleware } = require('./middleware/helmet')
-
 const { startApollo } = require('./graphql/server')
 const { bindConnections } = require('./models')
 const { migrate } = require('./db/migrate')
@@ -109,6 +107,7 @@ const startServer = async () => {
 
   const serverInterface = config.getSafe('interface')
   const serverPort = config.getSafe('port')
+
   httpServer.listen(serverPort, serverInterface)
   log.info(
     TAGS.ReactMap,
@@ -118,11 +117,13 @@ const startServer = async () => {
   await state.loadLocalContexts()
   await state.loadExternalContexts()
   const newAreas = await loadLatestAreas()
+
   config.setAreas(newAreas)
 
   const text = rainbow(
     `ℹ ${Logger.getTimestamp()} [ReactMap] has fully started`,
   )
+
   setTimeout(() => text.stop(), 1_000)
 
   return httpServer

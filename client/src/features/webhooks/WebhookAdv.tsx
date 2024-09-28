@@ -18,7 +18,6 @@ import DialogContent from '@mui/material/DialogContent'
 import { useTranslation } from 'react-i18next'
 import { useLazyQuery } from '@apollo/client'
 import { debounce } from 'lodash'
-
 import { useMemory } from '@store/useMemory'
 import { useStorage } from '@store/useStorage'
 import { Query } from '@services/queries'
@@ -178,6 +177,7 @@ export function WebhookAdvanced() {
 
   const handleSwitch = (event) => {
     const { name, checked } = event.target
+
     switch (name) {
       case 'xl':
         setPoracleValues({
@@ -237,6 +237,7 @@ export function WebhookAdvanced() {
   const handleSelect = (event) => {
     const { name, value } = event.target
     const newObj = { [name]: value }
+
     if (name === 'pvp_ranking_league') {
       newObj.pvp_ranking_min_cp = pvp === 'ohbem' ? 0 : value - 50
     }
@@ -260,13 +261,14 @@ export function WebhookAdvanced() {
 
   const getOptions = (option) => {
     const menuItems = []
+
     switch (option.name) {
       case 'template':
         templates[poracleValues.noIv ? `${category}NoIv` : category]?.[
           human.language || locale
         ]?.forEach((item) =>
           menuItems.push(
-            <MenuItem key={item} value={item} dense>
+            <MenuItem key={item} dense value={item}>
               {item}
             </MenuItem>,
           ),
@@ -276,14 +278,14 @@ export function WebhookAdvanced() {
         if (profile.length) {
           profile.forEach((pro) =>
             menuItems.push(
-              <MenuItem key={pro.name} value={pro.profile_no} dense>
+              <MenuItem key={pro.name} dense value={pro.profile_no}>
                 {pro.name}
               </MenuItem>,
             ),
           )
         } else {
           menuItems.push(
-            <MenuItem key={1} value={1} dense>
+            <MenuItem key={1} dense value={1}>
               1
             </MenuItem>,
           )
@@ -292,7 +294,7 @@ export function WebhookAdvanced() {
       case 'pvp_ranking_cap':
         option.options.forEach((subOption) =>
           menuItems.push(
-            <MenuItem key={subOption} value={subOption} dense>
+            <MenuItem key={subOption} dense value={subOption}>
               {subOption ? t(subOption, subOption).toString() : t('all')}
             </MenuItem>,
           ),
@@ -301,7 +303,7 @@ export function WebhookAdvanced() {
       case 'pvp_ranking_league':
         option.options.forEach((league) =>
           menuItems.push(
-            <MenuItem key={league.name} value={league.cp} dense>
+            <MenuItem key={league.name} dense value={league.cp}>
               {t(`slider_${league.name}`)}
             </MenuItem>,
           ),
@@ -310,7 +312,7 @@ export function WebhookAdvanced() {
       case 'gender':
         option.options.forEach((gender) =>
           menuItems.push(
-            <MenuItem key={gender} value={gender} dense>
+            <MenuItem key={gender} dense value={gender}>
               {t(`gender_${gender}`)}
             </MenuItem>,
           ),
@@ -319,7 +321,7 @@ export function WebhookAdvanced() {
       case 'team':
         option.options.forEach((team) =>
           menuItems.push(
-            <MenuItem key={team} value={team} dense>
+            <MenuItem key={team} dense value={team}>
               {t(`team_${team}`, t('any'))}
             </MenuItem>,
           ),
@@ -327,7 +329,7 @@ export function WebhookAdvanced() {
         break
       case 'move':
         menuItems.push(
-          <MenuItem key={9000} value={9000} dense>
+          <MenuItem key={9000} dense value={9000}>
             {t('any')}
           </MenuItem>,
         )
@@ -335,7 +337,7 @@ export function WebhookAdvanced() {
           Object.keys(moves).forEach((move) => {
             if (moves[move].type) {
               menuItems.push(
-                <MenuItem key={move} value={move} dense>
+                <MenuItem key={move} dense value={move}>
                   {t(`move_${move}`)}
                 </MenuItem>,
               )
@@ -347,7 +349,7 @@ export function WebhookAdvanced() {
               pokemon[idObj.id]?.forms?.[idObj.form]?.[moveType].forEach(
                 (move) => {
                   menuItems.push(
-                    <MenuItem key={move} value={move} dense>
+                    <MenuItem key={move} dense value={move}>
                       {t(`move_${move}`)}
                     </MenuItem>,
                   )
@@ -356,7 +358,7 @@ export function WebhookAdvanced() {
             } else if (pokemon[idObj.id][moveType]) {
               pokemon[idObj.id][moveType].forEach((move) => {
                 menuItems.push(
-                  <MenuItem key={move} value={move} dense>
+                  <MenuItem key={move} dense value={move}>
                     {t(`move_${move}`)}
                   </MenuItem>,
                 )
@@ -368,12 +370,13 @@ export function WebhookAdvanced() {
       default:
         option.options.forEach((subOption) =>
           menuItems.push(
-            <MenuItem key={subOption} value={subOption} dense>
+            <MenuItem key={subOption} dense value={subOption}>
               {t(subOption, subOption).toString()}
             </MenuItem>,
           ),
         )
     }
+
     return menuItems
   }
 
@@ -421,6 +424,7 @@ export function WebhookAdvanced() {
       ) {
         const league =
           leagues.find((x) => x.cp === poracleValues.pvp_ranking_league) || {}
+
         switch (field) {
           case 'pvp_ranking_min_cp':
             return pvp === 'ohbem'
@@ -438,6 +442,7 @@ export function WebhookAdvanced() {
             return ''
         }
       }
+
       return ''
     }
     if (!poracleValues.pvpEntry) {
@@ -477,6 +482,7 @@ export function WebhookAdvanced() {
         const invasion = Object.keys(types).find(
           (x) => types[x].toLowerCase() === poracleValues.grunt_type,
         )
+
         return poracleValues?.grunt_type
           ? `${prefix}${t('invasion')} ${
               invasion
@@ -552,6 +558,7 @@ export function WebhookAdvanced() {
 
   const getInputs = (type, options, parent) => {
     const size = Math.floor(12 / options.length)
+
     switch (type) {
       case 'sliders':
         return options
@@ -559,13 +566,13 @@ export function WebhookAdvanced() {
           .map((option, i) => (
             <Grid
               key={option.name}
-              xs={12}
               sm={option.size || 6}
               style={isMobile ? { marginTop: i ? 'inherit' : 10 } : {}}
+              xs={12}
             >
               <SliderTile
-                slide={option}
                 handleChange={handleSlider(option.low, option.high)}
+                slide={option}
                 values={filterValues[option.name]}
               />
             </Grid>
@@ -576,17 +583,17 @@ export function WebhookAdvanced() {
           .map((option) => (
             <Grid
               key={option.name}
-              xs={option.xs || 6}
               sm={option.sm || size}
               style={{ margin: '10px 0', textAlign: 'center' }}
+              xs={option.xs || 6}
             >
               <FCSelect
+                disabled={getDisabled(option)}
+                fcSx={{ width: '80%' }}
+                label={t(option.name)}
                 name={option.name}
                 value={poracleValues[option.name]}
                 onChange={handleSelect}
-                label={t(option.name)}
-                disabled={getDisabled(option)}
-                fcSx={{ width: '80%' }}
               >
                 {getOptions(option)}
               </FCSelect>
@@ -597,25 +604,25 @@ export function WebhookAdvanced() {
           <Grid
             key={option.name}
             container
-            xs={option.xs || 6}
-            sm={option.sm || size}
-            justifyContent="center"
             alignItems="center"
             direction={isMobile || option.override ? 'row' : 'column'}
+            justifyContent="center"
+            sm={option.sm || size}
             style={{ margin: '10px 0' }}
+            xs={option.xs || 6}
           >
-            <Grid xs={6} textAlign="center">
+            <Grid textAlign="center" xs={6}>
               <Typography variant="subtitle2">
                 {t(camelToSnake(option.name))}
               </Typography>
             </Grid>
-            <Grid xs={6} textAlign="center">
+            <Grid textAlign="center" xs={6}>
               <Switch
-                name={option.name}
-                color="primary"
-                onChange={handleSwitch}
                 checked={Boolean(poracleValues[option.name])}
+                color="primary"
                 disabled={getDisabled(option)}
+                name={option.name}
+                onChange={handleSwitch}
               />
             </Grid>
           </Grid>
@@ -624,24 +631,20 @@ export function WebhookAdvanced() {
         return options.map((option) => (
           <Grid
             key={option.name}
-            xs={option.xs || 6}
             sm={option.sm || size}
             style={{ margin: '10px 0', textAlign: 'center' }}
+            xs={option.xs || 6}
           >
             <TextField
+              InputProps={{
+                endAdornment: option.adornment ? (
+                  <InputAdornment position="end">
+                    {t(option.adornment)}
+                  </InputAdornment>
+                ) : null,
+              }}
               autoComplete="off"
-              name={option.name}
-              label={t(option.name)}
-              value={
-                poracleValues[option.name] ||
-                (option.type === 'number' ? 0 : '')
-              }
-              onChange={handleSelect}
-              variant="outlined"
               disabled={getDisabled(option)}
-              type={option.type || 'text'}
-              size="small"
-              style={{ width: option.width || 120 }}
               inputProps={{
                 min:
                   option.name === 'pvp_ranking_min_cp' &&
@@ -656,13 +659,17 @@ export function WebhookAdvanced() {
                     ? poracleValues.pvp_ranking_league || 0
                     : option.max || 10000,
               }}
-              InputProps={{
-                endAdornment: option.adornment ? (
-                  <InputAdornment position="end">
-                    {t(option.adornment)}
-                  </InputAdornment>
-                ) : null,
-              }}
+              label={t(option.name)}
+              name={option.name}
+              size="small"
+              style={{ width: option.width || 120 }}
+              type={option.type || 'text'}
+              value={
+                poracleValues[option.name] ||
+                (option.type === 'number' ? 0 : '')
+              }
+              variant="outlined"
+              onChange={handleSelect}
             />
           </Grid>
         ))
@@ -671,32 +678,23 @@ export function WebhookAdvanced() {
           <Grid
             key={option.name}
             container
-            xs={option.xs}
-            sm={option.sm}
-            justifyContent="center"
             alignItems="center"
+            justifyContent="center"
+            sm={option.sm}
+            xs={option.xs}
           >
             <Grid xs={11}>
               <Autocomplete
-                style={{ width: '100%' }}
-                getOptionLabel={(x) => x.formatted}
-                filterOptions={(x) => x}
-                options={fetchedData ? fetchedData.search : []}
                 autoComplete
-                disabled={!hasNominatim}
-                includeInputInList
                 freeSolo
-                onChange={(event, newValue) => {
-                  if (newValue) {
-                    setPoracleValues({ ...poracleValues, gym_id: newValue.id })
-                  }
-                }}
+                includeInputInList
+                disabled={!hasNominatim}
+                filterOptions={(x) => x}
+                getOptionLabel={(x) => x.formatted}
+                options={fetchedData ? fetchedData.search : []}
                 renderInput={(params) => (
                   <TextField
                     {...params}
-                    label={t('search_specific', { category: t(option.label) })}
-                    variant="outlined"
-                    onChange={(e) => debounceChange(e, option.searchCategory)}
                     InputProps={{
                       ...params.InputProps,
                       endAdornment: (
@@ -708,29 +706,38 @@ export function WebhookAdvanced() {
                         </>
                       ),
                     }}
+                    label={t('search_specific', { category: t(option.label) })}
+                    variant="outlined"
+                    onChange={(e) => debounceChange(e, option.searchCategory)}
                   />
                 )}
                 renderOption={(props, x) => (
                   <Grid
-                    component="li"
                     container
                     alignItems="center"
+                    component="li"
                     rowSpacing={1}
                     {...props}
                   >
                     <Grid xs={12}>
                       <Typography variant="subtitle2">{x.name}</Typography>
                     </Grid>
-                    <Grid xs={12} maxWidth="100%">
+                    <Grid maxWidth="100%" xs={12}>
                       <Typography variant="caption">{x.formatted}</Typography>
                     </Grid>
                     <Divider
-                      light
                       flexItem
+                      light
                       style={{ height: 2, width: '100%', margin: '5px 0' }}
                     />
                   </Grid>
                 )}
+                style={{ width: '100%' }}
+                onChange={(event, newValue) => {
+                  if (newValue) {
+                    setPoracleValues({ ...poracleValues, gym_id: newValue.id })
+                  }
+                }}
               />
             </Grid>
           </Grid>
@@ -741,13 +748,13 @@ export function WebhookAdvanced() {
           <Grid
             key={type}
             container
-            xs={12}
-            justifyContent="center"
             alignItems="center"
+            justifyContent="center"
+            xs={12}
           >
             <Divider
-              light
               flexItem
+              light
               style={{ height: 3, width: '90%', margin: '10px 0' }}
             />
             {Object.keys(info?.ui[parent][type] || {}).map((subType) =>
@@ -760,11 +767,13 @@ export function WebhookAdvanced() {
 
   const handleClose = (save = false, filterId = '', filterToSave = null) => {
     const realSave = typeof save === 'boolean' && save
+
     if (realSave) {
       useWebhookStore.setState((prev) => {
         if (filterId === 'global' && filterToSave) {
           const newFilters = {}
           const wc = wildCards[category] || ['0-0']
+
           if (filterToSave.everything_individually !== false) {
             selectedIds.forEach((item) => {
               newFilters[item] = {
@@ -782,6 +791,7 @@ export function WebhookAdvanced() {
               }
             })
           }
+
           return {
             tempFilters: {
               ...prev.tempFilters,
@@ -802,6 +812,7 @@ export function WebhookAdvanced() {
             },
           }
         }
+
         return prev
       })
     } else {
@@ -837,29 +848,30 @@ export function WebhookAdvanced() {
 
   return (
     <Dialog
-      open={!!(open && id)}
-      fullWidth={!isMobile}
       fullScreen={isMobile}
+      fullWidth={!isMobile}
+      open={!!(open && id)}
       onClose={handleClose}
     >
-      <Header titles={Poracle.getTitles(idObj)} action={handleClose} />
+      <Header action={handleClose} titles={Poracle.getTitles(idObj)} />
       <DialogContent style={{ padding: '8px 5px' }}>
         {Object.keys(info?.ui || {}).map((type) => {
           if (human.blocked_alerts.includes(type)) return null
           if (type === 'global' && (idObj.id !== 'global' || !everything))
             return null
           const Items = (
-            <Grid container justifyContent="center" alignItems="center">
+            <Grid container alignItems="center" justifyContent="center">
               {Object.keys(info.ui[type]).map((subType) =>
                 getInputs(subType, info.ui[type][subType], type),
               )}
             </Grid>
           )
+
           return (
             <Paper
-              style={{ margin: 10, width: '95%' }}
-              elevation={3}
               key={type}
+              elevation={3}
+              style={{ margin: 10, width: '95%' }}
             >
               {type === 'general' ||
               type === 'distanceOrArea' ||
@@ -880,15 +892,15 @@ export function WebhookAdvanced() {
           )
         })}
         <Paper
-          style={{ margin: 10, width: '95%', textAlign: 'center' }}
           elevation={1}
+          style={{ margin: 10, width: '95%', textAlign: 'center' }}
         >
-          <Typography variant="subtitle1" color="secondary">
+          <Typography color="secondary" variant="subtitle1">
             {getPoracleString().toLowerCase()}
           </Typography>
         </Paper>
       </DialogContent>
-      <Footer options={footerOptions} role="webhook_advanced" />
+      <Footer i18nKey="webhook_advanced" options={footerOptions} />
     </Dialog>
   )
 }

@@ -1,5 +1,4 @@
 import * as React from 'react'
-
 import { useStorage } from '@store/useStorage'
 
 import { HolidayAnimations } from './HolidayAnimations'
@@ -15,7 +14,9 @@ export function HolidayEffect({
   React.useLayoutEffect(() => {
     if (images?.length && !userDisabled) {
       const animation = new HolidayAnimations(images, imageScale)
+
       animation.initialize()
+
       return () => {
         animation.stop()
       }

@@ -1,7 +1,6 @@
 import { useMemo } from 'react'
 import { createTheme, responsiveFontSizes, darken } from '@mui/material/styles'
 import dlv from 'dlv'
-
 import { useMemory } from '@store/useMemory'
 import { useStorage } from '@store/useStorage'
 
@@ -134,6 +133,7 @@ export function useCustomTheme() {
               styleOverrides: {
                 root: ({ theme, ownerState }) => {
                   const color = ownerState?.bgcolor
+
                   if (typeof color === 'string') {
                     const backgroundColor = color
                       ? (typeof color === 'string' && color.includes('.')) ||
@@ -145,9 +145,11 @@ export function useCustomTheme() {
                       typeof backgroundColor === 'string'
                         ? backgroundColor
                         : backgroundColor?.main
+
                     if (!VALID_COLOR.test(finalColor) || !finalColor) {
                       return
                     }
+
                     return {
                       color: theme.palette.getContrastText(finalColor),
                       backgroundColor,

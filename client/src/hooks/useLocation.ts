@@ -3,7 +3,6 @@ import { LayerGroup, DomEvent, DomUtil, Control } from 'leaflet'
 import { useTranslation } from 'react-i18next'
 import { useMap } from 'react-leaflet'
 import 'leaflet.locatecontrol'
-
 import { useStorage } from '@store/useStorage'
 
 export function useLocation(dependency = false): {
@@ -52,6 +51,7 @@ export function useLocation(dependency = false): {
           'div',
           'react-locate-control leaflet-bar leaflet-control',
         )
+
         // @ts-ignore
         this._container = container
         // @ts-ignore
@@ -71,6 +71,7 @@ export function useLocation(dependency = false): {
           // @ts-ignore
           this.options,
         )
+
         // @ts-ignore
         this._link = linkAndIcon.link
         // @ts-ignore
@@ -114,12 +115,14 @@ export function useLocation(dependency = false): {
         title: t('lc_title'),
       },
     })
+
     return result
   }, [t, metric])
 
   useEffect(() => {
     if (lc) {
       lc.addTo(map)
+
       return () => {
         lc.stop()
         lc.remove()

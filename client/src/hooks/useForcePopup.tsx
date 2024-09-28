@@ -1,5 +1,4 @@
 import { useEffect } from 'react'
-
 import { useMemory } from '@store/useMemory'
 
 const cleanup = () =>
@@ -15,6 +14,7 @@ export function useForcePopup(
     if (id === manualParams.id && ref) {
       ref.openPopup()
       ref.on('popupclose', cleanup)
+
       return () => {
         ref.off('popupclose', cleanup)
         ref.closePopup()

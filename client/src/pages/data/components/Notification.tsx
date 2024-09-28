@@ -16,8 +16,8 @@ export function DataManagementNotification() {
   const severity = useDataManagementStore((s) => s.severity)
 
   return (
-    <Snackbar open={open} autoHideDuration={5000} onClose={handleClose}>
-      <Alert onClose={handleClose} severity={severity} variant="filled">
+    <Snackbar autoHideDuration={5000} open={open} onClose={handleClose}>
+      <Alert severity={severity} variant="filled" onClose={handleClose}>
         {message}
       </Alert>
     </Snackbar>

@@ -5,8 +5,8 @@
 /* eslint-disable no-cond-assign */
 /* eslint-disable default-case */
 const vm = require('vm')
-const NodeCache = require('node-cache')
 
+const NodeCache = require('node-cache')
 const { log, TAGS } = require('@rm/logger')
 
 /**
@@ -21,11 +21,13 @@ function getParsedPvp(pokemon) {
 
   const parsed = { great: [], ultra: [], little: [] }
   const pvpKeys = ['great', 'ultra']
+
   pvpKeys.forEach((league) => {
     if (pokemon[`pvp_rankings_${league}_league`]) {
       parsed[league] = JSON.parse(pokemon[`pvp_rankings_${league}_league`])
     }
   })
+
   return parsed
 }
 
@@ -38,6 +40,7 @@ function getParsedPvp(pokemon) {
 function deepCompare(incoming, reference) {
   return Object.entries(incoming).every(([key, value]) => {
     const refValue = reference[key]
+
     if (typeof value === 'object') {
       if (Array.isArray(value) && Array.isArray(refValue)) {
         return (
@@ -45,8 +48,10 @@ function deepCompare(incoming, reference) {
           value.length === refValue.length
         )
       }
+
       return deepCompare(value, refValue)
     }
+
     return value === refValue
   })
 }
@@ -68,6 +73,7 @@ function between(value, ...args) {
 function assign(newObject, reference, props) {
   for (let i = 0; i < props.length; i += 1) {
     const prop = props[i]
+
     newObject[prop] = reference[prop]
   }
 }
@@ -95,6 +101,7 @@ function jsifyIvFilter(filter) {
   let stack = 0
   let lastIndex = 0
   let match
+
   while ((match = tokenizer.exec(input)) !== null) {
     if (match.index > lastIndex) {
       return null
@@ -104,6 +111,7 @@ function jsifyIvFilter(filter) {
         const lower = parseFloat(match[3])
         let column = 'iv'
         let subColumn
+
         switch (match[2]) {
           case 'A':
             column = 'atk_iv'
@@ -140,6 +148,7 @@ function jsifyIvFilter(filter) {
             break
         }
         let upper = lower
+
         if (match[4] !== undefined) {
           upper = parseFloat(match[4])
         }
@@ -195,7 +204,9 @@ function jsifyIvFilter(filter) {
   }
   log.trace(TAGS.pokemon, result)
   const fn = vm.runInNewContext(`(pokemon) => ${result};`)
+
   jsFnCache.set(filter, fn)
+
   return fn
 }
 
@@ -214,6 +225,7 @@ function dnfifyIvFilter(filter, pokemon) {
   let lastIndex = 0
   let match
   let clause = { pokemon }
+
   while ((match = tokenizer.exec(input)) !== null) {
     if (match.index > lastIndex) {
       return []
@@ -223,6 +235,7 @@ function dnfifyIvFilter(filter, pokemon) {
         return []
       }
       let column = 'iv'
+
       switch (match[2]) {
         case 'A':
           column = 'atk_iv'
@@ -256,6 +269,7 @@ function dnfifyIvFilter(filter, pokemon) {
           break
       }
       const minMax = { min: parseFloat(match[3]) }
+
       if (match[4] !== undefined) {
         minMax.max = parseInt(match[4])
       } else {
@@ -284,6 +298,7 @@ function dnfifyIvFilter(filter, pokemon) {
     return [{ pokemon, iv: { min: -1, max: 100 } }]
   }
   results.push(clause)
+
   return results
 }
 

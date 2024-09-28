@@ -4,6 +4,7 @@ export function setDeep(obj: object, path: string | string[], value: any) {
   }
   if (path.length > 1) {
     const next = path.shift()
+
     setDeep(
       (obj[next] =
         Object.prototype.toString.call(obj[next]) === '[object Object]'

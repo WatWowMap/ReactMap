@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-
 import { useFormatStore } from '@store/useFormatStore'
 
 export function useRelativeTimer(epochTime: number) {
@@ -12,6 +11,7 @@ export function useRelativeTimer(epochTime: number) {
     const interval = setInterval(() => {
       setRelative(relativeFormat(epochTime))
     }, 1000)
+
     return () => clearInterval(interval)
   }, [relativeFormat])
 

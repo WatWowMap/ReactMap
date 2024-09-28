@@ -1,9 +1,9 @@
 import { Icon } from 'leaflet'
-
 import { useMemory } from '@store/useMemory'
 
 export function routeMarker(position: 'start' | 'end') {
   const iconUrl = useMemory.getState().Icons.getMisc(`route-${position}`)
+
   return new Icon({
     iconUrl,
     iconAnchor: [position === 'start' ? 12 : 20, 16],

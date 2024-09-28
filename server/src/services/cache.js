@@ -20,19 +20,24 @@ const fsFriendlyName = (str) =>
  */
 const getCache = (unsafeName, fallback = null) => {
   const fileName = fsFriendlyName(unsafeName)
+
   try {
     if (!fs.existsSync(path.resolve(CACHE_DIR, fileName))) return fallback
     const data = JSON.parse(
       fs.readFileSync(path.resolve(CACHE_DIR, fileName), 'utf-8'),
     )
+
     if (fallback) {
       Object.entries(fallback).forEach(([key, value]) => {
         if (!(key in data)) data[key] = value
       })
     }
     log.info(TAGS.cache, 'Loaded', fileName)
+
     return data
   } catch (e) {
+    log.error(TAGS.cache, e)
+
     return fallback
   }
 }
@@ -43,6 +48,7 @@ const getCache = (unsafeName, fallback = null) => {
  */
 const setCache = async (unsafeName, data) => {
   const fileName = fsFriendlyName(unsafeName)
+
   try {
     if (!fs.existsSync(CACHE_DIR)) {
       await fs.promises.mkdir(CACHE_DIR, { recursive: true })

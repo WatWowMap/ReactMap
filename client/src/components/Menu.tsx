@@ -1,3 +1,5 @@
+import type { AdvCategories, Available } from '@rm/types'
+
 import * as React from 'react'
 import Box from '@mui/material/Box'
 import DialogContent from '@mui/material/DialogContent'
@@ -6,7 +8,6 @@ import { useTranslation } from 'react-i18next'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import Collapse from '@mui/material/Collapse'
 import IconButton from '@mui/material/IconButton'
-
 import { useMemory } from '@store/useMemory'
 import { useLayoutStore } from '@store/useLayoutStore'
 import { useFilter } from '@hooks/useFilter'
@@ -15,7 +16,6 @@ import { applyToAll } from '@utils/applyToAll'
 import { useGetAvailable } from '@hooks/useGetAvailable'
 import { applyToAllWebhooks, useWebhookStore } from '@store/useWebhookStore'
 import { useAnalytics } from '@hooks/useAnalytics'
-import type { AdvCategories, Available } from '@rm/types'
 
 import { OptionsContainer } from './filters/OptionsContainer'
 import { VirtualGrid } from './virtual/VirtualGrid'
@@ -76,11 +76,11 @@ export function Menu<T extends AdvCategories>({
                 false,
                 useMemory.getState().advMenuFiltered[category],
               )
-            : applyToAll({
-                newFilter: { enabled: false },
+            : applyToAll(
+                { enabled: false },
                 category,
-                selectedIds: useMemory.getState().advMenuFiltered[category],
-              }),
+                useMemory.getState().advMenuFiltered[category],
+              ),
         icon: 'Clear',
         color: 'error',
       },
@@ -92,12 +92,12 @@ export function Menu<T extends AdvCategories>({
                 true,
                 useMemory.getState().advMenuFiltered[category],
               )
-            : applyToAll({
-                newFilter: { enabled: true },
+            : applyToAll(
+                { enabled: true },
                 category,
-                selectedIds: useMemory.getState().advMenuFiltered[category],
-                includeSlots: !webhookCategory,
-              }),
+                useMemory.getState().advMenuFiltered[category],
+                !webhookCategory,
+              ),
         icon: 'Check',
         color: 'success',
       },
@@ -111,11 +111,11 @@ export function Menu<T extends AdvCategories>({
       <DialogContent className="container" sx={{ p: 0, minHeight: '75vh' }}>
         {!isMobile && (
           <Box className="column-25">
-            <OptionsContainer category={category} categories={categories} />
+            <OptionsContainer categories={categories} category={category} />
           </Box>
         )}
-        <Box p={1} className="column-75">
-          <Box pb={1} display="flex">
+        <Box className="column-75" p={1}>
+          <Box display="flex" pb={1}>
             <GenericSearch
               field={`searches.${category}Advanced`}
               label={t(`search_${category}`, t(`search_${category}s`))}
@@ -131,20 +131,20 @@ export function Menu<T extends AdvCategories>({
           <Box>
             {isMobile && (
               <Collapse in={filterDrawer}>
-                <OptionsContainer category={category} categories={categories} />
+                <OptionsContainer categories={categories} category={category} />
               </Collapse>
             )}
             <Results
+              categories={categories}
               category={category}
               webhookCategory={webhookCategory}
-              categories={categories}
             >
               {children}
             </Results>
           </Box>
         </Box>
       </DialogContent>
-      <Footer options={footerButtons} role="dialog_filter_footer" />
+      <Footer i18nKey="dialog_filter_footer" options={footerButtons} />
     </>
   )
 }
@@ -157,13 +157,14 @@ function Results<T extends AdvCategories>({
 }: Props<T>) {
   const { t } = useTranslation()
   const filteredArr = useFilter(category, webhookCategory, categories)
+
   return filteredArr.length ? (
-    <VirtualGrid data={filteredArr} xs={4} md={2}>
+    <VirtualGrid data={filteredArr} md={2} xs={4}>
       {children}
     </VirtualGrid>
   ) : (
     <Box className="flex-center" flex="1 1 auto" whiteSpace="pre-line">
-      <Typography variant="h6" align="center">
+      <Typography align="center" variant="h6">
         {t('no_filter_results')}
       </Typography>
     </Box>

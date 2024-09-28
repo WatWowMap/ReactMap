@@ -14,7 +14,7 @@ export function ExtraInfo({
   const { t } = useTranslation()
 
   return (
-    <Grid container xs={6} direction="column" textAlign="center">
+    <Grid container direction="column" textAlign="center" xs={6}>
       {title && (
         <Grid>
           <Typography variant="subtitle2">{t(title)}:</Typography>

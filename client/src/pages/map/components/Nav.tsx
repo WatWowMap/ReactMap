@@ -1,5 +1,4 @@
 import * as React from 'react'
-
 import { Tutorial } from '@features/tutorial'
 import { UserProfile } from '@features/profile'
 import { Search } from '@features/search'
@@ -28,6 +27,7 @@ import { FloatingButtonsMemo } from './FloatingBtn'
 export const Nav = React.memo(
   () => {
     const iconsIsReady = useMemory((s) => !!s.Icons)
+
     return (
       <>
         <ClientError />
@@ -61,3 +61,5 @@ export const Nav = React.memo(
   },
   () => true,
 )
+
+Nav.displayName = 'Nav'

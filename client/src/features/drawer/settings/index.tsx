@@ -8,7 +8,6 @@ import NotificationsActiveIcon from '@mui/icons-material/NotificationsActive'
 import NotificationsOffIcon from '@mui/icons-material/NotificationsOff'
 import LogoDevIcon from '@mui/icons-material/LogoDev'
 import { useTranslation } from 'react-i18next'
-
 import { useMemory } from '@store/useMemory'
 import { toggleDialog } from '@store/useLayoutStore'
 import {
@@ -22,6 +21,7 @@ import { BoolToggle } from '@components/inputs/BoolToggle'
 import { BasicListButton } from '@components/inputs/BasicListButton'
 
 import { DrawerActions } from '../components/Actions'
+
 import { GeneralSetting } from './General'
 import { UAssetSetting } from './UAssets'
 import { HolidaySetting } from './Holiday'
@@ -54,11 +54,11 @@ export function Settings() {
       {HAS_API && (
         <BasicListButton
           disabled={!HAS_API}
+          label="desktop_notifications"
           onClick={async () => {
             await requestPermission()
             toggleDialog(true, 'notifications', 'options')()
           }}
-          label="desktop_notifications"
         >
           {getPermission() === 'granted' ? (
             <NotificationsActiveIcon />

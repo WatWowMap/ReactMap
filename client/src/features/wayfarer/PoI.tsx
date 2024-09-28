@@ -9,10 +9,10 @@ const PoI = ({
   <Circle
     key={color}
     center={[lat, lon]}
-    radius={20}
-    interactive={false}
     color={color}
     fillColor={color}
+    interactive={false}
+    radius={20}
   />
 )
 

@@ -11,10 +11,10 @@ export function CustomText({
   return (
     <Typography
       className={className}
-      variant={variant}
       color={color}
       style={style}
       sx={sx}
+      variant={variant}
     >
       {children}
     </Typography>

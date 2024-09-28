@@ -3,7 +3,6 @@ import Grid from '@mui/material/Unstable_Grid2'
 import Divider from '@mui/material/Divider'
 import CircularProgress from '@mui/material/CircularProgress'
 import { styled } from '@mui/material/styles'
-
 import { useWebhookStore } from '@store/useWebhookStore'
 
 import { ProfileView } from './ProfileView'
@@ -32,19 +31,20 @@ export const ProfileTile = ({ uid }: Pick<Props, 'uid'>) => {
     (/** @type {View} */ newView: View) => () => setView(newView),
     [view],
   )
+
   return (
-    <Grid container xs={12} justifyContent="center" alignItems="center">
+    <Grid container alignItems="center" justifyContent="center" xs={12}>
       <StyledDivider flexItem />
       {isLoading ? (
         <CircularProgress />
       ) : (
         {
           profile: (
-            <ProfileView uid={uid} handleViewChange={handleViewChange} />
+            <ProfileView handleViewChange={handleViewChange} uid={uid} />
           ),
-          edit: <EditView uid={uid} handleViewChange={handleViewChange} />,
-          delete: <DeleteView uid={uid} handleViewChange={handleViewChange} />,
-          copy: <CopyView uid={uid} handleViewChange={handleViewChange} />,
+          edit: <EditView handleViewChange={handleViewChange} uid={uid} />,
+          delete: <DeleteView handleViewChange={handleViewChange} uid={uid} />,
+          copy: <CopyView handleViewChange={handleViewChange} uid={uid} />,
         }[view]
       )}
     </Grid>

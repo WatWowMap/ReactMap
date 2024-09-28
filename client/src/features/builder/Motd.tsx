@@ -3,16 +3,15 @@ import Typography from '@mui/material/Typography'
 import Dialog from '@mui/material/Dialog'
 import Box from '@mui/material/Box'
 import { useQuery } from '@apollo/client'
-
 import { useLayoutStore } from '@store/useLayoutStore'
 import { useStorage } from '@store/useStorage'
 import { CUSTOM_COMPONENT, MOTD_CHECK } from '@services/queries/config'
 import { Loading } from '@components/Loading'
+import { Config } from '@rm/types'
 
 import { CustomTile } from './components/CustomTile'
 import { CustomDialog } from './components/CustomDialog'
 import { getBlockContent } from './utils'
-import { Config } from '@rm/types'
 
 const DEFAULT: Config['map']['messageOfTheDay'] = {
   settings: {
@@ -66,8 +65,8 @@ export function MessageOfTheDay() {
 
   return (
     <Dialog
-      open={open && !tutorial}
       maxWidth={motd.dialogMaxWidth || 'sm'}
+      open={open && !tutorial}
       onClose={handleMotdClose}
     >
       <CustomDialog
@@ -93,11 +92,11 @@ export function MessageOfTheDay() {
 
 const DefaultMotD = ({ block }) =>
   typeof block === 'string' ? (
-    <Typography key={block} variant="subtitle1" align="center" margin={3}>
+    <Typography key={block} align="center" margin={3} variant="subtitle1">
       {block}
     </Typography>
   ) : (
-    <Box whiteSpace="pre-line" margin={3} textAlign="center">
+    <Box margin={3} textAlign="center" whiteSpace="pre-line">
       {block.title && (
         <Typography variant="h6">{getBlockContent(block.title)}</Typography>
       )}

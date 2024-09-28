@@ -6,6 +6,7 @@ const resetState = (
     keyof import('@store/useMemory').UseMemory,
 ) => {
   const state = useMemory.getState()[key]
+
   useStorage.setState({
     [key]:
       key === 'settings'
@@ -52,6 +53,7 @@ export const resetUI = () =>
 
 export const resetLocation = () => {
   const { config } = useMemory.getState()
+
   useStorage.setState({
     location: [config.general.startLat || 0, config.general.startLon || 0],
     zoom: config.general.startZoom || 18,
@@ -71,6 +73,7 @@ export const resetAllGeneral = () => {
 /** @param {import('@rm/types').Categories} key */
 export const resetFilter = (key: import('@rm/types').Categories) => {
   const reference = useMemory.getState().filters[key]
+
   useStorage.setState((prev) => ({
     filters: { ...prev.filters, [key]: structuredClone(reference) },
   }))

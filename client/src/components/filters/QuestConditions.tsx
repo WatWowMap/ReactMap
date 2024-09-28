@@ -2,7 +2,6 @@ import * as React from 'react'
 import Typography from '@mui/material/Typography'
 import MenuItem from '@mui/material/MenuItem'
 import { useTranslation } from 'react-i18next'
-
 import { useMemory } from '@store/useMemory'
 import { useDeepStore, useStorage } from '@store/useStorage'
 import { QuestTitle } from '@components/QuestTitle'
@@ -42,6 +41,7 @@ export function QuestConditionSelector({ id }: { id: string }) {
                 ),
               )
           : []
+
         setValue(filtered.length ? filtered.join(',') : '')
       }
     } else {
@@ -54,19 +54,18 @@ export function QuestConditionSelector({ id }: { id: string }) {
 
   return (
     <FCSelect
-      label={t('quest_condition')}
-      value={value.split(',')}
-      disabled={all}
       fullWidth
-      open={open}
-      onOpen={handleOpen}
-      onClose={handleClose}
       multiple
+      disabled={all}
+      fcSx={{ my: 1 }}
+      label={t('quest_condition')}
+      open={open}
       renderValue={(selected) =>
         Array.isArray(selected)
           ? `${selected.length} ${t('selected')}`
           : selected
       }
+      value={value.split(',')}
       onChange={(e, child) => {
         if (
           typeof child === 'object' &&
@@ -84,7 +83,8 @@ export function QuestConditionSelector({ id }: { id: string }) {
           if (e.target.value.length === 0) handleClose()
         }
       }}
-      fcSx={{ my: 1 }}
+      onClose={handleClose}
+      onOpen={handleOpen}
     >
       <MenuItem value="">
         <Typography variant="caption">{t('all')}</Typography>
@@ -94,7 +94,7 @@ export function QuestConditionSelector({ id }: { id: string }) {
         .sort((a, b) => a.title.localeCompare(b.title))
         .map(({ title, target }) => (
           <MenuItem key={`${title}-${target}`} value={`${title}__${target}`}>
-            <QuestTitle questTitle={title} questTarget={target} />
+            <QuestTitle questTarget={target} questTitle={title} />
           </MenuItem>
         ))}
     </FCSelect>

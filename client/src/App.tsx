@@ -7,7 +7,6 @@ import { BrowserRouter } from 'react-router-dom'
 import CssBaseline from '@mui/material/CssBaseline'
 import ThemeProvider from '@mui/material/styles/ThemeProvider'
 import { ApolloProvider } from '@apollo/client'
-
 import { useCustomTheme } from '@assets/theme'
 import { globalStyles } from '@components/Global'
 import { apolloClient } from '@services/apollo'
@@ -39,7 +38,9 @@ const LOADING_LOCALES = {
 
 function SetText() {
   const locale = localStorage?.getItem('i18nextLng') || 'en'
+
   setLoadingText(LOADING_LOCALES[locale.toLowerCase()] || LOADING_LOCALES.en)
+
   return <div />
 }
 

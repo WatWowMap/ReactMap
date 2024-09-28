@@ -3,17 +3,17 @@
 
 import Divider from '@mui/material/Divider'
 import Grid from '@mui/material/Unstable_Grid2'
-
 import { DiscordButton } from '@components/auth/Discord'
 import { LocalLogin } from '@components/auth/Local'
 import { TelegramWidget } from '@components/auth/Telegram'
 import { Img } from '@components/Img'
 import { LocaleSelection } from '@components/inputs/LocaleSelection'
 
+import { getGridSizes, getBlockContent } from '../utils'
+
 import { LinkWrapper } from './LinkWrapper'
 import { CustomText } from './CustomText'
 import { CustomButton } from './CustomButton'
-import { getGridSizes, getBlockContent } from '../utils'
 
 export function Generator({
   block,
@@ -24,6 +24,7 @@ export function Generator({
 }) {
   const { content = null, text = null, gridSizes, type, ...props } = block
   const children = getBlockContent(content || text)
+
   switch (type) {
     case 'img':
       return (
@@ -48,8 +49,8 @@ export function Generator({
     case 'telegram':
       return (
         <TelegramWidget
-          botName={block.telegramBotName}
           authUrl={block.telegramAuthUrl}
+          botName={block.telegramBotName}
         />
       )
     case 'discord':
@@ -68,8 +69,8 @@ export function Generator({
         <Grid
           container
           {...getGridSizes(gridSizes)}
-          className={block.className}
           alignItems={block.alignItems}
+          className={block.className}
           justifyContent={block.justifyContent}
           spacing={block.spacing}
           style={block.style}

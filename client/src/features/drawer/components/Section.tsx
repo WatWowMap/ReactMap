@@ -8,7 +8,6 @@ import AccordionSummary from '@mui/material/AccordionSummary'
 import AccordionDetails from '@mui/material/AccordionDetails'
 import List from '@mui/material/List'
 import { useTranslation } from 'react-i18next'
-
 import { useMemory } from '@store/useMemory'
 import { toggleDialog, useLayoutStore } from '@store/useLayoutStore'
 import { useStorage } from '@store/useStorage'
@@ -56,6 +55,7 @@ const DrawerSection = ({
       const timer = setTimeout(() => {
         setUnmountOnExit(false)
       }, 250)
+
       return () => clearTimeout(timer)
     }
     setUnmountOnExit(true)
@@ -63,9 +63,9 @@ const DrawerSection = ({
 
   return (
     <Accordion
+      TransitionProps={{ unmountOnExit }}
       expanded={sidebar}
       onChange={handleChange(category)}
-      TransitionProps={{ unmountOnExit }}
     >
       <AccordionSummary expandIcon={<ExpandMoreIcon />}>
         <Typography>{t(camelToSnake(category))}</Typography>
@@ -80,6 +80,7 @@ const DrawerSection = ({
             Object.keys(value).map((subItem) => {
               const hasSubSubCategories =
                 category === 'wayfarer' || category === 'admin'
+
               return (
                 <React.Fragment key={`${category}${subItem}`}>
                   {!(
@@ -101,16 +102,16 @@ const DrawerSection = ({
           )}
           {staticUserSettings && (
             <BasicListButton
-              onClick={toggleDialog(true, category, 'options')}
               label="options"
+              onClick={toggleDialog(true, category, 'options')}
             >
               <SettingsIcon color="secondary" />
             </BasicListButton>
           )}
           {ADV_CATEGORIES.has(category) && (
             <BasicListButton
-              onClick={toggleDialog(true, category, 'filters')}
               label="advanced"
+              onClick={toggleDialog(true, category, 'filters')}
             >
               <TuneIcon color="primary" />
             </BasicListButton>

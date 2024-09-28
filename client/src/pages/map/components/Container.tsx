@@ -1,5 +1,4 @@
 import { MapContainer } from 'react-leaflet'
-
 import { useMemory } from '@store/useMemory'
 import { useStorage } from '@store/useStorage'
 import { useMapStore } from '@store/useMapStore'
@@ -25,6 +24,7 @@ function setLocationZoom({
 }) {
   const { lat, lng } = map.getCenter()
   const zoom = map.getZoom()
+
   useStorage.setState({ location: [lat, lng], zoom })
   useMemory.setState({
     timeOfDay: timeCheck(lat, lng),
@@ -42,21 +42,22 @@ export function Container() {
 
   return (
     <MapContainer
-      tap={false}
-      center={location}
       ref={(ref) => {
         if (ref) {
           const { attributionPrefix } = useMemory.getState().config.general
+
           ref.attributionControl.setPrefix(attributionPrefix || '')
           ref.on('moveend', setLocationZoom)
           ref.on('zoomend', setLocationZoom)
         }
         useMapStore.setState({ map: ref })
       }}
+      preferCanvas
+      center={location}
+      maxBounds={MAX_BOUNDS}
+      tap={false}
       zoom={zoom}
       zoomControl={false}
-      maxBounds={MAX_BOUNDS}
-      preferCanvas
     >
       <Effects />
       <ControlledTileLayer />

@@ -3,7 +3,6 @@ import Box from '@mui/material/Box'
 import Popper, { PopperProps } from '@mui/material/Popper'
 import Autocomplete from '@mui/material/Autocomplete'
 import { useTranslation } from 'react-i18next'
-
 import { useMemory } from '@store/useMemory'
 import { useLayoutStore } from '@store/useLayoutStore'
 import { useStorage } from '@store/useStorage'
@@ -56,6 +55,7 @@ const STATIC_PROPS: Omit<
   onChange: (_, result) => {
     const { map } = useMapStore.getState()
     const { searchTab } = useStorage.getState()
+
     handleClose()
     if (typeof result === 'object' && 'lat' in result && 'lon' in result) {
       map.flyTo([result.lat, result.lon], 16)
@@ -92,19 +92,19 @@ export function Search() {
     <Dialog
       fullScreen={isMobile}
       open={open}
-      onClose={handleClose}
       sx={DIALOG_SX}
+      onClose={handleClose}
     >
       <Box width={BOX_WIDTH}>
-        <Header titles="search" action={handleClose} />
+        <Header action={handleClose} titles="search" />
         <Autocomplete
           freeSolo={!search.length}
           inputValue={search}
-          onInputChange={handleInputChange}
-          options={options}
           loading={loading}
           loadingText={t('searching')}
           noOptionsText={t('no_options')}
+          options={options}
+          onInputChange={handleInputChange}
           {...STATIC_PROPS}
         />
       </Box>

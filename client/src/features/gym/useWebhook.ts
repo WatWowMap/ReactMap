@@ -1,7 +1,6 @@
 import { useEffect } from 'react'
 import { useMutation } from '@apollo/client'
 import { useTranslation } from 'react-i18next'
-
 import { Query } from '@services/queries'
 import { useWebhookStore } from '@store/useWebhookStore'
 import { ALL_PROFILES } from '@services/queries/webhook'
@@ -22,6 +21,7 @@ export function useWebhook({ category }: { category: string }) {
         : data?.webhook
           ? t(`webhook_success_${category.replace('quick', '').toLowerCase()}`)
           : t('success')
+
       useWebhookStore.setState({
         alert: {
           open: true,

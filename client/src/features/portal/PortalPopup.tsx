@@ -2,7 +2,6 @@ import * as React from 'react'
 import Grid from '@mui/material/Unstable_Grid2'
 import Typography from '@mui/material/Typography'
 import { useTranslation } from 'react-i18next'
-
 import { ErrorBoundary } from '@components/ErrorBoundary'
 import { useMemory } from '@store/useMemory'
 import { useStorage } from '@store/useStorage'
@@ -46,28 +45,28 @@ export function PortalPopup({
     <ErrorBoundary noRefresh style={{}} variant="h5">
       <Grid
         container
-        style={{ width: 200 }}
+        alignItems="center"
         direction="row"
         justifyContent="space-evenly"
-        alignItems="center"
         spacing={1}
+        style={{ width: 200 }}
       >
         <Grid xs={12}>
           <Typography
-            variant={name.length > 20 ? 'subtitle2' : 'h6'}
             align="center"
             noWrap={portalName}
+            variant={name.length > 20 ? 'subtitle2' : 'h6'}
             onClick={() => setPortalName(!portalName)}
           >
             {name}
           </Typography>
         </Grid>
-        <Grid xs={12} textAlign="center">
-          <a href={url} target="_blank" rel="noreferrer">
+        <Grid textAlign="center" xs={12}>
+          <a href={url} rel="noreferrer" target="_blank">
             <img
-              src={src}
               alt={name || 'unknown'}
               className="circle-image"
+              src={src}
               style={{
                 maxHeight: 150,
                 maxWidth: 150,
@@ -75,23 +74,23 @@ export function PortalPopup({
             />
           </a>
         </Grid>
-        <Grid xs={12} textAlign="center">
+        <Grid textAlign="center" xs={12}>
           {extraMetaData.map((meta) => (
             <React.Fragment key={meta.description}>
-              <Typography variant="subtitle1" textAlign="center">
+              <Typography textAlign="center" variant="subtitle1">
                 {meta.description}
               </Typography>
-              <Typography variant="caption" textAlign="center">
+              <Typography textAlign="center" variant="caption">
                 {meta.data}
               </Typography>
             </React.Fragment>
           ))}
         </Grid>
-        <Grid xs={4} textAlign="center">
+        <Grid textAlign="center" xs={4}>
           <Navigation lat={lat} lon={lon} />
         </Grid>
         {enablePortalPopupCoords && (
-          <Grid xs={12} textAlign="center">
+          <Grid textAlign="center" xs={12}>
             <Coords lat={lat} lon={lon} />
           </Grid>
         )}

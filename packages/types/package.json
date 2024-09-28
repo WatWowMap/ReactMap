@@ -19,7 +19,7 @@
     "@sentry/node": "^7.65.0",
     "@types/config": "^3.3.5",
     "@types/express-session": "1.18.0",
-    "@types/node": "^18",
+    "@types/node": "20",
     "@types/passport-oauth2": "1.4.17",
     "@types/passport-discord": "0.1.13",
     "@types/react": "^18.3.3",

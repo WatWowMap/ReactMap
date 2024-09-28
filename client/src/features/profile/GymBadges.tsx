@@ -8,7 +8,6 @@ import Edit from '@mui/icons-material/Edit'
 import { useTranslation } from 'react-i18next'
 import { useQuery } from '@apollo/client'
 import { useMap } from 'react-leaflet'
-
 import { useMemory } from '@store/useMemory'
 import { useLayoutStore } from '@store/useLayoutStore'
 import { Query } from '@services/queries'
@@ -47,28 +46,29 @@ export function UserGymBadges() {
         }
       })
     }
+
     return counter
   }, [data])
 
   return data ? (
     <Box className="gym-badge-grid">
-      <Typography variant="h5" align="center" gutterBottom>
+      <Typography gutterBottom align="center" variant="h5">
         {t('gym_badges')}
       </Typography>
-      <Grid container pt={1} pb={2}>
+      <Grid container pb={2} pt={1}>
         {Object.entries(counts).map(([key, count], i) => (
           <Grid key={key} xs={3}>
             <Typography
-              variant="subtitle2"
               align="center"
               className={`badge_${i + 1}`}
+              variant="subtitle2"
             >
               {t(`badge_${i + 1}`)}: {count}
             </Typography>
           </Grid>
         ))}
       </Grid>
-      <VirtualGrid data={data?.badges || []} xs={4} md={3}>
+      <VirtualGrid data={data?.badges || []} md={3} xs={4}>
         {(_, badge) => <BadgeTile {...badge} />}
       </VirtualGrid>
     </Box>
@@ -96,21 +96,21 @@ function BadgeTile({ badge, ...gym }: import('@rm/types').Gym) {
       </IconButton>
       <Button
         className="vgrid-image"
-        onClick={() => map.flyTo([gym.lat, gym.lon], 16)}
         disabled={gym.deleted}
+        onClick={() => map.flyTo([gym.lat, gym.lon], 16)}
       >
         <Img
-          className="badge-diamond"
-          src={gym.url ? gym.url.replace('http://', 'https://') : ''}
           alt={gym.url}
+          className="badge-diamond"
           height={120}
+          src={gym.url ? gym.url.replace('http://', 'https://') : ''}
           width={120}
         />
         {gym.deleted && <div className="disabled-overlay badge-diamond" />}
         {badge && badge > 1 && (
           <Img
-            src={badgeIcon}
             alt={t(`badge_${badge}`)}
+            src={badgeIcon}
             width={96}
             zIndex={10}
           />
@@ -118,8 +118,8 @@ function BadgeTile({ badge, ...gym }: import('@rm/types').Gym) {
       </Button>
       <ToggleTypography
         className="vgrid-caption"
-        variant="caption"
         color={gym.deleted ? 'GrayText' : 'inherit'}
+        variant="caption"
       >
         {gym.name || t('unknown_gym')}
       </ToggleTypography>

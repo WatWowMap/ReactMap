@@ -18,13 +18,13 @@ export function TutorialClosing() {
     >
       {[0, 1, 2, 3, 4].map((i) => (
         <React.Fragment key={i}>
-          <Typography variant={i ? 'subtitle1' : 'h4'} align="center">
+          <Typography align="center" variant={i ? 'subtitle1' : 'h4'}>
             {t(`tutorial_closing_${i}`)}
           </Typography>
           {!!i && <Divider flexItem style={{ width: '100%' }} />}
         </React.Fragment>
       ))}
-      <Typography variant="subtitle1" align="center">
+      <Typography align="center" variant="subtitle1">
         {t('tutorial_closing_5')}
       </Typography>
     </DialogContent>

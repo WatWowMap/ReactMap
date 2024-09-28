@@ -1,6 +1,5 @@
 import * as React from 'react'
 import Dialog from '@mui/material/Dialog'
-
 import { useMemory } from '@store/useMemory'
 import { useLayoutStore } from '@store/useLayoutStore'
 
@@ -26,12 +25,12 @@ export function DialogWrapper({
 
   return (
     <Dialog
-      open={!!open}
       fullScreen={isMobile && variant === 'large'}
       fullWidth={!isMobile && variant === 'large'}
       maxWidth={
         variant === 'small' && !maxWidth ? (isMobile ? 'sm' : 'xs') : maxWidth
       }
+      open={!!open}
       onClose={handleClose}
       {...props}
     >

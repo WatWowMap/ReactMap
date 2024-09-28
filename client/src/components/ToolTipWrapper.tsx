@@ -1,7 +1,6 @@
 import * as React from 'react'
 import { Tooltip } from 'react-leaflet'
 import { useTranslation } from 'react-i18next'
-
 import { getTimeUntil } from '@utils/getTimeUntil'
 
 const Timer = ({ timestamp }) => {
@@ -12,6 +11,7 @@ const Timer = ({ timestamp }) => {
     const timer2 = setTimeout(() => {
       setTimer(getTimeUntil(timestamp * 1000, true))
     }, 1000)
+
     return () => clearTimeout(timer2)
   })
 
@@ -30,7 +30,7 @@ export function TooltipWrapper({
   children?: React.ReactNode
 }) {
   return (
-    <Tooltip direction="bottom" permanent offset={offset}>
+    <Tooltip permanent direction="bottom" offset={offset}>
       {children}
       {[...new Set(timers)].map((timer, i) => (
         <Timer key={timer + i * 123} timestamp={timer} />

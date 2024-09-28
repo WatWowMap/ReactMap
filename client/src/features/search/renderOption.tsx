@@ -5,7 +5,6 @@ import ListItemText from '@mui/material/ListItemText'
 import Grid2 from '@mui/material/Unstable_Grid2'
 import Divider from '@mui/material/Divider'
 import Typography from '@mui/material/Typography'
-
 import { Img } from '@components/Img'
 import { useMemory } from '@store/useMemory'
 import { useStorage } from '@store/useStorage'
@@ -31,7 +30,8 @@ const getBackupName = (tab: string) => {
 
 const MiniInvasion = ({ id, form }: { id: number; form: number }) => {
   const { Icons } = useMemory.getState()
-  return <Img src={Icons.getPokemon(id, form)} maxWidth={20} maxHeight={20} />
+
+  return <Img maxHeight={20} maxWidth={20} src={Icons.getPokemon(id, form)} />
 }
 
 const InvasionSubtitle = ({
@@ -46,6 +46,7 @@ const InvasionSubtitle = ({
   incident_expire_timestamp,
 }: import('@rm/types').Invasion) => {
   const expire = getTimeUntil(incident_expire_timestamp * 1000, true)
+
   if (!confirmed) return expire.str
   const { masterfile } = useMemory.getState()
   const reward = getGruntReward(masterfile.invasions[grunt_type])
@@ -54,29 +55,29 @@ const InvasionSubtitle = ({
     <Grid2 container alignItems="center">
       {slot_1_pokemon_id && (
         <>
-          <MiniInvasion id={slot_1_pokemon_id} form={slot_1_form} />
+          <MiniInvasion form={slot_1_form} id={slot_1_pokemon_id} />
           {!!reward.first && (
             <Typography variant="caption">
               &nbsp;{`(${reward.first}%)`}
             </Typography>
           )}
-          <Divider orientation="vertical" flexItem sx={{ mx: 1 }} />
+          <Divider flexItem orientation="vertical" sx={{ mx: 1 }} />
         </>
       )}
       {slot_2_pokemon_id && (
         <>
-          <MiniInvasion id={slot_2_pokemon_id} form={slot_2_form} />
+          <MiniInvasion form={slot_2_form} id={slot_2_pokemon_id} />
           {!!reward.second && (
             <Typography variant="caption">
               &nbsp;{`(${reward.second}%)`}
             </Typography>
           )}
-          <Divider orientation="vertical" flexItem sx={{ mx: 1 }} />
+          <Divider flexItem orientation="vertical" sx={{ mx: 1 }} />
         </>
       )}
       {slot_3_pokemon_id && (
         <>
-          <MiniInvasion id={slot_3_pokemon_id} form={slot_3_form} />
+          <MiniInvasion form={slot_3_form} id={slot_3_pokemon_id} />
           {!!reward.third && (
             <Typography variant="caption">
               &nbsp;{`(${reward.third}%)`}
@@ -90,6 +91,7 @@ const InvasionSubtitle = ({
 
 const Timer = ({ expireTime }) => {
   const time = useRelativeTimer(expireTime || 0)
+
   return time
 }
 
@@ -128,11 +130,16 @@ export const renderOption: import('@mui/material').AutocompleteProps<
               ? t(`grunt_${option.grunt_type}`).toString()
               : option.name || t(getBackupName(searchTab))
         }
+        primaryTypographyProps={{
+          variant: 'subtitle2',
+          noWrap: true,
+          pr: 1,
+        }}
         secondary={
           option.quest_title && option.quest_target ? (
             <RawQuestTitle
-              questTitle={option.quest_title}
               questTarget={option.quest_target}
+              questTitle={option.quest_title}
             />
           ) : option.lure_expire_timestamp ? (
             t(`lure_${option.lure_id}`).toString()
@@ -142,11 +149,6 @@ export const renderOption: import('@mui/material').AutocompleteProps<
             ''
           )
         }
-        primaryTypographyProps={{
-          variant: 'subtitle2',
-          noWrap: true,
-          pr: 1,
-        }}
         secondaryTypographyProps={{
           variant: 'caption',
           noWrap: true,
@@ -156,6 +158,10 @@ export const renderOption: import('@mui/material').AutocompleteProps<
       />
       <ListItemText
         primary={formatDistance(option.distance)}
+        primaryTypographyProps={{
+          variant: 'subtitle2',
+          align: 'right',
+        }}
         secondary={
           searchTab === 'quests' ? (
             questMessage || t(`ar_quest_${!!option.with_ar}`).toString()
@@ -167,10 +173,6 @@ export const renderOption: import('@mui/material').AutocompleteProps<
             ''
           )
         }
-        primaryTypographyProps={{
-          variant: 'subtitle2',
-          align: 'right',
-        }}
         secondaryTypographyProps={{
           variant: 'caption',
           align: 'right',

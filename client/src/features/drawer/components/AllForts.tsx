@@ -3,7 +3,6 @@ import Box from '@mui/material/Box'
 import ListItem from '@mui/material/ListItem'
 import ListItemText from '@mui/material/ListItemText'
 import { useTranslation } from 'react-i18next'
-
 import { useStorage } from '@store/useStorage'
 import { FORT_LEVELS } from '@assets/constants'
 import { MultiSelectorStore } from '@components/inputs/MultiSelector'
@@ -20,6 +19,7 @@ function BaseAllForts({
 }) {
   const { t } = useTranslation()
   const enabled = useStorage((s) => !!s.filters?.[category]?.[subItem])
+
   return (
     <CollapsibleItem open={enabled}>
       <ListItem>

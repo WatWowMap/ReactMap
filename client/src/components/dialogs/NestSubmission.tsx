@@ -4,7 +4,6 @@ import DialogContent from '@mui/material/DialogContent'
 import TextField from '@mui/material/TextField'
 import { useMutation } from '@apollo/client'
 import { useTranslation } from 'react-i18next'
-
 import { Query } from '@services/queries'
 import { useWebhookStore } from '@store/useWebhookStore'
 import { useLayoutStore } from '@store/useLayoutStore'
@@ -67,7 +66,7 @@ export function NestSubmission() {
 
   return (
     <Dialog open={!!id} onClose={handleClose}>
-      <Header titles="nest_submission_menu" action={handleClose} />
+      <Header action={handleClose} titles="nest_submission_menu" />
       <DialogContent sx={{ mt: 2 }}>
         <form noValidate autoComplete="off" onSubmit={handleSubmit}>
           <TextField
@@ -77,6 +76,7 @@ export function NestSubmission() {
         </form>
       </DialogContent>
       <Footer
+        i18nKey="webhook_footer"
         options={[
           {
             name: 'reset',
@@ -93,7 +93,6 @@ export function NestSubmission() {
             color: 'secondary',
           },
         ]}
-        role="webhook_footer"
       />
     </Dialog>
   )

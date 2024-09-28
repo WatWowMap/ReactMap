@@ -6,7 +6,6 @@ import TabPanel from '@mui/lab/TabPanel'
 import Tab from '@mui/material/Tab'
 import Box from '@mui/material/Box'
 import DialogContent from '@mui/material/DialogContent'
-
 import { useMemory } from '@store/useMemory'
 import { useLayoutStore } from '@store/useLayoutStore'
 import { Header } from '@components/dialogs/Header'
@@ -43,32 +42,32 @@ export function UserProfile() {
   return (
     <DialogWrapper dialog="userProfile">
       <Header
-        titles={['user_profile', `- ${auth.username}`]}
         action={handleClose}
+        titles={['user_profile', `- ${auth.username}`]}
       />
       <DialogContent sx={{ p: 0 }}>
         <TabContext value={tab}>
           <TabList
-            onChange={handleTabChange}
             ref={(ref) => ref && setTabsHeight(ref.clientHeight)}
+            onChange={handleTabChange}
           >
             {['profile', 'badges', 'access'].map((each) => (
               <Tab key={each} label={t(each)} value={each} />
             ))}
           </TabList>
           <Box
-            overflow="auto"
             height={{
               xs: `calc(100% - ${tabsHeight}px)`,
               sm: `calc(70vh - ${tabsHeight}px)`,
             }}
+            overflow="auto"
           >
             <TabPanel value="profile">
               <LinkAccounts />
               <ExtraUserFields />
               <UserBackups />
             </TabPanel>
-            <TabPanel value="badges" sx={{ height: '100%', px: 0 }}>
+            <TabPanel sx={{ height: '100%', px: 0 }} value="badges">
               <Box className="profile-container">
                 <UserGymBadges />
               </Box>

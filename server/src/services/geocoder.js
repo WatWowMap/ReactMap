@@ -36,6 +36,7 @@ async function geocoder(nominatimUrl, search, reverse, format) {
       osmServer: nominatimUrl,
       timeout: 5000,
     })
+
     stockGeocoder._geocoder._formatResult = ((original) => (result) => ({
       ...original(result),
       suburb: result.address.suburb || '',
@@ -46,6 +47,7 @@ async function geocoder(nominatimUrl, search, reverse, format) {
       typeof search === 'object'
         ? await stockGeocoder.reverse(search)
         : await stockGeocoder.geocode(search)
+
     return reverse
       ? formatter(format, results[0])
       : format
@@ -57,6 +59,7 @@ async function geocoder(nominatimUrl, search, reverse, format) {
         : results
   } catch (e) {
     log.warn(TAGS.geocoder, 'Unable to geocode for', search, e)
+
     return {}
   }
 }

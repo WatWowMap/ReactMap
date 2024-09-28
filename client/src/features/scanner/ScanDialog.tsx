@@ -3,7 +3,6 @@ import Dialog from '@mui/material/Dialog'
 import DialogContent from '@mui/material/DialogContent'
 import Typography from '@mui/material/Typography'
 import { useTranslation } from 'react-i18next'
-
 import { Header } from '@components/dialogs/Header'
 import { Footer } from '@components/dialogs/Footer'
 import { SCAN_MODES } from '@assets/constants'
@@ -43,17 +42,17 @@ export function ScanDialog() {
 
   return (
     <Dialog
-      onClose={handleClose}
-      open={SCAN_MODES.includes(scanMode as (typeof SCAN_MODES)[number])}
       maxWidth="xs"
+      open={SCAN_MODES.includes(scanMode as (typeof SCAN_MODES)[number])}
+      onClose={handleClose}
     >
-      <Header titles={[`scan_${scanMode}_title`]} action={handleClose} />
+      <Header action={handleClose} titles={[`scan_${scanMode}_title`]} />
       <DialogContent className="flex-center" sx={{ mt: 2 }}>
-        <Typography variant="subtitle1" align="center">
+        <Typography align="center" variant="subtitle1">
           {scanMode && t(`scan_${scanMode}`)}
         </Typography>
       </DialogContent>
-      <Footer role="alertdialog" options={footerOptions} />
+      <Footer i18nKey="alertdialog" options={footerOptions} />
     </Dialog>
   )
 }

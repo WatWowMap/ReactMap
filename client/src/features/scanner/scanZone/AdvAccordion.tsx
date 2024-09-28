@@ -34,6 +34,7 @@ const StyledAccordionSummary = styled(AccordionSummary)((/* { theme } */) => ({
 
 export function AdvAccordion({ children }: { children: React.ReactNode }) {
   const { t } = useTranslation()
+
   return (
     <StyledAccordion>
       <StyledAccordionSummary expandIcon={<ExpandMore />}>

@@ -1,5 +1,4 @@
 import * as React from 'react'
-
 import { useMemory } from '@store/useMemory'
 import { useStorage } from '@store/useStorage'
 
@@ -11,13 +10,16 @@ function getTileLayer(
   const fallbackTs = Object.values(tileServers).find(
     (server) => server.name !== 'auto',
   )
+
   if (tileServers?.[tileServer]?.name === 'auto') {
     const autoTile =
       timeOfDay === 'night'
         ? Object.values(tileServers).find((server) => server.style === 'dark')
         : Object.values(tileServers).find((server) => server.style === 'light')
+
     return autoTile || fallbackTs
   }
+
   return tileServers[tileServer] || fallbackTs
 }
 
@@ -32,6 +34,7 @@ export function useTileLayer() {
       maxZoom: 18,
     }
     const layer = getTileLayer(settings.tileServers, userTileLayer, timeOfDay)
+
     return {
       ...layer,
       style: layer.style || 'light',
@@ -52,6 +55,7 @@ export function useTileLayer() {
     const leafletContainerEl = document
       .getElementsByClassName('leaflet-container')
       .item(0)
+
     if (leafletContainerEl instanceof HTMLElement) {
       leafletContainerEl.style.background =
         tileLayer.background ??

@@ -10,6 +10,7 @@ const configDir = path.join(__dirname, '../../../config/user')
  */
 async function writeConfigFile(fileName, data) {
   const ts = Math.floor(Date.now() / 1000)
+
   if (fs.existsSync(`${configDir}/${fileName}.json`)) {
     await fs.promises.copyFile(
       `${configDir}/${fileName}.json`,

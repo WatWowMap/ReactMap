@@ -11,7 +11,6 @@ import Avatar from '@mui/material/Avatar'
 import Tooltip from '@mui/material/Tooltip'
 import Collapse from '@mui/material/Collapse'
 import { useTranslation } from 'react-i18next'
-
 import { useMemory } from '@store/useMemory'
 import { setDeepStore, useStorage } from '@store/useStorage'
 import { ErrorBoundary } from '@components/ErrorBoundary'
@@ -82,14 +81,14 @@ export function PokemonPopup({
     <ErrorBoundary noRefresh style={{}} variant="h5">
       <Grid
         container
-        style={{ width: 200 }}
         alignItems="center"
         justifyContent="center"
         spacing={1}
+        style={{ width: 200 }}
       >
-        <Header pokemon={pokemon} iconUrl={iconUrl} isTutorial={isTutorial} />
+        <Header iconUrl={iconUrl} isTutorial={isTutorial} pokemon={pokemon} />
         {pokemon.seen_type !== 'encounter' && (
-          <Grid xs={12} textAlign="center">
+          <Grid textAlign="center" xs={12}>
             <Typography variant="caption">
               {t(`seen_${pokemon.seen_type}`, '')}
             </Typography>
@@ -99,23 +98,23 @@ export function PokemonPopup({
           <Typography>{t('pokemon_cell')}</Typography>
         )}
         {!!pokemon.expire_timestamp && (
-          <Timer pokemon={pokemon} hasStats={hasStats} />
+          <Timer hasStats={hasStats} pokemon={pokemon} />
         )}
         {hasStats && ivPerm && (
           <>
             <Stats pokemon={pokemon} />
-            <Divider orientation="vertical" flexItem />
+            <Divider flexItem orientation="vertical" />
           </>
         )}
-        <Info pokemon={pokemon} isTutorial={isTutorial} />
-        <Footer pokemon={pokemon} hasPvp={!!hasLeagues.length} />
-        <Collapse in={pvpPopup && pvpPerm} timeout="auto" unmountOnExit>
+        <Info isTutorial={isTutorial} pokemon={pokemon} />
+        <Footer hasPvp={!!hasLeagues.length} pokemon={pokemon} />
+        <Collapse unmountOnExit in={pvpPopup && pvpPerm} timeout="auto">
           {hasLeagues.map((league) => (
             <PvpInfo key={league} league={league} pokemon={pokemon} />
           ))}
         </Collapse>
-        <Collapse in={extraPopup} timeout="auto" unmountOnExit>
-          <ExtraPokemonInfo pokemon={pokemon} isTutorial={isTutorial} />
+        <Collapse unmountOnExit in={extraPopup} timeout="auto">
+          <ExtraPokemonInfo isTutorial={isTutorial} pokemon={pokemon} />
         </Collapse>
       </Grid>
     </ErrorBoundary>
@@ -156,6 +155,7 @@ const Header = ({
     setAnchorEl(null)
     if (filters?.pokemon?.filter) {
       const key = `${pokemon_id}-${form}`
+
       setDeepStore(`filters.pokemon.filter.${key}.enabled`, false)
     }
   }
@@ -166,6 +166,7 @@ const Header = ({
       if (prev.timerList.includes(id)) {
         return { timerList: prev.timerList.filter((x) => x !== id) }
       }
+
       return { timerList: [...prev.timerList, id] }
     })
   }
@@ -174,6 +175,7 @@ const Header = ({
     { name: 'timer', action: handleTimer },
     { name: 'hide', action: handleHide },
   ]
+
   if (
     isTutorial ||
     filters?.pokemon?.filter?.[`${pokemon_id}-${form}`]?.enabled
@@ -193,13 +195,13 @@ const Header = ({
           <Avatar>{metaData.pokedexId}</Avatar>
         ) : (
           <img
+            alt={t(`poke_${display_pokemon_id}`)}
             src={iconUrl}
             style={{ maxWidth: 40, maxHeight: 40 }}
-            alt={t(`poke_${display_pokemon_id}`)}
           />
         )}
       </Grid>
-      <Grid xs={6} textAlign="center">
+      <Grid textAlign="center" xs={6}>
         <Typography variant={pokeName.length > 8 ? 'h6' : 'h5'}>
           {pokeName}
         </Typography>
@@ -212,21 +214,21 @@ const Header = ({
         )}
       </Grid>
       <Grid xs={3}>
-        <IconButton aria-haspopup="true" onClick={handleClick} size="large">
+        <IconButton aria-haspopup="true" size="large" onClick={handleClick}>
           <MoreVert />
         </IconButton>
       </Grid>
       <Menu
-        anchorEl={anchorEl}
         keepMounted
-        open={!!anchorEl}
-        onClose={handleClose}
         PaperProps={{
           style: {
             maxHeight: 216,
             minWidth: '20ch',
           },
         }}
+        anchorEl={anchorEl}
+        open={!!anchorEl}
+        onClose={handleClose}
       >
         {options.map((option) => (
           <MenuItem key={option.name} onClick={option.action}>
@@ -244,15 +246,15 @@ const Stats = ({ pokemon }: { pokemon: Pokemon }) => {
 
   return (
     <Grid
-      xs={8}
       container
+      alignItems="center"
       direction="column"
       justifyContent="space-around"
-      alignItems="center"
+      xs={8}
     >
       {iv !== null && (
         <Grid>
-          <Typography variant="h5" align="center" color={getColor(iv)}>
+          <Typography align="center" color={getColor(iv)} variant="h5">
             {iv.toFixed(2)}
             {t('%')}
           </Typography>
@@ -260,14 +262,14 @@ const Stats = ({ pokemon }: { pokemon: Pokemon }) => {
       )}
       {atk_iv !== null && (
         <Grid>
-          <Typography variant="subtitle1" align="center">
+          <Typography align="center" variant="subtitle1">
             {atk_iv} | {def_iv} | {sta_iv} {inactive_stats ? '*' : ''}
           </Typography>
         </Grid>
       )}
       {level !== null && (
         <Grid>
-          <Typography variant="subtitle1" align="center">
+          <Typography align="center" variant="subtitle1">
             {t('cp')} {cp} | {t('abbreviation_level')}
             {level}
           </Typography>
@@ -293,13 +295,14 @@ const Info = ({
 
   const { gender, size, weather, form } = pokemon
   const formTypes = metaData?.forms?.[form]?.types || metaData?.types || []
+
   return (
     <Grid
-      xs={ivPerm ? 3 : 11}
       container
+      alignItems="center"
       direction={ivPerm ? 'column' : 'row'}
       justifyContent="space-around"
-      alignItems="center"
+      xs={ivPerm ? 3 : 11}
     >
       {weather != 0 && ivPerm && (
         <Grid
@@ -360,16 +363,17 @@ const Timer = ({
     const timer2 = setTimeout(() => {
       setTimer(getTimeUntil(despawnTimer, true))
     }, 1000)
+
     return () => clearTimeout(timer2)
   })
 
   return (
     <>
       <Grid xs={hasStats ? 9 : 6}>
-        <Typography variant="h6" align="center">
+        <Typography align="center" variant="h6">
           {timer.str}
         </Typography>
-        <Typography variant="subtitle2" align="center">
+        <Typography align="center" variant="subtitle2">
           {new Date(despawnTimer).toLocaleTimeString(
             localStorage.getItem('i18nextLng') || 'en',
           )}
@@ -377,13 +381,13 @@ const Timer = ({
       </Grid>
       <Grid xs={hasStats ? 3 : 2}>
         <Tooltip
+          arrow
+          enterTouchDelay={0}
           title={
             expire_timestamp_verified
               ? t('timer_verified')
               : t('timer_unverified')
           }
-          arrow
-          enterTouchDelay={0}
         >
           <StatusIcon status={expire_timestamp_verified} />
         </Tooltip>
@@ -401,6 +405,7 @@ const Footer = ({ pokemon, hasPvp }: { pokemon: Pokemon; hasPvp: boolean }) => {
 
   const handleExpandClick = (category: string) => {
     const opposite = category === 'extras' ? 'pvp' : 'extras'
+
     useStorage.setState((prev) => ({
       popups: {
         ...prev.popups,
@@ -417,27 +422,27 @@ const Footer = ({ pokemon, hasPvp }: { pokemon: Pokemon; hasPvp: boolean }) => {
           <IconButton
             className={pvpPopup ? 'expanded' : 'closed'}
             name="pvp"
-            onClick={() => handleExpandClick('pvp')}
             size="large"
+            onClick={() => handleExpandClick('pvp')}
           >
             <img
               alt="pvp"
               className={darkMode ? '' : 'darken-image'}
-              src={Icons.getMisc('pvp')}
               height={20}
+              src={Icons.getMisc('pvp')}
               width="auto"
             />
           </IconButton>
         </Grid>
       )}
-      <Grid xs={4} textAlign="center">
+      <Grid textAlign="center" xs={4}>
         <Navigation lat={lat} lon={lon} />
       </Grid>
       <Grid xs={4}>
         <IconButton
           className={extraPopup ? 'expanded' : 'closed'}
-          onClick={() => handleExpandClick('extras')}
           size="large"
+          onClick={() => handleExpandClick('extras')}
         >
           <ExpandMore />
         </IconButton>
@@ -467,6 +472,7 @@ const ExtraPokemonInfo = ({
         iv !== null &&
         [move_1, move_2].map((move, i) => {
           if (!move) return null
+
           return (
             <ExtraInfo key={move} title={i ? 'charged' : 'fast'}>
               <TextWithIcon src={Icons.getTypes(moves[move].type)}>
@@ -483,14 +489,14 @@ const ExtraPokemonInfo = ({
       <TimeStamp time={updated}>last_seen</TimeStamp>
 
       {process.env.NODE_ENV === 'development' && (
-        <Grid xs={12} style={{ paddingTop: 10 }}>
-          <Typography variant="subtitle1" align="center">
+        <Grid style={{ paddingTop: 10 }} xs={12}>
+          <Typography align="center" variant="subtitle1">
             {pokemon.id}
           </Typography>
         </Grid>
       )}
       {userSettings.enablePokemonPopupCoords && (
-        <Grid xs={12} textAlign="center">
+        <Grid textAlign="center" xs={12}>
           <Coords lat={pokemon.lat.toFixed(6)} lon={pokemon.lon.toFixed(6)} />
         </Grid>
       )}
@@ -521,6 +527,7 @@ const PvpInfo = ({ pokemon, league }: { pokemon: Pokemon; league: string }) => {
                     ]}
                   >
                     <img
+                      alt={t(`poke_${each.pokemon}`)}
                       src={Icons.getPokemon(
                         each.pokemon,
                         each.form,
@@ -529,7 +536,6 @@ const PvpInfo = ({ pokemon, league }: { pokemon: Pokemon; league: string }) => {
                         pokemon.costume,
                       )}
                       style={{ maxWidth: 40, maxHeight: 20 }}
-                      alt={t(`poke_${each.pokemon}`)}
                     />
                   </NameTT>
                 ),
@@ -552,9 +558,9 @@ const PvpInfo = ({ pokemon, league }: { pokemon: Pokemon; league: string }) => {
         <tr>
           <td style={rowClass}>
             <img
-              src={Icons.getMisc(leagueLookup[league] || '500')}
-              height={20}
               alt={league}
+              height={20}
+              src={Icons.getMisc(leagueLookup[league] || '500')}
             />
           </td>
           <td style={rowClass}>{t('rank')}</td>

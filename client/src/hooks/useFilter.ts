@@ -1,5 +1,4 @@
 import { useTranslation } from 'react-i18next'
-
 import { useMemory } from '@store/useMemory'
 import { useGetDeepStore, useStorage } from '@store/useStorage'
 import { useEffect } from 'react'
@@ -83,10 +82,13 @@ export function useFilter(
       const cleaned = term.slice(1)
       const families = Object.keys(pokemon).filter((id) => {
         const name = t(`poke_${id}`)
+
         return name.toLowerCase().includes(cleaned)
       })
+
       if (families && term.slice(1)) {
         const familyIds = families.map((item) => +pokemon[item].family)
+
         searchTerms.push(...new Set(familyIds))
       }
     }
@@ -95,6 +97,7 @@ export function useFilter(
 
   const typeResolver = (pkmnTypes) => {
     let typeCount = 0
+
     Object.values(types).forEach((pkmnType) => {
       if (pkmnType) typeCount += 1
     })
@@ -109,8 +112,10 @@ export function useFilter(
   if (search) {
     switchKey = 'search'
     const clean = search.replace(/,/g, '|')
+
     if (clean.includes('|')) {
       const orSplit = clean.split('|').map((term) => term.trim())
+
       orSplit.forEach((term) => {
         evalSearchTerms(term)
       })
@@ -211,6 +216,7 @@ export function useFilter(
             case 'search':
               searchTerms.forEach((term) => {
                 const meta = item.searchMeta || item.name
+
                 switch (typeof term) {
                   case 'string':
                     term = term.trim()

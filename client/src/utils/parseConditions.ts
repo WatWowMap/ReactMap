@@ -6,6 +6,7 @@ export function parseQuestConditions(conditions: string) {
       type: specifics.type,
       info: {},
     }
+
     switch (specifics.type) {
       case 1:
         normalized.info.pokemon_type_ids =
@@ -42,8 +43,10 @@ export function parseQuestConditions(conditions: string) {
       default:
         break
     }
+
     return normalized
   }
+
   if (type1) {
     if (type1.info) {
       conditionsToReturn.push(type1)
@@ -58,5 +61,6 @@ export function parseQuestConditions(conditions: string) {
       conditionsToReturn.push(parseMadRewards(type2))
     }
   }
+
   return conditionsToReturn
 }

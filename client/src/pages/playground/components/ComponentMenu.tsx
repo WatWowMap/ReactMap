@@ -10,7 +10,6 @@ import DialogContentText from '@mui/material/DialogContentText'
 import DialogActions from '@mui/material/DialogActions'
 import { useTranslation } from 'react-i18next'
 import { useQuery } from '@apollo/client'
-
 import { CUSTOM_COMPONENT } from '@services/queries/config'
 import { camelToSnake } from '@utils/strings'
 
@@ -33,6 +32,7 @@ export function ComponentMenu() {
 
   const handleMenuClose = (newComponent?: string) => () => {
     const { original, code } = usePlayStore.getState()
+
     setAnchorEl(null)
     if (newComponent) {
       if (original === code) {
@@ -55,6 +55,7 @@ export function ComponentMenu() {
       const code = data?.customComponent
         ? JSON.stringify(data?.customComponent, null, 2)
         : prev.code
+
       return { loading, error, code, original: code }
     })
   }, [data, loading, error])
@@ -63,24 +64,24 @@ export function ComponentMenu() {
     <>
       <Button
         color="inherit"
-        onClick={(e) => setAnchorEl(e.currentTarget)}
         startIcon={startIcon}
+        onClick={(e) => setAnchorEl(e.currentTarget)}
       >
         {t('component')}
       </Button>
       <Menu
-        transitionDuration={200}
         anchorEl={anchorEl}
         open={!!anchorEl}
+        transitionDuration={200}
         onClose={handleMenuClose()}
       >
         {PAGES.map((c) => (
           <MenuItem
             key={c}
-            value={c}
             dense
-            onClick={handleMenuClose(c)}
             selected={c === component}
+            value={c}
+            onClick={handleMenuClose(c)}
           >
             {t(`component_${camelToSnake(c)}`)}
           </MenuItem>
@@ -94,7 +95,7 @@ export function ComponentMenu() {
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleDialogClose} color="secondary">
+          <Button color="secondary" onClick={handleDialogClose}>
             Cancel
           </Button>
           <Button onClick={handleDialogConfirm}>Confirm</Button>

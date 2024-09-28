@@ -11,7 +11,6 @@ import Typography from '@mui/material/Typography'
 import { useLazyQuery, useMutation } from '@apollo/client'
 import { useTranslation } from 'react-i18next'
 import { useMapEvents } from 'react-leaflet'
-
 import { SET_HUMAN } from '@services/queries/webhook'
 import { WEBHOOK_NOMINATIM } from '@services/queries/geocoder'
 import { useLocation } from '@hooks/useLocation'
@@ -65,6 +64,7 @@ const Location = () => {
     locationfound: (newLoc) => {
       const { location } = useWebhookStore.getState()
       const { lat, lng } = newLoc.latlng
+
       if (lat !== location[0] && lng !== location[1]) {
         handleLocationChange([lat, lng])
       }
@@ -97,37 +97,37 @@ const Location = () => {
   ) : (
     <Grid
       container
-      xs={12}
-      justifyContent="center"
       alignItems="center"
+      justifyContent="center"
       spacing={2}
+      xs={12}
     >
-      <Grid xs={6} sm={2}>
-        <Typography variant="h6" pl={1}>
+      <Grid sm={2} xs={6}>
+        <Typography pl={1} variant="h6">
           {t('location')}
         </Typography>
       </Grid>
-      <Grid xs={6} sm={4} textAlign="center">
+      <Grid sm={4} textAlign="center" xs={6}>
         <Typography variant="body2">
           {[latitude ?? 0, longitude ?? 0].map((x) => x.toFixed(6)).join(', ')}
         </Typography>
       </Grid>
-      <Grid xs={6} sm={3} textAlign="center">
+      <Grid sm={3} textAlign="center" xs={6}>
         <Button
-          size="small"
-          variant="contained"
           color={color}
-          onClick={() => lc._onClick()}
+          size="small"
           startIcon={<MyLocation sx={{ color: 'white' }} />}
+          variant="contained"
+          onClick={() => lc._onClick()}
         >
           {t('my_location')}
         </Button>
       </Grid>
-      <Grid xs={6} sm={3} textAlign="center">
+      <Grid sm={3} textAlign="center" xs={6}>
         <Button
+          color="primary"
           size="small"
           variant="contained"
-          color="primary"
           onClick={setModeBtn('location')}
         >
           {t('choose_on_map')}
@@ -135,33 +135,20 @@ const Location = () => {
       </Grid>
       <Grid xs={12}>
         <Autocomplete
-          style={{ width: '100%' }}
+          autoComplete
+          freeSolo
+          includeInputInList
+          disabled={!hasNominatim}
+          filterOptions={(x) => x}
           getOptionLabel={(option) =>
             typeof option === 'string'
               ? option
               : `${option.formatted} (${option.latitude}, ${option.longitude})`
           }
-          filterOptions={(x) => x}
           options={fetchedData.geocoder}
-          autoComplete
-          includeInputInList
-          freeSolo
-          disabled={!hasNominatim}
-          onInputChange={(_, newValue) =>
-            execSearch({ variables: { search: newValue } })
-          }
-          onChange={(_, newValue) => {
-            if (newValue && typeof newValue !== 'string') {
-              const { latitude: lat, longitude: lng } = newValue
-              map.panTo([lat, lng])
-              handleLocationChange([lat, lng])
-            }
-          }}
           renderInput={(params) => (
             <TextField
               {...params}
-              label={t('search_location')}
-              variant="outlined"
               InputProps={{
                 ...params.InputProps,
                 endAdornment: (
@@ -173,19 +160,33 @@ const Location = () => {
                   </>
                 ),
               }}
+              label={t('search_location')}
+              variant="outlined"
             />
           )}
           renderOption={(props, option) => (
             <Typography
               {...props}
               className="flex-center"
-              variant="caption"
               py={1}
+              variant="caption"
             >
               <LocationOn sx={{ mx: 2 }} />
               <Box flexGrow={1}>{option.formatted}</Box>
             </Typography>
           )}
+          style={{ width: '100%' }}
+          onChange={(_, newValue) => {
+            if (newValue && typeof newValue !== 'string') {
+              const { latitude: lat, longitude: lng } = newValue
+
+              map.panTo([lat, lng])
+              handleLocationChange([lat, lng])
+            }
+          }}
+          onInputChange={(_, newValue) =>
+            execSearch({ variables: { search: newValue } })
+          }
         />
       </Grid>
     </Grid>

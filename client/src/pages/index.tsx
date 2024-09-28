@@ -1,6 +1,5 @@
 import * as React from 'react'
 import { Route, Routes } from 'react-router-dom'
-
 import { Config } from '@components/Config'
 
 import { MapPage } from './map'
@@ -49,18 +48,18 @@ const localesPage = <LocalesPage />
 export function Pages() {
   return (
     <Routes>
-      <Route path="/" element={mapRoute} />
-      <Route path="reset" element={resetRoute} />
-      <Route path="login" element={loginRoute} />
-      <Route path="data-management" element={dataRoute} />
-      <Route path="locales" element={localesPage} />
-      <Route path="playground" element={playgroundRoute} />
-      <Route path="blocked/:info" element={blockedRoute} />
-      <Route path="@/:lat/:lon" element={mapRoute} />
-      <Route path="@/:lat/:lon/:zoom" element={mapRoute} />
-      <Route path="id/:category/:id" element={mapRoute} />
-      <Route path="id/:category/:id/:zoom" element={mapRoute} />
-      <Route path="*" element={errorRoute} />
+      <Route element={mapRoute} path="/" />
+      <Route element={resetRoute} path="reset" />
+      <Route element={loginRoute} path="login" />
+      <Route element={dataRoute} path="data-management" />
+      <Route element={localesPage} path="locales" />
+      <Route element={playgroundRoute} path="playground" />
+      <Route element={blockedRoute} path="blocked/:info" />
+      <Route element={mapRoute} path="@/:lat/:lon" />
+      <Route element={mapRoute} path="@/:lat/:lon/:zoom" />
+      <Route element={mapRoute} path="id/:category/:id" />
+      <Route element={mapRoute} path="id/:category/:id/:zoom" />
+      <Route element={errorRoute} path="*" />
     </Routes>
   )
 }

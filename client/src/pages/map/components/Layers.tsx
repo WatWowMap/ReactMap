@@ -8,6 +8,7 @@ import { useTileLayer } from '../hooks/useTileLayer'
 
 export function ControlledTileLayer() {
   const { key, ...layer } = useTileLayer()
+
   return <TileLayer key={key} {...layer} />
 }
 
@@ -20,6 +21,7 @@ export function ControlledZoomLayer() {
   React.useLayoutEffect(() => {
     if (navSetting) {
       const zoom = control.zoom({ position: 'bottomright' }).addTo(map)
+
       return () => {
         zoom.remove()
       }
@@ -60,6 +62,7 @@ export function ControlledLocate() {
   React.useEffect(() => {
     if (lc && navSetting) {
       lc.addTo(map)
+
       return () => {
         lc.stop()
         lc.remove()

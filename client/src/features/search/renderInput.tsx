@@ -10,7 +10,6 @@ import CircularProgress from '@mui/material/CircularProgress'
 import HighlightOffIcon from '@mui/icons-material/HighlightOff'
 import { useTranslation } from 'react-i18next'
 import { useQuery } from '@apollo/client'
-
 import { useMemory } from '@store/useMemory'
 import { useStorage } from '@store/useStorage'
 import { SEARCHABLE } from '@services/queries/config'
@@ -25,16 +24,18 @@ const SearchImage = React.memo(
 
     return (
       <Img
-        className={darkMode ? '' : 'darken-image'}
-        src={Icons.getMisc(name)}
         alt={t(name)}
-        maxWidth={20}
+        className={darkMode ? '' : 'darken-image'}
         maxHeight={20}
+        maxWidth={20}
+        src={Icons.getMisc(name)}
       />
     )
   },
   (prev, next) => prev.name === next.name,
 )
+
+SearchImage.displayName = 'SearchImage'
 
 const EndAdornment = React.memo(
   ({
@@ -45,11 +46,12 @@ const EndAdornment = React.memo(
     disabled: boolean
   }) => {
     const loading = useMemory((s) => s.searchLoading)
+
     return (
       <>
         <IconButton
-          sx={{ p: 1.25 }}
           disabled={disabled}
+          sx={{ p: 1.25 }}
           onClick={() => useStorage.setState({ search: '' })}
         >
           {loading ? (
@@ -65,12 +67,14 @@ const EndAdornment = React.memo(
             <HighlightOffIcon />
           )}
         </IconButton>
-        <Divider sx={{ height: 28, m: 0.5 }} orientation="vertical" />
+        <Divider orientation="vertical" sx={{ height: 28, m: 0.5 }} />
         {children}
       </>
     )
   },
 )
+
+EndAdornment.displayName = 'EndAdornment'
 
 export function renderInput({
   InputProps,
@@ -129,17 +133,17 @@ export function renderInput({
       />
       <Menu
         anchorEl={anchorEl}
-        open={!!anchorEl}
-        onClose={handleClose}
-        transformOrigin={{
-          vertical: 'top',
-          horizontal: 'right',
-        }}
-        elevation={0}
         anchorOrigin={{
           vertical: 'bottom',
           horizontal: 'right',
         }}
+        elevation={0}
+        open={!!anchorEl}
+        transformOrigin={{
+          vertical: 'top',
+          horizontal: 'right',
+        }}
+        onClose={handleClose}
       >
         {(data?.searchable || []).map((option) => (
           <MenuItem

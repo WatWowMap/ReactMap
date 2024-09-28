@@ -1,7 +1,6 @@
 import { useEffect, useMemo } from 'react'
 import { useQuery } from '@apollo/client'
 import { capitalize } from '@mui/material/utils'
-
 import * as queries from '@services/queries/available'
 import { useMemory } from '@store/useMemory'
 
@@ -43,6 +42,7 @@ export function useGetAvailable(
       (data || previousData)?.[`available${capitalized}`] ||
       useMemory.getState().available[category] ||
       []
+
     return { available, loading, error }
   }, [data, previousData, loading, error])
 }

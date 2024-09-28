@@ -2,7 +2,6 @@ import * as React from 'react'
 import Grid from '@mui/material/Unstable_Grid2'
 import Typography from '@mui/material/Typography'
 import { useTranslation } from 'react-i18next'
-
 import { useMemory } from '@store/useMemory'
 import { ErrorBoundary } from '@components/ErrorBoundary'
 import { useAnalytics } from '@hooks/useAnalytics'
@@ -29,33 +28,33 @@ export function WeatherPopup({
     <ErrorBoundary noRefresh variant="h5">
       <Grid
         container
+        alignItems="center"
         direction="row"
         justifyContent="center"
-        alignItems="center"
         style={{ width: 150 }}
       >
         <Grid xs={12}>
-          <Typography variant="h6" align="center">
+          <Typography align="center" variant="h6">
             {t(`weather_${gameplay_condition}`)}
           </Typography>
         </Grid>
         <Grid xs={12}>
-          <Typography variant="subtitle2" align="center">
+          <Typography align="center" variant="subtitle2">
             {t('last_updated')}:
           </Typography>
         </Grid>
         <Timer updated={updated} />
         <Grid xs={12}>
-          <Typography variant="subtitle2" align="center">
+          <Typography align="center" variant="subtitle2">
             {t('boosted_types')}:
           </Typography>
         </Grid>
         {weatherTypes.map((type) => (
-          <Grid xs={4} key={type} textAlign="center">
+          <Grid key={type} textAlign="center" xs={4}>
             <Typography variant="caption">{t(`poke_type_${type}`)}</Typography>
             <img
-              src={Icons.getTypes(type)}
               alt={t(`weather_${gameplay_condition}`)}
+              src={Icons.getTypes(type)}
               style={{
                 maxWidth: 30,
                 maxHeight: 30,
@@ -94,6 +93,7 @@ const Timer = ({
     const timer2 = setTimeout(() => {
       setTimer(getTimeUntil(updated * 1000))
     }, 1000)
+
     return () => clearTimeout(timer2)
   })
 
@@ -101,20 +101,20 @@ const Timer = ({
     <>
       <Grid xs={timer.diff > 60 ? 12 : 8}>
         <Typography
-          variant="subtitle2"
-          align="center"
           gutterBottom
+          align="center"
           sx={{ color }}
+          variant="subtitle2"
         >
           {dayCheck(ts, updated)}
         </Typography>
       </Grid>
       <Grid xs={timer.diff > 60 ? 12 : 4}>
         <Typography
-          variant="subtitle2"
-          align="center"
           gutterBottom
+          align="center"
           sx={{ color }}
+          variant="subtitle2"
         >
           ({timer.str.replace('days', t('days')).replace('day', t('day'))})
         </Typography>

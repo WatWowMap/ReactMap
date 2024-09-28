@@ -1,6 +1,5 @@
 import * as React from 'react'
 import { Marker, Popup } from 'react-leaflet'
-
 import { useMarkerTimer } from '@hooks/useMarkerTimer'
 import { useMemory } from '@store/useMemory'
 import { useStorage } from '@store/useStorage'
@@ -23,12 +22,14 @@ const BaseStationTile = (station: import('@rm/types').Station) => {
   const timers = React.useMemo(() => {
     const now = Date.now() / 1000
     const internalTimers = /** @type {number[]} */ []
+
     if (showTimer && station.start_time && station.start_time > now) {
       internalTimers.push(station.start_time)
     }
     if (showTimer && station.end_time && station.end_time > now) {
       internalTimers.push(station.end_time)
     }
+
     return internalTimers
   }, [showTimer])
 
@@ -40,14 +41,14 @@ const BaseStationTile = (station: import('@rm/types').Station) => {
   return (
     <Marker
       ref={setMarkerRef}
-      position={[station.lat, station.lon]}
       icon={useStationMarker(station)}
+      position={[station.lat, station.lon]}
     >
       <Popup position={[station.lat, station.lon]}>
         <StationPopup {...station} />
       </Popup>
       {!!(showTimer && timers.length > 0) && (
-        <TooltipWrapper timers={timers} offset={[0, 4]} />
+        <TooltipWrapper offset={[0, 4]} timers={timers} />
       )}
     </Marker>
   )

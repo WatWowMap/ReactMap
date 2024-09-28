@@ -1,5 +1,4 @@
 import { divIcon } from 'leaflet'
-
 import { basicEqualFn, useMemory } from '@store/useMemory'
 import { useStorage } from '@store/useStorage'
 import { useOpacity } from '@hooks/useOpacity'
@@ -29,6 +28,7 @@ export function usePokestopMarker({
   const getOpacity = useOpacity('pokestops', 'invasion')
   const [showArBadge, baseIcon, baseSize] = useStorage((s) => {
     const { filters, userSettings } = s
+
     return [
       userSettings.pokestops.showArBadge,
       Icons.getPokestops(
@@ -106,6 +106,7 @@ export function usePokestopMarker({
         quest_shiny,
         key,
       } = quest
+
       switch (quest_reward_type) {
         case 1:
           questIcons.unshift({

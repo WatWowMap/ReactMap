@@ -4,7 +4,6 @@ import TuneIcon from '@mui/icons-material/Tune'
 import IconButton from '@mui/material/IconButton'
 import Tooltip from '@mui/material/Tooltip'
 import Box from '@mui/material/Box'
-
 import { useTranslateById } from '@hooks/useTranslateById'
 import { useMemory } from '@store/useMemory'
 import { ColoredTile } from '@components/virtual/ColoredTile'
@@ -49,6 +48,7 @@ export function SelectorItem({
 
   const handleClick = React.useCallback(() => {
     const newFilter = { all: false, enabled: false, ...filter }
+
     // red => green => blue => red
     if (newFilter.all && hasAll) {
       newFilter.all = false
@@ -83,26 +83,26 @@ export function SelectorItem({
   return (
     <Box
       className="vgrid-item"
-      position="relative"
-      minWidth="100%"
       minHeight="100%"
+      minWidth="100%"
+      position="relative"
       sx={SQUARE_ITEM}
       onClick={handleClick}
     >
       <ColoredTile bgcolor={color} />
       <Tooltip
-        title={process.env.NODE_ENV === 'development' ? id : title}
         arrow
         className="vgrid-image"
+        title={process.env.NODE_ENV === 'development' ? id : title}
       >
         <Box
-          component="img"
           alt={title}
-          src={url}
+          component="img"
           maxHeight="50%"
           maxWidth="50%"
-          zIndex={10}
+          src={url}
           sx={{ aspectRatio: '1/1', objectFit: 'contain' }}
+          zIndex={10}
         />
       </Tooltip>
       <IconButton className="vgrid-icon" size="small" onClick={handleIconClick}>
@@ -110,12 +110,12 @@ export function SelectorItem({
       </IconButton>
       <Status status={status} />
       <ToggleTypography
-        className="vgrid-caption"
-        variant="caption"
-        fontWeight="bold"
-        zIndex={10}
         alignSelf="end"
+        className="vgrid-caption"
+        fontWeight="bold"
         px={1}
+        variant="caption"
+        zIndex={10}
       >
         {title && title.split('\n').at(-1).replace(/[()]/g, '')}
       </ToggleTypography>
@@ -125,6 +125,7 @@ export function SelectorItem({
 
 function Status({ status }: { status: null | boolean }) {
   const { t } = useTranslation()
+
   return (
     <Tooltip
       title={
@@ -137,8 +138,8 @@ function Status({ status }: { status: null | boolean }) {
     >
       <StatusIcon
         className="vgrid-color-blind-icon"
-        fontSize="small"
         color="action"
+        fontSize="small"
         status={status}
       />
     </Tooltip>

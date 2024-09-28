@@ -2,7 +2,6 @@ import * as React from 'react'
 import List from '@mui/material/List'
 import { Popup } from 'react-leaflet'
 import { useTranslation } from 'react-i18next'
-
 import { DividerWithMargin } from '@components/StyledDivider'
 
 import {
@@ -26,7 +25,7 @@ export function ScanOnDemandPopup({
   const context = React.useContext(ConfigContext)
 
   return (
-    <Popup minWidth={90} maxWidth={200} autoPan={false}>
+    <Popup autoPan={false} maxWidth={200} minWidth={90}>
       <List>
         <StyledListItemText
           className="no-leaflet-margin"

@@ -8,7 +8,6 @@ import Button from '@mui/material/Button'
 import Grid2 from '@mui/material/Unstable_Grid2'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import { useMap } from 'react-leaflet'
-
 import { useDeepStore, useStorage } from '@store/useStorage'
 import { useMemory } from '@store/useMemory'
 
@@ -54,6 +53,7 @@ export function AreaChild({
   const nameProp =
     name || feature?.properties?.formattedName || feature?.properties?.name
   const hasExpand = name && !expandAllScanAreas
+
   return (
     <TableCell
       colSpan={colSpan}
@@ -67,14 +67,22 @@ export function AreaChild({
     >
       <Grid2
         container
-        alignItems="center"
-        justifyContent="space-between"
-        component={Button}
         fullWidth
+        alignItems="center"
         borderRadius={0}
-        variant="text"
         color="inherit"
+        component={Button}
+        justifyContent="space-between"
         size="small"
+        sx={(theme) => ({
+          py: name ? 'inherit' : 0,
+          minHeight: 36,
+          textTransform: 'none',
+          '&:hover': {
+            backgroundColor: theme.palette.action.hover,
+          },
+        })}
+        variant="text"
         wrap="nowrap"
         onClick={() => {
           if (feature?.properties?.center) {
@@ -84,31 +92,17 @@ export function AreaChild({
             )
           }
         }}
-        sx={(theme) => ({
-          py: name ? 'inherit' : 0,
-          minHeight: 36,
-          textTransform: 'none',
-          '&:hover': {
-            backgroundColor: theme.palette.action.hover,
-          },
-        })}
       >
         {!hasExpand && hasManual ? null : (
           <Checkbox
-            size="small"
-            color="secondary"
-            indeterminate={name ? hasSome && !hasAll : false}
             checked={name ? hasAll : scanAreas.includes(feature.properties.key)}
-            onClick={(e) => e.stopPropagation()}
-            onChange={() =>
-              setAreas(
-                name
-                  ? childAreas.map((c) => c.properties.key)
-                  : feature.properties.key,
-                allAreas,
-                name ? hasSome : false,
-              )
+            color="secondary"
+            disabled={
+              (name ? !childAreas.length : !feature.properties.name) ||
+              hasManual
             }
+            indeterminate={name ? hasSome && !hasAll : false}
+            size="small"
             sx={{
               p: 1,
               color,
@@ -119,25 +113,32 @@ export function AreaChild({
                 color,
               },
             }}
-            disabled={
-              (name ? !childAreas.length : !feature.properties.name) ||
-              hasManual
+            onChange={() =>
+              setAreas(
+                name
+                  ? childAreas.map((c) => c.properties.key)
+                  : feature.properties.key,
+                allAreas,
+                name ? hasSome : false,
+              )
             }
+            onClick={(e) => e.stopPropagation()}
           />
         )}
         <Typography
-          variant={name ? 'h6' : 'caption'}
           align="center"
           style={{ whiteSpace: 'pre-wrap', flexGrow: 1 }}
+          variant={name ? 'h6' : 'caption'}
         >
           {nameProp || <>&nbsp;</>}
         </Typography>
         {hasExpand && (
           <IconButton
-            component="span"
             className={open === name ? 'expanded' : 'collapsed'}
+            component="span"
             onClick={(e) => {
               e.stopPropagation()
+
               return setOpen((prev) => (prev === name ? '' : name))
             }}
           >

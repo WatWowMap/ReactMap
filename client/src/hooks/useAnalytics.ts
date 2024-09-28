@@ -1,5 +1,4 @@
 import { useEffect } from 'react'
-
 import { analytics } from '@utils/analytics'
 
 export function useAnalytics(

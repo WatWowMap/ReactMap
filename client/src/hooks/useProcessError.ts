@@ -1,5 +1,4 @@
 import { t } from 'i18next'
-
 import { useMemory } from '@store/useMemory'
 import { useWebhookStore } from '@store/useWebhookStore'
 import React from 'react'
@@ -27,6 +26,7 @@ export const useProcessError = (
         const until =
           // @ts-ignore
           error?.networkError?.result?.errors?.[0]?.extensions?.until || 0
+
         useWebhookStore.setState({
           alert: {
             open: true,

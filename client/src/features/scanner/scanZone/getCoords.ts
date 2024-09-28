@@ -21,9 +21,11 @@ export const getScanZoneCoords = (
   const coords = [center]
   let currentPoint = point([center[1], center[0]])
   const distance = radius * 2 * Math.cos(30 * (Math.PI / 180))
+
   for (let i = 1; i < scanZoneSize + 1; i += 1) {
     let quadrant = 1
     let step = 1
+
     while (step < 6 * i + 1) {
       currentPoint = destination(
         currentPoint,
@@ -39,5 +41,6 @@ export const getScanZoneCoords = (
       step += 1
     }
   }
+
   return coords
 }

@@ -18,12 +18,13 @@ export function PowerUp({
   divider?: boolean
 }) {
   const { t } = useTranslation()
+
   if (!power_up_level) return null
+
   return (
     <Grid container alignItems="center" justifyContent="center">
       <TimeTile
         expireTime={power_up_end_timestamp}
-        size={5}
         icon={
           <>
             <Typography align="center" variant="subtitle2">
@@ -34,8 +35,9 @@ export function PowerUp({
             </Typography>
           </>
         }
+        size={5}
       />
-      {divider && <Divider light flexItem className="popup-divider" />}
+      {divider && <Divider flexItem light className="popup-divider" />}
     </Grid>
   )
 }

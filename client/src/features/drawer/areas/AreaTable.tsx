@@ -5,7 +5,6 @@ import Table from '@mui/material/Table'
 import TableBody from '@mui/material/TableBody'
 import TableRow from '@mui/material/TableRow'
 import TableContainer from '@mui/material/TableContainer'
-
 import { Query } from '@services/queries'
 import { useMemory } from '@store/useMemory'
 import { useStorage } from '@store/useStorage'
@@ -46,8 +45,10 @@ export function ScanAreasTable() {
         }))
         .map(({ children, ...rest }) => {
           const rows = []
+
           for (let i = 0; i < children.length; i += 1) {
             const newRow = []
+
             if (children[i]) newRow.push(children[i])
             if (
               children[i + 1] &&
@@ -59,6 +60,7 @@ export function ScanAreasTable() {
               newRow.push(children[++i])
             rows.push(newRow)
           }
+
           return { ...rest, children, rows }
         }),
     [data, search],
@@ -86,16 +88,17 @@ export function ScanAreasTable() {
         <TableBody>
           {allRows.map(({ name, details, children, rows }) => {
             if (!children.length) return null
+
             return (
               <React.Fragment key={`${name}-${children.length}`}>
                 {name && (
                   <TableRow>
                     <AreaChild
-                      name={name}
-                      feature={details}
                       allAreas={allAreas}
                       childAreas={children}
                       colSpan={2}
+                      feature={details}
+                      name={name}
                     />
                   </TableRow>
                 )}
@@ -108,11 +111,11 @@ export function ScanAreasTable() {
                         {row.map((feature, j) => (
                           <AreaChild
                             key={feature?.properties?.name || `${i}${j}`}
-                            feature={feature}
                             allAreas={allAreas}
-                            childAreas={children}
                             borderRight={row.length === 2 && j === 0}
+                            childAreas={children}
                             colSpan={row.length === 1 ? 2 : 1}
+                            feature={feature}
                           />
                         ))}
                       </TableRow>

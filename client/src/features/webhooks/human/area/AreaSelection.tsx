@@ -1,7 +1,6 @@
 import * as React from 'react'
 import { useQuery } from '@apollo/client'
 import { useTranslation } from 'react-i18next'
-
 import { ScanAreaTile } from '@features/scanArea'
 import { WEBHOOK_GEOJSON } from '@services/queries/webhook'
 import { Loading } from '@components/Loading'
@@ -11,6 +10,7 @@ const FALLBACK = {
   type: 'FeatureCollection',
   features: [],
 }
+
 export function WebhookAreaSelection() {
   const webhookMode = useWebhookStore((s) => s.mode)
 
@@ -32,5 +32,6 @@ export function WebhookAreaSelection() {
   if (webhookMode === 'areas' && data?.webhookGeojson) {
     return <ScanAreaTile {...(data.webhookGeojson || FALLBACK)} />
   }
+
   return null
 }

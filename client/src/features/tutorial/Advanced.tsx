@@ -13,7 +13,6 @@ import Button from '@mui/material/Button'
 import Grid from '@mui/material/Unstable_Grid2'
 import Box from '@mui/material/Box'
 import { useTranslation } from 'react-i18next'
-
 import { useMemory } from '@store/useMemory'
 import { VirtualGrid } from '@components/virtual/VirtualGrid'
 import { StandardItem } from '@components/virtual/StandardItem'
@@ -50,6 +49,7 @@ export function TutorialAdvanced({
 
   React.useEffect(() => {
     const newCategory = (category ?? isPokemon) ? 'pokemon' : 'gyms'
+
     setLocalCategory(newCategory)
     setTempFilters({
       ...tutorialData.filters[newCategory].filter,
@@ -61,27 +61,27 @@ export function TutorialAdvanced({
     <DialogContent>
       <Grid
         container
-        direction="row"
         alignItems="center"
+        direction="row"
+        height="100%"
         justifyContent="center"
         spacing={1}
-        height="100%"
       >
-        <Grid xs={12} textAlign="center">
+        <Grid textAlign="center" xs={12}>
           <Typography variant="caption" whiteSpace="pre-line">
             {t('tutorial_toggle')}
           </Typography>
         </Grid>
-        <Grid xs={12} sm={8}>
+        <Grid sm={8} xs={12}>
           <Box height={135}>
             <VirtualGrid data={tutorialData.tiles[localCategory]} xs={6}>
               {(_, key) => (
-                <StandardItem id={key} category={localCategory} caption />
+                <StandardItem caption category={localCategory} id={key} />
               )}
             </VirtualGrid>
           </Box>
         </Grid>
-        <Grid xs={12} textAlign="center">
+        <Grid textAlign="center" xs={12}>
           <Typography variant="caption" whiteSpace="pre-line">
             {isPokemon
               ? t('tutorial_pokemon_caption')
@@ -91,108 +91,108 @@ export function TutorialAdvanced({
         <Grid xs={12}>
           <Divider light />
         </Grid>
-        <Grid xs={3} sm={4} textAlign="center">
+        <Grid sm={4} textAlign="center" xs={3}>
           {isMobile ? <HelpOutline /> : <Typography>{t('help')}</Typography>}
         </Grid>
-        <Grid xs={9} sm={8}>
-          <Typography variant="subtitle2" align="center">
+        <Grid sm={8} xs={9}>
+          <Typography align="center" variant="subtitle2">
             {t('tutorial_help')}
           </Typography>
         </Grid>
-        <Grid xs={3} sm={4} textAlign="center">
+        <Grid sm={4} textAlign="center" xs={3}>
           <Ballot />
         </Grid>
-        <Grid xs={9} sm={8}>
-          <Typography variant="subtitle2" align="center">
+        <Grid sm={8} xs={9}>
+          <Typography align="center" variant="subtitle2">
             {t('tutorial_adv_filter')}
           </Typography>
         </Grid>
         {isPokemon ? (
           <>
-            <Grid xs={3} sm={4} textAlign="center">
+            <Grid sm={4} textAlign="center" xs={3}>
               {isMobile ? (
                 <Tune />
               ) : (
                 <Typography>{t('apply_to_all')}</Typography>
               )}
             </Grid>
-            <Grid xs={9} sm={8}>
-              <Typography variant="subtitle2" align="center">
+            <Grid sm={8} xs={9}>
+              <Typography align="center" variant="subtitle2">
                 {t('tutorial_tune')}
               </Typography>
             </Grid>
           </>
         ) : (
           <>
-            <Grid xs={3} sm={4} textAlign="center">
+            <Grid sm={4} textAlign="center" xs={3}>
               {isMobile ? (
                 <FormatSize />
               ) : (
                 <Typography>{t('apply_to_all')}</Typography>
               )}
             </Grid>
-            <Grid xs={9} sm={8}>
-              <Typography variant="subtitle2" align="center">
+            <Grid sm={8} xs={9}>
+              <Typography align="center" variant="subtitle2">
                 {t('tutorial_format_size')}
               </Typography>
             </Grid>
           </>
         )}
         <Grid
-          xs={3}
           sm={4}
           sx={(theme) => ({
             color: theme.palette.error.main,
             textAlign: 'center',
           })}
+          xs={3}
         >
           {isMobile ? <Clear /> : <Typography>{t('disable_all')}</Typography>}
         </Grid>
-        <Grid xs={9} sm={8}>
-          <Typography variant="subtitle2" align="center">
+        <Grid sm={8} xs={9}>
+          <Typography align="center" variant="subtitle2">
             {t('tutorial_clear')}
           </Typography>
         </Grid>
         <Grid
-          xs={3}
           sm={4}
           sx={(theme) => ({
             color: theme.palette.success.light,
             textAlign: 'center',
           })}
+          xs={3}
         >
           {isMobile ? <Check /> : <Typography>{t('enable_all')}</Typography>}
         </Grid>
-        <Grid xs={9} sm={8}>
-          <Typography variant="subtitle2" align="center">
+        <Grid sm={8} xs={9}>
+          <Typography align="center" variant="subtitle2">
             {t('tutorial_check')}
           </Typography>
         </Grid>
-        <Grid xs={3} sm={4} textAlign="center">
+        <Grid sm={4} textAlign="center" xs={3}>
           {isMobile ? (
             <Save color="secondary" />
           ) : (
             <Typography color="secondary">{t('save')}</Typography>
           )}
         </Grid>
-        <Grid xs={9} sm={8}>
-          <Typography variant="subtitle2" align="center">
+        <Grid sm={8} xs={9}>
+          <Typography align="center" variant="subtitle2">
             {t('tutorial_save')}
           </Typography>
         </Grid>
         {toggleHelp ? (
-          <Grid xs={12} textAlign="right">
-            <Button onClick={toggleHelp} color="secondary" size="small">
+          <Grid textAlign="right" xs={12}>
+            <Button color="secondary" size="small" onClick={toggleHelp}>
               {t('close')}
             </Button>
           </Grid>
         ) : (
-          <Grid xs={12} textAlign="center">
+          <Grid textAlign="center" xs={12}>
             <Button
-              onClick={handleSwitch}
-              variant="contained"
               color="primary"
               size="small"
+              variant="contained"
+              onClick={handleSwitch}
             >
               {isPokemon
                 ? t('tutorial_show_all_view')

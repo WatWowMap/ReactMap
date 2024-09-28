@@ -15,7 +15,6 @@ import type {
 import type { Knex } from 'knex'
 import type { NextFunction, Request, Response } from 'express'
 import type { VerifyCallback } from 'passport-oauth2'
-
 import type { ModelReturn } from './utility'
 import type { Profile } from 'passport-discord'
 import type { User } from './models'

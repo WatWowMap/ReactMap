@@ -1,6 +1,5 @@
 // @ts-check
 import { create } from 'zustand'
-
 import { downloadJson } from '@utils/downloadJson'
 
 export type LocalesStore = {
@@ -24,5 +23,6 @@ export const downloadLocales = () => {
   const filtered = Object.fromEntries(
     Object.entries(custom).filter(([, v]) => v !== ''),
   )
+
   return downloadJson({ ...existingHuman, ...filtered }, `${locale}.json`)
 }

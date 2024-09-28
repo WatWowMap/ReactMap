@@ -1,6 +1,5 @@
 import { useEffect } from 'react'
 import { useQuery } from '@apollo/client'
-
 import { GET_MAP_DATA } from '@services/queries/available'
 import { deepMerge } from '@utils/deepMerge'
 import { UAssets } from '@services/Assets'
@@ -25,6 +24,7 @@ export function useMapData(once = false) {
   useEffect(() => {
     if (active && online && !once) {
       startPolling(1000 * 60 * 60)
+
       return () => stopPolling()
     }
   }, [active, online, once])
@@ -50,6 +50,7 @@ export function useMapData(once = false) {
       const Audio =
         existing.Audio ??
         new UAssets(audio, masterfile.questRewardTypes, 'uaudio')
+
       Icons.build(
         typeof structuredClone === 'function'
           ? structuredClone(icons.styles)
@@ -109,12 +110,14 @@ export function useMapData(once = false) {
                     .filter(({ title }) => title === each)
                     .map(({ target }) => `${each}__${target}`),
                 )
+
               if (newAdv.length) {
                 filter.adv = newAdv.join(',')
               }
             }
           },
         )
+
         return {
           filters: newFilters,
         }

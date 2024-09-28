@@ -1,11 +1,11 @@
 // @ts-check
 const { rateLimit } = require('express-rate-limit')
-
 const { log, TAGS } = require('@rm/logger')
 const config = require('@rm/config')
 
 function rateLimitingMiddleware() {
   const minutes = config.getSafe('api.rateLimit.time')
+
   return rateLimit({
     windowMs: minutes * 60 * 1000,
     limit: config.getSafe('api.rateLimit.requests'),
@@ -24,6 +24,7 @@ function rateLimitingMiddleware() {
         req?.user?.username || 'Unknown user',
         'is being rate limited',
       )
+
       return res.status(options.statusCode).json(options.message)
     },
   })

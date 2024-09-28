@@ -60,5 +60,6 @@ export function usePermCheck(category: string): boolean {
         return true
       }
   }
+
   return false
 }

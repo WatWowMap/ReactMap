@@ -3,7 +3,6 @@ import MenuItem from '@mui/material/MenuItem'
 import CircularProgress from '@mui/material/CircularProgress'
 import { useMutation, useQuery } from '@apollo/client'
 import { useTranslation } from 'react-i18next'
-
 import { ALL_PROFILES, SET_HUMAN } from '@services/queries/webhook'
 import { useWebhookStore } from '@store/useWebhookStore'
 import { FCSelect } from '@components/inputs/FCSelect'
@@ -57,13 +56,13 @@ export function ProfileSelect() {
 
   return (
     <FCSelect
-      id="profile-select"
-      label={t('select_profile')}
-      value={safeProfiles ? currentProfile || '' : ''}
-      onChange={onChange}
-      style={STYLE}
       endAdornment={loading ? <CircularProgress /> : null}
       fcSx={{ m: 1, width: '90%' }}
+      id="profile-select"
+      label={t('select_profile')}
+      style={STYLE}
+      value={safeProfiles ? currentProfile || '' : ''}
+      onChange={onChange}
     >
       {(safeProfiles || []).map((profile) => (
         <MenuItem key={profile.profile_no} value={profile.profile_no}>

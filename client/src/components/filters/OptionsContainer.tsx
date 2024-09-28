@@ -5,7 +5,6 @@ import ListItem from '@mui/material/ListItem'
 import ListItemText from '@mui/material/ListItemText'
 import { useTranslation } from 'react-i18next'
 import ReplayIcon from '@mui/icons-material/Replay'
-
 import { useMemory } from '@store/useMemory'
 import { useStorage } from '@store/useStorage'
 import { BasicListButton } from '@components/inputs/BasicListButton'
@@ -15,15 +14,6 @@ import { OptionsGroup } from './Options'
 
 const CHIP_STYLE: React.CSSProperties = { margin: 3 }
 
-/**
- *
- * @param {{
- *  category: import('./Options').MenuCategories
- *  subCategory: import('./Options').MenuSubcategories
- *  option: string
- * }} props
- * @returns
- */
 function AppliedChip({
   category,
   subCategory,
@@ -35,7 +25,6 @@ function AppliedChip({
 }) {
   const { t } = useTranslation()
   const reverse = useStorage(
-    // @ts-ignore
     (s) => !!s.menus[category]?.filters?.others?.reverse,
   )
   const valid = useStorage(
@@ -43,13 +32,14 @@ function AppliedChip({
   )
 
   if (!valid) return null
+
   return (
     <Chip
-      label={t(camelToSnake(option))}
-      variant="outlined"
-      size="small"
       color={reverse ? 'secondary' : 'primary'}
+      label={t(camelToSnake(option))}
+      size="small"
       style={CHIP_STYLE}
+      variant="outlined"
     />
   )
 }
@@ -67,9 +57,8 @@ function Applied({
         <AppliedChipMemo
           key={`${subCategory}-${option}`}
           category={category}
-          // @ts-ignore
-          subCategory={subCategory}
           option={option}
+          subCategory={subCategory}
         />
       )),
   )
@@ -78,6 +67,7 @@ function Applied({
 const handleReset = (category: import('./Options').MenuCategories) => () => {
   const { menus } = useStorage.getState()
   const resetPayload = {}
+
   Object.keys(menus[category].filters).forEach((cat) => {
     resetPayload[cat] = {}
     Object.keys(menus[category].filters[cat]).forEach((filter) => {
@@ -114,11 +104,11 @@ function OptContainer({
               <OptionsGroup
                 key={subCategory}
                 category={category}
-                // @ts-ignore
                 subCategory={subCategory}
               />
             )
           }
+
           return null
         },
       )}
@@ -148,6 +138,7 @@ function CountDisplay({
   const { t } = useTranslation()
   const show = useMemory((s) => s.advMenuCounts[category]?.show || 0)
   const total = useMemory((s) => s.advMenuCounts[category]?.total || 0)
+
   return (
     <ListItem>
       <ListItemText primary={t('showing')} secondary={`${show}/${total}`} />

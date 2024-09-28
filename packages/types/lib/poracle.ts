@@ -1,6 +1,7 @@
-import { useQuery } from '@apollo/client'
 import type { Split } from './utility'
 import type { HttpMethod } from './general'
+
+import { useQuery } from '@apollo/client'
 
 export interface PoracleHuman<Parsed extends boolean = true> {
   id: string

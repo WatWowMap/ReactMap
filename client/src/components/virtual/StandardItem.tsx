@@ -13,14 +13,15 @@ export function StandardItem({
   const hasAll = checkIfHasAll(category, id)
   // @ts-ignore
   const easyMode = useStorage((s) => !!s.filters?.[category]?.easyMode)
+
   return (
     <SelectorItem
       {...props}
-      id={id}
-      filter={filter}
-      setFilter={setFilter}
-      hasAll={hasAll}
       easyMode={easyMode}
+      filter={filter}
+      hasAll={hasAll}
+      id={id}
+      setFilter={setFilter}
       onClick={() =>
         useLayoutStore.setState(
           id.startsWith('t')

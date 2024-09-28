@@ -4,7 +4,6 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { setUser } from '@sentry/react'
 import { Navigate } from 'react-router-dom'
-
 import { useMemory } from '@store/useMemory'
 import { useStorage } from '@store/useStorage'
 import { getSettings } from '@services/fetches'
@@ -58,6 +57,7 @@ export function Config({ children }) {
         if (localState?.state?.[category]) {
           return localState.state[category]
         }
+
         return defaults
       }
 

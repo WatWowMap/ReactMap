@@ -1,7 +1,6 @@
 import * as React from 'react'
 import ListItemText from '@mui/material/ListItemText'
 import { useTranslation } from 'react-i18next'
-
 import { useStorage } from '@store/useStorage'
 import { WAYFARER_OPTIONS } from '@assets/constants'
 import { BoolToggle } from '@components/inputs/BoolToggle'
@@ -18,10 +17,11 @@ const WayfarerOption = ({
   disabled: boolean
 }) => {
   const { t } = useTranslation()
+
   return (
     <BoolToggle
-      field={`filters.submissionCells.${item}`}
       disabled={disabled}
+      field={`filters.submissionCells.${item}`}
       label=""
     >
       <ListItemText inset>
@@ -34,10 +34,11 @@ const WayfarerOption = ({
 }
 const SubmissionCells = () => {
   const enabled = useStorage((s) => !!s.filters?.submissionCells?.enabled)
+
   return (
     <CollapsibleItem open={enabled}>
       {WAYFARER_OPTIONS.map((item, i) => (
-        <WayfarerOption key={item} item={item} index={i} disabled={!enabled} />
+        <WayfarerOption key={item} disabled={!enabled} index={i} item={item} />
       ))}
     </CollapsibleItem>
   )

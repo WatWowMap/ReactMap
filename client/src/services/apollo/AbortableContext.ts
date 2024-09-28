@@ -16,6 +16,7 @@ export class AbortableContext {
   _abort() {
     if (!this._pendingOp) return
     const { controller, operation, observer, subscription } = this._pendingOp
+
     controller.abort() // abort fetch operation
 
     // if the AbortController in the operation context is one we created,
@@ -23,6 +24,7 @@ export class AbortableContext {
     // future retry of the operation.
     const context = operation.getContext()
     let fetchOptions = context.fetchOptions || {}
+
     if (
       fetchOptions.controller === controller &&
       fetchOptions.signal === controller.signal
@@ -91,6 +93,7 @@ export class AbortableContext {
           observer.complete()
         },
       )
+
       op.subscription = subscription
       this._abort()
       this._pendingOp = op

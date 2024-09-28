@@ -17,6 +17,7 @@ class PvpWrapper extends Ohbem {
 
   async fetchLatestPokemon() {
     const data = await Ohbem.fetchPokemonData()
+
     this.updatePokemonData(data)
   }
 
@@ -29,6 +30,7 @@ class PvpWrapper extends Ohbem {
     if (pokemon.pokemon_id === 132) return {}
 
     const key = `${pokemon.id},${pokemon.updated}`
+
     if (this.rmCache.has(key)) return this.rmCache.get(key)
     try {
       const result = this.queryPvPRank(
@@ -41,7 +43,9 @@ class PvpWrapper extends Ohbem {
         pokemon.sta_iv,
         pokemon.level,
       )
+
       this.rmCache.set(key, result, pokemon.expire_timestamp - currentTs)
+
       return result
     } catch (e) {
       log.error(
@@ -53,6 +57,7 @@ class PvpWrapper extends Ohbem {
         e,
         pokemon,
       )
+
       return {}
     }
   }

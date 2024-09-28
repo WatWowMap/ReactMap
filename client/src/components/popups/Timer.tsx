@@ -9,6 +9,7 @@ export function Timer({
   'children'
 >) {
   const time = useRelativeTimer(expireTime)
+
   return (
     <Typography variant="subtitle2" {...props}>
       {time}

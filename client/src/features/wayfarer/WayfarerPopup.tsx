@@ -1,6 +1,5 @@
 import Typography from '@mui/material/Typography'
 import { useTranslation } from 'react-i18next'
-
 import { ErrorBoundary } from '@components/ErrorBoundary'
 import { useAnalytics } from '@hooks/useAnalytics'
 
@@ -16,6 +15,7 @@ export function WayfarerPopup({
     count_gyms < 3
       ? GYM_THRESHOLD[count_gyms] - total
       : t('never_alt', t('never'))
+
   if (
     (total === 1 && count_gyms < 1) ||
     (total === 5 && count_gyms < 2) ||
@@ -28,19 +28,19 @@ export function WayfarerPopup({
 
   return (
     <ErrorBoundary noRefresh style={{}} variant="h5">
-      <Typography variant="h6" align="center">
+      <Typography align="center" variant="h6">
         {t('s2_cell_level', { level: 14 })}
       </Typography>
-      <Typography variant="subtitle2" align="center">
+      <Typography align="center" variant="subtitle2">
         {t('total_count')}: {total}
       </Typography>
-      <Typography variant="subtitle2" align="center">
+      <Typography align="center" variant="subtitle2">
         {t('pokestops')}: {count_pokestops}
       </Typography>
-      <Typography variant="subtitle2" align="center">
+      <Typography align="center" variant="subtitle2">
         {t('gyms')}: {count_gyms}
       </Typography>
-      <Typography variant="subtitle2" align="center">
+      <Typography align="center" variant="subtitle2">
         {t('next_gym')}: {untilNextGym}
       </Typography>
     </ErrorBoundary>

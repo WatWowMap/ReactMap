@@ -1,5 +1,4 @@
 import Typography from '@mui/material/Typography'
-
 import { useStorage } from '@store/useStorage'
 
 export function Title({
@@ -14,9 +13,9 @@ export function Title({
 
   return (
     <Typography
-      variant={variant}
       align="center"
       noWrap={names}
+      variant={variant}
       onClick={() =>
         useStorage.setState((prev) => ({
           popups: {

@@ -2,7 +2,7 @@ import * as React from 'react'
 import Grid from '@mui/material/Unstable_Grid2'
 import Box from '@mui/material/Box'
 import Typography from '@mui/material/Typography'
-import Button, { ButtonProps } from '@mui/material/Button'
+import Button from '@mui/material/Button'
 import Collapse from '@mui/material/Collapse'
 import FormControl from '@mui/material/FormControl'
 import InputLabel from '@mui/material/InputLabel'
@@ -11,7 +11,6 @@ import InputAdornment from '@mui/material/InputAdornment'
 import IconButton from '@mui/material/IconButton'
 import { useTranslation } from 'react-i18next'
 import { useLazyQuery } from '@apollo/client'
-
 import { login } from '@services/fetches'
 import { Query } from '@services/queries'
 import { VisibleToggle } from '@components/inputs/VisibleToggle'
@@ -46,6 +45,7 @@ export function LocalLogin({
     e.preventDefault()
     setSubmitted(true)
     const resp = await login(user, href)
+
     if ('ok' in resp && !resp.ok) {
       setError(t('localauth_failed'))
       setSubmitted(false)
@@ -58,28 +58,28 @@ export function LocalLogin({
   }
 
   return (
-    <Box sx={sx} style={style}>
+    <Box style={style} sx={sx}>
       <form onSubmit={handleSubmit}>
         <Grid
           container
-          justifyContent="center"
           alignItems="center"
           direction="column"
+          justifyContent="center"
           spacing={2}
         >
           <Grid textAlign="center">
-            <FormControl variant="outlined" color="secondary" size="small">
+            <FormControl color="secondary" size="small" variant="outlined">
               <InputLabel htmlFor="username">{t('local_username')}</InputLabel>
               <OutlinedInput
+                autoComplete="username"
+                color="secondary"
                 id="username"
+                label={t('local_username')}
                 name="username"
+                style={{ width: 250 }}
                 type="text"
                 value={user.username}
                 onChange={handleChange}
-                autoComplete="username"
-                label={t('local_username')}
-                color="secondary"
-                style={{ width: 250 }}
                 onKeyDown={(e) => {
                   if (e.key === 'Enter') handleSubmit(e)
                 }}
@@ -87,21 +87,11 @@ export function LocalLogin({
             </FormControl>
           </Grid>
           <Grid textAlign="center">
-            <FormControl variant="outlined" color="secondary" size="small">
+            <FormControl color="secondary" size="small" variant="outlined">
               <InputLabel htmlFor="password">{t('local_password')}</InputLabel>
               <OutlinedInput
-                id="password"
-                name="password"
-                type={user.showPassword ? 'text' : 'password'}
-                value={user.password}
-                onChange={handleChange}
                 autoComplete="current-password"
                 color="secondary"
-                label={t('local_password')}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter') handleSubmit(e)
-                }}
-                style={{ width: 250 }}
                 endAdornment={
                   <InputAdornment position="end">
                     <IconButton
@@ -115,15 +105,25 @@ export function LocalLogin({
                     </IconButton>
                   </InputAdornment>
                 }
+                id="password"
+                label={t('local_password')}
+                name="password"
+                style={{ width: 250 }}
+                type={user.showPassword ? 'text' : 'password'}
+                value={user.password}
+                onChange={handleChange}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') handleSubmit(e)
+                }}
               />
             </FormControl>
           </Grid>
           <Grid textAlign="center">
             <Button
-              variant="contained"
               color="primary"
-              onClick={handleSubmit}
               disabled={!user.username || !user.password || submitted}
+              variant="contained"
+              onClick={handleSubmit}
             >
               {(() => {
                 if (!user.username && !user.password) {
@@ -132,6 +132,7 @@ export function LocalLogin({
                 if (data?.checkUsername) {
                   return t('login')
                 }
+
                 return t('register')
               })()}
             </Button>
@@ -139,7 +140,7 @@ export function LocalLogin({
         </Grid>
       </form>
       <Collapse in={!!error}>
-        <Typography variant="subtitle2" align="center" color="error" my={2}>
+        <Typography align="center" color="error" my={2} variant="subtitle2">
           {error}
         </Typography>
       </Collapse>

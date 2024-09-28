@@ -26,6 +26,12 @@ const COMPONENTS: TableComponents = {
   )),
 }
 
+COMPONENTS.Scroller.displayName = 'Scroller'
+COMPONENTS.Table.displayName = 'Table'
+COMPONENTS.TableHead.displayName = 'TableHead'
+COMPONENTS.TableRow.displayName = 'TableRow'
+COMPONENTS.TableBody.displayName = 'TableBody'
+
 export function VirtualTable<D, C>(
   props: import('react-virtuoso').TableVirtuosoProps<D, C>,
 ) {
