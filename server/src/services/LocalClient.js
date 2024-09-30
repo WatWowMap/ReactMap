@@ -13,16 +13,18 @@ const { AuthClient } = require('./AuthClient')
 const { state } = require('./state')
 
 class LocalClient extends AuthClient {
-  getPerms(trialActive = false) {
+  getPerms(trialActive = false, status = 'local') {
     return Object.fromEntries(
       Object.entries(this.perms).map(([perm, info]) => {
         if (info.enabled) {
           if (
             this.alwaysEnabledPerms.includes(perm) ||
             info.roles.includes('local') ||
+            info.roles.includes(status) ||
             (trialActive &&
               info.trialPeriodEligible &&
-              this.strategy.trialPeriod.roles.includes('local'))
+              (this.strategy.trialPeriod.roles.includes('local') ||
+                this.strategy.trialPeriod.roles.includes(status)))
           ) {
             return [perm, true]
           }
@@ -107,7 +109,10 @@ class LocalClient extends AuthClient {
                     : userExists.data.status) || 'local'
                 : 'local'
 
-              user.perms = { ...user.perms, ...this.getPerms(trialActive) }
+              user.perms = {
+                ...user.perms,
+                ...this.getPerms(trialActive, user.status),
+              }
 
               webhookPerms([user.status], 'local', trialActive).forEach((x) =>
                 user.perms.webhooks.push(x),
