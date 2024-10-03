@@ -62,6 +62,7 @@ class Station extends Model {
         query
           .whereNotNull('battle_pokemon_id')
           .andWhere('is_battle_available', true)
+          .andWhere('battle_end', '>', ts)
 
         if (onlyBattleTier === 'all') {
           const battleBosses = new Set()
@@ -159,9 +160,11 @@ class Station extends Model {
 
   static async getAvailable() {
     /** @type {import('@rm/types').FullStation[]} */
+    const ts = getEpoch()
     const results = await this.query()
       .distinct(['battle_pokemon_id', 'battle_pokemon_form', 'battle_level'])
       .where('is_inactive', false)
+      .andWhere('end_time', '>', ts)
       .groupBy(['battle_pokemon_id', 'battle_pokemon_form', 'battle_level'])
       .orderBy('battle_pokemon_id', 'asc')
     return {
@@ -191,6 +194,7 @@ class Station extends Model {
     const { areaRestrictions } = perms
     const { onlyAreas = [], search = '', locale } = args
     const { searchResultsLimit, stationUpdateLimit } = config.getSafe('api')
+    const ts = getEpoch()
 
     const pokemonIds = Object.keys(state.event.masterfile.pokemon).filter(
       (pkmn) =>
@@ -222,6 +226,7 @@ class Station extends Model {
         '>',
         Date.now() / 1000 - stationUpdateLimit * 60 * 60 * 24,
       )
+      .andWhere('end_time', '>', ts)
       .andWhere((builder) => {
         if (perms.stations) {
           builder.orWhereILike('name', `%${search}%`)
@@ -231,6 +236,7 @@ class Station extends Model {
             builder2
               .whereIn('battle_pokemon_id', pokemonIds)
               .andWhere('is_battle_available', true)
+              .andWhere('battle_end', '>', ts)
           })
         }
       })
