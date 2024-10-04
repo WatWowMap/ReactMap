@@ -1,7 +1,9 @@
 // @ts-check
 
 const { log, TAGS } = require('@rm/logger')
+
 const { fetchJson } = require('../utils/fetchJson')
+
 const { setCache, getCache } = require('./cache')
 
 const PLATFORMS = /** @type {const} */ (['discord', 'telegram'])
@@ -114,6 +116,7 @@ class PoracleAPI {
       (key) =>
         !(this.disabledHooks.includes(key) || blockedAlerts?.includes(key)),
     )
+
     return categories
   }
 
@@ -127,6 +130,7 @@ class PoracleAPI {
       return ''
     }
     const { strategy, webhookStrategy, discordId, telegramId } = user
+
     switch (strategy) {
       case 'discord':
         return discordId
@@ -150,6 +154,7 @@ class PoracleAPI {
         if (!groupMap[area.group]) groupMap[area.group] = []
         groupMap[area.group].push(area.name)
       }
+
       return groupMap
     }, /** @type {Record<string, string[]>} */ ({}))
 
@@ -185,8 +190,10 @@ class PoracleAPI {
 
   initFromCache() {
     const cached = getCache(`${this.name}-webhook.json`)
+
     if (!cached) {
       log.warn(TAGS.webhooks, `${this.name} webhook not found in cache`)
+
       return false
     }
     Object.assign(this, cached)
@@ -210,6 +217,7 @@ class PoracleAPI {
 
   async #fetchConfig() {
     const remoteConfig = await this.#sendRequest(APIS.config)
+
     if (!remoteConfig) {
       throw new Error(`Webhook [${this.name}] is not configured correctly`)
     }
@@ -231,6 +239,7 @@ class PoracleAPI {
       )
     }
     const { providerURL, addressFormat, ...rest } = remoteConfig
+
     Object.assign(this, rest)
     if (addressFormat && !this.addressFormat) {
       this.addressFormat = addressFormat
@@ -255,6 +264,7 @@ class PoracleAPI {
   async #fetchGeojson() {
     /** @type {{ geoJSON: import("@rm/types").RMGeoJSON }} */
     const { geoJSON } = await this.#sendRequest(APIS.geofence)
+
     if (geoJSON?.features) {
       this.geojson.features = geoJSON.features.filter(
         (x) => !this.areasToSkip.includes(x.properties.name.toLowerCase()),
@@ -266,6 +276,7 @@ class PoracleAPI {
 
   async #fetchTemplates() {
     const templates = await this.#sendRequest(APIS.templates)
+
     if (templates) {
       PLATFORMS.forEach((platform) => {
         this.templates[platform] = Object.fromEntries(
@@ -295,6 +306,7 @@ class PoracleAPI {
       },
       body: method === 'GET' || !method ? undefined : JSON.stringify(body),
     })
+
     return response
   }
 
@@ -305,6 +317,7 @@ class PoracleAPI {
    */
   async #oneHuman(userId) {
     const { human } = await this.#sendRequest(APIS.oneHuman(userId))
+
     return {
       human: {
         ...human,
@@ -336,6 +349,7 @@ class PoracleAPI {
       category === 'start' ? APIS.start(userId) : APIS.stop(userId),
       method,
     )
+
     return this.#oneHuman(userId)
   }
 
@@ -373,10 +387,12 @@ class PoracleAPI {
           }
         : undefined,
     )
+
     if (method === 'GET') {
       return { profile: PoracleAPI.#processProfiles(first.profile) }
     }
     const second = await this.#sendRequest(APIS.profiles(userId))
+
     return { profile: PoracleAPI.#processProfiles(second.profile) }
   }
 
@@ -415,6 +431,7 @@ class PoracleAPI {
   async #setLocation(userId, location) {
     await this.#sendRequest(APIS.location(userId, location), 'POST')
     const second = await this.#oneHuman(userId)
+
     return second
   }
 
@@ -427,6 +444,7 @@ class PoracleAPI {
   async #setAreas(userId, areas) {
     const first = await this.#sendRequest(APIS.areas(userId), 'POST', areas)
     const second = await this.#oneHuman(userId)
+
     return { ...first, ...second }
   }
 
@@ -451,9 +469,11 @@ class PoracleAPI {
     const second = await this.#sendRequest(APIS.tracking(userId, main))
 
     const sortBy = this.ui[category]?.sortProp
+
     if (sortBy) {
       second[category].sort((a, b) => a[sortBy] - b[sortBy])
     }
+
     return { ...first, ...second }
   }
 
@@ -468,6 +488,7 @@ class PoracleAPI {
    */
   async api(userId, category, method = 'GET', data = null) {
     const [main, action] = PoracleAPI.#split(category)
+
     switch (main) {
       case 'start':
       case 'stop':
@@ -528,6 +549,7 @@ class PoracleAPI {
         }),
       ),
     )
+
     return this.#sendRequest(APIS.tracking(userId, 'gym'))
   }
 
@@ -558,6 +580,7 @@ class PoracleAPI {
       /** @type {import("@rm/types").Split<typeof category, '-'>} */ (
         category.split('-', 2)
       )
+
     return [main, action]
   }
 
@@ -1216,6 +1239,7 @@ class PoracleAPI {
         },
       },
     })
+
     Object.values(poracleUiObj).forEach((category) => {
       if (
         typeof category === 'object' &&
@@ -1230,6 +1254,7 @@ class PoracleAPI {
         })
       }
     })
+
     // this.disabledHooks.forEach((hook) => delete poracleUiObj[hook])
     return poracleUiObj
   }

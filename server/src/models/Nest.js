@@ -34,6 +34,7 @@ class Nest extends Model {
       .andWhereBetween('lon', [minLon, maxLon])
 
     const pokemon = []
+
     if (filters.onlyPokemon) {
       Object.keys(filters).forEach((pkmn) => {
         if (!pkmn.startsWith('o')) {
@@ -81,10 +82,12 @@ class Nest extends Model {
     /** @type {(FullNest & { submitted_by?: string })[]} */
     const withNames = results.map((x) => {
       const submitted = submittedNameMap[x.id]?.name
+
       if (submitted && submitted !== x.name) {
         x.name = submittedNameMap[x.id]?.name || x.name
         x.submitted_by = submittedNameMap[x.id]?.submitted_by
       }
+
       return x
     })
 
@@ -100,6 +103,7 @@ class Nest extends Model {
    */
   static secondaryFilter(queryResults, filters, polygon) {
     const returnedResults = []
+
     queryResults.forEach((pkmn) => {
       pkmn.polygon_path = polygon
         ? typeof pkmn.polygon === 'string' && pkmn.polygon
@@ -116,6 +120,7 @@ class Nest extends Model {
         if (pkmn.pokemon_form == 0 || pkmn.pokemon_form === null) {
           const formId =
             state.event.masterfile.pokemon[pkmn.pokemon_id].defaultFormId
+
           if (formId) pkmn.pokemon_form = formId
         }
         if (filters[`${pkmn.pokemon_id}-${pkmn.pokemon_form}`]) {
@@ -125,6 +130,7 @@ class Nest extends Model {
         returnedResults.push(pkmn)
       }
     })
+
     return returnedResults
   }
 
@@ -150,6 +156,7 @@ class Nest extends Model {
             0
           }`
         }
+
         return `${pokemon.pokemon_id}-${pokemon.pokemon_form || 0}`
       }),
     }
@@ -204,10 +211,12 @@ class Nest extends Model {
       })
       .limit(config.getSafe('api.searchResultsLimit'))
       .orderBy('distance')
+
     if (!getAreaSql(query, perms.areaRestrictions, onlyAreas, isMad)) {
       return []
     }
     const results = /** @type {FullNest[]} */ (await query)
+
     return results
   }
 

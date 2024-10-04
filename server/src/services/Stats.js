@@ -1,6 +1,5 @@
 // @ts-check
 const NodeCache = require('node-cache')
-
 const { Logger } = require('@rm/logger')
 const config = require('@rm/config')
 
@@ -69,6 +68,7 @@ class Stats extends Logger {
    */
   pushApiEntry(userId, category, count) {
     const entries = this.getValidApiEntries(userId)
+
     entries.push({ count, timestamp: Date.now(), category })
     this.#apiCache.set(userId, entries)
   }
@@ -92,6 +92,7 @@ class Stats extends Logger {
    */
   setScanHistory(id, coordinates, requests = 1) {
     const existing = this.getScanHistory(id)
+
     this.#scanCache.set(id, {
       coordinates: existing.coordinates + coordinates,
       requests: existing.requests + requests,
@@ -147,9 +148,11 @@ class Stats extends Logger {
   serializeApiCache() {
     const userRequestCacheObj =
       /** @type {Record<number, UserApiEntry[]>} */ ({})
+
     this.#apiCache.forEach((v, k) => {
       userRequestCacheObj[k] = v
     })
+
     return userRequestCacheObj
   }
 
@@ -158,9 +161,11 @@ class Stats extends Logger {
    */
   serializeScanCache() {
     const cacheObj = {}
+
     this.#scanCache.keys().forEach((key) => {
       cacheObj[key] = this.#scanCache.get(key)
     })
+
     return cacheObj
   }
 }

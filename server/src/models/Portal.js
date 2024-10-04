@@ -36,9 +36,11 @@ class Portal extends Model {
         '>',
         Date.now() / 1000 - portalUpdateLimit * 60 * 60 * 24,
       )
+
     if (!getAreaSql(query, areaRestrictions, onlyAreas)) {
       return []
     }
+
     return query.limit(queryLimits.portals)
   }
 
@@ -68,9 +70,11 @@ class Portal extends Model {
       )
       .limit(searchResultsLimit)
       .orderBy('distance')
+
     if (!getAreaSql(query, areaRestrictions, onlyAreas, isMad)) {
       return []
     }
+
     return query
   }
 

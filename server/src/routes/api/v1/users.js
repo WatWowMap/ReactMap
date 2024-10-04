@@ -1,8 +1,7 @@
-/* eslint-disable no-restricted-syntax */
-/* eslint-disable no-await-in-loop */
 // @ts-check
 const router = require('express').Router()
 const { log, TAGS } = require('@rm/logger')
+
 const { state } = require('../../../services/state')
 
 router.get('/', async (req, res) => {
@@ -24,8 +23,8 @@ router.get('/export', async (req, res) => {
 
     /** @type {import('@rm/types').FullGymBadge[]} */
     const rawBadges = await state.db.models.Badge.query()
-    // eslint-disable-next-line no-unused-vars
-    rawBadges.forEach(({ userId, id, ...rest }) => {
+
+    rawBadges.forEach(({ userId, id: _id, ...rest }) => {
       if (!badges[userId]) {
         badges[userId] = []
       }
@@ -36,8 +35,7 @@ router.get('/export', async (req, res) => {
     /** @type {import('@rm/types').FullBackup[]} */
     const rawBackups = await state.db.models.Backup.query()
 
-    // eslint-disable-next-line no-unused-vars
-    rawBackups.forEach(({ userId, id, ...rest }) => {
+    rawBackups.forEach(({ userId, id: _id, ...rest }) => {
       if (!backups[userId]) {
         backups[userId] = []
       }
@@ -49,6 +47,7 @@ router.get('/export', async (req, res) => {
       badges: badges[id] || [],
       backups: backups[id] || [],
     }))
+
     res.status(200).json(data)
     log.info(TAGS.api, 'api/v1/users')
   } catch (e) {
@@ -71,20 +70,24 @@ router.post('/import', async (req, res) => {
         const found = await state.db.models.User.query().select().findOne({
           username: user.username,
         })
+
         if (found) return found
       }
       if (user.discordId) {
         const found = await state.db.models.User.query().select().findOne({
           discordId: user.discordId,
         })
+
         if (found) return found
       }
       if (user.telegramId) {
         const found = await state.db.models.User.query().select().findOne({
           telegramId: user.telegramId,
         })
+
         if (found) return found
       }
+
       return state.db.models.User.query().insert(user)
     }
 
@@ -126,6 +129,7 @@ router.post('/import', async (req, res) => {
 router.get('/:id', async (req, res) => {
   try {
     const user = await state.db.models.User.query().findById(req.params.id)
+
     res.status(200).json(user || { status: 'error', reason: 'User Not Found' })
     log.info(TAGS.api, `api/v1/users/${req.params.id}`)
   } catch (e) {
@@ -139,6 +143,7 @@ router.get('/discord/:id', async (req, res) => {
     const user = await state.db.models.User.query()
       .where('discordId', req.params.id)
       .first()
+
     res.status(200).json(user || { status: 'error', reason: 'User Not Found' })
     log.info(TAGS.api, `api/v1/users/discord/${req.params.id}`)
   } catch (e) {
@@ -152,6 +157,7 @@ router.get('/telegram/:id', async (req, res) => {
     const user = await state.db.models.User.query()
       .where('telegramId', req.params.id)
       .first()
+
     res.status(200).json(user || { status: 'error', reason: 'User Not Found' })
     log.info(TAGS.api, `api/v1/users/telegram/${req.params.id}`)
   } catch (e) {

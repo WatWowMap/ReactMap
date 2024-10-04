@@ -1,4 +1,3 @@
-/* eslint-disable import/order */
 // @ts-check
 const path = require('path')
 
@@ -6,7 +5,7 @@ if (!process.env.NODE_CONFIG_DIR) {
   process.env.NODE_CONFIG_DIR =
     path.join(__dirname, '..', '..', '..', 'config') +
     path.delimiter +
-    path.join(__dirname, '..', '..', '..', 'server', 'src', 'configs')
+    path.join(__dirname, '..', '..', '..', 'config', 'user')
   process.env.ALLOW_CONFIG_MUTATIONS = 'true'
   process.env.SUPPRESS_NO_CONFIG_WARNING = 'true'
 }
@@ -21,6 +20,7 @@ if (process.env.NODE_CONFIG_ENV) {
 }
 
 const { setGlobalLogLevel, TAGS, log } = require('@rm/logger')
+
 const { applyMutations } = require('./mutations')
 
 function purge() {
@@ -34,6 +34,7 @@ function purge() {
   delete require.cache[require.resolve('@rm/config')]
 }
 
+// eslint-disable-next-line import/order
 const config = require('config')
 
 config.getSafe = function getSafe(key) {
@@ -46,34 +47,19 @@ config.reload = function reload() {
   try {
     purge()
     log.info(TAGS.config, 'config purged, returning old reference')
+
     return this
   } catch (e) {
     log.error(TAGS.config, 'error reloading config', e)
+
     return this
   }
-}
-
-config.getMapConfig = function getMapConfig(req) {
-  const domain = /** @type {const} */ (
-    `multiDomainsObj.${req.headers.host.replaceAll('.', '_')}`
-  )
-  return this.has(domain) ? this.getSafe(domain) : this.getSafe('map')
-}
-
-config.getAreas = function getAreas(req, key) {
-  const location = /** @type {const} */ (
-    `areas.${key}.${req.headers.host.replaceAll('.', '_')}`
-  )
-  return this.has(location)
-    ? this.getSafe(location)
-    : this.getSafe(`areas.${key}.main`)
 }
 
 config.setAreas = function setAreas(newAreas) {
   log.info(TAGS.config, 'updating areas')
   this.areas = newAreas
 }
-
 applyMutations(config)
 
 module.exports = config

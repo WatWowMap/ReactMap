@@ -1,12 +1,12 @@
 // @ts-check
 const dlv = require('dlv')
-
 const { log, TAGS } = require('@rm/logger')
 
 const { state } = require('../services/state')
 const { bindConnections } = require('../models')
 const { loadLatestAreas } = require('../services/areas')
 const { loadAuthStrategies } = require('../routes/authRouter')
+
 const { deepCompare } = require('./deepCompare')
 
 const NO_RELOAD = new Set([
@@ -23,7 +23,6 @@ const NO_RELOAD = new Set([
   'api.rateLimit.requests',
   'api.sessionCheckIntervalMs',
   'api.enableHelmet',
-  'database.settings.sessionTableName',
   'sentry',
   'sentry.client',
   'sentry.client.enabled',
@@ -46,6 +45,7 @@ const NO_RELOAD = new Set([
  */
 async function reloadConfig() {
   const startTime = process.hrtime()
+
   try {
     log.info(TAGS.config, 'starting config reload...')
     const oldConfig = require('@rm/config').reload()
@@ -58,6 +58,7 @@ async function reloadConfig() {
       newConfig,
     )
     const [seconds, nanoseconds] = process.hrtime(startTime)
+
     log.debug(
       TAGS.config,
       `deep comparing took ${seconds}.${nanoseconds} seconds`,
@@ -80,17 +81,18 @@ async function reloadConfig() {
     const valid = changed.filter((key) => !NO_RELOAD.has(key))
     const invalid = changed.filter((key) => NO_RELOAD.has(key))
 
-    /** @param {string} key */
+    /** @param {(typeof changed)[number]} key */
     const print = (key) => {
       let newValue
       let oldValue
+
       try {
         oldValue = dlv(oldWithoutAreas, key)
       } catch {
         // do nothing
       }
       try {
-        newValue = newConfig.get(key)
+        newValue = newConfig.getSafe(key)
       } catch {
         // do nothing
       }
@@ -153,12 +155,15 @@ async function reloadConfig() {
     if (stateReport.strategies) {
       loadAuthStrategies()
     }
+
     return null
   } catch (e) {
     log.error(TAGS.config, e)
+
     return e
   } finally {
     const [seconds, nanoseconds] = process.hrtime(startTime)
+
     log.debug(
       TAGS.config,
       `configuration reload completed in ${seconds}.${nanoseconds} seconds`,

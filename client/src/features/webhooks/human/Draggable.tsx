@@ -1,0 +1,114 @@
+import * as React from 'react'
+import Button from '@mui/material/Button'
+import FormControl from '@mui/material/FormControl'
+import Grid from '@mui/material/Unstable_Grid2'
+import InputAdornment from '@mui/material/InputAdornment'
+import OutlinedInput from '@mui/material/OutlinedInput'
+import Typography from '@mui/material/Typography'
+import { Circle, Marker, Popup, useMap } from 'react-leaflet'
+import { useTranslation } from 'react-i18next'
+import { fallbackMarker } from '@assets/fallbackMarker'
+import { useWebhookStore } from '@store/useWebhookStore'
+
+export function WebhookMarker() {
+  const map = useMap()
+  const { t } = useTranslation()
+
+  const webhookLocation = useWebhookStore((s) => s.location)
+  const webhookMode = useWebhookStore((s) => s.mode)
+
+  const [radius, setRadius] = React.useState<number | ''>(1000)
+  const [position, setPosition] = React.useState(webhookLocation)
+
+  const eventHandlers: import('react-leaflet').MarkerProps['eventHandlers'] =
+    React.useMemo(
+      () => ({
+        dragend({ target }) {
+          if (target) {
+            const { lat, lng } = target.getLatLng()
+
+            map.flyTo([lat, lng])
+            setPosition([lat, lng])
+          }
+        },
+        add({ target }) {
+          if (target) target.openPopup()
+        },
+      }),
+      [map],
+    )
+
+  React.useEffect(() => {
+    if (webhookLocation.every((x) => x !== 0)) {
+      setPosition(webhookLocation)
+    }
+  }, [webhookLocation])
+
+  React.useEffect(() => {
+    if (webhookMode === 'location') {
+      map.panTo(webhookLocation)
+    }
+  }, [webhookMode])
+
+  if (webhookMode !== 'location') return null
+
+  return (
+    <>
+      <Marker
+        ref={(ref) => {
+          if (ref) ref.openPopup()
+        }}
+        draggable
+        eventHandlers={eventHandlers}
+        icon={fallbackMarker}
+        position={position}
+      >
+        <Popup maxWidth={150} minWidth={90}>
+          <Grid
+            container
+            alignItems="center"
+            direction="column"
+            justifyContent="center"
+            spacing={2}
+          >
+            <Grid>
+              <Typography align="center" variant="subtitle2">
+                {t('drag_and_drop')}
+              </Typography>
+            </Grid>
+            <Grid textAlign="center">
+              <FormControl variant="outlined">
+                <OutlinedInput
+                  endAdornment={
+                    <InputAdornment position="end">{t('m')}</InputAdornment>
+                  }
+                  type="number"
+                  value={radius}
+                  onChange={(e) =>
+                    setRadius(+e.target.value.replace(/[^0-9.]/g, '') || '')
+                  }
+                />
+              </FormControl>
+              <Typography variant="caption">{t('distance_radius')}</Typography>
+            </Grid>
+            <Grid>
+              <Button
+                color="secondary"
+                variant="contained"
+                onClick={() => {
+                  useWebhookStore.setState({
+                    mode: 'open',
+                    location: position,
+                  })
+                }}
+              >
+                {t('click_to_select')}
+              </Button>
+            </Grid>
+          </Grid>
+        </Popup>
+      </Marker>
+      <Circle center={position} radius={radius || 0} />
+    </>
+  )
+}

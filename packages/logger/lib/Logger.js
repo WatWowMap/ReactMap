@@ -1,5 +1,6 @@
 // @ts-check
 const logger = require('loglevel')
+
 const { TAGS } = require('./tags')
 
 class Logger {
@@ -13,6 +14,7 @@ class Logger {
     this.log.methodFactory = (methodName, logLevel, loggerName) => {
       const rawMethod = logger.methodFactory(methodName, logLevel, loggerName)
       const tag = Logger.#formatTags(this.#tags).trim()
+
       return (...args) => {
         rawMethod(
           ...[TAGS[methodName], Logger.getTimestamp(), tag].filter(Boolean),
@@ -31,15 +33,19 @@ class Logger {
   /** @param {string[]} tags */
   static #formatTags(tags) {
     let finalTag = ''
+
     for (let i = 0; i < tags.length; i++) {
       const tag = tags[i]
+
       if (!tag) continue
       if (finalTag) finalTag += ' '
       if (tag in TAGS) {
         const helper = TAGS[tag]
+
         if (typeof helper === 'function') {
           const firstArg = tags[++i]
           let secondArg = ''
+
           if (helper === 'custom') {
             secondArg = tags[++i]
           }
@@ -54,6 +60,7 @@ class Logger {
         finalTag += `[${tag.toUpperCase()}]`
       }
     }
+
     return finalTag
   }
 

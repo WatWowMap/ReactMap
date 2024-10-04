@@ -18,13 +18,16 @@ async function validateSelectedWebhook(user, Db, Event) {
   const validWebhook = Object.keys(Event.webhookObj).find((x) =>
     user.perms.webhooks.includes(x),
   )
+
   if (validWebhook) {
     const { selectedWebhook } = await Db.models.User.updateWebhook(
       user.id,
       validWebhook,
     )
+
     return selectedWebhook
   }
+
   return null
 }
 

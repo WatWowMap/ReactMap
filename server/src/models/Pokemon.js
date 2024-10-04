@@ -1,13 +1,13 @@
 // @ts-check
 
 /* eslint-disable no-restricted-syntax */
-const { Model, raw, ref } = require('objection')
-const i18next = require('i18next')
 const fs = require('fs')
 const { resolve } = require('path')
+
+const { Model, raw, ref } = require('objection')
+const i18next = require('i18next')
 const { default: getDistance } = require('@turf/distance')
 const { point } = require('@turf/helpers')
-
 const { log, TAGS } = require('@rm/logger')
 const config = require('@rm/config')
 
@@ -139,6 +139,7 @@ class Pokemon extends Model {
       const noPokemonSelect = Object.keys(args.filters).find(
         (x) => x.charAt(0) !== 'o',
       )
+
       if (!noPokemonSelect) return []
     }
 
@@ -146,6 +147,7 @@ class Pokemon extends Model {
 
     const pokemonIds = []
     const pokemonForms = []
+
     Object.values(filterMap).forEach((filter) => {
       pokemonIds.push(filter.pokemon)
       pokemonForms.push(filter.form)
@@ -184,8 +186,10 @@ class Pokemon extends Model {
             if (globalFilter.filterKeys.size) {
               ivOr.andWhere((pkmn) => {
                 const keys = globalFilter.keyArray
+
                 for (let i = 0; i < keys.length; i += 1) {
                   const key = keys[i]
+
                   switch (key) {
                     case 'xxs':
                     case 'xxl':
@@ -242,13 +246,16 @@ class Pokemon extends Model {
     const filters = mem
       ? Object.values(filterMap).flatMap((filter) => filter.buildApiFilter())
       : []
+
     if ((perms.iv || perms.pvp) && mem) {
       const pokemon = Object.keys(filterMap)
         .filter((key) => key.includes('-'))
         .map((key) => {
           const [id, form] = key.split('-', 2).map(Number)
+
           return { id, form }
         })
+
       if (!globalFilter.mods.onlyLinkGlobal) {
         pokemon.push({ id: -1 }) // add everything else
       }
@@ -262,6 +269,7 @@ class Pokemon extends Model {
       const globalPokes = globalFilter.mods.onlyLinkGlobal
         ? [...pokemon, { id: -1 }]
         : pokemon
+
       if (onlyZeroIv)
         filters.push({ iv: { min: 0, max: 0 }, pokemon: globalPokes })
       if (onlyHundoIv)
@@ -311,6 +319,7 @@ class Pokemon extends Model {
         pvpResults.push(pkmn)
       }
       const result = filter.build(pkmn)
+
       if (noPvp && filter.valid(result)) {
         finalResults.push(result)
       }
@@ -318,6 +327,7 @@ class Pokemon extends Model {
     // second query for pvp
     if (!mem && queryPvp && (!isMad || reactMapHandlesPvp)) {
       const pvpQuery = this.query()
+
       if (isMad) {
         Pokemon.getMadSql(pvpQuery)
       }
@@ -371,10 +381,12 @@ class Pokemon extends Model {
       const filter =
         filterMap[`${pkmn.pokemon_id}-${pkmn.form}`] || globalFilter
       const result = filter.build(pkmn)
+
       if (filter.valid(result)) {
         finalResults.push(result)
       }
     }
+
     return finalResults
   }
 
@@ -414,7 +426,9 @@ class Pokemon extends Model {
           body: query,
         })
       : query)
+
     log.debug(TAGS.pokemon, 'raw result length', results?.length || 0)
+
     return results || []
   }
 
@@ -434,6 +448,7 @@ class Pokemon extends Model {
       const noPokemonSelect = Object.keys(args.filters).find(
         (x) => x.charAt(0) !== 'o',
       )
+
       if (!noPokemonSelect) return []
     }
 
@@ -451,6 +466,7 @@ class Pokemon extends Model {
         args.minLon,
         args.maxLon,
       ])
+
     if (isMad) {
       Pokemon.getMadSql(query)
     } else {
@@ -471,6 +487,7 @@ class Pokemon extends Model {
     const filters = mem
       ? Object.values(filterMap).flatMap((filter) => filter.buildApiFilter())
       : []
+
     if ((perms.iv || perms.pvp) && mem)
       filters.push(...globalFilter.buildApiFilter())
 
@@ -493,6 +510,7 @@ class Pokemon extends Model {
       'POST',
       secret,
     )
+
     return results
       .filter(
         (item) =>
@@ -502,11 +520,13 @@ class Pokemon extends Model {
       .map((item) => {
         const filter =
           filterMap[`${item.pokemon_id}-${item.form}`] || globalFilter
+
         return filter.build(item)
       })
       .filter((pkmn) => {
         const filter =
           filterMap[`${pkmn.pokemon_id}-${pkmn.form}`] || globalFilter
+
         return filter.valid(pkmn)
       })
   }
@@ -535,6 +555,7 @@ class Pokemon extends Model {
       'GET',
       secret,
     )
+
     return {
       available: available.map((pkmn) => `${pkmn.id}-${pkmn.form}`),
       rarity: Object.fromEntries(
@@ -596,6 +617,7 @@ class Pokemon extends Model {
       )
       .limit(searchLimit)
       .orderBy('distance')
+
     if (isMad) {
       query.select([
         ref('encounter_id').castTo('CHAR').as('id'),
@@ -646,7 +668,9 @@ class Pokemon extends Model {
       'POST',
       secret,
     )
+
     if (!results || !Array.isArray(results)) return []
+
     return results
       .filter(
         (item) => !mem || filterRTree(item, perms.areaRestrictions, onlyAreas),

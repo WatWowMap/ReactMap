@@ -1,6 +1,5 @@
 // @ts-check
 const { default: fetch } = require('node-fetch')
-
 const config = require('@rm/config')
 const { log, TAGS } = require('@rm/logger')
 
@@ -13,9 +12,9 @@ const scannerQueue = {
 
 /**
  *
- * @param {import('packages/types/lib').ScanOnDemandReq['category']} category
- * @param {import('packages/types/lib').ScanOnDemandReq['method']} method
- * @param {import('packages/types/lib').ScanOnDemandReq['data']} data
+ * @param {import('@rm/types').ScanOnDemandReq['category']} category
+ * @param {import('@rm/types').ScanOnDemandReq['method']} method
+ * @param {import('@rm/types').ScanOnDemandReq['data']} data
  * @param {Partial<import('@rm/types').ExpressUser>} user
  * @returns
  */
@@ -71,6 +70,7 @@ async function scannerApi(
         typeof header === 'string' ? header : header.value,
       ]),
     )
+
     switch (backendConfig.platform) {
       case 'mad':
       case 'rdm':
@@ -98,6 +98,7 @@ async function scannerApi(
         url: '',
         options: {},
       })
+
     switch (category) {
       case 'scanNext':
         state.stats.setScanHistory(user.id, coords.length)
@@ -218,6 +219,7 @@ async function scannerApi(
               scannerQueue[data.typeName].queue
             }`,
           )
+
           return { status: 'ok', message: scannerQueue[data.typeName].queue }
         }
         log.info(TAGS.scanner, `Getting queue for method ${data.typeName}`)
@@ -278,6 +280,7 @@ async function scannerApi(
         backendConfig.platform === 'custom'
       ) {
         const { queue } = await scannerResponse.json()
+
         log.info(
           TAGS.scanner,
           `Returning received queue for method ${data.typeName}: ${queue}`,
@@ -286,9 +289,11 @@ async function scannerApi(
           queue,
           timestamp: Date.now(),
         }
+
         return { status: 'ok', message: queue }
       }
       const { data: queueData } = await scannerResponse.json()
+
       log.info(
         TAGS.scanner,
         `Returning received queue for method ${data.typeName}: ${queueData.size}`,
@@ -297,6 +302,7 @@ async function scannerApi(
         queue: queueData.size,
         timestamp: Date.now(),
       }
+
       return { status: 'ok', message: queueData.size }
     }
 
@@ -314,6 +320,7 @@ async function scannerApi(
               : c,
         )
         .join('\n')
+
       await state.event.chatLog(
         category === 'getQueue' ? 'main' : category,
         {
@@ -364,12 +371,14 @@ async function scannerApi(
             user.id ? ` (${user.id})` : ''
           } successful`,
         )
+
         return { status: 'ok', message: 'scanner_ok' }
       case 401:
         log.info(
           TAGS.scanner,
           'Wrong credentials - check your scanner API settings in config',
         )
+
         return { status: 'error', message: 'scanner_wrong_credentials' }
       case 404:
         log.info(
@@ -378,6 +387,7 @@ async function scannerApi(
             scanModes[category]?.[`${category}Instance`]
           } does not exist`,
         )
+
         return { status: 'error', message: 'scanner_no_instance' }
       case 416:
         log.info(
@@ -386,6 +396,7 @@ async function scannerApi(
             scanModes[category]?.[`${category}Instance`]
           } has no device assigned`,
         )
+
         return { status: 'error', message: 'scanner_no_device_assigned' }
       case 500:
         log.info(
@@ -394,6 +405,7 @@ async function scannerApi(
             scanModes[category]?.[`${category}Device`]
           } does not exist`,
         )
+
         return { status: 'error', message: 'scanner_no_device' }
       default:
         return { status: 'error', message: 'scanner_error' }
@@ -406,6 +418,7 @@ async function scannerApi(
         e,
       )
     }
+
     return { status: 'error', message: 'scanner_error' }
   } finally {
     clearTimeout(timeout)

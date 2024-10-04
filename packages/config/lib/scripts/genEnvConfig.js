@@ -10,6 +10,7 @@ const camelToSnake = (str) =>
 
 const recursiveObjCheck = (obj, key = '', parentKey = '') => {
   const snakeKey = `${parentKey}${camelToSnake(key)}`
+
   if (Array.isArray(obj)) {
     return { __name: snakeKey, __format: 'json' }
   }
@@ -21,6 +22,7 @@ const recursiveObjCheck = (obj, key = '', parentKey = '') => {
       ]),
     )
   }
+
   return typeof obj === 'string'
     ? snakeKey
     : { __name: snakeKey, __format: typeof obj }

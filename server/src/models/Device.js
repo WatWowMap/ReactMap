@@ -1,5 +1,6 @@
 // @ts-check
 const { Model, raw } = require('objection')
+
 const { getAreaSql } = require('../utils/getAreaSql')
 const { fetchJson } = require('../utils/fetchJson')
 const { filterRTree } = require('../utils/filterRTree')
@@ -20,6 +21,7 @@ class Device extends Model {
     const { areaRestrictions } = perms
     const { onlyAreas } = args.filters
     const query = this.query()
+
     if (context.isMad) {
       query
         .join('trs_status', 'settings_device.device_id', 'trs_status.device_id')
@@ -72,6 +74,7 @@ class Device extends Model {
             ),
         )
       : await query.from(context.isMad ? 'settings_device' : 'device')
+
     // @ts-ignore
     return results.filter((device) => device.id && device.lat && device.lon)
   }

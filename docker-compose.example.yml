@@ -44,7 +44,7 @@ services:
       - ./server/.cache:/home/node/server/.cache
       - ./server/src/configs:/home/node/server/src/configs
       # Optional
-      - ./public/favicon/favicon.ico:/home/node/public/favicon/favicon.ico
+      - ./client/public/favicon/favicon.ico:/home/node/client/public/favicon/favicon.ico
 
     security_opt:
       # https://nodramadevops.com/2019/06/running-docker-application-containers-more-securely/

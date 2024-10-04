@@ -591,11 +591,6 @@
   },
   "database": {
     "settings": {
-      "userTableName": "users",
-      "gymBadgeTableName": "gymBadges",
-      "sessionTableName": "session",
-      "backupTableName": "backups",
-      "migrationTableName": "knex_migrations",
       "maxConnections": 10,
       "userBackupLimits": 10,
       "userBackupSizeLimit": 10000000,

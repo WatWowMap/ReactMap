@@ -3,7 +3,6 @@
 /* eslint-disable no-restricted-syntax */
 const { Model, raw } = require('objection')
 const i18next = require('i18next')
-
 const config = require('@rm/config')
 
 const { getAreaSql } = require('../utils/getAreaSql')
@@ -176,6 +175,7 @@ class Gym extends Model {
         default:
           {
             const [id, form] = gym.split('-')
+
             if (id) raidBosses.add(id)
             if (form) raidForms.add(form)
           }
@@ -191,6 +191,7 @@ class Gym extends Model {
     teams.forEach((team) => {
       const all = args.filters[`t${team}-0`]?.all
       let slotCount = all ? baseGymSlotAmounts.length : 0
+
       if (!all) {
         slots.forEach((slot) => {
           if (slot.team === team) {
@@ -414,8 +415,10 @@ class Gym extends Model {
           filteredResults.push(newGym)
         }
       })
+
       return filteredResults
     }
+
     return secondaryFilter(await query.limit(queryLimits.gyms))
   }
 
@@ -448,14 +451,17 @@ class Gym extends Model {
       .groupBy(['team_id', isMad ? 'slots_available' : availableSlotsCol])
       .then((r) => {
         const unique = new Set()
+
         r.forEach((result) => {
           if (result.team !== null && result.slots !== null) {
             unique.add(`t${result.team}-0`)
             unique.add(`g${result.team}-${6 - result.slots}`)
           }
         })
+
         return [...unique]
       })
+
     return {
       available: [
         ...teamResults,
@@ -463,6 +469,7 @@ class Gym extends Model {
           if (result.raid_pokemon_id) {
             return `${result.raid_pokemon_id}-${result.raid_pokemon_form}`
           }
+
           return [`e${result.raid_level}`, `r${result.raid_level}`]
         }),
       ],
@@ -487,6 +494,7 @@ class Gym extends Model {
       .whereILike('name', `%${search}%`)
       .limit(config.getSafe('api.searchResultsLimit'))
       .orderBy('distance')
+
     if (isMad) {
       query.leftJoin('gymdetails', 'gym.gym_id', 'gymdetails.gym_id')
     }
@@ -545,6 +553,7 @@ class Gym extends Model {
         '>=',
         isMad ? this.knex().fn.now() : ts,
       )
+
     if (isMad) {
       query
         .leftJoin('gymdetails', 'gym.gym_id', 'gymdetails.gym_id')
@@ -590,6 +599,7 @@ class Gym extends Model {
           gym.updatedAt = gymBadge.updatedAt
           gym.createdAt = gymBadge.createdAt
         }
+
         return gym
       })
       .sort((a, b) => a.updatedAt - b.updatedAt)
@@ -624,6 +634,7 @@ class Gym extends Model {
         minLon - wiggle,
         maxLon + wiggle,
       ])
+
     if (isMad) {
       query.select(['gym_id AS id', 'latitude AS lat', 'longitude AS lon'])
     } else {
@@ -641,6 +652,7 @@ class Gym extends Model {
     Gym.onlyValid(query, isMad)
 
     const results = await query
+
     return results
   }
 }

@@ -1,8 +1,8 @@
 // @ts-check
 const fs = require('fs')
 const { resolve } = require('path')
-const { default: fetch } = require('node-fetch')
 
+const { default: fetch } = require('node-fetch')
 const config = require('@rm/config')
 const { log, TAGS } = require('@rm/logger')
 
@@ -40,6 +40,7 @@ const generate = async (save = false, historicRarity = {}, dbRarity = {}) => {
             (dbRarity.size
               ? dbRarity[`${pokemon.pokedexId}-${pokemon.defaultFormId}`]
               : rarityObj[pokemon.pokedexId]) || 'never'
+
           if (legendary) rarity = 'legendary'
           if (mythical) rarity = 'mythical'
           if (ultraBeast) rarity = 'ultraBeast'
@@ -57,6 +58,7 @@ const generate = async (save = false, historicRarity = {}, dbRarity = {}) => {
               },
             ]),
           )
+
           return [pokemon.pokedexId, { ...pokemon, forms, rarity, historic }]
         }),
       ),
@@ -69,6 +71,7 @@ const generate = async (save = false, historicRarity = {}, dbRarity = {}) => {
         'utf8',
       )
     }
+
     return newMf
   } catch (e) {
     log.warn(
@@ -91,7 +94,7 @@ const read = () => {
     return JSON.parse(
       fs.readFileSync(resolve(`${__dirname}/data/masterfile.json`), 'utf8'),
     )
-  } catch (e) {
+  } catch {
     log.warn(
       TAGS.masterfile,
       'Unable to read masterfile, generating a new one for you now',

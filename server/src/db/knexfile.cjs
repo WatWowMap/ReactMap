@@ -30,7 +30,7 @@ const getConfig = () => {
       database: selectedDb.database,
     },
     migrations: {
-      tableName: database.settings.migrationTableName,
+      tableName: 'knex_migrations',
       directory: migrationUrl,
       extension: 'cjs',
       stub: path.join(migrationUrl, 'migration.stub.cjs'),

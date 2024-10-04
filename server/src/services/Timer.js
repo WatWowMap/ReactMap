@@ -44,12 +44,14 @@ class Timer extends Logger {
   relative() {
     let seconds = Math.floor(this.ms / 1000)
     const isNegative = seconds < 0
+
     seconds = Math.abs(seconds)
     const result = []
 
     for (let i = 0; i < UNITS.length; i++) {
       const { unit, value } = UNITS[i]
       const count = Math.floor(seconds / value)
+
       if (count > 0) {
         result.push(rtf.format(isNegative ? -count : count, unit))
         seconds -= count * value
@@ -62,6 +64,7 @@ class Timer extends Logger {
           .map((r, i) => {
             if (i === 0) return r
             const [, ...n] = r.split(' ')
+
             return n.join(' ')
           })
           .join(', ')} and ${result[result.length - 1].replaceAll('in ', '')}`
@@ -91,10 +94,12 @@ class Timer extends Logger {
    */
   activate(cb) {
     const now = Date.now()
+
     this.clear()
 
     if (now >= this._date.getTime()) {
       this.setInterval(cb)
+
       return true
     }
     this.log.info(this.relative())

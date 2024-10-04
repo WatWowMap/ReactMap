@@ -4,6 +4,7 @@ if (!process.env.FORCE_COLOR) {
 }
 
 const logger = require('loglevel')
+
 const { TAGS } = require('./tags')
 const { Logger } = require('./Logger')
 

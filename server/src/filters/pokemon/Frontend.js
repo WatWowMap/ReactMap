@@ -1,5 +1,6 @@
 // @ts-check
 const config = require('@rm/config')
+
 const { BaseFilter } = require('../Base')
 
 class PokemonFilter extends BaseFilter {

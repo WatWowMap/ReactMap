@@ -79,6 +79,7 @@ class Station extends Model {
               default:
                 {
                   const [id, form] = key.split('-')
+
                   if (id) battleBosses.add(id)
                   if (form) battleForms.add(form)
                 }
@@ -126,6 +127,7 @@ class Station extends Model {
         if (station.total_stationed_pokemon === null) {
           station.total_stationed_pokemon = 0
         }
+
         return station
       })
   }
@@ -137,6 +139,7 @@ class Station extends Model {
   static async getOne(id) {
     /** @type {import('@rm/types').FullStation} */
     const result = await this.query().findById(id)
+
     return result
   }
 
@@ -150,9 +153,11 @@ class Station extends Model {
   static async getDynamaxMons(id, _ctx) {
     /** @type {import('@rm/types').FullStation} */
     const result = await this.query().findById(id).select('stationed_pokemon')
+
     if (!result) {
       return []
     }
+
     return typeof result.stationed_pokemon === 'string'
       ? JSON.parse(result.stationed_pokemon)
       : result.stationed_pokemon || []
@@ -167,6 +172,7 @@ class Station extends Model {
       .andWhere('end_time', '>', ts)
       .groupBy(['battle_pokemon_id', 'battle_pokemon_form', 'battle_level'])
       .orderBy('battle_pokemon_id', 'asc')
+
     return {
       available: [
         ...new Set(
@@ -205,6 +211,7 @@ class Station extends Model {
     )
 
     const select = ['id', 'name', 'lat', 'lon', distance]
+
     if (perms.dynamax) {
       select.push(
         'battle_level',
@@ -242,9 +249,11 @@ class Station extends Model {
       })
       .limit(searchResultsLimit)
       .orderBy('distance')
+
     if (!getAreaSql(query, areaRestrictions, onlyAreas, isMad)) {
       return []
     }
+
     return query
   }
 }

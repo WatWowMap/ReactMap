@@ -1,31 +1,30 @@
 // @ts-check
 const { Model } = require('objection')
-const config = require('@rm/config')
-
 const { log, TAGS } = require('@rm/logger')
 
 class User extends Model {
   static get tableName() {
-    return config.getSafe('database.settings.userTableName')
+    return 'users'
   }
 
   static get relationMappings() {
     // eslint-disable-next-line global-require
     const { state } = require('../services/state')
+
     return {
       badges: {
         relation: Model.HasManyRelation,
         modelClass: state.db.models.Badge,
         join: {
-          from: `${config.getSafe('database.settings.userTableName')}.id`,
-          to: `${config.getSafe('database.settings.gymBadgeTableName')}.userId`,
+          from: `${'users'}.id`,
+          to: `${'gymBadges'}.userId`,
         },
       },
       nestSubmissions: {
         relation: Model.HasManyRelation,
         modelClass: state.db.models.NestSubmission,
         join: {
-          from: `${config.getSafe('database.settings.userTableName')}.id`,
+          from: `${'users'}.id`,
           to: `nest_submissions.userId`,
         },
       },
@@ -67,6 +66,7 @@ class User extends Model {
    */
   static async updateWebhook(id, selectedWebhook) {
     await this.query().update({ selectedWebhook }).where({ id })
+
     return this.getOne(id)
   }
 }

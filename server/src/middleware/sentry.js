@@ -1,6 +1,5 @@
 // @ts-check
 const Sentry = require('@sentry/node')
-
 const config = require('@rm/config')
 
 const { version } = require('../../../package.json')
@@ -12,6 +11,7 @@ const { version } = require('../../../package.json')
  */
 function initSentry(app) {
   const sentry = config.getSafe('sentry.server')
+
   if (sentry.enabled || process.env.SENTRY_DSN) {
     Sentry.init({
       dsn: sentry.dsn || process.env.SENTRY_DSN,
@@ -43,6 +43,7 @@ function initSentry(app) {
 
     return Sentry.Handlers.errorHandler()
   }
+
   return null
 }
 
@@ -55,6 +56,7 @@ function sentryMiddleware(_req, res, next) {
       // @ts-ignore
       res.__sentry_transaction ??
       Sentry.startTransaction({ name: 'POST /graphql' })
+
     Sentry.configureScope((scope) => {
       scope.setSpan(transaction)
     })

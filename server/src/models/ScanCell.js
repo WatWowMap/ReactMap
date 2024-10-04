@@ -36,6 +36,7 @@ class ScanCell extends Model {
         minLon - 0.01,
         maxLon + 0.01,
       ])
+
     if (!getAreaSql(query, areaRestrictions, onlyAreas, isMad, 's2cell')) {
       return []
     }
@@ -47,6 +48,7 @@ class ScanCell extends Model {
     results.forEach((cell) => {
       cell.polygon = getPolyVector(cell.id, true).polygon
     })
+
     return results
   }
 }

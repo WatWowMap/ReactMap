@@ -1,0 +1,60 @@
+import * as React from 'react'
+import { Marker, Popup } from 'react-leaflet'
+import { basicEqualFn, useMemory } from '@store/useMemory'
+import { ErrorBoundary } from '@components/ErrorBoundary'
+
+import { deviceMarker } from './deviceMarker'
+import { DevicePath } from './DevicePath'
+import { DevicePopup } from './DevicePopup'
+
+const BaseDeviceTile = (device: import('@rm/types').Device) => {
+  const ts = Math.floor(Date.now() / 1000)
+  const [poly, setPoly] = React.useState(false)
+  const markerRef = React.useRef(null)
+  const isOnline = ts - device.updated < 900
+  const [iconUrl, iconSize, modifiers] = useMemory(
+    (s) => [
+      s.Icons.getDevices(isOnline),
+      s.Icons.getSize('device'),
+      s.Icons.getModifiers('device')[0],
+    ],
+    basicEqualFn,
+  )
+
+  React.useEffect(() => {
+    if (poly && markerRef) {
+      markerRef.current.openPopup()
+    }
+  })
+
+  const icon = React.useMemo(
+    () => deviceMarker(iconUrl, iconSize, modifiers),
+    [iconUrl, iconSize],
+  )
+
+  return (
+    <Marker
+      ref={markerRef}
+      eventHandlers={{
+        popupopen: () => setPoly(true),
+        popupclose: () => setPoly(false),
+      }}
+      icon={icon}
+      position={[device.lat, device.lon]}
+    >
+      <Popup position={[device.lat, device.lon]}>
+        <DevicePopup {...device} isOnline={isOnline} ts={ts} />
+      </Popup>
+      {poly && !device.isMad && (
+        <ErrorBoundary>
+          <DevicePath {...device} />
+        </ErrorBoundary>
+      )}
+    </Marker>
+  )
+}
+
+export const DeviceTile = React.memo(
+  BaseDeviceTile,
+  (prev, next) => prev.updated === next.updated,
+)

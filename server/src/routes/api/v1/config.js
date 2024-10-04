@@ -1,12 +1,12 @@
 // @ts-check
 const router = require('express').Router()
-
 const { log, TAGS } = require('@rm/logger')
 
 const { reloadConfig } = require('../../../utils/reloadConfig')
 
 router.get('/', (req, res) => {
   const config = require('@rm/config')
+
   try {
     res.status(200).json({
       ...config,
@@ -36,6 +36,7 @@ router.get('/', (req, res) => {
 
 router.get('/reload', async (req, res) => {
   const error = await reloadConfig()
+
   if (error) {
     res.status(500).json({ status: 'error', reason: error.message })
   } else {

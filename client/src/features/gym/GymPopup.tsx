@@ -1,0 +1,717 @@
+import * as React from 'react'
+import ExpandMore from '@mui/icons-material/ExpandMore'
+import MoreVert from '@mui/icons-material/MoreVert'
+import Grid from '@mui/material/Unstable_Grid2'
+import IconButton from '@mui/material/IconButton'
+import Menu from '@mui/material/Menu'
+import MenuItem from '@mui/material/MenuItem'
+import Divider from '@mui/material/Divider'
+import Collapse from '@mui/material/Collapse'
+import Typography from '@mui/material/Typography'
+import { useTranslation } from 'react-i18next'
+import { useSyncData } from '@features/webhooks'
+import { useMemory } from '@store/useMemory'
+import { useLayoutStore } from '@store/useLayoutStore'
+import { setDeepStore, useStorage } from '@store/useStorage'
+import { ErrorBoundary } from '@components/ErrorBoundary'
+import { Img, TextWithIcon } from '@components/Img'
+import { Title } from '@components/popups/Title'
+import { PowerUp } from '@components/popups/PowerUp'
+import { GenderIcon } from '@components/popups/GenderIcon'
+import { Navigation } from '@components/popups/Navigation'
+import { Coords } from '@components/popups/Coords'
+import { TimeStamp } from '@components/popups/TimeStamps'
+import { ExtraInfo } from '@components/popups/ExtraInfo'
+import { useAnalytics } from '@hooks/useAnalytics'
+import { getTimeUntil } from '@utils/getTimeUntil'
+import { formatInterval } from '@utils/formatInterval'
+
+import { useWebhook } from './useWebhook'
+
+export function GymPopup({
+  hasRaid,
+  hasHatched,
+  raidIconUrl,
+  ...gym
+}: {
+  hasRaid: boolean
+  hasHatched: boolean
+  raidIconUrl: string
+} & import('@rm/types').Gym) {
+  const { t } = useTranslation()
+  const { perms } = useMemory((s) => s.auth)
+  const popups = useStorage((s) => s.popups)
+  const ts = Math.floor(Date.now() / 1000)
+
+  useAnalytics('Popup', `Team ID: ${gym.team_id} Has Raid: ${hasRaid}`, 'Gym')
+
+  return (
+    <ErrorBoundary noRefresh style={{}} variant="h5">
+      <Grid
+        container
+        alignItems="center"
+        direction="row"
+        justifyContent="space-evenly"
+        width={200}
+      >
+        <Grid xs={10}>
+          <Title backup={t('unknown_gym')}>{gym.name}</Title>
+        </Grid>
+        <MenuActions hasRaid={hasRaid} {...gym} />
+        {perms.gyms && (
+          <Grid xs={12}>
+            <Collapse
+              unmountOnExit
+              in={!popups.raids || !hasRaid}
+              timeout="auto"
+            >
+              <Grid
+                container
+                alignItems="center"
+                justifyContent="space-evenly"
+                spacing={1}
+              >
+                <PoiImage {...gym} />
+                <Divider flexItem orientation="vertical" />
+                <GymInfo {...gym} />
+              </Grid>
+            </Collapse>
+          </Grid>
+        )}
+        {perms.raids && (
+          <Grid xs={12}>
+            <Collapse unmountOnExit in={popups.raids && hasRaid} timeout="auto">
+              <Grid
+                container
+                alignItems="center"
+                justifyContent="center"
+                spacing={1}
+              >
+                <RaidImage raidIconUrl={raidIconUrl} {...gym} />
+                <Divider flexItem orientation="vertical" />
+                {gym.raid_pokemon_id ? (
+                  <RaidInfo {...gym} />
+                ) : (
+                  <Timer start {...gym} />
+                )}
+                {Boolean(
+                  gym.raid_pokemon_id && gym.raid_battle_timestamp >= ts,
+                ) && <Timer start {...gym} hasHatched={hasHatched} />}
+                <Timer {...gym} hasHatched={hasHatched} />
+              </Grid>
+            </Collapse>
+          </Grid>
+        )}
+        <PowerUp {...gym} />
+        <GymFooter hasRaid={hasRaid} lat={gym.lat} lon={gym.lon} />
+        {perms.gyms && (
+          <Collapse unmountOnExit in={popups.extras} timeout="auto">
+            <ExtraGymInfo {...gym} />
+          </Collapse>
+        )}
+      </Grid>
+    </ErrorBoundary>
+  )
+}
+
+/**
+ *
+ * @param {{
+ *  hasRaid: boolean
+ * } & import('@rm/types').Gym} param0
+ * @returns
+ */
+const MenuActions = ({
+  hasRaid,
+  ...gym
+}: {
+  hasRaid: boolean
+} & import('@rm/types').Gym) => {
+  const [anchorEl, setAnchorEl] = React.useState(null)
+
+  const handleClick = (event) => {
+    setAnchorEl(event.currentTarget)
+  }
+
+  const handleClose = React.useCallback(() => setAnchorEl(null), [])
+
+  return (
+    <Grid textAlign="right" xs={2}>
+      <IconButton aria-haspopup="true" size="large" onClick={handleClick}>
+        <MoreVert />
+      </IconButton>
+      <Menu anchorEl={anchorEl} open={!!anchorEl} onClose={handleClose}>
+        <DropdownOptions {...gym} handleClose={handleClose} hasRaid={hasRaid} />
+      </Menu>
+    </Grid>
+  )
+}
+
+/**
+ *
+ * @param {{
+ *  handleClose: () => void
+ *  hasRaid: boolean
+ * } & import('@rm/types').Gym} param0
+ * @returns
+ */
+const DropdownOptions = ({
+  id,
+  badge,
+  handleClose,
+  updated,
+  team_id,
+  hasRaid,
+  raid_pokemon_id,
+  raid_pokemon_form,
+  raid_level,
+}: {
+  handleClose: () => void
+  hasRaid: boolean
+} & import('@rm/types').Gym) => {
+  const { t } = useTranslation()
+
+  const { gyms, raids, gymBadges, webhooks } = useMemory((s) => s.auth.perms)
+  const gymValidDataLimit = useMemory((s) => s.gymValidDataLimit)
+
+  const { data: raidHooks } = useSyncData('raid')
+  const { data: gymHooks } = useSyncData('gym')
+  const { data: eggHooks } = useSyncData('egg')
+
+  const hasRaidHook = raidHooks?.find((x) => x.gym_id === id)
+  const hasGymHook = gymHooks?.find((x) => x.gym_id === id)
+  const hasEggHook = eggHooks?.find((x) => x.gym_id === id)
+  const hasWebhook = !!(hasGymHook || hasRaidHook || hasEggHook)
+
+  const addWebhook = useWebhook({ category: 'quickGym' })
+
+  const handleHide = () => {
+    handleClose()
+    useMemory.setState((prev) => ({ hideList: new Set(prev.hideList).add(id) }))
+  }
+
+  const handleExclude = (key) => {
+    handleClose()
+    setDeepStore(`filters.gyms.filter.${key}.enabled`, false)
+  }
+
+  const excludeTeam = () => handleExclude(`t${team_id}-0`)
+
+  const excludeBoss = () =>
+    handleExclude(
+      raid_pokemon_id > 0
+        ? `${raid_pokemon_id}-${raid_pokemon_form}`
+        : `e${raid_level}`,
+    )
+
+  const handleTimer = () => {
+    handleClose()
+    useMemory.setState((prev) => {
+      if (prev.timerList.includes(id)) {
+        return { timerList: prev.timerList.filter((x) => x !== id) }
+      }
+
+      return { timerList: [...prev.timerList, id] }
+    })
+  }
+
+  const options: { name?: string; action: () => void; key?: string }[] = [
+    { name: 'hide', action: handleHide },
+  ]
+
+  if (gyms) {
+    if (updated > gymValidDataLimit) {
+      options.push({ name: 'exclude_team', action: excludeTeam })
+    }
+    if (gymBadges) {
+      options.push({
+        name: 'gym_badge_menu',
+        action: () => {
+          handleClose()
+
+          return useLayoutStore.setState({
+            gymBadge: { badge, gymId: id, open: true },
+          })
+        },
+      })
+    }
+  }
+  if (raids && hasRaid) {
+    options.push(
+      { name: 'exclude_raid', action: excludeBoss },
+      { name: 'timer', action: handleTimer },
+    )
+  }
+
+  if (webhooks?.length) {
+    options.push({
+      name: t(hasWebhook ? 'remove_webhook_entry' : 'webhook_entry', {
+        name: t('alerts'),
+      }),
+      action: () => {
+        if (hasWebhook) {
+          if (hasGymHook) addWebhook(hasGymHook.uid, 'gym-delete')
+          if (hasRaidHook) addWebhook(hasRaidHook.uid, 'raid-delete')
+          if (hasEggHook) addWebhook(hasEggHook.uid, 'egg-delete')
+        } else {
+          addWebhook(id, 'quickGym')
+        }
+      },
+      key: 'wehbhook',
+    })
+  }
+
+  return options.filter(Boolean).map((option) => (
+    <MenuItem key={option.key || option.name} dense onClick={option.action}>
+      {typeof option.name === 'string' ? t(option.name) : option.name}
+    </MenuItem>
+  ))
+}
+
+/**
+ *
+ * @param {import('@rm/types').Gym} props
+ * @returns
+ */
+const PoiImage = ({ url, team_id, name, badge }: import('@rm/types').Gym) => {
+  const Icons = useMemory((s) => s.Icons)
+  const src = url ? url.replace('http://', 'https://') : Icons.getTeams(team_id)
+
+  return (
+    <Grid xs={6}>
+      <Img
+        alt={name || 'unknown'}
+        className={`${
+          badge ? `badge badge-${badge}` : `circle-image team-${team_id}`
+        }`}
+        maxHeight={75}
+        maxWidth={75}
+        src={src}
+      />
+    </Grid>
+  )
+}
+
+/**
+ *
+ * @param {import('@rm/types').Gym & { raidIconUrl: string }} props
+ * @returns
+ */
+const RaidImage = ({
+  raidIconUrl,
+  raid_level,
+  raid_pokemon_id,
+  raid_pokemon_form,
+  raid_pokemon_gender,
+}: import('@rm/types').Gym & { raidIconUrl: string }) => {
+  const { t } = useTranslation()
+  const Icons = useMemory((s) => s.Icons)
+  const pokemon = useMemory((s) => s.masterfile.pokemon)
+
+  /**
+   *
+   * @param {number} id
+   * @param {number} form
+   * @returns
+   */
+  const getRaidTypes = (id: number, form: number) => {
+    if (pokemon[id].forms?.[form]?.types) {
+      return pokemon[id].forms[form].types
+    }
+
+    return pokemon[id]?.types || []
+  }
+
+  return (
+    <Grid container alignItems="center" justifyContent="center" xs={5}>
+      <Grid textAlign="center" xs={12}>
+        <Img alt={raidIconUrl} maxHeight={50} maxWidth={50} src={raidIconUrl} />
+      </Grid>
+      <Grid textAlign="center" xs={12}>
+        <Typography variant="caption">
+          {t(`raid_${raid_level}`)} ({raid_level})
+        </Typography>
+      </Grid>
+      {raid_pokemon_id > 0 &&
+        getRaidTypes(raid_pokemon_id, raid_pokemon_form).map((type) => (
+          <Grid
+            key={type}
+            className="grid-item"
+            height={15}
+            style={{ backgroundImage: `url(${Icons.getTypes(type)})` }}
+            width={15}
+            xs={4}
+          />
+        ))}
+      {!!raid_pokemon_gender && (
+        <Grid textAlign="center" xs={4}>
+          <GenderIcon gender={raid_pokemon_gender} />
+        </Grid>
+      )}
+    </Grid>
+  )
+}
+
+/**
+ *
+ * @param {import('@rm/types').Gym} props
+ * @returns
+ */
+const GymInfo = ({
+  team_id,
+  available_slots,
+  ex_raid_eligible,
+  ar_scan_eligible,
+  updated,
+  badge,
+}: import('@rm/types').Gym) => {
+  const { t } = useTranslation()
+  const Icons = useMemory((s) => s.Icons)
+  const gymValidDataLimit = useMemory((s) => s.gymValidDataLimit)
+
+  return (
+    <Grid
+      container
+      alignItems="center"
+      direction="row"
+      justifyContent="space-around"
+      xs={5}
+    >
+      {!!badge && (
+        <Grid xs={12}>
+          <Typography align="center" className={`badge_${badge}`} variant="h6">
+            {t(`badge_${badge}`)}
+          </Typography>
+        </Grid>
+      )}
+      {updated > gymValidDataLimit && (
+          <Grid xs={12}>
+            <Typography align="center" variant="h6">
+              {t(`team_${team_id}`)}
+            </Typography>
+          </Grid>
+        ) && (
+          <Grid xs={12}>
+            <Typography align="center" variant="h6">
+              {available_slots} {t('slots')}
+            </Typography>
+          </Grid>
+        )}
+      {ex_raid_eligible && (
+        <Grid
+          className="grid-item"
+          style={{
+            height: 24,
+            backgroundImage: `url(${Icons.getMisc('ex')})`,
+            backgroundSize: 'contain',
+          }}
+          xs={4}
+        />
+      )}
+      {ar_scan_eligible && (
+        <Grid
+          className="grid-item"
+          style={{
+            height: 24,
+            backgroundImage: `url(${Icons.getMisc('ar')})`,
+            backgroundSize: 'contain',
+          }}
+          xs={4}
+        />
+      )}
+      <Grid
+        style={{
+          height: 24,
+          backgroundImage: `url(${Icons.getTeams(team_id)})`,
+          backgroundSize: 'contain',
+          backgroundRepeat: 'no-repeat',
+          backgroundPosition: 'center',
+        }}
+        xs={4}
+      />
+    </Grid>
+  )
+}
+
+/**
+ * @param {import('@rm/types').Gym} props
+ */
+const RaidInfo = ({
+  raid_level,
+  raid_pokemon_id,
+  raid_pokemon_form,
+  raid_pokemon_costume,
+  raid_pokemon_move_1,
+  raid_pokemon_move_2,
+}: import('@rm/types').Gym) => {
+  const { t } = useTranslation()
+  const Icons = useMemory((s) => s.Icons)
+
+  const moves = useMemory((s) => s.masterfile.moves)
+
+  const getRaidName = (raidLevel, id) => {
+    if (id) {
+      return t(`poke_${raid_pokemon_id}`)
+    }
+
+    return `${t('tier')} ${raidLevel}`
+  }
+
+  const getRaidForm = (id, form, costume) => {
+    if (costume) {
+      return t(`costume_${costume}`, 'Unknown Costume')
+    }
+    if (form) {
+      const raidForm = t(`form_${form}`)
+
+      if (raidForm === t('form_29') || !raidForm) {
+        return ''
+      }
+
+      return `${raidForm} ${t('form')}`
+    }
+  }
+
+  return (
+    <Grid container alignItems="center" justifyContent="space-around" xs={6}>
+      <Grid xs={12}>
+        <Typography align="center" variant="h6">
+          {getRaidName(raid_level, raid_pokemon_id)}
+        </Typography>
+      </Grid>
+      <Grid style={{ paddingBottom: 4, textAlign: 'center' }} xs={12}>
+        <Typography align="center" variant="caption">
+          {getRaidForm(
+            raid_pokemon_id,
+            raid_pokemon_form,
+            raid_pokemon_costume,
+          )}
+        </Typography>
+      </Grid>
+      {raid_pokemon_move_1 && raid_pokemon_move_1 !== 1 && (
+        <Grid
+          className="grid-item"
+          style={{
+            textAlign: 'center',
+            height: 15,
+            width: 15,
+            backgroundImage: `url(${Icons.getTypes(
+              moves[raid_pokemon_move_1].type,
+            )})`,
+          }}
+          xs={2}
+        />
+      )}
+      <Grid textAlign="center" xs={10}>
+        <Typography align="center" variant="caption">
+          {t(`move_${raid_pokemon_move_1}`)}
+        </Typography>
+      </Grid>
+      {raid_pokemon_move_2 && raid_pokemon_move_2 !== 2 && (
+        <Grid
+          className="grid-item"
+          style={{
+            textAlign: 'center',
+            height: 15,
+            width: 15,
+            backgroundImage: `url(${Icons.getTypes(
+              moves[raid_pokemon_move_2].type,
+            )})`,
+          }}
+          xs={2}
+        />
+      )}
+      <Grid textAlign="center" xs={10}>
+        <Typography align="center" variant="caption">
+          {t(`move_${raid_pokemon_move_2}`)}
+        </Typography>
+      </Grid>
+    </Grid>
+  )
+}
+
+/**
+ *
+ * @param {{
+ *  start?: boolean
+ *  hasHatched?: boolean
+ *  raid_battle_timestamp: number
+ *  raid_end_timestamp: number
+ *  raid_pokemon_id: number
+ * }} param0
+ * @returns
+ */
+const Timer = ({
+  start,
+  hasHatched,
+  raid_battle_timestamp,
+  raid_end_timestamp,
+  raid_pokemon_id,
+}: {
+  start?: boolean
+  hasHatched?: boolean
+  raid_battle_timestamp: number
+  raid_end_timestamp: number
+  raid_pokemon_id: number
+}) => {
+  const { t } = useTranslation()
+
+  const target = (start ? raid_battle_timestamp : raid_end_timestamp) * 1000
+  const update = () =>
+    start || hasHatched || raid_pokemon_id
+      ? getTimeUntil(target, true)
+      : formatInterval(target - raid_battle_timestamp * 1000)
+
+  const [display, setDisplay] = React.useState(update)
+
+  React.useEffect(() => {
+    const timer = setTimeout(() => setDisplay(update()), 1000)
+
+    return () => clearTimeout(timer)
+  })
+
+  return target ? (
+    <Grid textAlign="center" xs={start && !raid_pokemon_id ? 6 : 12}>
+      <Typography variant="subtitle1">
+        {t(start ? 'starts' : 'ends')}:{' '}
+        {new Date(target).toLocaleTimeString(
+          localStorage.getItem('i18nextLng') || 'en',
+        )}
+      </Typography>
+      <Typography variant="h6">
+        {display.str.replace('days', t('days')).replace('day', t('day'))}
+      </Typography>
+    </Grid>
+  ) : null
+}
+
+/**
+ *
+ * @param {{
+ *   lat: number
+ *   lon: number
+ *   hasRaid: boolean
+ * }} param0
+ * @returns
+ */
+const GymFooter = ({
+  lat,
+  lon,
+  hasRaid,
+}: {
+  lat: number
+  lon: number
+  hasRaid: boolean
+}) => {
+  const darkMode = useStorage((s) => s.darkMode)
+  const popups = useStorage((s) => s.popups)
+  const perms = useMemory((s) => s.auth.perms)
+
+  const handleExpandClick = (category) => {
+    useStorage.setState((prev) => ({
+      popups: {
+        ...prev.popups,
+        [category]: !popups[category],
+      },
+    }))
+  }
+
+  return (
+    <>
+      {hasRaid && perms.raids && perms.gyms && (
+        <Grid xs={4}>
+          <IconButton size="large" onClick={() => handleExpandClick('raids')}>
+            <img
+              alt={popups.raids ? 'gyms' : 'raids'}
+              className={darkMode ? '' : 'darken-image'}
+              height={20}
+              src={useMemory
+                .getState()
+                .Icons.getMisc(popups.raids ? 'gyms' : 'raids')}
+              width="auto"
+            />
+          </IconButton>
+        </Grid>
+      )}
+      <Grid textAlign="center" xs={4}>
+        <Navigation lat={lat} lon={lon} />
+      </Grid>
+      {perms.gyms && (
+        <Grid xs={4}>
+          <IconButton
+            className={popups.extras ? 'expanded' : 'closed'}
+            size="large"
+            onClick={() => handleExpandClick('extras')}
+          >
+            <ExpandMore />
+          </IconButton>
+        </Grid>
+      )}
+    </>
+  )
+}
+
+/**
+ *
+ * @param {import('@rm/types').Gym} props
+ * @returns
+ */
+const ExtraGymInfo = ({
+  last_modified_timestamp,
+  lat,
+  lon,
+  updated,
+  total_cp,
+  guarding_pokemon_id,
+  guarding_pokemon_display,
+}: import('@rm/types').Gym) => {
+  const { t, i18n } = useTranslation()
+  const Icons = useMemory((s) => s.Icons)
+  const gymValidDataLimit = useMemory((s) => s.gymValidDataLimit)
+  const enableGymPopupCoords = useStorage(
+    (s) => s.userSettings.gyms.enableGymPopupCoords,
+  )
+
+  const numFormatter = new Intl.NumberFormat(i18n.language)
+  const gpd: Partial<import('@rm/types').PokemonDisplay> =
+    guarding_pokemon_display || {}
+
+  return (
+    <Grid container alignItems="center" justifyContent="center">
+      {!!guarding_pokemon_id && updated > gymValidDataLimit && (
+        <ExtraInfo title="defender">
+          <TextWithIcon
+            src={Icons.getPokemonByDisplay(guarding_pokemon_id, gpd)}
+          >
+            {gpd.badge === 1 && (
+              <>
+                <Img
+                  alt={t('best_buddy')}
+                  maxHeight={15}
+                  maxWidth={15}
+                  src={Icons.getMisc('bestbuddy')}
+                />
+                &nbsp;
+              </>
+            )}
+            {t(`poke_${guarding_pokemon_id}`)}
+          </TextWithIcon>
+        </ExtraInfo>
+      )}
+      {!!total_cp && updated > gymValidDataLimit && (
+        <ExtraInfo title="total_cp">{numFormatter.format(total_cp)}</ExtraInfo>
+      )}
+      <Divider
+        flexItem
+        style={{ width: '100%', height: 2, margin: '10px 0' }}
+      />
+      <TimeStamp time={updated}>last_seen</TimeStamp>
+      <TimeStamp time={last_modified_timestamp}>last_modified</TimeStamp>
+      {enableGymPopupCoords && (
+        <Grid textAlign="center" xs={12}>
+          <Coords lat={lat} lon={lon} />
+        </Grid>
+      )}
+    </Grid>
+  )
+}

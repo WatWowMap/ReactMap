@@ -41,6 +41,7 @@ function buildGyms(perms, defaults) {
       }
     }
   })
+
   return gymFilters
 }
 

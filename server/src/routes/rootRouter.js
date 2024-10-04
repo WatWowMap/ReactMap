@@ -1,21 +1,22 @@
 // @ts-check
 
-const express = require('express')
 const fs = require('fs')
 const { join } = require('path')
-const { SourceMapConsumer } = require('source-map')
 
+const express = require('express')
+const { SourceMapConsumer } = require('source-map')
 const config = require('@rm/config')
 const { log, TAGS } = require('@rm/logger')
 
-const { authRouter } = require('./authRouter')
-const { clientRouter } = require('./clientRouter')
-const { apiRouter } = require('./api')
 const { areaPerms } = require('../utils/areaPerms')
 const { getServerSettings } = require('../utils/getServerSettings')
 const { secretMiddleware } = require('../middleware/secret')
 const { version } = require('../../../package.json')
 const { state } = require('../services/state')
+
+const { apiRouter } = require('./api')
+const { clientRouter } = require('./clientRouter')
+const { authRouter } = require('./authRouter')
 
 const rootRouter = express.Router()
 
@@ -47,6 +48,7 @@ rootRouter.post('/api/error/client', async (req, res) => {
               const match = stackLine.match(
                 /at (.+) \((\/.+\.js):(\d+):(\d+)\)/,
               )
+
               log.debug(TAGS.client, { match, stackLine })
               if (match) {
                 const [full, functionName, file, line, column] = match
@@ -68,6 +70,7 @@ rootRouter.post('/api/error/client', async (req, res) => {
                     }
                   },
                 )
+
                 if (foundStack) {
                   return foundStack
                 }
@@ -82,6 +85,7 @@ rootRouter.post('/api/error/client', async (req, res) => {
               if (i > 0) {
                 log.warn(TAGS.client, 'Regex missed for stack line:', stackLine)
               }
+
               return stackLine
             }),
           ).then((lines) => lines.join('\n'))
@@ -104,16 +108,21 @@ rootRouter.post('/api/error/client', async (req, res) => {
 
 rootRouter.get('/area/:area/:zoom?', (req, res) => {
   const { area, zoom } = req.params
+
   try {
-    const validScanAreas = config.getAreas(req, 'scanAreas')
+    const validScanAreas = config.getSafe('areas.scanAreas')
+
     if (validScanAreas.features.length) {
       const foundArea = validScanAreas.features.find(
         (a) => a.properties.name.toLowerCase() === area.toLowerCase(),
       )
+
       if (foundArea) {
         const [lat, lon] = foundArea.properties.center
+
         return res.redirect(`/@/${lat}/${lon}/${zoom || 18}`)
       }
+
       return res.redirect('/404')
     }
   } catch (e) {
@@ -126,7 +135,7 @@ rootRouter.get('/api/settings', async (req, res, next) => {
   const authentication = config.getSafe('authentication')
   const scanner = config.getSafe('scanner')
   const api = config.getSafe('api')
-  const mapConfig = config.getMapConfig(req)
+  const mapConfig = config.getSafe('map')
 
   try {
     if (
@@ -169,11 +178,13 @@ rootRouter.get('/api/settings', async (req, res, next) => {
     if (authentication.methods.length && req.user) {
       try {
         const user = await state.db.query('User', 'getOne', req.user.id)
+
         if (user) {
           if (!user.selectedWebhook) {
             const newWebhook = req.user.perms.webhooks.find(
               (n) => n in state.event.webhookObj,
             )
+
             await state.db.query('User', 'updateWebhook', user.id, newWebhook)
             if (req.session?.user) {
               req.session.user.selectedWebhook = newWebhook

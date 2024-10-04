@@ -4,7 +4,7 @@ const path = require('path')
 
 const { log, TAGS } = require('@rm/logger')
 
-const [, serverConfigDir] = (process.env.NODE_CONFIG_DIR || '').split(
+const [, userConfigDir] = (process.env.NODE_CONFIG_DIR || '').split(
   path.delimiter,
 )
 
@@ -15,16 +15,17 @@ const [, serverConfigDir] = (process.env.NODE_CONFIG_DIR || '').split(
  * @returns
  */
 function validateJsons(fileName, domain = process.env.NODE_CONFIG_ENV || '') {
-  if (!serverConfigDir) {
+  if (!userConfigDir) {
     throw new Error('Invalid NODE_CONFIG_DIR')
   }
   const generalJson = fs.existsSync(
-    path.join(serverConfigDir, `${fileName}.json`),
+    path.join(userConfigDir, `${fileName}.json`),
   )
     ? JSON.parse(
-        fs.readFileSync(path.join(serverConfigDir, `${fileName}.json`), 'utf8'),
+        fs.readFileSync(path.join(userConfigDir, `${fileName}.json`), 'utf8'),
       )
     : {}
+
   if (Object.keys(generalJson).length && !domain) {
     log.info(
       TAGS.config,
@@ -33,27 +34,30 @@ function validateJsons(fileName, domain = process.env.NODE_CONFIG_ENV || '') {
   }
   if (
     domain &&
-    fs.existsSync(path.join(serverConfigDir, `${fileName}/${domain}.json`))
+    fs.existsSync(path.join(userConfigDir, `${fileName}-${domain}.json`))
   ) {
     const domainJson =
       JSON.parse(
         fs.readFileSync(
-          path.join(serverConfigDir, `${fileName}/${domain}.json`),
+          path.join(userConfigDir, `${fileName}-${domain}.json`),
           'utf8',
         ),
       ) || {}
+
     if (Object.keys(domainJson).length) {
       log.info(
         TAGS.config,
-        `${fileName}/${domain}.json found, overwriting your config.map.${fileName} for ${domain} with the found data.`,
+        `${fileName}-${domain}.json found, overwriting your config.map.${fileName} for ${domain} with the found data.`,
       )
     }
+
     return {
       components: [],
       ...generalJson,
       ...domainJson,
     }
   }
+
   return generalJson
 }
 

@@ -54,6 +54,7 @@ function advMenus(perms) {
           acc[form.name] = 1
         }
       })
+
       return acc
     }, /** @type {Record<string, number>} */ ({})),
   ).filter(([key, count]) => count > 10 && key !== 'Normal' && key !== 'Unset')

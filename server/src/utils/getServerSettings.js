@@ -6,6 +6,10 @@ const { advMenus } = require('../ui/advMenus')
 const { drawer } = require('../ui/drawer')
 
 /**
+ * @typedef {ReturnType<typeof getServerSettings>} GetServerSettings
+ */
+
+/**
  *
  * @param {import("express").Request} req
  */
@@ -19,7 +23,7 @@ function getServerSettings(req) {
 
   const { clientValues, clientMenus } = clientOptions(user.perms)
 
-  const mapConfig = config.getMapConfig(req)
+  const mapConfig = config.getSafe('map')
   const api = config.getSafe('api')
   const authentication = config.getSafe('authentication')
   const database = config.getSafe('database')
@@ -64,7 +68,7 @@ function getServerSettings(req) {
     menus: advMenus(user.perms),
     userSettings: clientValues,
     clientMenus,
-    ui: drawer(req, user.perms),
+    ui: drawer(user.perms),
   }
 
   return serverSettings

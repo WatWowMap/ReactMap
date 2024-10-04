@@ -3,6 +3,10 @@
 /* eslint-disable no-unused-vars */
 const config = require('@rm/config')
 const { log, TAGS } = require('@rm/logger')
+
+const { filterRTree } = require('../../utils/filterRTree')
+const { state } = require('../../services/state')
+
 const { AND_KEYS, BASE_KEYS } = require('./constants')
 const {
   deepCompare,
@@ -12,9 +16,7 @@ const {
   jsifyIvFilter,
   dnfifyIvFilter,
 } = require('./functions')
-const { filterRTree } = require('../../utils/filterRTree')
 const { PokemonFilter } = require('./Frontend')
-const { state } = require('../../services/state')
 
 class PkmnBackend {
   /**
@@ -49,6 +51,7 @@ class PkmnBackend {
     this.pvpConfig = config.getSafe('api.pvp')
 
     const [pokemon, form] = id.split('-', 2).map(Number)
+
     this.id = id
     this.pokemon = pokemon || 0
     this.form = form || 0
@@ -133,6 +136,7 @@ class PkmnBackend {
       orStr = `(${orStr})`
     }
     let merged = andStr ? `${andStr}${orStr ? `|${orStr}` : ''}` : orStr
+
     if (keys.has('gender') && this.perms.iv) {
       if (merged) merged = `(${merged})&`
       merged += `G${filter.gender}`
@@ -142,6 +146,7 @@ class PkmnBackend {
       orStr,
       merged,
     })
+
     return merged
   }
 
@@ -151,10 +156,12 @@ class PkmnBackend {
    */
   getCallback(global = false) {
     const filter = global ? this.global : this.filter
+
     if (this.mods.onlyLegacy) {
       return filter.adv ? jsifyIvFilter(filter.adv) : () => true
     }
     const keys = global ? this.globalKeys : this.filterKeys
+
     return keys.size ||
       (global ? this.mods.onlyZeroIv || this.mods.onlyHundoIv : false)
       ? jsifyIvFilter(this.createExpertFilter(filter, keys))
@@ -204,21 +211,25 @@ class PkmnBackend {
     const rankCheck =
       between(entry.rank, ...this.filter[league]) ||
       between(entry.rank, ...this.global[league])
+
     if (!rankCheck) return false
 
     const cpCheck =
       this.mods.pvpV2 ||
       this.pvpConfig.reactMapHandlesPvp ||
       entry.cp >= this.pvpConfig.minCp[league]
+
     if (!cpCheck) return false
 
     const megaCheck = !entry.evolution || this.mods.onlyPvpMega
+
     if (!megaCheck) return false
 
     const capCheck =
       this.mods.pvpV2 || this.pvpConfig.reactMapHandlesPvp
         ? entry.capped || this.mods[`onlyPvp${entry.cap}`]
         : true
+
     if (!capCheck) return false
 
     return true
@@ -237,9 +248,11 @@ class PkmnBackend {
             const valid =
               (this.filterKeys.has(league) || this.globalKeys.has(league)) &&
               this.pvpCheck(entry, league)
+
             return valid
           })
     const best = Math.min(4096, ...filtered.map((entry) => entry.rank))
+
     return { filtered, best }
   }
 
@@ -252,6 +265,7 @@ class PkmnBackend {
   static ensureSafe(filter, limit = 100) {
     // eslint-disable-next-line no-nested-ternary
     const [min, max] = filter.map((x, i) => (x > limit ? (i ? limit : 0) : x))
+
     return { min, max }
   }
 
@@ -272,10 +286,11 @@ class PkmnBackend {
       cp,
       level,
       gender,
-      xxs,
-      xxl,
+      xxs: _xxs,
+      xxl: _xxl,
       ...rest
     } = this.filter
+
     if (this.id !== 'global') {
       if (pokemon === undefined) {
         pokemon = [{ id: this.pokemon, form: this.form }]
@@ -291,6 +306,7 @@ class PkmnBackend {
       return dnfifyIvFilter(adv, pokemon)
     }
     const results = /** @type {import('@rm/types').DnfFilter[]} */ ([])
+
     if (
       this.perms.iv &&
       ((this.filterKeys.has('gender') && this.filterKeys.size === 1) ||
@@ -330,6 +346,7 @@ class PkmnBackend {
               this.standard[league]?.[1],
             ),
           }
+
           if (this.filterKeys.has('gender')) {
             pvpFilter.gender = { min: gender, max: gender }
           }
@@ -340,6 +357,7 @@ class PkmnBackend {
     if (this.filterKeys.has('xxs')) {
       /** @type {import('@rm/types').DnfFilter} */
       const xxsFilter = { pokemon, size: { min: 1, max: 1 } }
+
       if (this.filterKeys.has('gender')) {
         xxsFilter.gender = { min: gender, max: gender }
       }
@@ -348,11 +366,13 @@ class PkmnBackend {
     if (this.filterKeys.has('xxl')) {
       /** @type {import('@rm/types').DnfFilter} */
       const xxlFilter = { pokemon, size: { min: 5, max: 5 } }
+
       if (this.filterKeys.has('gender')) {
         xxlFilter.gender = { min: gender, max: gender }
       }
       results.push(xxlFilter)
     }
+
     return results
   }
 
@@ -384,6 +404,7 @@ class PkmnBackend {
       }
     }
     log.trace(pokemon)
+
     return false
   }
 
@@ -398,15 +419,18 @@ class PkmnBackend {
       : getParsedPvp(pokemon)
     const cleanPvp = /** @type {import('@rm/types').CleanPvp} */ ({})
     let bestPvp = 4096
+
     Object.keys(parsed).forEach((league) => {
       if (this.pvpConfig.leagueObj[league]) {
         const { filtered, best } = this.getRanks(league, parsed[league])
+
         if (filtered.length) {
           cleanPvp[league] = filtered
           if (best < bestPvp) bestPvp = best
         }
       }
     })
+
     return { cleanPvp, bestPvp }
   }
 
@@ -434,6 +458,7 @@ class PkmnBackend {
       seen_type: pokemon.seen_type,
       changed: !!pokemon.changed,
     }
+
     if (result.pokemon_id === 132 && !result.ditto_form) {
       result.ditto_form = result.form
       result.form =
@@ -468,11 +493,13 @@ class PkmnBackend {
     }
     if (this.perms.pvp && pokemon.cp) {
       const { cleanPvp, bestPvp } = this.buildPvp(pokemon)
+
       result.bestPvp = bestPvp
       result.cleanPvp = cleanPvp
     } else {
       result.cleanPvp = {}
     }
+
     return result
   }
 }

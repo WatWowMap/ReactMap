@@ -68,6 +68,7 @@ function buildPokemon(defaults, base, custom) {
       })
     }
   })
+
   return pokemon
 }
 

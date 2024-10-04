@@ -13,9 +13,11 @@ async function getCurrentBranch() {
     const gitRef = fs
       .readFileSync(path.resolve(`${__dirname}/../../../.gitref`), 'utf8')
       .trim()
+
     if (gitRef) return { branch: gitRef.split('/')[2].trim(), isDocker: true }
 
     const { stdout } = await execPromise('git branch --show-current')
+
     return { branch: stdout.trim(), isDocker: false }
   } catch (e) {
     log.info(
@@ -24,6 +26,7 @@ async function getCurrentBranch() {
       e.message,
       '\nProceeding normally...',
     )
+
     return { branch: 'main', isDocker: false }
   }
 }
@@ -33,9 +36,11 @@ async function getCurrentSha() {
     const gitSha = fs
       .readFileSync(path.resolve(`${__dirname}/../../../.gitsha`), 'utf8')
       .trim()
+
     if (gitSha) return gitSha
 
     const { stdout } = await execPromise('git rev-parse HEAD')
+
     return stdout.trim()
   } catch (e) {
     log.info(
@@ -44,6 +49,7 @@ async function getCurrentSha() {
       e.message,
       '\nProceeding normally...',
     )
+
     return ''
   }
 }
@@ -54,6 +60,7 @@ async function getRemoteSha(branch) {
     const { stdout } = await execPromise(
       `git ls-remote https://github.com/WatWowMap/ReactMap/ refs/heads/${branch}`,
     )
+
     return stdout.split('\t')[0]
   } catch (e) {
     log.info(
@@ -64,6 +71,7 @@ async function getRemoteSha(branch) {
       branch,
       '\nProceeding normally...',
     )
+
     return ''
   }
 }
@@ -73,6 +81,7 @@ async function checkForUpdates() {
     const { branch, isDocker } = await getCurrentBranch()
     const sha = await getCurrentSha()
     const remoteSha = await getRemoteSha(branch)
+
     if (remoteSha !== sha) {
       log.info(
         TAGS.update,

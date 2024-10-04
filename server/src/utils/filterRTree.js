@@ -1,8 +1,8 @@
 // @ts-check
 const { default: pointInPolygon } = require('@turf/boolean-point-in-polygon')
 const { point } = require('@turf/helpers')
-
 const config = require('@rm/config')
+
 const { consolidateAreas } = require('./consolidateAreas')
 
 /**

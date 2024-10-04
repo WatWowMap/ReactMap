@@ -9,7 +9,7 @@ const jsonSize = (s) => bytes(JSON.stringify(s))
 
 class Backup extends Model {
   static get tableName() {
-    return config.getSafe('database.settings.backupTableName')
+    return 'backups'
   }
 
   $beforeInsert() {
@@ -23,13 +23,14 @@ class Backup extends Model {
 
   static get relationMappings() {
     const { state } = require('../services/state')
+
     return {
       user: {
         relation: Model.BelongsToOneRelation,
         modelClass: state.db.models.User,
         join: {
-          from: `${config.getSafe('database.settings.backupTableName')}.userId`,
-          to: `${config.getSafe('database.settings.userTableName')}.id`,
+          from: `${'backups'}.userId`,
+          to: `${'users'}.id`,
         },
       },
     }
@@ -55,6 +56,7 @@ class Backup extends Model {
       .select(['id', 'name', 'createdAt', 'updatedAt'])
       .where({ userId })
       .whereNotNull('data')
+
     return records
   }
 
@@ -71,6 +73,7 @@ class Backup extends Model {
     )
       throw new Error('Data too large')
     const count = await this.query().count().where('userId', userId).first()
+
     if (
       count['count(*)'] < config.getSafe('database.settings.userBackupLimits')
     ) {
@@ -96,6 +99,7 @@ class Backup extends Model {
       config.getSafe('database.settings.userBackupSizeLimit')
     )
       throw new Error('Data too large')
+
     return (
       this.query()
         // @ts-ignore

@@ -25,6 +25,7 @@ class Weather extends Model {
         .castTo('CHAR')
         .as('id'),
     ])
+
     if (isMad) {
       query.select([
         'latitude',
@@ -36,6 +37,7 @@ class Weather extends Model {
       query.select(['latitude', 'longitude', 'gameplay_condition', 'updated'])
       const ts = Math.floor(Date.now() / 1000)
       const ms = ts - config.getSafe('api.weatherCellLimit') * 60 * 60 * 24
+
       query.where('updated', '>=', ms)
     }
     /** @type {import("@rm/types").FullWeather[]} */
@@ -52,6 +54,7 @@ class Weather extends Model {
       : cleanUserAreas
 
     const boundPolygon = getPolygonBbox(args)
+
     return results
       .map((cell) => {
         const center = point([cell.longitude, cell.latitude])
@@ -77,6 +80,7 @@ class Weather extends Model {
                     geojson,
                   )),
             ))
+
         return (
           hasOverlap && {
             ...cell,

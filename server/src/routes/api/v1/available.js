@@ -1,7 +1,7 @@
 // @ts-check
 const router = require('express').Router()
-
 const { log, TAGS } = require('@rm/logger')
+
 const { state } = require('../../../services/state')
 
 const queryObj = /** @type {const} */ ({
@@ -47,6 +47,7 @@ const getAll = async (compare) => {
         state.event.available.gyms,
         state.event.available.nests,
       ]
+
   return Object.fromEntries(
     Object.keys(queryObj).map((key, i) => [key, available[i]]),
   )
@@ -63,6 +64,7 @@ router.get(['/', '/:category'], async (req, res) => {
         current !== undefined
           ? await state.db.getAvailable(model)
           : state.event.available[category]
+
       available.sort((a, b) => a.localeCompare(b))
 
       if (equal !== undefined) {
@@ -70,6 +72,7 @@ router.get(['/', '/:category'], async (req, res) => {
           current !== undefined
             ? state.event.available[category]
             : await state.db.getAvailable(model)
+
         compare.sort((a, b) => a.localeCompare(b))
         res.status(200).json(available.every((item, i) => item === compare[i]))
       } else {
@@ -77,12 +80,14 @@ router.get(['/', '/:category'], async (req, res) => {
       }
     } else {
       const available = await getAll(!!current)
+
       Object.values(available).forEach((c) =>
         c.sort((a, b) => a.localeCompare(b)),
       )
 
       if (equal !== undefined) {
         const compare = await getAll(!current)
+
         Object.values(compare).forEach((c) =>
           c.sort((a, b) => a.localeCompare(b)),
         )

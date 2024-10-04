@@ -1,5 +1,6 @@
 // @ts-check
 const config = require('@rm/config')
+
 const { state } = require('../services/state')
 
 /** @typedef {import('@rm/types').RMSlider} Slider */
@@ -9,12 +10,11 @@ const BLOCKED = /** @type {undefined} */ (undefined)
 
 /**
  *
- * @param {import('express').Request} req
  * @param {import("@rm/types").Permissions} perms
  * @returns
  */
-function drawer(req, perms) {
-  const mapConfig = config.getMapConfig(req)
+function drawer(perms) {
+  const mapConfig = config.getSafe('map')
   const nestFilters = config.getSafe('defaultFilters.nests')
   const leagues = config.getSafe('api.pvp.leagues')
 
@@ -35,7 +35,7 @@ function drawer(req, perms) {
         ? {
             pokemon: true,
             sliders: {
-              secondary: [
+              secondary: /** @type {import('@rm/types').RMSlider[]}*/ ([
                 {
                   name: 'avgFilter',
                   i18nKey: 'spawns_per_hour',
@@ -45,7 +45,7 @@ function drawer(req, perms) {
                   perm: 'nests',
                   step: nestFilters.avgSliderStep,
                 },
-              ],
+              ]),
             },
             polygons: true,
             active: true,
@@ -82,72 +82,76 @@ function drawer(req, perms) {
             zeroIv: perms.iv || BLOCKED,
             hundoIv: perms.iv || BLOCKED,
             sliders: {
-              primary: [
-                {
-                  name: 'iv',
-                  label: '%',
-                  min: 0,
-                  max: 100,
-                  perm: 'iv',
-                  color: 'secondary',
-                },
-                ...leagues.map((league) => ({
-                  name: league.name,
-                  label: 'rank',
-                  min: league.minRank || 1,
-                  max: league.maxRank || 100,
-                  perm: 'pvp',
-                  color: 'primary',
-                })),
-              ].map((slider) => ({
-                ...slider,
-                disabled: !perms[slider.perm],
-              })),
-              secondary: [
-                {
-                  name: 'level',
-                  label: '',
-                  min: 1,
-                  max: 35,
-                  perm: 'iv',
-                  color: 'secondary',
-                },
-                {
-                  name: 'atk_iv',
-                  label: '',
-                  min: 0,
-                  max: 15,
-                  perm: 'iv',
-                  color: 'secondary',
-                },
-                {
-                  name: 'def_iv',
-                  label: '',
-                  min: 0,
-                  max: 15,
-                  perm: 'iv',
-                  color: 'secondary',
-                },
-                {
-                  name: 'sta_iv',
-                  label: '',
-                  min: 0,
-                  max: 15,
-                  perm: 'iv',
-                  color: 'secondary',
-                },
-                {
-                  name: 'cp',
-                  label: '',
-                  min: 10,
-                  max: 5000,
-                  perm: 'iv',
-                  color: 'secondary',
-                },
-              ].map((slider) => ({
-                ...slider,
-                disabled: !perms[slider.perm],
-              })),
+              primary: /** @type {import('@rm/types').RMSlider[]}*/ (
+                [
+                  {
+                    name: 'iv',
+                    label: '%',
+                    min: 0,
+                    max: 100,
+                    perm: 'iv',
+                    color: 'secondary',
+                  },
+                  ...leagues.map((league) => ({
+                    name: league.name,
+                    label: 'rank',
+                    min: league.minRank || 1,
+                    max: league.maxRank || 100,
+                    perm: 'pvp',
+                    color: 'primary',
+                  })),
+                ].map((slider) => ({
+                  ...slider,
+                  disabled: !perms[slider.perm],
+                }))
+              ),
+              secondary: /** @type {import('@rm/types').RMSlider[]}*/ (
+                [
+                  {
+                    name: 'level',
+                    label: '',
+                    min: 1,
+                    max: 35,
+                    perm: 'iv',
+                    color: 'secondary',
+                  },
+                  {
+                    name: 'atk_iv',
+                    label: '',
+                    min: 0,
+                    max: 15,
+                    perm: 'iv',
+                    color: 'secondary',
+                  },
+                  {
+                    name: 'def_iv',
+                    label: '',
+                    min: 0,
+                    max: 15,
+                    perm: 'iv',
+                    color: 'secondary',
+                  },
+                  {
+                    name: 'sta_iv',
+                    label: '',
+                    min: 0,
+                    max: 15,
+                    perm: 'iv',
+                    color: 'secondary',
+                  },
+                  {
+                    name: 'cp',
+                    label: '',
+                    min: 10,
+                    max: 5000,
+                    perm: 'iv',
+                    color: 'secondary',
+                  },
+                ].map((slider) => ({
+                  ...slider,
+                  disabled: !perms[slider.perm],
+                }))
+              ),
             },
           }
         : BLOCKED,
@@ -193,11 +197,13 @@ function drawer(req, perms) {
 
   // sorts the menus
   const sortedUi = {}
+
   mapConfig.general.menuOrder.forEach((category) => {
     if (ui[category]) {
       sortedUi[category] = ui[category]
     }
   })
+
   return { ...sortedUi, ...ui }
 }
 

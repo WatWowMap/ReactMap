@@ -1,7 +1,6 @@
 // @ts-check
 const session = require('express-session')
 const mysqlSession = require('express-mysql-session')
-
 const config = require('@rm/config')
 
 function sessionMiddleware() {
@@ -20,7 +19,7 @@ function sessionMiddleware() {
           createDatabaseTable: true,
           endConnectionOnClose: true,
           schema: {
-            tableName: config.getSafe('database.settings.sessionTableName'),
+            tableName: 'session',
           },
           host: dbSelection.host,
           port: dbSelection.port,

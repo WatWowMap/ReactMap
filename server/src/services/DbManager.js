@@ -7,6 +7,7 @@ const config = require('@rm/config')
 const { Logger, TAGS } = require('@rm/logger')
 
 const { getBboxFromCenter } = require('../utils/getBbox')
+
 const { getCache } = require('./cache')
 
 /**
@@ -56,6 +57,7 @@ class DbManager extends Logger {
           const capital = /** @type {import('../models').ModelKeys} */ (
             `${category.charAt(0).toUpperCase()}${category.slice(1)}`
           )
+
           if (DbManager.singleModels.includes(capital)) {
             this.models[capital] = {}
             if (capital === 'User') {
@@ -70,9 +72,11 @@ class DbManager extends Logger {
         })
         if ('endpoint' in schema) {
           this.endpoints[i] = schema
+
           return null
         }
         const { log } = new Logger('knex', schema.database)
+
         return knex({
           client: 'mysql2',
           connection: {
@@ -114,6 +118,7 @@ class DbManager extends Logger {
   static getDistance(args, isMad) {
     const radLat = args.lat * (Math.PI / 180)
     const radLon = args.lon * (Math.PI / 180)
+
     return raw(
       `ROUND(( 6371000 * acos( cos( ${radLat} ) * cos( radians( ${
         isMad ? 'latitude' : 'lat'
@@ -246,6 +251,7 @@ class DbManager extends Logger {
     const mapKey = historical ? 'historical' : 'rarity'
     const rarityPercents = config.getSafe('rarity.percents')
     let total = 0
+
     results.forEach((result) => {
       Object.entries(historical ? result : result.rarity).forEach(
         ([key, count]) => {
@@ -261,6 +267,7 @@ class DbManager extends Logger {
     this[mapKey] = {}
     Object.entries(base).forEach(([id, count]) => {
       const percent = (count / total) * 100
+
       if (percent === 0) {
         this[mapKey][id] = 'never'
       } else if (percent < rarityPercents.ultraRare) {
@@ -288,6 +295,7 @@ class DbManager extends Logger {
                 .groupBy('pokemon_id'),
         ),
       )
+
       this.setRarity(
         results.map((result) =>
           Object.fromEntries(
@@ -308,6 +316,7 @@ class DbManager extends Logger {
     try {
       Object.entries(this.models).forEach(([modelName, sources]) => {
         const model = /** @type {import('../models').RmModelKeys} */ (modelName)
+
         if (DbManager.singleModels.includes(model)) {
           if (sources.length > 1) {
             this.log.error(model, `only supports one database connection`)
@@ -365,16 +374,20 @@ class DbManager extends Logger {
     if (results.length === 1) return results[0]
     const returnObj = new Map()
     const { length } = results
+
     for (let i = 0; i < length; i += 1) {
       const { length: subLength } = results[i]
+
       for (let j = 0; j < subLength; j += 1) {
         const item = results[i][j]
         const existing = returnObj.get(item.id)
+
         if (!existing || item.updated > existing.updated) {
           returnObj.set(item.id, item)
         }
       }
     }
+
     return Array.from(returnObj.values())
   }
 
@@ -394,6 +407,7 @@ class DbManager extends Logger {
           SubModel[method](perms, args, source, userId),
         ),
       )
+
       return DbManager.deDupeResults(data)
     } catch (e) {
       this.log.error(TAGS[model.toLowerCase()], e)
@@ -414,6 +428,7 @@ class DbManager extends Logger {
       ),
     )
     const cleaned = DbManager.deDupeResults(data.filter(Boolean))
+
     return cleaned || {}
   }
 
@@ -438,8 +453,10 @@ class DbManager extends Logger {
     let distance = softLimit
     const max = model === 'Pokemon' ? hardLimit / 2 : hardLimit
     const startTime = Date.now()
+
     while (deDuped.length < searchLimit) {
       const loopTime = Date.now()
+
       count += 1
       const bbox = getBboxFromCenter(args.lat, args.lon, distance)
       const data = await Promise.all(
@@ -454,6 +471,7 @@ class DbManager extends Logger {
         ),
       )
       const results = DbManager.deDupeResults(data)
+
       if (results.length > deDuped.length) {
         deDuped = results
       }
@@ -499,6 +517,7 @@ class DbManager extends Logger {
     if (deDuped.length > searchLimit) {
       deDuped.length = searchLimit
     }
+
     return deDuped
   }
 
@@ -521,6 +540,7 @@ class DbManager extends Logger {
         SubModel.getSubmissions(perms, args, source),
       ),
     )
+
     return [DbManager.deDupeResults(stopData), DbManager.deDupeResults(gymData)]
   }
 
@@ -549,8 +569,10 @@ class DbManager extends Logger {
           SubModel[method](...args, source),
         ),
       )
+
       return DbManager.deDupeResults(data.filter(Boolean))
     }
+
     return this.models[model][method](...args)
   }
 
@@ -568,9 +590,11 @@ class DbManager extends Logger {
             SubModel.getAvailable(source),
           ),
         )
+
         this.log.info(`Setting available for ${model}`)
         if (model === 'Pokestop') {
           const newQuestConditions = {}
+
           results.forEach((result) => {
             if ('conditions' in result) {
               config.util.extendDeep(newQuestConditions, result.conditions)
@@ -589,11 +613,13 @@ class DbManager extends Logger {
         if (results.length === 1) return results[0].available
         if (results.length > 1) {
           const returnSet = new Set()
+
           for (let i = 0; i < results.length; i += 1) {
             for (let j = 0; j < results[i].available.length; j += 1) {
               returnSet.add(results[i].available[j])
             }
           }
+
           return [...returnSet]
         }
       } catch (e) {
@@ -603,9 +629,11 @@ class DbManager extends Logger {
             'This is likely due to "nest" being in a useFor array but not in the database',
           )
         }
+
         return []
       }
     }
+
     return []
   }
 
@@ -620,6 +648,7 @@ class DbManager extends Logger {
             SubModel.getFilterContext(source),
           ),
         )
+
         this.filterContext.Route.maxDistance = Math.max(
           ...results.map((result) => result.max_distance),
         )
@@ -637,6 +666,7 @@ class DbManager extends Logger {
           SubModel.getFilterContext(source),
         ),
       )
+
       this.filterContext.Pokestop.hasConfirmedInvasions = results.some(
         (result) => result.hasConfirmedInvasions,
       )

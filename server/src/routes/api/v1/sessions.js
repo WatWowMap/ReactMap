@@ -1,6 +1,5 @@
 // @ts-check
 const router = require('express').Router()
-
 const { log, TAGS } = require('@rm/logger')
 
 const { state } = require('../../../services/state')
@@ -8,6 +7,7 @@ const { state } = require('../../../services/state')
 router.get('/', async (req, res) => {
   try {
     const ts = Math.floor(new Date().getTime() / 1000)
+
     res
       .status(200)
       .json(await state.db.models.Session.query().where('expires', '>=', ts))
@@ -23,6 +23,7 @@ router.get('/hasValid/:id', async (req, res) => {
           OR json_extract(data, '$.passport.user.discordId') = "${req.params.id}"
           OR json_extract(data, '$.passport.user.telegramId') = "${req.params.id}"`,
     )
+
     res.status(200).json({
       valid: !!results.length,
       length: results.length,
@@ -42,6 +43,7 @@ router.get('/clearSessions/:id', async (req, res) => {
             OR json_extract(data, '$.passport.user.telegramId') = "${req.params.id}"`,
       )
       .delete()
+
     res.status(200).json({ results })
   } catch (e) {
     log.error(TAGS.api, req.originalUrl, e)

@@ -4,7 +4,6 @@ const path = require('path')
 
 const i18next = require('i18next')
 const Backend = require('i18next-fs-backend')
-
 const { locales } = require('@rm/locales')
 const { log, TAGS } = require('@rm/logger')
 const { create, writeAll } = require('@rm/locales')
@@ -13,6 +12,7 @@ const { create, writeAll } = require('@rm/locales')
 const starti18n = async (localePath) => {
   if (!fs.existsSync(localePath)) {
     const localeData = await create()
+
     await writeAll(localeData, true, localePath)
   }
   // @ts-ignore

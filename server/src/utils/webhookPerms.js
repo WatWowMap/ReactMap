@@ -10,6 +10,7 @@ const config = require('@rm/config')
  */
 function webhookPerms(roles, provider, trialActive = false) {
   const perms = []
+
   roles.forEach((role) => {
     config.getSafe('webhooks').forEach((webhook) => {
       if (
@@ -21,6 +22,7 @@ function webhookPerms(roles, provider, trialActive = false) {
       }
     })
   })
+
   return [...new Set(perms)]
 }
 

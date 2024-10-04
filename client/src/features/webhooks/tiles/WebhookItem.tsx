@@ -1,0 +1,48 @@
+import { SelectorItem } from '@components/virtual/SelectorItem'
+import { useWebhookStore } from '@store/useWebhookStore'
+
+import { Poracle } from '../services/Poracle'
+
+export function WebhookItem({
+  id,
+  category,
+  ...props
+}: import('@components/virtual/SelectorItem').BaseProps<
+  import('@rm/types').AllButHuman
+>) {
+  const filter = useWebhookStore((s) => s.tempFilters[id])
+
+  const setFilter = (newFilter) => {
+    useWebhookStore.setState((prev) => ({
+      tempFilters: {
+        ...prev.tempFilters,
+        [id]: newFilter
+          ? {
+              ...newFilter,
+              enabled: newFilter.enabled,
+            }
+          : { enabled: true, ...Poracle.getOtherData(id) },
+      },
+    }))
+  }
+
+  return (
+    <SelectorItem
+      {...props}
+      filter={filter}
+      id={id}
+      setFilter={setFilter}
+      onClick={() =>
+        useWebhookStore.setState({
+          advanced: {
+            id,
+            uid: 0,
+            open: true,
+            category,
+            selectedIds: [],
+          },
+        })
+      }
+    />
+  )
+}

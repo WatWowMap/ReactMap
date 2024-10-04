@@ -3,7 +3,6 @@ const fs = require('fs')
 const { resolve } = require('path')
 
 const { default: fetch, Response } = require('node-fetch')
-
 const config = require('@rm/config')
 const { log, TAGS } = require('@rm/logger')
 
@@ -23,11 +22,13 @@ async function fetchJson(url, options = undefined) {
   try {
     log.debug(TAGS.fetch, url, options || '')
     const response = await fetch(url, { ...options, signal: controller.signal })
+
     if (!response.ok) {
       throw new Error(`${response.status} (${response.statusText})`, {
         cause: response,
       })
     }
+
     return response.json()
   } catch (e) {
     if (e instanceof Error) {
@@ -48,6 +49,7 @@ async function fetchJson(url, options = undefined) {
           JSON.stringify(options, null, 2),
         )
       }
+
       return e.cause
     }
   } finally {

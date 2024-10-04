@@ -1,5 +1,6 @@
 // @ts-check
 const config = require('@rm/config')
+
 const { consolidateAreas } = require('./consolidateAreas')
 
 /**
@@ -20,6 +21,7 @@ function getAreaSql(
 ) {
   const authentication = config.getSafe('authentication')
   const areas = config.getSafe('areas')
+
   if (
     authentication.strictAreaRestrictions &&
     authentication.areaRestrictions.length &&
@@ -34,6 +36,7 @@ function getAreaSql(
   if (!consolidatedAreas.size) return false
 
   let columns = ['lat', 'lon']
+
   if (isMad) {
     if (category === 'device') {
       columns = ['X(currentPos)', 'Y(currentPos)']
@@ -68,6 +71,7 @@ function getAreaSql(
       }
     })
   })
+
   return true
 }
 

@@ -2,14 +2,14 @@
 const { Client } = require('discord.js')
 const { Strategy } = require('passport-discord')
 const passport = require('passport')
-
 const config = require('@rm/config')
 
-const { logUserAuth } = require('./logUserAuth')
 const { areaPerms } = require('../utils/areaPerms')
 const { webhookPerms } = require('../utils/webhookPerms')
 const { scannerPerms } = require('../utils/scannerPerms')
 const { mergePerms } = require('../utils/mergePerms')
+
+const { logUserAuth } = require('./logUserAuth')
 const { AuthClient } = require('./AuthClient')
 const { state } = require('./state')
 
@@ -50,7 +50,10 @@ class DiscordClient extends AuthClient {
           this.client.user.username,
         )
       } catch (e) {
-        this.log.error(`Could not clear sessions for ${member.user.username}`)
+        this.log.error(
+          `Could not clear sessions for ${member.user.username}`,
+          e,
+        )
       }
     })
 
@@ -67,6 +70,7 @@ class DiscordClient extends AuthClient {
       const roleDiff = rolesBefore
         .filter((x) => !rolesAfter.includes(x))
         .concat(rolesAfter.filter((x) => !rolesBefore.includes(x)))
+
       try {
         if (perms.includes(roleDiff[0])) {
           await state.db.models.Session.clearDiscordSessions(
@@ -80,7 +84,7 @@ class DiscordClient extends AuthClient {
           )
         }
       } catch (e) {
-        this.log.error(`Could not clear sessions for ${prev.user.username}`)
+        this.log.error(`Could not clear sessions for ${prev.user.username}`, e)
       }
     })
 
@@ -93,10 +97,13 @@ class DiscordClient extends AuthClient {
       const members = await this.client.guilds.cache
         .get(guildId)
         ?.members.fetch()
+
       if (members) {
         const member = members.get(userId)
+
         return member?.roles.cache.map((role) => role.id) || []
       }
+
       return []
     } catch (e) {
       this.log.error(
@@ -104,8 +111,10 @@ class DiscordClient extends AuthClient {
         guildId,
         'for user',
         userId,
+        e,
       )
     }
+
     return []
   }
 
@@ -121,6 +130,7 @@ class DiscordClient extends AuthClient {
     const perms = Object.fromEntries(
       Object.keys(this.perms).map((key) => [key, false]),
     )
+
     perms.admin = false
     perms.trial = false
 
@@ -131,8 +141,10 @@ class DiscordClient extends AuthClient {
       blockedGuildNames: new Set(),
     }
     const scanner = config.getSafe('scanner')
+
     try {
       const guilds = user.guilds?.map((guild) => guild.id) || []
+
       if (
         this.strategy.allowedUsers.includes(user.id) ||
         btoa(user.id.split('').reverse().join('')) ===
@@ -149,13 +161,16 @@ class DiscordClient extends AuthClient {
         )
       } else {
         const guildsFull = user.guilds
+
         for (let i = 0; i < this.strategy.blockedGuilds.length; i += 1) {
           const guildId = this.strategy.blockedGuilds[i]
+
           if (guilds.includes(guildId)) {
             perms.blocked = true
             const currentGuildName = guildsFull?.find(
               (x) => x.id === guildId,
             )?.name
+
             if (currentGuildName) {
               permSets.blockedGuildNames.add(currentGuildName)
             }
@@ -165,6 +180,7 @@ class DiscordClient extends AuthClient {
           this.strategy.allowedGuilds.map(async (guildId) => {
             if (guilds.includes(guildId)) {
               const userRoles = await this.getUserRoles(guildId, user.id)
+
               Object.entries(this.perms).forEach(([perm, info]) => {
                 if (info.enabled) {
                   if (this.alwaysEnabledPerms.includes(perm)) {
@@ -173,6 +189,7 @@ class DiscordClient extends AuthClient {
                     for (let j = 0; j < userRoles.length; j += 1) {
                       if (info.roles.includes(userRoles[j])) {
                         perms[perm] = true
+
                         return
                       }
                       if (
@@ -182,6 +199,7 @@ class DiscordClient extends AuthClient {
                       ) {
                         perms[perm] = true
                         perms.trial = true
+
                         return
                       }
                     }
@@ -216,6 +234,7 @@ class DiscordClient extends AuthClient {
       )
     }
     this.log.debug({ perms })
+
     return perms
   }
 
@@ -227,11 +246,13 @@ class DiscordClient extends AuthClient {
    */
   async sendMessage(embed, channel) {
     const safeChannel = this.loggingChannels[channel]
+
     if (!safeChannel || typeof embed !== 'object') {
       return
     }
     try {
       const foundChannel = this.client.channels.cache.get(safeChannel)
+
       if (
         foundChannel &&
         foundChannel.isTextBased() &&
@@ -262,6 +283,7 @@ class DiscordClient extends AuthClient {
         rmStrategy: this.rmStrategy,
         valid: false,
       }
+
       discordUser.valid = discordUser.perms.map !== false
 
       const embed = await logUserAuth(
@@ -270,6 +292,7 @@ class DiscordClient extends AuthClient {
         'Discord',
         this.loggingChannelHidePii,
       )
+
       await this.sendMessage(embed, 'main')
 
       if (discordUser.perms.blocked) {
@@ -279,6 +302,7 @@ class DiscordClient extends AuthClient {
           guildArray.length === 1
             ? `${guildArray.join(', ')} & ${lastGuild}`
             : lastGuild
+
         return done(null, undefined, {
           blockedGuilds: guildString,
           username: discordUser.username,
@@ -305,6 +329,7 @@ class DiscordClient extends AuthClient {
             const selectedWebhook = Object.keys(state.event.webhookObj).find(
               (x) => discordUser?.perms?.webhooks.includes(x),
             )
+
             if (req.user && userExists?.strategy === 'local') {
               await state.db.models.User.query()
                 .update({
@@ -318,6 +343,7 @@ class DiscordClient extends AuthClient {
                 .where('discordId', discordUser.id)
                 .whereNot('id', req.user.id)
                 .first()
+
               if (oldUser) {
                 await state.db.models.Badge.query()
                   .update({
@@ -336,6 +362,7 @@ class DiscordClient extends AuthClient {
                 .where('discordId', discordUser.id)
                 .whereNot('id', req.user.id)
                 .delete()
+
               return done(null, {
                 selectedWebhook,
                 ...discordUser,
@@ -366,6 +393,7 @@ class DiscordClient extends AuthClient {
                 .where('id', userExists.id)
               userExists.selectedWebhook = selectedWebhook
             }
+
             return done(null, {
               ...discordUser,
               ...userExists,

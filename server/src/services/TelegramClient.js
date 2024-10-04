@@ -2,14 +2,14 @@
 const { default: fetch } = require('node-fetch')
 const { TelegramStrategy } = require('@rainb0w-clwn/passport-telegram-official')
 const passport = require('passport')
-
 const config = require('@rm/config')
 
-const { state } = require('./state')
 const { areaPerms } = require('../utils/areaPerms')
 const { webhookPerms } = require('../utils/webhookPerms')
 const { scannerPerms } = require('../utils/scannerPerms')
 const { mergePerms } = require('../utils/mergePerms')
+
+const { state } = require('./state')
 const { AuthClient } = require('./AuthClient')
 
 /**
@@ -22,12 +22,14 @@ class TelegramClient extends AuthClient {
     if (!user || !user.id) return []
 
     const groups = [user.id]
+
     await Promise.all(
       this.strategy.groups.map(async (group) => {
         try {
           const response = await fetch(
             `https://api.telegram.org/bot${this.strategy.botToken}/getChatMember?chat_id=${group}&user_id=${user.id}`,
           )
+
           if (!response) {
             throw new Error(
               'Unable to query TG API or User is not in the group',
@@ -39,6 +41,7 @@ class TelegramClient extends AuthClient {
             )
           }
           const json = await response.json()
+
           if (
             json.result.status !== 'left' &&
             json.result.status !== 'kicked'
@@ -51,10 +54,12 @@ class TelegramClient extends AuthClient {
             `Telegram Group: ${group}`,
             `User: ${user.id} (${user.username})`,
           )
+
           return null
         }
       }),
     )
+
     return groups
   }
 
@@ -85,8 +90,10 @@ class TelegramClient extends AuthClient {
                 )
               ) {
                 gainedAccessViaTrial = true
+
                 return true
               }
+
               return false
             })),
       ]),
@@ -104,6 +111,7 @@ class TelegramClient extends AuthClient {
         scanner: scannerPerms(groups, 'telegramGroups', trialActive),
       },
     }
+
     if (newUserObj.perms.trial) {
       this.log.info(
         user.username,
@@ -116,6 +124,7 @@ class TelegramClient extends AuthClient {
     if (this.strategy.allowedUsers?.includes(newUserObj.id)) {
       newUserObj.perms.admin = true
     }
+
     return newUserObj
   }
 
@@ -127,6 +136,7 @@ class TelegramClient extends AuthClient {
 
     if (!user.perms.map) {
       this.log.warn(user.username, 'was not given map perms')
+
       return done(null, false, { message: 'access_denied' })
     }
     try {
@@ -137,6 +147,7 @@ class TelegramClient extends AuthClient {
             const selectedWebhook = Object.keys(state.event.webhookObj).find(
               (x) => user?.perms?.webhooks.includes(x),
             )
+
             if (req.user && userExists?.strategy === 'local') {
               await state.db.models.User.query()
                 .update({
@@ -154,6 +165,7 @@ class TelegramClient extends AuthClient {
                 `(${user.id})`,
                 'Authenticated successfully.',
               )
+
               return done(null, {
                 selectedWebhook,
                 ...user,
@@ -188,6 +200,7 @@ class TelegramClient extends AuthClient {
               `(${user.id})`,
               'Authenticated successfully.',
             )
+
             return done(null, {
               ...user,
               ...userExists,
@@ -211,6 +224,7 @@ class TelegramClient extends AuthClient {
     const text = AuthClient.getHtml(
       typeof embed === 'string' ? embed : { ...this.getBaseEmbed(), ...embed },
     )
+
     try {
       const response = await fetch(
         `https://api.telegram.org/bot${this.strategy.botToken}/sendMessage`,
@@ -225,6 +239,7 @@ class TelegramClient extends AuthClient {
           }),
         },
       )
+
       if (!response.ok) {
         throw new Error(
           `Telegram API error: ${response.status} ${response.statusText}`,

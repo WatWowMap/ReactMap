@@ -12,6 +12,7 @@ const { BaseFilter } = require('../Base')
  */
 function buildPokestops(perms, defaults) {
   const quests = { s0: new BaseFilter() }
+
   if (perms.quests) {
     Object.keys(state.event.masterfile.items).forEach((item) => {
       quests[`q${item}`] = new BaseFilter(defaults.items)
@@ -107,6 +108,7 @@ function buildPokestops(perms, defaults) {
       quests[avail] = new BaseFilter(defaults.showcasePokemon)
     }
   })
+
   return quests
 }
 

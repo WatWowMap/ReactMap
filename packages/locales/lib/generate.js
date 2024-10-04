@@ -6,7 +6,6 @@
 require('dotenv').config()
 const { OpenAI } = require('openai')
 const { encode } = require('gpt-tokenizer')
-
 const { log, TAGS } = require('@rm/logger')
 
 const { readAndParseJson, readLocaleDirectory, writeAll } = require('./utils')
@@ -60,6 +59,7 @@ function splitJson(json) {
         : currentTokenCount + totalTokenCount
   }
   if (Object.keys(currentChunk).length > 0) chunks.push(currentChunk)
+
   return chunks
 }
 
@@ -72,6 +72,7 @@ function matchJSON(str) {
   let start = 0
   let end = 0
   const stack = []
+
   for (let i = 0; i < str.length; i += 1) {
     if (str[i] === '{') {
       if (stack.length === 0) {
@@ -87,6 +88,7 @@ function matchJSON(str) {
       }
     }
   }
+
   return str.slice(start, end + 1)
 }
 
@@ -142,10 +144,12 @@ async function generate() {
               typeof englishRef[key] !== 'number',
           ),
         )
+
         if (Object.keys(missingKeys).length === 0) return
 
         try {
           const chunks = splitJson(missingKeys)
+
           log.info(
             TAGS.locales,
             locale,
@@ -159,6 +163,7 @@ async function generate() {
               const raw = await sendToGPT(locale, x)
               const { content } = raw.choices[0].message
               const clean = matchJSON(`${content}`)
+
               try {
                 return JSON.parse(clean)
               } catch (e) {
@@ -168,6 +173,7 @@ async function generate() {
                   content,
                   clean,
                 })
+
                 return {}
               }
             }),

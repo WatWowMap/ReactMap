@@ -1,6 +1,5 @@
 // @ts-check
 const { default: fetch } = require('node-fetch')
-
 const config = require('@rm/config')
 const { log, TAGS } = require('@rm/logger')
 
@@ -20,6 +19,7 @@ async function create() {
 
   if (!endpoint) {
     log.error(TAGS.locales, 'No translations endpoint')
+
     return
   }
   const localTranslations = readLocaleDirectory(true)
@@ -60,9 +60,11 @@ async function create() {
       }
 
       log.info(TAGS.locales, fileName, 'done.')
+
       return [locale, finalTranslations]
     }),
   )
+
   return Object.fromEntries(
     translated.map((x) => x.status === 'fulfilled' && x.value).filter(Boolean),
   )

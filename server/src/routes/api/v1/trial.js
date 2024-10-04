@@ -1,6 +1,5 @@
 // @ts-check
 const router = require('express').Router()
-
 const { log, TAGS } = require('@rm/logger')
 
 const { state } = require('../../../services/state')

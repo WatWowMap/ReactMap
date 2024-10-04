@@ -1,8 +1,8 @@
 // @ts-check
 const { Model, raw } = require('objection')
 const config = require('@rm/config')
-
 const { log, TAGS } = require('@rm/logger')
+
 const { getAreaSql } = require('../utils/getAreaSql')
 
 class Spawnpoint extends Model {
@@ -27,6 +27,7 @@ class Spawnpoint extends Model {
       maxLon,
     } = args
     const query = this.query()
+
     if (isMad) {
       query.select([
         'spawnpoint AS id',
@@ -54,6 +55,7 @@ class Spawnpoint extends Model {
     if (!getAreaSql(query, areaRestrictions, onlyAreas, isMad)) {
       return []
     }
+
     return query
       .limit(config.getSafe('api.queryLimits.spawnpoints'))
       .from(isMad ? 'trs_spawn' : 'spawnpoint')

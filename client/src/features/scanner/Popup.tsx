@@ -1,0 +1,47 @@
+import * as React from 'react'
+import List from '@mui/material/List'
+import { Popup } from 'react-leaflet'
+import { useTranslation } from 'react-i18next'
+import { DividerWithMargin } from '@components/StyledDivider'
+
+import {
+  InAllowedArea,
+  ScanCancel,
+  ScanConfirm,
+  ScanQueue,
+  ScanRequests,
+  StyledListItemText,
+} from './Shared'
+import { ConfigContext } from './ContextProvider'
+
+export function ScanOnDemandPopup({
+  children,
+  mode,
+}: {
+  children: React.ReactNode
+  mode: import('./hooks/store').ScanMode
+}) {
+  const { t } = useTranslation()
+  const context = React.useContext(ConfigContext)
+
+  return (
+    <Popup autoPan={false} maxWidth={200} minWidth={90}>
+      <List>
+        <StyledListItemText
+          className="no-leaflet-margin"
+          secondary={t(
+            mode === 'scanZone' ? 'scan_zone_choose' : 'scan_next_choose',
+          )}
+        />
+        <DividerWithMargin />
+        {context.scannerType !== 'mad' && children}
+        {context.showScanCount && <ScanRequests />}
+        {context.showScanQueue && <ScanQueue />}
+        <DividerWithMargin />
+        <ScanConfirm mode={mode} />
+        <InAllowedArea />
+        <ScanCancel mode={mode} />
+      </List>
+    </Popup>
+  )
+}

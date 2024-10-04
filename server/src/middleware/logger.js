@@ -1,7 +1,6 @@
 // @ts-check
 /* eslint-disable prefer-rest-params */
 const bytes = require('bytes')
-
 const { log, TAGS } = require('@rm/logger')
 
 /** @type {import('@rm/types').ExpressMiddleware} */
@@ -29,6 +28,7 @@ function loggerMiddleware(req, res, next) {
   res.on('finish', () => {
     const [seconds, nanoseconds] = process.hrtime(start)
     const responseTime = (seconds * 1000 + nanoseconds / 1e6).toFixed(3) // in milliseconds
+
     log.debug(
       TAGS.express,
       TAGS.method(req.method),
@@ -36,8 +36,8 @@ function loggerMiddleware(req, res, next) {
       TAGS.statusCode(res.statusCode),
       `${responseTime}ms`,
       '|',
-      TAGS.download(bytes(req.bodySize || 0)),
-      TAGS.upload(bytes(resBodySize || 0)),
+      TAGS.download(bytes(req.bodySize || 0).toString()),
+      TAGS.upload(bytes(resBodySize || 0).toString()),
       '|',
       req.user ? req.user.username : 'Not Logged In',
       req.headers['x-forwarded-for']
