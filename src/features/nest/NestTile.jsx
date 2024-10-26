@@ -1,5 +1,6 @@
-/* eslint-disable react/destructuring-assignment */
 // @ts-check
+/* eslint-disable react/destructuring-assignment */
+
 import * as React from 'react'
 import { GeoJSON, Marker, Popup } from 'react-leaflet'
 
@@ -30,6 +31,53 @@ const BaseNestTile = (nest) => {
     ]
   }, basicEqualFn)
 
+  return (
+    <>
+      {nest.pokemon_id && (
+        <NestMarker
+          iconUrl={iconUrl}
+          iconSize={iconSize}
+          recent={recent}
+          nest={nest}
+        >
+          <Popup>
+            <NestPopup iconUrl={iconUrl} recent={recent} {...nest} />
+          </Popup>
+        </NestMarker>
+      )}
+      <NestGeoJSON polygon_path={nest.polygon_path}>
+        <Popup>
+          <NestPopup iconUrl={iconUrl} recent={recent} {...nest} />
+        </Popup>
+      </NestGeoJSON>
+    </>
+  )
+}
+
+/**
+ *
+ * @param {Omit<import('react-leaflet').MarkerProps, 'position'> & {
+ *  children: React.ReactNode
+ *  iconUrl: string
+ *  iconSize: number
+ *  recent: boolean
+ *  nest: import('@rm/types').Nest
+ * }} props
+ * @returns
+ */
+const NestMarker = ({
+  children,
+  iconSize,
+  iconUrl,
+  recent,
+  nest,
+  ...props
+}) => {
+  const showPokemon = useStorage((s) => s.filters.nests.pokemon)
+  const [markerRef, setMarkerRef] = React.useState(null)
+
+  useForcePopup(nest.id, markerRef)
+
   const icon = React.useMemo(
     () =>
       nestMarker({
@@ -39,42 +87,19 @@ const BaseNestTile = (nest) => {
         formId: nest.pokemon_form,
         recent,
       }),
-    [iconUrl, iconSize, nest.pokemon_id, recent],
+    [iconUrl, iconSize, nest.pokemon_id, nest.pokemon_form, recent],
   )
-
-  return (
-    <>
-      <NestMarker icon={icon} id={nest.id} lat={nest.lat} lon={nest.lon}>
-        <Popup position={[nest.lat, nest.lon]}>
-          <NestPopup iconUrl={iconUrl} recent={recent} {...nest} />
-        </Popup>
-      </NestMarker>
-      <NestGeoJSON polygon_path={nest.polygon_path} />
-    </>
-  )
-}
-
-/**
- *
- * @param {Omit<import('react-leaflet').MarkerProps, 'position'> & {
- *  children: React.ReactNode
- *  id: number
- *  lat: number
- *  lon: number
- * }} props
- * @returns
- */
-const NestMarker = ({ children, icon, id, lat, lon, ...props }) => {
-  const showPokemon = useStorage((s) => s.filters.nests.pokemon)
-  const [markerRef, setMarkerRef] = React.useState(null)
-
-  useForcePopup(id, markerRef)
 
   if (!showPokemon) {
     return null
   }
   return (
-    <Marker ref={setMarkerRef} position={[lat, lon]} icon={icon} {...props}>
+    <Marker
+      ref={setMarkerRef}
+      position={[nest.lat, nest.lon]}
+      icon={icon}
+      {...props}
+    >
       {children}
     </Marker>
   )
@@ -82,10 +107,10 @@ const NestMarker = ({ children, icon, id, lat, lon, ...props }) => {
 
 /**
  *
- * @param {{ polygon_path: string }} props
+ * @param {{ polygon_path: string, children?: React.ReactNode }} props
  * @returns
  */
-const NestGeoJSON = ({ polygon_path }) => {
+const NestGeoJSON = ({ polygon_path, children }) => {
   const showPolygons = useStorage((s) => s.filters.nests.polygons)
 
   const geometry = React.useMemo(() => {
@@ -101,7 +126,7 @@ const NestGeoJSON = ({ polygon_path }) => {
   if (!showPolygons) {
     return null
   }
-  return <GeoJSON data={geometry} />
+  return <GeoJSON data={geometry}>{children}</GeoJSON>
 }
 
 export const NestTile = React.memo(

@@ -1,3 +1,5 @@
+// @ts-check
+
 import { gql } from '@apollo/client'
 
 export const GET_MAP_DATA = gql`
@@ -33,5 +35,11 @@ export const GET_AVAILABLE_GYMS = gql`
 export const GET_AVAILABLE_NESTS = gql`
   query AvailableNests {
     availableNests
+  }
+`
+
+export const GET_AVAILABLE_STATIONS = gql`
+  query AvailableStations {
+    availableStations
   }
 `

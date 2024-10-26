@@ -1,3 +1,5 @@
+// @ts-check
+
 export * from './ScanDialog'
 export * from './ScanOnDemand'
 export * from './hooks/store'

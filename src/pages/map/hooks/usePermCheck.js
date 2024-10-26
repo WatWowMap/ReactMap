@@ -1,6 +1,12 @@
+// @ts-check
+
 import { useMemory } from '@store/useMemory'
 import { useStorage } from '@store/useStorage'
 
+/**
+ * @param {string} category
+ * @returns {boolean}
+ */
 export function usePermCheck(category) {
   const filters = useStorage((s) => s.filters[category])
   const perms = useMemory((s) => s.auth.perms)
@@ -47,8 +53,16 @@ export function usePermCheck(category) {
         return true
       }
       break
+    case 'stations':
+      if (
+        (filters?.allStations && perms?.stations) ||
+        (filters?.maxBattles && perms?.dynamax)
+      ) {
+        return true
+      }
+      break
     default:
-      if (filters?.enabled && perms) {
+      if (filters?.enabled && perms[category]) {
         return true
       }
   }

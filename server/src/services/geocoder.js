@@ -1,5 +1,7 @@
+// @ts-check
+
 const NodeGeocoder = require('node-geocoder')
-const { log, HELPERS } = require('@rm/logger')
+const { log, TAGS } = require('@rm/logger')
 
 /**
  * @param {string} addressFormat
@@ -47,14 +49,14 @@ async function geocoder(nominatimUrl, search, reverse, format) {
     return reverse
       ? formatter(format, results[0])
       : format
-      ? results.map((result) => ({
-          formatted: formatter(format, result),
-          latitude: result.latitude,
-          longitude: result.longitude,
-        }))
-      : results
+        ? results.map((result) => ({
+            formatted: formatter(format, result),
+            latitude: result.latitude,
+            longitude: result.longitude,
+          }))
+        : results
   } catch (e) {
-    log.warn(HELPERS.geocoder, 'Unable to geocode for', search, e)
+    log.warn(TAGS.geocoder, 'Unable to geocode for', search, e)
     return {}
   }
 }

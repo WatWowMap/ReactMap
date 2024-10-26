@@ -8,8 +8,8 @@ import { useStorage } from '@store/useStorage'
 import { useTileLayer } from '../hooks/useTileLayer'
 
 export function ControlledTileLayer() {
-  const layer = useTileLayer()
-  return <TileLayer {...layer} />
+  const { key, ...layer } = useTileLayer()
+  return <TileLayer key={key} {...layer} />
 }
 
 export function ControlledZoomLayer() {

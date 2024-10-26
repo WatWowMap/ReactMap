@@ -1,0 +1,39 @@
+{
+  "port": 8082,
+  "map": {
+    "general": {
+      "title": "Orange Map",
+      "headerTitle": "Orange Map",
+      "startLat": 67.2512,
+      "startLon": -25.9667,
+      "geoJsonFilName": "http://koji.map.com/api/v1/geofence/feature-collection/orange"
+    },
+    "misc": {
+      "enableMapJsFilter": false,
+      "enablePokemonPopupCoordsSelector": false,
+      "enableGymPopupCoordsSelector": false,
+      "enablePokestopPopupCoordsSelector": false,
+      "enablePortalPopupCoordsSelector": false
+    }
+  },
+  "authentication": {
+    "strategies": [
+      {
+        "name": "this is your discord strategy for orange map",
+        "enabled": false,
+        "type": "discord",
+        "logChannelId": "",
+        "presence": "Map Status: Online",
+        "presenceType": 3,
+        "botToken": "",
+        "clientId": "",
+        "clientSecret": "",
+        "redirectUri": "http://localhost:8082/auth/discord/callback",
+        "allowedGuilds": [],
+        "blockedGuilds": [],
+        "allowedUsers": []
+      }
+    ],
+    "alwaysEnabledPerms": []
+  }
+}

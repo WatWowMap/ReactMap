@@ -101,7 +101,7 @@ const BaseGymTile = (gym) => {
         ? gym.raid_pokemon_id
           ? Icons.getSize('raid', filters.gyms.filter[raidFilterId]?.size)
           : Icons.getSize('raid', filters.gyms.filter[eggFilterId]?.size)
-        : '',
+        : 0,
       hasRaidInternal
         ? Audio.getPokemon(
             gym.raid_pokemon_id,

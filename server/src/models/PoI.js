@@ -1,14 +1,14 @@
 // @ts-check
 class PoI {
   /**
-   * @param {string} id
+   * @param {string| number} id
    * @param {number} lat
    * @param {number} lon
    * @param {boolean} [partner]
    * @param {boolean} [showcase]
    */
   constructor(id, lat, lon, partner = false, showcase = false) {
-    this.id = id
+    this.id = id.toString()
     this.lat = lat
     this.lon = lon
     this.partner = partner
@@ -16,4 +16,4 @@ class PoI {
   }
 }
 
-module.exports = PoI
+module.exports = { PoI }

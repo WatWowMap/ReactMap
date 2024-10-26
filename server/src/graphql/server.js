@@ -2,7 +2,7 @@
 // @ts-check
 const path = require('path')
 const { ApolloServer } = require('@apollo/server')
-const NodeCache = require('node-cache')
+
 const { loadTypedefs } = require('@graphql-tools/load')
 const { GraphQLFileLoader } = require('@graphql-tools/graphql-file-loader')
 const {
@@ -13,14 +13,13 @@ const {
 } = require('@apollo/server/plugin/disabled')
 
 const config = require('@rm/config')
+const { Logger, TAGS, log } = require('@rm/logger')
 
-const { log, HELPERS } = require('@rm/logger')
-const resolvers = require('./resolvers')
+const { resolvers } = require('./resolvers')
+const { state } = require('../services/state')
 
 /** @param {import('http').Server} httpServer */
 async function startApollo(httpServer) {
-  const errorCache = new NodeCache({ stdTTL: 60 * 60 })
-
   const documents = await loadTypedefs(
     path.join(__dirname, './typeDefs', '*.graphql'),
     {
@@ -28,6 +27,7 @@ async function startApollo(httpServer) {
     },
   )
   const typeDefs = documents.map((d) => d.document.definitions.slice())
+  const gqlLogger = new Logger('gql')
 
   const apolloServer = new ApolloServer({
     typeDefs,
@@ -47,37 +47,49 @@ async function startApollo(httpServer) {
       } else if (e.message === 'unauthenticated') {
         customMessage =
           'user is not authenticated, forcing logout, no need to report this error unless it continues to happen'
+      } else if (e.message === 'data_limit_reached') {
+        customMessage = `user has reached the data limit, blocking future requests for ${Math.ceil(
+          (Number(e?.extensions?.until || 0) - Date.now()) / 1000,
+        )} seconds`
       }
 
       const key = `${e.extensions.id || e.extensions.user}-${e.message}`
-      if (errorCache.has(key)) {
+      if (state.stats.hasApolloEntry(key)) {
+        if (e?.extensions?.stacktrace) {
+          delete e.extensions.stacktrace
+        }
         return e
       }
       if (!config.getSafe('devOptions.enabled')) {
-        errorCache.set(key, true)
+        state.stats.setApolloEntry(key)
       }
 
       const endpoint = /** @type {string} */ (e.extensions.endpoint)
 
-      log[customMessage ? 'info' : 'error'](
-        HELPERS.gql,
-        HELPERS[endpoint] || `[${endpoint?.toUpperCase()}]`,
+      gqlLogger.log[customMessage ? 'info' : 'warn'](
+        TAGS[endpoint] || `[${endpoint?.toUpperCase()}]`,
         'Client:',
         e.extensions.clientV || 'Unknown',
+        '|',
         'Server:',
         e.extensions.serverV || 'Unknown',
+        '|',
         'User:',
         e.extensions.user || 'Not Logged In',
-        e.extensions.id || '',
+        // e.extensions.id || '',
+        '|',
         customMessage || e,
       )
+      if (e?.extensions?.stacktrace) {
+        delete e.extensions.stacktrace
+      }
       return e
     },
     logger: {
-      debug: (...e) => log.debug(HELPERS.gql, ...e),
-      info: (...e) => log.info(HELPERS.gql, ...e),
-      warn: (...e) => log.warn(HELPERS.gql, ...e),
-      error: (...e) => log.error(HELPERS.gql, ...e),
+      debug: (...e) => gqlLogger.log.debug(...e),
+      info: (...e) => gqlLogger.log.info(...e),
+      warn: (...e) => gqlLogger.log.warn(...e),
+      error: (...e) => gqlLogger.log.error(...e),
     },
     plugins: [
       ApolloServerPluginLandingPageDisabled(),
@@ -86,42 +98,57 @@ async function startApollo(httpServer) {
         async requestDidStart(requestContext) {
           requestContext.contextValue.startTime = Date.now()
           if (requestContext.request?.variables?.filters) {
-            log.debug(requestContext.request?.variables?.filters)
+            log.trace(requestContext.request?.variables?.filters)
           }
           return {
-            async willSendResponse(context) {
-              const filterCount = Object.keys(
-                requestContext.request?.variables?.filters || {},
-              ).length
+            async willSendResponse({
+              response,
+              contextValue,
+              operation,
+              operationName,
+            }) {
+              const filterCount =
+                Object.keys(requestContext.request?.variables?.filters || {})
+                  .length || 0
 
-              const { response, contextValue } = context
               if (
                 response.body.kind === 'single' &&
                 'data' in response.body.singleResult
               ) {
                 const endpoint =
                   // @ts-ignore
-                  context?.operation?.selectionSet?.selections?.[0]?.name?.value
+                  operation?.selectionSet?.selections?.[0]?.name?.value
 
                 const data = response.body.singleResult.data?.[endpoint]
-                const returned = Array.isArray(data) ? data.length : 0
+                const returned = (Array.isArray(data) ? data.length : 0) || 0
+
+                if (contextValue.userId) {
+                  state.stats.pushApiEntry(
+                    contextValue.userId,
+                    endpoint,
+                    returned,
+                  )
+                }
+
                 log.info(
-                  HELPERS[endpoint] || `[${endpoint?.toUpperCase()}]`,
+                  TAGS[endpoint] || `[${endpoint?.toUpperCase()}]`,
                   '|',
-                  context.operationName,
+                  operationName,
                   '|',
-                  returned || 0,
+                  returned,
                   '|',
                   `${Date.now() - contextValue.startTime}ms`,
                   '|',
-                  contextValue.user || 'Not Logged In',
+                  contextValue.username || 'Not Logged In',
                   '|',
                   'Filters:',
-                  filterCount || 0,
+                  filterCount,
                 )
 
-                if (returned && config.getSafe('sentry.server.enabled')) {
-                  contextValue.transaction.setMeasurement(
+                // @ts-ignore
+                if (returned && response.__sentry_transaction) {
+                  // @ts-ignore
+                  response.__sentry_transaction.setMeasurement(
                     `${endpoint}.returned`,
                     returned,
                     'kilobyte',
@@ -140,4 +167,4 @@ async function startApollo(httpServer) {
   return apolloServer
 }
 
-module.exports = startApollo
+module.exports = { startApollo }

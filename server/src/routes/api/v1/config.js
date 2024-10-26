@@ -1,42 +1,45 @@
 // @ts-check
-const path = require('path')
 const router = require('express').Router()
-const config = require('@rm/config')
-const { log, HELPERS } = require('@rm/logger')
 
-const api = config.getSafe('api')
+const { log, TAGS } = require('@rm/logger')
+
+const { reloadConfig } = require('../../../utils/reloadConfig')
 
 router.get('/', (req, res) => {
+  const config = require('@rm/config')
   try {
-    if (
-      api.reactMapSecret &&
-      req.headers['react-map-secret'] === api.reactMapSecret
-    ) {
-      res.status(200).json({
-        ...config,
-        api: {
-          ...api,
-          reactMapSecret: undefined,
-        },
-        ...config,
-        database: {
-          ...config.database,
-          schemas: api.showSchemasInConfigApi ? config.database.schemas : [],
-        },
-        authentication: {
-          ...config.authentication,
-          strategies: api.showStrategiesInConfigApi
-            ? config.authentication.strategies
-            : [],
-        },
-      })
-    } else {
-      throw new Error('Incorrect or missing API secret')
-    }
-    log.info(HELPERS.api, `api/v1/${path.parse(__filename).name}`)
+    res.status(200).json({
+      ...config,
+      api: {
+        ...config.api,
+        reactMapSecret: undefined,
+      },
+      ...config,
+      database: {
+        ...config.database,
+        schemas: config.api.showSchemasInConfigApi
+          ? config.database.schemas
+          : [],
+      },
+      authentication: {
+        ...config.authentication,
+        strategies: config.api.showStrategiesInConfigApi
+          ? config.authentication.strategies
+          : [],
+      },
+    })
   } catch (e) {
-    log.error(HELPERS.api, `api/v1/${path.parse(__filename).name}`, e)
+    log.error(TAGS.api, req.originalUrl, e)
     res.status(500).json({ status: 'error', reason: e.message })
+  }
+})
+
+router.get('/reload', async (req, res) => {
+  const error = await reloadConfig()
+  if (error) {
+    res.status(500).json({ status: 'error', reason: error.message })
+  } else {
+    res.status(200).json({ status: 'ok' })
   }
 })
 

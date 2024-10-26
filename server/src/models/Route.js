@@ -2,8 +2,8 @@
 const { Model, raw } = require('objection')
 const config = require('@rm/config')
 
-const getAreaSql = require('../services/functions/getAreaSql')
-const { getEpoch } = require('../services/functions/getClientTime')
+const { getAreaSql } = require('../utils/getAreaSql')
+const { getEpoch } = require('../utils/getClientTime')
 
 const GET_ALL_SELECT = /** @type {const} */ ([
   'id',
@@ -26,8 +26,6 @@ const GET_MAD_ALL_SELECT = /** @type {const} */ ({
   reversible: 'reversible',
 })
 
-const updateSeconds = config.getSafe('api.routeUpdateLimit') * 24 * 60 * 60
-
 class Route extends Model {
   static get tableName() {
     return 'route'
@@ -43,7 +41,8 @@ class Route extends Model {
   static async getAll(perms, args, { isMad }) {
     const { areaRestrictions } = perms
     const { onlyAreas, onlyDistance } = args.filters
-    const ts = getEpoch() - updateSeconds
+    const ts =
+      getEpoch() - config.getSafe('api.routeUpdateLimit') * 24 * 60 * 60
     const distanceInMeters = (onlyDistance || [0.5, 100]).map((x) => x * 1000)
 
     const startLatitude = isMad ? 'start_poi_latitude' : 'start_lat'
@@ -177,4 +176,4 @@ class Route extends Model {
   }
 }
 
-module.exports = Route
+module.exports = { Route }

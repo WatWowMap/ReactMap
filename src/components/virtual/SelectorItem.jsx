@@ -138,8 +138,8 @@ function Status({ status }) {
         status === null
           ? t('individual_filters')
           : status
-          ? t('enabled')
-          : t('disabled')
+            ? t('enabled')
+            : t('disabled')
       }
     >
       <StatusIcon

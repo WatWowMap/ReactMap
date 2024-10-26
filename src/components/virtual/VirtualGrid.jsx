@@ -1,6 +1,6 @@
 // @ts-check
 import * as React from 'react'
-import Grid2 from '@mui/material/Unstable_Grid2/Grid2'
+import Grid2 from '@mui/material/Unstable_Grid2'
 import { VirtuosoGrid } from 'react-virtuoso'
 
 const STYLE = /** @type {React.CSSProperties} */ ({
@@ -16,7 +16,9 @@ export const SQUARE_ITEM = /** @type {import('@mui/material').SxProps} */ ({
 /** @typedef {Pick<import('@mui/material').Grid2Props, 'xs' | 'sm' | 'md' | 'lg' | 'xl'>} SomeGridProps */
 
 /** @type {React.ComponentType<import('react-virtuoso').GridItemProps & { context?: SomeGridProps }>} */
-const Item = ({ context, ...props }) => <Grid2 {...context} {...props} />
+const Item = React.forwardRef(({ context, ...props }, ref) => (
+  <Grid2 {...context} {...props} ref={ref} />
+))
 
 /** @type {React.ComponentType<import('react-virtuoso').GridListProps & { context?: SomeGridProps }>} */
 const List = React.forwardRef((props, ref) => (

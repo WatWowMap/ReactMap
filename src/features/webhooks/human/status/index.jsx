@@ -1,3 +1,5 @@
+// @ts-check
+
 import * as React from 'react'
 import Grid from '@mui/material/Unstable_Grid2'
 import Divider from '@mui/material/Divider'

@@ -22,7 +22,13 @@ import { PokemonDrawerMemo } from '../pokemon'
 import { AreaSection } from '../areas'
 import { Extras } from '../Extras'
 
-const ADV_CATEGORIES = new Set(['pokemon', 'gyms', 'pokestops', 'nests'])
+const ADV_CATEGORIES = new Set([
+  'pokemon',
+  'gyms',
+  'pokestops',
+  'nests',
+  'stations',
+])
 
 /** @param {{ category: keyof import('@rm/types').UIObject }} props */
 const DrawerSection = ({ category }) => {
@@ -72,7 +78,10 @@ const DrawerSection = ({ category }) => {
                 category === 'wayfarer' || category === 'admin'
               return (
                 <React.Fragment key={`${category}${subItem}`}>
-                  {!(category === 'nests' && subItem === 'sliders') && (
+                  {!(
+                    category === 'nests' &&
+                    (subItem === 'sliders' || subItem === 'active')
+                  ) && (
                     <BoolToggle
                       // @ts-ignore
                       field={`filters.${

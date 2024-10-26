@@ -1,3 +1,5 @@
+// @ts-check
+
 export const ICON_SIZES = /** @type {const} */ (['sm', 'md', 'lg', 'xl'])
 
 export const XXS_XXL = /** @type {const} */ (['xxs', 'xxl'])
@@ -9,7 +11,20 @@ export const ENUM_GENDER = /** @type {const} */ ([0, 1, 2, 3])
 export const ENUM_BADGES = /** @type {const} */ ([0, 1, 2, 3, 4])
 
 export const S2_LEVELS = /** @type {const} */ ([
-  10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20,
+  ...(process.env.NODE_ENV === 'development'
+    ? [1, 2, 3, 4, 5, 6, 7, 8, 9]
+    : []),
+  10,
+  11,
+  12,
+  13,
+  14,
+  15,
+  16,
+  17,
+  18,
+  19,
+  20,
 ])
 
 export const FORT_LEVELS = /** @type {const} */ (['all', '1', '2', '3'])
@@ -49,6 +64,6 @@ export const FILTER_SKIP_LIST = ['filter', 'enabled', 'legacy']
 
 export const ALWAYS_EXCLUDED = new Set(['donor', 'blockedGuildNames', 'admin'])
 
-export const SCAN_MODES = /** @type */ (['confirmed', 'loading', 'error'])
+export const SCAN_MODES = ['confirmed', 'loading', 'error']
 
 export const SCAN_SIZES = /** @type {const} */ (['S', 'M', 'XL'])

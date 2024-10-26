@@ -1,8 +1,9 @@
-import markerIconPng from 'leaflet/dist/images/marker-icon.png'
+// @ts-check
+
 import { Icon } from 'leaflet'
 
 export const fallbackMarker = new Icon({
-  iconUrl: markerIconPng,
+  iconUrl: '/images/fallback-marker.png',
   iconSize: [25, 41],
   iconAnchor: [12, 35],
   popupAnchor: [1, -30],

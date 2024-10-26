@@ -13,15 +13,17 @@ const S2Cells = () => {
   const { t } = useTranslation()
   const enabled = useStorage((s) => !!s.filters.s2cells.enabled)
   const [filters, setFilters] = useDeepStore('filters.s2cells.cells')
-  const safe = React.useMemo(
-    () =>
-      Array.isArray(filters)
-        ? filters
-        : typeof filters === 'string'
-        ? // @ts-ignore
-          filters.split(',')
-        : [],
-    [filters],
+  const safe = /** @type {number[]} */ (
+    React.useMemo(
+      () =>
+        Array.isArray(filters)
+          ? filters
+          : typeof filters === 'string'
+            ? // @ts-ignore
+              filters.split(',').map((v) => +v)
+            : [],
+      [filters],
+    )
   )
   return (
     <CollapsibleItem open={enabled}>
@@ -29,13 +31,13 @@ const S2Cells = () => {
         sx={{ mx: 'auto', width: '90%' }}
         value={safe}
         renderValue={(selected) =>
-          Array.isArray(selected) ? selected.join(', ') : selected
+          Array.isArray(selected) ? selected.join(', ') : `${selected}`
         }
         multiple
         onChange={({ target }) =>
           setFilters(
             typeof target.value === 'string'
-              ? target.value.split(',')
+              ? target.value.split(',').map((v) => +v)
               : target.value,
           )
         }

@@ -17,9 +17,11 @@ import { useDeepStore } from '@store/useStorage'
  * } & import('@mui/material').TextFieldProps} Props
  */
 
-/** @type {React.ForwardRefExoticComponent<Props>} */
 export const GenericSearch = React.forwardRef(
-  ({ field, label, disabled, value, setValue, ...props }, ref) => {
+  (
+    /** @type {Props} */ { field, label, disabled, value, setValue, ...props },
+    ref,
+  ) => {
     const { t } = useTranslation()
     const [searchValue, setSearchValue] = field
       ? useDeepStore(field, '')

@@ -1,26 +1,29 @@
+// @ts-check
+
 const Ohbem = require('ohbem')
 const NodeCache = require('node-cache')
 const config = require('@rm/config')
-const { log, HELPERS } = require('@rm/logger')
+const { log, TAGS } = require('@rm/logger')
 
-module.exports = class PvpWrapper extends Ohbem {
+class PvpWrapper extends Ohbem {
   constructor() {
     super({
       leagues: config.getSafe('api.pvp.leagueObj'),
-      pokemonData: {},
       levelCaps: config.getSafe('api.pvp.levels'),
       cachingStrategy: Ohbem.cachingStrategies.memoryHeavy,
     })
     this.rmCache = new NodeCache({ stdTTL: 60 * 60 * 1.5 })
-    ;(async () => {
-      this.updatePokemonData(await Ohbem.fetchPokemonData())
-    })()
+  }
+
+  async fetchLatestPokemon() {
+    const data = await Ohbem.fetchPokemonData()
+    this.updatePokemonData(data)
   }
 
   /**
    * @param {import("@rm/types").Pokemon} pokemon
    * @param {number} currentTs
-   * @returns {import("@rm/types").CleanPvp}
+   * @returns {Record<string, import("ohbem").PvPRankEntry[]>}
    */
   resultWithCache(pokemon, currentTs) {
     if (pokemon.pokemon_id === 132) return {}
@@ -42,7 +45,7 @@ module.exports = class PvpWrapper extends Ohbem {
       return result
     } catch (e) {
       log.error(
-        HELPERS.pokemon,
+        TAGS.pokemon,
         'Unable to process PVP Stats for Pokemon with ID#: ',
         pokemon.id,
         `${pokemon.pokemon_id}-${pokemon.form}`,
@@ -54,3 +57,5 @@ module.exports = class PvpWrapper extends Ohbem {
     }
   }
 }
+
+module.exports = { PvpWrapper }

@@ -13,10 +13,9 @@ import { useTranslation } from 'react-i18next'
 import { useMemory } from '@store/useMemory'
 import { useLayoutStore } from '@store/useLayoutStore'
 import { setDeepStore } from '@store/useStorage'
-import { ErrorBoundary } from '@components/ErrorBoundary'
-import { NestSubmission } from '@components/dialogs/NestSubmission'
 import { getTimeUntil } from '@utils/getTimeUntil'
 import { useAnalytics } from '@hooks/useAnalytics'
+import { Navigation } from '@components/popups/Navigation'
 
 /** @param {number} timeSince */
 const getColor = (timeSince) => {
@@ -48,23 +47,19 @@ export function NestPopup({
   updated = 0,
   pokemon_avg = 0,
   submitted_by = '',
+  lat,
+  lon,
 }) {
   const { t } = useTranslation()
-  const { perms } = useMemory((s) => s.auth)
+  const submissionPerm = useMemory((s) => s.auth.perms.nestSubmissions)
 
   const [parkName, setParkName] = React.useState(true)
   const [anchorEl, setAnchorEl] = React.useState(null)
 
   const lastUpdated = getTimeUntil(updated * 1000)
 
-  const handleClick = (event) => {
-    setAnchorEl(event.currentTarget)
-  }
-
-  const handleClose = () => {
-    setAnchorEl(null)
-  }
-
+  const handleClick = (event) => setAnchorEl(event.currentTarget)
+  const handleClose = () => setAnchorEl(null)
   const handleHide = () => {
     setAnchorEl(null)
     useMemory.setState((prev) => ({ hideList: new Set(prev.hideList).add(id) }))
@@ -84,57 +79,59 @@ export function NestPopup({
   ]
 
   return (
-    <ErrorBoundary noRefresh variant="h5">
-      <Grid
-        container
-        justifyContent="center"
-        alignItems="center"
-        style={{ width: 200 }}
-        spacing={1}
-      >
-        <Grid xs={9} textAlign="center">
+    <Grid
+      container
+      justifyContent="center"
+      alignItems="center"
+      style={{ width: 200 }}
+      spacing={1}
+    >
+      <Grid xs={pokemon_id ? 9 : 12} textAlign="center">
+        <Typography
+          variant={name.length > 20 ? 'subtitle2' : 'h6'}
+          align="center"
+          noWrap={parkName}
+          onClick={() => setParkName(!parkName)}
+        >
+          {name}
+        </Typography>
+        {submitted_by && (
           <Typography
-            variant={name.length > 20 ? 'subtitle2' : 'h6'}
-            align="center"
+            variant="caption"
+            fontSize={10}
             noWrap={parkName}
             onClick={() => setParkName(!parkName)}
           >
-            {name}
+            {t('submitted_by')}: {submitted_by}
           </Typography>
-          {submitted_by && (
-            <Typography
-              variant="caption"
-              fontSize={10}
-              noWrap={parkName}
-              onClick={() => setParkName(!parkName)}
-            >
-              {t('submitted_by')}: {submitted_by}
-            </Typography>
-          )}
-        </Grid>
+        )}
+      </Grid>
+      {!!pokemon_id && (
         <Grid xs={3}>
           <IconButton aria-haspopup="true" onClick={handleClick} size="large">
             <MoreVert />
           </IconButton>
         </Grid>
-        <Menu
-          anchorEl={anchorEl}
-          keepMounted
-          open={!!anchorEl}
-          onClose={handleClose}
-          PaperProps={{
-            style: {
-              maxHeight: 216,
-              minWidth: '20ch',
-            },
-          }}
-        >
-          {options.map((option) => (
-            <MenuItem key={option.key || option.name} onClick={option.action}>
-              {typeof option.name === 'string' ? t(option.name) : option.name}
-            </MenuItem>
-          ))}
-        </Menu>
+      )}
+      <Menu
+        anchorEl={anchorEl}
+        keepMounted
+        open={!!anchorEl}
+        onClose={handleClose}
+        PaperProps={{
+          style: {
+            maxHeight: 216,
+            minWidth: '20ch',
+          },
+        }}
+      >
+        {options.map((option) => (
+          <MenuItem key={option.key || option.name} onClick={option.action}>
+            {typeof option.name === 'string' ? t(option.name) : option.name}
+          </MenuItem>
+        ))}
+      </Menu>
+      {!!pokemon_id && (
         <Grid xs={6} textAlign="center">
           <img
             src={iconUrl}
@@ -147,54 +144,64 @@ export function NestPopup({
           <br />
           <Typography variant="caption">{t(`poke_${pokemon_id}`)}</Typography>
         </Grid>
-        <Grid xs={6} textAlign="center">
-          <Typography variant="subtitle2">{t('last_updated')}</Typography>
-          <Typography
-            variant={lastUpdated.str.includes('D') ? 'h6' : 'subtitle2'}
-            color={getColor(lastUpdated.diff)}
-          >
-            {lastUpdated.str
-              .replace('days', t('days'))
-              .replace('day', t('day'))}
+      )}
+      <Grid xs={pokemon_id ? 6 : 12} textAlign="center">
+        <Typography variant="subtitle2">{t('last_updated')}</Typography>
+        <Typography
+          variant={lastUpdated.str.includes('D') ? 'h6' : 'subtitle2'}
+          color={getColor(lastUpdated.diff)}
+        >
+          {lastUpdated.str.replace('days', t('days')).replace('day', t('day'))}
+        </Typography>
+        <Typography variant="subtitle2">
+          ~{pokemon_avg?.toFixed(2) || 0} {t('spawns_per_hour')}
+        </Typography>
+      </Grid>
+      <Grid xs={12}>
+        <Divider style={{ margin: 4 }} />
+      </Grid>
+      <Grid xs={12} textAlign="center">
+        {recent ? (
+          <Typography variant="caption">
+            {t('nest_estimated')}
+            <br />
+            {t('verify_nests')}
           </Typography>
-          <Typography variant="subtitle2">
-            ~{pokemon_avg?.toFixed(2) || 0} {t('spawns_per_hour')}
+        ) : (
+          <Typography variant="caption">
+            {t('nest_out_of_date')}
+            <br />
+            {t('nest_check_current')}
           </Typography>
-        </Grid>
-        <Grid xs={12}>
-          <Divider style={{ margin: 4 }} />
-        </Grid>
-        <Grid xs={12} textAlign="center">
-          {recent ? (
-            <Typography variant="caption">
-              {t('nest_estimated')}
-              <br />
-              {t('verify_nests')}
-            </Typography>
-          ) : (
-            <Typography variant="caption">
-              {t('nest_out_of_date')}
-              <br />
-              {t('nest_check_current')}
-            </Typography>
-          )}
-        </Grid>
-        {perms.nestSubmissions && (
-          <Grid xs={12} textAlign="center">
-            <Button
-              color="secondary"
-              variant="outlined"
-              size="small"
-              onClick={() =>
-                useLayoutStore.setState({ nestSubmissions: `${id}` })
-              }
-            >
-              {t('submit_nest_name')}
-            </Button>
-          </Grid>
         )}
       </Grid>
-      <NestSubmission id={id} name={name} />
-    </ErrorBoundary>
+      {submissionPerm && (
+        <Grid xs={9} textAlign="center">
+          <Button
+            color="secondary"
+            variant="outlined"
+            size="small"
+            onClick={() =>
+              useLayoutStore.setState({
+                nestSubmissions: {
+                  id: `${id}`,
+                  name: `${name}`,
+                },
+              })
+            }
+          >
+            <Typography variant="caption">{t('submit_nest_name')}</Typography>
+          </Button>
+        </Grid>
+      )}
+      <Grid
+        xs={submissionPerm ? 3 : 12}
+        container
+        alignItems="center"
+        justifyContent="center"
+      >
+        <Navigation lat={lat} lon={lon} />
+      </Grid>
+    </Grid>
   )
 }

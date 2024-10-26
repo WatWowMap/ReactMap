@@ -9,12 +9,10 @@ import { useStorage } from '@store/useStorage'
  * @param {{
  *  children: React.ReactNode,
  *  backup?: string,
- *  variant?: import('@mui/material/Typography').TypographyProps['variant'],
- *  sx?: import('@mui/material').SxProps
- * }} props
+ * } & import('@mui/material').TypographyProps} props
  * @returns
  */
-export function Title({ children, variant = 'subtitle2', backup, sx }) {
+export function Title({ children, variant = 'subtitle2', backup, ...props }) {
   const names = useStorage((s) => !!s.popups.names)
 
   return (
@@ -30,7 +28,7 @@ export function Title({ children, variant = 'subtitle2', backup, sx }) {
           },
         }))
       }
-      sx={sx}
+      {...props}
     >
       {children || backup}
     </Typography>

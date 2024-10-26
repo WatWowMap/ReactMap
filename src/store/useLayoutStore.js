@@ -7,7 +7,10 @@ import { useStorage } from './useStorage'
 
 /**
  * @typedef {{
- *  nestSubmissions: string | number,
+ *  nestSubmissions: {
+ *    id: string | number,
+ *    name: string,
+ *  },
  *  help: {
  *   open: boolean,
  *   category: string,
@@ -42,7 +45,10 @@ import { useStorage } from './useStorage'
  * @type {import("zustand").UseBoundStore<import("zustand").StoreApi<UseLayoutStore>>}
  */
 export const useLayoutStore = create(() => ({
-  nestSubmissions: '0',
+  nestSubmissions: {
+    id: '',
+    name: '',
+  },
   help: { open: false, category: '' },
   motd: false,
   pkmnFilterHelp: false,

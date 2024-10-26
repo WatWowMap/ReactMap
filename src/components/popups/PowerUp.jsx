@@ -25,7 +25,6 @@ export function PowerUp({
     <Grid container alignItems="center" justifyContent="center">
       <TimeTile
         expireTime={power_up_end_timestamp}
-        until
         size={5}
         icon={
           <>

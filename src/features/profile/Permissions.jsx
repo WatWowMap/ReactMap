@@ -1,7 +1,7 @@
 // @ts-check
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import Grid2 from '@mui/material/Unstable_Grid2/Grid2'
+import Grid2 from '@mui/material/Unstable_Grid2'
 import Box from '@mui/material/Box'
 import Card from '@mui/material/Card'
 import CardContent from '@mui/material/CardContent'

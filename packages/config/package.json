@@ -15,6 +15,7 @@
     "prettier:fix": "prettier --write \"**/*.{css,html,js,jsx,yml}\""
   },
   "dependencies": {
-    "config": "^3.3.10"
+    "@rm/logger": "*",
+    "config": "^3.3.12"
   }
 }

@@ -7,7 +7,7 @@ require('dotenv').config()
 const { OpenAI } = require('openai')
 const { encode } = require('gpt-tokenizer')
 
-const { log, HELPERS } = require('@rm/logger')
+const { log, TAGS } = require('@rm/logger')
 
 const { readAndParseJson, readLocaleDirectory, writeAll } = require('./utils')
 
@@ -41,8 +41,8 @@ function splitJson(json) {
       typeof value === 'string'
         ? `"${value}"`
         : typeof value === 'number'
-        ? value
-        : `${value}`
+          ? value
+          : `${value}`
     },\n`
     const newLineCount = (string.match(/\n/g) || []).length - 1
     const tokenCount = encode(string).length
@@ -98,7 +98,7 @@ function matchJSON(str) {
  */
 async function sendToGPT(locale, missingKeys) {
   return openAI.chat.completions.create({
-    model: 'gpt-4-turbo-preview',
+    model: 'gpt-4o-mini',
     messages: [
       {
         role: 'system',
@@ -147,7 +147,7 @@ async function generate() {
         try {
           const chunks = splitJson(missingKeys)
           log.info(
-            HELPERS.locales,
+            TAGS.locales,
             locale,
             'making',
             chunks.length,
@@ -178,7 +178,7 @@ async function generate() {
             result.reduce((acc, x) => ({ ...acc, ...x }), generated),
           ]
         } catch (error) {
-          log.error(HELPERS.locales, error)
+          log.error(TAGS.locales, error)
         }
       }),
   )
@@ -197,6 +197,6 @@ if (require.main === module) {
   generate()
     .then((locales) => writeAll(locales, false, __dirname, './generated'))
     .then(() =>
-      log.info(HELPERS.locales, 'ai has finished checking for missing locales'),
+      log.info(TAGS.locales, 'ai has finished checking for missing locales'),
     )
 }

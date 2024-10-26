@@ -11,15 +11,18 @@ export function useMarkerTimer(itemExpire, ref, callback) {
   const ts = Math.floor(Date.now() / 1000)
   useEffect(() => {
     if (itemExpire > ts && itemExpire !== Infinity) {
-      const timeout = setTimeout(() => {
-        if (itemExpire) {
-          if (callback) {
-            callback()
-          } else if (ref) {
-            ref.remove()
+      const timeout = setTimeout(
+        () => {
+          if (itemExpire) {
+            if (callback) {
+              callback()
+            } else if (ref) {
+              ref.remove()
+            }
           }
-        }
-      }, (itemExpire - ts) * 1000)
+        },
+        (itemExpire - ts) * 1000,
+      )
       return () => clearTimeout(timeout)
     }
   })

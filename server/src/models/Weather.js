@@ -6,7 +6,8 @@ const { default: pointInPolygon } = require('@turf/boolean-point-in-polygon')
 const { default: booleanContains } = require('@turf/boolean-contains')
 const config = require('@rm/config')
 
-const getPolyVector = require('../services/functions/getPolyVector')
+const { getPolyVector } = require('../utils/getPolyVector')
+const { getPolygonBbox } = require('../utils/getBbox')
 
 class Weather extends Model {
   static get tableName() {
@@ -15,7 +16,7 @@ class Weather extends Model {
 
   /**
    * @param {import("@rm/types").Permissions} perms
-   * @param {import('@rm/types').Bounds & { filters: { onlyAreas: string[] } } } args
+   * @param {import('@rm/types').BBox & { filters: { onlyAreas: string[] } } } args
    * @param {import('@rm/types').DbContext} ctx
    */
   static async getAll(perms, args, { isMad }) {
@@ -50,16 +51,7 @@ class Weather extends Model {
         )
       : cleanUserAreas
 
-    const boundPolygon = polygon([
-      [
-        [args.minLon, args.minLat],
-        [args.maxLon, args.minLat],
-        [args.maxLon, args.maxLat],
-        [args.minLon, args.maxLat],
-        [args.minLon, args.minLat],
-      ],
-    ])
-
+    const boundPolygon = getPolygonBbox(args)
     return results
       .map((cell) => {
         const center = point([cell.longitude, cell.latitude])
@@ -96,4 +88,4 @@ class Weather extends Model {
   }
 }
 
-module.exports = Weather
+module.exports = { Weather }

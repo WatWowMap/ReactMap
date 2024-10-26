@@ -42,7 +42,10 @@ export function useSendSearch(search, open) {
           lat,
           lon: lng,
           locale: i18n.language,
-          onlyAreas: filters?.scanAreas?.filter?.areas || [],
+          onlyAreas:
+            (filters?.scanAreas?.filterByAreas &&
+              filters?.scanAreas?.filter?.areas) ||
+            [],
           questLayer:
             searchTab === 'quests'
               ? filters?.pokestops?.showQuestSet || ''
@@ -77,10 +80,10 @@ export function useSendSearch(search, open) {
               searchTab === 'quests'
                 ? 'searchQuest'
                 : searchTab === 'lures'
-                ? 'searchLure'
-                : searchTab === 'invasions'
-                ? 'searchInvasion'
-                : 'search'
+                  ? 'searchLure'
+                  : searchTab === 'invasions'
+                    ? 'searchInvasion'
+                    : 'search'
             ] || []
           ).map((option, index) => ({ ...option, index }))
         : [],

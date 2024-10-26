@@ -21,6 +21,7 @@ Pokemon GO Map frontend built with React.
 - Devices
 - Weather
 - Portals
+- Stations
 - Nests (Only compatible with latest [NestWatcher](https://github.com/M4d40/nestwatcher))
 - Submissions Cells
 - Last Scanned Cells
@@ -39,7 +40,7 @@ Pokemon GO Map frontend built with React.
 
 ## PreReqs
 
-- NodeJS (V18+)
+- NodeJS (V20+)
 - MySQL (Only 8.0+ has been tested)
 - Or MariaDB (10.4 has been tested)
 - Yarn (npm install -g yarn)

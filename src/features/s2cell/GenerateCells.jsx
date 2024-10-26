@@ -23,13 +23,15 @@ export function GenerateCells() {
       : s.userSettings.s2cells.lightMapBorder,
   )
   /** @type {number[]} */
-  const filter = useStorage((s) => s.filters.s2cells.cells)
+  const filter = useStorage((s) => s.filters?.s2cells?.cells)
   const location = useStorage((s) => s.location)
   const zoom = useStorage((s) => s.zoom)
 
   const cells = React.useMemo(() => {
     const bounds = getQueryArgs()
-    return filter.flatMap((level) => {
+    return filter?.flatMap((level) => {
+      if (level > zoom) return []
+
       const regionCoverer = new S2RegionCoverer()
       const region = S2LatLngRect.fromLatLng(
         S2LatLng.fromDegrees(bounds.minLat, bounds.minLon),
@@ -55,7 +57,7 @@ export function GenerateCells() {
     })
   }, [filter, location, zoom, color])
 
-  return (
+  return filter ? (
     <>
       {cells
         .filter((_, i) => i < 20_000)
@@ -73,6 +75,11 @@ export function GenerateCells() {
           },
         ]}
       />
+      <Notification
+        open={filter.some((x) => x > zoom)}
+        severity="warning"
+        title="s2_cell_zoom_limit"
+      />
     </>
-  )
+  ) : null
 }

@@ -65,7 +65,7 @@ export function Footer({ options, role }) {
       justifyContent="flex-end"
       alignItems="center"
       sx={(theme) => ({
-        minHeight: { xs: 'inherit', sm: 50 },
+        minHeight: 50,
         borderTop: `1px solid ${theme.palette.divider}`,
       })}
     >
@@ -114,8 +114,8 @@ export function Footer({ options, role }) {
                     color: muiColor
                       ? null
                       : second
-                      ? theme.palette[first][second]
-                      : first,
+                        ? theme.palette[first][second]
+                        : first,
                   })}
                 />
               </IconButton>
@@ -135,8 +135,8 @@ export function Footer({ options, role }) {
                 color: muiColor
                   ? null
                   : second
-                  ? theme.palette[first][second]
-                  : first,
+                    ? theme.palette[first][second]
+                    : first,
               })}
             >
               <Typography variant="caption">

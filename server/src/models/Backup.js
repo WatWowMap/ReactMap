@@ -22,11 +22,11 @@ class Backup extends Model {
   }
 
   static get relationMappings() {
-    const { Db } = require('../services/initialization')
+    const { state } = require('../services/state')
     return {
       user: {
         relation: Model.BelongsToOneRelation,
-        modelClass: Db.models.User,
+        modelClass: state.db.models.User,
         join: {
           from: `${config.getSafe('database.settings.backupTableName')}.userId`,
           to: `${config.getSafe('database.settings.userTableName')}.id`,
@@ -75,7 +75,7 @@ class Backup extends Model {
       count['count(*)'] < config.getSafe('database.settings.userBackupLimits')
     ) {
       // @ts-ignore
-      return this.query().insert({
+      await this.query().insert({
         // @ts-ignore
         userId,
         name: backup.name,
@@ -116,4 +116,4 @@ class Backup extends Model {
   }
 }
 
-module.exports = Backup
+module.exports = { Backup }

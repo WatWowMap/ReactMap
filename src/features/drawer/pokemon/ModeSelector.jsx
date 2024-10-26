@@ -11,13 +11,13 @@ import { FCSelectListItem } from '@components/inputs/FCSelect'
 export function PokemonModeSelector() {
   const filterMode = useStorage((s) => s.getPokemonFilterMode())
   const { t } = useTranslation()
-  const ui = useMemory((s) => s.ui.pokemon)
-  const selectRef = React.useRef(/** @type {HTMLDivElement | null} */ (null))
+  const isLegacyEnabled = useMemory((s) => !!s.ui.pokemon?.legacy)
+  const [width, setWidth] = React.useState(0)
 
   return (
     <FCSelectListItem
       label={t('pokemon_filter_mode')}
-      ref={selectRef}
+      setWidth={setWidth}
       value={filterMode}
       fullWidth
       size="small"
@@ -35,7 +35,7 @@ export function PokemonModeSelector() {
         }
       }}
     >
-      {['basic', 'intermediate', ...(ui.legacy ? ['expert'] : [])].map(
+      {['basic', 'intermediate', ...(isLegacyEnabled ? ['expert'] : [])].map(
         (tier) => (
           <MenuItem
             key={tier}
@@ -46,7 +46,7 @@ export function PokemonModeSelector() {
               flexDirection: 'column',
               alignItems: 'flex-start',
               whiteSpace: 'normal',
-              width: selectRef.current?.clientWidth || 'auto',
+              width: width || 'auto',
             }}
           >
             <Typography variant="subtitle2">{t(tier)}</Typography>

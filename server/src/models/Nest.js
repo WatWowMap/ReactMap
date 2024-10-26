@@ -1,14 +1,10 @@
 // @ts-check
-/* eslint-disable no-nested-ternary */
 const { Model } = require('objection')
 const i18next = require('i18next')
 const config = require('@rm/config')
 
-const { Event, Db } = require('../services/initialization')
-const getAreaSql = require('../services/functions/getAreaSql')
-
-const { searchResultsLimit, queryLimits } = config.getSafe('api')
-const { avgFilter } = config.getSafe('defaultFilters.nests')
+const { state } = require('../services/state')
+const { getAreaSql } = require('../utils/getAreaSql')
 
 /** @typedef {Nest & Partial<import("@rm/types").Nest>} FullNest */
 
@@ -31,19 +27,34 @@ class Nest extends Model {
   static async getAll(perms, args, { polygon }) {
     const { areaRestrictions } = perms
     const { minLat, minLon, maxLat, maxLon, filters } = args
-    const pokemon = []
-    Object.keys(filters).forEach((pkmn) => {
-      if (!pkmn.startsWith('o')) {
-        pokemon.push(pkmn.split('-')[0])
-      }
-    })
     const query = this.query()
       .select(['*', 'nest_id AS id'])
-      .whereNotNull('pokemon_id')
+      // .whereNotNull('pokemon_id')
       .whereBetween('lat', [minLat, maxLat])
       .andWhereBetween('lon', [minLon, maxLon])
-      .whereIn('pokemon_id', pokemon)
-    if (!avgFilter.every((x, i) => x === filters.onlyAvgFilter[i])) {
+
+    const pokemon = []
+    if (filters.onlyPokemon) {
+      Object.keys(filters).forEach((pkmn) => {
+        if (!pkmn.startsWith('o')) {
+          pokemon.push(pkmn.split('-')[0])
+        }
+      })
+    }
+
+    if (pokemon.length) {
+      query.whereIn('pokemon_id', pokemon)
+    }
+    if (filters.onlyActive === 'inactive') {
+      query.where('active', false)
+    } else if (filters.onlyActive === 'active') {
+      query.where('active', true)
+    }
+    if (
+      !config
+        .getSafe('defaultFilters.nests.avgFilter')
+        .every((x, i) => x === filters.onlyAvgFilter[i])
+    ) {
       query.andWhereBetween('pokemon_avg', filters.onlyAvgFilter)
     }
     if (polygon) {
@@ -54,16 +65,18 @@ class Nest extends Model {
     }
 
     const results = /** @type {FullNest[]} */ (
-      await query.limit(queryLimits.nests)
+      await query.limit(config.getSafe('api.queryLimits.nests'))
     )
 
-    const submittedNameMap = await Db.query(
-      'NestSubmission',
-      'getAllByIds',
-      results.map((x) => x.id),
-    ).then((submissions) =>
-      Object.fromEntries(submissions.map((x) => [x.nest_id, x])),
-    )
+    const submittedNameMap = await state.db
+      .query(
+        'NestSubmission',
+        'getAllByIds',
+        results.map((x) => x.id),
+      )
+      .then((submissions) =>
+        Object.fromEntries(submissions.map((x) => [x.nest_id, x])),
+      )
 
     /** @type {(FullNest & { submitted_by?: string })[]} */
     const withNames = results.map((x) => {
@@ -88,23 +101,27 @@ class Nest extends Model {
   static secondaryFilter(queryResults, filters, polygon) {
     const returnedResults = []
     queryResults.forEach((pkmn) => {
-      if (pkmn.pokemon_form == 0 || pkmn.pokemon_form === null) {
-        const formId = Event.masterfile.pokemon[pkmn.pokemon_id].defaultFormId
-        if (formId) pkmn.pokemon_form = formId
-      }
-      if (filters[`${pkmn.pokemon_id}-${pkmn.pokemon_form}`]) {
-        pkmn.polygon_path = polygon
-          ? typeof pkmn.polygon === 'string' && pkmn.polygon
-            ? pkmn.polygon
-            : JSON.stringify(
-                pkmn.polygon || { type: 'Polygon', coordinates: [] },
-              )
-          : JSON.stringify({
-              type: 'Polygon',
-              coordinates: JSON.parse(pkmn.polygon_path || '[]').map((line) =>
-                line.map((point) => [point[1], point[0]]),
-              ),
-            })
+      pkmn.polygon_path = polygon
+        ? typeof pkmn.polygon === 'string' && pkmn.polygon
+          ? pkmn.polygon
+          : JSON.stringify(pkmn.polygon || { type: 'Polygon', coordinates: [] })
+        : JSON.stringify({
+            type: 'Polygon',
+            coordinates: JSON.parse(pkmn.polygon_path || '[]').map((line) =>
+              line.map((point) => [point[1], point[0]]),
+            ),
+          })
+
+      if (pkmn.pokemon_id && filters.onlyPokemon) {
+        if (pkmn.pokemon_form == 0 || pkmn.pokemon_form === null) {
+          const formId =
+            state.event.masterfile.pokemon[pkmn.pokemon_id].defaultFormId
+          if (formId) pkmn.pokemon_form = formId
+        }
+        if (filters[`${pkmn.pokemon_id}-${pkmn.pokemon_form}`]) {
+          returnedResults.push(pkmn)
+        }
+      } else {
         returnedResults.push(pkmn)
       }
     })
@@ -129,7 +146,8 @@ class Nest extends Model {
       available: results.map((pokemon) => {
         if (pokemon.pokemon_form == 0 || pokemon.pokemon_form === null) {
           return `${pokemon.pokemon_id}-${
-            Event.masterfile.pokemon[pokemon.pokemon_id].defaultFormId || 0
+            state.event.masterfile.pokemon[pokemon.pokemon_id].defaultFormId ||
+            0
           }`
         }
         return `${pokemon.pokemon_id}-${pokemon.pokemon_form || 0}`
@@ -143,16 +161,24 @@ class Nest extends Model {
    * @param {object} args
    * @param {import("@rm/types").DbContext} ctx
    * @param {import('objection').Raw} distance
-   * @param {ReturnType<typeof import("server/src/services/functions/getBbox").getBboxFromCenter>} bbox
+   * @param {ReturnType<typeof import("server/src/utils/getBbox").getBboxFromCenter>} bbox
    * @returns {Promise<FullNest[]>}
    */
   static async search(perms, args, { isMad }, distance, bbox) {
     const { search, locale, onlyAreas = [] } = args
-    const pokemonIds = Object.keys(Event.masterfile.pokemon).filter((pkmn) =>
-      i18next.t(`poke_${pkmn}`, { lng: locale }).toLowerCase().includes(search),
+    const pokemonIds = Object.keys(state.event.masterfile.pokemon).filter(
+      (pkmn) =>
+        i18next
+          .t(`poke_${pkmn}`, { lng: locale })
+          .toLowerCase()
+          .includes(search),
     )
 
-    const submittedNests = await Db.query('NestSubmission', 'search', search)
+    const submittedNests = await state.db.query(
+      'NestSubmission',
+      'search',
+      search,
+    )
 
     const query = this.query()
       .select([
@@ -176,7 +202,7 @@ class Nest extends Model {
           )
           .orWhere('name', 'like', `%${search}%`)
       })
-      .limit(searchResultsLimit)
+      .limit(config.getSafe('api.searchResultsLimit'))
       .orderBy('distance')
     if (!getAreaSql(query, perms.areaRestrictions, onlyAreas, isMad)) {
       return []
@@ -195,4 +221,4 @@ class Nest extends Model {
   }
 }
 
-module.exports = Nest
+module.exports = { Nest }

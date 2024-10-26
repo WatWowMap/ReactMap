@@ -70,6 +70,13 @@ type Search {
   costume: Int
   shiny: Int
   iv: Float
+  battle_pokemon_id: Int
+  battle_pokemon_form: Int
+  battle_pokemon_gender: Int
+  battle_pokemon_costume: Int
+  # battle_pokemon_evolution: Int
+  battle_pokemon_alignment: Int
+  battle_pokemon_bread_mode: Int
 }
 
 type SearchLure {

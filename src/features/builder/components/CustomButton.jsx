@@ -1,3 +1,5 @@
+// @ts-check
+
 import * as React from 'react'
 import Button from '@mui/material/Button'
 
@@ -26,6 +28,7 @@ export function CustomButton({
 }) {
   const isMuiColor = THEME_COLORS.has(color)
   return (
+    // TODO: Augment Mui Types
     <Button
       className={className}
       size={size}

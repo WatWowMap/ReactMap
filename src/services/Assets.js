@@ -56,6 +56,7 @@ export class UAssets {
         sizeMultiplier: 1,
         popupX: 0,
         popupY: 0,
+        manualPopup: 0,
       },
     }
 
@@ -197,6 +198,7 @@ export class UAssets {
   /**
    * @param {string} category
    * @param {'sm' | 'md' | 'lg' | 'xl'} [size]
+   * @returns {number}
    */
   getSize(category, size = 'md') {
     const baseSize = this.sizes[category]?.[size] || 20
@@ -205,7 +207,10 @@ export class UAssets {
       : baseSize
   }
 
-  /** @param {string[]} categories */
+  /**
+   * @param {string[]} categories
+   * @returns {(UAssets['modifiers']['base'])[]}
+   */
   getModifiers(...categories) {
     return categories.map(
       (category) => this.modifiers[category] ?? this.modifiers.base,
@@ -251,6 +256,9 @@ export class UAssets {
       case 'i':
         // invasions
         return this.getInvasions(id.slice(1), true)
+      case 'j':
+        // stations
+        return this.getStation()
       case 'l':
         // lures
         return this.getPokestops(id.slice(1))
@@ -315,7 +323,8 @@ export class UAssets {
    * @param {string | number} [costume]
    * @param {string | number} [alignment]
    * @param {boolean} [shiny]
-   * @returns
+   * @param {string | number} [bread]
+   * @returns {string}
    */
   getPokemon(
     pokemonId = 0,
@@ -325,21 +334,41 @@ export class UAssets {
     costume = 0,
     alignment = 0,
     shiny = false,
+    bread = 0,
   ) {
     try {
       return this[this.selected.pokemon]?.class?.pokemon(
         pokemonId,
-        form,
         evolution,
-        gender,
+        form,
         costume,
+        gender,
         alignment,
+        bread,
         shiny,
       )
     } catch (e) {
       console.error(`[${this.assetType.toUpperCase()}]`, e)
       return `${this.fallback}/pokemon/0.${this.fallbackExt}`
     }
+  }
+
+  /**
+   * @param {string|number} pokemonId
+   * @param {import('@rm/types').PokemonDisplay} pokemonDisplay
+   */
+  getPokemonByDisplay(pokemonId, pokemonDisplay) {
+    return this.getPokemon(
+      pokemonId,
+      pokemonDisplay.form,
+      Date.now() > pokemonDisplay.temp_evolution_finish_ms
+        ? 0
+        : pokemonDisplay.temp_evolution,
+      pokemonDisplay.gender,
+      pokemonDisplay.costume,
+      pokemonDisplay.alignment,
+      pokemonDisplay.shiny,
+    )
   }
 
   /** @param {number | string} [typeId] */
@@ -373,11 +402,10 @@ export class UAssets {
     try {
       return this[this.selected.pokestop]?.class?.pokestop(
         lureId,
-        power,
-        display,
-        invasionActive,
+        display || !!invasionActive,
         questActive,
         ar,
+        power || false,
       )
     } catch (e) {
       console.error(`[${this.assetType.toUpperCase()}]`, e)
@@ -424,6 +452,7 @@ export class UAssets {
    * @param {boolean} [inBattle]
    * @param {boolean} [ex]
    * @param {boolean} [ar]
+   * @param {string | number | boolean} [power]
    * @returns
    */
   getGyms(
@@ -432,6 +461,7 @@ export class UAssets {
     inBattle = false,
     ex = false,
     ar = false,
+    power = false,
   ) {
     try {
       return this[this.selected.gym]?.class?.gym(
@@ -440,6 +470,7 @@ export class UAssets {
         inBattle,
         ex,
         ar,
+        power,
       )
     } catch (e) {
       console.error(`[${this.assetType.toUpperCase()}]`, e)
@@ -485,7 +516,11 @@ export class UAssets {
    */
   getWeather(weatherId, timeOfDay = 'day') {
     try {
-      return this[this.selected.weather]?.class?.weather(weatherId, timeOfDay)
+      return this[this.selected.weather]?.class?.weather(
+        weatherId,
+        0,
+        timeOfDay,
+      )
     } catch (e) {
       console.error(`[${this.assetType.toUpperCase()}]`, e)
       return `${this.fallback}/weather/0.${this.fallbackExt}`
@@ -510,15 +545,12 @@ export class UAssets {
   getMisc(fileName = '') {
     try {
       const miscClass = this[this.selected.misc]?.class
-
+      const singular = fileName.slice(0, -1)
       if (miscClass.has('misc', fileName)) {
         return miscClass.misc(fileName)
       }
-      if (
-        fileName.endsWith('s') &&
-        miscClass.has('misc', fileName.slice(0, -1))
-      ) {
-        return miscClass.misc(fileName.slice(0, -1))
+      if (fileName.endsWith('s') && miscClass.has('misc', singular)) {
+        return miscClass.misc(singular)
       }
       if (!fileName.endsWith('s') && miscClass.has('misc', `${fileName}s`)) {
         return miscClass.misc(`${fileName}s`)
@@ -528,6 +560,12 @@ export class UAssets {
         this[this.selected[fileName]].class.has(fileName, `0`)
       ) {
         return this[this.selected[fileName]].class[fileName]('0')
+      }
+      if (
+        this[this.selected[singular]]?.path &&
+        this[this.selected[singular]].class.has(singular, `0`)
+      ) {
+        return this[this.selected[singular]].class[singular]('0')
       }
       return miscClass.misc('0')
     } catch (e) {
@@ -553,6 +591,16 @@ export class UAssets {
     } catch (e) {
       console.error(`[${this.assetType.toUpperCase()}]`, e)
       return `${this.fallback}/spawnpoint/0.${this.fallbackExt}`
+    }
+  }
+
+  /** @param {boolean} [active] */
+  getStation(active = false) {
+    try {
+      return this[this.selected.station]?.class?.station(active)
+    } catch (e) {
+      console.error(`[${this.assetType.toUpperCase()}]`, e)
+      return `${this.fallback}/station/0.${this.fallbackExt}`
     }
   }
 }

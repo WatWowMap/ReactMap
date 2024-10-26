@@ -3,7 +3,7 @@
 /* eslint-disable import/no-extraneous-dependencies */
 
 const { defineConfig, loadEnv, createLogger } = require('vite')
-const { default: react } = require('@vitejs/plugin-react')
+const { default: react } = require('@vitejs/plugin-react-swc')
 const { default: checker } = require('vite-plugin-checker')
 const removeFiles = require('rollup-plugin-delete')
 const { resolve } = require('path')
@@ -11,7 +11,7 @@ const fs = require('fs')
 const { sentryVitePlugin } = require('@sentry/vite-plugin')
 
 const config = require('@rm/config')
-const { log, HELPERS } = require('@rm/logger')
+const { log, TAGS } = require('@rm/logger')
 const { locales, status } = require('@rm/locales')
 const {
   faviconPlugin,
@@ -48,12 +48,12 @@ const viteConfig = defineConfig(({ mode }) => {
   })(resolve(__dirname, 'src'))
 
   if (mode === 'production') {
-    log.info(HELPERS.build, `Building production version: ${version}`)
+    log.info(TAGS.build, `Building production version: ${version}`)
   }
 
   if (env.GOOGLE_ANALYTICS_ID) {
     log.warn(
-      HELPERS.build,
+      TAGS.build,
       'The .env file has been deprecated, please move your Google Analytics ID to your config file as this functionality will be removed in the future.',
     )
   }
@@ -70,9 +70,7 @@ const viteConfig = defineConfig(({ mode }) => {
 
   return {
     plugins: [
-      react({
-        jsxRuntime: 'classic',
-      }),
+      react(),
       ...(isDevelopment
         ? [
             checker({
@@ -126,7 +124,14 @@ const viteConfig = defineConfig(({ mode }) => {
           hasCustom,
           title: config.getSafe('map.general.headerTitle'),
         },
-        sentry: { client: sentry },
+        sentry: {
+          client: {
+            enabled: sentry.enabled,
+            dsn: sentry.dsn,
+            tracesSampleRate: sentry.tracesSampleRate,
+            debug: sentry.debug,
+          },
+        },
         googleAnalyticsId:
           config.getSafe('googleAnalyticsId') || env.GOOGLE_ANALYTICS_ID || '',
         map: {
@@ -135,6 +140,10 @@ const viteConfig = defineConfig(({ mode }) => {
             startLon: config.getSafe('map.general.startLon'),
             startZoom: config.getSafe('map.general.startZoom'),
           },
+          theme: config.getSafe('map.theme'),
+        },
+        api: {
+          polling: config.getSafe('api.polling'),
         },
       },
     },
@@ -179,10 +188,10 @@ const viteConfig = defineConfig(({ mode }) => {
     logLevel: viteLogLevel,
     customLogger: {
       ...defaultLogger,
-      error: (message) => log.error(HELPERS.build, message),
-      warn: (message) => log.warn(HELPERS.build, message),
-      info: (message) => log.info(HELPERS.build, message),
-      // debug: (message) => log.debug(HELPERS.build, message),
+      error: (message) => log.error(TAGS.build, message),
+      warn: (message) => log.warn(TAGS.build, message),
+      info: (message) => log.info(TAGS.build, message),
+      // debug: (message) => log.debug(TAGS.build, message),
     },
     server: {
       host: '0.0.0.0',

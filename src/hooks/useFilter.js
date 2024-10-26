@@ -1,3 +1,5 @@
+// @ts-check
+
 import { useTranslation } from 'react-i18next'
 
 import { useMemory } from '@store/useMemory'
@@ -12,6 +14,13 @@ const filteringPokemon = [
   'quest_reward_12',
 ]
 
+/**
+ *
+ * @param {string} category
+ * @param {string} webhookCategory
+ * @param {string[]} reqCategories
+ * @returns
+ */
 export function useFilter(category, webhookCategory, reqCategories) {
   const { t } = useTranslation()
   const tempFilters = webhookCategory
@@ -26,6 +35,7 @@ export function useFilter(category, webhookCategory, reqCategories) {
     auth: { perms },
     masterfile: { pokemon },
     menuFilters,
+    menus: { [category]: staticMenus },
   } = useMemory.getState()
   const menus = useStorage((s) => s.menus[category].filters)
   const {
@@ -114,7 +124,7 @@ export function useFilter(category, webhookCategory, reqCategories) {
     }
   }
 
-  const c = reqCategories ?? Object.keys(menuFilters)
+  const c = reqCategories ?? (staticMenus?.categories || [])
 
   c.forEach((subCategory) => {
     Object.entries(menuFilters[subCategory] || {}).forEach(([id, item]) => {
@@ -129,7 +139,6 @@ export function useFilter(category, webhookCategory, reqCategories) {
           (item.name.endsWith('*') && category === item.category)
         ) {
           count.total += 1
-          item.id = id
           switch (switchKey) {
             case 'all':
               addItem(id)

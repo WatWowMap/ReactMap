@@ -1,3 +1,5 @@
+// @ts-check
+
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import TabContext from '@mui/lab/TabContext'

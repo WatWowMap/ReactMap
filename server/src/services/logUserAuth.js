@@ -1,6 +1,6 @@
 // @ts-check
 const { default: fetch } = require('node-fetch')
-const { log, HELPERS } = require('@rm/logger')
+const { log, TAGS } = require('@rm/logger')
 
 // PII fields inside getAuthInfo embed
 const PII_FIELDS = [
@@ -42,7 +42,7 @@ const mapPerms = (perms, userPerms) =>
  * @param {boolean} hidePii
  * @returns {Promise<import('discord.js').APIEmbed>}
  */
-async function getAuthInfo(req, user, strategy = 'custom', hidePii = false) {
+async function logUserAuth(req, user, strategy = 'custom', hidePii = false) {
   const ip =
     req.headers['cf-connecting-ip'] ||
     `${req.headers['x-forwarded-for'] || ''}`.split(', ')[0] ||
@@ -56,7 +56,7 @@ async function getAuthInfo(req, user, strategy = 'custom', hidePii = false) {
         .then((res) => res.json())
         .catch((err) => {
           log.warn(
-            HELPERS.custom(strategy, '#7289da'),
+            TAGS.custom(strategy, '#7289da'),
             'failed to fetch user information',
             err,
           )
@@ -185,7 +185,7 @@ async function getAuthInfo(req, user, strategy = 'custom', hidePii = false) {
   }
   if (user.valid) {
     log.info(
-      HELPERS.custom(strategy, '#7289da'),
+      TAGS.custom(strategy, '#7289da'),
       user.username,
       `(${user.id})`,
       'Authenticated successfully.',
@@ -194,7 +194,7 @@ async function getAuthInfo(req, user, strategy = 'custom', hidePii = false) {
   } else if (user.perms?.blocked) {
     const blockedGuilds = user.perms.blockedGuildNames.join(', ')
     log.warn(
-      HELPERS.custom(strategy, '#7289da'),
+      TAGS.custom(strategy, '#7289da'),
       user.id,
       'Blocked due to',
       blockedGuilds,
@@ -203,7 +203,7 @@ async function getAuthInfo(req, user, strategy = 'custom', hidePii = false) {
     embed.color = 0xff0000
   } else {
     log.warn(
-      HELPERS.custom(strategy, '#7289da'),
+      TAGS.custom(strategy, '#7289da'),
       user.id,
       'Not authorized to access map',
     )
@@ -216,4 +216,4 @@ async function getAuthInfo(req, user, strategy = 'custom', hidePii = false) {
   return embed
 }
 
-module.exports = getAuthInfo
+module.exports = { logUserAuth }

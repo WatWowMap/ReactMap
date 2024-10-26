@@ -22,6 +22,7 @@ import { useTranslation } from 'react-i18next'
 import { useMap } from 'react-leaflet'
 import { DomEvent } from 'leaflet'
 import CircularProgress from '@mui/material/CircularProgress'
+import { styled } from '@mui/material/styles'
 
 import { FAB_BUTTONS } from '@services/queries/config'
 import { useLocation } from '@hooks/useLocation'
@@ -33,6 +34,22 @@ import { setModeBtn, useWebhookStore } from '@store/useWebhookStore'
 import { I } from '@components/I'
 
 /** @typedef {keyof ReturnType<typeof useLayoutStore['getState']> | keyof ReturnType<typeof useScanStore['getState']>} Keys */
+
+const StyledStack = styled(Stack)(({ theme }) => ({
+  width: 50,
+  zIndex: 5000,
+  '& > *': {
+    margin: `${theme.spacing(1)} !important`,
+    position: 'sticky',
+    top: 0,
+    left: 5,
+    zIndex: 1000,
+    width: 10,
+  },
+  [theme.breakpoints.up('sm')]: {
+    width: 65,
+  },
+}))
 
 const DonationIcons = {
   dollar: AttachMoneyIcon,
@@ -122,7 +139,7 @@ export function FloatingButtons() {
   }, [])
 
   return (
-    <Stack ref={ref}>
+    <StyledStack ref={ref} justifyContent="flex-start" alignItems="flex-start">
       <Fab
         color="primary"
         size={fabSize}
@@ -263,7 +280,7 @@ export function FloatingButtons() {
           </Fab>
         ),
       )}
-    </Stack>
+    </StyledStack>
   )
 }
 

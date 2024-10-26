@@ -1,4 +1,5 @@
 import type { AdvCategories, Rarity } from '@rm/types'
+import mfjson = require('./data/masterfile.json')
 
 export interface MasterfileForm {
   name: string
@@ -75,6 +76,8 @@ export interface Masterfile {
   moves: Record<string, MasterfileMove>
   invasions: Record<string, Invasion>
   weather: Record<string, MasterfileWeather>
+  teams: (typeof mfjson)['teams']
+  raids: (typeof mfjson)['raids']
 }
 
 export declare function generate(

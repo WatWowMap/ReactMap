@@ -1,11 +1,13 @@
+// @ts-check
+
 const fs = require('fs')
 const path = require('path')
 
 fs.writeFileSync(
-  path.resolve(__dirname, '../../.configref'),
+  path.join(__dirname, '../../.configref'),
   fs
     .readFileSync(
-      path.resolve(__dirname, '../../../../server/src/configs/default.json'),
+      path.join(__dirname, '../../../../config/default.json'),
       'utf8',
     )
     .length.toString(),

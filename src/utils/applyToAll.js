@@ -14,7 +14,7 @@ export const STANDARD_BACKUP =
 
 /**
  * @template {import('@rm/types').Categories} T
- * @param {T extends 'pokemon' ? import('@rm/types/lib').PokemonFilter : import('@rm/types').BaseFilter} newFilter
+ * @param {import('@rm/types').ClientFilters<T>} newFilter
  * @param {T} category
  * @param {string[]} [selectedIds]
  * @param {boolean} [includeSlots]

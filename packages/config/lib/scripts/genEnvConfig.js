@@ -1,7 +1,9 @@
+// @ts-check
+
 const fs = require('fs')
 const { resolve } = require('path')
 
-const sourceConfig = require('../../../../server/src/configs/default.json')
+const sourceConfig = require('../../../../config/default.json')
 
 const camelToSnake = (str) =>
   str.replace(/([a-z](?=[A-Z]))/g, '$1_').toUpperCase()
@@ -27,7 +29,7 @@ const recursiveObjCheck = (obj, key = '', parentKey = '') => {
 const generateEnvConfig = async () => {
   fs.writeFileSync(
     resolve(
-      `${__dirname}/../../../../server/src/configs/custom-environment-variables.json`,
+      `${__dirname}/../../../../config/custom-environment-variables.json`,
     ),
     JSON.stringify(recursiveObjCheck(sourceConfig), null, 2),
   )

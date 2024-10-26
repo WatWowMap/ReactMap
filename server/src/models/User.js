@@ -2,7 +2,7 @@
 const { Model } = require('objection')
 const config = require('@rm/config')
 
-const { log, HELPERS } = require('@rm/logger')
+const { log, TAGS } = require('@rm/logger')
 
 class User extends Model {
   static get tableName() {
@@ -11,11 +11,11 @@ class User extends Model {
 
   static get relationMappings() {
     // eslint-disable-next-line global-require
-    const { Db } = require('../services/initialization')
+    const { state } = require('../services/state')
     return {
       badges: {
         relation: Model.HasManyRelation,
-        modelClass: Db.models.Badge,
+        modelClass: state.db.models.Badge,
         join: {
           from: `${config.getSafe('database.settings.userTableName')}.id`,
           to: `${config.getSafe('database.settings.gymBadgeTableName')}.userId`,
@@ -23,7 +23,7 @@ class User extends Model {
       },
       nestSubmissions: {
         relation: Model.HasManyRelation,
-        modelClass: Db.models.NestSubmission,
+        modelClass: state.db.models.NestSubmission,
         join: {
           from: `${config.getSafe('database.settings.userTableName')}.id`,
           to: `nest_submissions.userId`,
@@ -44,7 +44,7 @@ class User extends Model {
       .where({ [`${strategy}Id`]: userId })
       .then(() =>
         log.info(
-          HELPERS.custom(botName, '#fff2cc'),
+          TAGS.custom(botName, '#fff2cc'),
           `Cleared ${strategy} perms for user ${userId}`,
         ),
       )
@@ -71,4 +71,4 @@ class User extends Model {
   }
 }
 
-module.exports = User
+module.exports = { User }

@@ -1,3 +1,5 @@
+// @ts-check
+
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { setUser } from '@sentry/react'
@@ -28,9 +30,8 @@ export function Config({ children }) {
   const getServerSettings = async () => {
     const data = await getSettings()
 
-    if (data) {
+    if (data && !('error' in data)) {
       document.title = data?.map?.general.headerTitle || document.title
-
       analytics(
         'User',
         data.user ? `${data.user.username} (${data.user.id})` : 'Not Logged In',
@@ -66,10 +67,12 @@ export function Config({ children }) {
         data.map.general.startLat,
         data.map.general.startLon,
       ])
-      const location = updatePositionState(defaultLocation, 'location').map(
-        (x, i) =>
-          x ||
-          (i === 0 ? data.map.general.startLat : data.map.general.startLon),
+      const location = /** @type {[number, number]} */ (
+        updatePositionState(defaultLocation, 'location').map(
+          (x, i) =>
+            x ||
+            (i === 0 ? data.map.general.startLat : data.map.general.startLon),
+        )
       )
 
       const zoom = updatePositionState(data.map.general.startZoom, 'zoom')
@@ -113,7 +116,7 @@ export function Config({ children }) {
               ? JSON.parse(data.user?.data)
               : data.user?.data
             : {},
-          counts: data.authReferences || {},
+          counts: data.authReferences,
           userBackupLimits: data.database.settings.userBackupLimits || 0,
           excludeList: data.authentication.excludeList || [],
         },
@@ -132,7 +135,6 @@ export function Config({ children }) {
         polling: data.api.polling,
         settings,
         gymValidDataLimit: data.api.gymValidDataLimit,
-        tutorialExcludeList: data.authentication.excludeFromTutorial || [],
       })
 
       useStorage.setState((prev) => ({
@@ -143,13 +145,15 @@ export function Config({ children }) {
         menus: deepMerge({}, data.menus, prev.menus),
         userSettings: deepMerge({}, data.userSettings, prev.userSettings),
         settings: {
+          ...prev.settings,
           ...Object.fromEntries(
             Object.entries(settings).map(([k, v]) => [
               k,
-              data.map.misc[k] || Object.keys(v)[0],
+              prev.settings[k] in v
+                ? prev.settings[k]
+                : data.map.misc[k] || Object.keys(v)[0],
             ]),
           ),
-          ...prev.settings,
         },
         zoom: safeZoom,
         location,

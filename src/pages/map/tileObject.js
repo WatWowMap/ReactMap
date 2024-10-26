@@ -1,3 +1,5 @@
+// @ts-check
+
 import { PokemonTile as pokemon } from '@features/pokemon'
 import { PokestopTile as pokestops } from '@features/pokestop'
 import { GymTile as gyms } from '@features/gym'
@@ -11,6 +13,7 @@ import { ScanCellTile as scanCells } from '@features/scanCell'
 import { WayfarerTile as submissionCells } from '@features/wayfarer'
 import { ScanAreaTile as scanAreas } from '@features/scanArea'
 import { BaseCell as s2cells } from '@features/s2cell'
+import { StationTile as stations } from '@features/station'
 
 export const TILES = {
   devices,
@@ -26,4 +29,5 @@ export const TILES = {
   weather,
   s2cells,
   routes,
+  stations,
 }

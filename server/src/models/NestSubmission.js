@@ -1,7 +1,8 @@
 // @ts-check
 const { Model } = require('objection')
+
 const config = require('@rm/config')
-const { log, HELPERS } = require('@rm/logger')
+const { log, TAGS } = require('@rm/logger')
 
 class NestSubmission extends Model {
   static get tableName() {
@@ -14,11 +15,11 @@ class NestSubmission extends Model {
 
   static get relationMappings() {
     // eslint-disable-next-line global-require
-    const { Db } = require('../services/initialization')
+    const { state } = require('../services/state')
     return {
       user: {
         relation: Model.BelongsToOneRelation,
-        modelClass: Db.models.User,
+        modelClass: state.db.models.User,
         join: {
           from: `nest_submissions.user_id`,
           to: `${config.getSafe('database.settings.userTableName')}.id`,
@@ -72,24 +73,24 @@ class NestSubmission extends Model {
       if (nest) {
         await nest.$query().patch({ ...nestInfo, ...userInfo })
         log.info(
-          HELPERS.nests,
+          TAGS.nests,
           `Nest name updated for ${nestInfo.nest_id} from ${nest.name} to ${nestInfo.name} by ${userInfo.submitted_by} (ID: ${userInfo.user_id})`,
         )
         return true
       }
       await this.query().insert({ ...nestInfo, ...userInfo })
       log.info(
-        HELPERS.nests,
+        TAGS.nests,
         `Nest name submitted for ${nestInfo.nest_id} as ${nestInfo.name} by ${userInfo.submitted_by} (ID: ${userInfo.user_id})`,
       )
       return true
     }
     log.warn(
-      HELPERS.nests,
+      TAGS.nests,
       `Nest name submission failed for ${nestInfo.nest_id} by ${userInfo.submitted_by} (ID: ${userInfo.user_id})`,
     )
     return false
   }
 }
 
-module.exports = NestSubmission
+module.exports = { NestSubmission }

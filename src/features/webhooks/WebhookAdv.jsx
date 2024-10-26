@@ -1,3 +1,5 @@
+// @ts-check
+
 /* eslint-disable react/jsx-no-duplicate-props */
 import * as React from 'react'
 import ExpandMore from '@mui/icons-material/ExpandMore'
@@ -294,7 +296,7 @@ export function WebhookAdvanced() {
         option.options.forEach((subOption) =>
           menuItems.push(
             <MenuItem key={subOption} value={subOption} dense>
-              {subOption ? t(subOption, subOption) : t('all')}
+              {subOption ? t(subOption, subOption).toString() : t('all')}
             </MenuItem>,
           ),
         )
@@ -370,7 +372,7 @@ export function WebhookAdvanced() {
         option.options.forEach((subOption) =>
           menuItems.push(
             <MenuItem key={subOption} value={subOption} dense>
-              {t(subOption, subOption)}
+              {t(subOption, subOption).toString()}
             </MenuItem>,
           ),
         )
@@ -712,7 +714,13 @@ export function WebhookAdvanced() {
                   />
                 )}
                 renderOption={(props, x) => (
-                  <Grid container alignItems="center" rowSpacing={1} {...props}>
+                  <Grid
+                    component="li"
+                    container
+                    alignItems="center"
+                    rowSpacing={1}
+                    {...props}
+                  >
                     <Grid xs={12}>
                       <Typography variant="subtitle2">{x.name}</Typography>
                     </Grid>
@@ -818,11 +826,11 @@ export function WebhookAdvanced() {
 
   const footerOptions = React.useMemo(
     () => [
-      {
+      /** @type {import('@components/dialogs/Footer').FooterButton} */ ({
         name: 'save',
         action: () => handleClose(true, id, poracleValues),
         icon: 'Save',
-      },
+      }),
     ],
     [id, poracleValues, selectedIds],
   )

@@ -1,15 +1,14 @@
+/* eslint-disable import/order */
 // @ts-check
+const path = require('path')
+
 if (!process.env.NODE_CONFIG_DIR) {
-  process.env.NODE_CONFIG_DIR = require('path').resolve(
-    __dirname,
-    '..',
-    '..',
-    '..',
-    'server',
-    'src',
-    'configs',
-  )
+  process.env.NODE_CONFIG_DIR =
+    path.join(__dirname, '..', '..', '..', 'config') +
+    path.delimiter +
+    path.join(__dirname, '..', '..', '..', 'server', 'src', 'configs')
   process.env.ALLOW_CONFIG_MUTATIONS = 'true'
+  process.env.SUPPRESS_NO_CONFIG_WARNING = 'true'
 }
 
 if (process.env.NODE_CONFIG_ENV) {
@@ -21,24 +20,60 @@ if (process.env.NODE_CONFIG_ENV) {
   }
 }
 
+const { setGlobalLogLevel, TAGS, log } = require('@rm/logger')
+const { applyMutations } = require('./mutations')
+
+function purge() {
+  Object.keys(require.cache).forEach((fileName) => {
+    if (fileName.indexOf(process.env.NODE_CONFIG_DIR) === -1) {
+      return
+    }
+    delete require.cache[fileName]
+  })
+  delete require.cache[require.resolve('config')]
+  delete require.cache[require.resolve('@rm/config')]
+}
+
 const config = require('config')
 
-config.getSafe = config.get
+config.getSafe = function getSafe(key) {
+  return require('config').get(key)
+}
 
-config.getMapConfig = (req) => {
+setGlobalLogLevel(config.getSafe('devOptions.logLevel'))
+
+config.reload = function reload() {
+  try {
+    purge()
+    log.info(TAGS.config, 'config purged, returning old reference')
+    return this
+  } catch (e) {
+    log.error(TAGS.config, 'error reloading config', e)
+    return this
+  }
+}
+
+config.getMapConfig = function getMapConfig(req) {
   const domain = /** @type {const} */ (
     `multiDomainsObj.${req.headers.host.replaceAll('.', '_')}`
   )
-  return config.has(domain) ? config.getSafe(domain) : config.getSafe('map')
+  return this.has(domain) ? this.getSafe(domain) : this.getSafe('map')
 }
 
-config.getAreas = (req, key) => {
+config.getAreas = function getAreas(req, key) {
   const location = /** @type {const} */ (
     `areas.${key}.${req.headers.host.replaceAll('.', '_')}`
   )
-  return config.has(location)
-    ? config.getSafe(location)
-    : config.getSafe(`areas.${key}.main`)
+  return this.has(location)
+    ? this.getSafe(location)
+    : this.getSafe(`areas.${key}.main`)
 }
+
+config.setAreas = function setAreas(newAreas) {
+  log.info(TAGS.config, 'updating areas')
+  this.areas = newAreas
+}
+
+applyMutations(config)
 
 module.exports = config

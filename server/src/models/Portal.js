@@ -2,10 +2,7 @@
 const { Model } = require('objection')
 const config = require('@rm/config')
 
-const getAreaSql = require('../services/functions/getAreaSql')
-
-const { searchResultsLimit, portalUpdateLimit, queryLimits } =
-  config.getSafe('api')
+const { getAreaSql } = require('../utils/getAreaSql')
 
 class Portal extends Model {
   static get tableName() {
@@ -21,6 +18,8 @@ class Portal extends Model {
    */
   // eslint-disable-next-line no-unused-vars
   static async getAll(perms, args, _ctx) {
+    const { portalUpdateLimit, queryLimits } = config.getSafe('api')
+
     const { areaRestrictions } = perms
     const {
       filters: { onlyAreas = [] },
@@ -49,12 +48,14 @@ class Portal extends Model {
    * @param {object} args
    * @param {import("@rm/types").DbContext} context
    * @param {ReturnType<typeof import('objection').raw>} distance
-   * @param {ReturnType<typeof import("server/src/services/functions/getBbox").getBboxFromCenter>} bbox
+   * @param {ReturnType<typeof import("server/src/utils/getBbox").getBboxFromCenter>} bbox
    * @returns {Promise<import("@rm/types").FullPortal[]>}
    */
   static async search(perms, args, { isMad }, distance, bbox) {
     const { areaRestrictions } = perms
     const { onlyAreas = [], search = '' } = args
+    const { searchResultsLimit, portalUpdateLimit } = config.getSafe('api')
+
     const query = this.query()
       .select(['name', 'id', 'lat', 'lon', 'url', distance])
       .whereILike('name', `%${search}%`)
@@ -83,4 +84,4 @@ class Portal extends Model {
   }
 }
 
-module.exports = Portal
+module.exports = { Portal }

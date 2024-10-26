@@ -32,11 +32,11 @@ export function MultiSelector({ items, value, disabled, onClick, tKey }) {
 
 /**
  * @template {import('@store/useStorage').UseStoragePaths} T
- * @template {import('@rm/types').ConfigPathValue<import('@store/useStorage').UseStorage, T>} V
+ * @template {import('@rm/types').ObjectPathValue<import('@store/useStorage').UseStorage, T>} V
  * @param {{
  *  field: T,
  *  defaultValue?: V,
- *  onClick?: (oldValue: ReturnType<typeof useDeepStore>[0], newValue: V) => void
+ *  onClick?: (oldValue: V, newValue: V) => void
  *  allowNone?: boolean
  * } & Omit<import('@rm/types').MultiSelectorProps<V>, 'value' | 'onClick'>} props
  * @returns
@@ -50,7 +50,7 @@ export function MultiSelectorStore({
 }) {
   const [value, setValue] = useDeepStore(field, defaultValue)
 
-  /** @type {(o: typeof value, n: V) => import('@mui/material').ButtonProps['onClick']} */
+  /** @type {(o: V, n: V) => import('@mui/material').ButtonProps['onClick']} */
   const onClickWrapper = React.useCallback(
     (oldValue, newValue) => () => {
       // @ts-ignore // TODO: fix this

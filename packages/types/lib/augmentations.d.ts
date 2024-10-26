@@ -1,12 +1,17 @@
 import { Request } from 'express'
 import type { ButtonProps } from '@mui/material'
 
-import { Config, GetSafeConfig } from './config'
+import { Config, ConfigAreas, GetSafeConfig } from './config'
 import { ExpressUser, Permissions } from './server'
 
 declare module 'config' {
   interface IConfig extends Config {
     getSafe: GetSafeConfig
+    /**
+     * Due to the complexity of how the config package is cached, it's better to return the old config with this method and get the new config with a separate `require` call.
+     * @returns The old config object.
+     */
+    reload: () => IConfig
     getMapConfig: (request: Request) => Config['map']
     getAreas: <T extends 'scanAreas' | 'scanAreasMenu'>(
       request: Request,
@@ -14,12 +19,19 @@ declare module 'config' {
     ) => T extends 'scanAreas'
       ? Config['areas']['scanAreas'][string]
       : Config['areas']['scanAreasMenu'][string]
+    setAreas: (newAreas: ConfigAreas) => void
   }
 }
 
 declare global {
   namespace Express {
     interface User extends ExpressUser {}
+  }
+}
+
+declare module 'express-session' {
+  interface SessionData {
+    tutorial: boolean
   }
 }
 
@@ -58,9 +70,12 @@ declare module 'express-session' {
   }
 }
 
-// TODO
-// declare module '@mui/material/Button' {
-//   interface ExtendButtonTypeMap {
-//     bgcolor?: string
-//   }
-// }
+declare module 'http' {
+  interface IncomingMessage {
+    bodySize?: number
+  }
+}
+
+declare module 'ohbem' {
+  export = Ohbem
+}
