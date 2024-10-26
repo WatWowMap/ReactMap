@@ -106,19 +106,10 @@ type Invasion {
   slot_3_form: Int
 }
 
-type ShowcaseEntry {
-  rank: Int
-  pokemon_id: Int
-  form: Int
-  costume: Int
-  gender: Int
-  score: Float
-}
-
 type ShowcaseDetails {
   total_entries: Int
   last_update: Int
-  contest_entries: [ShowcaseEntry]
+  contest_entries: [JSON]
 }
 
 type Event {

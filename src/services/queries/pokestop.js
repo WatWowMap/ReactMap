@@ -84,14 +84,7 @@ const event = gql`
       showcase_rankings {
         total_entries
         last_update
-        contest_entries {
-          rank
-          pokemon_id
-          form
-          costume
-          gender
-          score
-        }
+        contest_entries
       }
     }
   }
