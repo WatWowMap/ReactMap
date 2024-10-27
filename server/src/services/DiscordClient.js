@@ -143,12 +143,12 @@ class DiscordClient extends AuthClient {
         Object.keys(this.perms).forEach((key) => (perms[key] = true))
         perms.admin = true
         config.getSafe('webhooks').forEach((x) => permSets.webhooks.add(x.name))
-        Object.keys(scanner).forEach(
-          (x) => {
-            if (scanner[x]?.enabled) {
-              permSets.scanner.add(x)
-              perms.scannerCooldowns[x] = 0
-            }})
+        Object.keys(scanner).forEach((x) => {
+          if (scanner[x]?.enabled) {
+            permSets.scanner.add(x)
+            perms.scannerCooldowns[x] = 0
+          }
+        })
         this.log.debug(
           `User ${user.username} (${user.id}) in allowed users list, skipping guild and role check.`,
         )
