@@ -1,3 +1,10 @@
+## [1.35.1-develop.1](https://github.com/WatWowMap/ReactMap/compare/v1.35.0...v1.35.1-develop.1) (2024-11-06)
+
+
+### Bug Fixes
+
+* showcase new fields not passed to client ([518fd5a](https://github.com/WatWowMap/ReactMap/commit/518fd5ab617e3c58ce3cc6fda432a2646c9fbb0c))
+
 # [1.35.0](https://github.com/WatWowMap/ReactMap/compare/v1.34.0...v1.35.0) (2024-09-24)
 
 
