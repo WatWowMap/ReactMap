@@ -11,10 +11,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4.1.1
       - name: Set .gitsha
-        if: github.event_name == 'push'
         run: 'echo ${{ github.sha }} > .gitsha'
       - name: Set .gitref
-        if: github.event_name == 'push'
         run: 'echo ${{ github.ref }} > .gitref'
 
       - name: Log in to the Container registry
