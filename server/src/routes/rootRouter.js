@@ -102,7 +102,7 @@ rootRouter.post('/api/error/client', async (req, res) => {
   }
 })
 
-rootRouter.get('/area/:area/:zoom?', (req, res) => {
+rootRouter.get(['/area/:area', '/area/:area/:zoom'], (req, res) => {
   const { area, zoom } = req.params
   try {
     const validScanAreas = config.getAreas(req, 'scanAreas')
