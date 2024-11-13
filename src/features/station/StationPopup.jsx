@@ -282,7 +282,7 @@ function StationMedia({
 }) {
   const { t } = useTranslateById()
   const stationImage = useMemory((s) =>
-    s.Icons.getStation(start_time < Date.now() / 1000)
+    s.Icons.getStation(start_time < Date.now() / 1000),
   )
   const battle_end_time =
     battle_end == end_time && battle_end > Date.now() / 1000 + 60 * 60
