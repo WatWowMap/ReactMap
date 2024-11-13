@@ -815,5 +815,8 @@
   "dynamic_opacity": "Dynamic Opacity",
   "tooltips": "Tooltips",
   "markers": "Markers",
-  "filters": "Filters"
+  "filters": "Filters",
+  "active": "Active",
+  "inactive": "Inactive",
+  "bread_time_window": "You can take on Max Battles between 6AM and 9PM."
 }
