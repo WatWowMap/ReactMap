@@ -50,15 +50,13 @@ export function StationPopup(station) {
 
   return (
     <Card sx={{ width: 200 }} elevation={0}>
-      <Box
-        display="flex"
-        alignItems="center"
-        justifyContent="space-evenly"
-      >
+      <Box display="flex" alignItems="center" justifyContent="space-evenly">
         <StationHeader {...station} />
         <StationMenu {...station} />
       </Box>
-      {!!station.battle_level && station.battle_end > Date.now() / 1000 && <StationRating {...station} />}
+      {!!station.battle_level && station.battle_end > Date.now() / 1000 && (
+        <StationRating {...station} />
+      )}
       <StationMedia {...station} />
       {!!station.is_battle_available &&
         station.battle_start < Date.now() / 1000 &&
@@ -76,7 +74,7 @@ export function StationPopup(station) {
               <StationMons {...station} />
             </CollapseWithState>
           </ExpandCollapse>
-      )}
+        )}
       <StationContent {...station} />
       <Footer lat={station.lat} lon={station.lon} />
       <ExtraInfo {...station} />
@@ -117,8 +115,12 @@ function StationRating({
 }) {
   const { t } = useTranslation()
   const isStarting = battle_start > Date.now() / 1000
-  const battle_start_time = (battle_start == start_time) ? battle_start + 60 * 60 : battle_start
-  const battle_end_time = ((battle_end == end_time) && (battle_end > Date.now() / 1000 + 60 * 60)) ? battle_end - 60 * 60 * 8 : battle_end
+  const battle_start_time =
+    battle_start == start_time ? battle_start + 60 * 60 : battle_start
+  const battle_end_time =
+    battle_end == end_time && battle_end > Date.now() / 1000 + 60 * 60
+      ? battle_end - 60 * 60 * 8
+      : battle_end
   const epoch = isStarting ? battle_start_time : battle_end_time
   return (
     <CardContent sx={{ p: 0, py: 1 }}>
@@ -134,7 +136,7 @@ function StationRating({
             <Typography variant="caption" align="center">
               {t('bread_time_window')}
             </Typography>
-        )}
+          )}
       </Stack>
     </CardContent>
   )
@@ -175,7 +177,8 @@ const ExtraInfo = ({ updated, lat, lon }) => {
   return (
     <Collapse in={open} timeout="auto" unmountOnExit sx={{ width: '100%' }}>
       <Grid container alignItems="center" justifyContent="center">
-        &nbsp;{t('last_seen')}:<br />{dateFormatter.format(new Date(updated * 1000))}
+        &nbsp;{t('last_seen')}:<br />
+        {dateFormatter.format(new Date(updated * 1000))}
       </Grid>
     </Collapse>
   )
@@ -278,8 +281,13 @@ function StationMedia({
   end_time,
 }) {
   const { t } = useTranslateById()
-  const stationImage = useMemory((s) => s.Icons.getStation(start_time < Date.now() / 1000))
-  const battle_end_time = ((battle_end == end_time) && (battle_end > Date.now() / 1000 + 60 * 60)) ? battle_end - 60 * 60 * 8 : battle_end
+  const stationImage = useMemory((s) =>
+    s.Icons.getStation(start_time < Date.now() / 1000)
+  )
+  const battle_end_time =
+    battle_end == end_time && battle_end > Date.now() / 1000 + 60 * 60
+      ? battle_end - 60 * 60 * 8
+      : battle_end
   const types = useMemory((s) => {
     if (!battle_pokemon_id) return []
     const poke = s.masterfile.pokemon[battle_pokemon_id]
@@ -455,9 +463,7 @@ function StationTimeStamp({ start = false, epoch, ...props }) {
 
   return (
     <Typography variant="subtitle2" {...props}>
-      {start
-        ? t('active')
-        : t('inactive')}
+      {start ? t('active') : t('inactive')}
       &nbsp;
       {relativeTime}
     </Typography>
