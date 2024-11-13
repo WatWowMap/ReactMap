@@ -771,5 +771,8 @@
   "spawnpoint_audio": "Son de point d’apparition",
   "team_audio": "Son d’équipe",
   "type_audio": "Son de type",
-  "weather_audio": "Son de météo"
+  "weather_audio": "Son de météo",
+  "active": "Actif",
+  "inactive": "Inactif",
+  "bread_time_window": "Tu peux participer à des Combats Dynamax entre 6h et 21h."
 }
