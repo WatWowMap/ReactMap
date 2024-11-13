@@ -446,7 +446,8 @@ class DbManager extends Logger {
       case 'Pokestop':
       case 'Portal':
       case 'Route':
-        max = Infinity
+      case 'Station':
+        max = 22222
         break
       default:
         break
