@@ -617,5 +617,6 @@
   "show_editor": "Mostrar Editor",
   "hide_editor": "Ocultar Editor",
   "reported_error": "Este error ha sido reportado al servidor con el identificador",
-  "dark_mode": "Modo Oscuro"
+  "dark_mode": "Modo Oscuro",
+  "bread_time_window": "Puedes acceder a los Combates Max de 6h a 21h."
 }
