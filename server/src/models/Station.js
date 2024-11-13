@@ -164,7 +164,7 @@ class Station extends Model {
     const results = await this.query()
       .distinct(['battle_pokemon_id', 'battle_pokemon_form', 'battle_level'])
       .where('is_inactive', false)
-      .andWhere('end_time', '>', ts)
+      .andWhere('battle_end', '>', ts)
       .groupBy(['battle_pokemon_id', 'battle_pokemon_form', 'battle_level'])
       .orderBy('battle_pokemon_id', 'asc')
     return {
