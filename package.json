@@ -1,6 +1,6 @@
 {
   "name": "reactmap",
-  "version": "1.35.1-develop.1",
+  "version": "1.35.1-develop.2",
   "private": true,
   "description": "React based frontend map.",
   "license": "MIT",
@@ -139,7 +139,7 @@
     "discord.js": "14.15.3",
     "dlv": "^1.1.3",
     "dotenv": "^16.3.1",
-    "express": "4.21.0",
+    "express": "5.0.1",
     "express-mysql-session": "3.0.3",
     "express-rate-limit": "7.4.0",
     "express-session": "1.18.0",

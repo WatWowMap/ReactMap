@@ -1,3 +1,10 @@
+## [1.35.1-develop.2](https://github.com/WatWowMap/ReactMap/compare/v1.35.1-develop.1...v1.35.1-develop.2) (2024-11-13)
+
+
+### Bug Fixes
+
+* available max pokemon battles ([f1a296c](https://github.com/WatWowMap/ReactMap/commit/f1a296c6eb3d24126baec745d216c3ff5fde7a72))
+
 ## [1.35.1-develop.1](https://github.com/WatWowMap/ReactMap/compare/v1.35.0...v1.35.1-develop.1) (2024-11-06)
 
 
