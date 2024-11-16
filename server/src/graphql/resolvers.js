@@ -419,20 +419,22 @@ const resolvers = {
         case 'gyms': {
           if (!perms.gyms) return []
           const results = await Db.search('Gym', perms, args)
-          const webhook = Event.webhookObj[req.user.selectedWebhook]
-          if (webhook?.nominatimUrl && results.length) {
-            const withFormatted = await Promise.all(
-              results.map(async (result) => ({
-                ...result,
-                formatted: await geocoder(
-                  webhook.nominatimUrl,
-                  { lat: result.lat, lon: result.lon },
-                  true,
-                  webhook.addressFormat,
-                ),
-              })),
-            )
-            return withFormatted
+          if (req.user?.selectedWebhook) {
+            const webhook = Event.webhookObj[req.user.selectedWebhook]
+            if (webhook?.nominatimUrl && results.length) {
+              const withFormatted = await Promise.all(
+                results.map(async (result) => ({
+                  ...result,
+                  formatted: await geocoder(
+                    webhook.nominatimUrl,
+                    { lat: result.lat, lon: result.lon },
+                    true,
+                    webhook.addressFormat,
+                  ),
+                })),
+              )
+              return withFormatted
+            }
           }
           return results
         }
