@@ -1,6 +1,6 @@
 /* eslint-disable no-fallthrough */
 // @ts-check
-import { useEffect, useMemo, useRef } from 'react'
+import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 
 /**
@@ -14,11 +14,6 @@ import { useTranslation } from 'react-i18next'
  */
 export function useTranslateById(options = {}) {
   const i18n = useTranslation()
-  const formsToIgnore = useRef(new Set([i18n.t('form_0'), i18n.t('form_45')]))
-
-  useEffect(() => {
-    formsToIgnore.current = new Set([i18n.t('form_0'), i18n.t('form_45')])
-  }, [i18n.i18n.language])
 
   return useMemo(
     () => ({
@@ -114,11 +109,9 @@ export function useTranslateById(options = {}) {
             // pokemon
             const [pokemon, form] = id.split('-', 2)
             const pokemonName = i18n.t(`poke_${pokemon}`)
-            const possibleForm = i18n.t(`form_${form}`)
-            const formName = formsToIgnore.current.has(possibleForm)
-              ? ''
-              : `${newLine ? '\n' : ' '}(${possibleForm})`
-            return `${pokemonName}${formName}`
+            return form === undefined
+              ? pokemonName
+              : `${pokemonName}${newLine ? '\n' : ' '}(${i18n.t(`form_${form}`)})`
           }
         }
       },
