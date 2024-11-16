@@ -1,3 +1,13 @@
+## [1.35.1-develop.3](https://github.com/WatWowMap/ReactMap/compare/v1.35.1-develop.2...v1.35.1-develop.3) (2024-11-16)
+
+
+### Bug Fixes
+
+* add station to excluded list ([8801d28](https://github.com/WatWowMap/ReactMap/commit/8801d28be85cc343844726eaef3cf355858f1f86))
+* do not set unset form on quest pokemon without display ([7356529](https://github.com/WatWowMap/ReactMap/commit/73565292b8fb520a4d46ae558fa4f0e9dbf09832))
+* no more hard limits for pois ([b2efc1e](https://github.com/WatWowMap/ReactMap/commit/b2efc1e98f3f2593e2b900e9dae1e25a19aef25f)), closes [#956](https://github.com/WatWowMap/ReactMap/issues/956)
+* search while not logged in ([9ddffcd](https://github.com/WatWowMap/ReactMap/commit/9ddffcde053059912c7ac6fa5752a1a554f3e7d6))
+
 ## [1.35.1-develop.2](https://github.com/WatWowMap/ReactMap/compare/v1.35.1-develop.1...v1.35.1-develop.2) (2024-11-13)
 
 
