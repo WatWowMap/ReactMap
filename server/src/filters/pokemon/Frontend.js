@@ -36,7 +36,7 @@ class PokemonFilter extends BaseFilter {
     this.atk_iv = atk || [0, 15]
     this.def_iv = def || [0, 15]
     this.sta_iv = sta || [0, 15]
-    this.level = level || [1, 35]
+    this.level = level || [1, 50]
     this.cp = cp || [10, 5000]
     this.gender = gender || 0
     this.xxs = xxs || false
