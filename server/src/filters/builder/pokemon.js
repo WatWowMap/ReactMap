@@ -34,6 +34,7 @@ function buildPokemon(defaults, base, custom) {
   ])
 
   Object.entries(state.event.masterfile.pokemon).forEach(([id, pkmn]) => {
+    pokemon.quests[`${id}`] = new BaseFilter(defaults.pokestops.pokemon)
     Object.keys(pkmn.forms).forEach((form) => {
       pokemon.full[`${id}-${form}`] = base
       pokemon.raids[`${id}-${form}`] = new BaseFilter(defaults.gyms.pokemon)
