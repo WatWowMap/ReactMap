@@ -48,7 +48,7 @@ export function useStationMarker({
   }, basicEqualFn)
   const [stationMod, battleMod] = Icons.getModifiers('station', 'dynamax')
   const opacity = useOpacity('stations')(end_time)
-  const isActive = start_time < Date.now() / 1000
+  const isActive = !!battle_pokemon_id && start_time < Date.now() / 1000
 
   return divIcon({
     popupAnchor: [
