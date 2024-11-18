@@ -35,6 +35,7 @@ class Station extends Model {
       'start_time',
       'end_time',
       'total_stationed_pokemon',
+      'total_stationed_gmax',
     ]
 
     const query = this.query()

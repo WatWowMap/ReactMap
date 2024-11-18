@@ -275,6 +275,7 @@ type Station {
   end_time: Int
   cooldown_complete: Int
   total_stationed_pokemon: Int
+  total_stationed_gmax: Int
   is_battle_available: Boolean
   is_inactive: Boolean
   battle_level: Int
