@@ -1,3 +1,10 @@
+## [1.35.1-develop.4](https://github.com/WatWowMap/ReactMap/compare/v1.35.1-develop.3...v1.35.1-develop.4) (2024-11-18)
+
+
+### Bug Fixes
+
+* undo unnecessary changes ([11531c7](https://github.com/WatWowMap/ReactMap/commit/11531c7ae4d823048045af7299752336351793ae))
+
 ## [1.35.1-develop.3](https://github.com/WatWowMap/ReactMap/compare/v1.35.1-develop.2...v1.35.1-develop.3) (2024-11-16)
 
 
