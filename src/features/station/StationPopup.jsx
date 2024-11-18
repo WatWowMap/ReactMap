@@ -5,7 +5,6 @@ import { useTranslation } from 'react-i18next'
 import Card from '@mui/material/Card'
 import CardMedia from '@mui/material/CardMedia'
 import CardContent from '@mui/material/CardContent'
-import CardActions from '@mui/material/CardActions'
 import CardHeader from '@mui/material/CardHeader'
 import Collapse from '@mui/material/Collapse'
 import ExpandMore from '@mui/icons-material/ExpandMore'
@@ -169,7 +168,7 @@ const Footer = ({ lat, lon }) => {
 }
 
 /** @param {import('@rm/types').Station} props */
-const ExtraInfo = ({ updated, lat, lon }) => {
+const ExtraInfo = ({ updated }) => {
   const open = useStorage((s) => s.popups.extras)
   const { t } = useTranslation()
   const dateFormatter = useFormatStore((s) => s.dateFormat)
@@ -267,7 +266,6 @@ function StationMenu({
 
 /** @param {import('@rm/types').Station} props */
 function StationMedia({
-  is_battle_available,
   battle_pokemon_id,
   battle_pokemon_form,
   battle_pokemon_alignment,
@@ -459,7 +457,6 @@ function LiveTimeStamp({ start = false, epoch, ...props }) {
 function StationTimeStamp({ start = false, epoch, ...props }) {
   const { t } = useTranslation()
   const relativeTime = useRelativeTimer(epoch || 0)
-  const pastTense = epoch * 1000 < Date.now()
 
   return (
     <Typography variant="subtitle2" {...props}>
