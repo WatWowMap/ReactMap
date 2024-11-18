@@ -22,8 +22,13 @@ class Station extends Model {
   static async getAll(perms, args, { isMad }) {
     const { areaRestrictions } = perms
     const { stationUpdateLimit } = config.getSafe('api')
-    const { onlyAreas, onlyAllStations, onlyMaxBattles, onlyBattleTier } =
-      args.filters
+    const {
+      onlyAreas,
+      onlyAllStations,
+      onlyMaxBattles,
+      onlyBattleTier,
+      onlyGmaxStationed,
+    } = args.filters
     const ts = getEpoch()
 
     const select = [
@@ -34,8 +39,6 @@ class Station extends Model {
       'updated',
       'start_time',
       'end_time',
-      'total_stationed_pokemon',
-      'total_stationed_gmax',
     ]
 
     const query = this.query()
@@ -49,7 +52,7 @@ class Station extends Model {
       )
     // .where('is_inactive', false)
 
-    if (perms.dynamax && onlyMaxBattles) {
+    if (perms.dynamax && (onlyMaxBattles || onlyGmaxStationed)) {
       select.push(
         'is_battle_available',
         'battle_level',
@@ -63,45 +66,51 @@ class Station extends Model {
         'battle_pokemon_bread_mode',
         'battle_pokemon_move_1',
         'battle_pokemon_move_2',
+        'total_stationed_pokemon',
+        'total_stationed_gmax',
       )
 
       if (!onlyAllStations) {
         query.whereNotNull('battle_pokemon_id').andWhere('battle_end', '>', ts)
 
-        if (onlyBattleTier === 'all') {
-          const battleBosses = new Set()
-          const battleForms = new Set()
-          const battleLevels = new Set()
+        query.andWhere((station) => {
+          station.where((battle) => {
+            if (onlyBattleTier === 'all') {
+              const battleBosses = new Set()
+              const battleForms = new Set()
+              const battleLevels = new Set()
 
-          Object.keys(args.filters).forEach((key) => {
-            switch (key.charAt(0)) {
-              case 'o':
-                break
-              case 'j':
-                battleLevels.add(key.slice(1))
-                break
-              default:
-                {
-                  const [id, form] = key.split('-')
-                  if (id) battleBosses.add(id)
-                  if (form) battleForms.add(form)
+              Object.keys(args.filters).forEach((key) => {
+                switch (key.charAt(0)) {
+                  case 'o':
+                    break
+                  case 'j':
+                    battleLevels.add(key.slice(1))
+                    break
+                  default:
+                    {
+                      const [id, form] = key.split('-')
+                      if (id) battleBosses.add(id)
+                      if (form) battleForms.add(form)
+                    }
+                    break
                 }
-                break
+              })
+              if (battleBosses.size) {
+                battle.andWhere('battle_pokemon_id', 'in', [...battleBosses])
+              }
+              if (battleForms.size) {
+                battle.andWhere('battle_pokemon_form', 'in', [...battleForms])
+              }
+              if (battleLevels.size) {
+                battle.andWhere('battle_level', 'in', [...battleLevels])
+              }
+            } else {
+              battle.andWhere('battle_level', onlyBattleTier)
             }
           })
-
-          if (battleBosses.size) {
-            query.andWhere('battle_pokemon_id', 'in', [...battleBosses])
-          }
-          if (battleForms.size) {
-            query.andWhere('battle_pokemon_form', 'in', [...battleForms])
-          }
-          if (battleLevels.size) {
-            query.andWhere('battle_level', 'in', [...battleLevels])
-          }
-        } else {
-          query.andWhere('battle_level', onlyBattleTier)
-        }
+          if (onlyGmaxStationed) station.orWhere('total_stationed_gmax', '>', 0)
+        })
       }
     }
 

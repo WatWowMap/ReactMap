@@ -579,7 +579,8 @@
       "enabled": false,
       "pokemon": false,
       "battleTier": "all",
-      "battles": false
+      "battles": false,
+      "gmaxStationed": false
     },
     "s2cells": {
       "enabled": false,

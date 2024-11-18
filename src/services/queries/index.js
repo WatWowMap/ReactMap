@@ -144,7 +144,7 @@ export class Query {
   static stations(filters) {
     const { perms } = useMemory.getState().auth
     let query = 'GET_ALL_STATIONS'
-    if (filters.maxBattles && perms.dynamax) {
+    if ((filters.maxBattles || filters.gmaxStationed) && perms.dynamax) {
       query += '_BATTLE'
     }
     return stationIndex[query]
