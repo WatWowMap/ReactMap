@@ -21,6 +21,7 @@ class Station extends Model {
    */
   static async getAll(perms, args, { isMad }) {
     const { areaRestrictions } = perms
+    const { stationUpdateLimit } = config.getSafe('api')
     const { onlyAreas, onlyAllStations, onlyMaxBattles, onlyBattleTier } =
       args.filters
     const ts = getEpoch()
@@ -40,6 +41,11 @@ class Station extends Model {
       .whereBetween('lat', [args.minLat, args.maxLat])
       .andWhereBetween('lon', [args.minLon, args.maxLon])
       .andWhere('end_time', '>', ts)
+      .andWhere(
+        'updated',
+        '>',
+        Date.now() / 1000 - stationUpdateLimit * 60 * 60,
+      )
     // .where('is_inactive', false)
 
     if (perms.dynamax && onlyMaxBattles) {
@@ -161,10 +167,16 @@ class Station extends Model {
   static async getAvailable() {
     /** @type {import('@rm/types').FullStation[]} */
     const ts = getEpoch()
+    const { stationUpdateLimit } = config.getSafe('api')
     const results = await this.query()
       .distinct(['battle_pokemon_id', 'battle_pokemon_form', 'battle_level'])
       .where('is_inactive', false)
       .andWhere('battle_end', '>', ts)
+      .andWhere(
+        'updated',
+        '>',
+        Date.now() / 1000 - stationUpdateLimit * 60 * 60,
+      )
       .groupBy(['battle_pokemon_id', 'battle_pokemon_form', 'battle_level'])
       .orderBy('battle_pokemon_id', 'asc')
     return {
@@ -224,7 +236,7 @@ class Station extends Model {
       .andWhere(
         'updated',
         '>',
-        Date.now() / 1000 - stationUpdateLimit * 60 * 60 * 24,
+        Date.now() / 1000 - stationUpdateLimit * 60 * 60,
       )
       .andWhere('end_time', '>', ts)
       .andWhere((builder) => {
@@ -235,7 +247,6 @@ class Station extends Model {
           builder.orWhere((builder2) => {
             builder2
               .whereIn('battle_pokemon_id', pokemonIds)
-              .andWhere('is_battle_available', true)
               .andWhere('battle_end', '>', ts)
           })
         }

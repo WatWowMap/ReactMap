@@ -7,7 +7,10 @@ import CardMedia from '@mui/material/CardMedia'
 import CardContent from '@mui/material/CardContent'
 import CardActions from '@mui/material/CardActions'
 import CardHeader from '@mui/material/CardHeader'
+import Collapse from '@mui/material/Collapse'
+import ExpandMore from '@mui/icons-material/ExpandMore'
 import MoreVertIcon from '@mui/icons-material/MoreVert'
+import Grid from '@mui/material/Unstable_Grid2'
 import IconButton from '@mui/material/IconButton'
 import Menu from '@mui/material/Menu'
 import MenuItem from '@mui/material/MenuItem'
@@ -19,7 +22,7 @@ import LockOpenIcon from '@mui/icons-material/LockOpen'
 import LockIcon from '@mui/icons-material/Lock'
 
 import { useMemory } from '@store/useMemory'
-import { setDeepStore, useGetDeepStore } from '@store/useStorage'
+import { setDeepStore, useGetDeepStore, useStorage } from '@store/useStorage'
 import { Navigation } from '@components/popups/Navigation'
 import { useTranslateById } from '@hooks/useTranslateById'
 import { PokeType } from '@components/popups/PokeType'
@@ -47,42 +50,41 @@ export function StationPopup(station) {
 
   return (
     <Card sx={{ width: 200 }} elevation={0}>
-      <StationHeader {...station} />
-      {!!station.battle_level && <StationRating {...station} />}
-      <StationMedia {...station} />
-      {!!station.is_battle_available && (
-        <ExpandCollapse>
-          <StationAttackBonus {...station} />
-          <ExpandWithState
-            field="popups.stationExtras"
-            disabled={!station.total_stationed_pokemon}
-          />
-          <CollapseWithState
-            field="popups.stationExtras"
-            in={!!station.total_stationed_pokemon}
-          >
-            <StationMons {...station} />
-          </CollapseWithState>
-        </ExpandCollapse>
-      )}
-      <StationContent {...station} />
-      <Box
-        component={CardActions}
-        display="flex"
-        alignItems="center"
-        justifyContent="space-evenly"
-      >
-        <Navigation lat={station.lat} lon={station.lon} />
+      <Box display="flex" alignItems="center" justifyContent="space-evenly">
+        <StationHeader {...station} />
         <StationMenu {...station} />
       </Box>
+      {!!station.battle_level && station.battle_end > Date.now() / 1000 && (
+        <StationRating {...station} />
+      )}
+      <StationMedia {...station} />
+      {!!station.is_battle_available &&
+        station.battle_start < Date.now() / 1000 &&
+        station.battle_end > Date.now() / 1000 && (
+          <ExpandCollapse>
+            <StationAttackBonus {...station} />
+            <ExpandWithState
+              field="popups.stationExtras"
+              disabled={!station.total_stationed_pokemon}
+            />
+            <CollapseWithState
+              field="popups.stationExtras"
+              in={!!station.total_stationed_pokemon}
+            >
+              <StationMons {...station} />
+            </CollapseWithState>
+          </ExpandCollapse>
+        )}
+      <StationContent {...station} />
+      <Footer lat={station.lat} lon={station.lon} />
+      <ExtraInfo {...station} />
     </Card>
   )
 }
 
 /** @param {import('@rm/types').Station} props */
-function StationHeader({ name, updated }) {
+function StationHeader({ name }) {
   const { t } = useTranslation()
-  const dateFormatter = useFormatStore((s) => s.dateFormat)
 
   return (
     <CardHeader
@@ -97,21 +99,29 @@ function StationHeader({ name, updated }) {
           {name}
         </Title>
       }
-      subheader={
-        <Typography variant="caption">
-          {dateFormatter.format(new Date(updated * 1000))}
-        </Typography>
-      }
       sx={{ p: 0 }}
     />
   )
 }
 
 /** @param {import('@rm/types').Station} props */
-function StationRating({ battle_level, battle_start, battle_end }) {
+function StationRating({
+  battle_level,
+  battle_start,
+  battle_end,
+  is_battle_available,
+  start_time,
+  end_time,
+}) {
   const { t } = useTranslation()
   const isStarting = battle_start > Date.now() / 1000
-  const epoch = isStarting ? battle_start : battle_end
+  const battle_start_time =
+    battle_start == start_time ? battle_start + 60 * 60 : battle_start
+  const battle_end_time =
+    battle_end == end_time && battle_end > Date.now() / 1000 + 60 * 60
+      ? battle_end - 60 * 60 * 8
+      : battle_end
+  const epoch = isStarting ? battle_start_time : battle_end_time
   return (
     <CardContent sx={{ p: 0, py: 1 }}>
       <Stack alignItems="center" justifyContent="center">
@@ -120,8 +130,57 @@ function StationRating({ battle_level, battle_start, battle_end }) {
           {t(`max_battle_${battle_level}`)}
         </Typography>
         <LiveTimeStamp start={isStarting} epoch={epoch} variant="caption" />
+        {!is_battle_available &&
+          battle_start < Date.now() / 1000 &&
+          battle_end_time > Date.now() / 1000 && (
+            <Typography variant="caption" align="center">
+              {t('bread_time_window')}
+            </Typography>
+          )}
       </Stack>
     </CardContent>
+  )
+}
+
+/** @param {import('@rm/types').Station} props */
+const Footer = ({ lat, lon }) => {
+  const open = useStorage((s) => !!s.popups.extras)
+
+  return (
+    <Grid container xs={12} justifyContent="space-evenly" alignItems="center">
+      <Grid xs={3}>
+        <Navigation lat={lat} lon={lon} />
+      </Grid>
+      <Grid xs={3} textAlign="center">
+        <IconButton
+          className={open ? 'expanded' : 'closed'}
+          onClick={() =>
+            useStorage.setState((prev) => ({
+              popups: { ...prev.popups, extras: !open },
+            }))
+          }
+          size="large"
+        >
+          <ExpandMore />
+        </IconButton>
+      </Grid>
+    </Grid>
+  )
+}
+
+/** @param {import('@rm/types').Station} props */
+const ExtraInfo = ({ updated, lat, lon }) => {
+  const open = useStorage((s) => s.popups.extras)
+  const { t } = useTranslation()
+  const dateFormatter = useFormatStore((s) => s.dateFormat)
+
+  return (
+    <Collapse in={open} timeout="auto" unmountOnExit sx={{ width: '100%' }}>
+      <Grid container alignItems="center" justifyContent="center">
+        &nbsp;{t('last_seen')}:<br />
+        {dateFormatter.format(new Date(updated * 1000))}
+      </Grid>
+    </Collapse>
   )
 }
 
@@ -217,9 +276,18 @@ function StationMedia({
   battle_pokemon_bread_mode,
   battle_pokemon_move_1,
   battle_pokemon_move_2,
+  battle_end,
+  start_time,
+  end_time,
 }) {
   const { t } = useTranslateById()
-  const stationImage = useMemory((s) => s.Icons.getStation(true))
+  const stationImage = useMemory((s) =>
+    s.Icons.getStation(start_time < Date.now() / 1000),
+  )
+  const battle_end_time =
+    battle_end == end_time && battle_end > Date.now() / 1000 + 60 * 60
+      ? battle_end - 60 * 60 * 8
+      : battle_end
   const types = useMemory((s) => {
     if (!battle_pokemon_id) return []
     const poke = s.masterfile.pokemon[battle_pokemon_id]
@@ -229,7 +297,7 @@ function StationMedia({
     return poke?.types || []
   })
 
-  return is_battle_available ? (
+  return battle_end_time > Date.now() / 1000 ? (
     <CardMedia>
       <Box className="popup-card-media">
         <Stack className="flex-center">
@@ -307,9 +375,9 @@ function StationContent({ start_time, end_time, id }) {
     <CardContent sx={{ p: 0 }}>
       <Stack alignItems="center" justifyContent="center">
         {start_time > Date.now() / 1000 ? (
-          <LiveTimeStamp start epoch={epoch} id={id} />
+          <StationTimeStamp start epoch={epoch} id={id} />
         ) : (
-          <LiveTimeStamp epoch={epoch} id={id} />
+          <StationTimeStamp epoch={epoch} id={id} />
         )}
         <StaticTimeStamp date epoch={epoch} />
       </Stack>
@@ -379,6 +447,23 @@ function LiveTimeStamp({ start = false, epoch, ...props }) {
       {start
         ? t(pastTense ? 'started' : 'starts')
         : t(pastTense ? 'ended' : 'ends')}
+      &nbsp;
+      {relativeTime}
+    </Typography>
+  )
+}
+
+/**
+ * @param {{ start?: boolean, epoch: number } & import('@mui/material').TypographyProps} props
+ */
+function StationTimeStamp({ start = false, epoch, ...props }) {
+  const { t } = useTranslation()
+  const relativeTime = useRelativeTimer(epoch || 0)
+  const pastTense = epoch * 1000 < Date.now()
+
+  return (
+    <Typography variant="subtitle2" {...props}>
+      {start ? t('active') : t('inactive')}
       &nbsp;
       {relativeTime}
     </Typography>

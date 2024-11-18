@@ -116,7 +116,7 @@
     },
     "portalUpdateLimit": 30,
     "weatherCellLimit": 3,
-    "stationUpdateLimit": 30,
+    "stationUpdateLimit": 6,
     "searchResultsLimit": 15,
     "searchSoftKmLimit": 10,
     "searchHardKmLimit": 100,
