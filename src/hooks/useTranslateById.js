@@ -1,10 +1,10 @@
 /* eslint-disable no-fallthrough */
 // @ts-check
-import { useMemo } from 'react'
+import { useEffect, useMemo, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 
 /**
- * @typedef {{ plural?: boolean, amount?: boolean, alt?: boolean, newLine?: boolean }} CustomTOptions
+ * @typedef {{ plural?: boolean, amount?: boolean, alt?: boolean, newLine?: boolean, quest?: boolean }} CustomTOptions
  * @typedef {(id: string, options?: CustomTOptions) => string} CustomT
  */
 
@@ -14,11 +14,16 @@ import { useTranslation } from 'react-i18next'
  */
 export function useTranslateById(options = {}) {
   const i18n = useTranslation()
+  const formsToIgnore = useRef(new Set([i18n.t('form_0'), i18n.t('form_45')]))
+
+  useEffect(() => {
+    formsToIgnore.current = new Set([i18n.t('form_0'), i18n.t('form_45')])
+  }, [i18n.i18n.language])
 
   return useMemo(
     () => ({
       language: i18n.i18n.language,
-      t: (id, { plural, amount, alt, newLine } = options) => {
+      t: (id, { plural, amount, alt, newLine, quest } = options) => {
         if (typeof id !== 'string') {
           return ''
         }
@@ -105,13 +110,18 @@ export function useTranslateById(options = {}) {
           case 'f':
             // showcase mons
             id = id.slice(1)
+            quest = false
           default: {
             // pokemon
             const [pokemon, form] = id.split('-', 2)
             const pokemonName = i18n.t(`poke_${pokemon}`)
-            return form === undefined
+            const possibleForm = i18n.t(`form_${form}`)
+            const hideForm = quest
+              ? form === undefined
+              : formsToIgnore.current.has(possibleForm)
+            return hideForm
               ? pokemonName
-              : `${pokemonName}${newLine ? '\n' : ' '}(${i18n.t(`form_${form}`)})`
+              : `${pokemonName}${newLine ? '\n' : ' '}(${possibleForm})`
           }
         }
       },
