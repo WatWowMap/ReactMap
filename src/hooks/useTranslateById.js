@@ -116,9 +116,10 @@ export function useTranslateById(options = {}) {
             const [pokemon, form] = id.split('-', 2)
             const pokemonName = i18n.t(`poke_${pokemon}`)
             const possibleForm = i18n.t(`form_${form}`)
-            const hideForm = quest
-              ? form === undefined
-              : formsToIgnore.current.has(possibleForm)
+            const hideForm =
+              quest || pokemon === '51' // Dugtrio (unset) != Dugtrio (normal)
+                ? form === undefined
+                : formsToIgnore.current.has(possibleForm)
             return hideForm
               ? pokemonName
               : `${pokemonName}${newLine ? '\n' : ' '}(${possibleForm})`
