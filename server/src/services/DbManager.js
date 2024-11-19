@@ -155,6 +155,8 @@ class DbManager extends Logger {
         'showcase_pokemon_form_id' in columns,
         'showcase_pokemon_type_id' in columns,
       ])
+    const hasStationedGmax =
+      'total_stationed_gmax' in (await schema('station').columnInfo())
     const [hasLayerColumn] = isMad
       ? await schema('trs_quest')
           .columnInfo()
@@ -200,6 +202,7 @@ class DbManager extends Logger {
       hasShowcaseData,
       hasShowcaseForm,
       hasShowcaseType,
+      hasStationedGmax,
     }
   }
 

@@ -45,6 +45,7 @@ export interface DbContext {
   hasShowcaseData: boolean
   hasShowcaseForm: boolean
   hasShowcaseType: boolean
+  hasStationedGmax: boolean
 }
 
 export interface ExpressUser extends User {
