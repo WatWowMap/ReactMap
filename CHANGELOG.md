@@ -1,3 +1,10 @@
+## [1.35.1-develop.6](https://github.com/WatWowMap/ReactMap/compare/v1.35.1-develop.5...v1.35.1-develop.6) (2024-11-19)
+
+
+### Bug Fixes
+
+* always distinguish Dugtrio normal form ([91f105a](https://github.com/WatWowMap/ReactMap/commit/91f105ae011dc00187392de6bb6d2e6881308692))
+
 ## [1.35.1-develop.5](https://github.com/WatWowMap/ReactMap/compare/v1.35.1-develop.4...v1.35.1-develop.5) (2024-11-18)
 
 
