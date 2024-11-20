@@ -154,12 +154,12 @@ class Station extends Model {
           onlyAllStations ||
           (perms.dynamax &&
             ((onlyMaxBattles &&
-              (args.filters[`j${station.battle_level}`] ||
-                args.filters[
-                  `${station.battle_pokemon_id}-${station.battle_pokemon_form}`
-                ] ||
-                onlyBattleTier === 'all' ||
-                onlyBattleTier === station.battle_level)) ||
+              (onlyBattleTier === 'all'
+                ? args.filters[`j${station.battle_level}`] ||
+                  args.filters[
+                    `${station.battle_pokemon_id}-${station.battle_pokemon_form}`
+                  ]
+                : onlyBattleTier === station.battle_level)) ||
               (onlyGmaxStationed && station.total_stationed_gmax))),
       )
   }
