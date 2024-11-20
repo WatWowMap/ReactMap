@@ -368,6 +368,7 @@ export interface Station<Parsed extends boolean = false> {
   battle_pokemon_move_2: number
 
   total_stationed_pokemon: number
+  total_stationed_gmax: number
   stationed_pokemon: Parsed extends true
     ? StationPokemon[]
     : string | StationPokemon[]

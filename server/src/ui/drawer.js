@@ -68,6 +68,7 @@ function drawer(req, perms) {
         ? {
             allStations: perms.stations || BLOCKED,
             maxBattles: perms.dynamax || BLOCKED,
+            gmaxStationed: perms.dynamax || BLOCKED,
           }
         : BLOCKED,
     pokemon:

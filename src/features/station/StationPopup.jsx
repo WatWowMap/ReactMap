@@ -57,8 +57,7 @@ export function StationPopup(station) {
         <StationRating {...station} />
       )}
       <StationMedia {...station} />
-      {!!station.is_battle_available &&
-        station.battle_start < Date.now() / 1000 &&
+      {station.battle_start < Date.now() / 1000 &&
         station.battle_end > Date.now() / 1000 && (
           <ExpandCollapse>
             <StationAttackBonus {...station} />
@@ -348,7 +347,7 @@ function StationMedia({
 }
 
 /** @param {import('@rm/types').Station} station */
-function StationAttackBonus({ total_stationed_pokemon }) {
+function StationAttackBonus({ total_stationed_pokemon, total_stationed_gmax }) {
   const { t } = useTranslation()
   return (
     <Stack alignItems="center">
@@ -360,7 +359,11 @@ function StationAttackBonus({ total_stationed_pokemon }) {
         max={4}
       />
       <Typography variant="caption">
-        {t('battle_bonus')} &nbsp;({total_stationed_pokemon} / 40)
+        {t('battle_bonus')} &nbsp;(
+        {total_stationed_gmax === undefined || total_stationed_gmax === null
+          ? ''
+          : `${total_stationed_gmax} / `}
+        {total_stationed_pokemon} / 40)
       </Typography>
     </Stack>
   )
