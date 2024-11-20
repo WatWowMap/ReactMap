@@ -1332,6 +1332,10 @@
       "battles": {
         "__name": "DEFAULT_FILTERS_STATIONS_BATTLES",
         "__format": "boolean"
+      },
+      "gmaxStationed": {
+        "__name": "DEFAULT_FILTERS_STATIONS_GMAX_STATIONED",
+        "__format": "boolean"
       }
     },
     "s2cells": {
