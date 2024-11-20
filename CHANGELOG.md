@@ -1,3 +1,21 @@
+# [1.36.0-develop.1](https://github.com/WatWowMap/ReactMap/compare/v1.35.1-develop.6...v1.36.0-develop.1) (2024-11-20)
+
+
+### Bug Fixes
+
+* add en translation ([437f6b7](https://github.com/WatWowMap/ReactMap/commit/437f6b78daf848f9a0adc96b61577d428dab0b1e))
+* filtering stations without gmax column ([f5ea5fb](https://github.com/WatWowMap/ReactMap/commit/f5ea5fb020c2068a20c76a6fe2a9b0d89a485bc3))
+* no pokemon icon marker if it is not available ([be85da2](https://github.com/WatWowMap/ReactMap/commit/be85da22ad64d06c7fd02e1384b4b0478a8925ec))
+* show active battle pokemon during inactive hours ([dcb00ab](https://github.com/WatWowMap/ReactMap/commit/dcb00ab4d3addc2b0beb83858c12b858189c15f0))
+* show battle bonus when inactive ([38b563a](https://github.com/WatWowMap/ReactMap/commit/38b563a973d3a4a5b78991bbfa98f23ecf3804de))
+
+
+### Features
+
+* filter by Gigantamax Stationed ([122f7ad](https://github.com/WatWowMap/ReactMap/commit/122f7ad333f24320116409e1a4c4e01b6fb479aa))
+* initial support for total_stationed_gmax ([f4f5c33](https://github.com/WatWowMap/ReactMap/commit/f4f5c331e41a609a71d35541b00d338d2bc154eb))
+* support db without gmax count ([5a7a72a](https://github.com/WatWowMap/ReactMap/commit/5a7a72aef1012b5504766a322f2046710482b296))
+
 ## [1.35.1-develop.6](https://github.com/WatWowMap/ReactMap/compare/v1.35.1-develop.5...v1.35.1-develop.6) (2024-11-19)
 
 
