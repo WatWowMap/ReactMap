@@ -1,3 +1,11 @@
+# [1.36.0-develop.2](https://github.com/WatWowMap/ReactMap/compare/v1.36.0-develop.1...v1.36.0-develop.2) (2024-11-21)
+
+
+### Bug Fixes
+
+* further increase level cap to 55 ([9e3e0be](https://github.com/WatWowMap/ReactMap/commit/9e3e0be4f9831d94fff98c88529d3c90d9eaa249))
+* increase wild level to 50 ([38be442](https://github.com/WatWowMap/ReactMap/commit/38be442bced7c9b1f510ce45509279915b9acdac))
+
 # [1.36.0-develop.1](https://github.com/WatWowMap/ReactMap/compare/v1.35.1-develop.6...v1.36.0-develop.1) (2024-11-20)
 
 
