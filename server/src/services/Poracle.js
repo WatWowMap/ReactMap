@@ -626,7 +626,7 @@ class PoracleAPI {
                 name: 'level',
                 label: '',
                 min: 0,
-                max: 40,
+                max: 55,
                 perm: 'iv',
                 low: 'min_level',
                 high: 'max_level',
