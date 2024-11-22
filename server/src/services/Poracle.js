@@ -584,7 +584,7 @@ class PoracleAPI {
           min_iv: -1,
           max_iv: 100,
           min_level: 0,
-          max_level: 40,
+          max_level: 55,
           size: 1,
           max_size: 5,
           rarity: -1,
