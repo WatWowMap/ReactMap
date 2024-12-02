@@ -65,7 +65,7 @@ const startServer = async () => {
   app.use(
     loggerMiddleware,
     noSourceMapMiddleware,
-    express.static(distDir),
+    express.static(distDir, { dotfiles: 'allow' }),
     sessionMiddleware(),
     compression(),
     express.json({
