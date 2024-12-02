@@ -1,3 +1,10 @@
+# [1.36.0-develop.3](https://github.com/WatWowMap/ReactMap/compare/v1.36.0-develop.2...v1.36.0-develop.3) (2024-12-02)
+
+
+### Bug Fixes
+
+* allow serving dotfiles ([781e8da](https://github.com/WatWowMap/ReactMap/commit/781e8daadc1402f8544bc8f5b64af9a3a31bf2a4))
+
 # [1.36.0-develop.2](https://github.com/WatWowMap/ReactMap/compare/v1.36.0-develop.1...v1.36.0-develop.2) (2024-11-21)
 
 
