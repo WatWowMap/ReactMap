@@ -535,11 +535,7 @@ class Gym extends Model {
       .whereIn(isMad ? 'pokemon_id' : 'raid_pokemon_id', pokemonIds)
       .limit(config.getSafe('api.searchResultsLimit'))
       .orderBy('distance')
-      .andWhere(
-        isMad ? 'start' : 'raid_battle_timestamp',
-        '<=',
-        isMad ? this.knex().fn.now() : ts,
-      )
+      .andWhere('raid_pokemon_id', '>', 0)
       .andWhere(
         isMad ? 'end' : 'raid_end_timestamp',
         '>=',
