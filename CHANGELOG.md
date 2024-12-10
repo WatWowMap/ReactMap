@@ -1,3 +1,10 @@
+# [1.36.0-develop.4](https://github.com/WatWowMap/ReactMap/compare/v1.36.0-develop.3...v1.36.0-develop.4) (2024-12-10)
+
+
+### Bug Fixes
+
+* search raid before hatching ([060d4ac](https://github.com/WatWowMap/ReactMap/commit/060d4ac2e3a66bf63a433f32c851248ce3d98334))
+
 # [1.36.0-develop.3](https://github.com/WatWowMap/ReactMap/compare/v1.36.0-develop.2...v1.36.0-develop.3) (2024-12-02)
 
 
