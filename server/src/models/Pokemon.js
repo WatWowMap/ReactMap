@@ -295,7 +295,8 @@ class Pokemon extends Model {
     // form checker
     for (let i = 0; i < results.length; i += 1) {
       const pkmn = results[i]
-      const id = `${pkmn.pokemon_id}-${pkmn.form}`
+      const id =
+        pkmn.pokemon_id === 132 ? '132-0' : `${pkmn.pokemon_id}-${pkmn.form}`
       const filter = filterMap[id] || globalFilter
       let noPvp = true
 
@@ -501,12 +502,20 @@ class Pokemon extends Model {
       )
       .map((item) => {
         const filter =
-          filterMap[`${item.pokemon_id}-${item.form}`] || globalFilter
+          filterMap[
+            item.pokemon_id === 132
+              ? '132-0'
+              : `${item.pokemon_id}-${item.form}`
+          ] || globalFilter
         return filter.build(item)
       })
       .filter((pkmn) => {
         const filter =
-          filterMap[`${pkmn.pokemon_id}-${pkmn.form}`] || globalFilter
+          filterMap[
+            pkmn.pokemon_id === 132
+              ? '132-0'
+              : `${pkmn.pokemon_id}-${pkmn.form}`
+          ] || globalFilter
         return filter.valid(pkmn)
       })
   }
@@ -535,6 +544,9 @@ class Pokemon extends Model {
       'GET',
       secret,
     )
+    available.forEach((pkmn) => {
+      if (pkmn.id === 132) pkmn.form = 0
+    })
     return {
       available: available.map((pkmn) => `${pkmn.id}-${pkmn.form}`),
       rarity: Object.fromEntries(
