@@ -1,3 +1,10 @@
+# [1.36.0-develop.5](https://github.com/WatWowMap/ReactMap/compare/v1.36.0-develop.4...v1.36.0-develop.5) (2024-12-11)
+
+
+### Bug Fixes
+
+* correctly handle ditto forms ([1944f0c](https://github.com/WatWowMap/ReactMap/commit/1944f0ca0ed9dd82b6fde86d14ecbacbb33ad2b4))
+
 # [1.36.0-develop.4](https://github.com/WatWowMap/ReactMap/compare/v1.36.0-develop.3...v1.36.0-develop.4) (2024-12-10)
 
 
