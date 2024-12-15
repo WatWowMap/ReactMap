@@ -528,6 +528,7 @@ class Gym extends Model {
         isMad
           ? 'evolution AS raid_pokemon_evolution'
           : 'raid_pokemon_evolution',
+        isMad ? 'end AS raid_end_timestamp' : 'raid_end_timestamp',
         distance,
       ])
       .whereBetween(isMad ? 'latitude' : 'lat', [bbox.minLat, bbox.maxLat])
@@ -536,11 +537,7 @@ class Gym extends Model {
       .limit(config.getSafe('api.searchResultsLimit'))
       .orderBy('distance')
       .andWhere('raid_pokemon_id', '>', 0)
-      .andWhere(
-        isMad ? 'end' : 'raid_end_timestamp',
-        '>=',
-        isMad ? this.knex().fn.now() : ts,
-      )
+      .andWhere('raid_end_timestamp', '>=', isMad ? this.knex().fn.now() : ts)
     if (isMad) {
       query
         .leftJoin('gymdetails', 'gym.gym_id', 'gymdetails.gym_id')

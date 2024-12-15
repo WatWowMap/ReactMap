@@ -254,6 +254,7 @@ class Station extends Model {
         'battle_pokemon_gender',
         'battle_pokemon_alignment',
         'battle_pokemon_bread_mode',
+        'battle_end',
       )
     }
 

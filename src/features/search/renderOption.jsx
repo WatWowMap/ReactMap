@@ -162,6 +162,12 @@ export const renderOption = ({ key, ...props }, option) => {
             <Timer expireTime={option.incident_expire_timestamp} />
           ) : searchTab === 'lures' ? (
             <Timer expireTime={option.lure_expire_timestamp} />
+          ) : searchTab === 'raids' ? (
+            <Timer expireTime={option.raid_end_timestamp} />
+          ) : searchTab === 'pokemon' ? (
+            <Timer expireTime={option.expire_timestamp} />
+          ) : searchTab === 'stations' ? (
+            <Timer expireTime={option.battle_end} />
           ) : (
             ''
           )

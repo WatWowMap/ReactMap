@@ -617,6 +617,7 @@ class Pokemon extends Model {
         'gender',
         'costume',
         raw(IV_CALC).as('iv'),
+        'disappear_time AS expire_timestamp',
       ])
     } else {
       query.select([
@@ -628,6 +629,7 @@ class Pokemon extends Model {
         'gender',
         'iv',
         'shiny',
+        'expire_timestamp',
       ])
     }
     if (!getAreaSql(query, perms.areaRestrictions, onlyAreas, isMad)) {
