@@ -1,3 +1,10 @@
+# [1.36.0-develop.6](https://github.com/WatWowMap/ReactMap/compare/v1.36.0-develop.5...v1.36.0-develop.6) (2024-12-15)
+
+
+### Bug Fixes
+
+* add expire to raid battle and pokemon search ([bd37100](https://github.com/WatWowMap/ReactMap/commit/bd371001d10b1f525f22722201404d7ec2fd129f))
+
 # [1.36.0-develop.5](https://github.com/WatWowMap/ReactMap/compare/v1.36.0-develop.4...v1.36.0-develop.5) (2024-12-11)
 
 
