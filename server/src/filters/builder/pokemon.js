@@ -41,9 +41,10 @@ function buildPokemon(defaults, base, custom) {
       pokemon.stations[`${id}-${form}`] = new BaseFilter(
         defaults.stations.pokemon,
       )
-      pokemon.quests[`${id}-${form}`] = new BaseFilter(
-        defaults.pokestops.pokemon,
-      )
+      if (form !== '0')
+        pokemon.quests[`${id}-${form}`] = new BaseFilter(
+          defaults.pokestops.pokemon,
+        )
       if (state.db.filterContext.Pokestop.hasConfirmedInvasions) {
         pokemon.rocket[`a${id}-${form}`] = new BaseFilter(
           defaults.pokestops.invasionPokemon,

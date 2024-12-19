@@ -519,16 +519,16 @@
       "allInvasions": true,
       "invasionPokemon": true,
       "rewardTypes": false,
-      "baseMegaEnergyAmounts": [10, 20, 25],
+      "baseMegaEnergyAmounts": [],
       "stardust": {
         "min": 100,
-        "max": 2500,
+        "max": 0,
         "interval": 100,
         "enabled": true
       },
       "xp": {
         "min": 100,
-        "max": 1000,
+        "max": 0,
         "interval": 100,
         "enabled": true
       }
