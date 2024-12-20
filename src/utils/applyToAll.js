@@ -30,14 +30,16 @@ export function applyToAll(
   const userFilters = localFilters.filter ?? {}
 
   const serverFilters = useMemory.getState().filters[category]
-  const staticFilters = serverFilters?.filter ?? {}
+  const staticFilters = Object.entries(serverFilters?.filter ?? {})
   const refFilter = serverFilters?.standard ?? STANDARD_BACKUP
 
   const idSet = new Set(selectedIds ?? [])
+  if (category === 'pokemon' && selectedIds.length >= staticFilters.length - 1)
+    idSet.add('global')
 
   const newObj = Object.fromEntries(
-    Object.keys(staticFilters).flatMap((key) => {
-      const filter = userFilters[key] ?? staticFilters[key] ?? refFilter
+    staticFilters.flatMap(([key, staticFilter]) => {
+      const filter = userFilters[key] ?? staticFilter ?? refFilter
       const filters = [
         [
           key,
