@@ -1,3 +1,15 @@
+# [1.36.0-develop.7](https://github.com/WatWowMap/ReactMap/compare/v1.36.0-develop.6...v1.36.0-develop.7) (2024-12-20)
+
+
+### Bug Fixes
+
+* skip generating unlikely quest rewards ([9c82b90](https://github.com/WatWowMap/ReactMap/commit/9c82b909eaeb25abdbe2078cf80b1d184efac373))
+
+
+### Features
+
+* allow enable/disable all Pokemon by user choice ([9fb95f1](https://github.com/WatWowMap/ReactMap/commit/9fb95f1cb34ebc3563ee6562bce28c2e33ff182c))
+
 # [1.36.0-develop.6](https://github.com/WatWowMap/ReactMap/compare/v1.36.0-develop.5...v1.36.0-develop.6) (2024-12-15)
 
 
