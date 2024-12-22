@@ -404,6 +404,7 @@ class EventManager extends Logger {
     this.available[category].forEach((item) => {
       if (!Number.isNaN(parseInt(item.charAt(0)))) {
         const [id, form] = item.split('-')
+        const formId = form || '0'
         if (!this.masterfile.pokemon[id]) {
           this.masterfile.pokemon[id] = {
             name: '',
@@ -411,7 +412,7 @@ class EventManager extends Logger {
             types: [],
             quickMoves: [],
             chargedMoves: [],
-            defaultFormId: +form,
+            defaultFormId: +formId,
             forms: {},
             genId: 0,
           }
@@ -420,8 +421,8 @@ class EventManager extends Logger {
         if (!this.masterfile.pokemon[id].forms) {
           this.masterfile.pokemon[id].forms = {}
         }
-        if (!this.masterfile.pokemon[id].forms[form]) {
-          this.masterfile.pokemon[id].forms[form] = { name: '*', category }
+        if (!this.masterfile.pokemon[id].forms[formId]) {
+          this.masterfile.pokemon[id].forms[formId] = { name: '*', category }
           this.log.debug(
             `Added ${this.masterfile.pokemon[id].name} Key: ${item} to masterfile. (${category})`,
           )
