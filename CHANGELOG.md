@@ -1,3 +1,11 @@
+# [1.36.0-develop.8](https://github.com/WatWowMap/ReactMap/compare/v1.36.0-develop.7...v1.36.0-develop.8) (2024-12-22)
+
+
+### Bug Fixes
+
+* always add 0 form ([31900e2](https://github.com/WatWowMap/ReactMap/commit/31900e21796dbe8b9063a51c05c7d772678a86f5))
+* form can be unset for quests ([b83c493](https://github.com/WatWowMap/ReactMap/commit/b83c493bfdd182503501207a97f76a64911dd0a3))
+
 # [1.36.0-develop.7](https://github.com/WatWowMap/ReactMap/compare/v1.36.0-develop.6...v1.36.0-develop.7) (2024-12-20)
 
 
