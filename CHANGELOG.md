@@ -1,3 +1,10 @@
+# [1.36.0-develop.9](https://github.com/WatWowMap/ReactMap/compare/v1.36.0-develop.8...v1.36.0-develop.9) (2024-12-26)
+
+
+### Bug Fixes
+
+* audit deps ([3ed1ff2](https://github.com/WatWowMap/ReactMap/commit/3ed1ff234eacbcadbc9e08aa08160ca6ee3b34db))
+
 # [1.36.0-develop.8](https://github.com/WatWowMap/ReactMap/compare/v1.36.0-develop.7...v1.36.0-develop.8) (2024-12-22)
 
 
