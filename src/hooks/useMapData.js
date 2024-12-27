@@ -116,9 +116,11 @@ export function useMapData(once = false) {
           },
         )
         const defaultEnabled = prev.filters?.pokemon?.filter?.global?.enabled
+        const serverEnabled = filters.pokemon?.filter?.global?.enabled
         if (
           defaultEnabled !== undefined &&
-          defaultEnabled !== filters.pokemon.filter.global.enabled
+          serverEnabled !== undefined &&
+          defaultEnabled !== serverEnabled
         )
           Object.entries(newFilters.pokemon.filter).forEach(([key, filter]) => {
             if (prev.filters.pokemon.filter[key] === undefined)
