@@ -1,3 +1,10 @@
+# [1.36.0-develop.10](https://github.com/WatWowMap/ReactMap/compare/v1.36.0-develop.9...v1.36.0-develop.10) (2024-12-27)
+
+
+### Bug Fixes
+
+* server filters might not be sent ([8a4db0f](https://github.com/WatWowMap/ReactMap/commit/8a4db0f71236f17fbd0509722fd474ff9f649365)), closes [#1083](https://github.com/WatWowMap/ReactMap/issues/1083)
+
 # [1.36.0-develop.9](https://github.com/WatWowMap/ReactMap/compare/v1.36.0-develop.8...v1.36.0-develop.9) (2024-12-26)
 
 
