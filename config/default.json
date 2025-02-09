@@ -921,7 +921,7 @@
     },
     {
       "name": "Waze",
-      "url": "https://www.waze.com/ul?ll={x},{y}"
+      "url": "https://www.waze.com/ul?ll={x},{y}&navigate=yes&zoom=17"
     },
     {
       "name": "Intel",
