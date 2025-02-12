@@ -1,3 +1,10 @@
+# [1.36.0-develop.11](https://github.com/WatWowMap/ReactMap/compare/v1.36.0-develop.10...v1.36.0-develop.11) (2025-02-12)
+
+
+### Bug Fixes
+
+* bump uicons 2.0.3 ([978f0c2](https://github.com/WatWowMap/ReactMap/commit/978f0c223db89c5231e3db91944f8be5f4043f2e))
+
 # [1.36.0-develop.10](https://github.com/WatWowMap/ReactMap/compare/v1.36.0-develop.9...v1.36.0-develop.10) (2024-12-27)
 
 
