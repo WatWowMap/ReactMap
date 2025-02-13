@@ -1,3 +1,10 @@
+# [1.36.0-develop.12](https://github.com/WatWowMap/ReactMap/compare/v1.36.0-develop.11...v1.36.0-develop.12) (2025-02-13)
+
+
+### Features
+
+* station interactionRanges ([35bea36](https://github.com/WatWowMap/ReactMap/commit/35bea3648a4c01180b9cc5f21791c5570e05893c)), closes [#1086](https://github.com/WatWowMap/ReactMap/issues/1086)
+
 # [1.36.0-develop.11](https://github.com/WatWowMap/ReactMap/compare/v1.36.0-develop.10...v1.36.0-develop.11) (2025-02-12)
 
 
