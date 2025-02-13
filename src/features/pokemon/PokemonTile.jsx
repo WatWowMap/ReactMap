@@ -219,7 +219,7 @@ const BasePokemonTile = (pkmn) => {
         <Circle
           center={finalLocation}
           radius={80}
-          color="#E3B3FB"
+          color="#4E893E"
           dashArray="5, 5"
           weight={1}
         />

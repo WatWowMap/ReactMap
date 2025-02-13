@@ -1,10 +1,10 @@
 /* eslint-disable react/destructuring-assignment */
 // @ts-check
 import * as React from 'react'
-import { Marker, Popup } from 'react-leaflet'
+import { Circle, Marker, Popup } from 'react-leaflet'
 
 import { useMarkerTimer } from '@hooks/useMarkerTimer'
-import { useMemory } from '@store/useMemory'
+import { basicEqualFn, useMemory } from '@store/useMemory'
 import { useStorage } from '@store/useStorage'
 import { useForcePopup } from '@hooks/useForcePopup'
 import { TooltipWrapper } from '@components/ToolTipWrapper'
@@ -21,11 +21,18 @@ const BaseStationTile = (station) => {
   const [stateChange, setStateChange] = React.useState(false)
   const [markerRef, setMarkerRef] = React.useState(null)
 
-  const individualTimer = useMemory((s) => s.timerList.includes(station.id))
+  const [individualTimer, interactionRangeZoom] = useMemory((s) => {
+    const { config, timerList } = s
+    return [timerList.includes(station.id), config.general.interactionRangeZoom]
+  }, basicEqualFn)
 
-  const showTimer = useStorage(
-    (s) => s?.userSettings?.stations?.stationTimers || individualTimer,
-  )
+  const [showTimer, showInteractionRange] = useStorage((s) => {
+    const { userSettings, zoom } = s
+    return [
+      userSettings.stations.stationTimers || individualTimer,
+      !!userSettings.stations.interactionRanges && zoom >= interactionRangeZoom,
+    ]
+  }, basicEqualFn)
 
   const timers = React.useMemo(() => {
     const now = Date.now() / 1000
@@ -54,6 +61,14 @@ const BaseStationTile = (station) => {
       </Popup>
       {!!(showTimer && timers.length > 0) && (
         <TooltipWrapper timers={timers} offset={[0, 4]} />
+      )}
+      {showInteractionRange && (
+        <Circle
+          center={[station.lat, station.lon]}
+          radius={80}
+          color="#EE94F7"
+          weight={0.5}
+        />
       )}
     </Marker>
   )

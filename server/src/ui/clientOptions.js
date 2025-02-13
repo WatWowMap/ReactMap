@@ -135,6 +135,11 @@ function clientOptions(perms) {
         perm: ['stations', 'dynamax'],
         category: 'tooltips',
       },
+      interactionRanges: {
+        type: 'bool',
+        perm: ['stations', 'dynamax'],
+        category: 'markers',
+      },
       stationsOpacity: {
         type: 'bool',
         perm: ['stations', 'dynamax'],
