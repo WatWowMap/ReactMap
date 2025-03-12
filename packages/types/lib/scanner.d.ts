@@ -121,6 +121,7 @@ export interface Quest {
   quest_gender_id: Gender
   quest_costume_id: number
   quest_shiny: number
+  quest_shiny_probability?: number
   mega_pokemon_id: number
   mega_amount: number
   candy_pokemon_id: number

@@ -83,6 +83,7 @@ type Quest {
   quest_gender_id: Int
   quest_costume_id: Int
   quest_shiny: Int
+  quest_shiny_probability: Float
   mega_pokemon_id: Int
   mega_amount: Int
   candy_pokemon_id: Int
