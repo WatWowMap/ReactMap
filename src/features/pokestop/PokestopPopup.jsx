@@ -129,7 +129,7 @@ export function PokestopPopup({
                       }}
                     >
                       <QuestConditions {...quest} />
-                      {quest.quest_shiny_probability !== null && (
+                      {quest.quest_shiny_probability && (
                         <>
                           <br />
                           <Typography variant="caption">
