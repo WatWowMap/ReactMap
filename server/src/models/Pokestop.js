@@ -875,6 +875,7 @@ class Pokestop extends Model {
                   'quest_costume_id',
                   'quest_gender_id',
                   'quest_shiny',
+                  'quest_shiny_probability',
                 )
                 break
               case 9:

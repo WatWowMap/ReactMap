@@ -43,6 +43,7 @@ const quest = gql`
       quest_gender_id
       quest_costume_id
       quest_shiny
+      quest_shiny_probability
       mega_pokemon_id
       mega_amount
       candy_pokemon_id
