@@ -1,3 +1,10 @@
+# [1.36.0-develop.14](https://github.com/WatWowMap/ReactMap/compare/v1.36.0-develop.13...v1.36.0-develop.14) (2025-03-14)
+
+
+### Bug Fixes
+
+* update en translation ([df052b6](https://github.com/WatWowMap/ReactMap/commit/df052b6068882a561d653fd5c573baa601857d45))
+
 # [1.36.0-develop.13](https://github.com/WatWowMap/ReactMap/compare/v1.36.0-develop.12...v1.36.0-develop.13) (2025-03-13)
 
 
