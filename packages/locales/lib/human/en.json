@@ -376,7 +376,7 @@
   "with_ar": "With AR",
   "both": "Both",
   "without_ar": "Without AR",
-  "shiny_probability": "Shiny: {{p}}",
+  "shiny_probability": "Shiny probability: {{p}}",
   "exclude_quest_multi": "Exclude {{reward}}",
   "cluster_limit_0": "{{variable_0}} limit ({{variable_1}}) has been hit",
   "cluster_limit_1": "Please zoom in or narrow your filters",
