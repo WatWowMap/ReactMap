@@ -129,7 +129,7 @@ export function PokestopPopup({
                       }}
                     >
                       <QuestConditions {...quest} />
-                      {quest.quest_shiny_probability && (
+                      {!!quest.quest_shiny_probability && (
                         <>
                           <br />
                           <Typography variant="caption">
@@ -538,7 +538,7 @@ const readableProbability = (x) => {
   const x_1 = Math.round(1 / x)
   const percent = Math.round(x * 100)
   return Math.abs(1 / x_1 - x) < Math.abs(percent * 0.01 - x)
-    ? `1/${x_1}`
+    ? `1:${x_1}`
     : `${percent}%`
 }
 
