@@ -1,3 +1,10 @@
+# [1.36.0-develop.15](https://github.com/WatWowMap/ReactMap/compare/v1.36.0-develop.14...v1.36.0-develop.15) (2025-03-23)
+
+
+### Features
+
+* add role array support ([67a71fb](https://github.com/WatWowMap/ReactMap/commit/67a71fb7d85c147f45c2942d98dc920c7e162137))
+
 # [1.36.0-develop.14](https://github.com/WatWowMap/ReactMap/compare/v1.36.0-develop.13...v1.36.0-develop.14) (2025-03-14)
 
 
