@@ -279,9 +279,9 @@ const applyMutations = (config) => {
   )
   /** @param {string | string[]} role */
   const replaceAliases = (role) =>
-    Array.isArray(role) 
-      ? role.flatMap((r) => aliasObj[r] ?? r) 
-      : aliasObj[role] ?? role
+    Array.isArray(role)
+      ? role.flatMap((r) => aliasObj[r] ?? r)
+      : (aliasObj[role] ?? role)
 
   const replaceBothAliases = (incomingObj) => ({
     ...incomingObj,
