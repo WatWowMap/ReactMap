@@ -1,3 +1,12 @@
+# [1.36.0-develop.16](https://github.com/WatWowMap/ReactMap/compare/v1.36.0-develop.15...v1.36.0-develop.16) (2025-04-11)
+
+
+### Bug Fixes
+
+* Apple map links ([18ac93c](https://github.com/WatWowMap/ReactMap/commit/18ac93cd5dee6982bf97095714c0d1e307ba8fec))
+* audit deps ([12366fc](https://github.com/WatWowMap/ReactMap/commit/12366fcf972f738f0d7b44e25e66a26c76167e04))
+* deps ([e4ee8cb](https://github.com/WatWowMap/ReactMap/commit/e4ee8cb6cab4ff67cfb3bc6211f0e39018753aa7))
+
 # [1.36.0-develop.15](https://github.com/WatWowMap/ReactMap/compare/v1.36.0-develop.14...v1.36.0-develop.15) (2025-03-23)
 
 
