@@ -212,7 +212,7 @@
     "rollup-plugin-delete": "^2.0.0",
     "semantic-release": "^22",
     "typescript": "5.5.4",
-    "vite": "5.4.6",
+    "vite": "5.4.19",
     "vite-plugin-checker": "0.7.2"
   },
   "engines": {
