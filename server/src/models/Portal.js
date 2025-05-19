@@ -51,7 +51,7 @@ class Portal extends Model {
    * @param {ReturnType<typeof import("server/src/utils/getBbox").getBboxFromCenter>} bbox
    * @returns {Promise<import("@rm/types").FullPortal[]>}
    */
-  static async search(perms, args, { isMad }, distance, bbox) {
+  static async search(perms, args, distance, bbox) {
     const { areaRestrictions } = perms
     const { onlyAreas = [], search = '' } = args
     const { searchResultsLimit, portalUpdateLimit } = config.getSafe('api')
@@ -59,8 +59,8 @@ class Portal extends Model {
     const query = this.query()
       .select(['name', 'id', 'lat', 'lon', 'url', distance])
       .whereILike('name', `%${search}%`)
-      .whereBetween(isMad ? 'latitude' : 'lat', [bbox.minLat, bbox.maxLat])
-      .andWhereBetween(isMad ? 'longitude' : 'lon', [bbox.minLon, bbox.maxLon])
+      .whereBetween('lat', [bbox.minLat, bbox.maxLat])
+      .andWhereBetween('lon', [bbox.minLon, bbox.maxLon])
       .andWhere(
         'updated',
         '>',
@@ -68,7 +68,7 @@ class Portal extends Model {
       )
       .limit(searchResultsLimit)
       .orderBy('distance')
-    if (!getAreaSql(query, areaRestrictions, onlyAreas, isMad)) {
+    if (!getAreaSql(query, areaRestrictions, onlyAreas)) {
       return []
     }
     return query

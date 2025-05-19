@@ -12,7 +12,6 @@ export const GET_ALL_DEVICES = gql`
       lon
       route
       type
-      isMad
       radius
     }
   }

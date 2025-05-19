@@ -368,7 +368,6 @@
       "interactionRanges": false,
       "lureRange": false,
       "customRange": 0,
-      "madQuestText": false,
       "hasQuestIndicator": true,
       "showArBadge": false,
       "enablePokestopPopupCoords": false,
@@ -606,7 +605,7 @@
   },
   "scanner": {
     "backendConfig": {
-      "platform": "rdm/mad/dragonite/custom",
+      "platform": "rdm/dragonite/custom",
       "apiEndpoint": "http://ip:port/api/",
       "headers": [],
       "apiUsername": "username",

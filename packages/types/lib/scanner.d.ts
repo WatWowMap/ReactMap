@@ -22,7 +22,6 @@ export interface Device {
   lat: number
   lon: number
   type: string
-  isMad: boolean
   route: any // JSON
   radius: number
 }

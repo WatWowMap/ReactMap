@@ -1,5 +1,5 @@
 // @ts-check
-const { Model, ref, raw } = require('objection')
+const { Model, ref } = require('objection')
 const { polygon, point } = require('@turf/helpers')
 const { default: booleanOverlap } = require('@turf/boolean-overlap')
 const { default: pointInPolygon } = require('@turf/boolean-point-in-polygon')
@@ -19,25 +19,13 @@ class Weather extends Model {
    * @param {import('@rm/types').BBox & { filters: { onlyAreas: string[] } } } args
    * @param {import('@rm/types').DbContext} ctx
    */
-  static async getAll(perms, args, { isMad }) {
-    const query = this.query().select([
-      ref(isMad ? 's2_cell_id' : 'id')
-        .castTo('CHAR')
-        .as('id'),
-    ])
-    if (isMad) {
-      query.select([
-        'latitude',
-        'longitude',
-        'gameplay_weather AS gameplay_condition',
-        raw('UNIX_TIMESTAMP(last_updated)').as('updated'),
-      ])
-    } else {
-      query.select(['latitude', 'longitude', 'gameplay_condition', 'updated'])
-      const ts = Math.floor(Date.now() / 1000)
-      const ms = ts - config.getSafe('api.weatherCellLimit') * 60 * 60 * 24
-      query.where('updated', '>=', ms)
-    }
+  static async getAll(perms, args) {
+    const query = this.query().select([ref('id').castTo('CHAR').as('id')])
+    query.select(['latitude', 'longitude', 'gameplay_condition', 'updated'])
+    const ts = Math.floor(Date.now() / 1000)
+    const ms = ts - config.getSafe('api.weatherCellLimit') * 60 * 60 * 24
+    query.where('updated', '>=', ms)
+
     /** @type {import("@rm/types").FullWeather[]} */
     const results = await query
 

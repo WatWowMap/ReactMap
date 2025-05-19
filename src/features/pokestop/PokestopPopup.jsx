@@ -548,18 +548,12 @@ const readableProbability = (x) => {
  * @returns
  */
 const QuestConditions = ({
-  quest_task,
   quest_type,
   quest_target,
   quest_conditions,
   quest_title,
 }) => {
   const { i18n, t } = useTranslation()
-  const madQuestText = useStorage((s) => s.userSettings.pokestops.madQuestText)
-
-  if (madQuestText && quest_task) {
-    return <Typography variant="caption">{quest_task}</Typography>
-  }
 
   if (quest_title && !quest_title.includes('geotarget')) {
     const normalized = `quest_title_${quest_title.toLowerCase()}`
