@@ -23,6 +23,7 @@ const gym = gql`
     in_battle
     guarding_pokemon_id
     guarding_pokemon_display
+    defenders
     total_cp
     badge
     power_up_level
