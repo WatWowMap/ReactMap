@@ -9,6 +9,8 @@ import MenuItem from '@mui/material/MenuItem'
 import Divider from '@mui/material/Divider'
 import Collapse from '@mui/material/Collapse'
 import Typography from '@mui/material/Typography'
+import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew'
+import FavoriteIcon from '@mui/icons-material/Favorite'
 import { useTranslation } from 'react-i18next'
 
 import { useSyncData } from '@features/webhooks'
@@ -44,8 +46,26 @@ export function GymPopup({ hasRaid, hasHatched, raidIconUrl, ...gym }) {
   const { perms } = useMemory((s) => s.auth)
   const popups = useStorage((s) => s.popups)
   const ts = Math.floor(Date.now() / 1000)
+  const [showDefenders, setShowDefenders] = React.useState(false)
 
   useAnalytics('Popup', `Team ID: ${gym.team_id} Has Raid: ${hasRaid}`, 'Gym')
+
+  // If defenders modal is toggled, show only that
+  if (showDefenders) {
+    return (
+      <ErrorBoundary noRefresh style={{}} variant="h5">
+        <Grid
+          container
+          direction="row"
+          justifyContent="center"
+          alignItems="center"
+          width={200}
+        >
+          <DefendersModal gym={gym} onClose={() => setShowDefenders(false)} />
+        </Grid>
+      </ErrorBoundary>
+    )
+  }
 
   return (
     <ErrorBoundary noRefresh style={{}} variant="h5">
@@ -60,6 +80,28 @@ export function GymPopup({ hasRaid, hasHatched, raidIconUrl, ...gym }) {
           <Title backup={t('unknown_gym')}>{gym.name}</Title>
         </Grid>
         <MenuActions hasRaid={hasRaid} {...gym} />
+        {gym.defenders?.length > 0 && (
+          <Grid xs={12} textAlign="center" my={1}>
+            <button
+              type="button"
+              style={{
+                padding: 6,
+                borderRadius: 8,
+                border: '1px solid #ccc',
+                background: '#fff',
+                fontWeight: 600,
+                width: '100%',
+                fontSize: 14,
+              }}
+              onClick={(e) => {
+                e.stopPropagation()
+                setShowDefenders(true)
+              }}
+            >
+              {t('view_defenders')}
+            </button>
+          </Grid>
+        )}
         {perms.gyms && (
           <Grid xs={12}>
             <Collapse
@@ -113,6 +155,217 @@ export function GymPopup({ hasRaid, hasHatched, raidIconUrl, ...gym }) {
         )}
       </Grid>
     </ErrorBoundary>
+  )
+}
+
+/**
+ * Compact modal for gym defenders
+ * @param {{ gym: import('@rm/types').Gym, onClose: () => void }} param0
+ */
+function DefendersModal({ gym, onClose }) {
+  const { t } = useTranslation()
+  const Icons = useMemory((s) => s.Icons)
+  const defenders = gym.defenders || []
+
+  return (
+    <Grid
+      container
+      direction="column"
+      alignItems="stretch"
+      style={{ minWidth: 250, maxWidth: 350, padding: 8 }}
+    >
+      <Grid container alignItems="center" mb={1}>
+        <Grid xs={2}>
+          <IconButton
+            onClick={(e) => {
+              e.stopPropagation()
+              onClose()
+            }}
+            size="small"
+          >
+            <ArrowBackIosNewIcon fontSize="small" />
+          </IconButton>
+        </Grid>
+        <Grid
+          xs={8}
+          style={{
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            wordBreak: 'break-word',
+            maxWidth: 200,
+            display: 'flex',
+            alignItems: 'center',
+          }}
+        >
+          <Title backup={t('unknown_gym')}>{gym.name}</Title>
+        </Grid>
+      </Grid>
+      <Grid container direction="column" spacing={1}>
+        {defenders.map((def) => {
+          const fullCP = def.cp_when_deployed
+          const currentCP = def.cp_now
+          const percent = Math.max(0, Math.min(1, currentCP / fullCP))
+
+          return (
+            <div
+              key={def.pokemon_id}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                minHeight: 60,
+                width: '100%',
+                padding: '4px 0',
+              }}
+            >
+              <div
+                style={{
+                  marginLeft: 8,
+                  marginRight: 8,
+                  display: 'flex',
+                  alignItems: 'center',
+                  flexShrink: 0,
+                }}
+              >
+                <Img
+                  src={Icons.getPokemonByDisplay(def.pokemon_id, def)}
+                  alt={t(`poke_${def.pokemon_id}`)}
+                  maxHeight={44}
+                  maxWidth={44}
+                  style={{ objectFit: 'contain' }}
+                />
+              </div>
+              <div
+                style={{
+                  flex: 1,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'flex-start',
+                  justifyContent: 'center',
+                  minWidth: 0,
+                  textAlign: 'left',
+                  overflow: 'hidden',
+                  marginLeft: 4,
+                }}
+              >
+                <span
+                  style={{
+                    fontSize: 15,
+                    fontWeight: 600,
+                    marginBottom: 2,
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap',
+                    maxWidth: '100%',
+                  }}
+                  title={t(`poke_${def.pokemon_id}`)}
+                >
+                  {t(`poke_${def.pokemon_id}`)}
+                </span>
+                <span style={{ fontSize: 13, color: '#666' }}>
+                  CP: <b>{currentCP}</b> / {fullCP}
+                </span>
+              </div>
+              <div
+                style={{
+                  width: 44,
+                  minWidth: 44,
+                  maxWidth: 44,
+                  height: 44,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'flex-end',
+                  position: 'relative',
+                  marginLeft: 4,
+                  marginRight: 8,
+                  flexShrink: 0,
+                }}
+              >
+                {/* Heart outline */}
+                <FavoriteIcon
+                  style={{
+                    color: 'transparent',
+                    position: 'absolute',
+                    top: 0,
+                    right: 0,
+                    width: 28,
+                    height: 28,
+                    stroke: 'white',
+                    strokeWidth: 1,
+                    filter: 'drop-shadow(0 0 1px #0008)',
+                  }}
+                  className="heart-outline"
+                />
+                {/* Heart background */}
+                <FavoriteIcon
+                  style={{
+                    color: 'white',
+                    opacity: 0.18,
+                    position: 'absolute',
+                    top: 0,
+                    right: 0,
+                    width: 28,
+                    height: 28,
+                  }}
+                />
+                {/* Heart fill */}
+                <FavoriteIcon
+                  style={{
+                    color: '#ff69b4',
+                    position: 'absolute',
+                    top: 0,
+                    right: 0,
+                    width: 28,
+                    height: 28,
+                    clipPath: `inset(${100 - percent * 100}% 0 0 0)`,
+                    transition: 'clip-path 0.3s',
+                  }}
+                />
+                {/* Heart cracks for rounds */}
+                <svg
+                  width={28}
+                  height={28}
+                  viewBox="0 0 28 28"
+                  style={{
+                    position: 'absolute',
+                    top: 0,
+                    right: 0,
+                    pointerEvents: 'none',
+                  }}
+                >
+                  {/* Crack at 1/3 height (top) */}
+                  <path
+                    d="M2,9 Q7,11 14,9 Q21,11 26,9"
+                    stroke="white"
+                    strokeWidth={1.5}
+                    fill="none"
+                    strokeLinejoin="round"
+                  />
+                  {/* Crack at 2/3 height (bottom, improved to fit heart) */}
+                  <path
+                    d="M7,19 Q11,17 14,19 Q17,17 21,19"
+                    stroke="white"
+                    strokeWidth={1.5}
+                    fill="none"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              </div>
+            </div>
+          )
+        })}
+      </Grid>
+      <Grid
+        xs={12}
+        textAlign="center"
+        mt={2}
+        style={{ fontSize: 12, color: '#888' }}
+      >
+        {t('last_updated')}:{' '}
+        {gym.updated
+          ? new Date(gym.updated * 1000).toLocaleString()
+          : t('unknown')}
+      </Grid>
+    </Grid>
   )
 }
 
