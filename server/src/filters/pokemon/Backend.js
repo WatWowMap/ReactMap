@@ -30,7 +30,6 @@ class PkmnBackend {
    * @param {boolean} mods.onlyLinkGlobal
    * @param {boolean} mods.pvpV2
    * @param {boolean} mods.hasSize
-   * @param {boolean} mods.isMad
    * @param {boolean} mods.mem
    * @param {boolean} mods.onlyPvpMega
    * @param {boolean} mods.onlyPvp40

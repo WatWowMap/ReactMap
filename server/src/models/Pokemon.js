@@ -1,7 +1,7 @@
 // @ts-check
 
 /* eslint-disable no-restricted-syntax */
-const { Model, raw, ref } = require('objection')
+const { Model } = require('objection')
 const i18next = require('i18next')
 const fs = require('fs')
 const { resolve } = require('path')
@@ -14,54 +14,13 @@ const config = require('@rm/config')
 const { getAreaSql } = require('../utils/getAreaSql')
 const { filterRTree } = require('../utils/filterRTree')
 const { fetchJson } = require('../utils/fetchJson')
-const {
-  IV_CALC,
-  LEVEL_CALC,
-  MAD_KEY_MAP,
-  BASE_KEYS,
-} = require('../filters/pokemon/constants')
+const { BASE_KEYS } = require('../filters/pokemon/constants')
 const { PkmnBackend } = require('../filters/pokemon/Backend')
 const { state } = require('../services/state')
 
 class Pokemon extends Model {
   static get tableName() {
     return 'pokemon'
-  }
-
-  /**
-   * @param {import('objection').QueryBuilder} query
-   */
-  static getMadSql(query) {
-    query
-      .leftJoin('trs_spawn', 'pokemon.spawnpoint_id', 'trs_spawn.spawnpoint')
-      .leftJoin(
-        'pokemon_display',
-        'pokemon.encounter_id',
-        'pokemon_display.encounter_id',
-      )
-      .select([
-        '*',
-        ref('pokemon.encounter_id').castTo('CHAR').as('id'),
-        'pokemon.latitude AS lat',
-        'pokemon.longitude AS lon',
-        'individual_attack AS atk_iv',
-        'individual_defense AS def_iv',
-        'individual_stamina AS sta_iv',
-        'height',
-        'pokemon.form',
-        'pokemon.gender',
-        'pokemon.costume',
-        'pokemon_display.pokemon AS display_pokemon_id',
-        'pokemon_display.form AS ditto_form',
-        'weather_boosted_condition AS weather',
-        raw('IF(calc_endminsec IS NOT NULL, 1, NULL)').as(
-          'expire_timestamp_verified',
-        ),
-        raw('Unix_timestamp(disappear_time)').as('expire_timestamp'),
-        raw('Unix_timestamp(last_modified)').as('updated'),
-        raw(IV_CALC).as('iv'),
-        raw(LEVEL_CALC).as('level'),
-      ])
   }
 
   /**
@@ -124,7 +83,7 @@ class Pokemon extends Model {
   static async getAll(perms, args, ctx) {
     const { iv: ivs, pvp, areaRestrictions } = perms
     const { onlyIvOr, onlyHundoIv, onlyZeroIv, onlyAreas = [] } = args.filters
-    const { hasSize, hasHeight, isMad, mem, secret, pvpV2 } = ctx
+    const { hasSize, hasHeight, mem, secret, pvpV2 } = ctx
     const { filterMap, globalFilter } = this.getFilters(perms, args, ctx)
 
     let queryPvp = config
@@ -160,25 +119,11 @@ class Pokemon extends Model {
     })
 
     if (!mem) {
-      if (isMad) {
-        Pokemon.getMadSql(query)
-      } else {
-        query.select(['*', hasSize && !hasHeight ? 'size AS height' : 'size'])
-      }
+      query.select(['*', hasSize && !hasHeight ? 'size AS height' : 'size'])
       query
-        .where(
-          isMad ? 'disappear_time' : 'expire_timestamp',
-          '>=',
-          isMad ? this.knex().fn.now() : ts,
-        )
-        .andWhereBetween(isMad ? 'pokemon.latitude' : 'lat', [
-          args.minLat,
-          args.maxLat,
-        ])
-        .andWhereBetween(isMad ? 'pokemon.longitude' : 'lon', [
-          args.minLon,
-          args.maxLon,
-        ])
+        .where('expire_timestamp', '>=', ts)
+        .andWhereBetween('lat', [args.minLat, args.maxLat])
+        .andWhereBetween('lon', [args.minLon, args.maxLon])
         .andWhere((ivOr) => {
           if (ivs || pvp) {
             if (globalFilter.filterKeys.size) {
@@ -203,10 +148,7 @@ class Pokemon extends Model {
                     case 'sta_iv':
                     case 'iv':
                       if (perms.iv) {
-                        pkmn.andWhereBetween(
-                          isMad ? MAD_KEY_MAP[key] : key,
-                          onlyIvOr[key],
-                        )
+                        pkmn.andWhereBetween(key, onlyIvOr[key])
                       }
                       break
                     default:
@@ -228,13 +170,13 @@ class Pokemon extends Model {
             ivOr.orWhereIn('pokemon.form', pokemonForms)
           }
           if (onlyZeroIv && ivs) {
-            ivOr.orWhere(isMad ? raw(IV_CALC) : 'iv', 0)
+            ivOr.orWhere('iv', 0)
           }
           if (onlyHundoIv && ivs) {
-            ivOr.orWhere(isMad ? raw(IV_CALC) : 'iv', 100)
+            ivOr.orWhere('iv', 100)
           }
         })
-      if (!getAreaSql(query, areaRestrictions, onlyAreas, isMad, 'pokemon')) {
+      if (!getAreaSql(query, areaRestrictions, onlyAreas, 'pokemon')) {
         return []
       }
     }
@@ -305,7 +247,7 @@ class Pokemon extends Model {
         (pkmn.pvp ||
           pkmn.pvp_rankings_great_league ||
           pkmn.pvp_rankings_ultra_league ||
-          (isMad && reactMapHandlesPvp && pkmn.cp))
+          (false && reactMapHandlesPvp && pkmn.cp))
       ) {
         noPvp = false
         listOfIds.push(pkmn.id)
@@ -317,26 +259,13 @@ class Pokemon extends Model {
       }
     }
     // second query for pvp
-    if (!mem && queryPvp && (!isMad || reactMapHandlesPvp)) {
+    if (!mem && queryPvp && reactMapHandlesPvp) {
       const pvpQuery = this.query()
-      if (isMad) {
-        Pokemon.getMadSql(pvpQuery)
-      }
       pvpQuery
-        .where(
-          isMad ? 'disappear_time' : 'expire_timestamp',
-          '>=',
-          isMad ? this.knex().fn.now() : ts,
-        )
-        .andWhereBetween(isMad ? 'pokemon.latitude' : 'lat', [
-          args.minLat,
-          args.maxLat,
-        ])
-        .andWhereBetween(isMad ? 'pokemon.longitude' : 'lon', [
-          args.minLon,
-          args.maxLon,
-        ])
-      if (isMad && listOfIds.length) {
+        .where('expire_timestamp', '>=', ts)
+        .andWhereBetween('lat', [args.minLat, args.maxLat])
+        .andWhereBetween('lon', [args.minLon, args.maxLon])
+      if (listOfIds.length) {
         pvpQuery.whereRaw(
           `pokemon.encounter_id NOT IN ( ${listOfIds.join(',')} )`,
         )
@@ -354,9 +283,7 @@ class Pokemon extends Model {
             .orWhereNotNull('pvp_rankings_ultra_league')
         })
       }
-      if (
-        !getAreaSql(pvpQuery, areaRestrictions, onlyAreas, isMad, 'pokemon')
-      ) {
+      if (!getAreaSql(pvpQuery, areaRestrictions, onlyAreas, 'pokemon')) {
         return []
       }
       pvpResults.push(
@@ -426,7 +353,7 @@ class Pokemon extends Model {
    * @returns {Promise<Partial<import("@rm/types").Pokemon>[]>}
    */
   static async getLegacy(perms, args, ctx) {
-    const { isMad, hasSize, hasHeight, mem, secret } = ctx
+    const { hasSize, hasHeight, mem, secret } = ctx
     const ts = Math.floor(Date.now() / 1000)
     const { filterMap, globalFilter } = this.getFilters(perms, args, ctx)
     const queryLimits = config.getSafe('api.queryLimits')
@@ -439,30 +366,15 @@ class Pokemon extends Model {
     }
 
     const query = this.query()
-      .where(
-        isMad ? 'disappear_time' : 'expire_timestamp',
-        '>=',
-        isMad ? this.knex().fn.now() : ts,
-      )
-      .andWhereBetween(isMad ? 'pokemon.latitude' : 'lat', [
-        args.minLat,
-        args.maxLat,
-      ])
-      .andWhereBetween(isMad ? 'pokemon.longitude' : 'lon', [
-        args.minLon,
-        args.maxLon,
-      ])
-    if (isMad) {
-      Pokemon.getMadSql(query)
-    } else {
-      query.select(['*', hasSize && !hasHeight ? 'size AS height' : 'size'])
-    }
+      .where('expire_timestamp', '>=', ts)
+      .andWhereBetween('lat', [args.minLat, args.maxLat])
+      .andWhereBetween('lon', [args.minLon, args.maxLon])
+    query.select(['*', hasSize && !hasHeight ? 'size AS height' : 'size'])
     if (
       !getAreaSql(
         query,
         perms.areaRestrictions,
         args.filters.onlyAreas || [],
-        isMad,
         'pokemon',
       )
     ) {
@@ -523,7 +435,7 @@ class Pokemon extends Model {
   /**
    * @param {import("@rm/types").DbContext} ctx
    */
-  static async getAvailable({ isMad, mem, secret }) {
+  static async getAvailable({ mem, secret }) {
     const ts = Math.floor(Date.now() / 1000)
 
     /** @type {import("@rm/types").AvailablePokemon[]} */
@@ -534,11 +446,7 @@ class Pokemon extends Model {
         : this.query()
             .select(['pokemon_id AS id', 'form'])
             .count('pokemon_id AS count')
-            .where(
-              isMad ? 'disappear_time' : 'expire_timestamp',
-              '>=',
-              isMad ? this.knex().fn.now() : ts,
-            )
+            .where('expire_timestamp', '>=', ts)
             .groupBy('pokemon_id', 'form')
             .orderBy(['pokemon_id', 'form']),
       'GET',
@@ -560,18 +468,12 @@ class Pokemon extends Model {
    * @param {import("@rm/types").DbContext} ctx
    * @returns {Promise<import("@rm/types").Pokemon>}
    */
-  static getOne(id, { isMad, mem, secret }) {
+  static getOne(id, { mem, secret }) {
     return this.evalQuery(
       mem ? `${mem}/api/pokemon/id/${id}` : null,
       mem
         ? undefined
-        : this.query()
-            .select([
-              isMad ? 'latitude AS lat' : 'lat',
-              isMad ? 'longitude AS lon' : 'lon',
-            ])
-            .where(isMad ? 'encounter_id' : 'id', id)
-            .first(),
+        : this.query().select(['lat', 'lon']).where('id', id).first(),
       'GET',
       secret,
     )
@@ -585,7 +487,7 @@ class Pokemon extends Model {
    * @param {ReturnType<typeof import("server/src/utils/getBbox").getBboxFromCenter>} bbox
    * @returns {Promise<Partial<import("@rm/types").Pokemon>[]>}
    */
-  static async search(perms, args, { isMad, mem, secret }, distance, bbox) {
+  static async search(perms, args, { mem, secret }, distance, bbox) {
     const { search, locale, onlyAreas = [] } = args
     const pokemonIds = Object.keys(state.event.masterfile.pokemon).filter(
       (pkmn) =>
@@ -599,40 +501,24 @@ class Pokemon extends Model {
     const query = this.query()
       .select(['pokemon_id', distance])
       .whereIn('pokemon_id', pokemonIds)
-      .whereBetween(isMad ? 'latitude' : 'lat', [bbox.minLat, bbox.maxLat])
-      .andWhereBetween(isMad ? 'longitude' : 'lon', [bbox.minLon, bbox.maxLon])
-      .andWhere(
-        isMad ? 'disappear_time' : 'expire_timestamp',
-        '>=',
-        isMad ? this.knex().fn.now() : ts,
-      )
+      .whereBetween('lat', [bbox.minLat, bbox.maxLat])
+      .andWhereBetween('lon', [bbox.minLon, bbox.maxLon])
+      .andWhere('expire_timestamp', '>=', ts)
       .limit(searchLimit)
       .orderBy('distance')
-    if (isMad) {
-      query.select([
-        ref('encounter_id').castTo('CHAR').as('id'),
-        'latitude AS lat',
-        'longitude AS lon',
-        'form',
-        'gender',
-        'costume',
-        raw(IV_CALC).as('iv'),
-        'disappear_time AS expire_timestamp',
-      ])
-    } else {
-      query.select([
-        'id',
-        'lat',
-        'lon',
-        'form',
-        'costume',
-        'gender',
-        'iv',
-        'shiny',
-        'expire_timestamp',
-      ])
-    }
-    if (!getAreaSql(query, perms.areaRestrictions, onlyAreas, isMad)) {
+    query.select([
+      'id',
+      'lat',
+      'lon',
+      'form',
+      'costume',
+      'gender',
+      'iv',
+      'shiny',
+      'expire_timestamp',
+    ])
+
+    if (!getAreaSql(query, perms.areaRestrictions, onlyAreas)) {
       return []
     }
     const results = await this.evalQuery(

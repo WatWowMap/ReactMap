@@ -35,7 +35,7 @@ export function ScanOnDemandPopup({ children, mode }) {
           )}
         />
         <DividerWithMargin />
-        {context.scannerType !== 'mad' && children}
+        {true && children}
         {context.showScanCount && <ScanRequests />}
         {context.showScanQueue && <ScanQueue />}
         <DividerWithMargin />
