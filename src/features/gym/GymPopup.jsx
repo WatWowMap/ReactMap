@@ -10,6 +10,7 @@ import Divider from '@mui/material/Divider'
 import Collapse from '@mui/material/Collapse'
 import Typography from '@mui/material/Typography'
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew'
+import ShieldIcon from '@mui/icons-material/Shield'
 import FavoriteIcon from '@mui/icons-material/Favorite'
 import { useTranslation } from 'react-i18next'
 
@@ -50,7 +51,6 @@ export function GymPopup({ hasRaid, hasHatched, raidIconUrl, ...gym }) {
 
   useAnalytics('Popup', `Team ID: ${gym.team_id} Has Raid: ${hasRaid}`, 'Gym')
 
-  // If defenders modal is toggled, show only that
   if (showDefenders) {
     return (
       <ErrorBoundary noRefresh style={{}} variant="h5">
@@ -80,28 +80,6 @@ export function GymPopup({ hasRaid, hasHatched, raidIconUrl, ...gym }) {
           <Title backup={t('unknown_gym')}>{gym.name}</Title>
         </Grid>
         <MenuActions hasRaid={hasRaid} {...gym} />
-        {gym.defenders?.length > 0 && (
-          <Grid xs={12} textAlign="center" my={1}>
-            <button
-              type="button"
-              style={{
-                padding: 6,
-                borderRadius: 8,
-                border: '1px solid #ccc',
-                background: '#fff',
-                fontWeight: 600,
-                width: '100%',
-                fontSize: 14,
-              }}
-              onClick={(e) => {
-                e.stopPropagation()
-                setShowDefenders(true)
-              }}
-            >
-              {t('view_defenders')}
-            </button>
-          </Grid>
-        )}
         {perms.gyms && (
           <Grid xs={12}>
             <Collapse
@@ -147,7 +125,13 @@ export function GymPopup({ hasRaid, hasHatched, raidIconUrl, ...gym }) {
           </Grid>
         )}
         <PowerUp {...gym} />
-        <GymFooter hasRaid={hasRaid} lat={gym.lat} lon={gym.lon} />
+        <GymFooter
+          hasRaid={hasRaid}
+          lat={gym.lat}
+          lon={gym.lon}
+          gym={gym}
+          setShowDefenders={setShowDefenders}
+        />
         {perms.gyms && (
           <Collapse in={popups.extras} timeout="auto" unmountOnExit>
             <ExtraGymInfo {...gym} />
@@ -187,7 +171,7 @@ function DefendersModal({ gym, onClose }) {
           </IconButton>
         </Grid>
         <Grid
-          xs={8}
+          xs={10}
           style={{
             overflow: 'hidden',
             textOverflow: 'ellipsis',
@@ -219,19 +203,24 @@ function DefendersModal({ gym, onClose }) {
             >
               <div
                 style={{
-                  marginLeft: 8,
-                  marginRight: 8,
+                  width: 44,
+                  height: 44,
                   display: 'flex',
                   alignItems: 'center',
+                  justifyContent: 'center',
+                  marginLeft: 12,
+                  marginRight: 6,
                   flexShrink: 0,
                 }}
               >
                 <Img
                   src={Icons.getPokemonByDisplay(def.pokemon_id, def)}
                   alt={t(`poke_${def.pokemon_id}`)}
-                  maxHeight={44}
-                  maxWidth={44}
-                  style={{ objectFit: 'contain' }}
+                  style={{
+                    maxHeight: 44,
+                    maxWidth: 44,
+                    objectFit: 'contain',
+                  }}
                 />
               </div>
               <div
@@ -268,16 +257,14 @@ function DefendersModal({ gym, onClose }) {
               <div
                 style={{
                   width: 44,
-                  minWidth: 44,
-                  maxWidth: 44,
                   height: 44,
                   display: 'flex',
                   alignItems: 'center',
-                  justifyContent: 'flex-end',
-                  position: 'relative',
-                  marginLeft: 4,
-                  marginRight: 8,
+                  justifyContent: 'right',
+                  marginLeft: 6,
+                  marginRight: 12,
                   flexShrink: 0,
+                  position: 'relative',
                 }}
               >
                 {/* Heart outline */}
@@ -285,8 +272,6 @@ function DefendersModal({ gym, onClose }) {
                   style={{
                     color: 'transparent',
                     position: 'absolute',
-                    top: 0,
-                    right: 0,
                     width: 28,
                     height: 28,
                     stroke: 'white',
@@ -301,8 +286,6 @@ function DefendersModal({ gym, onClose }) {
                     color: 'white',
                     opacity: 0.18,
                     position: 'absolute',
-                    top: 0,
-                    right: 0,
                     width: 28,
                     height: 28,
                   }}
@@ -312,27 +295,22 @@ function DefendersModal({ gym, onClose }) {
                   style={{
                     color: '#ff69b4',
                     position: 'absolute',
-                    top: 0,
-                    right: 0,
                     width: 28,
                     height: 28,
                     clipPath: `inset(${100 - percent * 100}% 0 0 0)`,
                     transition: 'clip-path 0.3s',
                   }}
                 />
-                {/* Heart cracks for rounds */}
+                {/* Heart cracks */}
                 <svg
                   width={28}
                   height={28}
                   viewBox="0 0 28 28"
                   style={{
                     position: 'absolute',
-                    top: 0,
-                    right: 0,
                     pointerEvents: 'none',
                   }}
                 >
-                  {/* Crack at 1/3 height (top) */}
                   <path
                     d="M2,9 Q7,11 14,9 Q21,11 26,9"
                     stroke="white"
@@ -340,7 +318,6 @@ function DefendersModal({ gym, onClose }) {
                     fill="none"
                     strokeLinejoin="round"
                   />
-                  {/* Crack at 2/3 height (bottom, improved to fit heart) */}
                   <path
                     d="M7,19 Q11,17 14,19 Q17,17 21,19"
                     stroke="white"
@@ -823,10 +800,12 @@ const Timer = ({
  *   lat: number
  *   lon: number
  *   hasRaid: boolean
+ *   gym: any
+ *   setShowDefenders: any
  * }} param0
  * @returns
  */
-const GymFooter = ({ lat, lon, hasRaid }) => {
+const GymFooter = ({ lat, lon, hasRaid, gym, setShowDefenders }) => {
   const darkMode = useStorage((s) => s.darkMode)
   const popups = useStorage((s) => s.popups)
   const perms = useMemory((s) => s.auth.perms)
@@ -841,9 +820,15 @@ const GymFooter = ({ lat, lon, hasRaid }) => {
   }
 
   return (
-    <>
+    <Grid
+      container
+      justifyContent="space-evenly"
+      alignItems="center"
+      spacing={1}
+      mt={1}
+    >
       {hasRaid && perms.raids && perms.gyms && (
-        <Grid xs={4}>
+        <Grid>
           <IconButton onClick={() => handleExpandClick('raids')} size="large">
             <img
               src={useMemory
@@ -851,17 +836,31 @@ const GymFooter = ({ lat, lon, hasRaid }) => {
                 .Icons.getMisc(popups.raids ? 'gyms' : 'raids')}
               alt={popups.raids ? 'gyms' : 'raids'}
               className={darkMode ? '' : 'darken-image'}
-              height={20}
-              width="auto"
+              height={24}
+              width={24}
+              style={{ objectFit: 'contain' }}
             />
           </IconButton>
         </Grid>
       )}
-      <Grid xs={4} textAlign="center">
+      <Grid>
         <Navigation lat={lat} lon={lon} />
       </Grid>
+      {gym.defenders?.length > 0 && (
+        <Grid>
+          <IconButton
+            onClick={(e) => {
+              e.stopPropagation()
+              setShowDefenders(true)
+            }}
+            size="large"
+          >
+            <ShieldIcon />
+          </IconButton>
+        </Grid>
+      )}
       {perms.gyms && (
-        <Grid xs={4}>
+        <Grid>
           <IconButton
             className={popups.extras ? 'expanded' : 'closed'}
             onClick={() => handleExpandClick('extras')}
@@ -871,7 +870,7 @@ const GymFooter = ({ lat, lon, hasRaid }) => {
           </IconButton>
         </Grid>
       )}
-    </>
+    </Grid>
   )
 }
 
