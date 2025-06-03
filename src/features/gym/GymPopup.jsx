@@ -254,7 +254,7 @@ function DefendersModal({ gym, onClose }) {
                   {t(`poke_${def.pokemon_id}`)}
                 </span>
                 <span style={{ fontSize: 13, color: '#666' }}>
-                  CP: <b>{currentCP}</b> / {fullCP}
+                  {t('cp')}: <b>{currentCP}</b> / {fullCP}
                 </span>
               </div>
               <div
@@ -314,22 +314,27 @@ function DefendersModal({ gym, onClose }) {
                     pointerEvents: 'none',
                   }}
                 >
-                  {/* Crack at 1/3 height (top) */}
-                  <path
-                    d="M2,9 Q7,11 14,9 Q21,11 26,9"
-                    stroke="white"
-                    strokeWidth={1.5}
-                    fill="none"
-                    strokeLinejoin="round"
-                  />
-                  {/* Crack at 2/3 height (bottom, improved to fit heart) */}
-                  <path
-                    d="M7,19 Q11,17 14,19 Q17,17 21,19"
-                    stroke="white"
-                    strokeWidth={1.5}
-                    fill="none"
-                    strokeLinejoin="round"
-                  />
+                  {/* Show cracks based on health: */}
+                  {percent <= 2 / 3 && (
+                    // Always show top crack if percent <= 2/3
+                    <path
+                      d="M2,9 Q7,11 14,9 Q21,11 26,9"
+                      stroke="white"
+                      strokeWidth={1.5}
+                      fill="none"
+                      strokeLinejoin="round"
+                    />
+                  )}
+                  {percent <= 1 / 3 && (
+                    // Show bottom crack only if percent <= 1/3
+                    <path
+                      d="M7,19 Q11,17 14,19 Q17,17 21,19"
+                      stroke="white"
+                      strokeWidth={1.5}
+                      fill="none"
+                      strokeLinejoin="round"
+                    />
+                  )}
                 </svg>
               </div>
             </div>
