@@ -824,57 +824,77 @@ const GymFooter = ({ lat, lon, hasRaid, gym, setShowDefenders }) => {
     }))
   }
 
+  const buttons = []
+
+  if (hasRaid && perms.raids && perms.gyms) {
+    buttons.push({
+      key: 'raids',
+      element: (
+        <IconButton onClick={() => handleExpandClick('raids')} size="large">
+          <img
+            src={useMemory
+              .getState()
+              .Icons.getMisc(popups.raids ? 'gyms' : 'raids')}
+            alt={popups.raids ? 'gyms' : 'raids'}
+            className={darkMode ? '' : 'darken-image'}
+            height={24}
+            width={24}
+            style={{ objectFit: 'contain' }}
+          />
+        </IconButton>
+      ),
+    })
+  }
+
+  if (gym.defenders?.length > 0) {
+    buttons.push({
+      key: 'defenders',
+      element: (
+        <IconButton
+          onClick={(e) => {
+            e.stopPropagation()
+            setShowDefenders(true)
+          }}
+          size="large"
+        >
+          <ShieldIcon />
+        </IconButton>
+      ),
+    })
+  }
+
+  buttons.push({
+    key: 'nav',
+    element: <Navigation lat={lat} lon={lon} />,
+  })
+
+  if (perms.gyms) {
+    buttons.push({
+      key: 'extras',
+      element: (
+        <IconButton
+          className={popups.extras ? 'expanded' : 'closed'}
+          onClick={() => handleExpandClick('extras')}
+          size="large"
+        >
+          <ExpandMore />
+        </IconButton>
+      ),
+    })
+  }
+
   return (
     <Grid
-      container
-      justifyContent="space-evenly"
-      alignItems="center"
-      spacing={1}
-      mt={1}
+      sx={{
+        display: 'flex',
+        flexWrap: 'nowrap',
+        overflow: 'hidden',
+        mt: 1,
+      }}
     >
-      {hasRaid && perms.raids && perms.gyms && (
-        <Grid>
-          <IconButton onClick={() => handleExpandClick('raids')} size="large">
-            <img
-              src={useMemory
-                .getState()
-                .Icons.getMisc(popups.raids ? 'gyms' : 'raids')}
-              alt={popups.raids ? 'gyms' : 'raids'}
-              className={darkMode ? '' : 'darken-image'}
-              height={24}
-              width={24}
-              style={{ objectFit: 'contain' }}
-            />
-          </IconButton>
-        </Grid>
-      )}
-      <Grid>
-        <Navigation lat={lat} lon={lon} />
-      </Grid>
-      {gym.defenders?.length > 0 && (
-        <Grid>
-          <IconButton
-            onClick={(e) => {
-              e.stopPropagation()
-              setShowDefenders(true)
-            }}
-            size="large"
-          >
-            <ShieldIcon />
-          </IconButton>
-        </Grid>
-      )}
-      {perms.gyms && (
-        <Grid>
-          <IconButton
-            className={popups.extras ? 'expanded' : 'closed'}
-            onClick={() => handleExpandClick('extras')}
-            size="large"
-          >
-            <ExpandMore />
-          </IconButton>
-        </Grid>
-      )}
+      {buttons.map(({ key, element }) => (
+        <Grid key={key}>{element}</Grid>
+      ))}
     </Grid>
   )
 }
