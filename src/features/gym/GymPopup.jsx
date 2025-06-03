@@ -69,6 +69,26 @@ export function GymPopup({ hasRaid, hasHatched, raidIconUrl, ...gym }) {
     )
   }
 
+  const formatTime = (timestamp) => {
+    const locale = localStorage.getItem('i18nextLng') || 'en'
+    return new Date(timestamp).toLocaleTimeString(locale, {
+      hour: '2-digit',
+      minute: '2-digit',
+    })
+  }
+
+  const now = Date.now()
+
+  const filteredRsvps =
+    gym.rsvps?.filter((entry) => {
+      const ets = entry.timeslot
+      return (
+        ets > now &&
+        ets / 1000 > gym.raid_spawn_timestamp &&
+        ets / 1000 < gym.raid_end_timestamp
+      )
+    }) || []
+
   return (
     <ErrorBoundary noRefresh style={{}} variant="h5">
       <Grid
@@ -121,6 +141,49 @@ export function GymPopup({ hasRaid, hasHatched, raidIconUrl, ...gym }) {
                 {Boolean(
                   gym.raid_pokemon_id && gym.raid_battle_timestamp >= ts,
                 ) && <Timer start {...gym} hasHatched={hasHatched} />}
+                {filteredRsvps?.length > 0 && (
+                  <Grid xs={12}>
+                    <Grid
+                      container
+                      direction="column"
+                      alignItems="center"
+                      style={{ margin: '2px 0' }}
+                    >
+                      <small
+                        style={{
+                          fontWeight: 'bold',
+                          fontSize: '0.9rem',
+                          marginBottom: 4,
+                        }}
+                      >
+                        RSVP (Going / Maybe)
+                      </small>
+                      <Grid container justifyContent="center" spacing={1}>
+                        {filteredRsvps.slice(0, 3).map((entry) => (
+                          <Grid
+                            key={entry.timeslot}
+                            xs="auto"
+                            style={{
+                              display: 'flex',
+                              flexDirection: 'column',
+                              alignItems: 'center',
+                              borderRadius: '6px',
+                              paddingTop: '4px',
+                              fontSize: '0.80rem',
+                              minWidth: 50,
+                              textAlign: 'center',
+                            }}
+                          >
+                            <div>{formatTime(entry.timeslot)}</div>
+                            <div style={{ fontSize: '0.75rem', opacity: 0.8 }}>
+                              {entry.going_count} / {entry.maybe_count}
+                            </div>
+                          </Grid>
+                        ))}
+                      </Grid>
+                    </Grid>
+                  </Grid>
+                )}
                 <Timer {...gym} hasHatched={hasHatched} />
               </Grid>
             </Collapse>

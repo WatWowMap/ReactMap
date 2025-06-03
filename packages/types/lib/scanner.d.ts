@@ -52,6 +52,12 @@ export interface Defender extends PokemonDisplay {
   cp_now: number
 }
 
+export interface Rsvp {
+  timeslot: number
+  going_count: number
+  maybe_count: number
+}
+
 export interface Gym {
   id: string
   lat: number
@@ -67,6 +73,7 @@ export interface Gym {
   guarding_pokemon_id: number
   guarding_pokemon_display: PokemonDisplay
   defenders: Defender[]
+  rsvps: Rsvp[]
   available_slots: number
   team_id: number
   raid_level: number
