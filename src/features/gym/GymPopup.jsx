@@ -5,6 +5,7 @@ import MoreVert from '@mui/icons-material/MoreVert'
 import Grid from '@mui/material/Unstable_Grid2'
 import IconButton from '@mui/material/IconButton'
 import Menu from '@mui/material/Menu'
+import Box from '@mui/material/Box'
 import MenuItem from '@mui/material/MenuItem'
 import Divider from '@mui/material/Divider'
 import Collapse from '@mui/material/Collapse'
@@ -694,14 +695,22 @@ const RaidInfo = ({
   }
 
   return (
-    <Grid xs={6} container justifyContent="space-around" alignItems="center">
-      <Grid xs={12}>
-        <Typography variant="h6" align="center">
+    <Grid
+      container
+      direction="column"
+      justifyContent="center"
+      alignItems="center"
+      xs={6}
+      spacing={0.5}
+    >
+      <Grid>
+        <Typography variant="h6" align="center" noWrap>
           {getRaidName(raid_level, raid_pokemon_id)}
         </Typography>
       </Grid>
-      <Grid xs={12} style={{ paddingBottom: 4, textAlign: 'center' }}>
-        <Typography variant="caption" align="center">
+
+      <Grid>
+        <Typography variant="caption" align="center" sx={{ pb: 0.5 }} noWrap>
           {getRaidForm(
             raid_pokemon_id,
             raid_pokemon_form,
@@ -709,44 +718,74 @@ const RaidInfo = ({
           )}
         </Typography>
       </Grid>
+
+      {/* Move 1 */}
       {raid_pokemon_move_1 && raid_pokemon_move_1 !== 1 && (
         <Grid
-          xs={2}
-          className="grid-item"
-          style={{
-            textAlign: 'center',
-            height: 15,
-            width: 15,
-            backgroundImage: `url(${Icons.getTypes(
-              moves[raid_pokemon_move_1].type,
-            )})`,
-          }}
-        />
+          container
+          alignItems="center"
+          justifyContent="center"
+          sx={{ maxWidth: '100%', flexWrap: 'nowrap' }}
+          spacing={1}
+        >
+          <Grid>
+            <Box
+              sx={{
+                width: 15,
+                height: 15,
+                backgroundImage: `url(${Icons.getTypes(
+                  moves[raid_pokemon_move_1].type,
+                )})`,
+                backgroundSize: 'contain',
+                backgroundRepeat: 'no-repeat',
+              }}
+            />
+          </Grid>
+          <Grid sx={{ minWidth: 0 }}>
+            <Typography
+              variant="caption"
+              noWrap
+              sx={{ textOverflow: 'ellipsis', overflow: 'hidden' }}
+            >
+              {t(`move_${raid_pokemon_move_1}`)}
+            </Typography>
+          </Grid>
+        </Grid>
       )}
-      <Grid xs={10} textAlign="center">
-        <Typography variant="caption" align="center">
-          {t(`move_${raid_pokemon_move_1}`)}
-        </Typography>
-      </Grid>
+
+      {/* Move 2 */}
       {raid_pokemon_move_2 && raid_pokemon_move_2 !== 2 && (
         <Grid
-          xs={2}
-          className="grid-item"
-          style={{
-            textAlign: 'center',
-            height: 15,
-            width: 15,
-            backgroundImage: `url(${Icons.getTypes(
-              moves[raid_pokemon_move_2].type,
-            )})`,
-          }}
-        />
+          container
+          alignItems="center"
+          justifyContent="center"
+          sx={{ maxWidth: '100%', flexWrap: 'nowrap' }}
+          spacing={1}
+        >
+          <Grid>
+            <Box
+              sx={{
+                width: 15,
+                height: 15,
+                backgroundImage: `url(${Icons.getTypes(
+                  moves[raid_pokemon_move_2].type,
+                )})`,
+                backgroundSize: 'contain',
+                backgroundRepeat: 'no-repeat',
+              }}
+            />
+          </Grid>
+          <Grid sx={{ minWidth: 0 }}>
+            <Typography
+              variant="caption"
+              noWrap
+              sx={{ textOverflow: 'ellipsis', overflow: 'hidden' }}
+            >
+              {t(`move_${raid_pokemon_move_2}`)}
+            </Typography>
+          </Grid>
+        </Grid>
       )}
-      <Grid xs={10} textAlign="center">
-        <Typography variant="caption" align="center">
-          {t(`move_${raid_pokemon_move_2}`)}
-        </Typography>
-      </Grid>
     </Grid>
   )
 }
@@ -887,7 +926,6 @@ const GymFooter = ({ lat, lon, hasRaid, gym, setShowDefenders }) => {
     <Grid
       sx={{
         display: 'flex',
-        flexWrap: 'nowrap',
         overflow: 'hidden',
         mt: 1,
       }}
