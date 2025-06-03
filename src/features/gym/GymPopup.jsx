@@ -51,6 +51,7 @@ export function GymPopup({ hasRaid, hasHatched, raidIconUrl, ...gym }) {
 
   useAnalytics('Popup', `Team ID: ${gym.team_id} Has Raid: ${hasRaid}`, 'Gym')
 
+  // If defenders modal is toggled, show only that
   if (showDefenders) {
     return (
       <ErrorBoundary noRefresh style={{}} variant="h5">
@@ -301,7 +302,7 @@ function DefendersModal({ gym, onClose }) {
                     transition: 'clip-path 0.3s',
                   }}
                 />
-                {/* Heart cracks */}
+                {/* Heart cracks for rounds */}
                 <svg
                   width={28}
                   height={28}
@@ -311,6 +312,7 @@ function DefendersModal({ gym, onClose }) {
                     pointerEvents: 'none',
                   }}
                 >
+                  {/* Crack at 1/3 height (top) */}
                   <path
                     d="M2,9 Q7,11 14,9 Q21,11 26,9"
                     stroke="white"
@@ -318,6 +320,7 @@ function DefendersModal({ gym, onClose }) {
                     fill="none"
                     strokeLinejoin="round"
                   />
+                  {/* Crack at 2/3 height (bottom, improved to fit heart) */}
                   <path
                     d="M7,19 Q11,17 14,19 Q17,17 21,19"
                     stroke="white"
