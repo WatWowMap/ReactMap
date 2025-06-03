@@ -157,6 +157,7 @@ function DefendersModal({ gym, onClose }) {
       container
       direction="column"
       alignItems="stretch"
+      mt={-1}
       style={{ minWidth: 250, maxWidth: 350, padding: 8 }}
     >
       <Grid container alignItems="center" mb={1}>
@@ -337,7 +338,8 @@ function DefendersModal({ gym, onClose }) {
       <Grid
         xs={12}
         textAlign="center"
-        mt={2}
+        mt={1}
+        mb={-1}
         style={{ fontSize: 12, color: '#888' }}
       >
         {t('last_updated')}:{' '}
