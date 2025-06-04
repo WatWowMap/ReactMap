@@ -20,14 +20,13 @@ import { useMemory } from '@store/useMemory'
 import { useLayoutStore } from '@store/useLayoutStore'
 import { setDeepStore, useStorage } from '@store/useStorage'
 import { ErrorBoundary } from '@components/ErrorBoundary'
-import { Img, TextWithIcon } from '@components/Img'
+import { Img } from '@components/Img'
 import { Title } from '@components/popups/Title'
 import { PowerUp } from '@components/popups/PowerUp'
 import { GenderIcon } from '@components/popups/GenderIcon'
 import { Navigation } from '@components/popups/Navigation'
 import { Coords } from '@components/popups/Coords'
 import { TimeStamp } from '@components/popups/TimeStamps'
-import { ExtraInfo } from '@components/popups/ExtraInfo'
 import { useAnalytics } from '@hooks/useAnalytics'
 import { getTimeUntil } from '@utils/getTimeUntil'
 import { formatInterval } from '@utils/formatInterval'
@@ -77,16 +76,14 @@ export function GymPopup({ hasRaid, hasHatched, raidIconUrl, ...gym }) {
     })
   }
 
-  const now = Date.now()
+  const nowSec = Math.floor(Date.now() / 1000)
+  const raidStart = Number(gym.raid_spawn_timestamp ?? 0)
+  const raidEnd = Number(gym.raid_end_timestamp ?? 0)
 
   const filteredRsvps =
     gym.rsvps?.filter((entry) => {
-      const ets = entry.timeslot
-      return (
-        ets > now &&
-        ets / 1000 > gym.raid_spawn_timestamp &&
-        ets / 1000 < gym.raid_end_timestamp
-      )
+      const etsSec = entry.timeslot / 1000
+      return etsSec >= nowSec && etsSec >= raidStart && etsSec <= raidEnd
     }) || []
 
   return (
@@ -141,7 +138,7 @@ export function GymPopup({ hasRaid, hasHatched, raidIconUrl, ...gym }) {
                 {Boolean(
                   gym.raid_pokemon_id && gym.raid_battle_timestamp >= ts,
                 ) && <Timer start {...gym} hasHatched={hasHatched} />}
-                {filteredRsvps?.length > 0 && (
+                {filteredRsvps.length > 0 && (
                   <Grid xs={12}>
                     <Grid
                       container
@@ -156,7 +153,7 @@ export function GymPopup({ hasRaid, hasHatched, raidIconUrl, ...gym }) {
                           marginBottom: 4,
                         }}
                       >
-                        RSVP (Going / Maybe)
+                        <Typography variant="subtitle1">RSVP</Typography>
                       </small>
                       <Grid container justifyContent="center" spacing={1}>
                         {filteredRsvps.slice(0, 3).map((entry) => (
@@ -1010,55 +1007,13 @@ const GymFooter = ({ lat, lon, hasRaid, gym, setShowDefenders }) => {
  * @param {import('@rm/types').Gym} props
  * @returns
  */
-const ExtraGymInfo = ({
-  last_modified_timestamp,
-  lat,
-  lon,
-  updated,
-  total_cp,
-  guarding_pokemon_id,
-  guarding_pokemon_display,
-}) => {
-  const { t, i18n } = useTranslation()
-  const Icons = useMemory((s) => s.Icons)
-  const gymValidDataLimit = useMemory((s) => s.gymValidDataLimit)
+const ExtraGymInfo = ({ last_modified_timestamp, lat, lon, updated }) => {
   const enableGymPopupCoords = useStorage(
     (s) => s.userSettings.gyms.enableGymPopupCoords,
   )
 
-  const numFormatter = new Intl.NumberFormat(i18n.language)
-  /** @type {Partial<import('@rm/types').PokemonDisplay>} */
-  const gpd = guarding_pokemon_display || {}
-
   return (
     <Grid container alignItems="center" justifyContent="center">
-      {!!guarding_pokemon_id && updated > gymValidDataLimit && (
-        <ExtraInfo title="defender">
-          <TextWithIcon
-            src={Icons.getPokemonByDisplay(guarding_pokemon_id, gpd)}
-          >
-            {gpd.badge === 1 && (
-              <>
-                <Img
-                  src={Icons.getMisc('bestbuddy')}
-                  alt={t('best_buddy')}
-                  maxHeight={15}
-                  maxWidth={15}
-                />
-                &nbsp;
-              </>
-            )}
-            {t(`poke_${guarding_pokemon_id}`)}
-          </TextWithIcon>
-        </ExtraInfo>
-      )}
-      {!!total_cp && updated > gymValidDataLimit && (
-        <ExtraInfo title="total_cp">{numFormatter.format(total_cp)}</ExtraInfo>
-      )}
-      <Divider
-        flexItem
-        style={{ width: '100%', height: 2, margin: '10px 0' }}
-      />
       <TimeStamp time={updated}>last_seen</TimeStamp>
       <TimeStamp time={last_modified_timestamp}>last_modified</TimeStamp>
       {enableGymPopupCoords && (
