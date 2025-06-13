@@ -34,7 +34,6 @@ export interface DbContext {
   hasRewardAmount: boolean
   hasPowerUp: boolean
   hasAltQuests: boolean
-  hasLayerColumn: boolean
   hasMultiInvasions: boolean
   multiInvasionMs: boolean
   hasConfirmed: boolean
