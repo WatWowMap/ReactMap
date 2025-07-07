@@ -156,6 +156,7 @@ function DefendersModal({ gym, onClose }) {
   const updatedMs =
     defenders.length &&
     defenders[0].deployed_ms + defenders[0].deployed_time * 1000
+  const now = Date.now()
 
   return (
     <Grid
@@ -194,10 +195,17 @@ function DefendersModal({ gym, onClose }) {
       <Grid container direction="column" spacing={1}>
         {defenders.map((def) => {
           const fullCP = def.cp_when_deployed
-          const currentCP = def.cp_now
-          const percent = Math.max(
+          const decayTime =
+            60 *
+            60 *
+            1000 *
+            Math.min(Math.max(Math.log10(3000 / fullCP), 8), 72)
+          const predictedMotivation = Math.max(
             0,
-            Math.min(1, (currentCP / fullCP) * 1.25 - 0.25),
+            def.motivation_now - Math.max(0, now - updatedMs) / decayTime,
+          )
+          const currentCP = Math.round(
+            fullCP * (0.2 + 0.8 * predictedMotivation),
           )
 
           return (
@@ -307,7 +315,7 @@ function DefendersModal({ gym, onClose }) {
                     position: 'absolute',
                     width: 28,
                     height: 28,
-                    clipPath: `inset(${100 - percent * 100}% 0 0 0)`,
+                    clipPath: `inset(${100 - predictedMotivation * 100}% 0 0 0)`,
                     transition: 'clip-path 0.3s',
                   }}
                 />
@@ -322,8 +330,8 @@ function DefendersModal({ gym, onClose }) {
                   }}
                 >
                   {/* Show cracks based on health: */}
-                  {percent <= 2 / 3 && (
-                    // Always show top crack if percent <= 2/3
+                  {predictedMotivation <= 2 / 3 && (
+                    // Always show top crack if predictedMotivation <= 2/3
                     <path
                       d="M2,9 Q7,11 14,9 Q21,11 26,9"
                       stroke={theme.palette.text.primary}
@@ -332,8 +340,8 @@ function DefendersModal({ gym, onClose }) {
                       strokeLinejoin="round"
                     />
                   )}
-                  {percent <= 1 / 3 && (
-                    // Show bottom crack only if percent <= 1/3
+                  {predictedMotivation <= 1 / 3 && (
+                    // Show bottom crack only if predictedMotivation <= 1/3
                     <path
                       d="M7,19 Q11,17 14,19 Q17,17 21,19"
                       stroke={theme.palette.text.primary}
