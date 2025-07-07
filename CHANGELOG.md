@@ -1,3 +1,10 @@
+# [1.36.0-develop.17](https://github.com/WatWowMap/ReactMap/compare/v1.36.0-develop.16...v1.36.0-develop.17) (2025-07-07)
+
+
+### Bug Fixes
+
+* search ([26eaaab](https://github.com/WatWowMap/ReactMap/commit/26eaaabdb08fb0a93bc5ba73118678425a63f11b))
+
 # [1.36.0-develop.16](https://github.com/WatWowMap/ReactMap/compare/v1.36.0-develop.15...v1.36.0-develop.16) (2025-04-11)
 
 
