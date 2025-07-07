@@ -5,10 +5,18 @@ import MoreVert from '@mui/icons-material/MoreVert'
 import Grid from '@mui/material/Unstable_Grid2'
 import IconButton from '@mui/material/IconButton'
 import Menu from '@mui/material/Menu'
+import Box from '@mui/material/Box'
 import MenuItem from '@mui/material/MenuItem'
 import Divider from '@mui/material/Divider'
 import Collapse from '@mui/material/Collapse'
 import Typography from '@mui/material/Typography'
+import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew'
+import ShieldIcon from '@mui/icons-material/Shield'
+import FavoriteIcon from '@mui/icons-material/Favorite'
+import EmojiEventsIcon from '@mui/icons-material/EmojiEvents'
+import SentimentVeryDissatisfiedIcon from '@mui/icons-material/SentimentVeryDissatisfied'
+import RestaurantIcon from '@mui/icons-material/Restaurant'
+import { useTheme } from '@mui/material/styles'
 import { useTranslation } from 'react-i18next'
 
 import { useSyncData } from '@features/webhooks'
@@ -16,19 +24,38 @@ import { useMemory } from '@store/useMemory'
 import { useLayoutStore } from '@store/useLayoutStore'
 import { setDeepStore, useStorage } from '@store/useStorage'
 import { ErrorBoundary } from '@components/ErrorBoundary'
-import { Img, TextWithIcon } from '@components/Img'
+import { Img } from '@components/Img'
 import { Title } from '@components/popups/Title'
 import { PowerUp } from '@components/popups/PowerUp'
 import { GenderIcon } from '@components/popups/GenderIcon'
 import { Navigation } from '@components/popups/Navigation'
 import { Coords } from '@components/popups/Coords'
 import { TimeStamp } from '@components/popups/TimeStamps'
-import { ExtraInfo } from '@components/popups/ExtraInfo'
 import { useAnalytics } from '@hooks/useAnalytics'
 import { getTimeUntil } from '@utils/getTimeUntil'
 import { formatInterval } from '@utils/formatInterval'
 
 import { useWebhook } from './useWebhook'
+
+/**
+ * Format deployed time as either "Xd Xh Xm" or "X:X:X" format
+ * @param {number} intervalMs - Time interval in milliseconds
+ * @returns {string} Formatted time string
+ */
+function formatDeployedTime(intervalMs) {
+  const totalSeconds = Math.floor(intervalMs / 1000)
+  const days = Math.floor(totalSeconds / 86400)
+  const hours = Math.floor((totalSeconds % 86400) / 3600)
+  const minutes = Math.floor((totalSeconds % 3600) / 60)
+
+  if (days > 0) {
+    // Format as "Xd Xh Xm"
+    return `${days}d ${hours}h ${minutes}m`
+  }
+  // Format as "X:X:X" (HH:MM:SS)
+  const seconds = totalSeconds % 60
+  return `${hours}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`
+}
 
 /**
  *
@@ -44,8 +71,26 @@ export function GymPopup({ hasRaid, hasHatched, raidIconUrl, ...gym }) {
   const { perms } = useMemory((s) => s.auth)
   const popups = useStorage((s) => s.popups)
   const ts = Math.floor(Date.now() / 1000)
+  const [showDefenders, setShowDefenders] = React.useState(false)
 
   useAnalytics('Popup', `Team ID: ${gym.team_id} Has Raid: ${hasRaid}`, 'Gym')
+
+  // If defenders modal is toggled, show only that
+  if (showDefenders) {
+    return (
+      <ErrorBoundary noRefresh style={{}} variant="h5">
+        <Grid
+          container
+          direction="row"
+          justifyContent="center"
+          alignItems="center"
+          width={200}
+        >
+          <DefendersModal gym={gym} onClose={() => setShowDefenders(false)} />
+        </Grid>
+      </ErrorBoundary>
+    )
+  }
 
   return (
     <ErrorBoundary noRefresh style={{}} variant="h5">
@@ -105,7 +150,13 @@ export function GymPopup({ hasRaid, hasHatched, raidIconUrl, ...gym }) {
           </Grid>
         )}
         <PowerUp {...gym} />
-        <GymFooter hasRaid={hasRaid} lat={gym.lat} lon={gym.lon} />
+        <GymFooter
+          hasRaid={hasRaid}
+          lat={gym.lat}
+          lon={gym.lon}
+          gym={gym}
+          setShowDefenders={setShowDefenders}
+        />
         {perms.gyms && (
           <Collapse in={popups.extras} timeout="auto" unmountOnExit>
             <ExtraGymInfo {...gym} />
@@ -113,6 +164,283 @@ export function GymPopup({ hasRaid, hasHatched, raidIconUrl, ...gym }) {
         )}
       </Grid>
     </ErrorBoundary>
+  )
+}
+
+/**
+ * Compact modal for gym defenders
+ * @param {{ gym: import('@rm/types').Gym, onClose: () => void }} param0
+ */
+function DefendersModal({ gym, onClose }) {
+  const { t } = useTranslation()
+  const theme = useTheme()
+  const Icons = useMemory((s) => s.Icons)
+  const defenders = gym.defenders || []
+  const updatedMs =
+    defenders.length &&
+    defenders[0].deployed_ms + defenders[0].deployed_time * 1000
+  const now = Date.now()
+
+  return (
+    <Grid
+      container
+      direction="column"
+      alignItems="stretch"
+      mt={-1}
+      style={{ minWidth: 250, maxWidth: 350, padding: 8 }}
+    >
+      <Grid container alignItems="center" mb={1}>
+        <Grid xs={2}>
+          <IconButton
+            onClick={(e) => {
+              e.stopPropagation()
+              onClose()
+            }}
+            size="small"
+          >
+            <ArrowBackIosNewIcon fontSize="small" />
+          </IconButton>
+        </Grid>
+        <Grid
+          xs={10}
+          style={{
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            wordBreak: 'break-word',
+            maxWidth: 200,
+            display: 'flex',
+            alignItems: 'center',
+          }}
+        >
+          <Title backup={t('unknown_gym')}>{gym.name}</Title>
+        </Grid>
+      </Grid>
+      <Grid container direction="column" spacing={1}>
+        {defenders.map((def) => {
+          const fullCP = def.cp_when_deployed
+          const decayTime =
+            72 *
+            60 *
+            60 *
+            1000 *
+            Math.min(Math.max(Math.log10(3000 / fullCP), 1 / 9), 1)
+          const predictedMotivation = Math.max(
+            0,
+            def.motivation_now - Math.max(0, now - updatedMs) / decayTime,
+          )
+          const currentCP = Math.round(
+            fullCP * (0.2 + 0.8 * predictedMotivation),
+          )
+
+          return (
+            <div
+              key={def.pokemon_id}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                minHeight: 80,
+                width: '100%',
+                padding: '8px 0',
+                borderBottom: `1px solid ${theme.palette.divider}`,
+              }}
+            >
+              <div
+                style={{
+                  width: 50,
+                  height: 50,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  marginLeft: 12,
+                  marginRight: 12,
+                  flexShrink: 0,
+                }}
+              >
+                <Img
+                  src={Icons.getPokemonByDisplay(def.pokemon_id, def)}
+                  alt={t(`poke_${def.pokemon_id}`)}
+                  style={{
+                    maxHeight: 50,
+                    maxWidth: 50,
+                    objectFit: 'contain',
+                  }}
+                />
+              </div>
+              <div
+                style={{
+                  flex: 1,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'flex-start',
+                  justifyContent: 'center',
+                  minWidth: 0,
+                  textAlign: 'left',
+                  overflow: 'hidden',
+                  marginLeft: 4,
+                  gap: '4px',
+                }}
+              >
+                {/* First line: Pokemon name CP{currentCP}/{fullCP} */}
+                <div
+                  style={{
+                    fontSize: 16,
+                    fontWeight: 700,
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap',
+                    maxWidth: '100%',
+                  }}
+                  title={`${t(`poke_${def.pokemon_id}`)} CP${currentCP}/${fullCP}`}
+                >
+                  {t(`poke_${def.pokemon_id}`)}
+                </div>
+
+                <div
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    fontSize: 13,
+                    color: theme.palette.text.secondary,
+                  }}
+                >
+                  <div
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '2px',
+                    }}
+                  >
+                    <EmojiEventsIcon style={{ fontSize: 16 }} />
+                    <span>{def.battles_won || 0}</span>
+                  </div>
+                  <div
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '2px',
+                    }}
+                  >
+                    <SentimentVeryDissatisfiedIcon style={{ fontSize: 16 }} />
+                    <span>{def.battles_lost || 0}</span>
+                  </div>
+                  <div
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '2px',
+                    }}
+                  >
+                    <RestaurantIcon style={{ fontSize: 16 }} />
+                    <span>{def.times_fed || 0}</span>
+                  </div>
+                </div>
+
+                <div
+                  style={{
+                    fontSize: 13,
+                    color: theme.palette.text.secondary,
+                  }}
+                >
+                  CP{currentCP}/{fullCP}{' '}
+                  {formatDeployedTime(def.deployed_ms + now - updatedMs)}
+                </div>
+              </div>
+              <div
+                style={{
+                  width: 44,
+                  height: 44,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'right',
+                  marginLeft: 6,
+                  marginRight: 12,
+                  flexShrink: 0,
+                  position: 'relative',
+                }}
+              >
+                {/* Heart outline */}
+                <FavoriteIcon
+                  style={{
+                    color: 'transparent',
+                    position: 'absolute',
+                    width: 28,
+                    height: 28,
+                    stroke: theme.palette.text.primary,
+                    strokeWidth: 1,
+                    filter: 'drop-shadow(0 0 1px #0008)',
+                  }}
+                  className="heart-outline"
+                />
+                {/* Heart background */}
+                <FavoriteIcon
+                  style={{
+                    color: theme.palette.mode === 'dark' ? 'white' : '#f0f0f0',
+                    opacity: 0.18,
+                    position: 'absolute',
+                    width: 28,
+                    height: 28,
+                  }}
+                />
+                {/* Heart fill */}
+                <FavoriteIcon
+                  style={{
+                    color: '#ff69b4',
+                    position: 'absolute',
+                    width: 28,
+                    height: 28,
+                    clipPath: `inset(${100 - predictedMotivation * 100}% 0 0 0)`,
+                    transition: 'clip-path 0.3s',
+                  }}
+                />
+                {/* Heart cracks for rounds */}
+                <svg
+                  width={28}
+                  height={28}
+                  viewBox="0 0 28 28"
+                  style={{
+                    position: 'absolute',
+                    pointerEvents: 'none',
+                  }}
+                >
+                  {/* Show cracks based on health: */}
+                  {predictedMotivation <= 2 / 3 && (
+                    // Always show top crack if predictedMotivation <= 2/3
+                    <path
+                      d="M2,9 Q7,11 14,9 Q21,11 26,9"
+                      stroke={theme.palette.text.primary}
+                      strokeWidth={1.5}
+                      fill="none"
+                      strokeLinejoin="round"
+                    />
+                  )}
+                  {predictedMotivation <= 1 / 3 && (
+                    // Show bottom crack only if predictedMotivation <= 1/3
+                    <path
+                      d="M7,19 Q11,17 14,19 Q17,17 21,19"
+                      stroke={theme.palette.text.primary}
+                      strokeWidth={1.5}
+                      fill="none"
+                      strokeLinejoin="round"
+                    />
+                  )}
+                </svg>
+              </div>
+            </div>
+          )
+        })}
+      </Grid>
+      <Grid
+        xs={12}
+        textAlign="center"
+        mt={1}
+        mb={-1}
+        style={{ fontSize: 12, color: '#888' }}
+      >
+        {t('last_updated')}:{' '}
+        {defenders.length ? new Date(updatedMs).toLocaleString() : t('unknown')}
+      </Grid>
+    </Grid>
   )
 }
 
@@ -459,14 +787,22 @@ const RaidInfo = ({
   }
 
   return (
-    <Grid xs={6} container justifyContent="space-around" alignItems="center">
-      <Grid xs={12}>
-        <Typography variant="h6" align="center">
+    <Grid
+      container
+      direction="column"
+      justifyContent="center"
+      alignItems="center"
+      xs={6}
+      spacing={0.5}
+    >
+      <Grid>
+        <Typography variant="h6" align="center" noWrap>
           {getRaidName(raid_level, raid_pokemon_id)}
         </Typography>
       </Grid>
-      <Grid xs={12} style={{ paddingBottom: 4, textAlign: 'center' }}>
-        <Typography variant="caption" align="center">
+
+      <Grid>
+        <Typography variant="caption" align="center" sx={{ pb: 0.5 }} noWrap>
           {getRaidForm(
             raid_pokemon_id,
             raid_pokemon_form,
@@ -474,44 +810,74 @@ const RaidInfo = ({
           )}
         </Typography>
       </Grid>
+
+      {/* Move 1 */}
       {raid_pokemon_move_1 && raid_pokemon_move_1 !== 1 && (
         <Grid
-          xs={2}
-          className="grid-item"
-          style={{
-            textAlign: 'center',
-            height: 15,
-            width: 15,
-            backgroundImage: `url(${Icons.getTypes(
-              moves[raid_pokemon_move_1].type,
-            )})`,
-          }}
-        />
+          container
+          alignItems="center"
+          justifyContent="center"
+          sx={{ maxWidth: '100%', flexWrap: 'nowrap' }}
+          spacing={1}
+        >
+          <Grid>
+            <Box
+              sx={{
+                width: 15,
+                height: 15,
+                backgroundImage: `url(${Icons.getTypes(
+                  moves[raid_pokemon_move_1].type,
+                )})`,
+                backgroundSize: 'contain',
+                backgroundRepeat: 'no-repeat',
+              }}
+            />
+          </Grid>
+          <Grid sx={{ minWidth: 0 }}>
+            <Typography
+              variant="caption"
+              noWrap
+              sx={{ textOverflow: 'ellipsis', overflow: 'hidden' }}
+            >
+              {t(`move_${raid_pokemon_move_1}`)}
+            </Typography>
+          </Grid>
+        </Grid>
       )}
-      <Grid xs={10} textAlign="center">
-        <Typography variant="caption" align="center">
-          {t(`move_${raid_pokemon_move_1}`)}
-        </Typography>
-      </Grid>
+
+      {/* Move 2 */}
       {raid_pokemon_move_2 && raid_pokemon_move_2 !== 2 && (
         <Grid
-          xs={2}
-          className="grid-item"
-          style={{
-            textAlign: 'center',
-            height: 15,
-            width: 15,
-            backgroundImage: `url(${Icons.getTypes(
-              moves[raid_pokemon_move_2].type,
-            )})`,
-          }}
-        />
+          container
+          alignItems="center"
+          justifyContent="center"
+          sx={{ maxWidth: '100%', flexWrap: 'nowrap' }}
+          spacing={1}
+        >
+          <Grid>
+            <Box
+              sx={{
+                width: 15,
+                height: 15,
+                backgroundImage: `url(${Icons.getTypes(
+                  moves[raid_pokemon_move_2].type,
+                )})`,
+                backgroundSize: 'contain',
+                backgroundRepeat: 'no-repeat',
+              }}
+            />
+          </Grid>
+          <Grid sx={{ minWidth: 0 }}>
+            <Typography
+              variant="caption"
+              noWrap
+              sx={{ textOverflow: 'ellipsis', overflow: 'hidden' }}
+            >
+              {t(`move_${raid_pokemon_move_2}`)}
+            </Typography>
+          </Grid>
+        </Grid>
       )}
-      <Grid xs={10} textAlign="center">
-        <Typography variant="caption" align="center">
-          {t(`move_${raid_pokemon_move_2}`)}
-        </Typography>
-      </Grid>
     </Grid>
   )
 }
@@ -570,10 +936,12 @@ const Timer = ({
  *   lat: number
  *   lon: number
  *   hasRaid: boolean
+ *   gym: any
+ *   setShowDefenders: any
  * }} param0
  * @returns
  */
-const GymFooter = ({ lat, lon, hasRaid }) => {
+const GymFooter = ({ lat, lon, hasRaid, gym, setShowDefenders }) => {
   const darkMode = useStorage((s) => s.darkMode)
   const popups = useStorage((s) => s.popups)
   const perms = useMemory((s) => s.auth.perms)
@@ -587,38 +955,77 @@ const GymFooter = ({ lat, lon, hasRaid }) => {
     }))
   }
 
+  const buttons = []
+
+  if (hasRaid && perms.raids && perms.gyms) {
+    buttons.push({
+      key: 'raids',
+      element: (
+        <IconButton onClick={() => handleExpandClick('raids')} size="large">
+          <img
+            src={useMemory
+              .getState()
+              .Icons.getMisc(popups.raids ? 'gyms' : 'raids')}
+            alt={popups.raids ? 'gyms' : 'raids'}
+            className={darkMode ? '' : 'darken-image'}
+            height={24}
+            width={24}
+            style={{ objectFit: 'contain' }}
+          />
+        </IconButton>
+      ),
+    })
+  }
+
+  if (gym.defenders?.length > 0) {
+    buttons.push({
+      key: 'defenders',
+      element: (
+        <IconButton
+          onClick={(e) => {
+            e.stopPropagation()
+            setShowDefenders(true)
+          }}
+          size="large"
+        >
+          <ShieldIcon />
+        </IconButton>
+      ),
+    })
+  }
+
+  buttons.push({
+    key: 'nav',
+    element: <Navigation lat={lat} lon={lon} />,
+  })
+
+  if (perms.gyms) {
+    buttons.push({
+      key: 'extras',
+      element: (
+        <IconButton
+          className={popups.extras ? 'expanded' : 'closed'}
+          onClick={() => handleExpandClick('extras')}
+          size="large"
+        >
+          <ExpandMore />
+        </IconButton>
+      ),
+    })
+  }
+
   return (
-    <>
-      {hasRaid && perms.raids && perms.gyms && (
-        <Grid xs={4}>
-          <IconButton onClick={() => handleExpandClick('raids')} size="large">
-            <img
-              src={useMemory
-                .getState()
-                .Icons.getMisc(popups.raids ? 'gyms' : 'raids')}
-              alt={popups.raids ? 'gyms' : 'raids'}
-              className={darkMode ? '' : 'darken-image'}
-              height={20}
-              width="auto"
-            />
-          </IconButton>
-        </Grid>
-      )}
-      <Grid xs={4} textAlign="center">
-        <Navigation lat={lat} lon={lon} />
-      </Grid>
-      {perms.gyms && (
-        <Grid xs={4}>
-          <IconButton
-            className={popups.extras ? 'expanded' : 'closed'}
-            onClick={() => handleExpandClick('extras')}
-            size="large"
-          >
-            <ExpandMore />
-          </IconButton>
-        </Grid>
-      )}
-    </>
+    <Grid
+      sx={{
+        display: 'flex',
+        overflow: 'hidden',
+        mt: 1,
+      }}
+    >
+      {buttons.map(({ key, element }) => (
+        <Grid key={key}>{element}</Grid>
+      ))}
+    </Grid>
   )
 }
 
@@ -627,55 +1034,13 @@ const GymFooter = ({ lat, lon, hasRaid }) => {
  * @param {import('@rm/types').Gym} props
  * @returns
  */
-const ExtraGymInfo = ({
-  last_modified_timestamp,
-  lat,
-  lon,
-  updated,
-  total_cp,
-  guarding_pokemon_id,
-  guarding_pokemon_display,
-}) => {
-  const { t, i18n } = useTranslation()
-  const Icons = useMemory((s) => s.Icons)
-  const gymValidDataLimit = useMemory((s) => s.gymValidDataLimit)
+const ExtraGymInfo = ({ last_modified_timestamp, lat, lon, updated }) => {
   const enableGymPopupCoords = useStorage(
     (s) => s.userSettings.gyms.enableGymPopupCoords,
   )
 
-  const numFormatter = new Intl.NumberFormat(i18n.language)
-  /** @type {Partial<import('@rm/types').PokemonDisplay>} */
-  const gpd = guarding_pokemon_display || {}
-
   return (
     <Grid container alignItems="center" justifyContent="center">
-      {!!guarding_pokemon_id && updated > gymValidDataLimit && (
-        <ExtraInfo title="defender">
-          <TextWithIcon
-            src={Icons.getPokemonByDisplay(guarding_pokemon_id, gpd)}
-          >
-            {gpd.badge === 1 && (
-              <>
-                <Img
-                  src={Icons.getMisc('bestbuddy')}
-                  alt={t('best_buddy')}
-                  maxHeight={15}
-                  maxWidth={15}
-                />
-                &nbsp;
-              </>
-            )}
-            {t(`poke_${guarding_pokemon_id}`)}
-          </TextWithIcon>
-        </ExtraInfo>
-      )}
-      {!!total_cp && updated > gymValidDataLimit && (
-        <ExtraInfo title="total_cp">{numFormatter.format(total_cp)}</ExtraInfo>
-      )}
-      <Divider
-        flexItem
-        style={{ width: '100%', height: 2, margin: '10px 0' }}
-      />
       <TimeStamp time={updated}>last_seen</TimeStamp>
       <TimeStamp time={last_modified_timestamp}>last_modified</TimeStamp>
       {enableGymPopupCoords && (
