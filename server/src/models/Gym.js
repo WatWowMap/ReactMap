@@ -426,6 +426,7 @@ class Gym extends Model {
         'raid_pokemon_gender',
         'raid_pokemon_costume',
         'raid_pokemon_evolution',
+        'raid_end_timestamp',
         distance,
       ])
       .whereBetween('lat', [bbox.minLat, bbox.maxLat])
