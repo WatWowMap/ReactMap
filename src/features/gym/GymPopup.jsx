@@ -13,6 +13,7 @@ import Typography from '@mui/material/Typography'
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew'
 import ShieldIcon from '@mui/icons-material/Shield'
 import FavoriteIcon from '@mui/icons-material/Favorite'
+import { useTheme } from '@mui/material/styles'
 import { useTranslation } from 'react-i18next'
 
 import { useSyncData } from '@features/webhooks'
@@ -149,6 +150,7 @@ export function GymPopup({ hasRaid, hasHatched, raidIconUrl, ...gym }) {
  */
 function DefendersModal({ gym, onClose }) {
   const { t } = useTranslation()
+  const theme = useTheme()
   const Icons = useMemory((s) => s.Icons)
   const defenders = gym.defenders || []
 
@@ -279,7 +281,7 @@ function DefendersModal({ gym, onClose }) {
                     position: 'absolute',
                     width: 28,
                     height: 28,
-                    stroke: 'white',
+                    stroke: theme.palette.text.primary,
                     strokeWidth: 1,
                     filter: 'drop-shadow(0 0 1px #0008)',
                   }}
@@ -288,7 +290,7 @@ function DefendersModal({ gym, onClose }) {
                 {/* Heart background */}
                 <FavoriteIcon
                   style={{
-                    color: 'white',
+                    color: theme.palette.mode === 'dark' ? 'white' : '#f0f0f0',
                     opacity: 0.18,
                     position: 'absolute',
                     width: 28,
@@ -321,7 +323,7 @@ function DefendersModal({ gym, onClose }) {
                     // Always show top crack if percent <= 2/3
                     <path
                       d="M2,9 Q7,11 14,9 Q21,11 26,9"
-                      stroke="white"
+                      stroke={theme.palette.text.primary}
                       strokeWidth={1.5}
                       fill="none"
                       strokeLinejoin="round"
@@ -331,7 +333,7 @@ function DefendersModal({ gym, onClose }) {
                     // Show bottom crack only if percent <= 1/3
                     <path
                       d="M7,19 Q11,17 14,19 Q17,17 21,19"
-                      stroke="white"
+                      stroke={theme.palette.text.primary}
                       strokeWidth={1.5}
                       fill="none"
                       strokeLinejoin="round"
