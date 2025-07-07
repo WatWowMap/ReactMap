@@ -150,6 +150,7 @@ class DbManager extends Logger {
       ])
     const hasStationedGmax =
       'total_stationed_gmax' in (await schema('station').columnInfo())
+    const [hasLayerColumn] = [false]
     const [hasMultiInvasions, multiInvasionMs, hasConfirmed] = await schema(
       'incident',
     )
@@ -179,6 +180,7 @@ class DbManager extends Logger {
       hasRewardAmount,
       hasPowerUp,
       hasAltQuests,
+      hasLayerColumn,
       hasMultiInvasions,
       multiInvasionMs,
       hasConfirmed,

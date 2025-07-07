@@ -384,8 +384,7 @@ class Gym extends Model {
     }
   }
 
-  // eslint-disable-next-line no-empty-pattern
-  static async search(perms, args, {}, distance, bbox) {
+  static async search(perms, args, distance, bbox) {
     const { areaRestrictions } = perms
     const { onlyAreas = [], search = '' } = args
 

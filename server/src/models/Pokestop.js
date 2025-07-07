@@ -103,8 +103,7 @@ class Pokestop extends Model {
     } = args
     const midnight = getUserMidnight(args)
     const ts = Math.floor(Date.now() / 1000)
-    const { queryLimits, stopValidDataLimit, hideOldPokestops } =
-      config.getSafe('api')
+    const { queryLimits, stopValidDataLimit } = config.getSafe('api')
 
     const {
       lures: lurePerms,
@@ -116,9 +115,7 @@ class Pokestop extends Model {
     } = perms
 
     const query = this.query()
-    if (hideOldPokestops) {
-      query.where('pokestop.updated', '>', ts - stopValidDataLimit * 86400)
-    }
+    query.where('pokestop.updated', '>', ts - stopValidDataLimit * 86400)
 
     Pokestop.joinIncident(query, hasMultiInvasions, multiInvasionMs)
     query
@@ -1320,8 +1317,7 @@ class Pokestop extends Model {
     return quest
   }
 
-  // eslint-disable-next-line no-empty-pattern
-  static async search(perms, args, {}, distance, bbox) {
+  static async search(perms, args, distance, bbox) {
     const { onlyAreas = [], search = '' } = args
     const query = this.query()
       .select(['name', 'id', 'lat', 'lon', 'url', distance])
@@ -1478,8 +1474,7 @@ class Pokestop extends Model {
     return mapped.map((result) => this.parseRdmRewards(result)).filter(Boolean)
   }
 
-  // eslint-disable-next-line no-empty-pattern
-  static async searchLures(perms, args, {}, distance, bbox) {
+  static async searchLures(perms, args, distance, bbox) {
     const { search, onlyAreas = [], locale } = args
     const ts = Math.floor(Date.now() / 1000)
 
@@ -1635,7 +1630,7 @@ class Pokestop extends Model {
    * @returns {Promise<{ hasConfirmedInvasions: boolean }>}
    */
   static async getFilterContext({ hasConfirmed }) {
-    if (!hasConfirmed) return { hasConfirmedInvasions: false }
+    if (false || !hasConfirmed) return { hasConfirmedInvasions: false }
     const result = await this.query()
       .from('incident')
       .count('id', { as: 'total' })
