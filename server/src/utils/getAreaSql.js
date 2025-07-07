@@ -7,10 +7,17 @@ const { consolidateAreas } = require('./consolidateAreas')
  * @param {import('objection').QueryBuilder} query
  * @param {string[]} areaRestrictions
  * @param {string[]} onlyAreas
+ * @param {boolean} [isMad]
  * @param {string} [category]
  * @returns
  */
-function getAreaSql(query, areaRestrictions, onlyAreas, category = '') {
+function getAreaSql(
+  query,
+  areaRestrictions,
+  onlyAreas,
+  isMad = false,
+  category = '',
+) {
   const authentication = config.getSafe('authentication')
   const areas = config.getSafe('areas')
   if (
@@ -27,7 +34,20 @@ function getAreaSql(query, areaRestrictions, onlyAreas, category = '') {
   if (!consolidatedAreas.size) return false
 
   let columns = ['lat', 'lon']
-  if (category === 'device') {
+  if (isMad) {
+    if (category === 'device') {
+      columns = ['X(currentPos)', 'Y(currentPos)']
+    } else {
+      columns = ['latitude', 'longitude']
+    }
+    if (category === 'pokemon') {
+      columns = columns.map((each) => `pokemon.${each}`)
+    } else if (category === 'route_start') {
+      columns = columns.map((each) => `start_poi_${each}`)
+    } else if (category === 'route_end') {
+      columns = columns.map((each) => `end_poi_${each}`)
+    }
+  } else if (category === 'device') {
     columns = columns.map((each) => `last_${each}`)
   } else if (category === 's2cell') {
     columns = columns.map((each) => `center_${each}`)

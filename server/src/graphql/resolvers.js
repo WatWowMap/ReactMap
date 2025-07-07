@@ -167,7 +167,9 @@ const resolvers = {
             : '',
         profileButton: !!(username && misc.enableFloatingProfileButton),
         scanZone:
-          scanner.scanZone.enabled && perms.scanner.includes('scanZone'),
+          scanner.backendConfig.platform !== 'mad' &&
+          scanner.scanZone.enabled &&
+          perms.scanner.includes('scanZone'),
         scanNext:
           scanner.scanNext.enabled && perms.scanner.includes('scanNext'),
         search: Object.entries(config.getSafe('api.searchable')).some(

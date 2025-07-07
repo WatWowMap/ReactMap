@@ -5,7 +5,7 @@ import { createJSONStorage, persist } from 'zustand/middleware'
 
 /**
  * @typedef {'scanNext' | 'scanZone'} ScanMode
- * @typedef {'' | 'rdm' | 'custom'} ScannerType
+ * @typedef {'' | 'mad' | 'rdm' | 'custom'} ScannerType
  * @typedef {{
  *   scannerType: ScannerType,
  *   showScanCount: boolean,
