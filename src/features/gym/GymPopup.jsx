@@ -153,6 +153,9 @@ function DefendersModal({ gym, onClose }) {
   const theme = useTheme()
   const Icons = useMemory((s) => s.Icons)
   const defenders = gym.defenders || []
+  const updatedMs =
+    defenders.length &&
+    defenders[0].deployed_ms + defenders[0].deployed_time * 1000
 
   return (
     <Grid
@@ -353,9 +356,7 @@ function DefendersModal({ gym, onClose }) {
         style={{ fontSize: 12, color: '#888' }}
       >
         {t('last_updated')}:{' '}
-        {gym.updated
-          ? new Date(gym.updated * 1000).toLocaleString()
-          : t('unknown')}
+        {defenders.length ? new Date(updatedMs).toLocaleString() : t('unknown')}
       </Grid>
     </Grid>
   )
