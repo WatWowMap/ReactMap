@@ -1,3 +1,10 @@
+# [1.36.0-develop.18](https://github.com/WatWowMap/ReactMap/compare/v1.36.0-develop.17...v1.36.0-develop.18) (2025-07-07)
+
+
+### Bug Fixes
+
+* raid timer in search ([23275f6](https://github.com/WatWowMap/ReactMap/commit/23275f6276cb014eab1858d693c9792731f64e3b))
+
 # [1.36.0-develop.17](https://github.com/WatWowMap/ReactMap/compare/v1.36.0-develop.16...v1.36.0-develop.17) (2025-07-07)
 
 
