@@ -51,7 +51,8 @@ class Portal extends Model {
    * @param {ReturnType<typeof import("server/src/utils/getBbox").getBboxFromCenter>} bbox
    * @returns {Promise<import("@rm/types").FullPortal[]>}
    */
-  static async search(perms, args, distance, bbox) {
+  // eslint-disable-next-line no-empty-pattern
+  static async search(perms, args, {}, distance, bbox) {
     const { areaRestrictions } = perms
     const { onlyAreas = [], search = '' } = args
     const { searchResultsLimit, portalUpdateLimit } = config.getSafe('api')

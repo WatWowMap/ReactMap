@@ -219,10 +219,11 @@ function DefendersModal({ gym, onClose }) {
         {defenders.map((def) => {
           const fullCP = def.cp_when_deployed
           const decayTime =
+            72 *
             60 *
             60 *
             1000 *
-            Math.min(Math.max(Math.log10(3000 / fullCP), 8), 72)
+            Math.min(Math.max(Math.log10(3000 / fullCP), 1 / 9), 1)
           const predictedMotivation = Math.max(
             0,
             def.motivation_now - Math.max(0, now - updatedMs) / decayTime,
