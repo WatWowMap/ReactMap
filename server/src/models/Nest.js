@@ -164,7 +164,8 @@ class Nest extends Model {
    * @param {ReturnType<typeof import("server/src/utils/getBbox").getBboxFromCenter>} bbox
    * @returns {Promise<FullNest[]>}
    */
-  static async search(perms, args, distance, bbox) {
+  // eslint-disable-next-line no-empty-pattern
+  static async search(perms, args, {}, distance, bbox) {
     const { search, locale, onlyAreas = [] } = args
     const pokemonIds = Object.keys(state.event.masterfile.pokemon).filter(
       (pkmn) =>
