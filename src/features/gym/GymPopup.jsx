@@ -13,6 +13,10 @@ import Typography from '@mui/material/Typography'
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew'
 import ShieldIcon from '@mui/icons-material/Shield'
 import FavoriteIcon from '@mui/icons-material/Favorite'
+import EmojiEventsIcon from '@mui/icons-material/EmojiEvents'
+import SentimentVeryDissatisfiedIcon from '@mui/icons-material/SentimentVeryDissatisfied'
+import RestaurantIcon from '@mui/icons-material/Restaurant'
+import { useTheme } from '@mui/material/styles'
 import { useTranslation } from 'react-i18next'
 
 import { useSyncData } from '@features/webhooks'
@@ -32,6 +36,26 @@ import { getTimeUntil } from '@utils/getTimeUntil'
 import { formatInterval } from '@utils/formatInterval'
 
 import { useWebhook } from './useWebhook'
+
+/**
+ * Format deployed time as either "Xd Xh Xm" or "X:X:X" format
+ * @param {number} intervalMs - Time interval in milliseconds
+ * @returns {string} Formatted time string
+ */
+function formatDeployedTime(intervalMs) {
+  const totalSeconds = Math.floor(intervalMs / 1000)
+  const days = Math.floor(totalSeconds / 86400)
+  const hours = Math.floor((totalSeconds % 86400) / 3600)
+  const minutes = Math.floor((totalSeconds % 3600) / 60)
+
+  if (days > 0) {
+    // Format as "Xd Xh Xm"
+    return `${days}d ${hours}h ${minutes}m`
+  }
+  // Format as "X:X:X" (HH:MM:SS)
+  const seconds = totalSeconds % 60
+  return `${hours}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`
+}
 
 /**
  *
@@ -210,8 +234,13 @@ export function GymPopup({ hasRaid, hasHatched, raidIconUrl, ...gym }) {
  */
 function DefendersModal({ gym, onClose }) {
   const { t } = useTranslation()
+  const theme = useTheme()
   const Icons = useMemory((s) => s.Icons)
   const defenders = gym.defenders || []
+  const updatedMs =
+    defenders.length &&
+    defenders[0].deployed_ms + defenders[0].deployed_time * 1000
+  const now = Date.now()
 
   return (
     <Grid
@@ -250,8 +279,19 @@ function DefendersModal({ gym, onClose }) {
       <Grid container direction="column" spacing={1}>
         {defenders.map((def) => {
           const fullCP = def.cp_when_deployed
-          const currentCP = def.cp_now
-          const percent = Math.max(0, Math.min(1, currentCP / fullCP))
+          const decayTime =
+            72 *
+            60 *
+            60 *
+            1000 *
+            Math.min(Math.max(Math.log10(3000 / fullCP), 1 / 9), 1)
+          const predictedMotivation = Math.max(
+            0,
+            def.motivation_now - Math.max(0, now - updatedMs) / decayTime,
+          )
+          const currentCP = Math.round(
+            fullCP * (0.2 + 0.8 * predictedMotivation),
+          )
 
           return (
             <div
@@ -259,20 +299,21 @@ function DefendersModal({ gym, onClose }) {
               style={{
                 display: 'flex',
                 alignItems: 'center',
-                minHeight: 60,
+                minHeight: 80,
                 width: '100%',
-                padding: '4px 0',
+                padding: '8px 0',
+                borderBottom: `1px solid ${theme.palette.divider}`,
               }}
             >
               <div
                 style={{
-                  width: 44,
-                  height: 44,
+                  width: 50,
+                  height: 50,
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
                   marginLeft: 12,
-                  marginRight: 6,
+                  marginRight: 12,
                   flexShrink: 0,
                 }}
               >
@@ -280,8 +321,8 @@ function DefendersModal({ gym, onClose }) {
                   src={Icons.getPokemonByDisplay(def.pokemon_id, def)}
                   alt={t(`poke_${def.pokemon_id}`)}
                   style={{
-                    maxHeight: 44,
-                    maxWidth: 44,
+                    maxHeight: 50,
+                    maxWidth: 50,
                     objectFit: 'contain',
                   }}
                 />
@@ -297,25 +338,74 @@ function DefendersModal({ gym, onClose }) {
                   textAlign: 'left',
                   overflow: 'hidden',
                   marginLeft: 4,
+                  gap: '4px',
                 }}
               >
-                <span
+                {/* First line: Pokemon name CP{currentCP}/{fullCP} */}
+                <div
                   style={{
-                    fontSize: 15,
-                    fontWeight: 600,
-                    marginBottom: 2,
+                    fontSize: 16,
+                    fontWeight: 700,
                     overflow: 'hidden',
                     textOverflow: 'ellipsis',
                     whiteSpace: 'nowrap',
                     maxWidth: '100%',
                   }}
-                  title={t(`poke_${def.pokemon_id}`)}
+                  title={`${t(`poke_${def.pokemon_id}`)} CP${currentCP}/${fullCP}`}
                 >
                   {t(`poke_${def.pokemon_id}`)}
-                </span>
-                <span style={{ fontSize: 13, color: '#666' }}>
-                  {t('cp')}: <b>{currentCP}</b> / {fullCP}
-                </span>
+                </div>
+
+                <div
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    fontSize: 13,
+                    color: theme.palette.text.secondary,
+                  }}
+                >
+                  <div
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '2px',
+                    }}
+                  >
+                    <EmojiEventsIcon style={{ fontSize: 16 }} />
+                    <span>{def.battles_won || 0}</span>
+                  </div>
+                  <div
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '2px',
+                    }}
+                  >
+                    <SentimentVeryDissatisfiedIcon style={{ fontSize: 16 }} />
+                    <span>{def.battles_lost || 0}</span>
+                  </div>
+                  <div
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '2px',
+                    }}
+                  >
+                    <RestaurantIcon style={{ fontSize: 16 }} />
+                    <span>{def.times_fed || 0}</span>
+                  </div>
+                </div>
+
+                <div
+                  style={{
+                    fontSize: 13,
+                    color: theme.palette.text.secondary,
+                  }}
+                >
+                  CP{currentCP}/{fullCP}{' '}
+                  {formatDeployedTime(def.deployed_ms + now - updatedMs)}
+                </div>
               </div>
               <div
                 style={{
@@ -337,7 +427,7 @@ function DefendersModal({ gym, onClose }) {
                     position: 'absolute',
                     width: 28,
                     height: 28,
-                    stroke: 'white',
+                    stroke: theme.palette.text.primary,
                     strokeWidth: 1,
                     filter: 'drop-shadow(0 0 1px #0008)',
                   }}
@@ -346,7 +436,7 @@ function DefendersModal({ gym, onClose }) {
                 {/* Heart background */}
                 <FavoriteIcon
                   style={{
-                    color: 'white',
+                    color: theme.palette.mode === 'dark' ? 'white' : '#f0f0f0',
                     opacity: 0.18,
                     position: 'absolute',
                     width: 28,
@@ -360,7 +450,7 @@ function DefendersModal({ gym, onClose }) {
                     position: 'absolute',
                     width: 28,
                     height: 28,
-                    clipPath: `inset(${100 - percent * 100}% 0 0 0)`,
+                    clipPath: `inset(${100 - predictedMotivation * 100}% 0 0 0)`,
                     transition: 'clip-path 0.3s',
                   }}
                 />
@@ -375,21 +465,21 @@ function DefendersModal({ gym, onClose }) {
                   }}
                 >
                   {/* Show cracks based on health: */}
-                  {percent <= 2 / 3 && (
-                    // Always show top crack if percent <= 2/3
+                  {predictedMotivation <= 2 / 3 && (
+                    // Always show top crack if predictedMotivation <= 2/3
                     <path
                       d="M2,9 Q7,11 14,9 Q21,11 26,9"
-                      stroke="white"
+                      stroke={theme.palette.text.primary}
                       strokeWidth={1.5}
                       fill="none"
                       strokeLinejoin="round"
                     />
                   )}
-                  {percent <= 1 / 3 && (
-                    // Show bottom crack only if percent <= 1/3
+                  {predictedMotivation <= 1 / 3 && (
+                    // Show bottom crack only if predictedMotivation <= 1/3
                     <path
                       d="M7,19 Q11,17 14,19 Q17,17 21,19"
-                      stroke="white"
+                      stroke={theme.palette.text.primary}
                       strokeWidth={1.5}
                       fill="none"
                       strokeLinejoin="round"
@@ -409,9 +499,7 @@ function DefendersModal({ gym, onClose }) {
         style={{ fontSize: 12, color: '#888' }}
       >
         {t('last_updated')}:{' '}
-        {gym.updated
-          ? new Date(gym.updated * 1000).toLocaleString()
-          : t('unknown')}
+        {defenders.length ? new Date(updatedMs).toLocaleString() : t('unknown')}
       </Grid>
     </Grid>
   )

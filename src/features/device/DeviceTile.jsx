@@ -53,7 +53,7 @@ const BaseDeviceTile = (device) => {
       <Popup position={[device.lat, device.lon]}>
         <DevicePopup {...device} isOnline={isOnline} ts={ts} />
       </Popup>
-      {poly && (
+      {poly && !device.isMad && (
         <ErrorBoundary>
           <DevicePath {...device} />
         </ErrorBoundary>

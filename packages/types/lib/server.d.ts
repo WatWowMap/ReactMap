@@ -26,6 +26,7 @@ import { Config } from '@rm/types'
 import { OperationTypeNode } from 'graphql'
 
 export interface DbContext {
+  isMad: boolean
   pvpV2: boolean
   mem: string
   secret: string

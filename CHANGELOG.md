@@ -1,3 +1,47 @@
+# [1.36.0-develop.19](https://github.com/WatWowMap/ReactMap/compare/v1.36.0-develop.18...v1.36.0-develop.19) (2025-07-07)
+
+
+### Bug Fixes
+
+* defender info updated time ([04706ab](https://github.com/WatWowMap/ReactMap/commit/04706abcb57ccafa2595bd9f3d56f6a1293cd36c))
+* fix the formula oops ([0de9804](https://github.com/WatWowMap/ReactMap/commit/0de98046516fc84a747687e19579a04b923b6834))
+* support light mode for motivation display ([cf9e412](https://github.com/WatWowMap/ReactMap/commit/cf9e4129daa8de175e7321fcdf41dca23c96de36))
+
+
+### Features
+
+* **client:** better footer on gym popup ([fd0ee09](https://github.com/WatWowMap/ReactMap/commit/fd0ee09687baf1bd9eb6c3e7a44202db090f0136))
+* **client:** better spacing on gym popup ([b187b46](https://github.com/WatWowMap/ReactMap/commit/b187b46eb26331414e803ee2c7eaff53f5927d36))
+* **client:** conditional gym defender heart lines & translate CP ([39726eb](https://github.com/WatWowMap/ReactMap/commit/39726eb5a634797c34924dba31f05544d806fd40))
+* **client:** drop defenders from extra info, fix defenders hearth calculation ([6604029](https://github.com/WatWowMap/ReactMap/commit/6604029d6058b48d0b951b3d55f4ca9749cccc95))
+* **client:** fixes on gym defenders popup ([14f8f97](https://github.com/WatWowMap/ReactMap/commit/14f8f97701a37eeb657e965bd90b18b12425def9))
+* **client:** make deffenders popup more compact ([5e3aa75](https://github.com/WatWowMap/ReactMap/commit/5e3aa754feea7ecda76228cb194ad3e85a822ff9))
+* **client:** restore comments on defenders code ([7f24004](https://github.com/WatWowMap/ReactMap/commit/7f240042fd3190099bbfce6284a4e92ec7ee757b))
+* display MOAR info ([791140b](https://github.com/WatWowMap/ReactMap/commit/791140b5af6fed72899f6327710a0ce0d67fc24d))
+* front-end display gym defenders ([f3c9511](https://github.com/WatWowMap/ReactMap/commit/f3c9511aac1b6c5d7bc7a2851248d4ec56cd2868))
+* predict motivation now ([644c01e](https://github.com/WatWowMap/ReactMap/commit/644c01ecb2e24bae89791a69cd7d756d920e50a8))
+* prepare gym defenders backend ([ca7f7c7](https://github.com/WatWowMap/ReactMap/commit/ca7f7c7b64df61262fa0445bfb4dc744d5aecb9a))
+
+
+### Reverts
+
+* Revert "chore: drop MAD support" ([4216560](https://github.com/WatWowMap/ReactMap/commit/4216560d16282d819b502200b8f00c6ee0a729a3))
+* Revert "fix: search" ([877c7eb](https://github.com/WatWowMap/ReactMap/commit/877c7eb4a8acb5d847431f87f86f9e8808fa14ab))
+
+# [1.36.0-develop.18](https://github.com/WatWowMap/ReactMap/compare/v1.36.0-develop.17...v1.36.0-develop.18) (2025-07-07)
+
+
+### Bug Fixes
+
+* raid timer in search ([23275f6](https://github.com/WatWowMap/ReactMap/commit/23275f6276cb014eab1858d693c9792731f64e3b))
+
+# [1.36.0-develop.17](https://github.com/WatWowMap/ReactMap/compare/v1.36.0-develop.16...v1.36.0-develop.17) (2025-07-07)
+
+
+### Bug Fixes
+
+* search ([26eaaab](https://github.com/WatWowMap/ReactMap/commit/26eaaabdb08fb0a93bc5ba73118678425a63f11b))
+
 # [1.36.0-develop.16](https://github.com/WatWowMap/ReactMap/compare/v1.36.0-develop.15...v1.36.0-develop.16) (2025-04-11)
 
 

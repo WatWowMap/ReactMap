@@ -5,6 +5,7 @@ type Device {
   lat: Float
   lon: Float
   type: String
+  isMad: Boolean
   route: JSON
   radius: Int
 }
