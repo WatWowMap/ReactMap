@@ -28,6 +28,7 @@
     "polling": {
       "devices": 10,
       "gyms": 10,
+      "hyperlocal": 20,
       "nests": 300,
       "pokemon": 20,
       "pokestops": 300,
@@ -159,6 +160,7 @@
         "pokestops",
         "stations",
         "pokemon",
+        "hyperlocal",
         "routes",
         "wayfarer",
         "s2cells",
@@ -489,6 +491,9 @@
       "gymBadges": false,
       "baseGymSlotAmounts": [1, 2, 3, 4, 5, 6]
     },
+    "hyperlocal": {
+      "enabled": true
+    },
     "nests": {
       "enabled": false,
       "polygons": false,
@@ -760,6 +765,11 @@
         "roles": []
       },
       "gyms": {
+        "enabled": true,
+        "trialPeriodEligible": false,
+        "roles": []
+      },
+      "hyperlocal": {
         "enabled": true,
         "trialPeriodEligible": false,
         "roles": []

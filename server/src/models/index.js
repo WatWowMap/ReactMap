@@ -3,6 +3,7 @@ const { Backup } = require('./Backup')
 const { Badge } = require('./Badge')
 const { Device } = require('./Device')
 const { Gym } = require('./Gym')
+const { Hyperlocal } = require('./Hyperlocal')
 const { Nest } = require('./Nest')
 const { NestSubmission } = require('./NestSubmission')
 const { Pokestop } = require('./Pokestop')
@@ -28,6 +29,7 @@ const rmModels = {
 const scannerModels = {
   Device,
   Gym,
+  Hyperlocal,
   Nest,
   Pokestop,
   Pokemon,
