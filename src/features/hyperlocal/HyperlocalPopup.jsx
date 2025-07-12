@@ -1,91 +1,79 @@
 // @ts-check
 import * as React from 'react'
-import Grid2 from '@mui/material/Unstable_Grid2'
 import Typography from '@mui/material/Typography'
 import { useTranslation } from 'react-i18next'
 
-import { useFormatStore } from '@store/useFormatStore'
 import { Timer } from '@components/popups/Timer'
+import { formatInterval } from '@utils/formatInterval'
 
 /**
  * @param {{ hyperlocal: import('@rm/types').Hyperlocal, ts?: number }} props
  */
-export function HyperlocalPopup({ hyperlocal }) {
-  const { t } = useTranslation()
-  const { distanceUnit } = useFormatStore()
+export function HyperlocalPopup({
+  hyperlocal,
+  ts = Math.floor(Date.now() / 1000),
+}) {
+  const { t, i18n } = useTranslation()
 
-  const radiusDisplay = React.useMemo(() => {
-    const radius = hyperlocal.radius_m
-    if (distanceUnit === 'miles') {
-      return `${(radius * 0.000621371).toFixed(0)} ft`
-    }
-    return `${radius.toFixed(0)} m`
-  }, [hyperlocal.radius_m, distanceUnit])
+  // Format times in h:m:s AM/PM format
+  const formatTime = React.useCallback(
+    (timestamp) => {
+      if (!timestamp) return null
+      const formatter = new Intl.DateTimeFormat(i18n.language, {
+        hour: 'numeric',
+        minute: 'numeric',
+        second: 'numeric',
+      })
+      return formatter.format(timestamp * 1000)
+    },
+    [i18n.language],
+  )
+
+  // Calculate time ago for last seen
+  const timeAgo = React.useMemo(() => {
+    if (!hyperlocal.updated_ms) return null
+    const updatedSeconds = Math.floor(hyperlocal.updated_ms / 1000)
+    const diff = ts - updatedSeconds
+    const { str } = formatInterval(diff * 1000)
+    return str
+  }, [hyperlocal.updated_ms, ts])
+
+  const startTime = hyperlocal.start_ms
+    ? Math.floor(hyperlocal.start_ms / 1000)
+    : null
+  const endTime = hyperlocal.end_ms
+    ? Math.floor(hyperlocal.end_ms / 1000)
+    : null
+  const lastSeenTime = hyperlocal.updated_ms
+    ? Math.floor(hyperlocal.updated_ms / 1000)
+    : null
 
   return (
-    <Grid2 container spacing={1} sx={{ minWidth: 250 }}>
-      <Grid2 xs={12}>
-        <Typography variant="h6" align="center">
-          {t('bonus_region')}
-        </Typography>
-      </Grid2>
+    <div style={{ textAlign: 'center', minWidth: 200 }}>
+      <Typography variant="h6" gutterBottom>
+        {`${t(hyperlocal.challenge_bonus_key)} (${hyperlocal.experiment_id})`}
+      </Typography>
 
-      <Grid2 xs={6}>
-        <Typography variant="caption" color="textSecondary">
-          {t('experiment_id')}:
-        </Typography>
-      </Grid2>
-      <Grid2 xs={6}>
-        <Typography variant="body2">{hyperlocal.experiment_id}</Typography>
-      </Grid2>
+      <Typography variant="subtitle1" gutterBottom>
+        {t('starts')}: {formatTime(startTime)}
+      </Typography>
 
-      <Grid2 xs={6}>
-        <Typography variant="caption" color="textSecondary">
-          {t('radius')}:
-        </Typography>
-      </Grid2>
-      <Grid2 xs={6}>
-        <Typography variant="body2">{radiusDisplay}</Typography>
-      </Grid2>
+      <Typography variant="subtitle1" gutterBottom>
+        {t('ends')}: {formatTime(endTime)}
+      </Typography>
 
-      <Grid2 xs={6}>
-        <Typography variant="caption" color="textSecondary">
-          {t('start_time')}:
-        </Typography>
-      </Grid2>
-      <Grid2 xs={6}>
-        <Typography variant="body2">
-          {new Date(hyperlocal.start_ms).toLocaleDateString()}{' '}
-          {new Date(hyperlocal.start_ms).toLocaleTimeString()}
-        </Typography>
-      </Grid2>
+      <Typography variant="h6" gutterBottom>
+        <Timer expireTime={endTime} />
+      </Typography>
 
-      <Grid2 xs={6}>
-        <Typography variant="caption" color="textSecondary">
-          {t('end_time')}:
-        </Typography>
-      </Grid2>
-      <Grid2 xs={6}>
-        <Typography variant="body2">
-          {new Date(hyperlocal.end_ms).toLocaleDateString()}{' '}
-          {new Date(hyperlocal.end_ms).toLocaleTimeString()}
-        </Typography>
-      </Grid2>
+      <Typography variant="subtitle1" gutterBottom>
+        Radius: {hyperlocal.radius_m}m
+      </Typography>
 
-      <Grid2 xs={6}>
-        <Typography variant="caption" color="textSecondary">
-          {t('challenge_bonus_key')}:
-        </Typography>
-      </Grid2>
-      <Grid2 xs={6}>
-        <Typography variant="body2" sx={{ wordBreak: 'break-all' }}>
-          {hyperlocal.challenge_bonus_key}
-        </Typography>
-      </Grid2>
-
-      <Grid2 xs={12}>
-        <Timer expireTime={hyperlocal.end_ms} />
-      </Grid2>
-    </Grid2>
+      <Typography variant="body2" gutterBottom>
+        {t('last_seen')}: {formatTime(lastSeenTime)}{' '}
+        {timeAgo && `(${timeAgo} ago)`}
+      </Typography>
+    </div>
   )
 }
