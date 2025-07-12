@@ -822,9 +822,5 @@
   "inactive": "Inactive",
   "bread_time_window": "You can take on Max Battles between 6AM and 9PM.",
   "hyperlocal": "Bonus Regions",
-  "experiment_id": "Experiment ID",
-  "radius": "Radius",
-  "start_time": "Start Time",
-  "end_time": "End Time",
-  "challenge_bonus_key": "Challenge Bonus Key"
+  "radius": "Radius"
 }
