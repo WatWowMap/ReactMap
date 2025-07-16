@@ -464,6 +464,10 @@
         "__name": "MAP_MISC_INVASION_CACHE_HRS",
         "__format": "number"
       },
+      "fallbackRocketPokemonFiltering": {
+        "__name": "MAP_MISC_FALLBACK_ROCKET_POKEMON_FILTERING",
+        "__format": "boolean"
+      },
       "masterfileCacheHrs": {
         "__name": "MAP_MISC_MASTERFILE_CACHE_HRS",
         "__format": "number"
