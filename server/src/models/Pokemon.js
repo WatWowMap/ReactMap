@@ -124,7 +124,7 @@ class Pokemon extends Model {
   static async getAll(perms, args, ctx) {
     const { iv: ivs, pvp, areaRestrictions } = perms
     const { onlyIvOr, onlyHundoIv, onlyZeroIv, onlyAreas = [] } = args.filters
-    const { hasSize, hasHeight, isMad, mem, secret, pvpV2 } = ctx
+    const { hasSize, hasHeight, isMad, mem, secret, httpAuth, pvpV2 } = ctx
     const { filterMap, globalFilter } = this.getFilters(perms, args, ctx)
 
     let queryPvp = config
@@ -286,6 +286,7 @@ class Pokemon extends Model {
         : query.limit(queryLimits.pokemon),
       'POST',
       secret,
+      httpAuth,
     )
 
     const finalResults = []
@@ -363,6 +364,9 @@ class Pokemon extends Model {
         ...(await this.evalQuery(
           mem,
           pvpQuery.limit(queryLimits.pokemonPvp - results.length),
+          'POST',
+          secret,
+          httpAuth,
         )),
       )
     }
@@ -385,9 +389,16 @@ class Pokemon extends Model {
    * @param {string | import("objection").QueryBuilder<Pokemon>} query
    * @param {'GET' | 'POST' | 'PATCH' | 'DELETE'} method
    * @param {string} secret
+   * @param {{ username: string, password: string } | null} httpAuth
    * @returns {Promise<T>}
    */
-  static async evalQuery(mem, query, method = 'POST', secret = '') {
+  static async evalQuery(
+    mem,
+    query,
+    method = 'POST',
+    secret = '',
+    httpAuth = null,
+  ) {
     if (config.getSafe('devOptions.queryDebug')) {
       if (!fs.existsSync(resolve(__dirname, './queries'))) {
         fs.mkdirSync(resolve(__dirname, './queries'), { recursive: true })
@@ -410,7 +421,13 @@ class Pokemon extends Model {
           headers: {
             Accept: 'application/json',
             'Content-Type': 'application/json',
-            'X-Golbat-Secret': secret || undefined,
+            // Support both secret-based and HTTP authentication
+            ...(secret ? { 'X-Golbat-Secret': secret } : {}),
+            ...(httpAuth
+              ? {
+                  Authorization: `Basic ${Buffer.from(`${httpAuth.username}:${httpAuth.password}`).toString('base64')}`,
+                }
+              : {}),
           },
           body: query,
         })
@@ -426,7 +443,7 @@ class Pokemon extends Model {
    * @returns {Promise<Partial<import("@rm/types").Pokemon>[]>}
    */
   static async getLegacy(perms, args, ctx) {
-    const { isMad, hasSize, hasHeight, mem, secret } = ctx
+    const { isMad, hasSize, hasHeight, mem, secret, httpAuth } = ctx
     const ts = Math.floor(Date.now() / 1000)
     const { filterMap, globalFilter } = this.getFilters(perms, args, ctx)
     const queryLimits = config.getSafe('api.queryLimits')
@@ -493,6 +510,7 @@ class Pokemon extends Model {
         : query,
       'POST',
       secret,
+      httpAuth,
     )
     return results
       .filter(
@@ -523,7 +541,7 @@ class Pokemon extends Model {
   /**
    * @param {import("@rm/types").DbContext} ctx
    */
-  static async getAvailable({ isMad, mem, secret }) {
+  static async getAvailable({ isMad, mem, secret, httpAuth }) {
     const ts = Math.floor(Date.now() / 1000)
 
     /** @type {import("@rm/types").AvailablePokemon[]} */
@@ -543,6 +561,7 @@ class Pokemon extends Model {
             .orderBy(['pokemon_id', 'form']),
       'GET',
       secret,
+      httpAuth,
     )
     available.forEach((pkmn) => {
       if (pkmn.id === 132) pkmn.form = 0
@@ -560,7 +579,7 @@ class Pokemon extends Model {
    * @param {import("@rm/types").DbContext} ctx
    * @returns {Promise<import("@rm/types").Pokemon>}
    */
-  static getOne(id, { isMad, mem, secret }) {
+  static getOne(id, { isMad, mem, secret, httpAuth }) {
     return this.evalQuery(
       mem ? `${mem}/api/pokemon/id/${id}` : null,
       mem
@@ -574,6 +593,7 @@ class Pokemon extends Model {
             .first(),
       'GET',
       secret,
+      httpAuth,
     )
   }
 
@@ -585,7 +605,13 @@ class Pokemon extends Model {
    * @param {ReturnType<typeof import("server/src/utils/getBbox").getBboxFromCenter>} bbox
    * @returns {Promise<Partial<import("@rm/types").Pokemon>[]>}
    */
-  static async search(perms, args, { isMad, mem, secret }, distance, bbox) {
+  static async search(
+    perms,
+    args,
+    { isMad, mem, secret, httpAuth },
+    distance,
+    bbox,
+  ) {
     const { search, locale, onlyAreas = [] } = args
     const pokemonIds = Object.keys(state.event.masterfile.pokemon).filter(
       (pkmn) =>
@@ -659,6 +685,7 @@ class Pokemon extends Model {
         : query,
       'POST',
       secret,
+      httpAuth,
     )
     if (!results || !Array.isArray(results)) return []
     return results
