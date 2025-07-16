@@ -245,7 +245,7 @@ class EventManager extends Logger {
     if (config.getSafe('api.pogoApiEndpoints.invasions')) {
       this.intervals.invasions = setInterval(
         async () => {
-          await this.getInvasions()
+          await this.getInvasions(Db)
           await this.chatLog('event', { description: 'Refreshed invasions' })
         },
         1000 * 60 * 60 * (config.getSafe('map.misc.invasionCacheHrs') || 1),
@@ -355,7 +355,11 @@ class EventManager extends Logger {
     this[type] = Object.values(this[`${type}Backup`])
   }
 
-  async getInvasions() {
+  /**
+   *
+   * @param {import('./DbManager').DbManager} [Db] - Database manager instance
+   */
+  async getInvasions(Db) {
     const endpoint = config.getSafe('api.pogoApiEndpoints.invasions')
     if (endpoint) {
       this.log.info('Fetching Latest Invasions')
@@ -376,6 +380,11 @@ class EventManager extends Logger {
             .map(Number)
 
           this.invasions = newInvasions
+
+          // Update available rocket Pokemon whenever invasions are refreshed
+          if (Db) {
+            await this.setAvailable('pokestops', 'Pokestop', Db)
+          }
         }
       } catch (e) {
         this.log.warn('Unable to generate latest invasions:\n', e)

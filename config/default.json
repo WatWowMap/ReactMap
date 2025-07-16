@@ -245,6 +245,7 @@
       "enableMapJsFilter": true,
       "fetchLatestInvasions": true,
       "invasionCacheHrs": 1,
+      "fallbackRocketPokemonFiltering": true,
       "masterfileCacheHrs": 6,
       "webhookCacheHrs": 1,
       "questMessage": "",

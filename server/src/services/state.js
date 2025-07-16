@@ -127,7 +127,7 @@ const state = {
       promises.push(this.pvp.fetchLatestPokemon())
     }
     if (!reloadReport || reloadReport.invasions) {
-      promises.push(this.event.getInvasions())
+      promises.push(this.event.getInvasions(this.db))
     }
     if (!reloadReport || reloadReport.webhooks) {
       promises.push(this.event.getWebhooks())
