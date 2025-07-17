@@ -1,3 +1,16 @@
+# [1.36.0-develop.20](https://github.com/WatWowMap/ReactMap/compare/v1.36.0-develop.19...v1.36.0-develop.20) (2025-07-17)
+
+
+### Bug Fixes
+
+* quest pokemon filtering in advanced menu ([35d34e3](https://github.com/WatWowMap/ReactMap/commit/35d34e3bc259acce0615294dec0dce37d80da2b0)), closes [#1082](https://github.com/WatWowMap/ReactMap/issues/1082)
+
+
+### Features
+
+* filter rocket Pokemon for unconfirmed grunts ([ffd4af5](https://github.com/WatWowMap/ReactMap/commit/ffd4af58121eeeef97f4da4fa9b6afb4291c9e76))
+* httpAuth for Golbat endpoint ([7be2aea](https://github.com/WatWowMap/ReactMap/commit/7be2aea295d37d75a41d149c9dac8ba6c020b1ef))
+
 # [1.36.0-develop.19](https://github.com/WatWowMap/ReactMap/compare/v1.36.0-develop.18...v1.36.0-develop.19) (2025-07-07)
 
 
