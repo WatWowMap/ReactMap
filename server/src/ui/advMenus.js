@@ -8,7 +8,7 @@ const CATEGORIES = /** @type {const} */ ({
     'items',
     'quest_reward_12',
     'invasions',
-    'pokemon',
+    'quest_pokemon',
     'rocket_pokemon',
     'showcase',
     'quest_reward_4',
