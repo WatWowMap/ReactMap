@@ -107,6 +107,7 @@
   "all_pokestops": "All PokéStops",
   "lures": "Lures",
   "quests": "Quests",
+  "quest_pokemon": "Quest Pokémon",
   "invasions": "Invasions",
   "portals": "Portals",
   "submission_cells": "Submission Cells",
@@ -376,6 +377,7 @@
   "with_ar": "With AR",
   "both": "Both",
   "without_ar": "Without AR",
+  "shiny_probability": "Shiny probability: <0/>",
   "exclude_quest_multi": "Exclude {{reward}}",
   "cluster_limit_0": "{{variable_0}} limit ({{variable_1}}) has been hit",
   "cluster_limit_1": "Please zoom in or narrow your filters",
@@ -794,6 +796,7 @@
   "stations_filters": "Power Spots Filter Settings",
   "stations_options": "Power Spot Options",
   "all_stations": "All Power Spots",
+  "gmax_stationed": "Gigantamax Placed",
   "search_battles": "Search Max Battles",
   "started": "Started",
   "ended": "Ended",
@@ -815,5 +818,8 @@
   "dynamic_opacity": "Dynamic Opacity",
   "tooltips": "Tooltips",
   "markers": "Markers",
-  "filters": "Filters"
+  "filters": "Filters",
+  "active": "Active",
+  "inactive": "Inactive",
+  "bread_time_window": "You can take on Max Battles between 6AM and 9PM."
 }

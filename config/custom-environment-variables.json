@@ -464,6 +464,10 @@
         "__name": "MAP_MISC_INVASION_CACHE_HRS",
         "__format": "number"
       },
+      "fallbackRocketPokemonFiltering": {
+        "__name": "MAP_MISC_FALLBACK_ROCKET_POKEMON_FILTERING",
+        "__format": "boolean"
+      },
       "masterfileCacheHrs": {
         "__name": "MAP_MISC_MASTERFILE_CACHE_HRS",
         "__format": "number"
@@ -1331,6 +1335,10 @@
       "battleTier": "DEFAULT_FILTERS_STATIONS_BATTLE_TIER",
       "battles": {
         "__name": "DEFAULT_FILTERS_STATIONS_BATTLES",
+        "__format": "boolean"
+      },
+      "gmaxStationed": {
+        "__name": "DEFAULT_FILTERS_STATIONS_GMAX_STATIONED",
         "__format": "boolean"
       }
     },

@@ -68,6 +68,7 @@ function drawer(req, perms) {
         ? {
             allStations: perms.stations || BLOCKED,
             maxBattles: perms.dynamax || BLOCKED,
+            gmaxStationed: perms.dynamax || BLOCKED,
           }
         : BLOCKED,
     pokemon:
@@ -108,7 +109,7 @@ function drawer(req, perms) {
                   name: 'level',
                   label: '',
                   min: 1,
-                  max: 35,
+                  max: 55,
                   perm: 'iv',
                   color: 'secondary',
                 },

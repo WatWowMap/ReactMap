@@ -56,7 +56,8 @@ export function usePermCheck(category) {
     case 'stations':
       if (
         (filters?.allStations && perms?.stations) ||
-        (filters?.maxBattles && perms?.dynamax)
+        (filters?.maxBattles && perms?.dynamax) ||
+        (filters?.gmaxStationed && perms?.dynamax)
       ) {
         return true
       }

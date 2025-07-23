@@ -155,6 +155,8 @@ class DbManager extends Logger {
         'showcase_pokemon_form_id' in columns,
         'showcase_pokemon_type_id' in columns,
       ])
+    const hasStationedGmax =
+      'total_stationed_gmax' in (await schema('station').columnInfo())
     const [hasLayerColumn] = isMad
       ? await schema('trs_quest')
           .columnInfo()
@@ -200,6 +202,7 @@ class DbManager extends Logger {
       hasShowcaseData,
       hasShowcaseForm,
       hasShowcaseType,
+      hasStationedGmax,
     }
   }
 
@@ -217,6 +220,8 @@ class DbManager extends Logger {
             : {
                 mem: this.endpoints[i].endpoint,
                 secret: this.endpoints[i].secret,
+                // Add support for HTTP authentication
+                httpAuth: this.endpoints[i].httpAuth,
                 pvpV2: true,
               }
 
@@ -436,7 +441,22 @@ class DbManager extends Logger {
     let deDuped = []
     let count = 0
     let distance = softLimit
-    const max = model === 'Pokemon' ? hardLimit / 2 : hardLimit
+    let max = hardLimit
+    switch (model) {
+      case 'Pokemon':
+        max = hardLimit / 2
+        break
+      case 'Gym':
+      case 'Nest':
+      case 'Pokestop':
+      case 'Portal':
+      case 'Route':
+      case 'Station':
+        max = 22222
+        break
+      default:
+        break
+    }
     const startTime = Date.now()
     while (deDuped.length < searchLimit) {
       const loopTime = Date.now()

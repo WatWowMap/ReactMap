@@ -45,7 +45,7 @@ function SelectorList({ category, subCategory, label, height = 400 }) {
     subCategory ? capitalize(subCategory) : ''
   }QuickSelect`
   const { available } = useGetAvailable(category)
-  const { t: tId } = useTranslateById()
+  const { t: tId } = useTranslateById({ quest: subCategory === 'pokemon' })
   const { t } = useTranslation()
   const allFilters = useMemory((s) => s.filters[category]?.filter)
 

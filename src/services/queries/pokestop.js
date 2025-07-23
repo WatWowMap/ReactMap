@@ -43,6 +43,7 @@ const quest = gql`
       quest_gender_id
       quest_costume_id
       quest_shiny
+      quest_shiny_probability
       mega_pokemon_id
       mega_amount
       candy_pokemon_id
@@ -84,14 +85,7 @@ const event = gql`
       showcase_rankings {
         total_entries
         last_update
-        contest_entries {
-          rank
-          pokemon_id
-          form
-          costume
-          gender
-          score
-        }
+        contest_entries
       }
     }
   }

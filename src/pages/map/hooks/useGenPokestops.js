@@ -38,7 +38,7 @@ export function useGenPokestops() {
     }
 
     Object.keys(pokestops.filter).forEach((id) => {
-      if (id !== 'global' && !/\d/.test(id.charAt(0))) {
+      if (id !== 'global') {
         switch (id.charAt(0)) {
           case 'a':
             if (tempObj.rocket_pokemon) {
@@ -192,7 +192,104 @@ export function useGenPokestops() {
             }
             break
           default:
-            if (tempObj.pokestops) {
+            if (/\d/.test(id.charAt(0))) {
+              // Handle numbered IDs - these are pokemon encounters
+              // ID format: pokemonId or pokemonId-formId
+              const [pokemonId, formId] = id.split('-', 2)
+              const pokemonData = pokemon[pokemonId]
+              if (tempObj.quest_pokemon && pokemonData) {
+                if (formId) {
+                  // Handle specific form
+                  const form = pokemonData.forms[formId]
+                  if (form) {
+                    const pokeName = t(`poke_${pokemonId}`)
+                    const formName = t(`form_${formId}`)
+                    const formTypes = (
+                      form.types ||
+                      pokemonData.types ||
+                      []
+                    ).map((x) => `poke_type_${x}`)
+                    const name =
+                      form.name &&
+                      form.name !== 'Normal' &&
+                      formId !== '0' &&
+                      +formId !== pokemonData.defaultFormId
+                        ? formName
+                        : pokeName
+
+                    tempObj.quest_pokemon[id] = {
+                      name: form.name === '*' ? `${name}*` : name,
+                      category: form.name === '*' ? form.category : undefined,
+                      pokedexId: +pokemonId,
+                      formId: +formId,
+                      defaultFormId: pokemonData.defaultFormId,
+                      pokeName,
+                      formName,
+                      formTypes,
+                      rarity: form.rarity || pokemonData.rarity,
+                      historic: pokemonData.historic,
+                      legendary: pokemonData.legendary,
+                      mythical: pokemonData.mythical,
+                      ultraBeast: pokemonData.ultraBeast,
+                      genId: `generation_${pokemonData.genId}`,
+                      perms: ['quests'],
+                      family: pokemonData.family,
+                    }
+                    tempObj.quest_pokemon[id].searchMeta = `${Object.entries(
+                      tempObj.quest_pokemon[id],
+                    )
+                      .flatMap(([k, v]) =>
+                        Array.isArray(v)
+                          ? v.map((y) => t(y))
+                          : typeof v === 'boolean'
+                            ? v
+                              ? t(k)
+                              : ''
+                            : t(v),
+                      )
+                      .join(' ')
+                      .toLowerCase()} ${t('pokemon').toLowerCase()}`
+                  }
+                } else {
+                  // Handle pokemon without specific form (use pokemonData directly)
+                  const pokeName = t(`poke_${pokemonId}`)
+                  const formTypes = pokemonData.types.map(
+                    (x) => `poke_type_${x}`,
+                  )
+
+                  tempObj.quest_pokemon[id] = {
+                    name: pokeName,
+                    pokedexId: +pokemonId,
+                    formId: pokemonData.defaultFormId,
+                    defaultFormId: pokemonData.defaultFormId,
+                    pokeName,
+                    formTypes,
+                    rarity: pokemonData.rarity,
+                    historic: pokemonData.historic,
+                    legendary: pokemonData.legendary,
+                    mythical: pokemonData.mythical,
+                    ultraBeast: pokemonData.ultraBeast,
+                    genId: `generation_${pokemonData.genId}`,
+                    perms: ['quests'],
+                    family: pokemonData.family,
+                  }
+                  tempObj.quest_pokemon[id].searchMeta = `${Object.entries(
+                    tempObj.quest_pokemon[id],
+                  )
+                    .flatMap(([k, v]) =>
+                      Array.isArray(v)
+                        ? v.map((y) => t(y))
+                        : typeof v === 'boolean'
+                          ? v
+                            ? t(k)
+                            : ''
+                          : t(v),
+                    )
+                    .join(' ')
+                    .toLowerCase()} ${t('pokemon').toLowerCase()}`
+                }
+              }
+            } else if (tempObj.pokestops) {
               tempObj.pokestops[id] = {
                 name: t('pokestop'),
                 perms: ['pokestops'],

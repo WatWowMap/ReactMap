@@ -245,7 +245,7 @@ class EventManager extends Logger {
     if (config.getSafe('api.pogoApiEndpoints.invasions')) {
       this.intervals.invasions = setInterval(
         async () => {
-          await this.getInvasions()
+          await this.getInvasions(Db)
           await this.chatLog('event', { description: 'Refreshed invasions' })
         },
         1000 * 60 * 60 * (config.getSafe('map.misc.invasionCacheHrs') || 1),
@@ -355,7 +355,11 @@ class EventManager extends Logger {
     this[type] = Object.values(this[`${type}Backup`])
   }
 
-  async getInvasions() {
+  /**
+   *
+   * @param {import('./DbManager').DbManager} [Db] - Database manager instance
+   */
+  async getInvasions(Db) {
     const endpoint = config.getSafe('api.pogoApiEndpoints.invasions')
     if (endpoint) {
       this.log.info('Fetching Latest Invasions')
@@ -376,6 +380,11 @@ class EventManager extends Logger {
             .map(Number)
 
           this.invasions = newInvasions
+
+          // Update available rocket Pokemon whenever invasions are refreshed
+          if (Db) {
+            await this.setAvailable('pokestops', 'Pokestop', Db)
+          }
         }
       } catch (e) {
         this.log.warn('Unable to generate latest invasions:\n', e)
@@ -404,6 +413,7 @@ class EventManager extends Logger {
     this.available[category].forEach((item) => {
       if (!Number.isNaN(parseInt(item.charAt(0)))) {
         const [id, form] = item.split('-')
+        const formId = form || '0'
         if (!this.masterfile.pokemon[id]) {
           this.masterfile.pokemon[id] = {
             name: '',
@@ -411,7 +421,7 @@ class EventManager extends Logger {
             types: [],
             quickMoves: [],
             chargedMoves: [],
-            defaultFormId: +form,
+            defaultFormId: +formId,
             forms: {},
             genId: 0,
           }
@@ -420,8 +430,8 @@ class EventManager extends Logger {
         if (!this.masterfile.pokemon[id].forms) {
           this.masterfile.pokemon[id].forms = {}
         }
-        if (!this.masterfile.pokemon[id].forms[form]) {
-          this.masterfile.pokemon[id].forms[form] = { name: '*', category }
+        if (!this.masterfile.pokemon[id].forms[formId]) {
+          this.masterfile.pokemon[id].forms[formId] = { name: '*', category }
           this.log.debug(
             `Added ${this.masterfile.pokemon[id].name} Key: ${item} to masterfile. (${category})`,
           )

@@ -56,7 +56,13 @@ class Device extends Model {
       ? await fetchJson(`${context.mem}/api/devices/all`, {
           method: 'GET',
           headers: {
-            'X-Golbat-Secret': context.secret || undefined,
+            // Support both secret-based and HTTP authentication
+            ...(context.secret ? { 'X-Golbat-Secret': context.secret } : {}),
+            ...(context.httpAuth
+              ? {
+                  Authorization: `Basic ${Buffer.from(`${context.httpAuth.username}:${context.httpAuth.password}`).toString('base64')}`,
+                }
+              : {}),
           },
         }).then((res) =>
           Object.entries(res.devices)

@@ -16,6 +16,6 @@
     "@rm/logger": "*"
   },
   "devDependencies": {
-    "vite": "5.0.13"
+    "vite": "^6.2.6"
   }
 }

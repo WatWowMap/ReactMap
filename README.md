@@ -22,7 +22,7 @@ Pokemon GO Map frontend built with React.
 - Weather
 - Portals
 - Stations
-- Nests (Only compatible with latest [NestWatcher](https://github.com/M4d40/nestwatcher))
+- Nests (Compatible with [Fletchling](https://github.com/UnownHash/Fletchling))
 - Submissions Cells
 - Last Scanned Cells
 - Spawnpoints

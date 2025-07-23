@@ -59,7 +59,7 @@ export type Config<Client extends boolean = false> = DeepMerge<
       // alwaysEnabledPerms: (keyof BaseConfig['authentication']['perms'])[]
       excludeFromTutorial: string[]
       alwaysEnabledPerms: string[]
-      aliases: { role: string; name: string }[]
+      aliases: { role: string | string[]; name: string }[]
       methods: Strategy[]
       strategies: {
         type: Strategy

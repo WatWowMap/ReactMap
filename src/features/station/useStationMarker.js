@@ -17,7 +17,6 @@ export function useStationMarker({
   battle_pokemon_form,
   battle_pokemon_gender,
   battle_pokemon_id,
-  is_battle_available,
   battle_pokemon_bread_mode,
   start_time,
   end_time,
@@ -49,14 +48,15 @@ export function useStationMarker({
   }, basicEqualFn)
   const [stationMod, battleMod] = Icons.getModifiers('station', 'dynamax')
   const opacity = useOpacity('stations')(end_time)
+  const isActive = !!battle_pokemon_id && start_time < Date.now() / 1000
 
   return divIcon({
     popupAnchor: [
       0 + stationMod.popupX + stationMod.offsetX,
-      (-baseSize - (is_battle_available ? battleSize : 0)) * 0.67 +
+      (-baseSize - (isActive ? battleSize : 0)) * 0.67 +
         stationMod.popupY +
         stationMod.offsetY +
-        (battleMod.offsetY + battleMod.popupY),
+        (-5 + battleMod.offsetY + battleMod.popupY),
     ],
     className: 'station-marker',
     html: /* html */ `
@@ -74,7 +74,7 @@ export function useStationMarker({
         "
       />
      ${
-       is_battle_available
+       isActive
          ? /* html */ `
         <img
             src="${battleIcon}"

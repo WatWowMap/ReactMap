@@ -16,6 +16,7 @@ export function StandardItem({ id, category, ...props }) {
     <SelectorItem
       {...props}
       id={id}
+      category={category}
       filter={filter}
       setFilter={setFilter}
       hasAll={hasAll}

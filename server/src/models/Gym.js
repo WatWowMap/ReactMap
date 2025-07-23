@@ -27,6 +27,7 @@ const gymFields = [
   'in_battle',
   'guarding_pokemon_id',
   'guarding_pokemon_display',
+  'defenders',
   'total_cp',
   'power_up_points',
   'power_up_level',
@@ -379,6 +380,9 @@ class Gym extends Model {
               gym.guarding_pokemon_display,
             )
           }
+          if (typeof gym.defenders === 'string' && gym.defenders) {
+            newGym.defenders = JSON.parse(gym.defenders)
+          }
         }
         if (
           onlyRaids &&
@@ -528,6 +532,7 @@ class Gym extends Model {
         isMad
           ? 'evolution AS raid_pokemon_evolution'
           : 'raid_pokemon_evolution',
+        isMad ? 'end AS raid_end_timestamp' : 'raid_end_timestamp',
         distance,
       ])
       .whereBetween(isMad ? 'latitude' : 'lat', [bbox.minLat, bbox.maxLat])
@@ -535,16 +540,8 @@ class Gym extends Model {
       .whereIn(isMad ? 'pokemon_id' : 'raid_pokemon_id', pokemonIds)
       .limit(config.getSafe('api.searchResultsLimit'))
       .orderBy('distance')
-      .andWhere(
-        isMad ? 'start' : 'raid_battle_timestamp',
-        '<=',
-        isMad ? this.knex().fn.now() : ts,
-      )
-      .andWhere(
-        isMad ? 'end' : 'raid_end_timestamp',
-        '>=',
-        isMad ? this.knex().fn.now() : ts,
-      )
+      .andWhere('raid_pokemon_id', '>', 0)
+      .andWhere('raid_end_timestamp', '>=', isMad ? this.knex().fn.now() : ts)
     if (isMad) {
       query
         .leftJoin('gymdetails', 'gym.gym_id', 'gymdetails.gym_id')

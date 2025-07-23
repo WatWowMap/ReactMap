@@ -549,27 +549,61 @@ class Pokestop extends Model {
                 invasion.andWhere('confirmed', onlyConfirmed)
               }
               invasion.andWhere((subQuery) => {
-                if (hasConfirmed) {
-                  if (rocketPokemon.length) {
-                    subQuery
-                      .whereIn('slot_1_pokemon_id', rocketPokemon)
-                      .orWhereIn('slot_2_pokemon_id', rocketPokemon)
-                      .orWhereIn('slot_3_pokemon_id', rocketPokemon)
-                      .orWhereIn(
-                        isMad ? 'character_display' : 'character',
-                        invasions,
-                      )
-                  } else {
-                    subQuery.whereIn(
-                      isMad ? 'character_display' : 'character',
-                      invasions,
-                    )
-                  }
-                } else {
-                  subQuery.whereIn(
-                    isMad ? 'character_display' : 'character',
-                    invasions,
+                // Case (a): Include if the invasion character/grunt type is checked
+                subQuery.whereIn(
+                  isMad ? 'character_display' : 'character',
+                  invasions,
+                )
+
+                // Case (b): Include if invasion has potential rewards that are checked
+                if (rocketPokemon.length) {
+                  // For confirmed invasions, check actual Pokemon slots
+                  if (hasConfirmed)
+                    subQuery.orWhere((confirmedQuery) => {
+                      confirmedQuery
+                        .where('confirmed', 1)
+                        .andWhere((pokemonQuery) => {
+                          pokemonQuery
+                            .whereIn('slot_1_pokemon_id', rocketPokemon)
+                            .orWhereIn('slot_2_pokemon_id', rocketPokemon)
+                            .orWhereIn('slot_3_pokemon_id', rocketPokemon)
+                        })
+                    })
+
+                  // For unconfirmed invasions, check if their potential rewards match
+                  // Get all grunt types that have potential rewards matching the filter
+                  const gruntTypesWithMatchingRewards = []
+                  Object.entries(state.event.invasions).forEach(
+                    ([gruntType, info]) => {
+                      if (!info) return
+                      if (
+                        [
+                          ...(info.firstReward ? info.encounters.first : []),
+                          ...(info.secondReward ? info.encounters.second : []),
+                          ...(info.thirdReward ? info.encounters.third : []),
+                        ].some((poke) =>
+                          rocketPokemon.includes(String(poke.id)),
+                        )
+                      ) {
+                        gruntTypesWithMatchingRewards.push(gruntType)
+                      }
+                    },
                   )
+
+                  if (gruntTypesWithMatchingRewards.length > 0) {
+                    subQuery.orWhere((unconfirmedQuery) => {
+                      unconfirmedQuery.whereIn(
+                        isMad ? 'character_display' : 'character',
+                        gruntTypesWithMatchingRewards,
+                      )
+                      if (hasConfirmed)
+                        unconfirmedQuery.andWhere((confirmationQuery) => {
+                          confirmationQuery
+                            .where('confirmed', 0)
+                            .orWhereNull('confirmed')
+                        })
+                    })
+                  }
                 }
               })
               if (onlyExcludeGrunts) {
@@ -864,14 +898,18 @@ class Pokestop extends Model {
                 fields.push('candy_pokemon_id', 'candy_amount')
                 break
               case 7:
-                quest.quest_form_id = quest.quest_form_id ?? 0
-                newQuest.key = `${quest.quest_pokemon_id}-${quest.quest_form_id}`
+                newQuest.key =
+                  quest.quest_form_id === undefined ||
+                  quest.quest_form_id === null
+                    ? `${quest.quest_pokemon_id}`
+                    : `${quest.quest_pokemon_id}-${quest.quest_form_id}`
                 fields.push(
                   'quest_pokemon_id',
                   'quest_form_id',
                   'quest_costume_id',
                   'quest_gender_id',
                   'quest_shiny',
+                  'quest_shiny_probability',
                 )
                 break
               case 9:
@@ -1526,6 +1564,37 @@ class Pokestop extends Model {
               }
             })
           }
+
+          if (config.getSafe('map.misc.fallbackRocketPokemonFiltering')) {
+            // Always include potential rocket Pokemon from state.event.invasions as backup
+            Object.values(state.event.invasions).forEach((invasionInfo) => {
+              if (invasionInfo) {
+                // Add all potential first slot rewards
+                if (invasionInfo.firstReward && invasionInfo.encounters.first) {
+                  invasionInfo.encounters.first.forEach((poke) => {
+                    finalList.add(`a${poke.id}-${poke.form}`)
+                  })
+                }
+
+                // Add all potential second slot rewards
+                if (
+                  invasionInfo.secondReward &&
+                  invasionInfo.encounters.second
+                ) {
+                  invasionInfo.encounters.second.forEach((poke) => {
+                    finalList.add(`a${poke.id}-${poke.form}`)
+                  })
+                }
+
+                // Add all potential third slot rewards
+                if (invasionInfo.thirdReward && invasionInfo.encounters.third) {
+                  invasionInfo.encounters.third.forEach((poke) => {
+                    finalList.add(`a${poke.id}-${poke.form}`)
+                  })
+                }
+              }
+            })
+          }
           break
         case 'showcase':
           if (hasShowcaseData) {
@@ -1545,7 +1614,9 @@ class Pokestop extends Model {
         default:
           rewards.forEach((reward) =>
             process(
-              `${reward.quest_pokemon_id}-${reward.form ?? 0}`,
+              reward.form === undefined || reward.form === null
+                ? `${reward.quest_pokemon_id}`
+                : `${reward.quest_pokemon_id}-${reward.form}`,
               reward.quest_title,
               reward.quest_target,
             ),
@@ -1998,6 +2069,16 @@ class Pokestop extends Model {
    * @returns {Promise<{ hasConfirmedInvasions: boolean }>}
    */
   static async getFilterContext({ isMad, hasConfirmed }) {
+    // Check if rocket Pokemon filtering should be forced via config
+    const fallback = config.getSafe('map.misc.fallbackRocketPokemonFiltering')
+
+    if (fallback) {
+      // Always enable rocket Pokemon filtering regardless of database support
+      // This allows filtering by potential rocket Pokemon even without confirmed invasions
+      return { hasConfirmedInvasions: true }
+    }
+
+    // Use original behavior when config is disabled
     if (isMad || !hasConfirmed) return { hasConfirmedInvasions: false }
     const result = await this.query()
       .from('incident')

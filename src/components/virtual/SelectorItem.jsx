@@ -37,13 +37,18 @@ import { useTranslation } from 'react-i18next'
 /** @param {FullProps} props */
 export function SelectorItem({
   id,
+  category,
   filter,
   setFilter,
   onClick,
   hasAll,
   easyMode,
 }) {
-  const { t } = useTranslateById({ alt: true, newLine: true })
+  const { t } = useTranslateById({
+    alt: true,
+    newLine: true,
+    quest: category === 'pokestops',
+  })
   const title = t(id)
   const url = useMemory((s) => s.Icons.getIconById(id))
 

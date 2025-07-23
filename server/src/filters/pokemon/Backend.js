@@ -312,7 +312,7 @@ class PkmnBackend {
           ? PkmnBackend.ensureSafe(cp, this.standard.cp[1])
           : undefined,
         level: this.filterKeys.has('level')
-          ? PkmnBackend.ensureSafe(level, 35)
+          ? PkmnBackend.ensureSafe(level)
           : undefined,
         gender: this.filterKeys.has('gender')
           ? { min: gender, max: gender }

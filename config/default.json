@@ -116,7 +116,7 @@
     },
     "portalUpdateLimit": 30,
     "weatherCellLimit": 3,
-    "stationUpdateLimit": 30,
+    "stationUpdateLimit": 9,
     "searchResultsLimit": 15,
     "searchSoftKmLimit": 10,
     "searchHardKmLimit": 100,
@@ -245,6 +245,7 @@
       "enableMapJsFilter": true,
       "fetchLatestInvasions": true,
       "invasionCacheHrs": 1,
+      "fallbackRocketPokemonFiltering": true,
       "masterfileCacheHrs": 6,
       "webhookCacheHrs": 1,
       "questMessage": "",
@@ -519,16 +520,16 @@
       "allInvasions": true,
       "invasionPokemon": true,
       "rewardTypes": false,
-      "baseMegaEnergyAmounts": [10, 20, 25],
+      "baseMegaEnergyAmounts": [],
       "stardust": {
         "min": 100,
-        "max": 2500,
+        "max": 0,
         "interval": 100,
         "enabled": true
       },
       "xp": {
         "min": 100,
-        "max": 1000,
+        "max": 0,
         "interval": 100,
         "enabled": true
       }
@@ -541,7 +542,7 @@
       "allPokemon": false,
       "globalValues": {
         "iv": [80, 100],
-        "level": [1, 35],
+        "level": [1, 55],
         "atk_iv": [0, 15],
         "def_iv": [0, 15],
         "sta_iv": [0, 15],
@@ -579,7 +580,8 @@
       "enabled": false,
       "pokemon": false,
       "battleTier": "all",
-      "battles": false
+      "battles": false,
+      "gmaxStationed": false
     },
     "s2cells": {
       "enabled": false,
@@ -916,11 +918,11 @@
     },
     {
       "name": "Apple Maps",
-      "url": "https://maps.apple.com/maps?daddr={x},{y}"
+      "url": "https://maps.apple.com/place?coordinate={x},{y}"
     },
     {
       "name": "Waze",
-      "url": "https://www.waze.com/ul?ll={x},{y}"
+      "url": "https://www.waze.com/ul?ll={x},{y}&navigate=yes&zoom=17"
     },
     {
       "name": "Intel",

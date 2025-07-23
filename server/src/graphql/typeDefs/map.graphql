@@ -64,12 +64,14 @@ type Search {
   raid_pokemon_costume: Int
   raid_pokemon_evolution: Int
   raid_pokemon_alignment: Int
+  raid_end_timestamp: Int
   pokemon_id: Int
   form: Int
   gender: Int
   costume: Int
   shiny: Int
   iv: Float
+  expire_timestamp: Int
   battle_pokemon_id: Int
   battle_pokemon_form: Int
   battle_pokemon_gender: Int
@@ -77,6 +79,7 @@ type Search {
   # battle_pokemon_evolution: Int
   battle_pokemon_alignment: Int
   battle_pokemon_bread_mode: Int
+  battle_end: Int
 }
 
 type SearchLure {

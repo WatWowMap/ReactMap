@@ -133,12 +133,12 @@ export const POKEMON = gql`
     ) {
       ...CoreSearch
       pokemon_id
-      pokemon_id
       form
       gender
       costume
       shiny
       iv
+      expire_timestamp
     }
   }
 `
@@ -213,6 +213,7 @@ export const RAIDS = gql`
       raid_pokemon_costume
       raid_pokemon_evolution
       raid_pokemon_alignment
+      raid_end_timestamp
     }
   }
 `
@@ -278,6 +279,7 @@ export const MAX_BATTLES = gql`
       # battle_pokemon_evolution
       battle_pokemon_alignment
       battle_pokemon_bread_mode
+      battle_end
     }
   }
 `

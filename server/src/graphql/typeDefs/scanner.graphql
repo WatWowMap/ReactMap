@@ -24,6 +24,7 @@ type Gym {
   updated: Int
   guarding_pokemon_id: Int
   guarding_pokemon_display: JSON
+  defenders: JSON
   available_slots: Int
   team_id: Int
   raid_level: Int
@@ -83,6 +84,7 @@ type Quest {
   quest_gender_id: Int
   quest_costume_id: Int
   quest_shiny: Int
+  quest_shiny_probability: Float
   mega_pokemon_id: Int
   mega_amount: Int
   candy_pokemon_id: Int
@@ -106,19 +108,10 @@ type Invasion {
   slot_3_form: Int
 }
 
-type ShowcaseEntry {
-  rank: Int
-  pokemon_id: Int
-  form: Int
-  costume: Int
-  gender: Int
-  score: Float
-}
-
 type ShowcaseDetails {
   total_entries: Int
   last_update: Int
-  contest_entries: [ShowcaseEntry]
+  contest_entries: [JSON]
 }
 
 type Event {
@@ -284,6 +277,7 @@ type Station {
   end_time: Int
   cooldown_complete: Int
   total_stationed_pokemon: Int
+  total_stationed_gmax: Int
   is_battle_available: Boolean
   is_inactive: Boolean
   battle_level: Int

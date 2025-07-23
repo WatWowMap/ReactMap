@@ -27,6 +27,7 @@ export function WebhookItem({ id, category, ...props }) {
     <SelectorItem
       {...props}
       id={id}
+      category={category}
       filter={filter}
       setFilter={setFilter}
       onClick={() =>

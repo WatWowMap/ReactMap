@@ -1,6 +1,6 @@
 {
   "name": "reactmap",
-  "version": "1.35.0",
+  "version": "1.36.0-develop.21",
   "private": true,
   "description": "React based frontend map.",
   "license": "MIT",
@@ -97,10 +97,6 @@
     ],
     "preset": "angular"
   },
-  "volta": {
-    "node": "18.18.2",
-    "yarn": "1.22.19"
-  },
   "dependencies": {
     "@apollo/client": "3.11.4",
     "@apollo/server": "4.11.0",
@@ -136,13 +132,13 @@
     "cors": "^2.8.5",
     "date-fns": "^2.30.0",
     "date-fns-tz": "^2.0.0",
-    "discord.js": "14.15.3",
+    "discord.js": "^14.18.0",
     "dlv": "^1.1.3",
     "dotenv": "^16.3.1",
-    "express": "4.21.0",
+    "express": "5.0.1",
     "express-mysql-session": "3.0.3",
     "express-rate-limit": "7.4.0",
-    "express-session": "1.18.0",
+    "express-session": "^1.18.1",
     "geo-tz": "^7.0.7",
     "graphql": "16.9.0",
     "graphql-type-json": "0.3.2",
@@ -177,7 +173,7 @@
     "source-map": "^0.7.4",
     "suncalc": "^1.9.0",
     "supercluster": "^8.0.1",
-    "uicons.js": "2.0.2",
+    "uicons.js": "2.0.3",
     "zustand": "4.4.6"
   },
   "devDependencies": {
@@ -193,7 +189,7 @@
     "@types/node-fetch": "2.6.11",
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
-    "@vitejs/plugin-react-swc": "3.7.0",
+    "@vitejs/plugin-react-swc": "^3.8.1",
     "commitizen": "^4.3.0",
     "cz-conventional-commit": "^1.0.6",
     "eslint": "^8.44.0",
@@ -212,8 +208,12 @@
     "rollup-plugin-delete": "^2.0.0",
     "semantic-release": "^22",
     "typescript": "5.5.4",
-    "vite": "5.4.6",
+    "vite": "^6.2.6",
     "vite-plugin-checker": "0.7.2"
+  },
+  "resolutions": {
+    "got": ">=11.8.5",
+    "dot-prop": ">=4.2.1"
   },
   "engines": {
     "node": ">=18",

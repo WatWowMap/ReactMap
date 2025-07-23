@@ -41,6 +41,18 @@ export interface PokemonDisplay {
   location_card: number
 }
 
+export interface Defender extends PokemonDisplay {
+  pokemon_id: number
+  deployed_ms: number
+  deployed_time: number
+  battles_won: number
+  battles_lost: number
+  times_fed: number
+  motivation_now: number
+  cp_when_deployed: number
+  cp_now: number
+}
+
 export interface Gym {
   id: string
   lat: number
@@ -55,6 +67,7 @@ export interface Gym {
   updated: number
   guarding_pokemon_id: number
   guarding_pokemon_display: PokemonDisplay
+  defenders: Defender[]
   available_slots: number
   team_id: number
   raid_level: number
@@ -121,6 +134,7 @@ export interface Quest {
   quest_gender_id: Gender
   quest_costume_id: number
   quest_shiny: number
+  quest_shiny_probability?: number
   mega_pokemon_id: number
   mega_amount: number
   candy_pokemon_id: number
@@ -368,6 +382,7 @@ export interface Station<Parsed extends boolean = false> {
   battle_pokemon_move_2: number
 
   total_stationed_pokemon: number
+  total_stationed_gmax: number
   stationed_pokemon: Parsed extends true
     ? StationPokemon[]
     : string | StationPokemon[]

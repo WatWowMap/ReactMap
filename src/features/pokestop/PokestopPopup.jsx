@@ -120,7 +120,31 @@ export function PokestopPopup({
                       <Divider light flexItem className="popup-divider" />
                     ) : null}
                     <RewardInfo {...quest} />
-                    <QuestConditions {...quest} />
+                    <Grid
+                      xs={9}
+                      style={{
+                        textAlign: 'center',
+                        maxHeight: 150,
+                        overflow: 'auto',
+                      }}
+                    >
+                      <QuestConditions {...quest} />
+                      {!!quest.quest_shiny_probability && (
+                        <>
+                          <br />
+                          <Typography variant="caption">
+                            <Trans
+                              i18nKey="shiny_probability"
+                              components={[
+                                readableProbability(
+                                  quest.quest_shiny_probability,
+                                ),
+                              ]}
+                            />
+                          </Typography>
+                        </>
+                      )}
+                    </Grid>
                   </React.Fragment>
                 ))}
               {hasLure && (
@@ -513,6 +537,28 @@ const RewardInfo = ({ with_ar, ...quest }) => {
 }
 
 /**
+ * Converts a numeric probability into a more human-readable format.
+ * It decides whether to display the probability as a percentage (e.g., "21%")
+ * or as a fraction (e.g., "1/4") based on which representation is more accurate
+ * after rounding. For fractions, it returns a React Fragment to prevent
+ * issues with HTML entity escaping of the forward slash.
+ *
+ * @param {number} x The raw probability value (e.g., 0.25).
+ * @returns {React.ReactNode} A string for percentages, a React Fragment
+ * for fractions, or a '🚫' emoji if the probability is zero or less.
+ */
+const readableProbability = (x) => {
+  if (x <= 0) return '🚫'
+  const x_1 = Math.round(1 / x)
+  const percent = Math.round(x * 100)
+  return Math.abs(1 / x_1 - x) < Math.abs(percent * 0.01 - x) ? (
+    <>1/{x_1}</>
+  ) : (
+    `${percent}%`
+  )
+}
+
+/**
  *
  * @param {Omit<import('@rm/types').Quest, 'key'>} props
  * @returns
@@ -528,22 +574,16 @@ const QuestConditions = ({
   const madQuestText = useStorage((s) => s.userSettings.pokestops.madQuestText)
 
   if (madQuestText && quest_task) {
-    return (
-      <Grid xs={9} textAlign="center">
-        <Typography variant="caption">{quest_task}</Typography>
-      </Grid>
-    )
+    return <Typography variant="caption">{quest_task}</Typography>
   }
 
   if (quest_title && !quest_title.includes('geotarget')) {
     const normalized = `quest_title_${quest_title.toLowerCase()}`
     if (i18n.exists(normalized)) {
       return (
-        <Grid xs={9} textAlign="center">
-          <Typography variant="caption">
-            <Trans i18nKey={normalized}>{{ amount_0: quest_target }}</Trans>
-          </Typography>
-        </Grid>
+        <Typography variant="caption">
+          <Trans i18nKey={normalized}>{{ amount_0: quest_target }}</Trans>
+        </Typography>
       )
     }
   }
@@ -615,10 +655,7 @@ const QuestConditions = ({
     }
   }
   return (
-    <Grid
-      xs={9}
-      style={{ textAlign: 'center', maxHeight: 150, overflow: 'auto' }}
-    >
+    <>
       {primaryCondition}
       {type1 && (
         <>
@@ -636,7 +673,7 @@ const QuestConditions = ({
           </Typography>
         </>
       )}
-    </Grid>
+    </>
   )
 }
 

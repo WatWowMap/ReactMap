@@ -4,7 +4,7 @@ import { useEffect, useMemo, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 
 /**
- * @typedef {{ plural?: boolean, amount?: boolean, alt?: boolean, newLine?: boolean }} CustomTOptions
+ * @typedef {{ plural?: boolean, amount?: boolean, alt?: boolean, newLine?: boolean, quest?: boolean }} CustomTOptions
  * @typedef {(id: string, options?: CustomTOptions) => string} CustomT
  */
 
@@ -23,7 +23,7 @@ export function useTranslateById(options = {}) {
   return useMemo(
     () => ({
       language: i18n.i18n.language,
-      t: (id, { plural, amount, alt, newLine } = options) => {
+      t: (id, { plural, amount, alt, newLine, quest } = options) => {
         if (typeof id !== 'string') {
           return ''
         }
@@ -110,15 +110,19 @@ export function useTranslateById(options = {}) {
           case 'f':
             // showcase mons
             id = id.slice(1)
+            quest = false
           default: {
             // pokemon
             const [pokemon, form] = id.split('-', 2)
             const pokemonName = i18n.t(`poke_${pokemon}`)
             const possibleForm = i18n.t(`form_${form}`)
-            const formName = formsToIgnore.current.has(possibleForm)
-              ? ''
-              : `${newLine ? '\n' : ' '}(${possibleForm})`
-            return `${pokemonName}${formName}`
+            const hideForm =
+              quest || pokemon === '51' // Dugtrio (unset) != Dugtrio (normal)
+                ? form === undefined
+                : formsToIgnore.current.has(possibleForm)
+            return hideForm
+              ? pokemonName
+              : `${pokemonName}${newLine ? '\n' : ' '}(${possibleForm})`
           }
         }
       },

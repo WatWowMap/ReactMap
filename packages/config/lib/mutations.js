@@ -277,27 +277,30 @@ const applyMutations = (config) => {
   const aliasObj = Object.fromEntries(
     config.authentication.aliases.map((alias) => [alias.name, alias.role]),
   )
-  /** @param {string} role */
-  const replaceAliases = (role) => aliasObj[role] ?? role
+  /** @param {string | string[]} role */
+  const replaceAliases = (role) =>
+    Array.isArray(role)
+      ? role.flatMap((r) => aliasObj[r] ?? r)
+      : (aliasObj[role] ?? role)
 
   const replaceBothAliases = (incomingObj) => ({
     ...incomingObj,
     discordRoles: Array.isArray(incomingObj.discordRoles)
-      ? incomingObj.discordRoles.map(replaceAliases)
+      ? incomingObj.discordRoles.flatMap(replaceAliases)
       : undefined,
     telegramGroups: Array.isArray(incomingObj.telegramGroups)
-      ? incomingObj.telegramGroups.map(replaceAliases)
+      ? incomingObj.telegramGroups.flatMap(replaceAliases)
       : undefined,
   })
 
   Object.keys(config.authentication.perms).forEach((perm) => {
     config.authentication.perms[perm].roles =
-      config.authentication.perms[perm].roles.map(replaceAliases)
+      config.authentication.perms[perm].roles.flatMap(replaceAliases)
   })
 
   config.authentication.areaRestrictions =
     config.authentication.areaRestrictions.map(({ roles, areas }) => ({
-      roles: roles.map(replaceAliases),
+      roles: roles.flatMap(replaceAliases),
       areas,
     }))
 
@@ -305,21 +308,21 @@ const applyMutations = (config) => {
     (strategy) => ({
       ...strategy,
       allowedGuilds: Array.isArray(strategy.allowedGuilds)
-        ? strategy.allowedGuilds.map(replaceAliases)
+        ? strategy.allowedGuilds.flatMap(replaceAliases)
         : [],
       blockedGuilds: Array.isArray(strategy.blockedGuilds)
-        ? strategy.blockedGuilds.map(replaceAliases)
+        ? strategy.blockedGuilds.flatMap(replaceAliases)
         : [],
       groups: Array.isArray(strategy.groups)
-        ? strategy.groups.map(replaceAliases)
+        ? strategy.groups.flatMap(replaceAliases)
         : [],
       allowedUsers: Array.isArray(strategy.allowedUsers)
-        ? strategy.allowedUsers.map(replaceAliases)
+        ? strategy.allowedUsers.flatMap(replaceAliases)
         : [],
       trialPeriod: {
         ...strategy.trialPeriod,
         roles: Array.isArray(strategy?.trialPeriod?.roles)
-          ? strategy.trialPeriod.roles.map(replaceAliases)
+          ? strategy.trialPeriod.roles.flatMap(replaceAliases)
           : [],
       },
     }),
