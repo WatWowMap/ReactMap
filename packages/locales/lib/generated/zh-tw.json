@@ -764,5 +764,11 @@
   "dynamic_opacity": "動態不透明度",
   "tooltips": "工具提示",
   "markers": "標記",
-  "filters": "篩選"
+  "filters": "篩選",
+  "quest_pokemon": "任務寶可夢",
+  "shiny_probability": "閃光機率：<0/>",
+  "gmax_stationed": "巨化寶可夢已設置",
+  "active": "活動中",
+  "inactive": "非活動中",
+  "bread_time_window": "您可以在早上6點到晚上9點之間參加巨化戰鬥。"
 }

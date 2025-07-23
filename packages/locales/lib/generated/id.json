@@ -764,5 +764,11 @@
   "dynamic_opacity": "Opasitas Dinamis",
   "tooltips": "Alat Keterangan",
   "markers": "Penanda",
-  "filters": "Filter"
+  "filters": "Filter",
+  "quest_pokemon": "Pokémon Quest",
+  "shiny_probability": "Probabilitas Shiny: <0/>",
+  "gmax_stationed": "Ditempatkan Gigantamax",
+  "active": "Aktif",
+  "inactive": "Tidak Aktif",
+  "bread_time_window": "Anda dapat mengikuti Pertarungan Max antara jam 6 pagi hingga 9 malam."
 }

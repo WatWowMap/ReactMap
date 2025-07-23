@@ -764,5 +764,11 @@
   "dynamic_opacity": "Opacidade Dinâmica",
   "tooltips": "Dicas",
   "markers": "Marcadores",
-  "filters": "Filtros"
+  "filters": "Filtros",
+  "quest_pokemon": "Pokémon de Missão",
+  "shiny_probability": "Probabilidade de Shiny: <0/>",
+  "gmax_stationed": "Gigantamax Posicionado",
+  "active": "Ativo",
+  "inactive": "Inativo",
+  "bread_time_window": "Você pode participar de Batalhas Max entre 6h e 21h."
 }

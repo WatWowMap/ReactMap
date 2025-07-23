@@ -764,5 +764,11 @@
   "dynamic_opacity": "डायनामिक अपारदर्शिता",
   "tooltips": "सूचना पट्टियाँ",
   "markers": "मार्कर",
-  "filters": "फ़िल्टर"
+  "filters": "फ़िल्टर",
+  "quest_pokemon": "क्वेस्ट पोकेमॉन",
+  "shiny_probability": "शाइनी होने की संभावना: <0/>",
+  "gmax_stationed": "गिगंटामैक्स स्थापित",
+  "active": "सक्रिय",
+  "inactive": "निष्क्रिय",
+  "bread_time_window": "आप 6AM से 9PM के बीच मैक्स बैटल ले सकते हैं।"
 }

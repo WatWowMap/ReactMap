@@ -762,5 +762,8 @@
   "dynamic_opacity": "Opacité dynamique",
   "tooltips": "Infobulles",
   "markers": "Marqueurs",
-  "filters": "Filtres"
+  "filters": "Filtres",
+  "quest_pokemon": "Pokémon de quête",
+  "shiny_probability": "Probabilité d'attraper un Shiny : <0/>",
+  "gmax_stationed": "Gigantamax Stationné"
 }

@@ -747,5 +747,11 @@
   "dynamic_opacity": "Dynamiczna Przezroczystość",
   "tooltips": "Podpowiedzi",
   "markers": "Znaczniki",
-  "filters": "Filtry"
+  "filters": "Filtry",
+  "quest_pokemon": "Pokémon w Zadaniach",
+  "shiny_probability": "Szansa na Shiny: <0/>",
+  "gmax_stationed": "Gigantamax Umiejscowiony",
+  "active": "Aktywny",
+  "inactive": "Nieaktywny",
+  "bread_time_window": "Możesz brać udział w Max Walkach między 6:00 a 21:00."
 }

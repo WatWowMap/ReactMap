@@ -764,5 +764,11 @@
   "dynamic_opacity": "ความโปร่งใสแบบไดนามิก",
   "tooltips": "ข้อมูลเพิ่มเติม",
   "markers": "เครื่องหมาย",
-  "filters": "ฟิลเตอร์"
+  "filters": "ฟิลเตอร์",
+  "quest_pokemon": "Pokémon ในเควส",
+  "shiny_probability": "ความน่าจะเป็นในการพบชินี: <0/>",
+  "gmax_stationed": "วางตำแหน่ง Gigantamax",
+  "active": "ใช้งาน",
+  "inactive": "ไม่ใช้งาน",
+  "bread_time_window": "คุณสามารถเข้าร่วม Max Battles ได้ระหว่าง 6 โมงเช้าถึง 3 ทุ่ม."
 }

@@ -764,5 +764,11 @@
   "dynamic_opacity": "Dinamik Opaklık",
   "tooltips": "Bilgi Balonları",
   "markers": "İşaretleyiciler",
-  "filters": "Filtreler"
+  "filters": "Filtreler",
+  "quest_pokemon": "Görev Pokémonu",
+  "shiny_probability": "Shiny olasılığı: <0/>",
+  "gmax_stationed": "Gigantamax Yerleştirildi",
+  "active": "Aktif",
+  "inactive": "Pasif",
+  "bread_time_window": "Max Savaşlarına sabah 6'dan akşam 9'a kadar katılabilirsiniz."
 }

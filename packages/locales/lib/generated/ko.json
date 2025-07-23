@@ -764,5 +764,11 @@
   "dynamic_opacity": "동적 불투명도",
   "tooltips": "툴팁",
   "markers": "마커",
-  "filters": "필터"
+  "filters": "필터",
+  "quest_pokemon": "퀘스트 포켓몬",
+  "shiny_probability": "섬광 확률: <0/>",
+  "gmax_stationed": "기갓막스 배치됨",
+  "active": "활성화됨",
+  "inactive": "비활성화됨",
+  "bread_time_window": "최대 배틀은 오전 6시부터 오후 9시 사이에 참여할 수 있습니다."
 }

@@ -764,5 +764,11 @@
   "dynamic_opacity": "Opacidad Dinámica",
   "tooltips": "Tooltips",
   "markers": "Marcadores",
-  "filters": "Filtros"
+  "filters": "Filtros",
+  "quest_pokemon": "Pokémon Quête",
+  "shiny_probability": "Probabilité Shiny : <0/>",
+  "gmax_stationed": "Gigantamax Placé",
+  "active": "Actif",
+  "inactive": "Inactif",
+  "bread_time_window": "Vous pouvez participer à des Batailles Max entre 6h et 21h."
 }

@@ -764,5 +764,11 @@
   "dynamic_opacity": "Dynamisk Opacitet",
   "tooltips": "Verktygstips",
   "markers": "Markörer",
-  "filters": "Filter"
+  "filters": "Filter",
+  "quest_pokemon": "Uppdrag Pokémon",
+  "shiny_probability": "Shiny sannolikhet: <0/>",
+  "gmax_stationed": "Gigantamax placerad",
+  "active": "Aktiv",
+  "inactive": "Inaktiv",
+  "bread_time_window": "Du kan delta i Max Strider mellan 06:00 och 21:00."
 }

@@ -764,5 +764,11 @@
   "dynamic_opacity": "Dynamische Opacity",
   "tooltips": "Hulptips",
   "markers": "Markeerders",
-  "filters": "Filters"
+  "filters": "Filters",
+  "quest_pokemon": "Quest Pokémon",
+  "shiny_probability": "Shiny kans: <0/>",
+  "gmax_stationed": "Gigantamax Plaatsing",
+  "active": "Actief",
+  "inactive": "Inactief",
+  "bread_time_window": "Je kunt Max Battles doen tussen 6.00 uur en 21.00 uur."
 }

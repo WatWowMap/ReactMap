@@ -764,5 +764,11 @@
   "dynamic_opacity": "ダイナミック不透明度",
   "tooltips": "ツールチップ",
   "markers": "マーカー",
-  "filters": "フィルター"
+  "filters": "フィルター",
+  "quest_pokemon": "クエストポケモン",
+  "shiny_probability": "色違いの確率: <0/>",
+  "gmax_stationed": "ギガントマックス配置済み",
+  "active": "アクティブ",
+  "inactive": "非アクティブ",
+  "bread_time_window": "マックスバトルは午前6時から午後9時の間で挑戦できます。"
 }

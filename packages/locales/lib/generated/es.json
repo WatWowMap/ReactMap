@@ -762,5 +762,10 @@
   "dynamic_opacity": "Opacidad Dinámica",
   "tooltips": "Consejos",
   "markers": "Marcadores",
-  "filters": "Filtros"
+  "filters": "Filtros",
+  "quest_pokemon": "Pokémon de Misión",
+  "shiny_probability": "Probabilidad Shiny: <0/>",
+  "gmax_stationed": "Gigantamax Colocado",
+  "active": "Activo",
+  "inactive": "Inactivo"
 }
