@@ -1,3 +1,11 @@
+# [1.36.0-develop.21](https://github.com/WatWowMap/ReactMap/compare/v1.36.0-develop.20...v1.36.0-develop.21) (2025-07-23)
+
+
+### Bug Fixes
+
+* best buddy ribbon in gym defender display ([0d332be](https://github.com/WatWowMap/ReactMap/commit/0d332be6911a14ce4356797a625f9ef096c069ee))
+* proper display of shiny probability ([1f92f4a](https://github.com/WatWowMap/ReactMap/commit/1f92f4accba0219d899d9eebf42e2b38dd103d29))
+
 # [1.36.0-develop.20](https://github.com/WatWowMap/ReactMap/compare/v1.36.0-develop.19...v1.36.0-develop.20) (2025-07-17)
 
 
