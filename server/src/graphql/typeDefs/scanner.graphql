@@ -267,6 +267,18 @@ type Route {
   waypoints: [Waypoint]
 }
 
+type Hyperlocal {
+  id: String
+  experiment_id: Int
+  start_ms: Float
+  end_ms: Float
+  lat: Float
+  lon: Float
+  radius_m: Float
+  challenge_bonus_key: String
+  updated_ms: Float
+}
+
 type Station {
   id: ID
   name: String

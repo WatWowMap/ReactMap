@@ -16,6 +16,7 @@ class DbManager extends Logger {
   static validModels = /** @type {const} */ ([
     'Device',
     'Gym',
+    'Hyperlocal',
     'Nest',
     'Pokestop',
     'Pokemon',

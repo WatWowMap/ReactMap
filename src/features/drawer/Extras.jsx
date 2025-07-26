@@ -5,6 +5,7 @@ import { PokestopDrawer } from './pokestops'
 import { GymDrawer } from './gyms'
 import { NestsDrawer } from './nests'
 import { RoutesDrawer } from './Routes'
+import { HyperlocalDrawer } from './Hyperlocal'
 import { WayfarerDrawer } from './Wayfarer'
 import { S2CellsDrawer } from './S2Cells'
 import { AdminDrawer } from './Admin'
@@ -24,6 +25,8 @@ function ExtrasComponent({ category, subItem }) {
       return <WayfarerDrawer subItem={subItem} />
     case 'routes':
       return <RoutesDrawer subItem={subItem} />
+    case 'hyperlocal':
+      return <HyperlocalDrawer subItem={subItem} />
     case 'admin':
       return <AdminDrawer subItem={subItem} />
     case 'stations':

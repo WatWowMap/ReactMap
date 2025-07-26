@@ -169,7 +169,18 @@ function QueryData({ category, timeout }) {
     ? []
     : (data || previousData || { [category]: [] })[category]
 
-  if (!returnData) {
+  // Add unique IDs to hyperlocal data for React keys
+  const processedData = React.useMemo(() => {
+    if (category === 'hyperlocal' && returnData) {
+      return returnData.map((item) => ({
+        ...item,
+        id: `${item.experiment_id}_${item.lat}_${item.lon}`,
+      }))
+    }
+    return returnData
+  }, [returnData, category])
+
+  if (!processedData) {
     return error && process.env.NODE_ENV === 'development' ? (
       <Notification
         open
@@ -187,7 +198,7 @@ function QueryData({ category, timeout }) {
 
   return (
     <Clustering category={category}>
-      {returnData.map((each) => {
+      {processedData.map((each) => {
         if (!hideList.has(each.id)) {
           return <Component key={each.id || category} {...each} />
         }

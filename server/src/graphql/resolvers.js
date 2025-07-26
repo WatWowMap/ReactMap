@@ -293,6 +293,12 @@ const resolvers = {
       }
       return []
     },
+    hyperlocal: (_, args, { perms, Db }) => {
+      if (perms?.hyperlocal) {
+        return Db.query('Hyperlocal', 'getAll', perms, args)
+      }
+      return []
+    },
     s2cells: (_, args, { perms }) => {
       if (perms?.s2cells) {
         const { onlyCells } = args.filters
