@@ -381,6 +381,8 @@
     "stations": {
       "clustering": true,
       "stationTimers": false,
+      "interactionRanges": false,
+      "customRange": 0,
       "stationsOpacity": true,
       "enableStationPopupCoords": false,
       "opacityTenMinutes": 0.75,
@@ -581,7 +583,9 @@
       "pokemon": false,
       "battleTier": "all",
       "battles": false,
-      "gmaxStationed": false
+      "gmaxStationed": false,
+      "interactionRanges": false,
+      "customRange": 0
     },
     "s2cells": {
       "enabled": false,

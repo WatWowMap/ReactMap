@@ -833,6 +833,14 @@
         "__name": "CLIENT_SIDE_OPTIONS_STATIONS_CLUSTERING",
         "__format": "boolean"
       },
+      "interactionRanges": {
+        "__name": "CLIENT_SIDE_OPTIONS_STATIONS_INTERACTION_RANGES",
+        "__format": "boolean"
+      },
+      "customRange": {
+        "__name": "CLIENT_SIDE_OPTIONS_STATIONS_CUSTOM_RANGE",
+        "__format": "number"
+      },
       "stationTimers": {
         "__name": "CLIENT_SIDE_OPTIONS_STATIONS_STATION_TIMERS",
         "__format": "boolean"
