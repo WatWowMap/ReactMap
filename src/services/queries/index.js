@@ -18,6 +18,7 @@ import { GET_ONE_NEST, GET_ALL_NESTS, NEST_SUBMISSION } from './nest'
 import { GET_ALL_SCAN_AREAS, GET_SCAN_AREAS_MENU } from './scanAreas'
 import { S2_CELLS } from './s2cell'
 import { GET_ROUTE, GET_ROUTES } from './route'
+import { GET_HYPERLOCAL } from './hyperlocal'
 
 export class Query {
   /**
@@ -188,5 +189,9 @@ export class Query {
   static routes(method) {
     if (method === 'getOne') return GET_ROUTE
     return GET_ROUTES
+  }
+
+  static hyperlocal() {
+    return GET_HYPERLOCAL
   }
 }

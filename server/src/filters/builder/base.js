@@ -167,6 +167,16 @@ function buildDefaultFilters(perms) {
             },
           }
         : undefined,
+    hyperlocal:
+      perms.hyperlocal && state.db.models.Hyperlocal
+        ? {
+            enabled: defaultFilters.hyperlocal.enabled,
+            standard: new BaseFilter(),
+            filter: {
+              global: new BaseFilter(),
+            },
+          }
+        : undefined,
     portals:
       perms.portals && state.db.models.Portal
         ? {

@@ -148,6 +148,13 @@ type Query {
     maxLon: Float
     filters: JSON
   ): [Route]
+  hyperlocal(
+    minLat: Float
+    maxLat: Float
+    minLon: Float
+    maxLon: Float
+    filters: JSON
+  ): [Hyperlocal]
   webhook(category: String, status: String): Poracle
   webhookAreas: [WebhookAreaGroups]
   webhookGeojson: JSON

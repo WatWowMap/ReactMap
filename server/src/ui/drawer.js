@@ -152,6 +152,10 @@ function drawer(req, perms) {
             },
           }
         : BLOCKED,
+    hyperlocal:
+      perms.hyperlocal && state.db.models.Hyperlocal
+        ? { enabled: true }
+        : BLOCKED,
     routes: perms.routes && state.db.models.Route ? { enabled: true } : BLOCKED,
     wayfarer:
       perms.portals || perms.submissionCells

@@ -7,6 +7,7 @@ import { DeviceTile as devices } from '@features/device'
 import { NestTile as nests } from '@features/nest'
 import { PortalTile as portals } from '@features/portal'
 import { RouteTile as routes } from '@features/route'
+import { HyperlocalTile as hyperlocal } from '@features/hyperlocal'
 import { WeatherTile as weather } from '@features/weather'
 import { SpawnpointTile as spawnpoints } from '@features/spawnpoint'
 import { ScanCellTile as scanCells } from '@features/scanCell'
@@ -29,5 +30,6 @@ export const TILES = {
   weather,
   s2cells,
   routes,
+  hyperlocal,
   stations,
 }
