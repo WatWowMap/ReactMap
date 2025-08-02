@@ -1,3 +1,16 @@
+# [1.37.0-develop.1](https://github.com/WatWowMap/ReactMap/compare/v1.36.1-develop.1...v1.37.0-develop.1) (2025-08-02)
+
+
+### Bug Fixes
+
+* add exclude rocket Pokemon on unconfirmed menu ([18582f1](https://github.com/WatWowMap/ReactMap/commit/18582f10028956f151f02362c535247ab95a0603))
+* properly check hasConfirmed ([47db2f1](https://github.com/WatWowMap/ReactMap/commit/47db2f1d7ccfe327de80e32763c5b6f0a730e763))
+
+
+### Features
+
+* custom ranges for power spots ([20761db](https://github.com/WatWowMap/ReactMap/commit/20761dbc608cc33321c35c6817e033fd22afb3bf)), closes [#1121](https://github.com/WatWowMap/ReactMap/issues/1121)
+
 ## [1.36.1-develop.1](https://github.com/WatWowMap/ReactMap/compare/v1.36.0...v1.36.1-develop.1) (2025-07-30)
 
 
