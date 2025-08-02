@@ -33,6 +33,7 @@ import { PowerUp } from '@components/popups/PowerUp'
 import { NameTT } from '@components/popups/NameTT'
 import { TimeStamp } from '@components/popups/TimeStamps'
 import { useAnalytics } from '@hooks/useAnalytics'
+import { useGetAvailable } from '@hooks/useGetAvailable'
 import { parseQuestConditions } from '@utils/parseConditions'
 import { Img } from '@components/Img'
 
@@ -329,11 +330,10 @@ const MenuActions = ({
   invasions,
 }) => {
   const { t } = useTranslation()
-  const [masterfile, hasConfirmed] = useMemory((s) => [
-    s.masterfile,
-    s.available.pokestops.some((x) => x.startsWith('a')),
-  ])
+  const masterfile = useMemory((s) => s.masterfile)
   const filters = useStorage((s) => s.filters)
+  const { available } = useGetAvailable('pokestops')
+  const hasConfirmed = available.some((x) => x.startsWith('a'))
 
   const [anchorEl, setAnchorEl] = React.useState(false)
 
