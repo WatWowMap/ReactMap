@@ -1,3 +1,15 @@
+# [1.37.0-develop.2](https://github.com/WatWowMap/ReactMap/compare/v1.37.0-develop.1...v1.37.0-develop.2) (2025-08-05)
+
+
+### Bug Fixes
+
+* rocket Pokemon sizes now affect invasion icon sizes ([c13c2db](https://github.com/WatWowMap/ReactMap/commit/c13c2db37c1e3ec48e97596ba9ea1787607ea171))
+
+
+### Features
+
+* fully deprecate basic/intermediate mode and add expert mode docs ([55f9cfb](https://github.com/WatWowMap/ReactMap/commit/55f9cfb50539f1ee2392c44b41bdbe31cce528d0))
+
 # [1.37.0-develop.1](https://github.com/WatWowMap/ReactMap/compare/v1.36.1-develop.1...v1.37.0-develop.1) (2025-08-02)
 
 
