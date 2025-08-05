@@ -27,8 +27,12 @@ export function usePokestopMarker({
   invasions,
   quests,
 }) {
-  const [, Icons] = useStorage(
-    (s) => [s.icons, useMemory.getState().Icons],
+  const [, Icons, masterfile] = useStorage(
+    (s) => [
+      s.icons,
+      useMemory.getState().Icons,
+      useMemory.getState().masterfile,
+    ],
     (a, b) => Object.entries(a[0]).every(([k, v]) => b[0][k] === v),
   )
 
@@ -81,9 +85,174 @@ export function usePokestopMarker({
           icon: Icons.getInvasions(invasion.grunt_type, invasion.confirmed),
           opacity: getOpacity(invasion.incident_expire_timestamp),
         })
-        invasionSizes.unshift(
-          Icons.getSize('invasion', filters[`i${invasion.grunt_type}`]?.size),
+
+        // Get base invasion type icon size
+        const invasionTypeSize = Icons.getSize(
+          'invasion',
+          filters[`i${invasion.grunt_type}`]?.size,
         )
+
+        // Exclude leaders and Giovanni (grunt_type 41-44) from size calculation
+        if (invasion.grunt_type >= 41 && invasion.grunt_type <= 44) {
+          invasionSizes.unshift(invasionTypeSize)
+        } else {
+          // Calculate potential reward icon sizes
+          let maxRewardSize = 0
+
+          // Only consider invasion type size if the invasion type is enabled
+          if (filters[`i${invasion.grunt_type}`]?.enabled) {
+            maxRewardSize = Math.max(maxRewardSize, invasionTypeSize)
+          }
+
+          const gruntData = masterfile.invasions[invasion.grunt_type]
+          if (invasion.confirmed && invasion.encounters) {
+            // If invasion has confirmed lineup from DB, use those specific rewards
+            // But still check which encounters are actually available as rewards
+            if (gruntData?.firstReward && invasion.encounters.first) {
+              invasion.encounters.first.forEach((encounter) => {
+                const pokemonKey = `a${encounter.pokemon_id}-${encounter.pokemon_form || 0}`
+                const pokemonKeySimple = `a${encounter.pokemon_id}`
+
+                // Only consider this Pokemon's size if it's enabled in filters
+                if (
+                  filters[pokemonKey]?.enabled ||
+                  filters[pokemonKeySimple]?.enabled
+                ) {
+                  const rewardSize =
+                    Icons.getSize('invasion', filters[pokemonKey]?.size) ||
+                    Icons.getSize(
+                      'invasion',
+                      filters[pokemonKeySimple]?.size,
+                    ) ||
+                    Icons.getSize('invasion')
+                  maxRewardSize = Math.max(maxRewardSize, rewardSize)
+                }
+              })
+            }
+
+            if (gruntData?.secondReward && invasion.encounters.second) {
+              invasion.encounters.second.forEach((encounter) => {
+                const pokemonKey = `a${encounter.pokemon_id}-${encounter.pokemon_form || 0}`
+                const pokemonKeySimple = `a${encounter.pokemon_id}`
+
+                // Only consider this Pokemon's size if it's enabled in filters
+                if (
+                  filters[pokemonKey]?.enabled ||
+                  filters[pokemonKeySimple]?.enabled
+                ) {
+                  const rewardSize =
+                    Icons.getSize('invasion', filters[pokemonKey]?.size) ||
+                    Icons.getSize(
+                      'invasion',
+                      filters[pokemonKeySimple]?.size,
+                    ) ||
+                    Icons.getSize('invasion')
+                  maxRewardSize = Math.max(maxRewardSize, rewardSize)
+                }
+              })
+            }
+
+            if (gruntData?.thirdReward && invasion.encounters.third) {
+              invasion.encounters.third.forEach((encounter) => {
+                const pokemonKey = `a${encounter.pokemon_id}-${encounter.pokemon_form || 0}`
+                const pokemonKeySimple = `a${encounter.pokemon_id}`
+
+                // Only consider this Pokemon's size if it's enabled in filters
+                if (
+                  filters[pokemonKey]?.enabled ||
+                  filters[pokemonKeySimple]?.enabled
+                ) {
+                  const rewardSize =
+                    Icons.getSize('invasion', filters[pokemonKey]?.size) ||
+                    Icons.getSize(
+                      'invasion',
+                      filters[pokemonKeySimple]?.size,
+                    ) ||
+                    Icons.getSize('invasion')
+                  maxRewardSize = Math.max(maxRewardSize, rewardSize)
+                }
+              })
+            }
+          } else if (gruntData?.encounters) {
+            // If no confirmed lineup, use all potential rewards from masterfile
+            if (gruntData.encounters) {
+              // Check first encounter rewards if firstReward is true
+              if (gruntData.firstReward && gruntData.encounters.first) {
+                gruntData.encounters.first.forEach((encounter) => {
+                  const pokemonKey = `a${encounter.id}-${encounter.form || 0}`
+                  const pokemonKeySimple = `a${encounter.id}`
+
+                  // Only consider this Pokemon's size if it's enabled in filters
+                  if (
+                    filters[pokemonKey]?.enabled ||
+                    filters[pokemonKeySimple]?.enabled
+                  ) {
+                    const rewardSize =
+                      Icons.getSize('invasion', filters[pokemonKey]?.size) ||
+                      Icons.getSize(
+                        'invasion',
+                        filters[pokemonKeySimple]?.size,
+                      ) ||
+                      Icons.getSize('invasion')
+                    maxRewardSize = Math.max(maxRewardSize, rewardSize)
+                  }
+                })
+              }
+
+              // Check second encounter rewards if secondReward is true
+              if (gruntData.secondReward && gruntData.encounters.second) {
+                gruntData.encounters.second.forEach((encounter) => {
+                  const pokemonKey = `a${encounter.id}-${encounter.form || 0}`
+                  const pokemonKeySimple = `a${encounter.id}`
+
+                  // Only consider this Pokemon's size if it's enabled in filters
+                  if (
+                    filters[pokemonKey]?.enabled ||
+                    filters[pokemonKeySimple]?.enabled
+                  ) {
+                    const rewardSize =
+                      Icons.getSize('invasion', filters[pokemonKey]?.size) ||
+                      Icons.getSize(
+                        'invasion',
+                        filters[pokemonKeySimple]?.size,
+                      ) ||
+                      Icons.getSize('invasion')
+                    maxRewardSize = Math.max(maxRewardSize, rewardSize)
+                  }
+                })
+              }
+
+              // Check third encounter rewards if thirdReward is true
+              if (gruntData.thirdReward && gruntData.encounters.third) {
+                gruntData.encounters.third.forEach((encounter) => {
+                  const pokemonKey = `a${encounter.id}-${encounter.form || 0}`
+                  const pokemonKeySimple = `a${encounter.id}`
+
+                  // Only consider this Pokemon's size if it's enabled in filters
+                  if (
+                    filters[pokemonKey]?.enabled ||
+                    filters[pokemonKeySimple]?.enabled
+                  ) {
+                    const rewardSize =
+                      Icons.getSize('invasion', filters[pokemonKey]?.size) ||
+                      Icons.getSize(
+                        'invasion',
+                        filters[pokemonKeySimple]?.size,
+                      ) ||
+                      Icons.getSize('invasion')
+                    maxRewardSize = Math.max(maxRewardSize, rewardSize)
+                  }
+                })
+              }
+            }
+          }
+
+          // Use the maximum size found, or default invasion size if none are enabled
+          const finalInvasionSize =
+            maxRewardSize > 0 ? maxRewardSize : invasionTypeSize
+          invasionSizes.unshift(finalInvasionSize)
+        }
+
         popupYOffset += invasionMod.offsetY - 1
         popupX += invasionMod.popupX
         popupY += invasionMod.popupY
