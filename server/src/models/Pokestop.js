@@ -805,40 +805,49 @@ class Pokestop extends Model {
         filtered.invasions = pokestop.invasions.filter((invasion) => {
           const info = state.event.invasions[invasion.grunt_type]
           if (!info) return false
-          if (
-            info.firstReward &&
-            (hasConfirmed && invasion.confirmed
-              ? filters[
-                  `a${invasion.slot_1_pokemon_id}-${invasion.slot_1_form}`
-                ]
-              : info.encounters.first.some(
-                  (poke) => !!filters[`a${poke.id}-${poke.form}`],
-                ))
-          )
-            return true
 
-          if (
-            info.secondReward &&
-            (hasConfirmed && invasion.confirmed
-              ? filters[
-                  `a${invasion.slot_2_pokemon_id}-${invasion.slot_2_form}`
-                ]
-              : info.encounters.second.some(
-                  (poke) => !!filters[`a${poke.id}-${poke.form}`],
-                ))
-          )
-            return true
-          if (
-            info.thirdReward &&
-            (hasConfirmed && invasion.confirmed
-              ? filters[
-                  `a${invasion.slot_3_pokemon_id}-${invasion.slot_3_form}`
-                ]
-              : info.encounters.third.some(
-                  (poke) => !!filters[`a${poke.id}-${poke.form}`],
-                ))
-          )
-            return true
+          // Check if this is a team leader or Giovanni (grunt types 41-44)
+          const isLeaderOrGiovanni =
+            invasion.grunt_type >= 41 && invasion.grunt_type <= 44
+
+          // For team leaders and Giovanni, skip Pokemon-based filtering
+          if (!isLeaderOrGiovanni) {
+            if (
+              info.firstReward &&
+              (hasConfirmed && invasion.confirmed
+                ? filters[
+                    `a${invasion.slot_1_pokemon_id}-${invasion.slot_1_form}`
+                  ]
+                : info.encounters.first.some(
+                    (poke) => !!filters[`a${poke.id}-${poke.form}`],
+                  ))
+            )
+              return true
+
+            if (
+              info.secondReward &&
+              (hasConfirmed && invasion.confirmed
+                ? filters[
+                    `a${invasion.slot_2_pokemon_id}-${invasion.slot_2_form}`
+                  ]
+                : info.encounters.second.some(
+                    (poke) => !!filters[`a${poke.id}-${poke.form}`],
+                  ))
+            )
+              return true
+            if (
+              info.thirdReward &&
+              (hasConfirmed && invasion.confirmed
+                ? filters[
+                    `a${invasion.slot_3_pokemon_id}-${invasion.slot_3_form}`
+                  ]
+                : info.encounters.third.some(
+                    (poke) => !!filters[`a${poke.id}-${poke.form}`],
+                  ))
+            )
+              return true
+          }
+
           return (
             filters[`i${invasion.grunt_type}`] ||
             (filters.onlyAllPokestops &&
