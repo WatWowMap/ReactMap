@@ -1,3 +1,10 @@
+## [1.37.1-develop.2](https://github.com/WatWowMap/ReactMap/compare/v1.37.1-develop.1...v1.37.1-develop.2) (2025-08-11)
+
+
+### Bug Fixes
+
+* invasion size by rocket Pokemon when confirmed lineups ([f1a9cba](https://github.com/WatWowMap/ReactMap/commit/f1a9cbacea0d830b478ef740bfb9bbbe893eb047))
+
 ## [1.37.1-develop.1](https://github.com/WatWowMap/ReactMap/compare/v1.37.0...v1.37.1-develop.1) (2025-08-11)
 
 
