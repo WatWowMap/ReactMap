@@ -1,3 +1,11 @@
+## [1.37.1-develop.1](https://github.com/WatWowMap/ReactMap/compare/v1.37.0...v1.37.1-develop.1) (2025-08-11)
+
+
+### Bug Fixes
+
+* exclude leaders and Giovanni from confirmed available rocket Pokemon ([85e6408](https://github.com/WatWowMap/ReactMap/commit/85e6408578923bb9f35ec6c08cd9fd195f7b9059))
+* secondaryFilter should also exclude leaders and Giovanni pokemon ([08696af](https://github.com/WatWowMap/ReactMap/commit/08696af1feeff9553ef1dfbe5b8596e05be0cdcd))
+
 # [1.37.0](https://github.com/WatWowMap/ReactMap/compare/v1.36.0...v1.37.0) (2025-08-11)
 
 
