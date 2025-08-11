@@ -837,6 +837,14 @@
         "__name": "CLIENT_SIDE_OPTIONS_STATIONS_STATION_TIMERS",
         "__format": "boolean"
       },
+      "interactionRanges": {
+        "__name": "CLIENT_SIDE_OPTIONS_STATIONS_INTERACTION_RANGES",
+        "__format": "boolean"
+      },
+      "customRange": {
+        "__name": "CLIENT_SIDE_OPTIONS_STATIONS_CUSTOM_RANGE",
+        "__format": "number"
+      },
       "stationsOpacity": {
         "__name": "CLIENT_SIDE_OPTIONS_STATIONS_STATIONS_OPACITY",
         "__format": "boolean"
@@ -1340,6 +1348,14 @@
       "gmaxStationed": {
         "__name": "DEFAULT_FILTERS_STATIONS_GMAX_STATIONED",
         "__format": "boolean"
+      },
+      "interactionRanges": {
+        "__name": "DEFAULT_FILTERS_STATIONS_INTERACTION_RANGES",
+        "__format": "boolean"
+      },
+      "customRange": {
+        "__name": "DEFAULT_FILTERS_STATIONS_CUSTOM_RANGE",
+        "__format": "number"
       }
     },
     "s2cells": {

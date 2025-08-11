@@ -140,6 +140,13 @@ function clientOptions(perms) {
         perm: ['stations', 'dynamax'],
         category: 'markers',
       },
+      customRange: {
+        type: 'number',
+        perm: ['stations', 'dynamax'],
+        min: 0,
+        max: 5000,
+        category: 'markers',
+      },
       stationsOpacity: {
         type: 'bool',
         perm: ['stations', 'dynamax'],

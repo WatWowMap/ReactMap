@@ -1,3 +1,35 @@
+# [1.37.0-develop.2](https://github.com/WatWowMap/ReactMap/compare/v1.37.0-develop.1...v1.37.0-develop.2) (2025-08-05)
+
+
+### Bug Fixes
+
+* rocket Pokemon sizes now affect invasion icon sizes ([c13c2db](https://github.com/WatWowMap/ReactMap/commit/c13c2db37c1e3ec48e97596ba9ea1787607ea171))
+
+
+### Features
+
+* fully deprecate basic/intermediate mode and add expert mode docs ([55f9cfb](https://github.com/WatWowMap/ReactMap/commit/55f9cfb50539f1ee2392c44b41bdbe31cce528d0))
+
+# [1.37.0-develop.1](https://github.com/WatWowMap/ReactMap/compare/v1.36.1-develop.1...v1.37.0-develop.1) (2025-08-02)
+
+
+### Bug Fixes
+
+* add exclude rocket Pokemon on unconfirmed menu ([18582f1](https://github.com/WatWowMap/ReactMap/commit/18582f10028956f151f02362c535247ab95a0603))
+* properly check hasConfirmed ([47db2f1](https://github.com/WatWowMap/ReactMap/commit/47db2f1d7ccfe327de80e32763c5b6f0a730e763))
+
+
+### Features
+
+* custom ranges for power spots ([20761db](https://github.com/WatWowMap/ReactMap/commit/20761dbc608cc33321c35c6817e033fd22afb3bf)), closes [#1121](https://github.com/WatWowMap/ReactMap/issues/1121)
+
+## [1.36.1-develop.1](https://github.com/WatWowMap/ReactMap/compare/v1.36.0...v1.36.1-develop.1) (2025-07-30)
+
+
+### Bug Fixes
+
+* exclude team leaders and Giovanni from rocket Pokemon filtering ([b6fcba6](https://github.com/WatWowMap/ReactMap/commit/b6fcba611718a9e34af9129152681cb5b80cfa69))
+
 # [1.36.0](https://github.com/WatWowMap/ReactMap/compare/v1.35.0...v1.36.0) (2025-07-23)
 
 

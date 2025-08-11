@@ -26,11 +26,14 @@ const BaseStationTile = (station) => {
     return [timerList.includes(station.id), config.general.interactionRangeZoom]
   }, basicEqualFn)
 
-  const [showTimer, showInteractionRange] = useStorage((s) => {
+  const [showTimer, showInteractionRange, customRange] = useStorage((s) => {
     const { userSettings, zoom } = s
     return [
       userSettings.stations.stationTimers || individualTimer,
       !!userSettings.stations.interactionRanges && zoom >= interactionRangeZoom,
+      zoom >= interactionRangeZoom
+        ? +userSettings.stations.customRange || 0
+        : 0,
     ]
   }, basicEqualFn)
 
@@ -66,6 +69,14 @@ const BaseStationTile = (station) => {
         <Circle
           center={[station.lat, station.lon]}
           radius={80}
+          color="#EE94F7"
+          weight={0.5}
+        />
+      )}
+      {!!customRange && (
+        <Circle
+          center={[station.lat, station.lon]}
+          radius={customRange}
           color="#EE94F7"
           weight={0.5}
         />
