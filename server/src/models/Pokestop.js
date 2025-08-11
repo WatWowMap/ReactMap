@@ -1563,6 +1563,9 @@ class Pokestop extends Model {
         case 'rocketPokemon':
           if (hasConfirmed) {
             rewards.forEach((reward) => {
+              // Exclude team leaders (41-43) and Giovanni (44)
+              if (reward.grunt_type >= 41 && reward.grunt_type <= 44) return
+
               const fullGrunt = state.event.invasions[reward.grunt_type]
               if (fullGrunt?.firstReward) {
                 finalList.add(
