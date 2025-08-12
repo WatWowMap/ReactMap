@@ -19,6 +19,9 @@ const { getPlacementCells } = require('../utils/getPlacementCells')
 const { getTypeCells } = require('../utils/getTypeCells')
 const { getValidCoords } = require('../utils/getValidCoords')
 
+const { loadCachedAreas } = require('../services/areas')
+const { buildAreaPermissionChecker } = require('../services/permissions/area')
+
 /** @type {import("@apollo/server").ApolloServerOptions<import("@rm/types").GqlContext>['resolvers']} */
 const resolvers = {
   JSON: GraphQLJSON,
@@ -342,38 +345,47 @@ const resolvers = {
       }
       return [{ features: [] }]
     },
+@@
     scanAreasMenu: (_, _args, { req, perms }) => {
-      if (perms?.scanAreas) {
-        const scanAreas = config.getAreas(req, 'scanAreasMenu')
-        if (perms.areaRestrictions.length) {
-          const filtered = scanAreas
-            .map((parent) => ({
-              ...parent,
-              children: perms.areaRestrictions.includes(parent.name)
-                ? parent.children
-                : parent.children.filter((child) =>
-                    perms.areaRestrictions.includes(child.properties.name),
-                  ),
-            }))
-            .filter((parent) => parent.children.length)
+      if (!perms?.scanAreas) return []
 
-          // // Adds new blanks to account for area restrictions trimming some
-          // filtered.forEach(({ children }) => {
-          //   if (children.length % 2 === 1) {
-          //     children.push({
-          //       type: 'Feature',
-          //       properties: {
-          //         name: '',
-          //         manual: !!config.getSafe('manualAreas.length'),
-          //       },
-          //     })
-          //   }
-          // })
-          return filtered
-        }
-        return scanAreas.filter((parent) => parent.children.length)
-      }
-      return []
+      // Existing domain-scoped menu from config
+      const menu = config.getAreas(req, 'scanAreasMenu')
+
+      // Roles source (match how the rest of your resolvers derive roles)
+      const roles =
+        (perms && (perms.roles || perms.all)) ||
+        (req && req.user && req.user.roles) ||
+        []
+
+      // Build runtime checker that understands roles + areas + parent(s)
+      const ctx = loadCachedAreas() // has scanAreasObj with .properties.key/name/parent
+      const isAllowed = buildAreaPermissionChecker({ scanAreasObj: ctx.scanAreasObj })
+
+      // Pre-compute allowed area keys for this user
+      const allowed = new Set(
+        Object.keys(ctx.scanAreasObj).filter((k) => isAllowed(roles, k)),
+      )
+
+      // Final filter: include only children whose key is allowed.
+      // (If you still want to honor perms.areaRestrictions as an extra allow-list,
+      // uncomment the OR below.)
+      const filtered = menu
+        .map((parent) => ({
+          ...parent,
+          children: parent.children.filter((child) => {
+            const key = child.properties.key
+            const name = child.properties.name
+            const allowByRule = allowed.has(key)
+            // Optional legacy allow by explicit perms.areaRestrictions (name-based):
+            // const allowByPerms = perms.areaRestrictions?.includes(parent.name) || perms.areaRestrictions?.includes(name)
+            // return allowByRule || allowByPerms
+            return allowByRule
+          }),
+        }))
+        .filter((p) => p.children.length)
+
+      return filtered
     },
     scannerConfig: (_, { mode }, { perms }) => {
       const scanner = config.getSafe('scanner')
