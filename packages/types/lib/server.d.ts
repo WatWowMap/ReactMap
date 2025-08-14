@@ -151,6 +151,7 @@ export interface Permissions extends BasePerms {
   areaRestrictions: string[]
   webhooks: string[]
   trial: boolean
+  scannerCooldowns: Record<string, number>
 }
 
 export interface FilterId {

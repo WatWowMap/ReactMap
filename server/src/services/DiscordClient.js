@@ -131,6 +131,8 @@ class DiscordClient extends AuthClient {
       blockedGuildNames: new Set(),
     }
     const scanner = config.getSafe('scanner')
+    perms.scannerCooldowns = {}
+
     try {
       const guilds = user.guilds?.map((guild) => guild.id) || []
       if (
@@ -141,9 +143,12 @@ class DiscordClient extends AuthClient {
         Object.keys(this.perms).forEach((key) => (perms[key] = true))
         perms.admin = true
         config.getSafe('webhooks').forEach((x) => permSets.webhooks.add(x.name))
-        Object.keys(scanner).forEach(
-          (x) => scanner[x]?.enabled && permSets.scanner.add(x),
-        )
+        Object.keys(scanner).forEach((x) => {
+          if (scanner[x]?.enabled) {
+            permSets.scanner.add(x)
+            perms.scannerCooldowns[x] = 0
+          }
+        })
         this.log.debug(
           `User ${user.username} (${user.id}) in allowed users list, skipping guild and role check.`,
         )
@@ -195,7 +200,21 @@ class DiscordClient extends AuthClient {
                 (x) => permSets.webhooks.add(x),
               )
               scannerPerms(userRoles, 'discordRoles', trialActive).forEach(
-                (x) => permSets.scanner.add(x),
+                (x) => {
+                  permSets.scanner.add(x)
+                  perms.scannerCooldowns[x] = scanner[x].rules.reduce(
+                    (acc, rule) => {
+                      if (
+                        userRoles.includes(rule?.role) &&
+                        rule.cooldown < acc
+                      ) {
+                        return rule.cooldown
+                      }
+                      return acc
+                    },
+                    scanner[x].userCooldownSeconds,
+                  )
+                },
               )
             }
           }),
