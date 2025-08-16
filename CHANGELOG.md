@@ -1,3 +1,10 @@
+## [1.37.1-develop.3](https://github.com/WatWowMap/ReactMap/compare/v1.37.1-develop.2...v1.37.1-develop.3) (2025-08-16)
+
+
+### Bug Fixes
+
+* typo ([56a2272](https://github.com/WatWowMap/ReactMap/commit/56a227210481e3548989174b1db3bf40717c2d70))
+
 ## [1.37.1-develop.2](https://github.com/WatWowMap/ReactMap/compare/v1.37.1-develop.1...v1.37.1-develop.2) (2025-08-11)
 
 
