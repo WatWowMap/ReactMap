@@ -105,9 +105,9 @@ export function usePokestopMarker({
           }
 
           const gruntData = masterfile.invasions[invasion.grunt_type]
-          if (invasion.confirmed && invasion.encounters) {
+          if (invasion.confirmed) {
             // If invasion has confirmed lineup from DB, use those specific rewards
-            // Check the actual confirmed reward Pokemon
+            // Only check Pokemon that are actually rewards based on grunt data
             if (gruntData?.firstReward && invasion.slot_1_pokemon_id) {
               const pokemonKey = `a${invasion.slot_1_pokemon_id}-${invasion.slot_1_form || 0}`
               const pokemonKeySimple = `a${invasion.slot_1_pokemon_id}`
