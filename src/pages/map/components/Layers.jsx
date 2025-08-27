@@ -4,6 +4,8 @@ import { TileLayer, useMap } from 'react-leaflet'
 import { useTranslation } from 'react-i18next'
 import { control } from 'leaflet'
 import { useStorage } from '@store/useStorage'
+import { useLocationError } from '@hooks/useLocationError'
+import { Notification } from '@components/Notification'
 
 import { useTileLayer } from '../hooks/useTileLayer'
 
@@ -37,6 +39,8 @@ export function ControlledLocate() {
   )
   const metric = useStorage((s) => s.settings.distanceUnit === 'kilometers')
   const map = useMap()
+  const { locationError, hideLocationError, handleLocationError } =
+    useLocationError()
 
   const lc = React.useMemo(
     () =>
@@ -47,6 +51,7 @@ export function ControlledLocate() {
         setView: 'untilPan',
         keepCurrentZoomLevel: true,
         locateOptions: { maximumAge: 5000 },
+        onLocationError: handleLocationError,
         strings: {
           metersUnit: t('lc_metersUnit'),
           feetUnit: t('lc_feetUnit'),
@@ -55,7 +60,7 @@ export function ControlledLocate() {
           title: t('lc_title'),
         },
       }),
-    [metric, navSetting, t],
+    [metric, navSetting, t, handleLocationError],
   )
 
   React.useEffect(() => {
@@ -68,5 +73,13 @@ export function ControlledLocate() {
     }
   }, [lc, navSetting, map])
 
-  return null
+  return (
+    <Notification
+      open={locationError.show}
+      severity="error"
+      cb={hideLocationError}
+    >
+      {locationError.message}
+    </Notification>
+  )
 }

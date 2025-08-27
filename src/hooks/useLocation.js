@@ -8,10 +8,11 @@ import { useMap } from 'react-leaflet'
 import 'leaflet.locatecontrol'
 
 import { useStorage } from '@store/useStorage'
+import { useLocationError } from '@hooks/useLocationError'
 
 /**
  * Use location hook
- * @returns {{ lc: Control.Locate & { _onClick: () => void }, requesting: boolean, color: import('@mui/material').ButtonProps['color'] }}
+ * @returns {{ lc: Control.Locate & { _onClick: () => void }, requesting: boolean, color: import('@mui/material').ButtonProps['color'], locationError: { show: boolean, message: string }, hideLocationError: () => void }}
  */
 export function useLocation(dependency = false) {
   const map = useMap()
@@ -21,6 +22,8 @@ export function useLocation(dependency = false) {
   const [requesting, setRequesting] = useState(false)
   const { t } = useTranslation()
   const metric = useStorage((s) => s.settings.distanceUnit === 'kilometers')
+  const { locationError, hideLocationError, handleLocationError } =
+    useLocationError()
 
   const lc = useMemo(() => {
     const LocateFab = Control.Locate.extend({
@@ -101,6 +104,7 @@ export function useLocation(dependency = false) {
         return container
       },
     })
+
     const result = new LocateFab({
       // @ts-ignore
       keepCurrentZoomLevel: true,
@@ -109,6 +113,7 @@ export function useLocation(dependency = false) {
       locateOptions: {
         maximumAge: 5000,
       },
+      onLocationError: handleLocationError,
       strings: {
         metersUnit: t('lc_metersUnit'),
         feetUnit: t('lc_feetUnit'),
@@ -118,7 +123,7 @@ export function useLocation(dependency = false) {
       },
     })
     return result
-  }, [t, metric])
+  }, [t, metric, handleLocationError])
 
   useEffect(() => {
     if (lc) {
@@ -131,5 +136,5 @@ export function useLocation(dependency = false) {
   }, [lc, map, dependency])
 
   // @ts-ignore
-  return { lc, requesting, color }
+  return { lc, requesting, color, locationError, hideLocationError }
 }
