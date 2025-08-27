@@ -118,7 +118,6 @@ const BaseGymTile = (gym) => {
   const [
     showTimer,
     showInteractionRange,
-    show300mCircles,
     customRange,
     showDiamond,
     showExBadge,
@@ -129,7 +128,6 @@ const BaseGymTile = (gym) => {
     return [
       (userSettings.gyms.raidTimers || inTimerList) && hasRaid,
       !!userSettings.gyms.interactionRanges && zoom >= interactionRangeZoom,
-      !!userSettings.gyms['300mRange'] && zoom >= interactionRangeZoom,
       zoom >= interactionRangeZoom ? +userSettings.gyms.customRange || 0 : 0,
       !!gym.badge &&
         filters.gyms.gymBadges &&
@@ -197,14 +195,6 @@ const BaseGymTile = (gym) => {
         <Circle
           center={[gym.lat, gym.lon]}
           radius={80}
-          color={getColor(gym.team_id)}
-          weight={0.5}
-        />
-      )}
-      {show300mCircles && (
-        <Circle
-          center={[gym.lat, gym.lon]}
-          radius={300}
           color={getColor(gym.team_id)}
           weight={0.5}
         />

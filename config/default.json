@@ -349,7 +349,6 @@
       "clustering": true,
       "raidTimers": false,
       "interactionRanges": false,
-      "300mRange": false,
       "customRange": 0,
       "showExBadge": false,
       "showArBadge": false,
