@@ -721,10 +721,6 @@
         "__name": "CLIENT_SIDE_OPTIONS_GYMS_INTERACTION_RANGES",
         "__format": "boolean"
       },
-      "300mRange": {
-        "__name": "CLIENT_SIDE_OPTIONS_GYMS_300M_RANGE",
-        "__format": "boolean"
-      },
       "customRange": {
         "__name": "CLIENT_SIDE_OPTIONS_GYMS_CUSTOM_RANGE",
         "__format": "number"
