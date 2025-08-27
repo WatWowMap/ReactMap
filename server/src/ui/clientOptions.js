@@ -87,6 +87,7 @@ function clientOptions(perms) {
         category: 'markers',
       },
       lureRange: { type: 'bool', perm: ['lures'], category: 'markers' },
+      showcaseRange: { type: 'bool', perm: ['pokestops'], category: 'markers' },
       customRange: {
         type: 'number',
         perm: ['raids', 'gyms'],
