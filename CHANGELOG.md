@@ -1,3 +1,10 @@
+# [1.38.0-develop.2](https://github.com/WatWowMap/ReactMap/compare/v1.38.0-develop.1...v1.38.0-develop.2) (2025-08-27)
+
+
+### Features
+
+* fallback gym defender info using old columns in db ([d794ea0](https://github.com/WatWowMap/ReactMap/commit/d794ea0ffdb1322fbfca93684480b9b12f05cdb8))
+
 # [1.38.0-develop.1](https://github.com/WatWowMap/ReactMap/compare/v1.37.1-develop.3...v1.38.0-develop.1) (2025-08-27)
 
 
