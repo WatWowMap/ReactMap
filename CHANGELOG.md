@@ -1,3 +1,16 @@
+# [1.38.0-develop.1](https://github.com/WatWowMap/ReactMap/compare/v1.37.1-develop.3...v1.38.0-develop.1) (2025-08-27)
+
+
+### Bug Fixes
+
+* remove 300m range ([e6e1651](https://github.com/WatWowMap/ReactMap/commit/e6e1651e98283b5eadce343f8789a29313273d10)), closes [#526](https://github.com/WatWowMap/ReactMap/issues/526)
+
+
+### Features
+
+* better location error UI ([2ce02e9](https://github.com/WatWowMap/ReactMap/commit/2ce02e9d275ebe7ccb2fcdc275e1f41511576402))
+* showcase ranges for remote joining ([5d2b792](https://github.com/WatWowMap/ReactMap/commit/5d2b792aa758efbb373be9b580cf8c20f9258a4a))
+
 ## [1.37.1-develop.3](https://github.com/WatWowMap/ReactMap/compare/v1.37.1-develop.2...v1.37.1-develop.3) (2025-08-16)
 
 
