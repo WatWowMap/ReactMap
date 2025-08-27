@@ -1,3 +1,10 @@
+# [1.38.0-develop.3](https://github.com/WatWowMap/ReactMap/compare/v1.38.0-develop.2...v1.38.0-develop.3) (2025-08-27)
+
+
+### Bug Fixes
+
+* discord clientReady event ([330df39](https://github.com/WatWowMap/ReactMap/commit/330df3924f67640e48f5b54e6e799aee237c3489))
+
 # [1.38.0-develop.2](https://github.com/WatWowMap/ReactMap/compare/v1.38.0-develop.1...v1.38.0-develop.2) (2025-08-27)
 
 
