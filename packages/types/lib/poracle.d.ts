@@ -66,6 +66,7 @@ export interface PoracleRaid {
   distance: number
   template: string
   team: number
+  rsvp_changes: number
   gym_id: string
   form: number
   move: number
@@ -84,6 +85,7 @@ export interface PoracleEgg {
   distance: number
   template: string
   team: number
+  rsvp_changes: number
   gym_id: string
   description: string
 }
