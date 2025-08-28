@@ -798,5 +798,9 @@
   "filters": "Filter",
   "active": "aktiv",
   "inactive": "inaktiv",
-  "bread_time_window": "Du kannst von 6Uhr bis 21Uhr an Dyna-Kämpfen teilnehmen."
+  "bread_time_window": "Du kannst von 6Uhr bis 21Uhr an Dyna-Kämpfen teilnehmen.",
+  "rsvp_0": "ohne RSVP",
+  "rsvp_1": "RSVP",
+  "rsvp_2": "nur_RSVP",
+  "rsvp_changes": "RSVP Änderungen"
 }
