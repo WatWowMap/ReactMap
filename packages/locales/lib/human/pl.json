@@ -517,6 +517,10 @@
   "reversible": "Odwrotny",
   "reward_audio": "Dźwięk nagrody",
   "reward_icons": "Ikony nagród",
+  "rsvp_0": "no rsvp",
+  "rsvp_1": "rsvp",
+  "rsvp_2": "rsvp_only",
+  "rsvp_changes": "RSVP zmiany"
   "rocket_pokemon": "Pokémony Rocket",
   "route_tags": "Etykiety scieżek",
   "route_type": "Typ scieżki",
