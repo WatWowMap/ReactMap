@@ -558,7 +558,7 @@
       "enabled": false
     },
     "routes": {
-      "enabled": true
+      "enabled": false
     },
     "scanAreas": {
       "enabled": false
