@@ -1,3 +1,11 @@
+# [1.38.0-develop.4](https://github.com/WatWowMap/ReactMap/compare/v1.38.0-develop.3...v1.38.0-develop.4) (2025-08-30)
+
+
+### Bug Fixes
+
+* disable routes by default ([7e8ed3b](https://github.com/WatWowMap/ReactMap/commit/7e8ed3bc6f726fc75e7cadf5bca60ab7ad211e3f))
+* showcase range is 500m ([9da523b](https://github.com/WatWowMap/ReactMap/commit/9da523b14ba8a86f1d802769dbb605eecfc04636))
+
 # [1.38.0-develop.3](https://github.com/WatWowMap/ReactMap/compare/v1.38.0-develop.2...v1.38.0-develop.3) (2025-08-27)
 
 
