@@ -160,7 +160,7 @@ const BasePokestopTile = (pokestop) => {
       {showcaseRange && (
         <Circle
           center={[pokestop.lat, pokestop.lon]}
-          radius={400}
+          radius={500}
           pathOptions={{ color: '#39a18f', weight: 1 }}
         />
       )}
