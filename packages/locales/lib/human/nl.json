@@ -469,5 +469,9 @@
   "webhook_advanced_save_width": 2,
   "login_button": 5,
   "join_button": 5,
-  "all": "Alle"
+  "all": "Alle",
+  "rsvp_0": "no rsvp",
+  "rsvp_1": "rsvp",
+  "rsvp_2": "rsvp_only",
+  "rsvp_changes": "RSVP veranderingen"
 }

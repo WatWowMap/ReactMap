@@ -66,6 +66,7 @@ const skipFields = new Set([
   'gym_id',
   'slot_changes',
   'team',
+  'rsvp_changes',
   'battle_changes',
   'shiny',
   'everything_individually',
@@ -328,6 +329,15 @@ export function WebhookAdvanced() {
           ),
         )
         break
+      case 'rsvp_changes':
+        option.options.forEach((rsvp_changes) =>
+          menuItems.push(
+            <MenuItem key={rsvp_changes} value={rsvp_changes} dense>
+              {t(`rsvp_${rsvp_changes}`)}
+            </MenuItem>,
+          ),
+        )
+        break
       case 'move':
         menuItems.push(
           <MenuItem key={9000} value={9000} dense>
@@ -410,6 +420,8 @@ export function WebhookAdvanced() {
       return ` ${t('battle_changes_poracle')} `
     if (field === 'team' && poracleValues.team !== 4)
       return t(`team_${poracleValues.team}`)
+    if (field === 'rsvp_changes' && poracleValues.rsvp_changes !== 0)
+      return t(`rsvp_${poracleValues.rsvp_changes}`)
     if (
       field === 'everything_individually' &&
       poracleValues.everything_individually

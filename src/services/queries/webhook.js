@@ -22,6 +22,7 @@ const Egg = gql`
       id
       profile_no
       team
+      rsvp_changes
       template
       uid
       description
@@ -224,6 +225,7 @@ const Raid = gql`
       pokemon_id
       profile_no
       team
+      rsvp_changes
       template
       uid
       description

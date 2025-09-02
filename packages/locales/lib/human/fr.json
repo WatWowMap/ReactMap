@@ -773,5 +773,9 @@
   "weather_audio": "Son de météo",
   "active": "Actif",
   "inactive": "Inactif",
-  "bread_time_window": "Tu peux participer à des Combats Dynamax entre 6h et 21h."
+  "bread_time_window": "Tu peux participer à des Combats Dynamax entre 6h et 21h.",
+  "rsvp_0": "no rsvp",
+  "rsvp_1": "rsvp",
+  "rsvp_2": "rsvp_only",
+  "rsvp_changes": "RSVP changements"
 }
