@@ -26,6 +26,7 @@ export function usePokestopMarker({
   events,
   invasions,
   quests,
+  hasShowcase,
 }) {
   const [, Icons, masterfile] = useStorage(
     (s) => [
@@ -78,7 +79,7 @@ export function usePokestopMarker({
   const showcaseIcons = []
   const showcaseSizes = []
 
-  if (hasInvasion) {
+  if (hasInvasion && !hasShowcase) {
     invasions.forEach((invasion) => {
       if (invasion.grunt_type) {
         invasionIcons.unshift({
@@ -342,10 +343,13 @@ export function usePokestopMarker({
   if (hasEvent && !hasInvasion && !hasQuest) {
     events.forEach((event) => {
       if (event.display_type === 8) {
-        showcaseIcons.unshift({
-          url: Icons.getPokemon(352),
-        })
-        showcaseSizes.unshift(Icons.getSize('event', filters.b7?.size))
+        // Only show Kecleon if there's no active showcase blocking it
+        if (!hasShowcase) {
+          showcaseIcons.unshift({
+            url: Icons.getPokemon(352),
+          })
+          showcaseSizes.unshift(Icons.getSize('event', filters.b7?.size))
+        }
       } else if (event.display_type === 9) {
         if (event.showcase_pokemon_id) {
           showcaseIcons.unshift({
