@@ -1,3 +1,10 @@
+# [1.38.0-develop.5](https://github.com/WatWowMap/ReactMap/compare/v1.38.0-develop.4...v1.38.0-develop.5) (2025-09-08)
+
+
+### Bug Fixes
+
+* remove invasion and kecleon icons if showcase overrides ([5cf6123](https://github.com/WatWowMap/ReactMap/commit/5cf6123f05e2265e21701e883b26cbf3cf996b36))
+
 # [1.38.0-develop.4](https://github.com/WatWowMap/ReactMap/compare/v1.38.0-develop.3...v1.38.0-develop.4) (2025-08-30)
 
 
