@@ -1,3 +1,10 @@
+# [1.38.0-develop.6](https://github.com/WatWowMap/ReactMap/compare/v1.38.0-develop.5...v1.38.0-develop.6) (2025-09-10)
+
+
+### Bug Fixes
+
+* audit ([66b07e9](https://github.com/WatWowMap/ReactMap/commit/66b07e93e35373c46b6f4deae01e0583bfb3d697))
+
 # [1.38.0-develop.5](https://github.com/WatWowMap/ReactMap/compare/v1.38.0-develop.4...v1.38.0-develop.5) (2025-09-08)
 
 
