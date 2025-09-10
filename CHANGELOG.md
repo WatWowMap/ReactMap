@@ -1,3 +1,26 @@
+# [1.38.0](https://github.com/WatWowMap/ReactMap/compare/v1.37.0...v1.38.0) (2025-09-10)
+
+
+### Bug Fixes
+
+* audit ([66b07e9](https://github.com/WatWowMap/ReactMap/commit/66b07e93e35373c46b6f4deae01e0583bfb3d697))
+* disable routes by default ([7e8ed3b](https://github.com/WatWowMap/ReactMap/commit/7e8ed3bc6f726fc75e7cadf5bca60ab7ad211e3f))
+* discord clientReady event ([330df39](https://github.com/WatWowMap/ReactMap/commit/330df3924f67640e48f5b54e6e799aee237c3489))
+* exclude leaders and Giovanni from confirmed available rocket Pokemon ([85e6408](https://github.com/WatWowMap/ReactMap/commit/85e6408578923bb9f35ec6c08cd9fd195f7b9059))
+* invasion size by rocket Pokemon when confirmed lineups ([f1a9cba](https://github.com/WatWowMap/ReactMap/commit/f1a9cbacea0d830b478ef740bfb9bbbe893eb047))
+* remove 300m range ([e6e1651](https://github.com/WatWowMap/ReactMap/commit/e6e1651e98283b5eadce343f8789a29313273d10)), closes [#526](https://github.com/WatWowMap/ReactMap/issues/526)
+* remove invasion and kecleon icons if showcase overrides ([5cf6123](https://github.com/WatWowMap/ReactMap/commit/5cf6123f05e2265e21701e883b26cbf3cf996b36))
+* secondaryFilter should also exclude leaders and Giovanni pokemon ([08696af](https://github.com/WatWowMap/ReactMap/commit/08696af1feeff9553ef1dfbe5b8596e05be0cdcd))
+* showcase range is 500m ([9da523b](https://github.com/WatWowMap/ReactMap/commit/9da523b14ba8a86f1d802769dbb605eecfc04636))
+* typo ([56a2272](https://github.com/WatWowMap/ReactMap/commit/56a227210481e3548989174b1db3bf40717c2d70))
+
+
+### Features
+
+* better location error UI ([2ce02e9](https://github.com/WatWowMap/ReactMap/commit/2ce02e9d275ebe7ccb2fcdc275e1f41511576402))
+* fallback gym defender info using old columns in db ([d794ea0](https://github.com/WatWowMap/ReactMap/commit/d794ea0ffdb1322fbfca93684480b9b12f05cdb8))
+* showcase ranges for remote joining ([5d2b792](https://github.com/WatWowMap/ReactMap/commit/5d2b792aa758efbb373be9b580cf8c20f9258a4a))
+
 # [1.38.0-develop.6](https://github.com/WatWowMap/ReactMap/compare/v1.38.0-develop.5...v1.38.0-develop.6) (2025-09-10)
 
 
