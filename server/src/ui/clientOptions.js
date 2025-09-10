@@ -24,7 +24,6 @@ function clientOptions(perms) {
         perm: ['gyms', 'raids'],
         category: 'markers',
       },
-      '300mRange': { type: 'bool', perm: ['raids'], category: 'markers' },
       customRange: {
         type: 'number',
         perm: ['raids', 'gyms'],
@@ -87,6 +86,7 @@ function clientOptions(perms) {
         category: 'markers',
       },
       lureRange: { type: 'bool', perm: ['lures'], category: 'markers' },
+      showcaseRange: { type: 'bool', perm: ['pokestops'], category: 'markers' },
       customRange: {
         type: 'number',
         perm: ['raids', 'gyms'],

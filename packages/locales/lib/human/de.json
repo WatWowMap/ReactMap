@@ -558,7 +558,6 @@
   "scan_areas_options": "Optionen für Scanbereiche",
   "historic_rarity": "Historische Seltenheit",
   "poi": "Wayspots",
-  "300m_range": "300m Radius",
   "lure_range": "Lockmodulradius",
   "custom_range": "individueller Radius",
   "tap_to_toggle": "Tippen zum Umschalten",
@@ -799,5 +798,9 @@
   "filters": "Filter",
   "active": "aktiv",
   "inactive": "inaktiv",
-  "bread_time_window": "Du kannst von 6Uhr bis 21Uhr an Dyna-Kämpfen teilnehmen."
+  "bread_time_window": "Du kannst von 6Uhr bis 21Uhr an Dyna-Kämpfen teilnehmen.",
+  "rsvp_0": "ohne RSVP",
+  "rsvp_1": "RSVP",
+  "rsvp_2": "nur_RSVP",
+  "rsvp_changes": "RSVP Änderungen"
 }

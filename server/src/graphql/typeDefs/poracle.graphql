@@ -61,6 +61,7 @@ type PoracleRaid {
   distance: Int
   template: String
   team: Int
+  rsvp_changes: Int
   gym_id: String
   form: Int
   move: Int
@@ -80,6 +81,7 @@ type PoracleEgg {
   distance: Int
   template: String
   team: Int
+  rsvp_changes: Int
   gym_id: String
   description: String
 }

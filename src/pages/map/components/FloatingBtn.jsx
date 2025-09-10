@@ -32,6 +32,7 @@ import { useStorage } from '@store/useStorage'
 import { useScanStore } from '@features/scanner'
 import { setModeBtn, useWebhookStore } from '@store/useWebhookStore'
 import { I } from '@components/I'
+import { Notification } from '@components/Notification'
 
 /** @typedef {keyof ReturnType<typeof useLayoutStore['getState']> | keyof ReturnType<typeof useScanStore['getState']>} Keys */
 
@@ -92,7 +93,8 @@ export function FloatingButtons() {
   const reactControls = useStorage(
     (s) => s.settings.navigationControls === 'react',
   )
-  const { lc, requesting, color } = useLocation(reactControls)
+  const { lc, requesting, color, locationError, hideLocationError } =
+    useLocation(reactControls)
 
   const isMobile = useMemory((s) => s.isMobile)
   const online = useMemory((s) => s.online)
@@ -139,148 +141,163 @@ export function FloatingButtons() {
   }, [])
 
   return (
-    <StyledStack ref={ref} justifyContent="flex-start" alignItems="flex-start">
-      <Fab
-        color="primary"
-        size={fabSize}
-        onClick={handleClick('drawer')}
-        title={t('open_menu')}
-        disabled={disabled}
+    <>
+      <StyledStack
+        ref={ref}
+        justifyContent="flex-start"
+        alignItems="flex-start"
       >
-        <MenuIcon fontSize={iconSize} />
-      </Fab>
-      {fabButtons.profileButton && (
         <Fab
           color="primary"
           size={fabSize}
-          onClick={handleClick('userProfile')}
-          title={t('user_profile')}
+          onClick={handleClick('drawer')}
+          title={t('open_menu')}
           disabled={disabled}
         >
-          <Person fontSize={iconSize} />
+          <MenuIcon fontSize={iconSize} />
         </Fab>
-      )}
-      {fabButtons.search && (
-        <Fab
-          color={reactControls ? 'primary' : 'secondary'}
-          size={fabSize}
-          onClick={handleClick('search')}
-          title={t('search')}
-          disabled={disabled}
-        >
-          <SearchIcon fontSize={iconSize} sx={{ color: 'white' }} />
-        </Fab>
-      )}
-      {fabButtons.webhooks && (
-        <Fab
-          color="secondary"
-          size={fabSize}
-          onClick={setModeBtn('open')}
-          disabled={disabled}
-          title={t('alert_manager')}
-        >
-          <NotificationsActiveIcon
-            fontSize={iconSize}
-            sx={{ color: 'white' }}
-          />
-        </Fab>
-      )}
-      {fabButtons.scanNext && (
-        <Fab
-          color={scanNextMode === 'setLocation' ? 'primary' : 'secondary'}
-          size={fabSize}
-          onClick={handleClick('scanNextMode')}
-          title={t('scan_next')}
-          disabled={!!webhookMode || !!scanZoneMode || !online}
-        >
-          <TrackChanges fontSize={iconSize} sx={{ color: 'white' }} />
-        </Fab>
-      )}
-      {fabButtons.scanZone && (
-        <Fab
-          color={scanZoneMode === 'setLocation' ? 'primary' : 'secondary'}
-          size={fabSize}
-          onClick={handleClick('scanZoneMode')}
-          title={t('scan_zone')}
-          disabled={!!webhookMode || !!scanNextMode || !online}
-        >
-          <BlurOn fontSize={iconSize} sx={{ color: 'white' }} />
-        </Fab>
-      )}
-      {!!DonorIcon && (
-        <Fab
-          color="secondary"
-          size={fabSize}
-          onClick={handleClick('donorPage')}
-          title={t('donor_menu')}
-          disabled={disabled}
-        >
-          <DonorIcon fontSize={iconSize} sx={{ color: 'white' }} />
-        </Fab>
-      )}
-      {reactControls && (
-        <>
-          <Fab
-            color={color}
-            size={fabSize}
-            onClick={handleNavBtn('locate')}
-            title={t('use_my_location')}
-          >
-            {requesting ? (
-              <CircularProgress
-                size={20}
-                thickness={5}
-                sx={{ color: 'white' }}
-              />
-            ) : (
-              <MyLocationIcon fontSize={iconSize} sx={{ color: 'white' }} />
-            )}
-          </Fab>
-          <Fab
-            color="secondary"
-            size={fabSize}
-            onClick={handleNavBtn('zoomIn')}
-            title={t('zoom_in')}
-          >
-            <ZoomInIcon fontSize={iconSize} sx={{ color: 'white' }} />
-          </Fab>
-          <Fab
-            color="secondary"
-            size={fabSize}
-            onClick={handleNavBtn('zoomOut')}
-            title={t('zoom_out')}
-          >
-            <ZoomOutIcon fontSize={iconSize} sx={{ color: 'white' }} />
-          </Fab>
-        </>
-      )}
-      {fabButtons.webhooks &&
-        (webhookMode === 'areas' || webhookMode === 'location') && (
+        {fabButtons.profileButton && (
           <Fab
             color="primary"
             size={fabSize}
-            onClick={setModeBtn('open')}
-            title={t('done')}
-          >
-            <CheckIcon fontSize={iconSize} sx={{ color: 'white' }} />
-          </Fab>
-        )}
-      {(Array.isArray(fabButtons.custom) ? fabButtons.custom : []).map(
-        (icon) => (
-          <Fab
-            key={`${icon.color}${icon.href}${icon.icon}`}
-            color={icon.color || 'secondary'}
-            size={fabSize}
-            href={icon.href}
-            referrerPolicy="no-referrer"
-            target={icon.target || '_blank'}
+            onClick={handleClick('userProfile')}
+            title={t('user_profile')}
             disabled={disabled}
           >
-            <I className={icon.icon} size={iconSize} color="white" />
+            <Person fontSize={iconSize} />
           </Fab>
-        ),
+        )}
+        {fabButtons.search && (
+          <Fab
+            color={reactControls ? 'primary' : 'secondary'}
+            size={fabSize}
+            onClick={handleClick('search')}
+            title={t('search')}
+            disabled={disabled}
+          >
+            <SearchIcon fontSize={iconSize} sx={{ color: 'white' }} />
+          </Fab>
+        )}
+        {fabButtons.webhooks && (
+          <Fab
+            color="secondary"
+            size={fabSize}
+            onClick={setModeBtn('open')}
+            disabled={disabled}
+            title={t('alert_manager')}
+          >
+            <NotificationsActiveIcon
+              fontSize={iconSize}
+              sx={{ color: 'white' }}
+            />
+          </Fab>
+        )}
+        {fabButtons.scanNext && (
+          <Fab
+            color={scanNextMode === 'setLocation' ? 'primary' : 'secondary'}
+            size={fabSize}
+            onClick={handleClick('scanNextMode')}
+            title={t('scan_next')}
+            disabled={!!webhookMode || !!scanZoneMode || !online}
+          >
+            <TrackChanges fontSize={iconSize} sx={{ color: 'white' }} />
+          </Fab>
+        )}
+        {fabButtons.scanZone && (
+          <Fab
+            color={scanZoneMode === 'setLocation' ? 'primary' : 'secondary'}
+            size={fabSize}
+            onClick={handleClick('scanZoneMode')}
+            title={t('scan_zone')}
+            disabled={!!webhookMode || !!scanNextMode || !online}
+          >
+            <BlurOn fontSize={iconSize} sx={{ color: 'white' }} />
+          </Fab>
+        )}
+        {!!DonorIcon && (
+          <Fab
+            color="secondary"
+            size={fabSize}
+            onClick={handleClick('donorPage')}
+            title={t('donor_menu')}
+            disabled={disabled}
+          >
+            <DonorIcon fontSize={iconSize} sx={{ color: 'white' }} />
+          </Fab>
+        )}
+        {reactControls && (
+          <>
+            <Fab
+              color={color}
+              size={fabSize}
+              onClick={handleNavBtn('locate')}
+              title={t('use_my_location')}
+            >
+              {requesting ? (
+                <CircularProgress
+                  size={20}
+                  thickness={5}
+                  sx={{ color: 'white' }}
+                />
+              ) : (
+                <MyLocationIcon fontSize={iconSize} sx={{ color: 'white' }} />
+              )}
+            </Fab>
+            <Fab
+              color="secondary"
+              size={fabSize}
+              onClick={handleNavBtn('zoomIn')}
+              title={t('zoom_in')}
+            >
+              <ZoomInIcon fontSize={iconSize} sx={{ color: 'white' }} />
+            </Fab>
+            <Fab
+              color="secondary"
+              size={fabSize}
+              onClick={handleNavBtn('zoomOut')}
+              title={t('zoom_out')}
+            >
+              <ZoomOutIcon fontSize={iconSize} sx={{ color: 'white' }} />
+            </Fab>
+          </>
+        )}
+        {fabButtons.webhooks &&
+          (webhookMode === 'areas' || webhookMode === 'location') && (
+            <Fab
+              color="primary"
+              size={fabSize}
+              onClick={setModeBtn('open')}
+              title={t('done')}
+            >
+              <CheckIcon fontSize={iconSize} sx={{ color: 'white' }} />
+            </Fab>
+          )}
+        {(Array.isArray(fabButtons.custom) ? fabButtons.custom : []).map(
+          (icon) => (
+            <Fab
+              key={`${icon.color}${icon.href}${icon.icon}`}
+              color={icon.color || 'secondary'}
+              size={fabSize}
+              href={icon.href}
+              referrerPolicy="no-referrer"
+              target={icon.target || '_blank'}
+              disabled={disabled}
+            >
+              <I className={icon.icon} size={iconSize} color="white" />
+            </Fab>
+          ),
+        )}
+      </StyledStack>
+      {reactControls && locationError && (
+        <Notification
+          open={locationError.show}
+          severity="error"
+          cb={hideLocationError}
+        >
+          {locationError.message}
+        </Notification>
       )}
-    </StyledStack>
+    </>
   )
 }
 

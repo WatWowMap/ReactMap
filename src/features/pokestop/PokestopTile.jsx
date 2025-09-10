@@ -29,6 +29,7 @@ const BasePokestopTile = (pokestop) => {
     hasAllStops,
     showTimer,
     interactionRangeZoom,
+    hasShowcase,
   ] = useMemory((s) => {
     const newTs = Date.now() / 1000
     const { filters } = useStorage.getState()
@@ -56,6 +57,7 @@ const BasePokestopTile = (pokestop) => {
         perms.pokestops,
       timerList.includes(pokestop.id),
       config.general.interactionRangeZoom,
+      !!(perms.pokestops && pokestop.hasShowcase),
     ]
   }, basicEqualFn)
 
@@ -64,6 +66,7 @@ const BasePokestopTile = (pokestop) => {
     lureTimers,
     eventStopTimers,
     lureRange,
+    showcaseRange,
     interactionRange,
     customRange,
   ] = useStorage((s) => {
@@ -73,6 +76,9 @@ const BasePokestopTile = (pokestop) => {
       userSettings.pokestops.lureTimers || showTimer,
       userSettings.pokestops.eventStopTimers || showTimer,
       !!userSettings.pokestops.lureRange && zoom >= interactionRangeZoom,
+      !!userSettings.pokestops.showcaseRange &&
+        zoom >= interactionRangeZoom &&
+        hasShowcase,
       !!userSettings.pokestops.interactionRanges &&
         zoom >= interactionRangeZoom,
       zoom >= interactionRangeZoom
@@ -151,6 +157,13 @@ const BasePokestopTile = (pokestop) => {
           pathOptions={{ color: '#32cd32', weight: 1 }}
         />
       )}
+      {showcaseRange && (
+        <Circle
+          center={[pokestop.lat, pokestop.lon]}
+          radius={500}
+          pathOptions={{ color: '#39a18f', weight: 1 }}
+        />
+      )}
       {!!customRange && (
         <Circle
           center={[pokestop.lat, pokestop.lon]}
@@ -168,6 +181,7 @@ export const PokestopTile = React.memo(
     prev.id === next.id &&
     prev.lure_expire_timestamp === next.lure_expire_timestamp &&
     prev.updated === next.updated &&
+    prev.hasShowcase === next.hasShowcase &&
     prev.quests?.length === next.quests?.length &&
     (prev.quests && next.quests
       ? prev.quests.every((q, i) => q.with_ar === next.quests[i]?.with_ar)

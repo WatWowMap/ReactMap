@@ -1,6 +1,6 @@
 {
   "name": "reactmap",
-  "version": "1.37.0",
+  "version": "1.38.0-develop.6",
   "private": true,
   "description": "React based frontend map.",
   "license": "MIT",
@@ -208,12 +208,13 @@
     "rollup-plugin-delete": "^2.0.0",
     "semantic-release": "^22",
     "typescript": "5.5.4",
-    "vite": "^6.2.6",
+    "vite": "^6.3.6",
     "vite-plugin-checker": "0.7.2"
   },
   "resolutions": {
     "got": ">=11.8.5",
-    "dot-prop": ">=4.2.1"
+    "dot-prop": ">=4.2.1",
+    "tmp": ">=0.2.4"
   },
   "engines": {
     "node": ">=18",

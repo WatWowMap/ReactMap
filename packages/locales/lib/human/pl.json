@@ -1,6 +1,5 @@
 {
   "%": "%",
-  "300m_range": "Zasięg 300m",
   "abbreviation_level": "L",
   "access": "Dostęp",
   "access_denied": "Brak dostępu",
@@ -523,6 +522,10 @@
   "route_type": "Typ scieżki",
   "routes": "Scieżki",
   "routes_subtitle": "Wyświetl scieżki w grze i związane z nimi informacje na mapie",
+  "rsvp_0": "no rsvp",
+  "rsvp_1": "rsvp",
+  "rsvp_2": "rsvp_only",
+  "rsvp_changes": "RSVP zmiany",
   "s2_cell_level": "Poziom {{level}} S2 Cell",
   "s2_cell_limit_0": "Próbowałeś wygenerować więcej niż 20 000 komórek ({{variable_0}})",
   "s2cells": "Komórki S2",

@@ -29,7 +29,7 @@ class DiscordClient extends AuthClient {
       intents: ['GuildMessages', 'GuildMembers', 'Guilds'],
     })
 
-    this.client.on('ready', (c) => {
+    this.client.on('clientReady', (c) => {
       this.log.info(`Logged in as ${c.user?.tag || 'Unknown??'}!`)
       c.user.setPresence({
         activities: [
