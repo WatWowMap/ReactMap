@@ -1,3 +1,10 @@
+## [1.38.1-develop.1](https://github.com/WatWowMap/ReactMap/compare/v1.38.0...v1.38.1-develop.1) (2025-09-15)
+
+
+### Bug Fixes
+
+* relative timer not updating ([72b0a8c](https://github.com/WatWowMap/ReactMap/commit/72b0a8cfb3fab2ce897b02e8517bb9c324d0cc80))
+
 # [1.38.0](https://github.com/WatWowMap/ReactMap/compare/v1.37.0...v1.38.0) (2025-09-10)
 
 
