@@ -1,3 +1,10 @@
+# [1.39.0-develop.2](https://github.com/WatWowMap/ReactMap/compare/v1.39.0-develop.1...v1.39.0-develop.2) (2025-09-16)
+
+
+### Bug Fixes
+
+* skip updated filtering if shortcode is present ([b0cfe13](https://github.com/WatWowMap/ReactMap/commit/b0cfe13876b9d81e70ce44c997f4accb48943609))
+
 # [1.39.0-develop.1](https://github.com/WatWowMap/ReactMap/compare/v1.38.1-develop.1...v1.39.0-develop.1) (2025-09-16)
 
 
