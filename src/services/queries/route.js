@@ -18,6 +18,7 @@ export const GET_ROUTE = gql`
     route(id: $id) {
       ...CoreRoute
       name
+      shortcode
       image
       description
       distance_meters

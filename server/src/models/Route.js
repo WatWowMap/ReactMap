@@ -96,7 +96,7 @@ class Route extends Model {
    * @param {number} id
    * @param {import('@rm/types').DbContext} ctx
    */
-  static async getOne(id, { isMad }) {
+  static async getOne(id, { isMad, hasShortcode }) {
     /** @type {import('@rm/types').FullRoute} */
     const result = isMad
       ? await this.query()
@@ -121,6 +121,7 @@ class Route extends Model {
             type: 'type',
             version: 'version',
             waypoints: 'waypoints',
+            ...(hasShortcode && { shortcode: 'shortcode' }),
           })
           .select(raw('UNIX_TIMESTAMP(last_updated)').as('updated'))
           .findOne({ route_id: id })

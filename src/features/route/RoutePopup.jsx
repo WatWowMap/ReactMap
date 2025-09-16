@@ -28,6 +28,7 @@ import { useStorage } from '@store/useStorage'
 import { Title } from '@components/popups/Title'
 import { Timer } from '@components/popups/Timer'
 import { Navigation } from '@components/popups/Navigation'
+import { Notification } from '@components/Notification'
 
 import { useFormatDistance } from './useFormatDistance'
 
@@ -134,6 +135,11 @@ export function RoutePopup({ end, ...props }) {
   const [route, setRoute] = React.useState({ ...props, tags: [] })
   const { config } = useMemory.getState()
   const formatDistance = useFormatDistance()
+  const [notification, setNotification] = React.useState({
+    open: false,
+    severity: 'info',
+    message: '',
+  })
 
   const [getRoute, { data, called }] = useLazyQuery(Query.routes('getOne'), {
     variables: { id: props.id },
@@ -169,6 +175,37 @@ export function RoutePopup({ end, ...props }) {
   const imagesAreEqual =
     route.image === (end ? route.end_image : route.start_image)
 
+  const handleShortcodeCopy = React.useCallback(async () => {
+    if (route.shortcode) {
+      try {
+        if (navigator?.clipboard?.writeText) {
+          await navigator.clipboard.writeText(route.shortcode)
+        } else {
+          const textArea = document.createElement('textarea')
+          textArea.value = route.shortcode
+          document.body.appendChild(textArea)
+          textArea.focus()
+          textArea.select()
+          document.execCommand('copy')
+          document.body.removeChild(textArea)
+        }
+        setNotification({
+          open: true,
+          severity: 'success',
+          message: t('shortcode_copied_to_clipboard'),
+        })
+      } catch (e) {
+        setNotification({
+          open: true,
+          severity: 'error',
+          message: `${t('copy_failed')}${e?.message ? `: ${e.message}` : ''}`,
+        })
+        // eslint-disable-next-line no-console
+        console.error(e)
+      }
+    }
+  }, [route.shortcode, t])
+
   return (
     <Popup
       ref={(ref) => {
@@ -186,6 +223,30 @@ export function RoutePopup({ end, ...props }) {
         <Grid2 xs={12}>
           <Title>{route.name}</Title>
         </Grid2>
+        {route.shortcode && (
+          <Grid2 xs={12} sx={{ textAlign: 'center', my: 1 }}>
+            <Typography variant="caption" sx={{ mb: 0.5 }}>
+              {t('route_short_code')}
+            </Typography>
+            <Box
+              onClick={handleShortcodeCopy}
+              sx={{
+                p: '2px 8px',
+                bgcolor: 'grey.300',
+                borderRadius: 2,
+                display: 'inline-block',
+                cursor: 'pointer',
+                '&:hover': {
+                  bgcolor: 'grey.400',
+                },
+              }}
+            >
+              <Typography variant="caption" sx={{ fontFamily: 'monospace' }}>
+                {route.shortcode}
+              </Typography>
+            </Box>
+          </Grid2>
+        )}
         <Grid2
           xs={imagesAreEqual ? 12 : 6}
           container
@@ -295,6 +356,13 @@ export function RoutePopup({ end, ...props }) {
           )}
         </Grid2>
       </Grid2>
+      <Notification
+        open={notification.open}
+        severity={notification.severity}
+        cb={() => setNotification({ ...notification, open: false })}
+      >
+        {notification.message}
+      </Notification>
     </Popup>
   )
 }

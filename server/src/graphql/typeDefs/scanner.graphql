@@ -246,6 +246,7 @@ type Waypoint {
 type Route {
   id: ID
   name: String
+  shortcode: String
   description: String
   distance_meters: Int
   duration_seconds: Int
