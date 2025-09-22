@@ -1,3 +1,10 @@
+# [1.39.0-develop.3](https://github.com/WatWowMap/ReactMap/compare/v1.39.0-develop.2...v1.39.0-develop.3) (2025-09-22)
+
+
+### Features
+
+* display actual battle bonus via stationed pokemon ([ba51f47](https://github.com/WatWowMap/ReactMap/commit/ba51f47d6c90dc659427148d4cc025ed6bc89950))
+
 # [1.39.0-develop.2](https://github.com/WatWowMap/ReactMap/compare/v1.39.0-develop.1...v1.39.0-develop.2) (2025-09-16)
 
 
