@@ -1,3 +1,10 @@
+# [1.39.0-develop.4](https://github.com/WatWowMap/ReactMap/compare/v1.39.0-develop.3...v1.39.0-develop.4) (2025-09-23)
+
+
+### Features
+
+* Compact Route View ([#1131](https://github.com/WatWowMap/ReactMap/issues/1131)) ([795976e](https://github.com/WatWowMap/ReactMap/commit/795976e2ea9f68ba54ad5495bbf81af2716b4920))
+
 # [1.39.0-develop.3](https://github.com/WatWowMap/ReactMap/compare/v1.39.0-develop.2...v1.39.0-develop.3) (2025-09-22)
 
 
