@@ -85,7 +85,7 @@ const BaseRouteTile = ({ route, orientation = 'forward' }) => {
       if (!group) {
         return
       }
-      /** @type {any} */ ;(group).eachLayer((layer) => {
+      /** @type {any} */ group.eachLayer((layer) => {
         if (layer && typeof layer.setStyle === 'function') {
           layer.setStyle({ color: targetColor, opacity: targetOpacity })
         }
@@ -158,27 +158,21 @@ const BaseRouteTile = ({ route, orientation = 'forward' }) => {
     }
   }, [applyArrowheadStyle, color, displayRoute.reversible, polylinePositions])
 
+  const isActive = Boolean(clicked || hover)
+
   React.useEffect(() => {
     if (lineRef.current) {
-      const active = Boolean(clicked || hover)
-      const lineOpacity = active ? 1 : LINE_OPACITY
+      const lineOpacity = isActive ? 1 : LINE_OPACITY
       lineRef.current.setStyle({
-        color: active ? darkened : color,
+        color: isActive ? darkened : color,
         opacity: lineOpacity,
       })
     }
     applyArrowheadStyle(
-      clicked || hover ? darkened : color,
-      clicked || hover ? 1 : LINE_OPACITY,
+      isActive ? darkened : color,
+      isActive ? 1 : LINE_OPACITY,
     )
-  }, [
-    applyArrowheadStyle,
-    clicked,
-    color,
-    darkened,
-    displayRoute.reversible,
-    hover,
-  ])
+  }, [applyArrowheadStyle, color, darkened, isActive])
 
   return (
     <>
@@ -273,12 +267,8 @@ const BaseRouteTile = ({ route, orientation = 'forward' }) => {
         }}
         positions={polylinePositions}
         pathOptions={{
-          color: clicked || hover ? darkened : color,
-          opacity: displayRoute.reversible
-            ? clicked || hover
-              ? 1
-              : LINE_OPACITY
-            : LINE_OPACITY,
+          color: isActive ? darkened : color,
+          opacity: displayRoute.reversible && isActive ? 1 : LINE_OPACITY,
           weight: 4,
         }}
       />
