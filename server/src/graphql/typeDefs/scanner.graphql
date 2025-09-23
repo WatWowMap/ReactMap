@@ -148,6 +148,12 @@ type Pokestop {
   hasShowcase: Boolean
 }
 
+type PokemonShinyStats {
+  shiny_seen: Int
+  encounters_seen: Int
+  shiny_rate: Float
+}
+
 type Pokemon {
   id: ID
   encounter_id: Int
@@ -183,6 +189,7 @@ type Pokemon {
   first_seen_timestamp: Int
   expire_timestamp_verified: Boolean
   updated: Int
+  shiny_stats: PokemonShinyStats
 }
 
 type Portal {

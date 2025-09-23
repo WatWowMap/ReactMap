@@ -124,7 +124,16 @@ class Pokemon extends Model {
   static async getAll(perms, args, ctx) {
     const { iv: ivs, pvp, areaRestrictions } = perms
     const { onlyIvOr, onlyHundoIv, onlyZeroIv, onlyAreas = [] } = args.filters
-    const { hasSize, hasHeight, isMad, mem, secret, httpAuth, pvpV2 } = ctx
+    const {
+      hasSize,
+      hasHeight,
+      isMad,
+      mem,
+      secret,
+      httpAuth,
+      pvpV2,
+      statsKnex,
+    } = ctx
     const { filterMap, globalFilter } = this.getFilters(perms, args, ctx)
 
     let queryPvp = config
@@ -380,6 +389,29 @@ class Pokemon extends Model {
         finalResults.push(result)
       }
     }
+
+    if (finalResults.length && (statsKnex || !mem)) {
+      const shinyKeys = [
+        ...new Set(
+          finalResults.map(
+            (result) => `${result.pokemon_id}-${result.form ?? 0}`,
+          ),
+        ),
+      ]
+      try {
+        const shinyStats = await this.fetchShinyStats(shinyKeys, statsKnex)
+        finalResults.forEach((result) => {
+          const key = `${result.pokemon_id}-${result.form ?? 0}`
+          const stats = shinyStats.get(key)
+          if (stats) {
+            result.shiny_stats = stats
+          }
+        })
+      } catch (e) {
+        log.error(TAGS.pokemon, 'Failed to fetch shiny stats', e)
+      }
+    }
+
     return finalResults
   }
 
@@ -437,13 +469,117 @@ class Pokemon extends Model {
   }
 
   /**
+   * @param {string[]} keys
+   * @param {import('knex').Knex | null | undefined} [statsKnex]
+   * @returns {Promise<Map<string, { shiny_seen: number, encounters_seen: number, shiny_rate: number }>>}
+   */
+  static async fetchShinyStats(keys, statsKnex = null) {
+    if (!keys.length) return new Map()
+
+    let knexInstance = statsKnex || null
+    if (!knexInstance) {
+      try {
+        knexInstance = this.knex()
+      } catch (e) {
+        knexInstance = null
+      }
+    }
+
+    if (!knexInstance) return new Map()
+
+    const pairs = keys
+      .map((key) => key.split('-'))
+      .map(([pokemonId, formId]) => {
+        const parsedPokemon = Number.parseInt(pokemonId, 10)
+        if (Number.isNaN(parsedPokemon)) return null
+        const parsedForm = Number.parseInt(formId, 10)
+        return [parsedPokemon, Number.isNaN(parsedForm) ? 0 : parsedForm]
+      })
+      .filter(Boolean)
+
+    if (!pairs.length) return new Map()
+
+    const whereClause = pairs
+      .map(() => '(pokemon_id = ? AND COALESCE(form_id, 0) = ?)')
+      .join(' OR ')
+    const bindings = pairs.flatMap(([pokemonId, formId]) => [pokemonId, formId])
+    const query = `
+      SELECT
+        pokemon_id,
+        COALESCE(form_id, 0) AS form_id,
+        date,
+        SUM(count) AS shiny,
+        SUM(total) AS checks
+      FROM pokemon_shiny_stats
+      WHERE area = 'world'
+        AND fence = 'world'
+        AND (${whereClause})
+        AND date >= CURRENT_DATE - INTERVAL 7 DAY
+      GROUP BY pokemon_id, form_id, date
+      ORDER BY pokemon_id, form_id, date DESC
+    `
+
+    const [rows] = await knexInstance.raw(query, bindings)
+
+    const grouped = new Map()
+    for (let i = 0; i < rows.length; i += 1) {
+      const row = rows[i]
+      const key = `${row.pokemon_id}-${row.form_id ?? 0}`
+      const entry = grouped.get(key)
+      const rowDate =
+        row.date instanceof Date
+          ? row.date.toISOString().slice(0, 10)
+          : `${row.date}`
+      const payload = {
+        shiny: Number(row.shiny) || 0,
+        checks: Number(row.checks) || 0,
+        date: rowDate,
+      }
+      if (entry) {
+        entry.push(payload)
+      } else {
+        grouped.set(key, [payload])
+      }
+    }
+
+    const statsMap = new Map()
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
+    const cutoff = new Date(today)
+    cutoff.setDate(cutoff.getDate() - 1)
+    const cutoffStr = cutoff.toISOString().slice(0, 10)
+
+    grouped.forEach((entries, key) => {
+      let shinySum = 0
+      let checkSum = 0
+      for (let i = 0; i < entries.length; i += 1) {
+        const { shiny, checks, date } = entries[i]
+        const includeRecent = date >= cutoffStr
+        // 20000 checks would give >99% of distinguishing even 1/512 from 1/256
+        if (!includeRecent && checkSum >= 20000) {
+          break
+        }
+        shinySum += shiny
+        checkSum += checks
+      }
+      statsMap.set(key, {
+        shiny_seen: shinySum,
+        encounters_seen: checkSum,
+        shiny_rate: checkSum ? shinySum / checkSum : 0,
+      })
+    })
+
+    return statsMap
+  }
+
+  /**
    * @param {import("@rm/types").Permissions} perms
    * @param {object} args
    * @param {import("@rm/types").DbContext} ctx
    * @returns {Promise<Partial<import("@rm/types").Pokemon>[]>}
    */
   static async getLegacy(perms, args, ctx) {
-    const { isMad, hasSize, hasHeight, mem, secret, httpAuth } = ctx
+    const { isMad, hasSize, hasHeight, mem, secret, httpAuth, statsKnex } = ctx
     const ts = Math.floor(Date.now() / 1000)
     const { filterMap, globalFilter } = this.getFilters(perms, args, ctx)
     const queryLimits = config.getSafe('api.queryLimits')
@@ -512,12 +648,13 @@ class Pokemon extends Model {
       secret,
       httpAuth,
     )
-    return results
-      .filter(
-        (item) =>
-          !mem ||
-          filterRTree(item, perms.areaRestrictions, args.filters.onlyAreas),
-      )
+    const filtered = results.filter(
+      (item) =>
+        !mem ||
+        filterRTree(item, perms.areaRestrictions, args.filters.onlyAreas),
+    )
+
+    const built = filtered
       .map((item) => {
         const filter =
           filterMap[
@@ -536,6 +673,28 @@ class Pokemon extends Model {
           ] || globalFilter
         return filter.valid(pkmn)
       })
+
+    if (built.length && (statsKnex || !mem)) {
+      const shinyKeys = [
+        ...new Set(
+          built.map((result) => `${result.pokemon_id}-${result.form ?? 0}`),
+        ),
+      ]
+      try {
+        const shinyStats = await this.fetchShinyStats(shinyKeys, statsKnex)
+        built.forEach((result) => {
+          const key = `${result.pokemon_id}-${result.form ?? 0}`
+          const stats = shinyStats.get(key)
+          if (stats) {
+            result.shiny_stats = stats
+          }
+        })
+      } catch (e) {
+        log.error(TAGS.pokemon, 'Failed to fetch shiny stats', e)
+      }
+    }
+
+    return built
   }
 
   /**

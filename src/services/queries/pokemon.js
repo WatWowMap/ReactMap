@@ -18,6 +18,11 @@ const core = gql`
     display_pokemon_id
     ditto_form
     seen_type
+    shiny_stats {
+      shiny_seen
+      encounters_seen
+      shiny_rate
+    }
   }
 `
 

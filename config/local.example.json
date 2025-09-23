@@ -38,7 +38,8 @@
           "weather",
           "route",
           "nest",
-          "station"
+          "station",
+          "pokemonStats"
         ]
       },
       {

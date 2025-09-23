@@ -11,7 +11,7 @@ import Divider from '@mui/material/Divider'
 import Avatar from '@mui/material/Avatar'
 import Tooltip from '@mui/material/Tooltip'
 import Collapse from '@mui/material/Collapse'
-import { useTranslation } from 'react-i18next'
+import { useTranslation, Trans } from 'react-i18next'
 
 import { useMemory } from '@store/useMemory'
 import { setDeepStore, useStorage } from '@store/useStorage'
@@ -26,6 +26,7 @@ import { ExtraInfo } from '@components/popups/ExtraInfo'
 import { useAnalytics } from '@hooks/useAnalytics'
 import { getTimeUntil } from '@utils/getTimeUntil'
 import { StatusIcon } from '@components/StatusIcon'
+import { readableProbability } from '@utils/readableProbability'
 
 const rowClass = { width: 30, fontWeight: 'bold' }
 
@@ -109,6 +110,7 @@ export function PokemonPopup({ pokemon, iconUrl, isTutorial = false }) {
         {!!pokemon.expire_timestamp && (
           <Timer pokemon={pokemon} hasStats={hasStats} t={t} />
         )}
+        <ShinyOdds shinyStats={pokemon.shiny_stats} t={t} />
         {hasStats && pokePerms.iv && (
           <>
             <Stats pokemon={pokemon} t={t} />
@@ -301,6 +303,69 @@ const Stats = ({ pokemon, t }) => {
           </Typography>
         </Grid>
       )}
+    </Grid>
+  )
+}
+
+const ShinyOdds = ({ shinyStats, t }) => {
+  if (!shinyStats) {
+    return (
+      <Grid xs={12} textAlign="center">
+        <Typography variant="caption">{t('shiny_no_data')}</Typography>
+      </Grid>
+    )
+  }
+
+  const {
+    shiny_rate: shinyRate,
+    encounters_seen: encounters,
+    shiny_seen: shinySeen,
+  } = shinyStats
+
+  const encountersNumber = Number(encounters) || 0
+  const shinyNumber = Number(shinySeen) || 0
+
+  if (!encountersNumber) {
+    return (
+      <Grid xs={12} textAlign="center">
+        <Typography variant="caption">{t('shiny_no_data')}</Typography>
+      </Grid>
+    )
+  }
+
+  const rateNode = readableProbability(shinyRate)
+
+  const sampleText = t('shiny_sample', {
+    percentage: (shinyRate * 100).toLocaleString(),
+    checks: encountersNumber.toLocaleString(),
+    shiny: shinyNumber.toLocaleString(),
+  })
+
+  return (
+    <Grid xs={12} textAlign="center">
+      <Typography variant="caption">
+        <Trans
+          i18nKey="shiny_probability"
+          components={[
+            <Tooltip
+              key="rate"
+              title={sampleText}
+              arrow
+              enterTouchDelay={0}
+              placement="top"
+            >
+              <span
+                style={{
+                  cursor: 'help',
+                  textDecoration: 'underline dotted',
+                }}
+              >
+                ~{rateNode}
+              </span>
+            </Tooltip>,
+          ]}
+        />
+      </Typography>
     </Grid>
   )
 }

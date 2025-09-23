@@ -48,11 +48,17 @@ class DbManager extends Logger {
       Pokestop: { hasConfirmedInvasions: false },
     })
     this.reactMapDb = null
+    this.pokemonStatsConnections = new Set()
     this.connections = config
       .getSafe('database.schemas')
       .filter((s) => s.useFor.length)
       .map((schema, i) => {
         schema.useFor.forEach((category) => {
+          const normalized = category.toLowerCase().replace(/_/g, '')
+          if (normalized === 'pokemonstats') {
+            this.pokemonStatsConnections.add(i)
+            return
+          }
           const capital = /** @type {import('../models').ModelKeys} */ (
             `${category.charAt(0).toUpperCase()}${category.slice(1)}`
           )
@@ -246,6 +252,45 @@ class DbManager extends Logger {
   }
 
   /**
+   * @param {number} connectionIndex
+   * @returns {import('knex').Knex | null}
+   */
+  getPokemonStatsKnex(connectionIndex) {
+    if (
+      typeof connectionIndex === 'number' &&
+      this.pokemonStatsConnections.has(connectionIndex) &&
+      this.connections[connectionIndex]
+    ) {
+      return this.connections[connectionIndex]
+    }
+
+    const availableStatsIndex = [...this.pokemonStatsConnections].find(
+      (index) => this.connections[index],
+    )
+    if (availableStatsIndex !== undefined) {
+      return this.connections[availableStatsIndex]
+    }
+
+    if (
+      typeof connectionIndex === 'number' &&
+      this.connections[connectionIndex]
+    ) {
+      return this.connections[connectionIndex]
+    }
+
+    const spawnpointIndex = Array.isArray(this.models?.Spawnpoint)
+      ? this.models.Spawnpoint.map((source) => source.connection).find(
+          (idx) => this.connections[idx],
+        )
+      : undefined
+    if (spawnpointIndex !== undefined) {
+      return this.connections[spawnpointIndex]
+    }
+
+    return null
+  }
+
+  /**
    * @param {{ [key: string]: number }[]} results
    * @param {boolean} historical
    * @returns {void}
@@ -342,6 +387,11 @@ class DbManager extends Logger {
               )
             } else {
               this.models[model][i].SubModel = models[model]
+            }
+            if (model === 'Pokemon') {
+              this.models[model][i].statsKnex = this.getPokemonStatsKnex(
+                source.connection,
+              )
             }
           })
         } else {

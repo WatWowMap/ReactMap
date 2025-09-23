@@ -41,6 +41,12 @@ export interface PokemonDisplay {
   location_card: number
 }
 
+export interface PokemonShinyStats {
+  shiny_seen: number
+  encounters_seen: number
+  shiny_rate: number
+}
+
 export interface Defender extends PokemonDisplay {
   pokemon_id: number
   deployed_ms: number
@@ -252,6 +258,7 @@ export interface Pokemon {
   pvp_rankings_ultra_league?: import('ohbem').PvPRankEntry[]
   distance?: number
   shiny?: boolean
+  shiny_stats?: PokemonShinyStats
 }
 
 export type FullPokemon = FullModel<Pokemon, PokemonModel.Pokemon>
