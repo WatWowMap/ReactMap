@@ -660,6 +660,7 @@
   "version": "Version",
   "route_tags": "Route Tags",
   "routes": "Routes",
+  "compact_route_view": "Compact Route View",
   "route_type": "Route Type",
   "route_short_code": "Route Share Code: ",
   "route_anchor_count_one": "{{count}} Route",

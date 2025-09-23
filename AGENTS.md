@@ -36,4 +36,5 @@
 ## Localization Notes
 
 - Update English copy only in `packages/locales/lib/human/en.json`; run `yarn locales:generate` to refresh derived languages.
+- When adding a new translation key (for example when calling `t('some_key')`), create the English entry in `packages/locales/lib/human/en.json` in the same change. NEVER use fallback strings.
 - Never edit generated locale files directly—the automation pipeline syncs translations downstream.

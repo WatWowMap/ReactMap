@@ -48,7 +48,7 @@ const RouteSlider = () => {
           />
         }
       >
-        <ListItemText primary={t('compact_route_view', 'Compact Route View')} />
+        <ListItemText primary={t('compact_route_view')} />
       </ListItem>
       <ListItem>
         <SliderTile
