@@ -1,3 +1,11 @@
+# [1.39.0-develop.5](https://github.com/WatWowMap/ReactMap/compare/v1.39.0-develop.4...v1.39.0-develop.5) (2025-09-23)
+
+
+### Bug Fixes
+
+* localization ([f02e8cd](https://github.com/WatWowMap/ReactMap/commit/f02e8cd927d76c9191e7fe6ea909f6eec9a4a729))
+* refinements to interaction between gyms/stops and routes ([8c0ba37](https://github.com/WatWowMap/ReactMap/commit/8c0ba372db29e53f2b74215494a8b170feab192a))
+
 # [1.39.0-develop.4](https://github.com/WatWowMap/ReactMap/compare/v1.39.0-develop.3...v1.39.0-develop.4) (2025-09-23)
 
 
