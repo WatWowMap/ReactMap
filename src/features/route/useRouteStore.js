@@ -30,6 +30,36 @@ const PRECISION = 6
 const fallbackKey = (lat, lon, prefix) =>
   `${prefix}:${lat.toFixed(PRECISION)}:${lon.toFixed(PRECISION)}`
 
+const EPSILON = 1 / 10 ** PRECISION
+
+/**
+ * @param {Record<string, RoutePoiIndex>} poiIndex
+ * @param {RoutePoiIndex | null} entry
+ * @param {Record<string, import('@rm/types').Route>} routeCache
+ * @returns {RouteSelection[]}
+ */
+const collectNearbyRoutes = (poiIndex, entry, routeCache) => {
+  if (!entry) return []
+  const seen = new Set()
+  /** @type {RouteSelection[]} */
+  const combined = []
+  Object.values(poiIndex).forEach((candidate) => {
+    if (
+      Math.abs(candidate.lat - entry.lat) <= EPSILON &&
+      Math.abs(candidate.lon - entry.lon) <= EPSILON
+    ) {
+      candidate.routes.forEach((ref) => {
+        const id = `${ref.routeId}-${ref.orientation}`
+        if (!seen.has(id) && routeCache[ref.routeId]) {
+          seen.add(id)
+          combined.push(ref)
+        }
+      })
+    }
+  })
+  return combined
+}
+
 /**
  * @param {Record<string, RoutePoiIndex>} poiIndex
  * @param {import('@rm/types').Route} route
@@ -105,8 +135,13 @@ export const useRouteStore = create(
 
         const { activePoiId } = state
         const activeEntry = activePoiId ? poiIndex[activePoiId] : null
-        const nextActiveRoutes = activeEntry
-          ? activeEntry.routes.filter((ref) => nextRouteCache[ref.routeId])
+        const nearbyActiveRoutes = collectNearbyRoutes(
+          poiIndex,
+          activeEntry,
+          nextRouteCache,
+        )
+        const nextActiveRoutes = nearbyActiveRoutes.length
+          ? nearbyActiveRoutes
           : state.activeRoutes.filter((ref) => nextRouteCache[ref.routeId])
 
         return {
@@ -132,8 +167,10 @@ export const useRouteStore = create(
         if (!entry) {
           return state
         }
-        const routes = entry.routes.filter(
-          (ref) => state.routeCache[ref.routeId],
+        const routes = collectNearbyRoutes(
+          state.poiIndex,
+          entry,
+          state.routeCache,
         )
         return {
           ...state,

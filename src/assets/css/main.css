@@ -88,40 +88,34 @@ body {
   background-color: #ff4b4d;
 }
 
-.route-flag {
-  border: none !important;
-  background: transparent !important;
+.route-direction {
+  pointer-events: none;
 }
 
-.route-flag__wrapper {
-  position: relative;
-  display: inline-flex;
+.route-direction__arrow {
+  width: 0;
+  height: 0;
+  border-top: 6px solid transparent;
+  border-bottom: 6px solid transparent;
+  border-left: 12px solid #00a3ee;
+  transform-origin: 0 50%;
+  filter: drop-shadow(0 0 2px rgba(0, 0, 0, 0.35));
+}
+
+.route-count-badge {
+  display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 20px;
-  text-shadow: 0 0 2px rgba(0, 0, 0, 0.65);
-}
-
-.route-flag__badge {
-  position: absolute;
-  top: -6px;
-  right: -6px;
-  min-width: 16px;
-  padding: 0 4px;
+  width: 18px;
+  height: 18px;
   border-radius: 10px;
   background: #ff4b4d;
   color: #fff;
   font-size: 11px;
   font-weight: 700;
-  line-height: 16px;
-}
-
-.route-flag--active .route-flag__wrapper {
-  transform: scale(1.1);
-}
-
-.route-flag--active .route-flag__emoji {
-  filter: drop-shadow(0 0 6px rgba(255, 75, 77, 0.75));
+  line-height: 18px;
+  border: 1px solid #ffffff;
+  box-shadow: 0 0 4px rgba(0, 0, 0, 0.4);
 }
 
 .invasion-exists {

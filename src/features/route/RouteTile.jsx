@@ -1,7 +1,8 @@
 /* eslint-disable react/destructuring-assignment */
 // @ts-check
 import * as React from 'react'
-import { Marker, Polyline, useMapEvents } from 'react-leaflet'
+import { Marker, Polyline, Popup, useMapEvents } from 'react-leaflet'
+import { divIcon } from 'leaflet'
 import { darken } from '@mui/material/styles'
 
 import { useForcePopup } from '@hooks/useForcePopup'
@@ -23,6 +24,9 @@ const MARKER_OPACITY = LINE_OPACITY * 2
 const BaseRouteTile = ({ route, orientation = 'forward' }) => {
   const [clicked, setClicked] = React.useState(false)
   const [hover, setHover] = React.useState('')
+  const [linePopup, setLinePopup] = React.useState(
+    /** @type {import('leaflet').LatLngExpression | null} */ (null),
+  )
 
   /** @type {React.MutableRefObject<import("leaflet").Polyline>} */
   const lineRef = React.useRef()
@@ -78,10 +82,45 @@ const BaseRouteTile = ({ route, orientation = 'forward' }) => {
       if (!originalEvent.defaultPrevented) {
         setClicked(false)
         setHover('')
+        setLinePopup(null)
       }
     },
   })
   useForcePopup(displayRoute.id, markerRef)
+
+  React.useEffect(() => {
+    setLinePopup(null)
+  }, [displayRoute.id, orientation])
+
+  const directionArrow = React.useMemo(() => {
+    if (displayRoute.reversible || waypoints.length < 2) {
+      return null
+    }
+    const index = Math.floor((waypoints.length - 1) / 2)
+    const startPoint = waypoints[index]
+    const nextPoint = waypoints[index + 1] || startPoint
+    if (!startPoint || !nextPoint) {
+      return null
+    }
+    const lat = (startPoint.lat_degrees + nextPoint.lat_degrees) / 2
+    const lon = (startPoint.lng_degrees + nextPoint.lng_degrees) / 2
+    const deltaLat = nextPoint.lat_degrees - startPoint.lat_degrees
+    const deltaLon = nextPoint.lng_degrees - startPoint.lng_degrees
+    const angle = (Math.atan2(deltaLat, deltaLon) * 180) / Math.PI
+    const arrowColor = `#${displayRoute.image_border_color}`
+    const icon = divIcon({
+      className: 'route-direction',
+      html: `<div class="route-direction__arrow" style="border-left-color: ${arrowColor}; transform: rotate(${angle}deg);"></div>`
+        .replace(/\s+</g, '<')
+        .trim(),
+      iconSize: [24, 24],
+      iconAnchor: [0, 12],
+    })
+    return {
+      position: [lat, lon],
+      icon,
+    }
+  }, [displayRoute.image_border_color, displayRoute.reversible, waypoints])
 
   return (
     <>
@@ -95,7 +134,11 @@ const BaseRouteTile = ({ route, orientation = 'forward' }) => {
             displayRoute[`${position}_lat`],
             displayRoute[`${position}_lon`],
           ]}
-          icon={routeMarker(position)}
+          icon={
+            displayRoute.reversible
+              ? routeMarker('start')
+              : routeMarker(position)
+          }
           eventHandlers={{
             popupopen: () => setClicked(true),
             popupclose: () => setClicked(false),
@@ -123,9 +166,12 @@ const BaseRouteTile = ({ route, orientation = 'forward' }) => {
       <Polyline
         ref={lineRef}
         eventHandlers={{
-          click: ({ originalEvent }) => {
+          click: ({ originalEvent, latlng }) => {
             originalEvent.preventDefault()
-            setClicked((prev) => !prev)
+            setClicked(true)
+            if (latlng) {
+              setLinePopup([latlng.lat, latlng.lng])
+            }
           },
           mouseover: ({ target }) => {
             if (target && !clicked) {
@@ -149,6 +195,26 @@ const BaseRouteTile = ({ route, orientation = 'forward' }) => {
           weight: 4,
         }}
       />
+      {directionArrow && (
+        <Marker
+          key={`${displayRoute.id}-${orientation}-arrow`}
+          icon={directionArrow.icon}
+          position={directionArrow.position}
+          interactive={false}
+          zIndexOffset={500}
+        />
+      )}
+      {linePopup && (
+        <Popup
+          position={linePopup}
+          eventHandlers={{
+            remove: () => setLinePopup(null),
+            close: () => setLinePopup(null),
+          }}
+        >
+          <RoutePopup inline {...displayRoute} waypoints={waypoints} />
+        </Popup>
+      )}
     </>
   )
 }

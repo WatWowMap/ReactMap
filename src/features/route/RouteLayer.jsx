@@ -1,31 +1,56 @@
 // @ts-check
 import * as React from 'react'
 import { Marker, useMapEvents } from 'react-leaflet'
+import { divIcon } from 'leaflet'
 
 import { useStorage } from '@store/useStorage'
 
 import { RouteTile } from './RouteTile'
-import { routeFlagMarker } from './routeFlagMarker'
+import { routeMarker } from './routeMarker'
 import { useRouteStore } from './useRouteStore'
 
 const ACTIVE_Z_INDEX = 1800
 const INACTIVE_Z_INDEX = 900
 
-const RouteAnchor = React.memo(({ entry, selected, onSelect }) => {
-  const icon = React.useMemo(
-    () => routeFlagMarker(entry.routes.length, selected),
-    [entry.routes.length, selected],
-  )
+const RouteAnchor = React.memo(({ entry, selected, onSelect, routeCount }) => {
+  const baseIcon = React.useMemo(() => routeMarker('start'), [])
+  const badgeIcon = React.useMemo(() => {
+    if (routeCount <= 1) return null
+    return divIcon({
+      className: 'route-count-badge',
+      html: `${routeCount}`,
+      iconSize: [18, 18],
+      iconAnchor: [-8, 20],
+    })
+  }, [routeCount])
 
   return (
-    <Marker
-      position={[entry.lat, entry.lon]}
-      icon={icon}
-      zIndexOffset={selected ? ACTIVE_Z_INDEX : INACTIVE_Z_INDEX}
-      eventHandlers={{
-        click: () => onSelect(entry.key),
-      }}
-    />
+    <>
+      {!selected && (
+        <Marker
+          position={[entry.lat, entry.lon]}
+          icon={baseIcon}
+          zIndexOffset={INACTIVE_Z_INDEX}
+          riseOnHover
+          eventHandlers={{
+            click: () => onSelect(entry.key),
+          }}
+          title={routeCount > 1 ? `${routeCount} routes` : ''}
+        />
+      )}
+      {badgeIcon && (
+        <Marker
+          position={[entry.lat, entry.lon]}
+          icon={badgeIcon}
+          interactive={false}
+          keyboard={false}
+          pane="tooltipPane"
+          zIndexOffset={
+            selected ? ACTIVE_Z_INDEX + 200 : INACTIVE_Z_INDEX + 200
+          }
+        />
+      )}
+    </>
   )
 })
 
@@ -43,8 +68,12 @@ const ActiveRoute = React.memo(({ selection }) => {
 
 export function RouteLayer({ routes }) {
   const enabled = useStorage((s) => !!s.filters?.routes?.enabled)
+  const compactView = useStorage(
+    (s) => s.userSettings.routes?.compactView ?? true,
+  )
   const syncRoutes = useRouteStore((s) => s.syncRoutes)
   const poiIndex = useRouteStore((s) => s.poiIndex)
+  const routeCache = useRouteStore((s) => s.routeCache)
   const activeRoutes = useRouteStore((s) => s.activeRoutes)
   const activePoiId = useRouteStore((s) => s.activePoiId)
   const selectPoi = useRouteStore((s) => s.selectPoi)
@@ -55,10 +84,10 @@ export function RouteLayer({ routes }) {
   }, [routes, syncRoutes])
 
   React.useEffect(() => {
-    if (!enabled) {
+    if (!enabled || !compactView) {
       clearSelection()
     }
-  }, [enabled, clearSelection])
+  }, [enabled, compactView, clearSelection])
 
   useMapEvents({
     click: ({ originalEvent }) => {
@@ -68,20 +97,54 @@ export function RouteLayer({ routes }) {
     },
   })
 
+  const anchors = React.useMemo(() => {
+    if (!compactView) return []
+    const epsilon = 1 / 10 ** 6
+    const values = Object.values(poiIndex)
+    return values.map((entry) => {
+      const seen = new Set()
+      let count = 0
+      values.forEach((candidate) => {
+        if (
+          Math.abs(candidate.lat - entry.lat) <= epsilon &&
+          Math.abs(candidate.lon - entry.lon) <= epsilon
+        ) {
+          candidate.routes.forEach((ref) => {
+            const id = `${ref.routeId}-${ref.orientation}`
+            if (!seen.has(id) && routeCache[ref.routeId]) {
+              seen.add(id)
+              count += 1
+            }
+          })
+        }
+      })
+      return { entry, routeCount: count || entry.routes.length || 1 }
+    })
+  }, [compactView, poiIndex, routeCache])
+
   if (!enabled) {
     return null
   }
 
-  const anchors = React.useMemo(() => Object.values(poiIndex), [poiIndex])
+  if (!compactView) {
+    return (
+      <>
+        {routes.map((route) => (
+          <RouteTile key={route.id} route={route} />
+        ))}
+      </>
+    )
+  }
 
   return (
     <>
-      {anchors.map((entry) => (
+      {anchors.map(({ entry, routeCount }) => (
         <RouteAnchor
           key={entry.key}
           entry={entry}
           selected={entry.key === activePoiId}
           onSelect={selectPoi}
+          routeCount={routeCount}
         />
       ))}
       {activeRoutes.map((selection) => (
