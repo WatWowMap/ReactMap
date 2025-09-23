@@ -2,7 +2,9 @@
 // @ts-check
 import * as React from 'react'
 import { Marker, Polyline, Popup, useMapEvents } from 'react-leaflet'
-import { divIcon } from 'leaflet'
+import destination from '@turf/destination'
+import distance from '@turf/distance'
+import { point as turfPoint } from '@turf/helpers'
 import { darken } from '@mui/material/styles'
 
 import { useForcePopup } from '@hooks/useForcePopup'
@@ -14,6 +16,144 @@ const POSITIONS = /** @type {const} */ (['start', 'end'])
 
 const LINE_OPACITY = 0.33
 const MARKER_OPACITY = LINE_OPACITY * 2
+const CHEVRON_SPACING_METERS = 10
+const CHEVRON_MIN_LENGTH_METERS = 2
+const CHEVRON_MAX_LENGTH_METERS = 5
+const CHEVRON_WIDTH_RATIO = 0.75
+
+/** @param {{ lat: number, lng: number }} start @param {{ lat: number, lng: number }} end */
+const segmentDistanceInMeters = (start, end) =>
+  distance(turfPoint([start.lng, start.lat]), turfPoint([end.lng, end.lat]), {
+    units: 'meters',
+  })
+
+/** @param {{ lat: number, lng: number }} start @param {{ lat: number, lng: number }} end */
+const calculateBearing = (start, end) => {
+  const toRadians = (degrees) => (degrees * Math.PI) / 180
+  const toDegrees = (radians) => (radians * 180) / Math.PI
+
+  const lat1 = toRadians(start.lat)
+  const lat2 = toRadians(end.lat)
+  const deltaLon = toRadians(end.lng - start.lng)
+  const y = Math.sin(deltaLon) * Math.cos(lat2)
+  const x =
+    Math.cos(lat1) * Math.sin(lat2) -
+    Math.sin(lat1) * Math.cos(lat2) * Math.cos(deltaLon)
+  const bearing = toDegrees(Math.atan2(y, x))
+  return (bearing + 360) % 360
+}
+
+/**
+ * @param {{ lat: number, lng: number }} origin
+ * @param {number} bearing
+ * @param {number} distanceMeters
+ */
+const movePoint = (origin, bearing, distanceMeters) => {
+  const result = destination(
+    turfPoint([origin.lng, origin.lat]),
+    distanceMeters,
+    bearing,
+    { units: 'meters' },
+  )
+  const [lng, lat] = result.geometry.coordinates
+  return { lat, lng }
+}
+
+/**
+ * @param {Array<[number, number]>} latLngTuples
+ * @returns {Array<Array<[number, number]>>}
+ */
+const generateChevronSegments = (latLngTuples) => {
+  if (!latLngTuples || latLngTuples.length < 2) {
+    return []
+  }
+
+  const latLngs = latLngTuples.map(([lat, lng]) => ({ lat, lng }))
+  const segmentLengths = []
+  let totalLength = 0
+
+  for (let index = 0; index < latLngs.length - 1; index += 1) {
+    const start = latLngs[index]
+    const end = latLngs[index + 1]
+    const length = segmentDistanceInMeters(start, end)
+    segmentLengths.push(length)
+    totalLength += length
+  }
+
+  if (totalLength === 0) {
+    return []
+  }
+
+  const desiredSpacing = CHEVRON_SPACING_METERS
+  const chevronCount = Math.max(1, Math.round(totalLength / desiredSpacing))
+  const spacingBetweenCenters = totalLength / chevronCount
+  const baseLength = spacingBetweenCenters * 0.35
+  const denseLength = spacingBetweenCenters * 0.55
+  let chevronLength =
+    spacingBetweenCenters < CHEVRON_MIN_LENGTH_METERS
+      ? denseLength
+      : Math.max(CHEVRON_MIN_LENGTH_METERS, baseLength)
+  chevronLength = Math.min(CHEVRON_MAX_LENGTH_METERS, chevronLength)
+  const chevronHalfLength = chevronLength / 2
+  const chevronWidth = chevronLength * CHEVRON_WIDTH_RATIO
+  const chevronHalfWidth = chevronWidth / 2
+
+  const chevronCenters = Array.from(
+    { length: chevronCount },
+    (_, index) => spacingBetweenCenters * index + spacingBetweenCenters / 2,
+  )
+
+  const chevrons = []
+
+  chevronCenters.forEach((targetDistance) => {
+    let accumulated = 0
+
+    for (let index = 0; index < segmentLengths.length; index += 1) {
+      const segmentLength = segmentLengths[index]
+      if (!segmentLength) {
+        continue
+      }
+
+      if (accumulated + segmentLength >= targetDistance) {
+        const start = latLngs[index]
+        const end = latLngs[index + 1]
+        const segmentRatio = (targetDistance - accumulated) / segmentLength
+        const center = {
+          lat: start.lat + (end.lat - start.lat) * segmentRatio,
+          lng: start.lng + (end.lng - start.lng) * segmentRatio,
+        }
+        const bearing = calculateBearing(start, end)
+        const tip = movePoint(center, bearing, chevronHalfLength)
+        const backCenter = movePoint(
+          center,
+          (bearing + 180) % 360,
+          chevronHalfLength,
+        )
+        const backTop = movePoint(
+          backCenter,
+          (bearing + 90) % 360,
+          chevronHalfWidth,
+        )
+        const backBottom = movePoint(
+          backCenter,
+          (bearing + 270) % 360,
+          chevronHalfWidth,
+        )
+
+        chevrons.push([
+          [backTop.lat, backTop.lng],
+          [tip.lat, tip.lng],
+          [backBottom.lat, backBottom.lng],
+        ])
+        break
+      }
+
+      accumulated += segmentLength
+    }
+  })
+
+  return chevrons
+}
 
 /**
  * @param {{
@@ -31,6 +171,8 @@ const BaseRouteTile = ({ route, orientation = 'forward' }) => {
   /** @type {React.MutableRefObject<import("leaflet").Polyline>} */
   const lineRef = React.useRef()
   const [markerRef, setMarkerRef] = React.useState(null)
+  /** @type {React.MutableRefObject<import('leaflet').Polyline | undefined>} */
+  const chevronRef = React.useRef()
 
   const displayRoute = React.useMemo(() => {
     if (orientation === 'forward') return route
@@ -77,6 +219,18 @@ const BaseRouteTile = ({ route, orientation = 'forward' }) => {
     [displayRoute.image_border_color],
   )
 
+  const polylinePositions = React.useMemo(
+    () =>
+      waypoints.map((waypoint) => [waypoint.lat_degrees, waypoint.lng_degrees]),
+    [waypoints],
+  )
+
+  const chevronSegments = React.useMemo(
+    () =>
+      displayRoute.reversible ? [] : generateChevronSegments(polylinePositions),
+    [displayRoute.reversible, polylinePositions],
+  )
+
   useMapEvents({
     click: ({ originalEvent }) => {
       if (!originalEvent.defaultPrevented) {
@@ -92,33 +246,24 @@ const BaseRouteTile = ({ route, orientation = 'forward' }) => {
     setLinePopup(null)
   }, [displayRoute.id, orientation])
 
-  const directionArrow = React.useMemo(() => {
-    if (displayRoute.reversible || waypoints.length < 2) {
-      return null
+  React.useEffect(() => {
+    if (lineRef.current) {
+      lineRef.current.setStyle({
+        color: clicked || hover ? darkened : color,
+        opacity: displayRoute.reversible
+          ? clicked || hover
+            ? 1
+            : LINE_OPACITY
+          : 0,
+      })
     }
-    const index = Math.floor((waypoints.length - 1) / 2)
-    const startPoint = waypoints[index]
-    const nextPoint = waypoints[index + 1] || startPoint
-    if (!startPoint || !nextPoint) {
-      return null
+    if (chevronRef.current) {
+      chevronRef.current.setStyle({
+        color: clicked || hover ? darkened : color,
+        opacity: clicked || hover ? 1 : LINE_OPACITY,
+      })
     }
-    const lat = (startPoint.lat_degrees + nextPoint.lat_degrees) / 2
-    const lon = (startPoint.lng_degrees + nextPoint.lng_degrees) / 2
-    const deltaLat = nextPoint.lat_degrees - startPoint.lat_degrees
-    const deltaLon = nextPoint.lng_degrees - startPoint.lng_degrees
-    const angle = (Math.atan2(deltaLat, deltaLon) * 180) / Math.PI
-    const arrowColor = `#${displayRoute.image_border_color}`
-    const icon = divIcon({
-      className: 'route-direction',
-      html: `<div class="route-direction__arrow" style="border-left-color: ${arrowColor}; transform: rotate(${angle}deg);"></div>`,
-      iconSize: [24, 24],
-      iconAnchor: [0, 12],
-    })
-    return {
-      position: [lat, lon],
-      icon,
-    }
-  }, [displayRoute.image_border_color, displayRoute.reversible, waypoints])
+  }, [clicked, color, darkened, displayRoute.reversible, hover])
 
   return (
     <>
@@ -142,13 +287,28 @@ const BaseRouteTile = ({ route, orientation = 'forward' }) => {
             popupclose: () => setClicked(false),
             mouseover: () => {
               if (lineRef.current) {
-                lineRef.current.setStyle({ color: darkened, opacity: 1 })
+                lineRef.current.setStyle({
+                  color: darkened,
+                  opacity: displayRoute.reversible ? 1 : 0,
+                })
+              }
+              if (chevronRef.current) {
+                chevronRef.current.setStyle({ color: darkened, opacity: 1 })
               }
               setHover(position)
             },
             mouseout: () => {
               if (lineRef.current && !clicked) {
-                lineRef.current.setStyle({ color, opacity: MARKER_OPACITY })
+                lineRef.current.setStyle({
+                  color,
+                  opacity: displayRoute.reversible ? LINE_OPACITY : 0,
+                })
+              }
+              if (chevronRef.current && !clicked) {
+                chevronRef.current.setStyle({
+                  color,
+                  opacity: LINE_OPACITY,
+                })
               }
               setHover('')
             },
@@ -167,39 +327,68 @@ const BaseRouteTile = ({ route, orientation = 'forward' }) => {
           click: ({ originalEvent, latlng }) => {
             originalEvent.preventDefault()
             setClicked(true)
+            if (lineRef.current) {
+              lineRef.current.setStyle({
+                color: darkened,
+                opacity: displayRoute.reversible ? 1 : 0,
+              })
+            }
+            if (chevronRef.current) {
+              chevronRef.current.setStyle({ color: darkened, opacity: 1 })
+            }
             if (latlng) {
               setLinePopup([latlng.lat, latlng.lng])
             }
           },
           mouseover: ({ target }) => {
             if (target && !clicked) {
-              target.setStyle({ color: darkened, opacity: 1 })
+              target.setStyle({
+                color: darkened,
+                opacity: displayRoute.reversible ? 1 : 0,
+              })
+            }
+            if (chevronRef.current && !clicked) {
+              chevronRef.current.setStyle({ color: darkened, opacity: 1 })
             }
           },
           mouseout: ({ target }) => {
             if (target && !clicked) {
-              target.setStyle({ color, opacity: LINE_OPACITY })
+              target.setStyle({
+                color,
+                opacity: displayRoute.reversible ? LINE_OPACITY : 0,
+              })
+            }
+            if (chevronRef.current && !clicked) {
+              chevronRef.current.setStyle({
+                color,
+                opacity: LINE_OPACITY,
+              })
             }
           },
         }}
-        dashArray={displayRoute.reversible ? undefined : '5, 5'}
-        positions={waypoints.map((waypoint) => [
-          waypoint.lat_degrees,
-          waypoint.lng_degrees,
-        ])}
+        positions={polylinePositions}
         pathOptions={{
           color: clicked || hover ? darkened : color,
-          opacity: clicked || hover ? 1 : LINE_OPACITY,
+          opacity: displayRoute.reversible
+            ? clicked || hover
+              ? 1
+              : LINE_OPACITY
+            : 0,
           weight: 4,
         }}
       />
-      {directionArrow && (
-        <Marker
-          key={`${displayRoute.id}-${orientation}-arrow`}
-          icon={directionArrow.icon}
-          position={directionArrow.position}
+      {chevronSegments.length > 0 && (
+        <Polyline
+          ref={chevronRef}
+          positions={chevronSegments}
+          pathOptions={{
+            color: clicked || hover ? darkened : color,
+            opacity: clicked || hover ? 1 : LINE_OPACITY,
+            weight: 4,
+            lineCap: 'butt',
+            lineJoin: 'miter',
+          }}
           interactive={false}
-          zIndexOffset={500}
         />
       )}
       {linePopup && (

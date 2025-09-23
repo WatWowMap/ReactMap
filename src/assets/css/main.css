@@ -88,20 +88,6 @@ body {
   background-color: #ff4b4d;
 }
 
-.route-direction {
-  pointer-events: none;
-}
-
-.route-direction__arrow {
-  width: 0;
-  height: 0;
-  border-top: 6px solid transparent;
-  border-bottom: 6px solid transparent;
-  border-left: 12px solid #00a3ee;
-  transform-origin: 0 50%;
-  filter: drop-shadow(0 0 2px rgba(0, 0, 0, 0.35));
-}
-
 .route-count-wrapper {
   display: inline-flex;
   transform: translate(10px, -12px);
