@@ -149,6 +149,7 @@
     "i18next-http-backend": "2.5.2",
     "knex": "3.1.0",
     "leaflet": "1.9.4",
+    "leaflet-arrowheads": "^1.4.0",
     "leaflet.locatecontrol": "0.81.0",
     "lodash": "^4.17.21",
     "moment-timezone": "^0.5.43",
