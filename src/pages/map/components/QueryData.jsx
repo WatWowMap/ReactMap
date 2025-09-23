@@ -11,6 +11,7 @@ import { RobustTimeout } from '@services/apollo/RobustTimeout'
 import { FILTER_SKIP_LIST } from '@assets/constants'
 import { Notification } from '@components/Notification'
 import { GenerateCells } from '@features/s2cell'
+import { RouteLayer } from '@features/route'
 import { useAnalytics } from '@hooks/useAnalytics'
 import { useProcessError } from '@hooks/useProcessError'
 
@@ -185,14 +186,17 @@ function QueryData({ category, timeout }) {
     ) : null
   }
 
+  const filteredData = returnData.filter((each) => !hideList.has(each.id))
+
+  if (category === 'routes') {
+    return <RouteLayer routes={filteredData} />
+  }
+
   return (
     <Clustering category={category}>
-      {returnData.map((each) => {
-        if (!hideList.has(each.id)) {
-          return <Component key={each.id || category} {...each} />
-        }
-        return null
-      })}
+      {filteredData.map((each) => (
+        <Component key={each.id || category} {...each} />
+      ))}
     </Clustering>
   )
 }

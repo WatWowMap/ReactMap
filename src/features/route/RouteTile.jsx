@@ -1,7 +1,8 @@
 /* eslint-disable react/destructuring-assignment */
 // @ts-check
 import * as React from 'react'
-import { Marker, Polyline, useMapEvents } from 'react-leaflet'
+import { Marker, Polyline, Popup, useMapEvents } from 'react-leaflet'
+import 'leaflet-arrowheads'
 import { darken } from '@mui/material/styles'
 
 import { useForcePopup } from '@hooks/useForcePopup'
@@ -14,43 +15,83 @@ const POSITIONS = /** @type {const} */ (['start', 'end'])
 const LINE_OPACITY = 0.33
 const MARKER_OPACITY = LINE_OPACITY * 2
 
-/**
- *
- * @param {import("@rm/types").Route} route
- * @returns
- */
-const BaseRouteTile = (route) => {
+const BaseRouteTile = ({ route, orientation = 'forward' }) => {
   const [clicked, setClicked] = React.useState(false)
   const [hover, setHover] = React.useState('')
+  const [linePopup, setLinePopup] = React.useState(
+    /** @type {import('leaflet').LatLngExpression | null} */ (null),
+  )
 
   /** @type {React.MutableRefObject<import("leaflet").Polyline>} */
   const lineRef = React.useRef()
   const [markerRef, setMarkerRef] = React.useState(null)
+  /** @type {React.MutableRefObject<import('leaflet').LayerGroup | null>} */
+  const arrowheadsRef = React.useRef(null)
 
-  const waypoints = React.useMemo(
-    () => [
+  const displayRoute = React.useMemo(() => {
+    if (orientation === 'forward') return route
+    const reversedWaypoints = [...(route.waypoints || [])]
+      .map((waypoint) => ({ ...waypoint }))
+      .reverse()
+    return {
+      ...route,
+      start_lat: route.end_lat,
+      start_lon: route.end_lon,
+      start_image: route.end_image,
+      start_fort_id: route.end_fort_id,
+      end_lat: route.start_lat,
+      end_lon: route.start_lon,
+      end_image: route.start_image,
+      end_fort_id: route.start_fort_id,
+      waypoints: reversedWaypoints,
+    }
+  }, [orientation, route])
+
+  const waypoints = React.useMemo(() => {
+    const internal = displayRoute.waypoints || []
+    return [
       {
-        lat_degrees: route.start_lat,
-        lng_degrees: route.start_lon,
-        elevation_in_meters: route.waypoints[0]?.elevation_in_meters || 0,
+        lat_degrees: displayRoute.start_lat,
+        lng_degrees: displayRoute.start_lon,
+        elevation_in_meters: internal[0]?.elevation_in_meters || 0,
       },
-      ...route.waypoints,
+      ...internal,
       {
-        lat_degrees: route.end_lat,
-        lng_degrees: route.end_lon,
+        lat_degrees: displayRoute.end_lat,
+        lng_degrees: displayRoute.end_lon,
         elevation_in_meters:
-          route.waypoints[route.waypoints.length - 1]?.elevation_in_meters || 1,
+          internal[internal.length - 1]?.elevation_in_meters || 1,
       },
-    ],
-    [route],
-  )
+    ]
+  }, [displayRoute])
 
   const [color, darkened] = React.useMemo(
     () => [
-      `#${route.image_border_color}`,
-      darken(`#${route.image_border_color}`, 0.2),
+      `#${displayRoute.image_border_color}`,
+      darken(`#${displayRoute.image_border_color}`, 0.2),
     ],
-    [route.image_border_color],
+    [displayRoute.image_border_color],
+  )
+
+  const polylinePositions = React.useMemo(
+    () =>
+      waypoints.map((waypoint) => [waypoint.lat_degrees, waypoint.lng_degrees]),
+    [waypoints],
+  )
+
+  const applyArrowheadStyle = React.useCallback(
+    (targetColor, targetOpacity) => {
+      const group = arrowheadsRef.current
+      if (!group) {
+        return
+      }
+      /** @type {any} */ group.eachLayer((layer) => {
+        if (layer && typeof layer.setStyle === 'function') {
+          layer.setStyle({ color: targetColor, opacity: targetOpacity })
+        }
+      })
+    },
+    [],
   )
 
   useMapEvents({
@@ -58,10 +99,80 @@ const BaseRouteTile = (route) => {
       if (!originalEvent.defaultPrevented) {
         setClicked(false)
         setHover('')
+        setLinePopup(null)
       }
     },
   })
-  useForcePopup(route.id, markerRef)
+  useForcePopup(displayRoute.id, markerRef)
+
+  React.useEffect(() => {
+    setLinePopup(null)
+  }, [displayRoute.id, orientation])
+
+  React.useEffect(() => {
+    const line = lineRef.current
+    if (!line) {
+      arrowheadsRef.current = null
+      return undefined
+    }
+
+    const arrowLine = /** @type {any} */ (line)
+    if (typeof arrowLine.deleteArrowheads === 'function') {
+      arrowLine.deleteArrowheads()
+    }
+    arrowheadsRef.current = null
+
+    if (
+      !displayRoute.reversible &&
+      typeof arrowLine.arrowheads === 'function'
+    ) {
+      arrowLine.arrowheads({
+        size: '10px',
+        frequency: '24px',
+        yawn: 32,
+        fill: false,
+        offsets: {
+          start: '10px',
+          end: '10px',
+        },
+      })
+      if (typeof line.redraw === 'function') {
+        line.redraw()
+      }
+      if (typeof arrowLine.getArrowheads === 'function') {
+        try {
+          const group = arrowLine.getArrowheads()
+          arrowheadsRef.current = group || null
+        } catch (error) {
+          arrowheadsRef.current = null
+        }
+      }
+      applyArrowheadStyle(color, LINE_OPACITY)
+    }
+
+    return () => {
+      if (typeof arrowLine.deleteArrowheads === 'function') {
+        arrowLine.deleteArrowheads()
+      }
+      arrowheadsRef.current = null
+    }
+  }, [applyArrowheadStyle, color, displayRoute.reversible, polylinePositions])
+
+  const isActive = Boolean(clicked || hover)
+
+  React.useEffect(() => {
+    if (lineRef.current) {
+      const lineOpacity = isActive ? 1 : LINE_OPACITY
+      lineRef.current.setStyle({
+        color: isActive ? darkened : color,
+        opacity: lineOpacity,
+      })
+    }
+    applyArrowheadStyle(
+      isActive ? darkened : color,
+      isActive ? 1 : LINE_OPACITY,
+    )
+  }, [applyArrowheadStyle, color, darkened, isActive])
 
   return (
     <>
@@ -71,27 +182,44 @@ const BaseRouteTile = (route) => {
           ref={position === 'start' ? setMarkerRef : undefined}
           opacity={hover || clicked ? 1 : MARKER_OPACITY}
           zIndexOffset={hover === position ? 2000 : hover || clicked ? 1000 : 0}
-          position={[route[`${position}_lat`], route[`${position}_lon`]]}
-          icon={routeMarker(position)}
+          position={[
+            displayRoute[`${position}_lat`],
+            displayRoute[`${position}_lon`],
+          ]}
+          icon={
+            displayRoute.reversible
+              ? routeMarker('start')
+              : routeMarker(position)
+          }
           eventHandlers={{
             popupopen: () => setClicked(true),
             popupclose: () => setClicked(false),
             mouseover: () => {
               if (lineRef.current) {
-                lineRef.current.setStyle({ color: darkened, opacity: 1 })
+                lineRef.current.setStyle({
+                  color: darkened,
+                  opacity: 1,
+                })
               }
+              applyArrowheadStyle(darkened, 1)
               setHover(position)
             },
             mouseout: () => {
               if (lineRef.current && !clicked) {
-                lineRef.current.setStyle({ color, opacity: MARKER_OPACITY })
+                lineRef.current.setStyle({
+                  color,
+                  opacity: LINE_OPACITY,
+                })
+              }
+              if (!clicked) {
+                applyArrowheadStyle(color, LINE_OPACITY)
               }
               setHover('')
             },
           }}
         >
           <RoutePopup
-            {...route}
+            {...displayRoute}
             waypoints={waypoints}
             end={position === 'end'}
           />
@@ -100,37 +228,68 @@ const BaseRouteTile = (route) => {
       <Polyline
         ref={lineRef}
         eventHandlers={{
-          click: ({ originalEvent }) => {
+          click: ({ originalEvent, latlng }) => {
             originalEvent.preventDefault()
-            setClicked((prev) => !prev)
+            setClicked(true)
+            if (lineRef.current) {
+              lineRef.current.setStyle({
+                color: darkened,
+                opacity: 1,
+              })
+            }
+            applyArrowheadStyle(darkened, 1)
+            if (latlng) {
+              setLinePopup([latlng.lat, latlng.lng])
+            }
           },
           mouseover: ({ target }) => {
             if (target && !clicked) {
-              target.setStyle({ color: darkened, opacity: 1 })
+              target.setStyle({
+                color: darkened,
+                opacity: 1,
+              })
+            }
+            if (!clicked) {
+              applyArrowheadStyle(darkened, 1)
             }
           },
           mouseout: ({ target }) => {
             if (target && !clicked) {
-              target.setStyle({ color, opacity: LINE_OPACITY })
+              target.setStyle({
+                color,
+                opacity: LINE_OPACITY,
+              })
+            }
+            if (!clicked) {
+              applyArrowheadStyle(color, LINE_OPACITY)
             }
           },
         }}
-        dashArray={route.reversible ? undefined : '5, 5'}
-        positions={waypoints.map((waypoint) => [
-          waypoint.lat_degrees,
-          waypoint.lng_degrees,
-        ])}
+        positions={polylinePositions}
         pathOptions={{
-          color: clicked || hover ? darkened : color,
-          opacity: clicked || hover ? 1 : LINE_OPACITY,
+          color: isActive ? darkened : color,
+          opacity: displayRoute.reversible && isActive ? 1 : LINE_OPACITY,
           weight: 4,
         }}
       />
+      {linePopup && (
+        <Popup
+          position={linePopup}
+          eventHandlers={{
+            remove: () => setLinePopup(null),
+            close: () => setLinePopup(null),
+          }}
+        >
+          <RoutePopup inline {...displayRoute} waypoints={waypoints} />
+        </Popup>
+      )}
     </>
   )
 }
 
 export const RouteTile = React.memo(
   BaseRouteTile,
-  (prev, next) => prev.updated === next.updated,
+  (prev, next) =>
+    prev.route.updated === next.route.updated &&
+    prev.orientation === next.orientation,
 )

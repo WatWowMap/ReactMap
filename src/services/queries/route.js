@@ -5,8 +5,10 @@ import { gql } from '@apollo/client'
 const core = gql`
   fragment CoreRoute on Route {
     id
+    start_fort_id
     start_lat
     start_lon
+    end_fort_id
     end_lat
     end_lon
   }

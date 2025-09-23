@@ -131,7 +131,7 @@ function ExpandableWrapper({ disabled = false, children, expandKey, primary }) {
  * @param {import("@rm/types").Route & { end?: boolean }} props
  * @returns
  */
-export function RoutePopup({ end, ...props }) {
+export function RoutePopup({ end, inline = false, ...props }) {
   const [route, setRoute] = React.useState({ ...props, tags: [] })
   const { config } = useMemory.getState()
   const formatDistance = useFormatDistance()
@@ -145,6 +145,12 @@ export function RoutePopup({ end, ...props }) {
     variables: { id: props.id },
   })
   const { t } = useTranslation()
+
+  React.useEffect(() => {
+    if (inline && !called) {
+      getRoute()
+    }
+  }, [inline, called, getRoute])
 
   React.useEffect(() => {
     if (data?.route) {
@@ -206,14 +212,8 @@ export function RoutePopup({ end, ...props }) {
     }
   }, [route.shortcode, t])
 
-  return (
-    <Popup
-      ref={(ref) => {
-        if (ref && ref.isOpen() && !called) {
-          getRoute()
-        }
-      }}
-    >
+  const content = (
+    <>
       <Grid2
         alignItems="center"
         justifyContent="center"
@@ -363,6 +363,22 @@ export function RoutePopup({ end, ...props }) {
       >
         {notification.message}
       </Notification>
+    </>
+  )
+
+  if (inline) {
+    return content
+  }
+
+  return (
+    <Popup
+      ref={(ref) => {
+        if (ref && ref.isOpen() && !called) {
+          getRoute()
+        }
+      }}
+    >
+      {content}
     </Popup>
   )
 }
