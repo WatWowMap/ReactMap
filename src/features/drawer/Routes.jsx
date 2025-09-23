@@ -39,14 +39,16 @@ const RouteSlider = () => {
 
   return (
     <CollapsibleItem open={enabled}>
-      <ListItem>
+      <ListItem
+        secondaryAction={
+          <Switch
+            color="secondary"
+            onChange={(_, checked) => setCompactView(checked)}
+            checked={compactView !== false}
+          />
+        }
+      >
         <ListItemText primary={t('compact_route_view', 'Compact Route View')} />
-        <Switch
-          edge="end"
-          color="secondary"
-          onChange={(_, checked) => setCompactView(checked)}
-          checked={compactView !== false}
-        />
       </ListItem>
       <ListItem>
         <SliderTile
