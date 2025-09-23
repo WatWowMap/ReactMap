@@ -4,6 +4,8 @@ import { create } from 'zustand'
 
 const PRECISION = 6
 
+export const ROUTE_COORD_EPSILON = 1 / 10 ** PRECISION
+
 /**
  * @typedef {{
  *  routeId: string,
@@ -30,8 +32,6 @@ const PRECISION = 6
 const fallbackKey = (lat, lon, prefix) =>
   `${prefix}:${lat.toFixed(PRECISION)}:${lon.toFixed(PRECISION)}`
 
-const EPSILON = 1 / 10 ** PRECISION
-
 /**
  * @param {Record<string, RoutePoiIndex>} poiIndex
  * @param {RoutePoiIndex | null} entry
@@ -45,8 +45,8 @@ const collectNearbyRoutes = (poiIndex, entry, routeCache) => {
   const combined = []
   Object.values(poiIndex).forEach((candidate) => {
     if (
-      Math.abs(candidate.lat - entry.lat) <= EPSILON &&
-      Math.abs(candidate.lon - entry.lon) <= EPSILON
+      Math.abs(candidate.lat - entry.lat) <= ROUTE_COORD_EPSILON &&
+      Math.abs(candidate.lon - entry.lon) <= ROUTE_COORD_EPSILON
     ) {
       candidate.routes.forEach((ref) => {
         const id = `${ref.routeId}-${ref.orientation}`

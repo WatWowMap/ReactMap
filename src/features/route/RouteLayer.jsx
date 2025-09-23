@@ -7,7 +7,7 @@ import { useStorage } from '@store/useStorage'
 
 import { RouteTile } from './RouteTile'
 import { routeMarker } from './routeMarker'
-import { useRouteStore } from './useRouteStore'
+import { useRouteStore, ROUTE_COORD_EPSILON } from './useRouteStore'
 
 const ACTIVE_Z_INDEX = 1800
 const INACTIVE_Z_INDEX = 900
@@ -99,15 +99,14 @@ export function RouteLayer({ routes }) {
 
   const anchors = React.useMemo(() => {
     if (!compactView) return []
-    const epsilon = 1 / 10 ** 6
     const values = Object.values(poiIndex)
     return values.map((entry) => {
       const seen = new Set()
       let count = 0
       values.forEach((candidate) => {
         if (
-          Math.abs(candidate.lat - entry.lat) <= epsilon &&
-          Math.abs(candidate.lon - entry.lon) <= epsilon
+          Math.abs(candidate.lat - entry.lat) <= ROUTE_COORD_EPSILON &&
+          Math.abs(candidate.lon - entry.lon) <= ROUTE_COORD_EPSILON
         ) {
           candidate.routes.forEach((ref) => {
             const id = `${ref.routeId}-${ref.orientation}`

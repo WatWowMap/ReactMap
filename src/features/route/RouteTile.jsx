@@ -110,9 +110,7 @@ const BaseRouteTile = ({ route, orientation = 'forward' }) => {
     const arrowColor = `#${displayRoute.image_border_color}`
     const icon = divIcon({
       className: 'route-direction',
-      html: `<div class="route-direction__arrow" style="border-left-color: ${arrowColor}; transform: rotate(${angle}deg);"></div>`
-        .replace(/\s+</g, '<')
-        .trim(),
+      html: `<div class="route-direction__arrow" style="border-left-color: ${arrowColor}; transform: rotate(${angle}deg);"></div>`,
       iconSize: [24, 24],
       iconAnchor: [0, 12],
     })
