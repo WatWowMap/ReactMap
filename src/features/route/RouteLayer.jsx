@@ -16,47 +16,59 @@ import {
 const ACTIVE_Z_INDEX = 1800
 const INACTIVE_Z_INDEX = 900
 
-const RouteAnchor = React.memo(({ entry, selected, onSelect, routeCount }) => {
-  const baseIcon = React.useMemo(() => routeMarker('start'), [])
-  const badgeIcon = React.useMemo(() => {
-    if (routeCount <= 1) return null
-    return divIcon({
-      className: 'route-count-wrapper',
-      html: `<span class="route-count-badge">${routeCount}</span>`,
-      iconSize: [0, 0],
-      iconAnchor: [0, 0],
-    })
-  }, [routeCount])
+const RouteAnchor = React.memo(
+  ({
+    entry,
+    selected,
+    onSelect,
+    routeCount,
+    variant = 'start',
+    icon = null,
+  }) => {
+    const baseIcon = React.useMemo(
+      () => icon || routeMarker(variant === 'destination' ? 'end' : 'start'),
+      [icon, variant],
+    )
+    const badgeIcon = React.useMemo(() => {
+      if (routeCount <= 1) return null
+      return divIcon({
+        className: 'route-count-wrapper',
+        html: `<span class="route-count-badge route-count-badge--${variant}">${routeCount}</span>`,
+        iconSize: [0, 0],
+        iconAnchor: [0, 0],
+      })
+    }, [routeCount, variant])
 
-  return (
-    <>
-      {!selected && (
-        <Marker
-          position={[entry.lat, entry.lon]}
-          icon={baseIcon}
-          zIndexOffset={INACTIVE_Z_INDEX}
-          riseOnHover
-          eventHandlers={{
-            click: () => onSelect(entry.key),
-          }}
-          title={routeCount > 1 ? `${routeCount} routes` : ''}
-        />
-      )}
-      {badgeIcon && (
-        <Marker
-          position={[entry.lat, entry.lon]}
-          icon={badgeIcon}
-          interactive={false}
-          keyboard={false}
-          pane="tooltipPane"
-          zIndexOffset={
-            selected ? ACTIVE_Z_INDEX + 200 : INACTIVE_Z_INDEX + 200
-          }
-        />
-      )}
-    </>
-  )
-})
+    return (
+      <>
+        {variant !== 'destination' && !selected && (
+          <Marker
+            position={[entry.lat, entry.lon]}
+            icon={baseIcon}
+            zIndexOffset={INACTIVE_Z_INDEX}
+            riseOnHover
+            eventHandlers={{
+              click: () => onSelect(entry.key),
+            }}
+            title={routeCount > 1 ? `${routeCount} routes` : ''}
+          />
+        )}
+        {badgeIcon && (
+          <Marker
+            position={[entry.lat, entry.lon]}
+            icon={badgeIcon}
+            interactive={false}
+            keyboard={false}
+            pane="tooltipPane"
+            zIndexOffset={
+              selected ? ACTIVE_Z_INDEX + 200 : INACTIVE_Z_INDEX + 200
+            }
+          />
+        )}
+      </>
+    )
+  },
+)
 
 const ActiveRoute = React.memo(({ selection }) => {
   const route = useRouteStore(
@@ -101,18 +113,26 @@ export function RouteLayer({ routes }) {
     },
   })
 
-  const destinationCoords = React.useMemo(() => {
-    if (!compactView) return new Set()
+  const destinationSummary = React.useMemo(() => {
+    if (!compactView)
+      return { keys: new Set(), icons: new Map(), counts: new Map() }
     const keys = new Set()
+    const icons = new Map()
+    const counts = new Map()
     activeRoutes.forEach((selection) => {
       const route = routeCache[selection.routeId]
       if (!route) return
       const isForward = selection.orientation === 'forward'
       const lat = isForward ? route.end_lat : route.start_lat
       const lon = isForward ? route.end_lon : route.start_lon
-      keys.add(getRouteCoordKey(lat, lon))
+      const coordKey = getRouteCoordKey(lat, lon)
+      keys.add(coordKey)
+      counts.set(coordKey, (counts.get(coordKey) || 0) + 1)
+      if (!icons.has(coordKey)) {
+        icons.set(coordKey, routeMarker('end'))
+      }
     })
-    return keys
+    return { keys, icons, counts }
   }, [activeRoutes, routeCache, compactView])
 
   const anchors = React.useMemo(() => {
@@ -158,7 +178,25 @@ export function RouteLayer({ routes }) {
     <>
       {anchors.map(({ entry, routeCount }) => {
         const entryCoordKey = getRouteCoordKey(entry.lat, entry.lon)
-        if (destinationCoords.has(entryCoordKey) && entry.key !== activePoiId) {
+        const iconOverride = destinationSummary.icons.get(entryCoordKey)
+        const destinationCount = destinationSummary.counts.get(entryCoordKey)
+        if (destinationCount && destinationCount > 1) {
+          return (
+            <RouteAnchor
+              key={`${entry.key}-destination`}
+              entry={entry}
+              selected={entry.key === activePoiId}
+              onSelect={selectPoi}
+              routeCount={destinationCount}
+              variant="destination"
+              icon={iconOverride || undefined}
+            />
+          )
+        }
+        if (
+          destinationSummary.keys.has(entryCoordKey) &&
+          entry.key !== activePoiId
+        ) {
           return null
         }
         return (
@@ -167,7 +205,9 @@ export function RouteLayer({ routes }) {
             entry={entry}
             selected={entry.key === activePoiId}
             onSelect={selectPoi}
-            routeCount={routeCount}
+            routeCount={destinationCount || routeCount}
+            variant="start"
+            icon={iconOverride || undefined}
           />
         )
       })}

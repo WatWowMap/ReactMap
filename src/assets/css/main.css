@@ -123,6 +123,10 @@ body {
   box-shadow: 0 0 4px rgba(0, 0, 0, 0.4);
 }
 
+.route-count-badge--destination {
+  background: #2196f3;
+}
+
 .invasion-exists {
   border: 4px solid rgb(141, 13, 13);
 }
