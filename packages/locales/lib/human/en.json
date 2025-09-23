@@ -662,6 +662,8 @@
   "routes": "Routes",
   "route_type": "Route Type",
   "route_short_code": "Route Share Code: ",
+  "route_anchor_count_one": "{{count}} Route",
+  "route_anchor_count_other": "{{count}} Routes",
   "shortcode_copied_to_clipboard": "Code copied to clipboard!",
   "copy_failed": "Copy failed",
   "routes_subtitle": "View in game routes and relevant information about them on the map",

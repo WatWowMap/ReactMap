@@ -2,6 +2,7 @@
 import * as React from 'react'
 import { Marker, useMap, useMapEvents } from 'react-leaflet'
 import { divIcon } from 'leaflet'
+import { t } from 'i18next'
 
 import { useStorage } from '@store/useStorage'
 
@@ -32,6 +33,8 @@ const RouteAnchor = React.memo(
       [icon, variant],
     )
     const showBadge = routeCount > 1 || (hideMarker && routeCount > 0)
+    const routeCountTitle =
+      routeCount > 0 ? t('route_anchor_count', { count: routeCount }) : ''
     const badgeIcon = React.useMemo(() => {
       if (!showBadge) return null
       return divIcon({
@@ -54,7 +57,7 @@ const RouteAnchor = React.memo(
             eventHandlers={{
               click: () => onSelect(entry.key),
             }}
-            title={routeCount > 1 ? `${routeCount} routes` : ''}
+            title={routeCountTitle}
           />
         )}
         {badgeIcon && (
@@ -67,7 +70,7 @@ const RouteAnchor = React.memo(
             zIndexOffset={
               selected ? ACTIVE_Z_INDEX + 200 : INACTIVE_Z_INDEX + 200
             }
-            title={`${routeCount} route${routeCount === 1 ? '' : 's'}`}
+            title={routeCountTitle}
             eventHandlers={
               hideMarker
                 ? {
