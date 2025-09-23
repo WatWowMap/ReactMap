@@ -17,10 +17,10 @@ const RouteAnchor = React.memo(({ entry, selected, onSelect, routeCount }) => {
   const badgeIcon = React.useMemo(() => {
     if (routeCount <= 1) return null
     return divIcon({
-      className: 'route-count-badge',
-      html: `${routeCount}`,
-      iconSize: [18, 18],
-      iconAnchor: [-8, 20],
+      className: 'route-count-wrapper',
+      html: `<span class="route-count-badge">${routeCount}</span>`,
+      iconSize: [0, 0],
+      iconAnchor: [0, 0],
     })
   }, [routeCount])
 
