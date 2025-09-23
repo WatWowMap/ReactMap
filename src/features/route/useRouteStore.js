@@ -29,8 +29,20 @@ export const ROUTE_COORD_EPSILON = 1 / 10 ** PRECISION
  * @param {number} lon
  * @param {'start' | 'end'} prefix
  */
+const formatCoordKey = (lat, lon) =>
+  `${lat.toFixed(PRECISION)}:${lon.toFixed(PRECISION)}`
+
 const fallbackKey = (lat, lon, prefix) =>
-  `${prefix}:${lat.toFixed(PRECISION)}:${lon.toFixed(PRECISION)}`
+  `${prefix}:${formatCoordKey(lat, lon)}`
+
+export const getRouteCoordKey = formatCoordKey
+
+export const getRoutePoiKey = (route, position) => {
+  const lat = position === 'start' ? route.start_lat : route.end_lat
+  const lon = position === 'start' ? route.start_lon : route.end_lon
+  const fortId = position === 'start' ? route.start_fort_id : route.end_fort_id
+  return fortId || fallbackKey(lat, lon, position)
+}
 
 /**
  * @param {Record<string, RoutePoiIndex>} poiIndex

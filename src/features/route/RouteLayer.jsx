@@ -7,7 +7,11 @@ import { useStorage } from '@store/useStorage'
 
 import { RouteTile } from './RouteTile'
 import { routeMarker } from './routeMarker'
-import { useRouteStore, ROUTE_COORD_EPSILON } from './useRouteStore'
+import {
+  useRouteStore,
+  ROUTE_COORD_EPSILON,
+  getRouteCoordKey,
+} from './useRouteStore'
 
 const ACTIVE_Z_INDEX = 1800
 const INACTIVE_Z_INDEX = 900
@@ -97,27 +101,42 @@ export function RouteLayer({ routes }) {
     },
   })
 
+  const destinationCoords = React.useMemo(() => {
+    if (!compactView) return new Set()
+    const keys = new Set()
+    activeRoutes.forEach((selection) => {
+      const route = routeCache[selection.routeId]
+      if (!route) return
+      const isForward = selection.orientation === 'forward'
+      const lat = isForward ? route.end_lat : route.start_lat
+      const lon = isForward ? route.end_lon : route.start_lon
+      keys.add(getRouteCoordKey(lat, lon))
+    })
+    return keys
+  }, [activeRoutes, routeCache, compactView])
+
   const anchors = React.useMemo(() => {
     if (!compactView) return []
     const values = Object.values(poiIndex)
     return values.map((entry) => {
-      const seen = new Set()
-      let count = 0
+      const uniqueRoutes = new Set()
       values.forEach((candidate) => {
         if (
           Math.abs(candidate.lat - entry.lat) <= ROUTE_COORD_EPSILON &&
           Math.abs(candidate.lon - entry.lon) <= ROUTE_COORD_EPSILON
         ) {
           candidate.routes.forEach((ref) => {
-            const id = `${ref.routeId}-${ref.orientation}`
-            if (!seen.has(id) && routeCache[ref.routeId]) {
-              seen.add(id)
-              count += 1
+            if (routeCache[ref.routeId]) {
+              uniqueRoutes.add(ref.routeId)
             }
           })
         }
       })
-      return { entry, routeCount: count || entry.routes.length || 1 }
+      return {
+        entry,
+        routeCount:
+          uniqueRoutes.size || new Set(entry.routes.map((r) => r.routeId)).size,
+      }
     })
   }, [compactView, poiIndex, routeCache])
 
@@ -137,15 +156,21 @@ export function RouteLayer({ routes }) {
 
   return (
     <>
-      {anchors.map(({ entry, routeCount }) => (
-        <RouteAnchor
-          key={entry.key}
-          entry={entry}
-          selected={entry.key === activePoiId}
-          onSelect={selectPoi}
-          routeCount={routeCount}
-        />
-      ))}
+      {anchors.map(({ entry, routeCount }) => {
+        const entryCoordKey = getRouteCoordKey(entry.lat, entry.lon)
+        if (destinationCoords.has(entryCoordKey) && entry.key !== activePoiId) {
+          return null
+        }
+        return (
+          <RouteAnchor
+            key={entry.key}
+            entry={entry}
+            selected={entry.key === activePoiId}
+            onSelect={selectPoi}
+            routeCount={routeCount}
+          />
+        )
+      })}
       {activeRoutes.map((selection) => (
         <ActiveRoute
           key={`${selection.routeId}-${selection.orientation}`}
