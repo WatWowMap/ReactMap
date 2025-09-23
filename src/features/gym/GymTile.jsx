@@ -12,6 +12,7 @@ import { useForcePopup } from '@hooks/useForcePopup'
 import { sendNotification } from '@services/desktopNotification'
 import { TooltipWrapper } from '@components/ToolTipWrapper'
 import { getTimeUntil } from '@utils/getTimeUntil'
+import { useRouteStore } from '@features/route'
 
 import { gymMarker } from './gymMarker'
 import { GymPopup } from './GymPopup'
@@ -38,6 +39,8 @@ const getColor = (team) => {
 const BaseGymTile = (gym) => {
   const [markerRef, setMarkerRef] = React.useState(null)
   const [stateChange, setStateChange] = React.useState(false)
+  const hasRoutes = useRouteStore((s) => !!s.poiIndex[gym.id])
+  const selectPoi = useRouteStore((s) => s.selectPoi)
 
   const [
     hasRaid,
@@ -179,6 +182,13 @@ const BaseGymTile = (gym) => {
         raidIconSize,
         ...gym,
       })}
+      eventHandlers={{
+        click: () => {
+          if (hasRoutes) {
+            selectPoi(gym.id)
+          }
+        },
+      }}
     >
       <Popup position={[gym.lat, gym.lon]}>
         <GymPopup

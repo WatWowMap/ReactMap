@@ -15,11 +15,12 @@ const LINE_OPACITY = 0.33
 const MARKER_OPACITY = LINE_OPACITY * 2
 
 /**
- *
- * @param {import("@rm/types").Route} route
- * @returns
+ * @param {{
+ *  route: import('@rm/types').Route,
+ *  orientation?: 'forward' | 'reverse',
+ * }} props
  */
-const BaseRouteTile = (route) => {
+const BaseRouteTile = ({ route, orientation = 'forward' }) => {
   const [clicked, setClicked] = React.useState(false)
   const [hover, setHover] = React.useState('')
 
@@ -27,30 +28,49 @@ const BaseRouteTile = (route) => {
   const lineRef = React.useRef()
   const [markerRef, setMarkerRef] = React.useState(null)
 
-  const waypoints = React.useMemo(
-    () => [
+  const displayRoute = React.useMemo(() => {
+    if (orientation === 'forward') return route
+    const reversedWaypoints = [...(route.waypoints || [])]
+      .map((waypoint) => ({ ...waypoint }))
+      .reverse()
+    return {
+      ...route,
+      start_lat: route.end_lat,
+      start_lon: route.end_lon,
+      start_image: route.end_image,
+      start_fort_id: route.end_fort_id,
+      end_lat: route.start_lat,
+      end_lon: route.start_lon,
+      end_image: route.start_image,
+      end_fort_id: route.start_fort_id,
+      waypoints: reversedWaypoints,
+    }
+  }, [orientation, route])
+
+  const waypoints = React.useMemo(() => {
+    const internal = displayRoute.waypoints || []
+    return [
       {
-        lat_degrees: route.start_lat,
-        lng_degrees: route.start_lon,
-        elevation_in_meters: route.waypoints[0]?.elevation_in_meters || 0,
+        lat_degrees: displayRoute.start_lat,
+        lng_degrees: displayRoute.start_lon,
+        elevation_in_meters: internal[0]?.elevation_in_meters || 0,
       },
-      ...route.waypoints,
+      ...internal,
       {
-        lat_degrees: route.end_lat,
-        lng_degrees: route.end_lon,
+        lat_degrees: displayRoute.end_lat,
+        lng_degrees: displayRoute.end_lon,
         elevation_in_meters:
-          route.waypoints[route.waypoints.length - 1]?.elevation_in_meters || 1,
+          internal[internal.length - 1]?.elevation_in_meters || 1,
       },
-    ],
-    [route],
-  )
+    ]
+  }, [displayRoute])
 
   const [color, darkened] = React.useMemo(
     () => [
-      `#${route.image_border_color}`,
-      darken(`#${route.image_border_color}`, 0.2),
+      `#${displayRoute.image_border_color}`,
+      darken(`#${displayRoute.image_border_color}`, 0.2),
     ],
-    [route.image_border_color],
+    [displayRoute.image_border_color],
   )
 
   useMapEvents({
@@ -61,7 +81,7 @@ const BaseRouteTile = (route) => {
       }
     },
   })
-  useForcePopup(route.id, markerRef)
+  useForcePopup(displayRoute.id, markerRef)
 
   return (
     <>
@@ -71,7 +91,10 @@ const BaseRouteTile = (route) => {
           ref={position === 'start' ? setMarkerRef : undefined}
           opacity={hover || clicked ? 1 : MARKER_OPACITY}
           zIndexOffset={hover === position ? 2000 : hover || clicked ? 1000 : 0}
-          position={[route[`${position}_lat`], route[`${position}_lon`]]}
+          position={[
+            displayRoute[`${position}_lat`],
+            displayRoute[`${position}_lon`],
+          ]}
           icon={routeMarker(position)}
           eventHandlers={{
             popupopen: () => setClicked(true),
@@ -91,7 +114,7 @@ const BaseRouteTile = (route) => {
           }}
         >
           <RoutePopup
-            {...route}
+            {...displayRoute}
             waypoints={waypoints}
             end={position === 'end'}
           />
@@ -115,7 +138,7 @@ const BaseRouteTile = (route) => {
             }
           },
         }}
-        dashArray={route.reversible ? undefined : '5, 5'}
+        dashArray={displayRoute.reversible ? undefined : '5, 5'}
         positions={waypoints.map((waypoint) => [
           waypoint.lat_degrees,
           waypoint.lng_degrees,
@@ -132,5 +155,7 @@ const BaseRouteTile = (route) => {
 
 export const RouteTile = React.memo(
   BaseRouteTile,
-  (prev, next) => prev.updated === next.updated,
+  (prev, next) =>
+    prev.route.updated === next.route.updated &&
+    prev.orientation === next.orientation,
 )
