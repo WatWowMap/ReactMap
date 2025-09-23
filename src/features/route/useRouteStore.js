@@ -73,6 +73,45 @@ const collectNearbyRoutes = (poiIndex, entry, routeCache) => {
 }
 
 /**
+ * Attempts to locate the route POI key that corresponds to a given
+ * fortress/pokestop id or the provided coordinates.
+ *
+ * @param {Record<string, RoutePoiIndex>} poiIndex
+ * @param {string} poiId
+ * @param {number | undefined} lat
+ * @param {number | undefined} lon
+ * @returns {string}
+ */
+export const resolveRoutePoiKey = (poiIndex, poiId, lat, lon) => {
+  if (poiId && poiIndex[poiId]) {
+    return poiId
+  }
+
+  if (typeof lat === 'number' && typeof lon === 'number') {
+    const startKey = fallbackKey(lat, lon, 'start')
+    if (poiIndex[startKey]) {
+      return startKey
+    }
+
+    const endKey = fallbackKey(lat, lon, 'end')
+    if (poiIndex[endKey]) {
+      return endKey
+    }
+
+    const nearby = Object.values(poiIndex).find(
+      (candidate) =>
+        Math.abs(candidate.lat - lat) <= ROUTE_COORD_EPSILON &&
+        Math.abs(candidate.lon - lon) <= ROUTE_COORD_EPSILON,
+    )
+    if (nearby) {
+      return nearby.key
+    }
+  }
+
+  return ''
+}
+
+/**
  * @param {Record<string, RoutePoiIndex>} poiIndex
  * @param {import('@rm/types').Route} route
  * @param {'forward' | 'reverse'} orientation
@@ -109,7 +148,7 @@ const addPoiEntry = (poiIndex, route, orientation) => {
  *  activePoiId: string,
  *  activeRoutes: RouteSelection[],
  *  syncRoutes: (routes: import('@rm/types').Route[]) => void,
- *  selectPoi: (poiId: string) => void,
+ *  selectPoi: (poiId: string, lat?: number, lon?: number) => void,
  *  clearSelection: () => void,
  * }} RouteStore
  */
@@ -163,19 +202,23 @@ export const useRouteStore = create(
         }
       })
     },
-    selectPoi: (poiId) => {
+    selectPoi: (poiId, lat, lon) => {
       set((state) => {
         if (!poiId) {
           return state
         }
-        if (state.activePoiId === poiId) {
+        const key = resolveRoutePoiKey(state.poiIndex, poiId, lat, lon)
+        if (!key) {
+          return state
+        }
+        if (state.activePoiId === key) {
           return {
             ...state,
             activePoiId: '',
             activeRoutes: [],
           }
         }
-        const entry = state.poiIndex[poiId]
+        const entry = state.poiIndex[key]
         if (!entry) {
           return state
         }
@@ -186,7 +229,7 @@ export const useRouteStore = create(
         )
         return {
           ...state,
-          activePoiId: poiId,
+          activePoiId: key,
           activeRoutes: routes,
         }
       })

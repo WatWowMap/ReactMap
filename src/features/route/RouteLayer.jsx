@@ -1,12 +1,13 @@
 // @ts-check
 import * as React from 'react'
-import { Marker, useMapEvents } from 'react-leaflet'
+import { Marker, useMap, useMapEvents } from 'react-leaflet'
 import { divIcon } from 'leaflet'
 
 import { useStorage } from '@store/useStorage'
 
 import { RouteTile } from './RouteTile'
 import { routeMarker } from './routeMarker'
+import { ROUTE_MARKER_PANE } from './constants'
 import {
   useRouteStore,
   ROUTE_COORD_EPSILON,
@@ -25,28 +26,31 @@ const RouteAnchor = React.memo(
     variant = 'start',
     icon = null,
   }) => {
+    const hideMarker = variant !== 'destination' && entry.isFort
     const baseIcon = React.useMemo(
       () => icon || routeMarker(variant === 'destination' ? 'end' : 'start'),
       [icon, variant],
     )
+    const showBadge = routeCount > 1 || (hideMarker && routeCount > 0)
     const badgeIcon = React.useMemo(() => {
-      if (routeCount <= 1) return null
+      if (!showBadge) return null
       return divIcon({
         className: 'route-count-wrapper',
         html: `<span class="route-count-badge route-count-badge--${variant}">${routeCount}</span>`,
         iconSize: [0, 0],
         iconAnchor: [0, 0],
       })
-    }, [routeCount, variant])
+    }, [routeCount, showBadge, variant])
 
     return (
       <>
-        {variant !== 'destination' && !selected && (
+        {variant !== 'destination' && !selected && !hideMarker && (
           <Marker
             position={[entry.lat, entry.lon]}
             icon={baseIcon}
             zIndexOffset={INACTIVE_Z_INDEX}
             riseOnHover
+            pane={ROUTE_MARKER_PANE}
             eventHandlers={{
               click: () => onSelect(entry.key),
             }}
@@ -57,11 +61,19 @@ const RouteAnchor = React.memo(
           <Marker
             position={[entry.lat, entry.lon]}
             icon={badgeIcon}
-            interactive={false}
+            interactive={hideMarker}
             keyboard={false}
-            pane="tooltipPane"
+            pane={hideMarker ? 'markerPane' : 'tooltipPane'}
             zIndexOffset={
               selected ? ACTIVE_Z_INDEX + 200 : INACTIVE_Z_INDEX + 200
+            }
+            title={`${routeCount} route${routeCount === 1 ? '' : 's'}`}
+            eventHandlers={
+              hideMarker
+                ? {
+                    click: () => onSelect(entry.key),
+                  }
+                : undefined
             }
           />
         )}
@@ -83,6 +95,7 @@ const ActiveRoute = React.memo(({ selection }) => {
 })
 
 export function RouteLayer({ routes }) {
+  const map = useMap()
   const enabled = useStorage((s) => !!s.filters?.routes?.enabled)
   const compactView = useStorage(
     (s) => s.userSettings.routes?.compactView ?? true,
@@ -94,6 +107,17 @@ export function RouteLayer({ routes }) {
   const activePoiId = useRouteStore((s) => s.activePoiId)
   const selectPoi = useRouteStore((s) => s.selectPoi)
   const clearSelection = useRouteStore((s) => s.clearSelection)
+
+  React.useEffect(() => {
+    if (!map) return
+    let pane = map.getPane(ROUTE_MARKER_PANE)
+    if (!pane) {
+      pane = map.createPane(ROUTE_MARKER_PANE)
+    }
+    if (pane) {
+      pane.style.zIndex = '400'
+    }
+  }, [map])
 
   React.useEffect(() => {
     syncRoutes(routes || [])

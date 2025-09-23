@@ -8,6 +8,7 @@ import { darken } from '@mui/material/styles'
 import { useForcePopup } from '@hooks/useForcePopup'
 
 import { routeMarker } from './routeMarker'
+import { ROUTE_MARKER_PANE } from './constants'
 import { RoutePopup } from './RoutePopup'
 
 const POSITIONS = /** @type {const} */ (['start', 'end'])
@@ -191,6 +192,7 @@ const BaseRouteTile = ({ route, orientation = 'forward' }) => {
               ? routeMarker('start')
               : routeMarker(position)
           }
+          pane={ROUTE_MARKER_PANE}
           eventHandlers={{
             popupopen: () => setClicked(true),
             popupclose: () => setClicked(false),
