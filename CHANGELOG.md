@@ -1,3 +1,10 @@
+# [1.39.0-develop.6](https://github.com/WatWowMap/ReactMap/compare/v1.39.0-develop.5...v1.39.0-develop.6) (2025-09-23)
+
+
+### Bug Fixes
+
+* translation ([5a02a6b](https://github.com/WatWowMap/ReactMap/commit/5a02a6b81ca3c559dd2fea41a0b4c5a382560ed1))
+
 # [1.39.0-develop.5](https://github.com/WatWowMap/ReactMap/compare/v1.39.0-develop.4...v1.39.0-develop.5) (2025-09-23)
 
 
