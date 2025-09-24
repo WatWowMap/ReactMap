@@ -552,6 +552,7 @@ class Pokemon extends Model {
     grouped.forEach((entries, key) => {
       let shinySum = 0
       let checkSum = 0
+      let sinceDate = null
       for (let i = 0; i < entries.length; i += 1) {
         const { shiny, checks, date } = entries[i]
         const includeRecent = date >= cutoffStr
@@ -561,11 +562,15 @@ class Pokemon extends Model {
         }
         shinySum += shiny
         checkSum += checks
+        if (!sinceDate || date < sinceDate) {
+          sinceDate = date
+        }
       }
       statsMap.set(key, {
         shiny_seen: shinySum,
         encounters_seen: checkSum,
         shiny_rate: checkSum ? shinySum / checkSum : 0,
+        since_date: sinceDate,
       })
     })
 

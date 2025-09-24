@@ -22,6 +22,7 @@ const core = gql`
       shiny_seen
       encounters_seen
       shiny_rate
+      since_date
     }
   }
 `

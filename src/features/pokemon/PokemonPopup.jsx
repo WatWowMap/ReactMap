@@ -110,7 +110,6 @@ export function PokemonPopup({ pokemon, iconUrl, isTutorial = false }) {
         {!!pokemon.expire_timestamp && (
           <Timer pokemon={pokemon} hasStats={hasStats} t={t} />
         )}
-        <ShinyOdds shinyStats={pokemon.shiny_stats} t={t} />
         {hasStats && pokePerms.iv && (
           <>
             <Stats pokemon={pokemon} t={t} />
@@ -125,6 +124,7 @@ export function PokemonPopup({ pokemon, iconUrl, isTutorial = false }) {
           timeOfDay={timeOfDay}
           t={t}
         />
+        <ShinyOdds shinyStats={pokemon.shiny_stats} t={t} />
         <Footer
           pokemon={pokemon}
           popups={popups}
@@ -309,28 +309,21 @@ const Stats = ({ pokemon, t }) => {
 
 const ShinyOdds = ({ shinyStats, t }) => {
   if (!shinyStats) {
-    return (
-      <Grid xs={12} textAlign="center">
-        <Typography variant="caption">{t('shiny_no_data')}</Typography>
-      </Grid>
-    )
+    return null
   }
 
   const {
     shiny_rate: shinyRate,
     encounters_seen: encounters,
     shiny_seen: shinySeen,
+    since_date: sinceDate,
   } = shinyStats
 
   const encountersNumber = Number(encounters) || 0
   const shinyNumber = Number(shinySeen) || 0
 
   if (!encountersNumber) {
-    return (
-      <Grid xs={12} textAlign="center">
-        <Typography variant="caption">{t('shiny_no_data')}</Typography>
-      </Grid>
-    )
+    return null
   }
 
   const rateNode = readableProbability(shinyRate)
@@ -339,6 +332,10 @@ const ShinyOdds = ({ shinyStats, t }) => {
     percentage: (shinyRate * 100).toLocaleString(),
     checks: encountersNumber.toLocaleString(),
     shiny: shinyNumber.toLocaleString(),
+    date: new Intl.DateTimeFormat(undefined, {
+      month: 'short',
+      day: 'numeric',
+    }).format(new Date(`${sinceDate}T00:00:00Z`)),
   })
 
   return (
