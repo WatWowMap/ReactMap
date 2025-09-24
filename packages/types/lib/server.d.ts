@@ -46,7 +46,7 @@ export interface DbContext {
   hasShowcaseForm: boolean
   hasShowcaseType: boolean
   hasStationedGmax: boolean
-  statsKnex?: import('knex').Knex
+  connection?: number
 }
 
 export interface ExpressUser extends User {
@@ -71,17 +71,11 @@ export interface Available {
   stations: ModelReturn<typeof Station, 'getAvailable'>
 }
 
-export type UseForValue =
-  | Lowercase<ModelKeys>
-  | 'pokemonStats'
-  | 'pokemonstats'
-  | 'pokemon_stats'
-
 export interface ApiEndpoint {
   type: string
   endpoint: string
   secret: string
-  useFor: UseForValue[]
+  useFor: Lowercase<ModelKeys>[]
 }
 
 export interface DbConnection {
@@ -90,7 +84,7 @@ export interface DbConnection {
   username: string
   password: string
   database: string
-  useFor: UseForValue[]
+  useFor: Lowercase<ModelKeys>[]
 }
 
 export type Schema = ApiEndpoint | DbConnection
@@ -116,8 +110,6 @@ export interface DbManagerClass {
     Route: { maxDistance: number; maxDuration: number }
     Pokestop: { hasConfirmedInvasions: boolean }
   }
-  pokemonStatsConnections: Set<number>
-  getPokemonStatsKnex(connectionIndex: number): import('knex').Knex | null
 }
 
 export interface RarityPercents {

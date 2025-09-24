@@ -132,8 +132,9 @@ class Pokemon extends Model {
       secret,
       httpAuth,
       pvpV2,
-      statsKnex,
+      connection,
     } = ctx
+    const statsKnex = this.getStatsKnex(connection)
     const { filterMap, globalFilter } = this.getFilters(perms, args, ctx)
 
     let queryPvp = config
@@ -399,7 +400,11 @@ class Pokemon extends Model {
         ),
       ]
       try {
-        const shinyStats = await this.fetchShinyStats(shinyKeys, statsKnex)
+        const shinyStats = await this.fetchShinyStats(
+          shinyKeys,
+          statsKnex,
+          connection,
+        )
         finalResults.forEach((result) => {
           const key = `${result.pokemon_id}-${result.form ?? 0}`
           const stats = shinyStats.get(key)
@@ -469,14 +474,57 @@ class Pokemon extends Model {
   }
 
   /**
+   * @param {number | null | undefined} preferredConnection
+   * @returns {import('knex').Knex | null}
+   */
+  static getStatsKnex(preferredConnection = null) {
+    const dbManager = state.db
+    if (!dbManager) return null
+    const { connections } = dbManager
+    if (!Array.isArray(dbManager.models?.Spawnpoint)) {
+      if (typeof preferredConnection === 'number') {
+        return connections?.[preferredConnection] ?? null
+      }
+      return null
+    }
+    const spawnSources = dbManager.models.Spawnpoint
+    if (typeof preferredConnection === 'number') {
+      const direct = spawnSources.find(
+        ({ connection }) => connection === preferredConnection,
+      )
+      if (direct) {
+        return connections?.[direct.connection] ?? null
+      }
+    }
+    const fallback = spawnSources.find(
+      ({ connection }) => connections?.[connection],
+    )
+    if (fallback) {
+      return connections?.[fallback.connection] ?? null
+    }
+    if (typeof preferredConnection === 'number') {
+      return connections?.[preferredConnection] ?? null
+    }
+    return null
+  }
+
+  /**
    * @param {string[]} keys
    * @param {import('knex').Knex | null | undefined} [statsKnex]
+   * @param {number | null | undefined} [preferredConnection]
    * @returns {Promise<Map<string, { shiny_seen: number, encounters_seen: number, since_date: string | null }>>}
    */
-  static async fetchShinyStats(keys, statsKnex = null) {
+  static async fetchShinyStats(
+    keys,
+    statsKnex = null,
+    preferredConnection = null,
+  ) {
     if (!keys.length) return new Map()
 
     let knexInstance = statsKnex || null
+    if (!knexInstance) {
+      knexInstance = this.getStatsKnex(preferredConnection)
+    }
     if (!knexInstance) {
       try {
         knexInstance = this.knex()
@@ -484,7 +532,6 @@ class Pokemon extends Model {
         knexInstance = null
       }
     }
-
     if (!knexInstance) return new Map()
 
     const pairs = keys
@@ -583,7 +630,8 @@ class Pokemon extends Model {
    * @returns {Promise<Partial<import("@rm/types").Pokemon>[]>}
    */
   static async getLegacy(perms, args, ctx) {
-    const { isMad, hasSize, hasHeight, mem, secret, httpAuth, statsKnex } = ctx
+    const { isMad, hasSize, hasHeight, mem, secret, httpAuth, connection } = ctx
+    const statsKnex = this.getStatsKnex(connection)
     const ts = Math.floor(Date.now() / 1000)
     const { filterMap, globalFilter } = this.getFilters(perms, args, ctx)
     const queryLimits = config.getSafe('api.queryLimits')
@@ -685,7 +733,11 @@ class Pokemon extends Model {
         ),
       ]
       try {
-        const shinyStats = await this.fetchShinyStats(shinyKeys, statsKnex)
+        const shinyStats = await this.fetchShinyStats(
+          shinyKeys,
+          statsKnex,
+          connection,
+        )
         built.forEach((result) => {
           const key = `${result.pokemon_id}-${result.form ?? 0}`
           const stats = shinyStats.get(key)
