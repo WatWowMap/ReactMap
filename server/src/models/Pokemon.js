@@ -612,28 +612,16 @@ class Pokemon extends Model {
     }
 
     const statsMap = new Map()
-    const today = new Date()
-    today.setHours(0, 0, 0, 0)
-    const cutoff = new Date(today)
-    cutoff.setDate(cutoff.getDate() - 1)
-    const cutoffStr = cutoff.toISOString().slice(0, 10)
-
     grouped.forEach((entries, key) => {
       let shinySum = 0
       let checkSum = 0
       let sinceDate = null
-      for (let i = 0; i < entries.length; i += 1) {
+      // 20000 checks would give >99% of distinguishing even 1/512 from 1/256
+      for (let i = 0; i < entries.length && checkSum < 20000; i++) {
         const { shiny, checks, date } = entries[i]
-        const includeRecent = date >= cutoffStr
-        // 20000 checks would give >99% of distinguishing even 1/512 from 1/256
-        if (!includeRecent && checkSum >= 20000) {
-          break
-        }
         shinySum += shiny
         checkSum += checks
-        if (!sinceDate || date < sinceDate) {
-          sinceDate = date
-        }
+        sinceDate = date
       }
       statsMap.set(key, {
         shiny_seen: shinySum,
