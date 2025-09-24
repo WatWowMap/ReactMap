@@ -21,7 +21,6 @@ const core = gql`
     shiny_stats {
       shiny_seen
       encounters_seen
-      shiny_rate
       since_date
     }
   }

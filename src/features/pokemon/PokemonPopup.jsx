@@ -313,7 +313,6 @@ const ShinyOdds = ({ shinyStats, t }) => {
   }
 
   const {
-    shiny_rate: shinyRate,
     encounters_seen: encounters,
     shiny_seen: shinySeen,
     since_date: sinceDate,
@@ -321,6 +320,7 @@ const ShinyOdds = ({ shinyStats, t }) => {
 
   const encountersNumber = Number(encounters) || 0
   const shinyNumber = Number(shinySeen) || 0
+  const shinyRate = encountersNumber ? shinyNumber / encountersNumber : 0
 
   if (!encountersNumber) {
     return null

@@ -151,7 +151,6 @@ type Pokestop {
 type PokemonShinyStats {
   shiny_seen: Int
   encounters_seen: Int
-  shiny_rate: Float
   since_date: String
 }
 

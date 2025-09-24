@@ -44,7 +44,6 @@ export interface PokemonDisplay {
 export interface PokemonShinyStats {
   shiny_seen: number
   encounters_seen: number
-  shiny_rate: number
   since_date?: string
 }
 

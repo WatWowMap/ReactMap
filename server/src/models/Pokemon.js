@@ -471,7 +471,7 @@ class Pokemon extends Model {
   /**
    * @param {string[]} keys
    * @param {import('knex').Knex | null | undefined} [statsKnex]
-   * @returns {Promise<Map<string, { shiny_seen: number, encounters_seen: number, shiny_rate: number }>>}
+   * @returns {Promise<Map<string, { shiny_seen: number, encounters_seen: number, since_date: string | null }>>}
    */
   static async fetchShinyStats(keys, statsKnex = null) {
     if (!keys.length) return new Map()
@@ -569,7 +569,6 @@ class Pokemon extends Model {
       statsMap.set(key, {
         shiny_seen: shinySum,
         encounters_seen: checkSum,
-        shiny_rate: checkSum ? shinySum / checkSum : 0,
         since_date: sinceDate,
       })
     })
