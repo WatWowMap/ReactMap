@@ -450,7 +450,6 @@ class Pokemon extends Model {
    * @returns {{
    *   knex: import('knex').Knex,
    *   connection: number,
-   *   pokemonSource?: import('@rm/types').DbContext & { connection: number },
    *   spawnSource?: import('@rm/types').DbContext & { connection: number },
    * } | null}
    */
@@ -461,116 +460,50 @@ class Pokemon extends Model {
     if (!connections?.length) return null
 
     const spawnSources = dbManager.models?.Spawnpoint
-    const pokemonSources = dbManager.models?.Pokemon
 
     const getSpawnByConnection = (connection) =>
       Array.isArray(spawnSources)
         ? spawnSources.find((source) => source.connection === connection)
         : undefined
 
-    const getPokemonByConnection = (connection) =>
-      Array.isArray(pokemonSources)
-        ? pokemonSources.find((source) => source.connection === connection)
-        : undefined
-
     const hasConnection = (connection) =>
       typeof connection === 'number' && Boolean(connections?.[connection])
 
-    let candidateConnection = null
-
-    if (Array.isArray(spawnSources) && spawnSources.length) {
-      if (typeof preferredConnection === 'number') {
-        const preferredSpawn = spawnSources.find(
-          (source) =>
-            source.connection === preferredConnection &&
-            source.hasPokemonShinyStats &&
-            hasConnection(source.connection),
-        )
-        if (preferredSpawn) {
-          candidateConnection = preferredSpawn.connection
-        }
-      }
-
-      if (candidateConnection === null) {
-        const enabledSpawn = spawnSources.find(
-          (source) =>
-            source.hasPokemonShinyStats && hasConnection(source.connection),
-        )
-        if (enabledSpawn) {
-          candidateConnection = enabledSpawn.connection
-        }
-      }
-
-      if (
-        candidateConnection === null &&
-        typeof preferredConnection === 'number'
-      ) {
-        const fallbackPreferred = spawnSources.find(
-          (source) =>
-            source.connection === preferredConnection &&
-            hasConnection(source.connection),
-        )
-        if (fallbackPreferred) {
-          candidateConnection = fallbackPreferred.connection
-        }
-      }
-
-      if (candidateConnection === null) {
-        const anySpawn = spawnSources.find((source) =>
-          hasConnection(source.connection),
-        )
-        if (anySpawn) {
-          candidateConnection = anySpawn.connection
-        }
-      }
-    }
-
-    if (
-      candidateConnection === null &&
-      typeof preferredConnection === 'number'
-    ) {
-      if (hasConnection(preferredConnection)) {
-        candidateConnection = preferredConnection
-      }
-    }
-
-    if (
-      candidateConnection === null &&
-      Array.isArray(pokemonSources) &&
-      pokemonSources.length
-    ) {
-      const enabledPokemon = pokemonSources.find(
-        (source) =>
-          source.hasPokemonShinyStats && hasConnection(source.connection),
-      )
-      if (enabledPokemon) {
-        candidateConnection = enabledPokemon.connection
-      }
-
-      if (candidateConnection === null) {
-        const anyPokemon = pokemonSources.find((source) =>
-          hasConnection(source.connection),
-        )
-        if (anyPokemon) {
-          candidateConnection = anyPokemon.connection
-        }
-      }
-    }
-
-    if (candidateConnection === null) {
+    if (!Array.isArray(spawnSources) || !spawnSources.length) {
       return null
     }
 
-    const knexInstance = connections?.[candidateConnection]
+    let candidate = null
+
+    if (typeof preferredConnection === 'number') {
+      candidate = spawnSources.find(
+        (source) =>
+          source.connection === preferredConnection &&
+          source.hasPokemonShinyStats &&
+          hasConnection(source.connection),
+      )
+    }
+
+    if (!candidate) {
+      candidate = spawnSources.find(
+        (source) =>
+          source.hasPokemonShinyStats && hasConnection(source.connection),
+      )
+    }
+
+    if (!candidate) {
+      return null
+    }
+
+    const knexInstance = connections?.[candidate.connection]
     if (!knexInstance) {
       return null
     }
 
     return {
       knex: knexInstance,
-      connection: candidateConnection,
-      pokemonSource: getPokemonByConnection(candidateConnection),
-      spawnSource: getSpawnByConnection(candidateConnection),
+      connection: candidate.connection,
+      spawnSource: getSpawnByConnection(candidate.connection),
     }
   }
 
@@ -586,11 +519,9 @@ class Pokemon extends Model {
     const flag =
       typeof statsHandle.spawnSource?.hasPokemonShinyStats === 'boolean'
         ? statsHandle.spawnSource.hasPokemonShinyStats
-        : typeof statsHandle.pokemonSource?.hasPokemonShinyStats === 'boolean'
-          ? statsHandle.pokemonSource.hasPokemonShinyStats
-          : typeof ctx?.hasPokemonShinyStats === 'boolean'
-            ? ctx.hasPokemonShinyStats
-            : false
+        : typeof ctx?.hasPokemonShinyStats === 'boolean'
+          ? ctx.hasPokemonShinyStats
+          : false
     return flag
   }
 
@@ -829,11 +760,9 @@ class Pokemon extends Model {
     const hasStats =
       typeof statsHandle.spawnSource?.hasPokemonShinyStats === 'boolean'
         ? statsHandle.spawnSource.hasPokemonShinyStats
-        : typeof statsHandle.pokemonSource?.hasPokemonShinyStats === 'boolean'
-          ? statsHandle.pokemonSource.hasPokemonShinyStats
-          : typeof ctx?.hasPokemonShinyStats === 'boolean'
-            ? ctx.hasPokemonShinyStats
-            : false
+        : typeof ctx?.hasPokemonShinyStats === 'boolean'
+          ? ctx.hasPokemonShinyStats
+          : false
     if (!hasStats) {
       return null
     }
@@ -855,9 +784,6 @@ class Pokemon extends Model {
       if (e?.code === 'ER_NO_SUCH_TABLE') {
         if (statsHandle.spawnSource) {
           statsHandle.spawnSource.hasPokemonShinyStats = false
-        }
-        if (statsHandle.pokemonSource) {
-          statsHandle.pokemonSource.hasPokemonShinyStats = false
         }
       }
       return null
