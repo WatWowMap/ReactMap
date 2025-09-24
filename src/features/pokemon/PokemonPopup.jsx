@@ -76,9 +76,7 @@ export function PokemonPopup({ pokemon, iconUrl, isTutorial = false }) {
   const hasLeagues = cleanPvp ? Object.keys(cleanPvp) : []
   const hasStats = iv || cp
 
-  const supportsShinyStats = useMemory(
-    (s) => s.featureFlags.supportsShinyStats,
-  )
+  const supportsShinyStats = useMemory((s) => s.featureFlags.supportsShinyStats)
   const shinyKey = React.useMemo(
     () => `${pokemon.pokemon_id}-${pokemon.form ?? 0}`,
     [pokemon.pokemon_id, pokemon.form],
@@ -135,7 +133,7 @@ export function PokemonPopup({ pokemon, iconUrl, isTutorial = false }) {
     return () => {
       isActive = false
     }
-  }, [supportsShinyStats, shinyStats, shinyKey, loadShinyStats, pokemon.pokemon_id, pokemon.form])
+  }, [supportsShinyStats, shinyStats, shinyKey, loadShinyStats])
 
   useAnalytics(
     'Popup',

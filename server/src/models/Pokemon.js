@@ -442,32 +442,67 @@ class Pokemon extends Model {
    * @returns {import('knex').Knex | null}
    */
   static getStatsKnex(preferredConnection = null) {
+    return this.getStatsHandle(preferredConnection)?.knex ?? null
+  }
+
+  /**
+   * @param {number | null | undefined} preferredConnection
+   * @returns {{ knex: import('knex').Knex, source?: import('@rm/types').DbContext & { connection: number } } | null}
+   */
+  static getStatsHandle(preferredConnection = null) {
     const dbManager = state.db
     if (!dbManager) return null
     const { connections } = dbManager
-    if (!Array.isArray(dbManager.models?.Spawnpoint)) {
+    if (!connections?.length) return null
+
+    const spawnSources = dbManager.models?.Spawnpoint
+    if (Array.isArray(spawnSources) && spawnSources.length) {
+      let candidate = null
+
       if (typeof preferredConnection === 'number') {
-        return connections?.[preferredConnection] ?? null
+        candidate = spawnSources.find(
+          (source) =>
+            source.connection === preferredConnection &&
+            source.hasPokemonShinyStats &&
+            connections?.[source.connection],
+        )
+      }
+
+      if (!candidate) {
+        candidate = spawnSources.find(
+          (source) =>
+            source.hasPokemonShinyStats && connections?.[source.connection],
+        )
+      }
+
+      if (!candidate && typeof preferredConnection === 'number') {
+        candidate = spawnSources.find(
+          (source) =>
+            source.connection === preferredConnection &&
+            connections?.[source.connection],
+        )
+      }
+
+      if (!candidate) {
+        candidate = spawnSources.find(
+          (source) => connections?.[source.connection],
+        )
+      }
+
+      if (candidate) {
+        const knexInstance = connections?.[candidate.connection]
+        if (knexInstance) {
+          return { knex: knexInstance, source: candidate }
+        }
       }
       return null
     }
-    const spawnSources = dbManager.models.Spawnpoint
+
     if (typeof preferredConnection === 'number') {
-      const direct = spawnSources.find(
-        ({ connection }) => connection === preferredConnection,
-      )
-      if (direct) {
-        return connections?.[direct.connection] ?? null
+      const knexInstance = connections?.[preferredConnection]
+      if (knexInstance) {
+        return { knex: knexInstance }
       }
-    }
-    const fallback = spawnSources.find(
-      ({ connection }) => connections?.[connection],
-    )
-    if (fallback) {
-      return connections?.[fallback.connection] ?? null
-    }
-    if (typeof preferredConnection === 'number') {
-      return connections?.[preferredConnection] ?? null
     }
     return null
   }
@@ -477,7 +512,17 @@ class Pokemon extends Model {
    * @returns {boolean}
    */
   static supportsShinyStats(ctx) {
-    return Boolean(this.getStatsKnex(ctx.connection) || !ctx.mem)
+    const statsHandle = this.getStatsHandle(ctx?.connection)
+    if (!statsHandle?.knex) {
+      return false
+    }
+    const flag =
+      typeof statsHandle.source?.hasPokemonShinyStats === 'boolean'
+        ? statsHandle.source.hasPokemonShinyStats
+        : typeof ctx?.hasPokemonShinyStats === 'boolean'
+          ? ctx.hasPokemonShinyStats
+          : false
+    return flag
   }
 
   /**
@@ -495,7 +540,8 @@ class Pokemon extends Model {
 
     let knexInstance = statsKnex || null
     if (!knexInstance) {
-      knexInstance = this.getStatsKnex(preferredConnection)
+      const statsHandle = this.getStatsHandle(preferredConnection)
+      knexInstance = statsHandle?.knex ?? null
     }
     if (!knexInstance) {
       try {
@@ -707,7 +753,17 @@ class Pokemon extends Model {
    * @returns {Promise<import("@rm/types").PokemonShinyStats | null>}
    */
   static async getShinyStats(_perms, args, ctx) {
-    if (!this.supportsShinyStats(ctx)) {
+    const statsHandle = this.getStatsHandle(ctx?.connection)
+    if (!statsHandle?.knex) {
+      return null
+    }
+    const hasStats =
+      typeof statsHandle.source?.hasPokemonShinyStats === 'boolean'
+        ? statsHandle.source.hasPokemonShinyStats
+        : typeof ctx?.hasPokemonShinyStats === 'boolean'
+          ? ctx.hasPokemonShinyStats
+          : false
+    if (!hasStats) {
       return null
     }
     const pokemonId = Number.parseInt(`${args.pokemon_id}`, 10)
@@ -719,12 +775,17 @@ class Pokemon extends Model {
     try {
       const stats = await this.fetchShinyStats(
         [key],
-        this.getStatsKnex(ctx.connection),
-        ctx.connection,
+        statsHandle.knex,
+        statsHandle.source?.connection ?? ctx.connection,
       )
       return stats.get(key) || null
     } catch (e) {
       log.error(TAGS.pokemon, 'Failed to fetch shiny stats', e)
+      if (statsHandle.source && e?.code === 'ER_NO_SUCH_TABLE') {
+        statsHandle.source.hasPokemonShinyStats = false
+      } else if (ctx && e?.code === 'ER_NO_SUCH_TABLE') {
+        ctx.hasPokemonShinyStats = false
+      }
       return null
     }
   }
