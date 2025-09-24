@@ -1,3 +1,10 @@
+# [1.39.0-develop.7](https://github.com/WatWowMap/ReactMap/compare/v1.39.0-develop.6...v1.39.0-develop.7) (2025-09-24)
+
+
+### Features
+
+* estimated shiny probability for pokemon ([#1133](https://github.com/WatWowMap/ReactMap/issues/1133)) ([d44a3df](https://github.com/WatWowMap/ReactMap/commit/d44a3df6834e3752a129a2fa5706526076cd9144))
+
 # [1.39.0-develop.6](https://github.com/WatWowMap/ReactMap/compare/v1.39.0-develop.5...v1.39.0-develop.6) (2025-09-23)
 
 
