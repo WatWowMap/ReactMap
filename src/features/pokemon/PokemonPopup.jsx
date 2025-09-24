@@ -1,5 +1,6 @@
 // @ts-check
 import * as React from 'react'
+import { useLazyQuery } from '@apollo/client'
 import ExpandMore from '@mui/icons-material/ExpandMore'
 import MoreVert from '@mui/icons-material/MoreVert'
 import Grid from '@mui/material/Unstable_Grid2'
@@ -27,6 +28,7 @@ import { useAnalytics } from '@hooks/useAnalytics'
 import { getTimeUntil } from '@utils/getTimeUntil'
 import { StatusIcon } from '@components/StatusIcon'
 import { readableProbability } from '@utils/readableProbability'
+import { GET_POKEMON_SHINY_STATS } from '@services/queries/pokemon'
 
 const rowClass = { width: 30, fontWeight: 'bold' }
 
@@ -73,6 +75,67 @@ export function PokemonPopup({ pokemon, iconUrl, isTutorial = false }) {
 
   const hasLeagues = cleanPvp ? Object.keys(cleanPvp) : []
   const hasStats = iv || cp
+
+  const supportsShinyStats = useMemory(
+    (s) => s.featureFlags.supportsShinyStats,
+  )
+  const shinyKey = React.useMemo(
+    () => `${pokemon.pokemon_id}-${pokemon.form ?? 0}`,
+    [pokemon.pokemon_id, pokemon.form],
+  )
+  const [shinyStats, setShinyStats] = React.useState(null)
+  const pendingShinyKey = React.useRef(null)
+  const [loadShinyStats] = useLazyQuery(GET_POKEMON_SHINY_STATS)
+
+  React.useEffect(() => {
+    setShinyStats(null)
+    pendingShinyKey.current = null
+  }, [shinyKey])
+
+  React.useEffect(() => {
+    if (!supportsShinyStats) {
+      setShinyStats(null)
+      pendingShinyKey.current = null
+    }
+  }, [supportsShinyStats])
+
+  React.useEffect(() => {
+    if (!supportsShinyStats) {
+      pendingShinyKey.current = null
+      return
+    }
+    if (shinyStats || !pokemon.pokemon_id) {
+      return
+    }
+    if (pendingShinyKey.current === shinyKey) {
+      return
+    }
+    let isActive = true
+    pendingShinyKey.current = shinyKey
+    loadShinyStats({
+      variables: {
+        pokemonId: pokemon.pokemon_id,
+        form: pokemon.form ?? 0,
+      },
+      fetchPolicy: 'cache-first',
+    })
+      .then(({ data }) => {
+        if (!isActive || pendingShinyKey.current !== shinyKey) {
+          return
+        }
+        if (data?.pokemonShinyStats) {
+          setShinyStats(data.pokemonShinyStats)
+        }
+      })
+      .catch(() => {
+        if (isActive && pendingShinyKey.current === shinyKey) {
+          pendingShinyKey.current = null
+        }
+      })
+    return () => {
+      isActive = false
+    }
+  }, [supportsShinyStats, shinyStats, shinyKey, loadShinyStats, pokemon.pokemon_id, pokemon.form])
 
   useAnalytics(
     'Popup',
@@ -124,7 +187,7 @@ export function PokemonPopup({ pokemon, iconUrl, isTutorial = false }) {
           timeOfDay={timeOfDay}
           t={t}
         />
-        <ShinyOdds shinyStats={pokemon.shiny_stats} t={t} />
+        <ShinyOdds shinyStats={shinyStats} t={t} />
         <Footer
           pokemon={pokemon}
           popups={popups}

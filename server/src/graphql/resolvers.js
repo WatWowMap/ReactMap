@@ -24,6 +24,14 @@ const resolvers = {
   JSON: GraphQLJSON,
   Query: {
     available: (_, _args, { Event, Db, perms }) => {
+      const supportsShinyStats = Array.isArray(Db.models?.Pokemon)
+        ? Db.models.Pokemon.some(({ SubModel, ...ctx }) =>
+            typeof SubModel.supportsShinyStats === 'function'
+              ? SubModel.supportsShinyStats(ctx)
+              : false,
+          )
+        : false
+
       const data = {
         questConditions: perms.quests ? Db.questConditions : {},
         masterfile: { ...Event.masterfile, invasions: Event.invasions },
@@ -36,6 +44,7 @@ const resolvers = {
           ...config.getSafe('icons'),
           styles: Event.uicons,
         },
+        supportsShinyStats,
       }
       return data
     },
@@ -268,6 +277,23 @@ const resolvers = {
         return Db.getOne('Pokemon', args.id)
       }
       return {}
+    },
+    pokemonShinyStats: async (_, args, { perms, Db }) => {
+      if (!perms?.pokemon) {
+        return null
+      }
+      const sources = Db.models?.Pokemon
+      if (!Array.isArray(sources)) {
+        return null
+      }
+      const results = await Promise.all(
+        sources.map(({ SubModel, ...ctx }) =>
+          typeof SubModel.getShinyStats === 'function'
+            ? SubModel.getShinyStats(perms, args, ctx)
+            : Promise.resolve(null),
+        ),
+      )
+      return results.find(Boolean) || null
     },
     portals: (_, args, { perms, Db }) => {
       if (perms?.portals) {

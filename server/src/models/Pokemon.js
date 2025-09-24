@@ -124,17 +124,7 @@ class Pokemon extends Model {
   static async getAll(perms, args, ctx) {
     const { iv: ivs, pvp, areaRestrictions } = perms
     const { onlyIvOr, onlyHundoIv, onlyZeroIv, onlyAreas = [] } = args.filters
-    const {
-      hasSize,
-      hasHeight,
-      isMad,
-      mem,
-      secret,
-      httpAuth,
-      pvpV2,
-      connection,
-    } = ctx
-    const statsKnex = this.getStatsKnex(connection)
+    const { hasSize, hasHeight, isMad, mem, secret, httpAuth, pvpV2 } = ctx
     const { filterMap, globalFilter } = this.getFilters(perms, args, ctx)
 
     let queryPvp = config
@@ -391,32 +381,6 @@ class Pokemon extends Model {
       }
     }
 
-    if (finalResults.length && (statsKnex || !mem)) {
-      const shinyKeys = [
-        ...new Set(
-          finalResults.map(
-            (result) => `${result.pokemon_id}-${result.form ?? 0}`,
-          ),
-        ),
-      ]
-      try {
-        const shinyStats = await this.fetchShinyStats(
-          shinyKeys,
-          statsKnex,
-          connection,
-        )
-        finalResults.forEach((result) => {
-          const key = `${result.pokemon_id}-${result.form ?? 0}`
-          const stats = shinyStats.get(key)
-          if (stats) {
-            result.shiny_stats = stats
-          }
-        })
-      } catch (e) {
-        log.error(TAGS.pokemon, 'Failed to fetch shiny stats', e)
-      }
-    }
-
     return finalResults
   }
 
@@ -506,6 +470,14 @@ class Pokemon extends Model {
       return connections?.[preferredConnection] ?? null
     }
     return null
+  }
+
+  /**
+   * @param {import("@rm/types").DbContext} ctx
+   * @returns {boolean}
+   */
+  static supportsShinyStats(ctx) {
+    return Boolean(this.getStatsKnex(ctx.connection) || !ctx.mem)
   }
 
   /**
@@ -630,8 +602,7 @@ class Pokemon extends Model {
    * @returns {Promise<Partial<import("@rm/types").Pokemon>[]>}
    */
   static async getLegacy(perms, args, ctx) {
-    const { isMad, hasSize, hasHeight, mem, secret, httpAuth, connection } = ctx
-    const statsKnex = this.getStatsKnex(connection)
+    const { isMad, hasSize, hasHeight, mem, secret, httpAuth } = ctx
     const ts = Math.floor(Date.now() / 1000)
     const { filterMap, globalFilter } = this.getFilters(perms, args, ctx)
     const queryLimits = config.getSafe('api.queryLimits')
@@ -726,31 +697,36 @@ class Pokemon extends Model {
         return filter.valid(pkmn)
       })
 
-    if (built.length && (statsKnex || !mem)) {
-      const shinyKeys = [
-        ...new Set(
-          built.map((result) => `${result.pokemon_id}-${result.form ?? 0}`),
-        ),
-      ]
-      try {
-        const shinyStats = await this.fetchShinyStats(
-          shinyKeys,
-          statsKnex,
-          connection,
-        )
-        built.forEach((result) => {
-          const key = `${result.pokemon_id}-${result.form ?? 0}`
-          const stats = shinyStats.get(key)
-          if (stats) {
-            result.shiny_stats = stats
-          }
-        })
-      } catch (e) {
-        log.error(TAGS.pokemon, 'Failed to fetch shiny stats', e)
-      }
-    }
-
     return built
+  }
+
+  /**
+   * @param {import("@rm/types").Permissions} _perms
+   * @param {{ pokemon_id: number, form?: number | null }} args
+   * @param {import("@rm/types").DbContext} ctx
+   * @returns {Promise<import("@rm/types").PokemonShinyStats | null>}
+   */
+  static async getShinyStats(_perms, args, ctx) {
+    if (!this.supportsShinyStats(ctx)) {
+      return null
+    }
+    const pokemonId = Number.parseInt(`${args.pokemon_id}`, 10)
+    if (Number.isNaN(pokemonId)) {
+      return null
+    }
+    const formId = Number.parseInt(`${args.form ?? 0}`, 10)
+    const key = `${pokemonId}-${Number.isNaN(formId) ? 0 : formId}`
+    try {
+      const stats = await this.fetchShinyStats(
+        [key],
+        this.getStatsKnex(ctx.connection),
+        ctx.connection,
+      )
+      return stats.get(key) || null
+    } catch (e) {
+      log.error(TAGS.pokemon, 'Failed to fetch shiny stats', e)
+      return null
+    }
   }
 
   /**

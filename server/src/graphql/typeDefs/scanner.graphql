@@ -189,7 +189,6 @@ type Pokemon {
   first_seen_timestamp: Int
   expire_timestamp_verified: Boolean
   updated: Int
-  shiny_stats: PokemonShinyStats
 }
 
 type Portal {
