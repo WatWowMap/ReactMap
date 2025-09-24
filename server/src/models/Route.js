@@ -38,7 +38,7 @@ class Route extends Model {
    * @param {import("@rm/types").DbContext} ctx
    * @returns {Promise<import("@rm/types").FullRoute[]>}
    */
-  static async getAll(perms, args, { isMad }) {
+  static async getAll(perms, args, { isMad, hasShortcode }) {
     const { areaRestrictions } = perms
     const { onlyAreas, onlyDistance } = args.filters
     const ts =
@@ -56,21 +56,31 @@ class Route extends Model {
       .whereBetween(startLatitude, [args.minLat, args.maxLat])
       .andWhereBetween(startLongitude, [args.minLon, args.maxLon])
       .andWhereBetween(distanceMeters, distanceInMeters)
-      .andWhere(
-        isMad ? raw('UNIX_TIMESTAMP(last_updated)') : 'updated',
-        '>',
-        ts,
-      )
+      .andWhere((builder) => {
+        builder.where(
+          isMad ? raw('UNIX_TIMESTAMP(last_updated)') : 'updated',
+          '>',
+          ts,
+        )
+        if (hasShortcode) {
+          builder.orWhere('shortcode', '<>', '')
+        }
+      })
       .union((qb) => {
         qb.select(isMad ? GET_MAD_ALL_SELECT : GET_ALL_SELECT)
           .whereBetween(endLatitude, [args.minLat, args.maxLat])
           .andWhereBetween(endLongitude, [args.minLon, args.maxLon])
           .andWhereBetween(distanceMeters, distanceInMeters)
-          .andWhere(
-            isMad ? raw('UNIX_TIMESTAMP(last_updated)') : 'updated',
-            '>',
-            ts,
-          )
+          .andWhere((builder) => {
+            builder.where(
+              isMad ? raw('UNIX_TIMESTAMP(last_updated)') : 'updated',
+              '>',
+              ts,
+            )
+            if (hasShortcode) {
+              builder.orWhere('shortcode', '<>', '')
+            }
+          })
           .from('route')
         getAreaSql(qb, areaRestrictions, onlyAreas, isMad, 'route_end')
       })
@@ -96,7 +106,7 @@ class Route extends Model {
    * @param {number} id
    * @param {import('@rm/types').DbContext} ctx
    */
-  static async getOne(id, { isMad }) {
+  static async getOne(id, { isMad, hasShortcode }) {
     /** @type {import('@rm/types').FullRoute} */
     const result = isMad
       ? await this.query()
@@ -121,6 +131,7 @@ class Route extends Model {
             type: 'type',
             version: 'version',
             waypoints: 'waypoints',
+            ...(hasShortcode && { shortcode: 'shortcode' }),
           })
           .select(raw('UNIX_TIMESTAMP(last_updated)').as('updated'))
           .findOne({ route_id: id })

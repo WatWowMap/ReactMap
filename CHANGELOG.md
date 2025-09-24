@@ -1,3 +1,67 @@
+# [1.39.0-develop.8](https://github.com/WatWowMap/ReactMap/compare/v1.39.0-develop.7...v1.39.0-develop.8) (2025-09-24)
+
+
+### Bug Fixes
+
+* ditto filtering ([2fe3af3](https://github.com/WatWowMap/ReactMap/commit/2fe3af358bd848810e8d63b3b7e442f70ad78da7))
+
+# [1.39.0-develop.7](https://github.com/WatWowMap/ReactMap/compare/v1.39.0-develop.6...v1.39.0-develop.7) (2025-09-24)
+
+
+### Features
+
+* estimated shiny probability for pokemon ([#1133](https://github.com/WatWowMap/ReactMap/issues/1133)) ([d44a3df](https://github.com/WatWowMap/ReactMap/commit/d44a3df6834e3752a129a2fa5706526076cd9144))
+
+# [1.39.0-develop.6](https://github.com/WatWowMap/ReactMap/compare/v1.39.0-develop.5...v1.39.0-develop.6) (2025-09-23)
+
+
+### Bug Fixes
+
+* translation ([5a02a6b](https://github.com/WatWowMap/ReactMap/commit/5a02a6b81ca3c559dd2fea41a0b4c5a382560ed1))
+
+# [1.39.0-develop.5](https://github.com/WatWowMap/ReactMap/compare/v1.39.0-develop.4...v1.39.0-develop.5) (2025-09-23)
+
+
+### Bug Fixes
+
+* localization ([f02e8cd](https://github.com/WatWowMap/ReactMap/commit/f02e8cd927d76c9191e7fe6ea909f6eec9a4a729))
+* refinements to interaction between gyms/stops and routes ([8c0ba37](https://github.com/WatWowMap/ReactMap/commit/8c0ba372db29e53f2b74215494a8b170feab192a))
+
+# [1.39.0-develop.4](https://github.com/WatWowMap/ReactMap/compare/v1.39.0-develop.3...v1.39.0-develop.4) (2025-09-23)
+
+
+### Features
+
+* Compact Route View ([#1131](https://github.com/WatWowMap/ReactMap/issues/1131)) ([795976e](https://github.com/WatWowMap/ReactMap/commit/795976e2ea9f68ba54ad5495bbf81af2716b4920))
+
+# [1.39.0-develop.3](https://github.com/WatWowMap/ReactMap/compare/v1.39.0-develop.2...v1.39.0-develop.3) (2025-09-22)
+
+
+### Features
+
+* display actual battle bonus via stationed pokemon ([ba51f47](https://github.com/WatWowMap/ReactMap/commit/ba51f47d6c90dc659427148d4cc025ed6bc89950))
+
+# [1.39.0-develop.2](https://github.com/WatWowMap/ReactMap/compare/v1.39.0-develop.1...v1.39.0-develop.2) (2025-09-16)
+
+
+### Bug Fixes
+
+* skip updated filtering if shortcode is present ([b0cfe13](https://github.com/WatWowMap/ReactMap/commit/b0cfe13876b9d81e70ce44c997f4accb48943609))
+
+# [1.39.0-develop.1](https://github.com/WatWowMap/ReactMap/compare/v1.38.1-develop.1...v1.39.0-develop.1) (2025-09-16)
+
+
+### Features
+
+* route share code ([4ac76d0](https://github.com/WatWowMap/ReactMap/commit/4ac76d00d53eb06966a94a525541302340b638de))
+
+## [1.38.1-develop.1](https://github.com/WatWowMap/ReactMap/compare/v1.38.0...v1.38.1-develop.1) (2025-09-15)
+
+
+### Bug Fixes
+
+* relative timer not updating ([72b0a8c](https://github.com/WatWowMap/ReactMap/commit/72b0a8cfb3fab2ce897b02e8517bb9c324d0cc80))
+
 # [1.38.0](https://github.com/WatWowMap/ReactMap/compare/v1.37.0...v1.38.0) (2025-09-10)
 
 

@@ -181,6 +181,16 @@ class DbManager extends Logger {
     const [polygon] = await schema('nests')
       .columnInfo()
       .then((columns) => ['polygon' in columns])
+    const [hasShortcode] = await schema('route')
+      .columnInfo()
+      .then((columns) => ['shortcode' in columns])
+
+    let hasPokemonShinyStats
+    try {
+      hasPokemonShinyStats = await schema.schema.hasTable('pokemon_shiny_stats')
+    } catch (e) {
+      hasPokemonShinyStats = false
+    }
 
     return {
       isMad,
@@ -203,6 +213,8 @@ class DbManager extends Logger {
       hasShowcaseForm,
       hasShowcaseType,
       hasStationedGmax,
+      hasShortcode,
+      hasPokemonShinyStats,
     }
   }
 
@@ -223,6 +235,7 @@ class DbManager extends Logger {
                 // Add support for HTTP authentication
                 httpAuth: this.endpoints[i].httpAuth,
                 pvpV2: true,
+                hasPokemonShinyStats: false,
               }
 
           Object.entries(this.models).forEach(([category, sources]) => {

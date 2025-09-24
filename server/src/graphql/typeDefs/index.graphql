@@ -50,6 +50,7 @@ type Query {
     filters: JSON
   ): [Pokemon]
   pokemonSingle(id: ID, perm: String): Pokemon
+  pokemonShinyStats(pokemon_id: Int!, form: Int): PokemonShinyStats
   portals(
     minLat: Float
     maxLat: Float

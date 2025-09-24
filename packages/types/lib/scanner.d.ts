@@ -41,6 +41,12 @@ export interface PokemonDisplay {
   location_card: number
 }
 
+export interface PokemonShinyStats {
+  shiny_seen: number
+  encounters_seen: number
+  since_date?: string
+}
+
 export interface Defender extends PokemonDisplay {
   pokemon_id: number
   deployed_ms: number
@@ -223,7 +229,6 @@ export interface Pokemon {
   costume: number
   gender: Gender
   display_pokemon_id: number
-  ditto_form: number
   weight: number
   height: number
   size: number

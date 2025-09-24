@@ -8,7 +8,6 @@ export const tutorialData = /** @type {const} */ ({
     gender: 1,
     expire_timestamp_verified: 1,
     display_pokemon_id: null,
-    ditto_form: null,
     iv: 62.22,
     cp: 111,
     level: 7,

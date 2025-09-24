@@ -6,6 +6,7 @@ import { Marker, Popup, Circle } from 'react-leaflet'
 import { useMarkerTimer } from '@hooks/useMarkerTimer'
 import { basicEqualFn, useMemory } from '@store/useMemory'
 import { useStorage } from '@store/useStorage'
+import { useRouteStore, resolveRoutePoiKey } from '@features/route'
 import { useForcePopup } from '@hooks/useForcePopup'
 import { TooltipWrapper } from '@components/ToolTipWrapper'
 
@@ -20,6 +21,19 @@ import { usePokestopMarker } from './usePokestopMarker'
 const BasePokestopTile = (pokestop) => {
   const [stateChange, setStateChange] = React.useState(false)
   const [markerRef, setMarkerRef] = React.useState(null)
+  const hasRoutes = useRouteStore(
+    React.useCallback(
+      (state) =>
+        !!resolveRoutePoiKey(
+          state.poiIndex,
+          pokestop.id,
+          pokestop.lat,
+          pokestop.lon,
+        ),
+      [pokestop.id, pokestop.lat, pokestop.lon],
+    ),
+  )
+  const selectPoi = useRouteStore((s) => s.selectPoi)
 
   const [
     hasLure,
@@ -130,6 +144,13 @@ const BasePokestopTile = (pokestop) => {
       ref={setMarkerRef}
       position={[pokestop.lat, pokestop.lon]}
       icon={icon}
+      eventHandlers={{
+        click: () => {
+          if (hasRoutes) {
+            selectPoi(pokestop.id, pokestop.lat, pokestop.lon)
+          }
+        },
+      }}
     >
       <Popup position={[pokestop.lat, pokestop.lon]}>
         <PokestopPopup

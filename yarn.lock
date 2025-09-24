@@ -6313,12 +6313,27 @@ latest-version@^2.0.0:
   dependencies:
     package-json "^2.0.0"
 
+leaflet-arrowheads@^1.4.0:
+  version "1.4.0"
+  resolved "https://registry.yarnpkg.com/leaflet-arrowheads/-/leaflet-arrowheads-1.4.0.tgz#2a92711c4ca89e6a63014f552cc0d6c67653a773"
+  integrity sha512-aIjsmoWe1VJXaGOpKpS6E8EzN2vpx3GGCNP/FxQteLVzAg5xMID7elf9hj/1CWLJo8FuGRjSvKkUQDj7mocrYA==
+  dependencies:
+    leaflet "^1.7.1"
+    leaflet-geometryutil "^0.10.0"
+
+leaflet-geometryutil@^0.10.0:
+  version "0.10.3"
+  resolved "https://registry.yarnpkg.com/leaflet-geometryutil/-/leaflet-geometryutil-0.10.3.tgz#dda78546abc58723a46b47fd6ffb081f5b63cec4"
+  integrity sha512-Qeas+KsnenE0Km/ydt8km3AqFe7kJhVwuLdbCYM2xe2epsxv5UFEaVJiagvP9fnxS8QvBNbm7DJlDA0tkKo9VA==
+  dependencies:
+    leaflet "^1.6.0"
+
 leaflet.locatecontrol@0.81.0:
   version "0.81.0"
   resolved "https://registry.yarnpkg.com/leaflet.locatecontrol/-/leaflet.locatecontrol-0.81.0.tgz#75e92d07c19edade910a2b5a177ac24cef7d10e7"
   integrity sha512-5Dqj6VXVFl1vPquYZW95hQYegvzqSI4eLIpZrBMuHuyoAo5i9y6js3z02TF//XXZByIyTI/XBtlxlZLUM08Pcg==
 
-leaflet@1.9.4:
+leaflet@1.9.4, leaflet@^1.6.0, leaflet@^1.7.1:
   version "1.9.4"
   resolved "https://registry.yarnpkg.com/leaflet/-/leaflet-1.9.4.tgz#23fae724e282fa25745aff82ca4d394748db7d8d"
   integrity sha512-nxS1ynzJOmOlHp+iL3FyWqK89GtNL8U8rvlMOsQdTTssxZwCXh8N2NB3GDQOL+YR3XnWyZAxwQixURb+FA74PA==
@@ -10020,20 +10035,6 @@ vite-plugin-checker@0.7.2:
     vscode-languageserver "^7.0.0"
     vscode-languageserver-textdocument "^1.0.1"
     vscode-uri "^3.0.2"
-
-vite@^6.2.6:
-  version "6.3.5"
-  resolved "https://registry.yarnpkg.com/vite/-/vite-6.3.5.tgz#fec73879013c9c0128c8d284504c6d19410d12a3"
-  integrity sha512-cZn6NDFE7wdTpINgs++ZJ4N49W2vRp8LCKrn3Ob1kYNtOo21vfDoaV5GzBfLU4MovSAB8uNRm4jgzVQZ+mBzPQ==
-  dependencies:
-    esbuild "^0.25.0"
-    fdir "^6.4.4"
-    picomatch "^4.0.2"
-    postcss "^8.5.3"
-    rollup "^4.34.9"
-    tinyglobby "^0.2.13"
-  optionalDependencies:
-    fsevents "~2.3.3"
 
 vite@^6.3.6:
   version "6.3.6"
