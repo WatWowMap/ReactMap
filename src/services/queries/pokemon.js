@@ -16,7 +16,6 @@ const core = gql`
     expire_timestamp_verified
     updated
     display_pokemon_id
-    ditto_form
     seen_type
   }
 `

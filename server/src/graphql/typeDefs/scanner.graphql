@@ -165,7 +165,6 @@ type Pokemon {
   costume: Int
   gender: Int
   display_pokemon_id: Int
-  ditto_form: Int
   weight: Float
   height: Float
   size: Float

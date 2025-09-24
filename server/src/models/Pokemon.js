@@ -57,7 +57,6 @@ class Pokemon extends Model {
         'pokemon.gender',
         'pokemon.costume',
         'pokemon_display.pokemon AS display_pokemon_id',
-        'pokemon_display.form AS ditto_form',
         'weather_boosted_condition AS weather',
         raw('IF(calc_endminsec IS NOT NULL, 1, NULL)').as(
           'expire_timestamp_verified',

@@ -229,7 +229,7 @@ const Header = ({
   const filters = useStorage((s) => s.filters)
 
   const [anchorEl, setAnchorEl] = React.useState(null)
-  const { id, pokemon_id, form, ditto_form, display_pokemon_id } = pokemon
+  const { id, pokemon_id, form, display_pokemon_id } = pokemon
 
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget)
@@ -295,7 +295,7 @@ const Header = ({
         <Typography variant={pokeName.length > 8 ? 'h6' : 'h5'}>
           {pokeName}
         </Typography>
-        {ditto_form !== null && display_pokemon_id ? (
+        {pokemon_id === 132 && display_pokemon_id ? (
           <Typography variant="caption">
             ({t(`poke_${display_pokemon_id}`)})
           </Typography>
