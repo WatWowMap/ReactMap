@@ -46,6 +46,8 @@ export interface DbContext {
   hasShowcaseForm: boolean
   hasShowcaseType: boolean
   hasStationedGmax: boolean
+  hasPokemonShinyStats?: boolean
+  connection?: number
 }
 
 export interface ExpressUser extends User {

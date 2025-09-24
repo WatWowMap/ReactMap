@@ -121,6 +121,9 @@ export const useMemory = create(() => ({
   menuFilters: {},
   userSettings: undefined,
   settings: undefined,
+  featureFlags: {
+    supportsShinyStats: false,
+  },
   available: {
     gyms: [],
     pokemon: [],

@@ -148,6 +148,12 @@ type Pokestop {
   hasShowcase: Boolean
 }
 
+type PokemonShinyStats {
+  shiny_seen: Int
+  encounters_seen: Int
+  since_date: String
+}
+
 type Pokemon {
   id: ID
   encounter_id: Int

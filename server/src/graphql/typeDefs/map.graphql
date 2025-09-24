@@ -4,6 +4,7 @@ type MapData {
   questConditions: JSON
   icons: JSON
   audio: JSON
+  supportsShinyStats: Boolean
 }
 
 type Badge {

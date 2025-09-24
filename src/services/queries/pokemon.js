@@ -137,6 +137,16 @@ export const GET_IVS_PVP = gql`
   }
 `
 
+export const GET_POKEMON_SHINY_STATS = gql`
+  query PokemonShinyStats($pokemonId: Int!, $form: Int) {
+    pokemonShinyStats(pokemon_id: $pokemonId, form: $form) {
+      shiny_seen
+      encounters_seen
+      since_date
+    }
+  }
+`
+
 export const GET_ONE_POKEMON = gql`
   query GetOnePokemon($id: ID!, $perm: String!) {
     pokemonSingle(id: $id, perm: $perm) {
