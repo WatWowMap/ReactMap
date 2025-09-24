@@ -1,3 +1,10 @@
+# [1.39.0-develop.8](https://github.com/WatWowMap/ReactMap/compare/v1.39.0-develop.7...v1.39.0-develop.8) (2025-09-24)
+
+
+### Bug Fixes
+
+* ditto filtering ([2fe3af3](https://github.com/WatWowMap/ReactMap/commit/2fe3af358bd848810e8d63b3b7e442f70ad78da7))
+
 # [1.39.0-develop.7](https://github.com/WatWowMap/ReactMap/compare/v1.39.0-develop.6...v1.39.0-develop.7) (2025-09-24)
 
 
