@@ -83,6 +83,7 @@ class Gym extends Model {
       onlyGymBadges,
       onlyBadge,
       onlyAreas = [],
+      onlyManualId,
     } = args.filters
     const ts = Math.floor(Date.now() / 1000)
     const query = this.query()
@@ -130,9 +131,27 @@ class Gym extends Model {
     } else if (hideOldGyms) {
       query.where('updated', '>', ts - gymValidDataLimit * 86400)
     }
-    query
-      .whereBetween(isMad ? 'latitude' : 'lat', [args.minLat, args.maxLat])
-      .andWhereBetween(isMad ? 'longitude' : 'lon', [args.minLon, args.maxLon])
+    const latCol = isMad ? 'latitude' : 'lat'
+    const lonCol = isMad ? 'longitude' : 'lon'
+    const idCol = isMad ? 'gym.gym_id' : 'id'
+    const manualIds = Array.isArray(onlyManualId)
+      ? onlyManualId.filter(Boolean)
+      : onlyManualId || onlyManualId === 0
+        ? [onlyManualId]
+        : []
+
+    if (manualIds.length) {
+      query.where((builder) => {
+        builder
+          .whereBetween(latCol, [args.minLat, args.maxLat])
+          .andWhereBetween(lonCol, [args.minLon, args.maxLon])
+          .orWhereIn(idCol, manualIds)
+      })
+    } else {
+      query
+        .whereBetween(latCol, [args.minLat, args.maxLat])
+        .andWhereBetween(lonCol, [args.minLon, args.maxLon])
+    }
     Gym.onlyValid(query, isMad)
 
     const raidBosses = new Set()
