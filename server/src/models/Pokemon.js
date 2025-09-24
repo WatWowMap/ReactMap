@@ -23,6 +23,11 @@ const {
 const { PkmnBackend } = require('../filters/pokemon/Backend')
 const { state } = require('../services/state')
 
+const DITTO_ID = 132
+
+const getPokemonFilterKey = (pokemonId, form) =>
+  pokemonId === DITTO_ID ? `${DITTO_ID}-0` : `${pokemonId}-${form}`
+
 class Pokemon extends Model {
   static get tableName() {
     return 'pokemon'
@@ -296,8 +301,7 @@ class Pokemon extends Model {
     // form checker
     for (let i = 0; i < results.length; i += 1) {
       const pkmn = results[i]
-      const id =
-        pkmn.pokemon_id === 132 ? '132-0' : `${pkmn.pokemon_id}-${pkmn.form}`
+      const id = getPokemonFilterKey(pkmn.pokemon_id, pkmn.form)
       const filter = filterMap[id] || globalFilter
       let noPvp = true
 
@@ -374,7 +378,8 @@ class Pokemon extends Model {
     for (let i = 0; i < pvpResults.length; i += 1) {
       const pkmn = pvpResults[i]
       const filter =
-        filterMap[`${pkmn.pokemon_id}-${pkmn.form}`] || globalFilter
+        filterMap[getPokemonFilterKey(pkmn.pokemon_id, pkmn.form)] ||
+        globalFilter
       const result = filter.build(pkmn)
       if (filter.valid(result)) {
         finalResults.push(result)
@@ -726,20 +731,14 @@ class Pokemon extends Model {
     const built = filtered
       .map((item) => {
         const filter =
-          filterMap[
-            item.pokemon_id === 132
-              ? '132-0'
-              : `${item.pokemon_id}-${item.form}`
-          ] || globalFilter
+          filterMap[getPokemonFilterKey(item.pokemon_id, item.form)] ||
+          globalFilter
         return filter.build(item)
       })
       .filter((pkmn) => {
         const filter =
-          filterMap[
-            pkmn.pokemon_id === 132
-              ? '132-0'
-              : `${pkmn.pokemon_id}-${pkmn.form}`
-          ] || globalFilter
+          filterMap[getPokemonFilterKey(pkmn.pokemon_id, pkmn.form)] ||
+          globalFilter
         return filter.valid(pkmn)
       })
 
@@ -816,7 +815,7 @@ class Pokemon extends Model {
       httpAuth,
     )
     available.forEach((pkmn) => {
-      if (pkmn.id === 132) pkmn.form = 0
+      if (pkmn.id === DITTO_ID) pkmn.form = 0
     })
     return {
       available: available.map((pkmn) => `${pkmn.id}-${pkmn.form}`),
