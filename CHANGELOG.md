@@ -1,3 +1,10 @@
+# [1.40.0-develop.2](https://github.com/WatWowMap/ReactMap/compare/v1.40.0-develop.1...v1.40.0-develop.2) (2025-09-25)
+
+
+### Bug Fixes
+
+* stationed pokemon maxHeight ([5c46dbd](https://github.com/WatWowMap/ReactMap/commit/5c46dbde0f5cbda6bab6a33616676f38aea54c6a)), closes [#1078](https://github.com/WatWowMap/ReactMap/issues/1078)
+
 # [1.40.0-develop.1](https://github.com/WatWowMap/ReactMap/compare/v1.39.0...v1.40.0-develop.1) (2025-09-25)
 
 
