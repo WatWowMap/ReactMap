@@ -6,6 +6,7 @@ import 'leaflet-arrowheads'
 import { darken } from '@mui/material/styles'
 
 import { useForcePopup } from '@hooks/useForcePopup'
+import { useManualPopupTracker } from '@hooks/useManualPopupTracker'
 
 import { routeMarker } from './routeMarker'
 import { ROUTE_MARKER_PANE } from './constants'
@@ -105,6 +106,7 @@ const BaseRouteTile = ({ route, orientation = 'forward' }) => {
     },
   })
   useForcePopup(displayRoute.id, markerRef)
+  const handleRoutePopupOpen = useManualPopupTracker('routes', displayRoute.id)
 
   React.useEffect(() => {
     setLinePopup(null)
@@ -194,7 +196,10 @@ const BaseRouteTile = ({ route, orientation = 'forward' }) => {
           }
           pane={ROUTE_MARKER_PANE}
           eventHandlers={{
-            popupopen: () => setClicked(true),
+            popupopen: () => {
+              setClicked(true)
+              handleRoutePopupOpen()
+            },
             popupclose: () => setClicked(false),
             mouseover: () => {
               if (lineRef.current) {
@@ -280,6 +285,7 @@ const BaseRouteTile = ({ route, orientation = 'forward' }) => {
           eventHandlers={{
             remove: () => setLinePopup(null),
             close: () => setLinePopup(null),
+            popupopen: handleRoutePopupOpen,
           }}
         >
           <RoutePopup inline {...displayRoute} waypoints={waypoints} />

@@ -11,6 +11,7 @@ import { basicEqualFn, useMemory } from '@store/useMemory'
 import { useStorage } from '@store/useStorage'
 import { useOpacity } from '@hooks/useOpacity'
 import { useForcePopup } from '@hooks/useForcePopup'
+import { useManualPopupTracker } from '@hooks/useManualPopupTracker'
 import { sendNotification } from '@services/desktopNotification'
 import { useMapStore } from '@store/useMapStore'
 import { TooltipWrapper } from '@components/ToolTipWrapper'
@@ -138,6 +139,7 @@ const BasePokemonTile = (pkmn) => {
 
   useForcePopup(pkmn.id, markerRef)
   useMarkerTimer(pkmn.expire_timestamp, markerRef)
+  const handlePopupOpen = useManualPopupTracker('pokemon', pkmn.id)
   sendNotification(
     pkmn.id,
     `${t(`poke_${pkmn.pokemon_id}`)}${
@@ -188,6 +190,7 @@ const BasePokemonTile = (pkmn) => {
             })
           : basicPokemonMarker({ iconUrl, iconSize })
       }
+      eventHandlers={{ popupopen: handlePopupOpen }}
     >
       <Popup position={finalLocation}>
         <PokemonPopup pokemon={pkmn} iconUrl={iconUrl} />

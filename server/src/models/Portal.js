@@ -3,6 +3,7 @@ const { Model } = require('objection')
 const config = require('@rm/config')
 
 const { getAreaSql } = require('../utils/getAreaSql')
+const { applyManualIdFilter, parseManualIds } = require('../utils/manualFilter')
 
 class Portal extends Model {
   static get tableName() {
@@ -28,14 +29,20 @@ class Portal extends Model {
       maxLat,
       maxLon,
     } = args
+    const manualIds = parseManualIds(args.filters.onlyManualId)
     const query = this.query()
-      .whereBetween('lat', [minLat, maxLat])
-      .andWhereBetween('lon', [minLon, maxLon])
-      .andWhere(
-        'updated',
-        '>',
-        Date.now() / 1000 - portalUpdateLimit * 60 * 60 * 24,
-      )
+    applyManualIdFilter(query, {
+      manualIds,
+      latColumn: 'lat',
+      lonColumn: 'lon',
+      idColumn: 'id',
+      bounds: { minLat, maxLat, minLon, maxLon },
+    })
+    query.andWhere(
+      'updated',
+      '>',
+      Date.now() / 1000 - portalUpdateLimit * 60 * 60 * 24,
+    )
     if (!getAreaSql(query, areaRestrictions, onlyAreas)) {
       return []
     }

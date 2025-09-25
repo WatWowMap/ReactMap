@@ -14,6 +14,7 @@ import { GenerateCells } from '@features/s2cell'
 import { RouteLayer } from '@features/route'
 import { useAnalytics } from '@hooks/useAnalytics'
 import { useProcessError } from '@hooks/useProcessError'
+import { normalizeCategory } from '@utils/normalizeCategory'
 
 import { Clustering } from './Clustering'
 import { TILES } from '../tileObject'
@@ -34,19 +35,15 @@ const userSettingsCategory = (category) => {
   }
 }
 
-const normalizeCategory = (category) => {
-  if (!category) return ''
-  const lower = category.toLowerCase()
-  switch (lower) {
-    case 'raids':
-      return 'gyms'
-    case 'lures':
-    case 'invasions':
-      return 'pokestops'
-    default:
-      return lower
-  }
-}
+const MANUAL_ID_CATEGORIES = new Set([
+  'gyms',
+  'pokestops',
+  'pokemon',
+  'nests',
+  'portals',
+  'stations',
+  'routes',
+])
 
 /**
  * @template {keyof import('@rm/types').AllFilters} T
@@ -155,7 +152,7 @@ function QueryData({ category, timeout }) {
       category,
       onlyAreas,
     )
-    if (manualId && normalizedCategory === 'gyms') {
+    if (manualId && MANUAL_ID_CATEGORIES.has(normalizedCategory)) {
       trimmedFilters.onlyManualId = manualId
     }
     return {

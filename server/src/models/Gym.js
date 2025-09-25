@@ -9,6 +9,8 @@ const config = require('@rm/config')
 const { getAreaSql } = require('../utils/getAreaSql')
 const { state } = require('../services/state')
 
+const { applyManualIdFilter, parseManualIds } = require('../utils/manualFilter')
+
 const coreFields = [
   'id',
   'name',
@@ -134,24 +136,19 @@ class Gym extends Model {
     const latCol = isMad ? 'latitude' : 'lat'
     const lonCol = isMad ? 'longitude' : 'lon'
     const idCol = isMad ? 'gym.gym_id' : 'id'
-    const manualIds = Array.isArray(onlyManualId)
-      ? onlyManualId.filter(Boolean)
-      : onlyManualId || onlyManualId === 0
-        ? [onlyManualId]
-        : []
-
-    if (manualIds.length) {
-      query.where((builder) => {
-        builder
-          .whereBetween(latCol, [args.minLat, args.maxLat])
-          .andWhereBetween(lonCol, [args.minLon, args.maxLon])
-          .orWhereIn(idCol, manualIds)
-      })
-    } else {
-      query
-        .whereBetween(latCol, [args.minLat, args.maxLat])
-        .andWhereBetween(lonCol, [args.minLon, args.maxLon])
-    }
+    const manualIds = parseManualIds(onlyManualId)
+    applyManualIdFilter(query, {
+      manualIds,
+      latColumn: latCol,
+      lonColumn: lonCol,
+      idColumn: idCol,
+      bounds: {
+        minLat: args.minLat,
+        maxLat: args.maxLat,
+        minLon: args.minLon,
+        maxLon: args.maxLon,
+      },
+    })
     Gym.onlyValid(query, isMad)
 
     const raidBosses = new Set()

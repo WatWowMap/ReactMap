@@ -14,6 +14,7 @@ const config = require('@rm/config')
 const { getAreaSql } = require('../utils/getAreaSql')
 const { filterRTree } = require('../utils/filterRTree')
 const { fetchJson } = require('../utils/fetchJson')
+const { applyManualIdFilter, parseManualIds } = require('../utils/manualFilter')
 const {
   IV_CALC,
   LEVEL_CALC,
@@ -130,6 +131,7 @@ class Pokemon extends Model {
     const { onlyIvOr, onlyHundoIv, onlyZeroIv, onlyAreas = [] } = args.filters
     const { hasSize, hasHeight, isMad, mem, secret, httpAuth, pvpV2 } = ctx
     const { filterMap, globalFilter } = this.getFilters(perms, args, ctx)
+    const manualIds = parseManualIds(args.filters.onlyManualId)
 
     let queryPvp = config
       .getSafe('api.pvp.leagues')
@@ -169,75 +171,77 @@ class Pokemon extends Model {
       } else {
         query.select(['*', hasSize && !hasHeight ? 'size AS height' : 'size'])
       }
-      query
-        .where(
-          isMad ? 'disappear_time' : 'expire_timestamp',
-          '>=',
-          isMad ? this.knex().fn.now() : ts,
-        )
-        .andWhereBetween(isMad ? 'pokemon.latitude' : 'lat', [
-          args.minLat,
-          args.maxLat,
-        ])
-        .andWhereBetween(isMad ? 'pokemon.longitude' : 'lon', [
-          args.minLon,
-          args.maxLon,
-        ])
-        .andWhere((ivOr) => {
-          if (ivs || pvp) {
-            if (globalFilter.filterKeys.size) {
-              ivOr.andWhere((pkmn) => {
-                const keys = globalFilter.keyArray
-                for (let i = 0; i < keys.length; i += 1) {
-                  const key = keys[i]
-                  switch (key) {
-                    case 'xxs':
-                    case 'xxl':
-                      if (hasSize) {
-                        pkmn.orWhere('pokemon.size', key === 'xxl' ? 5 : 1)
-                      }
-                      break
-                    case 'gender':
-                      pkmn.andWhere('pokemon.gender', onlyIvOr[key])
-                      break
-                    case 'cp':
-                    case 'level':
-                    case 'atk_iv':
-                    case 'def_iv':
-                    case 'sta_iv':
-                    case 'iv':
-                      if (perms.iv) {
-                        pkmn.andWhereBetween(
-                          isMad ? MAD_KEY_MAP[key] : key,
-                          onlyIvOr[key],
-                        )
-                      }
-                      break
-                    default:
-                      if (
-                        perms.pvp &&
-                        BASE_KEYS.every((x) => !globalFilter.filterKeys.has(x))
-                      ) {
-                        // doesn't return everything if only pvp stats for individual pokemon
-                        pkmn.whereNull('pokemon_id')
-                      }
-                      break
-                  }
+      query.where(
+        isMad ? 'disappear_time' : 'expire_timestamp',
+        '>=',
+        isMad ? this.knex().fn.now() : ts,
+      )
+      applyManualIdFilter(query, {
+        manualIds,
+        latColumn: isMad ? 'pokemon.latitude' : 'lat',
+        lonColumn: isMad ? 'pokemon.longitude' : 'lon',
+        idColumn: isMad ? 'pokemon.encounter_id' : 'id',
+        bounds: {
+          minLat: args.minLat,
+          maxLat: args.maxLat,
+          minLon: args.minLon,
+          maxLon: args.maxLon,
+        },
+      }).andWhere((ivOr) => {
+        if (ivs || pvp) {
+          if (globalFilter.filterKeys.size) {
+            ivOr.andWhere((pkmn) => {
+              const keys = globalFilter.keyArray
+              for (let i = 0; i < keys.length; i += 1) {
+                const key = keys[i]
+                switch (key) {
+                  case 'xxs':
+                  case 'xxl':
+                    if (hasSize) {
+                      pkmn.orWhere('pokemon.size', key === 'xxl' ? 5 : 1)
+                    }
+                    break
+                  case 'gender':
+                    pkmn.andWhere('pokemon.gender', onlyIvOr[key])
+                    break
+                  case 'cp':
+                  case 'level':
+                  case 'atk_iv':
+                  case 'def_iv':
+                  case 'sta_iv':
+                  case 'iv':
+                    if (perms.iv) {
+                      pkmn.andWhereBetween(
+                        isMad ? MAD_KEY_MAP[key] : key,
+                        onlyIvOr[key],
+                      )
+                    }
+                    break
+                  default:
+                    if (
+                      perms.pvp &&
+                      BASE_KEYS.every((x) => !globalFilter.filterKeys.has(x))
+                    ) {
+                      // doesn't return everything if only pvp stats for individual pokemon
+                      pkmn.whereNull('pokemon_id')
+                    }
+                    break
                 }
-              })
-            } else {
-              ivOr.whereNull('pokemon_id')
-            }
-            ivOr.orWhereIn('pokemon_id', pokemonIds)
-            ivOr.orWhereIn('pokemon.form', pokemonForms)
+              }
+            })
+          } else {
+            ivOr.whereNull('pokemon_id')
           }
-          if (onlyZeroIv && ivs) {
-            ivOr.orWhere(isMad ? raw(IV_CALC) : 'iv', 0)
-          }
-          if (onlyHundoIv && ivs) {
-            ivOr.orWhere(isMad ? raw(IV_CALC) : 'iv', 100)
-          }
-        })
+          ivOr.orWhereIn('pokemon_id', pokemonIds)
+          ivOr.orWhereIn('pokemon.form', pokemonForms)
+        }
+        if (onlyZeroIv && ivs) {
+          ivOr.orWhere(isMad ? raw(IV_CALC) : 'iv', 0)
+        }
+        if (onlyHundoIv && ivs) {
+          ivOr.orWhere(isMad ? raw(IV_CALC) : 'iv', 100)
+        }
+      })
       if (!getAreaSql(query, areaRestrictions, onlyAreas, isMad, 'pokemon')) {
         return []
       }
@@ -326,20 +330,23 @@ class Pokemon extends Model {
       if (isMad) {
         Pokemon.getMadSql(pvpQuery)
       }
-      pvpQuery
-        .where(
-          isMad ? 'disappear_time' : 'expire_timestamp',
-          '>=',
-          isMad ? this.knex().fn.now() : ts,
-        )
-        .andWhereBetween(isMad ? 'pokemon.latitude' : 'lat', [
-          args.minLat,
-          args.maxLat,
-        ])
-        .andWhereBetween(isMad ? 'pokemon.longitude' : 'lon', [
-          args.minLon,
-          args.maxLon,
-        ])
+      pvpQuery.where(
+        isMad ? 'disappear_time' : 'expire_timestamp',
+        '>=',
+        isMad ? this.knex().fn.now() : ts,
+      )
+      applyManualIdFilter(pvpQuery, {
+        manualIds,
+        latColumn: isMad ? 'pokemon.latitude' : 'lat',
+        lonColumn: isMad ? 'pokemon.longitude' : 'lon',
+        idColumn: isMad ? 'pokemon.encounter_id' : 'id',
+        bounds: {
+          minLat: args.minLat,
+          maxLat: args.maxLat,
+          minLon: args.minLon,
+          maxLon: args.maxLon,
+        },
+      })
       if (isMad && listOfIds.length) {
         pvpQuery.whereRaw(
           `pokemon.encounter_id NOT IN ( ${listOfIds.join(',')} )`,

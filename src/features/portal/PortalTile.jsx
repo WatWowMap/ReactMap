@@ -5,6 +5,7 @@ import { Circle, Popup } from 'react-leaflet'
 
 import { useStorage } from '@store/useStorage'
 import { useForcePopup } from '@hooks/useForcePopup'
+import { useManualPopupTracker } from '@hooks/useManualPopupTracker'
 
 import { PortalPopup } from './PortalPopup'
 
@@ -22,6 +23,7 @@ const BasePortalTile = (portal) => {
   )
 
   useForcePopup(portal.id, markerRef)
+  const handlePopupOpen = useManualPopupTracker('portals', portal.id)
 
   return (
     <Circle
@@ -32,6 +34,7 @@ const BasePortalTile = (portal) => {
       fillOpacity={0.25}
       color={color}
       fillColor={color}
+      eventHandlers={{ popupopen: handlePopupOpen }}
     >
       <Popup position={[portal.lat, portal.lon]}>
         <PortalPopup {...portal} />

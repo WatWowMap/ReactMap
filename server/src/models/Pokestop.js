@@ -6,6 +6,7 @@ const i18next = require('i18next')
 const config = require('@rm/config')
 
 const { getAreaSql } = require('../utils/getAreaSql')
+const { applyManualIdFilter, parseManualIds } = require('../utils/manualFilter')
 const { getUserMidnight } = require('../utils/getClientTime')
 const { state } = require('../services/state')
 
@@ -138,6 +139,7 @@ class Pokestop extends Model {
     const ts = Math.floor(Date.now() / 1000)
     const { queryLimits, stopValidDataLimit, hideOldPokestops } =
       config.getSafe('api')
+    const manualIds = parseManualIds(args.filters.onlyManualId)
 
     const {
       lures: lurePerms,
@@ -184,9 +186,18 @@ class Pokestop extends Model {
       query.where('pokestop.updated', '>', ts - stopValidDataLimit * 86400)
     }
     Pokestop.joinIncident(query, hasMultiInvasions, isMad, multiInvasionMs)
-    query
-      .whereBetween(isMad ? 'latitude' : 'lat', [args.minLat, args.maxLat])
-      .andWhereBetween(isMad ? 'longitude' : 'lon', [args.minLon, args.maxLon])
+    applyManualIdFilter(query, {
+      manualIds,
+      latColumn: isMad ? 'latitude' : 'lat',
+      lonColumn: isMad ? 'longitude' : 'lon',
+      idColumn: isMad ? 'pokestop.pokestop_id' : 'pokestop.id',
+      bounds: {
+        minLat: args.minLat,
+        maxLat: args.maxLat,
+        minLon: args.minLon,
+        maxLon: args.maxLon,
+      },
+    })
 
     if (!getAreaSql(query, areaRestrictions, onlyAreas, isMad)) {
       return []

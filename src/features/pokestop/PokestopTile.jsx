@@ -8,6 +8,7 @@ import { basicEqualFn, useMemory } from '@store/useMemory'
 import { useStorage } from '@store/useStorage'
 import { useRouteStore, resolveRoutePoiKey } from '@features/route'
 import { useForcePopup } from '@hooks/useForcePopup'
+import { useManualPopupTracker } from '@hooks/useManualPopupTracker'
 import { TooltipWrapper } from '@components/ToolTipWrapper'
 
 import { PokestopPopup } from './PokestopPopup'
@@ -130,6 +131,7 @@ const BasePokestopTile = (pokestop) => {
   useMarkerTimer(timers.length ? Math.min(...timers) : null, markerRef, () =>
     setStateChange(!stateChange),
   )
+  const handlePopupOpen = useManualPopupTracker('pokestops', pokestop.id)
 
   const icon = usePokestopMarker({
     hasQuest,
@@ -150,6 +152,7 @@ const BasePokestopTile = (pokestop) => {
             selectPoi(pokestop.id, pokestop.lat, pokestop.lon)
           }
         },
+        popupopen: handlePopupOpen,
       }}
     >
       <Popup position={[pokestop.lat, pokestop.lon]}>

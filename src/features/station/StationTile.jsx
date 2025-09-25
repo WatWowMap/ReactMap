@@ -7,6 +7,7 @@ import { useMarkerTimer } from '@hooks/useMarkerTimer'
 import { basicEqualFn, useMemory } from '@store/useMemory'
 import { useStorage } from '@store/useStorage'
 import { useForcePopup } from '@hooks/useForcePopup'
+import { useManualPopupTracker } from '@hooks/useManualPopupTracker'
 import { TooltipWrapper } from '@components/ToolTipWrapper'
 
 import { StationPopup } from './StationPopup'
@@ -52,12 +53,14 @@ const BaseStationTile = (station) => {
   useMarkerTimer(timers.length ? Math.min(...timers) : null, markerRef, () =>
     setStateChange(!stateChange),
   )
+  const handlePopupOpen = useManualPopupTracker('stations', station.id)
 
   return (
     <Marker
       ref={setMarkerRef}
       position={[station.lat, station.lon]}
       icon={useStationMarker(station)}
+      eventHandlers={{ popupopen: handlePopupOpen }}
     >
       <Popup position={[station.lat, station.lon]}>
         <StationPopup {...station} />

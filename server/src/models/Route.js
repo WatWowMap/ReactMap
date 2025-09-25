@@ -4,6 +4,7 @@ const config = require('@rm/config')
 
 const { getAreaSql } = require('../utils/getAreaSql')
 const { getEpoch } = require('../utils/getClientTime')
+const { applyManualIdFilter, parseManualIds } = require('../utils/manualFilter')
 
 const GET_ALL_SELECT = /** @type {const} */ ([
   'id',
@@ -44,6 +45,7 @@ class Route extends Model {
     const ts =
       getEpoch() - config.getSafe('api.routeUpdateLimit') * 24 * 60 * 60
     const distanceInMeters = (onlyDistance || [0.5, 100]).map((x) => x * 1000)
+    const manualIds = parseManualIds(args.filters.onlyManualId)
 
     const startLatitude = isMad ? 'start_poi_latitude' : 'start_lat'
     const startLongitude = isMad ? 'start_poi_longitude' : 'start_lon'
@@ -51,10 +53,23 @@ class Route extends Model {
     const endLatitude = isMad ? 'end_poi_latitude' : 'end_lat'
     const endLongitude = isMad ? 'end_poi_longitude' : 'end_lon'
 
-    const query = this.query()
-      .select(isMad ? GET_MAD_ALL_SELECT : GET_ALL_SELECT)
-      .whereBetween(startLatitude, [args.minLat, args.maxLat])
-      .andWhereBetween(startLongitude, [args.minLon, args.maxLon])
+    const idColumn = isMad ? 'route_id' : 'id'
+    const query = this.query().select(
+      isMad ? GET_MAD_ALL_SELECT : GET_ALL_SELECT,
+    )
+    applyManualIdFilter(query, {
+      manualIds,
+      latColumn: startLatitude,
+      lonColumn: startLongitude,
+      idColumn,
+      bounds: {
+        minLat: args.minLat,
+        maxLat: args.maxLat,
+        minLon: args.minLon,
+        maxLon: args.maxLon,
+      },
+    })
+    query
       .andWhereBetween(distanceMeters, distanceInMeters)
       .andWhere((builder) => {
         builder.where(
@@ -68,9 +83,19 @@ class Route extends Model {
       })
       .union((qb) => {
         qb.select(isMad ? GET_MAD_ALL_SELECT : GET_ALL_SELECT)
-          .whereBetween(endLatitude, [args.minLat, args.maxLat])
-          .andWhereBetween(endLongitude, [args.minLon, args.maxLon])
-          .andWhereBetween(distanceMeters, distanceInMeters)
+        applyManualIdFilter(qb, {
+          manualIds,
+          latColumn: endLatitude,
+          lonColumn: endLongitude,
+          idColumn,
+          bounds: {
+            minLat: args.minLat,
+            maxLat: args.maxLat,
+            minLon: args.minLon,
+            maxLon: args.maxLon,
+          },
+        })
+        qb.andWhereBetween(distanceMeters, distanceInMeters)
           .andWhere((builder) => {
             builder.where(
               isMad ? raw('UNIX_TIMESTAMP(last_updated)') : 'updated',
