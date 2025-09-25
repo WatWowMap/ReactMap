@@ -107,18 +107,19 @@ function StationRating({
   battle_start,
   battle_end,
   is_battle_available,
-  start_time,
   end_time,
 }) {
   const { t } = useTranslation()
   const isStarting = battle_start > Date.now() / 1000
-  const battle_start_time =
-    battle_start == start_time ? battle_start + 60 * 60 : battle_start
-  const battle_end_time =
-    battle_end == end_time && battle_end > Date.now() / 1000 + 60 * 60
-      ? battle_end - 60 * 60 * 8
-      : battle_end
-  const epoch = isStarting ? battle_start_time : battle_end_time
+  const battleStartEpoch = battle_start ?? 0
+  const battleEndEpoch = battle_end ?? 0
+  const isBattleEndSameAsExpire =
+    Number.isFinite(battle_end) &&
+    Number.isFinite(end_time) &&
+    battle_end === end_time
+  const epoch = isStarting ? battleStartEpoch : battleEndEpoch
+  const showBattleCountdown = epoch > 0 && !isBattleEndSameAsExpire
+
   return (
     <CardContent sx={{ p: 0, py: 1 }}>
       <Stack alignItems="center" justifyContent="center">
@@ -126,10 +127,13 @@ function StationRating({
         <Typography variant="caption">
           {t(`max_battle_${battle_level}`)}
         </Typography>
-        <LiveTimeStamp start={isStarting} epoch={epoch} variant="caption" />
+        {showBattleCountdown && (
+          <LiveTimeStamp start={isStarting} epoch={epoch} variant="caption" />
+        )}
         {!is_battle_available &&
+          showBattleCountdown &&
           battle_start < Date.now() / 1000 &&
-          battle_end_time > Date.now() / 1000 && (
+          battleEndEpoch > Date.now() / 1000 && (
             <Typography variant="caption" align="center">
               {t('bread_time_window')}
             </Typography>
@@ -274,16 +278,13 @@ function StationMedia({
   battle_pokemon_move_2,
   battle_end,
   start_time,
-  end_time,
 }) {
   const { t } = useTranslateById()
   const stationImage = useMemory((s) =>
     s.Icons.getStation(start_time < Date.now() / 1000),
   )
-  const battle_end_time =
-    battle_end == end_time && battle_end > Date.now() / 1000 + 60 * 60
-      ? battle_end - 60 * 60 * 8
-      : battle_end
+  const battleEndEpoch = battle_end ?? 0
+  const isBattleActive = battleEndEpoch > Date.now() / 1000
   const types = useMemory((s) => {
     if (!battle_pokemon_id) return []
     const poke = s.masterfile.pokemon[battle_pokemon_id]
@@ -293,7 +294,7 @@ function StationMedia({
     return poke?.types || []
   })
 
-  return battle_end_time > Date.now() / 1000 ? (
+  return isBattleActive ? (
     <CardMedia>
       <Box className="popup-card-media">
         <Stack className="flex-center">
@@ -364,15 +365,25 @@ function StationAttackBonus({ total_stationed_pokemon, total_stationed_gmax }) {
 }
 
 /** @param {import('@rm/types').Station} station */
-function StationContent({ start_time, end_time, id }) {
-  const epoch = (start_time > Date.now() / 1000 ? start_time : end_time) || 0
+function StationContent({ start_time, end_time, battle_end, id }) {
+  const now = Date.now() / 1000
+  const isFutureStart = start_time > now
+  const displayInactiveOnly =
+    Number.isFinite(battle_end) &&
+    Number.isFinite(end_time) &&
+    battle_end === end_time
+  const epoch = displayInactiveOnly
+    ? (end_time ?? 0)
+    : isFutureStart
+      ? (start_time ?? 0)
+      : (end_time ?? 0)
   return (
     <CardContent sx={{ p: 0 }}>
       <Stack alignItems="center" justifyContent="center">
-        {start_time > Date.now() / 1000 ? (
-          <StationTimeStamp start epoch={epoch} id={id} />
-        ) : (
+        {displayInactiveOnly || !isFutureStart ? (
           <StationTimeStamp epoch={epoch} id={id} />
+        ) : (
+          <StationTimeStamp start epoch={epoch} id={id} />
         )}
         <StaticTimeStamp date epoch={epoch} />
       </Stack>
