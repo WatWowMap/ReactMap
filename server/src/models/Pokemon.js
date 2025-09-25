@@ -187,7 +187,8 @@ class Pokemon extends Model {
           minLon: args.minLon,
           maxLon: args.maxLon,
         },
-      }).andWhere((ivOr) => {
+      })
+      query.andWhere((ivOr) => {
         if (ivs || pvp) {
           if (globalFilter.filterKeys.size) {
             ivOr.andWhere((pkmn) => {
@@ -241,6 +242,9 @@ class Pokemon extends Model {
         if (onlyHundoIv && ivs) {
           ivOr.orWhere(isMad ? raw(IV_CALC) : 'iv', 100)
         }
+        if (manualIds.length) {
+          ivOr.orWhereIn(isMad ? 'pokemon.encounter_id' : 'id', manualIds)
+        }
       })
       if (!getAreaSql(query, areaRestrictions, onlyAreas, isMad, 'pokemon')) {
         return []
@@ -276,7 +280,7 @@ class Pokemon extends Model {
         filters.push({ iv: { min: 100, max: 100 }, pokemon: globalPokes })
     }
     /** @type {import("@rm/types").Pokemon[]} */
-    const results = await this.evalQuery(
+    let results = await this.evalQuery(
       mem ? `${mem}/api/pokemon/v2/scan` : null,
       mem
         ? JSON.stringify({
@@ -296,6 +300,34 @@ class Pokemon extends Model {
       secret,
       httpAuth,
     )
+
+    if (mem && manualIds.length) {
+      const loadedIds = Array.isArray(results)
+        ? new Set(results.map((pkmn) => `${pkmn.id}`))
+        : new Set()
+      const missingManuals = manualIds.filter((id) => !loadedIds.has(`${id}`))
+      if (missingManuals.length) {
+        const manualResults = await Promise.all(
+          missingManuals.map((id) =>
+            this.evalQuery(
+              `${mem}/api/pokemon/id/${id}`,
+              null,
+              'GET',
+              secret,
+              httpAuth,
+            ).catch(() => null),
+          ),
+        )
+        const validManuals = manualResults.filter(Boolean)
+        results = Array.isArray(results)
+          ? [...results, ...validManuals]
+          : validManuals
+      }
+    }
+
+    if (!Array.isArray(results)) {
+      results = []
+    }
 
     const finalResults = []
     const pvpResults = []
@@ -347,6 +379,11 @@ class Pokemon extends Model {
           maxLon: args.maxLon,
         },
       })
+      if (manualIds.length) {
+        pvpQuery.andWhere((builder) => {
+          builder.orWhereIn(isMad ? 'pokemon.encounter_id' : 'id', manualIds)
+        })
+      }
       if (isMad && listOfIds.length) {
         pvpQuery.whereRaw(
           `pokemon.encounter_id NOT IN ( ${listOfIds.join(',')} )`,
@@ -696,7 +733,7 @@ class Pokemon extends Model {
     if ((perms.iv || perms.pvp) && mem)
       filters.push(...globalFilter.buildApiFilter())
 
-    const results = await this.evalQuery(
+    let results = await this.evalQuery(
       mem ? `${mem}/api/pokemon/v2/scan` : null,
       mem
         ? JSON.stringify({
@@ -716,6 +753,28 @@ class Pokemon extends Model {
       secret,
       httpAuth,
     )
+
+    if (mem && args.filters.onlyManualId) {
+      const manualIds = parseManualIds(args.filters.onlyManualId)
+      if (manualIds.length) {
+        const loaded = new Set(results.map((pkmn) => `${pkmn.id}`))
+        const missingManuals = manualIds.filter((id) => !loaded.has(`${id}`))
+        if (missingManuals.length) {
+          const manualResults = await Promise.all(
+            missingManuals.map((id) =>
+              this.evalQuery(
+                `${mem}/api/pokemon/id/${id}`,
+                null,
+                'GET',
+                secret,
+                httpAuth,
+              ).catch(() => null),
+            ),
+          )
+          results = [...results, ...manualResults.filter((pkmn) => pkmn)]
+        }
+      }
+    }
     const filtered = results.filter(
       (item) =>
         !mem ||
