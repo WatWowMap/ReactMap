@@ -11,6 +11,7 @@ export const DEFAULT = /** @type {import('./hooks/store').ScanConfig} */ ({
   gymRadius: 750,
   spacing: 1,
   maxSize: 1,
+  nineCellScan: false,
   cooldown: 1,
   refreshQueue: 5,
 })

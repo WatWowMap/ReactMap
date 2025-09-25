@@ -203,6 +203,7 @@ type ScannerConfig {
   gymRadius: Int
   spacing: Int
   maxSize: Int
+  nineCellScan: Boolean
   refreshQueue: Int
   enabled: Boolean
 }

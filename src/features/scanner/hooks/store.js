@@ -15,6 +15,7 @@ import { createJSONStorage, persist } from 'zustand/middleware'
  *   gymRadius: number,
  *   spacing: number,
  *   maxSize: number,
+ *   nineCellScan: boolean,
  *   cooldown: number,
  *   refreshQueue: number
  *   enabled: boolean,

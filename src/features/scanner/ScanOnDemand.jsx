@@ -138,14 +138,16 @@ function BaseScanOnDemand({ mode }) {
                 next.userSpacing,
                 next.scanZoneSize,
               )
-            : getScanNextCoords(next.scanLocation, next.scanNextSize)
+            : getScanNextCoords(next.scanLocation, next.scanNextSize, {
+                nineCellScan: config.nineCellScan,
+              })
         useScanStore.setState({ scanCoords })
       }
     })
     return () => {
       subscription()
     }
-  }, [mode])
+  }, [mode, config.nineCellScan])
 
   if (scanMode !== 'setLocation' || !config.scannerType) return null
 

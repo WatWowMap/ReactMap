@@ -631,6 +631,7 @@
       "scanNextInstance": "scanNext",
       "scanNextDevice": "Device01",
       "scanNextSleeptime": 5,
+      "nineCellScan": false,
       "userCooldownSeconds": 0,
       "scanNextAreaRestriction": [],
       "discordRoles": [],
