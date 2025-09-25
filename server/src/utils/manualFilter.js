@@ -1,40 +1,47 @@
 // @ts-check
 
 /**
- * @param {unknown} value
- * @returns {(string | number)[]}
- */
-function parseManualIds(value) {
-  if (Array.isArray(value)) {
-    return value.filter((id) => id !== undefined && id !== null && id !== '')
-  }
-  return value !== undefined && value !== null && value !== '' ? [value] : []
-}
-
-/**
  * @param {import('objection').QueryBuilder} query
  * @param {{
- *   manualIds: (string | number)[],
+ *   manualId?: string | number | null,
  *   latColumn: string,
  *   lonColumn: string,
  *   idColumn: string,
  *   bounds: { minLat: number, maxLat: number, minLon: number, maxLon: number },
  * }} options
+ * @returns {string | number | null}
  */
 function applyManualIdFilter(query, options) {
-  const { manualIds, latColumn, lonColumn, idColumn, bounds } = options
-  if (manualIds.length) {
+  const {
+    manualId: rawManual,
+    latColumn,
+    lonColumn,
+    idColumn,
+    bounds,
+  } = options
+
+  const manualId =
+    rawManual !== undefined &&
+    rawManual !== null &&
+    rawManual !== '' &&
+    (typeof rawManual === 'string' || typeof rawManual === 'number')
+      ? rawManual
+      : null
+
+  if (manualId !== null) {
     query.where((builder) => {
       builder
         .whereBetween(latColumn, [bounds.minLat, bounds.maxLat])
         .andWhereBetween(lonColumn, [bounds.minLon, bounds.maxLon])
-        .orWhereIn(idColumn, manualIds)
+        .orWhere(idColumn, manualId)
     })
   } else {
     query
       .whereBetween(latColumn, [bounds.minLat, bounds.maxLat])
       .andWhereBetween(lonColumn, [bounds.minLon, bounds.maxLon])
   }
+
+  return manualId
 }
 
-module.exports = { parseManualIds, applyManualIdFilter }
+module.exports = { applyManualIdFilter }

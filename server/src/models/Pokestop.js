@@ -6,7 +6,7 @@ const i18next = require('i18next')
 const config = require('@rm/config')
 
 const { getAreaSql } = require('../utils/getAreaSql')
-const { applyManualIdFilter, parseManualIds } = require('../utils/manualFilter')
+const { applyManualIdFilter } = require('../utils/manualFilter')
 const { getUserMidnight } = require('../utils/getClientTime')
 const { state } = require('../services/state')
 
@@ -139,7 +139,11 @@ class Pokestop extends Model {
     const ts = Math.floor(Date.now() / 1000)
     const { queryLimits, stopValidDataLimit, hideOldPokestops } =
       config.getSafe('api')
-    const manualIds = parseManualIds(args.filters.onlyManualId)
+    const manualId =
+      typeof args.filters.onlyManualId === 'string' ||
+      typeof args.filters.onlyManualId === 'number'
+        ? args.filters.onlyManualId
+        : null
 
     const {
       lures: lurePerms,
@@ -187,7 +191,7 @@ class Pokestop extends Model {
     }
     Pokestop.joinIncident(query, hasMultiInvasions, isMad, multiInvasionMs)
     applyManualIdFilter(query, {
-      manualIds,
+      manualId,
       latColumn: isMad ? 'latitude' : 'lat',
       lonColumn: isMad ? 'longitude' : 'lon',
       idColumn: isMad ? 'pokestop.pokestop_id' : 'id',

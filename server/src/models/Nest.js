@@ -5,7 +5,7 @@ const config = require('@rm/config')
 
 const { state } = require('../services/state')
 const { getAreaSql } = require('../utils/getAreaSql')
-const { applyManualIdFilter, parseManualIds } = require('../utils/manualFilter')
+const { applyManualIdFilter } = require('../utils/manualFilter')
 
 /** @typedef {Nest & Partial<import("@rm/types").Nest>} FullNest */
 
@@ -28,10 +28,14 @@ class Nest extends Model {
   static async getAll(perms, args, { polygon }) {
     const { areaRestrictions } = perms
     const { minLat, minLon, maxLat, maxLon, filters } = args
-    const manualIds = parseManualIds(filters.onlyManualId)
+    const manualId =
+      typeof filters.onlyManualId === 'string' ||
+      typeof filters.onlyManualId === 'number'
+        ? filters.onlyManualId
+        : null
     const query = this.query().select(['*', 'nest_id AS id'])
     applyManualIdFilter(query, {
-      manualIds,
+      manualId,
       latColumn: 'lat',
       lonColumn: 'lon',
       idColumn: 'nest_id',

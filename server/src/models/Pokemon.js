@@ -14,7 +14,7 @@ const config = require('@rm/config')
 const { getAreaSql } = require('../utils/getAreaSql')
 const { filterRTree } = require('../utils/filterRTree')
 const { fetchJson } = require('../utils/fetchJson')
-const { applyManualIdFilter, parseManualIds } = require('../utils/manualFilter')
+const { applyManualIdFilter } = require('../utils/manualFilter')
 const {
   IV_CALC,
   LEVEL_CALC,
@@ -131,7 +131,6 @@ class Pokemon extends Model {
     const { onlyIvOr, onlyHundoIv, onlyZeroIv, onlyAreas = [] } = args.filters
     const { hasSize, hasHeight, isMad, mem, secret, httpAuth, pvpV2 } = ctx
     const { filterMap, globalFilter } = this.getFilters(perms, args, ctx)
-    const manualIds = parseManualIds(args.filters.onlyManualId)
 
     let queryPvp = config
       .getSafe('api.pvp.leagues')
@@ -148,7 +147,15 @@ class Pokemon extends Model {
       if (!noPokemonSelect) return []
     }
 
+    const manualIdRaw =
+      typeof args.filters.onlyManualId === 'string' ||
+      typeof args.filters.onlyManualId === 'number'
+        ? args.filters.onlyManualId
+        : null
+
     const query = this.query()
+
+    let manualId = null
 
     const pokemonIds = []
     const pokemonForms = []
@@ -176,8 +183,8 @@ class Pokemon extends Model {
         '>=',
         isMad ? this.knex().fn.now() : ts,
       )
-      applyManualIdFilter(query, {
-        manualIds,
+      manualId = applyManualIdFilter(query, {
+        manualId: manualIdRaw,
         latColumn: isMad ? 'pokemon.latitude' : 'lat',
         lonColumn: isMad ? 'pokemon.longitude' : 'lon',
         idColumn: isMad ? 'pokemon.encounter_id' : 'id',
@@ -242,13 +249,15 @@ class Pokemon extends Model {
         if (onlyHundoIv && ivs) {
           ivOr.orWhere(isMad ? raw(IV_CALC) : 'iv', 100)
         }
-        if (manualIds.length) {
-          ivOr.orWhereIn(isMad ? 'pokemon.encounter_id' : 'id', manualIds)
+        if (manualId !== null) {
+          ivOr.orWhereIn(isMad ? 'pokemon.encounter_id' : 'id', [manualId])
         }
       })
       if (!getAreaSql(query, areaRestrictions, onlyAreas, isMad, 'pokemon')) {
         return []
       }
+    } else {
+      manualId = manualIdRaw
     }
 
     const filters = mem
@@ -301,27 +310,23 @@ class Pokemon extends Model {
       httpAuth,
     )
 
-    if (mem && manualIds.length) {
+    if (mem && manualId !== null) {
       const loadedIds = Array.isArray(results)
         ? new Set(results.map((pkmn) => `${pkmn.id}`))
         : new Set()
-      const missingManuals = manualIds.filter((id) => !loadedIds.has(`${id}`))
-      if (missingManuals.length) {
-        const manualResults = await Promise.all(
-          missingManuals.map((id) =>
-            this.evalQuery(
-              `${mem}/api/pokemon/id/${id}`,
-              null,
-              'GET',
-              secret,
-              httpAuth,
-            ).catch(() => null),
-          ),
-        )
-        const validManuals = manualResults.filter(Boolean)
-        results = Array.isArray(results)
-          ? [...results, ...validManuals]
-          : validManuals
+      if (!loadedIds.has(`${manualId}`)) {
+        const manualResult = await this.evalQuery(
+          `${mem}/api/pokemon/id/${manualId}`,
+          null,
+          'GET',
+          secret,
+          httpAuth,
+        ).catch(() => null)
+        if (manualResult) {
+          results = Array.isArray(results)
+            ? [...results, manualResult]
+            : [manualResult]
+        }
       }
     }
 
@@ -368,7 +373,7 @@ class Pokemon extends Model {
         isMad ? this.knex().fn.now() : ts,
       )
       applyManualIdFilter(pvpQuery, {
-        manualIds,
+        manualId,
         latColumn: isMad ? 'pokemon.latitude' : 'lat',
         lonColumn: isMad ? 'pokemon.longitude' : 'lon',
         idColumn: isMad ? 'pokemon.encounter_id' : 'id',
@@ -682,6 +687,11 @@ class Pokemon extends Model {
     const { isMad, hasSize, hasHeight, mem, secret, httpAuth } = ctx
     const ts = Math.floor(Date.now() / 1000)
     const { filterMap, globalFilter } = this.getFilters(perms, args, ctx)
+    const manualIdRaw =
+      typeof args.filters.onlyManualId === 'string' ||
+      typeof args.filters.onlyManualId === 'number'
+        ? args.filters.onlyManualId
+        : null
     const queryLimits = config.getSafe('api.queryLimits')
 
     if (!perms.iv && !perms.pvp) {
@@ -721,7 +731,18 @@ class Pokemon extends Model {
     ) {
       return []
     }
-
+    const manualId = applyManualIdFilter(query, {
+      manualId: manualIdRaw,
+      latColumn: isMad ? 'pokemon.latitude' : 'lat',
+      lonColumn: isMad ? 'pokemon.longitude' : 'lon',
+      idColumn: isMad ? 'pokemon.encounter_id' : 'id',
+      bounds: {
+        minLat: args.minLat,
+        maxLat: args.maxLat,
+        minLon: args.minLon,
+        maxLon: args.maxLon,
+      },
+    })
     const filters = mem
       ? Object.values(filterMap).flatMap((filter) => filter.buildApiFilter())
       : []
@@ -749,24 +770,18 @@ class Pokemon extends Model {
       httpAuth,
     )
 
-    if (mem && args.filters.onlyManualId) {
-      const manualIds = parseManualIds(args.filters.onlyManualId)
-      if (manualIds.length) {
-        const loaded = new Set(results.map((pkmn) => `${pkmn.id}`))
-        const missingManuals = manualIds.filter((id) => !loaded.has(`${id}`))
-        if (missingManuals.length) {
-          const manualResults = await Promise.all(
-            missingManuals.map((id) =>
-              this.evalQuery(
-                `${mem}/api/pokemon/id/${id}`,
-                null,
-                'GET',
-                secret,
-                httpAuth,
-              ).catch(() => null),
-            ),
-          )
-          results = [...results, ...manualResults.filter((pkmn) => pkmn)]
+    if (mem && manualId !== null) {
+      const loaded = new Set(results.map((pkmn) => `${pkmn.id}`))
+      if (!loaded.has(`${manualId}`)) {
+        const manualResult = await this.evalQuery(
+          `${mem}/api/pokemon/id/${manualId}`,
+          null,
+          'GET',
+          secret,
+          httpAuth,
+        ).catch(() => null)
+        if (manualResult) {
+          results = [...results, manualResult]
         }
       }
     }

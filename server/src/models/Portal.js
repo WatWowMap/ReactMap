@@ -3,7 +3,7 @@ const { Model } = require('objection')
 const config = require('@rm/config')
 
 const { getAreaSql } = require('../utils/getAreaSql')
-const { applyManualIdFilter, parseManualIds } = require('../utils/manualFilter')
+const { applyManualIdFilter } = require('../utils/manualFilter')
 
 class Portal extends Model {
   static get tableName() {
@@ -29,10 +29,14 @@ class Portal extends Model {
       maxLat,
       maxLon,
     } = args
-    const manualIds = parseManualIds(args.filters.onlyManualId)
+    const manualId =
+      typeof args.filters.onlyManualId === 'string' ||
+      typeof args.filters.onlyManualId === 'number'
+        ? args.filters.onlyManualId
+        : null
     const query = this.query()
     applyManualIdFilter(query, {
-      manualIds,
+      manualId,
       latColumn: 'lat',
       lonColumn: 'lon',
       idColumn: 'id',

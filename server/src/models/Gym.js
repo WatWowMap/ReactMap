@@ -9,7 +9,7 @@ const config = require('@rm/config')
 const { getAreaSql } = require('../utils/getAreaSql')
 const { state } = require('../services/state')
 
-const { applyManualIdFilter, parseManualIds } = require('../utils/manualFilter')
+const { applyManualIdFilter } = require('../utils/manualFilter')
 
 const coreFields = [
   'id',
@@ -136,9 +136,13 @@ class Gym extends Model {
     const latCol = isMad ? 'latitude' : 'lat'
     const lonCol = isMad ? 'longitude' : 'lon'
     const idCol = isMad ? 'gym.gym_id' : 'id'
-    const manualIds = parseManualIds(onlyManualId)
+    const manualId =
+      typeof onlyManualId === 'string' || typeof onlyManualId === 'number'
+        ? onlyManualId
+        : null
+
     applyManualIdFilter(query, {
-      manualIds,
+      manualId,
       latColumn: latCol,
       lonColumn: lonCol,
       idColumn: idCol,

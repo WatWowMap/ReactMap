@@ -4,7 +4,7 @@ const config = require('@rm/config')
 const i18next = require('i18next')
 
 const { getAreaSql } = require('../utils/getAreaSql')
-const { applyManualIdFilter, parseManualIds } = require('../utils/manualFilter')
+const { applyManualIdFilter } = require('../utils/manualFilter')
 const { getEpoch } = require('../utils/getClientTime')
 const { state } = require('../services/state')
 
@@ -31,7 +31,11 @@ class Station extends Model {
       onlyGmaxStationed,
     } = args.filters
     const ts = getEpoch()
-    const manualIds = parseManualIds(args.filters.onlyManualId)
+    const manualId =
+      typeof args.filters.onlyManualId === 'string' ||
+      typeof args.filters.onlyManualId === 'number'
+        ? args.filters.onlyManualId
+        : null
 
     const select = [
       'id',
@@ -45,7 +49,7 @@ class Station extends Model {
 
     const query = this.query()
     applyManualIdFilter(query, {
-      manualIds,
+      manualId,
       latColumn: 'lat',
       lonColumn: 'lon',
       idColumn: 'id',

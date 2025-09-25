@@ -4,7 +4,7 @@ const config = require('@rm/config')
 
 const { getAreaSql } = require('../utils/getAreaSql')
 const { getEpoch } = require('../utils/getClientTime')
-const { applyManualIdFilter, parseManualIds } = require('../utils/manualFilter')
+const { applyManualIdFilter } = require('../utils/manualFilter')
 
 const GET_ALL_SELECT = /** @type {const} */ ([
   'id',
@@ -45,7 +45,11 @@ class Route extends Model {
     const ts =
       getEpoch() - config.getSafe('api.routeUpdateLimit') * 24 * 60 * 60
     const distanceInMeters = (onlyDistance || [0.5, 100]).map((x) => x * 1000)
-    const manualIds = parseManualIds(args.filters.onlyManualId)
+    const manualId =
+      typeof args.filters.onlyManualId === 'string' ||
+      typeof args.filters.onlyManualId === 'number'
+        ? args.filters.onlyManualId
+        : null
 
     const startLatitude = isMad ? 'start_poi_latitude' : 'start_lat'
     const startLongitude = isMad ? 'start_poi_longitude' : 'start_lon'
@@ -58,7 +62,7 @@ class Route extends Model {
       isMad ? GET_MAD_ALL_SELECT : GET_ALL_SELECT,
     )
     applyManualIdFilter(query, {
-      manualIds,
+      manualId,
       latColumn: startLatitude,
       lonColumn: startLongitude,
       idColumn,
@@ -84,7 +88,7 @@ class Route extends Model {
       .union((qb) => {
         qb.select(isMad ? GET_MAD_ALL_SELECT : GET_ALL_SELECT)
         applyManualIdFilter(qb, {
-          manualIds,
+          manualId,
           latColumn: endLatitude,
           lonColumn: endLongitude,
           idColumn,
