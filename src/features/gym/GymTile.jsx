@@ -159,6 +159,7 @@ const BaseGymTile = (gym) => {
   const handlePopupOpen = useManualPopupTracker('gyms', gym.id)
   if (hasRaid) {
     sendNotification(`${gym.id}-${hasHatched}`, gym.name, 'raids', {
+      manualId: gym.id,
       lat: gym.lat,
       lon: gym.lon,
       expire: timerToDisplay,
