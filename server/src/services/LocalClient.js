@@ -7,7 +7,7 @@ const config = require('@rm/config')
 
 const { areaPerms } = require('../utils/areaPerms')
 const { webhookPerms } = require('../utils/webhookPerms')
-const { scannerPerms } = require('../utils/scannerPerms')
+const { scannerPerms, scannerCooldownBypass } = require('../utils/scannerPerms')
 const { mergePerms } = require('../utils/mergePerms')
 const { AuthClient } = require('./AuthClient')
 const { state } = require('./state')
@@ -47,6 +47,7 @@ class LocalClient extends AuthClient {
         areaRestrictions: areaPerms(localPerms),
         webhooks: [],
         scanner: [],
+        scannerCooldownBypass: [],
       }),
       rmStrategy: this.rmStrategy,
     }
@@ -119,6 +120,9 @@ class LocalClient extends AuthClient {
               )
               scannerPerms([user.status], 'local', trialActive).forEach((x) =>
                 user.perms.scanner.push(x),
+              )
+              scannerCooldownBypass([user.status], 'local').forEach((x) =>
+                user.perms.scannerCooldownBypass.push(x),
               )
               this.log.info(
                 user.username,

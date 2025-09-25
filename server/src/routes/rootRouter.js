@@ -149,6 +149,7 @@ rootRouter.get('/api/settings', async (req, res, next) => {
             !scanner[key].discordRoles.length &&
             !scanner[key].telegramGroups.length,
         ),
+        scannerCooldownBypass: [],
       }
       authentication.alwaysEnabledPerms.forEach((perm) => {
         if (authentication.perms[perm]) {
