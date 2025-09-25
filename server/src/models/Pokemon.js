@@ -379,11 +379,6 @@ class Pokemon extends Model {
           maxLon: args.maxLon,
         },
       })
-      if (manualIds.length) {
-        pvpQuery.andWhere((builder) => {
-          builder.orWhereIn(isMad ? 'pokemon.encounter_id' : 'id', manualIds)
-        })
-      }
       if (isMad && listOfIds.length) {
         pvpQuery.whereRaw(
           `pokemon.encounter_id NOT IN ( ${listOfIds.join(',')} )`,
