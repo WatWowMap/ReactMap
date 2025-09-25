@@ -42,7 +42,7 @@ export function sendNotification(key, title, category, options) {
   )
   if (userSettings.enabled && userSettings[category]) {
     if (getPermission() === 'granted') {
-      const { lat, lon, audio, expire, ...rest } = options
+      const { lat, lon, audio, expire, manualId, ...rest } = options || {}
       const countdown = expire ? expire * 1000 - Date.now() : 1
       if (countdown < 0) return
       cache.set(key, countdown)
@@ -65,7 +65,12 @@ export function sendNotification(key, title, category, options) {
         }
         if (lat && lon) {
           const { map } = useMapStore.getState()
-          useMemory.setState({ manualParams: { category, id: key } })
+          useMemory.setState({
+            manualParams: {
+              category,
+              id: manualId ?? key,
+            },
+          })
           map.flyTo([lat, lon], 16)
         }
         notif.close()

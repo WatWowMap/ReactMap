@@ -7,6 +7,7 @@ import { GeoJSON, Marker, Popup } from 'react-leaflet'
 import { basicEqualFn, useMemory } from '@store/useMemory'
 import { useStorage } from '@store/useStorage'
 import { useForcePopup } from '@hooks/useForcePopup'
+import { useManualPopupTracker } from '@hooks/useManualPopupTracker'
 
 import { nestMarker } from './nestMarker'
 import { NestPopup } from './NestPopup'
@@ -19,6 +20,7 @@ import { NestPopup } from './NestPopup'
 const BaseNestTile = (nest) => {
   const recent = Date.now() / 1000 - nest.updated < 172800000
   const internalId = `${nest.pokemon_id}-${nest.pokemon_form}`
+  const handlePopupOpen = useManualPopupTracker('nests', nest.id)
 
   const size = useStorage(
     (s) => s.filters.nests.filter[internalId]?.size || 'md',
@@ -39,13 +41,17 @@ const BaseNestTile = (nest) => {
           iconSize={iconSize}
           recent={recent}
           nest={nest}
+          eventHandlers={{ popupopen: handlePopupOpen }}
         >
           <Popup>
             <NestPopup iconUrl={iconUrl} recent={recent} {...nest} />
           </Popup>
         </NestMarker>
       )}
-      <NestGeoJSON polygon_path={nest.polygon_path}>
+      <NestGeoJSON
+        polygon_path={nest.polygon_path}
+        eventHandlers={{ popupopen: handlePopupOpen }}
+      >
         <Popup>
           <NestPopup iconUrl={iconUrl} recent={recent} {...nest} />
         </Popup>
@@ -107,10 +113,10 @@ const NestMarker = ({
 
 /**
  *
- * @param {{ polygon_path: string, children?: React.ReactNode }} props
+ * @param {{ polygon_path: string, children?: React.ReactNode, eventHandlers?: import('leaflet').LeafletEventHandlerFnMap }} props
  * @returns
  */
-const NestGeoJSON = ({ polygon_path, children }) => {
+const NestGeoJSON = ({ polygon_path, eventHandlers, children }) => {
   const showPolygons = useStorage((s) => s.filters.nests.polygons)
 
   const geometry = React.useMemo(() => {
@@ -126,7 +132,11 @@ const NestGeoJSON = ({ polygon_path, children }) => {
   if (!showPolygons) {
     return null
   }
-  return <GeoJSON data={geometry}>{children}</GeoJSON>
+  return (
+    <GeoJSON data={geometry} eventHandlers={eventHandlers}>
+      {children}
+    </GeoJSON>
+  )
 }
 
 export const NestTile = React.memo(

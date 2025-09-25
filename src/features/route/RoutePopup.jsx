@@ -29,6 +29,7 @@ import { Title } from '@components/popups/Title'
 import { Timer } from '@components/popups/Timer'
 import { Navigation } from '@components/popups/Navigation'
 import { Notification } from '@components/Notification'
+import { useManualPopupTracker } from '@hooks/useManualPopupTracker'
 
 import { useFormatDistance } from './useFormatDistance'
 
@@ -370,6 +371,8 @@ export function RoutePopup({ end, inline = false, ...props }) {
     return content
   }
 
+  const handlePopupOpen = useManualPopupTracker('routes', props.id)
+
   return (
     <Popup
       ref={(ref) => {
@@ -377,6 +380,7 @@ export function RoutePopup({ end, inline = false, ...props }) {
           getRoute()
         }
       }}
+      eventHandlers={{ popupopen: handlePopupOpen }}
     >
       {content}
     </Popup>

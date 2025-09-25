@@ -5,6 +5,7 @@ const config = require('@rm/config')
 
 const { state } = require('../services/state')
 const { getAreaSql } = require('../utils/getAreaSql')
+const { applyManualIdFilter } = require('../utils/manualFilter')
 
 /** @typedef {Nest & Partial<import("@rm/types").Nest>} FullNest */
 
@@ -27,11 +28,14 @@ class Nest extends Model {
   static async getAll(perms, args, { polygon }) {
     const { areaRestrictions } = perms
     const { minLat, minLon, maxLat, maxLon, filters } = args
-    const query = this.query()
-      .select(['*', 'nest_id AS id'])
-      // .whereNotNull('pokemon_id')
-      .whereBetween('lat', [minLat, maxLat])
-      .andWhereBetween('lon', [minLon, maxLon])
+    const query = this.query().select(['*', 'nest_id AS id'])
+    applyManualIdFilter(query, {
+      manualId: filters.onlyManualId,
+      latColumn: 'lat',
+      lonColumn: 'lon',
+      idColumn: 'nest_id',
+      bounds: { minLat, maxLat, minLon, maxLon },
+    })
 
     const pokemon = []
     if (filters.onlyPokemon) {

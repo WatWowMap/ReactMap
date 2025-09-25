@@ -9,6 +9,7 @@ import { basicEqualFn, useMemory } from '@store/useMemory'
 import { useStorage } from '@store/useStorage'
 import { useOpacity } from '@hooks/useOpacity'
 import { useForcePopup } from '@hooks/useForcePopup'
+import { useManualPopupTracker } from '@hooks/useManualPopupTracker'
 import { sendNotification } from '@services/desktopNotification'
 import { TooltipWrapper } from '@components/ToolTipWrapper'
 import { getTimeUntil } from '@utils/getTimeUntil'
@@ -155,8 +156,10 @@ const BaseGymTile = (gym) => {
 
   useForcePopup(gym.id, markerRef)
   useMarkerTimer(timerToDisplay, markerRef, () => setStateChange(!stateChange))
+  const handlePopupOpen = useManualPopupTracker('gyms', gym.id)
   if (hasRaid) {
     sendNotification(`${gym.id}-${hasHatched}`, gym.name, 'raids', {
+      manualId: gym.id,
       lat: gym.lat,
       lon: gym.lon,
       expire: timerToDisplay,
@@ -193,6 +196,7 @@ const BaseGymTile = (gym) => {
             selectPoi(gym.id, gym.lat, gym.lon)
           }
         },
+        popupopen: handlePopupOpen,
       }}
     >
       <Popup position={[gym.lat, gym.lon]}>

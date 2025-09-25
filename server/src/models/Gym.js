@@ -9,6 +9,8 @@ const config = require('@rm/config')
 const { getAreaSql } = require('../utils/getAreaSql')
 const { state } = require('../services/state')
 
+const { applyManualIdFilter } = require('../utils/manualFilter')
+
 const coreFields = [
   'id',
   'name',
@@ -83,6 +85,7 @@ class Gym extends Model {
       onlyGymBadges,
       onlyBadge,
       onlyAreas = [],
+      onlyManualId,
     } = args.filters
     const ts = Math.floor(Date.now() / 1000)
     const query = this.query()
@@ -130,9 +133,22 @@ class Gym extends Model {
     } else if (hideOldGyms) {
       query.where('updated', '>', ts - gymValidDataLimit * 86400)
     }
-    query
-      .whereBetween(isMad ? 'latitude' : 'lat', [args.minLat, args.maxLat])
-      .andWhereBetween(isMad ? 'longitude' : 'lon', [args.minLon, args.maxLon])
+    const latCol = isMad ? 'latitude' : 'lat'
+    const lonCol = isMad ? 'longitude' : 'lon'
+    const idCol = isMad ? 'gym.gym_id' : 'id'
+
+    applyManualIdFilter(query, {
+      manualId: onlyManualId,
+      latColumn: latCol,
+      lonColumn: lonCol,
+      idColumn: idCol,
+      bounds: {
+        minLat: args.minLat,
+        maxLat: args.maxLat,
+        minLon: args.minLon,
+        maxLon: args.maxLon,
+      },
+    })
     Gym.onlyValid(query, isMad)
 
     const raidBosses = new Set()
