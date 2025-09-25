@@ -424,7 +424,7 @@ function StationMons({ id }) {
                   mon.bread_mode,
                 )}
                 alt={caption}
-                maxHeight="100%"
+                maxHeight={50}
                 maxWidth={50}
               />
               <Typography variant="caption">{caption}</Typography>
