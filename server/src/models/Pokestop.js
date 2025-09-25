@@ -139,12 +139,6 @@ class Pokestop extends Model {
     const ts = Math.floor(Date.now() / 1000)
     const { queryLimits, stopValidDataLimit, hideOldPokestops } =
       config.getSafe('api')
-    const manualId =
-      typeof args.filters.onlyManualId === 'string' ||
-      typeof args.filters.onlyManualId === 'number'
-        ? args.filters.onlyManualId
-        : null
-
     const {
       lures: lurePerms,
       quests: questPerms,
@@ -191,7 +185,7 @@ class Pokestop extends Model {
     }
     Pokestop.joinIncident(query, hasMultiInvasions, isMad, multiInvasionMs)
     applyManualIdFilter(query, {
-      manualId,
+      manualId: args.filters.onlyManualId,
       latColumn: isMad ? 'latitude' : 'lat',
       lonColumn: isMad ? 'longitude' : 'lon',
       idColumn: isMad ? 'pokestop.pokestop_id' : 'id',

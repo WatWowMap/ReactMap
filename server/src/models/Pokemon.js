@@ -14,7 +14,10 @@ const config = require('@rm/config')
 const { getAreaSql } = require('../utils/getAreaSql')
 const { filterRTree } = require('../utils/filterRTree')
 const { fetchJson } = require('../utils/fetchJson')
-const { applyManualIdFilter } = require('../utils/manualFilter')
+const {
+  applyManualIdFilter,
+  normalizeManualId,
+} = require('../utils/manualFilter')
 const {
   IV_CALC,
   LEVEL_CALC,
@@ -147,15 +150,11 @@ class Pokemon extends Model {
       if (!noPokemonSelect) return []
     }
 
-    const manualIdRaw =
-      typeof args.filters.onlyManualId === 'string' ||
-      typeof args.filters.onlyManualId === 'number'
-        ? args.filters.onlyManualId
-        : null
-
     const query = this.query()
 
-    let manualId = null
+    const manualIdFilter = normalizeManualId(args.filters.onlyManualId)
+
+    let manualId = manualIdFilter
 
     const pokemonIds = []
     const pokemonForms = []
@@ -184,7 +183,7 @@ class Pokemon extends Model {
         isMad ? this.knex().fn.now() : ts,
       )
       manualId = applyManualIdFilter(query, {
-        manualId: manualIdRaw,
+        manualId: manualIdFilter,
         latColumn: isMad ? 'pokemon.latitude' : 'lat',
         lonColumn: isMad ? 'pokemon.longitude' : 'lon',
         idColumn: isMad ? 'pokemon.encounter_id' : 'id',
@@ -256,8 +255,6 @@ class Pokemon extends Model {
       if (!getAreaSql(query, areaRestrictions, onlyAreas, isMad, 'pokemon')) {
         return []
       }
-    } else {
-      manualId = manualIdRaw
     }
 
     const filters = mem
@@ -687,11 +684,7 @@ class Pokemon extends Model {
     const { isMad, hasSize, hasHeight, mem, secret, httpAuth } = ctx
     const ts = Math.floor(Date.now() / 1000)
     const { filterMap, globalFilter } = this.getFilters(perms, args, ctx)
-    const manualIdRaw =
-      typeof args.filters.onlyManualId === 'string' ||
-      typeof args.filters.onlyManualId === 'number'
-        ? args.filters.onlyManualId
-        : null
+    const manualIdFilter = normalizeManualId(args.filters.onlyManualId)
     const queryLimits = config.getSafe('api.queryLimits')
 
     if (!perms.iv && !perms.pvp) {
@@ -732,7 +725,7 @@ class Pokemon extends Model {
       return []
     }
     const manualId = applyManualIdFilter(query, {
-      manualId: manualIdRaw,
+      manualId: manualIdFilter,
       latColumn: isMad ? 'pokemon.latitude' : 'lat',
       lonColumn: isMad ? 'pokemon.longitude' : 'lon',
       idColumn: isMad ? 'pokemon.encounter_id' : 'id',

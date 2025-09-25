@@ -28,14 +28,9 @@ class Nest extends Model {
   static async getAll(perms, args, { polygon }) {
     const { areaRestrictions } = perms
     const { minLat, minLon, maxLat, maxLon, filters } = args
-    const manualId =
-      typeof filters.onlyManualId === 'string' ||
-      typeof filters.onlyManualId === 'number'
-        ? filters.onlyManualId
-        : null
     const query = this.query().select(['*', 'nest_id AS id'])
     applyManualIdFilter(query, {
-      manualId,
+      manualId: filters.onlyManualId,
       latColumn: 'lat',
       lonColumn: 'lon',
       idColumn: 'nest_id',

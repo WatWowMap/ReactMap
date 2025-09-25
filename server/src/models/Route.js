@@ -45,12 +45,6 @@ class Route extends Model {
     const ts =
       getEpoch() - config.getSafe('api.routeUpdateLimit') * 24 * 60 * 60
     const distanceInMeters = (onlyDistance || [0.5, 100]).map((x) => x * 1000)
-    const manualId =
-      typeof args.filters.onlyManualId === 'string' ||
-      typeof args.filters.onlyManualId === 'number'
-        ? args.filters.onlyManualId
-        : null
-
     const startLatitude = isMad ? 'start_poi_latitude' : 'start_lat'
     const startLongitude = isMad ? 'start_poi_longitude' : 'start_lon'
     const distanceMeters = isMad ? 'route_distance_meters' : 'distance_meters'
@@ -61,8 +55,8 @@ class Route extends Model {
     const query = this.query().select(
       isMad ? GET_MAD_ALL_SELECT : GET_ALL_SELECT,
     )
-    applyManualIdFilter(query, {
-      manualId,
+    const manualId = applyManualIdFilter(query, {
+      manualId: args.filters.onlyManualId,
       latColumn: startLatitude,
       lonColumn: startLongitude,
       idColumn,

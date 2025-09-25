@@ -29,14 +29,9 @@ class Portal extends Model {
       maxLat,
       maxLon,
     } = args
-    const manualId =
-      typeof args.filters.onlyManualId === 'string' ||
-      typeof args.filters.onlyManualId === 'number'
-        ? args.filters.onlyManualId
-        : null
     const query = this.query()
     applyManualIdFilter(query, {
-      manualId,
+      manualId: args.filters.onlyManualId,
       latColumn: 'lat',
       lonColumn: 'lon',
       idColumn: 'id',

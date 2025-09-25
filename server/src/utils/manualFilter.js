@@ -1,6 +1,22 @@
 // @ts-check
 
 /**
+ * @param {unknown} manualId
+ * @returns {string | number | null}
+ */
+function normalizeManualId(manualId) {
+  if (
+    manualId === undefined ||
+    manualId === null ||
+    manualId === '' ||
+    (typeof manualId !== 'string' && typeof manualId !== 'number')
+  ) {
+    return null
+  }
+  return manualId
+}
+
+/**
  * @param {import('objection').QueryBuilder} query
  * @param {{
  *   manualId?: string | number | null,
@@ -20,13 +36,7 @@ function applyManualIdFilter(query, options) {
     bounds,
   } = options
 
-  const manualId =
-    rawManual !== undefined &&
-    rawManual !== null &&
-    rawManual !== '' &&
-    (typeof rawManual === 'string' || typeof rawManual === 'number')
-      ? rawManual
-      : null
+  const manualId = normalizeManualId(rawManual)
 
   if (manualId !== null) {
     query.where((builder) => {
@@ -44,4 +54,4 @@ function applyManualIdFilter(query, options) {
   return manualId
 }
 
-module.exports = { applyManualIdFilter }
+module.exports = { applyManualIdFilter, normalizeManualId }

@@ -31,12 +31,6 @@ class Station extends Model {
       onlyGmaxStationed,
     } = args.filters
     const ts = getEpoch()
-    const manualId =
-      typeof args.filters.onlyManualId === 'string' ||
-      typeof args.filters.onlyManualId === 'number'
-        ? args.filters.onlyManualId
-        : null
-
     const select = [
       'id',
       'name',
@@ -49,7 +43,7 @@ class Station extends Model {
 
     const query = this.query()
     applyManualIdFilter(query, {
-      manualId,
+      manualId: args.filters.onlyManualId,
       latColumn: 'lat',
       lonColumn: 'lon',
       idColumn: 'id',

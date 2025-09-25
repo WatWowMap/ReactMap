@@ -136,13 +136,9 @@ class Gym extends Model {
     const latCol = isMad ? 'latitude' : 'lat'
     const lonCol = isMad ? 'longitude' : 'lon'
     const idCol = isMad ? 'gym.gym_id' : 'id'
-    const manualId =
-      typeof onlyManualId === 'string' || typeof onlyManualId === 'number'
-        ? onlyManualId
-        : null
 
     applyManualIdFilter(query, {
-      manualId,
+      manualId: onlyManualId,
       latColumn: latCol,
       lonColumn: lonCol,
       idColumn: idCol,
