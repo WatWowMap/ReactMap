@@ -3,6 +3,10 @@ import { point } from '@turf/helpers'
 import destination from '@turf/destination'
 import { S2CellId, S2LatLng } from 'nodes2ts'
 
+/**
+ * @typedef {{ coords: import('../hooks/store').UseScanStore['scanCoords'], mask: boolean[] }} ScanCoordResult
+ */
+
 const OPTIONS = /** @type {const} */ ({ units: 'kilometers' })
 const POKEMON_RADIUS = 70
 const GYM_RADIUS = 750
@@ -19,7 +23,7 @@ const NINE_CELL_RADIUS = (NINE_CELL_SIZE - 1) / 2
 /**
  * Build a 9x9 grid of S2 level-15 cell centers around the selected point.
  * @param {[number, number]} center
- * @returns {import('../hooks/store').UseScanStore['scanCoords']}
+ * @returns {ScanCoordResult}
  */
 const getNineCellCoords = (center) => {
   const latLng = S2LatLng.fromDegrees(center[0], center[1])
@@ -36,6 +40,9 @@ const getNineCellCoords = (center) => {
       offsets.push({
         di,
         dj,
+        isPerimeter:
+          Math.abs(di) === NINE_CELL_RADIUS ||
+          Math.abs(dj) === NINE_CELL_RADIUS,
         manhattan: Math.abs(di) + Math.abs(dj),
         chebyshev: Math.max(Math.abs(di), Math.abs(dj)),
       })
@@ -49,7 +56,7 @@ const getNineCellCoords = (center) => {
     return a.dj - b.dj
   })
 
-  return offsets.map(({ di, dj }) => {
+  const coords = offsets.map(({ di, dj }) => {
     const targetI = baseI + di * size
     const targetJ = baseJ + dj * size
     const sameFace =
@@ -65,6 +72,10 @@ const getNineCellCoords = (center) => {
     const pointLatLng = cell.toLatLng()
     return [pointLatLng.latDegrees, pointLatLng.lngDegrees]
   })
+
+  const mask = offsets.map(({ isPerimeter }) => isPerimeter)
+
+  return { coords, mask }
 }
 
 /**
@@ -72,7 +83,7 @@ const getNineCellCoords = (center) => {
  * @param {[number, number]} center
  * @param {import('../hooks/store').UseScanStore['scanNextSize']} size
  * @param {{ nineCellScan?: boolean }} [options]
- * @returns {import('../hooks/store').UseScanStore['scanCoords']}
+ * @returns {ScanCoordResult}
  */
 export const getScanNextCoords = (center, size, options = {}) => {
   if (size === 'XL' && options.nineCellScan) {
@@ -80,17 +91,26 @@ export const getScanNextCoords = (center, size, options = {}) => {
   }
 
   const coords = [center]
-  if (size === 'S') return coords
+  if (size === 'S') {
+    return { coords, mask: [true] }
+  }
 
   const distance = HEX_DISTANCE[size]
-  if (!distance) return coords
+  if (!distance) {
+    return { coords, mask: coords.map(() => true) }
+  }
 
   const start = point([center[1], center[0]])
-  return coords.concat(
+  const extended = coords.concat(
     [0, 60, 120, 180, 240, 300].map((bearing) => {
       const [lon, lat] = destination(start, distance / 1000, bearing, OPTIONS)
         .geometry.coordinates
       return [lat, lon]
     }),
   )
+
+  return {
+    coords: extended,
+    mask: extended.map(() => true),
+  }
 }

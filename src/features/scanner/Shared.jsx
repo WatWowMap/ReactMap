@@ -163,9 +163,13 @@ export function ScanCircles({ radius }) {
   const scanCoords = useScanStore((s) => s.scanCoords)
   const userRadius = useScanStore((s) => s.userRadius)
   const validCoords = useScanStore((s) => s.validCoords)
+  const scanCircleMask = useScanStore((s) => s.scanCircleMask)
 
   const finalRadius = radius || userRadius
   return scanCoords.map((coords, i) => {
+    if (scanCircleMask.length && !scanCircleMask[i]) {
+      return null
+    }
     const finalColor =
       finalRadius <= 70
         ? validCoords[i]

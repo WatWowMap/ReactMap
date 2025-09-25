@@ -130,7 +130,7 @@ function BaseScanOnDemand({ mode }) {
           next.scanZoneSize !== prev.scanZoneSize ||
           next.scanLocation.some((x, i) => x !== prev.scanLocation[i]))
       ) {
-        const scanCoords =
+        const { coords: scanCoords, mask: scanCircleMask } =
           mode === 'scanZone'
             ? getScanZoneCoords(
                 next.scanLocation,
@@ -141,7 +141,7 @@ function BaseScanOnDemand({ mode }) {
             : getScanNextCoords(next.scanLocation, next.scanNextSize, {
                 nineCellScan: config.nineCellScan,
               })
-        useScanStore.setState({ scanCoords })
+        useScanStore.setState({ scanCoords, scanCircleMask })
       }
     })
     return () => {
