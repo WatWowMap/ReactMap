@@ -1,3 +1,10 @@
+# [1.40.0-develop.1](https://github.com/WatWowMap/ReactMap/compare/v1.39.0...v1.40.0-develop.1) (2025-09-25)
+
+
+### Features
+
+* persistent popups ([5cd5be0](https://github.com/WatWowMap/ReactMap/commit/5cd5be0371842e67473e3c7764ab8a7e0b92e153)), closes [#1135](https://github.com/WatWowMap/ReactMap/issues/1135)
+
 # [1.39.0](https://github.com/WatWowMap/ReactMap/compare/v1.38.0...v1.39.0) (2025-09-24)
 
 
