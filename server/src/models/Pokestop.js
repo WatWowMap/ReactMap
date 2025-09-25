@@ -190,7 +190,7 @@ class Pokestop extends Model {
       manualIds,
       latColumn: isMad ? 'latitude' : 'lat',
       lonColumn: isMad ? 'longitude' : 'lon',
-      idColumn: isMad ? 'pokestop.pokestop_id' : 'pokestop.id',
+      idColumn: isMad ? 'pokestop.pokestop_id' : 'id',
       bounds: {
         minLat: args.minLat,
         maxLat: args.maxLat,
