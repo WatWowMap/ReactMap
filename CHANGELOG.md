@@ -1,3 +1,10 @@
+# [1.40.0-develop.3](https://github.com/WatWowMap/ReactMap/compare/v1.40.0-develop.2...v1.40.0-develop.3) (2025-09-26)
+
+
+### Bug Fixes
+
+* better hoverability on shiny rate ([e29a68b](https://github.com/WatWowMap/ReactMap/commit/e29a68b70c5ad1b724ca36a6ab2322006b8ba0a6))
+
 # [1.40.0-develop.2](https://github.com/WatWowMap/ReactMap/compare/v1.40.0-develop.1...v1.40.0-develop.2) (2025-09-25)
 
 
