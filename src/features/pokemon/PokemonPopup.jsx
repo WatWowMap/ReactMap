@@ -416,6 +416,11 @@ const ShinyOdds = ({ shinyStats, t }) => {
                 style={{
                   cursor: 'help',
                   textDecoration: 'underline dotted',
+                  display: 'inline-block',
+                  padding: '4px',
+                  margin: '-4px',
+                  borderRadius: 4,
+                  textAlign: 'center',
                 }}
               >
                 ~{rateNode}
