@@ -888,5 +888,7 @@
   "expert_group_2": "Group 2",
   "expert_group_2_description": "High level with perfect attack.",
   "expert_combine_description": "Combine them with a , or |:",
-  "expert_result_description": "This filter will show a Pokémon if it matches the criteria for Group 1 OR if it matches all the criteria for Group 2."
+  "expert_result_description": "This filter will show a Pokémon if it matches the criteria for Group 1 OR if it matches all the criteria for Group 2.",
+  "inactive_stations": "Inactive Power Spots",
+  "last_active": "Last active"
 }
