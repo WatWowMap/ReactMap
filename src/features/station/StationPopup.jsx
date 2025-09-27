@@ -365,7 +365,8 @@ function StationContent({ start_time, end_time, battle_end, id }) {
         <Stack alignItems="center" justifyContent="center">
           <Typography variant="subtitle2">{t('inactive')}</Typography>
           <Typography variant="caption">
-            {t('last_active')}: {dateFormatter.format(new Date((end_time ?? 0) * 1000))}
+            {t('last_active')}:{' '}
+            {dateFormatter.format(new Date((end_time ?? 0) * 1000))}
           </Typography>
         </Stack>
       </CardContent>
