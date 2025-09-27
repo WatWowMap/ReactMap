@@ -28,7 +28,7 @@ export function useStationMarker({
   const [baseIcon, baseSize, battleIcon, battleSize] = useStorage((s) => {
     const { filter } = s.filters.stations
     return [
-      Icons.getStation(start_time < Date.now() / 1000),
+      Icons.getStation((end_time ?? 0) > Date.now() / 1000),
       Icons.getSize('station', filter[`j${battle_level}`]?.size),
       Icons.getPokemon(
         battle_pokemon_id,
