@@ -111,6 +111,8 @@ export function Config({ children }) {
           perms: data.user ? data.user.perms : {},
           methods: data.authentication.methods || [],
           username: data.user?.username || '',
+          accessType: data.user?.accessType ?? null,
+          accessExpiration: data.user?.accessExpiration ?? null,
           data: data.user?.data
             ? typeof data.user?.data === 'string'
               ? JSON.parse(data.user?.data)
