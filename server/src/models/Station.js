@@ -29,6 +29,7 @@ class Station extends Model {
       onlyMaxBattles,
       onlyBattleTier,
       onlyGmaxStationed,
+      onlyInactiveStations,
     } = args.filters
     const ts = getEpoch()
     const select = [
@@ -54,16 +55,19 @@ class Station extends Model {
         maxLon: args.maxLon,
       },
     })
-    query
-      .andWhere('end_time', '>', ts)
-      .andWhere(
+    if (!(onlyAllStations && onlyInactiveStations)) {
+      query.andWhere('end_time', onlyInactiveStations ? '<' : '>', ts)
+    }
+    if (!onlyInactiveStations && !onlyAllStations) {
+      query.andWhere(
         'updated',
         '>',
         Date.now() / 1000 - stationUpdateLimit * 60 * 60,
       )
+    }
     // .where('is_inactive', false)
 
-    if (perms.dynamax && (onlyMaxBattles || onlyGmaxStationed)) {
+    if (!onlyInactiveStations && perms.dynamax && (onlyMaxBattles || onlyGmaxStationed)) {
       select.push(
         'is_battle_available',
         'battle_level',
@@ -163,6 +167,7 @@ class Station extends Model {
       .filter(
         (station) =>
           onlyAllStations ||
+          onlyInactiveStations ||
           (perms.dynamax &&
             ((onlyMaxBattles &&
               (onlyBattleTier === 'all'
