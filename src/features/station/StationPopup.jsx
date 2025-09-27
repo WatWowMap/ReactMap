@@ -13,6 +13,7 @@ import Grid from '@mui/material/Unstable_Grid2'
 import IconButton from '@mui/material/IconButton'
 import Menu from '@mui/material/Menu'
 import MenuItem from '@mui/material/MenuItem'
+import Rating from '@mui/material/Rating'
 import Typography from '@mui/material/Typography'
 import Stack from '@mui/material/Stack'
 import Box from '@mui/material/Box'
@@ -36,6 +37,7 @@ import {
 import { VirtualGrid } from '@components/virtual/VirtualGrid'
 import { getStationDamageBoost } from '@utils/getAttackBonus'
 import { CopyCoords } from '@components/popups/Coords'
+import { PokeMove } from '@components/popups/PokeMove'
 
 import { useGetStationMons } from './useGetStationMons'
 
@@ -101,6 +103,7 @@ function StationHeader({ name }) {
 
 /** @param {import('@rm/types').Station} props */
 function StationRating({
+  battle_level,
   battle_start,
   battle_end,
   is_battle_available,
@@ -120,6 +123,10 @@ function StationRating({
   return (
     <CardContent sx={{ p: 0, py: 1 }}>
       <Stack alignItems="center" justifyContent="center">
+        <Rating value={battle_level} max={Math.max(5, battle_level)} readOnly />
+        <Typography variant="caption">
+          {t(`max_battle_${battle_level}`)}
+        </Typography>
         {showBattleCountdown && (
           <LiveTimeStamp start={isStarting} epoch={epoch} variant="caption" />
         )}
@@ -267,11 +274,15 @@ function StationMedia({
   battle_pokemon_costume,
   battle_pokemon_gender,
   battle_pokemon_bread_mode,
-  battle_level,
+  battle_pokemon_move_1,
+  battle_pokemon_move_2,
   battle_end,
+  start_time,
 }) {
-  const { t: tById } = useTranslateById()
-  const { t } = useTranslation()
+  const { t } = useTranslateById()
+  const stationImage = useMemory((s) =>
+    s.Icons.getStation(start_time < Date.now() / 1000),
+  )
   const battleEndEpoch = battle_end ?? 0
   const isBattleActive = battleEndEpoch > Date.now() / 1000
   const types = useMemory((s) => {
@@ -300,17 +311,12 @@ function StationMedia({
           {!!battle_pokemon_costume && (
             <Box textAlign="center">
               <Typography variant="caption">
-                &nbsp;({tById(`costume_${battle_pokemon_costume}`)})
+                &nbsp;({t(`costume_${battle_pokemon_costume}`)})
               </Typography>
             </Box>
           )}
         </Stack>
-        <Stack
-          alignItems="center"
-          justifyContent="center"
-          spacing={0.5}
-          width="100%"
-        >
+        <Stack alignItems="center" justifyContent="center" spacing={0.5}>
           <Stack
             direction="row"
             justifyContent="space-evenly"
@@ -324,15 +330,20 @@ function StationMedia({
               <PokeType key={type} id={type} size="medium" />
             ))}
           </Stack>
-          {!!battle_level && (
-            <Typography variant="caption" align="center">
-              {t(`max_battle_${battle_level}`)}
-            </Typography>
-          )}
+          {battle_pokemon_move_1 && <PokeMove id={battle_pokemon_move_1} />}
+          {battle_pokemon_move_2 && <PokeMove id={battle_pokemon_move_2} />}
         </Stack>
       </Box>
     </CardMedia>
-  ) : null
+  ) : (
+    <Box width="100%" className="flex-center">
+      <CardMedia
+        component="img"
+        src={stationImage}
+        sx={{ maxWidth: 75, maxHeight: 75 }}
+      />
+    </Box>
+  )
 }
 
 /** @param {import('@rm/types').Station} station */
@@ -355,8 +366,24 @@ function StationAttackBonus({ total_stationed_pokemon, total_stationed_gmax }) {
 
 /** @param {import('@rm/types').Station} station */
 function StationContent({ start_time, end_time, battle_end, id }) {
+  const { t } = useTranslation()
+  const dateFormatter = useFormatStore((s) => s.dateFormat)
   const now = Date.now() / 1000
-  const isFutureStart = start_time > now
+  const isInactive = Number.isFinite(end_time) && (end_time ?? 0) < now
+  if (isInactive) {
+    return (
+      <CardContent sx={{ p: 0 }}>
+        <Stack alignItems="center" justifyContent="center">
+          <Typography variant="subtitle2">{t('inactive')}</Typography>
+          <Typography variant="caption">
+            {t('last_active')}: {dateFormatter.format(new Date((end_time ?? 0) * 1000))}
+          </Typography>
+        </Stack>
+      </CardContent>
+    )
+  }
+
+  const isFutureStart = (start_time ?? 0) > now
   const displayInactiveOnly =
     Number.isFinite(battle_end) &&
     Number.isFinite(end_time) &&
@@ -413,7 +440,7 @@ function StationMons({ id }) {
                   mon.bread_mode,
                 )}
                 alt={caption}
-                maxHeight={50}
+                maxHeight="100%"
                 maxWidth={50}
               />
               <Typography variant="caption">{caption}</Typography>
