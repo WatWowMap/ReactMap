@@ -185,7 +185,7 @@ rootRouter.get('/api/settings', async (req, res, next) => {
         log.warn(TAGS.session, 'Issue finding user, User ID:', req?.user?.id, e)
       }
     }
-    const settings = getServerSettings(req)
+    const settings = await getServerSettings(req)
 
     if ('perms' in settings.user) {
       if (settings.user.perms.pokemon && api.queryOnSessionInit.pokemon) {
