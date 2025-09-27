@@ -1061,5 +1061,17 @@
       "dsn": "",
       "tracesSampleRate": 0.1
     }
+  },
+  "accessDatabase": {
+    "host": "",
+    "port": 3306,
+    "username": "",
+    "password": "",
+    "database": "",
+    "table": "user_access_table",
+    "matchBy": "discordId/username",
+    "matchColumn": "discord_id_column/username_column",
+    "typeColumn": "access_type_column",
+    "expirationColumn": "access_expiration_column"
   }
 }
