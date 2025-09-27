@@ -48,10 +48,24 @@ export function LinkAccounts() {
           return (
             <Grid2 key={method} xs={12} textAlign="center">
               {auth[`${method}Id`] ? (
-                <Typography color="secondary">
-                  {t('user_username')}: {auth.username} ({t(`${method}_linked`)}
-                  )
-                </Typography>
+                <>
+                  <Typography color="secondary">
+                    {t('user_username')}: {auth.username} ({t(`${method}_linked`)})
+                  </Typography>
+                  {/* Only display access info once (for Discord section) */}
+                  {i === 0 && auth.accessType ? (
+                    <>
+                      <Typography color="secondary">
+                        {t('access_type')}: {auth.accessType}
+                      </Typography>
+                      {auth.accessExpiration ? (
+                        <Typography color="secondary">
+                          {t('access_expiration')}: {new Date(auth.accessExpiration * 1000).toLocaleString()}
+                        </Typography>
+                      ) : null}
+                    </>
+                  ) : null}
+                </>
               ) : (
                 Component
               )}
