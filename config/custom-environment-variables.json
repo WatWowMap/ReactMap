@@ -2326,5 +2326,20 @@
         "__format": "number"
       }
     }
+  },
+  "accessDatabase": {
+    "host": "ACCESS_DATABASE_HOST",
+    "port": {
+      "__name": "ACCESS_DATABASE_PORT",
+      "__format": "number"
+    },
+    "username": "ACCESS_DATABASE_USERNAME",
+    "password": "ACCESS_DATABASE_PASSWORD",
+    "database": "ACCESS_DATABASE_DATABASE",
+    "table": "ACCESS_DATABASE_TABLE",
+    "matchBy": "ACCESS_DATABASE_MATCH_BY",
+    "matchColumn": "ACCESS_DATABASE_MATCH_COLUMN",
+    "typeColumn": "ACCESS_DATABASE_TYPE_COLUMN",
+    "expirationColumn": "ACCESS_DATABASE_EXPIRATION_COLUMN"
   }
 }
