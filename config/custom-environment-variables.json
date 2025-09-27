@@ -2326,5 +2326,47 @@
         "__format": "number"
       }
     }
+  },
+  "accessDatabase": {
+    "host": {
+      "__name": "ACCESS_DB_HOST",
+      "__format": "string"
+    },
+    "port": {
+      "__name": "ACCESS_DB_PORT",
+      "__format": "number"
+    },
+    "username": {
+      "__name": "ACCESS_DB_USERNAME",
+      "__format": "string"
+    },
+    "password": {
+      "__name": "ACCESS_DB_PASSWORD",
+      "__format": "string"
+    },
+    "database": {
+      "__name": "ACCESS_DB_DATABASE",
+      "__format": "string"
+    },
+    "table": {
+      "__name": "ACCESS_DB_TABLE",
+      "__format": "string"
+    },
+    "matchBy": {
+      "__name": "ACCESS_DB_MATCH_BY",
+      "__format": "string"
+    },
+    "matchColumn": {
+      "__name": "ACCESS_DB_MATCH_COLUMN",
+      "__format": "string"
+    },
+    "typeColumn": {
+      "__name": "ACCESS_DB_TYPE_COLUMN",
+      "__format": "string"
+    },
+    "expirationColumn": {
+      "__name": "ACCESS_DB_EXPIRATION_COLUMN",
+      "__format": "string"
+    }
   }
 }
