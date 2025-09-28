@@ -363,9 +363,7 @@ function StationContent({ start_time, end_time, battle_end, id }) {
   const isInactive = hasEndTime && endEpoch < now
 
   if (isInactive) {
-    const formatted = hasEndTime
-      ? dateFormatter.format(new Date(endEpoch * 1000))
-      : '—'
+    const formatted = dateFormatter.format(new Date(endEpoch * 1000))
     return (
       <CardContent sx={{ p: 0 }}>
         <Stack alignItems="center" justifyContent="center">

@@ -55,13 +55,21 @@ class Station extends Model {
         maxLon: args.maxLon,
       },
     })
-    query
-      .andWhere('end_time', '>', ts)
-      .andWhere(
-        'updated',
-        '>',
-        Date.now() / 1000 - stationUpdateLimit * 60 * 60,
-      )
+    const activeCutoff = Date.now() / 1000 - stationUpdateLimit * 60 * 60
+
+    if (onlyInactiveStations) {
+      query.andWhere((builder) => {
+        builder
+          .where((active) =>
+            active
+              .where('end_time', '>', ts)
+              .andWhere('updated', '>', activeCutoff),
+          )
+          .orWhere('end_time', '<=', ts)
+      })
+    } else {
+      query.andWhere('end_time', '>', ts).andWhere('updated', '>', activeCutoff)
+    }
     // .where('is_inactive', false)
 
     if (perms.dynamax && (onlyMaxBattles || onlyGmaxStationed)) {
@@ -194,43 +202,9 @@ class Station extends Model {
       return matchesBaseFilters
     }
 
-    /** @type {import("@rm/types").FullStation[]} */
-    const activeResults = (await query.select(select))
+    return (await query.select(select))
       .map(normalizeStation)
       .filter(shouldInclude)
-
-    if (!onlyInactiveStations) {
-      return activeResults
-    }
-
-    const inactiveQuery = this.query()
-    applyManualIdFilter(inactiveQuery, {
-      manualId: args.filters.onlyManualId,
-      latColumn: 'lat',
-      lonColumn: 'lon',
-      idColumn: 'id',
-      bounds: {
-        minLat: args.minLat,
-        maxLat: args.maxLat,
-        minLon: args.minLon,
-        maxLon: args.maxLon,
-      },
-    })
-    inactiveQuery.andWhere('end_time', '<=', ts)
-
-    if (!getAreaSql(inactiveQuery, areaRestrictions, onlyAreas, isMad)) {
-      return activeResults
-    }
-
-    const inactiveResults = (await inactiveQuery.select(select))
-      .map(normalizeStation)
-      .filter(shouldInclude)
-
-    const combined = new Map()
-    activeResults.forEach((station) => combined.set(station.id, station))
-    inactiveResults.forEach((station) => combined.set(station.id, station))
-
-    return [...combined.values()]
   }
 
   /**
