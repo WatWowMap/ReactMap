@@ -164,6 +164,8 @@ class Station extends Model {
         Number.isFinite(station.end_time) && station.end_time <= ts
 
       const matchesBattleFilter =
+        // Inactive power spots shouldn’t be filtered by battle criteria; the toggle surfaces
+        // their historical location even if battle metadata is stale, so treat them as matching.
         onlyMaxBattles &&
         (isInactive ||
           (onlyBattleTier === 'all'
