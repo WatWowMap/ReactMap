@@ -29,6 +29,7 @@ class Station extends Model {
       onlyMaxBattles,
       onlyBattleTier,
       onlyGmaxStationed,
+      onlyInactivePowerSpots,
     } = args.filters
     const ts = getEpoch()
     const select = [
@@ -132,47 +133,91 @@ class Station extends Model {
     if (!getAreaSql(query, areaRestrictions, onlyAreas, isMad)) {
       return []
     }
-    /** @type {import("@rm/types").FullStation[]} */
-    const results = await query.select(select)
 
-    return results
-      .map((station) => {
-        if (station.is_battle_available && station.battle_pokemon_id === null) {
-          station.is_battle_available = false
-        }
-        if (station.total_stationed_pokemon === null) {
-          station.total_stationed_pokemon = 0
-        }
-        if (
-          station.stationed_pokemon &&
-          (station.total_stationed_gmax === undefined ||
-            station.total_stationed_gmax === null)
-        ) {
-          const list =
-            typeof station.stationed_pokemon === 'string'
-              ? JSON.parse(station.stationed_pokemon)
-              : station.stationed_pokemon || []
-          let count = 0
-          if (list)
-            for (let i = 0; i < list.length; ++i)
-              if (list[i].bread_mode === 2 || list[i].bread_mode === 3) ++count
-          station.total_stationed_gmax = count
-        }
-        return station
-      })
-      .filter(
-        (station) =>
-          onlyAllStations ||
-          (perms.dynamax &&
-            ((onlyMaxBattles &&
-              (onlyBattleTier === 'all'
-                ? args.filters[`j${station.battle_level}`] ||
-                  args.filters[
-                    `${station.battle_pokemon_id}-${station.battle_pokemon_form}`
-                  ]
-                : onlyBattleTier === station.battle_level)) ||
-              (onlyGmaxStationed && station.total_stationed_gmax))),
+    const normalizeStation = (station) => {
+      if (station.is_battle_available && station.battle_pokemon_id === null) {
+        station.is_battle_available = false
+      }
+      if (station.total_stationed_pokemon === null) {
+        station.total_stationed_pokemon = 0
+      }
+      if (
+        station.stationed_pokemon &&
+        (station.total_stationed_gmax === undefined ||
+          station.total_stationed_gmax === null)
+      ) {
+        const list =
+          typeof station.stationed_pokemon === 'string'
+            ? JSON.parse(station.stationed_pokemon)
+            : station.stationed_pokemon || []
+        let count = 0
+        if (list)
+          for (let i = 0; i < list.length; ++i)
+            if (list[i].bread_mode === 2 || list[i].bread_mode === 3) ++count
+        station.total_stationed_gmax = count
+      }
+      return station
+    }
+
+    const shouldInclude = (station) => {
+      const isInactive =
+        Number.isFinite(station.end_time) && station.end_time <= ts
+      if (onlyInactivePowerSpots && isInactive) {
+        return true
+      }
+      if (onlyAllStations) {
+        return true
+      }
+      return (
+        perms.dynamax &&
+        ((onlyMaxBattles &&
+          (onlyBattleTier === 'all'
+            ? args.filters[`j${station.battle_level}`] ||
+              args.filters[
+                `${station.battle_pokemon_id}-${station.battle_pokemon_form}`
+              ]
+            : onlyBattleTier === station.battle_level)) ||
+          (onlyGmaxStationed && station.total_stationed_gmax))
       )
+    }
+
+    /** @type {import("@rm/types").FullStation[]} */
+    const activeResults = (await query.select(select))
+      .map(normalizeStation)
+      .filter(shouldInclude)
+
+    if (!onlyInactivePowerSpots) {
+      return activeResults
+    }
+
+    const inactiveQuery = this.query()
+    applyManualIdFilter(inactiveQuery, {
+      manualId: args.filters.onlyManualId,
+      latColumn: 'lat',
+      lonColumn: 'lon',
+      idColumn: 'id',
+      bounds: {
+        minLat: args.minLat,
+        maxLat: args.maxLat,
+        minLon: args.minLon,
+        maxLon: args.maxLon,
+      },
+    })
+    inactiveQuery.andWhere('end_time', '<=', ts)
+
+    if (!getAreaSql(inactiveQuery, areaRestrictions, onlyAreas, isMad)) {
+      return activeResults
+    }
+
+    const inactiveResults = (await inactiveQuery.select(select))
+      .map(normalizeStation)
+      .filter(shouldInclude)
+
+    const combined = new Map()
+    activeResults.forEach((station) => combined.set(station.id, station))
+    inactiveResults.forEach((station) => combined.set(station.id, station))
+
+    return [...combined.values()]
   }
 
   /**

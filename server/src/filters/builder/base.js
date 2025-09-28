@@ -129,6 +129,9 @@ function buildDefaultFilters(perms) {
             gmaxStationed: perms.dynamax
               ? defaultFilters.stations.gmaxStationed
               : undefined,
+            inactivePowerSpots: perms.stations
+              ? defaultFilters.stations.inactivePowerSpots
+              : undefined,
           }
         : undefined,
     pokemon:

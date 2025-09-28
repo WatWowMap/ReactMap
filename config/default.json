@@ -584,7 +584,8 @@
       "battles": false,
       "gmaxStationed": false,
       "interactionRanges": false,
-      "customRange": 0
+      "customRange": 0,
+      "inactivePowerSpots": false
     },
     "s2cells": {
       "enabled": false,

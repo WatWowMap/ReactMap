@@ -75,6 +75,9 @@ const trimFilters = (requestedFilters, userSettings, category, onlyAreas) => {
         entryV
     }
   })
+  if (category === 'stations' && requestedFilters?.inactivePowerSpots) {
+    trimmed.onlyInactivePowerSpots = true
+  }
   Object.entries(requestedFilters?.filter || {}).forEach(([id, specifics]) => {
     // eslint-disable-next-line no-unused-vars
     const { enabled, size, ...rest } = (easyMode
