@@ -162,23 +162,26 @@ class Station extends Model {
     const shouldInclude = (station) => {
       const isInactive =
         Number.isFinite(station.end_time) && station.end_time <= ts
+      const matchesBaseFilters =
+        onlyAllStations ||
+        (perms.dynamax &&
+          ((onlyMaxBattles &&
+            (onlyBattleTier === 'all'
+              ? args.filters[`j${station.battle_level}`] ||
+                args.filters[
+                  `${station.battle_pokemon_id}-${station.battle_pokemon_form}`
+                ]
+              : onlyBattleTier === station.battle_level)) ||
+            (onlyGmaxStationed && station.total_stationed_gmax)))
+
       if (onlyInactiveStations && isInactive) {
+        if (onlyAllStations || onlyMaxBattles || onlyGmaxStationed) {
+          return matchesBaseFilters
+        }
         return true
       }
-      if (onlyAllStations) {
-        return true
-      }
-      return (
-        perms.dynamax &&
-        ((onlyMaxBattles &&
-          (onlyBattleTier === 'all'
-            ? args.filters[`j${station.battle_level}`] ||
-              args.filters[
-                `${station.battle_pokemon_id}-${station.battle_pokemon_form}`
-              ]
-            : onlyBattleTier === station.battle_level)) ||
-          (onlyGmaxStationed && station.total_stationed_gmax))
-      )
+
+      return matchesBaseFilters
     }
 
     /** @type {import("@rm/types").FullStation[]} */

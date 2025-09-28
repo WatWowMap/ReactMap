@@ -817,6 +817,7 @@
   "station_timers": "Power Spot Timers",
   "stations_opacity": "Dynamic Power Spot Opacity",
   "inactive_power_spots": "Inactive Power Spots",
+  "inactive_stations": "Inactive Power Spots",
   "max_battles": "Max Battles",
   "dynamax": "Dynamax",
   "stations_subtitle": "Displays Power Spots on the map",
