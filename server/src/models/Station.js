@@ -81,7 +81,7 @@ class Station extends Model {
         'battle_pokemon_bread_mode',
         'battle_pokemon_move_1',
         'battle_pokemon_move_2',
-        'total_stationed_pokemon'
+        'total_stationed_pokemon',
       )
       select.push(
         hasStationedGmax ? 'total_stationed_gmax' : 'stationed_pokemon'
