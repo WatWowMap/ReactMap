@@ -27,7 +27,7 @@ function ExtrasComponent({ category, subItem }) {
     case 'admin':
       return <AdminDrawer subItem={subItem} />
     case 'stations':
-      return subItem === 'allStations' && <StationsDrawer />
+      return <StationsDrawer subItem={subItem} />
     default:
       return null
   }
