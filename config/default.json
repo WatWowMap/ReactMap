@@ -585,7 +585,7 @@
       "gmaxStationed": false,
       "interactionRanges": false,
       "customRange": 0,
-      "inactivePowerSpots": false
+      "inactiveStations": false
     },
     "s2cells": {
       "enabled": false,

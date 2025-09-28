@@ -29,7 +29,7 @@ class Station extends Model {
       onlyMaxBattles,
       onlyBattleTier,
       onlyGmaxStationed,
-      onlyInactivePowerSpots,
+      onlyInactiveStations,
     } = args.filters
     const ts = getEpoch()
     const select = [
@@ -162,7 +162,7 @@ class Station extends Model {
     const shouldInclude = (station) => {
       const isInactive =
         Number.isFinite(station.end_time) && station.end_time <= ts
-      if (onlyInactivePowerSpots && isInactive) {
+      if (onlyInactiveStations && isInactive) {
         return true
       }
       if (onlyAllStations) {
@@ -186,7 +186,7 @@ class Station extends Model {
       .map(normalizeStation)
       .filter(shouldInclude)
 
-    if (!onlyInactivePowerSpots) {
+    if (!onlyInactiveStations) {
       return activeResults
     }
 

@@ -129,8 +129,8 @@ function buildDefaultFilters(perms) {
             gmaxStationed: perms.dynamax
               ? defaultFilters.stations.gmaxStationed
               : undefined,
-            inactivePowerSpots: perms.stations
-              ? defaultFilters.stations.inactivePowerSpots
+            inactiveStations: perms.stations
+              ? defaultFilters.stations.inactiveStations
               : undefined,
           }
         : undefined,

@@ -69,7 +69,7 @@ function drawer(req, perms) {
             allStations: perms.stations || BLOCKED,
             maxBattles: perms.dynamax || BLOCKED,
             gmaxStationed: perms.dynamax || BLOCKED,
-            inactivePowerSpots: perms.stations || BLOCKED,
+            inactiveStations: perms.stations || BLOCKED,
           }
         : BLOCKED,
     pokemon:
