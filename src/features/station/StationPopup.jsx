@@ -384,10 +384,10 @@ function StationContent({ start_time, end_time, battle_end, id }) {
   const displayInactiveOnly =
     Number.isFinite(battle_end) && hasEndTime && battle_end === endEpoch
   const epoch = displayInactiveOnly
-    ? endEpoch || 0
+    ? endEpoch
     : isFutureStart
-      ? startEpoch || 0
-      : endEpoch || 0
+      ? startEpoch
+      : endEpoch
 
   return (
     <CardContent sx={{ p: 0 }}>

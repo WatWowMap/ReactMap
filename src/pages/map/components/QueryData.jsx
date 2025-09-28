@@ -62,12 +62,22 @@ const trimFilters = (requestedFilters, userSettings, category, onlyAreas) => {
     onlyAllPvp: userSettings?.showAllPvpRanks,
     onlyAreas: onlyAreas || [],
   }
-  Object.entries(requestedFilters || {}).forEach((topLevelFilter) => {
-    const [id, specifics] = topLevelFilter
-
-    if (!FILTER_SKIP_LIST.includes(id)) {
-      trimmed[`only${id.charAt(0).toUpperCase()}${id.slice(1)}`] = specifics
+  const applyTopLevelFilter = (id, specifics) => {
+    if (FILTER_SKIP_LIST.includes(id)) return
+    const trimmedKey = `only${id.charAt(0).toUpperCase()}${id.slice(1)}`
+    if (typeof specifics === 'boolean') {
+      if (specifics) {
+        trimmed[trimmedKey] = true
+      }
+      return
     }
+    if (specifics !== undefined) {
+      trimmed[trimmedKey] = specifics
+    }
+  }
+
+  Object.entries(requestedFilters || {}).forEach(([id, specifics]) => {
+    applyTopLevelFilter(id, specifics)
   })
   Object.entries(userSettings || {}).forEach(([entryK, entryV]) => {
     if (entryK.startsWith('pvp')) {
@@ -75,9 +85,6 @@ const trimFilters = (requestedFilters, userSettings, category, onlyAreas) => {
         entryV
     }
   })
-  if (category === 'stations' && requestedFilters?.inactiveStations) {
-    trimmed.onlyInactiveStations = true
-  }
   Object.entries(requestedFilters?.filter || {}).forEach(([id, specifics]) => {
     // eslint-disable-next-line no-unused-vars
     const { enabled, size, ...rest } = (easyMode
