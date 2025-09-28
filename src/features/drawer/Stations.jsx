@@ -125,13 +125,17 @@ function StationsQuickSelect() {
   )
 }
 
-export function StationsDrawer() {
+export function StationsDrawer({ subItem }) {
   return (
     <>
       <StationsEffects />
-      <StationsNestedInactive />
-      <StationLevels />
-      <StationsQuickSelect />
+      {subItem === 'allStations' && <StationsNestedInactive />}
+      {subItem === 'maxBattles' && (
+        <>
+          <StationLevels />
+          <StationsQuickSelect />
+        </>
+      )}
     </>
   )
 }
