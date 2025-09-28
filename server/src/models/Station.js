@@ -62,12 +62,16 @@ class Station extends Model {
       query.andWhere(
         'updated',
         '>',
-        Date.now() / 1000 - stationUpdateLimit * 60 * 60
+        Date.now() / 1000 - stationUpdateLimit * 60 * 60,
       )
     }
     // .where('is_inactive', false)
 
-    if (!onlyInactiveStations && perms.dynamax && (onlyMaxBattles || onlyGmaxStationed)) {
+    if (
+      !onlyInactiveStations &&
+      perms.dynamax &&
+      (onlyMaxBattles || onlyGmaxStationed)
+    ) {
       select.push(
         'is_battle_available',
         'battle_level',
@@ -84,13 +88,11 @@ class Station extends Model {
         'total_stationed_pokemon',
       )
       select.push(
-        hasStationedGmax ? 'total_stationed_gmax' : 'stationed_pokemon'
+        hasStationedGmax ? 'total_stationed_gmax' : 'stationed_pokemon',
       )
 
       if (!onlyAllStations) {
-        query
-          .whereNotNull('battle_pokemon_id')
-          .andWhere('battle_end', '>', ts)
+        query.whereNotNull('battle_pokemon_id').andWhere('battle_end', '>', ts)
 
         query.andWhere((station) => {
           if (hasStationedGmax || !onlyGmaxStationed) {
@@ -178,7 +180,7 @@ class Station extends Model {
                     `${station.battle_pokemon_id}-${station.battle_pokemon_form}`
                   ]
                 : onlyBattleTier === station.battle_level)) ||
-              (onlyGmaxStationed && station.total_stationed_gmax)))
+              (onlyGmaxStationed && station.total_stationed_gmax))),
       )
   }
 
@@ -221,9 +223,9 @@ class Station extends Model {
       .andWhere(
         'updated',
         '>',
-        Date.now() / 1000 - stationUpdateLimit * 60 * 60
+        Date.now() / 1000 - stationUpdateLimit * 60 * 60,
       )
-    .groupBy(['battle_pokemon_id', 'battle_pokemon_form', 'battle_level'])
+      .groupBy(['battle_pokemon_id', 'battle_pokemon_form', 'battle_level'])
       .orderBy('battle_pokemon_id', 'asc')
     return {
       available: [
@@ -233,7 +235,7 @@ class Station extends Model {
             .flatMap((station) => [
               `${station.battle_pokemon_id}-${station.battle_pokemon_form}`,
               `j${station.battle_level}`,
-            ])
+            ]),
         ),
       ],
     }
@@ -283,7 +285,7 @@ class Station extends Model {
       .andWhere(
         'updated',
         '>',
-        Date.now() / 1000 - stationUpdateLimit * 60 * 60
+        Date.now() / 1000 - stationUpdateLimit * 60 * 60,
       )
       .andWhere('end_time', '>', ts)
       .andWhere((builder) => {
