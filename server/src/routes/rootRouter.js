@@ -180,6 +180,9 @@ rootRouter.get('/api/settings', async (req, res, next) => {
               req.session.save()
             }
           }
+          if (user.data !== undefined) {
+            req.user.data = user.data
+          }
         }
       } catch (e) {
         log.warn(TAGS.session, 'Issue finding user, User ID:', req?.user?.id, e)
@@ -214,6 +217,12 @@ rootRouter.get('/api/settings', async (req, res, next) => {
       }
     }
 
+    res.set({
+      'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
+      Pragma: 'no-cache',
+      Expires: '0',
+      'Surrogate-Control': 'no-store',
+    })
     res.status(200).json(settings)
   } catch (error) {
     res.status(500).json({ error: error.message, status: 500 })
