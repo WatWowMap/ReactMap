@@ -142,59 +142,55 @@ class Station extends Model {
       return []
     }
 
-    const normalizeStation = (station) => {
-      if (station.is_battle_available && station.battle_pokemon_id === null) {
-        station.is_battle_available = false
-      }
-      if (station.total_stationed_pokemon === null) {
-        station.total_stationed_pokemon = 0
-      }
-      if (
-        station.stationed_pokemon &&
-        (station.total_stationed_gmax === undefined ||
-          station.total_stationed_gmax === null)
-      ) {
-        const list =
-          typeof station.stationed_pokemon === 'string'
-            ? JSON.parse(station.stationed_pokemon)
-            : station.stationed_pokemon || []
-        let count = 0
-        if (list)
-          for (let i = 0; i < list.length; ++i)
-            if (list[i].bread_mode === 2 || list[i].bread_mode === 3) ++count
-        station.total_stationed_gmax = count
-      }
-      return station
-    }
-
-    const shouldInclude = (station) => {
-      if (Number.isFinite(station.end_time) && station.end_time <= ts) {
-        return onlyInactiveStations
-      }
-
-      const matchesBattleFilter =
-        onlyMaxBattles &&
-        (onlyBattleTier === 'all'
-          ? Boolean(
-              args.filters[`j${station.battle_level}`] ||
-                args.filters[
-                  `${station.battle_pokemon_id}-${station.battle_pokemon_form}`
-                ],
-            )
-          : onlyBattleTier === station.battle_level)
-
-      const matchesGmaxFilter =
-        onlyGmaxStationed && station.total_stationed_gmax > 0
-
-      return (
-        onlyAllStations ||
-        (perms.dynamax && (matchesBattleFilter || matchesGmaxFilter))
-      )
-    }
-
     return (await query.select(select))
-      .map(normalizeStation)
-      .filter(shouldInclude)
+      .map((station) => {
+        if (station.is_battle_available && station.battle_pokemon_id === null) {
+          station.is_battle_available = false
+        }
+        if (station.total_stationed_pokemon === null) {
+          station.total_stationed_pokemon = 0
+        }
+        if (
+          station.stationed_pokemon &&
+          (station.total_stationed_gmax === undefined ||
+            station.total_stationed_gmax === null)
+        ) {
+          const list =
+            typeof station.stationed_pokemon === 'string'
+              ? JSON.parse(station.stationed_pokemon)
+              : station.stationed_pokemon || []
+          let count = 0
+          if (list)
+            for (let i = 0; i < list.length; ++i)
+              if (list[i].bread_mode === 2 || list[i].bread_mode === 3) ++count
+          station.total_stationed_gmax = count
+        }
+        return station
+      })
+      .filter((station) => {
+        if (Number.isFinite(station.end_time) && station.end_time <= ts) {
+          return onlyInactiveStations
+        }
+
+        const matchesBattleFilter =
+          onlyMaxBattles &&
+          (onlyBattleTier === 'all'
+            ? Boolean(
+                args.filters[`j${station.battle_level}`] ||
+                  args.filters[
+                    `${station.battle_pokemon_id}-${station.battle_pokemon_form}`
+                  ],
+              )
+            : onlyBattleTier === station.battle_level)
+
+        const matchesGmaxFilter =
+          onlyGmaxStationed && station.total_stationed_gmax > 0
+
+        return (
+          onlyAllStations ||
+          (perms.dynamax && (matchesBattleFilter || matchesGmaxFilter))
+        )
+      })
   }
 
   /**
