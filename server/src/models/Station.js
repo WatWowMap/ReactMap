@@ -168,38 +168,28 @@ class Station extends Model {
     }
 
     const shouldInclude = (station) => {
-      const isInactive =
-        Number.isFinite(station.end_time) && station.end_time <= ts
+      if (Number.isFinite(station.end_time) && station.end_time <= ts) {
+        return onlyInactiveStations
+      }
 
       const matchesBattleFilter =
-        // Inactive power spots shouldn’t be filtered by battle criteria; the toggle surfaces
-        // their historical location even if battle metadata is stale, so treat them as matching.
         onlyMaxBattles &&
-        (isInactive ||
-          (onlyBattleTier === 'all'
-            ? Boolean(
-                args.filters[`j${station.battle_level}`] ||
-                  args.filters[
-                    `${station.battle_pokemon_id}-${station.battle_pokemon_form}`
-                  ],
-              )
-            : onlyBattleTier === station.battle_level))
+        (onlyBattleTier === 'all'
+          ? Boolean(
+              args.filters[`j${station.battle_level}`] ||
+                args.filters[
+                  `${station.battle_pokemon_id}-${station.battle_pokemon_form}`
+                ],
+            )
+          : onlyBattleTier === station.battle_level)
 
       const matchesGmaxFilter =
         onlyGmaxStationed && station.total_stationed_gmax > 0
 
-      const matchesBaseFilters =
+      return (
         onlyAllStations ||
         (perms.dynamax && (matchesBattleFilter || matchesGmaxFilter))
-
-      if (onlyInactiveStations && isInactive) {
-        if (onlyAllStations || onlyMaxBattles || onlyGmaxStationed) {
-          return matchesBaseFilters
-        }
-        return true
-      }
-
-      return matchesBaseFilters
+      )
     }
 
     return (await query.select(select))
