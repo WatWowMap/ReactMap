@@ -2,6 +2,28 @@
 /* eslint-disable no-console */
 import { UICONS } from 'uicons.js'
 
+/**
+ * Extract the first file extension from a set of filenames.
+ * @param {Set<string>} set
+ */
+const extractExtension = (set) => {
+  if (!set) return undefined
+  const iterator = set.values()
+  let next = iterator.next()
+  while (!next.done) {
+    const entry = next.value
+    if (typeof entry === 'string' && entry.includes('.')) {
+      const parts = entry.split('.')
+      const ext = parts.pop()
+      if (ext) {
+        return ext
+      }
+    }
+    next = iterator.next()
+  }
+  return undefined
+}
+
 // /**
 //  *
 //  * @template {object} T
@@ -144,6 +166,11 @@ export class UAssets {
               }
             }
           })
+          if (Array.isArray(data.tappable)) {
+            this[name].tappable = new Set(
+              data.tappable.filter((iconName) => typeof iconName === 'string'),
+            )
+          }
         }
       } catch (e) {
         console.error(
@@ -418,12 +445,47 @@ export class UAssets {
    * @returns {string}
    */
   getTappable(type = '0') {
+    const selection = this.selected.tappable
+    const pack = selection ? this[selection] : undefined
     try {
-      return this[this.selected.tappable]?.class?.tappable(type)
+      if (pack?.class && typeof pack.class.tappable === 'function') {
+        const iconPath = pack.class.tappable(type)
+        if (iconPath) {
+          return iconPath
+        }
+      }
     } catch (e) {
       console.error(`[${this.assetType.toUpperCase()}]`, e)
-      return `${this.fallback}/tappable/0.${this.fallbackExt}`
     }
+
+    const normalized = (type || '0').toString()
+    const basePath = pack?.path || this.fallback
+    const tappableSet =
+      pack?.tappable instanceof Set ? pack.tappable : undefined
+    const extension = extractExtension(tappableSet) || this.fallbackExt
+
+    const baseCandidates = [normalized, normalized.toLowerCase()]
+    if (normalized.startsWith('TAPPABLE_TYPE_')) {
+      const suffix = normalized.slice('TAPPABLE_TYPE_'.length)
+      baseCandidates.push(suffix, suffix.toLowerCase())
+    }
+    const candidates = Array.from(new Set(baseCandidates))
+
+    if (tappableSet) {
+      for (let i = 0; i < candidates.length; i += 1) {
+        const candidate = candidates[i]
+        const filename = `${candidate}.${extension}`
+        if (tappableSet.has(filename)) {
+          return `${basePath}/tappable/${filename}`
+        }
+      }
+      const fallbackName = `0.${extension}`
+      if (tappableSet.has(fallbackName)) {
+        return `${basePath}/tappable/${fallbackName}`
+      }
+    }
+
+    return `${basePath}/tappable/${normalized}.${extension}`
   }
 
   /**
