@@ -1,3 +1,10 @@
+# [1.40.0-develop.4](https://github.com/WatWowMap/ReactMap/compare/v1.40.0-develop.3...v1.40.0-develop.4) (2025-09-29)
+
+
+### Features
+
+* expired stations ([0521045](https://github.com/WatWowMap/ReactMap/commit/0521045f597aa755b3ec8b37b19022f9c280d765))
+
 # [1.40.0-develop.3](https://github.com/WatWowMap/ReactMap/compare/v1.40.0-develop.2...v1.40.0-develop.3) (2025-09-26)
 
 
