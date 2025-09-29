@@ -175,12 +175,10 @@ class Station extends Model {
         const matchesBattleFilter =
           onlyMaxBattles &&
           (onlyBattleTier === 'all'
-            ? Boolean(
-                args.filters[`j${station.battle_level}`] ||
-                  args.filters[
-                    `${station.battle_pokemon_id}-${station.battle_pokemon_form}`
-                  ],
-              )
+            ? args.filters[`j${station.battle_level}`] ||
+              args.filters[
+                `${station.battle_pokemon_id}-${station.battle_pokemon_form}`
+              ]
             : onlyBattleTier === station.battle_level)
 
         const matchesGmaxFilter =
