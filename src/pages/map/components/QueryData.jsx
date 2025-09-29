@@ -62,22 +62,12 @@ const trimFilters = (requestedFilters, userSettings, category, onlyAreas) => {
     onlyAllPvp: userSettings?.showAllPvpRanks,
     onlyAreas: onlyAreas || [],
   }
-  const applyTopLevelFilter = (id, specifics) => {
-    if (FILTER_SKIP_LIST.includes(id)) return
-    const trimmedKey = `only${id.charAt(0).toUpperCase()}${id.slice(1)}`
-    if (typeof specifics === 'boolean') {
-      if (specifics) {
-        trimmed[trimmedKey] = true
-      }
-      return
-    }
-    if (specifics !== undefined) {
-      trimmed[trimmedKey] = specifics
-    }
-  }
+  Object.entries(requestedFilters || {}).forEach((topLevelFilter) => {
+    const [id, specifics] = topLevelFilter
 
-  Object.entries(requestedFilters || {}).forEach(([id, specifics]) => {
-    applyTopLevelFilter(id, specifics)
+    if (!FILTER_SKIP_LIST.includes(id)) {
+      trimmed[`only${id.charAt(0).toUpperCase()}${id.slice(1)}`] = specifics
+    }
   })
   Object.entries(userSettings || {}).forEach(([entryK, entryV]) => {
     if (entryK.startsWith('pvp')) {
