@@ -22,7 +22,8 @@ class Station extends Model {
    */
   static async getAll(perms, args, { isMad, hasStationedGmax }) {
     const { areaRestrictions } = perms
-    const { stationUpdateLimit } = config.getSafe('api')
+    const { stationUpdateLimit, stationInactiveLimitDays } =
+      config.getSafe('api')
     const {
       onlyAreas,
       onlyAllStations,
@@ -55,7 +56,9 @@ class Station extends Model {
         maxLon: args.maxLon,
       },
     })
-    const activeCutoff = Date.now() / 1000 - stationUpdateLimit * 60 * 60
+    const now = Date.now() / 1000
+    const activeCutoff = now - stationUpdateLimit * 60 * 60
+    const inactiveCutoff = now - stationInactiveLimitDays * 24 * 60 * 60
 
     if (onlyInactiveStations) {
       query.andWhere((builder) => {
@@ -65,7 +68,11 @@ class Station extends Model {
               .where('end_time', '>', ts)
               .andWhere('updated', '>', activeCutoff),
           )
-          .orWhere('end_time', '<=', ts)
+          .orWhere((inactive) =>
+            inactive
+              .where('end_time', '<=', ts)
+              .andWhere('updated', '>', inactiveCutoff),
+          )
       })
     } else {
       query.andWhere('end_time', '>', ts).andWhere('updated', '>', activeCutoff)

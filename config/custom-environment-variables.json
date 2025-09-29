@@ -332,6 +332,10 @@
       "__name": "API_STATION_UPDATE_LIMIT",
       "__format": "number"
     },
+    "stationInactiveLimitDays": {
+      "__name": "API_STATION_INACTIVE_LIMIT_DAYS",
+      "__format": "number"
+    },
     "searchResultsLimit": {
       "__name": "API_SEARCH_RESULTS_LIMIT",
       "__format": "number"
