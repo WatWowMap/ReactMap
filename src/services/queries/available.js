@@ -44,3 +44,9 @@ export const GET_AVAILABLE_STATIONS = gql`
     availableStations
   }
 `
+
+export const GET_AVAILABLE_TAPPABLES = gql`
+  query AvailableTappables {
+    availableTappables
+  }
+`

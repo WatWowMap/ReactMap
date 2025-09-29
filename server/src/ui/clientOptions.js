@@ -171,6 +171,53 @@ function clientOptions(perms) {
         ? { type: 'bool', perm: ['stations', 'dynamax'], category: 'popups' }
         : undefined,
     },
+    tappables: {
+      clustering: {
+        type: 'bool',
+        perm: ['tappables'],
+        category: 'markers',
+      },
+      tappableTimers: {
+        type: 'bool',
+        perm: ['tappables'],
+        category: 'tooltips',
+      },
+      interactionRanges: {
+        type: 'bool',
+        perm: ['tappables'],
+        category: 'markers',
+      },
+      customRange: {
+        type: 'number',
+        perm: ['tappables'],
+        min: 0,
+        max: 5000,
+        category: 'markers',
+      },
+      tappablesOpacity: {
+        type: 'bool',
+        perm: ['tappables'],
+        category: 'dynamic_opacity',
+      },
+      opacityTenMinutes: {
+        type: 'number',
+        perm: ['tappables'],
+        category: 'dynamic_opacity',
+      },
+      opacityFiveMinutes: {
+        type: 'number',
+        perm: ['tappables'],
+        category: 'dynamic_opacity',
+      },
+      opacityOneMinute: {
+        type: 'number',
+        perm: ['tappables'],
+        category: 'dynamic_opacity',
+      },
+      enableTappablePopupCoords: map.misc.enableTappablePopupCoordsSelector
+        ? { type: 'bool', perm: ['tappables'], category: 'popups' }
+        : undefined,
+    },
     pokemon: {
       clustering: { type: 'bool', perm: ['pokemon'], category: 'markers' },
       linkGlobalAndAdvanced: {

@@ -92,6 +92,8 @@ const resolvers = {
       }),
     availableStations: (_, _args, { Event, perms }) =>
       perms?.dynamax ? Event.available.stations : [],
+    availableTappables: (_, _args, { Event, perms }) =>
+      perms?.tappables ? Event.available.tappables : [],
     backup: (_, args, { req, perms, Db }) => {
       if (perms?.backups && req?.user?.id) {
         return Db.models.Backup.getOne(args.id, req?.user?.id)
@@ -523,6 +525,12 @@ const resolvers = {
     stationPokemon: (_, { id }, { perms, Db }) => {
       if (perms?.stations) {
         return Db.query('Station', 'getDynamaxMons', id)
+      }
+      return []
+    },
+    tappables: (_, args, { perms, Db }) => {
+      if (perms?.tappables) {
+        return Db.query('Tappable', 'getAll', perms, args)
       }
       return []
     },

@@ -30,6 +30,7 @@ class EventManager extends Logger {
       pokemon: [],
       nests: [],
       stations: [],
+      tappables: [],
     })
     this.uicons = getCache('uicons.json', [])
     this.uaudio = getCache('uaudio.json', [])

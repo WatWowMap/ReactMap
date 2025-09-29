@@ -92,6 +92,8 @@ function SelectorList({ category, subCategory, label, height = 400 }) {
               switch (category) {
                 case 'gyms':
                   return key.startsWith('t')
+                case 'tappables':
+                  return key.startsWith('q')
                 default:
                   return Number.isInteger(Number(key.charAt(0)))
               }

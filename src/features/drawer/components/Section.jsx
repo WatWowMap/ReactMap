@@ -28,6 +28,7 @@ const ADV_CATEGORIES = new Set([
   'pokestops',
   'nests',
   'stations',
+  'tappables',
 ])
 
 /** @param {{ category: keyof import('@rm/types').UIObject }} props */

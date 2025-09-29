@@ -10,6 +10,7 @@ import SpawnpointModel = require('server/src/models/Spawnpoint')
 import WeatherModel = require('server/src/models/Weather')
 import RouteModel = require('server/src/models/Route')
 import StationModel = require('server/src/models/Station')
+import TappableModel = require('server/src/models/Tappable')
 
 import { S2Polygon } from './general'
 
@@ -273,6 +274,20 @@ export interface Portal {
 }
 
 export type FullPortal = FullModel<Portal, PortalModel.Portal>
+
+export interface Tappable {
+  id: string
+  lat: number
+  lon: number
+  type: string
+  item_id: number
+  count: number | null
+  expire_timestamp: number | null
+  expire_timestamp_verified: boolean
+  updated: number
+}
+
+export type FullTappable = FullModel<Tappable, TappableModel.Tappable>
 
 export interface ScanCell {
   id?: string

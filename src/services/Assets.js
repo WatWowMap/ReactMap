@@ -414,6 +414,19 @@ export class UAssets {
   }
 
   /**
+   * @param {string} [type]
+   * @returns {string}
+   */
+  getTappable(type = '0') {
+    try {
+      return this[this.selected.tappable]?.class?.tappable(type)
+    } catch (e) {
+      console.error(`[${this.assetType.toUpperCase()}]`, e)
+      return `${this.fallback}/tappable/0.${this.fallbackExt}`
+    }
+  }
+
+  /**
    *
    * @param {string | number} [rewardType]
    * @param {string | number} [id]
