@@ -1352,6 +1352,10 @@
       "customRange": {
         "__name": "DEFAULT_FILTERS_STATIONS_CUSTOM_RANGE",
         "__format": "number"
+      },
+      "inactiveStations": {
+        "__name": "DEFAULT_FILTERS_STATIONS_INACTIVE_STATIONS",
+        "__format": "boolean"
       }
     },
     "s2cells": {
