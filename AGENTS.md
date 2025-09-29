@@ -9,3 +9,7 @@ Testing guidelines - No dedicated Jest suite today; rely on `yarn lint`, type ch
 Commit and pull request guidelines - Use Conventional Commits (`type(scope): summary`), matching existing history (e.g. `feat(map): add weather overlays`). Each PR should describe scope, link related issues, list testing steps, and include screenshots or GIFs for UI changes. Re-run `yarn lint`, `yarn build`, and integration steps touched by the change before requesting review.
 
 Localization notes - Update English copy only in `packages/locales/lib/human/en.json`; run `yarn locales:generate` to refresh derived languages. When adding a new translation key (for example when calling `t('some_key')`), create the English entry in `packages/locales/lib/human/en.json` in the same change. NEVER use fallback strings. Never edit generated locale files directly - the automation pipeline syncs translations downstream.
+
+Naming and plumbing for new filters - For example, `station` is the internal terminology and “Power Spots” is the player-facing label. When adding a toggle like inactive visibility, check (and update only if needed) every touch point with the same internal key: `config/default.json`, drawer permissions, hooks such as `usePermCheck`, and the server model.
+
+Model queries - Avoid unnecessary second queries. Try to bunch all queries into a single SQL query whenever possible.
