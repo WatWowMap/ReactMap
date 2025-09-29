@@ -361,13 +361,16 @@ function StationContent({ start_time, end_time, battle_end, id }) {
   const hasEndTime = Number.isFinite(end_time)
   const endEpoch = hasEndTime ? end_time : 0
   const isInactive = hasEndTime && endEpoch < now
+  const inactiveRelativeTime = useRelativeTimer(endEpoch || 0)
 
   if (isInactive) {
     const formatted = dateFormatter.format(new Date(endEpoch * 1000))
     return (
       <CardContent sx={{ p: 0 }}>
         <Stack alignItems="center" justifyContent="center">
-          <Typography variant="subtitle2">{t('inactive')}</Typography>
+          <Typography variant="subtitle2">
+            {t('inactive_since', { time: inactiveRelativeTime })}
+          </Typography>
           <Typography variant="caption">
             {t('last_active', { time: formatted })}
           </Typography>
