@@ -15,6 +15,7 @@ import { Header } from '@components/dialogs/Header'
 import { Footer } from '@components/dialogs/Footer'
 import { DialogWrapper } from '@components/dialogs/DialogWrapper'
 import { useAnalytics } from '@hooks/useAnalytics'
+import { getSettings } from '@services/fetches'
 
 import { UserBackups } from './Backups'
 import { UserPermissions } from './Permissions'
@@ -32,6 +33,33 @@ export function UserProfile() {
 
   const [tab, setTab] = React.useState('profile')
   const [tabsHeight, setTabsHeight] = React.useState(0)
+  const isOpen = useLayoutStore((s) => s.userProfile)
+  React.useEffect(() => {
+    if (!isOpen) return
+    let active = true
+    ;(async () => {
+      try {
+        const data = await getSettings()
+        if (active && data && !('error' in data) && data.user) {
+          const parsed = data.user?.data
+            ? typeof data.user.data === 'string'
+              ? JSON.parse(data.user.data)
+              : data.user.data
+            : {}
+          useMemory.setState((prev) => ({
+            auth: {
+              ...prev.auth,
+              data: parsed,
+            },
+          }))
+        }
+      } catch {
+      }
+    })()
+    return () => {
+      active = false
+    }
+  }, [isOpen])
 
   const handleTabChange = (_event, newValue) => {
     setTab(newValue)
