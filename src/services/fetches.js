@@ -10,7 +10,9 @@
  */
 export async function getSettings() {
   try {
-    const response = await fetch('/api/settings')
+    const response = await fetch(`/api/settings?t=${Date.now()}`, {
+      cache: 'no-store',
+    })
     if (!response.ok) {
       throw new Error(`${response.status} (${response.statusText})`)
     }
