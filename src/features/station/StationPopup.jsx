@@ -355,17 +355,41 @@ function StationAttackBonus({ total_stationed_pokemon, total_stationed_gmax }) {
 
 /** @param {import('@rm/types').Station} station */
 function StationContent({ start_time, end_time, battle_end, id }) {
+  const { t } = useTranslation()
+  const dateFormatter = useFormatStore((s) => s.dateFormat)
   const now = Date.now() / 1000
-  const isFutureStart = start_time > now
+  const hasEndTime = Number.isFinite(end_time)
+  const endEpoch = hasEndTime ? end_time : 0
+  const isInactive = hasEndTime && endEpoch < now
+  const inactiveRelativeTime = useRelativeTimer(endEpoch || 0)
+
+  if (isInactive) {
+    const formatted = dateFormatter.format(new Date(endEpoch * 1000))
+    return (
+      <CardContent sx={{ p: 0 }}>
+        <Stack alignItems="center" justifyContent="center">
+          <Typography variant="subtitle2">
+            {t('inactive_since', { time: inactiveRelativeTime })}
+          </Typography>
+          <Typography variant="caption">
+            {t('last_active', { time: formatted })}
+          </Typography>
+        </Stack>
+      </CardContent>
+    )
+  }
+
+  const hasStartTime = Number.isFinite(start_time)
+  const startEpoch = hasStartTime ? start_time : 0
+  const isFutureStart = hasStartTime && startEpoch > now
   const displayInactiveOnly =
-    Number.isFinite(battle_end) &&
-    Number.isFinite(end_time) &&
-    battle_end === end_time
+    Number.isFinite(battle_end) && hasEndTime && battle_end === endEpoch
   const epoch = displayInactiveOnly
-    ? (end_time ?? 0)
+    ? endEpoch
     : isFutureStart
-      ? (start_time ?? 0)
-      : (end_time ?? 0)
+      ? startEpoch
+      : endEpoch
+
   return (
     <CardContent sx={{ p: 0 }}>
       <Stack alignItems="center" justifyContent="center">

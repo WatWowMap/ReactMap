@@ -29,6 +29,7 @@ class Station extends Model {
       onlyMaxBattles,
       onlyBattleTier,
       onlyGmaxStationed,
+      onlyInactiveStations,
     } = args.filters
     const ts = getEpoch()
     const select = [
@@ -54,13 +55,21 @@ class Station extends Model {
         maxLon: args.maxLon,
       },
     })
-    query
-      .andWhere('end_time', '>', ts)
-      .andWhere(
-        'updated',
-        '>',
-        Date.now() / 1000 - stationUpdateLimit * 60 * 60,
-      )
+    const activeCutoff = Date.now() / 1000 - stationUpdateLimit * 60 * 60
+
+    if (onlyInactiveStations) {
+      query.andWhere((builder) => {
+        builder
+          .where((active) =>
+            active
+              .where('end_time', '>', ts)
+              .andWhere('updated', '>', activeCutoff),
+          )
+          .orWhere('end_time', '<=', ts)
+      })
+    } else {
+      query.andWhere('end_time', '>', ts).andWhere('updated', '>', activeCutoff)
+    }
     // .where('is_inactive', false)
 
     if (perms.dynamax && (onlyMaxBattles || onlyGmaxStationed)) {
@@ -132,10 +141,8 @@ class Station extends Model {
     if (!getAreaSql(query, areaRestrictions, onlyAreas, isMad)) {
       return []
     }
-    /** @type {import("@rm/types").FullStation[]} */
-    const results = await query.select(select)
 
-    return results
+    return (await query.select(select))
       .map((station) => {
         if (station.is_battle_available && station.battle_pokemon_id === null) {
           station.is_battle_available = false
@@ -160,19 +167,28 @@ class Station extends Model {
         }
         return station
       })
-      .filter(
-        (station) =>
+      .filter((station) => {
+        if (Number.isFinite(station.end_time) && station.end_time <= ts) {
+          return onlyInactiveStations
+        }
+
+        const matchesBattleFilter =
+          onlyMaxBattles &&
+          (onlyBattleTier === 'all'
+            ? args.filters[`j${station.battle_level}`] ||
+              args.filters[
+                `${station.battle_pokemon_id}-${station.battle_pokemon_form}`
+              ]
+            : onlyBattleTier === station.battle_level)
+
+        const matchesGmaxFilter =
+          onlyGmaxStationed && station.total_stationed_gmax > 0
+
+        return (
           onlyAllStations ||
-          (perms.dynamax &&
-            ((onlyMaxBattles &&
-              (onlyBattleTier === 'all'
-                ? args.filters[`j${station.battle_level}`] ||
-                  args.filters[
-                    `${station.battle_pokemon_id}-${station.battle_pokemon_form}`
-                  ]
-                : onlyBattleTier === station.battle_level)) ||
-              (onlyGmaxStationed && station.total_stationed_gmax))),
-      )
+          (perms.dynamax && (matchesBattleFilter || matchesGmaxFilter))
+        )
+      })
   }
 
   /**

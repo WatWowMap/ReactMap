@@ -21,6 +21,9 @@ export function useStationMarker({
   start_time,
   end_time,
 }) {
+  const now = Date.now() / 1000
+  const isInactive = Number.isFinite(end_time) && end_time < now
+  const hasStarted = Number.isFinite(start_time) && start_time < now
   const [, Icons] = useStorage(
     (s) => [s.icons, useMemory.getState().Icons],
     (a, b) => Object.entries(a[0]).every(([k, v]) => b[0][k] === v),
@@ -28,7 +31,7 @@ export function useStationMarker({
   const [baseIcon, baseSize, battleIcon, battleSize] = useStorage((s) => {
     const { filter } = s.filters.stations
     return [
-      Icons.getStation(start_time < Date.now() / 1000),
+      Icons.getStation(isInactive ? false : hasStarted),
       Icons.getSize('station', filter[`j${battle_level}`]?.size),
       Icons.getPokemon(
         battle_pokemon_id,
@@ -47,8 +50,13 @@ export function useStationMarker({
     ]
   }, basicEqualFn)
   const [stationMod, battleMod] = Icons.getModifiers('station', 'dynamax')
-  const opacity = useOpacity('stations')(end_time)
-  const isActive = !!battle_pokemon_id && start_time < Date.now() / 1000
+  const dynamicOpacity = useOpacity('stations')(end_time)
+  const opacity = isInactive ? 0.3 : dynamicOpacity
+  const isActive =
+    !isInactive &&
+    !!battle_pokemon_id &&
+    Number.isFinite(start_time) &&
+    start_time < now
 
   return divIcon({
     popupAnchor: [
