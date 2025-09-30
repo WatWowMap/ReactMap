@@ -3,6 +3,7 @@ import * as React from 'react'
 import Grid from '@mui/material/Unstable_Grid2'
 import Typography from '@mui/material/Typography'
 import Divider from '@mui/material/Divider'
+import Tooltip from '@mui/material/Tooltip'
 import { useTranslation } from 'react-i18next'
 
 import { useStorage } from '@store/useStorage'
@@ -10,6 +11,9 @@ import { useMemory } from '@store/useMemory'
 import { Navigation } from '@components/popups/Navigation'
 import { Coords } from '@components/popups/Coords'
 import { TimeStamp } from '@components/popups/TimeStamps'
+import { StatusIcon } from '@components/StatusIcon'
+
+import { getTimeUntil } from '@utils/getTimeUntil'
 
 /**
  * @param {{
@@ -48,6 +52,8 @@ export function TappablePopup({ tappable, rewardIcon, iconSize }) {
       .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
       .join(' ')
   }, [tappable.type, t, i18n])
+
+  const hasExpireTime = !!tappable.expire_timestamp
 
   return (
     <Grid
@@ -93,18 +99,79 @@ export function TappablePopup({ tappable, rewardIcon, iconSize }) {
           <Divider sx={{ my: 0.5 }} />
         </Grid>
       )}
-      {tappable.expire_timestamp && (
-        <Grid xs={12}>
-          <TimeStamp time={tappable.expire_timestamp}>
-            {t('disappear_time')}
-          </TimeStamp>
+      {hasExpireTime && (
+        <Grid
+          xs={12}
+          container
+          justifyContent="center"
+          alignItems="center"
+          spacing={1}
+        >
+          <TappableTimer
+            expireTimestamp={tappable.expire_timestamp}
+            verified={!!tappable.expire_timestamp_verified}
+            locale={i18n.language}
+            t={t}
+          />
         </Grid>
       )}
       {tappable.updated && (
         <Grid xs={12}>
-          <TimeStamp time={tappable.updated}>{t('last_updated')}</TimeStamp>
+          <TimeStamp time={tappable.updated}>{t('last_seen')}</TimeStamp>
         </Grid>
       )}
     </Grid>
+  )
+}
+
+/**
+ * @param {{
+ *  expireTimestamp: number,
+ *  verified: boolean,
+ *  locale: string,
+ *  t: import('i18next').TFunction
+ * }} props
+ */
+const TappableTimer = ({ expireTimestamp, verified, locale, t }) => {
+  const expireTimeMs = React.useMemo(
+    () => expireTimestamp * 1000,
+    [expireTimestamp],
+  )
+  const [timer, setTimer] = React.useState(() =>
+    getTimeUntil(expireTimeMs, true),
+  )
+
+  React.useEffect(() => {
+    setTimer(getTimeUntil(expireTimeMs, true))
+    const interval = setInterval(() => {
+      setTimer(getTimeUntil(expireTimeMs, true))
+    }, 1000)
+    return () => clearInterval(interval)
+  }, [expireTimeMs])
+
+  return (
+    <>
+      <Grid xs={6} sm={6}>
+        <Typography variant="h6" align="center">
+          {timer.str}
+        </Typography>
+        <Typography variant="subtitle2" align="center">
+          {new Date(expireTimeMs).toLocaleTimeString(locale || 'en', {
+            hour: 'numeric',
+            minute: 'numeric',
+            second: 'numeric',
+          })}
+        </Typography>
+      </Grid>
+      <Grid xs={2} sm={2} sx={{ display: 'flex', justifyContent: 'center' }}>
+        <Tooltip
+          title={verified ? t('timer_verified') : t('timer_unverified')}
+          arrow
+          enterTouchDelay={0}
+        >
+          <StatusIcon status={verified} />
+        </Tooltip>
+      </Grid>
+    </>
   )
 }
