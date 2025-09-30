@@ -629,6 +629,7 @@
       "pokemon": false,
       "gmf": true,
       "scanNextInstance": "scanNext",
+      "rules": [],
       "scanNextDevice": "Device01",
       "scanNextSleeptime": 5,
       "userCooldownSeconds": 0,
@@ -648,6 +649,7 @@
       "gmf": false,
       "scanZoneMaxSize": 10,
       "userCooldownSeconds": 0,
+      "rules": [],
       "advancedScanZoneOptions": false,
       "scanZoneRadius": {
         "pokemon": 70,
