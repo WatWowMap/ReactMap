@@ -8,7 +8,8 @@ import { useTranslation } from 'react-i18next'
 import { useMemory } from '@store/useMemory'
 import { Query } from '@services/queries'
 
-export function ExtraUserFields() {
+/** @param {{ refreshing?: boolean }} props */
+export function ExtraUserFields({ refreshing = false } = {}) {
   const fields = useMemory((s) => s.extraUserFields)
   return fields?.length ? (
     <Grid2 container alignItems="center" justifyContent="center">
@@ -16,14 +17,20 @@ export function ExtraUserFields() {
         <FieldValue
           key={typeof field === 'string' ? field : field.database}
           field={field}
+          refreshing={refreshing}
         />
       ))}
     </Grid2>
   ) : null
 }
 
-/** @param {{ field: import('@rm/types').ExtraField | string}} props */
-export function FieldValue({ field }) {
+/**
+ * @param {{
+ *   field: import('@rm/types').ExtraField | string,
+ *   refreshing?: boolean,
+ * }} props
+ */
+export function FieldValue({ field, refreshing = false }) {
   const { i18n } = useTranslation()
   const label =
     typeof field === 'string' ? field : field[i18n.language] || field.name
@@ -37,7 +44,7 @@ export function FieldValue({ field }) {
   return (
     <Grid2 key={label} xs={5} textAlign="center" margin="10px 0">
       <TextField
-        disabled={disabled}
+        disabled={disabled || refreshing}
         variant="outlined"
         label={label}
         value={value}

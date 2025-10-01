@@ -33,60 +33,29 @@ export function UserProfile() {
 
   const [tab, setTab] = React.useState('profile')
   const [tabsHeight, setTabsHeight] = React.useState(0)
+  const [refreshing, setRefreshing] = React.useState(false)
   const isOpen = useLayoutStore((s) => s.userProfile)
   React.useEffect(() => {
     if (!isOpen) return
     let active = true
+    setRefreshing(true)
     ;(async () => {
       try {
         const data = await getSettings()
-        if (active && data && !('error' in data) && data.user) {
+        if (data && !('error' in data) && data.user) {
           const parsed = data.user?.data
             ? typeof data.user.data === 'string'
               ? JSON.parse(data.user.data)
               : data.user.data
             : {}
-          const store = useMemory.getState()
-          const readOnlyKeys = new Set(
-            (store.extraUserFields || [])
-              .map((field) =>
-                typeof field === 'string'
-                  ? null
-                  : field.disabled
-                    ? field.database
-                    : null,
-              )
-              .filter(Boolean),
-          )
-          if (!readOnlyKeys.size) return
-
-          const incoming =
-            parsed && typeof parsed === 'object'
-              ? parsed
-              : /** @type {Record<string, any>} */ ({})
-          const currentData = store.auth.data || {}
-          const updates = {}
-          let hasUpdates = false
-
-          readOnlyKeys.forEach((key) => {
-            if (Object.prototype.hasOwnProperty.call(incoming, key)) {
-              const nextValue = incoming[key]
-              if (currentData[key] !== nextValue) {
-                updates[key] = nextValue
-                hasUpdates = true
-              }
-            }
-          })
-
-          if (hasUpdates) {
-            // Only refresh disabled fields so live edits stay intact.
+          if (active) {
             useMemory.setState((prev) => ({
               auth: {
                 ...prev.auth,
-                data: {
-                  ...prev.auth.data,
-                  ...updates,
-                },
+                data:
+                  parsed && typeof parsed === 'object'
+                    ? parsed
+                    : /** @type {Record<string, any>} */ ({}),
               },
             }))
           }
@@ -96,10 +65,15 @@ export function UserProfile() {
           // eslint-disable-next-line no-console
           console.error('Failed to refresh user profile data', error)
         }
+      } finally {
+        if (active) {
+          setRefreshing(false)
+        }
       }
     })()
     return () => {
       active = false
+      setRefreshing(false)
     }
   }, [isOpen])
 
@@ -137,7 +111,7 @@ export function UserProfile() {
           >
             <TabPanel value="profile">
               <LinkAccounts />
-              <ExtraUserFields />
+              <ExtraUserFields refreshing={refreshing} />
               <UserBackups />
             </TabPanel>
             <TabPanel value="badges" sx={{ height: '100%', px: 0 }}>
