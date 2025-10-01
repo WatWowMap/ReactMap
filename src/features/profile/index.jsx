@@ -46,12 +46,50 @@ export function UserProfile() {
               ? JSON.parse(data.user.data)
               : data.user.data
             : {}
-          useMemory.setState((prev) => ({
-            auth: {
-              ...prev.auth,
-              data: parsed,
-            },
-          }))
+          const store = useMemory.getState()
+          const readOnlyKeys = new Set(
+            (store.extraUserFields || [])
+              .map((field) =>
+                typeof field === 'string'
+                  ? null
+                  : field.disabled
+                    ? field.database
+                    : null,
+              )
+              .filter(Boolean),
+          )
+          if (!readOnlyKeys.size) return
+
+          const incoming =
+            parsed && typeof parsed === 'object'
+              ? parsed
+              : /** @type {Record<string, any>} */ ({})
+          const currentData = store.auth.data || {}
+          const updates = {}
+          let hasUpdates = false
+
+          readOnlyKeys.forEach((key) => {
+            if (Object.prototype.hasOwnProperty.call(incoming, key)) {
+              const nextValue = incoming[key]
+              if (currentData[key] !== nextValue) {
+                updates[key] = nextValue
+                hasUpdates = true
+              }
+            }
+          })
+
+          if (hasUpdates) {
+            // Only refresh disabled fields so live edits stay intact.
+            useMemory.setState((prev) => ({
+              auth: {
+                ...prev.auth,
+                data: {
+                  ...prev.auth.data,
+                  ...updates,
+                },
+              },
+            }))
+          }
         }
       } catch (error) {
         if (active) {
