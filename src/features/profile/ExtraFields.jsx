@@ -54,7 +54,7 @@ export function FieldValue({ field }) {
           setField({
             variables: {
               key,
-              value,
+              value: target.value,
             },
           })
         }}
