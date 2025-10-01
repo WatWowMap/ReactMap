@@ -15,6 +15,7 @@ import { Header } from '@components/dialogs/Header'
 import { Footer } from '@components/dialogs/Footer'
 import { DialogWrapper } from '@components/dialogs/DialogWrapper'
 import { useAnalytics } from '@hooks/useAnalytics'
+import { getSettings } from '@services/fetches'
 
 import { UserBackups } from './Backups'
 import { UserPermissions } from './Permissions'
@@ -32,6 +33,49 @@ export function UserProfile() {
 
   const [tab, setTab] = React.useState('profile')
   const [tabsHeight, setTabsHeight] = React.useState(0)
+  const [refreshing, setRefreshing] = React.useState(false)
+  const isOpen = useLayoutStore((s) => s.userProfile)
+  React.useEffect(() => {
+    if (!isOpen) return
+    let active = true
+    setRefreshing(true)
+    ;(async () => {
+      try {
+        const data = await getSettings()
+        if (data && !('error' in data) && data.user) {
+          const parsed = data.user?.data
+            ? typeof data.user.data === 'string'
+              ? JSON.parse(data.user.data)
+              : data.user.data
+            : {}
+          if (active) {
+            useMemory.setState((prev) => ({
+              auth: {
+                ...prev.auth,
+                data:
+                  parsed && typeof parsed === 'object'
+                    ? parsed
+                    : /** @type {Record<string, any>} */ ({}),
+              },
+            }))
+          }
+        }
+      } catch (error) {
+        if (active) {
+          // eslint-disable-next-line no-console
+          console.error('Failed to refresh user profile data', error)
+        }
+      } finally {
+        if (active) {
+          setRefreshing(false)
+        }
+      }
+    })()
+    return () => {
+      active = false
+      setRefreshing(false)
+    }
+  }, [isOpen])
 
   const handleTabChange = (_event, newValue) => {
     setTab(newValue)
@@ -67,7 +111,7 @@ export function UserProfile() {
           >
             <TabPanel value="profile">
               <LinkAccounts />
-              <ExtraUserFields />
+              <ExtraUserFields refreshing={refreshing} />
               <UserBackups />
             </TabPanel>
             <TabPanel value="badges" sx={{ height: '100%', px: 0 }}>
