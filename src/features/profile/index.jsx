@@ -53,7 +53,8 @@ export function UserProfile() {
             },
           }))
         }
-      } catch {
+      } catch (error) {
+        // Swallow network/parsing errors to avoid interrupting the profile dialog
       }
     })()
     return () => {
