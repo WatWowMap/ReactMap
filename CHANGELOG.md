@@ -1,3 +1,10 @@
+# [1.40.0-develop.6](https://github.com/WatWowMap/ReactMap/compare/v1.40.0-develop.5...v1.40.0-develop.6) (2025-10-01)
+
+
+### Features
+
+* faster extraUserFields ([#1144](https://github.com/WatWowMap/ReactMap/issues/1144)) ([2216787](https://github.com/WatWowMap/ReactMap/commit/2216787b14a09e1297835bfa47c8ab746b89925e))
+
 # [1.40.0-develop.5](https://github.com/WatWowMap/ReactMap/compare/v1.40.0-develop.4...v1.40.0-develop.5) (2025-10-01)
 
 
