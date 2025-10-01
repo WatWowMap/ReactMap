@@ -32,7 +32,9 @@ const RouteAnchor = React.memo(
       () => icon || routeMarker(variant === 'destination' ? 'end' : 'start'),
       [icon, variant],
     )
-    const showBadge = routeCount > 1 || (hideMarker && routeCount > 0)
+    const showBadge =
+      routeCount > 0 &&
+      (variant === 'destination' || hideMarker || routeCount > 1)
     const routeCountTitle =
       routeCount > 0 ? t('route_anchor_count', { count: routeCount }) : ''
     const badgeIcon = React.useMemo(() => {
@@ -217,7 +219,7 @@ export function RouteLayer({ routes }) {
         const entryCoordKey = getRouteCoordKey(entry.lat, entry.lon)
         const iconOverride = destinationSummary.icons.get(entryCoordKey)
         const destinationCount = destinationSummary.counts.get(entryCoordKey)
-        if (destinationCount && destinationCount > 1) {
+        if (destinationCount && destinationCount >= 1) {
           return (
             <RouteAnchor
               key={`${entry.key}-destination`}
