@@ -22,6 +22,9 @@ import { TileLayer } from './client'
 type BaseConfig = typeof config
 type ExampleConfig = typeof example
 
+/** Discord role ID or user ID that can gate access to resources */
+type AuthIdentifier = string
+
 export type ConfigAreas = Awaited<
   ReturnType<(typeof import('server/src/services/areas'))['loadLatestAreas']>
 >
@@ -53,20 +56,20 @@ export type Config<Client extends boolean = false> = DeepMerge<
     }
     areas: ConfigAreas
     authentication: {
-      areaRestrictions: { roles: string[]; areas: string[] }[]
+      areaRestrictions: { roles: AuthIdentifier[]; areas: string[] }[]
       // Unfortunately these types are not convenient for looping the `perms` object...
       // excludeFromTutorial: (keyof BaseConfig['authentication']['perms'])[]
       // alwaysEnabledPerms: (keyof BaseConfig['authentication']['perms'])[]
       excludeFromTutorial: string[]
       alwaysEnabledPerms: string[]
-      aliases: { role: string | string[]; name: string }[]
+      aliases: { role: AuthIdentifier | AuthIdentifier[]; name: string }[]
       methods: Strategy[]
       strategies: {
         type: Strategy
         trialPeriod: {
           start: TrialPeriodDate
           end: TrialPeriodDate
-          roles: string[]
+          roles: AuthIdentifier[]
         }
         allowedGuilds: string[]
         blockedGuilds: string[]
@@ -76,7 +79,7 @@ export type Config<Client extends boolean = false> = DeepMerge<
         [K in keyof BaseConfig['authentication']['perms']]: Omit<
           BaseConfig['authentication']['perms'][K],
           'roles'
-        > & { roles: string[] }
+        > & { roles: AuthIdentifier[] }
       }
     }
     api: {
@@ -133,12 +136,12 @@ export type Config<Client extends boolean = false> = DeepMerge<
     }
     scanner: {
       scanNext: {
-        discordRoles: string[]
+        discordRoles: AuthIdentifier[]
         telegramGroups: string[]
         local: string[]
       }
       scanZone: {
-        discordRoles: string[]
+        discordRoles: AuthIdentifier[]
         telegramGroups: string[]
         local: string[]
       }
@@ -192,7 +195,7 @@ export interface Webhook {
   nominatimUrl?: string
   trialPeriodEligible?: boolean
   areasToSkip: string[]
-  discordRoles: []
+  discordRoles: AuthIdentifier[]
   telegramGroups: []
   local: []
 }

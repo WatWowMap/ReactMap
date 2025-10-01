@@ -3,16 +3,16 @@ const config = require('@rm/config')
 
 /**
  *
- * @param {string[]} roles
+ * @param {string[]} identifiers Discord role IDs or user IDs
  * @param {'discordRoles' | 'telegramGroups' | 'local'} provider
  * @param {boolean} [trialActive]
  * @returns {string[]}
  */
-function scannerPerms(roles, provider, trialActive = false) {
+function scannerPerms(identifiers, provider, trialActive = false) {
   const scanner = config.getSafe('scanner')
 
   const perms = []
-  roles.forEach((role) => {
+  identifiers.forEach((role) => {
     Object.keys(scanner).forEach((mode) => {
       if (
         scanner[mode]?.enabled &&

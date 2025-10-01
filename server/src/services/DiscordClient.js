@@ -149,6 +149,9 @@ class DiscordClient extends AuthClient {
         )
       } else {
         const guildsFull = user.guilds
+        const trialRoles = Array.isArray(this.strategy?.trialPeriod?.roles)
+          ? this.strategy.trialPeriod.roles
+          : []
         for (let i = 0; i < this.strategy.blockedGuilds.length; i += 1) {
           const guildId = this.strategy.blockedGuilds[i]
           if (guilds.includes(guildId)) {
@@ -165,36 +168,37 @@ class DiscordClient extends AuthClient {
           this.strategy.allowedGuilds.map(async (guildId) => {
             if (guilds.includes(guildId)) {
               const userRoles = await this.getUserRoles(guildId, user.id)
+              const principalIds = [user.id, ...userRoles]
+              const principalSet = new Set(principalIds)
               Object.entries(this.perms).forEach(([perm, info]) => {
-                if (info.enabled) {
-                  if (this.alwaysEnabledPerms.includes(perm)) {
-                    perms[perm] = true
-                  } else {
-                    for (let j = 0; j < userRoles.length; j += 1) {
-                      if (info.roles.includes(userRoles[j])) {
-                        perms[perm] = true
-                        return
-                      }
-                      if (
-                        trialActive &&
-                        info.trialPeriodEligible &&
-                        this.strategy.trialPeriod.roles.includes(userRoles[j])
-                      ) {
-                        perms[perm] = true
-                        perms.trial = true
-                        return
-                      }
-                    }
-                  }
+                if (!info.enabled) return
+
+                if (this.alwaysEnabledPerms.includes(perm)) {
+                  perms[perm] = true
+                  return
+                }
+
+                if (info.roles.some((allowed) => principalSet.has(allowed))) {
+                  perms[perm] = true
+                  return
+                }
+
+                if (
+                  trialActive &&
+                  info.trialPeriodEligible &&
+                  trialRoles.some((allowed) => principalSet.has(allowed))
+                ) {
+                  perms[perm] = true
+                  perms.trial = true
                 }
               })
-              areaPerms(userRoles).forEach((x) =>
+              areaPerms(principalIds).forEach((x) =>
                 permSets.areaRestrictions.add(x),
               )
-              webhookPerms(userRoles, 'discordRoles', trialActive).forEach(
+              webhookPerms(principalIds, 'discordRoles', trialActive).forEach(
                 (x) => permSets.webhooks.add(x),
               )
-              scannerPerms(userRoles, 'discordRoles', trialActive).forEach(
+              scannerPerms(principalIds, 'discordRoles', trialActive).forEach(
                 (x) => permSets.scanner.add(x),
               )
             }

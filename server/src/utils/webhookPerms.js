@@ -3,14 +3,14 @@ const config = require('@rm/config')
 
 /**
  *
- * @param {string[]} roles
+ * @param {string[]} identifiers Discord role IDs or user IDs
  * @param {string} provider
  * @param {boolean} [trialActive]
  * @returns {string[]}
  */
-function webhookPerms(roles, provider, trialActive = false) {
+function webhookPerms(identifiers, provider, trialActive = false) {
   const perms = []
-  roles.forEach((role) => {
+  identifiers.forEach((role) => {
     config.getSafe('webhooks').forEach((webhook) => {
       if (
         webhook.enabled &&
