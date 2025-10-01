@@ -1,3 +1,17 @@
+# [1.40.0-develop.5](https://github.com/WatWowMap/ReactMap/compare/v1.40.0-develop.4...v1.40.0-develop.5) (2025-10-01)
+
+
+### Bug Fixes
+
+* always show end route count ([5226575](https://github.com/WatWowMap/ReactMap/commit/5226575ba463923ab32a3c74345f0585dda10072))
+* route badge color should be consistent with their roles ([0c32962](https://github.com/WatWowMap/ReactMap/commit/0c32962e75d252d0f83493fb4ae345fad991c647))
+* self loop route counting ([e415caa](https://github.com/WatWowMap/ReactMap/commit/e415caae0aaa615ffab8fb0274894caf0d2764d7))
+
+
+### Features
+
+* configurable inactive station limit ([f8efbcd](https://github.com/WatWowMap/ReactMap/commit/f8efbcdb6849e067d967b0e1ed75110c84f6dc93))
+
 # [1.40.0-develop.4](https://github.com/WatWowMap/ReactMap/compare/v1.40.0-develop.3...v1.40.0-develop.4) (2025-09-29)
 
 
