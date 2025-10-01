@@ -54,7 +54,10 @@ export function UserProfile() {
           }))
         }
       } catch (error) {
-        // Swallow network/parsing errors to avoid interrupting the profile dialog
+        if (active) {
+          // eslint-disable-next-line no-console
+          console.error('Failed to refresh user profile data', error)
+        }
       }
     })()
     return () => {
