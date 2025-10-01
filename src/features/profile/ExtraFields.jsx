@@ -42,19 +42,20 @@ export function FieldValue({ field }) {
         label={label}
         value={value}
         onChange={({ target }) => {
+          const nextValue = target.value
           useMemory.setState((prev) => ({
             auth: {
               ...prev.auth,
               data: {
                 ...prev.auth.data,
-                [key]: target.value,
+                [key]: nextValue,
               },
             },
           }))
           setField({
             variables: {
               key,
-              value,
+              value: nextValue,
             },
           })
         }}
