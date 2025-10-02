@@ -1,3 +1,10 @@
+# [1.40.0-develop.7](https://github.com/WatWowMap/ReactMap/compare/v1.40.0-develop.6...v1.40.0-develop.7) (2025-10-02)
+
+
+### Bug Fixes
+
+* battle popup caching issue ([8cac1ce](https://github.com/WatWowMap/ReactMap/commit/8cac1ce4914911680f1d03dbfb9a0bc663657166))
+
 # [1.40.0-develop.6](https://github.com/WatWowMap/ReactMap/compare/v1.40.0-develop.5...v1.40.0-develop.6) (2025-10-01)
 
 
