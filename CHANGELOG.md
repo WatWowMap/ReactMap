@@ -1,3 +1,10 @@
+# [1.40.0-develop.8](https://github.com/WatWowMap/ReactMap/compare/v1.40.0-develop.7...v1.40.0-develop.8) (2025-10-02)
+
+
+### Bug Fixes
+
+* gym range color should dynamically update ([7f9f95b](https://github.com/WatWowMap/ReactMap/commit/7f9f95b6df1bddd8fe21ed49a61969bf404e82e4))
+
 # [1.40.0-develop.7](https://github.com/WatWowMap/ReactMap/compare/v1.40.0-develop.6...v1.40.0-develop.7) (2025-10-02)
 
 
