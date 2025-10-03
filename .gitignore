@@ -8,6 +8,7 @@ config/local.json
 config/areas.json
 !server/src/configs/.gitkeep
 .env
+ecosystem.config.js
 
 # Masterfile
 server/src/data/masterfile.json
