@@ -1,3 +1,11 @@
+# [1.40.0-develop.9](https://github.com/WatWowMap/ReactMap/compare/v1.40.0-develop.8...v1.40.0-develop.9) (2025-10-03)
+
+
+### Features
+
+* max battle stats display ([211e0ea](https://github.com/WatWowMap/ReactMap/commit/211e0ea35897e0ecf793c8d2bc4e2ba535505cb8))
+* quest bread mode ([b0fcf4f](https://github.com/WatWowMap/ReactMap/commit/b0fcf4fd2ea132a18058b1a3f40db07f31ade2b0))
+
 # [1.40.0-develop.8](https://github.com/WatWowMap/ReactMap/compare/v1.40.0-develop.7...v1.40.0-develop.8) (2025-10-02)
 
 
