@@ -301,6 +301,7 @@ type Station {
   battle_pokemon_move_2: Int
   battle_pokemon_stamina: Int
   battle_pokemon_cp_multiplier: Float
+  battle_pokemon_estimated_cp: Int
 }
 
 type StationPokemon {

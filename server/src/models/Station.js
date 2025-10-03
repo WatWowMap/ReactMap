@@ -3,10 +3,56 @@ const { Model } = require('objection')
 const config = require('@rm/config')
 const i18next = require('i18next')
 
+const { log, TAGS } = require('@rm/logger')
+
 const { getAreaSql } = require('../utils/getAreaSql')
 const { applyManualIdFilter } = require('../utils/manualFilter')
 const { getEpoch } = require('../utils/getClientTime')
 const { state } = require('../services/state')
+const { getSharedPvpWrapper } = require('../services/PvpWrapper')
+
+const DEFAULT_IV = 15
+
+/**
+ * @param {import('ohbem').PokemonData | null} pokemonData
+ * @param {import('@rm/types').FullStation} station
+ * @returns {number | null}
+ */
+function estimateStationCp(pokemonData, station) {
+  const { battle_pokemon_id: pokemonId, battle_pokemon_form: form } = station
+  const multiplier = Number(station.battle_pokemon_cp_multiplier)
+
+  if (
+    !pokemonData ||
+    !pokemonId ||
+    !Number.isFinite(multiplier) ||
+    multiplier <= 0
+  ) {
+    return null
+  }
+
+  const base = pokemonData.findBaseStats(pokemonId, form ?? 0, 0)
+  if (!base) return null
+  const { attack, defense } = base
+  if (typeof attack !== 'number' || typeof defense !== 'number') {
+    return null
+  }
+
+  const attackStat = attack + DEFAULT_IV
+  const defenseStat = defense + DEFAULT_IV
+  const staminaStat = Number(station.battle_pokemon_stamina)
+  if (!Number.isFinite(staminaStat)) {
+    return null
+  }
+
+  const cp = Math.floor(
+    (attackStat *
+      multiplier *
+      Math.sqrt(defenseStat * multiplier * staminaStat)) /
+      10,
+  )
+  return cp < 10 ? 10 : cp
+}
 
 class Station extends Model {
   static get tableName() {
@@ -156,7 +202,29 @@ class Station extends Model {
       return []
     }
 
-    return (await query.select(select))
+    const stations = await query.select(select)
+
+    let pokemonData = null
+    if (hasBattlePokemonStats && perms.dynamax) {
+      const needsEstimatedCp = stations.some((station) => {
+        if (!station || !station.battle_pokemon_id) return false
+        const multiplier = Number(station.battle_pokemon_cp_multiplier)
+        return Number.isFinite(multiplier) && multiplier > 0
+      })
+      if (needsEstimatedCp) {
+        try {
+          pokemonData = await getSharedPvpWrapper().ensurePokemonData()
+        } catch (e) {
+          log.warn(
+            TAGS.fetch,
+            'Unable to load ohbem basics for station CP estimation',
+            e,
+          )
+        }
+      }
+    }
+
+    return stations
       .map((station) => {
         if (station.is_battle_available && station.battle_pokemon_id === null) {
           station.is_battle_available = false
@@ -179,6 +247,9 @@ class Station extends Model {
               if (list[i].bread_mode === 2 || list[i].bread_mode === 3) ++count
           station.total_stationed_gmax = count
         }
+        station.battle_pokemon_estimated_cp = pokemonData
+          ? estimateStationCp(pokemonData, station)
+          : null
         return station
       })
       .filter((station) => {

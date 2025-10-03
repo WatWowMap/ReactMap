@@ -389,6 +389,7 @@ export interface Station<Parsed extends boolean = false> {
   battle_pokemon_move_2: number
   battle_pokemon_stamina?: number
   battle_pokemon_cp_multiplier?: number
+  battle_pokemon_estimated_cp?: number
 
   total_stationed_pokemon: number
   total_stationed_gmax: number

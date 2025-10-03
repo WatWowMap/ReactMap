@@ -36,6 +36,7 @@ import {
 import { VirtualGrid } from '@components/virtual/VirtualGrid'
 import { getStationDamageBoost } from '@utils/getAttackBonus'
 import { CopyCoords } from '@components/popups/Coords'
+import Tooltip from '@mui/material/Tooltip'
 
 import { useGetStationMons } from './useGetStationMons'
 
@@ -271,6 +272,7 @@ function StationMedia({
   battle_end,
   battle_pokemon_stamina,
   battle_pokemon_cp_multiplier,
+  battle_pokemon_estimated_cp,
 }) {
   const { t: tById } = useTranslateById()
   const { t } = useTranslation()
@@ -286,12 +288,56 @@ function StationMedia({
   })
   const battleStaminaDisplay =
     typeof battle_pokemon_stamina === 'number'
-      ? battle_pokemon_stamina.toLocaleString()
+      ? battle_pokemon_stamina.toString()
       : null
-  const battleCpMultiplierDisplay =
-    typeof battle_pokemon_cp_multiplier === 'number'
-      ? battle_pokemon_cp_multiplier.toLocaleString()
-      : null
+  const estimatedCpDisplay = Number.isFinite(battle_pokemon_estimated_cp)
+    ? Number(battle_pokemon_estimated_cp).toString()
+    : null
+  const cpMultiplierDisplay = Number.isFinite(battle_pokemon_cp_multiplier)
+    ? `${battle_pokemon_cp_multiplier}`
+    : null
+  const cpLabel = t('cp')
+  const hpLabel = t('hp')
+  let cpTooltip = null
+  let cpLine = null
+  if (estimatedCpDisplay) {
+    if (cpMultiplierDisplay) {
+      cpTooltip = t('station_battle_cp_tooltip', {
+        multiplier: cpMultiplierDisplay,
+      })
+      if (battle_level >= 5) {
+        cpTooltip = `${cpTooltip}${t('station_battle_cp_tooltip_extra')}`
+      }
+    }
+    const cpTypography = (
+      <Typography variant="caption" align="center">
+        {cpLabel} {estimatedCpDisplay}
+      </Typography>
+    )
+    cpLine = cpTooltip ? (
+      <Tooltip title={cpTooltip} arrow placement="top">
+        <Box
+          component="span"
+          sx={{
+            cursor: 'help',
+            textDecoration: 'underline dotted',
+            display: 'inline-block',
+          }}
+        >
+          {cpTypography}
+        </Box>
+      </Tooltip>
+    ) : (
+      cpTypography
+    )
+  } else if (cpMultiplierDisplay) {
+    cpLine = (
+      <Typography variant="caption" align="center">
+        {t('station_battle_cp_multiplier', { value: cpMultiplierDisplay })}
+      </Typography>
+    )
+  }
+  const showStatsRow = Boolean(cpLine || battleStaminaDisplay)
 
   return isBattleActive ? (
     <CardMedia>
@@ -339,24 +385,21 @@ function StationMedia({
               {t(`max_battle_${battle_level}`)}
             </Typography>
           )}
-          {battleStaminaDisplay && (
-            <Typography variant="caption" align="center">
-              {t('station_battle_hp', { value: battleStaminaDisplay })}
-            </Typography>
-          )}
-          {battleCpMultiplierDisplay && (
-            <Typography variant="caption" align="center">
-              {t('station_battle_cp_multiplier', {
-                value: battleCpMultiplierDisplay,
-              })}
-            </Typography>
+          {showStatsRow && (
+            <Stack spacing={0} alignItems="center">
+              {cpLine}
+              {battleStaminaDisplay && (
+                <Typography variant="caption" align="center">
+                  {hpLabel} {battleStaminaDisplay}
+                </Typography>
+              )}
+            </Stack>
           )}
         </Stack>
       </Box>
     </CardMedia>
   ) : null
 }
-
 /** @param {import('@rm/types').Station} station */
 function StationAttackBonus({ total_stationed_pokemon, total_stationed_gmax }) {
   const { t } = useTranslation()
