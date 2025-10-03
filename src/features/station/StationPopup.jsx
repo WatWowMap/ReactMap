@@ -269,6 +269,8 @@ function StationMedia({
   battle_pokemon_bread_mode,
   battle_level,
   battle_end,
+  battle_pokemon_stamina,
+  battle_pokemon_cp_multiplier,
 }) {
   const { t: tById } = useTranslateById()
   const { t } = useTranslation()
@@ -282,6 +284,14 @@ function StationMedia({
     }
     return poke?.types || []
   })
+  const battleStaminaDisplay =
+    typeof battle_pokemon_stamina === 'number'
+      ? battle_pokemon_stamina.toLocaleString()
+      : null
+  const battleCpMultiplierDisplay =
+    typeof battle_pokemon_cp_multiplier === 'number'
+      ? battle_pokemon_cp_multiplier.toLocaleString()
+      : null
 
   return isBattleActive ? (
     <CardMedia>
@@ -327,6 +337,18 @@ function StationMedia({
           {!!battle_level && (
             <Typography variant="caption" align="center">
               {t(`max_battle_${battle_level}`)}
+            </Typography>
+          )}
+          {battleStaminaDisplay && (
+            <Typography variant="caption" align="center">
+              {t('station_battle_hp', { value: battleStaminaDisplay })}
+            </Typography>
+          )}
+          {battleCpMultiplierDisplay && (
+            <Typography variant="caption" align="center">
+              {t('station_battle_cp_multiplier', {
+                value: battleCpMultiplierDisplay,
+              })}
             </Typography>
           )}
         </Stack>

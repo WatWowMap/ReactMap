@@ -297,6 +297,8 @@ type Station {
   battle_pokemon_bread_mode: Int
   battle_pokemon_move_1: Int
   battle_pokemon_move_2: Int
+  battle_pokemon_stamina: Int
+  battle_pokemon_cp_multiplier: Float
 }
 
 type StationPokemon {

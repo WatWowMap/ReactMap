@@ -825,6 +825,8 @@
   "placed_pokemon": "Placed Pokémon",
   "attack_bonus": "Attack Bonus",
   "battle_bonus": "Battle Bonus",
+  "station_battle_hp": "{{value}} HP",
+  "station_battle_cp_multiplier": "CP Multiplier: {{value}}",
   "copy_coordinates": "Copy Coordinates",
   "enable_station_popup_coords": "Show Power Spot Coords",
   "station_icons": "Power Spot Icons",

@@ -103,6 +103,8 @@ const trackedBattleKeys = [
   'battle_start',
   'battle_end',
   'is_battle_available',
+  'battle_pokemon_stamina',
+  'battle_pokemon_cp_multiplier',
   'total_stationed_pokemon',
   'total_stationed_gmax',
   'updated',

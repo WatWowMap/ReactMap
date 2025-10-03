@@ -20,7 +20,11 @@ class Station extends Model {
    * @param {import("@rm/types").DbContext} ctx
    * @returns {Promise<import("@rm/types").FullStation[]>}
    */
-  static async getAll(perms, args, { isMad, hasStationedGmax }) {
+  static async getAll(
+    perms,
+    args,
+    { isMad, hasStationedGmax, hasBattlePokemonStats },
+  ) {
     const { areaRestrictions } = perms
     const { stationUpdateLimit, stationInactiveLimitDays } =
       config.getSafe('api')
@@ -98,6 +102,9 @@ class Station extends Model {
       select.push(
         hasStationedGmax ? 'total_stationed_gmax' : 'stationed_pokemon',
       )
+      if (hasBattlePokemonStats) {
+        select.push('battle_pokemon_stamina', 'battle_pokemon_cp_multiplier')
+      }
 
       if (!onlyAllStations) {
         query.whereNotNull('battle_pokemon_id').andWhere('battle_end', '>', ts)
