@@ -302,8 +302,8 @@ function StationMedia({
   let cpLine = null
   if (estimatedCpDisplay) {
     if (cpMultiplierDisplay) {
-      cpTooltip = t('station_battle_cp_tooltip', {
-        multiplier: cpMultiplierDisplay,
+      cpTooltip = t('station_battle_cp_multiplier', {
+        value: cpMultiplierDisplay,
       })
       if (battle_level >= 5) {
         cpTooltip = `${cpTooltip}${t('station_battle_cp_tooltip_extra')}`
