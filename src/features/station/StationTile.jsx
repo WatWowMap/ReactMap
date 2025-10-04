@@ -41,10 +41,18 @@ const BaseStationTile = (station) => {
   const timers = React.useMemo(() => {
     const now = Date.now() / 1000
     const internalTimers = /** @type {number[]} */ ([])
-    if (showTimer && station.start_time && station.start_time > now) {
-      internalTimers.push(station.start_time)
-    } else if (showTimer && station.end_time && station.end_time > now) {
-      internalTimers.push(station.end_time)
+    if (showTimer) {
+      const hasStart = Number.isFinite(station.start_time)
+      const hasBattleEnd = Number.isFinite(station.battle_end)
+      const hasEnd = Number.isFinite(station.end_time)
+
+      if (hasStart && station.start_time > now) {
+        internalTimers.push(station.start_time)
+      } else if (hasBattleEnd && station.battle_end > now) {
+        internalTimers.push(station.battle_end)
+      } else if (hasEnd && station.end_time > now) {
+        internalTimers.push(station.end_time)
+      }
     }
     return internalTimers
   }, [showTimer])
