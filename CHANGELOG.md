@@ -1,3 +1,15 @@
+# [1.40.0-develop.10](https://github.com/WatWowMap/ReactMap/compare/v1.40.0-develop.9...v1.40.0-develop.10) (2025-10-04)
+
+
+### Bug Fixes
+
+* route crash ([206f558](https://github.com/WatWowMap/ReactMap/commit/206f5581f39ecb86b05486ca3fe051036fbcfe76))
+
+
+### Features
+
+* estimated max battle cp ([275f6f4](https://github.com/WatWowMap/ReactMap/commit/275f6f4e2ff44de57de0c49fa1f18fc7da96a70b))
+
 # [1.40.0-develop.9](https://github.com/WatWowMap/ReactMap/compare/v1.40.0-develop.8...v1.40.0-develop.9) (2025-10-03)
 
 
