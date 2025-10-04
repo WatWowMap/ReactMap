@@ -37,6 +37,28 @@ const fallbackKey = (lat, lon, prefix) =>
 
 export const getRouteCoordKey = formatCoordKey
 
+/**
+ * @param {import('@rm/types').Route | undefined} route
+ */
+const isLoopRoute = (route) => {
+  if (!route) return false
+  if (route.start_fort_id && route.start_fort_id === route.end_fort_id) {
+    return true
+  }
+  if (
+    typeof route.start_lat === 'number' &&
+    typeof route.start_lon === 'number' &&
+    typeof route.end_lat === 'number' &&
+    typeof route.end_lon === 'number'
+  ) {
+    return (
+      Math.abs(route.start_lat - route.end_lat) <= ROUTE_COORD_EPSILON &&
+      Math.abs(route.start_lon - route.end_lon) <= ROUTE_COORD_EPSILON
+    )
+  }
+  return false
+}
+
 export const getRoutePoiKey = (route, position) => {
   const lat = position === 'start' ? route.start_lat : route.end_lat
   const lon = position === 'start' ? route.start_lon : route.end_lon
@@ -53,6 +75,7 @@ export const getRoutePoiKey = (route, position) => {
 const collectNearbyRoutes = (poiIndex, entry, routeCache) => {
   if (!entry) return []
   const seen = new Set()
+  const loopedRoutes = new Set()
   /** @type {RouteSelection[]} */
   const combined = []
   Object.values(poiIndex).forEach((candidate) => {
@@ -61,8 +84,21 @@ const collectNearbyRoutes = (poiIndex, entry, routeCache) => {
       Math.abs(candidate.lon - entry.lon) <= ROUTE_COORD_EPSILON
     ) {
       candidate.routes.forEach((ref) => {
+        const route = routeCache[ref.routeId]
+        if (!route) {
+          return
+        }
+        if (isLoopRoute(route)) {
+          if (ref.orientation !== 'forward') {
+            return
+          }
+          if (loopedRoutes.has(route.id)) {
+            return
+          }
+          loopedRoutes.add(route.id)
+        }
         const id = `${ref.routeId}-${ref.orientation}`
-        if (!seen.has(id) && routeCache[ref.routeId]) {
+        if (!seen.has(id)) {
           seen.add(id)
           combined.push(ref)
         }
