@@ -1,3 +1,11 @@
+# [1.40.0-develop.11](https://github.com/WatWowMap/ReactMap/compare/v1.40.0-develop.10...v1.40.0-develop.11) (2025-10-05)
+
+
+### Bug Fixes
+
+* refine station timer ([1353beb](https://github.com/WatWowMap/ReactMap/commit/1353beb65254b5f44a8c659803fe8d778fb8d788))
+* separate station/battle opacity ([ccdbcec](https://github.com/WatWowMap/ReactMap/commit/ccdbcec52f1b25410dcc3dc31ea56719fde734dd))
+
 # [1.40.0-develop.10](https://github.com/WatWowMap/ReactMap/compare/v1.40.0-develop.9...v1.40.0-develop.10) (2025-10-04)
 
 
