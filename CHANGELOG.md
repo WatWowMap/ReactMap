@@ -1,3 +1,11 @@
+# [1.40.0-develop.12](https://github.com/WatWowMap/ReactMap/compare/v1.40.0-develop.11...v1.40.0-develop.12) (2025-10-05)
+
+
+### Bug Fixes
+
+* pvp50 enabled by default ([ad2df83](https://github.com/WatWowMap/ReactMap/commit/ad2df839bbce9ba8f269cf0f92408eeb28726201))
+* station display ([3d72e14](https://github.com/WatWowMap/ReactMap/commit/3d72e144835bae9659f842fbe5b0604bfd4e3256))
+
 # [1.40.0-develop.11](https://github.com/WatWowMap/ReactMap/compare/v1.40.0-develop.10...v1.40.0-develop.11) (2025-10-05)
 
 
