@@ -38,24 +38,26 @@ const BaseStationTile = (station) => {
     ]
   }, basicEqualFn)
 
+  const { start_time, battle_end, end_time } = station
+
   const timers = React.useMemo(() => {
     const now = Date.now() / 1000
     const internalTimers = /** @type {number[]} */ ([])
     if (showTimer) {
-      const hasStart = Number.isFinite(station.start_time)
-      const hasBattleEnd = Number.isFinite(station.battle_end)
-      const hasEnd = Number.isFinite(station.end_time)
+      const hasStart = Number.isFinite(start_time)
+      const hasBattleEnd = Number.isFinite(battle_end)
+      const hasEnd = Number.isFinite(end_time)
 
-      if (hasStart && station.start_time > now) {
-        internalTimers.push(station.start_time)
-      } else if (hasBattleEnd && station.battle_end > now) {
-        internalTimers.push(station.battle_end)
-      } else if (hasEnd && station.end_time > now) {
-        internalTimers.push(station.end_time)
+      if (hasStart && start_time > now) {
+        internalTimers.push(start_time)
+      } else if (hasBattleEnd && battle_end > now) {
+        internalTimers.push(battle_end)
+      } else if (hasEnd && end_time > now) {
+        internalTimers.push(end_time)
       }
     }
     return internalTimers
-  }, [showTimer])
+  }, [showTimer, start_time, battle_end, end_time])
 
   useForcePopup(station.id, markerRef)
   useMarkerTimer(timers.length ? Math.min(...timers) : null, markerRef, () =>
