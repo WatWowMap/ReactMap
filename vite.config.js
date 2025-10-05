@@ -34,7 +34,8 @@ const viteConfig = defineConfig(({ mode }) => {
   const pkg = JSON.parse(
     fs.readFileSync(resolve(__dirname, 'package.json'), 'utf8'),
   )
-  const version = env.npm_package_version || pkg.version
+  const resolvedVersion = env.npm_package_version || pkg.version
+  const version = isDevelopment ? 'development' : resolvedVersion
   const hasCustom = (function checkFolders(folder, isCustom = false) {
     const files = fs.readdirSync(folder)
     for (let i = 0; i < files.length; i += 1) {
