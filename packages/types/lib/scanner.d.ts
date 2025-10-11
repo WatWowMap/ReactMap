@@ -140,6 +140,8 @@ export interface Quest {
   quest_form_id: number
   quest_gender_id: Gender
   quest_costume_id: number
+  quest_location_card: number
+  quest_bread_mode: number
   quest_shiny: number
   quest_shiny_probability?: number
   mega_pokemon_id: number
@@ -400,6 +402,9 @@ export interface Station<Parsed extends boolean = false> {
   battle_pokemon_bread_mode: number
   battle_pokemon_move_1: number
   battle_pokemon_move_2: number
+  battle_pokemon_stamina?: number
+  battle_pokemon_cp_multiplier?: number
+  battle_pokemon_estimated_cp?: number
 
   total_stationed_pokemon: number
   total_stationed_gmax: number

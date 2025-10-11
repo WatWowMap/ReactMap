@@ -32,7 +32,9 @@ const RouteAnchor = React.memo(
       () => icon || routeMarker(variant === 'destination' ? 'end' : 'start'),
       [icon, variant],
     )
-    const showBadge = routeCount > 1 || (hideMarker && routeCount > 0)
+    const showBadge =
+      routeCount > 0 &&
+      (variant === 'destination' || hideMarker || routeCount > 1)
     const routeCountTitle =
       routeCount > 0 ? t('route_anchor_count', { count: routeCount }) : ''
     const badgeIcon = React.useMemo(() => {
@@ -146,6 +148,7 @@ export function RouteLayer({ routes }) {
     const keys = new Set()
     const icons = new Map()
     const counts = new Map()
+    const seenRoutesByCoord = new Map() // avoid double counting reversible loops
     activeRoutes.forEach((selection) => {
       const route = routeCache[selection.routeId]
       if (!route) return
@@ -154,7 +157,16 @@ export function RouteLayer({ routes }) {
       const lon = isForward ? route.end_lon : route.start_lon
       const coordKey = getRouteCoordKey(lat, lon)
       keys.add(coordKey)
-      counts.set(coordKey, (counts.get(coordKey) || 0) + 1)
+      const seenRoutes = seenRoutesByCoord.get(coordKey)
+      if (seenRoutes) {
+        if (!seenRoutes.has(route.id)) {
+          seenRoutes.add(route.id)
+          counts.set(coordKey, (counts.get(coordKey) || 0) + 1)
+        }
+      } else {
+        seenRoutesByCoord.set(coordKey, new Set([route.id]))
+        counts.set(coordKey, 1)
+      }
       if (!icons.has(coordKey)) {
         icons.set(coordKey, routeMarker('end'))
       }
@@ -207,7 +219,7 @@ export function RouteLayer({ routes }) {
         const entryCoordKey = getRouteCoordKey(entry.lat, entry.lon)
         const iconOverride = destinationSummary.icons.get(entryCoordKey)
         const destinationCount = destinationSummary.counts.get(entryCoordKey)
-        if (destinationCount && destinationCount > 1) {
+        if (destinationCount && destinationCount >= 1) {
           return (
             <RouteAnchor
               key={`${entry.key}-destination`}

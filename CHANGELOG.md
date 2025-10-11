@@ -1,3 +1,74 @@
+# [1.40.0-develop.12](https://github.com/WatWowMap/ReactMap/compare/v1.40.0-develop.11...v1.40.0-develop.12) (2025-10-05)
+
+
+### Bug Fixes
+
+* pvp50 enabled by default ([ad2df83](https://github.com/WatWowMap/ReactMap/commit/ad2df839bbce9ba8f269cf0f92408eeb28726201))
+* station display ([3d72e14](https://github.com/WatWowMap/ReactMap/commit/3d72e144835bae9659f842fbe5b0604bfd4e3256))
+
+# [1.40.0-develop.11](https://github.com/WatWowMap/ReactMap/compare/v1.40.0-develop.10...v1.40.0-develop.11) (2025-10-05)
+
+
+### Bug Fixes
+
+* refine station timer ([1353beb](https://github.com/WatWowMap/ReactMap/commit/1353beb65254b5f44a8c659803fe8d778fb8d788))
+* separate station/battle opacity ([ccdbcec](https://github.com/WatWowMap/ReactMap/commit/ccdbcec52f1b25410dcc3dc31ea56719fde734dd))
+
+# [1.40.0-develop.10](https://github.com/WatWowMap/ReactMap/compare/v1.40.0-develop.9...v1.40.0-develop.10) (2025-10-04)
+
+
+### Bug Fixes
+
+* route crash ([206f558](https://github.com/WatWowMap/ReactMap/commit/206f5581f39ecb86b05486ca3fe051036fbcfe76))
+
+
+### Features
+
+* estimated max battle cp ([275f6f4](https://github.com/WatWowMap/ReactMap/commit/275f6f4e2ff44de57de0c49fa1f18fc7da96a70b))
+
+# [1.40.0-develop.9](https://github.com/WatWowMap/ReactMap/compare/v1.40.0-develop.8...v1.40.0-develop.9) (2025-10-03)
+
+
+### Features
+
+* max battle stats display ([211e0ea](https://github.com/WatWowMap/ReactMap/commit/211e0ea35897e0ecf793c8d2bc4e2ba535505cb8))
+* quest bread mode ([b0fcf4f](https://github.com/WatWowMap/ReactMap/commit/b0fcf4fd2ea132a18058b1a3f40db07f31ade2b0))
+
+# [1.40.0-develop.8](https://github.com/WatWowMap/ReactMap/compare/v1.40.0-develop.7...v1.40.0-develop.8) (2025-10-02)
+
+
+### Bug Fixes
+
+* gym range color should dynamically update ([7f9f95b](https://github.com/WatWowMap/ReactMap/commit/7f9f95b6df1bddd8fe21ed49a61969bf404e82e4))
+
+# [1.40.0-develop.7](https://github.com/WatWowMap/ReactMap/compare/v1.40.0-develop.6...v1.40.0-develop.7) (2025-10-02)
+
+
+### Bug Fixes
+
+* battle popup caching issue ([8cac1ce](https://github.com/WatWowMap/ReactMap/commit/8cac1ce4914911680f1d03dbfb9a0bc663657166))
+
+# [1.40.0-develop.6](https://github.com/WatWowMap/ReactMap/compare/v1.40.0-develop.5...v1.40.0-develop.6) (2025-10-01)
+
+
+### Features
+
+* faster extraUserFields ([#1144](https://github.com/WatWowMap/ReactMap/issues/1144)) ([2216787](https://github.com/WatWowMap/ReactMap/commit/2216787b14a09e1297835bfa47c8ab746b89925e))
+
+# [1.40.0-develop.5](https://github.com/WatWowMap/ReactMap/compare/v1.40.0-develop.4...v1.40.0-develop.5) (2025-10-01)
+
+
+### Bug Fixes
+
+* always show end route count ([5226575](https://github.com/WatWowMap/ReactMap/commit/5226575ba463923ab32a3c74345f0585dda10072))
+* route badge color should be consistent with their roles ([0c32962](https://github.com/WatWowMap/ReactMap/commit/0c32962e75d252d0f83493fb4ae345fad991c647))
+* self loop route counting ([e415caa](https://github.com/WatWowMap/ReactMap/commit/e415caae0aaa615ffab8fb0274894caf0d2764d7))
+
+
+### Features
+
+* configurable inactive station limit ([f8efbcd](https://github.com/WatWowMap/ReactMap/commit/f8efbcdb6849e067d967b0e1ed75110c84f6dc93))
+
 # [1.40.0-develop.4](https://github.com/WatWowMap/ReactMap/compare/v1.40.0-develop.3...v1.40.0-develop.4) (2025-09-29)
 
 

@@ -180,6 +180,9 @@ rootRouter.get('/api/settings', async (req, res, next) => {
               req.session.save()
             }
           }
+          if (user.data !== undefined) {
+            req.user.data = user.data
+          }
         }
       } catch (e) {
         log.warn(TAGS.session, 'Issue finding user, User ID:', req?.user?.id, e)

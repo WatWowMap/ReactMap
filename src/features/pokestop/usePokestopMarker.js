@@ -263,6 +263,7 @@ export function usePokestopMarker({
         quest_gender_id,
         quest_costume_id,
         quest_shiny,
+        quest_bread_mode = 0,
         key,
       } = quest
       switch (quest_reward_type) {
@@ -308,6 +309,7 @@ export function usePokestopMarker({
               quest_costume_id,
               0,
               !!quest_shiny,
+              quest_bread_mode,
             ),
           })
           break

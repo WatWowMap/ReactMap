@@ -8,6 +8,7 @@ export function getRewardInfo({
   quest_form_id,
   quest_gender_id,
   quest_costume_id,
+  quest_bread_mode = 0,
   quest_shiny,
   quest_item_id,
   item_amount,
@@ -60,6 +61,7 @@ export function getRewardInfo({
         quest_costume_id,
         0,
         !!quest_shiny,
+        quest_bread_mode,
       )
       break
     case 9:

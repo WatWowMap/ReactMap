@@ -18,12 +18,14 @@ export function useStationMarker({
   battle_pokemon_gender,
   battle_pokemon_id,
   battle_pokemon_bread_mode,
+  battle_end,
   start_time,
   end_time,
 }) {
   const now = Date.now() / 1000
   const isInactive = Number.isFinite(end_time) && end_time < now
   const hasStarted = Number.isFinite(start_time) && start_time < now
+  const isBattleActive = Number.isFinite(battle_end) && battle_end > now
   const [, Icons] = useStorage(
     (s) => [s.icons, useMemory.getState().Icons],
     (a, b) => Object.entries(a[0]).every(([k, v]) => b[0][k] === v),
@@ -50,18 +52,15 @@ export function useStationMarker({
     ]
   }, basicEqualFn)
   const [stationMod, battleMod] = Icons.getModifiers('station', 'dynamax')
-  const dynamicOpacity = useOpacity('stations')(end_time)
-  const opacity = isInactive ? 0.3 : dynamicOpacity
-  const isActive =
-    !isInactive &&
-    !!battle_pokemon_id &&
-    Number.isFinite(start_time) &&
-    start_time < now
+  const getOpacity = useOpacity('stations')
+  const stationOpacity = isInactive ? 0.3 : getOpacity(end_time)
+  const showBattleIcon =
+    !isInactive && !!battle_pokemon_id && hasStarted && isBattleActive
 
   return divIcon({
     popupAnchor: [
       0 + stationMod.popupX + stationMod.offsetX,
-      (-baseSize - (isActive ? battleSize : 0)) * 0.67 +
+      (-baseSize - (showBattleIcon ? battleSize : 0)) * 0.67 +
         stationMod.popupY +
         stationMod.offsetY +
         (-5 + battleMod.offsetY + battleMod.popupY),
@@ -75,20 +74,20 @@ export function useStationMarker({
         style="
           width: ${baseSize}px;
           height: ${baseSize}px;
-          opacity: ${opacity};
+          opacity: ${stationOpacity};
           bottom: ${2 + stationMod.offsetY}px;
           left: ${stationMod.offsetX * 50}%;
           transform: translateX(-50%);
         "
       />
      ${
-       isActive
+       showBattleIcon
          ? /* html */ `
         <img
             src="${battleIcon}"
             alt="${battleIcon}"
             style="
-            opacity: ${opacity};
+            opacity: ${getOpacity(battle_end)};
             width: ${battleSize}px;
             height: ${battleSize}px;
             bottom: ${baseSize * 0.8 * battleMod.offsetY}px;

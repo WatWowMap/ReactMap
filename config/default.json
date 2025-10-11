@@ -423,6 +423,7 @@
       "showDexNumInPopup": false,
       "pvpMega": false,
       "showAllPvpRanks": false,
+      "pvp50": true,
       "linkGlobalAndAdvanced": false,
       "showSizeIndicator": false,
       "enablePokemonPopupCoords": false,
