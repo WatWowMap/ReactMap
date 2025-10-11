@@ -117,7 +117,7 @@ export function TappablePopup({ tappable, rewardIcon, iconSize }) {
       )}
       {tappable.updated && (
         <Grid xs={12}>
-          <TimeStamp time={tappable.updated}>{t('last_seen')}</TimeStamp>
+          <TimeStamp time={tappable.updated}>{t('last_updated')}</TimeStamp>
         </Grid>
       )}
     </Grid>
