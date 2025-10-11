@@ -444,34 +444,43 @@ export class UAssets {
    * @param {string} [type]
    * @returns {string}
    */
-  getTappable(type = '0') {
+  getTappable(type = 'TAPPABLE_TYPE_POKEBALL') {
     const selection = this.selected.tappable
     const pack = selection ? this[selection] : undefined
-    try {
-      if (pack?.class && typeof pack.class.tappable === 'function') {
-        const iconPath = pack.class.tappable(type)
-        if (iconPath) {
-          return iconPath
-        }
-      }
-    } catch (e) {
-      console.error(`[${this.assetType.toUpperCase()}]`, e)
-    }
-
-    const normalized = (type || '0').toString()
     const basePath = pack?.path || this.fallback
     const tappableSet =
       pack?.tappable instanceof Set ? pack.tappable : undefined
     const extension = extractExtension(tappableSet) || this.fallbackExt
 
-    const baseCandidates = [normalized, normalized.toLowerCase()]
-    if (normalized.startsWith('TAPPABLE_TYPE_')) {
-      const suffix = normalized.slice('TAPPABLE_TYPE_'.length)
-      baseCandidates.push(suffix, suffix.toLowerCase())
+    const tryClass = (tappableType) => {
+      if (pack?.class && typeof pack.class.tappable === 'function') {
+        try {
+          const iconPath = pack.class.tappable(tappableType)
+          if (iconPath) {
+            return iconPath
+          }
+        } catch (e) {
+          console.error(`[${this.assetType.toUpperCase()}]`, e)
+        }
+      }
+      return undefined
     }
-    const candidates = Array.from(new Set(baseCandidates))
 
-    if (tappableSet) {
+    const buildCandidates = (tappableType) => {
+      const normalized = (tappableType || 'TAPPABLE_TYPE_POKEBALL').toString()
+      const baseCandidates = [normalized, normalized.toLowerCase()]
+      if (normalized.startsWith('TAPPABLE_TYPE_')) {
+        const suffix = normalized.slice('TAPPABLE_TYPE_'.length)
+        baseCandidates.push(suffix, suffix.toLowerCase())
+      }
+      return Array.from(new Set(baseCandidates))
+    }
+
+    const trySet = (tappableType) => {
+      if (!tappableSet) {
+        return undefined
+      }
+      const candidates = buildCandidates(tappableType)
       for (let i = 0; i < candidates.length; i += 1) {
         const candidate = candidates[i]
         const filename = `${candidate}.${extension}`
@@ -479,13 +488,43 @@ export class UAssets {
           return `${basePath}/tappable/${filename}`
         }
       }
-      const fallbackName = `0.${extension}`
-      if (tappableSet.has(fallbackName)) {
-        return `${basePath}/tappable/${fallbackName}`
-      }
+      return undefined
     }
 
-    return `${basePath}/tappable/${normalized}.${extension}`
+    const buildDefaultPath = (tappableType) => {
+      const normalized = (tappableType || 'TAPPABLE_TYPE_POKEBALL').toString()
+      return `${basePath}/tappable/${normalized}.${extension}`
+    }
+
+    const resolveType = (tappableType, allowDefault) => {
+      const fromClass = tryClass(tappableType)
+      if (fromClass) {
+        return { path: fromClass, found: true }
+      }
+
+      const fromSet = trySet(tappableType)
+      if (fromSet) {
+        return { path: fromSet, found: true }
+      }
+
+      if (allowDefault && !tappableSet) {
+        return { path: buildDefaultPath(tappableType), found: false }
+      }
+
+      return { path: undefined, found: false }
+    }
+
+    const primary = resolveType(type, true)
+    if (primary.found) {
+      return primary.path
+    }
+
+    const fallback = resolveType('TAPPABLE_TYPE_POKEBALL', false)
+    if (fallback.found) {
+      return fallback.path
+    }
+
+    return this.getRewards(2, 1)
   }
 
   /**
