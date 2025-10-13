@@ -120,7 +120,6 @@
     "portalUpdateLimit": 30,
     "weatherCellLimit": 3,
     "stationUpdateLimit": 9,
-    "tappableUpdateLimit": 6,
     "stationInactiveLimitDays": 120,
     "searchResultsLimit": 15,
     "searchSoftKmLimit": 10,

@@ -28,7 +28,7 @@ class Tappable extends Model {
 
     const { filters: filterArgs = {}, minLat, maxLat, minLon, maxLon } = args
 
-    const { queryLimits = {}, tappableUpdateLimit = 6 } = config.getSafe('api')
+    const { queryLimits = {} } = config.getSafe('api')
     const timestamp = getEpoch()
 
     const query = this.query().select([
@@ -58,15 +58,7 @@ class Tappable extends Model {
 
     query.whereNull('pokemon_id').whereNotNull('item_id')
 
-    query.andWhere((builder) => {
-      builder
-        .whereNull('expire_timestamp')
-        .orWhere('expire_timestamp', '>', timestamp)
-    })
-
-    if (tappableUpdateLimit > 0) {
-      query.andWhere('updated', '>', timestamp - tappableUpdateLimit * 60 * 60)
-    }
+    query.andWhere('expire_timestamp', '>', timestamp)
 
     const itemIds = []
     Object.keys(filterArgs).forEach((key) => {
