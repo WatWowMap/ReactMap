@@ -14,6 +14,7 @@ import { useOpacity } from '@hooks/useOpacity'
 import { TooltipWrapper } from '@components/ToolTipWrapper'
 
 import { TappablePopup } from './TappablePopup'
+import { getTappableDisplaySettings } from './displayRules'
 
 /**
  * @param {import('@rm/types').Tappable} tappable
@@ -42,6 +43,8 @@ const BaseTappableTile = (tappable) => {
   const theme = useTheme()
   const bubbleFill = alpha(theme.palette.background.paper, 0.5)
   const bubbleTextColor = theme.palette.text.primary
+  const displaySettings = getTappableDisplaySettings(tappable)
+  const useRewardPrimary = displaySettings.map.rewardAsPrimary
 
   const { icon, rewardIcon } = React.useMemo(() => {
     if (!Icons || !tappable.item_id) {
@@ -50,14 +53,6 @@ const BaseTappableTile = (tappable) => {
     const filterKey = `q${tappable.item_id}`
     const tappableSize = Icons.getSize('tappable', itemFilters[filterKey]?.size)
     const tappableIcon = Icons.getTappable(tappable.type)
-    const tappableReward = Icons.getRewards(
-      2,
-      tappable.item_id,
-      tappable.count || 1,
-    )
-    if (!tappableIcon) {
-      return { icon: null, rewardIcon: '', size: tappableSize }
-    }
     const [tappableMod, rewardMod] = Icons.getModifiers('tappable', 'reward')
     const popupAnchor = [
       tappableMod?.popupX || 0,
@@ -65,9 +60,43 @@ const BaseTappableTile = (tappable) => {
         tappableSize / 2 +
         (tappableMod?.popupY || 0),
     ]
+    const tappableReward = Icons.getRewards(
+      2,
+      tappable.item_id,
+      tappable.count || 1,
+    )
     const count = tappable.count || 1
-    const hasCount = count > 1
+    if (useRewardPrimary && tappableReward) {
+      const countBadge =
+        count > 1 ? `<span class="tappable-marker__count">x${count}</span>` : ''
+      const html = `
+        <div
+          class="tappable-marker tappable-marker--reward-primary"
+          style="--tappable-size:${tappableSize}px;opacity:${opacity};"
+        >
+          <img
+            class="tappable-marker__reward-primary"
+            src="${tappableReward}"
+            alt="${tappable.type || ''}"
+          />
+          ${countBadge}
+        </div>
+      `
+      return {
+        rewardIcon: tappableReward,
+        icon: divIcon({
+          className: 'tappable-marker-icon',
+          iconAnchor: [tappableSize / 2, tappableSize],
+          popupAnchor,
+          html,
+        }),
+      }
+    }
+    if (!tappableIcon) {
+      return { icon: null, rewardIcon: '', size: tappableSize }
+    }
     const defaultRewardSize = Icons.getSize('reward')
+    const hasCount = count > 1
     const rewardSize = hasCount ? defaultRewardSize : 25
     const textHeight = hasCount ? 14 : 0
     const paddingX = hasCount ? 10 : (30 - rewardSize) / 2
@@ -176,6 +205,7 @@ const BaseTappableTile = (tappable) => {
     opacity,
     bubbleFill,
     bubbleTextColor,
+    useRewardPrimary,
   ])
 
   if (!Icons || !icon) {

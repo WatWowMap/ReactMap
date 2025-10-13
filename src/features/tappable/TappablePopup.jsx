@@ -20,6 +20,7 @@ import { StatusIcon } from '@components/StatusIcon'
 import { Title } from '@components/popups/Title'
 
 import { getTimeUntil } from '@utils/getTimeUntil'
+import { getTappableDisplaySettings } from './displayRules'
 
 /**
  * @param {{
@@ -39,6 +40,7 @@ export function TappablePopup({ tappable, rewardIcon }) {
   )
   const masterfile = useMemory((s) => s.masterfile)
   const Icons = useMemory((s) => s.Icons)
+  const displaySettings = getTappableDisplaySettings(tappable)
 
   const count = tappable.count ?? 1
   const itemName = React.useMemo(() => {
@@ -74,7 +76,9 @@ export function TappablePopup({ tappable, rewardIcon }) {
   const hasExpireTime = !!tappable.expire_timestamp
   const hasExtras = showCoords || tappable.updated
   const hasRewardIcon = !!rewardIcon
-  const hasTappableIcon = !!tappableIcon
+  const useRewardAsPrimary =
+    displaySettings.popup.rewardAsPrimary && hasRewardIcon
+  const hasTappableIcon = !!tappableIcon && !useRewardAsPrimary
   const itemDisplayName = count > 1 ? `${itemName} x${count}` : itemName
 
   const [menuAnchorEl, setMenuAnchorEl] = React.useState(null)
@@ -151,28 +155,57 @@ export function TappablePopup({ tappable, rewardIcon }) {
         justifyContent="center"
         spacing={1}
       >
-        {hasTappableIcon ? (
-          <Grid xs={3} display="flex" justifyContent="center">
-            <img
-              src={tappableIcon}
-              alt={formattedType}
-              style={{
-                width: 40,
-                height: 40,
-                objectFit: 'contain',
-              }}
-            />
-          </Grid>
-        ) : null}
-        <Grid
-          xs={hasTappableIcon ? 7 : 10}
-          textAlign="center"
-          display="flex"
-          justifyContent="center"
-          alignItems="center"
-        >
-          <Title>{formattedType}</Title>
-        </Grid>
+        {useRewardAsPrimary ? (
+          <>
+            {hasRewardIcon ? (
+              <Grid xs={3} display="flex" justifyContent="center">
+                <img
+                  src={rewardIcon}
+                  alt={itemName}
+                  style={{
+                    width: 35,
+                    height: 35,
+                    objectFit: 'contain',
+                  }}
+                />
+              </Grid>
+            ) : null}
+            <Grid
+              xs={hasRewardIcon ? 7 : 10}
+              textAlign="center"
+              display="flex"
+              justifyContent="center"
+              alignItems="center"
+            >
+              <Title>{itemDisplayName}</Title>
+            </Grid>
+          </>
+        ) : (
+          <>
+            {hasTappableIcon ? (
+              <Grid xs={3} display="flex" justifyContent="center">
+                <img
+                  src={tappableIcon}
+                  alt={formattedType}
+                  style={{
+                    width: 40,
+                    height: 40,
+                    objectFit: 'contain',
+                  }}
+                />
+              </Grid>
+            ) : null}
+            <Grid
+              xs={hasTappableIcon ? 7 : 10}
+              textAlign="center"
+              display="flex"
+              justifyContent="center"
+              alignItems="center"
+            >
+              <Title>{formattedType}</Title>
+            </Grid>
+          </>
+        )}
         <Grid
           xs={2}
           display="flex"
@@ -206,29 +239,31 @@ export function TappablePopup({ tappable, rewardIcon }) {
           </MenuItem>
         ))}
       </Menu>
-      <Grid
-        xs={12}
-        container
-        alignItems="center"
-        justifyContent="center"
-        spacing={1}
-      >
-        {hasRewardIcon ? (
-          <Grid xs={3} display="flex" justifyContent="center">
-            <img
-              src={rewardIcon}
-              alt={itemName}
-              style={{
-                maxWidth: 35,
-                maxHeight: 35,
-              }}
-            />
+      {!useRewardAsPrimary && (
+        <Grid
+          xs={12}
+          container
+          alignItems="center"
+          justifyContent="center"
+          spacing={1}
+        >
+          {hasRewardIcon ? (
+            <Grid xs={3} display="flex" justifyContent="center">
+              <img
+                src={rewardIcon}
+                alt={itemName}
+                style={{
+                  maxWidth: 35,
+                  maxHeight: 35,
+                }}
+              />
+            </Grid>
+          ) : null}
+          <Grid xs={hasRewardIcon ? 9 : 12} textAlign="center">
+            <Typography variant="caption">{itemDisplayName}</Typography>
           </Grid>
-        ) : null}
-        <Grid xs={hasRewardIcon ? 9 : 12} textAlign="center">
-          <Typography variant="caption">{itemDisplayName}</Typography>
         </Grid>
-      </Grid>
+      )}
       {hasExpireTime && (
         <Grid
           xs={12}
