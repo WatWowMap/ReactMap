@@ -402,7 +402,6 @@
       "clustering": true,
       "tappableTimers": false,
       "interactionRanges": false,
-      "customRange": 0,
       "tappablesOpacity": true,
       "enableTappablePopupCoords": false,
       "opacityTenMinutes": 0.75,

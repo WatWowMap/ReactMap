@@ -1,11 +1,11 @@
 /* eslint-disable react/destructuring-assignment */
 // @ts-check
 import * as React from 'react'
-import { Marker, Popup } from 'react-leaflet'
+import { Marker, Popup, Circle } from 'react-leaflet'
 import { divIcon } from 'leaflet'
 import { useTheme, alpha } from '@mui/material/styles'
 
-import { useMemory } from '@store/useMemory'
+import { useMemory, basicEqualFn } from '@store/useMemory'
 import { useStorage } from '@store/useStorage'
 import { useManualPopupTracker } from '@hooks/useManualPopupTracker'
 import { useForcePopup } from '@hooks/useForcePopup'
@@ -22,12 +22,27 @@ import { getTappableDisplaySettings } from './displayRules'
 const BaseTappableTile = (tappable) => {
   const Icons = useMemory((s) => s.Icons)
   const itemFilters = useStorage((s) => s.filters?.tappables?.filter || {})
-  const showTimerSetting = useStorage(
-    (s) => !!s.userSettings.tappables?.tappableTimers,
-  )
-  const timerForced = useMemory((s) =>
-    tappable.id == null ? false : s.timerList.includes(tappable.id),
-  )
+  const [timerForced, interactionRangeZoom] = useMemory((s) => {
+    const {
+      timerList,
+      config: { general = {} },
+    } = s
+    const zoomLimit = Number.isFinite(general.interactionRangeZoom)
+      ? general.interactionRangeZoom
+      : 15
+    return [
+      tappable.id == null ? false : timerList.includes(tappable.id),
+      zoomLimit,
+    ]
+  }, basicEqualFn)
+  const [showTimerSetting, showInteractionRange] = useStorage((s) => {
+    const { userSettings, zoom } = s
+    return [
+      !!userSettings.tappables?.tappableTimers,
+      !!userSettings.tappables?.interactionRanges &&
+        zoom >= interactionRangeZoom,
+    ]
+  }, basicEqualFn)
 
   const [markerRef, setMarkerRef] = React.useState(null)
   useForcePopup(tappable.id, markerRef)
@@ -229,6 +244,13 @@ const BaseTappableTile = (tappable) => {
       </Popup>
       {(showTimerSetting || timerForced) && !!timers.length && (
         <TooltipWrapper offset={[0, 4]} timers={timers} />
+      )}
+      {showInteractionRange && (
+        <Circle
+          center={[tappable.lat, tappable.lon]}
+          radius={40}
+          pathOptions={{ color: '#0DA8E7', weight: 1 }}
+        />
       )}
     </Marker>
   )
