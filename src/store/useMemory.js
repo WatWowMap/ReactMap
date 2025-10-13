@@ -59,7 +59,6 @@ import { create } from 'zustand'
  *     nests: string[],
  *     stations: string[],
  *     tappables: string[],
- *     tappables: string[],
  *     questConditions: Record<string, { title: string, target?: number }[]>,
  *   }
  *   manualParams: {
