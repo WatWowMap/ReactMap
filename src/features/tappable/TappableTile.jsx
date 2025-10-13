@@ -65,21 +65,24 @@ const BaseTappableTile = (tappable) => {
         (tappableMod?.popupY || 0),
     ]
     const count = tappable.count || 1
-    const rewardSize = Icons.getSize('reward')
-    const paddingX = 10
-    const paddingTop = 8
-    const paddingBottom = 8
-    const textHeight = count > 1 ? 14 : 0
-    const bubbleWidth = rewardSize + paddingX * 2
+    const hasCount = count > 1
+    const defaultRewardSize = Icons.getSize('reward')
+    const rewardSize = hasCount ? defaultRewardSize : 25
+    const textHeight = hasCount ? 14 : 0
+    const paddingX = hasCount ? 10 : (30 - rewardSize) / 2
+    const paddingTop = hasCount ? 8 : 4
+    const paddingBottom = hasCount ? 8 : 4
+    const bubbleWidth = hasCount ? rewardSize + paddingX * 2 : 30
     const bubbleHeight = paddingTop + rewardSize + textHeight + paddingBottom
-    const tailHeight = 16
-    const tailWidth = Math.min(24, bubbleWidth * 0.45)
+    const tailHeight = hasCount ? 16 : 12
+    const tailWidth = Math.min(hasCount ? 24 : 16, bubbleWidth * 0.45)
     const svgHeight = bubbleHeight + tailHeight
-    const cornerRadius = 12
+    const cornerRadius = hasCount ? 12 : 9
     const bubbleCenterX = bubbleWidth / 2
     const rewardX = paddingX
     const rewardY = paddingTop
     const countY = paddingTop + rewardSize + textHeight / 2
+    const bubbleOffset = hasCount ? 6 : 4
     const bubblePath = [
       `M${cornerRadius} 0`,
       `H${bubbleWidth - cornerRadius}`,
@@ -135,7 +138,9 @@ const BaseTappableTile = (tappable) => {
               <div
                 class="tappable-marker__bubble"
                 style="
-                  bottom: calc(100% + 6px + ${rewardMod?.popupY || 0}px);
+                  bottom: calc(100% + ${bubbleOffset}px + ${
+                    rewardMod?.popupY || 0
+                  }px);
                   width: ${bubbleWidth}px;
                   height: ${svgHeight}px;
                 "
