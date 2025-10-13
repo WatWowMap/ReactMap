@@ -187,6 +187,11 @@ function clientOptions(perms) {
         perm: ['tappables'],
         category: 'markers',
       },
+      spacialRendRange: {
+        type: 'bool',
+        perm: ['tappables'],
+        category: 'markers',
+      },
       tappablesOpacity: {
         type: 'bool',
         perm: ['tappables'],

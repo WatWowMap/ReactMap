@@ -35,14 +35,17 @@ const BaseTappableTile = (tappable) => {
       zoomLimit,
     ]
   }, basicEqualFn)
-  const [showTimerSetting, showInteractionRange] = useStorage((s) => {
-    const { userSettings, zoom } = s
-    return [
-      !!userSettings.tappables?.tappableTimers,
-      !!userSettings.tappables?.interactionRanges &&
-        zoom >= interactionRangeZoom,
-    ]
-  }, basicEqualFn)
+  const [showTimerSetting, showInteractionRange, showSpacialRendRange] =
+    useStorage((s) => {
+      const { userSettings, zoom } = s
+      return [
+        !!userSettings.tappables?.tappableTimers,
+        !!userSettings.tappables?.interactionRanges &&
+          zoom >= interactionRangeZoom,
+        !!userSettings.tappables?.spacialRendRange &&
+          zoom >= interactionRangeZoom,
+      ]
+    }, basicEqualFn)
 
   const [markerRef, setMarkerRef] = React.useState(null)
   useForcePopup(tappable.id, markerRef)
@@ -250,6 +253,17 @@ const BaseTappableTile = (tappable) => {
           center={[tappable.lat, tappable.lon]}
           radius={40}
           pathOptions={{ color: '#0DA8E7', weight: 1 }}
+        />
+      )}
+      {showSpacialRendRange && (
+        <Circle
+          center={[tappable.lat, tappable.lon]}
+          radius={80}
+          pathOptions={{
+            color: '#4E893E',
+            weight: 1,
+            dashArray: '5, 5',
+          }}
         />
       )}
     </Marker>
