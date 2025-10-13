@@ -1,9 +1,12 @@
 // @ts-check
 import * as React from 'react'
+import ExpandMore from '@mui/icons-material/ExpandMore'
 import Grid from '@mui/material/Unstable_Grid2'
 import Typography from '@mui/material/Typography'
 import Divider from '@mui/material/Divider'
 import Tooltip from '@mui/material/Tooltip'
+import IconButton from '@mui/material/IconButton'
+import Collapse from '@mui/material/Collapse'
 import { useTranslation } from 'react-i18next'
 
 import { useStorage } from '@store/useStorage'
@@ -27,6 +30,7 @@ export function TappablePopup({ tappable, rewardIcon, iconSize }) {
   const showCoords = useStorage(
     (s) => !!s.userSettings.tappables?.enableTappablePopupCoords,
   )
+  const popups = useStorage((s) => s.popups)
   const masterfile = useMemory((s) => s.masterfile)
 
   const count = tappable.count ?? 1
@@ -54,6 +58,17 @@ export function TappablePopup({ tappable, rewardIcon, iconSize }) {
   }, [tappable.type, t, i18n])
 
   const hasExpireTime = !!tappable.expire_timestamp
+  const hasExtras = showCoords || tappable.updated
+
+  const handleExtrasToggle = React.useCallback(() => {
+    useStorage.setState((prev) => ({
+      popups: {
+        ...prev.popups,
+        extras: !popups.extras,
+        pvp: false,
+      },
+    }))
+  }, [popups.extras])
 
   return (
     <Grid
@@ -86,19 +101,6 @@ export function TappablePopup({ tappable, rewardIcon, iconSize }) {
           </Typography>
         )}
       </Grid>
-      <Grid xs={12}>
-        <Navigation lat={tappable.lat} lon={tappable.lon} size="medium" />
-      </Grid>
-      {showCoords && (
-        <Grid xs={12}>
-          <Coords lat={tappable.lat} lon={tappable.lon} />
-        </Grid>
-      )}
-      {(tappable.expire_timestamp || tappable.updated) && (
-        <Grid xs={12}>
-          <Divider sx={{ my: 0.5 }} />
-        </Grid>
-      )}
       {hasExpireTime && (
         <Grid
           xs={12}
@@ -115,12 +117,42 @@ export function TappablePopup({ tappable, rewardIcon, iconSize }) {
           />
         </Grid>
       )}
-      {tappable.updated && (
-        <Grid xs={12}>
-          <TimeStamp time={tappable.updated} xs={12}>
-            {t('last_updated')}
-          </TimeStamp>
+      <Grid xs={hasExtras ? 6 : 12} textAlign="center">
+        <Navigation lat={tappable.lat} lon={tappable.lon} />
+      </Grid>
+      {hasExtras && (
+        <Grid xs={6} sx={{ display: 'flex', justifyContent: 'center' }}>
+          <IconButton
+            className={popups.extras ? 'expanded' : 'closed'}
+            onClick={handleExtrasToggle}
+            size="large"
+          >
+            <ExpandMore />
+          </IconButton>
         </Grid>
+      )}
+      {hasExtras && (
+        <Collapse in={popups.extras} timeout="auto" unmountOnExit>
+          <Grid
+            container
+            alignItems="center"
+            justifyContent="center"
+            spacing={1}
+            textAlign="center"
+          >
+            <Divider flexItem sx={{ width: '100%', height: 2, my: 1 }} />
+            {tappable.updated && (
+              <TimeStamp time={tappable.updated} xs={12}>
+                last_updated
+              </TimeStamp>
+            )}
+            {showCoords && (
+              <Grid xs={12}>
+                <Coords lat={tappable.lat} lon={tappable.lon} />
+              </Grid>
+            )}
+          </Grid>
+        </Collapse>
       )}
     </Grid>
   )
