@@ -1,15 +1,18 @@
 // @ts-check
 import * as React from 'react'
 import ExpandMore from '@mui/icons-material/ExpandMore'
+import MoreVert from '@mui/icons-material/MoreVert'
 import Grid from '@mui/material/Unstable_Grid2'
 import Typography from '@mui/material/Typography'
 import Divider from '@mui/material/Divider'
 import Tooltip from '@mui/material/Tooltip'
 import IconButton from '@mui/material/IconButton'
 import Collapse from '@mui/material/Collapse'
+import Menu from '@mui/material/Menu'
+import MenuItem from '@mui/material/MenuItem'
 import { useTranslation } from 'react-i18next'
 
-import { useStorage } from '@store/useStorage'
+import { useStorage, setDeepStore } from '@store/useStorage'
 import { useMemory } from '@store/useMemory'
 import { Navigation } from '@components/popups/Navigation'
 import { Coords } from '@components/popups/Coords'
@@ -31,6 +34,10 @@ export function TappablePopup({ tappable, rewardIcon, iconSize }) {
     (s) => !!s.userSettings.tappables?.enableTappablePopupCoords,
   )
   const popups = useStorage((s) => s.popups)
+  const filterKey = tappable.item_id ? `q${tappable.item_id}` : ''
+  const filterEnabled = useStorage((s) =>
+    filterKey ? s.filters?.tappables?.filter?.[filterKey]?.enabled : undefined,
+  )
   const masterfile = useMemory((s) => s.masterfile)
 
   const count = tappable.count ?? 1
@@ -59,6 +66,9 @@ export function TappablePopup({ tappable, rewardIcon, iconSize }) {
 
   const hasExpireTime = !!tappable.expire_timestamp
   const hasExtras = showCoords || tappable.updated
+  const hasRewardIcon = !!rewardIcon
+
+  const [menuAnchorEl, setMenuAnchorEl] = React.useState(null)
 
   const handleExtrasToggle = React.useCallback(() => {
     useStorage.setState((prev) => ({
@@ -70,6 +80,52 @@ export function TappablePopup({ tappable, rewardIcon, iconSize }) {
     }))
   }, [popups.extras])
 
+  const handleMenuOpen = React.useCallback((event) => {
+    setMenuAnchorEl(event.currentTarget)
+  }, [])
+
+  const handleMenuClose = React.useCallback(() => {
+    setMenuAnchorEl(null)
+  }, [])
+
+  const handleHide = React.useCallback(() => {
+    setMenuAnchorEl(null)
+    if (tappable.id === undefined || tappable.id === null) return
+    useMemory.setState((prev) => ({
+      hideList: new Set(prev.hideList).add(tappable.id),
+    }))
+  }, [tappable.id])
+
+  const handleExclude = React.useCallback(() => {
+    setMenuAnchorEl(null)
+    if (!filterKey) return
+    setDeepStore(`filters.tappables.filter.${filterKey}.enabled`, false)
+  }, [filterKey])
+
+  const handleTimer = React.useCallback(() => {
+    setMenuAnchorEl(null)
+    if (tappable.id === undefined || tappable.id === null) return
+    useMemory.setState((prev) => {
+      if (prev.timerList.includes(tappable.id)) {
+        return {
+          timerList: prev.timerList.filter((entry) => entry !== tappable.id),
+        }
+      }
+      return { timerList: [...prev.timerList, tappable.id] }
+    })
+  }, [tappable.id])
+
+  const menuOptions = React.useMemo(() => {
+    const options = [
+      { key: 'timer', label: 'timer', action: handleTimer },
+      { key: 'hide', label: 'hide', action: handleHide },
+    ]
+    if (filterKey && filterEnabled) {
+      options.push({ key: 'exclude', label: 'exclude', action: handleExclude })
+    }
+    return options
+  }, [handleTimer, handleHide, handleExclude, filterKey, filterEnabled])
+
   return (
     <Grid
       container
@@ -79,28 +135,74 @@ export function TappablePopup({ tappable, rewardIcon, iconSize }) {
       alignItems="center"
       textAlign="center"
     >
-      {rewardIcon && (
-        <Grid xs={12}>
-          <img
-            src={rewardIcon}
-            alt={itemName}
-            style={{ width: iconSize, height: iconSize, objectFit: 'contain' }}
-          />
+      <Grid
+        xs={12}
+        container
+        alignItems="center"
+        justifyContent="center"
+        spacing={1}
+      >
+        {hasRewardIcon && (
+          <Grid xs={3} display="flex" justifyContent="center">
+            <img
+              src={rewardIcon}
+              alt={itemName}
+              style={{
+                width: iconSize,
+                height: iconSize,
+                objectFit: 'contain',
+              }}
+            />
+          </Grid>
+        )}
+        <Grid xs={hasRewardIcon ? 6 : 9} textAlign="center">
+          <Typography variant={itemName.length > 14 ? 'subtitle1' : 'h6'}>
+            {itemName}
+          </Typography>
+          {count > 1 && (
+            <Typography variant="subtitle2" color="text.secondary">
+              ×{count}
+            </Typography>
+          )}
+          {formattedType && (
+            <Typography variant="caption" color="text.secondary">
+              {formattedType}
+            </Typography>
+          )}
         </Grid>
-      )}
-      <Grid xs={12}>
-        <Typography variant="h6">{itemName}</Typography>
-        {count > 1 && (
-          <Typography variant="subtitle2" color="text.secondary">
-            ×{count}
-          </Typography>
-        )}
-        {formattedType && (
-          <Typography variant="caption" color="text.secondary">
-            {formattedType}
-          </Typography>
-        )}
+        <Grid
+          xs={hasRewardIcon ? 3 : 3}
+          display="flex"
+          justifyContent="center"
+          alignItems="center"
+        >
+          <IconButton
+            aria-haspopup="true"
+            onClick={handleMenuOpen}
+            size="large"
+          >
+            <MoreVert />
+          </IconButton>
+        </Grid>
       </Grid>
+      <Menu
+        anchorEl={menuAnchorEl}
+        keepMounted
+        open={!!menuAnchorEl}
+        onClose={handleMenuClose}
+        PaperProps={{
+          style: {
+            maxHeight: 216,
+            minWidth: '20ch',
+          },
+        }}
+      >
+        {menuOptions.map((option) => (
+          <MenuItem key={option.key} onClick={option.action}>
+            {t(option.label)}
+          </MenuItem>
+        ))}
+      </Menu>
       {hasExpireTime && (
         <Grid
           xs={12}

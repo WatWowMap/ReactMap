@@ -21,8 +21,11 @@ import { TappablePopup } from './TappablePopup'
 const BaseTappableTile = (tappable) => {
   const Icons = useMemory((s) => s.Icons)
   const itemFilters = useStorage((s) => s.filters?.tappables?.filter || {})
-  const showTimer = useStorage(
+  const showTimerSetting = useStorage(
     (s) => !!s.userSettings.tappables?.tappableTimers,
+  )
+  const timerForced = useMemory((s) =>
+    tappable.id == null ? false : s.timerList.includes(tappable.id),
   )
 
   const [markerRef, setMarkerRef] = React.useState(null)
@@ -193,7 +196,7 @@ const BaseTappableTile = (tappable) => {
           iconSize={size}
         />
       </Popup>
-      {showTimer && !!timers.length && (
+      {(showTimerSetting || timerForced) && !!timers.length && (
         <TooltipWrapper offset={[0, 4]} timers={timers} />
       )}
     </Marker>
