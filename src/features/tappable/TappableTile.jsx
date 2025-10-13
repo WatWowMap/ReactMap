@@ -61,7 +61,8 @@ const BaseTappableTile = (tappable) => {
     const [tappableMod, rewardMod] = Icons.getModifiers('tappable', 'reward')
     const popupAnchor = [
       tappableMod?.popupX || 0,
-      tappableSize * -0.7 * (tappableMod?.offsetY || 1) +
+      tappableSize * -0.7 * (tappableMod?.offsetY || 1) -
+        tappableSize / 2 +
         (tappableMod?.popupY || 0),
     ]
     const count = tappable.count || 1
@@ -161,7 +162,7 @@ const BaseTappableTile = (tappable) => {
       rewardIcon: tappableReward,
       icon: divIcon({
         className: 'tappable-marker-icon',
-        iconAnchor: [tappableSize / 2, tappableSize / 2],
+        iconAnchor: [tappableSize / 2, tappableSize],
         popupAnchor,
         html,
       }),
