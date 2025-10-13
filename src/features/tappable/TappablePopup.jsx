@@ -4,7 +4,6 @@ import ExpandMore from '@mui/icons-material/ExpandMore'
 import MoreVert from '@mui/icons-material/MoreVert'
 import Grid from '@mui/material/Unstable_Grid2'
 import Typography from '@mui/material/Typography'
-import Divider from '@mui/material/Divider'
 import Tooltip from '@mui/material/Tooltip'
 import IconButton from '@mui/material/IconButton'
 import Collapse from '@mui/material/Collapse'
@@ -18,6 +17,7 @@ import { Navigation } from '@components/popups/Navigation'
 import { Coords } from '@components/popups/Coords'
 import { TimeStamp } from '@components/popups/TimeStamps'
 import { StatusIcon } from '@components/StatusIcon'
+import { Title } from '@components/popups/Title'
 
 import { getTimeUntil } from '@utils/getTimeUntil'
 
@@ -25,10 +25,9 @@ import { getTimeUntil } from '@utils/getTimeUntil'
  * @param {{
  *  tappable: import('@rm/types').Tappable,
  *  rewardIcon: string,
- *  iconSize: number,
  * }} props
  */
-export function TappablePopup({ tappable, rewardIcon, iconSize }) {
+export function TappablePopup({ tappable, rewardIcon }) {
   const { t, i18n } = useTranslation()
   const showCoords = useStorage(
     (s) => !!s.userSettings.tappables?.enableTappablePopupCoords,
@@ -39,6 +38,7 @@ export function TappablePopup({ tappable, rewardIcon, iconSize }) {
     filterKey ? s.filters?.tappables?.filter?.[filterKey]?.enabled : undefined,
   )
   const masterfile = useMemory((s) => s.masterfile)
+  const Icons = useMemory((s) => s.Icons)
 
   const count = tappable.count ?? 1
   const itemName = React.useMemo(() => {
@@ -64,9 +64,18 @@ export function TappablePopup({ tappable, rewardIcon, iconSize }) {
       .join(' ')
   }, [tappable.type, t, i18n])
 
+  const tappableIcon = React.useMemo(() => {
+    if (!Icons || typeof Icons.getTappable !== 'function') {
+      return ''
+    }
+    return Icons.getTappable(tappable.type) || ''
+  }, [Icons, tappable.type])
+
   const hasExpireTime = !!tappable.expire_timestamp
   const hasExtras = showCoords || tappable.updated
   const hasRewardIcon = !!rewardIcon
+  const hasTappableIcon = !!tappableIcon
+  const itemDisplayName = count > 1 ? `${itemName} x${count}` : itemName
 
   const [menuAnchorEl, setMenuAnchorEl] = React.useState(null)
 
@@ -130,7 +139,7 @@ export function TappablePopup({ tappable, rewardIcon, iconSize }) {
     <Grid
       container
       spacing={1}
-      width={220}
+      width={200}
       justifyContent="center"
       alignItems="center"
       textAlign="center"
@@ -142,38 +151,32 @@ export function TappablePopup({ tappable, rewardIcon, iconSize }) {
         justifyContent="center"
         spacing={1}
       >
-        {hasRewardIcon && (
+        {hasTappableIcon ? (
           <Grid xs={3} display="flex" justifyContent="center">
             <img
-              src={rewardIcon}
-              alt={itemName}
+              src={tappableIcon}
+              alt={formattedType}
               style={{
-                width: iconSize,
-                height: iconSize,
+                width: 40,
+                height: 40,
                 objectFit: 'contain',
               }}
             />
           </Grid>
-        )}
-        <Grid xs={hasRewardIcon ? 6 : 9} textAlign="center">
-          <Typography variant={itemName.length > 14 ? 'subtitle1' : 'h6'}>
-            {itemName}
-          </Typography>
-          {count > 1 && (
-            <Typography variant="subtitle2" color="text.secondary">
-              ×{count}
-            </Typography>
-          )}
-          {formattedType && (
-            <Typography variant="caption" color="text.secondary">
-              {formattedType}
-            </Typography>
-          )}
-        </Grid>
+        ) : null}
         <Grid
-          xs={hasRewardIcon ? 3 : 3}
+          xs={hasTappableIcon ? 7 : 10}
+          textAlign="center"
           display="flex"
           justifyContent="center"
+          alignItems="center"
+        >
+          <Title>{formattedType}</Title>
+        </Grid>
+        <Grid
+          xs={2}
+          display="flex"
+          justifyContent="flex-end"
           alignItems="center"
         >
           <IconButton
@@ -203,6 +206,29 @@ export function TappablePopup({ tappable, rewardIcon, iconSize }) {
           </MenuItem>
         ))}
       </Menu>
+      <Grid
+        xs={12}
+        container
+        alignItems="center"
+        justifyContent="center"
+        spacing={1}
+      >
+        {hasRewardIcon ? (
+          <Grid xs={3} display="flex" justifyContent="center">
+            <img
+              src={rewardIcon}
+              alt={itemName}
+              style={{
+                maxWidth: 35,
+                maxHeight: 35,
+              }}
+            />
+          </Grid>
+        ) : null}
+        <Grid xs={hasRewardIcon ? 9 : 12} textAlign="center">
+          <Typography variant="caption">{itemDisplayName}</Typography>
+        </Grid>
+      </Grid>
       {hasExpireTime && (
         <Grid
           xs={12}
@@ -242,7 +268,6 @@ export function TappablePopup({ tappable, rewardIcon, iconSize }) {
             spacing={1}
             textAlign="center"
           >
-            <Divider flexItem sx={{ width: '100%', height: 2, my: 1 }} />
             {tappable.updated && (
               <TimeStamp time={tappable.updated} xs={12}>
                 last_updated

@@ -43,7 +43,7 @@ const BaseTappableTile = (tappable) => {
   const bubbleFill = alpha(theme.palette.background.paper, 0.5)
   const bubbleTextColor = theme.palette.text.primary
 
-  const { icon, rewardIcon, size } = React.useMemo(() => {
+  const { icon, rewardIcon } = React.useMemo(() => {
     if (!Icons || !tappable.item_id) {
       return { icon: null, rewardIcon: '', size: 24 }
     }
@@ -153,7 +153,6 @@ const BaseTappableTile = (tappable) => {
     `
 
     return {
-      size: tappableSize,
       rewardIcon: tappableReward,
       icon: divIcon({
         className: 'tappable-marker-icon',
@@ -190,11 +189,7 @@ const BaseTappableTile = (tappable) => {
       eventHandlers={{ popupopen: handlePopupOpen }}
     >
       <Popup position={[tappable.lat, tappable.lon]}>
-        <TappablePopup
-          tappable={tappable}
-          rewardIcon={rewardIcon}
-          iconSize={size}
-        />
+        <TappablePopup tappable={tappable} rewardIcon={rewardIcon} />
       </Popup>
       {(showTimerSetting || timerForced) && !!timers.length && (
         <TooltipWrapper offset={[0, 4]} timers={timers} />
