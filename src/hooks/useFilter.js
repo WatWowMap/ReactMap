@@ -24,8 +24,8 @@ const filteringPokemon = [
 export function useFilter(category, webhookCategory, reqCategories) {
   const { t } = useTranslation()
   const tempFilters = webhookCategory
-    ? useWebhookStore((s) => s.tempFilters)
-    : useStorage((s) => s.filters[category].filter)
+    ? useWebhookStore((s) => s.tempFilters || {})
+    : useStorage((s) => s.filters?.[category]?.filter || {})
 
   const search = useGetDeepStore(`searches.${category}Advanced`, '')
     .toLowerCase()
@@ -37,15 +37,15 @@ export function useFilter(category, webhookCategory, reqCategories) {
     menuFilters,
     menus: { [category]: staticMenus },
   } = useMemory.getState()
-  const menus = useStorage((s) => s.menus[category].filters)
+  const menus = useStorage((s) => s.menus?.[category]?.filters || {})
   const {
-    generations,
-    types,
-    rarity,
-    historicRarity,
-    forms,
-    others,
-    categories,
+    generations = {},
+    types = {},
+    rarity = {},
+    historicRarity = {},
+    forms = {},
+    others = { onlyAvailable: true },
+    categories = {},
   } = menus
 
   const tempAdvFilter = {}
@@ -55,7 +55,8 @@ export function useFilter(category, webhookCategory, reqCategories) {
   let switchKey
 
   Object.keys(menus).forEach((subCategory) => {
-    tempAdvFilter[subCategory] = Object.values(menus[subCategory]).every(
+    const options = menus[subCategory] || {}
+    tempAdvFilter[subCategory] = Object.values(options).every(
       (val) => val === false,
     )
   })

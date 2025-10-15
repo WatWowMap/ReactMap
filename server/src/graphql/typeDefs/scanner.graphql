@@ -203,6 +203,18 @@ type Portal {
   updated: Int
 }
 
+type Tappable {
+  id: ID
+  lat: Float
+  lon: Float
+  type: String
+  item_id: Int
+  count: Int
+  expire_timestamp: Int
+  expire_timestamp_verified: Boolean
+  updated: Int
+}
+
 type ScanCell {
   id: ID
   level: Int

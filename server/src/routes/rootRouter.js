@@ -215,6 +215,9 @@ rootRouter.get('/api/settings', async (req, res, next) => {
       if (settings.user.perms.stations && api.queryOnSessionInit.stations) {
         state.event.setAvailable('stations', 'Station', state.db)
       }
+      if (settings.user.perms.tappables && api.queryOnSessionInit.tappables) {
+        state.event.setAvailable('tappables', 'Tappable', state.db)
+      }
     }
 
     res.status(200).json(settings)

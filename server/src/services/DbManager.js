@@ -24,6 +24,7 @@ class DbManager extends Logger {
     'ScanCell',
     'Spawnpoint',
     'Station',
+    'Tappable',
     'Weather',
   ])
 

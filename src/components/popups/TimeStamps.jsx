@@ -8,10 +8,10 @@ import { ExtraInfo } from './ExtraInfo'
 
 /**
  *
- * @param {{ time?: number, children: string }} props
+ * @param {{ time?: number, children: string, xs?: number }} props
  * @returns
  */
-export const TimeStamp = ({ time, children }) => {
+export const TimeStamp = ({ time, children, xs = 6 }) => {
   const { i18n } = useTranslation()
 
   if (!time) return null
@@ -23,7 +23,7 @@ export const TimeStamp = ({ time, children }) => {
   })
 
   return (
-    <ExtraInfo title={children} data={formatter.format(time * 1000)}>
+    <ExtraInfo xs={xs} title={children} data={formatter.format(time * 1000)}>
       <Grid>
         <Timer expireTime={time} />
       </Grid>

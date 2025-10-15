@@ -7,6 +7,7 @@ type Query {
   availableGyms: [String]
   availableNests: [String]
   availableStations: [String]
+  availableTappables: [String]
   badges: [Badge]
   backup(id: ID): Backup
   backups: [Backup]
@@ -67,6 +68,13 @@ type Query {
     filters: JSON
   ): [Station]
   stationPokemon(id: ID): [StationPokemon]
+  tappables(
+    minLat: Float
+    maxLat: Float
+    minLon: Float
+    maxLon: Float
+    filters: JSON
+  ): [Tappable]
   s2cells(
     minLat: Float
     maxLat: Float

@@ -9820,10 +9820,10 @@ uglify-js@^3.1.4:
   resolved "https://registry.yarnpkg.com/uglify-js/-/uglify-js-3.19.3.tgz#82315e9bbc6f2b25888858acd1fff8441035b77f"
   integrity sha512-v3Xu+yuwBXisp6QYTcH4UbH+xYJXqnq2m/LtQVWKWzYc1iehYnLixoQDN9FH6/j9/oybfd6W9Ghwkl8+UMKTKQ==
 
-uicons.js@2.0.3:
-  version "2.0.3"
-  resolved "https://registry.yarnpkg.com/uicons.js/-/uicons.js-2.0.3.tgz#38833f9cfad5fcbf6968ff3f0a1f36ab47dd40be"
-  integrity sha512-+hFdKLHkB1bIrwNNnDO8HBe0R10UuJDZ6xqkroigBqouHxZExuxznY2GlDUqGXv7RHB9OFNzFLo5mFzeudlf7w==
+uicons.js@2.1.0:
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/uicons.js/-/uicons.js-2.1.0.tgz#9aaa6254aeba25dad5d4672d2fb840ec4c4c97b0"
+  integrity sha512-Pmg2QBvQuy3VaTzZDKDCM0/K+fgKf0EK/ZGOnxzkN33HiRCtMOxcSmN80/tO1WFDzCXG0FvbF/zj2rgPDy5zTA==
 
 uid-safe@~2.1.5:
   version "2.1.5"
