@@ -20,7 +20,7 @@ const CATEGORIES = /** @type {const} */ ({
   stations: ['pokemon'],
   pokemon: ['pokemon'],
   nests: ['pokemon'],
-  tappables: ['items'],
+  tappables: ['tappables'],
 })
 
 /**
@@ -117,6 +117,12 @@ function advMenus(perms) {
         categories: Object.fromEntries(
           CATEGORIES.tappables.map((item) => [item, false]),
         ),
+        others: {
+          reverse: false,
+          selected: false,
+          unselected: false,
+          onlyAvailable: true,
+        },
       },
     },
     pokemon: {

@@ -2,6 +2,7 @@
 import * as React from 'react'
 
 import { toggleDialog, useLayoutStore } from '@store/useLayoutStore'
+import { useMemory } from '@store/useMemory'
 import { StandardItem } from '@components/virtual/StandardItem'
 import { Menu } from '@components/Menu'
 import { Header } from '@components/dialogs/Header'
@@ -19,13 +20,13 @@ const EXTRA_BUTTONS = [
 
 export function FilterMenu() {
   const { open, category, type } = useLayoutStore((s) => s.dialog)
+  const menuConfig = useMemory((s) => (category ? s.menus?.[category] : null))
 
-  return (category === 'pokemon' ||
-    category === 'gyms' ||
-    category === 'pokestops' ||
-    category === 'nests' ||
-    category === 'stations') &&
-    type === 'filters' ? (
+  if (!category || !menuConfig || type !== 'filters') {
+    return null
+  }
+
+  return (
     <DialogWrapper
       open={open && type === 'filters'}
       onClose={toggleDialog(false)}
@@ -40,5 +41,5 @@ export function FilterMenu() {
         {(_, key) => <StandardItem id={key} category={category} caption />}
       </Menu>
     </DialogWrapper>
-  ) : null
+  )
 }
