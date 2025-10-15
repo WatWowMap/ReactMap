@@ -1,3 +1,11 @@
+# [1.40.0-develop.13](https://github.com/WatWowMap/ReactMap/compare/v1.40.0-develop.12...v1.40.0-develop.13) (2025-10-15)
+
+
+### Features
+
+* display amount in quest tooltip ([5e57d50](https://github.com/WatWowMap/ReactMap/commit/5e57d502f85dfc43370aa4e2f6262fad3ee0c5af))
+* tappables ([#1143](https://github.com/WatWowMap/ReactMap/issues/1143)) ([943019f](https://github.com/WatWowMap/ReactMap/commit/943019f2f36c659b174cde327e1acbcfc1ad95d2))
+
 # [1.40.0-develop.12](https://github.com/WatWowMap/ReactMap/compare/v1.40.0-develop.11...v1.40.0-develop.12) (2025-10-05)
 
 
