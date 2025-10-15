@@ -2,28 +2,6 @@
 /* eslint-disable no-console */
 import { UICONS } from 'uicons.js'
 
-/**
- * Extract the first file extension from a set of filenames.
- * @param {Set<string>} set
- */
-const extractExtension = (set) => {
-  if (!set) return undefined
-  const iterator = set.values()
-  let next = iterator.next()
-  while (!next.done) {
-    const entry = next.value
-    if (typeof entry === 'string' && entry.includes('.')) {
-      const parts = entry.split('.')
-      const ext = parts.pop()
-      if (ext) {
-        return ext
-      }
-    }
-    next = iterator.next()
-  }
-  return undefined
-}
-
 // /**
 //  *
 //  * @template {object} T
@@ -166,11 +144,6 @@ export class UAssets {
               }
             }
           })
-          if (Array.isArray(data.tappable)) {
-            this[name].tappable = new Set(
-              data.tappable.filter((iconName) => typeof iconName === 'string'),
-            )
-          }
         }
       } catch (e) {
         console.error(
@@ -445,85 +418,18 @@ export class UAssets {
    * @returns {string}
    */
   getTappable(type = 'TAPPABLE_TYPE_POKEBALL') {
-    const selection = this.selected.tappable
-    const pack = selection ? this[selection] : undefined
-    const basePath = pack?.path || this.fallback
-    const tappableSet =
-      pack?.tappable instanceof Set ? pack.tappable : undefined
-    const extension = extractExtension(tappableSet) || this.fallbackExt
-
-    const tryClass = (tappableType) => {
+    try {
+      const selection = this.selected.tappable
+      const pack = selection ? this[selection] : undefined
       if (pack?.class && typeof pack.class.tappable === 'function') {
-        try {
-          const iconPath = pack.class.tappable(tappableType)
-          if (iconPath) {
-            return iconPath
-          }
-        } catch (e) {
-          console.error(`[${this.assetType.toUpperCase()}]`, e)
+        const iconPath = pack.class.tappable(type)
+        if (iconPath) {
+          return iconPath
         }
       }
-      return undefined
+    } catch (e) {
+      console.error(`[${this.assetType.toUpperCase()}]`, e)
     }
-
-    const buildCandidates = (tappableType) => {
-      const normalized = (tappableType || 'TAPPABLE_TYPE_POKEBALL').toString()
-      const baseCandidates = [normalized, normalized.toLowerCase()]
-      if (normalized.startsWith('TAPPABLE_TYPE_')) {
-        const suffix = normalized.slice('TAPPABLE_TYPE_'.length)
-        baseCandidates.push(suffix, suffix.toLowerCase())
-      }
-      return Array.from(new Set(baseCandidates))
-    }
-
-    const trySet = (tappableType) => {
-      if (!tappableSet) {
-        return undefined
-      }
-      const candidates = buildCandidates(tappableType)
-      for (let i = 0; i < candidates.length; i += 1) {
-        const candidate = candidates[i]
-        const filename = `${candidate}.${extension}`
-        if (tappableSet.has(filename)) {
-          return `${basePath}/tappable/${filename}`
-        }
-      }
-      return undefined
-    }
-
-    const buildDefaultPath = (tappableType) => {
-      const normalized = (tappableType || 'TAPPABLE_TYPE_POKEBALL').toString()
-      return `${basePath}/tappable/${normalized}.${extension}`
-    }
-
-    const resolveType = (tappableType, allowDefault) => {
-      const fromClass = tryClass(tappableType)
-      if (fromClass) {
-        return { path: fromClass, found: true }
-      }
-
-      const fromSet = trySet(tappableType)
-      if (fromSet) {
-        return { path: fromSet, found: true }
-      }
-
-      if (allowDefault && !tappableSet) {
-        return { path: buildDefaultPath(tappableType), found: false }
-      }
-
-      return { path: undefined, found: false }
-    }
-
-    const primary = resolveType(type, true)
-    if (primary.found) {
-      return primary.path
-    }
-
-    const fallback = resolveType('TAPPABLE_TYPE_POKEBALL', false)
-    if (fallback.found) {
-      return fallback.path
-    }
-
     return this.getRewards(2, 1)
   }
 
