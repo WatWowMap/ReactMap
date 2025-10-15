@@ -88,7 +88,6 @@ export function TappablePopup({ tappable, rewardIcon }) {
       popups: {
         ...prev.popups,
         extras: !popups.extras,
-        pvp: false,
       },
     }))
   }, [popups.extras])
