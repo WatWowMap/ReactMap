@@ -71,8 +71,6 @@ class Tappable extends Model {
           }
           break
         }
-        case 's':
-          break
         default:
           break
       }
