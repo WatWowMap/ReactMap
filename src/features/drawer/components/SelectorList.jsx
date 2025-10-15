@@ -94,7 +94,7 @@ function SelectorList({ category, subCategory, label, height = 400 }) {
                 case 'gyms':
                   return key.startsWith('t')
                 case 'tappables':
-                  return key.startsWith('q')
+                  return key.startsWith('q') && key !== 'q0'
                 default:
                   return Number.isInteger(Number(key.charAt(0)))
               }

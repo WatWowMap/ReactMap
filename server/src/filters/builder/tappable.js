@@ -8,7 +8,7 @@ const { BaseFilter } = require('../Base')
  * @returns {Record<string, BaseFilter>}
  */
 function buildTappables(perms, defaults) {
-  const filters = { s0: new BaseFilter() }
+  const filters = { q0: new BaseFilter() }
   if (!perms.tappables) {
     return filters
   }

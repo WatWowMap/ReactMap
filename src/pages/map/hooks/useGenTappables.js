@@ -18,7 +18,7 @@ export function useGenTappables() {
     const tappableFilters = {}
 
     Object.keys(tappables.filter).forEach((id) => {
-      if (id === 'global' || id === 's0') return
+      if (id === 'global' || id === 'q0') return
       const itemId = id.startsWith('q') ? id.slice(1) : id
       const name = t(`item_${itemId}`, `#${itemId}`)
       tappableFilters[id] = {

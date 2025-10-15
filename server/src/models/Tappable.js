@@ -66,7 +66,7 @@ class Tappable extends Model {
       switch (key.charAt(0)) {
         case 'q': {
           const itemId = Number.parseInt(key.slice(1), 10)
-          if (!Number.isNaN(itemId)) {
+          if (!Number.isNaN(itemId) && itemId !== 0) {
             itemIds.push(itemId)
           }
           break
