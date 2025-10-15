@@ -7,10 +7,13 @@ import { useMemory } from '@store/useMemory'
 export function useGenTappables() {
   const { t } = useTranslation()
   const tappables = useMemory((s) => s.filters.tappables)
-  const categories = useMemory((s) => s.menus.tappables?.categories || [])
+  const categories = useMemory((s) => s.menus.tappables?.categories)
 
   useEffect(() => {
-    if (!tappables?.filter || !categories.includes('tappables')) {
+    const hasCategory = Array.isArray(categories)
+      ? categories.includes('tappables')
+      : !!categories?.tappables
+    if (!tappables?.filter || !hasCategory) {
       return
     }
 
