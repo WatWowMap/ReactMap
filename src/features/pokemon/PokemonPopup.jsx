@@ -29,6 +29,7 @@ import { getTimeUntil } from '@utils/getTimeUntil'
 import { StatusIcon } from '@components/StatusIcon'
 import { readableProbability } from '@utils/readableProbability'
 import { GET_POKEMON_SHINY_STATS } from '@services/queries/pokemon'
+import { GET_TAPPABLE_BY_ID } from '@services/queries/tappable'
 
 const rowClass = { width: 30, fontWeight: 'bold' }
 
@@ -36,6 +37,28 @@ const leagueLookup = {
   great: '1500',
   ultra: '2500',
   master: '9000',
+}
+
+const TAPPABLE_SEEN_TYPES = new Set([
+  'tappable_encounter',
+  'tappable_lure_encounter',
+])
+
+const formatTappableType = (type, t, i18n) => {
+  if (!type) return ''
+  const cleaned = type
+    .replace(/^TAPPABLE_TYPE_/, '')
+    .toLowerCase()
+    .replace(/_/g, ' ')
+  const translationKey = `tappable_type_${cleaned.replace(/\s+/g, '_')}`
+  if (i18n?.exists?.(translationKey)) {
+    return t(translationKey)
+  }
+  return cleaned
+    .split(' ')
+    .filter(Boolean)
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(' ')
 }
 
 /** @param {number} ivPercent */
@@ -57,7 +80,7 @@ const getColor = (ivPercent) => {
 }
 
 export function PokemonPopup({ pokemon, iconUrl, isTutorial = false }) {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   const { pokemon_id, cleanPvp, iv, cp } = pokemon
   const perms = useMemory((s) => s.auth.perms)
   const timeOfDay = useMemory((s) => s.timeOfDay)
@@ -84,6 +107,19 @@ export function PokemonPopup({ pokemon, iconUrl, isTutorial = false }) {
   const [shinyStats, setShinyStats] = React.useState(null)
   const pendingShinyKey = React.useRef(null)
   const [loadShinyStats] = useLazyQuery(GET_POKEMON_SHINY_STATS)
+  const canQueryTappable = !isTutorial && !!perms?.tappables
+  const showTappableSource = React.useMemo(
+    () => canQueryTappable && TAPPABLE_SEEN_TYPES.has(pokemon.seen_type),
+    [canQueryTappable, pokemon.seen_type],
+  )
+  const [tappableSource, setTappableSource] = React.useState(null)
+  const tappableRequestToken = React.useRef(0)
+  const [loadTappableSource, { loading: tappableLoading }] = useLazyQuery(
+    GET_TAPPABLE_BY_ID,
+    {
+      fetchPolicy: 'cache-first',
+    },
+  )
 
   React.useEffect(() => {
     setShinyStats(null)
@@ -96,6 +132,18 @@ export function PokemonPopup({ pokemon, iconUrl, isTutorial = false }) {
       pendingShinyKey.current = null
     }
   }, [supportsShinyStats])
+
+  React.useEffect(() => {
+    setTappableSource(null)
+    tappableRequestToken.current += 1
+  }, [pokemon.id])
+
+  React.useEffect(() => {
+    if (!showTappableSource) {
+      setTappableSource(null)
+      tappableRequestToken.current += 1
+    }
+  }, [showTappableSource])
 
   React.useEffect(() => {
     if (!supportsShinyStats) {
@@ -135,6 +183,33 @@ export function PokemonPopup({ pokemon, iconUrl, isTutorial = false }) {
     }
   }, [supportsShinyStats, shinyStats, shinyKey, loadShinyStats])
 
+  React.useEffect(() => {
+    if (!showTappableSource || !canQueryTappable || !pokemon.id) {
+      return
+    }
+    const tappableId = pokemon.id
+    tappableRequestToken.current += 1
+    const requestToken = tappableRequestToken.current
+    loadTappableSource({
+      variables: { id: tappableId },
+    })
+      .then((response) => {
+        if (tappableRequestToken.current !== requestToken) {
+          return
+        }
+        setTappableSource(response?.data?.tappableById || null)
+      })
+      .catch(() => {
+        if (tappableRequestToken.current !== requestToken) {
+          return
+        }
+        setTappableSource(null)
+      })
+    return () => {
+      tappableRequestToken.current += 1
+    }
+  }, [showTappableSource, canQueryTappable, pokemon.id, loadTappableSource])
+
   useAnalytics(
     'Popup',
     `ID: ${pokemon.pokemon_id} IV: ${pokemon.iv}% PVP: #${pokemon.bestPvp}`,
@@ -160,8 +235,27 @@ export function PokemonPopup({ pokemon, iconUrl, isTutorial = false }) {
         />
         {pokemon.seen_type !== 'encounter' && (
           <Grid xs={12} textAlign="center">
-            <Typography variant="caption">
-              {t(`seen_${pokemon.seen_type}`, '')}
+            <Typography
+              variant="caption"
+              component="div"
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: 6,
+                flexWrap: 'wrap',
+              }}
+            >
+              <span>{t(`seen_${pokemon.seen_type}`, '')}</span>
+              {showTappableSource && (
+                <TappableOrigin
+                  tappable={tappableSource}
+                  Icons={Icons}
+                  t={t}
+                  i18n={i18n}
+                  loading={tappableLoading}
+                />
+              )}
             </Typography>
           </Grid>
         )}
@@ -430,6 +524,32 @@ const ShinyOdds = ({ shinyStats, t }) => {
         />
       </Typography>
     </Grid>
+  )
+}
+
+const TappableOrigin = ({ tappable, Icons, t, i18n, loading }) => {
+  if (loading || !tappable) {
+    return null
+  }
+
+  const formattedType = formatTappableType(tappable.type, t, i18n)
+  const tappableIcon =
+    Icons && typeof Icons.getTappable === 'function'
+      ? Icons.getTappable(tappable.type)
+      : ''
+
+  return (
+    <>
+      <span>{t('tappable_origin_from')}</span>
+      {tappableIcon ? (
+        <img
+          src={tappableIcon}
+          alt={formattedType}
+          style={{ width: 20, height: 20, objectFit: 'contain' }}
+        />
+      ) : null}
+      <span>{formattedType}</span>
+    </>
   )
 }
 

@@ -28,3 +28,17 @@ export const GET_ALL_TAPPABLES = gql`
     }
   }
 `
+
+export const GET_TAPPABLE_BY_ID = gql`
+  query GetTappableById($id: ID!) {
+    tappableById(id: $id) {
+      id
+      type
+      item_id
+      count
+      expire_timestamp
+      expire_timestamp_verified
+      updated
+    }
+  }
+`

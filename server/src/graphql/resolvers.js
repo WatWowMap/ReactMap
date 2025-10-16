@@ -534,6 +534,13 @@ const resolvers = {
       }
       return []
     },
+    tappableById: async (_, { id }, { perms, Db }) => {
+      if (perms?.tappables) {
+        const results = await Db.query('Tappable', 'getById', perms, id)
+        return Array.isArray(results) ? results[0] || null : results
+      }
+      return null
+    },
     submissionCells: async (_, args, { req, perms, Db }) => {
       const { submissionZoom } = config.getMapConfig(req).general
       if (perms?.submissionCells && args.zoom >= submissionZoom - 1) {
