@@ -1,3 +1,13 @@
+# [1.40.0-develop.14](https://github.com/WatWowMap/ReactMap/compare/v1.40.0-develop.13...v1.40.0-develop.14) (2025-10-16)
+
+
+### Features
+
+* mega energy marker can be taller ([5dad220](https://github.com/WatWowMap/ReactMap/commit/5dad22056d171ee108b8e819ca6c193f01f1eb67))
+* more compact pokestop marker ([622ae3d](https://github.com/WatWowMap/ReactMap/commit/622ae3d184c6fffe0d3288f2fb07a52d3313c8b8))
+* support tappable seen_type ([c74c607](https://github.com/WatWowMap/ReactMap/commit/c74c607e8a3aa1fc80f867a3b5a21a4f0c63e9aa))
+* tappable from lure in popup ([69ce017](https://github.com/WatWowMap/ReactMap/commit/69ce0171f417ef4939eb4ca5539be4e40bd5bfa3))
+
 # [1.40.0-develop.13](https://github.com/WatWowMap/ReactMap/compare/v1.40.0-develop.12...v1.40.0-develop.13) (2025-10-15)
 
 
