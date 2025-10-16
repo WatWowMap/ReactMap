@@ -1,3 +1,10 @@
+# [1.40.0-develop.15](https://github.com/WatWowMap/ReactMap/compare/v1.40.0-develop.14...v1.40.0-develop.15) (2025-10-16)
+
+
+### Bug Fixes
+
+* showcase icon missing when invasion blocked ([12e6512](https://github.com/WatWowMap/ReactMap/commit/12e6512c9e9204524ecc98719e3bcea170de393c))
+
 # [1.40.0-develop.14](https://github.com/WatWowMap/ReactMap/compare/v1.40.0-develop.13...v1.40.0-develop.14) (2025-10-16)
 
 
