@@ -208,6 +208,7 @@ type Tappable {
   lat: Float
   lon: Float
   type: String
+  fort_id: String
   item_id: Int
   count: Int
   expire_timestamp: Int

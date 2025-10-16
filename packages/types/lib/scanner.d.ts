@@ -282,6 +282,7 @@ export interface Tappable {
   lat: number
   lon: number
   type: string
+  fort_id: string | null
   item_id: number
   count: number | null
   expire_timestamp: number | null

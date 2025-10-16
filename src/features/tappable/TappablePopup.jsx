@@ -80,6 +80,10 @@ export function TappablePopup({ tappable, rewardIcon }) {
     displaySettings.popup.rewardAsPrimary && hasRewardIcon
   const hasTappableIcon = !!tappableIcon && !useRewardAsPrimary
   const itemDisplayName = count > 1 ? `${itemName} x${count}` : itemName
+  const isLure = React.useMemo(
+    () => Boolean(tappable.fort_id),
+    [tappable.fort_id],
+  )
 
   const [menuAnchorEl, setMenuAnchorEl] = React.useState(null)
 
@@ -261,6 +265,22 @@ export function TappablePopup({ tappable, rewardIcon }) {
           <Grid xs={hasRewardIcon ? 9 : 12} textAlign="center">
             <Typography variant="caption">{itemDisplayName}</Typography>
           </Grid>
+        </Grid>
+      )}
+      {isLure && (
+        <Grid xs={12} textAlign="center">
+          <Typography
+            variant="caption"
+            component="div"
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: 0.75,
+            }}
+          >
+            {t('seen_lure_wild')}
+          </Typography>
         </Grid>
       )}
       {hasExpireTime && (

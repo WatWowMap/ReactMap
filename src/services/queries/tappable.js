@@ -20,6 +20,7 @@ export const GET_ALL_TAPPABLES = gql`
       lat
       lon
       type
+      fort_id
       item_id
       count
       expire_timestamp
@@ -34,6 +35,7 @@ export const GET_TAPPABLE_BY_ID = gql`
     tappableById(id: $id) {
       id
       type
+      fort_id
       item_id
       count
       expire_timestamp
