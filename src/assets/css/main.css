@@ -367,6 +367,13 @@ img {
   object-fit: contain;
 }
 
+.leaflet-container
+  .leaflet-marker-pane
+  .pokestop-marker__stack-item[data-reward-type='12']
+  img:not(.pokestop-marker__decoration) {
+  max-height: calc(var(--marker-size, 30px) * 1.5) !important;
+}
+
 .search-amount-holder {
   position: absolute;
   left: 50%;

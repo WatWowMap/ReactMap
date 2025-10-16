@@ -266,41 +266,42 @@ export function usePokestopMarker({
         quest_bread_mode = 0,
         key,
       } = quest
+      let questIcon = { url: Icons.getRewards(quest_reward_type) }
       switch (quest_reward_type) {
         case 1:
-          questIcons.unshift({
+          questIcon = {
             url: Icons.getRewards(quest_reward_type, xp_amount),
             amount: xp_amount,
-          })
+          }
           break
         case 2:
-          questIcons.unshift({
+          questIcon = {
             url: Icons.getRewards(
               quest_reward_type,
               quest_item_id,
               item_amount,
             ),
             amount: item_amount > 1 && item_amount,
-          })
+          }
           break
         case 3:
-          questIcons.unshift({
+          questIcon = {
             url: Icons.getRewards(quest_reward_type, stardust_amount),
             amount: stardust_amount,
-          })
+          }
           break
         case 4:
-          questIcons.unshift({
+          questIcon = {
             url: Icons.getRewards(
               quest_reward_type,
               candy_pokemon_id,
               candy_amount,
             ),
             amount: candy_amount,
-          })
+          }
           break
         case 7:
-          questIcons.unshift({
+          questIcon = {
             url: Icons.getPokemon(
               quest_pokemon_id,
               quest_form_id,
@@ -311,31 +312,35 @@ export function usePokestopMarker({
               !!quest_shiny,
               quest_bread_mode,
             ),
-          })
+          }
           break
         case 9:
-          questIcons.unshift({
+          questIcon = {
             url: Icons.getRewards(
               quest_reward_type,
               xl_candy_pokemon_id,
               xl_candy_amount,
             ),
             amount: xl_candy_amount,
-          })
+          }
           break
         case 12:
-          questIcons.unshift({
+          questIcon = {
             url: Icons.getRewards(
               quest_reward_type,
               mega_pokemon_id,
               mega_amount,
             ),
             amount: mega_amount,
-          })
+          }
           break
         default:
-          questIcons.unshift({ url: Icons.getRewards(quest_reward_type) })
+          break
       }
+      questIcons.unshift({
+        ...questIcon,
+        rewardType: quest_reward_type,
+      })
       questSizes.unshift(Icons.getSize('reward', filters[key]?.size))
       popupYOffset += rewardMod.offsetY - 1
       popupX += rewardMod.popupX
@@ -412,6 +417,7 @@ export function usePokestopMarker({
       size: questSizes[index],
       modifier: rewardMod,
       amount: icon.amount,
+      rewardType: icon.rewardType,
     })
   })
 
@@ -468,6 +474,9 @@ export function usePokestopMarker({
             <div
               class="pokestop-marker__stack-item pokestop-marker__stack-item--${
                 item.type
+              }"
+              data-reward-type="${
+                typeof item.rewardType !== 'undefined' ? item.rewardType : ''
               }"
               style="
                 --marker-size: ${item.size}px;
