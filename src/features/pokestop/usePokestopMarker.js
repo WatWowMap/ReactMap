@@ -78,8 +78,9 @@ export function usePokestopMarker({
   const questSizes = []
   const showcaseIcons = []
   const showcaseSizes = []
+  const canShowInvasionIcons = hasInvasion && !hasShowcase
 
-  if (hasInvasion && !hasShowcase) {
+  if (canShowInvasionIcons) {
     invasions.forEach((invasion) => {
       if (invasion.grunt_type) {
         invasionIcons.unshift({
@@ -347,7 +348,7 @@ export function usePokestopMarker({
       popupY += rewardMod.popupY
     })
   }
-  if (hasEvent && !hasInvasion && !hasQuest) {
+  if (hasEvent && !canShowInvasionIcons && !hasQuest) {
     events.forEach((event) => {
       if (event.display_type === 8) {
         // Only show Kecleon if there's no active showcase blocking it
