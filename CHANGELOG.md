@@ -1,3 +1,10 @@
+# [1.40.0-develop.16](https://github.com/WatWowMap/ReactMap/compare/v1.40.0-develop.15...v1.40.0-develop.16) (2025-10-17)
+
+
+### Bug Fixes
+
+* update for Golbat [#312](https://github.com/WatWowMap/ReactMap/issues/312) ([#1151](https://github.com/WatWowMap/ReactMap/issues/1151)) ([3bd05d4](https://github.com/WatWowMap/ReactMap/commit/3bd05d42fd629b6f4819011d02b2f8056b6c290d))
+
 # [1.40.0-develop.15](https://github.com/WatWowMap/ReactMap/compare/v1.40.0-develop.14...v1.40.0-develop.15) (2025-10-16)
 
 
