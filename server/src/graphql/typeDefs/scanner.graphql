@@ -83,6 +83,8 @@ type Quest {
   quest_form_id: Int
   quest_gender_id: Int
   quest_costume_id: Int
+  quest_location_card: Int
+  quest_bread_mode: Int
   quest_shiny: Int
   quest_shiny_probability: Float
   mega_pokemon_id: Int
@@ -148,6 +150,12 @@ type Pokestop {
   hasShowcase: Boolean
 }
 
+type PokemonShinyStats {
+  shiny_seen: Int
+  encounters_seen: Int
+  since_date: String
+}
+
 type Pokemon {
   id: ID
   encounter_id: Int
@@ -159,7 +167,6 @@ type Pokemon {
   costume: Int
   gender: Int
   display_pokemon_id: Int
-  ditto_form: Int
   weight: Float
   height: Float
   size: Float
@@ -193,6 +200,19 @@ type Portal {
   name: String
   url: String
   imported: Int
+  updated: Int
+}
+
+type Tappable {
+  id: ID
+  lat: Float
+  lon: Float
+  type: String
+  fort_id: String
+  item_id: Int
+  count: Int
+  expire_timestamp: Int
+  expire_timestamp_verified: Boolean
   updated: Int
 }
 
@@ -246,6 +266,7 @@ type Waypoint {
 type Route {
   id: ID
   name: String
+  shortcode: String
   description: String
   distance_meters: Int
   duration_seconds: Int
@@ -291,6 +312,9 @@ type Station {
   battle_pokemon_bread_mode: Int
   battle_pokemon_move_1: Int
   battle_pokemon_move_2: Int
+  battle_pokemon_stamina: Int
+  battle_pokemon_cp_multiplier: Float
+  battle_pokemon_estimated_cp: Int
 }
 
 type StationPokemon {

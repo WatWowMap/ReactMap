@@ -208,6 +208,10 @@
       "stations": {
         "__name": "API_QUERY_ON_SESSION_INIT_STATIONS",
         "__format": "boolean"
+      },
+      "tappables": {
+        "__name": "API_QUERY_ON_SESSION_INIT_TAPPABLES",
+        "__format": "boolean"
       }
     },
     "dataRequestLimits": {
@@ -246,6 +250,10 @@
         },
         "stations": {
           "__name": "API_DATA_REQUEST_LIMITS_CATEGORIES_STATIONS",
+          "__format": "number"
+        },
+        "tappables": {
+          "__name": "API_DATA_REQUEST_LIMITS_CATEGORIES_TAPPABLES",
           "__format": "number"
         }
       },
@@ -290,6 +298,10 @@
       "stations": {
         "__name": "API_QUERY_LIMITS_STATIONS",
         "__format": "number"
+      },
+      "tappables": {
+        "__name": "API_QUERY_LIMITS_TAPPABLES",
+        "__format": "number"
       }
     },
     "pvp": {
@@ -330,6 +342,10 @@
     },
     "stationUpdateLimit": {
       "__name": "API_STATION_UPDATE_LIMIT",
+      "__format": "number"
+    },
+    "stationInactiveLimitDays": {
+      "__name": "API_STATION_INACTIVE_LIMIT_DAYS",
       "__format": "number"
     },
     "searchResultsLimit": {
@@ -532,6 +548,10 @@
         "__name": "MAP_MISC_ENABLE_STATION_POPUP_COORDS_SELECTOR",
         "__format": "boolean"
       },
+      "enableTappablePopupCoordsSelector": {
+        "__name": "MAP_MISC_ENABLE_TAPPABLE_POPUP_COORDS_SELECTOR",
+        "__format": "boolean"
+      },
       "customFloatingIcons": {
         "__name": "MAP_MISC_CUSTOM_FLOATING_ICONS",
         "__format": "json"
@@ -608,6 +628,16 @@
         },
         "forcedLimit": {
           "__name": "MAP_CLUSTERING_STATIONS_FORCED_LIMIT",
+          "__format": "number"
+        }
+      },
+      "tappables": {
+        "zoomLevel": {
+          "__name": "MAP_CLUSTERING_TAPPABLES_ZOOM_LEVEL",
+          "__format": "number"
+        },
+        "forcedLimit": {
+          "__name": "MAP_CLUSTERING_TAPPABLES_FORCED_LIMIT",
           "__format": "number"
         }
       }
@@ -862,6 +892,44 @@
         "__format": "number"
       }
     },
+    "tappables": {
+      "clustering": {
+        "__name": "CLIENT_SIDE_OPTIONS_TAPPABLES_CLUSTERING",
+        "__format": "boolean"
+      },
+      "tappableTimers": {
+        "__name": "CLIENT_SIDE_OPTIONS_TAPPABLES_TAPPABLE_TIMERS",
+        "__format": "boolean"
+      },
+      "interactionRanges": {
+        "__name": "CLIENT_SIDE_OPTIONS_TAPPABLES_INTERACTION_RANGES",
+        "__format": "boolean"
+      },
+      "spacialRendRange": {
+        "__name": "CLIENT_SIDE_OPTIONS_TAPPABLES_SPACIAL_REND_RANGE",
+        "__format": "boolean"
+      },
+      "tappablesOpacity": {
+        "__name": "CLIENT_SIDE_OPTIONS_TAPPABLES_TAPPABLES_OPACITY",
+        "__format": "boolean"
+      },
+      "enableTappablePopupCoords": {
+        "__name": "CLIENT_SIDE_OPTIONS_TAPPABLES_ENABLE_TAPPABLE_POPUP_COORDS",
+        "__format": "boolean"
+      },
+      "opacityTenMinutes": {
+        "__name": "CLIENT_SIDE_OPTIONS_TAPPABLES_OPACITY_TEN_MINUTES",
+        "__format": "number"
+      },
+      "opacityFiveMinutes": {
+        "__name": "CLIENT_SIDE_OPTIONS_TAPPABLES_OPACITY_FIVE_MINUTES",
+        "__format": "number"
+      },
+      "opacityOneMinute": {
+        "__name": "CLIENT_SIDE_OPTIONS_TAPPABLES_OPACITY_ONE_MINUTE",
+        "__format": "number"
+      }
+    },
     "pokemon": {
       "clustering": {
         "__name": "CLIENT_SIDE_OPTIONS_POKEMON_CLUSTERING",
@@ -909,6 +977,10 @@
       },
       "showAllPvpRanks": {
         "__name": "CLIENT_SIDE_OPTIONS_POKEMON_SHOW_ALL_PVP_RANKS",
+        "__format": "boolean"
+      },
+      "pvp50": {
+        "__name": "CLIENT_SIDE_OPTIONS_POKEMON_PVP50",
         "__format": "boolean"
       },
       "linkGlobalAndAdvanced": {
@@ -1207,6 +1279,16 @@
         }
       }
     },
+    "tappables": {
+      "enabled": {
+        "__name": "DEFAULT_FILTERS_TAPPABLES_ENABLED",
+        "__format": "boolean"
+      },
+      "items": {
+        "__name": "DEFAULT_FILTERS_TAPPABLES_ITEMS",
+        "__format": "boolean"
+      }
+    },
     "pokemon": {
       "enabled": {
         "__name": "DEFAULT_FILTERS_POKEMON_ENABLED",
@@ -1352,6 +1434,10 @@
       "customRange": {
         "__name": "DEFAULT_FILTERS_STATIONS_CUSTOM_RANGE",
         "__format": "number"
+      },
+      "inactiveStations": {
+        "__name": "DEFAULT_FILTERS_STATIONS_INACTIVE_STATIONS",
+        "__format": "boolean"
       }
     },
     "s2cells": {
@@ -1714,6 +1800,20 @@
         },
         "roles": {
           "__name": "AUTHENTICATION_PERMS_QUESTS_ROLES",
+          "__format": "json"
+        }
+      },
+      "tappables": {
+        "enabled": {
+          "__name": "AUTHENTICATION_PERMS_TAPPABLES_ENABLED",
+          "__format": "boolean"
+        },
+        "trialPeriodEligible": {
+          "__name": "AUTHENTICATION_PERMS_TAPPABLES_TRIAL_PERIOD_ELIGIBLE",
+          "__format": "boolean"
+        },
+        "roles": {
+          "__name": "AUTHENTICATION_PERMS_TAPPABLES_ROLES",
           "__format": "json"
         }
       },
@@ -2223,6 +2323,24 @@
         },
         "xl": {
           "__name": "ICONS_SIZES_DYNAMAX_XL",
+          "__format": "number"
+        }
+      },
+      "tappable": {
+        "sm": {
+          "__name": "ICONS_SIZES_TAPPABLE_SM",
+          "__format": "number"
+        },
+        "md": {
+          "__name": "ICONS_SIZES_TAPPABLE_MD",
+          "__format": "number"
+        },
+        "lg": {
+          "__name": "ICONS_SIZES_TAPPABLE_LG",
+          "__format": "number"
+        },
+        "xl": {
+          "__name": "ICONS_SIZES_TAPPABLE_XL",
           "__format": "number"
         }
       }

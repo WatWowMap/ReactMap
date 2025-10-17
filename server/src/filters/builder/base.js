@@ -5,6 +5,7 @@ const { state } = require('../../services/state')
 const { buildPokemon } = require('./pokemon')
 const { buildPokestops } = require('./pokestop')
 const { buildGyms } = require('./gym')
+const { buildTappables } = require('./tappable')
 const { BaseFilter } = require('../Base')
 const { PokemonFilter } = require('../pokemon/Frontend')
 
@@ -111,6 +112,14 @@ function buildDefaultFilters(perms) {
             },
           }
         : undefined,
+    tappables:
+      perms.tappables && state.db.models.Tappable
+        ? {
+            enabled: defaultFilters.tappables.enabled,
+            standard: new BaseFilter(),
+            filter: buildTappables(perms, defaultFilters.tappables),
+          }
+        : undefined,
     stations:
       stationReducer && state.db.models.Station
         ? {
@@ -128,6 +137,9 @@ function buildDefaultFilters(perms) {
             filter: pokemon.stations,
             gmaxStationed: perms.dynamax
               ? defaultFilters.stations.gmaxStationed
+              : undefined,
+            inactiveStations: perms.stations
+              ? defaultFilters.stations.inactiveStations
               : undefined,
           }
         : undefined,

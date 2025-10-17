@@ -1,5 +1,6 @@
 // @ts-check
 import * as React from 'react'
+import { useLazyQuery } from '@apollo/client'
 import ExpandMore from '@mui/icons-material/ExpandMore'
 import MoreVert from '@mui/icons-material/MoreVert'
 import Grid from '@mui/material/Unstable_Grid2'
@@ -11,7 +12,7 @@ import Divider from '@mui/material/Divider'
 import Avatar from '@mui/material/Avatar'
 import Tooltip from '@mui/material/Tooltip'
 import Collapse from '@mui/material/Collapse'
-import { useTranslation } from 'react-i18next'
+import { useTranslation, Trans } from 'react-i18next'
 
 import { useMemory } from '@store/useMemory'
 import { setDeepStore, useStorage } from '@store/useStorage'
@@ -26,6 +27,9 @@ import { ExtraInfo } from '@components/popups/ExtraInfo'
 import { useAnalytics } from '@hooks/useAnalytics'
 import { getTimeUntil } from '@utils/getTimeUntil'
 import { StatusIcon } from '@components/StatusIcon'
+import { readableProbability } from '@utils/readableProbability'
+import { GET_POKEMON_SHINY_STATS } from '@services/queries/pokemon'
+import { GET_TAPPABLE_BY_ID } from '@services/queries/tappable'
 
 const rowClass = { width: 30, fontWeight: 'bold' }
 
@@ -33,6 +37,28 @@ const leagueLookup = {
   great: '1500',
   ultra: '2500',
   master: '9000',
+}
+
+const TAPPABLE_SEEN_TYPES = new Set([
+  'tappable_encounter',
+  'tappable_lure_encounter',
+])
+
+const formatTappableType = (type, t, i18n) => {
+  if (!type) return ''
+  const cleaned = type
+    .replace(/^TAPPABLE_TYPE_/, '')
+    .toLowerCase()
+    .replace(/_/g, ' ')
+  const translationKey = `tappable_type_${cleaned.replace(/\s+/g, '_')}`
+  if (i18n?.exists?.(translationKey)) {
+    return t(translationKey)
+  }
+  return cleaned
+    .split(' ')
+    .filter(Boolean)
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(' ')
 }
 
 /** @param {number} ivPercent */
@@ -54,7 +80,7 @@ const getColor = (ivPercent) => {
 }
 
 export function PokemonPopup({ pokemon, iconUrl, isTutorial = false }) {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   const { pokemon_id, cleanPvp, iv, cp } = pokemon
   const perms = useMemory((s) => s.auth.perms)
   const timeOfDay = useMemory((s) => s.timeOfDay)
@@ -72,6 +98,117 @@ export function PokemonPopup({ pokemon, iconUrl, isTutorial = false }) {
 
   const hasLeagues = cleanPvp ? Object.keys(cleanPvp) : []
   const hasStats = iv || cp
+
+  const supportsShinyStats = useMemory((s) => s.featureFlags.supportsShinyStats)
+  const shinyKey = React.useMemo(
+    () => `${pokemon.pokemon_id}-${pokemon.form ?? 0}`,
+    [pokemon.pokemon_id, pokemon.form],
+  )
+  const [shinyStats, setShinyStats] = React.useState(null)
+  const pendingShinyKey = React.useRef(null)
+  const [loadShinyStats] = useLazyQuery(GET_POKEMON_SHINY_STATS)
+  const canQueryTappable = !isTutorial && !!perms?.tappables
+  const showTappableSource = React.useMemo(
+    () => canQueryTappable && TAPPABLE_SEEN_TYPES.has(pokemon.seen_type),
+    [canQueryTappable, pokemon.seen_type],
+  )
+  const [tappableSource, setTappableSource] = React.useState(null)
+  const tappableRequestToken = React.useRef(0)
+  const [loadTappableSource, { loading: tappableLoading }] = useLazyQuery(
+    GET_TAPPABLE_BY_ID,
+    {
+      fetchPolicy: 'cache-first',
+    },
+  )
+
+  React.useEffect(() => {
+    setShinyStats(null)
+    pendingShinyKey.current = null
+  }, [shinyKey])
+
+  React.useEffect(() => {
+    if (!supportsShinyStats) {
+      setShinyStats(null)
+      pendingShinyKey.current = null
+    }
+  }, [supportsShinyStats])
+
+  React.useEffect(() => {
+    setTappableSource(null)
+    tappableRequestToken.current += 1
+  }, [pokemon.id])
+
+  React.useEffect(() => {
+    if (!showTappableSource) {
+      setTappableSource(null)
+      tappableRequestToken.current += 1
+    }
+  }, [showTappableSource])
+
+  React.useEffect(() => {
+    if (!supportsShinyStats) {
+      pendingShinyKey.current = null
+      return
+    }
+    if (shinyStats || !pokemon.pokemon_id) {
+      return
+    }
+    if (pendingShinyKey.current === shinyKey) {
+      return
+    }
+    let isActive = true
+    pendingShinyKey.current = shinyKey
+    loadShinyStats({
+      variables: {
+        pokemonId: pokemon.pokemon_id,
+        form: pokemon.form ?? 0,
+      },
+      fetchPolicy: 'cache-first',
+    })
+      .then(({ data }) => {
+        if (!isActive || pendingShinyKey.current !== shinyKey) {
+          return
+        }
+        if (data?.pokemonShinyStats) {
+          setShinyStats(data.pokemonShinyStats)
+        }
+      })
+      .catch(() => {
+        if (isActive && pendingShinyKey.current === shinyKey) {
+          pendingShinyKey.current = null
+        }
+      })
+    return () => {
+      isActive = false
+    }
+  }, [supportsShinyStats, shinyStats, shinyKey, loadShinyStats])
+
+  React.useEffect(() => {
+    if (!showTappableSource || !canQueryTappable || !pokemon.id) {
+      return
+    }
+    const tappableId = pokemon.id
+    tappableRequestToken.current += 1
+    const requestToken = tappableRequestToken.current
+    loadTappableSource({
+      variables: { id: tappableId },
+    })
+      .then((response) => {
+        if (tappableRequestToken.current !== requestToken) {
+          return
+        }
+        setTappableSource(response?.data?.tappableById || null)
+      })
+      .catch(() => {
+        if (tappableRequestToken.current !== requestToken) {
+          return
+        }
+        setTappableSource(null)
+      })
+    return () => {
+      tappableRequestToken.current += 1
+    }
+  }, [showTappableSource, canQueryTappable, pokemon.id, loadTappableSource])
 
   useAnalytics(
     'Popup',
@@ -98,8 +235,27 @@ export function PokemonPopup({ pokemon, iconUrl, isTutorial = false }) {
         />
         {pokemon.seen_type !== 'encounter' && (
           <Grid xs={12} textAlign="center">
-            <Typography variant="caption">
-              {t(`seen_${pokemon.seen_type}`, '')}
+            <Typography
+              variant="caption"
+              component="div"
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: 6,
+                flexWrap: 'wrap',
+              }}
+            >
+              <span>{t(`seen_${pokemon.seen_type}`, '')}</span>
+              {showTappableSource && (
+                <TappableOrigin
+                  tappable={tappableSource}
+                  Icons={Icons}
+                  t={t}
+                  i18n={i18n}
+                  loading={tappableLoading}
+                />
+              )}
             </Typography>
           </Grid>
         )}
@@ -123,6 +279,7 @@ export function PokemonPopup({ pokemon, iconUrl, isTutorial = false }) {
           timeOfDay={timeOfDay}
           t={t}
         />
+        <ShinyOdds shinyStats={shinyStats} t={t} />
         <Footer
           pokemon={pokemon}
           popups={popups}
@@ -166,7 +323,7 @@ const Header = ({
   const filters = useStorage((s) => s.filters)
 
   const [anchorEl, setAnchorEl] = React.useState(null)
-  const { id, pokemon_id, form, ditto_form, display_pokemon_id } = pokemon
+  const { id, pokemon_id, form, display_pokemon_id } = pokemon
 
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget)
@@ -232,7 +389,7 @@ const Header = ({
         <Typography variant={pokeName.length > 8 ? 'h6' : 'h5'}>
           {pokeName}
         </Typography>
-        {ditto_form !== null && display_pokemon_id ? (
+        {pokemon_id === 132 && display_pokemon_id ? (
           <Typography variant="caption">
             ({t(`poke_${display_pokemon_id}`)})
           </Typography>
@@ -302,6 +459,97 @@ const Stats = ({ pokemon, t }) => {
         </Grid>
       )}
     </Grid>
+  )
+}
+
+const ShinyOdds = ({ shinyStats, t }) => {
+  if (!shinyStats) {
+    return null
+  }
+
+  const {
+    encounters_seen: encounters,
+    shiny_seen: shinySeen,
+    since_date: sinceDate,
+  } = shinyStats
+
+  const encountersNumber = Number(encounters) || 0
+  const shinyNumber = Number(shinySeen) || 0
+  const shinyRate = encountersNumber ? shinyNumber / encountersNumber : 0
+
+  if (!encountersNumber) {
+    return null
+  }
+
+  const rateNode = readableProbability(shinyRate)
+
+  const sampleText = t('shiny_sample', {
+    percentage: (shinyRate * 100).toLocaleString(),
+    checks: encountersNumber.toLocaleString(),
+    shiny: shinyNumber.toLocaleString(),
+    date: new Intl.DateTimeFormat(undefined, {
+      month: 'short',
+      day: 'numeric',
+    }).format(new Date(`${sinceDate}T00:00:00Z`)),
+  })
+
+  return (
+    <Grid xs={12} textAlign="center">
+      <Typography variant="caption">
+        <Trans
+          i18nKey="shiny_probability"
+          components={[
+            <Tooltip
+              key="rate"
+              title={sampleText}
+              arrow
+              enterTouchDelay={0}
+              placement="top"
+            >
+              <span
+                style={{
+                  cursor: 'help',
+                  textDecoration: 'underline dotted',
+                  display: 'inline-block',
+                  padding: '4px',
+                  margin: '-4px',
+                  borderRadius: 4,
+                  textAlign: 'center',
+                }}
+              >
+                ~{rateNode}
+              </span>
+            </Tooltip>,
+          ]}
+        />
+      </Typography>
+    </Grid>
+  )
+}
+
+const TappableOrigin = ({ tappable, Icons, t, i18n, loading }) => {
+  if (loading || !tappable) {
+    return null
+  }
+
+  const formattedType = formatTappableType(tappable.type, t, i18n)
+  const tappableIcon =
+    Icons && typeof Icons.getTappable === 'function'
+      ? Icons.getTappable(tappable.type)
+      : ''
+
+  return (
+    <>
+      <span>{t('tappable_origin_from')}</span>
+      {tappableIcon ? (
+        <img
+          src={tappableIcon}
+          alt={formattedType}
+          style={{ width: 20, height: 20, objectFit: 'contain' }}
+        />
+      ) : null}
+      <span>{formattedType}</span>
+    </>
   )
 }
 

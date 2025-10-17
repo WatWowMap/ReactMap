@@ -9,6 +9,7 @@ import { WayfarerDrawer } from './Wayfarer'
 import { S2CellsDrawer } from './S2Cells'
 import { AdminDrawer } from './Admin'
 import { StationsDrawer } from './Stations'
+import { TappablesDrawer } from './Tappables'
 
 function ExtrasComponent({ category, subItem }) {
   switch (category) {
@@ -28,6 +29,8 @@ function ExtrasComponent({ category, subItem }) {
       return <AdminDrawer subItem={subItem} />
     case 'stations':
       return subItem === 'maxBattles' && <StationsDrawer />
+    case 'tappables':
+      return <TappablesDrawer />
     default:
       return null
   }

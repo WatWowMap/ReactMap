@@ -36,6 +36,7 @@ import { useAnalytics } from '@hooks/useAnalytics'
 import { useGetAvailable } from '@hooks/useGetAvailable'
 import { parseQuestConditions } from '@utils/parseConditions'
 import { Img } from '@components/Img'
+import { readableProbability } from '@utils/readableProbability'
 
 /**
  *
@@ -540,13 +541,38 @@ const RewardInfo = ({ with_ar, ...quest }) => {
   const { src, amount, tt } = getRewardInfo(quest)
   const questMessage = useMemory((s) => s.config.misc.questMessage)
 
+  const labelKeys = Array.isArray(tt) ? tt.filter(Boolean) : tt ? [tt] : []
+  const translatedLabel = labelKeys.length
+    ? labelKeys.map((key) => t(key)).join(' ')
+    : ''
+  const fallbackLabel = labelKeys.join(' ') || 'quest reward'
+  const altLabel = (translatedLabel || fallbackLabel).trim()
+
+  const overrideAmount = Number(
+    {
+      1: quest.xp_amount,
+      2: quest.item_amount,
+      3: quest.stardust_amount,
+      4: quest.candy_amount,
+      9: quest.xl_candy_amount,
+      12: quest.mega_amount,
+    }[quest.quest_reward_type] ?? 0,
+  )
+  const altAmount =
+    typeof amount === 'number' && amount > 0
+      ? amount
+      : Number.isFinite(overrideAmount) && overrideAmount > 0
+        ? overrideAmount
+        : 0
+  const altText = altAmount > 0 ? `${altLabel} x${altAmount}` : altLabel
+
   return (
     <Grid xs={3} style={{ textAlign: 'center', position: 'relative' }}>
-      <NameTT title={tt}>
+      <NameTT title={altText}>
         <img
           src={src}
           style={{ maxWidth: 35, maxHeight: 35 }}
-          alt={typeof tt === 'string' ? tt : tt.join(' ')}
+          alt={altText}
           onError={(e) => {
             // @ts-ignore
             e.target.onerror = null
@@ -568,28 +594,6 @@ const RewardInfo = ({ with_ar, ...quest }) => {
         {questMessage || t(`ar_quest_${!!with_ar}`)}
       </Typography>
     </Grid>
-  )
-}
-
-/**
- * Converts a numeric probability into a more human-readable format.
- * It decides whether to display the probability as a percentage (e.g., "21%")
- * or as a fraction (e.g., "1/4") based on which representation is more accurate
- * after rounding. For fractions, it returns a React Fragment to prevent
- * issues with HTML entity escaping of the forward slash.
- *
- * @param {number} x The raw probability value (e.g., 0.25).
- * @returns {React.ReactNode} A string for percentages, a React Fragment
- * for fractions, or a '🚫' emoji if the probability is zero or less.
- */
-const readableProbability = (x) => {
-  if (x <= 0) return '🚫'
-  const x_1 = Math.round(1 / x)
-  const percent = Math.round(x * 100)
-  return Math.abs(1 / x_1 - x) < Math.abs(percent * 0.01 - x) ? (
-    <>1/{x_1}</>
-  ) : (
-    `${percent}%`
   )
 }
 

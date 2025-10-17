@@ -6,7 +6,9 @@ import { Marker, Popup, Circle } from 'react-leaflet'
 import { useMarkerTimer } from '@hooks/useMarkerTimer'
 import { basicEqualFn, useMemory } from '@store/useMemory'
 import { useStorage } from '@store/useStorage'
+import { useRouteStore, resolveRoutePoiKey } from '@features/route'
 import { useForcePopup } from '@hooks/useForcePopup'
+import { useManualPopupTracker } from '@hooks/useManualPopupTracker'
 import { TooltipWrapper } from '@components/ToolTipWrapper'
 
 import { PokestopPopup } from './PokestopPopup'
@@ -20,6 +22,19 @@ import { usePokestopMarker } from './usePokestopMarker'
 const BasePokestopTile = (pokestop) => {
   const [stateChange, setStateChange] = React.useState(false)
   const [markerRef, setMarkerRef] = React.useState(null)
+  const hasRoutes = useRouteStore(
+    React.useCallback(
+      (state) =>
+        !!resolveRoutePoiKey(
+          state.poiIndex,
+          pokestop.id,
+          pokestop.lat,
+          pokestop.lon,
+        ),
+      [pokestop.id, pokestop.lat, pokestop.lon],
+    ),
+  )
+  const selectPoi = useRouteStore((s) => s.selectPoi)
 
   const [
     hasLure,
@@ -116,6 +131,7 @@ const BasePokestopTile = (pokestop) => {
   useMarkerTimer(timers.length ? Math.min(...timers) : null, markerRef, () =>
     setStateChange(!stateChange),
   )
+  const handlePopupOpen = useManualPopupTracker('pokestops', pokestop.id)
 
   const icon = usePokestopMarker({
     hasQuest,
@@ -130,6 +146,14 @@ const BasePokestopTile = (pokestop) => {
       ref={setMarkerRef}
       position={[pokestop.lat, pokestop.lon]}
       icon={icon}
+      eventHandlers={{
+        click: () => {
+          if (hasRoutes) {
+            selectPoi(pokestop.id, pokestop.lat, pokestop.lon)
+          }
+        },
+        popupopen: handlePopupOpen,
+      }}
     >
       <Popup position={[pokestop.lat, pokestop.lon]}>
         <PokestopPopup
@@ -160,7 +184,7 @@ const BasePokestopTile = (pokestop) => {
       {showcaseRange && (
         <Circle
           center={[pokestop.lat, pokestop.lon]}
-          radius={400}
+          radius={500}
           pathOptions={{ color: '#39a18f', weight: 1 }}
         />
       )}

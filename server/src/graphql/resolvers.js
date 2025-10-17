@@ -24,6 +24,14 @@ const resolvers = {
   JSON: GraphQLJSON,
   Query: {
     available: (_, _args, { Event, Db, perms }) => {
+      const supportsShinyStats = Array.isArray(Db.models?.Pokemon)
+        ? Db.models.Pokemon.some(({ SubModel, ...ctx }) =>
+            typeof SubModel.supportsShinyStats === 'function'
+              ? SubModel.supportsShinyStats(ctx)
+              : false,
+          )
+        : false
+
       const data = {
         questConditions: perms.quests ? Db.questConditions : {},
         masterfile: { ...Event.masterfile, invasions: Event.invasions },
@@ -36,6 +44,7 @@ const resolvers = {
           ...config.getSafe('icons'),
           styles: Event.uicons,
         },
+        supportsShinyStats,
       }
       return data
     },
@@ -83,6 +92,8 @@ const resolvers = {
       }),
     availableStations: (_, _args, { Event, perms }) =>
       perms?.dynamax ? Event.available.stations : [],
+    availableTappables: (_, _args, { Event, perms }) =>
+      perms?.tappables ? Event.available.tappables : [],
     backup: (_, args, { req, perms, Db }) => {
       if (perms?.backups && req?.user?.id) {
         return Db.models.Backup.getOne(args.id, req?.user?.id)
@@ -268,6 +279,23 @@ const resolvers = {
         return Db.getOne('Pokemon', args.id)
       }
       return {}
+    },
+    pokemonShinyStats: async (_, args, { perms, Db }) => {
+      if (!perms?.pokemon) {
+        return null
+      }
+      const sources = Db.models?.Pokemon
+      if (!Array.isArray(sources)) {
+        return null
+      }
+      const results = await Promise.all(
+        sources.map(({ SubModel, ...ctx }) =>
+          typeof SubModel.getShinyStats === 'function'
+            ? SubModel.getShinyStats(perms, args, ctx)
+            : Promise.resolve(null),
+        ),
+      )
+      return results.find(Boolean) || null
     },
     portals: (_, args, { perms, Db }) => {
       if (perms?.portals) {
@@ -499,6 +527,19 @@ const resolvers = {
         return Db.query('Station', 'getDynamaxMons', id)
       }
       return []
+    },
+    tappables: (_, args, { perms, Db }) => {
+      if (perms?.tappables) {
+        return Db.query('Tappable', 'getAll', perms, args)
+      }
+      return []
+    },
+    tappableById: async (_, { id }, { perms, Db }) => {
+      if (perms?.tappables) {
+        const results = await Db.query('Tappable', 'getById', perms, id)
+        return Array.isArray(results) ? results[0] || null : results
+      }
+      return null
     },
     submissionCells: async (_, args, { req, perms, Db }) => {
       const { submissionZoom } = config.getMapConfig(req).general

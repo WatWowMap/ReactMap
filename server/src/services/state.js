@@ -7,14 +7,16 @@ const { log, TAGS } = require('@rm/logger')
 
 const { DbManager } = require('./DbManager')
 const { EventManager } = require('./EventManager')
-const { PvpWrapper } = require('./PvpWrapper')
+const { getSharedPvpWrapper } = require('./PvpWrapper')
 const { setCache } = require('./cache')
 const { migrate } = require('../db/migrate')
 const { Stats } = require('./Stats')
 
 const state = {
   db: new DbManager(),
-  pvp: config.getSafe('api.pvp.reactMapHandlesPvp') ? new PvpWrapper() : null,
+  pvp: config.getSafe('api.pvp.reactMapHandlesPvp')
+    ? getSharedPvpWrapper()
+    : null,
   event: new EventManager(),
   stats: new Stats(),
   startTimers() {
@@ -105,6 +107,7 @@ const state = {
         this.event.setAvailable('pokemon', 'Pokemon', this.db),
         this.event.setAvailable('nests', 'Nest', this.db),
         this.event.setAvailable('stations', 'Station', this.db),
+        this.event.setAvailable('tappables', 'Tappable', this.db),
       )
     }
     await Promise.all(promises)
@@ -143,7 +146,7 @@ const state = {
     }
     if (reloadReport.pvp) {
       this.pvp = config.getSafe('api.pvp.reactMapHandlesPvp')
-        ? new PvpWrapper()
+        ? getSharedPvpWrapper()
         : null
     }
     if (reloadReport.strategies) {

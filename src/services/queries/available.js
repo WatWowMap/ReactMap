@@ -10,6 +10,7 @@ export const GET_MAP_DATA = gql`
       questConditions
       icons
       audio
+      supportsShinyStats
     }
   }
 `
@@ -41,5 +42,11 @@ export const GET_AVAILABLE_NESTS = gql`
 export const GET_AVAILABLE_STATIONS = gql`
   query AvailableStations {
     availableStations
+  }
+`
+
+export const GET_AVAILABLE_TAPPABLES = gql`
+  query AvailableTappables {
+    availableTappables
   }
 `

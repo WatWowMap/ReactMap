@@ -63,12 +63,19 @@ function drawer(req, perms) {
             arEligible: perms.pokestops || BLOCKED,
           }
         : BLOCKED,
+    tappables:
+      perms.tappables && state.db.models.Tappable
+        ? {
+            enabled: perms.tappables || BLOCKED,
+          }
+        : BLOCKED,
     stations:
       (perms.stations || perms.dynamax) && state.db.models.Station
         ? {
             allStations: perms.stations || BLOCKED,
             maxBattles: perms.dynamax || BLOCKED,
             gmaxStationed: perms.dynamax || BLOCKED,
+            inactiveStations: perms.stations || BLOCKED,
           }
         : BLOCKED,
     pokemon:

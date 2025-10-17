@@ -13,12 +13,9 @@ import Grid from '@mui/material/Unstable_Grid2'
 import IconButton from '@mui/material/IconButton'
 import Menu from '@mui/material/Menu'
 import MenuItem from '@mui/material/MenuItem'
-import Rating from '@mui/material/Rating'
 import Typography from '@mui/material/Typography'
 import Stack from '@mui/material/Stack'
 import Box from '@mui/material/Box'
-import LockOpenIcon from '@mui/icons-material/LockOpen'
-import LockIcon from '@mui/icons-material/Lock'
 
 import { useMemory } from '@store/useMemory'
 import { setDeepStore, useGetDeepStore, useStorage } from '@store/useStorage'
@@ -37,9 +34,10 @@ import {
   ExpandWithState,
 } from '@components/inputs/ExpandCollapse'
 import { VirtualGrid } from '@components/virtual/VirtualGrid'
-import { getStationAttackBonus } from '@utils/getAttackBonus'
+import { getStationDamageBoost } from '@utils/getAttackBonus'
+import { getTimeUntil } from '@utils/getTimeUntil'
 import { CopyCoords } from '@components/popups/Coords'
-import { PokeMove } from '@components/popups/PokeMove'
+import Tooltip from '@mui/material/Tooltip'
 
 import { useGetStationMons } from './useGetStationMons'
 
@@ -53,12 +51,10 @@ export function StationPopup(station) {
         <StationHeader {...station} />
         <StationMenu {...station} />
       </Box>
-      {!!station.battle_level && station.battle_end > Date.now() / 1000 && (
-        <StationRating {...station} />
-      )}
       <StationMedia {...station} />
       {station.battle_start < Date.now() / 1000 &&
-        station.battle_end > Date.now() / 1000 && (
+        station.battle_end > Date.now() / 1000 &&
+        !!station.total_stationed_pokemon && (
           <ExpandCollapse>
             <StationAttackBonus {...station} />
             <ExpandWithState
@@ -99,44 +95,6 @@ function StationHeader({ name }) {
       }
       sx={{ p: 0 }}
     />
-  )
-}
-
-/** @param {import('@rm/types').Station} props */
-function StationRating({
-  battle_level,
-  battle_start,
-  battle_end,
-  is_battle_available,
-  start_time,
-  end_time,
-}) {
-  const { t } = useTranslation()
-  const isStarting = battle_start > Date.now() / 1000
-  const battle_start_time =
-    battle_start == start_time ? battle_start + 60 * 60 : battle_start
-  const battle_end_time =
-    battle_end == end_time && battle_end > Date.now() / 1000 + 60 * 60
-      ? battle_end - 60 * 60 * 8
-      : battle_end
-  const epoch = isStarting ? battle_start_time : battle_end_time
-  return (
-    <CardContent sx={{ p: 0, py: 1 }}>
-      <Stack alignItems="center" justifyContent="center">
-        <Rating value={battle_level} max={Math.max(5, battle_level)} readOnly />
-        <Typography variant="caption">
-          {t(`max_battle_${battle_level}`)}
-        </Typography>
-        <LiveTimeStamp start={isStarting} epoch={epoch} variant="caption" />
-        {!is_battle_available &&
-          battle_start < Date.now() / 1000 &&
-          battle_end_time > Date.now() / 1000 && (
-            <Typography variant="caption" align="center">
-              {t('bread_time_window')}
-            </Typography>
-          )}
-      </Stack>
-    </CardContent>
   )
 }
 
@@ -271,20 +229,35 @@ function StationMedia({
   battle_pokemon_costume,
   battle_pokemon_gender,
   battle_pokemon_bread_mode,
-  battle_pokemon_move_1,
-  battle_pokemon_move_2,
+  battle_level,
   battle_end,
-  start_time,
+  battle_start,
   end_time,
+  is_battle_available,
+  battle_pokemon_stamina,
+  battle_pokemon_cp_multiplier,
+  battle_pokemon_estimated_cp,
 }) {
-  const { t } = useTranslateById()
-  const stationImage = useMemory((s) =>
-    s.Icons.getStation(start_time < Date.now() / 1000),
-  )
-  const battle_end_time =
-    battle_end == end_time && battle_end > Date.now() / 1000 + 60 * 60
-      ? battle_end - 60 * 60 * 8
-      : battle_end
+  const { t: tById } = useTranslateById()
+  const { t } = useTranslation()
+  const nowSeconds = Date.now() / 1000
+  const hasBattleEnd = Number.isFinite(battle_end)
+  const hasBattleStart = Number.isFinite(battle_start)
+  const hasEndTime = Number.isFinite(end_time)
+  const battleEndEpoch = hasBattleEnd ? battle_end : 0
+  const battleStartEpoch = hasBattleStart ? battle_start : 0
+  const isBattleActive = battleEndEpoch > nowSeconds
+  const isStarting = hasBattleStart && battleStartEpoch > nowSeconds
+  const isBattleEndSameAsExpire =
+    hasBattleEnd && hasEndTime && battle_end === end_time
+  const countdownEpoch = isStarting ? battleStartEpoch : battleEndEpoch
+  const showBattleCountdown = countdownEpoch > 0 && !isBattleEndSameAsExpire
+  const showBreadWindow =
+    !is_battle_available &&
+    showBattleCountdown &&
+    hasBattleStart &&
+    battleStartEpoch < nowSeconds &&
+    battleEndEpoch > nowSeconds
   const types = useMemory((s) => {
     if (!battle_pokemon_id) return []
     const poke = s.masterfile.pokemon[battle_pokemon_id]
@@ -293,92 +266,202 @@ function StationMedia({
     }
     return poke?.types || []
   })
+  const battleStaminaDisplay =
+    typeof battle_pokemon_stamina === 'number'
+      ? battle_pokemon_stamina.toString()
+      : null
+  const estimatedCpDisplay = Number.isFinite(battle_pokemon_estimated_cp)
+    ? Number(battle_pokemon_estimated_cp).toString()
+    : null
+  const cpMultiplierDisplay = Number.isFinite(battle_pokemon_cp_multiplier)
+    ? `${battle_pokemon_cp_multiplier}`
+    : null
+  const cpLabel = t('cp')
+  const hpLabel = t('hp')
+  let cpTooltip = null
+  let cpLine = null
+  if (estimatedCpDisplay) {
+    if (cpMultiplierDisplay) {
+      cpTooltip = t('station_battle_cp_multiplier', {
+        value: cpMultiplierDisplay,
+      })
+      if (battle_level >= 5) {
+        cpTooltip = `${cpTooltip}${t('station_battle_cp_tooltip_extra')}`
+      }
+    }
+    const cpTypography = (
+      <Typography variant="caption" align="center">
+        {cpLabel} {estimatedCpDisplay}
+      </Typography>
+    )
+    cpLine = cpTooltip ? (
+      <Tooltip title={cpTooltip} arrow placement="top">
+        <Box
+          component="span"
+          sx={{
+            cursor: 'help',
+            textDecoration: 'underline dotted',
+            display: 'inline-block',
+          }}
+        >
+          {cpTypography}
+        </Box>
+      </Tooltip>
+    ) : (
+      cpTypography
+    )
+  } else if (cpMultiplierDisplay) {
+    cpLine = (
+      <Typography variant="caption" align="center">
+        {t('station_battle_cp_multiplier', { value: cpMultiplierDisplay })}
+      </Typography>
+    )
+  }
+  const showStatsRow = Boolean(cpLine || battleStaminaDisplay)
 
-  return battle_end_time > Date.now() / 1000 ? (
-    <CardMedia>
-      <Box className="popup-card-media">
-        <Stack className="flex-center">
-          <PokemonImg
-            id={battle_pokemon_id}
-            form={battle_pokemon_form}
-            costume={battle_pokemon_costume}
-            bread={battle_pokemon_bread_mode}
-            alignment={battle_pokemon_alignment}
-            gender={battle_pokemon_gender}
-            maxHeight="80%"
-            maxWidth="100%"
-          />
-          {!!battle_pokemon_costume && (
-            <Box textAlign="center">
-              <Typography variant="caption">
-                &nbsp;({t(`costume_${battle_pokemon_costume}`)})
-              </Typography>
-            </Box>
-          )}
-        </Stack>
-        <Stack alignItems="center" justifyContent="center" spacing={0.5}>
-          <Stack
-            direction="row"
-            justifyContent="space-evenly"
-            width="100%"
-            pb={0.5}
-          >
-            {!!battle_pokemon_gender && (
-              <GenderIcon gender={battle_pokemon_gender} fontSize="medium" />
+  if (!isBattleActive) {
+    return null
+  }
+
+  const countdownContent = showBattleCountdown ? (
+    <CardContent sx={{ pt: 1, pb: 0 }}>
+      <Stack spacing={0.5} alignItems="center" width="100%">
+        <StationBattleTimer start={isStarting} epoch={countdownEpoch} />
+        {showBreadWindow && (
+          <Typography variant="caption" align="center">
+            {t('bread_time_window')}
+          </Typography>
+        )}
+      </Stack>
+    </CardContent>
+  ) : null
+
+  return (
+    <>
+      <CardMedia>
+        <Box className="popup-card-media">
+          <Stack className="flex-center">
+            <PokemonImg
+              id={battle_pokemon_id}
+              form={battle_pokemon_form}
+              costume={battle_pokemon_costume}
+              bread={battle_pokemon_bread_mode}
+              alignment={battle_pokemon_alignment}
+              gender={battle_pokemon_gender}
+              maxHeight="80%"
+              maxWidth="100%"
+            />
+            {!!battle_pokemon_costume && (
+              <Box textAlign="center">
+                <Typography variant="caption">
+                  &nbsp;({tById(`costume_${battle_pokemon_costume}`)})
+                </Typography>
+              </Box>
             )}
-            {types.map((type) => (
-              <PokeType key={type} id={type} size="medium" />
-            ))}
           </Stack>
-          {battle_pokemon_move_1 && <PokeMove id={battle_pokemon_move_1} />}
-          {battle_pokemon_move_2 && <PokeMove id={battle_pokemon_move_2} />}
-        </Stack>
-      </Box>
-    </CardMedia>
-  ) : (
-    <Box width="100%" className="flex-center">
-      <CardMedia
-        component="img"
-        src={stationImage}
-        sx={{ maxWidth: 75, maxHeight: 75 }}
-      />
-    </Box>
+          <Stack
+            alignItems="center"
+            justifyContent="center"
+            spacing={0.5}
+            width="100%"
+          >
+            <Stack
+              direction="row"
+              justifyContent="space-evenly"
+              width="100%"
+              pb={0.5}
+            >
+              {!!battle_pokemon_gender && (
+                <GenderIcon gender={battle_pokemon_gender} fontSize="medium" />
+              )}
+              {types.map((type) => (
+                <PokeType key={type} id={type} size="medium" />
+              ))}
+            </Stack>
+            {!!battle_level && (
+              <Typography variant="caption" align="center">
+                {t(`max_battle_${battle_level}`)}
+              </Typography>
+            )}
+            {showStatsRow && (
+              <Stack spacing={0} alignItems="center">
+                {cpLine}
+                {battleStaminaDisplay && (
+                  <Typography variant="caption" align="center">
+                    {hpLabel} {battleStaminaDisplay}
+                  </Typography>
+                )}
+              </Stack>
+            )}
+          </Stack>
+        </Box>
+      </CardMedia>
+      {countdownContent}
+    </>
   )
 }
-
 /** @param {import('@rm/types').Station} station */
 function StationAttackBonus({ total_stationed_pokemon, total_stationed_gmax }) {
   const { t } = useTranslation()
   return (
     <Stack alignItems="center">
-      <Rating
-        value={getStationAttackBonus(total_stationed_pokemon)}
-        readOnly
-        icon={<LockOpenIcon fontSize="inherit" />}
-        emptyIcon={<LockIcon fontSize="inherit" />}
-        max={4}
-      />
       <Typography variant="caption">
-        {t('battle_bonus')} &nbsp;(
+        {t('battle_bonus')}: +{getStationDamageBoost(total_stationed_pokemon)}%
+        <br />
+        {t('placed_pokemon')}:{' '}
         {total_stationed_gmax === undefined || total_stationed_gmax === null
           ? ''
-          : `${total_stationed_gmax} / `}
-        {total_stationed_pokemon} / 40)
+          : `${total_stationed_gmax}/`}
+        {total_stationed_pokemon}/40
       </Typography>
     </Stack>
   )
 }
 
 /** @param {import('@rm/types').Station} station */
-function StationContent({ start_time, end_time, id }) {
-  const epoch = (start_time > Date.now() / 1000 ? start_time : end_time) || 0
+function StationContent({ start_time, end_time, battle_end, id }) {
+  const { t } = useTranslation()
+  const dateFormatter = useFormatStore((s) => s.dateFormat)
+  const now = Date.now() / 1000
+  const hasEndTime = Number.isFinite(end_time)
+  const endEpoch = hasEndTime ? end_time : 0
+  const isInactive = hasEndTime && endEpoch < now
+  const inactiveRelativeTime = useRelativeTimer(endEpoch || 0)
+
+  if (isInactive) {
+    const formatted = dateFormatter.format(new Date(endEpoch * 1000))
+    return (
+      <CardContent sx={{ p: 0 }}>
+        <Stack alignItems="center" justifyContent="center">
+          <Typography variant="subtitle2">
+            {t('inactive_since', { time: inactiveRelativeTime })}
+          </Typography>
+          <Typography variant="caption">
+            {t('last_active', { time: formatted })}
+          </Typography>
+        </Stack>
+      </CardContent>
+    )
+  }
+
+  const hasStartTime = Number.isFinite(start_time)
+  const startEpoch = hasStartTime ? start_time : 0
+  const isFutureStart = hasStartTime && startEpoch > now
+  const displayInactiveOnly =
+    Number.isFinite(battle_end) && hasEndTime && battle_end === endEpoch
+  const epoch = displayInactiveOnly
+    ? endEpoch
+    : isFutureStart
+      ? startEpoch
+      : endEpoch
+
   return (
     <CardContent sx={{ p: 0 }}>
       <Stack alignItems="center" justifyContent="center">
-        {start_time > Date.now() / 1000 ? (
-          <StationTimeStamp start epoch={epoch} id={id} />
-        ) : (
+        {displayInactiveOnly || !isFutureStart ? (
           <StationTimeStamp epoch={epoch} id={id} />
+        ) : (
+          <StationTimeStamp start epoch={epoch} id={id} />
         )}
         <StaticTimeStamp date epoch={epoch} />
       </Stack>
@@ -389,15 +472,11 @@ function StationContent({ start_time, end_time, id }) {
 /** @param {import('@rm/types').Station} props */
 function StationMons({ id }) {
   const { t: tId } = useTranslateById()
-  const { t } = useTranslation()
   const mons = useGetStationMons(id)
   const icons = useMemory((s) => s.Icons)
 
   return (
     <CardContent sx={{ my: 1, p: 0, height: 130 }}>
-      <Typography variant="h6" align="center">
-        {t('placed_pokemon')}
-      </Typography>
       <VirtualGrid data={mons} xs={6}>
         {(index, mon) => {
           const caption = tId(`${mon.pokemon_id}-${mon.form}`)
@@ -423,7 +502,7 @@ function StationMons({ id }) {
                   mon.bread_mode,
                 )}
                 alt={caption}
-                maxHeight="100%"
+                maxHeight={50}
                 maxWidth={50}
               />
               <Typography variant="caption">{caption}</Typography>
@@ -436,21 +515,39 @@ function StationMons({ id }) {
 }
 
 /**
- * @param {{ start?: boolean, epoch: number } & import('@mui/material').TypographyProps} props
+ * @param {{ start?: boolean, epoch: number }} props
  */
-function LiveTimeStamp({ start = false, epoch, ...props }) {
+function StationBattleTimer({ start = false, epoch }) {
   const { t } = useTranslation()
-  const relativeTime = useRelativeTimer(epoch || 0)
-  const pastTense = epoch * 1000 < Date.now()
+  const hasEpoch = Number.isFinite(epoch) && epoch > 0
+  const target = hasEpoch ? epoch * 1000 : 0
+  const update = React.useCallback(() => getTimeUntil(target, true), [target])
+  const [display, setDisplay] = React.useState(() =>
+    target ? update() : { str: '0s', diff: 0 },
+  )
+
+  React.useEffect(() => {
+    if (!target) return undefined
+    const timer = setTimeout(() => setDisplay(update()), 1000)
+    return () => clearTimeout(timer)
+  })
+
+  if (!target) {
+    return null
+  }
+
+  const locale = localStorage.getItem('i18nextLng') || 'en'
 
   return (
-    <Typography variant="subtitle2" {...props}>
-      {start
-        ? t(pastTense ? 'started' : 'starts')
-        : t(pastTense ? 'ended' : 'ends')}
-      &nbsp;
-      {relativeTime}
-    </Typography>
+    <Stack spacing={0} alignItems="center" width="100%">
+      <Typography variant="subtitle1" align="center">
+        {t(start ? 'starts' : 'ends')}:{' '}
+        {new Date(target).toLocaleTimeString(locale)}
+      </Typography>
+      <Typography variant="h6" align="center">
+        {display.str.replace('days', t('days')).replace('day', t('day'))}
+      </Typography>
+    </Stack>
   )
 }
 

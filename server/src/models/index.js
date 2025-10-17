@@ -14,6 +14,7 @@ const { ScanCell } = require('./ScanCell')
 const { Session } = require('./Session')
 const { Spawnpoint } = require('./Spawnpoint')
 const { Station } = require('./Station')
+const { Tappable } = require('./Tappable')
 const { User } = require('./User')
 const { Weather } = require('./Weather')
 
@@ -36,6 +37,7 @@ const scannerModels = {
   ScanCell,
   Spawnpoint,
   Station,
+  Tappable,
   Weather,
 }
 

@@ -180,6 +180,9 @@ rootRouter.get('/api/settings', async (req, res, next) => {
               req.session.save()
             }
           }
+          if (user.data !== undefined) {
+            req.user.data = user.data
+          }
         }
       } catch (e) {
         log.warn(TAGS.session, 'Issue finding user, User ID:', req?.user?.id, e)
@@ -211,6 +214,9 @@ rootRouter.get('/api/settings', async (req, res, next) => {
       }
       if (settings.user.perms.stations && api.queryOnSessionInit.stations) {
         state.event.setAvailable('stations', 'Station', state.db)
+      }
+      if (settings.user.perms.tappables && api.queryOnSessionInit.tappables) {
+        state.event.setAvailable('tappables', 'Tappable', state.db)
       }
     }
 
