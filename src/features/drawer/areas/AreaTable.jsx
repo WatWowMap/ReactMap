@@ -1,15 +1,24 @@
 // @ts-check
 import * as React from 'react'
 import { useQuery } from '@apollo/client'
+import { useTranslation } from 'react-i18next'
+import Box from '@mui/material/Box'
+import Button from '@mui/material/Button'
+import CircularProgress from '@mui/material/CircularProgress'
 import Paper from '@mui/material/Paper'
 import Table from '@mui/material/Table'
 import TableBody from '@mui/material/TableBody'
+import TableCell from '@mui/material/TableCell'
 import TableRow from '@mui/material/TableRow'
 import TableContainer from '@mui/material/TableContainer'
+import Typography from '@mui/material/Typography'
 
 import { Query } from '@services/queries'
 import { useMemory } from '@store/useMemory'
 import { useStorage } from '@store/useStorage'
+import { useMapStore } from '@store/useMapStore'
+
+/** @typedef {{ id: string, name: string, lat: number, lon: number }} JumpResult */
 
 import { AreaParent } from './Parent'
 import { AreaChild } from './Child'
@@ -17,10 +26,26 @@ import { AreaChild } from './Child'
 export function ScanAreasTable() {
   /** @type {import('@apollo/client').QueryResult<{ scanAreasMenu: import('@rm/types').Config['areas']['scanAreasMenu'][string] }>} */
   const { data, loading, error } = useQuery(Query.scanAreasMenu())
-  const search = useStorage(
-    (s) => s.filters.scanAreas?.filter?.search?.toLowerCase() || '',
+  const { t, i18n } = useTranslation()
+  const rawSearch = useStorage((s) => s.filters.scanAreas?.filter?.search || '')
+  const search = React.useMemo(() => rawSearch.toLowerCase(), [rawSearch])
+  const trimmedSearch = React.useMemo(() => rawSearch.trim(), [rawSearch])
+  const { misc, general } = useMemory.getState().config
+  const jumpZoom = general?.scanAreasZoom || general?.startZoom || 12
+  /** @type {[JumpResult[], React.Dispatch<React.SetStateAction<JumpResult[]>>]} */
+  const [jumpResults, setJumpResults] = React.useState([])
+  const [jumpLoading, setJumpLoading] = React.useState(false)
+  const [jumpError, setJumpError] = React.useState(false)
+
+  const handleJump = React.useCallback(
+    (target) => {
+      const mapInstance = useMapStore.getState().map
+      if (mapInstance) {
+        mapInstance.flyTo([target.lat, target.lon], jumpZoom)
+      }
+    },
+    [jumpZoom],
   )
-  const { misc } = useMemory.getState().config
 
   /** @type {string[]} */
   const allAreas = React.useMemo(
@@ -63,6 +88,73 @@ export function ScanAreasTable() {
         }),
     [data, search],
   )
+
+  const totalMatches = React.useMemo(
+    () => allRows.reduce((sum, area) => sum + area.children.length, 0),
+    [allRows],
+  )
+
+  const showJumpResults =
+    trimmedSearch.length >= 3 && totalMatches === 0 && !loading && !error
+
+  React.useEffect(() => {
+    if (!showJumpResults) {
+      if (trimmedSearch.length < 3) {
+        setJumpResults([])
+      }
+      setJumpLoading(false)
+      setJumpError(false)
+      return
+    }
+
+    setJumpResults([])
+    setJumpLoading(true)
+    const controller = new AbortController()
+    const timer = window.setTimeout(() => {
+      fetch(
+        `https://nominatim.openstreetmap.org/search?format=json&limit=5&q=${encodeURIComponent(trimmedSearch)}&accept-language=${encodeURIComponent(i18n.language || 'en')}`,
+        { signal: controller.signal, headers: { Accept: 'application/json' } },
+      )
+        .then((res) => {
+          if (!res.ok) throw new Error('Nominatim request failed')
+          return res.json()
+        })
+        .then((json) => {
+          if (!Array.isArray(json)) {
+            setJumpResults([])
+            return
+          }
+          setJumpResults(
+            json
+              .slice(0, 5)
+              .map((item) => ({
+                id: String(item.place_id),
+                name: item.display_name,
+                lat: Number(item.lat),
+                lon: Number(item.lon),
+              }))
+              .filter(
+                (item) =>
+                  Number.isFinite(item.lat) && Number.isFinite(item.lon),
+              ),
+          )
+          setJumpError(false)
+        })
+        .catch((err) => {
+          if (err.name === 'AbortError') return
+          setJumpResults([])
+          setJumpError(true)
+        })
+        .finally(() => {
+          setJumpLoading(false)
+        })
+    }, 400)
+
+    return () => {
+      clearTimeout(timer)
+      controller.abort()
+    }
+  }, [showJumpResults, trimmedSearch, i18n.language])
 
   if (loading || error) return null
 
@@ -122,6 +214,61 @@ export function ScanAreasTable() {
               </React.Fragment>
             )
           })}
+          {showJumpResults && (
+            <TableRow>
+              <TableCell colSpan={2}>
+                <Box display="flex" flexDirection="column" gap={1}>
+                  {jumpLoading ? (
+                    <Box display="flex" alignItems="center" gap={1}>
+                      <CircularProgress size={16} />
+                      <Typography variant="caption">
+                        {t('searching')}
+                      </Typography>
+                    </Box>
+                  ) : jumpError ? (
+                    <Typography variant="caption" color="error">
+                      {t('local_error')}
+                    </Typography>
+                  ) : jumpResults.length ? (
+                    jumpResults.map((result) => (
+                      <Button
+                        key={result.id}
+                        variant="outlined"
+                        color="secondary"
+                        onClick={() => handleJump(result)}
+                        sx={{
+                          justifyContent: 'flex-start',
+                          textTransform: 'none',
+                          width: '100%',
+                          whiteSpace: 'normal',
+                          lineHeight: 1.3,
+                          textAlign: 'left',
+                        }}
+                      >
+                        <Typography
+                          variant="body2"
+                          component="span"
+                          sx={{
+                            textAlign: 'left',
+                            width: '100%',
+                            overflowWrap: 'anywhere',
+                            wordBreak: 'break-word',
+                          }}
+                        >
+                          {result.name}
+                        </Typography>
+                      </Button>
+                    ))
+                  ) : (
+                    <Typography variant="caption">{t('no_options')}</Typography>
+                  )}
+                  <Typography variant="caption" color="text.secondary">
+                    {t('jump_to_areas_attribution')}
+                  </Typography>
+                </Box>
+              </TableCell>
+            </TableRow>
+          )}
         </TableBody>
       </Table>
     </TableContainer>
