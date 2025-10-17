@@ -43,6 +43,7 @@ const MANUAL_ID_CATEGORIES = new Set([
   'portals',
   'stations',
   'routes',
+  'tappables',
 ])
 
 /**

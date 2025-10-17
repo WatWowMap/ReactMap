@@ -78,8 +78,9 @@ export function usePokestopMarker({
   const questSizes = []
   const showcaseIcons = []
   const showcaseSizes = []
+  const canShowInvasionIcons = hasInvasion && !hasShowcase
 
-  if (hasInvasion && !hasShowcase) {
+  if (canShowInvasionIcons) {
     invasions.forEach((invasion) => {
       if (invasion.grunt_type) {
         invasionIcons.unshift({
@@ -266,41 +267,42 @@ export function usePokestopMarker({
         quest_bread_mode = 0,
         key,
       } = quest
+      let questIcon = { url: Icons.getRewards(quest_reward_type) }
       switch (quest_reward_type) {
         case 1:
-          questIcons.unshift({
+          questIcon = {
             url: Icons.getRewards(quest_reward_type, xp_amount),
             amount: xp_amount,
-          })
+          }
           break
         case 2:
-          questIcons.unshift({
+          questIcon = {
             url: Icons.getRewards(
               quest_reward_type,
               quest_item_id,
               item_amount,
             ),
             amount: item_amount > 1 && item_amount,
-          })
+          }
           break
         case 3:
-          questIcons.unshift({
+          questIcon = {
             url: Icons.getRewards(quest_reward_type, stardust_amount),
             amount: stardust_amount,
-          })
+          }
           break
         case 4:
-          questIcons.unshift({
+          questIcon = {
             url: Icons.getRewards(
               quest_reward_type,
               candy_pokemon_id,
               candy_amount,
             ),
             amount: candy_amount,
-          })
+          }
           break
         case 7:
-          questIcons.unshift({
+          questIcon = {
             url: Icons.getPokemon(
               quest_pokemon_id,
               quest_form_id,
@@ -311,38 +313,42 @@ export function usePokestopMarker({
               !!quest_shiny,
               quest_bread_mode,
             ),
-          })
+          }
           break
         case 9:
-          questIcons.unshift({
+          questIcon = {
             url: Icons.getRewards(
               quest_reward_type,
               xl_candy_pokemon_id,
               xl_candy_amount,
             ),
             amount: xl_candy_amount,
-          })
+          }
           break
         case 12:
-          questIcons.unshift({
+          questIcon = {
             url: Icons.getRewards(
               quest_reward_type,
               mega_pokemon_id,
               mega_amount,
             ),
             amount: mega_amount,
-          })
+          }
           break
         default:
-          questIcons.unshift({ url: Icons.getRewards(quest_reward_type) })
+          break
       }
+      questIcons.unshift({
+        ...questIcon,
+        rewardType: quest_reward_type,
+      })
       questSizes.unshift(Icons.getSize('reward', filters[key]?.size))
       popupYOffset += rewardMod.offsetY - 1
       popupX += rewardMod.popupX
       popupY += rewardMod.popupY
     })
   }
-  if (hasEvent && !hasInvasion && !hasQuest) {
+  if (hasEvent && !canShowInvasionIcons && !hasQuest) {
     events.forEach((event) => {
       if (event.display_type === 8) {
         // Only show Kecleon if there's no active showcase blocking it
@@ -393,6 +399,116 @@ export function usePokestopMarker({
 
   const showAr = showArBadge && ar_scan_eligible && !baseIcon.includes('_ar')
 
+  const stackItems = []
+
+  invasionIcons.forEach((invasion, index) => {
+    stackItems.push({
+      type: 'invasion',
+      url: invasion.icon,
+      size: invasionSizes[index],
+      modifier: invasionMod,
+      opacity: invasion.opacity,
+    })
+  })
+
+  questIcons.forEach((icon, index) => {
+    stackItems.push({
+      type: 'quest',
+      url: icon.url,
+      size: questSizes[index],
+      modifier: rewardMod,
+      amount: icon.amount,
+      rewardType: icon.rewardType,
+    })
+  })
+
+  showcaseIcons.forEach((icon, index) => {
+    stackItems.push({
+      type: 'event',
+      url: icon.url,
+      size: showcaseSizes[index],
+      modifier: eventMod,
+      decoration: icon.decoration,
+    })
+  })
+
+  const stackBottom = stackItems.length
+    ? invasionIcons.length
+      ? baseSize * 0.5 * invasionMod.offsetY
+      : questIcons.length
+        ? baseSize * 0.6 * rewardMod.offsetY
+        : baseSize * 0.6 * eventMod.offsetY
+    : 0
+
+  const stackMarkup = stackItems
+    .map((item) => {
+      const showAmount =
+        item.type === 'quest' && item.amount
+          ? item.url.includes('stardust') || item.url.includes('experience')
+            ? item.url.includes('/0.')
+            : !item.url.includes('_a')
+          : false
+      const amountHtml =
+        showAmount && item.amount
+          ? `
+                <span class="pokestop-marker__amount">
+                  x${item.amount}
+                </span>
+              `
+          : ''
+      const opacityStyle =
+        typeof item.opacity === 'number' ? `opacity: ${item.opacity};` : ''
+      const decorationHtml =
+        item.type === 'event' && item.decoration
+          ? `
+                <img
+                  src="${Icons.getMisc('showcase')}"
+                  alt="showcase"
+                  class="pokestop-marker__decoration"
+                  style="width: ${item.size * 0.66}px; height: ${
+                    item.size * 0.66
+                  }px;"
+                />
+              `
+          : ''
+      return `
+            <div
+              class="pokestop-marker__stack-item pokestop-marker__stack-item--${
+                item.type
+              }"
+              data-reward-type="${
+                typeof item.rewardType !== 'undefined' ? item.rewardType : ''
+              }"
+              style="
+                --marker-size: ${item.size}px;
+                left: ${item.modifier.offsetX * 50}%;
+              "
+            >
+              <img
+                src="${item.url}"
+                alt="${item.url}"
+                style="${opacityStyle}"
+              />
+              ${amountHtml}
+              ${decorationHtml}
+            </div>
+      `
+    })
+    .join('')
+
+  const stackHtml = stackItems.length
+    ? `
+          <div
+            class="pokestop-marker__stack"
+            style="
+              bottom: ${stackBottom}px;
+            "
+          >
+            ${stackMarkup}
+          </div>
+        `
+    : ''
+
   return divIcon({
     popupAnchor: [
       popupX - 5,
@@ -434,111 +550,7 @@ export function usePokestopMarker({
             `
             : ''
         }
-        ${questIcons
-          .map(
-            (icon, i) => `
-              <img
-                src="${icon.url}"
-                alt="${icon.url}"
-                style="
-                  width: ${questSizes[i]}px;
-                  height: ${questSizes[i]}px;
-                  bottom: ${
-                    (baseSize * 0.6 +
-                      (invasionMod?.removeQuest ? 10 : totalInvasionSize)) *
-                      rewardMod.offsetY +
-                    questSizes[i] * i
-                  }px;
-                  left: ${rewardMod.offsetX * 50}%;
-                  transform: translateX(-50%);
-                "
-              />
-              ${
-                (
-                  icon.url.includes('stardust') ||
-                  icon.url.includes('experience')
-                    ? icon.url.includes('/0.')
-                    : !icon.url.includes('_a') && icon.amount
-                )
-                  ? /* html */ `
-                  <div
-                    class="amount-holder"
-                    style="
-                      bottom: ${
-                        (baseSize * 0.6 +
-                          (invasionMod?.removeQuest ? 10 : totalInvasionSize)) *
-                          rewardMod.offsetY +
-                        questSizes[i] * i
-                      }px;
-                      left: ${rewardMod.offsetX * 50}%;
-                      transform: translateX(-50%);
-                    "
-                  >
-                    x${icon.amount}
-                  </div>
-                `
-                  : ''
-              }
-          `,
-          )
-          .join('')}
-        ${invasionIcons
-          .map(
-            (invasion, i) => /* html */ `
-              <img
-                src="${invasion.icon}"
-                alt="${invasion.icon}"
-                style="
-                  opacity: ${invasion.opacity};
-                  width: ${invasionSizes[i]}px;
-                  height: ${invasionSizes[i]}px;
-                  bottom: ${
-                    baseSize * 0.5 * invasionMod.offsetY + invasionSizes[i] * i
-                  }px;
-                  left: ${invasionMod.offsetX * 50}%;
-                  transform: translateX(-50%);
-                "
-              />
-          `,
-          )
-          .join('')}
-          ${showcaseIcons
-            .map(
-              (icon, i) => `
-                <img
-                  src="${icon.url}"
-                  alt="${icon.url}"
-                  style="
-                    width: ${showcaseSizes[i]}px;
-                    height: ${showcaseSizes[i]}px;
-                    bottom: ${
-                      baseSize * 0.6 * eventMod.offsetY + showcaseSizes[i] * i
-                    }px;
-                    left: ${eventMod.offsetX * 50}%;
-                    transform: translateX(-50%);
-                  "
-                />
-                ${
-                  icon.decoration
-                    ? `
-                  <img
-                    src="${Icons.getMisc('showcase')}"
-                    style="
-                      width: ${showcaseSizes[i] * 0.66}px;
-                      height: ${showcaseSizes[i] * 0.66}px;
-                      bottom: ${
-                        baseSize * 0.3 * eventMod.offsetY + showcaseSizes[i] * i
-                      }px;
-                      left: ${eventMod.offsetX * 50}%;
-                      transform: translateX(-50%);
-                    "
-                  />
-                `
-                    : ''
-                }
-            `,
-            )
-            .join('')}
+        ${stackHtml}
         </div>`,
   })
 }

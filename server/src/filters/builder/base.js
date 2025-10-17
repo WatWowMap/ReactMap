@@ -5,6 +5,7 @@ const { state } = require('../../services/state')
 const { buildPokemon } = require('./pokemon')
 const { buildPokestops } = require('./pokestop')
 const { buildGyms } = require('./gym')
+const { buildTappables } = require('./tappable')
 const { BaseFilter } = require('../Base')
 const { PokemonFilter } = require('../pokemon/Frontend')
 
@@ -109,6 +110,14 @@ function buildDefaultFilters(perms) {
               ...buildPokestops(perms, defaultFilters.pokestops),
               ...pokemon.quests,
             },
+          }
+        : undefined,
+    tappables:
+      perms.tappables && state.db.models.Tappable
+        ? {
+            enabled: defaultFilters.tappables.enabled,
+            standard: new BaseFilter(),
+            filter: buildTappables(perms, defaultFilters.tappables),
           }
         : undefined,
     stations:

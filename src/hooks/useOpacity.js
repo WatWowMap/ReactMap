@@ -5,7 +5,7 @@ import { useStorage } from '@store/useStorage'
 
 /**
  * Returns dynamic opacity based on timestamp
- * @template {'pokemon' | 'gyms' | 'pokestops' | 'stations'} T
+ * @template {'pokemon' | 'gyms' | 'pokestops' | 'stations' | 'tappables'} T
  * @param {T} category
  * @param {T extends 'pokestops' ? 'invasion' : T extends 'gyms' ? 'raid' : never} [subCategory]
  * @returns

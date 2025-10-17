@@ -63,6 +63,11 @@ export function usePermCheck(category) {
         return true
       }
       break
+    case 'tappables':
+      if (filters?.enabled && perms?.tappables) {
+        return true
+      }
+      break
     default:
       if (filters?.enabled && perms[category]) {
         return true

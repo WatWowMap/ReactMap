@@ -9,6 +9,7 @@ import * as searchIndex from './search'
 import * as webhookIndex from './webhook'
 import * as user from './user'
 import * as stationIndex from './station'
+import * as tappableIndex from './tappable'
 import { GET_ALL_DEVICES } from './device'
 import { GET_ALL_SPAWNPOINTS } from './spawnpoint'
 import { GET_ALL_WEATHER } from './weather'
@@ -148,6 +149,10 @@ export class Query {
       query += '_BATTLE'
     }
     return stationIndex[query]
+  }
+
+  static tappables() {
+    return tappableIndex.GET_ALL_TAPPABLES
   }
 
   /** @param {string} category */

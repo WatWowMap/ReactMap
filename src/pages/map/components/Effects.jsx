@@ -12,6 +12,7 @@ import { useMemory } from '@store/useMemory'
 import { useGenGyms } from '../hooks/useGenGyms'
 import { useGenPokestops } from '../hooks/useGenPokestops'
 import { useGenPokemon } from '../hooks/useGenPokemon'
+import { useGenTappables } from '../hooks/useGenTappables'
 
 export function Effects() {
   const params = useParams()
@@ -22,6 +23,7 @@ export function Effects() {
   useGenGyms()
   useGenPokestops()
   useGenPokemon()
+  useGenTappables()
 
   const isMobile = useMediaQuery(
     (/** @type {import('@mui/system').Theme} */ theme) =>

@@ -83,7 +83,7 @@ type Quest {
   quest_form_id: Int
   quest_gender_id: Int
   quest_costume_id: Int
-  quest_location_card: Int
+  quest_background: Int
   quest_bread_mode: Int
   quest_shiny: Int
   quest_shiny_probability: Float
@@ -200,6 +200,19 @@ type Portal {
   name: String
   url: String
   imported: Int
+  updated: Int
+}
+
+type Tappable {
+  id: ID
+  lat: Float
+  lon: Float
+  type: String
+  fort_id: String
+  item_id: Int
+  count: Int
+  expire_timestamp: Int
+  expire_timestamp_verified: Boolean
   updated: Int
 }
 

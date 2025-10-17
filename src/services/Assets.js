@@ -414,6 +414,26 @@ export class UAssets {
   }
 
   /**
+   * @param {string} [type]
+   * @returns {string}
+   */
+  getTappable(type = 'TAPPABLE_TYPE_POKEBALL') {
+    try {
+      const selection = this.selected.tappable
+      const pack = selection ? this[selection] : undefined
+      if (pack?.class && typeof pack.class.tappable === 'function') {
+        const iconPath = pack.class.tappable(type)
+        if (iconPath) {
+          return iconPath
+        }
+      }
+    } catch (e) {
+      console.error(`[${this.assetType.toUpperCase()}]`, e)
+    }
+    return this.getRewards(2, 1)
+  }
+
+  /**
    *
    * @param {string | number} [rewardType]
    * @param {string | number} [id]

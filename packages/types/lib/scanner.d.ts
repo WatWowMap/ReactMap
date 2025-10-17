@@ -10,6 +10,7 @@ import SpawnpointModel = require('server/src/models/Spawnpoint')
 import WeatherModel = require('server/src/models/Weather')
 import RouteModel = require('server/src/models/Route')
 import StationModel = require('server/src/models/Station')
+import TappableModel = require('server/src/models/Tappable')
 
 import { S2Polygon } from './general'
 
@@ -38,7 +39,7 @@ export interface PokemonDisplay {
   temp_evolution_finish_ms?: number
   alignment: number
   badge: number
-  location_card: number
+  background: number
 }
 
 export interface PokemonShinyStats {
@@ -139,7 +140,7 @@ export interface Quest {
   quest_form_id: number
   quest_gender_id: Gender
   quest_costume_id: number
-  quest_location_card: number
+  quest_background: number
   quest_bread_mode: number
   quest_shiny: number
   quest_shiny_probability?: number
@@ -275,6 +276,21 @@ export interface Portal {
 }
 
 export type FullPortal = FullModel<Portal, PortalModel.Portal>
+
+export interface Tappable {
+  id: string
+  lat: number
+  lon: number
+  type: string
+  fort_id: string | null
+  item_id: number
+  count: number | null
+  expire_timestamp: number | null
+  expire_timestamp_verified: boolean
+  updated: number
+}
+
+export type FullTappable = FullModel<Tappable, TappableModel.Tappable>
 
 export interface ScanCell {
   id?: string
