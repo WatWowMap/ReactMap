@@ -39,7 +39,7 @@ export interface PokemonDisplay {
   temp_evolution_finish_ms?: number
   alignment: number
   badge: number
-  location_card: number
+  background: number
 }
 
 export interface PokemonShinyStats {
