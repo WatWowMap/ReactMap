@@ -108,9 +108,9 @@ export function ScanAreasTable() {
     }
 
     setJumpResults([])
+    setJumpLoading(true)
     const controller = new AbortController()
     const timer = window.setTimeout(() => {
-      setJumpLoading(true)
       fetch(
         `https://nominatim.openstreetmap.org/search?format=json&limit=5&q=${encodeURIComponent(trimmedSearch)}&accept-language=${encodeURIComponent(i18n.language || 'en')}`,
         { signal: controller.signal, headers: { Accept: 'application/json' } },
@@ -218,9 +218,6 @@ export function ScanAreasTable() {
             <TableRow>
               <TableCell colSpan={2}>
                 <Box display="flex" flexDirection="column" gap={1}>
-                  <Typography variant="subtitle2">
-                    {t('jump_to_areas')}
-                  </Typography>
                   {jumpLoading ? (
                     <Box display="flex" alignItems="center" gap={1}>
                       <CircularProgress size={16} />
