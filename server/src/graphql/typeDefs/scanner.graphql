@@ -83,7 +83,7 @@ type Quest {
   quest_form_id: Int
   quest_gender_id: Int
   quest_costume_id: Int
-  quest_location_card: Int
+  quest_background: Int
   quest_bread_mode: Int
   quest_shiny: Int
   quest_shiny_probability: Float
