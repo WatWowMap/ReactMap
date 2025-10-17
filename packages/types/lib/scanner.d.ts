@@ -140,7 +140,7 @@ export interface Quest {
   quest_form_id: number
   quest_gender_id: Gender
   quest_costume_id: number
-  quest_location_card: number
+  quest_background: number
   quest_bread_mode: number
   quest_shiny: number
   quest_shiny_probability?: number
