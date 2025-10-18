@@ -181,6 +181,45 @@ function DefendersModal({ gym, onClose }) {
     defenders.length &&
     defenders[0].deployed_ms + defenders[0].deployed_time * 1000
   const now = Date.now()
+  const getDefenderVisuals = React.useCallback(
+    (backgroundValue) => {
+      const parsed =
+        typeof backgroundValue === 'string'
+          ? parseInt(backgroundValue, 10)
+          : backgroundValue
+      const backgroundUrl =
+        parsed && Icons?.getBackground ? Icons.getBackground(parsed) : ''
+      const hasBackground =
+        Boolean(parsed) && typeof backgroundUrl === 'string' && backgroundUrl
+      const primaryColor = hasBackground ? '#fff' : theme.palette.text.primary
+      const secondaryColor = hasBackground
+        ? 'rgba(255, 255, 255, 0.75)'
+        : theme.palette.text.secondary
+      const borderColor = hasBackground
+        ? 'rgba(255, 255, 255, 0.2)'
+        : theme.palette.divider
+      return {
+        hasBackground,
+        backgroundUrl,
+        primaryColor,
+        secondaryColor,
+        borderColor,
+        heartBackground: hasBackground
+          ? 'rgba(255, 255, 255, 0.2)'
+          : theme.palette.mode === 'dark'
+            ? 'white'
+            : '#f0f0f0',
+        heartShadow: hasBackground
+          ? 'drop-shadow(0 0 2px #000)'
+          : 'drop-shadow(0 0 1px #0008)',
+      }
+    },
+    [Icons, theme],
+  )
+  const fallbackVisuals = React.useMemo(
+    () => getDefenderVisuals(gym.guarding_pokemon_display?.background),
+    [getDefenderVisuals, gym.guarding_pokemon_display?.background],
+  )
 
   // Fallback to basic gym data when detailed defender info isn't available
   const useFallbackData =
@@ -231,7 +270,17 @@ function DefendersModal({ gym, onClose }) {
               minHeight: 80,
               width: '100%',
               padding: '8px 0',
-              borderBottom: `1px solid ${theme.palette.divider}`,
+              borderBottom: `1px solid ${fallbackVisuals.borderColor}`,
+              color: fallbackVisuals.primaryColor,
+              ...(fallbackVisuals.hasBackground && fallbackVisuals.backgroundUrl
+                ? {
+                    backgroundImage: `url(${fallbackVisuals.backgroundUrl})`,
+                    backgroundSize: '100% auto',
+                    backgroundRepeat: 'no-repeat',
+                    backgroundPosition: 'top center',
+                    backgroundColor: '#000',
+                  }
+                : {}),
             }}
           >
             <div
@@ -317,7 +366,7 @@ function DefendersModal({ gym, onClose }) {
               <div
                 style={{
                   fontSize: 13,
-                  color: theme.palette.text.secondary,
+                  color: fallbackVisuals.secondaryColor,
                 }}
               >
                 {gym.total_cp &&
@@ -355,6 +404,7 @@ function DefendersModal({ gym, onClose }) {
               const currentCP = Math.round(
                 fullCP * (0.2 + 0.8 * predictedMotivation),
               )
+              const visuals = getDefenderVisuals(def.background)
 
               return (
                 <div
@@ -365,7 +415,17 @@ function DefendersModal({ gym, onClose }) {
                     minHeight: 80,
                     width: '100%',
                     padding: '8px 0',
-                    borderBottom: `1px solid ${theme.palette.divider}`,
+                    borderBottom: `1px solid ${visuals.borderColor}`,
+                    color: visuals.primaryColor,
+                    ...(visuals.hasBackground && visuals.backgroundUrl
+                      ? {
+                          backgroundImage: `url(${visuals.backgroundUrl})`,
+                          backgroundSize: '100% auto',
+                          backgroundRepeat: 'no-repeat',
+                          backgroundPosition: 'top center',
+                          backgroundColor: '#000',
+                        }
+                      : {}),
                   }}
                 >
                   <div
@@ -440,7 +500,7 @@ function DefendersModal({ gym, onClose }) {
                         alignItems: 'center',
                         gap: '8px',
                         fontSize: 13,
-                        color: theme.palette.text.secondary,
+                        color: visuals.secondaryColor,
                       }}
                     >
                       <div
@@ -480,7 +540,7 @@ function DefendersModal({ gym, onClose }) {
                     <div
                       style={{
                         fontSize: 13,
-                        color: theme.palette.text.secondary,
+                        color: visuals.secondaryColor,
                       }}
                     >
                       CP{currentCP}/{fullCP}{' '}
@@ -507,17 +567,16 @@ function DefendersModal({ gym, onClose }) {
                         position: 'absolute',
                         width: 28,
                         height: 28,
-                        stroke: theme.palette.text.primary,
+                        stroke: visuals.primaryColor,
                         strokeWidth: 1,
-                        filter: 'drop-shadow(0 0 1px #0008)',
+                        filter: visuals.heartShadow,
                       }}
                       className="heart-outline"
                     />
                     {/* Heart background */}
                     <FavoriteIcon
                       style={{
-                        color:
-                          theme.palette.mode === 'dark' ? 'white' : '#f0f0f0',
+                        color: visuals.heartBackground,
                         opacity: 0.18,
                         position: 'absolute',
                         width: 28,
@@ -550,7 +609,7 @@ function DefendersModal({ gym, onClose }) {
                         // Always show top crack if predictedMotivation <= 2/3
                         <path
                           d="M2,9 Q7,11 14,9 Q21,11 26,9"
-                          stroke={theme.palette.text.primary}
+                          stroke={visuals.primaryColor}
                           strokeWidth={1.5}
                           fill="none"
                           strokeLinejoin="round"
@@ -560,7 +619,7 @@ function DefendersModal({ gym, onClose }) {
                         // Show bottom crack only if predictedMotivation <= 1/3
                         <path
                           d="M7,19 Q11,17 14,19 Q17,17 21,19"
-                          stroke={theme.palette.text.primary}
+                          stroke={visuals.primaryColor}
                           strokeWidth={1.5}
                           fill="none"
                           strokeLinejoin="round"
