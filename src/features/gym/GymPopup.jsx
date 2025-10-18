@@ -9,6 +9,7 @@ import Box from '@mui/material/Box'
 import MenuItem from '@mui/material/MenuItem'
 import Divider from '@mui/material/Divider'
 import Collapse from '@mui/material/Collapse'
+import Tooltip from '@mui/material/Tooltip'
 import Typography from '@mui/material/Typography'
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew'
 import ShieldIcon from '@mui/icons-material/Shield'
@@ -175,6 +176,7 @@ function DefendersModal({ gym, onClose }) {
   const { t, i18n } = useTranslation()
   const theme = useTheme()
   const Icons = useMemory((s) => s.Icons)
+  const locationCards = useMemory((s) => s.masterfile.locationCards || {})
   const numFormatter = new Intl.NumberFormat(i18n.language)
   const defenders = gym.defenders || []
   const updatedMs =
@@ -187,10 +189,55 @@ function DefendersModal({ gym, onClose }) {
         typeof backgroundValue === 'string'
           ? parseInt(backgroundValue, 10)
           : backgroundValue
+      const backgroundId =
+        typeof parsed === 'number' && Number.isFinite(parsed) ? parsed : 0
       const backgroundUrl =
-        parsed && Icons?.getBackground ? Icons.getBackground(parsed) : ''
+        backgroundId && Icons?.getBackground
+          ? Icons.getBackground(backgroundId)
+          : ''
       const hasBackground =
-        Boolean(parsed) && typeof backgroundUrl === 'string' && backgroundUrl
+        Boolean(backgroundId) &&
+        typeof backgroundUrl === 'string' &&
+        backgroundUrl
+      const card = backgroundId ? locationCards?.[backgroundId] : undefined
+      const defaultTypeLabel = t('filter_label_location_card')
+      const typeKey =
+        card?.cardType === 'SPECIAL_BACKGROUND'
+          ? 'special_background_filter_header'
+          : 'filter_label_location_card'
+      const fallbackTypeLabel = card?.cardType
+        ? card.cardType.replace(/_/g, ' ')
+        : defaultTypeLabel
+      const typeLabel = backgroundId
+        ? t(typeKey, {
+            defaultValue: fallbackTypeLabel || defaultTypeLabel,
+          })
+        : ''
+      let nameLabel = card?.formatted ?? ''
+      if (card?.proto) {
+        const normalizedProto = card.proto.toLowerCase()
+        const candidateKeys = [card.proto, normalizedProto]
+        if (typeof i18n.exists === 'function') {
+          candidateKeys.some((key) => {
+            if (key && i18n.exists(key)) {
+              nameLabel = t(key)
+              return true
+            }
+            return false
+          })
+        }
+      }
+      if (!nameLabel) {
+        nameLabel = card?.proto
+          ? card.proto.replace(/^LC_/, '').replace(/_/g, ' ')
+          : backgroundId
+            ? `#${backgroundId}`
+            : ''
+      }
+      const backgroundDescription =
+        backgroundId && (typeLabel || fallbackTypeLabel || defaultTypeLabel)
+          ? `${typeLabel || fallbackTypeLabel || defaultTypeLabel}: ${nameLabel} (${backgroundId})`
+          : ''
       const primaryColor = hasBackground ? '#fff' : theme.palette.text.primary
       const secondaryColor = hasBackground
         ? 'rgba(255, 255, 255, 0.75)'
@@ -212,9 +259,18 @@ function DefendersModal({ gym, onClose }) {
         heartShadow: hasBackground
           ? 'drop-shadow(0 0 2px #000)'
           : 'drop-shadow(0 0 1px #0008)',
+        backgroundMeta:
+          backgroundId && backgroundDescription
+            ? {
+                id: backgroundId,
+                tooltip: backgroundDescription,
+                typeLabel: typeLabel || fallbackTypeLabel || defaultTypeLabel,
+                nameLabel,
+              }
+            : undefined,
       }
     },
-    [Icons, theme],
+    [Icons, locationCards, t, i18n, theme],
   )
   const fallbackVisuals = React.useMemo(
     () => getDefenderVisuals(gym.guarding_pokemon_display?.background),
@@ -224,6 +280,152 @@ function DefendersModal({ gym, onClose }) {
   // Fallback to basic gym data when detailed defender info isn't available
   const useFallbackData =
     !defenders.length && gym.team_id > 0 && gym.guarding_pokemon_id
+  const fallbackBackgroundMeta = fallbackVisuals.backgroundMeta
+  let fallbackRow = null
+  if (useFallbackData) {
+    const fallbackImageSrc =
+      Icons &&
+      (gym.guarding_pokemon_display
+        ? Icons.getPokemonByDisplay(
+            gym.guarding_pokemon_id,
+            gym.guarding_pokemon_display,
+          )
+        : Icons.getPokemon?.(gym.guarding_pokemon_id))
+
+    const {
+      borderColor: fallbackBorderColor,
+      primaryColor: fallbackPrimaryColor,
+      hasBackground: fallbackHasBackground,
+      backgroundUrl: fallbackBackgroundUrl,
+      secondaryColor: fallbackSecondaryColor,
+    } = fallbackVisuals
+    const row = (
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          minHeight: 80,
+          width: '100%',
+          padding: '8px 0',
+          borderBottom: `1px solid ${fallbackBorderColor}`,
+          color: fallbackPrimaryColor,
+          ...(fallbackHasBackground && fallbackBackgroundUrl
+            ? {
+                backgroundImage: `url(${fallbackBackgroundUrl})`,
+                backgroundSize: '100% auto',
+                backgroundRepeat: 'no-repeat',
+                backgroundPosition: 'top center',
+                backgroundColor: '#000',
+              }
+            : {}),
+        }}
+        aria-label={fallbackBackgroundMeta?.tooltip || undefined}
+      >
+        <div
+          style={{
+            width: 50,
+            height: 50,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            marginLeft: 12,
+            marginRight: 12,
+            flexShrink: 0,
+            position: 'relative',
+          }}
+        >
+          {fallbackImageSrc ? (
+            <Img
+              src={fallbackImageSrc}
+              alt={t(`poke_${gym.guarding_pokemon_id}`)}
+              style={{
+                maxHeight: 50,
+                maxWidth: 50,
+                objectFit: 'contain',
+              }}
+            />
+          ) : null}
+          {gym.guarding_pokemon_display?.badge === 1 && (
+            <Img
+              src={Icons.getMisc('bestbuddy')}
+              alt={t('best_buddy')}
+              style={{
+                position: 'absolute',
+                top: 0,
+                right: 0,
+                maxHeight: 15,
+                maxWidth: 15,
+                zIndex: 2,
+              }}
+            />
+          )}
+        </div>
+        <div
+          style={{
+            flex: 1,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'flex-start',
+            justifyContent: 'center',
+            minWidth: 0,
+            textAlign: 'left',
+            overflow: 'hidden',
+            marginLeft: 4,
+            gap: '4px',
+          }}
+        >
+          <div
+            style={{
+              fontSize: 16,
+              fontWeight: 700,
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap',
+              maxWidth: '100%',
+            }}
+            title={t(`poke_${gym.guarding_pokemon_id}`)}
+          >
+            {gym.guarding_pokemon_display?.badge === 1 && (
+              <Img
+                src={Icons.getMisc('bestbuddy')}
+                alt={t('best_buddy')}
+                style={{
+                  maxHeight: 15,
+                  maxWidth: 15,
+                  marginRight: 4,
+                  verticalAlign: 'middle',
+                }}
+              />
+            )}
+            {t(`poke_${gym.guarding_pokemon_id}`)}
+          </div>
+
+          <div
+            style={{
+              fontSize: 13,
+              color: fallbackSecondaryColor,
+            }}
+          >
+            {gym.total_cp &&
+              `${t('total_cp')}: ${numFormatter.format(gym.total_cp)}`}
+          </div>
+        </div>
+      </div>
+    )
+
+    fallbackRow = fallbackBackgroundMeta?.tooltip ? (
+      <Tooltip
+        title={fallbackBackgroundMeta.tooltip}
+        arrow
+        enterTouchDelay={0}
+        placement="top"
+      >
+        {row}
+      </Tooltip>
+    ) : (
+      row
+    )
+  }
 
   return (
     <Grid
@@ -263,117 +465,7 @@ function DefendersModal({ gym, onClose }) {
       {useFallbackData ? (
         // Fallback display using basic gym data
         <Grid container direction="column" spacing={1}>
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              minHeight: 80,
-              width: '100%',
-              padding: '8px 0',
-              borderBottom: `1px solid ${fallbackVisuals.borderColor}`,
-              color: fallbackVisuals.primaryColor,
-              ...(fallbackVisuals.hasBackground && fallbackVisuals.backgroundUrl
-                ? {
-                    backgroundImage: `url(${fallbackVisuals.backgroundUrl})`,
-                    backgroundSize: '100% auto',
-                    backgroundRepeat: 'no-repeat',
-                    backgroundPosition: 'top center',
-                    backgroundColor: '#000',
-                  }
-                : {}),
-            }}
-          >
-            <div
-              style={{
-                width: 50,
-                height: 50,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                marginLeft: 12,
-                marginRight: 12,
-                flexShrink: 0,
-                position: 'relative',
-              }}
-            >
-              <Img
-                src={Icons.getPokemonByDisplay(
-                  gym.guarding_pokemon_id,
-                  gym.guarding_pokemon_display,
-                )}
-                alt={t(`poke_${gym.guarding_pokemon_id}`)}
-                style={{
-                  maxHeight: 50,
-                  maxWidth: 50,
-                  objectFit: 'contain',
-                }}
-              />
-              {gym.guarding_pokemon_display?.badge === 1 && (
-                <Img
-                  src={Icons.getMisc('bestbuddy')}
-                  alt={t('best_buddy')}
-                  style={{
-                    position: 'absolute',
-                    top: 0,
-                    right: 0,
-                    maxHeight: 15,
-                    maxWidth: 15,
-                    zIndex: 2,
-                  }}
-                />
-              )}
-            </div>
-            <div
-              style={{
-                flex: 1,
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'flex-start',
-                justifyContent: 'center',
-                minWidth: 0,
-                textAlign: 'left',
-                overflow: 'hidden',
-                marginLeft: 4,
-                gap: '4px',
-              }}
-            >
-              <div
-                style={{
-                  fontSize: 16,
-                  fontWeight: 700,
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                  whiteSpace: 'nowrap',
-                  maxWidth: '100%',
-                }}
-                title={t(`poke_${gym.guarding_pokemon_id}`)}
-              >
-                {gym.guarding_pokemon_display?.badge === 1 && (
-                  <Img
-                    src={Icons.getMisc('bestbuddy')}
-                    alt={t('best_buddy')}
-                    style={{
-                      maxHeight: 15,
-                      maxWidth: 15,
-                      marginRight: 4,
-                      verticalAlign: 'middle',
-                    }}
-                  />
-                )}
-                {t(`poke_${gym.guarding_pokemon_id}`)}
-              </div>
-
-              <div
-                style={{
-                  fontSize: 13,
-                  color: fallbackVisuals.secondaryColor,
-                }}
-              >
-                {gym.total_cp &&
-                  `${t('total_cp')}: ${numFormatter.format(gym.total_cp)}`}
-              </div>
-            </div>
-          </div>
+          {fallbackRow}
 
           <Grid
             xs={12}
@@ -389,7 +481,7 @@ function DefendersModal({ gym, onClose }) {
         // Original detailed defender display
         <>
           <Grid container direction="column" spacing={1}>
-            {defenders.map((def) => {
+            {defenders.map((def, index) => {
               const fullCP = def.cp_when_deployed
               const decayTime =
                 72 *
@@ -405,21 +497,32 @@ function DefendersModal({ gym, onClose }) {
                 fullCP * (0.2 + 0.8 * predictedMotivation),
               )
               const visuals = getDefenderVisuals(def.background)
-
-              return (
+              const {
+                borderColor,
+                primaryColor,
+                hasBackground,
+                backgroundUrl,
+                secondaryColor,
+                heartShadow,
+                heartBackground,
+                backgroundMeta,
+              } = visuals
+              const rowKey = def.pokemon_id
+                ? `${def.pokemon_id}-${index}`
+                : `${index}`
+              const defenderRow = (
                 <div
-                  key={def.pokemon_id}
                   style={{
                     display: 'flex',
                     alignItems: 'center',
                     minHeight: 80,
                     width: '100%',
                     padding: '8px 0',
-                    borderBottom: `1px solid ${visuals.borderColor}`,
-                    color: visuals.primaryColor,
-                    ...(visuals.hasBackground && visuals.backgroundUrl
+                    borderBottom: `1px solid ${borderColor}`,
+                    color: primaryColor,
+                    ...(hasBackground && backgroundUrl
                       ? {
-                          backgroundImage: `url(${visuals.backgroundUrl})`,
+                          backgroundImage: `url(${backgroundUrl})`,
                           backgroundSize: '100% auto',
                           backgroundRepeat: 'no-repeat',
                           backgroundPosition: 'top center',
@@ -427,6 +530,7 @@ function DefendersModal({ gym, onClose }) {
                         }
                       : {}),
                   }}
+                  aria-label={backgroundMeta?.tooltip || undefined}
                 >
                   <div
                     style={{
@@ -500,7 +604,7 @@ function DefendersModal({ gym, onClose }) {
                         alignItems: 'center',
                         gap: '8px',
                         fontSize: 13,
-                        color: visuals.secondaryColor,
+                        color: secondaryColor,
                       }}
                     >
                       <div
@@ -540,7 +644,7 @@ function DefendersModal({ gym, onClose }) {
                     <div
                       style={{
                         fontSize: 13,
-                        color: visuals.secondaryColor,
+                        color: secondaryColor,
                       }}
                     >
                       CP{currentCP}/{fullCP}{' '}
@@ -567,16 +671,16 @@ function DefendersModal({ gym, onClose }) {
                         position: 'absolute',
                         width: 28,
                         height: 28,
-                        stroke: visuals.primaryColor,
+                        stroke: primaryColor,
                         strokeWidth: 1,
-                        filter: visuals.heartShadow,
+                        filter: heartShadow,
                       }}
                       className="heart-outline"
                     />
                     {/* Heart background */}
                     <FavoriteIcon
                       style={{
-                        color: visuals.heartBackground,
+                        color: heartBackground,
                         opacity: 0.18,
                         position: 'absolute',
                         width: 28,
@@ -609,7 +713,7 @@ function DefendersModal({ gym, onClose }) {
                         // Always show top crack if predictedMotivation <= 2/3
                         <path
                           d="M2,9 Q7,11 14,9 Q21,11 26,9"
-                          stroke={visuals.primaryColor}
+                          stroke={primaryColor}
                           strokeWidth={1.5}
                           fill="none"
                           strokeLinejoin="round"
@@ -619,7 +723,7 @@ function DefendersModal({ gym, onClose }) {
                         // Show bottom crack only if predictedMotivation <= 1/3
                         <path
                           d="M7,19 Q11,17 14,19 Q17,17 21,19"
-                          stroke={visuals.primaryColor}
+                          stroke={primaryColor}
                           strokeWidth={1.5}
                           fill="none"
                           strokeLinejoin="round"
@@ -629,6 +733,21 @@ function DefendersModal({ gym, onClose }) {
                   </div>
                 </div>
               )
+
+              if (backgroundMeta?.tooltip) {
+                return (
+                  <Tooltip
+                    key={rowKey}
+                    title={backgroundMeta.tooltip}
+                    arrow
+                    enterTouchDelay={0}
+                    placement="top"
+                  >
+                    {defenderRow}
+                  </Tooltip>
+                )
+              }
+              return React.cloneElement(defenderRow, { key: rowKey })
             })}
           </Grid>
           <Grid

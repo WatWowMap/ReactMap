@@ -68,6 +68,14 @@ export interface MasterfileWeather {
   types: number[]
 }
 
+export interface MasterfileLocationCard {
+  proto: string
+  formatted: string
+  cardType?: string
+  imageUrl?: string
+  vfxAddress?: string
+}
+
 export interface Masterfile {
   pokemon: Record<string, MasterfilePokemon>
   types: MasterfileObject
@@ -78,6 +86,8 @@ export interface Masterfile {
   weather: Record<string, MasterfileWeather>
   teams: (typeof mfjson)['teams']
   raids: (typeof mfjson)['raids']
+  routeTypes: (typeof mfjson)['routeTypes']
+  locationCards: Record<string, MasterfileLocationCard>
 }
 
 export declare function generate(
