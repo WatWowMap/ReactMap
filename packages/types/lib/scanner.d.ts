@@ -260,6 +260,7 @@ export interface Pokemon {
   pvp_rankings_ultra_league?: import('ohbem').PvPRankEntry[]
   distance?: number
   shiny?: boolean
+  background?: number
 }
 
 export type FullPokemon = FullModel<Pokemon, PokemonModel.Pokemon>
