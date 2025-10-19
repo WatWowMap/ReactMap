@@ -147,6 +147,43 @@ export function PokestopPopup({
                         </>
                       )}
                     </Grid>
+                    {!!quest.quest_background && !!quest.quest_pokemon_id ? (
+                      <Grid
+                        xs={12}
+                        container
+                        alignItems="center"
+                        justifyContent="center"
+                        spacing={1}
+                      >
+                        <Grid xs={8} textAlign="center">
+                          <Typography
+                            variant="caption"
+                            component="div"
+                            style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              flexWrap: 'wrap',
+                            }}
+                          >
+                            {t('with_background')}
+                          </Typography>
+                        </Grid>
+                        <Grid xs={4} display="flex" justifyContent="center">
+                          <img
+                            src={Icons.getBackgrounds(quest.quest_background)}
+                            style={{ maxWidth: 42, maxHeight: 42 }}
+                            onError={(e) => {
+                              // @ts-ignore
+                              e.target.onerror = null
+                              // @ts-ignore
+                              e.target.src =
+                                'https://raw.githubusercontent.com/WatWowMap/wwm-uicons-webp/main/background/0.webp'
+                            }}
+                          />
+                        </Grid>
+                      </Grid>
+                    ) : null}
                   </React.Fragment>
                 ))}
               {hasLure && (
