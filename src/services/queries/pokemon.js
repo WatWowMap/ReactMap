@@ -10,6 +10,7 @@ const core = gql`
     pokemon_id
     form
     gender
+    background
     costume
     first_seen_timestamp
     expire_timestamp
