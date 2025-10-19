@@ -7,11 +7,7 @@ import Grid from '@mui/material/Unstable_Grid2'
 import IconButton from '@mui/material/IconButton'
 import Collapse from '@mui/material/Collapse'
 import Typography from '@mui/material/Typography'
-import TableCell from '@mui/material/TableCell'
-import TableRow from '@mui/material/TableRow'
-import Table from '@mui/material/Table'
-import TableBody from '@mui/material/TableBody'
-import styled from '@mui/material/styles/styled'
+import Tooltip from '@mui/material/Tooltip'
 import Check from '@mui/icons-material/Check'
 import Help from '@mui/icons-material/Help'
 import { useTranslation, Trans } from 'react-i18next'
@@ -37,6 +33,7 @@ import { useGetAvailable } from '@hooks/useGetAvailable'
 import { parseQuestConditions } from '@utils/parseConditions'
 import { Img } from '@components/Img'
 import { readableProbability } from '@utils/readableProbability'
+import { usePokemonBackgroundVisuals } from '@hooks/usePokemonBackgroundVisuals'
 
 /**
  *
@@ -282,19 +279,14 @@ export function PokestopPopup({
                               event.showcase_ranking_standard
                             }
                           >
-                            <Table
-                              size="small"
-                              className="table-invasion three-quarters-width"
-                            >
-                              <TableBody>
-                                {(contest_entries || []).map((position) => (
-                                  <ShowcaseEntry
-                                    key={position.rank}
-                                    {...position}
-                                  />
-                                ))}
-                              </TableBody>
-                            </Table>
+                            <div className="showcase-entries">
+                              {(contest_entries || []).map((position) => (
+                                <ShowcaseEntry
+                                  key={position.rank}
+                                  {...position}
+                                />
+                              ))}
+                            </div>
                           </Showcase>
                         </TimeTile>
                       </React.Fragment>
@@ -911,47 +903,108 @@ const Showcase = ({
   )
 }
 
-const NoBorderCell = styled(TableCell, {
-  shouldForwardProp: (prop) => prop !== 'textAlign',
-  // @ts-ignore
-})(({ textAlign = 'right' }) => ({
-  borderBottom: 'none',
-  padding: 2,
-  textAlign,
-}))
-
-const ShowcaseEntry = (entry) => {
-  const { rank, score, pokemon_id, badge } = entry
+const ShowcaseEntry = ({
+  rank,
+  score,
+  pokemon_id,
+  badge,
+  background,
+  ...display
+}) => {
   const Icons = useMemory((s) => s.Icons)
   const { t } = useTranslation()
-  return (
-    <TableRow>
-      <NoBorderCell>
-        <img src={Icons.getMisc(getBadge(rank))} alt="rank" height={20} />
-      </NoBorderCell>
-      <NoBorderCell
-        // @ts-ignore
-        textAlign="center"
-      >
-        {score.toFixed(2)}
-      </NoBorderCell>
-      {pokemon_id && (
-        <NoBorderCell>
-          <img
-            src={Icons.getPokemonByDisplay(pokemon_id, entry)}
-            alt="rank"
-            height={20}
-          />
-          {badge === 1 && (
-            <Img
-              src={Icons.getMisc('bestbuddy')}
-              alt={t('best_buddy')}
-              maxHeight={15}
-              maxWidth={15}
-            />
-          )}
-        </NoBorderCell>
-      )}
-    </TableRow>
+  const getPokemonBackgroundVisuals = usePokemonBackgroundVisuals()
+  const visuals = React.useMemo(
+    () => getPokemonBackgroundVisuals(background),
+    [background, getPokemonBackgroundVisuals],
   )
+  const {
+    hasBackground,
+    backgroundUrl,
+    primaryColor,
+    primaryTextShadow,
+    secondaryTextShadow,
+    backgroundMeta,
+  } = visuals
+
+  const entry = (
+    <div
+      className={`showcase-entry${hasBackground ? ' has-background' : ''}`}
+      style={{
+        ...(hasBackground
+          ? {
+              '--showcase-bg': `url(${backgroundUrl})`,
+            }
+          : {}),
+      }}
+    >
+      <div className="showcase-entry-content">
+        <div
+          className="showcase-entry-col showcase-entry-rank"
+          style={{
+            color: hasBackground ? '#fff' : primaryColor,
+            textShadow: primaryTextShadow,
+          }}
+        >
+          <img src={Icons.getMisc(getBadge(rank))} alt="rank" height={20} />
+        </div>
+        <div
+          className="showcase-entry-col"
+          style={{
+            color: hasBackground ? '#fff' : primaryColor,
+            textShadow: hasBackground ? secondaryTextShadow : primaryTextShadow,
+          }}
+        >
+          {score.toFixed(2)}
+        </div>
+        <div
+          className="showcase-entry-col"
+          style={{
+            color: hasBackground ? '#fff' : primaryColor,
+            textShadow: primaryTextShadow,
+          }}
+        >
+          {pokemon_id ? (
+            <>
+              <img
+                src={Icons.getPokemonByDisplay(pokemon_id, {
+                  ...display,
+                  badge,
+                  background,
+                })}
+                alt={t(`poke_${pokemon_id}`)}
+                height={20}
+              />
+              {badge === 1 && (
+                <Img
+                  src={Icons.getMisc('bestbuddy')}
+                  alt={t('best_buddy')}
+                  maxHeight={15}
+                  maxWidth={15}
+                  style={{
+                    marginLeft: 4,
+                  }}
+                />
+              )}
+            </>
+          ) : null}
+        </div>
+      </div>
+    </div>
+  )
+
+  if (backgroundMeta?.tooltip) {
+    return (
+      <Tooltip
+        title={backgroundMeta.tooltip}
+        arrow
+        enterTouchDelay={0}
+        placement="top"
+      >
+        {entry}
+      </Tooltip>
+    )
+  }
+
+  return entry
 }

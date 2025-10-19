@@ -215,6 +215,59 @@ body {
   padding-left: 7px;
 }
 
+.showcase-entry {
+  position: relative;
+  overflow: visible;
+  z-index: 0;
+}
+
+.showcase-entry.has-background::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: calc(100% + 43px);
+  height: 100%;
+  background-image: var(--showcase-bg, none);
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: top center;
+  background-color: #000;
+  z-index: -1;
+  pointer-events: none;
+  border-radius: 6px;
+}
+
+.showcase-entries {
+  width: 100%;
+}
+
+.showcase-entry-content {
+  display: table;
+  border-collapse: separate;
+  border-spacing: 0;
+  width: 75%;
+  margin: 0 auto;
+  padding: 2px 0;
+  font-family: 'Roboto', 'Helvetica', 'Arial', sans-serif;
+  font-size: 0.875rem;
+  line-height: 1.43;
+  letter-spacing: 0.01071em;
+  font-weight: 400;
+  text-align: center;
+}
+
+.showcase-entry-col {
+  display: table-cell;
+  vertical-align: middle;
+}
+
+.showcase-entry-score {
+  width: 100px;
+  text-align: center;
+}
+
 .marker-image-holder {
   position: absolute;
   width: 100%;

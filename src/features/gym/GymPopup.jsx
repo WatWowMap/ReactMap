@@ -17,7 +17,6 @@ import FavoriteIcon from '@mui/icons-material/Favorite'
 import EmojiEventsIcon from '@mui/icons-material/EmojiEvents'
 import SentimentVeryDissatisfiedIcon from '@mui/icons-material/SentimentVeryDissatisfied'
 import RestaurantIcon from '@mui/icons-material/Restaurant'
-import { useTheme } from '@mui/material/styles'
 import { useTranslation } from 'react-i18next'
 
 import { useSyncData } from '@features/webhooks'
@@ -35,6 +34,7 @@ import { TimeStamp } from '@components/popups/TimeStamps'
 import { useAnalytics } from '@hooks/useAnalytics'
 import { getTimeUntil } from '@utils/getTimeUntil'
 import { formatInterval } from '@utils/formatInterval'
+import { usePokemonBackgroundVisuals } from '@hooks/usePokemonBackgroundVisuals'
 
 import { useWebhook } from './useWebhook'
 
@@ -174,117 +174,17 @@ export function GymPopup({ hasRaid, hasHatched, raidIconUrl, ...gym }) {
  */
 function DefendersModal({ gym, onClose }) {
   const { t, i18n } = useTranslation()
-  const theme = useTheme()
   const Icons = useMemory((s) => s.Icons)
-  const locationCards = useMemory((s) => s.masterfile.locationCards || {})
+  const getPokemonBackgroundVisuals = usePokemonBackgroundVisuals()
   const numFormatter = new Intl.NumberFormat(i18n.language)
   const defenders = gym.defenders || []
   const updatedMs =
     defenders.length &&
     defenders[0].deployed_ms + defenders[0].deployed_time * 1000
   const now = Date.now()
-  const getDefenderVisuals = React.useCallback(
-    (backgroundValue) => {
-      const parsed =
-        typeof backgroundValue === 'string'
-          ? parseInt(backgroundValue, 10)
-          : backgroundValue
-      const backgroundId =
-        typeof parsed === 'number' && Number.isFinite(parsed) ? parsed : 0
-      const backgroundUrl =
-        backgroundId && Icons?.getBackground
-          ? Icons.getBackground(backgroundId)
-          : ''
-      const hasBackground =
-        Boolean(backgroundId) &&
-        typeof backgroundUrl === 'string' &&
-        backgroundUrl
-      const card = backgroundId ? locationCards?.[backgroundId] : undefined
-      const defaultTypeLabel = t('filter_label_location_card')
-      const typeKey =
-        card?.cardType === 'SPECIAL_BACKGROUND'
-          ? 'special_background_filter_header'
-          : 'filter_label_location_card'
-      const fallbackTypeLabel = card?.cardType
-        ? card.cardType.replace(/_/g, ' ')
-        : defaultTypeLabel
-      const typeLabel = backgroundId
-        ? t(typeKey, {
-            defaultValue: fallbackTypeLabel || defaultTypeLabel,
-          })
-        : ''
-      let nameLabel = card?.formatted ?? ''
-      if (card?.proto) {
-        const normalizedProto = card.proto.toLowerCase()
-        const candidateKeys = [card.proto, normalizedProto]
-        if (typeof i18n.exists === 'function') {
-          candidateKeys.some((key) => {
-            if (key && i18n.exists(key)) {
-              nameLabel = t(key)
-              return true
-            }
-            return false
-          })
-        }
-      }
-      if (!nameLabel) {
-        nameLabel = card?.proto
-          ? card.proto.replace(/^LC_/, '').replace(/_/g, ' ')
-          : backgroundId
-            ? `#${backgroundId}`
-            : ''
-      }
-      const backgroundDescription =
-        backgroundId && (typeLabel || fallbackTypeLabel || defaultTypeLabel)
-          ? `${typeLabel || fallbackTypeLabel || defaultTypeLabel}: ${nameLabel} (${backgroundId})`
-          : ''
-      const primaryColor = hasBackground ? '#fff' : theme.palette.text.primary
-      const secondaryColor = hasBackground
-        ? 'rgba(255, 255, 255, 0.75)'
-        : theme.palette.text.secondary
-      const borderColor = hasBackground
-        ? 'rgba(255, 255, 255, 0.2)'
-        : theme.palette.divider
-      const secondaryTextShadow = hasBackground
-        ? '0 0 3px rgba(0, 0, 0, 0.75)'
-        : 'none'
-      const primaryTextShadow = secondaryTextShadow
-      const iconShadow = hasBackground
-        ? 'drop-shadow(0 0 3px rgba(0, 0, 0, 0.75))'
-        : 'none'
-      return {
-        hasBackground,
-        backgroundUrl,
-        primaryColor,
-        secondaryColor,
-        borderColor,
-        heartBackground: hasBackground
-          ? 'rgba(255, 255, 255, 0.2)'
-          : theme.palette.mode === 'dark'
-            ? 'white'
-            : '#f0f0f0',
-        heartShadow: hasBackground
-          ? 'drop-shadow(0 0 2px #000)'
-          : 'drop-shadow(0 0 1px #0008)',
-        primaryTextShadow,
-        secondaryTextShadow,
-        iconShadow,
-        backgroundMeta:
-          backgroundId && backgroundDescription
-            ? {
-                id: backgroundId,
-                tooltip: backgroundDescription,
-                typeLabel: typeLabel || fallbackTypeLabel || defaultTypeLabel,
-                nameLabel,
-              }
-            : undefined,
-      }
-    },
-    [Icons, locationCards, t, i18n, theme],
-  )
   const fallbackVisuals = React.useMemo(
-    () => getDefenderVisuals(gym.guarding_pokemon_display?.background),
-    [getDefenderVisuals, gym.guarding_pokemon_display?.background],
+    () => getPokemonBackgroundVisuals(gym.guarding_pokemon_display?.background),
+    [getPokemonBackgroundVisuals, gym.guarding_pokemon_display?.background],
   )
 
   // Fallback to basic gym data when detailed defender info isn't available
@@ -511,7 +411,7 @@ function DefendersModal({ gym, onClose }) {
               const currentCP = Math.round(
                 fullCP * (0.2 + 0.8 * predictedMotivation),
               )
-              const visuals = getDefenderVisuals(def.background)
+              const visuals = getPokemonBackgroundVisuals(def.background)
               const {
                 borderColor,
                 primaryColor,
