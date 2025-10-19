@@ -71,6 +71,7 @@ type Search {
   gender: Int
   costume: Int
   shiny: Int
+  background: Int
   iv: Float
   expire_timestamp: Int
   battle_pokemon_id: Int
