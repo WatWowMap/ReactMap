@@ -233,6 +233,43 @@ export function PokemonPopup({ pokemon, iconUrl, isTutorial = false }) {
           userSettings={userSettings}
           isTutorial={isTutorial}
         />
+        {!!pokemon.background && pokemon.seen_type === 'encounter' ? (
+          <Grid
+            xs={12}
+            container
+            alignItems="center"
+            justifyContent="center"
+            spacing={1}
+          >
+            <Grid xs={8} textAlign="center">
+              <Typography
+                variant="caption"
+                component="div"
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  flexWrap: 'wrap',
+                }}
+              >
+                {t('with_background')}
+              </Typography>
+            </Grid>
+            <Grid xs={4} display="flex" justifyContent="center">
+              <img
+                src={Icons.getBackgrounds(quest.quest_location_card)}
+                style={{ maxWidth: 42, maxHeight: 42 }}
+                onError={(e) => {
+                  // @ts-ignore
+                  e.target.onerror = null
+                  // @ts-ignore
+                  e.target.src =
+                    'https://raw.githubusercontent.com//ReuschelCGN/wwm-uicons/main/background/0.png'
+                }}
+              />
+            </Grid>
+          </Grid>
+        ) : null}
         {pokemon.seen_type !== 'encounter' && (
           <Grid xs={12} textAlign="center">
             <Typography
