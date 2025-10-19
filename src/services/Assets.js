@@ -371,6 +371,20 @@ export class UAssets {
     )
   }
 
+  /**
+   *
+   * @param {string | number} [background]
+   * @returns
+   */
+  getBackgrounds(background = 0) {
+    try {
+      return this[this.selected.background]?.class?.background(background)
+    } catch (e) {
+      console.error(`[${this.assetType.toUpperCase()}]`, e)
+      return `${this.fallback}/background/0.${this.fallbackExt}`
+    }
+  }
+
   /** @param {number | string} [typeId] */
   getTypes(typeId = 0) {
     try {
