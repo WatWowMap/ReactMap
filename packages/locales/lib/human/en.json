@@ -65,6 +65,7 @@
   "pokemon": "Pokémon",
   "wayfarer": "Wayfarer",
   "scan_areas": "Scan Areas",
+  "jump_to_areas_attribution": "Search powered by OpenStreetMap",
   "s2cells": "S2 Cells",
   "weather": "Weather",
   "admin": "Admin",
