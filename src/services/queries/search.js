@@ -137,6 +137,7 @@ export const POKEMON = gql`
       gender
       costume
       shiny
+      background
       iv
       expire_timestamp
     }
