@@ -167,6 +167,7 @@ type Pokemon {
   costume: Int
   gender: Int
   display_pokemon_id: Int
+  background: Int
   weight: Float
   height: Float
   size: Float
