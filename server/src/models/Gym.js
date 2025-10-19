@@ -271,7 +271,9 @@ class Gym extends Model {
       if (onlyAllGyms && gymPerms) {
         if (finalTeams.length === 0 && slots.length === 0) {
           gym.whereNull('team_id')
-        } else if (finalTeams.length !== 4) {
+        } else if (finalTeams.length === 4) {
+          gym.orWhereNotNull('team_id')
+        } else {
           if (finalTeams.length) {
             gym.orWhere((team) => {
               team.whereIn('team_id', finalTeams || [])
@@ -413,23 +415,13 @@ class Gym extends Model {
           if (!newGym.raid_pokemon_alignment) newGym.raid_pokemon_alignment = 0
           newGym.hasRaid = true
         }
-        const hasAllGymsEnabled =
-          onlyAllGyms ||
-          (onlyExEligible && newGym.ex_raid_eligible) ||
-          (onlyArEligible && newGym.ar_scan_eligible) ||
-          (onlyInBattle && newGym.in_battle)
-        const teamMatches =
-          finalTeams.includes(gym.team_id) ||
-          finalSlots[gym.team_id]?.includes(gym.available_slots)
-        const isUnknownOwnership =
-          gym.team_id === null && gym.available_slots === null
-
         if (
           (onlyAllGyms ||
             (onlyExEligible && newGym.ex_raid_eligible) ||
             (onlyArEligible && newGym.ar_scan_eligible) ||
             (onlyInBattle && newGym.in_battle)) &&
-          (teamMatches || (isUnknownOwnership && hasAllGymsEnabled))
+          (finalTeams.includes(gym.team_id) ||
+            finalSlots[gym.team_id]?.includes(gym.available_slots))
         ) {
           newGym.hasGym = true
         }
