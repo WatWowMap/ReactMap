@@ -377,6 +377,7 @@
   "ar_quest_true": "AR Task",
   "ar_quest_false": "No AR",
   "with_ar": "With AR",
+  "with_background": "with Background",
   "both": "Both",
   "without_ar": "Without AR",
   "shiny_probability": "Shiny rate: <0/>",
