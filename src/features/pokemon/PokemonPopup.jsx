@@ -264,7 +264,7 @@ export function PokemonPopup({ pokemon, iconUrl, isTutorial = false }) {
                   e.target.onerror = null
                   // @ts-ignore
                   e.target.src =
-                    'https://raw.githubusercontent.com//ReuschelCGN/wwm-uicons/main/background/0.png'
+                    'https://raw.githubusercontent.com/WatWowMap/wwm-uicons-webp/main/background/0.webp'
                 }}
               />
             </Grid>
