@@ -625,6 +625,8 @@
   "load": "Load",
   "update": "Update",
   "delete": "Delete",
+  "backup_error_generic": "Unable to create backup. Please try again.",
+  "backup_error_too_large": "Backup is too large to upload. Reduce its size and retry.",
   "name": "Name",
   "only_confirmed": "Only Confirmed",
   "only_exclude_grunts": "Exclude  Grunts",
