@@ -69,13 +69,15 @@ export function Footer({ options, role }) {
         borderTop: `1px solid ${theme.palette.divider}`,
       })}
     >
-      {options.map((button) => {
-        const key = button.key || button.name
+      {options.map((button, index) => {
+        const baseName = typeof button.name === 'string' ? button.name : null
+        const key =
+          button.key ?? (baseName ? `${baseName}-${index}` : `option-${index}`)
         const actualSize = button.size || Math.floor(12 / options.length)
         if (button.component) {
           return (
             <Grid
-              key={button.key}
+              key={key}
               xs={actualSize}
               style={{ textAlign: button.align || 'center' }}
             >
