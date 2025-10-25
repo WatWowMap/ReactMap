@@ -183,26 +183,55 @@ const state = {
   },
 }
 
-process.on('SIGINT', async (e) => {
-  await state.writeCache(e)
-  process.exit(0)
+const shutdownState = {
+  initiated: false,
+  exitCode: 0,
+  reason: /** @type {NodeJS.Signals | 'SIGPIPE' | 'SIGBREAK' | null} */ (null),
+}
+
+/**
+ * Flush caches once and terminate the process.
+ * @param {NodeJS.Signals | 'SIGPIPE' | 'SIGBREAK'} reason
+ * @param {number} [exitCode]
+ */
+const shutdown = (reason, exitCode = 0) => {
+  if (shutdownState.initiated) {
+    if (exitCode > shutdownState.exitCode) {
+      shutdownState.exitCode = exitCode
+      shutdownState.reason = reason
+      process.exitCode = exitCode
+    }
+    return
+  }
+  shutdownState.initiated = true
+  shutdownState.exitCode = exitCode
+  shutdownState.reason = reason
+  process.exitCode = exitCode
+  state
+    .writeCache(reason)
+    .catch((err) => log.error(TAGS.ReactMap, err))
+    .finally(() => process.exit(shutdownState.exitCode))
+}
+
+;['SIGINT', 'SIGTERM', 'SIGUSR1', 'SIGUSR2', 'SIGHUP'].forEach(
+  /** @param {NodeJS.Signals} signal */ (signal) => {
+    process.on(signal, () => shutdown(signal))
+  },
+)
+
+process.on('uncaughtException', (err) => {
+  log.error(TAGS.ReactMap, err)
+  shutdown('SIGBREAK', 99)
 })
-process.on('SIGTERM', async (e) => {
-  await state.writeCache(e)
-  process.exit(0)
-})
-process.on('SIGUSR1', async (e) => {
-  await state.writeCache(e)
-  process.exit(0)
-})
-process.on('SIGUSR2', async (e) => {
-  await state.writeCache(e)
-  process.exit(0)
-})
-process.on('uncaughtException', async (e) => {
-  log.error(TAGS.ReactMap, e)
-  await state.writeCache('SIGBREAK')
-  process.exit(99)
-})
+
+const handleStreamError = (err) => {
+  if (!err) return
+  if (err.code === 'EPIPE' || err.code === 'ERR_STREAM_DESTROYED') {
+    shutdown('SIGPIPE')
+  }
+}
+
+process.stdout?.on('error', handleStreamError)
+process.stderr?.on('error', handleStreamError)
 
 module.exports = { state }

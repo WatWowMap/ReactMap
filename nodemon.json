@@ -1,0 +1,11 @@
+{
+  "signal": "SIGTERM",
+  "watch": ["server/src/**/*.js", "config/default.json", "packages/**/*"],
+  "ignore": [
+    "server/src/configs/koji_backups/**",
+    "server/src/models/queries/**",
+    "packages/masterfile/lib/data/*",
+    "logs",
+    "server/.cache/**"
+  ]
+}
