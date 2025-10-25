@@ -68,7 +68,6 @@ const STATIC_PROPS =
     },
     PopperComponent,
     onChange: handleChange,
-    renderInput,
     renderOption,
     autoComplete: false,
     clearOnBlur: false,
@@ -83,18 +82,41 @@ export function Search() {
 
   const { t } = useTranslation()
 
+  /** @type {React.MutableRefObject<HTMLInputElement | null>} */
+  const inputRef = React.useRef(null)
+
   const search = useStorage((s) => s.search)
   const isMobile = useMemory((s) => s.isMobile)
   const open = useLayoutStore((s) => s.search)
 
   const { loading, options, handleInputChange } = useSendSearch(search, open)
 
+  const handleDialogEntered = React.useCallback(() => {
+    if (inputRef.current) {
+      inputRef.current.focus()
+    }
+  }, [])
+
+  React.useEffect(() => {
+    if (!open) {
+      return undefined
+    }
+    const frame = requestAnimationFrame(() => {
+      if (inputRef.current) {
+        inputRef.current.focus()
+      }
+    })
+    return () => cancelAnimationFrame(frame)
+  }, [open])
+
   return (
     <Dialog
       fullScreen={isMobile}
       open={open}
       onClose={handleClose}
+      disableAutoFocus
       sx={DIALOG_SX}
+      TransitionProps={{ onEntered: handleDialogEntered }}
     >
       <Box width={BOX_WIDTH}>
         <Header titles="search" action={handleClose} />
@@ -106,6 +128,7 @@ export function Search() {
           loading={loading}
           loadingText={t('searching')}
           noOptionsText={t('no_options')}
+          renderInput={(params) => renderInput(params, inputRef)}
           {...STATIC_PROPS}
         />
       </Box>
