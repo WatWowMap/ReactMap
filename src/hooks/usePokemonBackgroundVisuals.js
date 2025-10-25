@@ -19,6 +19,12 @@ import { useMemory } from '@store/useMemory'
  *  iconShadow: string
  *  heartBackground: string
  *  heartShadow: string
+ *  styles: {
+ *    surface: import('react').CSSProperties
+ *    primaryText: import('react').CSSProperties
+ *    secondaryText: import('react').CSSProperties
+ *    icon: import('react').CSSProperties
+ *  }
  *  backgroundMeta?: {
  *    id: number
  *    tooltip: string
@@ -102,6 +108,33 @@ export function usePokemonBackgroundVisuals() {
         backgroundId && (typeLabel || fallbackTypeLabel || defaultTypeLabel)
           ? `${typeLabel || fallbackTypeLabel || defaultTypeLabel}: ${nameLabel} (${backgroundId})`
           : ''
+      const surfaceBackgroundStyles =
+        hasBackground && backgroundUrl
+          ? {
+              backgroundImage: `url(${backgroundUrl})`,
+              backgroundSize: '100% auto',
+              backgroundRepeat: 'no-repeat',
+              backgroundPosition: 'top center',
+              backgroundColor: '#000',
+            }
+          : undefined
+      const styles = {
+        surface: {
+          color: primaryColor,
+          ...(surfaceBackgroundStyles || {}),
+        },
+        primaryText: {
+          color: primaryColor,
+          textShadow: primaryTextShadow,
+        },
+        secondaryText: {
+          color: secondaryColor,
+          textShadow: secondaryTextShadow,
+        },
+        icon: {
+          filter: hasBackground ? iconShadow : 'none',
+        },
+      }
 
       return {
         backgroundId,
@@ -121,6 +154,7 @@ export function usePokemonBackgroundVisuals() {
         heartShadow: hasBackground
           ? 'drop-shadow(0 0 2px #000)'
           : 'drop-shadow(0 0 1px #0008)',
+        styles,
         backgroundMeta:
           backgroundId && backgroundDescription
             ? {

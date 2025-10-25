@@ -202,35 +202,18 @@ function DefendersModal({ gym, onClose }) {
           )
         : Icons.getPokemon?.(gym.guarding_pokemon_id))
 
-    const {
-      borderColor: fallbackBorderColor,
-      primaryColor: fallbackPrimaryColor,
-      hasBackground: fallbackHasBackground,
-      backgroundUrl: fallbackBackgroundUrl,
-      secondaryColor: fallbackSecondaryColor,
-      primaryTextShadow: fallbackPrimaryTextShadow,
-      secondaryTextShadow: fallbackSecondaryTextShadow,
-      iconShadow: fallbackIconShadow,
-    } = fallbackVisuals
+    const { borderColor: fallbackBorderColor, styles: fallbackStyles } =
+      fallbackVisuals
     const row = (
       <div
         style={{
+          ...fallbackStyles.surface,
           display: 'flex',
           alignItems: 'center',
           minHeight: 80,
           width: '100%',
           padding: '8px 0',
           borderBottom: `1px solid ${fallbackBorderColor}`,
-          color: fallbackPrimaryColor,
-          ...(fallbackHasBackground && fallbackBackgroundUrl
-            ? {
-                backgroundImage: `url(${fallbackBackgroundUrl})`,
-                backgroundSize: '100% auto',
-                backgroundRepeat: 'no-repeat',
-                backgroundPosition: 'top center',
-                backgroundColor: '#000',
-              }
-            : {}),
         }}
         aria-label={fallbackBackgroundMeta?.tooltip || undefined}
       >
@@ -263,13 +246,13 @@ function DefendersModal({ gym, onClose }) {
               src={Icons.getMisc('bestbuddy')}
               alt={t('best_buddy')}
               style={{
+                ...fallbackStyles.icon,
                 position: 'absolute',
                 top: 0,
                 right: 0,
                 maxHeight: 15,
                 maxWidth: 15,
                 zIndex: 2,
-                filter: fallbackHasBackground ? fallbackIconShadow : 'none',
               }}
             />
           )}
@@ -289,12 +272,12 @@ function DefendersModal({ gym, onClose }) {
         >
           <div
             style={{
+              ...fallbackStyles.primaryText,
               fontSize: 16,
               fontWeight: 700,
               whiteSpace: 'normal',
               wordBreak: 'break-word',
               maxWidth: '100%',
-              textShadow: fallbackPrimaryTextShadow,
             }}
             title={t(`poke_${gym.guarding_pokemon_id}`)}
           >
@@ -303,11 +286,11 @@ function DefendersModal({ gym, onClose }) {
                 src={Icons.getMisc('bestbuddy')}
                 alt={t('best_buddy')}
                 style={{
+                  ...fallbackStyles.icon,
                   maxHeight: 15,
                   maxWidth: 15,
                   marginRight: 4,
                   verticalAlign: 'middle',
-                  filter: fallbackHasBackground ? fallbackIconShadow : 'none',
                 }}
               />
             )}
@@ -316,9 +299,8 @@ function DefendersModal({ gym, onClose }) {
 
           <div
             style={{
+              ...fallbackStyles.secondaryText,
               fontSize: 13,
-              color: fallbackSecondaryColor,
-              textShadow: fallbackSecondaryTextShadow,
             }}
           >
             {gym.total_cp &&
@@ -415,38 +397,26 @@ function DefendersModal({ gym, onClose }) {
               const {
                 borderColor,
                 primaryColor,
-                hasBackground,
-                backgroundUrl,
-                secondaryColor,
                 heartShadow,
                 heartBackground,
                 backgroundMeta,
-                primaryTextShadow,
-                secondaryTextShadow,
-                iconShadow,
+                styles: defenderStyles,
               } = visuals
+              const { surface, primaryText, secondaryText, icon } =
+                defenderStyles
               const rowKey = def.pokemon_id
                 ? `${def.pokemon_id}-${index}`
                 : `${index}`
               const defenderRow = (
                 <div
                   style={{
+                    ...surface,
                     display: 'flex',
                     alignItems: 'center',
                     minHeight: 80,
                     width: '100%',
                     padding: '8px 0',
                     borderBottom: `1px solid ${borderColor}`,
-                    color: primaryColor,
-                    ...(hasBackground && backgroundUrl
-                      ? {
-                          backgroundImage: `url(${backgroundUrl})`,
-                          backgroundSize: '100% auto',
-                          backgroundRepeat: 'no-repeat',
-                          backgroundPosition: 'top center',
-                          backgroundColor: '#000',
-                        }
-                      : {}),
                   }}
                   aria-label={backgroundMeta?.tooltip || undefined}
                 >
@@ -477,13 +447,13 @@ function DefendersModal({ gym, onClose }) {
                         src={Icons.getMisc('bestbuddy')}
                         alt={t('best_buddy')}
                         style={{
+                          ...icon,
                           position: 'absolute',
                           top: 0,
                           right: 0,
                           maxHeight: 15,
                           maxWidth: 15,
                           zIndex: 2,
-                          filter: hasBackground ? iconShadow : 'none',
                         }}
                       />
                     )}
@@ -504,12 +474,12 @@ function DefendersModal({ gym, onClose }) {
                     {/* First line: Pokemon name CP{currentCP}/{fullCP} */}
                     <div
                       style={{
+                        ...primaryText,
                         fontSize: 16,
                         fontWeight: 700,
                         whiteSpace: 'normal',
                         wordBreak: 'break-word',
                         maxWidth: '100%',
-                        textShadow: primaryTextShadow,
                       }}
                       title={`${t(`poke_${def.pokemon_id}`)} CP${currentCP}/${fullCP}`}
                     >
@@ -522,7 +492,6 @@ function DefendersModal({ gym, onClose }) {
                         alignItems: 'center',
                         gap: '8px',
                         fontSize: 13,
-                        color: secondaryColor,
                       }}
                     >
                       <div
@@ -534,11 +503,12 @@ function DefendersModal({ gym, onClose }) {
                       >
                         <EmojiEventsIcon
                           style={{
+                            ...icon,
                             fontSize: 16,
-                            filter: hasBackground ? iconShadow : 'none',
+                            color: secondaryText.color,
                           }}
                         />
-                        <span style={{ textShadow: secondaryTextShadow }}>
+                        <span style={secondaryText}>
                           {def.battles_won || 0}
                         </span>
                       </div>
@@ -551,11 +521,12 @@ function DefendersModal({ gym, onClose }) {
                       >
                         <SentimentVeryDissatisfiedIcon
                           style={{
+                            ...icon,
                             fontSize: 16,
-                            filter: hasBackground ? iconShadow : 'none',
+                            color: secondaryText.color,
                           }}
                         />
-                        <span style={{ textShadow: secondaryTextShadow }}>
+                        <span style={secondaryText}>
                           {def.battles_lost || 0}
                         </span>
                       </div>
@@ -568,21 +539,19 @@ function DefendersModal({ gym, onClose }) {
                       >
                         <RestaurantIcon
                           style={{
+                            ...icon,
                             fontSize: 16,
-                            filter: hasBackground ? iconShadow : 'none',
+                            color: secondaryText.color,
                           }}
                         />
-                        <span style={{ textShadow: secondaryTextShadow }}>
-                          {def.times_fed || 0}
-                        </span>
+                        <span style={secondaryText}>{def.times_fed || 0}</span>
                       </div>
                     </div>
 
                     <div
                       style={{
+                        ...secondaryText,
                         fontSize: 13,
-                        color: secondaryColor,
-                        textShadow: secondaryTextShadow,
                       }}
                     >
                       CP{currentCP}/{fullCP}{' '}

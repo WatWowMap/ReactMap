@@ -918,14 +918,8 @@ const ShowcaseEntry = ({
     () => getPokemonBackgroundVisuals(background),
     [background, getPokemonBackgroundVisuals],
   )
-  const {
-    hasBackground,
-    backgroundUrl,
-    primaryColor,
-    primaryTextShadow,
-    secondaryTextShadow,
-    backgroundMeta,
-  } = visuals
+  const { hasBackground, backgroundUrl, backgroundMeta, styles } = visuals
+  const { primaryText, secondaryText } = styles
 
   const entry = (
     <div
@@ -942,8 +936,7 @@ const ShowcaseEntry = ({
         <div
           className="showcase-entry-col showcase-entry-rank"
           style={{
-            color: hasBackground ? '#fff' : primaryColor,
-            textShadow: primaryTextShadow,
+            ...primaryText,
           }}
         >
           <img src={Icons.getMisc(getBadge(rank))} alt="rank" height={20} />
@@ -951,8 +944,8 @@ const ShowcaseEntry = ({
         <div
           className="showcase-entry-col showcase-entry-score"
           style={{
-            color: hasBackground ? '#fff' : primaryColor,
-            textShadow: hasBackground ? secondaryTextShadow : primaryTextShadow,
+            ...primaryText,
+            ...(hasBackground ? { textShadow: secondaryText.textShadow } : {}),
           }}
         >
           {score.toFixed(2)}
@@ -960,8 +953,7 @@ const ShowcaseEntry = ({
         <div
           className="showcase-entry-col showcase-entry-pokemon"
           style={{
-            color: hasBackground ? '#fff' : primaryColor,
-            textShadow: primaryTextShadow,
+            ...primaryText,
           }}
         >
           {pokemon_id ? (
