@@ -1,3 +1,12 @@
+# [1.40.0-develop.18](https://github.com/WatWowMap/ReactMap/compare/v1.40.0-develop.17...v1.40.0-develop.18) (2025-10-25)
+
+
+### Bug Fixes
+
+* apply to all should flip global ([5c23140](https://github.com/WatWowMap/ReactMap/commit/5c23140b0809221b86854cab76c1ae529c7d6a98))
+* backup error handling ([c6585e6](https://github.com/WatWowMap/ReactMap/commit/c6585e64ee9bdbb7b0317ed60937651e1ca5f0f9))
+* dup keys ([91f1f58](https://github.com/WatWowMap/ReactMap/commit/91f1f58dfd3e40ee4689fe49724db6b43f6a6c30))
+
 # [1.40.0-develop.17](https://github.com/WatWowMap/ReactMap/compare/v1.40.0-develop.16...v1.40.0-develop.17) (2025-10-17)
 
 
