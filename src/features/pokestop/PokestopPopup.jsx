@@ -949,7 +949,7 @@ const ShowcaseEntry = ({
           <img src={Icons.getMisc(getBadge(rank))} alt="rank" height={20} />
         </div>
         <div
-          className="showcase-entry-col"
+          className="showcase-entry-col showcase-entry-score"
           style={{
             color: hasBackground ? '#fff' : primaryColor,
             textShadow: hasBackground ? secondaryTextShadow : primaryTextShadow,
@@ -958,35 +958,33 @@ const ShowcaseEntry = ({
           {score.toFixed(2)}
         </div>
         <div
-          className="showcase-entry-col"
+          className="showcase-entry-col showcase-entry-pokemon"
           style={{
             color: hasBackground ? '#fff' : primaryColor,
             textShadow: primaryTextShadow,
           }}
         >
           {pokemon_id ? (
-            <>
-              <img
-                src={Icons.getPokemonByDisplay(pokemon_id, {
-                  ...display,
-                  badge,
-                  background,
-                })}
-                alt={t(`poke_${pokemon_id}`)}
-                height={20}
-              />
+            <div className="showcase-entry-pokemon-inner">
+              <div className="showcase-entry-pokemon-icon">
+                <Img
+                  src={Icons.getPokemonByDisplay(pokemon_id, {
+                    ...display,
+                    badge,
+                    background,
+                  })}
+                  alt={t(`poke_${pokemon_id}`)}
+                />
+              </div>
               {badge === 1 && (
                 <Img
                   src={Icons.getMisc('bestbuddy')}
                   alt={t('best_buddy')}
                   maxHeight={15}
                   maxWidth={15}
-                  style={{
-                    marginLeft: 4,
-                  }}
                 />
               )}
-            </>
+            </div>
           ) : null}
         </div>
       </div>
