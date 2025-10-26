@@ -524,7 +524,6 @@ const RewardInfo = ({ with_ar, styles, ...quest }) => {
   const { src, amount, tt } = getRewardInfo(quest)
   const questMessage = useMemory((s) => s.config.misc.questMessage)
   const primaryTextStyle = styles?.primaryText
-  const secondaryTextStyle = styles?.secondaryText || styles?.primaryText
 
   const labelKeys = Array.isArray(tt) ? tt.filter(Boolean) : tt ? [tt] : []
   const translatedLabel = labelKeys.length
@@ -594,7 +593,7 @@ const RewardInfo = ({ with_ar, styles, ...quest }) => {
         variant="caption"
         className="ar-task"
         noWrap
-        style={secondaryTextStyle || primaryTextStyle}
+        style={primaryTextStyle}
       >
         {questMessage || t(`ar_quest_${!!with_ar}`)}
       </Typography>
