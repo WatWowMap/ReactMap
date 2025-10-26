@@ -113,39 +113,23 @@ export function PokestopPopup({
               />
               {hasQuest &&
                 // eslint-disable-next-line no-unused-vars
-                pokestop.quests.map(({ key, ...quest }, index) => (
-                  <React.Fragment key={`${quest.with_ar}`}>
-                    {index ? (
-                      <Divider light flexItem className="popup-divider" />
-                    ) : null}
-                    <RewardInfo {...quest} />
-                    <Grid
-                      xs={9}
-                      style={{
-                        textAlign: 'center',
-                        maxHeight: 150,
-                        overflow: 'auto',
-                      }}
-                    >
-                      <QuestConditions {...quest} />
-                      {!!quest.quest_shiny_probability && (
-                        <>
-                          <br />
-                          <Typography variant="caption">
-                            <Trans
-                              i18nKey="shiny_probability"
-                              components={[
-                                readableProbability(
-                                  quest.quest_shiny_probability,
-                                ),
-                              ]}
-                            />
-                          </Typography>
-                        </>
-                      )}
-                    </Grid>
-                  </React.Fragment>
-                ))}
+                pokestop.quests.map(({ key, ...quest }, index) => {
+                  const isBackgroundReward = quest.quest_reward_type === 7
+                  const previousWasBackground =
+                    index > 0 &&
+                    pokestop.quests[index - 1]?.quest_reward_type === 7
+                  const showDivider =
+                    index && !isBackgroundReward && !previousWasBackground
+
+                  return (
+                    <React.Fragment key={`${quest.with_ar}`}>
+                      {showDivider ? (
+                        <Divider light flexItem className="popup-divider" />
+                      ) : null}
+                      <QuestRewardRow quest={quest} />
+                    </React.Fragment>
+                  )
+                })}
               {hasLure && (
                 <>
                   {hasQuest && (
@@ -525,13 +509,22 @@ const MenuActions = ({
 
 /**
  *
- * @param {Omit<import('@rm/types').Quest, 'key'>} props
+ * @param {{
+ *  with_ar: boolean
+ *  styles?: {
+ *    primaryText?: React.CSSProperties
+ *    secondaryText?: React.CSSProperties
+ *    icon?: React.CSSProperties
+ *  }
+ * } & Omit<import('@rm/types').Quest, 'key'>} props
  * @returns
  */
-const RewardInfo = ({ with_ar, ...quest }) => {
+const RewardInfo = ({ with_ar, styles, ...quest }) => {
   const { t } = useTranslation()
   const { src, amount, tt } = getRewardInfo(quest)
   const questMessage = useMemory((s) => s.config.misc.questMessage)
+  const primaryTextStyle = styles?.primaryText
+  const secondaryTextStyle = styles?.secondaryText || styles?.primaryText
 
   const labelKeys = Array.isArray(tt) ? tt.filter(Boolean) : tt ? [tt] : []
   const translatedLabel = labelKeys.length
@@ -559,11 +552,22 @@ const RewardInfo = ({ with_ar, ...quest }) => {
   const altText = altAmount > 0 ? `${altLabel} x${altAmount}` : altLabel
 
   return (
-    <Grid xs={3} style={{ textAlign: 'center', position: 'relative' }}>
+    <div
+      style={{
+        flex: '0 0 calc(100% * 3 / 12)',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        textAlign: 'center',
+        position: 'relative',
+        gap: 4,
+      }}
+    >
       <NameTT title={altText}>
         <img
           src={src}
-          style={{ maxWidth: 35, maxHeight: 35 }}
+          style={{ maxWidth: 35, maxHeight: 35, filter: 'none' }}
           alt={altText}
           onError={(e) => {
             // @ts-ignore
@@ -577,21 +581,122 @@ const RewardInfo = ({ with_ar, ...quest }) => {
       {!!amount && (
         <div
           className="search-amount-holder"
-          style={{ fontSize: 'medium', bottom: 20 }}
+          style={{
+            fontSize: 'medium',
+            bottom: 20,
+            ...(primaryTextStyle || {}),
+          }}
         >
           x{amount}
         </div>
       )}
-      <Typography variant="caption" className="ar-task" noWrap>
+      <Typography
+        variant="caption"
+        className="ar-task"
+        noWrap
+        style={secondaryTextStyle || primaryTextStyle}
+      >
         {questMessage || t(`ar_quest_${!!with_ar}`)}
       </Typography>
-    </Grid>
+    </div>
   )
 }
 
 /**
  *
+ * @param {{ quest: Omit<import('@rm/types').Quest, 'key'> }} param0
+ * @returns
+ */
+const QuestRewardRow = ({ quest }) => {
+  const { quest_reward_type, quest_background, quest_shiny_probability } = quest
+  const getPokemonBackgroundVisuals = usePokemonBackgroundVisuals()
+  const visuals = React.useMemo(
+    () =>
+      getPokemonBackgroundVisuals(
+        quest_reward_type === 7 ? quest_background : 0,
+      ),
+    [getPokemonBackgroundVisuals, quest_background, quest_reward_type],
+  )
+  const { styles, backgroundMeta } = visuals
+  const { surface, primaryText, secondaryText } = styles
+  const applyBackground = quest_reward_type === 7
+  const rowStyle = applyBackground
+    ? {
+        display: 'flex',
+        alignItems: 'center',
+        gap: 0,
+        width: 'calc(100% + 43px)',
+        marginLeft: '-21px',
+        marginRight: '-22px',
+        padding: '0 22px 0 21px',
+        border: 'none',
+        borderRadius: 0,
+        boxShadow: 'none',
+        ...surface,
+      }
+    : {
+        display: 'flex',
+        alignItems: 'center',
+        gap: 0,
+        width: '100%',
+        padding: 0,
+      }
+
+  const rowContent = (
+    <div style={rowStyle}>
+      <RewardInfo {...quest} styles={{ primaryText, secondaryText }} />
+      <div
+        style={{
+          flex: '1 1 0',
+          textAlign: 'center',
+          maxHeight: 150,
+          overflow: 'auto',
+          padding: 0,
+        }}
+      >
+        <QuestConditions
+          {...quest}
+          primaryTextStyle={primaryText}
+          secondaryTextStyle={secondaryText}
+        />
+        {!!quest_shiny_probability && (
+          <>
+            <br />
+            <Typography variant="caption" style={secondaryText}>
+              <Trans
+                i18nKey="shiny_probability"
+                components={[readableProbability(quest_shiny_probability)]}
+              />
+            </Typography>
+          </>
+        )}
+      </div>
+    </div>
+  )
+
+  if (applyBackground && backgroundMeta?.tooltip) {
+    return (
+      <Grid xs={12}>
+        <Tooltip
+          title={backgroundMeta.tooltip}
+          arrow
+          enterTouchDelay={0}
+          placement="top"
+        >
+          <div style={{ width: '100%' }}>{rowContent}</div>
+        </Tooltip>
+      </Grid>
+    )
+  }
+
+  return <Grid xs={12}>{rowContent}</Grid>
+}
+
+/**
+ *
  * @param {Omit<import('@rm/types').Quest, 'key'>} props
+ * @param {React.CSSProperties} [props.primaryTextStyle]
+ * @param {React.CSSProperties} [props.secondaryTextStyle]
  * @returns
  */
 const QuestConditions = ({
@@ -600,19 +705,27 @@ const QuestConditions = ({
   quest_target,
   quest_conditions,
   quest_title,
+  primaryTextStyle,
+  secondaryTextStyle,
 }) => {
   const { i18n, t } = useTranslation()
   const madQuestText = useStorage((s) => s.userSettings.pokestops.madQuestText)
+  const primaryStyle = primaryTextStyle || {}
+  const secondaryStyle = secondaryTextStyle || primaryStyle
 
   if (madQuestText && quest_task) {
-    return <Typography variant="caption">{quest_task}</Typography>
+    return (
+      <Typography variant="caption" style={primaryStyle}>
+        {quest_task}
+      </Typography>
+    )
   }
 
   if (quest_title && !quest_title.includes('geotarget')) {
     const normalized = `quest_title_${quest_title.toLowerCase()}`
     if (i18n.exists(normalized)) {
       return (
-        <Typography variant="caption">
+        <Typography variant="caption" style={primaryStyle}>
           <Trans i18nKey={normalized}>{{ amount_0: quest_target }}</Trans>
         </Typography>
       )
@@ -621,7 +734,7 @@ const QuestConditions = ({
 
   const [type1, type2] = parseQuestConditions(quest_conditions)
   const primaryCondition = (
-    <Typography variant="caption">
+    <Typography variant="caption" style={primaryStyle}>
       <Trans i18nKey={`quest_${quest_type}`}>{{ amount: quest_target }}</Trans>
     </Typography>
   )
@@ -691,7 +804,7 @@ const QuestConditions = ({
       {type1 && (
         <>
           <br />
-          <Typography variant="caption">
+          <Typography variant="caption" style={secondaryStyle}>
             {getQuestConditions(type1.type, type1.info)}
           </Typography>
         </>
@@ -699,7 +812,7 @@ const QuestConditions = ({
       {type2 && (
         <>
           <br />
-          <Typography variant="caption">
+          <Typography variant="caption" style={secondaryStyle}>
             {getQuestConditions(type2.type, type2.info)}
           </Typography>
         </>

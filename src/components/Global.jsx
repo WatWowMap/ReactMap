@@ -110,7 +110,7 @@ function ApplyGlobal() {
             borderRadius: '12px',
             padding: '3px',
             fontSize: '0.5rem !important',
-            backgroundColor: theme.palette.grey[grey],
+            backgroundColor: 'transparent',
             color: theme.palette.text.primary,
           },
           '.iv-badge': {
