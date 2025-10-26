@@ -1,3 +1,10 @@
+# [1.40.0-develop.19](https://github.com/WatWowMap/ReactMap/compare/v1.40.0-develop.18...v1.40.0-develop.19) (2025-10-26)
+
+
+### Features
+
+* search auto focus ([29f1cef](https://github.com/WatWowMap/ReactMap/commit/29f1cefd59203a197b719a5b61f12ae99f0e8099))
+
 # [1.40.0-develop.18](https://github.com/WatWowMap/ReactMap/compare/v1.40.0-develop.17...v1.40.0-develop.18) (2025-10-25)
 
 
