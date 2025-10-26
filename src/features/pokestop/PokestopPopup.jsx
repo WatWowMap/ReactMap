@@ -65,6 +65,18 @@ export function PokestopPopup({
     'Pokestop',
   )
 
+  const getPokemonBackgroundVisuals = usePokemonBackgroundVisuals()
+  const questVisuals = React.useMemo(() => {
+    if (!Array.isArray(pokestop.quests)) {
+      return []
+    }
+    return pokestop.quests.map((quest) =>
+      quest.quest_reward_type === 7
+        ? getPokemonBackgroundVisuals(quest.quest_background)
+        : undefined,
+    )
+  }, [getPokemonBackgroundVisuals, pokestop.quests])
+
   const plainPokestop = !hasLure && !hasQuest && !hasInvasion && !hasEvent
 
   return (
@@ -114,19 +126,29 @@ export function PokestopPopup({
               {hasQuest &&
                 // eslint-disable-next-line no-unused-vars
                 pokestop.quests.map(({ key, ...quest }, index) => {
-                  const isBackgroundReward = quest.quest_reward_type === 7
-                  const previousWasBackground =
-                    index > 0 &&
-                    pokestop.quests[index - 1]?.quest_reward_type === 7
+                  const visuals =
+                    questVisuals[index] ||
+                    (quest.quest_reward_type === 7
+                      ? getPokemonBackgroundVisuals(quest.quest_background)
+                      : undefined)
+                  const hasBackground = Boolean(visuals?.hasBackground)
+                  const previousHasBackground =
+                    index > 0
+                      ? Boolean(questVisuals[index - 1]?.hasBackground)
+                      : false
                   const showDivider =
-                    index && !isBackgroundReward && !previousWasBackground
+                    index && !(hasBackground || previousHasBackground)
 
                   return (
                     <React.Fragment key={`${quest.with_ar}`}>
                       {showDivider ? (
                         <Divider light flexItem className="popup-divider" />
                       ) : null}
-                      <QuestRewardRow quest={quest} />
+                      <QuestRewardRow
+                        quest={quest}
+                        visuals={visuals}
+                        hasBackground={hasBackground}
+                      />
                     </React.Fragment>
                   )
                 })}
@@ -603,22 +625,41 @@ const RewardInfo = ({ with_ar, styles, ...quest }) => {
 
 /**
  *
- * @param {{ quest: Omit<import('@rm/types').Quest, 'key'> }} param0
+ * @param {{
+ *  quest: Omit<import('@rm/types').Quest, 'key'>
+ *  visuals?: ReturnType<ReturnType<typeof usePokemonBackgroundVisuals>>
+ *  hasBackground?: boolean
+ * }} props
  * @returns
  */
-const QuestRewardRow = ({ quest }) => {
+const QuestRewardRow = ({ quest, visuals: visualsProp, hasBackground }) => {
   const { quest_reward_type, quest_background, quest_shiny_probability } = quest
   const getPokemonBackgroundVisuals = usePokemonBackgroundVisuals()
   const visuals = React.useMemo(
     () =>
+      visualsProp ||
       getPokemonBackgroundVisuals(
         quest_reward_type === 7 ? quest_background : 0,
       ),
-    [getPokemonBackgroundVisuals, quest_background, quest_reward_type],
+    [
+      visualsProp,
+      getPokemonBackgroundVisuals,
+      quest_background,
+      quest_reward_type,
+    ],
   )
-  const { styles, backgroundMeta } = visuals
-  const { surface, primaryText, secondaryText } = styles
-  const applyBackground = quest_reward_type === 7
+  const resolvedHasBackground = hasBackground ?? visuals?.hasBackground ?? false
+  const { styles, backgroundMeta } = visuals || {}
+  const surface = styles?.surface || {}
+  const primaryText = styles?.primaryText || {}
+  const secondaryText = styles?.secondaryText || {}
+  const icon = styles?.icon || {}
+  const applyBackground = quest_reward_type === 7 && resolvedHasBackground
+  const rewardStyles = applyBackground
+    ? { primaryText, secondaryText, icon }
+    : undefined
+  const primaryConditionStyle = applyBackground ? primaryText : undefined
+  const secondaryConditionStyle = applyBackground ? secondaryText : undefined
   const rowStyle = applyBackground
     ? {
         display: 'flex',
@@ -643,7 +684,7 @@ const QuestRewardRow = ({ quest }) => {
 
   const rowContent = (
     <div style={rowStyle}>
-      <RewardInfo {...quest} styles={{ primaryText, secondaryText }} />
+      <RewardInfo {...quest} styles={rewardStyles} />
       <div
         style={{
           flex: '1 1 0',
@@ -655,13 +696,13 @@ const QuestRewardRow = ({ quest }) => {
       >
         <QuestConditions
           {...quest}
-          primaryTextStyle={primaryText}
-          secondaryTextStyle={secondaryText}
+          primaryTextStyle={primaryConditionStyle}
+          secondaryTextStyle={secondaryConditionStyle}
         />
         {!!quest_shiny_probability && (
           <>
             <br />
-            <Typography variant="caption" style={secondaryText}>
+            <Typography variant="caption" style={secondaryConditionStyle}>
               <Trans
                 i18nKey="shiny_probability"
                 components={[readableProbability(quest_shiny_probability)]}
