@@ -57,20 +57,30 @@ export function usePokemonBackgroundVisuals() {
         backgroundUrl
       const card = backgroundId ? locationCards?.[backgroundId] : undefined
       const defaultTypeLabel = t('filter_label_location_card')
+      const hasCard = Boolean(card)
+      const fallbackTypeLabel =
+        hasCard && card?.cardType
+          ? card.cardType.replace(/_/g, ' ')
+          : defaultTypeLabel
       const typeKey =
-        card?.cardType === 'SPECIAL_BACKGROUND'
+        hasCard && card?.cardType === 'SPECIAL_BACKGROUND'
           ? 'special_background_filter_header'
           : 'filter_label_location_card'
-      const fallbackTypeLabel = card?.cardType
-        ? card.cardType.replace(/_/g, ' ')
-        : defaultTypeLabel
-      const typeLabel = backgroundId
-        ? t(typeKey, {
-            defaultValue: fallbackTypeLabel || defaultTypeLabel,
-          })
-        : ''
+      const unknownBackgroundLabel =
+        backgroundId && !hasCard
+          ? t('unknown_background_with_id', {
+              id: backgroundId,
+              defaultValue: `Unknown Background #${backgroundId}`,
+            })
+          : ''
+      let typeLabel = ''
+      if (backgroundId && hasCard) {
+        typeLabel = t(typeKey, {
+          defaultValue: fallbackTypeLabel || defaultTypeLabel,
+        })
+      }
       let nameLabel = card?.formatted ?? ''
-      if (card?.proto) {
+      if (hasCard && card?.proto) {
         const normalizedProto = card.proto.toLowerCase()
         const candidateKeys = [card.proto, normalizedProto]
         if (typeof i18n.exists === 'function') {
@@ -83,12 +93,17 @@ export function usePokemonBackgroundVisuals() {
           })
         }
       }
-      if (!nameLabel) {
-        nameLabel = card?.proto
-          ? card.proto.replace(/^LC_/, '').replace(/_/g, ' ')
-          : backgroundId
-            ? `#${backgroundId}`
-            : ''
+      if (hasCard) {
+        if (!nameLabel) {
+          nameLabel = card?.proto
+            ? card.proto.replace(/^LC_/, '').replace(/_/g, ' ')
+            : backgroundId
+              ? `#${backgroundId}`
+              : ''
+        }
+      } else if (backgroundId) {
+        nameLabel =
+          unknownBackgroundLabel || `Unknown Background #${backgroundId}`
       }
       const primaryColor = hasBackground ? '#fff' : theme.palette.text.primary
       const secondaryColor = hasBackground
@@ -104,10 +119,18 @@ export function usePokemonBackgroundVisuals() {
       const iconShadow = hasBackground
         ? 'drop-shadow(0 0 3px rgba(0, 0, 0, 0.75))'
         : 'none'
-      const backgroundDescription =
-        backgroundId && (typeLabel || fallbackTypeLabel || defaultTypeLabel)
-          ? `${typeLabel || fallbackTypeLabel || defaultTypeLabel}: ${nameLabel} (${backgroundId})`
-          : ''
+      let backgroundDescription = ''
+      if (backgroundId) {
+        if (hasCard) {
+          const descriptionLabel =
+            typeLabel || fallbackTypeLabel || defaultTypeLabel
+          const descriptionName =
+            nameLabel || (backgroundId ? `#${backgroundId}` : '')
+          backgroundDescription = `${descriptionLabel}: ${descriptionName} (${backgroundId})`
+        } else {
+          backgroundDescription = nameLabel
+        }
+      }
       const surfaceBackgroundStyles =
         hasBackground && backgroundUrl
           ? {
@@ -160,7 +183,9 @@ export function usePokemonBackgroundVisuals() {
             ? {
                 id: backgroundId,
                 tooltip: backgroundDescription,
-                typeLabel: typeLabel || fallbackTypeLabel || defaultTypeLabel,
+                typeLabel: hasCard
+                  ? typeLabel || fallbackTypeLabel || defaultTypeLabel
+                  : '',
                 nameLabel,
               }
             : undefined,
