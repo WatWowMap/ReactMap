@@ -17,6 +17,7 @@ const core = gql`
     updated
     display_pokemon_id
     seen_type
+    background
   }
 `
 

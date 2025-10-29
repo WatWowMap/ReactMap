@@ -1,7 +1,6 @@
 // @ts-check
 import * as React from 'react'
 import SvgIcon from '@mui/material/SvgIcon'
-import useTheme from '@mui/material/styles/useTheme'
 
 const PATH = {
   0: '',
@@ -12,11 +11,9 @@ const PATH = {
 
 /** @param {{ gender: keyof typeof PATH } & import('@mui/material').SvgIconProps} props */
 export function GenderIcon({ gender, ...props }) {
-  const theme = useTheme()
-
   return (
     <SvgIcon fontSize={gender === 3 ? 'small' : 'medium'} {...props}>
-      <path d={PATH[gender]} fill={theme.palette.text.primary} />
+      <path d={PATH[gender]} />
     </SvgIcon>
   )
 }

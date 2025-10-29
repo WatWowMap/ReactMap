@@ -30,6 +30,8 @@ import { StatusIcon } from '@components/StatusIcon'
 import { readableProbability } from '@utils/readableProbability'
 import { GET_POKEMON_SHINY_STATS } from '@services/queries/pokemon'
 import { GET_TAPPABLE_BY_ID } from '@services/queries/tappable'
+import { usePokemonBackgroundVisuals } from '@hooks/usePokemonBackgroundVisuals'
+import { BackgroundThemeProvider } from '@components/popups/BackgroundThemeProvider'
 
 const rowClass = { width: 30, fontWeight: 'bold' }
 
@@ -86,6 +88,13 @@ export function PokemonPopup({ pokemon, iconUrl, isTutorial = false }) {
   const timeOfDay = useMemory((s) => s.timeOfDay)
   const metaData = useMemory((s) => s.masterfile.pokemon[pokemon_id])
   const Icons = useMemory((s) => s.Icons)
+  const getPokemonBackgroundVisuals = usePokemonBackgroundVisuals()
+  const backgroundVisuals = React.useMemo(
+    () => getPokemonBackgroundVisuals(pokemon.background),
+    [getPokemonBackgroundVisuals, pokemon.background],
+  )
+  const hasBackground = Boolean(backgroundVisuals?.hasBackground)
+  const backgroundTooltip = backgroundVisuals?.backgroundMeta?.tooltip
 
   const userSettings = useStorage((s) => s.userSettings.pokemon)
   const pokePerms = isTutorial
@@ -216,98 +225,121 @@ export function PokemonPopup({ pokemon, iconUrl, isTutorial = false }) {
     'Pokemon',
   )
 
-  return (
-    <ErrorBoundary noRefresh style={{}} variant="h5">
-      <Grid
-        container
-        style={{ width: 200 }}
-        alignItems="center"
-        justifyContent="center"
-        spacing={1}
-      >
-        <Header
-          pokemon={pokemon}
-          metaData={metaData}
-          iconUrl={iconUrl}
-          t={t}
-          userSettings={userSettings}
-          isTutorial={isTutorial}
-        />
-        {pokemon.seen_type !== 'encounter' && (
-          <Grid xs={12} textAlign="center">
-            <Typography
-              variant="caption"
-              component="div"
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: 6,
-                flexWrap: 'wrap',
-              }}
-            >
-              <span>{t(`seen_${pokemon.seen_type}`, '')}</span>
-              {showTappableSource && (
-                <TappableOrigin
-                  tappable={tappableSource}
-                  Icons={Icons}
-                  t={t}
-                  i18n={i18n}
-                  loading={tappableLoading}
-                />
-              )}
-            </Typography>
-          </Grid>
-        )}
-        {pokemon.seen_type === 'nearby_cell' && (
-          <Typography>{t('pokemon_cell')}</Typography>
-        )}
-        {!!pokemon.expire_timestamp && (
-          <Timer pokemon={pokemon} hasStats={hasStats} t={t} />
-        )}
-        {hasStats && pokePerms.iv && (
-          <>
-            <Stats pokemon={pokemon} t={t} />
-            <Divider orientation="vertical" flexItem />
-          </>
-        )}
-        <Info
-          pokemon={pokemon}
-          metaData={metaData}
-          perms={pokePerms}
-          Icons={Icons}
-          timeOfDay={timeOfDay}
-          t={t}
-        />
-        <ShinyOdds shinyStats={shinyStats} t={t} />
-        <Footer
-          pokemon={pokemon}
-          popups={popups}
-          hasPvp={!!hasLeagues.length}
-          Icons={Icons}
-        />
-        <Collapse in={popups.pvp && perms.pvp} timeout="auto" unmountOnExit>
-          {hasLeagues.map((league) => (
-            <PvpInfo
-              key={league}
-              league={league}
-              data={cleanPvp[league]}
-              t={t}
-              Icons={Icons}
-              pokemon={pokemon}
-            />
-          ))}
-        </Collapse>
-        <Collapse in={popups.extras} timeout="auto" unmountOnExit>
-          <ExtraPokemonInfo
-            pokemon={pokemon}
-            perms={pokePerms}
-            userSettings={userSettings}
+  const gridContent = (
+    <Grid
+      container
+      style={{ width: 200 }}
+      alignItems="center"
+      justifyContent="center"
+      spacing={1}
+    >
+      <Header
+        pokemon={pokemon}
+        metaData={metaData}
+        iconUrl={iconUrl}
+        t={t}
+        userSettings={userSettings}
+        isTutorial={isTutorial}
+      />
+      {pokemon.seen_type !== 'encounter' && (
+        <Grid xs={12} textAlign="center">
+          <Typography
+            variant="caption"
+            component="div"
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: 6,
+              flexWrap: 'wrap',
+            }}
+          >
+            <span>{t(`seen_${pokemon.seen_type}`, '')}</span>
+            {showTappableSource && (
+              <TappableOrigin
+                tappable={tappableSource}
+                Icons={Icons}
+                t={t}
+                i18n={i18n}
+                loading={tappableLoading}
+              />
+            )}
+          </Typography>
+        </Grid>
+      )}
+      {pokemon.seen_type === 'nearby_cell' && (
+        <Typography>{t('pokemon_cell')}</Typography>
+      )}
+      {!!pokemon.expire_timestamp && (
+        <Timer pokemon={pokemon} hasStats={hasStats} t={t} />
+      )}
+      {hasStats && pokePerms.iv && (
+        <>
+          <Stats pokemon={pokemon} t={t} />
+          <Divider orientation="vertical" flexItem />
+        </>
+      )}
+      <Info
+        pokemon={pokemon}
+        metaData={metaData}
+        perms={pokePerms}
+        Icons={Icons}
+        timeOfDay={timeOfDay}
+        t={t}
+      />
+      <ShinyOdds shinyStats={shinyStats} t={t} />
+      <Footer
+        pokemon={pokemon}
+        popups={popups}
+        hasPvp={!!hasLeagues.length}
+        Icons={Icons}
+      />
+      <Collapse in={popups.pvp && perms.pvp} timeout="auto" unmountOnExit>
+        {hasLeagues.map((league) => (
+          <PvpInfo
+            key={league}
+            league={league}
+            data={cleanPvp[league]}
             t={t}
             Icons={Icons}
+            pokemon={pokemon}
           />
-        </Collapse>
-      </Grid>
+        ))}
+      </Collapse>
+      <Collapse in={popups.extras} timeout="auto" unmountOnExit>
+        <ExtraPokemonInfo
+          pokemon={pokemon}
+          perms={pokePerms}
+          userSettings={userSettings}
+          t={t}
+          Icons={Icons}
+        />
+      </Collapse>
+    </Grid>
+  )
+
+  const themedContent = hasBackground ? (
+    <BackgroundThemeProvider visuals={backgroundVisuals}>
+      {gridContent}
+    </BackgroundThemeProvider>
+  ) : (
+    gridContent
+  )
+
+  return (
+    <ErrorBoundary noRefresh style={{}} variant="h5">
+      {hasBackground && backgroundTooltip ? (
+        <Tooltip
+          title={backgroundTooltip}
+          arrow
+          enterTouchDelay={0}
+          placement="top"
+        >
+          {themedContent}
+        </Tooltip>
+      ) : (
+        themedContent
+      )}
     </ErrorBoundary>
   )
 }
@@ -399,7 +431,7 @@ const Header = ({
       </Grid>
       <Grid xs={3}>
         <IconButton aria-haspopup="true" onClick={handleClick} size="large">
-          <MoreVert />
+          <MoreVert data-background-icon="true" />
         </IconButton>
       </Grid>
       <Menu
@@ -577,7 +609,7 @@ const Info = ({ pokemon, metaData, perms, Icons, timeOfDay, t }) => {
       )}
       {!!gender && (
         <Grid textAlign="center">
-          <GenderIcon gender={gender} />
+          <GenderIcon gender={gender} data-background-icon="true" />
         </Grid>
       )}
       {!!size && Number.isInteger(size) && (
@@ -680,6 +712,7 @@ const Footer = ({ pokemon, popups, hasPvp, Icons }) => {
               src={Icons.getMisc('pvp')}
               height={20}
               width="auto"
+              data-background-icon="true"
             />
           </IconButton>
         </Grid>
@@ -693,7 +726,7 @@ const Footer = ({ pokemon, popups, hasPvp, Icons }) => {
           onClick={() => handleExpandClick('extras')}
           size="large"
         >
-          <ExpandMore />
+          <ExpandMore data-background-icon="true" />
         </IconButton>
       </Grid>
     </>
@@ -721,7 +754,11 @@ const ExtraPokemonInfo = ({ pokemon, perms, userSettings, t, Icons }) => {
         })}
       <Divider
         flexItem
-        style={{ width: '100%', height: 2, margin: '10px 0' }}
+        style={{
+          width: '100%',
+          height: 2,
+          margin: '10px 0',
+        }}
       />
       <TimeStamp time={first_seen_timestamp}>first_seen</TimeStamp>
       <TimeStamp time={updated}>last_seen</TimeStamp>
