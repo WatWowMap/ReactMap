@@ -31,17 +31,6 @@ const BackgroundStylesContext = React.createContext({
 })
 
 /**
- * Accessor for background styling context.
- * @returns {{
- *  hasBackground: boolean
- *  visuals?: any
- * }}
- */
-export function useBackgroundStyles() {
-  return React.useContext(BackgroundStylesContext)
-}
-
-/**
  * Wraps popup content with a dark theme override when a background image is present.
  *
  * @param {{
