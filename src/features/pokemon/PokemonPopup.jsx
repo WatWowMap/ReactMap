@@ -326,20 +326,22 @@ export function PokemonPopup({ pokemon, iconUrl, isTutorial = false }) {
     gridContent
   )
 
+  const contentWithTooltip = backgroundTooltip ? (
+    <Tooltip
+      title={backgroundTooltip}
+      arrow
+      enterTouchDelay={0}
+      placement="top"
+    >
+      <span style={{ display: 'inline-block' }}>{themedContent}</span>
+    </Tooltip>
+  ) : (
+    themedContent
+  )
+
   return (
     <ErrorBoundary noRefresh style={{}} variant="h5">
-      {hasBackground && backgroundTooltip ? (
-        <Tooltip
-          title={backgroundTooltip}
-          arrow
-          enterTouchDelay={0}
-          placement="top"
-        >
-          {themedContent}
-        </Tooltip>
-      ) : (
-        themedContent
-      )}
+      {contentWithTooltip}
     </ErrorBoundary>
   )
 }
