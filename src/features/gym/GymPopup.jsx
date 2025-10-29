@@ -9,7 +9,6 @@ import Box from '@mui/material/Box'
 import MenuItem from '@mui/material/MenuItem'
 import Divider from '@mui/material/Divider'
 import Collapse from '@mui/material/Collapse'
-import Tooltip from '@mui/material/Tooltip'
 import Typography from '@mui/material/Typography'
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew'
 import ShieldIcon from '@mui/icons-material/Shield'
@@ -31,7 +30,7 @@ import { GenderIcon } from '@components/popups/GenderIcon'
 import { Navigation } from '@components/popups/Navigation'
 import { Coords } from '@components/popups/Coords'
 import { TimeStamp } from '@components/popups/TimeStamps'
-import { BackgroundThemeProvider } from '@components/popups/BackgroundThemeProvider'
+import { BackgroundCard } from '@components/popups/BackgroundCard'
 import { useAnalytics } from '@hooks/useAnalytics'
 import { getTimeUntil } from '@utils/getTimeUntil'
 import { formatInterval } from '@utils/formatInterval'
@@ -322,26 +321,18 @@ function DefendersModal({ gym, onClose }) {
       </div>
     )
 
-    let row = rowContent
-    if (fallbackHasBackground) {
-      row = (
-        <BackgroundThemeProvider visuals={fallbackThemedVisuals}>
-          {rowContent}
-        </BackgroundThemeProvider>
-      )
-    }
-
-    fallbackRow = fallbackBackgroundMeta?.tooltip ? (
-      <Tooltip
-        title={fallbackBackgroundMeta.tooltip}
-        arrow
-        enterTouchDelay={0}
-        placement="top"
+    fallbackRow = (
+      <BackgroundCard
+        visuals={fallbackHasBackground ? fallbackThemedVisuals : undefined}
+        tooltip={fallbackBackgroundMeta?.tooltip}
+        wrapperProps={
+          fallbackBackgroundMeta?.tooltip
+            ? { style: { width: '100%' } }
+            : undefined
+        }
       >
-        <div style={{ width: '100%' }}>{row}</div>
-      </Tooltip>
-    ) : (
-      row
+        {rowContent}
+      </BackgroundCard>
     )
   }
 
@@ -683,27 +674,21 @@ function DefendersModal({ gym, onClose }) {
                 </div>
               )
 
-              let defenderRow = hasBackground ? (
-                <BackgroundThemeProvider visuals={themedVisuals}>
-                  {rowContent}
-                </BackgroundThemeProvider>
-              ) : (
-                rowContent
-              )
-
-              if (backgroundMeta?.tooltip) {
-                defenderRow = (
-                  <Tooltip
-                    title={backgroundMeta.tooltip}
-                    arrow
-                    enterTouchDelay={0}
-                    placement="top"
+              return (
+                <React.Fragment key={rowKey}>
+                  <BackgroundCard
+                    visuals={hasBackground ? themedVisuals : undefined}
+                    tooltip={backgroundMeta?.tooltip}
+                    wrapperProps={
+                      backgroundMeta?.tooltip
+                        ? { style: { width: '100%' } }
+                        : undefined
+                    }
                   >
-                    <div style={{ width: '100%' }}>{defenderRow}</div>
-                  </Tooltip>
-                )
-              }
-              return <React.Fragment key={rowKey}>{defenderRow}</React.Fragment>
+                    {rowContent}
+                  </BackgroundCard>
+                </React.Fragment>
+              )
             })}
           </Grid>
           <Grid

@@ -7,7 +7,6 @@ import Grid from '@mui/material/Unstable_Grid2'
 import IconButton from '@mui/material/IconButton'
 import Collapse from '@mui/material/Collapse'
 import Typography from '@mui/material/Typography'
-import Tooltip from '@mui/material/Tooltip'
 import Check from '@mui/icons-material/Check'
 import Help from '@mui/icons-material/Help'
 import { useTranslation, Trans } from 'react-i18next'
@@ -28,7 +27,7 @@ import { Timer } from '@components/popups/Timer'
 import { PowerUp } from '@components/popups/PowerUp'
 import { NameTT } from '@components/popups/NameTT'
 import { TimeStamp } from '@components/popups/TimeStamps'
-import { BackgroundThemeProvider } from '@components/popups/BackgroundThemeProvider'
+import { BackgroundCard } from '@components/popups/BackgroundCard'
 import { useAnalytics } from '@hooks/useAnalytics'
 import { useGetAvailable } from '@hooks/useGetAvailable'
 import { parseQuestConditions } from '@utils/parseConditions'
@@ -609,19 +608,20 @@ const RewardInfo = ({ with_ar, ...quest }) => {
 const QuestRewardRow = ({ quest, visuals: visualsProp }) => {
   const { quest_reward_type, quest_background, quest_shiny_probability } = quest
   const getPokemonBackgroundVisuals = usePokemonBackgroundVisuals()
-  const visuals = React.useMemo(
-    () =>
-      visualsProp ||
-      getPokemonBackgroundVisuals(
-        quest_reward_type === 7 ? quest_background : 0,
-      ),
-    [
-      visualsProp,
-      getPokemonBackgroundVisuals,
-      quest_background,
-      quest_reward_type,
-    ],
-  )
+  const visuals = React.useMemo(() => {
+    if (visualsProp) {
+      return visualsProp
+    }
+    if (quest_reward_type !== 7) {
+      return undefined
+    }
+    return getPokemonBackgroundVisuals(quest_background)
+  }, [
+    visualsProp,
+    getPokemonBackgroundVisuals,
+    quest_background,
+    quest_reward_type,
+  ])
   const hasBackground = visuals?.hasBackground ?? false
   const applyBackground = quest_reward_type === 7 && hasBackground
   const backgroundMeta = visuals?.backgroundMeta
@@ -686,28 +686,17 @@ const QuestRewardRow = ({ quest, visuals: visualsProp }) => {
     </Grid>
   )
 
-  let themedRow = applyBackground ? (
-    <BackgroundThemeProvider visuals={themedVisuals}>
+  const wrappedRow = (
+    <BackgroundCard
+      visuals={applyBackground ? themedVisuals : undefined}
+      tooltip={applyBackground ? backgroundMeta?.tooltip : undefined}
+      wrapperProps={applyBackground ? { style: { width: '100%' } } : undefined}
+    >
       {rowContent}
-    </BackgroundThemeProvider>
-  ) : (
-    rowContent
+    </BackgroundCard>
   )
 
-  if (applyBackground && backgroundMeta?.tooltip) {
-    themedRow = (
-      <Tooltip
-        title={backgroundMeta.tooltip}
-        arrow
-        enterTouchDelay={0}
-        placement="top"
-      >
-        <div style={{ width: '100%' }}>{themedRow}</div>
-      </Tooltip>
-    )
-  }
-
-  return <Grid xs={12}>{themedRow}</Grid>
+  return <Grid xs={12}>{wrappedRow}</Grid>
 }
 
 /**
@@ -1106,28 +1095,15 @@ const ShowcaseEntry = ({
     </div>
   )
 
-  let content = entry
-
-  if (hasBackground) {
-    content = (
-      <BackgroundThemeProvider visuals={themedVisuals}>
-        {entry}
-      </BackgroundThemeProvider>
-    )
-  }
-
-  if (backgroundMeta?.tooltip) {
-    content = (
-      <Tooltip
-        title={backgroundMeta.tooltip}
-        arrow
-        enterTouchDelay={0}
-        placement="top"
-      >
-        <div style={{ width: '100%' }}>{content}</div>
-      </Tooltip>
-    )
-  }
-
-  return content
+  return (
+    <BackgroundCard
+      visuals={hasBackground ? themedVisuals : undefined}
+      tooltip={backgroundMeta?.tooltip}
+      wrapperProps={
+        backgroundMeta?.tooltip ? { style: { width: '100%' } } : undefined
+      }
+    >
+      {entry}
+    </BackgroundCard>
+  )
 }

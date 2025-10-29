@@ -31,7 +31,7 @@ import { readableProbability } from '@utils/readableProbability'
 import { GET_POKEMON_SHINY_STATS } from '@services/queries/pokemon'
 import { GET_TAPPABLE_BY_ID } from '@services/queries/tappable'
 import { usePokemonBackgroundVisuals } from '@hooks/usePokemonBackgroundVisuals'
-import { BackgroundThemeProvider } from '@components/popups/BackgroundThemeProvider'
+import { BackgroundCard } from '@components/popups/BackgroundCard'
 
 const rowClass = { width: 30, fontWeight: 'bold' }
 
@@ -93,8 +93,31 @@ export function PokemonPopup({ pokemon, iconUrl, isTutorial = false }) {
     () => getPokemonBackgroundVisuals(pokemon.background),
     [getPokemonBackgroundVisuals, pokemon.background],
   )
-  const hasBackground = Boolean(backgroundVisuals?.hasBackground)
-  const backgroundTooltip = backgroundVisuals?.backgroundMeta?.tooltip
+  const themedBackgroundVisuals = React.useMemo(() => {
+    if (!backgroundVisuals?.hasBackground) {
+      return backgroundVisuals
+    }
+    const styles = backgroundVisuals.styles || {}
+    return {
+      ...backgroundVisuals,
+      styles: {
+        ...styles,
+        surface: {
+          display: 'flex',
+          flexDirection: 'column',
+          flex: '1 1 auto',
+          alignSelf: 'stretch',
+          margin: '-13px -20px',
+          padding: '13px 20px',
+          width: 'calc(100% + 40px)',
+          maxWidth: 'none',
+          boxSizing: 'border-box',
+          ...(styles.surface || {}),
+        },
+      },
+    }
+  }, [backgroundVisuals])
+  const backgroundTooltip = themedBackgroundVisuals?.backgroundMeta?.tooltip
 
   const userSettings = useStorage((s) => s.userSettings.pokemon)
   const pokePerms = isTutorial
@@ -318,30 +341,15 @@ export function PokemonPopup({ pokemon, iconUrl, isTutorial = false }) {
     </Grid>
   )
 
-  const themedContent = hasBackground ? (
-    <BackgroundThemeProvider visuals={backgroundVisuals}>
-      {gridContent}
-    </BackgroundThemeProvider>
-  ) : (
-    gridContent
-  )
-
-  const contentWithTooltip = backgroundTooltip ? (
-    <Tooltip
-      title={backgroundTooltip}
-      arrow
-      enterTouchDelay={0}
-      placement="top"
-    >
-      <div style={{ display: 'block', width: '100%' }}>{themedContent}</div>
-    </Tooltip>
-  ) : (
-    themedContent
-  )
-
   return (
     <ErrorBoundary noRefresh style={{}} variant="h5">
-      {contentWithTooltip}
+      <BackgroundCard
+        visuals={themedBackgroundVisuals}
+        tooltip={backgroundTooltip}
+        wrapperProps={{ style: { display: 'block', width: '100%' } }}
+      >
+        {gridContent}
+      </BackgroundCard>
     </ErrorBoundary>
   )
 }
