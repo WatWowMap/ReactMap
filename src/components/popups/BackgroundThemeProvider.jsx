@@ -4,6 +4,27 @@ import ThemeProvider from '@mui/material/styles/ThemeProvider'
 import { createTheme, useTheme } from '@mui/material/styles'
 import Box from '@mui/material/Box'
 
+const DARK_PALETTE_ENTRIES = Object.entries(
+  createTheme({ palette: { mode: 'dark' } }).palette,
+)
+  .filter(
+    ([, value]) =>
+      value &&
+      typeof value === 'object' &&
+      !Array.isArray(value) &&
+      'main' in value &&
+      typeof value.main === 'string',
+  )
+  .reduce((acc, [key, value]) => {
+    acc[key] = {
+      main: value.main,
+      light: value.light,
+      dark: value.dark,
+      contrastText: value.contrastText,
+    }
+    return acc
+  }, {})
+
 const BackgroundStylesContext = React.createContext({
   hasBackground: false,
   visuals: undefined,
@@ -67,35 +88,6 @@ export function BackgroundThemeProvider({ visuals, children }) {
     ? { color: primaryColor || '#fff', ...(styles.icon || {}) }
     : {}
 
-  const paletteOverrides = React.useMemo(() => {
-    if (!hasBackground) {
-      return {}
-    }
-    const overrides = {}
-    Object.entries(parentTheme.palette || {}).forEach(([key, value]) => {
-      if (
-        value &&
-        typeof value === 'object' &&
-        !Array.isArray(value) &&
-        'main' in value &&
-        typeof value.main === 'string'
-      ) {
-        overrides[key] = {
-          ...value,
-          main:
-            typeof value.light === 'string' && value.light
-              ? value.light
-              : value.main,
-          contrastText:
-            typeof value.contrastText === 'string' && value.contrastText
-              ? value.contrastText
-              : '#fff',
-        }
-      }
-    })
-    return overrides
-  }, [hasBackground, parentTheme.palette])
-
   const contextValue = React.useMemo(
     () => ({
       hasBackground: Boolean(hasBackground),
@@ -111,10 +103,10 @@ export function BackgroundThemeProvider({ visuals, children }) {
     return createTheme(parentTheme, {
       palette: {
         mode: 'dark',
-        ...paletteOverrides,
+        ...DARK_PALETTE_ENTRIES,
       },
     })
-  }, [borderColor, hasBackground, paletteOverrides, parentTheme, primaryColor])
+  }, [hasBackground, parentTheme])
 
   if (!hasBackground) {
     return (
