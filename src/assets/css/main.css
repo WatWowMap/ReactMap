@@ -215,10 +215,6 @@ body {
   padding-left: 7px;
 }
 
-.showcase-entries {
-  width: 100%;
-}
-
 .showcase-entry {
   display: flex;
   justify-content: center;

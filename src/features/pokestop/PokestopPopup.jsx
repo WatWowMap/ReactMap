@@ -281,14 +281,12 @@ export function PokestopPopup({
                               event.showcase_ranking_standard
                             }
                           >
-                            <div className="showcase-entries">
-                              {(contest_entries || []).map((position) => (
-                                <ShowcaseEntry
-                                  key={position.rank}
-                                  {...position}
-                                />
-                              ))}
-                            </div>
+                            {(contest_entries || []).map((position) => (
+                              <ShowcaseEntry
+                                key={position.rank}
+                                {...position}
+                              />
+                            ))}
                           </Showcase>
                         </TimeTile>
                       </React.Fragment>
