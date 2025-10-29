@@ -131,14 +131,16 @@ class DbManager extends Logger {
    * @returns {Promise<import("@rm/types").DbContext>}
    */
   static async schemaCheck(schema) {
-    const [isMad, pvpV2, hasSize, hasHeight] = await schema('pokemon')
-      .columnInfo()
-      .then((columns) => [
-        'cp_multiplier' in columns,
-        'pvp' in columns,
-        'size' in columns,
-        'height' in columns,
-      ])
+    const [isMad, pvpV2, hasSize, hasHeight, hasPokemonBackground] =
+      await schema('pokemon')
+        .columnInfo()
+        .then((columns) => [
+          'cp_multiplier' in columns,
+          'pvp' in columns,
+          'size' in columns,
+          'height' in columns,
+          'background' in columns,
+        ])
     const [
       hasRewardAmount,
       hasPowerUp,
@@ -220,6 +222,7 @@ class DbManager extends Logger {
       hasBattlePokemonStats,
       hasShortcode,
       hasPokemonShinyStats,
+      hasPokemonBackground,
     }
   }
 
@@ -237,7 +240,6 @@ class DbManager extends Logger {
             : {
                 mem: this.endpoints[i].endpoint,
                 secret: this.endpoints[i].secret,
-                // Add support for HTTP authentication
                 httpAuth: this.endpoints[i].httpAuth,
                 pvpV2: true,
               }

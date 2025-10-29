@@ -48,6 +48,7 @@ export interface DbContext {
   hasShowcaseType: boolean
   hasStationedGmax: boolean
   hasBattlePokemonStats: boolean
+  hasPokemonBackground: boolean
   hasPokemonShinyStats?: boolean
   connection?: number
 }
