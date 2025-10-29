@@ -95,7 +95,6 @@ function withSurfaceReset(visuals) {
  *  imageSrc?: string
  *  imageAlt?: string
  *  showBestBuddy?: boolean
- *  textContainerStyle?: React.CSSProperties
  *  trailingContent?: React.ReactNode
  *  children: React.ReactNode
  * }} props
@@ -106,7 +105,6 @@ function DefenderRowLayout({
   imageSrc,
   imageAlt,
   showBestBuddy,
-  textContainerStyle,
   trailingContent,
   children,
 }) {
@@ -173,7 +171,6 @@ function DefenderRowLayout({
           justifyContent: 'center',
           minWidth: 0,
           textAlign: 'left',
-          ...(textContainerStyle || {}),
         }}
       >
         {children}
@@ -341,7 +338,6 @@ function DefendersModal({ gym, onClose }) {
         imageSrc={fallbackImageSrc}
         imageAlt={t(`poke_${gym.guarding_pokemon_id}`)}
         showBestBuddy={gym.guarding_pokemon_display?.badge === 1}
-        textContainerStyle={{ marginLeft: 4 }}
       >
         <Typography
           variant="subtitle1"
