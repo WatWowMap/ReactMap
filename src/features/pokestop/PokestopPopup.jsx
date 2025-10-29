@@ -1028,44 +1028,43 @@ const ShowcaseEntry = ({
     () => getPokemonBackgroundVisuals(background),
     [background, getPokemonBackgroundVisuals],
   )
-  const { hasBackground, backgroundUrl, backgroundMeta } = visuals
+  const { hasBackground, backgroundMeta } = visuals
   const themedVisuals = React.useMemo(() => {
     if (!hasBackground || !visuals) {
       return visuals
     }
     const styles = visuals.styles || {}
+    const surface = styles.surface || {}
     return {
       ...visuals,
       styles: {
         ...styles,
         surface: {
-          ...(styles.surface || {}),
-          margin: 0,
-          padding: 0,
-          width: '100%',
-          maxWidth: '100%',
+          ...surface,
+          margin: '0 -21px',
+          padding: '0 21px',
+          width: 'calc(100% + 42px)',
+          maxWidth: 'none',
+          boxSizing: 'border-box',
         },
       },
     }
   }, [hasBackground, visuals])
 
   const entry = (
-    <div
-      className={`showcase-entry${hasBackground ? ' has-background' : ''}`}
-      style={
-        hasBackground
-          ? {
-              '--showcase-bg': `url(${backgroundUrl})`,
-            }
-          : undefined
-      }
-    >
+    <div className="showcase-entry">
       <div className="showcase-entry-content">
         <div className="showcase-entry-col showcase-entry-rank">
           <img src={Icons.getMisc(getBadge(rank))} alt="rank" height={20} />
         </div>
         <div className="showcase-entry-col showcase-entry-score">
-          {score.toFixed(2)}
+          <Typography
+            variant="body2"
+            component="div"
+            sx={{ fontWeight: 'inherit' }}
+          >
+            {score.toFixed(2)}
+          </Typography>
         </div>
         <div className="showcase-entry-col showcase-entry-pokemon">
           {pokemon_id ? (
@@ -1099,9 +1098,8 @@ const ShowcaseEntry = ({
     <BackgroundCard
       visuals={hasBackground ? themedVisuals : undefined}
       tooltip={backgroundMeta?.tooltip}
-      wrapperProps={
-        backgroundMeta?.tooltip ? { style: { width: '100%' } } : undefined
-      }
+      wrapperProps={{ style: { width: '100%' } }}
+      wrapWhenNoTooltip
     >
       {entry}
     </BackgroundCard>

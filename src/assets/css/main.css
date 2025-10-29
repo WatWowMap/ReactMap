@@ -215,30 +215,13 @@ body {
   padding-left: 7px;
 }
 
-.showcase-entry {
-  position: relative;
-  overflow: visible;
-  z-index: 0;
-}
-
-.showcase-entry.has-background::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  width: calc(100% + 43px);
-  height: 100%;
-  background-image: var(--showcase-bg, none);
-  background-size: cover;
-  background-repeat: no-repeat;
-  background-position: top center;
-  background-color: #000;
-  z-index: -1;
-  pointer-events: none;
-}
-
 .showcase-entries {
+  width: 100%;
+}
+
+.showcase-entry {
+  display: flex;
+  justify-content: center;
   width: 100%;
 }
 
