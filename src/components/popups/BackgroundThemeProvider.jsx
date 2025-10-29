@@ -121,6 +121,9 @@ export function BackgroundThemeProvider({ visuals, children }) {
               borderColor: borderColor || 'rgba(255, 255, 255, 0.2)',
               backgroundColor: borderColor || 'rgba(255, 255, 255, 0.2)',
             },
+            '& .ar-task': {
+              borderColor: borderColor || 'rgba(255, 255, 255, 0.2)',
+            },
           }}
         >
           {children}

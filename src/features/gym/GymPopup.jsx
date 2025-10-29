@@ -31,6 +31,7 @@ import { GenderIcon } from '@components/popups/GenderIcon'
 import { Navigation } from '@components/popups/Navigation'
 import { Coords } from '@components/popups/Coords'
 import { TimeStamp } from '@components/popups/TimeStamps'
+import { BackgroundThemeProvider } from '@components/popups/BackgroundThemeProvider'
 import { useAnalytics } from '@hooks/useAnalytics'
 import { getTimeUntil } from '@utils/getTimeUntil'
 import { formatInterval } from '@utils/formatInterval'
@@ -202,17 +203,38 @@ function DefendersModal({ gym, onClose }) {
           )
         : Icons.getPokemon?.(gym.guarding_pokemon_id))
 
-    const { borderColor: fallbackBorderColor, styles: fallbackStyles } =
-      fallbackVisuals
-    const row = (
+    const fallbackHasBackground = fallbackVisuals.hasBackground
+    const fallbackBorderColor = fallbackVisuals.borderColor
+    const fallbackStyles = fallbackVisuals.styles || {}
+    const fallbackPrimaryText = fallbackStyles.primaryText || {}
+    const fallbackSecondaryText = fallbackStyles.secondaryText || {}
+    const fallbackThemedVisuals = (() => {
+      if (!fallbackHasBackground || !fallbackVisuals) {
+        return fallbackVisuals
+      }
+      const styles = fallbackVisuals.styles || {}
+      return {
+        ...fallbackVisuals,
+        styles: {
+          ...styles,
+          surface: {
+            ...(styles.surface || {}),
+            margin: 0,
+            padding: 0,
+            width: '100%',
+            maxWidth: '100%',
+          },
+        },
+      }
+    })()
+    const rowContent = (
       <div
         style={{
-          ...fallbackStyles.surface,
           display: 'flex',
           alignItems: 'center',
           minHeight: 80,
           width: '100%',
-          padding: '8px 0',
+          padding: '4px 0',
           borderBottom: `1px solid ${fallbackBorderColor}`,
         }}
         aria-label={fallbackBackgroundMeta?.tooltip || undefined}
@@ -225,7 +247,7 @@ function DefendersModal({ gym, onClose }) {
             alignItems: 'center',
             justifyContent: 'center',
             marginLeft: 12,
-            marginRight: 12,
+            marginRight: 8,
             flexShrink: 0,
             position: 'relative',
           }}
@@ -246,7 +268,6 @@ function DefendersModal({ gym, onClose }) {
               src={Icons.getMisc('bestbuddy')}
               alt={t('best_buddy')}
               style={{
-                ...fallbackStyles.icon,
                 position: 'absolute',
                 top: 0,
                 right: 0,
@@ -267,48 +288,48 @@ function DefendersModal({ gym, onClose }) {
             minWidth: 0,
             textAlign: 'left',
             marginLeft: 4,
-            gap: '4px',
           }}
         >
-          <div
-            style={{
-              ...fallbackStyles.primaryText,
+          <Typography
+            variant="subtitle1"
+            component="div"
+            sx={{
+              ...fallbackPrimaryText,
               fontSize: 16,
               fontWeight: 700,
               whiteSpace: 'normal',
               wordBreak: 'break-word',
               maxWidth: '100%',
+              lineHeight: 1.43,
             }}
             title={t(`poke_${gym.guarding_pokemon_id}`)}
           >
-            {gym.guarding_pokemon_display?.badge === 1 && (
-              <Img
-                src={Icons.getMisc('bestbuddy')}
-                alt={t('best_buddy')}
-                style={{
-                  ...fallbackStyles.icon,
-                  maxHeight: 15,
-                  maxWidth: 15,
-                  marginRight: 4,
-                  verticalAlign: 'middle',
-                }}
-              />
-            )}
             {t(`poke_${gym.guarding_pokemon_id}`)}
-          </div>
+          </Typography>
 
-          <div
-            style={{
-              ...fallbackStyles.secondaryText,
+          <Typography
+            variant="body2"
+            component="div"
+            sx={{
+              ...fallbackSecondaryText,
               fontSize: 13,
             }}
           >
             {gym.total_cp &&
               `${t('total_cp')}: ${numFormatter.format(gym.total_cp)}`}
-          </div>
+          </Typography>
         </div>
       </div>
     )
+
+    let row = rowContent
+    if (fallbackHasBackground) {
+      row = (
+        <BackgroundThemeProvider visuals={fallbackThemedVisuals}>
+          {rowContent}
+        </BackgroundThemeProvider>
+      )
+    }
 
     fallbackRow = fallbackBackgroundMeta?.tooltip ? (
       <Tooltip
@@ -317,7 +338,7 @@ function DefendersModal({ gym, onClose }) {
         enterTouchDelay={0}
         placement="top"
       >
-        {row}
+        <div style={{ width: '100%' }}>{row}</div>
       </Tooltip>
     ) : (
       row
@@ -400,22 +421,38 @@ function DefendersModal({ gym, onClose }) {
                 heartShadow,
                 heartBackground,
                 backgroundMeta,
-                styles: defenderStyles,
+                hasBackground,
+                styles: defenderStyles = {},
               } = visuals
-              const { surface, primaryText, secondaryText, icon } =
-                defenderStyles
+              const primaryTextStyles = defenderStyles.primaryText || {}
+              const secondaryTextStyles = defenderStyles.secondaryText || {}
+              const iconStyles = defenderStyles.icon || {}
+              const themedVisuals = hasBackground
+                ? {
+                    ...visuals,
+                    styles: {
+                      ...(visuals.styles || {}),
+                      surface: {
+                        ...(visuals.styles?.surface || {}),
+                        margin: 0,
+                        padding: 0,
+                        width: '100%',
+                        maxWidth: '100%',
+                      },
+                    },
+                  }
+                : visuals
               const rowKey = def.pokemon_id
                 ? `${def.pokemon_id}-${index}`
                 : `${index}`
-              const defenderRow = (
+              const rowContent = (
                 <div
                   style={{
-                    ...surface,
                     display: 'flex',
                     alignItems: 'center',
                     minHeight: 80,
                     width: '100%',
-                    padding: '8px 0',
+                    padding: '4px 0',
                     borderBottom: `1px solid ${borderColor}`,
                   }}
                   aria-label={backgroundMeta?.tooltip || undefined}
@@ -428,7 +465,7 @@ function DefendersModal({ gym, onClose }) {
                       alignItems: 'center',
                       justifyContent: 'center',
                       marginLeft: 12,
-                      marginRight: 12,
+                      marginRight: 8,
                       flexShrink: 0,
                       position: 'relative',
                     }}
@@ -447,7 +484,6 @@ function DefendersModal({ gym, onClose }) {
                         src={Icons.getMisc('bestbuddy')}
                         alt={t('best_buddy')}
                         style={{
-                          ...icon,
                           position: 'absolute',
                           top: 0,
                           right: 0,
@@ -467,105 +503,111 @@ function DefendersModal({ gym, onClose }) {
                       justifyContent: 'center',
                       minWidth: 0,
                       textAlign: 'left',
-                      marginLeft: 4,
-                      gap: '4px',
                     }}
                   >
                     {/* First line: Pokemon name CP{currentCP}/{fullCP} */}
-                    <div
-                      style={{
-                        ...primaryText,
+                    <Typography
+                      variant="subtitle1"
+                      component="div"
+                      sx={{
+                        ...primaryTextStyles,
                         fontSize: 16,
                         fontWeight: 700,
                         whiteSpace: 'normal',
                         wordBreak: 'break-word',
                         maxWidth: '100%',
+                        lineHeight: 1.43,
                       }}
                       title={`${t(`poke_${def.pokemon_id}`)} CP${currentCP}/${fullCP}`}
                     >
                       {t(`poke_${def.pokemon_id}`)}
-                    </div>
+                    </Typography>
 
-                    <div
-                      style={{
+                    <Typography
+                      variant="body2"
+                      component="div"
+                      sx={{
+                        ...secondaryTextStyles,
                         display: 'flex',
                         alignItems: 'center',
                         gap: '8px',
                         fontSize: 13,
                       }}
                     >
-                      <div
-                        style={{
+                      <Box
+                        component="span"
+                        sx={{
                           display: 'flex',
                           alignItems: 'center',
                           gap: '2px',
                         }}
                       >
-                        <EmojiEventsIcon
-                          style={{
-                            ...icon,
-                            fontSize: 16,
-                            color: secondaryText.color,
-                          }}
-                        />
-                        <span style={secondaryText}>
+                        <EmojiEventsIcon sx={{ fontSize: 16, ...iconStyles }} />
+                        <Typography
+                          component="span"
+                          variant="body2"
+                          sx={{ fontSize: 13, color: 'inherit' }}
+                        >
                           {def.battles_won || 0}
-                        </span>
-                      </div>
-                      <div
-                        style={{
+                        </Typography>
+                      </Box>
+                      <Box
+                        component="span"
+                        sx={{
                           display: 'flex',
                           alignItems: 'center',
                           gap: '2px',
                         }}
                       >
                         <SentimentVeryDissatisfiedIcon
-                          style={{
-                            ...icon,
-                            fontSize: 16,
-                            color: secondaryText.color,
-                          }}
+                          sx={{ fontSize: 16, ...iconStyles }}
                         />
-                        <span style={secondaryText}>
+                        <Typography
+                          component="span"
+                          variant="body2"
+                          sx={{ fontSize: 13, color: 'inherit' }}
+                        >
                           {def.battles_lost || 0}
-                        </span>
-                      </div>
-                      <div
-                        style={{
+                        </Typography>
+                      </Box>
+                      <Box
+                        component="span"
+                        sx={{
                           display: 'flex',
                           alignItems: 'center',
                           gap: '2px',
                         }}
                       >
-                        <RestaurantIcon
-                          style={{
-                            ...icon,
-                            fontSize: 16,
-                            color: secondaryText.color,
-                          }}
-                        />
-                        <span style={secondaryText}>{def.times_fed || 0}</span>
-                      </div>
-                    </div>
+                        <RestaurantIcon sx={{ fontSize: 16, ...iconStyles }} />
+                        <Typography
+                          component="span"
+                          variant="body2"
+                          sx={{ fontSize: 13, color: 'inherit' }}
+                        >
+                          {def.times_fed || 0}
+                        </Typography>
+                      </Box>
+                    </Typography>
 
-                    <div
-                      style={{
-                        ...secondaryText,
+                    <Typography
+                      variant="body2"
+                      component="div"
+                      sx={{
+                        ...secondaryTextStyles,
                         fontSize: 13,
                       }}
                     >
                       CP{currentCP}/{fullCP}{' '}
                       {formatDeployedTime(def.deployed_ms + now - updatedMs)}
-                    </div>
+                    </Typography>
                   </div>
                   <div
                     style={{
-                      width: 44,
-                      height: 44,
+                      width: 28,
+                      height: 28,
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'right',
-                      marginLeft: 6,
                       marginRight: 12,
                       flexShrink: 0,
                       position: 'relative',
@@ -641,20 +683,27 @@ function DefendersModal({ gym, onClose }) {
                 </div>
               )
 
+              let defenderRow = hasBackground ? (
+                <BackgroundThemeProvider visuals={themedVisuals}>
+                  {rowContent}
+                </BackgroundThemeProvider>
+              ) : (
+                rowContent
+              )
+
               if (backgroundMeta?.tooltip) {
-                return (
+                defenderRow = (
                   <Tooltip
-                    key={rowKey}
                     title={backgroundMeta.tooltip}
                     arrow
                     enterTouchDelay={0}
                     placement="top"
                   >
-                    {defenderRow}
+                    <div style={{ width: '100%' }}>{defenderRow}</div>
                   </Tooltip>
                 )
               }
-              return React.cloneElement(defenderRow, { key: rowKey })
+              return <React.Fragment key={rowKey}>{defenderRow}</React.Fragment>
             })}
           </Grid>
           <Grid

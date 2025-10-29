@@ -28,6 +28,7 @@ import { Timer } from '@components/popups/Timer'
 import { PowerUp } from '@components/popups/PowerUp'
 import { NameTT } from '@components/popups/NameTT'
 import { TimeStamp } from '@components/popups/TimeStamps'
+import { BackgroundThemeProvider } from '@components/popups/BackgroundThemeProvider'
 import { useAnalytics } from '@hooks/useAnalytics'
 import { useGetAvailable } from '@hooks/useGetAvailable'
 import { parseQuestConditions } from '@utils/parseConditions'
@@ -144,11 +145,7 @@ export function PokestopPopup({
                       {showDivider ? (
                         <Divider light flexItem className="popup-divider" />
                       ) : null}
-                      <QuestRewardRow
-                        quest={quest}
-                        visuals={visuals}
-                        hasBackground={hasBackground}
-                      />
+                      <QuestRewardRow quest={quest} visuals={visuals} />
                     </React.Fragment>
                   )
                 })}
@@ -533,19 +530,13 @@ const MenuActions = ({
  *
  * @param {{
  *  with_ar: boolean
- *  styles?: {
- *    primaryText?: React.CSSProperties
- *    secondaryText?: React.CSSProperties
- *    icon?: React.CSSProperties
- *  }
  * } & Omit<import('@rm/types').Quest, 'key'>} props
  * @returns
  */
-const RewardInfo = ({ with_ar, styles, ...quest }) => {
+const RewardInfo = ({ with_ar, ...quest }) => {
   const { t } = useTranslation()
   const { src, amount, tt } = getRewardInfo(quest)
   const questMessage = useMemory((s) => s.config.misc.questMessage)
-  const primaryTextStyle = styles?.primaryText
 
   const labelKeys = Array.isArray(tt) ? tt.filter(Boolean) : tt ? [tt] : []
   const translatedLabel = labelKeys.length
@@ -573,22 +564,11 @@ const RewardInfo = ({ with_ar, styles, ...quest }) => {
   const altText = altAmount > 0 ? `${altLabel} x${altAmount}` : altLabel
 
   return (
-    <div
-      style={{
-        flex: '0 0 calc(100% * 3 / 12)',
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        textAlign: 'center',
-        position: 'relative',
-        gap: 4,
-      }}
-    >
+    <>
       <NameTT title={altText}>
         <img
           src={src}
-          style={{ maxWidth: 35, maxHeight: 35, filter: 'none' }}
+          style={{ maxWidth: 35, maxHeight: 35 }}
           alt={altText}
           onError={(e) => {
             // @ts-ignore
@@ -605,21 +585,15 @@ const RewardInfo = ({ with_ar, styles, ...quest }) => {
           style={{
             fontSize: 'medium',
             bottom: 20,
-            ...(primaryTextStyle || {}),
           }}
         >
           x{amount}
         </div>
       )}
-      <Typography
-        variant="caption"
-        className="ar-task"
-        noWrap
-        style={primaryTextStyle}
-      >
+      <Typography variant="caption" className="ar-task" noWrap>
         {questMessage || t(`ar_quest_${!!with_ar}`)}
       </Typography>
-    </div>
+    </>
   )
 }
 
@@ -632,7 +606,7 @@ const RewardInfo = ({ with_ar, styles, ...quest }) => {
  * }} props
  * @returns
  */
-const QuestRewardRow = ({ quest, visuals: visualsProp, hasBackground }) => {
+const QuestRewardRow = ({ quest, visuals: visualsProp }) => {
   const { quest_reward_type, quest_background, quest_shiny_probability } = quest
   const getPokemonBackgroundVisuals = usePokemonBackgroundVisuals()
   const visuals = React.useMemo(
@@ -648,61 +622,59 @@ const QuestRewardRow = ({ quest, visuals: visualsProp, hasBackground }) => {
       quest_reward_type,
     ],
   )
-  const resolvedHasBackground = hasBackground ?? visuals?.hasBackground ?? false
-  const { styles, backgroundMeta } = visuals || {}
-  const surface = styles?.surface || {}
-  const primaryText = styles?.primaryText || {}
-  const secondaryText = styles?.secondaryText || {}
-  const icon = styles?.icon || {}
-  const applyBackground = quest_reward_type === 7 && resolvedHasBackground
-  const rewardStyles = applyBackground
-    ? { primaryText, secondaryText, icon }
-    : undefined
-  const primaryConditionStyle = applyBackground ? primaryText : undefined
-  const secondaryConditionStyle = applyBackground ? secondaryText : undefined
-  const rowStyle = applyBackground
-    ? {
-        display: 'flex',
-        alignItems: 'center',
-        gap: 0,
-        width: 'calc(100% + 42px)',
-        marginLeft: '-21px',
-        marginRight: '-21px',
-        padding: '0 21px',
-        border: 'none',
-        borderRadius: 0,
-        boxShadow: 'none',
-        ...surface,
-      }
-    : {
-        display: 'flex',
-        alignItems: 'center',
-        gap: 0,
-        width: '100%',
-        padding: 0,
-      }
-
+  const hasBackground = visuals?.hasBackground ?? false
+  const applyBackground = quest_reward_type === 7 && hasBackground
+  const backgroundMeta = visuals?.backgroundMeta
+  const themedVisuals = React.useMemo(() => {
+    if (!applyBackground || !visuals) {
+      return visuals
+    }
+    const styles = visuals.styles || {}
+    const surface = styles.surface || {}
+    return {
+      ...visuals,
+      styles: {
+        ...styles,
+        surface: {
+          ...surface,
+          margin: '0 -21px',
+          padding: '0 21px',
+          width: 'calc(100% + 42px)',
+          maxWidth: 'calc(100% + 42px)',
+          boxSizing: 'border-box',
+        },
+      },
+    }
+  }, [applyBackground, visuals])
   const rowContent = (
-    <div style={rowStyle}>
-      <RewardInfo {...quest} styles={rewardStyles} />
-      <div
+    <Grid container justifyContent="center" alignItems="center">
+      <Grid
+        xs={3}
         style={{
-          flex: '1 1 0',
+          textAlign: 'center',
+          position: 'relative',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: 4,
+        }}
+      >
+        <RewardInfo {...quest} />
+      </Grid>
+      <Grid
+        xs={9}
+        style={{
           textAlign: 'center',
           maxHeight: 150,
           overflow: 'auto',
-          padding: 0,
         }}
       >
-        <QuestConditions
-          {...quest}
-          primaryTextStyle={primaryConditionStyle}
-          secondaryTextStyle={secondaryConditionStyle}
-        />
+        <QuestConditions {...quest} />
         {!!quest_shiny_probability && (
           <>
             <br />
-            <Typography variant="caption" style={secondaryConditionStyle}>
+            <Typography variant="caption">
               <Trans
                 i18nKey="shiny_probability"
                 components={[readableProbability(quest_shiny_probability)]}
@@ -710,33 +682,37 @@ const QuestRewardRow = ({ quest, visuals: visualsProp, hasBackground }) => {
             </Typography>
           </>
         )}
-      </div>
-    </div>
+      </Grid>
+    </Grid>
+  )
+
+  let themedRow = applyBackground ? (
+    <BackgroundThemeProvider visuals={themedVisuals}>
+      {rowContent}
+    </BackgroundThemeProvider>
+  ) : (
+    rowContent
   )
 
   if (applyBackground && backgroundMeta?.tooltip) {
-    return (
-      <Grid xs={12}>
-        <Tooltip
-          title={backgroundMeta.tooltip}
-          arrow
-          enterTouchDelay={0}
-          placement="top"
-        >
-          <div style={{ width: '100%' }}>{rowContent}</div>
-        </Tooltip>
-      </Grid>
+    themedRow = (
+      <Tooltip
+        title={backgroundMeta.tooltip}
+        arrow
+        enterTouchDelay={0}
+        placement="top"
+      >
+        <div style={{ width: '100%' }}>{themedRow}</div>
+      </Tooltip>
     )
   }
 
-  return <Grid xs={12}>{rowContent}</Grid>
+  return <Grid xs={12}>{themedRow}</Grid>
 }
 
 /**
  *
  * @param {Omit<import('@rm/types').Quest, 'key'>} props
- * @param {React.CSSProperties} [props.primaryTextStyle]
- * @param {React.CSSProperties} [props.secondaryTextStyle]
  * @returns
  */
 const QuestConditions = ({
@@ -745,27 +721,19 @@ const QuestConditions = ({
   quest_target,
   quest_conditions,
   quest_title,
-  primaryTextStyle,
-  secondaryTextStyle,
 }) => {
   const { i18n, t } = useTranslation()
   const madQuestText = useStorage((s) => s.userSettings.pokestops.madQuestText)
-  const primaryStyle = primaryTextStyle || {}
-  const secondaryStyle = secondaryTextStyle || primaryStyle
 
   if (madQuestText && quest_task) {
-    return (
-      <Typography variant="caption" style={primaryStyle}>
-        {quest_task}
-      </Typography>
-    )
+    return <Typography variant="caption">{quest_task}</Typography>
   }
 
   if (quest_title && !quest_title.includes('geotarget')) {
     const normalized = `quest_title_${quest_title.toLowerCase()}`
     if (i18n.exists(normalized)) {
       return (
-        <Typography variant="caption" style={primaryStyle}>
+        <Typography variant="caption">
           <Trans i18nKey={normalized}>{{ amount_0: quest_target }}</Trans>
         </Typography>
       )
@@ -774,7 +742,7 @@ const QuestConditions = ({
 
   const [type1, type2] = parseQuestConditions(quest_conditions)
   const primaryCondition = (
-    <Typography variant="caption" style={primaryStyle}>
+    <Typography variant="caption">
       <Trans i18nKey={`quest_${quest_type}`}>{{ amount: quest_target }}</Trans>
     </Typography>
   )
@@ -844,7 +812,7 @@ const QuestConditions = ({
       {type1 && (
         <>
           <br />
-          <Typography variant="caption" style={secondaryStyle}>
+          <Typography variant="caption">
             {getQuestConditions(type1.type, type1.info)}
           </Typography>
         </>
@@ -852,7 +820,7 @@ const QuestConditions = ({
       {type2 && (
         <>
           <br />
-          <Typography variant="caption" style={secondaryStyle}>
+          <Typography variant="caption">
             {getQuestConditions(type2.type, type2.info)}
           </Typography>
         </>
@@ -1071,44 +1039,46 @@ const ShowcaseEntry = ({
     () => getPokemonBackgroundVisuals(background),
     [background, getPokemonBackgroundVisuals],
   )
-  const { hasBackground, backgroundUrl, backgroundMeta, styles } = visuals
-  const { primaryText, secondaryText } = styles
+  const { hasBackground, backgroundUrl, backgroundMeta } = visuals
+  const themedVisuals = React.useMemo(() => {
+    if (!hasBackground || !visuals) {
+      return visuals
+    }
+    const styles = visuals.styles || {}
+    return {
+      ...visuals,
+      styles: {
+        ...styles,
+        surface: {
+          ...(styles.surface || {}),
+          margin: 0,
+          padding: 0,
+          width: '100%',
+          maxWidth: '100%',
+        },
+      },
+    }
+  }, [hasBackground, visuals])
 
   const entry = (
     <div
       className={`showcase-entry${hasBackground ? ' has-background' : ''}`}
-      style={{
-        ...(hasBackground
+      style={
+        hasBackground
           ? {
               '--showcase-bg': `url(${backgroundUrl})`,
             }
-          : {}),
-      }}
+          : undefined
+      }
     >
       <div className="showcase-entry-content">
-        <div
-          className="showcase-entry-col showcase-entry-rank"
-          style={{
-            ...primaryText,
-          }}
-        >
+        <div className="showcase-entry-col showcase-entry-rank">
           <img src={Icons.getMisc(getBadge(rank))} alt="rank" height={20} />
         </div>
-        <div
-          className="showcase-entry-col showcase-entry-score"
-          style={{
-            ...primaryText,
-            ...(hasBackground ? { textShadow: secondaryText.textShadow } : {}),
-          }}
-        >
+        <div className="showcase-entry-col showcase-entry-score">
           {score.toFixed(2)}
         </div>
-        <div
-          className="showcase-entry-col showcase-entry-pokemon"
-          style={{
-            ...primaryText,
-          }}
-        >
+        <div className="showcase-entry-col showcase-entry-pokemon">
           {pokemon_id ? (
             <div className="showcase-entry-pokemon-inner">
               <div className="showcase-entry-pokemon-icon">
@@ -1136,18 +1106,28 @@ const ShowcaseEntry = ({
     </div>
   )
 
+  let content = entry
+
+  if (hasBackground) {
+    content = (
+      <BackgroundThemeProvider visuals={themedVisuals}>
+        {entry}
+      </BackgroundThemeProvider>
+    )
+  }
+
   if (backgroundMeta?.tooltip) {
-    return (
+    content = (
       <Tooltip
         title={backgroundMeta.tooltip}
         arrow
         enterTouchDelay={0}
         placement="top"
       >
-        {entry}
+        <div style={{ width: '100%' }}>{content}</div>
       </Tooltip>
     )
   }
 
-  return entry
+  return content
 }

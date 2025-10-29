@@ -113,7 +113,6 @@ function ApplyGlobal() {
             padding: '3px',
             fontSize: '0.5rem !important',
             backgroundColor: 'transparent',
-            color: theme.palette.text.primary,
           },
           '.iv-badge': {
             color: theme.palette.text.primary,

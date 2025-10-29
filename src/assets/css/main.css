@@ -236,7 +236,6 @@ body {
   background-color: #000;
   z-index: -1;
   pointer-events: none;
-  border-radius: 6px;
 }
 
 .showcase-entries {
