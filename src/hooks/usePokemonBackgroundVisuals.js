@@ -8,15 +8,10 @@ import { useMemory } from '@store/useMemory'
 /**
  * Creates a memoized callback for computing Pokemon background visual metadata.
  * @returns {(backgroundValue: number | string | null | undefined) => {
- *  backgroundId: number
  *  hasBackground: boolean
- *  backgroundUrl: string
  *  primaryColor: string
- *  secondaryColor: string
  *  borderColor: string
  *  primaryTextShadow: string
- *  secondaryTextShadow: string
- *  iconShadow: string
  *  styles: {
  *    surface: import('react').CSSProperties
  *    primaryText: import('react').CSSProperties
@@ -153,20 +148,15 @@ export function usePokemonBackgroundVisuals() {
           textShadow: secondaryTextShadow,
         },
         icon: {
-          filter: hasBackground ? iconShadow : 'none',
+          filter: iconShadow,
         },
       }
 
       return {
-        backgroundId,
         hasBackground,
-        backgroundUrl,
         primaryColor,
-        secondaryColor,
         borderColor,
         primaryTextShadow,
-        secondaryTextShadow,
-        iconShadow,
         styles,
         backgroundMeta:
           backgroundId && backgroundDescription
