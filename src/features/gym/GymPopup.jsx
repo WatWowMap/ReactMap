@@ -59,6 +59,130 @@ function formatDeployedTime(intervalMs) {
   return `${hours}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`
 }
 
+const surfaceResetStyles = {
+  margin: 0,
+  padding: 0,
+  width: '100%',
+  maxWidth: '100%',
+}
+
+/**
+ * Ensure background visuals use full width without extra padding or margin.
+ * @param {import('@rm/types').PokemonBackgroundVisuals | undefined} visuals
+ */
+function withSurfaceReset(visuals) {
+  if (!visuals?.hasBackground) {
+    return visuals
+  }
+  const styles = visuals.styles || {}
+  return {
+    ...visuals,
+    styles: {
+      ...styles,
+      surface: {
+        ...(styles.surface || {}),
+        ...surfaceResetStyles,
+      },
+    },
+  }
+}
+
+/**
+ * Shared row layout between fallback and detailed defender displays.
+ * @param {{
+ *  borderColor: string | undefined
+ *  tooltip?: string
+ *  imageSrc?: string
+ *  imageAlt?: string
+ *  showBestBuddy?: boolean
+ *  textContainerStyle?: React.CSSProperties
+ *  trailingContent?: React.ReactNode
+ *  children: React.ReactNode
+ * }} props
+ */
+function DefenderRowLayout({
+  borderColor,
+  tooltip,
+  imageSrc,
+  imageAlt,
+  showBestBuddy,
+  textContainerStyle,
+  trailingContent,
+  children,
+}) {
+  const { t } = useTranslation()
+  const Icons = useMemory((s) => s.Icons)
+  const bestBuddySrc = Icons?.getMisc('bestbuddy')
+  return (
+    <div
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        minHeight: 80,
+        width: '100%',
+        padding: '4px 0',
+        borderBottom: `1px solid ${borderColor}`,
+      }}
+      aria-label={tooltip || undefined}
+    >
+      <div
+        style={{
+          width: 50,
+          height: 50,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          marginLeft: 12,
+          marginRight: 8,
+          flexShrink: 0,
+          position: 'relative',
+        }}
+      >
+        {imageSrc ? (
+          <Img
+            src={imageSrc}
+            alt={imageAlt}
+            style={{
+              maxHeight: 50,
+              maxWidth: 50,
+              objectFit: 'contain',
+            }}
+          />
+        ) : null}
+        {showBestBuddy && bestBuddySrc ? (
+          <Img
+            src={bestBuddySrc}
+            alt={t('best_buddy')}
+            style={{
+              position: 'absolute',
+              top: 0,
+              right: 0,
+              maxHeight: 15,
+              maxWidth: 15,
+              zIndex: 2,
+            }}
+          />
+        ) : null}
+      </div>
+      <div
+        style={{
+          flex: 1,
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'flex-start',
+          justifyContent: 'center',
+          minWidth: 0,
+          textAlign: 'left',
+          ...(textContainerStyle || {}),
+        }}
+      >
+        {children}
+      </div>
+      {trailingContent || null}
+    </div>
+  )
+}
+
 /**
  *
  * @param {{
@@ -209,118 +333,45 @@ function DefendersModal({ gym, onClose }) {
     const fallbackStyles = fallbackVisuals.styles || {}
     const fallbackPrimaryText = fallbackStyles.primaryText || {}
     const fallbackSecondaryText = fallbackStyles.secondaryText || {}
-    const fallbackThemedVisuals = (() => {
-      if (!fallbackHasBackground || !fallbackVisuals) {
-        return fallbackVisuals
-      }
-      const styles = fallbackVisuals.styles || {}
-      return {
-        ...fallbackVisuals,
-        styles: {
-          ...styles,
-          surface: {
-            ...(styles.surface || {}),
-            margin: 0,
-            padding: 0,
-            width: '100%',
-            maxWidth: '100%',
-          },
-        },
-      }
-    })()
+    const fallbackThemedVisuals = withSurfaceReset(fallbackVisuals)
     const rowContent = (
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          minHeight: 80,
-          width: '100%',
-          padding: '4px 0',
-          borderBottom: `1px solid ${fallbackBorderColor}`,
-        }}
-        aria-label={fallbackBackgroundMeta?.tooltip || undefined}
+      <DefenderRowLayout
+        borderColor={fallbackBorderColor}
+        tooltip={fallbackBackgroundMeta?.tooltip}
+        imageSrc={fallbackImageSrc}
+        imageAlt={t(`poke_${gym.guarding_pokemon_id}`)}
+        showBestBuddy={gym.guarding_pokemon_display?.badge === 1}
+        textContainerStyle={{ marginLeft: 4 }}
       >
-        <div
-          style={{
-            width: 50,
-            height: 50,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            marginLeft: 12,
-            marginRight: 8,
-            flexShrink: 0,
-            position: 'relative',
+        <Typography
+          variant="subtitle1"
+          component="div"
+          sx={{
+            ...fallbackPrimaryText,
+            fontSize: 16,
+            fontWeight: 700,
+            whiteSpace: 'normal',
+            wordBreak: 'break-word',
+            maxWidth: '100%',
+            lineHeight: 1.43,
           }}
+          title={t(`poke_${gym.guarding_pokemon_id}`)}
         >
-          {fallbackImageSrc ? (
-            <Img
-              src={fallbackImageSrc}
-              alt={t(`poke_${gym.guarding_pokemon_id}`)}
-              style={{
-                maxHeight: 50,
-                maxWidth: 50,
-                objectFit: 'contain',
-              }}
-            />
-          ) : null}
-          {gym.guarding_pokemon_display?.badge === 1 && (
-            <Img
-              src={Icons.getMisc('bestbuddy')}
-              alt={t('best_buddy')}
-              style={{
-                position: 'absolute',
-                top: 0,
-                right: 0,
-                maxHeight: 15,
-                maxWidth: 15,
-                zIndex: 2,
-              }}
-            />
-          )}
-        </div>
-        <div
-          style={{
-            flex: 1,
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'flex-start',
-            justifyContent: 'center',
-            minWidth: 0,
-            textAlign: 'left',
-            marginLeft: 4,
-          }}
-        >
-          <Typography
-            variant="subtitle1"
-            component="div"
-            sx={{
-              ...fallbackPrimaryText,
-              fontSize: 16,
-              fontWeight: 700,
-              whiteSpace: 'normal',
-              wordBreak: 'break-word',
-              maxWidth: '100%',
-              lineHeight: 1.43,
-            }}
-            title={t(`poke_${gym.guarding_pokemon_id}`)}
-          >
-            {t(`poke_${gym.guarding_pokemon_id}`)}
-          </Typography>
+          {t(`poke_${gym.guarding_pokemon_id}`)}
+        </Typography>
 
-          <Typography
-            variant="body2"
-            component="div"
-            sx={{
-              ...fallbackSecondaryText,
-              fontSize: 13,
-            }}
-          >
-            {gym.total_cp &&
-              `${t('total_cp')}: ${numFormatter.format(gym.total_cp)}`}
-          </Typography>
-        </div>
-      </div>
+        <Typography
+          variant="body2"
+          component="div"
+          sx={{
+            ...fallbackSecondaryText,
+            fontSize: 13,
+          }}
+        >
+          {gym.total_cp &&
+            `${t('total_cp')}: ${numFormatter.format(gym.total_cp)}`}
+        </Typography>
+      </DefenderRowLayout>
     )
 
     fallbackRow = (
@@ -419,263 +470,200 @@ function DefendersModal({ gym, onClose }) {
               const secondaryTextStyles = defenderStyles.secondaryText || {}
               const iconStyles = defenderStyles.icon || {}
               const themedVisuals = hasBackground
-                ? {
-                    ...visuals,
-                    styles: {
-                      ...(visuals.styles || {}),
-                      surface: {
-                        ...(visuals.styles?.surface || {}),
-                        margin: 0,
-                        padding: 0,
-                        width: '100%',
-                        maxWidth: '100%',
-                      },
-                    },
-                  }
+                ? withSurfaceReset(visuals)
                 : visuals
               const rowKey = def.pokemon_id
                 ? `${def.pokemon_id}-${index}`
                 : `${index}`
               const rowContent = (
-                <div
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    minHeight: 80,
-                    width: '100%',
-                    padding: '4px 0',
-                    borderBottom: `1px solid ${borderColor}`,
-                  }}
-                  aria-label={backgroundMeta?.tooltip || undefined}
-                >
-                  <div
-                    style={{
-                      width: 50,
-                      height: 50,
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      marginLeft: 12,
-                      marginRight: 8,
-                      flexShrink: 0,
-                      position: 'relative',
-                    }}
-                  >
-                    <Img
-                      src={Icons.getPokemonByDisplay(def.pokemon_id, def)}
-                      alt={t(`poke_${def.pokemon_id}`)}
+                <DefenderRowLayout
+                  borderColor={borderColor}
+                  tooltip={backgroundMeta?.tooltip}
+                  imageSrc={Icons.getPokemonByDisplay(def.pokemon_id, def)}
+                  imageAlt={t(`poke_${def.pokemon_id}`)}
+                  showBestBuddy={def.badge === 1}
+                  trailingContent={
+                    <div
                       style={{
-                        maxHeight: 50,
-                        maxWidth: 50,
-                        objectFit: 'contain',
-                      }}
-                    />
-                    {def.badge === 1 && (
-                      <Img
-                        src={Icons.getMisc('bestbuddy')}
-                        alt={t('best_buddy')}
-                        style={{
-                          position: 'absolute',
-                          top: 0,
-                          right: 0,
-                          maxHeight: 15,
-                          maxWidth: 15,
-                          zIndex: 2,
-                        }}
-                      />
-                    )}
-                  </div>
-                  <div
-                    style={{
-                      flex: 1,
-                      display: 'flex',
-                      flexDirection: 'column',
-                      alignItems: 'flex-start',
-                      justifyContent: 'center',
-                      minWidth: 0,
-                      textAlign: 'left',
-                    }}
-                  >
-                    {/* First line: Pokemon name CP{currentCP}/{fullCP} */}
-                    <Typography
-                      variant="subtitle1"
-                      component="div"
-                      sx={{
-                        ...primaryTextStyles,
-                        fontSize: 16,
-                        fontWeight: 700,
-                        whiteSpace: 'normal',
-                        wordBreak: 'break-word',
-                        maxWidth: '100%',
-                        lineHeight: 1.43,
-                      }}
-                      title={`${t(`poke_${def.pokemon_id}`)} CP${currentCP}/${fullCP}`}
-                    >
-                      {t(`poke_${def.pokemon_id}`)}
-                    </Typography>
-
-                    <Typography
-                      variant="body2"
-                      component="div"
-                      sx={{
-                        ...secondaryTextStyles,
+                        width: 28,
+                        height: 28,
                         display: 'flex',
                         alignItems: 'center',
-                        gap: '8px',
-                        fontSize: 13,
+                        justifyContent: 'right',
+                        marginRight: 12,
+                        flexShrink: 0,
+                        position: 'relative',
                       }}
                     >
-                      <Box
-                        component="span"
-                        sx={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: '2px',
+                      {/* Heart outline */}
+                      <FavoriteIcon
+                        style={{
+                          color: 'transparent',
+                          position: 'absolute',
+                          width: 28,
+                          height: 28,
+                          stroke: primaryColor,
+                          strokeWidth: 1,
+                          filter: 'drop-shadow(0 0 1px #0008)',
+                        }}
+                        className="heart-outline"
+                      />
+                      {/* Heart background */}
+                      <FavoriteIcon
+                        style={{
+                          color: hasBackground
+                            ? 'rgba(255, 255, 255, 0.2)'
+                            : theme.palette.mode === 'dark'
+                              ? 'white'
+                              : '#f0f0f0',
+                          opacity: 0.18,
+                          position: 'absolute',
+                          width: 28,
+                          height: 28,
+                        }}
+                      />
+                      {/* Heart fill */}
+                      <FavoriteIcon
+                        style={{
+                          color: '#ff69b4',
+                          position: 'absolute',
+                          width: 28,
+                          height: 28,
+                          clipPath: `inset(${100 - predictedMotivation * 100}% 0 0 0)`,
+                          transition: 'clip-path 0.3s',
+                        }}
+                      />
+                      {/* Heart cracks for rounds */}
+                      <svg
+                        width={28}
+                        height={28}
+                        viewBox="0 0 28 28"
+                        style={{
+                          position: 'absolute',
+                          pointerEvents: 'none',
                         }}
                       >
-                        <EmojiEventsIcon sx={{ fontSize: 16, ...iconStyles }} />
-                        <Typography
-                          component="span"
-                          variant="body2"
-                          sx={{ fontSize: 13, color: 'inherit' }}
-                        >
-                          {def.battles_won || 0}
-                        </Typography>
-                      </Box>
-                      <Box
-                        component="span"
-                        sx={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: '2px',
-                        }}
-                      >
-                        <SentimentVeryDissatisfiedIcon
-                          sx={{ fontSize: 16, ...iconStyles }}
-                        />
-                        <Typography
-                          component="span"
-                          variant="body2"
-                          sx={{ fontSize: 13, color: 'inherit' }}
-                        >
-                          {def.battles_lost || 0}
-                        </Typography>
-                      </Box>
-                      <Box
-                        component="span"
-                        sx={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: '2px',
-                        }}
-                      >
-                        <RestaurantIcon sx={{ fontSize: 16, ...iconStyles }} />
-                        <Typography
-                          component="span"
-                          variant="body2"
-                          sx={{ fontSize: 13, color: 'inherit' }}
-                        >
-                          {def.times_fed || 0}
-                        </Typography>
-                      </Box>
-                    </Typography>
+                        {/* Show cracks based on health: */}
+                        {predictedMotivation <= 2 / 3 && (
+                          // Always show top crack if predictedMotivation <= 2/3
+                          <path
+                            d="M2,9 Q7,11 14,9 Q21,11 26,9"
+                            stroke={primaryColor}
+                            strokeWidth={1.5}
+                            fill="none"
+                            strokeLinejoin="round"
+                          />
+                        )}
+                        {predictedMotivation <= 1 / 3 && (
+                          // Show bottom crack only if predictedMotivation <= 1/3
+                          <path
+                            d="M7,19 Q11,17 14,19 Q17,17 21,19"
+                            stroke={primaryColor}
+                            strokeWidth={1.5}
+                            fill="none"
+                            strokeLinejoin="round"
+                          />
+                        )}
+                      </svg>
+                    </div>
+                  }
+                >
+                  {/* First line: Pokemon name CP{currentCP}/{fullCP} */}
+                  <Typography
+                    variant="subtitle1"
+                    component="div"
+                    sx={{
+                      ...primaryTextStyles,
+                      fontSize: 16,
+                      fontWeight: 700,
+                      whiteSpace: 'normal',
+                      wordBreak: 'break-word',
+                      maxWidth: '100%',
+                      lineHeight: 1.43,
+                    }}
+                    title={`${t(`poke_${def.pokemon_id}`)} CP${currentCP}/${fullCP}`}
+                  >
+                    {t(`poke_${def.pokemon_id}`)}
+                  </Typography>
 
-                    <Typography
-                      variant="body2"
-                      component="div"
-                      sx={{
-                        ...secondaryTextStyles,
-                        fontSize: 13,
-                      }}
-                    >
-                      CP{currentCP}/{fullCP}{' '}
-                      {formatDeployedTime(def.deployed_ms + now - updatedMs)}
-                    </Typography>
-                  </div>
-                  <div
-                    style={{
-                      width: 28,
-                      height: 28,
+                  <Typography
+                    variant="body2"
+                    component="div"
+                    sx={{
+                      ...secondaryTextStyles,
                       display: 'flex',
                       alignItems: 'center',
-                      justifyContent: 'right',
-                      marginRight: 12,
-                      flexShrink: 0,
-                      position: 'relative',
+                      gap: '8px',
+                      fontSize: 13,
                     }}
                   >
-                    {/* Heart outline */}
-                    <FavoriteIcon
-                      style={{
-                        color: 'transparent',
-                        position: 'absolute',
-                        width: 28,
-                        height: 28,
-                        stroke: primaryColor,
-                        strokeWidth: 1,
-                        filter: 'drop-shadow(0 0 1px #0008)',
-                      }}
-                      className="heart-outline"
-                    />
-                    {/* Heart background */}
-                    <FavoriteIcon
-                      style={{
-                        color: hasBackground
-                          ? 'rgba(255, 255, 255, 0.2)'
-                          : theme.palette.mode === 'dark'
-                            ? 'white'
-                            : '#f0f0f0',
-                        opacity: 0.18,
-                        position: 'absolute',
-                        width: 28,
-                        height: 28,
-                      }}
-                    />
-                    {/* Heart fill */}
-                    <FavoriteIcon
-                      style={{
-                        color: '#ff69b4',
-                        position: 'absolute',
-                        width: 28,
-                        height: 28,
-                        clipPath: `inset(${100 - predictedMotivation * 100}% 0 0 0)`,
-                        transition: 'clip-path 0.3s',
-                      }}
-                    />
-                    {/* Heart cracks for rounds */}
-                    <svg
-                      width={28}
-                      height={28}
-                      viewBox="0 0 28 28"
-                      style={{
-                        position: 'absolute',
-                        pointerEvents: 'none',
+                    <Box
+                      component="span"
+                      sx={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '2px',
                       }}
                     >
-                      {/* Show cracks based on health: */}
-                      {predictedMotivation <= 2 / 3 && (
-                        // Always show top crack if predictedMotivation <= 2/3
-                        <path
-                          d="M2,9 Q7,11 14,9 Q21,11 26,9"
-                          stroke={primaryColor}
-                          strokeWidth={1.5}
-                          fill="none"
-                          strokeLinejoin="round"
-                        />
-                      )}
-                      {predictedMotivation <= 1 / 3 && (
-                        // Show bottom crack only if predictedMotivation <= 1/3
-                        <path
-                          d="M7,19 Q11,17 14,19 Q17,17 21,19"
-                          stroke={primaryColor}
-                          strokeWidth={1.5}
-                          fill="none"
-                          strokeLinejoin="round"
-                        />
-                      )}
-                    </svg>
-                  </div>
-                </div>
+                      <EmojiEventsIcon sx={{ fontSize: 16, ...iconStyles }} />
+                      <Typography
+                        component="span"
+                        variant="body2"
+                        sx={{ fontSize: 13, color: 'inherit' }}
+                      >
+                        {def.battles_won || 0}
+                      </Typography>
+                    </Box>
+                    <Box
+                      component="span"
+                      sx={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '2px',
+                      }}
+                    >
+                      <SentimentVeryDissatisfiedIcon
+                        sx={{ fontSize: 16, ...iconStyles }}
+                      />
+                      <Typography
+                        component="span"
+                        variant="body2"
+                        sx={{ fontSize: 13, color: 'inherit' }}
+                      >
+                        {def.battles_lost || 0}
+                      </Typography>
+                    </Box>
+                    <Box
+                      component="span"
+                      sx={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '2px',
+                      }}
+                    >
+                      <RestaurantIcon sx={{ fontSize: 16, ...iconStyles }} />
+                      <Typography
+                        component="span"
+                        variant="body2"
+                        sx={{ fontSize: 13, color: 'inherit' }}
+                      >
+                        {def.times_fed || 0}
+                      </Typography>
+                    </Box>
+                  </Typography>
+
+                  <Typography
+                    variant="body2"
+                    component="div"
+                    sx={{
+                      ...secondaryTextStyles,
+                      fontSize: 13,
+                    }}
+                  >
+                    CP{currentCP}/{fullCP}{' '}
+                    {formatDeployedTime(def.deployed_ms + now - updatedMs)}
+                  </Typography>
+                </DefenderRowLayout>
               )
 
               return (
