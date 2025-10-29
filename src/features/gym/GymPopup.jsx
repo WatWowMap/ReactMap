@@ -17,6 +17,7 @@ import EmojiEventsIcon from '@mui/icons-material/EmojiEvents'
 import SentimentVeryDissatisfiedIcon from '@mui/icons-material/SentimentVeryDissatisfied'
 import RestaurantIcon from '@mui/icons-material/Restaurant'
 import { useTranslation } from 'react-i18next'
+import { useTheme } from '@mui/material/styles'
 
 import { useSyncData } from '@features/webhooks'
 import { useMemory } from '@store/useMemory'
@@ -174,6 +175,7 @@ export function GymPopup({ hasRaid, hasHatched, raidIconUrl, ...gym }) {
  */
 function DefendersModal({ gym, onClose }) {
   const { t, i18n } = useTranslation()
+  const theme = useTheme()
   const Icons = useMemory((s) => s.Icons)
   const getPokemonBackgroundVisuals = usePokemonBackgroundVisuals()
   const numFormatter = new Intl.NumberFormat(i18n.language)
@@ -409,8 +411,6 @@ function DefendersModal({ gym, onClose }) {
               const {
                 borderColor,
                 primaryColor,
-                heartShadow,
-                heartBackground,
                 backgroundMeta,
                 hasBackground,
                 styles: defenderStyles = {},
@@ -613,14 +613,18 @@ function DefendersModal({ gym, onClose }) {
                         height: 28,
                         stroke: primaryColor,
                         strokeWidth: 1,
-                        filter: heartShadow,
+                        filter: 'drop-shadow(0 0 1px #0008)',
                       }}
                       className="heart-outline"
                     />
                     {/* Heart background */}
                     <FavoriteIcon
                       style={{
-                        color: heartBackground,
+                        color: hasBackground
+                          ? 'rgba(255, 255, 255, 0.2)'
+                          : theme.palette.mode === 'dark'
+                            ? 'white'
+                            : '#f0f0f0',
                         opacity: 0.18,
                         position: 'absolute',
                         width: 28,

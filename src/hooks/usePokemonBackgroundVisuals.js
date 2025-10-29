@@ -17,8 +17,6 @@ import { useMemory } from '@store/useMemory'
  *  primaryTextShadow: string
  *  secondaryTextShadow: string
  *  iconShadow: string
- *  heartBackground: string
- *  heartShadow: string
  *  styles: {
  *    surface: import('react').CSSProperties
  *    primaryText: import('react').CSSProperties
@@ -169,14 +167,6 @@ export function usePokemonBackgroundVisuals() {
         primaryTextShadow,
         secondaryTextShadow,
         iconShadow,
-        heartBackground: hasBackground
-          ? 'rgba(255, 255, 255, 0.2)'
-          : theme.palette.mode === 'dark'
-            ? 'white'
-            : '#f0f0f0',
-        heartShadow: hasBackground
-          ? 'drop-shadow(0 0 2px #000)'
-          : 'drop-shadow(0 0 1px #0008)',
         styles,
         backgroundMeta:
           backgroundId && backgroundDescription
