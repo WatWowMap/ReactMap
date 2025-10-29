@@ -49,7 +49,20 @@ export function BackgroundThemeProvider({ visuals, children }) {
     styles = {},
   } = visuals || {}
 
-  const surfaceStyle = hasBackground ? styles.surface || {} : {}
+  const surfaceStyle = hasBackground
+    ? {
+        display: 'flex',
+        flexDirection: 'column',
+        flex: '1 1 auto',
+        alignSelf: 'stretch',
+        margin: '-13px -20px',
+        padding: '13px 20px',
+        width: 'calc(100% + 40px)',
+        maxWidth: 'none',
+        boxSizing: 'border-box',
+        ...(styles.surface || {}),
+      }
+    : {}
   const iconStyles = hasBackground
     ? { color: primaryColor || '#fff', ...(styles.icon || {}) }
     : {}

@@ -61,6 +61,7 @@ function ApplyGlobal() {
             border: `${theme.palette.divider} solid 4px`,
             color: theme.palette.text.primary,
             padding: 0,
+            overflow: 'hidden',
           },
           '.leaflet-bar a': {
             backgroundColor: theme.palette.grey[grey],

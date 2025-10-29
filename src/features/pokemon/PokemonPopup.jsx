@@ -333,7 +333,7 @@ export function PokemonPopup({ pokemon, iconUrl, isTutorial = false }) {
       enterTouchDelay={0}
       placement="top"
     >
-      <span style={{ display: 'inline-block' }}>{themedContent}</span>
+      <div style={{ display: 'block', width: '100%' }}>{themedContent}</div>
     </Tooltip>
   ) : (
     themedContent
