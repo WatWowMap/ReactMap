@@ -420,7 +420,7 @@ function DefendersModal({ gym, onClose }) {
         // Original detailed defender display
         <>
           <Grid container direction="column" spacing={1}>
-            {defenders.map((def, index) => {
+            {defenders.map((def) => {
               const fullCP = def.cp_when_deployed
               const decayTime =
                 72 *
@@ -446,9 +446,7 @@ function DefendersModal({ gym, onClose }) {
               const primaryTextStyles = defenderStyles.primaryText || {}
               const secondaryTextStyles = defenderStyles.secondaryText || {}
               const iconStyles = defenderStyles.icon || {}
-              const rowKey = def.pokemon_id
-                ? `${def.pokemon_id}-${index}`
-                : `${index}`
+              const rowKey = `${def.pokemon_id}-${def.deployed_ms}`
               const rowContent = (
                 <DefenderRowLayout
                   borderColor={borderColor}
