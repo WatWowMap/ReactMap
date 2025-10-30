@@ -27,6 +27,32 @@ const DARK_PALETTE_ENTRIES = Object.entries(
   }, {})
 
 /**
+ * Generates symmetrical margin/padding to let the background artwork bleed.
+ *
+ * @param {{
+ *  horizontal?: number
+ *  vertical?: number
+ *  clampWidth?: boolean
+ * }} [options]
+ * @returns {React.CSSProperties}
+ */
+export function createFullBleedSurfaceStyle({
+  horizontal = 0,
+  vertical = 0,
+} = {}) {
+  const horizontalPixels = Number(horizontal) || 0
+  const verticalPixels = Number(vertical) || 0
+  const widthAdjustment = horizontalPixels * 2
+  const width = widthAdjustment ? `calc(100% + ${widthAdjustment}px)` : '100%'
+  return {
+    margin: `${-verticalPixels}px ${-horizontalPixels}px`,
+    padding: `${verticalPixels}px ${horizontalPixels}px`,
+    width,
+    boxSizing: 'border-box',
+  }
+}
+
+/**
  * Applies themed background visuals (and optional tooltip) around popup content.
  *
  * @param {{

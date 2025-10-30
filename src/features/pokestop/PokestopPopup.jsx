@@ -27,7 +27,10 @@ import { Timer } from '@components/popups/Timer'
 import { PowerUp } from '@components/popups/PowerUp'
 import { NameTT } from '@components/popups/NameTT'
 import { TimeStamp } from '@components/popups/TimeStamps'
-import { BackgroundCard } from '@components/popups/BackgroundCard'
+import {
+  BackgroundCard,
+  createFullBleedSurfaceStyle,
+} from '@components/popups/BackgroundCard'
 import { useAnalytics } from '@hooks/useAnalytics'
 import { useGetAvailable } from '@hooks/useGetAvailable'
 import { parseQuestConditions } from '@utils/parseConditions'
@@ -599,27 +602,11 @@ const RewardInfo = ({ with_ar, ...quest }) => {
  * @param {{
  *  quest: Omit<import('@rm/types').Quest, 'key'>
  *  visuals?: ReturnType<ReturnType<typeof usePokemonBackgroundVisuals>>
- *  hasBackground?: boolean
  * }} props
  * @returns
  */
-const QuestRewardRow = ({ quest, visuals: visualsProp }) => {
-  const { quest_reward_type, quest_background, quest_shiny_probability } = quest
-  const getPokemonBackgroundVisuals = usePokemonBackgroundVisuals()
-  const visuals = React.useMemo(() => {
-    if (visualsProp) {
-      return visualsProp
-    }
-    if (quest_reward_type !== 7) {
-      return undefined
-    }
-    return getPokemonBackgroundVisuals(quest_background)
-  }, [
-    visualsProp,
-    getPokemonBackgroundVisuals,
-    quest_background,
-    quest_reward_type,
-  ])
+const QuestRewardRow = ({ quest, visuals }) => {
+  const { quest_reward_type, quest_shiny_probability } = quest
   const hasBackground = visuals?.hasBackground ?? false
   const applyBackground = quest_reward_type === 7 && hasBackground
   const backgroundMeta = visuals?.backgroundMeta
@@ -670,13 +657,7 @@ const QuestRewardRow = ({ quest, visuals: visualsProp }) => {
       wrapperProps={applyBackground ? { style: { width: '100%' } } : undefined}
       surfaceStyle={
         applyBackground
-          ? {
-              margin: '0 -21px',
-              padding: '0 21px',
-              width: 'calc(100% + 42px)',
-              maxWidth: 'calc(100% + 42px)',
-              boxSizing: 'border-box',
-            }
+          ? createFullBleedSurfaceStyle({ horizontal: 21 })
           : undefined
       }
     >
@@ -1068,13 +1049,7 @@ const ShowcaseEntry = ({
       wrapWhenNoTooltip
       surfaceStyle={
         hasBackground
-          ? {
-              margin: '0 -21px',
-              padding: '0 21px',
-              width: 'calc(100% + 42px)',
-              maxWidth: 'none',
-              boxSizing: 'border-box',
-            }
+          ? createFullBleedSurfaceStyle({ horizontal: 21 })
           : undefined
       }
     >

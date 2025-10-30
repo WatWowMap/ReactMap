@@ -31,7 +31,10 @@ import { GenderIcon } from '@components/popups/GenderIcon'
 import { Navigation } from '@components/popups/Navigation'
 import { Coords } from '@components/popups/Coords'
 import { TimeStamp } from '@components/popups/TimeStamps'
-import { BackgroundCard } from '@components/popups/BackgroundCard'
+import {
+  BackgroundCard,
+  createFullBleedSurfaceStyle,
+} from '@components/popups/BackgroundCard'
 import { useAnalytics } from '@hooks/useAnalytics'
 import { getTimeUntil } from '@utils/getTimeUntil'
 import { formatInterval } from '@utils/formatInterval'
@@ -351,14 +354,7 @@ function DefendersModal({ gym, onClose }) {
             : undefined
         }
         surfaceStyle={
-          fallbackHasBackground
-            ? {
-                margin: 0,
-                padding: 0,
-                width: '100%',
-                maxWidth: '100%',
-              }
-            : undefined
+          fallbackHasBackground ? createFullBleedSurfaceStyle({}) : undefined
         }
       >
         {rowContent}
@@ -650,12 +646,7 @@ function DefendersModal({ gym, onClose }) {
                     }
                     surfaceStyle={
                       hasBackground
-                        ? {
-                            margin: 0,
-                            padding: 0,
-                            width: '100%',
-                            maxWidth: '100%',
-                          }
+                        ? createFullBleedSurfaceStyle({})
                         : undefined
                     }
                   >
