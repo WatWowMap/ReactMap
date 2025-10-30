@@ -30,7 +30,7 @@ import { StatusIcon } from '@components/StatusIcon'
 import { readableProbability } from '@utils/readableProbability'
 import { GET_POKEMON_SHINY_STATS } from '@services/queries/pokemon'
 import { GET_TAPPABLE_BY_ID } from '@services/queries/tappable'
-import { usePokemonBackgroundVisuals } from '@hooks/usePokemonBackgroundVisuals'
+import { usePokemonBackgroundVisual } from '@hooks/usePokemonBackgroundVisuals'
 import {
   BackgroundCard,
   createFullBleedSurfaceStyle,
@@ -91,12 +91,7 @@ export function PokemonPopup({ pokemon, iconUrl, isTutorial = false }) {
   const timeOfDay = useMemory((s) => s.timeOfDay)
   const metaData = useMemory((s) => s.masterfile.pokemon[pokemon_id])
   const Icons = useMemory((s) => s.Icons)
-  const getPokemonBackgroundVisuals = usePokemonBackgroundVisuals()
-  const backgroundVisuals = React.useMemo(
-    () => getPokemonBackgroundVisuals(pokemon.background),
-    [getPokemonBackgroundVisuals, pokemon.background],
-  )
-  const backgroundTooltip = backgroundVisuals?.backgroundMeta?.tooltip
+  const backgroundVisuals = usePokemonBackgroundVisual(pokemon.background)
 
   const userSettings = useStorage((s) => s.userSettings.pokemon)
   const pokePerms = isTutorial
@@ -324,7 +319,6 @@ export function PokemonPopup({ pokemon, iconUrl, isTutorial = false }) {
     <ErrorBoundary noRefresh style={{}} variant="h5">
       <BackgroundCard
         visuals={backgroundVisuals}
-        tooltip={backgroundTooltip}
         wrapperProps={{ style: { display: 'block', width: '100%' } }}
         surfaceStyle={
           backgroundVisuals?.hasBackground

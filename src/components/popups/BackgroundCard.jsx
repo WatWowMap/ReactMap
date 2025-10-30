@@ -32,7 +32,6 @@ const DARK_PALETTE_ENTRIES = Object.entries(
  * @param {{
  *  horizontal?: number
  *  vertical?: number
- *  clampWidth?: boolean
  * }} [options]
  * @returns {React.CSSProperties}
  */

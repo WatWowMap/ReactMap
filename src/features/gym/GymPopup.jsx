@@ -38,7 +38,10 @@ import {
 import { useAnalytics } from '@hooks/useAnalytics'
 import { getTimeUntil } from '@utils/getTimeUntil'
 import { formatInterval } from '@utils/formatInterval'
-import { usePokemonBackgroundVisuals } from '@hooks/usePokemonBackgroundVisuals'
+import {
+  usePokemonBackgroundVisuals,
+  usePokemonBackgroundVisual,
+} from '@hooks/usePokemonBackgroundVisuals'
 
 import { useWebhook } from './useWebhook'
 
@@ -273,16 +276,15 @@ function DefendersModal({ gym, onClose }) {
   const { t, i18n } = useTranslation()
   const theme = useTheme()
   const Icons = useMemory((s) => s.Icons)
-  const getPokemonBackgroundVisuals = usePokemonBackgroundVisuals()
+  const resolvePokemonBackgroundVisual = usePokemonBackgroundVisuals()
   const numFormatter = new Intl.NumberFormat(i18n.language)
   const defenders = gym.defenders || []
   const updatedMs =
     defenders.length &&
     defenders[0].deployed_ms + defenders[0].deployed_time * 1000
   const now = Date.now()
-  const fallbackVisuals = React.useMemo(
-    () => getPokemonBackgroundVisuals(gym.guarding_pokemon_display?.background),
-    [getPokemonBackgroundVisuals, gym.guarding_pokemon_display?.background],
+  const fallbackVisuals = usePokemonBackgroundVisual(
+    gym.guarding_pokemon_display?.background,
   )
 
   // Fallback to basic gym data when detailed defender info isn't available
@@ -308,7 +310,6 @@ function DefendersModal({ gym, onClose }) {
     const rowContent = (
       <DefenderRowLayout
         borderColor={fallbackBorderColor}
-        tooltip={fallbackBackgroundMeta?.tooltip}
         imageSrc={fallbackImageSrc}
         imageAlt={t(`poke_${gym.guarding_pokemon_id}`)}
         showBestBuddy={gym.guarding_pokemon_display?.badge === 1}
@@ -347,7 +348,6 @@ function DefendersModal({ gym, onClose }) {
     fallbackRow = (
       <BackgroundCard
         visuals={fallbackHasBackground ? fallbackVisuals : undefined}
-        tooltip={fallbackBackgroundMeta?.tooltip}
         wrapperProps={
           fallbackBackgroundMeta?.tooltip
             ? { style: { width: '100%' } }
@@ -431,7 +431,7 @@ function DefendersModal({ gym, onClose }) {
               const currentCP = Math.round(
                 fullCP * (0.2 + 0.8 * predictedMotivation),
               )
-              const visuals = getPokemonBackgroundVisuals(def.background)
+              const visuals = resolvePokemonBackgroundVisual(def.background)
               const {
                 borderColor,
                 primaryColor,
@@ -638,7 +638,6 @@ function DefendersModal({ gym, onClose }) {
                 <React.Fragment key={rowKey}>
                   <BackgroundCard
                     visuals={hasBackground ? visuals : undefined}
-                    tooltip={backgroundMeta?.tooltip}
                     wrapperProps={
                       backgroundMeta?.tooltip
                         ? { style: { width: '100%' } }

@@ -174,3 +174,17 @@ export function usePokemonBackgroundVisuals() {
     [Icons, i18n, locationCards, t, theme],
   )
 }
+
+/**
+ * Convenience hook for resolving a single Pokemon background visual record.
+ *
+ * @param {number | string | null | undefined} backgroundValue
+ */
+export function usePokemonBackgroundVisual(backgroundValue) {
+  const resolveBackgroundVisual = usePokemonBackgroundVisuals()
+
+  return React.useMemo(
+    () => resolveBackgroundVisual(backgroundValue),
+    [backgroundValue, resolveBackgroundVisual],
+  )
+}

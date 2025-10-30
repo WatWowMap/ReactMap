@@ -36,7 +36,10 @@ import { useGetAvailable } from '@hooks/useGetAvailable'
 import { parseQuestConditions } from '@utils/parseConditions'
 import { Img } from '@components/Img'
 import { readableProbability } from '@utils/readableProbability'
-import { usePokemonBackgroundVisuals } from '@hooks/usePokemonBackgroundVisuals'
+import {
+  usePokemonBackgroundVisuals,
+  usePokemonBackgroundVisual,
+} from '@hooks/usePokemonBackgroundVisuals'
 
 /**
  *
@@ -601,7 +604,7 @@ const RewardInfo = ({ with_ar, ...quest }) => {
  *
  * @param {{
  *  quest: Omit<import('@rm/types').Quest, 'key'>
- *  visuals?: ReturnType<ReturnType<typeof usePokemonBackgroundVisuals>>
+ *  visuals?: ReturnType<typeof usePokemonBackgroundVisual>
  * }} props
  * @returns
  */
@@ -609,7 +612,6 @@ const QuestRewardRow = ({ quest, visuals }) => {
   const { quest_reward_type, quest_shiny_probability } = quest
   const hasBackground = visuals?.hasBackground ?? false
   const applyBackground = quest_reward_type === 7 && hasBackground
-  const backgroundMeta = visuals?.backgroundMeta
   const rowContent = (
     <Grid container justifyContent="center" alignItems="center">
       <Grid
@@ -653,7 +655,6 @@ const QuestRewardRow = ({ quest, visuals }) => {
   const wrappedRow = (
     <BackgroundCard
       visuals={applyBackground ? visuals : undefined}
-      tooltip={applyBackground ? backgroundMeta?.tooltip : undefined}
       wrapperProps={applyBackground ? { style: { width: '100%' } } : undefined}
       surfaceStyle={
         applyBackground
@@ -992,12 +993,8 @@ const ShowcaseEntry = ({
 }) => {
   const Icons = useMemory((s) => s.Icons)
   const { t } = useTranslation()
-  const getPokemonBackgroundVisuals = usePokemonBackgroundVisuals()
-  const visuals = React.useMemo(
-    () => getPokemonBackgroundVisuals(background),
-    [background, getPokemonBackgroundVisuals],
-  )
-  const { hasBackground, backgroundMeta } = visuals
+  const visuals = usePokemonBackgroundVisual(background)
+  const { hasBackground } = visuals
   const entry = (
     <div className="showcase-entry">
       <div className="showcase-entry-content">
@@ -1044,7 +1041,6 @@ const ShowcaseEntry = ({
   return (
     <BackgroundCard
       visuals={hasBackground ? visuals : undefined}
-      tooltip={backgroundMeta?.tooltip}
       wrapperProps={{ style: { width: '100%' } }}
       wrapWhenNoTooltip
       surfaceStyle={
