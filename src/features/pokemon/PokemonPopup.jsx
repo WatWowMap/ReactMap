@@ -97,7 +97,19 @@ export function PokemonPopup({ pokemon, iconUrl, isTutorial = false }) {
         iv: true,
       }
     : perms
-  const popups = useStorage((s) => s.popups)
+  const pokemonExtrasOpen = useStorage((s) => !!s.popups.pokemonExtras)
+  const pokemonPvpOpen = useStorage((s) => !!s.popups.pokemonPvp)
+  const handlePokemonSectionToggle = React.useCallback((section) => {
+    const currentKey = section === 'extras' ? 'pokemonExtras' : 'pokemonPvp'
+    const oppositeKey = section === 'extras' ? 'pokemonPvp' : 'pokemonExtras'
+    useStorage.setState((prev) => ({
+      popups: {
+        ...prev.popups,
+        [currentKey]: !prev.popups[currentKey],
+        [oppositeKey]: false,
+      },
+    }))
+  }, [])
 
   const hasLeagues = cleanPvp ? Object.keys(cleanPvp) : []
   const hasStats = iv || cp
@@ -284,11 +296,13 @@ export function PokemonPopup({ pokemon, iconUrl, isTutorial = false }) {
       <ShinyOdds shinyStats={shinyStats} t={t} />
       <Footer
         pokemon={pokemon}
-        popups={popups}
+        extrasOpen={pokemonExtrasOpen}
+        pvpOpen={pokemonPvpOpen}
         hasPvp={!!hasLeagues.length}
         Icons={Icons}
+        onToggle={handlePokemonSectionToggle}
       />
-      <Collapse in={popups.pvp && perms.pvp} timeout="auto" unmountOnExit>
+      <Collapse in={pokemonPvpOpen && perms.pvp} timeout="auto" unmountOnExit>
         {hasLeagues.map((league) => (
           <PvpInfo
             key={league}
@@ -300,7 +314,7 @@ export function PokemonPopup({ pokemon, iconUrl, isTutorial = false }) {
           />
         ))}
       </Collapse>
-      <Collapse in={popups.extras} timeout="auto" unmountOnExit>
+      <Collapse in={pokemonExtrasOpen} timeout="auto" unmountOnExit>
         <ExtraPokemonInfo
           pokemon={pokemon}
           perms={pokePerms}
@@ -673,29 +687,18 @@ const Timer = ({ pokemon, hasStats, t }) => {
   )
 }
 
-const Footer = ({ pokemon, popups, hasPvp, Icons }) => {
+const Footer = ({ pokemon, extrasOpen, pvpOpen, hasPvp, Icons, onToggle }) => {
   const { lat, lon } = pokemon
   const darkMode = useStorage((s) => s.darkMode)
-
-  const handleExpandClick = (category) => {
-    const opposite = category === 'extras' ? 'pvp' : 'extras'
-    useStorage.setState((prev) => ({
-      popups: {
-        ...prev.popups,
-        [category]: !popups[category],
-        [opposite]: false,
-      },
-    }))
-  }
 
   return (
     <>
       {hasPvp && (
         <Grid xs={4}>
           <IconButton
-            className={popups.pvp ? 'expanded' : 'closed'}
+            className={pvpOpen ? 'expanded' : 'closed'}
             name="pvp"
-            onClick={() => handleExpandClick('pvp')}
+            onClick={() => onToggle?.('pvp')}
             size="large"
           >
             <img
@@ -714,8 +717,8 @@ const Footer = ({ pokemon, popups, hasPvp, Icons }) => {
       </Grid>
       <Grid xs={4}>
         <IconButton
-          className={popups.extras ? 'expanded' : 'closed'}
-          onClick={() => handleExpandClick('extras')}
+          className={extrasOpen ? 'expanded' : 'closed'}
+          onClick={() => onToggle?.('extras')}
           size="large"
         >
           <ExpandMore data-background-icon="true" />
