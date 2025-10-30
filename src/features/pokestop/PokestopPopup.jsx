@@ -3,6 +3,7 @@ import * as React from 'react'
 import ExpandMore from '@mui/icons-material/ExpandMore'
 import MoreVert from '@mui/icons-material/MoreVert'
 import Divider from '@mui/material/Divider'
+import Box from '@mui/material/Box'
 import Grid from '@mui/material/Unstable_Grid2'
 import IconButton from '@mui/material/IconButton'
 import Collapse from '@mui/material/Collapse'
@@ -10,6 +11,7 @@ import Typography from '@mui/material/Typography'
 import Check from '@mui/icons-material/Check'
 import Help from '@mui/icons-material/Help'
 import { useTranslation, Trans } from 'react-i18next'
+import { useTheme } from '@mui/material/styles'
 
 import { ErrorBoundary } from '@components/ErrorBoundary'
 import { useMemory } from '@store/useMemory'
@@ -993,15 +995,43 @@ const ShowcaseEntry = ({
 }) => {
   const Icons = useMemory((s) => s.Icons)
   const { t } = useTranslation()
+  const theme = useTheme()
   const visuals = usePokemonBackgroundVisual(background)
   const { hasBackground } = visuals
   const entry = (
-    <div className="showcase-entry">
-      <div className="showcase-entry-content">
-        <div className="showcase-entry-col showcase-entry-rank">
+    <Box display="flex" justifyContent="center" width="100%">
+      <Box
+        sx={{
+          width: '75%',
+          mx: 'auto',
+          py: 0.25,
+          display: 'grid',
+          gridTemplateColumns: '60px 1fr 60px',
+          alignItems: 'center',
+          justifyItems: 'center',
+          textAlign: 'center',
+          ...theme.typography.body2,
+        }}
+      >
+        <Box
+          component="span"
+          sx={{
+            width: 40,
+            display: 'flex',
+            justifyContent: 'center',
+          }}
+        >
           <img src={Icons.getMisc(getBadge(rank))} alt="rank" height={20} />
-        </div>
-        <div className="showcase-entry-col showcase-entry-score">
+        </Box>
+        <Box
+          component="span"
+          sx={{
+            display: 'flex',
+            justifyContent: 'center',
+            minWidth: 0,
+            width: '100%',
+          }}
+        >
           <Typography
             variant="body2"
             component="div"
@@ -1009,33 +1039,57 @@ const ShowcaseEntry = ({
           >
             {score.toFixed(2)}
           </Typography>
-        </div>
-        <div className="showcase-entry-col showcase-entry-pokemon">
-          {pokemon_id ? (
-            <div className="showcase-entry-pokemon-inner">
-              <div className="showcase-entry-pokemon-icon">
-                <Img
-                  src={Icons.getPokemonByDisplay(pokemon_id, {
-                    ...display,
-                    badge,
-                    background,
-                  })}
-                  alt={t(`poke_${pokemon_id}`)}
-                />
-              </div>
-              {badge === 1 && (
-                <Img
-                  src={Icons.getMisc('bestbuddy')}
-                  alt={t('best_buddy')}
-                  maxHeight={15}
-                  maxWidth={15}
-                />
-              )}
-            </div>
-          ) : null}
-        </div>
-      </div>
-    </div>
+        </Box>
+        <Box
+          component="span"
+          sx={{
+            width: 40,
+            display: 'flex',
+            justifyContent: 'center',
+          }}
+        >
+          <Box
+            sx={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: theme.spacing(0.5),
+              width: '100%',
+            }}
+          >
+            <Box
+              component="span"
+              sx={{
+                width: 40,
+                height: 20,
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              <Img
+                src={Icons.getPokemonByDisplay(pokemon_id, {
+                  ...display,
+                  badge,
+                  background,
+                })}
+                alt={t(`poke_${pokemon_id}`)}
+                maxHeight={20}
+                maxWidth={20}
+              />
+            </Box>
+            {badge === 1 && (
+              <Img
+                src={Icons.getMisc('bestbuddy')}
+                alt={t('best_buddy')}
+                maxHeight={20}
+                maxWidth={20}
+              />
+            )}
+          </Box>
+        </Box>
+      </Box>
+    </Box>
   )
 
   return (

@@ -5,26 +5,17 @@ import Box from '@mui/material/Box'
 import ThemeProvider from '@mui/material/styles/ThemeProvider'
 import { createTheme, useTheme } from '@mui/material/styles'
 
-const DARK_PALETTE_ENTRIES = Object.entries(
-  createTheme({ palette: { mode: 'dark' } }).palette,
-)
-  .filter(
-    ([, value]) =>
-      value &&
-      typeof value === 'object' &&
-      !Array.isArray(value) &&
-      'main' in value &&
-      typeof value.main === 'string',
-  )
-  .reduce((acc, [key, value]) => {
-    acc[key] = {
-      main: value.main,
-      light: value.light,
-      dark: value.dark,
-      contrastText: value.contrastText,
+const DARK_PALETTE_OVERRIDES = (() => {
+  const dark = createTheme({ palette: { mode: 'dark' } }).palette
+  return Object.entries(dark).reduce((acc, [key, value]) => {
+    if (value && typeof value === 'object') {
+      acc[key] = { ...value }
+    } else {
+      acc[key] = value
     }
     return acc
-  }, {})
+  }, /** @type {Record<string, unknown>} */ ({ mode: 'dark' }))
+})()
 
 /**
  * Generates symmetrical margin/padding to let the background artwork bleed.
@@ -141,8 +132,7 @@ export function BackgroundCard({
     }
     return createTheme(parentTheme, {
       palette: {
-        mode: 'dark',
-        ...DARK_PALETTE_ENTRIES,
+        ...DARK_PALETTE_OVERRIDES,
       },
     })
   }, [hasBackground, parentTheme])
