@@ -457,7 +457,6 @@ class Gym extends Model {
       .groupBy([
         isMad ? 'pokemon_id' : 'raid_pokemon_id',
         isMad ? 'form' : 'raid_pokemon_form',
-        isMad ? 'level' : 'raid_level',
       ])
       .orderBy(isMad ? 'pokemon_id' : 'raid_pokemon_id', 'asc')
     const teamResults = await this.query()
