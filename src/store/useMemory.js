@@ -148,6 +148,8 @@ export const useMemory = create(() => ({
     weather: {},
     raids: {},
     teams: {},
+    locationCards: {},
+    routeTypes: {},
   },
   hideList: new Set(),
   timerList: [],

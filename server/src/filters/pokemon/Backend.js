@@ -432,6 +432,7 @@ class PkmnBackend {
       display_pokemon_id: pokemon.display_pokemon_id,
       seen_type: pokemon.seen_type,
       changed: !!pokemon.changed,
+      background: pokemon.background,
     }
     if (!result.seen_type) {
       if (result.spawn_id === null) {

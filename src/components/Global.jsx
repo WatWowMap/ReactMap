@@ -60,6 +60,8 @@ function ApplyGlobal() {
             backgroundColor: theme.palette.background.paper,
             border: `${theme.palette.divider} solid 4px`,
             color: theme.palette.text.primary,
+            padding: 0,
+            overflow: 'hidden',
           },
           '.leaflet-bar a': {
             backgroundColor: theme.palette.grey[grey],
@@ -110,8 +112,7 @@ function ApplyGlobal() {
             borderRadius: '12px',
             padding: '3px',
             fontSize: '0.5rem !important',
-            backgroundColor: theme.palette.grey[grey],
-            color: theme.palette.text.primary,
+            backgroundColor: 'transparent',
           },
           '.iv-badge': {
             color: theme.palette.text.primary,

@@ -3,18 +3,15 @@ import * as React from 'react'
 import ExpandMore from '@mui/icons-material/ExpandMore'
 import MoreVert from '@mui/icons-material/MoreVert'
 import Divider from '@mui/material/Divider'
+import Box from '@mui/material/Box'
 import Grid from '@mui/material/Unstable_Grid2'
 import IconButton from '@mui/material/IconButton'
 import Collapse from '@mui/material/Collapse'
 import Typography from '@mui/material/Typography'
-import TableCell from '@mui/material/TableCell'
-import TableRow from '@mui/material/TableRow'
-import Table from '@mui/material/Table'
-import TableBody from '@mui/material/TableBody'
-import styled from '@mui/material/styles/styled'
 import Check from '@mui/icons-material/Check'
 import Help from '@mui/icons-material/Help'
 import { useTranslation, Trans } from 'react-i18next'
+import { useTheme } from '@mui/material/styles'
 
 import { ErrorBoundary } from '@components/ErrorBoundary'
 import { useMemory } from '@store/useMemory'
@@ -32,11 +29,16 @@ import { Timer } from '@components/popups/Timer'
 import { PowerUp } from '@components/popups/PowerUp'
 import { NameTT } from '@components/popups/NameTT'
 import { TimeStamp } from '@components/popups/TimeStamps'
+import { BackgroundCard } from '@components/popups/BackgroundCard'
 import { useAnalytics } from '@hooks/useAnalytics'
 import { useGetAvailable } from '@hooks/useGetAvailable'
 import { parseQuestConditions } from '@utils/parseConditions'
 import { Img } from '@components/Img'
 import { readableProbability } from '@utils/readableProbability'
+import {
+  usePokemonBackgroundVisuals,
+  usePokemonBackgroundVisual,
+} from '@hooks/usePokemonBackgroundVisuals'
 
 /**
  *
@@ -67,6 +69,18 @@ export function PokestopPopup({
       .join(','),
     'Pokestop',
   )
+
+  const getPokemonBackgroundVisuals = usePokemonBackgroundVisuals()
+  const questVisuals = React.useMemo(() => {
+    if (!Array.isArray(pokestop.quests)) {
+      return []
+    }
+    return pokestop.quests.map((quest) =>
+      quest.quest_reward_type === 7
+        ? getPokemonBackgroundVisuals(quest.quest_background)
+        : undefined,
+    )
+  }, [getPokemonBackgroundVisuals, pokestop.quests])
 
   const plainPokestop = !hasLure && !hasQuest && !hasInvasion && !hasEvent
 
@@ -116,39 +130,25 @@ export function PokestopPopup({
               />
               {hasQuest &&
                 // eslint-disable-next-line no-unused-vars
-                pokestop.quests.map(({ key, ...quest }, index) => (
-                  <React.Fragment key={`${quest.with_ar}`}>
-                    {index ? (
-                      <Divider light flexItem className="popup-divider" />
-                    ) : null}
-                    <RewardInfo {...quest} />
-                    <Grid
-                      xs={9}
-                      style={{
-                        textAlign: 'center',
-                        maxHeight: 150,
-                        overflow: 'auto',
-                      }}
-                    >
-                      <QuestConditions {...quest} />
-                      {!!quest.quest_shiny_probability && (
-                        <>
-                          <br />
-                          <Typography variant="caption">
-                            <Trans
-                              i18nKey="shiny_probability"
-                              components={[
-                                readableProbability(
-                                  quest.quest_shiny_probability,
-                                ),
-                              ]}
-                            />
-                          </Typography>
-                        </>
-                      )}
-                    </Grid>
-                  </React.Fragment>
-                ))}
+                pokestop.quests.map(({ key, ...quest }, index) => {
+                  const visuals = questVisuals[index]
+                  const hasBackground = Boolean(visuals?.hasBackground)
+                  const previousHasBackground =
+                    index > 0
+                      ? Boolean(questVisuals[index - 1]?.hasBackground)
+                      : false
+                  const showDivider =
+                    index && !(hasBackground || previousHasBackground)
+
+                  return (
+                    <React.Fragment key={`${quest.with_ar}`}>
+                      {showDivider ? (
+                        <Divider light flexItem className="popup-divider" />
+                      ) : null}
+                      <QuestRewardRow quest={quest} visuals={visuals} />
+                    </React.Fragment>
+                  )
+                })}
               {hasLure && (
                 <>
                   {hasQuest && (
@@ -282,19 +282,12 @@ export function PokestopPopup({
                               event.showcase_ranking_standard
                             }
                           >
-                            <Table
-                              size="small"
-                              className="table-invasion three-quarters-width"
-                            >
-                              <TableBody>
-                                {(contest_entries || []).map((position) => (
-                                  <ShowcaseEntry
-                                    key={position.rank}
-                                    {...position}
-                                  />
-                                ))}
-                              </TableBody>
-                            </Table>
+                            {(contest_entries || []).map((position) => (
+                              <ShowcaseEntry
+                                key={position.rank}
+                                {...position}
+                              />
+                            ))}
                           </Showcase>
                         </TimeTile>
                       </React.Fragment>
@@ -533,7 +526,9 @@ const MenuActions = ({
 
 /**
  *
- * @param {Omit<import('@rm/types').Quest, 'key'>} props
+ * @param {{
+ *  with_ar: boolean
+ * } & Omit<import('@rm/types').Quest, 'key'>} props
  * @returns
  */
 const RewardInfo = ({ with_ar, ...quest }) => {
@@ -567,7 +562,7 @@ const RewardInfo = ({ with_ar, ...quest }) => {
   const altText = altAmount > 0 ? `${altLabel} x${altAmount}` : altLabel
 
   return (
-    <Grid xs={3} style={{ textAlign: 'center', position: 'relative' }}>
+    <>
       <NameTT title={altText}>
         <img
           src={src}
@@ -585,7 +580,10 @@ const RewardInfo = ({ with_ar, ...quest }) => {
       {!!amount && (
         <div
           className="search-amount-holder"
-          style={{ fontSize: 'medium', bottom: 20 }}
+          style={{
+            fontSize: 'medium',
+            bottom: 20,
+          }}
         >
           x{amount}
         </div>
@@ -593,8 +591,73 @@ const RewardInfo = ({ with_ar, ...quest }) => {
       <Typography variant="caption" className="ar-task" noWrap>
         {questMessage || t(`ar_quest_${!!with_ar}`)}
       </Typography>
+    </>
+  )
+}
+
+/**
+ *
+ * @param {{
+ *  quest: Omit<import('@rm/types').Quest, 'key'>
+ *  visuals?: ReturnType<typeof usePokemonBackgroundVisual>
+ * }} props
+ * @returns
+ */
+const QuestRewardRow = ({ quest, visuals }) => {
+  const { quest_reward_type, quest_shiny_probability } = quest
+  const hasBackground = visuals?.hasBackground ?? false
+  const applyBackground = quest_reward_type === 7 && hasBackground
+  const rowContent = (
+    <Grid container justifyContent="center" alignItems="center">
+      <Grid
+        xs={3}
+        style={{
+          textAlign: 'center',
+          position: 'relative',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: 4,
+        }}
+      >
+        <RewardInfo {...quest} />
+      </Grid>
+      <Grid
+        xs={9}
+        style={{
+          textAlign: 'center',
+          maxHeight: 150,
+          overflow: 'auto',
+        }}
+      >
+        <QuestConditions {...quest} />
+        {!!quest_shiny_probability && (
+          <>
+            <br />
+            <Typography variant="caption">
+              <Trans
+                i18nKey="shiny_probability"
+                components={[readableProbability(quest_shiny_probability)]}
+              />
+            </Typography>
+          </>
+        )}
+      </Grid>
     </Grid>
   )
+
+  const wrappedRow = (
+    <BackgroundCard
+      visuals={applyBackground ? visuals : undefined}
+      fullWidth={applyBackground}
+      fullBleed={applyBackground ? 21 : undefined}
+    >
+      {rowContent}
+    </BackgroundCard>
+  )
+
+  return <Grid xs={12}>{wrappedRow}</Grid>
 }
 
 /**
@@ -911,47 +974,121 @@ const Showcase = ({
   )
 }
 
-const NoBorderCell = styled(TableCell, {
-  shouldForwardProp: (prop) => prop !== 'textAlign',
-  // @ts-ignore
-})(({ textAlign = 'right' }) => ({
-  borderBottom: 'none',
-  padding: 2,
-  textAlign,
-}))
-
-const ShowcaseEntry = (entry) => {
-  const { rank, score, pokemon_id, badge } = entry
+const ShowcaseEntry = ({
+  rank,
+  score,
+  pokemon_id,
+  badge,
+  background,
+  ...display
+}) => {
   const Icons = useMemory((s) => s.Icons)
   const { t } = useTranslation()
-  return (
-    <TableRow>
-      <NoBorderCell>
-        <img src={Icons.getMisc(getBadge(rank))} alt="rank" height={20} />
-      </NoBorderCell>
-      <NoBorderCell
-        // @ts-ignore
-        textAlign="center"
+  const theme = useTheme()
+  const visuals = usePokemonBackgroundVisual(background)
+  const { hasBackground } = visuals
+  const entry = (
+    <Box display="flex" justifyContent="center" width="100%">
+      <Box
+        sx={{
+          width: '75%',
+          mx: 'auto',
+          py: 0.25,
+          display: 'grid',
+          gridTemplateColumns: '60px 1fr 60px',
+          alignItems: 'center',
+          justifyItems: 'center',
+          textAlign: 'center',
+          ...theme.typography.body2,
+        }}
       >
-        {score.toFixed(2)}
-      </NoBorderCell>
-      {pokemon_id && (
-        <NoBorderCell>
-          <img
-            src={Icons.getPokemonByDisplay(pokemon_id, entry)}
-            alt="rank"
-            height={20}
-          />
-          {badge === 1 && (
-            <Img
-              src={Icons.getMisc('bestbuddy')}
-              alt={t('best_buddy')}
-              maxHeight={15}
-              maxWidth={15}
-            />
-          )}
-        </NoBorderCell>
-      )}
-    </TableRow>
+        <Box
+          component="span"
+          sx={{
+            width: 40,
+            display: 'flex',
+            justifyContent: 'center',
+          }}
+        >
+          <img src={Icons.getMisc(getBadge(rank))} alt="rank" height={20} />
+        </Box>
+        <Box
+          component="span"
+          sx={{
+            display: 'flex',
+            justifyContent: 'center',
+            minWidth: 0,
+            width: '100%',
+          }}
+        >
+          <Typography
+            variant="body2"
+            component="div"
+            sx={{ fontWeight: 'inherit' }}
+          >
+            {score.toFixed(2)}
+          </Typography>
+        </Box>
+        <Box
+          component="span"
+          sx={{
+            width: 40,
+            display: 'flex',
+            justifyContent: 'center',
+          }}
+        >
+          <Box
+            sx={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: theme.spacing(0.5),
+              width: '100%',
+            }}
+          >
+            <Box
+              component="span"
+              sx={{
+                width: 40,
+                height: 20,
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              <Img
+                src={Icons.getPokemonByDisplay(pokemon_id, {
+                  ...display,
+                  badge,
+                  background,
+                })}
+                alt={t(`poke_${pokemon_id}`)}
+                maxHeight={20}
+                maxWidth={20}
+              />
+            </Box>
+            {badge === 1 && (
+              <Img
+                src={Icons.getMisc('bestbuddy')}
+                alt={t('best_buddy')}
+                maxHeight={20}
+                maxWidth={20}
+              />
+            )}
+          </Box>
+        </Box>
+      </Box>
+    </Box>
+  )
+
+  return (
+    <BackgroundCard
+      visuals={hasBackground ? visuals : undefined}
+      fullWidth
+      wrapWhenNoTooltip
+      fullBleed={hasBackground ? 21 : undefined}
+    >
+      {entry}
+    </BackgroundCard>
   )
 }

@@ -132,7 +132,16 @@ class Pokemon extends Model {
   static async getAll(perms, args, ctx) {
     const { iv: ivs, pvp, areaRestrictions } = perms
     const { onlyIvOr, onlyHundoIv, onlyZeroIv, onlyAreas = [] } = args.filters
-    const { hasSize, hasHeight, isMad, mem, secret, httpAuth, pvpV2 } = ctx
+    const {
+      hasSize,
+      hasHeight,
+      hasPokemonBackground,
+      isMad,
+      mem,
+      secret,
+      httpAuth,
+      pvpV2,
+    } = ctx
     const { filterMap, globalFilter } = this.getFilters(perms, args, ctx)
 
     let queryPvp = config
@@ -175,7 +184,14 @@ class Pokemon extends Model {
       if (isMad) {
         Pokemon.getMadSql(query)
       } else {
-        query.select(['*', hasSize && !hasHeight ? 'size AS height' : 'size'])
+        const selectColumns = [
+          '*',
+          hasSize && !hasHeight ? 'size AS height' : 'size',
+        ]
+        if (hasPokemonBackground) {
+          selectColumns.push('background')
+        }
+        query.select(selectColumns)
       }
       query.where(
         isMad ? 'disappear_time' : 'expire_timestamp',

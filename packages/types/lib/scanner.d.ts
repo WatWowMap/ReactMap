@@ -244,6 +244,7 @@ export interface Pokemon {
   def_iv: number
   sta_iv: number
   weather: number
+  background?: number
   capture_1: number
   capture_2: number
   capture_3: number

@@ -179,6 +179,7 @@ type Pokemon {
   def_iv: Int
   sta_iv: Int
   weather: Int
+  background: Int
   capture_1: Float
   capture_2: Float
   capture_3: Float
