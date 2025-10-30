@@ -35,6 +35,8 @@ const DARK_PALETTE_ENTRIES = Object.entries(
  *  tooltipProps?: import('@mui/material/Tooltip').TooltipProps
  *  wrapperProps?: React.HTMLAttributes<HTMLDivElement>
  *  wrapWhenNoTooltip?: boolean
+ *  surfaceStyle?: React.CSSProperties
+ *  contentProps?: import('@mui/material/Box').BoxProps
  *  children: React.ReactNode
  * }} props
  */
@@ -44,15 +46,14 @@ export function BackgroundCard({
   tooltipProps,
   wrapperProps,
   wrapWhenNoTooltip = false,
+  surfaceStyle,
+  contentProps,
   children,
 }) {
   const parentTheme = useTheme()
   const hasBackground = Boolean(visuals?.hasBackground)
   const tooltipTitle =
     tooltip ?? (visuals?.backgroundMeta && visuals.backgroundMeta.tooltip)
-  const surfaceStyle = hasBackground
-    ? visuals?.styles?.surface || {}
-    : undefined
   const iconStyles = hasBackground
     ? {
         color: visuals?.primaryColor || '#fff',
@@ -61,6 +62,53 @@ export function BackgroundCard({
     : {}
   const primaryTextShadow = visuals?.primaryTextShadow
   const borderColor = visuals?.borderColor
+
+  const resolvedSurfaceStyle = React.useMemo(() => {
+    if (!hasBackground) {
+      return surfaceStyle
+    }
+    const base = {
+      ...(visuals?.styles?.surface || {}),
+    }
+    if (surfaceStyle) {
+      Object.assign(base, surfaceStyle)
+    }
+    return base
+  }, [hasBackground, surfaceStyle, visuals])
+
+  const { sx: contentSx, ...restContentProps } = contentProps || {}
+  const combinedSx = React.useMemo(() => {
+    const baseSx = {
+      ...(resolvedSurfaceStyle || {}),
+      color: visuals?.primaryColor || parentTheme.palette.text.primary,
+      '& .MuiTypography-root': {
+        textShadow: primaryTextShadow || 'none',
+      },
+      '& img[data-background-icon="true"], & svg[data-background-icon="true"]':
+        iconStyles,
+      '& .MuiDivider-root': {
+        borderColor: borderColor || 'rgba(255, 255, 255, 0.2)',
+        backgroundColor: borderColor || 'rgba(255, 255, 255, 0.2)',
+      },
+      '& .ar-task': {
+        borderColor: borderColor || 'rgba(255, 255, 255, 0.2)',
+      },
+    }
+    if (contentSx) {
+      return Array.isArray(contentSx)
+        ? [baseSx, ...contentSx]
+        : [baseSx, contentSx]
+    }
+    return baseSx
+  }, [
+    borderColor,
+    contentSx,
+    iconStyles,
+    parentTheme.palette.text.primary,
+    primaryTextShadow,
+    resolvedSurfaceStyle,
+    visuals?.primaryColor,
+  ])
 
   const themed = React.useMemo(() => {
     if (!hasBackground) {
@@ -79,24 +127,7 @@ export function BackgroundCard({
   if (hasBackground && visuals) {
     content = (
       <ThemeProvider theme={themed}>
-        <Box
-          sx={{
-            ...(surfaceStyle || {}),
-            color: visuals?.primaryColor || parentTheme.palette.text.primary,
-            '& .MuiTypography-root': {
-              textShadow: primaryTextShadow || 'none',
-            },
-            '& img[data-background-icon="true"], & svg[data-background-icon="true"]':
-              iconStyles,
-            '& .MuiDivider-root': {
-              borderColor: borderColor || 'rgba(255, 255, 255, 0.2)',
-              backgroundColor: borderColor || 'rgba(255, 255, 255, 0.2)',
-            },
-            '& .ar-task': {
-              borderColor: borderColor || 'rgba(255, 255, 255, 0.2)',
-            },
-          }}
-        >
+        <Box {...restContentProps} sx={combinedSx}>
           {children}
         </Box>
       </ThemeProvider>

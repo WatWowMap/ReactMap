@@ -59,34 +59,6 @@ function formatDeployedTime(intervalMs) {
   return `${hours}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`
 }
 
-const surfaceResetStyles = {
-  margin: 0,
-  padding: 0,
-  width: '100%',
-  maxWidth: '100%',
-}
-
-/**
- * Ensure background visuals use full width without extra padding or margin.
- * @param {import('@rm/types').PokemonBackgroundVisuals | undefined} visuals
- */
-function withSurfaceReset(visuals) {
-  if (!visuals?.hasBackground) {
-    return visuals
-  }
-  const styles = visuals.styles || {}
-  return {
-    ...visuals,
-    styles: {
-      ...styles,
-      surface: {
-        ...(styles.surface || {}),
-        ...surfaceResetStyles,
-      },
-    },
-  }
-}
-
 /**
  * Shared row layout between fallback and detailed defender displays.
  * @param {{
@@ -330,7 +302,6 @@ function DefendersModal({ gym, onClose }) {
     const fallbackStyles = fallbackVisuals.styles || {}
     const fallbackPrimaryText = fallbackStyles.primaryText || {}
     const fallbackSecondaryText = fallbackStyles.secondaryText || {}
-    const fallbackThemedVisuals = withSurfaceReset(fallbackVisuals)
     const rowContent = (
       <DefenderRowLayout
         borderColor={fallbackBorderColor}
@@ -372,11 +343,21 @@ function DefendersModal({ gym, onClose }) {
 
     fallbackRow = (
       <BackgroundCard
-        visuals={fallbackHasBackground ? fallbackThemedVisuals : undefined}
+        visuals={fallbackHasBackground ? fallbackVisuals : undefined}
         tooltip={fallbackBackgroundMeta?.tooltip}
         wrapperProps={
           fallbackBackgroundMeta?.tooltip
             ? { style: { width: '100%' } }
+            : undefined
+        }
+        surfaceStyle={
+          fallbackHasBackground
+            ? {
+                margin: 0,
+                padding: 0,
+                width: '100%',
+                maxWidth: '100%',
+              }
             : undefined
         }
       >
@@ -465,9 +446,6 @@ function DefendersModal({ gym, onClose }) {
               const primaryTextStyles = defenderStyles.primaryText || {}
               const secondaryTextStyles = defenderStyles.secondaryText || {}
               const iconStyles = defenderStyles.icon || {}
-              const themedVisuals = hasBackground
-                ? withSurfaceReset(visuals)
-                : visuals
               const rowKey = def.pokemon_id
                 ? `${def.pokemon_id}-${index}`
                 : `${index}`
@@ -665,11 +643,21 @@ function DefendersModal({ gym, onClose }) {
               return (
                 <React.Fragment key={rowKey}>
                   <BackgroundCard
-                    visuals={hasBackground ? themedVisuals : undefined}
+                    visuals={hasBackground ? visuals : undefined}
                     tooltip={backgroundMeta?.tooltip}
                     wrapperProps={
                       backgroundMeta?.tooltip
                         ? { style: { width: '100%' } }
+                        : undefined
+                    }
+                    surfaceStyle={
+                      hasBackground
+                        ? {
+                            margin: 0,
+                            padding: 0,
+                            width: '100%',
+                            maxWidth: '100%',
+                          }
                         : undefined
                     }
                   >

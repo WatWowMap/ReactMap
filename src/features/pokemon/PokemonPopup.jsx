@@ -93,31 +93,7 @@ export function PokemonPopup({ pokemon, iconUrl, isTutorial = false }) {
     () => getPokemonBackgroundVisuals(pokemon.background),
     [getPokemonBackgroundVisuals, pokemon.background],
   )
-  const themedBackgroundVisuals = React.useMemo(() => {
-    if (!backgroundVisuals?.hasBackground) {
-      return backgroundVisuals
-    }
-    const styles = backgroundVisuals.styles || {}
-    return {
-      ...backgroundVisuals,
-      styles: {
-        ...styles,
-        surface: {
-          display: 'flex',
-          flexDirection: 'column',
-          flex: '1 1 auto',
-          alignSelf: 'stretch',
-          margin: '-13px -20px',
-          padding: '13px 20px',
-          width: 'calc(100% + 40px)',
-          maxWidth: 'none',
-          boxSizing: 'border-box',
-          ...(styles.surface || {}),
-        },
-      },
-    }
-  }, [backgroundVisuals])
-  const backgroundTooltip = themedBackgroundVisuals?.backgroundMeta?.tooltip
+  const backgroundTooltip = backgroundVisuals?.backgroundMeta?.tooltip
 
   const userSettings = useStorage((s) => s.userSettings.pokemon)
   const pokePerms = isTutorial
@@ -344,9 +320,24 @@ export function PokemonPopup({ pokemon, iconUrl, isTutorial = false }) {
   return (
     <ErrorBoundary noRefresh style={{}} variant="h5">
       <BackgroundCard
-        visuals={themedBackgroundVisuals}
+        visuals={backgroundVisuals}
         tooltip={backgroundTooltip}
         wrapperProps={{ style: { display: 'block', width: '100%' } }}
+        surfaceStyle={
+          backgroundVisuals?.hasBackground
+            ? {
+                display: 'flex',
+                flexDirection: 'column',
+                flex: '1 1 auto',
+                alignSelf: 'stretch',
+                margin: '-13px -20px',
+                padding: '13px 20px',
+                width: 'calc(100% + 40px)',
+                maxWidth: 'none',
+                boxSizing: 'border-box',
+              }
+            : undefined
+        }
       >
         {gridContent}
       </BackgroundCard>

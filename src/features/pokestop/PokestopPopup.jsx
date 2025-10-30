@@ -623,27 +623,6 @@ const QuestRewardRow = ({ quest, visuals: visualsProp }) => {
   const hasBackground = visuals?.hasBackground ?? false
   const applyBackground = quest_reward_type === 7 && hasBackground
   const backgroundMeta = visuals?.backgroundMeta
-  const themedVisuals = React.useMemo(() => {
-    if (!applyBackground || !visuals) {
-      return visuals
-    }
-    const styles = visuals.styles || {}
-    const surface = styles.surface || {}
-    return {
-      ...visuals,
-      styles: {
-        ...styles,
-        surface: {
-          ...surface,
-          margin: '0 -21px',
-          padding: '0 21px',
-          width: 'calc(100% + 42px)',
-          maxWidth: 'calc(100% + 42px)',
-          boxSizing: 'border-box',
-        },
-      },
-    }
-  }, [applyBackground, visuals])
   const rowContent = (
     <Grid container justifyContent="center" alignItems="center">
       <Grid
@@ -686,9 +665,20 @@ const QuestRewardRow = ({ quest, visuals: visualsProp }) => {
 
   const wrappedRow = (
     <BackgroundCard
-      visuals={applyBackground ? themedVisuals : undefined}
+      visuals={applyBackground ? visuals : undefined}
       tooltip={applyBackground ? backgroundMeta?.tooltip : undefined}
       wrapperProps={applyBackground ? { style: { width: '100%' } } : undefined}
+      surfaceStyle={
+        applyBackground
+          ? {
+              margin: '0 -21px',
+              padding: '0 21px',
+              width: 'calc(100% + 42px)',
+              maxWidth: 'calc(100% + 42px)',
+              boxSizing: 'border-box',
+            }
+          : undefined
+      }
     >
       {rowContent}
     </BackgroundCard>
@@ -1027,28 +1017,6 @@ const ShowcaseEntry = ({
     [background, getPokemonBackgroundVisuals],
   )
   const { hasBackground, backgroundMeta } = visuals
-  const themedVisuals = React.useMemo(() => {
-    if (!hasBackground || !visuals) {
-      return visuals
-    }
-    const styles = visuals.styles || {}
-    const surface = styles.surface || {}
-    return {
-      ...visuals,
-      styles: {
-        ...styles,
-        surface: {
-          ...surface,
-          margin: '0 -21px',
-          padding: '0 21px',
-          width: 'calc(100% + 42px)',
-          maxWidth: 'none',
-          boxSizing: 'border-box',
-        },
-      },
-    }
-  }, [hasBackground, visuals])
-
   const entry = (
     <div className="showcase-entry">
       <div className="showcase-entry-content">
@@ -1094,10 +1062,21 @@ const ShowcaseEntry = ({
 
   return (
     <BackgroundCard
-      visuals={hasBackground ? themedVisuals : undefined}
+      visuals={hasBackground ? visuals : undefined}
       tooltip={backgroundMeta?.tooltip}
       wrapperProps={{ style: { width: '100%' } }}
       wrapWhenNoTooltip
+      surfaceStyle={
+        hasBackground
+          ? {
+              margin: '0 -21px',
+              padding: '0 21px',
+              width: 'calc(100% + 42px)',
+              maxWidth: 'none',
+              boxSizing: 'border-box',
+            }
+          : undefined
+      }
     >
       {entry}
     </BackgroundCard>
