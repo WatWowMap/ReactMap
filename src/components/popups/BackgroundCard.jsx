@@ -49,12 +49,18 @@ export function BackgroundCard({
   const hasBackground = Boolean(visuals?.hasBackground)
   const tooltipTitle =
     tooltip ?? (visuals?.backgroundMeta && visuals.backgroundMeta.tooltip)
-  const iconStyles = hasBackground
-    ? {
-        color: visuals?.primaryColor || '#fff',
-        ...(visuals?.styles?.icon || {}),
-      }
-    : {}
+  const iconStyles = visuals?.styles?.icon || {}
+  const iconBaseColor =
+    iconStyles && typeof iconStyles.color === 'string'
+      ? iconStyles.color
+      : undefined
+  const primaryIconColor = hasBackground
+    ? iconBaseColor || visuals?.primaryColor || '#fff'
+    : iconBaseColor
+  const secondaryIconColor =
+    hasBackground && visuals?.styles?.secondaryText?.color
+      ? visuals.styles.secondaryText.color
+      : undefined
   const primaryTextShadow = visuals?.primaryTextShadow
   const borderColor = visuals?.borderColor
 
@@ -103,8 +109,21 @@ export function BackgroundCard({
       '& .MuiTypography-root': {
         textShadow: primaryTextShadow || 'none',
       },
-      '& img[data-background-icon="true"], & svg[data-background-icon="true"]':
-        iconStyles,
+      '& img[data-background-icon], & svg[data-background-icon]': {
+        ...(iconStyles || {}),
+      },
+      ...(hasBackground && (primaryIconColor || secondaryIconColor)
+        ? {
+            '& img[data-background-icon="true"], & svg[data-background-icon="true"], & img[data-background-icon="primary"], & svg[data-background-icon="primary"]':
+              primaryIconColor ? { color: primaryIconColor } : undefined,
+            ...(secondaryIconColor
+              ? {
+                  '& img[data-background-icon="secondary"], & svg[data-background-icon="secondary"]':
+                    { color: secondaryIconColor },
+                }
+              : {}),
+          }
+        : {}),
       '& .MuiDivider-root': {
         borderColor: borderColor || 'rgba(255, 255, 255, 0.2)',
         backgroundColor: borderColor || 'rgba(255, 255, 255, 0.2)',
@@ -123,6 +142,8 @@ export function BackgroundCard({
     borderColor,
     contentSx,
     iconStyles,
+    primaryIconColor,
+    secondaryIconColor,
     parentTheme.palette.text.primary,
     primaryTextShadow,
     resolvedSurfaceStyle,

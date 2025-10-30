@@ -35,10 +35,7 @@ import { BackgroundCard } from '@components/popups/BackgroundCard'
 import { useAnalytics } from '@hooks/useAnalytics'
 import { getTimeUntil } from '@utils/getTimeUntil'
 import { formatInterval } from '@utils/formatInterval'
-import {
-  usePokemonBackgroundVisuals,
-  usePokemonBackgroundVisual,
-} from '@hooks/usePokemonBackgroundVisuals'
+import { usePokemonBackgroundVisuals } from '@hooks/usePokemonBackgroundVisuals'
 
 import { useWebhook } from './useWebhook'
 
@@ -328,13 +325,15 @@ function DefendersModal({ gym, onClose }) {
   const Icons = useMemory((s) => s.Icons)
   const resolvePokemonBackgroundVisual = usePokemonBackgroundVisuals()
   const numFormatter = new Intl.NumberFormat(i18n.language)
+  const fallbackBackground = gym.guarding_pokemon_display?.background ?? null
   const defenders = gym.defenders || []
   const updatedMs =
     defenders.length &&
     defenders[0].deployed_ms + defenders[0].deployed_time * 1000
   const now = Date.now()
-  const fallbackVisuals = usePokemonBackgroundVisual(
-    gym.guarding_pokemon_display?.background,
+  const fallbackVisuals = React.useMemo(
+    () => resolvePokemonBackgroundVisual(fallbackBackground),
+    [resolvePokemonBackgroundVisual, fallbackBackground],
   )
 
   // Fallback to basic gym data when detailed defender info isn't available
@@ -465,7 +464,6 @@ function DefendersModal({ gym, onClose }) {
               } = visuals
               const primaryTextStyles = defenderStyles.primaryText
               const secondaryTextStyles = defenderStyles.secondaryText
-              const iconStyles = defenderStyles.icon || {}
               const rowKey = `${def.pokemon_id}-${def.deployed_ms}`
               const rowContent = (
                 <DefenderRowLayout
@@ -584,7 +582,10 @@ function DefendersModal({ gym, onClose }) {
                         gap: '2px',
                       }}
                     >
-                      <EmojiEventsIcon sx={{ fontSize: 16, ...iconStyles }} />
+                      <EmojiEventsIcon
+                        data-background-icon="secondary"
+                        sx={{ fontSize: 16 }}
+                      />
                       <Typography
                         component="span"
                         variant="body2"
@@ -602,7 +603,8 @@ function DefendersModal({ gym, onClose }) {
                       }}
                     >
                       <SentimentVeryDissatisfiedIcon
-                        sx={{ fontSize: 16, ...iconStyles }}
+                        data-background-icon="secondary"
+                        sx={{ fontSize: 16 }}
                       />
                       <Typography
                         component="span"
@@ -620,7 +622,10 @@ function DefendersModal({ gym, onClose }) {
                         gap: '2px',
                       }}
                     >
-                      <RestaurantIcon sx={{ fontSize: 16, ...iconStyles }} />
+                      <RestaurantIcon
+                        data-background-icon="secondary"
+                        sx={{ fontSize: 16 }}
+                      />
                       <Typography
                         component="span"
                         variant="body2"

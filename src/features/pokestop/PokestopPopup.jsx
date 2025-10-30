@@ -131,11 +131,7 @@ export function PokestopPopup({
               {hasQuest &&
                 // eslint-disable-next-line no-unused-vars
                 pokestop.quests.map(({ key, ...quest }, index) => {
-                  const visuals =
-                    questVisuals[index] ||
-                    (quest.quest_reward_type === 7
-                      ? getPokemonBackgroundVisuals(quest.quest_background)
-                      : undefined)
+                  const visuals = questVisuals[index]
                   const hasBackground = Boolean(visuals?.hasBackground)
                   const previousHasBackground =
                     index > 0
