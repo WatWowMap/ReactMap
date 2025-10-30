@@ -31,10 +31,7 @@ import { readableProbability } from '@utils/readableProbability'
 import { GET_POKEMON_SHINY_STATS } from '@services/queries/pokemon'
 import { GET_TAPPABLE_BY_ID } from '@services/queries/tappable'
 import { usePokemonBackgroundVisual } from '@hooks/usePokemonBackgroundVisuals'
-import {
-  BackgroundCard,
-  createFullBleedSurfaceStyle,
-} from '@components/popups/BackgroundCard'
+import { BackgroundCard } from '@components/popups/BackgroundCard'
 
 const rowClass = { width: 30, fontWeight: 'bold' }
 
@@ -319,14 +316,12 @@ export function PokemonPopup({ pokemon, iconUrl, isTutorial = false }) {
     <ErrorBoundary noRefresh style={{}} variant="h5">
       <BackgroundCard
         visuals={backgroundVisuals}
-        wrapperProps={{ style: { display: 'block', width: '100%' } }}
+        fullWidth
+        wrapperProps={{ style: { display: 'block' } }}
+        fullBleed={{ horizontal: 20, vertical: 13 }}
         surfaceStyle={
           backgroundVisuals?.hasBackground
             ? {
-                ...createFullBleedSurfaceStyle({
-                  horizontal: 20,
-                  vertical: 13,
-                }),
                 display: 'flex',
                 flexDirection: 'column',
                 flex: '1 1 auto',

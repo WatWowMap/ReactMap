@@ -29,10 +29,7 @@ import { Timer } from '@components/popups/Timer'
 import { PowerUp } from '@components/popups/PowerUp'
 import { NameTT } from '@components/popups/NameTT'
 import { TimeStamp } from '@components/popups/TimeStamps'
-import {
-  BackgroundCard,
-  createFullBleedSurfaceStyle,
-} from '@components/popups/BackgroundCard'
+import { BackgroundCard } from '@components/popups/BackgroundCard'
 import { useAnalytics } from '@hooks/useAnalytics'
 import { useGetAvailable } from '@hooks/useGetAvailable'
 import { parseQuestConditions } from '@utils/parseConditions'
@@ -657,12 +654,8 @@ const QuestRewardRow = ({ quest, visuals }) => {
   const wrappedRow = (
     <BackgroundCard
       visuals={applyBackground ? visuals : undefined}
-      wrapperProps={applyBackground ? { style: { width: '100%' } } : undefined}
-      surfaceStyle={
-        applyBackground
-          ? createFullBleedSurfaceStyle({ horizontal: 21 })
-          : undefined
-      }
+      fullWidth={applyBackground}
+      fullBleed={applyBackground ? 21 : undefined}
     >
       {rowContent}
     </BackgroundCard>
@@ -1095,13 +1088,9 @@ const ShowcaseEntry = ({
   return (
     <BackgroundCard
       visuals={hasBackground ? visuals : undefined}
-      wrapperProps={{ style: { width: '100%' } }}
+      fullWidth
       wrapWhenNoTooltip
-      surfaceStyle={
-        hasBackground
-          ? createFullBleedSurfaceStyle({ horizontal: 21 })
-          : undefined
-      }
+      fullBleed={hasBackground ? 21 : undefined}
     >
       {entry}
     </BackgroundCard>

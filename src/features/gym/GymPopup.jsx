@@ -31,10 +31,7 @@ import { GenderIcon } from '@components/popups/GenderIcon'
 import { Navigation } from '@components/popups/Navigation'
 import { Coords } from '@components/popups/Coords'
 import { TimeStamp } from '@components/popups/TimeStamps'
-import {
-  BackgroundCard,
-  createFullBleedSurfaceStyle,
-} from '@components/popups/BackgroundCard'
+import { BackgroundCard } from '@components/popups/BackgroundCard'
 import { useAnalytics } from '@hooks/useAnalytics'
 import { getTimeUntil } from '@utils/getTimeUntil'
 import { formatInterval } from '@utils/formatInterval'
@@ -155,6 +152,59 @@ function DefenderRowLayout({
       </div>
       {trailingContent || null}
     </div>
+  )
+}
+
+const mergeSxParts = (...parts) => {
+  const flattened = parts.reduce((acc, part) => {
+    if (!part) {
+      return acc
+    }
+    if (Array.isArray(part)) {
+      return acc.concat(part)
+    }
+    acc.push(part)
+    return acc
+  }, [])
+  if (!flattened.length) {
+    return undefined
+  }
+  return flattened.length === 1 ? flattened[0] : flattened
+}
+
+function DefenderPrimaryText({ children, title, visualStyles, sx }) {
+  return (
+    <Typography
+      variant="subtitle1"
+      component="div"
+      sx={mergeSxParts(
+        {
+          fontSize: 16,
+          fontWeight: 700,
+          whiteSpace: 'normal',
+          wordBreak: 'break-word',
+          maxWidth: '100%',
+          lineHeight: 1.43,
+        },
+        visualStyles,
+        sx,
+      )}
+      title={title}
+    >
+      {children}
+    </Typography>
+  )
+}
+
+function DefenderSecondaryText({ children, visualStyles, sx }) {
+  return (
+    <Typography
+      variant="body2"
+      component="div"
+      sx={mergeSxParts({ fontSize: 13 }, visualStyles, sx)}
+    >
+      {children}
+    </Typography>
   )
 }
 
@@ -290,7 +340,6 @@ function DefendersModal({ gym, onClose }) {
   // Fallback to basic gym data when detailed defender info isn't available
   const useFallbackData =
     !defenders.length && gym.team_id > 0 && gym.guarding_pokemon_id
-  const fallbackBackgroundMeta = fallbackVisuals.backgroundMeta
   let fallbackRow = null
   if (useFallbackData) {
     const fallbackImageSrc =
@@ -304,9 +353,8 @@ function DefendersModal({ gym, onClose }) {
 
     const fallbackHasBackground = fallbackVisuals.hasBackground
     const fallbackBorderColor = fallbackVisuals.borderColor
-    const fallbackStyles = fallbackVisuals.styles || {}
-    const fallbackPrimaryText = fallbackStyles.primaryText || {}
-    const fallbackSecondaryText = fallbackStyles.secondaryText || {}
+    const fallbackPrimaryText = fallbackVisuals.styles?.primaryText
+    const fallbackSecondaryText = fallbackVisuals.styles?.secondaryText
     const rowContent = (
       <DefenderRowLayout
         borderColor={fallbackBorderColor}
@@ -314,48 +362,24 @@ function DefendersModal({ gym, onClose }) {
         imageAlt={t(`poke_${gym.guarding_pokemon_id}`)}
         showBestBuddy={gym.guarding_pokemon_display?.badge === 1}
       >
-        <Typography
-          variant="subtitle1"
-          component="div"
-          sx={{
-            ...fallbackPrimaryText,
-            fontSize: 16,
-            fontWeight: 700,
-            whiteSpace: 'normal',
-            wordBreak: 'break-word',
-            maxWidth: '100%',
-            lineHeight: 1.43,
-          }}
+        <DefenderPrimaryText
           title={t(`poke_${gym.guarding_pokemon_id}`)}
+          visualStyles={fallbackPrimaryText}
         >
           {t(`poke_${gym.guarding_pokemon_id}`)}
-        </Typography>
+        </DefenderPrimaryText>
 
-        <Typography
-          variant="body2"
-          component="div"
-          sx={{
-            ...fallbackSecondaryText,
-            fontSize: 13,
-          }}
-        >
+        <DefenderSecondaryText visualStyles={fallbackSecondaryText}>
           {gym.total_cp &&
             `${t('total_cp')}: ${numFormatter.format(gym.total_cp)}`}
-        </Typography>
+        </DefenderSecondaryText>
       </DefenderRowLayout>
     )
 
     fallbackRow = (
       <BackgroundCard
         visuals={fallbackHasBackground ? fallbackVisuals : undefined}
-        wrapperProps={
-          fallbackBackgroundMeta?.tooltip
-            ? { style: { width: '100%' } }
-            : undefined
-        }
-        surfaceStyle={
-          fallbackHasBackground ? createFullBleedSurfaceStyle({}) : undefined
-        }
+        fullBleed={fallbackHasBackground}
       >
         {rowContent}
       </BackgroundCard>
@@ -439,8 +463,8 @@ function DefendersModal({ gym, onClose }) {
                 hasBackground,
                 styles: defenderStyles = {},
               } = visuals
-              const primaryTextStyles = defenderStyles.primaryText || {}
-              const secondaryTextStyles = defenderStyles.secondaryText || {}
+              const primaryTextStyles = defenderStyles.primaryText
+              const secondaryTextStyles = defenderStyles.secondaryText
               const iconStyles = defenderStyles.icon || {}
               const rowKey = `${def.pokemon_id}-${def.deployed_ms}`
               const rowContent = (
@@ -537,32 +561,19 @@ function DefendersModal({ gym, onClose }) {
                   }
                 >
                   {/* First line: Pokemon name CP{currentCP}/{fullCP} */}
-                  <Typography
-                    variant="subtitle1"
-                    component="div"
-                    sx={{
-                      ...primaryTextStyles,
-                      fontSize: 16,
-                      fontWeight: 700,
-                      whiteSpace: 'normal',
-                      wordBreak: 'break-word',
-                      maxWidth: '100%',
-                      lineHeight: 1.43,
-                    }}
+                  <DefenderPrimaryText
                     title={`${t(`poke_${def.pokemon_id}`)} CP${currentCP}/${fullCP}`}
+                    visualStyles={primaryTextStyles}
                   >
                     {t(`poke_${def.pokemon_id}`)}
-                  </Typography>
+                  </DefenderPrimaryText>
 
-                  <Typography
-                    variant="body2"
-                    component="div"
+                  <DefenderSecondaryText
+                    visualStyles={secondaryTextStyles}
                     sx={{
-                      ...secondaryTextStyles,
                       display: 'flex',
                       alignItems: 'center',
                       gap: '8px',
-                      fontSize: 13,
                     }}
                   >
                     <Box
@@ -618,19 +629,12 @@ function DefendersModal({ gym, onClose }) {
                         {def.times_fed || 0}
                       </Typography>
                     </Box>
-                  </Typography>
+                  </DefenderSecondaryText>
 
-                  <Typography
-                    variant="body2"
-                    component="div"
-                    sx={{
-                      ...secondaryTextStyles,
-                      fontSize: 13,
-                    }}
-                  >
+                  <DefenderSecondaryText visualStyles={secondaryTextStyles}>
                     CP{currentCP}/{fullCP}{' '}
                     {formatDeployedTime(def.deployed_ms + now - updatedMs)}
-                  </Typography>
+                  </DefenderSecondaryText>
                 </DefenderRowLayout>
               )
 
@@ -638,16 +642,8 @@ function DefendersModal({ gym, onClose }) {
                 <React.Fragment key={rowKey}>
                   <BackgroundCard
                     visuals={hasBackground ? visuals : undefined}
-                    wrapperProps={
-                      backgroundMeta?.tooltip
-                        ? { style: { width: '100%' } }
-                        : undefined
-                    }
-                    surfaceStyle={
-                      hasBackground
-                        ? createFullBleedSurfaceStyle({})
-                        : undefined
-                    }
+                    fullBleed={hasBackground}
+                    fullWidth={Boolean(backgroundMeta?.tooltip)}
                   >
                     {rowContent}
                   </BackgroundCard>

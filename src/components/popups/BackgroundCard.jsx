@@ -18,31 +18,6 @@ const DARK_PALETTE_OVERRIDES = (() => {
 })()
 
 /**
- * Generates symmetrical margin/padding to let the background artwork bleed.
- *
- * @param {{
- *  horizontal?: number
- *  vertical?: number
- * }} [options]
- * @returns {React.CSSProperties}
- */
-export function createFullBleedSurfaceStyle({
-  horizontal = 0,
-  vertical = 0,
-} = {}) {
-  const horizontalPixels = Number(horizontal) || 0
-  const verticalPixels = Number(vertical) || 0
-  const widthAdjustment = horizontalPixels * 2
-  const width = widthAdjustment ? `calc(100% + ${widthAdjustment}px)` : '100%'
-  return {
-    margin: `${-verticalPixels}px ${-horizontalPixels}px`,
-    padding: `${verticalPixels}px ${horizontalPixels}px`,
-    width,
-    boxSizing: 'border-box',
-  }
-}
-
-/**
  * Applies themed background visuals (and optional tooltip) around popup content.
  *
  * @param {{
@@ -51,6 +26,8 @@ export function createFullBleedSurfaceStyle({
  *  tooltipProps?: import('@mui/material/Tooltip').TooltipProps
  *  wrapperProps?: React.HTMLAttributes<HTMLDivElement>
  *  wrapWhenNoTooltip?: boolean
+ *  fullWidth?: boolean
+ *  fullBleed?: boolean | number | { horizontal?: number, vertical?: number }
  *  surfaceStyle?: React.CSSProperties
  *  contentProps?: import('@mui/material/Box').BoxProps
  *  children: React.ReactNode
@@ -62,6 +39,8 @@ export function BackgroundCard({
   tooltipProps,
   wrapperProps,
   wrapWhenNoTooltip = false,
+  fullWidth = false,
+  fullBleed,
   surfaceStyle,
   contentProps,
   children,
@@ -79,6 +58,19 @@ export function BackgroundCard({
   const primaryTextShadow = visuals?.primaryTextShadow
   const borderColor = visuals?.borderColor
 
+  const normalizedFullBleed = React.useMemo(() => {
+    if (!fullBleed) {
+      return undefined
+    }
+    if (fullBleed === true) {
+      return {}
+    }
+    if (typeof fullBleed === 'number') {
+      return { horizontal: fullBleed, vertical: 0 }
+    }
+    return fullBleed
+  }, [fullBleed])
+
   const resolvedSurfaceStyle = React.useMemo(() => {
     if (!hasBackground) {
       return surfaceStyle
@@ -86,11 +78,22 @@ export function BackgroundCard({
     const base = {
       ...(visuals?.styles?.surface || {}),
     }
+    if (normalizedFullBleed) {
+      const horizontalPixels = Number(normalizedFullBleed.horizontal ?? 0) || 0
+      const verticalPixels = Number(normalizedFullBleed.vertical ?? 0) || 0
+      const widthAdjustment = horizontalPixels * 2
+      base.margin = `${-verticalPixels}px ${-horizontalPixels}px`
+      base.padding = `${verticalPixels}px ${horizontalPixels}px`
+      base.width = widthAdjustment
+        ? `calc(100% + ${widthAdjustment}px)`
+        : '100%'
+      base.boxSizing = 'border-box'
+    }
     if (surfaceStyle) {
       Object.assign(base, surfaceStyle)
     }
     return base
-  }, [hasBackground, surfaceStyle, visuals])
+  }, [hasBackground, normalizedFullBleed, surfaceStyle, visuals])
 
   const { sx: contentSx, ...restContentProps } = contentProps || {}
   const combinedSx = React.useMemo(() => {
@@ -126,6 +129,21 @@ export function BackgroundCard({
     visuals?.primaryColor,
   ])
 
+  const resolvedWrapperProps = React.useMemo(() => {
+    if (!wrapperProps && !fullWidth) {
+      return undefined
+    }
+    const base = wrapperProps ? { ...wrapperProps } : {}
+    const existingStyle = wrapperProps?.style
+    if (existingStyle || fullWidth) {
+      base.style = {
+        ...(existingStyle || {}),
+        ...(fullWidth ? { width: '100%' } : {}),
+      }
+    }
+    return base
+  }, [fullWidth, wrapperProps])
+
   const themed = React.useMemo(() => {
     if (!hasBackground) {
       return parentTheme
@@ -158,13 +176,15 @@ export function BackgroundCard({
         placement="top"
         {...tooltipProps}
       >
-        <div {...(wrapperProps || { style: { width: '100%' } })}>{content}</div>
+        <div {...(resolvedWrapperProps || { style: { width: '100%' } })}>
+          {content}
+        </div>
       </Tooltip>
     )
   }
 
-  if (wrapWhenNoTooltip && wrapperProps) {
-    return <div {...wrapperProps}>{content}</div>
+  if (wrapWhenNoTooltip && resolvedWrapperProps) {
+    return <div {...resolvedWrapperProps}>{content}</div>
   }
 
   return content
