@@ -28,7 +28,7 @@ export function DevicePopup({ isOnline, ts, ...device }) {
           ? `${t('instance')}: ${device.instance_name}`
           : device.type}
       </Typography>
-      <Timer device={device} t={t} ts={ts} />
+      <Timer device={device} ts={ts} />
       <Typography
         variant="subtitle1"
         color={isOnline ? 'success' : 'error'}
@@ -40,7 +40,8 @@ export function DevicePopup({ isOnline, ts, ...device }) {
   )
 }
 
-const Timer = ({ device, t, ts }) => {
+const Timer = ({ device, ts }) => {
+  const { t } = useTranslation()
   const { updated } = device
   const lastSeen = updated * 1000
   const [since, setSince] = React.useState(getTimeUntil(lastSeen))

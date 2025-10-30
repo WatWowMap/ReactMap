@@ -870,7 +870,6 @@ const ENCOUNTER_NUM = { first: '#1', second: '#2', third: '#3' }
  * @returns
  */
 const Invasion = ({ grunt_type, confirmed, ...invasion }) => {
-  const Icons = useMemory((s) => s.Icons)
   const { t } = useTranslation()
   const info = useMemory((s) => s.masterfile.invasions[grunt_type])
 
@@ -906,7 +905,6 @@ const Invasion = ({ grunt_type, confirmed, ...invasion }) => {
                         lineup.map((data) => (
                           <ShadowPokemon
                             key={`${data.id}-${data.form}`}
-                            Icons={Icons}
                             {...data}
                           />
                         ))

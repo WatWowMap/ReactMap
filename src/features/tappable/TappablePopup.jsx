@@ -294,8 +294,6 @@ export function TappablePopup({ tappable, rewardIcon }) {
           <TappableTimer
             expireTimestamp={tappable.expire_timestamp}
             verified={!!tappable.expire_timestamp_verified}
-            locale={i18n.language}
-            t={t}
           />
         </Grid>
       )}
@@ -342,12 +340,11 @@ export function TappablePopup({ tappable, rewardIcon }) {
 /**
  * @param {{
  *  expireTimestamp: number,
- *  verified: boolean,
- *  locale: string,
- *  t: import('i18next').TFunction
+ *  verified: boolean
  * }} props
  */
-const TappableTimer = ({ expireTimestamp, verified, locale, t }) => {
+const TappableTimer = ({ expireTimestamp, verified }) => {
+  const { t, i18n } = useTranslation()
   const expireTimeMs = React.useMemo(
     () => expireTimestamp * 1000,
     [expireTimestamp],
@@ -371,7 +368,7 @@ const TappableTimer = ({ expireTimestamp, verified, locale, t }) => {
           {timer.str}
         </Typography>
         <Typography variant="subtitle2" align="center">
-          {new Date(expireTimeMs).toLocaleTimeString(locale || 'en', {
+          {new Date(expireTimeMs).toLocaleTimeString(i18n.language || 'en', {
             hour: 'numeric',
             minute: 'numeric',
             second: 'numeric',

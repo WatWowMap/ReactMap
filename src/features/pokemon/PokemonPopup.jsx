@@ -82,12 +82,11 @@ const getColor = (ivPercent) => {
 }
 
 export function PokemonPopup({ pokemon, iconUrl, isTutorial = false }) {
-  const { t, i18n } = useTranslation()
+  const { t } = useTranslation()
   const { pokemon_id, cleanPvp, iv, cp } = pokemon
   const perms = useMemory((s) => s.auth.perms)
   const timeOfDay = useMemory((s) => s.timeOfDay)
   const metaData = useMemory((s) => s.masterfile.pokemon[pokemon_id])
-  const Icons = useMemory((s) => s.Icons)
   const backgroundVisuals = usePokemonBackgroundVisual(pokemon.background)
 
   const userSettings = useStorage((s) => s.userSettings.pokemon)
@@ -243,7 +242,6 @@ export function PokemonPopup({ pokemon, iconUrl, isTutorial = false }) {
         pokemon={pokemon}
         metaData={metaData}
         iconUrl={iconUrl}
-        t={t}
         userSettings={userSettings}
         isTutorial={isTutorial}
       />
@@ -264,9 +262,6 @@ export function PokemonPopup({ pokemon, iconUrl, isTutorial = false }) {
             {showTappableSource && (
               <TappableOrigin
                 tappable={tappableSource}
-                Icons={Icons}
-                t={t}
-                i18n={i18n}
                 loading={tappableLoading}
               />
             )}
@@ -277,11 +272,11 @@ export function PokemonPopup({ pokemon, iconUrl, isTutorial = false }) {
         <Typography>{t('pokemon_cell')}</Typography>
       )}
       {!!pokemon.expire_timestamp && (
-        <Timer pokemon={pokemon} hasStats={hasStats} t={t} />
+        <Timer pokemon={pokemon} hasStats={hasStats} />
       )}
       {hasStats && pokePerms.iv && (
         <>
-          <Stats pokemon={pokemon} t={t} />
+          <Stats pokemon={pokemon} />
           <Divider orientation="vertical" flexItem />
         </>
       )}
@@ -289,17 +284,14 @@ export function PokemonPopup({ pokemon, iconUrl, isTutorial = false }) {
         pokemon={pokemon}
         metaData={metaData}
         perms={pokePerms}
-        Icons={Icons}
         timeOfDay={timeOfDay}
-        t={t}
       />
-      <ShinyOdds shinyStats={shinyStats} t={t} />
+      <ShinyOdds shinyStats={shinyStats} />
       <Footer
         pokemon={pokemon}
         extrasOpen={pokemonExtrasOpen}
         pvpOpen={pokemonPvpOpen}
         hasPvp={!!hasLeagues.length}
-        Icons={Icons}
         onToggle={handlePokemonSectionToggle}
       />
       <Collapse in={pokemonPvpOpen && perms.pvp} timeout="auto" unmountOnExit>
@@ -308,8 +300,6 @@ export function PokemonPopup({ pokemon, iconUrl, isTutorial = false }) {
             key={league}
             league={league}
             data={cleanPvp[league]}
-            t={t}
-            Icons={Icons}
             pokemon={pokemon}
           />
         ))}
@@ -319,8 +309,6 @@ export function PokemonPopup({ pokemon, iconUrl, isTutorial = false }) {
           pokemon={pokemon}
           perms={pokePerms}
           userSettings={userSettings}
-          t={t}
-          Icons={Icons}
         />
       </Collapse>
     </Grid>
@@ -350,14 +338,8 @@ export function PokemonPopup({ pokemon, iconUrl, isTutorial = false }) {
   )
 }
 
-const Header = ({
-  pokemon,
-  metaData,
-  t,
-  iconUrl,
-  userSettings,
-  isTutorial,
-}) => {
+const Header = ({ pokemon, metaData, iconUrl, userSettings, isTutorial }) => {
+  const { t } = useTranslation()
   const filters = useStorage((s) => s.filters)
 
   const [anchorEl, setAnchorEl] = React.useState(null)
@@ -462,7 +444,8 @@ const Header = ({
   )
 }
 
-const Stats = ({ pokemon, t }) => {
+const Stats = ({ pokemon }) => {
+  const { t } = useTranslation()
   const { cp, iv, atk_iv, def_iv, sta_iv, level, inactive_stats } = pokemon
 
   return (
@@ -500,7 +483,8 @@ const Stats = ({ pokemon, t }) => {
   )
 }
 
-const ShinyOdds = ({ shinyStats, t }) => {
+const ShinyOdds = ({ shinyStats }) => {
+  const { t } = useTranslation()
   if (!shinyStats) {
     return null
   }
@@ -565,7 +549,9 @@ const ShinyOdds = ({ shinyStats, t }) => {
   )
 }
 
-const TappableOrigin = ({ tappable, Icons, t, i18n, loading }) => {
+const TappableOrigin = ({ tappable, loading }) => {
+  const { t, i18n } = useTranslation()
+  const Icons = useMemory((s) => s.Icons)
   if (loading || !tappable) {
     return null
   }
@@ -591,7 +577,9 @@ const TappableOrigin = ({ tappable, Icons, t, i18n, loading }) => {
   )
 }
 
-const Info = ({ pokemon, metaData, perms, Icons, timeOfDay, t }) => {
+const Info = ({ pokemon, metaData, perms, timeOfDay }) => {
+  const Icons = useMemory((s) => s.Icons)
+  const { t } = useTranslation()
   const { gender, size, weather, form } = pokemon
   const formTypes = metaData?.forms?.[form]?.types || metaData?.types || []
   const darkMode = useStorage((s) => s.darkMode)
@@ -646,7 +634,8 @@ const Info = ({ pokemon, metaData, perms, Icons, timeOfDay, t }) => {
   )
 }
 
-const Timer = ({ pokemon, hasStats, t }) => {
+const Timer = ({ pokemon, hasStats }) => {
+  const { t } = useTranslation()
   const { expire_timestamp, expire_timestamp_verified } = pokemon
   const despawnTimer = expire_timestamp * 1000
   const [timer, setTimer] = React.useState(getTimeUntil(despawnTimer, true))
@@ -687,7 +676,8 @@ const Timer = ({ pokemon, hasStats, t }) => {
   )
 }
 
-const Footer = ({ pokemon, extrasOpen, pvpOpen, hasPvp, Icons, onToggle }) => {
+const Footer = ({ pokemon, extrasOpen, pvpOpen, hasPvp, onToggle }) => {
+  const Icons = useMemory((s) => s.Icons)
   const { lat, lon } = pokemon
   const darkMode = useStorage((s) => s.darkMode)
 
@@ -728,7 +718,9 @@ const Footer = ({ pokemon, extrasOpen, pvpOpen, hasPvp, Icons, onToggle }) => {
   )
 }
 
-const ExtraPokemonInfo = ({ pokemon, perms, userSettings, t, Icons }) => {
+const ExtraPokemonInfo = ({ pokemon, perms, userSettings }) => {
+  const Icons = useMemory((s) => s.Icons)
+  const { t } = useTranslation()
   const moves = useMemory((s) => s.masterfile.moves)
 
   const { move_1, move_2, first_seen_timestamp, updated, iv } = pokemon
@@ -774,7 +766,9 @@ const ExtraPokemonInfo = ({ pokemon, perms, userSettings, t, Icons }) => {
   )
 }
 
-const PvpInfo = ({ pokemon, league, data, t, Icons }) => {
+const PvpInfo = ({ pokemon, league, data }) => {
+  const Icons = useMemory((s) => s.Icons)
+  const { t } = useTranslation()
   if (data === null) return ''
 
   const rows = data
