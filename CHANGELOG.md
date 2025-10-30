@@ -1,3 +1,10 @@
+# [1.40.0-develop.20](https://github.com/WatWowMap/ReactMap/compare/v1.40.0-develop.19...v1.40.0-develop.20) (2025-10-30)
+
+
+### Features
+
+* background support in popups ([#1152](https://github.com/WatWowMap/ReactMap/issues/1152)) ([3354ef7](https://github.com/WatWowMap/ReactMap/commit/3354ef798e7aef95d0fc8feb5e077e5d9ebf7cf1))
+
 # [1.40.0-develop.19](https://github.com/WatWowMap/ReactMap/compare/v1.40.0-develop.18...v1.40.0-develop.19) (2025-10-26)
 
 
