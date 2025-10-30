@@ -148,6 +148,7 @@ export function BackgroundCard({
     primaryTextShadow,
     resolvedSurfaceStyle,
     visuals?.primaryColor,
+    hasBackground,
   ])
 
   const resolvedWrapperProps = React.useMemo(() => {
