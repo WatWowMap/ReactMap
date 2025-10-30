@@ -1,3 +1,12 @@
+# [1.40.0-develop.21](https://github.com/WatWowMap/ReactMap/compare/v1.40.0-develop.20...v1.40.0-develop.21) (2025-10-30)
+
+
+### Bug Fixes
+
+* dup gym pokemon ([d099945](https://github.com/WatWowMap/ReactMap/commit/d099945d55c55a3e5c51a8f507507fc6ba6f273b))
+* expert filter per-Pokemon ([f06fae8](https://github.com/WatWowMap/ReactMap/commit/f06fae8155fb3b1c2d2f4bc745bb57d0811f4822))
+* isolate pokemon popup open state ([dc5fdc0](https://github.com/WatWowMap/ReactMap/commit/dc5fdc0d0c71a53e6862865d6d84ffbcee9730db))
+
 # [1.40.0-develop.20](https://github.com/WatWowMap/ReactMap/compare/v1.40.0-develop.19...v1.40.0-develop.20) (2025-10-30)
 
 
