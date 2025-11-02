@@ -1,3 +1,10 @@
+# [1.40.0-develop.22](https://github.com/WatWowMap/ReactMap/compare/v1.40.0-develop.21...v1.40.0-develop.22) (2025-11-02)
+
+
+### Bug Fixes
+
+* eggs available ([48580d1](https://github.com/WatWowMap/ReactMap/commit/48580d1ab9e6dfe1233974d25542e810703dc115))
+
 # [1.40.0-develop.21](https://github.com/WatWowMap/ReactMap/compare/v1.40.0-develop.20...v1.40.0-develop.21) (2025-10-30)
 
 
