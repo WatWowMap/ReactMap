@@ -457,8 +457,10 @@ class Gym extends Model {
       .groupBy([
         isMad ? 'pokemon_id' : 'raid_pokemon_id',
         isMad ? 'form' : 'raid_pokemon_form',
+        isMad ? 'level' : 'raid_level',
       ])
       .orderBy(isMad ? 'pokemon_id' : 'raid_pokemon_id', 'asc')
+      .orderBy(isMad ? 'level' : 'raid_level', 'asc')
     const teamResults = await this.query()
       .select([
         'team_id AS team',
@@ -475,15 +477,23 @@ class Gym extends Model {
         })
         return [...unique]
       })
+    const seenBosses = new Set()
+    const seenEggLevels = new Set()
+    results.forEach((result) => {
+      if (result.raid_pokemon_id) {
+        seenBosses.add(`${result.raid_pokemon_id}-${result.raid_pokemon_form}`)
+      } else {
+        seenEggLevels.add(result.raid_level)
+      }
+    })
+
     return {
       available: [
         ...teamResults,
-        ...results.flatMap((result) => {
-          if (result.raid_pokemon_id) {
-            return `${result.raid_pokemon_id}-${result.raid_pokemon_form}`
-          }
-          return [`e${result.raid_level}`, `r${result.raid_level}`]
-        }),
+        ...Array.from(seenBosses),
+        ...Array.from(seenEggLevels)
+          .sort((a, b) => Number(a) - Number(b))
+          .flatMap((level) => [`e${level}`, `r${level}`]),
       ],
     }
   }
