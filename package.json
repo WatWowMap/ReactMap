@@ -152,6 +152,7 @@
     "leaflet-arrowheads": "^1.4.0",
     "leaflet.locatecontrol": "0.81.0",
     "lodash": "^4.17.21",
+    "long": "^4.0.0",
     "moment-timezone": "^0.5.43",
     "mysql2": "3.11.0",
     "node-cache": "^5.1.2",
