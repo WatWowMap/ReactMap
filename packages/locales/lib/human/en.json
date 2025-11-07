@@ -129,6 +129,7 @@
   "unknown_pokestop": "Unknown PokéStop Name",
   "unknown_gym": "Unknown Gym Name",
   "unknown_background_with_id": "Unknown Background #{{id}}",
+  "unknown_costume": "Unknown Costume",
   "exclude": "Exclude",
   "exclude_quest": "Exclude Quest",
   "exclude_invasion": "Exclude Invasion",

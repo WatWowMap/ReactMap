@@ -1005,7 +1005,7 @@ const RaidInfo = ({
 
   const getRaidForm = (id, form, costume) => {
     if (costume) {
-      return t(`costume_${costume}`, 'Unknown Costume')
+      return t(`costume_${costume}`, t('unknown_costume'))
     }
     if (form) {
       const raidForm = t(`form_${form}`)
