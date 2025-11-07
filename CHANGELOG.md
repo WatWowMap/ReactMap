@@ -1,3 +1,10 @@
+# [1.40.0-develop.23](https://github.com/WatWowMap/ReactMap/compare/v1.40.0-develop.22...v1.40.0-develop.23) (2025-11-07)
+
+
+### Features
+
+* better nearby pokemon display and randomization ([425f840](https://github.com/WatWowMap/ReactMap/commit/425f8401c3f49000169d68ad20860bd2db1f8d7b))
+
 # [1.40.0-develop.22](https://github.com/WatWowMap/ReactMap/compare/v1.40.0-develop.21...v1.40.0-develop.22) (2025-11-02)
 
 
