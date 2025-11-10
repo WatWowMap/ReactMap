@@ -13,6 +13,7 @@ import { useManualPopupTracker } from '@hooks/useManualPopupTracker'
 import { sendNotification } from '@services/desktopNotification'
 import { TooltipWrapper } from '@components/ToolTipWrapper'
 import { getTimeUntil } from '@utils/getTimeUntil'
+import { getFormDisplay } from '@utils/getFormDisplay'
 import { useRouteStore, resolveRoutePoiKey } from '@features/route'
 
 import { gymMarker } from './gymMarker'
@@ -162,6 +163,11 @@ const BaseGymTile = (gym) => {
   useForcePopup(gym.id, markerRef)
   useMarkerTimer(timerToDisplay, markerRef, () => setStateChange(!stateChange))
   const handlePopupOpen = useManualPopupTracker('gyms', gym.id)
+  const raidForm = getFormDisplay(
+    gym.raid_pokemon_id,
+    gym.raid_pokemon_form,
+    gym.raid_pokemon_costume,
+  )
   if (hasRaid) {
     sendNotification(`${gym.id}-${hasHatched}`, gym.name, 'raids', {
       manualId: gym.id,
@@ -172,7 +178,7 @@ const BaseGymTile = (gym) => {
       body: `${t(`${hasHatched ? `raid` : 'egg'}_${gym.raid_level}`)}\n${
         gym.raid_pokemon_evolution ? t(`evo_${gym.raid_pokemon_evolution}`) : ''
       }${gym.raid_pokemon_id ? t(`poke_${gym.raid_pokemon_id}`) : ''}${
-        gym.raid_pokemon_form ? t(`form_${gym.raid_pokemon_form}`) : ''
+        raidForm && gym.raid_pokemon_id ? ` ${raidForm}` : ''
       }${gym.raid_pokemon_id ? '\n' : ''}${
         getTimeUntil(timerToDisplay * 1000, true).str
       }`,

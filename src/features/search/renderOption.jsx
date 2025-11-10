@@ -16,6 +16,7 @@ import { getGruntReward } from '@utils/getGruntReward'
 import { formatDistance } from '@utils/formatDistance'
 import { getTimeUntil } from '@utils/getTimeUntil'
 import { useRelativeTimer } from '@hooks/useRelativeTime'
+import { getFormDisplay } from '@utils/getFormDisplay'
 
 import { OptionImageMemo } from './OptionImage'
 
@@ -100,6 +101,10 @@ const Timer = ({ expireTime }) => {
 export const renderOption = ({ key, ...props }, option) => {
   const { searchTab } = useStorage.getState()
   const { questMessage } = useMemory.getState().config.misc
+  const pokemonFormLabel =
+    searchTab === 'pokemon'
+      ? getFormDisplay(option.pokemon_id, option.form, option.costume)
+      : ''
 
   return (
     <ListItem
@@ -118,10 +123,8 @@ export const renderOption = ({ key, ...props }, option) => {
       <ListItemText
         primary={
           searchTab === 'pokemon'
-            ? `${t(`poke_${option.pokemon_id}`)} ${
-                option.form && t(`form_${option.form}`) !== t('poke_type_1')
-                  ? `(${t(`form_${option.form}`)})`
-                  : ''
+            ? `${t(`poke_${option.pokemon_id}`)}${
+                pokemonFormLabel ? ` (${pokemonFormLabel})` : ''
               }${option.iv ? ` - ${option.iv}%` : ''}`
             : option.grunt_type
               ? t(`grunt_${option.grunt_type}`).toString()

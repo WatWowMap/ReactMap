@@ -19,6 +19,7 @@ import { TooltipWrapper } from '@components/ToolTipWrapper'
 import { getTimeUntil } from '@utils/getTimeUntil'
 import { normalizeCategory } from '@utils/normalizeCategory'
 import { getS2Polygon } from '@utils/getS2Polygon'
+import { getFormDisplay } from '@utils/getFormDisplay'
 
 import { PokemonPopup } from './PokemonPopup'
 import { basicPokemonMarker, fancyPokemonMarker } from './pokemonMarker'
@@ -170,11 +171,11 @@ const BasePokemonTile = (pkmn) => {
     return null
   }, [isNearbyCell, pkmn.lat, pkmn.lon])
 
+  const pokemonForm = getFormDisplay(pkmn.pokemon_id, pkmn.form, pkmn.costume)
+
   sendNotification(
     pkmn.id,
-    `${t(`poke_${pkmn.pokemon_id}`)}${
-      pkmn.form ? ` (${t(`form_${pkmn.form}`)})` : ''
-    }`,
+    `${t(`poke_${pkmn.pokemon_id}`)}${pokemonForm ? ` (${pokemonForm})` : ''}`,
     'pokemon',
     {
       icon: iconUrl,

@@ -32,6 +32,7 @@ import { GET_POKEMON_SHINY_STATS } from '@services/queries/pokemon'
 import { GET_TAPPABLE_BY_ID } from '@services/queries/tappable'
 import { usePokemonBackgroundVisual } from '@hooks/usePokemonBackgroundVisuals'
 import { BackgroundCard } from '@components/popups/BackgroundCard'
+import { getFormDisplay } from '@utils/getFormDisplay'
 
 const rowClass = { width: 30, fontWeight: 'bold' }
 
@@ -387,10 +388,7 @@ const Header = ({ pokemon, metaData, iconUrl, userSettings, isTutorial }) => {
     options.push({ name: 'exclude', action: handleExclude })
   }
   const pokeName = t(`poke_${metaData.pokedexId}`)
-  const formName =
-    metaData.forms?.[form]?.name === 'Normal' || form === 0
-      ? ''
-      : t(`form_${pokemon.form}`)
+  const formName = getFormDisplay(pokemon.pokemon_id, form, pokemon.costume)
 
   return (
     <>

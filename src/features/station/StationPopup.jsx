@@ -36,6 +36,7 @@ import {
 import { VirtualGrid } from '@components/virtual/VirtualGrid'
 import { getStationDamageBoost } from '@utils/getAttackBonus'
 import { getTimeUntil } from '@utils/getTimeUntil'
+import { getFormDisplay } from '@utils/getFormDisplay'
 import { CopyCoords } from '@components/popups/Coords'
 import Tooltip from '@mui/material/Tooltip'
 
@@ -238,7 +239,6 @@ function StationMedia({
   battle_pokemon_cp_multiplier,
   battle_pokemon_estimated_cp,
 }) {
-  const { t: tById } = useTranslateById()
   const { t } = useTranslation()
   const nowSeconds = Date.now() / 1000
   const hasBattleEnd = Number.isFinite(battle_end)
@@ -278,6 +278,11 @@ function StationMedia({
     : null
   const cpLabel = t('cp')
   const hpLabel = t('hp')
+  const pokemonFormLabel = getFormDisplay(
+    battle_pokemon_id,
+    battle_pokemon_form,
+    battle_pokemon_costume,
+  )
   let cpTooltip = null
   let cpLine = null
   if (estimatedCpDisplay) {
@@ -351,10 +356,10 @@ function StationMedia({
               maxHeight="80%"
               maxWidth="100%"
             />
-            {!!battle_pokemon_costume && (
+            {!!pokemonFormLabel && (
               <Box textAlign="center">
                 <Typography variant="caption">
-                  &nbsp;({tById(`costume_${battle_pokemon_costume}`)})
+                  &nbsp;({pokemonFormLabel})
                 </Typography>
               </Box>
             )}
