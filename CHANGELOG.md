@@ -1,3 +1,11 @@
+# [1.40.0-develop.24](https://github.com/WatWowMap/ReactMap/compare/v1.40.0-develop.23...v1.40.0-develop.24) (2025-11-13)
+
+
+### Bug Fixes
+
+* seen raid level ([6c543c3](https://github.com/WatWowMap/ReactMap/commit/6c543c3cbf20b9ac58c431de81848c644f774209))
+* unknown_costume translatable ([3f4bb57](https://github.com/WatWowMap/ReactMap/commit/3f4bb5794d19755ac3f94e9d4dc0c4471cfbca57))
+
 # [1.40.0-develop.23](https://github.com/WatWowMap/ReactMap/compare/v1.40.0-develop.22...v1.40.0-develop.23) (2025-11-07)
 
 
