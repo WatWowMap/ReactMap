@@ -479,12 +479,14 @@ class Gym extends Model {
       })
     const seenBosses = new Set()
     const seenEggLevels = new Set()
+    const seenRaidLevels = new Set()
     results.forEach((result) => {
       if (result.raid_pokemon_id) {
         seenBosses.add(`${result.raid_pokemon_id}-${result.raid_pokemon_form}`)
       } else {
         seenEggLevels.add(result.raid_level)
       }
+      seenRaidLevels.add(result.raid_level)
     })
 
     return {
@@ -493,7 +495,10 @@ class Gym extends Model {
         ...Array.from(seenBosses),
         ...Array.from(seenEggLevels)
           .sort((a, b) => Number(a) - Number(b))
-          .flatMap((level) => [`e${level}`, `r${level}`]),
+          .map((level) => `e${level}`),
+        ...Array.from(seenRaidLevels)
+          .sort((a, b) => Number(a) - Number(b))
+          .map((level) => `r${level}`),
       ],
     }
   }
