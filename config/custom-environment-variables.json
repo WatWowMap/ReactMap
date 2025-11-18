@@ -1548,6 +1548,10 @@
         "__name": "SCANNER_SCAN_NEXT_SCAN_NEXT_SLEEPTIME",
         "__format": "number"
       },
+      "nineCellScan": {
+        "__name": "SCANNER_SCAN_NEXT_NINE_CELL_SCAN",
+        "__format": "boolean"
+      },
       "userCooldownSeconds": {
         "__name": "SCANNER_SCAN_NEXT_USER_COOLDOWN_SECONDS",
         "__format": "number"

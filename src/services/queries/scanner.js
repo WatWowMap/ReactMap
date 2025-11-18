@@ -23,6 +23,7 @@ export const SCANNER_CONFIG = gql`
       gymRadius
       spacing
       maxSize
+      nineCellScan
       refreshQueue
       enabled
     }

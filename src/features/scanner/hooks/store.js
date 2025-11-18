@@ -15,6 +15,7 @@ import { createJSONStorage, persist } from 'zustand/middleware'
  *   gymRadius: number,
  *   spacing: number,
  *   maxSize: number,
+ *   nineCellScan: boolean,
  *   cooldown: number,
  *   refreshQueue: number
  *   enabled: boolean,
@@ -25,6 +26,7 @@ import { createJSONStorage, persist } from 'zustand/middleware'
  *  queue: 'init' | '...' | number,
  *  scanLocation: [number, number],
  *  scanCoords: [number, number][],
+ *  scanCircleMask: boolean[],
  *  validCoords: boolean[],
  *  scanNextSize: 'S' | 'M' | 'L' | 'XL',
  *  scanZoneSize: number,
@@ -43,6 +45,7 @@ export const useScanStore = create((set) => ({
   queue: 'init',
   scanLocation: [0, 0],
   scanCoords: [],
+  scanCircleMask: [],
   validCoords: [],
   scanNextSize: 'S',
   scanZoneSize: 1,

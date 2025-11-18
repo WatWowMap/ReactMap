@@ -417,6 +417,7 @@ const resolvers = {
               gymRadius: scanner.scanZone.scanZoneRadius.gym,
               spacing: scanner.scanZone.scanZoneSpacing,
               maxSize: scanner.scanZone.scanZoneMaxSize,
+              nineCellScan: false,
               cooldown: scanner.scanZone.userCooldownSeconds,
               refreshQueue: scanner.backendConfig.queueRefreshInterval,
               enabled: scanner[mode].enabled,
@@ -426,6 +427,7 @@ const resolvers = {
               showScanCount: scanner.scanNext.showScanCount,
               showScanQueue: scanner.scanNext.showScanQueue,
               cooldown: scanner.scanNext.userCooldownSeconds,
+              nineCellScan: scanner.scanNext.nineCellScan,
               refreshQueue: scanner.backendConfig.queueRefreshInterval,
               enabled: scanner[mode].enabled,
             }

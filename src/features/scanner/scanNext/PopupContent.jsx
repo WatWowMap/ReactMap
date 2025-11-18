@@ -8,10 +8,12 @@ import { useTranslation } from 'react-i18next'
 import { SCAN_SIZES } from '@assets/constants'
 
 import { useScanStore } from '../hooks/store'
+import { ConfigContext } from '../ContextProvider'
 
 export function ScanNextPopup() {
   const { t } = useTranslation()
   const scanNextSize = useScanStore((s) => s.scanNextSize)
+  const { nineCellScan } = React.useContext(ConfigContext)
 
   const setSize = React.useCallback(
     (/** @type {typeof SCAN_SIZES[number]} */ size) => () => {
@@ -30,7 +32,7 @@ export function ScanNextPopup() {
             color={size === scanNextSize ? 'primary' : 'secondary'}
             variant={size === scanNextSize ? 'contained' : 'outlined'}
           >
-            {t(size)}
+            {size === 'XL' && nineCellScan ? t('scan_next_size_9x9') : t(size)}
           </Button>
         ))}
       </ButtonGroup>

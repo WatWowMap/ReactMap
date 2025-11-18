@@ -136,6 +136,7 @@ export type Config<Client extends boolean = false> = DeepMerge<
         discordRoles: string[]
         telegramGroups: string[]
         local: string[]
+        nineCellScan?: boolean
       }
       scanZone: {
         discordRoles: string[]

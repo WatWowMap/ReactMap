@@ -130,7 +130,7 @@ function BaseScanOnDemand({ mode }) {
           next.scanZoneSize !== prev.scanZoneSize ||
           next.scanLocation.some((x, i) => x !== prev.scanLocation[i]))
       ) {
-        const scanCoords =
+        const { coords: scanCoords, mask: scanCircleMask } =
           mode === 'scanZone'
             ? getScanZoneCoords(
                 next.scanLocation,
@@ -138,14 +138,16 @@ function BaseScanOnDemand({ mode }) {
                 next.userSpacing,
                 next.scanZoneSize,
               )
-            : getScanNextCoords(next.scanLocation, next.scanNextSize)
-        useScanStore.setState({ scanCoords })
+            : getScanNextCoords(next.scanLocation, next.scanNextSize, {
+                nineCellScan: config.nineCellScan,
+              })
+        useScanStore.setState({ scanCoords, scanCircleMask })
       }
     })
     return () => {
       subscription()
     }
-  }, [mode])
+  }, [mode, config.nineCellScan])
 
   if (scanMode !== 'setLocation' || !config.scannerType) return null
 
