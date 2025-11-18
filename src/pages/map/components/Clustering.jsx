@@ -147,7 +147,7 @@ export function Clustering({ category, children }) {
   return (
     <>
       <GeoJSON ref={featureRef} data={null} pointToLayer={createClusterIcon} />
-      {children.length > rules.forcedLimit || userCluster
+      {(children.length > rules.forcedLimit || userCluster) && !IGNORE_CLUSTERING.has(category)
         ? children.filter((x) => x && markers.has(x.key))
         : children}
       {limitHit && (
