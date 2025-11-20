@@ -110,12 +110,69 @@ class DiscordClient extends AuthClient {
   }
 
   /**
+   * Resolve user-specific area restrictions.
+   * @param {string} userId
+   * @returns {{ areas: string[]; reset: boolean }}
+   */
+  // static so it remains lint-compliant and easily testable
+  static getUserAreaRestrictionsFromConfig(
+    userId,
+    authentication,
+    areasConfig,
+  ) {
+    const { areaRestrictions = [] } = authentication || {}
+    if (!userId || !areaRestrictions.length) {
+      return { areas: [], reset: false }
+    }
+    const matchedAreas = new Set()
+    const userIdStr = `${userId}`
+
+    for (let i = 0; i < areaRestrictions.length; i += 1) {
+      const restriction = areaRestrictions[i]
+      if (!Array.isArray(restriction.users)) continue
+
+      const matchesUser = restriction.users.some(
+        (user) => `${user}` === userIdStr,
+      )
+      if (!matchesUser) continue
+
+      if (!restriction.areas?.length) {
+        return { areas: [], reset: true }
+      }
+
+      for (let j = 0; j < restriction.areas.length; j += 1) {
+        const areaName = restriction.areas[j]
+        if (areasConfig.names.has(areaName)) {
+          matchedAreas.add(areaName)
+        } else if (areasConfig.withoutParents[areaName]) {
+          areasConfig.withoutParents[areaName].forEach((child) =>
+            matchedAreas.add(child),
+          )
+        }
+      }
+    }
+
+    return { areas: [...matchedAreas], reset: false }
+  }
+
+  static getUserAreaRestrictions(userId) {
+    const authentication = config.getSafe('authentication')
+    const areasConfig = config.getSafe('areas')
+    return DiscordClient.getUserAreaRestrictionsFromConfig(
+      userId,
+      authentication,
+      areasConfig,
+    )
+  }
+
+  /**
    *
    * @param {import('passport-discord').Profile} user
    * @returns {Promise<import("@rm/types").Permissions>}
    */
   async getPerms(user) {
     const trialActive = this.trialManager.active()
+    const userAreaPerms = DiscordClient.getUserAreaRestrictions(user.id)
     /** @type {import("@rm/types").Permissions} */
     // @ts-ignore
     const perms = Object.fromEntries(
@@ -204,6 +261,10 @@ class DiscordClient extends AuthClient {
     } catch (e) {
       this.log.warn('Failed to get perms for user', user.id, e)
     }
+    if (userAreaPerms.reset) {
+      permSets.areaRestrictions.clear()
+    }
+    userAreaPerms.areas.forEach((area) => permSets.areaRestrictions.add(area))
     Object.entries(permSets).forEach(([key, value]) => {
       perms[key] = [...value]
     })

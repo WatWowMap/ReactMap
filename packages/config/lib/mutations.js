@@ -274,55 +274,91 @@ const applyMutations = (config) => {
       : { little: false, cap: 500 }
   }
 
-  const aliasObj = Object.fromEntries(
-    config.authentication.aliases.map((alias) => [alias.name, alias.role]),
+  /**
+   * @param {unknown} value
+   * @returns {string[]}
+   */
+  const toStringArray = (value) =>
+    (Array.isArray(value) ? value : [value])
+      .filter((item) => item !== undefined && item !== null)
+      .map((item) => `${item}`)
+
+  const roleAliasMap = Object.fromEntries(
+    config.authentication.aliases
+      .filter((alias) => alias.role !== undefined)
+      .map((alias) => [alias.name, toStringArray(alias.role)]),
   )
-  /** @param {string | string[]} role */
-  const replaceAliases = (role) =>
-    Array.isArray(role)
-      ? role.flatMap((r) => aliasObj[r] ?? r)
-      : (aliasObj[role] ?? role)
+  const userAliasMap = Object.fromEntries(
+    config.authentication.aliases
+      .filter((alias) => alias.user !== undefined)
+      .map((alias) => [alias.name, toStringArray(alias.user)]),
+  )
+
+  /**
+   * @param {unknown} value
+   * @returns {string[]}
+   */
+  const replaceRoleAliases = (value) =>
+    toStringArray(value).flatMap((item) => roleAliasMap[item] ?? [item])
+
+  /**
+   * @param {unknown} value
+   * @returns {string[]}
+   */
+  const replaceUserAliases = (value) =>
+    toStringArray(value).flatMap((item) => userAliasMap[item] ?? [item])
 
   const replaceBothAliases = (incomingObj) => ({
     ...incomingObj,
     discordRoles: Array.isArray(incomingObj.discordRoles)
-      ? incomingObj.discordRoles.flatMap(replaceAliases)
+      ? incomingObj.discordRoles.flatMap(replaceRoleAliases)
       : undefined,
     telegramGroups: Array.isArray(incomingObj.telegramGroups)
-      ? incomingObj.telegramGroups.flatMap(replaceAliases)
+      ? incomingObj.telegramGroups.flatMap(replaceRoleAliases)
       : undefined,
   })
 
   Object.keys(config.authentication.perms).forEach((perm) => {
     config.authentication.perms[perm].roles =
-      config.authentication.perms[perm].roles.flatMap(replaceAliases)
+      config.authentication.perms[perm].roles.flatMap(replaceRoleAliases)
   })
 
   config.authentication.areaRestrictions =
-    config.authentication.areaRestrictions.map(({ roles, areas }) => ({
-      roles: roles.flatMap(replaceAliases),
-      areas,
-    }))
+    config.authentication.areaRestrictions.map((restriction) => {
+      const roles = Array.isArray(restriction.roles)
+        ? restriction.roles
+        : restriction.roles !== undefined && restriction.roles !== null
+          ? [restriction.roles]
+          : []
+      const next = {
+        roles: roles.flatMap(replaceRoleAliases),
+        areas: Array.isArray(restriction.areas) ? restriction.areas : [],
+      }
+      if (Array.isArray(restriction.users)) {
+        next.users = restriction.users.flatMap(replaceUserAliases)
+      }
+      return next
+    })
 
   config.authentication.strategies = config.authentication.strategies.map(
     (strategy) => ({
       ...strategy,
       allowedGuilds: Array.isArray(strategy.allowedGuilds)
-        ? strategy.allowedGuilds.flatMap(replaceAliases)
+        ? strategy.allowedGuilds.flatMap(replaceRoleAliases)
         : [],
       blockedGuilds: Array.isArray(strategy.blockedGuilds)
-        ? strategy.blockedGuilds.flatMap(replaceAliases)
+        ? strategy.blockedGuilds.flatMap(replaceRoleAliases)
         : [],
       groups: Array.isArray(strategy.groups)
-        ? strategy.groups.flatMap(replaceAliases)
+        ? strategy.groups.flatMap(replaceRoleAliases)
         : [],
       allowedUsers: Array.isArray(strategy.allowedUsers)
-        ? strategy.allowedUsers.flatMap(replaceAliases)
+        ? strategy.allowedUsers.flatMap(replaceUserAliases)
         : [],
       trialPeriod: {
         ...strategy.trialPeriod,
         roles: Array.isArray(strategy?.trialPeriod?.roles)
-          ? strategy.trialPeriod.roles.flatMap(replaceAliases)
+          ? strategy.trialPeriod.roles.flatMap(replaceRoleAliases)
           : [],
       },
     }),

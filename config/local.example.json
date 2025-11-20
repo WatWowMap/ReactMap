@@ -94,6 +94,10 @@
       {
         "roles": [],
         "areas": []
+      },
+      {
+        "users": [],
+        "areas": []
       }
     ],
     "aliases": [
@@ -104,6 +108,10 @@
       {
         "role": "897581458191",
         "name": "supporter"
+      },
+      {
+        "user": "112233445566778899",
+        "name": "special_user"
       }
     ],
     "alwaysEnabledPerms": [],

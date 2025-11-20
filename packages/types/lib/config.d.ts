@@ -53,13 +53,21 @@ export type Config<Client extends boolean = false> = DeepMerge<
     }
     areas: ConfigAreas
     authentication: {
-      areaRestrictions: { roles: string[]; areas: string[] }[]
+      areaRestrictions: {
+        roles: string[]
+        users?: string[]
+        areas: string[]
+      }[]
       // Unfortunately these types are not convenient for looping the `perms` object...
       // excludeFromTutorial: (keyof BaseConfig['authentication']['perms'])[]
       // alwaysEnabledPerms: (keyof BaseConfig['authentication']['perms'])[]
       excludeFromTutorial: string[]
       alwaysEnabledPerms: string[]
-      aliases: { role: string | string[]; name: string }[]
+      aliases: {
+        name: string
+        role?: string | string[]
+        user?: string | string[]
+      }[]
       methods: Strategy[]
       strategies: {
         type: Strategy
