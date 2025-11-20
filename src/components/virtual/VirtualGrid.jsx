@@ -13,7 +13,7 @@ export const SQUARE_ITEM = /** @type {import('@mui/material').SxProps} */ ({
   outline: 'ButtonText 1px solid',
 })
 
-/** @typedef {Pick<import('@mui/material').Grid2Props, 'xs' | 'sm' | 'md' | 'lg' | 'xl'>} SomeGridProps */
+/** @typedef {Pick<import('@mui/material').Grid2Props, 'xs' | 'sm' | 'md' | 'lg' | 'xl' | 'columns'>} SomeGridProps */
 
 /** @type {React.ComponentType<import('react-virtuoso').GridItemProps & { context?: SomeGridProps }>} */
 const Item = React.forwardRef(({ context, ...props }, ref) => (
@@ -21,8 +21,14 @@ const Item = React.forwardRef(({ context, ...props }, ref) => (
 ))
 
 /** @type {React.ComponentType<import('react-virtuoso').GridListProps & { context?: SomeGridProps }>} */
-const List = React.forwardRef((props, ref) => (
-  <Grid2 {...props} container alignItems="stretch" ref={ref} />
+const List = React.forwardRef(({ context, ...props }, ref) => (
+  <Grid2
+    columns={context?.columns}
+    {...props}
+    container
+    alignItems="stretch"
+    ref={ref}
+  />
 ))
 
 /**

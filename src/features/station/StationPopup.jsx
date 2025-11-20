@@ -482,7 +482,7 @@ function StationMons({ id }) {
 
   return (
     <CardContent sx={{ my: 1, p: 0, height: 130 }}>
-      <VirtualGrid data={mons} xs={6}>
+      <VirtualGrid data={mons} xs={1} context={{ columns: 5 }}>
         {(index, mon) => {
           const caption = tId(`${mon.pokemon_id}-${mon.form}`)
           return (
@@ -490,27 +490,28 @@ function StationMons({ id }) {
               display="flex"
               flexDirection="column"
               alignItems="center"
-              justifyContent="space-between"
+              justifyContent="flex-end"
               p={1}
               height="100%"
             >
-              <Img
-                key={index}
-                src={icons.getPokemon(
-                  mon.pokemon_id,
-                  mon.form,
-                  0,
-                  mon.gender,
-                  mon.costume,
-                  0,
-                  false,
-                  mon.bread_mode,
-                )}
-                alt={caption}
-                maxHeight={50}
-                maxWidth={50}
-              />
-              <Typography variant="caption">{caption}</Typography>
+              <Tooltip title={caption} arrow placement="top">
+                <Img
+                  key={index}
+                  src={icons.getPokemon(
+                    mon.pokemon_id,
+                    mon.form,
+                    0,
+                    mon.gender,
+                    mon.costume,
+                    0,
+                    false,
+                    mon.bread_mode,
+                  )}
+                  alt={caption}
+                  maxHeight={35}
+                  maxWidth={35}
+                />
+              </Tooltip>
             </Box>
           )
         }}
