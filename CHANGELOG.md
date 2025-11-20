@@ -1,3 +1,11 @@
+# [1.40.0-develop.25](https://github.com/WatWowMap/ReactMap/compare/v1.40.0-develop.24...v1.40.0-develop.25) (2025-11-20)
+
+
+### Bug Fixes
+
+* default icon/audio selection ([248edda](https://github.com/WatWowMap/ReactMap/commit/248eddaf8049f3df22960630b455cbc9df43cc98))
+* improve touch tooltip experience ([945c24a](https://github.com/WatWowMap/ReactMap/commit/945c24af97d772a93ac7a7a603a67559f30e7b57))
+
 # [1.40.0-develop.24](https://github.com/WatWowMap/ReactMap/compare/v1.40.0-develop.23...v1.40.0-develop.24) (2025-11-13)
 
 
