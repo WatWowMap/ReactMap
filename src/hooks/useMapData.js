@@ -66,10 +66,10 @@ export function useMapData(once = false) {
           ? structuredClone(audio.styles)
           : JSON.parse(JSON.stringify(audio.styles)),
       )
-      if (icons.defaultIcons && !existing) {
+      if (icons.defaultIcons && !existing.Icons) {
         Icons.setSelection(icons.defaultIcons)
       }
-      if (audio.defaultAudio && !existing) {
+      if (audio.defaultAudio && !existing.Audio) {
         Audio.setSelection(audio.defaultAudio)
       }
       if (Icons.checkValid(userIcons)) {
