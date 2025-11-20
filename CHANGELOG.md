@@ -1,3 +1,15 @@
+# [1.40.0-develop.28](https://github.com/WatWowMap/ReactMap/compare/v1.40.0-develop.27...v1.40.0-develop.28) (2025-11-20)
+
+
+### Bug Fixes
+
+* alias support for cooldown ([73e8157](https://github.com/WatWowMap/ReactMap/commit/73e815794f630c5b9297bf0833b95b6c7ac12f59))
+
+
+### Features
+
+* cooldown bypass ([#1137](https://github.com/WatWowMap/ReactMap/issues/1137)) ([9ceefef](https://github.com/WatWowMap/ReactMap/commit/9ceefef1b1a64eb49b40b179f3450e1e5b2c1ff0))
+
 # [1.40.0-develop.27](https://github.com/WatWowMap/ReactMap/compare/v1.40.0-develop.26...v1.40.0-develop.27) (2025-11-20)
 
 
