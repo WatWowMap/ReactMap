@@ -481,7 +481,9 @@ function StationMons({ id }) {
   const icons = useMemory((s) => s.Icons)
 
   return (
-    <CardContent sx={{ my: 1, p: 0, height: 130 }}>
+    <CardContent
+      sx={{ m: 0, p: 0, height: 130, pb: 0, '&:last-child': { pb: 0 } }}
+    >
       <VirtualGrid data={mons} xs={1} context={{ columns: 5 }}>
         {(index, mon) => {
           const caption = tId(`${mon.pokemon_id}-${mon.form}`)
