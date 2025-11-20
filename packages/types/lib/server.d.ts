@@ -154,6 +154,7 @@ type BasePerms = { [K in keyof Config['authentication']['perms']]: boolean }
 export interface Permissions extends BasePerms {
   blockedGuildNames: string[]
   scanner: string[]
+  scannerCooldownBypass: string[]
   areaRestrictions: string[]
   webhooks: string[]
   trial: boolean

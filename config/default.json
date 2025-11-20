@@ -659,6 +659,11 @@
       "scanNextDevice": "Device01",
       "scanNextSleeptime": 5,
       "userCooldownSeconds": 0,
+      "cooldownBypass": {
+        "discordRoles": [],
+        "local": [],
+        "telegramGroups": []
+      },
       "scanNextAreaRestriction": [],
       "discordRoles": [],
       "local": [],
@@ -675,6 +680,11 @@
       "gmf": false,
       "scanZoneMaxSize": 10,
       "userCooldownSeconds": 0,
+      "cooldownBypass": {
+        "discordRoles": [],
+        "local": [],
+        "telegramGroups": []
+      },
       "advancedScanZoneOptions": false,
       "scanZoneRadius": {
         "pokemon": 70,

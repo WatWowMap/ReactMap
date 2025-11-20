@@ -8,7 +8,7 @@ const config = require('@rm/config')
 const { logUserAuth } = require('./logUserAuth')
 const { areaPerms } = require('../utils/areaPerms')
 const { webhookPerms } = require('../utils/webhookPerms')
-const { scannerPerms } = require('../utils/scannerPerms')
+const { scannerPerms, scannerCooldownBypass } = require('../utils/scannerPerms')
 const { mergePerms } = require('../utils/mergePerms')
 const { AuthClient } = require('./AuthClient')
 const { state } = require('./state')
@@ -128,6 +128,7 @@ class DiscordClient extends AuthClient {
       areaRestrictions: new Set(),
       webhooks: new Set(),
       scanner: new Set(),
+      scannerCooldownBypass: new Set(),
       blockedGuildNames: new Set(),
     }
     const scanner = config.getSafe('scanner')
@@ -141,9 +142,12 @@ class DiscordClient extends AuthClient {
         Object.keys(this.perms).forEach((key) => (perms[key] = true))
         perms.admin = true
         config.getSafe('webhooks').forEach((x) => permSets.webhooks.add(x.name))
-        Object.keys(scanner).forEach(
-          (x) => scanner[x]?.enabled && permSets.scanner.add(x),
-        )
+        Object.keys(scanner).forEach((x) => {
+          if (scanner[x]?.enabled) {
+            permSets.scanner.add(x)
+            permSets.scannerCooldownBypass.add(x)
+          }
+        })
         this.log.debug(
           `User ${user.username} (${user.id}) in allowed users list, skipping guild and role check.`,
         )
@@ -196,6 +200,9 @@ class DiscordClient extends AuthClient {
               )
               scannerPerms(userRoles, 'discordRoles', trialActive).forEach(
                 (x) => permSets.scanner.add(x),
+              )
+              scannerCooldownBypass(userRoles, 'discordRoles').forEach((x) =>
+                permSets.scannerCooldownBypass.add(x),
               )
             }
           }),
