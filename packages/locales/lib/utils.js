@@ -17,9 +17,12 @@ const AI_LOCALES = resolve(__dirname, './generated')
  */
 async function fetchRemote(locale, endpoint) {
   try {
-    const remoteFiles = await fetch(
-      `${endpoint}/static/locales/${locale}.json`,
-    ).then((res) => res.json())
+    const remoteEndpoint = `${endpoint}/static/locales/${locale}.json`
+    const response = await fetch(remoteEndpoint)
+    if (!response.ok) {
+      throw new Error(`GET ${remoteEndpoint} -> ${response.status}`)
+    }
+    const remoteFiles = await response.json()
 
     return Object.fromEntries(
       Object.entries(remoteFiles)
@@ -36,6 +39,7 @@ async function fetchRemote(locale, endpoint) {
     )
   } catch (e) {
     log.error(TAGS.locales, `[${locale}]`, e)
+    return {}
   }
 }
 

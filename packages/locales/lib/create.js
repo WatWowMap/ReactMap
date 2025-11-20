@@ -19,16 +19,33 @@ async function create() {
   const endpoint = config.getSafe('api.pogoApiEndpoints.translations')
 
   if (!endpoint) {
-    log.error(TAGS.locales, 'No translations endpoint')
-    return
+    log.error(
+      TAGS.locales,
+      'No translations endpoint configured, using local translations only',
+    )
   }
   const localTranslations = readLocaleDirectory(true)
 
   const englishRef = await readAndParseJson('en.json', true)
 
-  const availableRemote = await fetch(`${endpoint}/index.json`)
-    .then((res) => res.json())
-    .then((res) => new Set(res))
+  /** @type {Set<string> | null} */
+  let availableRemote = null
+  if (endpoint) {
+    try {
+      const response = await fetch(`${endpoint}/index.json`)
+      if (!response.ok) {
+        throw new Error(`GET ${endpoint}/index.json -> ${response.status}`)
+      }
+      const remoteIndex = await response.json()
+      availableRemote = new Set(remoteIndex)
+    } catch (e) {
+      log.warn(
+        TAGS.locales,
+        'Unable to fetch remote translation index, using local translations only',
+        e,
+      )
+    }
+  }
 
   const translated = await Promise.allSettled(
     localTranslations.map(async (fileName) => {
@@ -37,7 +54,8 @@ async function create() {
       const humanLocales = await readAndParseJson(fileName, true)
       const aiLocales = await readAndParseJson(fileName, false)
 
-      if (!availableRemote.has(fileName)) {
+      const hasRemote = availableRemote?.has(fileName)
+      if (availableRemote && !hasRemote) {
         log.warn(
           TAGS.locales,
           'No remote translation found for',
@@ -46,10 +64,10 @@ async function create() {
         )
       }
 
-      const trimmedRemoteFiles = await fetchRemote(
-        availableRemote.has(fileName) ? locale : 'en',
-        endpoint,
-      )
+      const trimmedRemoteFiles =
+        endpoint && availableRemote
+          ? await fetchRemote(hasRemote ? locale : 'en', endpoint)
+          : {}
 
       /** @type {Record<string, string>} */
       const finalTranslations = {
