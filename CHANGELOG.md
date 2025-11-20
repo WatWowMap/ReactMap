@@ -1,3 +1,10 @@
+# [1.40.0-develop.29](https://github.com/WatWowMap/ReactMap/compare/v1.40.0-develop.28...v1.40.0-develop.29) (2025-11-20)
+
+
+### Bug Fixes
+
+* resetState respects server default ([e85f1e4](https://github.com/WatWowMap/ReactMap/commit/e85f1e413d93b91c3bbf009026c7c2e67bd3a4b7))
+
 # [1.40.0-develop.28](https://github.com/WatWowMap/ReactMap/compare/v1.40.0-develop.27...v1.40.0-develop.28) (2025-11-20)
 
 
