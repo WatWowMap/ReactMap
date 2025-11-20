@@ -191,13 +191,7 @@ export function BackgroundCard({
 
   if (tooltipTitle) {
     return (
-      <Tooltip
-        title={tooltipTitle}
-        arrow
-        enterTouchDelay={0}
-        placement="top"
-        {...tooltipProps}
-      >
+      <Tooltip title={tooltipTitle} arrow placement="top" {...tooltipProps}>
         <div {...(resolvedWrapperProps || { style: { width: '100%' } })}>
           {content}
         </div>

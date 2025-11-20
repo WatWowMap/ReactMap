@@ -519,13 +519,7 @@ const ShinyOdds = ({ shinyStats }) => {
         <Trans
           i18nKey="shiny_probability"
           components={[
-            <Tooltip
-              key="rate"
-              title={sampleText}
-              arrow
-              enterTouchDelay={0}
-              placement="top"
-            >
+            <Tooltip key="rate" title={sampleText} arrow placement="top">
               <span
                 style={{
                   cursor: 'help',
@@ -665,7 +659,6 @@ const Timer = ({ pokemon, hasStats }) => {
               : t('timer_unverified')
           }
           arrow
-          enterTouchDelay={0}
         >
           <StatusIcon status={expire_timestamp_verified} />
         </Tooltip>

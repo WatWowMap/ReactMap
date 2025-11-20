@@ -11,6 +11,12 @@ const VALID_COLOR =
 
 /** @type {import('@mui/material').Components<Omit<import('@mui/material').Theme, 'components'>>} */
 const components = {
+  MuiTooltip: {
+    defaultProps: {
+      enterTouchDelay: 0,
+      leaveTouchDelay: 5000,
+    },
+  },
   MuiPaper: {
     styleOverrides: {
       root: {

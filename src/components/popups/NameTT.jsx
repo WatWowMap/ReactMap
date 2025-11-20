@@ -14,7 +14,6 @@ export function NameTT({ title, children }) {
   return (
     <Tooltip
       enterDelay={0}
-      enterTouchDelay={0}
       placement="left-start"
       title={
         Array.isArray(title)

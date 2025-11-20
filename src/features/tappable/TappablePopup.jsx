@@ -379,7 +379,6 @@ const TappableTimer = ({ expireTimestamp, verified }) => {
         <Tooltip
           title={verified ? t('timer_verified') : t('timer_unverified')}
           arrow
-          enterTouchDelay={0}
         >
           <StatusIcon status={verified} />
         </Tooltip>
