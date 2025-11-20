@@ -1,3 +1,10 @@
+# [1.40.0-develop.27](https://github.com/WatWowMap/ReactMap/compare/v1.40.0-develop.26...v1.40.0-develop.27) (2025-11-20)
+
+
+### Bug Fixes
+
+* more robust translation fetching ([eaa2acf](https://github.com/WatWowMap/ReactMap/commit/eaa2acf712a5ec8dfad224aadcb18002a520e79c))
+
 # [1.40.0-develop.26](https://github.com/WatWowMap/ReactMap/compare/v1.40.0-develop.25...v1.40.0-develop.26) (2025-11-20)
 
 
