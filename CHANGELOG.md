@@ -1,3 +1,15 @@
+# [1.40.0-develop.26](https://github.com/WatWowMap/ReactMap/compare/v1.40.0-develop.25...v1.40.0-develop.26) (2025-11-20)
+
+
+### Bug Fixes
+
+* extra space around placed pokemon ([898e1e2](https://github.com/WatWowMap/ReactMap/commit/898e1e2b936d02787f1fa2260780b28dd6cd31d3))
+
+
+### Features
+
+* reworked placed pokemon in station popup ([252f327](https://github.com/WatWowMap/ReactMap/commit/252f32700a080f1ebe59fb916d044f74fdc8a9f4))
+
 # [1.40.0-develop.25](https://github.com/WatWowMap/ReactMap/compare/v1.40.0-develop.24...v1.40.0-develop.25) (2025-11-20)
 
 
