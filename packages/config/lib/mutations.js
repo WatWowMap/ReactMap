@@ -282,14 +282,22 @@ const applyMutations = (config) => {
     Array.isArray(role)
       ? role.flatMap((r) => aliasObj[r] ?? r)
       : (aliasObj[role] ?? role)
+  const replaceRoleArray = (roles) =>
+    Array.isArray(roles) ? roles.flatMap(replaceAliases) : undefined
+  const replaceCooldownAliases = (cooldownBypass = {}) => ({
+    ...cooldownBypass,
+    discordRoles: replaceRoleArray(cooldownBypass.discordRoles),
+    telegramGroups: replaceRoleArray(cooldownBypass.telegramGroups),
+    local: replaceRoleArray(cooldownBypass.local),
+  })
 
   const replaceBothAliases = (incomingObj) => ({
     ...incomingObj,
-    discordRoles: Array.isArray(incomingObj.discordRoles)
-      ? incomingObj.discordRoles.flatMap(replaceAliases)
-      : undefined,
-    telegramGroups: Array.isArray(incomingObj.telegramGroups)
-      ? incomingObj.telegramGroups.flatMap(replaceAliases)
+    discordRoles: replaceRoleArray(incomingObj.discordRoles),
+    telegramGroups: replaceRoleArray(incomingObj.telegramGroups),
+    local: replaceRoleArray(incomingObj.local),
+    cooldownBypass: incomingObj.cooldownBypass
+      ? replaceCooldownAliases(incomingObj.cooldownBypass)
       : undefined,
   })
 
