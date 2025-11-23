@@ -1,3 +1,10 @@
+# [1.40.0-develop.31](https://github.com/WatWowMap/ReactMap/compare/v1.40.0-develop.30...v1.40.0-develop.31) (2025-11-23)
+
+
+### Bug Fixes
+
+* fix AdvAccordion backgroundColor ([4061ee2](https://github.com/WatWowMap/ReactMap/commit/4061ee23c4376098ebc1c5e3efaea1a97e1d50a3))
+
 # [1.40.0-develop.30](https://github.com/WatWowMap/ReactMap/compare/v1.40.0-develop.29...v1.40.0-develop.30) (2025-11-23)
 
 
