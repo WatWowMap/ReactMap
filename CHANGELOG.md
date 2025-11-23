@@ -1,3 +1,10 @@
+# [1.40.0-develop.32](https://github.com/WatWowMap/ReactMap/compare/v1.40.0-develop.31...v1.40.0-develop.32) (2025-11-23)
+
+
+### Features
+
+* gym defender updates every second ([e99d020](https://github.com/WatWowMap/ReactMap/commit/e99d02090dcbe1dad3cab3fd066f4231bc35603a))
+
 # [1.40.0-develop.31](https://github.com/WatWowMap/ReactMap/compare/v1.40.0-develop.30...v1.40.0-develop.31) (2025-11-23)
 
 
