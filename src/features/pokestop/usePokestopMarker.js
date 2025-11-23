@@ -265,6 +265,7 @@ export function usePokestopMarker({
         quest_costume_id,
         quest_shiny,
         quest_bread_mode = 0,
+        quest_background,
         key,
       } = quest
       let questIcon = { url: Icons.getRewards(quest_reward_type) }
@@ -313,6 +314,10 @@ export function usePokestopMarker({
               !!quest_shiny,
               quest_bread_mode,
             ),
+            backgroundUrl:
+              quest_reward_type === 7
+                ? Icons.getBackground(quest_background)
+                : '',
           }
           break
         case 9:
@@ -419,6 +424,7 @@ export function usePokestopMarker({
       modifier: rewardMod,
       amount: icon.amount,
       rewardType: icon.rewardType,
+      backgroundUrl: icon.backgroundUrl,
     })
   })
 
@@ -471,6 +477,19 @@ export function usePokestopMarker({
                 />
               `
           : ''
+      const backgroundStyle = item.backgroundUrl
+        ? `
+                background-image: url(${item.backgroundUrl});
+                background-size: contain;
+                background-repeat: no-repeat;
+                background-position: center;
+                width: ${item.size}px;
+                height: ${item.size}px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+              `
+        : ''
       return `
             <div
               class="pokestop-marker__stack-item pokestop-marker__stack-item--${
@@ -482,6 +501,7 @@ export function usePokestopMarker({
               style="
                 --marker-size: ${item.size}px;
                 left: ${item.modifier.offsetX * 50}%;
+                ${backgroundStyle}
               "
             >
               <img

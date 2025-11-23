@@ -28,6 +28,7 @@ export const basicPokemonMarker = ({ iconUrl, iconSize }) =>
  * @property {string} badge
  * @property {number} opacity
  * @property {import('@rm/types').TimesOfDay} timeOfDay
+ * @property {string} [backgroundUrl]
  * @param {FancyPokemonMarkerProps} props
  */
 export const fancyPokemonMarker = ({
@@ -39,9 +40,11 @@ export const fancyPokemonMarker = ({
   badge,
   opacity,
   timeOfDay,
+  backgroundUrl,
 }) => {
   const { Icons } = useMemory.getState()
   const [pokemonMod, weatherMod] = Icons.getModifiers('pokemon', 'weather')
+  const pokemonBackground = backgroundUrl || ''
 
   return divIcon({
     popupAnchor: [
@@ -58,6 +61,19 @@ export const fancyPokemonMarker = ({
           opacity: ${opacity};
         "
       >
+        ${
+          pokemonBackground
+            ? /* html */ `
+        <img
+          src="${pokemonBackground}"
+          alt="background-${pkmn.background || 'override'}"
+          style="
+            height: ${iconSize}px;
+            width: ${iconSize}px;
+          "
+        />`
+            : ''
+        }
         <img
           src="${iconUrl}"
           alt="${pkmn.pokemon_id}"

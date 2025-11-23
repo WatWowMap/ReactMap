@@ -88,33 +88,42 @@ const BasePokemonTile = (pkmn) => {
     ]
   }, basicEqualFn)
 
-  const [timerOverride, iconUrl, iconSize, badge, configZoom, timeOfDay, cry] =
-    useMemory((s) => {
-      const { Icons, timerList, config, Audio } = s
-      const badgeId = getBadge(pkmn.bestPvp)
-      return [
-        timerList.includes(pkmn.id),
-        Icons.getPokemon(
-          pkmn.pokemon_id,
-          pkmn.form,
-          0,
-          pkmn.gender,
-          pkmn.costume,
-        ),
-        Icons.getSize('pokemon', filterSize),
-        badgeId ? Icons.getMisc(badgeId) : '',
-        config.general.interactionRangeZoom <=
-          useMapStore.getState().map.getZoom(),
-        s.timeOfDay,
-        Audio.getPokemon(
-          pkmn.pokemon_id,
-          pkmn.form,
-          0,
-          pkmn.gender,
-          pkmn.costume,
-        ),
-      ]
-    }, basicEqualFn)
+  const [
+    timerOverride,
+    iconUrl,
+    iconSize,
+    badge,
+    configZoom,
+    timeOfDay,
+    cry,
+    backgroundUrl,
+  ] = useMemory((s) => {
+    const { Icons, timerList, config, Audio } = s
+    const badgeId = getBadge(pkmn.bestPvp)
+    return [
+      timerList.includes(pkmn.id),
+      Icons.getPokemon(
+        pkmn.pokemon_id,
+        pkmn.form,
+        0,
+        pkmn.gender,
+        pkmn.costume,
+      ),
+      Icons.getSize('pokemon', filterSize),
+      badgeId ? Icons.getMisc(badgeId) : '',
+      config.general.interactionRangeZoom <=
+        useMapStore.getState().map.getZoom(),
+      s.timeOfDay,
+      Audio.getPokemon(
+        pkmn.pokemon_id,
+        pkmn.form,
+        0,
+        pkmn.gender,
+        pkmn.costume,
+      ),
+      Icons.getBackground(pkmn.background),
+    ]
+  }, basicEqualFn)
 
   const manualParams = useMemory((s) => s.manualParams)
 
@@ -232,6 +241,7 @@ const BasePokemonTile = (pkmn) => {
         }
         position={finalLocation}
         icon={
+          Boolean(backgroundUrl) ||
           (pkmn.bestPvp !== null && pkmn.bestPvp < 4 && extras.length === 0) ||
           showGlow ||
           showWeather ||
@@ -246,6 +256,7 @@ const BasePokemonTile = (pkmn) => {
                 badge: extras.length ? null : badge,
                 opacity,
                 timeOfDay,
+                backgroundUrl,
               })
             : basicPokemonMarker({ iconUrl, iconSize })
         }

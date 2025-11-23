@@ -44,10 +44,7 @@ export function usePokemonBackgroundVisuals() {
         backgroundId && Icons?.getBackground
           ? Icons.getBackground(backgroundId)
           : ''
-      const hasBackground =
-        Boolean(backgroundId) &&
-        typeof backgroundUrl === 'string' &&
-        backgroundUrl
+      const hasBackground = Boolean(backgroundId) && Boolean(backgroundUrl)
       const card = backgroundId ? locationCards?.[backgroundId] : undefined
       const defaultTypeLabel = t('filter_label_location_card')
       const hasCard = Boolean(card)
