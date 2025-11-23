@@ -1,3 +1,10 @@
+# [1.40.0-develop.30](https://github.com/WatWowMap/ReactMap/compare/v1.40.0-develop.29...v1.40.0-develop.30) (2025-11-23)
+
+
+### Features
+
+* (quest) pokemon background on map ([0676dd4](https://github.com/WatWowMap/ReactMap/commit/0676dd48270e3d50fd6be89e417a2479f7993ba4))
+
 # [1.40.0-develop.29](https://github.com/WatWowMap/ReactMap/compare/v1.40.0-develop.28...v1.40.0-develop.29) (2025-11-20)
 
 
