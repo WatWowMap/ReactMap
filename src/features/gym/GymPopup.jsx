@@ -857,6 +857,8 @@ const RaidImage = ({
   raid_pokemon_id,
   raid_pokemon_form,
   raid_pokemon_gender,
+  raid_pokemon_costume,
+  raid_pokemon_alignment,
 }) => {
   const { t } = useTranslation()
   const Icons = useMemory((s) => s.Icons)
@@ -875,10 +877,27 @@ const RaidImage = ({
     return pokemon[id]?.types || []
   }
 
+  const raidDisplayIcon =
+    raid_pokemon_id && Icons?.getPokemon
+      ? Icons.getPokemon(
+          raid_pokemon_id,
+          raid_pokemon_form,
+          0,
+          raid_pokemon_gender,
+          raid_pokemon_costume,
+          raid_pokemon_alignment,
+        ) || raidIconUrl
+      : raidIconUrl
+
   return (
     <Grid container xs={5} justifyContent="center" alignItems="center">
       <Grid xs={12} textAlign="center">
-        <Img src={raidIconUrl} alt={raidIconUrl} maxHeight={50} maxWidth={50} />
+        <Img
+          src={raidDisplayIcon}
+          alt={raidDisplayIcon}
+          maxHeight={50}
+          maxWidth={50}
+        />
       </Grid>
       <Grid xs={12} textAlign="center">
         <Typography variant="caption">
