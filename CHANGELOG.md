@@ -1,3 +1,10 @@
+# [1.40.0-develop.33](https://github.com/WatWowMap/ReactMap/compare/v1.40.0-develop.32...v1.40.0-develop.33) (2025-11-23)
+
+
+### Features
+
+* show caught Pokemon in raid popup ([95eda89](https://github.com/WatWowMap/ReactMap/commit/95eda897e98fd77b67d1db204cf8c4f303a10564))
+
 # [1.40.0-develop.32](https://github.com/WatWowMap/ReactMap/compare/v1.40.0-develop.31...v1.40.0-develop.32) (2025-11-23)
 
 
