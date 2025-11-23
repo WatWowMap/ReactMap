@@ -41,7 +41,7 @@ import { getFormDisplay } from '@utils/getFormDisplay'
 import { useWebhook } from './useWebhook'
 
 /**
- * Format deployed time as either "Xd Xh Xm" or "X:X:X" format
+ * Format deployed time as m:ss, h:mm:ss, or d:hh:mm:ss using the shortest layout
  * @param {number} intervalMs - Time interval in milliseconds
  * @returns {string} Formatted time string
  */
@@ -50,14 +50,16 @@ function formatDeployedTime(intervalMs) {
   const days = Math.floor(totalSeconds / 86400)
   const hours = Math.floor((totalSeconds % 86400) / 3600)
   const minutes = Math.floor((totalSeconds % 3600) / 60)
+  const seconds = totalSeconds % 60
+  const pad = (value) => value.toString().padStart(2, '0')
 
   if (days > 0) {
-    // Format as "Xd Xh Xm"
-    return `${days}d ${hours}h ${minutes}m`
+    return `${days}:${pad(hours)}:${pad(minutes)}:${pad(seconds)}`
   }
-  // Format as "X:X:X" (HH:MM:SS)
-  const seconds = totalSeconds % 60
-  return `${hours}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`
+  if (hours > 0) {
+    return `${hours}:${pad(minutes)}:${pad(seconds)}`
+  }
+  return `${minutes}:${pad(seconds)}`
 }
 
 /**
