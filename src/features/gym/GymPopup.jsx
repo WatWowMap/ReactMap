@@ -331,11 +331,16 @@ function DefendersModal({ gym, onClose }) {
   const updatedMs =
     defenders.length &&
     defenders[0].deployed_ms + defenders[0].deployed_time * 1000
-  const now = Date.now()
+  const [now, setNow] = React.useState(Date.now())
   const fallbackVisuals = React.useMemo(
     () => resolvePokemonBackgroundVisual(fallbackBackground),
     [resolvePokemonBackgroundVisual, fallbackBackground],
   )
+
+  React.useEffect(() => {
+    const interval = setInterval(() => setNow(Date.now()), 1000)
+    return () => clearInterval(interval)
+  }, [])
 
   // Fallback to basic gym data when detailed defender info isn't available
   const useFallbackData =
