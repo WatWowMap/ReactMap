@@ -1,3 +1,10 @@
+# [1.40.0-develop.34](https://github.com/WatWowMap/ReactMap/compare/v1.40.0-develop.33...v1.40.0-develop.34) (2025-11-23)
+
+
+### Bug Fixes
+
+* refine gym defender time ([30106c2](https://github.com/WatWowMap/ReactMap/commit/30106c28290c0b9048b089752fab437f593ee6f2))
+
 # [1.40.0-develop.33](https://github.com/WatWowMap/ReactMap/compare/v1.40.0-develop.32...v1.40.0-develop.33) (2025-11-23)
 
 
