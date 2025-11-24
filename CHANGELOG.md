@@ -1,3 +1,10 @@
+## [1.40.1-develop.1](https://github.com/WatWowMap/ReactMap/compare/v1.40.0...v1.40.1-develop.1) (2025-11-24)
+
+
+### Bug Fixes
+
+* stationed pokemon not updating in popup ([cb3ff09](https://github.com/WatWowMap/ReactMap/commit/cb3ff095fb312133579a87884d391d2a4ee0afe7))
+
 # [1.40.0](https://github.com/WatWowMap/ReactMap/compare/v1.39.0...v1.40.0) (2025-11-24)
 
 
