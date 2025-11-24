@@ -44,7 +44,10 @@ function apolloMiddleware(server) {
         endpoint: userDataLimit.category,
       }
 
-      if (clientV && serverV && clientV !== serverV) {
+      // Allow the hot-reload dev client to bypass strict version matching
+      const isDevClient = clientV === 'development'
+
+      if (clientV && serverV && clientV !== serverV && !isDevClient) {
         throw new GraphQLError('old_client', {
           extensions: {
             ...errorCtx,

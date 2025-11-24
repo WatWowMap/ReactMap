@@ -13,11 +13,29 @@ class PvpWrapper extends Ohbem {
       cachingStrategy: Ohbem.cachingStrategies.memoryHeavy,
     })
     this.rmCache = new NodeCache({ stdTTL: 60 * 60 * 1.5 })
+    this._pokemonDataPromise = null
   }
 
   async fetchLatestPokemon() {
     const data = await Ohbem.fetchPokemonData()
     this.updatePokemonData(data)
+  }
+
+  async ensurePokemonData() {
+    if (this._pokemonData) return this._pokemonData
+    if (this._pokemonDataPromise) return this._pokemonDataPromise
+    this._pokemonDataPromise = Ohbem.fetchPokemonData()
+      .then((data) => {
+        this.updatePokemonData(data)
+        return this._pokemonData
+      })
+      .catch((error) => {
+        throw error
+      })
+      .finally(() => {
+        this._pokemonDataPromise = null
+      })
+    return this._pokemonDataPromise
   }
 
   /**
@@ -58,4 +76,16 @@ class PvpWrapper extends Ohbem {
   }
 }
 
-module.exports = { PvpWrapper }
+let sharedInstance = null
+
+/**
+ * @returns {PvpWrapper}
+ */
+function getSharedPvpWrapper() {
+  if (!sharedInstance) {
+    sharedInstance = new PvpWrapper()
+  }
+  return sharedInstance
+}
+
+module.exports = { PvpWrapper, getSharedPvpWrapper }

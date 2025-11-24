@@ -7,6 +7,7 @@ import { marker, divIcon, point } from 'leaflet'
 import { useMemory } from '@store/useMemory'
 import { useStorage } from '@store/useStorage'
 import { Notification } from '@components/Notification'
+import { normalizeCategory } from '@utils/normalizeCategory'
 
 const IGNORE_CLUSTERING = new Set([
   'devices',
@@ -50,6 +51,13 @@ export function Clustering({ category, children }) {
   const userCluster = useStorage(
     (s) => s.userSettings[category]?.clustering || false,
   )
+  const manualParams = useMemory((s) => s.manualParams)
+  const manualKey = React.useMemo(() => {
+    const normalized = normalizeCategory(manualParams.category)
+    return normalized === category && manualParams.id !== undefined
+      ? `${manualParams.id}`
+      : null
+  }, [manualParams, category])
   const {
     config: {
       clustering,
@@ -133,6 +141,7 @@ export function Clustering({ category, children }) {
           newMarkers.add(cluster.id)
         }
       }
+      if (manualKey) newMarkers.add(manualKey)
       // @ts-ignore
       featureRef?.current?.addData(newClusters)
       setMarkers(newMarkers)
@@ -144,12 +153,25 @@ export function Clustering({ category, children }) {
     }
   }, [children, featureRef, superCluster])
 
+  const clustered = React.useMemo(() => {
+    const requiresFilter = children.length > rules.forcedLimit || userCluster
+    if (!requiresFilter) return children
+    const base = children.filter((x) => x && markers.has(x.key))
+    if (manualKey) {
+      const manualChild = children.find(
+        (child) => child && child.key === manualKey,
+      )
+      if (manualChild && !base.includes(manualChild)) {
+        return [...base, manualChild]
+      }
+    }
+    return base
+  }, [children, markers, manualKey, rules.forcedLimit, userCluster])
+
   return (
     <>
       <GeoJSON ref={featureRef} data={null} pointToLayer={createClusterIcon} />
-      {children.length > rules.forcedLimit || userCluster
-        ? children.filter((x) => x && markers.has(x.key))
-        : children}
+      {clustered}
       {limitHit && (
         <Notification
           open={!!limitHit}

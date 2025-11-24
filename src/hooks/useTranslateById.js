@@ -1,7 +1,8 @@
 /* eslint-disable no-fallthrough */
 // @ts-check
-import { useEffect, useMemo, useRef } from 'react'
+import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
+import { getFormDisplay } from '@utils/getFormDisplay'
 
 /**
  * @typedef {{ plural?: boolean, amount?: boolean, alt?: boolean, newLine?: boolean, quest?: boolean }} CustomTOptions
@@ -14,11 +15,6 @@ import { useTranslation } from 'react-i18next'
  */
 export function useTranslateById(options = {}) {
   const i18n = useTranslation()
-  const formsToIgnore = useRef(new Set([i18n.t('form_0'), i18n.t('form_45')]))
-
-  useEffect(() => {
-    formsToIgnore.current = new Set([i18n.t('form_0'), i18n.t('form_45')])
-  }, [i18n.i18n.language])
 
   return useMemo(
     () => ({
@@ -115,14 +111,15 @@ export function useTranslateById(options = {}) {
             // pokemon
             const [pokemon, form] = id.split('-', 2)
             const pokemonName = i18n.t(`poke_${pokemon}`)
-            const possibleForm = i18n.t(`form_${form}`)
-            const hideForm =
-              quest || pokemon === '51' // Dugtrio (unset) != Dugtrio (normal)
-                ? form === undefined
-                : formsToIgnore.current.has(possibleForm)
-            return hideForm
-              ? pokemonName
-              : `${pokemonName}${newLine ? '\n' : ' '}(${possibleForm})`
+            const formLabel =
+              form === undefined
+                ? ''
+                : getFormDisplay(pokemon, form, undefined, {
+                    showDefaultForms: quest,
+                  })
+            return formLabel
+              ? `${pokemonName}${newLine ? '\n' : ' '}(${formLabel})`
+              : pokemonName
           }
         }
       },

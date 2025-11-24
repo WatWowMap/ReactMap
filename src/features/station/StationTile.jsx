@@ -7,6 +7,7 @@ import { useMarkerTimer } from '@hooks/useMarkerTimer'
 import { basicEqualFn, useMemory } from '@store/useMemory'
 import { useStorage } from '@store/useStorage'
 import { useForcePopup } from '@hooks/useForcePopup'
+import { useManualPopupTracker } from '@hooks/useManualPopupTracker'
 import { TooltipWrapper } from '@components/ToolTipWrapper'
 
 import { StationPopup } from './StationPopup'
@@ -37,27 +38,39 @@ const BaseStationTile = (station) => {
     ]
   }, basicEqualFn)
 
+  const { start_time, battle_end, end_time } = station
+
   const timers = React.useMemo(() => {
     const now = Date.now() / 1000
     const internalTimers = /** @type {number[]} */ ([])
-    if (showTimer && station.start_time && station.start_time > now) {
-      internalTimers.push(station.start_time)
-    } else if (showTimer && station.end_time && station.end_time > now) {
-      internalTimers.push(station.end_time)
+    if (showTimer) {
+      const hasStart = Number.isFinite(start_time)
+      const hasBattleEnd = Number.isFinite(battle_end)
+      const hasEnd = Number.isFinite(end_time)
+
+      if (hasStart && start_time > now) {
+        internalTimers.push(start_time)
+      } else if (hasBattleEnd && battle_end > now) {
+        internalTimers.push(battle_end)
+      } else if (hasEnd && end_time > now) {
+        internalTimers.push(end_time)
+      }
     }
     return internalTimers
-  }, [showTimer])
+  }, [showTimer, start_time, battle_end, end_time])
 
   useForcePopup(station.id, markerRef)
   useMarkerTimer(timers.length ? Math.min(...timers) : null, markerRef, () =>
     setStateChange(!stateChange),
   )
+  const handlePopupOpen = useManualPopupTracker('stations', station.id)
 
   return (
     <Marker
       ref={setMarkerRef}
       position={[station.lat, station.lon]}
       icon={useStationMarker(station)}
+      eventHandlers={{ popupopen: handlePopupOpen }}
     >
       <Popup position={[station.lat, station.lon]}>
         <StationPopup {...station} />
@@ -89,12 +102,33 @@ function compareValueOrFalsy(prev, next) {
   return prev === next || (!prev && !next)
 }
 
+const trackedBattleKeys = [
+  'battle_level',
+  'battle_pokemon_id',
+  'battle_pokemon_form',
+  'battle_pokemon_costume',
+  'battle_pokemon_gender',
+  'battle_pokemon_alignment',
+  'battle_pokemon_bread_mode',
+  'battle_start',
+  'battle_end',
+  'is_battle_available',
+  'battle_pokemon_stamina',
+  'battle_pokemon_cp_multiplier',
+  'battle_pokemon_estimated_cp',
+  'total_stationed_pokemon',
+  'total_stationed_gmax',
+  'updated',
+]
+
 export const StationTile = React.memo(
   BaseStationTile,
   (prev, next) =>
     prev.id === next.id &&
-    compareValueOrFalsy(prev.battle_level, next.battle_level) &&
-    compareValueOrFalsy(prev.battle_pokemon_id, next.battle_pokemon_id) &&
-    prev.start_time === next.start_time &&
-    prev.end_time === next.end_time,
+    prev.name === next.name &&
+    compareValueOrFalsy(prev.lat, next.lat) &&
+    compareValueOrFalsy(prev.lon, next.lon) &&
+    compareValueOrFalsy(prev.start_time, next.start_time) &&
+    compareValueOrFalsy(prev.end_time, next.end_time) &&
+    trackedBattleKeys.every((key) => compareValueOrFalsy(prev[key], next[key])),
 )

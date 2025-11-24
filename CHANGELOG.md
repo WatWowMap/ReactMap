@@ -1,3 +1,276 @@
+# [1.40.0-develop.34](https://github.com/WatWowMap/ReactMap/compare/v1.40.0-develop.33...v1.40.0-develop.34) (2025-11-23)
+
+
+### Bug Fixes
+
+* refine gym defender time ([30106c2](https://github.com/WatWowMap/ReactMap/commit/30106c28290c0b9048b089752fab437f593ee6f2))
+
+# [1.40.0-develop.33](https://github.com/WatWowMap/ReactMap/compare/v1.40.0-develop.32...v1.40.0-develop.33) (2025-11-23)
+
+
+### Features
+
+* show caught Pokemon in raid popup ([95eda89](https://github.com/WatWowMap/ReactMap/commit/95eda897e98fd77b67d1db204cf8c4f303a10564))
+
+# [1.40.0-develop.32](https://github.com/WatWowMap/ReactMap/compare/v1.40.0-develop.31...v1.40.0-develop.32) (2025-11-23)
+
+
+### Features
+
+* gym defender updates every second ([e99d020](https://github.com/WatWowMap/ReactMap/commit/e99d02090dcbe1dad3cab3fd066f4231bc35603a))
+
+# [1.40.0-develop.31](https://github.com/WatWowMap/ReactMap/compare/v1.40.0-develop.30...v1.40.0-develop.31) (2025-11-23)
+
+
+### Bug Fixes
+
+* fix AdvAccordion backgroundColor ([4061ee2](https://github.com/WatWowMap/ReactMap/commit/4061ee23c4376098ebc1c5e3efaea1a97e1d50a3))
+
+# [1.40.0-develop.30](https://github.com/WatWowMap/ReactMap/compare/v1.40.0-develop.29...v1.40.0-develop.30) (2025-11-23)
+
+
+### Features
+
+* (quest) pokemon background on map ([0676dd4](https://github.com/WatWowMap/ReactMap/commit/0676dd48270e3d50fd6be89e417a2479f7993ba4))
+
+# [1.40.0-develop.29](https://github.com/WatWowMap/ReactMap/compare/v1.40.0-develop.28...v1.40.0-develop.29) (2025-11-20)
+
+
+### Bug Fixes
+
+* resetState respects server default ([e85f1e4](https://github.com/WatWowMap/ReactMap/commit/e85f1e413d93b91c3bbf009026c7c2e67bd3a4b7))
+
+# [1.40.0-develop.28](https://github.com/WatWowMap/ReactMap/compare/v1.40.0-develop.27...v1.40.0-develop.28) (2025-11-20)
+
+
+### Bug Fixes
+
+* alias support for cooldown ([73e8157](https://github.com/WatWowMap/ReactMap/commit/73e815794f630c5b9297bf0833b95b6c7ac12f59))
+
+
+### Features
+
+* cooldown bypass ([#1137](https://github.com/WatWowMap/ReactMap/issues/1137)) ([9ceefef](https://github.com/WatWowMap/ReactMap/commit/9ceefef1b1a64eb49b40b179f3450e1e5b2c1ff0))
+
+# [1.40.0-develop.27](https://github.com/WatWowMap/ReactMap/compare/v1.40.0-develop.26...v1.40.0-develop.27) (2025-11-20)
+
+
+### Bug Fixes
+
+* more robust translation fetching ([eaa2acf](https://github.com/WatWowMap/ReactMap/commit/eaa2acf712a5ec8dfad224aadcb18002a520e79c))
+
+# [1.40.0-develop.26](https://github.com/WatWowMap/ReactMap/compare/v1.40.0-develop.25...v1.40.0-develop.26) (2025-11-20)
+
+
+### Bug Fixes
+
+* extra space around placed pokemon ([898e1e2](https://github.com/WatWowMap/ReactMap/commit/898e1e2b936d02787f1fa2260780b28dd6cd31d3))
+
+
+### Features
+
+* reworked placed pokemon in station popup ([252f327](https://github.com/WatWowMap/ReactMap/commit/252f32700a080f1ebe59fb916d044f74fdc8a9f4))
+
+# [1.40.0-develop.25](https://github.com/WatWowMap/ReactMap/compare/v1.40.0-develop.24...v1.40.0-develop.25) (2025-11-20)
+
+
+### Bug Fixes
+
+* default icon/audio selection ([248edda](https://github.com/WatWowMap/ReactMap/commit/248eddaf8049f3df22960630b455cbc9df43cc98))
+* improve touch tooltip experience ([945c24a](https://github.com/WatWowMap/ReactMap/commit/945c24af97d772a93ac7a7a603a67559f30e7b57))
+
+# [1.40.0-develop.24](https://github.com/WatWowMap/ReactMap/compare/v1.40.0-develop.23...v1.40.0-develop.24) (2025-11-13)
+
+
+### Bug Fixes
+
+* seen raid level ([6c543c3](https://github.com/WatWowMap/ReactMap/commit/6c543c3cbf20b9ac58c431de81848c644f774209))
+* unknown_costume translatable ([3f4bb57](https://github.com/WatWowMap/ReactMap/commit/3f4bb5794d19755ac3f94e9d4dc0c4471cfbca57))
+
+# [1.40.0-develop.23](https://github.com/WatWowMap/ReactMap/compare/v1.40.0-develop.22...v1.40.0-develop.23) (2025-11-07)
+
+
+### Features
+
+* better nearby pokemon display and randomization ([425f840](https://github.com/WatWowMap/ReactMap/commit/425f8401c3f49000169d68ad20860bd2db1f8d7b))
+
+# [1.40.0-develop.22](https://github.com/WatWowMap/ReactMap/compare/v1.40.0-develop.21...v1.40.0-develop.22) (2025-11-02)
+
+
+### Bug Fixes
+
+* eggs available ([48580d1](https://github.com/WatWowMap/ReactMap/commit/48580d1ab9e6dfe1233974d25542e810703dc115))
+
+# [1.40.0-develop.21](https://github.com/WatWowMap/ReactMap/compare/v1.40.0-develop.20...v1.40.0-develop.21) (2025-10-30)
+
+
+### Bug Fixes
+
+* dup gym pokemon ([d099945](https://github.com/WatWowMap/ReactMap/commit/d099945d55c55a3e5c51a8f507507fc6ba6f273b))
+* expert filter per-Pokemon ([f06fae8](https://github.com/WatWowMap/ReactMap/commit/f06fae8155fb3b1c2d2f4bc745bb57d0811f4822))
+* isolate pokemon popup open state ([dc5fdc0](https://github.com/WatWowMap/ReactMap/commit/dc5fdc0d0c71a53e6862865d6d84ffbcee9730db))
+
+# [1.40.0-develop.20](https://github.com/WatWowMap/ReactMap/compare/v1.40.0-develop.19...v1.40.0-develop.20) (2025-10-30)
+
+
+### Features
+
+* background support in popups ([#1152](https://github.com/WatWowMap/ReactMap/issues/1152)) ([3354ef7](https://github.com/WatWowMap/ReactMap/commit/3354ef798e7aef95d0fc8feb5e077e5d9ebf7cf1))
+
+# [1.40.0-develop.19](https://github.com/WatWowMap/ReactMap/compare/v1.40.0-develop.18...v1.40.0-develop.19) (2025-10-26)
+
+
+### Features
+
+* search auto focus ([29f1cef](https://github.com/WatWowMap/ReactMap/commit/29f1cefd59203a197b719a5b61f12ae99f0e8099))
+
+# [1.40.0-develop.18](https://github.com/WatWowMap/ReactMap/compare/v1.40.0-develop.17...v1.40.0-develop.18) (2025-10-25)
+
+
+### Bug Fixes
+
+* apply to all should flip global ([5c23140](https://github.com/WatWowMap/ReactMap/commit/5c23140b0809221b86854cab76c1ae529c7d6a98))
+* backup error handling ([c6585e6](https://github.com/WatWowMap/ReactMap/commit/c6585e64ee9bdbb7b0317ed60937651e1ca5f0f9))
+* dup keys ([91f1f58](https://github.com/WatWowMap/ReactMap/commit/91f1f58dfd3e40ee4689fe49724db6b43f6a6c30))
+
+# [1.40.0-develop.17](https://github.com/WatWowMap/ReactMap/compare/v1.40.0-develop.16...v1.40.0-develop.17) (2025-10-17)
+
+
+### Features
+
+* jump to area ([#1149](https://github.com/WatWowMap/ReactMap/issues/1149)) ([179ca24](https://github.com/WatWowMap/ReactMap/commit/179ca24e7230944b823041a71384143875e7d559))
+
+# [1.40.0-develop.16](https://github.com/WatWowMap/ReactMap/compare/v1.40.0-develop.15...v1.40.0-develop.16) (2025-10-17)
+
+
+### Bug Fixes
+
+* update for Golbat [#312](https://github.com/WatWowMap/ReactMap/issues/312) ([#1151](https://github.com/WatWowMap/ReactMap/issues/1151)) ([3bd05d4](https://github.com/WatWowMap/ReactMap/commit/3bd05d42fd629b6f4819011d02b2f8056b6c290d))
+
+# [1.40.0-develop.15](https://github.com/WatWowMap/ReactMap/compare/v1.40.0-develop.14...v1.40.0-develop.15) (2025-10-16)
+
+
+### Bug Fixes
+
+* showcase icon missing when invasion blocked ([12e6512](https://github.com/WatWowMap/ReactMap/commit/12e6512c9e9204524ecc98719e3bcea170de393c))
+
+# [1.40.0-develop.14](https://github.com/WatWowMap/ReactMap/compare/v1.40.0-develop.13...v1.40.0-develop.14) (2025-10-16)
+
+
+### Features
+
+* mega energy marker can be taller ([5dad220](https://github.com/WatWowMap/ReactMap/commit/5dad22056d171ee108b8e819ca6c193f01f1eb67))
+* more compact pokestop marker ([622ae3d](https://github.com/WatWowMap/ReactMap/commit/622ae3d184c6fffe0d3288f2fb07a52d3313c8b8))
+* support tappable seen_type ([c74c607](https://github.com/WatWowMap/ReactMap/commit/c74c607e8a3aa1fc80f867a3b5a21a4f0c63e9aa))
+* tappable from lure in popup ([69ce017](https://github.com/WatWowMap/ReactMap/commit/69ce0171f417ef4939eb4ca5539be4e40bd5bfa3))
+
+# [1.40.0-develop.13](https://github.com/WatWowMap/ReactMap/compare/v1.40.0-develop.12...v1.40.0-develop.13) (2025-10-15)
+
+
+### Features
+
+* display amount in quest tooltip ([5e57d50](https://github.com/WatWowMap/ReactMap/commit/5e57d502f85dfc43370aa4e2f6262fad3ee0c5af))
+* tappables ([#1143](https://github.com/WatWowMap/ReactMap/issues/1143)) ([943019f](https://github.com/WatWowMap/ReactMap/commit/943019f2f36c659b174cde327e1acbcfc1ad95d2))
+
+# [1.40.0-develop.12](https://github.com/WatWowMap/ReactMap/compare/v1.40.0-develop.11...v1.40.0-develop.12) (2025-10-05)
+
+
+### Bug Fixes
+
+* pvp50 enabled by default ([ad2df83](https://github.com/WatWowMap/ReactMap/commit/ad2df839bbce9ba8f269cf0f92408eeb28726201))
+* station display ([3d72e14](https://github.com/WatWowMap/ReactMap/commit/3d72e144835bae9659f842fbe5b0604bfd4e3256))
+
+# [1.40.0-develop.11](https://github.com/WatWowMap/ReactMap/compare/v1.40.0-develop.10...v1.40.0-develop.11) (2025-10-05)
+
+
+### Bug Fixes
+
+* refine station timer ([1353beb](https://github.com/WatWowMap/ReactMap/commit/1353beb65254b5f44a8c659803fe8d778fb8d788))
+* separate station/battle opacity ([ccdbcec](https://github.com/WatWowMap/ReactMap/commit/ccdbcec52f1b25410dcc3dc31ea56719fde734dd))
+
+# [1.40.0-develop.10](https://github.com/WatWowMap/ReactMap/compare/v1.40.0-develop.9...v1.40.0-develop.10) (2025-10-04)
+
+
+### Bug Fixes
+
+* route crash ([206f558](https://github.com/WatWowMap/ReactMap/commit/206f5581f39ecb86b05486ca3fe051036fbcfe76))
+
+
+### Features
+
+* estimated max battle cp ([275f6f4](https://github.com/WatWowMap/ReactMap/commit/275f6f4e2ff44de57de0c49fa1f18fc7da96a70b))
+
+# [1.40.0-develop.9](https://github.com/WatWowMap/ReactMap/compare/v1.40.0-develop.8...v1.40.0-develop.9) (2025-10-03)
+
+
+### Features
+
+* max battle stats display ([211e0ea](https://github.com/WatWowMap/ReactMap/commit/211e0ea35897e0ecf793c8d2bc4e2ba535505cb8))
+* quest bread mode ([b0fcf4f](https://github.com/WatWowMap/ReactMap/commit/b0fcf4fd2ea132a18058b1a3f40db07f31ade2b0))
+
+# [1.40.0-develop.8](https://github.com/WatWowMap/ReactMap/compare/v1.40.0-develop.7...v1.40.0-develop.8) (2025-10-02)
+
+
+### Bug Fixes
+
+* gym range color should dynamically update ([7f9f95b](https://github.com/WatWowMap/ReactMap/commit/7f9f95b6df1bddd8fe21ed49a61969bf404e82e4))
+
+# [1.40.0-develop.7](https://github.com/WatWowMap/ReactMap/compare/v1.40.0-develop.6...v1.40.0-develop.7) (2025-10-02)
+
+
+### Bug Fixes
+
+* battle popup caching issue ([8cac1ce](https://github.com/WatWowMap/ReactMap/commit/8cac1ce4914911680f1d03dbfb9a0bc663657166))
+
+# [1.40.0-develop.6](https://github.com/WatWowMap/ReactMap/compare/v1.40.0-develop.5...v1.40.0-develop.6) (2025-10-01)
+
+
+### Features
+
+* faster extraUserFields ([#1144](https://github.com/WatWowMap/ReactMap/issues/1144)) ([2216787](https://github.com/WatWowMap/ReactMap/commit/2216787b14a09e1297835bfa47c8ab746b89925e))
+
+# [1.40.0-develop.5](https://github.com/WatWowMap/ReactMap/compare/v1.40.0-develop.4...v1.40.0-develop.5) (2025-10-01)
+
+
+### Bug Fixes
+
+* always show end route count ([5226575](https://github.com/WatWowMap/ReactMap/commit/5226575ba463923ab32a3c74345f0585dda10072))
+* route badge color should be consistent with their roles ([0c32962](https://github.com/WatWowMap/ReactMap/commit/0c32962e75d252d0f83493fb4ae345fad991c647))
+* self loop route counting ([e415caa](https://github.com/WatWowMap/ReactMap/commit/e415caae0aaa615ffab8fb0274894caf0d2764d7))
+
+
+### Features
+
+* configurable inactive station limit ([f8efbcd](https://github.com/WatWowMap/ReactMap/commit/f8efbcdb6849e067d967b0e1ed75110c84f6dc93))
+
+# [1.40.0-develop.4](https://github.com/WatWowMap/ReactMap/compare/v1.40.0-develop.3...v1.40.0-develop.4) (2025-09-29)
+
+
+### Features
+
+* expired stations ([0521045](https://github.com/WatWowMap/ReactMap/commit/0521045f597aa755b3ec8b37b19022f9c280d765))
+
+# [1.40.0-develop.3](https://github.com/WatWowMap/ReactMap/compare/v1.40.0-develop.2...v1.40.0-develop.3) (2025-09-26)
+
+
+### Bug Fixes
+
+* better hoverability on shiny rate ([e29a68b](https://github.com/WatWowMap/ReactMap/commit/e29a68b70c5ad1b724ca36a6ab2322006b8ba0a6))
+
+# [1.40.0-develop.2](https://github.com/WatWowMap/ReactMap/compare/v1.40.0-develop.1...v1.40.0-develop.2) (2025-09-25)
+
+
+### Bug Fixes
+
+* stationed pokemon maxHeight ([5c46dbd](https://github.com/WatWowMap/ReactMap/commit/5c46dbde0f5cbda6bab6a33616676f38aea54c6a)), closes [#1078](https://github.com/WatWowMap/ReactMap/issues/1078)
+
+# [1.40.0-develop.1](https://github.com/WatWowMap/ReactMap/compare/v1.39.0...v1.40.0-develop.1) (2025-09-25)
+
+
+### Features
+
+* persistent popups ([5cd5be0](https://github.com/WatWowMap/ReactMap/commit/5cd5be0371842e67473e3c7764ab8a7e0b92e153)), closes [#1135](https://github.com/WatWowMap/ReactMap/issues/1135)
+
 # [1.39.0](https://github.com/WatWowMap/ReactMap/compare/v1.38.0...v1.39.0) (2025-09-24)
 
 

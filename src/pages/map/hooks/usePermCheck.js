@@ -56,9 +56,15 @@ export function usePermCheck(category) {
     case 'stations':
       if (
         (filters?.allStations && perms?.stations) ||
+        (filters?.inactiveStations && perms?.stations) ||
         (filters?.maxBattles && perms?.dynamax) ||
         (filters?.gmaxStationed && perms?.dynamax)
       ) {
+        return true
+      }
+      break
+    case 'tappables':
+      if (filters?.enabled && perms?.tappables) {
         return true
       }
       break

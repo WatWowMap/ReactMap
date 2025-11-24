@@ -22,8 +22,8 @@ const StyledAccordion = styled(Accordion)((/* { theme } */) => ({
   width: '100%',
 }))
 
-const StyledAccordionSummary = styled(AccordionSummary)((/* { theme } */) => ({
-  backgroundColor: '#2e2e2e',
+const StyledAccordionSummary = styled(AccordionSummary)(({ theme }) => ({
+  backgroundColor: theme.palette.action.hover,
   padding: '0px 5px 0px 8px',
   minHeight: 30,
   borderRadius: 5,

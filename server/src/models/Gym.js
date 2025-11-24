@@ -9,6 +9,8 @@ const config = require('@rm/config')
 const { getAreaSql } = require('../utils/getAreaSql')
 const { state } = require('../services/state')
 
+const { applyManualIdFilter } = require('../utils/manualFilter')
+
 const coreFields = [
   'id',
   'name',
@@ -83,6 +85,7 @@ class Gym extends Model {
       onlyGymBadges,
       onlyBadge,
       onlyAreas = [],
+      onlyManualId,
     } = args.filters
     const ts = Math.floor(Date.now() / 1000)
     const query = this.query()
@@ -130,9 +133,22 @@ class Gym extends Model {
     } else if (hideOldGyms) {
       query.where('updated', '>', ts - gymValidDataLimit * 86400)
     }
-    query
-      .whereBetween(isMad ? 'latitude' : 'lat', [args.minLat, args.maxLat])
-      .andWhereBetween(isMad ? 'longitude' : 'lon', [args.minLon, args.maxLon])
+    const latCol = isMad ? 'latitude' : 'lat'
+    const lonCol = isMad ? 'longitude' : 'lon'
+    const idCol = isMad ? 'gym.gym_id' : 'id'
+
+    applyManualIdFilter(query, {
+      manualId: onlyManualId,
+      latColumn: latCol,
+      lonColumn: lonCol,
+      idColumn: idCol,
+      bounds: {
+        minLat: args.minLat,
+        maxLat: args.maxLat,
+        minLon: args.minLon,
+        maxLon: args.maxLon,
+      },
+    })
     Gym.onlyValid(query, isMad)
 
     const raidBosses = new Set()
@@ -444,6 +460,7 @@ class Gym extends Model {
         isMad ? 'level' : 'raid_level',
       ])
       .orderBy(isMad ? 'pokemon_id' : 'raid_pokemon_id', 'asc')
+      .orderBy(isMad ? 'level' : 'raid_level', 'asc')
     const teamResults = await this.query()
       .select([
         'team_id AS team',
@@ -460,15 +477,28 @@ class Gym extends Model {
         })
         return [...unique]
       })
+    const seenBosses = new Set()
+    const seenEggLevels = new Set()
+    const seenRaidLevels = new Set()
+    results.forEach((result) => {
+      if (result.raid_pokemon_id) {
+        seenBosses.add(`${result.raid_pokemon_id}-${result.raid_pokemon_form}`)
+      } else {
+        seenEggLevels.add(result.raid_level)
+      }
+      seenRaidLevels.add(result.raid_level)
+    })
+
     return {
       available: [
         ...teamResults,
-        ...results.flatMap((result) => {
-          if (result.raid_pokemon_id) {
-            return `${result.raid_pokemon_id}-${result.raid_pokemon_form}`
-          }
-          return [`e${result.raid_level}`, `r${result.raid_level}`]
-        }),
+        ...Array.from(seenBosses),
+        ...Array.from(seenEggLevels)
+          .sort((a, b) => Number(a) - Number(b))
+          .map((level) => `e${level}`),
+        ...Array.from(seenRaidLevels)
+          .sort((a, b) => Number(a) - Number(b))
+          .map((level) => `r${level}`),
       ],
     }
   }

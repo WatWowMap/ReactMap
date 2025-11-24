@@ -25,7 +25,8 @@ export function applyToAll(
   selectedIds = [],
   includeSlots = false,
 ) {
-  const localFilters = useStorage.getState().filters[category]
+  const storageState = useStorage.getState()
+  const localFilters = storageState.filters?.[category] ?? {}
   const easyMode = !!localFilters.easyMode
   const userFilters = localFilters.filter ?? {}
 
@@ -34,8 +35,17 @@ export function applyToAll(
   const refFilter = serverFilters?.standard ?? STANDARD_BACKUP
 
   const idSet = new Set(selectedIds ?? [])
-  if (category === 'pokemon' && selectedIds.length >= staticFilters.length - 1)
-    idSet.add('global')
+
+  const menuSelections = storageState.menus?.[category]?.filters ?? {}
+  const hasMenuFiltersApplied = Object.values(menuSelections).some((options) =>
+    Object.values(options || {}).some(Boolean),
+  )
+  const advancedSearch =
+    /** @type {string | undefined} */ (
+      storageState.searches?.[`${category}Advanced`]
+    ) ?? ''
+  const hasSearchApplied =
+    typeof advancedSearch === 'string' && advancedSearch.trim().length > 0
 
   const newObj = Object.fromEntries(
     staticFilters.flatMap(([key, staticFilter]) => {
@@ -56,5 +66,29 @@ export function applyToAll(
       return filters
     }),
   )
+  if (
+    category === 'pokemon' &&
+    typeof newFilter.enabled === 'boolean' &&
+    newObj.global &&
+    !hasMenuFiltersApplied &&
+    !hasSearchApplied
+  ) {
+    newObj.global = {
+      ...newObj.global,
+      enabled: newFilter.enabled,
+      all: newFilter.enabled ? !!easyMode : false,
+    }
+  } else if (
+    category !== 'pokemon' &&
+    typeof newFilter.enabled === 'boolean' &&
+    newObj.global &&
+    !hasMenuFiltersApplied &&
+    !hasSearchApplied
+  ) {
+    newObj.global = {
+      ...newObj.global,
+      enabled: newFilter.enabled,
+    }
+  }
   setDeepStore(`filters.${category}.filter`, newObj)
 }

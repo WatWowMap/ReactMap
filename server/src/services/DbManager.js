@@ -24,6 +24,7 @@ class DbManager extends Logger {
     'ScanCell',
     'Spawnpoint',
     'Station',
+    'Tappable',
     'Weather',
   ])
 
@@ -130,14 +131,16 @@ class DbManager extends Logger {
    * @returns {Promise<import("@rm/types").DbContext>}
    */
   static async schemaCheck(schema) {
-    const [isMad, pvpV2, hasSize, hasHeight] = await schema('pokemon')
-      .columnInfo()
-      .then((columns) => [
-        'cp_multiplier' in columns,
-        'pvp' in columns,
-        'size' in columns,
-        'height' in columns,
-      ])
+    const [isMad, pvpV2, hasSize, hasHeight, hasPokemonBackground] =
+      await schema('pokemon')
+        .columnInfo()
+        .then((columns) => [
+          'cp_multiplier' in columns,
+          'pvp' in columns,
+          'size' in columns,
+          'height' in columns,
+          'background' in columns,
+        ])
     const [
       hasRewardAmount,
       hasPowerUp,
@@ -155,8 +158,11 @@ class DbManager extends Logger {
         'showcase_pokemon_form_id' in columns,
         'showcase_pokemon_type_id' in columns,
       ])
-    const hasStationedGmax =
-      'total_stationed_gmax' in (await schema('station').columnInfo())
+    const stationColumns = await schema('station').columnInfo()
+    const hasStationedGmax = 'total_stationed_gmax' in stationColumns
+    const hasBattlePokemonStats =
+      'battle_pokemon_stamina' in stationColumns &&
+      'battle_pokemon_cp_multiplier' in stationColumns
     const [hasLayerColumn] = isMad
       ? await schema('trs_quest')
           .columnInfo()
@@ -213,8 +219,10 @@ class DbManager extends Logger {
       hasShowcaseForm,
       hasShowcaseType,
       hasStationedGmax,
+      hasBattlePokemonStats,
       hasShortcode,
       hasPokemonShinyStats,
+      hasPokemonBackground,
     }
   }
 
@@ -232,10 +240,8 @@ class DbManager extends Logger {
             : {
                 mem: this.endpoints[i].endpoint,
                 secret: this.endpoints[i].secret,
-                // Add support for HTTP authentication
                 httpAuth: this.endpoints[i].httpAuth,
                 pvpV2: true,
-                hasPokemonShinyStats: false,
               }
 
           Object.entries(this.models).forEach(([category, sources]) => {

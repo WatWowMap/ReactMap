@@ -1,7 +1,12 @@
 // @ts-check
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { useLazyQuery, useMutation, useQuery } from '@apollo/client'
+import {
+  useLazyQuery,
+  useMutation,
+  useQuery,
+  ApolloError,
+} from '@apollo/client'
 import List from '@mui/material/List'
 import ListSubheader from '@mui/material/ListSubheader'
 import ListItem from '@mui/material/ListItem'
@@ -52,35 +57,79 @@ function CreateNew({ backups }) {
   const { t } = useTranslation()
   const userBackupLimits = useMemory((s) => s.auth.userBackupLimits)
   const [name, setName] = React.useState('')
+  const [errorMessage, setErrorMessage] = React.useState('')
 
   const [create, { loading }] = useMutation(Query.user('CREATE_BACKUP'), {
     refetchQueries: ['GetBackups'],
   })
-  return (
-    <ListItem>
-      <TextField
-        label={t('new_backup')}
-        fullWidth
-        size="small"
-        value={name || ''}
-        onChange={(e) => setName(e.target.value)}
-        variant="outlined"
-      />
-      <ListItemButton
-        disabled={
-          backups.length >= userBackupLimits ||
-          backups.some((x) => x.name === name) ||
-          loading
+
+  const handleCreate = React.useCallback(async () => {
+    if (
+      backups.length >= userBackupLimits ||
+      backups.some((x) => x.name === name) ||
+      loading
+    )
+      return
+    setErrorMessage('')
+    try {
+      await create({
+        variables: { backup: { name, data: useStorage.getState() } },
+      })
+      setName('')
+    } catch (err) {
+      let message = t('backup_error_generic')
+      if (err instanceof ApolloError) {
+        const { networkError } = err
+        if (
+          networkError &&
+          'statusCode' in networkError &&
+          networkError.statusCode === 413
+        ) {
+          message = t('backup_error_too_large')
+        } else if (err.message) {
+          message = err.message
         }
-        onClick={() => {
-          create({
-            variables: { backup: { name, data: useStorage.getState() } },
-          })
-          setName('')
-        }}
-      >
-        {t('create')}
-      </ListItemButton>
+      }
+      setErrorMessage(message)
+    }
+  }, [backups, create, loading, name, t, userBackupLimits])
+
+  const handleChange = React.useCallback((event) => {
+    setErrorMessage('')
+    setName(event.target.value)
+  }, [])
+
+  return (
+    <ListItem sx={{ flexDirection: 'column', alignItems: 'stretch' }}>
+      <Box sx={{ display: 'flex', gap: 2, width: '100%' }}>
+        <TextField
+          label={t('new_backup')}
+          fullWidth
+          size="small"
+          value={name || ''}
+          onChange={handleChange}
+          variant="outlined"
+        />
+        <ListItemButton
+          disabled={
+            backups.length >= userBackupLimits ||
+            backups.some((x) => x.name === name) ||
+            loading
+          }
+          onClick={handleCreate}
+        >
+          {t('create')}
+        </ListItemButton>
+      </Box>
+      {errorMessage ? (
+        <Typography
+          variant="caption"
+          color="error"
+          sx={{ mt: 1, alignSelf: 'flex-start' }}
+        >
+          {errorMessage}
+        </Typography>
+      ) : null}
     </ListItem>
   )
 }

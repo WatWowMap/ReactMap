@@ -15,6 +15,10 @@ const { getAreaSql } = require('../utils/getAreaSql')
 const { filterRTree } = require('../utils/filterRTree')
 const { fetchJson } = require('../utils/fetchJson')
 const {
+  applyManualIdFilter,
+  normalizeManualId,
+} = require('../utils/manualFilter')
+const {
   IV_CALC,
   LEVEL_CALC,
   MAD_KEY_MAP,
@@ -128,7 +132,16 @@ class Pokemon extends Model {
   static async getAll(perms, args, ctx) {
     const { iv: ivs, pvp, areaRestrictions } = perms
     const { onlyIvOr, onlyHundoIv, onlyZeroIv, onlyAreas = [] } = args.filters
-    const { hasSize, hasHeight, isMad, mem, secret, httpAuth, pvpV2 } = ctx
+    const {
+      hasSize,
+      hasHeight,
+      hasPokemonBackground,
+      isMad,
+      mem,
+      secret,
+      httpAuth,
+      pvpV2,
+    } = ctx
     const { filterMap, globalFilter } = this.getFilters(perms, args, ctx)
 
     let queryPvp = config
@@ -147,6 +160,10 @@ class Pokemon extends Model {
     }
 
     const query = this.query()
+
+    const manualIdFilter = normalizeManualId(args.filters.onlyManualId)
+
+    let manualId = manualIdFilter
 
     const pokemonIds = []
     const pokemonForms = []
@@ -167,77 +184,90 @@ class Pokemon extends Model {
       if (isMad) {
         Pokemon.getMadSql(query)
       } else {
-        query.select(['*', hasSize && !hasHeight ? 'size AS height' : 'size'])
+        const selectColumns = [
+          '*',
+          hasSize && !hasHeight ? 'size AS height' : 'size',
+        ]
+        if (hasPokemonBackground) {
+          selectColumns.push('background')
+        }
+        query.select(selectColumns)
       }
-      query
-        .where(
-          isMad ? 'disappear_time' : 'expire_timestamp',
-          '>=',
-          isMad ? this.knex().fn.now() : ts,
-        )
-        .andWhereBetween(isMad ? 'pokemon.latitude' : 'lat', [
-          args.minLat,
-          args.maxLat,
-        ])
-        .andWhereBetween(isMad ? 'pokemon.longitude' : 'lon', [
-          args.minLon,
-          args.maxLon,
-        ])
-        .andWhere((ivOr) => {
-          if (ivs || pvp) {
-            if (globalFilter.filterKeys.size) {
-              ivOr.andWhere((pkmn) => {
-                const keys = globalFilter.keyArray
-                for (let i = 0; i < keys.length; i += 1) {
-                  const key = keys[i]
-                  switch (key) {
-                    case 'xxs':
-                    case 'xxl':
-                      if (hasSize) {
-                        pkmn.orWhere('pokemon.size', key === 'xxl' ? 5 : 1)
-                      }
-                      break
-                    case 'gender':
-                      pkmn.andWhere('pokemon.gender', onlyIvOr[key])
-                      break
-                    case 'cp':
-                    case 'level':
-                    case 'atk_iv':
-                    case 'def_iv':
-                    case 'sta_iv':
-                    case 'iv':
-                      if (perms.iv) {
-                        pkmn.andWhereBetween(
-                          isMad ? MAD_KEY_MAP[key] : key,
-                          onlyIvOr[key],
-                        )
-                      }
-                      break
-                    default:
-                      if (
-                        perms.pvp &&
-                        BASE_KEYS.every((x) => !globalFilter.filterKeys.has(x))
-                      ) {
-                        // doesn't return everything if only pvp stats for individual pokemon
-                        pkmn.whereNull('pokemon_id')
-                      }
-                      break
-                  }
+      query.where(
+        isMad ? 'disappear_time' : 'expire_timestamp',
+        '>=',
+        isMad ? this.knex().fn.now() : ts,
+      )
+      manualId = applyManualIdFilter(query, {
+        manualId: manualIdFilter,
+        latColumn: isMad ? 'pokemon.latitude' : 'lat',
+        lonColumn: isMad ? 'pokemon.longitude' : 'lon',
+        idColumn: isMad ? 'pokemon.encounter_id' : 'id',
+        bounds: {
+          minLat: args.minLat,
+          maxLat: args.maxLat,
+          minLon: args.minLon,
+          maxLon: args.maxLon,
+        },
+      })
+      query.andWhere((ivOr) => {
+        if (ivs || pvp) {
+          if (globalFilter.filterKeys.size) {
+            ivOr.andWhere((pkmn) => {
+              const keys = globalFilter.keyArray
+              for (let i = 0; i < keys.length; i += 1) {
+                const key = keys[i]
+                switch (key) {
+                  case 'xxs':
+                  case 'xxl':
+                    if (hasSize) {
+                      pkmn.orWhere('pokemon.size', key === 'xxl' ? 5 : 1)
+                    }
+                    break
+                  case 'gender':
+                    pkmn.andWhere('pokemon.gender', onlyIvOr[key])
+                    break
+                  case 'cp':
+                  case 'level':
+                  case 'atk_iv':
+                  case 'def_iv':
+                  case 'sta_iv':
+                  case 'iv':
+                    if (perms.iv) {
+                      pkmn.andWhereBetween(
+                        isMad ? MAD_KEY_MAP[key] : key,
+                        onlyIvOr[key],
+                      )
+                    }
+                    break
+                  default:
+                    if (
+                      perms.pvp &&
+                      BASE_KEYS.every((x) => !globalFilter.filterKeys.has(x))
+                    ) {
+                      // doesn't return everything if only pvp stats for individual pokemon
+                      pkmn.whereNull('pokemon_id')
+                    }
+                    break
                 }
-              })
-            } else {
-              ivOr.whereNull('pokemon_id')
-            }
-            ivOr.orWhereIn('pokemon_id', pokemonIds)
-            ivOr.orWhereIn('pokemon.form', pokemonForms)
+              }
+            })
+          } else {
+            ivOr.whereNull('pokemon_id')
           }
-          if (onlyZeroIv && ivs) {
-            ivOr.orWhere(isMad ? raw(IV_CALC) : 'iv', 0)
-          }
-          if (onlyHundoIv && ivs) {
-            ivOr.orWhere(isMad ? raw(IV_CALC) : 'iv', 100)
-          }
-        })
+          ivOr.orWhereIn('pokemon_id', pokemonIds)
+          ivOr.orWhereIn('pokemon.form', pokemonForms)
+        }
+        if (onlyZeroIv && ivs) {
+          ivOr.orWhere(isMad ? raw(IV_CALC) : 'iv', 0)
+        }
+        if (onlyHundoIv && ivs) {
+          ivOr.orWhere(isMad ? raw(IV_CALC) : 'iv', 100)
+        }
+        if (manualId !== null) {
+          ivOr.orWhereIn(isMad ? 'pokemon.encounter_id' : 'id', [manualId])
+        }
+      })
       if (!getAreaSql(query, areaRestrictions, onlyAreas, isMad, 'pokemon')) {
         return []
       }
@@ -272,7 +302,7 @@ class Pokemon extends Model {
         filters.push({ iv: { min: 100, max: 100 }, pokemon: globalPokes })
     }
     /** @type {import("@rm/types").Pokemon[]} */
-    const results = await this.evalQuery(
+    let results = await this.evalQuery(
       mem ? `${mem}/api/pokemon/v2/scan` : null,
       mem
         ? JSON.stringify({
@@ -292,6 +322,30 @@ class Pokemon extends Model {
       secret,
       httpAuth,
     )
+
+    if (mem && manualId !== null) {
+      const loadedIds = Array.isArray(results)
+        ? new Set(results.map((pkmn) => `${pkmn.id}`))
+        : new Set()
+      if (!loadedIds.has(`${manualId}`)) {
+        const manualResult = await this.evalQuery(
+          `${mem}/api/pokemon/id/${manualId}`,
+          null,
+          'GET',
+          secret,
+          httpAuth,
+        ).catch(() => null)
+        if (manualResult) {
+          results = Array.isArray(results)
+            ? [...results, manualResult]
+            : [manualResult]
+        }
+      }
+    }
+
+    if (!Array.isArray(results)) {
+      results = []
+    }
 
     const finalResults = []
     const pvpResults = []
@@ -326,20 +380,23 @@ class Pokemon extends Model {
       if (isMad) {
         Pokemon.getMadSql(pvpQuery)
       }
-      pvpQuery
-        .where(
-          isMad ? 'disappear_time' : 'expire_timestamp',
-          '>=',
-          isMad ? this.knex().fn.now() : ts,
-        )
-        .andWhereBetween(isMad ? 'pokemon.latitude' : 'lat', [
-          args.minLat,
-          args.maxLat,
-        ])
-        .andWhereBetween(isMad ? 'pokemon.longitude' : 'lon', [
-          args.minLon,
-          args.maxLon,
-        ])
+      pvpQuery.where(
+        isMad ? 'disappear_time' : 'expire_timestamp',
+        '>=',
+        isMad ? this.knex().fn.now() : ts,
+      )
+      applyManualIdFilter(pvpQuery, {
+        manualId,
+        latColumn: isMad ? 'pokemon.latitude' : 'lat',
+        lonColumn: isMad ? 'pokemon.longitude' : 'lon',
+        idColumn: isMad ? 'pokemon.encounter_id' : 'id',
+        bounds: {
+          minLat: args.minLat,
+          maxLat: args.maxLat,
+          minLon: args.minLon,
+          maxLon: args.maxLon,
+        },
+      })
       if (isMad && listOfIds.length) {
         pvpQuery.whereRaw(
           `pokemon.encounter_id NOT IN ( ${listOfIds.join(',')} )`,
@@ -612,28 +669,16 @@ class Pokemon extends Model {
     }
 
     const statsMap = new Map()
-    const today = new Date()
-    today.setHours(0, 0, 0, 0)
-    const cutoff = new Date(today)
-    cutoff.setDate(cutoff.getDate() - 1)
-    const cutoffStr = cutoff.toISOString().slice(0, 10)
-
     grouped.forEach((entries, key) => {
       let shinySum = 0
       let checkSum = 0
       let sinceDate = null
-      for (let i = 0; i < entries.length; i += 1) {
+      // 20000 checks would give >99% of distinguishing even 1/512 from 1/256
+      for (let i = 0; i < entries.length && checkSum < 20000; i++) {
         const { shiny, checks, date } = entries[i]
-        const includeRecent = date >= cutoffStr
-        // 20000 checks would give >99% of distinguishing even 1/512 from 1/256
-        if (!includeRecent && checkSum >= 20000) {
-          break
-        }
         shinySum += shiny
         checkSum += checks
-        if (!sinceDate || date < sinceDate) {
-          sinceDate = date
-        }
+        sinceDate = date
       }
       statsMap.set(key, {
         shiny_seen: shinySum,
@@ -655,6 +700,7 @@ class Pokemon extends Model {
     const { isMad, hasSize, hasHeight, mem, secret, httpAuth } = ctx
     const ts = Math.floor(Date.now() / 1000)
     const { filterMap, globalFilter } = this.getFilters(perms, args, ctx)
+    const manualIdFilter = normalizeManualId(args.filters.onlyManualId)
     const queryLimits = config.getSafe('api.queryLimits')
 
     if (!perms.iv && !perms.pvp) {
@@ -694,14 +740,25 @@ class Pokemon extends Model {
     ) {
       return []
     }
-
+    const manualId = applyManualIdFilter(query, {
+      manualId: manualIdFilter,
+      latColumn: isMad ? 'pokemon.latitude' : 'lat',
+      lonColumn: isMad ? 'pokemon.longitude' : 'lon',
+      idColumn: isMad ? 'pokemon.encounter_id' : 'id',
+      bounds: {
+        minLat: args.minLat,
+        maxLat: args.maxLat,
+        minLon: args.minLon,
+        maxLon: args.maxLon,
+      },
+    })
     const filters = mem
       ? Object.values(filterMap).flatMap((filter) => filter.buildApiFilter())
       : []
     if ((perms.iv || perms.pvp) && mem)
       filters.push(...globalFilter.buildApiFilter())
 
-    const results = await this.evalQuery(
+    let results = await this.evalQuery(
       mem ? `${mem}/api/pokemon/v2/scan` : null,
       mem
         ? JSON.stringify({
@@ -721,6 +778,22 @@ class Pokemon extends Model {
       secret,
       httpAuth,
     )
+
+    if (mem && manualId !== null) {
+      const loaded = new Set(results.map((pkmn) => `${pkmn.id}`))
+      if (!loaded.has(`${manualId}`)) {
+        const manualResult = await this.evalQuery(
+          `${mem}/api/pokemon/id/${manualId}`,
+          null,
+          'GET',
+          secret,
+          httpAuth,
+        ).catch(() => null)
+        if (manualResult) {
+          results = [...results, manualResult]
+        }
+      }
+    }
     const filtered = results.filter(
       (item) =>
         !mem ||

@@ -5,6 +5,7 @@ import type {
   RmModelKeys,
   ModelKeys,
   Station,
+  Tappable,
   Backup,
   Nest,
   NestSubmission,
@@ -46,6 +47,8 @@ export interface DbContext {
   hasShowcaseForm: boolean
   hasShowcaseType: boolean
   hasStationedGmax: boolean
+  hasBattlePokemonStats: boolean
+  hasPokemonBackground: boolean
   hasPokemonShinyStats?: boolean
   connection?: number
 }
@@ -70,6 +73,7 @@ export interface Available {
   pokestops: ModelReturn<typeof Pokestop, 'getAvailable'>
   nests: ModelReturn<typeof Nest, 'getAvailable'>
   stations: ModelReturn<typeof Station, 'getAvailable'>
+  tappables: ModelReturn<typeof Tappable, 'getAvailable'>
 }
 
 export interface ApiEndpoint {
@@ -150,6 +154,7 @@ type BasePerms = { [K in keyof Config['authentication']['perms']]: boolean }
 export interface Permissions extends BasePerms {
   blockedGuildNames: string[]
   scanner: string[]
+  scannerCooldownBypass: string[]
   areaRestrictions: string[]
   webhooks: string[]
   trial: boolean
@@ -204,6 +209,7 @@ export type AdvCategories =
   | 'pokestops'
   | 'nests'
   | 'stations'
+  | 'tappables'
 
 export type UIObject = ReturnType<
   (typeof import('server/src/ui/drawer'))['drawer']

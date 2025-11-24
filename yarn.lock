@@ -6150,9 +6150,9 @@ jiti@^2.4.1:
   integrity sha512-RdJUflcE3cUzKiMqQgsCu06FPu9UdIJO0beYbPhHN4k6apgJtifcoCtT9bcxOpYBtpD2kCM6Sbzg4CausW/PKQ==
 
 js-yaml@^4.1.0:
-  version "4.1.0"
-  resolved "https://registry.yarnpkg.com/js-yaml/-/js-yaml-4.1.0.tgz#c1fb65f8f5017901cdd2c951864ba18458a10602"
-  integrity sha512-wpxZs9NoxZaJESJGIZTyDEaYpl0FKSA+FB9aJiyemKhMwkxQg63h4T1KJgUGHpTqPDNRcmmYLugrRjJlBtWvRA==
+  version "4.1.1"
+  resolved "https://registry.yarnpkg.com/js-yaml/-/js-yaml-4.1.1.tgz#854c292467705b699476e1a2decc0c8a3458806b"
+  integrity sha512-qQKT4zQxXl8lLwBtHMWwaTcGfFOZviOJet3Oy/xmGk2gZH677CJM9EvtfdSkgWcATZhj/55JZ0rmy3myCT5lsA==
   dependencies:
     argparse "^2.0.1"
 
@@ -9820,10 +9820,10 @@ uglify-js@^3.1.4:
   resolved "https://registry.yarnpkg.com/uglify-js/-/uglify-js-3.19.3.tgz#82315e9bbc6f2b25888858acd1fff8441035b77f"
   integrity sha512-v3Xu+yuwBXisp6QYTcH4UbH+xYJXqnq2m/LtQVWKWzYc1iehYnLixoQDN9FH6/j9/oybfd6W9Ghwkl8+UMKTKQ==
 
-uicons.js@2.0.3:
-  version "2.0.3"
-  resolved "https://registry.yarnpkg.com/uicons.js/-/uicons.js-2.0.3.tgz#38833f9cfad5fcbf6968ff3f0a1f36ab47dd40be"
-  integrity sha512-+hFdKLHkB1bIrwNNnDO8HBe0R10UuJDZ6xqkroigBqouHxZExuxznY2GlDUqGXv7RHB9OFNzFLo5mFzeudlf7w==
+uicons.js@2.2.0:
+  version "2.2.0"
+  resolved "https://registry.yarnpkg.com/uicons.js/-/uicons.js-2.2.0.tgz#5fc2fdcdfd272d669e63400dee55ed347680aedc"
+  integrity sha512-USQcp4UL4MHfMwKXsR6FreyBBWsmG9WeAfil4Yu8xRD6qw8YjQxF/XHIkf8DNk3M0f3VDPNGssiPlOwLsJMJDQ==
 
 uid-safe@~2.1.5:
   version "2.1.5"
@@ -10036,10 +10036,10 @@ vite-plugin-checker@0.7.2:
     vscode-languageserver-textdocument "^1.0.1"
     vscode-uri "^3.0.2"
 
-vite@^6.3.6:
-  version "6.3.6"
-  resolved "https://registry.yarnpkg.com/vite/-/vite-6.3.6.tgz#69a976b64930750d40219fbc68c5200874d315c1"
-  integrity sha512-0msEVHJEScQbhkbVTb/4iHZdJ6SXp/AvxL2sjwYQFfBqleHtnCqv1J3sa9zbWz/6kW1m9Tfzn92vW+kZ1WV6QA==
+vite@^6.4.1:
+  version "6.4.1"
+  resolved "https://registry.yarnpkg.com/vite/-/vite-6.4.1.tgz#afbe14518cdd6887e240a4b0221ab6d0ce733f96"
+  integrity sha512-+Oxm7q9hDoLMyJOYfUYBuHQo+dkAloi33apOPP56pzj+vsdJDzr+j1NISE5pyaAuKL4A3UD34qd0lx5+kfKp2g==
   dependencies:
     esbuild "^0.25.0"
     fdir "^6.4.4"

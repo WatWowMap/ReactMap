@@ -354,6 +354,31 @@ export class UAssets {
   }
 
   /**
+   * @param {number | string | null | undefined} [backgroundId]
+   */
+  getBackground(backgroundId = 0) {
+    const parsed =
+      typeof backgroundId === 'string'
+        ? parseInt(backgroundId, 10)
+        : backgroundId
+    if (!parsed) {
+      return ''
+    }
+    try {
+      const selected = this.selected.background
+      const backgroundClass = selected ? this[selected]?.class : undefined
+      const result = backgroundClass?.background?.(backgroundId)
+      if (result) {
+        return result
+      }
+      return `${this.fallback}/background/${parsed}.${this.fallbackExt}`
+    } catch (e) {
+      console.error(`[${this.assetType.toUpperCase()}]`, e)
+      return `${this.fallback}/background/0.${this.fallbackExt}`
+    }
+  }
+
+  /**
    * @param {string|number} pokemonId
    * @param {import('@rm/types').PokemonDisplay} pokemonDisplay
    */
@@ -411,6 +436,26 @@ export class UAssets {
       console.error(`[${this.assetType.toUpperCase()}]`, e)
       return `${this.fallback}/pokestop/0.${this.fallbackExt}`
     }
+  }
+
+  /**
+   * @param {string} [type]
+   * @returns {string}
+   */
+  getTappable(type = 'TAPPABLE_TYPE_POKEBALL') {
+    try {
+      const selection = this.selected.tappable
+      const pack = selection ? this[selection] : undefined
+      if (pack?.class && typeof pack.class.tappable === 'function') {
+        const iconPath = pack.class.tappable(type)
+        if (iconPath) {
+          return iconPath
+        }
+      }
+    } catch (e) {
+      console.error(`[${this.assetType.toUpperCase()}]`, e)
+    }
+    return this.getRewards(2, 1)
   }
 
   /**

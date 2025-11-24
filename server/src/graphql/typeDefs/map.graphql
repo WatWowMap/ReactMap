@@ -123,6 +123,8 @@ type SearchQuest {
   quest_form_id: Int
   quest_gender_id: Int
   quest_costume_id: Int
+  quest_background: Int
+  quest_bread_mode: Int
   quest_item_id: Int
   quest_reward_type: Int
   quest_shiny: Int

@@ -16,8 +16,8 @@ import FavoriteIcon from '@mui/icons-material/Favorite'
 import EmojiEventsIcon from '@mui/icons-material/EmojiEvents'
 import SentimentVeryDissatisfiedIcon from '@mui/icons-material/SentimentVeryDissatisfied'
 import RestaurantIcon from '@mui/icons-material/Restaurant'
-import { useTheme } from '@mui/material/styles'
 import { useTranslation } from 'react-i18next'
+import { useTheme } from '@mui/material/styles'
 
 import { useSyncData } from '@features/webhooks'
 import { useMemory } from '@store/useMemory'
@@ -31,14 +31,17 @@ import { GenderIcon } from '@components/popups/GenderIcon'
 import { Navigation } from '@components/popups/Navigation'
 import { Coords } from '@components/popups/Coords'
 import { TimeStamp } from '@components/popups/TimeStamps'
+import { BackgroundCard } from '@components/popups/BackgroundCard'
 import { useAnalytics } from '@hooks/useAnalytics'
 import { getTimeUntil } from '@utils/getTimeUntil'
 import { formatInterval } from '@utils/formatInterval'
+import { usePokemonBackgroundVisuals } from '@hooks/usePokemonBackgroundVisuals'
+import { getFormDisplay } from '@utils/getFormDisplay'
 
 import { useWebhook } from './useWebhook'
 
 /**
- * Format deployed time as either "Xd Xh Xm" or "X:X:X" format
+ * Format deployed time as m:ss, h:mm:ss, or d:hh:mm:ss using the shortest layout
  * @param {number} intervalMs - Time interval in milliseconds
  * @returns {string} Formatted time string
  */
@@ -47,14 +50,162 @@ function formatDeployedTime(intervalMs) {
   const days = Math.floor(totalSeconds / 86400)
   const hours = Math.floor((totalSeconds % 86400) / 3600)
   const minutes = Math.floor((totalSeconds % 3600) / 60)
+  const seconds = totalSeconds % 60
+  const pad = (value) => value.toString().padStart(2, '0')
 
   if (days > 0) {
-    // Format as "Xd Xh Xm"
-    return `${days}d ${hours}h ${minutes}m`
+    return `${days}:${pad(hours)}:${pad(minutes)}:${pad(seconds)}`
   }
-  // Format as "X:X:X" (HH:MM:SS)
-  const seconds = totalSeconds % 60
-  return `${hours}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`
+  if (hours > 0) {
+    return `${hours}:${pad(minutes)}:${pad(seconds)}`
+  }
+  return `${minutes}:${pad(seconds)}`
+}
+
+/**
+ * Shared row layout between fallback and detailed defender displays.
+ * @param {{
+ *  borderColor: string | undefined
+ *  tooltip?: string
+ *  imageSrc?: string
+ *  imageAlt?: string
+ *  showBestBuddy?: boolean
+ *  trailingContent?: React.ReactNode
+ *  children: React.ReactNode
+ * }} props
+ */
+function DefenderRowLayout({
+  borderColor,
+  tooltip,
+  imageSrc,
+  imageAlt,
+  showBestBuddy,
+  trailingContent,
+  children,
+}) {
+  const { t } = useTranslation()
+  const Icons = useMemory((s) => s.Icons)
+  const bestBuddySrc = Icons?.getMisc('bestbuddy')
+  return (
+    <div
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        minHeight: 80,
+        width: '100%',
+        padding: '4px 0',
+        borderBottom: `1px solid ${borderColor}`,
+      }}
+      aria-label={tooltip || undefined}
+    >
+      <div
+        style={{
+          width: 50,
+          height: 50,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          marginLeft: 12,
+          marginRight: 8,
+          flexShrink: 0,
+          position: 'relative',
+        }}
+      >
+        {imageSrc ? (
+          <Img
+            src={imageSrc}
+            alt={imageAlt}
+            style={{
+              maxHeight: 50,
+              maxWidth: 50,
+              objectFit: 'contain',
+            }}
+          />
+        ) : null}
+        {showBestBuddy && bestBuddySrc ? (
+          <Img
+            src={bestBuddySrc}
+            alt={t('best_buddy')}
+            style={{
+              position: 'absolute',
+              top: 0,
+              right: 0,
+              maxHeight: 15,
+              maxWidth: 15,
+              zIndex: 2,
+            }}
+          />
+        ) : null}
+      </div>
+      <div
+        style={{
+          flex: 1,
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'flex-start',
+          justifyContent: 'center',
+          minWidth: 0,
+          textAlign: 'left',
+        }}
+      >
+        {children}
+      </div>
+      {trailingContent || null}
+    </div>
+  )
+}
+
+const mergeSxParts = (...parts) => {
+  const flattened = parts.reduce((acc, part) => {
+    if (!part) {
+      return acc
+    }
+    if (Array.isArray(part)) {
+      return acc.concat(part)
+    }
+    acc.push(part)
+    return acc
+  }, [])
+  if (!flattened.length) {
+    return undefined
+  }
+  return flattened.length === 1 ? flattened[0] : flattened
+}
+
+function DefenderPrimaryText({ children, title, visualStyles, sx }) {
+  return (
+    <Typography
+      variant="subtitle1"
+      component="div"
+      sx={mergeSxParts(
+        {
+          fontSize: 16,
+          fontWeight: 700,
+          whiteSpace: 'normal',
+          wordBreak: 'break-word',
+          maxWidth: '100%',
+          lineHeight: 1.43,
+        },
+        visualStyles,
+        sx,
+      )}
+      title={title}
+    >
+      {children}
+    </Typography>
+  )
+}
+
+function DefenderSecondaryText({ children, visualStyles, sx }) {
+  return (
+    <Typography
+      variant="body2"
+      component="div"
+      sx={mergeSxParts({ fontSize: 13 }, visualStyles, sx)}
+    >
+      {children}
+    </Typography>
+  )
 }
 
 /**
@@ -175,16 +326,72 @@ function DefendersModal({ gym, onClose }) {
   const { t, i18n } = useTranslation()
   const theme = useTheme()
   const Icons = useMemory((s) => s.Icons)
+  const resolvePokemonBackgroundVisual = usePokemonBackgroundVisuals()
   const numFormatter = new Intl.NumberFormat(i18n.language)
+  const fallbackBackground = gym.guarding_pokemon_display?.background ?? null
   const defenders = gym.defenders || []
   const updatedMs =
     defenders.length &&
     defenders[0].deployed_ms + defenders[0].deployed_time * 1000
-  const now = Date.now()
+  const [now, setNow] = React.useState(Date.now())
+  const fallbackVisuals = React.useMemo(
+    () => resolvePokemonBackgroundVisual(fallbackBackground),
+    [resolvePokemonBackgroundVisual, fallbackBackground],
+  )
+
+  React.useEffect(() => {
+    const interval = setInterval(() => setNow(Date.now()), 1000)
+    return () => clearInterval(interval)
+  }, [])
 
   // Fallback to basic gym data when detailed defender info isn't available
   const useFallbackData =
     !defenders.length && gym.team_id > 0 && gym.guarding_pokemon_id
+  let fallbackRow = null
+  if (useFallbackData) {
+    const fallbackImageSrc =
+      Icons &&
+      (gym.guarding_pokemon_display
+        ? Icons.getPokemonByDisplay(
+            gym.guarding_pokemon_id,
+            gym.guarding_pokemon_display,
+          )
+        : Icons.getPokemon?.(gym.guarding_pokemon_id))
+
+    const fallbackHasBackground = fallbackVisuals.hasBackground
+    const fallbackBorderColor = fallbackVisuals.borderColor
+    const fallbackPrimaryText = fallbackVisuals.styles?.primaryText
+    const fallbackSecondaryText = fallbackVisuals.styles?.secondaryText
+    const rowContent = (
+      <DefenderRowLayout
+        borderColor={fallbackBorderColor}
+        imageSrc={fallbackImageSrc}
+        imageAlt={t(`poke_${gym.guarding_pokemon_id}`)}
+        showBestBuddy={gym.guarding_pokemon_display?.badge === 1}
+      >
+        <DefenderPrimaryText
+          title={t(`poke_${gym.guarding_pokemon_id}`)}
+          visualStyles={fallbackPrimaryText}
+        >
+          {t(`poke_${gym.guarding_pokemon_id}`)}
+        </DefenderPrimaryText>
+
+        <DefenderSecondaryText visualStyles={fallbackSecondaryText}>
+          {gym.total_cp &&
+            `${t('total_cp')}: ${numFormatter.format(gym.total_cp)}`}
+        </DefenderSecondaryText>
+      </DefenderRowLayout>
+    )
+
+    fallbackRow = (
+      <BackgroundCard
+        visuals={fallbackHasBackground ? fallbackVisuals : undefined}
+        fullBleed={fallbackHasBackground}
+      >
+        {rowContent}
+      </BackgroundCard>
+    )
+  }
 
   return (
     <Grid
@@ -224,107 +431,7 @@ function DefendersModal({ gym, onClose }) {
       {useFallbackData ? (
         // Fallback display using basic gym data
         <Grid container direction="column" spacing={1}>
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              minHeight: 80,
-              width: '100%',
-              padding: '8px 0',
-              borderBottom: `1px solid ${theme.palette.divider}`,
-            }}
-          >
-            <div
-              style={{
-                width: 50,
-                height: 50,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                marginLeft: 12,
-                marginRight: 12,
-                flexShrink: 0,
-                position: 'relative',
-              }}
-            >
-              <Img
-                src={Icons.getPokemonByDisplay(
-                  gym.guarding_pokemon_id,
-                  gym.guarding_pokemon_display,
-                )}
-                alt={t(`poke_${gym.guarding_pokemon_id}`)}
-                style={{
-                  maxHeight: 50,
-                  maxWidth: 50,
-                  objectFit: 'contain',
-                }}
-              />
-              {gym.guarding_pokemon_display?.badge === 1 && (
-                <Img
-                  src={Icons.getMisc('bestbuddy')}
-                  alt={t('best_buddy')}
-                  style={{
-                    position: 'absolute',
-                    top: 0,
-                    right: 0,
-                    maxHeight: 15,
-                    maxWidth: 15,
-                    zIndex: 2,
-                  }}
-                />
-              )}
-            </div>
-            <div
-              style={{
-                flex: 1,
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'flex-start',
-                justifyContent: 'center',
-                minWidth: 0,
-                textAlign: 'left',
-                overflow: 'hidden',
-                marginLeft: 4,
-                gap: '4px',
-              }}
-            >
-              <div
-                style={{
-                  fontSize: 16,
-                  fontWeight: 700,
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                  whiteSpace: 'nowrap',
-                  maxWidth: '100%',
-                }}
-                title={t(`poke_${gym.guarding_pokemon_id}`)}
-              >
-                {gym.guarding_pokemon_display?.badge === 1 && (
-                  <Img
-                    src={Icons.getMisc('bestbuddy')}
-                    alt={t('best_buddy')}
-                    style={{
-                      maxHeight: 15,
-                      maxWidth: 15,
-                      marginRight: 4,
-                      verticalAlign: 'middle',
-                    }}
-                  />
-                )}
-                {t(`poke_${gym.guarding_pokemon_id}`)}
-              </div>
-
-              <div
-                style={{
-                  fontSize: 13,
-                  color: theme.palette.text.secondary,
-                }}
-              >
-                {gym.total_cp &&
-                  `${t('total_cp')}: ${numFormatter.format(gym.total_cp)}`}
-              </div>
-            </div>
-          </div>
+          {fallbackRow}
 
           <Grid
             xs={12}
@@ -355,220 +462,205 @@ function DefendersModal({ gym, onClose }) {
               const currentCP = Math.round(
                 fullCP * (0.2 + 0.8 * predictedMotivation),
               )
-
-              return (
-                <div
-                  key={def.pokemon_id}
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    minHeight: 80,
-                    width: '100%',
-                    padding: '8px 0',
-                    borderBottom: `1px solid ${theme.palette.divider}`,
-                  }}
-                >
-                  <div
-                    style={{
-                      width: 50,
-                      height: 50,
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      marginLeft: 12,
-                      marginRight: 12,
-                      flexShrink: 0,
-                      position: 'relative',
-                    }}
-                  >
-                    <Img
-                      src={Icons.getPokemonByDisplay(def.pokemon_id, def)}
-                      alt={t(`poke_${def.pokemon_id}`)}
-                      style={{
-                        maxHeight: 50,
-                        maxWidth: 50,
-                        objectFit: 'contain',
-                      }}
-                    />
-                    {def.badge === 1 && (
-                      <Img
-                        src={Icons.getMisc('bestbuddy')}
-                        alt={t('best_buddy')}
-                        style={{
-                          position: 'absolute',
-                          top: 0,
-                          right: 0,
-                          maxHeight: 15,
-                          maxWidth: 15,
-                          zIndex: 2,
-                        }}
-                      />
-                    )}
-                  </div>
-                  <div
-                    style={{
-                      flex: 1,
-                      display: 'flex',
-                      flexDirection: 'column',
-                      alignItems: 'flex-start',
-                      justifyContent: 'center',
-                      minWidth: 0,
-                      textAlign: 'left',
-                      overflow: 'hidden',
-                      marginLeft: 4,
-                      gap: '4px',
-                    }}
-                  >
-                    {/* First line: Pokemon name CP{currentCP}/{fullCP} */}
+              const visuals = resolvePokemonBackgroundVisual(def.background)
+              const {
+                borderColor,
+                primaryColor,
+                backgroundMeta,
+                hasBackground,
+                styles: defenderStyles = {},
+              } = visuals
+              const primaryTextStyles = defenderStyles.primaryText
+              const secondaryTextStyles = defenderStyles.secondaryText
+              const rowKey = `${def.pokemon_id}-${def.deployed_ms}`
+              const rowContent = (
+                <DefenderRowLayout
+                  borderColor={borderColor}
+                  tooltip={backgroundMeta?.tooltip}
+                  imageSrc={Icons.getPokemonByDisplay(def.pokemon_id, def)}
+                  imageAlt={t(`poke_${def.pokemon_id}`)}
+                  showBestBuddy={def.badge === 1}
+                  trailingContent={
                     <div
                       style={{
-                        fontSize: 16,
-                        fontWeight: 700,
-                        overflow: 'hidden',
-                        textOverflow: 'ellipsis',
-                        whiteSpace: 'nowrap',
-                        maxWidth: '100%',
-                      }}
-                      title={`${t(`poke_${def.pokemon_id}`)} CP${currentCP}/${fullCP}`}
-                    >
-                      {t(`poke_${def.pokemon_id}`)}
-                    </div>
-
-                    <div
-                      style={{
+                        width: 28,
+                        height: 28,
                         display: 'flex',
                         alignItems: 'center',
-                        gap: '8px',
-                        fontSize: 13,
-                        color: theme.palette.text.secondary,
+                        justifyContent: 'right',
+                        marginRight: 12,
+                        flexShrink: 0,
+                        position: 'relative',
                       }}
                     >
-                      <div
+                      {/* Heart outline */}
+                      <FavoriteIcon
                         style={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: '2px',
+                          color: 'transparent',
+                          position: 'absolute',
+                          width: 28,
+                          height: 28,
+                          stroke: primaryColor,
+                          strokeWidth: 1,
+                          filter: 'drop-shadow(0 0 1px #0008)',
+                        }}
+                        className="heart-outline"
+                      />
+                      {/* Heart background */}
+                      <FavoriteIcon
+                        style={{
+                          color: hasBackground
+                            ? 'rgba(255, 255, 255, 0.2)'
+                            : theme.palette.mode === 'dark'
+                              ? 'white'
+                              : '#f0f0f0',
+                          opacity: 0.18,
+                          position: 'absolute',
+                          width: 28,
+                          height: 28,
+                        }}
+                      />
+                      {/* Heart fill */}
+                      <FavoriteIcon
+                        style={{
+                          color: '#ff69b4',
+                          position: 'absolute',
+                          width: 28,
+                          height: 28,
+                          clipPath: `inset(${100 - predictedMotivation * 100}% 0 0 0)`,
+                          transition: 'clip-path 0.3s',
+                        }}
+                      />
+                      {/* Heart cracks for rounds */}
+                      <svg
+                        width={28}
+                        height={28}
+                        viewBox="0 0 28 28"
+                        style={{
+                          position: 'absolute',
+                          pointerEvents: 'none',
                         }}
                       >
-                        <EmojiEventsIcon style={{ fontSize: 16 }} />
-                        <span>{def.battles_won || 0}</span>
-                      </div>
-                      <div
-                        style={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: '2px',
-                        }}
-                      >
-                        <SentimentVeryDissatisfiedIcon
-                          style={{ fontSize: 16 }}
-                        />
-                        <span>{def.battles_lost || 0}</span>
-                      </div>
-                      <div
-                        style={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: '2px',
-                        }}
-                      >
-                        <RestaurantIcon style={{ fontSize: 16 }} />
-                        <span>{def.times_fed || 0}</span>
-                      </div>
+                        {/* Show cracks based on health: */}
+                        {predictedMotivation <= 2 / 3 && (
+                          // Always show top crack if predictedMotivation <= 2/3
+                          <path
+                            d="M2,9 Q7,11 14,9 Q21,11 26,9"
+                            stroke={primaryColor}
+                            strokeWidth={1.5}
+                            fill="none"
+                            strokeLinejoin="round"
+                          />
+                        )}
+                        {predictedMotivation <= 1 / 3 && (
+                          // Show bottom crack only if predictedMotivation <= 1/3
+                          <path
+                            d="M7,19 Q11,17 14,19 Q17,17 21,19"
+                            stroke={primaryColor}
+                            strokeWidth={1.5}
+                            fill="none"
+                            strokeLinejoin="round"
+                          />
+                        )}
+                      </svg>
                     </div>
+                  }
+                >
+                  {/* First line: Pokemon name CP{currentCP}/{fullCP} */}
+                  <DefenderPrimaryText
+                    title={`${t(`poke_${def.pokemon_id}`)} CP${currentCP}/${fullCP}`}
+                    visualStyles={primaryTextStyles}
+                  >
+                    {t(`poke_${def.pokemon_id}`)}
+                  </DefenderPrimaryText>
 
-                    <div
-                      style={{
-                        fontSize: 13,
-                        color: theme.palette.text.secondary,
-                      }}
-                    >
-                      CP{currentCP}/{fullCP}{' '}
-                      {formatDeployedTime(def.deployed_ms + now - updatedMs)}
-                    </div>
-                  </div>
-                  <div
-                    style={{
-                      width: 44,
-                      height: 44,
+                  <DefenderSecondaryText
+                    visualStyles={secondaryTextStyles}
+                    sx={{
                       display: 'flex',
                       alignItems: 'center',
-                      justifyContent: 'right',
-                      marginLeft: 6,
-                      marginRight: 12,
-                      flexShrink: 0,
-                      position: 'relative',
+                      gap: '8px',
                     }}
                   >
-                    {/* Heart outline */}
-                    <FavoriteIcon
-                      style={{
-                        color: 'transparent',
-                        position: 'absolute',
-                        width: 28,
-                        height: 28,
-                        stroke: theme.palette.text.primary,
-                        strokeWidth: 1,
-                        filter: 'drop-shadow(0 0 1px #0008)',
-                      }}
-                      className="heart-outline"
-                    />
-                    {/* Heart background */}
-                    <FavoriteIcon
-                      style={{
-                        color:
-                          theme.palette.mode === 'dark' ? 'white' : '#f0f0f0',
-                        opacity: 0.18,
-                        position: 'absolute',
-                        width: 28,
-                        height: 28,
-                      }}
-                    />
-                    {/* Heart fill */}
-                    <FavoriteIcon
-                      style={{
-                        color: '#ff69b4',
-                        position: 'absolute',
-                        width: 28,
-                        height: 28,
-                        clipPath: `inset(${100 - predictedMotivation * 100}% 0 0 0)`,
-                        transition: 'clip-path 0.3s',
-                      }}
-                    />
-                    {/* Heart cracks for rounds */}
-                    <svg
-                      width={28}
-                      height={28}
-                      viewBox="0 0 28 28"
-                      style={{
-                        position: 'absolute',
-                        pointerEvents: 'none',
+                    <Box
+                      component="span"
+                      sx={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '2px',
                       }}
                     >
-                      {/* Show cracks based on health: */}
-                      {predictedMotivation <= 2 / 3 && (
-                        // Always show top crack if predictedMotivation <= 2/3
-                        <path
-                          d="M2,9 Q7,11 14,9 Q21,11 26,9"
-                          stroke={theme.palette.text.primary}
-                          strokeWidth={1.5}
-                          fill="none"
-                          strokeLinejoin="round"
-                        />
-                      )}
-                      {predictedMotivation <= 1 / 3 && (
-                        // Show bottom crack only if predictedMotivation <= 1/3
-                        <path
-                          d="M7,19 Q11,17 14,19 Q17,17 21,19"
-                          stroke={theme.palette.text.primary}
-                          strokeWidth={1.5}
-                          fill="none"
-                          strokeLinejoin="round"
-                        />
-                      )}
-                    </svg>
-                  </div>
-                </div>
+                      <EmojiEventsIcon
+                        data-background-icon="secondary"
+                        sx={{ fontSize: 16 }}
+                      />
+                      <Typography
+                        component="span"
+                        variant="body2"
+                        sx={{ fontSize: 13, color: 'inherit' }}
+                      >
+                        {def.battles_won || 0}
+                      </Typography>
+                    </Box>
+                    <Box
+                      component="span"
+                      sx={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '2px',
+                      }}
+                    >
+                      <SentimentVeryDissatisfiedIcon
+                        data-background-icon="secondary"
+                        sx={{ fontSize: 16 }}
+                      />
+                      <Typography
+                        component="span"
+                        variant="body2"
+                        sx={{ fontSize: 13, color: 'inherit' }}
+                      >
+                        {def.battles_lost || 0}
+                      </Typography>
+                    </Box>
+                    <Box
+                      component="span"
+                      sx={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '2px',
+                      }}
+                    >
+                      <RestaurantIcon
+                        data-background-icon="secondary"
+                        sx={{ fontSize: 16 }}
+                      />
+                      <Typography
+                        component="span"
+                        variant="body2"
+                        sx={{ fontSize: 13, color: 'inherit' }}
+                      >
+                        {def.times_fed || 0}
+                      </Typography>
+                    </Box>
+                  </DefenderSecondaryText>
+
+                  <DefenderSecondaryText visualStyles={secondaryTextStyles}>
+                    CP{currentCP}/{fullCP}{' '}
+                    {formatDeployedTime(def.deployed_ms + now - updatedMs)}
+                  </DefenderSecondaryText>
+                </DefenderRowLayout>
+              )
+
+              return (
+                <React.Fragment key={rowKey}>
+                  <BackgroundCard
+                    visuals={hasBackground ? visuals : undefined}
+                    fullBleed={hasBackground}
+                    fullWidth={Boolean(backgroundMeta?.tooltip)}
+                  >
+                    {rowContent}
+                  </BackgroundCard>
+                </React.Fragment>
               )
             })}
           </Grid>
@@ -767,6 +859,8 @@ const RaidImage = ({
   raid_pokemon_id,
   raid_pokemon_form,
   raid_pokemon_gender,
+  raid_pokemon_costume,
+  raid_pokemon_alignment,
 }) => {
   const { t } = useTranslation()
   const Icons = useMemory((s) => s.Icons)
@@ -785,10 +879,27 @@ const RaidImage = ({
     return pokemon[id]?.types || []
   }
 
+  const raidDisplayIcon =
+    raid_pokemon_id && Icons?.getPokemon
+      ? Icons.getPokemon(
+          raid_pokemon_id,
+          raid_pokemon_form,
+          0,
+          raid_pokemon_gender,
+          raid_pokemon_costume,
+          raid_pokemon_alignment,
+        ) || raidIconUrl
+      : raidIconUrl
+
   return (
     <Grid container xs={5} justifyContent="center" alignItems="center">
       <Grid xs={12} textAlign="center">
-        <Img src={raidIconUrl} alt={raidIconUrl} maxHeight={50} maxWidth={50} />
+        <Img
+          src={raidDisplayIcon}
+          alt={raidDisplayIcon}
+          maxHeight={50}
+          maxWidth={50}
+        />
       </Grid>
       <Grid xs={12} textAlign="center">
         <Typography variant="caption">
@@ -919,19 +1030,6 @@ const RaidInfo = ({
     return `${t('tier')} ${raidLevel}`
   }
 
-  const getRaidForm = (id, form, costume) => {
-    if (costume) {
-      return t(`costume_${costume}`, 'Unknown Costume')
-    }
-    if (form) {
-      const raidForm = t(`form_${form}`)
-      if (raidForm === t('form_29') || !raidForm) {
-        return ''
-      }
-      return `${raidForm} ${t('form')}`
-    }
-  }
-
   return (
     <Grid
       container
@@ -949,7 +1047,7 @@ const RaidInfo = ({
 
       <Grid>
         <Typography variant="caption" align="center" sx={{ pb: 0.5 }} noWrap>
-          {getRaidForm(
+          {getFormDisplay(
             raid_pokemon_id,
             raid_pokemon_form,
             raid_pokemon_costume,

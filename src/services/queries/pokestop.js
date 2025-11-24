@@ -42,6 +42,8 @@ const quest = gql`
       quest_form_id
       quest_gender_id
       quest_costume_id
+      quest_background
+      quest_bread_mode
       quest_shiny
       quest_shiny_probability
       mega_pokemon_id

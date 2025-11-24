@@ -4,12 +4,21 @@ import { useStorage } from '@store/useStorage'
 
 /** @param {keyof import('@store/useStorage').UseStorage & keyof import('@store/useMemory').UseMemory} key */
 const resetState = (key) => {
-  const state = useMemory.getState()[key]
+  const memoryState = useMemory.getState()
+  const state = memoryState[key]
   useStorage.setState({
     [key]:
       key === 'settings'
         ? Object.fromEntries(
-            Object.entries(state).map(([k, v]) => [k, Object.keys(v)[0]]),
+            Object.entries(state).map(([k, v]) => {
+              const defaultSetting = memoryState.config?.misc?.[k]
+              return [
+                k,
+                defaultSetting !== undefined && defaultSetting in v
+                  ? defaultSetting
+                  : Object.keys(v)[0],
+              ]
+            }),
           )
         : structuredClone(state),
   })

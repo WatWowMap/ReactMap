@@ -85,6 +85,7 @@ export function Menu({
                   { enabled: false },
                   category,
                   useMemory.getState().advMenuFiltered[category],
+                  false,
                 ),
           icon: 'Clear',
           color: 'error',

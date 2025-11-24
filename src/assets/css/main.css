@@ -100,7 +100,7 @@ body {
   min-width: 18px;
   padding: 0 4px;
   border-radius: 10px;
-  background: #ff4b4d;
+  background: #2196f3;
   color: #fff;
   font-size: 11px;
   font-weight: 700;
@@ -110,7 +110,7 @@ body {
 }
 
 .route-count-badge--destination {
-  background: #2196f3;
+  background: #ff4b4d;
 }
 
 .invasion-exists {
@@ -315,6 +315,65 @@ img {
   font-weight: 700;
 }
 
+.pokestop-marker__stack {
+  position: absolute;
+  display: flex;
+  flex-direction: column-reverse;
+  align-items: flex-start;
+  width: 100%;
+  gap: 0;
+}
+
+.pokestop-marker__stack-item {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transform: translateX(-50%);
+}
+
+.pokestop-marker__amount {
+  position: absolute;
+  bottom: -4px;
+  left: 50%;
+  transform: translateX(-50%);
+  color: white;
+  text-shadow:
+    #000 0 0 1px,
+    #000 0 0 1px,
+    #000 0 0 1px,
+    #000 0 0 1px,
+    #000 0 0 1px,
+    #000 0 0 1px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.pokestop-marker__decoration {
+  position: absolute;
+  bottom: calc(var(--marker-size, 30px) * -0.34);
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.leaflet-container
+  .leaflet-marker-pane
+  .pokestop-marker__stack-item
+  img:not(.pokestop-marker__decoration) {
+  width: var(--marker-size, 30px) !important;
+  height: auto !important;
+  max-width: var(--marker-size, 30px) !important;
+  max-height: var(--marker-size, 30px) !important;
+  object-fit: contain;
+}
+
+.leaflet-container
+  .leaflet-marker-pane
+  .pokestop-marker__stack-item[data-reward-type='12']
+  img:not(.pokestop-marker__decoration) {
+  max-height: calc(var(--marker-size, 30px) * 1.5) !important;
+}
+
 .search-amount-holder {
   position: absolute;
   left: 50%;
@@ -345,6 +404,66 @@ img {
 
 .weather-icon > .fancy {
   filter: invert(75%) sepia(100%) hue-rotate(151deg) saturate(3.1);
+}
+
+.tappable-marker {
+  position: relative;
+  width: var(--tappable-size, 32px);
+  height: var(--tappable-size, 32px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.tappable-marker__icon {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.tappable-marker--reward-primary {
+  position: relative;
+  width: var(--tappable-size, 32px);
+  height: var(--tappable-size, 32px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.tappable-marker__reward-primary {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.tappable-marker__count {
+  position: absolute;
+  right: -4px;
+  bottom: -6px;
+  min-width: 22px;
+  padding: 0 4px;
+  border-radius: 10px;
+  background: rgba(32, 32, 32, 0.8);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.4;
+  text-align: center;
+  pointer-events: none;
+}
+
+.tappable-marker__bubble {
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1;
+}
+
+.tappable-marker__bubble-svg {
+  display: block;
+  overflow: visible;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
 }
 
 .quest-popup-img {

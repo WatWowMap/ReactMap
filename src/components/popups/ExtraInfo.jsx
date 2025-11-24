@@ -6,14 +6,14 @@ import { useTranslation } from 'react-i18next'
 
 /**
  *
- * @param {{ title?: string, data?: React.ReactNode, children?: React.ReactNode }} props
+ * @param {{ title?: string, data?: React.ReactNode, children?: React.ReactNode, xs?: number }} props
  * @returns
  */
-export const ExtraInfo = ({ title, data, children }) => {
+export const ExtraInfo = ({ title, data, children, xs = 6 }) => {
   const { t } = useTranslation()
 
   return (
-    <Grid container xs={6} direction="column" textAlign="center">
+    <Grid container xs={xs} direction="column" textAlign="center">
       {title && (
         <Grid>
           <Typography variant="subtitle2">{t(title)}:</Typography>

@@ -64,7 +64,8 @@
       "quests": false,
       "raids": true,
       "nests": false,
-      "stations": false
+      "stations": false,
+      "tappables": false
     },
     "dataRequestLimits": {
       "categories": {
@@ -76,7 +77,8 @@
         "portals": 0,
         "routes": 0,
         "weather": 0,
-        "stations": 0
+        "stations": 0,
+        "tappables": 0
       },
       "time": 60
     },
@@ -89,7 +91,8 @@
       "spawnpoints": 10000,
       "nests": 2500,
       "scanCells": 5000,
-      "stations": 5000
+      "stations": 5000,
+      "tappables": 5000
     },
     "pvp": {
       "leagues": [
@@ -117,6 +120,7 @@
     "portalUpdateLimit": 30,
     "weatherCellLimit": 3,
     "stationUpdateLimit": 9,
+    "stationInactiveLimitDays": 120,
     "searchResultsLimit": 15,
     "searchSoftKmLimit": 10,
     "searchHardKmLimit": 100,
@@ -157,6 +161,7 @@
         "gyms",
         "nests",
         "pokestops",
+        "tappables",
         "stations",
         "pokemon",
         "routes",
@@ -265,6 +270,7 @@
       "enablePokestopPopupCoordsSelector": false,
       "enablePortalPopupCoordsSelector": false,
       "enableStationPopupCoordsSelector": false,
+      "enableTappablePopupCoordsSelector": false,
       "customFloatingIcons": [],
       "expandAllScanAreas": false,
       "enableRouteDownload": false
@@ -296,6 +302,10 @@
         "forcedLimit": 5000
       },
       "stations": {
+        "zoomLevel": 14,
+        "forcedLimit": 2500
+      },
+      "tappables": {
         "zoomLevel": 14,
         "forcedLimit": 2500
       }
@@ -388,6 +398,17 @@
       "opacityFiveMinutes": 0.5,
       "opacityOneMinute": 0.25
     },
+    "tappables": {
+      "clustering": true,
+      "tappableTimers": false,
+      "interactionRanges": false,
+      "spacialRendRange": false,
+      "tappablesOpacity": true,
+      "enableTappablePopupCoords": false,
+      "opacityTenMinutes": 0.75,
+      "opacityFiveMinutes": 0.5,
+      "opacityOneMinute": 0.25
+    },
     "pokemon": {
       "clustering": true,
       "pokemonTimers": false,
@@ -401,6 +422,7 @@
       "showDexNumInPopup": false,
       "pvpMega": false,
       "showAllPvpRanks": false,
+      "pvp50": true,
       "linkGlobalAndAdvanced": false,
       "showSizeIndicator": false,
       "enablePokemonPopupCoords": false,
@@ -535,6 +557,10 @@
         "enabled": true
       }
     },
+    "tappables": {
+      "enabled": false,
+      "items": true
+    },
     "pokemon": {
       "enabled": false,
       "easyMode": true,
@@ -584,7 +610,8 @@
       "battles": false,
       "gmaxStationed": false,
       "interactionRanges": false,
-      "customRange": 0
+      "customRange": 0,
+      "inactiveStations": false
     },
     "s2cells": {
       "enabled": false,
@@ -632,6 +659,11 @@
       "scanNextDevice": "Device01",
       "scanNextSleeptime": 5,
       "userCooldownSeconds": 0,
+      "cooldownBypass": {
+        "discordRoles": [],
+        "local": [],
+        "telegramGroups": []
+      },
       "scanNextAreaRestriction": [],
       "discordRoles": [],
       "local": [],
@@ -648,6 +680,11 @@
       "gmf": false,
       "scanZoneMaxSize": 10,
       "userCooldownSeconds": 0,
+      "cooldownBypass": {
+        "discordRoles": [],
+        "local": [],
+        "telegramGroups": []
+      },
       "advancedScanZoneOptions": false,
       "scanZoneRadius": {
         "pokemon": 70,
@@ -784,6 +821,11 @@
         "roles": []
       },
       "quests": {
+        "enabled": true,
+        "trialPeriodEligible": false,
+        "roles": []
+      },
+      "tappables": {
         "enabled": true,
         "trialPeriodEligible": false,
         "roles": []
@@ -1011,6 +1053,12 @@
         "xl": 45
       },
       "dynamax": {
+        "sm": 15,
+        "md": 25,
+        "lg": 35,
+        "xl": 45
+      },
+      "tappable": {
         "sm": 15,
         "md": 25,
         "lg": 35,

@@ -136,11 +136,21 @@ export type Config<Client extends boolean = false> = DeepMerge<
         discordRoles: string[]
         telegramGroups: string[]
         local: string[]
+        cooldownBypass: {
+          discordRoles: string[]
+          telegramGroups: string[]
+          local: string[]
+        }
       }
       scanZone: {
         discordRoles: string[]
         telegramGroups: string[]
         local: string[]
+        cooldownBypass: {
+          discordRoles: string[]
+          telegramGroups: string[]
+          local: string[]
+        }
       }
     }
     icons: Icons

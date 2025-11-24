@@ -8,7 +8,7 @@ const config = require('@rm/config')
 const { state } = require('./state')
 const { areaPerms } = require('../utils/areaPerms')
 const { webhookPerms } = require('../utils/webhookPerms')
-const { scannerPerms } = require('../utils/scannerPerms')
+const { scannerPerms, scannerCooldownBypass } = require('../utils/scannerPerms')
 const { mergePerms } = require('../utils/mergePerms')
 const { AuthClient } = require('./AuthClient')
 
@@ -102,6 +102,7 @@ class TelegramClient extends AuthClient {
         areaRestrictions: areaPerms(groups),
         webhooks: webhookPerms(groups, 'telegramGroups', trialActive),
         scanner: scannerPerms(groups, 'telegramGroups', trialActive),
+        scannerCooldownBypass: scannerCooldownBypass(groups, 'telegramGroups'),
       },
     }
     if (newUserObj.perms.trial) {

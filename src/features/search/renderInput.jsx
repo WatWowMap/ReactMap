@@ -70,8 +70,11 @@ const EndAdornment = React.memo(
   },
 )
 
-/** @param {import('@mui/material').AutocompleteRenderInputParams} props */
-export function renderInput({ InputProps, ...props }) {
+/**
+ * @param {import('@mui/material').AutocompleteRenderInputParams} props
+ * @param {React.MutableRefObject<HTMLInputElement | null>} [inputRef]
+ */
+export function renderInput({ InputProps, ...props }, inputRef) {
   const { t } = useTranslation()
 
   const searchTab = useStorage((s) => s.searchTab)
@@ -98,11 +101,24 @@ export function renderInput({ InputProps, ...props }) {
     }
   }, [searchTab, data])
 
+  const handleInputRef = (node) => {
+    const { ref } = props.inputProps
+    if (typeof ref === 'function') {
+      ref(node)
+    } else if (ref && typeof ref === 'object') {
+      ref.current = node
+    }
+    if (inputRef) {
+      inputRef.current = node
+    }
+  }
+
   return (
     <>
       <TextField
         placeholder={t(`global_search_${searchTab}`)}
         variant="standard"
+        inputRef={handleInputRef}
         {...props}
         InputProps={{
           ...InputProps,
