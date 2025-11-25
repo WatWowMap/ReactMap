@@ -1,3 +1,10 @@
+## [1.40.1-develop.3](https://github.com/WatWowMap/ReactMap/compare/v1.40.1-develop.2...v1.40.1-develop.3) (2025-11-25)
+
+
+### Bug Fixes
+
+* missing translations ([238f602](https://github.com/WatWowMap/ReactMap/commit/238f6021eec53b12ec4a1ad1a1080d0718293b02))
+
 ## [1.40.1-develop.2](https://github.com/WatWowMap/ReactMap/compare/v1.40.1-develop.1...v1.40.1-develop.2) (2025-11-25)
 
 
