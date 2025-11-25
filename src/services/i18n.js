@@ -16,6 +16,9 @@ export default i18n
     joinArrays: '\n',
     lowerCaseLng: true,
     react: {},
+    interpolation: {
+      escapeValue: false,
+    },
   })
 
 i18n.on('languageChanged', (lng) => {
