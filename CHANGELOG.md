@@ -1,3 +1,10 @@
+## [1.40.1-develop.2](https://github.com/WatWowMap/ReactMap/compare/v1.40.1-develop.1...v1.40.1-develop.2) (2025-11-25)
+
+
+### Bug Fixes
+
+* incorrect escape shiny rate tooltip ([ebf31da](https://github.com/WatWowMap/ReactMap/commit/ebf31da2af9528e686130da6aa8e7f52f77e0d18)), closes [#1160](https://github.com/WatWowMap/ReactMap/issues/1160)
+
 ## [1.40.1-develop.1](https://github.com/WatWowMap/ReactMap/compare/v1.40.0...v1.40.1-develop.1) (2025-11-24)
 
 
