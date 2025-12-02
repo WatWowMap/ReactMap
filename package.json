@@ -100,7 +100,7 @@
   "dependencies": {
     "@apollo/client": "3.11.4",
     "@apollo/server": "4.11.0",
-    "@emotion/react": "11.13.0",
+    "@emotion/react": "11.14.0",
     "@emotion/styled": "11.13.0",
     "@graphql-tools/graphql-file-loader": "8.0.1",
     "@graphql-tools/load": "8.0.2",
