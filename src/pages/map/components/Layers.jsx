@@ -3,6 +3,7 @@ import * as React from 'react'
 import { TileLayer, useMap } from 'react-leaflet'
 import { useTranslation } from 'react-i18next'
 import { control } from 'leaflet'
+import { locate } from 'leaflet.locatecontrol'
 import { useStorage } from '@store/useStorage'
 import { useLocationError } from '@hooks/useLocationError'
 import { Notification } from '@components/Notification'
@@ -44,7 +45,7 @@ export function ControlledLocate() {
 
   const lc = React.useMemo(
     () =>
-      control.locate({
+      locate({
         position: 'bottomright',
         metric,
         icon: 'fas fa-crosshairs',
