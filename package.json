@@ -114,7 +114,7 @@
     "@rm/logger": "*",
     "@rm/masterfile": "*",
     "@sentry/node": "^7.65.0",
-    "@sentry/react": "^7.65.0",
+    "@sentry/react": "^10.28.0",
     "@turf/boolean-contains": "7.1.0",
     "@turf/boolean-overlap": "7.1.0",
     "@turf/boolean-point-in-polygon": "7.3.1",
