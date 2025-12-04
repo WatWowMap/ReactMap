@@ -1,3 +1,10 @@
+## [1.40.1-develop.4](https://github.com/WatWowMap/ReactMap/compare/v1.40.1-develop.3...v1.40.1-develop.4) (2025-12-04)
+
+
+### Bug Fixes
+
+* locatecontrol ([754e544](https://github.com/WatWowMap/ReactMap/commit/754e54446059c0a4f0c5200b193b3a73972b43a4))
+
 ## [1.40.1-develop.3](https://github.com/WatWowMap/ReactMap/compare/v1.40.1-develop.2...v1.40.1-develop.3) (2025-11-25)
 
 
