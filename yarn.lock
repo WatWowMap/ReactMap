@@ -2078,28 +2078,28 @@
     "@tufjs/canonical-json" "2.0.0"
     minimatch "^9.0.5"
 
-"@turf/bbox@^7.1.0", "@turf/bbox@^7.2.0":
-  version "7.2.0"
-  resolved "https://registry.yarnpkg.com/@turf/bbox/-/bbox-7.2.0.tgz#9db338d6407380f66a72050657f1998c5c5ccc4a"
-  integrity sha512-wzHEjCXlYZiDludDbXkpBSmv8Zu6tPGLmJ1sXQ6qDwpLE1Ew3mcWqt8AaxfTP5QwDNQa3sf2vvgTEzNbPQkCiA==
+"@turf/bbox@7.3.1", "@turf/bbox@^7.1.0", "@turf/bbox@^7.2.0":
+  version "7.3.1"
+  resolved "https://registry.yarnpkg.com/@turf/bbox/-/bbox-7.3.1.tgz#145a5655bedb61be4f381601d3c622b70a5e8773"
+  integrity sha512-/IyMKoS7P9B0ch5PIlQ6gMfoE8gRr48+cSbzlyexvEjuDuaAV1VURjH1jAthS0ipFG8RrFxFJKnp7TLL1Skong==
   dependencies:
-    "@turf/helpers" "^7.2.0"
-    "@turf/meta" "^7.2.0"
+    "@turf/helpers" "7.3.1"
+    "@turf/meta" "7.3.1"
     "@types/geojson" "^7946.0.10"
     tslib "^2.8.1"
 
-"@turf/boolean-contains@7.1.0":
-  version "7.1.0"
-  resolved "https://registry.yarnpkg.com/@turf/boolean-contains/-/boolean-contains-7.1.0.tgz#6ceaf8083c7ed82e41187951eccb2111c23c004e"
-  integrity sha512-ldy4j1/RVChYTYjEb4wWaE/JyF1jA87WpsB4eVLic6OcAYJGs7POF1kfKbcdkJJiRBmhI3CXNA+u+m9y4Z/j3g==
+"@turf/boolean-contains@7.3.1":
+  version "7.3.1"
+  resolved "https://registry.yarnpkg.com/@turf/boolean-contains/-/boolean-contains-7.3.1.tgz#269b250ec1f9cd0da12210fd253f8d6b0b1906b3"
+  integrity sha512-VvytV9ZcUgnitzm5ILVWIoOhoZOh8VZ4dnweUJM3N+A77CzXXFk8e4NqPNZ6tZVPY3ehxzDXrq1+iN87pMcB7g==
   dependencies:
-    "@turf/bbox" "^7.1.0"
-    "@turf/boolean-point-in-polygon" "^7.1.0"
-    "@turf/boolean-point-on-line" "^7.1.0"
-    "@turf/helpers" "^7.1.0"
-    "@turf/invariant" "^7.1.0"
+    "@turf/bbox" "7.3.1"
+    "@turf/boolean-point-in-polygon" "7.3.1"
+    "@turf/boolean-point-on-line" "7.3.1"
+    "@turf/helpers" "7.3.1"
+    "@turf/invariant" "7.3.1"
     "@types/geojson" "^7946.0.10"
-    tslib "^2.6.2"
+    tslib "^2.8.1"
 
 "@turf/boolean-overlap@7.1.0":
   version "7.1.0"
@@ -2115,7 +2115,7 @@
     geojson-equality-ts "^1.0.2"
     tslib "^2.6.2"
 
-"@turf/boolean-point-in-polygon@7.3.1", "@turf/boolean-point-in-polygon@^7.1.0":
+"@turf/boolean-point-in-polygon@7.3.1":
   version "7.3.1"
   resolved "https://registry.yarnpkg.com/@turf/boolean-point-in-polygon/-/boolean-point-in-polygon-7.3.1.tgz#0ea4462476ab1ec270c378a69353afe4a63f83d5"
   integrity sha512-BUPW63vE43LctwkgannjmEFTX1KFR/18SS7WzFahJWK1ZoP0s1jrfxGX+pi0BH/3Dd9mA71hkGKDDnj1Ndcz0g==
@@ -2134,13 +2134,13 @@
     "@turf/helpers" "^6.5.0"
     "@turf/invariant" "^6.5.0"
 
-"@turf/boolean-point-on-line@^7.1.0", "@turf/boolean-point-on-line@^7.2.0":
-  version "7.2.0"
-  resolved "https://registry.yarnpkg.com/@turf/boolean-point-on-line/-/boolean-point-on-line-7.2.0.tgz#e0373a453cf504d1e7f3125705e7786ea8d48df6"
-  integrity sha512-H/bXX8+2VYeSyH8JWrOsu8OGmeA9KVZfM7M6U5/fSqGsRHXo9MyYJ94k39A9kcKSwI0aWiMXVD2UFmiWy8423Q==
+"@turf/boolean-point-on-line@7.3.1", "@turf/boolean-point-on-line@^7.2.0":
+  version "7.3.1"
+  resolved "https://registry.yarnpkg.com/@turf/boolean-point-on-line/-/boolean-point-on-line-7.3.1.tgz#6742d720848ce117f48956bbaec1cfdbe6a765b2"
+  integrity sha512-8Hywuv7XFpSc8nfH0BJBtt+XTcJ7OjfjpX2Sz+ty8gyiY/2nCLLqq6amu3ebr67ruqZTDpPNQoGGUbUePjF3rA==
   dependencies:
-    "@turf/helpers" "^7.2.0"
-    "@turf/invariant" "^7.2.0"
+    "@turf/helpers" "7.3.1"
+    "@turf/invariant" "7.3.1"
     "@types/geojson" "^7946.0.10"
     tslib "^2.8.1"
 
@@ -2268,6 +2268,14 @@
     "@turf/meta" "^7.2.0"
     "@types/geojson" "^7946.0.10"
     tslib "^2.8.1"
+
+"@turf/meta@7.3.1":
+  version "7.3.1"
+  resolved "https://registry.yarnpkg.com/@turf/meta/-/meta-7.3.1.tgz#af2076f6388ea87585190c99b8530cbb05e38944"
+  integrity sha512-NWsfOE5RVtWpLQNkfOF/RrYvLRPwwruxhZUV0UFIzHqfiRJ50aO9Y6uLY4bwCUe2TumLJQSR4yaoA72Rmr2mnQ==
+  dependencies:
+    "@turf/helpers" "7.3.1"
+    "@types/geojson" "^7946.0.10"
 
 "@turf/meta@^7.1.0", "@turf/meta@^7.2.0":
   version "7.2.0"
