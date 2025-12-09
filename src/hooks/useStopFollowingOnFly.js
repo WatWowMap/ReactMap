@@ -11,17 +11,16 @@ export function useStopFollowingOnFly(map, lc) {
   useEffect(() => {
     if (!map || !lc) return undefined
 
-    const originalFlyTo = map.flyTo
-
-    map.flyTo = (...args) => {
-      if (lc._active && lc._event && lc.stopFollowing) {
+    const handleMove = (event) => {
+      if (event?.flyTo && lc._active && lc._event && lc.stopFollowing) {
         lc.stopFollowing()
       }
-      return originalFlyTo.apply(map, args)
     }
 
+    map.on('move', handleMove)
+
     return () => {
-      map.flyTo = originalFlyTo
+      map.off('move', handleMove)
     }
   }, [map, lc])
 }
