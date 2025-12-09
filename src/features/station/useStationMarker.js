@@ -4,6 +4,7 @@ import { divIcon } from 'leaflet'
 import { basicEqualFn, useMemory } from '@store/useMemory'
 import { useStorage } from '@store/useStorage'
 import { useOpacity } from '@hooks/useOpacity'
+import { renderOverlayIcon } from '@utils/renderOverlayIcon'
 
 /**
  *
@@ -82,22 +83,13 @@ export function useStationMarker({
       />
      ${
        showBattleIcon
-         ? /* html */ `
-        <div
-          class="station-marker__battle-icon"
-          style="
-            --battle-icon-size: ${battleSize}px;
-            opacity: ${getOpacity(battle_end)};
-            bottom: ${baseSize * 0.8 * battleMod.offsetY}px;
-            left: ${battleMod.offsetX * 50}%;
-          "
-        >
-          <img
-            src="${battleIcon}"
-            alt="${battleIcon}"
-          />
-        </div>
-      `
+         ? /* html */ renderOverlayIcon({
+             url: battleIcon,
+             size: battleSize,
+             opacity: getOpacity(battle_end),
+             bottom: baseSize * 0.8 * battleMod.offsetY,
+             left: battleMod.offsetX * 50,
+           })
          : ''
      }
     </div>

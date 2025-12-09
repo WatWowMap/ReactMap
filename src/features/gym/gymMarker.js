@@ -1,6 +1,7 @@
 // @ts-check
 import { divIcon } from 'leaflet'
 import { useMemory } from '@store/useMemory'
+import { renderOverlayIcon } from '@utils/renderOverlayIcon'
 
 /** @param {number} raidLevel */
 const getBadgeColor = (raidLevel) => {
@@ -165,23 +166,13 @@ export function gymMarker({
           }
           ${
             raidIconUrl
-              ? /* html */
-                `<div
-                  class="gym-marker__raid-icon"
-                  style="
-                    --raid-icon-size: ${raidIconSize}px;
-                    opacity: ${opacity};
-                    bottom: ${
-                      gymIconSize * 0.4 + slotModifier * raidMod.offsetY
-                    }px;
-                    left: ${raidMod.offsetX * 50}%;
-                  "
-                >
-                  <img
-                    src="${raidIconUrl}"
-                    alt="${raidIconUrl}"
-                  />
-                </div>`
+              ? /* html */ renderOverlayIcon({
+                  url: raidIconUrl,
+                  size: raidIconSize,
+                  opacity,
+                  bottom: gymIconSize * 0.4 + slotModifier * raidMod.offsetY,
+                  left: raidMod.offsetX * 50,
+                })
               : ''
           }
           ${

@@ -249,31 +249,25 @@ body {
   position: absolute;
 }
 
-.gym-marker__raid-icon,
-.station-marker__battle-icon {
+.marker-overlay-icon {
   position: absolute;
   display: flex;
   align-items: flex-end;
   justify-content: center;
   transform: translateX(-50%);
+  width: var(--marker-overlay-size, 30px);
+  height: var(--marker-overlay-size, 30px);
 }
 
-.gym-marker__raid-icon {
-  width: var(--raid-icon-size, 30px);
-  height: var(--raid-icon-size, 30px);
-}
-
-.station-marker__battle-icon {
-  width: var(--battle-icon-size, 30px);
-  height: var(--battle-icon-size, 30px);
-}
-
-.gym-marker__raid-icon img,
-.station-marker__battle-icon img {
-  width: 100% !important;
+.marker-overlay-icon img,
+.leaflet-container
+  .leaflet-marker-pane
+  .pokestop-marker__stack-item
+  img:not(.pokestop-marker__decoration) {
+  width: var(--marker-overlay-size, var(--marker-size, 30px)) !important;
   height: auto !important;
-  max-width: 100% !important;
-  max-height: 100% !important;
+  max-width: var(--marker-overlay-size, var(--marker-size, 30px)) !important;
+  max-height: var(--marker-overlay-size, var(--marker-size, 30px)) !important;
   object-fit: contain;
 }
 
@@ -382,17 +376,6 @@ img {
   bottom: calc(var(--marker-size, 30px) * -0.34);
   left: 50%;
   transform: translateX(-50%);
-}
-
-.leaflet-container
-  .leaflet-marker-pane
-  .pokestop-marker__stack-item
-  img:not(.pokestop-marker__decoration) {
-  width: var(--marker-size, 30px) !important;
-  height: auto !important;
-  max-width: var(--marker-size, 30px) !important;
-  max-height: var(--marker-size, 30px) !important;
-  object-fit: contain;
 }
 
 .leaflet-container
