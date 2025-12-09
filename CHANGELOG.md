@@ -1,3 +1,14 @@
+## [1.40.1](https://github.com/WatWowMap/ReactMap/compare/v1.40.0...v1.40.1) (2025-12-09)
+
+
+### Bug Fixes
+
+* flyTo stops location following ([08e4eac](https://github.com/WatWowMap/ReactMap/commit/08e4eac27a2d6e1e804339ac3c887f5051e248e0))
+* incorrect escape shiny rate tooltip ([ebf31da](https://github.com/WatWowMap/ReactMap/commit/ebf31da2af9528e686130da6aa8e7f52f77e0d18)), closes [#1160](https://github.com/WatWowMap/ReactMap/issues/1160)
+* locatecontrol ([754e544](https://github.com/WatWowMap/ReactMap/commit/754e54446059c0a4f0c5200b193b3a73972b43a4))
+* missing translations ([238f602](https://github.com/WatWowMap/ReactMap/commit/238f6021eec53b12ec4a1ad1a1080d0718293b02))
+* stationed pokemon not updating in popup ([cb3ff09](https://github.com/WatWowMap/ReactMap/commit/cb3ff095fb312133579a87884d391d2a4ee0afe7))
+
 ## [1.40.1-develop.5](https://github.com/WatWowMap/ReactMap/compare/v1.40.1-develop.4...v1.40.1-develop.5) (2025-12-09)
 
 
