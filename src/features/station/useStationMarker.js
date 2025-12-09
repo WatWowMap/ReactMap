@@ -83,18 +83,20 @@ export function useStationMarker({
      ${
        showBattleIcon
          ? /* html */ `
-        <img
+        <div
+          class="station-marker__battle-icon"
+          style="
+            --battle-icon-size: ${battleSize}px;
+            opacity: ${getOpacity(battle_end)};
+            bottom: ${baseSize * 0.8 * battleMod.offsetY}px;
+            left: ${battleMod.offsetX * 50}%;
+          "
+        >
+          <img
             src="${battleIcon}"
             alt="${battleIcon}"
-            style="
-            opacity: ${getOpacity(battle_end)};
-            width: ${battleSize}px;
-            height: ${battleSize}px;
-            bottom: ${baseSize * 0.8 * battleMod.offsetY}px;
-            left: ${battleMod.offsetX * 55}%;
-            transform: translateX(-50%);
-          "
-        />
+          />
+        </div>
       `
          : ''
      }

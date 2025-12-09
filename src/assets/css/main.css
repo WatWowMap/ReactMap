@@ -249,6 +249,34 @@ body {
   position: absolute;
 }
 
+.gym-marker__raid-icon,
+.station-marker__battle-icon {
+  position: absolute;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  transform: translateX(-50%);
+}
+
+.gym-marker__raid-icon {
+  width: var(--raid-icon-size, 30px);
+  height: var(--raid-icon-size, 30px);
+}
+
+.station-marker__battle-icon {
+  width: var(--battle-icon-size, 30px);
+  height: var(--battle-icon-size, 30px);
+}
+
+.gym-marker__raid-icon img,
+.station-marker__battle-icon img {
+  width: 100% !important;
+  height: auto !important;
+  max-width: 100% !important;
+  max-height: 100% !important;
+  object-fit: contain;
+}
+
 .invasion-reward {
   display: inline-block;
   width: 30px;

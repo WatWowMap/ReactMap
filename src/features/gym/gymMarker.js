@@ -166,20 +166,22 @@ export function gymMarker({
           ${
             raidIconUrl
               ? /* html */
-                `<img
-                  src="${raidIconUrl}"
-                  alt="${raidIconUrl}"
+                `<div
+                  class="gym-marker__raid-icon"
                   style="
+                    --raid-icon-size: ${raidIconSize}px;
                     opacity: ${opacity};
-                    width: ${raidIconSize}px;
-                    height: ${raidIconSize}px;
                     bottom: ${
                       gymIconSize * 0.4 + slotModifier * raidMod.offsetY
                     }px;
-                    left: ${raidMod.offsetX * 55}%;
-                    transform: translateX(-50%);
+                    left: ${raidMod.offsetX * 50}%;
                   "
-                />`
+                >
+                  <img
+                    src="${raidIconUrl}"
+                    alt="${raidIconUrl}"
+                  />
+                </div>`
               : ''
           }
           ${
