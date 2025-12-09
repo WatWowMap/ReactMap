@@ -9,6 +9,7 @@ import { LocateControl } from 'leaflet.locatecontrol'
 
 import { useStorage } from '@store/useStorage'
 import { useLocationError } from '@hooks/useLocationError'
+import { useStopFollowingOnFly } from '@hooks/useStopFollowingOnFly'
 
 /**
  * Use location hook
@@ -124,6 +125,8 @@ export function useLocation(dependency = false) {
     })
     return result
   }, [t, metric, handleLocationError])
+
+  useStopFollowingOnFly(map, dependency ? lc : null)
 
   useEffect(() => {
     if (lc) {

@@ -6,6 +6,7 @@ import { control } from 'leaflet'
 import { locate } from 'leaflet.locatecontrol'
 import { useStorage } from '@store/useStorage'
 import { useLocationError } from '@hooks/useLocationError'
+import { useStopFollowingOnFly } from '@hooks/useStopFollowingOnFly'
 import { Notification } from '@components/Notification'
 
 import { useTileLayer } from '../hooks/useTileLayer'
@@ -63,6 +64,8 @@ export function ControlledLocate() {
       }),
     [metric, navSetting, t, handleLocationError],
   )
+
+  useStopFollowingOnFly(map, navSetting ? lc : null)
 
   React.useEffect(() => {
     if (lc && navSetting) {
