@@ -1,3 +1,10 @@
+## [1.40.1-develop.5](https://github.com/WatWowMap/ReactMap/compare/v1.40.1-develop.4...v1.40.1-develop.5) (2025-12-09)
+
+
+### Bug Fixes
+
+* flyTo stops location following ([08e4eac](https://github.com/WatWowMap/ReactMap/commit/08e4eac27a2d6e1e804339ac3c887f5051e248e0))
+
 ## [1.40.1-develop.4](https://github.com/WatWowMap/ReactMap/compare/v1.40.1-develop.3...v1.40.1-develop.4) (2025-12-04)
 
 
