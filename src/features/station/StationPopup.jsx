@@ -475,9 +475,9 @@ function StationContent({ start_time, end_time, battle_end, id }) {
 }
 
 /** @param {import('@rm/types').Station} props */
-function StationMons({ id }) {
+function StationMons({ id, updated }) {
   const { t: tId } = useTranslateById()
-  const mons = useGetStationMons(id)
+  const mons = useGetStationMons(id, updated)
   const icons = useMemory((s) => s.Icons)
 
   return (
