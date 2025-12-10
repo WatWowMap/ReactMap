@@ -1,3 +1,12 @@
+## [1.40.2-develop.1](https://github.com/WatWowMap/ReactMap/compare/v1.40.1...v1.40.2-develop.1) (2025-12-10)
+
+
+### Bug Fixes
+
+* battle/raid filtering race condition ([2a9cbbf](https://github.com/WatWowMap/ReactMap/commit/2a9cbbf180313064830a524f86eae62f41b6b87b))
+* ground raid/battle icons ([cd01a92](https://github.com/WatWowMap/ReactMap/commit/cd01a92bda81f786ca2c14f10df8cc4489163fd6))
+* weather icon in pokemon background popup ([21b50f5](https://github.com/WatWowMap/ReactMap/commit/21b50f51b81bf6f7723753a4f77289ead99c51e7))
+
 ## [1.40.1](https://github.com/WatWowMap/ReactMap/compare/v1.40.0...v1.40.1) (2025-12-09)
 
 
