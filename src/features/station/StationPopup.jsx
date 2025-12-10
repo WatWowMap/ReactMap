@@ -27,6 +27,7 @@ import { Img, PokemonImg } from '@components/Img'
 import { useFormatStore } from '@store/useFormatStore'
 import { useRelativeTimer } from '@hooks/useRelativeTime'
 import { useAnalytics } from '@hooks/useAnalytics'
+import { BackgroundCard } from '@components/popups/BackgroundCard'
 import { Title } from '@components/popups/Title'
 import {
   CollapseWithState,
@@ -39,6 +40,7 @@ import { getTimeUntil } from '@utils/getTimeUntil'
 import { getFormDisplay } from '@utils/getFormDisplay'
 import { CopyCoords } from '@components/popups/Coords'
 import Tooltip from '@mui/material/Tooltip'
+import { usePokemonBackgroundVisuals } from '@hooks/usePokemonBackgroundVisuals'
 
 import { useGetStationMons } from './useGetStationMons'
 
@@ -477,8 +479,11 @@ function StationContent({ start_time, end_time, battle_end, id }) {
 /** @param {import('@rm/types').Station} props */
 function StationMons({ id, updated }) {
   const { t: tId } = useTranslateById()
+  const { t } = useTranslation()
   const mons = useGetStationMons(id, updated)
   const icons = useMemory((s) => s.Icons)
+  const resolveBackgroundVisual = usePokemonBackgroundVisuals()
+  const bestBuddyIcon = icons?.getMisc?.('bestbuddy')
 
   return (
     <CardContent
@@ -487,34 +492,65 @@ function StationMons({ id, updated }) {
       <VirtualGrid data={mons} xs={1} context={{ columns: 5 }}>
         {(index, mon) => {
           const caption = tId(`${mon.pokemon_id}-${mon.form}`)
+          const visuals = resolveBackgroundVisual(mon.background)
+          const { hasBackground } = visuals
+          const backgroundTooltip = visuals.backgroundMeta?.tooltip
+          const tooltipTitle = backgroundTooltip ? (
+            <>
+              {caption}
+              <br />
+              {backgroundTooltip}
+            </>
+          ) : (
+            caption
+          )
           return (
-            <Box
-              display="flex"
-              flexDirection="column"
-              alignItems="center"
-              justifyContent="flex-end"
-              p={1}
-              height="100%"
+            <BackgroundCard
+              visuals={hasBackground ? visuals : undefined}
+              tooltip={tooltipTitle}
+              contentProps={{
+                sx: {
+                  height: 40,
+                  width: 40,
+                  mx: 'auto',
+                },
+              }}
             >
-              <Tooltip title={caption} arrow placement="top">
-                <Img
-                  key={index}
-                  src={icons.getPokemon(
-                    mon.pokemon_id,
-                    mon.form,
-                    0,
-                    mon.gender,
-                    mon.costume,
-                    0,
-                    false,
-                    mon.bread_mode,
-                  )}
-                  alt={caption}
-                  maxHeight={35}
-                  maxWidth={35}
-                />
-              </Tooltip>
-            </Box>
+              <Box
+                display="flex"
+                flexDirection="column"
+                alignItems="center"
+                justifyContent="center"
+                width="100%"
+                height="100%"
+              >
+                <Box
+                  position="relative"
+                  display="flex"
+                  alignItems="center"
+                  justifyContent="center"
+                  width={40}
+                  height={40}
+                >
+                  <Img
+                    key={index}
+                    src={icons.getPokemonByDisplay(mon.pokemon_id, mon)}
+                    alt={caption}
+                    maxHeight={40}
+                    maxWidth={40}
+                  />
+                  {mon.badge === 1 && bestBuddyIcon ? (
+                    <Img
+                      src={bestBuddyIcon}
+                      alt={t('best_buddy')}
+                      maxHeight={12}
+                      maxWidth={12}
+                      style={{ position: 'absolute', top: 0, right: 0 }}
+                    />
+                  ) : null}
+                </Box>
+              </Box>
+            </BackgroundCard>
           )
         }}
       </VirtualGrid>

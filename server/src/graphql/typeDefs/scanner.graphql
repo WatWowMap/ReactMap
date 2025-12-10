@@ -323,5 +323,11 @@ type StationPokemon {
   form: Int
   costume: Int
   gender: Int
+  shiny: Boolean
+  temp_evolution: Int
+  temp_evolution_finish_ms: Float
+  alignment: Int
+  badge: Int
+  background: Int
   bread_mode: Int
 }

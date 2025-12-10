@@ -88,6 +88,12 @@ export const GET_STATION_POKEMON = gql`
       form
       costume
       gender
+      shiny
+      temp_evolution
+      temp_evolution_finish_ms
+      alignment
+      badge
+      background
       bread_mode
     }
   }
