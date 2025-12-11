@@ -271,6 +271,12 @@ body {
   object-fit: contain;
 }
 
+/* Override Leaflet's marker-pane img reset for overlay icons */
+.leaflet-container .leaflet-marker-pane .marker-overlay-icon img {
+  max-width: var(--marker-overlay-size, var(--marker-size, 30px)) !important;
+  max-height: var(--marker-overlay-size, var(--marker-size, 30px)) !important;
+}
+
 .invasion-reward {
   display: inline-block;
   width: 30px;
