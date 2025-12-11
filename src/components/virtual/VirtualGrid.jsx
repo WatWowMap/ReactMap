@@ -40,7 +40,8 @@ const List = React.forwardRef(({ context, ...props }, ref) => (
  *  children: import('react-virtuoso').VirtuosoGridProps<T, U & SomeGridProps>['itemContent'],
  *  Header?: React.ComponentType<U>,
  *  Footer?: React.ComponentType<U>,
- *  useWindowScroll?: boolean
+ *  useWindowScroll?: boolean,
+ *  scrollerRef?: import('react-virtuoso').VirtuosoGridProps<T, U & SomeGridProps>['scrollerRef']
  * }} props
  */
 export function VirtualGrid({
@@ -55,6 +56,7 @@ export function VirtualGrid({
   Header,
   Footer,
   useWindowScroll,
+  scrollerRef,
 }) {
   const fullContext = React.useMemo(
     () => ({ ...context, xs, sm, md, lg, xl }),
@@ -74,6 +76,7 @@ export function VirtualGrid({
       components={components}
       itemContent={children}
       useWindowScroll={useWindowScroll}
+      scrollerRef={scrollerRef}
     />
   )
 }

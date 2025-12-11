@@ -484,12 +484,54 @@ function StationMons({ id, updated }) {
   const icons = useMemory((s) => s.Icons)
   const resolveBackgroundVisual = usePokemonBackgroundVisuals()
   const bestBuddyIcon = icons?.getMisc?.('bestbuddy')
+  const scrollerEl = React.useRef(/** @type {HTMLElement | null} */ (null))
+  const resizeObserver = React.useRef(
+    /** @type {ResizeObserver | null} */ (null),
+  )
+  const [iconSize, setIconSize] = React.useState(40)
+  const columns = 5
+
+  const recomputeIconSize = React.useCallback(() => {
+    const el = scrollerEl.current
+    if (!el) return
+    const perColumn = Math.floor(el.clientWidth / columns)
+    const nextSize = Math.min(40, perColumn || 40)
+    setIconSize((prev) => (prev === nextSize ? prev : nextSize))
+  }, [columns])
+
+  const handleScrollerRef = React.useCallback(
+    (ref) => {
+      if (resizeObserver.current) {
+        resizeObserver.current.disconnect()
+        resizeObserver.current = null
+      }
+      scrollerEl.current = ref
+      if (ref) {
+        recomputeIconSize()
+        if (typeof ResizeObserver !== 'undefined') {
+          const observer = new ResizeObserver(() => recomputeIconSize())
+          observer.observe(ref)
+          resizeObserver.current = observer
+        }
+      }
+    },
+    [recomputeIconSize],
+  )
+
+  React.useLayoutEffect(() => {
+    recomputeIconSize()
+  }, [mons.length, recomputeIconSize])
 
   return (
     <CardContent
       sx={{ m: 0, p: 0, height: 130, pb: 0, '&:last-child': { pb: 0 } }}
     >
-      <VirtualGrid data={mons} xs={1} context={{ columns: 5 }}>
+      <VirtualGrid
+        data={mons}
+        xs={1}
+        context={{ columns }}
+        scrollerRef={handleScrollerRef}
+      >
         {(index, mon) => {
           const caption = tId(`${mon.pokemon_id}-${mon.form}`)
           const visuals = resolveBackgroundVisual(mon.background)
@@ -510,9 +552,9 @@ function StationMons({ id, updated }) {
               tooltip={tooltipTitle}
               contentProps={{
                 sx: {
-                  height: 40,
-                  width: 40,
                   mx: 'auto',
+                  width: iconSize,
+                  height: iconSize,
                 },
               }}
             >
@@ -529,15 +571,17 @@ function StationMons({ id, updated }) {
                   display="flex"
                   alignItems="center"
                   justifyContent="center"
-                  width={40}
-                  height={40}
+                  sx={{
+                    width: iconSize,
+                    height: iconSize,
+                  }}
                 >
                   <Img
                     key={index}
                     src={icons.getPokemonByDisplay(mon.pokemon_id, mon)}
                     alt={caption}
-                    maxHeight={40}
-                    maxWidth={40}
+                    maxHeight="100%"
+                    maxWidth="100%"
                   />
                   {mon.badge === 1 && bestBuddyIcon ? (
                     <Img
