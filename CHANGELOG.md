@@ -1,3 +1,17 @@
+# [1.41.0-develop.1](https://github.com/WatWowMap/ReactMap/compare/v1.40.2-develop.1...v1.41.0-develop.1) (2025-12-11)
+
+
+### Bug Fixes
+
+* battle/raid icon max height ([497f350](https://github.com/WatWowMap/ReactMap/commit/497f3504a4ea6000184c9df30c5a3c3e76d65d80))
+* no scrollbars plz ([907ca33](https://github.com/WatWowMap/ReactMap/commit/907ca331beb1fe81dd671732d5ebe1980d8d6faa))
+
+
+### Features
+
+* dynamic placed Pokemon dropdown height ([8a0447c](https://github.com/WatWowMap/ReactMap/commit/8a0447c3e9d7df9c4aa9add657a234a1bc59b412))
+* support stationed pokemon extras ([4f5aace](https://github.com/WatWowMap/ReactMap/commit/4f5aace285285d55e3a946fb2f465b7609a9caea))
+
 ## [1.40.2-develop.1](https://github.com/WatWowMap/ReactMap/compare/v1.40.1...v1.40.2-develop.1) (2025-12-10)
 
 
