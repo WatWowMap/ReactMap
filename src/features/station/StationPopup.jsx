@@ -490,6 +490,12 @@ function StationMons({ id, updated }) {
   )
   const [iconSize, setIconSize] = React.useState(40)
   const columns = 5
+  const maxRows = 3
+  const visibleRows = Math.min(
+    maxRows,
+    Math.max(1, Math.ceil(mons.length / columns)),
+  )
+  const gridHeight = visibleRows * iconSize
 
   const recomputeIconSize = React.useCallback(() => {
     const el = scrollerEl.current
@@ -524,7 +530,13 @@ function StationMons({ id, updated }) {
 
   return (
     <CardContent
-      sx={{ m: 0, p: 0, height: 130, pb: 0, '&:last-child': { pb: 0 } }}
+      sx={{
+        m: 0,
+        p: 0,
+        height: gridHeight,
+        pb: 0,
+        '&:last-child': { pb: 0 },
+      }}
     >
       <VirtualGrid
         data={mons}
