@@ -138,6 +138,8 @@
   "exclude_lure": "Exclude Lure",
   "timer": "Timer",
   "hide": "Hide",
+  "hidden_for_hour": "Hidden for an hour",
+  "clean_hidden": "Clean Hidden",
   "tier": "Tier",
   "slots": "Slots",
   "mega": "Mega",

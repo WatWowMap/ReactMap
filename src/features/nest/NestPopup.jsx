@@ -16,6 +16,7 @@ import { setDeepStore } from '@store/useStorage'
 import { getTimeUntil } from '@utils/getTimeUntil'
 import { useAnalytics } from '@hooks/useAnalytics'
 import { Navigation } from '@components/popups/Navigation'
+import { addHiddenEntity, showHideSnackbar } from '@utils/pokemon/hiddenPokemon'
 
 /** @param {number} timeSince */
 const getColor = (timeSince) => {
@@ -62,7 +63,8 @@ export function NestPopup({
   const handleClose = () => setAnchorEl(null)
   const handleHide = () => {
     setAnchorEl(null)
-    useMemory.setState((prev) => ({ hideList: new Set(prev.hideList).add(id) }))
+    useMemory.setState({ hideList: addHiddenEntity(id) })
+    showHideSnackbar(t('hidden_for_hour'))
   }
 
   const handleExclude = () => {

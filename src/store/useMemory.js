@@ -2,6 +2,8 @@
 
 import { create } from 'zustand'
 
+import { getHiddenEntitySet } from '@utils/pokemon/hiddenPokemon'
+
 /**
  * TODO: Finish this
  * @typedef {{
@@ -151,7 +153,7 @@ export const useMemory = create(() => ({
     locationCards: {},
     routeTypes: {},
   },
-  hideList: new Set(),
+  hideList: getHiddenEntitySet(),
   timerList: [],
   timeOfDay: 'day',
   extraUserFields: [],

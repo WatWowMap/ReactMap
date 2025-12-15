@@ -20,6 +20,8 @@ import { StatusIcon } from '@components/StatusIcon'
 import { Title } from '@components/popups/Title'
 
 import { getTimeUntil } from '@utils/getTimeUntil'
+import { addHiddenEntity, showHideSnackbar } from '@utils/pokemon/hiddenPokemon'
+
 import { getTappableDisplaySettings } from './displayRules'
 
 /**
@@ -107,10 +109,9 @@ export function TappablePopup({ tappable, rewardIcon }) {
   const handleHide = React.useCallback(() => {
     setMenuAnchorEl(null)
     if (tappable.id === undefined || tappable.id === null) return
-    useMemory.setState((prev) => ({
-      hideList: new Set(prev.hideList).add(tappable.id),
-    }))
-  }, [tappable.id])
+    useMemory.setState({ hideList: addHiddenEntity(tappable.id) })
+    showHideSnackbar(t('hidden_for_hour'))
+  }, [tappable.id, t])
 
   const handleExclude = React.useCallback(() => {
     setMenuAnchorEl(null)

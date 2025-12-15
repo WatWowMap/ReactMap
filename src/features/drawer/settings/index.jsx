@@ -9,6 +9,7 @@ import InsightsIcon from '@mui/icons-material/Insights'
 import NotificationsActiveIcon from '@mui/icons-material/NotificationsActive'
 import NotificationsOffIcon from '@mui/icons-material/NotificationsOff'
 import LogoDevIcon from '@mui/icons-material/LogoDev'
+import VisibilityOffIcon from '@mui/icons-material/VisibilityOff'
 import { useTranslation } from 'react-i18next'
 
 import { useMemory } from '@store/useMemory'
@@ -22,6 +23,7 @@ import { LocaleSelection } from '@components/inputs/LocaleSelection'
 import { DividerWithMargin } from '@components/StyledDivider'
 import { BoolToggle } from '@components/inputs/BoolToggle'
 import { BasicListButton } from '@components/inputs/BasicListButton'
+import { clearHiddenEntities } from '@utils/pokemon/hiddenPokemon'
 
 import { DrawerActions } from '../components/Actions'
 import { GeneralSetting } from './General'
@@ -70,6 +72,15 @@ export function Settings() {
         </BasicListButton>
       )}
       <HolidaySetting />
+      <BasicListButton
+        onClick={() => {
+          clearHiddenEntities()
+          useMemory.setState({ hideList: new Set() })
+        }}
+        label="clean_hidden"
+      >
+        <VisibilityOffIcon />
+      </BasicListButton>
       <DividerWithMargin />
       <UAssetSetting asset="icons" />
       <UAssetSetting asset="audio" />

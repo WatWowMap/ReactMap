@@ -27,6 +27,7 @@ import { Img, PokemonImg } from '@components/Img'
 import { useFormatStore } from '@store/useFormatStore'
 import { useRelativeTimer } from '@hooks/useRelativeTime'
 import { useAnalytics } from '@hooks/useAnalytics'
+import { addHiddenEntity, showHideSnackbar } from '@utils/pokemon/hiddenPokemon'
 import { BackgroundCard } from '@components/popups/BackgroundCard'
 import { Title } from '@components/popups/Title'
 import {
@@ -169,10 +170,10 @@ function StationMenu({
     () => [
       {
         name: 'hide',
-        action: () =>
-          useMemory.setState((prev) => ({
-            hideList: new Set(prev.hideList).add(id),
-          })),
+        action: () => {
+          useMemory.setState({ hideList: addHiddenEntity(id) })
+          showHideSnackbar(t('hidden_for_hour'))
+        },
       },
       {
         name: 'exclude_battle',

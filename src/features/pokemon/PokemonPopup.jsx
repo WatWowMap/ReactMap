@@ -33,6 +33,7 @@ import { GET_TAPPABLE_BY_ID } from '@services/queries/tappable'
 import { usePokemonBackgroundVisual } from '@hooks/usePokemonBackgroundVisuals'
 import { BackgroundCard } from '@components/popups/BackgroundCard'
 import { getFormDisplay } from '@utils/getFormDisplay'
+import { addHiddenEntity } from '@utils/pokemon/hiddenPokemon'
 
 const rowClass = { width: 30, fontWeight: 'bold' }
 
@@ -357,7 +358,7 @@ const Header = ({ pokemon, metaData, iconUrl, userSettings, isTutorial }) => {
 
   const handleHide = () => {
     setAnchorEl(null)
-    useMemory.setState((prev) => ({ hideList: new Set(prev.hideList).add(id) }))
+    useMemory.setState({ hideList: addHiddenEntity(id) })
   }
 
   const handleExclude = () => {

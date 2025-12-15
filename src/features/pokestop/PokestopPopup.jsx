@@ -35,6 +35,7 @@ import { useGetAvailable } from '@hooks/useGetAvailable'
 import { parseQuestConditions } from '@utils/parseConditions'
 import { Img } from '@components/Img'
 import { readableProbability } from '@utils/readableProbability'
+import { addHiddenEntity, showHideSnackbar } from '@utils/pokemon/hiddenPokemon'
 import {
   usePokemonBackgroundVisuals,
   usePokemonBackgroundVisual,
@@ -321,7 +322,8 @@ const MenuActions = ({
 
   const handleHide = () => {
     setAnchorEl(null)
-    useMemory.setState((prev) => ({ hideList: new Set(prev.hideList).add(id) }))
+    useMemory.setState({ hideList: addHiddenEntity(id) })
+    showHideSnackbar(t('hidden_for_hour'))
   }
 
   /** @param {string} key */

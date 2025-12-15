@@ -37,6 +37,7 @@ import { getTimeUntil } from '@utils/getTimeUntil'
 import { formatInterval } from '@utils/formatInterval'
 import { usePokemonBackgroundVisuals } from '@hooks/usePokemonBackgroundVisuals'
 import { getFormDisplay } from '@utils/getFormDisplay'
+import { addHiddenEntity, showHideSnackbar } from '@utils/pokemon/hiddenPokemon'
 
 import { useWebhook } from './useWebhook'
 
@@ -747,7 +748,8 @@ const DropdownOptions = ({
 
   const handleHide = () => {
     handleClose()
-    useMemory.setState((prev) => ({ hideList: new Set(prev.hideList).add(id) }))
+    useMemory.setState({ hideList: addHiddenEntity(id) })
+    showHideSnackbar(t('hidden_for_hour'))
   }
 
   const handleExclude = (key) => {

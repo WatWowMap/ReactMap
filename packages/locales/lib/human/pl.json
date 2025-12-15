@@ -228,6 +228,8 @@
   "has_quest_indicator": "Alternatywny kolor dla Pokéstopów z zadaniami",
   "help": "Pomoc",
   "hide": "Ukryj",
+  "hidden_for_hour": "Schowano na godzinę",
+  "clean_hidden": "Wyczyść schowane",
   "hide_editor": "Ukryj edytor",
   "historic_rarity": "Rzadkość historyczna",
   "hisuian": "Hisuian",
