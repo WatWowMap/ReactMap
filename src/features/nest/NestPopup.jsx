@@ -16,7 +16,7 @@ import { setDeepStore } from '@store/useStorage'
 import { getTimeUntil } from '@utils/getTimeUntil'
 import { useAnalytics } from '@hooks/useAnalytics'
 import { Navigation } from '@components/popups/Navigation'
-import { addHiddenEntity, showHideSnackbar } from '@utils/pokemon/hiddenPokemon'
+import { addHiddenEntity, showHideSnackbar } from '@utils/hiddenEntities'
 
 /** @param {number} timeSince */
 const getColor = (timeSince) => {

@@ -1,7 +1,7 @@
 // @ts-check
 
-const STORAGE_KEY = 'pokemon-hide-list'
-const SNACKBAR_COUNT_KEY = 'pokemon-hide-snackbar-count'
+const STORAGE_KEY = 'hidden-entities'
+const SNACKBAR_COUNT_KEY = 'hidden-entities-snackbar-count'
 const MAX_AGE_MS = 60 * 60 * 1000 // 1 hour
 const MAX_SNACKBAR_SHOWS = 3
 
@@ -10,7 +10,7 @@ const MAX_SNACKBAR_SHOWS = 3
  */
 
 /**
- * Load hidden Pokemon entries from localStorage
+ * Load hidden entries from localStorage
  * @returns {HiddenEntry[]}
  */
 function loadEntries() {
@@ -25,7 +25,7 @@ function loadEntries() {
 }
 
 /**
- * Save hidden Pokemon entries to localStorage
+ * Save hidden entries to localStorage
  * @param {HiddenEntry[]} entries
  */
 function saveEntries(entries) {
@@ -47,12 +47,12 @@ function cleanOldEntries(entries) {
 }
 
 /**
- * Add an entity ID to the hidden list with timestamp, cleaning old entries
+ * Add an entity ID to the hidden list with timestamp
  * @param {string | number} id
  * @returns {Set<string | number>} Updated hideList Set
  */
 export function addHiddenEntity(id) {
-  const entries = cleanOldEntries(loadEntries())
+  const entries = loadEntries()
   if (!entries.some((e) => e.id === id)) {
     entries.push({ id, ts: Date.now() })
   }
@@ -61,13 +61,26 @@ export function addHiddenEntity(id) {
 }
 
 /**
- * Get the current hidden entity Set from localStorage (cleaned)
+ * Get the current hidden entity Set from localStorage
  * @returns {Set<string | number>}
  */
 export function getHiddenEntitySet() {
-  const entries = cleanOldEntries(loadEntries())
-  saveEntries(entries) // persist cleaned list
+  const entries = loadEntries()
   return new Set(entries.map((e) => e.id))
+}
+
+/**
+ * Clean outdated hidden entries (older than 1 hour) from localStorage
+ * Updates both localStorage and the in-memory hideList
+ * @param {(state: { hideList: Set<string | number> }) => void} setState
+ */
+export function cleanupHiddenEntities(setState) {
+  const entries = loadEntries()
+  const cleaned = cleanOldEntries(entries)
+  if (cleaned.length !== entries.length) {
+    saveEntries(cleaned)
+    setState({ hideList: new Set(cleaned.map((e) => e.id)) })
+  }
 }
 
 /** @type {{ current: number | null }} */

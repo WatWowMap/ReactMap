@@ -2,7 +2,7 @@
 
 import { create } from 'zustand'
 
-import { getHiddenEntitySet } from '@utils/pokemon/hiddenPokemon'
+import { getHiddenEntitySet } from '@utils/hiddenEntities'
 
 /**
  * TODO: Finish this

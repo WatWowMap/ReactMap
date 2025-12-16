@@ -35,7 +35,7 @@ import { useGetAvailable } from '@hooks/useGetAvailable'
 import { parseQuestConditions } from '@utils/parseConditions'
 import { Img } from '@components/Img'
 import { readableProbability } from '@utils/readableProbability'
-import { addHiddenEntity, showHideSnackbar } from '@utils/pokemon/hiddenPokemon'
+import { addHiddenEntity, showHideSnackbar } from '@utils/hiddenEntities'
 import {
   usePokemonBackgroundVisuals,
   usePokemonBackgroundVisual,

@@ -37,7 +37,7 @@ import { getTimeUntil } from '@utils/getTimeUntil'
 import { formatInterval } from '@utils/formatInterval'
 import { usePokemonBackgroundVisuals } from '@hooks/usePokemonBackgroundVisuals'
 import { getFormDisplay } from '@utils/getFormDisplay'
-import { addHiddenEntity, showHideSnackbar } from '@utils/pokemon/hiddenPokemon'
+import { addHiddenEntity, showHideSnackbar } from '@utils/hiddenEntities'
 
 import { useWebhook } from './useWebhook'
 

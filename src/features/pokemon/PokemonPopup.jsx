@@ -33,7 +33,7 @@ import { GET_TAPPABLE_BY_ID } from '@services/queries/tappable'
 import { usePokemonBackgroundVisual } from '@hooks/usePokemonBackgroundVisuals'
 import { BackgroundCard } from '@components/popups/BackgroundCard'
 import { getFormDisplay } from '@utils/getFormDisplay'
-import { addHiddenEntity } from '@utils/pokemon/hiddenPokemon'
+import { addHiddenEntity } from '@utils/hiddenEntities'
 
 const rowClass = { width: 30, fontWeight: 'bold' }
 

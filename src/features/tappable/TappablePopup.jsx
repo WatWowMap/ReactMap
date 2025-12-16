@@ -20,7 +20,7 @@ import { StatusIcon } from '@components/StatusIcon'
 import { Title } from '@components/popups/Title'
 
 import { getTimeUntil } from '@utils/getTimeUntil'
-import { addHiddenEntity, showHideSnackbar } from '@utils/pokemon/hiddenPokemon'
+import { addHiddenEntity, showHideSnackbar } from '@utils/hiddenEntities'
 
 import { getTappableDisplaySettings } from './displayRules'
 

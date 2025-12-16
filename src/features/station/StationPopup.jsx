@@ -27,7 +27,7 @@ import { Img, PokemonImg } from '@components/Img'
 import { useFormatStore } from '@store/useFormatStore'
 import { useRelativeTimer } from '@hooks/useRelativeTime'
 import { useAnalytics } from '@hooks/useAnalytics'
-import { addHiddenEntity, showHideSnackbar } from '@utils/pokemon/hiddenPokemon'
+import { addHiddenEntity, showHideSnackbar } from '@utils/hiddenEntities'
 import { BackgroundCard } from '@components/popups/BackgroundCard'
 import { Title } from '@components/popups/Title'
 import {

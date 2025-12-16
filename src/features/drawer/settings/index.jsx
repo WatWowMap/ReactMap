@@ -23,7 +23,7 @@ import { LocaleSelection } from '@components/inputs/LocaleSelection'
 import { DividerWithMargin } from '@components/StyledDivider'
 import { BoolToggle } from '@components/inputs/BoolToggle'
 import { BasicListButton } from '@components/inputs/BasicListButton'
-import { clearHiddenEntities } from '@utils/pokemon/hiddenPokemon'
+import { clearHiddenEntities } from '@utils/hiddenEntities'
 
 import { DrawerActions } from '../components/Actions'
 import { GeneralSetting } from './General'

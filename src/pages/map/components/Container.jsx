@@ -9,6 +9,7 @@ import { ScanOnDemand } from '@features/scanner'
 import { WebhookMarker, WebhookAreaSelection } from '@features/webhooks'
 import { ActiveWeather } from '@features/weather'
 import { timeCheck } from '@utils/timeCheck'
+import { cleanupHiddenEntities } from '@utils/hiddenEntities'
 
 import { Effects } from './Effects'
 import { DataView } from './Data'
@@ -37,6 +38,14 @@ const MAX_BOUNDS = /** @type {[[number, number], [number, number]]} */ ([
 
 export function Container() {
   const { location, zoom } = useStorage.getState()
+
+  // Cleanup hidden entities 15 seconds after map loads
+  React.useEffect(() => {
+    const timer = setTimeout(() => {
+      cleanupHiddenEntities(useMemory.setState)
+    }, 15000)
+    return () => clearTimeout(timer)
+  }, [])
 
   return (
     <MapContainer
