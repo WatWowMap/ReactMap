@@ -1,0 +1,23 @@
+# Do NOT ignore .git - needed in the image for version metadata
+# .git
+node_modules
+**/node_modules
+npm-debug.log
+yarn-error.log
+dist
+.DS_Store
+.gitignore
+.vscode
+.env
+.env.local
+logs
+*.log
+coverage
+tests
+docs
+.idea
+.cache
+# Ignore local config backups
+server/src/configs/koji_backups/**
+# Keep package and source files but ignore nested node_modules
+packages/*/node_modules
