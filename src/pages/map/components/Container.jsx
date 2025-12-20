@@ -39,12 +39,13 @@ const MAX_BOUNDS = /** @type {[[number, number], [number, number]]} */ ([
 export function Container() {
   const { location, zoom } = useStorage.getState()
 
-  // Cleanup hidden entities 15 seconds after map loads
+  // Cleanup hidden entities every 15 seconds
   React.useEffect(() => {
-    const timer = setTimeout(() => {
-      cleanupHiddenEntities(useMemory.setState)
-    }, 15000)
-    return () => clearTimeout(timer)
+    const interval = setInterval(
+      () => cleanupHiddenEntities(useMemory.setState),
+      15000,
+    )
+    return () => clearInterval(interval)
   }, [])
 
   return (
