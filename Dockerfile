@@ -53,3 +53,5 @@ COPY --from=builder /home/node/server ./server
 COPY --from=builder /home/node/public ./public
 COPY --from=builder /home/node/dist ./dist
 COPY --from=builder /home/node/ReactMap.js ./ReactMap.js
+COPY --from=builder /home/node/packages ./packages
+COPY --from=builder /home/node/config ./config
