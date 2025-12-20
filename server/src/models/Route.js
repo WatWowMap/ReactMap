@@ -115,9 +115,13 @@ class Route extends Model {
     const results = await query
 
     return results.map((result) => {
-      if (typeof result.waypoints === 'string') {
-        result.waypoints = JSON.parse(result.waypoints)
-      } else if (result.waypoints === null) {
+      if (typeof result.waypoints === 'string' && result.waypoints) {
+        try {
+          result.waypoints = JSON.parse(result.waypoints)
+        } catch {
+          result.waypoints = []
+        }
+      } else if (!result.waypoints) {
         result.waypoints = []
       }
       return result
@@ -162,14 +166,22 @@ class Route extends Model {
 
     if (!result) return null
 
-    if (typeof result.waypoints === 'string') {
-      result.waypoints = JSON.parse(result.waypoints)
-    } else if (result.waypoints === null) {
+    if (typeof result.waypoints === 'string' && result.waypoints) {
+      try {
+        result.waypoints = JSON.parse(result.waypoints)
+      } catch {
+        result.waypoints = []
+      }
+    } else if (!result.waypoints) {
       result.waypoints = []
     }
-    if (typeof result.tags === 'string') {
-      result.tags = JSON.parse(result.tags)
-    } else if (result.tags === null) {
+    if (typeof result.tags === 'string' && result.tags) {
+      try {
+        result.tags = JSON.parse(result.tags)
+      } catch {
+        result.tags = []
+      }
+    } else if (!result.tags) {
       result.tags = []
     }
     if (typeof result.image === 'string') {
