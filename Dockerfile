@@ -28,12 +28,20 @@ COPY ReactMap.js ./ReactMap.js
 # Copy remaining source needed for build (excluding node_modules via .dockerignore)
 COPY . .
 
+# Capture git metadata for update checks in Docker builds.
+RUN if [ -d .git ]; then \
+    git rev-parse HEAD > .gitsha; \
+    ref="$(git symbolic-ref -q HEAD || true)"; \
+    if [ -z "$ref" ]; then ref="refs/heads/main"; fi; \
+    printf '%s\n' "$ref" > .gitref; \
+  fi
+
 # Install all deps and build
 RUN yarn install --frozen-lockfile
 RUN yarn build
 
 # Reinstall only production dependencies to a clean node_modules folder
-RUN rm -rf node_modules && yarn install --production --frozen-lockfile --ignore-scripts
+RUN rm -rf node_modules && HUSKY=0 yarn install --production --frozen-lockfile
 
 
 # Final runtime image
@@ -55,3 +63,5 @@ COPY --from=builder /home/node/dist ./dist
 COPY --from=builder /home/node/ReactMap.js ./ReactMap.js
 COPY --from=builder /home/node/packages ./packages
 COPY --from=builder /home/node/config ./config
+COPY --from=builder /home/node/.gitsha ./.gitsha
+COPY --from=builder /home/node/.gitref ./.gitref
