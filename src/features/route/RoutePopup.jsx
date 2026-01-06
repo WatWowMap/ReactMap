@@ -389,16 +389,22 @@ export function RoutePopup({ end, inline = false, ...props }) {
 
 function DownloadRouteGPX({ route }) {
   const escapeXml = (value = '') =>
-    String(value).replace(/[<>&'"]/g, (c) => ({
-      '<': '&lt;',
-      '>': '&gt;',
-      '&': '&amp;',
-      "'": '&apos;',
-      '"': '&quot;',
-    }[c]))
+    String(value).replace(
+      /[<>&'"]/g,
+      (c) =>
+        ({
+          '<': '&lt;',
+          '>': '&gt;',
+          '&': '&amp;',
+          "'": '&apos;',
+          '"': '&quot;',
+        })[c],
+    )
 
   const sanitizeFilename = (name = '') =>
-    String(name).replace(/[\/:*?"<>|]/g, '').slice(0, 200) || 'route'
+    String(name)
+      .replace(/[\/:*?"<>|]/g, '')
+      .slice(0, 200) || 'route'
 
   const GPXContent = React.useMemo(() => {
     if (!route.waypoints.length) {
