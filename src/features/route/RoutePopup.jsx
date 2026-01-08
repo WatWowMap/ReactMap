@@ -403,7 +403,7 @@ function DownloadRouteGPX({ route }) {
 
   const sanitizeFilename = (name = '') =>
     String(name)
-      .replace(/[\/:*?"<>|]/g, '')
+      .replace(/[\\/:*?"<>|]/g, '')
       .slice(0, 200) || 'route'
 
   const GPXContent = React.useMemo(() => {
