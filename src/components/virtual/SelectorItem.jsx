@@ -48,6 +48,7 @@ export function SelectorItem({
     alt: true,
     newLine: true,
     quest: category === 'pokestops',
+    omitFormSuffix: true,
   })
   const title = t(id)
   const url = useMemory((s) => s.Icons.getIconById(id))

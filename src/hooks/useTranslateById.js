@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next'
 import { getFormDisplay } from '@utils/getFormDisplay'
 
 /**
- * @typedef {{ plural?: boolean, amount?: boolean, alt?: boolean, newLine?: boolean, quest?: boolean }} CustomTOptions
+ * @typedef {{ plural?: boolean, amount?: boolean, alt?: boolean, newLine?: boolean, quest?: boolean, omitFormSuffix?: boolean }} CustomTOptions
  * @typedef {(id: string, options?: CustomTOptions) => string} CustomT
  */
 
@@ -19,7 +19,10 @@ export function useTranslateById(options = {}) {
   return useMemo(
     () => ({
       language: i18n.i18n.language,
-      t: (id, { plural, amount, alt, newLine, quest } = options) => {
+      t: (
+        id,
+        { plural, amount, alt, newLine, quest, omitFormSuffix } = options,
+      ) => {
         if (typeof id !== 'string') {
           return ''
         }
@@ -116,6 +119,7 @@ export function useTranslateById(options = {}) {
                 ? ''
                 : getFormDisplay(pokemon, form, undefined, {
                     showDefaultForms: quest,
+                    appendFormSuffix: !omitFormSuffix,
                   })
             return formLabel
               ? `${pokemonName}${newLine ? '\n' : ' '}(${formLabel})`
@@ -124,6 +128,13 @@ export function useTranslateById(options = {}) {
         }
       },
     }),
-    [i18n, options.alt, options.amount, options.plural, options.newLine],
+    [
+      i18n,
+      options.alt,
+      options.amount,
+      options.plural,
+      options.newLine,
+      options.omitFormSuffix,
+    ],
   )
 }

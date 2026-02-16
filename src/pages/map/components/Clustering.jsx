@@ -154,7 +154,9 @@ export function Clustering({ category, children }) {
   }, [children, featureRef, superCluster])
 
   const clustered = React.useMemo(() => {
-    const requiresFilter = children.length > rules.forcedLimit || userCluster
+    const requiresFilter =
+      userCluster ||
+      (children.length > rules.forcedLimit && !IGNORE_CLUSTERING.has(category))
     if (!requiresFilter) return children
     const base = children.filter((x) => x && markers.has(x.key))
     if (manualKey) {
@@ -166,7 +168,7 @@ export function Clustering({ category, children }) {
       }
     }
     return base
-  }, [children, markers, manualKey, rules.forcedLimit, userCluster])
+  }, [category, children, markers, manualKey, rules.forcedLimit, userCluster])
 
   return (
     <>

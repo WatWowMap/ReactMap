@@ -372,11 +372,8 @@ export interface Route {
 
 export type FullRoute = FullModel<Route, RouteModel.Route>
 
-export interface StationPokemon {
+export interface StationPokemon extends PokemonDisplay {
   pokemon_id: number
-  form: number
-  costume: number
-  gender: number
   bread_mode: number
 }
 

@@ -286,6 +286,7 @@ export function PokemonPopup({ pokemon, iconUrl, isTutorial = false }) {
         metaData={metaData}
         perms={pokePerms}
         timeOfDay={timeOfDay}
+        backgroundVisuals={backgroundVisuals}
       />
       <ShinyOdds shinyStats={shinyStats} />
       <Footer
@@ -569,12 +570,17 @@ const TappableOrigin = ({ tappable, loading }) => {
   )
 }
 
-const Info = ({ pokemon, metaData, perms, timeOfDay }) => {
+const Info = ({ pokemon, metaData, perms, timeOfDay, backgroundVisuals }) => {
   const Icons = useMemory((s) => s.Icons)
   const { t } = useTranslation()
   const { gender, size, weather, form } = pokemon
   const formTypes = metaData?.forms?.[form]?.types || metaData?.types || []
   const darkMode = useStorage((s) => s.darkMode)
+  const iconStyles = backgroundVisuals?.styles?.icon
+  const hasBackground = Boolean(backgroundVisuals?.hasBackground)
+  const weatherIconTimeOfDay = hasBackground ? 'night' : timeOfDay
+  const weatherIconUrl =
+    Icons?.getWeather?.(weather, weatherIconTimeOfDay) || ''
   return (
     <Grid
       xs={perms.iv ? 3 : 11}
@@ -585,13 +591,39 @@ const Info = ({ pokemon, metaData, perms, timeOfDay }) => {
     >
       {weather != 0 && perms.iv && (
         <Grid
-          className={`grid-item ${darkMode ? '' : 'darken-image'}`}
           style={{
             height: 24,
             width: 24,
-            backgroundImage: `url(${Icons.getWeather(weather, timeOfDay)})`,
+            ...(iconStyles || {}),
           }}
-        />
+        >
+          <div
+            className={
+              hasBackground
+                ? 'grid-item'
+                : `grid-item ${darkMode ? '' : 'darken-image'}`
+            }
+            style={{
+              height: '100%',
+              width: '100%',
+              ...(hasBackground
+                ? {
+                    WebkitMaskImage: `url(${weatherIconUrl})`,
+                    maskImage: `url(${weatherIconUrl})`,
+                    WebkitMaskRepeat: 'no-repeat',
+                    maskRepeat: 'no-repeat',
+                    WebkitMaskPosition: 'center',
+                    maskPosition: 'center',
+                    WebkitMaskSize: 'contain',
+                    maskSize: 'contain',
+                    backgroundColor: '#fff',
+                  }
+                : {
+                    backgroundImage: `url(${weatherIconUrl})`,
+                  }),
+            }}
+          />
+        </Grid>
       )}
       {!!gender && (
         <Grid textAlign="center">

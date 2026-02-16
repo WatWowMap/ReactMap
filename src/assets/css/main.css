@@ -249,6 +249,34 @@ body {
   position: absolute;
 }
 
+.marker-overlay-icon {
+  position: absolute;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  transform: translateX(-50%);
+  width: var(--marker-overlay-size, 30px);
+  height: var(--marker-overlay-size, 30px);
+}
+
+.marker-overlay-icon img,
+.leaflet-container
+  .leaflet-marker-pane
+  .pokestop-marker__stack-item
+  img:not(.pokestop-marker__decoration) {
+  width: var(--marker-overlay-size, var(--marker-size, 30px)) !important;
+  height: auto !important;
+  max-width: var(--marker-overlay-size, var(--marker-size, 30px)) !important;
+  max-height: var(--marker-overlay-size, var(--marker-size, 30px)) !important;
+  object-fit: contain;
+}
+
+/* Override Leaflet's marker-pane img reset for overlay icons */
+.leaflet-container .leaflet-marker-pane .marker-overlay-icon img {
+  max-width: var(--marker-overlay-size, var(--marker-size, 30px)) !important;
+  max-height: var(--marker-overlay-size, var(--marker-size, 30px)) !important;
+}
+
 .invasion-reward {
   display: inline-block;
   width: 30px;
@@ -356,15 +384,16 @@ img {
   transform: translateX(-50%);
 }
 
-.leaflet-container
-  .leaflet-marker-pane
-  .pokestop-marker__stack-item
-  img:not(.pokestop-marker__decoration) {
-  width: var(--marker-size, 30px) !important;
-  height: auto !important;
-  max-width: var(--marker-size, 30px) !important;
-  max-height: var(--marker-size, 30px) !important;
-  object-fit: contain;
+.pokestop-marker__quest-dot {
+  position: absolute;
+  right: calc(var(--marker-size, 30px) * 0.02);
+  top: calc(var(--marker-size, 30px) * 0.02);
+  width: calc(var(--marker-size, 30px) * 0.28);
+  height: calc(var(--marker-size, 30px) * 0.28);
+  border-radius: 50%;
+  box-shadow:
+    #000 0 0 1px,
+    #000 0 0 1px;
 }
 
 .leaflet-container

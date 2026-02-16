@@ -1,3 +1,60 @@
+# [1.41.0-develop.5](https://github.com/WatWowMap/ReactMap/compare/v1.41.0-develop.4...v1.41.0-develop.5) (2026-01-08)
+
+
+### Bug Fixes
+
+* escape gpx xml ([#1186](https://github.com/WatWowMap/ReactMap/issues/1186)) ([7bd5ce1](https://github.com/WatWowMap/ReactMap/commit/7bd5ce10d3e8aa6f64faac8d3d9773c589d6a28e))
+
+# [1.41.0-develop.4](https://github.com/WatWowMap/ReactMap/compare/v1.41.0-develop.3...v1.41.0-develop.4) (2025-12-31)
+
+
+### Bug Fixes
+
+* area reload ([cea3141](https://github.com/WatWowMap/ReactMap/commit/cea3141386d804f502e83e89b9bf92da93102a5d))
+
+# [1.41.0-develop.3](https://github.com/WatWowMap/ReactMap/compare/v1.41.0-develop.2...v1.41.0-develop.3) (2025-12-16)
+
+
+### Bug Fixes
+
+* logic bug in loading non-clustered elements ([#1161](https://github.com/WatWowMap/ReactMap/issues/1161)) ([a2c7f17](https://github.com/WatWowMap/ReactMap/commit/a2c7f17e02ff7cd5467d4bf5ccd8b13a444ba725))
+* more robust discord handling ([#1181](https://github.com/WatWowMap/ReactMap/issues/1181)) ([b579ded](https://github.com/WatWowMap/ReactMap/commit/b579dedeb196fb4d8b1da025e325049bfd7833e8))
+
+
+### Features
+
+* default clientPrompt to none to skip permission reapproval ([d3ea283](https://github.com/WatWowMap/ReactMap/commit/d3ea283b5eacda18b9f4725e50e5353a955a363d))
+
+# [1.41.0-develop.2](https://github.com/WatWowMap/ReactMap/compare/v1.41.0-develop.1...v1.41.0-develop.2) (2025-12-15)
+
+
+### Bug Fixes
+
+* remove extra Forms ([0f157ed](https://github.com/WatWowMap/ReactMap/commit/0f157edba37eb727fdb9f4a5b96bdf417298cdfc))
+
+# [1.41.0-develop.1](https://github.com/WatWowMap/ReactMap/compare/v1.40.2-develop.1...v1.41.0-develop.1) (2025-12-11)
+
+
+### Bug Fixes
+
+* battle/raid icon max height ([497f350](https://github.com/WatWowMap/ReactMap/commit/497f3504a4ea6000184c9df30c5a3c3e76d65d80))
+* no scrollbars plz ([907ca33](https://github.com/WatWowMap/ReactMap/commit/907ca331beb1fe81dd671732d5ebe1980d8d6faa))
+
+
+### Features
+
+* dynamic placed Pokemon dropdown height ([8a0447c](https://github.com/WatWowMap/ReactMap/commit/8a0447c3e9d7df9c4aa9add657a234a1bc59b412))
+* support stationed pokemon extras ([4f5aace](https://github.com/WatWowMap/ReactMap/commit/4f5aace285285d55e3a946fb2f465b7609a9caea))
+
+## [1.40.2-develop.1](https://github.com/WatWowMap/ReactMap/compare/v1.40.1...v1.40.2-develop.1) (2025-12-10)
+
+
+### Bug Fixes
+
+* battle/raid filtering race condition ([2a9cbbf](https://github.com/WatWowMap/ReactMap/commit/2a9cbbf180313064830a524f86eae62f41b6b87b))
+* ground raid/battle icons ([cd01a92](https://github.com/WatWowMap/ReactMap/commit/cd01a92bda81f786ca2c14f10df8cc4489163fd6))
+* weather icon in pokemon background popup ([21b50f5](https://github.com/WatWowMap/ReactMap/commit/21b50f51b81bf6f7723753a4f77289ead99c51e7))
+
 ## [1.40.1](https://github.com/WatWowMap/ReactMap/compare/v1.40.0...v1.40.1) (2025-12-09)
 
 

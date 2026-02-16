@@ -412,6 +412,8 @@
   "webhook_selection": "{{name}} Selection",
   "message_of_the_day": "Message of the Day",
   "has_quest_indicator": "Alternative Color for Stops with Quests",
+  "show_ar_quest_dot_badge": "Show AR Quest Dot Badge",
+  "show_no_ar_quest_dot_badge": "Show No-AR Quest Dot Badge",
   "show_ar_badge": "Show AR Badge",
   "all_gyms": "All Gyms",
   "general": "General",
