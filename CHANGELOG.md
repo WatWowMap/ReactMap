@@ -1,3 +1,10 @@
+# [1.41.0-develop.8](https://github.com/WatWowMap/ReactMap/compare/v1.41.0-develop.7...v1.41.0-develop.8) (2026-02-18)
+
+
+### Bug Fixes
+
+* hidden power in raids are fighting type ([018ba93](https://github.com/WatWowMap/ReactMap/commit/018ba93642eee0a08d2a864c1a04998ff63503a9))
+
 # [1.41.0-develop.7](https://github.com/WatWowMap/ReactMap/compare/v1.41.0-develop.6...v1.41.0-develop.7) (2026-02-17)
 
 
