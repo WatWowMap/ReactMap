@@ -1018,6 +1018,8 @@ const RaidInfo = ({
   raid_pokemon_move_1,
   raid_pokemon_move_2,
 }) => {
+  const HIDDEN_POWER_FAST_MOVE_ID = 281
+  const FIGHTING_TYPE_ID = 2
   const { t } = useTranslation()
   const Icons = useMemory((s) => s.Icons)
 
@@ -1028,6 +1030,13 @@ const RaidInfo = ({
       return t(`poke_${raid_pokemon_id}`)
     }
     return `${t('tier')} ${raidLevel}`
+  }
+
+  const getRaidMoveType = (moveId, isFastMove = false) => {
+    if (isFastMove && moveId === HIDDEN_POWER_FAST_MOVE_ID) {
+      return FIGHTING_TYPE_ID
+    }
+    return moves[moveId]?.type
   }
 
   return (
@@ -1070,7 +1079,7 @@ const RaidInfo = ({
                 width: 15,
                 height: 15,
                 backgroundImage: `url(${Icons.getTypes(
-                  moves[raid_pokemon_move_1].type,
+                  getRaidMoveType(raid_pokemon_move_1, true),
                 )})`,
                 backgroundSize: 'contain',
                 backgroundRepeat: 'no-repeat',
@@ -1104,7 +1113,7 @@ const RaidInfo = ({
                 width: 15,
                 height: 15,
                 backgroundImage: `url(${Icons.getTypes(
-                  moves[raid_pokemon_move_2].type,
+                  getRaidMoveType(raid_pokemon_move_2),
                 )})`,
                 backgroundSize: 'contain',
                 backgroundRepeat: 'no-repeat',
