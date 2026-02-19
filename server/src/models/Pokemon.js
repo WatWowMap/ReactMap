@@ -187,6 +187,7 @@ class Pokemon extends Model {
         const selectColumns = [
           '*',
           hasSize && !hasHeight ? 'size AS height' : 'size',
+          ref('pokemon.id').castTo('CHAR').as('id'),
         ]
         if (hasPokemonBackground) {
           selectColumns.push('background')
@@ -198,11 +199,12 @@ class Pokemon extends Model {
         '>=',
         isMad ? this.knex().fn.now() : ts,
       )
+      const manualIdColumn = isMad ? 'pokemon.encounter_id' : 'id'
       manualId = applyManualIdFilter(query, {
         manualId: manualIdFilter,
         latColumn: isMad ? 'pokemon.latitude' : 'lat',
         lonColumn: isMad ? 'pokemon.longitude' : 'lon',
-        idColumn: isMad ? 'pokemon.encounter_id' : 'id',
+        idColumn: manualIdColumn,
         bounds: {
           minLat: args.minLat,
           maxLat: args.maxLat,
@@ -210,6 +212,9 @@ class Pokemon extends Model {
           maxLon: args.maxLon,
         },
       })
+      if (manualId !== null) {
+        query.orderByRaw('?? = ? DESC', [manualIdColumn, manualId])
+      }
       query.andWhere((ivOr) => {
         if (ivs || pvp) {
           if (globalFilter.filterKeys.size) {
@@ -710,24 +715,19 @@ class Pokemon extends Model {
       if (!noPokemonSelect) return []
     }
 
-    const query = this.query()
-      .where(
-        isMad ? 'disappear_time' : 'expire_timestamp',
-        '>=',
-        isMad ? this.knex().fn.now() : ts,
-      )
-      .andWhereBetween(isMad ? 'pokemon.latitude' : 'lat', [
-        args.minLat,
-        args.maxLat,
-      ])
-      .andWhereBetween(isMad ? 'pokemon.longitude' : 'lon', [
-        args.minLon,
-        args.maxLon,
-      ])
+    const query = this.query().where(
+      isMad ? 'disappear_time' : 'expire_timestamp',
+      '>=',
+      isMad ? this.knex().fn.now() : ts,
+    )
     if (isMad) {
       Pokemon.getMadSql(query)
     } else {
-      query.select(['*', hasSize && !hasHeight ? 'size AS height' : 'size'])
+      query.select([
+        '*',
+        hasSize && !hasHeight ? 'size AS height' : 'size',
+        ref('id').castTo('CHAR').as('id'),
+      ])
     }
     if (
       !getAreaSql(
@@ -970,7 +970,7 @@ class Pokemon extends Model {
       ])
     } else {
       query.select([
-        'id',
+        ref('id').castTo('CHAR').as('id'),
         'lat',
         'lon',
         'form',
