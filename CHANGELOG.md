@@ -1,3 +1,10 @@
+# [1.41.0-develop.9](https://github.com/WatWowMap/ReactMap/compare/v1.41.0-develop.8...v1.41.0-develop.9) (2026-02-19)
+
+
+### Bug Fixes
+
+* pokemon onlyManualId filter in expert sql mode ([ee176da](https://github.com/WatWowMap/ReactMap/commit/ee176da3749c27b33aa659ba432706ad5c19951b))
+
 # [1.41.0-develop.8](https://github.com/WatWowMap/ReactMap/compare/v1.41.0-develop.7...v1.41.0-develop.8) (2026-02-18)
 
 
