@@ -20,6 +20,7 @@ import { getTimeUntil } from '@utils/getTimeUntil'
 import { normalizeCategory } from '@utils/normalizeCategory'
 import { getS2Polygon } from '@utils/getS2Polygon'
 import { getFormDisplay } from '@utils/getFormDisplay'
+import { getWildFilterId } from '@utils/getWildFilterId'
 
 import { PokemonPopup } from './PokemonPopup'
 import { basicPokemonMarker, fancyPokemonMarker } from './pokemonMarker'
@@ -46,7 +47,7 @@ const getGlowStatus = (pkmn, userSettings) => {
  * @returns
  */
 const BasePokemonTile = (pkmn) => {
-  const internalId = `${pkmn.pokemon_id}-${pkmn.form}`
+  const internalId = getWildFilterId(pkmn.pokemon_id, pkmn.form)
 
   const [markerRef, setMarkerRef] = React.useState(null)
 

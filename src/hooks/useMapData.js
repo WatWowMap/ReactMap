@@ -4,6 +4,7 @@ import { useQuery } from '@apollo/client'
 
 import { GET_MAP_DATA } from '@services/queries/available'
 import { deepMerge } from '@utils/deepMerge'
+import { getWildFilterId } from '@utils/getWildFilterId'
 import { UAssets } from '@services/Assets'
 import { useMemory } from '@store/useMemory'
 import { useStorage } from '@store/useStorage'
@@ -128,6 +129,22 @@ export function useMapData(once = false) {
             }
           },
         )
+        const pokemonFilters = newFilters?.pokemon?.filter
+        if (pokemonFilters?.['132-0']) {
+          Object.keys(pokemonFilters)
+            .filter(
+              (key) =>
+                key !== '132-0' &&
+                getWildFilterId(...key.split('-', 2)) === '132-0',
+            )
+            .forEach((key) => {
+              pokemonFilters['132-0'] = {
+                ...pokemonFilters['132-0'],
+                ...pokemonFilters[key],
+              }
+              delete pokemonFilters[key]
+            })
+        }
         const defaultEnabled = prev.filters?.pokemon?.filter?.global?.enabled
         const serverEnabled = filters.pokemon?.filter?.global?.enabled
         if (
