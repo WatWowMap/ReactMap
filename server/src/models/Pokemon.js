@@ -899,7 +899,9 @@ class Pokemon extends Model {
         // Normalize them to a single wild-filter key for the Pokémon drawer.
         const key = getWildFilterKey(pkmn.id, pkmn.form)
         acc.available.add(key)
-        acc.rarity.set(key, (acc.rarity.get(key) || 0) + (pkmn.count || 0))
+        const current = Number(acc.rarity.get(key) ?? 0)
+        const count = Number(pkmn.count ?? 0)
+        acc.rarity.set(key, current + count)
         return acc
       },
       { available: new Set(), rarity: new Map() },
