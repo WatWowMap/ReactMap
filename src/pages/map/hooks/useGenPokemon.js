@@ -3,6 +3,7 @@ import { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { useMemory } from '@store/useMemory'
+import { getWildFilterId } from '@utils/getWildFilterId'
 
 export function useGenPokemon() {
   const { t } = useTranslation()
@@ -29,7 +30,10 @@ export function useGenPokemon() {
       const pokeName = t(`poke_${i}`)
       Object.entries(pkmn.forms).forEach(([j, form]) => {
         const formName = t(`form_${j}`)
-        const id = `${i}-${j}`
+        const id = getWildFilterId(i, j)
+        if (tempObj.pokemon[id]) {
+          return
+        }
         const formTypes = (form.types || pkmn.types || []).map(
           (x) => `poke_type_${x}`,
         )

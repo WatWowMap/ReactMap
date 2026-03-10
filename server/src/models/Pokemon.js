@@ -25,12 +25,11 @@ const {
   BASE_KEYS,
 } = require('../filters/pokemon/constants')
 const { PkmnBackend } = require('../filters/pokemon/Backend')
+const {
+  DITTO_ID,
+  getWildFilterKey,
+} = require('../filters/pokemon/getWildFilterKey')
 const { state } = require('../services/state')
-
-const DITTO_ID = 132
-
-const getPokemonFilterKey = (pokemonId, form) =>
-  pokemonId === DITTO_ID ? `${DITTO_ID}-0` : `${pokemonId}-${form}`
 
 class Pokemon extends Model {
   static get tableName() {
@@ -169,7 +168,12 @@ class Pokemon extends Model {
     const pokemonForms = []
     Object.values(filterMap).forEach((filter) => {
       pokemonIds.push(filter.pokemon)
-      pokemonForms.push(filter.form)
+      if (!(filter.pokemon === DITTO_ID && filter.form === 0)) {
+        // Wild Ditto uses a synthetic canonical filter form. Keep the SQL
+        // prefilter species-only here so disguise form ids don't get turned
+        // into `form = 0` broad matches.
+        pokemonForms.push(filter.form)
+      }
       if (
         !queryPvp &&
         config
@@ -260,8 +264,12 @@ class Pokemon extends Model {
           } else {
             ivOr.whereNull('pokemon_id')
           }
-          ivOr.orWhereIn('pokemon_id', pokemonIds)
-          ivOr.orWhereIn('pokemon.form', pokemonForms)
+          if (pokemonIds.length) {
+            ivOr.orWhereIn('pokemon_id', pokemonIds)
+          }
+          if (pokemonForms.length) {
+            ivOr.orWhereIn('pokemon.form', pokemonForms)
+          }
         }
         if (onlyZeroIv && ivs) {
           ivOr.orWhere(isMad ? raw(IV_CALC) : 'iv', 0)
@@ -359,7 +367,7 @@ class Pokemon extends Model {
     // form checker
     for (let i = 0; i < results.length; i += 1) {
       const pkmn = results[i]
-      const id = getPokemonFilterKey(pkmn.pokemon_id, pkmn.form)
+      const id = getWildFilterKey(pkmn.pokemon_id, pkmn.form)
       const filter = filterMap[id] || globalFilter
       let noPvp = true
 
@@ -439,8 +447,7 @@ class Pokemon extends Model {
     for (let i = 0; i < pvpResults.length; i += 1) {
       const pkmn = pvpResults[i]
       const filter =
-        filterMap[getPokemonFilterKey(pkmn.pokemon_id, pkmn.form)] ||
-        globalFilter
+        filterMap[getWildFilterKey(pkmn.pokemon_id, pkmn.form)] || globalFilter
       const result = filter.build(pkmn)
       if (filter.valid(result)) {
         finalResults.push(result)
@@ -803,13 +810,13 @@ class Pokemon extends Model {
     const built = filtered
       .map((item) => {
         const filter =
-          filterMap[getPokemonFilterKey(item.pokemon_id, item.form)] ||
+          filterMap[getWildFilterKey(item.pokemon_id, item.form)] ||
           globalFilter
         return filter.build(item)
       })
       .filter((pkmn) => {
         const filter =
-          filterMap[getPokemonFilterKey(pkmn.pokemon_id, pkmn.form)] ||
+          filterMap[getWildFilterKey(pkmn.pokemon_id, pkmn.form)] ||
           globalFilter
         return filter.valid(pkmn)
       })
@@ -886,14 +893,22 @@ class Pokemon extends Model {
       secret,
       httpAuth,
     )
-    available.forEach((pkmn) => {
-      if (pkmn.id === DITTO_ID) pkmn.form = 0
-    })
+    const normalizedAvailable = available.reduce(
+      (acc, pkmn) => {
+        // Wild Ditto reports disguise form ids here, not true Ditto form ids.
+        // Normalize them to a single wild-filter key for the Pokémon drawer.
+        const key = getWildFilterKey(pkmn.id, pkmn.form)
+        acc.available.add(key)
+        const current = Number(acc.rarity.get(key) ?? 0)
+        const count = Number(pkmn.count ?? 0)
+        acc.rarity.set(key, current + count)
+        return acc
+      },
+      { available: new Set(), rarity: new Map() },
+    )
     return {
-      available: available.map((pkmn) => `${pkmn.id}-${pkmn.form}`),
-      rarity: Object.fromEntries(
-        available.map((pkmn) => [`${pkmn.id}-${pkmn.form}`, pkmn.count]),
-      ),
+      available: [...normalizedAvailable.available],
+      rarity: Object.fromEntries(normalizedAvailable.rarity),
     }
   }
 

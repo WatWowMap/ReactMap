@@ -4,6 +4,7 @@
 const config = require('@rm/config')
 const { log, TAGS } = require('@rm/logger')
 const { AND_KEYS, BASE_KEYS } = require('./constants')
+const { getWildFilterKey } = require('./getWildFilterKey')
 const {
   deepCompare,
   between,
@@ -372,7 +373,7 @@ class PkmnBackend {
         return true
       if (
         !this.mods.onlyLinkGlobal ||
-        (this.pokemon === pokemon.pokemon_id && this.form === pokemon.form)
+        this.id === getWildFilterKey(pokemon.pokemon_id, pokemon.form)
       ) {
         if (!this.expertFilter || !this.expertGlobal) return true
         if (this.expertFilter(pokemon)) {
