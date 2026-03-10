@@ -1,3 +1,10 @@
+# [1.41.0-develop.10](https://github.com/WatWowMap/ReactMap/compare/v1.41.0-develop.9...v1.41.0-develop.10) (2026-03-10)
+
+
+### Bug Fixes
+
+* ditto shenanigans ([#1193](https://github.com/WatWowMap/ReactMap/issues/1193)) ([647a175](https://github.com/WatWowMap/ReactMap/commit/647a1758e6c3ab0dc4340c7a4b6fe8cc88e00084))
+
 # [1.41.0-develop.9](https://github.com/WatWowMap/ReactMap/compare/v1.41.0-develop.8...v1.41.0-develop.9) (2026-02-19)
 
 
