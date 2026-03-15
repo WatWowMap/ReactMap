@@ -1,3 +1,10 @@
+# [1.41.0-develop.11](https://github.com/WatWowMap/ReactMap/compare/v1.41.0-develop.10...v1.41.0-develop.11) (2026-03-15)
+
+
+### Bug Fixes
+
+* sentry node version ([8640ee0](https://github.com/WatWowMap/ReactMap/commit/8640ee0da68cc2a23e4d12e472b109a6628507c6))
+
 # [1.41.0-develop.10](https://github.com/WatWowMap/ReactMap/compare/v1.41.0-develop.9...v1.41.0-develop.10) (2026-03-10)
 
 
