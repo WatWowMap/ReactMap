@@ -27,6 +27,7 @@ import { Img, PokemonImg } from '@components/Img'
 import { useFormatStore } from '@store/useFormatStore'
 import { useRelativeTimer } from '@hooks/useRelativeTime'
 import { useAnalytics } from '@hooks/useAnalytics'
+import { BackgroundCard } from '@components/popups/BackgroundCard'
 import { Title } from '@components/popups/Title'
 import {
   CollapseWithState,
@@ -39,6 +40,7 @@ import { getTimeUntil } from '@utils/getTimeUntil'
 import { getFormDisplay } from '@utils/getFormDisplay'
 import { CopyCoords } from '@components/popups/Coords'
 import Tooltip from '@mui/material/Tooltip'
+import { usePokemonBackgroundVisuals } from '@hooks/usePokemonBackgroundVisuals'
 
 import { useGetStationMons } from './useGetStationMons'
 
@@ -477,44 +479,134 @@ function StationContent({ start_time, end_time, battle_end, id }) {
 /** @param {import('@rm/types').Station} props */
 function StationMons({ id, updated }) {
   const { t: tId } = useTranslateById()
+  const { t } = useTranslation()
   const mons = useGetStationMons(id, updated)
   const icons = useMemory((s) => s.Icons)
+  const resolveBackgroundVisual = usePokemonBackgroundVisuals()
+  const bestBuddyIcon = icons?.getMisc?.('bestbuddy')
+  const scrollerEl = React.useRef(/** @type {HTMLElement | null} */ (null))
+  const resizeObserver = React.useRef(
+    /** @type {ResizeObserver | null} */ (null),
+  )
+  const [iconSize, setIconSize] = React.useState(40)
+  const columns = 5
+  const maxRows = 3
+  const visibleRows = Math.min(
+    maxRows,
+    Math.max(1, Math.ceil(mons.length / columns)),
+  )
+  const gridHeight = visibleRows * iconSize
+
+  const recomputeIconSize = React.useCallback(() => {
+    const el = scrollerEl.current
+    if (!el) return
+    const perColumn = Math.floor(el.clientWidth / columns)
+    const nextSize = Math.min(40, perColumn || 40)
+    setIconSize((prev) => (prev === nextSize ? prev : nextSize))
+  }, [columns])
+
+  const handleScrollerRef = React.useCallback(
+    (ref) => {
+      if (resizeObserver.current) {
+        resizeObserver.current.disconnect()
+        resizeObserver.current = null
+      }
+      scrollerEl.current = ref
+      if (ref) {
+        recomputeIconSize()
+        if (typeof ResizeObserver !== 'undefined') {
+          const observer = new ResizeObserver(() => recomputeIconSize())
+          observer.observe(ref)
+          resizeObserver.current = observer
+        }
+      }
+    },
+    [recomputeIconSize],
+  )
+
+  React.useLayoutEffect(() => {
+    recomputeIconSize()
+  }, [mons.length, recomputeIconSize])
 
   return (
     <CardContent
-      sx={{ m: 0, p: 0, height: 130, pb: 0, '&:last-child': { pb: 0 } }}
+      sx={{
+        m: 0,
+        p: 0,
+        height: gridHeight,
+        pb: 0,
+        '&:last-child': { pb: 0 },
+      }}
     >
-      <VirtualGrid data={mons} xs={1} context={{ columns: 5 }}>
+      <VirtualGrid
+        data={mons}
+        xs={1}
+        context={{ columns }}
+        scrollerRef={handleScrollerRef}
+      >
         {(index, mon) => {
           const caption = tId(`${mon.pokemon_id}-${mon.form}`)
+          const visuals = resolveBackgroundVisual(mon.background)
+          const { hasBackground } = visuals
+          const backgroundTooltip = visuals.backgroundMeta?.tooltip
+          const tooltipTitle = backgroundTooltip ? (
+            <>
+              {caption}
+              <br />
+              {backgroundTooltip}
+            </>
+          ) : (
+            caption
+          )
           return (
-            <Box
-              display="flex"
-              flexDirection="column"
-              alignItems="center"
-              justifyContent="flex-end"
-              p={1}
-              height="100%"
+            <BackgroundCard
+              visuals={hasBackground ? visuals : undefined}
+              tooltip={tooltipTitle}
+              contentProps={{
+                sx: {
+                  mx: 'auto',
+                  width: iconSize,
+                  height: iconSize,
+                },
+              }}
             >
-              <Tooltip title={caption} arrow placement="top">
-                <Img
-                  key={index}
-                  src={icons.getPokemon(
-                    mon.pokemon_id,
-                    mon.form,
-                    0,
-                    mon.gender,
-                    mon.costume,
-                    0,
-                    false,
-                    mon.bread_mode,
-                  )}
-                  alt={caption}
-                  maxHeight={35}
-                  maxWidth={35}
-                />
-              </Tooltip>
-            </Box>
+              <Box
+                display="flex"
+                flexDirection="column"
+                alignItems="center"
+                justifyContent="center"
+                width="100%"
+                height="100%"
+              >
+                <Box
+                  position="relative"
+                  display="flex"
+                  alignItems="center"
+                  justifyContent="center"
+                  sx={{
+                    width: iconSize,
+                    height: iconSize,
+                  }}
+                >
+                  <Img
+                    key={index}
+                    src={icons.getPokemonByDisplay(mon.pokemon_id, mon)}
+                    alt={caption}
+                    maxHeight="100%"
+                    maxWidth="100%"
+                  />
+                  {mon.badge === 1 && bestBuddyIcon ? (
+                    <Img
+                      src={bestBuddyIcon}
+                      alt={t('best_buddy')}
+                      maxHeight={12}
+                      maxWidth={12}
+                      style={{ position: 'absolute', top: 0, right: 0 }}
+                    />
+                  ) : null}
+                </Box>
+              </Box>
+            </BackgroundCard>
           )
         }}
       </VirtualGrid>

@@ -6,8 +6,8 @@ import ListItemText from '@mui/material/ListItemText'
 import MenuItem from '@mui/material/MenuItem'
 import { useTranslation } from 'react-i18next'
 
-import { useMemory } from '@store/useMemory'
 import { useDeepStore, useStorage } from '@store/useStorage'
+import { useGetAvailable } from '@hooks/useGetAvailable'
 import { FCSelect } from '@components/inputs/FCSelect'
 
 import { CollapsibleItem } from './components/CollapsibleItem'
@@ -15,7 +15,7 @@ import { SelectorListMemo } from './components/SelectorList'
 
 function StationLevels() {
   const { t } = useTranslation()
-  const available = useMemory((s) => s.available.stations)
+  const { available } = useGetAvailable('stations')
   const enabled = useStorage(
     (s) =>
       !!s.filters?.stations?.maxBattles && !s.filters?.stations?.allStations,
@@ -24,6 +24,20 @@ function StationLevels() {
     'filters.stations.battleTier',
     'all',
   )
+
+  const battleTiers = React.useMemo(() => {
+    const availableTiers = available
+      .filter((x) => x.startsWith('j'))
+      .map((y) => +y.slice(1))
+    if (filters === 'all') return availableTiers
+
+    const storedTier = Number(filters)
+    if (Number.isNaN(storedTier) || availableTiers.includes(storedTier)) {
+      return availableTiers
+    }
+    return [storedTier, ...availableTiers]
+  }, [available, filters])
+
   return (
     <CollapsibleItem open={enabled}>
       <ListItem
@@ -36,12 +50,7 @@ function StationLevels() {
               setFilters(e.target.value === 'all' ? 'all' : e.target.value)
             }
           >
-            {[
-              'all',
-              ...available
-                .filter((x) => x.startsWith('j'))
-                .map((y) => +y.slice(1)),
-            ].map((tier, i) => (
+            {['all', ...battleTiers].map((tier, i) => (
               <MenuItem key={tier} dense value={tier}>
                 {t(i ? `max_battle_${tier}_plural` : 'disabled')}
               </MenuItem>

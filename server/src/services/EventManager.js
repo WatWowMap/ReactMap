@@ -415,6 +415,11 @@ class EventManager extends Logger {
       if (!Number.isNaN(parseInt(item.charAt(0)))) {
         const [id, form] = item.split('-')
         const formId = form || '0'
+        if (category === 'pokemon' && id === '132' && formId === '0') {
+          // Wild Ditto uses a synthetic filter key here. Do not backfill it
+          // into the masterfile as a real form entry.
+          return
+        }
         if (!this.masterfile.pokemon[id]) {
           this.masterfile.pokemon[id] = {
             name: '',

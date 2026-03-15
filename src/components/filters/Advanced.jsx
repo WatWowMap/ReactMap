@@ -126,7 +126,9 @@ export function AdvancedFilter() {
           category === 'pokemon' || (!id.startsWith('l') && !id.startsWith('i'))
             ? t('advanced')
             : t('set_size')
-        } - ${tId(id)}`}
+        } - ${tId(id, {
+          omitFormSuffix: true,
+        })}`}
         action={() => toggleClose(false)}
       />
       <DialogContent sx={{ mt: 3 }}>

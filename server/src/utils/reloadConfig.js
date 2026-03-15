@@ -5,7 +5,7 @@ const { log, TAGS } = require('@rm/logger')
 
 const { state } = require('../services/state')
 const { bindConnections } = require('../models')
-const { loadLatestAreas } = require('../services/areas')
+const { loadCachedAreas, loadLatestAreas } = require('../services/areas')
 const { loadAuthStrategies } = require('../routes/authRouter')
 const { deepCompare } = require('./deepCompare')
 
@@ -52,6 +52,10 @@ async function reloadConfig() {
     const newConfig = require('@rm/config')
 
     const { areas, ...oldWithoutAreas } = oldConfig
+    const primedAreas = areas || loadCachedAreas()
+    // Prime areas early so config.getSafe('areas') never fails during reload.
+    newConfig.setAreas(primedAreas)
+    oldWithoutAreas.areas = primedAreas
 
     const { report, areEqual, changed } = deepCompare(
       oldWithoutAreas,
@@ -69,8 +73,6 @@ async function reloadConfig() {
       !report.manualAreas.areEqual
     ) {
       newConfig.setAreas(await loadLatestAreas())
-    } else {
-      newConfig.setAreas(areas)
     }
 
     if (areEqual) {

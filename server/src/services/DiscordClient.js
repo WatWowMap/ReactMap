@@ -87,23 +87,36 @@ class DiscordClient extends AuthClient {
     this.client.login(this.strategy.botToken)
   }
 
-  /** @param {string} guildId @param {string} userId */
+  /**
+   * @param {string} guildId
+   * @param {string} userId
+   * @returns {Promise<string[]>}
+   */
   async getUserRoles(guildId, userId) {
     try {
-      const members = await this.client.guilds.cache
-        .get(guildId)
-        ?.members.fetch()
-      if (members) {
-        const member = members.get(userId)
-        return member?.roles.cache.map((role) => role.id) || []
-      }
-      return []
+      const guild =
+        this.client.guilds.cache.get(guildId) ||
+        (await this.client.guilds.fetch(guildId))
+      const member = await guild?.members.fetch(userId)
+      return member?.roles.cache.map((role) => role.id) || []
     } catch (e) {
+      const code =
+        e && typeof e === 'object' && 'code' in e ? Number(e.code) : null
+      if (code === 10007) {
+        this.log.debug(
+          'Discord member not found in guild',
+          guildId,
+          'for user',
+          userId,
+        )
+        return []
+      }
       this.log.error(
         'Failed to get roles in guild',
         guildId,
         'for user',
         userId,
+        e,
       )
     }
     return []

@@ -33,6 +33,7 @@ import { GET_TAPPABLE_BY_ID } from '@services/queries/tappable'
 import { usePokemonBackgroundVisual } from '@hooks/usePokemonBackgroundVisuals'
 import { BackgroundCard } from '@components/popups/BackgroundCard'
 import { getFormDisplay } from '@utils/getFormDisplay'
+import { getWildFilterId } from '@utils/getWildFilterId'
 
 const rowClass = { width: 30, fontWeight: 'bold' }
 
@@ -286,6 +287,7 @@ export function PokemonPopup({ pokemon, iconUrl, isTutorial = false }) {
         metaData={metaData}
         perms={pokePerms}
         timeOfDay={timeOfDay}
+        backgroundVisuals={backgroundVisuals}
       />
       <ShinyOdds shinyStats={shinyStats} />
       <Footer
@@ -345,6 +347,7 @@ const Header = ({ pokemon, metaData, iconUrl, userSettings, isTutorial }) => {
 
   const [anchorEl, setAnchorEl] = React.useState(null)
   const { id, pokemon_id, form, display_pokemon_id } = pokemon
+  const filterKey = getWildFilterId(pokemon_id, form)
 
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget)
@@ -362,8 +365,7 @@ const Header = ({ pokemon, metaData, iconUrl, userSettings, isTutorial }) => {
   const handleExclude = () => {
     setAnchorEl(null)
     if (filters?.pokemon?.filter) {
-      const key = `${pokemon_id}-${form}`
-      setDeepStore(`filters.pokemon.filter.${key}.enabled`, false)
+      setDeepStore(`filters.pokemon.filter.${filterKey}.enabled`, false)
     }
   }
 
@@ -381,10 +383,7 @@ const Header = ({ pokemon, metaData, iconUrl, userSettings, isTutorial }) => {
     { name: 'timer', action: handleTimer },
     { name: 'hide', action: handleHide },
   ]
-  if (
-    isTutorial ||
-    filters?.pokemon?.filter?.[`${pokemon_id}-${form}`]?.enabled
-  ) {
+  if (isTutorial || filters?.pokemon?.filter?.[filterKey]?.enabled) {
     options.push({ name: 'exclude', action: handleExclude })
   }
   const pokeName = t(`poke_${metaData.pokedexId}`)
@@ -569,12 +568,17 @@ const TappableOrigin = ({ tappable, loading }) => {
   )
 }
 
-const Info = ({ pokemon, metaData, perms, timeOfDay }) => {
+const Info = ({ pokemon, metaData, perms, timeOfDay, backgroundVisuals }) => {
   const Icons = useMemory((s) => s.Icons)
   const { t } = useTranslation()
   const { gender, size, weather, form } = pokemon
   const formTypes = metaData?.forms?.[form]?.types || metaData?.types || []
   const darkMode = useStorage((s) => s.darkMode)
+  const iconStyles = backgroundVisuals?.styles?.icon
+  const hasBackground = Boolean(backgroundVisuals?.hasBackground)
+  const weatherIconTimeOfDay = hasBackground ? 'night' : timeOfDay
+  const weatherIconUrl =
+    Icons?.getWeather?.(weather, weatherIconTimeOfDay) || ''
   return (
     <Grid
       xs={perms.iv ? 3 : 11}
@@ -585,13 +589,39 @@ const Info = ({ pokemon, metaData, perms, timeOfDay }) => {
     >
       {weather != 0 && perms.iv && (
         <Grid
-          className={`grid-item ${darkMode ? '' : 'darken-image'}`}
           style={{
             height: 24,
             width: 24,
-            backgroundImage: `url(${Icons.getWeather(weather, timeOfDay)})`,
+            ...(iconStyles || {}),
           }}
-        />
+        >
+          <div
+            className={
+              hasBackground
+                ? 'grid-item'
+                : `grid-item ${darkMode ? '' : 'darken-image'}`
+            }
+            style={{
+              height: '100%',
+              width: '100%',
+              ...(hasBackground
+                ? {
+                    WebkitMaskImage: `url(${weatherIconUrl})`,
+                    maskImage: `url(${weatherIconUrl})`,
+                    WebkitMaskRepeat: 'no-repeat',
+                    maskRepeat: 'no-repeat',
+                    WebkitMaskPosition: 'center',
+                    maskPosition: 'center',
+                    WebkitMaskSize: 'contain',
+                    maskSize: 'contain',
+                    backgroundColor: '#fff',
+                  }
+                : {
+                    backgroundImage: `url(${weatherIconUrl})`,
+                  }),
+            }}
+          />
+        </Grid>
       )}
       {!!gender && (
         <Grid textAlign="center">

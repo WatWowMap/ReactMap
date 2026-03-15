@@ -39,6 +39,7 @@ import {
   usePokemonBackgroundVisuals,
   usePokemonBackgroundVisual,
 } from '@hooks/usePokemonBackgroundVisuals'
+import { resolveShowcaseEventIcon } from './resolveShowcaseEventIcon'
 
 /**
  *
@@ -200,6 +201,10 @@ export function PokestopPopup({
                   {events.map(({ showcase_rankings, ...event }, index) => {
                     const { contest_entries = [], ...showcase } =
                       showcase_rankings || { contest_entries: [] }
+                    const showcaseIcon =
+                      event.display_type === 9
+                        ? resolveShowcaseEventIcon(event, Icons)
+                        : null
                     return (
                       <React.Fragment
                         key={`${event.display_type}-${event.event_expire_timestamp}`}
@@ -220,19 +225,16 @@ export function PokestopPopup({
                               : ''
                           }
                           icon={
-                            event.showcase_pokemon_id ? (
+                            showcaseIcon?.tooltipKey ? (
                               <NameTT
-                                key={event.showcase_pokemon_id}
-                                title={[`poke_${event.showcase_pokemon_id}`]}
+                                key={showcaseIcon.tooltipKey}
+                                title={[showcaseIcon.tooltipKey]}
                               >
                                 <div className="invasion-reward">
                                   <img
                                     className="invasion-reward"
                                     alt="invasion reward"
-                                    src={Icons.getPokemon(
-                                      event.showcase_pokemon_id,
-                                      event.showcase_pokemon_form_id,
-                                    )}
+                                    src={showcaseIcon.url}
                                   />
                                   <img
                                     className="invasion-reward-shadow"
@@ -243,30 +245,8 @@ export function PokestopPopup({
                                   />
                                 </div>
                               </NameTT>
-                            ) : event.showcase_pokemon_type_id ? (
-                              <NameTT
-                                key={event.showcase_pokemon_type_id}
-                                title={[
-                                  `poke_type_${event.showcase_pokemon_type_id}`,
-                                ]}
-                              >
-                                <div className="invasion-reward">
-                                  <img
-                                    className="invasion-reward"
-                                    alt="invasion reward"
-                                    src={Icons.getTypes(
-                                      event.showcase_pokemon_type_id,
-                                    )}
-                                  />
-                                  <img
-                                    className="invasion-reward-shadow"
-                                    alt="shadow"
-                                    src={Icons.getEventStops(
-                                      event.display_type,
-                                    )}
-                                  />
-                                </div>
-                              </NameTT>
+                            ) : showcaseIcon ? (
+                              showcaseIcon.url
                             ) : (
                               Icons.getEventStops(event.display_type)
                             )

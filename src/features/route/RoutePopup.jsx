@@ -388,6 +388,24 @@ export function RoutePopup({ end, inline = false, ...props }) {
 }
 
 function DownloadRouteGPX({ route }) {
+  const escapeXml = (value = '') =>
+    String(value).replace(
+      /[<>&'"]/g,
+      (c) =>
+        ({
+          '<': '&lt;',
+          '>': '&gt;',
+          '&': '&amp;',
+          "'": '&apos;',
+          '"': '&quot;',
+        })[c],
+    )
+
+  const sanitizeFilename = (name = '') =>
+    String(name)
+      .replace(/[\\/:*?"<>|]/g, '')
+      .slice(0, 200) || 'route'
+
   const GPXContent = React.useMemo(() => {
     if (!route.waypoints.length) {
       return null
@@ -396,8 +414,8 @@ function DownloadRouteGPX({ route }) {
     return `<?xml version="1.0" encoding="UTF-8"?>
 <gpx version="1.1" creator="ReactMap" xmlns="http://www.topografix.com/GPX/1/1">
   <rte>
-    <name>${route.name}</name>
-    <desc>${route.description}</desc>
+    <name>${escapeXml(route.name)}</name>
+    <desc>${escapeXml(route.description)}</desc>
     ${route.waypoints
       .map(
         (waypoint) =>
@@ -417,7 +435,7 @@ function DownloadRouteGPX({ route }) {
       href={`data:application/gpx;charset=utf-8,${encodeURIComponent(
         GPXContent,
       )}`}
-      download={`${route.name}.gpx`}
+      download={`${sanitizeFilename(route.name)}.gpx`}
       size="small"
       style={{ color: 'inherit' }}
     >

@@ -4,6 +4,7 @@ import { divIcon } from 'leaflet'
 import { basicEqualFn, useMemory } from '@store/useMemory'
 import { useStorage } from '@store/useStorage'
 import { useOpacity } from '@hooks/useOpacity'
+import { resolveShowcaseEventIcon } from './resolveShowcaseEventIcon'
 
 /**
  *
@@ -38,16 +39,24 @@ export function usePokestopMarker({
   )
 
   const getOpacity = useOpacity('pokestops', 'invasion')
-  const [showArBadge, baseIcon, baseSize] = useStorage((s) => {
+  const [
+    showArBadge,
+    showArQuestDotBadge,
+    showNoArQuestDotBadge,
+    baseIcon,
+    baseSize,
+  ] = useStorage((s) => {
     const { filters, userSettings } = s
+    const pokestops = userSettings.pokestops || {}
     return [
-      userSettings.pokestops.showArBadge,
+      pokestops.showArBadge,
+      pokestops.showArQuestDotBadge ?? false,
+      pokestops.showNoArQuestDotBadge ?? true,
       Icons.getPokestops(
         hasLure ? lure_id : 0,
         hasInvasion,
-        hasQuest && userSettings.pokestops.hasQuestIndicator,
-        ar_scan_eligible &&
-          (userSettings.pokestops.showArBadge || !!power_up_level),
+        hasQuest && pokestops.hasQuestIndicator,
+        ar_scan_eligible && (pokestops.showArBadge || !!power_up_level),
         power_up_level,
         hasEvent ? Math.max(...events.map((event) => event.display_type)) : 0,
       ),
@@ -266,8 +275,10 @@ export function usePokestopMarker({
         quest_shiny,
         quest_bread_mode = 0,
         quest_background,
+        with_ar = true,
         key,
       } = quest
+      const showQuestDot = with_ar ? showArQuestDotBadge : showNoArQuestDotBadge
       let questIcon = { url: Icons.getRewards(quest_reward_type) }
       switch (quest_reward_type) {
         case 1:
@@ -346,6 +357,7 @@ export function usePokestopMarker({
       questIcons.unshift({
         ...questIcon,
         rewardType: quest_reward_type,
+        questDotColor: showQuestDot ? (with_ar ? '#1e88e5' : '#9e9e9e') : '',
       })
       questSizes.unshift(Icons.getSize('reward', filters[key]?.size))
       popupYOffset += rewardMod.offsetY - 1
@@ -364,34 +376,14 @@ export function usePokestopMarker({
           showcaseSizes.unshift(Icons.getSize('event', filters.b7?.size))
         }
       } else if (event.display_type === 9) {
-        if (event.showcase_pokemon_id) {
-          showcaseIcons.unshift({
-            url: Icons.getPokemon(
-              event.showcase_pokemon_id,
-              event.showcase_pokemon_form_id,
-            ),
-            decoration: true,
-          })
-          showcaseSizes.unshift(
-            Icons.getSize(
-              'event',
-              filters[
-                `f${event.showcase_pokemon_id}-${event.showcase_pokemon_form_id}`
-              ]?.size,
-            ),
-          )
-        } else if (event.showcase_pokemon_type_id) {
-          showcaseIcons.unshift({
-            url: Icons.getTypes(event.showcase_pokemon_type_id),
-            decoration: true,
-          })
-          showcaseSizes.unshift(
-            Icons.getSize(
-              'event',
-              filters[`h${event.showcase_pokemon_type_id}`]?.size,
-            ),
-          )
-        }
+        const showcaseIcon = resolveShowcaseEventIcon(event, Icons)
+        showcaseIcons.unshift({
+          url: showcaseIcon.url,
+          decoration: showcaseIcon.decoration,
+        })
+        showcaseSizes.unshift(
+          Icons.getSize('event', filters[showcaseIcon.sizeFilterKey]?.size),
+        )
       }
       popupYOffset += eventMod.offsetY - 1
       popupX += eventMod.popupX
@@ -425,6 +417,7 @@ export function usePokestopMarker({
       amount: icon.amount,
       rewardType: icon.rewardType,
       backgroundUrl: icon.backgroundUrl,
+      questDotColor: icon.questDotColor,
     })
   })
 
@@ -477,6 +470,15 @@ export function usePokestopMarker({
                 />
               `
           : ''
+      const questDotHtml =
+        item.type === 'quest' && item.questDotColor
+          ? `
+                <span
+                  class="pokestop-marker__quest-dot"
+                  style="background-color: ${item.questDotColor};"
+                ></span>
+              `
+          : ''
       const backgroundStyle = item.backgroundUrl
         ? `
                 background-image: url(${item.backgroundUrl});
@@ -510,6 +512,7 @@ export function usePokestopMarker({
                 style="${opacityStyle}"
               />
               ${amountHtml}
+              ${questDotHtml}
               ${decorationHtml}
             </div>
       `

@@ -829,6 +829,14 @@
         "__name": "CLIENT_SIDE_OPTIONS_POKESTOPS_HAS_QUEST_INDICATOR",
         "__format": "boolean"
       },
+      "showArQuestDotBadge": {
+        "__name": "CLIENT_SIDE_OPTIONS_POKESTOPS_SHOW_AR_QUEST_DOT_BADGE",
+        "__format": "boolean"
+      },
+      "showNoArQuestDotBadge": {
+        "__name": "CLIENT_SIDE_OPTIONS_POKESTOPS_SHOW_NO_AR_QUEST_DOT_BADGE",
+        "__format": "boolean"
+      },
       "showArBadge": {
         "__name": "CLIENT_SIDE_OPTIONS_POKESTOPS_SHOW_AR_BADGE",
         "__format": "boolean"

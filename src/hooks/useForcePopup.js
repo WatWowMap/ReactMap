@@ -15,7 +15,14 @@ export function useForcePopup(id, ref) {
   const manualParams = useMemory((s) => s.manualParams)
 
   useEffect(() => {
-    if (id === manualParams.id && ref) {
+    const manualId = manualParams?.id
+    if (
+      manualId !== undefined &&
+      manualId !== null &&
+      manualId !== '' &&
+      `${id}` === `${manualId}` &&
+      ref
+    ) {
       ref.openPopup()
       ref.on('popupclose', cleanup)
       return () => {

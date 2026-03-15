@@ -1,5 +1,5 @@
 // @ts-check
-const { expressMiddleware } = require('@apollo/server/express4')
+const { expressMiddleware } = require('@as-integrations/express5')
 const { ApolloServerErrorCode } = require('@apollo/server/errors')
 const { GraphQLError } = require('graphql')
 const { parse } = require('graphql')

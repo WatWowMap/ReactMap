@@ -1,6 +1,6 @@
 {
   "name": "reactmap",
-  "version": "1.40.1",
+  "version": "1.41.0-develop.11",
   "private": true,
   "description": "React based frontend map.",
   "license": "MIT",
@@ -99,7 +99,8 @@
   },
   "dependencies": {
     "@apollo/client": "3.11.4",
-    "@apollo/server": "4.11.0",
+    "@apollo/server": "5.4.0",
+    "@as-integrations/express5": "1.1.2",
     "@emotion/react": "11.14.0",
     "@emotion/styled": "11.13.0",
     "@graphql-tools/graphql-file-loader": "8.0.1",
@@ -140,7 +141,7 @@
     "express-rate-limit": "7.4.0",
     "express-session": "^1.18.1",
     "geo-tz": "^7.0.7",
-    "graphql": "16.9.0",
+    "graphql": "16.11.0",
     "graphql-type-json": "0.3.2",
     "helmet": "7.1.0",
     "i18next": "23.12.3",
@@ -151,7 +152,7 @@
     "leaflet": "1.9.4",
     "leaflet-arrowheads": "^1.4.0",
     "leaflet.locatecontrol": "0.85.1",
-    "lodash": "^4.17.21",
+    "lodash": "^4.17.23",
     "long": "^4.0.0",
     "moment-timezone": "^0.6.0",
     "mysql2": "3.11.0",
@@ -219,7 +220,7 @@
     "tmp": ">=0.2.4"
   },
   "engines": {
-    "node": ">=18",
+    "node": ">=20",
     "yarn": "^1.22.x"
   }
 }

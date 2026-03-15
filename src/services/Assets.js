@@ -383,16 +383,29 @@ export class UAssets {
    * @param {import('@rm/types').PokemonDisplay} pokemonDisplay
    */
   getPokemonByDisplay(pokemonId, pokemonDisplay) {
+    const {
+      form,
+      gender,
+      costume,
+      alignment,
+      shiny,
+      temp_evolution,
+      temp_evolution_finish_ms,
+      bread_mode,
+    } = pokemonDisplay || {}
+    const evolution =
+      temp_evolution_finish_ms && Date.now() > temp_evolution_finish_ms
+        ? 0
+        : temp_evolution
     return this.getPokemon(
       pokemonId,
-      pokemonDisplay.form,
-      Date.now() > pokemonDisplay.temp_evolution_finish_ms
-        ? 0
-        : pokemonDisplay.temp_evolution,
-      pokemonDisplay.gender,
-      pokemonDisplay.costume,
-      pokemonDisplay.alignment,
-      pokemonDisplay.shiny,
+      form,
+      evolution,
+      gender,
+      costume,
+      alignment,
+      shiny,
+      bread_mode,
     )
   }
 

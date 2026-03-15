@@ -1,6 +1,7 @@
 // @ts-check
 const { state } = require('../../services/state')
 const { BaseFilter } = require('../Base')
+const { getWildFilterKey } = require('../pokemon/getWildFilterKey')
 
 /**
  *
@@ -36,20 +37,18 @@ function buildPokemon(defaults, base, custom) {
   Object.entries(state.event.masterfile.pokemon).forEach(([id, pkmn]) => {
     pokemon.quests[`${id}`] = new BaseFilter(defaults.pokestops.pokemon)
     Object.keys(pkmn.forms).forEach((form) => {
-      pokemon.full[`${id}-${form}`] = base
-      pokemon.raids[`${id}-${form}`] = new BaseFilter(defaults.gyms.pokemon)
-      pokemon.stations[`${id}-${form}`] = new BaseFilter(
-        defaults.stations.pokemon,
-      )
-      pokemon.quests[`${id}-${form}`] = new BaseFilter(
-        defaults.pokestops.pokemon,
-      )
+      const filterKey = getWildFilterKey(id, form)
+      const rawKey = `${id}-${form}`
+      pokemon.full[filterKey] = base
+      pokemon.raids[rawKey] = new BaseFilter(defaults.gyms.pokemon)
+      pokemon.stations[rawKey] = new BaseFilter(defaults.stations.pokemon)
+      pokemon.quests[rawKey] = new BaseFilter(defaults.pokestops.pokemon)
       if (state.db.filterContext.Pokestop.hasConfirmedInvasions) {
-        pokemon.rocket[`a${id}-${form}`] = new BaseFilter(
+        pokemon.rocket[`a${rawKey}`] = new BaseFilter(
           defaults.pokestops.invasionPokemon,
         )
       }
-      pokemon.nests[`${id}-${form}`] = new BaseFilter(defaults.nests.allPokemon)
+      pokemon.nests[rawKey] = new BaseFilter(defaults.nests.allPokemon)
     })
     if ('family' in pkmn) {
       if (pkmn.family === +id) {

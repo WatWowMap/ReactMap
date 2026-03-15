@@ -10,7 +10,7 @@ const ALWAYS_SHOW_FORM_POKEMON = new Set([51]) // Dugtrio (51) needs form labels
  * @param {number | string | null | undefined} pokemonId
  * @param {number | string | null | undefined} form
  * @param {number | string | null | undefined} costume
- * @param {{ showDefaultForms?: boolean }} [options]
+ * @param {{ showDefaultForms?: boolean, appendFormSuffix?: boolean }} [options]
  * @returns {string}
  */
 export function getFormDisplay(pokemonId, form, costume, options = {}) {
@@ -34,7 +34,7 @@ export function getFormDisplay(pokemonId, form, costume, options = {}) {
     return `${translate('form')} ${form}`
   }
 
-  const { showDefaultForms = false } = options
+  const { showDefaultForms = false, appendFormSuffix = true } = options
   if (!showDefaultForms) {
     const normalizedPokemonId =
       typeof pokemonId === 'number'
@@ -51,6 +51,8 @@ export function getFormDisplay(pokemonId, form, costume, options = {}) {
     )
       return ''
   }
+
+  if (!appendFormSuffix) return formName
 
   const suffix = ` ${translate('form')}`
   return formName.endsWith(suffix) ? formName : `${formName}${suffix}`
