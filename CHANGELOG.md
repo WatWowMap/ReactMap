@@ -1,3 +1,10 @@
+## [1.41.1](https://github.com/WatWowMap/ReactMap/compare/v1.41.0...v1.41.1) (2026-03-15)
+
+
+### Bug Fixes
+
+* workflow git creds ([e5dc6f9](https://github.com/WatWowMap/ReactMap/commit/e5dc6f90d14fa1afb8a75bb9bdb2246213ff1c88))
+
 # [1.41.0](https://github.com/WatWowMap/ReactMap/compare/v1.40.1...v1.41.0) (2026-03-15)
 
 
