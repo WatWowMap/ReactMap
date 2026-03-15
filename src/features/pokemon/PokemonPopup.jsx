@@ -576,9 +576,8 @@ const Info = ({ pokemon, metaData, perms, timeOfDay, backgroundVisuals }) => {
   const darkMode = useStorage((s) => s.darkMode)
   const iconStyles = backgroundVisuals?.styles?.icon
   const hasBackground = Boolean(backgroundVisuals?.hasBackground)
-  const weatherIconTimeOfDay = hasBackground ? 'night' : timeOfDay
-  const weatherIconUrl =
-    Icons?.getWeather?.(weather, weatherIconTimeOfDay) || ''
+  const weatherIconUrl = Icons?.getWeather?.(weather, timeOfDay) || ''
+  const weatherIconColor = backgroundVisuals?.primaryColor || '#fff'
   return (
     <Grid
       xs={perms.iv ? 3 : 11}
@@ -614,7 +613,7 @@ const Info = ({ pokemon, metaData, perms, timeOfDay, backgroundVisuals }) => {
                     maskPosition: 'center',
                     WebkitMaskSize: 'contain',
                     maskSize: 'contain',
-                    backgroundColor: '#fff',
+                    backgroundColor: weatherIconColor,
                   }
                 : {
                     backgroundImage: `url(${weatherIconUrl})`,
