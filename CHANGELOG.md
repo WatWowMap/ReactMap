@@ -1,3 +1,10 @@
+# [1.41.0-develop.12](https://github.com/WatWowMap/ReactMap/compare/v1.41.0-develop.11...v1.41.0-develop.12) (2026-03-15)
+
+
+### Bug Fixes
+
+* weather icon uses wrong time of day for wild ([5944452](https://github.com/WatWowMap/ReactMap/commit/594445268ca027b8f2b1d9c8edce70208b23c49d))
+
 # [1.41.0-develop.11](https://github.com/WatWowMap/ReactMap/compare/v1.41.0-develop.10...v1.41.0-develop.11) (2026-03-15)
 
 
