@@ -380,10 +380,11 @@ const resolvers = {
               ...parent,
               children: perms.areaRestrictions.includes(parent.name)
                 ? parent.children
-                : parent.children.filter((child) =>
-                    perms.areaRestrictions.includes(child.properties.key) ||
-                    perms.areaRestrictions.includes(child.properties.name) ||
-                    perms.areaRestrictions.includes(child.properties.parent),
+                : parent.children.filter(
+                    (child) =>
+                      perms.areaRestrictions.includes(child.properties.key) ||
+                      perms.areaRestrictions.includes(child.properties.name) ||
+                      perms.areaRestrictions.includes(child.properties.parent),
                   ),
             }))
             .filter((parent) => parent.children.length)

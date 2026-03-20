@@ -12,7 +12,7 @@ function areaPerms(roles) {
   // Map parent names to child keys for easy lookup when parent-based restrictions are used.
   const parentKeyMap = Object.values(areas.scanAreasObj).reduce(
     (acc, feature) => {
-      const parent = feature.properties.parent
+      const { parent } = feature.properties
       if (!parent) return acc
       if (!acc[parent]) acc[parent] = []
       acc[parent].push(feature.properties.key)
