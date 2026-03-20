@@ -103,15 +103,17 @@ export function AreaChild({
             indeterminate={name ? hasSome && !hasAll : false}
             checked={name ? hasAll : scanAreas.includes(feature.properties.key)}
             onClick={(e) => e.stopPropagation()}
-            onChange={() =>
-              setAreas(
-                name
-                  ? childAreas.map((c) => c.properties.key)
-                  : feature.properties.key,
-                allAreas,
-                name ? hasSome : false,
-              )
-            }
+            onChange={() => {
+              const areaKeys = name
+                ? [
+                    ...(feature?.properties?.key
+                      ? [feature.properties.key]
+                      : []),
+                    ...childAreas.map((c) => c.properties.key),
+                  ]
+                : feature.properties.key
+              setAreas(areaKeys, allAreas, name ? hasSome : false)
+            }}
             sx={{
               p: 1,
               color,

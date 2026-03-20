@@ -307,9 +307,10 @@ const applyMutations = (config) => {
   })
 
   config.authentication.areaRestrictions =
-    config.authentication.areaRestrictions.map(({ roles, areas }) => ({
+    config.authentication.areaRestrictions.map(({ roles, areas, parent }) => ({
       roles: roles.flatMap(replaceAliases),
       areas,
+      parent,
     }))
 
   config.authentication.strategies = config.authentication.strategies.map(
