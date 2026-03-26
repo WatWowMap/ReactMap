@@ -18,6 +18,7 @@ import { useMemory } from '@store/useMemory'
  *  feature?: Pick<import('@rm/types').RMFeature, 'properties'>
  *  allAreas?: string[]
  *  childAreas?: Pick<import('@rm/types').RMFeature, 'properties'>[]
+ *  groupedAreas?: Pick<import('@rm/types').RMFeature, 'properties'>[]
  *  borderRight?: boolean
  *  colSpan?: number
  * }} props
@@ -26,6 +27,7 @@ export function AreaChild({
   name,
   feature,
   childAreas,
+  groupedAreas,
   allAreas,
   borderRight,
   colSpan = 1,
@@ -40,11 +42,12 @@ export function AreaChild({
 
   if (!scanAreas) return null
 
+  const groupedChildren = groupedAreas || childAreas || []
   const groupedAreaKeys = [
     ...(feature?.properties?.key && !feature.properties.manual
       ? [feature.properties.key]
       : []),
-    ...(childAreas || [])
+    ...groupedChildren
       .filter((child) => !child.properties.manual)
       .map((child) => child.properties.key),
   ]
@@ -57,7 +60,8 @@ export function AreaChild({
       ? groupedAreaKeys.some((key) => scanAreas.includes(key))
       : false
   const allChildrenManual =
-    !!childAreas?.length && childAreas.every((child) => child.properties.manual)
+    !!groupedChildren.length &&
+    groupedChildren.every((child) => child.properties.manual)
   const hasManual = feature?.properties?.manual || allChildrenManual
   const color =
     hasManual || (name ? !groupedAreaKeys.length : !feature.properties.name)

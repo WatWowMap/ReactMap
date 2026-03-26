@@ -7,19 +7,31 @@ const config = require('@rm/config')
  *   keyDomainMap: Record<string, string>,
  *   parentDomainsMap: Record<string, string[]>,
  *   scopedParentKeyMap: Record<string, string[]>,
+ *   scopedParentAreaKeyMap: Record<string, string>,
  * }}
  */
 function getAreaMaps(scanAreas) {
   return Object.entries(scanAreas).reduce(
     (acc, [domain, featureCollection]) => {
+      /** @type {Record<string, string[]>} */
+      const areaKeysByName = {}
+
       featureCollection.features.forEach((feature) => {
-        const { hidden, key, parent } = feature.properties
+        const { key, name, parent } = feature.properties
         if (!key) return
 
         acc.keyDomainMap[key] = domain
+        if (name && !parent) {
+          if (!areaKeysByName[name]) areaKeysByName[name] = []
+          areaKeysByName[name].push(key)
+        }
+      })
+
+      featureCollection.features.forEach((feature) => {
+        const { hidden, key, parent } = feature.properties
 
         // Hidden children should not widen backend access through parent expansion.
-        if (!parent || hidden) return
+        if (!key || !parent || hidden) return
 
         const scopedKey = `${domain}:${parent}`
         if (!acc.parentDomainsMap[parent]) acc.parentDomainsMap[parent] = []
@@ -30,6 +42,11 @@ function getAreaMaps(scanAreas) {
           acc.scopedParentKeyMap[scopedKey] = []
         }
         acc.scopedParentKeyMap[scopedKey].push(key)
+
+        if (areaKeysByName[parent]?.length === 1) {
+          const [parentAreaKey] = areaKeysByName[parent]
+          acc.scopedParentAreaKeyMap[scopedKey] = parentAreaKey
+        }
       })
       return acc
     },
@@ -37,10 +54,12 @@ function getAreaMaps(scanAreas) {
      *   keyDomainMap: Record<string, string>,
      *   parentDomainsMap: Record<string, string[]>,
      *   scopedParentKeyMap: Record<string, string[]>,
+     *   scopedParentAreaKeyMap: Record<string, string>,
      * }} */ ({
       keyDomainMap: {},
       parentDomainsMap: {},
       scopedParentKeyMap: {},
+      scopedParentAreaKeyMap: {},
     }),
   )
 }
@@ -62,11 +81,13 @@ function getAreaMaps(scanAreas) {
 function pushAreaKeys(perms, target, areas, areaMaps, includeChildren = false) {
   if (!target) return
 
-  if (areas.names.has(target)) {
+  const parentFeature = includeChildren ? areas.scanAreasObj[target] : null
+
+  if (areas.names.has(target) || parentFeature?.properties?.key === target) {
     perms.push(target)
 
     if (includeChildren) {
-      const parentName = areas.scanAreasObj[target]?.properties?.name
+      const parentName = parentFeature?.properties?.name
       const domain = areaMaps.keyDomainMap[target]
       const scopedKey =
         parentName && domain ? `${domain}:${parentName}` : undefined
@@ -85,6 +106,9 @@ function pushAreaKeys(perms, target, areas, areaMaps, includeChildren = false) {
   // expand children when the parent label resolves to exactly one domain.
   if (includeChildren && areaMaps.parentDomainsMap[target]?.length === 1) {
     const scopedKey = `${areaMaps.parentDomainsMap[target][0]}:${target}`
+    if (areaMaps.scopedParentAreaKeyMap[scopedKey]) {
+      perms.push(areaMaps.scopedParentAreaKeyMap[scopedKey])
+    }
     if (areaMaps.scopedParentKeyMap[scopedKey]) {
       perms.push(...areaMaps.scopedParentKeyMap[scopedKey])
     }
