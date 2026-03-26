@@ -66,7 +66,7 @@ export function AreaChild({
 
   const nameProp =
     name || feature?.properties?.formattedName || feature?.properties?.name
-  const hasExpand = name && !expandAllScanAreas
+  const hasExpand = name && !expandAllScanAreas && !!childAreas?.length
   return (
     <TableCell
       colSpan={colSpan}

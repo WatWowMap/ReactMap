@@ -355,16 +355,18 @@ const resolvers = {
     scanAreas: (_, _args, { req, perms }) => {
       if (perms?.scanAreas) {
         const scanAreas = config.getAreas(req, 'scanAreas')
+        const canAccessArea = (properties) =>
+          !perms.areaRestrictions.length ||
+          perms.areaRestrictions.includes(properties.key) ||
+          perms.areaRestrictions.includes(properties.name) ||
+          perms.areaRestrictions.includes(properties.parent)
+
         return [
           {
             ...scanAreas,
             features: scanAreas.features.filter(
               (feature) =>
-                !feature.properties.hidden &&
-                (!perms.areaRestrictions.length ||
-                  perms.areaRestrictions.includes(feature.properties.key) ||
-                  perms.areaRestrictions.includes(feature.properties.name) ||
-                  perms.areaRestrictions.includes(feature.properties.parent)),
+                !feature.properties.hidden && canAccessArea(feature.properties),
             ),
           },
         ]
@@ -374,20 +376,32 @@ const resolvers = {
     scanAreasMenu: (_, _args, { req, perms }) => {
       if (perms?.scanAreas) {
         const scanAreas = config.getAreas(req, 'scanAreasMenu')
+        const baseMenu = scanAreas.map((parent) => ({
+          ...parent,
+          details:
+            parent.details && !parent.details.properties.hidden
+              ? parent.details
+              : null,
+        }))
+
         if (perms.areaRestrictions.length) {
-          const filtered = scanAreas
+          const canAccessArea = (properties) =>
+            perms.areaRestrictions.includes(properties.key) ||
+            perms.areaRestrictions.includes(properties.name) ||
+            perms.areaRestrictions.includes(properties.parent)
+
+          const filtered = baseMenu
             .map((parent) => ({
               ...parent,
-              children: perms.areaRestrictions.includes(parent.name)
-                ? parent.children
-                : parent.children.filter(
-                    (child) =>
-                      perms.areaRestrictions.includes(child.properties.key) ||
-                      perms.areaRestrictions.includes(child.properties.name) ||
-                      perms.areaRestrictions.includes(child.properties.parent),
-                  ),
+              details:
+                parent.details && canAccessArea(parent.details.properties)
+                  ? parent.details
+                  : null,
+              children: parent.children.filter((child) =>
+                canAccessArea(child.properties),
+              ),
             }))
-            .filter((parent) => parent.children.length)
+            .filter((parent) => parent.details || parent.children.length)
 
           // // Adds new blanks to account for area restrictions trimming some
           // filtered.forEach(({ children }) => {
@@ -403,7 +417,7 @@ const resolvers = {
           // })
           return filtered
         }
-        return scanAreas.filter((parent) => parent.children.length)
+        return baseMenu.filter((parent) => parent.children.length)
       }
       return []
     },
