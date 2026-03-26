@@ -29,6 +29,11 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           HUSKY: 0
         run: npx semantic-release
+      - name: Configure git
+        if: ${{ github.ref_name == 'main'}}
+        run: |
+          git config --global user.name "turtlesocks-bot"
+          git config --global user.email "turtlesocks-bot@users.noreply.github.com"
       - name: Sync Dev to Main
         if: ${{ github.ref_name == 'main'}}
         env:
