@@ -43,14 +43,9 @@ export function AreaChild({
   if (!scanAreas) return null
 
   const groupedChildren = groupedAreas || childAreas || []
-  const groupedAreaKeys = [
-    ...(feature?.properties?.key && !feature.properties.manual
-      ? [feature.properties.key]
-      : []),
-    ...groupedChildren
-      .filter((child) => !child.properties.manual)
-      .map((child) => child.properties.key),
-  ]
+  const groupedAreaKeys = groupedChildren
+    .filter((child) => !child.properties.manual)
+    .map((child) => child.properties.key)
   const hasAll =
     name && groupedAreaKeys.length
       ? groupedAreaKeys.every((key) => scanAreas.includes(key))
