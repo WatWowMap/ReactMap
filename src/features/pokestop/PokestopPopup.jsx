@@ -40,6 +40,13 @@ import {
   usePokemonBackgroundVisual,
 } from '@hooks/usePokemonBackgroundVisuals'
 import { resolveShowcaseEventIcon } from './resolveShowcaseEventIcon'
+import {
+  INCIDENT_DISPLAY_TYPES,
+  getEventIncidentPriority,
+  getIncidentBlockReason,
+  getInvasionIncidentPriority,
+  isIncidentBlockedBy,
+} from './incidentPriority'
 
 /**
  *
@@ -48,6 +55,9 @@ import { resolveShowcaseEventIcon } from './resolveShowcaseEventIcon'
  *   hasInvasion: boolean
  *   hasQuest: boolean
  *   hasEvent: boolean
+ *   popupInvasions: import('@rm/types').Invasion[]
+ *   popupEvents: import('@rm/types').Event[]
+ *   incidentBlocker: { event: { display_type?: number | string | null }, priority: number } | null
  * }} props
  * @returns
  */
@@ -56,11 +66,15 @@ export function PokestopPopup({
   hasInvasion,
   hasQuest,
   hasEvent,
+  popupInvasions,
+  popupEvents,
+  incidentBlocker,
   ...pokestop
 }) {
   const { t } = useTranslation()
   const Icons = useMemory((s) => s.Icons)
-  const { lure_expire_timestamp, lure_id, invasions, events } = pokestop
+  const { lure_expire_timestamp, lure_id } = pokestop
+  const incidentBlockReason = getIncidentBlockReason(incidentBlocker)
 
   useAnalytics(
     'Popup',
@@ -166,7 +180,7 @@ export function PokestopPopup({
               )}
               {hasInvasion && (
                 <>
-                  {invasions.map((invasion, index) => (
+                  {popupInvasions.map((invasion, index) => (
                     <React.Fragment
                       key={`${invasion.grunt_type}-${invasion.incident_expire_timestamp}`}
                     >
@@ -180,7 +194,14 @@ export function PokestopPopup({
                           invasion.grunt_type,
                           invasion.confirmed,
                         )}
-                        disabled={pokestop.hasShowcase ? 'showcase_block' : ''}
+                        disabled={
+                          isIncidentBlockedBy(
+                            incidentBlocker,
+                            getInvasionIncidentPriority(invasion),
+                          )
+                            ? incidentBlockReason
+                            : ''
+                        }
                         tt={
                           invasion.grunt_type === 44 && !invasion.confirmed
                             ? [`grunt_a_${invasion.grunt_type}`, ' / ', 'decoy']
@@ -198,11 +219,12 @@ export function PokestopPopup({
                   {(hasQuest || hasLure || hasInvasion) && (
                     <Divider light flexItem className="popup-divider" />
                   )}
-                  {events.map(({ showcase_rankings, ...event }, index) => {
+                  {popupEvents.map(({ showcase_rankings, ...event }, index) => {
+                    const displayType = Number(event.display_type ?? 0)
                     const { contest_entries = [], ...showcase } =
                       showcase_rankings || { contest_entries: [] }
                     const showcaseIcon =
-                      event.display_type === 9
+                      displayType === INCIDENT_DISPLAY_TYPES.SHOWCASE
                         ? resolveShowcaseEventIcon(event, Icons)
                         : null
                     return (
@@ -215,13 +237,16 @@ export function PokestopPopup({
                         <TimeTile
                           expireTime={event.event_expire_timestamp}
                           expandKey={
-                            event.display_type === 9
-                              ? `event_${event.display_type}`
+                            displayType === INCIDENT_DISPLAY_TYPES.SHOWCASE
+                              ? `event_${displayType}`
                               : undefined
                           }
                           disabled={
-                            event.display_type !== 9 && pokestop.hasShowcase
-                              ? 'showcase_block'
+                            isIncidentBlockedBy(
+                              incidentBlocker,
+                              getEventIncidentPriority(event),
+                            )
+                              ? incidentBlockReason
                               : ''
                           }
                           icon={
@@ -239,20 +264,18 @@ export function PokestopPopup({
                                   <img
                                     className="invasion-reward-shadow"
                                     alt="shadow"
-                                    src={Icons.getEventStops(
-                                      event.display_type,
-                                    )}
+                                    src={Icons.getEventStops(displayType)}
                                   />
                                 </div>
                               </NameTT>
                             ) : showcaseIcon ? (
                               showcaseIcon.url
                             ) : (
-                              Icons.getEventStops(event.display_type)
+                              Icons.getEventStops(displayType)
                             )
                           }
                           tt={t(
-                            `display_type_${event.display_type}`,
+                            `display_type_${displayType}`,
                             t('unknown_event'),
                           )}
                         >

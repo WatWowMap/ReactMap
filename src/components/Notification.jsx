@@ -14,6 +14,7 @@ function SlideTransition(props) {
 
 /** @type {React.CSSProperties} */
 const alertStyle = { textAlign: 'center', color: 'white' }
+const DEFAULT_AUTO_HIDE_DURATION = 5000
 
 /**
  *
@@ -26,6 +27,9 @@ const alertStyle = { textAlign: 'center', color: 'white' }
  *  children?: T extends string ? never : React.ReactNode
  *  cb?: () => void
  *  title?: string
+ *  autoHideDuration?: number | null
+ *  ignoreClickaway?: boolean
+ *  closable?: boolean
  * }} props
  * @returns
  */
@@ -37,34 +41,47 @@ export function Notification({
   children,
   cb,
   title,
+  autoHideDuration = DEFAULT_AUTO_HIDE_DURATION,
+  ignoreClickaway = false,
+  closable = true,
 }) {
   const { t } = useTranslation()
-  const [alert, setAlert] = React.useState(open || false)
+  const [alert, setAlert] = React.useState(!!open)
 
   const handleClose = React.useCallback(() => {
     setAlert(false)
     if (cb) cb()
   }, [cb])
 
-  React.useEffect(() => {
-    setAlert(open)
+  const handleSnackbarClose = React.useCallback(
+    (_, reason) => {
+      if (reason === 'clickaway' && ignoreClickaway) return
+      if (!closable) return
+      handleClose()
+    },
+    [closable, handleClose, ignoreClickaway],
+  )
 
-    if (open) {
+  React.useEffect(() => {
+    setAlert(!!open)
+
+    if (open && typeof autoHideDuration === 'number') {
       const timer = setTimeout(() => {
         handleClose()
-      }, 5000)
+      }, autoHideDuration)
       return () => clearTimeout(timer)
     }
-  }, [open])
+    return undefined
+  }, [autoHideDuration, handleClose, open])
 
   return (
     <Snackbar
       open={alert}
-      onClose={handleClose}
+      onClose={handleSnackbarClose}
       TransitionComponent={SlideTransition}
     >
       <Alert
-        onClose={handleClose}
+        onClose={closable ? handleClose : undefined}
         severity={severity}
         variant="filled"
         style={alertStyle}
