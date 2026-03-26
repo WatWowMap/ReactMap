@@ -2,17 +2,45 @@
 const config = require('@rm/config')
 
 /**
- * @param {Record<string, import('@rm/types').RMFeature>} scanAreasObj
- * @returns {Record<string, string[]>}
+ * @param {Record<string, import('@rm/types').RMGeoJSON>} scanAreas
+ * @returns {{
+ *   keyDomainMap: Record<string, string>,
+ *   parentKeyMap: Record<string, string[]>,
+ *   scopedParentKeyMap: Record<string, string[]>,
+ * }}
  */
-function getParentKeyMap(scanAreasObj) {
-  return Object.values(scanAreasObj).reduce((acc, feature) => {
-    const { key, parent } = feature.properties
-    if (!parent || !key) return acc
-    if (!acc[parent]) acc[parent] = []
-    acc[parent].push(key)
-    return acc
-  }, /** @type {Record<string, string[]>} */ ({}))
+function getAreaMaps(scanAreas) {
+  return Object.entries(scanAreas).reduce(
+    (acc, [domain, featureCollection]) => {
+      featureCollection.features.forEach((feature) => {
+        const { key, parent } = feature.properties
+        if (!key) return
+
+        acc.keyDomainMap[key] = domain
+
+        if (!parent) return
+
+        if (!acc.parentKeyMap[parent]) acc.parentKeyMap[parent] = []
+        acc.parentKeyMap[parent].push(key)
+
+        const scopedKey = `${domain}:${parent}`
+        if (!acc.scopedParentKeyMap[scopedKey]) {
+          acc.scopedParentKeyMap[scopedKey] = []
+        }
+        acc.scopedParentKeyMap[scopedKey].push(key)
+      })
+      return acc
+    },
+    /** @type {{
+     *   keyDomainMap: Record<string, string>,
+     *   parentKeyMap: Record<string, string[]>,
+     *   scopedParentKeyMap: Record<string, string[]>,
+     * }} */ ({
+      keyDomainMap: {},
+      parentKeyMap: {},
+      scopedParentKeyMap: {},
+    }),
+  )
 }
 
 /**
@@ -26,16 +54,10 @@ function getParentKeyMap(scanAreasObj) {
  *   scanAreasObj: Record<string, import('@rm/types').RMFeature>,
  *   withoutParents: Record<string, string[]>,
  * }} areas
- * @param {Record<string, string[]>} parentKeyMap
+ * @param {ReturnType<typeof getAreaMaps>} areaMaps
  * @param {boolean} [includeChildren]
  */
-function pushAreaKeys(
-  perms,
-  target,
-  areas,
-  parentKeyMap,
-  includeChildren = false,
-) {
+function pushAreaKeys(perms, target, areas, areaMaps, includeChildren = false) {
   if (!target) return
 
   if (areas.names.has(target)) {
@@ -43,8 +65,12 @@ function pushAreaKeys(
 
     if (includeChildren) {
       const parentName = areas.scanAreasObj[target]?.properties?.name
-      if (parentName && parentKeyMap[parentName]) {
-        perms.push(...parentKeyMap[parentName])
+      const domain = areaMaps.keyDomainMap[target]
+      const scopedKey =
+        parentName && domain ? `${domain}:${parentName}` : undefined
+
+      if (scopedKey && areaMaps.scopedParentKeyMap[scopedKey]) {
+        perms.push(...areaMaps.scopedParentKeyMap[scopedKey])
       }
     }
   }
@@ -53,8 +79,8 @@ function pushAreaKeys(
     perms.push(...areas.withoutParents[target])
   }
 
-  if (includeChildren && parentKeyMap[target]) {
-    perms.push(...parentKeyMap[target])
+  if (includeChildren && areaMaps.parentKeyMap[target]) {
+    perms.push(...areaMaps.parentKeyMap[target])
   }
 }
 
@@ -65,7 +91,7 @@ function pushAreaKeys(
 function areaPerms(roles) {
   const areaRestrictions = config.getSafe('authentication.areaRestrictions')
   const areas = config.getSafe('areas')
-  const parentKeyMap = getParentKeyMap(areas.scanAreasObj)
+  const areaMaps = getAreaMaps(areas.scanAreas)
 
   const perms = []
   for (let i = 0; i < roles.length; i += 1) {
@@ -84,7 +110,7 @@ function areaPerms(roles) {
 
       if (hasAreas) {
         for (let k = 0; k < areaRestrictions[j].areas.length; k += 1) {
-          pushAreaKeys(perms, areaRestrictions[j].areas[k], areas, parentKeyMap)
+          pushAreaKeys(perms, areaRestrictions[j].areas[k], areas, areaMaps)
         }
       }
 
@@ -94,7 +120,7 @@ function areaPerms(roles) {
             perms,
             areaRestrictions[j].parent[k],
             areas,
-            parentKeyMap,
+            areaMaps,
             true,
           )
         }

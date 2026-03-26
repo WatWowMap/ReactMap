@@ -56,9 +56,9 @@ export function AreaChild({
     name && groupedAreaKeys.length
       ? groupedAreaKeys.some((key) => scanAreas.includes(key))
       : false
-  const hasManual =
-    feature?.properties?.manual ||
-    (childAreas || []).every((child) => child.properties.manual)
+  const allChildrenManual =
+    !!childAreas?.length && childAreas.every((child) => child.properties.manual)
+  const hasManual = feature?.properties?.manual || allChildrenManual
   const color =
     hasManual || (name ? !groupedAreaKeys.length : !feature.properties.name)
       ? 'transparent'
