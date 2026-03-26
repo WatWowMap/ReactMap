@@ -5,7 +5,7 @@ const config = require('@rm/config')
  * @param {Record<string, import('@rm/types').RMGeoJSON>} scanAreas
  * @returns {{
  *   keyDomainMap: Record<string, string>,
- *   parentKeyMap: Record<string, string[]>,
+ *   parentDomainsMap: Record<string, string[]>,
  *   scopedParentKeyMap: Record<string, string[]>,
  * }}
  */
@@ -13,17 +13,19 @@ function getAreaMaps(scanAreas) {
   return Object.entries(scanAreas).reduce(
     (acc, [domain, featureCollection]) => {
       featureCollection.features.forEach((feature) => {
-        const { key, parent } = feature.properties
+        const { hidden, key, parent } = feature.properties
         if (!key) return
 
         acc.keyDomainMap[key] = domain
 
-        if (!parent) return
-
-        if (!acc.parentKeyMap[parent]) acc.parentKeyMap[parent] = []
-        acc.parentKeyMap[parent].push(key)
+        // Hidden children should not widen backend access through parent expansion.
+        if (!parent || hidden) return
 
         const scopedKey = `${domain}:${parent}`
+        if (!acc.parentDomainsMap[parent]) acc.parentDomainsMap[parent] = []
+        if (!acc.parentDomainsMap[parent].includes(domain)) {
+          acc.parentDomainsMap[parent].push(domain)
+        }
         if (!acc.scopedParentKeyMap[scopedKey]) {
           acc.scopedParentKeyMap[scopedKey] = []
         }
@@ -33,11 +35,11 @@ function getAreaMaps(scanAreas) {
     },
     /** @type {{
      *   keyDomainMap: Record<string, string>,
-     *   parentKeyMap: Record<string, string[]>,
+     *   parentDomainsMap: Record<string, string[]>,
      *   scopedParentKeyMap: Record<string, string[]>,
      * }} */ ({
       keyDomainMap: {},
-      parentKeyMap: {},
+      parentDomainsMap: {},
       scopedParentKeyMap: {},
     }),
   )
@@ -79,8 +81,13 @@ function pushAreaKeys(perms, target, areas, areaMaps, includeChildren = false) {
     perms.push(...areas.withoutParents[target])
   }
 
-  if (includeChildren && areaMaps.parentKeyMap[target]) {
-    perms.push(...areaMaps.parentKeyMap[target])
+  // Bare parent names are ambiguous across multi-domain configs, so only
+  // expand children when the parent label resolves to exactly one domain.
+  if (includeChildren && areaMaps.parentDomainsMap[target]?.length === 1) {
+    const scopedKey = `${areaMaps.parentDomainsMap[target][0]}:${target}`
+    if (areaMaps.scopedParentKeyMap[scopedKey]) {
+      perms.push(...areaMaps.scopedParentKeyMap[scopedKey])
+    }
   }
 }
 
