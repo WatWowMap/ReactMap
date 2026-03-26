@@ -215,6 +215,8 @@ export interface Pokestop {
   showcase_ranking_standard?: number
   showcase_rankings?: ShowcaseDetails | string
   hasShowcase: boolean
+  incident_blocker_display_type: number | null
+  incident_blocker_expire_timestamp: number | null
 }
 
 export type FullPokestop = FullModel<Pokestop, PokestopModel.Pokestop>

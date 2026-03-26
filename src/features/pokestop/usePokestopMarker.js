@@ -4,6 +4,7 @@ import { divIcon } from 'leaflet'
 import { basicEqualFn, useMemory } from '@store/useMemory'
 import { useStorage } from '@store/useStorage'
 import { useOpacity } from '@hooks/useOpacity'
+import { INCIDENT_DISPLAY_TYPES } from './incidentPriority'
 import { resolveShowcaseEventIcon } from './resolveShowcaseEventIcon'
 
 /**
@@ -11,23 +12,22 @@ import { resolveShowcaseEventIcon } from './resolveShowcaseEventIcon'
  * @param {{
  *  hasQuest: boolean,
  *  hasLure: boolean,
- *  hasInvasion: boolean,
- *  hasEvent: boolean,
+ *  markerEvents: Array<{ display_type?: number | string | null }>,
+ *  markerInvasions: Array<import('@rm/types').Invasion>,
+ *  baseIncidentDisplay: number | string,
  * } & import('@rm/types').Pokestop} param0
  * @returns
  */
 export function usePokestopMarker({
   hasQuest,
   hasLure,
-  hasInvasion,
-  hasEvent,
   lure_id,
   ar_scan_eligible,
   power_up_level,
-  events,
-  invasions,
   quests,
-  hasShowcase,
+  markerEvents,
+  markerInvasions,
+  baseIncidentDisplay,
 }) {
   const [, Icons, masterfile] = useStorage(
     (s) => [
@@ -37,6 +37,18 @@ export function usePokestopMarker({
     ],
     (a, b) => Object.entries(a[0]).every(([k, v]) => b[0][k] === v),
   )
+
+  const hasVisibleInvasion = markerInvasions.some(
+    (invasion) => !!invasion.grunt_type,
+  )
+  const shouldShowStandaloneKecleonBadge =
+    !hasQuest &&
+    !hasVisibleInvasion &&
+    markerEvents.length > 0 &&
+    markerEvents.every(
+      (event) =>
+        Number(event.display_type ?? 0) === INCIDENT_DISPLAY_TYPES.KECLEON,
+    )
 
   const getOpacity = useOpacity('pokestops', 'invasion')
   const [
@@ -54,11 +66,11 @@ export function usePokestopMarker({
       pokestops.showNoArQuestDotBadge ?? true,
       Icons.getPokestops(
         hasLure ? lure_id : 0,
-        hasInvasion,
+        hasVisibleInvasion,
         hasQuest && pokestops.hasQuestIndicator,
         ar_scan_eligible && (pokestops.showArBadge || !!power_up_level),
         power_up_level,
-        hasEvent ? Math.max(...events.map((event) => event.display_type)) : 0,
+        baseIncidentDisplay,
       ),
       hasLure
         ? Icons.getSize(
@@ -85,12 +97,11 @@ export function usePokestopMarker({
   const invasionSizes = []
   const questIcons = []
   const questSizes = []
-  const showcaseIcons = []
-  const showcaseSizes = []
-  const canShowInvasionIcons = hasInvasion && !hasShowcase
+  const eventIcons = []
+  const eventSizes = []
 
-  if (canShowInvasionIcons) {
-    invasions.forEach((invasion) => {
+  if (hasVisibleInvasion) {
+    markerInvasions.forEach((invasion) => {
       if (invasion.grunt_type) {
         invasionIcons.unshift({
           icon: Icons.getInvasions(invasion.grunt_type, invasion.confirmed),
@@ -254,7 +265,7 @@ export function usePokestopMarker({
     })
   }
 
-  if (hasQuest && !(hasInvasion && invasionMod?.removeQuest)) {
+  if (hasQuest && !(hasVisibleInvasion && invasionMod?.removeQuest)) {
     quests.forEach((quest) => {
       const {
         quest_item_id,
@@ -365,24 +376,37 @@ export function usePokestopMarker({
       popupY += rewardMod.popupY
     })
   }
-  if (hasEvent && !canShowInvasionIcons && !hasQuest) {
-    events.forEach((event) => {
-      if (event.display_type === 8) {
-        // Only show Kecleon if there's no active showcase blocking it
-        if (!hasShowcase) {
-          showcaseIcons.unshift({
-            url: Icons.getPokemon(352),
-          })
-          showcaseSizes.unshift(Icons.getSize('event', filters.b7?.size))
+  if (markerEvents.length && !hasQuest) {
+    markerEvents.forEach((event) => {
+      const displayType = Number(event.display_type ?? 0)
+      if (displayType === INCIDENT_DISPLAY_TYPES.KECLEON) {
+        if (!shouldShowStandaloneKecleonBadge || eventIcons.length) {
+          return
         }
-      } else if (event.display_type === 9) {
+        eventIcons.unshift({
+          url: Icons.getPokemon(352),
+        })
+        eventSizes.unshift(
+          Icons.getSize(
+            'event',
+            filters[`b${INCIDENT_DISPLAY_TYPES.KECLEON}`]?.size,
+          ),
+        )
+      } else if (displayType === INCIDENT_DISPLAY_TYPES.SHOWCASE) {
         const showcaseIcon = resolveShowcaseEventIcon(event, Icons)
-        showcaseIcons.unshift({
+        eventIcons.unshift({
           url: showcaseIcon.url,
           decoration: showcaseIcon.decoration,
         })
-        showcaseSizes.unshift(
+        eventSizes.unshift(
           Icons.getSize('event', filters[showcaseIcon.sizeFilterKey]?.size),
+        )
+      } else {
+        eventIcons.unshift({
+          url: Icons.getEventStops(displayType),
+        })
+        eventSizes.unshift(
+          Icons.getSize('event', filters[`b${displayType}`]?.size),
         )
       }
       popupYOffset += eventMod.offsetY - 1
@@ -392,7 +416,9 @@ export function usePokestopMarker({
   }
   const totalQuestSize = questSizes.reduce((a, b) => a + b, 0)
   const totalInvasionSize = invasionSizes.reduce((a, b) => a + b, 0)
-  const totalShowcaseSize = showcaseSizes.reduce((a, b) => a + b, -3)
+  const totalEventSize = eventSizes.length
+    ? eventSizes.reduce((a, b) => a + b, -3)
+    : 0
 
   const showAr = showArBadge && ar_scan_eligible && !baseIcon.includes('_ar')
 
@@ -421,11 +447,11 @@ export function usePokestopMarker({
     })
   })
 
-  showcaseIcons.forEach((icon, index) => {
+  eventIcons.forEach((icon, index) => {
     stackItems.push({
       type: 'event',
       url: icon.url,
-      size: showcaseSizes[index],
+      size: eventSizes[index],
       modifier: eventMod,
       decoration: icon.decoration,
     })
@@ -539,7 +565,7 @@ export function usePokestopMarker({
         ? pokestopMod.manualPopup -
           totalInvasionSize * 0.25 -
           totalQuestSize * 0.1
-        : -(baseSize + totalInvasionSize + totalQuestSize + totalShowcaseSize) /
+        : -(baseSize + totalInvasionSize + totalQuestSize + totalEventSize) /
           popupYOffset) + popupY,
     ],
     className: 'pokestop-marker',

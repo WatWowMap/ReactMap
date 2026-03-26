@@ -1,9 +1,25 @@
+## [1.41.2-develop.1](https://github.com/WatWowMap/ReactMap/compare/v1.41.1...v1.41.2-develop.1) (2026-03-26)
+
+
+### Bug Fixes
+
+* change scan-on-demand dialog to notification ([b77145d](https://github.com/WatWowMap/ReactMap/commit/b77145dd8e037f0916d72c6a84e76fbb9584bde8))
+* **pokestops:** align incident blocker visibility across markers and popups ([8acf245](https://github.com/WatWowMap/ReactMap/commit/8acf245983402e9e14ef78f628fae217c1e23000))
+* weather icon uses wrong time of day for wild ([5944452](https://github.com/WatWowMap/ReactMap/commit/594445268ca027b8f2b1d9c8edce70208b23c49d))
+
 ## [1.41.1](https://github.com/WatWowMap/ReactMap/compare/v1.41.0...v1.41.1) (2026-03-15)
 
 
 ### Bug Fixes
 
 * workflow git creds ([e5dc6f9](https://github.com/WatWowMap/ReactMap/commit/e5dc6f90d14fa1afb8a75bb9bdb2246213ff1c88))
+
+# [1.41.0-develop.12](https://github.com/WatWowMap/ReactMap/compare/v1.41.0-develop.11...v1.41.0-develop.12) (2026-03-15)
+
+
+### Bug Fixes
+
+* weather icon uses wrong time of day for wild ([5944452](https://github.com/WatWowMap/ReactMap/commit/594445268ca027b8f2b1d9c8edce70208b23c49d))
 
 # [1.41.0](https://github.com/WatWowMap/ReactMap/compare/v1.40.1...v1.41.0) (2026-03-15)
 
