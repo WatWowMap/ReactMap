@@ -40,17 +40,27 @@ export function AreaChild({
 
   if (!scanAreas) return null
 
+  const groupedAreaKeys = [
+    ...(feature?.properties?.key && !feature.properties.manual
+      ? [feature.properties.key]
+      : []),
+    ...(childAreas || [])
+      .filter((child) => !child.properties.manual)
+      .map((child) => child.properties.key),
+  ]
   const hasAll =
-    childAreas &&
-    childAreas.every(
-      (c) => c.properties.manual || scanAreas.includes(c.properties.key),
-    )
+    name && groupedAreaKeys.length
+      ? groupedAreaKeys.every((key) => scanAreas.includes(key))
+      : false
   const hasSome =
-    childAreas && childAreas.some((c) => scanAreas.includes(c.properties.key))
+    name && groupedAreaKeys.length
+      ? groupedAreaKeys.some((key) => scanAreas.includes(key))
+      : false
   const hasManual =
-    feature?.properties?.manual || childAreas.every((c) => c.properties.manual)
+    feature?.properties?.manual ||
+    (childAreas || []).every((child) => child.properties.manual)
   const color =
-    hasManual || (name ? !childAreas.length : !feature.properties.name)
+    hasManual || (name ? !groupedAreaKeys.length : !feature.properties.name)
       ? 'transparent'
       : 'none'
 
@@ -104,14 +114,7 @@ export function AreaChild({
             checked={name ? hasAll : scanAreas.includes(feature.properties.key)}
             onClick={(e) => e.stopPropagation()}
             onChange={() => {
-              const areaKeys = name
-                ? [
-                    ...(feature?.properties?.key
-                      ? [feature.properties.key]
-                      : []),
-                    ...childAreas.map((c) => c.properties.key),
-                  ]
-                : feature.properties.key
+              const areaKeys = name ? groupedAreaKeys : feature.properties.key
               setAreas(areaKeys, allAreas, name ? hasSome : false)
             }}
             sx={{
@@ -125,7 +128,7 @@ export function AreaChild({
               },
             }}
             disabled={
-              (name ? !childAreas.length : !feature.properties.name) ||
+              (name ? !groupedAreaKeys.length : !feature.properties.name) ||
               hasManual
             }
           />

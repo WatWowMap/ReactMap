@@ -49,12 +49,19 @@ export function ScanAreasTable() {
 
   /** @type {string[]} */
   const allAreas = React.useMemo(
-    () =>
-      data?.scanAreasMenu.flatMap((parent) =>
-        parent.children
-          .filter((child) => !child.properties.manual)
-          .map((child) => child.properties.key),
-      ) || [],
+    () => [
+      ...new Set(
+        data?.scanAreasMenu.flatMap((parent) => [
+          ...(parent.details?.properties?.key &&
+          !parent.details.properties.manual
+            ? [parent.details.properties.key]
+            : []),
+          ...parent.children
+            .filter((child) => !child.properties.manual)
+            .map((child) => child.properties.key),
+        ]) || [],
+      ),
+    ],
     [data],
   )
 
