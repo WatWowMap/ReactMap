@@ -358,8 +358,7 @@ const resolvers = {
         const canAccessArea = (properties) =>
           !perms.areaRestrictions.length ||
           perms.areaRestrictions.includes(properties.key) ||
-          perms.areaRestrictions.includes(properties.name) ||
-          perms.areaRestrictions.includes(properties.parent)
+          perms.areaRestrictions.includes(properties.name)
 
         return [
           {
@@ -387,8 +386,7 @@ const resolvers = {
         if (perms.areaRestrictions.length) {
           const canAccessArea = (properties) =>
             perms.areaRestrictions.includes(properties.key) ||
-            perms.areaRestrictions.includes(properties.name) ||
-            perms.areaRestrictions.includes(properties.parent)
+            perms.areaRestrictions.includes(properties.name)
 
           const filtered = baseMenu
             .map((parent) => ({

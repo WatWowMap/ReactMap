@@ -1,6 +1,8 @@
 // @ts-check
 const config = require('@rm/config')
 
+const NO_ACCESS_SENTINEL = '__rm_no_access__'
+
 /**
  * @param {Record<string, import('@rm/types').RMGeoJSON>} scanAreas
  * @returns {{
@@ -144,6 +146,7 @@ function areaPerms(roles) {
   const areaMaps = getAreaMaps(areas.scanAreas)
 
   const perms = []
+  let matchedRestrictedRule = false
   for (let i = 0; i < roles.length; i += 1) {
     for (let j = 0; j < areaRestrictions.length; j += 1) {
       if (!areaRestrictions[j].roles.includes(roles[i])) continue
@@ -157,6 +160,8 @@ function areaPerms(roles) {
 
       // No areas/parents means unrestricted access
       if (!hasAreas && !hasParents) return []
+
+      matchedRestrictedRule = true
 
       if (hasAreas) {
         for (let k = 0; k < areaRestrictions[j].areas.length; k += 1) {
@@ -177,7 +182,10 @@ function areaPerms(roles) {
       }
     }
   }
-  return [...new Set(perms)]
+  const uniquePerms = [...new Set(perms)]
+  return matchedRestrictedRule && !uniquePerms.length
+    ? [NO_ACCESS_SENTINEL]
+    : uniquePerms
 }
 
 module.exports = { areaPerms }
