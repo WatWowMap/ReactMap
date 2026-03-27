@@ -92,16 +92,13 @@ function pushAreaKeys(perms, target, areas, areaMaps, includeChildren = false) {
   if (!target) return
 
   const parentFeature = includeChildren ? areas.scanAreasObj[target] : null
-  const canIncludeOwnKey =
-    !includeChildren || !parentFeature?.properties?.hidden
+  const isCanonicalTarget =
+    areas.names.has(target) || parentFeature?.properties?.key === target
 
-  if (
-    canIncludeOwnKey &&
-    (areas.names.has(target) || parentFeature?.properties?.key === target)
-  ) {
+  if (isCanonicalTarget) {
     perms.push(target)
 
-    if (includeChildren) {
+    if (includeChildren && !parentFeature?.properties?.parent) {
       const parentName = parentFeature?.properties?.name
       const domain = areaMaps.keyDomainMap[target]
       const scopedKey =
@@ -111,24 +108,10 @@ function pushAreaKeys(perms, target, areas, areaMaps, includeChildren = false) {
         perms.push(...areaMaps.scopedParentKeyMap[scopedKey])
       }
     }
-  } else if (includeChildren && parentFeature?.properties?.key === target) {
-    const parentName = parentFeature?.properties?.name
-    const domain = areaMaps.keyDomainMap[target]
-    const scopedKey =
-      parentName && domain ? `${domain}:${parentName}` : undefined
-
-    if (scopedKey && areaMaps.scopedParentKeyMap[scopedKey]) {
-      perms.push(...areaMaps.scopedParentKeyMap[scopedKey])
-    }
   }
 
   if (areas.withoutParents[target]) {
-    perms.push(
-      ...areas.withoutParents[target].filter(
-        (key) =>
-          !includeChildren || !areas.scanAreasObj[key]?.properties?.hidden,
-      ),
-    )
+    perms.push(...areas.withoutParents[target])
   }
 
   // Bare parent names are ambiguous across multi-domain configs, so only

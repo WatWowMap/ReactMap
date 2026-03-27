@@ -355,10 +355,28 @@ const resolvers = {
     scanAreas: (_, _args, { req, perms }) => {
       if (perms?.scanAreas) {
         const scanAreas = config.getAreas(req, 'scanAreas')
+        const parentKeyByName = Object.fromEntries(
+          scanAreas.features
+            .filter(
+              (feature) =>
+                !feature.properties.parent &&
+                feature.properties.name &&
+                feature.properties.key,
+            )
+            .map((feature) => [
+              feature.properties.name,
+              feature.properties.key,
+            ]),
+        )
         const canAccessArea = (properties) =>
           !perms.areaRestrictions.length ||
           perms.areaRestrictions.includes(properties.key) ||
-          perms.areaRestrictions.includes(properties.name)
+          perms.areaRestrictions.includes(properties.name) ||
+          (!!properties.parent &&
+            (perms.areaRestrictions.includes(
+              parentKeyByName[properties.parent],
+            ) ||
+              perms.areaRestrictions.includes(properties.parent)))
 
         return [
           {
@@ -375,6 +393,11 @@ const resolvers = {
     scanAreasMenu: (_, _args, { req, perms }) => {
       if (perms?.scanAreas) {
         const scanAreas = config.getAreas(req, 'scanAreasMenu')
+        const parentKeyByName = Object.fromEntries(
+          scanAreas
+            .filter((parent) => parent.name && parent.details?.properties?.key)
+            .map((parent) => [parent.name, parent.details.properties.key]),
+        )
         const baseMenu = scanAreas.map((parent) => ({
           ...parent,
           details:
@@ -386,7 +409,12 @@ const resolvers = {
         if (perms.areaRestrictions.length) {
           const canAccessArea = (properties) =>
             perms.areaRestrictions.includes(properties.key) ||
-            perms.areaRestrictions.includes(properties.name)
+            perms.areaRestrictions.includes(properties.name) ||
+            (!!properties.parent &&
+              (perms.areaRestrictions.includes(
+                parentKeyByName[properties.parent],
+              ) ||
+                perms.areaRestrictions.includes(properties.parent)))
 
           const filtered = baseMenu
             .map((parent) => ({
