@@ -8,6 +8,7 @@ const config = require('@rm/config')
 
 const { getPolyVector } = require('../utils/getPolyVector')
 const { getPolygonBbox } = require('../utils/getBbox')
+const { consolidateAreas } = require('../utils/consolidateAreas')
 
 class Weather extends Model {
   static get tableName() {
@@ -42,14 +43,15 @@ class Weather extends Model {
     const results = await query
 
     const areas = config.getSafe('areas')
-    const cleanUserAreas = (args.filters.onlyAreas || []).filter((area) =>
-      areas.names.has(area),
-    )
-    const merged = perms.areaRestrictions.length
-      ? perms.areaRestrictions.filter(
-          (area) => !cleanUserAreas.length || cleanUserAreas.includes(area),
-        )
-      : cleanUserAreas
+    const hasAreaFilter =
+      perms.areaRestrictions.length || (args.filters.onlyAreas || []).length
+    const merged = hasAreaFilter
+      ? [...consolidateAreas(perms.areaRestrictions, args.filters.onlyAreas)]
+      : []
+
+    if (hasAreaFilter && !merged.length) {
+      return []
+    }
 
     const boundPolygon = getPolygonBbox(args)
     return results
@@ -61,7 +63,7 @@ class Weather extends Model {
           (pointInPolygon(center, boundPolygon) ||
             booleanOverlap(geojson, boundPolygon) ||
             booleanContains(geojson, boundPolygon)) &&
-          (!merged.length ||
+          (!hasAreaFilter ||
             merged.some(
               (area) =>
                 areas.scanAreasObj[area] &&
