@@ -4,6 +4,7 @@ const config = require('@rm/config')
 const { clientOptions } = require('../ui/clientOptions')
 const { advMenus } = require('../ui/advMenus')
 const { drawer } = require('../ui/drawer')
+const { getPublicAreaRestrictions } = require('./areaPerms')
 
 /**
  *
@@ -17,7 +18,19 @@ function getServerSettings(req) {
       cooldown: req.session?.cooldown || 0,
     })
 
-  const { clientValues, clientMenus } = clientOptions(user.perms)
+  const safeUser = {
+    ...user,
+    perms: user.perms
+      ? {
+          ...user.perms,
+          areaRestrictions: getPublicAreaRestrictions(
+            user.perms.areaRestrictions || [],
+          ),
+        }
+      : user.perms,
+  }
+
+  const { clientValues, clientMenus } = clientOptions(safeUser.perms)
 
   const mapConfig = config.getMapConfig(req)
   const api = config.getSafe('api')
@@ -29,7 +42,7 @@ function getServerSettings(req) {
       polling: api.polling,
       gymValidDataLimit: Date.now() / 1000 - api.gymValidDataLimit * 86400,
     },
-    user,
+    user: safeUser,
     authReferences: {
       areaRestrictions: authentication.areaRestrictions.length,
       webhooks: config.getSafe('webhooks').filter((w) => w.enabled).length,
@@ -61,10 +74,10 @@ function getServerSettings(req) {
     },
     tileServers: config.getSafe('tileServers'),
     navigation: config.getSafe('navigation'),
-    menus: advMenus(user.perms),
+    menus: advMenus(safeUser.perms),
     userSettings: clientValues,
     clientMenus,
-    ui: drawer(req, user.perms),
+    ui: drawer(req, safeUser.perms),
   }
 
   return serverSettings

@@ -58,13 +58,17 @@ export function AreaChild({
       ? groupedAreaKeys
       : fallbackAreaKeys
     : []
+  const removableAreaKeys =
+    name && feature?.properties?.key && !feature.properties.manual
+      ? [...new Set([...selectableAreaKeys, feature.properties.key])]
+      : selectableAreaKeys
   const hasAll =
     name && selectableAreaKeys.length
       ? selectableAreaKeys.every((key) => scanAreas.includes(key))
       : false
   const hasSome =
-    name && selectableAreaKeys.length
-      ? selectableAreaKeys.some((key) => scanAreas.includes(key))
+    name && removableAreaKeys.length
+      ? removableAreaKeys.some((key) => scanAreas.includes(key))
       : false
   const allChildrenManual =
     name &&
@@ -130,7 +134,9 @@ export function AreaChild({
             onClick={(e) => e.stopPropagation()}
             onChange={() => {
               const areaKeys = name
-                ? selectableAreaKeys
+                ? hasSome
+                  ? removableAreaKeys
+                  : selectableAreaKeys
                 : feature.properties.key
               setAreas(areaKeys, allAreas, name ? hasSome : false)
             }}

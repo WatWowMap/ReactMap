@@ -4,6 +4,14 @@ const config = require('@rm/config')
 const NO_ACCESS_SENTINEL = '__rm_no_access__'
 
 /**
+ * @param {string[]} [areaRestrictions]
+ * @returns {string[]}
+ */
+function getPublicAreaRestrictions(areaRestrictions = []) {
+  return areaRestrictions.filter((area) => area !== NO_ACCESS_SENTINEL)
+}
+
+/**
  * @param {Record<string, import('@rm/types').RMGeoJSON>} scanAreas
  * @returns {{
  *   keyDomainMap: Record<string, string>,
@@ -165,7 +173,13 @@ function areaPerms(roles) {
 
       if (hasAreas) {
         for (let k = 0; k < areaRestrictions[j].areas.length; k += 1) {
-          pushAreaKeys(perms, areaRestrictions[j].areas[k], areas, areaMaps)
+          pushAreaKeys(
+            perms,
+            areaRestrictions[j].areas[k],
+            areas,
+            areaMaps,
+            true,
+          )
         }
       }
 
@@ -188,4 +202,8 @@ function areaPerms(roles) {
     : uniquePerms
 }
 
-module.exports = { areaPerms }
+module.exports = {
+  areaPerms,
+  getPublicAreaRestrictions,
+  NO_ACCESS_SENTINEL,
+}
