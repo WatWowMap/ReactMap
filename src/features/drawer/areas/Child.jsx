@@ -46,20 +46,36 @@ export function AreaChild({
   const groupedAreaKeys = groupedChildren
     .filter((child) => !child.properties.manual)
     .map((child) => child.properties.key)
+  const fallbackAreaKeys =
+    name &&
+    !groupedAreaKeys.length &&
+    feature?.properties?.key &&
+    !feature.properties.manual
+      ? [feature.properties.key]
+      : []
+  const selectableAreaKeys = name
+    ? groupedAreaKeys.length
+      ? groupedAreaKeys
+      : fallbackAreaKeys
+    : []
   const hasAll =
-    name && groupedAreaKeys.length
-      ? groupedAreaKeys.every((key) => scanAreas.includes(key))
+    name && selectableAreaKeys.length
+      ? selectableAreaKeys.every((key) => scanAreas.includes(key))
       : false
   const hasSome =
-    name && groupedAreaKeys.length
-      ? groupedAreaKeys.some((key) => scanAreas.includes(key))
+    name && selectableAreaKeys.length
+      ? selectableAreaKeys.some((key) => scanAreas.includes(key))
       : false
   const allChildrenManual =
+    name &&
     !!groupedChildren.length &&
     groupedChildren.every((child) => child.properties.manual)
-  const hasManual = feature?.properties?.manual || allChildrenManual
+  const hasManual = name
+    ? !selectableAreaKeys.length &&
+      (feature?.properties?.manual || allChildrenManual)
+    : feature?.properties?.manual
   const color =
-    hasManual || (name ? !groupedAreaKeys.length : !feature.properties.name)
+    hasManual || (name ? !selectableAreaKeys.length : !feature.properties.name)
       ? 'transparent'
       : 'none'
 
@@ -113,7 +129,9 @@ export function AreaChild({
             checked={name ? hasAll : scanAreas.includes(feature.properties.key)}
             onClick={(e) => e.stopPropagation()}
             onChange={() => {
-              const areaKeys = name ? groupedAreaKeys : feature.properties.key
+              const areaKeys = name
+                ? selectableAreaKeys
+                : feature.properties.key
               setAreas(areaKeys, allAreas, name ? hasSome : false)
             }}
             sx={{
@@ -127,7 +145,7 @@ export function AreaChild({
               },
             }}
             disabled={
-              (name ? !groupedAreaKeys.length : !feature.properties.name) ||
+              (name ? !selectableAreaKeys.length : !feature.properties.name) ||
               hasManual
             }
           />

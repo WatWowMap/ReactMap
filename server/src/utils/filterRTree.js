@@ -18,7 +18,7 @@ function filterRTree(item, areaRestrictions = [], onlyAreas = []) {
 
   const consolidatedAreas = consolidateAreas(areaRestrictions, onlyAreas)
 
-  if (!consolidatedAreas.size) return true
+  if (!consolidatedAreas.size) return false
 
   /** @type {import("@rm/types").RMGeoJSON['features']} */
   const foundFeatures = config
