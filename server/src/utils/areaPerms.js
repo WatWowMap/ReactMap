@@ -193,6 +193,27 @@ function resolveAreaPerms(roles) {
 }
 
 /**
+ * @param {string[]} [areaRestrictions]
+ * @returns {string[]}
+ */
+function normalizeAreaRestrictions(areaRestrictions = []) {
+  const areas = config.getSafe('areas')
+  const areaMaps = getAreaMaps(areas.scanAreas)
+  const normalized = []
+
+  areaRestrictions.forEach((area) => {
+    pushAreaKeys(normalized, area, areas, areaMaps, true)
+  })
+
+  const uniquePerms = [...new Set(normalized)]
+  return uniquePerms.length
+    ? uniquePerms
+    : areaRestrictions.includes(NO_ACCESS_SENTINEL)
+      ? [NO_ACCESS_SENTINEL]
+      : uniquePerms
+}
+
+/**
  * @param {string[]} roles
  * @returns {string[]}
  */
@@ -204,5 +225,6 @@ module.exports = {
   areaPerms,
   getPublicAreaRestrictions,
   NO_ACCESS_SENTINEL,
+  normalizeAreaRestrictions,
   resolveAreaPerms,
 }

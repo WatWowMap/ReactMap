@@ -15,10 +15,7 @@ function consolidateAreas(areaRestrictions = [], onlyAreas = []) {
   const validUserAreas = onlyAreas.filter((a) => areas.names.has(a))
 
   const cleanedValidUserAreas = validUserAreas.filter((area) =>
-    areaRestrictions.length
-      ? areaRestrictions.includes(area) ||
-        areaRestrictions.includes(areas.scanAreasObj[area]?.properties?.parent)
-      : true,
+    areaRestrictions.length ? areaRestrictions.includes(area) : true,
   )
   return new Set(
     cleanedValidUserAreas.length
