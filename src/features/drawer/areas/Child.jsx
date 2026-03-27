@@ -18,7 +18,6 @@ import { useMemory } from '@store/useMemory'
  *  feature?: Pick<import('@rm/types').RMFeature, 'properties'>
  *  allAreas?: string[]
  *  childAreas?: Pick<import('@rm/types').RMFeature, 'properties'>[]
- *  groupedAreas?: Pick<import('@rm/types').RMFeature, 'properties'>[]
  *  borderRight?: boolean
  *  colSpan?: number
  * }} props
@@ -27,7 +26,6 @@ export function AreaChild({
   name,
   feature,
   childAreas,
-  groupedAreas,
   allAreas,
   borderRight,
   colSpan = 1,
@@ -42,7 +40,7 @@ export function AreaChild({
 
   if (!scanAreas) return null
 
-  const groupedChildren = groupedAreas || childAreas || []
+  const groupedChildren = childAreas || []
   const groupedAreaKeys = groupedChildren
     .filter((child) => !child.properties.manual)
     .map((child) => child.properties.key)
