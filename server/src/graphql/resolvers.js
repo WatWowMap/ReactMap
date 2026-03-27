@@ -443,7 +443,9 @@ const resolvers = {
           // })
           return filtered
         }
-        return baseMenu.filter((parent) => parent.children.length)
+        return baseMenu.filter(
+          (parent) => parent.details || parent.children.length,
+        )
       }
       return []
     },

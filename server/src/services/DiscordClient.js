@@ -6,7 +6,7 @@ const passport = require('passport')
 const config = require('@rm/config')
 
 const { logUserAuth } = require('./logUserAuth')
-const { areaPerms } = require('../utils/areaPerms')
+const { areaPerms, NO_ACCESS_SENTINEL } = require('../utils/areaPerms')
 const { webhookPerms } = require('../utils/webhookPerms')
 const { scannerPerms, scannerCooldownBypass } = require('../utils/scannerPerms')
 const { mergePerms } = require('../utils/mergePerms')
@@ -144,6 +144,7 @@ class DiscordClient extends AuthClient {
       scannerCooldownBypass: new Set(),
       blockedGuildNames: new Set(),
     }
+    let hasUnrestrictedAreaGrant = false
     const scanner = config.getSafe('scanner')
     try {
       const guilds = user.guilds?.map((guild) => guild.id) || []
@@ -205,9 +206,14 @@ class DiscordClient extends AuthClient {
                   }
                 }
               })
-              areaPerms(userRoles).forEach((x) =>
-                permSets.areaRestrictions.add(x),
-              )
+              const guildAreaRestrictions = areaPerms(userRoles)
+              if (guildAreaRestrictions.length) {
+                guildAreaRestrictions.forEach((x) =>
+                  permSets.areaRestrictions.add(x),
+                )
+              } else {
+                hasUnrestrictedAreaGrant = true
+              }
               webhookPerms(userRoles, 'discordRoles', trialActive).forEach(
                 (x) => permSets.webhooks.add(x),
               )
@@ -223,6 +229,14 @@ class DiscordClient extends AuthClient {
       }
     } catch (e) {
       this.log.warn('Failed to get perms for user', user.id, e)
+    }
+    if (
+      hasUnrestrictedAreaGrant &&
+      ![...permSets.areaRestrictions].some(
+        (area) => area !== NO_ACCESS_SENTINEL,
+      )
+    ) {
+      permSets.areaRestrictions.clear()
     }
     Object.entries(permSets).forEach(([key, value]) => {
       perms[key] = [...value]
