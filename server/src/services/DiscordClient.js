@@ -6,7 +6,7 @@ const passport = require('passport')
 const config = require('@rm/config')
 
 const { logUserAuth } = require('./logUserAuth')
-const { areaPerms, NO_ACCESS_SENTINEL } = require('../utils/areaPerms')
+const { NO_ACCESS_SENTINEL, resolveAreaPerms } = require('../utils/areaPerms')
 const { webhookPerms } = require('../utils/webhookPerms')
 const { scannerPerms, scannerCooldownBypass } = require('../utils/scannerPerms')
 const { mergePerms } = require('../utils/mergePerms')
@@ -206,12 +206,11 @@ class DiscordClient extends AuthClient {
                   }
                 }
               })
-              const guildAreaRestrictions = areaPerms(userRoles)
-              if (guildAreaRestrictions.length) {
-                guildAreaRestrictions.forEach((x) =>
-                  permSets.areaRestrictions.add(x),
-                )
-              } else {
+              const guildAreaPerms = resolveAreaPerms(userRoles)
+              guildAreaPerms.areaRestrictions.forEach((x) =>
+                permSets.areaRestrictions.add(x),
+              )
+              if (guildAreaPerms.hasUnrestrictedGrant) {
                 hasUnrestrictedAreaGrant = true
               }
               webhookPerms(userRoles, 'discordRoles', trialActive).forEach(

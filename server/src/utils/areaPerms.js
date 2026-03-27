@@ -129,9 +129,9 @@ function pushAreaKeys(perms, target, areas, areaMaps, includeChildren = false) {
 
 /**
  * @param {string[]} roles
- * @returns {string[]}
+ * @returns {{ areaRestrictions: string[], hasUnrestrictedGrant: boolean }}
  */
-function areaPerms(roles) {
+function resolveAreaPerms(roles) {
   const areaRestrictions = config.getSafe('authentication.areaRestrictions')
   const areas = config.getSafe('areas')
   const areaMaps = getAreaMaps(areas.scanAreas)
@@ -150,7 +150,9 @@ function areaPerms(roles) {
         : false
 
       // No areas/parents means unrestricted access
-      if (!hasAreas && !hasParents) return []
+      if (!hasAreas && !hasParents) {
+        return { areaRestrictions: [], hasUnrestrictedGrant: true }
+      }
 
       matchedRestrictedRule = true
 
@@ -179,14 +181,28 @@ function areaPerms(roles) {
       }
     }
   }
+
   const uniquePerms = [...new Set(perms)]
-  return matchedRestrictedRule && !uniquePerms.length
-    ? [NO_ACCESS_SENTINEL]
-    : uniquePerms
+  return {
+    areaRestrictions:
+      matchedRestrictedRule && !uniquePerms.length
+        ? [NO_ACCESS_SENTINEL]
+        : uniquePerms,
+    hasUnrestrictedGrant: false,
+  }
+}
+
+/**
+ * @param {string[]} roles
+ * @returns {string[]}
+ */
+function areaPerms(roles) {
+  return resolveAreaPerms(roles).areaRestrictions
 }
 
 module.exports = {
   areaPerms,
   getPublicAreaRestrictions,
   NO_ACCESS_SENTINEL,
+  resolveAreaPerms,
 }
