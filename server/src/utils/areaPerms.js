@@ -208,7 +208,7 @@ function normalizeAreaRestrictions(areaRestrictions = []) {
   const uniquePerms = [...new Set(normalized)]
   return uniquePerms.length
     ? uniquePerms
-    : areaRestrictions.includes(NO_ACCESS_SENTINEL)
+    : areaRestrictions.length
       ? [NO_ACCESS_SENTINEL]
       : uniquePerms
 }
