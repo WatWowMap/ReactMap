@@ -17,17 +17,23 @@ function mergePerms(existingPerms, incomingPerms) {
       [...keys].map((key) => {
         const existingValue = existingPerms[key]
         const incomingValue = incomingPerms[key]
+        const hasUnrestrictedAreaGrant =
+          key === 'areaRestrictions' &&
+          ((Array.isArray(existingValue) && existingValue.length === 0) ||
+            (Array.isArray(incomingValue) && incomingValue.length === 0))
 
         return [
           key,
           Array.isArray(existingValue) || Array.isArray(incomingValue)
             ? key === 'areaRestrictions'
-              ? normalizeAreaRestrictions([
-                  ...new Set([
-                    ...(existingValue || []),
-                    ...(incomingValue || []),
-                  ]),
-                ])
+              ? hasUnrestrictedAreaGrant
+                ? []
+                : normalizeAreaRestrictions([
+                    ...new Set([
+                      ...(existingValue || []),
+                      ...(incomingValue || []),
+                    ]),
+                  ])
               : [
                   ...new Set([
                     ...(existingValue || []),
