@@ -163,7 +163,7 @@ function resolveAreaPerms(roles) {
             areaRestrictions[j].areas[k],
             areas,
             areaMaps,
-            true,
+            false,
           )
         }
       }
@@ -202,7 +202,7 @@ function normalizeAreaRestrictions(areaRestrictions = []) {
   const normalized = []
 
   areaRestrictions.forEach((area) => {
-    pushAreaKeys(normalized, area, areas, areaMaps, true)
+    pushAreaKeys(normalized, area, areas, areaMaps, false)
   })
 
   const uniquePerms = [...new Set(normalized)]
