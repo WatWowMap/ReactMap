@@ -105,20 +105,44 @@ function consolidateAreas(areaRestrictions = [], onlyAreas = []) {
     acc[parentGrant.area].add(parentGrant.domain)
     return acc
   }, /** @type {Record<string, Set<string>>} */ ({}))
-  const getDirectFeatures = (area) => {
+  const getScopedDomains = (area) => {
+    const scopedDomains = new Set([
+      ...(scopedAreaDomains[area] || []),
+      ...(scopedParentDomains[area] || []),
+    ])
+
+    if (scopedDomains.size) {
+      return scopedDomains
+    }
+
+    ;(childFeaturesByKey[area] || []).forEach(
+      ({ domain, parentKey, parentName }) => {
+        const matchingParentDomains = new Set([
+          ...(scopedParentDomains[parentKey] || []),
+          ...(scopedParentDomains[parentName] || []),
+        ])
+        if (matchingParentDomains.has(domain)) {
+          scopedDomains.add(domain)
+        }
+      },
+    )
+    return scopedDomains
+  }
+  const getDirectFeatures = (area, allowAmbiguous = false) => {
     const featureEntries = featureEntriesByKey[area] || []
     if (!featureEntries.length) {
       return []
     }
 
-    if (scopedAreaDomains[area]?.size) {
+    const scopedDomains = getScopedDomains(area)
+    if (scopedDomains.size) {
       return featureEntries
-        .filter(({ domain }) => scopedAreaDomains[area].has(domain))
+        .filter(({ domain }) => scopedDomains.has(domain))
         .map(({ feature }) => feature)
     }
 
     const distinctDomains = new Set(featureEntries.map(({ domain }) => domain))
-    return distinctDomains.size === 1
+    return distinctDomains.size === 1 || allowAmbiguous
       ? featureEntries.map(({ feature }) => feature)
       : []
   }
@@ -154,7 +178,7 @@ function consolidateAreas(areaRestrictions = [], onlyAreas = []) {
               ? matchingChildren.map(({ feature }) => feature)
               : []
           })()
-      : getDirectFeatures(area),
+      : getDirectFeatures(area, true),
   )
   return new Set(
     cleanedValidUserAreas.length
