@@ -47,6 +47,14 @@ function getPublicAreaRestrictions(areaRestrictions = []) {
 }
 
 /**
+ * @param {string[]} [areaRestrictions]
+ * @returns {boolean}
+ */
+function hasUnrestrictedAreaGrant(areaRestrictions = []) {
+  return areaRestrictions.includes(UNRESTRICTED_ACCESS_SENTINEL)
+}
+
+/**
  * @param {Record<string, import('@rm/types').RMGeoJSON>} scanAreas
  * @returns {{
  *   keyDomainsMap: Record<string, string[]>,
@@ -336,8 +344,8 @@ function resolveAreaPerms(roles, req, serializeParentGrants = false) {
  */
 function normalizeAreaRestrictions(areaRestrictions, req) {
   const safeAreaRestrictions = areaRestrictions || []
-  if (safeAreaRestrictions.includes(UNRESTRICTED_ACCESS_SENTINEL)) {
-    return req ? [] : [UNRESTRICTED_ACCESS_SENTINEL]
+  if (hasUnrestrictedAreaGrant(safeAreaRestrictions)) {
+    return [UNRESTRICTED_ACCESS_SENTINEL]
   }
 
   const areas = getRestrictionAreas(req)
@@ -385,6 +393,7 @@ function areaPerms(roles, req, serializeParentGrants = false) {
 module.exports = {
   areaPerms,
   getPublicAreaRestrictions,
+  hasUnrestrictedAreaGrant,
   NO_ACCESS_SENTINEL,
   UNRESTRICTED_ACCESS_SENTINEL,
   normalizeAreaRestrictions,

@@ -9,6 +9,7 @@ const config = require('@rm/config')
 const { getPolyVector } = require('../utils/getPolyVector')
 const { getPolygonBbox } = require('../utils/getBbox')
 const { consolidateAreas } = require('../utils/consolidateAreas')
+const { hasUnrestrictedAreaGrant } = require('../utils/areaPerms')
 
 class Weather extends Model {
   static get tableName() {
@@ -43,10 +44,19 @@ class Weather extends Model {
     const results = await query
 
     const areas = config.getSafe('areas')
+    const unrestrictedAreaGrant = hasUnrestrictedAreaGrant(
+      perms.areaRestrictions,
+    )
     const hasAreaFilter =
-      perms.areaRestrictions.length || (args.filters.onlyAreas || []).length
+      (!unrestrictedAreaGrant && perms.areaRestrictions.length) ||
+      (args.filters.onlyAreas || []).length
     const merged = hasAreaFilter
-      ? [...consolidateAreas(perms.areaRestrictions, args.filters.onlyAreas)]
+      ? [
+          ...consolidateAreas(
+            unrestrictedAreaGrant ? [] : perms.areaRestrictions,
+            args.filters.onlyAreas,
+          ),
+        ]
       : []
 
     if (hasAreaFilter && !merged.length) {

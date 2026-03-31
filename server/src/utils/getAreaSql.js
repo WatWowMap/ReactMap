@@ -1,6 +1,7 @@
 // @ts-check
 const config = require('@rm/config')
 const { consolidateAreas } = require('./consolidateAreas')
+const { hasUnrestrictedAreaGrant } = require('./areaPerms')
 
 /**
  *
@@ -20,16 +21,22 @@ function getAreaSql(
 ) {
   const authentication = config.getSafe('authentication')
   const areas = config.getSafe('areas')
+  const unrestrictedAreaGrant = hasUnrestrictedAreaGrant(areaRestrictions)
   if (
     authentication.strictAreaRestrictions &&
     authentication.areaRestrictions.length &&
-    !areaRestrictions.length
+    !areaRestrictions.length &&
+    !unrestrictedAreaGrant
   )
     return false
 
+  if (unrestrictedAreaGrant && !onlyAreas?.length) return true
   if (!areaRestrictions?.length && !onlyAreas?.length) return true
 
-  const consolidatedAreas = consolidateAreas(areaRestrictions, onlyAreas)
+  const consolidatedAreas = consolidateAreas(
+    unrestrictedAreaGrant ? [] : areaRestrictions,
+    onlyAreas,
+  )
 
   if (!consolidatedAreas.size) return false
 

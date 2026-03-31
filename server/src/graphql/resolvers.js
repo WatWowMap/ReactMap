@@ -18,6 +18,7 @@ const { getPolyVector } = require('../utils/getPolyVector')
 const { getPlacementCells } = require('../utils/getPlacementCells')
 const { getTypeCells } = require('../utils/getTypeCells')
 const { getValidCoords } = require('../utils/getValidCoords')
+const { hasUnrestrictedAreaGrant } = require('../utils/areaPerms')
 
 /** @type {import("@apollo/server").ApolloServerOptions<import("@rm/types").GqlContext>['resolvers']} */
 const resolvers = {
@@ -355,6 +356,9 @@ const resolvers = {
     scanAreas: (_, _args, { req, perms }) => {
       if (perms?.scanAreas) {
         const scanAreas = config.getAreas(req, 'scanAreas')
+        const unrestrictedAreaGrant = hasUnrestrictedAreaGrant(
+          perms.areaRestrictions,
+        )
         const parentKeyByName = Object.fromEntries(
           scanAreas.features
             .filter(
@@ -369,6 +373,7 @@ const resolvers = {
             ]),
         )
         const canAccessArea = (properties) =>
+          unrestrictedAreaGrant ||
           !perms.areaRestrictions.length ||
           perms.areaRestrictions.includes(properties.key) ||
           perms.areaRestrictions.includes(properties.name) ||
@@ -393,6 +398,9 @@ const resolvers = {
     scanAreasMenu: (_, _args, { req, perms }) => {
       if (perms?.scanAreas) {
         const scanAreas = config.getAreas(req, 'scanAreasMenu')
+        const unrestrictedAreaGrant = hasUnrestrictedAreaGrant(
+          perms.areaRestrictions,
+        )
         const parentKeyByName = Object.fromEntries(
           scanAreas
             .filter((parent) => parent.name && parent.details?.properties?.key)
@@ -406,7 +414,7 @@ const resolvers = {
               : null,
         }))
 
-        if (perms.areaRestrictions.length) {
+        if (perms.areaRestrictions.length && !unrestrictedAreaGrant) {
           const canAccessArea = (properties) =>
             perms.areaRestrictions.includes(properties.key) ||
             perms.areaRestrictions.includes(properties.name) ||

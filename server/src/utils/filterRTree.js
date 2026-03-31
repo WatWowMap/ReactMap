@@ -4,6 +4,7 @@ const { point } = require('@turf/helpers')
 
 const config = require('@rm/config')
 const { consolidateAreas } = require('./consolidateAreas')
+const { hasUnrestrictedAreaGrant } = require('./areaPerms')
 
 /**
  * Filters via RTree in place of MySQL query when using in memory data
@@ -14,9 +15,14 @@ const { consolidateAreas } = require('./consolidateAreas')
  * @returns {boolean}
  */
 function filterRTree(item, areaRestrictions = [], onlyAreas = []) {
+  const unrestrictedAreaGrant = hasUnrestrictedAreaGrant(areaRestrictions)
+  if (unrestrictedAreaGrant && !onlyAreas.length) return true
   if (!areaRestrictions.length && !onlyAreas.length) return true
 
-  const consolidatedAreas = consolidateAreas(areaRestrictions, onlyAreas)
+  const consolidatedAreas = consolidateAreas(
+    unrestrictedAreaGrant ? [] : areaRestrictions,
+    onlyAreas,
+  )
 
   if (!consolidatedAreas.size) return false
 
