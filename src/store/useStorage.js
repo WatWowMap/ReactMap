@@ -6,6 +6,70 @@ import { create } from 'zustand'
 import { persist, createJSONStorage } from 'zustand/middleware'
 
 import { setDeep } from '@utils/setDeep'
+import {
+  getScanAreaMenuFeatures,
+  migrateLegacyAreaKeys,
+} from '../features/scanArea/utils'
+
+/**
+ * @returns {import('@rm/types').Config['areas']['scanAreasMenu'][string]}
+ */
+function getCurrentScanAreaMenu() {
+  const currentDomain =
+    typeof window === 'undefined'
+      ? 'main'
+      : window.location.host.replaceAll('.', '_')
+
+  return (
+    CONFIG.areas?.scanAreasMenu?.[currentDomain] ||
+    CONFIG.areas?.scanAreasMenu?.main ||
+    []
+  )
+}
+
+/**
+ * @param {Partial<import('@rm/types').AllFilters> | undefined} filters
+ * @returns {Partial<import('@rm/types').AllFilters> | undefined}
+ */
+function migrateStoredScanAreaFilters(filters) {
+  const selectedAreas = filters?.scanAreas?.filter?.areas || []
+  if (!selectedAreas.length) {
+    return filters
+  }
+
+  const features = getScanAreaMenuFeatures(getCurrentScanAreaMenu())
+  const migratedAreas = migrateLegacyAreaKeys(features, selectedAreas)
+  if (!migratedAreas) {
+    return filters
+  }
+
+  return {
+    ...filters,
+    scanAreas: {
+      ...filters.scanAreas,
+      filter: {
+        ...filters.scanAreas?.filter,
+        areas: migratedAreas,
+      },
+    },
+  }
+}
+
+function mergePersistedState(persistedState, currentState) {
+  if (!persistedState || typeof persistedState !== 'object') {
+    return currentState
+  }
+
+  return {
+    ...currentState,
+    ...persistedState,
+    filters: migrateStoredScanAreaFilters(
+      /** @type {{ filters?: Partial<import('@rm/types').AllFilters> }} */ (
+        persistedState
+      ).filters || currentState.filters,
+    ),
+  }
+}
 
 /**
  * @typedef {{
@@ -174,6 +238,7 @@ export const useStorage = create(
     {
       name: 'local-state',
       storage: createJSONStorage(() => localStorage),
+      merge: mergePersistedState,
     },
   ),
 )
