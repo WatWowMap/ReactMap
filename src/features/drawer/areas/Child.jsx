@@ -136,11 +136,7 @@ export function AreaChild({
             size="small"
             color="secondary"
             indeterminate={name ? hasSome && !hasAll : false}
-            checked={
-              name
-                ? hasAll
-                : coveredByGroup || scanAreas.includes(feature.properties.key)
-            }
+            checked={name ? hasAll : scanAreas.includes(feature.properties.key)}
             onClick={(e) => e.stopPropagation()}
             onChange={() => {
               let areaKeys = name
@@ -150,20 +146,7 @@ export function AreaChild({
                 : feature.properties.key
 
               if (!name && coveredByGroup) {
-                const siblingAreaKeys = (allChildAreas || childAreas || [])
-                  .filter(
-                    (child) =>
-                      !child.properties.manual &&
-                      child.properties.key !== feature.properties.key,
-                  )
-                  .map((child) => child.properties.key)
-                areaKeys = [
-                  groupKey,
-                  ...(scanAreas.includes(feature.properties.key)
-                    ? [feature.properties.key]
-                    : []),
-                  ...siblingAreaKeys.filter((key) => !scanAreas.includes(key)),
-                ]
+                areaKeys = [groupKey, feature.properties.key]
               }
 
               setAreas(areaKeys, allAreas, name ? hasSome : false)
