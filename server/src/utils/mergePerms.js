@@ -1,6 +1,4 @@
 // @ts-check
-const { normalizeAreaRestrictions } = require('./areaPerms')
-
 /**
  *
  * @param {import("@rm/types").Permissions} existingPerms
@@ -21,19 +19,7 @@ function mergePerms(existingPerms, incomingPerms) {
         return [
           key,
           Array.isArray(existingValue) || Array.isArray(incomingValue)
-            ? key === 'areaRestrictions'
-              ? normalizeAreaRestrictions([
-                  ...new Set([
-                    ...(existingValue || []),
-                    ...(incomingValue || []),
-                  ]),
-                ])
-              : [
-                  ...new Set([
-                    ...(existingValue || []),
-                    ...(incomingValue || []),
-                  ]),
-                ]
+            ? [...new Set([...(existingValue || []), ...(incomingValue || [])])]
             : existingValue || incomingValue,
         ]
       }),

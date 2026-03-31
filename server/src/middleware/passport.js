@@ -1,7 +1,6 @@
 // @ts-check
 
 const passport = require('passport')
-const { normalizeAreaRestrictions } = require('../utils/areaPerms')
 
 /**
  *
@@ -17,12 +16,6 @@ passport.serializeUser(async (user, done) => {
 })
 
 passport.deserializeUser(async (user, done) => {
-  if (Array.isArray(user?.perms?.areaRestrictions)) {
-    user.perms.areaRestrictions = normalizeAreaRestrictions(
-      user.perms.areaRestrictions,
-    )
-  }
-
   if (user.perms.map) {
     done(null, user)
   } else {
