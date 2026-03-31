@@ -18,6 +18,7 @@ import { useMemory } from '@store/useMemory'
  *  feature?: Pick<import('@rm/types').RMFeature, 'properties'>
  *  allAreas?: string[]
  *  childAreas?: Pick<import('@rm/types').RMFeature, 'properties'>[]
+ *  allChildAreas?: Pick<import('@rm/types').RMFeature, 'properties'>[]
  *  borderRight?: boolean
  *  colSpan?: number
  * }} props
@@ -26,6 +27,7 @@ export function AreaChild({
   name,
   feature,
   childAreas,
+  allChildAreas,
   allAreas,
   borderRight,
   colSpan = 1,
@@ -40,16 +42,20 @@ export function AreaChild({
 
   if (!scanAreas) return null
 
-  const groupedChildren = childAreas || []
+  const groupedChildren = allChildAreas || childAreas || []
+  const visibleChildren = childAreas || []
   const groupedAreaKeys = groupedChildren
     .filter((child) => !child.properties.manual)
     .map((child) => child.properties.key)
   const parentAreaKeys =
-    name && feature?.properties?.key && !feature.properties.manual
+    name &&
+    feature?.properties?.key &&
+    !feature.properties.manual &&
+    !groupedAreaKeys.length
       ? [feature.properties.key]
       : []
   const selectableAreaKeys = name
-    ? [...new Set([...parentAreaKeys, ...groupedAreaKeys])]
+    ? [...new Set([...groupedAreaKeys, ...parentAreaKeys])]
     : []
   const removableAreaKeys =
     name && feature?.properties?.key && !feature.properties.manual
@@ -78,7 +84,7 @@ export function AreaChild({
 
   const nameProp =
     name || feature?.properties?.formattedName || feature?.properties?.name
-  const hasExpand = name && !expandAllScanAreas && !!childAreas?.length
+  const hasExpand = name && !expandAllScanAreas && !!visibleChildren.length
   return (
     <TableCell
       colSpan={colSpan}
