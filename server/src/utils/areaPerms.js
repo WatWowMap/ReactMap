@@ -412,6 +412,7 @@ function normalizeAreaRestrictions(areaRestrictions, req) {
         if (areaGrant.domain && areaGrant.domain !== getRequestAreaDomain(req))
           return
 
+        normalized.push(area)
         pushAreaKeys(
           normalized,
           areaGrant.area,
@@ -434,6 +435,7 @@ function normalizeAreaRestrictions(areaRestrictions, req) {
         )
           return
 
+        normalized.push(area)
         pushAreaKeys(
           normalized,
           parentGrant.area,
@@ -477,8 +479,12 @@ function areaPerms(roles, req, serializeScopedGrants = false) {
 
 module.exports = {
   areaPerms,
+  decodeAreaGrant,
+  decodeParentAreaGrant,
   getPublicAreaRestrictions,
   hasUnrestrictedAreaGrant,
+  isAreaGrant,
+  isParentAreaGrant,
   NO_ACCESS_SENTINEL,
   UNRESTRICTED_ACCESS_SENTINEL,
   normalizeAreaRestrictions,

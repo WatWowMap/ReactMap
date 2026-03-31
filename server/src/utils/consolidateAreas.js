@@ -1,5 +1,11 @@
 // @ts-check
 const config = require('@rm/config')
+const {
+  decodeAreaGrant,
+  decodeParentAreaGrant,
+  isAreaGrant,
+  isParentAreaGrant,
+} = require('./areaPerms')
 
 /**
  * Consolidate area restrictions and user set areas, accounts for parents
@@ -9,8 +15,8 @@ const config = require('@rm/config')
  */
 function consolidateAreas(areaRestrictions = [], onlyAreas = []) {
   const areas = config.getSafe('areas')
-  const featuresByKey = Object.values(areas.scanAreas).reduce(
-    (acc, featureCollection) => {
+  const featureEntriesByKey = Object.entries(areas.scanAreas).reduce(
+    (acc, [domain, featureCollection]) => {
       featureCollection.features.forEach((feature) => {
         if (
           !feature.properties.key ||
@@ -22,14 +28,14 @@ function consolidateAreas(areaRestrictions = [], onlyAreas = []) {
         if (!acc[feature.properties.key]) {
           acc[feature.properties.key] = []
         }
-        acc[feature.properties.key].push(feature)
+        acc[feature.properties.key].push({ domain, feature })
       })
       return acc
     },
-    /** @type {Record<string, import('@rm/types').RMFeature[]>} */ ({}),
+    /** @type {Record<string, { domain: string, feature: import('@rm/types').RMFeature }[]>} */ ({}),
   )
-  const childFeaturesByKey = Object.values(areas.scanAreas).reduce(
-    (acc, featureCollection) => {
+  const childFeaturesByKey = Object.entries(areas.scanAreas).reduce(
+    (acc, [domain, featureCollection]) => {
       const parentKeysByName = Object.fromEntries(
         featureCollection.features
           .filter(
@@ -52,6 +58,7 @@ function consolidateAreas(areaRestrictions = [], onlyAreas = []) {
             acc[feature.properties.key] = []
           }
           acc[feature.properties.key].push({
+            domain,
             feature,
             parentKey: parentKeysByName[feature.properties.parent] || '',
             parentName: feature.properties.parent,
@@ -61,43 +68,98 @@ function consolidateAreas(areaRestrictions = [], onlyAreas = []) {
       return acc
     },
     /** @type {Record<string, {
+     *   domain: string,
      *   feature: import('@rm/types').RMFeature,
      *   parentKey: string,
      *   parentName: string,
      * }[]>} */ ({}),
   )
-  const validAreaRestrictions = areaRestrictions.flatMap(
-    (area) => featuresByKey[area] || [],
+  const plainAreaRestrictions = areaRestrictions.filter(
+    (area) => !isAreaGrant(area) && !isParentAreaGrant(area),
   )
-  const validUserAreas = onlyAreas.filter((area) => featuresByKey[area]?.length)
+  const scopedAreaDomains = areaRestrictions.reduce((acc, area) => {
+    if (!isAreaGrant(area)) {
+      return acc
+    }
+    const areaGrant = decodeAreaGrant(area)
+    if (!areaGrant.domain) {
+      return acc
+    }
+    if (!acc[areaGrant.area]) {
+      acc[areaGrant.area] = new Set()
+    }
+    acc[areaGrant.area].add(areaGrant.domain)
+    return acc
+  }, /** @type {Record<string, Set<string>>} */ ({}))
+  const scopedParentDomains = areaRestrictions.reduce((acc, area) => {
+    if (!isParentAreaGrant(area)) {
+      return acc
+    }
+    const parentGrant = decodeParentAreaGrant(area)
+    if (!parentGrant.domain) {
+      return acc
+    }
+    if (!acc[parentGrant.area]) {
+      acc[parentGrant.area] = new Set()
+    }
+    acc[parentGrant.area].add(parentGrant.domain)
+    return acc
+  }, /** @type {Record<string, Set<string>>} */ ({}))
+  const getDirectFeatures = (area) => {
+    const featureEntries = featureEntriesByKey[area] || []
+    if (!featureEntries.length) {
+      return []
+    }
+
+    if (scopedAreaDomains[area]?.size) {
+      return featureEntries
+        .filter(({ domain }) => scopedAreaDomains[area].has(domain))
+        .map(({ feature }) => feature)
+    }
+
+    const distinctDomains = new Set(featureEntries.map(({ domain }) => domain))
+    return distinctDomains.size === 1
+      ? featureEntries.map(({ feature }) => feature)
+      : []
+  }
+  const validAreaRestrictions = plainAreaRestrictions.flatMap(getDirectFeatures)
+  const validUserAreas = onlyAreas.filter(
+    (area) => featureEntriesByKey[area]?.length,
+  )
 
   const cleanedValidUserAreas = validUserAreas.flatMap((area) =>
     areaRestrictions.length
-      ? areaRestrictions.includes(area)
-        ? featuresByKey[area]
+      ? getDirectFeatures(area).length
+        ? getDirectFeatures(area)
         : (() => {
             const matchingChildren = (childFeaturesByKey[area] || []).filter(
-              ({ parentKey, parentName }) =>
-                (!!parentKey && areaRestrictions.includes(parentKey)) ||
-                areaRestrictions.includes(parentName),
+              ({ domain, parentKey, parentName }) => {
+                const scopedDomains = new Set([
+                  ...(scopedAreaDomains[parentKey] || []),
+                  ...(scopedAreaDomains[parentName] || []),
+                  ...(scopedParentDomains[parentKey] || []),
+                  ...(scopedParentDomains[parentName] || []),
+                ])
+                return scopedDomains.size
+                  ? scopedDomains.has(domain)
+                  : (!!parentKey &&
+                      plainAreaRestrictions.includes(parentKey)) ||
+                      plainAreaRestrictions.includes(parentName)
+              },
             )
-            const distinctParentKeys = new Set(
-              matchingChildren
-                .map(({ parentKey }) => parentKey)
-                .filter(Boolean),
+            const distinctDomains = new Set(
+              matchingChildren.map(({ domain }) => domain),
             )
-            const distinctParentNames = new Set(
-              matchingChildren.map(({ parentName }) => parentName),
-            )
-            return distinctParentKeys.size <= 1 &&
-              distinctParentNames.size === 1
+            return distinctDomains.size === 1
               ? matchingChildren.map(({ feature }) => feature)
               : []
           })()
-      : featuresByKey[area],
+      : getDirectFeatures(area),
   )
   return new Set(
-    validUserAreas.length ? cleanedValidUserAreas : validAreaRestrictions,
+    cleanedValidUserAreas.length
+      ? cleanedValidUserAreas
+      : validAreaRestrictions,
   )
 }
 

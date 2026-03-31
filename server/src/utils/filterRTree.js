@@ -25,12 +25,6 @@ function filterRTree(item, areaRestrictions = [], onlyAreas = []) {
   )
 
   if (!consolidatedAreas.size) return false
-  const areaRefs = new Set(
-    [...consolidatedAreas].map(
-      (feature) =>
-        `${feature.properties.key || ''}:${feature.properties.parent || ''}:${feature.properties.name || ''}`,
-    ),
-  )
 
   /** @type {import("@rm/types").RMGeoJSON['features']} */
   const foundFeatures = config
@@ -41,11 +35,7 @@ function filterRTree(item, areaRestrictions = [], onlyAreas = []) {
       w: 0,
       h: 0,
     })
-    .filter((feature) =>
-      areaRefs.has(
-        `${feature.properties.key || ''}:${feature.properties.parent || ''}:${feature.properties.name || ''}`,
-      ),
-    )
+    .filter((feature) => consolidatedAreas.has(feature))
 
   const foundInRtree =
     foundFeatures.length &&
