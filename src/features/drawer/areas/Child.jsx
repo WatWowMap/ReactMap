@@ -44,7 +44,9 @@ export function AreaChild({
 
   if (!scanAreas) return null
 
-  const groupedChildren = childAreas || []
+  const groupedChildren = name
+    ? allChildAreas || childAreas || []
+    : childAreas || []
   const groupedAreaKeys = groupedChildren
     .filter((child) => !child.properties.manual)
     .map((child) => child.properties.key)
@@ -159,6 +161,22 @@ export function AreaChild({
                     : []),
                   ...siblingAreaKeys.filter((key) => !scanAreas.includes(key)),
                 ]
+              } else if (!name && groupKey && !scanAreas.includes(groupKey)) {
+                const siblingAreaKeys = (allChildAreas || childAreas || [])
+                  .filter(
+                    (child) =>
+                      !child.properties.manual &&
+                      child.properties.key !== feature.properties.key,
+                  )
+                  .map((child) => child.properties.key)
+                const completesGroup =
+                  !scanAreas.includes(feature.properties.key) &&
+                  siblingAreaKeys.length > 0 &&
+                  siblingAreaKeys.every((key) => scanAreas.includes(key))
+
+                if (completesGroup) {
+                  areaKeys = [feature.properties.key, groupKey]
+                }
               }
 
               setAreas(areaKeys, allAreas, name ? hasSome : false)

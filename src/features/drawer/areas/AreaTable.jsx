@@ -208,6 +208,7 @@ export function ScanAreasTable() {
                         feature={details}
                         allAreas={allAreas}
                         childAreas={children}
+                        allChildAreas={allChildren}
                         groupKey={groupKey}
                         colSpan={2}
                       />
