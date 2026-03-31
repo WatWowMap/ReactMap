@@ -58,7 +58,10 @@ export function AreaChild({
   const selectableAreaKeys = name
     ? [...new Set([...groupedAreaKeys, ...parentAreaKeys])]
     : []
-  const removableAreaKeys = selectableAreaKeys
+  const removableAreaKeys =
+    name && feature?.properties?.key && !feature.properties.manual
+      ? [...new Set([...selectableAreaKeys, feature.properties.key])]
+      : selectableAreaKeys
   const hasAll =
     name && selectableAreaKeys.length
       ? selectableAreaKeys.every((key) => scanAreas.includes(key))
