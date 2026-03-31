@@ -18,20 +18,20 @@ function isAreaGrant(area) {
 /**
  * @param {string} areaOrDomain
  * @param {string} [area]
- * @param {string[]} [keys]
+ * @param {'key' | 'label' | 'none'} [lookup]
  * @returns {string}
  */
-function encodeAreaGrant(areaOrDomain, area, keys) {
+function encodeAreaGrant(areaOrDomain, area, lookup) {
   return `${AREA_ACCESS_PREFIX}${JSON.stringify(
     area
-      ? { domain: areaOrDomain, area, ...(keys ? { keys } : {}) }
-      : { area: areaOrDomain, ...(keys ? { keys } : {}) },
+      ? { domain: areaOrDomain, area, ...(lookup ? { lookup } : {}) }
+      : { area: areaOrDomain, ...(lookup ? { lookup } : {}) },
   )}`
 }
 
 /**
  * @param {string} area
- * @returns {{ domain?: string, area: string, keys?: string[] }}
+ * @returns {{ domain?: string, area: string, lookup?: 'key' | 'label' | 'none' }}
  */
 function decodeAreaGrant(area) {
   const value = JSON.parse(area.slice(AREA_ACCESS_PREFIX.length))
@@ -49,20 +49,20 @@ function isParentAreaGrant(area) {
 /**
  * @param {string} areaOrDomain
  * @param {string} [area]
- * @param {string[]} [keys]
+ * @param {'key' | 'label' | 'none'} [lookup]
  * @returns {string}
  */
-function encodeParentAreaGrant(areaOrDomain, area, keys) {
+function encodeParentAreaGrant(areaOrDomain, area, lookup) {
   return `${PARENT_ACCESS_PREFIX}${JSON.stringify(
     area
-      ? { domain: areaOrDomain, area, ...(keys ? { keys } : {}) }
-      : { area: areaOrDomain, ...(keys ? { keys } : {}) },
+      ? { domain: areaOrDomain, area, ...(lookup ? { lookup } : {}) }
+      : { area: areaOrDomain, ...(lookup ? { lookup } : {}) },
   )}`
 }
 
 /**
  * @param {string} area
- * @returns {{ domain?: string, area: string, keys?: string[] }}
+ * @returns {{ domain?: string, area: string, lookup?: 'key' | 'label' | 'none' }}
  */
 function decodeParentAreaGrant(area) {
   const value = JSON.parse(area.slice(PARENT_ACCESS_PREFIX.length))
@@ -253,11 +253,21 @@ function getRequestAreaDomain(req) {
  * }} areas
  * @param {ReturnType<typeof getAreaMaps>} areaMaps
  * @param {boolean} [includeChildren]
+ * @param {'auto' | 'key' | 'label'} [lookupMode]
  */
-function pushAreaKeys(perms, target, areas, areaMaps, includeChildren = false) {
+function pushAreaKeys(
+  perms,
+  target,
+  areas,
+  areaMaps,
+  includeChildren = false,
+  lookupMode = 'auto',
+) {
   if (!target) return
 
-  const targetFeature = areas.scanAreasObj[target]
+  const allowCanonicalLookup = lookupMode !== 'label'
+  const allowLabelLookup = lookupMode !== 'key'
+  const targetFeature = allowCanonicalLookup ? areas.scanAreasObj[target] : null
   const isCanonicalTarget = targetFeature?.properties?.key === target
 
   if (isCanonicalTarget) {
@@ -283,7 +293,7 @@ function pushAreaKeys(perms, target, areas, areaMaps, includeChildren = false) {
     }
   }
 
-  const nameMatches = areas.withoutParents[target] || []
+  const nameMatches = allowLabelLookup ? areas.withoutParents[target] || [] : []
   const visibleNameMatches = nameMatches.filter(
     (key) => !areas.scanAreasObj[key]?.properties?.hidden,
   )
@@ -329,12 +339,20 @@ function pushAreaKeys(perms, target, areas, areaMaps, includeChildren = false) {
  * }} areas
  * @param {ReturnType<typeof getAreaMaps>} areaMaps
  * @param {boolean} [includeChildren]
- * @returns {string[]}
+ * @returns {'key' | 'label' | 'none'}
  */
-function resolveAreaKeys(target, areas, areaMaps, includeChildren = false) {
+function getAreaLookupMode(target, areas, areaMaps, includeChildren = false) {
+  if (!target) {
+    return 'none'
+  }
+
+  if (areas.scanAreasObj[target]) {
+    return 'key'
+  }
+
   const resolved = []
-  pushAreaKeys(resolved, target, areas, areaMaps, includeChildren)
-  return [...new Set(resolved)]
+  pushAreaKeys(resolved, target, areas, areaMaps, includeChildren, 'label')
+  return resolved.length ? 'label' : 'none'
 }
 
 /**
@@ -394,7 +412,7 @@ function resolveAreaPerms(roles, req, serializeScopedGrants = false) {
               encodeAreaGrant(
                 req ? getRequestAreaDomain(req) : '',
                 areaTarget,
-                resolveAreaKeys(
+                getAreaLookupMode(
                   areaTarget,
                   requestAreas,
                   requestAreaMaps,
@@ -421,7 +439,7 @@ function resolveAreaPerms(roles, req, serializeScopedGrants = false) {
               encodeParentAreaGrant(
                 req ? getRequestAreaDomain(req) : '',
                 areaRestrictions[j].parent[k],
-                resolveAreaKeys(
+                getAreaLookupMode(
                   areaRestrictions[j].parent[k],
                   requestAreas,
                   requestAreaMaps,
@@ -497,15 +515,14 @@ function normalizeAreaRestrictions(areaRestrictions, req) {
           return
 
         normalized.push(area)
-        if (Array.isArray(areaGrant.keys)) {
-          normalized.push(...areaGrant.keys)
-        } else {
+        if (areaGrant.lookup !== 'none') {
           pushAreaKeys(
             normalized,
             areaGrant.area,
             requestAreas,
             requestAreaMaps,
             false,
+            areaGrant.lookup || 'auto',
           )
         }
       } else {
@@ -524,15 +541,14 @@ function normalizeAreaRestrictions(areaRestrictions, req) {
           return
 
         normalized.push(area)
-        if (Array.isArray(parentGrant.keys)) {
-          normalized.push(...parentGrant.keys)
-        } else {
+        if (parentGrant.lookup !== 'none') {
           pushAreaKeys(
             normalized,
             parentGrant.area,
             requestAreas,
             requestAreaMaps,
             true,
+            parentGrant.lookup || 'auto',
           )
         }
       } else {
