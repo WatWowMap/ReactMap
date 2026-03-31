@@ -16,6 +16,7 @@ function getPublicAreaRestrictions(areaRestrictions = []) {
  * @returns {{
  *   keyDomainMap: Record<string, string>,
  *   parentDomainsMap: Record<string, string[]>,
+ *   queryableAreaNames: Set<string>,
  *   scopedParentKeyMap: Record<string, string[]>,
  *   scopedParentAreaKeyMap: Record<string, string>,
  * }}
@@ -27,21 +28,24 @@ function getAreaMaps(scanAreas) {
       const areaKeysByName = {}
 
       featureCollection.features.forEach((feature) => {
-        const { hidden, key, name, parent } = feature.properties
+        const { hidden, key, manual, name, parent } = feature.properties
         if (!key) return
 
-        acc.keyDomainMap[key] = domain
-        if (name && !parent && !hidden) {
+        if (!manual) {
+          acc.keyDomainMap[key] = domain
+        }
+        if (name && !parent && !hidden && !manual) {
+          acc.queryableAreaNames.add(name)
           if (!areaKeysByName[name]) areaKeysByName[name] = []
           areaKeysByName[name].push(key)
         }
       })
 
       featureCollection.features.forEach((feature) => {
-        const { hidden, key, parent } = feature.properties
+        const { hidden, key, manual, parent } = feature.properties
 
         // Hidden children should not widen backend access through parent expansion.
-        if (!key || !parent || hidden) return
+        if (!key || !parent || hidden || manual) return
 
         const scopedKey = `${domain}:${parent}`
         if (!acc.parentDomainsMap[parent]) acc.parentDomainsMap[parent] = []
@@ -63,11 +67,13 @@ function getAreaMaps(scanAreas) {
     /** @type {{
      *   keyDomainMap: Record<string, string>,
      *   parentDomainsMap: Record<string, string[]>,
+     *   queryableAreaNames: Set<string>,
      *   scopedParentKeyMap: Record<string, string[]>,
      *   scopedParentAreaKeyMap: Record<string, string>,
      * }} */ ({
       keyDomainMap: {},
       parentDomainsMap: {},
+      queryableAreaNames: new Set(),
       scopedParentKeyMap: {},
       scopedParentAreaKeyMap: {},
     }),
@@ -93,7 +99,10 @@ function pushAreaKeys(perms, target, areas, areaMaps, includeChildren = false) {
 
   const parentFeature = includeChildren ? areas.scanAreasObj[target] : null
   const isCanonicalTarget =
-    areas.names.has(target) || parentFeature?.properties?.key === target
+    areas.names.has(target) ||
+    (!!parentFeature &&
+      !parentFeature.properties.manual &&
+      parentFeature.properties.key === target)
 
   if (isCanonicalTarget) {
     perms.push(target)
@@ -114,7 +123,11 @@ function pushAreaKeys(perms, target, areas, areaMaps, includeChildren = false) {
     perms.push(...areas.withoutParents[target])
   }
 
-  if (!includeChildren && areaMaps.parentDomainsMap[target]?.length === 1) {
+  if (
+    !includeChildren &&
+    !areaMaps.queryableAreaNames.has(target) &&
+    areaMaps.parentDomainsMap[target]?.length === 1
+  ) {
     const scopedKey = `${areaMaps.parentDomainsMap[target][0]}:${target}`
     if (!areaMaps.scopedParentAreaKeyMap[scopedKey]) {
       perms.push(...(areaMaps.scopedParentKeyMap[scopedKey] || []))
