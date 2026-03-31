@@ -62,10 +62,9 @@ class TelegramClient extends AuthClient {
    *
    * @param {TGUser} user
    * @param {string[]} groups
-   * @param {import('express').Request} req
    * @returns {TGUser & { perms: import("@rm/types").Permissions }}
    */
-  getUserPerms(user, groups, req) {
+  getUserPerms(user, groups) {
     const trialActive = this.trialManager.active()
     let gainedAccessViaTrial = false
 
@@ -100,7 +99,7 @@ class TelegramClient extends AuthClient {
         ...perms,
         trial: gainedAccessViaTrial,
         admin: false,
-        areaRestrictions: areaPerms(groups, req),
+        areaRestrictions: areaPerms(groups),
         webhooks: webhookPerms(groups, 'telegramGroups', trialActive),
         scanner: scannerPerms(groups, 'telegramGroups', trialActive),
         scannerCooldownBypass: scannerCooldownBypass(groups, 'telegramGroups'),
@@ -125,7 +124,7 @@ class TelegramClient extends AuthClient {
   async authHandler(req, profile, done) {
     const baseUser = { ...profile, rmStrategy: this.rmStrategy }
     const groups = await this.getUserGroups(baseUser)
-    const user = this.getUserPerms(baseUser, groups, req)
+    const user = this.getUserPerms(baseUser, groups)
 
     if (!user.perms.map) {
       this.log.warn(user.username, 'was not given map perms')

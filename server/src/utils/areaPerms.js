@@ -189,6 +189,8 @@ function pushAreaKeys(perms, target, areas, areaMaps, includeChildren = false) {
 
   if (isCanonicalTarget) {
     if (includeChildren && !targetFeature?.properties?.parent) {
+      perms.push(target)
+
       const parentName = targetFeature?.properties?.name
       const domain =
         areaMaps.keyDomainsMap[target]?.length === 1
@@ -202,8 +204,6 @@ function pushAreaKeys(perms, target, areas, areaMaps, includeChildren = false) {
 
       if (scopedChildren.length) {
         perms.push(...scopedChildren)
-      } else {
-        perms.push(target)
       }
     } else {
       perms.push(target)

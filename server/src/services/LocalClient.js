@@ -35,7 +35,7 @@ class LocalClient extends AuthClient {
   }
 
   /** @type {import('passport-local').VerifyFunctionWithRequest} */
-  async authHandler(req, username, password, done) {
+  async authHandler(_req, username, password, done) {
     const forceTutorial = config.getSafe('map.misc.forceTutorial')
     const trialActive = this.trialManager.active()
     const localPerms = Object.keys(this.perms).filter((key) =>
@@ -44,7 +44,7 @@ class LocalClient extends AuthClient {
     const user = {
       perms: /** @type {import('@rm/types').Permissions} */ ({
         ...Object.fromEntries(Object.keys(this.perms).map((x) => [x, false])),
-        areaRestrictions: areaPerms(localPerms, req),
+        areaRestrictions: areaPerms(localPerms),
         webhooks: [],
         scanner: [],
         scannerCooldownBypass: [],
