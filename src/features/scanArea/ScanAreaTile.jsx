@@ -33,11 +33,21 @@ function ScanArea(featureCollection) {
     () => [...effectiveSelectedAreas].sort().join(','),
     [effectiveSelectedAreas],
   )
+  const orderedFeatureCollection = React.useMemo(
+    () => ({
+      ...featureCollection,
+      // Render grouped parents underneath children so child taps stay reachable.
+      features: [...featureCollection.features].sort(
+        (a, b) => Number(!!a.properties.parent) - Number(!!b.properties.parent),
+      ),
+    }),
+    [featureCollection],
+  )
 
   return (
     <GeoJSON
       key={`${search}${tapToToggle}${alwaysShowLabels}${selectionKey}`}
-      data={featureCollection}
+      data={orderedFeatureCollection}
       filter={(f) =>
         webhook ||
         search === '' ||
