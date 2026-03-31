@@ -171,10 +171,11 @@ function consolidateAreas(areaRestrictions = [], onlyAreas = []) {
     !!plainAreaRestrictions.length ||
     !!Object.keys(scopedAreaDomains).length ||
     !!Object.keys(scopedParentDomains).length
+  const allowedDirectAreas = new Set(plainAreaRestrictions)
 
   const cleanedValidUserAreas = validUserAreas.flatMap((area) =>
     hasExplicitRestrictions
-      ? getDirectFeatures(area).length
+      ? allowedDirectAreas.has(area)
         ? getDirectFeatures(area)
         : (() => {
             const matchingChildren = (childFeaturesByKey[area] || []).filter(
