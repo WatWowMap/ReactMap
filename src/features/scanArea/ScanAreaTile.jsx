@@ -63,9 +63,9 @@ function ScanArea(featureCollection) {
               layer.feature,
             )
             const validAreaKeys = getValidAreaKeys(featureCollection.features)
-            const { filters, setAreas } = useStorage.getState()
+            const { setAreas } = useStorage.getState()
             const hasSome = areaKeys.some((area) =>
-              filters?.scanAreas?.filter?.areas?.includes(area),
+              effectiveSelectedAreas.includes(area),
             )
             layer.setStyle({ fillOpacity: hasSome ? 0.2 : 0.8 })
             setAreas(areaKeys, validAreaKeys, hasSome)
