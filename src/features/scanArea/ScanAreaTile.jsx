@@ -51,7 +51,9 @@ function ScanArea(featureCollection) {
       filter={(f) =>
         webhook ||
         search === '' ||
-        f.properties.key.toLowerCase().includes(search.toLowerCase())
+        `${f.properties.key || f.properties.name || ''}`
+          .toLowerCase()
+          .includes(search.toLowerCase())
       }
       eventHandlers={{
         click: ({ propagatedFrom: layer }) => {

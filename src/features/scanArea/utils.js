@@ -17,9 +17,8 @@ export function getScanAreaMenuFeatures(scanAreasMenu = []) {
  * @returns {string[]}
  */
 export function getAreaKeys(features, feature) {
-  if (!feature?.properties?.key || feature.properties.manual) return []
+  if (!feature?.properties || feature.properties.manual) return []
 
-  const areaKeys = [feature.properties.key]
   const childKeys =
     !feature.properties.parent && feature.properties.name
       ? features
@@ -32,6 +31,9 @@ export function getAreaKeys(features, feature) {
           .map((child) => child.properties.key)
       : []
 
+  if (!feature.properties.key) return childKeys
+
+  const areaKeys = [feature.properties.key]
   return childKeys.length ? [...areaKeys, ...childKeys] : areaKeys
 }
 
