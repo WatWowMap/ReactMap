@@ -18,17 +18,20 @@ function isAreaGrant(area) {
 /**
  * @param {string} areaOrDomain
  * @param {string} [area]
+ * @param {string[]} [keys]
  * @returns {string}
  */
-function encodeAreaGrant(areaOrDomain, area) {
+function encodeAreaGrant(areaOrDomain, area, keys) {
   return `${AREA_ACCESS_PREFIX}${JSON.stringify(
-    area ? { domain: areaOrDomain, area } : { area: areaOrDomain },
+    area
+      ? { domain: areaOrDomain, area, ...(keys ? { keys } : {}) }
+      : { area: areaOrDomain, ...(keys ? { keys } : {}) },
   )}`
 }
 
 /**
  * @param {string} area
- * @returns {{ domain?: string, area: string }}
+ * @returns {{ domain?: string, area: string, keys?: string[] }}
  */
 function decodeAreaGrant(area) {
   const value = JSON.parse(area.slice(AREA_ACCESS_PREFIX.length))
@@ -46,17 +49,20 @@ function isParentAreaGrant(area) {
 /**
  * @param {string} areaOrDomain
  * @param {string} [area]
+ * @param {string[]} [keys]
  * @returns {string}
  */
-function encodeParentAreaGrant(areaOrDomain, area) {
+function encodeParentAreaGrant(areaOrDomain, area, keys) {
   return `${PARENT_ACCESS_PREFIX}${JSON.stringify(
-    area ? { domain: areaOrDomain, area } : { area: areaOrDomain },
+    area
+      ? { domain: areaOrDomain, area, ...(keys ? { keys } : {}) }
+      : { area: areaOrDomain, ...(keys ? { keys } : {}) },
   )}`
 }
 
 /**
  * @param {string} area
- * @returns {{ domain?: string, area: string }}
+ * @returns {{ domain?: string, area: string, keys?: string[] }}
  */
 function decodeParentAreaGrant(area) {
   const value = JSON.parse(area.slice(PARENT_ACCESS_PREFIX.length))
@@ -315,6 +321,23 @@ function pushAreaKeys(perms, target, areas, areaMaps, includeChildren = false) {
 }
 
 /**
+ * @param {string | undefined} target
+ * @param {{
+ *   names: Set<string>,
+ *   scanAreasObj: Record<string, import('@rm/types').RMFeature>,
+ *   withoutParents: Record<string, string[]>,
+ * }} areas
+ * @param {ReturnType<typeof getAreaMaps>} areaMaps
+ * @param {boolean} [includeChildren]
+ * @returns {string[]}
+ */
+function resolveAreaKeys(target, areas, areaMaps, includeChildren = false) {
+  const resolved = []
+  pushAreaKeys(resolved, target, areas, areaMaps, includeChildren)
+  return [...new Set(resolved)]
+}
+
+/**
  * @param {string[]} roles
  * @param {import('express').Request} [req]
  * @param {boolean} [serializeScopedGrants]
@@ -368,7 +391,16 @@ function resolveAreaPerms(roles, req, serializeScopedGrants = false) {
 
           if (shouldSerializeScopedAreaGrant) {
             perms.push(
-              encodeAreaGrant(req ? getRequestAreaDomain(req) : '', areaTarget),
+              encodeAreaGrant(
+                req ? getRequestAreaDomain(req) : '',
+                areaTarget,
+                resolveAreaKeys(
+                  areaTarget,
+                  requestAreas,
+                  requestAreaMaps,
+                  false,
+                ),
+              ),
             )
           } else {
             pushAreaKeys(
@@ -389,6 +421,12 @@ function resolveAreaPerms(roles, req, serializeScopedGrants = false) {
               encodeParentAreaGrant(
                 req ? getRequestAreaDomain(req) : '',
                 areaRestrictions[j].parent[k],
+                resolveAreaKeys(
+                  areaRestrictions[j].parent[k],
+                  requestAreas,
+                  requestAreaMaps,
+                  true,
+                ),
               ),
             )
           } else if (req) {
@@ -459,10 +497,9 @@ function normalizeAreaRestrictions(areaRestrictions, req) {
           return
 
         normalized.push(area)
-        if (
-          !globalAreas.scanAreasObj[areaGrant.area] ||
-          requestAreas.scanAreasObj[areaGrant.area]
-        ) {
+        if (Array.isArray(areaGrant.keys)) {
+          normalized.push(...areaGrant.keys)
+        } else {
           pushAreaKeys(
             normalized,
             areaGrant.area,
@@ -486,15 +523,10 @@ function normalizeAreaRestrictions(areaRestrictions, req) {
         )
           return
 
-        const hasRequestParentLabel =
-          !!requestAreaMaps.parentDomainsMap[parentGrant.area]?.length
-
         normalized.push(area)
-        if (
-          !globalAreas.scanAreasObj[parentGrant.area] ||
-          requestAreas.scanAreasObj[parentGrant.area] ||
-          hasRequestParentLabel
-        ) {
+        if (Array.isArray(parentGrant.keys)) {
+          normalized.push(...parentGrant.keys)
+        } else {
           pushAreaKeys(
             normalized,
             parentGrant.area,
