@@ -292,7 +292,7 @@ function pushAreaKeys(perms, target, areas, areaMaps, includeChildren = false) {
 
   if (
     !includeChildren &&
-    !visibleNameMatches.length &&
+    !directNameMatches.length &&
     areaMaps.parentDomainsMap[target]?.length === 1
   ) {
     const scopedKey = `${areaMaps.parentDomainsMap[target][0]}:${target}`
