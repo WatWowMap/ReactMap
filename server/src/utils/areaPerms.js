@@ -13,19 +13,20 @@ function isParentAreaGrant(area) {
 }
 
 /**
+ * @param {string} domain
  * @param {string} area
  * @returns {string}
  */
-function encodeParentAreaGrant(area) {
-  return `${PARENT_ACCESS_PREFIX}${area}`
+function encodeParentAreaGrant(domain, area) {
+  return `${PARENT_ACCESS_PREFIX}${JSON.stringify({ domain, area })}`
 }
 
 /**
  * @param {string} area
- * @returns {string}
+ * @returns {{ domain: string, area: string }}
  */
 function decodeParentAreaGrant(area) {
-  return area.slice(PARENT_ACCESS_PREFIX.length)
+  return JSON.parse(area.slice(PARENT_ACCESS_PREFIX.length))
 }
 
 /**
@@ -150,8 +151,47 @@ function getRestrictionAreas(req) {
 }
 
 /**
+ * @param {import('express').Request} req
+ * @returns {string}
+ */
+function getRequestAreaDomain(req) {
+  const domain = req.headers.host.replaceAll('.', '_')
+  const location = `areas.scanAreas.${domain}`
+  return typeof config.has === 'function' && config.has(location)
+    ? domain
+    : 'main'
+}
+
+/**
+ * @param {string | undefined} target
+ * @param {{
+ *   scanAreasObj: Record<string, import('@rm/types').RMFeature>,
+ * }} areas
+ * @param {ReturnType<typeof getAreaMaps>} areaMaps
+ * @returns {string | undefined}
+ */
+function getParentGrantDomain(target, areas, areaMaps) {
+  if (!target) return undefined
+
+  const targetFeature = areas.scanAreasObj[target]
+  if (
+    targetFeature?.properties?.key === target &&
+    !targetFeature?.properties?.parent
+  ) {
+    return areaMaps.keyDomainsMap[target]?.length === 1
+      ? areaMaps.keyDomainsMap[target][0]
+      : undefined
+  }
+
+  return areaMaps.parentDomainsMap[target]?.length === 1
+    ? areaMaps.parentDomainsMap[target][0]
+    : undefined
+}
+
+/**
  * Resolves config entries into canonical area keys.
- * `parent` rules expand to both the parent's own area key and all child keys.
+ * `parent` rules expand to visible child keys and only fall back to the
+ * parent's own area key when no visible children are available.
  *
  * @param {string[]} perms
  * @param {string | undefined} target
@@ -170,8 +210,6 @@ function pushAreaKeys(perms, target, areas, areaMaps, includeChildren = false) {
   const isCanonicalTarget = targetFeature?.properties?.key === target
 
   if (isCanonicalTarget) {
-    perms.push(target)
-
     if (includeChildren && !targetFeature?.properties?.parent) {
       const parentName = targetFeature?.properties?.name
       const domain =
@@ -180,10 +218,17 @@ function pushAreaKeys(perms, target, areas, areaMaps, includeChildren = false) {
           : undefined
       const scopedKey =
         parentName && domain ? `${domain}:${parentName}` : undefined
+      const scopedChildren = scopedKey
+        ? areaMaps.scopedParentKeyMap[scopedKey] || []
+        : []
 
-      if (scopedKey && areaMaps.scopedParentKeyMap[scopedKey]) {
-        perms.push(...areaMaps.scopedParentKeyMap[scopedKey])
+      if (scopedChildren.length) {
+        perms.push(...scopedChildren)
+      } else {
+        perms.push(target)
       }
+    } else {
+      perms.push(target)
     }
   }
 
@@ -209,11 +254,11 @@ function pushAreaKeys(perms, target, areas, areaMaps, includeChildren = false) {
   // expand children when the parent label resolves to exactly one domain.
   if (includeChildren && areaMaps.parentDomainsMap[target]?.length === 1) {
     const scopedKey = `${areaMaps.parentDomainsMap[target][0]}:${target}`
-    if (areaMaps.scopedParentAreaKeyMap[scopedKey]) {
+    const scopedChildren = areaMaps.scopedParentKeyMap[scopedKey] || []
+    if (scopedChildren.length) {
+      perms.push(...scopedChildren)
+    } else if (areaMaps.scopedParentAreaKeyMap[scopedKey]) {
       perms.push(areaMaps.scopedParentAreaKeyMap[scopedKey])
-    }
-    if (areaMaps.scopedParentKeyMap[scopedKey]) {
-      perms.push(...areaMaps.scopedParentKeyMap[scopedKey])
     }
   }
 }
@@ -271,7 +316,17 @@ function resolveAreaPerms(roles, req) {
               true,
             )
           } else {
-            perms.push(encodeParentAreaGrant(areaRestrictions[j].parent[k]))
+            const domain = getParentGrantDomain(
+              areaRestrictions[j].parent[k],
+              areas,
+              areaMaps,
+            )
+
+            if (domain) {
+              perms.push(
+                encodeParentAreaGrant(domain, areaRestrictions[j].parent[k]),
+              )
+            }
           }
         }
       }
@@ -302,13 +357,10 @@ function normalizeAreaRestrictions(areaRestrictions, req) {
   safeAreaRestrictions.forEach((area) => {
     if (isParentAreaGrant(area)) {
       if (req) {
-        pushAreaKeys(
-          normalized,
-          decodeParentAreaGrant(area),
-          areas,
-          areaMaps,
-          true,
-        )
+        const parentGrant = decodeParentAreaGrant(area)
+        if (parentGrant.domain !== getRequestAreaDomain(req)) return
+
+        pushAreaKeys(normalized, parentGrant.area, areas, areaMaps, true)
       } else {
         normalized.push(area)
       }
