@@ -521,16 +521,30 @@ function normalizeAreaRestrictions(areaRestrictions, req) {
         if (areaGrant.domain && areaGrant.domain !== getRequestAreaDomain(req))
           return
 
+        const normalizedAreaLookup = areaGrant.lookup || 'auto'
+        const resolvedAreaKeys = []
+
         normalized.push(area)
         if (areaGrant.lookup !== 'none') {
           pushAreaKeys(
-            normalized,
+            resolvedAreaKeys,
             areaGrant.area,
             requestAreas,
             requestAreaMaps,
             false,
-            areaGrant.lookup || 'auto',
+            normalizedAreaLookup,
           )
+          normalized.push(...resolvedAreaKeys)
+
+          if (normalizedAreaLookup === 'label') {
+            resolvedAreaKeys.forEach((key) => {
+              if (requestAreas.scanAreasObj[key]) {
+                normalized.push(
+                  encodeAreaGrant(getRequestAreaDomain(req), key, 'key'),
+                )
+              }
+            })
+          }
         }
       } else {
         normalized.push(area)
