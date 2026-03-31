@@ -54,7 +54,7 @@ export function ScanAreasTable() {
         data?.scanAreasMenu.flatMap((parent) => [
           ...(parent.details?.properties?.key &&
           !parent.details.properties.manual &&
-          !parent.children.length
+          !parent.children.some((child) => !child.properties.manual)
             ? [parent.details.properties.key]
             : []),
           ...parent.children
