@@ -248,9 +248,10 @@ function pushAreaKeys(perms, target, areas, areaMaps, includeChildren = false) {
 /**
  * @param {string[]} roles
  * @param {import('express').Request} [req]
+ * @param {boolean} [serializeParentGrants]
  * @returns {{ areaRestrictions: string[], hasUnrestrictedGrant: boolean }}
  */
-function resolveAreaPerms(roles, req) {
+function resolveAreaPerms(roles, req, serializeParentGrants = false) {
   const areaRestrictions = config.getSafe('authentication.areaRestrictions')
   const areas = getRestrictionAreas(req)
   const areaMaps = getAreaMaps(areas.scanAreas)
@@ -292,7 +293,9 @@ function resolveAreaPerms(roles, req) {
 
       if (hasParents) {
         for (let k = 0; k < areaRestrictions[j].parent.length; k += 1) {
-          if (req) {
+          if (serializeParentGrants) {
+            perms.push(encodeParentAreaGrant(areaRestrictions[j].parent[k]))
+          } else if (req) {
             pushAreaKeys(
               perms,
               areaRestrictions[j].parent[k],
@@ -364,10 +367,11 @@ function normalizeAreaRestrictions(areaRestrictions, req) {
 /**
  * @param {string[]} roles
  * @param {import('express').Request} [req]
+ * @param {boolean} [serializeParentGrants]
  * @returns {string[]}
  */
-function areaPerms(roles, req) {
-  return resolveAreaPerms(roles, req).areaRestrictions
+function areaPerms(roles, req, serializeParentGrants = false) {
+  return resolveAreaPerms(roles, req, serializeParentGrants).areaRestrictions
 }
 
 module.exports = {

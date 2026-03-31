@@ -125,9 +125,10 @@ class DiscordClient extends AuthClient {
   /**
    *
    * @param {import('passport-discord').Profile} user
+   * @param {import('express').Request} req
    * @returns {Promise<import("@rm/types").Permissions>}
    */
-  async getPerms(user) {
+  async getPerms(user, req) {
     const trialActive = this.trialManager.active()
     /** @type {import("@rm/types").Permissions} */
     // @ts-ignore
@@ -205,7 +206,7 @@ class DiscordClient extends AuthClient {
                   }
                 }
               })
-              const guildAreaPerms = resolveAreaPerms(userRoles)
+              const guildAreaPerms = resolveAreaPerms(userRoles, req, true)
               guildAreaPerms.areaRestrictions.forEach((x) =>
                 permSets.areaRestrictions.add(x),
               )
@@ -279,7 +280,7 @@ class DiscordClient extends AuthClient {
         username: profile.username,
         avatar: profile.avatar || '',
         locale: profile.locale,
-        perms: await this.getPerms(profile),
+        perms: await this.getPerms(profile, req),
         rmStrategy: this.rmStrategy,
         valid: false,
       }
