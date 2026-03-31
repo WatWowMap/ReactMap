@@ -21,17 +21,26 @@ function getServerSettings(req) {
       loggedIn: !!req.user,
       cooldown: req.session?.cooldown || 0,
     })
+  const normalizedPerms = user.perms
+    ? {
+        ...user.perms,
+        areaRestrictions: normalizeAreaRestrictions(
+          user.perms.areaRestrictions || [],
+          req,
+        ),
+      }
+    : user.perms
 
   const safeUser = {
     ...user,
-    perms: user.perms
+    perms: normalizedPerms
       ? {
-          ...user.perms,
+          ...normalizedPerms,
           areaRestrictions: getPublicAreaRestrictions(
-            normalizeAreaRestrictions(user.perms.areaRestrictions || [], req),
+            normalizedPerms.areaRestrictions,
           ),
         }
-      : user.perms,
+      : normalizedPerms,
   }
 
   const { clientValues, clientMenus } = clientOptions(safeUser.perms)
@@ -79,7 +88,7 @@ function getServerSettings(req) {
     tileServers: config.getSafe('tileServers'),
     navigation: config.getSafe('navigation'),
     menus: advMenus(safeUser.perms),
-    scanAreasMenu: getAccessibleScanAreasMenu(req, safeUser.perms),
+    scanAreasMenu: getAccessibleScanAreasMenu(req, normalizedPerms),
     userSettings: clientValues,
     clientMenus,
     ui: drawer(req, safeUser.perms),
