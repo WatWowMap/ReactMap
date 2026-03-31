@@ -353,6 +353,35 @@ function getAreaLookupMode(target, areas, areaMaps, includeChildren = false) {
 }
 
 /**
+ * Preserve legacy grouped parent names that still live under the `areas`
+ * config key by serializing them as parent grants when their label-based
+ * expansion differs from the direct canonical area key.
+ *
+ * @param {string | undefined} target
+ * @param {{
+ *   names: Set<string>,
+ *   scanAreasObj: Record<string, import('@rm/types').RMFeature>,
+ *   withoutParents: Record<string, string[]>,
+ * }} areas
+ * @param {ReturnType<typeof getAreaMaps>} areaMaps
+ * @returns {boolean}
+ */
+function shouldUseParentGrantForLegacyArea(target, areas, areaMaps) {
+  if (!target || !areas.scanAreasObj[target]) {
+    return false
+  }
+
+  const labelResolved = []
+  pushAreaKeys(labelResolved, target, areas, areaMaps, true, 'label')
+  const uniqueLabelResolved = [...new Set(labelResolved)]
+
+  return (
+    !!uniqueLabelResolved.length &&
+    (uniqueLabelResolved.length !== 1 || uniqueLabelResolved[0] !== target)
+  )
+}
+
+/**
  * @param {string[]} roles
  * @param {import('express').Request} [req]
  * @param {boolean} [serializeScopedGrants]
@@ -410,8 +439,23 @@ function resolveAreaPerms(roles, req, serializeScopedGrants = false) {
             (areaLookupMode === 'label' ||
               !usesGlobalAreaLookup ||
               globalAreaMaps.keyDomainsMap[areaTarget]?.length > 1)
+          const shouldSerializeLegacyParentGrant =
+            !!req &&
+            serializeScopedGrants &&
+            shouldUseParentGrantForLegacyArea(
+              areaTarget,
+              requestAreas,
+              requestAreaMaps,
+            )
 
-          if (shouldSerializeScopedAreaGrant) {
+          if (shouldSerializeLegacyParentGrant) {
+            perms.push(
+              encodeParentAreaGrant(
+                req ? getRequestAreaDomain(req) : '',
+                areaTarget,
+              ),
+            )
+          } else if (shouldSerializeScopedAreaGrant) {
             perms.push(
               encodeAreaGrant(req ? getRequestAreaDomain(req) : '', areaTarget),
             )
