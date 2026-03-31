@@ -486,10 +486,14 @@ function normalizeAreaRestrictions(areaRestrictions, req) {
         )
           return
 
+        const hasRequestParentLabel =
+          !!requestAreaMaps.parentDomainsMap[parentGrant.area]?.length
+
         normalized.push(area)
         if (
           !globalAreas.scanAreasObj[parentGrant.area] ||
-          requestAreas.scanAreasObj[parentGrant.area]
+          requestAreas.scanAreasObj[parentGrant.area] ||
+          hasRequestParentLabel
         ) {
           pushAreaKeys(
             normalized,
