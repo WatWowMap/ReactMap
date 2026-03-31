@@ -264,8 +264,12 @@ function pushAreaKeys(perms, target, areas, areaMaps, includeChildren = false) {
  */
 function resolveAreaPerms(roles, req, serializeParentGrants = false) {
   const areaRestrictions = config.getSafe('authentication.areaRestrictions')
-  const areas = getRestrictionAreas(req)
-  const areaMaps = getAreaMaps(areas.scanAreas)
+  const globalAreas = getRestrictionAreas()
+  const globalAreaMaps = getAreaMaps(globalAreas.scanAreas)
+  const requestAreas = req ? getRestrictionAreas(req) : globalAreas
+  const requestAreaMaps = req
+    ? getAreaMaps(requestAreas.scanAreas)
+    : globalAreaMaps
 
   const perms = []
   let matchedRestrictedRule = false
@@ -295,8 +299,8 @@ function resolveAreaPerms(roles, req, serializeParentGrants = false) {
           pushAreaKeys(
             perms,
             areaRestrictions[j].areas[k],
-            areas,
-            areaMaps,
+            globalAreas,
+            globalAreaMaps,
             false,
           )
         }
@@ -315,8 +319,8 @@ function resolveAreaPerms(roles, req, serializeParentGrants = false) {
             pushAreaKeys(
               perms,
               areaRestrictions[j].parent[k],
-              areas,
-              areaMaps,
+              requestAreas,
+              requestAreaMaps,
               true,
             )
           } else {
