@@ -9,7 +9,7 @@ const config = require('@rm/config')
  */
 function consolidateAreas(areaRestrictions = [], onlyAreas = []) {
   const areas = config.getSafe('areas')
-  const parentRefsByChildKey = Object.values(areas.scanAreas).reduce(
+  const parentKeysByChildKey = Object.values(areas.scanAreas).reduce(
     (acc, featureCollection) => {
       const parentKeysByName = Object.fromEntries(
         featureCollection.features
@@ -25,11 +25,10 @@ function consolidateAreas(areaRestrictions = [], onlyAreas = []) {
       featureCollection.features.forEach((feature) => {
         if (feature.properties.key && feature.properties.parent) {
           if (!acc[feature.properties.key]) {
-            acc[feature.properties.key] = []
+            acc[feature.properties.key] = new Set()
           }
-          acc[feature.properties.key].push(feature.properties.parent)
           if (parentKeysByName[feature.properties.parent]) {
-            acc[feature.properties.key].push(
+            acc[feature.properties.key].add(
               parentKeysByName[feature.properties.parent],
             )
           }
@@ -37,25 +36,46 @@ function consolidateAreas(areaRestrictions = [], onlyAreas = []) {
       })
       return acc
     },
-    /** @type {Record<string, string[]>} */ ({}),
+    /** @type {Record<string, Set<string>>} */ ({}),
+  )
+  const parentNamesByChildKey = Object.values(areas.scanAreas).reduce(
+    (acc, featureCollection) => {
+      featureCollection.features.forEach((feature) => {
+        if (feature.properties.key && feature.properties.parent) {
+          if (!acc[feature.properties.key]) {
+            acc[feature.properties.key] = new Set()
+          }
+          acc[feature.properties.key].add(feature.properties.parent)
+        }
+      })
+      return acc
+    },
+    /** @type {Record<string, Set<string>>} */ ({}),
   )
   const validAreaRestrictions = areaRestrictions.filter((a) =>
     areas.names.has(a),
   )
   const validUserAreas = onlyAreas.filter((a) => areas.names.has(a))
+  const getUniqueValue = (values) =>
+    values?.size === 1 ? values.values().next().value : ''
 
   const cleanedValidUserAreas = validUserAreas.filter((area) =>
     areaRestrictions.length
-      ? areaRestrictions.includes(area) ||
-        (parentRefsByChildKey[area] || []).some((parentRef) =>
-          areaRestrictions.includes(parentRef),
-        )
+      ? (() => {
+          const parentKey = getUniqueValue(parentKeysByChildKey[area])
+          const parentName = parentKey
+            ? getUniqueValue(parentNamesByChildKey[area])
+            : ''
+          return (
+            areaRestrictions.includes(area) ||
+            (!!parentKey && areaRestrictions.includes(parentKey)) ||
+            (!!parentName && areaRestrictions.includes(parentName))
+          )
+        })()
       : true,
   )
   return new Set(
-    cleanedValidUserAreas.length
-      ? cleanedValidUserAreas
-      : validAreaRestrictions,
+    validUserAreas.length ? cleanedValidUserAreas : validAreaRestrictions,
   )
 }
 

@@ -53,6 +53,13 @@ export function AreaChild({
   const groupedAreaKeys = groupedChildren
     .filter((child) => !child.properties.manual)
     .map((child) => child.properties.key)
+  const allGroupedAreaKeys = (allChildAreas || childAreas || [])
+    .filter((child) => !child.properties.manual)
+    .map((child) => child.properties.key)
+  const isSearchScopedGroup =
+    !!name &&
+    groupedAreaKeys.length > 0 &&
+    allGroupedAreaKeys.some((key) => !groupedAreaKeys.includes(key))
   const parentAreaKey =
     groupKey ||
     (feature?.properties?.key && !feature.properties.manual
@@ -61,9 +68,15 @@ export function AreaChild({
   const parentAreaKeys =
     name &&
     parentAreaKey &&
+    !isSearchScopedGroup &&
     (!accessibleAreaKeys.length || accessibleAreaKeys.includes(parentAreaKey))
       ? [parentAreaKey]
       : []
+  const coveredByParentSelection =
+    !!name &&
+    !!parentAreaKey &&
+    isSearchScopedGroup &&
+    scanAreas.includes(parentAreaKey)
   const selectableAreaKeys = name
     ? [...new Set([...groupedAreaKeys, ...parentAreaKeys])]
     : []
@@ -71,14 +84,18 @@ export function AreaChild({
     name && parentAreaKey
       ? [...new Set([...selectableAreaKeys, parentAreaKey])]
       : selectableAreaKeys
-  const hasAll =
-    name && selectableAreaKeys.length
-      ? selectableAreaKeys.every((key) => scanAreas.includes(key))
-      : false
-  const hasSome =
-    name && removableAreaKeys.length
-      ? removableAreaKeys.some((key) => scanAreas.includes(key))
-      : false
+  const hasAll = name
+    ? coveredByParentSelection ||
+      (selectableAreaKeys.length
+        ? selectableAreaKeys.every((key) => scanAreas.includes(key))
+        : false)
+    : false
+  const hasSome = name
+    ? coveredByParentSelection ||
+      (removableAreaKeys.length
+        ? removableAreaKeys.some((key) => scanAreas.includes(key))
+        : false)
+    : false
   const allChildrenManual =
     name &&
     !!groupedChildren.length &&
@@ -155,8 +172,21 @@ export function AreaChild({
                   ? removableAreaKeys
                   : selectableAreaKeys
                 : feature.properties.key
+              let unselectAll = name ? hasSome : false
 
-              if (!name && coveredByGroup) {
+              if (name && coveredByParentSelection) {
+                const hiddenSiblingKeys = allGroupedAreaKeys.filter(
+                  (key) => !groupedAreaKeys.includes(key),
+                )
+                areaKeys = [
+                  parentAreaKey,
+                  ...groupedAreaKeys.filter((key) => scanAreas.includes(key)),
+                  ...hiddenSiblingKeys.filter(
+                    (key) => !scanAreas.includes(key),
+                  ),
+                ]
+                unselectAll = false
+              } else if (!name && coveredByGroup) {
                 const siblingAreaKeys = (allChildAreas || childAreas || [])
                   .filter(
                     (child) =>
@@ -171,9 +201,10 @@ export function AreaChild({
                     : []),
                   ...siblingAreaKeys.filter((key) => !scanAreas.includes(key)),
                 ]
+                unselectAll = false
               }
 
-              setAreas(areaKeys, allAreas, name ? hasSome : false)
+              setAreas(areaKeys, allAreas, unselectAll)
             }}
             sx={{
               p: 1,
