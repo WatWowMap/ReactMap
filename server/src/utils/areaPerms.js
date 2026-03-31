@@ -104,16 +104,13 @@ function pushAreaKeys(perms, target, areas, areaMaps, includeChildren = false) {
 
     if (includeChildren && !targetFeature?.properties?.parent) {
       const parentName = targetFeature?.properties?.name
-      const domain =
-        areaMaps.keyDomainsMap[target]?.length === 1
-          ? areaMaps.keyDomainsMap[target][0]
-          : undefined
-      const scopedKey =
-        parentName && domain ? `${domain}:${parentName}` : undefined
+      ;(areaMaps.keyDomainsMap[target] || []).forEach((domain) => {
+        const scopedKey = parentName ? `${domain}:${parentName}` : undefined
 
-      if (scopedKey && areaMaps.scopedParentKeyMap[scopedKey]) {
-        perms.push(...areaMaps.scopedParentKeyMap[scopedKey])
-      }
+        if (scopedKey && areaMaps.scopedParentKeyMap[scopedKey]) {
+          perms.push(...areaMaps.scopedParentKeyMap[scopedKey])
+        }
+      })
     }
   }
 
