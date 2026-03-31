@@ -6,7 +6,7 @@ const passport = require('passport')
 const config = require('@rm/config')
 
 const { logUserAuth } = require('./logUserAuth')
-const { NO_ACCESS_SENTINEL, resolveAreaPerms } = require('../utils/areaPerms')
+const { resolveAreaPerms } = require('../utils/areaPerms')
 const { webhookPerms } = require('../utils/webhookPerms')
 const { scannerPerms, scannerCooldownBypass } = require('../utils/scannerPerms')
 const { mergePerms } = require('../utils/mergePerms')
@@ -125,9 +125,10 @@ class DiscordClient extends AuthClient {
   /**
    *
    * @param {import('passport-discord').Profile} user
+   * @param {import('express').Request} req
    * @returns {Promise<import("@rm/types").Permissions>}
    */
-  async getPerms(user) {
+  async getPerms(user, req) {
     const trialActive = this.trialManager.active()
     /** @type {import("@rm/types").Permissions} */
     // @ts-ignore
@@ -144,7 +145,6 @@ class DiscordClient extends AuthClient {
       scannerCooldownBypass: new Set(),
       blockedGuildNames: new Set(),
     }
-    let hasUnrestrictedAreaGrant = false
     const scanner = config.getSafe('scanner')
     try {
       const guilds = user.guilds?.map((guild) => guild.id) || []
@@ -206,13 +206,10 @@ class DiscordClient extends AuthClient {
                   }
                 }
               })
-              const guildAreaPerms = resolveAreaPerms(userRoles)
+              const guildAreaPerms = resolveAreaPerms(userRoles, req)
               guildAreaPerms.areaRestrictions.forEach((x) =>
                 permSets.areaRestrictions.add(x),
               )
-              if (guildAreaPerms.hasUnrestrictedGrant) {
-                hasUnrestrictedAreaGrant = true
-              }
               webhookPerms(userRoles, 'discordRoles', trialActive).forEach(
                 (x) => permSets.webhooks.add(x),
               )
@@ -228,14 +225,6 @@ class DiscordClient extends AuthClient {
       }
     } catch (e) {
       this.log.warn('Failed to get perms for user', user.id, e)
-    }
-    if (
-      hasUnrestrictedAreaGrant &&
-      ![...permSets.areaRestrictions].some(
-        (area) => area !== NO_ACCESS_SENTINEL,
-      )
-    ) {
-      permSets.areaRestrictions.clear()
     }
     Object.entries(permSets).forEach(([key, value]) => {
       perms[key] = [...value]
@@ -291,7 +280,7 @@ class DiscordClient extends AuthClient {
         username: profile.username,
         avatar: profile.avatar || '',
         locale: profile.locale,
-        perms: await this.getPerms(profile),
+        perms: await this.getPerms(profile, req),
         rmStrategy: this.rmStrategy,
         valid: false,
       }

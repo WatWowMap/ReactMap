@@ -2,6 +2,7 @@
 const config = require('@rm/config')
 
 const NO_ACCESS_SENTINEL = '__rm_no_access__'
+const UNRESTRICTED_ACCESS_SENTINEL = '__rm_unrestricted__'
 const PARENT_ACCESS_PREFIX = '__rm_parent__:'
 
 /**
@@ -13,20 +14,20 @@ function isParentAreaGrant(area) {
 }
 
 /**
- * @param {string} domain
  * @param {string} area
  * @returns {string}
  */
-function encodeParentAreaGrant(domain, area) {
-  return `${PARENT_ACCESS_PREFIX}${JSON.stringify({ domain, area })}`
+function encodeParentAreaGrant(area) {
+  return `${PARENT_ACCESS_PREFIX}${JSON.stringify({ area })}`
 }
 
 /**
  * @param {string} area
- * @returns {{ domain: string, area: string }}
+ * @returns {{ domain?: string, area: string }}
  */
 function decodeParentAreaGrant(area) {
-  return JSON.parse(area.slice(PARENT_ACCESS_PREFIX.length))
+  const value = JSON.parse(area.slice(PARENT_ACCESS_PREFIX.length))
+  return typeof value === 'string' ? { area: value } : value
 }
 
 /**
@@ -35,7 +36,10 @@ function decodeParentAreaGrant(area) {
  */
 function getPublicAreaRestrictions(areaRestrictions = []) {
   return areaRestrictions.filter(
-    (area) => area !== NO_ACCESS_SENTINEL && !isParentAreaGrant(area),
+    (area) =>
+      area !== NO_ACCESS_SENTINEL &&
+      area !== UNRESTRICTED_ACCESS_SENTINEL &&
+      !isParentAreaGrant(area),
   )
 }
 
@@ -163,32 +167,6 @@ function getRequestAreaDomain(req) {
 }
 
 /**
- * @param {string | undefined} target
- * @param {{
- *   scanAreasObj: Record<string, import('@rm/types').RMFeature>,
- * }} areas
- * @param {ReturnType<typeof getAreaMaps>} areaMaps
- * @returns {string | undefined}
- */
-function getParentGrantDomain(target, areas, areaMaps) {
-  if (!target) return undefined
-
-  const targetFeature = areas.scanAreasObj[target]
-  if (
-    targetFeature?.properties?.key === target &&
-    !targetFeature?.properties?.parent
-  ) {
-    return areaMaps.keyDomainsMap[target]?.length === 1
-      ? areaMaps.keyDomainsMap[target][0]
-      : undefined
-  }
-
-  return areaMaps.parentDomainsMap[target]?.length === 1
-    ? areaMaps.parentDomainsMap[target][0]
-    : undefined
-}
-
-/**
  * Resolves config entries into canonical area keys.
  * `parent` rules expand to visible child keys and only fall back to the
  * parent's own area key when no visible children are available.
@@ -235,7 +213,11 @@ function pushAreaKeys(perms, target, areas, areaMaps, includeChildren = false) {
   const visibleNameMatches = (areas.withoutParents[target] || []).filter(
     (key) => !areas.scanAreasObj[key]?.properties?.hidden,
   )
-  if (!isCanonicalTarget && visibleNameMatches.length) {
+  if (
+    !isCanonicalTarget &&
+    visibleNameMatches.length &&
+    (!includeChildren || !areaMaps.parentDomainsMap[target]?.length)
+  ) {
     perms.push(...visibleNameMatches)
   }
 
@@ -288,7 +270,10 @@ function resolveAreaPerms(roles, req) {
 
       // No areas/parents means unrestricted access
       if (!hasAreas && !hasParents) {
-        return { areaRestrictions: [], hasUnrestrictedGrant: true }
+        return {
+          areaRestrictions: [UNRESTRICTED_ACCESS_SENTINEL],
+          hasUnrestrictedGrant: true,
+        }
       }
 
       matchedRestrictedRule = true
@@ -316,17 +301,7 @@ function resolveAreaPerms(roles, req) {
               true,
             )
           } else {
-            const domain = getParentGrantDomain(
-              areaRestrictions[j].parent[k],
-              areas,
-              areaMaps,
-            )
-
-            if (domain) {
-              perms.push(
-                encodeParentAreaGrant(domain, areaRestrictions[j].parent[k]),
-              )
-            }
+            perms.push(encodeParentAreaGrant(areaRestrictions[j].parent[k]))
           }
         }
       }
@@ -350,6 +325,10 @@ function resolveAreaPerms(roles, req) {
  */
 function normalizeAreaRestrictions(areaRestrictions, req) {
   const safeAreaRestrictions = areaRestrictions || []
+  if (safeAreaRestrictions.includes(UNRESTRICTED_ACCESS_SENTINEL)) {
+    return req ? [] : [UNRESTRICTED_ACCESS_SENTINEL]
+  }
+
   const areas = getRestrictionAreas(req)
   const areaMaps = getAreaMaps(areas.scanAreas)
   const normalized = []
@@ -358,7 +337,11 @@ function normalizeAreaRestrictions(areaRestrictions, req) {
     if (isParentAreaGrant(area)) {
       if (req) {
         const parentGrant = decodeParentAreaGrant(area)
-        if (parentGrant.domain !== getRequestAreaDomain(req)) return
+        if (
+          parentGrant.domain &&
+          parentGrant.domain !== getRequestAreaDomain(req)
+        )
+          return
 
         pushAreaKeys(normalized, parentGrant.area, areas, areaMaps, true)
       } else {
@@ -391,6 +374,7 @@ module.exports = {
   areaPerms,
   getPublicAreaRestrictions,
   NO_ACCESS_SENTINEL,
+  UNRESTRICTED_ACCESS_SENTINEL,
   normalizeAreaRestrictions,
   resolveAreaPerms,
 }
