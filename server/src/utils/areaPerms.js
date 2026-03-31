@@ -277,15 +277,17 @@ function pushAreaKeys(perms, target, areas, areaMaps, includeChildren = false) {
     }
   }
 
-  const visibleNameMatches = (areas.withoutParents[target] || []).filter(
+  const nameMatches = areas.withoutParents[target] || []
+  const visibleNameMatches = nameMatches.filter(
     (key) => !areas.scanAreasObj[key]?.properties?.hidden,
   )
+  const directNameMatches = includeChildren ? visibleNameMatches : nameMatches
   if (
     !isCanonicalTarget &&
-    visibleNameMatches.length &&
+    directNameMatches.length &&
     (!includeChildren || !areaMaps.parentDomainsMap[target]?.length)
   ) {
-    perms.push(...visibleNameMatches)
+    perms.push(...directNameMatches)
   }
 
   if (
