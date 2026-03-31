@@ -7,66 +7,7 @@ import { Polygon } from 'leaflet'
 import { useWebhookStore, handleClick } from '@store/useWebhookStore'
 import { useStorage } from '@store/useStorage'
 import { getProperName } from '@utils/strings'
-
-/**
- * @param {Pick<import('@rm/types').RMFeature, 'properties'>[]} features
- * @param {Pick<import('@rm/types').RMFeature, 'properties'>} feature
- * @returns {string[]}
- */
-function getAreaKeys(features, feature) {
-  if (!feature?.properties?.key || feature.properties.manual) return []
-
-  const childKeys =
-    !feature.properties.parent && feature.properties.name
-      ? features
-          .filter(
-            (child) =>
-              !child.properties.manual &&
-              child.properties.parent === feature.properties.name &&
-              child.properties.key,
-          )
-          .map((child) => child.properties.key)
-      : []
-
-  return childKeys.length ? childKeys : [feature.properties.key]
-}
-
-/**
- * @param {Pick<import('@rm/types').RMFeature, 'properties'>[]} features
- * @returns {string[]}
- */
-function getValidAreaKeys(features) {
-  return [
-    ...new Set(features.flatMap((feature) => getAreaKeys(features, feature))),
-  ]
-}
-
-/**
- * @param {Pick<import('@rm/types').RMFeature, 'properties'>[]} features
- * @param {string[]} selectedAreas
- * @returns {string[] | null}
- */
-function migrateLegacyAreaKeys(features, selectedAreas) {
-  const migrated = new Set(selectedAreas)
-  let changed = false
-
-  features.forEach((feature) => {
-    if (!feature.properties?.key || !migrated.has(feature.properties.key)) {
-      return
-    }
-
-    const areaKeys = getAreaKeys(features, feature)
-    if (areaKeys.length === 1 && areaKeys[0] === feature.properties.key) {
-      return
-    }
-
-    migrated.delete(feature.properties.key)
-    areaKeys.forEach((area) => migrated.add(area))
-    changed = true
-  })
-
-  return changed ? [...migrated] : null
-}
+import { getAreaKeys, getValidAreaKeys, migrateLegacyAreaKeys } from './utils'
 
 /**
  *
@@ -88,27 +29,14 @@ function ScanArea(featureCollection) {
     [featureCollection.features, selectedAreas],
   )
   const effectiveSelectedAreas = migratedAreas || selectedAreas
-
-  React.useEffect(() => {
-    if (!migratedAreas?.length) return
-
-    useStorage.setState((prev) => ({
-      filters: {
-        ...prev.filters,
-        scanAreas: {
-          ...prev.filters.scanAreas,
-          filter: {
-            ...prev.filters.scanAreas?.filter,
-            areas: migratedAreas,
-          },
-        },
-      },
-    }))
-  }, [migratedAreas])
+  const selectionKey = React.useMemo(
+    () => [...effectiveSelectedAreas].sort().join(','),
+    [effectiveSelectedAreas],
+  )
 
   return (
     <GeoJSON
-      key={`${search}${tapToToggle}${alwaysShowLabels}`}
+      key={`${search}${tapToToggle}${alwaysShowLabels}${selectionKey}`}
       data={featureCollection}
       filter={(f) =>
         webhook ||
