@@ -9,6 +9,39 @@ import { useStorage } from '@store/useStorage'
 import { getProperName } from '@utils/strings'
 
 /**
+ * @param {Pick<import('@rm/types').RMFeature, 'properties'>[]} features
+ * @param {Pick<import('@rm/types').RMFeature, 'properties'>} feature
+ * @returns {string[]}
+ */
+function getAreaKeys(features, feature) {
+  if (!feature?.properties?.key || feature.properties.manual) return []
+
+  const childKeys =
+    !feature.properties.parent && feature.properties.name
+      ? features
+          .filter(
+            (child) =>
+              !child.properties.manual &&
+              child.properties.parent === feature.properties.name &&
+              child.properties.key,
+          )
+          .map((child) => child.properties.key)
+      : []
+
+  return childKeys.length ? childKeys : [feature.properties.key]
+}
+
+/**
+ * @param {Pick<import('@rm/types').RMFeature, 'properties'>[]} features
+ * @returns {string[]}
+ */
+function getValidAreaKeys(features) {
+  return [
+    ...new Set(features.flatMap((feature) => getAreaKeys(features, feature))),
+  ]
+}
+
+/**
  *
  * @param {import('@rm/types').RMGeoJSON} featureCollection
  * @returns
@@ -33,7 +66,7 @@ function ScanArea(featureCollection) {
       eventHandlers={{
         click: ({ propagatedFrom: layer }) => {
           if (!layer.feature) return
-          const { name, key, manual = false } = layer.feature.properties
+          const { name, manual = false } = layer.feature.properties
           if (webhook && name && handleClick) {
             handleClick(name)().then((newAreas) => {
               layer.setStyle({
@@ -45,21 +78,31 @@ function ScanArea(featureCollection) {
               })
             })
           } else if (!manual && tapToToggle) {
-            const { filters, setAreas } = useStorage.getState()
-            const includes = filters?.scanAreas?.filter?.areas?.includes(key)
-            layer.setStyle({ fillOpacity: includes ? 0.2 : 0.8 })
-            setAreas(
-              key,
-              featureCollection.features
-                .filter((f) => !f.properties.manual)
-                .map((f) => f.properties.key),
+            const areaKeys = getAreaKeys(
+              featureCollection.features,
+              layer.feature,
             )
+            const validAreaKeys = getValidAreaKeys(featureCollection.features)
+            const { filters, setAreas } = useStorage.getState()
+            const hasSome = areaKeys.some((area) =>
+              filters?.scanAreas?.filter?.areas?.includes(area),
+            )
+            layer.setStyle({ fillOpacity: hasSome ? 0.2 : 0.8 })
+            setAreas(areaKeys, validAreaKeys, hasSome)
           }
         },
       }}
       onEachFeature={(feature, layer) => {
         if (feature.properties?.name) {
-          const { name, key } = feature.properties
+          const { name } = feature.properties
+          const areaKeys = getAreaKeys(featureCollection.features, feature)
+          const isSelected = areaKeys.length
+            ? areaKeys.every((area) =>
+                (
+                  useStorage.getState().filters?.scanAreas?.filter?.areas || []
+                ).includes(area),
+              )
+            : false
           const popupContent = getProperName(name)
           if (layer instanceof Polygon) {
             layer
@@ -81,10 +124,7 @@ function ScanArea(featureCollection) {
                         .human?.area?.some(
                           (area) => area.toLowerCase() === name?.toLowerCase(),
                         )
-                    : (
-                        useStorage.getState().filters?.scanAreas?.filter
-                          ?.areas || []
-                      ).includes(webhook ? name : key)
+                    : isSelected
                 )
                   ? 0.8
                   : 0.2,
