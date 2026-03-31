@@ -14,11 +14,14 @@ function isParentAreaGrant(area) {
 }
 
 /**
- * @param {string} area
+ * @param {string} areaOrDomain
+ * @param {string} [area]
  * @returns {string}
  */
-function encodeParentAreaGrant(area) {
-  return `${PARENT_ACCESS_PREFIX}${JSON.stringify({ area })}`
+function encodeParentAreaGrant(areaOrDomain, area) {
+  return `${PARENT_ACCESS_PREFIX}${JSON.stringify(
+    area ? { domain: areaOrDomain, area } : { area: areaOrDomain },
+  )}`
 }
 
 /**
@@ -294,7 +297,12 @@ function resolveAreaPerms(roles, req, serializeParentGrants = false) {
       if (hasParents) {
         for (let k = 0; k < areaRestrictions[j].parent.length; k += 1) {
           if (serializeParentGrants) {
-            perms.push(encodeParentAreaGrant(areaRestrictions[j].parent[k]))
+            perms.push(
+              encodeParentAreaGrant(
+                req ? getRequestAreaDomain(req) : '',
+                areaRestrictions[j].parent[k],
+              ),
+            )
           } else if (req) {
             pushAreaKeys(
               perms,
