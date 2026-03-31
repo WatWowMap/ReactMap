@@ -1,6 +1,17 @@
 // @ts-check
 
 /**
+ * @param {import('@rm/types').Config['areas']['scanAreasMenu']} scanAreasMenu
+ * @returns {Pick<import('@rm/types').RMFeature, 'properties'>[]}
+ */
+export function getScanAreaMenuFeatures(scanAreasMenu = []) {
+  return scanAreasMenu.flatMap((parent) => [
+    ...(parent?.details ? [parent.details] : []),
+    ...(parent?.children || []),
+  ])
+}
+
+/**
  * @param {Pick<import('@rm/types').RMFeature, 'properties'>[]} features
  * @param {Pick<import('@rm/types').RMFeature, 'properties'>} feature
  * @returns {string[]}

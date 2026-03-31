@@ -6,7 +6,6 @@ import { useMemory } from '@store/useMemory'
 import { useStorage } from '@store/useStorage'
 import { useMapStore } from '@store/useMapStore'
 import { ScanOnDemand } from '@features/scanner'
-import { LegacyScanAreaMigration } from '@features/scanArea'
 import { WebhookMarker, WebhookAreaSelection } from '@features/webhooks'
 import { ActiveWeather } from '@features/weather'
 import { timeCheck } from '@utils/timeCheck'
@@ -58,7 +57,6 @@ export function Container() {
       preferCanvas
     >
       <Effects />
-      <LegacyScanAreaMigration />
       <ControlledTileLayer />
       <ControlledZoomLayer />
       <ControlledLocate />
