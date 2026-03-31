@@ -43,7 +43,6 @@ class Weather extends Model {
     /** @type {import("@rm/types").FullWeather[]} */
     const results = await query
 
-    const areas = config.getSafe('areas')
     const unrestrictedAreaGrant = hasUnrestrictedAreaGrant(
       perms.areaRestrictions,
     )
@@ -76,18 +75,17 @@ class Weather extends Model {
           (!hasAreaFilter ||
             merged.some(
               (area) =>
-                areas.scanAreasObj[area] &&
-                (pointInPolygon(center, areas.scanAreasObj[area]) ||
-                  booleanOverlap(geojson, areas.scanAreasObj[area]) ||
-                  pointInPolygon(
-                    point(
-                      // @ts-ignore // again, probably need real TS types
-                      areas.scanAreasObj[area].geometry.type === 'MultiPolygon'
-                        ? areas.scanAreasObj[area].geometry.coordinates[0][0][0]
-                        : areas.scanAreasObj[area].geometry.coordinates[0][0],
-                    ),
-                    geojson,
-                  )),
+                pointInPolygon(center, area) ||
+                booleanOverlap(geojson, area) ||
+                pointInPolygon(
+                  point(
+                    // @ts-ignore // again, probably need real TS types
+                    area.geometry.type === 'MultiPolygon'
+                      ? area.geometry.coordinates[0][0][0]
+                      : area.geometry.coordinates[0][0],
+                  ),
+                  geojson,
+                ),
             ))
         return (
           hasOverlap && {

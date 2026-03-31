@@ -5,11 +5,30 @@ const config = require('@rm/config')
  * Consolidate area restrictions and user set areas, accounts for parents
  * @param {string[]} areaRestrictions
  * @param {string[]} onlyAreas
- * @returns {Set<string>}
+ * @returns {Set<import('@rm/types').RMFeature>}
  */
 function consolidateAreas(areaRestrictions = [], onlyAreas = []) {
   const areas = config.getSafe('areas')
-  const parentKeysByChildKey = Object.values(areas.scanAreas).reduce(
+  const featuresByKey = Object.values(areas.scanAreas).reduce(
+    (acc, featureCollection) => {
+      featureCollection.features.forEach((feature) => {
+        if (
+          !feature.properties.key ||
+          feature.properties.manual ||
+          !feature.geometry?.type?.includes('Polygon')
+        ) {
+          return
+        }
+        if (!acc[feature.properties.key]) {
+          acc[feature.properties.key] = []
+        }
+        acc[feature.properties.key].push(feature)
+      })
+      return acc
+    },
+    /** @type {Record<string, import('@rm/types').RMFeature[]>} */ ({}),
+  )
+  const childFeaturesByKey = Object.values(areas.scanAreas).reduce(
     (acc, featureCollection) => {
       const parentKeysByName = Object.fromEntries(
         featureCollection.features
@@ -23,56 +42,50 @@ function consolidateAreas(areaRestrictions = [], onlyAreas = []) {
       )
 
       featureCollection.features.forEach((feature) => {
-        if (feature.properties.key && feature.properties.parent) {
+        if (
+          feature.properties.key &&
+          feature.properties.parent &&
+          !feature.properties.manual &&
+          feature.geometry?.type?.includes('Polygon')
+        ) {
           if (!acc[feature.properties.key]) {
-            acc[feature.properties.key] = new Set()
+            acc[feature.properties.key] = []
           }
-          if (parentKeysByName[feature.properties.parent]) {
-            acc[feature.properties.key].add(
-              parentKeysByName[feature.properties.parent],
-            )
-          }
+          acc[feature.properties.key].push({
+            feature,
+            parentKey: parentKeysByName[feature.properties.parent] || '',
+            parentName: feature.properties.parent,
+          })
         }
       })
       return acc
     },
-    /** @type {Record<string, Set<string>>} */ ({}),
+    /** @type {Record<string, {
+     *   feature: import('@rm/types').RMFeature,
+     *   parentKey: string,
+     *   parentName: string,
+     * }[]>} */ ({}),
   )
-  const parentNamesByChildKey = Object.values(areas.scanAreas).reduce(
-    (acc, featureCollection) => {
-      featureCollection.features.forEach((feature) => {
-        if (feature.properties.key && feature.properties.parent) {
-          if (!acc[feature.properties.key]) {
-            acc[feature.properties.key] = new Set()
-          }
-          acc[feature.properties.key].add(feature.properties.parent)
-        }
-      })
-      return acc
-    },
-    /** @type {Record<string, Set<string>>} */ ({}),
+  const validAreaRestrictions = areaRestrictions.flatMap(
+    (area) => featuresByKey[area] || [],
   )
-  const validAreaRestrictions = areaRestrictions.filter((a) =>
-    areas.names.has(a),
-  )
-  const validUserAreas = onlyAreas.filter((a) => areas.names.has(a))
-  const getUniqueValue = (values) =>
-    values?.size === 1 ? values.values().next().value : ''
+  const validUserAreas = onlyAreas.filter((area) => featuresByKey[area]?.length)
 
-  const cleanedValidUserAreas = validUserAreas.filter((area) =>
+  const cleanedValidUserAreas = validUserAreas.flatMap((area) =>
     areaRestrictions.length
-      ? (() => {
-          const parentKey = getUniqueValue(parentKeysByChildKey[area])
-          const parentName = parentKey
-            ? getUniqueValue(parentNamesByChildKey[area])
-            : ''
-          return (
-            areaRestrictions.includes(area) ||
-            (!!parentKey && areaRestrictions.includes(parentKey)) ||
-            (!!parentName && areaRestrictions.includes(parentName))
-          )
-        })()
-      : true,
+      ? areaRestrictions.includes(area)
+        ? featuresByKey[area]
+        : (() => {
+            const matchingChildren = (childFeaturesByKey[area] || []).filter(
+              ({ parentKey, parentName }) =>
+                (!!parentKey && areaRestrictions.includes(parentKey)) ||
+                areaRestrictions.includes(parentName),
+            )
+            return matchingChildren.length === 1
+              ? [matchingChildren[0].feature]
+              : []
+          })()
+      : featuresByKey[area],
   )
   return new Set(
     validUserAreas.length ? cleanedValidUserAreas : validAreaRestrictions,

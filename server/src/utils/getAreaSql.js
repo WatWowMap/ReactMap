@@ -20,7 +20,6 @@ function getAreaSql(
   category = '',
 ) {
   const authentication = config.getSafe('authentication')
-  const areas = config.getSafe('areas')
   const unrestrictedAreaGrant = hasUnrestrictedAreaGrant(areaRestrictions)
   if (
     authentication.strictAreaRestrictions &&
@@ -66,10 +65,10 @@ function getAreaSql(
 
   query.andWhere((restrictions) => {
     consolidatedAreas.forEach((area) => {
-      if (areas.polygons[area]) {
+      if (area.geometry?.type?.includes('Polygon')) {
         restrictions.orWhereRaw(
           `ST_CONTAINS(ST_GeomFromGeoJSON('${JSON.stringify(
-            areas.polygons[area],
+            area.geometry,
           )}', 2, 0), POINT(${columns[1]}, ${columns[0]}))`,
         )
       }
