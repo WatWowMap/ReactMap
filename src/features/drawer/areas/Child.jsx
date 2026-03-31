@@ -19,6 +19,7 @@ import { useMemory } from '@store/useMemory'
  *  allAreas?: string[]
  *  childAreas?: Pick<import('@rm/types').RMFeature, 'properties'>[]
  *  allChildAreas?: Pick<import('@rm/types').RMFeature, 'properties'>[]
+ *  groupKey?: string
  *  borderRight?: boolean
  *  colSpan?: number
  * }} props
@@ -28,6 +29,7 @@ export function AreaChild({
   feature,
   childAreas,
   allChildAreas,
+  groupKey,
   allAreas,
   borderRight,
   colSpan = 1,
@@ -82,6 +84,10 @@ export function AreaChild({
     hasManual || (name ? !selectableAreaKeys.length : !feature.properties.name)
       ? 'transparent'
       : 'none'
+  const coveredByGroup =
+    !name && !feature?.properties?.manual && groupKey
+      ? scanAreas.includes(groupKey)
+      : false
 
   const nameProp =
     name || feature?.properties?.formattedName || feature?.properties?.name
@@ -130,14 +136,36 @@ export function AreaChild({
             size="small"
             color="secondary"
             indeterminate={name ? hasSome && !hasAll : false}
-            checked={name ? hasAll : scanAreas.includes(feature.properties.key)}
+            checked={
+              name
+                ? hasAll
+                : coveredByGroup || scanAreas.includes(feature.properties.key)
+            }
             onClick={(e) => e.stopPropagation()}
             onChange={() => {
-              const areaKeys = name
+              let areaKeys = name
                 ? hasSome
                   ? removableAreaKeys
                   : selectableAreaKeys
                 : feature.properties.key
+
+              if (!name && coveredByGroup) {
+                const siblingAreaKeys = (allChildAreas || childAreas || [])
+                  .filter(
+                    (child) =>
+                      !child.properties.manual &&
+                      child.properties.key !== feature.properties.key,
+                  )
+                  .map((child) => child.properties.key)
+                areaKeys = [
+                  groupKey,
+                  ...(scanAreas.includes(feature.properties.key)
+                    ? [feature.properties.key]
+                    : []),
+                  ...siblingAreaKeys.filter((key) => !scanAreas.includes(key)),
+                ]
+              }
+
               setAreas(areaKeys, allAreas, name ? hasSome : false)
             }}
             sx={{

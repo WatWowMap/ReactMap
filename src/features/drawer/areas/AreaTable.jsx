@@ -53,8 +53,7 @@ export function ScanAreasTable() {
       ...new Set(
         data?.scanAreasMenu.flatMap((parent) => [
           ...(parent.details?.properties?.key &&
-          !parent.details.properties.manual &&
-          !parent.children.some((child) => !child.properties.manual)
+          !parent.details.properties.manual
             ? [parent.details.properties.key]
             : []),
           ...parent.children
@@ -72,6 +71,9 @@ export function ScanAreasTable() {
         .map((area) => ({
           ...area,
           allChildren: area.children,
+          groupKey: area.details?.properties?.manual
+            ? undefined
+            : area.details?.properties?.key,
           details:
             search === '' ||
             area.details?.properties?.key?.toLowerCase()?.includes(search)
@@ -194,47 +196,52 @@ export function ScanAreasTable() {
         })}
       >
         <TableBody>
-          {allRows.map(({ name, details, children, rows, allChildren }) => {
-            if (!children.length && !details) return null
-            return (
-              <React.Fragment key={`${name}-${children.length}`}>
-                {name && (
-                  <TableRow>
-                    <AreaChild
-                      name={name}
-                      feature={details}
-                      allAreas={allAreas}
-                      childAreas={children}
-                      allChildAreas={allChildren}
-                      colSpan={2}
-                    />
-                  </TableRow>
-                )}
-                {!!rows.length && (
-                  <TableRow>
-                    <AreaParent name={name}>
-                      {rows.map((row, i) => (
-                        <TableRow
-                          key={`${row[0]?.properties?.key}-${row[1]?.properties?.key}`}
-                        >
-                          {row.map((feature, j) => (
-                            <AreaChild
-                              key={feature?.properties?.name || `${i}${j}`}
-                              feature={feature}
-                              allAreas={allAreas}
-                              childAreas={children}
-                              borderRight={row.length === 2 && j === 0}
-                              colSpan={row.length === 1 ? 2 : 1}
-                            />
-                          ))}
-                        </TableRow>
-                      ))}
-                    </AreaParent>
-                  </TableRow>
-                )}
-              </React.Fragment>
-            )
-          })}
+          {allRows.map(
+            ({ name, details, children, rows, allChildren, groupKey }) => {
+              if (!children.length && !details) return null
+              return (
+                <React.Fragment key={`${name}-${children.length}`}>
+                  {name && (
+                    <TableRow>
+                      <AreaChild
+                        name={name}
+                        feature={details}
+                        allAreas={allAreas}
+                        childAreas={children}
+                        allChildAreas={allChildren}
+                        groupKey={groupKey}
+                        colSpan={2}
+                      />
+                    </TableRow>
+                  )}
+                  {!!rows.length && (
+                    <TableRow>
+                      <AreaParent name={name}>
+                        {rows.map((row, i) => (
+                          <TableRow
+                            key={`${row[0]?.properties?.key}-${row[1]?.properties?.key}`}
+                          >
+                            {row.map((feature, j) => (
+                              <AreaChild
+                                key={feature?.properties?.name || `${i}${j}`}
+                                feature={feature}
+                                allAreas={allAreas}
+                                childAreas={children}
+                                allChildAreas={allChildren}
+                                groupKey={groupKey}
+                                borderRight={row.length === 2 && j === 0}
+                                colSpan={row.length === 1 ? 2 : 1}
+                              />
+                            ))}
+                          </TableRow>
+                        ))}
+                      </AreaParent>
+                    </TableRow>
+                  )}
+                </React.Fragment>
+              )
+            },
+          )}
           {showJumpResults && (
             <TableRow>
               <TableCell colSpan={2}>
