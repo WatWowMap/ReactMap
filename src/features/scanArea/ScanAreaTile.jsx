@@ -67,8 +67,43 @@ function ScanArea(featureCollection) {
             const hasSome = areaKeys.some((area) =>
               effectiveSelectedAreas.includes(area),
             )
+            const legacyGroupKey = layer.feature.properties.parent
+              ? featureCollection.features.find(
+                  (feature) =>
+                    !feature.properties.manual &&
+                    !feature.properties.parent &&
+                    feature.properties.name ===
+                      layer.feature.properties.parent &&
+                    feature.properties.key,
+                )?.properties.key
+              : undefined
+            let nextAreaKeys = areaKeys
+            let unselectAll = areaKeys.length > 1 && hasSome
+
+            if (legacyGroupKey && selectedAreas.includes(legacyGroupKey)) {
+              const siblingAreaKeys = featureCollection.features
+                .filter(
+                  (feature) =>
+                    !feature.properties.manual &&
+                    feature.properties.parent ===
+                      layer.feature.properties.parent &&
+                    feature.properties.key !== layer.feature.properties.key,
+                )
+                .map((feature) => feature.properties.key)
+              nextAreaKeys = [
+                legacyGroupKey,
+                ...(selectedAreas.includes(layer.feature.properties.key)
+                  ? [layer.feature.properties.key]
+                  : []),
+                ...siblingAreaKeys.filter(
+                  (key) => !selectedAreas.includes(key),
+                ),
+              ]
+              unselectAll = false
+            }
+
             layer.setStyle({ fillOpacity: hasSome ? 0.2 : 0.8 })
-            setAreas(areaKeys, validAreaKeys, hasSome)
+            setAreas(nextAreaKeys, validAreaKeys, unselectAll)
           }
         },
       }}
