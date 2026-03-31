@@ -42,17 +42,69 @@ function getValidAreaKeys(features) {
 }
 
 /**
+ * @param {Pick<import('@rm/types').RMFeature, 'properties'>[]} features
+ * @param {string[]} selectedAreas
+ * @returns {string[] | null}
+ */
+function migrateLegacyAreaKeys(features, selectedAreas) {
+  const migrated = new Set(selectedAreas)
+  let changed = false
+
+  features.forEach((feature) => {
+    if (!feature.properties?.key || !migrated.has(feature.properties.key)) {
+      return
+    }
+
+    const areaKeys = getAreaKeys(features, feature)
+    if (areaKeys.length === 1 && areaKeys[0] === feature.properties.key) {
+      return
+    }
+
+    migrated.delete(feature.properties.key)
+    areaKeys.forEach((area) => migrated.add(area))
+    changed = true
+  })
+
+  return changed ? [...migrated] : null
+}
+
+/**
  *
  * @param {import('@rm/types').RMGeoJSON} featureCollection
  * @returns
  */
 function ScanArea(featureCollection) {
   const search = useStorage((s) => s.filters.scanAreas?.filter?.search)
+  const selectedAreas = useStorage(
+    (s) => s.filters.scanAreas?.filter?.areas || [],
+  )
   const tapToToggle = useStorage((s) => s.userSettings.scanAreas.tapToToggle)
   const alwaysShowLabels = useStorage(
     (s) => s.userSettings.scanAreas.alwaysShowLabels,
   )
   const webhook = useWebhookStore((s) => !!s.mode)
+  const migratedAreas = React.useMemo(
+    () => migrateLegacyAreaKeys(featureCollection.features, selectedAreas),
+    [featureCollection.features, selectedAreas],
+  )
+  const effectiveSelectedAreas = migratedAreas || selectedAreas
+
+  React.useEffect(() => {
+    if (!migratedAreas?.length) return
+
+    useStorage.setState((prev) => ({
+      filters: {
+        ...prev.filters,
+        scanAreas: {
+          ...prev.filters.scanAreas,
+          filter: {
+            ...prev.filters.scanAreas?.filter,
+            areas: migratedAreas,
+          },
+        },
+      },
+    }))
+  }, [migratedAreas])
 
   return (
     <GeoJSON
@@ -97,11 +149,7 @@ function ScanArea(featureCollection) {
           const { name } = feature.properties
           const areaKeys = getAreaKeys(featureCollection.features, feature)
           const isSelected = areaKeys.length
-            ? areaKeys.every((area) =>
-                (
-                  useStorage.getState().filters?.scanAreas?.filter?.areas || []
-                ).includes(area),
-              )
+            ? areaKeys.every((area) => effectiveSelectedAreas.includes(area))
             : false
           const popupContent = getProperName(name)
           if (layer instanceof Polygon) {
