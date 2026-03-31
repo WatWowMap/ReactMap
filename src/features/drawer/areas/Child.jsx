@@ -51,10 +51,7 @@ export function AreaChild({
     .filter((child) => !child.properties.manual)
     .map((child) => child.properties.key)
   const parentAreaKeys =
-    name &&
-    !groupedAreaKeys.length &&
-    feature?.properties?.key &&
-    !feature.properties.manual
+    name && feature?.properties?.key && !feature.properties.manual
       ? [feature.properties.key]
       : []
   const selectableAreaKeys = name

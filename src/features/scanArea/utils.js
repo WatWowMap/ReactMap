@@ -33,14 +33,13 @@ export function getAreaKeys(features, feature, accessibleAreaKeys = []) {
       : []
 
   if (!feature.properties.key) return childKeys
-  if (childKeys.length) return childKeys
 
   const areaKeys =
     !accessibleAreaKeys.length ||
     accessibleAreaKeys.includes(feature.properties.key)
       ? [feature.properties.key]
       : []
-  return areaKeys
+  return childKeys.length ? [...areaKeys, ...childKeys] : areaKeys
 }
 
 /**
