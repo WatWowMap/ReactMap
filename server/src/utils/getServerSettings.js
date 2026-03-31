@@ -4,7 +4,10 @@ const config = require('@rm/config')
 const { clientOptions } = require('../ui/clientOptions')
 const { advMenus } = require('../ui/advMenus')
 const { drawer } = require('../ui/drawer')
-const { getPublicAreaRestrictions } = require('./areaPerms')
+const {
+  getPublicAreaRestrictions,
+  normalizeAreaRestrictions,
+} = require('./areaPerms')
 
 /**
  *
@@ -24,7 +27,7 @@ function getServerSettings(req) {
       ? {
           ...user.perms,
           areaRestrictions: getPublicAreaRestrictions(
-            user.perms.areaRestrictions || [],
+            normalizeAreaRestrictions(user.perms.areaRestrictions || [], req),
           ),
         }
       : user.perms,

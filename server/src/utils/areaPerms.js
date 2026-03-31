@@ -2,13 +2,40 @@
 const config = require('@rm/config')
 
 const NO_ACCESS_SENTINEL = '__rm_no_access__'
+const PARENT_ACCESS_PREFIX = '__rm_parent__:'
+
+/**
+ * @param {string} area
+ * @returns {boolean}
+ */
+function isParentAreaGrant(area) {
+  return area.startsWith(PARENT_ACCESS_PREFIX)
+}
+
+/**
+ * @param {string} area
+ * @returns {string}
+ */
+function encodeParentAreaGrant(area) {
+  return `${PARENT_ACCESS_PREFIX}${area}`
+}
+
+/**
+ * @param {string} area
+ * @returns {string}
+ */
+function decodeParentAreaGrant(area) {
+  return area.slice(PARENT_ACCESS_PREFIX.length)
+}
 
 /**
  * @param {string[]} [areaRestrictions]
  * @returns {string[]}
  */
 function getPublicAreaRestrictions(areaRestrictions = []) {
-  return areaRestrictions.filter((area) => area !== NO_ACCESS_SENTINEL)
+  return areaRestrictions.filter(
+    (area) => area !== NO_ACCESS_SENTINEL && !isParentAreaGrant(area),
+  )
 }
 
 /**
@@ -80,6 +107,49 @@ function getAreaMaps(scanAreas) {
 }
 
 /**
+ * @param {import('express').Request} [req]
+ */
+function getRestrictionAreas(req) {
+  if (!req) return config.getSafe('areas')
+
+  const scanAreas = config.getAreas(req, 'scanAreas')
+  const scanAreasObj = Object.fromEntries(
+    scanAreas.features
+      .filter((feature) => feature.properties.key)
+      .map((feature) => [feature.properties.key, feature]),
+  )
+  const names = new Set()
+  /** @type {Record<string, string[]>} */
+  const withoutParents = {}
+
+  scanAreas.features.forEach((feature) => {
+    const { key, manual, name } = feature.properties
+
+    if (
+      !key ||
+      !name ||
+      manual ||
+      !feature.geometry?.type?.includes('Polygon')
+    ) {
+      return
+    }
+
+    names.add(key)
+    if (!withoutParents[name]) {
+      withoutParents[name] = []
+    }
+    withoutParents[name].push(key)
+  })
+
+  return {
+    names,
+    scanAreas: { current: scanAreas },
+    scanAreasObj,
+    withoutParents,
+  }
+}
+
+/**
  * Resolves config entries into canonical area keys.
  * `parent` rules expand to both the parent's own area key and all child keys.
  *
@@ -104,13 +174,16 @@ function pushAreaKeys(perms, target, areas, areaMaps, includeChildren = false) {
 
     if (includeChildren && !targetFeature?.properties?.parent) {
       const parentName = targetFeature?.properties?.name
-      ;(areaMaps.keyDomainsMap[target] || []).forEach((domain) => {
-        const scopedKey = parentName ? `${domain}:${parentName}` : undefined
+      const domain =
+        areaMaps.keyDomainsMap[target]?.length === 1
+          ? areaMaps.keyDomainsMap[target][0]
+          : undefined
+      const scopedKey =
+        parentName && domain ? `${domain}:${parentName}` : undefined
 
-        if (scopedKey && areaMaps.scopedParentKeyMap[scopedKey]) {
-          perms.push(...areaMaps.scopedParentKeyMap[scopedKey])
-        }
-      })
+      if (scopedKey && areaMaps.scopedParentKeyMap[scopedKey]) {
+        perms.push(...areaMaps.scopedParentKeyMap[scopedKey])
+      }
     }
   }
 
@@ -147,11 +220,12 @@ function pushAreaKeys(perms, target, areas, areaMaps, includeChildren = false) {
 
 /**
  * @param {string[]} roles
+ * @param {import('express').Request} [req]
  * @returns {{ areaRestrictions: string[], hasUnrestrictedGrant: boolean }}
  */
-function resolveAreaPerms(roles) {
+function resolveAreaPerms(roles, req) {
   const areaRestrictions = config.getSafe('authentication.areaRestrictions')
-  const areas = config.getSafe('areas')
+  const areas = getRestrictionAreas(req)
   const areaMaps = getAreaMaps(areas.scanAreas)
 
   const perms = []
@@ -188,13 +262,17 @@ function resolveAreaPerms(roles) {
 
       if (hasParents) {
         for (let k = 0; k < areaRestrictions[j].parent.length; k += 1) {
-          pushAreaKeys(
-            perms,
-            areaRestrictions[j].parent[k],
-            areas,
-            areaMaps,
-            true,
-          )
+          if (req) {
+            pushAreaKeys(
+              perms,
+              areaRestrictions[j].parent[k],
+              areas,
+              areaMaps,
+              true,
+            )
+          } else {
+            perms.push(encodeParentAreaGrant(areaRestrictions[j].parent[k]))
+          }
         }
       }
     }
@@ -212,31 +290,49 @@ function resolveAreaPerms(roles) {
 
 /**
  * @param {string[]} [areaRestrictions]
+ * @param {import('express').Request} [req]
  * @returns {string[]}
  */
-function normalizeAreaRestrictions(areaRestrictions = []) {
-  const areas = config.getSafe('areas')
+function normalizeAreaRestrictions(areaRestrictions, req) {
+  const safeAreaRestrictions = areaRestrictions || []
+  const areas = getRestrictionAreas(req)
   const areaMaps = getAreaMaps(areas.scanAreas)
   const normalized = []
 
-  areaRestrictions.forEach((area) => {
+  safeAreaRestrictions.forEach((area) => {
+    if (isParentAreaGrant(area)) {
+      if (req) {
+        pushAreaKeys(
+          normalized,
+          decodeParentAreaGrant(area),
+          areas,
+          areaMaps,
+          true,
+        )
+      } else {
+        normalized.push(area)
+      }
+      return
+    }
+
     pushAreaKeys(normalized, area, areas, areaMaps, false)
   })
 
   const uniquePerms = [...new Set(normalized)]
   return uniquePerms.length
     ? uniquePerms
-    : areaRestrictions.length
+    : safeAreaRestrictions.length
       ? [NO_ACCESS_SENTINEL]
       : uniquePerms
 }
 
 /**
  * @param {string[]} roles
+ * @param {import('express').Request} [req]
  * @returns {string[]}
  */
-function areaPerms(roles) {
-  return resolveAreaPerms(roles).areaRestrictions
+function areaPerms(roles, req) {
+  return resolveAreaPerms(roles, req).areaRestrictions
 }
 
 module.exports = {
