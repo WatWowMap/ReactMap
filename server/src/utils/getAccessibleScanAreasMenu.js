@@ -41,12 +41,15 @@ function getAccessibleScanAreasMenu(req, perms) {
         const children = parent.children.filter((child) =>
           canAccessArea(child.properties),
         )
+        const hasSelectableChild = children.some(
+          (child) => !child.properties.manual,
+        )
 
         return {
           ...parent,
           details:
             parent.details &&
-            (canAccessArea(parent.details.properties) || children.length)
+            (canAccessArea(parent.details.properties) || hasSelectableChild)
               ? parent.details
               : null,
           children,
