@@ -14,7 +14,7 @@ function getPublicAreaRestrictions(areaRestrictions = []) {
 /**
  * @param {Record<string, import('@rm/types').RMGeoJSON>} scanAreas
  * @returns {{
- *   keyDomainMap: Record<string, string>,
+ *   keyDomainsMap: Record<string, string[]>,
  *   parentDomainsMap: Record<string, string[]>,
  *   scopedParentKeyMap: Record<string, string[]>,
  *   scopedParentAreaKeyMap: Record<string, string>,
@@ -31,7 +31,10 @@ function getAreaMaps(scanAreas) {
         if (!key) return
 
         if (!manual) {
-          acc.keyDomainMap[key] = domain
+          if (!acc.keyDomainsMap[key]) acc.keyDomainsMap[key] = []
+          if (!acc.keyDomainsMap[key].includes(domain)) {
+            acc.keyDomainsMap[key].push(domain)
+          }
         }
         if (name && !parent && !hidden && !manual) {
           if (!areaKeysByName[name]) areaKeysByName[name] = []
@@ -63,12 +66,12 @@ function getAreaMaps(scanAreas) {
       return acc
     },
     /** @type {{
-     *   keyDomainMap: Record<string, string>,
+     *   keyDomainsMap: Record<string, string[]>,
      *   parentDomainsMap: Record<string, string[]>,
      *   scopedParentKeyMap: Record<string, string[]>,
      *   scopedParentAreaKeyMap: Record<string, string>,
      * }} */ ({
-      keyDomainMap: {},
+      keyDomainsMap: {},
       parentDomainsMap: {},
       scopedParentKeyMap: {},
       scopedParentAreaKeyMap: {},
@@ -101,7 +104,10 @@ function pushAreaKeys(perms, target, areas, areaMaps, includeChildren = false) {
 
     if (includeChildren && !targetFeature?.properties?.parent) {
       const parentName = targetFeature?.properties?.name
-      const domain = areaMaps.keyDomainMap[target]
+      const domain =
+        areaMaps.keyDomainsMap[target]?.length === 1
+          ? areaMaps.keyDomainsMap[target][0]
+          : undefined
       const scopedKey =
         parentName && domain ? `${domain}:${parentName}` : undefined
 
