@@ -4,6 +4,7 @@ const config = require('@rm/config')
 const { clientOptions } = require('../ui/clientOptions')
 const { advMenus } = require('../ui/advMenus')
 const { drawer } = require('../ui/drawer')
+const { getAccessibleScanAreasMenu } = require('./getAccessibleScanAreasMenu')
 const {
   getPublicAreaRestrictions,
   normalizeAreaRestrictions,
@@ -78,6 +79,7 @@ function getServerSettings(req) {
     tileServers: config.getSafe('tileServers'),
     navigation: config.getSafe('navigation'),
     menus: advMenus(safeUser.perms),
+    scanAreasMenu: getAccessibleScanAreasMenu(req, safeUser.perms),
     userSettings: clientValues,
     clientMenus,
     ui: drawer(req, safeUser.perms),

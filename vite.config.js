@@ -19,7 +19,6 @@ const {
   localePlugin,
   muteWarningsPlugin,
 } = require('@rm/vite-plugins')
-const { loadCachedAreas } = require('./server/src/services/areas')
 
 const defaultLogger = createLogger()
 const logLevel = config.getSafe('devOptions.logLevel')
@@ -27,8 +26,6 @@ const viteLogLevel =
   logLevel === 'debug' || logLevel === 'trace' ? 'info' : logLevel
 
 const viteConfig = defineConfig(({ mode }) => {
-  config.setAreas(loadCachedAreas())
-
   const env = loadEnv(mode, resolve(process.cwd(), './'), '')
   const isRelease = process.argv.includes('-r')
   const isDevelopment = mode === 'development'
@@ -138,9 +135,6 @@ const viteConfig = defineConfig(({ mode }) => {
         },
         googleAnalyticsId:
           config.getSafe('googleAnalyticsId') || env.GOOGLE_ANALYTICS_ID || '',
-        areas: {
-          scanAreasMenu: config.getSafe('areas.scanAreasMenu'),
-        },
         map: {
           general: {
             startLat: config.getSafe('map.general.startLat'),
