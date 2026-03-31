@@ -114,6 +114,17 @@ function pushAreaKeys(perms, target, areas, areaMaps, includeChildren = false) {
     perms.push(...areas.withoutParents[target])
   }
 
+  if (
+    !includeChildren &&
+    !areas.withoutParents[target] &&
+    areaMaps.parentDomainsMap[target]?.length === 1
+  ) {
+    const scopedKey = `${areaMaps.parentDomainsMap[target][0]}:${target}`
+    if (!areaMaps.scopedParentAreaKeyMap[scopedKey]) {
+      perms.push(...(areaMaps.scopedParentKeyMap[scopedKey] || []))
+    }
+  }
+
   // Bare parent names are ambiguous across multi-domain configs, so only
   // expand children when the parent label resolves to exactly one domain.
   if (includeChildren && areaMaps.parentDomainsMap[target]?.length === 1) {
