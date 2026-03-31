@@ -459,13 +459,18 @@ function normalizeAreaRestrictions(areaRestrictions, req) {
           return
 
         normalized.push(area)
-        pushAreaKeys(
-          normalized,
-          areaGrant.area,
-          requestAreas,
-          requestAreaMaps,
-          false,
-        )
+        if (
+          !globalAreas.scanAreasObj[areaGrant.area] ||
+          requestAreas.scanAreasObj[areaGrant.area]
+        ) {
+          pushAreaKeys(
+            normalized,
+            areaGrant.area,
+            requestAreas,
+            requestAreaMaps,
+            false,
+          )
+        }
       } else {
         normalized.push(area)
       }
@@ -482,13 +487,18 @@ function normalizeAreaRestrictions(areaRestrictions, req) {
           return
 
         normalized.push(area)
-        pushAreaKeys(
-          normalized,
-          parentGrant.area,
-          requestAreas,
-          requestAreaMaps,
-          true,
-        )
+        if (
+          !globalAreas.scanAreasObj[parentGrant.area] ||
+          requestAreas.scanAreasObj[parentGrant.area]
+        ) {
+          pushAreaKeys(
+            normalized,
+            parentGrant.area,
+            requestAreas,
+            requestAreaMaps,
+            true,
+          )
+        }
       } else {
         normalized.push(area)
       }
