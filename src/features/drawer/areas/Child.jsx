@@ -18,7 +18,7 @@ import { useMemory } from '@store/useMemory'
  *  feature?: Pick<import('@rm/types').RMFeature, 'properties'>
  *  allAreas?: string[]
  *  childAreas?: Pick<import('@rm/types').RMFeature, 'properties'>[]
- *  allChildAreas?: Pick<import('@rm/types').RMFeature, 'properties'>[]
+ *  groupKey?: string
  *  borderRight?: boolean
  *  colSpan?: number
  * }} props
@@ -27,7 +27,7 @@ export function AreaChild({
   name,
   feature,
   childAreas,
-  allChildAreas,
+  groupKey,
   allAreas,
   borderRight,
   colSpan = 1,
@@ -42,20 +42,16 @@ export function AreaChild({
 
   if (!scanAreas) return null
 
-  const groupedChildren = allChildAreas || childAreas || []
-  const visibleChildren = childAreas || []
+  const groupedChildren = childAreas || []
   const groupedAreaKeys = groupedChildren
     .filter((child) => !child.properties.manual)
     .map((child) => child.properties.key)
   const parentAreaKeys =
-    name &&
-    feature?.properties?.key &&
-    !feature.properties.manual &&
-    !groupedAreaKeys.length
+    name && feature?.properties?.key && !feature.properties.manual
       ? [feature.properties.key]
       : []
   const selectableAreaKeys = name
-    ? [...new Set([...groupedAreaKeys, ...parentAreaKeys])]
+    ? [...new Set([...parentAreaKeys, ...groupedAreaKeys])]
     : []
   const removableAreaKeys =
     name && feature?.properties?.key && !feature.properties.manual
@@ -81,10 +77,14 @@ export function AreaChild({
     hasManual || (name ? !selectableAreaKeys.length : !feature.properties.name)
       ? 'transparent'
       : 'none'
+  const coveredByGroup =
+    !name && !feature?.properties?.manual && groupKey
+      ? scanAreas.includes(groupKey)
+      : false
 
   const nameProp =
     name || feature?.properties?.formattedName || feature?.properties?.name
-  const hasExpand = name && !expandAllScanAreas && !!visibleChildren.length
+  const hasExpand = name && !expandAllScanAreas && !!childAreas?.length
   return (
     <TableCell
       colSpan={colSpan}
@@ -129,14 +129,35 @@ export function AreaChild({
             size="small"
             color="secondary"
             indeterminate={name ? hasSome && !hasAll : false}
-            checked={name ? hasAll : scanAreas.includes(feature.properties.key)}
+            checked={
+              name
+                ? hasAll
+                : coveredByGroup || scanAreas.includes(feature.properties.key)
+            }
             onClick={(e) => e.stopPropagation()}
             onChange={() => {
+              const siblingAreaKeys = (childAreas || [])
+                .filter(
+                  (child) =>
+                    !child.properties.manual &&
+                    child.properties.key !== feature.properties.key,
+                )
+                .map((child) => child.properties.key)
               const areaKeys = name
                 ? hasSome
                   ? removableAreaKeys
                   : selectableAreaKeys
-                : feature.properties.key
+                : coveredByGroup
+                  ? [
+                      groupKey,
+                      ...(scanAreas.includes(feature.properties.key)
+                        ? [feature.properties.key]
+                        : []),
+                      ...siblingAreaKeys.filter(
+                        (key) => !scanAreas.includes(key),
+                      ),
+                    ]
+                  : feature.properties.key
               setAreas(areaKeys, allAreas, name ? hasSome : false)
             }}
             sx={{

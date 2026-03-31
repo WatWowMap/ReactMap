@@ -70,7 +70,6 @@ export function ScanAreasTable() {
       (data?.scanAreasMenu || [])
         .map((area) => ({
           ...area,
-          allChildren: area.children,
           details:
             search === '' ||
             area.details?.properties?.key?.toLowerCase()?.includes(search)
@@ -193,7 +192,7 @@ export function ScanAreasTable() {
         })}
       >
         <TableBody>
-          {allRows.map(({ name, details, children, rows, allChildren }) => {
+          {allRows.map(({ name, details, children, rows }) => {
             if (!children.length && !details) return null
             return (
               <React.Fragment key={`${name}-${children.length}`}>
@@ -204,7 +203,11 @@ export function ScanAreasTable() {
                       feature={details}
                       allAreas={allAreas}
                       childAreas={children}
-                      allChildAreas={allChildren}
+                      groupKey={
+                        details?.properties?.manual
+                          ? undefined
+                          : details?.properties?.key
+                      }
                       colSpan={2}
                     />
                   </TableRow>
@@ -222,6 +225,11 @@ export function ScanAreasTable() {
                               feature={feature}
                               allAreas={allAreas}
                               childAreas={children}
+                              groupKey={
+                                details?.properties?.manual
+                                  ? undefined
+                                  : details?.properties?.key
+                              }
                               borderRight={row.length === 2 && j === 0}
                               colSpan={row.length === 1 ? 2 : 1}
                             />
