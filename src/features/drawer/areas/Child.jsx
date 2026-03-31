@@ -53,20 +53,23 @@ export function AreaChild({
   const groupedAreaKeys = groupedChildren
     .filter((child) => !child.properties.manual)
     .map((child) => child.properties.key)
+  const parentAreaKey =
+    groupKey ||
+    (feature?.properties?.key && !feature.properties.manual
+      ? feature.properties.key
+      : undefined)
   const parentAreaKeys =
     name &&
-    feature?.properties?.key &&
-    !feature.properties.manual &&
-    (!accessibleAreaKeys.length ||
-      accessibleAreaKeys.includes(feature.properties.key))
-      ? [feature.properties.key]
+    parentAreaKey &&
+    (!accessibleAreaKeys.length || accessibleAreaKeys.includes(parentAreaKey))
+      ? [parentAreaKey]
       : []
   const selectableAreaKeys = name
     ? [...new Set([...groupedAreaKeys, ...parentAreaKeys])]
     : []
   const removableAreaKeys =
-    name && feature?.properties?.key && !feature.properties.manual
-      ? [...new Set([...selectableAreaKeys, feature.properties.key])]
+    name && parentAreaKey
+      ? [...new Set([...selectableAreaKeys, parentAreaKey])]
       : selectableAreaKeys
   const hasAll =
     name && selectableAreaKeys.length
