@@ -50,12 +50,7 @@ class Weather extends Model {
       (!unrestrictedAreaGrant && perms.areaRestrictions.length) ||
       (args.filters.onlyAreas || []).length
     const merged = hasAreaFilter
-      ? [
-          ...consolidateAreas(
-            unrestrictedAreaGrant ? [] : perms.areaRestrictions,
-            args.filters.onlyAreas,
-          ),
-        ]
+      ? [...consolidateAreas(perms.areaRestrictions, args.filters.onlyAreas)]
       : []
 
     if (hasAreaFilter && !merged.length) {

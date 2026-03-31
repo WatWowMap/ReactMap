@@ -5,6 +5,7 @@ const NO_ACCESS_SENTINEL = '__rm_no_access__'
 const UNRESTRICTED_ACCESS_SENTINEL = '__rm_unrestricted__'
 const AREA_ACCESS_PREFIX = '__rm_area__:'
 const PARENT_ACCESS_PREFIX = '__rm_parent__:'
+const AREA_SCOPE_PREFIX = '__rm_scope__:'
 
 /**
  * @param {string} area
@@ -63,6 +64,30 @@ function decodeParentAreaGrant(area) {
 }
 
 /**
+ * @param {string} area
+ * @returns {boolean}
+ */
+function isAreaScope(area) {
+  return area.startsWith(AREA_SCOPE_PREFIX)
+}
+
+/**
+ * @param {string} domain
+ * @returns {string}
+ */
+function encodeAreaScope(domain) {
+  return `${AREA_SCOPE_PREFIX}${JSON.stringify({ domain })}`
+}
+
+/**
+ * @param {string} area
+ * @returns {{ domain: string }}
+ */
+function decodeAreaScope(area) {
+  return JSON.parse(area.slice(AREA_SCOPE_PREFIX.length))
+}
+
+/**
  * @param {string[]} [areaRestrictions]
  * @returns {string[]}
  */
@@ -72,7 +97,8 @@ function getPublicAreaRestrictions(areaRestrictions = []) {
       area !== NO_ACCESS_SENTINEL &&
       area !== UNRESTRICTED_ACCESS_SENTINEL &&
       !isAreaGrant(area) &&
-      !isParentAreaGrant(area),
+      !isParentAreaGrant(area) &&
+      !isAreaScope(area),
   )
 }
 
@@ -394,7 +420,12 @@ function resolveAreaPerms(roles, req, serializeScopedGrants = false) {
 function normalizeAreaRestrictions(areaRestrictions, req) {
   const safeAreaRestrictions = areaRestrictions || []
   if (hasUnrestrictedAreaGrant(safeAreaRestrictions)) {
-    return [UNRESTRICTED_ACCESS_SENTINEL]
+    return req
+      ? [
+          UNRESTRICTED_ACCESS_SENTINEL,
+          encodeAreaScope(getRequestAreaDomain(req)),
+        ]
+      : [UNRESTRICTED_ACCESS_SENTINEL]
   }
 
   const globalAreas = getRestrictionAreas()
@@ -480,10 +511,12 @@ function areaPerms(roles, req, serializeScopedGrants = false) {
 module.exports = {
   areaPerms,
   decodeAreaGrant,
+  decodeAreaScope,
   decodeParentAreaGrant,
   getPublicAreaRestrictions,
   hasUnrestrictedAreaGrant,
   isAreaGrant,
+  isAreaScope,
   isParentAreaGrant,
   NO_ACCESS_SENTINEL,
   UNRESTRICTED_ACCESS_SENTINEL,

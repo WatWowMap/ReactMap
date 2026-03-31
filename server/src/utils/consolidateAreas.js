@@ -2,9 +2,12 @@
 const config = require('@rm/config')
 const {
   decodeAreaGrant,
+  decodeAreaScope,
   decodeParentAreaGrant,
   isAreaGrant,
+  isAreaScope,
   isParentAreaGrant,
+  UNRESTRICTED_ACCESS_SENTINEL,
 } = require('./areaPerms')
 
 /**
@@ -75,8 +78,19 @@ function consolidateAreas(areaRestrictions = [], onlyAreas = []) {
      * }[]>} */ ({}),
   )
   const plainAreaRestrictions = areaRestrictions.filter(
-    (area) => !isAreaGrant(area) && !isParentAreaGrant(area),
+    (area) =>
+      area !== UNRESTRICTED_ACCESS_SENTINEL &&
+      !isAreaGrant(area) &&
+      !isAreaScope(area) &&
+      !isParentAreaGrant(area),
   )
+  const requestScopedDomains = areaRestrictions.reduce((acc, area) => {
+    if (!isAreaScope(area)) {
+      return acc
+    }
+    acc.add(decodeAreaScope(area).domain)
+    return acc
+  }, /** @type {Set<string>} */ (new Set()))
   const scopedAreaDomains = areaRestrictions.reduce((acc, area) => {
     if (!isAreaGrant(area)) {
       return acc
@@ -105,7 +119,7 @@ function consolidateAreas(areaRestrictions = [], onlyAreas = []) {
     acc[parentGrant.area].add(parentGrant.domain)
     return acc
   }, /** @type {Record<string, Set<string>>} */ ({}))
-  const getScopedDomains = (area) => {
+  const getScopedDomains = (area, includeRequestScope = false) => {
     const scopedDomains = new Set([
       ...(scopedAreaDomains[area] || []),
       ...(scopedParentDomains[area] || []),
@@ -126,15 +140,18 @@ function consolidateAreas(areaRestrictions = [], onlyAreas = []) {
         }
       },
     )
+    if (!scopedDomains.size && includeRequestScope) {
+      return requestScopedDomains
+    }
     return scopedDomains
   }
-  const getDirectFeatures = (area, allowAmbiguous = false) => {
+  const getDirectFeatures = (area, includeRequestScope = false) => {
     const featureEntries = featureEntriesByKey[area] || []
     if (!featureEntries.length) {
       return []
     }
 
-    const scopedDomains = getScopedDomains(area)
+    const scopedDomains = getScopedDomains(area, includeRequestScope)
     if (scopedDomains.size) {
       return featureEntries
         .filter(({ domain }) => scopedDomains.has(domain))
@@ -142,7 +159,7 @@ function consolidateAreas(areaRestrictions = [], onlyAreas = []) {
     }
 
     const distinctDomains = new Set(featureEntries.map(({ domain }) => domain))
-    return distinctDomains.size === 1 || allowAmbiguous
+    return distinctDomains.size === 1
       ? featureEntries.map(({ feature }) => feature)
       : []
   }
@@ -150,9 +167,13 @@ function consolidateAreas(areaRestrictions = [], onlyAreas = []) {
   const validUserAreas = onlyAreas.filter(
     (area) => featureEntriesByKey[area]?.length,
   )
+  const hasExplicitRestrictions =
+    !!plainAreaRestrictions.length ||
+    !!Object.keys(scopedAreaDomains).length ||
+    !!Object.keys(scopedParentDomains).length
 
   const cleanedValidUserAreas = validUserAreas.flatMap((area) =>
-    areaRestrictions.length
+    hasExplicitRestrictions
       ? getDirectFeatures(area).length
         ? getDirectFeatures(area)
         : (() => {

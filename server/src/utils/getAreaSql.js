@@ -32,10 +32,7 @@ function getAreaSql(
   if (unrestrictedAreaGrant && !onlyAreas?.length) return true
   if (!areaRestrictions?.length && !onlyAreas?.length) return true
 
-  const consolidatedAreas = consolidateAreas(
-    unrestrictedAreaGrant ? [] : areaRestrictions,
-    onlyAreas,
-  )
+  const consolidatedAreas = consolidateAreas(areaRestrictions, onlyAreas)
 
   if (!consolidatedAreas.size) return false
 
