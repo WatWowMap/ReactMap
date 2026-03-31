@@ -327,13 +327,19 @@ function resolveAreaPerms(roles, req, serializeScopedGrants = false) {
       if (hasAreas) {
         for (let k = 0; k < areaRestrictions[j].areas.length; k += 1) {
           const areaTarget = areaRestrictions[j].areas[k]
-          if (serializeScopedGrants) {
+          const usesGlobalAreaLookup =
+            !req || globalAreas.scanAreasObj[areaTarget]
+          const shouldSerializeScopedAreaGrant =
+            !!req &&
+            serializeScopedGrants &&
+            (!usesGlobalAreaLookup ||
+              globalAreaMaps.keyDomainsMap[areaTarget]?.length > 1)
+
+          if (shouldSerializeScopedAreaGrant) {
             perms.push(
               encodeAreaGrant(req ? getRequestAreaDomain(req) : '', areaTarget),
             )
           } else {
-            const usesGlobalAreaLookup =
-              !req || globalAreas.scanAreasObj[areaTarget]
             pushAreaKeys(
               perms,
               areaTarget,
@@ -391,8 +397,12 @@ function normalizeAreaRestrictions(areaRestrictions, req) {
     return [UNRESTRICTED_ACCESS_SENTINEL]
   }
 
-  const areas = getRestrictionAreas(req)
-  const areaMaps = getAreaMaps(areas.scanAreas)
+  const globalAreas = getRestrictionAreas()
+  const globalAreaMaps = getAreaMaps(globalAreas.scanAreas)
+  const requestAreas = req ? getRestrictionAreas(req) : globalAreas
+  const requestAreaMaps = req
+    ? getAreaMaps(requestAreas.scanAreas)
+    : globalAreaMaps
   const normalized = []
 
   safeAreaRestrictions.forEach((area) => {
@@ -402,7 +412,13 @@ function normalizeAreaRestrictions(areaRestrictions, req) {
         if (areaGrant.domain && areaGrant.domain !== getRequestAreaDomain(req))
           return
 
-        pushAreaKeys(normalized, areaGrant.area, areas, areaMaps, false)
+        pushAreaKeys(
+          normalized,
+          areaGrant.area,
+          requestAreas,
+          requestAreaMaps,
+          false,
+        )
       } else {
         normalized.push(area)
       }
@@ -418,14 +434,27 @@ function normalizeAreaRestrictions(areaRestrictions, req) {
         )
           return
 
-        pushAreaKeys(normalized, parentGrant.area, areas, areaMaps, true)
+        pushAreaKeys(
+          normalized,
+          parentGrant.area,
+          requestAreas,
+          requestAreaMaps,
+          true,
+        )
       } else {
         normalized.push(area)
       }
       return
     }
 
-    pushAreaKeys(normalized, area, areas, areaMaps, false)
+    const usesGlobalAreaLookup = !req || globalAreas.scanAreasObj[area]
+    pushAreaKeys(
+      normalized,
+      area,
+      usesGlobalAreaLookup ? globalAreas : requestAreas,
+      usesGlobalAreaLookup ? globalAreaMaps : requestAreaMaps,
+      false,
+    )
   })
 
   const uniquePerms = [...new Set(normalized)]
