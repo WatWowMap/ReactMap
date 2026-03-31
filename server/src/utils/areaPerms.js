@@ -361,125 +361,6 @@ function getAreaLookupMode(target, areas, areaMaps, includeChildren = false) {
 }
 
 /**
- * @param {string[]} perms
- * @param {string} area
- * @param {string} domain
- * @param {{
- *   names: Set<string>,
- *   scanAreas: Record<string, import('@rm/types').RMGeoJSON>,
- *   scanAreasObj: Record<string, import('@rm/types').RMFeature>,
- *   withoutParents: Record<string, string[]>,
- * }} requestAreas
- * @param {ReturnType<typeof getAreaMaps>} requestAreaMaps
- */
-function pushResolvedScopedAreaGrant(
-  perms,
-  area,
-  domain,
-  requestAreas,
-  requestAreaMaps,
-) {
-  const resolvedAreaKeys = []
-
-  perms.push(encodeAreaGrant(domain, area))
-  pushAreaKeys(
-    resolvedAreaKeys,
-    area,
-    requestAreas,
-    requestAreaMaps,
-    false,
-    'key',
-  )
-  perms.push(...resolvedAreaKeys)
-
-  resolvedAreaKeys.forEach((key) => {
-    if (requestAreas.scanAreasObj[key]) {
-      perms.push(encodeAreaGrant(domain, key))
-    }
-  })
-}
-
-/**
- * @param {string[][]} domainSets
- * @returns {Set<string>}
- */
-function intersectDomainSets(domainSets) {
-  let matchingDomains = new Set(domainSets[0] || [])
-  domainSets.slice(1).forEach((domains) => {
-    matchingDomains = new Set(
-      domains.filter((domain) => matchingDomains.has(domain)),
-    )
-  })
-  return matchingDomains
-}
-
-/**
- * @param {string[]} areaRestrictions
- * @param {ReturnType<typeof getAreaMaps>} areaMaps
- * @param {string} requestDomain
- * @returns {string}
- */
-function getLegacyAreaScopeDomain(areaRestrictions, areaMaps, requestDomain) {
-  const explicitDomainSets = /** @type {string[][]} */ ([])
-  const rawDomainSets = /** @type {string[][]} */ ([])
-
-  areaRestrictions.forEach((area) => {
-    if (isAreaScope(area)) {
-      explicitDomainSets.push([decodeAreaScope(area).domain])
-      return
-    }
-
-    if (isAreaGrant(area)) {
-      const areaGrant = decodeAreaGrant(area)
-      if (areaGrant.domain) {
-        explicitDomainSets.push([areaGrant.domain])
-      }
-      return
-    }
-
-    if (isParentAreaGrant(area)) {
-      const parentGrant = decodeParentAreaGrant(area)
-      if (parentGrant.domain) {
-        explicitDomainSets.push([parentGrant.domain])
-      }
-      return
-    }
-
-    if (areaMaps.keyDomainsMap[area]?.length) {
-      rawDomainSets.push(areaMaps.keyDomainsMap[area])
-    }
-  })
-
-  const explicitMatchingDomains = explicitDomainSets.length
-    ? intersectDomainSets(explicitDomainSets)
-    : null
-
-  if (
-    explicitMatchingDomains &&
-    (!explicitMatchingDomains.size ||
-      !explicitMatchingDomains.has(requestDomain))
-  ) {
-    return ''
-  }
-
-  const compatibleRawDomainSets = rawDomainSets.filter((domains) =>
-    domains.includes(requestDomain),
-  )
-
-  if (!compatibleRawDomainSets.length) {
-    return explicitMatchingDomains?.size === 1 ? requestDomain : ''
-  }
-
-  const matchingDomains = intersectDomainSets(
-    explicitMatchingDomains?.size
-      ? [[...explicitMatchingDomains], ...compatibleRawDomainSets]
-      : compatibleRawDomainSets,
-  )
-
-  return matchingDomains.size === 1 ? [...matchingDomains][0] : ''
-}
-
-/**
  * @param {string[]} roles
  * @param {import('express').Request} [req]
  * @param {boolean} [serializeScopedGrants]
@@ -621,21 +502,14 @@ function normalizeAreaRestrictions(areaRestrictions, req) {
   const requestAreaMaps = req
     ? getAreaMaps(requestAreas.scanAreas)
     : globalAreaMaps
-  const requestAreaDomain = req ? getRequestAreaDomain(req) : ''
-  const legacyAreaScopeDomain = requestAreaDomain
-    ? getLegacyAreaScopeDomain(
-        safeAreaRestrictions,
-        globalAreaMaps,
-        requestAreaDomain,
-      )
-    : ''
   const normalized = []
 
   safeAreaRestrictions.forEach((area) => {
     if (isAreaGrant(area)) {
       if (req) {
         const areaGrant = decodeAreaGrant(area)
-        if (areaGrant.domain && areaGrant.domain !== requestAreaDomain) return
+        if (areaGrant.domain && areaGrant.domain !== getRequestAreaDomain(req))
+          return
 
         const resolvedAreaKeys = []
 
@@ -663,7 +537,10 @@ function normalizeAreaRestrictions(areaRestrictions, req) {
     if (isParentAreaGrant(area)) {
       if (req) {
         const parentGrant = decodeParentAreaGrant(area)
-        if (parentGrant.domain && parentGrant.domain !== requestAreaDomain)
+        if (
+          parentGrant.domain &&
+          parentGrant.domain !== getRequestAreaDomain(req)
+        )
           return
 
         normalized.push(area)
@@ -676,55 +553,6 @@ function normalizeAreaRestrictions(areaRestrictions, req) {
         )
       } else {
         normalized.push(area)
-      }
-      return
-    }
-
-    const legacyKeyDomains = globalAreaMaps.keyDomainsMap[area] || []
-    const requestLookupMode = req
-      ? getAreaLookupMode(area, requestAreas, requestAreaMaps, false)
-      : 'none'
-
-    if (requestLookupMode === 'label' && !legacyKeyDomains.length) {
-      pushAreaKeys(
-        normalized,
-        area,
-        requestAreas,
-        requestAreaMaps,
-        false,
-        'label',
-      )
-      return
-    }
-
-    if (req && legacyKeyDomains.length === 1) {
-      const [legacyKeyDomain] = legacyKeyDomains
-
-      if (legacyKeyDomain === requestAreaDomain) {
-        pushResolvedScopedAreaGrant(
-          normalized,
-          area,
-          legacyKeyDomain,
-          requestAreas,
-          requestAreaMaps,
-        )
-      }
-      return
-    }
-
-    if (req && legacyKeyDomains.length > 1) {
-      if (
-        legacyAreaScopeDomain &&
-        legacyKeyDomains.includes(legacyAreaScopeDomain) &&
-        legacyAreaScopeDomain === requestAreaDomain
-      ) {
-        pushResolvedScopedAreaGrant(
-          normalized,
-          area,
-          legacyAreaScopeDomain,
-          requestAreas,
-          requestAreaMaps,
-        )
       }
       return
     }
