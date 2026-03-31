@@ -375,7 +375,7 @@ const resolvers = {
               feature.properties.key,
             ]),
         )
-        const canAccessArea = (properties) =>
+        const hasDirectAreaAccess = (properties) =>
           unrestrictedAreaGrant ||
           !perms.areaRestrictions.length ||
           perms.areaRestrictions.includes(properties.key) ||
@@ -385,6 +385,22 @@ const resolvers = {
               parentKeyByName[properties.parent],
             ) ||
               perms.areaRestrictions.includes(properties.parent)))
+        const accessibleSelectableParents = new Set(
+          scanAreas.features
+            .filter(
+              (feature) =>
+                feature.properties.parent &&
+                !feature.properties.hidden &&
+                !feature.properties.manual &&
+                hasDirectAreaAccess(feature.properties),
+            )
+            .map((feature) => feature.properties.parent),
+        )
+        const canAccessArea = (properties) =>
+          hasDirectAreaAccess(properties) ||
+          (!properties.parent &&
+            !properties.manual &&
+            accessibleSelectableParents.has(properties.name))
 
         return [
           {
