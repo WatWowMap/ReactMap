@@ -29,6 +29,7 @@ export function getAreaKeys(features, feature, accessibleAreaKeys = []) {
       )?.properties.key
     : undefined
 
+  if (childKeys.length) return childKeys
   if (!feature.properties.key) return childKeys
 
   const areaKeys =

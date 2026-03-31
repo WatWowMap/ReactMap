@@ -19,7 +19,6 @@ import { useMemory } from '@store/useMemory'
  *  allAreas?: string[]
  *  childAreas?: Pick<import('@rm/types').RMFeature, 'properties'>[]
  *  allChildAreas?: Pick<import('@rm/types').RMFeature, 'properties'>[]
- *  groupKey?: string
  *  borderRight?: boolean
  *  colSpan?: number
  * }} props
@@ -29,7 +28,6 @@ export function AreaChild({
   feature,
   childAreas,
   allChildAreas,
-  groupKey,
   allAreas,
   borderRight,
   colSpan = 1,
@@ -37,9 +35,6 @@ export function AreaChild({
   const scanAreas = useStorage((s) => s.filters?.scanAreas?.filter?.areas)
   const zoom = useMemory((s) => s.config.general.scanAreasZoom)
   const expandAllScanAreas = useMemory((s) => s.config.misc.expandAllScanAreas)
-  const accessibleAreaKeys = useMemory(
-    (s) => s.auth.perms.areaRestrictions || [],
-  )
   const map = useMap()
 
   const { setAreas } = useStorage.getState()
@@ -47,73 +42,24 @@ export function AreaChild({
 
   if (!scanAreas) return null
 
-  const groupedChildren = name
-    ? childAreas?.length
-      ? childAreas
-      : allChildAreas || childAreas || []
-    : allChildAreas || childAreas || []
-  const groupedAreaKeys = groupedChildren
-    .filter((child) => !child.properties.manual)
-    .map((child) => child.properties.key)
-  const allGroupedAreaKeys = (allChildAreas || childAreas || [])
-    .filter((child) => !child.properties.manual)
-    .map((child) => child.properties.key)
-  const isSearchScopedGroup =
-    !!name &&
-    groupedAreaKeys.length > 0 &&
-    allGroupedAreaKeys.some((key) => !groupedAreaKeys.includes(key))
-  const parentAreaKey =
-    groupKey ||
-    (feature?.properties?.key && !feature.properties.manual
-      ? feature.properties.key
-      : undefined)
-  const parentAreaKeys =
-    name &&
-    parentAreaKey &&
-    !isSearchScopedGroup &&
-    (!accessibleAreaKeys.length || accessibleAreaKeys.includes(parentAreaKey))
-      ? [parentAreaKey]
-      : []
-  const coveredByParentSelection =
-    !!name &&
-    !!parentAreaKey &&
-    isSearchScopedGroup &&
-    scanAreas.includes(parentAreaKey)
-  const selectableAreaKeys = name
-    ? [...new Set([...groupedAreaKeys, ...parentAreaKeys])]
-    : []
-  const removableAreaKeys =
-    name && parentAreaKey
-      ? [...new Set([...selectableAreaKeys, parentAreaKey])]
-      : selectableAreaKeys
-  const hasAll = name
-    ? coveredByParentSelection ||
-      (selectableAreaKeys.length
-        ? selectableAreaKeys.every((key) => scanAreas.includes(key))
-        : false)
-    : false
-  const hasSome = name
-    ? coveredByParentSelection ||
-      (removableAreaKeys.length
-        ? removableAreaKeys.some((key) => scanAreas.includes(key))
-        : false)
-    : false
+  const allSelectableChildren = (allChildAreas || childAreas || []).filter(
+    (child) => !child.properties.manual,
+  )
+  const hasSelectableChildren = !!name && allSelectableChildren.length > 0
   const allChildrenManual =
     name &&
-    !!groupedChildren.length &&
-    groupedChildren.every((child) => child.properties.manual)
-  const hasManual = name
-    ? !selectableAreaKeys.length &&
-      (feature?.properties?.manual || allChildrenManual)
-    : feature?.properties?.manual
-  const color =
-    hasManual || (name ? !selectableAreaKeys.length : !feature.properties.name)
-      ? 'transparent'
-      : 'none'
-  const coveredByGroup =
-    !name && !feature?.properties?.manual && groupKey
-      ? scanAreas.includes(groupKey)
-      : false
+    !!(allChildAreas || childAreas || []).length &&
+    (allChildAreas || childAreas || []).every(
+      (child) => child.properties.manual,
+    )
+  const hasManual = !!feature?.properties?.manual || allChildrenManual
+  const areaKey = feature?.properties?.key
+  const checked = !!areaKey && scanAreas.includes(areaKey)
+  const showCheckbox =
+    !!areaKey &&
+    !!feature?.properties?.name &&
+    !hasManual &&
+    !hasSelectableChildren
 
   const nameProp =
     name || feature?.properties?.formattedName || feature?.properties?.name
@@ -157,73 +103,20 @@ export function AreaChild({
           },
         })}
       >
-        {!hasExpand && hasManual ? null : (
+        {showCheckbox ? (
           <Checkbox
             size="small"
             color="secondary"
-            indeterminate={name ? hasSome && !hasAll : false}
-            checked={
-              name
-                ? hasAll
-                : coveredByGroup || scanAreas.includes(feature.properties.key)
-            }
+            checked={checked}
             onClick={(e) => e.stopPropagation()}
             onChange={() => {
-              let areaKeys = name
-                ? hasSome
-                  ? removableAreaKeys
-                  : selectableAreaKeys
-                : feature.properties.key
-              let unselectAll = name ? hasSome : false
-
-              if (name && coveredByParentSelection) {
-                const hiddenSiblingKeys = allGroupedAreaKeys.filter(
-                  (key) => !groupedAreaKeys.includes(key),
-                )
-                areaKeys = [
-                  parentAreaKey,
-                  ...groupedAreaKeys.filter((key) => scanAreas.includes(key)),
-                  ...hiddenSiblingKeys.filter(
-                    (key) => !scanAreas.includes(key),
-                  ),
-                ]
-                unselectAll = false
-              } else if (!name && coveredByGroup) {
-                const siblingAreaKeys = (allChildAreas || childAreas || [])
-                  .filter(
-                    (child) =>
-                      !child.properties.manual &&
-                      child.properties.key !== feature.properties.key,
-                  )
-                  .map((child) => child.properties.key)
-                areaKeys = [
-                  groupKey,
-                  ...(scanAreas.includes(feature.properties.key)
-                    ? [feature.properties.key]
-                    : []),
-                  ...siblingAreaKeys.filter((key) => !scanAreas.includes(key)),
-                ]
-                unselectAll = false
-              }
-
-              setAreas(areaKeys, allAreas, unselectAll)
+              setAreas(areaKey, allAreas, checked)
             }}
             sx={{
               p: 1,
-              color,
-              '&.Mui-checked': {
-                color,
-              },
-              '&.Mui-disabled': {
-                color,
-              },
             }}
-            disabled={
-              (name ? !selectableAreaKeys.length : !feature.properties.name) ||
-              hasManual
-            }
           />
-        )}
+        ) : null}
         <Typography
           variant={name ? 'h6' : 'caption'}
           align="center"

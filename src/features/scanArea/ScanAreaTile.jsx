@@ -69,6 +69,16 @@ function ScanArea(featureCollection) {
               })
             })
           } else if (!manual && tapToToggle) {
+            const hasSelectableChildren =
+              !layer.feature.properties.parent &&
+              featureCollection.features.some(
+                (feature) =>
+                  !feature.properties.manual &&
+                  feature.properties.parent === layer.feature.properties.name &&
+                  feature.properties.key,
+              )
+            if (hasSelectableChildren) return
+
             const areaKeys = getAreaKeys(
               featureCollection.features,
               layer.feature,
@@ -79,50 +89,12 @@ function ScanArea(featureCollection) {
               accessibleAreaKeys,
             )
             const { setAreas } = useStorage.getState()
-            const hasAll = areaKeys.every((area) =>
+            const hasSome = areaKeys.some((area) =>
               selectedAreas.includes(area),
             )
-            const groupKey = layer.feature.properties.parent
-              ? featureCollection.features.find(
-                  (feature) =>
-                    !feature.properties.manual &&
-                    !feature.properties.parent &&
-                    feature.properties.name ===
-                      layer.feature.properties.parent &&
-                    feature.properties.key,
-                )?.properties.key
-              : undefined
-            let nextAreaKeys = areaKeys
-            let unselectAll = hasAll
 
-            if (groupKey && selectedAreas.includes(groupKey)) {
-              const siblingAreaKeys = featureCollection.features
-                .filter(
-                  (feature) =>
-                    !feature.properties.manual &&
-                    feature.properties.parent ===
-                      layer.feature.properties.parent &&
-                    feature.properties.key !== layer.feature.properties.key,
-                )
-                .map((feature) => feature.properties.key)
-              nextAreaKeys = [
-                groupKey,
-                ...(selectedAreas.includes(layer.feature.properties.key)
-                  ? [layer.feature.properties.key]
-                  : []),
-                ...siblingAreaKeys.filter(
-                  (key) => !selectedAreas.includes(key),
-                ),
-              ]
-              unselectAll = false
-            } else if (areaKeys.length > 1 && !hasAll) {
-              nextAreaKeys = areaKeys.filter(
-                (area) => !selectedAreas.includes(area),
-              )
-            }
-
-            layer.setStyle({ fillOpacity: hasAll ? 0.2 : 0.8 })
-            setAreas(nextAreaKeys, validAreaKeys, unselectAll)
+            layer.setStyle({ fillOpacity: hasSome ? 0.2 : 0.8 })
+            setAreas(areaKeys, validAreaKeys, hasSome)
           }
         },
       }}
