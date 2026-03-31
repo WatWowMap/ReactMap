@@ -296,11 +296,14 @@ function resolveAreaPerms(roles, req, serializeParentGrants = false) {
 
       if (hasAreas) {
         for (let k = 0; k < areaRestrictions[j].areas.length; k += 1) {
+          const areaTarget = areaRestrictions[j].areas[k]
+          const usesGlobalAreaLookup =
+            !req || globalAreas.scanAreasObj[areaTarget]
           pushAreaKeys(
             perms,
-            areaRestrictions[j].areas[k],
-            globalAreas,
-            globalAreaMaps,
+            areaTarget,
+            usesGlobalAreaLookup ? globalAreas : requestAreas,
+            usesGlobalAreaLookup ? globalAreaMaps : requestAreaMaps,
             false,
           )
         }
