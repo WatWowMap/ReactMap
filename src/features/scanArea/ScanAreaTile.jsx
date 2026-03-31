@@ -5,6 +5,7 @@ import { GeoJSON } from 'react-leaflet'
 import { Polygon } from 'leaflet'
 
 import { useWebhookStore, handleClick } from '@store/useWebhookStore'
+import { useMemory } from '@store/useMemory'
 import { useStorage } from '@store/useStorage'
 import { getProperName } from '@utils/strings'
 import { getAreaKeys, getValidAreaKeys, migrateLegacyAreaKeys } from './utils'
@@ -23,10 +24,18 @@ function ScanArea(featureCollection) {
   const alwaysShowLabels = useStorage(
     (s) => s.userSettings.scanAreas.alwaysShowLabels,
   )
+  const accessibleAreaKeys = useMemory(
+    (s) => s.auth.perms.areaRestrictions || [],
+  )
   const webhook = useWebhookStore((s) => !!s.mode)
   const migratedAreas = React.useMemo(
-    () => migrateLegacyAreaKeys(featureCollection.features, selectedAreas),
-    [featureCollection.features, selectedAreas],
+    () =>
+      migrateLegacyAreaKeys(
+        featureCollection.features,
+        selectedAreas,
+        accessibleAreaKeys,
+      ),
+    [accessibleAreaKeys, featureCollection.features, selectedAreas],
   )
   const effectiveSelectedAreas = migratedAreas || selectedAreas
   const selectionKey = React.useMemo(
@@ -73,8 +82,12 @@ function ScanArea(featureCollection) {
             const areaKeys = getAreaKeys(
               featureCollection.features,
               layer.feature,
+              accessibleAreaKeys,
             )
-            const validAreaKeys = getValidAreaKeys(featureCollection.features)
+            const validAreaKeys = getValidAreaKeys(
+              featureCollection.features,
+              accessibleAreaKeys,
+            )
             const { setAreas } = useStorage.getState()
             const hasAll = areaKeys.every((area) =>
               effectiveSelectedAreas.includes(area),
@@ -126,7 +139,11 @@ function ScanArea(featureCollection) {
       onEachFeature={(feature, layer) => {
         if (feature.properties?.name) {
           const { name } = feature.properties
-          const areaKeys = getAreaKeys(featureCollection.features, feature)
+          const areaKeys = getAreaKeys(
+            featureCollection.features,
+            feature,
+            accessibleAreaKeys,
+          )
           const isSelected = areaKeys.length
             ? areaKeys.every((area) => effectiveSelectedAreas.includes(area))
             : false

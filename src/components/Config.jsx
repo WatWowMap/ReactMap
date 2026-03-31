@@ -59,6 +59,7 @@ export function Config({ children }) {
           ? migrateLegacyAreaKeys(
               getScanAreaMenuFeatures(data.scanAreasMenu),
               selectedAreas,
+              data.user?.perms?.areaRestrictions || [],
             )
           : null
 

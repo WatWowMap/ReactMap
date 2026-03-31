@@ -14,9 +14,10 @@ export function getScanAreaMenuFeatures(scanAreasMenu = []) {
 /**
  * @param {Pick<import('@rm/types').RMFeature, 'properties'>[]} features
  * @param {Pick<import('@rm/types').RMFeature, 'properties'>} feature
+ * @param {string[]} [accessibleAreaKeys]
  * @returns {string[]}
  */
-export function getAreaKeys(features, feature) {
+export function getAreaKeys(features, feature, accessibleAreaKeys = []) {
   if (!feature?.properties || feature.properties.manual) return []
 
   const childKeys =
@@ -33,26 +34,40 @@ export function getAreaKeys(features, feature) {
 
   if (!feature.properties.key) return childKeys
 
-  const areaKeys = [feature.properties.key]
+  const areaKeys =
+    !accessibleAreaKeys.length ||
+    accessibleAreaKeys.includes(feature.properties.key)
+      ? [feature.properties.key]
+      : []
   return childKeys.length ? [...areaKeys, ...childKeys] : areaKeys
 }
 
 /**
  * @param {Pick<import('@rm/types').RMFeature, 'properties'>[]} features
+ * @param {string[]} [accessibleAreaKeys]
  * @returns {string[]}
  */
-export function getValidAreaKeys(features) {
+export function getValidAreaKeys(features, accessibleAreaKeys = []) {
   return [
-    ...new Set(features.flatMap((feature) => getAreaKeys(features, feature))),
+    ...new Set(
+      features.flatMap((feature) =>
+        getAreaKeys(features, feature, accessibleAreaKeys),
+      ),
+    ),
   ]
 }
 
 /**
  * @param {Pick<import('@rm/types').RMFeature, 'properties'>[]} features
  * @param {string[]} selectedAreas
+ * @param {string[]} [accessibleAreaKeys]
  * @returns {string[] | null}
  */
-export function migrateLegacyAreaKeys(features, selectedAreas) {
+export function migrateLegacyAreaKeys(
+  features,
+  selectedAreas,
+  accessibleAreaKeys = [],
+) {
   const migrated = new Set(selectedAreas)
   let changed = false
 
@@ -61,7 +76,7 @@ export function migrateLegacyAreaKeys(features, selectedAreas) {
       return
     }
 
-    const areaKeys = getAreaKeys(features, feature)
+    const areaKeys = getAreaKeys(features, feature, accessibleAreaKeys)
     if (areaKeys.length === 1 && areaKeys[0] === feature.properties.key) {
       return
     }
