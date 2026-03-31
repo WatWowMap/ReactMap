@@ -355,12 +355,15 @@ function resolveAreaPerms(roles, req, serializeScopedGrants = false) {
       if (hasAreas) {
         for (let k = 0; k < areaRestrictions[j].areas.length; k += 1) {
           const areaTarget = areaRestrictions[j].areas[k]
+          const usesRequestAreaLookup =
+            !!req && !!requestAreas.scanAreasObj[areaTarget]
           const usesGlobalAreaLookup =
             !req || globalAreas.scanAreasObj[areaTarget]
           const shouldSerializeScopedAreaGrant =
             !!req &&
             serializeScopedGrants &&
-            (!usesGlobalAreaLookup ||
+            (!usesRequestAreaLookup ||
+              !usesGlobalAreaLookup ||
               globalAreaMaps.keyDomainsMap[areaTarget]?.length > 1)
 
           if (shouldSerializeScopedAreaGrant) {
