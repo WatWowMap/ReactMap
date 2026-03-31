@@ -30,6 +30,9 @@ export function ScanAreasTable() {
   const rawSearch = useStorage((s) => s.filters.scanAreas?.filter?.search || '')
   const search = React.useMemo(() => rawSearch.toLowerCase(), [rawSearch])
   const trimmedSearch = React.useMemo(() => rawSearch.trim(), [rawSearch])
+  const accessibleAreaKeys = useMemory(
+    (s) => s.auth.perms.areaRestrictions || [],
+  )
   const { misc, general } = useMemory.getState().config
   const jumpZoom = general?.scanAreasZoom || general?.startZoom || 12
   /** @type {[JumpResult[], React.Dispatch<React.SetStateAction<JumpResult[]>>]} */
@@ -53,7 +56,9 @@ export function ScanAreasTable() {
       ...new Set(
         data?.scanAreasMenu.flatMap((parent) => [
           ...(parent.details?.properties?.key &&
-          !parent.details.properties.manual
+          !parent.details.properties.manual &&
+          (!accessibleAreaKeys.length ||
+            accessibleAreaKeys.includes(parent.details.properties.key))
             ? [parent.details.properties.key]
             : []),
           ...parent.children
@@ -62,7 +67,7 @@ export function ScanAreasTable() {
         ]) || [],
       ),
     ],
-    [data],
+    [accessibleAreaKeys, data],
   )
 
   const allRows = React.useMemo(

@@ -37,6 +37,9 @@ export function AreaChild({
   const scanAreas = useStorage((s) => s.filters?.scanAreas?.filter?.areas)
   const zoom = useMemory((s) => s.config.general.scanAreasZoom)
   const expandAllScanAreas = useMemory((s) => s.config.misc.expandAllScanAreas)
+  const accessibleAreaKeys = useMemory(
+    (s) => s.auth.perms.areaRestrictions || [],
+  )
   const map = useMap()
 
   const { setAreas } = useStorage.getState()
@@ -51,7 +54,11 @@ export function AreaChild({
     .filter((child) => !child.properties.manual)
     .map((child) => child.properties.key)
   const parentAreaKeys =
-    name && feature?.properties?.key && !feature.properties.manual
+    name &&
+    feature?.properties?.key &&
+    !feature.properties.manual &&
+    (!accessibleAreaKeys.length ||
+      accessibleAreaKeys.includes(feature.properties.key))
       ? [feature.properties.key]
       : []
   const selectableAreaKeys = name
