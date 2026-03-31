@@ -140,7 +140,7 @@ rootRouter.get('/api/settings', async (req, res, next) => {
         ...Object.fromEntries(
           Object.keys(authentication.perms).map((p) => [p, false]),
         ),
-        areaRestrictions: areaPerms(['none']),
+        areaRestrictions: areaPerms(['none'], req, true),
         webhooks: [],
         scanner: Object.keys(scanner).filter(
           (key) =>
