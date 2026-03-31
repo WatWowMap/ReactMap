@@ -367,6 +367,7 @@ const resolvers = {
             .filter(
               (feature) =>
                 !feature.properties.parent &&
+                !feature.properties.hidden &&
                 feature.properties.name &&
                 feature.properties.key,
             )

@@ -17,7 +17,12 @@ function getAccessibleScanAreasMenu(req, perms) {
   const unrestrictedAreaGrant = hasUnrestrictedAreaGrant(perms.areaRestrictions)
   const parentKeyByName = Object.fromEntries(
     scanAreas
-      .filter((parent) => parent.name && parent.details?.properties?.key)
+      .filter(
+        (parent) =>
+          parent.name &&
+          parent.details?.properties?.key &&
+          !parent.details.properties.hidden,
+      )
       .map((parent) => [parent.name, parent.details.properties.key]),
   )
   const baseMenu = scanAreas.map((parent) => ({
