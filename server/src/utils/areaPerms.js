@@ -3,7 +3,36 @@ const config = require('@rm/config')
 
 const NO_ACCESS_SENTINEL = '__rm_no_access__'
 const UNRESTRICTED_ACCESS_SENTINEL = '__rm_unrestricted__'
+const AREA_ACCESS_PREFIX = '__rm_area__:'
 const PARENT_ACCESS_PREFIX = '__rm_parent__:'
+
+/**
+ * @param {string} area
+ * @returns {boolean}
+ */
+function isAreaGrant(area) {
+  return area.startsWith(AREA_ACCESS_PREFIX)
+}
+
+/**
+ * @param {string} areaOrDomain
+ * @param {string} [area]
+ * @returns {string}
+ */
+function encodeAreaGrant(areaOrDomain, area) {
+  return `${AREA_ACCESS_PREFIX}${JSON.stringify(
+    area ? { domain: areaOrDomain, area } : { area: areaOrDomain },
+  )}`
+}
+
+/**
+ * @param {string} area
+ * @returns {{ domain?: string, area: string }}
+ */
+function decodeAreaGrant(area) {
+  const value = JSON.parse(area.slice(AREA_ACCESS_PREFIX.length))
+  return typeof value === 'string' ? { area: value } : value
+}
 
 /**
  * @param {string} area
@@ -42,6 +71,7 @@ function getPublicAreaRestrictions(areaRestrictions = []) {
     (area) =>
       area !== NO_ACCESS_SENTINEL &&
       area !== UNRESTRICTED_ACCESS_SENTINEL &&
+      !isAreaGrant(area) &&
       !isParentAreaGrant(area),
   )
 }
@@ -259,10 +289,10 @@ function pushAreaKeys(perms, target, areas, areaMaps, includeChildren = false) {
 /**
  * @param {string[]} roles
  * @param {import('express').Request} [req]
- * @param {boolean} [serializeParentGrants]
+ * @param {boolean} [serializeScopedGrants]
  * @returns {{ areaRestrictions: string[], hasUnrestrictedGrant: boolean }}
  */
-function resolveAreaPerms(roles, req, serializeParentGrants = false) {
+function resolveAreaPerms(roles, req, serializeScopedGrants = false) {
   const areaRestrictions = config.getSafe('authentication.areaRestrictions')
   const globalAreas = getRestrictionAreas()
   const globalAreaMaps = getAreaMaps(globalAreas.scanAreas)
@@ -297,21 +327,27 @@ function resolveAreaPerms(roles, req, serializeParentGrants = false) {
       if (hasAreas) {
         for (let k = 0; k < areaRestrictions[j].areas.length; k += 1) {
           const areaTarget = areaRestrictions[j].areas[k]
-          const usesGlobalAreaLookup =
-            !req || globalAreas.scanAreasObj[areaTarget]
-          pushAreaKeys(
-            perms,
-            areaTarget,
-            usesGlobalAreaLookup ? globalAreas : requestAreas,
-            usesGlobalAreaLookup ? globalAreaMaps : requestAreaMaps,
-            false,
-          )
+          if (serializeScopedGrants) {
+            perms.push(
+              encodeAreaGrant(req ? getRequestAreaDomain(req) : '', areaTarget),
+            )
+          } else {
+            const usesGlobalAreaLookup =
+              !req || globalAreas.scanAreasObj[areaTarget]
+            pushAreaKeys(
+              perms,
+              areaTarget,
+              usesGlobalAreaLookup ? globalAreas : requestAreas,
+              usesGlobalAreaLookup ? globalAreaMaps : requestAreaMaps,
+              false,
+            )
+          }
         }
       }
 
       if (hasParents) {
         for (let k = 0; k < areaRestrictions[j].parent.length; k += 1) {
-          if (serializeParentGrants) {
+          if (serializeScopedGrants) {
             perms.push(
               encodeParentAreaGrant(
                 req ? getRequestAreaDomain(req) : '',
@@ -360,6 +396,19 @@ function normalizeAreaRestrictions(areaRestrictions, req) {
   const normalized = []
 
   safeAreaRestrictions.forEach((area) => {
+    if (isAreaGrant(area)) {
+      if (req) {
+        const areaGrant = decodeAreaGrant(area)
+        if (areaGrant.domain && areaGrant.domain !== getRequestAreaDomain(req))
+          return
+
+        pushAreaKeys(normalized, areaGrant.area, areas, areaMaps, false)
+      } else {
+        normalized.push(area)
+      }
+      return
+    }
+
     if (isParentAreaGrant(area)) {
       if (req) {
         const parentGrant = decodeParentAreaGrant(area)
@@ -390,11 +439,11 @@ function normalizeAreaRestrictions(areaRestrictions, req) {
 /**
  * @param {string[]} roles
  * @param {import('express').Request} [req]
- * @param {boolean} [serializeParentGrants]
+ * @param {boolean} [serializeScopedGrants]
  * @returns {string[]}
  */
-function areaPerms(roles, req, serializeParentGrants = false) {
-  return resolveAreaPerms(roles, req, serializeParentGrants).areaRestrictions
+function areaPerms(roles, req, serializeScopedGrants = false) {
+  return resolveAreaPerms(roles, req, serializeScopedGrants).areaRestrictions
 }
 
 module.exports = {
