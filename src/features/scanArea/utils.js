@@ -20,25 +20,16 @@ export function getAreaKeys(features, feature, accessibleAreaKeys = []) {
           )
           .map((child) => child.properties.key)
       : []
-  const parentKey = feature.properties.parent
-    ? features.find(
-        (parent) =>
-          !parent.properties.parent &&
-          parent.properties.name === feature.properties.parent &&
-          parent.properties.key,
-      )?.properties.key
-    : undefined
 
   if (childKeys.length) return childKeys
   if (!feature.properties.key) return childKeys
 
   const areaKeys =
     !accessibleAreaKeys.length ||
-    accessibleAreaKeys.includes(feature.properties.key) ||
-    (!!parentKey && accessibleAreaKeys.includes(parentKey))
+    accessibleAreaKeys.includes(feature.properties.key)
       ? [feature.properties.key]
       : []
-  return childKeys.length ? [...areaKeys, ...childKeys] : areaKeys
+  return areaKeys
 }
 
 /**

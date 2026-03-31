@@ -362,30 +362,10 @@ const resolvers = {
         const unrestrictedAreaGrant = hasUnrestrictedAreaGrant(
           perms.areaRestrictions,
         )
-        const parentKeyByName = Object.fromEntries(
-          scanAreas.features
-            .filter(
-              (feature) =>
-                !feature.properties.parent &&
-                !feature.properties.hidden &&
-                feature.properties.name &&
-                feature.properties.key,
-            )
-            .map((feature) => [
-              feature.properties.name,
-              feature.properties.key,
-            ]),
-        )
         const hasDirectAreaAccess = (properties) =>
           unrestrictedAreaGrant ||
           !perms.areaRestrictions.length ||
-          perms.areaRestrictions.includes(properties.key) ||
-          perms.areaRestrictions.includes(properties.name) ||
-          (!!properties.parent &&
-            (perms.areaRestrictions.includes(
-              parentKeyByName[properties.parent],
-            ) ||
-              perms.areaRestrictions.includes(properties.parent)))
+          perms.areaRestrictions.includes(properties.key)
         const accessibleSelectableParents = new Set(
           scanAreas.features
             .filter(

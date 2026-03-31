@@ -18,24 +18,20 @@ function isAreaGrant(area) {
 /**
  * @param {string} areaOrDomain
  * @param {string} [area]
- * @param {'key' | 'label' | 'none'} [lookup]
  * @returns {string}
  */
-function encodeAreaGrant(areaOrDomain, area, lookup) {
+function encodeAreaGrant(areaOrDomain, area) {
   return `${AREA_ACCESS_PREFIX}${JSON.stringify(
-    area
-      ? { domain: areaOrDomain, area, ...(lookup ? { lookup } : {}) }
-      : { area: areaOrDomain, ...(lookup ? { lookup } : {}) },
+    area ? { domain: areaOrDomain, area } : { area: areaOrDomain },
   )}`
 }
 
 /**
  * @param {string} area
- * @returns {{ domain?: string, area: string, lookup?: 'key' | 'label' | 'none' }}
+ * @returns {{ domain?: string, area: string }}
  */
 function decodeAreaGrant(area) {
-  const value = JSON.parse(area.slice(AREA_ACCESS_PREFIX.length))
-  return typeof value === 'string' ? { area: value } : value
+  return JSON.parse(area.slice(AREA_ACCESS_PREFIX.length))
 }
 
 /**
@@ -49,24 +45,20 @@ function isParentAreaGrant(area) {
 /**
  * @param {string} areaOrDomain
  * @param {string} [area]
- * @param {'key' | 'label' | 'none'} [lookup]
  * @returns {string}
  */
-function encodeParentAreaGrant(areaOrDomain, area, lookup) {
+function encodeParentAreaGrant(areaOrDomain, area) {
   return `${PARENT_ACCESS_PREFIX}${JSON.stringify(
-    area
-      ? { domain: areaOrDomain, area, ...(lookup ? { lookup } : {}) }
-      : { area: areaOrDomain, ...(lookup ? { lookup } : {}) },
+    area ? { domain: areaOrDomain, area } : { area: areaOrDomain },
   )}`
 }
 
 /**
  * @param {string} area
- * @returns {{ domain?: string, area: string, lookup?: 'key' | 'label' | 'none' }}
+ * @returns {{ domain?: string, area: string }}
  */
 function decodeParentAreaGrant(area) {
-  const value = JSON.parse(area.slice(PARENT_ACCESS_PREFIX.length))
-  return typeof value === 'string' ? { area: value } : value
+  return JSON.parse(area.slice(PARENT_ACCESS_PREFIX.length))
 }
 
 /**
