@@ -37,16 +37,21 @@ function getAccessibleScanAreasMenu(req, perms) {
           perms.areaRestrictions.includes(properties.parent)))
 
     return baseMenu
-      .map((parent) => ({
-        ...parent,
-        details:
-          parent.details && canAccessArea(parent.details.properties)
-            ? parent.details
-            : null,
-        children: parent.children.filter((child) =>
+      .map((parent) => {
+        const children = parent.children.filter((child) =>
           canAccessArea(child.properties),
-        ),
-      }))
+        )
+
+        return {
+          ...parent,
+          details:
+            parent.details &&
+            (canAccessArea(parent.details.properties) || children.length)
+              ? parent.details
+              : null,
+          children,
+        }
+      })
       .filter((parent) => parent.details || parent.children.length)
   }
 
