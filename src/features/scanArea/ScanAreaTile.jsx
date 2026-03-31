@@ -67,6 +67,9 @@ function ScanArea(featureCollection) {
             const hasSome = areaKeys.some((area) =>
               effectiveSelectedAreas.includes(area),
             )
+            const hasAll = areaKeys.every((area) =>
+              effectiveSelectedAreas.includes(area),
+            )
             const legacyGroupKey = layer.feature.properties.parent
               ? featureCollection.features.find(
                   (feature) =>
@@ -102,7 +105,11 @@ function ScanArea(featureCollection) {
               unselectAll = false
             }
 
-            layer.setStyle({ fillOpacity: hasSome ? 0.2 : 0.8 })
+            if (areaKeys.length > 1) {
+              unselectAll = hasAll
+            }
+
+            layer.setStyle({ fillOpacity: hasAll ? 0.2 : 0.8 })
             setAreas(nextAreaKeys, validAreaKeys, unselectAll)
           }
         },
