@@ -400,54 +400,81 @@ function pushResolvedScopedAreaGrant(
 }
 
 /**
+ * @param {string[][]} domainSets
+ * @returns {Set<string>}
+ */
+function intersectDomainSets(domainSets) {
+  let matchingDomains = new Set(domainSets[0] || [])
+  domainSets.slice(1).forEach((domains) => {
+    matchingDomains = new Set(
+      domains.filter((domain) => matchingDomains.has(domain)),
+    )
+  })
+  return matchingDomains
+}
+
+/**
  * @param {string[]} areaRestrictions
  * @param {ReturnType<typeof getAreaMaps>} areaMaps
  * @param {string} requestDomain
  * @returns {string}
  */
 function getLegacyAreaScopeDomain(areaRestrictions, areaMaps, requestDomain) {
-  const domainSets = areaRestrictions.reduce((acc, area) => {
+  const explicitDomainSets = /** @type {string[][]} */ ([])
+  const rawDomainSets = /** @type {string[][]} */ ([])
+
+  areaRestrictions.forEach((area) => {
     if (isAreaScope(area)) {
-      acc.push([decodeAreaScope(area).domain])
-      return acc
+      explicitDomainSets.push([decodeAreaScope(area).domain])
+      return
     }
 
     if (isAreaGrant(area)) {
       const areaGrant = decodeAreaGrant(area)
       if (areaGrant.domain) {
-        acc.push([areaGrant.domain])
+        explicitDomainSets.push([areaGrant.domain])
       }
-      return acc
+      return
     }
 
     if (isParentAreaGrant(area)) {
       const parentGrant = decodeParentAreaGrant(area)
       if (parentGrant.domain) {
-        acc.push([parentGrant.domain])
+        explicitDomainSets.push([parentGrant.domain])
       }
-      return acc
+      return
     }
 
     if (areaMaps.keyDomainsMap[area]?.length) {
-      acc.push(areaMaps.keyDomainsMap[area])
+      rawDomainSets.push(areaMaps.keyDomainsMap[area])
     }
-    return acc
-  }, /** @type {string[][]} */ ([]))
+  })
 
-  const compatibleDomainSets = domainSets.filter((domains) =>
-    domains.includes(requestDomain),
-  )
+  const explicitMatchingDomains = explicitDomainSets.length
+    ? intersectDomainSets(explicitDomainSets)
+    : null
 
-  if (!compatibleDomainSets.length) {
+  if (
+    explicitMatchingDomains &&
+    (!explicitMatchingDomains.size ||
+      !explicitMatchingDomains.has(requestDomain))
+  ) {
     return ''
   }
 
-  let matchingDomains = new Set(compatibleDomainSets[0])
-  compatibleDomainSets.slice(1).forEach((domains) => {
-    matchingDomains = new Set(
-      domains.filter((domain) => matchingDomains.has(domain)),
-    )
-  })
+  const compatibleRawDomainSets = rawDomainSets.filter((domains) =>
+    domains.includes(requestDomain),
+  )
+
+  if (!compatibleRawDomainSets.length) {
+    return explicitMatchingDomains?.size === 1 ? requestDomain : ''
+  }
+
+  const matchingDomains = intersectDomainSets(
+    explicitMatchingDomains?.size
+      ? [[...explicitMatchingDomains], ...compatibleRawDomainSets]
+      : compatibleRawDomainSets,
+  )
 
   return matchingDomains.size === 1 ? [...matchingDomains][0] : ''
 }
@@ -653,11 +680,12 @@ function normalizeAreaRestrictions(areaRestrictions, req) {
       return
     }
 
+    const legacyKeyDomains = globalAreaMaps.keyDomainsMap[area] || []
     const requestLookupMode = req
       ? getAreaLookupMode(area, requestAreas, requestAreaMaps, false)
       : 'none'
 
-    if (requestLookupMode === 'label') {
+    if (requestLookupMode === 'label' && !legacyKeyDomains.length) {
       pushAreaKeys(
         normalized,
         area,
@@ -668,8 +696,6 @@ function normalizeAreaRestrictions(areaRestrictions, req) {
       )
       return
     }
-
-    const legacyKeyDomains = globalAreaMaps.keyDomainsMap[area] || []
 
     if (req && legacyKeyDomains.length === 1) {
       const [legacyKeyDomain] = legacyKeyDomains
