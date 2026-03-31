@@ -138,6 +138,7 @@ export function ScanAreasTable() {
 
     setJumpResults([])
     setJumpLoading(true)
+    let active = true
     const controller = new AbortController()
     const timer = window.setTimeout(() => {
       fetch(
@@ -149,6 +150,7 @@ export function ScanAreasTable() {
           return res.json()
         })
         .then((json) => {
+          if (!active) return
           if (!Array.isArray(json)) {
             setJumpResults([])
             return
@@ -170,16 +172,19 @@ export function ScanAreasTable() {
           setJumpError(false)
         })
         .catch((err) => {
-          if (err.name === 'AbortError') return
+          if (!active || err.name === 'AbortError') return
           setJumpResults([])
           setJumpError(true)
         })
         .finally(() => {
-          setJumpLoading(false)
+          if (active) {
+            setJumpLoading(false)
+          }
         })
     }, 400)
 
     return () => {
+      active = false
       clearTimeout(timer)
       controller.abort()
     }
