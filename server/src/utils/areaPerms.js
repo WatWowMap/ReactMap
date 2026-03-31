@@ -361,6 +361,93 @@ function getAreaLookupMode(target, areas, areaMaps, includeChildren = false) {
 }
 
 /**
+ * @param {string[]} perms
+ * @param {string} area
+ * @param {string} domain
+ * @param {{
+ *   names: Set<string>,
+ *   scanAreas: Record<string, import('@rm/types').RMGeoJSON>,
+ *   scanAreasObj: Record<string, import('@rm/types').RMFeature>,
+ *   withoutParents: Record<string, string[]>,
+ * }} requestAreas
+ * @param {ReturnType<typeof getAreaMaps>} requestAreaMaps
+ */
+function pushResolvedScopedAreaGrant(
+  perms,
+  area,
+  domain,
+  requestAreas,
+  requestAreaMaps,
+) {
+  const resolvedAreaKeys = []
+
+  perms.push(encodeAreaGrant(domain, area))
+  pushAreaKeys(
+    resolvedAreaKeys,
+    area,
+    requestAreas,
+    requestAreaMaps,
+    false,
+    'key',
+  )
+  perms.push(...resolvedAreaKeys)
+
+  resolvedAreaKeys.forEach((key) => {
+    if (requestAreas.scanAreasObj[key]) {
+      perms.push(encodeAreaGrant(domain, key))
+    }
+  })
+}
+
+/**
+ * @param {string[]} areaRestrictions
+ * @param {ReturnType<typeof getAreaMaps>} areaMaps
+ * @returns {string}
+ */
+function getLegacyAreaScopeDomain(areaRestrictions, areaMaps) {
+  const domainSets = areaRestrictions.reduce((acc, area) => {
+    if (isAreaScope(area)) {
+      acc.push([decodeAreaScope(area).domain])
+      return acc
+    }
+
+    if (isAreaGrant(area)) {
+      const areaGrant = decodeAreaGrant(area)
+      if (areaGrant.domain) {
+        acc.push([areaGrant.domain])
+      }
+      return acc
+    }
+
+    if (isParentAreaGrant(area)) {
+      const parentGrant = decodeParentAreaGrant(area)
+      if (parentGrant.domain) {
+        acc.push([parentGrant.domain])
+      }
+      return acc
+    }
+
+    if (areaMaps.keyDomainsMap[area]?.length) {
+      acc.push(areaMaps.keyDomainsMap[area])
+    }
+    return acc
+  }, /** @type {string[][]} */ ([]))
+
+  if (!domainSets.length) {
+    return ''
+  }
+
+  let matchingDomains = new Set(domainSets[0])
+  domainSets.slice(1).forEach((domains) => {
+    matchingDomains = new Set(
+      domains.filter((domain) => matchingDomains.has(domain)),
+    )
+  })
+
+  return matchingDomains.size === 1 ? [...matchingDomains][0] : ''
+}
+
+/**
  * @param {string[]} roles
  * @param {import('express').Request} [req]
  * @param {boolean} [serializeScopedGrants]
@@ -473,14 +560,9 @@ function resolveAreaPerms(roles, req, serializeScopedGrants = false) {
 /**
  * @param {string[]} [areaRestrictions]
  * @param {import('express').Request} [req]
- * @param {boolean} [allowRequestScopedLegacyKeys]
  * @returns {string[]}
  */
-function normalizeAreaRestrictions(
-  areaRestrictions,
-  req,
-  allowRequestScopedLegacyKeys = false,
-) {
+function normalizeAreaRestrictions(areaRestrictions, req) {
   const safeAreaRestrictions = areaRestrictions || []
   const authentication = config.getSafe('authentication')
   const hasImplicitUnrestrictedGrant =
@@ -507,6 +589,9 @@ function normalizeAreaRestrictions(
   const requestAreaMaps = req
     ? getAreaMaps(requestAreas.scanAreas)
     : globalAreaMaps
+  const legacyAreaScopeDomain = req
+    ? getLegacyAreaScopeDomain(safeAreaRestrictions, globalAreaMaps)
+    : ''
   const normalized = []
 
   safeAreaRestrictions.forEach((area) => {
@@ -562,28 +647,37 @@ function normalizeAreaRestrictions(
       return
     }
 
-    const usesRequestScopedGrant =
-      !!req &&
-      allowRequestScopedLegacyKeys &&
-      globalAreaMaps.keyDomainsMap[area]?.length > 1
+    const legacyKeyDomains = globalAreaMaps.keyDomainsMap[area] || []
 
-    if (usesRequestScopedGrant) {
-      const resolvedAreaKeys = []
-      pushAreaKeys(
-        resolvedAreaKeys,
-        area,
-        requestAreas,
-        requestAreaMaps,
-        false,
-        'key',
-      )
-      normalized.push(...resolvedAreaKeys)
+    if (req && legacyKeyDomains.length === 1) {
+      const [legacyKeyDomain] = legacyKeyDomains
 
-      resolvedAreaKeys.forEach((key) => {
-        if (requestAreas.scanAreasObj[key]) {
-          normalized.push(encodeAreaGrant(getRequestAreaDomain(req), key))
-        }
-      })
+      if (legacyKeyDomain === getRequestAreaDomain(req)) {
+        pushResolvedScopedAreaGrant(
+          normalized,
+          area,
+          legacyKeyDomain,
+          requestAreas,
+          requestAreaMaps,
+        )
+      }
+      return
+    }
+
+    if (req && legacyKeyDomains.length > 1) {
+      if (
+        legacyAreaScopeDomain &&
+        legacyKeyDomains.includes(legacyAreaScopeDomain) &&
+        legacyAreaScopeDomain === getRequestAreaDomain(req)
+      ) {
+        pushResolvedScopedAreaGrant(
+          normalized,
+          area,
+          legacyAreaScopeDomain,
+          requestAreas,
+          requestAreaMaps,
+        )
+      }
       return
     }
 

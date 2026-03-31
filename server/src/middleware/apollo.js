@@ -18,15 +18,12 @@ function apolloMiddleware(server) {
   return expressMiddleware(server, {
     context: async ({ req, res }) => {
       const rawPerms = req.user ? req.user.perms : req.session.perms
-      const allowRequestScopedLegacyKeys =
-        !!req.user && req.user.rmStrategy !== 'local'
       const perms = rawPerms
         ? {
             ...rawPerms,
             areaRestrictions: normalizeAreaRestrictions(
               rawPerms.areaRestrictions || [],
               req,
-              allowRequestScopedLegacyKeys,
             ),
           }
         : rawPerms

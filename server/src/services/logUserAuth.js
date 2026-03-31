@@ -160,11 +160,7 @@ async function logUserAuth(req, user, strategy = 'custom', hidePii = false) {
     timestamp: new Date().toISOString(),
   }
   const publicAreaRestrictions = getPublicAreaRestrictions(
-    normalizeAreaRestrictions(
-      user.perms.areaRestrictions || [],
-      req,
-      user.rmStrategy !== 'local',
-    ),
+    normalizeAreaRestrictions(user.perms.areaRestrictions || [], req),
   )
   if (publicAreaRestrictions.length) {
     const trimmed = publicAreaRestrictions
