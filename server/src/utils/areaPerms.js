@@ -557,6 +557,29 @@ function normalizeAreaRestrictions(areaRestrictions, req) {
       return
     }
 
+    const usesRequestScopedGrant =
+      !!req && globalAreaMaps.keyDomainsMap[area]?.length > 1
+
+    if (usesRequestScopedGrant) {
+      const resolvedAreaKeys = []
+      pushAreaKeys(
+        resolvedAreaKeys,
+        area,
+        requestAreas,
+        requestAreaMaps,
+        false,
+        'key',
+      )
+      normalized.push(...resolvedAreaKeys)
+
+      resolvedAreaKeys.forEach((key) => {
+        if (requestAreas.scanAreasObj[key]) {
+          normalized.push(encodeAreaGrant(getRequestAreaDomain(req), key))
+        }
+      })
+      return
+    }
+
     const usesGlobalAreaLookup = !req || globalAreas.scanAreasObj[area]
     pushAreaKeys(
       normalized,
