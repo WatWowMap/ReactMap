@@ -81,8 +81,17 @@ function consolidateAreas(areaRestrictions = [], onlyAreas = []) {
                 (!!parentKey && areaRestrictions.includes(parentKey)) ||
                 areaRestrictions.includes(parentName),
             )
-            return matchingChildren.length === 1
-              ? [matchingChildren[0].feature]
+            const distinctParentKeys = new Set(
+              matchingChildren
+                .map(({ parentKey }) => parentKey)
+                .filter(Boolean),
+            )
+            const distinctParentNames = new Set(
+              matchingChildren.map(({ parentName }) => parentName),
+            )
+            return distinctParentKeys.size <= 1 &&
+              distinctParentNames.size === 1
+              ? matchingChildren.map(({ feature }) => feature)
               : []
           })()
       : featuresByKey[area],
