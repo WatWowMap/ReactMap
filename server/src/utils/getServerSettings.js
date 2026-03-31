@@ -21,12 +21,15 @@ function getServerSettings(req) {
       loggedIn: !!req.user,
       cooldown: req.session?.cooldown || 0,
     })
+  const allowRequestScopedLegacyKeys =
+    !!req.user && req.user.rmStrategy !== 'local'
   const normalizedPerms = user.perms
     ? {
         ...user.perms,
         areaRestrictions: normalizeAreaRestrictions(
           user.perms.areaRestrictions || [],
           req,
+          allowRequestScopedLegacyKeys,
         ),
       }
     : user.perms

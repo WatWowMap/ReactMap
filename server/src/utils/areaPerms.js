@@ -473,9 +473,14 @@ function resolveAreaPerms(roles, req, serializeScopedGrants = false) {
 /**
  * @param {string[]} [areaRestrictions]
  * @param {import('express').Request} [req]
+ * @param {boolean} [allowRequestScopedLegacyKeys]
  * @returns {string[]}
  */
-function normalizeAreaRestrictions(areaRestrictions, req) {
+function normalizeAreaRestrictions(
+  areaRestrictions,
+  req,
+  allowRequestScopedLegacyKeys = false,
+) {
   const safeAreaRestrictions = areaRestrictions || []
   const authentication = config.getSafe('authentication')
   const hasImplicitUnrestrictedGrant =
@@ -558,7 +563,9 @@ function normalizeAreaRestrictions(areaRestrictions, req) {
     }
 
     const usesRequestScopedGrant =
-      !!req && globalAreaMaps.keyDomainsMap[area]?.length > 1
+      !!req &&
+      allowRequestScopedLegacyKeys &&
+      globalAreaMaps.keyDomainsMap[area]?.length > 1
 
     if (usesRequestScopedGrant) {
       const resolvedAreaKeys = []
