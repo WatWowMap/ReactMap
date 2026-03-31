@@ -401,14 +401,21 @@ function resolveAreaPerms(roles, req, serializeScopedGrants = false) {
       if (hasAreas) {
         for (let k = 0; k < areaRestrictions[j].areas.length; k += 1) {
           const areaTarget = areaRestrictions[j].areas[k]
-          const usesRequestAreaLookup =
-            !!req && !!requestAreas.scanAreasObj[areaTarget]
+          const areaLookupMode =
+            !!req && serializeScopedGrants
+              ? getAreaLookupMode(
+                  areaTarget,
+                  requestAreas,
+                  requestAreaMaps,
+                  false,
+                )
+              : undefined
           const usesGlobalAreaLookup =
             !req || globalAreas.scanAreasObj[areaTarget]
           const shouldSerializeScopedAreaGrant =
             !!req &&
             serializeScopedGrants &&
-            (!usesRequestAreaLookup ||
+            (areaLookupMode === 'label' ||
               !usesGlobalAreaLookup ||
               globalAreaMaps.keyDomainsMap[areaTarget]?.length > 1)
 
@@ -417,12 +424,7 @@ function resolveAreaPerms(roles, req, serializeScopedGrants = false) {
               encodeAreaGrant(
                 req ? getRequestAreaDomain(req) : '',
                 areaTarget,
-                getAreaLookupMode(
-                  areaTarget,
-                  requestAreas,
-                  requestAreaMaps,
-                  false,
-                ),
+                areaLookupMode,
               ),
             )
           } else {
