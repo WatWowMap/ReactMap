@@ -564,6 +564,7 @@ function normalizeAreaRestrictions(areaRestrictions, req) {
       usesGlobalAreaLookup ? globalAreas : requestAreas,
       usesGlobalAreaLookup ? globalAreaMaps : requestAreaMaps,
       false,
+      'key',
     )
   })
 

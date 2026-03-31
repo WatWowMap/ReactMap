@@ -13,10 +13,6 @@ import { deepMerge } from '@utils/deepMerge'
 import { useHideElement } from '@hooks/useHideElement'
 import { getGlowRules } from '@utils/getGlowRules'
 import { useScannerSessionStorage } from '@features/scanner'
-import {
-  getScanAreaMenuFeatures,
-  migrateLegacyAreaKeys,
-} from '@features/scanArea/utils'
 import { timeCheck } from '@utils/timeCheck'
 import { analytics } from '@utils/analytics'
 import { checkHoliday } from '@features/holiday'
@@ -53,15 +49,6 @@ export function Config({ children }) {
       const localState = JSON.parse(
         localStorage.getItem('local-state') || '{ "state": {} }',
       )
-      const selectedAreas = localState?.state?.filters?.scanAreas?.filter?.areas
-      const migratedAreas =
-        selectedAreas?.length && data.scanAreasMenu?.length
-          ? migrateLegacyAreaKeys(
-              getScanAreaMenuFeatures(data.scanAreasMenu),
-              selectedAreas,
-              data.user?.perms?.areaRestrictions || [],
-            )
-          : null
 
       /**
        * @template T
@@ -114,20 +101,6 @@ export function Config({ children }) {
       useScannerSessionStorage.setState((prev) => ({
         cooldown: Math.max(prev.cooldown, data.user.cooldown || 0),
       }))
-      if (migratedAreas) {
-        useStorage.setState((prev) => ({
-          filters: {
-            ...prev.filters,
-            scanAreas: {
-              ...prev.filters.scanAreas,
-              filter: {
-                ...prev.filters.scanAreas?.filter,
-                areas: migratedAreas,
-              },
-            },
-          },
-        }))
-      }
       useMemory.setState({
         auth: {
           strategy: data.user?.strategy || '',

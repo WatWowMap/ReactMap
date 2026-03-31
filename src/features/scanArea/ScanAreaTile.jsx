@@ -8,7 +8,7 @@ import { useWebhookStore, handleClick } from '@store/useWebhookStore'
 import { useMemory } from '@store/useMemory'
 import { useStorage } from '@store/useStorage'
 import { getProperName } from '@utils/strings'
-import { getAreaKeys, getValidAreaKeys, migrateLegacyAreaKeys } from './utils'
+import { getAreaKeys, getValidAreaKeys } from './utils'
 
 /**
  *
@@ -28,19 +28,9 @@ function ScanArea(featureCollection) {
     (s) => s.auth.perms.areaRestrictions || [],
   )
   const webhook = useWebhookStore((s) => !!s.mode)
-  const migratedAreas = React.useMemo(
-    () =>
-      migrateLegacyAreaKeys(
-        featureCollection.features,
-        selectedAreas,
-        accessibleAreaKeys,
-      ),
-    [accessibleAreaKeys, featureCollection.features, selectedAreas],
-  )
-  const effectiveSelectedAreas = migratedAreas || selectedAreas
   const selectionKey = React.useMemo(
-    () => [...effectiveSelectedAreas].sort().join(','),
-    [effectiveSelectedAreas],
+    () => [...selectedAreas].sort().join(','),
+    [selectedAreas],
   )
   const orderedFeatureCollection = React.useMemo(
     () => ({
@@ -90,9 +80,9 @@ function ScanArea(featureCollection) {
             )
             const { setAreas } = useStorage.getState()
             const hasAll = areaKeys.every((area) =>
-              effectiveSelectedAreas.includes(area),
+              selectedAreas.includes(area),
             )
-            const legacyGroupKey = layer.feature.properties.parent
+            const groupKey = layer.feature.properties.parent
               ? featureCollection.features.find(
                   (feature) =>
                     !feature.properties.manual &&
@@ -105,7 +95,7 @@ function ScanArea(featureCollection) {
             let nextAreaKeys = areaKeys
             let unselectAll = hasAll
 
-            if (legacyGroupKey && selectedAreas.includes(legacyGroupKey)) {
+            if (groupKey && selectedAreas.includes(groupKey)) {
               const siblingAreaKeys = featureCollection.features
                 .filter(
                   (feature) =>
@@ -116,7 +106,7 @@ function ScanArea(featureCollection) {
                 )
                 .map((feature) => feature.properties.key)
               nextAreaKeys = [
-                legacyGroupKey,
+                groupKey,
                 ...(selectedAreas.includes(layer.feature.properties.key)
                   ? [layer.feature.properties.key]
                   : []),
@@ -127,7 +117,7 @@ function ScanArea(featureCollection) {
               unselectAll = false
             } else if (areaKeys.length > 1 && !hasAll) {
               nextAreaKeys = areaKeys.filter(
-                (area) => !effectiveSelectedAreas.includes(area),
+                (area) => !selectedAreas.includes(area),
               )
             }
 
@@ -145,7 +135,7 @@ function ScanArea(featureCollection) {
             accessibleAreaKeys,
           )
           const isSelected = areaKeys.length
-            ? areaKeys.every((area) => effectiveSelectedAreas.includes(area))
+            ? areaKeys.every((area) => selectedAreas.includes(area))
             : false
           const popupContent = getProperName(name)
           if (layer instanceof Polygon) {

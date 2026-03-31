@@ -7,6 +7,8 @@ import { persist, createJSONStorage } from 'zustand/middleware'
 
 import { setDeep } from '@utils/setDeep'
 
+const SCAN_AREA_FILTER_RESET_VERSION = 1
+
 /**
  * @typedef {{
  *   darkMode: boolean,
@@ -174,6 +176,30 @@ export const useStorage = create(
     {
       name: 'local-state',
       storage: createJSONStorage(() => localStorage),
+      version: SCAN_AREA_FILTER_RESET_VERSION,
+      migrate: (persistedState, version) => {
+        if (
+          !persistedState ||
+          version >= SCAN_AREA_FILTER_RESET_VERSION ||
+          !persistedState.filters?.scanAreas?.filter?.areas
+        ) {
+          return persistedState
+        }
+
+        return {
+          ...persistedState,
+          filters: {
+            ...persistedState.filters,
+            scanAreas: {
+              ...persistedState.filters.scanAreas,
+              filter: {
+                ...persistedState.filters.scanAreas.filter,
+                areas: [],
+              },
+            },
+          },
+        }
+      },
     },
   ),
 )
