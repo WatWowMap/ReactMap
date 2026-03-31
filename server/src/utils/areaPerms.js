@@ -402,9 +402,10 @@ function pushResolvedScopedAreaGrant(
 /**
  * @param {string[]} areaRestrictions
  * @param {ReturnType<typeof getAreaMaps>} areaMaps
+ * @param {string} requestDomain
  * @returns {string}
  */
-function getLegacyAreaScopeDomain(areaRestrictions, areaMaps) {
+function getLegacyAreaScopeDomain(areaRestrictions, areaMaps, requestDomain) {
   const domainSets = areaRestrictions.reduce((acc, area) => {
     if (isAreaScope(area)) {
       acc.push([decodeAreaScope(area).domain])
@@ -433,12 +434,16 @@ function getLegacyAreaScopeDomain(areaRestrictions, areaMaps) {
     return acc
   }, /** @type {string[][]} */ ([]))
 
-  if (!domainSets.length) {
+  const compatibleDomainSets = domainSets.filter((domains) =>
+    domains.includes(requestDomain),
+  )
+
+  if (!compatibleDomainSets.length) {
     return ''
   }
 
-  let matchingDomains = new Set(domainSets[0])
-  domainSets.slice(1).forEach((domains) => {
+  let matchingDomains = new Set(compatibleDomainSets[0])
+  compatibleDomainSets.slice(1).forEach((domains) => {
     matchingDomains = new Set(
       domains.filter((domain) => matchingDomains.has(domain)),
     )
@@ -589,8 +594,13 @@ function normalizeAreaRestrictions(areaRestrictions, req) {
   const requestAreaMaps = req
     ? getAreaMaps(requestAreas.scanAreas)
     : globalAreaMaps
-  const legacyAreaScopeDomain = req
-    ? getLegacyAreaScopeDomain(safeAreaRestrictions, globalAreaMaps)
+  const requestAreaDomain = req ? getRequestAreaDomain(req) : ''
+  const legacyAreaScopeDomain = requestAreaDomain
+    ? getLegacyAreaScopeDomain(
+        safeAreaRestrictions,
+        globalAreaMaps,
+        requestAreaDomain,
+      )
     : ''
   const normalized = []
 
@@ -598,8 +608,7 @@ function normalizeAreaRestrictions(areaRestrictions, req) {
     if (isAreaGrant(area)) {
       if (req) {
         const areaGrant = decodeAreaGrant(area)
-        if (areaGrant.domain && areaGrant.domain !== getRequestAreaDomain(req))
-          return
+        if (areaGrant.domain && areaGrant.domain !== requestAreaDomain) return
 
         const resolvedAreaKeys = []
 
@@ -627,10 +636,7 @@ function normalizeAreaRestrictions(areaRestrictions, req) {
     if (isParentAreaGrant(area)) {
       if (req) {
         const parentGrant = decodeParentAreaGrant(area)
-        if (
-          parentGrant.domain &&
-          parentGrant.domain !== getRequestAreaDomain(req)
-        )
+        if (parentGrant.domain && parentGrant.domain !== requestAreaDomain)
           return
 
         normalized.push(area)
@@ -647,12 +653,28 @@ function normalizeAreaRestrictions(areaRestrictions, req) {
       return
     }
 
+    const requestLookupMode = req
+      ? getAreaLookupMode(area, requestAreas, requestAreaMaps, false)
+      : 'none'
+
+    if (requestLookupMode === 'label') {
+      pushAreaKeys(
+        normalized,
+        area,
+        requestAreas,
+        requestAreaMaps,
+        false,
+        'label',
+      )
+      return
+    }
+
     const legacyKeyDomains = globalAreaMaps.keyDomainsMap[area] || []
 
     if (req && legacyKeyDomains.length === 1) {
       const [legacyKeyDomain] = legacyKeyDomains
 
-      if (legacyKeyDomain === getRequestAreaDomain(req)) {
+      if (legacyKeyDomain === requestAreaDomain) {
         pushResolvedScopedAreaGrant(
           normalized,
           area,
@@ -668,7 +690,7 @@ function normalizeAreaRestrictions(areaRestrictions, req) {
       if (
         legacyAreaScopeDomain &&
         legacyKeyDomains.includes(legacyAreaScopeDomain) &&
-        legacyAreaScopeDomain === getRequestAreaDomain(req)
+        legacyAreaScopeDomain === requestAreaDomain
       ) {
         pushResolvedScopedAreaGrant(
           normalized,
