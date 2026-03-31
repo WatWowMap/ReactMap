@@ -421,11 +421,7 @@ function resolveAreaPerms(roles, req, serializeScopedGrants = false) {
 
           if (shouldSerializeScopedAreaGrant) {
             perms.push(
-              encodeAreaGrant(
-                req ? getRequestAreaDomain(req) : '',
-                areaTarget,
-                areaLookupMode,
-              ),
+              encodeAreaGrant(req ? getRequestAreaDomain(req) : '', areaTarget),
             )
           } else {
             pushAreaKeys(
@@ -446,12 +442,6 @@ function resolveAreaPerms(roles, req, serializeScopedGrants = false) {
               encodeParentAreaGrant(
                 req ? getRequestAreaDomain(req) : '',
                 areaRestrictions[j].parent[k],
-                getAreaLookupMode(
-                  areaRestrictions[j].parent[k],
-                  requestAreas,
-                  requestAreaMaps,
-                  true,
-                ),
               ),
             )
           } else if (req) {
@@ -521,31 +511,23 @@ function normalizeAreaRestrictions(areaRestrictions, req) {
         if (areaGrant.domain && areaGrant.domain !== getRequestAreaDomain(req))
           return
 
-        const normalizedAreaLookup = areaGrant.lookup || 'auto'
         const resolvedAreaKeys = []
 
         normalized.push(area)
-        if (areaGrant.lookup !== 'none') {
-          pushAreaKeys(
-            resolvedAreaKeys,
-            areaGrant.area,
-            requestAreas,
-            requestAreaMaps,
-            false,
-            normalizedAreaLookup,
-          )
-          normalized.push(...resolvedAreaKeys)
+        pushAreaKeys(
+          resolvedAreaKeys,
+          areaGrant.area,
+          requestAreas,
+          requestAreaMaps,
+          false,
+        )
+        normalized.push(...resolvedAreaKeys)
 
-          if (normalizedAreaLookup === 'label') {
-            resolvedAreaKeys.forEach((key) => {
-              if (requestAreas.scanAreasObj[key]) {
-                normalized.push(
-                  encodeAreaGrant(getRequestAreaDomain(req), key, 'key'),
-                )
-              }
-            })
+        resolvedAreaKeys.forEach((key) => {
+          if (requestAreas.scanAreasObj[key]) {
+            normalized.push(encodeAreaGrant(getRequestAreaDomain(req), key))
           }
-        }
+        })
       } else {
         normalized.push(area)
       }
@@ -562,16 +544,13 @@ function normalizeAreaRestrictions(areaRestrictions, req) {
           return
 
         normalized.push(area)
-        if (parentGrant.lookup !== 'none') {
-          pushAreaKeys(
-            normalized,
-            parentGrant.area,
-            requestAreas,
-            requestAreaMaps,
-            true,
-            parentGrant.lookup || 'auto',
-          )
-        }
+        pushAreaKeys(
+          normalized,
+          parentGrant.area,
+          requestAreas,
+          requestAreaMaps,
+          true,
+        )
       } else {
         normalized.push(area)
       }
