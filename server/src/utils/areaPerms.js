@@ -419,7 +419,17 @@ function resolveAreaPerms(roles, req, serializeScopedGrants = false) {
  */
 function normalizeAreaRestrictions(areaRestrictions, req) {
   const safeAreaRestrictions = areaRestrictions || []
-  if (hasUnrestrictedAreaGrant(safeAreaRestrictions)) {
+  const authentication = config.getSafe('authentication')
+  const hasImplicitUnrestrictedGrant =
+    !!req &&
+    !safeAreaRestrictions.length &&
+    (!authentication.areaRestrictions.length ||
+      !authentication.strictAreaRestrictions)
+
+  if (
+    hasUnrestrictedAreaGrant(safeAreaRestrictions) ||
+    hasImplicitUnrestrictedGrant
+  ) {
     return req
       ? [
           UNRESTRICTED_ACCESS_SENTINEL,
