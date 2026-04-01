@@ -29,9 +29,11 @@ function getAccessibleScanAreasMenu(req, perms) {
 
     return baseMenu
       .map((parent) => {
-        const children = parent.children.filter((child) =>
-          canAccessArea(child.properties),
-        )
+        const canAccessParent =
+          !!parent.details && canAccessArea(parent.details.properties)
+        const children = canAccessParent
+          ? parent.children
+          : parent.children.filter((child) => canAccessArea(child.properties))
         const hasSelectableChild = children.some(
           (child) => !child.properties.manual,
         )
@@ -39,8 +41,7 @@ function getAccessibleScanAreasMenu(req, perms) {
         return {
           ...parent,
           details:
-            parent.details &&
-            (canAccessArea(parent.details.properties) || hasSelectableChild)
+            parent.details && (canAccessParent || hasSelectableChild)
               ? parent.details
               : null,
           children,
