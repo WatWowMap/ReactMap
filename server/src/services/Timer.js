@@ -1,5 +1,4 @@
 // @ts-check
-const { zonedTimeToUtc } = require('date-fns-tz')
 const { Logger } = require('@rm/logger')
 
 const rtf = new Intl.RelativeTimeFormat('en', { numeric: 'auto' })
@@ -37,6 +36,8 @@ class Timer extends Logger {
     this._timer = null
     /** @type {NodeJS.Timeout | null} */
     this._interval = null
+    /** @type {boolean} */
+    this._stopped = false
   }
 
   get ms() {
@@ -88,6 +89,61 @@ class Timer extends Logger {
   }
 
   /**
+   * Convert local date/time components in a timezone to a UTC Date.
+   * Uses only Date.UTC and Intl.DateTimeFormat to avoid host-timezone
+   * interference (no `new Date(y,m,d,h,…)` which normalises through
+   * the server's local DST rules).
+   *
+   * @param {number} year
+   * @param {number} month 0-indexed
+   * @param {number} day
+   * @param {number} hour may overflow/underflow (Date.UTC normalises)
+   * @param {number} minute
+   * @param {number} second
+   * @param {string} timezone IANA timezone identifier
+   * @returns {Date}
+   */
+  static localToUtc(year, month, day, hour, minute, second, timezone) {
+    const fmt = new Intl.DateTimeFormat('en-US', {
+      timeZone: timezone,
+      year: 'numeric',
+      month: 'numeric',
+      day: 'numeric',
+      hour: 'numeric',
+      minute: 'numeric',
+      second: 'numeric',
+      hourCycle: 'h23',
+    })
+    const getOffset = (ms) => {
+      const parts = fmt.formatToParts(new Date(ms))
+      const get = (type) =>
+        parseInt(parts.find((p) => p.type === type).value, 10)
+      return (
+        Date.UTC(
+          get('year'),
+          get('month') - 1,
+          get('day'),
+          get('hour'),
+          get('minute'),
+          get('second'),
+        ) - ms
+      )
+    }
+
+    const utcMs = Date.UTC(year, month, day, hour, minute, second)
+    const offset = getOffset(utcMs)
+    const result = utcMs - offset
+
+    // Re-check: if utcMs and result straddle a DST boundary the offset
+    // at the result may differ from the initial guess.
+    const offset2 = getOffset(result)
+    if (offset !== offset2) {
+      return new Date(utcMs - offset2)
+    }
+    return new Date(result)
+  }
+
+  /**
    * Advance a UTC date by the given hours while preserving local time
    * in the target timezone across DST transitions.
    *
@@ -105,20 +161,20 @@ class Timer extends Logger {
       hour: 'numeric',
       minute: 'numeric',
       second: 'numeric',
-      hour12: false,
+      hourCycle: 'h23',
     }).formatToParts(utcDate)
     const get = (type) =>
       parseInt(parts.find((p) => p.type === type).value, 10)
 
-    const advanced = new Date(
+    return Timer.localToUtc(
       get('year'),
       get('month') - 1,
       get('day'),
       get('hour') + hours,
       get('minute'),
       get('second'),
+      timezone,
     )
-    return zonedTimeToUtc(advanced, timezone)
   }
 
   /**
@@ -129,9 +185,11 @@ class Timer extends Logger {
       this.setNextDate()
       if (this._timezone) {
         const scheduleNext = () => {
+          if (this._stopped) return
           const delay = Math.max(0, this._date.getTime() - Date.now())
           this._interval = setTimeout(async () => {
             await cb()
+            if (this._stopped) return
             this.setNextDate()
             scheduleNext()
           }, delay)
@@ -152,6 +210,7 @@ class Timer extends Logger {
   activate(cb) {
     const now = Date.now()
     this.clear()
+    this._stopped = false
 
     if (now >= this._date.getTime()) {
       this.setInterval(cb)
@@ -168,6 +227,7 @@ class Timer extends Logger {
   }
 
   async clear() {
+    this._stopped = true
     if (this._timer) {
       this.log.info('clearing timer')
       clearTimeout(this._timer)

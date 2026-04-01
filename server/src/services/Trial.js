@@ -1,5 +1,4 @@
 // @ts-check
-const { zonedTimeToUtc } = require('date-fns-tz')
 const { Logger, log } = require('@rm/logger')
 const config = require('@rm/config')
 
@@ -113,7 +112,18 @@ class Trial extends Logger {
       log.debug('date object is missing required fields')
       return new Date(0)
     }
-    const localDate = new Date(
+    if (timezone) {
+      return Timer.localToUtc(
+        dateObj.year,
+        dateObj.month - 1,
+        dateObj.day,
+        dateObj.hour || 0,
+        dateObj.minute || 0,
+        dateObj.second || 0,
+        timezone,
+      )
+    }
+    return new Date(
       dateObj.year,
       dateObj.month - 1,
       dateObj.day,
@@ -122,10 +132,6 @@ class Trial extends Logger {
       dateObj.second || 0,
       dateObj.millisecond || 0,
     )
-    if (timezone) {
-      return zonedTimeToUtc(localDate, timezone)
-    }
-    return localDate
   }
 
   #getClearFn(start = false) {
