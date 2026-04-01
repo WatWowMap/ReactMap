@@ -42,10 +42,6 @@ export function AreaChild({
 
   if (!scanAreas) return null
 
-  const allSelectableChildren = (allChildAreas || childAreas || []).filter(
-    (child) => !child.properties.manual,
-  )
-  const hasSelectableChildren = !!name && allSelectableChildren.length > 0
   const allChildrenManual =
     name &&
     !!(allChildAreas || childAreas || []).length &&
@@ -59,7 +55,7 @@ export function AreaChild({
     !!areaKey &&
     !!feature?.properties?.name &&
     !hasManual &&
-    !hasSelectableChildren
+    !!allAreas?.includes(areaKey)
 
   const nameProp =
     name || feature?.properties?.formattedName || feature?.properties?.name

@@ -69,16 +69,6 @@ function ScanArea(featureCollection) {
               })
             })
           } else if (!manual && tapToToggle) {
-            const hasSelectableChildren =
-              !layer.feature.properties.parent &&
-              featureCollection.features.some(
-                (feature) =>
-                  !feature.properties.manual &&
-                  feature.properties.parent === layer.feature.properties.name &&
-                  feature.properties.key,
-              )
-            if (hasSelectableChildren) return
-
             const areaKeys = getAreaKeys(
               featureCollection.features,
               layer.feature,

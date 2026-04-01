@@ -54,24 +54,17 @@ export function ScanAreasTable() {
   const allAreas = React.useMemo(
     () => [
       ...new Set(
-        data?.scanAreasMenu.flatMap((parent) => {
-          const hasSelectableChildren = parent.children.some(
-            (child) => !child.properties.manual,
-          )
-
-          return [
-            ...(!hasSelectableChildren &&
-            parent.details?.properties?.key &&
-            !parent.details.properties.manual &&
-            (!accessibleAreaKeys.length ||
-              accessibleAreaKeys.includes(parent.details.properties.key))
-              ? [parent.details.properties.key]
-              : []),
-            ...parent.children
-              .filter((child) => !child.properties.manual)
-              .map((child) => child.properties.key),
-          ]
-        }) || [],
+        data?.scanAreasMenu.flatMap((parent) => [
+          ...(parent.details?.properties?.key &&
+          !parent.details.properties.manual &&
+          (!accessibleAreaKeys.length ||
+            accessibleAreaKeys.includes(parent.details.properties.key))
+            ? [parent.details.properties.key]
+            : []),
+          ...parent.children
+            .filter((child) => !child.properties.manual)
+            .map((child) => child.properties.key),
+        ]) || [],
       ),
     ],
     [accessibleAreaKeys, data],
