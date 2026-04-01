@@ -31,9 +31,11 @@ function getAccessibleScanAreasMenu(req, perms) {
       .map((parent) => {
         const canAccessParent =
           !!parent.details && canAccessArea(parent.details.properties)
-        const children = canAccessParent
-          ? parent.children
-          : parent.children.filter((child) => canAccessArea(child.properties))
+        const children = parent.children.filter(
+          (child) =>
+            canAccessArea(child.properties) ||
+            (canAccessParent && child.properties.manual),
+        )
         const hasSelectableChild = children.some(
           (child) => !child.properties.manual,
         )
