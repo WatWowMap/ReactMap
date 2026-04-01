@@ -469,9 +469,7 @@ function resolveAreaPerms(roles, req, serializeScopedGrants = false) {
                 areaTarget,
               ),
             )
-          }
-
-          if (shouldSerializeScopedAreaGrant) {
+          } else if (shouldSerializeScopedAreaGrant) {
             perms.push(
               encodeAreaGrant(req ? getRequestAreaDomain(req) : '', areaTarget),
             )
