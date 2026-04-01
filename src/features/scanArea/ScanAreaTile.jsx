@@ -79,12 +79,50 @@ function ScanArea(featureCollection) {
               accessibleAreaKeys,
             )
             const { setAreas } = useStorage.getState()
-            const hasSome = areaKeys.some((area) =>
+            const hasAll = areaKeys.every((area) =>
               selectedAreas.includes(area),
             )
+            const legacyGroupKey = layer.feature.properties.parent
+              ? featureCollection.features.find(
+                  (feature) =>
+                    !feature.properties.manual &&
+                    !feature.properties.parent &&
+                    feature.properties.name ===
+                      layer.feature.properties.parent &&
+                    feature.properties.key,
+                )?.properties.key
+              : undefined
+            let nextAreaKeys = areaKeys
+            let unselectAll = hasAll
 
-            layer.setStyle({ fillOpacity: hasSome ? 0.2 : 0.8 })
-            setAreas(areaKeys, validAreaKeys, hasSome)
+            if (legacyGroupKey && selectedAreas.includes(legacyGroupKey)) {
+              const siblingAreaKeys = featureCollection.features
+                .filter(
+                  (feature) =>
+                    !feature.properties.manual &&
+                    feature.properties.parent ===
+                      layer.feature.properties.parent &&
+                    feature.properties.key !== layer.feature.properties.key,
+                )
+                .map((feature) => feature.properties.key)
+              nextAreaKeys = [
+                legacyGroupKey,
+                ...(selectedAreas.includes(layer.feature.properties.key)
+                  ? [layer.feature.properties.key]
+                  : []),
+                ...siblingAreaKeys.filter(
+                  (key) => !selectedAreas.includes(key),
+                ),
+              ]
+              unselectAll = false
+            } else if (areaKeys.length > 1 && !hasAll) {
+              nextAreaKeys = areaKeys.filter(
+                (area) => !selectedAreas.includes(area),
+              )
+            }
+
+            layer.setStyle({ fillOpacity: hasAll ? 0.2 : 0.8 })
+            setAreas(nextAreaKeys, validAreaKeys, unselectAll)
           }
         },
       }}
