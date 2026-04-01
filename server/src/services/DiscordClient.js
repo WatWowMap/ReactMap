@@ -6,7 +6,10 @@ const passport = require('passport')
 const config = require('@rm/config')
 
 const { logUserAuth } = require('./logUserAuth')
-const { resolveAreaPerms } = require('../utils/areaPerms')
+const {
+  getHostAgnosticAreaRestrictions,
+  resolveAreaPerms,
+} = require('../utils/areaPerms')
 const { webhookPerms } = require('../utils/webhookPerms')
 const { scannerPerms, scannerCooldownBypass } = require('../utils/scannerPerms')
 const { mergePerms } = require('../utils/mergePerms')
@@ -328,10 +331,16 @@ class DiscordClient extends AuthClient {
               (x) => discordUser?.perms?.webhooks.includes(x),
             )
             if (req.user && userExists?.strategy === 'local') {
+              const linkedPerms = {
+                ...discordUser.perms,
+                areaRestrictions: getHostAgnosticAreaRestrictions(
+                  discordUser.perms.areaRestrictions || [],
+                ),
+              }
               await state.db.models.User.query()
                 .update({
                   discordId: discordUser.id,
-                  discordPerms: JSON.stringify(discordUser.perms),
+                  discordPerms: JSON.stringify(linkedPerms),
                   webhookStrategy: 'discord',
                 })
                 .where('id', req.user.id)

@@ -232,6 +232,50 @@ function getRequestAreaDomain(req) {
 }
 
 /**
+ * @param {string[]} perms
+ * @param {string[]} areaKeys
+ * @param {{
+ *   scanAreasObj: Record<string, import('@rm/types').RMFeature>,
+ * }} areas
+ * @param {import('express').Request} req
+ */
+function pushRequestScopedAreaGrants(perms, areaKeys, areas, req) {
+  const domain = getRequestAreaDomain(req)
+
+  areaKeys.forEach((key) => {
+    if (areas.scanAreasObj[key]) {
+      perms.push(encodeAreaGrant(domain, key))
+    }
+  })
+}
+
+/**
+ * Strip request scope before persisting linked-account perms so they can be
+ * re-scoped safely on the next request.
+ *
+ * @param {string[]} [areaRestrictions]
+ * @returns {string[]}
+ */
+function getHostAgnosticAreaRestrictions(areaRestrictions = []) {
+  return [
+    ...new Set(
+      areaRestrictions.flatMap((area) => {
+        if (isAreaScope(area)) {
+          return []
+        }
+        if (isAreaGrant(area)) {
+          return [encodeAreaGrant(decodeAreaGrant(area).area)]
+        }
+        if (isParentAreaGrant(area)) {
+          return [encodeParentAreaGrant(decodeParentAreaGrant(area).area)]
+        }
+        return [area]
+      }),
+    ),
+  ]
+}
+
+/**
  * Resolves config entries into canonical area keys.
  * `parent` rules expand to visible child keys and only fall back to the
  * parent's own area key when no visible children are available.
@@ -558,12 +602,12 @@ function normalizeAreaRestrictions(areaRestrictions, req) {
           false,
         )
         normalized.push(...resolvedAreaKeys)
-
-        resolvedAreaKeys.forEach((key) => {
-          if (requestAreas.scanAreasObj[key]) {
-            normalized.push(encodeAreaGrant(getRequestAreaDomain(req), key))
-          }
-        })
+        pushRequestScopedAreaGrants(
+          normalized,
+          resolvedAreaKeys,
+          requestAreas,
+          req,
+        )
       } else {
         normalized.push(area)
       }
@@ -594,14 +638,25 @@ function normalizeAreaRestrictions(areaRestrictions, req) {
     }
 
     const usesGlobalAreaLookup = !req || globalAreas.scanAreasObj[area]
+    const resolvedAreaKeys = []
+
     pushAreaKeys(
-      normalized,
+      resolvedAreaKeys,
       area,
       usesGlobalAreaLookup ? globalAreas : requestAreas,
       usesGlobalAreaLookup ? globalAreaMaps : requestAreaMaps,
       false,
       'key',
     )
+    normalized.push(...resolvedAreaKeys)
+    if (req) {
+      pushRequestScopedAreaGrants(
+        normalized,
+        resolvedAreaKeys,
+        requestAreas,
+        req,
+      )
+    }
   })
 
   const uniquePerms = [...new Set(normalized)]
@@ -627,6 +682,7 @@ module.exports = {
   decodeAreaGrant,
   decodeAreaScope,
   decodeParentAreaGrant,
+  getHostAgnosticAreaRestrictions,
   getPublicAreaRestrictions,
   hasUnrestrictedAreaGrant,
   isAreaGrant,
