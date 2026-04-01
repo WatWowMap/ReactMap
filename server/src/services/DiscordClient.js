@@ -90,9 +90,10 @@ class DiscordClient extends AuthClient {
   /**
    * @param {string} guildId
    * @param {string} userId
+   * @param {boolean} [strictLookup]
    * @returns {Promise<string[]>}
    */
-  async getUserRoles(guildId, userId) {
+  async getUserRoles(guildId, userId, strictLookup = false) {
     try {
       const guild =
         this.client.guilds.cache.get(guildId) ||
@@ -111,6 +112,9 @@ class DiscordClient extends AuthClient {
         )
         return []
       }
+      if (strictLookup) {
+        throw e
+      }
       this.log.error(
         'Failed to get roles in guild',
         guildId,
@@ -126,9 +130,10 @@ class DiscordClient extends AuthClient {
    *
    * @param {import('passport-discord').Profile} user
    * @param {import('express').Request} req
+   * @param {boolean} [strictLookup]
    * @returns {Promise<import("@rm/types").Permissions>}
    */
-  async getPerms(user, req) {
+  async getPerms(user, req, strictLookup = false) {
     const trialActive = this.trialManager.active()
     const knownGuildIds = user.guilds?.map((guild) => guild.id) || null
     /** @type {import("@rm/types").Permissions} */
@@ -175,7 +180,11 @@ class DiscordClient extends AuthClient {
               : false
 
             if (!knownGuildIds) {
-              const linkedRoles = await this.getUserRoles(guildId, user.id)
+              const linkedRoles = await this.getUserRoles(
+                guildId,
+                user.id,
+                strictLookup,
+              )
               isGuildMember = linkedRoles.length > 0
               if (isGuildMember) {
                 const guild =
@@ -205,7 +214,11 @@ class DiscordClient extends AuthClient {
               return
             }
 
-            const userRoles = await this.getUserRoles(guildId, user.id)
+            const userRoles = await this.getUserRoles(
+              guildId,
+              user.id,
+              strictLookup,
+            )
             if (!userRoles.length) {
               return
             }
@@ -250,6 +263,9 @@ class DiscordClient extends AuthClient {
         )
       }
     } catch (e) {
+      if (strictLookup) {
+        throw e
+      }
       this.log.warn('Failed to get perms for user', user.id, e)
     }
     Object.entries(permSets).forEach(([key, value]) => {
@@ -271,10 +287,18 @@ class DiscordClient extends AuthClient {
    * @param {string} userId
    * @param {import('express').Request} req
    * @param {string} [username]
-   * @returns {Promise<import("@rm/types").Permissions>}
+   * @returns {Promise<{ degraded: boolean, perms: import("@rm/types").Permissions | null }>}
    */
   async getLinkedPerms(userId, req, username = '') {
-    return this.getPerms({ id: userId, username }, req)
+    try {
+      return {
+        degraded: false,
+        perms: await this.getPerms({ id: userId, username }, req, true),
+      }
+    } catch (e) {
+      this.log.warn('Failed to refresh linked discord perms', userId, e)
+      return { degraded: true, perms: null }
+    }
   }
 
   /**

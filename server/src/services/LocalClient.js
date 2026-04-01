@@ -55,50 +55,33 @@ class LocalClient extends AuthClient {
     ]
     const providerPerms = await Promise.all(
       linkedProviders.map(async ({ type, id, storedPerms }) => {
+        const parsedStoredPerms = storedPerms
+          ? typeof storedPerms === 'string'
+            ? JSON.parse(storedPerms)
+            : storedPerms
+          : null
         const matchingClients = authClients.filter(
           (client) =>
             client?.strategy?.type === type &&
             typeof client.getLinkedPerms === 'function',
         )
 
-        if (id && matchingClients.length) {
-          const livePermResults = await Promise.allSettled(
-            matchingClients.map((client) =>
-              client.getLinkedPerms(id, req, userExists.username),
-            ),
-          )
-
-          const fulfilledPerms = livePermResults
-            .filter((result) => result.status === 'fulfilled')
-            .map((result) => result.value)
-
-          livePermResults
-            .filter((result) => result.status === 'rejected')
-            .forEach((result) => {
-              this.log.warn(
-                `Failed to refresh linked ${type} perms`,
-                result.reason,
-              )
-            })
-
-          if (fulfilledPerms.length) {
-            return fulfilledPerms.reduce(
-              (acc, perms) => mergePerms(acc, perms),
-              /** @type {import('@rm/types').Permissions} */ ({
-                areaRestrictions: [],
-                webhooks: [],
-                scanner: [],
-                scannerCooldownBypass: [],
-              }),
+        if (id && matchingClients.length === 1) {
+          try {
+            const livePermResult = await matchingClients[0].getLinkedPerms(
+              id,
+              req,
+              userExists.username,
             )
+            if (!livePermResult?.degraded && livePermResult?.perms) {
+              return livePermResult.perms
+            }
+          } catch (error) {
+            this.log.warn(`Failed to refresh linked ${type} perms`, error)
           }
         }
 
-        return storedPerms
-          ? typeof storedPerms === 'string'
-            ? JSON.parse(storedPerms)
-            : storedPerms
-          : null
+        return parsedStoredPerms
       }),
     )
 

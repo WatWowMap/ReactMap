@@ -17,8 +17,11 @@ const { AuthClient } = require('./AuthClient')
  */
 
 class TelegramClient extends AuthClient {
-  /** @param {TGUser} user */
-  async getUserGroups(user) {
+  /**
+   * @param {TGUser} user
+   * @param {boolean} [strictLookup]
+   */
+  async getUserGroups(user, strictLookup = false) {
     if (!user || !user.id) return []
 
     const groups = [user.id]
@@ -46,6 +49,9 @@ class TelegramClient extends AuthClient {
             groups.push(group)
           }
         } catch (e) {
+          if (strictLookup) {
+            throw e
+          }
           this.log.error(
             e,
             `Telegram Group: ${group}`,
@@ -125,12 +131,20 @@ class TelegramClient extends AuthClient {
    * @param {string | number} userId
    * @param {import('express').Request} req
    * @param {string} [username]
-   * @returns {Promise<import("@rm/types").Permissions>}
+   * @returns {Promise<{ degraded: boolean, perms: import("@rm/types").Permissions | null }>}
    */
   async getLinkedPerms(userId, req, username = '') {
-    const baseUser = { id: userId, username }
-    const groups = await this.getUserGroups(baseUser)
-    return this.getUserPerms(baseUser, groups, req).perms
+    try {
+      const baseUser = { id: userId, username }
+      const groups = await this.getUserGroups(baseUser, true)
+      return {
+        degraded: false,
+        perms: this.getUserPerms(baseUser, groups, req).perms,
+      }
+    } catch (e) {
+      this.log.warn('Failed to refresh linked telegram perms', userId, e)
+      return { degraded: true, perms: null }
+    }
   }
 
   /** @type {import('@rainb0w-clwn/passport-telegram-official/dist/types').CallbackWithRequest} */
