@@ -163,8 +163,7 @@ class Timer extends Logger {
       second: 'numeric',
       hourCycle: 'h23',
     }).formatToParts(utcDate)
-    const get = (type) =>
-      parseInt(parts.find((p) => p.type === type).value, 10)
+    const get = (type) => parseInt(parts.find((p) => p.type === type).value, 10)
 
     return Timer.localToUtc(
       get('year'),
