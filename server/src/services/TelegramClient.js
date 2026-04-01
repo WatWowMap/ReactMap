@@ -6,10 +6,7 @@ const passport = require('passport')
 const config = require('@rm/config')
 
 const { state } = require('./state')
-const {
-  areaPerms,
-  getHostAgnosticAreaRestrictions,
-} = require('../utils/areaPerms')
+const { areaPerms } = require('../utils/areaPerms')
 const { webhookPerms } = require('../utils/webhookPerms')
 const { scannerPerms, scannerCooldownBypass } = require('../utils/scannerPerms')
 const { mergePerms } = require('../utils/mergePerms')
@@ -143,16 +140,10 @@ class TelegramClient extends AuthClient {
               (x) => user?.perms?.webhooks.includes(x),
             )
             if (req.user && userExists?.strategy === 'local') {
-              const linkedPerms = {
-                ...user.perms,
-                areaRestrictions: getHostAgnosticAreaRestrictions(
-                  user.perms.areaRestrictions || [],
-                ),
-              }
               await state.db.models.User.query()
                 .update({
                   telegramId: user.id,
-                  telegramPerms: JSON.stringify(linkedPerms),
+                  telegramPerms: JSON.stringify(user.perms),
                   webhookStrategy: 'telegram',
                 })
                 .where('id', req.user.id)

@@ -250,32 +250,6 @@ function pushRequestScopedAreaGrants(perms, areaKeys, areas, req) {
 }
 
 /**
- * Strip request scope before persisting linked-account perms so they can be
- * re-scoped safely on the next request.
- *
- * @param {string[]} [areaRestrictions]
- * @returns {string[]}
- */
-function getHostAgnosticAreaRestrictions(areaRestrictions = []) {
-  return [
-    ...new Set(
-      areaRestrictions.flatMap((area) => {
-        if (isAreaScope(area)) {
-          return []
-        }
-        if (isAreaGrant(area)) {
-          return [encodeAreaGrant(decodeAreaGrant(area).area)]
-        }
-        if (isParentAreaGrant(area)) {
-          return [encodeParentAreaGrant(decodeParentAreaGrant(area).area)]
-        }
-        return [area]
-      }),
-    ),
-  ]
-}
-
-/**
  * Resolves config entries into canonical area keys.
  * `parent` rules expand to visible child keys and only fall back to the
  * parent's own area key when no visible children are available.
@@ -690,7 +664,6 @@ module.exports = {
   decodeAreaGrant,
   decodeAreaScope,
   decodeParentAreaGrant,
-  getHostAgnosticAreaRestrictions,
   getPublicAreaRestrictions,
   hasUnrestrictedAreaGrant,
   isAreaGrant,

@@ -5,10 +5,7 @@ const bcrypt = require('bcrypt')
 
 const config = require('@rm/config')
 
-const {
-  areaPerms,
-  getHostAgnosticAreaRestrictions,
-} = require('../utils/areaPerms')
+const { areaPerms } = require('../utils/areaPerms')
 const { webhookPerms } = require('../utils/webhookPerms')
 const { scannerPerms, scannerCooldownBypass } = require('../utils/scannerPerms')
 const { mergePerms } = require('../utils/mergePerms')
@@ -91,12 +88,7 @@ class LocalClient extends AuthClient {
                     typeof userExists[permSet] === 'string'
                       ? JSON.parse(userExists[permSet])
                       : userExists[permSet]
-                  user.perms = mergePerms(user.perms, {
-                    ...linkedPerms,
-                    areaRestrictions: getHostAgnosticAreaRestrictions(
-                      linkedPerms.areaRestrictions || [],
-                    ),
-                  })
+                  user.perms = mergePerms(user.perms, linkedPerms)
                 }
               })
               if (userExists.strategy !== 'local') {
