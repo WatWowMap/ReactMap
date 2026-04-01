@@ -38,23 +38,26 @@ class LocalClient extends AuthClient {
    * @param {import('@rm/types').Permissions} userPerms
    * @param {import('@rm/types').FullUser} userExists
    * @param {import('express').Request} req
+   * @returns {Promise<Record<string, string>>}
    */
   async mergeLinkedPerms(userPerms, userExists, req) {
     const authClients = Object.values(state.event.authClients || {})
     const linkedProviders = [
       {
+        field: 'discordPerms',
         type: 'discord',
         id: userExists.discordId,
         storedPerms: userExists.discordPerms,
       },
       {
+        field: 'telegramPerms',
         type: 'telegram',
         id: userExists.telegramId,
         storedPerms: userExists.telegramPerms,
       },
     ]
     const providerPerms = await Promise.all(
-      linkedProviders.map(async ({ type, id, storedPerms }) => {
+      linkedProviders.map(async ({ field, type, id, storedPerms }) => {
         const parsedStoredPerms = storedPerms
           ? typeof storedPerms === 'string'
             ? JSON.parse(storedPerms)
@@ -74,20 +77,32 @@ class LocalClient extends AuthClient {
               userExists.username,
             )
             if (!livePermResult?.degraded && livePermResult?.perms) {
-              return livePermResult.perms
+              return {
+                field,
+                perms: livePermResult.perms,
+                persisted: JSON.stringify(livePermResult.perms),
+              }
             }
           } catch (error) {
             this.log.warn(`Failed to refresh linked ${type} perms`, error)
           }
         }
 
-        return parsedStoredPerms
+        return { field, perms: parsedStoredPerms, persisted: null }
       }),
     )
+    const refreshedLinkedPerms = {}
 
-    providerPerms.filter(Boolean).forEach((perms) => {
-      Object.assign(userPerms, mergePerms(userPerms, perms))
-    })
+    providerPerms
+      .filter(({ perms }) => !!perms)
+      .forEach(({ field, perms, persisted }) => {
+        if (persisted) {
+          refreshedLinkedPerms[field] = persisted
+        }
+        Object.assign(userPerms, mergePerms(userPerms, perms))
+      })
+
+    return refreshedLinkedPerms
   }
 
   /** @type {import('passport-local').VerifyFunctionWithRequest} */
@@ -138,13 +153,11 @@ class LocalClient extends AuthClient {
               }
             }
             if (bcrypt.compareSync(password, userExists.password)) {
-              await this.mergeLinkedPerms(user.perms, userExists, req)
-              if (userExists.strategy !== 'local') {
-                await state.db.models.User.query()
-                  .update({ strategy: 'local' })
-                  .where('id', userExists.id)
-                userExists.strategy = 'local'
-              }
+              const linkedPermUpdates = await this.mergeLinkedPerms(
+                user.perms,
+                userExists,
+                req,
+              )
               user.id = userExists.id
               user.username = userExists.username
               user.discordId = userExists.discordId
@@ -171,6 +184,39 @@ class LocalClient extends AuthClient {
               scannerCooldownBypass([user.status], 'local').forEach((x) =>
                 user.perms.scannerCooldownBypass.push(x),
               )
+
+              if (user.perms.blocked || user.perms.map === false) {
+                if (Object.keys(linkedPermUpdates).length) {
+                  await state.db.models.User.query()
+                    .update(linkedPermUpdates)
+                    .where('id', userExists.id)
+                }
+
+                if (user.perms.blocked) {
+                  return done(null, false, {
+                    blockedGuilds: (user.perms.blockedGuildNames || []).join(
+                      ',',
+                    ),
+                  })
+                }
+
+                return done(null, false, { message: 'access_denied' })
+              }
+
+              const userUpdates = {
+                ...linkedPermUpdates,
+                ...(userExists.strategy !== 'local'
+                  ? { strategy: 'local' }
+                  : {}),
+              }
+              if (Object.keys(userUpdates).length) {
+                await state.db.models.User.query()
+                  .update(userUpdates)
+                  .where('id', userExists.id)
+              }
+              if (userExists.strategy !== 'local') {
+                userExists.strategy = 'local'
+              }
               this.log.info(
                 user.username,
                 `(${user.id})`,
