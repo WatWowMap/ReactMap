@@ -645,7 +645,7 @@ function normalizeAreaRestrictions(areaRestrictions, req) {
       return
     }
 
-    const usesGlobalAreaLookup = !req || globalAreas.scanAreasObj[area]
+    const usesGlobalAreaLookup = !req
     const resolvedAreaKeys = []
 
     pushAreaKeys(
