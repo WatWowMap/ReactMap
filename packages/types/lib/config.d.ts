@@ -66,6 +66,8 @@ export type Config<Client extends boolean = false> = DeepMerge<
         trialPeriod: {
           start: TrialPeriodDate
           end: TrialPeriodDate
+          intervalHours: number
+          timezone: string
           roles: string[]
         }
         allowedGuilds: string[]

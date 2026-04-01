@@ -739,6 +739,7 @@
             "minute": 0
           },
           "intervalHours": 0,
+          "timezone": "",
           "roles": []
         }
       },
@@ -767,6 +768,8 @@
             "hour": 14,
             "minute": 0
           },
+          "intervalHours": 0,
+          "timezone": "",
           "roles": []
         }
       },

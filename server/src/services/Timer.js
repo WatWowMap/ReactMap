@@ -1,4 +1,5 @@
 // @ts-check
+const { zonedTimeToUtc } = require('date-fns-tz')
 const { Logger } = require('@rm/logger')
 
 const rtf = new Intl.RelativeTimeFormat('en', { numeric: 'auto' })
@@ -17,13 +18,18 @@ class Timer extends Logger {
   /**
    * @param {Date} date
    * @param {number} intervalHours
+   * @param {string} [timezone]
    * @param {...string} [tags]
    */
-  constructor(date, intervalHours, ...tags) {
+  constructor(date, intervalHours, timezone, ...tags) {
     super(...(tags.length ? tags : ['timer']))
 
     /** @type {number} */
-    this._intervalMs = (intervalHours || 0) * 60 * 60 * 1000
+    this._intervalHours = intervalHours || 0
+    /** @type {number} */
+    this._intervalMs = this._intervalHours * 60 * 60 * 1000
+    /** @type {string | undefined} */
+    this._timezone = timezone || undefined
     /** @type {Date} */
     this._date = date
 
@@ -69,8 +75,50 @@ class Timer extends Logger {
   }
 
   setNextDate() {
-    this._date = new Date(this._date.getTime() + this._intervalMs)
+    if (this._timezone) {
+      this._date = Timer.advanceInTimezone(
+        this._date,
+        this._intervalHours,
+        this._timezone,
+      )
+    } else {
+      this._date = new Date(this._date.getTime() + this._intervalMs)
+    }
     this.log.info('next', this.relative())
+  }
+
+  /**
+   * Advance a UTC date by the given hours while preserving local time
+   * in the target timezone across DST transitions.
+   *
+   * @param {Date} utcDate
+   * @param {number} hours
+   * @param {string} timezone IANA timezone identifier
+   * @returns {Date}
+   */
+  static advanceInTimezone(utcDate, hours, timezone) {
+    const parts = new Intl.DateTimeFormat('en-US', {
+      timeZone: timezone,
+      year: 'numeric',
+      month: 'numeric',
+      day: 'numeric',
+      hour: 'numeric',
+      minute: 'numeric',
+      second: 'numeric',
+      hour12: false,
+    }).formatToParts(utcDate)
+    const get = (type) =>
+      parseInt(parts.find((p) => p.type === type).value, 10)
+
+    const advanced = new Date(
+      get('year'),
+      get('month') - 1,
+      get('day'),
+      get('hour') + hours,
+      get('minute'),
+      get('second'),
+    )
+    return zonedTimeToUtc(advanced, timezone)
   }
 
   /**
@@ -79,10 +127,22 @@ class Timer extends Logger {
   setInterval(cb) {
     if (this._intervalMs > 0) {
       this.setNextDate()
-      this._interval = setInterval(async () => {
-        await cb()
-        this.setNextDate()
-      }, this._intervalMs)
+      if (this._timezone) {
+        const scheduleNext = () => {
+          const delay = Math.max(0, this._date.getTime() - Date.now())
+          this._interval = setTimeout(async () => {
+            await cb()
+            this.setNextDate()
+            scheduleNext()
+          }, delay)
+        }
+        scheduleNext()
+      } else {
+        this._interval = setInterval(async () => {
+          await cb()
+          this.setNextDate()
+        }, this._intervalMs)
+      }
     }
   }
 

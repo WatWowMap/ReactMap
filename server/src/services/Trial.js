@@ -1,4 +1,5 @@
 // @ts-check
+const { zonedTimeToUtc } = require('date-fns-tz')
 const { Logger, log } = require('@rm/logger')
 const config = require('@rm/config')
 
@@ -18,15 +19,18 @@ class Trial extends Logger {
         start: null,
         end: null,
         intervalHours: 0,
+        timezone: '',
         roles: [],
       },
       strategy.trialPeriod,
     )
+    /** @type {string | undefined} */
+    this._timezone = this._trial.timezone || undefined
 
     this._forceActive = false
 
-    let startDate = Trial.getJsDate(this._trial.start)
-    let endDate = Trial.getJsDate(this._trial.end)
+    let startDate = Trial.getJsDate(this._trial.start, this._timezone)
+    let endDate = Trial.getJsDate(this._trial.end, this._timezone)
 
     if (this._trial.intervalHours > 0) {
       if (startDate.getTime() < Date.now() && endDate.getTime() < Date.now()) {
@@ -43,9 +47,17 @@ class Trial extends Logger {
         startDate.getTime() < Date.now() &&
         endDate.getTime() < Date.now()
       ) {
-        startDate = new Date(
-          startDate.getTime() + this._trial.intervalHours * 60 * 60 * 1000,
-        )
+        if (this._timezone) {
+          startDate = Timer.advanceInTimezone(
+            startDate,
+            this._trial.intervalHours,
+            this._timezone,
+          )
+        } else {
+          startDate = new Date(
+            startDate.getTime() + this._trial.intervalHours * 60 * 60 * 1000,
+          )
+        }
         endDate = new Date(startDate.getTime() + diff)
         this.log.debug('next start:', startDate, 'next end:', endDate)
       }
@@ -60,6 +72,7 @@ class Trial extends Logger {
     this._startTimer = new Timer(
       startDate,
       this._trial.intervalHours,
+      this._timezone,
       this._type,
       this._name,
       'trial',
@@ -68,6 +81,7 @@ class Trial extends Logger {
     this._endTimer = new Timer(
       endDate,
       this._trial.intervalHours,
+      this._timezone,
       this._type,
       this._name,
       'trial',
@@ -87,9 +101,10 @@ class Trial extends Logger {
    * Get a JavaScript Date object from a @see TrialPeriodDate object
    *
    * @param {import("@rm/types").TrialPeriodDate} dateObj
+   * @param {string} [timezone] IANA timezone (e.g. 'Europe/Warsaw')
    * @returns {Date}
    */
-  static getJsDate(dateObj) {
+  static getJsDate(dateObj, timezone) {
     if (!dateObj) {
       log.debug('date object is null')
       return new Date(0)
@@ -98,7 +113,7 @@ class Trial extends Logger {
       log.debug('date object is missing required fields')
       return new Date(0)
     }
-    return new Date(
+    const localDate = new Date(
       dateObj.year,
       dateObj.month - 1,
       dateObj.day,
@@ -107,6 +122,10 @@ class Trial extends Logger {
       dateObj.second || 0,
       dateObj.millisecond || 0,
     )
+    if (timezone) {
+      return zonedTimeToUtc(localDate, timezone)
+    }
+    return localDate
   }
 
   #getClearFn(start = false) {
