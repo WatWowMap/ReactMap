@@ -142,6 +142,10 @@ class LocalClient extends AuthClient {
                 user.username = newUser.username
                 user.perms = { ...user.perms, ...this.getPerms(trialActive) }
 
+                if (user.perms.map === false) {
+                  return done(null, false, { message: 'access_denied' })
+                }
+
                 this.log.info(
                   user.username,
                   `(${user.id})`,
