@@ -624,12 +624,20 @@ function normalizeAreaRestrictions(areaRestrictions, req) {
           return
 
         normalized.push(area)
+        const resolvedAreaKeys = []
         pushAreaKeys(
-          normalized,
+          resolvedAreaKeys,
           parentGrant.area,
           requestAreas,
           requestAreaMaps,
           true,
+        )
+        normalized.push(...resolvedAreaKeys)
+        pushRequestScopedAreaGrants(
+          normalized,
+          resolvedAreaKeys,
+          requestAreas,
+          req,
         )
       } else {
         normalized.push(area)
