@@ -6,7 +6,7 @@ const passport = require('passport')
 const config = require('@rm/config')
 
 const { state } = require('./state')
-const { areaPerms, stripAreaRestrictionScopes } = require('../utils/areaPerms')
+const { areaPerms } = require('../utils/areaPerms')
 const { webhookPerms } = require('../utils/webhookPerms')
 const { scannerPerms, scannerCooldownBypass } = require('../utils/scannerPerms')
 const { mergePerms } = require('../utils/mergePerms')
@@ -121,6 +121,18 @@ class TelegramClient extends AuthClient {
     return newUserObj
   }
 
+  /**
+   * @param {string | number} userId
+   * @param {import('express').Request} req
+   * @param {string} [username]
+   * @returns {Promise<import("@rm/types").Permissions>}
+   */
+  async getLinkedPerms(userId, req, username = '') {
+    const baseUser = { id: userId, username }
+    const groups = await this.getUserGroups(baseUser)
+    return this.getUserPerms(baseUser, groups, req).perms
+  }
+
   /** @type {import('@rainb0w-clwn/passport-telegram-official/dist/types').CallbackWithRequest} */
   async authHandler(req, profile, done) {
     const baseUser = { ...profile, rmStrategy: this.rmStrategy }
@@ -143,12 +155,7 @@ class TelegramClient extends AuthClient {
               await state.db.models.User.query()
                 .update({
                   telegramId: user.id,
-                  telegramPerms: JSON.stringify({
-                    ...user.perms,
-                    areaRestrictions: stripAreaRestrictionScopes(
-                      user.perms.areaRestrictions,
-                    ),
-                  }),
+                  telegramPerms: JSON.stringify(user.perms),
                   webhookStrategy: 'telegram',
                 })
                 .where('id', req.user.id)

@@ -100,36 +100,6 @@ function getPublicAreaRestrictions(areaRestrictions = []) {
   )
 }
 
-/**
- * @param {string[]} [areaRestrictions]
- * @returns {string[]}
- */
-function stripAreaRestrictionScopes(areaRestrictions = []) {
-  return [
-    ...new Set(
-      areaRestrictions.flatMap((area) => {
-        if (isAreaGrant(area)) {
-          return encodeAreaGrant(decodeAreaGrant(area).area)
-        }
-
-        if (isParentAreaGrant(area)) {
-          return encodeParentAreaGrant(decodeParentAreaGrant(area).area)
-        }
-
-        if (isAreaScope(area)) {
-          return []
-        }
-
-        return [area]
-      }),
-    ),
-  ]
-}
-
-/**
- * @param {string[]} [areaRestrictions]
- * @returns {boolean}
- */
 function hasUnrestrictedAreaGrant(areaRestrictions = []) {
   return areaRestrictions.includes(UNRESTRICTED_ACCESS_SENTINEL)
 }
@@ -397,6 +367,35 @@ function getAreaLookupMode(target, areas, areaMaps, includeChildren = false) {
 }
 
 /**
+ * Preserve legacy grouped parent names that still live under the `areas`
+ * config key, while keeping the direct parent polygon available when the
+ * target is also a canonical area key.
+ *
+ * @param {string | undefined} target
+ * @param {{
+ *   names: Set<string>,
+ *   scanAreasObj: Record<string, import('@rm/types').RMFeature>,
+ *   withoutParents: Record<string, string[]>,
+ * }} areas
+ * @param {ReturnType<typeof getAreaMaps>} areaMaps
+ * @returns {boolean}
+ */
+function shouldUseParentGrantForLegacyArea(target, areas, areaMaps) {
+  if (!target || !areas.scanAreasObj[target]) {
+    return false
+  }
+
+  const labelResolved = []
+  pushAreaKeys(labelResolved, target, areas, areaMaps, true, 'label')
+  const uniqueLabelResolved = [...new Set(labelResolved)]
+
+  return (
+    !!uniqueLabelResolved.length &&
+    (uniqueLabelResolved.length !== 1 || uniqueLabelResolved[0] !== target)
+  )
+}
+
+/**
  * @param {string[]} roles
  * @param {import('express').Request} [req]
  * @param {boolean} [serializeScopedGrants]
@@ -454,6 +453,23 @@ function resolveAreaPerms(roles, req, serializeScopedGrants = false) {
             (areaLookupMode === 'label' ||
               !usesGlobalAreaLookup ||
               globalAreaMaps.keyDomainsMap[areaTarget]?.length > 1)
+          const shouldSerializeLegacyParentGrant =
+            !!req &&
+            serializeScopedGrants &&
+            shouldUseParentGrantForLegacyArea(
+              areaTarget,
+              requestAreas,
+              requestAreaMaps,
+            )
+
+          if (shouldSerializeLegacyParentGrant) {
+            perms.push(
+              encodeParentAreaGrant(
+                req ? getRequestAreaDomain(req) : '',
+                areaTarget,
+              ),
+            )
+          }
 
           if (shouldSerializeScopedAreaGrant) {
             perms.push(
@@ -652,7 +668,6 @@ module.exports = {
   isAreaScope,
   isParentAreaGrant,
   NO_ACCESS_SENTINEL,
-  stripAreaRestrictionScopes,
   UNRESTRICTED_ACCESS_SENTINEL,
   normalizeAreaRestrictions,
   resolveAreaPerms,

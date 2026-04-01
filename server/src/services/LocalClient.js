@@ -5,7 +5,7 @@ const bcrypt = require('bcrypt')
 
 const config = require('@rm/config')
 
-const { areaPerms, stripAreaRestrictionScopes } = require('../utils/areaPerms')
+const { areaPerms } = require('../utils/areaPerms')
 const { webhookPerms } = require('../utils/webhookPerms')
 const { scannerPerms, scannerCooldownBypass } = require('../utils/scannerPerms')
 const { mergePerms } = require('../utils/mergePerms')
@@ -32,6 +32,79 @@ class LocalClient extends AuthClient {
         return [perm, false]
       }),
     )
+  }
+
+  /**
+   * @param {import('@rm/types').Permissions} userPerms
+   * @param {import('@rm/types').FullUser} userExists
+   * @param {import('express').Request} req
+   */
+  async mergeLinkedPerms(userPerms, userExists, req) {
+    const authClients = Object.values(state.event.authClients || {})
+    const linkedProviders = [
+      {
+        type: 'discord',
+        id: userExists.discordId,
+        storedPerms: userExists.discordPerms,
+      },
+      {
+        type: 'telegram',
+        id: userExists.telegramId,
+        storedPerms: userExists.telegramPerms,
+      },
+    ]
+    const providerPerms = await Promise.all(
+      linkedProviders.map(async ({ type, id, storedPerms }) => {
+        const matchingClients = authClients.filter(
+          (client) =>
+            client?.strategy?.type === type &&
+            typeof client.getLinkedPerms === 'function',
+        )
+
+        if (id && matchingClients.length) {
+          const livePermResults = await Promise.allSettled(
+            matchingClients.map((client) =>
+              client.getLinkedPerms(id, req, userExists.username),
+            ),
+          )
+
+          const fulfilledPerms = livePermResults
+            .filter((result) => result.status === 'fulfilled')
+            .map((result) => result.value)
+
+          livePermResults
+            .filter((result) => result.status === 'rejected')
+            .forEach((result) => {
+              this.log.warn(
+                `Failed to refresh linked ${type} perms`,
+                result.reason,
+              )
+            })
+
+          if (fulfilledPerms.length) {
+            return fulfilledPerms.reduce(
+              (acc, perms) => mergePerms(acc, perms),
+              /** @type {import('@rm/types').Permissions} */ ({
+                areaRestrictions: [],
+                webhooks: [],
+                scanner: [],
+                scannerCooldownBypass: [],
+              }),
+            )
+          }
+        }
+
+        return storedPerms
+          ? typeof storedPerms === 'string'
+            ? JSON.parse(storedPerms)
+            : storedPerms
+          : null
+      }),
+    )
+
+    providerPerms.filter(Boolean).forEach((perms) => {
+      Object.assign(userPerms, mergePerms(userPerms, perms))
+    })
   }
 
   /** @type {import('passport-local').VerifyFunctionWithRequest} */
@@ -82,20 +155,7 @@ class LocalClient extends AuthClient {
               }
             }
             if (bcrypt.compareSync(password, userExists.password)) {
-              ;['discordPerms', 'telegramPerms'].forEach((permSet) => {
-                if (userExists[permSet]) {
-                  const linkedPerms =
-                    typeof userExists[permSet] === 'string'
-                      ? JSON.parse(userExists[permSet])
-                      : userExists[permSet]
-                  user.perms = mergePerms(user.perms, {
-                    ...linkedPerms,
-                    areaRestrictions: stripAreaRestrictionScopes(
-                      linkedPerms.areaRestrictions,
-                    ),
-                  })
-                }
-              })
+              await this.mergeLinkedPerms(user.perms, userExists, req)
               if (userExists.strategy !== 'local') {
                 await state.db.models.User.query()
                   .update({ strategy: 'local' })
