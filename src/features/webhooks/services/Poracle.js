@@ -329,7 +329,7 @@ export class Poracle {
   }
 
   static toApiPayload(category, entries, defaults) {
-    const processed = Poracle.processor(category, entries, defaults)
+    const processed = Poracle.toLocalState(category, entries, defaults)
     if (category !== 'pokemon') {
       return processed
     }
@@ -362,6 +362,10 @@ export class Poracle {
           payload[field] = pokemon[field]
         }
       })
+
+      if (pokemon.ping) {
+        payload.ping = pokemon.ping
+      }
 
       if (pokemon.noIv) {
         scalarFields.forEach((field) => {
