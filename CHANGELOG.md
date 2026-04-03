@@ -1,3 +1,10 @@
+## [1.41.2-develop.3](https://github.com/WatWowMap/ReactMap/compare/v1.41.2-develop.2...v1.41.2-develop.3) (2026-04-03)
+
+
+### Bug Fixes
+
+* weather update consistency ([184ac2f](https://github.com/WatWowMap/ReactMap/commit/184ac2fa3fbc372d896f70bf36277fa1dd2e6a22))
+
 ## [1.41.2-develop.2](https://github.com/WatWowMap/ReactMap/compare/v1.41.2-develop.1...v1.41.2-develop.2) (2026-04-03)
 
 
