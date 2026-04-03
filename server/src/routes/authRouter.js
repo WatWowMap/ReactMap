@@ -18,22 +18,61 @@ const loadAuthStrategies = () => {
         : 'post'
     if (strategy.enabled) {
       const name = strategy.name ?? `${strategy.type}-${i}`
-      const callbackOptions = {}
-      const authenticateOptions = {
-        failureRedirect: '/',
-        successRedirect: '/',
+      const isDiscordPromptRetry = (req) =>
+        strategy.type === 'discord' && req.session.discordPromptRetry === name
+      const getAuthenticateOptions = (req, includeRedirects = false) => {
+        const options = includeRedirects
+          ? {
+              failureRedirect: '/',
+              successRedirect: '/',
+            }
+          : {}
+
+        if (
+          strategy.type === 'discord' &&
+          strategy.clientPrompt &&
+          !isDiscordPromptRetry(req)
+        ) {
+          options.prompt = strategy.clientPrompt
+        }
+
+        return options
       }
-      if (strategy.type === 'discord') {
-        callbackOptions.prompt = strategy.clientPrompt
-      }
-      authRouter[method](
-        `/${name}`,
-        passport.authenticate(name, authenticateOptions),
+
+      authRouter[method](`/${name}`, (req, res, next) =>
+        passport.authenticate(name, getAuthenticateOptions(req, true))(
+          req,
+          res,
+          next,
+        ),
       )
-      authRouter[method](`/${name}/callback`, async (req, res, next) =>
-        passport.authenticate(
+      authRouter[method](`/${name}/callback`, async (req, res, next) => {
+        if (
+          strategy.type === 'discord' &&
+          strategy.clientPrompt === 'none' &&
+          !isDiscordPromptRetry(req) &&
+          typeof req.query.error === 'string'
+        ) {
+          req.session.discordPromptRetry = name
+          log.debug(
+            TAGS.auth,
+            'Discord silent auth needs user interaction, retrying with approval page',
+          )
+          return res.redirect(`${req.baseUrl}/${name}/callback`)
+        }
+
+        if (
+          strategy.type === 'discord' &&
+          isDiscordPromptRetry(req) &&
+          (typeof req.query.code === 'string' ||
+            typeof req.query.error === 'string')
+        ) {
+          delete req.session.discordPromptRetry
+        }
+
+        return passport.authenticate(
           name,
-          callbackOptions,
+          getAuthenticateOptions(req),
           async (err, user, info) => {
             if (err) {
               return next(err)
@@ -67,8 +106,8 @@ const loadAuthStrategies = () => {
               }
             }
           },
-        )(req, res, next),
-      )
+        )(req, res, next)
+      })
       log.info(
         TAGS.auth,
         `${method.toUpperCase()} /auth/${name}/callback route initialized`,

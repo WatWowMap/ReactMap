@@ -32,6 +32,7 @@ declare global {
 declare module 'express-session' {
   interface SessionData {
     tutorial: boolean
+    discordPromptRetry?: string
   }
 }
 
