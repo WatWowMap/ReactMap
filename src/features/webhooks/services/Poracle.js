@@ -307,19 +307,13 @@ export class Poracle {
     }
   }
 
-  static toApiPayload(category, entries, defaults) {
+  static toApiPayload(category, entries, defaults, options = {}) {
     const processed = Poracle.processor(category, entries, defaults)
     if (category !== 'pokemon') {
       return processed
     }
 
-    const requiredFields = [
-      'uid',
-      'pokemon_id',
-      'form',
-      'profile_no',
-      'template',
-    ]
+    const requiredFields = ['pokemon_id', 'form', 'profile_no', 'template']
     const scalarFields = ['clean', 'distance', 'gender', 'min_time']
     const rangeGroups = [
       ['min_cp', 'max_cp'],
@@ -341,6 +335,10 @@ export class Poracle {
 
     return processed.map((pokemon) => {
       const payload = {}
+
+      if (options.includeUid && pokemon.uid !== undefined) {
+        payload.uid = pokemon.uid
+      }
 
       requiredFields.forEach((field) => {
         if (pokemon[field] !== undefined) {
