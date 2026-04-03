@@ -308,19 +308,20 @@ export class Poracle {
       return processed
     }
 
-    const uiState = new Map(
-      entries.map((pokemon) => [
-        `${pokemon.pokemon_id}-${pokemon.form}`,
-        {
+    const uiState = new Map()
+    entries.forEach((pokemon) => {
+      const key = `${pokemon.pokemon_id}-${pokemon.form}`
+      if (!uiState.has(key)) {
+        uiState.set(key, {
           allForms: !!pokemon.allForms,
           byDistance: !!pokemon.byDistance,
           noIv: !!pokemon.noIv,
           pvpEntry: !!pokemon.pvpEntry,
           xs: !!pokemon.xs,
           xl: !!pokemon.xl,
-        },
-      ]),
-    )
+        })
+      }
+    })
 
     return processed.map((pokemon) => ({
       ...pokemon,
