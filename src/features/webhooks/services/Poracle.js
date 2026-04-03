@@ -258,6 +258,7 @@ export class Poracle {
         return entries
           .map((pkmn) => {
             const fields = [
+              'uid',
               'pokemon_id',
               'form',
               'clean',
@@ -312,7 +313,13 @@ export class Poracle {
       return processed
     }
 
-    const requiredFields = ['pokemon_id', 'form', 'profile_no', 'template']
+    const requiredFields = [
+      'uid',
+      'pokemon_id',
+      'form',
+      'profile_no',
+      'template',
+    ]
     const scalarFields = ['clean', 'distance', 'gender', 'min_time']
     const rangeGroups = [
       ['min_cp', 'max_cp'],
@@ -342,7 +349,7 @@ export class Poracle {
       })
 
       if (pokemon.noIv) {
-        ;['clean', 'distance', 'gender'].forEach((field) => {
+        scalarFields.forEach((field) => {
           if (
             pokemon[field] !== undefined &&
             pokemon[field] !== defaults[field]
