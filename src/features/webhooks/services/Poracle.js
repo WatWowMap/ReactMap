@@ -461,6 +461,13 @@ export class Poracle {
         }
       })
 
+      if (payload.min_weight === undefined) {
+        payload.min_weight = defaults.min_weight
+      }
+      if (payload.max_weight === undefined) {
+        payload.max_weight = defaults.max_weight
+      }
+
       if (pokemon.noIv) {
         return payload
       }
