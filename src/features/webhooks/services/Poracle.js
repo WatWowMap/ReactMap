@@ -355,6 +355,16 @@ export class Poracle {
             payload[field] = pokemon[field]
           }
         })
+        rangeGroups.forEach(([low, high]) => {
+          if (
+            pokemon[low] !== undefined &&
+            pokemon[high] !== undefined &&
+            (pokemon[low] !== defaults[low] || pokemon[high] !== defaults[high])
+          ) {
+            payload[low] = pokemon[low]
+            payload[high] = pokemon[high]
+          }
+        })
         payload.min_iv = pokemon.min_iv ?? defaults.min_iv
         payload.max_iv = pokemon.max_iv ?? defaults.max_iv
         return payload
