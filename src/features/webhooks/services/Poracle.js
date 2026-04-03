@@ -11,6 +11,31 @@ const POKEMON_PVP_FIELDS = [
   'pvp_ranking_cap',
 ]
 
+const POKEMON_CREATE_REQUIRED_FIELDS = [
+  'pokemon_id',
+  'form',
+  'profile_no',
+  'template',
+]
+
+const POKEMON_UPDATE_REQUIRED_FIELDS = [
+  'uid',
+  ...POKEMON_CREATE_REQUIRED_FIELDS,
+]
+
+const POKEMON_SCALAR_FIELDS = ['clean', 'distance', 'gender', 'min_time']
+
+const POKEMON_RANGE_GROUPS = [
+  ['min_cp', 'max_cp'],
+  ['min_level', 'max_level'],
+  ['atk', 'max_atk'],
+  ['def', 'max_def'],
+  ['sta', 'max_sta'],
+  ['rarity', 'max_rarity'],
+  ['size', 'max_size'],
+  ['min_weight', 'max_weight'],
+]
+
 export class Poracle {
   static getMapCategory(poracleCategory) {
     switch (poracleCategory) {
@@ -340,28 +365,10 @@ export class Poracle {
       return processed
     }
 
-    const requiredFields = [
-      'uid',
-      'pokemon_id',
-      'form',
-      'profile_no',
-      'template',
-    ]
-    const scalarFields = ['clean', 'distance', 'gender', 'min_time']
-    const rangeGroups = [
-      ['min_cp', 'max_cp'],
-      ['min_level', 'max_level'],
-      ['atk', 'max_atk'],
-      ['def', 'max_def'],
-      ['sta', 'max_sta'],
-      ['rarity', 'max_rarity'],
-      ['size', 'max_size'],
-      ['min_weight', 'max_weight'],
-    ]
     return processed.map((pokemon) => {
       const payload = {}
 
-      requiredFields.forEach((field) => {
+      POKEMON_UPDATE_REQUIRED_FIELDS.forEach((field) => {
         if (pokemon[field] !== undefined) {
           payload[field] = pokemon[field]
         }
@@ -371,7 +378,7 @@ export class Poracle {
         payload.ping = pokemon.ping
       }
 
-      scalarFields.forEach((field) => {
+      POKEMON_SCALAR_FIELDS.forEach((field) => {
         payload[field] =
           pokemon[field] === undefined ? defaults[field] : pokemon[field]
       })
@@ -381,7 +388,7 @@ export class Poracle {
       payload.max_iv =
         pokemon.max_iv === undefined ? defaults.max_iv : pokemon.max_iv
 
-      rangeGroups.forEach(([low, high]) => {
+      POKEMON_RANGE_GROUPS.forEach(([low, high]) => {
         payload[low] = pokemon[low] === undefined ? defaults[low] : pokemon[low]
         payload[high] =
           pokemon[high] === undefined ? defaults[high] : pokemon[high]
@@ -401,14 +408,70 @@ export class Poracle {
   }
 
   static toApiPayload(category, entries, defaults) {
-    const processed = Poracle.toUpdatePayload(category, entries, defaults)
+    const processed = Poracle.toLocalState(category, entries, defaults)
     if (category !== 'pokemon') {
       return processed
     }
 
     return processed.map((pokemon) => {
-      const payload = { ...pokemon }
-      delete payload.uid
+      const payload = {}
+
+      POKEMON_CREATE_REQUIRED_FIELDS.forEach((field) => {
+        if (pokemon[field] !== undefined) {
+          payload[field] = pokemon[field]
+        }
+      })
+
+      if (pokemon.ping !== undefined) {
+        payload.ping = pokemon.ping
+      }
+
+      POKEMON_SCALAR_FIELDS.forEach((field) => {
+        if (
+          pokemon[field] !== undefined &&
+          pokemon[field] !== defaults[field]
+        ) {
+          payload[field] = pokemon[field]
+        }
+      })
+
+      if (pokemon.noIv) {
+        payload.min_iv =
+          pokemon.min_iv === undefined ? defaults.min_iv : pokemon.min_iv
+        payload.max_iv =
+          pokemon.max_iv === undefined ? defaults.max_iv : pokemon.max_iv
+        return payload
+      }
+
+      if (
+        pokemon.min_iv !== undefined &&
+        pokemon.max_iv !== undefined &&
+        (pokemon.min_iv !== defaults.min_iv ||
+          pokemon.max_iv !== defaults.max_iv)
+      ) {
+        payload.min_iv = pokemon.min_iv
+        payload.max_iv = pokemon.max_iv
+      }
+
+      POKEMON_RANGE_GROUPS.forEach(([low, high]) => {
+        if (
+          pokemon[low] !== undefined &&
+          pokemon[high] !== undefined &&
+          (pokemon[low] !== defaults[low] || pokemon[high] !== defaults[high])
+        ) {
+          payload[low] = pokemon[low]
+          payload[high] = pokemon[high]
+        }
+      })
+
+      if (pokemon.pvpEntry && pokemon.pvp_ranking_league) {
+        POKEMON_PVP_FIELDS.forEach((field) => {
+          if (pokemon[field] !== undefined) {
+            payload[field] = pokemon[field]
+          }
+        })
+      }
+
       return payload
     })
   }
