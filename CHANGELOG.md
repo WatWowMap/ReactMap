@@ -1,3 +1,11 @@
+## [1.41.2-develop.2](https://github.com/WatWowMap/ReactMap/compare/v1.41.2-develop.1...v1.41.2-develop.2) (2026-04-03)
+
+
+### Bug Fixes
+
+* keep drawer scroll position ([a242e84](https://github.com/WatWowMap/ReactMap/commit/a242e842acaf9f5526491c7a294b8a677979b48f))
+* properly set default discord auth as none ([3670810](https://github.com/WatWowMap/ReactMap/commit/3670810193e1c74bcd8352825083c069b33b1bff))
+
 ## [1.41.2-develop.1](https://github.com/WatWowMap/ReactMap/compare/v1.41.1...v1.41.2-develop.1) (2026-03-26)
 
 
