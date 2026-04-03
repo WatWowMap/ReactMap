@@ -3,6 +3,14 @@ import { t } from 'i18next'
 
 import { useWebhookStore } from '@store/useWebhookStore'
 
+const POKEMON_PVP_FIELDS = [
+  'pvp_ranking_league',
+  'pvp_ranking_best',
+  'pvp_ranking_worst',
+  'pvp_ranking_min_cp',
+  'pvp_ranking_cap',
+]
+
 export class Poracle {
   static getMapCategory(poracleCategory) {
     switch (poracleCategory) {
@@ -178,13 +186,6 @@ export class Poracle {
   }
 
   static processPokemon(entries, defaults, includeUiState = false) {
-    const pvpFields = [
-      'pvp_ranking_league',
-      'pvp_ranking_best',
-      'pvp_ranking_worst',
-      'pvp_ranking_min_cp',
-      'pvp_ranking_cap',
-    ]
     const ignoredFields = [
       'noIv',
       'byDistance',
@@ -226,11 +227,13 @@ export class Poracle {
         }
 
         if (pokemon.pvpEntry) {
-          fields.push(...pvpFields)
+          fields.push(...POKEMON_PVP_FIELDS)
         } else {
           fields.push(
             ...Object.keys(normalized).filter(
-              (key) => !pvpFields.includes(key) && !ignoredFields.includes(key),
+              (key) =>
+                !POKEMON_PVP_FIELDS.includes(key) &&
+                !ignoredFields.includes(key),
             ),
           )
         }
@@ -355,14 +358,6 @@ export class Poracle {
       ['size', 'max_size'],
       ['min_weight', 'max_weight'],
     ]
-    const pvpFields = [
-      'pvp_ranking_league',
-      'pvp_ranking_best',
-      'pvp_ranking_worst',
-      'pvp_ranking_min_cp',
-      'pvp_ranking_cap',
-    ]
-
     return processed.map((pokemon) => {
       const payload = {}
 
@@ -392,7 +387,7 @@ export class Poracle {
           pokemon[high] === undefined ? defaults[high] : pokemon[high]
       })
 
-      pvpFields.forEach((field) => {
+      POKEMON_PVP_FIELDS.forEach((field) => {
         payload[field] =
           pokemon.pvpEntry && pokemon.pvp_ranking_league
             ? pokemon[field] === undefined
