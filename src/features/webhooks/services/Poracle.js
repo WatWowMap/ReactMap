@@ -36,6 +36,16 @@ const POKEMON_RANGE_GROUPS = [
   ['min_weight', 'max_weight'],
 ]
 
+const POKEMON_OMITTABLE_FIELDS = [
+  ...new Set([
+    ...POKEMON_SCALAR_FIELDS,
+    'min_iv',
+    'max_iv',
+    ...POKEMON_RANGE_GROUPS.flat(),
+    ...POKEMON_PVP_FIELDS,
+  ]),
+]
+
 export class Poracle {
   static getMapCategory(poracleCategory) {
     switch (poracleCategory) {
@@ -210,11 +220,51 @@ export class Poracle {
     return reactMapFriendly
   }
 
+  static getPokemonOmittedFields(pokemon) {
+    if (!pokemon) return {}
+
+    const omittedFields = { ...(pokemon?.omittedFields || {}) }
+
+    POKEMON_OMITTABLE_FIELDS.forEach((field) => {
+      if (pokemon?.[field] == null) {
+        omittedFields[field] = true
+      }
+    })
+
+    return omittedFields
+  }
+
+  static getPokemonFieldValue(pokemon, defaults, field) {
+    return pokemon[field] == null ? defaults[field] : pokemon[field]
+  }
+
+  static shouldOmitPokemonField(pokemon, defaults, omittedFields, field) {
+    return (
+      omittedFields[field] &&
+      Poracle.getPokemonFieldValue(pokemon, defaults, field) === defaults[field]
+    )
+  }
+
+  static toTrackedState(category, entries, defaults, payload = []) {
+    if (category !== 'pokemon') {
+      return Poracle.toLocalState(category, entries, defaults)
+    }
+
+    return Poracle.toLocalState(
+      category,
+      entries.map((pokemon, index) => ({
+        ...pokemon,
+        omittedFields: Poracle.getPokemonOmittedFields(payload[index]),
+      })),
+      defaults,
+    )
+  }
+
   static processPokemon(entries, defaults, includeUiState = false) {
     const ignoredFields = [
       'noIv',
       'byDistance',
-      'omitIvBounds',
+      'omittedFields',
       'xs',
       'xl',
       'allForms',
@@ -227,6 +277,7 @@ export class Poracle {
         const normalized = pokemon.allForms
           ? { ...pokemon, form: defaults.form }
           : pokemon
+        const omittedFields = Poracle.getPokemonOmittedFields(normalized)
         const fields = [
           'uid',
           'pokemon_id',
@@ -265,15 +316,18 @@ export class Poracle {
         }
 
         new Set(fields).forEach((field) => {
-          newPokemon[field] =
-            normalized[field] == null ? defaults[field] : normalized[field]
+          newPokemon[field] = Poracle.getPokemonFieldValue(
+            normalized,
+            defaults,
+            field,
+          )
         })
 
         if (includeUiState) {
           newPokemon.allForms = !!pokemon.allForms
           newPokemon.byDistance = !!pokemon.byDistance
           newPokemon.noIv = !!pokemon.noIv
-          newPokemon.omitIvBounds = !!pokemon.omitIvBounds
+          newPokemon.omittedFields = omittedFields
           newPokemon.pvpEntry = !!pokemon.pvpEntry
           newPokemon.xs = !!pokemon.xs
           newPokemon.xl = !!pokemon.xl
@@ -367,12 +421,7 @@ export class Poracle {
 
     return processed.map((pokemon) => {
       const payload = {}
-      const omitIvBounds =
-        pokemon.omitIvBounds &&
-        !pokemon.noIv &&
-        !pokemon.pvpEntry &&
-        pokemon.min_iv === defaults.min_iv &&
-        pokemon.max_iv === defaults.max_iv
+      const omittedFields = Poracle.getPokemonOmittedFields(pokemon)
 
       POKEMON_UPDATE_REQUIRED_FIELDS.forEach((field) => {
         if (pokemon[field] !== undefined) {
@@ -385,31 +434,80 @@ export class Poracle {
       }
 
       POKEMON_SCALAR_FIELDS.forEach((field) => {
-        payload[field] =
-          pokemon[field] === undefined ? defaults[field] : pokemon[field]
+        const value = Poracle.getPokemonFieldValue(pokemon, defaults, field)
+        if (
+          !Poracle.shouldOmitPokemonField(
+            pokemon,
+            defaults,
+            omittedFields,
+            field,
+          )
+        ) {
+          payload[field] = value
+        }
       })
 
-      if (!omitIvBounds) {
-        payload.min_iv =
-          pokemon.min_iv === undefined ? defaults.min_iv : pokemon.min_iv
-        payload.max_iv =
-          pokemon.max_iv === undefined ? defaults.max_iv : pokemon.max_iv
+      if (
+        pokemon.noIv ||
+        !['min_iv', 'max_iv'].every((field) =>
+          Poracle.shouldOmitPokemonField(
+            pokemon,
+            defaults,
+            omittedFields,
+            field,
+          ),
+        )
+      ) {
+        payload.min_iv = Poracle.getPokemonFieldValue(
+          pokemon,
+          defaults,
+          'min_iv',
+        )
+        payload.max_iv = Poracle.getPokemonFieldValue(
+          pokemon,
+          defaults,
+          'max_iv',
+        )
       }
 
       POKEMON_RANGE_GROUPS.forEach(([low, high]) => {
-        payload[low] = pokemon[low] === undefined ? defaults[low] : pokemon[low]
-        payload[high] =
-          pokemon[high] === undefined ? defaults[high] : pokemon[high]
+        if (
+          ![low, high].every((field) =>
+            Poracle.shouldOmitPokemonField(
+              pokemon,
+              defaults,
+              omittedFields,
+              field,
+            ),
+          )
+        ) {
+          payload[low] = Poracle.getPokemonFieldValue(pokemon, defaults, low)
+          payload[high] = Poracle.getPokemonFieldValue(pokemon, defaults, high)
+        }
       })
 
-      POKEMON_PVP_FIELDS.forEach((field) => {
-        payload[field] =
-          pokemon.pvpEntry && pokemon.pvp_ranking_league
-            ? pokemon[field] === undefined
-              ? defaults[field]
-              : pokemon[field]
-            : defaults[field]
-      })
+      if (pokemon.pvpEntry && pokemon.pvp_ranking_league) {
+        POKEMON_PVP_FIELDS.forEach((field) => {
+          payload[field] = Poracle.getPokemonFieldValue(
+            pokemon,
+            defaults,
+            field,
+          )
+        })
+      } else if (
+        !POKEMON_PVP_FIELDS.every((field) =>
+          Poracle.shouldOmitPokemonField(
+            pokemon,
+            defaults,
+            omittedFields,
+            field,
+          ),
+        )
+      ) {
+        POKEMON_PVP_FIELDS.forEach((field) => {
+          payload[field] = defaults[field]
+        })
+      }
 
       return payload
     })

@@ -99,8 +99,13 @@ export function Manage() {
       const enabledFilters = Object.values(tempFilters || {}).filter(
         (x) => x && x.enabled,
       )
-      const values = Poracle.toLocalState(category, enabledFilters, defaults)
       const payload = Poracle.toApiPayload(category, enabledFilters, defaults)
+      const values = Poracle.toTrackedState(
+        category,
+        enabledFilters,
+        defaults,
+        payload,
+      )
       apolloClient.mutate({
         // @ts-ignore
         mutation: Query.webhook(category.toUpperCase()),

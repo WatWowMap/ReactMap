@@ -29,17 +29,16 @@ export function TrackedTile({ index }) {
 
   React.useEffect(() => {
     if (advOpen.open && advOpen.id === id && advOpen.uid === item.uid) {
-      const omitIvBounds =
-        item.omitIvBounds ||
-        (category === 'pokemon' &&
-          item.min_iv == null &&
-          item.max_iv == null &&
-          !item.pvpEntry)
       const localItem =
         category === 'pokemon'
           ? Poracle.toLocalState(
               category,
-              [{ ...item, omitIvBounds }],
+              [
+                {
+                  ...item,
+                  omittedFields: Poracle.getPokemonOmittedFields(item),
+                },
+              ],
               defaults,
             )[0]
           : { ...defaults, ...item }
