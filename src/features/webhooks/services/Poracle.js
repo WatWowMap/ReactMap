@@ -440,10 +440,7 @@ export class Poracle {
           pokemon.min_iv === undefined ? defaults.min_iv : pokemon.min_iv
         payload.max_iv =
           pokemon.max_iv === undefined ? defaults.max_iv : pokemon.max_iv
-        return payload
-      }
-
-      if (
+      } else if (
         pokemon.min_iv !== undefined &&
         pokemon.max_iv !== undefined &&
         (pokemon.min_iv !== defaults.min_iv ||
@@ -463,6 +460,10 @@ export class Poracle {
           payload[high] = pokemon[high]
         }
       })
+
+      if (pokemon.noIv) {
+        return payload
+      }
 
       if (pokemon.pvpEntry && pokemon.pvp_ranking_league) {
         POKEMON_PVP_FIELDS.forEach((field) => {
