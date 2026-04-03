@@ -337,14 +337,70 @@ export class Poracle {
       return processed
     }
 
+    const requiredFields = [
+      'uid',
+      'pokemon_id',
+      'form',
+      'profile_no',
+      'template',
+    ]
+    const scalarFields = ['clean', 'distance', 'gender', 'min_time']
+    const rangeGroups = [
+      ['min_cp', 'max_cp'],
+      ['min_level', 'max_level'],
+      ['atk', 'max_atk'],
+      ['def', 'max_def'],
+      ['sta', 'max_sta'],
+      ['rarity', 'max_rarity'],
+      ['size', 'max_size'],
+      ['min_weight', 'max_weight'],
+    ]
+    const pvpFields = [
+      'pvp_ranking_league',
+      'pvp_ranking_best',
+      'pvp_ranking_worst',
+      'pvp_ranking_min_cp',
+      'pvp_ranking_cap',
+    ]
+
     return processed.map((pokemon) => {
-      const payload = { ...pokemon }
-      delete payload.allForms
-      delete payload.byDistance
-      delete payload.noIv
-      delete payload.pvpEntry
-      delete payload.xs
-      delete payload.xl
+      const payload = {}
+
+      requiredFields.forEach((field) => {
+        if (pokemon[field] !== undefined) {
+          payload[field] = pokemon[field]
+        }
+      })
+
+      if (pokemon.ping !== undefined) {
+        payload.ping = pokemon.ping
+      }
+
+      scalarFields.forEach((field) => {
+        payload[field] =
+          pokemon[field] === undefined ? defaults[field] : pokemon[field]
+      })
+
+      payload.min_iv =
+        pokemon.min_iv === undefined ? defaults.min_iv : pokemon.min_iv
+      payload.max_iv =
+        pokemon.max_iv === undefined ? defaults.max_iv : pokemon.max_iv
+
+      rangeGroups.forEach(([low, high]) => {
+        payload[low] = pokemon[low] === undefined ? defaults[low] : pokemon[low]
+        payload[high] =
+          pokemon[high] === undefined ? defaults[high] : pokemon[high]
+      })
+
+      pvpFields.forEach((field) => {
+        payload[field] =
+          pokemon.pvpEntry && pokemon.pvp_ranking_league
+            ? pokemon[field] === undefined
+              ? defaults[field]
+              : pokemon[field]
+            : defaults[field]
+      })
+
       return payload
     })
   }
