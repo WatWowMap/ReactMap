@@ -32,11 +32,11 @@ export function TrackedTile({ index }) {
       useWebhookStore.setState((prev) => ({
         tempFilters: {
           ...prev.tempFilters,
-          [id]: { ...item, byDistance: !!item.distance },
+          [id]: { ...defaults, ...item, byDistance: !!item.distance },
         },
       }))
     }
-  }, [advOpen, id, item])
+  }, [advOpen, defaults, id, item])
 
   const onClose = React.useCallback(
     (newFilter, save) => {
@@ -44,7 +44,7 @@ export function TrackedTile({ index }) {
         apolloClient.mutate({
           mutation: webhookNodes[category.toUpperCase()],
           variables: {
-            data: Poracle.processor(category, [newFilter], defaults),
+            data: Poracle.toApiPayload(category, [newFilter], defaults),
             status: 'POST',
             category,
           },

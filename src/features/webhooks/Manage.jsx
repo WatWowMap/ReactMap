@@ -97,12 +97,17 @@ export function Manage() {
         Object.values(tempFilters || {}).filter((x) => x && x.enabled),
         useWebhookStore.getState().context.ui[category].defaults,
       )
+      const payload = Poracle.toApiPayload(
+        category,
+        Object.values(tempFilters || {}).filter((x) => x && x.enabled),
+        useWebhookStore.getState().context.ui[category].defaults,
+      )
       apolloClient.mutate({
         // @ts-ignore
         mutation: Query.webhook(category.toUpperCase()),
         variables: {
           category,
-          data: values,
+          data: payload,
           status: 'POST',
         },
         refetchQueries: [ALL_PROFILES],
