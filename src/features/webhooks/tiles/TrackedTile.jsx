@@ -44,7 +44,7 @@ export function TrackedTile({ index }) {
         apolloClient.mutate({
           mutation: webhookNodes[category.toUpperCase()],
           variables: {
-            data: Poracle.processor(category, [newFilter], defaults),
+            data: Poracle.toUpdatePayload(category, [newFilter], defaults),
             status: 'POST',
             category,
           },

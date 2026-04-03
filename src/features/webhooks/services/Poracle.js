@@ -177,7 +177,7 @@ export class Poracle {
     return reactMapFriendly
   }
 
-  static processor(category, entries, defaults) {
+  static processPokemon(entries, defaults, includeUiState = false) {
     const pvpFields = [
       'pvp_ranking_league',
       'pvp_ranking_best',
@@ -193,6 +193,70 @@ export class Poracle {
       'allForms',
       'pvpEntry',
     ]
+    const dupes = {}
+
+    return entries
+      .map((pokemon) => {
+        const normalized = pokemon.allForms
+          ? { ...pokemon, form: defaults.form }
+          : pokemon
+        const fields = [
+          'uid',
+          'pokemon_id',
+          'form',
+          'clean',
+          'distance',
+          'min_time',
+          'template',
+          'profile_no',
+          'ping',
+          'gender',
+          'rarity',
+          'max_rarity',
+          'size',
+          'max_size',
+        ]
+        const newPokemon = {}
+
+        if (pokemon.allForms) {
+          if (dupes[pokemon.pokemon_id]) {
+            return null
+          }
+          dupes[pokemon.pokemon_id] = true
+        }
+
+        if (pokemon.pvpEntry) {
+          fields.push(...pvpFields)
+        } else {
+          fields.push(
+            ...Object.keys(normalized).filter(
+              (key) => !pvpFields.includes(key) && !ignoredFields.includes(key),
+            ),
+          )
+        }
+
+        new Set(fields).forEach((field) => {
+          newPokemon[field] =
+            normalized[field] === undefined
+              ? defaults[field]
+              : normalized[field]
+        })
+
+        if (includeUiState) {
+          newPokemon.allForms = !!pokemon.allForms
+          newPokemon.byDistance = !!pokemon.byDistance
+          newPokemon.noIv = !!pokemon.noIv
+          newPokemon.pvpEntry = !!pokemon.pvpEntry
+          newPokemon.xs = !!pokemon.xs
+          newPokemon.xl = !!pokemon.xl
+        }
+
+        return newPokemon
+      })
+      .filter((pokemon) => pokemon)
+  }
+
+  static processor(category, entries, defaults) {
     const dupes = {}
     switch (category) {
       case 'egg':
@@ -255,78 +319,34 @@ export class Poracle {
           })
           .filter((quest) => quest)
       default:
-        return entries
-          .map((pkmn) => {
-            const fields = [
-              'uid',
-              'pokemon_id',
-              'form',
-              'clean',
-              'distance',
-              'min_time',
-              'template',
-              'profile_no',
-              'ping',
-              'gender',
-              'rarity',
-              'max_rarity',
-              'size',
-              'max_size',
-            ]
-            const newPokemon = {}
-            if (pkmn.allForms) {
-              pkmn.form = 0
-              if (dupes[pkmn.pokemon_id]) {
-                return null
-              }
-              dupes[pkmn.pokemon_id] = true
-            }
-            if (pkmn.pvpEntry) {
-              fields.push(...pvpFields)
-            } else {
-              fields.push(
-                ...Object.keys(pkmn).filter(
-                  (key) =>
-                    !pvpFields.includes(key) && !ignoredFields.includes(key),
-                ),
-              )
-            }
-            new Set(fields).forEach(
-              (field) =>
-                (newPokemon[field] =
-                  pkmn[field] === undefined ? defaults[field] : pkmn[field]),
-            )
-            return newPokemon
-          })
-          .filter((pokemon) => pokemon)
+        return Poracle.processPokemon(entries, defaults)
     }
   }
 
   static toLocalState(category, entries, defaults) {
-    const processed = Poracle.processor(category, entries, defaults)
+    if (category !== 'pokemon') {
+      return Poracle.processor(category, entries, defaults)
+    }
+
+    return Poracle.processPokemon(entries, defaults, true)
+  }
+
+  static toUpdatePayload(category, entries, defaults) {
+    const processed = Poracle.toLocalState(category, entries, defaults)
     if (category !== 'pokemon') {
       return processed
     }
 
-    const uiState = new Map()
-    entries.forEach((pokemon) => {
-      const key = `${pokemon.pokemon_id}-${pokemon.form}`
-      if (!uiState.has(key)) {
-        uiState.set(key, {
-          allForms: !!pokemon.allForms,
-          byDistance: !!pokemon.byDistance,
-          noIv: !!pokemon.noIv,
-          pvpEntry: !!pokemon.pvpEntry,
-          xs: !!pokemon.xs,
-          xl: !!pokemon.xl,
-        })
-      }
+    return processed.map((pokemon) => {
+      const payload = { ...pokemon }
+      delete payload.allForms
+      delete payload.byDistance
+      delete payload.noIv
+      delete payload.pvpEntry
+      delete payload.xs
+      delete payload.xl
+      return payload
     })
-
-    return processed.map((pokemon) => ({
-      ...pokemon,
-      ...uiState.get(`${pokemon.pokemon_id}-${pokemon.form}`),
-    }))
   }
 
   static toApiPayload(category, entries, defaults) {
