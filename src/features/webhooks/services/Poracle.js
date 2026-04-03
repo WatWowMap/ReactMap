@@ -406,104 +406,14 @@ export class Poracle {
   }
 
   static toApiPayload(category, entries, defaults) {
-    const processed = Poracle.toLocalState(category, entries, defaults)
+    const processed = Poracle.toUpdatePayload(category, entries, defaults)
     if (category !== 'pokemon') {
       return processed
     }
 
-    const requiredFields = ['pokemon_id', 'form', 'profile_no', 'template']
-    const scalarFields = ['clean', 'distance', 'gender', 'min_time']
-    const rangeGroups = [
-      ['min_cp', 'max_cp'],
-      ['min_level', 'max_level'],
-      ['atk', 'max_atk'],
-      ['def', 'max_def'],
-      ['sta', 'max_sta'],
-      ['rarity', 'max_rarity'],
-      ['size', 'max_size'],
-      ['min_weight', 'max_weight'],
-    ]
-    const pvpFields = [
-      'pvp_ranking_league',
-      'pvp_ranking_best',
-      'pvp_ranking_worst',
-      'pvp_ranking_min_cp',
-      'pvp_ranking_cap',
-    ]
-
     return processed.map((pokemon) => {
-      const payload = {}
-
-      requiredFields.forEach((field) => {
-        if (pokemon[field] !== undefined) {
-          payload[field] = pokemon[field]
-        }
-      })
-
-      if (pokemon.ping) {
-        payload.ping = pokemon.ping
-      }
-
-      if (pokemon.noIv) {
-        scalarFields.forEach((field) => {
-          if (
-            pokemon[field] !== undefined &&
-            pokemon[field] !== defaults[field]
-          ) {
-            payload[field] = pokemon[field]
-          }
-        })
-        rangeGroups.forEach(([low, high]) => {
-          if (
-            pokemon[low] !== undefined &&
-            pokemon[high] !== undefined &&
-            (pokemon[low] !== defaults[low] || pokemon[high] !== defaults[high])
-          ) {
-            payload[low] = pokemon[low]
-            payload[high] = pokemon[high]
-          }
-        })
-        payload.min_iv = pokemon.min_iv ?? defaults.min_iv
-        payload.max_iv = pokemon.max_iv ?? defaults.max_iv
-        return payload
-      }
-
-      scalarFields.forEach((field) => {
-        if (
-          pokemon[field] !== undefined &&
-          pokemon[field] !== defaults[field]
-        ) {
-          payload[field] = pokemon[field]
-        }
-      })
-
-      if (
-        pokemon.min_iv !== defaults.min_iv ||
-        pokemon.max_iv !== defaults.max_iv
-      ) {
-        payload.min_iv = pokemon.min_iv
-        payload.max_iv = pokemon.max_iv
-      }
-
-      rangeGroups.forEach(([low, high]) => {
-        if (
-          pokemon[low] !== undefined &&
-          pokemon[high] !== undefined &&
-          (pokemon[low] !== defaults[low] || pokemon[high] !== defaults[high])
-        ) {
-          payload[low] = pokemon[low]
-          payload[high] = pokemon[high]
-        }
-      })
-
-      if (pokemon.pvpEntry && pokemon.pvp_ranking_league) {
-        pvpFields.forEach((field) => {
-          if (pokemon[field] !== undefined) {
-            payload[field] = pokemon[field]
-          }
-        })
-      }
-
+      const payload = { ...pokemon }
+      delete payload.uid
       return payload
     })
   }
