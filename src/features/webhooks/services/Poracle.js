@@ -266,6 +266,7 @@ export class Poracle {
               'min_time',
               'template',
               'profile_no',
+              'ping',
               'gender',
               'rarity',
               'max_rarity',
@@ -307,7 +308,7 @@ export class Poracle {
     }
   }
 
-  static toApiPayload(category, entries, defaults, options = {}) {
+  static toApiPayload(category, entries, defaults) {
     const processed = Poracle.processor(category, entries, defaults)
     if (category !== 'pokemon') {
       return processed
@@ -335,10 +336,6 @@ export class Poracle {
 
     return processed.map((pokemon) => {
       const payload = {}
-
-      if (options.includeUid && pokemon.uid !== undefined) {
-        payload.uid = pokemon.uid
-      }
 
       requiredFields.forEach((field) => {
         if (pokemon[field] !== undefined) {
