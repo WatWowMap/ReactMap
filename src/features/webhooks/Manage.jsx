@@ -92,7 +92,7 @@ export function Manage() {
   React.useEffect(() => {
     if (!addNew.open && addNew.save && category !== 'human') {
       const { tempFilters } = useWebhookStore.getState()
-      const values = Poracle.processor(
+      const values = Poracle.toLocalState(
         category,
         Object.values(tempFilters || {}).filter((x) => x && x.enabled),
         useWebhookStore.getState().context.ui[category].defaults,

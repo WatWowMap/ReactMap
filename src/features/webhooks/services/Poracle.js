@@ -296,16 +296,36 @@ export class Poracle {
                 (newPokemon[field] =
                   pkmn[field] === undefined ? defaults[field] : pkmn[field]),
             )
-            newPokemon.allForms = !!pkmn.allForms
-            newPokemon.byDistance = !!pkmn.byDistance
-            newPokemon.noIv = !!pkmn.noIv
-            newPokemon.pvpEntry = !!pkmn.pvpEntry
-            newPokemon.xs = !!pkmn.xs
-            newPokemon.xl = !!pkmn.xl
             return newPokemon
           })
           .filter((pokemon) => pokemon)
     }
+  }
+
+  static toLocalState(category, entries, defaults) {
+    const processed = Poracle.processor(category, entries, defaults)
+    if (category !== 'pokemon') {
+      return processed
+    }
+
+    const uiState = new Map(
+      entries.map((pokemon) => [
+        `${pokemon.pokemon_id}-${pokemon.form}`,
+        {
+          allForms: !!pokemon.allForms,
+          byDistance: !!pokemon.byDistance,
+          noIv: !!pokemon.noIv,
+          pvpEntry: !!pokemon.pvpEntry,
+          xs: !!pokemon.xs,
+          xl: !!pokemon.xl,
+        },
+      ]),
+    )
+
+    return processed.map((pokemon) => ({
+      ...pokemon,
+      ...uiState.get(`${pokemon.pokemon_id}-${pokemon.form}`),
+    }))
   }
 
   static toApiPayload(category, entries, defaults) {
