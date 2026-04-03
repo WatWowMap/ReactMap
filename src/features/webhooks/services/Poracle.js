@@ -266,9 +266,7 @@ export class Poracle {
 
         new Set(fields).forEach((field) => {
           newPokemon[field] =
-            normalized[field] === undefined
-              ? defaults[field]
-              : normalized[field]
+            normalized[field] == null ? defaults[field] : normalized[field]
         })
 
         if (includeUiState) {

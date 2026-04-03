@@ -32,17 +32,23 @@ export function TrackedTile({ index }) {
       const omitIvBounds =
         item.omitIvBounds ||
         (category === 'pokemon' &&
-          item.min_iv === undefined &&
-          item.max_iv === undefined &&
+          item.min_iv == null &&
+          item.max_iv == null &&
           !item.pvpEntry)
+      const localItem =
+        category === 'pokemon'
+          ? Poracle.toLocalState(
+              category,
+              [{ ...item, omitIvBounds }],
+              defaults,
+            )[0]
+          : { ...defaults, ...item }
       useWebhookStore.setState((prev) => ({
         tempFilters: {
           ...prev.tempFilters,
           [id]: {
-            ...defaults,
-            ...item,
+            ...localItem,
             byDistance: !!item.distance,
-            omitIvBounds,
           },
         },
       }))
