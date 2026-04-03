@@ -29,10 +29,21 @@ export function TrackedTile({ index }) {
 
   React.useEffect(() => {
     if (advOpen.open && advOpen.id === id && advOpen.uid === item.uid) {
+      const omitIvBounds =
+        item.omitIvBounds ||
+        (category === 'pokemon' &&
+          item.min_iv === undefined &&
+          item.max_iv === undefined &&
+          !item.pvpEntry)
       useWebhookStore.setState((prev) => ({
         tempFilters: {
           ...prev.tempFilters,
-          [id]: { ...defaults, ...item, byDistance: !!item.distance },
+          [id]: {
+            ...defaults,
+            ...item,
+            byDistance: !!item.distance,
+            omitIvBounds,
+          },
         },
       }))
     }

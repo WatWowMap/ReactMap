@@ -40,6 +40,7 @@ const skipFields = new Set([
   'allForms',
   'pvpEntry',
   'noIv',
+  'omitIvBounds',
   'byDistance',
   'distance',
   'xs',

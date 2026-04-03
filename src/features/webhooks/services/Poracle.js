@@ -214,6 +214,7 @@ export class Poracle {
     const ignoredFields = [
       'noIv',
       'byDistance',
+      'omitIvBounds',
       'xs',
       'xl',
       'allForms',
@@ -274,6 +275,7 @@ export class Poracle {
           newPokemon.allForms = !!pokemon.allForms
           newPokemon.byDistance = !!pokemon.byDistance
           newPokemon.noIv = !!pokemon.noIv
+          newPokemon.omitIvBounds = !!pokemon.omitIvBounds
           newPokemon.pvpEntry = !!pokemon.pvpEntry
           newPokemon.xs = !!pokemon.xs
           newPokemon.xl = !!pokemon.xl
@@ -367,6 +369,12 @@ export class Poracle {
 
     return processed.map((pokemon) => {
       const payload = {}
+      const omitIvBounds =
+        pokemon.omitIvBounds &&
+        !pokemon.noIv &&
+        !pokemon.pvpEntry &&
+        pokemon.min_iv === defaults.min_iv &&
+        pokemon.max_iv === defaults.max_iv
 
       POKEMON_UPDATE_REQUIRED_FIELDS.forEach((field) => {
         if (pokemon[field] !== undefined) {
@@ -383,10 +391,12 @@ export class Poracle {
           pokemon[field] === undefined ? defaults[field] : pokemon[field]
       })
 
-      payload.min_iv =
-        pokemon.min_iv === undefined ? defaults.min_iv : pokemon.min_iv
-      payload.max_iv =
-        pokemon.max_iv === undefined ? defaults.max_iv : pokemon.max_iv
+      if (!omitIvBounds) {
+        payload.min_iv =
+          pokemon.min_iv === undefined ? defaults.min_iv : pokemon.min_iv
+        payload.max_iv =
+          pokemon.max_iv === undefined ? defaults.max_iv : pokemon.max_iv
+      }
 
       POKEMON_RANGE_GROUPS.forEach(([low, high]) => {
         payload[low] = pokemon[low] === undefined ? defaults[low] : pokemon[low]
