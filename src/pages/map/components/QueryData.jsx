@@ -12,6 +12,7 @@ import { FILTER_SKIP_LIST } from '@assets/constants'
 import { Notification } from '@components/Notification'
 import { GenerateCells } from '@features/s2cell'
 import { RouteLayer } from '@features/route'
+import { ActiveWeather } from '@features/weather'
 import { useAnalytics } from '@hooks/useAnalytics'
 import { useProcessError } from '@hooks/useProcessError'
 import { normalizeCategory } from '@utils/normalizeCategory'
@@ -230,10 +231,13 @@ function QueryData({ category, timeout }) {
   }
 
   return (
-    <Clustering category={category}>
-      {filteredData.map((each) => (
-        <Component key={each.id || category} {...each} />
-      ))}
-    </Clustering>
+    <>
+      <Clustering category={category}>
+        {filteredData.map((each) => (
+          <Component key={each.id || category} {...each} />
+        ))}
+      </Clustering>
+      {category === 'weather' && <ActiveWeather weatherData={filteredData} />}
+    </>
   )
 }

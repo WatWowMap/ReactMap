@@ -7,7 +7,6 @@ import { useStorage } from '@store/useStorage'
 import { useMapStore } from '@store/useMapStore'
 import { ScanOnDemand } from '@features/scanner'
 import { WebhookMarker, WebhookAreaSelection } from '@features/webhooks'
-import { ActiveWeather } from '@features/weather'
 import { timeCheck } from '@utils/timeCheck'
 
 import { Effects } from './Effects'
@@ -66,7 +65,6 @@ export function Container() {
       <WebhookMarker />
       <WebhookAreaSelection />
       <Nav />
-      <ActiveWeather />
     </MapContainer>
   )
 }
