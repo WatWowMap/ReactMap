@@ -36,6 +36,11 @@ const POKEMON_RANGE_GROUPS = [
   ['min_weight', 'max_weight'],
 ]
 
+const POKEMON_PVP_RANGE_GROUPS = [
+  ['rarity', 'max_rarity'],
+  ['size', 'max_size'],
+]
+
 const POKEMON_OMITTABLE_FIELDS = [
   ...new Set([
     ...POKEMON_SCALAR_FIELDS,
@@ -431,6 +436,9 @@ export class Poracle {
       const omittedFields = { ...(pokemon.omittedFields || {}) }
       const hasPvpEntry = pokemon.pvpEntry && pokemon.pvp_ranking_league
       const includeNoIv = pokemon.noIv && !hasPvpEntry
+      const rangeGroups = hasPvpEntry
+        ? POKEMON_PVP_RANGE_GROUPS
+        : POKEMON_RANGE_GROUPS
       const setPokemonField = (field) => {
         if (
           !Poracle.shouldOmitPokemonField(
@@ -460,7 +468,9 @@ export class Poracle {
 
       POKEMON_SCALAR_FIELDS.forEach(setPokemonField)
 
-      if (includeNoIv) {
+      if (hasPvpEntry) {
+        // PvP alerts intentionally ignore regular IV/stat ranges.
+      } else if (includeNoIv) {
         payload.min_iv = Poracle.getPokemonFieldValue(
           pokemon,
           defaults,
@@ -475,7 +485,7 @@ export class Poracle {
         ;['min_iv', 'max_iv'].forEach(setPokemonField)
       }
 
-      POKEMON_RANGE_GROUPS.forEach(([low, high]) => {
+      rangeGroups.forEach(([low, high]) => {
         setPokemonField(low)
         setPokemonField(high)
       })
@@ -496,6 +506,9 @@ export class Poracle {
       const payload = {}
       const hasPvpEntry = pokemon.pvpEntry && pokemon.pvp_ranking_league
       const includeNoIv = pokemon.noIv && !hasPvpEntry
+      const rangeGroups = hasPvpEntry
+        ? POKEMON_PVP_RANGE_GROUPS
+        : POKEMON_RANGE_GROUPS
 
       POKEMON_CREATE_REQUIRED_FIELDS.forEach((field) => {
         if (pokemon[field] !== undefined) {
@@ -516,7 +529,9 @@ export class Poracle {
         }
       })
 
-      if (includeNoIv) {
+      if (hasPvpEntry) {
+        // PvP alerts intentionally ignore regular IV/stat ranges.
+      } else if (includeNoIv) {
         payload.min_iv =
           pokemon.min_iv === undefined ? defaults.min_iv : pokemon.min_iv
         payload.max_iv =
@@ -531,7 +546,7 @@ export class Poracle {
         payload.max_iv = pokemon.max_iv
       }
 
-      POKEMON_RANGE_GROUPS.forEach(([low, high]) => {
+      rangeGroups.forEach(([low, high]) => {
         if (
           pokemon[low] !== undefined &&
           pokemon[high] !== undefined &&
