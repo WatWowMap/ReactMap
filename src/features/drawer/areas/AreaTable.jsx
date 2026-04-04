@@ -18,6 +18,8 @@ import { useMemory } from '@store/useMemory'
 import { useStorage } from '@store/useStorage'
 import { useMapStore } from '@store/useMapStore'
 
+import { useDrawerScrollMemory } from '../hooks/useScrollMemory'
+
 /** @typedef {{ id: string, name: string, lat: number, lon: number }} JumpResult */
 
 import { AreaParent } from './Parent'
@@ -32,6 +34,7 @@ export function ScanAreasTable() {
   const trimmedSearch = React.useMemo(() => rawSearch.trim(), [rawSearch])
   const { misc, general } = useMemory.getState().config
   const jumpZoom = general?.scanAreasZoom || general?.startZoom || 12
+  const tableScrollMemory = useDrawerScrollMemory('scanAreas:table')
   /** @type {[JumpResult[], React.Dispatch<React.SetStateAction<JumpResult[]>>]} */
   const [jumpResults, setJumpResults] = React.useState([])
   const [jumpLoading, setJumpLoading] = React.useState(false)
@@ -161,6 +164,7 @@ export function ScanAreasTable() {
   return (
     <TableContainer
       component={Paper}
+      ref={tableScrollMemory.ref}
       sx={{
         minHeight: 50,
         maxHeight: misc.scanAreaMenuHeight || 400,
