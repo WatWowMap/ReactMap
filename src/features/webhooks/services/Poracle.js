@@ -305,6 +305,15 @@ export class Poracle {
 
         if (pokemon.pvpEntry) {
           fields.push(...POKEMON_PVP_FIELDS)
+          if (includeUiState) {
+            fields.push(
+              ...Object.keys(defaults).filter(
+                (key) =>
+                  !POKEMON_PVP_FIELDS.includes(key) &&
+                  !ignoredFields.includes(key),
+              ),
+            )
+          }
         } else {
           fields.push(
             ...Object.keys(normalized).filter(
