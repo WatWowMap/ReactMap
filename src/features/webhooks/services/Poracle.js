@@ -52,12 +52,6 @@ const POKEMON_OMITTABLE_FIELDS = [
 ]
 
 export class Poracle {
-  static getPokemonPvpDefaults(defaults = {}) {
-    return Object.fromEntries(
-      POKEMON_PVP_FIELDS.map((field) => [field, defaults[field]]),
-    )
-  }
-
   static getMapCategory(poracleCategory) {
     switch (poracleCategory) {
       case 'gym':
@@ -499,7 +493,22 @@ export class Poracle {
         setPokemonField(high)
       })
 
-      POKEMON_PVP_FIELDS.forEach(setPokemonField)
+      if (hasPvpEntry) {
+        POKEMON_PVP_FIELDS.forEach(setPokemonField)
+      } else if (
+        !POKEMON_PVP_FIELDS.every((field) =>
+          Poracle.shouldOmitPokemonField(
+            pokemon,
+            defaults,
+            omittedFields,
+            field,
+          ),
+        )
+      ) {
+        POKEMON_PVP_FIELDS.forEach((field) => {
+          payload[field] = defaults[field]
+        })
+      }
 
       return payload
     })
