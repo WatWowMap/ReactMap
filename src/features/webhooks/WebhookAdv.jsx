@@ -171,13 +171,16 @@ export function WebhookAdvanced() {
   const handleSlider = React.useCallback(
     (low, high) => (name, values) => {
       const isPvp = name.startsWith('pvp')
-      const keepsPvp = isPvp || name === 'size'
       setFilterValues((prev) => ({ ...prev, [name]: values }))
       setPoracleValues((prev) => ({
         ...prev,
         [low]: values[0],
         [high]: values[1],
-        pvpEntry: keepsPvp ? !!prev.pvp_ranking_league : false,
+        pvpEntry: isPvp
+          ? !!prev.pvp_ranking_league
+          : name === 'size'
+            ? prev.pvpEntry && !!prev.pvp_ranking_league
+            : false,
         noIv: isPvp && prev.pvp_ranking_league ? false : prev.noIv,
       }))
     },
