@@ -250,13 +250,11 @@ export class Poracle {
       return Poracle.toLocalState(category, entries, defaults)
     }
 
-    return Poracle.toLocalState(
-      category,
-      entries.map((pokemon, index) => ({
+    return Poracle.toLocalState(category, entries, defaults).map(
+      (pokemon, index) => ({
         ...pokemon,
         omittedFields: Poracle.getPokemonOmittedFields(payload[index]),
-      })),
-      defaults,
+      }),
     )
   }
 
@@ -431,6 +429,8 @@ export class Poracle {
     return processed.map((pokemon) => {
       const payload = {}
       const omittedFields = { ...(pokemon.omittedFields || {}) }
+      const hasPvpEntry = pokemon.pvpEntry && pokemon.pvp_ranking_league
+      const includeNoIv = pokemon.noIv && !hasPvpEntry
       const setPokemonField = (field) => {
         if (
           !Poracle.shouldOmitPokemonField(
@@ -460,7 +460,7 @@ export class Poracle {
 
       POKEMON_SCALAR_FIELDS.forEach(setPokemonField)
 
-      if (pokemon.noIv) {
+      if (includeNoIv) {
         payload.min_iv = Poracle.getPokemonFieldValue(
           pokemon,
           defaults,
@@ -494,6 +494,8 @@ export class Poracle {
 
     return processed.map((pokemon) => {
       const payload = {}
+      const hasPvpEntry = pokemon.pvpEntry && pokemon.pvp_ranking_league
+      const includeNoIv = pokemon.noIv && !hasPvpEntry
 
       POKEMON_CREATE_REQUIRED_FIELDS.forEach((field) => {
         if (pokemon[field] !== undefined) {
@@ -514,7 +516,7 @@ export class Poracle {
         }
       })
 
-      if (pokemon.noIv) {
+      if (includeNoIv) {
         payload.min_iv =
           pokemon.min_iv === undefined ? defaults.min_iv : pokemon.min_iv
         payload.max_iv =
@@ -547,11 +549,11 @@ export class Poracle {
         payload.max_weight = defaults.max_weight
       }
 
-      if (pokemon.noIv) {
+      if (includeNoIv) {
         return payload
       }
 
-      if (pokemon.pvpEntry && pokemon.pvp_ranking_league) {
+      if (hasPvpEntry) {
         POKEMON_PVP_FIELDS.forEach((field) => {
           if (pokemon[field] !== undefined) {
             payload[field] = pokemon[field]

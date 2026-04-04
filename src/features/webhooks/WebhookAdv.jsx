@@ -170,12 +170,14 @@ export function WebhookAdvanced() {
 
   const handleSlider = React.useCallback(
     (low, high) => (name, values) => {
+      const isPvp = name.startsWith('pvp')
       setFilterValues((prev) => ({ ...prev, [name]: values }))
       setPoracleValues((prev) => ({
         ...prev,
         [low]: values[0],
         [high]: values[1],
-        pvpEntry: name.startsWith('pvp'),
+        pvpEntry: isPvp,
+        noIv: isPvp ? false : prev.noIv,
       }))
     },
     [],
@@ -247,6 +249,7 @@ export function WebhookAdvanced() {
     }
     if (name.startsWith('pvp')) {
       newObj.pvpEntry = true
+      newObj.noIv = false
     }
     if (name === 'move' && value !== 9000) {
       newObj.allMoves = false
