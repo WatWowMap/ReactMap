@@ -176,7 +176,7 @@ export function WebhookAdvanced() {
         ...prev,
         [low]: values[0],
         [high]: values[1],
-        pvpEntry: isPvp ? !!prev.pvp_ranking_league : prev.pvpEntry,
+        pvpEntry: isPvp ? !!prev.pvp_ranking_league : false,
         noIv: isPvp && prev.pvp_ranking_league ? false : prev.noIv,
       }))
     },
