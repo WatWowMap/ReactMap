@@ -325,6 +325,9 @@ export class Poracle {
                 !ignoredFields.includes(key),
             ),
           )
+          if (includeUiState) {
+            fields.push(...POKEMON_PVP_FIELDS)
+          }
         }
 
         new Set(fields).forEach((field) => {
