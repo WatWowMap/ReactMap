@@ -430,7 +430,7 @@ export class Poracle {
 
     return processed.map((pokemon) => {
       const payload = {}
-      const omittedFields = Poracle.getPokemonOmittedFields(pokemon)
+      const omittedFields = { ...(pokemon.omittedFields || {}) }
 
       POKEMON_UPDATE_REQUIRED_FIELDS.forEach((field) => {
         if (pokemon[field] !== undefined) {
