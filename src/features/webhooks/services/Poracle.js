@@ -431,6 +431,22 @@ export class Poracle {
     return processed.map((pokemon) => {
       const payload = {}
       const omittedFields = { ...(pokemon.omittedFields || {}) }
+      const setPokemonField = (field) => {
+        if (
+          !Poracle.shouldOmitPokemonField(
+            pokemon,
+            defaults,
+            omittedFields,
+            field,
+          )
+        ) {
+          payload[field] = Poracle.getPokemonFieldValue(
+            pokemon,
+            defaults,
+            field,
+          )
+        }
+      }
 
       POKEMON_UPDATE_REQUIRED_FIELDS.forEach((field) => {
         if (pokemon[field] !== undefined) {
@@ -442,31 +458,9 @@ export class Poracle {
         payload.ping = pokemon.ping
       }
 
-      POKEMON_SCALAR_FIELDS.forEach((field) => {
-        const value = Poracle.getPokemonFieldValue(pokemon, defaults, field)
-        if (
-          !Poracle.shouldOmitPokemonField(
-            pokemon,
-            defaults,
-            omittedFields,
-            field,
-          )
-        ) {
-          payload[field] = value
-        }
-      })
+      POKEMON_SCALAR_FIELDS.forEach(setPokemonField)
 
-      if (
-        pokemon.noIv ||
-        !['min_iv', 'max_iv'].every((field) =>
-          Poracle.shouldOmitPokemonField(
-            pokemon,
-            defaults,
-            omittedFields,
-            field,
-          ),
-        )
-      ) {
+      if (pokemon.noIv) {
         payload.min_iv = Poracle.getPokemonFieldValue(
           pokemon,
           defaults,
@@ -477,46 +471,16 @@ export class Poracle {
           defaults,
           'max_iv',
         )
+      } else {
+        ;['min_iv', 'max_iv'].forEach(setPokemonField)
       }
 
       POKEMON_RANGE_GROUPS.forEach(([low, high]) => {
-        if (
-          ![low, high].every((field) =>
-            Poracle.shouldOmitPokemonField(
-              pokemon,
-              defaults,
-              omittedFields,
-              field,
-            ),
-          )
-        ) {
-          payload[low] = Poracle.getPokemonFieldValue(pokemon, defaults, low)
-          payload[high] = Poracle.getPokemonFieldValue(pokemon, defaults, high)
-        }
+        setPokemonField(low)
+        setPokemonField(high)
       })
 
-      if (pokemon.pvpEntry && pokemon.pvp_ranking_league) {
-        POKEMON_PVP_FIELDS.forEach((field) => {
-          payload[field] = Poracle.getPokemonFieldValue(
-            pokemon,
-            defaults,
-            field,
-          )
-        })
-      } else if (
-        !POKEMON_PVP_FIELDS.every((field) =>
-          Poracle.shouldOmitPokemonField(
-            pokemon,
-            defaults,
-            omittedFields,
-            field,
-          ),
-        )
-      ) {
-        POKEMON_PVP_FIELDS.forEach((field) => {
-          payload[field] = defaults[field]
-        })
-      }
+      POKEMON_PVP_FIELDS.forEach(setPokemonField)
 
       return payload
     })
