@@ -168,23 +168,38 @@ export function WebhookAdvanced() {
     }))
   }, [selectedIds])
 
+  const normalizePokemonPvpValues = React.useCallback(
+    (nextPoracleValues) =>
+      nextPoracleValues.pvpEntry
+        ? nextPoracleValues
+        : {
+            ...nextPoracleValues,
+            ...Poracle.getPokemonPvpDefaults(info?.defaults),
+          },
+    [info?.defaults],
+  )
+
   const handleSlider = React.useCallback(
     (low, high) => (name, values) => {
       const isPvp = name.startsWith('pvp')
-      setFilterValues((prev) => ({ ...prev, [name]: values }))
-      setPoracleValues((prev) => ({
-        ...prev,
+      const nextPoracleValues = normalizePokemonPvpValues({
+        ...poracleValues,
         [low]: values[0],
         [high]: values[1],
         pvpEntry: isPvp
-          ? !!prev.pvp_ranking_league
+          ? !!poracleValues.pvp_ranking_league
           : name === 'size'
-            ? prev.pvpEntry && !!prev.pvp_ranking_league
+            ? poracleValues.pvpEntry && !!poracleValues.pvp_ranking_league
             : false,
-        noIv: isPvp && prev.pvp_ranking_league ? false : prev.noIv,
-      }))
+        noIv:
+          isPvp && poracleValues.pvp_ranking_league
+            ? false
+            : poracleValues.noIv,
+      })
+      setFilterValues(Poracle.reactMapFriendly(nextPoracleValues))
+      setPoracleValues(nextPoracleValues)
     },
-    [],
+    [normalizePokemonPvpValues, poracleValues],
   )
 
   const handleSwitch = (event) => {
@@ -213,20 +228,23 @@ export function WebhookAdvanced() {
         })
         break
       case 'noIv':
-        setPoracleValues({
-          ...poracleValues,
-          [name]: checked,
-          pvpEntry: false,
-        })
+        {
+          const nextPoracleValues = normalizePokemonPvpValues({
+            ...poracleValues,
+            [name]: checked,
+            pvpEntry: false,
+          })
+          setPoracleValues(nextPoracleValues)
+          setFilterValues(Poracle.reactMapFriendly(nextPoracleValues))
+        }
         break
       case 'pvpEntry':
         {
-          const nextPoracleValues = {
+          const nextPoracleValues = normalizePokemonPvpValues({
             ...poracleValues,
-            ...(checked ? {} : Poracle.getPokemonPvpDefaults(info?.defaults)),
             [name]: checked,
             noIv: false,
-          }
+          })
           setPoracleValues(nextPoracleValues)
           setFilterValues(Poracle.reactMapFriendly(nextPoracleValues))
         }
@@ -272,7 +290,16 @@ export function WebhookAdvanced() {
     if (name === 'template') {
       newObj[name] = value?.toString() || ''
     }
-    setPoracleValues({ ...poracleValues, ...newObj })
+    {
+      const nextPoracleValues = normalizePokemonPvpValues({
+        ...poracleValues,
+        ...newObj,
+      })
+      setPoracleValues(nextPoracleValues)
+      if (name.startsWith('pvp')) {
+        setFilterValues(Poracle.reactMapFriendly(nextPoracleValues))
+      }
+    }
   }
 
   const handleChange = (panel) => (_, isExpanded) => {
