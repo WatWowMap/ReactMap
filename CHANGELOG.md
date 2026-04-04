@@ -1,3 +1,10 @@
+## [1.41.2-develop.4](https://github.com/WatWowMap/ReactMap/compare/v1.41.2-develop.3...v1.41.2-develop.4) (2026-04-04)
+
+
+### Bug Fixes
+
+* restore drawer sublist scroll positions ([8950dd5](https://github.com/WatWowMap/ReactMap/commit/8950dd56745be7ee591ccfffe6e97b6cfafb34fc))
+
 ## [1.41.2-develop.3](https://github.com/WatWowMap/ReactMap/compare/v1.41.2-develop.2...v1.41.2-develop.3) (2026-04-03)
 
 
