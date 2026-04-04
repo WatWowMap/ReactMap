@@ -52,6 +52,12 @@ const POKEMON_OMITTABLE_FIELDS = [
 ]
 
 export class Poracle {
+  static getPokemonPvpDefaults(defaults = {}) {
+    return Object.fromEntries(
+      POKEMON_PVP_FIELDS.map((field) => [field, defaults[field]]),
+    )
+  }
+
   static getMapCategory(poracleCategory) {
     switch (poracleCategory) {
       case 'gym':

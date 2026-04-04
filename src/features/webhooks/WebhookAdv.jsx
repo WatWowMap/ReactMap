@@ -220,11 +220,16 @@ export function WebhookAdvanced() {
         })
         break
       case 'pvpEntry':
-        setPoracleValues({
-          ...poracleValues,
-          [name]: checked,
-          noIv: false,
-        })
+        {
+          const nextPoracleValues = {
+            ...poracleValues,
+            ...(checked ? {} : Poracle.getPokemonPvpDefaults(info?.defaults)),
+            [name]: checked,
+            noIv: false,
+          }
+          setPoracleValues(nextPoracleValues)
+          setFilterValues(Poracle.reactMapFriendly(nextPoracleValues))
+        }
         break
       case 'allMoves':
         setPoracleValues({
