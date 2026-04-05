@@ -1084,10 +1084,15 @@ class Station extends Model {
       if (hasMultiBattles) {
         select.push(
           ...getAliasedStationSelect(STATION_SEARCH_BATTLE_FIELDS, 'station_'),
-          getSearchBattleJsonSubquery(knexRef, pokemonIds, ts).as(
-            'search_battle',
-          ),
+          getSearchBattleJsonSubquery(knexRef, [], ts).as('display_battle'),
         )
+        if (pokemonIds.length) {
+          select.push(
+            getSearchBattleJsonSubquery(knexRef, pokemonIds, ts).as(
+              'matched_battle',
+            ),
+          )
+        }
       } else {
         select.push(...getStationSelect(STATION_SEARCH_BATTLE_FIELDS))
       }
@@ -1152,21 +1157,26 @@ class Station extends Model {
       return rows
     }
     return rows.map((row) => {
+      const matchedBattle =
+        typeof row.matched_battle === 'string'
+          ? JSON.parse(row.matched_battle)
+          : row.matched_battle
       const searchBattle =
-        typeof row.search_battle === 'string'
-          ? JSON.parse(row.search_battle)
-          : row.search_battle
+        typeof row.display_battle === 'string'
+          ? JSON.parse(row.display_battle)
+          : row.display_battle
       const legacyBattle = getAliasedStationBattle(row, 'station', ts, null)
-      const displayBattle = pokemonIds.length
-        ? searchBattle || legacyBattle
-        : getPreferredStationBattle([legacyBattle, searchBattle], ts)
+      const displayBattle =
+        matchedBattle ||
+        getPreferredStationBattle([legacyBattle, searchBattle], ts)
       STATION_SEARCH_BATTLE_FIELDS.forEach((field) => {
         row[field] = displayBattle
           ? (displayBattle[field] ?? null)
           : (row[`station_${field}`] ?? null)
         delete row[`station_${field}`]
       })
-      delete row.search_battle
+      delete row.display_battle
+      delete row.matched_battle
       return row
     })
   }
