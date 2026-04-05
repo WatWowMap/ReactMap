@@ -302,8 +302,11 @@ function normalizeStationBattleIdentityField(field, value) {
     return !Number.isFinite(battleStart) || battleStart === 0 ? '' : battleStart
   }
   if (STATION_SEARCH_BATTLE_STRICT_FIELDS.includes(field)) {
+    if (value === null || value === undefined || value === '') {
+      return ''
+    }
     const variantValue = Number(value)
-    return Number.isFinite(variantValue) && variantValue > 0 ? variantValue : ''
+    return Number.isFinite(variantValue) ? variantValue : ''
   }
   const numericValue = Number(value)
   return Number.isFinite(numericValue) && numericValue > 0
