@@ -524,7 +524,10 @@ function StationContent({ start_time, end_time, battle_end, id }) {
   const startEpoch = hasStartTime ? start_time : 0
   const isFutureStart = hasStartTime && startEpoch > now
   const displayInactiveOnly =
-    Number.isFinite(battle_end) && hasEndTime && battle_end === endEpoch
+    !isFutureStart &&
+    Number.isFinite(battle_end) &&
+    hasEndTime &&
+    battle_end === endEpoch
   const epoch = displayInactiveOnly
     ? endEpoch
     : isFutureStart
