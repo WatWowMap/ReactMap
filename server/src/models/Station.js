@@ -312,7 +312,7 @@ function isStationBattleActive(battle, ts) {
  * @param {number} ts
  * @returns {number}
  */
-function compareStationBattles(left, right, ts) {
+function compareStationBattleTiming(left, right, ts) {
   const leftActive = isStationBattleActive(left, ts)
   const rightActive = isStationBattleActive(right, ts)
   if (leftActive !== rightActive) {
@@ -331,6 +331,21 @@ function compareStationBattles(left, right, ts) {
   const rightEnd = Number(right?.battle_end) || 0
   if (leftEnd !== rightEnd) {
     return rightEnd - leftEnd
+  }
+
+  return 0
+}
+
+/**
+ * @param {import('@rm/types').StationBattle | null | undefined} left
+ * @param {import('@rm/types').StationBattle | null | undefined} right
+ * @param {number} ts
+ * @returns {number}
+ */
+function compareStationBattles(left, right, ts) {
+  const timingComparison = compareStationBattleTiming(left, right, ts)
+  if (timingComparison) {
+    return timingComparison
   }
 
   return getStationBattleIdentity(left).localeCompare(
@@ -1179,10 +1194,22 @@ class Station extends Model {
         pokemonIds.includes(legacyBattle.battle_pokemon_id)
           ? legacyBattle
           : null
-      const matchedDisplayBattle = getPreferredStationBattle(
-        [matchedBattle, matchedLegacyBattle],
-        ts,
-      )
+      let matchedDisplayBattle = matchedBattle || matchedLegacyBattle || null
+      if (matchedBattle && matchedLegacyBattle) {
+        const timingComparison = compareStationBattleTiming(
+          matchedBattle,
+          matchedLegacyBattle,
+          ts,
+        )
+        if (timingComparison > 0) {
+          matchedDisplayBattle = matchedLegacyBattle
+        } else if (timingComparison === 0) {
+          matchedDisplayBattle = {
+            ...matchedLegacyBattle,
+            ...matchedBattle,
+          }
+        }
+      }
       const displayBattle =
         matchedDisplayBattle ||
         getPreferredStationBattle([legacyBattle, searchBattle], ts)
