@@ -47,6 +47,12 @@ const STATION_SEARCH_BATTLE_FIELDS = [
   'battle_pokemon_bread_mode',
   'battle_end',
 ]
+const STATION_SEARCH_BATTLE_STRICT_FIELDS = [
+  'battle_pokemon_costume',
+  'battle_pokemon_gender',
+  'battle_pokemon_alignment',
+  'battle_pokemon_bread_mode',
+]
 
 /**
  * @param {import('ohbem').PokemonData | null} pokemonData
@@ -422,7 +428,10 @@ function canReuseStationBattleDetails(left, right) {
       field,
       right?.[field],
     )
-    return leftValue === rightValue
+    if (STATION_SEARCH_BATTLE_STRICT_FIELDS.includes(field)) {
+      return leftValue === rightValue
+    }
+    return leftValue == null || rightValue == null || leftValue === rightValue
   })
 }
 
