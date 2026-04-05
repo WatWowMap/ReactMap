@@ -170,7 +170,7 @@ function addSearchBattleMatchOrder(builder, alias, ts) {
  * @param {number[]} pokemonIds
  * @param {number} ts
  */
-function getMatchedSearchBattleJsonSubquery(knexRef, pokemonIds, ts) {
+function getSearchBattleJsonSubquery(knexRef, pokemonIds, ts) {
   const jsonFields = STATION_SEARCH_BATTLE_FIELDS.flatMap((field) => [
     `'${field}'`,
     `${STATION_BATTLE_SEARCH_ALIAS}.${field}`,
@@ -179,11 +179,16 @@ function getMatchedSearchBattleJsonSubquery(knexRef, pokemonIds, ts) {
   return knexRef(STATION_BATTLE_SEARCH_TABLE)
     .select(raw(`JSON_OBJECT(${jsonFields})`))
     .whereRaw(`${STATION_BATTLE_SEARCH_ALIAS}.station_id = ${STATION_TABLE}.id`)
-    .whereIn(`${STATION_BATTLE_SEARCH_ALIAS}.battle_pokemon_id`, pokemonIds)
     .andWhere(`${STATION_BATTLE_SEARCH_ALIAS}.battle_end`, '>', ts)
-    .modify((builder) =>
-      addSearchBattleMatchOrder(builder, STATION_BATTLE_SEARCH_ALIAS, ts),
-    )
+    .modify((builder) => {
+      if (pokemonIds.length) {
+        builder.whereIn(
+          `${STATION_BATTLE_SEARCH_ALIAS}.battle_pokemon_id`,
+          pokemonIds,
+        )
+      }
+      addSearchBattleMatchOrder(builder, STATION_BATTLE_SEARCH_ALIAS, ts)
+    })
     .limit(1)
 }
 
@@ -389,9 +394,28 @@ function matchesStationBattleFilter(
 /**
  * @param {import('@rm/types').FullStation} station
  * @param {import('ohbem').PokemonData | null} pokemonData
+ * @param {number} ts
  */
-function finalizeStation(station, pokemonData) {
-  if (station.is_battle_available && station.battle_pokemon_id === null) {
+function finalizeStation(station, pokemonData, ts) {
+  const hasJoinedAvailableBattle =
+    Array.isArray(station.battles) &&
+    station.battles.some((battle) => {
+      if (
+        battle?.battle_pokemon_id == null ||
+        !(Number(battle?.battle_end) > ts)
+      ) {
+        return false
+      }
+      const battleStart = Number(battle?.battle_start)
+      return (
+        !Number.isFinite(battleStart) || battleStart === 0 || battleStart <= ts
+      )
+    })
+  if (
+    station.is_battle_available &&
+    station.battle_pokemon_id === null &&
+    !hasJoinedAvailableBattle
+  ) {
     station.is_battle_available = false
   }
   if (station.total_stationed_pokemon === null) {
@@ -741,7 +765,7 @@ class Station extends Model {
           )
           station.battles = fallbackBattle ? [fallbackBattle] : []
         }
-        return finalizeStation(station, pokemonData)
+        return finalizeStation(station, pokemonData, ts)
       })
     }
 
@@ -785,7 +809,7 @@ class Station extends Model {
       if (!station.battles.length && fallbackBattle) {
         station.battles = [fallbackBattle]
       }
-      return finalizeStation(station, pokemonData)
+      return finalizeStation(station, pokemonData, ts)
     })
   }
 
@@ -934,11 +958,11 @@ class Station extends Model {
 
     const select = [...getStationSelect(['id', 'name', 'lat', 'lon']), distance]
     if (perms.dynamax) {
-      if (hasMultiBattles && pokemonIds.length) {
+      if (hasMultiBattles) {
         select.push(
           ...getAliasedStationSelect(STATION_SEARCH_BATTLE_FIELDS, 'station_'),
-          getMatchedSearchBattleJsonSubquery(knexRef, pokemonIds, ts).as(
-            'matched_battle',
+          getSearchBattleJsonSubquery(knexRef, pokemonIds, ts).as(
+            'search_battle',
           ),
         )
       } else {
@@ -1001,23 +1025,22 @@ class Station extends Model {
       return []
     }
     const rows = await query
-    if (!(perms.dynamax && hasMultiBattles && pokemonIds.length)) {
+    if (!(perms.dynamax && hasMultiBattles)) {
       return rows
     }
     return rows.map((row) => {
-      const matchedBattle =
-        typeof row.matched_battle === 'string'
-          ? JSON.parse(row.matched_battle)
-          : row.matched_battle
-      const hasMatchedBattle =
-        matchedBattle && typeof matchedBattle === 'object'
+      const searchBattle =
+        typeof row.search_battle === 'string'
+          ? JSON.parse(row.search_battle)
+          : row.search_battle
+      const hasSearchBattle = searchBattle && typeof searchBattle === 'object'
       STATION_SEARCH_BATTLE_FIELDS.forEach((field) => {
-        row[field] = hasMatchedBattle
-          ? matchedBattle[field]
+        row[field] = hasSearchBattle
+          ? searchBattle[field]
           : row[`station_${field}`]
         delete row[`station_${field}`]
       })
-      delete row.matched_battle
+      delete row.search_battle
       return row
     })
   }
