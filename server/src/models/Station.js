@@ -283,7 +283,15 @@ function getFallbackStationBattle(station, ts, pokemonData) {
  * @returns {string}
  */
 function getStationBattleIdentity(battle) {
-  return STATION_BATTLE_FIELDS.map((field) => battle?.[field] ?? '').join(':')
+  return STATION_BATTLE_FIELDS.map((field) => {
+    if (field === 'battle_start') {
+      const battleStart = Number(battle?.[field])
+      return !Number.isFinite(battleStart) || battleStart === 0
+        ? ''
+        : battleStart
+    }
+    return battle?.[field] ?? ''
+  }).join(':')
 }
 
 /**
