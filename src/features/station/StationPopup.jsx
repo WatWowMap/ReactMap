@@ -16,6 +16,7 @@ import MenuItem from '@mui/material/MenuItem'
 import Typography from '@mui/material/Typography'
 import Stack from '@mui/material/Stack'
 import Box from '@mui/material/Box'
+import Divider from '@mui/material/Divider'
 
 import { useMemory } from '@store/useMemory'
 import { setDeepStore, useGetDeepStore, useStorage } from '@store/useStorage'
@@ -42,11 +43,17 @@ import { CopyCoords } from '@components/popups/Coords'
 import Tooltip from '@mui/material/Tooltip'
 import { usePokemonBackgroundVisuals } from '@hooks/usePokemonBackgroundVisuals'
 
+import { getStationBattleKey, getStationBattleState } from './battleState'
 import { useGetStationMons } from './useGetStationMons'
 
 /** @param {import('@rm/types').Station} station */
 export function StationPopup(station) {
   useAnalytics('Popup', 'Station')
+  const now = Date.now() / 1000
+  const battleState = getStationBattleState(station, now)
+  const hasVisibleBattle = !!battleState.visibleBattle
+  const hasStationMons =
+    hasVisibleBattle && !!battleState.visibleBattle?.battle_pokemon_id
 
   return (
     <Card sx={{ width: 200 }} elevation={0}>
@@ -54,9 +61,14 @@ export function StationPopup(station) {
         <StationHeader {...station} />
         <StationMenu {...station} />
       </Box>
-      <StationMedia {...station} />
-      {station.battle_start < Date.now() / 1000 &&
-        station.battle_end > Date.now() / 1000 &&
+      <StationBattles
+        popupBattles={battleState.popupBattles}
+        visibleBattle={battleState.visibleBattle}
+        end_time={station.end_time}
+        is_battle_available={station.is_battle_available}
+      />
+      {hasVisibleBattle &&
+        hasStationMons &&
         !!station.total_stationed_pokemon && (
           <ExpandCollapse>
             <StationAttackBonus {...station} />
@@ -224,8 +236,48 @@ function StationMenu({
   )
 }
 
-/** @param {import('@rm/types').Station} props */
-function StationMedia({
+/**
+ * @param {{
+ *  popupBattles: import('@rm/types').StationBattle[]
+ *  visibleBattle: import('@rm/types').StationBattle | null
+ *  end_time?: number
+ *  is_battle_available: boolean
+ * }} props
+ */
+function StationBattles({
+  popupBattles,
+  visibleBattle,
+  end_time,
+  is_battle_available,
+}) {
+  if (!popupBattles.length) {
+    return null
+  }
+
+  return popupBattles.map((battle, index) => (
+    <React.Fragment key={getStationBattleKey(battle)}>
+      {!!index && <Divider light flexItem className="popup-divider" />}
+      <StationBattleSection
+        {...battle}
+        end_time={end_time}
+        is_battle_available={is_battle_available}
+        hidden={
+          !visibleBattle ||
+          getStationBattleKey(battle) !== getStationBattleKey(visibleBattle)
+        }
+      />
+    </React.Fragment>
+  ))
+}
+
+/**
+ * @param {import('@rm/types').StationBattle & {
+ *  end_time?: number
+ *  hidden?: boolean
+ *  is_battle_available: boolean
+ * }} props
+ */
+function StationBattleSection({
   battle_pokemon_id,
   battle_pokemon_form,
   battle_pokemon_alignment,
@@ -236,6 +288,7 @@ function StationMedia({
   battle_end,
   battle_start,
   end_time,
+  hidden = false,
   is_battle_available,
   battle_pokemon_stamina,
   battle_pokemon_cp_multiplier,
@@ -280,6 +333,7 @@ function StationMedia({
     : null
   const cpLabel = t('cp')
   const hpLabel = t('hp')
+  const textColor = hidden ? 'GrayText' : 'inherit'
   const pokemonFormLabel = getFormDisplay(
     battle_pokemon_id,
     battle_pokemon_form,
@@ -297,7 +351,7 @@ function StationMedia({
       }
     }
     const cpTypography = (
-      <Typography variant="caption" align="center">
+      <Typography variant="caption" align="center" color={textColor}>
         {cpLabel} {estimatedCpDisplay}
       </Typography>
     )
@@ -319,7 +373,7 @@ function StationMedia({
     )
   } else if (cpMultiplierDisplay) {
     cpLine = (
-      <Typography variant="caption" align="center">
+      <Typography variant="caption" align="center" color={textColor}>
         {t('station_battle_cp_multiplier', { value: cpMultiplierDisplay })}
       </Typography>
     )
@@ -333,9 +387,13 @@ function StationMedia({
   const countdownContent = showBattleCountdown ? (
     <CardContent sx={{ pt: 1, pb: 0 }}>
       <Stack spacing={0.5} alignItems="center" width="100%">
-        <StationBattleTimer start={isStarting} epoch={countdownEpoch} />
+        <StationBattleTimer
+          start={isStarting}
+          epoch={countdownEpoch}
+          hidden={hidden}
+        />
         {showBreadWindow && (
-          <Typography variant="caption" align="center">
+          <Typography variant="caption" align="center" color={textColor}>
             {t('bread_time_window')}
           </Typography>
         )}
@@ -348,19 +406,23 @@ function StationMedia({
       <CardMedia>
         <Box className="popup-card-media">
           <Stack className="flex-center">
-            <PokemonImg
-              id={battle_pokemon_id}
-              form={battle_pokemon_form}
-              costume={battle_pokemon_costume}
-              bread={battle_pokemon_bread_mode}
-              alignment={battle_pokemon_alignment}
-              gender={battle_pokemon_gender}
-              maxHeight="80%"
-              maxWidth="100%"
-            />
+            {!!battle_pokemon_id && (
+              <PokemonImg
+                id={battle_pokemon_id}
+                form={battle_pokemon_form}
+                costume={battle_pokemon_costume}
+                bread={battle_pokemon_bread_mode}
+                alignment={battle_pokemon_alignment}
+                gender={battle_pokemon_gender}
+                maxHeight="80%"
+                maxWidth="100%"
+                className={hidden ? 'disable-image' : undefined}
+                style={hidden ? { opacity: 0.65 } : undefined}
+              />
+            )}
             {!!pokemonFormLabel && (
               <Box textAlign="center">
-                <Typography variant="caption">
+                <Typography variant="caption" color={textColor}>
                   &nbsp;({pokemonFormLabel})
                 </Typography>
               </Box>
@@ -377,16 +439,21 @@ function StationMedia({
               justifyContent="space-evenly"
               width="100%"
               pb={0.5}
+              sx={hidden ? { opacity: 0.65 } : undefined}
             >
               {!!battle_pokemon_gender && (
-                <GenderIcon gender={battle_pokemon_gender} fontSize="medium" />
+                <GenderIcon
+                  gender={battle_pokemon_gender}
+                  fontSize="medium"
+                  color={hidden ? 'disabled' : undefined}
+                />
               )}
               {types.map((type) => (
                 <PokeType key={type} id={type} size="medium" />
               ))}
             </Stack>
             {!!battle_level && (
-              <Typography variant="caption" align="center">
+              <Typography variant="caption" align="center" color={textColor}>
                 {t(`max_battle_${battle_level}`)}
               </Typography>
             )}
@@ -394,7 +461,11 @@ function StationMedia({
               <Stack spacing={0} alignItems="center">
                 {cpLine}
                 {battleStaminaDisplay && (
-                  <Typography variant="caption" align="center">
+                  <Typography
+                    variant="caption"
+                    align="center"
+                    color={textColor}
+                  >
                     {hpLabel} {battleStaminaDisplay}
                   </Typography>
                 )}
@@ -615,9 +686,9 @@ function StationMons({ id, updated }) {
 }
 
 /**
- * @param {{ start?: boolean, epoch: number }} props
+ * @param {{ start?: boolean, epoch: number, hidden?: boolean }} props
  */
-function StationBattleTimer({ start = false, epoch }) {
+function StationBattleTimer({ start = false, epoch, hidden = false }) {
   const { t } = useTranslation()
   const hasEpoch = Number.isFinite(epoch) && epoch > 0
   const target = hasEpoch ? epoch * 1000 : 0
@@ -637,14 +708,15 @@ function StationBattleTimer({ start = false, epoch }) {
   }
 
   const locale = localStorage.getItem('i18nextLng') || 'en'
+  const textColor = hidden ? 'GrayText' : 'inherit'
 
   return (
     <Stack spacing={0} alignItems="center" width="100%">
-      <Typography variant="subtitle1" align="center">
+      <Typography variant="subtitle1" align="center" color={textColor}>
         {t(start ? 'starts' : 'ends')}:{' '}
         {new Date(target).toLocaleTimeString(locale)}
       </Typography>
-      <Typography variant="h6" align="center">
+      <Typography variant="h6" align="center" color={textColor}>
         {display.str.replace('days', t('days')).replace('day', t('day'))}
       </Typography>
     </Stack>

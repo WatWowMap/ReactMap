@@ -9,6 +9,23 @@ const { Logger, TAGS } = require('@rm/logger')
 const { getBboxFromCenter } = require('../utils/getBbox')
 const { getCache } = require('./cache')
 
+const STATION_BATTLE_REQUIRED_COLUMNS = [
+  'station_id',
+  'battle_level',
+  'battle_start',
+  'battle_end',
+  'battle_pokemon_id',
+  'battle_pokemon_form',
+  'battle_pokemon_costume',
+  'battle_pokemon_gender',
+  'battle_pokemon_alignment',
+  'battle_pokemon_bread_mode',
+  'battle_pokemon_move_1',
+  'battle_pokemon_move_2',
+  'battle_pokemon_stamina',
+  'battle_pokemon_cp_multiplier',
+]
+
 /**
  * @type {import("@rm/types").DbManagerClass}
  */
@@ -158,7 +175,15 @@ class DbManager extends Logger {
         'showcase_pokemon_form_id' in columns,
         'showcase_pokemon_type_id' in columns,
       ])
-    const stationColumns = await schema('station').columnInfo()
+    const [stationColumns, hasMultiBattles] = await Promise.all([
+      schema('station').columnInfo(),
+      schema('station_battle')
+        .columnInfo()
+        .then((columns) =>
+          STATION_BATTLE_REQUIRED_COLUMNS.every((column) => column in columns),
+        )
+        .catch(() => false),
+    ])
     const hasStationedGmax = 'total_stationed_gmax' in stationColumns
     const hasBattlePokemonStats =
       'battle_pokemon_stamina' in stationColumns &&
@@ -218,6 +243,7 @@ class DbManager extends Logger {
       hasShowcaseData,
       hasShowcaseForm,
       hasShowcaseType,
+      hasMultiBattles,
       hasStationedGmax,
       hasBattlePokemonStats,
       hasShortcode,

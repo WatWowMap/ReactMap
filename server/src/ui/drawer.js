@@ -74,6 +74,7 @@ function drawer(req, perms) {
         ? {
             allStations: perms.stations || BLOCKED,
             maxBattles: perms.dynamax || BLOCKED,
+            includeUpcoming: perms.dynamax || BLOCKED,
             gmaxStationed: perms.dynamax || BLOCKED,
             inactiveStations: perms.stations || BLOCKED,
           }
