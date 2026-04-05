@@ -804,9 +804,10 @@ class Station extends Model {
           matchesStationBattleFilter(fallbackBattle, battleFilterOptions)
         ) {
           station.battles = [fallbackBattle]
+        } else {
+          station.battles = []
         }
-      }
-      if (!station.battles.length && fallbackBattle) {
+      } else if (!station.battles.length && fallbackBattle) {
         station.battles = [fallbackBattle]
       }
       return finalizeStation(station, pokemonData, ts)
