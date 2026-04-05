@@ -601,21 +601,30 @@ class Station extends Model {
             const method = applied ? 'orWhere' : 'where'
             station[method]((battle) => {
               if (hasMultiBattles) {
-                battle.whereExists(
-                  this.knex()
-                    .select(1)
-                    .from(STATION_BATTLE_FILTER_TABLE)
-                    .whereRaw(
-                      `${STATION_BATTLE_FILTER_ALIAS}.station_id = station.id`,
-                    )
-                    .modify((subquery) => {
-                      addBattleFilterClause(
-                        subquery,
-                        `${STATION_BATTLE_FILTER_ALIAS}.`,
-                        battleFilterOptions,
+                battle.where((multiBattle) => {
+                  multiBattle.whereExists(
+                    this.knex()
+                      .select(1)
+                      .from(STATION_BATTLE_FILTER_TABLE)
+                      .whereRaw(
+                        `${STATION_BATTLE_FILTER_ALIAS}.station_id = station.id`,
                       )
-                    }),
-                )
+                      .modify((subquery) => {
+                        addBattleFilterClause(
+                          subquery,
+                          `${STATION_BATTLE_FILTER_ALIAS}.`,
+                          battleFilterOptions,
+                        )
+                      }),
+                  )
+                  multiBattle.orWhere((legacyBattle) => {
+                    addBattleFilterClause(
+                      legacyBattle,
+                      `${STATION_TABLE}.`,
+                      battleFilterOptions,
+                    )
+                  })
+                })
               } else {
                 addBattleFilterClause(
                   battle,
@@ -693,7 +702,10 @@ class Station extends Model {
     const stationRows = await query
 
     let pokemonData = null
-    if (hasBattlePokemonStats && perms.dynamax) {
+    if (
+      perms.dynamax &&
+      (hasBattlePokemonStats || hasMultiBattlePokemonStats)
+    ) {
       const needsEstimatedCp = stationRows.some((station) => {
         if (!station) return false
         const multiplier = Number(station.battle_pokemon_cp_multiplier)
@@ -757,23 +769,21 @@ class Station extends Model {
     })
 
     return [...grouped.values()].map((station) => {
+      const fallbackBattle = getFallbackStationBattle(station, ts, pokemonData)
       if (shouldRestrictReturnedBattles) {
         const filteredBattles = station.battles.filter((battle) =>
           matchesStationBattleFilter(battle, battleFilterOptions),
         )
         if (filteredBattles.length) {
           station.battles = filteredBattles
-        }
-      }
-      if (!station.battles.length) {
-        const fallbackBattle = getFallbackStationBattle(
-          station,
-          ts,
-          pokemonData,
-        )
-        if (fallbackBattle) {
+        } else if (
+          matchesStationBattleFilter(fallbackBattle, battleFilterOptions)
+        ) {
           station.battles = [fallbackBattle]
         }
+      }
+      if (!station.battles.length && fallbackBattle) {
+        station.battles = [fallbackBattle]
       }
       return finalizeStation(station, pokemonData)
     })
@@ -952,19 +962,30 @@ class Station extends Model {
         }
         if (perms.dynamax) {
           if (hasMultiBattles) {
-            builder.orWhereExists(
-              knexRef
-                .select(1)
-                .from(STATION_BATTLE_FILTER_TABLE)
-                .whereRaw(
-                  `${STATION_BATTLE_FILTER_ALIAS}.station_id = station.id`,
-                )
-                .whereIn(
-                  `${STATION_BATTLE_FILTER_ALIAS}.battle_pokemon_id`,
-                  pokemonIds,
-                )
-                .andWhere(`${STATION_BATTLE_FILTER_ALIAS}.battle_end`, '>', ts),
-            )
+            builder.orWhere((battleMatch) => {
+              battleMatch.orWhereExists(
+                knexRef
+                  .select(1)
+                  .from(STATION_BATTLE_FILTER_TABLE)
+                  .whereRaw(
+                    `${STATION_BATTLE_FILTER_ALIAS}.station_id = station.id`,
+                  )
+                  .whereIn(
+                    `${STATION_BATTLE_FILTER_ALIAS}.battle_pokemon_id`,
+                    pokemonIds,
+                  )
+                  .andWhere(
+                    `${STATION_BATTLE_FILTER_ALIAS}.battle_end`,
+                    '>',
+                    ts,
+                  ),
+              )
+              battleMatch.orWhere((legacyBattle) => {
+                legacyBattle
+                  .whereIn(getStationColumn('battle_pokemon_id'), pokemonIds)
+                  .andWhere(getStationColumn('battle_end'), '>', ts)
+              })
+            })
           } else {
             builder.orWhere((builder2) => {
               builder2
