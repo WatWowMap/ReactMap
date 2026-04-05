@@ -1130,7 +1130,9 @@ class Station extends Model {
         ? searchBattle || legacyBattle
         : getPreferredStationBattle([legacyBattle, searchBattle], ts)
       STATION_SEARCH_BATTLE_FIELDS.forEach((field) => {
-        row[field] = displayBattle?.[field] ?? row[`station_${field}`] ?? null
+        row[field] = displayBattle
+          ? (displayBattle[field] ?? null)
+          : (row[`station_${field}`] ?? null)
         delete row[`station_${field}`]
       })
       delete row.search_battle
