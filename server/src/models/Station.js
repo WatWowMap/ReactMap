@@ -1166,8 +1166,15 @@ class Station extends Model {
           ? JSON.parse(row.display_battle)
           : row.display_battle
       const legacyBattle = getAliasedStationBattle(row, 'station', ts, null)
+      const matchedLegacyBattle =
+        pokemonIds.length &&
+        legacyBattle &&
+        pokemonIds.includes(Number(legacyBattle.battle_pokemon_id))
+          ? legacyBattle
+          : null
       const displayBattle =
         matchedBattle ||
+        matchedLegacyBattle ||
         getPreferredStationBattle([legacyBattle, searchBattle], ts)
       STATION_SEARCH_BATTLE_FIELDS.forEach((field) => {
         row[field] = displayBattle
