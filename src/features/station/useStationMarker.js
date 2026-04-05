@@ -22,11 +22,14 @@ export function useStationMarker(station, battle = null) {
     battle_pokemon_gender = 0,
     battle_pokemon_id = 0,
     battle_pokemon_bread_mode = 0,
+    battle_start = 0,
     battle_end = 0,
   } = battle || {}
   const now = Date.now() / 1000
   const isInactive = Number.isFinite(end_time) && end_time < now
   const hasStarted = Number.isFinite(start_time) && start_time < now
+  const hasBattleStarted =
+    !Number.isFinite(battle_start) || battle_start === 0 || battle_start <= now
   const [, Icons] = useStorage(
     (s) => [s.icons, useMemory.getState().Icons],
     (a, b) => Object.entries(a[0]).every(([k, v]) => b[0][k] === v),
@@ -56,7 +59,11 @@ export function useStationMarker(station, battle = null) {
   const getOpacity = useOpacity('stations')
   const stationOpacity = isInactive ? 0.3 : getOpacity(end_time)
   const showBattleIcon =
-    !isInactive && !!battle_pokemon_id && hasStarted && battle_end > now
+    !isInactive &&
+    !!battle_pokemon_id &&
+    hasStarted &&
+    hasBattleStarted &&
+    battle_end > now
 
   return divIcon({
     popupAnchor: [
