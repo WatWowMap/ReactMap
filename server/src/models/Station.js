@@ -124,29 +124,52 @@ function getAliasedStationSelect(fields, aliasPrefix) {
 }
 
 /**
+ * @param {number} ts
+ * @param {import('objection').QueryBuilder<any>} builder
+ * @param {string} alias
+ */
+function addSearchBattleMatchOrder(builder, alias, ts) {
+  builder.orderByRaw(
+    `CASE
+      WHEN ${alias}.battle_start IS NULL
+        OR ${alias}.battle_start = 0
+        OR ${alias}.battle_start <= ?
+      THEN 0
+      ELSE 1
+    END ASC`,
+    [ts],
+  )
+  builder
+    .orderBy(`${alias}.battle_start`, 'asc')
+    .orderBy(`${alias}.battle_end`, 'desc')
+    .orderBy(`${alias}.battle_pokemon_id`, 'asc')
+    .orderBy(`${alias}.battle_pokemon_form`, 'asc')
+    .orderBy(`${alias}.battle_pokemon_costume`, 'asc')
+    .orderBy(`${alias}.battle_pokemon_gender`, 'asc')
+    .orderBy(`${alias}.battle_pokemon_alignment`, 'asc')
+    .orderBy(`${alias}.battle_pokemon_bread_mode`, 'asc')
+    .orderBy(`${alias}.battle_level`, 'asc')
+}
+
+/**
  * @param {ReturnType<typeof Model.knex>} knexRef
- * @param {string} field
  * @param {number[]} pokemonIds
  * @param {number} ts
  */
-function getMatchedSearchBattleSubquery(knexRef, field, pokemonIds, ts) {
+function getMatchedSearchBattleJsonSubquery(knexRef, pokemonIds, ts) {
+  const jsonFields = STATION_SEARCH_BATTLE_FIELDS.flatMap((field) => [
+    `'${field}'`,
+    `${STATION_BATTLE_SEARCH_ALIAS}.${field}`,
+  ]).join(', ')
+
   return knexRef(STATION_BATTLE_SEARCH_TABLE)
-    .select(`${STATION_BATTLE_SEARCH_ALIAS}.${field}`)
+    .select(raw(`JSON_OBJECT(${jsonFields})`))
     .whereRaw(`${STATION_BATTLE_SEARCH_ALIAS}.station_id = ${STATION_TABLE}.id`)
     .whereIn(`${STATION_BATTLE_SEARCH_ALIAS}.battle_pokemon_id`, pokemonIds)
     .andWhere(`${STATION_BATTLE_SEARCH_ALIAS}.battle_end`, '>', ts)
-    .orderByRaw(
-      `CASE
-        WHEN ${STATION_BATTLE_SEARCH_ALIAS}.battle_start IS NULL
-          OR ${STATION_BATTLE_SEARCH_ALIAS}.battle_start = 0
-          OR ${STATION_BATTLE_SEARCH_ALIAS}.battle_start <= ?
-        THEN 0
-        ELSE 1
-      END ASC`,
-      [ts],
+    .modify((builder) =>
+      addSearchBattleMatchOrder(builder, STATION_BATTLE_SEARCH_ALIAS, ts),
     )
-    .orderBy(`${STATION_BATTLE_SEARCH_ALIAS}.battle_start`, 'asc')
-    .orderBy(`${STATION_BATTLE_SEARCH_ALIAS}.battle_end`, 'desc')
     .limit(1)
 }
 
@@ -808,10 +831,8 @@ class Station extends Model {
       if (hasMultiBattles && pokemonIds.length) {
         select.push(
           ...getAliasedStationSelect(STATION_SEARCH_BATTLE_FIELDS, 'station_'),
-          ...STATION_SEARCH_BATTLE_FIELDS.map((field) =>
-            getMatchedSearchBattleSubquery(knexRef, field, pokemonIds, ts).as(
-              `matched_${field}`,
-            ),
+          getMatchedSearchBattleJsonSubquery(knexRef, pokemonIds, ts).as(
+            'matched_battle',
           ),
         )
       } else {
@@ -867,11 +888,19 @@ class Station extends Model {
       return rows
     }
     return rows.map((row) => {
+      const matchedBattle =
+        typeof row.matched_battle === 'string'
+          ? JSON.parse(row.matched_battle)
+          : row.matched_battle
+      const hasMatchedBattle =
+        matchedBattle && typeof matchedBattle === 'object'
       STATION_SEARCH_BATTLE_FIELDS.forEach((field) => {
-        row[field] = row[`matched_${field}`] ?? row[`station_${field}`]
-        delete row[`matched_${field}`]
+        row[field] = hasMatchedBattle
+          ? matchedBattle[field]
+          : row[`station_${field}`]
         delete row[`station_${field}`]
       })
+      delete row.matched_battle
       return row
     })
   }
