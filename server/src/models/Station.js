@@ -47,6 +47,16 @@ const STATION_SEARCH_BATTLE_FIELDS = [
   'battle_pokemon_bread_mode',
   'battle_end',
 ]
+const STATION_SEARCH_BATTLE_MATCH_FIELDS = [
+  'battle_level',
+  'battle_start',
+  'battle_pokemon_id',
+  'battle_pokemon_form',
+  'battle_end',
+]
+const STATION_SEARCH_BATTLE_DETAIL_FIELDS = STATION_SEARCH_BATTLE_FIELDS.filter(
+  (field) => !STATION_SEARCH_BATTLE_MATCH_FIELDS.includes(field),
+)
 
 /**
  * @param {import('ohbem').PokemonData | null} pokemonData
@@ -410,10 +420,11 @@ function normalizeStationBattleComparisonField(field, value) {
 /**
  * @param {import('@rm/types').StationBattle | null | undefined} left
  * @param {import('@rm/types').StationBattle | null | undefined} right
+ * @param {string[]} fields
  * @returns {boolean}
  */
-function canReuseStationBattleDetails(left, right) {
-  return STATION_SEARCH_BATTLE_FIELDS.every((field) => {
+function hasExactStationBattleMatch(left, right, fields) {
+  return fields.every((field) => {
     const leftValue = normalizeStationBattleComparisonField(
       field,
       left?.[field],
@@ -422,8 +433,56 @@ function canReuseStationBattleDetails(left, right) {
       field,
       right?.[field],
     )
-    return leftValue == null || rightValue == null || leftValue === rightValue
+    return leftValue === rightValue
   })
+}
+
+/**
+ * @param {import('@rm/types').StationBattle | null | undefined} left
+ * @param {import('@rm/types').StationBattle | null | undefined} right
+ * @returns {boolean}
+ */
+function canReuseStationBattleDetails(left, right) {
+  return (
+    hasExactStationBattleMatch(
+      left,
+      right,
+      STATION_SEARCH_BATTLE_MATCH_FIELDS,
+    ) &&
+    STATION_SEARCH_BATTLE_DETAIL_FIELDS.every((field) => {
+      const leftValue = normalizeStationBattleComparisonField(
+        field,
+        left?.[field],
+      )
+      const rightValue = normalizeStationBattleComparisonField(
+        field,
+        right?.[field],
+      )
+      return leftValue == null || rightValue == null || leftValue === rightValue
+    })
+  )
+}
+
+/**
+ * @param {import('@rm/types').StationBattle | null | undefined} primary
+ * @param {import('@rm/types').StationBattle | null | undefined} secondary
+ * @returns {import('@rm/types').StationBattle | null}
+ */
+function mergeStationBattleDetails(primary, secondary) {
+  if (!primary) return secondary || null
+  if (!secondary) return primary || null
+
+  const merged = /** @type {import('@rm/types').StationBattle} */ ({})
+  STATION_SEARCH_BATTLE_FIELDS.forEach((field) => {
+    const leftValue = normalizeStationBattleComparisonField(
+      field,
+      primary?.[field],
+    )
+    merged[field] =
+      leftValue ??
+      normalizeStationBattleComparisonField(field, secondary?.[field])
+  })
+  return merged
 }
 
 /**
@@ -1248,15 +1307,25 @@ class Station extends Model {
         )
         if (timingComparison > 0) {
           matchedDisplayBattle = matchedLegacyBattle
-        } else if (
-          timingComparison === 0 &&
-          canReuseStationBattleDetails(matchedBattle, matchedLegacyBattle)
-        ) {
-          matchedDisplayBattle =
+        } else if (timingComparison === 0) {
+          const preferredMatchedBattle =
             getStationBattleCompleteness(matchedBattle) >=
             getStationBattleCompleteness(matchedLegacyBattle)
               ? matchedBattle
               : matchedLegacyBattle
+          const fallbackMatchedBattle =
+            preferredMatchedBattle === matchedBattle
+              ? matchedLegacyBattle
+              : matchedBattle
+          matchedDisplayBattle = canReuseStationBattleDetails(
+            preferredMatchedBattle,
+            fallbackMatchedBattle,
+          )
+            ? mergeStationBattleDetails(
+                preferredMatchedBattle,
+                fallbackMatchedBattle,
+              )
+            : preferredMatchedBattle
         }
       }
       const displayBattle =
