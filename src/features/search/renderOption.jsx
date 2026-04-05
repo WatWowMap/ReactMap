@@ -92,8 +92,10 @@ const InvasionSubtitle = ({
   )
 }
 
-const Timer = ({ expireTime }) => {
-  const time = useRelativeTimer(expireTime || 0)
+const Timer = ({ expireTime, startTime = 0 }) => {
+  const now = Date.now() / 1000
+  const target = startTime > now ? startTime : expireTime
+  const time = useRelativeTimer(target || 0)
   return time
 }
 
@@ -171,11 +173,8 @@ export const renderOption = ({ key, ...props }, option) => {
             <Timer expireTime={option.expire_timestamp} />
           ) : searchTab === 'stations' ? (
             <Timer
-              expireTime={
-                option.battle_start > Date.now() / 1000
-                  ? option.battle_start
-                  : option.battle_end
-              }
+              expireTime={option.battle_end}
+              startTime={option.battle_start}
             />
           ) : (
             ''
