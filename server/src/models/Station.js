@@ -393,6 +393,26 @@ function appendDistinctStationBattle(battles, battle, pokemonData) {
 }
 
 /**
+ * @param {import('@rm/types').StationBattle | null | undefined} primary
+ * @param {import('@rm/types').StationBattle | null | undefined} secondary
+ * @returns {import('@rm/types').StationBattle | null}
+ */
+function mergeStationBattle(primary, secondary) {
+  if (!primary) return secondary || null
+  if (!secondary) return primary || null
+
+  const merged = /** @type {import('@rm/types').StationBattle} */ ({})
+  ;[
+    ...STATION_BATTLE_FIELDS,
+    ...STATION_BATTLE_STAT_FIELDS,
+    'battle_pokemon_estimated_cp',
+  ].forEach((field) => {
+    merged[field] = primary?.[field] ?? secondary?.[field] ?? null
+  })
+  return merged
+}
+
+/**
  * @param {(import('@rm/types').StationBattle | null | undefined)[]} battles
  * @param {number} ts
  * @returns {import('@rm/types').StationBattle | null}
@@ -1204,10 +1224,10 @@ class Station extends Model {
         if (timingComparison > 0) {
           matchedDisplayBattle = matchedLegacyBattle
         } else if (timingComparison === 0) {
-          matchedDisplayBattle = {
-            ...matchedLegacyBattle,
-            ...matchedBattle,
-          }
+          matchedDisplayBattle = mergeStationBattle(
+            matchedBattle,
+            matchedLegacyBattle,
+          )
         }
       }
       const displayBattle =
