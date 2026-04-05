@@ -170,6 +170,14 @@ export function stationBattlesEqual(prev, next) {
   }
   return (prev || []).every(
     (battle, index) =>
-      getStationBattleKey(battle) === getStationBattleKey(next?.[index]),
+      getStationBattleKey(battle) === getStationBattleKey(next?.[index]) &&
+      [
+        'battle_pokemon_stamina',
+        'battle_pokemon_cp_multiplier',
+        'battle_pokemon_estimated_cp',
+      ].every(
+        (field) =>
+          (battle?.[field] ?? null) === (next?.[index]?.[field] ?? null),
+      ),
   )
 }

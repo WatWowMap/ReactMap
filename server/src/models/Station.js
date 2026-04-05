@@ -326,6 +326,63 @@ function addBattleFilterClause(
 }
 
 /**
+ * @param {import('@rm/types').StationBattle | null | undefined} battle
+ * @param {{
+ *  ts: number
+ *  includeUpcoming: boolean
+ *  onlyBattleTier: string | number
+ *  battleLevels: number[]
+ *  battleCombos: { pokemonId: number, form: number | null }[]
+ * }} options
+ */
+function matchesStationBattleFilter(
+  battle,
+  { ts, includeUpcoming, onlyBattleTier, battleLevels, battleCombos },
+) {
+  if (
+    battle?.battle_pokemon_id === null ||
+    battle?.battle_pokemon_id === undefined
+  ) {
+    return false
+  }
+  if (!(Number(battle?.battle_end) > ts)) {
+    return false
+  }
+  if (!includeUpcoming) {
+    const battleStart = Number(battle?.battle_start)
+    if (Number.isFinite(battleStart) && battleStart > 0 && battleStart > ts) {
+      return false
+    }
+  }
+  if (onlyBattleTier !== 'all') {
+    return Number(battle?.battle_level) === Number(onlyBattleTier)
+  }
+
+  let matchApplied = false
+  let matched = false
+  if (battleLevels.length) {
+    matchApplied = true
+    matched = battleLevels.includes(Number(battle?.battle_level))
+  }
+  if (
+    battleCombos.some(({ pokemonId, form }) => {
+      if (Number(battle?.battle_pokemon_id) !== pokemonId) {
+        return false
+      }
+      if (form === null) {
+        return battle?.battle_pokemon_form === null
+      }
+      return Number(battle?.battle_pokemon_form) === form
+    })
+  ) {
+    matchApplied = true
+    matched = true
+  }
+
+  return matchApplied && matched
+}
+
+/**
  * @param {import('@rm/types').FullStation} station
  * @param {import('ohbem').PokemonData | null} pokemonData
  */
@@ -418,6 +475,10 @@ class Station extends Model {
     }
     const battleLevels = [...battleLevelFilters]
     const battleCombos = [...battleComboFilters.values()]
+    const hasBattleConditions =
+      onlyBattleTier !== 'all' ||
+      battleLevels.length > 0 ||
+      battleCombos.length > 0
 
     if (!onlyAllStations && !onlyInactiveStations && !perms.dynamax) {
       return []
@@ -456,6 +517,14 @@ class Station extends Model {
     const now = Date.now() / 1000
     const activeCutoff = now - stationUpdateLimit * 60 * 60
     const inactiveCutoff = now - stationInactiveLimitDays * 24 * 60 * 60
+    const battleFilterOptions = {
+      ts,
+      includeUpcoming: !!onlyIncludeUpcoming,
+      onlyBattleTier,
+      battleLevels,
+      battleCombos,
+    }
+    const shouldRestrictReturnedBattles = onlyMaxBattles && hasBattleConditions
 
     if (includeBattleData) {
       select.push(
@@ -513,10 +582,6 @@ class Station extends Model {
         let applied = false
 
         if (onlyMaxBattles) {
-          const hasBattleConditions =
-            onlyBattleTier !== 'all' ||
-            battleLevels.length > 0 ||
-            battleCombos.length > 0
           if (hasBattleConditions) {
             const method = applied ? 'orWhere' : 'where'
             station[method]((battle) => {
@@ -528,28 +593,20 @@ class Station extends Model {
                     .whereRaw(
                       `${STATION_BATTLE_FILTER_ALIAS}.station_id = station.id`,
                     )
-                    .modify((subquery) =>
+                    .modify((subquery) => {
                       addBattleFilterClause(
                         subquery,
                         `${STATION_BATTLE_FILTER_ALIAS}.`,
-                        {
-                          ts,
-                          includeUpcoming: !!onlyIncludeUpcoming,
-                          onlyBattleTier,
-                          battleLevels,
-                          battleCombos,
-                        },
-                      ),
-                    ),
+                        battleFilterOptions,
+                      )
+                    }),
                 )
               } else {
-                addBattleFilterClause(battle, `${STATION_TABLE}.`, {
-                  ts,
-                  includeUpcoming: !!onlyIncludeUpcoming,
-                  onlyBattleTier,
-                  battleLevels,
-                  battleCombos,
-                })
+                addBattleFilterClause(
+                  battle,
+                  `${STATION_TABLE}.`,
+                  battleFilterOptions,
+                )
               }
             })
             applied = true
@@ -685,6 +742,14 @@ class Station extends Model {
     })
 
     return [...grouped.values()].map((station) => {
+      if (shouldRestrictReturnedBattles) {
+        const filteredBattles = station.battles.filter((battle) =>
+          matchesStationBattleFilter(battle, battleFilterOptions),
+        )
+        if (filteredBattles.length) {
+          station.battles = filteredBattles
+        }
+      }
       if (!station.battles.length) {
         const fallbackBattle = getFallbackStationBattle(
           station,

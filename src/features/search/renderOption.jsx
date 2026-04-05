@@ -93,7 +93,13 @@ const InvasionSubtitle = ({
 }
 
 const Timer = ({ expireTime, startTime = 0 }) => {
-  const now = Date.now() / 1000
+  const [now, setNow] = React.useState(() => Math.floor(Date.now() / 1000))
+  React.useEffect(() => {
+    const interval = setInterval(() => {
+      setNow(Math.floor(Date.now() / 1000))
+    }, 1000)
+    return () => clearInterval(interval)
+  }, [])
   const target = startTime > now ? startTime : expireTime
   const time = useRelativeTimer(target || 0)
   return time
