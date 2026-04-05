@@ -346,12 +346,19 @@ function compareStationBattles(left, right, ts) {
 function appendDistinctStationBattle(battles, battle) {
   if (!battle) return battles
   const battleIdentity = getStationBattleIdentity(battle)
-  if (
-    !battles.some(
-      (existingBattle) =>
-        getStationBattleIdentity(existingBattle) === battleIdentity,
+  const existingBattle = battles.find(
+    (currentBattle) =>
+      getStationBattleIdentity(currentBattle) === battleIdentity,
+  )
+  if (existingBattle) {
+    ;[...STATION_BATTLE_STAT_FIELDS, 'battle_pokemon_estimated_cp'].forEach(
+      (field) => {
+        if (existingBattle[field] == null && battle[field] != null) {
+          existingBattle[field] = battle[field]
+        }
+      },
     )
-  ) {
+  } else {
     battles.push(battle)
   }
   return battles
