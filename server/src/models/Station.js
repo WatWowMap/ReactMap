@@ -393,23 +393,48 @@ function appendDistinctStationBattle(battles, battle, pokemonData) {
 }
 
 /**
- * @param {import('@rm/types').StationBattle | null | undefined} primary
- * @param {import('@rm/types').StationBattle | null | undefined} secondary
- * @returns {import('@rm/types').StationBattle | null}
+ * @param {string} field
+ * @param {unknown} value
+ * @returns {unknown}
  */
-function mergeStationBattle(primary, secondary) {
-  if (!primary) return secondary || null
-  if (!secondary) return primary || null
+function normalizeStationBattleComparisonField(field, value) {
+  if (field === 'battle_start') {
+    const battleStart = Number(value)
+    return !Number.isFinite(battleStart) || battleStart === 0
+      ? null
+      : battleStart
+  }
+  return value ?? null
+}
 
-  const merged = /** @type {import('@rm/types').StationBattle} */ ({})
-  ;[
-    ...STATION_BATTLE_FIELDS,
-    ...STATION_BATTLE_STAT_FIELDS,
-    'battle_pokemon_estimated_cp',
-  ].forEach((field) => {
-    merged[field] = primary?.[field] ?? secondary?.[field] ?? null
+/**
+ * @param {import('@rm/types').StationBattle | null | undefined} left
+ * @param {import('@rm/types').StationBattle | null | undefined} right
+ * @returns {boolean}
+ */
+function canReuseStationBattleDetails(left, right) {
+  return STATION_SEARCH_BATTLE_FIELDS.every((field) => {
+    const leftValue = normalizeStationBattleComparisonField(
+      field,
+      left?.[field],
+    )
+    const rightValue = normalizeStationBattleComparisonField(
+      field,
+      right?.[field],
+    )
+    return leftValue == null || rightValue == null || leftValue === rightValue
   })
-  return merged
+}
+
+/**
+ * @param {import('@rm/types').StationBattle | null | undefined} battle
+ * @returns {number}
+ */
+function getStationBattleCompleteness(battle) {
+  return STATION_SEARCH_BATTLE_FIELDS.reduce((count, field) => {
+    const value = normalizeStationBattleComparisonField(field, battle?.[field])
+    return value == null ? count : count + 1
+  }, 0)
 }
 
 /**
@@ -1223,11 +1248,15 @@ class Station extends Model {
         )
         if (timingComparison > 0) {
           matchedDisplayBattle = matchedLegacyBattle
-        } else if (timingComparison === 0) {
-          matchedDisplayBattle = mergeStationBattle(
-            matchedBattle,
-            matchedLegacyBattle,
-          )
+        } else if (
+          timingComparison === 0 &&
+          canReuseStationBattleDetails(matchedBattle, matchedLegacyBattle)
+        ) {
+          matchedDisplayBattle =
+            getStationBattleCompleteness(matchedBattle) >=
+            getStationBattleCompleteness(matchedLegacyBattle)
+              ? matchedBattle
+              : matchedLegacyBattle
         }
       }
       const displayBattle =
