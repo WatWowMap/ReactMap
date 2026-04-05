@@ -827,13 +827,14 @@ class Station extends Model {
     const { searchResultsLimit, stationUpdateLimit } = config.getSafe('api')
     const ts = getEpoch()
     const knexRef = this.knex()
+    const normalizedSearch = search.toLowerCase()
 
     const pokemonIds = Object.keys(state.event.masterfile.pokemon).filter(
       (pkmn) =>
         i18next
           .t(`poke_${pkmn}`, { lng: locale })
           .toLowerCase()
-          .includes(search),
+          .includes(normalizedSearch),
     )
 
     const select = [...getStationSelect(['id', 'name', 'lat', 'lon']), distance]
@@ -904,10 +905,15 @@ class Station extends Model {
           : row.matched_battle
       const hasMatchedBattle =
         matchedBattle && typeof matchedBattle === 'object'
+      const matchesStationName =
+        perms.stations &&
+        typeof row.name === 'string' &&
+        row.name.toLowerCase().includes(normalizedSearch)
       STATION_SEARCH_BATTLE_FIELDS.forEach((field) => {
-        row[field] = hasMatchedBattle
-          ? matchedBattle[field]
-          : row[`station_${field}`]
+        row[field] =
+          hasMatchedBattle && !matchesStationName
+            ? matchedBattle[field]
+            : row[`station_${field}`]
         delete row[`station_${field}`]
       })
       delete row.matched_battle
