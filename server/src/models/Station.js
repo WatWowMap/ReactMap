@@ -312,6 +312,22 @@ function normalizeStationBattleIdentityField(field, value) {
 }
 
 /**
+ * @param {import('@rm/types').StationBattle | null | undefined} left
+ * @param {import('@rm/types').StationBattle | null | undefined} right
+ * @returns {boolean}
+ */
+function canMergeStationBattleIdentity(left, right) {
+  return STATION_BATTLE_IDENTITY_FIELDS.every((field) => {
+    const leftValue = normalizeStationBattleIdentityField(field, left?.[field])
+    const rightValue = normalizeStationBattleIdentityField(
+      field,
+      right?.[field],
+    )
+    return !leftValue || !rightValue || leftValue === rightValue
+  })
+}
+
+/**
  * @param {import('@rm/types').StationBattle | null | undefined} battle
  * @returns {string}
  */
@@ -374,6 +390,13 @@ function compareStationBattles(left, right, ts) {
   if (timingComparison) {
     return timingComparison
   }
+  if (canMergeStationBattleIdentity(left, right)) {
+    const completenessComparison =
+      getStationBattleCompleteness(right) - getStationBattleCompleteness(left)
+    if (completenessComparison) {
+      return completenessComparison
+    }
+  }
 
   return getStationBattleIdentity(left).localeCompare(
     getStationBattleIdentity(right),
@@ -389,10 +412,17 @@ function compareStationBattles(left, right, ts) {
 function appendDistinctStationBattle(battles, battle, pokemonData) {
   if (!battle) return battles
   const battleIdentity = getStationBattleIdentity(battle)
-  const existingBattle = battles.find(
+  const exactBattle = battles.find(
     (currentBattle) =>
       getStationBattleIdentity(currentBattle) === battleIdentity,
   )
+  const existingBattle =
+    exactBattle ||
+    [...battles]
+      .filter((currentBattle) =>
+        canMergeStationBattleIdentity(currentBattle, battle),
+      )
+      .sort((left, right) => compareStationBattles(left, right, 0))[0]
   if (existingBattle) {
     let statsChanged = false
     STATION_BATTLE_STAT_FIELDS.forEach((field) => {
@@ -1050,6 +1080,11 @@ class Station extends Model {
         fallbackBattle,
         pokemonData,
       )
+      if (!onlyIncludeUpcoming) {
+        station.battles = station.battles.filter((battle) =>
+          isStationBattleActive(battle, ts),
+        )
+      }
       if (shouldRestrictReturnedBattles) {
         const filteredBattles = station.battles.filter((battle) =>
           matchesStationBattleFilter(battle, battleFilterOptions),
