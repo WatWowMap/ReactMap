@@ -666,7 +666,8 @@ class Station extends Model {
       battleLevels,
       battleCombos,
     }
-    const shouldRestrictReturnedBattles = onlyMaxBattles && hasBattleConditions
+    const shouldRestrictReturnedBattles =
+      onlyMaxBattles && hasBattleConditions && !onlyGmaxStationed
 
     if (includeBattleData) {
       select.push(
