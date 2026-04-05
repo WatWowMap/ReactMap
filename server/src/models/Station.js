@@ -32,6 +32,9 @@ const STATION_BATTLE_FIELDS = [
   'battle_pokemon_move_1',
   'battle_pokemon_move_2',
 ]
+const STATION_BATTLE_IDENTITY_FIELDS = STATION_BATTLE_FIELDS.filter(
+  (field) => !field.startsWith('battle_pokemon_move_'),
+)
 const STATION_BATTLE_STAT_FIELDS = [
   'battle_pokemon_stamina',
   'battle_pokemon_cp_multiplier',
@@ -285,19 +288,33 @@ function getFallbackStationBattle(station, ts, pokemonData) {
 }
 
 /**
+ * @param {string} field
+ * @param {unknown} value
+ * @returns {string | number}
+ */
+function normalizeStationBattleIdentityField(field, value) {
+  if (field === 'battle_start') {
+    const battleStart = Number(value)
+    return !Number.isFinite(battleStart) || battleStart === 0 ? '' : battleStart
+  }
+  if (STATION_SEARCH_BATTLE_STRICT_FIELDS.includes(field)) {
+    const variantValue = Number(value)
+    return Number.isFinite(variantValue) && variantValue > 0 ? variantValue : ''
+  }
+  const numericValue = Number(value)
+  return Number.isFinite(numericValue) && numericValue > 0
+    ? numericValue
+    : (value ?? '')
+}
+
+/**
  * @param {import('@rm/types').StationBattle | null | undefined} battle
  * @returns {string}
  */
 function getStationBattleIdentity(battle) {
-  return STATION_BATTLE_FIELDS.map((field) => {
-    if (field === 'battle_start') {
-      const battleStart = Number(battle?.[field])
-      return !Number.isFinite(battleStart) || battleStart === 0
-        ? ''
-        : battleStart
-    }
-    return battle?.[field] ?? ''
-  }).join(':')
+  return STATION_BATTLE_IDENTITY_FIELDS.map((field) =>
+    normalizeStationBattleIdentityField(field, battle?.[field]),
+  ).join(':')
 }
 
 /**
@@ -476,6 +493,24 @@ function clearStationBattleFallback(station) {
     station[field] = null
   })
   station.is_battle_available = false
+  return station
+}
+
+/**
+ * @param {import('@rm/types').FullStation} station
+ * @param {import('@rm/types').StationBattle | null | undefined} battle
+ * @returns {import('@rm/types').FullStation}
+ */
+function syncStationBattleFallback(station, battle) {
+  clearStationBattleFallback(station)
+  if (!battle) return station
+  ;[...STATION_BATTLE_FIELDS, ...STATION_BATTLE_STAT_FIELDS].forEach(
+    (field) => {
+      station[field] = battle?.[field] ?? null
+    },
+  )
+  station.battle_pokemon_estimated_cp =
+    battle?.battle_pokemon_estimated_cp ?? null
   return station
 }
 
@@ -1012,6 +1047,10 @@ class Station extends Model {
         )
         if (filteredBattles.length) {
           station.battles = filteredBattles
+          syncStationBattleFallback(
+            station,
+            getPreferredStationBattle(station.battles, ts),
+          )
         } else if (!onlyGmaxStationed) {
           station.battles = []
           clearStationBattleFallback(station)
