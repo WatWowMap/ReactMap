@@ -323,7 +323,7 @@ function canMergeStationBattleIdentity(left, right) {
       field,
       right?.[field],
     )
-    return !leftValue || !rightValue || leftValue === rightValue
+    return leftValue === '' || rightValue === '' || leftValue === rightValue
   })
 }
 
@@ -424,6 +424,19 @@ function appendDistinctStationBattle(battles, battle, pokemonData) {
       )
       .sort((left, right) => compareStationBattles(left, right, 0))[0]
   if (existingBattle) {
+    STATION_BATTLE_IDENTITY_FIELDS.forEach((field) => {
+      const existingValue = normalizeStationBattleIdentityField(
+        field,
+        existingBattle[field],
+      )
+      const nextValue = normalizeStationBattleIdentityField(
+        field,
+        battle[field],
+      )
+      if (existingValue === '' && nextValue !== '') {
+        existingBattle[field] = battle[field]
+      }
+    })
     let statsChanged = false
     STATION_BATTLE_STAT_FIELDS.forEach((field) => {
       if (existingBattle[field] == null && battle[field] != null) {
