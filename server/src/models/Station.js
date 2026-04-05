@@ -341,9 +341,10 @@ function compareStationBattles(left, right, ts) {
 /**
  * @param {import('@rm/types').StationBattle[]} battles
  * @param {import('@rm/types').StationBattle | null | undefined} battle
+ * @param {import('ohbem').PokemonData | null} pokemonData
  * @returns {import('@rm/types').StationBattle[]}
  */
-function appendDistinctStationBattle(battles, battle) {
+function appendDistinctStationBattle(battles, battle, pokemonData) {
   if (!battle) return battles
   const battleIdentity = getStationBattleIdentity(battle)
   const existingBattle = battles.find(
@@ -351,13 +352,25 @@ function appendDistinctStationBattle(battles, battle) {
       getStationBattleIdentity(currentBattle) === battleIdentity,
   )
   if (existingBattle) {
-    ;[...STATION_BATTLE_STAT_FIELDS, 'battle_pokemon_estimated_cp'].forEach(
-      (field) => {
-        if (existingBattle[field] == null && battle[field] != null) {
-          existingBattle[field] = battle[field]
-        }
-      },
-    )
+    let statsChanged = false
+    STATION_BATTLE_STAT_FIELDS.forEach((field) => {
+      if (existingBattle[field] == null && battle[field] != null) {
+        existingBattle[field] = battle[field]
+        statsChanged = true
+      }
+    })
+    if (statsChanged && pokemonData) {
+      existingBattle.battle_pokemon_estimated_cp = estimateStationCp(
+        pokemonData,
+        existingBattle,
+      )
+    } else if (
+      existingBattle.battle_pokemon_estimated_cp == null &&
+      battle.battle_pokemon_estimated_cp != null
+    ) {
+      existingBattle.battle_pokemon_estimated_cp =
+        battle.battle_pokemon_estimated_cp
+    }
   } else {
     battles.push(battle)
   }
@@ -912,6 +925,7 @@ class Station extends Model {
       station.battles = appendDistinctStationBattle(
         [...station.battles],
         fallbackBattle,
+        pokemonData,
       )
       if (shouldRestrictReturnedBattles) {
         const filteredBattles = station.battles.filter((battle) =>
