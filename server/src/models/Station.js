@@ -612,10 +612,11 @@ function finalizeStation(station, pokemonData, ts) {
         !Number.isFinite(battleStart) || battleStart === 0 || battleStart <= ts
       )
     })
-  if (
+  if (hasJoinedAvailableBattle) {
+    station.is_battle_available = true
+  } else if (
     station.is_battle_available &&
-    station.battle_pokemon_id === null &&
-    !hasJoinedAvailableBattle
+    station.battle_pokemon_id === null
   ) {
     station.is_battle_available = false
   }
