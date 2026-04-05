@@ -36,6 +36,7 @@ const STATION_BATTLE_FIELDS = [
 ]
 const STATION_SEARCH_BATTLE_FIELDS = [
   'battle_level',
+  'battle_start',
   'battle_pokemon_id',
   'battle_pokemon_form',
   'battle_pokemon_costume',
@@ -140,7 +141,16 @@ function addSearchBattleMatchOrder(builder, alias, ts) {
     [ts],
   )
   builder
-    .orderBy(`${alias}.battle_start`, 'asc')
+    .orderByRaw(
+      `CASE
+        WHEN ${alias}.battle_start IS NULL
+          OR ${alias}.battle_start = 0
+          OR ${alias}.battle_start <= ?
+        THEN NULL
+        ELSE ${alias}.battle_start
+      END ASC`,
+      [ts],
+    )
     .orderBy(`${alias}.battle_end`, 'desc')
     .orderBy(`${alias}.battle_pokemon_id`, 'asc')
     .orderBy(`${alias}.battle_pokemon_form`, 'asc')

@@ -170,7 +170,13 @@ export const renderOption = ({ key, ...props }, option) => {
           ) : searchTab === 'pokemon' ? (
             <Timer expireTime={option.expire_timestamp} />
           ) : searchTab === 'stations' ? (
-            <Timer expireTime={option.battle_end} />
+            <Timer
+              expireTime={
+                option.battle_start > Date.now() / 1000
+                  ? option.battle_start
+                  : option.battle_end
+              }
+            />
           ) : (
             ''
           )
