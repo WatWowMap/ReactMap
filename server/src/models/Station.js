@@ -1097,6 +1097,9 @@ class Station extends Model {
         station.battles = station.battles.filter((battle) =>
           isStationBattleActive(battle, ts),
         )
+        if (!station.battles.length) {
+          clearStationBattleFallback(station)
+        }
       }
       if (shouldRestrictReturnedBattles) {
         const filteredBattles = station.battles.filter((battle) =>
