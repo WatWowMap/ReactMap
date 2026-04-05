@@ -410,6 +410,10 @@ function normalizeStationBattleComparisonField(field, value) {
       ? null
       : battleStart
   }
+  if (STATION_SEARCH_BATTLE_STRICT_FIELDS.includes(field)) {
+    const variantValue = Number(value)
+    return Number.isFinite(variantValue) ? variantValue : 0
+  }
   return value ?? null
 }
 
