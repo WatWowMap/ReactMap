@@ -1071,13 +1071,15 @@ class Station extends Model {
       return []
     }
 
-    const pokemonIds = Object.keys(state.event.masterfile.pokemon).filter(
-      (pkmn) =>
+    const pokemonIds = Object.keys(state.event.masterfile.pokemon)
+      .filter((pkmn) =>
         i18next
           .t(`poke_${pkmn}`, { lng: locale })
           .toLowerCase()
           .includes(normalizedSearch),
-    )
+      )
+      .map(Number)
+      .filter(Number.isFinite)
 
     const select = [...getStationSelect(['id', 'name', 'lat', 'lon']), distance]
     if (perms.dynamax) {
@@ -1169,7 +1171,7 @@ class Station extends Model {
       const matchedLegacyBattle =
         pokemonIds.length &&
         legacyBattle &&
-        pokemonIds.includes(Number(legacyBattle.battle_pokemon_id))
+        pokemonIds.includes(legacyBattle.battle_pokemon_id)
           ? legacyBattle
           : null
       const displayBattle =
