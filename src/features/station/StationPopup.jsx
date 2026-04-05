@@ -52,12 +52,14 @@ export function StationPopup(station) {
   const now = Date.now() / 1000
   const battleState = getStationBattleState(station, now)
   const hasVisibleBattle = !!battleState.visibleBattle
+  const menuBattle =
+    battleState.visibleBattle || battleState.popupBattles[0] || null
 
   return (
     <Card sx={{ width: 200 }} elevation={0}>
       <Box display="flex" alignItems="center" justifyContent="space-evenly">
         <StationHeader {...station} />
-        <StationMenu {...station} />
+        <StationMenu {...station} battle={menuBattle} />
       </Box>
       <StationBattles
         popupBattles={battleState.popupBattles}
@@ -151,15 +153,15 @@ const ExtraInfo = ({ updated }) => {
   )
 }
 
-/** @param {import('@rm/types').Station} props */
-function StationMenu({
-  id,
-  battle_level,
-  battle_pokemon_id,
-  battle_pokemon_form,
-  lat,
-  lon,
-}) {
+/** @param {import('@rm/types').Station & {
+ *  battle?: import('@rm/types').StationBattle | null
+ * }} props */
+function StationMenu({ id, lat, lon, battle = null }) {
+  const {
+    battle_level = 0,
+    battle_pokemon_id = 0,
+    battle_pokemon_form = 0,
+  } = battle || {}
   const copyCoords = useGetDeepStore(
     'userSettings.stations.enableStationPopupCoords',
     false,

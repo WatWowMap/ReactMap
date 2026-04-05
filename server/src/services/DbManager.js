@@ -22,6 +22,9 @@ const STATION_BATTLE_REQUIRED_COLUMNS = [
   'battle_pokemon_bread_mode',
   'battle_pokemon_move_1',
   'battle_pokemon_move_2',
+]
+
+const STATION_BATTLE_STATS_COLUMNS = [
   'battle_pokemon_stamina',
   'battle_pokemon_cp_multiplier',
 ]
@@ -175,15 +178,22 @@ class DbManager extends Logger {
         'showcase_pokemon_form_id' in columns,
         'showcase_pokemon_type_id' in columns,
       ])
-    const [stationColumns, hasMultiBattles] = await Promise.all([
+    const [stationColumns, stationBattleColumns] = await Promise.all([
       schema('station').columnInfo(),
       schema('station_battle')
         .columnInfo()
-        .then((columns) =>
-          STATION_BATTLE_REQUIRED_COLUMNS.every((column) => column in columns),
-        )
-        .catch(() => false),
+        .catch(() => null),
     ])
+    const hasMultiBattles = stationBattleColumns
+      ? STATION_BATTLE_REQUIRED_COLUMNS.every(
+          (column) => column in stationBattleColumns,
+        )
+      : false
+    const hasMultiBattlePokemonStats = stationBattleColumns
+      ? STATION_BATTLE_STATS_COLUMNS.every(
+          (column) => column in stationBattleColumns,
+        )
+      : false
     const hasStationedGmax = 'total_stationed_gmax' in stationColumns
     const hasBattlePokemonStats =
       'battle_pokemon_stamina' in stationColumns &&
@@ -244,6 +254,7 @@ class DbManager extends Logger {
       hasShowcaseForm,
       hasShowcaseType,
       hasMultiBattles,
+      hasMultiBattlePokemonStats,
       hasStationedGmax,
       hasBattlePokemonStats,
       hasShortcode,

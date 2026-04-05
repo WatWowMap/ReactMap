@@ -31,6 +31,8 @@ const STATION_BATTLE_FIELDS = [
   'battle_pokemon_bread_mode',
   'battle_pokemon_move_1',
   'battle_pokemon_move_2',
+]
+const STATION_BATTLE_STAT_FIELDS = [
   'battle_pokemon_stamina',
   'battle_pokemon_cp_multiplier',
 ]
@@ -89,12 +91,14 @@ function estimateStationCp(pokemonData, station) {
 
 /**
  * @param {string} alias
+ * @param {boolean} [includeStats]
  * @returns {string[]}
  */
-function getAliasedStationBattleSelect(alias) {
-  return STATION_BATTLE_FIELDS.map(
-    (field) => `${alias}.${field} as ${alias}_${field}`,
-  )
+function getAliasedStationBattleSelect(alias, includeStats = false) {
+  return [
+    ...STATION_BATTLE_FIELDS,
+    ...(includeStats ? STATION_BATTLE_STAT_FIELDS : []),
+  ].map((field) => `${alias}.${field} as ${alias}_${field}`)
 }
 
 /**
@@ -429,7 +433,13 @@ class Station extends Model {
   static async getAll(
     perms,
     args,
-    { isMad, hasMultiBattles, hasStationedGmax, hasBattlePokemonStats },
+    {
+      isMad,
+      hasMultiBattles,
+      hasMultiBattlePokemonStats,
+      hasStationedGmax,
+      hasBattlePokemonStats,
+    },
   ) {
     const { areaRestrictions } = perms
     const { stationUpdateLimit, stationInactiveLimitDays } =
@@ -558,7 +568,12 @@ class Station extends Model {
         )
       }
       if (hasMultiBattles) {
-        select.push(...getAliasedStationBattleSelect(STATION_BATTLE_ROW_ALIAS))
+        select.push(
+          ...getAliasedStationBattleSelect(
+            STATION_BATTLE_ROW_ALIAS,
+            hasMultiBattlePokemonStats,
+          ),
+        )
         query.leftJoin(STATION_BATTLE_ROW_TABLE, (join) => {
           join
             .on('station.id', '=', `${STATION_BATTLE_ROW_ALIAS}.station_id`)
