@@ -827,7 +827,12 @@ class Station extends Model {
     const { searchResultsLimit, stationUpdateLimit } = config.getSafe('api')
     const ts = getEpoch()
     const knexRef = this.knex()
-    const normalizedSearch = search.toLowerCase()
+    const trimmedSearch = search.trim()
+    const normalizedSearch = trimmedSearch.toLowerCase()
+
+    if (!normalizedSearch) {
+      return []
+    }
 
     const pokemonIds = Object.keys(state.event.masterfile.pokemon).filter(
       (pkmn) =>
@@ -863,7 +868,7 @@ class Station extends Model {
       .andWhere(getStationColumn('end_time'), '>', ts)
       .andWhere((builder) => {
         if (perms.stations) {
-          builder.orWhereILike(getStationColumn('name'), `%${search}%`)
+          builder.orWhereILike(getStationColumn('name'), `%${trimmedSearch}%`)
         }
         if (perms.dynamax) {
           if (hasMultiBattles) {
