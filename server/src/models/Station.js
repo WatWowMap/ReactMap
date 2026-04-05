@@ -39,6 +39,10 @@ const STATION_BATTLE_STAT_FIELDS = [
   'battle_pokemon_stamina',
   'battle_pokemon_cp_multiplier',
 ]
+const STATION_BATTLE_DETAIL_MERGE_FIELDS = [
+  'battle_pokemon_move_1',
+  'battle_pokemon_move_2',
+]
 const STATION_SEARCH_BATTLE_FIELDS = [
   'battle_level',
   'battle_start',
@@ -395,6 +399,11 @@ function appendDistinctStationBattle(battles, battle, pokemonData) {
       if (existingBattle[field] == null && battle[field] != null) {
         existingBattle[field] = battle[field]
         statsChanged = true
+      }
+    })
+    STATION_BATTLE_DETAIL_MERGE_FIELDS.forEach((field) => {
+      if (existingBattle[field] == null && battle[field] != null) {
+        existingBattle[field] = battle[field]
       }
     })
     if (statsChanged && pokemonData) {
