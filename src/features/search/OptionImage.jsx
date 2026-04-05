@@ -206,7 +206,4 @@ function OptionImage(props) {
   return <Misc />
 }
 
-export const OptionImageMemo = React.memo(
-  OptionImage,
-  (prev, next) => prev.id === next.id,
-)
+export const OptionImageMemo = React.memo(OptionImage)
