@@ -81,7 +81,7 @@ const BaseStationTile = (station) => {
     <Marker
       ref={setMarkerRef}
       position={[station.lat, station.lon]}
-      icon={useStationMarker(station, battleState.visibleBattle)}
+      icon={useStationMarker(station, battleState.markerBattle)}
       eventHandlers={{ popupopen: handlePopupOpen }}
     >
       <Popup position={[station.lat, station.lon]}>

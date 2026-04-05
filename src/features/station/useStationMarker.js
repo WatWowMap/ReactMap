@@ -5,7 +5,6 @@ import { basicEqualFn, useMemory } from '@store/useMemory'
 import { useStorage } from '@store/useStorage'
 import { useOpacity } from '@hooks/useOpacity'
 import { renderOverlayIcon } from '@utils/renderOverlayIcon'
-import { isStationBattleActive } from './battleState'
 
 /**
  *
@@ -28,7 +27,6 @@ export function useStationMarker(station, battle = null) {
   const now = Date.now() / 1000
   const isInactive = Number.isFinite(end_time) && end_time < now
   const hasStarted = Number.isFinite(start_time) && start_time < now
-  const isBattleActive = isStationBattleActive(battle, now)
   const [, Icons] = useStorage(
     (s) => [s.icons, useMemory.getState().Icons],
     (a, b) => Object.entries(a[0]).every(([k, v]) => b[0][k] === v),
@@ -58,7 +56,7 @@ export function useStationMarker(station, battle = null) {
   const getOpacity = useOpacity('stations')
   const stationOpacity = isInactive ? 0.3 : getOpacity(end_time)
   const showBattleIcon =
-    !isInactive && !!battle_pokemon_id && hasStarted && isBattleActive
+    !isInactive && !!battle_pokemon_id && hasStarted && battle_end > now
 
   return divIcon({
     popupAnchor: [

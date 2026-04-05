@@ -15,8 +15,10 @@ const DEFAULT_IV = 15
 const STATION_TABLE = 'station'
 const STATION_BATTLE_ROW_ALIAS = 'station_battle_row'
 const STATION_BATTLE_FILTER_ALIAS = 'station_battle_filter'
+const STATION_BATTLE_SEARCH_ALIAS = 'station_battle_search'
 const STATION_BATTLE_ROW_TABLE = `station_battle as ${STATION_BATTLE_ROW_ALIAS}`
 const STATION_BATTLE_FILTER_TABLE = `station_battle as ${STATION_BATTLE_FILTER_ALIAS}`
+const STATION_BATTLE_SEARCH_TABLE = `station_battle as ${STATION_BATTLE_SEARCH_ALIAS}`
 const STATION_BATTLE_FIELDS = [
   'battle_level',
   'battle_start',
@@ -31,6 +33,16 @@ const STATION_BATTLE_FIELDS = [
   'battle_pokemon_move_2',
   'battle_pokemon_stamina',
   'battle_pokemon_cp_multiplier',
+]
+const STATION_SEARCH_BATTLE_FIELDS = [
+  'battle_level',
+  'battle_pokemon_id',
+  'battle_pokemon_form',
+  'battle_pokemon_costume',
+  'battle_pokemon_gender',
+  'battle_pokemon_alignment',
+  'battle_pokemon_bread_mode',
+  'battle_end',
 ]
 
 /**
@@ -98,6 +110,44 @@ function getStationColumn(field) {
  */
 function getStationSelect(fields) {
   return fields.map((field) => `${getStationColumn(field)} as ${field}`)
+}
+
+/**
+ * @param {string[]} fields
+ * @param {string} aliasPrefix
+ * @returns {string[]}
+ */
+function getAliasedStationSelect(fields, aliasPrefix) {
+  return fields.map(
+    (field) => `${getStationColumn(field)} as ${aliasPrefix}${field}`,
+  )
+}
+
+/**
+ * @param {ReturnType<typeof Model.knex>} knexRef
+ * @param {string} field
+ * @param {number[]} pokemonIds
+ * @param {number} ts
+ */
+function getMatchedSearchBattleSubquery(knexRef, field, pokemonIds, ts) {
+  return knexRef(STATION_BATTLE_SEARCH_TABLE)
+    .select(`${STATION_BATTLE_SEARCH_ALIAS}.${field}`)
+    .whereRaw(`${STATION_BATTLE_SEARCH_ALIAS}.station_id = ${STATION_TABLE}.id`)
+    .whereIn(`${STATION_BATTLE_SEARCH_ALIAS}.battle_pokemon_id`, pokemonIds)
+    .andWhere(`${STATION_BATTLE_SEARCH_ALIAS}.battle_end`, '>', ts)
+    .orderByRaw(
+      `CASE
+        WHEN ${STATION_BATTLE_SEARCH_ALIAS}.battle_start IS NULL
+          OR ${STATION_BATTLE_SEARCH_ALIAS}.battle_start = 0
+          OR ${STATION_BATTLE_SEARCH_ALIAS}.battle_start <= ?
+        THEN 0
+        ELSE 1
+      END ASC`,
+      [ts],
+    )
+    .orderBy(`${STATION_BATTLE_SEARCH_ALIAS}.battle_start`, 'asc')
+    .orderBy(`${STATION_BATTLE_SEARCH_ALIAS}.battle_end`, 'desc')
+    .limit(1)
 }
 
 /**
@@ -743,6 +793,7 @@ class Station extends Model {
     const { onlyAreas = [], search = '', locale } = args
     const { searchResultsLimit, stationUpdateLimit } = config.getSafe('api')
     const ts = getEpoch()
+    const knexRef = this.knex()
 
     const pokemonIds = Object.keys(state.event.masterfile.pokemon).filter(
       (pkmn) =>
@@ -754,18 +805,18 @@ class Station extends Model {
 
     const select = [...getStationSelect(['id', 'name', 'lat', 'lon']), distance]
     if (perms.dynamax) {
-      select.push(
-        ...getStationSelect([
-          'battle_level',
-          'battle_pokemon_id',
-          'battle_pokemon_form',
-          'battle_pokemon_costume',
-          'battle_pokemon_gender',
-          'battle_pokemon_alignment',
-          'battle_pokemon_bread_mode',
-          'battle_end',
-        ]),
-      )
+      if (hasMultiBattles && pokemonIds.length) {
+        select.push(
+          ...getAliasedStationSelect(STATION_SEARCH_BATTLE_FIELDS, 'station_'),
+          ...STATION_SEARCH_BATTLE_FIELDS.map((field) =>
+            getMatchedSearchBattleSubquery(knexRef, field, pokemonIds, ts).as(
+              `matched_${field}`,
+            ),
+          ),
+        )
+      } else {
+        select.push(...getStationSelect(STATION_SEARCH_BATTLE_FIELDS))
+      }
     }
 
     const query = this.query()
@@ -785,7 +836,7 @@ class Station extends Model {
         if (perms.dynamax) {
           if (hasMultiBattles) {
             builder.orWhereExists(
-              this.knex()
+              knexRef
                 .select(1)
                 .from(STATION_BATTLE_FILTER_TABLE)
                 .whereRaw(
@@ -811,7 +862,18 @@ class Station extends Model {
     if (!getAreaSql(query, areaRestrictions, onlyAreas, isMad)) {
       return []
     }
-    return query
+    const rows = await query
+    if (!(perms.dynamax && hasMultiBattles && pokemonIds.length)) {
+      return rows
+    }
+    return rows.map((row) => {
+      STATION_SEARCH_BATTLE_FIELDS.forEach((field) => {
+        row[field] = row[`matched_${field}`] ?? row[`station_${field}`]
+        delete row[`matched_${field}`]
+        delete row[`station_${field}`]
+      })
+      return row
+    })
   }
 }
 

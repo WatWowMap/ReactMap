@@ -52,8 +52,6 @@ export function StationPopup(station) {
   const now = Date.now() / 1000
   const battleState = getStationBattleState(station, now)
   const hasVisibleBattle = !!battleState.visibleBattle
-  const hasStationMons =
-    hasVisibleBattle && !!battleState.visibleBattle?.battle_pokemon_id
 
   return (
     <Card sx={{ width: 200 }} elevation={0}>
@@ -67,23 +65,21 @@ export function StationPopup(station) {
         end_time={station.end_time}
         is_battle_available={station.is_battle_available}
       />
-      {hasVisibleBattle &&
-        hasStationMons &&
-        !!station.total_stationed_pokemon && (
-          <ExpandCollapse>
-            <StationAttackBonus {...station} />
-            <ExpandWithState
-              field="popups.stationExtras"
-              disabled={!station.total_stationed_pokemon}
-            />
-            <CollapseWithState
-              field="popups.stationExtras"
-              in={!!station.total_stationed_pokemon}
-            >
-              <StationMons {...station} />
-            </CollapseWithState>
-          </ExpandCollapse>
-        )}
+      {hasVisibleBattle && !!station.total_stationed_pokemon && (
+        <ExpandCollapse>
+          <StationAttackBonus {...station} />
+          <ExpandWithState
+            field="popups.stationExtras"
+            disabled={!station.total_stationed_pokemon}
+          />
+          <CollapseWithState
+            field="popups.stationExtras"
+            in={!!station.total_stationed_pokemon}
+          >
+            <StationMons {...station} />
+          </CollapseWithState>
+        </ExpandCollapse>
+      )}
       <StationContent {...station} />
       <Footer lat={station.lat} lon={station.lon} />
       <ExtraInfo {...station} />

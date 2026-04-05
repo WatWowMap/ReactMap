@@ -120,6 +120,7 @@ export function getStationBattleState(station, ts) {
   )
   const visibleBattle =
     popupBattles.find((battle) => isStationBattleActive(battle, ts)) || null
+  const markerBattle = visibleBattle || popupBattles[0] || null
   const refreshTimestamps = [
     ...new Set(
       popupBattles.flatMap((battle) => {
@@ -146,6 +147,7 @@ export function getStationBattleState(station, ts) {
   return {
     popupBattles,
     visibleBattle,
+    markerBattle,
     hiddenBattles: visibleBattle
       ? popupBattles.filter(
           (battle) =>
