@@ -279,6 +279,22 @@ function getFallbackStationBattle(station, ts, pokemonData) {
 }
 
 /**
+ * @param {import('@rm/types').FullStation} station
+ * @returns {import('@rm/types').FullStation}
+ */
+function clearStationBattleFallback(station) {
+  ;[
+    ...STATION_BATTLE_FIELDS,
+    ...STATION_BATTLE_STAT_FIELDS,
+    'battle_pokemon_estimated_cp',
+  ].forEach((field) => {
+    station[field] = null
+  })
+  station.is_battle_available = false
+  return station
+}
+
+/**
  * @param {import('objection').QueryBuilder<any>} builder
  * @param {string} prefix
  * @param {{
@@ -806,6 +822,7 @@ class Station extends Model {
           station.battles = [fallbackBattle]
         } else {
           station.battles = []
+          clearStationBattleFallback(station)
         }
       } else if (!station.battles.length && fallbackBattle) {
         station.battles = [fallbackBattle]
