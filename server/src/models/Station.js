@@ -666,8 +666,7 @@ class Station extends Model {
       battleLevels,
       battleCombos,
     }
-    const shouldRestrictReturnedBattles =
-      onlyMaxBattles && hasBattleConditions && !onlyGmaxStationed
+    const shouldRestrictReturnedBattles = onlyMaxBattles && hasBattleConditions
 
     if (includeBattleData) {
       select.push(
@@ -913,9 +912,11 @@ class Station extends Model {
         )
         if (filteredBattles.length) {
           station.battles = filteredBattles
-        } else {
+        } else if (!onlyGmaxStationed) {
           station.battles = []
           clearStationBattleFallback(station)
+        } else {
+          station.battles = [...station.battles]
         }
       }
       return finalizeStation(station, pokemonData, ts)
