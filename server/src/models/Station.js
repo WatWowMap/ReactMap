@@ -921,6 +921,11 @@ class Station extends Model {
     })
 
     return [...grouped.values()].map((station) => {
+      if (Number(station?.end_time) <= ts) {
+        station.battles = []
+        clearStationBattleFallback(station)
+        return finalizeStation(station, pokemonData, ts)
+      }
       const fallbackBattle = getFallbackStationBattle(station, ts, pokemonData)
       station.battles = appendDistinctStationBattle(
         [...station.battles],
@@ -1174,9 +1179,12 @@ class Station extends Model {
         pokemonIds.includes(legacyBattle.battle_pokemon_id)
           ? legacyBattle
           : null
+      const matchedDisplayBattle = getPreferredStationBattle(
+        [matchedBattle, matchedLegacyBattle],
+        ts,
+      )
       const displayBattle =
-        matchedBattle ||
-        matchedLegacyBattle ||
+        matchedDisplayBattle ||
         getPreferredStationBattle([legacyBattle, searchBattle], ts)
       STATION_SEARCH_BATTLE_FIELDS.forEach((field) => {
         row[field] = displayBattle
