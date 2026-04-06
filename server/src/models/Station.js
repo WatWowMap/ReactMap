@@ -1133,13 +1133,13 @@ class Station extends Model {
             clearStationBattleFallback(station)
           }
         }
+        const hasMatchingReturnedBattle = station.battles.some((battle) =>
+          matchesStationBattleFilter(battle, battleFilterOptions),
+        )
         if (
           !onlyAllStations &&
           shouldRestrictReturnedBattles &&
-          !matchesStationBattleFilter(
-            station.battles[0],
-            battleFilterOptions,
-          ) &&
+          !hasMatchingReturnedBattle &&
           !onlyGmaxStationed
         ) {
           return null
