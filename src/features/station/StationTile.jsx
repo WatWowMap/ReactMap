@@ -28,20 +28,23 @@ const BaseStationTile = (station) => {
     return [timerList.includes(station.id), config.general.interactionRangeZoom]
   }, basicEqualFn)
 
-  const [showTimer, showInteractionRange, customRange] = useStorage((s) => {
-    const { userSettings, zoom } = s
-    return [
-      userSettings.stations.stationTimers || individualTimer,
-      !!userSettings.stations.interactionRanges && zoom >= interactionRangeZoom,
-      zoom >= interactionRangeZoom
-        ? +userSettings.stations.customRange || 0
-        : 0,
-    ]
-  }, basicEqualFn)
+  const [showTimer, showInteractionRange, customRange, includeUpcoming] =
+    useStorage((s) => {
+      const { userSettings, zoom, filters } = s
+      return [
+        userSettings.stations.stationTimers || individualTimer,
+        !!userSettings.stations.interactionRanges &&
+          zoom >= interactionRangeZoom,
+        zoom >= interactionRangeZoom
+          ? +userSettings.stations.customRange || 0
+          : 0,
+        filters?.stations?.includeUpcoming ?? true,
+      ]
+    }, basicEqualFn)
 
   const { start_time, end_time } = station
   const now = Date.now() / 1000
-  const battleState = getStationBattleState(station, now)
+  const battleState = getStationBattleState(station, now, { includeUpcoming })
 
   const refreshTimers = React.useMemo(() => {
     const internalTimers = /** @type {number[]} */ ([])

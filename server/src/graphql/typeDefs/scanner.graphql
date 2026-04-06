@@ -326,6 +326,7 @@ type StationBattle {
   battle_level: Int
   battle_start: Int
   battle_end: Int
+  updated: Int
   battle_pokemon_id: Int
   battle_pokemon_form: Int
   battle_pokemon_costume: Int

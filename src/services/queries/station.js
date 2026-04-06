@@ -38,6 +38,7 @@ const battle = gql`
       battle_level
       battle_start
       battle_end
+      updated
       battle_pokemon_id
       battle_pokemon_form
       battle_pokemon_costume

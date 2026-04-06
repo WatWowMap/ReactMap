@@ -31,14 +31,20 @@ const STATION_BATTLE_FIELDS = [
   'battle_pokemon_bread_mode',
   'battle_pokemon_move_1',
   'battle_pokemon_move_2',
-]
-const STATION_BATTLE_IDENTITY_FIELDS = STATION_BATTLE_FIELDS.filter(
-  (field) => !field.startsWith('battle_pokemon_move_'),
-)
-const STATION_BATTLE_STAT_FIELDS = [
   'battle_pokemon_stamina',
   'battle_pokemon_cp_multiplier',
+  'updated',
 ]
+const STATION_BATTLE_IDENTITY_FIELDS = STATION_BATTLE_FIELDS.filter(
+  (field) =>
+    ![
+      'battle_pokemon_move_1',
+      'battle_pokemon_move_2',
+      'battle_pokemon_stamina',
+      'battle_pokemon_cp_multiplier',
+      'updated',
+    ].includes(field),
+)
 const STATION_BATTLE_DETAIL_MERGE_FIELDS = [
   'battle_pokemon_move_1',
   'battle_pokemon_move_2',
@@ -104,14 +110,12 @@ function estimateStationCp(pokemonData, station) {
 
 /**
  * @param {string} alias
- * @param {boolean} [includeStats]
  * @returns {string[]}
  */
-function getAliasedStationBattleSelect(alias, includeStats = false) {
-  return [
-    ...STATION_BATTLE_FIELDS,
-    ...(includeStats ? STATION_BATTLE_STAT_FIELDS : []),
-  ].map((field) => `${alias}.${field} as ${alias}_${field}`)
+function getAliasedStationBattleSelect(alias) {
+  return STATION_BATTLE_FIELDS.map(
+    (field) => `${alias}.${field} as ${alias}_${field}`,
+  )
 }
 
 /**
@@ -237,6 +241,7 @@ function getAliasedStationBattle(row, alias, ts, pokemonData) {
       battle_level: row?.[`${alias}_battle_level`] ?? null,
       battle_start: row?.[`${alias}_battle_start`] ?? null,
       battle_end: row?.[`${alias}_battle_end`] ?? null,
+      updated: row?.[`${alias}_updated`] ?? null,
       battle_pokemon_id: row?.[`${alias}_battle_pokemon_id`] ?? null,
       battle_pokemon_form: row?.[`${alias}_battle_pokemon_form`] ?? null,
       battle_pokemon_costume: row?.[`${alias}_battle_pokemon_costume`] ?? null,
@@ -275,6 +280,7 @@ function getFallbackStationBattle(station, ts, pokemonData) {
       battle_level: station.battle_level ?? null,
       battle_start: station.battle_start ?? null,
       battle_end: station.battle_end ?? null,
+      updated: station.updated ?? null,
       battle_pokemon_id: station.battle_pokemon_id ?? null,
       battle_pokemon_form: station.battle_pokemon_form ?? null,
       battle_pokemon_costume: station.battle_pokemon_costume ?? null,
@@ -410,9 +416,15 @@ function compareStationBattles(left, right, ts) {
  * @param {import('@rm/types').StationBattle[]} battles
  * @param {import('@rm/types').StationBattle | null | undefined} battle
  * @param {import('ohbem').PokemonData | null} pokemonData
+ * @param {{ preserveExistingUpdated?: boolean }} [options]
  * @returns {import('@rm/types').StationBattle[]}
  */
-function appendDistinctStationBattle(battles, battle, pokemonData) {
+function appendDistinctStationBattle(
+  battles,
+  battle,
+  pokemonData,
+  { preserveExistingUpdated = false } = {},
+) {
   if (!battle) return battles
   const battleIdentity = getStationBattleIdentity(battle)
   const exactBattle = battles.find(
@@ -441,17 +453,29 @@ function appendDistinctStationBattle(battles, battle, pokemonData) {
       }
     })
     let statsChanged = false
-    STATION_BATTLE_STAT_FIELDS.forEach((field) => {
-      if (existingBattle[field] == null && battle[field] != null) {
-        existingBattle[field] = battle[field]
-        statsChanged = true
-      }
-    })
+    ;['battle_pokemon_stamina', 'battle_pokemon_cp_multiplier'].forEach(
+      (field) => {
+        if (existingBattle[field] == null && battle[field] != null) {
+          existingBattle[field] = battle[field]
+          statsChanged = true
+        }
+      },
+    )
     STATION_BATTLE_DETAIL_MERGE_FIELDS.forEach((field) => {
       if (existingBattle[field] == null && battle[field] != null) {
         existingBattle[field] = battle[field]
       }
     })
+    const existingUpdated = Number(existingBattle.updated)
+    const nextUpdated = Number(battle.updated)
+    if (
+      Number.isFinite(nextUpdated) &&
+      nextUpdated > 0 &&
+      (!preserveExistingUpdated || !Number.isFinite(existingUpdated)) &&
+      (!Number.isFinite(existingUpdated) || nextUpdated > existingUpdated)
+    ) {
+      existingBattle.updated = battle.updated
+    }
     if (statsChanged && pokemonData) {
       existingBattle.battle_pokemon_estimated_cp = estimateStationCp(
         pokemonData,
@@ -541,31 +565,12 @@ function getPreferredStationBattle(battles, ts) {
  */
 function clearStationBattleFallback(station) {
   ;[
-    ...STATION_BATTLE_FIELDS,
-    ...STATION_BATTLE_STAT_FIELDS,
+    ...STATION_BATTLE_FIELDS.filter((field) => field !== 'updated'),
     'battle_pokemon_estimated_cp',
   ].forEach((field) => {
     station[field] = null
   })
   station.is_battle_available = false
-  return station
-}
-
-/**
- * @param {import('@rm/types').FullStation} station
- * @param {import('@rm/types').StationBattle | null | undefined} battle
- * @returns {import('@rm/types').FullStation}
- */
-function syncStationBattleFallback(station, battle) {
-  clearStationBattleFallback(station)
-  if (!battle) return station
-  ;[...STATION_BATTLE_FIELDS, ...STATION_BATTLE_STAT_FIELDS].forEach(
-    (field) => {
-      station[field] = battle?.[field] ?? null
-    },
-  )
-  station.battle_pokemon_estimated_cp =
-    battle?.battle_pokemon_estimated_cp ?? null
   return station
 }
 
@@ -648,11 +653,8 @@ function matchesStationBattleFilter(
   if (!(Number(battle?.battle_end) > ts)) {
     return false
   }
-  if (!includeUpcoming) {
-    const battleStart = Number(battle?.battle_start)
-    if (Number.isFinite(battleStart) && battleStart > 0 && battleStart > ts) {
-      return false
-    }
+  if (!includeUpcoming && !isStationBattleActive(battle, ts)) {
+    return false
   }
   if (onlyBattleTier !== 'all') {
     return Number(battle?.battle_level) === Number(onlyBattleTier)
@@ -680,6 +682,42 @@ function matchesStationBattleFilter(
   }
 
   return matchApplied && matched
+}
+
+/**
+ * @param {import('@rm/types').StationBattle | null | undefined} left
+ * @param {import('@rm/types').StationBattle | null | undefined} right
+ * @returns {number}
+ */
+function compareVisibleStationBattles(left, right) {
+  const leftEnd = Number(left?.battle_end) || Number.MAX_SAFE_INTEGER
+  const rightEnd = Number(right?.battle_end) || Number.MAX_SAFE_INTEGER
+  if (leftEnd !== rightEnd) {
+    return leftEnd - rightEnd
+  }
+
+  const leftStart = Number(left?.battle_start) || 0
+  const rightStart = Number(right?.battle_start) || 0
+  if (leftStart !== rightStart) {
+    return leftStart - rightStart
+  }
+
+  return getStationBattleIdentity(left).localeCompare(
+    getStationBattleIdentity(right),
+  )
+}
+
+/**
+ * @param {(import('@rm/types').StationBattle | null | undefined)[]} battles
+ * @param {number} ts
+ * @returns {import('@rm/types').StationBattle | null}
+ */
+function getVisibleStationBattle(battles, ts) {
+  return (
+    [...(battles || [])]
+      .filter((battle) => isStationBattleActive(battle, ts))
+      .sort(compareVisibleStationBattles)[0] || null
+  )
 }
 
 /**
@@ -749,13 +787,7 @@ class Station extends Model {
   static async getAll(
     perms,
     args,
-    {
-      isMad,
-      hasMultiBattles,
-      hasMultiBattlePokemonStats,
-      hasStationedGmax,
-      hasBattlePokemonStats,
-    },
+    { isMad, hasMultiBattles, hasStationedGmax, hasBattlePokemonStats },
   ) {
     const { areaRestrictions } = perms
     const { stationUpdateLimit, stationInactiveLimitDays } =
@@ -884,12 +916,7 @@ class Station extends Model {
         )
       }
       if (hasMultiBattles) {
-        select.push(
-          ...getAliasedStationBattleSelect(
-            STATION_BATTLE_ROW_ALIAS,
-            hasMultiBattlePokemonStats,
-          ),
-        )
+        select.push(...getAliasedStationBattleSelect(STATION_BATTLE_ROW_ALIAS))
         query.leftJoin(STATION_BATTLE_ROW_TABLE, (join) => {
           join
             .on('station.id', '=', `${STATION_BATTLE_ROW_ALIAS}.station_id`)
@@ -1018,10 +1045,7 @@ class Station extends Model {
     const stationRows = await query
 
     let pokemonData = null
-    if (
-      perms.dynamax &&
-      (hasBattlePokemonStats || hasMultiBattlePokemonStats)
-    ) {
+    if (perms.dynamax && (hasBattlePokemonStats || hasMultiBattles)) {
       const needsEstimatedCp = stationRows.some((station) => {
         if (!station) return false
         const multiplier = Number(station.battle_pokemon_cp_multiplier)
@@ -1084,45 +1108,45 @@ class Station extends Model {
       }
     })
 
-    return [...grouped.values()].map((station) => {
-      if (Number(station?.end_time) <= ts) {
-        station.battles = []
-        clearStationBattleFallback(station)
-        return finalizeStation(station, pokemonData, ts)
-      }
-      const fallbackBattle = getFallbackStationBattle(station, ts, pokemonData)
-      station.battles = appendDistinctStationBattle(
-        [...station.battles],
-        fallbackBattle,
-        pokemonData,
-      )
-      if (!onlyIncludeUpcoming) {
-        station.battles = station.battles.filter((battle) =>
-          isStationBattleActive(battle, ts),
-        )
-        if (!station.battles.length) {
-          clearStationBattleFallback(station)
-        }
-      }
-      if (shouldRestrictReturnedBattles) {
-        const filteredBattles = station.battles.filter((battle) =>
-          matchesStationBattleFilter(battle, battleFilterOptions),
-        )
-        if (filteredBattles.length) {
-          station.battles = filteredBattles
-          syncStationBattleFallback(
-            station,
-            getPreferredStationBattle(station.battles, ts),
-          )
-        } else if (!onlyGmaxStationed) {
+    return [...grouped.values()]
+      .map((station) => {
+        if (Number(station?.end_time) <= ts) {
           station.battles = []
           clearStationBattleFallback(station)
-        } else {
-          station.battles = [...station.battles]
+          return finalizeStation(station, pokemonData, ts)
         }
-      }
-      return finalizeStation(station, pokemonData, ts)
-    })
+        const fallbackBattle = getFallbackStationBattle(
+          station,
+          ts,
+          pokemonData,
+        )
+        station.battles = appendDistinctStationBattle(
+          [...station.battles],
+          fallbackBattle,
+          pokemonData,
+          { preserveExistingUpdated: true },
+        )
+        if (!onlyIncludeUpcoming) {
+          const visibleBattle = getVisibleStationBattle(station.battles, ts)
+          station.battles = visibleBattle ? [visibleBattle] : []
+          if (!station.battles.length) {
+            clearStationBattleFallback(station)
+          }
+        }
+        if (
+          !onlyAllStations &&
+          shouldRestrictReturnedBattles &&
+          !matchesStationBattleFilter(
+            station.battles[0],
+            battleFilterOptions,
+          ) &&
+          !onlyGmaxStationed
+        ) {
+          return null
+        }
+        return finalizeStation(station, pokemonData, ts)
+      })
+      .filter(Boolean)
   }
 
   /**

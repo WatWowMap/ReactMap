@@ -22,11 +22,9 @@ const STATION_BATTLE_REQUIRED_COLUMNS = [
   'battle_pokemon_bread_mode',
   'battle_pokemon_move_1',
   'battle_pokemon_move_2',
-]
-
-const STATION_BATTLE_STATS_COLUMNS = [
   'battle_pokemon_stamina',
   'battle_pokemon_cp_multiplier',
+  'updated',
 ]
 
 /**
@@ -189,11 +187,6 @@ class DbManager extends Logger {
           (column) => column in stationBattleColumns,
         )
       : false
-    const hasMultiBattlePokemonStats = stationBattleColumns
-      ? STATION_BATTLE_STATS_COLUMNS.every(
-          (column) => column in stationBattleColumns,
-        )
-      : false
     const hasStationedGmax = 'total_stationed_gmax' in stationColumns
     const hasBattlePokemonStats =
       'battle_pokemon_stamina' in stationColumns &&
@@ -254,7 +247,6 @@ class DbManager extends Logger {
       hasShowcaseForm,
       hasShowcaseType,
       hasMultiBattles,
-      hasMultiBattlePokemonStats,
       hasStationedGmax,
       hasBattlePokemonStats,
       hasShortcode,

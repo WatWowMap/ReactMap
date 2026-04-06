@@ -37,7 +37,6 @@ import {
 } from '@components/inputs/ExpandCollapse'
 import { VirtualGrid } from '@components/virtual/VirtualGrid'
 import { getStationDamageBoost } from '@utils/getAttackBonus'
-import { getTimeUntil } from '@utils/getTimeUntil'
 import { getFormDisplay } from '@utils/getFormDisplay'
 import { CopyCoords } from '@components/popups/Coords'
 import Tooltip from '@mui/material/Tooltip'
@@ -46,14 +45,116 @@ import { usePokemonBackgroundVisuals } from '@hooks/usePokemonBackgroundVisuals'
 import { getStationBattleKey, getStationBattleState } from './battleState'
 import { useGetStationMons } from './useGetStationMons'
 
+/**
+ * @param {import('@rm/types').AllFilters['stations'] | undefined} filters
+ */
+function getDisplayedBattleFilters(filters) {
+  if (!filters?.maxBattles || filters?.allStations) {
+    return null
+  }
+
+  const onlyBattleTier = filters.battleTier ?? 'all'
+  const battleLevels = new Set()
+  const battleCombos = new Map()
+
+  if (onlyBattleTier === 'all') {
+    Object.entries(filters.filter || {}).forEach(([key, value]) => {
+      if (!value?.enabled) return
+      if (key.startsWith('j')) {
+        const parsedLevel = Number(key.slice(1))
+        if (Number.isFinite(parsedLevel)) {
+          battleLevels.add(parsedLevel)
+        }
+        return
+      }
+      if (/^\d+-/.test(key)) {
+        const [idPart, formPart] = key.split('-', 2)
+        const pokemonId = Number(idPart)
+        if (!Number.isFinite(pokemonId)) return
+        let formValue = null
+        if (formPart && formPart !== 'null') {
+          const parsedForm = Number(formPart)
+          if (!Number.isFinite(parsedForm)) return
+          formValue = parsedForm
+        }
+        battleCombos.set(`${pokemonId}-${formValue ?? 'null'}`, {
+          pokemonId,
+          form: formValue,
+        })
+      }
+    })
+  }
+
+  if (
+    onlyBattleTier === 'all' &&
+    battleLevels.size === 0 &&
+    battleCombos.size === 0
+  ) {
+    return null
+  }
+
+  return {
+    onlyBattleTier,
+    battleLevels: [...battleLevels],
+    battleCombos: [...battleCombos.values()],
+  }
+}
+
+/**
+ * @param {import('@rm/types').StationBattle | null | undefined} battle
+ * @param {ReturnType<typeof getDisplayedBattleFilters>} filters
+ */
+function matchesDisplayedBattleFilter(battle, filters) {
+  if (!filters) return true
+  if (filters.onlyBattleTier !== 'all') {
+    return Number(battle?.battle_level) === Number(filters.onlyBattleTier)
+  }
+  const battleLevel = Number(battle?.battle_level)
+  const pokemonId = Number(battle?.battle_pokemon_id)
+  const pokemonForm =
+    battle?.battle_pokemon_form === null
+      ? null
+      : Number(battle?.battle_pokemon_form)
+
+  return (
+    filters.battleLevels.includes(battleLevel) ||
+    filters.battleCombos.some(
+      ({ pokemonId: filterPokemonId, form }) =>
+        pokemonId === filterPokemonId && pokemonForm === form,
+    )
+  )
+}
+
 /** @param {import('@rm/types').Station} station */
 export function StationPopup(station) {
   useAnalytics('Popup', 'Station')
   const now = Date.now() / 1000
-  const battleState = getStationBattleState(station, now)
+  const stationFilters = useStorage((s) => s.filters?.stations)
+  const battleState = getStationBattleState(station, now, {
+    includeUpcoming: stationFilters?.includeUpcoming ?? true,
+  })
+  const visibleBattleKey = battleState.visibleBattle
+    ? getStationBattleKey(battleState.visibleBattle)
+    : ''
+  const displayedBattleFilters = React.useMemo(
+    () => getDisplayedBattleFilters(stationFilters),
+    [stationFilters],
+  )
+  const displayedPopupBattles = React.useMemo(
+    () =>
+      battleState.popupBattles.filter(
+        (battle) =>
+          getStationBattleKey(battle) === visibleBattleKey ||
+          matchesDisplayedBattleFilter(battle, displayedBattleFilters),
+      ),
+    [battleState.popupBattles, displayedBattleFilters, visibleBattleKey],
+  )
   const hasVisibleBattle = !!battleState.visibleBattle
   const menuBattle =
-    battleState.visibleBattle || battleState.popupBattles[0] || null
+    displayedPopupBattles[0] ||
+    battleState.visibleBattle ||
+    battleState.popupBattles[0] ||
+    null
 
   return (
     <Card sx={{ width: 200 }} elevation={0}>
@@ -62,9 +163,8 @@ export function StationPopup(station) {
         <StationMenu {...station} battle={menuBattle} />
       </Box>
       <StationBattles
-        popupBattles={battleState.popupBattles}
+        popupBattles={displayedPopupBattles}
         visibleBattle={battleState.visibleBattle}
-        end_time={station.end_time}
         is_battle_available={station.is_battle_available}
       />
       {hasVisibleBattle && !!station.total_stationed_pokemon && (
@@ -238,16 +338,10 @@ function StationMenu({ id, lat, lon, battle = null }) {
  * @param {{
  *  popupBattles: import('@rm/types').StationBattle[]
  *  visibleBattle: import('@rm/types').StationBattle | null
- *  end_time?: number
  *  is_battle_available: boolean
  * }} props
  */
-function StationBattles({
-  popupBattles,
-  visibleBattle,
-  end_time,
-  is_battle_available,
-}) {
+function StationBattles({ popupBattles, visibleBattle, is_battle_available }) {
   if (!popupBattles.length) {
     return null
   }
@@ -257,7 +351,6 @@ function StationBattles({
       {!!index && <Divider light flexItem className="popup-divider" />}
       <StationBattleSection
         {...battle}
-        end_time={end_time}
         is_battle_available={is_battle_available}
         hidden={
           !visibleBattle ||
@@ -270,7 +363,6 @@ function StationBattles({
 
 /**
  * @param {import('@rm/types').StationBattle & {
- *  end_time?: number
  *  hidden?: boolean
  *  is_battle_available: boolean
  * }} props
@@ -285,7 +377,7 @@ function StationBattleSection({
   battle_level,
   battle_end,
   battle_start,
-  end_time,
+  updated,
   hidden = false,
   is_battle_available,
   battle_pokemon_stamina,
@@ -294,20 +386,19 @@ function StationBattleSection({
 }) {
   const { t } = useTranslation()
   const nowSeconds = Date.now() / 1000
-  const hasBattleEnd = Number.isFinite(battle_end)
-  const hasBattleStart = Number.isFinite(battle_start)
-  const hasEndTime = Number.isFinite(end_time)
-  const battleEndEpoch = hasBattleEnd ? battle_end : 0
-  const battleStartEpoch = hasBattleStart ? battle_start : 0
-  const isBattleActive = battleEndEpoch > nowSeconds
-  const isStarting = hasBattleStart && battleStartEpoch > nowSeconds
-  const isBattleEndSameAsExpire =
-    hasBattleEnd && hasEndTime && battle_end === end_time
-  const countdownEpoch = isStarting ? battleStartEpoch : battleEndEpoch
-  const showBattleCountdown = countdownEpoch > 0 && !isBattleEndSameAsExpire
+  const battleEndEpoch = Number(battle_end)
+  const battleStartEpoch = Number(battle_start)
+  const hasBattleEnd = Number.isFinite(battleEndEpoch) && battleEndEpoch > 0
+  const hasBattleStart =
+    Number.isFinite(battleStartEpoch) && battleStartEpoch > 0
+  const isBattleActive =
+    hasBattleEnd &&
+    battleEndEpoch > nowSeconds &&
+    (!hasBattleStart || battleStartEpoch <= nowSeconds)
+  const showLiveCountdown = isBattleActive && !hidden
   const showBreadWindow =
+    showLiveCountdown &&
     !is_battle_available &&
-    showBattleCountdown &&
     hasBattleStart &&
     battleStartEpoch < nowSeconds &&
     battleEndEpoch > nowSeconds
@@ -379,15 +470,18 @@ function StationBattleSection({
   const showStatsRow = Boolean(cpLine || battleStaminaDisplay)
 
   if (!isBattleActive) {
-    return null
+    if (!(hasBattleEnd && battleEndEpoch > nowSeconds)) {
+      return null
+    }
   }
 
-  const countdownContent = showBattleCountdown ? (
+  const countdownContent = hasBattleEnd ? (
     <CardContent sx={{ pt: 1, pb: 0 }}>
       <Stack spacing={0.5} alignItems="center" width="100%">
         <StationBattleTimer
-          start={isStarting}
-          epoch={countdownEpoch}
+          epoch={battleEndEpoch}
+          updated={updated}
+          countdown={showLiveCountdown}
           hidden={hidden}
         />
         {showBreadWindow && (
@@ -687,39 +781,46 @@ function StationMons({ id, updated }) {
 }
 
 /**
- * @param {{ start?: boolean, epoch: number, hidden?: boolean }} props
+ * @param {{ epoch: number, updated?: number, countdown?: boolean, hidden?: boolean }} props
  */
-function StationBattleTimer({ start = false, epoch, hidden = false }) {
+function StationBattleTimer({
+  epoch,
+  updated,
+  countdown = false,
+  hidden = false,
+}) {
   const { t } = useTranslation()
   const hasEpoch = Number.isFinite(epoch) && epoch > 0
+  const updatedEpoch = Number(updated)
+  const hasUpdated = Number.isFinite(updatedEpoch) && updatedEpoch > 0
   const target = hasEpoch ? epoch * 1000 : 0
-  const update = React.useCallback(() => getTimeUntil(target, true), [target])
-  const [display, setDisplay] = React.useState(() =>
-    target ? update() : { str: '0s', diff: 0 },
-  )
-
-  React.useEffect(() => {
-    if (!target) return undefined
-    const timer = setTimeout(() => setDisplay(update()), 1000)
-    return () => clearTimeout(timer)
-  })
+  const timeFormatter = useFormatStore((s) => s.timeFormat)
+  const dateFormatter = useFormatStore((s) => s.dateFormat)
+  const relativeTime = useRelativeTimer(countdown ? epoch : 0)
 
   if (!target) {
     return null
   }
 
-  const locale = localStorage.getItem('i18nextLng') || 'en'
   const textColor = hidden ? 'GrayText' : 'inherit'
 
   return (
     <Stack spacing={0} alignItems="center" width="100%">
       <Typography variant="subtitle1" align="center" color={textColor}>
-        {t(start ? 'starts' : 'ends')}:{' '}
-        {new Date(target).toLocaleTimeString(locale)}
+        {t('ends')}: {timeFormatter.format(new Date(target))}
       </Typography>
-      <Typography variant="h6" align="center" color={textColor}>
-        {display.str.replace('days', t('days')).replace('day', t('day'))}
-      </Typography>
+      {countdown ? (
+        <Typography variant="h6" align="center" color={textColor}>
+          {relativeTime}
+        </Typography>
+      ) : (
+        hasUpdated && (
+          <Typography variant="caption" align="center" color={textColor}>
+            {t('last_seen')}:{' '}
+            {dateFormatter.format(new Date(updatedEpoch * 1000))}
+          </Typography>
+        )
+      )}
     </Stack>
   )
 }

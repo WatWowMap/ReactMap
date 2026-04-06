@@ -54,6 +54,7 @@ function getFallbackBattle(station, ts) {
     battle_level: station.battle_level,
     battle_start: station.battle_start,
     battle_end: station.battle_end,
+    updated: station.updated,
     battle_pokemon_id: station.battle_pokemon_id,
     battle_pokemon_form: station.battle_pokemon_form,
     battle_pokemon_costume: station.battle_pokemon_costume,
@@ -70,29 +71,20 @@ function getFallbackBattle(station, ts) {
 
 /**
  * @param {import('@rm/types').StationBattle[]} battles
- * @param {number} ts
  * @returns {import('@rm/types').StationBattle[]}
  */
-function sortStationBattles(battles, ts) {
+function sortStationBattles(battles) {
   return [...battles].sort((left, right) => {
-    const leftActive = isStationBattleActive(left, ts)
-    const rightActive = isStationBattleActive(right, ts)
-    if (leftActive !== rightActive) {
-      return leftActive ? -1 : 1
-    }
-
-    if (!leftActive) {
-      const leftStart = Number(left?.battle_start) || Number.MAX_SAFE_INTEGER
-      const rightStart = Number(right?.battle_start) || Number.MAX_SAFE_INTEGER
-      if (leftStart !== rightStart) {
-        return leftStart - rightStart
-      }
-    }
-
-    const leftEnd = Number(left?.battle_end) || 0
-    const rightEnd = Number(right?.battle_end) || 0
+    const leftEnd = Number(left?.battle_end) || Number.MAX_SAFE_INTEGER
+    const rightEnd = Number(right?.battle_end) || Number.MAX_SAFE_INTEGER
     if (leftEnd !== rightEnd) {
-      return rightEnd - leftEnd
+      return leftEnd - rightEnd
+    }
+
+    const leftStart = Number(left?.battle_start) || 0
+    const rightStart = Number(right?.battle_start) || 0
+    if (leftStart !== rightStart) {
+      return leftStart - rightStart
     }
 
     return getStationBattleKey(left).localeCompare(getStationBattleKey(right))
@@ -102,8 +94,13 @@ function sortStationBattles(battles, ts) {
 /**
  * @param {import('@rm/types').Station} station
  * @param {number} ts
+ * @param {{ includeUpcoming?: boolean }} [options]
  */
-export function getStationBattleState(station, ts) {
+export function getStationBattleState(
+  station,
+  ts,
+  { includeUpcoming = true } = {},
+) {
   const sourceBattles =
     Array.isArray(station?.battles) && station.battles.length
       ? station.battles
@@ -115,8 +112,7 @@ export function getStationBattleState(station, ts) {
     [
       ...sourceBattles.filter((battle) => Number(battle?.battle_end) > ts),
       ...(fallbackBattle ? [fallbackBattle] : []),
-    ],
-    ts,
+    ].filter((battle) => includeUpcoming || isStationBattleActive(battle, ts)),
   )
   const visibleBattle =
     popupBattles.find((battle) => isStationBattleActive(battle, ts)) || null
@@ -172,6 +168,7 @@ export function stationBattlesEqual(prev, next) {
     (battle, index) =>
       getStationBattleKey(battle) === getStationBattleKey(next?.[index]) &&
       [
+        'updated',
         'battle_pokemon_stamina',
         'battle_pokemon_cp_multiplier',
         'battle_pokemon_estimated_cp',

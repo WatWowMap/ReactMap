@@ -383,6 +383,7 @@ export interface StationBattle {
   battle_level: number
   battle_start?: number
   battle_end?: number
+  updated?: number
   battle_pokemon_id: number
   battle_pokemon_form: number
   battle_pokemon_costume: number
