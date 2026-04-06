@@ -28,8 +28,9 @@ export function useStationMarker(station, battle = null) {
   const now = Date.now() / 1000
   const isInactive = Number.isFinite(end_time) && end_time < now
   const hasStarted = Number.isFinite(start_time) && start_time < now
+  const battleStart = Number(battle_start)
   const hasBattleStarted =
-    !Number.isFinite(battle_start) || battle_start === 0 || battle_start <= now
+    !Number.isFinite(battleStart) || battleStart === 0 || battleStart <= now
   const [, Icons] = useStorage(
     (s) => [s.icons, useMemory.getState().Icons],
     (a, b) => Object.entries(a[0]).every(([k, v]) => b[0][k] === v),
