@@ -384,6 +384,7 @@
   "shiny_probability": "Shiny rate: <0/>",
   "shiny_sample": "{{percentage}}%: {{shiny}} shiny/{{checks}} checks since {{date}}",
   "exclude_quest_multi": "Exclude {{reward}}",
+  "exclude_battle_multi": "Exclude {{battle}}",
   "cluster_limit_0": "{{variable_0}} limit ({{variable_1}}) has been hit",
   "cluster_limit_1": "Please zoom in or narrow your filters",
   "show_polygons": "Show Polygons",

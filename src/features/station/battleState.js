@@ -50,6 +50,13 @@ export function getStationBattleKey(battle) {
  */
 function getFallbackBattle(station, ts) {
   if (!(Number(station?.battle_end) > ts)) return null
+  if (
+    station?.battle_level === null &&
+    station?.battle_pokemon_id === null &&
+    station?.battle_pokemon_form === null
+  ) {
+    return null
+  }
   return {
     battle_level: station.battle_level,
     battle_start: station.battle_start,

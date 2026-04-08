@@ -150,17 +150,12 @@ export function StationPopup(station) {
     [battleState.popupBattles, displayedBattleFilters, visibleBattleKey],
   )
   const hasVisibleBattle = !!battleState.visibleBattle
-  const menuBattle =
-    displayedPopupBattles[0] ||
-    battleState.visibleBattle ||
-    battleState.popupBattles[0] ||
-    null
 
   return (
     <Card sx={{ width: 200 }} elevation={0}>
       <Box display="flex" alignItems="center" justifyContent="space-evenly">
         <StationHeader {...station} />
-        <StationMenu {...station} battle={menuBattle} />
+        <StationMenu {...station} battles={displayedPopupBattles} />
       </Box>
       <StationBattles
         popupBattles={displayedPopupBattles}
@@ -254,20 +249,16 @@ const ExtraInfo = ({ updated }) => {
 }
 
 /** @param {import('@rm/types').Station & {
- *  battle?: import('@rm/types').StationBattle | null
+ *  battles?: import('@rm/types').StationBattle[]
  * }} props */
-function StationMenu({ id, lat, lon, battle = null }) {
-  const {
-    battle_level = 0,
-    battle_pokemon_id = 0,
-    battle_pokemon_form = 0,
-  } = battle || {}
+function StationMenu({ id, lat, lon, battles = [] }) {
   const copyCoords = useGetDeepStore(
     'userSettings.stations.enableStationPopupCoords',
     false,
   )
   const [anchorEl, setAnchorEl] = React.useState(null)
   const { t } = useTranslation()
+  const { t: tId } = useTranslateById()
 
   const handleClick = React.useCallback(
     (event) => setAnchorEl(event.currentTarget),
@@ -275,29 +266,54 @@ function StationMenu({ id, lat, lon, battle = null }) {
   )
   const handleClose = React.useCallback(() => setAnchorEl(null), [])
 
+  const battleOptions = React.useMemo(() => {
+    const actionableBattles = [...battles].filter(
+      (battle) =>
+        Number(battle?.battle_pokemon_id) > 0 ||
+        Number(battle?.battle_level) > 0,
+    )
+
+    return actionableBattles.reduce((acc, battle) => {
+      const battleKey = getStationBattleKey(battle)
+      const filterKey =
+        Number(battle?.battle_pokemon_id) > 0
+          ? `${battle.battle_pokemon_id}-${battle.battle_pokemon_form}`
+          : `j${battle?.battle_level}`
+      if (acc.some((option) => option.filterKey === filterKey)) {
+        return acc
+      }
+      const battleLabel =
+        Number(battle?.battle_pokemon_id) > 0
+          ? battle?.battle_pokemon_form === null
+            ? tId(`${battle.battle_pokemon_id}`)
+            : tId(`${battle.battle_pokemon_id}-${battle.battle_pokemon_form}`)
+          : t(`max_battle_${battle?.battle_level}`)
+
+      acc.push({
+        filterKey,
+        key: `exclude_${battleKey}`,
+        label: t('exclude_battle_multi', { battle: battleLabel }),
+        action: () =>
+          setDeepStore(`filters.stations.filter.${filterKey}.enabled`, false),
+      })
+      return acc
+    }, [])
+  }, [battles, t, tId])
+
   const options = React.useMemo(
     () => [
       {
-        name: 'hide',
+        key: 'hide',
+        label: t('hide'),
         action: () =>
           useMemory.setState((prev) => ({
             hideList: new Set(prev.hideList).add(id),
           })),
       },
+      ...battleOptions,
       {
-        name: 'exclude_battle',
-        action: () =>
-          setDeepStore(
-            `filters.stations.filter.${
-              battle_pokemon_id > 0
-                ? `${battle_pokemon_id}-${battle_pokemon_form}`
-                : `j${battle_level}`
-            }.enabled`,
-            false,
-          ),
-      },
-      {
-        name: 'timer',
+        key: 'timer',
+        label: t('timer'),
         action: () =>
           useMemory.setState((prev) => {
             if (prev.timerList.includes(id)) {
@@ -307,7 +323,7 @@ function StationMenu({ id, lat, lon, battle = null }) {
           }),
       },
     ],
-    [battle_level, battle_pokemon_form, battle_pokemon_id, id],
+    [battleOptions, id, t],
   )
 
   return (
@@ -318,14 +334,14 @@ function StationMenu({ id, lat, lon, battle = null }) {
       <Menu anchorEl={anchorEl} open={!!anchorEl} onClose={handleClose}>
         {options.map((option) => (
           <MenuItem
-            key={option.name}
+            key={option.key}
             onClick={() => {
               handleClose()
               option.action()
             }}
             dense
           >
-            {t(option.name)}
+            {option.label}
           </MenuItem>
         ))}
         {copyCoords && <CopyCoords lat={lat} lon={lon} onClick={handleClose} />}
