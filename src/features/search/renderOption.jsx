@@ -93,14 +93,25 @@ const InvasionSubtitle = ({
 }
 
 const Timer = ({ expireTime, startTime = 0 }) => {
-  const [now, setNow] = React.useState(() => Math.floor(Date.now() / 1000))
+  const [target, setTarget] = React.useState(() =>
+    startTime > Math.floor(Date.now() / 1000) ? startTime : expireTime,
+  )
+
   React.useEffect(() => {
-    const interval = setInterval(() => {
-      setNow(Math.floor(Date.now() / 1000))
-    }, 1000)
-    return () => clearInterval(interval)
-  }, [])
-  const target = startTime > now ? startTime : expireTime
+    const now = Math.floor(Date.now() / 1000)
+    if (startTime > now) {
+      setTarget(startTime)
+      const timeout = setTimeout(
+        () => setTarget(expireTime),
+        Math.max(startTime * 1000 - Date.now(), 0),
+      )
+      return () => clearTimeout(timeout)
+    }
+
+    setTarget(expireTime)
+    return undefined
+  }, [expireTime, startTime])
+
   const time = useRelativeTimer(target || 0)
   return time
 }

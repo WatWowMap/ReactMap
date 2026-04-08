@@ -346,15 +346,20 @@ function StationBattles({ popupBattles, visibleBattle, is_battle_available }) {
     return null
   }
 
+  const primaryBattle = visibleBattle || popupBattles[0] || null
+
   return popupBattles.map((battle, index) => (
     <React.Fragment key={getStationBattleKey(battle)}>
       {!!index && <Divider light flexItem className="popup-divider" />}
       <StationBattleSection
         {...battle}
+        primary={
+          getStationBattleKey(battle) === getStationBattleKey(primaryBattle)
+        }
         is_battle_available={is_battle_available}
         hidden={
-          !visibleBattle ||
-          getStationBattleKey(battle) !== getStationBattleKey(visibleBattle)
+          !!primaryBattle &&
+          getStationBattleKey(battle) !== getStationBattleKey(primaryBattle)
         }
       />
     </React.Fragment>
@@ -364,6 +369,7 @@ function StationBattles({ popupBattles, visibleBattle, is_battle_available }) {
 /**
  * @param {import('@rm/types').StationBattle & {
  *  hidden?: boolean
+ *  primary?: boolean
  *  is_battle_available: boolean
  * }} props
  */
@@ -379,6 +385,7 @@ function StationBattleSection({
   battle_start,
   updated,
   hidden = false,
+  primary = false,
   is_battle_available,
   battle_pokemon_stamina,
   battle_pokemon_cp_multiplier,
@@ -395,8 +402,17 @@ function StationBattleSection({
     hasBattleEnd &&
     battleEndEpoch > nowSeconds &&
     (!hasBattleStart || battleStartEpoch <= nowSeconds)
-  const showLiveCountdown = isBattleActive && !hidden
+  const showUpcomingStartTimer =
+    primary &&
+    hasBattleStart &&
+    battleStartEpoch > nowSeconds &&
+    hasBattleEnd &&
+    battleEndEpoch > nowSeconds
+  const timerEpoch = showUpcomingStartTimer ? battleStartEpoch : battleEndEpoch
+  const showLiveCountdown =
+    (!hidden && isBattleActive) || showUpcomingStartTimer
   const showBreadWindow =
+    !showUpcomingStartTimer &&
     showLiveCountdown &&
     !is_battle_available &&
     hasBattleStart &&
@@ -479,8 +495,9 @@ function StationBattleSection({
     <CardContent sx={{ pt: 1, pb: 0 }}>
       <Stack spacing={0.5} alignItems="center" width="100%">
         <StationBattleTimer
-          epoch={battleEndEpoch}
+          epoch={timerEpoch}
           updated={updated}
+          start={showUpcomingStartTimer}
           countdown={showLiveCountdown}
           hidden={hidden}
         />
@@ -781,11 +798,18 @@ function StationMons({ id, updated }) {
 }
 
 /**
- * @param {{ epoch: number, updated?: number, countdown?: boolean, hidden?: boolean }} props
+ * @param {{
+ *  epoch: number
+ *  updated?: number
+ *  start?: boolean
+ *  countdown?: boolean
+ *  hidden?: boolean
+ * }} props
  */
 function StationBattleTimer({
   epoch,
   updated,
+  start = false,
   countdown = false,
   hidden = false,
 }) {
@@ -807,7 +831,7 @@ function StationBattleTimer({
   return (
     <Stack spacing={0} alignItems="center" width="100%">
       <Typography variant="subtitle1" align="center" color={textColor}>
-        {t('ends')}: {timeFormatter.format(new Date(target))}
+        {t(start ? 'starts' : 'ends')}: {timeFormatter.format(new Date(target))}
       </Typography>
       {countdown ? (
         <Typography variant="h6" align="center" color={textColor}>
