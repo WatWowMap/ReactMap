@@ -115,18 +115,21 @@ export function getStationBattleState(
   const fallbackBattle = sourceBattles.length
     ? null
     : getFallbackBattle(station, ts)
+  const currentBattles = sortStationBattles([
+    ...sourceBattles.filter((battle) => Number(battle?.battle_end) > ts),
+    ...(fallbackBattle ? [fallbackBattle] : []),
+  ])
   const popupBattles = sortStationBattles(
-    [
-      ...sourceBattles.filter((battle) => Number(battle?.battle_end) > ts),
-      ...(fallbackBattle ? [fallbackBattle] : []),
-    ].filter((battle) => includeUpcoming || isStationBattleActive(battle, ts)),
+    currentBattles.filter(
+      (battle) => includeUpcoming || isStationBattleActive(battle, ts),
+    ),
   )
   const visibleBattle =
     popupBattles.find((battle) => isStationBattleActive(battle, ts)) || null
   const markerBattle = visibleBattle || popupBattles[0] || null
   const refreshTimestamps = [
     ...new Set(
-      popupBattles.flatMap((battle) => {
+      currentBattles.flatMap((battle) => {
         const timestamps = []
         const battleStart = Number(battle?.battle_start)
         const battleEnd = Number(battle?.battle_end)
