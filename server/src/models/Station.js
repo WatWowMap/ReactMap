@@ -960,14 +960,11 @@ class Station extends Model {
     const activeCutoff = Date.now() / 1000 - stationUpdateLimit * 60 * 60
     const results = hasMultiBattles
       ? await this.knex()(STATION_BATTLE_ROW_TABLE)
-          .distinct([
-            raw(
-              `${STATION_BATTLE_ROW_ALIAS}.battle_pokemon_id AS battle_pokemon_id`,
-            ),
-            raw(
-              `${STATION_BATTLE_ROW_ALIAS}.battle_pokemon_form AS battle_pokemon_form`,
-            ),
-            raw(`${STATION_BATTLE_ROW_ALIAS}.battle_level AS battle_level`),
+          .distinct()
+          .select([
+            `${STATION_BATTLE_ROW_ALIAS}.battle_pokemon_id as battle_pokemon_id`,
+            `${STATION_BATTLE_ROW_ALIAS}.battle_pokemon_form as battle_pokemon_form`,
+            `${STATION_BATTLE_ROW_ALIAS}.battle_level as battle_level`,
           ])
           .join(
             STATION_TABLE,
