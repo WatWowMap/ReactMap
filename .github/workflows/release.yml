@@ -22,6 +22,8 @@ jobs:
         run: yarn --prefer-offline
         env:
           HUSKY: 0
+      - name: Lint app
+        run: yarn lint
       - name: Build app
         run: yarn build
       - name: Release
