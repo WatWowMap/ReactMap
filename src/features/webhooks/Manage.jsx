@@ -91,18 +91,27 @@ export function Manage() {
 
   React.useEffect(() => {
     if (!addNew.open && addNew.save && category !== 'human') {
-      const { tempFilters } = useWebhookStore.getState()
-      const values = Poracle.processor(
+      const {
+        tempFilters,
+        context: { ui },
+      } = useWebhookStore.getState()
+      const { defaults } = ui[category]
+      const enabledFilters = Object.values(tempFilters || {}).filter(
+        (x) => x && x.enabled,
+      )
+      const payload = Poracle.toApiPayload(category, enabledFilters, defaults)
+      const values = Poracle.toTrackedState(
         category,
-        Object.values(tempFilters || {}).filter((x) => x && x.enabled),
-        useWebhookStore.getState().context.ui[category].defaults,
+        enabledFilters,
+        defaults,
+        payload,
       )
       apolloClient.mutate({
         // @ts-ignore
         mutation: Query.webhook(category.toUpperCase()),
         variables: {
           category,
-          data: values,
+          data: payload,
           status: 'POST',
         },
         refetchQueries: [ALL_PROFILES],
