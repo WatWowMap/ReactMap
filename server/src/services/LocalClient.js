@@ -34,8 +34,79 @@ class LocalClient extends AuthClient {
     )
   }
 
+  /**
+   * @param {import('@rm/types').Permissions} userPerms
+   * @param {import('@rm/types').FullUser} userExists
+   * @param {import('express').Request} req
+   * @returns {Promise<Record<string, string>>}
+   */
+  async mergeLinkedPerms(userPerms, userExists, req) {
+    const authClients = Object.values(state.event.authClients || {})
+    const linkedProviders = [
+      {
+        field: 'discordPerms',
+        type: 'discord',
+        id: userExists.discordId,
+        storedPerms: userExists.discordPerms,
+      },
+      {
+        field: 'telegramPerms',
+        type: 'telegram',
+        id: userExists.telegramId,
+        storedPerms: userExists.telegramPerms,
+      },
+    ]
+    const providerPerms = await Promise.all(
+      linkedProviders.map(async ({ field, type, id, storedPerms }) => {
+        const parsedStoredPerms = storedPerms
+          ? typeof storedPerms === 'string'
+            ? JSON.parse(storedPerms)
+            : storedPerms
+          : null
+        const matchingClients = authClients.filter(
+          (client) =>
+            client?.strategy?.type === type &&
+            typeof client.getLinkedPerms === 'function',
+        )
+
+        if (id && matchingClients.length === 1) {
+          try {
+            const livePermResult = await matchingClients[0].getLinkedPerms(
+              id,
+              req,
+              userExists.username,
+            )
+            if (!livePermResult?.degraded && livePermResult?.perms) {
+              return {
+                field,
+                perms: livePermResult.perms,
+                persisted: JSON.stringify(livePermResult.perms),
+              }
+            }
+          } catch (error) {
+            this.log.warn(`Failed to refresh linked ${type} perms`, error)
+          }
+        }
+
+        return { field, perms: parsedStoredPerms, persisted: null }
+      }),
+    )
+    const refreshedLinkedPerms = {}
+
+    providerPerms
+      .filter(({ perms }) => !!perms)
+      .forEach(({ field, perms, persisted }) => {
+        if (persisted) {
+          refreshedLinkedPerms[field] = persisted
+        }
+        Object.assign(userPerms, mergePerms(userPerms, perms))
+      })
+
+    return refreshedLinkedPerms
+  }
+
   /** @type {import('passport-local').VerifyFunctionWithRequest} */
-  async authHandler(_req, username, password, done) {
+  async authHandler(req, username, password, done) {
     const forceTutorial = config.getSafe('map.misc.forceTutorial')
     const trialActive = this.trialManager.active()
     const localPerms = Object.keys(this.perms).filter((key) =>
@@ -44,7 +115,7 @@ class LocalClient extends AuthClient {
     const user = {
       perms: /** @type {import('@rm/types').Permissions} */ ({
         ...Object.fromEntries(Object.keys(this.perms).map((x) => [x, false])),
-        areaRestrictions: areaPerms(localPerms),
+        areaRestrictions: areaPerms(localPerms, req, true),
         webhooks: [],
         scanner: [],
         scannerCooldownBypass: [],
@@ -71,6 +142,10 @@ class LocalClient extends AuthClient {
                 user.username = newUser.username
                 user.perms = { ...user.perms, ...this.getPerms(trialActive) }
 
+                if (user.perms.map === false) {
+                  return done(null, false, { message: 'access_denied' })
+                }
+
                 this.log.info(
                   user.username,
                   `(${user.id})`,
@@ -82,22 +157,11 @@ class LocalClient extends AuthClient {
               }
             }
             if (bcrypt.compareSync(password, userExists.password)) {
-              ;['discordPerms', 'telegramPerms'].forEach((permSet) => {
-                if (userExists[permSet]) {
-                  user.perms = mergePerms(
-                    user.perms,
-                    typeof userExists[permSet] === 'string'
-                      ? JSON.parse(userExists[permSet])
-                      : userExists[permSet],
-                  )
-                }
-              })
-              if (userExists.strategy !== 'local') {
-                await state.db.models.User.query()
-                  .update({ strategy: 'local' })
-                  .where('id', userExists.id)
-                userExists.strategy = 'local'
-              }
+              const linkedPermUpdates = await this.mergeLinkedPerms(
+                user.perms,
+                userExists,
+                req,
+              )
               user.id = userExists.id
               user.username = userExists.username
               user.discordId = userExists.discordId
@@ -124,6 +188,39 @@ class LocalClient extends AuthClient {
               scannerCooldownBypass([user.status], 'local').forEach((x) =>
                 user.perms.scannerCooldownBypass.push(x),
               )
+
+              if (user.perms.blocked || user.perms.map === false) {
+                if (Object.keys(linkedPermUpdates).length) {
+                  await state.db.models.User.query()
+                    .update(linkedPermUpdates)
+                    .where('id', userExists.id)
+                }
+
+                if (user.perms.blocked) {
+                  return done(null, false, {
+                    blockedGuilds: (user.perms.blockedGuildNames || []).join(
+                      ',',
+                    ),
+                  })
+                }
+
+                return done(null, false, { message: 'access_denied' })
+              }
+
+              const userUpdates = {
+                ...linkedPermUpdates,
+                ...(userExists.strategy !== 'local'
+                  ? { strategy: 'local' }
+                  : {}),
+              }
+              if (Object.keys(userUpdates).length) {
+                await state.db.models.User.query()
+                  .update(userUpdates)
+                  .where('id', userExists.id)
+              }
+              if (userExists.strategy !== 'local') {
+                userExists.strategy = 'local'
+              }
               this.log.info(
                 user.username,
                 `(${user.id})`,

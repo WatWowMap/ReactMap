@@ -17,8 +17,11 @@ const { AuthClient } = require('./AuthClient')
  */
 
 class TelegramClient extends AuthClient {
-  /** @param {TGUser} user */
-  async getUserGroups(user) {
+  /**
+   * @param {TGUser} user
+   * @param {boolean} [strictLookup]
+   */
+  async getUserGroups(user, strictLookup = false) {
     if (!user || !user.id) return []
 
     const groups = [user.id]
@@ -46,6 +49,9 @@ class TelegramClient extends AuthClient {
             groups.push(group)
           }
         } catch (e) {
+          if (strictLookup) {
+            throw e
+          }
           this.log.error(
             e,
             `Telegram Group: ${group}`,
@@ -62,9 +68,10 @@ class TelegramClient extends AuthClient {
    *
    * @param {TGUser} user
    * @param {string[]} groups
+   * @param {import('express').Request} req
    * @returns {TGUser & { perms: import("@rm/types").Permissions }}
    */
-  getUserPerms(user, groups) {
+  getUserPerms(user, groups, req) {
     const trialActive = this.trialManager.active()
     let gainedAccessViaTrial = false
 
@@ -99,7 +106,7 @@ class TelegramClient extends AuthClient {
         ...perms,
         trial: gainedAccessViaTrial,
         admin: false,
-        areaRestrictions: areaPerms(groups),
+        areaRestrictions: areaPerms(groups, req, true),
         webhooks: webhookPerms(groups, 'telegramGroups', trialActive),
         scanner: scannerPerms(groups, 'telegramGroups', trialActive),
         scannerCooldownBypass: scannerCooldownBypass(groups, 'telegramGroups'),
@@ -120,11 +127,31 @@ class TelegramClient extends AuthClient {
     return newUserObj
   }
 
+  /**
+   * @param {string | number} userId
+   * @param {import('express').Request} req
+   * @param {string} [username]
+   * @returns {Promise<{ degraded: boolean, perms: import("@rm/types").Permissions | null }>}
+   */
+  async getLinkedPerms(userId, req, username = '') {
+    try {
+      const baseUser = { id: userId, username }
+      const groups = await this.getUserGroups(baseUser, true)
+      return {
+        degraded: false,
+        perms: this.getUserPerms(baseUser, groups, req).perms,
+      }
+    } catch (e) {
+      this.log.warn('Failed to refresh linked telegram perms', userId, e)
+      return { degraded: true, perms: null }
+    }
+  }
+
   /** @type {import('@rainb0w-clwn/passport-telegram-official/dist/types').CallbackWithRequest} */
   async authHandler(req, profile, done) {
     const baseUser = { ...profile, rmStrategy: this.rmStrategy }
     const groups = await this.getUserGroups(baseUser)
-    const user = this.getUserPerms(baseUser, groups)
+    const user = this.getUserPerms(baseUser, groups, req)
 
     if (!user.perms.map) {
       this.log.warn(user.username, 'was not given map perms')

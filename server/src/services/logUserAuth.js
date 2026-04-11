@@ -1,6 +1,10 @@
 // @ts-check
 const { default: fetch } = require('node-fetch')
 const { log, TAGS } = require('@rm/logger')
+const {
+  getPublicAreaRestrictions,
+  normalizeAreaRestrictions,
+} = require('../utils/areaPerms')
 
 // PII fields inside getAuthInfo embed
 const PII_FIELDS = [
@@ -155,16 +159,19 @@ async function logUserAuth(req, user, strategy = 'custom', hidePii = false) {
     ],
     timestamp: new Date().toISOString(),
   }
-  if (user.perms.areaRestrictions.length) {
-    const trimmed = user.perms.areaRestrictions
+  const publicAreaRestrictions = getPublicAreaRestrictions(
+    normalizeAreaRestrictions(user.perms.areaRestrictions || [], req),
+  )
+  if (publicAreaRestrictions.length) {
+    const trimmed = publicAreaRestrictions
       .filter((_f, i) => i < 15)
       .map((f) => capCamel(f))
       .join('\n')
     embed.fields.push({
-      name: `(${user.perms.areaRestrictions.length}) Area Restrictions`,
+      name: `(${publicAreaRestrictions.length}) Area Restrictions`,
       value:
-        user.perms.areaRestrictions.length > 15
-          ? `${trimmed}\n...${user.perms.areaRestrictions.length - 15} more`
+        publicAreaRestrictions.length > 15
+          ? `${trimmed}\n...${publicAreaRestrictions.length - 15} more`
           : trimmed,
       inline: true,
     })

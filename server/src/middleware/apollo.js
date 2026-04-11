@@ -7,6 +7,7 @@ const { parse } = require('graphql')
 const { state } = require('../services/state')
 const { version } = require('../../../package.json')
 const { DataLimitCheck } = require('../services/DataLimitCheck')
+const { normalizeAreaRestrictions } = require('../utils/areaPerms')
 
 /**
  *
@@ -16,7 +17,16 @@ const { DataLimitCheck } = require('../services/DataLimitCheck')
 function apolloMiddleware(server) {
   return expressMiddleware(server, {
     context: async ({ req, res }) => {
-      const perms = req.user ? req.user.perms : req.session.perms
+      const rawPerms = req.user ? req.user.perms : req.session.perms
+      const perms = rawPerms
+        ? {
+            ...rawPerms,
+            areaRestrictions: normalizeAreaRestrictions(
+              rawPerms.areaRestrictions || [],
+              req,
+            ),
+          }
+        : rawPerms
       const username = req?.user?.username || ''
       const id = req?.user?.id || 0
 
