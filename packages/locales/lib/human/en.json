@@ -623,6 +623,7 @@
   "show_size_indicator": "Show Size Indicator",
   "size": "Size",
   "gold_stop": "Gold Stop",
+  "gold_stop_block": "Blocked due to a gold stop",
   "profile_backups": "Profile Swapping",
   "new_backup": "New Backup",
   "create": "Create",

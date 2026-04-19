@@ -10,7 +10,6 @@ import { useTranslation } from 'react-i18next'
 
 import { useMemory } from '@store/useMemory'
 import { useStorage } from '@store/useStorage'
-import { apolloClient } from '@services/apollo'
 import { Header } from '@components/dialogs/Header'
 import { Footer } from '@components/dialogs/Footer'
 import { Img } from '@components/Img'
@@ -89,42 +88,27 @@ function Weather({ gameplay_condition, ...props }) {
   )
 }
 
-const WeatherMemo = React.memo(
-  Weather,
-  (prev, next) => prev.gameplay_condition === next.gameplay_condition,
-)
-
-export function ActiveWeather() {
+/**
+ * @param {{ weatherData: import('@rm/types').Weather[] }} props
+ */
+export function ActiveWeather({ weatherData }) {
   const weatherEnabled = useStorage((s) => s.filters?.weather?.enabled ?? false)
   const location = useStorage((s) => s.location)
   const zoom = useStorage((s) => s.zoom)
   const allowedZoom = useMemory((s) => s.config.general.activeWeatherZoom)
 
-  const [active, setActive] = React.useState(
-    /** @type {import('@rm/types').Weather | null} */ (null),
+  const active = React.useMemo(
+    () =>
+      zoom > allowedZoom
+        ? weatherData.find(
+            (cell) =>
+              Array.isArray(cell?.polygon) &&
+              booleanPointInPolygon(point(location), polygon([cell.polygon])),
+          ) || null
+        : null,
+    [allowedZoom, location, weatherData, zoom],
   )
 
-  React.useEffect(() => {
-    if (zoom > allowedZoom) {
-      const weatherCache = Object.values(apolloClient.cache.extract()).find(
-        (x) =>
-          x.__typename === 'Weather' &&
-          // @ts-ignore
-          booleanPointInPolygon(point(location), polygon([x.polygon])),
-      )
-      if (
-        weatherCache &&
-        'gameplay_condition' in weatherCache &&
-        weatherCache?.gameplay_condition !== active?.gameplay_condition
-      ) {
-        // @ts-ignore
-        setActive(weatherCache)
-      }
-    } else {
-      setActive(null)
-    }
-  }, [location, zoom, allowedZoom])
-
   if (!weatherEnabled || !active) return null
-  return <WeatherMemo {...active} />
+  return <Weather {...active} />
 }

@@ -89,11 +89,12 @@ const Timer = ({ updated, ts = Date.now() / 1000 }) => {
       : 'error.main'
 
   React.useEffect(() => {
-    const timer2 = setTimeout(() => {
+    setTimer(getTimeUntil(updated * 1000))
+    const timerId = setInterval(() => {
       setTimer(getTimeUntil(updated * 1000))
     }, 1000)
-    return () => clearTimeout(timer2)
-  })
+    return () => clearInterval(timerId)
+  }, [updated])
 
   return (
     <>

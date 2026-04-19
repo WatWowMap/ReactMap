@@ -720,6 +720,41 @@ class Pokestop extends Model {
     fields.forEach((field) => (target[field] = source[field]))
   }
 
+  static getIncidentDisplayType(incident, isMad, hasMultiInvasions) {
+    return isMad && !hasMultiInvasions
+      ? MAD_GRUNT_MAP[incident.grunt_type] || 8
+      : incident.display_type
+  }
+
+  static getIncidentBlocker(incidents, isMad, hasMultiInvasions) {
+    const blocker = {
+      displayType: 0,
+      expireTimestamp: 0,
+    }
+
+    ;(incidents || []).forEach((incident) => {
+      const displayType = this.getIncidentDisplayType(
+        incident,
+        isMad,
+        hasMultiInvasions,
+      )
+      // Showcase expiry is tracked separately on the client so local timer
+      // updates can fall through to the next hidden blocker without a refetch.
+      if (
+        displayType === 7 &&
+        incident.incident_expire_timestamp > blocker.expireTimestamp
+      ) {
+        blocker.displayType = 7
+        blocker.expireTimestamp = incident.incident_expire_timestamp
+      }
+    })
+
+    return {
+      displayType: blocker.displayType || null,
+      expireTimestamp: blocker.expireTimestamp || null,
+    }
+  }
+
   // filters and removes unwanted data
   static secondaryFilter(
     queryResults,
@@ -734,7 +769,18 @@ class Pokestop extends Model {
     const filteredResults = []
     for (let i = 0; i < queryResults.length; i += 1) {
       const pokestop = queryResults[i]
-      const filtered = { hasShowcase: pokestop.showcase_expiry > ts }
+      const canViewIncidentMetadata = perms.eventStops || perms.invasions
+      const incidentBlocker = canViewIncidentMetadata
+        ? this.getIncidentBlocker(pokestop.invasions, isMad, hasMultiInvasions)
+        : null
+      const filtered = {
+        showcase_expiry: canViewIncidentMetadata
+          ? pokestop.showcase_expiry || null
+          : null,
+        incident_blocker_display_type: incidentBlocker?.displayType || null,
+        incident_blocker_expire_timestamp:
+          incidentBlocker?.expireTimestamp || null,
+      }
 
       this.fieldAssigner(filtered, pokestop, [
         'id',
@@ -790,10 +836,11 @@ class Pokestop extends Model {
               event.display_type === 9
                 ? pokestop.showcase_ranking_standard
                 : null,
-            display_type:
-              isMad && !hasMultiInvasions
-                ? MAD_GRUNT_MAP[event.grunt_type] || 8
-                : event.display_type,
+            display_type: this.getIncidentDisplayType(
+              event,
+              isMad,
+              hasMultiInvasions,
+            ),
           }))
           .filter((event) =>
             event.showcase_pokemon_id

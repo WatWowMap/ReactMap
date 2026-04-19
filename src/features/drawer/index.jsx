@@ -16,10 +16,8 @@ import { DividerWithMargin } from '@components/StyledDivider'
 import { DrawerActions } from './components/Actions'
 import { DrawerSectionMemo } from './components/Section'
 
-const handleClose = () => useLayoutStore.setState({ drawer: false })
-
 const DrawerHeader = React.memo(
-  () => {
+  ({ onClose }) => {
     const title = useMemory((s) => s.config.general.title)
     return (
       <ListItem disablePadding>
@@ -35,13 +33,13 @@ const DrawerHeader = React.memo(
         >
           {title}
         </ListItemText>
-        <IconButton onClick={handleClose} size="large">
+        <IconButton onClick={onClose} size="large">
           <Clear />
         </IconButton>
       </ListItem>
     )
   },
-  () => true,
+  (prev, next) => prev.onClose === next.onClose,
 )
 
 const listItemSx = /** @type {import('@mui/material').SxProps} */ ({
@@ -51,6 +49,21 @@ const listItemSx = /** @type {import('@mui/material').SxProps} */ ({
 export function Drawer() {
   const drawer = useLayoutStore((s) => s.drawer)
   const { config, ui } = useMemory.getState()
+  const paperRef = React.useRef(/** @type {HTMLDivElement | null} */ (null))
+  const scrollTopRef = React.useRef(0)
+
+  const handleScroll = React.useCallback((e) => {
+    scrollTopRef.current = e.currentTarget.scrollTop
+  }, [])
+
+  const handleClose = React.useCallback(() => {
+    scrollTopRef.current = paperRef.current?.scrollTop || 0
+    useLayoutStore.setState({ drawer: false })
+  }, [])
+
+  const handleEnter = React.useCallback((node) => {
+    node.scrollTop = scrollTopRef.current
+  }, [])
 
   return (
     <MuiDrawer
@@ -58,9 +71,14 @@ export function Drawer() {
       variant="temporary"
       open={drawer}
       onClose={handleClose}
+      PaperProps={{
+        ref: paperRef,
+        onScroll: handleScroll,
+      }}
+      SlideProps={{ onEnter: handleEnter }}
     >
       <List disablePadding sx={{ minWidth: 290 }}>
-        <DrawerHeader />
+        <DrawerHeader onClose={handleClose} />
         {Object.entries(ui).map(([category, value]) => (
           <React.Fragment key={category}>
             <DividerWithMargin flexItem />

@@ -1,13 +1,8 @@
 // @ts-check
 import * as React from 'react'
-import Dialog from '@mui/material/Dialog'
-import DialogContent from '@mui/material/DialogContent'
-import Typography from '@mui/material/Typography'
 import { useTranslation } from 'react-i18next'
 
-import { Header } from '@components/dialogs/Header'
-import { Footer } from '@components/dialogs/Footer'
-import { SCAN_MODES } from '@assets/constants'
+import { Notification } from '@components/Notification'
 
 import { useScanStore } from './hooks/store'
 
@@ -28,33 +23,30 @@ export function ScanDialog() {
     if (scanZone) return setScanMode('scanZoneMode')
   }, [scanNext, scanZone])
 
-  const footerOptions = React.useMemo(
-    () =>
-      /** @type {import('@components/dialogs/Footer').FooterButton[]} */ ([
-        {
-          name: 'close',
-          icon: 'Clear',
-          color: 'primary',
-          align: 'right',
-          action: handleClose,
-        },
-      ]),
-    [handleClose],
-  )
+  const resultOpen = scanMode === 'confirmed' || scanMode === 'error'
+  const resultSeverity = scanMode === 'error' ? 'error' : 'success'
 
   return (
-    <Dialog
-      onClose={handleClose}
-      open={SCAN_MODES.includes(scanMode)}
-      maxWidth="xs"
-    >
-      <Header titles={[`scan_${scanMode}_title`]} action={handleClose} />
-      <DialogContent className="flex-center" sx={{ mt: 2 }}>
-        <Typography variant="subtitle1" align="center">
-          {scanMode && t(`scan_${scanMode}`)}
-        </Typography>
-      </DialogContent>
-      <Footer role="alertdialog" options={footerOptions} />
-    </Dialog>
+    <>
+      <Notification
+        open={scanMode === 'loading'}
+        severity="info"
+        title="scan_loading_title"
+        cb={handleClose}
+        autoHideDuration={null}
+        ignoreClickaway
+      >
+        {t('scan_loading')}
+      </Notification>
+      <Notification
+        open={resultOpen}
+        severity={resultSeverity}
+        title={resultOpen ? `scan_${scanMode}_title` : undefined}
+        cb={handleClose}
+        ignoreClickaway
+      >
+        {resultOpen ? t(`scan_${scanMode}`) : null}
+      </Notification>
+    </>
   )
 }

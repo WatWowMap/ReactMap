@@ -27,6 +27,12 @@ import { BoolToggle } from '@components/inputs/BoolToggle'
 import { GenericSearchMemo } from '@components/inputs/GenericSearch'
 import { StandardItem } from '@components/virtual/StandardItem'
 
+import {
+  getDrawerGridState,
+  setDrawerGridState,
+  useDrawerScrollMemory,
+} from '../hooks/useScrollMemory'
+
 /**
  * @template {keyof import('@rm/types').Available} T
  * @typedef {{
@@ -36,14 +42,27 @@ import { StandardItem } from '@components/virtual/StandardItem'
  *  children?: React.ReactNode,
  *  label?: string
  *  height?: React.CSSProperties['height'],
+ *  scrollKey?: string,
+ *  visible?: boolean,
  * }} SelectorListProps
  * @param {SelectorListProps<keyof import('@rm/types').Available>} props
  * @returns
  */
-function SelectorList({ category, subCategory, label, height = 400 }) {
+function SelectorList({
+  category,
+  subCategory,
+  label,
+  height = 400,
+  scrollKey,
+  visible = true,
+}) {
   const searchKey = `${category}${
     subCategory ? capitalize(subCategory) : ''
   }QuickSelect`
+  const listScrollKey =
+    scrollKey ||
+    `selector:${category}:${subCategory || 'default'}:${label || 'default'}`
+  const drawer = useLayoutStore((s) => s.drawer)
   const { available } = useGetAvailable(category)
   const { t: tId } = useTranslateById({
     quest: subCategory === 'pokemon',
@@ -113,6 +132,32 @@ function SelectorList({ category, subCategory, label, height = 400 }) {
       .filter((item) => item.name.includes(lowerCase))
       .map((item) => item.id)
   }, [translated, search])
+
+  const restoreStateFrom = React.useMemo(
+    () => getDrawerGridState(listScrollKey),
+    [listScrollKey],
+  )
+  const shouldPersistGridState = drawer && visible
+  const scrollMemory = useDrawerScrollMemory(
+    listScrollKey,
+    shouldPersistGridState,
+  )
+
+  const handleStateChanged = React.useCallback(
+    (state) => {
+      if (
+        !shouldPersistGridState ||
+        !state.viewport.height ||
+        !state.viewport.width ||
+        !state.item.height ||
+        !state.item.width
+      ) {
+        return
+      }
+      setDrawerGridState(listScrollKey, state)
+    },
+    [listScrollKey, shouldPersistGridState],
+  )
 
   /** @param {'enable' | 'disable' | 'advanced'} action */
   const setAll = (action) => {
@@ -194,7 +239,13 @@ function SelectorList({ category, subCategory, label, height = 400 }) {
             : height
         }
       >
-        <VirtualGrid data={items} xs={4}>
+        <VirtualGrid
+          data={items}
+          xs={4}
+          scrollerRef={scrollMemory.ref}
+          restoreStateFrom={restoreStateFrom}
+          stateChanged={handleStateChanged}
+        >
           {(_, key) => <StandardItem id={key} category={category} />}
         </VirtualGrid>
       </Box>
@@ -208,13 +259,16 @@ export const SelectorListMemo = React.memo(
     prev.category === next.category &&
     prev.subCategory === next.subCategory &&
     prev.label === next.label &&
-    prev.height === next.height,
+    prev.height === next.height &&
+    prev.scrollKey === next.scrollKey &&
+    prev.visible === next.visible,
 )
 
 /** @param {{ children: React.ReactElement[], tabKey: string }} props */
 export function MultiSelectorList({ children, tabKey }) {
   const { t } = useTranslation()
   const [openTab, setOpenTab] = useDeepStore(`tabs.${tabKey}`, 0)
+  const visibleChildren = children.filter(Boolean)
 
   /** @type {import('@mui/material').TabsProps['onChange']} */
   const handleTabChange = React.useCallback(
@@ -226,14 +280,14 @@ export function MultiSelectorList({ children, tabKey }) {
     <Box pt={2}>
       <AppBar position="static">
         <Tabs value={openTab} onChange={handleTabChange}>
-          {children.map((child) => (
+          {visibleChildren.map((child) => (
             <Tab key={child.key} label={t(child.key)} />
           ))}
         </Tabs>
       </AppBar>
-      {children.filter(Boolean).map((child, index) => (
+      {visibleChildren.map((child, index) => (
         <TabPanel value={openTab} index={index} key={child.key}>
-          {child}
+          {React.cloneElement(child, { visible: openTab === index })}
         </TabPanel>
       ))}
     </Box>

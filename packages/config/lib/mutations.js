@@ -315,6 +315,9 @@ const applyMutations = (config) => {
   config.authentication.strategies = config.authentication.strategies.map(
     (strategy) => ({
       ...strategy,
+      ...(strategy.type === 'discord'
+        ? { clientPrompt: strategy.clientPrompt ?? 'none' }
+        : {}),
       allowedGuilds: Array.isArray(strategy.allowedGuilds)
         ? strategy.allowedGuilds.flatMap(replaceAliases)
         : [],

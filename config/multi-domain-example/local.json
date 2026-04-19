@@ -82,7 +82,8 @@
         "redirectUri": "http://localhost:8080/auth/discord/callback",
         "allowedGuilds": [],
         "blockedGuilds": [],
-        "allowedUsers": []
+        "allowedUsers": [],
+        "clientPrompt": "none"
       }
     ],
     "alwaysEnabledPerms": ["map"],
