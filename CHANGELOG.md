@@ -1,3 +1,10 @@
+## [1.41.2-develop.5](https://github.com/WatWowMap/ReactMap/compare/v1.41.2-develop.4...v1.41.2-develop.5) (2026-04-19)
+
+
+### Bug Fixes
+
+* perms cleanup ([c513936](https://github.com/WatWowMap/ReactMap/commit/c513936fe84f5c863644fe90555de73c723d7a44))
+
 ## [1.41.2-develop.4](https://github.com/WatWowMap/ReactMap/compare/v1.41.2-develop.3...v1.41.2-develop.4) (2026-04-04)
 
 
