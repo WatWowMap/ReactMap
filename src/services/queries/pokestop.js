@@ -15,7 +15,6 @@ const core = gql`
     power_up_level
     power_up_points
     power_up_end_timestamp
-    hasShowcase
     showcase_expiry
     incident_blocker_display_type
     incident_blocker_expire_timestamp

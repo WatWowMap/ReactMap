@@ -254,7 +254,6 @@ export const PokestopTile = React.memo(
     prev.id === next.id &&
     prev.lure_expire_timestamp === next.lure_expire_timestamp &&
     prev.updated === next.updated &&
-    prev.hasShowcase === next.hasShowcase &&
     prev.showcase_expiry === next.showcase_expiry &&
     prev.incident_blocker_display_type === next.incident_blocker_display_type &&
     prev.incident_blocker_expire_timestamp ===
