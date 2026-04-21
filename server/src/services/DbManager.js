@@ -403,6 +403,52 @@ class DbManager extends Logger {
   }
 
   /**
+   * @param {import("../models").ScannerModelKeys} model
+   * @param {{ connection?: number, mem?: string }} source
+   * @returns {string}
+   */
+  static sourceLabel(model, source) {
+    if (source.mem) {
+      return `${model}:endpoint:${source.mem}`
+    }
+    if (typeof source.connection === 'number') {
+      return `${model}:connection:${source.connection}`
+    }
+    return `${model}:unknown-source`
+  }
+
+  /**
+   * @template T
+   * @param {import("../models").ScannerModelKeys} model
+   * @param {(source: any) => Promise<T>} handler
+   * @returns {Promise<T[]>}
+   */
+  async runScannerSources(model, handler) {
+    const settled = await Promise.allSettled(
+      this.models[model].map(async ({ SubModel, ...source }) =>
+        handler({ SubModel, ...source }),
+      ),
+    )
+
+    /** @type {T[]} */
+    const successful = []
+    settled.forEach((result, index) => {
+      if (result.status === 'fulfilled') {
+        successful.push(result.value)
+      } else {
+        const source = this.models[model][index]
+        this.log.warn(
+          TAGS[model.toLowerCase()] || `[${model.toUpperCase()}]`,
+          DbManager.sourceLabel(model, source),
+          result.reason,
+        )
+      }
+    })
+
+    return successful
+  }
+
+  /**
    * @template {import("@rm/types").BaseRecord} T
    * @param {import("../models").ScannerModelKeys} model
    * @param {import("@rm/types").Permissions} perms
@@ -412,17 +458,12 @@ class DbManager extends Logger {
    * @returns {Promise<T[]>}
    */
   async getAll(model, perms, args, userId, method = 'getAll') {
-    try {
-      const data = await Promise.all(
-        this.models[model].map(async ({ SubModel, ...source }) =>
-          SubModel[method](perms, args, source, userId),
-        ),
-      )
-      return DbManager.deDupeResults(data)
-    } catch (e) {
-      this.log.error(TAGS[model.toLowerCase()], e)
-      throw e
-    }
+    const data = await this.runScannerSources(
+      model,
+      async ({ SubModel, ...source }) =>
+        SubModel[method](perms, args, source, userId),
+    )
+    return DbManager.deDupeResults(data)
   }
 
   /**
@@ -583,10 +624,9 @@ class DbManager extends Logger {
    */
   async query(model, method, ...args) {
     if (Array.isArray(this.models[model])) {
-      const data = await Promise.all(
-        this.models[model].map(async ({ SubModel, ...source }) =>
-          SubModel[method](...args, source),
-        ),
+      const data = await this.runScannerSources(
+        model,
+        async ({ SubModel, ...source }) => SubModel[method](...args, source),
       )
       return DbManager.deDupeResults(data.filter(Boolean))
     }
@@ -601,49 +641,44 @@ class DbManager extends Logger {
   async getAvailable(model) {
     if (this.models[model]) {
       this.log.info(`Querying available for ${model}`)
-      try {
-        const results = await Promise.all(
-          this.models[model].map(async ({ SubModel, ...source }) =>
-            SubModel.getAvailable(source),
-          ),
-        )
-        this.log.info(`Setting available for ${model}`)
-        if (model === 'Pokestop') {
-          const newQuestConditions = {}
-          results.forEach((result) => {
-            if ('conditions' in result) {
-              config.util.extendDeep(newQuestConditions, result.conditions)
-            }
-          })
-          this.questConditions = Object.fromEntries(
-            Object.entries(newQuestConditions).map(([key, titles]) => [
-              key,
-              Object.values(titles),
-            ]),
-          )
-        }
-        if (model === 'Pokemon') {
-          this.setRarity(results, false)
-        }
-        if (results.length === 1) return results[0].available
-        if (results.length > 1) {
-          const returnSet = new Set()
-          for (let i = 0; i < results.length; i += 1) {
-            for (let j = 0; j < results[i].available.length; j += 1) {
-              returnSet.add(results[i].available[j])
-            }
+      const results = await this.runScannerSources(
+        model,
+        async ({ SubModel, ...source }) => SubModel.getAvailable(source),
+      )
+      this.log.info(`Setting available for ${model}`)
+      if (model === 'Pokestop') {
+        const newQuestConditions = {}
+        results.forEach((result) => {
+          if ('conditions' in result) {
+            config.util.extendDeep(newQuestConditions, result.conditions)
           }
-          return [...returnSet]
-        }
-      } catch (e) {
-        this.log.warn('Unable to query available for:', model, '\n', e)
-        if (model === 'Nest') {
-          this.log.warn(
-            'This is likely due to "nest" being in a useFor array but not in the database',
-          )
-        }
-        return []
+        })
+        this.questConditions = Object.fromEntries(
+          Object.entries(newQuestConditions).map(([key, titles]) => [
+            key,
+            Object.values(titles),
+          ]),
+        )
       }
+      if (model === 'Pokemon') {
+        this.setRarity(results, false)
+      }
+      if (results.length === 1) return results[0].available
+      if (results.length > 1) {
+        const returnSet = new Set()
+        for (let i = 0; i < results.length; i += 1) {
+          for (let j = 0; j < results[i].available.length; j += 1) {
+            returnSet.add(results[i].available[j])
+          }
+        }
+        return [...returnSet]
+      }
+      if (results.length === 0 && model === 'Nest') {
+        this.log.warn(
+          'This is likely due to "nest" being in a useFor array but not in the database',
+        )
+      }
+      return []
     }
     return []
   }
