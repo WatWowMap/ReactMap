@@ -10,7 +10,11 @@ import { ENUM_GENDER } from '@assets/constants'
 /**
  *
  * @param {{
- *  field: `filters.pokemon.filter.${string}` | `filters.pokemon.ivOr`
+ *  field:
+ *    | `filters.gyms.filter.${string}`
+ *    | `filters.pokemon.filter.${string}`
+ *    | `filters.pokemon.ivOr`
+ *    | `filters.stations.filter.${string}`
  * } & import('@mui/material').ListItemProps} props
  * @returns
  */
@@ -23,6 +27,7 @@ export function GenderListItem({ field, ...props }) {
         items={ENUM_GENDER}
         tKey="gender_icon_"
         field={`${field}.gender`}
+        defaultValue={0}
         disabled={props.disabled}
       />
     </ListItem>

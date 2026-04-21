@@ -14,6 +14,39 @@ const { getSharedPvpWrapper } = require('../services/PvpWrapper')
 const DEFAULT_IV = 15
 
 /**
+ * @param {unknown} gender
+ * @returns {1 | 2 | 3 | null}
+ */
+function parseFilterGender(gender) {
+  const parsed = Number(gender)
+  return parsed >= 1 && parsed <= 3 ? /** @type {1 | 2 | 3} */ (parsed) : null
+}
+
+/**
+ * @param {string} key
+ * @param {unknown} value
+ * @returns {{ pokemonId: number, form: number | null, gender: 1 | 2 | 3 | null } | null}
+ */
+function parseBattleComboFilter(key, value) {
+  const [idPart, formPart] = key.split('-', 2)
+  const pokemonId = Number(idPart)
+  if (!Number.isFinite(pokemonId)) return null
+
+  let form = null
+  if (formPart && formPart !== 'null') {
+    const parsedForm = Number(formPart)
+    if (!Number.isFinite(parsedForm)) return null
+    form = parsedForm
+  }
+
+  return {
+    pokemonId,
+    form,
+    gender: parseFilterGender(value?.gender),
+  }
+}
+
+/**
  * @param {import('ohbem').PokemonData | null} pokemonData
  * @param {import('@rm/types').FullStation} station
  * @returns {number | null}
@@ -96,18 +129,11 @@ class Station extends Model {
           return
         }
         if (/^\d+-/.test(key)) {
-          const [idPart, formPart] = key.split('-', 2)
-          const pokemonId = Number(idPart)
-          if (!Number.isFinite(pokemonId)) return
-          let formValue = null
-          if (formPart && formPart !== 'null') {
-            const parsedForm = Number(formPart)
-            if (!Number.isFinite(parsedForm)) return
-            formValue = parsedForm
-          }
-          const comboKey = `${pokemonId}-${formValue ?? 'null'}`
+          const parsed = parseBattleComboFilter(key, value)
+          if (!parsed) return
+          const comboKey = `${parsed.pokemonId}-${parsed.form ?? 'null'}`
           if (!battleComboFilters.has(comboKey)) {
-            battleComboFilters.set(comboKey, { pokemonId, form: formValue })
+            battleComboFilters.set(comboKey, parsed)
           }
         }
       })
@@ -204,7 +230,7 @@ class Station extends Model {
                     match[levelMethod]('battle_level', battleLevels)
                     matchApplied = true
                   }
-                  battleCombos.forEach(({ pokemonId, form }) => {
+                  battleCombos.forEach(({ pokemonId, form, gender }) => {
                     const comboMethod = matchApplied ? 'orWhere' : 'where'
                     match[comboMethod]((combo) => {
                       combo.where('battle_pokemon_id', pokemonId)
@@ -212,6 +238,9 @@ class Station extends Model {
                         combo.andWhereNull('battle_pokemon_form')
                       } else {
                         combo.andWhere('battle_pokemon_form', form)
+                      }
+                      if (gender !== null) {
+                        combo.andWhere('battle_pokemon_gender', gender)
                       }
                     })
                     matchApplied = true
