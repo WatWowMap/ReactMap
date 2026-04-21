@@ -1,3 +1,10 @@
+# [1.42.0](https://github.com/WatWowMap/ReactMap/compare/v1.41.2...v1.42.0) (2026-04-21)
+
+
+### Features
+
+* raid/max battle gender filtering ([059427a](https://github.com/WatWowMap/ReactMap/commit/059427a6b64f4f18e3f27c2f4795984fe6828535))
+
 ## [1.41.2](https://github.com/WatWowMap/ReactMap/compare/v1.41.1...v1.41.2) (2026-04-19)
 
 
