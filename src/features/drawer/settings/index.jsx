@@ -4,6 +4,7 @@ import ListItem from '@mui/material/ListItem'
 import ListItemIcon from '@mui/material/ListItemIcon'
 import ListSubheader from '@mui/material/ListSubheader'
 import TranslateIcon from '@mui/icons-material/Translate'
+import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome'
 import Brightness7Icon from '@mui/icons-material/Brightness7'
 import InsightsIcon from '@mui/icons-material/Insights'
 import NotificationsActiveIcon from '@mui/icons-material/NotificationsActive'
@@ -51,6 +52,11 @@ export function Settings() {
       <BoolToggle field="darkMode">
         <ListItemIcon>
           <Brightness7Icon />
+        </ListItemIcon>
+      </BoolToggle>
+      <BoolToggle field="enhancedGraphics">
+        <ListItemIcon>
+          <AutoAwesomeIcon />
         </ListItemIcon>
       </BoolToggle>
       {HAS_API && (

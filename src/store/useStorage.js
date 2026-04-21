@@ -10,6 +10,7 @@ import { setDeep } from '@utils/setDeep'
 /**
  * @typedef {{
  *   darkMode: boolean,
+ *   enhancedGraphics: boolean,
  *   location: [number, number],
  *   popups: Record<string, boolean>,
  *   zoom: number,
@@ -61,6 +62,7 @@ export const useStorage = create(
   persist(
     (set, get) => ({
       darkMode: !!window?.matchMedia('(prefers-color-scheme: dark)').matches,
+      enhancedGraphics: true,
       location: [
         CONFIG.map.general.startLat || 0,
         CONFIG.map.general.startLon || 0,
