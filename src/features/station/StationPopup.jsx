@@ -177,7 +177,7 @@ export function StationPopup(station) {
           </CollapseWithState>
         </ExpandCollapse>
       )}
-      <StationContent {...station} />
+      <StationContent {...station} battles={displayedPopupBattles} />
       <Footer lat={station.lat} lon={station.lon} />
       <ExtraInfo {...station} />
     </Card>
@@ -621,8 +621,20 @@ function StationAttackBonus({ total_stationed_pokemon, total_stationed_gmax }) {
   )
 }
 
-/** @param {import('@rm/types').Station} station */
-function StationContent({ start_time, end_time, battle_end, id }) {
+/**
+ * @param {import('@rm/types').StationBattle[]} battles
+ * @param {(battle: import('@rm/types').StationBattle) => number} getEpoch
+ * @param {(epoch: number) => boolean} include
+ * @param {(...values: number[]) => number} compare
+ * @returns {number | null}
+ */
+function getBattleTimerEpoch(battles, getEpoch, include, compare) {
+  const epochs = battles.map(getEpoch).filter(include)
+  return epochs.length ? compare(...epochs) : null
+}
+
+/** @param {import('@rm/types').Station & { battles?: import('@rm/types').StationBattle[] }} station */
+function StationContent({ start_time, end_time, id, battles = [] }) {
   const { t } = useTranslation()
   const dateFormatter = useFormatStore((s) => s.dateFormat)
   const now = Date.now() / 1000
@@ -650,24 +662,34 @@ function StationContent({ start_time, end_time, battle_end, id }) {
   const hasStartTime = Number.isFinite(start_time)
   const startEpoch = hasStartTime ? start_time : 0
   const isFutureStart = hasStartTime && startEpoch > now
-  const displayInactiveOnly =
-    !isFutureStart &&
-    Number.isFinite(battle_end) &&
-    hasEndTime &&
-    battle_end === endEpoch
-  const epoch = displayInactiveOnly
-    ? endEpoch
-    : isFutureStart
-      ? startEpoch
-      : endEpoch
+  const earliestBattleStart = getBattleTimerEpoch(
+    battles,
+    (battle) => Number(battle?.battle_start),
+    (epoch) => Number.isFinite(epoch) && epoch > now,
+    Math.min,
+  )
+  const latestBattleEnd = getBattleTimerEpoch(
+    battles,
+    (battle) => Number(battle?.battle_end),
+    (epoch) => Number.isFinite(epoch) && epoch > now,
+    Math.max,
+  )
+  if (
+    (isFutureStart && earliestBattleStart === startEpoch) ||
+    (!isFutureStart && latestBattleEnd === endEpoch)
+  ) {
+    return null
+  }
+
+  const epoch = isFutureStart ? startEpoch : endEpoch
 
   return (
     <CardContent sx={{ p: 0 }}>
       <Stack alignItems="center" justifyContent="center">
-        {displayInactiveOnly || !isFutureStart ? (
-          <StationTimeStamp epoch={epoch} id={id} />
-        ) : (
+        {isFutureStart ? (
           <StationTimeStamp start epoch={epoch} id={id} />
+        ) : (
+          <StationTimeStamp epoch={epoch} id={id} />
         )}
         <StaticTimeStamp date epoch={epoch} />
       </Stack>
