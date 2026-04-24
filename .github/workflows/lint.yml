@@ -23,7 +23,7 @@ jobs:
         run: yarn masterfile
 
       - name: Lint
-        run: yarn eslint
+        run: yarn lint
 
       - name: Prettier
         run: yarn prettier

@@ -115,6 +115,9 @@ export function AdvancedFilter() {
 
   if (!id || !category) return null
   const showMoreFilters = category === 'pokemon' && !easyMode
+  const showGenderFilter =
+    showMoreFilters ||
+    ((category === 'gyms' || category === 'stations') && /^\d+-/.test(id))
   return (
     <Dialog
       open={!!open}
@@ -162,7 +165,7 @@ export function AdvancedFilter() {
                 </Grid2>
               ))}
               <Grid2 component={List} xs={12} sm={showMoreFilters ? 6 : 12}>
-                {showMoreFilters && (
+                {showGenderFilter && (
                   <GenderListItem
                     field={`filters.${category}.filter.${id}`}
                     disabled={filters.all}

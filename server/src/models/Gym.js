@@ -50,6 +50,49 @@ const raidFields = [
   'raid_pokemon_alignment',
 ]
 
+/**
+ * @param {unknown} gender
+ * @returns {1 | 2 | 3 | null}
+ */
+function parseFilterGender(gender) {
+  const parsed = Number(gender)
+  return parsed >= 1 && parsed <= 3 ? /** @type {1 | 2 | 3} */ (parsed) : null
+}
+
+/**
+ * @param {string} key
+ * @param {unknown} filter
+ * @returns {{ pokemonId: number, form: number | null, gender: 1 | 2 | 3 | null } | null}
+ */
+function parseRaidBossFilter(key, filter) {
+  const [idPart, formPart] = key.split('-', 2)
+  const pokemonId = Number(idPart)
+  if (!Number.isFinite(pokemonId)) return null
+
+  let form = null
+  if (formPart && formPart !== 'null') {
+    const parsedForm = Number(formPart)
+    if (!Number.isFinite(parsedForm)) return null
+    form = parsedForm
+  }
+
+  return {
+    pokemonId,
+    form,
+    gender: parseFilterGender(filter?.gender),
+  }
+}
+
+/**
+ * @param {import('@rm/types').Gym} gym
+ * @param {unknown} filter
+ * @returns {boolean}
+ */
+function matchesRaidBossGender(gym, filter) {
+  const gender = parseFilterGender(filter?.gender)
+  return gender === null || gym.raid_pokemon_gender === gender
+}
+
 class Gym extends Model {
   static get tableName() {
     return 'gym'
@@ -151,8 +194,7 @@ class Gym extends Model {
     })
     Gym.onlyValid(query, isMad)
 
-    const raidBosses = new Set()
-    const raidForms = new Set()
+    const raidBossFilters = new Map()
     const teams = []
     const eggs = []
     const slots = []
@@ -173,7 +215,7 @@ class Gym extends Model {
           )
         : []
 
-    Object.keys(args.filters).forEach((gym) => {
+    Object.entries(args.filters).forEach(([gym, filter]) => {
       switch (gym.charAt(0)) {
         case 'r':
         case 'o':
@@ -192,9 +234,13 @@ class Gym extends Model {
           break
         default:
           {
-            const [id, form] = gym.split('-')
-            if (id) raidBosses.add(id)
-            if (form) raidForms.add(form)
+            const parsed = parseRaidBossFilter(gym, filter)
+            if (parsed) {
+              raidBossFilters.set(
+                `${parsed.pokemonId}-${parsed.form ?? 'null'}`,
+                parsed,
+              )
+            }
           }
           break
       }
@@ -237,7 +283,7 @@ class Gym extends Model {
         !onlyAllGyms &&
         onlyRaids &&
         onlyRaidTier === 'all' &&
-        !raidBosses.size &&
+        !raidBossFilters.size &&
         !eggs.length
       ) {
         // Returns nothing if only raids are enabled without any filters
@@ -306,7 +352,7 @@ class Gym extends Model {
       }
       if (onlyRaids && raidPerms) {
         if (onlyRaidTier === 'all') {
-          if (raidBosses.size) {
+          if (raidBossFilters.size) {
             gym.orWhere((raid) => {
               raid
                 .where(
@@ -314,12 +360,35 @@ class Gym extends Model {
                   '>=',
                   isMad ? this.knex().fn.now() : ts,
                 )
-                .whereIn(isMad ? 'pokemon_id' : 'raid_pokemon_id', [
-                  ...(raidBosses || []),
-                ])
-                .whereIn(isMad ? 'raid.form' : 'raid_pokemon_form', [
-                  ...(raidForms || []),
-                ])
+                .andWhere((bosses) => {
+                  ;[...raidBossFilters.values()].forEach(
+                    ({ pokemonId, form, gender }, index) => {
+                      const method = index ? 'orWhere' : 'where'
+                      bosses[method]((combo) => {
+                        combo.where(
+                          isMad ? 'pokemon_id' : 'raid_pokemon_id',
+                          pokemonId,
+                        )
+                        if (form === null) {
+                          combo.andWhereNull(
+                            isMad ? 'raid.form' : 'raid_pokemon_form',
+                          )
+                        } else {
+                          combo.andWhere(
+                            isMad ? 'raid.form' : 'raid_pokemon_form',
+                            form,
+                          )
+                        }
+                        if (gender !== null) {
+                          combo.andWhere(
+                            isMad ? 'raid.gender' : 'raid_pokemon_gender',
+                            gender,
+                          )
+                        }
+                      })
+                    },
+                  )
+                })
             })
           }
           if (eggs.length) {
@@ -377,6 +446,8 @@ class Gym extends Model {
         )
         const isRaid = gym.raid_end_timestamp > ts
         const isEgg = isRaid && !gym.raid_pokemon_id
+        const raidBossFilter =
+          args.filters[`${gym.raid_pokemon_id}-${gym.raid_pokemon_form}`]
 
         if (userBadgeObj[gym.id]) {
           newGym.badge = userBadgeObj[gym.id]
@@ -404,10 +475,9 @@ class Gym extends Model {
           onlyRaids &&
           raidPerms &&
           (onlyRaidTier === 'all'
-            ? (args.filters[
-                `${gym.raid_pokemon_id}-${gym.raid_pokemon_form}`
-              ] &&
-                isRaid) ||
+            ? (raidBossFilter &&
+                isRaid &&
+                matchesRaidBossGender(gym, raidBossFilter)) ||
               (args.filters[`e${gym.raid_level}`] && isEgg)
             : onlyRaidTier === gym.raid_level && (isRaid || isEgg))
         ) {

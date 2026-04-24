@@ -32,6 +32,39 @@ const STATION_SEARCH_BATTLE_FIELDS = [
 ]
 
 /**
+ * @param {unknown} gender
+ * @returns {1 | 2 | 3 | null}
+ */
+function parseFilterGender(gender) {
+  const parsed = Number(gender)
+  return parsed >= 1 && parsed <= 3 ? /** @type {1 | 2 | 3} */ (parsed) : null
+}
+
+/**
+ * @param {string} key
+ * @param {unknown} value
+ * @returns {{ pokemonId: number, form: number | null, gender: 1 | 2 | 3 | null } | null}
+ */
+function parseBattleComboFilter(key, value) {
+  const [idPart, formPart] = key.split('-', 2)
+  const pokemonId = Number(idPart)
+  if (!Number.isFinite(pokemonId)) return null
+
+  let form = null
+  if (formPart && formPart !== 'null') {
+    const parsedForm = Number(formPart)
+    if (!Number.isFinite(parsedForm)) return null
+    form = parsedForm
+  }
+
+  return {
+    pokemonId,
+    form,
+    gender: parseFilterGender(value?.gender),
+  }
+}
+
+/**
  * @param {import('ohbem').PokemonData | null} pokemonData
  * @param {import('@rm/types').FullStation} station
  * @returns {number | null}
@@ -388,7 +421,7 @@ function getVisibleStationBattle(battles, ts) {
  *  includeUpcoming: boolean
  *  onlyBattleTier: string | number
  *  battleLevels: number[]
- *  battleCombos: { pokemonId: number, form: number | null }[]
+ *  battleCombos: { pokemonId: number, form: number | null, gender: 1 | 2 | 3 | null }[]
  * }} options
  */
 function addBattleFilterClause(
@@ -415,7 +448,7 @@ function addBattleFilterClause(
         match[levelMethod](`${prefix}battle_level`, battleLevels)
         matchApplied = true
       }
-      battleCombos.forEach(({ pokemonId, form }) => {
+      battleCombos.forEach(({ pokemonId, form, gender }) => {
         const comboMethod = matchApplied ? 'orWhere' : 'where'
         match[comboMethod]((combo) => {
           combo.where(`${prefix}battle_pokemon_id`, pokemonId)
@@ -423,6 +456,9 @@ function addBattleFilterClause(
             combo.andWhereNull(`${prefix}battle_pokemon_form`)
           } else {
             combo.andWhere(`${prefix}battle_pokemon_form`, form)
+          }
+          if (gender !== null) {
+            combo.andWhere(`${prefix}battle_pokemon_gender`, gender)
           }
         })
         matchApplied = true
@@ -443,7 +479,7 @@ function addBattleFilterClause(
  *  includeUpcoming: boolean
  *  onlyBattleTier: string | number
  *  battleLevels: number[]
- *  battleCombos: { pokemonId: number, form: number | null }[]
+ *  battleCombos: { pokemonId: number, form: number | null, gender: 1 | 2 | 3 | null }[]
  * }} options
  */
 function matchesStationBattleFilter(
@@ -473,14 +509,16 @@ function matchesStationBattleFilter(
     matched = battleLevels.includes(Number(battle?.battle_level))
   }
   if (
-    battleCombos.some(({ pokemonId, form }) => {
+    battleCombos.some(({ pokemonId, form, gender }) => {
       if (Number(battle?.battle_pokemon_id) !== pokemonId) {
         return false
       }
       if (form === null) {
-        return battle?.battle_pokemon_form === null
+        if (battle?.battle_pokemon_form !== null) return false
+      } else if (Number(battle?.battle_pokemon_form) !== form) {
+        return false
       }
-      return Number(battle?.battle_pokemon_form) === form
+      return gender === null || Number(battle?.battle_pokemon_gender) === gender
     })
   ) {
     matchApplied = true
@@ -585,18 +623,11 @@ class Station extends Model {
           return
         }
         if (/^\d+-/.test(key)) {
-          const [idPart, formPart] = key.split('-', 2)
-          const pokemonId = Number(idPart)
-          if (!Number.isFinite(pokemonId)) return
-          let formValue = null
-          if (formPart && formPart !== 'null') {
-            const parsedForm = Number(formPart)
-            if (!Number.isFinite(parsedForm)) return
-            formValue = parsedForm
-          }
-          const comboKey = `${pokemonId}-${formValue ?? 'null'}`
+          const parsed = parseBattleComboFilter(key, value)
+          if (!parsed) return
+          const comboKey = `${parsed.pokemonId}-${parsed.form ?? 'null'}`
           if (!battleComboFilters.has(comboKey)) {
-            battleComboFilters.set(comboKey, { pokemonId, form: formValue })
+            battleComboFilters.set(comboKey, parsed)
           }
         }
       })

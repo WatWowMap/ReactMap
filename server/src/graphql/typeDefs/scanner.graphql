@@ -147,7 +147,6 @@ type Pokestop {
   power_up_level: Int
   power_up_points: Int
   power_up_end_timestamp: Int
-  hasShowcase: Boolean
   showcase_expiry: Int
   incident_blocker_display_type: Int
   incident_blocker_expire_timestamp: Int

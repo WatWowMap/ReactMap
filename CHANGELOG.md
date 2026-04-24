@@ -1,3 +1,31 @@
+# [1.42.0](https://github.com/WatWowMap/ReactMap/compare/v1.41.2...v1.42.0) (2026-04-21)
+
+
+### Features
+
+* raid/max battle gender filtering ([059427a](https://github.com/WatWowMap/ReactMap/commit/059427a6b64f4f18e3f27c2f4795984fe6828535))
+
+## [1.41.2](https://github.com/WatWowMap/ReactMap/compare/v1.41.1...v1.41.2) (2026-04-19)
+
+
+### Bug Fixes
+
+* change scan-on-demand dialog to notification ([b77145d](https://github.com/WatWowMap/ReactMap/commit/b77145dd8e037f0916d72c6a84e76fbb9584bde8))
+* keep drawer scroll position ([a242e84](https://github.com/WatWowMap/ReactMap/commit/a242e842acaf9f5526491c7a294b8a677979b48f))
+* perms cleanup ([c513936](https://github.com/WatWowMap/ReactMap/commit/c513936fe84f5c863644fe90555de73c723d7a44))
+* **pokestops:** align incident blocker visibility across markers and popups ([8acf245](https://github.com/WatWowMap/ReactMap/commit/8acf245983402e9e14ef78f628fae217c1e23000))
+* properly set default discord auth as none ([3670810](https://github.com/WatWowMap/ReactMap/commit/3670810193e1c74bcd8352825083c069b33b1bff))
+* restore drawer sublist scroll positions ([8950dd5](https://github.com/WatWowMap/ReactMap/commit/8950dd56745be7ee591ccfffe6e97b6cfafb34fc))
+* weather icon uses wrong time of day for wild ([5944452](https://github.com/WatWowMap/ReactMap/commit/594445268ca027b8f2b1d9c8edce70208b23c49d))
+* weather update consistency ([184ac2f](https://github.com/WatWowMap/ReactMap/commit/184ac2fa3fbc372d896f70bf36277fa1dd2e6a22))
+
+## [1.41.2-develop.5](https://github.com/WatWowMap/ReactMap/compare/v1.41.2-develop.4...v1.41.2-develop.5) (2026-04-19)
+
+
+### Bug Fixes
+
+* perms cleanup ([c513936](https://github.com/WatWowMap/ReactMap/commit/c513936fe84f5c863644fe90555de73c723d7a44))
+
 ## [1.41.2-develop.4](https://github.com/WatWowMap/ReactMap/compare/v1.41.2-develop.3...v1.41.2-develop.4) (2026-04-04)
 
 

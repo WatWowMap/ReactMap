@@ -769,17 +769,17 @@ class Pokestop extends Model {
     const filteredResults = []
     for (let i = 0; i < queryResults.length; i += 1) {
       const pokestop = queryResults[i]
-      const hasShowcase = pokestop.showcase_expiry > ts
-      const incidentBlocker = this.getIncidentBlocker(
-        pokestop.invasions,
-        isMad,
-        hasMultiInvasions,
-      )
+      const canViewIncidentMetadata = perms.eventStops || perms.invasions
+      const incidentBlocker = canViewIncidentMetadata
+        ? this.getIncidentBlocker(pokestop.invasions, isMad, hasMultiInvasions)
+        : null
       const filtered = {
-        hasShowcase,
-        showcase_expiry: pokestop.showcase_expiry || null,
-        incident_blocker_display_type: incidentBlocker.displayType,
-        incident_blocker_expire_timestamp: incidentBlocker.expireTimestamp,
+        showcase_expiry: canViewIncidentMetadata
+          ? pokestop.showcase_expiry || null
+          : null,
+        incident_blocker_display_type: incidentBlocker?.displayType || null,
+        incident_blocker_expire_timestamp:
+          incidentBlocker?.expireTimestamp || null,
       }
 
       this.fieldAssigner(filtered, pokestop, [
