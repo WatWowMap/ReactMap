@@ -281,6 +281,7 @@ export const MAX_BATTLES = gql`
       # battle_pokemon_evolution
       battle_pokemon_alignment
       battle_pokemon_bread_mode
+      battle_start
       battle_end
     }
   }

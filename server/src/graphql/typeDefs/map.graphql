@@ -80,6 +80,7 @@ type Search {
   # battle_pokemon_evolution: Int
   battle_pokemon_alignment: Int
   battle_pokemon_bread_mode: Int
+  battle_start: Int
   battle_end: Int
 }
 

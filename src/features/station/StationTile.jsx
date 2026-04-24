@@ -10,6 +10,7 @@ import { useForcePopup } from '@hooks/useForcePopup'
 import { useManualPopupTracker } from '@hooks/useManualPopupTracker'
 import { TooltipWrapper } from '@components/ToolTipWrapper'
 
+import { getStationBattleState, stationBattlesEqual } from './battleState'
 import { StationPopup } from './StationPopup'
 import { useStationMarker } from './useStationMarker'
 
@@ -27,41 +28,55 @@ const BaseStationTile = (station) => {
     return [timerList.includes(station.id), config.general.interactionRangeZoom]
   }, basicEqualFn)
 
-  const [showTimer, showInteractionRange, customRange] = useStorage((s) => {
-    const { userSettings, zoom } = s
-    return [
-      userSettings.stations.stationTimers || individualTimer,
-      !!userSettings.stations.interactionRanges && zoom >= interactionRangeZoom,
-      zoom >= interactionRangeZoom
-        ? +userSettings.stations.customRange || 0
-        : 0,
-    ]
-  }, basicEqualFn)
+  const [showTimer, showInteractionRange, customRange, includeUpcoming] =
+    useStorage((s) => {
+      const { userSettings, zoom, filters } = s
+      return [
+        userSettings.stations.stationTimers || individualTimer,
+        !!userSettings.stations.interactionRanges &&
+          zoom >= interactionRangeZoom,
+        zoom >= interactionRangeZoom
+          ? +userSettings.stations.customRange || 0
+          : 0,
+        filters?.stations?.includeUpcoming ?? true,
+      ]
+    }, basicEqualFn)
 
-  const { start_time, battle_end, end_time } = station
+  const { start_time, end_time } = station
+  const now = Date.now() / 1000
+  const battleState = getStationBattleState(station, now, { includeUpcoming })
+
+  const refreshTimers = React.useMemo(() => {
+    const internalTimers = /** @type {number[]} */ ([])
+    if (Number.isFinite(start_time) && start_time > now) {
+      internalTimers.push(start_time)
+    }
+    if (Number.isFinite(end_time) && end_time > now) {
+      internalTimers.push(end_time)
+    }
+    internalTimers.push(...battleState.refreshTimestamps)
+    return [...new Set(internalTimers)]
+  }, [battleState.refreshTimestamps, end_time, now, start_time])
 
   const timers = React.useMemo(() => {
-    const now = Date.now() / 1000
     const internalTimers = /** @type {number[]} */ ([])
     if (showTimer) {
-      const hasStart = Number.isFinite(start_time)
-      const hasBattleEnd = Number.isFinite(battle_end)
-      const hasEnd = Number.isFinite(end_time)
-
-      if (hasStart && start_time > now) {
+      if (battleState.tooltipTimers.length) {
+        internalTimers.push(...battleState.tooltipTimers)
+      } else if (Number.isFinite(start_time) && start_time > now) {
         internalTimers.push(start_time)
-      } else if (hasBattleEnd && battle_end > now) {
-        internalTimers.push(battle_end)
-      } else if (hasEnd && end_time > now) {
+      } else if (Number.isFinite(end_time) && end_time > now) {
         internalTimers.push(end_time)
       }
     }
     return internalTimers
-  }, [showTimer, start_time, battle_end, end_time])
+  }, [battleState.tooltipTimers, end_time, now, showTimer, start_time])
 
   useForcePopup(station.id, markerRef)
-  useMarkerTimer(timers.length ? Math.min(...timers) : null, markerRef, () =>
-    setStateChange(!stateChange),
+  useMarkerTimer(
+    refreshTimers.length ? Math.min(...refreshTimers) : null,
+    markerRef,
+    () => setStateChange(!stateChange),
   )
   const handlePopupOpen = useManualPopupTracker('stations', station.id)
 
@@ -69,7 +84,7 @@ const BaseStationTile = (station) => {
     <Marker
       ref={setMarkerRef}
       position={[station.lat, station.lon]}
-      icon={useStationMarker(station)}
+      icon={useStationMarker(station, battleState.markerBattle)}
       eventHandlers={{ popupopen: handlePopupOpen }}
     >
       <Popup position={[station.lat, station.lon]}>
@@ -130,5 +145,6 @@ export const StationTile = React.memo(
     compareValueOrFalsy(prev.lon, next.lon) &&
     compareValueOrFalsy(prev.start_time, next.start_time) &&
     compareValueOrFalsy(prev.end_time, next.end_time) &&
+    stationBattlesEqual(prev.battles, next.battles) &&
     trackedBattleKeys.every((key) => compareValueOrFalsy(prev[key], next[key])),
 )
