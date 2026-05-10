@@ -219,7 +219,7 @@ export function getPokestopIncidentState({
         (event) => getEventIncidentPriority(event) >= blocker.priority,
       )
     : popupEvents
-  const markerInvasions = popupInvasions
+  const markerInvasions = blocker ? [] : popupInvasions
   const baseDisplay = getBasePokestopIncidentDisplay({
     events: markerEvents,
     invasions: markerInvasions,
