@@ -1,3 +1,16 @@
+# [1.43.0](https://github.com/WatWowMap/ReactMap/compare/v1.42.0...v1.43.0) (2026-05-10)
+
+
+### Bug Fixes
+
+* **server:** tolerate scanner source failures ([eacf29e](https://github.com/WatWowMap/ReactMap/commit/eacf29e2628e322080bb11fd60dc29668a1b1ec8))
+
+
+### Features
+
+* enhanced graphics gates pulsing locating dot ([5b4802d](https://github.com/WatWowMap/ReactMap/commit/5b4802ddfab1d29ecbd1e35725d71b682024457a))
+* **settings:** add enhanced graphics toggle ([0cb07ad](https://github.com/WatWowMap/ReactMap/commit/0cb07add3e3ce25e064215634044220f5fe96b2e))
+
 # [1.42.0](https://github.com/WatWowMap/ReactMap/compare/v1.41.2...v1.42.0) (2026-04-21)
 
 
