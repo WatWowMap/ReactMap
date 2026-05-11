@@ -755,6 +755,102 @@ class Pokestop extends Model {
     }
   }
 
+  static hasRocketPokemonFilter(filters, pokemonId, formId) {
+    if (!pokemonId) return false
+    return !!(
+      filters[`a${pokemonId}-${formId ?? 0}`] || filters[`a${pokemonId}`]
+    )
+  }
+
+  static invasionMatchesFilters(
+    invasion,
+    filters,
+    isMad,
+    hasMultiInvasions,
+    hasConfirmed,
+  ) {
+    const gruntType = Number(invasion.grunt_type ?? 0)
+    const info = state.event.invasions[gruntType]
+    if (!gruntType || !info) return false
+
+    if (hasConfirmed && filters.onlyConfirmed && !invasion.confirmed) {
+      return false
+    }
+    if (
+      filters.onlyExcludeGrunts &&
+      state.event.rocketGruntIDs.includes(gruntType)
+    ) {
+      return false
+    }
+    if (
+      filters.onlyExcludeLeaders &&
+      state.event.rocketLeaderIDs.includes(gruntType)
+    ) {
+      return false
+    }
+    if (
+      isMad &&
+      !hasMultiInvasions &&
+      MADE_UP_MAD_INVASIONS.includes(gruntType)
+    ) {
+      return false
+    }
+
+    const isLeaderOrGiovanni = gruntType >= 41 && gruntType <= 44
+    if (!isLeaderOrGiovanni) {
+      if (
+        info.firstReward &&
+        (hasConfirmed && invasion.confirmed
+          ? this.hasRocketPokemonFilter(
+              filters,
+              invasion.slot_1_pokemon_id,
+              invasion.slot_1_form,
+            )
+          : info.encounters.first.some((poke) =>
+              this.hasRocketPokemonFilter(filters, poke.id, poke.form),
+            ))
+      ) {
+        return true
+      }
+
+      if (
+        info.secondReward &&
+        (hasConfirmed && invasion.confirmed
+          ? this.hasRocketPokemonFilter(
+              filters,
+              invasion.slot_2_pokemon_id,
+              invasion.slot_2_form,
+            )
+          : info.encounters.second.some((poke) =>
+              this.hasRocketPokemonFilter(filters, poke.id, poke.form),
+            ))
+      ) {
+        return true
+      }
+
+      if (
+        info.thirdReward &&
+        (hasConfirmed && invasion.confirmed
+          ? this.hasRocketPokemonFilter(
+              filters,
+              invasion.slot_3_pokemon_id,
+              invasion.slot_3_form,
+            )
+          : info.encounters.third.some((poke) =>
+              this.hasRocketPokemonFilter(filters, poke.id, poke.form),
+            ))
+      ) {
+        return true
+      }
+    }
+
+    return !!(
+      filters[`i${gruntType}`] ||
+      (filters.onlyAllPokestops &&
+        (filters.onlyConfirmed ? invasion.confirmed : true))
+    )
+  }
+
   // filters and removes unwanted data
   static secondaryFilter(
     queryResults,
@@ -858,61 +954,15 @@ class Pokestop extends Model {
         perms.invasions &&
         (filters.onlyAllPokestops || filters.onlyInvasions)
       ) {
-        filtered.invasions = pokestop.invasions.filter((invasion) => {
-          const info = state.event.invasions[invasion.grunt_type]
-          if (!info) return false
-
-          // Check if this is a team leader or Giovanni (grunt types 41-44)
-          const isLeaderOrGiovanni =
-            invasion.grunt_type >= 41 && invasion.grunt_type <= 44
-
-          // For team leaders and Giovanni, skip Pokemon-based filtering
-          if (!isLeaderOrGiovanni) {
-            if (
-              info.firstReward &&
-              (hasConfirmed && invasion.confirmed
-                ? filters[
-                    `a${invasion.slot_1_pokemon_id}-${invasion.slot_1_form}`
-                  ]
-                : info.encounters.first.some(
-                    (poke) => !!filters[`a${poke.id}-${poke.form}`],
-                  ))
-            )
-              return true
-
-            if (
-              info.secondReward &&
-              (hasConfirmed && invasion.confirmed
-                ? filters[
-                    `a${invasion.slot_2_pokemon_id}-${invasion.slot_2_form}`
-                  ]
-                : info.encounters.second.some(
-                    (poke) => !!filters[`a${poke.id}-${poke.form}`],
-                  ))
-            )
-              return true
-            if (
-              info.thirdReward &&
-              (hasConfirmed && invasion.confirmed
-                ? filters[
-                    `a${invasion.slot_3_pokemon_id}-${invasion.slot_3_form}`
-                  ]
-                : info.encounters.third.some(
-                    (poke) => !!filters[`a${poke.id}-${poke.form}`],
-                  ))
-            )
-              return true
-          }
-
-          return (
-            filters[`i${invasion.grunt_type}`] ||
-            (filters.onlyAllPokestops &&
-              (filters.onlyConfirmed ? invasion.confirmed : true) &&
-              (isMad && !hasMultiInvasions
-                ? !MADE_UP_MAD_INVASIONS.includes(invasion.grunt_type)
-                : invasion.grunt_type))
-          )
-        })
+        filtered.invasions = pokestop.invasions.filter((invasion) =>
+          this.invasionMatchesFilters(
+            invasion,
+            filters,
+            isMad,
+            hasMultiInvasions,
+            hasConfirmed,
+          ),
+        )
       }
       if (
         perms.lures &&
