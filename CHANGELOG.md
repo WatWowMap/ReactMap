@@ -1,3 +1,10 @@
+## [1.43.1](https://github.com/WatWowMap/ReactMap/compare/v1.43.0...v1.43.1) (2026-05-11)
+
+
+### Bug Fixes
+
+* invasion filtering ([94510ee](https://github.com/WatWowMap/ReactMap/commit/94510eeaad324c9de6d356d00dffc5dee021cfe0))
+
 # [1.43.0](https://github.com/WatWowMap/ReactMap/compare/v1.42.0...v1.43.0) (2026-05-10)
 
 
