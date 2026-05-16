@@ -134,6 +134,9 @@ function buildDefaultFilters(perms) {
             maxBattles: perms.stations
               ? defaultFilters.stations.battles
               : undefined,
+            includeUpcoming: perms.dynamax
+              ? defaultFilters.stations.includeUpcoming
+              : undefined,
             filter: pokemon.stations,
             gmaxStationed: perms.dynamax
               ? defaultFilters.stations.gmaxStationed

@@ -8,25 +8,29 @@ import { renderOverlayIcon } from '@utils/renderOverlayIcon'
 
 /**
  *
- * @param {import('@rm/types').Station} param0
+ * @param {import('@rm/types').Station} station
+ * @param {import('@rm/types').StationBattle | null} battle
  * @returns
  */
-export function useStationMarker({
-  battle_level,
-  battle_pokemon_alignment,
-  battle_pokemon_costume,
-  battle_pokemon_form,
-  battle_pokemon_gender,
-  battle_pokemon_id,
-  battle_pokemon_bread_mode,
-  battle_end,
-  start_time,
-  end_time,
-}) {
+export function useStationMarker(station, battle = null) {
+  const { start_time, end_time } = station
+  const {
+    battle_level = 0,
+    battle_pokemon_alignment = 0,
+    battle_pokemon_costume = 0,
+    battle_pokemon_form = 0,
+    battle_pokemon_gender = 0,
+    battle_pokemon_id = 0,
+    battle_pokemon_bread_mode = 0,
+    battle_start = 0,
+    battle_end = 0,
+  } = battle || {}
   const now = Date.now() / 1000
   const isInactive = Number.isFinite(end_time) && end_time < now
   const hasStarted = Number.isFinite(start_time) && start_time < now
-  const isBattleActive = Number.isFinite(battle_end) && battle_end > now
+  const battleStart = Number(battle_start)
+  const hasBattleStarted =
+    !Number.isFinite(battleStart) || battleStart === 0 || battleStart <= now
   const [, Icons] = useStorage(
     (s) => [s.icons, useMemory.getState().Icons],
     (a, b) => Object.entries(a[0]).every(([k, v]) => b[0][k] === v),
@@ -56,7 +60,11 @@ export function useStationMarker({
   const getOpacity = useOpacity('stations')
   const stationOpacity = isInactive ? 0.3 : getOpacity(end_time)
   const showBattleIcon =
-    !isInactive && !!battle_pokemon_id && hasStarted && isBattleActive
+    !isInactive &&
+    !!battle_pokemon_id &&
+    hasStarted &&
+    hasBattleStarted &&
+    battle_end > now
 
   return divIcon({
     popupAnchor: [

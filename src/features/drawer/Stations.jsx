@@ -9,6 +9,7 @@ import { useTranslation } from 'react-i18next'
 import { useDeepStore, useStorage } from '@store/useStorage'
 import { useGetAvailable } from '@hooks/useGetAvailable'
 import { FCSelect } from '@components/inputs/FCSelect'
+import { BoolToggle } from '@components/inputs/BoolToggle'
 
 import { CollapsibleItem } from './components/CollapsibleItem'
 import { SelectorListMemo } from './components/SelectorList'
@@ -84,10 +85,27 @@ function StationsQuickSelect() {
   )
 }
 
+function IncludeUpcomingToggle() {
+  const enabled = useStorage(
+    (s) =>
+      !!s.filters?.stations?.maxBattles && !s.filters?.stations?.allStations,
+  )
+
+  return (
+    <CollapsibleItem open={enabled}>
+      <BoolToggle
+        field="filters.stations.includeUpcoming"
+        label="include_upcoming"
+      />
+    </CollapsibleItem>
+  )
+}
+
 export function StationsDrawer() {
   return (
     <>
       <StationLevels />
+      <IncludeUpcomingToggle />
       <StationsQuickSelect />
     </>
   )
