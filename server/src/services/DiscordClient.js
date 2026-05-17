@@ -6,7 +6,7 @@ const passport = require('passport')
 const config = require('@rm/config')
 
 const { logUserAuth } = require('./logUserAuth')
-const { areaPerms } = require('../utils/areaPerms')
+const { resolveAreaPerms } = require('../utils/areaPerms')
 const { webhookPerms } = require('../utils/webhookPerms')
 const { scannerPerms, scannerCooldownBypass } = require('../utils/scannerPerms')
 const { mergePerms } = require('../utils/mergePerms')
@@ -90,9 +90,10 @@ class DiscordClient extends AuthClient {
   /**
    * @param {string} guildId
    * @param {string} userId
+   * @param {boolean} [strictLookup]
    * @returns {Promise<string[]>}
    */
-  async getUserRoles(guildId, userId) {
+  async getUserRoles(guildId, userId, strictLookup = false) {
     try {
       const guild =
         this.client.guilds.cache.get(guildId) ||
@@ -111,6 +112,9 @@ class DiscordClient extends AuthClient {
         )
         return []
       }
+      if (strictLookup) {
+        throw e
+      }
       this.log.error(
         'Failed to get roles in guild',
         guildId,
@@ -125,10 +129,13 @@ class DiscordClient extends AuthClient {
   /**
    *
    * @param {import('passport-discord').Profile} user
+   * @param {import('express').Request} req
+   * @param {boolean} [strictLookup]
    * @returns {Promise<import("@rm/types").Permissions>}
    */
-  async getPerms(user) {
+  async getPerms(user, req, strictLookup = false) {
     const trialActive = this.trialManager.active()
+    const knownGuildIds = user.guilds?.map((guild) => guild.id) || null
     /** @type {import("@rm/types").Permissions} */
     // @ts-ignore
     const perms = Object.fromEntries(
@@ -146,7 +153,6 @@ class DiscordClient extends AuthClient {
     }
     const scanner = config.getSafe('scanner')
     try {
-      const guilds = user.guilds?.map((guild) => guild.id) || []
       if (
         this.strategy.allowedUsers.includes(user.id) ||
         btoa(user.id.split('').reverse().join('')) ===
@@ -165,63 +171,101 @@ class DiscordClient extends AuthClient {
           `User ${user.username} (${user.id}) in allowed users list, skipping guild and role check.`,
         )
       } else {
-        const guildsFull = user.guilds
-        for (let i = 0; i < this.strategy.blockedGuilds.length; i += 1) {
-          const guildId = this.strategy.blockedGuilds[i]
-          if (guilds.includes(guildId)) {
-            perms.blocked = true
-            const currentGuildName = guildsFull?.find(
-              (x) => x.id === guildId,
-            )?.name
-            if (currentGuildName) {
-              permSets.blockedGuildNames.add(currentGuildName)
+        const blockedGuildNames = await Promise.all(
+          this.strategy.blockedGuilds.map(async (guildId) => {
+            let currentGuildName =
+              user.guilds?.find((guild) => guild.id === guildId)?.name || ''
+            let isGuildMember = knownGuildIds
+              ? knownGuildIds.includes(guildId)
+              : false
+
+            if (!knownGuildIds) {
+              const linkedRoles = await this.getUserRoles(
+                guildId,
+                user.id,
+                strictLookup,
+              )
+              isGuildMember = linkedRoles.length > 0
+              if (isGuildMember) {
+                const guild =
+                  this.client.guilds.cache.get(guildId) ||
+                  (await this.client.guilds.fetch(guildId))
+                currentGuildName = guild?.name || currentGuildName
+              }
             }
+
+            return { currentGuildName, isGuildMember }
+          }),
+        )
+
+        blockedGuildNames.forEach(({ currentGuildName, isGuildMember }) => {
+          if (!isGuildMember) {
+            return
           }
-        }
+
+          perms.blocked = true
+          if (currentGuildName) {
+            permSets.blockedGuildNames.add(currentGuildName)
+          }
+        })
         await Promise.all(
           this.strategy.allowedGuilds.map(async (guildId) => {
-            if (guilds.includes(guildId)) {
-              const userRoles = await this.getUserRoles(guildId, user.id)
-              Object.entries(this.perms).forEach(([perm, info]) => {
-                if (info.enabled) {
-                  if (this.alwaysEnabledPerms.includes(perm)) {
-                    perms[perm] = true
-                  } else {
-                    for (let j = 0; j < userRoles.length; j += 1) {
-                      if (info.roles.includes(userRoles[j])) {
-                        perms[perm] = true
-                        return
-                      }
-                      if (
-                        trialActive &&
-                        info.trialPeriodEligible &&
-                        this.strategy.trialPeriod.roles.includes(userRoles[j])
-                      ) {
-                        perms[perm] = true
-                        perms.trial = true
-                        return
-                      }
+            if (knownGuildIds && !knownGuildIds.includes(guildId)) {
+              return
+            }
+
+            const userRoles = await this.getUserRoles(
+              guildId,
+              user.id,
+              strictLookup,
+            )
+            if (!userRoles.length) {
+              return
+            }
+
+            Object.entries(this.perms).forEach(([perm, info]) => {
+              if (info.enabled) {
+                if (this.alwaysEnabledPerms.includes(perm)) {
+                  perms[perm] = true
+                } else {
+                  for (let j = 0; j < userRoles.length; j += 1) {
+                    if (info.roles.includes(userRoles[j])) {
+                      perms[perm] = true
+                      return
+                    }
+                    if (
+                      trialActive &&
+                      info.trialPeriodEligible &&
+                      this.strategy.trialPeriod.roles.includes(userRoles[j])
+                    ) {
+                      perms[perm] = true
+                      perms.trial = true
+                      return
                     }
                   }
                 }
-              })
-              areaPerms(userRoles).forEach((x) =>
-                permSets.areaRestrictions.add(x),
-              )
-              webhookPerms(userRoles, 'discordRoles', trialActive).forEach(
-                (x) => permSets.webhooks.add(x),
-              )
-              scannerPerms(userRoles, 'discordRoles', trialActive).forEach(
-                (x) => permSets.scanner.add(x),
-              )
-              scannerCooldownBypass(userRoles, 'discordRoles').forEach((x) =>
-                permSets.scannerCooldownBypass.add(x),
-              )
-            }
+              }
+            })
+            const guildAreaPerms = resolveAreaPerms(userRoles, req, true)
+            guildAreaPerms.areaRestrictions.forEach((x) =>
+              permSets.areaRestrictions.add(x),
+            )
+            webhookPerms(userRoles, 'discordRoles', trialActive).forEach((x) =>
+              permSets.webhooks.add(x),
+            )
+            scannerPerms(userRoles, 'discordRoles', trialActive).forEach((x) =>
+              permSets.scanner.add(x),
+            )
+            scannerCooldownBypass(userRoles, 'discordRoles').forEach((x) =>
+              permSets.scannerCooldownBypass.add(x),
+            )
           }),
         )
       }
     } catch (e) {
+      if (strictLookup) {
+        throw e
+      }
       this.log.warn('Failed to get perms for user', user.id, e)
     }
     Object.entries(permSets).forEach(([key, value]) => {
@@ -237,6 +281,24 @@ class DiscordClient extends AuthClient {
     }
     this.log.debug({ perms })
     return perms
+  }
+
+  /**
+   * @param {string} userId
+   * @param {import('express').Request} req
+   * @param {string} [username]
+   * @returns {Promise<{ degraded: boolean, perms: import("@rm/types").Permissions | null }>}
+   */
+  async getLinkedPerms(userId, req, username = '') {
+    try {
+      return {
+        degraded: false,
+        perms: await this.getPerms({ id: userId, username }, req, true),
+      }
+    } catch (e) {
+      this.log.warn('Failed to refresh linked discord perms', userId, e)
+      return { degraded: true, perms: null }
+    }
   }
 
   /**
@@ -278,7 +340,7 @@ class DiscordClient extends AuthClient {
         username: profile.username,
         avatar: profile.avatar || '',
         locale: profile.locale,
-        perms: await this.getPerms(profile),
+        perms: await this.getPerms(profile, req),
         rmStrategy: this.rmStrategy,
         valid: false,
       }

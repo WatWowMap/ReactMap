@@ -51,6 +51,8 @@ export function LocalLogin({ href, sx, style }) {
     } else if ('url' in resp && resp.url.includes('invalid_credentials')) {
       setError(t('invalid_credentials'))
       setSubmitted(false)
+    } else if ('url' in resp && resp.url.includes('/blocked/')) {
+      window.location.replace(resp.url)
     } else {
       window.location.replace('/')
     }

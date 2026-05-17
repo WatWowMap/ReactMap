@@ -1,5 +1,4 @@
 // @ts-check
-
 /**
  *
  * @param {import("@rm/types").Permissions} existingPerms

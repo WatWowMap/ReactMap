@@ -91,11 +91,13 @@
     "areaRestrictions": [
       {
         "roles": [],
-        "areas": []
+        "areas": [],
+        "parent": []
       },
       {
         "roles": [],
-        "areas": []
+        "areas": [],
+        "parent": []
       }
     ],
     "aliases": [

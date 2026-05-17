@@ -5,8 +5,10 @@ import { GeoJSON } from 'react-leaflet'
 import { Polygon } from 'leaflet'
 
 import { useWebhookStore, handleClick } from '@store/useWebhookStore'
+import { useMemory } from '@store/useMemory'
 import { useStorage } from '@store/useStorage'
 import { getProperName } from '@utils/strings'
+import { getAreaKeys, getValidAreaKeys } from './utils'
 
 /**
  *
@@ -15,25 +17,47 @@ import { getProperName } from '@utils/strings'
  */
 function ScanArea(featureCollection) {
   const search = useStorage((s) => s.filters.scanAreas?.filter?.search)
+  const selectedAreas = useStorage(
+    (s) => s.filters.scanAreas?.filter?.areas || [],
+  )
   const tapToToggle = useStorage((s) => s.userSettings.scanAreas.tapToToggle)
   const alwaysShowLabels = useStorage(
     (s) => s.userSettings.scanAreas.alwaysShowLabels,
   )
+  const accessibleAreaKeys = useMemory(
+    (s) => s.auth.perms.areaRestrictions || [],
+  )
   const webhook = useWebhookStore((s) => !!s.mode)
+  const selectionKey = React.useMemo(
+    () => [...selectedAreas].sort().join(','),
+    [selectedAreas],
+  )
+  const orderedFeatureCollection = React.useMemo(
+    () => ({
+      ...featureCollection,
+      // Render grouped parents underneath children so child taps stay reachable.
+      features: [...featureCollection.features].sort(
+        (a, b) => Number(!!a.properties.parent) - Number(!!b.properties.parent),
+      ),
+    }),
+    [featureCollection],
+  )
 
   return (
     <GeoJSON
-      key={`${search}${tapToToggle}${alwaysShowLabels}`}
-      data={featureCollection}
+      key={`${search}${tapToToggle}${alwaysShowLabels}${selectionKey}`}
+      data={orderedFeatureCollection}
       filter={(f) =>
         webhook ||
         search === '' ||
-        f.properties.key.toLowerCase().includes(search.toLowerCase())
+        `${f.properties.key || f.properties.name || ''}`
+          .toLowerCase()
+          .includes(search.toLowerCase())
       }
       eventHandlers={{
         click: ({ propagatedFrom: layer }) => {
           if (!layer.feature) return
-          const { name, key, manual = false } = layer.feature.properties
+          const { name, manual = false } = layer.feature.properties
           if (webhook && name && handleClick) {
             handleClick(name)().then((newAreas) => {
               layer.setStyle({
@@ -45,21 +69,74 @@ function ScanArea(featureCollection) {
               })
             })
           } else if (!manual && tapToToggle) {
-            const { filters, setAreas } = useStorage.getState()
-            const includes = filters?.scanAreas?.filter?.areas?.includes(key)
-            layer.setStyle({ fillOpacity: includes ? 0.2 : 0.8 })
-            setAreas(
-              key,
-              featureCollection.features
-                .filter((f) => !f.properties.manual)
-                .map((f) => f.properties.key),
+            const areaKeys = getAreaKeys(
+              featureCollection.features,
+              layer.feature,
+              accessibleAreaKeys,
             )
+            const validAreaKeys = getValidAreaKeys(
+              featureCollection.features,
+              accessibleAreaKeys,
+            )
+            const { setAreas } = useStorage.getState()
+            const hasAll = areaKeys.every((area) =>
+              selectedAreas.includes(area),
+            )
+            const legacyGroupKey = layer.feature.properties.parent
+              ? featureCollection.features.find(
+                  (feature) =>
+                    !feature.properties.manual &&
+                    !feature.properties.parent &&
+                    feature.properties.name ===
+                      layer.feature.properties.parent &&
+                    feature.properties.key,
+                )?.properties.key
+              : undefined
+            let nextAreaKeys = areaKeys
+            let unselectAll = hasAll
+
+            if (legacyGroupKey && selectedAreas.includes(legacyGroupKey)) {
+              const siblingAreaKeys = featureCollection.features
+                .filter(
+                  (feature) =>
+                    !feature.properties.manual &&
+                    feature.properties.parent ===
+                      layer.feature.properties.parent &&
+                    feature.properties.key !== layer.feature.properties.key,
+                )
+                .map((feature) => feature.properties.key)
+              nextAreaKeys = [
+                legacyGroupKey,
+                ...(selectedAreas.includes(layer.feature.properties.key)
+                  ? [layer.feature.properties.key]
+                  : []),
+                ...siblingAreaKeys.filter(
+                  (key) => !selectedAreas.includes(key),
+                ),
+              ]
+              unselectAll = false
+            } else if (areaKeys.length > 1 && !hasAll) {
+              nextAreaKeys = areaKeys.filter(
+                (area) => !selectedAreas.includes(area),
+              )
+            }
+
+            layer.setStyle({ fillOpacity: hasAll ? 0.2 : 0.8 })
+            setAreas(nextAreaKeys, validAreaKeys, unselectAll)
           }
         },
       }}
       onEachFeature={(feature, layer) => {
         if (feature.properties?.name) {
-          const { name, key } = feature.properties
+          const { name } = feature.properties
+          const areaKeys = getAreaKeys(
+            featureCollection.features,
+            feature,
+            accessibleAreaKeys,
+          )
+          const isSelected = areaKeys.length
+            ? areaKeys.every((area) => selectedAreas.includes(area))
+            : false
           const popupContent = getProperName(name)
           if (layer instanceof Polygon) {
             layer
@@ -81,10 +158,7 @@ function ScanArea(featureCollection) {
                         .human?.area?.some(
                           (area) => area.toLowerCase() === name?.toLowerCase(),
                         )
-                    : (
-                        useStorage.getState().filters?.scanAreas?.filter
-                          ?.areas || []
-                      ).includes(webhook ? name : key)
+                    : isSelected
                 )
                   ? 0.8
                   : 0.2,
