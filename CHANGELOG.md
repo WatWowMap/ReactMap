@@ -1,3 +1,10 @@
+## [1.43.2](https://github.com/WatWowMap/ReactMap/compare/v1.43.1...v1.43.2) (2026-05-29)
+
+
+### Bug Fixes
+
+* advanced control disabled state ([52e2c1a](https://github.com/WatWowMap/ReactMap/commit/52e2c1aaac090eb1209724501a7a5522c7352730))
+
 ## [1.43.1](https://github.com/WatWowMap/ReactMap/compare/v1.43.0...v1.43.1) (2026-05-11)
 
 
