@@ -534,22 +534,15 @@ function matchesStationBattleFilter(
  * @param {number} ts
  */
 function finalizeStation(station, pokemonData, ts) {
-  const hasAvailableBattle =
-    Array.isArray(station.battles) &&
-    station.battles.some((battle) => {
-      if (
-        battle?.battle_pokemon_id == null ||
-        !(Number(battle?.battle_end) > ts)
-      ) {
-        return false
-      }
-      const battleStart = Number(battle?.battle_start)
-      return (
-        !Number.isFinite(battleStart) || battleStart === 0 || battleStart <= ts
-      )
-    })
   if (Array.isArray(station.battles)) {
-    station.is_battle_available = hasAvailableBattle
+    station.is_battle_available =
+      station.is_battle_available !== false &&
+      station.is_battle_available !== 0 &&
+      station.battles.some(
+        (battle) =>
+          battle?.battle_pokemon_id != null &&
+          isStationBattleActive(battle, ts),
+      )
   } else if (
     station.is_battle_available &&
     station.battle_pokemon_id === null
@@ -687,7 +680,9 @@ class Station extends Model {
     const shouldRestrictReturnedBattles = onlyMaxBattles && hasBattleConditions
 
     if (includeBattleData) {
-      select.push(...getStationSelect(['total_stationed_pokemon']))
+      select.push(
+        ...getStationSelect(['is_battle_available', 'total_stationed_pokemon']),
+      )
       select.push(
         `${getStationColumn(
           hasStationedGmax ? 'total_stationed_gmax' : 'stationed_pokemon',
@@ -707,7 +702,6 @@ class Station extends Model {
       } else {
         select.push(
           ...getStationSelect([
-            'is_battle_available',
             'battle_level',
             'battle_start',
             'battle_end',
