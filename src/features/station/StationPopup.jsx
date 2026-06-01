@@ -42,7 +42,11 @@ import { CopyCoords } from '@components/popups/Coords'
 import Tooltip from '@mui/material/Tooltip'
 import { usePokemonBackgroundVisuals } from '@hooks/usePokemonBackgroundVisuals'
 
-import { getStationBattleKey, getStationBattleState } from './battleState'
+import {
+  getEffectiveIncludeUpcoming,
+  getStationBattleKey,
+  getStationBattleState,
+} from './battleState'
 import { useGetStationMons } from './useGetStationMons'
 
 /**
@@ -131,7 +135,7 @@ export function StationPopup(station) {
   const now = Date.now() / 1000
   const stationFilters = useStorage((s) => s.filters?.stations)
   const battleState = getStationBattleState(station, now, {
-    includeUpcoming: stationFilters?.includeUpcoming ?? true,
+    includeUpcoming: getEffectiveIncludeUpcoming(stationFilters),
   })
   const visibleBattleKey = battleState.visibleBattle
     ? getStationBattleKey(battleState.visibleBattle)

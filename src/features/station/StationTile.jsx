@@ -10,7 +10,11 @@ import { useForcePopup } from '@hooks/useForcePopup'
 import { useManualPopupTracker } from '@hooks/useManualPopupTracker'
 import { TooltipWrapper } from '@components/ToolTipWrapper'
 
-import { getStationBattleState, stationBattlesEqual } from './battleState'
+import {
+  getEffectiveIncludeUpcoming,
+  getStationBattleState,
+  stationBattlesEqual,
+} from './battleState'
 import { StationPopup } from './StationPopup'
 import { useStationMarker } from './useStationMarker'
 
@@ -38,7 +42,7 @@ const BaseStationTile = (station) => {
         zoom >= interactionRangeZoom
           ? +userSettings.stations.customRange || 0
           : 0,
-        filters?.stations?.includeUpcoming ?? true,
+        getEffectiveIncludeUpcoming(filters?.stations),
       ]
     }, basicEqualFn)
 

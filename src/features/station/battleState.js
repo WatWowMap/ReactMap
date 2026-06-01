@@ -44,6 +44,14 @@ export function getStationBattleKey(battle) {
 }
 
 /**
+ * @param {import('@rm/types').AllFilters['stations'] | undefined} filters
+ * @returns {boolean}
+ */
+export function getEffectiveIncludeUpcoming(filters) {
+  return !!filters?.allStations || (filters?.includeUpcoming ?? true)
+}
+
+/**
  * @param {import('@rm/types').Station} station
  * @param {number} ts
  * @returns {import('@rm/types').StationBattle | null}

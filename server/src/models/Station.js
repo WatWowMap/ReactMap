@@ -678,11 +678,12 @@ class Station extends Model {
     const inactiveCutoff = now - stationInactiveLimitDays * 24 * 60 * 60
     const battleFilterOptions = {
       ts,
-      includeUpcoming: !!onlyIncludeUpcoming,
+      includeUpcoming: !!onlyAllStations || !!onlyIncludeUpcoming,
       onlyBattleTier,
       battleLevels,
       battleCombos,
     }
+    const { includeUpcoming } = battleFilterOptions
     const shouldRestrictReturnedBattles = onlyMaxBattles && hasBattleConditions
 
     if (includeBattleData) {
@@ -879,7 +880,7 @@ class Station extends Model {
             pokemonData,
           )
           station.battles = fallbackBattle ? [fallbackBattle] : []
-          if (!onlyIncludeUpcoming) {
+          if (!includeUpcoming) {
             const visibleBattle = getVisibleStationBattle(station.battles, ts)
             station.battles = visibleBattle ? [visibleBattle] : []
             if (!station.battles.length) {
@@ -932,7 +933,7 @@ class Station extends Model {
           clearStationBattleFallback(station)
           return finalizeStation(station, pokemonData, ts)
         }
-        if (!onlyIncludeUpcoming) {
+        if (!includeUpcoming) {
           const visibleBattle = getVisibleStationBattle(station.battles, ts)
           station.battles = visibleBattle ? [visibleBattle] : []
         }
