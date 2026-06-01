@@ -81,10 +81,16 @@ function getDisplayedBattleFilters(filters) {
           if (!Number.isFinite(parsedForm)) return
           formValue = parsedForm
         }
-        battleCombos.set(`${pokemonId}-${formValue ?? 'null'}`, {
-          pokemonId,
-          form: formValue,
-        })
+        const gender = Number(value.gender)
+        const genderValue = gender >= 1 && gender <= 3 ? gender : null
+        battleCombos.set(
+          `${pokemonId}-${formValue ?? 'null'}-${genderValue ?? 'all'}`,
+          {
+            pokemonId,
+            form: formValue,
+            gender: genderValue,
+          },
+        )
       }
     })
   }
@@ -123,8 +129,10 @@ function matchesDisplayedBattleFilter(battle, filters) {
   return (
     filters.battleLevels.includes(battleLevel) ||
     filters.battleCombos.some(
-      ({ pokemonId: filterPokemonId, form }) =>
-        pokemonId === filterPokemonId && pokemonForm === form,
+      ({ pokemonId: filterPokemonId, form, gender }) =>
+        pokemonId === filterPokemonId &&
+        pokemonForm === form &&
+        (gender === null || Number(battle?.battle_pokemon_gender) === gender),
     )
   )
 }

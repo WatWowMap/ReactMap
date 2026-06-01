@@ -193,7 +193,7 @@ function getSearchBattleJsonSubquery(knexRef, pokemonIds, ts) {
   ]).join(', ')
 
   return knexRef(STATION_BATTLE_SEARCH_TABLE)
-    .select(raw(`JSON_OBJECT(${jsonFields})`))
+    .select(knexRef.raw(`JSON_OBJECT(${jsonFields})`))
     .whereRaw(`${STATION_BATTLE_SEARCH_ALIAS}.station_id = ${STATION_TABLE}.id`)
     .andWhere(`${STATION_BATTLE_SEARCH_ALIAS}.battle_end`, '>', ts)
     .modify((builder) => {
