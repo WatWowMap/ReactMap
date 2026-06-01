@@ -45,6 +45,7 @@ export const resetAudio = () => resetAssets('Audio')
 export const resetUI = () =>
   useStorage.setState({
     holidayEffects: {},
+    enhancedGraphics: true,
     tabs: {},
     searches: {},
     popups: {},

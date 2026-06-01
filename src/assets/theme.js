@@ -156,6 +156,7 @@ const components = {
 export function useCustomTheme() {
   const { primary, secondary } = useMemory((s) => s.theme)
   const darkMode = useStorage((s) => s.darkMode)
+  const enhancedGraphics = useStorage((s) => s.enhancedGraphics)
 
   if (darkMode) {
     if (!document.body.classList.contains('dark')) {
@@ -164,6 +165,7 @@ export function useCustomTheme() {
   } else if (document.body.classList.contains('dark')) {
     document.body.classList.remove('dark')
   }
+  document.body.classList.toggle('reduced-graphics', !enhancedGraphics)
 
   const newTheme = useMemo(
     () =>

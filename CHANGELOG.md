@@ -1,3 +1,30 @@
+## [1.43.2](https://github.com/WatWowMap/ReactMap/compare/v1.43.1...v1.43.2) (2026-05-29)
+
+
+### Bug Fixes
+
+* advanced control disabled state ([52e2c1a](https://github.com/WatWowMap/ReactMap/commit/52e2c1aaac090eb1209724501a7a5522c7352730))
+
+## [1.43.1](https://github.com/WatWowMap/ReactMap/compare/v1.43.0...v1.43.1) (2026-05-11)
+
+
+### Bug Fixes
+
+* invasion filtering ([94510ee](https://github.com/WatWowMap/ReactMap/commit/94510eeaad324c9de6d356d00dffc5dee021cfe0))
+
+# [1.43.0](https://github.com/WatWowMap/ReactMap/compare/v1.42.0...v1.43.0) (2026-05-10)
+
+
+### Bug Fixes
+
+* **server:** tolerate scanner source failures ([eacf29e](https://github.com/WatWowMap/ReactMap/commit/eacf29e2628e322080bb11fd60dc29668a1b1ec8))
+
+
+### Features
+
+* enhanced graphics gates pulsing locating dot ([5b4802d](https://github.com/WatWowMap/ReactMap/commit/5b4802ddfab1d29ecbd1e35725d71b682024457a))
+* **settings:** add enhanced graphics toggle ([0cb07ad](https://github.com/WatWowMap/ReactMap/commit/0cb07add3e3ce25e064215634044220f5fe96b2e))
+
 # [1.42.0](https://github.com/WatWowMap/ReactMap/compare/v1.41.2...v1.42.0) (2026-04-21)
 
 

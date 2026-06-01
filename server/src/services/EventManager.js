@@ -19,9 +19,9 @@ class EventManager extends Logger {
     super('event')
     /** @type {import("@rm/masterfile").Masterfile} */
     this.masterfile = read()
-    /** @type {import("@rm/masterfile").Masterfile['invasions'] | {}} */
-    this.invasions =
-      'invasions' in this.masterfile ? this.masterfile.invasions : {}
+    this.setInvasions(
+      'invasions' in this.masterfile ? this.masterfile.invasions : {},
+    )
 
     /** @type {{[key in keyof import('@rm/types').Available]: string[] }} */
     this.available = getCache('available.json', {
@@ -59,6 +59,21 @@ class EventManager extends Logger {
     )
     /** @type {ClientObject} */
     this.authClients = {}
+  }
+
+  /** @param {import("@rm/masterfile").Masterfile['invasions'] | {}} invasions */
+  setInvasions(invasions) {
+    this.invasions = invasions
+    this.rocketGruntIDs = Object.keys(invasions)
+      .filter((key) => invasions[key].grunt === 'Grunt')
+      .map(Number)
+    this.rocketLeaderIDs = Object.keys(invasions)
+      .filter(
+        (key) =>
+          invasions[key].grunt === 'Executive' ||
+          invasions[key].grunt === 'Giovanni',
+      )
+      .map(Number)
   }
 
   /**
@@ -368,19 +383,7 @@ class EventManager extends Logger {
         /** @type {import('@rm/masterfile').Masterfile['invasions']} */
         const newInvasions = await fetch(endpoint).then((res) => res.json())
         if (newInvasions) {
-          this.rocketGruntIDs = Object.keys(newInvasions)
-            .filter((key) => newInvasions[key].grunt === 'Grunt')
-            .map(Number)
-
-          this.rocketLeaderIDs = Object.keys(newInvasions)
-            .filter(
-              (key) =>
-                newInvasions[key].grunt === 'Executive' ||
-                newInvasions[key].grunt === 'Giovanni',
-            )
-            .map(Number)
-
-          this.invasions = newInvasions
+          this.setInvasions(newInvasions)
 
           // Update available rocket Pokemon whenever invasions are refreshed
           if (Db) {

@@ -39,14 +39,22 @@ async function fetchJson(url, options = undefined) {
         return e.cause
       log.error(TAGS.fetch, `Unable to fetch ${url}`, '\n', e)
       if (options) {
-        fs.writeFileSync(
-          resolve(
-            __dirname,
-            '../../../../logs',
-            `${url.replaceAll('/', '_')}${Math.floor(Date.now() / 1000)}.json`,
-          ),
-          JSON.stringify(options, null, 2),
-        )
+        try {
+          const logsDir = resolve(__dirname, '../../../logs')
+          const fileName = `${url.replaceAll(/[^a-zA-Z0-9._-]/g, '_')}${Math.floor(Date.now() / 1000)}.json`
+          fs.mkdirSync(logsDir, { recursive: true })
+          fs.writeFileSync(
+            resolve(logsDir, fileName),
+            JSON.stringify(options, null, 2),
+          )
+        } catch (writeError) {
+          log.warn(
+            TAGS.fetch,
+            'Unable to write failed request payload log',
+            '\n',
+            writeError,
+          )
+        }
       }
       return e.cause
     }

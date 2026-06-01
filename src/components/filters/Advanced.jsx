@@ -118,6 +118,8 @@ export function AdvancedFilter() {
   const showGenderFilter =
     showMoreFilters ||
     ((category === 'gyms' || category === 'stations') && /^\d+-/.test(id))
+  const hasAll = checkIfHasAll(category, id)
+  const controlsDisabled = hasAll && filters.all
   return (
     <Dialog
       open={!!open}
@@ -154,7 +156,7 @@ export function AdvancedFilter() {
                       <SliderTile
                         slide={{
                           ...each,
-                          disabled: each.disabled || filters.all,
+                          disabled: each.disabled || controlsDisabled,
                         }}
                         // @ts-ignore
                         handleChange={handleChange}
@@ -168,7 +170,7 @@ export function AdvancedFilter() {
                 {showGenderFilter && (
                   <GenderListItem
                     field={`filters.${category}.filter.${id}`}
-                    disabled={filters.all}
+                    disabled={controlsDisabled}
                     disableGutters
                   />
                 )}
@@ -182,12 +184,12 @@ export function AdvancedFilter() {
                   <DualBoolToggle
                     items={XXS_XXL}
                     field={`filters.${category}.filter.${id}`}
-                    disabled={filters.all}
+                    disabled={controlsDisabled}
                     label="size_1-size_5"
                   />
                 )}
                 {category === 'pokestops' && <QuestConditionSelector id={id} />}
-                {checkIfHasAll(category, id) ? (
+                {hasAll ? (
                   <DualBoolToggle
                     items={ENABLED_ALL}
                     field={`filters.${category}.filter.${id}`}

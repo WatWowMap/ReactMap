@@ -24,6 +24,10 @@
   display: none;
 }
 
+.reduced-graphics .leaflet-control-locate-location circle {
+  animation: none;
+}
+
 body {
   margin: 0;
   background-color: white;
