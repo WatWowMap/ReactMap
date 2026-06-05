@@ -1,3 +1,10 @@
+# [1.44.0](https://github.com/WatWowMap/ReactMap/compare/v1.43.2...v1.44.0) (2026-06-05)
+
+
+### Features
+
+* multi-battle for stations ([#1205](https://github.com/WatWowMap/ReactMap/issues/1205)) ([e9920fc](https://github.com/WatWowMap/ReactMap/commit/e9920fc37f90cfd166658eb557d15658f0ec722a))
+
 ## [1.43.2](https://github.com/WatWowMap/ReactMap/compare/v1.43.1...v1.43.2) (2026-05-29)
 
 
