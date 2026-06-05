@@ -1,6 +1,6 @@
 {
   "name": "reactmap",
-  "version": "1.44.0",
+  "version": "1.44.1",
   "private": true,
   "description": "React based frontend map.",
   "license": "MIT",
@@ -99,7 +99,7 @@
   },
   "dependencies": {
     "@apollo/client": "3.11.4",
-    "@apollo/server": "5.5.0",
+    "@apollo/server": "5.5.1",
     "@as-integrations/express5": "1.1.2",
     "@emotion/react": "11.14.0",
     "@emotion/styled": "11.13.0",
@@ -125,7 +125,7 @@
     "@turf/helpers": "7.1.0",
     "@turtlesocks/react-leaflet.locatecontrol": "^0.1.1",
     "bcrypt": "^5.0.1",
-    "body-parser": "2.0.1",
+    "body-parser": "2.2.2",
     "bytes": "3.1.2",
     "chalkercli": "https://github.com/TurtIeSocks/chalkercli.git",
     "chokidar": "^3.5.3",
@@ -170,7 +170,7 @@
     "react-ga4": "^1.4.1",
     "react-i18next": "15.0.1",
     "react-leaflet": "4.2.1",
-    "react-router-dom": "^6.15.0",
+    "react-router-dom": "^6.30.4",
     "react-virtuoso": "4.16.1",
     "rtree": "^1.4.2",
     "source-map": "^0.7.4",
@@ -217,7 +217,8 @@
   "resolutions": {
     "got": ">=11.8.5",
     "dot-prop": ">=4.2.1",
-    "tmp": ">=0.2.4"
+    "qs": ">=6.15.2",
+    "tmp": ">=0.2.6"
   },
   "engines": {
     "node": ">=20",
