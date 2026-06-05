@@ -88,7 +88,6 @@ export function TimeTile({
         <>
           <Grid xs={2}>
             <IconButton
-              disabled={!!disabled}
               className={expanded ? 'expanded' : 'closed'}
               onClick={() =>
                 useStorage.setState((prev) => ({
