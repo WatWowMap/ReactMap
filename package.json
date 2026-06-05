@@ -218,7 +218,12 @@
     "got": ">=11.8.5",
     "dot-prop": ">=4.2.1",
     "qs": ">=6.15.2",
-    "tmp": ">=0.2.6"
+    "tmp": ">=0.2.6",
+    "protobufjs": "7.5.8",
+    "uuid": "11.1.1",
+    "lodash": "4.18.1",
+    "tar": "7.5.11",
+    "@rainb0w-clwn/passport-telegram-official/express/path-to-regexp": "0.1.13"
   },
   "engines": {
     "node": ">=20",
