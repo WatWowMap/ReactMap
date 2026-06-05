@@ -34,6 +34,23 @@ const battle = gql`
     battle_pokemon_estimated_cp
     total_stationed_pokemon
     total_stationed_gmax
+    battles {
+      battle_level
+      battle_start
+      battle_end
+      updated
+      battle_pokemon_id
+      battle_pokemon_form
+      battle_pokemon_costume
+      battle_pokemon_gender
+      battle_pokemon_alignment
+      battle_pokemon_bread_mode
+      battle_pokemon_move_1
+      battle_pokemon_move_2
+      battle_pokemon_stamina
+      battle_pokemon_cp_multiplier
+      battle_pokemon_estimated_cp
+    }
   }
 `
 
