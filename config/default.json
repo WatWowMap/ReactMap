@@ -610,6 +610,7 @@
       "pokemon": false,
       "battleTier": "all",
       "battles": false,
+      "includeUpcoming": true,
       "gmaxStationed": false,
       "interactionRanges": false,
       "customRange": 0,

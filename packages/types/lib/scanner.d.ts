@@ -378,6 +378,24 @@ export interface StationPokemon extends PokemonDisplay {
   bread_mode: number
 }
 
+export interface StationBattle {
+  battle_level: number
+  battle_start?: number
+  battle_end?: number
+  updated?: number
+  battle_pokemon_id: number
+  battle_pokemon_form: number
+  battle_pokemon_costume: number
+  battle_pokemon_gender: Gender
+  battle_pokemon_alignment: number
+  battle_pokemon_bread_mode: number
+  battle_pokemon_move_1: number
+  battle_pokemon_move_2: number
+  battle_pokemon_stamina?: number
+  battle_pokemon_cp_multiplier?: number
+  battle_pokemon_estimated_cp?: number
+}
+
 export interface Station<Parsed extends boolean = false> {
   id: string
   lat: number
@@ -411,6 +429,7 @@ export interface Station<Parsed extends boolean = false> {
   stationed_pokemon: Parsed extends true
     ? StationPokemon[]
     : string | StationPokemon[]
+  battles?: StationBattle[]
   updated: number
 }
 
