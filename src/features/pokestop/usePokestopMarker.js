@@ -63,7 +63,7 @@ export function usePokestopMarker({
     return [
       pokestops.showArBadge,
       pokestops.showArQuestDotBadge ?? false,
-      pokestops.showNoArQuestDotBadge ?? true,
+      pokestops.showNoArQuestDotBadge ?? false,
       Icons.getPokestops(
         hasLure ? lure_id : 0,
         hasVisibleInvasion,

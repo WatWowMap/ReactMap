@@ -381,7 +381,7 @@
       "madQuestText": false,
       "hasQuestIndicator": true,
       "showArQuestDotBadge": false,
-      "showNoArQuestDotBadge": true,
+      "showNoArQuestDotBadge": false,
       "showArBadge": false,
       "enablePokestopPopupCoords": false,
       "invasionOpacity": true,
