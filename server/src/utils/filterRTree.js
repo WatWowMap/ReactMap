@@ -4,6 +4,7 @@ const { point } = require('@turf/helpers')
 
 const config = require('@rm/config')
 const { consolidateAreas } = require('./consolidateAreas')
+const { hasUnrestrictedAreaGrant } = require('./areaPerms')
 
 /**
  * Filters via RTree in place of MySQL query when using in memory data
@@ -14,11 +15,13 @@ const { consolidateAreas } = require('./consolidateAreas')
  * @returns {boolean}
  */
 function filterRTree(item, areaRestrictions = [], onlyAreas = []) {
+  const unrestrictedAreaGrant = hasUnrestrictedAreaGrant(areaRestrictions)
+  if (unrestrictedAreaGrant && !onlyAreas.length) return true
   if (!areaRestrictions.length && !onlyAreas.length) return true
 
   const consolidatedAreas = consolidateAreas(areaRestrictions, onlyAreas)
 
-  if (!consolidatedAreas.size) return true
+  if (!consolidatedAreas.size) return false
 
   /** @type {import("@rm/types").RMGeoJSON['features']} */
   const foundFeatures = config
@@ -29,7 +32,7 @@ function filterRTree(item, areaRestrictions = [], onlyAreas = []) {
       w: 0,
       h: 0,
     })
-    .filter((feature) => consolidatedAreas.has(feature.properties.key))
+    .filter((feature) => consolidatedAreas.has(feature))
 
   const foundInRtree =
     foundFeatures.length &&

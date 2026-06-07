@@ -314,12 +314,14 @@ const buildAreas = (scanAreas) => {
   const myRTree = RTree()
   myRTree.geoJSON({
     type: 'FeatureCollection',
-    features: Object.values(scanAreasObj).filter(
-      (f) =>
-        !f.properties.manual &&
-        f.properties.key &&
-        f.geometry.type.includes('Polygon'),
-    ),
+    features: Object.values(scanAreas)
+      .flatMap((areas) => areas.features)
+      .filter(
+        (f) =>
+          !f.properties.manual &&
+          f.properties.key &&
+          f.geometry.type.includes('Polygon'),
+      ),
   })
 
   const raw = loadAreas(scanAreas)

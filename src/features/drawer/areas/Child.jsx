@@ -18,6 +18,8 @@ import { useMemory } from '@store/useMemory'
  *  feature?: Pick<import('@rm/types').RMFeature, 'properties'>
  *  allAreas?: string[]
  *  childAreas?: Pick<import('@rm/types').RMFeature, 'properties'>[]
+ *  allChildAreas?: Pick<import('@rm/types').RMFeature, 'properties'>[]
+ *  groupKey?: string
  *  borderRight?: boolean
  *  colSpan?: number
  * }} props
@@ -26,6 +28,8 @@ export function AreaChild({
   name,
   feature,
   childAreas,
+  allChildAreas,
+  groupKey,
   allAreas,
   borderRight,
   colSpan = 1,
@@ -33,6 +37,9 @@ export function AreaChild({
   const scanAreas = useStorage((s) => s.filters?.scanAreas?.filter?.areas)
   const zoom = useMemory((s) => s.config.general.scanAreasZoom)
   const expandAllScanAreas = useMemory((s) => s.config.misc.expandAllScanAreas)
+  const accessibleAreaKeys = useMemory(
+    (s) => s.auth.perms.areaRestrictions || [],
+  )
   const map = useMap()
 
   const { setAreas } = useStorage.getState()
@@ -40,23 +47,56 @@ export function AreaChild({
 
   if (!scanAreas) return null
 
+  const groupedChildren = name
+    ? allChildAreas || childAreas || []
+    : childAreas || []
+  const groupedAreaKeys = groupedChildren
+    .filter((child) => !child.properties.manual)
+    .map((child) => child.properties.key)
+  const parentAreaKeys =
+    name &&
+    feature?.properties?.key &&
+    !feature.properties.manual &&
+    (!accessibleAreaKeys.length ||
+      accessibleAreaKeys.includes(feature.properties.key))
+      ? [feature.properties.key]
+      : []
+  const selectableAreaKeys = name
+    ? [...new Set([...groupedAreaKeys, ...parentAreaKeys])]
+    : []
+  const removableAreaKeys =
+    name && feature?.properties?.key && !feature.properties.manual
+      ? [...new Set([...selectableAreaKeys, feature.properties.key])]
+      : selectableAreaKeys
   const hasAll =
-    childAreas &&
-    childAreas.every(
-      (c) => c.properties.manual || scanAreas.includes(c.properties.key),
-    )
+    name && selectableAreaKeys.length
+      ? selectableAreaKeys.every((key) => scanAreas.includes(key))
+      : false
   const hasSome =
-    childAreas && childAreas.some((c) => scanAreas.includes(c.properties.key))
-  const hasManual =
-    feature?.properties?.manual || childAreas.every((c) => c.properties.manual)
+    name && removableAreaKeys.length
+      ? removableAreaKeys.some((key) => scanAreas.includes(key))
+      : false
+  const allChildrenManual =
+    name &&
+    !!groupedChildren.length &&
+    groupedChildren.every((child) => child.properties.manual)
+  const hasManual = name
+    ? !selectableAreaKeys.length &&
+      (feature?.properties?.manual || allChildrenManual)
+    : feature?.properties?.manual
   const color =
-    hasManual || (name ? !childAreas.length : !feature.properties.name)
+    hasManual ||
+    (name ? !selectableAreaKeys.length : !feature?.properties?.name)
       ? 'transparent'
       : 'none'
+  const coveredByGroup =
+    !name && !feature?.properties?.manual && groupKey
+      ? scanAreas.includes(groupKey)
+      : false
 
   const nameProp =
     name || feature?.properties?.formattedName || feature?.properties?.name
-  const hasExpand = name && !expandAllScanAreas
+  const hasExpand = name && !expandAllScanAreas && !!childAreas?.length
   return (
     <TableCell
       colSpan={colSpan}
@@ -101,17 +141,38 @@ export function AreaChild({
             size="small"
             color="secondary"
             indeterminate={name ? hasSome && !hasAll : false}
-            checked={name ? hasAll : scanAreas.includes(feature.properties.key)}
-            onClick={(e) => e.stopPropagation()}
-            onChange={() =>
-              setAreas(
-                name
-                  ? childAreas.map((c) => c.properties.key)
-                  : feature.properties.key,
-                allAreas,
-                name ? hasSome : false,
-              )
+            checked={
+              name
+                ? hasAll
+                : coveredByGroup || scanAreas.includes(feature.properties.key)
             }
+            onClick={(e) => e.stopPropagation()}
+            onChange={() => {
+              let areaKeys = name
+                ? hasSome
+                  ? removableAreaKeys
+                  : selectableAreaKeys
+                : feature.properties.key
+
+              if (!name && coveredByGroup) {
+                const siblingAreaKeys = (allChildAreas || childAreas || [])
+                  .filter(
+                    (child) =>
+                      !child.properties.manual &&
+                      child.properties.key !== feature.properties.key,
+                  )
+                  .map((child) => child.properties.key)
+                areaKeys = [
+                  groupKey,
+                  ...(scanAreas.includes(feature.properties.key)
+                    ? [feature.properties.key]
+                    : []),
+                  ...siblingAreaKeys.filter((key) => !scanAreas.includes(key)),
+                ]
+              }
+
+              setAreas(areaKeys, allAreas, name ? hasSome : false)
+            }}
             sx={{
               p: 1,
               color,
@@ -123,7 +184,7 @@ export function AreaChild({
               },
             }}
             disabled={
-              (name ? !childAreas.length : !feature.properties.name) ||
+              (name ? !selectableAreaKeys.length : !feature.properties.name) ||
               hasManual
             }
           />
