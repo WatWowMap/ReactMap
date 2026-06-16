@@ -1,3 +1,10 @@
+## [1.44.2](https://github.com/WatWowMap/ReactMap/compare/v1.44.1...v1.44.2) (2026-06-16)
+
+
+### Bug Fixes
+
+* recovering locate control ([2a4f8ea](https://github.com/WatWowMap/ReactMap/commit/2a4f8ea4d2a0fc0473a11cbad865f17887e06fdf))
+
 ## [1.44.1](https://github.com/WatWowMap/ReactMap/compare/v1.44.0...v1.44.1) (2026-06-05)
 
 
