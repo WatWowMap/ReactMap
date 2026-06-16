@@ -2,6 +2,8 @@
 import { useCallback, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
+import { GEOLOCATION_ERROR_CODE } from '@utils/locateControl'
+
 /**
  * Shared hook for handling location errors with toast notifications
  * @returns {{ locationError: { show: boolean, message: string }, hideLocationError: () => void, handleLocationError: (err: any) => void }}
@@ -25,13 +27,13 @@ export function useLocationError() {
 
       if (!message)
         switch (err.code) {
-          case 1: // PERMISSION_DENIED
+          case GEOLOCATION_ERROR_CODE.PERMISSION_DENIED:
             message = t('location_error_permission_denied')
             break
-          case 2: // POSITION_UNAVAILABLE
+          case GEOLOCATION_ERROR_CODE.POSITION_UNAVAILABLE:
             message = t('location_error_position_unavailable')
             break
-          case 3: // TIMEOUT
+          case GEOLOCATION_ERROR_CODE.TIMEOUT:
             message = t('location_error_timeout')
             break
           default:
