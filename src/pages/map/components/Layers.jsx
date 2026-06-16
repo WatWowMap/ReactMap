@@ -3,11 +3,11 @@ import * as React from 'react'
 import { TileLayer, useMap } from 'react-leaflet'
 import { useTranslation } from 'react-i18next'
 import { control } from 'leaflet'
-import { locate } from 'leaflet.locatecontrol'
 import { useStorage } from '@store/useStorage'
 import { useLocationError } from '@hooks/useLocationError'
 import { useStopFollowingOnFly } from '@hooks/useStopFollowingOnFly'
 import { Notification } from '@components/Notification'
+import { RecoveringLocateControl } from '@utils/locateControl'
 
 import { useTileLayer } from '../hooks/useTileLayer'
 
@@ -46,7 +46,7 @@ export function ControlledLocate() {
 
   const lc = React.useMemo(
     () =>
-      locate({
+      new RecoveringLocateControl({
         position: 'bottomright',
         metric,
         icon: 'fas fa-crosshairs',

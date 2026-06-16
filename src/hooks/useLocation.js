@@ -5,11 +5,11 @@ import { useEffect, useMemo, useState } from 'react'
 import { LayerGroup, DomEvent, DomUtil } from 'leaflet'
 import { useTranslation } from 'react-i18next'
 import { useMap } from 'react-leaflet'
-import { LocateControl } from 'leaflet.locatecontrol'
 
 import { useStorage } from '@store/useStorage'
 import { useLocationError } from '@hooks/useLocationError'
 import { useStopFollowingOnFly } from '@hooks/useStopFollowingOnFly'
+import { RecoveringLocateControl } from '@utils/locateControl'
 
 /**
  * Use location hook
@@ -27,7 +27,7 @@ export function useLocation(dependency = false) {
     useLocationError()
 
   const lc = useMemo(() => {
-    const LocateFab = LocateControl.extend({
+    const LocateFab = RecoveringLocateControl.extend({
       _setClasses(state) {
         if (state === 'requesting') setColor('secondary')
         else if (state === 'active') setColor('success')
