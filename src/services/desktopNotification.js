@@ -5,6 +5,7 @@ import { useMemory } from '@store/useMemory'
 import { useStorage } from '@store/useStorage'
 import { SimpleTTLCache } from '@services/SimpleTTLCache'
 import { useMapStore } from '@store/useMapStore'
+import { setLongTimeout } from '@utils/setLongTimeout'
 
 export const HAS_API = 'Notification' in window
 const cache = new SimpleTTLCache(1000 * 60 * 60)
@@ -76,12 +77,10 @@ export function sendNotification(key, title, category, options) {
         notif.close()
       }
       if (expire) {
-        const timer = setTimeout(() => {
+        const clearNotificationTimer = setLongTimeout(() => {
           notif.close()
         }, countdown)
-        notif.onclose = () => {
-          clearTimeout(timer)
-        }
+        notif.onclose = clearNotificationTimer
       }
 
       if (

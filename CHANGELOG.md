@@ -1,3 +1,10 @@
+## [1.44.3](https://github.com/WatWowMap/ReactMap/compare/v1.44.2...v1.44.3) (2026-06-18)
+
+
+### Bug Fixes
+
+* setLongTimeout ([4763f4b](https://github.com/WatWowMap/ReactMap/commit/4763f4bc6a47fd7278cbe89aa1d9abbe0edf600d))
+
 ## [1.44.2](https://github.com/WatWowMap/ReactMap/compare/v1.44.1...v1.44.2) (2026-06-16)
 
 

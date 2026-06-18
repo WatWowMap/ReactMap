@@ -1,6 +1,8 @@
 // @ts-check
 const { Logger } = require('@rm/logger')
 
+const { setLongInterval, setLongTimeout } = require('../utils/setLongTimeout')
+
 const rtf = new Intl.RelativeTimeFormat('en', { numeric: 'auto' })
 
 const UNITS = /** @type {const} */ ([
@@ -27,9 +29,9 @@ class Timer extends Logger {
     /** @type {Date} */
     this._date = date
 
-    /** @type {NodeJS.Timeout | null} */
+    /** @type {(() => void) | null} */
     this._timer = null
-    /** @type {NodeJS.Timeout | null} */
+    /** @type {(() => void) | null} */
     this._interval = null
   }
 
@@ -79,7 +81,7 @@ class Timer extends Logger {
   setInterval(cb) {
     if (this._intervalMs > 0) {
       this.setNextDate()
-      this._interval = setInterval(async () => {
+      this._interval = setLongInterval(async () => {
         await cb()
         this.setNextDate()
       }, this._intervalMs)
@@ -99,7 +101,7 @@ class Timer extends Logger {
     }
     this.log.info(this.relative())
 
-    this._timer = setTimeout(async () => {
+    this._timer = setLongTimeout(async () => {
       await cb()
       this.setInterval(cb)
     }, this._date.getTime() - now)
@@ -110,11 +112,11 @@ class Timer extends Logger {
   async clear() {
     if (this._timer) {
       this.log.info('clearing timer')
-      clearTimeout(this._timer)
+      this._timer()
     }
     if (this._interval) {
       this.log.info('clearing interval')
-      clearInterval(this._interval)
+      this._interval()
     }
   }
 }

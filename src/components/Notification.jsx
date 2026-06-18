@@ -6,6 +6,8 @@ import Slide from '@mui/material/Slide'
 import AlertTitle from '@mui/material/AlertTitle'
 import { useTranslation, Trans } from 'react-i18next'
 
+import { setLongTimeout } from '@utils/setLongTimeout'
+
 /** @param {import('@mui/material').SlideProps} props */
 function SlideTransition(props) {
   // eslint-disable-next-line react/jsx-props-no-spreading
@@ -66,10 +68,9 @@ export function Notification({
     setAlert(!!open)
 
     if (open && typeof autoHideDuration === 'number') {
-      const timer = setTimeout(() => {
+      return setLongTimeout(() => {
         handleClose()
       }, autoHideDuration)
-      return () => clearTimeout(timer)
     }
     return undefined
   }, [autoHideDuration, handleClose, open])

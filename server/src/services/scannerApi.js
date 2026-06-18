@@ -4,6 +4,7 @@ const { default: fetch } = require('node-fetch')
 const config = require('@rm/config')
 const { log, TAGS } = require('@rm/logger')
 
+const { setLongTimeout } = require('../utils/setLongTimeout')
 const { state } = require('./state')
 
 const scannerQueue = {
@@ -43,7 +44,7 @@ async function scannerApi(
 
   const controller = new AbortController()
 
-  const timeout = setTimeout(() => {
+  const clearFetchTimeout = setLongTimeout(() => {
     controller.abort()
   }, config.getSafe('api.fetchTimeoutMs'))
 
@@ -408,7 +409,7 @@ async function scannerApi(
     }
     return { status: 'error', message: 'scanner_error' }
   } finally {
-    clearTimeout(timeout)
+    clearFetchTimeout()
   }
 }
 
