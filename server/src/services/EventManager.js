@@ -7,6 +7,7 @@ const config = require('@rm/config')
 const { Logger } = require('@rm/logger')
 const { generate, read } = require('@rm/masterfile')
 
+const { setLongInterval } = require('../utils/setLongTimeout')
 const { PoracleAPI } = require('./Poracle')
 const { getCache } = require('./cache')
 
@@ -37,7 +38,7 @@ class EventManager extends Logger {
     this.uiconsBackup = {}
     this.uaudioBackup = {}
 
-    /** @type {Record<string, NodeJS.Timeout>} */
+    /** @type {Record<string, () => void>} */
     this.intervals = {}
 
     this.baseUrl =
@@ -160,7 +161,7 @@ class EventManager extends Logger {
 
   clearIntervals() {
     this.log.info('clearing intervals')
-    Object.values(this.intervals).forEach((interval) => clearInterval(interval))
+    Object.values(this.intervals).forEach((cancelInterval) => cancelInterval())
     this.intervals = {}
   }
 
@@ -190,7 +191,7 @@ class EventManager extends Logger {
     this.log.info('starting intervals')
 
     if (!config.getSafe('api.queryOnSessionInit.raids')) {
-      this.intervals.raidUpdate = setInterval(
+      this.intervals.raidUpdate = setLongInterval(
         async () => {
           await this.setAvailable('gyms', 'Gym', Db)
           await this.chatLog('event', {
@@ -201,7 +202,7 @@ class EventManager extends Logger {
       )
     }
     if (!config.getSafe('api.queryOnSessionInit.nests')) {
-      this.intervals.nestUpdate = setInterval(
+      this.intervals.nestUpdate = setLongInterval(
         async () => {
           await this.setAvailable('nests', 'Nest', Db)
           await this.chatLog('event', {
@@ -212,7 +213,7 @@ class EventManager extends Logger {
       )
     }
     if (!config.getSafe('api.queryOnSessionInit.pokemon')) {
-      this.intervals.pokemonUpdate = setInterval(
+      this.intervals.pokemonUpdate = setLongInterval(
         async () => {
           await this.setAvailable('pokemon', 'Pokemon', Db)
           await this.chatLog('event', {
@@ -223,7 +224,7 @@ class EventManager extends Logger {
       )
     }
     if (!config.getSafe('api.queryOnSessionInit.quests')) {
-      this.intervals.questUpdate = setInterval(
+      this.intervals.questUpdate = setLongInterval(
         async () => {
           await this.setAvailable('pokestops', 'Pokestop', Db)
           await this.chatLog('event', {
@@ -234,7 +235,7 @@ class EventManager extends Logger {
       )
     }
     if (!config.getSafe('api.queryOnSessionInit.stations')) {
-      this.intervals.stationUpdate = setInterval(
+      this.intervals.stationUpdate = setLongInterval(
         async () => {
           await this.setAvailable('stations', 'Station', Db)
           await this.chatLog('event', {
@@ -244,14 +245,14 @@ class EventManager extends Logger {
         1000 * 60 * 60 * (config.getSafe('api.queryUpdateHours.stations') || 1),
       )
     }
-    this.intervals.uicons = setInterval(
+    this.intervals.uicons = setLongInterval(
       async () => {
         await this.getUniversalAssets('uicons')
         await this.chatLog('event', { description: 'Refreshed UICONS indexes' })
       },
       1000 * 60 * 60 * (config.getSafe('icons.cacheHrs') || 3),
     )
-    this.intervals.uaudio = setInterval(
+    this.intervals.uaudio = setLongInterval(
       async () => {
         await this.getUniversalAssets('uaudio')
         await this.chatLog('event', { description: 'Refreshed UAUDIO indexes' })
@@ -259,7 +260,7 @@ class EventManager extends Logger {
       1000 * 60 * 60 * (config.getSafe('audio.cacheHrs') || 3),
     )
     if (config.getSafe('api.pogoApiEndpoints.invasions')) {
-      this.intervals.invasions = setInterval(
+      this.intervals.invasions = setLongInterval(
         async () => {
           await this.getInvasions(Db)
           await this.chatLog('event', { description: 'Refreshed invasions' })
@@ -267,7 +268,7 @@ class EventManager extends Logger {
         1000 * 60 * 60 * (config.getSafe('map.misc.invasionCacheHrs') || 1),
       )
     }
-    this.intervals.historical = setInterval(
+    this.intervals.historical = setLongInterval(
       async () => {
         await Db.historicalRarity()
         await this.chatLog('event', {
@@ -280,7 +281,7 @@ class EventManager extends Logger {
         (config.getSafe('api.queryUpdateHours.historicalRarity') || 6),
     )
     if (config.getSafe('api.pogoApiEndpoints.masterfile')) {
-      this.intervals.masterfile = setInterval(
+      this.intervals.masterfile = setLongInterval(
         async () => {
           await this.getMasterfile(Db.historical, Db.rarity)
           await this.chatLog('event', { description: 'Refreshed masterfile' })
@@ -289,7 +290,7 @@ class EventManager extends Logger {
       )
     }
     if (Pvp) {
-      this.intervals.pvp = setInterval(
+      this.intervals.pvp = setLongInterval(
         async () => {
           await Pvp.fetchLatestPokemon()
           await this.chatLog('event', {
@@ -299,7 +300,7 @@ class EventManager extends Logger {
         1000 * 60 * 60 * (config.getSafe('map.misc.masterfileCacheHrs') || 6),
       )
     }
-    this.intervals.webhooks = setInterval(
+    this.intervals.webhooks = setLongInterval(
       async () => {
         await this.getWebhooks()
         await this.chatLog('event', {
@@ -309,7 +310,7 @@ class EventManager extends Logger {
       1000 * 60 * 60 * (config.getSafe('map.misc.webhookCacheHrs') || 1),
     )
 
-    this.intervals.filterCxt = setInterval(
+    this.intervals.filterCxt = setLongInterval(
       async () => {
         await Db.getFilterContext()
         await this.chatLog('event', { description: 'Updated filter contexts' })

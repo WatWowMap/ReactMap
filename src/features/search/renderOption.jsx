@@ -17,6 +17,7 @@ import { formatDistance } from '@utils/formatDistance'
 import { getTimeUntil } from '@utils/getTimeUntil'
 import { useRelativeTimer } from '@hooks/useRelativeTime'
 import { getFormDisplay } from '@utils/getFormDisplay'
+import { setLongTimeout } from '@utils/setLongTimeout'
 
 import { OptionImageMemo } from './OptionImage'
 
@@ -101,11 +102,10 @@ const Timer = ({ expireTime, startTime = 0 }) => {
     const now = Math.floor(Date.now() / 1000)
     if (startTime > now) {
       setTarget(startTime)
-      const timeout = setTimeout(
+      return setLongTimeout(
         () => setTarget(expireTime),
         Math.max(startTime * 1000 - Date.now(), 0),
       )
-      return () => clearTimeout(timeout)
     }
 
     setTarget(expireTime)

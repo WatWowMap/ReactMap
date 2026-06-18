@@ -7,6 +7,8 @@ const { default: fetch, Response } = require('node-fetch')
 const config = require('@rm/config')
 const { log, TAGS } = require('@rm/logger')
 
+const { setLongTimeout } = require('./setLongTimeout')
+
 /**
  * fetch wrapper with timeout and error handling
  * @param {string} url
@@ -16,7 +18,7 @@ const { log, TAGS } = require('@rm/logger')
 async function fetchJson(url, options = undefined) {
   const controller = new AbortController()
 
-  const timeout = setTimeout(() => {
+  const clearFetchTimeout = setLongTimeout(() => {
     controller.abort()
   }, config.getSafe('api.fetchTimeoutMs'))
 
@@ -59,7 +61,7 @@ async function fetchJson(url, options = undefined) {
       return e.cause
     }
   } finally {
-    clearTimeout(timeout)
+    clearFetchTimeout()
   }
 }
 

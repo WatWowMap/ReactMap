@@ -1,6 +1,7 @@
 // @ts-check
 import { useMemory } from '@store/useMemory'
 import { useStorage } from '@store/useStorage'
+import { setLongTimeout } from '@utils/setLongTimeout'
 
 window.addEventListener('keydown', (event) => {
   // This is mostly meant for development purposes
@@ -13,13 +14,13 @@ let timer
 
 window.addEventListener('focus', () => {
   if (timer) {
-    clearTimeout(timer)
+    timer()
   }
   useMemory.setState({ active: true })
 })
 
 window.addEventListener('blur', () => {
-  timer = setTimeout(
+  timer = setLongTimeout(
     () => {
       useMemory.setState({ active: false })
     },

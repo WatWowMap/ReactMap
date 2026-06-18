@@ -1,5 +1,7 @@
 // @ts-check
 
+import { setLongTimeout } from '@utils/setLongTimeout'
+
 export class SimpleTTLCache {
   /**
    * @param {number} ttl
@@ -15,11 +17,11 @@ export class SimpleTTLCache {
    */
   set(key, expire = this._ttl) {
     if (this._cache.has(key)) {
-      clearTimeout(this._cache.get(key))
+      this._cache.get(key)()
     }
     this._cache.set(
       key,
-      setTimeout(() => this._cache.delete(key), expire),
+      setLongTimeout(() => this._cache.delete(key), expire),
     )
   }
 

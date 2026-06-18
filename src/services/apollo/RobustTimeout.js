@@ -1,5 +1,6 @@
 // @ts-check
 import { useMemory } from '@store/useMemory'
+import { setLongTimeout } from '@utils/setLongTimeout'
 import { AbortableContext } from './AbortableContext'
 
 export class RobustTimeout extends AbortableContext {
@@ -30,8 +31,8 @@ export class RobustTimeout extends AbortableContext {
     }
     this._lastUpdated = now
     if (this._ms) {
-      clearTimeout(this.timeout)
-      this.timeout = setTimeout(() => this.doRefetch(), this._ms)
+      if (this.timeout) this.timeout()
+      this.timeout = setLongTimeout(() => this.doRefetch(), this._ms)
     }
     this.refetch(variables === undefined ? this._pendingVariables : variables)
     delete this._pendingVariables
@@ -44,13 +45,13 @@ export class RobustTimeout extends AbortableContext {
   setupTimeout(refetch) {
     this.refetch = refetch
     if (this._ms) {
-      clearTimeout(this.timeout)
-      this.timeout = setTimeout(() => this.doRefetch(), this._ms)
+      if (this.timeout) this.timeout()
+      this.timeout = setLongTimeout(() => this.doRefetch(), this._ms)
     }
   }
 
   off() {
-    clearTimeout(this.timeout)
+    if (this.timeout) this.timeout()
     delete this._pendingVariables
   }
 }

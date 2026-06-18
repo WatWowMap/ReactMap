@@ -1,6 +1,8 @@
 // @ts-check
 import { useEffect } from 'react'
 
+import { setLongTimeout } from '@utils/setLongTimeout'
+
 /**
  *
  * @param {number} itemExpire
@@ -8,22 +10,20 @@ import { useEffect } from 'react'
  * @param {() => void} [callback]
  */
 export function useMarkerTimer(itemExpire, ref, callback) {
-  const ts = Math.floor(Date.now() / 1000)
   useEffect(() => {
-    if (itemExpire > ts && itemExpire !== Infinity) {
-      const timeout = setTimeout(
-        () => {
-          if (itemExpire) {
-            if (callback) {
-              callback()
-            } else if (ref) {
-              ref.remove()
-            }
-          }
-        },
-        (itemExpire - ts) * 1000,
-      )
-      return () => clearTimeout(timeout)
+    if (!Number.isFinite(itemExpire) || itemExpire <= Date.now() / 1000) {
+      return undefined
     }
-  })
+
+    return setLongTimeout(
+      () => {
+        if (callback) {
+          callback()
+        } else if (ref) {
+          ref.remove()
+        }
+      },
+      (itemExpire - Date.now() / 1000) * 1000,
+    )
+  }, [callback, itemExpire, ref])
 }
