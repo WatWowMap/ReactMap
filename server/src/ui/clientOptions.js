@@ -1,11 +1,16 @@
 // @ts-check
 const config = require('@rm/config')
+const {
+  isDualQuestLayerMode,
+  getQuestLayerMode,
+} = require('../utils/questLayerMode')
 
 /** @param {import("@rm/types").Permissions} perms */
 function clientOptions(perms) {
   const clientSideOptions = config.getSafe('clientSideOptions')
   const map = config.getSafe('map')
   const levels = config.getSafe('api.pvp.levels')
+  const hasDualQuestLayer = isDualQuestLayerMode(getQuestLayerMode(map))
 
   // the values here are the relevant perms to use them, they are looped through and the values are set based on your config, then the type is set based off of those values in the above function
   const clientMenus = {
@@ -32,7 +37,9 @@ function clientOptions(perms) {
         category: 'markers',
       },
       showExBadge: { type: 'bool', perm: ['gyms'], category: 'markers' },
-      showArBadge: { type: 'bool', perm: ['gyms'], category: 'markers' },
+      showArBadge: hasDualQuestLayer
+        ? { type: 'bool', perm: ['gyms'], category: 'markers' }
+        : undefined,
       raidLevelBadges: { type: 'bool', perm: ['raids'], category: 'markers' },
       gymBadgeDiamonds: {
         type: 'bool',
@@ -99,17 +106,29 @@ function clientOptions(perms) {
         perm: ['quests'],
         category: 'markers',
       },
-      showArQuestDotBadge: {
+      invasionRewardMarker: {
         type: 'bool',
-        perm: ['quests'],
+        perm: ['invasions'],
         category: 'markers',
+        value: false,
       },
-      showNoArQuestDotBadge: {
-        type: 'bool',
-        perm: ['quests'],
-        category: 'markers',
-      },
-      showArBadge: { type: 'bool', perm: ['pokestops'], category: 'markers' },
+      showArQuestDotBadge: hasDualQuestLayer
+        ? {
+            type: 'bool',
+            perm: ['quests'],
+            category: 'markers',
+          }
+        : undefined,
+      showNoArQuestDotBadge: hasDualQuestLayer
+        ? {
+            type: 'bool',
+            perm: ['quests'],
+            category: 'markers',
+          }
+        : undefined,
+      showArBadge: hasDualQuestLayer
+        ? { type: 'bool', perm: ['pokestops'], category: 'markers' }
+        : undefined,
       invasionOpacity: {
         type: 'bool',
         perm: ['invasions'],

@@ -1,6 +1,10 @@
 // @ts-check
 const config = require('@rm/config')
 const { state } = require('../services/state')
+const {
+  isDualQuestLayerMode,
+  getQuestLayerMode,
+} = require('../utils/questLayerMode')
 
 /** @typedef {import('@rm/types').RMSlider} Slider */
 
@@ -17,6 +21,7 @@ function drawer(req, perms) {
   const mapConfig = config.getMapConfig(req)
   const nestFilters = config.getSafe('defaultFilters.nests')
   const leagues = config.getSafe('api.pvp.leagues')
+  const hasDualQuestLayer = isDualQuestLayerMode(getQuestLayerMode(mapConfig))
 
   const ui = {
     gyms:
@@ -26,7 +31,7 @@ function drawer(req, perms) {
             raids: perms.raids || BLOCKED,
             exEligible: perms.gyms || BLOCKED,
             inBattle: perms.gyms || BLOCKED,
-            arEligible: perms.gyms || BLOCKED,
+            arEligible: hasDualQuestLayer ? perms.gyms || BLOCKED : BLOCKED,
             gymBadges: perms.gymBadges || BLOCKED,
           }
         : BLOCKED,
@@ -60,7 +65,9 @@ function drawer(req, perms) {
             invasions: perms.invasions || BLOCKED,
             eventStops: perms.eventStops || BLOCKED,
             lures: perms.lures || BLOCKED,
-            arEligible: perms.pokestops || BLOCKED,
+            arEligible: hasDualQuestLayer
+              ? perms.pokestops || BLOCKED
+              : BLOCKED,
           }
         : BLOCKED,
     tappables:

@@ -35,6 +35,7 @@ export function useSendSearch(search, open) {
     (/** @type {string} */ newSearch) => {
       const { lat, lng } = map.getCenter()
       const { filters } = useStorage.getState()
+      const { questLayerMode } = useMemory.getState().config.misc
       callSearch({
         variables: {
           search: newSearch,
@@ -48,7 +49,9 @@ export function useSendSearch(search, open) {
             [],
           questLayer:
             searchTab === 'quests'
-              ? filters?.pokestops?.showQuestSet || ''
+              ? questLayerMode === 'dual'
+                ? filters?.pokestops?.showQuestSet || ''
+                : questLayerMode
               : undefined,
         },
       })

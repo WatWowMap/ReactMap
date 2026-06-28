@@ -40,6 +40,8 @@ export class Query {
   /** @param {import('@rm/types').AllFilters['gyms'] | 'id' | 'badges'} filters */
   static gyms(filters) {
     const perms = useMemory.getState().ui.gyms
+    const hasDualQuestLayer =
+      useMemory.getState().config.misc.questLayerMode === 'dual'
     if (filters === 'id') {
       return gymIndex.GET_ONE_GYM
     }
@@ -56,7 +58,7 @@ export class Query {
       query === 'GET' &&
       (filters.exEligible ||
         filters.inBattle ||
-        filters.arEligible ||
+        (hasDualQuestLayer && filters.arEligible) ||
         filters.gymBadges)
     ) {
       query += '_GYMS'

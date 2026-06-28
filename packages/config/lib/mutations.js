@@ -8,6 +8,7 @@ const { log, TAGS } = require('@rm/logger')
 const { validateJsons } = require('./validateJsons')
 
 let firstRun = true
+const QUEST_LAYER_MODES = new Set(['dual', 'with_ar', 'without_ar'])
 
 /** @param {import('config').IConfig} config */
 const applyMutations = (config) => {
@@ -198,6 +199,14 @@ const applyMutations = (config) => {
       } else {
         merged.misc.distanceUnit = 'kilometers'
       }
+    }
+    if (!QUEST_LAYER_MODES.has(merged.misc.questLayerMode)) {
+      if (firstRun)
+        log.warn(
+          TAGS.config,
+          `Invalid questLayerMode: ${merged.misc.questLayerMode}, only 'dual', 'with_ar', OR 'without_ar' are allowed.`,
+        )
+      merged.misc.questLayerMode = defaults.map.misc.questLayerMode
     }
     merged.general.menuOrder = merged?.general?.menuOrder
       ? merged.general.menuOrder.filter((x) =>

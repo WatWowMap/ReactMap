@@ -662,6 +662,7 @@
   "nest_submissions_subtitle": "Allows you to submit new names for nests",
   "pokemon_opacity": "Dynamic Pokemon Opacity",
   "invasion_opacity": "Dynamic Invasion Opacity",
+  "invasion_reward_marker": "Use Reward Pokémon Invasion Markers",
   "raid_opacity": "Dynamic Raid Opacity",
   "opacity_ten_minutes": "Opacity at 10 minutes",
   "opacity_five_minutes": "Opacity at 5 minutes",

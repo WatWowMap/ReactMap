@@ -10,6 +10,9 @@ import { useStorage } from '@store/useStorage'
 export function usePermCheck(category) {
   const filters = useStorage((s) => s.filters[category])
   const perms = useMemory((s) => s.auth.perms)
+  const hasDualQuestLayer = useMemory(
+    (s) => s.config.misc.questLayerMode === 'dual',
+  )
 
   if (!filters || !perms.map) return false
 
@@ -25,7 +28,7 @@ export function usePermCheck(category) {
         (filters.raids && perms.raids) ||
         (filters.exEligible && perms.gyms) ||
         (filters.inBattle && perms.gyms) ||
-        (filters.arEligible && perms.gyms) ||
+        (hasDualQuestLayer && filters.arEligible && perms.gyms) ||
         (filters.gymBadges && perms.gymBadges)
       ) {
         return true
@@ -43,7 +46,7 @@ export function usePermCheck(category) {
         (filters.invasions && perms.invasions) ||
         (filters.quests && perms.quests) ||
         (filters.eventStops && perms.eventStops) ||
-        (filters.arEligible && perms.pokestops)
+        (hasDualQuestLayer && filters.arEligible && perms.pokestops)
       ) {
         return true
       }

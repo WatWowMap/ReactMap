@@ -10,6 +10,7 @@ const { getAreaSql } = require('../utils/getAreaSql')
 const { state } = require('../services/state')
 
 const { applyManualIdFilter } = require('../utils/manualFilter')
+const { isDualQuestLayerMode } = require('../utils/questLayerMode')
 
 const coreFields = [
   'id',
@@ -130,6 +131,7 @@ class Gym extends Model {
       onlyAreas = [],
       onlyManualId,
     } = args.filters
+    const effectiveOnlyArEligible = isDualQuestLayerMode() && onlyArEligible
     const ts = Math.floor(Date.now() / 1000)
     const query = this.query()
     const { queryLimits, gymValidDataLimit, hideOldGyms } =
@@ -269,7 +271,7 @@ class Gym extends Model {
     })
 
     if (
-      !onlyArEligible &&
+      !effectiveOnlyArEligible &&
       !onlyExEligible &&
       !onlyInBattle &&
       !userBadges.length
@@ -309,7 +311,7 @@ class Gym extends Model {
           battle.where(isMad ? 'is_in_battle' : 'in_battle', 1)
         })
       }
-      if (onlyArEligible && gymPerms) {
+      if (effectiveOnlyArEligible && gymPerms) {
         gym.orWhere((ar) => {
           ar.where(isMad ? 'is_ar_scan_eligible' : 'ar_scan_eligible', 1)
         })
@@ -488,7 +490,7 @@ class Gym extends Model {
         if (
           (onlyAllGyms ||
             (onlyExEligible && newGym.ex_raid_eligible) ||
-            (onlyArEligible && newGym.ar_scan_eligible) ||
+            (effectiveOnlyArEligible && newGym.ar_scan_eligible) ||
             (onlyInBattle && newGym.in_battle)) &&
           (finalTeams.includes(gym.team_id) ||
             finalSlots[gym.team_id]?.includes(gym.available_slots))
