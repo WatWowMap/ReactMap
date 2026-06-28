@@ -106,6 +106,12 @@ function clientOptions(perms) {
         perm: ['quests'],
         category: 'markers',
       },
+      invasionRewardMarker: {
+        type: 'bool',
+        perm: ['invasions'],
+        category: 'markers',
+        value: false,
+      },
       showArQuestDotBadge: hasDualQuestLayer
         ? {
             type: 'bool',

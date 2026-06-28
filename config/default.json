@@ -381,6 +381,7 @@
       "customRange": 0,
       "madQuestText": false,
       "hasQuestIndicator": true,
+      "invasionRewardMarker": false,
       "showArQuestDotBadge": false,
       "showNoArQuestDotBadge": false,
       "showArBadge": false,

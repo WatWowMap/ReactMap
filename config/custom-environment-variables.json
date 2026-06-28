@@ -830,6 +830,10 @@
         "__name": "CLIENT_SIDE_OPTIONS_POKESTOPS_HAS_QUEST_INDICATOR",
         "__format": "boolean"
       },
+      "invasionRewardMarker": {
+        "__name": "CLIENT_SIDE_OPTIONS_POKESTOPS_INVASION_REWARD_MARKER",
+        "__format": "boolean"
+      },
       "showArQuestDotBadge": {
         "__name": "CLIENT_SIDE_OPTIONS_POKESTOPS_SHOW_AR_QUEST_DOT_BADGE",
         "__format": "boolean"
