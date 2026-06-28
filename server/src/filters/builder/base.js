@@ -8,6 +8,10 @@ const { buildGyms } = require('./gym')
 const { buildTappables } = require('./tappable')
 const { BaseFilter } = require('../Base')
 const { PokemonFilter } = require('../pokemon/Frontend')
+const {
+  getQuestLayerMode,
+  isDualQuestLayerMode,
+} = require('../../utils/questLayerMode')
 
 /**
  * @param {import("@rm/types").Permissions} perms
@@ -15,6 +19,8 @@ const { PokemonFilter } = require('../pokemon/Frontend')
  */
 function buildDefaultFilters(perms) {
   const defaultFilters = config.getSafe('defaultFilters')
+  const questLayerMode = getQuestLayerMode()
+  const hasDualQuestLayer = isDualQuestLayerMode(questLayerMode)
 
   const base = new PokemonFilter(defaultFilters.pokemon.allPokemon)
   const custom = new PokemonFilter(
@@ -49,7 +55,7 @@ function buildDefaultFilters(perms) {
             raids: perms.raids ? defaultFilters.gyms.raids : undefined,
             exEligible: perms.gyms ? defaultFilters.gyms.exEligible : undefined,
             inBattle: perms.gyms ? defaultFilters.gyms.exEligible : undefined,
-            arEligible: perms.gyms ? false : undefined,
+            arEligible: hasDualQuestLayer && perms.gyms ? false : undefined,
             gymBadges: perms.gymBadges
               ? defaultFilters.gyms.gymBadges
               : undefined,
@@ -90,7 +96,9 @@ function buildDefaultFilters(perms) {
               ? defaultFilters.pokestops.eventStops
               : undefined,
             quests: perms.quests ? defaultFilters.pokestops.quests : undefined,
-            showQuestSet: defaultFilters.pokestops.questSet,
+            showQuestSet: hasDualQuestLayer
+              ? defaultFilters.pokestops.questSet
+              : questLayerMode,
             confirmed: perms.invasions
               ? defaultFilters.pokestops.confirmed
               : undefined,
@@ -103,7 +111,8 @@ function buildDefaultFilters(perms) {
             invasions: perms.invasions
               ? defaultFilters.pokestops.invasions
               : undefined,
-            arEligible: perms.pokestops ? false : undefined,
+            arEligible:
+              hasDualQuestLayer && perms.pokestops ? false : undefined,
             standard: new BaseFilter(),
             filter: {
               ...pokemon.rocket,

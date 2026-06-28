@@ -119,7 +119,7 @@ const Timer = ({ expireTime, startTime = 0 }) => {
 /** @type {import('@mui/material').AutocompleteProps['renderOption']} */
 export const renderOption = ({ key, ...props }, option) => {
   const { searchTab } = useStorage.getState()
-  const { questMessage } = useMemory.getState().config.misc
+  const { questLayerMode, questMessage } = useMemory.getState().config.misc
   const pokemonFormLabel =
     searchTab === 'pokemon'
       ? getFormDisplay(option.pokemon_id, option.form, option.costume)
@@ -178,7 +178,7 @@ export const renderOption = ({ key, ...props }, option) => {
       <ListItemText
         primary={formatDistance(option.distance)}
         secondary={
-          searchTab === 'quests' ? (
+          searchTab === 'quests' && questLayerMode === 'dual' ? (
             questMessage || t(`ar_quest_${!!option.with_ar}`).toString()
           ) : searchTab === 'invasions' ? (
             <Timer expireTime={option.incident_expire_timestamp} />

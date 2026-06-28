@@ -492,6 +492,7 @@
         "__name": "MAP_MISC_WEBHOOK_CACHE_HRS",
         "__format": "number"
       },
+      "questLayerMode": "MAP_MISC_QUEST_LAYER_MODE",
       "questMessage": "MAP_MISC_QUEST_MESSAGE",
       "navigationControls": "MAP_MISC_NAVIGATION_CONTROLS",
       "enableFloatingProfileButton": {

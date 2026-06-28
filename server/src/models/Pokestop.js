@@ -9,6 +9,10 @@ const { getAreaSql } = require('../utils/getAreaSql')
 const { applyManualIdFilter } = require('../utils/manualFilter')
 const { getUserMidnight } = require('../utils/getClientTime')
 const { state } = require('../services/state')
+const {
+  isDualQuestLayerMode,
+  resolveQuestLayerSelection,
+} = require('../utils/questLayerMode')
 
 const questProps = {
   quest_type: true,
@@ -147,6 +151,11 @@ class Pokestop extends Model {
       eventStops: eventStopPerms,
       areaRestrictions,
     } = perms
+    const effectiveOnlyArEligible = isDualQuestLayerMode() && onlyArEligible
+    const effectiveQuestLayer = resolveQuestLayerSelection(
+      args.filters.onlyShowQuestSet,
+      { isMad, hasAltQuests, hasLayerColumn },
+    )
 
     const query = this.query()
     if (isMad) {
@@ -658,7 +667,7 @@ class Pokestop extends Model {
             })
           }
         }
-        if (onlyArEligible && pokestopPerms) {
+        if (effectiveOnlyArEligible && pokestopPerms) {
           stops.orWhere((ar) => {
             ar.where(isMad ? 'is_ar_scan_eligible' : 'ar_scan_eligible', 1)
           })
@@ -712,6 +721,8 @@ class Pokestop extends Model {
       perms,
       hasMultiInvasions,
       hasConfirmed,
+      effectiveOnlyArEligible,
+      effectiveQuestLayer,
     )
     return finalResults
   }
@@ -861,6 +872,8 @@ class Pokestop extends Model {
     perms,
     hasMultiInvasions,
     hasConfirmed,
+    effectiveOnlyArEligible,
+    effectiveQuestLayer,
   ) {
     const filteredResults = []
     for (let i = 0; i < queryResults.length; i += 1) {
@@ -982,9 +995,9 @@ class Pokestop extends Model {
         pokestop.quests.forEach((quest) => {
           if (
             quest.quest_reward_type &&
-            (filters.onlyShowQuestSet === 'both' ||
-              (filters.onlyShowQuestSet === 'with_ar' && quest.with_ar) ||
-              (filters.onlyShowQuestSet === 'without_ar' && !quest.with_ar))
+            (effectiveQuestLayer === 'both' ||
+              (effectiveQuestLayer === 'with_ar' && quest.with_ar) ||
+              (effectiveQuestLayer === 'without_ar' && !quest.with_ar))
           ) {
             const newQuest = {}
             if (isMad) {
@@ -1067,7 +1080,7 @@ class Pokestop extends Model {
         })
       }
       if (
-        (pokestop.ar_scan_eligible && filters.onlyArEligible) ||
+        (pokestop.ar_scan_eligible && effectiveOnlyArEligible) ||
         filters.onlyAllPokestops ||
         filtered.quests?.length ||
         filtered.invasions?.length ||
@@ -1182,6 +1195,7 @@ class Pokestop extends Model {
     hasMultiInvasions,
     multiInvasionMs,
     hasRewardAmount,
+    hasLayerColumn,
     hasConfirmed,
     hasShowcaseData,
     hasShowcaseForm,
@@ -1191,6 +1205,21 @@ class Pokestop extends Model {
     const finalList = new Set()
     const conditions = {}
     const queries = {}
+    const questLayer = resolveQuestLayerSelection('both', {
+      isMad,
+      hasAltQuests,
+      hasLayerColumn,
+    })
+    const hasMadQuestLayer = isMad && hasLayerColumn
+    const shouldIncludeBaseQuests =
+      questLayer !== 'without_ar' || hasMadQuestLayer
+    const shouldIncludeAltQuests = hasAltQuests && questLayer !== 'with_ar'
+    const applyMadQuestLayer = (query) => {
+      if (hasMadQuestLayer && questLayer !== 'both') {
+        query.where('layer', questLayer === 'with_ar' ? 1 : 0)
+      }
+      return query
+    }
 
     const process = (key, title, target) => {
       if (title) {
@@ -1574,29 +1603,47 @@ class Pokestop extends Model {
     }
     // showcase
 
+    ;['items', 'stardust', 'xp', 'mega', 'candy', 'xlCandy', 'pokemon'].forEach(
+      (key) => {
+        if (!shouldIncludeBaseQuests) {
+          delete queries[key]
+        } else if (queries[key]) {
+          applyMadQuestLayer(queries[key])
+        }
+        if (!shouldIncludeAltQuests) {
+          delete queries[`${key}Alt`]
+        }
+      },
+    )
+
     const resolved = Object.fromEntries(
       await Promise.all(
         Object.entries(queries).map(async ([key, query]) => [key, await query]),
       ),
     )
 
-    let questTypes = [
-      ...new Set([
-        ...(await this.query()
-          .from(isMad ? 'trs_quest' : 'pokestop')
-          .distinct('quest_reward_type')
-          .whereNotNull('quest_reward_type')
-          .then((results) => results.map((x) => x.quest_reward_type))),
-        ...(hasAltQuests
-          ? await this.query()
-              .distinct('alternative_quest_reward_type')
-              .whereNotNull('alternative_quest_reward_type')
-              .then((results) =>
-                results.map((x) => x.alternative_quest_reward_type),
-              )
-          : []),
-      ]),
-    ]
+    const questTypeQueries = []
+    if (shouldIncludeBaseQuests) {
+      questTypeQueries.push(
+        applyMadQuestLayer(
+          this.query()
+            .from(isMad ? 'trs_quest' : 'pokestop')
+            .distinct('quest_reward_type')
+            .whereNotNull('quest_reward_type'),
+        ).then((results) => results.map((x) => x.quest_reward_type)),
+      )
+    }
+    if (shouldIncludeAltQuests) {
+      questTypeQueries.push(
+        this.query()
+          .distinct('alternative_quest_reward_type')
+          .whereNotNull('alternative_quest_reward_type')
+          .then((results) =>
+            results.map((x) => x.alternative_quest_reward_type),
+          ),
+      )
+    }
+    let questTypes = [...new Set((await Promise.all(questTypeQueries)).flat())]
 
     Object.entries(resolved).forEach(([questType, rewards]) => {
       switch (questType) {
@@ -1856,11 +1903,17 @@ class Pokestop extends Model {
   static async searchQuests(
     perms,
     args,
-    { isMad, hasAltQuests },
+    { isMad, hasAltQuests, hasLayerColumn },
     distance,
     bbox,
   ) {
-    const { search, onlyAreas = [], locale, lat, lon, questLayer } = args
+    const { search, onlyAreas = [], locale, lat, lon } = args
+    const questLayer = resolveQuestLayerSelection(args.questLayer, {
+      isMad,
+      hasAltQuests,
+      hasLayerColumn,
+    })
+    const hasMadQuestLayer = isMad && hasLayerColumn
     const searchResultsLimit = config.getSafe('api.searchResultsLimit')
     const midnight = getUserMidnight({ lat, lon })
     const pokemonIds = Object.keys(state.event.masterfile.pokemon).filter(
@@ -1895,7 +1948,7 @@ class Pokestop extends Model {
       return []
     }
     const queries = []
-    if (questLayer !== 'without_ar') {
+    if (questLayer !== 'without_ar' || hasMadQuestLayer) {
       const query = this.query()
         .select([
           isMad ? 'pokestop_id AS id' : 'id',
@@ -1943,6 +1996,12 @@ class Pokestop extends Model {
             'quest_pokemon_form_id AS quest_form_id',
             'quest_pokemon_costume_id AS quest_costume_id',
           ])
+        if (hasLayerColumn) {
+          query.select('layer AS with_ar')
+          if (questLayer !== 'both') {
+            query.andWhere('layer', questLayer === 'with_ar' ? 1 : 0)
+          }
+        }
       }
       if (!getAreaSql(query, perms.areaRestrictions, onlyAreas, isMad)) {
         return []
