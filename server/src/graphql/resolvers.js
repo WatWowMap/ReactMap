@@ -18,6 +18,10 @@ const { getPolyVector } = require('../utils/getPolyVector')
 const { getPlacementCells } = require('../utils/getPlacementCells')
 const { getTypeCells } = require('../utils/getTypeCells')
 const { getValidCoords } = require('../utils/getValidCoords')
+const { hasUnrestrictedAreaGrant } = require('../utils/areaPerms')
+const {
+  getAccessibleScanAreasMenu,
+} = require('../utils/getAccessibleScanAreasMenu')
 
 /** @type {import("@apollo/server").ApolloServerOptions<import("@rm/types").GqlContext>['resolvers']} */
 const resolvers = {
@@ -355,54 +359,44 @@ const resolvers = {
     scanAreas: (_, _args, { req, perms }) => {
       if (perms?.scanAreas) {
         const scanAreas = config.getAreas(req, 'scanAreas')
+        const unrestrictedAreaGrant = hasUnrestrictedAreaGrant(
+          perms.areaRestrictions,
+        )
+        const hasDirectAreaAccess = (properties) =>
+          unrestrictedAreaGrant ||
+          !perms.areaRestrictions.length ||
+          perms.areaRestrictions.includes(properties.key)
+        const accessibleSelectableParents = new Set(
+          scanAreas.features
+            .filter(
+              (feature) =>
+                feature.properties.parent &&
+                !feature.properties.hidden &&
+                !feature.properties.manual &&
+                hasDirectAreaAccess(feature.properties),
+            )
+            .map((feature) => feature.properties.parent),
+        )
+        const canAccessArea = (properties) =>
+          hasDirectAreaAccess(properties) ||
+          (!properties.parent &&
+            !properties.manual &&
+            accessibleSelectableParents.has(properties.name))
+
         return [
           {
             ...scanAreas,
             features: scanAreas.features.filter(
               (feature) =>
-                !feature.properties.hidden &&
-                (!perms.areaRestrictions.length ||
-                  perms.areaRestrictions.includes(feature.properties.name) ||
-                  perms.areaRestrictions.includes(feature.properties.parent)),
+                !feature.properties.hidden && canAccessArea(feature.properties),
             ),
           },
         ]
       }
       return [{ features: [] }]
     },
-    scanAreasMenu: (_, _args, { req, perms }) => {
-      if (perms?.scanAreas) {
-        const scanAreas = config.getAreas(req, 'scanAreasMenu')
-        if (perms.areaRestrictions.length) {
-          const filtered = scanAreas
-            .map((parent) => ({
-              ...parent,
-              children: perms.areaRestrictions.includes(parent.name)
-                ? parent.children
-                : parent.children.filter((child) =>
-                    perms.areaRestrictions.includes(child.properties.name),
-                  ),
-            }))
-            .filter((parent) => parent.children.length)
-
-          // // Adds new blanks to account for area restrictions trimming some
-          // filtered.forEach(({ children }) => {
-          //   if (children.length % 2 === 1) {
-          //     children.push({
-          //       type: 'Feature',
-          //       properties: {
-          //         name: '',
-          //         manual: !!config.getSafe('manualAreas.length'),
-          //       },
-          //     })
-          //   }
-          // })
-          return filtered
-        }
-        return scanAreas.filter((parent) => parent.children.length)
-      }
-      return []
-    },
+    scanAreasMenu: (_, _args, { req, perms }) =>
+      getAccessibleScanAreasMenu(req, perms),
     scannerConfig: (_, { mode }, { perms }) => {
       const scanner = config.getSafe('scanner')
       const modeConfig = scanner[mode]

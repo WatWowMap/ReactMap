@@ -8,6 +8,8 @@ const config = require('@rm/config')
 
 const { getPolyVector } = require('../utils/getPolyVector')
 const { getPolygonBbox } = require('../utils/getBbox')
+const { consolidateAreas } = require('../utils/consolidateAreas')
+const { hasUnrestrictedAreaGrant } = require('../utils/areaPerms')
 
 class Weather extends Model {
   static get tableName() {
@@ -41,15 +43,19 @@ class Weather extends Model {
     /** @type {import("@rm/types").FullWeather[]} */
     const results = await query
 
-    const areas = config.getSafe('areas')
-    const cleanUserAreas = (args.filters.onlyAreas || []).filter((area) =>
-      areas.names.has(area),
+    const unrestrictedAreaGrant = hasUnrestrictedAreaGrant(
+      perms.areaRestrictions,
     )
-    const merged = perms.areaRestrictions.length
-      ? perms.areaRestrictions.filter(
-          (area) => !cleanUserAreas.length || cleanUserAreas.includes(area),
-        )
-      : cleanUserAreas
+    const hasAreaFilter =
+      (!unrestrictedAreaGrant && perms.areaRestrictions.length) ||
+      (args.filters.onlyAreas || []).length
+    const merged = hasAreaFilter
+      ? [...consolidateAreas(perms.areaRestrictions, args.filters.onlyAreas)]
+      : []
+
+    if (hasAreaFilter && !merged.length) {
+      return []
+    }
 
     const boundPolygon = getPolygonBbox(args)
     return results
@@ -61,21 +67,20 @@ class Weather extends Model {
           (pointInPolygon(center, boundPolygon) ||
             booleanOverlap(geojson, boundPolygon) ||
             booleanContains(geojson, boundPolygon)) &&
-          (!merged.length ||
+          (!hasAreaFilter ||
             merged.some(
               (area) =>
-                areas.scanAreasObj[area] &&
-                (pointInPolygon(center, areas.scanAreasObj[area]) ||
-                  booleanOverlap(geojson, areas.scanAreasObj[area]) ||
-                  pointInPolygon(
-                    point(
-                      // @ts-ignore // again, probably need real TS types
-                      areas.scanAreasObj[area].geometry.type === 'MultiPolygon'
-                        ? areas.scanAreasObj[area].geometry.coordinates[0][0][0]
-                        : areas.scanAreasObj[area].geometry.coordinates[0][0],
-                    ),
-                    geojson,
-                  )),
+                pointInPolygon(center, area) ||
+                booleanOverlap(geojson, area) ||
+                pointInPolygon(
+                  point(
+                    // @ts-ignore // again, probably need real TS types
+                    area.geometry.type === 'MultiPolygon'
+                      ? area.geometry.coordinates[0][0][0]
+                      : area.geometry.coordinates[0][0],
+                  ),
+                  geojson,
+                ),
             ))
         return (
           hasOverlap && {
