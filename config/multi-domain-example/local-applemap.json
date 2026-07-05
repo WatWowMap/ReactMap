@@ -4,7 +4,7 @@
     "general": {
       "title": "Apple Map",
       "headerTitle": "Apple Map PoGo",
-      "geoJsonFilName": "http://koji.map.com/api/v1/geofence/feature-collection/apple"
+      "geoJsonFileName": "http://koji.map.com/api/v1/geofence/feature-collection/apple"
     },
     "links": {
       "discordInvite": "apple map invite",

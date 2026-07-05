@@ -14,7 +14,8 @@ import { getProperName } from '@utils/strings'
  * @returns
  */
 function ScanArea(featureCollection) {
-  const search = useStorage((s) => s.filters.scanAreas?.filter?.search)
+  const rawSearch = useStorage((s) => s.filters.scanAreas?.filter?.search ?? '')
+  const search = rawSearch.toLowerCase()
   const tapToToggle = useStorage((s) => s.userSettings.scanAreas.tapToToggle)
   const alwaysShowLabels = useStorage(
     (s) => s.userSettings.scanAreas.alwaysShowLabels,
@@ -23,12 +24,12 @@ function ScanArea(featureCollection) {
 
   return (
     <GeoJSON
-      key={`${search}${tapToToggle}${alwaysShowLabels}`}
+      key={`${rawSearch}${tapToToggle}${alwaysShowLabels}`}
       data={featureCollection}
       filter={(f) =>
         webhook ||
         search === '' ||
-        f.properties.key.toLowerCase().includes(search.toLowerCase())
+        (f.properties?.key || '').toLowerCase().includes(search)
       }
       eventHandlers={{
         click: ({ propagatedFrom: layer }) => {
