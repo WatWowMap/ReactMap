@@ -4,7 +4,7 @@
 
 - This makes use of the `NODE_CONFIG_ENV` env variable to determine which `local.json` files to load
 - Loads `default.json` => `local.json` => `local-{NODE_CONFIG_ENV}`.json
-- You set all of your base defaults in `local.json` still, then set things that are unique to those domains, such `geoJsonFileName` or authentication strategies in each of the domain specifics jsons
+- You set all of your base defaults in `local.json` still, then set things that are unique to those domains, such as `geoJsonFileName` or authentication strategies in each of the domain specifics jsons
 - The `NODE_CONFIG_ENV` var names should not contain `/` or `.`
 
 ## File System
