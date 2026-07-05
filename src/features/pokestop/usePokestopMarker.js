@@ -61,21 +61,21 @@ function getInvasionRewardCandidates(invasion, gruntData) {
  * @param {{ id: number, form: number }} candidate
  * @param {import('@rm/types').AllFilters['pokestops']['filter']} filters
  * @param {import('@store/useMemory').UseMemory['Icons']} Icons
+ * @param {'invasion' | 'reward'} sizeCategory
  * @returns {number}
  */
-function getInvasionRewardSize(candidate, filters, Icons) {
+function getInvasionRewardSize(candidate, filters, Icons, sizeCategory) {
   const pokemonKey = `a${candidate.id}-${candidate.form || 0}`
   const pokemonKeySimple = `a${candidate.id}`
+  const pokemonFilter = filters[pokemonKey]
+  const simplePokemonFilter = filters[pokemonKeySimple]
 
-  if (!filters[pokemonKey]?.enabled && !filters[pokemonKeySimple]?.enabled) {
-    return 0
+  if (pokemonFilter?.enabled) {
+    return Icons.getSize(sizeCategory, pokemonFilter.size)
   }
-
-  return (
-    Icons.getSize('invasion', filters[pokemonKey]?.size) ||
-    Icons.getSize('invasion', filters[pokemonKeySimple]?.size) ||
-    Icons.getSize('invasion')
-  )
+  return simplePokemonFilter?.enabled
+    ? Icons.getSize(sizeCategory, simplePokemonFilter.size)
+    : 0
 }
 
 /**
@@ -186,17 +186,18 @@ export function usePokestopMarker({
           gruntData,
         )
         const uniqueReward = rewardCandidates.length === 1
-        const invasionIcon =
-          showInvasionRewardMarker && uniqueReward
-            ? Icons.getPokemon(
-                rewardCandidates[0].id,
-                rewardCandidates[0].form,
-                0,
-                0,
-                0,
-                1,
-              )
-            : Icons.getInvasions(invasion.grunt_type, invasion.confirmed)
+        const showRewardMarker = showInvasionRewardMarker && uniqueReward
+        const invasionSizeCategory = showRewardMarker ? 'reward' : 'invasion'
+        const invasionIcon = showRewardMarker
+          ? Icons.getPokemon(
+              rewardCandidates[0].id,
+              rewardCandidates[0].form,
+              0,
+              0,
+              0,
+              1,
+            )
+          : Icons.getInvasions(invasion.grunt_type, invasion.confirmed)
 
         invasionIcons.unshift({
           icon: invasionIcon,
@@ -205,7 +206,7 @@ export function usePokestopMarker({
 
         // Get base invasion type icon size
         const invasionTypeSize = Icons.getSize(
-          'invasion',
+          invasionSizeCategory,
           filters[`i${invasion.grunt_type}`]?.size,
         )
 
@@ -224,7 +225,12 @@ export function usePokestopMarker({
           rewardCandidates.forEach((candidate) => {
             maxRewardSize = Math.max(
               maxRewardSize,
-              getInvasionRewardSize(candidate, filters, Icons),
+              getInvasionRewardSize(
+                candidate,
+                filters,
+                Icons,
+                invasionSizeCategory,
+              ),
             )
           })
 

@@ -1,3 +1,16 @@
+# [1.45.0](https://github.com/WatWowMap/ReactMap/compare/v1.44.3...v1.45.0) (2026-07-05)
+
+
+### Bug Fixes
+
+* invasion reward icon size logic ([4806148](https://github.com/WatWowMap/ReactMap/commit/48061482ba81921e469f44e670acf74c0bea3405))
+
+
+### Features
+
+* client option to use invasion rewards as marker ([7b24b32](https://github.com/WatWowMap/ReactMap/commit/7b24b3208f867388dfe3b3289e62af4fdb06209f))
+* questLayerMode defaulting to non_ar ([925c8ed](https://github.com/WatWowMap/ReactMap/commit/925c8ed32dd26f1ac2ed75c257ff50bce7e6a78a))
+
 ## [1.44.3](https://github.com/WatWowMap/ReactMap/compare/v1.44.2...v1.44.3) (2026-06-18)
 
 
