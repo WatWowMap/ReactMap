@@ -1,3 +1,10 @@
+## [1.45.1](https://github.com/WatWowMap/ReactMap/compare/v1.45.0...v1.45.1) (2026-07-05)
+
+
+### Bug Fixes
+
+* **scanArea:** prevent crash when area feature has no name/key ([#1225](https://github.com/WatWowMap/ReactMap/issues/1225)) ([#1226](https://github.com/WatWowMap/ReactMap/issues/1226)) ([2df8c9e](https://github.com/WatWowMap/ReactMap/commit/2df8c9e7de2fc7e21ae9cc92e8fd0cadbfb038d6))
+
 # [1.45.0](https://github.com/WatWowMap/ReactMap/compare/v1.44.3...v1.45.0) (2026-07-05)
 
 
