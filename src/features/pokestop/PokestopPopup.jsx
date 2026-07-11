@@ -588,7 +588,6 @@ const RewardInfo = ({ with_ar, ...quest }) => {
           className="search-amount-holder"
           style={{
             fontSize: 'medium',
-            bottom: 20,
           }}
         >
           x{amount}
