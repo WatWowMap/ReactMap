@@ -1,3 +1,10 @@
+# [1.46.0](https://github.com/WatWowMap/ReactMap/compare/v1.45.1...v1.46.0) (2026-07-11)
+
+
+### Features
+
+* mega branch resource with fallback ([8756f38](https://github.com/WatWowMap/ReactMap/commit/8756f38f964c7a330e16fb57888795e5bbd5da16))
+
 ## [1.45.1](https://github.com/WatWowMap/ReactMap/compare/v1.45.0...v1.45.1) (2026-07-05)
 
 
