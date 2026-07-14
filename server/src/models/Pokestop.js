@@ -1381,6 +1381,14 @@ class Pokestop extends Model {
     secret,
     httpAuth,
   }) {
+    // Endpoint sources (mem truthy) have no bound knex -- DbManager binds
+    // the unbound Pokestop base class for endpoint sources precisely
+    // because they have no DB connection. They are endpoint-authoritative:
+    // on failure we return a clean empty result instead of falling
+    // through, since the SQL block below would throw on `this.query()`
+    // (swallowed by the caller's Promise.allSettled) and silently
+    // contribute zero filter keys. The SQL block is reached only for
+    // `mem: ''` (DB / MAD) sources.
     if (mem) {
       try {
         const res = await this.evalQuery(
@@ -1393,7 +1401,7 @@ class Pokestop extends Model {
         // fetchJson returns a node-fetch Response object on a non-2xx
         // response (e.g. 503 when FortInMemory is off) and evalQuery
         // normalizes a network/timeout error to `[]` -- neither shape has
-        // a `.quests`/`.invasions` array, so both fall through to SQL.
+        // a `.quests`/`.invasions` array.
         if (res && Array.isArray(res.quests) && Array.isArray(res.invasions)) {
           const result = mapAvailablePokestops(res, {
             invasions: state.event.invasions,
@@ -1404,14 +1412,16 @@ class Pokestop extends Model {
         }
         log.warn(
           TAGS.pokestops,
-          '[POKESTOP] /api/pokestop/available unavailable (falling back to SQL)',
+          '[POKESTOP] /api/pokestop/available unavailable (e.g. fort_in_memory off) — returning empty available for this endpoint source',
         )
       } catch (e) {
         log.warn(
           TAGS.pokestops,
-          `[POKESTOP] /api/pokestop/available error (falling back to SQL): ${e}`,
+          `[POKESTOP] /api/pokestop/available error — returning empty available for this endpoint source: ${e}`,
         )
       }
+      // Endpoint sources have no bound DB to fall back to.
+      return { available: [], conditions: {} }
     }
     const ts = Math.floor(Date.now() / 1000)
     const finalList = new Set()
