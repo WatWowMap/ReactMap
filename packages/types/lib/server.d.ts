@@ -52,6 +52,7 @@ export interface DbContext {
   hasPokemonBackground: boolean
   hasPokemonShinyStats?: boolean
   connection?: number
+  httpAuth?: { username: string; password: string } | null
 }
 
 export interface ExpressUser extends User {
@@ -66,6 +67,46 @@ export interface AvailablePokemon {
   id: number
   form: number
   count: number
+}
+
+export interface AvailablePokestopQuest {
+  with_ar: boolean
+  reward_type: number
+  item_id: number
+  amount: number
+  pokemon_id: number
+  form_id: number
+  title: string
+  target: number
+  count: number
+}
+
+export interface AvailablePokestopInvasion {
+  character: number
+  display_type: number
+  confirmed: boolean
+  slot1_pokemon_id: number
+  slot1_form: number
+  count: number
+}
+
+export interface AvailablePokestopLure {
+  lure_id: number
+  count: number
+}
+
+export interface AvailablePokestopShowcase {
+  pokemon_id: number
+  form: number
+  type_id: number
+  count: number
+}
+
+export interface AvailablePokestops {
+  quests: AvailablePokestopQuest[]
+  invasions: AvailablePokestopInvasion[]
+  lures: AvailablePokestopLure[]
+  showcases: AvailablePokestopShowcase[]
 }
 
 export interface Available {
