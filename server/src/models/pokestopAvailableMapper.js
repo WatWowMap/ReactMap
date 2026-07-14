@@ -138,7 +138,23 @@ function mapAvailablePokestops(api, ctx) {
   // exactly as the SQL merges `quest` + `alternative_quest` columns.
   const quests = api.quests || []
   quests.forEach((quest) => {
-    process(questRewardKey(quest), quest.title, quest.target)
+    // SQL filters reward_type 1 (xp) and 3 (stardust) tuples on
+    // `quest_reward_amount > 0`; a non-positive amount emits no key at all.
+    if (
+      (quest.reward_type === 1 || quest.reward_type === 3) &&
+      quest.amount <= 0
+    ) {
+      return
+    }
+    const key = questRewardKey(quest)
+    // SQL builds `u`-prefixed fallback keys via `questTypes.map(t =>
+    // `u${t}`)` and never runs them through the conditions-attaching helper,
+    // so fallback keys carry no conditions here either.
+    if (key[0] === 'u') {
+      available.add(key)
+    } else {
+      process(key, quest.title, quest.target)
+    }
   })
 
   // Invasions: `i`/`b` keys are unconditional; the `a` key additionally
