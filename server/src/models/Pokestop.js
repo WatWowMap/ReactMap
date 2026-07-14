@@ -1381,14 +1381,13 @@ class Pokestop extends Model {
     secret,
     httpAuth,
   }) {
-    // Endpoint sources (mem truthy) have no bound knex -- DbManager binds
-    // the unbound Pokestop base class for endpoint sources precisely
-    // because they have no DB connection. They are endpoint-authoritative:
-    // on failure we return a clean empty result instead of falling
-    // through, since the SQL block below would throw on `this.query()`
-    // (swallowed by the caller's Promise.allSettled) and silently
-    // contribute zero filter keys. The SQL block is reached only for
-    // `mem: ''` (DB / MAD) sources.
+    // A source with a Golbat endpoint (mem truthy) fetches the available list
+    // from the endpoint. On failure (503 when fort_in_memory is off, or a
+    // network error) it falls through to the SQL block below: a DUAL source
+    // (endpoint + DB) runs the SQL fallback on its bound knex, while a
+    // pure-endpoint source has no bound knex, so this.query() throws and the
+    // caller's Promise.allSettled drops it (contributing nothing). The SQL
+    // block also serves mem:'' (DB / MAD) sources directly.
     if (mem) {
       try {
         const res = await this.evalQuery(
@@ -1420,8 +1419,6 @@ class Pokestop extends Model {
           `[POKESTOP] /api/pokestop/available error — returning empty available for this endpoint source: ${e}`,
         )
       }
-      // Endpoint sources have no bound DB to fall back to.
-      return { available: [], conditions: {} }
     }
     const ts = Math.floor(Date.now() / 1000)
     const finalList = new Set()

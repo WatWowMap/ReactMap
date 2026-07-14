@@ -122,6 +122,7 @@ export interface ApiEndpoint {
   type: string
   endpoint: string
   secret: string
+  httpAuth?: { username: string; password: string } | null
   useFor: Lowercase<ModelKeys>[]
 }
 
@@ -132,6 +133,12 @@ export interface DbConnection {
   password: string
   database: string
   useFor: Lowercase<ModelKeys>[]
+  // Optional Golbat endpoint on the same source (dual): migrated queries use
+  // the endpoint, the rest fall back to this DB connection.
+  endpoint?: string
+  secret?: string
+  httpAuth?: { username: string; password: string } | null
+  type?: string
 }
 
 export type Schema = ApiEndpoint | DbConnection
