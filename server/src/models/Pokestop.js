@@ -1407,6 +1407,10 @@ class Pokestop extends Model {
           })
           const availableSet = new Set(result.available)
           applyRocketPokemonFallback(availableSet)
+          log.info(
+            TAGS.pokestops,
+            `[POKESTOP] loaded available from Golbat endpoint ${mem}/api/pokestop/available — ${availableSet.size} filter keys (${res.quests.length} quests, ${res.invasions.length} invasions, ${(res.lures || []).length} lures, ${(res.showcases || []).length} showcases), ${Object.keys(result.conditions).length} reward conditions`,
+          )
           return { available: [...availableSet], conditions: result.conditions }
         }
         log.warn(
