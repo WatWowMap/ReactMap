@@ -53,6 +53,8 @@
  *
  * @typedef {object} MapAvailablePokestopsCtx
  * @property {Record<number, InvasionRewardConfig>} invasions
+ * @property {boolean} [includeBaseQuests] include AR (`with_ar:true`) quests; default true
+ * @property {boolean} [includeAltQuests] include non-AR (`with_ar:false`) quests; default true
  *
  * @typedef {{ title: number | string, target: number }} QuestCondition
  * @typedef {Record<string, Record<string, QuestCondition>>} QuestConditions
@@ -115,6 +117,7 @@ function questRewardKey(quest) {
  * @returns {{ available: string[], conditions: QuestConditions }}
  */
 function mapAvailablePokestops(api, ctx) {
+  const { includeBaseQuests = true, includeAltQuests = true } = ctx
   const available = new Set()
   /** @type {QuestConditions} */
   const conditions = {}
@@ -138,6 +141,13 @@ function mapAvailablePokestops(api, ctx) {
   // exactly as the SQL merges `quest` + `alternative_quest` columns.
   const quests = api.quests || []
   quests.forEach((quest) => {
+    // Honor questLayerMode: `with_ar:true` is the AR (base/`quest_*`) layer,
+    // `false` the non-AR (alt/`alternative_quest_*`) layer. Skip a layer the
+    // config excludes, matching the SQL `shouldIncludeBaseQuests`/
+    // `shouldIncludeAltQuests` gating in `Pokestop.getAvailable`.
+    if (quest.with_ar ? !includeBaseQuests : !includeAltQuests) {
+      return
+    }
     // SQL filters reward_type 1 (xp) and 3 (stardust) tuples on
     // `quest_reward_amount > 0`; a non-positive amount emits no key at all.
     if (

@@ -1402,8 +1402,16 @@ class Pokestop extends Model {
         // normalizes a network/timeout error to `[]` -- neither shape has
         // a `.quests`/`.invasions` array.
         if (res && Array.isArray(res.quests) && Array.isArray(res.invasions)) {
+          // The Golbat endpoint always returns both AR (`with_ar:true`) and
+          // non-AR quest tuples; honor `map.misc.questLayerMode` the same way
+          // the SQL path does so we don't advertise filters for a hidden layer.
+          const questLayer = resolveQuestLayerSelection('both', {
+            hasAltQuests: true,
+          })
           const result = mapAvailablePokestops(res, {
             invasions: state.event.invasions,
+            includeBaseQuests: questLayer !== 'without_ar',
+            includeAltQuests: questLayer !== 'with_ar',
           })
           const availableSet = new Set(result.available)
           applyRocketPokemonFallback(availableSet)
