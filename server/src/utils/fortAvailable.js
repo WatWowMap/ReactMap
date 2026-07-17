@@ -20,8 +20,9 @@ const combinedCache = new Map()
 /**
  * Fetches the combined fort availability, deduped per endpoint per window.
  * Resolves null when the combined endpoint is unavailable (older Golbat or
- * fort_in_memory off) — callers fall back to their per-type endpoint. The
- * null is cached for the same window so an old Golbat isn't hammered.
+ * fort_in_memory off) — callers then fall through to their SQL path (or an
+ * empty result for a pure-endpoint source). The null is cached for the same
+ * window so an old Golbat isn't hammered.
  *
  * @param {import('@rm/logger').Tag} tag
  * @param {string} mem endpoint base url
@@ -53,12 +54,12 @@ function getCombinedFortAvailable(tag, mem, secret, httpAuth) {
       }
       log.warn(
         TAGS.gyms,
-        `[FORT] combined ${mem}/api/fort/available unusable — ${describeScannerResponse(res)} — falling back to per-type`,
+        `[FORT] combined ${mem}/api/fort/available unusable — ${describeScannerResponse(res)} — callers fall through to SQL`,
       )
     } catch (e) {
       log.warn(
         TAGS.gyms,
-        `[FORT] combined ${mem}/api/fort/available error — falling back to per-type: ${e}`,
+        `[FORT] combined ${mem}/api/fort/available error — callers fall through to SQL: ${e}`,
       )
     }
     return null

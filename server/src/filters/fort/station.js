@@ -1,4 +1,5 @@
 // @ts-check
+const { parseIdFormPair } = require('./parseIdForm')
 
 /**
  * Translate a station's `args.filters` into ApiFortDnfFilter[] clauses.
@@ -45,23 +46,14 @@ function buildStationDnfFilters(filters) {
       if (Number.isFinite(t)) battleLevels.push(t)
     } else {
       // per-level multi-select + battle-combo keys
-      Object.entries(filters).forEach(([key]) => {
+      Object.keys(filters).forEach((key) => {
         if (typeof key !== 'string' || key.length === 0) return
         if (key.startsWith('j')) {
           const lvl = Number(key.slice(1))
           if (Number.isFinite(lvl)) battleLevels.push(lvl)
         } else if (/^\d/.test(key)) {
-          const [idPart, formPart] = key.split('-', 2)
-          const id = Number(idPart)
-          if (!Number.isFinite(id)) return
-          const pair = { pokemon_id: id }
-          if (
-            formPart &&
-            formPart !== 'null' &&
-            Number.isFinite(Number(formPart))
-          )
-            pair.form = Number(formPart)
-          battlePokemon.push(pair)
+          const pair = parseIdFormPair(key)
+          if (pair) battlePokemon.push(pair)
         }
       })
     }

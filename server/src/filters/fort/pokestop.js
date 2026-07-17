@@ -1,15 +1,5 @@
 // @ts-check
-
-/** push {pokemon_id, form?} from a "<id>[-<form>]" key onto arr */
-function pushIdForm(arr, key, offset) {
-  const [idPart, formPart] = key.slice(offset).split('-', 2)
-  const id = Number(idPart)
-  if (!Number.isFinite(id)) return
-  const pair = { pokemon_id: id }
-  if (formPart && formPart !== 'null' && Number.isFinite(Number(formPart)))
-    pair.form = Number(formPart)
-  arr.push(pair)
-}
+const { parseIdFormPair } = require('./parseIdForm')
 
 /**
  * Grunt (incident) character ids whose *possible* rocket encounters include any
@@ -112,7 +102,7 @@ function buildPokestopDnfFilters(filters, eventInvasions) {
   const contestPokemon = []
   const contestPokemonType = []
 
-  Object.entries(filters).forEach(([key]) => {
+  Object.keys(filters).forEach((key) => {
     if (typeof key !== 'string' || key.length === 0) return
     const n = Number(key.slice(1))
     switch (key.charAt(0)) {
@@ -177,9 +167,11 @@ function buildPokestopDnfFilters(filters, eventInvasions) {
         if (Number.isFinite(rocketId)) rocketPokemonIds.add(rocketId)
         break
       }
-      case 'f':
-        pushIdForm(contestPokemon, key, 1)
+      case 'f': {
+        const pair = parseIdFormPair(key, 1)
+        if (pair) contestPokemon.push(pair)
         break
+      }
       case 'h':
         if (Number.isFinite(n)) contestPokemonType.push(n)
         break
@@ -297,7 +289,7 @@ function buildPokestopDnfFilters(filters, eventInvasions) {
   }
   if (onlyArEligible) clauses.push({ is_ar_scan_eligible: true })
 
-  return clauses.length ? clauses : []
+  return clauses
 }
 
 module.exports = { buildPokestopDnfFilters }

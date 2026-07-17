@@ -3,8 +3,6 @@
 /* eslint-disable no-continue */
 const { Model, raw } = require('objection')
 const i18next = require('i18next')
-const fs = require('fs')
-const { resolve } = require('path')
 
 const config = require('@rm/config')
 const { log, TAGS } = require('@rm/logger')
@@ -15,10 +13,10 @@ const {
   normalizeManualId,
 } = require('../utils/manualFilter')
 const { getUserMidnight } = require('../utils/getClientTime')
-const { fetchJson } = require('../utils/fetchJson')
 const {
   evalScannerQuery,
   describeScannerResponse,
+  fetchFortById,
 } = require('../utils/evalScannerQuery')
 const { filterRTree } = require('../utils/filterRTree')
 const { mapScanPokestop } = require('./pokestopScanMapper')
@@ -861,21 +859,13 @@ class Pokestop extends Model {
             !res.pokestops.some((p) => p && p.id === manualId)
           ) {
             try {
-              const one = await evalScannerQuery(
+              const one = await fetchFortById(
                 TAGS.pokestops,
                 `${mem}/api/pokestop/id/${manualId}`,
-                undefined,
-                'GET',
                 secret,
                 httpAuth,
               )
-              if (
-                one &&
-                typeof one === 'object' &&
-                'lat' in one &&
-                'lon' in one
-              )
-                res.pokestops.push(one)
+              if (one) res.pokestops.push(one)
             } catch {
               // by-id miss mirrors SQL finding no such row
             }
@@ -1433,65 +1423,6 @@ class Pokestop extends Model {
   }
 
   /**
-   * Mirrors `Pokemon.evalQuery`: fetches a Golbat scanner endpoint (when
-   * `mem` is set) with secret/httpAuth header handling, or evaluates a
-   * knex query builder / raw query directly otherwise. Pokestop currently
-   * only calls this with the `mem` branch (`/api/pokestop/available`), but
-   * keeps the same shape as Pokemon's for any future Golbat migrations of
-   * this model (see Phase 2 follow-up: `getPokestops`).
-   * @template T
-   * @param {string} mem
-   * @param {string | import("objection").QueryBuilder<Pokestop>} query
-   * @param {'GET' | 'POST' | 'PATCH' | 'DELETE'} method
-   * @param {string} secret
-   * @param {{ username: string, password: string } | null} httpAuth
-   * @returns {Promise<T>}
-   */
-  static async evalQuery(
-    mem,
-    query,
-    method = 'POST',
-    secret = '',
-    httpAuth = null,
-  ) {
-    if (config.getSafe('devOptions.queryDebug')) {
-      if (!fs.existsSync(resolve(__dirname, './queries'))) {
-        fs.mkdirSync(resolve(__dirname, './queries'), { recursive: true })
-      }
-      if (mem && typeof query === 'string') {
-        fs.writeFileSync(
-          resolve(__dirname, './queries', `${Date.now()}.json`),
-          query,
-        )
-      } else if (typeof query === 'object') {
-        fs.writeFileSync(
-          resolve(__dirname, './queries', `${Date.now()}.sql`),
-          query.toKnexQuery().toString(),
-        )
-      }
-    }
-    const results = await (mem
-      ? fetchJson(mem, {
-          method,
-          headers: {
-            Accept: 'application/json',
-            'Content-Type': 'application/json',
-            // Support both secret-based and HTTP authentication
-            ...(secret ? { 'X-Golbat-Secret': secret } : {}),
-            ...(httpAuth
-              ? {
-                  Authorization: `Basic ${Buffer.from(`${httpAuth.username}:${httpAuth.password}`).toString('base64')}`,
-                }
-              : {}),
-          },
-          body: query,
-        })
-      : query)
-    log.debug(TAGS.pokestops, 'raw result length', results?.length || 0)
-    return results || []
-  }
-
-  /**
    *
    * @param {import("@rm/types").DbContext} param0
    * @returns
@@ -1529,10 +1460,9 @@ class Pokestop extends Model {
           httpAuth,
         )
         const res = combined?.pokestops
-        // fetchJson returns a node-fetch Response object on a non-2xx
-        // response (e.g. 503 when FortInMemory is off) and evalQuery
-        // normalizes a network/timeout error to `[]` -- neither shape has
-        // a `.quests`/`.invasions` array.
+        // getCombinedFortAvailable resolves null when the endpoint is
+        // unavailable (e.g. 503 when fort_in_memory is off, or a network
+        // error), so res is undefined and this guard falls through to SQL.
         if (res && Array.isArray(res.quests) && Array.isArray(res.invasions)) {
           // The Golbat endpoint always returns both AR (`with_ar:true`) and
           // non-AR quest tuples; honor `map.misc.questLayerMode` the same way
@@ -1555,12 +1485,12 @@ class Pokestop extends Model {
         }
         log.warn(
           TAGS.pokestops,
-          '[POKESTOP] /api/pokestop/available unavailable (e.g. fort_in_memory off) — returning empty available for this endpoint source',
+          '[POKESTOP] /api/fort/available unavailable (e.g. fort_in_memory off) — returning empty available for this endpoint source',
         )
       } catch (e) {
         log.warn(
           TAGS.pokestops,
-          `[POKESTOP] /api/pokestop/available error — returning empty available for this endpoint source: ${e}`,
+          `[POKESTOP] /api/fort/available error — returning empty available for this endpoint source: ${e}`,
         )
       }
     }
@@ -2642,17 +2572,13 @@ class Pokestop extends Model {
   static async getOne(id, { isMad, mem, secret, httpAuth }) {
     if (mem) {
       try {
-        const res = await evalScannerQuery(
+        const one = await fetchFortById(
           TAGS.pokestops,
           `${mem}/api/pokestop/id/${id}`,
-          undefined,
-          'GET',
           secret,
           httpAuth,
         )
-        if (res && typeof res === 'object' && 'lat' in res && 'lon' in res) {
-          return res
-        }
+        if (one) return one
       } catch (e) {
         log.warn(
           TAGS.pokestops,

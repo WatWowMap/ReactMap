@@ -83,4 +83,31 @@ function describeScannerResponse(res) {
   return `unexpected ${typeof res} response`
 }
 
-module.exports = { evalScannerQuery, describeScannerResponse }
+/**
+ * Fetch a single fort by id from a Golbat endpoint (GET) and validate the
+ * response looks like a fort record (an object carrying lat/lon). Returns the
+ * record or null on a non-fort/unexpected shape. Does NOT catch — the caller
+ * decides whether to swallow (manual-id miss mirrors an empty SQL lookup) or
+ * log and fall back to SQL (getOne).
+ *
+ * @param {import('@rm/logger').Tag} tag
+ * @param {string} url endpoint base + `/api/<type>/id/<id>`
+ * @param {string} [secret]
+ * @param {{ username: string, password: string } | null} [httpAuth]
+ * @returns {Promise<object | null>}
+ */
+async function fetchFortById(tag, url, secret, httpAuth) {
+  const one = await evalScannerQuery(
+    tag,
+    url,
+    undefined,
+    'GET',
+    secret,
+    httpAuth,
+  )
+  return one && typeof one === 'object' && 'lat' in one && 'lon' in one
+    ? one
+    : null
+}
+
+module.exports = { evalScannerQuery, describeScannerResponse, fetchFortById }

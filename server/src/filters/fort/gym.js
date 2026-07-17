@@ -1,4 +1,5 @@
 // @ts-check
+const { parseIdFormPair } = require('./parseIdForm')
 
 /**
  * Team/slot clauses for the gym layer, mirroring Gym.getAll's
@@ -107,24 +108,15 @@ function buildGymDnfFilters(filters, slotCount = 6) {
     } else {
       const eggs = []
       const raidBosses = []
-      Object.entries(filters).forEach(([key]) => {
+      Object.keys(filters).forEach((key) => {
         if (typeof key !== 'string' || key.length === 0) return
         if (key.charAt(0) === 'e') {
           const tier = Number(key.slice(1))
           if (Number.isFinite(tier)) eggs.push(tier)
         } else if (/^\d/.test(key)) {
           // raid boss "<id>-<form>" (default case in Gym.getAll); gender residual
-          const [idPart, formPart] = key.split('-', 2)
-          const id = Number(idPart)
-          if (!Number.isFinite(id)) return
-          const pair = { pokemon_id: id }
-          if (
-            formPart &&
-            formPart !== 'null' &&
-            Number.isFinite(Number(formPart))
-          )
-            pair.form = Number(formPart)
-          raidBosses.push(pair)
+          const pair = parseIdFormPair(key)
+          if (pair) raidBosses.push(pair)
         }
       })
       // Golbat's tag is `raid_pokemon_id` (unlike other types' `*_pokemon`).
@@ -136,7 +128,7 @@ function buildGymDnfFilters(filters, slotCount = 6) {
     clauses.push(...buildGymTeamClauses(filters, slotCount))
   }
 
-  return clauses.length ? clauses : []
+  return clauses
 }
 
 module.exports = { buildGymDnfFilters }

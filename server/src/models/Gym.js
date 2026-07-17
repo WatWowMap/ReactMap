@@ -18,6 +18,7 @@ const { isDualQuestLayerMode } = require('../utils/questLayerMode')
 const {
   evalScannerQuery,
   describeScannerResponse,
+  fetchFortById,
 } = require('../utils/evalScannerQuery')
 const { filterRTree } = require('../utils/filterRTree')
 const { getCombinedFortAvailable } = require('../utils/fortAvailable')
@@ -556,21 +557,13 @@ class Gym extends Model {
             !res.gyms.some((g) => g && g.id === manualId)
           ) {
             try {
-              const one = await evalScannerQuery(
+              const one = await fetchFortById(
                 TAGS.gyms,
                 `${mem}/api/gym/id/${manualId}`,
-                undefined,
-                'GET',
                 secret,
                 httpAuth,
               )
-              if (
-                one &&
-                typeof one === 'object' &&
-                'lat' in one &&
-                'lon' in one
-              )
-                res.gyms.push(one)
+              if (one) res.gyms.push(one)
             } catch {
               // by-id miss mirrors SQL finding no such row
             }
@@ -654,7 +647,7 @@ class Gym extends Model {
       } catch (e) {
         log.warn(
           TAGS.gyms,
-          `[GYM] /api/gym/available error — returning empty available for this endpoint source: ${e}`,
+          `[GYM] /api/fort/available error — returning empty available for this endpoint source: ${e}`,
         )
       }
     }
@@ -844,17 +837,13 @@ class Gym extends Model {
   static async getOne(id, { isMad, mem, secret, httpAuth }) {
     if (mem) {
       try {
-        const res = await evalScannerQuery(
+        const one = await fetchFortById(
           TAGS.gyms,
           `${mem}/api/gym/id/${id}`,
-          undefined,
-          'GET',
           secret,
           httpAuth,
         )
-        if (res && typeof res === 'object' && 'lat' in res && 'lon' in res) {
-          return res
-        }
+        if (one) return one
       } catch (e) {
         log.warn(
           TAGS.gyms,

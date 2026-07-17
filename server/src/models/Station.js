@@ -16,6 +16,7 @@ const { getSharedPvpWrapper } = require('../services/PvpWrapper')
 const {
   evalScannerQuery,
   describeScannerResponse,
+  fetchFortById,
 } = require('../utils/evalScannerQuery')
 const { filterRTree } = require('../utils/filterRTree')
 const { getCombinedFortAvailable } = require('../utils/fortAvailable')
@@ -725,21 +726,13 @@ class Station extends Model {
             !res.stations.some((s) => s && s.id === manualId)
           ) {
             try {
-              const one = await evalScannerQuery(
+              const one = await fetchFortById(
                 TAGS.stations,
                 `${mem}/api/station/id/${manualId}`,
-                undefined,
-                'GET',
                 secret,
                 httpAuth,
               )
-              if (
-                one &&
-                typeof one === 'object' &&
-                'lat' in one &&
-                'lon' in one
-              )
-                res.stations.push(one)
+              if (one) res.stations.push(one)
             } catch {
               // by-id miss mirrors SQL finding no such row
             }
@@ -1203,12 +1196,12 @@ class Station extends Model {
         }
         log.warn(
           TAGS.stations,
-          `[STATION] /api/station/available gave no battles — ${describeScannerResponse(res)} — returning empty available for this endpoint source`,
+          `[STATION] /api/fort/available gave no battles — ${describeScannerResponse(res)} — returning empty available for this endpoint source`,
         )
       } catch (e) {
         log.warn(
           TAGS.stations,
-          `[STATION] /api/station/available error — returning empty available for this endpoint source: ${e}`,
+          `[STATION] /api/fort/available error — returning empty available for this endpoint source: ${e}`,
         )
       }
     }
