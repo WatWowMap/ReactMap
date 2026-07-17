@@ -628,33 +628,28 @@ class Gym extends Model {
         // One combined /api/fort/available per endpoint serves all three fort
         // models' refresh batch; falls back to the per-type endpoint when the
         // combined one is unavailable (older Golbat).
+        // Availability comes from the combined /api/fort/available (one Golbat
+        // cache pass for all three fort types, deduped across the models). No
+        // per-type fallback: ReactMap always runs against a current Golbat that
+        // serves it. A combined failure falls through to the SQL block below.
         const combined = await getCombinedFortAvailable(
           TAGS.gyms,
           mem,
           secret,
           httpAuth,
         )
-        const res =
-          combined?.gyms ??
-          (await evalScannerQuery(
-            TAGS.gyms,
-            `${mem}/api/gym/available`,
-            undefined,
-            'GET',
-            secret,
-            httpAuth,
-          ))
+        const res = combined?.gyms
         if (res && Array.isArray(res.teams) && Array.isArray(res.raids)) {
           const { available } = mapGymAvailable(res)
           log.info(
             TAGS.gyms,
-            `[GYM] loaded available from Golbat endpoint ${mem}/api/gym/available — ${available.length} filter keys (${res.teams.length} team/slot, ${res.raids.length} raid options)`,
+            `[GYM] loaded available from ${mem}/api/fort/available — ${available.length} filter keys (${res.teams.length} team/slot, ${res.raids.length} raid options)`,
           )
           return { available }
         }
         log.warn(
           TAGS.gyms,
-          `[GYM] /api/gym/available gave no teams/raids — ${describeScannerResponse(res)} — returning empty available for this endpoint source`,
+          `[GYM] combined /api/fort/available had no gyms section — returning empty available for this endpoint source`,
         )
       } catch (e) {
         log.warn(

@@ -49,10 +49,6 @@ function getCombinedFortAvailable(tag, mem, secret, httpAuth) {
         res.gyms &&
         res.stations
       ) {
-        log.info(
-          TAGS.gyms,
-          `[FORT] combined ${mem}/api/fort/available OK — one pass for all three types`,
-        )
         return res
       }
       log.warn(

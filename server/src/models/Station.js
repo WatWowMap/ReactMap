@@ -1158,28 +1158,20 @@ class Station extends Model {
     // pure-endpoint source's this.query() throws and is dropped upstream).
     if (mem) {
       try {
-        // Combined-first, per-type fallback — see Gym.getAvailable.
+        // From the combined /api/fort/available (see Gym.getAvailable) — no
+        // per-type fallback; a combined failure falls through to SQL below.
         const combined = await getCombinedFortAvailable(
           TAGS.stations,
           mem,
           secret,
           httpAuth,
         )
-        const res =
-          combined?.stations ??
-          (await evalScannerQuery(
-            TAGS.stations,
-            `${mem}/api/station/available`,
-            undefined,
-            'GET',
-            secret,
-            httpAuth,
-          ))
+        const res = combined?.stations
         if (res && Array.isArray(res.battles)) {
           const { available } = mapStationAvailable(res)
           log.info(
             TAGS.stations,
-            `[STATION] loaded available from Golbat endpoint ${mem}/api/station/available — ${available.length} filter keys (${res.battles.length} battle options)`,
+            `[STATION] loaded available from ${mem}/api/fort/available — ${available.length} filter keys (${res.battles.length} battle options)`,
           )
           return { available }
         }

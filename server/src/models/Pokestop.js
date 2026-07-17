@@ -1509,22 +1509,15 @@ class Pokestop extends Model {
     // block also serves mem:'' (DB / MAD) sources directly.
     if (mem) {
       try {
-        // Combined-first, per-type fallback — see Gym.getAvailable.
+        // From the combined /api/fort/available (see Gym.getAvailable) — no
+        // per-type fallback; a combined failure falls through to SQL below.
         const combined = await getCombinedFortAvailable(
           TAGS.pokestops,
           mem,
           secret,
           httpAuth,
         )
-        const res =
-          combined?.pokestops ??
-          (await this.evalQuery(
-            `${mem}/api/pokestop/available`,
-            undefined,
-            'GET',
-            secret,
-            httpAuth,
-          ))
+        const res = combined?.pokestops
         // fetchJson returns a node-fetch Response object on a non-2xx
         // response (e.g. 503 when FortInMemory is off) and evalQuery
         // normalizes a network/timeout error to `[]` -- neither shape has
@@ -1545,7 +1538,7 @@ class Pokestop extends Model {
           applyRocketPokemonFallback(availableSet)
           log.info(
             TAGS.pokestops,
-            `[POKESTOP] loaded available from Golbat endpoint ${mem}/api/pokestop/available — ${availableSet.size} filter keys (${res.quests.length} quests, ${res.invasions.length} invasions, ${(res.lures || []).length} lures, ${(res.showcases || []).length} showcases), ${Object.keys(result.conditions).length} reward conditions`,
+            `[POKESTOP] loaded available from ${mem}/api/fort/available — ${availableSet.size} filter keys (${res.quests.length} quests, ${res.invasions.length} invasions, ${(res.lures || []).length} lures, ${(res.showcases || []).length} showcases), ${Object.keys(result.conditions).length} reward conditions`,
           )
           return { available: [...availableSet], conditions: result.conditions }
         }
