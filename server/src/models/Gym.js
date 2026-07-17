@@ -530,7 +530,7 @@ class Gym extends Model {
       try {
         // /api/gym/scan returns an envelope { gyms, examined, skipped, total },
         // not a bare array — the matching gyms are on res.gyms.
-        const dnf = buildGymDnfFilters(args.filters)
+        const dnf = buildGymDnfFilters(args.filters, baseGymSlotAmounts.length)
         const res = await evalScannerQuery(
           TAGS.gyms,
           `${mem}/api/gym/scan`,
