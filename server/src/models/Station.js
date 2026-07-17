@@ -6,10 +6,21 @@ const i18next = require('i18next')
 const { log, TAGS } = require('@rm/logger')
 
 const { getAreaSql } = require('../utils/getAreaSql')
-const { applyManualIdFilter } = require('../utils/manualFilter')
+const {
+  applyManualIdFilter,
+  normalizeManualId,
+} = require('../utils/manualFilter')
 const { getEpoch } = require('../utils/getClientTime')
 const { state } = require('../services/state')
 const { getSharedPvpWrapper } = require('../services/PvpWrapper')
+const {
+  evalScannerQuery,
+  describeScannerResponse,
+} = require('../utils/evalScannerQuery')
+const { filterRTree } = require('../utils/filterRTree')
+const { buildStationDnfFilters } = require('../filters/fort/station')
+const { describeDnfNarrowing } = require('../filters/fort/describeDnfNarrowing')
+const { mapStationAvailable } = require('./stationAvailableMapper')
 
 const DEFAULT_IV = 15
 const STATION_TABLE = 'station'
@@ -588,10 +599,18 @@ class Station extends Model {
   static async getAll(
     perms,
     args,
-    { isMad, hasMultiBattles, hasStationedGmax, hasBattlePokemonStats },
+    {
+      isMad,
+      hasMultiBattles,
+      hasStationedGmax,
+      hasBattlePokemonStats,
+      mem,
+      secret,
+      httpAuth,
+    },
   ) {
     const { areaRestrictions } = perms
-    const { stationUpdateLimit, stationInactiveLimitDays } =
+    const { stationUpdateLimit, stationInactiveLimitDays, queryLimits } =
       config.getSafe('api')
     const {
       onlyAreas,
@@ -678,6 +697,159 @@ class Station extends Model {
     }
     const { includeUpcoming } = battleFilterOptions
     const shouldRestrictReturnedBattles = onlyMaxBattles && hasBattleConditions
+
+    if (mem) {
+      try {
+        // /api/station/scan returns an envelope { stations, examined, skipped,
+        // total } — the matching stations are on res.stations.
+        const dnf = buildStationDnfFilters(args.filters)
+        const res = await evalScannerQuery(
+          TAGS.stations,
+          `${mem}/api/station/scan`,
+          JSON.stringify({
+            min: { latitude: args.minLat, longitude: args.minLon },
+            max: { latitude: args.maxLat, longitude: args.maxLon },
+            limit: queryLimits.stations,
+            filters: dnf,
+          }),
+          'POST',
+          secret,
+          httpAuth,
+        )
+        if (res && Array.isArray(res.stations)) {
+          // Deep-link parity with SQL's `(bbox) OR id = manualId` — see Gym.
+          const manualId = normalizeManualId(args.filters.onlyManualId)
+          if (
+            manualId !== null &&
+            !res.stations.some((s) => s && s.id === manualId)
+          ) {
+            try {
+              const one = await evalScannerQuery(
+                TAGS.stations,
+                `${mem}/api/station/id/${manualId}`,
+                undefined,
+                'GET',
+                secret,
+                httpAuth,
+              )
+              if (
+                one &&
+                typeof one === 'object' &&
+                'lat' in one &&
+                'lon' in one
+              )
+                res.stations.push(one)
+            } catch {
+              // by-id miss mirrors SQL finding no such row
+            }
+          }
+          // CP estimation needs ohbem base stats, same as the SQL path.
+          // includeBattleData already implies perms.dynamax.
+          let pokemonData = null
+          if (includeBattleData) {
+            try {
+              pokemonData = await getSharedPvpWrapper().ensurePokemonData()
+            } catch (e) {
+              log.warn(
+                TAGS.fetch,
+                'Unable to load ohbem basics for station CP estimation',
+                e,
+              )
+            }
+          }
+          // Replicate the SQL WHERE that the endpoint (match-all) can't apply.
+          const passesFilterGate = (s) => {
+            if (onlyAllStations) return true
+            if (!perms.dynamax) return false
+            const battleMatch =
+              onlyMaxBattles &&
+              hasBattleConditions &&
+              (s.battles || []).some((b) =>
+                matchesStationBattleFilter(b, battleFilterOptions),
+              )
+            // Golbat always computes total_stationed_gmax on decode (from the
+            // bread-dough modes), so — unlike the SQL path — the endpoint needs
+            // no hasStationedGmax / stationed_pokemon JSON fallback here.
+            const gmaxMatch =
+              onlyGmaxStationed && Number(s.total_stationed_gmax || 0) > 0
+            return battleMatch || gmaxMatch
+          }
+          const passesTimeGate = (s) => {
+            const active =
+              Number(s.end_time) > ts && Number(s.updated) > activeCutoff
+            if (onlyInactiveStations) {
+              const inactive =
+                Number(s.end_time) <= ts && Number(s.updated) > inactiveCutoff
+              return (active && passesFilterGate(s)) || inactive
+            }
+            return active && passesFilterGate(s)
+          }
+          const stations = res.stations
+            .filter(
+              (s) =>
+                passesTimeGate(s) &&
+                filterRTree(s, areaRestrictions, onlyAreas),
+            )
+            .map((apiStation) => {
+              const station = {
+                ...apiStation,
+                battles: includeBattleData
+                  ? (apiStation.battles || []).map((b) =>
+                      enrichStationBattle(b, pokemonData),
+                    )
+                  : [],
+              }
+              // Mirror the SQL multi-battle tail (Station.js grouped-values map):
+              if (Number(station.end_time) <= ts) {
+                station.battles = []
+                clearStationBattleFallback(station)
+                return finalizeStation(station, pokemonData, ts)
+              }
+              if (!includeUpcoming) {
+                const visible = getVisibleStationBattle(station.battles, ts)
+                station.battles = visible ? [visible] : []
+              }
+              const hasMatchingReturnedBattle = station.battles.some((b) =>
+                matchesStationBattleFilter(b, battleFilterOptions),
+              )
+              if (
+                !onlyAllStations &&
+                shouldRestrictReturnedBattles &&
+                !hasMatchingReturnedBattle &&
+                !onlyGmaxStationed
+              ) {
+                return null
+              }
+              setStationBattleFields(
+                station,
+                getVisibleStationBattle(station.battles, ts),
+              )
+              return finalizeStation(station, pokemonData, ts)
+            })
+            .filter(Boolean)
+          log.info(
+            TAGS.stations,
+            describeDnfNarrowing(
+              'STATION',
+              dnf,
+              res.examined,
+              res.stations.length,
+              stations.length,
+            ),
+          )
+          return stations
+        }
+        log.warn(
+          TAGS.stations,
+          `[STATION] /api/station/scan gave no stations array — ${describeScannerResponse(res)} — falling back to SQL for this source`,
+        )
+      } catch (e) {
+        log.warn(
+          TAGS.stations,
+          `[STATION] /api/station/scan error — falling back to SQL for this source: ${e}`,
+        )
+      }
+    }
 
     if (includeBattleData) {
       select.push(
@@ -979,7 +1151,39 @@ class Station extends Model {
       : result.stationed_pokemon || []
   }
 
-  static async getAvailable({ hasMultiBattles }) {
+  static async getAvailable({ hasMultiBattles, mem, secret, httpAuth }) {
+    // Endpoint source: fetch the aggregate from Golbat; on 503/error fall
+    // through to the SQL below (dual source runs SQL on its bound knex; a
+    // pure-endpoint source's this.query() throws and is dropped upstream).
+    if (mem) {
+      try {
+        const res = await evalScannerQuery(
+          TAGS.stations,
+          `${mem}/api/station/available`,
+          undefined,
+          'GET',
+          secret,
+          httpAuth,
+        )
+        if (res && Array.isArray(res.battles)) {
+          const { available } = mapStationAvailable(res)
+          log.info(
+            TAGS.stations,
+            `[STATION] loaded available from Golbat endpoint ${mem}/api/station/available — ${available.length} filter keys (${res.battles.length} battle options)`,
+          )
+          return { available }
+        }
+        log.warn(
+          TAGS.stations,
+          `[STATION] /api/station/available gave no battles — ${describeScannerResponse(res)} — returning empty available for this endpoint source`,
+        )
+      } catch (e) {
+        log.warn(
+          TAGS.stations,
+          `[STATION] /api/station/available error — returning empty available for this endpoint source: ${e}`,
+        )
+      }
+    }
     /** @type {import('@rm/types').FullStation[]} */
     const ts = getEpoch()
     const { stationUpdateLimit } = config.getSafe('api')
