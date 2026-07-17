@@ -3,16 +3,33 @@
 /* eslint-disable no-continue */
 const { Model, raw } = require('objection')
 const i18next = require('i18next')
+const fs = require('fs')
+const { resolve } = require('path')
+
 const config = require('@rm/config')
+const { log, TAGS } = require('@rm/logger')
 
 const { getAreaSql } = require('../utils/getAreaSql')
-const { applyManualIdFilter } = require('../utils/manualFilter')
+const {
+  applyManualIdFilter,
+  normalizeManualId,
+} = require('../utils/manualFilter')
 const { getUserMidnight } = require('../utils/getClientTime')
+const { fetchJson } = require('../utils/fetchJson')
+const {
+  evalScannerQuery,
+  describeScannerResponse,
+} = require('../utils/evalScannerQuery')
+const { filterRTree } = require('../utils/filterRTree')
+const { mapScanPokestop } = require('./pokestopScanMapper')
+const { buildPokestopDnfFilters } = require('../filters/fort/pokestop')
+const { describeDnfNarrowing } = require('../filters/fort/describeDnfNarrowing')
 const { state } = require('../services/state')
 const {
   isDualQuestLayerMode,
   resolveQuestLayerSelection,
 } = require('../utils/questLayerMode')
+const { mapAvailablePokestops } = require('./pokestopAvailableMapper')
 
 const MEGA_RESOURCE_REWARD_TYPE = 12
 const TEMP_EVO_BRANCH_RESOURCE_REWARD_TYPE = 20
@@ -31,6 +48,57 @@ const applyGoFest2026MewtwoRewardFallback = (
     .andWhere(
       raw(`json_length(json_extract(${rewardsColumn}, "$[0].info")) = 0`),
     )
+
+// Team leaders (41-43) and Giovanni (44) never hand out a catchable rocket
+// Pokemon, so both the confirmed-invasion branch and this config-derived
+// fallback exclude them.
+const ROCKET_LEADER_GRUNT_TYPE_MIN = 41
+const ROCKET_LEADER_GRUNT_TYPE_MAX = 44
+
+/**
+ * Adds config-derived `a${id}-${form}` rocket-encounter fallback keys to
+ * `availableSet`, mirroring the SQL `rocketPokemon` case (originally inline
+ * here, now shared so the SQL path and the `/api/pokestop/available`
+ * endpoint path stay byte-identical). Gated on
+ * `map.misc.fallbackRocketPokemonFiltering` (default `true`,
+ * `config/default.json`).
+ * @param {Set<string>} availableSet
+ */
+const applyRocketPokemonFallback = (availableSet) => {
+  if (!config.getSafe('map.misc.fallbackRocketPokemonFiltering')) return
+  // Always include potential rocket Pokemon from state.event.invasions as backup
+  Object.entries(state.event.invasions).forEach(([gruntType, invasionInfo]) => {
+    if (!invasionInfo) return
+    // Exclude team leaders (41-43) and Giovanni (44)
+    const gruntTypeNum = parseInt(gruntType, 10)
+    if (
+      gruntTypeNum >= ROCKET_LEADER_GRUNT_TYPE_MIN &&
+      gruntTypeNum <= ROCKET_LEADER_GRUNT_TYPE_MAX
+    )
+      return
+
+    // Add all potential first slot rewards
+    if (invasionInfo.firstReward && invasionInfo.encounters.first) {
+      invasionInfo.encounters.first.forEach((poke) => {
+        availableSet.add(`a${poke.id}-${poke.form}`)
+      })
+    }
+
+    // Add all potential second slot rewards
+    if (invasionInfo.secondReward && invasionInfo.encounters.second) {
+      invasionInfo.encounters.second.forEach((poke) => {
+        availableSet.add(`a${poke.id}-${poke.form}`)
+      })
+    }
+
+    // Add all potential third slot rewards
+    if (invasionInfo.thirdReward && invasionInfo.encounters.third) {
+      invasionInfo.encounters.third.forEach((poke) => {
+        availableSet.add(`a${poke.id}-${poke.form}`)
+      })
+    }
+  })
+}
 
 const questProps = {
   quest_type: true,
@@ -140,6 +208,9 @@ class Pokestop extends Model {
       hasLayerColumn,
       hasPowerUp,
       hasConfirmed,
+      mem,
+      secret,
+      httpAuth,
     },
   ) {
     const {
@@ -749,6 +820,101 @@ class Pokestop extends Model {
     } else if (onlyLevels !== 'all' && hasPowerUp) {
       query.andWhere('power_up_level', onlyLevels)
     }
+    // Endpoint-backed source: fetch the DNF-less match-all scan and map each
+    // Golbat row into the mapRDM shape secondaryFilter expects. Mirrors
+    // Gym.getAll — the same secondaryFilter runs for both SQL and endpoint
+    // rows. `with_incidents:true` makes Golbat attach invasions[] (grunts +
+    // showcase/goldstop/kecleon event rows). On any failure/bad-shape we log
+    // and fall through to the SQL block below.
+    if (mem) {
+      try {
+        const dnf = buildPokestopDnfFilters(args.filters, state.event.invasions)
+        const res = await evalScannerQuery(
+          TAGS.pokestops,
+          `${mem}/api/pokestop/scan`,
+          JSON.stringify({
+            min: { latitude: args.minLat, longitude: args.minLon },
+            max: { latitude: args.maxLat, longitude: args.maxLon },
+            limit: queryLimits.pokestops,
+            filters: dnf,
+            with_incidents: true,
+          }),
+          'POST',
+          secret,
+          httpAuth,
+        )
+        if (res && Array.isArray(res.pokestops)) {
+          // Deep-link parity with SQL's `(bbox) OR id = manualId` — see Gym.
+          const manualId = normalizeManualId(args.filters.onlyManualId)
+          if (
+            manualId !== null &&
+            !res.pokestops.some((p) => p && p.id === manualId)
+          ) {
+            try {
+              const one = await evalScannerQuery(
+                TAGS.pokestops,
+                `${mem}/api/pokestop/id/${manualId}`,
+                undefined,
+                'GET',
+                secret,
+                httpAuth,
+              )
+              if (
+                one &&
+                typeof one === 'object' &&
+                'lat' in one &&
+                'lon' in one
+              )
+                res.pokestops.push(one)
+            } catch {
+              // by-id miss mirrors SQL finding no such row
+            }
+          }
+          const mapped = res.pokestops
+            .map(mapScanPokestop)
+            .filter(
+              (stop) => stop && filterRTree(stop, areaRestrictions, onlyAreas),
+            )
+          if (mapped.length > queryLimits.pokestops) {
+            mapped.length = queryLimits.pokestops
+          }
+          const final = this.secondaryFilter(
+            mapped,
+            args.filters,
+            false,
+            ts,
+            midnight,
+            perms,
+            hasMultiInvasions,
+            hasConfirmed,
+            effectiveOnlyArEligible,
+            effectiveQuestLayer,
+          )
+          log.info(
+            TAGS.pokestops,
+            describeDnfNarrowing(
+              'POKESTOP',
+              dnf,
+              res.examined,
+              res.pokestops.length,
+              final.length,
+            ),
+          )
+          return final
+        }
+        log.warn(
+          TAGS.pokestops,
+          `[POKESTOP] /api/pokestop/scan gave no pokestops array — ${describeScannerResponse(
+            res,
+          )} — falling back to SQL for this source`,
+        )
+      } catch (e) {
+        log.warn(
+          TAGS.pokestops,
+          `[POKESTOP] /api/pokestop/scan error — falling back to SQL for this source: ${e}`,
+        )
+      }
+    }
     const results = await query
 
     const normalized = isMad
@@ -1246,6 +1412,65 @@ class Pokestop extends Model {
   }
 
   /**
+   * Mirrors `Pokemon.evalQuery`: fetches a Golbat scanner endpoint (when
+   * `mem` is set) with secret/httpAuth header handling, or evaluates a
+   * knex query builder / raw query directly otherwise. Pokestop currently
+   * only calls this with the `mem` branch (`/api/pokestop/available`), but
+   * keeps the same shape as Pokemon's for any future Golbat migrations of
+   * this model (see Phase 2 follow-up: `getPokestops`).
+   * @template T
+   * @param {string} mem
+   * @param {string | import("objection").QueryBuilder<Pokestop>} query
+   * @param {'GET' | 'POST' | 'PATCH' | 'DELETE'} method
+   * @param {string} secret
+   * @param {{ username: string, password: string } | null} httpAuth
+   * @returns {Promise<T>}
+   */
+  static async evalQuery(
+    mem,
+    query,
+    method = 'POST',
+    secret = '',
+    httpAuth = null,
+  ) {
+    if (config.getSafe('devOptions.queryDebug')) {
+      if (!fs.existsSync(resolve(__dirname, './queries'))) {
+        fs.mkdirSync(resolve(__dirname, './queries'), { recursive: true })
+      }
+      if (mem && typeof query === 'string') {
+        fs.writeFileSync(
+          resolve(__dirname, './queries', `${Date.now()}.json`),
+          query,
+        )
+      } else if (typeof query === 'object') {
+        fs.writeFileSync(
+          resolve(__dirname, './queries', `${Date.now()}.sql`),
+          query.toKnexQuery().toString(),
+        )
+      }
+    }
+    const results = await (mem
+      ? fetchJson(mem, {
+          method,
+          headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json',
+            // Support both secret-based and HTTP authentication
+            ...(secret ? { 'X-Golbat-Secret': secret } : {}),
+            ...(httpAuth
+              ? {
+                  Authorization: `Basic ${Buffer.from(`${httpAuth.username}:${httpAuth.password}`).toString('base64')}`,
+                }
+              : {}),
+          },
+          body: query,
+        })
+      : query)
+    log.debug(TAGS.pokestops, 'raw result length', results?.length || 0)
+    return results || []
+  }
+
+  /**
    *
    * @param {import("@rm/types").DbContext} param0
    * @returns
@@ -1261,7 +1486,61 @@ class Pokestop extends Model {
     hasShowcaseData,
     hasShowcaseForm,
     hasShowcaseType,
+    mem,
+    secret,
+    httpAuth,
   }) {
+    // A source with a Golbat endpoint (mem truthy) fetches the available list
+    // from the endpoint. On failure (503 when fort_in_memory is off, or a
+    // network error) it falls through to the SQL block below: a DUAL source
+    // (endpoint + DB) runs the SQL fallback on its bound knex, while a
+    // pure-endpoint source has no bound knex, so this.query() throws and the
+    // caller's Promise.allSettled drops it (contributing nothing). The SQL
+    // block also serves mem:'' (DB / MAD) sources directly.
+    if (mem) {
+      try {
+        const res = await this.evalQuery(
+          `${mem}/api/pokestop/available`,
+          undefined,
+          'GET',
+          secret,
+          httpAuth,
+        )
+        // fetchJson returns a node-fetch Response object on a non-2xx
+        // response (e.g. 503 when FortInMemory is off) and evalQuery
+        // normalizes a network/timeout error to `[]` -- neither shape has
+        // a `.quests`/`.invasions` array.
+        if (res && Array.isArray(res.quests) && Array.isArray(res.invasions)) {
+          // The Golbat endpoint always returns both AR (`with_ar:true`) and
+          // non-AR quest tuples; honor `map.misc.questLayerMode` the same way
+          // the SQL path does so we don't advertise filters for a hidden layer.
+          const questLayer = resolveQuestLayerSelection('both', {
+            hasAltQuests: true,
+          })
+          const result = mapAvailablePokestops(res, {
+            invasions: state.event.invasions,
+            includeBaseQuests: questLayer !== 'without_ar',
+            includeAltQuests: questLayer !== 'with_ar',
+          })
+          const availableSet = new Set(result.available)
+          applyRocketPokemonFallback(availableSet)
+          log.info(
+            TAGS.pokestops,
+            `[POKESTOP] loaded available from Golbat endpoint ${mem}/api/pokestop/available — ${availableSet.size} filter keys (${res.quests.length} quests, ${res.invasions.length} invasions, ${(res.lures || []).length} lures, ${(res.showcases || []).length} showcases), ${Object.keys(result.conditions).length} reward conditions`,
+          )
+          return { available: [...availableSet], conditions: result.conditions }
+        }
+        log.warn(
+          TAGS.pokestops,
+          '[POKESTOP] /api/pokestop/available unavailable (e.g. fort_in_memory off) — returning empty available for this endpoint source',
+        )
+      } catch (e) {
+        log.warn(
+          TAGS.pokestops,
+          `[POKESTOP] /api/pokestop/available error — returning empty available for this endpoint source: ${e}`,
+        )
+      }
+    }
     const ts = Math.floor(Date.now() / 1000)
     const finalList = new Set()
     const conditions = {}
@@ -1865,41 +2144,7 @@ class Pokestop extends Model {
             })
           }
 
-          if (config.getSafe('map.misc.fallbackRocketPokemonFiltering')) {
-            // Always include potential rocket Pokemon from state.event.invasions as backup
-            Object.entries(state.event.invasions).forEach(
-              ([gruntType, invasionInfo]) => {
-                if (!invasionInfo) return
-                // Exclude team leaders (41-43) and Giovanni (44)
-                const gruntTypeNum = parseInt(gruntType, 10)
-                if (gruntTypeNum >= 41 && gruntTypeNum <= 44) return
-
-                // Add all potential first slot rewards
-                if (invasionInfo.firstReward && invasionInfo.encounters.first) {
-                  invasionInfo.encounters.first.forEach((poke) => {
-                    finalList.add(`a${poke.id}-${poke.form}`)
-                  })
-                }
-
-                // Add all potential second slot rewards
-                if (
-                  invasionInfo.secondReward &&
-                  invasionInfo.encounters.second
-                ) {
-                  invasionInfo.encounters.second.forEach((poke) => {
-                    finalList.add(`a${poke.id}-${poke.form}`)
-                  })
-                }
-
-                // Add all potential third slot rewards
-                if (invasionInfo.thirdReward && invasionInfo.encounters.third) {
-                  invasionInfo.encounters.third.forEach((poke) => {
-                    finalList.add(`a${poke.id}-${poke.form}`)
-                  })
-                }
-              },
-            )
-          }
+          applyRocketPokemonFallback(finalList)
           break
         case 'showcase':
           if (hasShowcaseData) {
@@ -1939,7 +2184,10 @@ class Pokestop extends Model {
 
   static parseRdmRewards = (quest) => {
     if (quest.quest_reward_type) {
-      const rewards = JSON.parse(quest.quest_rewards)
+      const rewards =
+        typeof quest.quest_rewards === 'string'
+          ? JSON.parse(quest.quest_rewards)
+          : quest.quest_rewards
       let { info } = rewards[0]
       if (
         quest.quest_reward_type === TEMP_EVO_BRANCH_RESOURCE_REWARD_TYPE &&
@@ -2368,7 +2616,27 @@ class Pokestop extends Model {
       : results
   }
 
-  static getOne(id, { isMad }) {
+  static async getOne(id, { isMad, mem, secret, httpAuth }) {
+    if (mem) {
+      try {
+        const res = await evalScannerQuery(
+          TAGS.pokestops,
+          `${mem}/api/pokestop/id/${id}`,
+          undefined,
+          'GET',
+          secret,
+          httpAuth,
+        )
+        if (res && typeof res === 'object' && 'lat' in res && 'lon' in res) {
+          return res
+        }
+      } catch (e) {
+        log.warn(
+          TAGS.pokestops,
+          `[POKESTOP] /api/pokestop/id error — falling back to SQL: ${e}`,
+        )
+      }
+    }
     return this.query()
       .select([
         isMad ? 'latitude AS lat' : 'lat',
