@@ -829,6 +829,15 @@ class Pokestop extends Model {
     if (mem) {
       try {
         const dnf = buildPokestopDnfFilters(args.filters, state.event.invasions)
+        // Endpoint rows always carry BOTH quest layers, so resolve the layer
+        // selection as dual-capable (mirrors getAvailable's override). The SQL
+        // ctx flags are undefined for a pure-endpoint source, which would make
+        // effectiveQuestLayer resolve to 'both' even when questLayerMode
+        // restricts to a single layer.
+        const memQuestLayer = resolveQuestLayerSelection(
+          args.filters.onlyShowQuestSet,
+          { hasAltQuests: true },
+        )
         const res = await evalScannerQuery(
           TAGS.pokestops,
           `${mem}/api/pokestop/scan`,
@@ -888,7 +897,7 @@ class Pokestop extends Model {
             hasMultiInvasions,
             hasConfirmed,
             effectiveOnlyArEligible,
-            effectiveQuestLayer,
+            memQuestLayer,
           )
           log.info(
             TAGS.pokestops,

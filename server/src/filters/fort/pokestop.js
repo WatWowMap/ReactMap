@@ -284,10 +284,13 @@ function buildPokestopDnfFilters(filters, eventInvasions) {
     }
     if (incidentCharacter.size)
       clauses.push({ incident_character: [...incidentCharacter] })
-    if (incidentDisplayType.length)
-      clauses.push({ incident_display_type: incidentDisplayType })
   }
   if (onlyEventStops) {
+    // `b<display_type>` keys (goldstop/kecleon/showcase incidents) are consumed
+    // by secondaryFilter's EVENTS branch (gated on onlyEventStops), not the
+    // invasions branch — grunt-less incidents never match invasionMatchesFilters.
+    if (incidentDisplayType.length)
+      clauses.push({ incident_display_type: incidentDisplayType })
     if (contestPokemon.length) clauses.push({ contest_pokemon: contestPokemon })
     if (contestPokemonType.length)
       clauses.push({ contest_pokemon_type: contestPokemonType })
