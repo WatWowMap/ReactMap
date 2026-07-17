@@ -1141,15 +1141,41 @@ class Station extends Model {
    * @returns {Promise<import('@rm/types').StationPokemon[]>}
    */
   // eslint-disable-next-line no-unused-vars
-  static async getDynamaxMons(id, _ctx) {
-    /** @type {import('@rm/types').FullStation} */
-    const result = await this.query().findById(id).select('stationed_pokemon')
-    if (!result) {
-      return []
+  static async getDynamaxMons(id, ctx = {}) {
+    const { mem, secret, httpAuth } = ctx
+    let stationedPokemon
+    if (mem) {
+      // Endpoint source: the whole-record by-id response carries
+      // stationed_pokemon, so a pure-endpoint station source (unbound model,
+      // where this.query() would throw) can still serve the dynamax popup.
+      const one = await evalScannerQuery(
+        TAGS.stations,
+        `${mem}/api/station/id/${id}`,
+        undefined,
+        'GET',
+        secret,
+        httpAuth,
+      ).catch(() => null)
+      if (one && typeof one === 'object') {
+        stationedPokemon = one.stationed_pokemon
+      }
     }
-    return typeof result.stationed_pokemon === 'string'
-      ? JSON.parse(result.stationed_pokemon)
-      : result.stationed_pokemon || []
+    if (stationedPokemon === undefined) {
+      // SQL (dual source or SQL-only). A pure-endpoint source whose fetch
+      // failed has no bound knex, so this.query() throws -> empty list.
+      try {
+        /** @type {import('@rm/types').FullStation} */
+        const result = await this.query()
+          .findById(id)
+          .select('stationed_pokemon')
+        stationedPokemon = result?.stationed_pokemon
+      } catch {
+        return []
+      }
+    }
+    return typeof stationedPokemon === 'string'
+      ? JSON.parse(stationedPokemon)
+      : stationedPokemon || []
   }
 
   static async getAvailable({ hasMultiBattles, mem, secret, httpAuth }) {

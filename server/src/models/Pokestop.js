@@ -880,11 +880,22 @@ class Pokestop extends Model {
               // by-id miss mirrors SQL finding no such row
             }
           }
-          const mapped = res.pokestops
-            .map(mapScanPokestop)
-            .filter(
-              (stop) => stop && filterRTree(stop, areaRestrictions, onlyAreas),
-            )
+          const mapped = res.pokestops.map(mapScanPokestop).filter(
+            (stop) =>
+              stop &&
+              // Mirror the SQL-only gates: the endpoint path never applied
+              // them and secondaryFilter has no equivalent, so stale/wrong
+              // stops would render where the SQL source suppresses them.
+              // Freshness (hideOldPokestops):
+              (!hideOldPokestops ||
+                stop.updated > ts - stopValidDataLimit * 86400) &&
+              // Power-up level (onlyLevels): power-ups are out of the game
+              // (also why power_up_level is dropped from the DNF); the gate is
+              // vestigial but mirrored for exact endpoint↔SQL parity.
+              (onlyLevels === 'all' ||
+                Number(stop.power_up_level) === Number(onlyLevels)) &&
+              filterRTree(stop, areaRestrictions, onlyAreas),
+          )
           if (mapped.length > queryLimits.pokestops) {
             mapped.length = queryLimits.pokestops
           }
