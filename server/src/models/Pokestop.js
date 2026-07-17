@@ -22,6 +22,7 @@ const {
 } = require('../utils/evalScannerQuery')
 const { filterRTree } = require('../utils/filterRTree')
 const { mapScanPokestop } = require('./pokestopScanMapper')
+const { getCombinedFortAvailable } = require('../utils/fortAvailable')
 const { buildPokestopDnfFilters } = require('../filters/fort/pokestop')
 const { describeDnfNarrowing } = require('../filters/fort/describeDnfNarrowing')
 const { state } = require('../services/state')
@@ -1508,13 +1509,22 @@ class Pokestop extends Model {
     // block also serves mem:'' (DB / MAD) sources directly.
     if (mem) {
       try {
-        const res = await this.evalQuery(
-          `${mem}/api/pokestop/available`,
-          undefined,
-          'GET',
+        // Combined-first, per-type fallback — see Gym.getAvailable.
+        const combined = await getCombinedFortAvailable(
+          TAGS.pokestops,
+          mem,
           secret,
           httpAuth,
         )
+        const res =
+          combined?.pokestops ??
+          (await this.evalQuery(
+            `${mem}/api/pokestop/available`,
+            undefined,
+            'GET',
+            secret,
+            httpAuth,
+          ))
         // fetchJson returns a node-fetch Response object on a non-2xx
         // response (e.g. 503 when FortInMemory is off) and evalQuery
         // normalizes a network/timeout error to `[]` -- neither shape has

@@ -116,15 +116,15 @@ router.put('/:category', async (req, res) => {
       queryObj[resolveCategory(req.params.category)] || {}
 
     if (model && category) {
-      await state.event.setAvailable(category, model, state.db)
+      await state.event.setAvailable(category, model, state.db, true)
     } else {
       await Promise.all([
-        state.event.setAvailable('pokemon', 'Pokemon', state.db),
-        state.event.setAvailable('pokestops', 'Pokestop', state.db),
-        state.event.setAvailable('gyms', 'Gym', state.db),
-        state.event.setAvailable('nests', 'Nest', state.db),
-        state.event.setAvailable('stations', 'Station', state.db),
-        state.event.setAvailable('tappables', 'Tappable', state.db),
+        state.event.setAvailable('pokemon', 'Pokemon', state.db, true),
+        state.event.setAvailable('pokestops', 'Pokestop', state.db, true),
+        state.event.setAvailable('gyms', 'Gym', state.db, true),
+        state.event.setAvailable('nests', 'Nest', state.db, true),
+        state.event.setAvailable('stations', 'Station', state.db, true),
+        state.event.setAvailable('tappables', 'Tappable', state.db, true),
       ])
     }
     res

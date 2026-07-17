@@ -18,6 +18,7 @@ const {
   describeScannerResponse,
 } = require('../utils/evalScannerQuery')
 const { filterRTree } = require('../utils/filterRTree')
+const { getCombinedFortAvailable } = require('../utils/fortAvailable')
 const { buildStationDnfFilters } = require('../filters/fort/station')
 const { describeDnfNarrowing } = require('../filters/fort/describeDnfNarrowing')
 const { mapStationAvailable } = require('./stationAvailableMapper')
@@ -1157,14 +1158,23 @@ class Station extends Model {
     // pure-endpoint source's this.query() throws and is dropped upstream).
     if (mem) {
       try {
-        const res = await evalScannerQuery(
+        // Combined-first, per-type fallback — see Gym.getAvailable.
+        const combined = await getCombinedFortAvailable(
           TAGS.stations,
-          `${mem}/api/station/available`,
-          undefined,
-          'GET',
+          mem,
           secret,
           httpAuth,
         )
+        const res =
+          combined?.stations ??
+          (await evalScannerQuery(
+            TAGS.stations,
+            `${mem}/api/station/available`,
+            undefined,
+            'GET',
+            secret,
+            httpAuth,
+          ))
         if (res && Array.isArray(res.battles)) {
           const { available } = mapStationAvailable(res)
           log.info(

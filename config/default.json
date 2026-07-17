@@ -59,6 +59,7 @@
       "historicalRarity": 6,
       "stations": 0.05
     },
+    "availableRefreshSeconds": 60,
     "queryOnSessionInit": {
       "pokemon": false,
       "quests": false,

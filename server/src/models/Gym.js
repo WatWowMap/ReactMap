@@ -20,6 +20,7 @@ const {
   describeScannerResponse,
 } = require('../utils/evalScannerQuery')
 const { filterRTree } = require('../utils/filterRTree')
+const { getCombinedFortAvailable } = require('../utils/fortAvailable')
 const { buildGymDnfFilters } = require('../filters/fort/gym')
 const { describeDnfNarrowing } = require('../filters/fort/describeDnfNarrowing')
 const { mapGymAvailable } = require('./gymAvailableMapper')
@@ -624,14 +625,25 @@ class Gym extends Model {
     // pure-endpoint source's this.query() throws and is dropped upstream).
     if (mem) {
       try {
-        const res = await evalScannerQuery(
+        // One combined /api/fort/available per endpoint serves all three fort
+        // models' refresh batch; falls back to the per-type endpoint when the
+        // combined one is unavailable (older Golbat).
+        const combined = await getCombinedFortAvailable(
           TAGS.gyms,
-          `${mem}/api/gym/available`,
-          undefined,
-          'GET',
+          mem,
           secret,
           httpAuth,
         )
+        const res =
+          combined?.gyms ??
+          (await evalScannerQuery(
+            TAGS.gyms,
+            `${mem}/api/gym/available`,
+            undefined,
+            'GET',
+            secret,
+            httpAuth,
+          ))
         if (res && Array.isArray(res.teams) && Array.isArray(res.raids)) {
           const { available } = mapGymAvailable(res)
           log.info(
