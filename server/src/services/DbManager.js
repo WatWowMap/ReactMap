@@ -89,7 +89,13 @@ class DbManager extends Logger {
         })
         if ('endpoint' in schema) {
           this.endpoints[i] = schema
-          return null
+          // Pure-endpoint source (no DB creds): no knex connection. A dual
+          // source (endpoint + host/…) registers the endpoint AND falls
+          // through to build knex below, so migrated queries use the endpoint
+          // while un-migrated ones fall back to the bound DB.
+          if (!('host' in schema)) {
+            return null
+          }
         }
         const { log } = new Logger('knex', schema.database)
         return knex({
@@ -272,6 +278,16 @@ class DbManager extends Logger {
                 httpAuth: this.endpoints[i].httpAuth,
                 pvpV2: true,
               }
+
+          // Dual source (endpoint + DB): schemaCheck ran on the bound knex
+          // (giving isMad + has* flags) but returns mem:''/secret:''. Overlay
+          // the endpoint AFTER so migrated queries (getAvailable) use it while
+          // un-migrated ones fall back to this.query() on the bound DB.
+          if (schema && this.endpoints[i]) {
+            schemaContext.mem = this.endpoints[i].endpoint
+            schemaContext.secret = this.endpoints[i].secret
+            schemaContext.httpAuth = this.endpoints[i].httpAuth
+          }
 
           Object.entries(this.models).forEach(([category, sources]) => {
             if (Array.isArray(sources)) {
