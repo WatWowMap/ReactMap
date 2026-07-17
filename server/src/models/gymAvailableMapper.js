@@ -1,21 +1,15 @@
 // @ts-check
 
 /**
- * Pure mapper for Golbat's `GET /api/gym/available` response. Reproduces the
- * key output of the SQL `Gym.getAvailable` (t/g/e/r + boss `<id>-<form>`).
+ * Pure mapper for Golbat's gym availability. Reproduces the dynamic raid keys
+ * of the SQL `Gym.getAvailable` (e/r + boss `<id>-<form>`); team/slot (t/g)
+ * keys are generated statically by buildGyms, so Golbat no longer returns them.
  * Dependency-free so it can run under plain node for golden checks.
- * @param {{ teams?: {team_id:number,available_slots:number,count:number}[], raids?: {raid_level:number,pokemon_id:number,form:number,count:number}[] }} api
+ * @param {{ raids?: {raid_level:number,pokemon_id:number,form:number,count:number}[] }} api
  * @returns {{ available: string[] }}
  */
 function mapGymAvailable(api) {
   const available = new Set()
-
-  const teams = api.teams || []
-  teams.forEach((t) => {
-    if (t.team_id === null || t.available_slots === null) return
-    available.add(`t${t.team_id}-0`)
-    available.add(`g${t.team_id}-${6 - t.available_slots}`)
-  })
 
   const raids = api.raids || []
   const raidLevels = new Set()

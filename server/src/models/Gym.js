@@ -639,11 +639,11 @@ class Gym extends Model {
           httpAuth,
         )
         const res = combined?.gyms
-        if (res && Array.isArray(res.teams) && Array.isArray(res.raids)) {
+        if (res && Array.isArray(res.raids)) {
           const { available } = mapGymAvailable(res)
           log.info(
             TAGS.gyms,
-            `[GYM] loaded available from ${mem}/api/fort/available — ${available.length} filter keys (${res.teams.length} team/slot, ${res.raids.length} raid options)`,
+            `[GYM] loaded available from ${mem}/api/fort/available — ${available.length} filter keys (${res.raids.length} raid options)`,
           )
           return { available }
         }
