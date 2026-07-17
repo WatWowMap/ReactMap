@@ -5,12 +5,24 @@ const { Model, raw } = require('objection')
 const i18next = require('i18next')
 
 const config = require('@rm/config')
+const { log, TAGS } = require('@rm/logger')
 
 const { getAreaSql } = require('../utils/getAreaSql')
 const { state } = require('../services/state')
 
-const { applyManualIdFilter } = require('../utils/manualFilter')
+const {
+  applyManualIdFilter,
+  normalizeManualId,
+} = require('../utils/manualFilter')
 const { isDualQuestLayerMode } = require('../utils/questLayerMode')
+const {
+  evalScannerQuery,
+  describeScannerResponse,
+} = require('../utils/evalScannerQuery')
+const { filterRTree } = require('../utils/filterRTree')
+const { buildGymDnfFilters } = require('../filters/fort/gym')
+const { describeDnfNarrowing } = require('../filters/fort/describeDnfNarrowing')
+const { mapGymAvailable } = require('./gymAvailableMapper')
 
 const coreFields = [
   'id',
@@ -111,7 +123,12 @@ class Gym extends Model {
     }
   }
 
-  static async getAll(perms, args, { isMad, availableSlotsCol }, userId) {
+  static async getAll(
+    perms,
+    args,
+    { isMad, availableSlotsCol, mem, secret, httpAuth },
+    userId,
+  ) {
     const {
       gyms: gymPerms,
       raids: raidPerms,
@@ -508,10 +525,132 @@ class Gym extends Model {
       })
       return filteredResults
     }
+
+    if (mem) {
+      try {
+        // /api/gym/scan returns an envelope { gyms, examined, skipped, total },
+        // not a bare array — the matching gyms are on res.gyms.
+        const dnf = buildGymDnfFilters(args.filters)
+        const res = await evalScannerQuery(
+          TAGS.gyms,
+          `${mem}/api/gym/scan`,
+          JSON.stringify({
+            min: { latitude: args.minLat, longitude: args.minLon },
+            max: { latitude: args.maxLat, longitude: args.maxLon },
+            limit: queryLimits.gyms,
+            filters: dnf,
+          }),
+          'POST',
+          secret,
+          httpAuth,
+        )
+        if (res && Array.isArray(res.gyms)) {
+          // Deep-link parity with SQL's `(bbox) OR id = manualId`: an
+          // off-viewport manually-selected gym joins the candidate set via the
+          // by-id endpoint; every later gate (active/area/secondaryFilter)
+          // still runs, exactly as it does for the SQL OR.
+          const manualId = normalizeManualId(args.filters.onlyManualId)
+          if (
+            manualId !== null &&
+            !res.gyms.some((g) => g && g.id === manualId)
+          ) {
+            try {
+              const one = await evalScannerQuery(
+                TAGS.gyms,
+                `${mem}/api/gym/id/${manualId}`,
+                undefined,
+                'GET',
+                secret,
+                httpAuth,
+              )
+              if (
+                one &&
+                typeof one === 'object' &&
+                'lat' in one &&
+                'lon' in one
+              )
+                res.gyms.push(one)
+            } catch {
+              // by-id miss mirrors SQL finding no such row
+            }
+          }
+          const active = res.gyms.filter(
+            (gym) =>
+              gym.enabled &&
+              !gym.deleted &&
+              (!hideOldGyms || gym.updated > ts - gymValidDataLimit * 86400) &&
+              (!onlyAllGyms ||
+                !onlyLevels ||
+                onlyLevels === 'all' ||
+                gym.power_up_level === Number(onlyLevels)) &&
+              filterRTree(gym, areaRestrictions, onlyAreas),
+          )
+          const final = secondaryFilter(active)
+          log.info(
+            TAGS.gyms,
+            describeDnfNarrowing(
+              'GYM',
+              dnf,
+              res.examined,
+              res.gyms.length,
+              final.length,
+            ),
+          )
+          return final
+        }
+        log.warn(
+          TAGS.gyms,
+          `[GYM] /api/gym/scan gave no gyms array — ${describeScannerResponse(res)} — falling back to SQL for this source`,
+        )
+      } catch (e) {
+        log.warn(
+          TAGS.gyms,
+          `[GYM] /api/gym/scan error — falling back to SQL for this source: ${e}`,
+        )
+      }
+    }
     return secondaryFilter(await query.limit(queryLimits.gyms))
   }
 
-  static async getAvailable({ isMad, availableSlotsCol }) {
+  static async getAvailable({
+    isMad,
+    availableSlotsCol,
+    mem,
+    secret,
+    httpAuth,
+  }) {
+    // Endpoint source: fetch the aggregate from Golbat; on 503/error fall
+    // through to the SQL below (dual source runs SQL on its bound knex; a
+    // pure-endpoint source's this.query() throws and is dropped upstream).
+    if (mem) {
+      try {
+        const res = await evalScannerQuery(
+          TAGS.gyms,
+          `${mem}/api/gym/available`,
+          undefined,
+          'GET',
+          secret,
+          httpAuth,
+        )
+        if (res && Array.isArray(res.teams) && Array.isArray(res.raids)) {
+          const { available } = mapGymAvailable(res)
+          log.info(
+            TAGS.gyms,
+            `[GYM] loaded available from Golbat endpoint ${mem}/api/gym/available — ${available.length} filter keys (${res.teams.length} team/slot, ${res.raids.length} raid options)`,
+          )
+          return { available }
+        }
+        log.warn(
+          TAGS.gyms,
+          `[GYM] /api/gym/available gave no teams/raids — ${describeScannerResponse(res)} — returning empty available for this endpoint source`,
+        )
+      } catch (e) {
+        log.warn(
+          TAGS.gyms,
+          `[GYM] /api/gym/available error — returning empty available for this endpoint source: ${e}`,
+        )
+      }
+    }
     const ts = Math.floor(Date.now() / 1000)
     const results = await this.query()
       .select([
@@ -695,7 +834,27 @@ class Gym extends Model {
       .reverse()
   }
 
-  static getOne(id, { isMad }) {
+  static async getOne(id, { isMad, mem, secret, httpAuth }) {
+    if (mem) {
+      try {
+        const res = await evalScannerQuery(
+          TAGS.gyms,
+          `${mem}/api/gym/id/${id}`,
+          undefined,
+          'GET',
+          secret,
+          httpAuth,
+        )
+        if (res && typeof res === 'object' && 'lat' in res && 'lon' in res) {
+          return res
+        }
+      } catch (e) {
+        log.warn(
+          TAGS.gyms,
+          `[GYM] /api/gym/id error — falling back to SQL: ${e}`,
+        )
+      }
+    }
     return this.query()
       .select([
         isMad ? 'latitude AS lat' : 'lat',
