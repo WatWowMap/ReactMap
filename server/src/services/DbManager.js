@@ -277,6 +277,12 @@ class DbManager extends Logger {
                 secret: this.endpoints[i].secret,
                 httpAuth: this.endpoints[i].httpAuth,
                 pvpV2: true,
+                // No DB schema check runs for a pure-endpoint source, but the
+                // Golbat scan always returns confirmed incident data (confirmed
+                // flag + lineup slots), so it IS confirmed-capable. Without this,
+                // onlyConfirmed is ineffective and confirmed `a` reward filters
+                // fall back to the grunt's possible-encounter pool.
+                hasConfirmed: true,
               }
 
           // Dual source (endpoint + DB): schemaCheck ran on the bound knex
@@ -349,7 +355,11 @@ class DbManager extends Logger {
     try {
       const results = await Promise.all(
         (this.models.Pokemon ?? []).map(async (source) =>
-          source.isMad || source.mem
+          // Skip MAD (no pokemon_stats) and pure-endpoint sources (no bound
+          // knex to query). A dual source (endpoint + DB) keeps its knex, so it
+          // still serves historical rarity — testing source.mem alone would
+          // wrongly drop it and clear the rarity map on refresh.
+          source.isMad || !this.connections[source.connection]
             ? []
             : source.SubModel.query()
                 .select('pokemon_id', raw('SUM(count) as total'))
@@ -518,11 +528,18 @@ class DbManager extends Logger {
    * @returns {Promise<T | {}>}
    */
   async getOne(model, id) {
-    const data = await Promise.all(
+    // allSettled, not all: a pure-endpoint source whose by-id fetch misses
+    // falls through to this.query() on an unbound model, which throws. With
+    // Promise.all that one rejection would fail the whole single-fort lookup;
+    // here it just contributes no match.
+    const settled = await Promise.allSettled(
       this.models[model].map(async ({ SubModel, ...source }) =>
         SubModel.getOne(id, source),
       ),
     )
+    const data = settled
+      .filter((r) => r.status === 'fulfilled')
+      .map((r) => r.value)
     const cleaned = DbManager.deDupeResults(data.filter(Boolean))
     return cleaned || {}
   }
