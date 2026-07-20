@@ -7,7 +7,7 @@ const i18next = require('i18next')
 const config = require('@rm/config')
 const { log, TAGS } = require('@rm/logger')
 
-const { getAreaSql } = require('../utils/getAreaSql')
+const { getAreaSql, areaRestrictionsDenyAll } = require('../utils/getAreaSql')
 const { state } = require('../services/state')
 
 const {
@@ -529,6 +529,10 @@ class Gym extends Model {
     }
 
     if (mem) {
+      // filterRTree below allow-alls on empty area inputs, unlike the SQL
+      // getAreaSql — so enforce the strict-area denial before accepting any
+      // endpoint rows (else a no-area user under strict mode sees everything).
+      if (areaRestrictionsDenyAll(areaRestrictions, onlyAreas)) return []
       try {
         // /api/gym/scan returns an envelope { gyms, examined, skipped, total },
         // not a bare array — the matching gyms are on res.gyms.
