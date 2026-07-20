@@ -28,6 +28,10 @@
  * @property {boolean} confirmed
  * @property {number} slot1_pokemon_id
  * @property {number} slot1_form
+ * @property {number} slot2_pokemon_id
+ * @property {number} slot2_form
+ * @property {number} slot3_pokemon_id
+ * @property {number} slot3_form
  * @property {number} count
  *
  * @typedef {object} AvailablePokestopLure
@@ -173,18 +177,33 @@ function mapAvailablePokestops(api, ctx) {
   // mirrors the `invasions` and `rocketPokemon` SQL branches.
   const invasions = api.invasions || []
   invasions.forEach((invasion) => {
-    const { character, display_type, confirmed, slot1_pokemon_id, slot1_form } =
-      invasion
+    const {
+      character,
+      display_type,
+      confirmed,
+      slot1_pokemon_id,
+      slot1_form,
+      slot2_pokemon_id,
+      slot2_form,
+      slot3_pokemon_id,
+      slot3_form,
+    } = invasion
     available.add(character > 0 ? `i${character}` : `b${display_type}`)
 
     const isRocketLeaderOrGiovanni = character >= 41 && character <= 44
-    if (
-      confirmed &&
-      slot1_pokemon_id > 0 &&
-      !isRocketLeaderOrGiovanni &&
-      ctx.invasions?.[character]?.firstReward
-    ) {
-      available.add(`a${slot1_pokemon_id}-${slot1_form}`)
+    if (confirmed && !isRocketLeaderOrGiovanni) {
+      // Each slot the event config marks as a reward contributes an `a` key,
+      // mirroring the SQL path which reads confirmed slots 1/2/3.
+      const cfg = ctx.invasions?.[character]
+      if (slot1_pokemon_id > 0 && cfg?.firstReward) {
+        available.add(`a${slot1_pokemon_id}-${slot1_form}`)
+      }
+      if (slot2_pokemon_id > 0 && cfg?.secondReward) {
+        available.add(`a${slot2_pokemon_id}-${slot2_form}`)
+      }
+      if (slot3_pokemon_id > 0 && cfg?.thirdReward) {
+        available.add(`a${slot3_pokemon_id}-${slot3_form}`)
+      }
     }
   })
 
