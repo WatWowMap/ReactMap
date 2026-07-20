@@ -642,12 +642,12 @@ class Gym extends Model {
         }
         log.warn(
           TAGS.gyms,
-          `[GYM] combined /api/fort/available had no gyms section — returning empty available for this endpoint source`,
+          `[GYM] combined /api/fort/available had no gyms section — falling through to SQL (empty only for a pure-endpoint source)`,
         )
       } catch (e) {
         log.warn(
           TAGS.gyms,
-          `[GYM] /api/fort/available error — returning empty available for this endpoint source: ${e}`,
+          `[GYM] /api/fort/available error — falling through to SQL (empty only for a pure-endpoint source): ${e}`,
         )
       }
     }

@@ -1196,12 +1196,12 @@ class Station extends Model {
         }
         log.warn(
           TAGS.stations,
-          `[STATION] /api/fort/available gave no battles — ${describeScannerResponse(res)} — returning empty available for this endpoint source`,
+          `[STATION] /api/fort/available gave no battles — ${describeScannerResponse(res)} — falling through to SQL (empty only for a pure-endpoint source)`,
         )
       } catch (e) {
         log.warn(
           TAGS.stations,
-          `[STATION] /api/fort/available error — returning empty available for this endpoint source: ${e}`,
+          `[STATION] /api/fort/available error — falling through to SQL (empty only for a pure-endpoint source): ${e}`,
         )
       }
     }

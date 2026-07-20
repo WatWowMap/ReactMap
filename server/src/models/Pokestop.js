@@ -1485,12 +1485,12 @@ class Pokestop extends Model {
         }
         log.warn(
           TAGS.pokestops,
-          '[POKESTOP] /api/fort/available unavailable (e.g. fort_in_memory off) — returning empty available for this endpoint source',
+          '[POKESTOP] /api/fort/available unavailable (e.g. fort_in_memory off) — falling through to SQL (empty only for a pure-endpoint source)',
         )
       } catch (e) {
         log.warn(
           TAGS.pokestops,
-          `[POKESTOP] /api/fort/available error — returning empty available for this endpoint source: ${e}`,
+          `[POKESTOP] /api/fort/available error — falling through to SQL (empty only for a pure-endpoint source): ${e}`,
         )
       }
     }
@@ -2141,6 +2141,9 @@ class Pokestop extends Model {
         typeof quest.quest_rewards === 'string'
           ? JSON.parse(quest.quest_rewards)
           : quest.quest_rewards
+      // Defensive: a malformed endpoint row could carry quest_reward_type with
+      // no rewards array; don't let one bad stop throw and break the whole query.
+      if (!Array.isArray(rewards) || rewards.length === 0) return quest
       let { info } = rewards[0]
       if (
         quest.quest_reward_type === TEMP_EVO_BRANCH_RESOURCE_REWARD_TYPE &&
