@@ -81,6 +81,7 @@ const resolvers = {
           x.startsWith('c') ||
           x.startsWith('d') ||
           x.startsWith('p') ||
+          x.startsWith('u') ||
           Number.isInteger(Number(x.charAt(0)))
         ) {
           return perms?.quests

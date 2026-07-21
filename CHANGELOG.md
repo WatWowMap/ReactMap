@@ -1,3 +1,10 @@
+# [1.47.0](https://github.com/WatWowMap/ReactMap/compare/v1.46.0...v1.47.0) (2026-07-21)
+
+
+### Features
+
+* support PokéCoin quest filtering ([1d5d142](https://github.com/WatWowMap/ReactMap/commit/1d5d14266032c947a03224ef3f23b7cce0c89a51))
+
 # [1.46.0](https://github.com/WatWowMap/ReactMap/compare/v1.45.1...v1.46.0) (2026-07-11)
 
 
