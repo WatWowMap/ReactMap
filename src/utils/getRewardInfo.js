@@ -41,6 +41,7 @@ export function getRewardInfo(
       4: candy_amount,
       9: xl_candy_amount,
       12: mega_amount,
+      20: mega_amount,
     }[quest_reward_type] ??
       quest_reward_amount ??
       0,
@@ -106,8 +107,9 @@ export function getRewardInfo(
       amount = src.includes('_a') ? 0 : rewardAmount
       break
     case 12:
+    case 20:
       tt = `poke_${mega_pokemon_id}`
-      src = Icons.getRewards(quest_reward_type, mega_pokemon_id, mega_amount)
+      src = Icons.getRewards(12, mega_pokemon_id, mega_amount)
       amount = src.includes('_a') ? 0 : rewardAmount
       break
     default:

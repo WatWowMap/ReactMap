@@ -398,6 +398,7 @@ const MenuActions = ({
           reward = `${t(`poke_${quest.xl_candy_pokemon_id}`)} ${t('xl')}`
           break
         case 12:
+        case 20:
           reward = `${t(`poke_${quest.mega_pokemon_id}`)} x${quest.mega_amount}`
           break
         default:
