@@ -16,8 +16,10 @@ const {
 
 const MEGA_RESOURCE_REWARD_TYPE = 12
 const TEMP_EVO_BRANCH_RESOURCE_REWARD_TYPE = 20
-const GO_FEST_2026_MEWTWO_ID = 150
-const GO_FEST_2026_MEWTWO_ENERGY_AMOUNT = 150
+const MEGA_ENERGY_REWARD_TYPES = [
+  MEGA_RESOURCE_REWARD_TYPE,
+  TEMP_EVO_BRANCH_RESOURCE_REWARD_TYPE,
+]
 const SPECIALIZED_QUEST_REWARD_TYPES = [
   1,
   2,
@@ -27,19 +29,10 @@ const SPECIALIZED_QUEST_REWARD_TYPES = [
   9,
   MEGA_RESOURCE_REWARD_TYPE,
 ]
-
-const applyGoFest2026MewtwoRewardFallback = (
-  query,
-  { rewardTypeColumn, rewardsColumn },
-) =>
-  query
-    .where(rewardTypeColumn, TEMP_EVO_BRANCH_RESOURCE_REWARD_TYPE)
-    .andWhere(
-      raw(`json_type(json_extract(${rewardsColumn}, "$[0].info")) = 'OBJECT'`),
-    )
-    .andWhere(
-      raw(`json_length(json_extract(${rewardsColumn}, "$[0].info")) = 0`),
-    )
+const RDM_SPECIALIZED_QUEST_REWARD_TYPES = [
+  ...SPECIALIZED_QUEST_REWARD_TYPES,
+  TEMP_EVO_BRANCH_RESOURCE_REWARD_TYPE,
+]
 
 const questProps = {
   quest_type: true,
@@ -420,7 +413,12 @@ class Pokestop extends Model {
                 if (hasRewardAmount) {
                   questTypes.orWhere((mega) => {
                     mega
-                      .where('quest_reward_type', MEGA_RESOURCE_REWARD_TYPE)
+                      .whereIn(
+                        'quest_reward_type',
+                        isMad
+                          ? [MEGA_RESOURCE_REWARD_TYPE]
+                          : MEGA_ENERGY_REWARD_TYPES,
+                      )
                       .andWhere(
                         isMad ? 'quest_item_amount' : 'quest_reward_amount',
                         amount,
@@ -430,9 +428,9 @@ class Pokestop extends Model {
                   if (hasAltQuests) {
                     questTypes.orWhere((altMega) => {
                       altMega
-                        .where(
+                        .whereIn(
                           'alternative_quest_reward_type',
-                          MEGA_RESOURCE_REWARD_TYPE,
+                          MEGA_ENERGY_REWARD_TYPES,
                         )
                         .andWhere('alternative_quest_reward_amount', amount)
                         .andWhere('alternative_quest_pokemon_id', pokeId)
@@ -440,7 +438,12 @@ class Pokestop extends Model {
                   }
                 } else {
                   questTypes.orWhere((mega) => {
-                    mega.where('quest_reward_type', MEGA_RESOURCE_REWARD_TYPE)
+                    mega.whereIn(
+                      'quest_reward_type',
+                      isMad
+                        ? [MEGA_RESOURCE_REWARD_TYPE]
+                        : MEGA_ENERGY_REWARD_TYPES,
+                    )
                     if (hasRewardAmount) {
                       mega
                         .andWhere('quest_reward_amount', amount)
@@ -469,9 +472,9 @@ class Pokestop extends Model {
                   })
                   if (hasAltQuests) {
                     questTypes.orWhere((altMega) => {
-                      altMega.where(
+                      altMega.whereIn(
                         'alternative_quest_reward_type',
-                        MEGA_RESOURCE_REWARD_TYPE,
+                        MEGA_ENERGY_REWARD_TYPES,
                       )
                       if (hasRewardAmount) {
                         altMega
@@ -491,26 +494,6 @@ class Pokestop extends Model {
                           )
                       }
                     })
-                  }
-                }
-                if (
-                  !isMad &&
-                  Number(pokeId) === GO_FEST_2026_MEWTWO_ID &&
-                  Number(amount) === GO_FEST_2026_MEWTWO_ENERGY_AMOUNT
-                ) {
-                  questTypes.orWhere((fallback) =>
-                    applyGoFest2026MewtwoRewardFallback(fallback, {
-                      rewardTypeColumn: 'quest_reward_type',
-                      rewardsColumn: 'quest_rewards',
-                    }),
-                  )
-                  if (hasAltQuests) {
-                    questTypes.orWhere((fallback) =>
-                      applyGoFest2026MewtwoRewardFallback(fallback, {
-                        rewardTypeColumn: 'alternative_quest_reward_type',
-                        rewardsColumn: 'alternative_quest_rewards',
-                      }),
-                    )
                   }
                 }
               })
@@ -1057,7 +1040,6 @@ class Pokestop extends Model {
               (effectiveQuestLayer === 'without_ar' && !quest.with_ar))
           ) {
             const newQuest = {}
-            const sourceQuestRewardType = quest.quest_reward_type
             if (isMad) {
               this.parseMadRewards(quest)
             } else {
@@ -1112,7 +1094,15 @@ class Pokestop extends Model {
                 newQuest.key = `x${quest.xl_candy_pokemon_id}`
                 fields.push('xl_candy_pokemon_id', 'xl_candy_amount')
                 break
-              case 12:
+              case MEGA_RESOURCE_REWARD_TYPE:
+              case TEMP_EVO_BRANCH_RESOURCE_REWARD_TYPE:
+                if (
+                  quest.quest_reward_type ===
+                    TEMP_EVO_BRANCH_RESOURCE_REWARD_TYPE &&
+                  (!quest.mega_pokemon_id || !quest.mega_amount)
+                ) {
+                  return
+                }
                 newQuest.key = `m${quest.mega_pokemon_id}-${quest.mega_amount}`
                 fields.push('mega_pokemon_id', 'mega_amount')
                 break
@@ -1138,25 +1128,12 @@ class Pokestop extends Model {
             const matchesNormalizedTypeFilter =
               normalizedRewardKey !== newQuest.key &&
               filterMatchesQuest(normalizedRewardKey)
-            const sourceRewardKey = `u${sourceQuestRewardType}`
-            const matchesSourceTypeFilter =
-              sourceQuestRewardType !== quest.quest_reward_type &&
-              filterMatchesQuest(sourceRewardKey)
             if (
               quest.quest_timestamp >= midnight &&
               (filters.onlyAllPokestops ||
                 matchesNormalizedFilter ||
-                matchesNormalizedTypeFilter ||
-                matchesSourceTypeFilter)
+                matchesNormalizedTypeFilter)
             ) {
-              if (
-                !filters.onlyAllPokestops &&
-                !matchesNormalizedFilter &&
-                !matchesNormalizedTypeFilter &&
-                matchesSourceTypeFilter
-              ) {
-                newQuest.key = sourceRewardKey
-              }
               this.fieldAssigner(newQuest, quest, fields)
               filtered.quests.push(newQuest)
             }
@@ -1456,7 +1433,10 @@ class Pokestop extends Model {
     // mega
     queries.mega = this.query()
       .from(isMad ? 'trs_quest' : 'pokestop')
-      .where('quest_reward_type', MEGA_RESOURCE_REWARD_TYPE)
+      .whereIn(
+        'quest_reward_type',
+        isMad ? [MEGA_RESOURCE_REWARD_TYPE] : MEGA_ENERGY_REWARD_TYPES,
+      )
     if (hasRewardAmount) {
       queries.mega
         .select('quest_title', 'quest_target')
@@ -1483,9 +1463,9 @@ class Pokestop extends Model {
         )
     }
     if (hasAltQuests) {
-      queries.megaAlt = this.query().where(
+      queries.megaAlt = this.query().whereIn(
         'alternative_quest_reward_type',
-        MEGA_RESOURCE_REWARD_TYPE,
+        MEGA_ENERGY_REWARD_TYPES,
       )
       if (hasRewardAmount) {
         queries.megaAlt
@@ -1511,33 +1491,6 @@ class Pokestop extends Model {
               'json_extract(alternative_quest_rewards, "$[0].info.amount")',
             ).as('amount'),
           )
-      }
-    }
-    if (!isMad) {
-      queries.megaBranchFallback = this.query()
-        .select('quest_title', 'quest_target')
-        .distinct(
-          raw(`${GO_FEST_2026_MEWTWO_ID}`).as('id'),
-          raw(`${GO_FEST_2026_MEWTWO_ENERGY_AMOUNT}`).as('amount'),
-        )
-      applyGoFest2026MewtwoRewardFallback(queries.megaBranchFallback, {
-        rewardTypeColumn: 'quest_reward_type',
-        rewardsColumn: 'quest_rewards',
-      })
-      if (hasAltQuests) {
-        queries.megaBranchFallbackAlt = this.query()
-          .select(
-            'alternative_quest_title AS quest_title',
-            'alternative_quest_target AS quest_target',
-          )
-          .distinct(
-            raw(`${GO_FEST_2026_MEWTWO_ID}`).as('id'),
-            raw(`${GO_FEST_2026_MEWTWO_ENERGY_AMOUNT}`).as('amount'),
-          )
-        applyGoFest2026MewtwoRewardFallback(queries.megaBranchFallbackAlt, {
-          rewardTypeColumn: 'alternative_quest_reward_type',
-          rewardsColumn: 'alternative_quest_rewards',
-        })
       }
     }
     // mega
@@ -1717,25 +1670,18 @@ class Pokestop extends Model {
     }
     // showcase
 
-    ;[
-      'items',
-      'stardust',
-      'xp',
-      'mega',
-      'megaBranchFallback',
-      'candy',
-      'xlCandy',
-      'pokemon',
-    ].forEach((key) => {
-      if (!shouldIncludeBaseQuests) {
-        delete queries[key]
-      } else if (queries[key]) {
-        applyMadQuestLayer(queries[key])
-      }
-      if (!shouldIncludeAltQuests) {
-        delete queries[`${key}Alt`]
-      }
-    })
+    ;['items', 'stardust', 'xp', 'mega', 'candy', 'xlCandy', 'pokemon'].forEach(
+      (key) => {
+        if (!shouldIncludeBaseQuests) {
+          delete queries[key]
+        } else if (queries[key]) {
+          applyMadQuestLayer(queries[key])
+        }
+        if (!shouldIncludeAltQuests) {
+          delete queries[`${key}Alt`]
+        }
+      },
+    )
 
     const resolved = Object.fromEntries(
       await Promise.all(
@@ -1750,17 +1696,14 @@ class Pokestop extends Model {
           .from(isMad ? 'trs_quest' : 'pokestop')
           .select('quest_reward_type', 'quest_title', 'quest_target')
           .whereNotNull('quest_reward_type')
-          .whereNotIn('quest_reward_type', SPECIALIZED_QUEST_REWARD_TYPES)
+          .whereNotIn(
+            'quest_reward_type',
+            isMad
+              ? SPECIALIZED_QUEST_REWARD_TYPES
+              : RDM_SPECIALIZED_QUEST_REWARD_TYPES,
+          )
           .groupBy('quest_reward_type', 'quest_title', 'quest_target'),
       )
-      if (!isMad) {
-        genericQuestQuery.whereNot((fallback) =>
-          applyGoFest2026MewtwoRewardFallback(fallback, {
-            rewardTypeColumn: 'quest_reward_type',
-            rewardsColumn: 'quest_rewards',
-          }),
-        )
-      }
       genericQuestQueries.push(genericQuestQuery)
     }
     if (shouldIncludeAltQuests) {
@@ -1773,13 +1716,7 @@ class Pokestop extends Model {
         .whereNotNull('alternative_quest_reward_type')
         .whereNotIn(
           'alternative_quest_reward_type',
-          SPECIALIZED_QUEST_REWARD_TYPES,
-        )
-        .whereNot((fallback) =>
-          applyGoFest2026MewtwoRewardFallback(fallback, {
-            rewardTypeColumn: 'alternative_quest_reward_type',
-            rewardsColumn: 'alternative_quest_rewards',
-          }),
+          RDM_SPECIALIZED_QUEST_REWARD_TYPES,
         )
         .groupBy(
           'alternative_quest_reward_type',
@@ -1812,25 +1749,17 @@ class Pokestop extends Model {
             ),
           )
           break
-        case 'megaBranchFallbackAlt':
-        case 'megaBranchFallback':
-          rewards.forEach((reward) =>
-            process(
-              `m${reward.id}-${reward.amount}`,
-              reward.quest_title,
-              reward.quest_target,
-            ),
-          )
-          break
         case 'megaAlt':
         case 'mega':
-          rewards.forEach((reward) =>
-            process(
-              `m${reward.id}-${reward.amount}`,
-              reward.quest_title,
-              reward.quest_target,
-            ),
-          )
+          rewards.forEach((reward) => {
+            if (reward.id && reward.amount) {
+              process(
+                `m${reward.id}-${reward.amount}`,
+                reward.quest_title,
+                reward.quest_target,
+              )
+            }
+          })
           break
         case 'stardustAlt':
         case 'stardust':
@@ -1970,27 +1899,7 @@ class Pokestop extends Model {
 
   static parseRdmRewards = (quest) => {
     if (quest.quest_reward_type) {
-      const rewards = JSON.parse(quest.quest_rewards)
-      let { info } = rewards[0]
-      if (
-        quest.quest_reward_type === TEMP_EVO_BRANCH_RESOURCE_REWARD_TYPE &&
-        info &&
-        !Array.isArray(info) &&
-        Object.keys(info).length === 0
-      ) {
-        // GO Fest 2026 fallback until Golbat exposes branch-specific details.
-        info = {
-          amount: GO_FEST_2026_MEWTWO_ENERGY_AMOUNT,
-          pokemon_id: GO_FEST_2026_MEWTWO_ID,
-        }
-        rewards[0] = {
-          ...rewards[0],
-          info,
-          type: MEGA_RESOURCE_REWARD_TYPE,
-        }
-        quest.quest_rewards = JSON.stringify(rewards)
-        quest.quest_reward_type = MEGA_RESOURCE_REWARD_TYPE
-      }
+      const { info } = JSON.parse(quest.quest_rewards)[0]
       switch (quest.quest_reward_type) {
         case 1:
           Object.keys(info).forEach((x) => (quest[`xp_${x}`] = info[x]))
@@ -2013,6 +1922,7 @@ class Pokestop extends Model {
           Object.keys(info).forEach((x) => (quest[`xl_candy_${x}`] = info[x]))
           break
         case MEGA_RESOURCE_REWARD_TYPE:
+        case TEMP_EVO_BRANCH_RESOURCE_REWARD_TYPE:
           Object.keys(info).forEach((x) => (quest[`mega_${x}`] = info[x]))
           break
         default:
@@ -2112,7 +2022,7 @@ class Pokestop extends Model {
         .toLowerCase()
         .includes(search),
     )
-    const rewardTypes = Object.keys(
+    const matchingRewardTypes = Object.keys(
       state.event.masterfile.questRewardTypes,
     ).filter((rType) =>
       i18next
@@ -2122,9 +2032,13 @@ class Pokestop extends Model {
         .toLowerCase()
         .includes(search),
     )
-    const searchIncludesGoFest2026MewtwoReward =
-      pokemonIds.includes(`${GO_FEST_2026_MEWTWO_ID}`) ||
-      rewardTypes.includes(`${MEGA_RESOURCE_REWARD_TYPE}`)
+    const rewardTypes = [
+      ...new Set(
+        !isMad && matchingRewardTypes.includes(`${MEGA_RESOURCE_REWARD_TYPE}`)
+          ? [...matchingRewardTypes, `${TEMP_EVO_BRANCH_RESOURCE_REWARD_TYPE}`]
+          : matchingRewardTypes,
+      ),
+    ]
 
     if (!pokemonIds.length && !itemIds.length && !rewardTypes.length) {
       return []
@@ -2166,14 +2080,6 @@ class Pokestop extends Model {
             quests.orWhere('quest_reward_type', rewardTypes[0])
           } else if (rewardTypes.length > 1) {
             quests.orWhereIn('quest_reward_type', rewardTypes)
-          }
-          if (!isMad && searchIncludesGoFest2026MewtwoReward) {
-            quests.orWhere((fallback) =>
-              applyGoFest2026MewtwoRewardFallback(fallback, {
-                rewardTypeColumn: 'quest_reward_type',
-                rewardsColumn: 'quest_rewards',
-              }),
-            )
           }
         })
         .limit(config.getSafe('api.searchResultsLimit'))
@@ -2231,14 +2137,6 @@ class Pokestop extends Model {
             quests.orWhere('alternative_quest_reward_type', rewardTypes[0])
           } else if (rewardTypes.length > 1) {
             quests.orWhereIn('alternative_quest_reward_type', rewardTypes)
-          }
-          if (searchIncludesGoFest2026MewtwoReward) {
-            quests.orWhere((fallback) =>
-              applyGoFest2026MewtwoRewardFallback(fallback, {
-                rewardTypeColumn: 'alternative_quest_reward_type',
-                rewardsColumn: 'alternative_quest_rewards',
-              }),
-            )
           }
         })
         .limit(searchResultsLimit)

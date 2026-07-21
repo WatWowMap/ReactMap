@@ -260,7 +260,7 @@ export function usePokestopMarker({
         amount,
         backgroundUrl:
           quest_reward_type === 7 ? Icons.getBackground(quest_background) : '',
-        rewardType: quest_reward_type,
+        rewardType: quest_reward_type === 20 ? 12 : quest_reward_type,
         questDotColor: showQuestDot ? (with_ar ? '#1e88e5' : '#9e9e9e') : '',
       })
       questSizes.unshift(Icons.getSize('reward', filters[key]?.size))
