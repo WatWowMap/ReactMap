@@ -1,3 +1,10 @@
+## [1.47.2](https://github.com/WatWowMap/ReactMap/compare/v1.47.1...v1.47.2) (2026-07-21)
+
+
+### Bug Fixes
+
+* pokecoin amount methinks ([9f41f72](https://github.com/WatWowMap/ReactMap/commit/9f41f72bb39e4c7b033fd08544975661f9f63bcf))
+
 ## [1.47.1](https://github.com/WatWowMap/ReactMap/compare/v1.47.0...v1.47.1) (2026-07-21)
 
 
