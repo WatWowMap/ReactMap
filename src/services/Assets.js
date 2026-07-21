@@ -476,12 +476,18 @@ export class UAssets {
    * @param {string | number} [rewardType]
    * @param {string | number} [id]
    * @param {number} [amount]
+   * @param {number} [tempEvolution]
    * @returns
    */
-  getRewards(rewardType, id, amount = 0) {
+  getRewards(rewardType, id, amount = 0, tempEvolution = 0) {
     try {
       const reward = this.questRewardTypes[rewardType]
-      return this[this.selected.reward]?.class?.reward(reward, id, amount)
+      return this[this.selected.reward]?.class?.reward(
+        reward,
+        id,
+        amount,
+        tempEvolution,
+      )
     } catch (e) {
       console.error(`[${this.assetType.toUpperCase()}]`, e)
       return `${this.fallback}/reward/unset/0.${this.fallbackExt}`

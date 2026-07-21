@@ -147,6 +147,7 @@ export interface Quest {
   quest_shiny_probability?: number
   mega_pokemon_id: number
   mega_amount: number
+  temp_evolution?: number
   candy_pokemon_id: number
   candy_amount: number
   xl_candy_pokemon_id: number

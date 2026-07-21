@@ -16,7 +16,7 @@ const {
 
 const MEGA_RESOURCE_REWARD_TYPE = 12
 const TEMP_EVO_BRANCH_RESOURCE_REWARD_TYPE = 20
-const MEGA_ENERGY_REWARD_TYPES = [
+const TEMP_EVOLUTION_RESOURCE_REWARD_TYPES = [
   MEGA_RESOURCE_REWARD_TYPE,
   TEMP_EVO_BRANCH_RESOURCE_REWARD_TYPE,
 ]
@@ -417,7 +417,7 @@ class Pokestop extends Model {
                         'quest_reward_type',
                         isMad
                           ? [MEGA_RESOURCE_REWARD_TYPE]
-                          : MEGA_ENERGY_REWARD_TYPES,
+                          : TEMP_EVOLUTION_RESOURCE_REWARD_TYPES,
                       )
                       .andWhere(
                         isMad ? 'quest_item_amount' : 'quest_reward_amount',
@@ -430,7 +430,7 @@ class Pokestop extends Model {
                       altMega
                         .whereIn(
                           'alternative_quest_reward_type',
-                          MEGA_ENERGY_REWARD_TYPES,
+                          TEMP_EVOLUTION_RESOURCE_REWARD_TYPES,
                         )
                         .andWhere('alternative_quest_reward_amount', amount)
                         .andWhere('alternative_quest_pokemon_id', pokeId)
@@ -442,7 +442,7 @@ class Pokestop extends Model {
                       'quest_reward_type',
                       isMad
                         ? [MEGA_RESOURCE_REWARD_TYPE]
-                        : MEGA_ENERGY_REWARD_TYPES,
+                        : TEMP_EVOLUTION_RESOURCE_REWARD_TYPES,
                     )
                     if (hasRewardAmount) {
                       mega
@@ -474,7 +474,7 @@ class Pokestop extends Model {
                     questTypes.orWhere((altMega) => {
                       altMega.whereIn(
                         'alternative_quest_reward_type',
-                        MEGA_ENERGY_REWARD_TYPES,
+                        TEMP_EVOLUTION_RESOURCE_REWARD_TYPES,
                       )
                       if (hasRewardAmount) {
                         altMega
@@ -1104,7 +1104,7 @@ class Pokestop extends Model {
                   return
                 }
                 newQuest.key = `m${quest.mega_pokemon_id}-${quest.mega_amount}`
-                fields.push('mega_pokemon_id', 'mega_amount')
+                fields.push('mega_pokemon_id', 'mega_amount', 'temp_evolution')
                 break
               default:
                 newQuest.key = `u${quest.quest_reward_type}`
@@ -1435,7 +1435,9 @@ class Pokestop extends Model {
       .from(isMad ? 'trs_quest' : 'pokestop')
       .whereIn(
         'quest_reward_type',
-        isMad ? [MEGA_RESOURCE_REWARD_TYPE] : MEGA_ENERGY_REWARD_TYPES,
+        isMad
+          ? [MEGA_RESOURCE_REWARD_TYPE]
+          : TEMP_EVOLUTION_RESOURCE_REWARD_TYPES,
       )
     if (hasRewardAmount) {
       queries.mega
@@ -1465,7 +1467,7 @@ class Pokestop extends Model {
     if (hasAltQuests) {
       queries.megaAlt = this.query().whereIn(
         'alternative_quest_reward_type',
-        MEGA_ENERGY_REWARD_TYPES,
+        TEMP_EVOLUTION_RESOURCE_REWARD_TYPES,
       )
       if (hasRewardAmount) {
         queries.megaAlt
@@ -1923,7 +1925,9 @@ class Pokestop extends Model {
           break
         case MEGA_RESOURCE_REWARD_TYPE:
         case TEMP_EVO_BRANCH_RESOURCE_REWARD_TYPE:
-          Object.keys(info).forEach((x) => (quest[`mega_${x}`] = info[x]))
+          Object.keys(info).forEach((key) => {
+            quest[key === 'temp_evolution' ? key : `mega_${key}`] = info[key]
+          })
           break
         default:
           quest.quest_reward_amount = info?.amount
