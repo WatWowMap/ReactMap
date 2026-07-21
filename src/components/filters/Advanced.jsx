@@ -36,15 +36,16 @@ export function AdvancedFilter() {
   const legacyFilter = useStorage(
     (s) => !!s.userSettings[category]?.legacyFilter,
   )
-  const standard = useMemory((s) =>
-    category === 'pokemon'
+  const defaultFilter = useMemory((s) => {
+    if (!category) return STANDARD_BACKUP
+    return category === 'pokemon'
       ? s.filters[category]?.standard || STANDARD_BACKUP
-      : STANDARD_BACKUP,
-  )
+      : s.filters[category]?.filter?.[id] || STANDARD_BACKUP
+  })
   const easyMode = useStorage((s) => !!s.filters?.[category]?.easyMode)
   const [filters, setFilters] = useDeepStore(
     category ? `filters.${category}.filter.${id}` : `filters.gyms.standard`,
-    standard,
+    defaultFilter,
   )
   const backup = React.useRef(filters)
 
@@ -87,7 +88,7 @@ export function AdvancedFilter() {
     () => [
       {
         name: 'reset',
-        action: () => setFilters({ ...standard }),
+        action: () => setFilters({ ...defaultFilter }),
         color: 'primary',
       },
       {
@@ -96,7 +97,7 @@ export function AdvancedFilter() {
         color: 'secondary',
       },
     ],
-    [standard, filters, setFilters],
+    [defaultFilter, filters, setFilters],
   )
 
   /** @type {import('@mui/material').SwitchProps['onChange']} */
