@@ -128,6 +128,7 @@ type SearchQuest {
   quest_bread_mode: Int
   quest_item_id: Int
   quest_reward_type: Int
+  quest_reward_amount: Int
   quest_shiny: Int
   mega_pokemon_id: Int
   mega_amount: Int

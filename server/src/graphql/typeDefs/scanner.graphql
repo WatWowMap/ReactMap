@@ -74,6 +74,7 @@ type Quest {
   quest_rewards: String
   quest_template: String
   quest_reward_type: Int
+  quest_reward_amount: Int
   quest_task: String
   quest_item_id: Int
   quest_title: String

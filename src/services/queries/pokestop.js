@@ -35,6 +35,7 @@ const quest = gql`
       quest_target
       quest_conditions
       quest_reward_type
+      quest_reward_amount
       quest_item_id
       quest_task
       quest_title
