@@ -763,8 +763,6 @@ class Pokestop extends Model {
     const normalized = isMad
       ? this.mapMAD(results, ts)
       : this.mapRDM(results, ts)
-    if (normalized.length > queryLimits.pokestops)
-      normalized.length = queryLimits.pokestops
     const finalResults = this.secondaryFilter(
       normalized,
       args.filters,
@@ -776,6 +774,7 @@ class Pokestop extends Model {
       hasConfirmed,
       effectiveOnlyArEligible,
       effectiveQuestLayer,
+      queryLimits.pokestops,
     )
     return finalResults
   }
@@ -927,9 +926,14 @@ class Pokestop extends Model {
     hasConfirmed,
     effectiveOnlyArEligible,
     effectiveQuestLayer,
+    resultLimit,
   ) {
     const filteredResults = []
-    for (let i = 0; i < queryResults.length; i += 1) {
+    for (
+      let i = 0;
+      i < queryResults.length && filteredResults.length < resultLimit;
+      i += 1
+    ) {
       const pokestop = queryResults[i]
       const canViewIncidentMetadata = perms.eventStops || perms.invasions
       const incidentBlocker = canViewIncidentMetadata
