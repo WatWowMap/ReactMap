@@ -29,11 +29,6 @@ function buildPokestops(perms, defaults) {
     ) {
       quests[`d${i}`] = new BaseFilter(defaults.stardust.enabled)
     }
-    Object.keys(state.event.masterfile.questRewardTypes).forEach((type) => {
-      if (type !== '0') {
-        quests[`u${type}`] = new BaseFilter(defaults.rewardTypes)
-      }
-    })
     for (
       let i = defaults.xp.min;
       i <= defaults.xp.max;
@@ -41,11 +36,6 @@ function buildPokestops(perms, defaults) {
     ) {
       quests[`p${i}`] = new BaseFilter(defaults.xp.enabled)
     }
-    Object.keys(state.event.masterfile.questRewardTypes).forEach((type) => {
-      if (type !== '0') {
-        quests[`u${type}`] = new BaseFilter(defaults.rewardTypes)
-      }
-    })
   }
   if (perms.invasions) {
     Object.keys(state.event.invasions).forEach((type) => {
@@ -64,7 +54,7 @@ function buildPokestops(perms, defaults) {
       } else if (avail.startsWith('d')) {
         quests[avail] = new BaseFilter(defaults.stardust.enabled)
       } else if (avail.startsWith('u')) {
-        quests[avail] = new BaseFilter(defaults.rewardTypes)
+        quests[avail] = new BaseFilter(true)
       } else if (avail.startsWith('p')) {
         quests[avail] = new BaseFilter(defaults.xp.enabled)
       } else if (avail.startsWith('c')) {
