@@ -1,3 +1,11 @@
+## [1.47.1](https://github.com/WatWowMap/ReactMap/compare/v1.47.0...v1.47.1) (2026-07-21)
+
+
+### Bug Fixes
+
+* bounded early-exit ([b382a2c](https://github.com/WatWowMap/ReactMap/commit/b382a2c02cf2a6c42fd0b6663e203177a4af6d34))
+* quest target filtering logic ([96e59d6](https://github.com/WatWowMap/ReactMap/commit/96e59d6fab18bc5b7474f8c592eb9dd16485eacc))
+
 # [1.47.0](https://github.com/WatWowMap/ReactMap/compare/v1.46.0...v1.47.0) (2026-07-21)
 
 
