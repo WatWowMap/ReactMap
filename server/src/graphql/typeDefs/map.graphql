@@ -132,6 +132,7 @@ type SearchQuest {
   quest_shiny: Int
   mega_pokemon_id: Int
   mega_amount: Int
+  temp_evolution: Int
   stardust_amount: Int
   item_amount: Int
   candy_pokemon_id: Int

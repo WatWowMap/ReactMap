@@ -22,6 +22,7 @@ export function getRewardInfo(
     xp_amount,
     mega_pokemon_id,
     mega_amount,
+    temp_evolution,
     candy_pokemon_id,
     xl_candy_pokemon_id,
     quest_reward_type,
@@ -108,8 +109,11 @@ export function getRewardInfo(
       break
     case 12:
     case 20:
-      tt = `poke_${mega_pokemon_id}`
-      src = Icons.getRewards(12, mega_pokemon_id, mega_amount)
+      tt = [
+        temp_evolution ? `evo_${temp_evolution}` : '',
+        `poke_${mega_pokemon_id}`,
+      ]
+      src = Icons.getRewards(12, mega_pokemon_id, mega_amount, temp_evolution)
       amount = src.includes('_a') ? 0 : rewardAmount
       break
     default:

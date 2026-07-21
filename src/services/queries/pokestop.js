@@ -51,6 +51,7 @@ const quest = gql`
       quest_shiny_probability
       mega_pokemon_id
       mega_amount
+      temp_evolution
       candy_pokemon_id
       candy_amount
       xl_candy_pokemon_id
