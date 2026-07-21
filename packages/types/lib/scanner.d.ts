@@ -131,6 +131,7 @@ export interface Quest {
   quest_rewards: string
   quest_template: string
   quest_reward_type: number
+  quest_reward_amount: number
   quest_task: string
   quest_item_id: number
   quest_title: string

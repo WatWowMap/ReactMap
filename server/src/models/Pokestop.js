@@ -1118,6 +1118,7 @@ class Pokestop extends Model {
                 break
               default:
                 newQuest.key = `u${quest.quest_reward_type}`
+                fields.push('quest_reward_amount')
             }
 
             const questCondition = `${quest.quest_title}__${quest.quest_target}`
@@ -2015,6 +2016,7 @@ class Pokestop extends Model {
           Object.keys(info).forEach((x) => (quest[`mega_${x}`] = info[x]))
           break
         default:
+          quest.quest_reward_amount = info?.amount
           break
       }
     }
@@ -2023,9 +2025,8 @@ class Pokestop extends Model {
 
   static parseMadRewards = (quest) => {
     if (quest.quest_reward_type) {
-      const { item, exp, candy, xl_candy, mega_resource } = JSON.parse(
-        quest.quest_rewards,
-      )[0]
+      const { item, exp, candy, pokecoin, xl_candy, mega_resource } =
+        JSON.parse(quest.quest_rewards)[0]
       switch (quest.quest_reward_type) {
         case 1:
           quest.xp_amount = exp
@@ -2045,6 +2046,9 @@ class Pokestop extends Model {
           Object.keys(mega_resource).forEach(
             (x) => (quest[`mega_${x}`] = mega_resource[x]),
           )
+          break
+        case 8:
+          quest.quest_reward_amount = pokecoin
           break
         default:
           break

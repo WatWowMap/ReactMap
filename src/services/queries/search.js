@@ -176,6 +176,7 @@ export const QUESTS = gql`
       quest_shiny
       quest_item_id
       quest_reward_type
+      quest_reward_amount
       mega_pokemon_id
       mega_amount
       stardust_amount
