@@ -1,3 +1,10 @@
+# [1.48.0](https://github.com/WatWowMap/ReactMap/compare/v1.47.2...v1.48.0) (2026-07-21)
+
+
+### Features
+
+* mega branch resource icon support ([b35507f](https://github.com/WatWowMap/ReactMap/commit/b35507f086c9b6cf2ce11bc1946c74fc1feb1420))
+
 ## [1.47.2](https://github.com/WatWowMap/ReactMap/compare/v1.47.1...v1.47.2) (2026-07-21)
 
 
