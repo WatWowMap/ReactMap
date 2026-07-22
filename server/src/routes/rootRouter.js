@@ -189,38 +189,66 @@ rootRouter.get('/api/settings', async (req, res, next) => {
         log.warn(TAGS.session, 'Issue finding user, User ID:', req?.user?.id, e)
       }
     }
-    const settings = getServerSettings(req)
+    const perms = req.user ? req.user.perms : req.session.perms
+    /** @type {[string, Promise<void>][]} */
+    const refreshes = []
 
-    if ('perms' in settings.user) {
-      if (settings.user.perms.pokemon && api.queryOnSessionInit.pokemon) {
-        state.event.setAvailable('pokemon', 'Pokemon', state.db)
+    if (perms) {
+      if (perms.pokemon && api.queryOnSessionInit.pokemon) {
+        refreshes.push([
+          'pokemon',
+          state.event.setAvailable('pokemon', 'Pokemon', state.db),
+        ])
       }
-      if (
-        api.queryOnSessionInit.raids &&
-        (settings.user.perms.raids || settings.user.perms.gyms)
-      ) {
-        state.event.setAvailable('gyms', 'Gym', state.db)
+      if (api.queryOnSessionInit.raids && (perms.raids || perms.gyms)) {
+        refreshes.push([
+          'gyms',
+          state.event.setAvailable('gyms', 'Gym', state.db),
+        ])
       }
       if (
         api.queryOnSessionInit.quests &&
-        (settings.user.perms.quests ||
-          settings.user.perms.pokestops ||
-          settings.user.perms.invasions ||
-          settings.user.perms.lures)
+        (perms.quests || perms.pokestops || perms.invasions || perms.lures)
       ) {
-        state.event.setAvailable('pokestops', 'Pokestop', state.db)
+        refreshes.push([
+          'pokestops',
+          state.event.setAvailable('pokestops', 'Pokestop', state.db),
+        ])
       }
-      if (settings.user.perms.nests && api.queryOnSessionInit.nests) {
-        state.event.setAvailable('nests', 'Nest', state.db)
+      if (perms.nests && api.queryOnSessionInit.nests) {
+        refreshes.push([
+          'nests',
+          state.event.setAvailable('nests', 'Nest', state.db),
+        ])
       }
-      if (settings.user.perms.stations && api.queryOnSessionInit.stations) {
-        state.event.setAvailable('stations', 'Station', state.db)
+      if (perms.stations && api.queryOnSessionInit.stations) {
+        refreshes.push([
+          'stations',
+          state.event.setAvailable('stations', 'Station', state.db),
+        ])
       }
-      if (settings.user.perms.tappables && api.queryOnSessionInit.tappables) {
-        state.event.setAvailable('tappables', 'Tappable', state.db)
+      if (perms.tappables && api.queryOnSessionInit.tappables) {
+        refreshes.push([
+          'tappables',
+          state.event.setAvailable('tappables', 'Tappable', state.db),
+        ])
       }
     }
 
+    const refreshResults = await Promise.allSettled(
+      refreshes.map(([, refresh]) => refresh),
+    )
+    refreshResults.forEach((result, index) => {
+      if (result.status === 'rejected') {
+        log.warn(
+          TAGS.available,
+          `Unable to refresh ${refreshes[index][0]} during session initialization`,
+          result.reason,
+        )
+      }
+    })
+
+    const settings = getServerSettings(req)
     res.status(200).json(settings)
   } catch (error) {
     res.status(500).json({ error: error.message, status: 500 })

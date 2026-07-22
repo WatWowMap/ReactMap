@@ -41,6 +41,9 @@ class EventManager extends Logger {
     /** @type {Record<string, () => void>} */
     this.intervals = {}
 
+    /** @type {Partial<Record<keyof EventManager['available'], Promise<void>>>} */
+    this.availablePending = {}
+
     this.baseUrl =
       'https://raw.githubusercontent.com/WatWowMap/wwm-uicons-webp/main'
 
@@ -93,7 +96,28 @@ class EventManager extends Logger {
    * @param {import('./DbManager').DbManager} Db
    */
   async setAvailable(category, model, Db) {
-    this.available[category] = await Db.getAvailable(model)
+    let pending = this.availablePending[category]
+    if (!pending) {
+      pending = this.#refreshAvailable(category, model, Db)
+      this.availablePending[category] = pending
+    }
+
+    try {
+      await pending
+    } finally {
+      if (this.availablePending[category] === pending) {
+        delete this.availablePending[category]
+      }
+    }
+  }
+
+  /**
+   * @param {keyof EventManager['available']} category
+   * @param {import('../models').ScannerModelKeys} model
+   * @param {import('./DbManager').DbManager} Db
+   */
+  async #refreshAvailable(category, model, Db) {
+    const available = await Db.getAvailable(model)
 
     /** @param {string} key */
     const parseKey = (key) => {
@@ -105,7 +129,7 @@ class EventManager extends Logger {
       }
     }
 
-    this.available[category].sort((a, b) => {
+    available.sort((a, b) => {
       const keyA = parseKey(a)
       const keyB = parseKey(b)
 
@@ -130,6 +154,7 @@ class EventManager extends Logger {
 
       return 0
     })
+    this.available[category] = available
     this.addAvailable(category)
   }
 
