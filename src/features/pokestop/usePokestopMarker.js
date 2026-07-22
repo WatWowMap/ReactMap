@@ -4,6 +4,7 @@ import { divIcon } from 'leaflet'
 import { basicEqualFn, useMemory } from '@store/useMemory'
 import { useStorage } from '@store/useStorage'
 import { useOpacity } from '@hooks/useOpacity'
+import { getRewardInfo } from '@utils/getRewardInfo'
 import { INCIDENT_DISPLAY_TYPES } from './incidentPriority'
 import { resolveShowcaseEventIcon } from './resolveShowcaseEventIcon'
 
@@ -249,107 +250,17 @@ export function usePokestopMarker({
 
   if (hasQuest && !(hasVisibleInvasion && invasionMod?.removeQuest)) {
     quests.forEach((quest) => {
-      const {
-        quest_item_id,
-        item_amount,
-        xp_amount,
-        stardust_amount,
-        candy_pokemon_id,
-        candy_amount,
-        xl_candy_pokemon_id,
-        xl_candy_amount,
-        mega_pokemon_id,
-        mega_amount,
-        quest_reward_type,
-        quest_pokemon_id,
-        quest_form_id,
-        quest_gender_id,
-        quest_costume_id,
-        quest_shiny,
-        quest_bread_mode = 0,
-        quest_background,
-        with_ar = true,
-        key,
-      } = quest
+      const { quest_reward_type, quest_background, with_ar = true, key } = quest
       const showQuestDot = with_ar ? showArQuestDotBadge : showNoArQuestDotBadge
-      let questIcon = { url: Icons.getRewards(quest_reward_type) }
-      switch (quest_reward_type) {
-        case 1:
-          questIcon = {
-            url: Icons.getRewards(quest_reward_type, xp_amount),
-            amount: xp_amount,
-          }
-          break
-        case 2:
-          questIcon = {
-            url: Icons.getRewards(
-              quest_reward_type,
-              quest_item_id,
-              item_amount,
-            ),
-            amount: item_amount > 1 && item_amount,
-          }
-          break
-        case 3:
-          questIcon = {
-            url: Icons.getRewards(quest_reward_type, stardust_amount),
-            amount: stardust_amount,
-          }
-          break
-        case 4:
-          questIcon = {
-            url: Icons.getRewards(
-              quest_reward_type,
-              candy_pokemon_id,
-              candy_amount,
-            ),
-            amount: candy_amount,
-          }
-          break
-        case 7:
-          questIcon = {
-            url: Icons.getPokemon(
-              quest_pokemon_id,
-              quest_form_id,
-              0,
-              quest_gender_id,
-              quest_costume_id,
-              0,
-              !!quest_shiny,
-              quest_bread_mode,
-            ),
-            backgroundUrl:
-              quest_reward_type === 7
-                ? Icons.getBackground(quest_background)
-                : '',
-          }
-          break
-        case 9:
-          questIcon = {
-            url: Icons.getRewards(
-              quest_reward_type,
-              xl_candy_pokemon_id,
-              xl_candy_amount,
-            ),
-            amount: xl_candy_amount,
-          }
-          break
-        case 12:
-          questIcon = {
-            url: Icons.getRewards(
-              quest_reward_type,
-              mega_pokemon_id,
-              mega_amount,
-            ),
-            amount: mega_amount,
-          }
-          break
-        default:
-          break
-      }
+      const { src: url, amount } = getRewardInfo(quest, {
+        preferAmountIcon: true,
+      })
       questIcons.unshift({
-        ...questIcon,
-        rewardType: quest_reward_type,
+        url,
+        amount,
+        backgroundUrl:
+          quest_reward_type === 7 ? Icons.getBackground(quest_background) : '',
+        rewardType: quest_reward_type === 20 ? 12 : quest_reward_type,
         questDotColor: showQuestDot ? (with_ar ? '#1e88e5' : '#9e9e9e') : '',
       })
       questSizes.unshift(Icons.getSize('reward', filters[key]?.size))
@@ -449,14 +360,8 @@ export function usePokestopMarker({
 
   const stackMarkup = stackItems
     .map((item) => {
-      const showAmount =
-        item.type === 'quest' && item.amount
-          ? item.url.includes('stardust') || item.url.includes('experience')
-            ? item.url.includes('/0.')
-            : !item.url.includes('_a')
-          : false
       const amountHtml =
-        showAmount && item.amount
+        item.type === 'quest' && item.amount
           ? `
                 <span class="pokestop-marker__amount">
                   x${item.amount}

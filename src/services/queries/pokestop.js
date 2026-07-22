@@ -35,6 +35,7 @@ const quest = gql`
       quest_target
       quest_conditions
       quest_reward_type
+      quest_reward_amount
       quest_item_id
       quest_task
       quest_title
@@ -50,6 +51,7 @@ const quest = gql`
       quest_shiny_probability
       mega_pokemon_id
       mega_amount
+      temp_evolution
       candy_pokemon_id
       candy_amount
       xl_candy_pokemon_id

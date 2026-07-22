@@ -131,6 +131,7 @@ export interface Quest {
   quest_rewards: string
   quest_template: string
   quest_reward_type: number
+  quest_reward_amount: number
   quest_task: string
   quest_item_id: number
   quest_title: string
@@ -146,6 +147,7 @@ export interface Quest {
   quest_shiny_probability?: number
   mega_pokemon_id: number
   mega_amount: number
+  temp_evolution?: number
   candy_pokemon_id: number
   candy_amount: number
   xl_candy_pokemon_id: number

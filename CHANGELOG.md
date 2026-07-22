@@ -1,3 +1,32 @@
+# [1.48.0](https://github.com/WatWowMap/ReactMap/compare/v1.47.2...v1.48.0) (2026-07-21)
+
+
+### Features
+
+* mega branch resource icon support ([b35507f](https://github.com/WatWowMap/ReactMap/commit/b35507f086c9b6cf2ce11bc1946c74fc1feb1420))
+
+## [1.47.2](https://github.com/WatWowMap/ReactMap/compare/v1.47.1...v1.47.2) (2026-07-21)
+
+
+### Bug Fixes
+
+* pokecoin amount methinks ([9f41f72](https://github.com/WatWowMap/ReactMap/commit/9f41f72bb39e4c7b033fd08544975661f9f63bcf))
+
+## [1.47.1](https://github.com/WatWowMap/ReactMap/compare/v1.47.0...v1.47.1) (2026-07-21)
+
+
+### Bug Fixes
+
+* bounded early-exit ([b382a2c](https://github.com/WatWowMap/ReactMap/commit/b382a2c02cf2a6c42fd0b6663e203177a4af6d34))
+* quest target filtering logic ([96e59d6](https://github.com/WatWowMap/ReactMap/commit/96e59d6fab18bc5b7474f8c592eb9dd16485eacc))
+
+# [1.47.0](https://github.com/WatWowMap/ReactMap/compare/v1.46.0...v1.47.0) (2026-07-21)
+
+
+### Features
+
+* support PokéCoin quest filtering ([1d5d142](https://github.com/WatWowMap/ReactMap/commit/1d5d14266032c947a03224ef3f23b7cce0c89a51))
+
 # [1.46.0](https://github.com/WatWowMap/ReactMap/compare/v1.45.1...v1.46.0) (2026-07-11)
 
 

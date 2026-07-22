@@ -74,6 +74,7 @@ type Quest {
   quest_rewards: String
   quest_template: String
   quest_reward_type: Int
+  quest_reward_amount: Int
   quest_task: String
   quest_item_id: Int
   quest_title: String
@@ -89,6 +90,7 @@ type Quest {
   quest_shiny_probability: Float
   mega_pokemon_id: Int
   mega_amount: Int
+  temp_evolution: Int
   candy_pokemon_id: Int
   candy_amount: Int
   xl_candy_pokemon_id: Int

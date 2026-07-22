@@ -1247,10 +1247,6 @@
         "__name": "DEFAULT_FILTERS_POKESTOPS_INVASION_POKEMON",
         "__format": "boolean"
       },
-      "rewardTypes": {
-        "__name": "DEFAULT_FILTERS_POKESTOPS_REWARD_TYPES",
-        "__format": "boolean"
-      },
       "baseMegaEnergyAmounts": {
         "__name": "DEFAULT_FILTERS_POKESTOPS_BASE_MEGA_ENERGY_AMOUNTS",
         "__format": "json"

@@ -99,7 +99,8 @@ function SelectorList({
                 key.startsWith('x') ||
                 key.startsWith('c') ||
                 key.startsWith('d') ||
-                key.startsWith('p')
+                key.startsWith('p') ||
+                key.startsWith('u')
               )
             case 'showcase':
               return (
