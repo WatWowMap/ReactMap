@@ -1,3 +1,11 @@
+## [1.48.1](https://github.com/WatWowMap/ReactMap/compare/v1.48.0...v1.48.1) (2026-07-22)
+
+
+### Bug Fixes
+
+* availability bootstrap ([520c1f1](https://github.com/WatWowMap/ReactMap/commit/520c1f157883252b558b57ff7afbff4438f6b1af))
+* no more reward types ffs ([b4e2f71](https://github.com/WatWowMap/ReactMap/commit/b4e2f71c8cafe08f0505fc88938c2ff4577dee95))
+
 # [1.48.0](https://github.com/WatWowMap/ReactMap/compare/v1.47.2...v1.48.0) (2026-07-21)
 
 
