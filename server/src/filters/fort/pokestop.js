@@ -223,19 +223,15 @@ function buildPokestopDnfFilters(filters, eventInvasions) {
       })
     if (xlPokemon.length)
       clauses.push({ quest_reward_type: [9], quest_reward_pokemon: xlPokemon })
-    // type 20 (temp-evo branch resource) is mega energy too, so match both.
     megaByAmount.forEach((pokes, amt) =>
       clauses.push({
-        quest_reward_type: [12, 20],
+        quest_reward_type: [12],
         quest_reward_pokemon: pokes,
         quest_reward_amount: { min: amt, max: amt },
       }),
     )
     if (megaLoose.length)
-      clauses.push({
-        quest_reward_type: [12, 20],
-        quest_reward_pokemon: megaLoose,
-      })
+      clauses.push({ quest_reward_type: [12], quest_reward_pokemon: megaLoose })
     dustAmounts.forEach((amt) =>
       clauses.push({
         quest_reward_type: [3],
