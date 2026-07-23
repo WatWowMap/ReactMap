@@ -42,9 +42,19 @@ const Location = () => {
 
   const [save] = useMutation(SET_HUMAN, { fetchPolicy: 'no-cache' })
 
+  // The locate control watches the device position, so `locationfound` keeps
+  // firing for as long as it is active. Only consume the first event after the
+  // user explicitly asks for their location, otherwise a background GPS tick
+  // would silently overwrite a location they set on purpose.
+  const awaitingLocate = React.useRef(false)
+
   /** @param {[number, number]} location */
   const handleLocationChange = (location) => {
     if (location.every((x) => x !== 0)) {
+      // Whatever we are about to save supersedes a locate request that has not
+      // come back yet, otherwise a slow GPS fix would land on top of a pick the
+      // user made while waiting for it.
+      awaitingLocate.current = false
       useWebhookStore.setState((prev) => ({
         location: prev.location.some((x, i) => x !== location[i])
           ? [location[0] ?? 0, location[1] ?? 0]
@@ -63,12 +73,6 @@ const Location = () => {
       })
     }
   }
-
-  // The locate control watches the device position, so `locationfound` keeps
-  // firing for as long as it is active. Only consume the first event after the
-  // user explicitly asks for their location, otherwise a background GPS tick
-  // would silently overwrite a location they set on purpose.
-  const awaitingLocate = React.useRef(false)
 
   const map = useMapEvents({
     locationfound: (newLoc) => {
