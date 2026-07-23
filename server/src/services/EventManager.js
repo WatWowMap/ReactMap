@@ -41,7 +41,7 @@ class EventManager extends Logger {
     /** @type {Record<string, () => void>} */
     this.intervals = {}
 
-    /** @type {Record<string, Promise<void> | undefined>} in-flight setAvailable per category */
+    /** @type {Partial<Record<keyof EventManager['available'], Promise<void>>>} in-flight setAvailable per category */
     this.availablePending = {}
     /** @type {Record<string, number | undefined>} last successful setAvailable per category */
     this.availableUpdatedAt = {}
@@ -124,8 +124,13 @@ class EventManager extends Logger {
     return this.availablePending[category]
   }
 
+  /**
+   * @param {keyof EventManager['available']} category
+   * @param {import('../models').ScannerModelKeys} model
+   * @param {import('./DbManager').DbManager} Db
+   */
   async #refreshAvailable(category, model, Db) {
-    this.available[category] = await Db.getAvailable(model)
+    const available = await Db.getAvailable(model)
 
     /** @param {string} key */
     const parseKey = (key) => {
@@ -137,7 +142,7 @@ class EventManager extends Logger {
       }
     }
 
-    this.available[category].sort((a, b) => {
+    available.sort((a, b) => {
       const keyA = parseKey(a)
       const keyB = parseKey(b)
 
@@ -162,6 +167,7 @@ class EventManager extends Logger {
 
       return 0
     })
+    this.available[category] = available
     this.addAvailable(category)
     this.availableUpdatedAt[category] = Date.now()
   }
