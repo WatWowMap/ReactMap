@@ -64,24 +64,38 @@ const Location = () => {
     }
   }
 
+  // The locate control watches the device position, so `locationfound` keeps
+  // firing for as long as it is active. Only consume the first event after the
+  // user explicitly asks for their location, otherwise a background GPS tick
+  // would silently overwrite a location they set on purpose.
+  const awaitingLocate = React.useRef(false)
+
   const map = useMapEvents({
     locationfound: (newLoc) => {
+      if (!awaitingLocate.current) return
+      awaitingLocate.current = false
       const { location } = useWebhookStore.getState()
       const { lat, lng } = newLoc.latlng
-      if (lat !== location[0] && lng !== location[1]) {
+      if (lat !== location[0] || lng !== location[1]) {
         handleLocationChange([lat, lng])
       }
     },
   })
 
   React.useEffect(() => {
-    if (webhookLocation[0] !== latitude && webhookLocation[1] !== longitude) {
+    if (webhookLocation[0] !== latitude || webhookLocation[1] !== longitude) {
       handleLocationChange(webhookLocation)
     }
   }, [webhookLocation])
 
   React.useEffect(() => {
-    if (webhookLocation.every((x) => x === 0)) {
+    // `human` is empty until the query resolves, so wait for real coordinates
+    // rather than seeding the store with undefined.
+    if (
+      typeof latitude === 'number' &&
+      typeof longitude === 'number' &&
+      webhookLocation.every((x) => x === 0)
+    ) {
       useWebhookStore.setState({ location: [latitude, longitude] })
     }
   }, [latitude, longitude])
@@ -120,7 +134,12 @@ const Location = () => {
           size="small"
           variant="contained"
           color={color}
-          onClick={() => lc._onClick()}
+          onClick={() => {
+            lc._onClick()
+            // `_onClick` toggles: if that turned the control off, no
+            // `locationfound` is coming and the request must not stay armed.
+            awaitingLocate.current = !!lc._active
+          }}
           startIcon={<MyLocation sx={{ color: 'white' }} />}
         >
           {t('my_location')}
