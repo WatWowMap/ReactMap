@@ -169,7 +169,13 @@ class EventManager extends Logger {
     })
     this.available[category] = available
     this.addAvailable(category)
-    this.availableUpdatedAt[category] = Date.now()
+    // Only arm the TTL when the refresh returned options. A failed endpoint
+    // refresh (esp. pure-endpoint) comes back empty; arming the TTL on it would
+    // suppress the retry for the whole window and keep the drawer empty until it
+    // expires — leaving it unstamped lets the next setAvailable recover.
+    if (available.length) {
+      this.availableUpdatedAt[category] = Date.now()
+    }
   }
 
   /**

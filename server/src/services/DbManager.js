@@ -358,12 +358,12 @@ class DbManager extends Logger {
   async historicalRarity() {
     this.log.info('Setting historical rarity stats')
     try {
-      const results = await Promise.all(
+      // allSettled: skip MAD (no pokemon_stats) and pure-endpoint sources (no
+      // bound knex). A dual source (endpoint + DB) keeps its knex and still
+      // serves rarity, but if one such DB lacks pokemon_stats its query must
+      // not fail the whole batch and blank every source's rarity map.
+      const settled = await Promise.allSettled(
         (this.models.Pokemon ?? []).map(async (source) =>
-          // Skip MAD (no pokemon_stats) and pure-endpoint sources (no bound
-          // knex to query). A dual source (endpoint + DB) keeps its knex, so it
-          // still serves historical rarity — testing source.mem alone would
-          // wrongly drop it and clear the rarity map on refresh.
           source.isMad || !this.connections[source.connection]
             ? []
             : source.SubModel.query()
@@ -372,6 +372,9 @@ class DbManager extends Logger {
                 .groupBy('pokemon_id'),
         ),
       )
+      const results = settled
+        .filter((r) => r.status === 'fulfilled')
+        .map((r) => r.value)
       this.setRarity(
         results.map((result) =>
           Object.fromEntries(
@@ -589,7 +592,11 @@ class DbManager extends Logger {
       const loopTime = Date.now()
       count += 1
       const bbox = getBboxFromCenter(args.lat, args.lon, distance)
-      const data = await Promise.all(
+      // allSettled: the fort search methods have no endpoint branch, so a
+      // pure-endpoint source hits an unbound this.query() and rejects. Degrade
+      // that source to no results rather than failing the whole search batch
+      // (a co-configured SQL source still contributes).
+      const settled = await Promise.allSettled(
         this.models[model].map(async ({ SubModel, ...source }) =>
           SubModel[method](
             perms,
@@ -600,6 +607,9 @@ class DbManager extends Logger {
           ),
         ),
       )
+      const data = settled
+        .filter((r) => r.status === 'fulfilled')
+        .map((r) => r.value)
       const results = DbManager.deDupeResults(data)
       if (results.length > deDuped.length) {
         deDuped = results
@@ -658,16 +668,21 @@ class DbManager extends Logger {
    * ]>}
    */
   async submissionCells(perms, args) {
-    const stopData = await Promise.all(
-      this.models.Pokestop.map(async ({ SubModel, ...source }) =>
-        SubModel.getSubmissions(perms, args, source),
-      ),
-    )
-    const gymData = await Promise.all(
-      this.models.Gym.map(async ({ SubModel, ...source }) =>
-        SubModel.getSubmissions(perms, args, source),
-      ),
-    )
+    // allSettled: getSubmissions has no endpoint branch, so a pure-endpoint
+    // source rejects on an unbound this.query(); degrade it to no cells rather
+    // than failing the whole submission overlay.
+    const collect = async (sources) =>
+      (
+        await Promise.allSettled(
+          sources.map(async ({ SubModel, ...source }) =>
+            SubModel.getSubmissions(perms, args, source),
+          ),
+        )
+      )
+        .filter((r) => r.status === 'fulfilled')
+        .map((r) => r.value)
+    const stopData = await collect(this.models.Pokestop)
+    const gymData = await collect(this.models.Gym)
     return [DbManager.deDupeResults(stopData), DbManager.deDupeResults(gymData)]
   }
 

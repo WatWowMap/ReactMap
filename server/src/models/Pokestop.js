@@ -901,7 +901,7 @@ class Pokestop extends Model {
             try {
               const one = await fetchFortById(
                 TAGS.pokestops,
-                `${mem}/api/pokestop/id/${manualId}`,
+                `${mem}/api/pokestop/id/${encodeURIComponent(manualId)}`,
                 secret,
                 httpAuth,
               )
@@ -921,8 +921,12 @@ class Pokestop extends Model {
                 stop.updated > ts - stopValidDataLimit * 86400) &&
               // Power-up level (onlyLevels): power-ups are out of the game
               // (also why power_up_level is dropped from the DNF); the gate is
-              // vestigial but mirrored for exact endpoint↔SQL parity.
-              (onlyLevels === 'all' ||
+              // vestigial but mirrored for exact endpoint↔SQL parity. SQL only
+              // applies it under onlyAllPokestops (the `else` of `if
+              // (!onlyAllPokestops)`), so guard on it like the gym sibling —
+              // else the whole quest/invasion/lure layer under-returns.
+              (!onlyAllPokestops ||
+                onlyLevels === 'all' ||
                 Number(stop.power_up_level) === Number(onlyLevels)) &&
               filterRTree(stop, areaRestrictions, onlyAreas),
           )
@@ -2510,11 +2514,14 @@ class Pokestop extends Model {
       try {
         const one = await fetchFortById(
           TAGS.pokestops,
-          `${mem}/api/pokestop/id/${id}`,
+          `${mem}/api/pokestop/id/${encodeURIComponent(id)}`,
           secret,
           httpAuth,
         )
-        if (one) return one
+        // Match the SQL projection ({lat, lon} only). Returning the raw Golbat
+        // record would leak lure/power-up/detail fields past the sub-perm gates
+        // and area restrictions — a deep link only needs centering.
+        if (one) return { lat: one.lat, lon: one.lon }
       } catch (e) {
         log.warn(
           TAGS.pokestops,

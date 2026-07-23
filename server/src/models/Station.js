@@ -732,7 +732,7 @@ class Station extends Model {
             try {
               const one = await fetchFortById(
                 TAGS.stations,
-                `${mem}/api/station/id/${manualId}`,
+                `${mem}/api/station/id/${encodeURIComponent(manualId)}`,
                 secret,
                 httpAuth,
               )
@@ -1147,7 +1147,7 @@ class Station extends Model {
       // where this.query() would throw) can still serve the dynamax popup.
       const one = await evalScannerQuery(
         TAGS.stations,
-        `${mem}/api/station/id/${id}`,
+        `${mem}/api/station/id/${encodeURIComponent(id)}`,
         undefined,
         'GET',
         secret,

@@ -563,7 +563,7 @@ class Gym extends Model {
             try {
               const one = await fetchFortById(
                 TAGS.gyms,
-                `${mem}/api/gym/id/${manualId}`,
+                `${mem}/api/gym/id/${encodeURIComponent(manualId)}`,
                 secret,
                 httpAuth,
               )
@@ -843,11 +843,14 @@ class Gym extends Model {
       try {
         const one = await fetchFortById(
           TAGS.gyms,
-          `${mem}/api/gym/id/${id}`,
+          `${mem}/api/gym/id/${encodeURIComponent(id)}`,
           secret,
           httpAuth,
         )
-        if (one) return one
+        // Match the SQL projection ({lat, lon} only). Returning the raw Golbat
+        // record would leak raid/team/detail fields past the raids sub-perm
+        // split and area restrictions — a deep link only needs centering.
+        if (one) return { lat: one.lat, lon: one.lon }
       } catch (e) {
         log.warn(
           TAGS.gyms,
