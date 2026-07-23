@@ -29,14 +29,30 @@ export function TrackedTile({ index }) {
 
   React.useEffect(() => {
     if (advOpen.open && advOpen.id === id && advOpen.uid === item.uid) {
+      const localItem =
+        category === 'pokemon'
+          ? Poracle.toLocalState(
+              category,
+              [
+                {
+                  ...item,
+                  omittedFields: Poracle.getPokemonOmittedFields(item),
+                },
+              ],
+              defaults,
+            )[0]
+          : { ...defaults, ...item }
       useWebhookStore.setState((prev) => ({
         tempFilters: {
           ...prev.tempFilters,
-          [id]: { ...item, byDistance: !!item.distance },
+          [id]: {
+            ...localItem,
+            byDistance: !!item.distance,
+          },
         },
       }))
     }
-  }, [advOpen, id, item])
+  }, [advOpen, defaults, id, item])
 
   const onClose = React.useCallback(
     (newFilter, save) => {
@@ -44,7 +60,7 @@ export function TrackedTile({ index }) {
         apolloClient.mutate({
           mutation: webhookNodes[category.toUpperCase()],
           variables: {
-            data: Poracle.processor(category, [newFilter], defaults),
+            data: Poracle.toUpdatePayload(category, [newFilter], defaults),
             status: 'POST',
             category,
           },

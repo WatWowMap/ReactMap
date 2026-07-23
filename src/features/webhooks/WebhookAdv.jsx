@@ -40,6 +40,7 @@ const skipFields = new Set([
   'allForms',
   'pvpEntry',
   'noIv',
+  'omittedFields',
   'byDistance',
   'distance',
   'xs',
@@ -169,12 +170,18 @@ export function WebhookAdvanced() {
 
   const handleSlider = React.useCallback(
     (low, high) => (name, values) => {
+      const isPvp = name.startsWith('pvp')
       setFilterValues((prev) => ({ ...prev, [name]: values }))
       setPoracleValues((prev) => ({
         ...prev,
         [low]: values[0],
         [high]: values[1],
-        pvpEntry: name.startsWith('pvp'),
+        pvpEntry: isPvp
+          ? !!prev.pvp_ranking_league
+          : name === 'size'
+            ? prev.pvpEntry && !!prev.pvp_ranking_league
+            : false,
+        noIv: isPvp && prev.pvp_ranking_league ? false : prev.noIv,
       }))
     },
     [],
@@ -241,11 +248,18 @@ export function WebhookAdvanced() {
   const handleSelect = (event) => {
     const { name, value } = event.target
     const newObj = { [name]: value }
+    const hasPvpLeague =
+      name === 'pvp_ranking_league'
+        ? !!value
+        : !!poracleValues.pvp_ranking_league
     if (name === 'pvp_ranking_league') {
       newObj.pvp_ranking_min_cp = pvp === 'ohbem' ? 0 : value - 50
     }
     if (name.startsWith('pvp')) {
-      newObj.pvpEntry = true
+      newObj.pvpEntry = hasPvpLeague
+      if (hasPvpLeague) {
+        newObj.noIv = false
+      }
     }
     if (name === 'move' && value !== 9000) {
       newObj.allMoves = false
