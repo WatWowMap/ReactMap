@@ -926,9 +926,10 @@ class Pokestop extends Model {
                 Number(stop.power_up_level) === Number(onlyLevels)) &&
               filterRTree(stop, areaRestrictions, onlyAreas),
           )
-          if (mapped.length > queryLimits.pokestops) {
-            mapped.length = queryLimits.pokestops
-          }
+          // Mirror the SQL path: pass the result cap to secondaryFilter (its
+          // loop runs while filteredResults.length < resultLimit — omitting it
+          // returns zero markers) rather than pre-truncating, which would drop
+          // the appended off-viewport manual-id row before filtering.
           const final = this.secondaryFilter(
             mapped,
             args.filters,
@@ -940,6 +941,7 @@ class Pokestop extends Model {
             hasConfirmed,
             effectiveOnlyArEligible,
             memQuestLayer,
+            queryLimits.pokestops,
           )
           log.info(
             TAGS.pokestops,
@@ -2577,7 +2579,7 @@ class Pokestop extends Model {
    * @param {import('@rm/types').DbContext} ctx
    * @returns {Promise<{ hasConfirmedInvasions: boolean }>}
    */
-  static async getFilterContext({ isMad, hasConfirmed }) {
+  static async getFilterContext({ isMad, hasConfirmed, mem }) {
     // Check if rocket Pokemon filtering should be forced via config
     const fallback = config.getSafe('map.misc.fallbackRocketPokemonFiltering')
 
@@ -2586,6 +2588,11 @@ class Pokestop extends Model {
       // This allows filtering by potential rocket Pokemon even without confirmed invasions
       return { hasConfirmedInvasions: true }
     }
+
+    // Endpoint source: Golbat scan rows always carry confirmed + lineup slots,
+    // so it is confirmed-capable without an SQL probe — and a pure-endpoint
+    // model has no bound knex, so this.query() below would throw at startup.
+    if (mem) return { hasConfirmedInvasions: true }
 
     // Use original behavior when config is disabled
     if (isMad || !hasConfirmed) return { hasConfirmedInvasions: false }

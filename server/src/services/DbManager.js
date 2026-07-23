@@ -293,6 +293,11 @@ class DbManager extends Logger {
             schemaContext.mem = this.endpoints[i].endpoint
             schemaContext.secret = this.endpoints[i].secret
             schemaContext.httpAuth = this.endpoints[i].httpAuth
+            // getAll uses Golbat rows (confirmed + lineup slots) when the
+            // endpoint is active, so mark the source confirmed-capable even if
+            // the bound DB lacks the confirmed column (schemaCheck left it
+            // false). Endpoint capability is authoritative while mem is set.
+            schemaContext.hasConfirmed = true
           }
 
           Object.entries(this.models).forEach(([category, sources]) => {

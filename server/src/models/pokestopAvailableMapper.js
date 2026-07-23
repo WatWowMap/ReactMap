@@ -102,10 +102,12 @@ function questRewardKey(quest) {
     case 12:
       return `m${pokemon_id}-${amount}`
     case 20:
-      // §type20: covers both the GoFest 2026 Mewtwo mega-energy fallback
-      // (`m150-150`) and generic temp-evo mega-energy rewards. Falls back
-      // to `u20` when no pokemon_id is conveyed.
-      return pokemon_id > 0 ? `m${pokemon_id}-${amount}` : 'u20'
+      // §type20: temp-evo branch mega energy. secondaryFilter keys type 20 as a
+      // dedicated mega reward ONLY when both pokemon_id and amount are present
+      // (else no key), and never emits `u20` (type 20 has a dedicated filter).
+      // So advertise `m<id>-<amt>` only when complete — `u20`/`m<id>-0` would be
+      // a filter no marker can satisfy.
+      return pokemon_id > 0 && amount > 0 ? `m${pokemon_id}-${amount}` : ''
     default:
       return `u${reward_type}`
   }
@@ -161,6 +163,9 @@ function mapAvailablePokestops(api, ctx) {
       return
     }
     const key = questRewardKey(quest)
+    // An incomplete reward (e.g. type-20 missing pokemon_id/amount) yields no
+    // key — advertise nothing rather than a filter no marker can satisfy.
+    if (!key) return
     // SQL builds `u`-prefixed fallback keys via `questTypes.map(t =>
     // `u${t}`)` and never runs them through the conditions-attaching helper,
     // so fallback keys carry no conditions here either.
