@@ -28,10 +28,9 @@ function buildGyms(perms, defaults) {
       }
     })
   }
+  // Team/slot (t/g) keys are generated statically above — availability only
+  // contributes the dynamic raid keys (e/r + boss `<id>-<form>`).
   state.event.getAvailable('gyms').forEach((avail) => {
-    if (perms.gyms && (avail.startsWith('t') || avail.startsWith('g'))) {
-      gymFilters[avail] = new BaseFilter(defaults.allGyms)
-    }
     if (perms.raids) {
       if (avail.startsWith('e')) {
         gymFilters[avail] = new BaseFilter(defaults.eggs)

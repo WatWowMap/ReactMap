@@ -89,7 +89,13 @@ class DbManager extends Logger {
         })
         if ('endpoint' in schema) {
           this.endpoints[i] = schema
-          return null
+          // Pure-endpoint source (no DB creds): no knex connection. A dual
+          // source (endpoint + host/…) registers the endpoint AND falls
+          // through to build knex below, so migrated queries use the endpoint
+          // while un-migrated ones fall back to the bound DB.
+          if (!('host' in schema)) {
+            return null
+          }
         }
         const { log } = new Logger('knex', schema.database)
         return knex({
@@ -271,7 +277,28 @@ class DbManager extends Logger {
                 secret: this.endpoints[i].secret,
                 httpAuth: this.endpoints[i].httpAuth,
                 pvpV2: true,
+                // No DB schema check runs for a pure-endpoint source, but the
+                // Golbat scan always returns confirmed incident data (confirmed
+                // flag + lineup slots), so it IS confirmed-capable. Without this,
+                // onlyConfirmed is ineffective and confirmed `a` reward filters
+                // fall back to the grunt's possible-encounter pool.
+                hasConfirmed: true,
               }
+
+          // Dual source (endpoint + DB): schemaCheck ran on the bound knex
+          // (giving isMad + has* flags) but returns mem:''/secret:''. Overlay
+          // the endpoint AFTER so migrated queries (getAvailable) use it while
+          // un-migrated ones fall back to this.query() on the bound DB.
+          if (schema && this.endpoints[i]) {
+            schemaContext.mem = this.endpoints[i].endpoint
+            schemaContext.secret = this.endpoints[i].secret
+            schemaContext.httpAuth = this.endpoints[i].httpAuth
+            // getAll uses Golbat rows (confirmed + lineup slots) when the
+            // endpoint is active, so mark the source confirmed-capable even if
+            // the bound DB lacks the confirmed column (schemaCheck left it
+            // false). Endpoint capability is authoritative while mem is set.
+            schemaContext.hasConfirmed = true
+          }
 
           Object.entries(this.models).forEach(([category, sources]) => {
             if (Array.isArray(sources)) {
@@ -331,9 +358,13 @@ class DbManager extends Logger {
   async historicalRarity() {
     this.log.info('Setting historical rarity stats')
     try {
-      const results = await Promise.all(
+      // allSettled: skip MAD (no pokemon_stats) and pure-endpoint sources (no
+      // bound knex). A dual source (endpoint + DB) keeps its knex and still
+      // serves rarity, but if one such DB lacks pokemon_stats its query must
+      // not fail the whole batch and blank every source's rarity map.
+      const settled = await Promise.allSettled(
         (this.models.Pokemon ?? []).map(async (source) =>
-          source.isMad || source.mem
+          source.isMad || !this.connections[source.connection]
             ? []
             : source.SubModel.query()
                 .select('pokemon_id', raw('SUM(count) as total'))
@@ -341,6 +372,9 @@ class DbManager extends Logger {
                 .groupBy('pokemon_id'),
         ),
       )
+      const results = settled
+        .filter((r) => r.status === 'fulfilled')
+        .map((r) => r.value)
       this.setRarity(
         results.map((result) =>
           Object.fromEntries(
@@ -502,11 +536,18 @@ class DbManager extends Logger {
    * @returns {Promise<T | {}>}
    */
   async getOne(model, id) {
-    const data = await Promise.all(
+    // allSettled, not all: a pure-endpoint source whose by-id fetch misses
+    // falls through to this.query() on an unbound model, which throws. With
+    // Promise.all that one rejection would fail the whole single-fort lookup;
+    // here it just contributes no match.
+    const settled = await Promise.allSettled(
       this.models[model].map(async ({ SubModel, ...source }) =>
         SubModel.getOne(id, source),
       ),
     )
+    const data = settled
+      .filter((r) => r.status === 'fulfilled')
+      .map((r) => r.value)
     const cleaned = DbManager.deDupeResults(data.filter(Boolean))
     return cleaned || {}
   }
@@ -551,7 +592,11 @@ class DbManager extends Logger {
       const loopTime = Date.now()
       count += 1
       const bbox = getBboxFromCenter(args.lat, args.lon, distance)
-      const data = await Promise.all(
+      // allSettled: the fort search methods have no endpoint branch, so a
+      // pure-endpoint source hits an unbound this.query() and rejects. Degrade
+      // that source to no results rather than failing the whole search batch
+      // (a co-configured SQL source still contributes).
+      const settled = await Promise.allSettled(
         this.models[model].map(async ({ SubModel, ...source }) =>
           SubModel[method](
             perms,
@@ -562,6 +607,9 @@ class DbManager extends Logger {
           ),
         ),
       )
+      const data = settled
+        .filter((r) => r.status === 'fulfilled')
+        .map((r) => r.value)
       const results = DbManager.deDupeResults(data)
       if (results.length > deDuped.length) {
         deDuped = results
@@ -620,16 +668,21 @@ class DbManager extends Logger {
    * ]>}
    */
   async submissionCells(perms, args) {
-    const stopData = await Promise.all(
-      this.models.Pokestop.map(async ({ SubModel, ...source }) =>
-        SubModel.getSubmissions(perms, args, source),
-      ),
-    )
-    const gymData = await Promise.all(
-      this.models.Gym.map(async ({ SubModel, ...source }) =>
-        SubModel.getSubmissions(perms, args, source),
-      ),
-    )
+    // allSettled: getSubmissions has no endpoint branch, so a pure-endpoint
+    // source rejects on an unbound this.query(); degrade it to no cells rather
+    // than failing the whole submission overlay.
+    const collect = async (sources) =>
+      (
+        await Promise.allSettled(
+          sources.map(async ({ SubModel, ...source }) =>
+            SubModel.getSubmissions(perms, args, source),
+          ),
+        )
+      )
+        .filter((r) => r.status === 'fulfilled')
+        .map((r) => r.value)
+    const stopData = await collect(this.models.Pokestop)
+    const gymData = await collect(this.models.Gym)
     return [DbManager.deDupeResults(stopData), DbManager.deDupeResults(gymData)]
   }
 

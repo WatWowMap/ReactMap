@@ -41,8 +41,10 @@ class EventManager extends Logger {
     /** @type {Record<string, () => void>} */
     this.intervals = {}
 
-    /** @type {Partial<Record<keyof EventManager['available'], Promise<void>>>} */
+    /** @type {Partial<Record<keyof EventManager['available'], Promise<void>>>} in-flight setAvailable per category */
     this.availablePending = {}
+    /** @type {Record<string, number | undefined>} last successful setAvailable per category */
+    this.availableUpdatedAt = {}
 
     this.baseUrl =
       'https://raw.githubusercontent.com/WatWowMap/wwm-uicons-webp/main'
@@ -95,20 +97,31 @@ class EventManager extends Logger {
    * @param {import('../models').ScannerModelKeys} model
    * @param {import('./DbManager').DbManager} Db
    */
-  async setAvailable(category, model, Db) {
-    let pending = this.availablePending[category]
-    if (!pending) {
-      pending = this.#refreshAvailable(category, model, Db)
-      this.availablePending[category] = pending
+  async setAvailable(category, model, Db, force = false) {
+    // Single-flight + TTL: session-init triggers (queryOnSessionInit) fire on
+    // EVERY page load and can stampede — on endpoint-backed sources each
+    // refresh walks Golbat's whole fort cache. Concurrent calls share one
+    // in-flight promise; repeats within the TTL are served by the last result
+    // (map markers never depend on this — only the filter drawer options —
+    // so the staleness cost is bounded and cosmetic). Scheduled intervals and
+    // the explicit /api/v1/available route pass force=true.
+    if (this.availablePending[category]) return this.availablePending[category]
+    const ttlMs = (config.getSafe('api.availableRefreshSeconds') || 60) * 1000
+    if (
+      !force &&
+      this.availableUpdatedAt[category] &&
+      Date.now() - this.availableUpdatedAt[category] < ttlMs
+    ) {
+      return undefined
     }
-
-    try {
-      await pending
-    } finally {
-      if (this.availablePending[category] === pending) {
-        delete this.availablePending[category]
-      }
-    }
+    this.availablePending[category] = this.#refreshAvailable(
+      category,
+      model,
+      Db,
+    ).finally(() => {
+      delete this.availablePending[category]
+    })
+    return this.availablePending[category]
   }
 
   /**
@@ -156,6 +169,13 @@ class EventManager extends Logger {
     })
     this.available[category] = available
     this.addAvailable(category)
+    // Only arm the TTL when the refresh returned options. A failed endpoint
+    // refresh (esp. pure-endpoint) comes back empty; arming the TTL on it would
+    // suppress the retry for the whole window and keep the drawer empty until it
+    // expires — leaving it unstamped lets the next setAvailable recover.
+    if (available.length) {
+      this.availableUpdatedAt[category] = Date.now()
+    }
   }
 
   /**
@@ -218,7 +238,7 @@ class EventManager extends Logger {
     if (!config.getSafe('api.queryOnSessionInit.raids')) {
       this.intervals.raidUpdate = setLongInterval(
         async () => {
-          await this.setAvailable('gyms', 'Gym', Db)
+          await this.setAvailable('gyms', 'Gym', Db, true)
           await this.chatLog('event', {
             description: 'Refreshed available raids',
           })
@@ -229,7 +249,7 @@ class EventManager extends Logger {
     if (!config.getSafe('api.queryOnSessionInit.nests')) {
       this.intervals.nestUpdate = setLongInterval(
         async () => {
-          await this.setAvailable('nests', 'Nest', Db)
+          await this.setAvailable('nests', 'Nest', Db, true)
           await this.chatLog('event', {
             description: 'Refreshed available nests',
           })
@@ -240,7 +260,7 @@ class EventManager extends Logger {
     if (!config.getSafe('api.queryOnSessionInit.pokemon')) {
       this.intervals.pokemonUpdate = setLongInterval(
         async () => {
-          await this.setAvailable('pokemon', 'Pokemon', Db)
+          await this.setAvailable('pokemon', 'Pokemon', Db, true)
           await this.chatLog('event', {
             description: 'Refreshed available pokemon',
           })
@@ -251,7 +271,7 @@ class EventManager extends Logger {
     if (!config.getSafe('api.queryOnSessionInit.quests')) {
       this.intervals.questUpdate = setLongInterval(
         async () => {
-          await this.setAvailable('pokestops', 'Pokestop', Db)
+          await this.setAvailable('pokestops', 'Pokestop', Db, true)
           await this.chatLog('event', {
             description: 'Refreshed available quests & invasions',
           })
@@ -262,7 +282,7 @@ class EventManager extends Logger {
     if (!config.getSafe('api.queryOnSessionInit.stations')) {
       this.intervals.stationUpdate = setLongInterval(
         async () => {
-          await this.setAvailable('stations', 'Station', Db)
+          await this.setAvailable('stations', 'Station', Db, true)
           await this.chatLog('event', {
             description: 'Refreshed available stations',
           })
@@ -413,7 +433,7 @@ class EventManager extends Logger {
 
           // Update available rocket Pokemon whenever invasions are refreshed
           if (Db) {
-            await this.setAvailable('pokestops', 'Pokestop', Db)
+            await this.setAvailable('pokestops', 'Pokestop', Db, true)
           }
         }
       } catch (e) {

@@ -3,16 +3,32 @@
 /* eslint-disable no-continue */
 const { Model, raw } = require('objection')
 const i18next = require('i18next')
-const config = require('@rm/config')
 
-const { getAreaSql } = require('../utils/getAreaSql')
-const { applyManualIdFilter } = require('../utils/manualFilter')
+const config = require('@rm/config')
+const { log, TAGS } = require('@rm/logger')
+
+const { getAreaSql, areaRestrictionsDenyAll } = require('../utils/getAreaSql')
+const {
+  applyManualIdFilter,
+  normalizeManualId,
+} = require('../utils/manualFilter')
 const { getUserMidnight } = require('../utils/getClientTime')
+const {
+  evalScannerQuery,
+  describeScannerResponse,
+  fetchFortById,
+} = require('../utils/evalScannerQuery')
+const { filterRTree } = require('../utils/filterRTree')
+const { mapScanPokestop } = require('./pokestopScanMapper')
+const { getCombinedFortAvailable } = require('../utils/fortAvailable')
+const { buildPokestopDnfFilters } = require('../filters/fort/pokestop')
+const { describeDnfNarrowing } = require('../filters/fort/describeDnfNarrowing')
 const { state } = require('../services/state')
 const {
   isDualQuestLayerMode,
   resolveQuestLayerSelection,
 } = require('../utils/questLayerMode')
+const { mapAvailablePokestops } = require('./pokestopAvailableMapper')
 
 const MEGA_RESOURCE_REWARD_TYPE = 12
 const TEMP_EVO_BRANCH_RESOURCE_REWARD_TYPE = 20
@@ -77,6 +93,57 @@ const QUEST_REWARD_FILTER_DEFINITIONS = {
 const REWARD_TYPES_WITH_DEDICATED_FILTERS = Object.keys(
   QUEST_REWARD_FILTER_DEFINITIONS,
 ).map(Number)
+
+// Team leaders (41-43) and Giovanni (44) never hand out a catchable rocket
+// Pokemon, so both the confirmed-invasion branch and this config-derived
+// fallback exclude them.
+const ROCKET_LEADER_GRUNT_TYPE_MIN = 41
+const ROCKET_LEADER_GRUNT_TYPE_MAX = 44
+
+/**
+ * Adds config-derived `a${id}-${form}` rocket-encounter fallback keys to
+ * `availableSet`, mirroring the SQL `rocketPokemon` case (originally inline
+ * here, now shared so the SQL path and the `/api/pokestop/available`
+ * endpoint path stay byte-identical). Gated on
+ * `map.misc.fallbackRocketPokemonFiltering` (default `true`,
+ * `config/default.json`).
+ * @param {Set<string>} availableSet
+ */
+const applyRocketPokemonFallback = (availableSet) => {
+  if (!config.getSafe('map.misc.fallbackRocketPokemonFiltering')) return
+  // Always include potential rocket Pokemon from state.event.invasions as backup
+  Object.entries(state.event.invasions).forEach(([gruntType, invasionInfo]) => {
+    if (!invasionInfo) return
+    // Exclude team leaders (41-43) and Giovanni (44)
+    const gruntTypeNum = parseInt(gruntType, 10)
+    if (
+      gruntTypeNum >= ROCKET_LEADER_GRUNT_TYPE_MIN &&
+      gruntTypeNum <= ROCKET_LEADER_GRUNT_TYPE_MAX
+    )
+      return
+
+    // Add all potential first slot rewards
+    if (invasionInfo.firstReward && invasionInfo.encounters.first) {
+      invasionInfo.encounters.first.forEach((poke) => {
+        availableSet.add(`a${poke.id}-${poke.form}`)
+      })
+    }
+
+    // Add all potential second slot rewards
+    if (invasionInfo.secondReward && invasionInfo.encounters.second) {
+      invasionInfo.encounters.second.forEach((poke) => {
+        availableSet.add(`a${poke.id}-${poke.form}`)
+      })
+    }
+
+    // Add all potential third slot rewards
+    if (invasionInfo.thirdReward && invasionInfo.encounters.third) {
+      invasionInfo.encounters.third.forEach((poke) => {
+        availableSet.add(`a${poke.id}-${poke.form}`)
+      })
+    }
+  })
+}
 
 const questProps = {
   quest_type: true,
@@ -186,6 +253,9 @@ class Pokestop extends Model {
       hasLayerColumn,
       hasPowerUp,
       hasConfirmed,
+      mem,
+      secret,
+      httpAuth,
     },
   ) {
     const {
@@ -785,6 +855,123 @@ class Pokestop extends Model {
     } else if (onlyLevels !== 'all' && hasPowerUp) {
       query.andWhere('power_up_level', onlyLevels)
     }
+    // Endpoint-backed source: fetch the DNF-less match-all scan and map each
+    // Golbat row into the mapRDM shape secondaryFilter expects. Mirrors
+    // Gym.getAll — the same secondaryFilter runs for both SQL and endpoint
+    // rows. `with_incidents:true` makes Golbat attach invasions[] (grunts +
+    // showcase/goldstop/kecleon event rows). On any failure/bad-shape we log
+    // and fall through to the SQL block below.
+    if (mem) {
+      // filterRTree below allow-alls on empty area inputs, unlike the SQL
+      // getAreaSql — so enforce the strict-area denial before accepting any
+      // endpoint rows (else a no-area user under strict mode sees everything).
+      if (areaRestrictionsDenyAll(areaRestrictions, onlyAreas)) return []
+      try {
+        const dnf = buildPokestopDnfFilters(args.filters, state.event.invasions)
+        // Endpoint rows always carry BOTH quest layers, so resolve the layer
+        // selection as dual-capable (mirrors getAvailable's override). The SQL
+        // ctx flags are undefined for a pure-endpoint source, which would make
+        // effectiveQuestLayer resolve to 'both' even when questLayerMode
+        // restricts to a single layer.
+        const memQuestLayer = resolveQuestLayerSelection(
+          args.filters.onlyShowQuestSet,
+          { hasAltQuests: true },
+        )
+        const res = await evalScannerQuery(
+          TAGS.pokestops,
+          `${mem}/api/pokestop/scan`,
+          JSON.stringify({
+            min: { latitude: args.minLat, longitude: args.minLon },
+            max: { latitude: args.maxLat, longitude: args.maxLon },
+            limit: queryLimits.pokestops,
+            filters: dnf,
+            with_incidents: true,
+          }),
+          'POST',
+          secret,
+          httpAuth,
+        )
+        if (res && Array.isArray(res.pokestops)) {
+          // Deep-link parity with SQL's `(bbox) OR id = manualId` — see Gym.
+          const manualId = normalizeManualId(args.filters.onlyManualId)
+          if (
+            manualId !== null &&
+            !res.pokestops.some((p) => p && p.id === manualId)
+          ) {
+            try {
+              const one = await fetchFortById(
+                TAGS.pokestops,
+                `${mem}/api/pokestop/id/${encodeURIComponent(manualId)}`,
+                secret,
+                httpAuth,
+              )
+              if (one) res.pokestops.push(one)
+            } catch {
+              // by-id miss mirrors SQL finding no such row
+            }
+          }
+          const mapped = res.pokestops.map(mapScanPokestop).filter(
+            (stop) =>
+              stop &&
+              // Mirror the SQL-only gates: the endpoint path never applied
+              // them and secondaryFilter has no equivalent, so stale/wrong
+              // stops would render where the SQL source suppresses them.
+              // Freshness (hideOldPokestops):
+              (!hideOldPokestops ||
+                stop.updated > ts - stopValidDataLimit * 86400) &&
+              // Power-up level (onlyLevels): power-ups are out of the game
+              // (also why power_up_level is dropped from the DNF); the gate is
+              // vestigial but mirrored for exact endpoint↔SQL parity. SQL only
+              // applies it under onlyAllPokestops (the `else` of `if
+              // (!onlyAllPokestops)`), so guard on it like the gym sibling —
+              // else the whole quest/invasion/lure layer under-returns.
+              (!onlyAllPokestops ||
+                onlyLevels === 'all' ||
+                Number(stop.power_up_level) === Number(onlyLevels)) &&
+              filterRTree(stop, areaRestrictions, onlyAreas),
+          )
+          // Mirror the SQL path: pass the result cap to secondaryFilter (its
+          // loop runs while filteredResults.length < resultLimit — omitting it
+          // returns zero markers) rather than pre-truncating, which would drop
+          // the appended off-viewport manual-id row before filtering.
+          const final = this.secondaryFilter(
+            mapped,
+            args.filters,
+            false,
+            ts,
+            midnight,
+            perms,
+            hasMultiInvasions,
+            hasConfirmed,
+            effectiveOnlyArEligible,
+            memQuestLayer,
+            queryLimits.pokestops,
+          )
+          log.info(
+            TAGS.pokestops,
+            describeDnfNarrowing(
+              'POKESTOP',
+              dnf,
+              res.examined,
+              res.pokestops.length,
+              final.length,
+            ),
+          )
+          return final
+        }
+        log.warn(
+          TAGS.pokestops,
+          `[POKESTOP] /api/pokestop/scan gave no pokestops array — ${describeScannerResponse(
+            res,
+          )} — falling back to SQL for this source`,
+        )
+      } catch (e) {
+        log.warn(
+          TAGS.pokestops,
+          `[POKESTOP] /api/pokestop/scan error — falling back to SQL for this source: ${e}`,
+        )
+      }
+    }
     const results = await query
 
     const normalized = isMad
@@ -1255,7 +1442,62 @@ class Pokestop extends Model {
     hasShowcaseData,
     hasShowcaseForm,
     hasShowcaseType,
+    mem,
+    secret,
+    httpAuth,
   }) {
+    // A source with a Golbat endpoint (mem truthy) fetches the available list
+    // from the endpoint. On failure (503 when fort_in_memory is off, or a
+    // network error) it falls through to the SQL block below: a DUAL source
+    // (endpoint + DB) runs the SQL fallback on its bound knex, while a
+    // pure-endpoint source has no bound knex, so this.query() throws and the
+    // caller's Promise.allSettled drops it (contributing nothing). The SQL
+    // block also serves mem:'' (DB / MAD) sources directly.
+    if (mem) {
+      try {
+        // From the combined /api/fort/available (see Gym.getAvailable) — no
+        // per-type fallback; a combined failure falls through to SQL below.
+        const combined = await getCombinedFortAvailable(
+          TAGS.pokestops,
+          mem,
+          secret,
+          httpAuth,
+        )
+        const res = combined?.pokestops
+        // getCombinedFortAvailable resolves null when the endpoint is
+        // unavailable (e.g. 503 when fort_in_memory is off, or a network
+        // error), so res is undefined and this guard falls through to SQL.
+        if (res && Array.isArray(res.quests) && Array.isArray(res.invasions)) {
+          // The Golbat endpoint always returns both AR (`with_ar:true`) and
+          // non-AR quest tuples; honor `map.misc.questLayerMode` the same way
+          // the SQL path does so we don't advertise filters for a hidden layer.
+          const questLayer = resolveQuestLayerSelection('both', {
+            hasAltQuests: true,
+          })
+          const result = mapAvailablePokestops(res, {
+            invasions: state.event.invasions,
+            includeBaseQuests: questLayer !== 'without_ar',
+            includeAltQuests: questLayer !== 'with_ar',
+          })
+          const availableSet = new Set(result.available)
+          applyRocketPokemonFallback(availableSet)
+          log.info(
+            TAGS.pokestops,
+            `[POKESTOP] loaded available from ${mem}/api/fort/available — ${availableSet.size} filter keys (${res.quests.length} quests, ${res.invasions.length} invasions, ${(res.lures || []).length} lures, ${(res.showcases || []).length} showcases), ${Object.keys(result.conditions).length} reward conditions`,
+          )
+          return { available: [...availableSet], conditions: result.conditions }
+        }
+        log.warn(
+          TAGS.pokestops,
+          '[POKESTOP] /api/fort/available unavailable (e.g. fort_in_memory off) — falling through to SQL (empty only for a pure-endpoint source)',
+        )
+      } catch (e) {
+        log.warn(
+          TAGS.pokestops,
+          `[POKESTOP] /api/fort/available error — falling through to SQL (empty only for a pure-endpoint source): ${e}`,
+        )
+      }
+    }
     const ts = Math.floor(Date.now() / 1000)
     const finalList = new Set()
     const conditions = {}
@@ -1809,41 +2051,7 @@ class Pokestop extends Model {
             })
           }
 
-          if (config.getSafe('map.misc.fallbackRocketPokemonFiltering')) {
-            // Always include potential rocket Pokemon from state.event.invasions as backup
-            Object.entries(state.event.invasions).forEach(
-              ([gruntType, invasionInfo]) => {
-                if (!invasionInfo) return
-                // Exclude team leaders (41-43) and Giovanni (44)
-                const gruntTypeNum = parseInt(gruntType, 10)
-                if (gruntTypeNum >= 41 && gruntTypeNum <= 44) return
-
-                // Add all potential first slot rewards
-                if (invasionInfo.firstReward && invasionInfo.encounters.first) {
-                  invasionInfo.encounters.first.forEach((poke) => {
-                    finalList.add(`a${poke.id}-${poke.form}`)
-                  })
-                }
-
-                // Add all potential second slot rewards
-                if (
-                  invasionInfo.secondReward &&
-                  invasionInfo.encounters.second
-                ) {
-                  invasionInfo.encounters.second.forEach((poke) => {
-                    finalList.add(`a${poke.id}-${poke.form}`)
-                  })
-                }
-
-                // Add all potential third slot rewards
-                if (invasionInfo.thirdReward && invasionInfo.encounters.third) {
-                  invasionInfo.encounters.third.forEach((poke) => {
-                    finalList.add(`a${poke.id}-${poke.form}`)
-                  })
-                }
-              },
-            )
-          }
+          applyRocketPokemonFallback(finalList)
           break
         case 'showcase':
           if (hasShowcaseData) {
@@ -1890,7 +2098,15 @@ class Pokestop extends Model {
 
   static parseRdmRewards = (quest) => {
     if (quest.quest_reward_type) {
-      const { info } = JSON.parse(quest.quest_rewards)[0]
+      // Endpoint rows carry an already-parsed rewards array; SQL rows carry a
+      // JSON string. Defensive: a malformed row could have quest_reward_type
+      // with no rewards, so don't let one bad stop throw and break the query.
+      const rewards =
+        typeof quest.quest_rewards === 'string'
+          ? JSON.parse(quest.quest_rewards)
+          : quest.quest_rewards
+      if (!Array.isArray(rewards) || rewards.length === 0) return quest
+      const { info } = rewards[0]
       switch (quest.quest_reward_type) {
         case 1:
           Object.keys(info).forEach((x) => (quest[`xp_${x}`] = info[x]))
@@ -2293,7 +2509,26 @@ class Pokestop extends Model {
       : results
   }
 
-  static getOne(id, { isMad }) {
+  static async getOne(id, { isMad, mem, secret, httpAuth }) {
+    if (mem) {
+      try {
+        const one = await fetchFortById(
+          TAGS.pokestops,
+          `${mem}/api/pokestop/id/${encodeURIComponent(id)}`,
+          secret,
+          httpAuth,
+        )
+        // Match the SQL projection ({lat, lon} only). Returning the raw Golbat
+        // record would leak lure/power-up/detail fields past the sub-perm gates
+        // and area restrictions — a deep link only needs centering.
+        if (one) return { lat: one.lat, lon: one.lon }
+      } catch (e) {
+        log.warn(
+          TAGS.pokestops,
+          `[POKESTOP] /api/pokestop/id error — falling back to SQL: ${e}`,
+        )
+      }
+    }
     return this.query()
       .select([
         isMad ? 'latitude AS lat' : 'lat',
@@ -2351,7 +2586,7 @@ class Pokestop extends Model {
    * @param {import('@rm/types').DbContext} ctx
    * @returns {Promise<{ hasConfirmedInvasions: boolean }>}
    */
-  static async getFilterContext({ isMad, hasConfirmed }) {
+  static async getFilterContext({ isMad, hasConfirmed, mem }) {
     // Check if rocket Pokemon filtering should be forced via config
     const fallback = config.getSafe('map.misc.fallbackRocketPokemonFiltering')
 
@@ -2360,6 +2595,11 @@ class Pokestop extends Model {
       // This allows filtering by potential rocket Pokemon even without confirmed invasions
       return { hasConfirmedInvasions: true }
     }
+
+    // Endpoint source: Golbat scan rows always carry confirmed + lineup slots,
+    // so it is confirmed-capable without an SQL probe — and a pure-endpoint
+    // model has no bound knex, so this.query() below would throw at startup.
+    if (mem) return { hasConfirmedInvasions: true }
 
     // Use original behavior when config is disabled
     if (isMad || !hasConfirmed) return { hasConfirmedInvasions: false }

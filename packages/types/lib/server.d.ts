@@ -52,6 +52,7 @@ export interface DbContext {
   hasPokemonBackground: boolean
   hasPokemonShinyStats?: boolean
   connection?: number
+  httpAuth?: { username: string; password: string } | null
 }
 
 export interface ExpressUser extends User {
@@ -68,6 +69,46 @@ export interface AvailablePokemon {
   count: number
 }
 
+export interface AvailablePokestopQuest {
+  with_ar: boolean
+  reward_type: number
+  item_id: number
+  amount: number
+  pokemon_id: number
+  form_id: number
+  title: string
+  target: number
+  count: number
+}
+
+export interface AvailablePokestopInvasion {
+  character: number
+  display_type: number
+  confirmed: boolean
+  slot1_pokemon_id: number
+  slot1_form: number
+  count: number
+}
+
+export interface AvailablePokestopLure {
+  lure_id: number
+  count: number
+}
+
+export interface AvailablePokestopShowcase {
+  pokemon_id: number
+  form: number
+  type_id: number
+  count: number
+}
+
+export interface AvailablePokestops {
+  quests: AvailablePokestopQuest[]
+  invasions: AvailablePokestopInvasion[]
+  lures: AvailablePokestopLure[]
+  showcases: AvailablePokestopShowcase[]
+}
+
 export interface Available {
   pokemon: ModelReturn<typeof Pokemon, 'getAvailable'>
   gyms: ModelReturn<typeof Gym, 'getAvailable'>
@@ -81,6 +122,7 @@ export interface ApiEndpoint {
   type: string
   endpoint: string
   secret: string
+  httpAuth?: { username: string; password: string } | null
   useFor: Lowercase<ModelKeys>[]
 }
 
@@ -91,6 +133,12 @@ export interface DbConnection {
   password: string
   database: string
   useFor: Lowercase<ModelKeys>[]
+  // Optional Golbat endpoint on the same source (dual): migrated queries use
+  // the endpoint, the rest fall back to this DB connection.
+  endpoint?: string
+  secret?: string
+  httpAuth?: { username: string; password: string } | null
+  type?: string
 }
 
 export type Schema = ApiEndpoint | DbConnection
