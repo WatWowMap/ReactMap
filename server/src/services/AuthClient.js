@@ -1,5 +1,7 @@
 // @ts-check
 /* eslint-disable no-unused-vars */
+const escapeHtml = require('escape-html')
+
 const { Logger } = require('@rm/logger')
 const config = require('@rm/config')
 
@@ -58,24 +60,32 @@ class AuthClient extends Logger {
     if (typeof embed === 'string') return embed
     const { title, author, thumbnail, description, fields, footer } = embed
     return `
-      ${title ? `<h2>${title}</h2>` : ''}
-      ${author ? `<p><strong>${author.name}</strong></p>` : ''}
-      ${thumbnail ? `<img src="${thumbnail.url}" alt="thumbnail" />` : ''}
-      ${description ? `<p>${description}</p>` : ''}
+      ${title ? `<h2>${escapeHtml(title)}</h2>` : ''}
+      ${author ? `<p><strong>${escapeHtml(author.name)}</strong></p>` : ''}
+      ${
+        thumbnail
+          ? `<img src="${escapeHtml(thumbnail.url)}" alt="thumbnail" />`
+          : ''
+      }
+      ${description ? `<p>${escapeHtml(description)}</p>` : ''}
       ${
         fields
           ? fields
               .map(
                 ({ name, value }) =>
-                  `<p><strong>${name}</strong>: ${value}</p>`,
+                  `<p><strong>${escapeHtml(name)}</strong>: ${escapeHtml(
+                    value,
+                  )}</p>`,
               )
               .join('')
           : ''
       }
-      ${footer ? `<p><em>${footer.text}</em></p>` : ''}
+      ${footer ? `<p><em>${escapeHtml(footer.text)}</em></p>` : ''}
       ${
         embed.timestamp
-          ? `<p><em>${dateFormat.format(new Date(embed.timestamp))}</em></p>`
+          ? `<p><em>${escapeHtml(
+              dateFormat.format(new Date(embed.timestamp)),
+            )}</em></p>`
           : ''
       }
     `
