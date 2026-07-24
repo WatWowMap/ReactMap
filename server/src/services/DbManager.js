@@ -293,11 +293,11 @@ class DbManager extends Logger {
             schemaContext.mem = this.endpoints[i].endpoint
             schemaContext.secret = this.endpoints[i].secret
             schemaContext.httpAuth = this.endpoints[i].httpAuth
-            // getAll uses Golbat rows (confirmed + lineup slots) when the
-            // endpoint is active, so mark the source confirmed-capable even if
-            // the bound DB lacks the confirmed column (schemaCheck left it
-            // false). Endpoint capability is authoritative while mem is set.
-            schemaContext.hasConfirmed = true
+            // NB: leave schema-derived capability flags (hasConfirmed, etc.)
+            // untouched — the SQL fallback path relies on them (a dual source
+            // whose DB lacks the `confirmed` column must NOT query it). The
+            // endpoint always provides confirmed data, so the endpoint scan
+            // branch marks itself confirmed-capable locally instead.
           }
 
           Object.entries(this.models).forEach(([category, sources]) => {
@@ -358,23 +358,32 @@ class DbManager extends Logger {
   async historicalRarity() {
     this.log.info('Setting historical rarity stats')
     try {
-      // allSettled: skip MAD (no pokemon_stats) and pure-endpoint sources (no
-      // bound knex). A dual source (endpoint + DB) keeps its knex and still
-      // serves rarity, but if one such DB lacks pokemon_stats its query must
-      // not fail the whole batch and blank every source's rarity map.
+      // Only DB-backed, non-MAD sources have pokemon_stats. A dual source
+      // (endpoint + DB) keeps its knex and still serves rarity.
+      const eligible = (this.models.Pokemon ?? []).filter(
+        (source) => !source.isMad && this.connections[source.connection],
+      )
+      // allSettled: if one dual-source DB lacks pokemon_stats its query must not
+      // fail the whole batch and blank every source's rarity map.
       const settled = await Promise.allSettled(
-        (this.models.Pokemon ?? []).map(async (source) =>
-          source.isMad || !this.connections[source.connection]
-            ? []
-            : source.SubModel.query()
-                .select('pokemon_id', raw('SUM(count) as total'))
-                .from('pokemon_stats')
-                .groupBy('pokemon_id'),
+        eligible.map((source) =>
+          source.SubModel.query()
+            .select('pokemon_id', raw('SUM(count) as total'))
+            .from('pokemon_stats')
+            .groupBy('pokemon_id'),
         ),
       )
       const results = settled
         .filter((r) => r.status === 'fulfilled')
         .map((r) => r.value)
+      // Every eligible query rejected (e.g. the sole dual-source DB is down):
+      // retain the last-good rarity map rather than clearing it to empty.
+      if (eligible.length && results.length === 0) {
+        this.log.warn(
+          'Historical rarity: all sources failed; retaining last-good stats',
+        )
+        return
+      }
       this.setRarity(
         results.map((result) =>
           Object.fromEntries(

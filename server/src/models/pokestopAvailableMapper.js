@@ -166,14 +166,11 @@ function mapAvailablePokestops(api, ctx) {
     // An incomplete reward (e.g. type-20 missing pokemon_id/amount) yields no
     // key — advertise nothing rather than a filter no marker can satisfy.
     if (!key) return
-    // SQL builds `u`-prefixed fallback keys via `questTypes.map(t =>
-    // `u${t}`)` and never runs them through the conditions-attaching helper,
-    // so fallback keys carry no conditions here either.
-    if (key[0] === 'u') {
-      available.add(key)
-    } else {
-      process(key, quest.title, quest.target)
-    }
+    // Every key — including generic `u<type>` fallbacks — carries its
+    // title/target conditions, matching the SQL path's
+    // `genericQuests.forEach(process)`. Otherwise endpoint deployments lose the
+    // advanced quest-condition selector for generic rewards.
+    process(key, quest.title, quest.target)
   })
 
   // Invasions: `i`/`b` keys are unconditional; the `a` key additionally

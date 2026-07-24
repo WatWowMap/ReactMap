@@ -942,7 +942,10 @@ class Pokestop extends Model {
             midnight,
             perms,
             hasMultiInvasions,
-            hasConfirmed,
+            // The endpoint scan always returns confirmed lineup data, so treat
+            // it as confirmed-capable regardless of the source's schema flag
+            // (which the SQL fallback below still relies on).
+            true,
             effectiveOnlyArEligible,
             memQuestLayer,
             queryLimits.pokestops,

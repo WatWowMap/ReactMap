@@ -131,6 +131,12 @@ class EventManager extends Logger {
    */
   async #refreshAvailable(category, model, Db) {
     const available = await Db.getAvailable(model)
+    // A failed refresh (esp. a pure-endpoint /api/fort/available request) comes
+    // back empty. Don't replace the last-good drawer + conditions with it or arm
+    // the TTL — keep serving the previous options and retry on the next call. (A
+    // genuinely-empty category just re-scans next session; this list is
+    // drawer-only, so that is harmless.)
+    if (!available.length) return
 
     /** @param {string} key */
     const parseKey = (key) => {
@@ -169,13 +175,7 @@ class EventManager extends Logger {
     })
     this.available[category] = available
     this.addAvailable(category)
-    // Only arm the TTL when the refresh returned options. A failed endpoint
-    // refresh (esp. pure-endpoint) comes back empty; arming the TTL on it would
-    // suppress the retry for the whole window and keep the drawer empty until it
-    // expires — leaving it unstamped lets the next setAvailable recover.
-    if (available.length) {
-      this.availableUpdatedAt[category] = Date.now()
-    }
+    this.availableUpdatedAt[category] = Date.now()
   }
 
   /**
