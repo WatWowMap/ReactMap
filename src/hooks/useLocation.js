@@ -13,7 +13,7 @@ import { RecoveringLocateControl } from '@utils/locateControl'
 
 /**
  * Use location hook
- * @returns {{ lc: import('leaflet.locatecontrol').LocateControl & { _onClick: () => void }, requesting: boolean, color: import('@mui/material').ButtonProps['color'], locationError: { show: boolean, message: string }, hideLocationError: () => void }}
+ * @returns {{ lc: import('leaflet.locatecontrol').LocateControl & { _onClick: () => void, _active?: boolean }, requesting: boolean, color: import('@mui/material').ButtonProps['color'], locationError: { show: boolean, message: string }, hideLocationError: () => void }}
  */
 export function useLocation(dependency = false) {
   const map = useMap()
