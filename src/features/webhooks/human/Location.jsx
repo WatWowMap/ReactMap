@@ -48,6 +48,14 @@ const Location = () => {
   // would silently overwrite a location they set on purpose.
   const awaitingLocate = React.useRef(false)
 
+  // Search, My Location, and the map picker call `handleLocationChange`
+  // directly, which both writes the store and POSTs. That store write also
+  // re-fires the `webhookLocation` sync effect below (which exists for the
+  // drag picker, whose only signal is the store). Remember the coordinates we
+  // are already persisting so the effect can skip a duplicate save.
+  /** @type {React.MutableRefObject<[number, number] | null>} */
+  const savingLocation = React.useRef(null)
+
   /** @param {[number, number]} location */
   const handleLocationChange = (location) => {
     if (location.every((x) => x !== 0)) {
@@ -55,6 +63,7 @@ const Location = () => {
       // come back yet, otherwise a slow GPS fix would land on top of a pick the
       // user made while waiting for it.
       awaitingLocate.current = false
+      savingLocation.current = location
       useWebhookStore.setState((prev) => ({
         location: prev.location.some((x, i) => x !== location[i])
           ? [location[0] ?? 0, location[1] ?? 0]
@@ -66,11 +75,23 @@ const Location = () => {
           data: location,
           status: 'POST',
         },
-      }).then(({ data: newData }) => {
-        if (newData?.webhook) {
-          useWebhookStore.setState({ human: newData.webhook.human })
-        }
       })
+        .then(({ data: newData }) => {
+          if (newData?.webhook) {
+            useWebhookStore.setState({ human: newData.webhook.human })
+          }
+        })
+        .finally(() => {
+          // Only clear if a newer save has not already claimed the ref, so an
+          // in-flight save can't wipe the marker for the location after it.
+          if (
+            savingLocation.current &&
+            savingLocation.current[0] === location[0] &&
+            savingLocation.current[1] === location[1]
+          ) {
+            savingLocation.current = null
+          }
+        })
     }
   }
 
@@ -87,6 +108,18 @@ const Location = () => {
   })
 
   React.useEffect(() => {
+    const saving = savingLocation.current
+    if (
+      saving &&
+      saving[0] === webhookLocation[0] &&
+      saving[1] === webhookLocation[1]
+    ) {
+      // `handleLocationChange` already saved these exact coordinates and only
+      // updated the store, which is what re-triggered this effect. The drag
+      // picker, by contrast, writes the store without saving and relies on the
+      // POST below.
+      return
+    }
     if (webhookLocation[0] !== latitude || webhookLocation[1] !== longitude) {
       handleLocationChange(webhookLocation)
     }
