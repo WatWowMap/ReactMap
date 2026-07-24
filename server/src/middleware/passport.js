@@ -2,6 +2,8 @@
 
 const passport = require('passport')
 
+const { getUserDisplayName } = require('../utils/getUserDisplayName')
+
 /**
  *
  * @param {import('express').Application} app
@@ -17,7 +19,7 @@ passport.serializeUser(async (user, done) => {
 
 passport.deserializeUser(async (user, done) => {
   if (user.perms.map) {
-    done(null, user)
+    done(null, { ...user, username: getUserDisplayName(user) })
   } else {
     done('User does not have map permissions', null)
   }

@@ -5,6 +5,7 @@ const config = require('@rm/config')
 const { log, TAGS } = require('@rm/logger')
 
 const { setLongTimeout } = require('../utils/setLongTimeout')
+const { getUserDisplayName } = require('../utils/getUserDisplayName')
 const { state } = require('./state')
 
 const scannerQueue = {
@@ -27,6 +28,7 @@ async function scannerApi(
   user = { id: 0, username: 'a visitor' },
 ) {
   const { backendConfig, ...scanModes } = config.getSafe('scanner')
+  const scannerUsername = getUserDisplayName(user)
 
   const scanNextOptions = {
     routes: scanModes.scanNext.routes,
@@ -104,7 +106,7 @@ async function scannerApi(
         state.stats.setScanHistory(user.id, coords.length)
         log.info(
           TAGS.scanner,
-          `Request to scan new location by ${user.username}${
+          `Request to scan new location by ${scannerUsername}${
             user.id ? ` (${user.id})` : ''
           } - type ${data.scanSize}: ${data.scanLocation[0].toFixed(
             5,
@@ -140,7 +142,7 @@ async function scannerApi(
                 method: 'POST',
                 headers,
                 body: JSON.stringify({
-                  username: user.username,
+                  username: scannerUsername,
                   locations: coords,
                   options: scanNextOptions,
                 }),
@@ -165,7 +167,7 @@ async function scannerApi(
         state.stats.setScanHistory(user.id, coords.length)
         log.info(
           TAGS.scanner,
-          `Request to scan new zone by ${user.username}${
+          `Request to scan new zone by ${scannerUsername}${
             user.id ? ` (${user.id})` : ''
           } - size ${data.scanSize}: ${data.scanLocation[0].toFixed(
             5,
@@ -179,7 +181,7 @@ async function scannerApi(
                 method: 'POST',
                 headers,
                 body: JSON.stringify({
-                  username: user.username,
+                  username: scannerUsername,
                   locations: coords,
                   options: scanZoneOptions,
                 }),
@@ -257,9 +259,9 @@ async function scannerApi(
       })
     }
     const scannerResponse = await fetch(
-      `${payloadObj.url}${payloadObj.url.includes('?') ? '&' : '?'}username=${
-        user.username || user.id || 'a visitor'
-      }`,
+      `${payloadObj.url}${
+        payloadObj.url.includes('?') ? '&' : '?'
+      }username=${encodeURIComponent(scannerUsername)}`,
       {
         ...payloadObj.options,
         signal: controller.signal,
@@ -320,7 +322,7 @@ async function scannerApi(
         {
           title: `${capitalized} Request`,
           author: {
-            name: user.username,
+            name: scannerUsername,
             icon_url: `https://cdn.discordapp.com/avatars/${user.discordId}/${user.avatar}.png`,
           },
           description: `<@${user.discordId}>\n${capitalized} Size: ${data.scanSize}\nCoordinates: ${coords.length}\n`,
@@ -361,7 +363,7 @@ async function scannerApi(
       case 201:
         log.info(
           TAGS.scanner,
-          `Request from ${user.username || 'a visitor'}${
+          `Request from ${scannerUsername}${
             user.id ? ` (${user.id})` : ''
           } successful`,
         )
@@ -397,6 +399,10 @@ async function scannerApi(
         )
         return { status: 'error', message: 'scanner_no_device' }
       default:
+        log.warn(
+          TAGS.scanner,
+          `Unexpected ${backendConfig.platform} response for ${category}: ${scannerResponse.status} ${scannerResponse.statusText}`,
+        )
         return { status: 'error', message: 'scanner_error' }
     }
   } catch (e) {
