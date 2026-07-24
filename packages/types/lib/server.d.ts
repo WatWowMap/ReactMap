@@ -55,7 +55,6 @@ export interface DbContext {
 }
 
 export interface ExpressUser extends User {
-  username: string
   perms: Permissions
   valid: boolean
   avatar: string

@@ -10,7 +10,6 @@ const { areaPerms } = require('../utils/areaPerms')
 const { webhookPerms } = require('../utils/webhookPerms')
 const { scannerPerms, scannerCooldownBypass } = require('../utils/scannerPerms')
 const { mergePerms } = require('../utils/mergePerms')
-const { getUserDisplayName } = require('../utils/getUserDisplayName')
 const { AuthClient } = require('./AuthClient')
 
 /**
@@ -123,11 +122,7 @@ class TelegramClient extends AuthClient {
 
   /** @type {import('@rainb0w-clwn/passport-telegram-official/dist/types').CallbackWithRequest} */
   async authHandler(req, profile, done) {
-    const baseUser = {
-      ...profile,
-      username: getUserDisplayName(profile),
-      rmStrategy: this.rmStrategy,
-    }
+    const baseUser = { ...profile, rmStrategy: this.rmStrategy }
     const groups = await this.getUserGroups(baseUser)
     const user = this.getUserPerms(baseUser, groups)
 
