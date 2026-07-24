@@ -1,3 +1,10 @@
+## [1.48.2](https://github.com/WatWowMap/ReactMap/compare/v1.48.1...v1.48.2) (2026-07-24)
+
+
+### Bug Fixes
+
+* **webhooks:** stop GPS ticks overwriting the saved Poracle location ([#1231](https://github.com/WatWowMap/ReactMap/issues/1231)) ([0f27862](https://github.com/WatWowMap/ReactMap/commit/0f278626684fc193d0b72d2be6c40a1f77353e27))
+
 ## [1.48.1](https://github.com/WatWowMap/ReactMap/compare/v1.48.0...v1.48.1) (2026-07-22)
 
 
