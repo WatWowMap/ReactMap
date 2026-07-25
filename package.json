@@ -29,6 +29,7 @@
     "release": "vite build -- -r",
     "server": "node server/src/index.js",
     "start": "node .",
+    "test": "yarn workspace @rm/masterfile run test",
     "prepare": "husky install",
     "watch": "vite"
   },

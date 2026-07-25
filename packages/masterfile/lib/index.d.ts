@@ -97,3 +97,5 @@ export declare function generate(
 ): Promise<Masterfile>
 
 export declare function read(): Masterfile
+
+export declare function load(): Promise<Masterfile>

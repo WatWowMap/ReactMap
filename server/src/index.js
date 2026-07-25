@@ -16,7 +16,7 @@ const http = require('http')
 const { log, TAGS, Logger } = require('@rm/logger')
 const config = require('@rm/config')
 
-const { state } = require('./services/state')
+const { shutdown, state } = require('./services/state')
 const { starti18n } = require('./services/i18n')
 const { checkForUpdates } = require('./services/checkForUpdates')
 const { loadLatestAreas, loadCachedAreas } = require('./services/areas')
@@ -38,6 +38,8 @@ const { migrate } = require('./db/migrate')
 const { rootRouter } = require('./routes/rootRouter')
 
 const startServer = async () => {
+  await state.event.initialize()
+
   if (!config.getSafe('devOptions.skipUpdateCheck')) {
     await checkForUpdates()
     log.info(TAGS.update, 'Completed')
@@ -128,4 +130,7 @@ const startServer = async () => {
   return httpServer
 }
 
-startServer()
+startServer().catch((e) => {
+  log.error(TAGS.ReactMap, 'Unable to start ReactMap', e)
+  shutdown('SIGBREAK', 1)
+})
