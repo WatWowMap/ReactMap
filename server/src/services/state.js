@@ -234,4 +234,4 @@ const handleStreamError = (err) => {
 process.stdout?.on('error', handleStreamError)
 process.stderr?.on('error', handleStreamError)
 
-module.exports = { state }
+module.exports = { shutdown, state }

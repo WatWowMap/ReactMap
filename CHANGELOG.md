@@ -1,3 +1,10 @@
+## [1.48.4](https://github.com/WatWowMap/ReactMap/compare/v1.48.3...v1.48.4) (2026-07-25)
+
+
+### Bug Fixes
+
+* more robust masterfile ([e68a4f9](https://github.com/WatWowMap/ReactMap/commit/e68a4f997a6f210a6645f8e1e18df19292186733))
+
 ## [1.48.3](https://github.com/WatWowMap/ReactMap/compare/v1.48.2...v1.48.3) (2026-07-24)
 
 

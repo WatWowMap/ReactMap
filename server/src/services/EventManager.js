@@ -5,7 +5,7 @@ const { default: fetch } = require('node-fetch')
 
 const config = require('@rm/config')
 const { Logger } = require('@rm/logger')
-const { generate, read } = require('@rm/masterfile')
+const { generate, load } = require('@rm/masterfile')
 
 const { setLongInterval } = require('../utils/setLongTimeout')
 const { PoracleAPI } = require('./Poracle')
@@ -16,13 +16,12 @@ const { getCache } = require('./cache')
  */
 
 class EventManager extends Logger {
+  /** @type {import('@rm/masterfile').Masterfile} */
+  masterfile
+
   constructor() {
     super('event')
-    /** @type {import("@rm/masterfile").Masterfile} */
-    this.masterfile = read()
-    this.setInvasions(
-      'invasions' in this.masterfile ? this.masterfile.invasions : {},
-    )
+    this.setInvasions({})
 
     /** @type {{[key in keyof import('@rm/types').Available]: string[] }} */
     this.available = getCache('available.json', {
@@ -63,6 +62,12 @@ class EventManager extends Logger {
     )
     /** @type {ClientObject} */
     this.authClients = {}
+  }
+
+  async initialize() {
+    const masterfile = await load()
+    this.setInvasions(masterfile.invasions || {})
+    this.masterfile = masterfile
   }
 
   /** @param {import("@rm/masterfile").Masterfile['invasions'] | {}} invasions */
@@ -308,8 +313,11 @@ class EventManager extends Logger {
     if (config.getSafe('api.pogoApiEndpoints.masterfile')) {
       this.intervals.masterfile = setLongInterval(
         async () => {
-          await this.getMasterfile(Db.historical, Db.rarity)
-          await this.chatLog('event', { description: 'Refreshed masterfile' })
+          if (await this.getMasterfile(Db.historical, Db.rarity)) {
+            await this.chatLog('event', {
+              description: 'Refreshed masterfile',
+            })
+          }
         },
         1000 * 60 * 60 * (config.getSafe('map.misc.masterfileCacheHrs') || 6),
       )
@@ -426,15 +434,18 @@ class EventManager extends Logger {
    *
    * @param {import("@rm/types").Rarity} historical
    * @param {import("@rm/types").Rarity} dbRarity
+   * @returns {Promise<boolean>} whether the masterfile was refreshed
    */
   async getMasterfile(historical, dbRarity) {
     this.log.info('Fetching Latest Masterfile')
     try {
       const newMf = await generate(true, historical, dbRarity)
-      this.masterfile = newMf ?? this.masterfile
+      this.masterfile = newMf
       this.addAllAvailable()
+      return true
     } catch (e) {
       this.log.warn('Failed to generate latest masterfile:\n', e)
+      return false
     }
   }
 

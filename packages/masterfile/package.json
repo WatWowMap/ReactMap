@@ -11,7 +11,8 @@
     "lint": "eslint \"**/*.{js,jsx}\"",
     "lint:fix": "eslint \"**/*.{js,jsx}\" --fix",
     "prettier": "prettier --check \"**/*.{css,html,js,jsx,yml}\"",
-    "prettier:fix": "prettier --write \"**/*.{css,html,js,jsx,yml}\""
+    "prettier:fix": "prettier --write \"**/*.{css,html,js,jsx,yml}\"",
+    "test": "node --test test/index.test.js"
   },
   "dependencies": {
     "@rm/config": "*",
