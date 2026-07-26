@@ -545,18 +545,14 @@ class DbManager extends Logger {
    * @returns {Promise<T | {}>}
    */
   async getOne(model, id) {
-    // allSettled, not all: a pure-endpoint source whose by-id fetch misses
-    // falls through to this.query() on an unbound model, which throws. With
-    // Promise.all that one rejection would fail the whole single-fort lookup;
-    // here it just contributes no match.
-    const settled = await Promise.allSettled(
-      this.models[model].map(async ({ SubModel, ...source }) =>
-        SubModel.getOne(id, source),
-      ),
+    // runScannerSources (allSettled + logs rejections): a pure-endpoint source
+    // whose by-id fetch misses falls through to an unbound this.query() and
+    // rejects. Isolating it keeps one miss from failing the whole single-fort
+    // lookup, while a genuine SQL error from a DB source is still logged.
+    const data = await this.runScannerSources(
+      model,
+      ({ SubModel, ...source }) => SubModel.getOne(id, source),
     )
-    const data = settled
-      .filter((r) => r.status === 'fulfilled')
-      .map((r) => r.value)
     const cleaned = DbManager.deDupeResults(data.filter(Boolean))
     return cleaned || {}
   }
@@ -601,12 +597,14 @@ class DbManager extends Logger {
       const loopTime = Date.now()
       count += 1
       const bbox = getBboxFromCenter(args.lat, args.lon, distance)
-      // allSettled: the fort search methods have no endpoint branch, so a
-      // pure-endpoint source hits an unbound this.query() and rejects. Degrade
-      // that source to no results rather than failing the whole search batch
-      // (a co-configured SQL source still contributes).
-      const settled = await Promise.allSettled(
-        this.models[model].map(async ({ SubModel, ...source }) =>
+      // runScannerSources (allSettled + logs rejections): the fort search
+      // methods have no endpoint branch, so a pure-endpoint source hits an
+      // unbound this.query() and rejects. Isolating it degrades that source to
+      // no results rather than failing the whole batch, while a genuine SQL
+      // error from a DB source stays visible in the logs.
+      const data = await this.runScannerSources(
+        model,
+        ({ SubModel, ...source }) =>
           SubModel[method](
             perms,
             args,
@@ -614,11 +612,7 @@ class DbManager extends Logger {
             DbManager.getDistance(args, source.isMad),
             bbox,
           ),
-        ),
       )
-      const data = settled
-        .filter((r) => r.status === 'fulfilled')
-        .map((r) => r.value)
       const results = DbManager.deDupeResults(data)
       if (results.length > deDuped.length) {
         deDuped = results
@@ -677,21 +671,14 @@ class DbManager extends Logger {
    * ]>}
    */
   async submissionCells(perms, args) {
-    // allSettled: getSubmissions has no endpoint branch, so a pure-endpoint
-    // source rejects on an unbound this.query(); degrade it to no cells rather
-    // than failing the whole submission overlay.
-    const collect = async (sources) =>
-      (
-        await Promise.allSettled(
-          sources.map(async ({ SubModel, ...source }) =>
-            SubModel.getSubmissions(perms, args, source),
-          ),
-        )
-      )
-        .filter((r) => r.status === 'fulfilled')
-        .map((r) => r.value)
-    const stopData = await collect(this.models.Pokestop)
-    const gymData = await collect(this.models.Gym)
+    // runScannerSources (allSettled + logs rejections): getSubmissions has no
+    // endpoint branch, so a pure-endpoint source rejects on an unbound
+    // this.query(); isolate it to no cells rather than failing the whole
+    // overlay, while a genuine DB error stays visible in the logs.
+    const handler = ({ SubModel, ...source }) =>
+      SubModel.getSubmissions(perms, args, source)
+    const stopData = await this.runScannerSources('Pokestop', handler)
+    const gymData = await this.runScannerSources('Gym', handler)
     return [DbManager.deDupeResults(stopData), DbManager.deDupeResults(gymData)]
   }
 
@@ -737,7 +724,11 @@ class DbManager extends Logger {
         async ({ SubModel, ...source }) => SubModel.getAvailable(source),
       )
       this.log.info(`Setting available for ${model}`)
-      if (model === 'Pokestop') {
+      // runScannerSources returns only fulfilled sources, so an empty `results`
+      // means every source failed. Don't overwrite manager-owned metadata
+      // (quest conditions / rarity) with that failure-derived emptiness —
+      // retain the last-good so a transient outage doesn't blank the drawer.
+      if (results.length && model === 'Pokestop') {
         const newQuestConditions = {}
         results.forEach((result) => {
           if ('conditions' in result) {
@@ -751,7 +742,7 @@ class DbManager extends Logger {
           ]),
         )
       }
-      if (model === 'Pokemon') {
+      if (results.length && model === 'Pokemon') {
         this.setRarity(results, false)
       }
       if (results.length === 1) return results[0].available

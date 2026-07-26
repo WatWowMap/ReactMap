@@ -736,7 +736,9 @@ class Station extends Model {
                 secret,
                 httpAuth,
               )
-              if (one) res.stations.push(one)
+              // Prepend so the off-viewport deep-link survives the resultLimit
+              // cap in a dense viewport (see Pokestop.getAll).
+              if (one) res.stations.unshift(one)
             } catch {
               // by-id miss mirrors SQL finding no such row
             }

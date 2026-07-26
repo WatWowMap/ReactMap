@@ -100,14 +100,19 @@ const state = {
       if (!reloadReport || reloadReport.historical) {
         promises.push(this.db.historicalRarity())
       }
+      // force=true: startup/reload must query the current manager. On a hot
+      // reload this.db is a fresh manager, so the availability TTL (keyed by
+      // category only) must not short-circuit and keep the old source's data.
+      // The per-session stampede path (rootRouter queryOnSessionInit) stays
+      // non-forced and TTL-protected.
       promises.push(
         this.db.getFilterContext(),
-        this.event.setAvailable('gyms', 'Gym', this.db),
-        this.event.setAvailable('pokestops', 'Pokestop', this.db),
-        this.event.setAvailable('pokemon', 'Pokemon', this.db),
-        this.event.setAvailable('nests', 'Nest', this.db),
-        this.event.setAvailable('stations', 'Station', this.db),
-        this.event.setAvailable('tappables', 'Tappable', this.db),
+        this.event.setAvailable('gyms', 'Gym', this.db, true),
+        this.event.setAvailable('pokestops', 'Pokestop', this.db, true),
+        this.event.setAvailable('pokemon', 'Pokemon', this.db, true),
+        this.event.setAvailable('nests', 'Nest', this.db, true),
+        this.event.setAvailable('stations', 'Station', this.db, true),
+        this.event.setAvailable('tappables', 'Tappable', this.db, true),
       )
     }
     await Promise.all(promises)

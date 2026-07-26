@@ -567,7 +567,9 @@ class Gym extends Model {
                 secret,
                 httpAuth,
               )
-              if (one) res.gyms.push(one)
+              // Prepend so the off-viewport deep-link survives secondaryFilter's
+              // resultLimit cap in a dense viewport (see Pokestop.getAll).
+              if (one) res.gyms.unshift(one)
             } catch {
               // by-id miss mirrors SQL finding no such row
             }

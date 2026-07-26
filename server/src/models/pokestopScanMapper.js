@@ -75,6 +75,11 @@ function mapInvasion(inc) {
  * @param {boolean} withAr
  * @returns {Record<string, any> | null}
  */
+/** Serialize a parsed JSON value back to a string (SQL shape); pass strings
+ * and null/undefined through unchanged. */
+const jsonString = (v) =>
+  typeof v === 'string' || v == null ? v : JSON.stringify(v)
+
 function buildQuestLayer(api, prefix, withAr) {
   const questRewardType = api[`${prefix}quest_reward_type`]
   if (!questRewardType) return null
@@ -82,8 +87,11 @@ function buildQuestLayer(api, prefix, withAr) {
     quest_type: api[`${prefix}quest_type`],
     quest_timestamp: api[`${prefix}quest_timestamp`],
     quest_target: api[`${prefix}quest_target`],
-    quest_conditions: api[`${prefix}quest_conditions`],
-    quest_rewards: api[`${prefix}quest_rewards`],
+    // SQL exposes these as raw JSON strings (`quest_condition`/`quest_reward`
+    // columns); Golbat returns them parsed. Stringify so the GraphQL `String`
+    // field coerces and parseRdmRewards (which handles a string) still parses.
+    quest_conditions: jsonString(api[`${prefix}quest_conditions`]),
+    quest_rewards: jsonString(api[`${prefix}quest_rewards`]),
     quest_reward_type: questRewardType,
     quest_item_id: api[`${prefix}quest_item_id`],
     quest_pokemon_id: api[`${prefix}quest_pokemon_id`],

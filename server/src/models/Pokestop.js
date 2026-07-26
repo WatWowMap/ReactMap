@@ -905,7 +905,10 @@ class Pokestop extends Model {
                 secret,
                 httpAuth,
               )
-              if (one) res.pokestops.push(one)
+              // Prepend, not append: secondaryFilter stops at resultLimit, so
+              // an off-viewport deep-link appended last would be skipped in a
+              // dense viewport that already fills the cap.
+              if (one) res.pokestops.unshift(one)
             } catch {
               // by-id miss mirrors SQL finding no such row
             }
