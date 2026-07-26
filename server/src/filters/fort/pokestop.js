@@ -1,37 +1,11 @@
 // @ts-check
 const { parseIdFormPair } = require('./parseIdForm')
 
-/**
- * Grunt (incident) character ids whose *possible* rocket encounters include any
- * of the requested reward pokemon ids. Mirrors the SQL path's
- * `gruntTypesWithMatchingRewards` (`Pokestop.getAll`): iterate the event
- * invasion map, skip team leaders/Giovanni (41-44), and match by pokemon id
- * across the reward-gated first/second/third encounter slots. This is the DNF
- * expression of the `a<pokemon>` rocket-reward filter — a superset of the real
- * matches (both confirmed slots and unconfirmed grunts of these types),
- * narrowed exactly by secondaryFilter.
- *
- * @param {Record<string, any>} eventInvasions state.event.invasions
- * @param {Set<number>} pokemonIds
- * @returns {number[]}
- */
-function gruntTypesForRocketPokemon(eventInvasions, pokemonIds) {
-  const grunts = []
-  Object.entries(eventInvasions || {}).forEach(([gruntStr, info]) => {
-    if (!info) return
-    const grunt = Number(gruntStr)
-    if (!Number.isFinite(grunt) || (grunt >= 41 && grunt <= 44)) return
-    const encounters = [
-      ...(info.firstReward ? info.encounters?.first || [] : []),
-      ...(info.secondReward ? info.encounters?.second || [] : []),
-      ...(info.thirdReward ? info.encounters?.third || [] : []),
-    ]
-    if (encounters.some((poke) => pokemonIds.has(Number(poke.id)))) {
-      grunts.push(grunt)
-    }
-  })
-  return grunts
-}
+// Incident display types for Team Rocket grunt invasions (the only invasions
+// that carry a catchable reward). Sourced from the GMO, so reliable — unlike
+// the reward pokemon (see the `a` rocket-reward handling below). Golbat doc:
+// display_type 1-4 = rocket, 7 goldstop, 8 kecleon, 9 showcase.
+const ROCKET_INCIDENT_DISPLAY_TYPES = [1, 2, 3, 4]
 
 /**
  * Translate a pokestop's `args.filters` into ApiFortDnfFilter[] clauses.
@@ -59,12 +33,13 @@ function gruntTypesForRocketPokemon(eventInvasions, pokemonIds) {
  * (quest title/target `adv`, invasion `confirmed` stay residual). Returns []
  * (match-all) when a match-all toggle is active or nothing is set.
  *
- * `a<pokemon>` rocket-reward keys are expanded to `incident_character` (the
- * grunt types that can reward those pokemon) via `eventInvasions`; without that
- * map (empty/unloaded) they poison to `[]` since they can't be expressed safely.
+ * `a<pokemon>` rocket-reward keys narrow ONLY by rocket incident display type
+ * (reliable, from the GMO), never by the reward pokemon (a slot-1-only value
+ * from an optional invasion check that no Golbat clause can safely track);
+ * secondaryFilter confirms the specific reward.
  *
  * @param {Record<string, any>} filters args.filters
- * @param {Record<string, any>} [eventInvasions] state.event.invasions (grunt→reward map)
+ * @param {Record<string, any>} [eventInvasions] state.event.invasions (grunt→reward map, used for grunt-class exclusion)
  * @returns {object[]}
  */
 function buildPokestopDnfFilters(filters, eventInvasions) {
@@ -253,12 +228,16 @@ function buildPokestopDnfFilters(filters, eventInvasions) {
   if (onlyLures && lureId.length) clauses.push({ lure_id: lureId })
   if (onlyInvasions) {
     if (rocketPokemonIds.size) {
-      // Can't expand rocket-reward filters without the event map -> match-all so
-      // the residual (invasionMatchesFilters) can still surface them.
-      if (!eventInvasions || Object.keys(eventInvasions).length === 0) return []
-      gruntTypesForRocketPokemon(eventInvasions, rocketPokemonIds).forEach(
-        (g) => incidentCharacter.add(g),
-      )
+      // Rocket-reward `a` filters narrow by incident DISPLAY TYPE only, never by
+      // the reward pokemon. Display type is reliable (it comes from the GMO and
+      // is always present); the reward is a slot-1-only value populated by an
+      // optional invasion check, so a reward-derived incident_character could
+      // drop a stop secondaryFilter would accept (e.g. across a rotation).
+      // Restrict to rocket incidents (safe superset); secondaryFilter confirms
+      // the specific reward from its slot/metadata data.
+      clauses.push({
+        incident_display_type: [...ROCKET_INCIDENT_DISPLAY_TYPES],
+      })
     }
     if (
       incidentCharacter.size &&
