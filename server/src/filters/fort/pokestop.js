@@ -71,7 +71,7 @@ function buildPokestopDnfFilters(filters, eventInvasions) {
   const xpAmounts = new Set() // 'p<amt>' -> type 1, amount-exact
   const typeOnly = new Set() // 'u<type>' (+ overflow amounts) -> type-level
   const lureId = []
-  const incidentCharacter = new Set() // 'i' grunt ids + 'a'-derived grunt ids
+  const incidentCharacter = new Set() // 'i' grunt character ids
   const rocketPokemonIds = new Set() // 'a<pokemon>' reward ids
   const incidentDisplayType = []
   const contestPokemon = []
