@@ -54,7 +54,7 @@ const getAll = async (compare) => {
         state.event.available.tappables,
       ]
   return Object.fromEntries(
-    Object.keys(queryObj).map((key, i) => [key, available[i]]),
+    Object.keys(queryObj).map((key, i) => [key, available[i] || []]),
   )
 }
 
@@ -66,16 +66,16 @@ router.get(['/', '/:category'], async (req, res) => {
 
     if (model && category) {
       const available =
-        current !== undefined
+        (current !== undefined
           ? await state.db.getAvailable(model)
-          : state.event.available[category]
+          : state.event.available[category]) || []
       available.sort((a, b) => a.localeCompare(b))
 
       if (equal !== undefined) {
         const compare =
-          current !== undefined
+          (current !== undefined
             ? state.event.available[category]
-            : await state.db.getAvailable(model)
+            : await state.db.getAvailable(model)) || []
         compare.sort((a, b) => a.localeCompare(b))
         res.status(200).json(available.every((item, i) => item === compare[i]))
       } else {

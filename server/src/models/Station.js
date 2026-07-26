@@ -784,6 +784,18 @@ class Station extends Model {
             }
             return active && passesFilterGate(s)
           }
+          // Match the SQL projection: total_stationed_* are selected only under
+          // includeBattleData (dynamax perm). The endpoint spreads the raw
+          // Golbat record, so strip them when battle data isn't included, else a
+          // non-dynamax GraphQL selection could read the stationed/gmax counts.
+          const finalizeEndpointStation = (s) => {
+            const out = finalizeStation(s, pokemonData, ts)
+            if (!includeBattleData) {
+              delete out.total_stationed_pokemon
+              delete out.total_stationed_gmax
+            }
+            return out
+          }
           const stations = res.stations
             .filter(
               (s) =>
@@ -803,7 +815,7 @@ class Station extends Model {
               if (Number(station.end_time) <= ts) {
                 station.battles = []
                 clearStationBattleFallback(station)
-                return finalizeStation(station, pokemonData, ts)
+                return finalizeEndpointStation(station)
               }
               if (!includeUpcoming) {
                 const visible = getVisibleStationBattle(station.battles, ts)
@@ -824,7 +836,7 @@ class Station extends Model {
                 station,
                 getVisibleStationBattle(station.battles, ts),
               )
-              return finalizeStation(station, pokemonData, ts)
+              return finalizeEndpointStation(station)
             })
             .filter(Boolean)
           log.info(

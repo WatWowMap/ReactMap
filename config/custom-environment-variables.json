@@ -60,6 +60,10 @@
       "__name": "API_COOKIE_AGE_DAYS",
       "__format": "number"
     },
+    "availableRefreshSeconds": {
+      "__name": "API_AVAILABLE_REFRESH_SECONDS",
+      "__format": "number"
+    },
     "rateLimit": {
       "time": {
         "__name": "API_RATE_LIMIT_TIME",

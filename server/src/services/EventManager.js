@@ -131,12 +131,12 @@ class EventManager extends Logger {
    */
   async #refreshAvailable(category, model, Db) {
     const available = await Db.getAvailable(model)
-    // A failed refresh (esp. a pure-endpoint /api/fort/available request) comes
-    // back empty. Don't replace the last-good drawer + conditions with it or arm
-    // the TTL — keep serving the previous options and retry on the next call. (A
-    // genuinely-empty category just re-scans next session; this list is
-    // drawer-only, so that is harmless.)
-    if (!available.length) return
+    // null = total source failure (getAvailable): keep the last-good drawer +
+    // conditions and retry on the next call. A successful snapshot — even an
+    // empty one, when a category's last active option disappears — falls
+    // through and commits, so the drawer clears instead of showing stale
+    // filters forever.
+    if (available == null) return
 
     /** @param {string} key */
     const parseKey = (key) => {

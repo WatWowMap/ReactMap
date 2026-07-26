@@ -723,6 +723,16 @@ class DbManager extends Logger {
         model,
         async ({ SubModel, ...source }) => SubModel.getAvailable(source),
       )
+      // Total failure: sources exist but every one rejected. Return null so the
+      // caller retains its last-good data. A genuine empty snapshot (sources
+      // succeeded, no active options) falls through and returns [], which
+      // legitimately clears the category.
+      if (this.models[model].length && results.length === 0) {
+        this.log.warn(
+          `Available for ${model}: all sources failed, retaining last-good`,
+        )
+        return null
+      }
       this.log.info(`Setting available for ${model}`)
       // runScannerSources returns only fulfilled sources, so an empty `results`
       // means every source failed. Don't overwrite manager-owned metadata
