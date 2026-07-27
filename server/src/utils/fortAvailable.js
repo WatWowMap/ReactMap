@@ -1,4 +1,5 @@
 // @ts-check
+const config = require('@rm/config')
 const { log } = require('@rm/logger')
 const {
   evalScannerQuery,
@@ -10,12 +11,25 @@ const {
  * scheduled intervals fire them as a batch), and on Golbat each per-type
  * /available call walks the ENTIRE fort cache. Share one combined
  * GET /api/fort/available per endpoint within a short window so a refresh
- * batch costs one cache pass instead of three.
+ * batch costs one cache pass instead of three. The window tracks
+ * api.availableRefreshSeconds so it never floors a shorter configured throttle;
+ * a forced refresh (config reload / PUT /api/v1/available) busts the cache so it
+ * starts a fresh generation (see bustCombinedFortCache).
  */
-const CACHE_MS = 30_000
+const cacheMs = () =>
+  (config.getSafe('api.availableRefreshSeconds') || 60) * 1000
 
 /** @type {Map<string, { ts: number, promise: Promise<object | null> }>} */
 const combinedCache = new Map()
+
+/**
+ * Drop all cached snapshots so the next fetch starts a fresh generation. Called
+ * before a forced refresh; the concurrent fort batch that follows still shares
+ * one Golbat request via the repopulated entry's window.
+ */
+function bustCombinedFortCache() {
+  combinedCache.clear()
+}
 
 /**
  * Cache key = endpoint URL AND credentials. Two sources can point at the same
@@ -47,7 +61,7 @@ function cacheKeyFor(mem, secret, httpAuth) {
 function getCombinedFortAvailable(tag, mem, secret, httpAuth) {
   const cacheKey = cacheKeyFor(mem, secret, httpAuth)
   const entry = combinedCache.get(cacheKey)
-  if (entry && Date.now() - entry.ts < CACHE_MS) return entry.promise
+  if (entry && Date.now() - entry.ts < cacheMs()) return entry.promise
   const promise = (async () => {
     try {
       const res = await evalScannerQuery(
@@ -83,4 +97,4 @@ function getCombinedFortAvailable(tag, mem, secret, httpAuth) {
   return promise
 }
 
-module.exports = { getCombinedFortAvailable }
+module.exports = { getCombinedFortAvailable, bustCombinedFortCache }

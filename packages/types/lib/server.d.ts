@@ -87,19 +87,20 @@ export interface AvailablePokestopInvasion {
   confirmed: boolean
   slot1_pokemon_id: number
   slot1_form: number
-  count: number
+  slot2_pokemon_id: number
+  slot2_form: number
+  slot3_pokemon_id: number
+  slot3_form: number
 }
 
 export interface AvailablePokestopLure {
   lure_id: number
-  count: number
 }
 
 export interface AvailablePokestopShowcase {
   pokemon_id: number
   form: number
   type_id: number
-  count: number
 }
 
 export interface AvailablePokestops {

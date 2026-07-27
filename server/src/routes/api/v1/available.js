@@ -3,6 +3,7 @@ const router = require('express').Router()
 
 const { log, TAGS } = require('@rm/logger')
 const { state } = require('../../../services/state')
+const { bustCombinedFortCache } = require('../../../utils/fortAvailable')
 
 const queryObj = /** @type {const} */ ({
   pokemon: { model: 'Pokemon', category: 'pokemon' },
@@ -114,6 +115,10 @@ router.put('/:category', async (req, res) => {
   try {
     const { model, category } =
       queryObj[resolveCategory(req.params.category)] || {}
+
+    // Explicit refresh: bust the combined fort snapshot cache so the forced
+    // setAvailable calls below fetch fresh instead of reusing a cached window.
+    bustCombinedFortCache()
 
     if (model && category) {
       await state.event.setAvailable(category, model, state.db, true)

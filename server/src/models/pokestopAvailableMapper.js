@@ -32,17 +32,14 @@
  * @property {number} slot2_form
  * @property {number} slot3_pokemon_id
  * @property {number} slot3_form
- * @property {number} count
  *
  * @typedef {object} AvailablePokestopLure
  * @property {number} lure_id
- * @property {number} count
  *
  * @typedef {object} AvailablePokestopShowcase
  * @property {number} pokemon_id
  * @property {number} form
  * @property {number} type_id
- * @property {number} count
  *
  * @typedef {object} AvailablePokestops
  * @property {AvailablePokestopQuest[]} quests

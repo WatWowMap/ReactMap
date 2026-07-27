@@ -9,6 +9,7 @@ const { DbManager } = require('./DbManager')
 const { EventManager } = require('./EventManager')
 const { getSharedPvpWrapper } = require('./PvpWrapper')
 const { setCache } = require('./cache')
+const { bustCombinedFortCache } = require('../utils/fortAvailable')
 const { migrate } = require('../db/migrate')
 const { Stats } = require('./Stats')
 
@@ -97,6 +98,10 @@ const state = {
   async loadLocalContexts(reloadReport) {
     const promises = [this.event.cleanupTrials()]
     if (!reloadReport || reloadReport.database) {
+      // A reload can swap the db manager / endpoint config, so drop the combined
+      // fort snapshot cache — the forced setAvailable batch below then fetches
+      // fresh (and still coalesces via the repopulated window).
+      bustCombinedFortCache()
       if (!reloadReport || reloadReport.historical) {
         promises.push(this.db.historicalRarity())
       }
