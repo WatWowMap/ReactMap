@@ -883,7 +883,13 @@ class Pokestop extends Model {
           JSON.stringify({
             min: { latitude: args.minLat, longitude: args.minLon },
             max: { latitude: args.maxLat, longitude: args.maxLon },
-            limit: queryLimits.pokestops,
+            // 0 = Golbat's server default (max_fort_results). The request must
+            // NOT cap traversal at the display limit: Golbat stops before
+            // ReactMap's filterRTree/freshness/secondaryFilter run, so rejected
+            // stops consume the cap and valid ones later in the scan are lost.
+            // queryLimits.pokestops is applied below as the display cap, after
+            // those local gates.
+            limit: 0,
             filters: dnf,
             with_incidents: true,
           }),

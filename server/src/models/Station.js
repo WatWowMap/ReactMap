@@ -715,7 +715,10 @@ class Station extends Model {
           JSON.stringify({
             min: { latitude: args.minLat, longitude: args.minLon },
             max: { latitude: args.maxLat, longitude: args.maxLon },
-            limit: queryLimits.stations,
+            // 0 = Golbat's server default (max_fort_results); the display cap
+            // (queryLimits.stations) is applied after the local gates below, not
+            // as a pre-filter traversal cap (see Pokestop.getAll).
+            limit: 0,
             filters: dnf,
           }),
           'POST',
@@ -849,7 +852,9 @@ class Station extends Model {
               stations.length,
             ),
           )
-          return stations
+          // Display cap, applied after the local gates; the scan request itself
+          // is uncapped (Golbat's max_fort_results is the traversal backstop).
+          return stations.slice(0, queryLimits.stations)
         }
         log.warn(
           TAGS.stations,
