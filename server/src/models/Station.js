@@ -810,7 +810,17 @@ class Station extends Model {
                 ...apiStation,
                 battles: includeBattleData
                   ? (apiStation.battles || []).map((b) =>
-                      enrichStationBattle(b, pokemonData),
+                      enrichStationBattle(
+                        // Golbat's scan battle has no per-battle `updated`; the
+                        // SQL path (getFallbackStationBattle) uses the station's
+                        // `updated` for last_seen, so mirror that here — else
+                        // StationBattleTimer has no timestamp to render.
+                        {
+                          ...b,
+                          updated: b.updated ?? apiStation.updated ?? null,
+                        },
+                        pokemonData,
+                      ),
                     )
                   : [],
               }

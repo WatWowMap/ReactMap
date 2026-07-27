@@ -45,6 +45,8 @@ class EventManager extends Logger {
     this.availablePending = {}
     /** @type {Record<string, number | undefined>} last successful setAvailable per category */
     this.availableUpdatedAt = {}
+    /** @type {Record<string, number | undefined>} monotonic refresh token per category; a stale in-flight refresh whose token is superseded must not commit */
+    this.availableGeneration = {}
 
     this.baseUrl =
       'https://raw.githubusercontent.com/WatWowMap/wwm-uicons-webp/main'
@@ -100,36 +102,52 @@ class EventManager extends Logger {
   async setAvailable(category, model, Db, force = false) {
     // Single-flight + TTL: session-init triggers (queryOnSessionInit) fire on
     // EVERY page load and can stampede — on endpoint-backed sources each
-    // refresh walks Golbat's whole fort cache. Concurrent calls share one
-    // in-flight promise; repeats within the TTL are served by the last result
-    // (map markers never depend on this — only the filter drawer options —
-    // so the staleness cost is bounded and cosmetic). Scheduled intervals and
-    // the explicit /api/v1/available route pass force=true.
-    if (this.availablePending[category]) return this.availablePending[category]
+    // refresh walks Golbat's whole fort cache. Non-forced concurrent calls
+    // share one in-flight promise; repeats within the TTL are served by the
+    // last result (map markers never depend on this — only the filter drawer
+    // options — so the staleness cost is bounded and cosmetic).
+    //
+    // A forced refresh (scheduled interval, /api/v1/available, hot reload) must
+    // NOT adopt an in-flight non-forced promise: that promise may hold a
+    // superseded Db/cache generation and would never query the newly installed
+    // manager. It supersedes instead — bumping the generation so the older
+    // refresh bails before committing stale data (see #refreshAvailable).
     const ttlMs = (config.getSafe('api.availableRefreshSeconds') || 60) * 1000
-    if (
-      !force &&
-      this.availableUpdatedAt[category] &&
-      Date.now() - this.availableUpdatedAt[category] < ttlMs
-    ) {
-      return undefined
+    if (!force) {
+      if (this.availablePending[category]) {
+        return this.availablePending[category]
+      }
+      if (
+        this.availableUpdatedAt[category] &&
+        Date.now() - this.availableUpdatedAt[category] < ttlMs
+      ) {
+        return undefined
+      }
     }
-    this.availablePending[category] = this.#refreshAvailable(
+    const generation = (this.availableGeneration[category] || 0) + 1
+    this.availableGeneration[category] = generation
+    const pending = this.#refreshAvailable(
       category,
       model,
       Db,
+      generation,
     ).finally(() => {
-      delete this.availablePending[category]
+      // Only clear the slot if a newer refresh hasn't already replaced it.
+      if (this.availablePending[category] === pending) {
+        delete this.availablePending[category]
+      }
     })
-    return this.availablePending[category]
+    this.availablePending[category] = pending
+    return pending
   }
 
   /**
    * @param {keyof EventManager['available']} category
    * @param {import('../models').ScannerModelKeys} model
    * @param {import('./DbManager').DbManager} Db
+   * @param {number} generation refresh token; only commits if still current
    */
-  async #refreshAvailable(category, model, Db) {
+  async #refreshAvailable(category, model, Db, generation) {
     const available = await Db.getAvailable(model)
     // null = total source failure (getAvailable): keep the last-good drawer +
     // conditions and retry on the next call. A successful snapshot — even an
@@ -137,6 +155,10 @@ class EventManager extends Logger {
     // through and commits, so the drawer clears instead of showing stale
     // filters forever.
     if (available == null) return
+    // A newer refresh (typically a forced reload) started while this one was
+    // awaiting Golbat/SQL; it owns the current Db, so drop this superseded
+    // result rather than committing/TTL-stamping data from an old generation.
+    if (this.availableGeneration[category] !== generation) return
 
     /** @param {string} key */
     const parseKey = (key) => {
