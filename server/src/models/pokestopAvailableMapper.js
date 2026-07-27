@@ -26,20 +26,20 @@
  * @property {number} character
  * @property {number} display_type
  * @property {boolean} confirmed
- * @property {number} slot1_pokemon_id
- * @property {number} slot1_form
- * @property {number} slot2_pokemon_id
- * @property {number} slot2_form
- * @property {number} slot3_pokemon_id
- * @property {number} slot3_form
+ * @property {number|null} slot1_pokemon_id
+ * @property {number|null} slot1_form
+ * @property {number|null} slot2_pokemon_id
+ * @property {number|null} slot2_form
+ * @property {number|null} slot3_pokemon_id
+ * @property {number|null} slot3_form
  *
  * @typedef {object} AvailablePokestopLure
  * @property {number} lure_id
  *
  * @typedef {object} AvailablePokestopShowcase
- * @property {number} pokemon_id
- * @property {number} form
- * @property {number} type_id
+ * @property {number|null} pokemon_id
+ * @property {number|null} form
+ * @property {number|null} type_id
  *
  * @typedef {object} AvailablePokestops
  * @property {AvailablePokestopQuest[]} quests

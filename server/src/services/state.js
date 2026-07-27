@@ -162,7 +162,11 @@ const state = {
     if (reloadReport.strategies) {
       this.setAuthClients()
     }
-    if (reloadReport.events) {
+    if (reloadReport.events || reloadReport.database) {
+      // startIntervals captures `this.db` in each timer's closure. A database
+      // reload swaps in a fresh DbManager, so the intervals must be rebuilt
+      // around it — otherwise a later forced refresh would query (and commit)
+      // the replaced manager's data. See EventManager.#refreshAvailable.
       this.event.startIntervals(this.db, this.pvp)
     }
     return this

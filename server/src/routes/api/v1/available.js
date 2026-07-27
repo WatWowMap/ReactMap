@@ -40,13 +40,17 @@ const resolveCategory = (category) => {
 /** @param {boolean} compare */
 const getAll = async (compare) => {
   const available = compare
-    ? await Promise.all([
-        state.db.getAvailable('Pokemon'),
-        state.db.getAvailable('Pokestop'),
-        state.db.getAvailable('Gym'),
-        state.db.getAvailable('Nest'),
-        state.db.getAvailable('Tappable'),
-      ])
+    ? // getAvailable now returns { available, ... } (or null on total failure);
+      // this route only needs the string list.
+      (
+        await Promise.all([
+          state.db.getAvailable('Pokemon'),
+          state.db.getAvailable('Pokestop'),
+          state.db.getAvailable('Gym'),
+          state.db.getAvailable('Nest'),
+          state.db.getAvailable('Tappable'),
+        ])
+      ).map((r) => r?.available || [])
     : [
         state.event.available.pokemon,
         state.event.available.pokestops,
@@ -66,9 +70,11 @@ router.get(['/', '/:category'], async (req, res) => {
     const { current, equal } = req.query
 
     if (model && category) {
+      // getAvailable returns { available, ... } (or null); the drawer snapshot
+      // in state.event.available is already a string list.
       const available =
         (current !== undefined
-          ? await state.db.getAvailable(model)
+          ? (await state.db.getAvailable(model))?.available
           : state.event.available[category]) || []
       available.sort((a, b) => a.localeCompare(b))
 
@@ -76,7 +82,7 @@ router.get(['/', '/:category'], async (req, res) => {
         const compare =
           (current !== undefined
             ? state.event.available[category]
-            : await state.db.getAvailable(model)) || []
+            : (await state.db.getAvailable(model))?.available) || []
         compare.sort((a, b) => a.localeCompare(b))
         res.status(200).json(available.every((item, i) => item === compare[i]))
       } else {

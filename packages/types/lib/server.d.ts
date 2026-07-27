@@ -85,12 +85,14 @@ export interface AvailablePokestopInvasion {
   character: number
   display_type: number
   confirmed: boolean
-  slot1_pokemon_id: number
-  slot1_form: number
-  slot2_pokemon_id: number
-  slot2_form: number
-  slot3_pokemon_id: number
-  slot3_form: number
+  // Confirmed slots are null when unknown/unconfirmed; a present pokemon id
+  // pairs with a real form (0 is valid). See Golbat ApiPokestopInvasionAvailable.
+  slot1_pokemon_id: number | null
+  slot1_form: number | null
+  slot2_pokemon_id: number | null
+  slot2_form: number | null
+  slot3_pokemon_id: number | null
+  slot3_form: number | null
 }
 
 export interface AvailablePokestopLure {
@@ -98,9 +100,11 @@ export interface AvailablePokestopLure {
 }
 
 export interface AvailablePokestopShowcase {
-  pokemon_id: number
-  form: number
-  type_id: number
+  // Pokemon-based showcase: pokemon_id/form set, type_id null. Type-based:
+  // pokemon_id/form null, type_id set. See Golbat ApiPokestopShowcaseAvailable.
+  pokemon_id: number | null
+  form: number | null
+  type_id: number | null
 }
 
 export interface AvailablePokestops {

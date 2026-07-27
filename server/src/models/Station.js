@@ -809,18 +809,11 @@ class Station extends Model {
               const station = {
                 ...apiStation,
                 battles: includeBattleData
-                  ? (apiStation.battles || []).map((b) =>
-                      enrichStationBattle(
-                        // Golbat's scan battle has no per-battle `updated`; the
-                        // SQL path (getFallbackStationBattle) uses the station's
-                        // `updated` for last_seen, so mirror that here — else
-                        // StationBattleTimer has no timestamp to render.
-                        {
-                          ...b,
-                          updated: b.updated ?? apiStation.updated ?? null,
-                        },
-                        pokemonData,
-                      ),
+                  ? // Golbat now exposes the real per-battle `updated` on each
+                    // ApiStationBattleResult (matching the SQL station_battle.updated
+                    // the multi-battle path relies on), so pass it through unchanged.
+                    (apiStation.battles || []).map((b) =>
+                      enrichStationBattle(b, pokemonData),
                     )
                   : [],
               }

@@ -27,6 +27,43 @@ const STATION_BATTLE_REQUIRED_COLUMNS = [
   'updated',
 ]
 
+// Pure: buckets summed spawn counts into rarity tiers and RETURNS the map (no
+// mutation), so callers can commit it atomically under a gate — see
+// DbManager.getAvailable / EventManager's generation check.
+function computeRarityTiers(results, historical = false) {
+  const base = {}
+  const rarityPercents = config.getSafe('rarity.percents')
+  let total = 0
+  results.forEach((result) => {
+    Object.entries(historical ? result : result.rarity).forEach(
+      ([key, count]) => {
+        if (key in base) {
+          base[key] += count
+        } else {
+          base[key] = count
+        }
+        total += count
+      },
+    )
+  })
+  const tiers = {}
+  Object.entries(base).forEach(([id, count]) => {
+    const percent = (count / total) * 100
+    if (percent === 0) {
+      tiers[id] = 'never'
+    } else if (percent < rarityPercents.ultraRare) {
+      tiers[id] = 'ultraRare'
+    } else if (percent < rarityPercents.rare) {
+      tiers[id] = 'rare'
+    } else if (percent < rarityPercents.uncommon) {
+      tiers[id] = 'uncommon'
+    } else {
+      tiers[id] = 'common'
+    }
+  })
+  return tiers
+}
+
 /**
  * @type {import("@rm/types").DbManagerClass}
  */
@@ -322,37 +359,10 @@ class DbManager extends Logger {
    * @returns {void}
    */
   setRarity(results, historical = false) {
-    const base = {}
-    const mapKey = historical ? 'historical' : 'rarity'
-    const rarityPercents = config.getSafe('rarity.percents')
-    let total = 0
-    results.forEach((result) => {
-      Object.entries(historical ? result : result.rarity).forEach(
-        ([key, count]) => {
-          if (key in base) {
-            base[key] += count
-          } else {
-            base[key] = count
-          }
-          total += count
-        },
-      )
-    })
-    this[mapKey] = {}
-    Object.entries(base).forEach(([id, count]) => {
-      const percent = (count / total) * 100
-      if (percent === 0) {
-        this[mapKey][id] = 'never'
-      } else if (percent < rarityPercents.ultraRare) {
-        this[mapKey][id] = 'ultraRare'
-      } else if (percent < rarityPercents.rare) {
-        this[mapKey][id] = 'rare'
-      } else if (percent < rarityPercents.uncommon) {
-        this[mapKey][id] = 'uncommon'
-      } else {
-        this[mapKey][id] = 'common'
-      }
-    })
+    this[historical ? 'historical' : 'rarity'] = computeRarityTiers(
+      results,
+      historical,
+    )
   }
 
   async historicalRarity() {
@@ -716,63 +726,78 @@ class DbManager extends Logger {
    * @param {import("../models").ScannerModelKeys} model
    * @returns {Promise<T[]>}
    */
+  // Returns { available, conditions?, rarity? }, or null on total source
+  // failure. PURE: it no longer commits questConditions/rarity onto `this` —
+  // the caller applies the metadata via applyAvailableMetadata AFTER the
+  // EventManager generation gate, so a superseded refresh (e.g. one holding a
+  // replaced Db after a reload) cannot overwrite current metadata.
   async getAvailable(model) {
-    if (this.models[model]) {
-      this.log.info(`Querying available for ${model}`)
-      const results = await this.runScannerSources(
-        model,
-        async ({ SubModel, ...source }) => SubModel.getAvailable(source),
+    if (!this.models[model]) return { available: [] }
+    this.log.info(`Querying available for ${model}`)
+    const results = await this.runScannerSources(
+      model,
+      async ({ SubModel, ...source }) => SubModel.getAvailable(source),
+    )
+    // Total failure: sources exist but every one rejected. Return null so the
+    // caller retains its last-good data. A genuine empty snapshot (sources
+    // succeeded, no active options) falls through and returns { available: [] },
+    // which legitimately clears the category.
+    if (this.models[model].length && results.length === 0) {
+      this.log.warn(
+        `Available for ${model}: all sources failed, retaining last-good`,
       )
-      // Total failure: sources exist but every one rejected. Return null so the
-      // caller retains its last-good data. A genuine empty snapshot (sources
-      // succeeded, no active options) falls through and returns [], which
-      // legitimately clears the category.
-      if (this.models[model].length && results.length === 0) {
-        this.log.warn(
-          `Available for ${model}: all sources failed, retaining last-good`,
-        )
-        return null
-      }
-      this.log.info(`Setting available for ${model}`)
-      // runScannerSources returns only fulfilled sources, so an empty `results`
-      // means every source failed. Don't overwrite manager-owned metadata
-      // (quest conditions / rarity) with that failure-derived emptiness —
-      // retain the last-good so a transient outage doesn't blank the drawer.
-      if (results.length && model === 'Pokestop') {
-        const newQuestConditions = {}
-        results.forEach((result) => {
-          if ('conditions' in result) {
-            config.util.extendDeep(newQuestConditions, result.conditions)
-          }
-        })
-        this.questConditions = Object.fromEntries(
-          Object.entries(newQuestConditions).map(([key, titles]) => [
-            key,
-            Object.values(titles),
-          ]),
-        )
-      }
-      if (results.length && model === 'Pokemon') {
-        this.setRarity(results, false)
-      }
-      if (results.length === 1) return results[0].available
-      if (results.length > 1) {
-        const returnSet = new Set()
-        for (let i = 0; i < results.length; i += 1) {
-          for (let j = 0; j < results[i].available.length; j += 1) {
-            returnSet.add(results[i].available[j])
-          }
-        }
-        return [...returnSet]
-      }
-      if (results.length === 0 && model === 'Nest') {
-        this.log.warn(
-          'This is likely due to "nest" being in a useFor array but not in the database',
-        )
-      }
-      return []
+      return null
     }
-    return []
+    /** @type {{ available: string[], conditions?: object, rarity?: object }} */
+    const out = { available: [] }
+    // runScannerSources returns only fulfilled sources, so an empty `results`
+    // means every source failed. Don't derive manager-owned metadata (quest
+    // conditions / rarity) from that failure-derived emptiness — leave it
+    // undefined so applyAvailableMetadata retains the last-good.
+    if (results.length && model === 'Pokestop') {
+      const newQuestConditions = {}
+      results.forEach((result) => {
+        if ('conditions' in result) {
+          config.util.extendDeep(newQuestConditions, result.conditions)
+        }
+      })
+      out.conditions = Object.fromEntries(
+        Object.entries(newQuestConditions).map(([key, titles]) => [
+          key,
+          Object.values(titles),
+        ]),
+      )
+    }
+    if (results.length && model === 'Pokemon') {
+      out.rarity = computeRarityTiers(results, false)
+    }
+    if (results.length === 1) {
+      out.available = results[0].available
+    } else if (results.length > 1) {
+      const returnSet = new Set()
+      for (let i = 0; i < results.length; i += 1) {
+        for (let j = 0; j < results[i].available.length; j += 1) {
+          returnSet.add(results[i].available[j])
+        }
+      }
+      out.available = [...returnSet]
+    } else if (model === 'Nest') {
+      this.log.warn(
+        'This is likely due to "nest" being in a useFor array but not in the database',
+      )
+    }
+    return out
+  }
+
+  // Commits the metadata half of a getAvailable() result onto this manager.
+  // EventManager calls it under the generation gate (so a superseded refresh
+  // never reaches here); a failure-derived result leaves conditions/rarity
+  // undefined, so a transient outage can't blank the drawer's metadata.
+  applyAvailableMetadata(result) {
+    if (!result) return
+    if (result.conditions !== undefined)
+      this.questConditions = result.conditions
+    if (result.rarity !== undefined) this.rarity = result.rarity
   }
 
   /**
