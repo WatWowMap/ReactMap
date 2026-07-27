@@ -722,15 +722,14 @@ class DbManager extends Logger {
   }
 
   /**
-   * @template T
+   * Returns { available, conditions?, rarity? }, or null on total source
+   * failure. PURE: it no longer commits questConditions/rarity onto `this` —
+   * the caller applies the metadata via applyAvailableMetadata AFTER the
+   * EventManager generation gate, so a superseded refresh (e.g. one holding a
+   * replaced Db after a reload) cannot overwrite current metadata.
    * @param {import("../models").ScannerModelKeys} model
-   * @returns {Promise<T[]>}
+   * @returns {Promise<{ available: string[], conditions?: object, rarity?: object } | null>}
    */
-  // Returns { available, conditions?, rarity? }, or null on total source
-  // failure. PURE: it no longer commits questConditions/rarity onto `this` —
-  // the caller applies the metadata via applyAvailableMetadata AFTER the
-  // EventManager generation gate, so a superseded refresh (e.g. one holding a
-  // replaced Db after a reload) cannot overwrite current metadata.
   async getAvailable(model) {
     if (!this.models[model]) return { available: [] }
     this.log.info(`Querying available for ${model}`)
@@ -789,10 +788,13 @@ class DbManager extends Logger {
     return out
   }
 
-  // Commits the metadata half of a getAvailable() result onto this manager.
-  // EventManager calls it under the generation gate (so a superseded refresh
-  // never reaches here); a failure-derived result leaves conditions/rarity
-  // undefined, so a transient outage can't blank the drawer's metadata.
+  /**
+   * Commits the metadata half of a getAvailable() result onto this manager.
+   * EventManager calls it under the generation gate (so a superseded refresh
+   * never reaches here); a failure-derived result leaves conditions/rarity
+   * undefined, so a transient outage can't blank the drawer's metadata.
+   * @param {{ conditions?: object, rarity?: object } | null} result
+   */
   applyAvailableMetadata(result) {
     if (!result) return
     if (result.conditions !== undefined)
