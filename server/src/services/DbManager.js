@@ -307,25 +307,48 @@ class DbManager extends Logger {
     await Promise.all(
       this.connections.map(async (schema, i) => {
         try {
-          const schemaContext = schema
-            ? await DbManager.schemaCheck(schema)
-            : {
-                mem: this.endpoints[i].endpoint,
-                secret: this.endpoints[i].secret,
-                httpAuth: this.endpoints[i].httpAuth,
-                pvpV2: true,
-                // No DB schema check runs for a pure-endpoint source, but the
-                // Golbat scan always returns confirmed incident data (confirmed
-                // flag + lineup slots), so it IS confirmed-capable. Without this,
-                // onlyConfirmed is ineffective and confirmed `a` reward filters
-                // fall back to the grunt's possible-encounter pool.
-                hasConfirmed: true,
-              }
+          // Endpoint context is independent of the DB capability probe. A dual
+          // (endpoint + DB) source must keep mem/secret/httpAuth even if
+          // schemaCheck rejects (e.g. a transient scanner-DB outage), otherwise
+          // its endpoint-capable fort queries would bypass the healthy endpoint
+          // and run against the down DB. So resolve the schema flags in their
+          // own try/catch and always overlay + assign the endpoint context.
+          let schemaContext
+          if (schema) {
+            try {
+              schemaContext = await DbManager.schemaCheck(schema)
+            } catch (e) {
+              this.log.error(
+                `schemaCheck failed for connection ${i}${
+                  this.endpoints[i]
+                    ? ' — retaining endpoint context; SQL fallback degraded until reload'
+                    : ''
+                }`,
+                e,
+              )
+              schemaContext = {}
+            }
+          } else {
+            schemaContext = {
+              mem: this.endpoints[i].endpoint,
+              secret: this.endpoints[i].secret,
+              httpAuth: this.endpoints[i].httpAuth,
+              pvpV2: true,
+              // No DB schema check runs for a pure-endpoint source, but the
+              // Golbat scan always returns confirmed incident data (confirmed
+              // flag + lineup slots), so it IS confirmed-capable. Without this,
+              // onlyConfirmed is ineffective and confirmed `a` reward filters
+              // fall back to the grunt's possible-encounter pool.
+              hasConfirmed: true,
+            }
+          }
 
           // Dual source (endpoint + DB): schemaCheck ran on the bound knex
           // (giving isMad + has* flags) but returns mem:''/secret:''. Overlay
           // the endpoint AFTER so migrated queries (getAvailable) use it while
-          // un-migrated ones fall back to this.query() on the bound DB.
+          // un-migrated ones fall back to this.query() on the bound DB. Runs
+          // even when schemaCheck failed above (schemaContext={}), so a DB
+          // outage cannot disable the healthy endpoint.
           if (schema && this.endpoints[i]) {
             schemaContext.mem = this.endpoints[i].endpoint
             schemaContext.secret = this.endpoints[i].secret
@@ -623,6 +646,12 @@ class DbManager extends Logger {
             bbox,
           ),
       )
+      // runScannerSources returns [] ONLY when every source rejected — a
+      // genuine-empty source is fulfilled with [] (so data would be [[]]).
+      // That happens for an all-pure-endpoint fort search (the search methods
+      // have no endpoint branch) or a DB outage; widening just reissues the
+      // same failing queries, so stop rather than spin the radius to `max`.
+      if (data.length === 0) break
       const results = DbManager.deDupeResults(data)
       if (results.length > deDuped.length) {
         deDuped = results

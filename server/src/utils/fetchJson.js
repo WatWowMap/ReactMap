@@ -54,10 +54,15 @@ async function fetchJson(url, options = undefined) {
     return response.json()
   } catch (e) {
     if (e instanceof Error) {
+      // A 404 on a by-id lookup is an expected miss (the id isn't in the
+      // endpoint's cache), mirroring an empty SQL lookup — return it quietly
+      // instead of logging an error + dumping the request to logs/. Covers
+      // pokemon and the fort by-id endpoints (gym/pokestop/station getOne +
+      // manual/deep-link ids).
       if (
         e.cause instanceof Response &&
         e.cause.status === 404 &&
-        url.includes('/api/pokemon/id')
+        /\/api\/(pokemon|gym|pokestop|station)\/id\//.test(url)
       )
         return e.cause
       log.error(TAGS.fetch, `Unable to fetch ${url}`, '\n', e)
