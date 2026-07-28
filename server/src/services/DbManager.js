@@ -192,16 +192,16 @@ class DbManager extends Logger {
    * @returns {Promise<import("@rm/types").DbContext>}
    */
   static async schemaCheck(schema) {
-    const [isMad, pvpV2, hasSize, hasHeight, hasPokemonBackground] =
-      await schema('pokemon')
-        .columnInfo()
-        .then((columns) => [
-          'cp_multiplier' in columns,
-          'pvp' in columns,
-          'size' in columns,
-          'height' in columns,
-          'background' in columns,
-        ])
+    const [isMad, hasSize, hasHeight, hasPokemonBackground] = await schema(
+      'pokemon',
+    )
+      .columnInfo()
+      .then((columns) => [
+        'cp_multiplier' in columns,
+        'size' in columns,
+        'height' in columns,
+        'background' in columns,
+      ])
     const [
       hasRewardAmount,
       hasPowerUp,
@@ -271,7 +271,6 @@ class DbManager extends Logger {
 
     return {
       isMad,
-      pvpV2,
       mem: '',
       secret: '',
       hasSize,
@@ -333,7 +332,6 @@ class DbManager extends Logger {
               mem: this.endpoints[i].endpoint,
               secret: this.endpoints[i].secret,
               httpAuth: this.endpoints[i].httpAuth,
-              pvpV2: true,
               // No DB schema check runs for a pure-endpoint source, but the
               // Golbat scan always returns confirmed incident data (confirmed
               // flag + lineup slots), so it IS confirmed-capable. Without this,

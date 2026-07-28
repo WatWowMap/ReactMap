@@ -111,12 +111,7 @@
         }
       ],
       "levels": [50, 51],
-      "reactMapHandlesPvp": false,
-      "minCp": {
-        "little": 400,
-        "great": 1400,
-        "ultra": 2400
-      }
+      "reactMapHandlesPvp": false
     },
     "portalUpdateLimit": 30,
     "weatherCellLimit": 3,

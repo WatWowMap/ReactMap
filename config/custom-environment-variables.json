@@ -60,10 +60,6 @@
       "__name": "API_COOKIE_AGE_DAYS",
       "__format": "number"
     },
-    "availableRefreshSeconds": {
-      "__name": "API_AVAILABLE_REFRESH_SECONDS",
-      "__format": "number"
-    },
     "rateLimit": {
       "time": {
         "__name": "API_RATE_LIMIT_TIME",
@@ -191,6 +187,10 @@
         "__name": "API_QUERY_UPDATE_HOURS_STATIONS",
         "__format": "number"
       }
+    },
+    "availableRefreshSeconds": {
+      "__name": "API_AVAILABLE_REFRESH_SECONDS",
+      "__format": "number"
     },
     "queryOnSessionInit": {
       "pokemon": {
@@ -320,20 +320,6 @@
       "reactMapHandlesPvp": {
         "__name": "API_PVP_REACT_MAP_HANDLES_PVP",
         "__format": "boolean"
-      },
-      "minCp": {
-        "little": {
-          "__name": "API_PVP_MIN_CP_LITTLE",
-          "__format": "number"
-        },
-        "great": {
-          "__name": "API_PVP_MIN_CP_GREAT",
-          "__format": "number"
-        },
-        "ultra": {
-          "__name": "API_PVP_MIN_CP_ULTRA",
-          "__format": "number"
-        }
       }
     },
     "portalUpdateLimit": {
