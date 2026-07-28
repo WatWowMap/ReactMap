@@ -518,9 +518,17 @@ class Gym extends Model {
         }
         if (
           newGym.hasRaid ||
-          newGym.badge ||
-          (actualBadge === 'none' && onlyGymBadges) ||
-          newGym.hasGym
+          newGym.hasGym ||
+          // Badge layer: mirror the SQL query's whereIn/whereNotIn(userBadges).
+          // The endpoint candidate set is NOT pre-filtered by badge (it's
+          // per-user ReactMap data Golbat can't know), so verify it here: the
+          // `none` view keeps only gyms the user has NO badge for, and a
+          // specific/`all` badge view keeps only gyms they DO. For the SQL path
+          // this is a no-op — its results are already whereIn/whereNotIn'd — but
+          // it stops the endpoint `none` view from leaking previously-badged
+          // gyms. (newGym.badge is only ever set when onlyGymBadges.)
+          (onlyGymBadges &&
+            (actualBadge === 'none' ? !newGym.badge : !!newGym.badge))
         ) {
           filteredResults.push(newGym)
         }
