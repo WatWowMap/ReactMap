@@ -10,6 +10,7 @@ import { setLongTimeout } from '@utils/setLongTimeout'
 export const HAS_API = 'Notification' in window
 const cache = new SimpleTTLCache(1000 * 60 * 60)
 let isAudioPlaying = false
+let canConstructNotification = HAS_API
 
 /**
  * Wrapper to get permission, to keep API check in one module
@@ -37,7 +38,7 @@ export async function requestPermission() {
  * @param {NotificationOptions & { lat?: number, lon?: number, expire?: number, audio?: string }} [options]
  */
 export function sendNotification(key, title, category, options) {
-  if (cache.has(key) || !HAS_API) return
+  if (cache.has(key) || !canConstructNotification) return
   const userSettings = /** @type {Partial<RMNotificationOptions>} */ (
     useStorage.getState().userSettings?.notifications || {}
   )
@@ -46,20 +47,30 @@ export function sendNotification(key, title, category, options) {
       const { lat, lon, audio, expire, manualId, ...rest } = options || {}
       const countdown = expire ? expire * 1000 - Date.now() : 1
       if (countdown < 0) return
-      cache.set(key, countdown)
 
-      const notif = new Notification(
-        title
-          .split(',')
-          .filter(Boolean)
-          .map((w) => t(w))
-          .join(' '),
-        {
-          ...rest,
-          tag: key,
-          lang: localStorage.getItem('i18nextLng') || window.navigator.language,
-        },
-      )
+      /** @type {Notification} */
+      let notif
+      try {
+        notif = new Notification(
+          title
+            .split(',')
+            .filter(Boolean)
+            .map((w) => t(w))
+            .join(' '),
+          {
+            ...rest,
+            tag: key,
+            lang:
+              localStorage.getItem('i18nextLng') || window.navigator.language,
+          },
+        )
+      } catch (error) {
+        canConstructNotification = false
+        // eslint-disable-next-line no-console
+        console.warn('Desktop notifications are unavailable', error)
+        return
+      }
+      cache.set(key, countdown)
       notif.onclick = () => {
         if (!document.hasFocus()) {
           window.focus()
