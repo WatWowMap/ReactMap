@@ -29,7 +29,6 @@ class PkmnBackend {
    * @param {string[]} perms.areaRestrictions
    * @param {object} mods
    * @param {boolean} mods.onlyLinkGlobal
-   * @param {boolean} mods.pvpV2
    * @param {boolean} mods.hasSize
    * @param {boolean} mods.isMad
    * @param {boolean} mods.mem
@@ -207,19 +206,10 @@ class PkmnBackend {
       between(entry.rank, ...this.global[league])
     if (!rankCheck) return false
 
-    const cpCheck =
-      this.mods.pvpV2 ||
-      this.pvpConfig.reactMapHandlesPvp ||
-      entry.cp >= this.pvpConfig.minCp[league]
-    if (!cpCheck) return false
-
     const megaCheck = !entry.evolution || this.mods.onlyPvpMega
     if (!megaCheck) return false
 
-    const capCheck =
-      this.mods.pvpV2 || this.pvpConfig.reactMapHandlesPvp
-        ? entry.capped || this.mods[`onlyPvp${entry.cap}`]
-        : true
+    const capCheck = entry.capped || this.mods[`onlyPvp${entry.cap}`]
     if (!capCheck) return false
 
     return true

@@ -40,8 +40,12 @@ class EventManager extends Logger {
     /** @type {Record<string, () => void>} */
     this.intervals = {}
 
-    /** @type {Partial<Record<keyof EventManager['available'], Promise<void>>>} */
+    /** @type {Partial<Record<keyof EventManager['available'], Promise<void>>>} in-flight setAvailable per category */
     this.availablePending = {}
+    /** @type {Record<string, number | undefined>} last successful setAvailable per category */
+    this.availableUpdatedAt = {}
+    /** @type {Record<string, number | undefined>} monotonic refresh token per category; a stale in-flight refresh whose token is superseded must not commit */
+    this.availableGeneration = {}
 
     this.baseUrl =
       'https://raw.githubusercontent.com/WatWowMap/wwm-uicons-webp/main'
@@ -100,29 +104,69 @@ class EventManager extends Logger {
    * @param {import('../models').ScannerModelKeys} model
    * @param {import('./DbManager').DbManager} Db
    */
-  async setAvailable(category, model, Db) {
-    let pending = this.availablePending[category]
-    if (!pending) {
-      pending = this.#refreshAvailable(category, model, Db)
-      this.availablePending[category] = pending
+  async setAvailable(category, model, Db, force = false) {
+    // Single-flight + TTL: session-init triggers (queryOnSessionInit) fire on
+    // EVERY page load and can stampede — on endpoint-backed sources each
+    // refresh walks Golbat's whole fort cache. Non-forced concurrent calls
+    // share one in-flight promise; repeats within the TTL are served by the
+    // last result (map markers never depend on this — only the filter drawer
+    // options — so the staleness cost is bounded and cosmetic).
+    //
+    // A forced refresh (scheduled interval, /api/v1/available, hot reload) must
+    // NOT adopt an in-flight non-forced promise: that promise may hold a
+    // superseded Db/cache generation and would never query the newly installed
+    // manager. It supersedes instead — bumping the generation so the older
+    // refresh bails before committing stale data (see #refreshAvailable).
+    const ttlMs = (config.getSafe('api.availableRefreshSeconds') || 60) * 1000
+    if (!force) {
+      if (this.availablePending[category]) {
+        return this.availablePending[category]
+      }
+      if (
+        this.availableUpdatedAt[category] &&
+        Date.now() - this.availableUpdatedAt[category] < ttlMs
+      ) {
+        return undefined
+      }
     }
-
-    try {
-      await pending
-    } finally {
+    const generation = (this.availableGeneration[category] || 0) + 1
+    this.availableGeneration[category] = generation
+    const pending = this.#refreshAvailable(
+      category,
+      model,
+      Db,
+      generation,
+    ).finally(() => {
+      // Only clear the slot if a newer refresh hasn't already replaced it.
       if (this.availablePending[category] === pending) {
         delete this.availablePending[category]
       }
-    }
+    })
+    this.availablePending[category] = pending
+    return pending
   }
 
   /**
    * @param {keyof EventManager['available']} category
    * @param {import('../models').ScannerModelKeys} model
    * @param {import('./DbManager').DbManager} Db
+   * @param {number} generation refresh token; only commits if still current
    */
-  async #refreshAvailable(category, model, Db) {
-    const available = await Db.getAvailable(model)
+  async #refreshAvailable(category, model, Db, generation) {
+    const result = await Db.getAvailable(model)
+    // null = total source failure (getAvailable): keep the last-good drawer +
+    // conditions and retry on the next call. A successful snapshot — even an
+    // empty one, when a category's last active option disappears — falls
+    // through and commits, so the drawer clears instead of showing stale
+    // filters forever.
+    if (result == null) return
+    // A newer refresh (typically a forced reload) started while this one was
+    // awaiting Golbat/SQL; it owns the current Db, so drop this superseded
+    // result rather than committing/TTL-stamping data from an old generation.
+    // This must precede applyAvailableMetadata below so the drawer AND the
+    // manager metadata (questConditions/rarity) commit as one gated snapshot.
+    if (this.availableGeneration[category] !== generation) return
+    const { available } = result
 
     /** @param {string} key */
     const parseKey = (key) => {
@@ -160,7 +204,11 @@ class EventManager extends Logger {
       return 0
     })
     this.available[category] = available
+    // Commit the manager metadata (questConditions/rarity) in the same gated
+    // step as the drawer, so a superseded refresh can overwrite neither.
+    Db.applyAvailableMetadata(result)
     this.addAvailable(category)
+    this.availableUpdatedAt[category] = Date.now()
   }
 
   /**
@@ -223,7 +271,7 @@ class EventManager extends Logger {
     if (!config.getSafe('api.queryOnSessionInit.raids')) {
       this.intervals.raidUpdate = setLongInterval(
         async () => {
-          await this.setAvailable('gyms', 'Gym', Db)
+          await this.setAvailable('gyms', 'Gym', Db, true)
           await this.chatLog('event', {
             description: 'Refreshed available raids',
           })
@@ -234,7 +282,7 @@ class EventManager extends Logger {
     if (!config.getSafe('api.queryOnSessionInit.nests')) {
       this.intervals.nestUpdate = setLongInterval(
         async () => {
-          await this.setAvailable('nests', 'Nest', Db)
+          await this.setAvailable('nests', 'Nest', Db, true)
           await this.chatLog('event', {
             description: 'Refreshed available nests',
           })
@@ -245,7 +293,7 @@ class EventManager extends Logger {
     if (!config.getSafe('api.queryOnSessionInit.pokemon')) {
       this.intervals.pokemonUpdate = setLongInterval(
         async () => {
-          await this.setAvailable('pokemon', 'Pokemon', Db)
+          await this.setAvailable('pokemon', 'Pokemon', Db, true)
           await this.chatLog('event', {
             description: 'Refreshed available pokemon',
           })
@@ -256,7 +304,7 @@ class EventManager extends Logger {
     if (!config.getSafe('api.queryOnSessionInit.quests')) {
       this.intervals.questUpdate = setLongInterval(
         async () => {
-          await this.setAvailable('pokestops', 'Pokestop', Db)
+          await this.setAvailable('pokestops', 'Pokestop', Db, true)
           await this.chatLog('event', {
             description: 'Refreshed available quests & invasions',
           })
@@ -267,7 +315,7 @@ class EventManager extends Logger {
     if (!config.getSafe('api.queryOnSessionInit.stations')) {
       this.intervals.stationUpdate = setLongInterval(
         async () => {
-          await this.setAvailable('stations', 'Station', Db)
+          await this.setAvailable('stations', 'Station', Db, true)
           await this.chatLog('event', {
             description: 'Refreshed available stations',
           })
@@ -421,7 +469,7 @@ class EventManager extends Logger {
 
           // Update available rocket Pokemon whenever invasions are refreshed
           if (Db) {
-            await this.setAvailable('pokestops', 'Pokestop', Db)
+            await this.setAvailable('pokestops', 'Pokestop', Db, true)
           }
         }
       } catch (e) {

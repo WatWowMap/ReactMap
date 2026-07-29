@@ -5,12 +5,26 @@ const { Model, raw } = require('objection')
 const i18next = require('i18next')
 
 const config = require('@rm/config')
+const { log, TAGS } = require('@rm/logger')
 
-const { getAreaSql } = require('../utils/getAreaSql')
+const { getAreaSql, areaRestrictionsDenyAll } = require('../utils/getAreaSql')
 const { state } = require('../services/state')
 
-const { applyManualIdFilter } = require('../utils/manualFilter')
+const {
+  applyManualIdFilter,
+  normalizeManualId,
+} = require('../utils/manualFilter')
 const { isDualQuestLayerMode } = require('../utils/questLayerMode')
+const {
+  evalScannerQuery,
+  describeScannerResponse,
+  fetchFortById,
+} = require('../utils/evalScannerQuery')
+const { filterRTree } = require('../utils/filterRTree')
+const { getCombinedFortAvailable } = require('../utils/fortAvailable')
+const { buildGymDnfFilters } = require('../filters/fort/gym')
+const { describeDnfNarrowing } = require('../filters/fort/describeDnfNarrowing')
+const { mapGymAvailable } = require('./gymAvailableMapper')
 
 const coreFields = [
   'id',
@@ -111,7 +125,12 @@ class Gym extends Model {
     }
   }
 
-  static async getAll(perms, args, { isMad, availableSlotsCol }, userId) {
+  static async getAll(
+    perms,
+    args,
+    { isMad, availableSlotsCol, mem, secret, httpAuth },
+    userId,
+  ) {
     const {
       gyms: gymPerms,
       raids: raidPerms,
@@ -499,19 +518,158 @@ class Gym extends Model {
         }
         if (
           newGym.hasRaid ||
-          newGym.badge ||
-          (actualBadge === 'none' && onlyGymBadges) ||
-          newGym.hasGym
+          newGym.hasGym ||
+          // Badge layer: mirror the SQL query's whereIn/whereNotIn(userBadges).
+          // The endpoint candidate set is NOT pre-filtered by badge (it's
+          // per-user ReactMap data Golbat can't know), so verify it here: the
+          // `none` view keeps only gyms the user has NO badge for, and a
+          // specific/`all` badge view keeps only gyms they DO. For the SQL path
+          // this is a no-op — its results are already whereIn/whereNotIn'd — but
+          // it stops the endpoint `none` view from leaking previously-badged
+          // gyms. (newGym.badge is only ever set when onlyGymBadges.)
+          (onlyGymBadges &&
+            (actualBadge === 'none' ? !newGym.badge : !!newGym.badge))
         ) {
           filteredResults.push(newGym)
         }
       })
       return filteredResults
     }
+
+    if (mem) {
+      // filterRTree below allow-alls on empty area inputs, unlike the SQL
+      // getAreaSql — so enforce the strict-area denial before accepting any
+      // endpoint rows (else a no-area user under strict mode sees everything).
+      if (areaRestrictionsDenyAll(areaRestrictions, onlyAreas)) return []
+      try {
+        // /api/gym/scan returns an envelope { gyms, examined, skipped, total },
+        // not a bare array — the matching gyms are on res.gyms.
+        const dnf = buildGymDnfFilters(args.filters, baseGymSlotAmounts.length)
+        const res = await evalScannerQuery(
+          TAGS.gyms,
+          `${mem}/api/gym/scan`,
+          JSON.stringify({
+            min: { latitude: args.minLat, longitude: args.minLon },
+            max: { latitude: args.maxLat, longitude: args.maxLon },
+            // 0 = Golbat's server default (max_fort_results); the display cap
+            // (queryLimits.gyms) is applied after the local gates below, not as
+            // a pre-filter traversal cap (see Pokestop.getAll).
+            limit: 0,
+            filters: dnf,
+          }),
+          'POST',
+          secret,
+          httpAuth,
+        )
+        if (res && Array.isArray(res.gyms)) {
+          // Deep-link parity with SQL's `(bbox) OR id = manualId`: an
+          // off-viewport manually-selected gym joins the candidate set via the
+          // by-id endpoint; every later gate (active/area/secondaryFilter)
+          // still runs, exactly as it does for the SQL OR.
+          const manualId = normalizeManualId(args.filters.onlyManualId)
+          if (
+            manualId !== null &&
+            !res.gyms.some((g) => g && g.id === manualId)
+          ) {
+            try {
+              const one = await fetchFortById(
+                TAGS.gyms,
+                `${mem}/api/gym/id/${encodeURIComponent(manualId)}`,
+                secret,
+                httpAuth,
+              )
+              // Prepend so the off-viewport deep-link survives secondaryFilter's
+              // resultLimit cap in a dense viewport (see Pokestop.getAll).
+              if (one) res.gyms.unshift(one)
+            } catch {
+              // by-id miss mirrors SQL finding no such row
+            }
+          }
+          const active = res.gyms.filter(
+            (gym) =>
+              gym.enabled &&
+              !gym.deleted &&
+              (!hideOldGyms || gym.updated > ts - gymValidDataLimit * 86400) &&
+              (!onlyAllGyms ||
+                !onlyLevels ||
+                onlyLevels === 'all' ||
+                gym.power_up_level === Number(onlyLevels)) &&
+              filterRTree(gym, areaRestrictions, onlyAreas),
+          )
+          const final = secondaryFilter(active)
+          log.info(
+            TAGS.gyms,
+            describeDnfNarrowing(
+              'GYM',
+              dnf,
+              res.examined,
+              res.gyms.length,
+              final.length,
+            ),
+          )
+          // Display cap, applied after the local gates (mirrors SQL's
+          // `.limit(queryLimits.gyms)`); the scan request itself is uncapped.
+          return final.slice(0, queryLimits.gyms)
+        }
+        log.warn(
+          TAGS.gyms,
+          `[GYM] /api/gym/scan gave no gyms array — ${describeScannerResponse(res)} — falling back to SQL for this source`,
+        )
+      } catch (e) {
+        log.warn(
+          TAGS.gyms,
+          `[GYM] /api/gym/scan error — falling back to SQL for this source: ${e}`,
+        )
+      }
+    }
     return secondaryFilter(await query.limit(queryLimits.gyms))
   }
 
-  static async getAvailable({ isMad, availableSlotsCol }) {
+  static async getAvailable({
+    isMad,
+    availableSlotsCol,
+    mem,
+    secret,
+    httpAuth,
+  }) {
+    // Endpoint source: fetch the aggregate from Golbat; on 503/error fall
+    // through to the SQL below (dual source runs SQL on its bound knex; a
+    // pure-endpoint source's this.query() throws and is dropped upstream).
+    if (mem) {
+      try {
+        // One combined /api/fort/available per endpoint serves all three fort
+        // models' refresh batch; falls back to the per-type endpoint when the
+        // combined one is unavailable (older Golbat).
+        // Availability comes from the combined /api/fort/available (one Golbat
+        // cache pass for all three fort types, deduped across the models). No
+        // per-type fallback: ReactMap always runs against a current Golbat that
+        // serves it. A combined failure falls through to the SQL block below.
+        const combined = await getCombinedFortAvailable(
+          TAGS.gyms,
+          mem,
+          secret,
+          httpAuth,
+        )
+        const res = combined?.gyms
+        if (res && Array.isArray(res.raids)) {
+          const { available } = mapGymAvailable(res)
+          log.info(
+            TAGS.gyms,
+            `[GYM] loaded available from ${mem}/api/fort/available — ${available.length} filter keys (${res.raids.length} raid options)`,
+          )
+          return { available }
+        }
+        log.warn(
+          TAGS.gyms,
+          `[GYM] combined /api/fort/available had no gyms section — falling through to SQL (empty only for a pure-endpoint source)`,
+        )
+      } catch (e) {
+        log.warn(
+          TAGS.gyms,
+          `[GYM] /api/fort/available error — falling through to SQL (empty only for a pure-endpoint source): ${e}`,
+        )
+      }
+    }
     const ts = Math.floor(Date.now() / 1000)
     const results = await this.query()
       .select([
@@ -695,7 +853,26 @@ class Gym extends Model {
       .reverse()
   }
 
-  static getOne(id, { isMad }) {
+  static async getOne(id, { isMad, mem, secret, httpAuth }) {
+    if (mem) {
+      try {
+        const one = await fetchFortById(
+          TAGS.gyms,
+          `${mem}/api/gym/id/${encodeURIComponent(id)}`,
+          secret,
+          httpAuth,
+        )
+        // Match the SQL projection ({lat, lon} only). Returning the raw Golbat
+        // record would leak raid/team/detail fields past the raids sub-perm
+        // split and area restrictions — a deep link only needs centering.
+        if (one) return { lat: one.lat, lon: one.lon }
+      } catch (e) {
+        log.warn(
+          TAGS.gyms,
+          `[GYM] /api/gym/id error — falling back to SQL: ${e}`,
+        )
+      }
+    }
     return this.query()
       .select([
         isMad ? 'latitude AS lat' : 'lat',

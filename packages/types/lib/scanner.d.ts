@@ -260,8 +260,6 @@ export interface Pokemon {
   expire_timestamp_verified: boolean
   updated: number
   pvp: CleanPvp
-  pvp_rankings_great_league?: import('ohbem').PvPRankEntry[]
-  pvp_rankings_ultra_league?: import('ohbem').PvPRankEntry[]
   distance?: number
   shiny?: boolean
 }

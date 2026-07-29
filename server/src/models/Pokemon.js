@@ -139,7 +139,6 @@ class Pokemon extends Model {
       mem,
       secret,
       httpAuth,
-      pvpV2,
     } = ctx
     const { filterMap, globalFilter } = this.getFilters(perms, args, ctx)
 
@@ -371,13 +370,7 @@ class Pokemon extends Model {
       const filter = filterMap[id] || globalFilter
       let noPvp = true
 
-      if (
-        pvp &&
-        (pkmn.pvp ||
-          pkmn.pvp_rankings_great_league ||
-          pkmn.pvp_rankings_ultra_league ||
-          (isMad && reactMapHandlesPvp && pkmn.cp))
-      ) {
+      if (pvp && (pkmn.pvp || (isMad && reactMapHandlesPvp && pkmn.cp))) {
         noPvp = false
         listOfIds.push(pkmn.id)
         pvpResults.push(pkmn)
@@ -419,14 +412,8 @@ class Pokemon extends Model {
       }
       if (reactMapHandlesPvp) {
         pvpQuery.whereNotNull('cp')
-      } else if (pvpV2) {
-        pvpQuery.whereNotNull('pvp')
       } else {
-        pvpQuery.andWhere((pvpBuilder) => {
-          pvpBuilder
-            .whereNotNull('pvp_rankings_great_league')
-            .orWhereNotNull('pvp_rankings_ultra_league')
-        })
+        pvpQuery.whereNotNull('pvp')
       }
       if (
         !getAreaSql(pvpQuery, areaRestrictions, onlyAreas, isMad, 'pokemon')

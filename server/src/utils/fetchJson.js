@@ -9,6 +9,27 @@ const { log, TAGS } = require('@rm/logger')
 
 const { setLongTimeout } = require('./setLongTimeout')
 
+const REDACTED_HEADERS = new Set(['authorization', 'x-golbat-secret'])
+
+/**
+ * Returns a shallow copy of the fetch options with credential headers masked,
+ * so debug logs and the failed-request payload dump never persist the
+ * X-Golbat-Secret or Basic auth to disk.
+ * @param {import('node-fetch').RequestInit} [options]
+ */
+function redactOptions(options) {
+  const headers = options && /** @type {any} */ (options).headers
+  if (!headers || typeof headers !== 'object') return options
+  return {
+    ...options,
+    headers: Object.fromEntries(
+      Object.entries(headers).map(([k, v]) =>
+        REDACTED_HEADERS.has(k.toLowerCase()) ? [k, '<redacted>'] : [k, v],
+      ),
+    ),
+  }
+}
+
 /**
  * fetch wrapper with timeout and error handling
  * @param {string} url
@@ -23,7 +44,7 @@ async function fetchJson(url, options = undefined) {
   }, config.getSafe('api.fetchTimeoutMs'))
 
   try {
-    log.debug(TAGS.fetch, url, options || '')
+    log.debug(TAGS.fetch, url, options ? redactOptions(options) : '')
     const response = await fetch(url, { ...options, signal: controller.signal })
     if (!response.ok) {
       throw new Error(`${response.status} (${response.statusText})`, {
@@ -33,10 +54,15 @@ async function fetchJson(url, options = undefined) {
     return response.json()
   } catch (e) {
     if (e instanceof Error) {
+      // A 404 on a by-id lookup is an expected miss (the id isn't in the
+      // endpoint's cache), mirroring an empty SQL lookup — return it quietly
+      // instead of logging an error + dumping the request to logs/. Covers
+      // pokemon and the fort by-id endpoints (gym/pokestop/station getOne +
+      // manual/deep-link ids).
       if (
         e.cause instanceof Response &&
         e.cause.status === 404 &&
-        url.includes('/api/pokemon/id')
+        /\/api\/(pokemon|gym|pokestop|station)\/id\//.test(url)
       )
         return e.cause
       log.error(TAGS.fetch, `Unable to fetch ${url}`, '\n', e)
@@ -47,7 +73,7 @@ async function fetchJson(url, options = undefined) {
           fs.mkdirSync(logsDir, { recursive: true })
           fs.writeFileSync(
             resolve(logsDir, fileName),
-            JSON.stringify(options, null, 2),
+            JSON.stringify(redactOptions(options), null, 2),
           )
         } catch (writeError) {
           log.warn(
