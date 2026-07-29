@@ -1,3 +1,16 @@
+# [1.49.0](https://github.com/WatWowMap/ReactMap/compare/v1.48.4...v1.49.0) (2026-07-29)
+
+
+### Bug Fixes
+
+* in mem golbat pokemon search ([8816432](https://github.com/WatWowMap/ReactMap/commit/8816432149869e9e71b78ce8467aa977bb7f7140))
+* randomize lure encounters ([3c4db92](https://github.com/WatWowMap/ReactMap/commit/3c4db92dbd0cf059a8cc2a5cb3d7b7317fd7f185))
+
+
+### Features
+
+* fort map-data consumer — gyms, stations & pokestops - with DNF filtering ([#1228](https://github.com/WatWowMap/ReactMap/issues/1228)) ([a9daf36](https://github.com/WatWowMap/ReactMap/commit/a9daf36081ac0262ee3f00dd40372299c84375fb)), closes [#1225](https://github.com/WatWowMap/ReactMap/issues/1225)
+
 ## [1.48.4](https://github.com/WatWowMap/ReactMap/compare/v1.48.3...v1.48.4) (2026-07-25)
 
 
