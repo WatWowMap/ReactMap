@@ -1004,8 +1004,6 @@ class Pokemon extends Model {
             },
             limit: searchLimit,
             searchIds: pokemonIds.map((id) => +id),
-            global: {},
-            filters: {},
           })
         : query,
       'POST',
