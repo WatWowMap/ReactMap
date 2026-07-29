@@ -183,23 +183,41 @@ const BasePokemonTile = (pkmn) => {
 
   const pokemonForm = getFormDisplay(pkmn.pokemon_id, pkmn.form, pkmn.costume)
 
-  sendNotification(
-    pkmn.id,
-    `${t(`poke_${pkmn.pokemon_id}`)}${pokemonForm ? ` (${pokemonForm})` : ''}`,
-    'pokemon',
-    {
-      icon: iconUrl,
-      body: `A${pkmn.atk_iv || '?'} | D${pkmn.def_iv || '?'} | S${
-        pkmn.sta_iv || '?'
-      } | L${pkmn.level || '?'} | CP${pkmn.cp || '?'}\n${
-        getTimeUntil(pkmn.expire_timestamp * 1000, true).str
+  React.useEffect(() => {
+    sendNotification(
+      pkmn.id,
+      `${t(`poke_${pkmn.pokemon_id}`)}${
+        pokemonForm ? ` (${pokemonForm})` : ''
       }`,
-      lat: pkmn.lat,
-      lon: pkmn.lon,
-      expire: pkmn.expire_timestamp,
-      audio: cry,
-    },
-  )
+      'pokemon',
+      {
+        icon: iconUrl,
+        body: `A${pkmn.atk_iv || '?'} | D${pkmn.def_iv || '?'} | S${
+          pkmn.sta_iv || '?'
+        } | L${pkmn.level || '?'} | CP${pkmn.cp || '?'}\n${
+          getTimeUntil(pkmn.expire_timestamp * 1000, true).str
+        }`,
+        lat: pkmn.lat,
+        lon: pkmn.lon,
+        expire: pkmn.expire_timestamp,
+        audio: cry,
+      },
+    )
+  }, [
+    cry,
+    iconUrl,
+    pkmn.atk_iv,
+    pkmn.cp,
+    pkmn.def_iv,
+    pkmn.expire_timestamp,
+    pkmn.id,
+    pkmn.lat,
+    pkmn.level,
+    pkmn.lon,
+    pkmn.pokemon_id,
+    pkmn.sta_iv,
+    pokemonForm,
+  ])
   if (pkmn.expire_timestamp < Date.now() / 1000) {
     return null
   }
