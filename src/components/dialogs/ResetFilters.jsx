@@ -4,7 +4,7 @@ import DialogContent from '@mui/material/DialogContent'
 import Typography from '@mui/material/Typography'
 import Grid2 from '@mui/material/Unstable_Grid2'
 import Button from '@mui/material/Button'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router'
 import { useTranslation } from 'react-i18next'
 
 import { useLayoutStore } from '@store/useLayoutStore'

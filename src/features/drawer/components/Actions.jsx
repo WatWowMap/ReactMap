@@ -4,7 +4,7 @@ import List from '@mui/material/List'
 import Divider from '@mui/material/Divider'
 import { styled } from '@mui/material/styles'
 
-import { Link } from 'react-router-dom'
+import { Link } from 'react-router'
 import AccountBoxIcon from '@mui/icons-material/AccountBox'
 import ExitToAppIcon from '@mui/icons-material/ExitToApp'
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline'

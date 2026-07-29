@@ -4,7 +4,7 @@ import 'leaflet.locatecontrol/dist/L.Control.Locate.css'
 import 'leaflet/dist/leaflet.css'
 
 import * as React from 'react'
-import { BrowserRouter } from 'react-router-dom'
+import { BrowserRouter } from 'react-router'
 import CssBaseline from '@mui/material/CssBaseline'
 import ThemeProvider from '@mui/material/styles/ThemeProvider'
 import { ApolloProvider } from '@apollo/client'

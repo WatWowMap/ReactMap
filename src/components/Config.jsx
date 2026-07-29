@@ -3,7 +3,7 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { setUser } from '@sentry/react'
-import { Navigate } from 'react-router-dom'
+import { Navigate } from 'react-router'
 
 import { useMemory } from '@store/useMemory'
 import { useStorage } from '@store/useStorage'

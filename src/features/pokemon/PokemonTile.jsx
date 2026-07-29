@@ -143,7 +143,7 @@ const BasePokemonTile = (pkmn) => {
   /** @type {[number, number]} */
   const finalLocation = React.useMemo(() => {
     const seenType = pkmn.seen_type
-    return seenType?.startsWith('nearby')
+    return seenType?.startsWith('nearby') || seenType?.includes('lure')
       ? getOffset({
           coords: /** @type {[number, number]} */ ([pkmn.lat, pkmn.lon]),
           id: pkmn.id,

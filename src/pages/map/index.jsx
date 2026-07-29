@@ -1,6 +1,6 @@
 // @ts-check
 import * as React from 'react'
-import { Navigate, useParams } from 'react-router-dom'
+import { Navigate, useParams } from 'react-router'
 
 import { useMemory } from '@store/useMemory'
 

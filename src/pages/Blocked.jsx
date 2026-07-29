@@ -1,6 +1,6 @@
 // @ts-check
 import React from 'react'
-import { useParams, useNavigate } from 'react-router-dom'
+import { useParams, useNavigate } from 'react-router'
 import { useTranslation } from 'react-i18next'
 import Typography from '@mui/material/Typography'
 import Button from '@mui/material/Button'
