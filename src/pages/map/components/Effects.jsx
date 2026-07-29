@@ -1,7 +1,7 @@
 // @ts-check
 
 import * as React from 'react'
-import { useParams } from 'react-router-dom'
+import { useParams } from 'react-router'
 import { useMap } from 'react-leaflet'
 import { useTranslation } from 'react-i18next'
 import useMediaQuery from '@mui/material/useMediaQuery'

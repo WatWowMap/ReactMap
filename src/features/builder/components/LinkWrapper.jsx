@@ -1,6 +1,6 @@
 // @ts-check
 import * as React from 'react'
-import { Link as RouterLink } from 'react-router-dom'
+import { Link as RouterLink } from 'react-router'
 import Link from '@mui/material/Link'
 
 /**
@@ -12,7 +12,7 @@ import Link from '@mui/material/Link'
  *  color?: string,
  *  underline?: import("@mui/material/Link").LinkProps['underline'],
  *  style?: import('react').CSSProperties,
- *  referrerPolicy?: import('react-router-dom').LinkProps['referrerPolicy'],
+ *  referrerPolicy?: import('react-router').LinkProps['referrerPolicy'],
  *  sx?: import("@mui/system").SxProps,
  *  children: React.ReactNode
  *  className?: string
