@@ -12,8 +12,11 @@ jobs:
         uses: actions/checkout@v4.1.1
         with:
           fetch-depth: 0
-      - name: Install Volta
-        uses: volta-cli/action@v4
+      - name: Setup Node.js environment
+        uses: actions/setup-node@v4.0.2
+        with:
+          node-version: 22.23.1
+          cache: yarn
       - name: Echo versions
         run: |
           node --version

@@ -24,10 +24,10 @@ const BaseRouteTile = ({ route, orientation = 'forward' }) => {
     /** @type {import('leaflet').LatLngExpression | null} */ (null),
   )
 
-  /** @type {React.MutableRefObject<import("leaflet").Polyline>} */
-  const lineRef = React.useRef()
+  /** @type {React.RefObject<import("leaflet").Polyline | null>} */
+  const lineRef = React.useRef(null)
   const [markerRef, setMarkerRef] = React.useState(null)
-  /** @type {React.MutableRefObject<import('leaflet').LayerGroup | null>} */
+  /** @type {React.RefObject<import('leaflet').LayerGroup | null>} */
   const arrowheadsRef = React.useRef(null)
 
   const displayRoute = React.useMemo(() => {

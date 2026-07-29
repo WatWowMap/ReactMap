@@ -19,7 +19,7 @@ const { setScanMode } = useScanStore.getState()
 /**
  *
  * @param {{ mode: 'scanNext' | 'scanZone' }} props
- * @returns {JSX.Element}
+ * @returns {React.JSX.Element}
  */
 function BaseScanOnDemand({ mode }) {
   const scanMode = useScanStore((s) => s[`${mode}Mode`])

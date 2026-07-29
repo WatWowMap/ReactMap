@@ -15,13 +15,6 @@ const StyledChip = styled(Chip)(({ theme }) => ({
   margin: theme.spacing(0.5),
 }))
 
-StyledChip.defaultProps = /** @type {const} */ ({
-  clickable: true,
-  deleteIcon: <Clear />,
-  size: 'small',
-  color: 'secondary',
-})
-
 /** @param {import("@rm/types").PoracleActiveHours & { uid: number }} props */
 export const ActiveHourChip = ({ day, hours, mins, uid, id }) => {
   const { t } = useTranslation()
@@ -51,8 +44,12 @@ export const ActiveHourChip = ({ day, hours, mins, uid, id }) => {
 
   return (
     <StyledChip
+      clickable
+      color="secondary"
+      deleteIcon={<Clear />}
       label={`${t(`day_${day}`)} ${hours}:${String(mins).padStart(2, '0')}`}
       onDelete={handleRemoveSchedule}
+      size="small"
     />
   )
 }

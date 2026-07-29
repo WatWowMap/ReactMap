@@ -72,7 +72,7 @@ const EndAdornment = React.memo(
 
 /**
  * @param {import('@mui/material').AutocompleteRenderInputParams} props
- * @param {React.MutableRefObject<HTMLInputElement | null>} [inputRef]
+ * @param {React.RefObject<HTMLInputElement | null>} [inputRef]
  */
 export function renderInput({ InputProps, ...props }, inputRef) {
   const { t } = useTranslation()

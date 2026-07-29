@@ -9,7 +9,7 @@ import { I } from '../I'
 /**
  *
  * @param {{ children?: string, bgcolor?: string } & import('@mui/material/Button').ButtonProps} props
- * @returns {JSX.Element}
+ * @returns {React.JSX.Element}
  */
 export function DiscordButton({
   href = '/auth/discord/callback',

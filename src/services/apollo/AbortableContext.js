@@ -1,5 +1,5 @@
 // @ts-check
-import { Observable } from '@apollo/client/utilities/observables/Observable'
+import { Observable } from '@apollo/client'
 
 /**
  * Based on: https://github.com/drcallaway/apollo-link-timeout

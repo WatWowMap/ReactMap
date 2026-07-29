@@ -4,6 +4,7 @@ import { ApolloClient, InMemoryCache, createHttpLink } from '@apollo/client'
 import { AbortableLink } from './AbortableLink'
 
 const abortableLink = new AbortableLink()
+const httpLink = createHttpLink({ uri: '/graphql' })
 
 export const apolloCache = new InMemoryCache({
   typePolicies: {
@@ -45,9 +46,10 @@ export const apolloCache = new InMemoryCache({
 })
 
 export const apolloClient = new ApolloClient({
-  uri: '/graphql',
-  link: abortableLink.concat(createHttpLink()),
-  name: encodeURIComponent(CONFIG.client.title),
-  version: CONFIG.client.version,
+  link: abortableLink.concat(httpLink),
+  clientAwareness: {
+    name: encodeURIComponent(CONFIG.client.title),
+    version: CONFIG.client.version,
+  },
   cache: apolloCache,
 })

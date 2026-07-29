@@ -12,7 +12,7 @@ const POKEMON_RADIUS = 70
 const GYM_RADIUS = 750
 
 /**
- * @returns {JSX.Element}
+ * @returns {React.JSX.Element}
  */
 export function ScanNext() {
   useCheckValid('scanNext')
