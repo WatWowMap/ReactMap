@@ -82,7 +82,7 @@ export function Search() {
 
   const { t } = useTranslation()
 
-  /** @type {React.MutableRefObject<HTMLInputElement | null>} */
+  /** @type {React.RefObject<HTMLInputElement | null>} */
   const inputRef = React.useRef(null)
 
   const search = useStorage((s) => s.search)

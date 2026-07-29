@@ -13,7 +13,7 @@ import { useLayoutStore } from '@store/useLayoutStore'
  *  children: React.ReactNode
  *  open?: boolean
  * } & Omit<import('@mui/material').DialogProps, 'open'>} props
- * @returns {JSX.Element}
+ * @returns {React.JSX.Element}
  */
 export function DialogWrapper({
   dialog,

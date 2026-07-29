@@ -1,15 +1,15 @@
 // @ts-check
-import { init, BrowserTracing } from '@sentry/react'
+import { init, browserTracingIntegration } from '@sentry/react'
 
 if (CONFIG.sentry.client.enabled) {
   init({
     dsn: CONFIG.sentry.client.dsn,
     integrations: [
-      new BrowserTracing({
-        tracePropagationTargets: ['localhost', /^\//, 'graphql'],
+      browserTracingIntegration({
         idleTimeout: 10000,
       }),
     ],
+    tracePropagationTargets: ['localhost', /^\//, 'graphql'],
     tracesSampleRate: CONFIG.sentry.client.tracesSampleRate
       ? +CONFIG.sentry.client.tracesSampleRate
       : 0.1,

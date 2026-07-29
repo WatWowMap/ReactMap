@@ -14,7 +14,6 @@ import { methods } from './Methods'
 const StyledDivider = styled(Divider)(({ theme }) => ({
   margin: theme.spacing(3, 0),
 }))
-StyledDivider.defaultProps = { flexItem: true }
 
 export function DefaultLoginPage() {
   const { t } = useTranslation()
@@ -46,7 +45,7 @@ export function DefaultLoginPage() {
         </Grid>
         {authMethods.map((method, index) => (
           <React.Fragment key={method}>
-            {!!index && <StyledDivider />}
+            {!!index && <StyledDivider flexItem />}
             {methods[method] || null}
           </React.Fragment>
         ))}

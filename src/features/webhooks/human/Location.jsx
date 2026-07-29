@@ -53,7 +53,7 @@ const Location = () => {
   // re-fires the `webhookLocation` sync effect below (which exists for the
   // drag picker, whose only signal is the store). Remember the coordinates we
   // are already persisting so the effect can skip a duplicate save.
-  /** @type {React.MutableRefObject<[number, number] | null>} */
+  /** @type {React.RefObject<[number, number] | null>} */
   const savingLocation = React.useRef(null)
 
   /** @param {[number, number]} location */

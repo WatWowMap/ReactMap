@@ -96,7 +96,9 @@ export function UserProfile() {
         <TabContext value={tab}>
           <TabList
             onChange={handleTabChange}
-            ref={(ref) => ref && setTabsHeight(ref.clientHeight)}
+            ref={(ref) => {
+              if (ref) setTabsHeight(ref.clientHeight)
+            }}
           >
             {['profile', 'badges', 'access'].map((each) => (
               <Tab key={each} label={t(each)} value={each} />
