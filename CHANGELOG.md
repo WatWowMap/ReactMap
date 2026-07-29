@@ -1,3 +1,10 @@
+## [1.49.1](https://github.com/WatWowMap/ReactMap/compare/v1.49.0...v1.49.1) (2026-07-29)
+
+
+### Bug Fixes
+
+* move notifs to effects ([7746864](https://github.com/WatWowMap/ReactMap/commit/77468648b760f4213713e28821b3cdacf0bff2a8))
+
 # [1.49.0](https://github.com/WatWowMap/ReactMap/compare/v1.48.4...v1.49.0) (2026-07-29)
 
 
