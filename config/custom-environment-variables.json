@@ -188,6 +188,10 @@
         "__format": "number"
       }
     },
+    "availableRefreshSeconds": {
+      "__name": "API_AVAILABLE_REFRESH_SECONDS",
+      "__format": "number"
+    },
     "queryOnSessionInit": {
       "pokemon": {
         "__name": "API_QUERY_ON_SESSION_INIT_POKEMON",
@@ -316,20 +320,6 @@
       "reactMapHandlesPvp": {
         "__name": "API_PVP_REACT_MAP_HANDLES_PVP",
         "__format": "boolean"
-      },
-      "minCp": {
-        "little": {
-          "__name": "API_PVP_MIN_CP_LITTLE",
-          "__format": "number"
-        },
-        "great": {
-          "__name": "API_PVP_MIN_CP_GREAT",
-          "__format": "number"
-        },
-        "ultra": {
-          "__name": "API_PVP_MIN_CP_ULTRA",
-          "__format": "number"
-        }
       }
     },
     "portalUpdateLimit": {

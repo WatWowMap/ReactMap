@@ -14,19 +14,8 @@ const { log, TAGS } = require('@rm/logger')
  * @returns {Record<string, import("ohbem").PvPRankEntry[]>}
  */
 function getParsedPvp(pokemon) {
-  if (pokemon.pvp)
-    return typeof pokemon.pvp === 'string'
-      ? JSON.parse(pokemon.pvp)
-      : pokemon.pvp
-
-  const parsed = { great: [], ultra: [], little: [] }
-  const pvpKeys = ['great', 'ultra']
-  pvpKeys.forEach((league) => {
-    if (pokemon[`pvp_rankings_${league}_league`]) {
-      parsed[league] = JSON.parse(pokemon[`pvp_rankings_${league}_league`])
-    }
-  })
-  return parsed
+  if (!pokemon.pvp) return {}
+  return typeof pokemon.pvp === 'string' ? JSON.parse(pokemon.pvp) : pokemon.pvp
 }
 
 /**

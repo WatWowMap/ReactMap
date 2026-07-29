@@ -3,6 +3,7 @@ const router = require('express').Router()
 
 const { log, TAGS } = require('@rm/logger')
 const { state } = require('../../../services/state')
+const { bustCombinedFortCache } = require('../../../utils/fortAvailable')
 
 const queryObj = /** @type {const} */ ({
   pokemon: { model: 'Pokemon', category: 'pokemon' },
@@ -39,13 +40,17 @@ const resolveCategory = (category) => {
 /** @param {boolean} compare */
 const getAll = async (compare) => {
   const available = compare
-    ? await Promise.all([
-        state.db.getAvailable('Pokemon'),
-        state.db.getAvailable('Pokestop'),
-        state.db.getAvailable('Gym'),
-        state.db.getAvailable('Nest'),
-        state.db.getAvailable('Tappable'),
-      ])
+    ? // getAvailable now returns { available, ... } (or null on total failure);
+      // this route only needs the string list.
+      (
+        await Promise.all([
+          state.db.getAvailable('Pokemon'),
+          state.db.getAvailable('Pokestop'),
+          state.db.getAvailable('Gym'),
+          state.db.getAvailable('Nest'),
+          state.db.getAvailable('Tappable'),
+        ])
+      ).map((r) => r?.available || [])
     : [
         state.event.available.pokemon,
         state.event.available.pokestops,
@@ -54,7 +59,7 @@ const getAll = async (compare) => {
         state.event.available.tappables,
       ]
   return Object.fromEntries(
-    Object.keys(queryObj).map((key, i) => [key, available[i]]),
+    Object.keys(queryObj).map((key, i) => [key, available[i] || []]),
   )
 }
 
@@ -65,17 +70,19 @@ router.get(['/', '/:category'], async (req, res) => {
     const { current, equal } = req.query
 
     if (model && category) {
+      // getAvailable returns { available, ... } (or null); the drawer snapshot
+      // in state.event.available is already a string list.
       const available =
-        current !== undefined
-          ? await state.db.getAvailable(model)
-          : state.event.available[category]
+        (current !== undefined
+          ? (await state.db.getAvailable(model))?.available
+          : state.event.available[category]) || []
       available.sort((a, b) => a.localeCompare(b))
 
       if (equal !== undefined) {
         const compare =
-          current !== undefined
+          (current !== undefined
             ? state.event.available[category]
-            : await state.db.getAvailable(model)
+            : (await state.db.getAvailable(model))?.available) || []
         compare.sort((a, b) => a.localeCompare(b))
         res.status(200).json(available.every((item, i) => item === compare[i]))
       } else {
@@ -115,16 +122,20 @@ router.put('/:category', async (req, res) => {
     const { model, category } =
       queryObj[resolveCategory(req.params.category)] || {}
 
+    // Explicit refresh: bust the combined fort snapshot cache so the forced
+    // setAvailable calls below fetch fresh instead of reusing a cached window.
+    bustCombinedFortCache()
+
     if (model && category) {
-      await state.event.setAvailable(category, model, state.db)
+      await state.event.setAvailable(category, model, state.db, true)
     } else {
       await Promise.all([
-        state.event.setAvailable('pokemon', 'Pokemon', state.db),
-        state.event.setAvailable('pokestops', 'Pokestop', state.db),
-        state.event.setAvailable('gyms', 'Gym', state.db),
-        state.event.setAvailable('nests', 'Nest', state.db),
-        state.event.setAvailable('stations', 'Station', state.db),
-        state.event.setAvailable('tappables', 'Tappable', state.db),
+        state.event.setAvailable('pokemon', 'Pokemon', state.db, true),
+        state.event.setAvailable('pokestops', 'Pokestop', state.db, true),
+        state.event.setAvailable('gyms', 'Gym', state.db, true),
+        state.event.setAvailable('nests', 'Nest', state.db, true),
+        state.event.setAvailable('stations', 'Station', state.db, true),
+        state.event.setAvailable('tappables', 'Tappable', state.db, true),
       ])
     }
     res

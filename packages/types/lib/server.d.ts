@@ -28,7 +28,6 @@ import { OperationTypeNode } from 'graphql'
 
 export interface DbContext {
   isMad: boolean
-  pvpV2: boolean
   mem: string
   secret: string
   hasSize: boolean
@@ -52,6 +51,7 @@ export interface DbContext {
   hasPokemonBackground: boolean
   hasPokemonShinyStats?: boolean
   connection?: number
+  httpAuth?: { username: string; password: string } | null
 }
 
 export interface ExpressUser extends User {
@@ -69,6 +69,51 @@ export interface AvailablePokemon {
   count: number
 }
 
+export interface AvailablePokestopQuest {
+  with_ar: boolean
+  reward_type: number
+  item_id: number
+  amount: number
+  pokemon_id: number
+  form_id: number
+  title: string
+  target: number
+  count: number
+}
+
+export interface AvailablePokestopInvasion {
+  character: number
+  display_type: number
+  confirmed: boolean
+  // Confirmed slots are null when unknown/unconfirmed; a present pokemon id
+  // pairs with a real form (0 is valid). See Golbat ApiPokestopInvasionAvailable.
+  slot1_pokemon_id: number | null
+  slot1_form: number | null
+  slot2_pokemon_id: number | null
+  slot2_form: number | null
+  slot3_pokemon_id: number | null
+  slot3_form: number | null
+}
+
+export interface AvailablePokestopLure {
+  lure_id: number
+}
+
+export interface AvailablePokestopShowcase {
+  // Pokemon-based showcase: pokemon_id/form set, type_id null. Type-based:
+  // pokemon_id/form null, type_id set. See Golbat ApiPokestopShowcaseAvailable.
+  pokemon_id: number | null
+  form: number | null
+  type_id: number | null
+}
+
+export interface AvailablePokestops {
+  quests: AvailablePokestopQuest[]
+  invasions: AvailablePokestopInvasion[]
+  lures: AvailablePokestopLure[]
+  showcases: AvailablePokestopShowcase[]
+}
+
 export interface Available {
   pokemon: ModelReturn<typeof Pokemon, 'getAvailable'>
   gyms: ModelReturn<typeof Gym, 'getAvailable'>
@@ -82,6 +127,7 @@ export interface ApiEndpoint {
   type: string
   endpoint: string
   secret: string
+  httpAuth?: { username: string; password: string } | null
   useFor: Lowercase<ModelKeys>[]
 }
 
@@ -92,6 +138,12 @@ export interface DbConnection {
   password: string
   database: string
   useFor: Lowercase<ModelKeys>[]
+  // Optional Golbat endpoint on the same source (dual): migrated queries use
+  // the endpoint, the rest fall back to this DB connection.
+  endpoint?: string
+  secret?: string
+  httpAuth?: { username: string; password: string } | null
+  type?: string
 }
 
 export type Schema = ApiEndpoint | DbConnection

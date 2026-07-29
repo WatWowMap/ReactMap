@@ -27,6 +27,43 @@ const STATION_BATTLE_REQUIRED_COLUMNS = [
   'updated',
 ]
 
+// Pure: buckets summed spawn counts into rarity tiers and RETURNS the map (no
+// mutation), so callers can commit it atomically under a gate — see
+// DbManager.getAvailable / EventManager's generation check.
+function computeRarityTiers(results, historical = false) {
+  const base = {}
+  const rarityPercents = config.getSafe('rarity.percents')
+  let total = 0
+  results.forEach((result) => {
+    Object.entries(historical ? result : result.rarity).forEach(
+      ([key, count]) => {
+        if (key in base) {
+          base[key] += count
+        } else {
+          base[key] = count
+        }
+        total += count
+      },
+    )
+  })
+  const tiers = {}
+  Object.entries(base).forEach(([id, count]) => {
+    const percent = (count / total) * 100
+    if (percent === 0) {
+      tiers[id] = 'never'
+    } else if (percent < rarityPercents.ultraRare) {
+      tiers[id] = 'ultraRare'
+    } else if (percent < rarityPercents.rare) {
+      tiers[id] = 'rare'
+    } else if (percent < rarityPercents.uncommon) {
+      tiers[id] = 'uncommon'
+    } else {
+      tiers[id] = 'common'
+    }
+  })
+  return tiers
+}
+
 /**
  * @type {import("@rm/types").DbManagerClass}
  */
@@ -89,7 +126,13 @@ class DbManager extends Logger {
         })
         if ('endpoint' in schema) {
           this.endpoints[i] = schema
-          return null
+          // Pure-endpoint source (no DB creds): no knex connection. A dual
+          // source (endpoint + host/…) registers the endpoint AND falls
+          // through to build knex below, so migrated queries use the endpoint
+          // while un-migrated ones fall back to the bound DB.
+          if (!('host' in schema)) {
+            return null
+          }
         }
         const { log } = new Logger('knex', schema.database)
         return knex({
@@ -149,16 +192,16 @@ class DbManager extends Logger {
    * @returns {Promise<import("@rm/types").DbContext>}
    */
   static async schemaCheck(schema) {
-    const [isMad, pvpV2, hasSize, hasHeight, hasPokemonBackground] =
-      await schema('pokemon')
-        .columnInfo()
-        .then((columns) => [
-          'cp_multiplier' in columns,
-          'pvp' in columns,
-          'size' in columns,
-          'height' in columns,
-          'background' in columns,
-        ])
+    const [isMad, hasSize, hasHeight, hasPokemonBackground] = await schema(
+      'pokemon',
+    )
+      .columnInfo()
+      .then((columns) => [
+        'cp_multiplier' in columns,
+        'size' in columns,
+        'height' in columns,
+        'background' in columns,
+      ])
     const [
       hasRewardAmount,
       hasPowerUp,
@@ -228,7 +271,6 @@ class DbManager extends Logger {
 
     return {
       isMad,
-      pvpV2,
       mem: '',
       secret: '',
       hasSize,
@@ -264,14 +306,57 @@ class DbManager extends Logger {
     await Promise.all(
       this.connections.map(async (schema, i) => {
         try {
-          const schemaContext = schema
-            ? await DbManager.schemaCheck(schema)
-            : {
-                mem: this.endpoints[i].endpoint,
-                secret: this.endpoints[i].secret,
-                httpAuth: this.endpoints[i].httpAuth,
-                pvpV2: true,
-              }
+          // Endpoint context is independent of the DB capability probe. A dual
+          // (endpoint + DB) source must keep mem/secret/httpAuth even if
+          // schemaCheck rejects (e.g. a transient scanner-DB outage), otherwise
+          // its endpoint-capable fort queries would bypass the healthy endpoint
+          // and run against the down DB. So resolve the schema flags in their
+          // own try/catch and always overlay + assign the endpoint context.
+          let schemaContext
+          if (schema) {
+            try {
+              schemaContext = await DbManager.schemaCheck(schema)
+            } catch (e) {
+              this.log.error(
+                `schemaCheck failed for connection ${i}${
+                  this.endpoints[i]
+                    ? ' — retaining endpoint context; SQL fallback degraded until reload'
+                    : ''
+                }`,
+                e,
+              )
+              schemaContext = {}
+            }
+          } else {
+            schemaContext = {
+              mem: this.endpoints[i].endpoint,
+              secret: this.endpoints[i].secret,
+              httpAuth: this.endpoints[i].httpAuth,
+              // No DB schema check runs for a pure-endpoint source, but the
+              // Golbat scan always returns confirmed incident data (confirmed
+              // flag + lineup slots), so it IS confirmed-capable. Without this,
+              // onlyConfirmed is ineffective and confirmed `a` reward filters
+              // fall back to the grunt's possible-encounter pool.
+              hasConfirmed: true,
+            }
+          }
+
+          // Dual source (endpoint + DB): schemaCheck ran on the bound knex
+          // (giving isMad + has* flags) but returns mem:''/secret:''. Overlay
+          // the endpoint AFTER so migrated queries (getAvailable) use it while
+          // un-migrated ones fall back to this.query() on the bound DB. Runs
+          // even when schemaCheck failed above (schemaContext={}), so a DB
+          // outage cannot disable the healthy endpoint.
+          if (schema && this.endpoints[i]) {
+            schemaContext.mem = this.endpoints[i].endpoint
+            schemaContext.secret = this.endpoints[i].secret
+            schemaContext.httpAuth = this.endpoints[i].httpAuth
+            // NB: leave schema-derived capability flags (hasConfirmed, etc.)
+            // untouched — the SQL fallback path relies on them (a dual source
+            // whose DB lacks the `confirmed` column must NOT query it). The
+            // endpoint always provides confirmed data, so the endpoint scan
+            // branch marks itself confirmed-capable locally instead.
+          }
 
           Object.entries(this.models).forEach(([category, sources]) => {
             if (Array.isArray(sources)) {
@@ -295,52 +380,41 @@ class DbManager extends Logger {
    * @returns {void}
    */
   setRarity(results, historical = false) {
-    const base = {}
-    const mapKey = historical ? 'historical' : 'rarity'
-    const rarityPercents = config.getSafe('rarity.percents')
-    let total = 0
-    results.forEach((result) => {
-      Object.entries(historical ? result : result.rarity).forEach(
-        ([key, count]) => {
-          if (key in base) {
-            base[key] += count
-          } else {
-            base[key] = count
-          }
-          total += count
-        },
-      )
-    })
-    this[mapKey] = {}
-    Object.entries(base).forEach(([id, count]) => {
-      const percent = (count / total) * 100
-      if (percent === 0) {
-        this[mapKey][id] = 'never'
-      } else if (percent < rarityPercents.ultraRare) {
-        this[mapKey][id] = 'ultraRare'
-      } else if (percent < rarityPercents.rare) {
-        this[mapKey][id] = 'rare'
-      } else if (percent < rarityPercents.uncommon) {
-        this[mapKey][id] = 'uncommon'
-      } else {
-        this[mapKey][id] = 'common'
-      }
-    })
+    this[historical ? 'historical' : 'rarity'] = computeRarityTiers(
+      results,
+      historical,
+    )
   }
 
   async historicalRarity() {
     this.log.info('Setting historical rarity stats')
     try {
-      const results = await Promise.all(
-        (this.models.Pokemon ?? []).map(async (source) =>
-          source.isMad || source.mem
-            ? []
-            : source.SubModel.query()
-                .select('pokemon_id', raw('SUM(count) as total'))
-                .from('pokemon_stats')
-                .groupBy('pokemon_id'),
+      // Only DB-backed, non-MAD sources have pokemon_stats. A dual source
+      // (endpoint + DB) keeps its knex and still serves rarity.
+      const eligible = (this.models.Pokemon ?? []).filter(
+        (source) => !source.isMad && this.connections[source.connection],
+      )
+      // allSettled: if one dual-source DB lacks pokemon_stats its query must not
+      // fail the whole batch and blank every source's rarity map.
+      const settled = await Promise.allSettled(
+        eligible.map((source) =>
+          source.SubModel.query()
+            .select('pokemon_id', raw('SUM(count) as total'))
+            .from('pokemon_stats')
+            .groupBy('pokemon_id'),
         ),
       )
+      const results = settled
+        .filter((r) => r.status === 'fulfilled')
+        .map((r) => r.value)
+      // Every eligible query rejected (e.g. the sole dual-source DB is down):
+      // retain the last-good rarity map rather than clearing it to empty.
+      if (eligible.length && results.length === 0) {
+        this.log.warn(
+          'Historical rarity: all sources failed; retaining last-good stats',
+        )
+        return
+      }
       this.setRarity(
         results.map((result) =>
           Object.fromEntries(
@@ -502,10 +576,13 @@ class DbManager extends Logger {
    * @returns {Promise<T | {}>}
    */
   async getOne(model, id) {
-    const data = await Promise.all(
-      this.models[model].map(async ({ SubModel, ...source }) =>
-        SubModel.getOne(id, source),
-      ),
+    // runScannerSources (allSettled + logs rejections): a pure-endpoint source
+    // whose by-id fetch misses falls through to an unbound this.query() and
+    // rejects. Isolating it keeps one miss from failing the whole single-fort
+    // lookup, while a genuine SQL error from a DB source is still logged.
+    const data = await this.runScannerSources(
+      model,
+      ({ SubModel, ...source }) => SubModel.getOne(id, source),
     )
     const cleaned = DbManager.deDupeResults(data.filter(Boolean))
     return cleaned || {}
@@ -551,8 +628,14 @@ class DbManager extends Logger {
       const loopTime = Date.now()
       count += 1
       const bbox = getBboxFromCenter(args.lat, args.lon, distance)
-      const data = await Promise.all(
-        this.models[model].map(async ({ SubModel, ...source }) =>
+      // runScannerSources (allSettled + logs rejections): the fort search
+      // methods have no endpoint branch, so a pure-endpoint source hits an
+      // unbound this.query() and rejects. Isolating it degrades that source to
+      // no results rather than failing the whole batch, while a genuine SQL
+      // error from a DB source stays visible in the logs.
+      const data = await this.runScannerSources(
+        model,
+        ({ SubModel, ...source }) =>
           SubModel[method](
             perms,
             args,
@@ -560,8 +643,13 @@ class DbManager extends Logger {
             DbManager.getDistance(args, source.isMad),
             bbox,
           ),
-        ),
       )
+      // runScannerSources returns [] ONLY when every source rejected — a
+      // genuine-empty source is fulfilled with [] (so data would be [[]]).
+      // That happens for an all-pure-endpoint fort search (the search methods
+      // have no endpoint branch) or a DB outage; widening just reissues the
+      // same failing queries, so stop rather than spin the radius to `max`.
+      if (data.length === 0) break
       const results = DbManager.deDupeResults(data)
       if (results.length > deDuped.length) {
         deDuped = results
@@ -620,16 +708,14 @@ class DbManager extends Logger {
    * ]>}
    */
   async submissionCells(perms, args) {
-    const stopData = await Promise.all(
-      this.models.Pokestop.map(async ({ SubModel, ...source }) =>
-        SubModel.getSubmissions(perms, args, source),
-      ),
-    )
-    const gymData = await Promise.all(
-      this.models.Gym.map(async ({ SubModel, ...source }) =>
-        SubModel.getSubmissions(perms, args, source),
-      ),
-    )
+    // runScannerSources (allSettled + logs rejections): getSubmissions has no
+    // endpoint branch, so a pure-endpoint source rejects on an unbound
+    // this.query(); isolate it to no cells rather than failing the whole
+    // overlay, while a genuine DB error stays visible in the logs.
+    const handler = ({ SubModel, ...source }) =>
+      SubModel.getSubmissions(perms, args, source)
+    const stopData = await this.runScannerSources('Pokestop', handler)
+    const gymData = await this.runScannerSources('Gym', handler)
     return [DbManager.deDupeResults(stopData), DbManager.deDupeResults(gymData)]
   }
 
@@ -663,53 +749,84 @@ class DbManager extends Logger {
   }
 
   /**
-   * @template T
+   * Returns { available, conditions?, rarity? }, or null on total source
+   * failure. PURE: it no longer commits questConditions/rarity onto `this` —
+   * the caller applies the metadata via applyAvailableMetadata AFTER the
+   * EventManager generation gate, so a superseded refresh (e.g. one holding a
+   * replaced Db after a reload) cannot overwrite current metadata.
    * @param {import("../models").ScannerModelKeys} model
-   * @returns {Promise<T[]>}
+   * @returns {Promise<{ available: string[], conditions?: object, rarity?: object } | null>}
    */
   async getAvailable(model) {
-    if (this.models[model]) {
-      this.log.info(`Querying available for ${model}`)
-      const results = await this.runScannerSources(
-        model,
-        async ({ SubModel, ...source }) => SubModel.getAvailable(source),
+    if (!this.models[model]) return { available: [] }
+    this.log.info(`Querying available for ${model}`)
+    const results = await this.runScannerSources(
+      model,
+      async ({ SubModel, ...source }) => SubModel.getAvailable(source),
+    )
+    // Total failure: sources exist but every one rejected. Return null so the
+    // caller retains its last-good data. A genuine empty snapshot (sources
+    // succeeded, no active options) falls through and returns { available: [] },
+    // which legitimately clears the category.
+    if (this.models[model].length && results.length === 0) {
+      this.log.warn(
+        `Available for ${model}: all sources failed, retaining last-good`,
       )
-      this.log.info(`Setting available for ${model}`)
-      if (model === 'Pokestop') {
-        const newQuestConditions = {}
-        results.forEach((result) => {
-          if ('conditions' in result) {
-            config.util.extendDeep(newQuestConditions, result.conditions)
-          }
-        })
-        this.questConditions = Object.fromEntries(
-          Object.entries(newQuestConditions).map(([key, titles]) => [
-            key,
-            Object.values(titles),
-          ]),
-        )
-      }
-      if (model === 'Pokemon') {
-        this.setRarity(results, false)
-      }
-      if (results.length === 1) return results[0].available
-      if (results.length > 1) {
-        const returnSet = new Set()
-        for (let i = 0; i < results.length; i += 1) {
-          for (let j = 0; j < results[i].available.length; j += 1) {
-            returnSet.add(results[i].available[j])
-          }
-        }
-        return [...returnSet]
-      }
-      if (results.length === 0 && model === 'Nest') {
-        this.log.warn(
-          'This is likely due to "nest" being in a useFor array but not in the database',
-        )
-      }
-      return []
+      return null
     }
-    return []
+    /** @type {{ available: string[], conditions?: object, rarity?: object }} */
+    const out = { available: [] }
+    // runScannerSources returns only fulfilled sources, so an empty `results`
+    // means every source failed. Don't derive manager-owned metadata (quest
+    // conditions / rarity) from that failure-derived emptiness — leave it
+    // undefined so applyAvailableMetadata retains the last-good.
+    if (results.length && model === 'Pokestop') {
+      const newQuestConditions = {}
+      results.forEach((result) => {
+        if ('conditions' in result) {
+          config.util.extendDeep(newQuestConditions, result.conditions)
+        }
+      })
+      out.conditions = Object.fromEntries(
+        Object.entries(newQuestConditions).map(([key, titles]) => [
+          key,
+          Object.values(titles),
+        ]),
+      )
+    }
+    if (results.length && model === 'Pokemon') {
+      out.rarity = computeRarityTiers(results, false)
+    }
+    if (results.length === 1) {
+      out.available = results[0].available
+    } else if (results.length > 1) {
+      const returnSet = new Set()
+      for (let i = 0; i < results.length; i += 1) {
+        for (let j = 0; j < results[i].available.length; j += 1) {
+          returnSet.add(results[i].available[j])
+        }
+      }
+      out.available = [...returnSet]
+    } else if (model === 'Nest') {
+      this.log.warn(
+        'This is likely due to "nest" being in a useFor array but not in the database',
+      )
+    }
+    return out
+  }
+
+  /**
+   * Commits the metadata half of a getAvailable() result onto this manager.
+   * EventManager calls it under the generation gate (so a superseded refresh
+   * never reaches here); a failure-derived result leaves conditions/rarity
+   * undefined, so a transient outage can't blank the drawer's metadata.
+   * @param {{ conditions?: object, rarity?: object } | null} result
+   */
+  applyAvailableMetadata(result) {
+    if (!result) return
+    if (result.conditions !== undefined)
+      this.questConditions = result.conditions
+    if (result.rarity !== undefined) this.rarity = result.rarity
   }
 
   /**

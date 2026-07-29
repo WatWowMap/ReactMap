@@ -71,4 +71,28 @@ function getAreaSql(
   return true
 }
 
-module.exports = { getAreaSql }
+/**
+ * The deny half of getAreaSql, for the in-memory (filterRTree) path. filterRTree
+ * returns true (allow-all) for empty inputs, so on its own it BYPASSES strict
+ * area restrictions — a user with no assigned areas would see every fort. This
+ * mirrors getAreaSql's two deny cases so an endpoint source can short-circuit to
+ * an empty result exactly as the SQL query returns no rows:
+ *   1. strict mode on, restrictions configured, and this user has none; or
+ *   2. the user's areas don't resolve to any polygon.
+ * @param {string[]} areaRestrictions
+ * @param {string[]} onlyAreas
+ * @returns {boolean} true when the request must yield no results
+ */
+function areaRestrictionsDenyAll(areaRestrictions = [], onlyAreas = []) {
+  const authentication = config.getSafe('authentication')
+  if (
+    authentication.strictAreaRestrictions &&
+    authentication.areaRestrictions.length &&
+    !areaRestrictions.length
+  )
+    return true
+  if (!areaRestrictions.length && !onlyAreas.length) return false
+  return !consolidateAreas(areaRestrictions, onlyAreas).size
+}
+
+module.exports = { getAreaSql, areaRestrictionsDenyAll }

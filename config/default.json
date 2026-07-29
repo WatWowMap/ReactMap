@@ -59,6 +59,7 @@
       "historicalRarity": 6,
       "stations": 0.05
     },
+    "availableRefreshSeconds": 60,
     "queryOnSessionInit": {
       "pokemon": false,
       "quests": false,
@@ -110,12 +111,7 @@
         }
       ],
       "levels": [50, 51],
-      "reactMapHandlesPvp": false,
-      "minCp": {
-        "little": 400,
-        "great": 1400,
-        "ultra": 2400
-      }
+      "reactMapHandlesPvp": false
     },
     "portalUpdateLimit": 30,
     "weatherCellLimit": 3,

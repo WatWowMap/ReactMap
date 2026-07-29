@@ -9,6 +9,7 @@ const { DbManager } = require('./DbManager')
 const { EventManager } = require('./EventManager')
 const { getSharedPvpWrapper } = require('./PvpWrapper')
 const { setCache } = require('./cache')
+const { bustCombinedFortCache } = require('../utils/fortAvailable')
 const { migrate } = require('../db/migrate')
 const { Stats } = require('./Stats')
 
@@ -97,17 +98,26 @@ const state = {
   async loadLocalContexts(reloadReport) {
     const promises = [this.event.cleanupTrials()]
     if (!reloadReport || reloadReport.database) {
+      // A reload can swap the db manager / endpoint config, so drop the combined
+      // fort snapshot cache — the forced setAvailable batch below then fetches
+      // fresh (and still coalesces via the repopulated window).
+      bustCombinedFortCache()
       if (!reloadReport || reloadReport.historical) {
         promises.push(this.db.historicalRarity())
       }
+      // force=true: startup/reload must query the current manager. On a hot
+      // reload this.db is a fresh manager, so the availability TTL (keyed by
+      // category only) must not short-circuit and keep the old source's data.
+      // The per-session stampede path (rootRouter queryOnSessionInit) stays
+      // non-forced and TTL-protected.
       promises.push(
         this.db.getFilterContext(),
-        this.event.setAvailable('gyms', 'Gym', this.db),
-        this.event.setAvailable('pokestops', 'Pokestop', this.db),
-        this.event.setAvailable('pokemon', 'Pokemon', this.db),
-        this.event.setAvailable('nests', 'Nest', this.db),
-        this.event.setAvailable('stations', 'Station', this.db),
-        this.event.setAvailable('tappables', 'Tappable', this.db),
+        this.event.setAvailable('gyms', 'Gym', this.db, true),
+        this.event.setAvailable('pokestops', 'Pokestop', this.db, true),
+        this.event.setAvailable('pokemon', 'Pokemon', this.db, true),
+        this.event.setAvailable('nests', 'Nest', this.db, true),
+        this.event.setAvailable('stations', 'Station', this.db, true),
+        this.event.setAvailable('tappables', 'Tappable', this.db, true),
       )
     }
     await Promise.all(promises)
@@ -152,7 +162,11 @@ const state = {
     if (reloadReport.strategies) {
       this.setAuthClients()
     }
-    if (reloadReport.events) {
+    if (reloadReport.events || reloadReport.database) {
+      // startIntervals captures `this.db` in each timer's closure. A database
+      // reload swaps in a fresh DbManager, so the intervals must be rebuilt
+      // around it — otherwise a later forced refresh would query (and commit)
+      // the replaced manager's data. See EventManager.#refreshAvailable.
       this.event.startIntervals(this.db, this.pvp)
     }
     return this
