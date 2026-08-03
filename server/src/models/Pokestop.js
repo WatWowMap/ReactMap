@@ -1332,22 +1332,6 @@ class Pokestop extends Model {
             const matchesFilter =
               matchesAdvancedFilter(filters[newQuest.key], questCondition) ||
               matchesAdvancedFilter(filters[taskKey], newQuest.key)
-            if (process.env.RM_DEBUG_TASK) {
-              // TEMPORARY diagnostic - remove before merging.
-              const taskKeysInFilters = Object.keys(filters).filter((k) =>
-                k.startsWith('k'),
-              )
-              // eslint-disable-next-line no-console
-              console.log(
-                `[RM_DEBUG_TASK] rewardKey=${newQuest.key} taskKey=${taskKey} ` +
-                  `taskFilterPresent=${taskKey in filters} ` +
-                  `taskFilterValue=${JSON.stringify(filters[taskKey])} ` +
-                  `rewardFilterValue=${JSON.stringify(filters[newQuest.key])} ` +
-                  `matchesFilter=${matchesFilter} ` +
-                  `totalTaskKeysSent=${taskKeysInFilters.length} ` +
-                  `sampleTaskKeysSent=${JSON.stringify(taskKeysInFilters.slice(0, 5))}`,
-              )
-            }
             if (
               quest.quest_timestamp >= midnight &&
               (filters.onlyAllPokestops || matchesFilter)
