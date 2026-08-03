@@ -31,6 +31,7 @@ const {
 const { mapAvailablePokestops } = require('./pokestopAvailableMapper')
 const {
   dedupeRocketPokemonKeys,
+  getCanonicalRewardForm,
   hasRocketPokemonFilter,
 } = require('../filters/pokestop/rocketPokemonKeys')
 
@@ -1705,19 +1706,28 @@ class Pokestop extends Model {
 
               const fullGrunt = state.event.invasions[reward.grunt_type]
               if (fullGrunt?.firstReward) {
-                finalList.add(
-                  `a${reward.slot_1_pokemon_id}-${reward.slot_1_form}`,
+                const form = getCanonicalRewardForm(
+                  fullGrunt.encounters?.first,
+                  reward.slot_1_pokemon_id,
+                  reward.slot_1_form,
                 )
+                finalList.add(`a${reward.slot_1_pokemon_id}-${form}`)
               }
               if (fullGrunt?.secondReward) {
-                finalList.add(
-                  `a${reward.slot_2_pokemon_id}-${reward.slot_2_form}`,
+                const form = getCanonicalRewardForm(
+                  fullGrunt.encounters?.second,
+                  reward.slot_2_pokemon_id,
+                  reward.slot_2_form,
                 )
+                finalList.add(`a${reward.slot_2_pokemon_id}-${form}`)
               }
               if (fullGrunt?.thirdReward) {
-                finalList.add(
-                  `a${reward.slot_3_pokemon_id}-${reward.slot_3_form}`,
+                const form = getCanonicalRewardForm(
+                  fullGrunt.encounters?.third,
+                  reward.slot_3_pokemon_id,
+                  reward.slot_3_form,
                 )
+                finalList.add(`a${reward.slot_3_pokemon_id}-${form}`)
               }
             })
           }

@@ -3,6 +3,7 @@ const assert = require('node:assert/strict')
 
 const {
   dedupeRocketPokemonKeys,
+  getCanonicalRewardForm,
   hasRocketPokemonFilter,
 } = require('./rocketPokemonKeys')
 
@@ -82,4 +83,40 @@ test('the survivor still matches, so the menu entry works', () => {
   const filters = Object.fromEntries([...available].map((k) => [k, {}]))
   // Confirmed grunt reports form 0, unconfirmed reports 3163 - both match.
   assert.equal(hasRocketPokemonFilter(filters, 276), true)
+})
+
+test('getCanonicalRewardForm prefers the masterfile encounter form', () => {
+  // Wobbuffet (202): scanner reports 602 for this grunt, masterfile says 2328.
+  const encounters = [
+    { id: 202, form: 2328 },
+    { id: 359, form: 830 },
+  ]
+  assert.equal(getCanonicalRewardForm(encounters, 202, 602), 2328)
+})
+
+test('getCanonicalRewardForm falls back when the species is not in the pool', () => {
+  const encounters = [{ id: 359, form: 830 }]
+  assert.equal(getCanonicalRewardForm(encounters, 202, 602), 602)
+})
+
+test('getCanonicalRewardForm falls back to 0 with no encounters and no fallback', () => {
+  assert.equal(getCanonicalRewardForm(undefined, 202, undefined), 0)
+})
+
+test('canonical form keeps repeated polls from minting a second key', () => {
+  // Poll 1: confirmed slot reports scanner form 602 for Wobbuffet.
+  const poll1 = new Set()
+  const form1 = getCanonicalRewardForm([{ id: 202, form: 2328 }], 202, 602)
+  poll1.add(`a202-${form1}`)
+  dedupeRocketPokemonKeys(poll1)
+
+  // Poll 2: a different grunt occurrence, scanner form is 0 this time.
+  const poll2 = new Set()
+  const form2 = getCanonicalRewardForm([{ id: 202, form: 2328 }], 202, 0)
+  poll2.add(`a202-${form2}`)
+  dedupeRocketPokemonKeys(poll2)
+
+  // Both polls must agree on the exact same key - nothing left to reconcile.
+  assert.deepEqual([...poll1], [...poll2])
+  assert.deepEqual([...poll1], ['a202-2328'])
 })
