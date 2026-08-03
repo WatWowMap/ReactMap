@@ -541,7 +541,7 @@
       "pokemon": true,
       "invasions": false,
       "allInvasions": true,
-      "invasionPokemon": true,
+      "invasionPokemon": false,
       "baseMegaEnergyAmounts": [],
       "stardust": {
         "min": 100,
