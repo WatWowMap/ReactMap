@@ -83,6 +83,10 @@ function buildPokestops(perms, defaults) {
       if (avail.startsWith('i')) {
         quests[avail] = new BaseFilter(defaults.allInvasions)
       }
+      // Reward filters come only from the canonical available list. Building
+      // an `a` key for every masterfile form creates hidden siblings that the
+      // menu cannot switch off, while reward matching intentionally ignores
+      // form differences between scanner and masterfile data.
       if (
         avail.startsWith('a') &&
         state.db.filterContext.Pokestop.hasConfirmedInvasions
