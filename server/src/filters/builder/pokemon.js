@@ -13,7 +13,6 @@ const { getWildFilterKey } = require('../pokemon/getWildFilterKey')
  *  raids: { [key: string]: BaseFilter },
  *  quests: { [key: string]: BaseFilter },
  *  nests: { [key: string]: BaseFilter },
- *  rocket: { [key: string]: BaseFilter },
  *  stations: { [key: string]: BaseFilter },
  * }}
  */
@@ -24,7 +23,6 @@ function buildPokemon(defaults, base, custom) {
     stations: { global: new BaseFilter() },
     quests: { global: new BaseFilter() },
     nests: { global: new BaseFilter() },
-    rocket: { global: new BaseFilter() },
   }
   const energyAmounts = new Set([
     ...defaults.pokestops.baseMegaEnergyAmounts,
@@ -43,11 +41,6 @@ function buildPokemon(defaults, base, custom) {
       pokemon.raids[rawKey] = new BaseFilter(defaults.gyms.pokemon)
       pokemon.stations[rawKey] = new BaseFilter(defaults.stations.pokemon)
       pokemon.quests[rawKey] = new BaseFilter(defaults.pokestops.pokemon)
-      if (state.db.filterContext.Pokestop.hasConfirmedInvasions) {
-        pokemon.rocket[`a${rawKey}`] = new BaseFilter(
-          defaults.pokestops.invasionPokemon,
-        )
-      }
       pokemon.nests[rawKey] = new BaseFilter(defaults.nests.allPokemon)
     })
     if ('family' in pkmn) {

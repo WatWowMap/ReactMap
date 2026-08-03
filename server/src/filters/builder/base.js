@@ -115,7 +115,6 @@ function buildDefaultFilters(perms) {
               hasDualQuestLayer && perms.pokestops ? false : undefined,
             standard: new BaseFilter(),
             filter: {
-              ...pokemon.rocket,
               ...buildPokestops(perms, defaultFilters.pokestops),
               ...pokemon.quests,
             },
