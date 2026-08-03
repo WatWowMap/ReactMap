@@ -62,7 +62,35 @@ const dedupeRocketPokemonKeys = (availableSet) => {
   })
 }
 
+/**
+ * Resolves the form to use when building a Rocket reward's available key.
+ *
+ * A confirmed grunt's scanner-reported form and the masterfile encounter
+ * pool's form for the same species routinely disagree (Wobbuffet has shown
+ * up as both `602` and `2328` for the same grunt type). Building the key
+ * straight from whichever form the current poll happened to report means the
+ * SAME species can mint a NEW, different key on a later poll — a menu entry
+ * a user already switched off keeps a live twin they never see appear, and
+ * `dedupeRocketPokemonKeys` only reconciles keys within a single poll, not
+ * across separate ones over time.
+ *
+ * Always deriving the form from the masterfile encounter pool - regardless of
+ * whether this reward came from a confirmed scanner slot or the unconfirmed
+ * fallback - makes every poll agree on the same key for a given species, so
+ * there is nothing left to reconcile after the fact.
+ * @param {{id: number, form: number}[] | undefined} encounters the grunt's
+ *   masterfile encounter pool for this slot (e.g. `fullGrunt.encounters.first`)
+ * @param {number} pokemonId
+ * @param {number} fallbackForm used only if `pokemonId` isn't in `encounters`
+ *   (e.g. a masterfile/scanner mismatch on the species itself, not just form)
+ */
+const getCanonicalRewardForm = (encounters, pokemonId, fallbackForm) => {
+  const match = encounters?.find((poke) => poke.id === pokemonId)
+  return match ? match.form : (fallbackForm ?? 0)
+}
+
 module.exports = {
   dedupeRocketPokemonKeys,
+  getCanonicalRewardForm,
   hasRocketPokemonFilter,
 }

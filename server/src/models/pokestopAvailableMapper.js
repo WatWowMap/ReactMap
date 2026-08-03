@@ -192,16 +192,42 @@ function mapAvailablePokestops(api, ctx) {
     const isRocketLeaderOrGiovanni = character >= 41 && character <= 44
     if (confirmed && !isRocketLeaderOrGiovanni) {
       // Each slot the event config marks as a reward contributes an `a` key,
-      // mirroring the SQL path which reads confirmed slots 1/2/3.
+      // mirroring the SQL path which reads confirmed slots 1/2/3. The form is
+      // taken from the masterfile encounter pool, not the scanner-reported
+      // slot form: the two disagree often enough (Wobbuffet has shown up as
+      // both 602 and 2328 for the same grunt type) that building the key from
+      // whichever form THIS poll happened to report lets the same species
+      // mint a different key on a later poll, orphaning whatever a user
+      // already switched off. Keeping this in lockstep with the SQL path (see
+      // `getCanonicalRewardForm` there) means both always agree on one key.
       const cfg = ctx.invasions?.[character]
+      const canonicalForm = (encounters, pokemonId, fallbackForm) => {
+        const match = encounters?.find((poke) => poke.id === pokemonId)
+        return match ? match.form : (fallbackForm ?? 0)
+      }
       if (slot1_pokemon_id > 0 && cfg?.firstReward) {
-        available.add(`a${slot1_pokemon_id}-${slot1_form}`)
+        const form = canonicalForm(
+          cfg.encounters?.first,
+          slot1_pokemon_id,
+          slot1_form,
+        )
+        available.add(`a${slot1_pokemon_id}-${form}`)
       }
       if (slot2_pokemon_id > 0 && cfg?.secondReward) {
-        available.add(`a${slot2_pokemon_id}-${slot2_form}`)
+        const form = canonicalForm(
+          cfg.encounters?.second,
+          slot2_pokemon_id,
+          slot2_form,
+        )
+        available.add(`a${slot2_pokemon_id}-${form}`)
       }
       if (slot3_pokemon_id > 0 && cfg?.thirdReward) {
-        available.add(`a${slot3_pokemon_id}-${slot3_form}`)
+        const form = canonicalForm(
+          cfg.encounters?.third,
+          slot3_pokemon_id,
+          slot3_form,
+        )
+        available.add(`a${slot3_pokemon_id}-${form}`)
       }
     }
   })
