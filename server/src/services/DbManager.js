@@ -97,6 +97,7 @@ class DbManager extends Logger {
     this.models = {}
     this.endpoints = {}
     this.questConditions = getCache('questConditions.json', {})
+    this.taskConditions = getCache('taskConditions.json', {})
     this.rarity = getCache('rarity.json', {})
     this.historical = getCache('historical.json', {})
     this.filterContext = getCache('filterContext.json', {
@@ -755,7 +756,7 @@ class DbManager extends Logger {
    * EventManager generation gate, so a superseded refresh (e.g. one holding a
    * replaced Db after a reload) cannot overwrite current metadata.
    * @param {import("../models").ScannerModelKeys} model
-   * @returns {Promise<{ available: string[], conditions?: object, rarity?: object } | null>}
+   * @returns {Promise<{ available: string[], conditions?: object, taskConditions?: object, rarity?: object } | null>}
    */
   async getAvailable(model) {
     if (!this.models[model]) return { available: [] }
@@ -782,9 +783,13 @@ class DbManager extends Logger {
     // undefined so applyAvailableMetadata retains the last-good.
     if (results.length && model === 'Pokestop') {
       const newQuestConditions = {}
+      const newTaskConditions = {}
       results.forEach((result) => {
         if ('conditions' in result) {
           config.util.extendDeep(newQuestConditions, result.conditions)
+        }
+        if ('taskConditions' in result) {
+          config.util.extendDeep(newTaskConditions, result.taskConditions)
         }
       })
       out.conditions = Object.fromEntries(
@@ -792,6 +797,17 @@ class DbManager extends Logger {
           key,
           Object.values(titles),
         ]),
+      )
+      // Mirrors `conditions` in the opposite direction - one entry per task,
+      // carrying its own title/target plus every reward key seen for it
+      // (merged as a set across sources, so extendDeep unions cleanly).
+      out.taskConditions = Object.fromEntries(
+        Object.entries(newTaskConditions).map(
+          ([key, { title, target, rewards }]) => [
+            key,
+            { title, target, rewards: Object.keys(rewards) },
+          ],
+        ),
       )
     }
     if (results.length && model === 'Pokemon') {
@@ -820,12 +836,14 @@ class DbManager extends Logger {
    * EventManager calls it under the generation gate (so a superseded refresh
    * never reaches here); a failure-derived result leaves conditions/rarity
    * undefined, so a transient outage can't blank the drawer's metadata.
-   * @param {{ conditions?: object, rarity?: object } | null} result
+   * @param {{ conditions?: object, taskConditions?: object, rarity?: object } | null} result
    */
   applyAvailableMetadata(result) {
     if (!result) return
     if (result.conditions !== undefined)
       this.questConditions = result.conditions
+    if (result.taskConditions !== undefined)
+      this.taskConditions = result.taskConditions
     if (result.rarity !== undefined) this.rarity = result.rarity
   }
 

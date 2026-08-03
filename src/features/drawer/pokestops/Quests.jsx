@@ -40,6 +40,13 @@ const BaseQuestQuickSelect = () => {
           label="search_quests"
           height={350}
         />
+        <SelectorListMemo
+          key="tasks"
+          category="pokestops"
+          subCategory="tasks"
+          label="search_tasks"
+          height={350}
+        />
       </MultiSelectorList>
     </CollapsibleItem>
   )

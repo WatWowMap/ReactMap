@@ -16,6 +16,7 @@ const CATEGORIES = /** @type {const} */ ({
     'quest_reward_3',
     'quest_reward_1',
     'general',
+    'tasks',
   ],
   stations: ['pokemon'],
   pokemon: ['pokemon'],

@@ -4,7 +4,7 @@ import { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 
 export function useGenPokestops() {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   const pokemon = useMemory((s) => s.masterfile.pokemon)
   const pokestops = useMemory((s) => s.filters.pokestops)
   const categories = useMemory((s) => s.menus.pokestops.categories)
@@ -180,6 +180,25 @@ export function useGenPokestops() {
               }
             }
             break
+          case 'k':
+            if (tempObj.tasks) {
+              const match = id.slice(1).match(/^(.+)-(\d+)$/)
+              if (match) {
+                const [, taskTitle, taskTarget] = match
+                const normalized = `quest_title_${taskTitle.toLowerCase()}`
+                const name = i18n.exists(normalized)
+                  ? t(normalized, { amount_0: Number(taskTarget) })
+                  : taskTitle
+                tempObj.tasks[id] = {
+                  name,
+                  perms: ['quests'],
+                }
+                tempObj.tasks[id].searchMeta = `${t(
+                  'tasks',
+                ).toLowerCase()} ${name.toLowerCase()}`
+              }
+            }
+            break
           case 'u':
             if (tempObj.general) {
               tempObj.general[id] = {
@@ -301,5 +320,5 @@ export function useGenPokestops() {
     useMemory.setState((prev) => ({
       menuFilters: { ...prev.menuFilters, ...tempObj },
     }))
-  }, [pokemon, pokestops, categories, t])
+  }, [pokemon, pokestops, categories, t, i18n])
 }

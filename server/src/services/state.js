@@ -186,6 +186,7 @@ const state = {
       setCache('available.json', this.event.available),
       setCache('filterContext.json', this.db.filterContext),
       setCache('questConditions.json', this.db.questConditions),
+      setCache('taskConditions.json', this.db.taskConditions),
       setCache('uaudio.json', this.event.uaudio),
       setCache('uicons.json', this.event.uicons),
     ])

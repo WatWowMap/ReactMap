@@ -37,7 +37,7 @@ import {
  * @template {keyof import('@rm/types').Available} T
  * @typedef {{
  *  category: T,
- *  subCategory?: T extends 'gyms' ? 'raids' | 'pokemon' : T extends 'pokestops' ? 'lures' | 'invasions' | 'quests' | 'showcase' | 'rocketPokemon' | 'pokemon' : never
+ *  subCategory?: T extends 'gyms' ? 'raids' | 'pokemon' : T extends 'pokestops' ? 'lures' | 'invasions' | 'quests' | 'showcase' | 'rocketPokemon' | 'pokemon' | 'tasks' : never
  *  itemsPerRow?: number,
  *  children?: React.ReactNode,
  *  label?: string
@@ -110,6 +110,8 @@ function SelectorList({
               )
             case 'rocketPokemon':
               return key.startsWith('a')
+            case 'tasks':
+              return key.startsWith('k')
             case 'pokemon':
               return Number.isInteger(Number(key.charAt(0)))
             default:

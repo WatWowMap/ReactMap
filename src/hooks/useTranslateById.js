@@ -72,6 +72,16 @@ export function useTranslateById(options = {}) {
           case 'i':
             // invasions
             return i18n.t(`grunt${alt ? '_a' : ''}_${id.slice(1)}`)
+          case 'k': {
+            // quest tasks
+            const match = id.slice(1).match(/^(.+)-(\d+)$/)
+            if (!match) return ''
+            const [, taskTitle, taskTarget] = match
+            const normalized = `quest_title_${taskTitle.toLowerCase()}`
+            return i18n.i18n.exists(normalized)
+              ? i18n.t(normalized, { amount_0: Number(taskTarget) })
+              : ''
+          }
           case 'l':
             // lures
             return i18n.t(`lure_${id.slice(1)}`)

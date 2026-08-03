@@ -34,6 +34,10 @@ const {
   getCanonicalRewardForm,
   hasRocketPokemonFilter,
 } = require('../filters/pokestop/rocketPokemonKeys')
+const {
+  addTaskCondition,
+  matchesAdvancedFilter,
+} = require('../filters/pokestop/questTaskMatch')
 
 const MEGA_RESOURCE_REWARD_TYPE = 12
 const TEMP_EVO_BRANCH_RESOURCE_REWARD_TYPE = 20
@@ -1315,18 +1319,15 @@ class Pokestop extends Model {
             }
 
             const questCondition = `${quest.quest_title}__${quest.quest_target}`
-            const filterMatchesQuest = (key) => {
-              const filter = filters[key]
-              if (!filter || !filter.adv || filter.all) return !!filter
-              const selectedConditions = Array.isArray(filter.adv)
-                ? filter.adv
-                : filter.adv.split(',')
-              return (
-                !selectedConditions.length ||
-                selectedConditions.includes(questCondition)
-              )
-            }
-            const matchesFilter = filterMatchesQuest(newQuest.key)
+            // Task filter (`k<title>-<target>`) is the reverse of the reward
+            // filter above: enabled on its own, or narrowed via `.adv` to
+            // specific reward keys instead of specific task conditions.
+            // Additive - either "this reward is wanted" or "this task is
+            // wanted" can surface the quest.
+            const taskKey = `k${quest.quest_title}-${quest.quest_target}`
+            const matchesFilter =
+              matchesAdvancedFilter(filters[newQuest.key], questCondition) ||
+              matchesAdvancedFilter(filters[taskKey], newQuest.key)
             if (
               quest.quest_timestamp >= midnight &&
               (filters.onlyAllPokestops || matchesFilter)
@@ -1535,6 +1536,7 @@ class Pokestop extends Model {
       return query
     }
 
+    const taskConditions = {}
     const process = (key, title, target) => {
       if (title) {
         if (key in conditions) {
@@ -1542,6 +1544,11 @@ class Pokestop extends Model {
         } else {
           conditions[key] = { [`${title}-${target}`]: { title, target } }
         }
+        // Mirrors `conditions` in the opposite direction: `k<title>-<target>`
+        // is a task-primary filter key, letting a user filter by task and
+        // optionally narrow to specific reward keys, the reverse of the
+        // reward-primary `.adv` narrowing above.
+        finalList.add(addTaskCondition(taskConditions, key, title, target))
       }
       finalList.add(key)
     }
@@ -2120,6 +2127,7 @@ class Pokestop extends Model {
     return {
       available: [...finalList],
       conditions,
+      taskConditions,
     }
   }
 

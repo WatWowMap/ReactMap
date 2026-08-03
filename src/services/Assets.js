@@ -259,6 +259,10 @@ export class UAssets {
       case 'j':
         // stations
         return this.getStation()
+      case 'k':
+        // quest tasks - not tied to a specific reward sprite, so this
+        // renders the same generic marker as the base pokestop filter (`s0`)
+        return this.getPokestops(0)
       case 'l':
         // lures
         return this.getPokestops(id.slice(1))
