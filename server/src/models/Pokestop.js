@@ -1503,7 +1503,11 @@ class Pokestop extends Model {
             TAGS.pokestops,
             `[POKESTOP] loaded available from ${mem}/api/fort/available — ${availableSet.size} filter keys (${res.quests.length} quests, ${res.invasions.length} invasions, ${(res.lures || []).length} lures, ${(res.showcases || []).length} showcases), ${Object.keys(result.conditions).length} reward conditions`,
           )
-          return { available: [...availableSet], conditions: result.conditions }
+          return {
+            available: [...availableSet],
+            conditions: result.conditions,
+            taskConditions: result.taskConditions,
+          }
         }
         log.warn(
           TAGS.pokestops,

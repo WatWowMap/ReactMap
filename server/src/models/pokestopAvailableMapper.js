@@ -117,13 +117,18 @@ function questRewardKey(quest) {
  *
  * @param {AvailablePokestops} api
  * @param {MapAvailablePokestopsCtx} ctx event invasion config (`state.event.invasions`), used to gate `a` keys
- * @returns {{ available: string[], conditions: QuestConditions }}
+ * @returns {{ available: string[], conditions: QuestConditions, taskConditions: Record<string, {title: string | number, target: number, rewards: Record<string, boolean>}> }}
  */
 function mapAvailablePokestops(api, ctx) {
   const { includeBaseQuests = true, includeAltQuests = true } = ctx
   const available = new Set()
   /** @type {QuestConditions} */
   const conditions = {}
+  // Task-primary filter keys (`k<title>-<target>`), the reverse of
+  // `conditions` above - see `addTaskCondition` in
+  // `filters/pokestop/questTaskMatch.js` (not required here to keep this
+  // mapper dependency-free; kept in lockstep with that version by hand).
+  const taskConditions = {}
 
   const process = (
     /** @type {string} */ key,
@@ -136,6 +141,13 @@ function mapAvailablePokestops(api, ctx) {
       } else {
         conditions[key] = { [`${title}-${target}`]: { title, target } }
       }
+      const taskKey = `k${title}-${target}`
+      if (taskKey in taskConditions) {
+        taskConditions[taskKey].rewards[key] = true
+      } else {
+        taskConditions[taskKey] = { title, target, rewards: { [key]: true } }
+      }
+      available.add(taskKey)
     }
     available.add(key)
   }
@@ -248,7 +260,7 @@ function mapAvailablePokestops(api, ctx) {
     }
   })
 
-  return { available: [...available], conditions }
+  return { available: [...available], conditions, taskConditions }
 }
 
 module.exports = { mapAvailablePokestops, questRewardKey }
