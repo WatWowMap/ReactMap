@@ -29,6 +29,10 @@ const {
   resolveQuestLayerSelection,
 } = require('../utils/questLayerMode')
 const { mapAvailablePokestops } = require('./pokestopAvailableMapper')
+const {
+  dedupeRocketPokemonKeys,
+  hasRocketPokemonFilter,
+} = require('../filters/pokestop/rocketPokemonKeys')
 
 const MEGA_RESOURCE_REWARD_TYPE = 12
 const TEMP_EVO_BRANCH_RESOURCE_REWARD_TYPE = 20
@@ -1044,11 +1048,22 @@ class Pokestop extends Model {
     }
   }
 
-  static hasRocketPokemonFilter(filters, pokemonId, formId) {
-    if (!pokemonId) return false
-    return !!(
-      filters[`a${pokemonId}-${formId ?? 0}`] || filters[`a${pokemonId}`]
-    )
+  /**
+   * Matches a Rocket reward by Pokemon ID, ignoring the form id.
+   *
+   * The form cannot be compared: the scanner's `incident` table commonly
+   * records a reward's form as `0`, while the masterfile encounter pool gives
+   * it a real form (Deino is `2291`). An exact comparison therefore drops
+   * whichever of the two the ticked filter did not come from, even though the
+   * SQL stage already selected the stop by Pokemon ID alone. Grunt rewards do
+   * not meaningfully vary by form, so matching on the ID makes every source
+   * (confirmed, unconfirmed, scanner, masterfile) agree at once.
+   *
+   * Accepts both the `a<id>` and the legacy `a<id>-<form>` key shapes so
+   * existing saved filters keep resolving.
+   */
+  static hasRocketPokemonFilter(filters, pokemonId) {
+    return hasRocketPokemonFilter(filters, pokemonId)
   }
 
   static invasionMatchesFilters(
@@ -1090,13 +1105,9 @@ class Pokestop extends Model {
       if (
         info.firstReward &&
         (hasConfirmed && invasion.confirmed
-          ? this.hasRocketPokemonFilter(
-              filters,
-              invasion.slot_1_pokemon_id,
-              invasion.slot_1_form,
-            )
+          ? this.hasRocketPokemonFilter(filters, invasion.slot_1_pokemon_id)
           : info.encounters.first.some((poke) =>
-              this.hasRocketPokemonFilter(filters, poke.id, poke.form),
+              this.hasRocketPokemonFilter(filters, poke.id),
             ))
       ) {
         return true
@@ -1105,13 +1116,9 @@ class Pokestop extends Model {
       if (
         info.secondReward &&
         (hasConfirmed && invasion.confirmed
-          ? this.hasRocketPokemonFilter(
-              filters,
-              invasion.slot_2_pokemon_id,
-              invasion.slot_2_form,
-            )
+          ? this.hasRocketPokemonFilter(filters, invasion.slot_2_pokemon_id)
           : info.encounters.second.some((poke) =>
-              this.hasRocketPokemonFilter(filters, poke.id, poke.form),
+              this.hasRocketPokemonFilter(filters, poke.id),
             ))
       ) {
         return true
@@ -1120,13 +1127,9 @@ class Pokestop extends Model {
       if (
         info.thirdReward &&
         (hasConfirmed && invasion.confirmed
-          ? this.hasRocketPokemonFilter(
-              filters,
-              invasion.slot_3_pokemon_id,
-              invasion.slot_3_form,
-            )
+          ? this.hasRocketPokemonFilter(filters, invasion.slot_3_pokemon_id)
           : info.encounters.third.some((poke) =>
-              this.hasRocketPokemonFilter(filters, poke.id, poke.form),
+              this.hasRocketPokemonFilter(filters, poke.id),
             ))
       ) {
         return true
@@ -1493,6 +1496,7 @@ class Pokestop extends Model {
           })
           const availableSet = new Set(result.available)
           applyRocketPokemonFallback(availableSet)
+          dedupeRocketPokemonKeys(availableSet)
           log.info(
             TAGS.pokestops,
             `[POKESTOP] loaded available from ${mem}/api/fort/available — ${availableSet.size} filter keys (${res.quests.length} quests, ${res.invasions.length} invasions, ${(res.lures || []).length} lures, ${(res.showcases || []).length} showcases), ${Object.keys(result.conditions).length} reward conditions`,
@@ -2064,6 +2068,7 @@ class Pokestop extends Model {
           }
 
           applyRocketPokemonFallback(finalList)
+          dedupeRocketPokemonKeys(finalList)
           break
         case 'showcase':
           if (hasShowcaseData) {
