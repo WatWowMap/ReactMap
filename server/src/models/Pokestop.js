@@ -876,7 +876,11 @@ class Pokestop extends Model {
       // endpoint rows (else a no-area user under strict mode sees everything).
       if (areaRestrictionsDenyAll(areaRestrictions, onlyAreas)) return []
       try {
-        const dnf = buildPokestopDnfFilters(args.filters, state.event.invasions)
+        const dnf = buildPokestopDnfFilters(
+          args.filters,
+          state.event.invasions,
+          state.db.taskConditions,
+        )
         // Endpoint rows always carry BOTH quest layers, so resolve the layer
         // selection as dual-capable (mirrors getAvailable's override). The SQL
         // ctx flags are undefined for a pure-endpoint source, which would make

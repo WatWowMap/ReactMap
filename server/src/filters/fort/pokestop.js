@@ -8,6 +8,43 @@ const { parseIdFormPair } = require('./parseIdForm')
 const ROCKET_INCIDENT_DISPLAY_TYPES = [1, 2, 3, 4]
 
 /**
+ * Expands enabled task-primary filters (`k<title>-<target>`) into their
+ * reward-primary equivalents, so the switch below - which only understands
+ * reward keys - picks them up automatically without needing its own clause
+ * type. A task narrowed via `.adv` to specific rewards (the reverse Advanced
+ * dialog) expands to only those; an unnarrowed task expands to every reward
+ * `taskConditions` has ever seen it grant.
+ *
+ * Presence of a key in `filters` already means enabled - `trimFilters`
+ * strips disabled entries and the `enabled` field itself before the client
+ * ever sends this - so no `.enabled` check is needed here, matching every
+ * other key in this file.
+ * @param {Record<string, any>} filters
+ * @param {Record<string, {rewards?: string[]}>} [taskConditions]
+ * @returns {Record<string, any>}
+ */
+function expandTaskFilters(filters, taskConditions) {
+  if (!taskConditions) return filters
+  const taskKeys = Object.keys(filters).filter((key) => key.startsWith('k'))
+  if (!taskKeys.length) return filters
+  const expanded = { ...filters }
+  taskKeys.forEach((taskKey) => {
+    const filter = filters[taskKey]
+    const rewards =
+      filter?.adv && !filter.all
+        ? Array.isArray(filter.adv)
+          ? filter.adv
+          : filter.adv.split(',')
+        : taskConditions[taskKey]?.rewards
+    if (!rewards) return
+    rewards.forEach((rewardKey) => {
+      if (!expanded[rewardKey]) expanded[rewardKey] = { all: false, adv: '' }
+    })
+  })
+  return expanded
+}
+
+/**
  * Translate a pokestop's `args.filters` into ApiFortDnfFilter[] clauses.
  *
  * CRITICAL — exact key semantics. secondaryFilter matches a stop's computed
@@ -38,12 +75,14 @@ const ROCKET_INCIDENT_DISPLAY_TYPES = [1, 2, 3, 4]
  * from an optional invasion check that no Golbat clause can safely track);
  * secondaryFilter confirms the specific reward.
  *
- * @param {Record<string, any>} filters args.filters
+ * @param {Record<string, any>} rawFilters args.filters
  * @param {Record<string, any>} [eventInvasions] state.event.invasions (grunt→reward map, used for grunt-class exclusion)
+ * @param {Record<string, {rewards?: string[]}>} [taskConditions] state.db.taskConditions, used to expand task-primary keys into reward keys
  * @returns {object[]}
  */
-function buildPokestopDnfFilters(filters, eventInvasions) {
-  if (!filters || typeof filters !== 'object') return []
+function buildPokestopDnfFilters(rawFilters, eventInvasions, taskConditions) {
+  if (!rawFilters || typeof rawFilters !== 'object') return []
+  const filters = expandTaskFilters(rawFilters, taskConditions)
   const {
     onlyAllPokestops,
     onlyArEligible,
