@@ -7,6 +7,7 @@ import { useOpacity } from '@hooks/useOpacity'
 import { getRewardInfo } from '@utils/getRewardInfo'
 import { INCIDENT_DISPLAY_TYPES } from './incidentPriority'
 import { resolveShowcaseEventIcon } from './resolveShowcaseEventIcon'
+import { isRocketPokemonFilterExcluded } from './rocketPokemonFiltering'
 
 const INVASION_REWARD_SLOTS = [
   {
@@ -211,8 +212,7 @@ export function usePokestopMarker({
           filters[`i${invasion.grunt_type}`]?.size,
         )
 
-        // Exclude leaders and Giovanni (grunt_type 41-44) from size calculation
-        if (invasion.grunt_type >= 41 && invasion.grunt_type <= 44) {
+        if (isRocketPokemonFilterExcluded(invasion.grunt_type)) {
           invasionSizes.unshift(invasionTypeSize)
         } else {
           // Calculate potential reward icon sizes

@@ -47,6 +47,7 @@ import {
   getInvasionIncidentPriority,
   isIncidentBlockedBy,
 } from './incidentPriority'
+import { isRocketPokemonFilterExcluded } from './rocketPokemonFiltering'
 
 /**
  *
@@ -426,7 +427,10 @@ const MenuActions = ({
           })
         }
 
-        if (hasConfirmed) {
+        if (
+          hasConfirmed &&
+          !isRocketPokemonFilterExcluded(invasion.grunt_type)
+        ) {
           const reference = masterfile.invasions[invasion.grunt_type]
           if (reference) {
             const encounters = new Set()
