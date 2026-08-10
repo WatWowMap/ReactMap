@@ -8,6 +8,7 @@ export const GET_MAP_DATA = gql`
       masterfile
       filters
       questConditions
+      taskConditions
       icons
       audio
       supportsShinyStats

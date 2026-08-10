@@ -538,6 +538,7 @@
       "candy": true,
       "xlCandy": true,
       "pokemon": true,
+      "tasks": false,
       "invasions": false,
       "allInvasions": true,
       "invasionPokemon": true,

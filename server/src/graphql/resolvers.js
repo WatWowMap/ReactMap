@@ -34,6 +34,7 @@ const resolvers = {
 
       const data = {
         questConditions: perms.quests ? Db.questConditions : {},
+        taskConditions: perms.quests ? Db.taskConditions : {},
         masterfile: { ...Event.masterfile, invasions: Event.invasions },
         filters: buildDefaultFilters(perms),
         audio: {

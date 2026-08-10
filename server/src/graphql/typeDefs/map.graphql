@@ -2,6 +2,7 @@ type MapData {
   masterfile: JSON
   filters: JSON
   questConditions: JSON
+  taskConditions: JSON
   icons: JSON
   audio: JSON
   supportsShinyStats: Boolean

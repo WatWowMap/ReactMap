@@ -63,6 +63,11 @@ function buildPokestops(perms, defaults) {
         quests[avail] = new BaseFilter(defaults.xlCandy)
       } else if (avail.startsWith('m')) {
         quests[avail] = new BaseFilter(defaults.megaEnergy)
+      } else if (avail.startsWith('k')) {
+        // Task-primary filter: the reverse of the per-reward `.adv` narrowing
+        // above. Same reward-type default (`tasks`) since a task is just
+        // another way of selecting the same underlying quest rewards.
+        quests[avail] = new BaseFilter(defaults.tasks)
       } else if (
         !avail.startsWith('i') &&
         !avail.startsWith('l') &&
@@ -70,6 +75,7 @@ function buildPokestops(perms, defaults) {
         !avail.startsWith('b') &&
         !avail.startsWith('f') &&
         !avail.startsWith('h') &&
+        !avail.startsWith('k') &&
         !Number.isInteger(+avail.charAt(0))
       ) {
         log.warn(

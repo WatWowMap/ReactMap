@@ -24,6 +24,7 @@ import { SliderTile } from '../inputs/SliderTile'
 import { Size } from './Size'
 import { GenderListItem } from './Gender'
 import { QuestConditionSelector } from './QuestConditions'
+import { TaskRewardSelector } from './TaskConditions'
 
 export function AdvancedFilter() {
   const { category, id, selectedIds, open } = useLayoutStore(
@@ -189,7 +190,12 @@ export function AdvancedFilter() {
                     label="size_1-size_5"
                   />
                 )}
-                {category === 'pokestops' && <QuestConditionSelector id={id} />}
+                {category === 'pokestops' &&
+                  (id.startsWith('k') ? (
+                    <TaskRewardSelector id={id} />
+                  ) : (
+                    <QuestConditionSelector id={id} />
+                  ))}
                 {hasAll ? (
                   <DualBoolToggle
                     items={ENABLED_ALL}

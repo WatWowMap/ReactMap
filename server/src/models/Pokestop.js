@@ -29,6 +29,10 @@ const {
   resolveQuestLayerSelection,
 } = require('../utils/questLayerMode')
 const { mapAvailablePokestops } = require('./pokestopAvailableMapper')
+const {
+  addTaskCondition,
+  matchesAdvancedFilter,
+} = require('../filters/pokestop/questTaskMatch')
 
 const MEGA_RESOURCE_REWARD_TYPE = 12
 const TEMP_EVO_BRANCH_RESOURCE_REWARD_TYPE = 20
@@ -727,7 +731,11 @@ class Pokestop extends Model {
       // endpoint rows (else a no-area user under strict mode sees everything).
       if (areaRestrictionsDenyAll(areaRestrictions, onlyAreas)) return []
       try {
-        const dnf = buildPokestopDnfFilters(args.filters, state.event.invasions)
+        const dnf = buildPokestopDnfFilters(
+          args.filters,
+          state.event.invasions,
+          state.db.taskConditions,
+        )
         // Endpoint rows always carry BOTH quest layers, so resolve the layer
         // selection as dual-capable (mirrors getAvailable's override). The SQL
         // ctx flags are undefined for a pure-endpoint source, which would make
@@ -1119,18 +1127,15 @@ class Pokestop extends Model {
             }
 
             const questCondition = `${quest.quest_title}__${quest.quest_target}`
-            const filterMatchesQuest = (key) => {
-              const filter = filters[key]
-              if (!filter || !filter.adv || filter.all) return !!filter
-              const selectedConditions = Array.isArray(filter.adv)
-                ? filter.adv
-                : filter.adv.split(',')
-              return (
-                !selectedConditions.length ||
-                selectedConditions.includes(questCondition)
-              )
-            }
-            const matchesFilter = filterMatchesQuest(newQuest.key)
+            // Task filter (`k<title>-<target>`) is the reverse of the reward
+            // filter above: enabled on its own, or narrowed via `.adv` to
+            // specific reward keys instead of specific task conditions.
+            // Additive - either "this reward is wanted" or "this task is
+            // wanted" can surface the quest.
+            const taskKey = `k${quest.quest_title}-${quest.quest_target}`
+            const matchesFilter =
+              matchesAdvancedFilter(filters[newQuest.key], questCondition) ||
+              matchesAdvancedFilter(filters[taskKey], newQuest.key)
             if (
               quest.quest_timestamp >= midnight &&
               (filters.onlyAllPokestops || matchesFilter)
@@ -1254,7 +1259,11 @@ class Pokestop extends Model {
             TAGS.pokestops,
             `[POKESTOP] loaded available from ${mem}/api/fort/available — ${availableSet.size} filter keys (${res.quests.length} quests, ${res.invasions.length} invasions, ${(res.lures || []).length} lures, ${(res.showcases || []).length} showcases), ${Object.keys(result.conditions).length} reward conditions`,
           )
-          return { available: [...availableSet], conditions: result.conditions }
+          return {
+            available: [...availableSet],
+            conditions: result.conditions,
+            taskConditions: result.taskConditions,
+          }
         }
         log.warn(
           TAGS.pokestops,
@@ -1275,6 +1284,7 @@ class Pokestop extends Model {
     const shouldIncludeBaseQuests = questLayer !== 'without_ar'
     const shouldIncludeAltQuests = hasAltQuests && questLayer !== 'with_ar'
 
+    const taskConditions = {}
     const process = (key, title, target) => {
       if (title) {
         if (key in conditions) {
@@ -1282,6 +1292,11 @@ class Pokestop extends Model {
         } else {
           conditions[key] = { [`${title}-${target}`]: { title, target } }
         }
+        // Mirrors `conditions` in the opposite direction: `k<title>-<target>`
+        // is a task-primary filter key, letting a user filter by task and
+        // optionally narrow to specific reward keys, the reverse of the
+        // reward-primary `.adv` narrowing above.
+        finalList.add(addTaskCondition(taskConditions, key, title, target))
       }
       finalList.add(key)
     }
@@ -1760,6 +1775,7 @@ class Pokestop extends Model {
     return {
       available: [...finalList],
       conditions,
+      taskConditions,
     }
   }
 

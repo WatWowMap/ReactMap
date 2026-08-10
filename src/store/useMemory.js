@@ -60,6 +60,7 @@ import { create } from 'zustand'
  *     stations: string[],
  *     tappables: string[],
  *     questConditions: Record<string, { title: string, target?: number }[]>,
+ *     taskConditions: Record<string, { title: string, target?: number, rewards: string[] }>,
  *   }
  *   manualParams: {
  *     category: string,
@@ -133,6 +134,7 @@ export const useMemory = create(() => ({
     stations: [],
     tappables: [],
     questConditions: {},
+    taskConditions: {},
   },
   Icons: null,
   Audio: null,

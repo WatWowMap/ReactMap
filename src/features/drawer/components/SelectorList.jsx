@@ -37,7 +37,7 @@ import {
  * @template {keyof import('@rm/types').Available} T
  * @typedef {{
  *  category: T,
- *  subCategory?: T extends 'gyms' ? 'raids' | 'pokemon' : T extends 'pokestops' ? 'lures' | 'invasions' | 'quests' | 'showcase' | 'rocketPokemon' | 'pokemon' : never
+ *  subCategory?: T extends 'gyms' ? 'raids' | 'pokemon' : T extends 'pokestops' ? 'lures' | 'invasions' | 'quests' | 'showcase' | 'rocketPokemon' | 'pokemon' | 'tasks' : never
  *  itemsPerRow?: number,
  *  children?: React.ReactNode,
  *  label?: string
@@ -110,6 +110,8 @@ function SelectorList({
               )
             case 'rocketPokemon':
               return key.startsWith('a')
+            case 'tasks':
+              return key.startsWith('k')
             case 'pokemon':
               return Number.isInteger(Number(key.charAt(0)))
             default:
@@ -134,11 +136,15 @@ function SelectorList({
       .map((item) => item.id)
   }, [translated, search])
 
-  const restoreStateFrom = React.useMemo(
-    () => getDrawerGridState(listScrollKey),
-    [listScrollKey],
-  )
+  // Virtuoso cannot reliably measure a grid inside a hidden tab or a closed
+  // drawer. In particular, reopening the drawer directly onto a persisted tab
+  // leaves that grid mounted with the closed drawer's stale viewport until the
+  // user switches away and back. Only mount the active grid, and read its
+  // latest snapshot as it becomes active so the remount restores its position.
   const shouldPersistGridState = drawer && visible
+  const restoreStateFrom = shouldPersistGridState
+    ? getDrawerGridState(listScrollKey)
+    : null
   const scrollMemory = useDrawerScrollMemory(
     listScrollKey,
     shouldPersistGridState,
@@ -240,15 +246,17 @@ function SelectorList({
             : height
         }
       >
-        <VirtualGrid
-          data={items}
-          xs={4}
-          scrollerRef={scrollMemory.ref}
-          restoreStateFrom={restoreStateFrom}
-          stateChanged={handleStateChanged}
-        >
-          {(_, key) => <StandardItem id={key} category={category} />}
-        </VirtualGrid>
+        {shouldPersistGridState && (
+          <VirtualGrid
+            data={items}
+            xs={4}
+            scrollerRef={scrollMemory.ref}
+            restoreStateFrom={restoreStateFrom}
+            stateChanged={handleStateChanged}
+          >
+            {(_, key) => <StandardItem id={key} category={category} />}
+          </VirtualGrid>
+        )}
       </Box>
     </List>
   )

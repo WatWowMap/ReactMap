@@ -45,6 +45,7 @@ export function useMapData(once = false) {
         icons,
         audio,
         questConditions,
+        taskConditions,
         supportsShinyStats,
       } = data.available
       const { icons: userIcons, audio: userAudio } = useStorage.getState()
@@ -99,6 +100,7 @@ export function useMapData(once = false) {
         available: {
           ...prev.available,
           questConditions,
+          taskConditions,
         },
         featureFlags: {
           ...prev.featureFlags,
