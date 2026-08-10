@@ -602,7 +602,6 @@ class Station extends Model {
     perms,
     args,
     {
-      isMad,
       hasMultiBattles,
       hasStationedGmax,
       hasBattlePokemonStats,
@@ -1017,7 +1016,7 @@ class Station extends Model {
       applyStationFilters(query)
     }
 
-    if (!getAreaSql(query, areaRestrictions, onlyAreas, isMad)) {
+    if (!getAreaSql(query, areaRestrictions, onlyAreas)) {
       return []
     }
 
@@ -1292,7 +1291,7 @@ class Station extends Model {
    * @param {ReturnType<typeof import("server/src/utils/getBbox").getBboxFromCenter>} bbox
    * @returns {Promise<import("@rm/types").FullStation[]>}
    */
-  static async search(perms, args, { isMad, hasMultiBattles }, distance, bbox) {
+  static async search(perms, args, { hasMultiBattles }, distance, bbox) {
     const { areaRestrictions } = perms
     const { onlyAreas = [], search = '', locale } = args
     const { searchResultsLimit, stationUpdateLimit } = config.getSafe('api')
@@ -1373,7 +1372,7 @@ class Station extends Model {
       })
       .limit(searchResultsLimit)
       .orderBy('distance')
-    if (!getAreaSql(query, areaRestrictions, onlyAreas, isMad)) {
+    if (!getAreaSql(query, areaRestrictions, onlyAreas)) {
       return []
     }
     const rows = await query

@@ -37,7 +37,6 @@ const quest = gql`
       quest_reward_type
       quest_reward_amount
       quest_item_id
-      quest_task
       quest_title
       item_amount
       stardust_amount

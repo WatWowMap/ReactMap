@@ -23,7 +23,6 @@ export interface Device {
   lat: number
   lon: number
   type: string
-  isMad: boolean
   route: any // JSON
   radius: number
 }
@@ -132,7 +131,6 @@ export interface Quest {
   quest_template: string
   quest_reward_type: number
   quest_reward_amount: number
-  quest_task: string
   quest_item_id: number
   quest_title: string
   item_amount: number
