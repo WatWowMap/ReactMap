@@ -51,21 +51,16 @@ async function scannerApi(
   }, config.getSafe('api.fetchTimeoutMs'))
 
   const coords =
-    backendConfig.platform === 'mad'
-      ? [
-          parseFloat(data.scanCoords[0][0].toFixed(5)),
-          parseFloat(data.scanCoords[0][1].toFixed(5)),
-        ]
-      : backendConfig.platform === 'dragonite' ||
-          backendConfig.platform === 'custom'
-        ? data.scanCoords?.map((coord) => [
-            parseFloat(coord[0].toFixed(5)),
-            parseFloat(coord[1].toFixed(5)),
-          ]) || []
-        : data.scanCoords?.map((coord) => ({
-            lat: parseFloat(coord[0].toFixed(5)),
-            lon: parseFloat(coord[1].toFixed(5)),
-          })) || []
+    backendConfig.platform === 'dragonite' ||
+    backendConfig.platform === 'custom'
+      ? data.scanCoords?.map((coord) => [
+          parseFloat(coord[0].toFixed(5)),
+          parseFloat(coord[1].toFixed(5)),
+        ]) || []
+      : data.scanCoords?.map((coord) => ({
+          lat: parseFloat(coord[0].toFixed(5)),
+          lon: parseFloat(coord[1].toFixed(5)),
+        })) || []
 
   try {
     const headers = Object.fromEntries(
@@ -75,7 +70,6 @@ async function scannerApi(
       ]),
     )
     switch (backendConfig.platform) {
-      case 'mad':
       case 'rdm':
         Object.assign(headers, {
           Authorization: `Basic ${Buffer.from(
@@ -113,18 +107,6 @@ async function scannerApi(
           )},${data.scanLocation[1].toFixed(5)}`,
         )
         switch (backendConfig.platform) {
-          case 'mad':
-            Object.assign(payloadObj, {
-              url: `${
-                backendConfig.apiEndpoint
-              }/send_gps?origin=${encodeURIComponent(
-                scanModes.scanNext.scanNextDevice,
-              )}&coords=${JSON.stringify(coords)}&sleeptime=${
-                scanModes.scanNext.scanNextSleeptime
-              }`,
-              options: { method, headers },
-            })
-            break
           case 'rdm':
             Object.assign(payloadObj, {
               url: `${
@@ -336,11 +318,7 @@ async function scannerApi(
             },
             {
               name: 'Instance',
-              value: `${
-                backendConfig.platform === 'mad'
-                  ? `Device: ${scanModes.scanNext.scanNextDevice}`
-                  : ''
-              }\nName: ${
+              value: `Name: ${
                 scanModes[category]?.[`${category}Instance`] || '-'
               }\nQueue: ${scannerQueue[category]?.queue || 0}`,
               inline: true,
@@ -390,14 +368,6 @@ async function scannerApi(
           } has no device assigned`,
         )
         return { status: 'error', message: 'scanner_no_device_assigned' }
-      case 500:
-        log.info(
-          TAGS.scanner,
-          `Error: device ${
-            scanModes[category]?.[`${category}Device`]
-          } does not exist`,
-        )
-        return { status: 'error', message: 'scanner_no_device' }
       default:
         log.warn(
           TAGS.scanner,

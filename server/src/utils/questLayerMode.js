@@ -38,16 +38,16 @@ function isDualQuestLayerMode(mode = getQuestLayerMode()) {
 }
 
 /**
- * @param {{ isMad?: boolean, hasAltQuests?: boolean, hasLayerColumn?: boolean }} source
+ * @param {{ hasAltQuests?: boolean }} source
  * @returns {boolean}
  */
 function hasDualQuestLayer(source) {
-  return !!(source.hasAltQuests || (source.isMad && source.hasLayerColumn))
+  return !!source.hasAltQuests
 }
 
 /**
  * @param {unknown} requestedLayer
- * @param {{ isMad?: boolean, hasAltQuests?: boolean, hasLayerColumn?: boolean }} source
+ * @param {{ hasAltQuests?: boolean }} source
  * @param {'dual' | 'with_ar' | 'without_ar'} [mode]
  * @returns {'both' | 'with_ar' | 'without_ar'}
  */

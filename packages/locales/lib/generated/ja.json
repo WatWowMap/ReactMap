@@ -185,7 +185,6 @@
   "min_iv_circle": "最小のサークル IV",
   "interaction_ranges": "交流範囲",
   "cannot_connect": "\n現時点でサーバーに接続できません。\nすぐに再試行するとさらに問題が生じる可能性があります。\n数分後に再試行してください。\n\n- マップ管理チーム",
-  "mad_quest_text": "ネイティブクエスト",
   "xs": "XS",
   "primary": "プライマリ",
   "secondary": "セカンダリ",

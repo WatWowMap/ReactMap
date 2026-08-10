@@ -375,7 +375,6 @@
       "interactionRanges": false,
       "lureRange": false,
       "customRange": 0,
-      "madQuestText": false,
       "hasQuestIndicator": true,
       "invasionRewardMarker": false,
       "showArQuestDotBadge": false,
@@ -637,7 +636,7 @@
   },
   "scanner": {
     "backendConfig": {
-      "platform": "rdm/mad/dragonite/custom",
+      "platform": "rdm/dragonite/custom",
       "apiEndpoint": "http://ip:port/api/",
       "headers": [],
       "apiUsername": "username",
@@ -656,8 +655,6 @@
       "pokemon": false,
       "gmf": true,
       "scanNextInstance": "scanNext",
-      "scanNextDevice": "Device01",
-      "scanNextSleeptime": 5,
       "userCooldownSeconds": 0,
       "cooldownBypass": {
         "discordRoles": [],

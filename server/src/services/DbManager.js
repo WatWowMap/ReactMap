@@ -170,20 +170,13 @@ class DbManager extends Logger {
 
   /**
    * @param {{ lat: number, lon: number }} args
-   * @param {boolean} isMad
    * @returns {ReturnType<typeof raw>}
    */
-  static getDistance(args, isMad) {
+  static getDistance(args) {
     const radLat = args.lat * (Math.PI / 180)
     const radLon = args.lon * (Math.PI / 180)
     return raw(
-      `ROUND(( 6371000 * acos( cos( ${radLat} ) * cos( radians( ${
-        isMad ? 'latitude' : 'lat'
-      } ) ) * cos( radians( ${
-        isMad ? 'longitude' : 'lon'
-      } ) - ${radLon} ) + sin( ${radLat} ) * sin( radians( ${
-        isMad ? 'latitude' : 'lat'
-      } ) ) ) ), 2)`,
+      `ROUND(( 6371000 * acos( cos( ${radLat} ) * cos( radians( lat ) ) * cos( radians( lon ) - ${radLon} ) + sin( ${radLat} ) * sin( radians( lat ) ) ) ), 2)`,
     ).as('distance')
   }
 
@@ -192,12 +185,9 @@ class DbManager extends Logger {
    * @returns {Promise<import("@rm/types").DbContext>}
    */
   static async schemaCheck(schema) {
-    const [isMad, hasSize, hasHeight, hasPokemonBackground] = await schema(
-      'pokemon',
-    )
+    const [hasSize, hasHeight, hasPokemonBackground] = await schema('pokemon')
       .columnInfo()
       .then((columns) => [
-        'cp_multiplier' in columns,
         'size' in columns,
         'height' in columns,
         'background' in columns,
@@ -212,7 +202,7 @@ class DbManager extends Logger {
     ] = await schema('pokestop')
       .columnInfo()
       .then((columns) => [
-        'quest_reward_amount' in columns || isMad,
+        'quest_reward_amount' in columns,
         'power_up_level' in columns,
         'alternative_quest_type' in columns,
         'showcase_pokemon_id' in columns,
@@ -234,17 +224,12 @@ class DbManager extends Logger {
     const hasBattlePokemonStats =
       'battle_pokemon_stamina' in stationColumns &&
       'battle_pokemon_cp_multiplier' in stationColumns
-    const [hasLayerColumn] = isMad
-      ? await schema('trs_quest')
-          .columnInfo()
-          .then((columns) => ['layer' in columns])
-      : [false]
     const [hasMultiInvasions, multiInvasionMs, hasConfirmed] = await schema(
-      isMad ? 'pokestop_incident' : 'incident',
+      'incident',
     )
       .columnInfo()
       .then((columns) => [
-        (isMad ? 'character_display' : 'character') in columns,
+        'character' in columns,
         'expiration_ms' in columns,
         'confirmed' in columns,
       ])
@@ -270,7 +255,6 @@ class DbManager extends Logger {
     }
 
     return {
-      isMad,
       mem: '',
       secret: '',
       hasSize,
@@ -278,7 +262,6 @@ class DbManager extends Logger {
       hasRewardAmount,
       hasPowerUp,
       hasAltQuests,
-      hasLayerColumn,
       hasMultiInvasions,
       multiInvasionMs,
       hasConfirmed,
@@ -342,7 +325,7 @@ class DbManager extends Logger {
           }
 
           // Dual source (endpoint + DB): schemaCheck ran on the bound knex
-          // (giving isMad + has* flags) but returns mem:''/secret:''. Overlay
+          // (giving schema capability flags) but returns mem:''/secret:''. Overlay
           // the endpoint AFTER so migrated queries (getAvailable) use it while
           // un-migrated ones fall back to this.query() on the bound DB. Runs
           // even when schemaCheck failed above (schemaContext={}), so a DB
@@ -389,10 +372,9 @@ class DbManager extends Logger {
   async historicalRarity() {
     this.log.info('Setting historical rarity stats')
     try {
-      // Only DB-backed, non-MAD sources have pokemon_stats. A dual source
-      // (endpoint + DB) keeps its knex and still serves rarity.
+      // A dual source (endpoint + DB) keeps its knex and still serves rarity.
       const eligible = (this.models.Pokemon ?? []).filter(
-        (source) => !source.isMad && this.connections[source.connection],
+        (source) => this.connections[source.connection],
       )
       // allSettled: if one dual-source DB lacks pokemon_stats its query must not
       // fail the whole batch and blank every source's rarity map.
@@ -640,7 +622,7 @@ class DbManager extends Logger {
             perms,
             args,
             source,
-            DbManager.getDistance(args, source.isMad),
+            DbManager.getDistance(args),
             bbox,
           ),
       )
@@ -836,9 +818,7 @@ class DbManager extends Logger {
     if (this.models.Route) {
       try {
         const results = await Promise.all(
-          this.models.Route.map(({ SubModel, ...source }) =>
-            SubModel.getFilterContext(source),
-          ),
+          this.models.Route.map(({ SubModel }) => SubModel.getFilterContext()),
         )
         this.filterContext.Route.maxDistance = Math.max(
           ...results.map((result) => result.max_distance),

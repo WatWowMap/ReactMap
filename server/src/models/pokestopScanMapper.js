@@ -87,7 +87,7 @@ function buildQuestLayer(api, prefix, withAr) {
     quest_type: api[`${prefix}quest_type`],
     quest_timestamp: api[`${prefix}quest_timestamp`],
     quest_target: api[`${prefix}quest_target`],
-    // SQL exposes these as raw JSON strings (`quest_condition`/`quest_reward`
+    // SQL exposes these as raw JSON strings (`quest_conditions`/`quest_rewards`
     // columns); Golbat returns them parsed. Stringify so the GraphQL `String`
     // field coerces and parseRdmRewards (which handles a string) still parses.
     quest_conditions: jsonString(api[`${prefix}quest_conditions`]),

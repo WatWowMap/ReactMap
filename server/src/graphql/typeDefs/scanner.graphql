@@ -5,7 +5,6 @@ type Device {
   lat: Float
   lon: Float
   type: String
-  isMad: Boolean
   route: JSON
   radius: Int
 }
@@ -75,7 +74,6 @@ type Quest {
   quest_template: String
   quest_reward_type: Int
   quest_reward_amount: Int
-  quest_task: String
   quest_item_id: Int
   quest_title: String
   item_amount: Int

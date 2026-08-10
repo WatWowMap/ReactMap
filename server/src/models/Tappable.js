@@ -20,10 +20,9 @@ class Tappable extends Model {
    *  minLon: number,
    *  maxLon: number,
    * }} args
-   * @param {import('@rm/types').DbContext} ctx
    * @returns {Promise<import('@rm/types').FullTappable[]>}
    */
-  static async getAll(perms, args, ctx) {
+  static async getAll(perms, args) {
     if (!perms?.tappables) return []
 
     const { filters: filterArgs = {}, minLat, maxLat, minLon, maxLon } = args
@@ -53,7 +52,7 @@ class Tappable extends Model {
     })
 
     const onlyAreas = filterArgs.onlyAreas || []
-    if (!getAreaSql(query, perms.areaRestrictions, onlyAreas, ctx?.isMad)) {
+    if (!getAreaSql(query, perms.areaRestrictions, onlyAreas)) {
       return []
     }
 
@@ -96,10 +95,9 @@ class Tappable extends Model {
    * Retrieve tappable metadata for a specific tappable id.
    * @param {import('@rm/types').Permissions} perms
    * @param {string | number} tappableId
-   * @param {import('@rm/types').DbContext} ctx
    * @returns {Promise<import('@rm/types').Tappable[]>}
    */
-  static async getById(perms, tappableId, ctx) {
+  static async getById(perms, tappableId) {
     if (!perms?.tappables || !tappableId) {
       return []
     }
@@ -117,9 +115,7 @@ class Tappable extends Model {
       'updated',
     ])
 
-    if (
-      !getAreaSql(query, perms.areaRestrictions, [], ctx?.isMad, 'tappable')
-    ) {
+    if (!getAreaSql(query, perms.areaRestrictions, [])) {
       return []
     }
 
