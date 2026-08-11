@@ -62,6 +62,7 @@
  */
 
 const {
+  getRocketPokemonFilterKey,
   isRocketPokemonFilterExcluded,
 } = require('../utils/rocketPokemonFiltering')
 
@@ -197,13 +198,13 @@ function mapAvailablePokestops(api, ctx) {
       // mirroring the SQL path which reads confirmed slots 1/2/3.
       const cfg = ctx.invasions?.[character]
       if (slot1_pokemon_id > 0 && cfg?.firstReward) {
-        available.add(`a${slot1_pokemon_id}-${slot1_form}`)
+        available.add(getRocketPokemonFilterKey(slot1_pokemon_id, slot1_form))
       }
       if (slot2_pokemon_id > 0 && cfg?.secondReward) {
-        available.add(`a${slot2_pokemon_id}-${slot2_form}`)
+        available.add(getRocketPokemonFilterKey(slot2_pokemon_id, slot2_form))
       }
       if (slot3_pokemon_id > 0 && cfg?.thirdReward) {
-        available.add(`a${slot3_pokemon_id}-${slot3_form}`)
+        available.add(getRocketPokemonFilterKey(slot3_pokemon_id, slot3_form))
       }
     }
   })

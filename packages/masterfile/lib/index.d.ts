@@ -44,7 +44,7 @@ export interface MasterfileMove {
 
 export interface InvasionPokemon {
   id: number
-  form: number
+  form?: number | null
 }
 
 export interface InvasionRewards {

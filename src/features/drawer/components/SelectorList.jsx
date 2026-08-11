@@ -67,6 +67,7 @@ function SelectorList({
   const { t: tId } = useTranslateById({
     quest: subCategory === 'pokemon',
     omitFormSuffix: true,
+    showDefaultForms: subCategory === 'rocketPokemon',
   })
   const { t } = useTranslation()
   const allFilters = useMemory((s) => s.filters[category]?.filter)

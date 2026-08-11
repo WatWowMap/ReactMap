@@ -43,11 +43,6 @@ function buildPokemon(defaults, base, custom) {
       pokemon.raids[rawKey] = new BaseFilter(defaults.gyms.pokemon)
       pokemon.stations[rawKey] = new BaseFilter(defaults.stations.pokemon)
       pokemon.quests[rawKey] = new BaseFilter(defaults.pokestops.pokemon)
-      if (state.db.filterContext.Pokestop.hasConfirmedInvasions) {
-        pokemon.rocket[`a${rawKey}`] = new BaseFilter(
-          defaults.pokestops.invasionPokemon,
-        )
-      }
       pokemon.nests[rawKey] = new BaseFilter(defaults.nests.allPokemon)
     })
     if ('family' in pkmn) {

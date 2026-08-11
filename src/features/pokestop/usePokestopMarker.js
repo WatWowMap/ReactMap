@@ -7,7 +7,11 @@ import { useOpacity } from '@hooks/useOpacity'
 import { getRewardInfo } from '@utils/getRewardInfo'
 import { INCIDENT_DISPLAY_TYPES } from './incidentPriority'
 import { resolveShowcaseEventIcon } from './resolveShowcaseEventIcon'
-import { isRocketPokemonFilterExcluded } from './rocketPokemonFiltering'
+import {
+  getEnabledRocketPokemonFilterKeys,
+  getRocketPokemonFilterKey,
+  isRocketPokemonFilterExcluded,
+} from './rocketPokemonFiltering'
 
 const INVASION_REWARD_SLOTS = [
   {
@@ -33,7 +37,7 @@ const INVASION_REWARD_SLOTS = [
 /**
  * @param {import('@rm/types').Invasion} invasion
  * @param {import('@rm/masterfile').Invasion | undefined} gruntData
- * @returns {{ id: number, form: number }[]}
+ * @returns {{ id: number, form?: number }[]}
  */
 function getInvasionRewardCandidates(invasion, gruntData) {
   if (!invasion.confirmed && Number(invasion.grunt_type) === 44) return []
@@ -42,8 +46,16 @@ function getInvasionRewardCandidates(invasion, gruntData) {
   const addCandidate = (id, form) => {
     const pokemonId = Number(id)
     if (!pokemonId) return
-    const formId = Number(form) || 0
-    candidates.set(`${pokemonId}-${formId}`, { id: pokemonId, form: formId })
+    const hasForm = form !== null && form !== undefined && form !== ''
+    const numericForm = Number(form)
+    const formId =
+      hasForm && Number.isFinite(numericForm) && numericForm >= 0
+        ? numericForm
+        : undefined
+    candidates.set(getRocketPokemonFilterKey(pokemonId, formId), {
+      id: pokemonId,
+      form: formId,
+    })
   }
   INVASION_REWARD_SLOTS.forEach((slot) => {
     if (!gruntData?.[slot.flag]) return
@@ -56,28 +68,28 @@ function getInvasionRewardCandidates(invasion, gruntData) {
     }
   })
 
+  // Keep candidates from different reward positions distinct. An exact form
+  // observed in one slot is not evidence for an unknown form in another.
   return [...candidates.values()]
 }
 
 /**
- * @param {{ id: number, form: number }} candidate
+ * @param {{ id: number, form?: number }} candidate
  * @param {import('@rm/types').AllFilters['pokestops']['filter']} filters
  * @param {import('@store/useMemory').UseMemory['Icons']} Icons
  * @param {'invasion' | 'reward'} sizeCategory
  * @returns {number}
  */
 function getInvasionRewardSize(candidate, filters, Icons, sizeCategory) {
-  const pokemonKey = `a${candidate.id}-${candidate.form || 0}`
-  const pokemonKeySimple = `a${candidate.id}`
-  const pokemonFilter = filters[pokemonKey]
-  const simplePokemonFilter = filters[pokemonKeySimple]
-
-  if (pokemonFilter?.enabled) {
-    return Icons.getSize(sizeCategory, pokemonFilter.size)
-  }
-  return simplePokemonFilter?.enabled
-    ? Icons.getSize(sizeCategory, simplePokemonFilter.size)
-    : 0
+  return getEnabledRocketPokemonFilterKeys(
+    candidate.id,
+    candidate.form,
+    filters,
+  ).reduce(
+    (size, key) =>
+      Math.max(size, Icons.getSize(sizeCategory, filters[key].size)),
+    0,
+  )
 }
 
 /**

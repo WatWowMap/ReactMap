@@ -7,6 +7,9 @@ const config = require('@rm/config')
 const { Logger, TAGS } = require('@rm/logger')
 
 const { getBboxFromCenter } = require('../utils/getBbox')
+const {
+  collapseRocketPokemonFilterKeys,
+} = require('../utils/rocketPokemonFiltering')
 const { getCache } = require('./cache')
 
 const STATION_BATTLE_REQUIRED_COLUMNS = [
@@ -793,6 +796,9 @@ class DbManager extends Logger {
       this.log.warn(
         'This is likely due to "nest" being in a useFor array but not in the database',
       )
+    }
+    if (model === 'Pokestop') {
+      out.available = [...collapseRocketPokemonFilterKeys(out.available)]
     }
     return out
   }
