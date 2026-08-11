@@ -134,6 +134,7 @@ export function AdvancedFilter() {
             : t('set_size')
         } - ${tId(id, {
           omitFormSuffix: true,
+          showDefaultForms: id.startsWith('a'),
         })}`}
         action={() => toggleClose(false)}
       />

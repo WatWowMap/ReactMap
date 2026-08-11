@@ -230,9 +230,11 @@ export class UAssets {
       id = 'b9'
     }
     switch (id.charAt(0)) {
-      case 'a':
+      case 'a': {
         // rocket pokemon
-        return this.getPokemon(...id.slice(1).split('-', 2), 0, 0, 0, 1)
+        const [pokemonId, form = 0] = id.slice(1).split('-', 2)
+        return this.getPokemon(pokemonId, form, 0, 0, 0, 1)
+      }
       case 'b':
         // event stops
         return this.getEventStops(id.slice(1))

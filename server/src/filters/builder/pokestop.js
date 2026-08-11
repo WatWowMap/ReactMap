@@ -83,10 +83,7 @@ function buildPokestops(perms, defaults) {
       if (avail.startsWith('i')) {
         quests[avail] = new BaseFilter(defaults.allInvasions)
       }
-      if (
-        avail.startsWith('a') &&
-        state.db.filterContext.Pokestop.hasConfirmedInvasions
-      ) {
+      if (avail.startsWith('a')) {
         quests[avail] = new BaseFilter(defaults.invasionPokemon)
       }
     }

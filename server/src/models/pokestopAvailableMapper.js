@@ -8,8 +8,8 @@
  * so that switching a pokestop source over to the Golbat endpoint yields the
  * SAME `{ available, conditions }` shape the map UI already expects.
  *
- * Standalone by design: no requires, so it can run under plain `node` with
- * no `node_modules` present.
+ * Standalone by design: no external dependencies, so it can run under plain
+ * `node` with no `node_modules` present.
  *
  * @typedef {object} AvailablePokestopQuest
  * @property {boolean} with_ar
@@ -60,6 +60,11 @@
  * @typedef {{ title: number | string, target: number }} QuestCondition
  * @typedef {Record<string, Record<string, QuestCondition>>} QuestConditions
  */
+
+const {
+  getRocketPokemonFilterKey,
+  isRocketPokemonFilterExcluded,
+} = require('../utils/rocketPokemonFiltering')
 
 /**
  * Builds the quest reward filter key for a single quest tuple, mirroring
@@ -170,10 +175,9 @@ function mapAvailablePokestops(api, ctx) {
     process(key, quest.title, quest.target)
   })
 
-  // Invasions: `i`/`b` keys are unconditional; the `a` key additionally
-  // requires a confirmed slot1 reward the event config marks as a
-  // `firstReward`, excluding team leaders (41-43) and Giovanni (44) -
-  // mirrors the `invasions` and `rocketPokemon` SQL branches.
+  // Invasions: `i`/`b` keys are unconditional. `a` keys require confirmed
+  // reward slots and exclude team leaders (41-43), Giovanni (44), and Decoys
+  // (45-46), mirroring the `invasions` and `rocketPokemon` SQL branches.
   const invasions = api.invasions || []
   invasions.forEach((invasion) => {
     const {
@@ -189,19 +193,18 @@ function mapAvailablePokestops(api, ctx) {
     } = invasion
     available.add(character > 0 ? `i${character}` : `b${display_type}`)
 
-    const isRocketLeaderOrGiovanni = character >= 41 && character <= 44
-    if (confirmed && !isRocketLeaderOrGiovanni) {
+    if (confirmed && !isRocketPokemonFilterExcluded(character)) {
       // Each slot the event config marks as a reward contributes an `a` key,
       // mirroring the SQL path which reads confirmed slots 1/2/3.
       const cfg = ctx.invasions?.[character]
       if (slot1_pokemon_id > 0 && cfg?.firstReward) {
-        available.add(`a${slot1_pokemon_id}-${slot1_form}`)
+        available.add(getRocketPokemonFilterKey(slot1_pokemon_id, slot1_form))
       }
       if (slot2_pokemon_id > 0 && cfg?.secondReward) {
-        available.add(`a${slot2_pokemon_id}-${slot2_form}`)
+        available.add(getRocketPokemonFilterKey(slot2_pokemon_id, slot2_form))
       }
       if (slot3_pokemon_id > 0 && cfg?.thirdReward) {
-        available.add(`a${slot3_pokemon_id}-${slot3_form}`)
+        available.add(getRocketPokemonFilterKey(slot3_pokemon_id, slot3_form))
       }
     }
   })

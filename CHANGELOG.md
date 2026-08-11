@@ -1,3 +1,11 @@
+## [1.49.2](https://github.com/WatWowMap/ReactMap/compare/v1.49.1...v1.49.2) (2026-08-11)
+
+
+### Bug Fixes
+
+* exclude leaders+giovanni+decoy from rocket pokemon filtering ([7a4179e](https://github.com/WatWowMap/ReactMap/commit/7a4179e26a18c4cac9cfb1ba71769177ad1f25f6))
+* rocket unknown form handling ([5ff1a48](https://github.com/WatWowMap/ReactMap/commit/5ff1a483227d658f4f829a7ffe7bba3e9caac370))
+
 ## [1.49.1](https://github.com/WatWowMap/ReactMap/compare/v1.49.0...v1.49.1) (2026-07-29)
 
 

@@ -111,6 +111,85 @@ export function useMapData(once = false) {
       useStorage.setState((prev) => {
         const newFilters = deepMerge({}, filters, prev.filters)
 
+        const currentPokestopFilters = filters.pokestops?.filter || {}
+        const previousPokestopFilters = prev.filters.pokestops?.filter || {}
+        const rocketKey = /^a(\d+)(?:-\d+)?$/
+        const legacyUnknownRocketKey = /^a(\d+)-(?:undefined|null|NaN)$/
+        const getRocketSpecies = (key) =>
+          key.match(rocketKey)?.[1] || key.match(legacyUnknownRocketKey)?.[1]
+        const currentRocketKeys = Object.keys(currentPokestopFilters).filter(
+          (key) => rocketKey.test(key),
+        )
+        const previousRocketKeys = Object.keys(previousPokestopFilters).filter(
+          (key) => getRocketSpecies(key),
+        )
+
+        // Availability can switch between a species-wide unknown key and one
+        // or more scanner-observed exact forms. Carry user settings to new
+        // replacement keys before pruning definitions the server no longer has.
+        const rocketSpecies = new Set(
+          [...currentRocketKeys, ...previousRocketKeys].map((key) =>
+            getRocketSpecies(key),
+          ),
+        )
+        rocketSpecies.forEach((pokemonId) => {
+          const belongsToSpecies = (key) => getRocketSpecies(key) === pokemonId
+          const currentKeys = currentRocketKeys.filter(belongsToSpecies)
+          const previousKeys = previousRocketKeys.filter(belongsToSpecies)
+          const previousUnknownKey = previousKeys.find(
+            (key) =>
+              key === `a${pokemonId}` || legacyUnknownRocketKey.test(key),
+          )
+          const hasUnknownKey =
+            currentKeys.includes(`a${pokemonId}`) || previousUnknownKey
+          const addedKeys = currentKeys.filter(
+            (key) =>
+              !Object.prototype.hasOwnProperty.call(
+                previousPokestopFilters,
+                key,
+              ),
+          )
+          const removedKeys = previousKeys.filter(
+            (key) =>
+              !Object.prototype.hasOwnProperty.call(
+                currentPokestopFilters,
+                key,
+              ),
+          )
+          if (!addedKeys.length || !removedKeys.length || !hasUnknownKey) return
+
+          const removedSettings = removedKeys
+            .map((key) => previousPokestopFilters[key])
+            .filter(Boolean)
+          if (!removedSettings.length) return
+
+          // A bare setting maps directly to every newly observed form. When
+          // several exact forms collapse to one unknown key, preserve the first
+          // enabled form's settings and keep the union enabled if any was enabled.
+          const replacement = previousPokestopFilters[previousUnknownKey] || {
+            ...(removedSettings.find((setting) => setting.enabled) ||
+              removedSettings[0]),
+            enabled: removedSettings.some((setting) => setting.enabled),
+          }
+          addedKeys.forEach((key) => {
+            newFilters.pokestops.filter[key] = {
+              ...newFilters.pokestops.filter[key],
+              ...replacement,
+            }
+          })
+        })
+
+        // Server filter definitions remain authoritative after settings move.
+        Object.keys(newFilters.pokestops?.filter || {})
+          .filter((key) => key.startsWith('a'))
+          .forEach((key) => {
+            if (
+              !Object.prototype.hasOwnProperty.call(currentPokestopFilters, key)
+            ) {
+              delete newFilters.pokestops.filter[key]
+            }
+          })
+
         // Migration for quest conditions to use target as well
         Object.entries(newFilters?.pokestops?.filter || {}).forEach(
           ([key, filter]) => {

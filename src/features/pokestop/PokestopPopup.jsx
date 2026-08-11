@@ -35,6 +35,7 @@ import { useGetAvailable } from '@hooks/useGetAvailable'
 import { parseQuestConditions } from '@utils/parseConditions'
 import { Img } from '@components/Img'
 import { readableProbability } from '@utils/readableProbability'
+import { useTranslateById } from '@hooks/useTranslateById'
 import {
   usePokemonBackgroundVisuals,
   usePokemonBackgroundVisual,
@@ -47,6 +48,31 @@ import {
   getInvasionIncidentPriority,
   isIncidentBlockedBy,
 } from './incidentPriority'
+import {
+  getEnabledRocketPokemonFilterKeys,
+  isRocketPokemonFilterExcluded,
+} from './rocketPokemonFiltering'
+
+const INVASION_REWARD_SLOTS = [
+  {
+    flag: 'firstReward',
+    id: 'slot_1_pokemon_id',
+    form: 'slot_1_form',
+    encounters: 'first',
+  },
+  {
+    flag: 'secondReward',
+    id: 'slot_2_pokemon_id',
+    form: 'slot_2_form',
+    encounters: 'second',
+  },
+  {
+    flag: 'thirdReward',
+    id: 'slot_3_pokemon_id',
+    form: 'slot_3_form',
+    encounters: 'third',
+  },
+]
 
 /**
  *
@@ -327,6 +353,10 @@ const MenuActions = ({
   invasions,
 }) => {
   const { t } = useTranslation()
+  const { t: tPokemon } = useTranslateById({
+    omitFormSuffix: true,
+    showDefaultForms: true,
+  })
   const masterfile = useMemory((s) => s.masterfile)
   const filters = useStorage((s) => s.filters)
   const { available } = useGetAvailable('pokestops')
@@ -426,78 +456,40 @@ const MenuActions = ({
           })
         }
 
-        if (hasConfirmed) {
+        if (
+          hasConfirmed &&
+          !isRocketPokemonFilterExcluded(invasion.grunt_type)
+        ) {
           const reference = masterfile.invasions[invasion.grunt_type]
           if (reference) {
             const encounters = new Set()
+            INVASION_REWARD_SLOTS.forEach((slot) => {
+              if (!reference[slot.flag]) return
 
-            // Check actual invasion slots first (confirmed invasions)
-            if (
-              invasion.slot_1_pokemon_id &&
-              reference.firstReward &&
-              filters.pokestops.filter[
-                `a${invasion.slot_1_pokemon_id}-${invasion.slot_1_form}`
-              ]?.enabled
-            ) {
-              encounters.add(
-                `a${invasion.slot_1_pokemon_id}-${invasion.slot_1_form}`,
-              )
-            }
-            if (
-              invasion.slot_2_pokemon_id &&
-              reference.secondReward &&
-              filters.pokestops.filter[
-                `a${invasion.slot_2_pokemon_id}-${invasion.slot_2_form}`
-              ]?.enabled
-            ) {
-              encounters.add(
-                `a${invasion.slot_2_pokemon_id}-${invasion.slot_2_form}`,
-              )
-            }
-            if (
-              invasion.slot_3_pokemon_id &&
-              reference.thirdReward &&
-              filters.pokestops.filter[
-                `a${invasion.slot_3_pokemon_id}-${invasion.slot_3_form}`
-              ]?.enabled
-            ) {
-              encounters.add(
-                `a${invasion.slot_3_pokemon_id}-${invasion.slot_3_form}`,
-              )
-            }
+              if (invasion.confirmed && Number(invasion[slot.id]) > 0) {
+                getEnabledRocketPokemonFilterKeys(
+                  invasion[slot.id],
+                  invasion[slot.form],
+                  filters.pokestops.filter,
+                ).forEach((key) => encounters.add(key))
+                return
+              }
 
-            // If no specific Pokemon IDs are set (forced mode), iterate over all possible rewards from masterfile
-            if (
-              !invasion.slot_1_pokemon_id &&
-              !invasion.slot_2_pokemon_id &&
-              !invasion.slot_3_pokemon_id
-            ) {
-              // Iterate over all encounters in the masterfile for this grunt type
-              Object.entries(reference.encounters || {}).forEach(
-                ([position, lineup]) => {
-                  const hasReward =
-                    (position === 'first' && reference.firstReward) ||
-                    (position === 'second' && reference.secondReward) ||
-                    (position === 'third' && reference.thirdReward)
-
-                  if (hasReward && Array.isArray(lineup)) {
-                    lineup.forEach((pokemon) => {
-                      const key = `a${pokemon.id}-${pokemon.form || 0}`
-                      if (filters.pokestops.filter[key]?.enabled) {
-                        encounters.add(key)
-                      }
-                    })
-                  }
-                },
-              )
-            }
+              reference.encounters?.[slot.encounters]?.forEach((pokemon) => {
+                getEnabledRocketPokemonFilterKeys(
+                  pokemon.id,
+                  pokemon.form,
+                  filters.pokestops.filter,
+                ).forEach((key) => encounters.add(key))
+              })
+            })
 
             if (encounters.size)
               options.push(
                 ...[...encounters].map((x) => ({
                   key: x,
                   name: t('exclude_quest_multi', {
-                    reward: t(`poke_${x.slice(1).split('-')[0]}`),
+                    reward: tPokemon(x),
                   }),
                   action: () => {
                     setAnchorEl(null)

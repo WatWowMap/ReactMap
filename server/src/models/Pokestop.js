@@ -19,6 +19,12 @@ const {
   fetchFortById,
 } = require('../utils/evalScannerQuery')
 const { filterRTree } = require('../utils/filterRTree')
+const {
+  ROCKET_POKEMON_FILTER_EXCLUDED_CHARACTERS,
+  getEnabledRocketPokemonSpecies,
+  getRocketPokemonFilterKey,
+  isRocketPokemonFilterExcluded,
+} = require('../utils/rocketPokemonFiltering')
 const { mapScanPokestop } = require('./pokestopScanMapper')
 const { getCombinedFortAvailable } = require('../utils/fortAvailable')
 const { buildPokestopDnfFilters } = require('../filters/fort/pokestop')
@@ -94,14 +100,29 @@ const REWARD_TYPES_WITH_DEDICATED_FILTERS = Object.keys(
   QUEST_REWARD_FILTER_DEFINITIONS,
 ).map(Number)
 
-// Team leaders (41-43) and Giovanni (44) never hand out a catchable rocket
-// Pokemon, so both the confirmed-invasion branch and this config-derived
-// fallback exclude them.
-const ROCKET_LEADER_GRUNT_TYPE_MIN = 41
-const ROCKET_LEADER_GRUNT_TYPE_MAX = 44
+const ROCKET_REWARD_POSITIONS = [
+  {
+    name: 'first',
+    enabled: 'firstReward',
+    pokemonId: 'slot_1_pokemon_id',
+    form: 'slot_1_form',
+  },
+  {
+    name: 'second',
+    enabled: 'secondReward',
+    pokemonId: 'slot_2_pokemon_id',
+    form: 'slot_2_form',
+  },
+  {
+    name: 'third',
+    enabled: 'thirdReward',
+    pokemonId: 'slot_3_pokemon_id',
+    form: 'slot_3_form',
+  },
+]
 
 /**
- * Adds config-derived `a${id}-${form}` rocket-encounter fallback keys to
+ * Adds config-derived Rocket encounter fallback keys to
  * `availableSet`, mirroring the SQL `rocketPokemon` case (originally inline
  * here, now shared so the SQL path and the `/api/pokestop/available`
  * endpoint path stay byte-identical). Gated on
@@ -114,35 +135,53 @@ const applyRocketPokemonFallback = (availableSet) => {
   // Always include potential rocket Pokemon from state.event.invasions as backup
   Object.entries(state.event.invasions).forEach(([gruntType, invasionInfo]) => {
     if (!invasionInfo) return
-    // Exclude team leaders (41-43) and Giovanni (44)
-    const gruntTypeNum = parseInt(gruntType, 10)
-    if (
-      gruntTypeNum >= ROCKET_LEADER_GRUNT_TYPE_MIN &&
-      gruntTypeNum <= ROCKET_LEADER_GRUNT_TYPE_MAX
-    )
-      return
+    if (isRocketPokemonFilterExcluded(gruntType)) return
 
-    // Add all potential first slot rewards
-    if (invasionInfo.firstReward && invasionInfo.encounters.first) {
-      invasionInfo.encounters.first.forEach((poke) => {
-        availableSet.add(`a${poke.id}-${poke.form}`)
+    ROCKET_REWARD_POSITIONS.forEach(({ name, enabled }) => {
+      if (!invasionInfo[enabled]) return
+      invasionInfo.encounters[name]?.forEach((poke) => {
+        availableSet.add(getRocketPokemonFilterKey(poke.id, poke.form))
       })
-    }
-
-    // Add all potential second slot rewards
-    if (invasionInfo.secondReward && invasionInfo.encounters.second) {
-      invasionInfo.encounters.second.forEach((poke) => {
-        availableSet.add(`a${poke.id}-${poke.form}`)
-      })
-    }
-
-    // Add all potential third slot rewards
-    if (invasionInfo.thirdReward && invasionInfo.encounters.third) {
-      invasionInfo.encounters.third.forEach((poke) => {
-        availableSet.add(`a${poke.id}-${poke.form}`)
-      })
-    }
+    })
   })
+}
+
+/**
+ * @param {number|string} gruntType
+ * @param {number[]} pokemonIds
+ */
+const invasionHasMatchingRocketPokemon = (gruntType, pokemonIds) =>
+  !isRocketPokemonFilterExcluded(gruntType) &&
+  ROCKET_REWARD_POSITIONS.some(
+    ({ name, enabled }) =>
+      state.event.invasions[gruntType]?.[enabled] &&
+      state.event.invasions[gruntType]?.encounters[name]?.some((pokemon) =>
+        pokemonIds.includes(pokemon.id),
+      ),
+  )
+
+/**
+ * @param {(number|string)[]} pokemonIds
+ * @returns {Record<string, string[]>}
+ */
+const getMatchingRocketGruntsByPosition = (pokemonIds) => {
+  const selected = new Set(pokemonIds.map(Number))
+  const matching = Object.fromEntries(
+    ROCKET_REWARD_POSITIONS.map(({ name }) => [name, []]),
+  )
+
+  Object.entries(state.event.invasions).forEach(([gruntType, info]) => {
+    if (!info || isRocketPokemonFilterExcluded(gruntType)) return
+    ROCKET_REWARD_POSITIONS.forEach(({ name, enabled }) => {
+      if (
+        info[enabled] &&
+        info.encounters[name]?.some((poke) => selected.has(Number(poke.id)))
+      ) {
+        matching[name].push(gruntType)
+      }
+    })
+  })
+  return matching
 }
 
 const questProps = {
@@ -621,43 +660,50 @@ class Pokestop extends Model {
 
                 // Case (b): Include if invasion has potential rewards that are checked
                 if (rocketPokemon.length) {
+                  const matchingGruntsByPosition =
+                    getMatchingRocketGruntsByPosition(rocketPokemon)
+
                   // For confirmed invasions, check actual Pokemon slots
                   if (hasConfirmed)
                     subQuery.orWhere((confirmedQuery) => {
                       confirmedQuery
-                        .whereNotIn('character', [41, 42, 43, 44])
+                        .whereNotIn(
+                          'character',
+                          ROCKET_POKEMON_FILTER_EXCLUDED_CHARACTERS,
+                        )
                         .andWhere('confirmed', 1)
                         .andWhere((pokemonQuery) => {
-                          pokemonQuery
-                            .whereIn('slot_1_pokemon_id', rocketPokemon)
-                            .orWhereIn('slot_2_pokemon_id', rocketPokemon)
-                            .orWhereIn('slot_3_pokemon_id', rocketPokemon)
+                          ROCKET_REWARD_POSITIONS.forEach(
+                            ({ name, pokemonId }) => {
+                              pokemonQuery.orWhereIn(pokemonId, rocketPokemon)
+                              if (matchingGruntsByPosition[name].length) {
+                                // Confirmation only makes populated slots
+                                // authoritative. A missing slot is still unknown,
+                                // so keep rows whose event lineup can reward the
+                                // selected Pokemon in that same position.
+                                pokemonQuery.orWhere((missingSlotQuery) => {
+                                  missingSlotQuery
+                                    .whereIn(
+                                      'character',
+                                      matchingGruntsByPosition[name],
+                                    )
+                                    .andWhere((missingPokemonQuery) => {
+                                      missingPokemonQuery
+                                        .whereNull(pokemonId)
+                                        .orWhere(pokemonId, 0)
+                                    })
+                                })
+                              }
+                            },
+                          )
                         })
                     })
 
                   // For unconfirmed invasions, check if their potential rewards match
                   // Get all grunt types that have potential rewards matching the filter
-                  const gruntTypesWithMatchingRewards = []
-                  Object.entries(state.event.invasions).forEach(
-                    ([gruntType, info]) => {
-                      if (!info) return
-                      // Exclude team leaders (41-43) and Giovanni (44)
-                      const gruntTypeNum = parseInt(gruntType, 10)
-                      if (gruntTypeNum >= 41 && gruntTypeNum <= 44) return
-
-                      if (
-                        [
-                          ...(info.firstReward ? info.encounters.first : []),
-                          ...(info.secondReward ? info.encounters.second : []),
-                          ...(info.thirdReward ? info.encounters.third : []),
-                        ].some((poke) =>
-                          rocketPokemon.includes(String(poke.id)),
-                        )
-                      ) {
-                        gruntTypesWithMatchingRewards.push(gruntType)
-                      }
-                    },
-                  )
+                  const gruntTypesWithMatchingRewards = [
+                    ...new Set(Object.values(matchingGruntsByPosition).flat()),
+                  ]
 
                   if (gruntTypesWithMatchingRewards.length > 0) {
                     subQuery.orWhere((unconfirmedQuery) => {
@@ -684,10 +730,24 @@ class Pokestop extends Model {
               }
             })
           } else {
+            const matchingGrunts = rocketPokemon.length
+              ? [
+                  ...new Set(
+                    Object.values(
+                      getMatchingRocketGruntsByPosition(rocketPokemon),
+                    ).flat(),
+                  ),
+                ]
+              : []
             stops.orWhere((invasion) => {
               invasion
-                .whereIn('grunt_type', invasions)
-                .andWhere('expiration', '>=', ts)
+                // Legacy/non-incident schemas have no observed lineup slots.
+                // Use event-info grunt candidates as a safe SQL superset and
+                // let secondaryFilter apply the exact Rocket reward filter.
+                .whereIn('grunt_type', [
+                  ...new Set([...invasions, ...matchingGrunts]),
+                ])
+                .andWhere('incident_expire_timestamp', '>=', ts)
               if (hasConfirmed) {
                 invasion.andWhere('confirmed', onlyConfirmed)
               }
@@ -888,14 +948,33 @@ class Pokestop extends Model {
     }
   }
 
-  static hasRocketPokemonFilter(filters, pokemonId, formId) {
+  static hasRocketPokemonFilter(
+    filters,
+    pokemonId,
+    formId,
+    enabledRocketPokemonSpecies,
+  ) {
     if (!pokemonId) return false
-    return !!(
-      filters[`a${pokemonId}-${formId ?? 0}`] || filters[`a${pokemonId}`]
+    const speciesKey = getRocketPokemonFilterKey(pokemonId)
+    const exactKey = getRocketPokemonFilterKey(pokemonId, formId)
+    if (filters[exactKey] || filters[speciesKey]) return true
+
+    // An unknown community form is a potential match for any selected exact
+    // form of that species. A known form never matches a different exact form.
+    return (
+      exactKey === speciesKey &&
+      (
+        enabledRocketPokemonSpecies || getEnabledRocketPokemonSpecies(filters)
+      ).has(Number(pokemonId))
     )
   }
 
-  static invasionMatchesFilters(invasion, filters, hasConfirmed) {
+  static invasionMatchesFilters(
+    invasion,
+    filters,
+    hasConfirmed,
+    enabledRocketPokemonSpecies,
+  ) {
     const gruntType = Number(invasion.grunt_type ?? 0)
     const info = state.event.invasions[gruntType]
     if (!gruntType || !info) return false
@@ -915,52 +994,35 @@ class Pokestop extends Model {
     ) {
       return false
     }
-    const isLeaderOrGiovanni = gruntType >= 41 && gruntType <= 44
-    if (!isLeaderOrGiovanni) {
-      if (
-        info.firstReward &&
-        (hasConfirmed && invasion.confirmed
-          ? this.hasRocketPokemonFilter(
-              filters,
-              invasion.slot_1_pokemon_id,
-              invasion.slot_1_form,
-            )
-          : info.encounters.first.some((poke) =>
-              this.hasRocketPokemonFilter(filters, poke.id, poke.form),
-            ))
-      ) {
-        return true
-      }
-
-      if (
-        info.secondReward &&
-        (hasConfirmed && invasion.confirmed
-          ? this.hasRocketPokemonFilter(
-              filters,
-              invasion.slot_2_pokemon_id,
-              invasion.slot_2_form,
-            )
-          : info.encounters.second.some((poke) =>
-              this.hasRocketPokemonFilter(filters, poke.id, poke.form),
-            ))
-      ) {
-        return true
-      }
-
-      if (
-        info.thirdReward &&
-        (hasConfirmed && invasion.confirmed
-          ? this.hasRocketPokemonFilter(
-              filters,
-              invasion.slot_3_pokemon_id,
-              invasion.slot_3_form,
-            )
-          : info.encounters.third.some((poke) =>
-              this.hasRocketPokemonFilter(filters, poke.id, poke.form),
-            ))
-      ) {
-        return true
-      }
+    if (
+      !isRocketPokemonFilterExcluded(gruntType) &&
+      ROCKET_REWARD_POSITIONS.some(({ name, enabled, pokemonId, form }) => {
+        if (!info[enabled]) return false
+        // Trust each observed slot independently. Confirmed incidents can still
+        // have partial lineups, so an absent slot falls back to event info.
+        if (
+          hasConfirmed &&
+          invasion.confirmed &&
+          Number(invasion[pokemonId]) > 0
+        ) {
+          return this.hasRocketPokemonFilter(
+            filters,
+            invasion[pokemonId],
+            invasion[form],
+            enabledRocketPokemonSpecies,
+          )
+        }
+        return info.encounters[name]?.some((poke) =>
+          this.hasRocketPokemonFilter(
+            filters,
+            poke.id,
+            poke.form,
+            enabledRocketPokemonSpecies,
+          ),
+        )
+      })
+    ) {
+      return true
     }
 
     return !!(
@@ -983,6 +1045,7 @@ class Pokestop extends Model {
     resultLimit,
   ) {
     const filteredResults = []
+    const enabledRocketPokemonSpecies = getEnabledRocketPokemonSpecies(filters)
     for (
       let i = 0;
       i < queryResults.length && filteredResults.length < resultLimit;
@@ -1070,7 +1133,12 @@ class Pokestop extends Model {
         (filters.onlyAllPokestops || filters.onlyInvasions)
       ) {
         filtered.invasions = pokestop.invasions.filter((invasion) =>
-          this.invasionMatchesFilters(invasion, filters, hasConfirmed),
+          this.invasionMatchesFilters(
+            invasion,
+            filters,
+            hasConfirmed,
+            enabledRocketPokemonSpecies,
+          ),
         )
       }
       if (
@@ -1538,9 +1606,18 @@ class Pokestop extends Model {
           'slot_3_pokemon_id',
           'slot_3_form',
         ])
-        .whereNotNull('slot_1_pokemon_id')
-        .whereNotNull('slot_2_pokemon_id')
-        .whereNotNull('slot_3_pokemon_id')
+        .where('confirmed', 1)
+        .andWhere(
+          multiInvasionMs ? 'expiration_ms' : 'expiration',
+          '>=',
+          ts * (multiInvasionMs ? 1000 : 1),
+        )
+        .where((slots) =>
+          slots
+            .where('slot_1_pokemon_id', '>', 0)
+            .orWhere('slot_2_pokemon_id', '>', 0)
+            .orWhere('slot_3_pokemon_id', '>', 0),
+        )
         .groupBy([
           'character',
           'slot_1_pokemon_id',
@@ -1696,29 +1773,35 @@ class Pokestop extends Model {
         case 'rocketPokemon':
           if (hasConfirmed) {
             rewards.forEach((reward) => {
-              // Exclude team leaders (41-43) and Giovanni (44)
-              if (reward.grunt_type >= 41 && reward.grunt_type <= 44) return
+              if (isRocketPokemonFilterExcluded(reward.grunt_type)) return
 
               const fullGrunt = state.event.invasions[reward.grunt_type]
-              if (fullGrunt?.firstReward) {
+              if (fullGrunt?.firstReward && reward.slot_1_pokemon_id > 0) {
                 finalList.add(
-                  `a${reward.slot_1_pokemon_id}-${reward.slot_1_form}`,
+                  getRocketPokemonFilterKey(
+                    reward.slot_1_pokemon_id,
+                    reward.slot_1_form,
+                  ),
                 )
               }
-              if (fullGrunt?.secondReward) {
+              if (fullGrunt?.secondReward && reward.slot_2_pokemon_id > 0) {
                 finalList.add(
-                  `a${reward.slot_2_pokemon_id}-${reward.slot_2_form}`,
+                  getRocketPokemonFilterKey(
+                    reward.slot_2_pokemon_id,
+                    reward.slot_2_form,
+                  ),
                 )
               }
-              if (fullGrunt?.thirdReward) {
+              if (fullGrunt?.thirdReward && reward.slot_3_pokemon_id > 0) {
                 finalList.add(
-                  `a${reward.slot_3_pokemon_id}-${reward.slot_3_form}`,
+                  getRocketPokemonFilterKey(
+                    reward.slot_3_pokemon_id,
+                    reward.slot_3_form,
+                  ),
                 )
               }
             })
           }
-
-          applyRocketPokemonFallback(finalList)
           break
         case 'showcase':
           if (hasShowcaseData) {
@@ -1748,6 +1831,8 @@ class Pokestop extends Model {
           break
       }
     })
+
+    applyRocketPokemonFallback(finalList)
 
     genericQuests.forEach((reward) =>
       process(
@@ -2025,8 +2110,10 @@ class Pokestop extends Model {
         .toLowerCase()
         .includes(search),
     )
-    const validMons = new Set(
-      state.event.available.pokestops.filter((a) => a.startsWith('a')),
+    const validPokemonIds = new Set(
+      state.event.available.pokestops
+        .filter((key) => key.startsWith('a'))
+        .map((key) => key.slice(1).split('-')[0]),
     )
     const pokemonIds = Object.keys(state.event.masterfile.pokemon)
       .filter(
@@ -2036,13 +2123,12 @@ class Pokestop extends Model {
             .normalize('NFD')
             .replace(/[\u0300-\u036f]/g, '')
             .toLowerCase()
-            .includes(search) &&
-          (validMons.has(`a${pkmn}-0`) ||
-            Object.keys(state.event.masterfile.pokemon[pkmn].forms || {}).some(
-              (form) => validMons.has(`a${pkmn}-${form}`),
-            )),
+            .includes(search) && validPokemonIds.has(pkmn),
       )
       .map((x) => +x)
+    const pokemonInvasions = Object.keys(state.event.invasions).filter(
+      (gruntType) => invasionHasMatchingRocketPokemon(gruntType, pokemonIds),
+    )
     if (!invasions.length && !pokemonIds.length) {
       return []
     }
@@ -2055,31 +2141,86 @@ class Pokestop extends Model {
     Pokestop.joinIncident(query, hasMultiInvasions, multiInvasionMs)
     query.select(distance)
 
-    query.andWhere('expiration', '>=', ts)
-    if (invasions.length) {
-      query.whereIn('character', invasions)
-    }
+    const characterColumn = hasMultiInvasions ? 'character' : 'grunt_type'
+    query.andWhere(
+      hasMultiInvasions
+        ? multiInvasionMs
+          ? 'expiration_ms'
+          : 'expiration'
+        : 'incident_expire_timestamp',
+      '>=',
+      ts * (hasMultiInvasions && multiInvasionMs ? 1000 : 1),
+    )
     if (hasConfirmed && pokemonIds.length) {
-      query.where((subQuery) => {
-        subQuery
-          .whereIn('slot_1_pokemon_id', pokemonIds)
-          .orWhereIn('slot_2_pokemon_id', pokemonIds)
-          .orWhereIn('slot_3_pokemon_id', pokemonIds)
+      const matchingGruntsByPosition =
+        getMatchingRocketGruntsByPosition(pokemonIds)
+      query.where((searchQuery) => {
+        const addPokemonSearch = (pokemonQuery) => {
+          pokemonQuery.where((confirmedQuery) => {
+            confirmedQuery
+              .whereNotIn(
+                characterColumn,
+                ROCKET_POKEMON_FILTER_EXCLUDED_CHARACTERS,
+              )
+              .andWhere('confirmed', 1)
+              .andWhere((slotQuery) => {
+                ROCKET_REWARD_POSITIONS.forEach(({ name, pokemonId }) => {
+                  slotQuery.orWhereIn(pokemonId, pokemonIds)
+                  if (matchingGruntsByPosition[name].length) {
+                    slotQuery.orWhere((missingSlotQuery) => {
+                      missingSlotQuery
+                        .whereIn(
+                          characterColumn,
+                          matchingGruntsByPosition[name],
+                        )
+                        .andWhere((missingPokemonQuery) => {
+                          missingPokemonQuery
+                            .whereNull(pokemonId)
+                            .orWhere(pokemonId, 0)
+                        })
+                    })
+                  }
+                })
+              })
+          })
+          if (pokemonInvasions.length) {
+            pokemonQuery.orWhere((unconfirmedQuery) => {
+              unconfirmedQuery
+                .whereIn(characterColumn, pokemonInvasions)
+                .andWhere((confirmationQuery) => {
+                  confirmationQuery
+                    .where('confirmed', 0)
+                    .orWhereNull('confirmed')
+                })
+            })
+          }
+        }
+        if (invasions.length) {
+          searchQuery
+            .whereIn(characterColumn, invasions)
+            .orWhere(addPokemonSearch)
+        } else {
+          searchQuery.where(addPokemonSearch)
+        }
       })
+    } else {
+      const searchCharacters = [...new Set([...invasions, ...pokemonInvasions])]
+      if (searchCharacters.length) {
+        query.whereIn(characterColumn, searchCharacters)
+      }
     }
     if (!getAreaSql(query, perms.areaRestrictions, onlyAreas)) {
       return []
     }
     const results = await query
+    const pokemonFilters = Object.fromEntries(
+      pokemonIds.map((pokemonId) => [getRocketPokemonFilterKey(pokemonId), {}]),
+    )
     return pokemonIds.length
-      ? results.filter(({ grunt_type }) =>
-          ['first', 'second', 'third'].some(
-            (pos) =>
-              state.event.invasions[grunt_type]?.[`${pos}Reward`] &&
-              state.event.invasions[grunt_type]?.encounters[pos]?.some((pkmn) =>
-                pokemonIds.includes(pkmn.id),
-              ),
-          ),
+      ? results.filter(
+          (invasion) =>
+            invasions.includes(String(invasion.grunt_type)) ||
+            this.invasionMatchesFilters(invasion, pokemonFilters, hasConfirmed),
         )
       : results
   }
