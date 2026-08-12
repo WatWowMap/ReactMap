@@ -197,6 +197,7 @@ const resolvers = {
             search,
             false,
             webhook.addressFormat,
+            webhook.geocoderProvider,
           )
         }
       }
@@ -465,6 +466,7 @@ const resolvers = {
                     { lat: result.lat, lon: result.lon },
                     true,
                     webhook.addressFormat,
+                    webhook.geocoderProvider,
                   ),
                 })),
               )
