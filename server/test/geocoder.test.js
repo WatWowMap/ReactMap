@@ -86,6 +86,28 @@ test('drops a feature with no usable coordinates', () => {
   assert.equal(formatPhotonFeature({ properties: { name: 'Nowhere' } }), null)
 })
 
+// A pair of the right length is not the same as a pair of usable numbers.
+// Emitting these would put a null or NaN latitude on the map rather than
+// dropping the result.
+test('drops a feature whose coordinates are not finite numbers', () => {
+  const unusable = [
+    [null, null],
+    [-104.9903, null],
+    [null, 39.7392],
+    ['-104.9903', '39.7392'],
+    [undefined, undefined],
+    [NaN, NaN],
+    [Infinity, 39.7392],
+  ]
+  unusable.forEach((coordinates) => {
+    assert.equal(
+      formatPhotonFeature(feature({ name: 'Nowhere' }, coordinates)),
+      null,
+      `${JSON.stringify(coordinates)} should be dropped`,
+    )
+  })
+})
+
 // Photon reports a result's own label only in properties.name. Nominatim
 // echoes it into the matching address field, and the whole locality fallback
 // depends on that echo happening.

@@ -138,6 +138,10 @@ function formatPhotonFeature(feature) {
 
   // GeoJSON is [longitude, latitude]. Never the other way around.
   const [longitude, latitude] = coordinates
+  // A well behaved Photon sends two numbers, but the length check alone would
+  // pass [null, null] straight through to an entry with a null latitude. Check
+  // the values, not just the shape.
+  if (!Number.isFinite(longitude) || !Number.isFinite(latitude)) return null
   const properties = feature.properties || {}
 
   const selfReferenced = PLACE_SELF_REFERENCE[properties.osm_value]
