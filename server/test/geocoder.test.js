@@ -3,6 +3,7 @@ const { test } = require('node:test')
 
 const NodeGeocoder = require('node-geocoder')
 
+const { PoracleAPI } = require('../src/services/Poracle')
 const {
   formatPhotonFeature,
   joinComponents,
@@ -247,4 +248,37 @@ test('the Photon path emits the same keys as the Nominatim path', () => {
   // And for this address the values agree too, which is the point of the
   // exercise: ReactMap should not be able to tell which backend answered.
   assert.deepEqual(fromPhoton, fromNominatim)
+})
+
+// Event.webhookObj holds PoracleAPI instances, not the raw webhook config, and
+// the constructor copies fields across one by one. A setting it forgets is
+// undefined by the time the resolvers read it, so the whole feature silently
+// takes the Nominatim branch. These cover that boundary rather than the
+// mapping.
+const webhookConfig = (overrides = {}) => ({
+  name: 'test',
+  host: 'http://127.0.0.1',
+  port: 3030,
+  enabled: true,
+  nominatimUrl: 'http://127.0.0.1:2322',
+  addressFormat: '{{city}}, {{state}}',
+  ...overrides,
+})
+
+test('PoracleAPI carries the configured geocoder provider through to the resolvers', () => {
+  const api = new PoracleAPI(webhookConfig({ geocoderProvider: 'photon' }))
+
+  // The three values resolvers.js hands to geocoder().
+  assert.equal(api.geocoderProvider, 'photon')
+  assert.equal(api.nominatimUrl, 'http://127.0.0.1:2322')
+  assert.equal(api.addressFormat, '{{city}}, {{state}}')
+})
+
+test('PoracleAPI leaves the provider undefined when it is not configured', () => {
+  const api = new PoracleAPI(webhookConfig())
+
+  // Undefined is what sends geocoder() down the Nominatim branch, which is the
+  // correct default for every existing config.
+  assert.equal(api.geocoderProvider, undefined)
+  assert.equal(api.nominatimUrl, 'http://127.0.0.1:2322')
 })

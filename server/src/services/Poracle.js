@@ -55,6 +55,7 @@ class PoracleAPI {
     this.areasToSkip = webhook.areasToSkip?.map((x) => x.toLowerCase()) || []
     this.addressFormat = webhook.addressFormat
     this.nominatimUrl = webhook.nominatimUrl
+    this.geocoderProvider = webhook.geocoderProvider
     this.enabled = webhook.enabled || false
 
     this.discordRoles = webhook.discordRoles || []
