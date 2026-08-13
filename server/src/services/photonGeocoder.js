@@ -19,6 +19,8 @@ const { fetchJson } = require('../utils/fetchJson')
  * @property {string} [street]
  * @property {string} [postcode]
  * @property {string} [city]
+ * @property {string} [locality] A settlement below Photon's city layer, such
+ *   as the hamlet a rural address sits in. Present when `city` is not.
  * @property {string} [county]
  * @property {string} [state]
  * @property {string} [country]
@@ -100,9 +102,9 @@ function preferBroader(parts) {
 
 /**
  * @param {PhotonProperties} properties
- * @param {string} locality
+ * @param {string} settlement The resolved city, town, village, hamlet or locality
  */
-function buildFormattedAddress(properties, locality) {
+function buildFormattedAddress(properties, settlement) {
   const street = joinComponents([properties.housenumber, properties.street])
 
   // The result's own name leads. When it was already echoed into a hierarchy
@@ -111,7 +113,7 @@ function buildFormattedAddress(properties, locality) {
     properties.name,
     ...preferBroader([
       street,
-      locality,
+      settlement,
       properties.county,
       properties.state,
       properties.postcode,
@@ -152,15 +154,23 @@ function formatPhotonFeature(feature) {
   const city = properties.city || named('city')
   const town = named('town')
   const village = named('village')
-  const locality = city || town || village || named('hamlet') || ''
+  // Photon's hierarchy runs city > district > locality > street, so an address
+  // whose containing settlement sits below the city layer carries that name in
+  // `locality` and has no `city` at all. Without it a rural address loses its
+  // settlement from both `city` and formattedAddress. Named `settlement` rather
+  // than `locality` so it is not confused with the Photon field it falls back
+  // to.
+  const settlement =
+    city || town || village || named('hamlet') || properties.locality || ''
 
   return {
     latitude,
     longitude,
-    formattedAddress: buildFormattedAddress(properties, locality),
+    formattedAddress: buildFormattedAddress(properties, settlement),
     country: properties.country,
-    // Mirrors _formatResult's own city/town/village/hamlet fallback.
-    city: locality || undefined,
+    // Mirrors _formatResult's own city/town/village/hamlet fallback, with
+    // Photon's locality layer appended to it.
+    city: settlement || undefined,
     state: properties.state,
     zipcode: properties.postcode,
     streetName:

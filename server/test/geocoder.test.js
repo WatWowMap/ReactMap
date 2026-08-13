@@ -129,6 +129,50 @@ test('echoes the result name into its locality field', () => {
   })
 })
 
+// A house in a hamlet: Photon puts the containing settlement in `locality` and
+// sends no `city` at all. Reading only `city` drops the settlement from both
+// the entry and the formatted address, so a {{city}} format renders blank for
+// every rural address.
+test('falls back to Photon locality when there is no city', () => {
+  const got = formatPhotonFeature(
+    feature(
+      {
+        housenumber: '4',
+        street: 'County Road 15',
+        locality: 'Bootjack',
+        county: 'Mariposa County',
+        state: 'California',
+        postcode: '95338',
+        country: 'United States',
+        countrycode: 'US',
+        osm_key: 'building',
+        osm_value: 'yes',
+      },
+      [-119.9515, 37.4744],
+    ),
+  )
+  assert.equal(got.city, 'Bootjack')
+  assert.equal(
+    got.formattedAddress,
+    '4, County Road 15, Bootjack, Mariposa County, California, 95338, United States',
+  )
+})
+
+// Photon's own hierarchy puts city above locality, so a response carrying both
+// must not demote the city.
+test('prefers city over locality when Photon sends both', () => {
+  const got = formatPhotonFeature(
+    feature({
+      city: 'Mariposa',
+      locality: 'Bootjack',
+      state: 'California',
+      country: 'United States',
+      countrycode: 'US',
+    }),
+  )
+  assert.equal(got.city, 'Mariposa')
+})
+
 test('uses the result name as the street for a road', () => {
   const got = formatPhotonFeature(
     feature({
