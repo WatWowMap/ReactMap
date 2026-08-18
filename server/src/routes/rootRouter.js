@@ -13,6 +13,9 @@ const { clientRouter } = require('./clientRouter')
 const { apiRouter } = require('./api')
 const { areaPerms } = require('../utils/areaPerms')
 const { getServerSettings } = require('../utils/getServerSettings')
+const {
+  hasAnyPokestopPermission,
+} = require('../utils/hasAnyPokestopPermission')
 const { secretMiddleware } = require('../middleware/secret')
 const { version } = require('../../../package.json')
 const { state } = require('../services/state')
@@ -206,10 +209,7 @@ rootRouter.get('/api/settings', async (req, res, next) => {
           state.event.setAvailable('gyms', 'Gym', state.db),
         ])
       }
-      if (
-        api.queryOnSessionInit.quests &&
-        (perms.quests || perms.pokestops || perms.invasions || perms.lures)
-      ) {
+      if (api.queryOnSessionInit.quests && hasAnyPokestopPermission(perms)) {
         refreshes.push([
           'pokestops',
           state.event.setAvailable('pokestops', 'Pokestop', state.db),

@@ -73,9 +73,10 @@ function buildPokestopDnfFilters(filters, eventInvasions) {
   const lureId = []
   const incidentCharacter = new Set() // 'i' grunt character ids
   const rocketPokemonIds = new Set() // 'a<pokemon>' reward ids
-  const incidentDisplayType = []
+  const incidentDisplayType = new Set()
   const contestPokemon = []
   const contestPokemonType = []
+  const contestFocus = []
 
   Object.keys(filters).forEach((key) => {
     if (typeof key !== 'string' || key.length === 0) return
@@ -133,7 +134,12 @@ function buildPokestopDnfFilters(filters, eventInvasions) {
         if (Number.isFinite(n)) incidentCharacter.add(n)
         break
       case 'b':
-        if (Number.isFinite(n)) incidentDisplayType.push(n)
+        if (Number.isFinite(n)) incidentDisplayType.add(n)
+        break
+      case 'y':
+        if (Number.isInteger(n) && n > 0 && n <= 127) {
+          contestFocus.push({ type: 'buddy', min_level: n })
+        }
         break
       case 'a': {
         // `a<pokemon>-<form>` rocket reward: match by pokemon id (form ignored,
@@ -264,11 +270,12 @@ function buildPokestopDnfFilters(filters, eventInvasions) {
     // `b<display_type>` keys (goldstop/kecleon/showcase incidents) are consumed
     // by secondaryFilter's EVENTS branch (gated on onlyEventStops), not the
     // invasions branch — grunt-less incidents never match invasionMatchesFilters.
-    if (incidentDisplayType.length)
-      clauses.push({ incident_display_type: incidentDisplayType })
+    if (incidentDisplayType.size)
+      clauses.push({ incident_display_type: [...incidentDisplayType] })
     if (contestPokemon.length) clauses.push({ contest_pokemon: contestPokemon })
     if (contestPokemonType.length)
       clauses.push({ contest_pokemon_type: contestPokemonType })
+    if (contestFocus.length) clauses.push({ contest_focus: contestFocus })
   }
   if (onlyArEligible) clauses.push({ is_ar_scan_eligible: true })
 

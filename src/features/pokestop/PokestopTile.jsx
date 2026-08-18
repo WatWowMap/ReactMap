@@ -10,6 +10,7 @@ import { useRouteStore, resolveRoutePoiKey } from '@features/route'
 import { useForcePopup } from '@hooks/useForcePopup'
 import { useManualPopupTracker } from '@hooks/useManualPopupTracker'
 import { TooltipWrapper } from '@components/ToolTipWrapper'
+import { isBuddyShowcaseFocus } from '@utils/showcaseFocus'
 
 import { PokestopPopup } from './PokestopPopup'
 import {
@@ -117,9 +118,10 @@ const BasePokestopTile = (pokestop) => {
     canShowInvasions && visibleMarkerInvasions.length
   )
   const hasVisibleEvent = !!visibleMarkerEvents.length
-  const hasVisibleShowcase = visibleMarkerEvents.some(
+  const hasRemoteEligibleShowcase = visibleMarkerEvents.some(
     (event) =>
-      Number(event.display_type ?? 0) === INCIDENT_DISPLAY_TYPES.SHOWCASE,
+      Number(event.display_type ?? 0) === INCIDENT_DISPLAY_TYPES.SHOWCASE &&
+      !isBuddyShowcaseFocus(event.showcase_focus),
   )
   const hasAllStops = !!(
     (showAllStops || pokestop.ar_scan_eligible) &&
@@ -128,7 +130,7 @@ const BasePokestopTile = (pokestop) => {
   const withinRangeZoom = zoom >= interactionRangeZoom
   const lureRange = showLureRange && withinRangeZoom
   const showcaseRange =
-    showShowcaseRange && withinRangeZoom && hasVisibleShowcase
+    showShowcaseRange && withinRangeZoom && hasRemoteEligibleShowcase
   const interactionRange = showInteractionRange && withinRangeZoom
   const renderedCustomRange = withinRangeZoom ? customRange : 0
 
@@ -278,7 +280,11 @@ export const PokestopTile = React.memo(
           (event, i) =>
             event.display_type === next.events?.[i]?.display_type &&
             event.event_expire_timestamp ===
-              next.events?.[i]?.event_expire_timestamp,
+              next.events?.[i]?.event_expire_timestamp &&
+            event.showcase_focus?.type ===
+              next.events?.[i]?.showcase_focus?.type &&
+            event.showcase_focus?.min_level ===
+              next.events?.[i]?.showcase_focus?.min_level,
         )
       : true),
 )

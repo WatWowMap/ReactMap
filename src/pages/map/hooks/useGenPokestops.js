@@ -2,6 +2,7 @@
 import { useMemory } from '@store/useMemory'
 import { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
+import { getShowcaseBuddyFilterLabelKey } from '@utils/showcaseFocus'
 
 export function useGenPokestops() {
   const { t } = useTranslation()
@@ -76,6 +77,18 @@ export function useGenPokestops() {
           case 'f':
             if (tempObj.showcase) {
               const name = t(`poke_${id.slice(1).split('-')[0]}`)
+              tempObj.showcase[id] = {
+                name,
+                perms: ['eventStops'],
+              }
+              tempObj.showcase[id].searchMeta = `${t(
+                'showcase',
+              ).toLowerCase()} ${name.toLowerCase()}`
+            }
+            break
+          case 'y':
+            if (tempObj.showcase) {
+              const name = t(getShowcaseBuddyFilterLabelKey(id))
               tempObj.showcase[id] = {
                 name,
                 perms: ['eventStops'],

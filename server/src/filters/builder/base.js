@@ -12,6 +12,9 @@ const {
   getQuestLayerMode,
   isDualQuestLayerMode,
 } = require('../../utils/questLayerMode')
+const {
+  hasAnyPokestopPermission,
+} = require('../../utils/hasAnyPokestopPermission')
 
 /**
  * @param {import("@rm/types").Permissions} perms
@@ -38,8 +41,7 @@ function buildDefaultFilters(perms) {
     defaultFilters.pokemon.globalValues.xxl,
   )
 
-  const stopReducer =
-    perms.pokestops || perms.lures || perms.quests || perms.invasions
+  const stopReducer = hasAnyPokestopPermission(perms)
   const gymReducer = perms.gyms || perms.raids
   const pokemonReducer = perms.iv || perms.pvp
   const stationReducer = perms.stations || perms.dynamax
@@ -117,7 +119,7 @@ function buildDefaultFilters(perms) {
             filter: {
               ...pokemon.rocket,
               ...buildPokestops(perms, defaultFilters.pokestops),
-              ...pokemon.quests,
+              ...(perms.quests ? pokemon.quests : {}),
             },
           }
         : undefined,

@@ -107,6 +107,7 @@ function SelectorList({
               return (
                 key.startsWith('f') ||
                 key.startsWith('h') ||
+                key.startsWith('y') ||
                 key.startsWith('b')
               )
             case 'rocketPokemon':

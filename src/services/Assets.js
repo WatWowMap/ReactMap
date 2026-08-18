@@ -288,6 +288,9 @@ export class UAssets {
       case 'x':
         // xl candy
         return this.getRewards(9, ...id.slice(1).split('-'))
+      case 'y':
+        // buddy Showcase minimum
+        return this.getEventStops(9)
       default:
         // pokemon
         return this.getPokemon(...id.split('-'))

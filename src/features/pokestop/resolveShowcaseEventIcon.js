@@ -1,9 +1,15 @@
 // @ts-check
 
+import {
+  getShowcaseBuddyFilterKey,
+  getShowcaseBuddyLabelKey,
+} from '@utils/showcaseFocus'
+
 /**
  * Resolve showcase event icon metadata for marker and popup rendering.
  * @param {{
  *  display_type: number | string,
+ *  showcase_focus?: unknown,
  *  showcase_pokemon_id?: number | null,
  *  showcase_pokemon_form_id?: number | null,
  *  showcase_pokemon_type_id?: number | null,
@@ -17,6 +23,16 @@
  * }}
  */
 export function resolveShowcaseEventIcon(event, Icons) {
+  const buddyFilterKey = getShowcaseBuddyFilterKey(event.showcase_focus)
+  const buddyLabelKey = getShowcaseBuddyLabelKey(event.showcase_focus)
+  if (buddyLabelKey) {
+    return {
+      url: Icons.getEventStops(event.display_type),
+      decoration: false,
+      tooltipKey: buddyLabelKey,
+      sizeFilterKey: buddyFilterKey || `b${event.display_type}`,
+    }
+  }
   if (event.showcase_pokemon_id) {
     const formId = event.showcase_pokemon_form_id ?? 0
     return {

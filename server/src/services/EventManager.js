@@ -154,18 +154,15 @@ class EventManager extends Logger {
    */
   async #refreshAvailable(category, model, Db, generation) {
     const result = await Db.getAvailable(model)
-    // null = total source failure (getAvailable): keep the last-good drawer +
-    // conditions and retry on the next call. A successful snapshot — even an
-    // empty one, when a category's last active option disappears — falls
-    // through and commits, so the drawer clears instead of showing stale
-    // filters forever.
-    if (result == null) return
     // A newer refresh (typically a forced reload) started while this one was
     // awaiting Golbat/SQL; it owns the current Db, so drop this superseded
     // result rather than committing/TTL-stamping data from an old generation.
     // This must precede applyAvailableMetadata below so the drawer AND the
     // manager metadata (questConditions/rarity) commit as one gated snapshot.
     if (this.availableGeneration[category] !== generation) return
+    // null = total source failure (getAvailable): retain the last-good drawer
+    // and conditions, and retry on the next call.
+    if (result == null) return
     const { available } = result
 
     /** @param {string} key */
