@@ -46,7 +46,7 @@ const SEARCH_LIMIT = 10
  * name into the matching address field, so searching "Denver" yields a city of
  * Denver. These are the OSM classifications where that echo matters, because
  * they are the ones `_formatResult` reads.
- * @type {Record<string, 'city' | 'town' | 'village' | 'hamlet'>}
+ * @type {Set<string>}
  */
 const SETTLEMENT_OSM_VALUES = new Set(['city', 'town', 'village', 'hamlet'])
 
