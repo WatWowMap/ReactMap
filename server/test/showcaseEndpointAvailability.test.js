@@ -2,6 +2,8 @@ const assert = require('node:assert/strict')
 const { test } = require('node:test')
 const knexFactory = require('knex')
 
+require('./stateMock')
+
 const fortAvailable = require('../src/utils/fortAvailable')
 
 test('endpoint availability uses Golbat Showcase focus without SQL supplementation', async (t) => {

@@ -1,3 +1,11 @@
+# [1.50.0](https://github.com/WatWowMap/ReactMap/compare/v1.49.2...v1.50.0) (2026-08-19)
+
+
+### Features
+
+* **geocoder:** add native Photon provider ([#1242](https://github.com/WatWowMap/ReactMap/issues/1242)) ([b3b9e81](https://github.com/WatWowMap/ReactMap/commit/b3b9e81762a5893a6e5966671767b679855fac61))
+* showcase focus buddy support ([16bd28f](https://github.com/WatWowMap/ReactMap/commit/16bd28fe1db5a966012bd8205d2b1f373153666f)), closes [#1090](https://github.com/WatWowMap/ReactMap/issues/1090)
+
 ## [1.49.2](https://github.com/WatWowMap/ReactMap/compare/v1.49.1...v1.49.2) (2026-08-11)
 
 

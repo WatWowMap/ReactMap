@@ -1,6 +1,6 @@
 {
   "name": "reactmap",
-  "version": "1.49.2",
+  "version": "1.50.0",
   "private": true,
   "description": "React based frontend map.",
   "license": "MIT",
@@ -29,7 +29,7 @@
     "release": "vite build -- -r",
     "server": "node server/src/index.js",
     "start": "node .",
-    "test": "yarn workspace @rm/masterfile run test && node --test server/test/*.test.js",
+    "test": "yarn workspace @rm/masterfile run test && node --experimental-test-module-mocks --test server/test/*.test.js",
     "prepare": "husky install",
     "watch": "vite"
   },

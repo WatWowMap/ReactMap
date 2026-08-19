@@ -2,6 +2,8 @@ const assert = require('node:assert/strict')
 const { test } = require('node:test')
 const knexFactory = require('knex')
 
+require('./stateMock')
+
 const scannerQuery = require('../src/utils/evalScannerQuery')
 const areaSql = require('../src/utils/getAreaSql')
 const questLayerMode = require('../src/utils/questLayerMode')

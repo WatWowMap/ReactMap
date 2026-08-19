@@ -199,7 +199,14 @@ export interface Webhook {
   port: number
   poracleSecret: string
   addressFormat?: string
+  /** Base URL of the geocoding backend. Used for both providers. */
   nominatimUrl?: string
+  /**
+   * Which geocoding backend `nominatimUrl` points at. Photon speaks GeoJSON
+   * rather than Nominatim's JSON, so it needs its own request and response
+   * handling. Defaults to `nominatim`.
+   */
+  geocoderProvider?: 'nominatim' | 'photon'
   trialPeriodEligible?: boolean
   areasToSkip: string[]
   discordRoles: []
