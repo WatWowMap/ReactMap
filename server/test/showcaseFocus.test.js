@@ -2,6 +2,7 @@ const assert = require('node:assert/strict')
 const { test } = require('node:test')
 const knexFactory = require('knex')
 
+const { state } = require('./stateMock')
 const { buildDefaultFilters } = require('../src/filters/builder/base')
 const { buildPokestops } = require('../src/filters/builder/pokestop')
 const { buildPokestopDnfFilters } = require('../src/filters/fort/pokestop')
@@ -12,7 +13,6 @@ const {
   mapAvailablePokestops,
 } = require('../src/models/pokestopAvailableMapper')
 const { mapScanPokestop } = require('../src/models/pokestopScanMapper')
-const { state } = require('../src/services/state')
 const {
   hasAnyPokestopPermission,
 } = require('../src/utils/hasAnyPokestopPermission')

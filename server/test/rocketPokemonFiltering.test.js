@@ -4,12 +4,13 @@ const i18next = require('i18next')
 const knexFactory = require('knex')
 
 const config = require('@rm/config')
+
+const { state } = require('./stateMock')
 const { buildPokestops } = require('../src/filters/builder/pokestop')
 const { Pokestop } = require('../src/models/Pokestop')
 const {
   mapAvailablePokestops,
 } = require('../src/models/pokestopAvailableMapper')
-const { state } = require('../src/services/state')
 const {
   ROCKET_POKEMON_FILTER_EXCLUDED_CHARACTERS,
   collapseRocketPokemonFilterKeys,
