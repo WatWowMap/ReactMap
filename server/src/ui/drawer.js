@@ -5,6 +5,9 @@ const {
   isDualQuestLayerMode,
   getQuestLayerMode,
 } = require('../utils/questLayerMode')
+const {
+  hasAnyPokestopPermission,
+} = require('../utils/hasAnyPokestopPermission')
 
 /** @typedef {import('@rm/types').RMSlider} Slider */
 
@@ -57,8 +60,7 @@ function drawer(req, perms) {
           }
         : BLOCKED,
     pokestops:
-      (perms.pokestops || perms.quests || perms.invasions || perms.lures) &&
-      state.db.models.Pokestop
+      hasAnyPokestopPermission(perms) && state.db.models.Pokestop
         ? {
             allPokestops: perms.pokestops || BLOCKED,
             quests: perms.quests || BLOCKED,

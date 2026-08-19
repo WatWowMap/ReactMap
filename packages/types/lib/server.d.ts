@@ -23,6 +23,7 @@ import type { EventManager } from 'server/src/services/EventManager'
 import { ModelReturn, OnlyType } from './utility'
 import { Profile } from 'passport-discord'
 import { User } from './models'
+import { ShowcaseFocus } from './scanner'
 import { Config } from '@rm/types'
 import { OperationTypeNode } from 'graphql'
 
@@ -43,6 +44,7 @@ export interface DbContext {
   hasShowcaseData: boolean
   hasShowcaseForm: boolean
   hasShowcaseType: boolean
+  hasShowcaseFocus: boolean
   hasMultiBattles: boolean
   hasStationedGmax: boolean
   hasBattlePokemonStats: boolean
@@ -103,9 +105,11 @@ export interface AvailablePokestopShowcase {
   pokemon_id: number | null
   form: number | null
   type_id: number | null
+  showcase_focus: ShowcaseFocus | null
 }
 
 export interface AvailablePokestops {
+  showcase_focus_filter: boolean
   quests: AvailablePokestopQuest[]
   invasions: AvailablePokestopInvasion[]
   lures: AvailablePokestopLure[]

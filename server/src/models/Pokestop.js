@@ -35,6 +35,12 @@ const {
   resolveQuestLayerSelection,
 } = require('../utils/questLayerMode')
 const { mapAvailablePokestops } = require('./pokestopAvailableMapper')
+const {
+  getShowcaseEventFilterKey,
+  getShowcaseFocusDisplay,
+  getShowcaseFocusFilterKey,
+  parseShowcaseFocus,
+} = require('../utils/showcaseFocus')
 
 const MEGA_RESOURCE_REWARD_TYPE = 12
 const TEMP_EVO_BRANCH_RESOURCE_REWARD_TYPE = 20
@@ -265,25 +271,6 @@ class Pokestop extends Model {
     },
   ) {
     const {
-      filters: {
-        onlyLevels = 'all',
-        onlyLures,
-        onlyQuests,
-        onlyInvasions,
-        onlyArEligible,
-        onlyAllPokestops,
-        onlyEventStops,
-        onlyConfirmed,
-        onlyAreas = [],
-        onlyExcludeGrunts,
-        onlyExcludeLeaders,
-      },
-    } = args
-    const midnight = getUserMidnight(args)
-    const ts = Math.floor(Date.now() / 1000)
-    const { queryLimits, stopValidDataLimit, hideOldPokestops } =
-      config.getSafe('api')
-    const {
       lures: lurePerms,
       quests: questPerms,
       invasions: invasionPerms,
@@ -291,11 +278,50 @@ class Pokestop extends Model {
       eventStops: eventStopPerms,
       areaRestrictions,
     } = perms
+    // All-stop and AR-only modes expose ordinary Pokestops, so authorize both
+    // at the model boundary before either SQL or Golbat sees the request.
+    // Never mutate the shared GraphQL args: DbManager fans them out to sources
+    // concurrently.
+    const filters = {
+      ...(args.filters || {}),
+      onlyAllPokestops: Boolean(
+        pokestopPerms && args.filters?.onlyAllPokestops,
+      ),
+      onlyArEligible: Boolean(pokestopPerms && args.filters?.onlyArEligible),
+    }
+    const {
+      onlyLevels = 'all',
+      onlyLures,
+      onlyQuests,
+      onlyInvasions,
+      onlyArEligible,
+      onlyAllPokestops,
+      onlyEventStops,
+      onlyConfirmed,
+      onlyAreas = [],
+      onlyExcludeGrunts,
+      onlyExcludeLeaders,
+    } = filters
+    const midnight = getUserMidnight(args)
+    const ts = Math.floor(Date.now() / 1000)
+    const { queryLimits, stopValidDataLimit, hideOldPokestops } =
+      config.getSafe('api')
     const effectiveOnlyArEligible = isDualQuestLayerMode() && onlyArEligible
     const effectiveQuestLayer = resolveQuestLayerSelection(
-      args.filters.onlyShowQuestSet,
+      filters.onlyShowQuestSet,
       { hasAltQuests },
     )
+    if (
+      !onlyAllPokestops &&
+      !effectiveOnlyArEligible &&
+      !(onlyLures && lurePerms) &&
+      !(onlyQuests && questPerms) &&
+      !(onlyInvasions && invasionPerms) &&
+      !(onlyEventStops && eventStopPerms)
+    ) {
+      return []
+    }
+    const dnfFilters = buildPokestopDnfFilters(filters, state.event.invasions)
 
     const query = this.query()
     if (hideOldPokestops) {
@@ -303,7 +329,7 @@ class Pokestop extends Model {
     }
     Pokestop.joinIncident(query, hasMultiInvasions, multiInvasionMs)
     applyManualIdFilter(query, {
-      manualId: args.filters.onlyManualId,
+      manualId: filters.onlyManualId,
       latColumn: 'pokestop.lat',
       lonColumn: 'pokestop.lon',
       idColumn: 'pokestop.id',
@@ -335,12 +361,13 @@ class Pokestop extends Model {
       const displayTypes = []
       let hasShowcase = false
       // preps arrays for interested objects
-      Object.keys(args.filters).forEach((pokestop) => {
+      Object.keys(filters).forEach((pokestop) => {
         switch (pokestop.charAt(0)) {
           case 'o':
             break
           case 'f':
           case 'h':
+          case 'y':
             hasShowcase = true
             break
           case 'd':
@@ -775,8 +802,10 @@ class Pokestop extends Model {
     } else if (onlyLevels !== 'all' && hasPowerUp) {
       query.andWhere('power_up_level', onlyLevels)
     }
-    // Endpoint-backed source: fetch the DNF-less match-all scan and map each
-    // Golbat row into the mapRDM shape secondaryFilter expects. Mirrors
+    // Endpoint-backed source: fetch the DNF scan and map each Golbat row into
+    // the mapRDM shape secondaryFilter expects. Golbat applies contest_focus
+    // inside its DNF matcher before max_fort_results, so Buddy filters stay on
+    // the endpoint path without unrelated Showcases consuming the cap. Mirrors
     // Gym.getAll — the same secondaryFilter runs for both SQL and endpoint
     // rows. `with_incidents:true` makes Golbat attach invasions[] (grunts +
     // showcase/goldstop/kecleon event rows). On any failure/bad-shape we log
@@ -787,14 +816,13 @@ class Pokestop extends Model {
       // endpoint rows (else a no-area user under strict mode sees everything).
       if (areaRestrictionsDenyAll(areaRestrictions, onlyAreas)) return []
       try {
-        const dnf = buildPokestopDnfFilters(args.filters, state.event.invasions)
         // Endpoint rows always carry BOTH quest layers, so resolve the layer
         // selection as dual-capable (mirrors getAvailable's override). The SQL
         // ctx flags are undefined for a pure-endpoint source, which would make
         // effectiveQuestLayer resolve to 'both' even when questLayerMode
         // restricts to a single layer.
         const memQuestLayer = resolveQuestLayerSelection(
-          args.filters.onlyShowQuestSet,
+          filters.onlyShowQuestSet,
           { hasAltQuests: true },
         )
         const res = await evalScannerQuery(
@@ -810,7 +838,7 @@ class Pokestop extends Model {
             // queryLimits.pokestops is applied below as the display cap, after
             // those local gates.
             limit: 0,
-            filters: dnf,
+            filters: dnfFilters,
             with_incidents: true,
           }),
           'POST',
@@ -819,7 +847,7 @@ class Pokestop extends Model {
         )
         if (res && Array.isArray(res.pokestops)) {
           // Deep-link parity with SQL's `(bbox) OR id = manualId` — see Gym.
-          const manualId = normalizeManualId(args.filters.onlyManualId)
+          const manualId = normalizeManualId(filters.onlyManualId)
           if (
             manualId !== null &&
             !res.pokestops.some((p) => p && p.id === manualId)
@@ -865,7 +893,7 @@ class Pokestop extends Model {
           // the appended off-viewport manual-id row before filtering.
           const final = this.secondaryFilter(
             mapped,
-            args.filters,
+            filters,
             ts,
             midnight,
             perms,
@@ -881,7 +909,7 @@ class Pokestop extends Model {
             TAGS.pokestops,
             describeDnfNarrowing(
               'POKESTOP',
-              dnf,
+              dnfFilters,
               res.examined,
               res.pokestops.length,
               final.length,
@@ -907,7 +935,7 @@ class Pokestop extends Model {
     const normalized = this.mapRDM(results, ts)
     const finalResults = this.secondaryFilter(
       normalized,
-      args.filters,
+      filters,
       ts,
       midnight,
       perms,
@@ -1088,6 +1116,9 @@ class Pokestop extends Model {
         perms.eventStops &&
         (filters.onlyAllPokestops || filters.onlyEventStops)
       ) {
+        const showcaseFocus = parseShowcaseFocus(pokestop.showcase_focus)
+        const showcaseFocusDisplay = getShowcaseFocusDisplay(showcaseFocus)
+        const useLegacyShowcaseFields = !showcaseFocusDisplay
         const showcaseData =
           typeof pokestop.showcase_rankings === 'string'
             ? JSON.parse(pokestop.showcase_rankings)
@@ -1100,15 +1131,24 @@ class Pokestop extends Model {
           .map((event) => ({
             event_expire_timestamp: event.incident_expire_timestamp,
             showcase_pokemon_id:
-              event.display_type === 9 ? pokestop.showcase_pokemon_id : null,
+              event.display_type === 9
+                ? useLegacyShowcaseFields
+                  ? pokestop.showcase_pokemon_id
+                  : showcaseFocusDisplay.pokemonId
+                : null,
             showcase_pokemon_form_id:
               event.display_type === 9
-                ? pokestop.showcase_pokemon_form_id
+                ? useLegacyShowcaseFields
+                  ? pokestop.showcase_pokemon_form_id
+                  : showcaseFocusDisplay.pokemonFormId
                 : null,
             showcase_pokemon_type_id:
               event.display_type === 9
-                ? pokestop.showcase_pokemon_type_id
+                ? useLegacyShowcaseFields
+                  ? pokestop.showcase_pokemon_type_id
+                  : showcaseFocusDisplay.pokemonTypeId
                 : null,
+            showcase_focus: event.display_type === 9 ? showcaseFocus : null,
             showcase_rankings: event.display_type === 9 ? showcaseData : null,
             showcase_ranking_standard:
               event.display_type === 9
@@ -1116,17 +1156,7 @@ class Pokestop extends Model {
                 : null,
             display_type: event.display_type,
           }))
-          .filter((event) =>
-            event.showcase_pokemon_id
-              ? filters[
-                  `f${event.showcase_pokemon_id}-${
-                    event.showcase_pokemon_form_id ?? 0
-                  }`
-                ]
-              : event.showcase_pokemon_type_id
-                ? filters[`h${event.showcase_pokemon_type_id}`]
-                : filters[`b${event.display_type}`],
-          )
+          .filter((event) => filters[getShowcaseEventFilterKey(event)])
       }
       if (
         perms.invasions &&
@@ -1280,10 +1310,12 @@ class Pokestop extends Model {
     hasShowcaseData,
     hasShowcaseForm,
     hasShowcaseType,
+    hasShowcaseFocus,
     mem,
     secret,
     httpAuth,
   }) {
+    const ts = Math.floor(Date.now() / 1000)
     // A source with a Golbat endpoint (mem truthy) fetches the available list
     // from the endpoint. On failure (503 when fort_in_memory is off, or a
     // network error) it falls through to the SQL block below: a DUAL source
@@ -1291,6 +1323,9 @@ class Pokestop extends Model {
     // pure-endpoint source has no bound knex, so this.query() throws and the
     // caller's Promise.allSettled drops it (contributing nothing).
     if (mem) {
+      let res
+      let endpointError
+      let malformedResponse = false
       try {
         // From the combined /api/fort/available (see Gym.getAvailable) — no
         // per-type fallback; a combined failure falls through to SQL below.
@@ -1300,42 +1335,74 @@ class Pokestop extends Model {
           secret,
           httpAuth,
         )
-        const res = combined?.pokestops
-        // getCombinedFortAvailable resolves null when the endpoint is
-        // unavailable (e.g. 503 when fort_in_memory is off, or a network
-        // error), so res is undefined and this guard falls through to SQL.
-        if (res && Array.isArray(res.quests) && Array.isArray(res.invasions)) {
-          // The Golbat endpoint always returns both AR (`with_ar:true`) and
-          // non-AR quest tuples; honor `map.misc.questLayerMode` the same way
-          // the SQL path does so we don't advertise filters for a hidden layer.
-          const questLayer = resolveQuestLayerSelection('both', {
-            hasAltQuests: true,
-          })
-          const result = mapAvailablePokestops(res, {
+        res = combined?.pokestops
+      } catch (e) {
+        endpointError = e
+      }
+      // A returned Pokestop payload must implement the approved exact focus
+      // contract. Do not let an outdated endpoint masquerade as a transient
+      // failure and fall through to SQL.
+      const hasPayload = res && typeof res === 'object' && !Array.isArray(res)
+      if (hasPayload && res.showcase_focus_filter !== true) {
+        throw new Error(
+          'Golbat lacks the required showcase_focus_filter capability',
+        )
+      }
+      // Transport failures and malformed responses may use the source's
+      // normal SQL fallback. Keep only the mapper call inside this catch so
+      // internal processing errors remain visible.
+      if (
+        hasPayload &&
+        Array.isArray(res.quests) &&
+        Array.isArray(res.invasions)
+      ) {
+        // The Golbat endpoint always returns both AR (`with_ar:true`) and
+        // non-AR quest tuples; honor `map.misc.questLayerMode` the same way
+        // the SQL path does so we don't advertise filters for a hidden layer.
+        const questLayer = resolveQuestLayerSelection('both', {
+          hasAltQuests: true,
+        })
+        let result
+        try {
+          result = mapAvailablePokestops(res, {
             invasions: state.event.invasions,
             includeBaseQuests: questLayer !== 'without_ar',
             includeAltQuests: questLayer !== 'with_ar',
           })
+        } catch (e) {
+          endpointError = e
+          malformedResponse = true
+        }
+        if (result) {
           const availableSet = new Set(result.available)
           applyRocketPokemonFallback(availableSet)
           log.info(
             TAGS.pokestops,
             `[POKESTOP] loaded available from ${mem}/api/fort/available — ${availableSet.size} filter keys (${res.quests.length} quests, ${res.invasions.length} invasions, ${(res.lures || []).length} lures, ${(res.showcases || []).length} showcases), ${Object.keys(result.conditions).length} reward conditions`,
           )
-          return { available: [...availableSet], conditions: result.conditions }
+          return {
+            available: [...availableSet],
+            conditions: result.conditions,
+          }
         }
+      }
+      if (endpointError) {
         log.warn(
           TAGS.pokestops,
-          '[POKESTOP] /api/fort/available unavailable (e.g. fort_in_memory off) — falling through to SQL (empty only for a pure-endpoint source)',
+          `[POKESTOP] /api/fort/available ${
+            malformedResponse ? 'malformed payload' : 'error'
+          } — falling through to SQL (empty only for a pure-endpoint source): ${endpointError}`,
         )
-      } catch (e) {
+      } else {
+        // getCombinedFortAvailable resolves null when the endpoint is
+        // unavailable (e.g. 503 when fort_in_memory is off, or a network
+        // error), so res is undefined and this branch falls through to SQL.
         log.warn(
           TAGS.pokestops,
-          `[POKESTOP] /api/fort/available error — falling through to SQL (empty only for a pure-endpoint source): ${e}`,
+          '[POKESTOP] /api/fort/available unavailable or malformed (e.g. fort_in_memory off) — falling through to SQL (empty only for a pure-endpoint source)',
         )
       }
     }
-    const ts = Math.floor(Date.now() / 1000)
     const finalList = new Set()
     const conditions = {}
     const queries = {}
@@ -1645,8 +1712,10 @@ class Pokestop extends Model {
     // lures
 
     // showcase
-    if (hasShowcaseData) {
-      const distinct = ['showcase_pokemon_id']
+    if (hasShowcaseData || hasShowcaseFocus) {
+      const distinct = []
+      if (hasShowcaseFocus) distinct.push('showcase_focus')
+      if (hasShowcaseData) distinct.push('showcase_pokemon_id')
       if (hasShowcaseForm) distinct.push('showcase_pokemon_form_id')
       if (hasShowcaseType) distinct.push('showcase_pokemon_type_id')
       queries.showcase = this.query()
@@ -1804,15 +1873,19 @@ class Pokestop extends Model {
           }
           break
         case 'showcase':
-          if (hasShowcaseData) {
+          if (hasShowcaseData || hasShowcaseFocus) {
             rewards.forEach((reward) => {
-              if (reward.showcase_pokemon_id) {
+              const showcaseFocus = parseShowcaseFocus(reward.showcase_focus)
+              const focusKey = getShowcaseFocusFilterKey(showcaseFocus)
+              if (focusKey) {
+                finalList.add(focusKey)
+              } else if (!showcaseFocus && reward.showcase_pokemon_id) {
                 finalList.add(
                   `f${reward.showcase_pokemon_id}-${
                     reward.showcase_pokemon_form_id ?? 0
                   }`,
                 )
-              } else if (reward.showcase_pokemon_type_id) {
+              } else if (!showcaseFocus && reward.showcase_pokemon_type_id) {
                 finalList.add(`h${reward.showcase_pokemon_type_id}`)
               }
             })
@@ -1842,10 +1915,7 @@ class Pokestop extends Model {
       ),
     )
 
-    return {
-      available: [...finalList],
-      conditions,
-    }
+    return { available: [...finalList], conditions }
   }
 
   static parseRdmRewards = (quest) => {

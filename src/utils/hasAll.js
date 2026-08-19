@@ -15,6 +15,7 @@ export function checkIfHasAll(category, id) {
         id.startsWith('f') ||
         id.startsWith('a') ||
         id.startsWith('h') ||
+        id.startsWith('y') ||
         id.startsWith('b')
       )) ||
     (id.startsWith('t') && id !== 't0-0')

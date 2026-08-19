@@ -119,6 +119,7 @@ type ShowcaseDetails {
 type Event {
   display_type: Int
   event_expire_timestamp: Int
+  showcase_focus: JSON
   showcase_pokemon_id: Int
   showcase_pokemon_form_id: Int
   showcase_pokemon_type_id: Int

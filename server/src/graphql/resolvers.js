@@ -18,6 +18,9 @@ const { getPolyVector } = require('../utils/getPolyVector')
 const { getPlacementCells } = require('../utils/getPlacementCells')
 const { getTypeCells } = require('../utils/getTypeCells')
 const { getValidCoords } = require('../utils/getValidCoords')
+const {
+  hasAnyPokestopPermission,
+} = require('../utils/hasAnyPokestopPermission')
 
 /** @type {import("@apollo/server").ApolloServerOptions<import("@rm/types").GqlContext>['resolvers']} */
 const resolvers = {
@@ -71,8 +74,13 @@ const resolvers = {
         if (x.startsWith('i') || x.startsWith('a')) {
           return perms?.invasions
         }
-        if (x.startsWith('d') || x.startsWith('f') || x.startsWith('h')) {
-          return perms?.lures
+        if (
+          x.startsWith('b') ||
+          x.startsWith('f') ||
+          x.startsWith('h') ||
+          x.startsWith('y')
+        ) {
+          return perms?.eventStops
         }
         if (
           x.startsWith('q') ||
@@ -248,12 +256,7 @@ const resolvers = {
       return {}
     },
     pokestops: (_, args, { perms, Db }) => {
-      if (
-        perms?.pokestops ||
-        perms?.lures ||
-        perms?.quests ||
-        perms?.invasions
-      ) {
+      if (hasAnyPokestopPermission(perms)) {
         return Db.query('Pokestop', 'getAll', perms, args)
       }
       return []

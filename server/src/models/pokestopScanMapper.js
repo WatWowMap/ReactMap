@@ -139,6 +139,7 @@ function mapScanPokestop(api) {
     lure_id: api.lure_id,
     lure_expire_timestamp: api.lure_expire_timestamp,
     showcase_expiry: api.showcase_expiry,
+    showcase_focus: jsonString(api.showcase_focus),
     showcase_pokemon_id: api.showcase_pokemon_id,
     showcase_pokemon_form_id: api.showcase_pokemon_form_id,
     showcase_pokemon_type_id: api.showcase_pokemon_type_id,

@@ -3,6 +3,7 @@
 import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { getFormDisplay } from '@utils/getFormDisplay'
+import { getShowcaseBuddyFilterLabelKey } from '@utils/showcaseFocus'
 
 /**
  * @typedef {{ plural?: boolean, amount?: boolean, alt?: boolean, newLine?: boolean, quest?: boolean, omitFormSuffix?: boolean, showDefaultForms?: boolean }} CustomTOptions
@@ -112,6 +113,9 @@ export function useTranslateById(options = {}) {
             return `${i18n.t(`poke_${id.slice(1)}`)} (${i18n.t(
               'quest_reward_9',
             )})`
+          case 'y':
+            // buddy Showcase minimum
+            return i18n.t(getShowcaseBuddyFilterLabelKey(id))
           case 'a':
           // rocket pokemon
           case 'f':

@@ -70,6 +70,7 @@ function buildPokestops(perms, defaults) {
         !avail.startsWith('b') &&
         !avail.startsWith('f') &&
         !avail.startsWith('h') &&
+        !avail.startsWith('y') &&
         !Number.isInteger(+avail.charAt(0))
       ) {
         log.warn(
@@ -90,7 +91,10 @@ function buildPokestops(perms, defaults) {
     if (perms.eventStops && avail.startsWith('b')) {
       quests[avail] = new BaseFilter(defaults.eventStops)
     }
-    if (perms.eventStops && (avail.startsWith('f') || avail.startsWith('h'))) {
+    if (
+      perms.eventStops &&
+      (avail.startsWith('f') || avail.startsWith('h') || avail.startsWith('y'))
+    ) {
       quests[avail] = new BaseFilter(defaults.showcasePokemon)
     }
   })

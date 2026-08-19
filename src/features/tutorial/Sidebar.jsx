@@ -38,7 +38,11 @@ export function TutorialSidebar() {
   )
 
   const permCheck =
-    perms.pokestops || perms.invasions || perms.quests || perms.lures
+    perms.pokestops ||
+    perms.invasions ||
+    perms.quests ||
+    perms.lures ||
+    perms.eventStops
 
   return (
     <DialogContent>

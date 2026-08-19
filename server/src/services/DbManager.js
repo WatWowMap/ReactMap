@@ -202,6 +202,7 @@ class DbManager extends Logger {
       hasShowcaseData,
       hasShowcaseForm,
       hasShowcaseType,
+      hasShowcaseFocus,
     ] = await schema('pokestop')
       .columnInfo()
       .then((columns) => [
@@ -211,6 +212,7 @@ class DbManager extends Logger {
         'showcase_pokemon_id' in columns,
         'showcase_pokemon_form_id' in columns,
         'showcase_pokemon_type_id' in columns,
+        'showcase_focus' in columns,
       ])
     const [stationColumns, stationBattleColumns] = await Promise.all([
       schema('station').columnInfo(),
@@ -274,6 +276,7 @@ class DbManager extends Logger {
       hasShowcaseData,
       hasShowcaseForm,
       hasShowcaseType,
+      hasShowcaseFocus,
       hasMultiBattles,
       hasStationedGmax,
       hasBattlePokemonStats,
@@ -324,6 +327,8 @@ class DbManager extends Logger {
               // onlyConfirmed is ineffective and confirmed `a` reward filters
               // fall back to the grunt's possible-encounter pool.
               hasConfirmed: true,
+              // Pure endpoints have no SQL schema to probe.
+              hasShowcaseFocus: false,
             }
           }
 

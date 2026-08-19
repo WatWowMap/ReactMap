@@ -417,6 +417,7 @@ test('available mapper keeps invasion keys but omits rewards for 44-46', () => {
   })
   const { available } = mapAvailablePokestops(
     {
+      showcase_focus_filter: true,
       invasions: [
         apiInvasion(1, 19),
         apiInvasion(44, 643),
@@ -439,6 +440,7 @@ test('available mapper keeps invasion keys but omits rewards for 44-46', () => {
 test('available mapper distinguishes unknown and explicit zero forms', () => {
   const { available } = mapAvailablePokestops(
     {
+      showcase_focus_filter: true,
       invasions: [
         {
           character: 1,
@@ -510,6 +512,7 @@ test('SQL availability accepts partial lineups and community-only sources', asyn
     hasShowcaseData: false,
     hasShowcaseForm: false,
     hasShowcaseType: false,
+    hasShowcaseFocus: false,
   }
   const confirmed = await Pokestop.getAvailable(context)
   const rocketSql = sql.find(

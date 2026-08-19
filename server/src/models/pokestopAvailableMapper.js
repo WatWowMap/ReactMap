@@ -6,7 +6,9 @@
  * Reproduces the filter-key formulas built by the SQL `getAvailable` block
  * in `Pokestop.js` (~lines 1763-1932, `process()` helper ~lines 1285-1294)
  * so that switching a pokestop source over to the Golbat endpoint yields the
- * SAME `{ available, conditions }` shape the map UI already expects.
+ * SAME `{ available, conditions }` shape the map UI already expects. The
+ * caller enforces Golbat's exact pre-cap Showcase focus capability before
+ * mapping.
  *
  * Standalone by design: no external dependencies, so it can run under plain
  * `node` with no `node_modules` present.
@@ -40,8 +42,10 @@
  * @property {number|null} pokemon_id
  * @property {number|null} form
  * @property {number|null} type_id
+ * @property {Record<string, any>|null} showcase_focus
  *
  * @typedef {object} AvailablePokestops
+ * @property {boolean} showcase_focus_filter
  * @property {AvailablePokestopQuest[]} quests
  * @property {AvailablePokestopInvasion[]} invasions
  * @property {AvailablePokestopLure[]} lures
@@ -65,6 +69,10 @@ const {
   getRocketPokemonFilterKey,
   isRocketPokemonFilterExcluded,
 } = require('../utils/rocketPokemonFiltering')
+const {
+  getShowcaseFocusFilterKey,
+  parseShowcaseFocus,
+} = require('../utils/showcaseFocus')
 
 /**
  * Builds the quest reward filter key for a single quest tuple, mirroring
@@ -218,9 +226,13 @@ function mapAvailablePokestops(api, ctx) {
   // Showcases contribute no conditions.
   const showcases = api.showcases || []
   showcases.forEach((showcase) => {
-    if (showcase.pokemon_id > 0) {
+    const showcaseFocus = parseShowcaseFocus(showcase.showcase_focus)
+    const focusKey = getShowcaseFocusFilterKey(showcaseFocus)
+    if (focusKey) {
+      available.add(focusKey)
+    } else if (!showcaseFocus && showcase.pokemon_id > 0) {
       available.add(`f${showcase.pokemon_id}-${showcase.form ?? 0}`)
-    } else if (showcase.type_id > 0) {
+    } else if (!showcaseFocus && showcase.type_id > 0) {
       available.add(`h${showcase.type_id}`)
     }
   })

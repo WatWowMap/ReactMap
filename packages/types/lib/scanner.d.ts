@@ -179,9 +179,20 @@ export interface ShowcaseDetails {
   contest_entries: ShowcaseEntry[]
 }
 
+export interface ShowcaseFocus {
+  type: string
+  pokemon_id?: number
+  pokemon_form?: number
+  pokemon_type_1?: number
+  pokemon_type_2?: number
+  min_level?: number
+  [key: string]: unknown
+}
+
 export interface Event {
   display_type: number
   event_expire_timestamp: number
+  showcase_focus: ShowcaseFocus | null
   showcase_pokemon_id: number
   showcase_pokemon_form_id: number
   showcase_pokemon_type_id: number
@@ -211,6 +222,7 @@ export interface Pokestop {
   power_up_points: number
   power_up_end_timestamp: number
   showcase_expiry?: number
+  showcase_focus?: ShowcaseFocus | string | null
   showcase_pokemon_id?: number
   showcase_ranking_standard?: number
   showcase_rankings?: ShowcaseDetails | string

@@ -83,6 +83,7 @@ const event = gql`
     events {
       display_type
       event_expire_timestamp
+      showcase_focus
       showcase_pokemon_id
       showcase_pokemon_form_id
       showcase_pokemon_type_id

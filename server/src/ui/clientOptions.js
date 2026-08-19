@@ -73,7 +73,7 @@ function clientOptions(perms) {
     pokestops: {
       clustering: {
         type: 'bool',
-        perm: ['pokestops', 'quests', 'invasions'],
+        perm: ['pokestops', 'quests', 'invasions', 'eventStops'],
         category: 'markers',
       },
       invasionTimers: {
@@ -84,7 +84,7 @@ function clientOptions(perms) {
       lureTimers: { type: 'bool', perm: ['lures'], category: 'tooltips' },
       eventStopTimers: {
         type: 'bool',
-        perm: ['pokestops'],
+        perm: ['pokestops', 'eventStops'],
         category: 'tooltips',
       },
       interactionRanges: {
@@ -93,7 +93,11 @@ function clientOptions(perms) {
         category: 'markers',
       },
       lureRange: { type: 'bool', perm: ['lures'], category: 'markers' },
-      showcaseRange: { type: 'bool', perm: ['pokestops'], category: 'markers' },
+      showcaseRange: {
+        type: 'bool',
+        perm: ['pokestops', 'eventStops'],
+        category: 'markers',
+      },
       customRange: {
         type: 'number',
         perm: ['raids', 'gyms'],
