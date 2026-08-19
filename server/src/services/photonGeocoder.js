@@ -27,6 +27,8 @@ const { fetchJson } = require('../utils/fetchJson')
  * @property {string} [countrycode] Upper-case, e.g. "US"
  * @property {string} [osm_key] OSM tag key, e.g. "place" or "highway"
  * @property {string} [osm_value] OSM tag value, e.g. "city"
+ * @property {string} [type] The layer the result itself occupies: one of
+ *   house, street, locality, district, city, county, state, country, other
  */
 
 /**
@@ -46,11 +48,45 @@ const SEARCH_LIMIT = 10
  * they are the ones `_formatResult` reads.
  * @type {Record<string, 'city' | 'town' | 'village' | 'hamlet'>}
  */
-const PLACE_SELF_REFERENCE = {
+const SETTLEMENT_OSM_VALUES = new Set(['city', 'town', 'village', 'hamlet'])
+
+/**
+ * The Photon property a result's own name belongs in, keyed by the layer Photon
+ * reports in `properties.type`.
+ *
+ * `house` is absent on purpose: a building or POI name has no hierarchy field
+ * to occupy, matching Nominatim filing it under a key node-geocoder ignores.
+ */
+const TYPE_TO_PROPERTY = {
+  country: 'country',
+  state: 'state',
+  county: 'county',
   city: 'city',
-  town: 'town',
-  village: 'village',
-  hamlet: 'hamlet',
+  locality: 'locality',
+  street: 'street',
+}
+
+/**
+ * Fills the result's own name into the hierarchy field that describes it.
+ *
+ * Photon omits the result's own level from its containing hierarchy: a search
+ * for Illinois comes back with the name in `properties.name` and no `state`.
+ * Nominatim echoes it, and everything downstream reads the hierarchy fields, so
+ * the name has to be placed or the level goes missing from both the entry and
+ * the formatted address.
+ *
+ * `properties.type` is the authority rather than the OSM tags, because a city,
+ * state or country is usually an administrative boundary in OSM and arrives as
+ * osm_key=boundary, osm_value=administrative. Gating on osm_key=place would
+ * miss the common case and keep only the exception.
+ *
+ * A value Photon already supplied always wins.
+ * @param {PhotonProperties} properties
+ */
+function resolveSelfReference(properties) {
+  const property = TYPE_TO_PROPERTY[properties.type]
+  if (!properties.name || !property || properties[property]) return properties
+  return { ...properties, [property]: properties.name }
 }
 
 /**
@@ -144,14 +180,20 @@ function formatPhotonFeature(feature) {
   // pass [null, null] straight through to an entry with a null latitude. Check
   // the values, not just the shape.
   if (!Number.isFinite(longitude) || !Number.isFinite(latitude)) return null
-  const properties = feature.properties || {}
+  const properties = resolveSelfReference(feature.properties || {})
 
-  const selfReferenced = PLACE_SELF_REFERENCE[properties.osm_value]
-  const isPlace = properties.osm_key === 'place' && !!selfReferenced
-  const named = (/** @type {string} */ field) =>
-    isPlace && selfReferenced === field ? properties.name : undefined
+  // The OSM tags are still consulted for settlements, because they are the only
+  // thing separating a town from a village or a hamlet. Photon's city layer
+  // flattens all three together, and node-geocoder reads them as distinct
+  // fields.
+  const settlementTag =
+    properties.osm_key === 'place' &&
+    SETTLEMENT_OSM_VALUES.has(properties.osm_value)
+      ? properties.osm_value
+      : undefined
+  const named = (/** @type {string} */ value) =>
+    settlementTag === value ? properties.name : undefined
 
-  const city = properties.city || named('city')
   const town = named('town')
   const village = named('village')
   // Photon's hierarchy runs city > district > locality > street, so an address
@@ -160,8 +202,17 @@ function formatPhotonFeature(feature) {
   // settlement from both `city` and formattedAddress. Named `settlement` rather
   // than `locality` so it is not confused with the Photon field it falls back
   // to.
+  // properties.city covers both what Photon sent and what resolveSelfReference
+  // placed there from the type layer; named('city') covers a place=city tagged
+  // result that carries no type at all.
   const settlement =
-    city || town || village || named('hamlet') || properties.locality || ''
+    properties.city ||
+    named('city') ||
+    town ||
+    village ||
+    named('hamlet') ||
+    properties.locality ||
+    ''
 
   return {
     latitude,

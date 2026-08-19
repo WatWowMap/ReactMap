@@ -173,6 +173,100 @@ test('prefers city over locality when Photon sends both', () => {
   assert.equal(got.city, 'Mariposa')
 })
 
+// Photon reports the result's own layer in properties.type, and a city, state
+// or country is usually an administrative boundary in OSM, arriving as
+// osm_key=boundary. Gating self-reference on osm_key=place alone would keep
+// only the exception and drop the common case.
+test('places the result name using the Photon type layer', () => {
+  const cases = [
+    { type: 'city', name: 'Denver', field: 'city' },
+    { type: 'state', name: 'Illinois', field: 'state' },
+    { type: 'country', name: 'United States', field: 'country' },
+    { type: 'locality', name: 'Bootjack', field: 'city' },
+    { type: 'street', name: 'Lake Shore Drive', field: 'streetName' },
+  ]
+  cases.forEach(({ type, name, field }) => {
+    const got = formatPhotonFeature(
+      feature({
+        name,
+        type,
+        osm_key: 'boundary',
+        osm_value: 'administrative',
+      }),
+    )
+    assert.equal(got[field], name, `type=${type} should populate ${field}`)
+  })
+})
+
+// The failure this prevents: a state search rendering as ", United States".
+test('a state result keeps its own name in the formatted address', () => {
+  const got = formatPhotonFeature(
+    feature({
+      name: 'Illinois',
+      type: 'state',
+      country: 'United States',
+      countrycode: 'US',
+      osm_key: 'boundary',
+      osm_value: 'administrative',
+    }),
+  )
+  assert.equal(got.state, 'Illinois')
+  assert.equal(got.formattedAddress, 'Illinois, United States')
+})
+
+// A city carried as an administrative boundary is the common OSM shape.
+test('an administrative city result still resolves its city', () => {
+  const got = formatPhotonFeature(
+    feature({
+      name: 'Denver',
+      type: 'city',
+      county: 'Denver County',
+      state: 'Colorado',
+      country: 'United States',
+      countrycode: 'US',
+      osm_key: 'boundary',
+      osm_value: 'administrative',
+    }),
+  )
+  assert.equal(got.city, 'Denver')
+  assert.equal(
+    got.formattedAddress,
+    'Denver, Denver County, Colorado, United States',
+  )
+})
+
+// The type layer flattens town, village and hamlet into `city`, so the OSM tag
+// stays the only source for the distinction node-geocoder reads.
+test('the type layer does not cost the town and village distinction', () => {
+  const got = formatPhotonFeature(
+    feature({
+      name: 'Lyman',
+      type: 'city',
+      osm_key: 'place',
+      osm_value: 'town',
+      state: 'Nebraska',
+      country: 'United States',
+      countrycode: 'US',
+    }),
+  )
+  assert.equal(got.town, 'Lyman')
+  assert.equal(got.city, 'Lyman')
+  assert.equal(got.village, '')
+})
+
+// A value Photon supplied is never overwritten by the result's own name.
+test('the type layer never overwrites a value Photon sent', () => {
+  const got = formatPhotonFeature(
+    feature({
+      name: 'Denver',
+      type: 'city',
+      city: 'Aurora',
+      state: 'Colorado',
+    }),
+  )
+  assert.equal(got.city, 'Aurora')
+})
+
 test('uses the result name as the street for a road', () => {
   const got = formatPhotonFeature(
     feature({
