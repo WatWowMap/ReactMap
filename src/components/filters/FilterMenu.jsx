@@ -38,7 +38,14 @@ export function FilterMenu() {
         names={[category]}
       />
       <Menu category={category} extraButtons={EXTRA_BUTTONS}>
-        {(_, key) => <StandardItem id={key} category={category} caption />}
+        {(_, key, ambiguousForms) => (
+          <StandardItem
+            id={key}
+            category={category}
+            ambiguousForms={ambiguousForms}
+            caption
+          />
+        )}
       </Menu>
     </DialogWrapper>
   )

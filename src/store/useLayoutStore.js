@@ -28,6 +28,7 @@ import { useStorage } from './useStorage'
  *    category: import('@rm/types').AdvCategories | '',
  *    id: string,
  *    selectedIds: string[],
+ *    showDefaultForms?: boolean,
  *  },
  *  dialog: {
  *    open: boolean,
@@ -64,6 +65,7 @@ export const useLayoutStore = create(() => ({
     category: '',
     id: '',
     selectedIds: [],
+    showDefaultForms: false,
   },
   dialog: {
     open: false,

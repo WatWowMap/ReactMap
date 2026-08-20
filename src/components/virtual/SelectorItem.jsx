@@ -6,6 +6,7 @@ import Tooltip from '@mui/material/Tooltip'
 import Box from '@mui/material/Box'
 
 import { useTranslateById } from '@hooks/useTranslateById'
+import { hasAmbiguousForm } from '@utils/getAmbiguousForms'
 import { useMemory } from '@store/useMemory'
 import { ColoredTile } from '@components/virtual/ColoredTile'
 import { ToggleTypography } from '@components/ToggleTypography'
@@ -19,6 +20,7 @@ import { useTranslation } from 'react-i18next'
  *  id: string,
  *  category: T,
  *  caption?: boolean
+ *  ambiguousForms?: Set<string>
  * }} BaseProps
  */
 
@@ -31,6 +33,7 @@ import { useTranslation } from 'react-i18next'
  *  hasAll?: boolean
  *  easyMode?: boolean
  *  caption?: boolean
+ *  ambiguousForms?: Set<string>
  * }} FullProps
  */
 
@@ -43,13 +46,15 @@ export function SelectorItem({
   onClick,
   hasAll,
   easyMode,
+  ambiguousForms,
 }) {
   const { t } = useTranslateById({
     alt: true,
     newLine: true,
     quest: category === 'pokestops',
     omitFormSuffix: true,
-    showDefaultForms: id.startsWith('a'),
+    showDefaultForms:
+      id.startsWith('a') || hasAmbiguousForm(ambiguousForms, id),
   })
   const title = t(id)
   const url = useMemory((s) => s.Icons.getIconById(id))
