@@ -1,3 +1,10 @@
+## [1.50.1](https://github.com/WatWowMap/ReactMap/compare/v1.50.0...v1.50.1) (2026-08-20)
+
+
+### Bug Fixes
+
+* distinguish normal/unset form when they both spawn ([a32b97d](https://github.com/WatWowMap/ReactMap/commit/a32b97d0595a47bc2f5dca6e282a1899e4ebaa5e))
+
 # [1.50.0](https://github.com/WatWowMap/ReactMap/compare/v1.49.2...v1.50.0) (2026-08-19)
 
 
