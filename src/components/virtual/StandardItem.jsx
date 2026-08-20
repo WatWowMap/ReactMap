@@ -4,11 +4,12 @@ import * as React from 'react'
 import { useLayoutStore } from '@store/useLayoutStore'
 import { useDeepStore, useStorage } from '@store/useStorage'
 import { checkIfHasAll } from '@utils/hasAll'
+import { hasAmbiguousForm } from '@utils/getAmbiguousForms'
 
 import { SelectorItem } from './SelectorItem'
 
 /** @param {import('./SelectorItem').BaseProps<keyof import('@rm/types').Available>} props */
-export function StandardItem({ id, category, ...props }) {
+export function StandardItem({ id, category, ambiguousForms, ...props }) {
   const [filter, setFilter] = useDeepStore(`filters.${category}.filter.${id}`)
   const hasAll = checkIfHasAll(category, id)
   const easyMode = useStorage((s) => !!s.filters?.[category]?.easyMode)
@@ -21,6 +22,7 @@ export function StandardItem({ id, category, ...props }) {
       setFilter={setFilter}
       hasAll={hasAll}
       easyMode={easyMode}
+      ambiguousForms={ambiguousForms}
       onClick={() =>
         useLayoutStore.setState(
           id.startsWith('t')
@@ -31,6 +33,7 @@ export function StandardItem({ id, category, ...props }) {
                   id,
                   category,
                   selectedIds: [],
+                  showDefaultForms: hasAmbiguousForm(ambiguousForms, id),
                 },
               },
         )

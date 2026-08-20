@@ -14,6 +14,7 @@ import { useLayoutStore } from '@store/useLayoutStore'
 import { useFilter } from '@hooks/useFilter'
 import { Footer } from '@components/dialogs/Footer'
 import { applyToAll } from '@utils/applyToAll'
+import { getAmbiguousForms } from '@utils/getAmbiguousForms'
 import { useGetAvailable } from '@hooks/useGetAvailable'
 import { applyToAllWebhooks, useWebhookStore } from '@store/useWebhookStore'
 import { useAnalytics } from '@hooks/useAnalytics'
@@ -156,11 +157,26 @@ export function Menu({
 }
 
 function Results({ category, webhookCategory, categories, children }) {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   const filteredArr = useFilter(category, webhookCategory, categories)
+  const available = useMemory((s) => s.available[category])
+
+  // available keeps the labels stable while the anomaly lasts, filteredArr
+  // covers the menu options that render more than what's currently available
+  const ambiguousForms = React.useMemo(
+    () => getAmbiguousForms([...(available || []), ...filteredArr]),
+    [available, filteredArr, i18n.language],
+  )
+
+  // not via VirtualGrid's context: that one gets spread onto the Grid2 items
+  const itemContent = React.useCallback(
+    (index, key) => children(index, key, ambiguousForms),
+    [children, ambiguousForms],
+  )
+
   return filteredArr.length ? (
     <VirtualGrid data={filteredArr} xs={4} md={2}>
-      {children}
+      {itemContent}
     </VirtualGrid>
   ) : (
     <Box className="flex-center" flex="1 1 auto" whiteSpace="pre-line">

@@ -24,18 +24,22 @@ export function useGetAvailable(category) {
   )
 
   useEffect(() => {
-    if (data?.[`available${capitalized}`]) {
-      useMemory.setState((prev) => ({
-        available: {
-          ...prev.available,
-          [category]: data[`available${capitalized}`].some(
-            (key, i) => key !== prev.available[category][i],
-          )
-            ? data[`available${capitalized}`]
-            : prev.available[category],
-          // if it's the same, don't cause re-renders
-        },
-      }))
+    const next = data?.[`available${capitalized}`]
+    if (next) {
+      useMemory.setState((prev) => {
+        const previous = prev.available[category] || []
+        return {
+          available: {
+            ...prev.available,
+            // if it's the same, don't cause re-renders
+            [category]:
+              next.length !== previous.length ||
+              next.some((key, i) => key !== previous[i])
+                ? next
+                : previous,
+          },
+        }
+      })
     }
   }, [data])
 

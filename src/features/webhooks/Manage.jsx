@@ -149,7 +149,14 @@ export function Manage() {
         webhookCategory={category}
         extraButtons={buttons}
       >
-        {(_, key) => <WebhookItem id={key} category={category} caption />}
+        {(_, key, ambiguousForms) => (
+          <WebhookItem
+            id={key}
+            category={category}
+            ambiguousForms={ambiguousForms}
+            caption
+          />
+        )}
       </Menu>
     </>
   ) : (

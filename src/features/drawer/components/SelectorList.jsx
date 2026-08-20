@@ -21,6 +21,7 @@ import { useMemory } from '@store/useMemory'
 import { useLayoutStore } from '@store/useLayoutStore'
 import { useDeepStore, useStorage } from '@store/useStorage'
 import { useGetAvailable } from '@hooks/useGetAvailable'
+import { getAmbiguousForms, hasAmbiguousForm } from '@utils/getAmbiguousForms'
 import { VirtualGrid } from '@components/virtual/VirtualGrid'
 import { TabPanel } from '@components/TabPanel'
 import { BoolToggle } from '@components/inputs/BoolToggle'
@@ -81,53 +82,66 @@ function SelectorList({
   const search = useStorage((s) => s.searches[searchKey] || '')
   const disableGutters = !['pokemon', 'tappables'].includes(category)
 
-  const translated = React.useMemo(
-    () =>
-      (onlyShowAvailable ? available : Object.keys(allFilters))
-        .filter((key) => {
-          if (key === 'global') return false
-          switch (subCategory) {
-            case 'raids':
-              return key.startsWith('e')
-            case 'lures':
-              return key.startsWith('l')
-            case 'invasions':
-              return key.startsWith('i')
-            case 'quests':
-              return (
-                key.startsWith('q') ||
-                key.startsWith('m') ||
-                key.startsWith('x') ||
-                key.startsWith('c') ||
-                key.startsWith('d') ||
-                key.startsWith('p') ||
-                key.startsWith('u')
-              )
-            case 'showcase':
-              return (
-                key.startsWith('f') ||
-                key.startsWith('h') ||
-                key.startsWith('y') ||
-                key.startsWith('b')
-              )
-            case 'rocketPokemon':
-              return key.startsWith('a')
-            case 'pokemon':
-              return Number.isInteger(Number(key.charAt(0)))
+  const { translated, ambiguousForms } = React.useMemo(() => {
+    const ids = (
+      onlyShowAvailable ? available : Object.keys(allFilters)
+    ).filter((key) => {
+      if (key === 'global') return false
+      switch (subCategory) {
+        case 'raids':
+          return key.startsWith('e')
+        case 'lures':
+          return key.startsWith('l')
+        case 'invasions':
+          return key.startsWith('i')
+        case 'quests':
+          return (
+            key.startsWith('q') ||
+            key.startsWith('m') ||
+            key.startsWith('x') ||
+            key.startsWith('c') ||
+            key.startsWith('d') ||
+            key.startsWith('p') ||
+            key.startsWith('u')
+          )
+        case 'showcase':
+          return (
+            key.startsWith('f') ||
+            key.startsWith('h') ||
+            key.startsWith('y') ||
+            key.startsWith('b')
+          )
+        case 'rocketPokemon':
+          return key.startsWith('a')
+        case 'pokemon':
+          return Number.isInteger(Number(key.charAt(0)))
+        default:
+          switch (category) {
+            case 'gyms':
+              return key.startsWith('t')
+            case 'tappables':
+              return key.startsWith('q') && key !== 'q0'
             default:
-              switch (category) {
-                case 'gyms':
-                  return key.startsWith('t')
-                case 'tappables':
-                  return key.startsWith('q') && key !== 'q0'
-                default:
-                  return Number.isInteger(Number(key.charAt(0)))
-              }
+              return Number.isInteger(Number(key.charAt(0)))
           }
-        })
-        .map((id) => ({ id, name: tId(id).toLowerCase() })),
-    [onlyShowAvailable ? available : allFilters, tId, category, subCategory],
-  )
+      }
+    })
+    // two identical looking entries (e.g. Litleo Unset + Normal) must show
+    // their form to be told apart, but only for as long as both are around
+    const ambiguous = getAmbiguousForms(ids)
+    return {
+      ambiguousForms: ambiguous,
+      translated: ids.map((id) => ({
+        id,
+        name: tId(id, {
+          quest: subCategory === 'pokemon',
+          omitFormSuffix: true,
+          showDefaultForms:
+            subCategory === 'rocketPokemon' || hasAmbiguousForm(ambiguous, id),
+        }).toLowerCase(),
+      })),
+    }
+  }, [onlyShowAvailable ? available : allFilters, tId, category, subCategory])
 
   const items = React.useMemo(() => {
     const lowerCase = search.toLowerCase()
@@ -249,7 +263,13 @@ function SelectorList({
           restoreStateFrom={restoreStateFrom}
           stateChanged={handleStateChanged}
         >
-          {(_, key) => <StandardItem id={key} category={category} />}
+          {(_, key) => (
+            <StandardItem
+              id={key}
+              category={category}
+              ambiguousForms={ambiguousForms}
+            />
+          )}
         </VirtualGrid>
       </Box>
     </List>
