@@ -271,18 +271,6 @@ const applyMutations = (config) => {
     }
   })
 
-  config.api.pvp.leagueObj = Object.fromEntries(
-    config.api.pvp.leagues.map((league) => [league.name, league.cp]),
-  )
-  const hasLittle = config.api.pvp.leagues.find(
-    (league) => league.name === 'little',
-  )
-  if (hasLittle) {
-    config.api.pvp.leagueObj.little = hasLittle.littleCupRules
-      ? 500
-      : { little: false, cap: 500 }
-  }
-
   const aliasObj = Object.fromEntries(
     config.authentication.aliases.map((alias) => [alias.name, alias.role]),
   )

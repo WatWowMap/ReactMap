@@ -100,7 +100,6 @@ class Pokemon extends Model {
       .some((league) => globalFilter.filterKeys.has(league.name))
     const ts = Math.floor(Date.now() / 1000)
     const queryLimits = config.getSafe('api.queryLimits')
-    const reactMapHandlesPvp = config.getSafe('api.pvp.reactMapHandlesPvp')
 
     // quick check to make sure no Pokemon are returned when none are enabled for users with only Pokemon perms
     if (!ivs && !pvp) {
@@ -339,11 +338,7 @@ class Pokemon extends Model {
         },
       })
       pvpQuery.whereNotIn('id', listOfIds)
-      if (reactMapHandlesPvp) {
-        pvpQuery.whereNotNull('cp')
-      } else {
-        pvpQuery.whereNotNull('pvp')
-      }
+      pvpQuery.whereNotNull('pvp')
       if (!getAreaSql(pvpQuery, areaRestrictions, onlyAreas)) {
         return []
       }

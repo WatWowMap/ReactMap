@@ -9,6 +9,7 @@ const { generate, load } = require('@rm/masterfile')
 
 const { setLongInterval } = require('../utils/setLongTimeout')
 const { PoracleAPI } = require('./Poracle')
+const { refreshPokemonData } = require('./PokemonData')
 const { getCache } = require('./cache')
 
 /**
@@ -259,9 +260,8 @@ class EventManager extends Logger {
   /**
    *
    * @param {import('./DbManager').DbManager} Db
-   * @param {import('./PvpWrapper').PvpWrapper | null} Pvp
    */
-  startIntervals(Db, Pvp) {
+  startIntervals(Db) {
     this.clearIntervals()
     this.log.info('starting intervals')
 
@@ -364,20 +364,22 @@ class EventManager extends Logger {
             })
           }
         },
-        1000 * 60 * 60 * (config.getSafe('map.misc.masterfileCacheHrs') || 6),
+        1000 * 60 * 60 * (config.getSafe('map.misc.masterfileCacheHrs') || 12),
       )
     }
-    if (Pvp) {
-      this.intervals.pvp = setLongInterval(
-        async () => {
-          await Pvp.fetchLatestPokemon()
+    this.intervals.pokemonData = setLongInterval(
+      async () => {
+        try {
+          await refreshPokemonData()
           await this.chatLog('event', {
-            description: 'Refreshed PVP masterfile',
+            description: 'Refreshed Pokemon base-stat snapshot',
           })
-        },
-        1000 * 60 * 60 * (config.getSafe('map.misc.masterfileCacheHrs') || 6),
-      )
-    }
+        } catch (e) {
+          this.log.warn('Unable to refresh Pokemon base-stat snapshot', e)
+        }
+      },
+      1000 * 60 * 60 * (config.getSafe('map.misc.masterfileCacheHrs') || 12),
+    )
     this.intervals.webhooks = setLongInterval(
       async () => {
         await this.getWebhooks()

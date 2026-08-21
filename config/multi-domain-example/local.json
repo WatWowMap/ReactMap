@@ -3,10 +3,7 @@
   "port": 8080,
   "api": {
     "reactMapSecret": "very-secure-secret",
-    "maxSessions": 5,
-    "pvp": {
-      "reactMapHandlesPvp": false
-    }
+    "maxSessions": 5
   },
   "map": {
     "general": {

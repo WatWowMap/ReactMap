@@ -316,10 +316,6 @@
       "levels": {
         "__name": "API_PVP_LEVELS",
         "__format": "json"
-      },
-      "reactMapHandlesPvp": {
-        "__name": "API_PVP_REACT_MAP_HANDLES_PVP",
-        "__format": "boolean"
       }
     },
     "portalUpdateLimit": {

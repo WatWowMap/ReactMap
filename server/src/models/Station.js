@@ -12,7 +12,7 @@ const {
 } = require('../utils/manualFilter')
 const { getEpoch } = require('../utils/getClientTime')
 const { state } = require('../services/state')
-const { getSharedPvpWrapper } = require('../services/PvpWrapper')
+const { ensurePokemonData } = require('../services/PokemonData')
 const {
   evalScannerQuery,
   describeScannerResponse,
@@ -750,7 +750,7 @@ class Station extends Model {
           let pokemonData = null
           if (includeBattleData) {
             try {
-              pokemonData = await getSharedPvpWrapper().ensurePokemonData()
+              pokemonData = await ensurePokemonData()
             } catch (e) {
               log.warn(
                 TAGS.fetch,
@@ -1039,7 +1039,7 @@ class Station extends Model {
       })
       if (needsEstimatedCp) {
         try {
-          pokemonData = await getSharedPvpWrapper().ensurePokemonData()
+          pokemonData = await ensurePokemonData()
         } catch (e) {
           log.warn(
             TAGS.fetch,

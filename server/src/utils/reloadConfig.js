@@ -120,9 +120,6 @@ async function reloadConfig() {
     const stateReport = /** @type {import('@rm/types').StateReportObj} */ ({
       database:
         !report.database.areEqual || !report.devOptions.report.queryDebug,
-      pvp:
-        !report.api.report.pvp.report.reactMapHandlesPvp ||
-        !report.api.report.pvp.areEqual,
       icons: !report.icons.report.styles.areEqual,
       audio: !report.audio.report.styles.areEqual,
       historical: !report.rarity.report.percents.areEqual,
@@ -140,8 +137,7 @@ async function reloadConfig() {
         !report.audio.report.cacheHrs ||
         !report.map.report.misc.report.masterfileCacheHrs ||
         !report.map.report.misc.report.invasionCacheHrs ||
-        !report.map.report.misc.report.webhookCacheHrs ||
-        !report.map.report.misc.report.masterfileCacheHrs,
+        !report.map.report.misc.report.webhookCacheHrs,
     })
     const newState = await state.reload(stateReport)
 

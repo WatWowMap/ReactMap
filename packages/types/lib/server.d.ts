@@ -299,7 +299,6 @@ export type ExpressErrorMiddleware = (
 
 export interface StateReportObj {
   database: boolean
-  pvp: boolean
   icons: boolean
   audio: boolean
   historical: boolean

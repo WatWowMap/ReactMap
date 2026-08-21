@@ -7,7 +7,6 @@ const { log, TAGS } = require('@rm/logger')
 
 const { DbManager } = require('./DbManager')
 const { EventManager } = require('./EventManager')
-const { getSharedPvpWrapper } = require('./PvpWrapper')
 const { setCache } = require('./cache')
 const { bustCombinedFortCache } = require('../utils/fortAvailable')
 const { migrate } = require('../db/migrate')
@@ -15,13 +14,10 @@ const { Stats } = require('./Stats')
 
 const state = {
   db: new DbManager(),
-  pvp: config.getSafe('api.pvp.reactMapHandlesPvp')
-    ? getSharedPvpWrapper()
-    : null,
   event: new EventManager(),
   stats: new Stats(),
   startTimers() {
-    this.event.startIntervals(this.db, this.pvp)
+    this.event.startIntervals(this.db)
   },
   setAuthClients() {
     log.info(TAGS.auth, 'setting authentication clients')
@@ -136,9 +132,6 @@ const state = {
         this.event.getMasterfile(this.db.historical, this.db.rarity),
       )
     }
-    if ((!reloadReport || reloadReport.pvp) && this.pvp) {
-      promises.push(this.pvp.fetchLatestPokemon())
-    }
     if (!reloadReport || reloadReport.invasions) {
       promises.push(this.event.getInvasions(this.db))
     }
@@ -154,11 +147,6 @@ const state = {
       await migrate()
       this.db = new DbManager()
     }
-    if (reloadReport.pvp) {
-      this.pvp = config.getSafe('api.pvp.reactMapHandlesPvp')
-        ? getSharedPvpWrapper()
-        : null
-    }
     if (reloadReport.strategies) {
       this.setAuthClients()
     }
@@ -167,7 +155,7 @@ const state = {
       // reload swaps in a fresh DbManager, so the intervals must be rebuilt
       // around it — otherwise a later forced refresh would query (and commit)
       // the replaced manager's data. See EventManager.#refreshAvailable.
-      this.event.startIntervals(this.db, this.pvp)
+      this.event.startIntervals(this.db)
     }
     return this
   },
