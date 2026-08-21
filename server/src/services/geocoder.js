@@ -21,6 +21,31 @@ function formatter(addressFormat, result) {
 }
 
 /**
+ * Fails loudly when the configured URL answered with something that is not a
+ * Nominatim response.
+ *
+ * node-geocoder decides how to read a body by its shape: an array is treated as
+ * a result list, and anything else is treated as a single result. Photon
+ * answers with a GeoJSON object, so the whole FeatureCollection gets handed to
+ * _formatResult as though it were one place. Nothing throws, because
+ * node-geocoder guards the address lookup, so the caller silently receives one
+ * entry with every field undefined.
+ *
+ * That is a misconfiguration rather than a geocoding failure, and it is
+ * invisible in the results, so it is worth an error naming the fix.
+ * @param {any} results
+ * @param {string} url
+ */
+function assertNominatimResponse(results, url) {
+  const raw = results?.raw
+  if (raw && !Array.isArray(raw) && raw.type === 'FeatureCollection') {
+    throw new Error(
+      `${url} answered with GeoJSON, which is Photon's format rather than Nominatim's. Set "geocoderProvider": "photon" on this webhook, or point the URL at a Nominatim instance.`,
+    )
+  }
+}
+
+/**
  * Nominatim, via node-geocoder's `openstreetmap` provider.
  * @param {string} url
  * @param {string | { lat: number, lon: number }} search
@@ -34,13 +59,20 @@ async function nominatimGeocoder(url, search, isReverse) {
   })
   stockGeocoder._geocoder._formatResult = ((original) => (result) => ({
     ...original(result),
-    suburb: result.address.suburb || '',
-    town: result.address.town || '',
-    village: result.address.village || '',
+    suburb: result.address?.suburb || '',
+    town: result.address?.town || '',
+    village: result.address?.village || '',
   }))(stockGeocoder._geocoder._formatResult)
-  return isReverse && typeof search === 'object'
+  // Awaited rather than returned so the shape check runs here. A throw inside
+  // _formatResult would not reach geocoder()'s catch at all: node-geocoder
+  // resolves through bluebird's asCallback, so it surfaces as an uncaught
+  // exception and takes the process down. Anything thrown from this function
+  // rejects normally and is caught.
+  const results = await (isReverse && typeof search === 'object'
     ? stockGeocoder.reverse(search)
-    : stockGeocoder.geocode(String(search))
+    : stockGeocoder.geocode(String(search)))
+  assertNominatimResponse(results, url)
+  return results
 }
 
 /**

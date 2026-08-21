@@ -3,7 +3,10 @@ const { test } = require('node:test')
 
 const NodeGeocoder = require('node-geocoder')
 
+const http = require('node:http')
+
 const { PoracleAPI } = require('../src/services/Poracle')
+const { geocoder } = require('../src/services/geocoder')
 const {
   formatPhotonFeature,
   joinComponents,
@@ -419,4 +422,107 @@ test('PoracleAPI leaves the provider undefined when it is not configured', () =>
   // correct default for every existing config.
   assert.equal(api.geocoderProvider, undefined)
   assert.equal(api.nominatimUrl, 'http://127.0.0.1:2322')
+})
+
+// A misconfigured webhook -- a Photon URL left on the Nominatim provider, or the
+// reverse -- used to reach node-geocoder, which reads a GeoJSON object as a
+// single result and hands the whole FeatureCollection to _formatResult. The
+// unguarded address lookup in ReactMap's patch then threw, and because
+// node-geocoder resolves through bluebird's asCallback the throw never reached
+// geocoder()'s catch: it surfaced as an uncaught exception and killed the
+// process.
+const serveOnce = async (body) => {
+  const server = http.createServer((_, res) => {
+    res.writeHead(200, { 'Content-Type': 'application/json' })
+    res.end(typeof body === 'string' ? body : JSON.stringify(body))
+  })
+  await new Promise((resolve) => {
+    server.listen(0, '127.0.0.1', resolve)
+  })
+  return {
+    url: `http://127.0.0.1:${server.address().port}`,
+    close: () =>
+      new Promise((resolve) => {
+        server.close(resolve)
+      }),
+  }
+}
+
+const PHOTON_BODY = {
+  type: 'FeatureCollection',
+  features: [
+    {
+      geometry: { type: 'Point', coordinates: [-104.9903, 39.7392] },
+      properties: { name: 'Denver', type: 'city', countrycode: 'US' },
+    },
+  ],
+}
+
+const NOMINATIM_BODY = [
+  {
+    lat: '39.7392',
+    lon: '-104.9903',
+    display_name: 'Denver, Colorado, United States',
+    address: { city: 'Denver', state: 'Colorado', country_code: 'us' },
+  },
+]
+
+test('a Photon URL on the Nominatim provider fails without crashing', async () => {
+  const server = await serveOnce(PHOTON_BODY)
+  try {
+    // geocoder() catches and returns {}. What matters is that the process
+    // survives to get here at all.
+    const result = await geocoder(server.url, 'Denver', false, '{{city}}')
+    assert.deepEqual(result, {})
+  } finally {
+    await server.close()
+  }
+})
+
+test('a Nominatim URL on the Photon provider fails without returning nothing silently', async () => {
+  const server = await serveOnce(NOMINATIM_BODY)
+  try {
+    const result = await geocoder(
+      server.url,
+      'Denver',
+      false,
+      '{{city}}',
+      'photon',
+    )
+    assert.deepEqual(result, {})
+  } finally {
+    await server.close()
+  }
+})
+
+// The matched pairs still work, so the checks above are not rejecting valid
+// responses.
+test('a correctly configured Photon webhook still geocodes', async () => {
+  const server = await serveOnce(PHOTON_BODY)
+  try {
+    const result = await geocoder(
+      server.url,
+      'Denver',
+      false,
+      '{{city}}',
+      'photon',
+    )
+    assert.deepEqual(result, [
+      { formatted: 'Denver', latitude: 39.7392, longitude: -104.9903 },
+    ])
+  } finally {
+    await server.close()
+  }
+})
+
+test('a correctly configured Nominatim webhook still geocodes', async () => {
+  const server = await serveOnce(NOMINATIM_BODY)
+  try {
+    const result = await geocoder(server.url, 'Denver', false, '{{city}}')
+    assert.deepEqual(result, [
+      { formatted: 'Denver', latitude: 39.7392, longitude: -104.9903 },
+    ])
+  } finally {
+    await server.close()
+  }
 })

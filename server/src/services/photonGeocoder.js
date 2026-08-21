@@ -257,6 +257,14 @@ async function photonGeocoder(photonUrl, search, isReverse) {
         })
 
   const response = await fetchJson(url)
+  // The mirror of the Nominatim check: a JSON array is Nominatim's search
+  // shape, so the URL and the provider disagree. Without this the caller just
+  // gets an empty result set and no reason for it.
+  if (Array.isArray(response)) {
+    throw new Error(
+      `${photonUrl} answered with a JSON array, which is Nominatim's format rather than Photon's. Remove "geocoderProvider": "photon" from this webhook, or point the URL at a Photon instance.`,
+    )
+  }
   // fetchJson answers a failed request with the Response rather than throwing,
   // so an absent features array covers both a network failure and an empty
   // result set.
