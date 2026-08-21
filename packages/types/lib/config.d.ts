@@ -84,13 +84,7 @@ export type Config<Client extends boolean = false> = DeepMerge<
         leagues: {
           minRank?: number
           maxRank?: number
-          littleCupRules?: boolean
         }[]
-        leagueObj: {
-          [key in BaseConfig['api']['pvp']['leagues'][number]['name']]:
-            | number
-            | { little: false; cap: number }
-        }
       }
     }
     map: {

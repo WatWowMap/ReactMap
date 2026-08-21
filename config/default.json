@@ -110,8 +110,7 @@
           "cp": 2500
         }
       ],
-      "levels": [50, 51],
-      "reactMapHandlesPvp": false
+      "levels": [50, 51]
     },
     "portalUpdateLimit": 30,
     "weatherCellLimit": 3,
@@ -247,7 +246,7 @@
       "fetchLatestInvasions": true,
       "invasionCacheHrs": 1,
       "fallbackRocketPokemonFiltering": true,
-      "masterfileCacheHrs": 6,
+      "masterfileCacheHrs": 12,
       "webhookCacheHrs": 1,
       "questLayerMode": "without_ar",
       "questMessage": "",

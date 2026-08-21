@@ -5,10 +5,7 @@
   "reloadConfigOnSave": true,
   "api": {
     "reactMapSecret": "You Should Change Me",
-    "maxSessions": 5,
-    "pvp": {
-      "reactMapHandlesPvp": false
-    }
+    "maxSessions": 5
   },
   "map": {
     "general": {
