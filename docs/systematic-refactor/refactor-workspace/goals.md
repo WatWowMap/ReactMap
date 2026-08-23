@@ -2,7 +2,7 @@
 
 Written against `90f94e63` on branch `c/project-2-0-audit-49a89f`.
 
-Phase 2 of the systematic-refactor workflow. Goals here are drawn from what Rin stated
+Phase 2 of the systematic-refactor workflow. Goals here are drawn from what the maintainer stated
 across the audit session rather than from a fresh questionnaire — she asked that we use
 what we already have. Everything she decided explicitly is marked **stated**; everything
 inferred is marked **assumed** and needs a yes/no before it hardens into a plan.
@@ -13,7 +13,7 @@ inferred is marked **assumed** and needs a yes/no before it hardens into a plan.
 
 From the standard checklist, the picks are:
 
-| Driver                              | Status              | What Rin actually said                                                                                  |
+| Driver                              | Status              | What was actually said                                                                                  |
 | ----------------------------------- | ------------------- | ------------------------------------------------------------------------------------------------------- |
 | Architecture (boundaries, layering) | **stated**          | Golbat becomes the data source; gut RDM/MAD remnants                                                    |
 | API surface change (breaking)       | **stated**          | "Removing graphql, just native websocket is fine"                                                       |
@@ -26,9 +26,9 @@ From the standard checklist, the picks are:
 
 ---
 
-## 2. Goals, in Rin's priority order
+## 2. Goals, in the maintainer's priority order
 
-She ordered these herself: _"most importantly: make filtering easier to use and understand."_
+These were ordered by the maintainer: _"most importantly: make filtering easier to use and understand."_
 
 ### G1 — Filtering that a person can understand without a manual _(stated, highest priority)_
 
@@ -56,7 +56,7 @@ Clearing site data loses them; a second device never sees them.
 column specifically because push transport needs a reverse index (condition → rules → users)
 to decide which connected clients care about an incoming entity.
 
-Rin pushed back on an earlier JSON-column recommendation and was right to.
+An earlier JSON-column recommendation was pushed back on, correctly.
 
 ### G3 — Networking: smaller payloads, push instead of poll _(stated)_
 
@@ -78,7 +78,7 @@ attached, while the client pays for Apollo, `graphql`, and a normalised cache it
 
 ### G5 — Golbat as the only _scanner_ data source _(stated, scope corrected)_
 
-Rin's framing was "improve comms with golbat". The audit sharpened it: today every fort model
+The original framing was "improve comms with golbat". The audit sharpened it: today every fort model
 carries a Golbat endpoint branch _and_ a SQL fallback, with comments about keeping the two
 byte-identical.
 
@@ -109,7 +109,7 @@ stylesheet; 2 of 49 icon buttons have an accessible name.
 
 ### G9 — Performance at real marker counts _(stated, with measurements)_
 
-Rin's own numbers: choppy past 3,000 markers, and timers are the worst part. Two independent
+Measured in production: choppy past 3,000 markers, and timers are the worst part. Two independent
 causes were identified, both fixable without a new render engine:
 
 - `ToolTipWrapper` mounts a permanent Leaflet tooltip per marker whose `Timer` re-renders at
@@ -119,18 +119,18 @@ causes were identified, both fixable without a new render engine:
 
 ### G10 — Config that declares shapes instead of enumerating instances _(stated)_
 
-Rin: _"the config is absolutely batshit."_ Measured: 3,574 lines across two hand-mirrored
+Stated plainly: _"the config is absolutely batshit."_ Measured: 3,574 lines across two hand-mirrored
 files defining 611 keys — 5.8 lines of definition per settable key — with only 7 keys
 genuinely unreferenced. 45% of leaves are repeated key names.
 
 ### G11 — Auth reviewed properly _(stated)_
 
 Done as part of the audit; findings carried into the map. One item deliberately retained by
-Rin's decision and not tracked further here.
+a deliberate decision and is not tracked further here.
 
 ### G12 — Backend in Go _(stated as a question, deliberately unresolved)_
 
-Rin's framing: _"maybe rewrite the backend in GO?"_
+Framed as a question: _"maybe rewrite the backend in GO?"_
 
 **Recommendation carried forward:** not as a wholesale rewrite. Of 23,682 backend lines,
 ~7,347 are scanner SQL this plan deletes and ~1,960 are the filter engine it replaces —
@@ -140,7 +140,7 @@ keeping auth and permissions. Decide after the deletions land, because they chan
 
 ### G13 — Replace MUI with shadcn/ui _(stated)_
 
-Rin: _"Mui is so heavy on the client and outdated feeling."_
+Stated plainly: _"Mui is so heavy on the client and outdated feeling."_
 
 **Measured blast radius:** 204 of 415 client files import `@mui/*` — 49% of the client. 834
 import lines, 71 distinct `@mui/material` components, 82 distinct icons, 187 `sx=` props, 26
@@ -159,7 +159,7 @@ rendered by React.
 
 ### G14 — Poracle is the only webhook provider, and it gets its own page _(stated)_
 
-Two separate changes Rin asked for together.
+Two separate changes, asked for together.
 
 **Single-provider.** The multi-provider abstraction was built for webhook backends that never
 materialised. `selectedWebhook` alone has 55 references across 7 files; `webhookObj` is a
@@ -185,20 +185,20 @@ New surface — and public-facing copy, so it goes through the humanizer pass be
 ### Stated
 
 - **Breaking changes are allowed.** This is a major version.
-- **Rin maintains Golbat too**, so Golbat-side changes are in scope — and three of the four
+- **Golbat is maintained by the same person**, so Golbat-side changes are in scope — and three of the four
   longest poles turn out to live there.
 - **ReactMap ships to third-party operators.** Self-hosted, multi-tenant, own configs. Any
-  migration has to work for people who are not Rin.
+  migration has to work for operators who are not the maintainer.
 - **Production Golbat caps:** 5,000 pokemon results, forts at default. ReactMap currently
   requests 35,000.
 - **Gym badges reach a few thousand per user**, against Golbat's 500-id query cap which
   returns 413 rather than truncating. Batching is a prerequisite, not an optimisation.
-- **`fort_in_memory=false` is no longer run** on Rin's deployments.
+- **`fort_in_memory=false` is no longer run** on the maintainer's own deployments.
 
 ### Assumed — confirm before planning
 
 - **A1 — Migration strategy: greenfield client, greenfield data service, strangled auth/config.**
-  Rin leaned greenfield (_"just write 2.0 in place alongside 1.0"_) and two adversarial passes
+  The stated lean was greenfield (_"just write 2.0 in place alongside 1.0"_) and two adversarial passes
   converged on splitting by layer rather than choosing globally.
   **G13 effectively settles the client half.** The overlap is close to total: 204 of 415 files
   import MUI, 35 import react-leaflet directly with no abstraction, essentially every file
