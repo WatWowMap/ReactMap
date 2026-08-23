@@ -1,5 +1,5 @@
 const assert = require('node:assert/strict')
-const { test } = require('node:test')
+const { test } = require('bun:test')
 const knexFactory = require('knex')
 
 const { state } = require('./stateMock')
@@ -178,24 +178,25 @@ test('Buddy Showcase DNF uses Golbat exact focus selectors', () => {
   )
 })
 
-test('builder defaults exact Showcase filters without broad b9', (t) => {
+test('builder defaults exact Showcase filters without broad b9', () => {
   const previousAvailable = state.event.available.pokestops
-  t.after(() => {
+  try {
+    state.event.available.pokestops = [...SHOWCASE_BUDDY_FILTER_KEYS, 'b9']
+
+    const filters = buildPokestops(
+      { eventStops: true },
+      { showcasePokemon: true },
+    )
+
+    assert.deepEqual(
+      SHOWCASE_BUDDY_FILTER_KEYS.map((key) => filters[key].enabled),
+      [true, true, true, true],
+    )
+    assert.equal(filters.b9.enabled, false)
+    assert.equal(buildPokestops({}, { showcasePokemon: true }).y2, undefined)
+  } finally {
     state.event.available.pokestops = previousAvailable
-  })
-  state.event.available.pokestops = [...SHOWCASE_BUDDY_FILTER_KEYS, 'b9']
-
-  const filters = buildPokestops(
-    { eventStops: true },
-    { showcasePokemon: true },
-  )
-
-  assert.deepEqual(
-    SHOWCASE_BUDDY_FILTER_KEYS.map((key) => filters[key].enabled),
-    [true, true, true, true],
-  )
-  assert.equal(filters.b9.enabled, false)
-  assert.equal(buildPokestops({}, { showcasePokemon: true }).y2, undefined)
+  }
 })
 
 test('shared Pokestop access gate includes every Pokestop facet', () => {
@@ -208,40 +209,41 @@ test('shared Pokestop access gate includes every Pokestop facet', () => {
   assert.equal(hasAnyPokestopPermission(null), false)
 })
 
-test('Event Stop-only users receive the Pokestop filter tree', (t) => {
+test('Event Stop-only users receive the Pokestop filter tree', () => {
   const previousModels = state.db.models.Pokestop
   const previousAvailable = state.event.available.pokestops
   const previousMasterfile = state.event.masterfile
-  t.after(() => {
+  try {
+    state.db.models.Pokestop = [{}]
+    state.event.available.pokestops = ['y3']
+    state.event.masterfile = {
+      items: {},
+      pokemon: {
+        25: { family: 25, forms: { 0: {} } },
+      },
+    }
+
+    const filters = buildDefaultFilters({ eventStops: true })
+
+    assert.ok(filters.pokestops)
+    assert.equal(filters.pokestops.allPokestops, undefined)
+    assert.equal(filters.pokestops.quests, undefined)
+    assert.equal(typeof filters.pokestops.eventStops, 'boolean')
+    assert.ok(filters.pokestops.filter.s0)
+    assert.equal(filters.pokestops.filter.y3.enabled, true)
+    assert.equal(filters.pokestops.filter['25'], undefined)
+    assert.equal(filters.pokestops.filter['25-0'], undefined)
+    assert.equal(filters.pokestops.filter.c25, undefined)
+    assert.equal(filters.pokestops.filter.x25, undefined)
+
+    const questFilters = buildDefaultFilters({ quests: true })
+    assert.ok(questFilters.pokestops.filter['25'])
+    assert.ok(questFilters.pokestops.filter['25-0'])
+  } finally {
     state.db.models.Pokestop = previousModels
     state.event.available.pokestops = previousAvailable
     state.event.masterfile = previousMasterfile
-  })
-  state.db.models.Pokestop = [{}]
-  state.event.available.pokestops = ['y3']
-  state.event.masterfile = {
-    items: {},
-    pokemon: {
-      25: { family: 25, forms: { 0: {} } },
-    },
   }
-
-  const filters = buildDefaultFilters({ eventStops: true })
-
-  assert.ok(filters.pokestops)
-  assert.equal(filters.pokestops.allPokestops, undefined)
-  assert.equal(filters.pokestops.quests, undefined)
-  assert.equal(typeof filters.pokestops.eventStops, 'boolean')
-  assert.ok(filters.pokestops.filter.s0)
-  assert.equal(filters.pokestops.filter.y3.enabled, true)
-  assert.equal(filters.pokestops.filter['25'], undefined)
-  assert.equal(filters.pokestops.filter['25-0'], undefined)
-  assert.equal(filters.pokestops.filter.c25, undefined)
-  assert.equal(filters.pokestops.filter.x25, undefined)
-
-  const questFilters = buildDefaultFilters({ quests: true })
-  assert.ok(questFilters.pokestops.filter['25'])
-  assert.ok(questFilters.pokestops.filter['25-0'])
 })
 
 test('Event Stop-only users can configure their visible Pokestop markers', () => {
@@ -373,48 +375,48 @@ test('secondary filter exact-matches Buddy level and emits normalized focus', ()
   )
 })
 
-test('SQL availability selects and derives active structured focus', async (t) => {
+test('SQL availability selects and derives active structured focus', async () => {
   const previousQuery = Pokestop.query
   const knex = knexFactory({ client: 'mysql2' })
   const sql = []
 
-  t.after(async () => {
+  try {
+    Pokestop.query = () => {
+      const query = knex('pokestop')
+      query.then = (resolve, reject) => {
+        const statement = query.toSQL().sql
+        sql.push(statement)
+        const rows = statement.includes('showcase_focus')
+          ? [{ showcase_focus: '{"type":"buddy","min_level":4}' }]
+          : []
+        return Promise.resolve(rows).then(resolve, reject)
+      }
+      return query
+    }
+
+    const result = await Pokestop.getAvailable({
+      hasAltQuests: false,
+      hasMultiInvasions: false,
+      multiInvasionMs: false,
+      hasRewardAmount: true,
+      hasConfirmed: false,
+      hasShowcaseData: false,
+      hasShowcaseForm: false,
+      hasShowcaseType: false,
+      hasShowcaseFocus: true,
+    })
+
+    assert.equal(result.available.includes('y4'), true)
+    assert.equal(
+      sql.some(
+        (statement) =>
+          statement.includes('showcase_focus') &&
+          statement.includes('showcase_expiry'),
+      ),
+      true,
+    )
+  } finally {
     Pokestop.query = previousQuery
     await knex.destroy()
-  })
-
-  Pokestop.query = () => {
-    const query = knex('pokestop')
-    query.then = (resolve, reject) => {
-      const statement = query.toSQL().sql
-      sql.push(statement)
-      const rows = statement.includes('showcase_focus')
-        ? [{ showcase_focus: '{"type":"buddy","min_level":4}' }]
-        : []
-      return Promise.resolve(rows).then(resolve, reject)
-    }
-    return query
   }
-
-  const result = await Pokestop.getAvailable({
-    hasAltQuests: false,
-    hasMultiInvasions: false,
-    multiInvasionMs: false,
-    hasRewardAmount: true,
-    hasConfirmed: false,
-    hasShowcaseData: false,
-    hasShowcaseForm: false,
-    hasShowcaseType: false,
-    hasShowcaseFocus: true,
-  })
-
-  assert.equal(result.available.includes('y4'), true)
-  assert.equal(
-    sql.some(
-      (statement) =>
-        statement.includes('showcase_focus') &&
-        statement.includes('showcase_expiry'),
-    ),
-    true,
-  )
 })

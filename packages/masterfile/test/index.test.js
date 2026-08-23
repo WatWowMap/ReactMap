@@ -5,7 +5,14 @@ const fs = require('node:fs')
 const http = require('node:http')
 const path = require('node:path')
 const { once } = require('node:events')
-const { after, before, test } = require('node:test')
+const {
+  afterAll,
+  afterEach,
+  beforeAll,
+  mock,
+  spyOn,
+  test,
+} = require('bun:test')
 
 const config = require('@rm/config')
 
@@ -41,7 +48,7 @@ let server
 let baseUrl
 let requestCount = 0
 
-before(async () => {
+beforeAll(async () => {
   server = http.createServer((req, res) => {
     requestCount += 1
     if (req.url === '/failure') {
@@ -61,45 +68,50 @@ before(async () => {
   baseUrl = `http://127.0.0.1:${address.port}`
 })
 
-after(async () => {
+afterAll(async () => {
   const closed = once(server, 'close')
   server.close()
   await closed
 })
 
 /**
- * @param {import('node:test').TestContext} context
  * @param {string} endpoint
  */
-const mockEndpoint = (context, endpoint) => {
+const mockEndpoint = (endpoint) => {
   const getSafe = config.getSafe.bind(config)
-  context.mock.method(config, 'getSafe', (key) => {
+  spyOn(config, 'getSafe').mockImplementation((key) => {
     if (key === 'api.pogoApiEndpoints.masterfile') return endpoint
     if (key === 'rarity') return {}
     return getSafe(key)
   })
 }
 
-test('load returns a valid cached masterfile without generating', async (t) => {
-  t.mock.method(fs, 'readFileSync', () => JSON.stringify(remoteMasterfile))
-  t.mock.method(config, 'getSafe', () => {
+afterEach(() => {
+  mock.restore()
+})
+
+test('load returns a valid cached masterfile without generating', async () => {
+  spyOn(fs, 'readFileSync').mockImplementation(() =>
+    JSON.stringify(remoteMasterfile),
+  )
+  spyOn(config, 'getSafe').mockImplementation(() => {
     throw new Error('generation should not run for a valid cache')
   })
 
   assert.deepEqual(await load(), remoteMasterfile)
 })
 
-test('load awaits generation when the cache is missing', async (t) => {
+test('load awaits generation when the cache is missing', async () => {
   requestCount = 0
-  t.mock.method(fs, 'readFileSync', () => {
+  spyOn(fs, 'readFileSync').mockImplementation(() => {
     throw Object.assign(new Error('cache missing'), { code: 'ENOENT' })
   })
   /** @type {Parameters<typeof fs.promises.writeFile> | null} */
   let writeArgs = null
-  t.mock.method(fs.promises, 'writeFile', async (...args) => {
+  spyOn(fs.promises, 'writeFile').mockImplementation(async (...args) => {
     writeArgs = args
   })
-  mockEndpoint(t, `${baseUrl}/success`)
+  mockEndpoint(`${baseUrl}/success`)
 
   const masterfile = await load()
 
@@ -110,16 +122,16 @@ test('load awaits generation when the cache is missing', async (t) => {
   assert.equal(JSON.parse(writeArgs[1].toString()).pokemon[25].name, 'Pikachu')
 })
 
-test('load rejects when cache recovery generation fails', async (t) => {
+test('load rejects when cache recovery generation fails', async () => {
   requestCount = 0
-  t.mock.method(fs, 'readFileSync', () => {
+  spyOn(fs, 'readFileSync').mockImplementation(() => {
     throw Object.assign(new Error('cache missing'), { code: 'ENOENT' })
   })
   let writeCount = 0
-  t.mock.method(fs.promises, 'writeFile', async () => {
+  spyOn(fs.promises, 'writeFile').mockImplementation(async () => {
     writeCount += 1
   })
-  mockEndpoint(t, `${baseUrl}/failure`)
+  mockEndpoint(`${baseUrl}/failure`)
 
   await assert.rejects(load(), /503 Service Unavailable/)
   assert.equal(requestCount, 1)

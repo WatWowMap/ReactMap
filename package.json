@@ -29,7 +29,7 @@
     "release": "vite build -- -r",
     "server": "bun server/src/index.js",
     "start": "bun .",
-    "test": "yarn workspace @rm/masterfile run test && node --experimental-test-module-mocks --test server/test/*.test.js",
+    "test": "bun test",
     "prepare": "husky install",
     "watch": "vite"
   },
