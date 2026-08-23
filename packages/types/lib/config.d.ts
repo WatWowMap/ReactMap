@@ -201,9 +201,10 @@ export interface Webhook {
    * handling. Defaults to `nominatim`.
    *
    * Optional when Poracle reports it. Poracle sends the backend behind its
-   * `providerURL` as `provider`, and ReactMap uses that when this is unset,
-   * the same way `nominatimUrl` falls back to Poracle's `providerURL`. Setting
-   * it here always wins.
+   * `providerURL` as `provider`, and ReactMap uses that when this is unset and
+   * `nominatimUrl` was itself inherited from Poracle. A locally configured URL
+   * keeps its local backend, since the two are one setting in two fields.
+   * Setting this explicitly always wins.
    */
   geocoderProvider?: 'nominatim' | 'photon'
   trialPeriodEligible?: boolean

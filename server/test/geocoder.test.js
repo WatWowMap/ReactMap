@@ -1156,13 +1156,48 @@ test('a formatted result keeps the mapped fields for the Geocoder type', async (
 // backend type in ReactMap's own config. Local config still wins, matching how
 // providerURL and addressFormat already behave.
 test('derives the geocoder provider from Poracle when it is not set locally', () => {
-  assert.equal(resolveGeocoderProvider('photon', undefined), 'photon')
-  assert.equal(resolveGeocoderProvider('nominatim', undefined), 'nominatim')
+  const args = { local: undefined, usingRemoteURL: true }
+  assert.equal(resolveGeocoderProvider({ ...args, remote: 'photon' }), 'photon')
+  assert.equal(
+    resolveGeocoderProvider({ ...args, remote: 'nominatim' }),
+    'nominatim',
+  )
 })
 
 test('local configuration beats what Poracle reports', () => {
-  assert.equal(resolveGeocoderProvider('nominatim', 'photon'), 'photon')
-  assert.equal(resolveGeocoderProvider('photon', 'nominatim'), 'nominatim')
+  assert.equal(
+    resolveGeocoderProvider({
+      remote: 'nominatim',
+      local: 'photon',
+      usingRemoteURL: true,
+    }),
+    'photon',
+  )
+  // Explicit local config wins even when the URL is local too, which is the
+  // only way to run a backend Poracle does not know about.
+  assert.equal(
+    resolveGeocoderProvider({
+      remote: 'nominatim',
+      local: 'photon',
+      usingRemoteURL: false,
+    }),
+    'photon',
+  )
+})
+
+// The URL and the protocol used to talk to it are one setting in two fields.
+// Inheriting the type while keeping a local URL is how a working Nominatim
+// deployment ends up being addressed as Photon: local nominatimUrl, no
+// geocoderProvider, and a Photon-backed Poracle supplying the type.
+test('never inherits the provider without the URL that goes with it', () => {
+  assert.equal(
+    resolveGeocoderProvider({
+      remote: 'photon',
+      local: undefined,
+      usingRemoteURL: false,
+    }),
+    undefined,
+  )
 })
 
 // Poracle supports google and none. Neither has a ReactMap equivalent, and
@@ -1171,7 +1206,11 @@ test('ignores Poracle backends ReactMap cannot drive', () => {
   const unusable = ['google', 'none', '', undefined, 'PHOTON']
   unusable.forEach((remote) => {
     assert.equal(
-      resolveGeocoderProvider(remote, undefined),
+      resolveGeocoderProvider({
+        remote,
+        local: undefined,
+        usingRemoteURL: true,
+      }),
       undefined,
       `${remote} should not resolve to a provider`,
     )
@@ -1194,7 +1233,11 @@ test('a Poracle geocoding provider never overwrites the webhook provider', () =>
   const remoteConfig = { provider: 'photon', providerURL: 'http://photon:2322' }
   const { provider, ...rest } = remoteConfig
   Object.assign(api, rest)
-  api.geocoderProvider = resolveGeocoderProvider(provider, api.geocoderProvider)
+  api.geocoderProvider = resolveGeocoderProvider({
+    remote: provider,
+    local: api.geocoderProvider,
+    usingRemoteURL: true,
+  })
 
   assert.equal(api.provider, 'poracle')
   assert.equal(api.geocoderProvider, 'photon')

@@ -55,12 +55,21 @@ const REMOTE_GEOCODERS = new Set(['nominatim', 'photon'])
  * deployment that gets its geocoder URL from Poracle no longer has to restate
  * the backend type in ReactMap's own config. Local config still wins, matching
  * how `providerURL` and `addressFormat` already behave.
- * @param {string} [remote] The `provider` field from Poracle's remote config
- * @param {string} [local] geocoderProvider from this webhook's own config
+ *
+ * The backend type is only inherited when the URL was inherited with it. A URL
+ * and the protocol used to talk to it are one setting in two fields, and
+ * splitting them across two sources is how a working Nominatim deployment ends
+ * up being addressed as Photon: keep a local `nominatimUrl`, omit
+ * `geocoderProvider`, and let a Photon-backed Poracle supply the type.
+ * @param {object} args
+ * @param {string} [args.remote] The `provider` field from Poracle's remote config
+ * @param {string} [args.local] geocoderProvider from this webhook's own config
+ * @param {boolean} args.usingRemoteURL Whether nominatimUrl also came from Poracle
  * @returns {'nominatim' | 'photon' | undefined}
  */
-function resolveGeocoderProvider(remote, local) {
+function resolveGeocoderProvider({ remote, local, usingRemoteURL }) {
   if (local) return /** @type {'nominatim' | 'photon'} */ (local)
+  if (!usingRemoteURL) return undefined
   return REMOTE_GEOCODERS.has(remote)
     ? /** @type {'nominatim' | 'photon'} */ (remote)
     : undefined
@@ -265,13 +274,17 @@ class PoracleAPI {
     if (addressFormat && !this.addressFormat) {
       this.addressFormat = addressFormat
     }
-    if (providerURL && !this.nominatimUrl) {
+    // Evaluated before the assignment below, because it is the assignment that
+    // decides whether the backend type may be inherited too.
+    const usingRemoteURL = !!providerURL && !this.nominatimUrl
+    if (usingRemoteURL) {
       this.nominatimUrl = providerURL
     }
-    this.geocoderProvider = resolveGeocoderProvider(
-      provider,
-      this.geocoderProvider,
-    )
+    this.geocoderProvider = resolveGeocoderProvider({
+      remote: provider,
+      local: this.geocoderProvider,
+      usingRemoteURL,
+    })
     this.leagues = [
       { name: 'great', cp: 1500, min: remoteConfig.pvpFilterGreatMinCP },
       { name: 'ultra', cp: 2500, min: remoteConfig.pvpFilterUltraMinCP },
