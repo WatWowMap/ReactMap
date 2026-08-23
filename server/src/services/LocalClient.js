@@ -1,7 +1,6 @@
 // @ts-check
 const { Strategy } = require('passport-local')
 const passport = require('passport')
-const bcrypt = require('bcrypt')
 
 const config = require('@rm/config')
 
@@ -11,6 +10,25 @@ const { scannerPerms, scannerCooldownBypass } = require('../utils/scannerPerms')
 const { mergePerms } = require('../utils/mergePerms')
 const { AuthClient } = require('./AuthClient')
 const { state } = require('./state')
+
+const BCRYPT_COST = 10
+
+/**
+ * @param {string} password
+ * @returns {Promise<string>}
+ */
+async function hashPassword(password) {
+  return Bun.password.hash(password, { algorithm: 'bcrypt', cost: BCRYPT_COST })
+}
+
+/**
+ * @param {string} password
+ * @param {string} hash
+ * @returns {Promise<boolean>}
+ */
+async function verifyPassword(password, hash) {
+  return Bun.password.verify(password, hash)
+}
 
 class LocalClient extends AuthClient {
   getPerms(trialActive = false, status = 'local') {
@@ -63,7 +81,7 @@ class LocalClient extends AuthClient {
                 const newUser =
                   await state.db.models.User.query().insertAndFetch({
                     username,
-                    password: await bcrypt.hash(password, 10),
+                    password: await hashPassword(password),
                     strategy: 'local',
                     tutorial: !forceTutorial,
                   })
@@ -81,7 +99,7 @@ class LocalClient extends AuthClient {
                 return done(null, user, { message: 'error_creating_user' })
               }
             }
-            if (bcrypt.compareSync(password, userExists.password)) {
+            if (await verifyPassword(password, userExists.password)) {
               ;['discordPerms', 'telegramPerms'].forEach((permSet) => {
                 if (userExists[permSet]) {
                   user.perms = mergePerms(
@@ -154,4 +172,4 @@ class LocalClient extends AuthClient {
   }
 }
 
-module.exports = { LocalClient }
+module.exports = { LocalClient, hashPassword, verifyPassword }
