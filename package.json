@@ -71,6 +71,10 @@
       {
         "name": "develop",
         "prerelease": true
+      },
+      {
+        "name": "v2",
+        "prerelease": true
       }
     ],
     "plugins": [
