@@ -239,6 +239,31 @@ function formatPhotonFeature(feature) {
 }
 
 /**
+ * Recognises a response that came from Nominatim rather than Photon.
+ *
+ * An array is Nominatim's /search shape. A single object carrying result fields
+ * and no `features` is its /reverse shape. Both mean the URL and the configured
+ * provider disagree.
+ *
+ * The test is deliberately positive: it looks for fields a Nominatim result
+ * has, rather than treating anything without `features` as suspect. fetchJson
+ * hands back a Response object on a failed request, and Nominatim answers a
+ * miss with {"error":"Unable to geocode"} -- neither is a provider mismatch,
+ * and an empty result set is already the right outcome for both.
+ * @param {any} response
+ */
+function isNominatimResponse(response) {
+  if (Array.isArray(response)) return true
+  if (!response || typeof response !== 'object') return false
+  if ('features' in response) return false
+  return (
+    'address' in response ||
+    'display_name' in response ||
+    'place_id' in response
+  )
+}
+
+/**
  * @param {string} photonUrl
  * @param {string | { lat: number, lon: number }} search
  * @param {boolean} isReverse
@@ -257,12 +282,14 @@ async function photonGeocoder(photonUrl, search, isReverse) {
         })
 
   const response = await fetchJson(url)
-  // The mirror of the Nominatim check: a JSON array is Nominatim's search
-  // shape, so the URL and the provider disagree. Without this the caller just
-  // gets an empty result set and no reason for it.
-  if (Array.isArray(response)) {
+  // The mirror of the Nominatim check. Both of Nominatim's shapes have to be
+  // recognised: /search answers with an array, and /reverse answers with a
+  // single object. Checking only the array would let gym reverse geocoding
+  // fall through to an empty result set with no reason given, which is the
+  // path resolvers.js takes for every fort lookup.
+  if (isNominatimResponse(response)) {
     throw new Error(
-      `${photonUrl} answered with a JSON array, which is Nominatim's format rather than Photon's. Remove "geocoderProvider": "photon" from this webhook, or point the URL at a Photon instance.`,
+      `${photonUrl} answered in Nominatim's format rather than Photon's. Remove "geocoderProvider": "photon" from this webhook, or point the URL at a Photon instance.`,
     )
   }
   // fetchJson answers a failed request with the Response rather than throwing,

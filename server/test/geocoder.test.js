@@ -10,6 +10,7 @@ const { geocoder } = require('../src/services/geocoder')
 const {
   formatPhotonFeature,
   joinComponents,
+  photonGeocoder,
   preferBroader,
 } = require('../src/services/photonGeocoder')
 
@@ -522,6 +523,89 @@ test('a correctly configured Nominatim webhook still geocodes', async () => {
     assert.deepEqual(result, [
       { formatted: 'Denver', latitude: 39.7392, longitude: -104.9903 },
     ])
+  } finally {
+    await server.close()
+  }
+})
+
+// Nominatim answers /reverse with a single object rather than the array /search
+// returns, and gym reverse geocoding is the path resolvers.js takes for every
+// fort lookup. Checking only for an array let that mismatch through as an empty
+// result set with no reason given.
+const NOMINATIM_REVERSE_BODY = {
+  place_id: 315787599,
+  lat: '39.7392',
+  lon: '-104.9903',
+  display_name: '1437, Bannock Street, Denver, Colorado, 80202, United States',
+  address: {
+    house_number: '1437',
+    road: 'Bannock Street',
+    city: 'Denver',
+    country_code: 'us',
+  },
+}
+
+// Asserted against photonGeocoder rather than geocoder(), deliberately.
+// geocoder() catches everything and returns {}, so a mismatch and a plain miss
+// look identical from there -- the whole point of this change is which error
+// reaches the log, and only the inner function exposes that.
+test('a Nominatim reverse response on the Photon provider raises a provider error', async () => {
+  const server = await serveOnce(NOMINATIM_REVERSE_BODY)
+  try {
+    await assert.rejects(
+      () => photonGeocoder(server.url, { lat: 39.7392, lon: -104.9903 }, true),
+      /Nominatim's format/,
+    )
+  } finally {
+    await server.close()
+  }
+})
+
+test('a Nominatim search response on the Photon provider raises a provider error', async () => {
+  const server = await serveOnce(NOMINATIM_BODY)
+  try {
+    await assert.rejects(
+      () => photonGeocoder(server.url, 'Denver', false),
+      /Nominatim's format/,
+    )
+  } finally {
+    await server.close()
+  }
+})
+
+// A miss is not a mismatch. An unmatched reverse lookup carries no result
+// fields, and an empty result is already the right outcome, so it must not be
+// reported as a provider error.
+test('a no-match reverse response is not mistaken for a provider mismatch', async () => {
+  const server = await serveOnce({ error: 'Unable to geocode' })
+  try {
+    const results = await photonGeocoder(server.url, { lat: 0, lon: 0 }, true)
+    assert.deepEqual(results, [])
+  } finally {
+    await server.close()
+  }
+})
+
+// The matched pair still works on the reverse path.
+test('a correctly configured Photon webhook still reverse geocodes', async () => {
+  const server = await serveOnce({
+    type: 'FeatureCollection',
+    features: [
+      {
+        geometry: { type: 'Point', coordinates: [-104.9903, 39.7392] },
+        properties: { city: 'Denver', state: 'Colorado', countrycode: 'US' },
+      },
+    ],
+  })
+  try {
+    const result = await geocoder(
+      server.url,
+      { lat: 39.7392, lon: -104.9903 },
+      true,
+      '{{city}}',
+      'photon',
+    )
+    assert.equal(result, 'Denver')
   } finally {
     await server.close()
   }
