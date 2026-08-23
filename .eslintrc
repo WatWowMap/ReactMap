@@ -12,7 +12,8 @@
   "globals": {
     "document": true,
     "window": true,
-    "CONFIG": true
+    "CONFIG": true,
+    "Bun": "readonly"
   },
   "rules": {
     "global-require": 0,
