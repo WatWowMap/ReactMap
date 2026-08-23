@@ -2,6 +2,7 @@
 const { Strategy } = require('passport-local')
 const passport = require('passport')
 
+const { log, TAGS } = require('@rm/logger')
 const config = require('@rm/config')
 
 const { areaPerms } = require('../utils/areaPerms')
@@ -13,6 +14,9 @@ const { state } = require('./state')
 
 const BCRYPT_COST = 10
 
+/** The input length bcrypt has always silently truncated at, in bytes. */
+const BCRYPT_MAX_BYTES = 72
+
 /**
  * @param {string} password
  * @returns {Promise<string>}
@@ -22,12 +26,55 @@ async function hashPassword(password) {
 }
 
 /**
+ * Replaces a user's stored hash with one covering the whole password.
+ *
+ * A failed rewrite must not deny an otherwise valid login, so this reports the
+ * problem and gives up. The next successful login tries again.
+ *
+ * @param {string} password
+ * @param {number} userId
+ * @returns {Promise<void>}
+ */
+async function upgradeStoredHash(password, userId) {
+  try {
+    await state.db.models.User.query()
+      .update({ password: await hashPassword(password) })
+      .where('id', userId)
+  } catch (e) {
+    log.warn(TAGS.auth, 'Unable to upgrade a legacy password hash', userId, e)
+  }
+}
+
+/**
+ * bcrypt truncated its input at 72 bytes, so hashes written before the move to
+ * Bun.password encode only that prefix. Bun pre-hashes the whole input instead,
+ * so a longer password no longer matches its own stored hash. On a failed
+ * verify, retry against the bytes bcrypt would have seen, and on success
+ * re-hash the full password so the account never needs this path again.
+ *
+ * Accepting the prefix is what bcrypt itself did for years, so it gives up
+ * nothing relative to the previous behaviour, and it converges: once every
+ * affected account has logged in once, the fallback is dead code.
+ *
  * @param {string} password
  * @param {string} hash
+ * @param {number} [userId] omit to verify without upgrading the stored hash
  * @returns {Promise<boolean>}
  */
-async function verifyPassword(password, hash) {
-  return Bun.password.verify(password, hash)
+async function verifyPassword(password, hash, userId) {
+  if (await Bun.password.verify(password, hash)) return true
+
+  if (Buffer.byteLength(password, 'utf8') <= BCRYPT_MAX_BYTES) return false
+
+  // Slice the bytes, not the characters. The two disagree for any non-ASCII
+  // password, and a character-boundary slice would not reproduce what bcrypt
+  // hashed. The cut may land inside a multi-byte character, which is fine and
+  // is why this stays a Buffer: re-encoding a split character changes it.
+  const truncated = Buffer.from(password, 'utf8').subarray(0, BCRYPT_MAX_BYTES)
+  if (!(await Bun.password.verify(truncated, hash))) return false
+
+  if (userId !== undefined) await upgradeStoredHash(password, userId)
+  return true
 }
 
 class LocalClient extends AuthClient {
@@ -99,7 +146,9 @@ class LocalClient extends AuthClient {
                 return done(null, user, { message: 'error_creating_user' })
               }
             }
-            if (await verifyPassword(password, userExists.password)) {
+            if (
+              await verifyPassword(password, userExists.password, userExists.id)
+            ) {
               ;['discordPerms', 'telegramPerms'].forEach((permSet) => {
                 if (userExists[permSet]) {
                   user.perms = mergePerms(
