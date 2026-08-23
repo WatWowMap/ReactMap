@@ -1,3 +1,15 @@
+## [1.50.2](https://github.com/WatWowMap/ReactMap/compare/v1.50.1...v1.50.2) (2026-08-23)
+
+
+### Bug Fixes
+
+* disable legacy pvp calc ([1ccb391](https://github.com/WatWowMap/ReactMap/commit/1ccb3914e4f5bb3840b0a52a880f3a338d412562))
+
+
+### Reverts
+
+* Revert "Update FUNDING.yml" ([4081a70](https://github.com/WatWowMap/ReactMap/commit/4081a70d1e65f9ad7c436184096834d4cec5d832))
+
 ## [1.50.1](https://github.com/WatWowMap/ReactMap/compare/v1.50.0...v1.50.1) (2026-08-20)
 
 
