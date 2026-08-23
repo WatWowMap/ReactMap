@@ -2,7 +2,6 @@
 const { default: center } = require('@turf/center')
 const fs = require('fs')
 const { resolve } = require('path')
-const { default: fetch } = require('node-fetch')
 const RTree = require('rtree')
 
 const config = require('@rm/config')

@@ -2,8 +2,6 @@
 const fs = require('fs')
 const { resolve } = require('path')
 
-const { default: fetch, Response } = require('node-fetch')
-
 const config = require('@rm/config')
 const { log, TAGS } = require('@rm/logger')
 
@@ -15,7 +13,7 @@ const REDACTED_HEADERS = new Set(['authorization', 'x-golbat-secret'])
  * Returns a shallow copy of the fetch options with credential headers masked,
  * so debug logs and the failed-request payload dump never persist the
  * X-Golbat-Secret or Basic auth to disk.
- * @param {import('node-fetch').RequestInit} [options]
+ * @param {RequestInit} [options]
  */
 function redactOptions(options) {
   const headers = options && /** @type {any} */ (options).headers
@@ -33,7 +31,7 @@ function redactOptions(options) {
 /**
  * fetch wrapper with timeout and error handling
  * @param {string} url
- * @param {import('node-fetch').RequestInit} [options]
+ * @param {RequestInit} [options]
  * @returns
  */
 async function fetchJson(url, options = undefined) {

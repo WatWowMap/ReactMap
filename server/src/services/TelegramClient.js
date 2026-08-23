@@ -1,5 +1,4 @@
 // @ts-check
-const { default: fetch } = require('node-fetch')
 const { TelegramStrategy } = require('@rainb0w-clwn/passport-telegram-official')
 const passport = require('passport')
 

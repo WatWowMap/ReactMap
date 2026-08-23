@@ -1,7 +1,6 @@
 // @ts-check
 const { promises: fs } = require('fs')
 const path = require('path')
-const { default: fetch } = require('node-fetch')
 
 const config = require('@rm/config')
 const { Logger } = require('@rm/logger')
