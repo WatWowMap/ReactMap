@@ -199,6 +199,11 @@ export interface Webhook {
    * Which geocoding backend `nominatimUrl` points at. Photon speaks GeoJSON
    * rather than Nominatim's JSON, so it needs its own request and response
    * handling. Defaults to `nominatim`.
+   *
+   * Optional when Poracle reports it. Poracle sends the backend behind its
+   * `providerURL` as `provider`, and ReactMap uses that when this is unset,
+   * the same way `nominatimUrl` falls back to Poracle's `providerURL`. Setting
+   * it here always wins.
    */
   geocoderProvider?: 'nominatim' | 'photon'
   trialPeriodEligible?: boolean

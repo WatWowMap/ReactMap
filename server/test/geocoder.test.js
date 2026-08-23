@@ -5,7 +5,10 @@ const NodeGeocoder = require('node-geocoder')
 
 const http = require('node:http')
 
-const { PoracleAPI } = require('../src/services/Poracle')
+const {
+  PoracleAPI,
+  resolveGeocoderProvider,
+} = require('../src/services/Poracle')
 const {
   formatter,
   geocoder,
@@ -1146,4 +1149,53 @@ test('a formatted result keeps the mapped fields for the Geocoder type', async (
   } finally {
     await server.close()
   }
+})
+
+// Poracle reports the backend behind its providerURL as `provider`, so a
+// deployment whose geocoder URL comes from Poracle no longer has to restate the
+// backend type in ReactMap's own config. Local config still wins, matching how
+// providerURL and addressFormat already behave.
+test('derives the geocoder provider from Poracle when it is not set locally', () => {
+  assert.equal(resolveGeocoderProvider('photon', undefined), 'photon')
+  assert.equal(resolveGeocoderProvider('nominatim', undefined), 'nominatim')
+})
+
+test('local configuration beats what Poracle reports', () => {
+  assert.equal(resolveGeocoderProvider('nominatim', 'photon'), 'photon')
+  assert.equal(resolveGeocoderProvider('photon', 'nominatim'), 'nominatim')
+})
+
+// Poracle supports google and none. Neither has a ReactMap equivalent, and
+// mapping them onto nominatim would claim something untrue about the backend.
+test('ignores Poracle backends ReactMap cannot drive', () => {
+  const unusable = ['google', 'none', '', undefined, 'PHOTON']
+  unusable.forEach((remote) => {
+    assert.equal(
+      resolveGeocoderProvider(remote, undefined),
+      undefined,
+      `${remote} should not resolve to a provider`,
+    )
+  })
+})
+
+// The reason `provider` is destructured out of remoteConfig rather than left to
+// the spread: this.provider is the webhook provider, an unrelated field that
+// happens to share the name.
+test('a Poracle geocoding provider never overwrites the webhook provider', () => {
+  const api = new PoracleAPI({
+    name: 'test',
+    host: 'http://127.0.0.1',
+    port: 3030,
+    provider: 'poracle',
+  })
+  assert.equal(api.provider, 'poracle')
+
+  // Mirrors what #fetchConfig does with a remote payload.
+  const remoteConfig = { provider: 'photon', providerURL: 'http://photon:2322' }
+  const { provider, ...rest } = remoteConfig
+  Object.assign(api, rest)
+  api.geocoderProvider = resolveGeocoderProvider(provider, api.geocoderProvider)
+
+  assert.equal(api.provider, 'poracle')
+  assert.equal(api.geocoderProvider, 'photon')
 })

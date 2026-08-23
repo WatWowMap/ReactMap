@@ -41,6 +41,31 @@ const SUBCATEGORIES = /** @type {const} */ ({
   gym: ['raid', 'egg', 'gym'],
 })
 
+/**
+ * Geocoding backends ReactMap can drive. Poracle also offers `google` and
+ * `none`, which have no equivalent here, so they are ignored rather than
+ * mapped onto something they are not.
+ */
+const REMOTE_GEOCODERS = new Set(['nominatim', 'photon'])
+
+/**
+ * Resolves which geocoding backend a webhook should use.
+ *
+ * Poracle reports the backend behind its `providerURL` as `provider`, so a
+ * deployment that gets its geocoder URL from Poracle no longer has to restate
+ * the backend type in ReactMap's own config. Local config still wins, matching
+ * how `providerURL` and `addressFormat` already behave.
+ * @param {string} [remote] The `provider` field from Poracle's remote config
+ * @param {string} [local] geocoderProvider from this webhook's own config
+ * @returns {'nominatim' | 'photon' | undefined}
+ */
+function resolveGeocoderProvider(remote, local) {
+  if (local) return /** @type {'nominatim' | 'photon'} */ (local)
+  return REMOTE_GEOCODERS.has(remote)
+    ? /** @type {'nominatim' | 'photon'} */ (remote)
+    : undefined
+}
+
 class PoracleAPI {
   /** @param {import("@rm/types").Config['webhooks'][number]} webhook */
   constructor(webhook) {
@@ -231,7 +256,11 @@ class PoracleAPI {
         `Poracle must be at least version 4.8.4, current version is ${this.version}`,
       )
     }
-    const { providerURL, addressFormat, ...rest } = remoteConfig
+    // `provider` is pulled out of remoteConfig even when it is not usable.
+    // this.provider is the *webhook* provider ('poracle'); letting Poracle's
+    // geocoding provider through the spread below would silently overwrite it
+    // with an unrelated meaning.
+    const { providerURL, provider, addressFormat, ...rest } = remoteConfig
     Object.assign(this, rest)
     if (addressFormat && !this.addressFormat) {
       this.addressFormat = addressFormat
@@ -239,6 +268,10 @@ class PoracleAPI {
     if (providerURL && !this.nominatimUrl) {
       this.nominatimUrl = providerURL
     }
+    this.geocoderProvider = resolveGeocoderProvider(
+      provider,
+      this.geocoderProvider,
+    )
     this.leagues = [
       { name: 'great', cp: 1500, min: remoteConfig.pvpFilterGreatMinCP },
       { name: 'ultra', cp: 2500, min: remoteConfig.pvpFilterUltraMinCP },
@@ -1257,4 +1290,4 @@ class PoracleAPI {
   }
 }
 
-module.exports = { PoracleAPI }
+module.exports = { PoracleAPI, resolveGeocoderProvider }
