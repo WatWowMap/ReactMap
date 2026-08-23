@@ -90,3 +90,6 @@ server/.cache/*
 
 # Misc
 ts-check.js
+
+# brainstorming visual companion
+.superpowers/
