@@ -1,5 +1,17 @@
 @import 'tailwindcss';
+
 @import './tokens/data-palette.css';
+
+/*
+ * Tailwind v4 auto-detects sources across the repo, which includes the
+ * markdown under docs/. Plan documents quote class names in prose, and every
+ * one of them was being emitted as a real rule: text-neutral-500,
+ * text-violet-600 and border-neutral-200 all shipped while being used in zero
+ * source files. Documentation should not reach the bundle, and a built
+ * stylesheet that contains a class nothing uses misleads anyone grepping it to
+ * check whether a change landed.
+ */
+@source not '../docs';
 
 @theme {
   --font-display: 'Fredoka', ui-sans-serif, system-ui, sans-serif;
@@ -92,6 +104,7 @@
      * same thing shadcn's own dark theme does with a lightened primary.
      */
     --color-primary-foreground: #17151f;
+
     /*
      * Same shape as --color-primary above. #dc2626 reads at 3.74 on the dark
      * surface, a fail, so it lightens here. That in turn makes white unreadable
