@@ -28,6 +28,7 @@ const viteLogLevel =
 
 const viteConfig = defineConfig(({ mode }) => {
   const env = loadEnv(mode, resolve(process.cwd(), './'), '')
+  const appDir = `${resolve(__dirname, 'app')}/`
   const isRelease = process.argv.includes('-r')
   const isDevelopment = mode === 'development'
   const serverPort = +(env.PORT || config.getSafe('port') || '8080')
@@ -181,7 +182,9 @@ const viteConfig = defineConfig(({ mode }) => {
         ],
         output: {
           manualChunks: (id) => {
-            if (id.endsWith('.css')) return 'index'
+            if (id.endsWith('.css')) {
+              return id.startsWith(appDir) ? 'app' : 'index'
+            }
             if (id.includes('node_modules')) return 'vendor'
             // return id.replace(/.*node_modules\//, '').split('/')[0]
             if (id.includes('src')) return version.replaceAll('.', '-')
