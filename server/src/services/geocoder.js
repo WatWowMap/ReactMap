@@ -108,7 +108,12 @@ async function geocoder(nominatimUrl, search, reverse, format, provider) {
         : results
   } catch (e) {
     log.warn(TAGS.geocoder, 'Unable to geocode for', search, e)
-    return {}
+    // The fallback has to match the shape the caller's schema expects.
+    // Query.geocoder is [Geocoder] and Gym.formatted is String, so returning {}
+    // made GraphQL discard the field with "Expected Iterable" or "String cannot
+    // represent value" rather than degrading to an empty answer. The failure is
+    // still reported: it is logged immediately above.
+    return reverse ? '' : []
   }
 }
 

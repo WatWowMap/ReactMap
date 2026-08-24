@@ -69,6 +69,11 @@ const TYPE_TO_PROPERTY = {
   state: 'state',
   county: 'county',
   city: 'city',
+  // A search for a suburb by name comes back as type=district with the label in
+  // `name` and no `district` field, so without this the result being asked for
+  // is the one value missing from the answer. Live index, q=West Town Chicago:
+  // {name: "West Town", type: "district", osm_key: "place", osm_value: "suburb"}
+  district: 'district',
   locality: 'locality',
   street: 'street',
 }

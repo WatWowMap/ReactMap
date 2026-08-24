@@ -492,7 +492,7 @@ test('a Photon URL on the Nominatim provider fails without crashing', async () =
     // geocoder() catches and returns {}. What matters is that the process
     // survives to get here at all.
     const result = await geocoder(server.url, 'Denver', false, '{{city}}')
-    assert.deepEqual(result, {})
+    assert.deepEqual(result, [])
   } finally {
     await server.close()
   }
@@ -508,7 +508,7 @@ test('a Nominatim URL on the Photon provider fails without returning nothing sil
       '{{city}}',
       'photon',
     )
-    assert.deepEqual(result, {})
+    assert.deepEqual(result, [])
   } finally {
     await server.close()
   }
@@ -745,5 +745,66 @@ test('a correctly configured Photon webhook still reverse geocodes', async () =>
     assert.equal(result, 'Denver')
   } finally {
     await server.close()
+  }
+})
+
+// Captured from a live index, q=West Town Chicago. A suburb searched by name
+// comes back as its own result: the label is in `name` and the containing
+// `district` field is absent, so without a district entry in the type map the
+// one value being asked for is the one missing from the answer.
+test('a district searched by name populates suburb', () => {
+  const got = formatPhotonFeature(
+    feature(
+      {
+        city: 'West Chicago Township',
+        country: 'United States',
+        countrycode: 'US',
+        county: 'Cook County',
+        name: 'West Town',
+        osm_key: 'place',
+        osm_value: 'suburb',
+        state: 'Illinois',
+        type: 'district',
+      },
+      [-87.6796, 41.9088],
+    ),
+  )
+  assert.equal(got.suburb, 'West Town')
+  assert.equal(
+    got.formattedAddress,
+    'West Town, West Chicago Township, Cook County, Illinois, United States',
+  )
+})
+
+// Query.geocoder is [Geocoder] and Gym.formatted is String. An object fallback
+// makes GraphQL discard the field entirely rather than degrade to an empty
+// answer, so a transient upstream failure has to keep the caller's shape.
+test('a transient upstream failure keeps the shape the schema expects', async () => {
+  const failing = http.createServer((_, res) => {
+    res.writeHead(500, { 'Content-Type': 'application/json' })
+    res.end(JSON.stringify({ message: 'overloaded' }))
+  })
+  await new Promise((resolve) => {
+    failing.listen(0, '127.0.0.1', resolve)
+  })
+  const url = `http://127.0.0.1:${failing.address().port}`
+  try {
+    const forward = await geocoder(url, 'Denver', false, '{{city}}', 'photon')
+    assert.ok(Array.isArray(forward), `forward returned ${typeof forward}`)
+    assert.deepEqual(forward, [])
+
+    const reverse = await geocoder(
+      url,
+      { lat: 39.7392, lon: -104.9903 },
+      true,
+      '{{city}}',
+      'photon',
+    )
+    assert.equal(typeof reverse, 'string', 'reverse must stay a String')
+    assert.equal(reverse, '')
+  } finally {
+    await new Promise((resolve) => {
+      failing.close(resolve)
+    })
   }
 })
