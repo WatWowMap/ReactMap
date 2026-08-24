@@ -18,6 +18,14 @@ const GYM_COUNT = 100
 
 const SEED = 20260824
 
+/**
+ * A fixed point in time that expiry is measured from. Date.now() here
+ * would make every expiresAt differ between runs, which defeats the
+ * reason these fixtures are seeded at all: a countdown that changes on
+ * every reload cannot be compared against a screenshot from yesterday.
+ */
+const FIXTURE_EPOCH = Date.UTC(2026, 7, 24)
+
 /** Deterministic PRNG (mulberry32) so fixtures reproduce across runs. */
 function createRng(seed: number) {
   let state = seed
@@ -39,7 +47,6 @@ function randomInt(rng: () => number, min: number, max: number): number {
 }
 
 function buildPokemon(rng: () => number, index: number): PokemonEntity {
-  const now = Date.now()
   const entity: PokemonEntity = {
     kind: 'pokemon',
     spawnId: `pokemon-${index}`,
@@ -49,7 +56,7 @@ function buildPokemon(rng: () => number, index: number): PokemonEntity {
     gender: randomInt(rng, 1, 3),
     lat: randomInRange(rng, FIXTURE_AREA.south, FIXTURE_AREA.north),
     lon: randomInRange(rng, FIXTURE_AREA.west, FIXTURE_AREA.east),
-    expiresAt: now + randomInt(rng, 60, 1800) * 1000,
+    expiresAt: FIXTURE_EPOCH + randomInt(rng, 60, 1800) * 1000,
   }
   if (rng() < 0.05) entity.badge = randomInt(rng, 1, 3)
   if (rng() < 0.1) entity.background = randomInt(rng, 1, 5)
@@ -71,27 +78,34 @@ function buildGym(rng: () => number, index: number): GymEntity {
   }
 }
 
+/**
+ * Builds a fresh set every call. The cached getters below return the
+ * same array identity, so a determinism test written against them
+ * would pass without proving anything; these are what that test needs.
+ */
+export function generateFixturePokemon(): PokemonEntity[] {
+  const rng = createRng(SEED)
+  return Array.from({ length: POKEMON_COUNT }, (_, index) =>
+    buildPokemon(rng, index),
+  )
+}
+
+export function generateFixtureGyms(): GymEntity[] {
+  // Separate seed offset so gym placement doesn't consume the same
+  // PRNG stream as pokemon and shift its sequence.
+  const rng = createRng(SEED + 1)
+  return Array.from({ length: GYM_COUNT }, (_, index) => buildGym(rng, index))
+}
+
 let cachedPokemon: PokemonEntity[] | undefined
 let cachedGyms: GymEntity[] | undefined
 
 export function getFixturePokemon(): PokemonEntity[] {
-  if (!cachedPokemon) {
-    const rng = createRng(SEED)
-    cachedPokemon = Array.from({ length: POKEMON_COUNT }, (_, index) =>
-      buildPokemon(rng, index),
-    )
-  }
+  if (!cachedPokemon) cachedPokemon = generateFixturePokemon()
   return cachedPokemon
 }
 
 export function getFixtureGyms(): GymEntity[] {
-  if (!cachedGyms) {
-    // Separate seed offset so gym placement doesn't consume the same
-    // PRNG stream as pokemon and shift its sequence.
-    const rng = createRng(SEED + 1)
-    cachedGyms = Array.from({ length: GYM_COUNT }, (_, index) =>
-      buildGym(rng, index),
-    )
-  }
+  if (!cachedGyms) cachedGyms = generateFixtureGyms()
   return cachedGyms
 }
