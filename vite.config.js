@@ -176,6 +176,18 @@ const viteConfig = defineConfig(({ mode }) => {
             // behind index.html's stylesheet (every 1.0 route too) -
             // either way a visitor who never opens /map would pay for it.
             if (id.includes('node_modules/maplibre-gl')) return 'maplibre'
+            // deck.gl is the same story: only ever reached from app/map,
+            // behind /map's lazy() call. Left ungrouped it falls into the
+            // generic 'vendor' check below, which app.html preloads on
+            // every 2.0 route - confirmed by build output before this rule
+            // existed, where deck.gl's ~1.4MB landed in vendor and pushed
+            // every route's preload past 2.2MB, not just /map's.
+            if (
+              id.includes('node_modules/@deck.gl') ||
+              id.includes('node_modules/deck.gl')
+            ) {
+              return 'deckgl'
+            }
             if (id.endsWith('.css')) {
               return id.startsWith(appDir) ? 'app' : 'index'
             }
