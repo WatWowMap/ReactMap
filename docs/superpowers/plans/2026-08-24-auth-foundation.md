@@ -1513,14 +1513,19 @@ const { toNodeHandler } = require('better-auth/node')
 const { getAuth, buildAuthRoutePrefix } = require('./auth')
 ```
 
-and mount it immediately before `app.use(rootRouter)`:
+Mount it immediately after `const app = express()`, BEFORE the bundled `app.use(...)` stack:
 
 ```js
-  // Better auth reads the raw body itself, so it must sit ahead of any json
-  // body parser that would consume the stream first.
-  app.all(`${buildAuthRoutePrefix()}/*`, toNodeHandler(getAuth()))
+  const app = express()
 
-  app.use(rootRouter)
+  // Better auth reads the raw body itself, so it has to sit ahead of the
+  // express.json() in the app.use stack below, which would otherwise consume
+  // the stream first and leave every POST here hanging on an empty body.
+  //
+  // The route is `*splat`, not a bare `*`. Express 5 moved to path-to-regexp 8,
+  // which dropped the bare wildcard, and `'/api/auth/*'` throws at boot rather
+  // than simply failing to match.
+  app.all(`${buildAuthRoutePrefix()}/*splat`, toNodeHandler(getAuth()))
 ```
 
 - [ ] **Step 4: Run the test and watch it pass**
