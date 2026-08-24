@@ -92,5 +92,15 @@
      * same thing shadcn's own dark theme does with a lightened primary.
      */
     --color-primary-foreground: #17151f;
+    /*
+     * Same shape as --color-primary above. #dc2626 reads at 3.74 on the dark
+     * surface, a fail, so it lightens here. That in turn makes white unreadable
+     * on top of it at 2.77, so the on-colour flips to the surface, giving 6.53
+     * either way round. Nothing renders a destructive control yet; this is
+     * fixed now because it is the same defect the review just caught in the
+     * accent, and leaving the second instance would be odd.
+     */
+    --color-destructive: #f87171;
+    --color-destructive-foreground: #17151f;
   }
 }
