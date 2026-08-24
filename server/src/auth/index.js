@@ -7,6 +7,7 @@ const { username } = require('better-auth/plugins')
 const config = require('@rm/config')
 const { getDrizzle } = require('../db/drizzle')
 const schema = require('../db/authSchema')
+const { telegramPlugin } = require('./telegram')
 
 /**
  * Pure option construction, split out so the wiring can be tested without
@@ -62,6 +63,9 @@ let cached = null
 
 function getAuth() {
   if (cached) return cached
+  const telegram = config
+    .getSafe('authentication.strategies')
+    .find((s) => s.type === 'telegram' && s.enabled)
   cached = betterAuth({
     ...buildAuthOptions({
       strategies: config.getSafe('authentication.strategies'),
@@ -94,6 +98,7 @@ function getAuth() {
         maxUsernameLength: 255,
         usernameValidator: (name) => name.length > 0 && name.length <= 255,
       }),
+      ...(telegram ? [telegramPlugin({ botToken: telegram.botToken })] : []),
     ],
   })
   return cached
