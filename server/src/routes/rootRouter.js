@@ -13,6 +13,7 @@ const { clientRouter } = require('./clientRouter')
 const { apiRouter } = require('./api')
 const { areaPerms } = require('../utils/areaPerms')
 const { getServerSettings } = require('../utils/getServerSettings')
+const { refreshSessionUser } = require('../utils/refreshSessionUser')
 const {
   hasAnyPokestopPermission,
 } = require('../utils/hasAnyPokestopPermission')
@@ -184,9 +185,7 @@ rootRouter.get('/api/settings', async (req, res, next) => {
               req.session.save()
             }
           }
-          if (user.data !== undefined) {
-            req.user.data = user.data
-          }
+          refreshSessionUser(req, user)
         }
       } catch (e) {
         log.warn(TAGS.session, 'Issue finding user, User ID:', req?.user?.id, e)
