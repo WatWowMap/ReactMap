@@ -201,7 +201,16 @@ const viteConfig = defineConfig(({ mode }) => {
               id.includes('node_modules/deck.gl') ||
               id.includes('node_modules/@luma.gl') ||
               id.includes('node_modules/@math.gl') ||
-              id.includes('node_modules/@loaders.gl')
+              id.includes('node_modules/@loaders.gl') ||
+              // deck.gl's gesture, logging and text dependencies sit under
+              // scopes of their own again. Enumerating is how this rule keeps
+              // failing: the fifth leak shipped in the same commit whose
+              // comment predicted a fifth. Measured at the time, 43,773 bytes
+              // of mjolnir.js, probe.gl and tiny-sdf were reaching every 1.0
+              // visitor through the vendor catch-all below.
+              id.includes('node_modules/mjolnir.js') ||
+              id.includes('node_modules/@probe.gl') ||
+              id.includes('node_modules/@mapbox/tiny-sdf')
             ) {
               return 'deckgl'
             }
