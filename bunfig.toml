@@ -4,3 +4,4 @@ exact = true
 [test]
 root = "."
 coverage = false
+preload = ["./app/test-setup.ts"]

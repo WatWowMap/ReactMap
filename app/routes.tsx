@@ -1,4 +1,5 @@
 import type { RouteObject } from 'react-router'
+import { Shell } from './layout/Shell'
 
 /*
  * Every route is lazy so the bundler gives each one its own chunk. The map
@@ -51,5 +52,17 @@ export const ROUTES: RouteObject[] = [
     lazy: async () => ({
       Component: (await import('./pages/NotFound')).NotFound,
     }),
+  },
+]
+
+/*
+ * The route table `createBrowserRouter` actually consumes: ROUTES nested as
+ * children of one layout route rendering Shell, which owns the bottom nav.
+ * ROUTES itself stays flat because Task 1's test asserts against that shape.
+ */
+export const ROUTER_ROUTES: RouteObject[] = [
+  {
+    Component: Shell,
+    children: ROUTES,
   },
 ]

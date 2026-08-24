@@ -177,6 +177,7 @@
     "@biomejs/biome": "2.5.10",
     "@commitlint/cli": "^19.4.0",
     "@commitlint/config-conventional": "^19.2.2",
+    "@happy-dom/global-registrator": "20.11.6",
     "@rm/types": "*",
     "@rm/vite-plugins": "*",
     "@semantic-release/changelog": "^6.0.3",
