@@ -53,8 +53,33 @@ function getAuth() {
       sessionSecret: config.getSafe('api.sessionSecret'),
       baseURL: config.getSafe('api.baseUrl'),
     }),
-    database: drizzleAdapter(getDrizzle(), { provider: 'mysql', schema }),
-    plugins: [username()],
+    database: drizzleAdapter(getDrizzle(), {
+      provider: 'mysql',
+      // The adapter resolves a model by looking up `schema[modelName]`, so the
+      // keys have to be the table names, not the camelCase export names. Handing
+      // it `authSchema` directly fails at runtime with "The model auth_user was
+      // not found in the schema object", and no pure unit test catches it.
+      schema: {
+        auth_user: schema.authUser,
+        auth_session: schema.authSession,
+        auth_account: schema.authAccount,
+        auth_verification: schema.authVerification,
+      },
+    }),
+    plugins: [
+      username({
+        // Better Auth defaults to /^[a-zA-Z0-9_.]+$/, min 3, max 30. ReactMap
+        // 1.x never validated usernames at all and stores them in a
+        // varchar(255), so anyone whose name carries a hyphen, a space or fewer
+        // than three characters would be unable to sign in after migrating.
+        // These limits exist to preserve every existing login. Tightening the
+        // rules for new signups is a product decision, not something to smuggle
+        // into a migration.
+        minUsernameLength: 1,
+        maxUsernameLength: 255,
+        usernameValidator: (name) => name.length > 0 && name.length <= 255,
+      }),
+    ],
   })
   return cached
 }
