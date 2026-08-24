@@ -8,6 +8,7 @@ import { buildMapLayers } from './layers'
 import { Popup } from './Popup'
 import { createFixtureSource } from './source'
 import type { GymEntity, MapEntity, MapQuery, PokemonEntity } from './types'
+import { useDismissOnEscape } from './useDismissOnEscape'
 import type { Camera } from './useMapLibre'
 import { anchorFor, pickedEntityFrom, useMapLibre } from './useMapLibre'
 
@@ -83,6 +84,8 @@ export function MapCanvas({ initialCamera, onCameraChange }: MapCanvasProps) {
   }, [])
 
   const closePopup = useCallback(() => setSelected(null), [])
+
+  useDismissOnEscape(selected !== null, closePopup)
 
   // Recreated only when the selection itself changes, not on every render:
   // useMapLibre's reprojection effect keys off this object's identity, and
