@@ -88,6 +88,23 @@ test('passwords hash as bcrypt, so existing hashes keep verifying', async () => 
   expect(await verify({ hash: hashed, password: 'wrong' })).toBe(false)
 })
 
+test('a password over 72 bytes verifies through the configured hasher, via the bcrypt-truncation fallback', async () => {
+  const { hash, verify } =
+    buildAuthOptions(baseConfig).emailAndPassword.password
+  const long = 'a'.repeat(100)
+  const hashed = await hash(long)
+  expect(await verify({ hash: hashed, password: long })).toBe(true)
+  // Only the first 72 bytes are significant, matching what bcrypt itself did.
+  expect(await verify({ hash: hashed, password: 'a'.repeat(72) })).toBe(false)
+})
+
+test('a malformed hash fails verification cleanly instead of throwing', async () => {
+  const { verify } = buildAuthOptions(baseConfig).emailAndPassword.password
+  expect(await verify({ hash: 'not-a-real-hash', password: 'reactmap' })).toBe(
+    false,
+  )
+})
+
 test('forwarded ip headers are ignored unless a proxy is trusted', () => {
   // Better Auth does not read Express's `trust proxy`, so without this the two
   // disagree and a forged X-Forwarded-For lands in auth_session.ip_address.

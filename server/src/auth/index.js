@@ -11,6 +11,7 @@ const { telegramPlugin } = require('./telegram')
 const { resolveTrustProxy } = require('../middleware/trustProxy')
 const { createRecomputeUserPerms } = require('./recomputePermsOnSignIn')
 const { createSignInGateCheck } = require('./signInGate')
+const { hashPassword, verifyPassword } = require('../services/localPassword')
 
 /**
  * Pure option construction, split out so the wiring can be tested without
@@ -63,12 +64,18 @@ function buildAuthOptions(input) {
       // hash would insert cleanly and then fail every verification, locking out
       // every local-auth user with no error anywhere to explain it.
       //
-      // Staying on bcrypt keeps one format across the migration. Bun.password
-      // detects the algorithm from the hash prefix, so this verifies legacy
-      // rows and anything written from here on.
+      // Staying on bcrypt keeps one format across the migration.
+      // `localPassword` (server/src/services/localPassword.js) wraps
+      // Bun.password.{hash,verify} with the handling raw Bun.password lacks:
+      // bcrypt silently truncated its input at 72 bytes, so a legacy password
+      // longer than that no longer matches its own hash under Bun's
+      // pre-hashing unless the verify falls back to the truncated bytes.
+      // `matchesHash` also swallows a parse failure on a malformed or null
+      // hash -- every Discord and Telegram account has one -- turning what
+      // would otherwise be a 500 into a clean non-match.
       password: {
-        hash: (password) => Bun.password.hash(password, 'bcrypt'),
-        verify: ({ hash, password }) => Bun.password.verify(password, hash),
+        hash: hashPassword,
+        verify: ({ hash, password }) => verifyPassword(password, hash),
       },
     },
     socialProviders,
