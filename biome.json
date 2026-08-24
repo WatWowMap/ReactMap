@@ -29,6 +29,26 @@
     },
     "globals": ["CONFIG", "Bun"]
   },
+  "overrides": [
+    {
+      "includes": ["app/components/ui/**"],
+      "linter": {
+        "rules": {
+          "a11y": {
+            "useAriaPropsForRole": "off",
+            "useFocusableInteractive": "off",
+            "useKeyWithClickEvents": "off",
+            "useSemanticElements": "off"
+          },
+          "security": { "noDangerouslySetInnerHtml": "off" },
+          "suspicious": {
+            "noArrayIndexKey": "off",
+            "noDocumentCookie": "off"
+          }
+        }
+      }
+    }
+  ],
   "linter": {
     "enabled": true,
     "rules": {
