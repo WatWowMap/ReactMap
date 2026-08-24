@@ -56,5 +56,16 @@
     --color-border: #322d42;
     --color-ring: #a78bfa;
     --color-secondary: #241f30;
+
+    /*
+     * --color-primary aliases --color-accent-from, and the brand violet is
+     * the same value in both themes, so the alias inherits a colour that
+     * never lightens for the dark surface. #7b5ce0 on #17151f is 3.82:1,
+     * under the 4.5:1 floor, and the active bottom-nav destination is the
+     * state that fails. Overriding the alias rather than the brand keeps
+     * --color-accent-from as the single brand value everything else reads.
+     * #8c70e5 is the same violet lifted just far enough to reach 4.78:1.
+     */
+    --color-primary: #8c70e5;
   }
 }
