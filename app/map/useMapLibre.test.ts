@@ -1,6 +1,8 @@
 import { expect, test } from 'bun:test'
+import type { PickingInfo } from '@deck.gl/core'
 import { IconLayer } from '@deck.gl/layers'
-import { buildOverlayProps } from './useMapLibre'
+import type { GymEntity, PokemonEntity } from './types'
+import { anchorFor, buildOverlayProps, pickedEntityFrom } from './useMapLibre'
 
 /*
  * Mounting a real MapLibre map needs a WebGL context the test environment
@@ -27,4 +29,68 @@ test('overlay props carry whatever layers are passed through unchanged', () => {
   })
   const props = buildOverlayProps([layer])
   expect(props.layers).toEqual([layer])
+})
+
+test('overlay props omit onClick when none is given, so deck.gl skips picking work on every click', () => {
+  const props = buildOverlayProps([])
+  expect('onClick' in props).toBe(false)
+})
+
+test('overlay props carry the click handler through when one is given', () => {
+  const onClick = () => {}
+  const props = buildOverlayProps([], onClick)
+  expect(props.onClick).toBe(onClick)
+})
+
+/*
+ * Picking and reprojection themselves need a WebGL context and a mounted
+ * MapLibre map, which this environment does not have (see the file-level
+ * comment above). What is testable in isolation is the selection state
+ * transition - a picking result in, an entity or null out - and the pure
+ * coordinate lookup that decides what a popup anchors to.
+ */
+
+const POKEMON: PokemonEntity = {
+  kind: 'pokemon',
+  spawnId: 'spawn-1',
+  pokemonId: 25,
+  form: 0,
+  costume: 0,
+  gender: 1,
+  lat: 51.5,
+  lon: -0.1,
+  expiresAt: 1_000,
+}
+
+const GYM: GymEntity = {
+  kind: 'gym',
+  gymId: 'gym-1',
+  lat: 40.7,
+  lon: -74,
+  team: 2,
+  inBattle: false,
+}
+
+function pickingInfoFor(object: PokemonEntity | GymEntity | undefined) {
+  return { object } as PickingInfo
+}
+
+test('a picking hit on a pokemon selects that pokemon', () => {
+  expect(pickedEntityFrom(pickingInfoFor(POKEMON))).toEqual(POKEMON)
+})
+
+test('a picking hit on a gym selects that gym', () => {
+  expect(pickedEntityFrom(pickingInfoFor(GYM))).toEqual(GYM)
+})
+
+test('a picking miss (empty map, no object) clears the selection', () => {
+  expect(pickedEntityFrom(pickingInfoFor(undefined))).toBeNull()
+})
+
+test('the anchor for a selected entity is exactly its coordinate', () => {
+  expect(anchorFor(POKEMON)).toEqual({ lat: 51.5, lon: -0.1 })
+})
+
+test('the anchor for no selection is null', () => {
+  expect(anchorFor(null)).toBeNull()
 })

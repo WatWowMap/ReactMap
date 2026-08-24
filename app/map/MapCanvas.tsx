@@ -1,13 +1,15 @@
 import 'maplibre-gl/dist/maplibre-gl.css'
 
-import { useEffect, useMemo, useRef, useState } from 'react'
+import type { PickingInfo } from '@deck.gl/core'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { createAtlas } from './atlas'
 import { drawGymIcon, drawPokemonIcon } from './draw-icon'
 import { buildMapLayers } from './layers'
+import { Popup } from './Popup'
 import { createFixtureSource } from './source'
 import type { GymEntity, MapEntity, MapQuery, PokemonEntity } from './types'
 import type { Camera } from './useMapLibre'
-import { useMapLibre } from './useMapLibre'
+import { anchorFor, pickedEntityFrom, useMapLibre } from './useMapLibre'
 
 export interface MapCanvasProps {
   initialCamera: Camera
@@ -70,6 +72,23 @@ export function MapCanvas({ initialCamera, onCameraChange }: MapCanvasProps) {
   // rebuilt from it on the same tick rather than each owning its own.
   const [now, setNow] = useState(() => Date.now())
 
+  // The one selected entity, or none. This is the entire replacement for
+  // 1.0's per-marker ref plus useForcePopup/useMarkerTimer: deck.gl's
+  // picking reports what is under the cursor, and there is exactly one
+  // popup, so one nullable slot is the whole model.
+  const [selected, setSelected] = useState<MapEntity | null>(null)
+
+  const handlePick = useCallback((info: PickingInfo) => {
+    setSelected(pickedEntityFrom(info))
+  }, [])
+
+  const closePopup = useCallback(() => setSelected(null), [])
+
+  // Recreated only when the selection itself changes, not on every render:
+  // useMapLibre's reprojection effect keys off this object's identity, and
+  // a fresh object every render would refire it needlessly.
+  const anchor = useMemo(() => anchorFor(selected), [selected])
+
   useEffect(() => {
     const source = sourceRef.current
     if (!source) return undefined
@@ -102,18 +121,29 @@ export function MapCanvas({ initialCamera, onCameraChange }: MapCanvasProps) {
     })
   }, [pokemon, gyms, now])
 
-  const { containerRef } = useMapLibre({
+  const { containerRef, screenPosition } = useMapLibre({
     initialCamera,
     ...(onCameraChange ? { onCameraChange } : {}),
     layers,
+    onPick: handlePick,
+    anchor,
   })
 
   return (
     <div
-      ref={containerRef}
-      className="h-[calc(100dvh-4rem)] w-full"
+      className="relative h-[calc(100dvh-4rem)] w-full"
       role="application"
       aria-label="Map"
-    />
+    >
+      <div ref={containerRef} className="h-full w-full" />
+      {selected && screenPosition && (
+        <Popup
+          entity={selected}
+          x={screenPosition.x}
+          y={screenPosition.y}
+          onClose={closePopup}
+        />
+      )}
+    </div>
   )
 }
