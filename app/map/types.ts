@@ -11,6 +11,12 @@ export interface Bounds {
   north: number
 }
 
+/** What the camera currently frames: the area, and how far in it is. */
+export interface Viewport {
+  bounds: Bounds
+  zoom: number
+}
+
 export type MapEntityKind = 'pokemon' | 'gym'
 
 export interface MapQuery {

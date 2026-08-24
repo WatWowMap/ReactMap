@@ -8,7 +8,7 @@ import {
   DEFAULT_GYM_CLUSTER_RULES,
   DEFAULT_POKEMON_CLUSTER_RULES,
 } from './clustering'
-import type { Bounds, GymEntity, PokemonEntity, Team } from './types'
+import type { GymEntity, PokemonEntity, Team, Viewport } from './types'
 
 export const POKEMON_ICON_LAYER_ID = 'pokemon-icons'
 export const POKEMON_LABEL_LAYER_ID = 'pokemon-labels'
@@ -243,11 +243,6 @@ export function buildClusterTextLayer(
   })
 }
 
-export interface MapLayersViewport {
-  bounds: Bounds
-  zoom: number
-}
-
 export interface BuildMapLayersOptions {
   pokemon: readonly PokemonEntity[]
   gyms: readonly GymEntity[]
@@ -263,7 +258,7 @@ export interface BuildMapLayersOptions {
    * `maxZoom`. Omitted, every entity renders individually as before; this
    * keeps every existing caller (and layers.test.ts) working unchanged.
    */
-  viewport?: MapLayersViewport
+  viewport?: Viewport
   /** Per-category override of the default rules read from `config/default.json`. */
   clusterRules?: { pokemon?: ClusterRules; gyms?: ClusterRules }
   getClusterIcon?: () => IconDescriptor
@@ -285,7 +280,7 @@ interface ClusteredEntities<T> {
 
 function clusterPokemon(
   pokemon: readonly PokemonEntity[],
-  viewport: MapLayersViewport,
+  viewport: Viewport,
   rules: ClusterRules,
 ): ClusteredEntities<PokemonEntity> {
   const wrapped = pokemon.map((entity) => ({
@@ -304,7 +299,7 @@ function clusterPokemon(
 
 function clusterGyms(
   gyms: readonly GymEntity[],
-  viewport: MapLayersViewport,
+  viewport: Viewport,
   rules: ClusterRules,
 ): ClusteredEntities<GymEntity> {
   const wrapped = gyms.map((entity) => ({

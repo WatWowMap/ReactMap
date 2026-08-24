@@ -4,7 +4,7 @@ import { MapboxOverlay } from '@deck.gl/mapbox'
 import { Map as MapLibreMap, NavigationControl } from 'maplibre-gl'
 import { type RefObject, useEffect, useRef, useState } from 'react'
 import { resolveBasemapStyle } from './basemap'
-import type { MapEntity } from './types'
+import type { MapEntity, Viewport } from './types'
 
 export interface Camera {
   lat: number
@@ -37,6 +37,34 @@ export function pickedEntityFrom(info: PickingInfo): MapEntity | null {
 /** The coordinate a selected entity's popup should stay anchored to. */
 export function anchorFor(entity: MapEntity | null): AnchorCoordinate | null {
   return entity ? { lat: entity.lat, lon: entity.lon } : null
+}
+
+/**
+ * Reads what a map currently frames. Typed against the accessors rather than
+ * against `MapLibreMap` so a test can hand it a plain object: mounting a real
+ * map needs a WebGL context this environment does not have, and the
+ * bounds-to-`Bounds` mapping is exactly the kind of thing that is wrong by a
+ * swapped field and renders without erroring.
+ */
+export function viewportFrom(map: {
+  getBounds(): {
+    getWest(): number
+    getSouth(): number
+    getEast(): number
+    getNorth(): number
+  }
+  getZoom(): number
+}): Viewport {
+  const bounds = map.getBounds()
+  return {
+    bounds: {
+      west: bounds.getWest(),
+      south: bounds.getSouth(),
+      east: bounds.getEast(),
+      north: bounds.getNorth(),
+    },
+    zoom: map.getZoom(),
+  }
 }
 
 export interface UseMapLibreOptions {
@@ -74,6 +102,26 @@ export interface UseMapLibreOptions {
    * MapLibre `Marker`.
    */
   anchor?: AnchorCoordinate | null
+  /**
+   * Fired with what the camera frames, once when the map mounts and again on
+   * every `moveend`. The caller feeds this straight back in as the area
+   * `buildMapLayers` clusters and caps against; without it there is no
+   * viewport, the clustering path never runs, and the whole of task 6 sits
+   * inert behind green tests.
+   *
+   * This is a callback rather than a returned value because the caller's
+   * `layers` are derived from it and are themselves an input to this hook.
+   * Returning it would close that loop inside one render pass; handing the
+   * caller the value to store breaks it, the same shape `onCameraChange`
+   * already uses.
+   *
+   * Fires on `moveend`, not on `move`. Clustering a viewport is real work and
+   * doing it once per animation frame through a pan would cost far more than
+   * it buys: markers already move with the map during a gesture, so all that
+   * is stale mid-gesture is the clustering granularity, and it settles the
+   * moment the gesture does.
+   */
+  onViewportChange?: (viewport: Viewport) => void
 }
 
 export interface UseMapLibreResult {
@@ -118,6 +166,7 @@ export function useMapLibre({
   layers,
   onPick,
   anchor,
+  onViewportChange,
 }: UseMapLibreOptions): UseMapLibreResult {
   const containerRef = useRef<HTMLDivElement | null>(null)
   const mapRef = useRef<MapLibreMap | null>(null)
@@ -126,6 +175,8 @@ export function useMapLibre({
   onCameraChangeRef.current = onCameraChange
   const onPickRef = useRef(onPick)
   onPickRef.current = onPick
+  const onViewportChangeRef = useRef(onViewportChange)
+  onViewportChangeRef.current = onViewportChange
   // Read by the mount effect below, once, so the overlay starts with
   // whatever layers are already available instead of an empty frame while
   // waiting for the layers-sync effect to run.
@@ -161,6 +212,7 @@ export function useMapLibre({
     overlayRef.current = overlay
 
     const handleMoveEnd = () => {
+      onViewportChangeRef.current?.(viewportFrom(map))
       const center = map.getCenter()
       onCameraChangeRef.current?.({
         lat: center.lat,
@@ -187,6 +239,10 @@ export function useMapLibre({
       setScreenPosition({ x: point.x, y: point.y })
     }
     map.on('move', handleMove)
+
+    // Reported here rather than waiting for the first gesture, or the map
+    // would spend its whole first view unclustered and uncapped.
+    onViewportChangeRef.current?.(viewportFrom(map))
 
     mapRef.current = map
     return () => {

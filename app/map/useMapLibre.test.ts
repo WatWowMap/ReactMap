@@ -2,7 +2,12 @@ import { expect, test } from 'bun:test'
 import type { PickingInfo } from '@deck.gl/core'
 import { IconLayer } from '@deck.gl/layers'
 import type { GymEntity, PokemonEntity } from './types'
-import { anchorFor, buildOverlayProps, pickedEntityFrom } from './useMapLibre'
+import {
+  anchorFor,
+  buildOverlayProps,
+  pickedEntityFrom,
+  viewportFrom,
+} from './useMapLibre'
 
 /*
  * Mounting a real MapLibre map needs a WebGL context the test environment
@@ -93,4 +98,27 @@ test('the anchor for a selected entity is exactly its coordinate', () => {
 
 test('the anchor for no selection is null', () => {
   expect(anchorFor(null)).toBeNull()
+})
+
+/*
+ * The bounds-to-Bounds mapping is four accessors read in an order that is
+ * easy to get wrong and renders without erroring when it is: a swapped west
+ * and east gives a bbox supercluster quietly returns nothing for, which
+ * looks exactly like an empty map. Values here are deliberately asymmetric
+ * so a swap cannot pass.
+ */
+test('viewportFrom reads each edge of the camera bounds into its own field', () => {
+  const viewport = viewportFrom({
+    getBounds: () => ({
+      getWest: () => -3,
+      getSouth: () => 50,
+      getEast: () => 1,
+      getNorth: () => 54,
+    }),
+    getZoom: () => 11.4,
+  })
+  expect(viewport).toEqual({
+    bounds: { west: -3, south: 50, east: 1, north: 54 },
+    zoom: 11.4,
+  })
 })

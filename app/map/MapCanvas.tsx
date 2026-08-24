@@ -3,12 +3,18 @@ import 'maplibre-gl/dist/maplibre-gl.css'
 import type { PickingInfo } from '@deck.gl/core'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { createAtlas } from './atlas'
-import { drawGymIcon, drawPokemonIcon } from './draw-icon'
+import { drawClusterIcon, drawGymIcon, drawPokemonIcon } from './draw-icon'
 import type { MapLayersResult } from './layers'
 import { buildMapLayers } from './layers'
 import { Popup } from './Popup'
 import { createFixtureSource } from './source'
-import type { GymEntity, MapEntity, MapQuery, PokemonEntity } from './types'
+import type {
+  GymEntity,
+  MapEntity,
+  MapQuery,
+  PokemonEntity,
+  Viewport,
+} from './types'
 import { useDismissOnEscape } from './useDismissOnEscape'
 import type { Camera } from './useMapLibre'
 import { anchorFor, pickedEntityFrom, useMapLibre } from './useMapLibre'
@@ -87,6 +93,9 @@ export function MapCanvas({ initialCamera, onCameraChange }: MapCanvasProps) {
   // popup, so one nullable slot is the whole model.
   const [selected, setSelected] = useState<MapEntity | null>(null)
 
+  // Null only until the map mounts and reports its first frame.
+  const [viewport, setViewport] = useState<Viewport | null>(null)
+
   // Bumped on WebGL context restoration purely to force `layers` below to
   // recompute immediately. buildMapLayers already gets fresh Layer
   // instances every clock tick regardless, since `now` is in its deps -
@@ -138,6 +147,10 @@ export function MapCanvas({ initialCamera, onCameraChange }: MapCanvasProps) {
     return () => clearInterval(interval)
   }, [])
 
+  // What the camera frames, reported by useMapLibre on mount and on every
+  // moveend. Passing it into buildMapLayers is what makes any of the
+  // clustering run at all: without it every entity renders individually and
+  // no forcedLimit applies, which is the state task 6 shipped in.
   const built = useMemo(() => {
     const atlas = atlasRef.current
     if (!atlas) return EMPTY_LAYERS
@@ -146,12 +159,15 @@ export function MapCanvas({ initialCamera, onCameraChange }: MapCanvasProps) {
       gyms,
       getIconFor: atlas.getIconFor,
       getGymIcon: drawGymIcon,
+      getClusterIcon: drawClusterIcon,
       now,
+      ...(viewport ? { viewport } : {}),
     })
     // rebuildToken is intentionally in this array with no other purpose
     // than to invalidate this memo; see handleContextRestore above.
-  }, [pokemon, gyms, now, rebuildToken])
+  }, [pokemon, gyms, now, viewport, rebuildToken])
   const layers = built.layers
+  const capped = built.limitHit.pokemon || built.limitHit.gyms
 
   const { containerRef, screenPosition } = useMapLibre({
     initialCamera,
@@ -159,6 +175,7 @@ export function MapCanvas({ initialCamera, onCameraChange }: MapCanvasProps) {
     layers,
     onPick: handlePick,
     anchor,
+    onViewportChange: setViewport,
   })
 
   const { restoring } = useWebglContextRecovery(containerRef, {
@@ -178,6 +195,14 @@ export function MapCanvas({ initialCamera, onCameraChange }: MapCanvasProps) {
           className="absolute inset-0 flex items-center justify-center bg-black/60 text-white"
         >
           Restoring map…
+        </div>
+      )}
+      {capped && !restoring && (
+        <div
+          role="status"
+          className="pointer-events-none absolute inset-x-0 top-2 mx-auto w-fit rounded-md bg-black/70 px-3 py-1 text-sm text-white"
+        >
+          Too much to draw here. Zoom in for detail.
         </div>
       )}
       {selected && screenPosition && (
