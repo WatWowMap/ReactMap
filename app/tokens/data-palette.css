@@ -1,0 +1,99 @@
+/*
+ * These colours are a language on the map surface, not a brand choice.
+ * Team, league and IV-tier colours mean specific things to players and
+ * must never be derived from the accent tokens or otherwise harmonised
+ * with the rest of the UI, because that would make the map lie about
+ * what it is showing. Values below are carried across unchanged from
+ * the 1.0 client rather than invented. Each group notes its source below.
+ * (task report) for exact sourcing per group.
+ */
+
+/*
+ * `static` because Tailwind v4 otherwise prunes theme variables nothing
+ * references, and every colour here was being dropped from the build
+ * entirely. Usage does bring them back, but only when the scanner can see the
+ * literal name in source. The map layer picks a colour from data, so it will
+ * write something like var(--color-team-${id}), which the scanner cannot
+ * resolve. Pruned tokens then resolve to nothing and markers render colourless
+ * with no error anywhere.
+ */
+@theme static {
+  /* Team colours. Source: src/features/gym/GymTile.jsx, getColor(team). */
+  --color-team-0: #a9a9a9; /* uncontested */
+  --color-team-1: #0030c8; /* mystic */
+  --color-team-2: #d83c22; /* valor */
+  --color-team-3: #f1f642; /* instinct */
+
+  /*
+   * League colours. Unlike every other group in this file these are NOT
+   * carried across from 1.0, because 1.0 has none: leagueLookup in
+   * src/features/pokemon/PokemonPopup.jsx maps a league name to a CP-cap
+   * string that only picks a badge icon, and config/default.json's
+   * pvp.leagues carries name and cp. There was nothing to copy.
+   *
+   * These are matched to how the game renders league identity in its battle
+   * UI, chosen deliberately rather than sampled from an asset, so they are
+   * approximate to the game and exact to us.
+   *
+   * Master is a purple and the brand accent is also a violet, which is a
+   * collision worth knowing about. This one is deeper and redder so a league
+   * chip does not read as the same thing as an accented control sitting
+   * beside it. Do not resolve that by moving it toward the accent.
+   */
+  --color-league-little: #6aa84f;
+  --color-league-great: #3d7dca;
+  --color-league-ultra: #f2c14e;
+  --color-league-master: #8e44ad;
+
+  /*
+   * IV tier colours. Source: src/features/pokemon/PokemonPopup.jsx,
+   * getColor(ivPercent), which returns MUI theme palette keys. The
+   * theme (src/assets/theme.js) only overrides info.main; error,
+   * warning and success are unmodified MUI v5 light-mode defaults.
+   * Values here are those resolved defaults, keyed by the same tiers.
+   */
+  --color-iv-low: #c62828; /* < 51%, error.dark */
+  --color-iv-mid-low: #ef5350; /* < 66%, error.light */
+  --color-iv-mid: #ed6c02; /* < 82%, warning.main */
+  --color-iv-mid-high: #2ab5f6; /* < 100%, info.main (1.0 override) */
+  --color-iv-perfect: #2e7d32; /* = 100%, success.main */
+}
+
+/*
+ * Chart series colours, added with the shadcn component set. They live in
+ * this file rather than with the chrome tokens because they are the same
+ * kind of thing as the groups above: a colour picked by data at render time,
+ * carrying meaning of its own, and answering to legibility rather than to
+ * the brand. chart.tsx takes a series colour from a config object, so the
+ * scanner never sees the token name in source and a plain @theme entry would
+ * be pruned, which is the exact failure the note at the top of this file
+ * describes.
+ *
+ * They are not tints of the brand violet. Every hue here sits at least 35
+ * degrees off it, so a series never reads as a branded control, and the
+ * separation between series survives protanopia, deuteranopia and
+ * tritanopia (verified in contrast.test.ts, worst pair 19.3 dE under
+ * protanopia in light, 23.1 dE in dark).
+ *
+ * Unlike the groups above these do change with the theme, because a set that
+ * clears 3:1 on white and on #17151f at once has to sit inside a luminance
+ * band too narrow to keep five hues apart for a dichromat. Two sets, one per
+ * theme, each with the full range to work in.
+ */
+@theme static {
+  --color-chart-1: #1f6fb5;
+  --color-chart-2: #d4622e;
+  --color-chart-3: #2f9c7e;
+  --color-chart-4: #b52a44;
+  --color-chart-5: #4a4700;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-chart-1: #a8cdf7;
+    --color-chart-2: #e07a45;
+    --color-chart-3: #35c79a;
+    --color-chart-4: #d53c51;
+    --color-chart-5: #efe66a;
+  }
+}

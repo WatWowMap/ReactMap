@@ -1,12 +1,185 @@
 @import 'tailwindcss';
 
+@import './tokens/data-palette.css';
+
+/*
+ * Tailwind v4 auto-detects sources across the repo, which includes the
+ * markdown under docs/. Plan documents quote class names in prose, and every
+ * one of them was being emitted as a real rule: text-neutral-500,
+ * text-violet-600 and border-neutral-200 all shipped while being used in zero
+ * source files. Documentation should not reach the bundle, and a built
+ * stylesheet that contains a class nothing uses misleads anyone grepping it to
+ * check whether a change landed.
+ */
+@source not '../docs';
+
 @theme {
   --font-display: 'Fredoka', ui-sans-serif, system-ui, sans-serif;
   --font-sans: 'Nunito', ui-sans-serif, system-ui, sans-serif;
+  --font-heading: var(--font-display);
 
   --color-accent-from: #7b5ce0;
   --color-accent-to: #e067a8;
 
+  --color-surface: #ffffff;
+  --color-foreground: #1c1a26;
+  /*
+   * shadcn's contract: --muted is a SURFACE and --muted-foreground is the
+   * text that sits on it. The vendored button and card read it that way
+   * (hover:bg-muted, bg-muted/50), so these have to hold surface and text
+   * respectively or those components paint text-coloured slabs.
+   */
+  --color-muted: #f5f3fb;
+  --color-muted-foreground: #6f6b80;
+  /*
+   * Two border roles, two floors. --color-border is the decorative hairline
+   * on cards and button outlines: it identifies no control and carries no
+   * state, so WCAG 1.4.11 does not bind it and it stays soft, raised only
+   * from an invisible 1.30:1 to 1.95:1. --color-border-strong is for a
+   * boundary that does carry meaning, currently the bottom nav's top edge,
+   * which is the only thing separating a fixed bar from content scrolling
+   * under it. That one is held to the 3:1 non-text floor.
+   */
+  --color-border: #bdb6cf;
+  --color-border-strong: #968dae;
+  --color-ring: #7b5ce0;
+
+  --color-background: var(--color-surface);
+  --color-card: var(--color-surface);
+  --color-card-foreground: var(--color-foreground);
+  --color-primary: var(--color-accent-from);
+  --color-primary-foreground: #ffffff;
+  --color-secondary: #f1eef9;
+  --color-secondary-foreground: var(--color-foreground);
+  --color-destructive: #dc2626;
+  --color-destructive-foreground: #ffffff;
+  /*
+   * --color-input is the boundary of a control, not decoration, so WCAG
+   * 1.4.11 binds it at 3:1 and it reads --color-border-strong rather than
+   * --color-border. Before the component install this token had one
+   * consumer; it now has forty, every text field and select among them, and
+   * the soft hairline it used to point at measures 1.95:1 on white.
+   */
+  --color-input: var(--color-border-strong);
+
+  /*
+   * The vendored components expect shadcn's token names. Each one aliases
+   * the token here that already means the same thing, so the dark overrides
+   * below reach them without a second parallel set to keep in step.
+   *
+   * accent is shadcn's highlight surface, the fill under a hovered or
+   * keyboard-focused menu row, which is what --color-muted already is. It is
+   * unrelated to --color-accent-from and --color-accent-to, which are the
+   * brand gradient stops.
+   *
+   * popover and sidebar are both plain panels over the page, so both take
+   * the surface tone the card already uses.
+   */
+  --color-accent: var(--color-muted);
+  --color-accent-foreground: var(--color-foreground);
+  --color-popover: var(--color-surface);
+  --color-popover-foreground: var(--color-foreground);
+  --color-sidebar: var(--color-surface);
+  --color-sidebar-foreground: var(--color-foreground);
+  --color-sidebar-accent: var(--color-muted);
+  --color-sidebar-accent-foreground: var(--color-foreground);
+  --color-sidebar-border: var(--color-border-strong);
+  --color-sidebar-ring: var(--color-ring);
+
   --radius-card: 1.125rem;
   --radius-sheet: 1.25rem;
+}
+
+/*
+ * Upstream shadcn writes var(--primary) where Tailwind v4 emits
+ * --color-primary, because its own setup declares the palette as plain
+ * custom properties and maps them into @theme afterwards. This project
+ * declares them in @theme directly, so roughly a dozen arbitrary values
+ * inside the vendored components resolve to nothing: a hover fill built with
+ * color-mix() simply does not paint, and neither typecheck, lint, the build
+ * nor a test can see it happen.
+ *
+ * Bridging the names here rather than editing the components means the next
+ * shadcn add --overwrite cannot undo it. These are deliberately not @theme
+ * entries: they generate no utilities and exist only to be read by var().
+ * They resolve through the cascade, so the dark overrides below apply to
+ * them too.
+ */
+:root {
+  --border: var(--color-border);
+  --foreground: var(--color-foreground);
+  --muted: var(--color-muted);
+  --popover: var(--color-popover);
+  --popover-foreground: var(--color-popover-foreground);
+  --primary: var(--color-primary);
+  --secondary: var(--color-secondary);
+  --sidebar-accent: var(--color-sidebar-accent);
+  --sidebar-border: var(--color-sidebar-border);
+
+  /*
+   * The one value with no counterpart already in the token set. Upstream
+   * derives small radii from it with calc(). Matched to the lg radius the
+   * button already rounds to, so a kbd inside an input group and a button
+   * beside it agree.
+   */
+  --radius: 0.5rem;
+}
+
+/*
+ * One mechanism for dark mode: prefers-color-scheme, not a data-theme
+ * attribute. Nothing in app/ writes a theme attribute to the document
+ * yet (no toggle, no persisted preference), so a data-theme override
+ * would be dead CSS today. prefers-color-scheme works immediately from
+ * the OS setting with no wiring, and can be layered under a future
+ * data-theme override later without conflict.
+ *
+ * @theme above already emits these as real custom properties on :root
+ * (that is how Tailwind v4 tokens work), so the override below targets
+ * the same variables directly rather than declaring a second :root set.
+ * Tokens defined above as var() references onto these (background, card,
+ * card-foreground, secondary-foreground, input) pick up the override for
+ * free since custom properties resolve through the cascade, not at
+ * declaration time.
+ */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-surface: #17151f;
+    --color-foreground: #f1eef9;
+    --color-muted: #221f2d;
+    --color-muted-foreground: #a29dbb;
+    --color-border: #4b4465;
+    --color-border-strong: #6f668c;
+    --color-ring: #a78bfa;
+    --color-secondary: #241f30;
+
+    /*
+     * --color-primary aliases --color-accent-from, and the brand violet is
+     * the same value in both themes, so the alias inherits a colour that
+     * never lightens for the dark surface. #7b5ce0 on #17151f is 3.82:1,
+     * under the 4.5:1 floor, and the active bottom-nav destination is the
+     * state that fails. Overriding the alias rather than the brand keeps
+     * --color-accent-from as the single brand value everything else reads.
+     * #8c70e5 is the same violet lifted just far enough to reach 4.78:1.
+     */
+    --color-primary: #8c70e5;
+
+    /*
+     * The lighter dark primary is a better text colour on the dark surface
+     * and a worse background under white: white on #8c70e5 is 3.77:1. So
+     * the on-colour flips to the dark surface tone, 4.78:1, which is the
+     * same thing shadcn's own dark theme does with a lightened primary.
+     */
+    --color-primary-foreground: #17151f;
+
+    /*
+     * Same shape as --color-primary above. #dc2626 reads at 3.74 on the dark
+     * surface, a fail, so it lightens here. That in turn makes white unreadable
+     * on top of it at 2.77, so the on-colour flips to the surface, giving 6.53
+     * either way round. Nothing renders a destructive control yet; this is
+     * fixed now because it is the same defect the review just caught in the
+     * accent, and leaving the second instance would be odd.
+     */
+    --color-destructive: #f87171;
+    --color-destructive-foreground: #17151f;
+  }
 }

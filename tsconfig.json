@@ -21,7 +21,8 @@
       "@services/*": ["./src/services/*"],
       "@hooks/*": ["./src/hooks/*"],
       "@utils/*": ["./src/utils/*"],
-      "@store/*": ["./src/store/*"]
+      "@store/*": ["./src/store/*"],
+      "@app/*": ["./app/*"]
     }
   },
   "exclude": ["node_modules", "**/node_modules/*", "dist", "dist-*"]
