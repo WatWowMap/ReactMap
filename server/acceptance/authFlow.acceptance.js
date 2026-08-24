@@ -297,6 +297,42 @@ describe('criterion 2: the session cookie identifies the caller on /api/settings
       expect.objectContaining({ map: true }),
     )
   })
+
+  // The test above proves the READ path: a permission that exists in
+  // user_perms reaches the client. It cannot prove the criterion as written,
+  // because its ARRANGE step supplies the very thing the system is meant to
+  // produce. Asserting the artifact a step produced rather than the outcome it
+  // exists for is how three Criticals were reported closed while still broken
+  // on this branch.
+  //
+  // So this one takes the seed away. It is red until permissions are computed
+  // for credential sign-ins, and it must stay red rather than be made green by
+  // seeding.
+  test('a user who signs in has permissions without anyone seeding them', async () => {
+    const solo = usernameFor('c2solo')
+    await timedFetch(`${BASE_URL}/api/auth/sign-up/email`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        email: emailFor('c2solo'),
+        password,
+        name: solo,
+        username: solo,
+      }),
+    })
+    const signIn = await timedFetch(`${BASE_URL}/api/auth/sign-in/username`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username: solo, password }),
+    })
+    const settings = await timedFetch(`${BASE_URL}/api/settings`, {
+      headers: { Cookie: getSessionCookie(signIn.response) },
+    })
+    expect(settings.json.user.loggedIn).toBe(true)
+    expect(Object.keys(settings.json.user.perms || {}).length).toBeGreaterThan(
+      0,
+    )
+  })
 })
 
 // ---------------------------------------------------------------------------
