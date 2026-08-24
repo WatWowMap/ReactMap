@@ -168,6 +168,52 @@ const viteConfig = defineConfig(({ mode }) => {
         ],
         output: {
           manualChunks: (id) => {
+            // MapLibre is only ever imported from app/map, behind the /map
+            // route's own lazy() call, so it needs a bucket of its own.
+            // Grouping it into the same 'vendor'/'index' buckets as
+            // everything else would put it behind app.html's unconditional
+            // modulepreload of vendor (every 2.0 route) or, for its CSS,
+            // behind index.html's stylesheet (every 1.0 route too) -
+            // either way a visitor who never opens /map would pay for it.
+            if (id.includes('node_modules/maplibre-gl')) return 'maplibre'
+            // deck.gl is the same story: only ever reached from app/map,
+            // behind /map's lazy() call. Left ungrouped it falls into the
+            // generic 'vendor' check below, which app.html preloads on
+            // every 2.0 route - confirmed by build output before this rule
+            // existed, where deck.gl's ~1.4MB landed in vendor and pushed
+            // every route's preload past 2.2MB, not just /map's.
+            // deck.gl's rendering engine ships under separate npm scopes, so
+            // matching only its own name left luma.gl, math.gl and loaders.gl
+            // falling through to the generic vendor bucket that every entry
+            // preloads, the 1.0 hub included. Measured at the time: 414 kB
+            // raw and 118 kB gzipped of WebGL engine in front of visitors who
+            // never open the map.
+            //
+            // Enumerating scopes is fragile, and this is the fourth thing to
+            // leak through this rule after tailwind's preflight, the font
+            // faces and maplibre's stylesheet. The durable fix is to stop
+            // bucketing by path prefix and let rollup place modules by which
+            // entry reaches them, but dropping the vendor catch-all changes
+            // the chunk 1.0 users are served, so that wants its own change
+            // with its own verification rather than riding along here.
+            if (
+              id.includes('node_modules/@deck.gl') ||
+              id.includes('node_modules/deck.gl') ||
+              id.includes('node_modules/@luma.gl') ||
+              id.includes('node_modules/@math.gl') ||
+              id.includes('node_modules/@loaders.gl') ||
+              // deck.gl's gesture, logging and text dependencies sit under
+              // scopes of their own again. Enumerating is how this rule keeps
+              // failing: the fifth leak shipped in the same commit whose
+              // comment predicted a fifth. Measured at the time, 43,773 bytes
+              // of mjolnir.js, probe.gl and tiny-sdf were reaching every 1.0
+              // visitor through the vendor catch-all below.
+              id.includes('node_modules/mjolnir.js') ||
+              id.includes('node_modules/@probe.gl') ||
+              id.includes('node_modules/@mapbox/tiny-sdf')
+            ) {
+              return 'deckgl'
+            }
             if (id.endsWith('.css')) {
               return id.startsWith(appDir) ? 'app' : 'index'
             }

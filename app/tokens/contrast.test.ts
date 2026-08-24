@@ -113,3 +113,47 @@ for (const theme of ['light', 'dark'] as const) {
     }
   })
 }
+
+/*
+ * Cluster bubbles. The count is drawn straight onto the fill, so the pair
+ * that has to hold is the label against each of the three buckets. Nothing
+ * else in this repo can see a colour, and these were hardcoded literals in
+ * the layer until they moved into the palette, which is exactly the state in
+ * which a contrast failure ships unnoticed.
+ *
+ * Both themes assert the same pairs because the tokens do not vary by theme:
+ * a bubble sits on map tiles, not on the page background. The test still runs
+ * per theme so a future theme override cannot slip past it.
+ */
+const CLUSTER_FILLS = [
+  '--color-cluster-small',
+  '--color-cluster-medium',
+  '--color-cluster-large',
+]
+
+for (const theme of ['light', 'dark'] as const) {
+  test(`${theme}: the cluster count clears 4.5:1 on every bubble`, () => {
+    for (const fill of CLUSTER_FILLS) {
+      const ratio = contrast(
+        hex(theme, '--color-cluster-label'),
+        hex(theme, fill),
+      )
+      expect(`${fill}: ${ratio.toFixed(2)}`).toBe(
+        `${fill}: ${Math.max(ratio, 4.5).toFixed(2)}`,
+      )
+    }
+  })
+
+  test(`${theme}: the three cluster buckets stay apart for dichromats`, () => {
+    for (let i = 0; i < CLUSTER_FILLS.length; i += 1) {
+      for (let j = i + 1; j < CLUSTER_FILLS.length; j += 1) {
+        const a = CLUSTER_FILLS[i] as string
+        const b = CLUSTER_FILLS[j] as string
+        const apart = separation(hex(theme, a), hex(theme, b))
+        expect(`${a} vs ${b}: ${apart.toFixed(1)}`).toBe(
+          `${a} vs ${b}: ${Math.max(apart, 7).toFixed(1)}`,
+        )
+      }
+    }
+  })
+}

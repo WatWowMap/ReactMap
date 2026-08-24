@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "reactmap-app",
+      "runtimeExecutable": "bunx",
+      "runtimeArgs": ["vite", "--port", "5273", "--strictPort", "--no-open"],
+      "port": 5273
+    }
+  ]
+}
