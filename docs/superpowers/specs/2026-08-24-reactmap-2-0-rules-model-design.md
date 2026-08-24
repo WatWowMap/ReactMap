@@ -28,13 +28,20 @@ defaults. All of it is flattened into a GraphQL JSON scalar on every query and e
 
 ## The schema
 
-### A shared rule, typed conditions, one species table
+### Every rule row is singular
 
-Five categories get rules: pokemon, gym, pokestop, station, nest.
+The decision this schema turns on. A rule names **one** thing: one species, one reward, one invasion
+character, one lure. It never holds a set.
 
-Everything a rule has in common lives in one table, so anything referencing a rule has a single
-foreign key to point at. Every other table is a child of it and is named for what it holds, so the
-prefix groups them and the convention never mixes.
+Sets were the source of every hard question in this design. Once a rule holds several species and
+several rewards, something has to record which species belongs to which reward, and every answer to
+that is worse than the problem: a nullable foreign key, a second species table, or a role that
+duplicates a column that already exists. Singular rows delete the question rather than answering it.
+
+`NULL` still means "any", so this does not force enumeration. "Hundos on everything" is one row with
+`species_id IS NULL`, not a thousand rows. Enumeration happens only when a user genuinely enumerates,
+and 25 chosen species is 25 rows against the hundreds of entries the same user carries in
+localStorage today.
 
 ```sql
 rule
@@ -44,201 +51,138 @@ rule
   size, glow, notify
 ```
 
-Conditions live in a table per category, as typed columns. There is no shared condition table, no
-`type` discriminator, and no polymorphic value column.
-
-This is the most important decision in the document. A generic condition bag cannot be understood
-without reading the evaluator, and this codebase has already paid for that kind of cleverness once.
-Adding a condition means a migration, which is the correct signal that you changed what a rule can
-say.
-
 ```sql
 rule_pokemon
   rule_id
+  species_id, form_id            -- NULL means any
+  pvp_target_species             -- NULL means any evolution; see the Azumarill case
   iv_min, iv_max
   atk_min, atk_max,  def_min, def_max,  sta_min, sta_max
   level_min, level_max
   cp_min, cp_max
   gender
   xxs, xxl
-  great_min, great_max,  ultra_min, ultra_max,  master_min, master_max
+  little_min, little_max,  great_min, great_max,  ultra_min, ultra_max
 ```
+
+There is no master league column. The configured leagues are little at 500, great at 1500 and ultra
+at 2500 (`config/default.json`, `api.pvp.leagues`). Master has no CP cap, so its rank is decided by
+IVs alone and a column for it would duplicate `iv_min` and `iv_max`.
 
 ```sql
 rule_nest
   rule_id
-  avg_min, avg_max          -- pokemon_avg, spawns per hour
+  species_id, form_id            -- NULL means any
+  avg_min, avg_max               -- pokemon_avg, spawns per hour
 ```
 
 ```sql
 rule_gym
   rule_id
-  raid_levels int[]         -- egg tiers, gym.js `eggs`
+  raid_level                     -- NULL means any
+  boss_species, boss_form        -- NULL means any
   team
-  slots_min, slots_max      -- available_slots
+  slots_min, slots_max
   ex_eligible, ar_eligible, in_battle, has_badge
 ```
 
 ```sql
 rule_station
   rule_id
-  battle_levels int[]       -- station.js `battleLevels`
+  battle_level                   -- NULL means any
+  boss_species, boss_form
   gmax_stationed
-  include_inactive          -- default false; station_active is otherwise implied
+  include_inactive               -- default false; station_active is otherwise implied
 ```
 
 ```sql
 rule_pokestop
   rule_id
-  quests_enabled, invasions_enabled, lures_enabled, event_stops_enabled
-  invasion_ids int[]
-  lure_ids int[]
+  role                           -- quest | invasion | lure | event_stop
+
+  reward_type                    -- role=quest. 1 xp, 2 item, 3 dust, 4 candy,
+                                 --   7 encounter, 9 xl, 12 and 20 mega
+  item_id                        -- reward_type 2
+  reward_species, reward_form    -- reward types 4, 7, 9, 12, 20
+  amount_min, amount_max         -- reward types 1, 3, 12, 20
+
+  invasion_character_id          -- role=invasion
+  lure_id                        -- role=lure
+  event_display_type             -- role=event_stop. 7 goldstop, 8 kecleon, 9 showcase
 ```
 
-Invasions are named individually rather than filtered by class. 1.x carries `onlyExcludeGrunts` and
-`onlyExcludeLeaders`, coarse "hide this whole category" toggles that existed because invasions could
-not be selected one at a time. With `invasion_ids` you simply do not select them, which is the same
-reasoning that removed the global hide rule.
+A pokestop rule does one thing. `role` says which, and a check constraint per role should reject the
+combinations that make no sense, so the database enforces it rather than trusting the interface.
+Invasions and event stops both key on `incident_display_type` in 1.x
+(`server/src/filters/fort/pokestop.js:7,270`), with rocket being display types 1 to 4.
 
-### Quests are their own table
-
-Quest conditions attach to a reward, not to a rule. 1.x stores them per reward key as
-`"title__target,title__target"` in that reward's `adv` field
-(`src/components/filters/QuestConditions.jsx:43-51`), against a catalogue the server builds into
-`DbManager.questConditions`. "Catch 10 Pokemon" narrows one reward; it says nothing about the others.
-
-That is a one to many, and columns on `rule_pokestop` were hiding it.
+The four `*_enabled` booleans an earlier draft carried are gone, along with `exclude_grunts` and
+`exclude_leaders`. Those existed because invasions could not be named individually; now they can, so
+not selecting one is how you exclude it.
 
 ```sql
-rule_quest
-  id
-  rule_id                   -- FK to rule_pokestop(rule_id), not to rule
-  reward_type               -- 1 xp, 2 item, 3 dust, 4 candy, 7 encounter, 9 xl, 12 and 20 mega
-  item_id                   -- type 2
-  amount_min, amount_max    -- types 1, 3, 12, 20
-
-rule_quest_condition
-  rule_quest_id
-  title, target
+rule_pokestop_condition
+  rule_id, title, target
 ```
 
-The foreign key points at `rule_pokestop`, not at `rule`. `rule_pokestop` is keyed by `rule_id`, so
-this costs nothing and means a quest reward can only exist on a rule that actually has a pokestop
-part. Pointing it at `rule` would have made quests a sibling of the pokestop conditions rather than
-part of them, and nothing would have stopped a quest reward being attached to a pokemon rule.
+The one join table that survives, because a single reward genuinely carries several conditions. 1.x
+stores them per reward as `"title__target,title__target"` in that reward's `adv` field
+(`src/components/filters/QuestConditions.jsx:43-51`), against the catalogue the server builds into
+`DbManager.questConditions`. That catalogue stays the source of truth.
 
-Quest reward species are not columns here. They live in `rule_species` like every other species
-reference, linked back by `rule_quest_id`.
+### Exclusions
 
-### Species references are one table
+Singular rows remove the set an exclusion used to be local to, so "IV 90 and above on everything
+except Magikarp" needs somewhere to put the exception:
 
-Every category references species, and four of them already key on the same `<id>-<form>` pair:
+```sql
+rule_exclusion
+  rule_id, species_id, form_id     -- form_id NULL means any form
+```
 
-| category | reference | source |
+**Invariant: exclusions are only meaningful on a rule whose own species is NULL.** A rule naming one
+species has nothing to carve out of. Worth a check constraint, and worth stating in the editor, since
+the control should simply not appear on a rule that names a species.
+
+This stays rule local. There is no global blocklist and no hide treatment, because a global hide acts
+at a distance: it silently subtracts from every rule in the list, and six months later nobody
+remembers why the shiny families filter has a hole in it.
+
+### Grouping is derived, never stored
+
+Singular rows are correct for storage and wrong for a person reading a list, so the interface groups
+them. That grouping is computed, not persisted. There is no group table and no group id.
+
+**Two rules group when they are identical in every column except the one that identifies them.**
+species for pokemon and nests, reward for quests, character for invasions, lure for lures. That makes
+grouping deterministic, reversible, and free of a second source of truth about which rules belong
+together.
+
+Given that definition, "editing one rule ungroups it" is not behaviour anyone implements. Change one
+row's `iv_min` and it stops matching its siblings, so it falls out of the group by itself. That
+property only holds while grouping stays derived.
+
+Two consequences worth knowing. Renaming a group is N writes, since `name` lives on each row. And the
+split must be **visible at the moment it happens**, because silently lengthening someone's filter
+list when they nudge a slider is exactly the kind of surprise that generates support questions. The
+editor says it: "This will separate Larvitar from the other 24."
+
+Creation works the other way round. The user selects 25 species in one pass and the form writes 25
+rows. They never type 25 rules, and they never see 25 cards unless they ask to.
+
+### Species selection
+
+Species and form are columns on the rule that references them, and every category that references a
+species uses the same pair:
+
+| category | column | source |
 | --- | --- | --- |
-| pokemon | the spawn, plus the PvP evolution | `PokemonFilter`, `PvPRankEntry.pokemon` |
-| nest | the nesting species | `Nest.js:50` |
-| gym | the raid boss | `gym.js:117-123`, `parseIdFormPair` |
-| station | the max battle boss | `station.js:55-67`, `parseIdFormPair` |
-| pokestop | quest rewards and rocket rewards | `pokestop.js:194-228` |
-
-So species references are the most common thing in the schema, and they get one table. No other table
-carries a species and form pair.
-
-```sql
-rule_species
-  rule_id            -- FK to rule
-  rule_quest_id      -- FK to rule_quest, NULL for every role except quest_reward
-  role               -- see below
-  species_id
-  form_id            -- NULL means any form of this species
-  excluded           -- boolean, default false
-```
-
-```
-spawn            the pokemon that spawned
-nesting          the species nesting at this location
-pvp_target       the evolution a PvP rank belongs to
-raid_boss        gym
-battle_boss      station
-rocket_reward    pokestop invasions
-quest_reward     pokestop quests; which kind of reward comes from rule_quest.reward_type
-```
-
-Seven roles rather than ten. There is no `quest_candy`, `quest_encounter`, `quest_xl` or `quest_mega`
-role, because `rule_quest.reward_type` already carries that and a role repeating it would be a second
-source of truth.
-
-`rule_species.rule_id` is derivable from `rule_quest_id` when that is set. It is kept anyway, so that
-"every species this rule references" is one query with no join, which is the read path that actually
-runs. It is redundant and checkable rather than ambiguous.
-
-**This is normalisation, not the polymorphism rejected above.** In a polymorphic condition bag the
-columns change meaning per row: `num_min` is an IV on one row and a level on the next. Here they
-never do. `species_id` is always a species and `form_id` is always a form or "any". Only what the
-pair is for varies, and `role` names it explicitly.
-
-Every role names a concrete thing in the domain. There is no general purpose "subject" role, because
-"the pokemon that spawned" and "the species nesting here" are different concepts that happened to
-share a shape.
-
-**Why `excluded` is a column and not a role.** An exclusion has to know what it subtracts from. As a
-role it could only say "not this species, somewhere", so a pokestop rule filtering both encounter and
-candy rewards could not exclude a species from one without excluding it from both. As a column
-alongside the role it is exact:
-
-```
-(role='quest_reward', rule_quest_id=5, species_id=129, excluded=true)   that reward, but not Magikarp
-(role='spawn',        species_id=129, excluded=true)                    spawns, but not Magikarp
-```
-
-**Read discipline.** Any query that forgets `excluded = false` silently inverts meaning. Exactly one
-function reads this table, and it returns included and excluded already separated. That predicate
-must not appear at a call site.
-
-### A worked example
-
-"Larvitar candy, only from Catch 10 Pokemon quests", on a pokestop rule:
-
-```
-rule                   id=42,  category=pokestop,  name='Larvitar candy'
-rule_pokestop          rule_id=42,  quests_enabled=true
-rule_quest             id=5,  rule_id=42,  reward_type=4
-rule_species           rule_quest_id=5,  role=quest_reward,  species_id=246,  form_id=NULL
-rule_quest_condition   rule_quest_id=5,  title='catch_pokemon',  target=10
-```
-
-An item reward carries no species at all: one `rule_quest` row with `item_id` set and nothing in
-`rule_species` pointing at it.
-
-Breaking quests out also preserved a capability an earlier draft had dropped. 1.x groups mega energy
-rewards by amount (`server/src/filters/fort/pokestop.js:210-219`,
-`megaByAmount.forEach((pokes, amt) => ...)`), so different species can carry different thresholds
-inside one filter. With amounts as columns on `rule_pokestop` that would have collapsed to one range
-per rule. With a row per reward it survives: two thresholds is two `rule_quest` rows.
-
-### form_id NULL means any form
-
-The single most important correction made during this session. Storing `species int[]` alongside
-`forms int[]` describes a cross product: species {Rattata, Raticate} with forms {Alolan} means
-Alolan Rattata and Alolan Raticate, and there is no way to express "normal Rattata plus Alolan
-Raticate". That is why 1.x keys on `${species}-${form}`. The composite key is the correct model, not
-legacy debt.
-
-`NULL` earns its place twice. It is the common case, since "I want Larvitar" rarely means one
-specific Larvitar, and it means a form added to the game later is included automatically. A rule
-that enumerated every form at selection time goes quietly stale the next time a costume ships.
-
-### Exclusions are rule local
-
-There is no hide treatment and no global blocklist. Exclusions are rows on the rule that owns them,
-so "IV 90 and above except Magikarp" is one rule that says exactly that and cannot affect any other
-rule. A global hide acts at a distance: it silently subtracts from every rule in the list, and six
-months later nobody remembers why the shiny families filter has a hole in it.
-
-The honest cost is that "never show this anywhere" now means excluding it on each rule that would
-otherwise match. That is more work, and it is the right more work, because each exclusion is visible
-where it applies.
+| pokemon | `species_id`, `form_id` | the spawn |
+| pokemon | `pvp_target_species` | the evolution a PvP rank belongs to |
+| nest | `species_id`, `form_id` | `Nest.js:50` |
+| gym | `boss_species`, `boss_form` | `gym.js:117-123`, `parseIdFormPair` |
+| station | `boss_species`, `boss_form` | `station.js:55-67`, `parseIdFormPair` |
+| pokestop | `reward_species`, `reward_form` | `pokestop.js:194-228` |
 
 ### Everything else is preferences
 
@@ -344,38 +288,46 @@ never couples to its schema; it calls the HTTP API and maps at the boundary.
 
 ### Push
 
-A projection, not a translation:
+Not a projection any more. An identity.
+
+Poracle stores one tracking row per (pokemon, form) pair with a falsy form meaning any form
+(`src/features/webhooks/services/Poracle.js:93,144,422`). Singular rules store exactly the same
+thing, so a push is a field rename:
 
 ```js
-rows.map((row) => ({
-  pokemon_id: row.species_id,
-  form: row.form_id ?? 0,
+rules.map((rule) => ({
+  pokemon_id: rule.species_id,
+  form: rule.form_id ?? 0,
   min_iv: rule.iv_min,
   max_iv: rule.iv_max,
 }))
 ```
 
-25 pairs in, 25 tracking entries out. `NULL` to `0` is the entire impedance mismatch. This works
-because the pair table already stores what Poracle stores. A cross product model would have had to
-expand first and could not have represented "Alolan Raticate but not Raticate" at all.
+A grouped filter of 25 species is 25 rows and becomes 25 tracking entries. `NULL` to `0` is the
+entire impedance mismatch.
 
-Push is worth treating as the test for any future schema change. A shape that cannot round trip to
-the system already integrated with is wrong regardless of how clean it looks alone.
+This is worth treating as the standing test for any future schema change. An earlier draft of this
+document stored species and forms as separate arrays, which describes a cross product and cannot
+represent "normal Rattata plus Alolan Raticate" at all. That bug was invisible while reasoning about
+the schema on its own terms and obvious the moment it had to round trip to a system that already
+exists.
 
 ### Pull
 
-Lossier, because Poracle rows are flat pairs carrying their own conditions. The import dialog offers
-the choice explicitly, with live counts so the decision is concrete rather than abstract:
+Also one to one. 38 tracked pokemon become 38 rules, because Poracle's row and this schema's row are
+the same shape.
 
-```
-Pull from Alerts                      38 tracked Pokémon found
+An earlier draft of this document proposed a switch during import, merged or separate, with live
+counts. Singular rows make it unnecessary. Storage is always separate, and merged is a view the
+grouping layer produces from identical rows. So the choice stops being a decision made once at import
+and baked in, and becomes a toggle that can be flipped whenever, on any set of filters, including
+ones created by hand.
 
-  (o)  Merge alerts with identical conditions   ->  12 filters
-  ( )  One filter per alert                     ->  38 filters
-```
+That is strictly better. An import time choice is the worst moment to ask, because the user has not
+seen the result yet.
 
-Whichever is chosen is a copy. Twins stay explicit push or pull rather than a sync, so copies staying
-copies is the intended behaviour.
+Whichever way it renders, the rules are a copy. Twins stay an explicit push or pull rather than a
+sync, so copies staying copies is intended.
 
 ## Why is this one like this
 
@@ -432,17 +384,20 @@ Recorded because the reasoning is the part that gets lost.
 
 | decision | why |
 | --- | --- |
+| Every rule row is singular | Sets forced something to record which species belonged to which reward. Every answer to that was worse than the question. |
+| `NULL` means any | Singular rows do not force enumeration. "Hundos on everything" is one row. |
+| Grouping is derived | No group table and no group id, so editing one row ungroups it by itself rather than by rule. |
 | No migration from 1.x | Filters were never durable. Importing the old model imports the enumeration problem. |
 | Forward evaluation only | Alerts are Poracle's job. Reverse matching duplicates it. |
 | Five rule categories | Gyms, stops, stations and nests all carry ranges or per type enumeration, not just toggles. |
 | One table per category | A generic condition bag cannot be read without reading the evaluator. This codebase has paid for that before. |
-| Species as (species, form) pairs | Separate arrays describe a cross product and cannot express "normal Rattata plus Alolan Raticate". |
-| `form_id NULL` for any form | Matches the common case, and includes forms added to the game later. |
+| Species and form as a pair | Separate arrays describe a cross product and cannot express "normal Rattata plus Alolan Raticate". |
+| No master league column | Master has no CP cap, so its rank is decided by IVs alone and would duplicate `iv_min` and `iv_max`. |
 | No rule ordering | Ordering forces conflicts between statements that do not conflict, and makes CRUD write many rows. |
 | Size takes the maximum | Importance composes upward. Nothing needs to lose. |
 | Notify is a boolean OR | A rule is a statement of interest. Suppressing one because another matched discards intent. |
 | Ring segments, not mixing | Mixing invents a colour meaning nobody assigned and hurts colourblind users. |
-| Exclusions per rule, no global hide | A global hide acts at a distance and is unfindable six months later. |
+| Exclusions rule local, no global hide | A global hide acts at a distance and is unfindable six months later. |
 | Preferences as JSON | Read whole, written whole, never evaluated. Different problem from rules. |
 | DSL deferred | One way to build a filter. The parser stays in 1.0 and costs nothing to keep. |
 
