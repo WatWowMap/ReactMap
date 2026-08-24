@@ -644,6 +644,16 @@ test('the auth tables are the prefixed ones, not the existing users table', () =
 test('the base url comes straight from config', () => {
   expect(buildAuthOptions(baseConfig).baseURL).toBe('http://localhost:8080')
 })
+
+test('forwarded ip headers are ignored unless a proxy is trusted', () => {
+  // Better Auth does not read Express's `trust proxy`, so without this the two
+  // disagree and a forged X-Forwarded-For lands in auth_session.ip_address.
+  expect(buildAuthOptions(baseConfig).advanced.ipAddress.ipAddressHeaders).toEqual([])
+  expect(
+    buildAuthOptions({ ...baseConfig, trustProxy: 1 }).advanced.ipAddress
+      .ipAddressHeaders,
+  ).toBeUndefined()
+})
 ```
 
 - [ ] **Step 2: Run the test and watch it fail**
@@ -665,12 +675,13 @@ const { username } = require('better-auth/plugins')
 const config = require('@rm/config')
 const { getDrizzle } = require('../db/drizzle')
 const schema = require('../db/authSchema')
+const { resolveTrustProxy } = require('../middleware/trustProxy')
 
 /**
  * Pure option construction, split out so the wiring can be tested without
  * opening a database connection.
  *
- * @param {{ strategies: any[], sessionSecret: string, baseURL: string }} input
+ * @param {{ strategies: any[], sessionSecret: string, baseURL: string, trustProxy?: unknown }} input
  */
 function buildAuthOptions(input) {
   /** @type {Record<string, { clientId: string, clientSecret: string }>} */
@@ -714,6 +725,20 @@ function buildAuthOptions(input) {
       },
     },
     socialProviders,
+    // Better Auth resolves the client IP itself and does NOT consult Express's
+    // `trust proxy`. `getIPFromHeader` in @better-auth/core trusts a
+    // single-valued `x-forwarded-for` unconditionally when no trusted proxies
+    // are configured, so with the default Express setting of false the two
+    // layers would disagree and `auth_session.ip_address` would record whatever
+    // a client claimed. Driving both from one value is what keeps them honest.
+    //
+    // An empty `ipAddressHeaders` means no forwarded header is consulted at all,
+    // because `[] || DEFAULT_IP_HEADERS` evaluates to the empty array.
+    advanced: {
+      ipAddress: input.trustProxy
+        ? {}
+        : { ipAddressHeaders: /** @type {string[]} */ ([]) },
+    },
     // Point at the prefixed tables. The unprefixed `session` name belongs to
     // express-mysql-session and `users` to the pre-2.0 user table.
     user: { modelName: 'auth_user' },
@@ -733,6 +758,7 @@ function getAuth() {
       strategies: config.getSafe('authentication.strategies'),
       sessionSecret: config.getSafe('api.sessionSecret'),
       baseURL: config.getSafe('api.baseUrl'),
+      trustProxy: resolveTrustProxy(config.getSafe('api.trustProxy')),
     }),
     database: drizzleAdapter(getDrizzle(), {
       provider: 'mysql',
