@@ -279,6 +279,8 @@ export interface BuildMapLayersOptions {
 interface ClusteredEntities<T> {
   points: readonly T[]
   clusters: readonly ClusterMarker[]
+  /** Carried straight out of `clusterEntities`; see `MapLayersResult`. */
+  limitHit: boolean
 }
 
 function clusterPokemon(
@@ -296,6 +298,7 @@ function clusterPokemon(
   return {
     points: result.points.map((wrapper) => wrapper.entity),
     clusters: result.clusters,
+    limitHit: result.limitHit,
   }
 }
 
@@ -314,8 +317,33 @@ function clusterGyms(
   return {
     points: result.points.map((wrapper) => wrapper.entity),
     clusters: result.clusters,
+    limitHit: result.limitHit,
   }
 }
+
+/**
+ * Whether each category's `forcedLimit` engaged for the frame just built.
+ *
+ * This exists because a capped map and a genuinely empty area are pixel for
+ * pixel identical: the user has no way to tell "there is nothing here" from
+ * "there is too much here to draw and some of it has been merged away". The
+ * flag `clusterEntities` computes has to survive the trip out to something
+ * that can say so, which means `buildMapLayers` cannot return a bare array.
+ *
+ * Both are false when no `viewport` is given, since nothing was clustered and
+ * nothing was capped.
+ */
+export interface LimitHit {
+  pokemon: boolean
+  gyms: boolean
+}
+
+export interface MapLayersResult {
+  layers: Layer[]
+  limitHit: LimitHit
+}
+
+const NOTHING_CAPPED: LimitHit = { pokemon: false, gyms: false }
 
 /**
  * All layers this task adds, in the order deck.gl should draw them: gyms
@@ -330,9 +358,10 @@ function clusterGyms(
  * `forcedLimit` (clustering.ts; see clustering.test.ts for the bug this
  * closes) before their icon/text layers are built, and any resulting
  * cluster bubbles are added as their own layers when `getClusterIcon` is
- * supplied. `clusterEntities`'s `limitHit` is available to callers that
- * cluster directly and want to show a warning; this function itself stays
- * `Layer[]`-in-`Layer[]`-out so existing callers are unaffected.
+ * supplied.
+ *
+ * Returns the layers alongside a per-category `limitHit`, rather than a bare
+ * array, so a caller can tell the user the view is capped. See `LimitHit`.
  */
 export function buildMapLayers({
   pokemon,
@@ -344,13 +373,16 @@ export function buildMapLayers({
   viewport,
   clusterRules,
   getClusterIcon,
-}: BuildMapLayersOptions): Layer[] {
+}: BuildMapLayersOptions): MapLayersResult {
   if (!viewport) {
-    return [
-      buildGymIconLayer(gyms, getGymIcon, root),
-      buildPokemonIconLayer(pokemon, getIconFor),
-      buildPokemonTextLayer(pokemon, now),
-    ]
+    return {
+      layers: [
+        buildGymIconLayer(gyms, getGymIcon, root),
+        buildPokemonIconLayer(pokemon, getIconFor),
+        buildPokemonTextLayer(pokemon, now),
+      ],
+      limitHit: NOTHING_CAPPED,
+    }
   }
 
   const pokemonResult = clusterPokemon(
@@ -396,5 +428,8 @@ export function buildMapLayers({
     }
   }
 
-  return layers
+  return {
+    layers,
+    limitHit: { pokemon: pokemonResult.limitHit, gyms: gymResult.limitHit },
+  }
 }

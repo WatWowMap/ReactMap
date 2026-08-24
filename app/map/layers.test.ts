@@ -176,7 +176,7 @@ test('buildGymIconLayer marks the shared icon as a mask so getColor actually tin
 })
 
 test('buildMapLayers returns gyms, pokemon icons and pokemon labels, in that draw order', () => {
-  const layers = buildMapLayers({
+  const { layers } = buildMapLayers({
     pokemon: [POKEMON],
     gyms: [GYM],
     getIconFor: () => STUB_ICON,
@@ -195,7 +195,7 @@ test('buildMapLayers scales to the viewport-sized set the fixtures exist to exer
     ...POKEMON,
     spawnId: `spawn-${index}`,
   }))
-  const layers = buildMapLayers({
+  const { layers } = buildMapLayers({
     pokemon,
     gyms: [],
     getIconFor: () => STUB_ICON,
@@ -204,4 +204,46 @@ test('buildMapLayers scales to the viewport-sized set the fixtures exist to exer
   })
   const iconLayer = layers.find((layer) => layer.id === POKEMON_ICON_LAYER_ID)
   expect(iconLayer?.props.data).toHaveLength(500)
+})
+
+/*
+ * The point of the flag is that a capped map and an empty area look the same
+ * on screen, so the flag has to reach a caller that can say which one it is.
+ * An earlier pass computed it in clusterEntities and dropped it here, which
+ * is the same as not computing it.
+ */
+test('buildMapLayers reports no cap when nothing was clustered', () => {
+  const result = buildMapLayers({
+    pokemon: [POKEMON],
+    gyms: [GYM],
+    getIconFor: () => STUB_ICON,
+    getGymIcon: () => STUB_ICON,
+    now: 0,
+  })
+  expect(result.limitHit).toEqual({ pokemon: false, gyms: false })
+})
+
+test('buildMapLayers carries limitHit out of the gym clusterer', () => {
+  const gyms = Array.from({ length: 400 }, (_, index) => ({
+    ...GYM,
+    gymId: `gym-${index}`,
+    lat: 51 + (index % 20) * 0.05,
+    lon: -0.5 + Math.floor(index / 20) * 0.05,
+  }))
+  const result = buildMapLayers({
+    pokemon: [],
+    gyms,
+    getIconFor: () => STUB_ICON,
+    getGymIcon: () => STUB_ICON,
+    now: 0,
+    viewport: {
+      bounds: { west: -1, south: 50, east: 1, north: 53 },
+      zoom: 14,
+    },
+    clusterRules: {
+      gyms: { zoomLevel: 13, forcedLimit: 50, minPoints: 2 },
+    },
+  })
+  expect(result.limitHit.gyms).toBe(true)
+  expect(result.limitHit.pokemon).toBe(false)
 })

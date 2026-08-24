@@ -4,6 +4,7 @@ import type { PickingInfo } from '@deck.gl/core'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { createAtlas } from './atlas'
 import { drawGymIcon, drawPokemonIcon } from './draw-icon'
+import type { MapLayersResult } from './layers'
 import { buildMapLayers } from './layers'
 import { Popup } from './Popup'
 import { createFixtureSource } from './source'
@@ -38,6 +39,12 @@ function isPokemon(entity: MapEntity): entity is PokemonEntity {
 
 function isGym(entity: MapEntity): entity is GymEntity {
   return entity.kind === 'gym'
+}
+
+/** What the layer memo falls back to before the atlas exists. */
+const EMPTY_LAYERS: MapLayersResult = {
+  layers: [],
+  limitHit: { pokemon: false, gyms: false },
 }
 
 /** How often the countdown/IV text layer is rebuilt against a fresh clock. */
@@ -131,9 +138,9 @@ export function MapCanvas({ initialCamera, onCameraChange }: MapCanvasProps) {
     return () => clearInterval(interval)
   }, [])
 
-  const layers = useMemo(() => {
+  const built = useMemo(() => {
     const atlas = atlasRef.current
-    if (!atlas) return []
+    if (!atlas) return EMPTY_LAYERS
     return buildMapLayers({
       pokemon,
       gyms,
@@ -144,6 +151,7 @@ export function MapCanvas({ initialCamera, onCameraChange }: MapCanvasProps) {
     // rebuildToken is intentionally in this array with no other purpose
     // than to invalidate this memo; see handleContextRestore above.
   }, [pokemon, gyms, now, rebuildToken])
+  const layers = built.layers
 
   const { containerRef, screenPosition } = useMapLibre({
     initialCamera,
