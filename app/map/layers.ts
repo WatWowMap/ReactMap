@@ -387,6 +387,14 @@ export interface LimitHit {
 }
 
 export interface MapLayersResult {
+  /**
+   * The pokemon actually rendered after clustering, so a caller can rebuild
+   * just the countdown text on a tick instead of re-running the clustering.
+   * Building a Supercluster index over every subscribed entity once a second
+   * is what this exists to avoid.
+   */
+  renderedPokemon: readonly PokemonEntity[]
+
   layers: Layer[]
   limitHit: LimitHit
 }
@@ -430,6 +438,7 @@ export function buildMapLayers({
         buildPokemonTextLayer(pokemon, now),
       ],
       limitHit: NOTHING_CAPPED,
+      renderedPokemon: pokemon,
     }
   }
 
@@ -486,5 +495,6 @@ export function buildMapLayers({
   return {
     layers,
     limitHit: { pokemon: pokemonResult.limitHit, gyms: gymResult.limitHit },
+    renderedPokemon: pokemonResult.points,
   }
 }

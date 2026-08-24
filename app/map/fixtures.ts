@@ -24,7 +24,16 @@ const SEED = 20260824
  * reason these fixtures are seeded at all: a countdown that changes on
  * every reload cannot be compared against a screenshot from yesterday.
  */
-const FIXTURE_EPOCH = Date.UTC(2026, 7, 24)
+/**
+ * The instant fixture expiries are measured from.
+ *
+ * Fixed rather than wall-clock so a given seed always produces byte-identical
+ * entities. The cost is that against real time every fixture is long expired,
+ * so anything rendering a countdown from `Date.now()` shows 0:00 for all of
+ * them and the map reads as dead. A caller wanting live countdowns should run
+ * its clock from here rather than from now; see MapCanvas.
+ */
+export const FIXTURE_EPOCH = Date.UTC(2026, 7, 24)
 
 /** Deterministic PRNG (mulberry32) so fixtures reproduce across runs. */
 function createRng(seed: number) {

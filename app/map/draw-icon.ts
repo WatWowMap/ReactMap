@@ -164,3 +164,16 @@ export function drawGymIcon(): IconDescriptor {
   }
   return cachedGymIcon
 }
+
+/**
+ * Drops the module-level icon caches.
+ *
+ * These hold canvas-derived descriptors that die with the WebGL context, and
+ * unlike the pokemon atlas they are plain module state with no owner to clear
+ * them. A restore that leaves them populated hands deck.gl textures that no
+ * longer exist, which renders nothing and reports nothing.
+ */
+export function resetSharedIconCaches() {
+  cachedClusterIcon = undefined
+  cachedGymIcon = undefined
+}

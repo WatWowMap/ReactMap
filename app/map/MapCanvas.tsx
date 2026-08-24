@@ -3,9 +3,19 @@ import 'maplibre-gl/dist/maplibre-gl.css'
 import type { PickingInfo } from '@deck.gl/core'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { createAtlas } from './atlas'
-import { drawClusterIcon, drawGymIcon, drawPokemonIcon } from './draw-icon'
+import {
+  drawClusterIcon,
+  drawGymIcon,
+  drawPokemonIcon,
+  resetSharedIconCaches,
+} from './draw-icon'
+import { FIXTURE_EPOCH } from './fixtures'
 import type { MapLayersResult } from './layers'
-import { buildMapLayers } from './layers'
+import {
+  buildMapLayers,
+  buildPokemonTextLayer,
+  POKEMON_LABEL_LAYER_ID,
+} from './layers'
 import { Popup } from './Popup'
 import { createFixtureSource } from './source'
 import type {
@@ -51,6 +61,7 @@ function isGym(entity: MapEntity): entity is GymEntity {
 const EMPTY_LAYERS: MapLayersResult = {
   layers: [],
   limitHit: { pokemon: false, gyms: false },
+  renderedPokemon: [],
 }
 
 /** How often the countdown/IV text layer is rebuilt against a fresh clock. */
@@ -85,7 +96,13 @@ export function MapCanvas({ initialCamera, onCameraChange }: MapCanvasProps) {
   // Countdown/IV text is layer data, not a per-marker component: this is
   // the one clock this whole tree reads, and every timer-bearing layer is
   // rebuilt from it on the same tick rather than each owning its own.
-  const [now, setNow] = useState(() => Date.now())
+  // Fixture expiries are measured from a fixed epoch so the generator stays
+  // reproducible, which means real wall-clock time is long past all of them and
+  // every countdown would read 0:00. Running the clock from that epoch instead
+  // keeps the fixtures deterministic and the timers live. When a real source
+  // replaces the fixtures this becomes Date.now() again.
+  const timeOrigin = useRef(Date.now())
+  const [now, setNow] = useState(() => FIXTURE_EPOCH)
 
   // The one selected entity, or none. This is the entire replacement for
   // 1.0's per-marker ref plus useForcePopup/useMarkerTimer: deck.gl's
@@ -117,6 +134,9 @@ export function MapCanvas({ initialCamera, onCameraChange }: MapCanvasProps) {
   // empty map with no error.
   const handleContextRestore = useCallback(() => {
     atlasRef.current?.clear()
+    // The gym and cluster icons live in module state, not in the atlas, so
+    // they need clearing too or the restore reuses dead textures.
+    resetSharedIconCaches()
     setRebuildToken((token) => token + 1)
   }, [])
 
@@ -143,7 +163,10 @@ export function MapCanvas({ initialCamera, onCameraChange }: MapCanvasProps) {
   }, [])
 
   useEffect(() => {
-    const interval = setInterval(() => setNow(Date.now()), CLOCK_TICK_MS)
+    const interval = setInterval(
+      () => setNow(FIXTURE_EPOCH + (Date.now() - timeOrigin.current)),
+      CLOCK_TICK_MS,
+    )
     return () => clearInterval(interval)
   }, [])
 
@@ -151,21 +174,42 @@ export function MapCanvas({ initialCamera, onCameraChange }: MapCanvasProps) {
   // moveend. Passing it into buildMapLayers is what makes any of the
   // clustering run at all: without it every entity renders individually and
   // no forcedLimit applies, which is the state task 6 shipped in.
-  const built = useMemo(() => {
+  // Clustering builds a fresh Supercluster index over every subscribed entity,
+  // so it must not depend on the clock. It previously sat in one memo with
+  // `now`, which ticks every second, meaning the whole set was re-indexed once
+  // a second forever whether or not anything moved. Splitting it means the
+  // per-second work is rebuilding the text layer's array, which is what the
+  // spec asks for, rather than re-clustering thousands of points.
+  const clustered = useMemo(() => {
     const atlas = atlasRef.current
-    if (!atlas) return EMPTY_LAYERS
+    if (!atlas) return null
     return buildMapLayers({
       pokemon,
       gyms,
       getIconFor: atlas.getIconFor,
       getGymIcon: drawGymIcon,
       getClusterIcon: drawClusterIcon,
-      now,
+      // Any value: the text layer this produces is replaced on every tick.
+      now: 0,
       ...(viewport ? { viewport } : {}),
     })
     // rebuildToken is intentionally in this array with no other purpose
     // than to invalidate this memo; see handleContextRestore above.
-  }, [pokemon, gyms, now, viewport, rebuildToken])
+  }, [pokemon, gyms, viewport, rebuildToken])
+
+  const built = useMemo(() => {
+    const atlas = atlasRef.current
+    if (!atlas || !clustered) return EMPTY_LAYERS
+    // Only the text layer reads the clock, so only it is rebuilt on a tick.
+    return {
+      layers: clustered.layers.map((layer) =>
+        layer.id === POKEMON_LABEL_LAYER_ID
+          ? buildPokemonTextLayer(clustered.renderedPokemon, now)
+          : layer,
+      ),
+      limitHit: clustered.limitHit,
+    }
+  }, [clustered, now])
   const layers = built.layers
   const capped = built.limitHit.pokemon || built.limitHit.gyms
 
