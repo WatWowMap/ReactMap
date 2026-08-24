@@ -32,8 +32,9 @@ defaults. All of it is flattened into a GraphQL JSON scalar on every query and e
 
 Five categories get rules: pokemon, gym, pokestop, station, nest.
 
-Everything a rule has in common lives in one table, so that anything referencing a rule has a single
-foreign key to point at:
+Everything a rule has in common lives in one table, so anything referencing a rule has a single
+foreign key to point at. Every other table is a child of it and is named for what it holds, so the
+prefix groups them and the convention never mixes.
 
 ```sql
 rule
@@ -52,7 +53,7 @@ Adding a condition means a migration, which is the correct signal that you chang
 say.
 
 ```sql
-pokemon_rule
+rule_pokemon
   rule_id
   iv_min, iv_max
   atk_min, atk_max,  def_min, def_max,  sta_min, sta_max
@@ -64,13 +65,13 @@ pokemon_rule
 ```
 
 ```sql
-nest_rule
+rule_nest
   rule_id
   avg_min, avg_max          -- pokemon_avg, spawns per hour
 ```
 
 ```sql
-gym_rule
+rule_gym
   rule_id
   raid_levels int[]         -- egg tiers, gym.js `eggs`
   team
@@ -79,7 +80,7 @@ gym_rule
 ```
 
 ```sql
-station_rule
+rule_station
   rule_id
   battle_levels int[]       -- station.js `battleLevels`
   gmax_stationed
@@ -87,32 +88,47 @@ station_rule
 ```
 
 ```sql
-pokestop_rule
+rule_pokestop
   rule_id
   quests_enabled, invasions_enabled, lures_enabled, event_stops_enabled
-
-  -- quests. Reward species live in rule_species; these are the non-species parts.
-  quest_item_ids int[]           -- reward type 2
-  quest_reward_types int[]       -- type-only matches, pokestop.js `typeOnly`
-  quest_dust_amounts int[]       -- type 3, exact amounts
-  quest_xp_amounts int[]         -- type 1, exact amounts
-  quest_mega_amount_min, quest_mega_amount_max   -- types 12 and 20
-
-  -- invasions
-  exclude_grunts, exclude_leaders
-
-  -- lures
+  invasion_ids int[]
   lure_ids int[]
 ```
 
-Pokestop is the most complex of the five because quests, invasions and lures are three separate
-subsystems, and its sentence reads as three clauses rather than one.
+Invasions are named individually rather than filtered by class. 1.x carries `onlyExcludeGrunts` and
+`onlyExcludeLeaders`, coarse "hide this whole category" toggles that existed because invasions could
+not be selected one at a time. With `invasion_ids` you simply do not select them, which is the same
+reasoning that removed the global hide rule.
 
-One capability is deliberately dropped. 1.x groups mega energy rewards by amount
-(`server/src/filters/fort/pokestop.js:210-219`, `megaByAmount.forEach((pokes, amt) => ...)`), so
-different species can carry different amount thresholds inside a single filter. Here the threshold
-is one range on the rule, applying to every mega species in it. Two thresholds means two rules. The
-table is much simpler and the case is believed rare.
+### Quests are their own table
+
+Quest conditions attach to a reward, not to a rule. 1.x stores them per reward key as
+`"title__target,title__target"` in that reward's `adv` field
+(`src/components/filters/QuestConditions.jsx:43-51`), against a catalogue the server builds into
+`DbManager.questConditions`. "Catch 10 Pokemon" narrows one reward; it says nothing about the others.
+
+That is a one to many, and columns on `rule_pokestop` were hiding it.
+
+```sql
+rule_quest
+  id
+  rule_id                   -- FK to rule_pokestop(rule_id), not to rule
+  reward_type               -- 1 xp, 2 item, 3 dust, 4 candy, 7 encounter, 9 xl, 12 and 20 mega
+  item_id                   -- type 2
+  amount_min, amount_max    -- types 1, 3, 12, 20
+
+rule_quest_condition
+  rule_quest_id
+  title, target
+```
+
+The foreign key points at `rule_pokestop`, not at `rule`. `rule_pokestop` is keyed by `rule_id`, so
+this costs nothing and means a quest reward can only exist on a rule that actually has a pokestop
+part. Pointing it at `rule` would have made quests a sibling of the pokestop conditions rather than
+part of them, and nothing would have stopped a quest reward being attached to a pokemon rule.
+
+Quest reward species are not columns here. They live in `rule_species` like every other species
+reference, linked back by `rule_quest_id`.
 
 ### Species references are one table
 
@@ -126,11 +142,13 @@ Every category references species, and four of them already key on the same `<id
 | station | the max battle boss | `station.js:55-67`, `parseIdFormPair` |
 | pokestop | quest rewards and rocket rewards | `pokestop.js:194-228` |
 
-So species references are the most common thing in the schema, and they get one table:
+So species references are the most common thing in the schema, and they get one table. No other table
+carries a species and form pair.
 
 ```sql
 rule_species
   rule_id            -- FK to rule
+  rule_quest_id      -- FK to rule_quest, NULL for every role except quest_reward
   role               -- see below
   species_id
   form_id            -- NULL means any form of this species
@@ -143,12 +161,17 @@ nesting          the species nesting at this location
 pvp_target       the evolution a PvP rank belongs to
 raid_boss        gym
 battle_boss      station
-quest_candy      pokestop, quest_reward_type 4
-quest_encounter  pokestop, type 7
-quest_xl         pokestop, type 9
-quest_mega       pokestop, types 12 and 20
 rocket_reward    pokestop invasions
+quest_reward     pokestop quests; which kind of reward comes from rule_quest.reward_type
 ```
+
+Seven roles rather than ten. There is no `quest_candy`, `quest_encounter`, `quest_xl` or `quest_mega`
+role, because `rule_quest.reward_type` already carries that and a role repeating it would be a second
+source of truth.
+
+`rule_species.rule_id` is derivable from `rule_quest_id` when that is set. It is kept anyway, so that
+"every species this rule references" is one query with no join, which is the read path that actually
+runs. It is redundant and checkable rather than ambiguous.
 
 **This is normalisation, not the polymorphism rejected above.** In a polymorphic condition bag the
 columns change meaning per row: `num_min` is an IV on one row and a level on the next. Here they
@@ -160,18 +183,39 @@ Every role names a concrete thing in the domain. There is no general purpose "su
 share a shape.
 
 **Why `excluded` is a column and not a role.** An exclusion has to know what it subtracts from. As a
-role it could only say "not this species, somewhere", so a pokestop rule filtering both encounter
-and candy rewards could not exclude a species from one without excluding it from both. As a column
+role it could only say "not this species, somewhere", so a pokestop rule filtering both encounter and
+candy rewards could not exclude a species from one without excluding it from both. As a column
 alongside the role it is exact:
 
 ```
-(role='quest_encounter', species_id=129, excluded=true)   encounter rewards, but not Magikarp
-(role='spawn',           species_id=129, excluded=true)   spawns, but not Magikarp
+(role='quest_reward', rule_quest_id=5, species_id=129, excluded=true)   that reward, but not Magikarp
+(role='spawn',        species_id=129, excluded=true)                    spawns, but not Magikarp
 ```
 
 **Read discipline.** Any query that forgets `excluded = false` silently inverts meaning. Exactly one
 function reads this table, and it returns included and excluded already separated. That predicate
 must not appear at a call site.
+
+### A worked example
+
+"Larvitar candy, only from Catch 10 Pokemon quests", on a pokestop rule:
+
+```
+rule                   id=42,  category=pokestop,  name='Larvitar candy'
+rule_pokestop          rule_id=42,  quests_enabled=true
+rule_quest             id=5,  rule_id=42,  reward_type=4
+rule_species           rule_quest_id=5,  role=quest_reward,  species_id=246,  form_id=NULL
+rule_quest_condition   rule_quest_id=5,  title='catch_pokemon',  target=10
+```
+
+An item reward carries no species at all: one `rule_quest` row with `item_id` set and nothing in
+`rule_species` pointing at it.
+
+Breaking quests out also preserved a capability an earlier draft had dropped. 1.x groups mega energy
+rewards by amount (`server/src/filters/fort/pokestop.js:210-219`,
+`megaByAmount.forEach((pokes, amt) => ...)`), so different species can carry different thresholds
+inside one filter. With amounts as columns on `rule_pokestop` that would have collapsed to one range
+per rule. With a row per reward it survives: two thresholds is two `rule_quest` rows.
 
 ### form_id NULL means any form
 
@@ -407,10 +451,11 @@ Recorded because the reasoning is the part that gets lost.
 Things deliberately left for the implementation plan rather than decided here.
 
 - Whether `gender`, `team` and similar single valued columns are integers or enums.
-- Whether invasion filtering needs more than `exclude_grunts` and `exclude_leaders`. 1.x narrows by
-  incident display type and confirms the specific reward in a second pass
-  (`server/src/filters/fort/pokestop.js:236-245`), so the `rocket_reward` role may want a companion
-  column for display type.
+- Whether `rule_pokestop.invasion_ids` is enough on its own. 1.x narrows by incident display type and
+  then confirms the specific reward in a second pass
+  (`server/src/filters/fort/pokestop.js:236-245`), deliberately, because the reward is a slot one
+  value that an optional invasion check populates and a reward derived filter can drop stops that
+  should match. Invasion ids may need a display type companion for the same reason.
 - How the sentence renders a rule whose species selection is large. "25 Pokémon" with a peek is
   probably right, but that is a UI question.
 - Indexes. `(user_id, profile_id)` on every rule table is obvious; anything else waits for a real
