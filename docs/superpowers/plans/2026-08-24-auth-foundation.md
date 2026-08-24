@@ -621,6 +621,14 @@ test('username and password auth is enabled', () => {
   expect(options.emailAndPassword.enabled).toBe(true)
 })
 
+test('passwords hash as bcrypt, so existing hashes keep verifying', async () => {
+  const { hash, verify } = buildAuthOptions(baseConfig).emailAndPassword.password
+  const hashed = await hash('reactmap')
+  expect(hashed.startsWith('$2b$')).toBe(true)
+  expect(await verify({ hash: hashed, password: 'reactmap' })).toBe(true)
+  expect(await verify({ hash: hashed, password: 'wrong' })).toBe(false)
+})
+
 test('the auth tables are the prefixed ones, not the existing users table', () => {
   const options = buildAuthOptions(baseConfig)
   expect(options.user.modelName).toBe('auth_user')
@@ -675,7 +683,22 @@ function buildAuthOptions(input) {
   return {
     baseURL: input.baseURL,
     secret: input.sessionSecret,
-    emailAndPassword: { enabled: true },
+    emailAndPassword: {
+      enabled: true,
+      // Better Auth hashes with scrypt by default, storing `salt:hash` hex.
+      // ReactMap has always stored bcrypt (`$2b$`, cost 10, originally from
+      // bcrypt@5.1.1). Those formats are not interchangeable, so a back-filled
+      // hash would insert cleanly and then fail every verification, locking out
+      // every local-auth user with no error anywhere to explain it.
+      //
+      // Staying on bcrypt keeps one format across the migration. Bun.password
+      // detects the algorithm from the hash prefix, so this verifies legacy
+      // rows and anything written from here on.
+      password: {
+        hash: (password) => Bun.password.hash(password, 'bcrypt'),
+        verify: ({ hash, password }) => Bun.password.verify(password, hash),
+      },
+    },
     socialProviders,
     // Point at the prefixed tables. The unprefixed `session` name belongs to
     // express-mysql-session and `users` to the pre-2.0 user table.
@@ -1121,7 +1144,9 @@ test('a local account keeps its password hash on the account row', () => {
   })
   const credential = plan.accounts.find((a) => a.providerId === 'credential')
   expect(credential.password).toBe('$2b$10$hash')
-  expect(credential.accountId).toBe('ash')
+  // Better Auth uses the user's own id as the credential accountId, not the
+  // username. Confirmed against a row it wrote itself.
+  expect(credential.accountId).toBe(plan.user.id)
   expect(plan.user.username).toBe('ash')
 })
 
@@ -1242,7 +1267,10 @@ function planBackfill(row) {
     accounts.push({
       providerId: 'credential',
       issuer: localIssuer('credential'),
-      accountId: row.username || String(row.id),
+      // Better Auth writes the user's own id here for credential accounts,
+      // verified by inspecting a row it created. Putting the username here
+      // instead would diverge from every row Better Auth writes afterwards.
+      accountId: id,
       userId: id,
       password: row.password,
     })
