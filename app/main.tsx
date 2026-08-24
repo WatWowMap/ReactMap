@@ -1,3 +1,6 @@
+import '@fontsource-variable/fredoka'
+import '@fontsource-variable/nunito'
+
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 
