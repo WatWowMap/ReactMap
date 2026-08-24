@@ -100,6 +100,22 @@ const ChartStyle = ({ id, config }: { id: string; config: ChartConfig }) => {
     return null
   }
 
+  /*
+   * SECURITY. itemConfig.color is interpolated straight into a style element
+   * with no escaping, so whoever supplies ChartConfig can write arbitrary CSS
+   * into the page. CSS injection is not harmless: attribute selectors paired
+   * with background-image URLs exfiltrate values, and absolute positioning
+   * redresses controls.
+   *
+   * This is upstream shadcn source and safe while ChartConfig is a literal
+   * written by us. It stops being safe the moment a colour reaches it from a
+   * request, from stored user settings, or from operator config, all of which
+   * exist in this project. Sanitise at the first caller that does that, or
+   * validate colours against a strict pattern here.
+   *
+   * Note also that noDangerouslySetInnerHtml is switched off for this
+   * directory, so the lint rule that would otherwise flag this will not.
+   */
   return (
     <style
       dangerouslySetInnerHTML={{
