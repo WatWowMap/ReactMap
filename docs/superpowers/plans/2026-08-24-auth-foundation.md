@@ -616,9 +616,15 @@ test('a disabled strategy is not registered', () => {
   expect(options.socialProviders.discord).toBeUndefined()
 })
 
-test('username and password auth is enabled', () => {
-  const options = buildAuthOptions(baseConfig)
-  expect(options.emailAndPassword.enabled).toBe(true)
+test('username and password auth follows the local strategy', () => {
+  const withLocal = {
+    ...baseConfig,
+    strategies: [...baseConfig.strategies, { name: 'local', type: 'local', enabled: true }],
+  }
+  expect(buildAuthOptions(withLocal).emailAndPassword.enabled).toBe(true)
+  // Off by default. An instance with local auth disabled must not accept
+  // sign-ups at /api/auth/sign-up/email.
+  expect(buildAuthOptions(baseConfig).emailAndPassword.enabled).toBe(false)
 })
 
 test('passwords hash as bcrypt, so existing hashes keep verifying', async () => {
@@ -669,6 +675,7 @@ const schema = require('../db/authSchema')
 function buildAuthOptions(input) {
   /** @type {Record<string, { clientId: string, clientSecret: string }>} */
   const socialProviders = {}
+  let localEnabled = false
 
   for (const strategy of input.strategies) {
     if (!strategy.enabled) continue
@@ -678,13 +685,20 @@ function buildAuthOptions(input) {
         clientSecret: strategy.clientSecret,
       }
     }
+    if (strategy.type === 'local') {
+      localEnabled = true
+    }
   }
 
   return {
     baseURL: input.baseURL,
     secret: input.sessionSecret,
     emailAndPassword: {
-      enabled: true,
+      // Gated on the `local` strategy, which defaults to disabled. Leaving this
+      // unconditionally true means /api/auth/sign-up/email accepts registrations
+      // on an instance whose operator switched local auth off, which is open
+      // registration nobody asked for.
+      enabled: localEnabled,
       // Better Auth hashes with scrypt by default, storing `salt:hash` hex.
       // ReactMap has always stored bcrypt (`$2b$`, cost 10, originally from
       // bcrypt@5.1.1). Those formats are not interchangeable, so a back-filled
