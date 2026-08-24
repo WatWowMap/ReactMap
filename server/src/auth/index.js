@@ -14,13 +14,14 @@ const {
 } = require('../middleware/trustProxy')
 const { createRecomputeUserPerms } = require('./recomputePermsOnSignIn')
 const { createSignInGateCheck } = require('./signInGate')
+const { createEnforceMaxSessions } = require('./maxSessions')
 const { hashPassword, verifyPassword } = require('../services/localPassword')
 
 /**
  * Pure option construction, split out so the wiring can be tested without
  * opening a database connection.
  *
- * @param {{ strategies: any[], sessionSecret: string, baseURL: string, trustProxy?: unknown, cookieAgeDays?: number, onSessionCreate?: (userId: string) => Promise<void>, checkSignInGate?: (userId: string) => Promise<{ allow: true } | { allow: false, reason: string }> }} input
+ * @param {{ strategies: any[], sessionSecret: string, baseURL: string, trustProxy?: unknown, cookieAgeDays?: number, onSessionCreate?: (userId: string) => Promise<void>, checkSignInGate?: (userId: string) => Promise<{ allow: true } | { allow: false, reason: string }>, enforceMaxSessions?: (userId: string) => Promise<void> }} input
  */
 function buildAuthOptions(input) {
   /** @type {Record<string, { clientId: string, clientSecret: string, scope?: string[], redirectURI?: string }>} */
@@ -137,8 +138,13 @@ function buildAuthOptions(input) {
     // `create.after` is the perms recompute (`onSessionCreate`, from Task 2
     // of this plan): it runs once the session already exists, so a failure
     // there must not be allowed to block login -- `user_perms` is downstream
-    // of the session, not a precondition for creating it.
-    ...((input.onSessionCreate || input.checkSignInGate) && {
+    // of the session, not a precondition for creating it. `enforceMaxSessions`
+    // (Task 9 of this plan) shares the same reasoning: the `api.maxSessions`
+    // cap trims sessions after the new one is written, so it belongs in this
+    // same `after` hook rather than a third hook layer.
+    ...((input.onSessionCreate ||
+      input.checkSignInGate ||
+      input.enforceMaxSessions) && {
       databaseHooks: {
         session: {
           create: {
@@ -148,8 +154,15 @@ function buildAuthOptions(input) {
                 if (!result.allow) return false
               },
             }),
-            ...(input.onSessionCreate && {
-              after: (session) => input.onSessionCreate(session.userId),
+            ...((input.onSessionCreate || input.enforceMaxSessions) && {
+              after: async (session) => {
+                if (input.onSessionCreate) {
+                  await input.onSessionCreate(session.userId)
+                }
+                if (input.enforceMaxSessions) {
+                  await input.enforceMaxSessions(session.userId)
+                }
+              },
             }),
           },
         },
@@ -194,6 +207,9 @@ function getAuth() {
       cookieAgeDays: config.getSafe('api.cookieAgeDays'),
       onSessionCreate: createRecomputeUserPerms(),
       checkSignInGate: createSignInGateCheck(),
+      enforceMaxSessions: createEnforceMaxSessions(
+        config.getSafe('api.maxSessions'),
+      ),
     }),
     database: drizzleAdapter(getDrizzle(), {
       provider: 'mysql',

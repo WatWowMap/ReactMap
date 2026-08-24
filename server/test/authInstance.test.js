@@ -199,3 +199,16 @@ test('session.expiresIn is left unset when cookieAgeDays is not provided', () =>
   const options = buildAuthOptions(baseConfig)
   expect('expiresIn' in options.session).toBe(false)
 })
+
+test('enforceMaxSessions is wired to session.create.after alongside onSessionCreate', async () => {
+  let enforcedFor = null
+  const options = buildAuthOptions({
+    ...baseConfig,
+    checkSignInGate: async () => ({ allow: true }),
+    enforceMaxSessions: async (userId) => {
+      enforcedFor = userId
+    },
+  })
+  await options.databaseHooks.session.create.after({ userId: 'u1' }, null)
+  expect(enforcedFor).toBe('u1')
+})
