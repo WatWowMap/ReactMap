@@ -53,10 +53,76 @@
   --color-secondary-foreground: var(--color-foreground);
   --color-destructive: #dc2626;
   --color-destructive-foreground: #ffffff;
-  --color-input: var(--color-border);
+  /*
+   * --color-input is the boundary of a control, not decoration, so WCAG
+   * 1.4.11 binds it at 3:1 and it reads --color-border-strong rather than
+   * --color-border. Before the component install this token had one
+   * consumer; it now has forty, every text field and select among them, and
+   * the soft hairline it used to point at measures 1.95:1 on white.
+   */
+  --color-input: var(--color-border-strong);
+
+  /*
+   * The vendored components expect shadcn's token names. Each one aliases
+   * the token here that already means the same thing, so the dark overrides
+   * below reach them without a second parallel set to keep in step.
+   *
+   * accent is shadcn's highlight surface, the fill under a hovered or
+   * keyboard-focused menu row, which is what --color-muted already is. It is
+   * unrelated to --color-accent-from and --color-accent-to, which are the
+   * brand gradient stops.
+   *
+   * popover and sidebar are both plain panels over the page, so both take
+   * the surface tone the card already uses.
+   */
+  --color-accent: var(--color-muted);
+  --color-accent-foreground: var(--color-foreground);
+  --color-popover: var(--color-surface);
+  --color-popover-foreground: var(--color-foreground);
+  --color-sidebar: var(--color-surface);
+  --color-sidebar-foreground: var(--color-foreground);
+  --color-sidebar-accent: var(--color-muted);
+  --color-sidebar-accent-foreground: var(--color-foreground);
+  --color-sidebar-border: var(--color-border-strong);
+  --color-sidebar-ring: var(--color-ring);
 
   --radius-card: 1.125rem;
   --radius-sheet: 1.25rem;
+}
+
+/*
+ * Upstream shadcn writes var(--primary) where Tailwind v4 emits
+ * --color-primary, because its own setup declares the palette as plain
+ * custom properties and maps them into @theme afterwards. This project
+ * declares them in @theme directly, so roughly a dozen arbitrary values
+ * inside the vendored components resolve to nothing: a hover fill built with
+ * color-mix() simply does not paint, and neither typecheck, lint, the build
+ * nor a test can see it happen.
+ *
+ * Bridging the names here rather than editing the components means the next
+ * shadcn add --overwrite cannot undo it. These are deliberately not @theme
+ * entries: they generate no utilities and exist only to be read by var().
+ * They resolve through the cascade, so the dark overrides below apply to
+ * them too.
+ */
+:root {
+  --border: var(--color-border);
+  --foreground: var(--color-foreground);
+  --muted: var(--color-muted);
+  --popover: var(--color-popover);
+  --popover-foreground: var(--color-popover-foreground);
+  --primary: var(--color-primary);
+  --secondary: var(--color-secondary);
+  --sidebar-accent: var(--color-sidebar-accent);
+  --sidebar-border: var(--color-sidebar-border);
+
+  /*
+   * The one value with no counterpart already in the token set. Upstream
+   * derives small radii from it with calc(). Matched to the lg radius the
+   * button already rounds to, so a kbd inside an input group and a button
+   * beside it agree.
+   */
+  --radius: 0.5rem;
 }
 
 /*

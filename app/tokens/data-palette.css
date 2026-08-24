@@ -58,3 +58,42 @@
   --color-iv-mid-high: #2ab5f6; /* < 100%, info.main (1.0 override) */
   --color-iv-perfect: #2e7d32; /* = 100%, success.main */
 }
+
+/*
+ * Chart series colours, added with the shadcn component set. They live in
+ * this file rather than with the chrome tokens because they are the same
+ * kind of thing as the groups above: a colour picked by data at render time,
+ * carrying meaning of its own, and answering to legibility rather than to
+ * the brand. chart.tsx takes a series colour from a config object, so the
+ * scanner never sees the token name in source and a plain @theme entry would
+ * be pruned, which is the exact failure the note at the top of this file
+ * describes.
+ *
+ * They are not tints of the brand violet. Every hue here sits at least 35
+ * degrees off it, so a series never reads as a branded control, and the
+ * separation between series survives protanopia, deuteranopia and
+ * tritanopia (verified in contrast.test.ts, worst pair 19.3 dE under
+ * protanopia in light, 23.1 dE in dark).
+ *
+ * Unlike the groups above these do change with the theme, because a set that
+ * clears 3:1 on white and on #17151f at once has to sit inside a luminance
+ * band too narrow to keep five hues apart for a dichromat. Two sets, one per
+ * theme, each with the full range to work in.
+ */
+@theme static {
+  --color-chart-1: #1f6fb5;
+  --color-chart-2: #d4622e;
+  --color-chart-3: #2f9c7e;
+  --color-chart-4: #b52a44;
+  --color-chart-5: #4a4700;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-chart-1: #a8cdf7;
+    --color-chart-2: #e07a45;
+    --color-chart-3: #35c79a;
+    --color-chart-4: #d53c51;
+    --color-chart-5: #efe66a;
+  }
+}
