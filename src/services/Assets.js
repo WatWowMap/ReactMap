@@ -105,7 +105,7 @@ export class UAssets {
           indexes.forEach((category) => {
             let isValid = false
             if (
-              !parseInt(category) &&
+              !parseInt(category, 10) &&
               category !== '0' &&
               category !== 'lastFetched'
             ) {

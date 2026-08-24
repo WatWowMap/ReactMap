@@ -1,8 +1,7 @@
 // @ts-check
-import * as React from 'react'
+
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
-
 import { useMemory } from '@store/useMemory'
 import { useTranslation } from 'react-i18next'
 import { PokeType } from './PokeType'

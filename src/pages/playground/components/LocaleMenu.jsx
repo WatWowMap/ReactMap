@@ -1,9 +1,10 @@
 // @ts-check
-import * as React from 'react'
-import MenuItem from '@mui/material/MenuItem'
+
+import TranslateIcon from '@mui/icons-material/Translate'
 import Button from '@mui/material/Button'
 import Menu from '@mui/material/Menu'
-import TranslateIcon from '@mui/icons-material/Translate'
+import MenuItem from '@mui/material/MenuItem'
+import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 
 const startIcon = <TranslateIcon />

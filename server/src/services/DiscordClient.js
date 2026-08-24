@@ -49,7 +49,7 @@ class DiscordClient extends AuthClient {
           'discord',
           this.client.user.username,
         )
-      } catch (e) {
+      } catch (_e) {
         this.log.error(`Could not clear sessions for ${member.user.username}`)
       }
     })
@@ -79,7 +79,7 @@ class DiscordClient extends AuthClient {
             this.client.user.username,
           )
         }
-      } catch (e) {
+      } catch (_e) {
         this.log.error(`Could not clear sessions for ${prev.user.username}`)
       }
     })
@@ -130,7 +130,7 @@ class DiscordClient extends AuthClient {
   async getPerms(user) {
     const trialActive = this.trialManager.active()
     /** @type {import("@rm/types").Permissions} */
-    // @ts-ignore
+    // @ts-expect-error
     const perms = Object.fromEntries(
       Object.keys(this.perms).map((key) => [key, false]),
     )
@@ -253,8 +253,7 @@ class DiscordClient extends AuthClient {
     try {
       const foundChannel = this.client.channels.cache.get(safeChannel)
       if (
-        foundChannel &&
-        foundChannel.isTextBased() &&
+        foundChannel?.isTextBased() &&
         !foundChannel.isVoiceBased() &&
         typeof embed === 'object'
       ) {
@@ -341,7 +340,7 @@ class DiscordClient extends AuthClient {
               if (oldUser) {
                 await state.db.models.Badge.query()
                   .update({
-                    // @ts-ignore
+                    // @ts-expect-error
                     userId: req.user.id,
                   })
                   .where('userId', oldUser.id)

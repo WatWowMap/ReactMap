@@ -1,27 +1,26 @@
 // @ts-check
 
-import * as React from 'react'
-import Box from '@mui/material/Box'
-import DialogContent from '@mui/material/DialogContent'
-import Typography from '@mui/material/Typography'
-import { useTranslation } from 'react-i18next'
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
-import Collapse from '@mui/material/Collapse'
-import IconButton from '@mui/material/IconButton'
-
-import { useMemory } from '@store/useMemory'
-import { useLayoutStore } from '@store/useLayoutStore'
-import { useFilter } from '@hooks/useFilter'
 import { Footer } from '@components/dialogs/Footer'
+import { useAnalytics } from '@hooks/useAnalytics'
+import { useFilter } from '@hooks/useFilter'
+import { useGetAvailable } from '@hooks/useGetAvailable'
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
+import Box from '@mui/material/Box'
+import Collapse from '@mui/material/Collapse'
+import DialogContent from '@mui/material/DialogContent'
+import IconButton from '@mui/material/IconButton'
+import Typography from '@mui/material/Typography'
+import { useLayoutStore } from '@store/useLayoutStore'
+import { useMemory } from '@store/useMemory'
+import { applyToAllWebhooks, useWebhookStore } from '@store/useWebhookStore'
 import { applyToAll } from '@utils/applyToAll'
 import { getAmbiguousForms } from '@utils/getAmbiguousForms'
-import { useGetAvailable } from '@hooks/useGetAvailable'
-import { applyToAllWebhooks, useWebhookStore } from '@store/useWebhookStore'
-import { useAnalytics } from '@hooks/useAnalytics'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 
 import { OptionsContainer } from './filters/OptionsContainer'
-import { VirtualGrid } from './virtual/VirtualGrid'
 import { GenericSearch } from './inputs/GenericSearch'
+import { VirtualGrid } from './virtual/VirtualGrid'
 
 /**
  * @template {import('@rm/types').AdvCategories} T

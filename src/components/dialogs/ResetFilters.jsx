@@ -1,17 +1,15 @@
 // @ts-check
-import * as React from 'react'
+
+import Button from '@mui/material/Button'
 import DialogContent from '@mui/material/DialogContent'
 import Typography from '@mui/material/Typography'
 import Grid2 from '@mui/material/Unstable_Grid2'
-import Button from '@mui/material/Button'
-import { useNavigate } from 'react-router'
-import { useTranslation } from 'react-i18next'
-
 import { useLayoutStore } from '@store/useLayoutStore'
-
-import { Header } from './Header'
-import { Footer } from './Footer'
+import { useTranslation } from 'react-i18next'
+import { useNavigate } from 'react-router'
 import { DialogWrapper } from './DialogWrapper'
+import { Footer } from './Footer'
+import { Header } from './Header'
 
 const handleClose = () => useLayoutStore.setState({ resetFilters: false })
 

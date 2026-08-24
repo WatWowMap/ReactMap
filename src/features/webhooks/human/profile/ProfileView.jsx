@@ -1,12 +1,11 @@
 // @ts-check
-import * as React from 'react'
-import DeleteForever from '@mui/icons-material/DeleteForever'
-import MoreTimeIcon from '@mui/icons-material/MoreTime'
-import FileCopy from '@mui/icons-material/FileCopy'
-import Grid from '@mui/material/Unstable_Grid2'
-import Typography from '@mui/material/Typography'
-import IconButton from '@mui/material/IconButton'
 
+import DeleteForever from '@mui/icons-material/DeleteForever'
+import FileCopy from '@mui/icons-material/FileCopy'
+import MoreTimeIcon from '@mui/icons-material/MoreTime'
+import IconButton from '@mui/material/IconButton'
+import Typography from '@mui/material/Typography'
+import Grid from '@mui/material/Unstable_Grid2'
 import { useMemory } from '@store/useMemory'
 import { useWebhookStore } from '@store/useWebhookStore'
 

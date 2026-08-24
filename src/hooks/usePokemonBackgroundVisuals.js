@@ -1,9 +1,9 @@
 // @ts-check
-import * as React from 'react'
-import { useTheme } from '@mui/material/styles'
-import { useTranslation } from 'react-i18next'
 
+import { useTheme } from '@mui/material/styles'
 import { useMemory } from '@store/useMemory'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 
 /**
  * Creates a memoized callback for computing Pokemon background visual metadata.

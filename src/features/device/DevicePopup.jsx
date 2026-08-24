@@ -1,12 +1,12 @@
 // @ts-check
-import * as React from 'react'
-import Typography from '@mui/material/Typography'
-import { useTranslation } from 'react-i18next'
 
 import { ErrorBoundary } from '@components/ErrorBoundary'
 import { useAnalytics } from '@hooks/useAnalytics'
-import { getTimeUntil } from '@utils/getTimeUntil'
+import Typography from '@mui/material/Typography'
 import { dayCheck } from '@utils/dayCheck'
+import { getTimeUntil } from '@utils/getTimeUntil'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 
 /**
  *

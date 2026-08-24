@@ -1,11 +1,12 @@
 /* eslint-disable react/destructuring-assignment */
 // @ts-check
-import * as React from 'react'
-import { Circle, Popup } from 'react-leaflet'
 
-import { useStorage } from '@store/useStorage'
 import { useForcePopup } from '@hooks/useForcePopup'
 import { useManualPopupTracker } from '@hooks/useManualPopupTracker'
+
+import { useStorage } from '@store/useStorage'
+import * as React from 'react'
+import { Circle, Popup } from 'react-leaflet'
 
 import { PortalPopup } from './PortalPopup'
 

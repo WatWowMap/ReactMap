@@ -1,13 +1,13 @@
 // @ts-check
 /* eslint-disable react/no-array-index-key */
-import * as React from 'react'
+
 import { useQuery } from '@apollo/client'
+import { Loading } from '@components/Loading'
 import Dialog from '@mui/material/Dialog'
 
 import { CUSTOM_COMPONENT } from '@services/queries/config'
-import { useMemory } from '@store/useMemory'
 import { useLayoutStore } from '@store/useLayoutStore'
-import { Loading } from '@components/Loading'
+import { useMemory } from '@store/useMemory'
 
 import { CustomDialog } from './components/CustomDialog'
 import { CustomTile } from './components/CustomTile'
@@ -46,6 +46,7 @@ export function DonorPage() {
           <Loading />
         ) : (
           donorPage.components.map((block, i) => (
+            // biome-ignore lint/suspicious/noArrayIndexKey: pre-existing, tracked for follow-up
             <CustomTile key={i} block={block} />
           ))
         )}

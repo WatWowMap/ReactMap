@@ -1,11 +1,10 @@
 // @ts-check
-import * as React from 'react'
 
+import { Header } from '@components/dialogs/Header'
+import { Menu } from '@components/Menu'
+import { StandardItem } from '@components/virtual/StandardItem'
 import { toggleDialog, useLayoutStore } from '@store/useLayoutStore'
 import { useMemory } from '@store/useMemory'
-import { StandardItem } from '@components/virtual/StandardItem'
-import { Menu } from '@components/Menu'
-import { Header } from '@components/dialogs/Header'
 
 import { DialogWrapper } from '../dialogs/DialogWrapper'
 

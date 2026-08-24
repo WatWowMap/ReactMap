@@ -1,19 +1,19 @@
 // @ts-check
 /* eslint-disable react/jsx-no-duplicate-props */
-import * as React from 'react'
-import Grid2 from '@mui/material/Unstable_Grid2'
-import TextField from '@mui/material/TextField'
+
+import { MIN_MAX } from '@assets/constants'
+import { ToggleTypography } from '@components/ToggleTypography'
 import Slider from '@mui/material/Slider'
 import { styled } from '@mui/material/styles'
+import TextField from '@mui/material/TextField'
+import Grid2 from '@mui/material/Unstable_Grid2'
+import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-
-import { ToggleTypography } from '@components/ToggleTypography'
-import { MIN_MAX } from '@assets/constants'
 
 const StyledTextField =
   /** @type {React.FC<import('@mui/material').TextFieldProps & { textColor: string }>} */ (
     styled(TextField, { shouldForwardProp: (prop) => prop !== 'textColor' })(
-      // @ts-ignore
+      // @ts-expect-error
       ({ textColor }) => ({
         width: 80,
         color: textColor,
@@ -86,7 +86,7 @@ export function SliderTile({
           setText(existing)
           if (existing.every((x) => typeof x === 'number')) {
             // annoying but TypeScript is rude for not liking my check above
-            // @ts-ignore
+            // @ts-expect-error
             handleChange(name, existing)
           }
         },

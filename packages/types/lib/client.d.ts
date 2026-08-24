@@ -1,16 +1,4 @@
-import * as React from 'react'
-import type {
-  ButtonProps,
-  FormControlProps,
-  SxProps,
-  Theme,
-  BaseSelectProps,
-} from '@mui/material'
-import type { SelectInputProps } from '@mui/material/Select/SelectInput'
-import { SystemStyleObject } from '@mui/system'
-
-import { UAssets } from '@services/Assets'
-import { Config } from './config'
+import type { BaseSelectProps, ButtonProps, SxProps } from '@mui/material'
 import {
   AdvCategories,
   BaseFilter,
@@ -19,7 +7,11 @@ import {
   Permissions,
   PokemonFilter,
 } from '@rm/types'
+
+import { UAssets } from '@services/Assets'
 import { UseStorage, UseStoragePaths } from '@store/useStorage'
+import * as React from 'react'
+import { Config } from './config'
 
 declare global {
   declare const CONFIG: Config<true>
@@ -145,7 +137,8 @@ type ClassToObjectType<T> = Partial<
     },
     keyof T extends infer K
       ? K extends keyof T
-        ? T[K] extends Function
+        ? // biome-ignore lint/complexity/noBannedTypes: matches the builtin Function type on purpose to filter callable props
+          T[K] extends Function
           ? K
           : never
         : never

@@ -1,32 +1,30 @@
 // @ts-check
-import * as React from 'react'
-import Person from '@mui/icons-material/Person'
-import DialogContent from '@mui/material/DialogContent'
-import AppBar from '@mui/material/AppBar'
-import Tabs from '@mui/material/Tabs'
-import Tab from '@mui/material/Tab'
-import Collapse from '@mui/material/Collapse'
 
-import Box from '@mui/material/Box'
-import { useTranslation } from 'react-i18next'
-
-import { useMemory } from '@store/useMemory'
-import { useLayoutStore } from '@store/useLayoutStore'
 import { Footer } from '@components/dialogs/Footer'
 import { Header } from '@components/dialogs/Header'
+import { Menu } from '@components/Menu'
+import Person from '@mui/icons-material/Person'
+import AppBar from '@mui/material/AppBar'
+import Box from '@mui/material/Box'
+import Collapse from '@mui/material/Collapse'
+import DialogContent from '@mui/material/DialogContent'
+import Tab from '@mui/material/Tab'
+import Tabs from '@mui/material/Tabs'
 import { apolloClient } from '@services/apollo'
 import { Query } from '@services/queries'
 import { ALL_PROFILES } from '@services/queries/webhook'
-import { Menu } from '@components/Menu'
+import { useLayoutStore } from '@store/useLayoutStore'
+import { useMemory } from '@store/useMemory'
 import { setMode, setSelected, useWebhookStore } from '@store/useWebhookStore'
 import { analytics } from '@utils/analytics'
-
-import { Human } from './human'
-import { Tracked } from './Tracked'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 import { useGenFilters } from './hooks/useGenFilters'
 import { useGetHookContext } from './hooks/useGetHookContext'
+import { Human } from './human'
 import { ProfileEditing } from './human/profile'
 import { Poracle } from './services/Poracle'
+import { Tracked } from './Tracked'
 import { WebhookItem } from './tiles/WebhookItem'
 
 export function Manage() {
@@ -94,11 +92,11 @@ export function Manage() {
       const { tempFilters } = useWebhookStore.getState()
       const values = Poracle.processor(
         category,
-        Object.values(tempFilters || {}).filter((x) => x && x.enabled),
+        Object.values(tempFilters || {}).filter((x) => x?.enabled),
         useWebhookStore.getState().context.ui[category].defaults,
       )
       apolloClient.mutate({
-        // @ts-ignore
+        // @ts-expect-error
         mutation: Query.webhook(category.toUpperCase()),
         variables: {
           category,
@@ -122,7 +120,7 @@ export function Manage() {
     [categories],
   )
 
-  const tabValue = categories.findIndex((x) => x === category)
+  const tabValue = categories.indexOf(category)
 
   const buttons = React.useMemo(
     () =>

@@ -1,8 +1,8 @@
 // @ts-check
-import * as React from 'react'
-import Grid from '@mui/material/Unstable_Grid2'
-import Button from '@mui/material/Button'
+
 import GitHubIcon from '@mui/icons-material/GitHub'
+import Button from '@mui/material/Button'
+import Grid from '@mui/material/Unstable_Grid2'
 import { useTranslation } from 'react-i18next'
 
 import { downloadLocales } from '../hooks/store'

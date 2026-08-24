@@ -116,7 +116,7 @@ async function startApollo(httpServer) {
                 'data' in response.body.singleResult
               ) {
                 const endpoint =
-                  // @ts-ignore
+                  // @ts-expect-error
                   operation?.selectionSet?.selections?.[0]?.name?.value
 
                 const data = response.body.singleResult.data?.[endpoint]
@@ -145,9 +145,9 @@ async function startApollo(httpServer) {
                   filterCount,
                 )
 
-                // @ts-ignore
+                // @ts-expect-error
                 if (returned && response.__sentry_transaction) {
-                  // @ts-ignore
+                  // @ts-expect-error
                   response.__sentry_transaction.setMeasurement(
                     `${endpoint}.returned`,
                     returned,

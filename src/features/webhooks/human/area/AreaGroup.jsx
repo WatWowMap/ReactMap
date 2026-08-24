@@ -1,12 +1,12 @@
 // @ts-check
-import * as React from 'react'
-import Grid2 from '@mui/material/Unstable_Grid2'
-import Divider from '@mui/material/Divider'
-import { useTranslation } from 'react-i18next'
 
-import { Loading } from '@components/Loading'
 import { BasicAccordion } from '@components/BasicAccordion'
+import { Loading } from '@components/Loading'
+import Divider from '@mui/material/Divider'
+import Grid2 from '@mui/material/Unstable_Grid2'
 import { useWebhookStore } from '@store/useWebhookStore'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 
 import { useGetAreas } from '../../hooks/useGetAreas'
 import { MemoAreaChip } from './AreaChip'

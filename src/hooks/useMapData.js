@@ -1,13 +1,13 @@
 // @ts-check
-import { useEffect } from 'react'
-import { useQuery } from '@apollo/client'
 
-import { GET_MAP_DATA } from '@services/queries/available'
-import { deepMerge } from '@utils/deepMerge'
+import { useQuery } from '@apollo/client'
+import { useProcessError } from '@hooks/useProcessError'
 import { UAssets } from '@services/Assets'
+import { GET_MAP_DATA } from '@services/queries/available'
 import { useMemory } from '@store/useMemory'
 import { useStorage } from '@store/useStorage'
-import { useProcessError } from '@hooks/useProcessError'
+import { deepMerge } from '@utils/deepMerge'
+import { useEffect } from 'react'
 
 export function useMapData(once = false) {
   const active = useMemory((s) => s.active)
@@ -143,18 +143,10 @@ export function useMapData(once = false) {
           const hasUnknownKey =
             currentKeys.includes(`a${pokemonId}`) || previousUnknownKey
           const addedKeys = currentKeys.filter(
-            (key) =>
-              !Object.prototype.hasOwnProperty.call(
-                previousPokestopFilters,
-                key,
-              ),
+            (key) => !Object.hasOwn(previousPokestopFilters, key),
           )
           const removedKeys = previousKeys.filter(
-            (key) =>
-              !Object.prototype.hasOwnProperty.call(
-                currentPokestopFilters,
-                key,
-              ),
+            (key) => !Object.hasOwn(currentPokestopFilters, key),
           )
           if (!addedKeys.length || !removedKeys.length || !hasUnknownKey) return
 
@@ -183,9 +175,7 @@ export function useMapData(once = false) {
         Object.keys(newFilters.pokestops?.filter || {})
           .filter((key) => key.startsWith('a'))
           .forEach((key) => {
-            if (
-              !Object.prototype.hasOwnProperty.call(currentPokestopFilters, key)
-            ) {
+            if (!Object.hasOwn(currentPokestopFilters, key)) {
               delete newFilters.pokestops.filter[key]
             }
           })

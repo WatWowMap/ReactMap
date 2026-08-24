@@ -1,26 +1,26 @@
 /* eslint-disable react/destructuring-assignment */
 // @ts-check
-import * as React from 'react'
-import { Marker, Popup, Circle, Polygon } from 'react-leaflet'
-import { t } from 'i18next'
-import { S2CellId, S2LatLng } from 'nodes2ts'
 
-import { useMarkerTimer } from '@hooks/useMarkerTimer'
-import { NEARBY_CELL_LEVEL, getOffset } from '@utils/offset'
-import { getBadge } from '@utils/getBadge'
-import { basicEqualFn, useMemory } from '@store/useMemory'
-import { useStorage } from '@store/useStorage'
-import { useOpacity } from '@hooks/useOpacity'
+import { TooltipWrapper } from '@components/ToolTipWrapper'
 import { useForcePopup } from '@hooks/useForcePopup'
 import { useManualPopupTracker } from '@hooks/useManualPopupTracker'
+import { useMarkerTimer } from '@hooks/useMarkerTimer'
+import { useOpacity } from '@hooks/useOpacity'
 import { sendNotification } from '@services/desktopNotification'
 import { useMapStore } from '@store/useMapStore'
-import { TooltipWrapper } from '@components/ToolTipWrapper'
-import { getTimeUntil } from '@utils/getTimeUntil'
-import { normalizeCategory } from '@utils/normalizeCategory'
-import { getS2Polygon } from '@utils/getS2Polygon'
+import { basicEqualFn, useMemory } from '@store/useMemory'
+import { useStorage } from '@store/useStorage'
+import { getBadge } from '@utils/getBadge'
 import { getFormDisplay } from '@utils/getFormDisplay'
+import { getS2Polygon } from '@utils/getS2Polygon'
+import { getTimeUntil } from '@utils/getTimeUntil'
 import { getWildFilterId } from '@utils/getWildFilterId'
+import { normalizeCategory } from '@utils/normalizeCategory'
+import { getOffset, NEARBY_CELL_LEVEL } from '@utils/offset'
+import { t } from 'i18next'
+import { S2CellId, S2LatLng } from 'nodes2ts'
+import * as React from 'react'
+import { Circle, Marker, Polygon, Popup } from 'react-leaflet'
 
 import { PokemonPopup } from './PokemonPopup'
 import { basicPokemonMarker, fancyPokemonMarker } from './pokemonMarker'
@@ -224,7 +224,7 @@ const BasePokemonTile = (pkmn) => {
 
   return (
     <>
-      {isPopupOpen && !!nearbyCellPolygon ? (
+      {isPopupOpen && nearbyCellPolygon ? (
         <Polygon
           positions={nearbyCellPolygon}
           pathOptions={{
@@ -260,7 +260,7 @@ const BasePokemonTile = (pkmn) => {
         }
         position={finalLocation}
         icon={
-          Boolean(backgroundUrl) ||
+          backgroundUrl ||
           (pkmn.bestPvp !== null && pkmn.bestPvp < 4 && extras.length === 0) ||
           showGlow ||
           showWeather ||

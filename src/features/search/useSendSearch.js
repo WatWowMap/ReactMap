@@ -1,14 +1,14 @@
 // @ts-check
-import { useState, useCallback, useMemo, useEffect } from 'react'
-import { useLazyQuery } from '@apollo/client'
-import { useTranslation } from 'react-i18next'
-import { debounce } from 'lodash'
 
+import { useLazyQuery } from '@apollo/client'
 import { Query } from '@services/queries'
-import { useStorage } from '@store/useStorage'
-import { useMemory } from '@store/useMemory'
 import { useMapStore } from '@store/useMapStore'
+import { useMemory } from '@store/useMemory'
+import { useStorage } from '@store/useStorage'
 import { analytics } from '@utils/analytics'
+import { debounce } from 'lodash'
+import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 
 /**
  * @param {string} search

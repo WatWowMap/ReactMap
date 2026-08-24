@@ -1,17 +1,16 @@
 // @ts-check
-import * as React from 'react'
-import DialogContent from '@mui/material/DialogContent'
-import Dialog from '@mui/material/Dialog'
+
 import { useMutation } from '@apollo/client'
-
-import { apolloClient, apolloCache } from '@services/apollo'
-import { Query } from '@services/queries'
 import { ENUM_BADGES } from '@assets/constants'
-import { useLayoutStore } from '@store/useLayoutStore'
 import { MultiSelector } from '@components/inputs/MultiSelector'
-
-import { Header } from './Header'
+import Dialog from '@mui/material/Dialog'
+import DialogContent from '@mui/material/DialogContent'
+import { apolloCache, apolloClient } from '@services/apollo'
+import { Query } from '@services/queries'
+import { useLayoutStore } from '@store/useLayoutStore'
+import * as React from 'react'
 import { Footer } from './Footer'
+import { Header } from './Header'
 
 const handleClose = () =>
   useLayoutStore.setState({

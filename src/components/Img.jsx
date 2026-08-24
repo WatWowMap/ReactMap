@@ -1,9 +1,10 @@
 // @ts-check
-import * as React from 'react'
+
+import { useTranslateById } from '@hooks/useTranslateById'
 import { styled } from '@mui/material/styles'
 import Typography from '@mui/material/Typography'
 import { useMemory } from '@store/useMemory'
-import { useTranslateById } from '@hooks/useTranslateById'
+import * as React from 'react'
 import { NameTT } from './popups/NameTT'
 
 /**

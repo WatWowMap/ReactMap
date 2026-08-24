@@ -1,20 +1,19 @@
 /* eslint-disable react/destructuring-assignment */
 // @ts-check
-import * as React from 'react'
-import { Marker, Popup, Circle } from 'react-leaflet'
-import { divIcon } from 'leaflet'
-import { useTheme, alpha } from '@mui/material/styles'
 
-import { useMemory, basicEqualFn } from '@store/useMemory'
-import { useStorage } from '@store/useStorage'
-import { useManualPopupTracker } from '@hooks/useManualPopupTracker'
+import { TooltipWrapper } from '@components/ToolTipWrapper'
 import { useForcePopup } from '@hooks/useForcePopup'
+import { useManualPopupTracker } from '@hooks/useManualPopupTracker'
 import { useMarkerTimer } from '@hooks/useMarkerTimer'
 import { useOpacity } from '@hooks/useOpacity'
-import { TooltipWrapper } from '@components/ToolTipWrapper'
-
-import { TappablePopup } from './TappablePopup'
+import { alpha, useTheme } from '@mui/material/styles'
+import { basicEqualFn, useMemory } from '@store/useMemory'
+import { useStorage } from '@store/useStorage'
+import { divIcon } from 'leaflet'
+import * as React from 'react'
+import { Circle, Marker, Popup } from 'react-leaflet'
 import { getTappableDisplaySettings } from './displayRules'
+import { TappablePopup } from './TappablePopup'
 
 /**
  * @param {import('@rm/types').Tappable} tappable

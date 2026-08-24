@@ -1,8 +1,9 @@
 // @ts-check
-import * as React from 'react'
+
 import CheckIcon from '@mui/icons-material/Check'
 import ClearIcon from '@mui/icons-material/Clear'
 import RuleIcon from '@mui/icons-material/Rule'
+import * as React from 'react'
 
 /**
  * @typedef {{

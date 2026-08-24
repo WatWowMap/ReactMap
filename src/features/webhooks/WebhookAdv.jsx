@@ -1,37 +1,36 @@
 // @ts-check
 
-/* eslint-disable react/jsx-no-duplicate-props */
-import * as React from 'react'
+import { useLazyQuery } from '@apollo/client'
+import { Footer } from '@components/dialogs/Footer'
+import { Header } from '@components/dialogs/Header'
+import { FCSelect } from '@components/inputs/FCSelect'
+import { SliderTile } from '@components/inputs/SliderTile'
+import { useAnalytics } from '@hooks/useAnalytics'
 import ExpandMore from '@mui/icons-material/ExpandMore'
 import Accordion from '@mui/material/Accordion'
 import AccordionDetails from '@mui/material/AccordionDetails'
 import AccordionSummary from '@mui/material/AccordionSummary'
+import Autocomplete from '@mui/material/Autocomplete'
 import CircularProgress from '@mui/material/CircularProgress'
+import Dialog from '@mui/material/Dialog'
+import DialogContent from '@mui/material/DialogContent'
 import Divider from '@mui/material/Divider'
-import Grid from '@mui/material/Unstable_Grid2'
 import InputAdornment from '@mui/material/InputAdornment'
 import MenuItem from '@mui/material/MenuItem'
 import Paper from '@mui/material/Paper'
 import Switch from '@mui/material/Switch'
 import TextField from '@mui/material/TextField'
 import Typography from '@mui/material/Typography'
-import Autocomplete from '@mui/material/Autocomplete'
-import Dialog from '@mui/material/Dialog'
-import DialogContent from '@mui/material/DialogContent'
-import { useTranslation } from 'react-i18next'
-import { useLazyQuery } from '@apollo/client'
-import { debounce } from 'lodash'
-
+import Grid from '@mui/material/Unstable_Grid2'
+import { Query } from '@services/queries'
 import { useMemory } from '@store/useMemory'
 import { useStorage } from '@store/useStorage'
-import { Query } from '@services/queries'
-import { SliderTile } from '@components/inputs/SliderTile'
-import { Header } from '@components/dialogs/Header'
-import { Footer } from '@components/dialogs/Footer'
 import { useWebhookStore } from '@store/useWebhookStore'
-import { useAnalytics } from '@hooks/useAnalytics'
 import { camelToSnake } from '@utils/strings'
-import { FCSelect } from '@components/inputs/FCSelect'
+import { debounce } from 'lodash'
+/* eslint-disable react/jsx-no-duplicate-props */
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 
 import { Poracle } from './services/Poracle'
 
@@ -407,7 +406,7 @@ export function WebhookAdvanced() {
       +poracleValues.distance
     )
       return `d${poracleValues.distance}`
-    if (field === 'min_time' && parseInt(poracleValues.min_time))
+    if (field === 'min_time' && parseInt(poracleValues.min_time, 10))
       return `t${poracleValues.min_time}`
     if (field === 'exclusive' && poracleValues.exclusive)
       return ` ${t('exclusive')} `
@@ -533,7 +532,7 @@ export function WebhookAdvanced() {
       ${
         poracleValues.noIv
           ? `${poracleValues.clean ? ` ${t('clean')} ` : ''}${
-              poracleValues.byDistance && parseInt(poracleValues.distance)
+              poracleValues.byDistance && parseInt(poracleValues.distance, 10)
                 ? ` d${poracleValues.distance} `
                 : ''
             }`
@@ -701,7 +700,7 @@ export function WebhookAdvanced() {
                 disabled={!hasNominatim}
                 includeInputInList
                 freeSolo
-                onChange={(event, newValue) => {
+                onChange={(_event, newValue) => {
                   if (newValue) {
                     setPoracleValues({ ...poracleValues, gym_id: newValue.id })
                   }

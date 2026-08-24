@@ -1,5 +1,5 @@
 // @ts-check
-import * as React from 'react'
+
 import ListItem from '@mui/material/ListItem'
 import ListItemButton from '@mui/material/ListItemButton'
 import ListItemIcon from '@mui/material/ListItemIcon'

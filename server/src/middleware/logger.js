@@ -1,5 +1,4 @@
 // @ts-check
-/* eslint-disable prefer-rest-params */
 const bytes = require('bytes')
 
 const { log, TAGS } = require('@rm/logger')
@@ -12,17 +11,19 @@ function loggerMiddleware(req, res, next) {
   const oldEnd = res.end
   let resBodySize = 0
 
-  // @ts-ignore
+  // @ts-expect-error
   res.write = function write(chunk) {
     resBodySize += chunk.length
+    // biome-ignore lint/complexity/noArguments: forwards the caller's exact arity to the original res.write
     oldWrite.apply(res, arguments)
   }
 
-  // @ts-ignore
+  // @ts-expect-error
   res.end = function end(chunk) {
     if (chunk) {
       resBodySize += chunk.length
     }
+    // biome-ignore lint/complexity/noArguments: forwards the caller's exact arity to the original res.end
     oldEnd.apply(res, arguments)
   }
 

@@ -1,19 +1,19 @@
 // @ts-check
-import * as React from 'react'
-import { useTranslation } from 'react-i18next'
-import { useMutation } from '@apollo/client'
-import Grid2 from '@mui/material/Unstable_Grid2'
-import Select from '@mui/material/Select'
-import MenuItem from '@mui/material/MenuItem'
-import Typography from '@mui/material/Typography'
 
-import { useMemory } from '@store/useMemory'
-import { Query } from '@services/queries'
+import { useMutation } from '@apollo/client'
 import { METHODS } from '@assets/constants'
 import { DiscordButton } from '@components/auth/Discord'
 import { TelegramWidget } from '@components/auth/Telegram'
 import { Notification } from '@components/Notification'
+import MenuItem from '@mui/material/MenuItem'
+import Select from '@mui/material/Select'
+import Typography from '@mui/material/Typography'
+import Grid2 from '@mui/material/Unstable_Grid2'
+import { Query } from '@services/queries'
+import { useMemory } from '@store/useMemory'
 import { getProperName } from '@utils/strings'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 
 export function LinkAccounts() {
   const { t } = useTranslation()

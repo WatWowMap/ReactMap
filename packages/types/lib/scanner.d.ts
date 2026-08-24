@@ -1,4 +1,5 @@
 import { FullModel } from './utility'
+
 import DeviceModel = require('server/src/models/Device')
 import GymModel = require('server/src/models/Gym')
 import NestModel = require('server/src/models/Nest')

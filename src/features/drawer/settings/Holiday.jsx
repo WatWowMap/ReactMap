@@ -1,12 +1,11 @@
 // @ts-check
-import * as React from 'react'
-import ListItemIcon from '@mui/material/ListItemIcon'
-import CakeIcon from '@mui/icons-material/Cake'
-import { useTranslation } from 'react-i18next'
 
+import { BoolToggle } from '@components/inputs/BoolToggle'
+import CakeIcon from '@mui/icons-material/Cake'
+import ListItemIcon from '@mui/material/ListItemIcon'
 import { useMemory } from '@store/useMemory'
 import { useStorage } from '@store/useStorage'
-import { BoolToggle } from '@components/inputs/BoolToggle'
+import { useTranslation } from 'react-i18next'
 
 import { SettingIcon } from './Icon'
 

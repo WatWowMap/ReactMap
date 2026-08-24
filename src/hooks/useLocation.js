@@ -1,15 +1,14 @@
 // @ts-check
 // TODO: Not sure if this is possible to actually type correctly with how the leaflet.locatecontrol library is written
 
-import { useEffect, useMemo, useState } from 'react'
-import { LayerGroup, DomEvent, DomUtil } from 'leaflet'
-import { useTranslation } from 'react-i18next'
-import { useMap } from 'react-leaflet'
-
-import { useStorage } from '@store/useStorage'
 import { useLocationError } from '@hooks/useLocationError'
 import { useStopFollowingOnFly } from '@hooks/useStopFollowingOnFly'
+import { useStorage } from '@store/useStorage'
 import { RecoveringLocateControl } from '@utils/locateControl'
+import { DomEvent, DomUtil, LayerGroup } from 'leaflet'
+import { useEffect, useMemo, useState } from 'react'
+import { useTranslation } from 'react-i18next'
+import { useMap } from 'react-leaflet'
 
 /**
  * Use location hook
@@ -40,18 +39,18 @@ export function useLocation(dependency = false) {
       },
       _unload() {
         this.stop()
-        // @ts-ignore
+        // @ts-expect-error
         if (this._map) this._map.off('unload', this._unload, this)
       },
       stop() {
-        // @ts-ignore
+        // @ts-expect-error
         if (!this._map) return
-        // @ts-ignore
+        // @ts-expect-error
         this._deactivate()
         this._cleanClasses()
-        // @ts-ignore
+        // @ts-expect-error
         this._resetVariables()
-        // @ts-ignore
+        // @ts-expect-error
         this._removeMarker()
       },
       onAdd() {
@@ -59,32 +58,32 @@ export function useLocation(dependency = false) {
           'div',
           'react-locate-control leaflet-bar leaflet-control',
         )
-        // @ts-ignore
+        // @ts-expect-error
         this._container = container
-        // @ts-ignore
+        // @ts-expect-error
         this._layer = this.options.layer || new LayerGroup()
-        // @ts-ignore
+        // @ts-expect-error
         this._layer.addTo(this._map)
-        // @ts-ignore
+        // @ts-expect-error
         this._event = undefined
-        // @ts-ignore
+        // @ts-expect-error
         this._compassHeading = null
-        // @ts-ignore
+        // @ts-expect-error
         this._prevBounds = null
 
-        // @ts-ignore
+        // @ts-expect-error
         const linkAndIcon = this.options.createButtonCallback(
           container,
-          // @ts-ignore
+          // @ts-expect-error
           this.options,
         )
-        // @ts-ignore
+        // @ts-expect-error
         this._link = linkAndIcon.link
-        // @ts-ignore
+        // @ts-expect-error
         this._icon = linkAndIcon.icon
 
         DomEvent.on(
-          // @ts-ignore
+          // @ts-expect-error
           this._link,
           'click',
           function stuff(ev) {
@@ -93,13 +92,13 @@ export function useLocation(dependency = false) {
             this._onClick()
           },
           this,
-          // @ts-ignore
+          // @ts-expect-error
         ).on(this._link, 'dblclick', DomEvent.stopPropagation)
 
-        // @ts-ignore
+        // @ts-expect-error
         this._resetVariables()
 
-        // @ts-ignore
+        // @ts-expect-error
         this._map.on('unload', this._unload, this)
 
         return container
@@ -107,7 +106,7 @@ export function useLocation(dependency = false) {
     })
 
     const result = new LocateFab({
-      // @ts-ignore
+      // @ts-expect-error
       keepCurrentZoomLevel: true,
       setView: 'untilPan',
       metric,
@@ -138,6 +137,6 @@ export function useLocation(dependency = false) {
     }
   }, [lc, map, dependency])
 
-  // @ts-ignore
+  // @ts-expect-error
   return { lc, requesting, color, locationError, hideLocationError }
 }

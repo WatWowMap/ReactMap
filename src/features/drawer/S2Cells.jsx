@@ -1,11 +1,12 @@
 // @ts-check
-import * as React from 'react'
-import MenuItem from '@mui/material/MenuItem'
-import { useTranslation } from 'react-i18next'
 
-import { useStorage, useDeepStore } from '@store/useStorage'
 import { S2_LEVELS } from '@assets/constants'
 import { FCSelectListItem } from '@components/inputs/FCSelect'
+import MenuItem from '@mui/material/MenuItem'
+
+import { useDeepStore, useStorage } from '@store/useStorage'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 
 import { CollapsibleItem } from './components/CollapsibleItem'
 

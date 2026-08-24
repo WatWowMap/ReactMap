@@ -1,29 +1,28 @@
 // @ts-check
-import * as React from 'react'
-import Grid2 from '@mui/material/Unstable_Grid2'
+
+import { ENABLED_ALL, XXS_XXL } from '@assets/constants'
+import { Footer } from '@components/dialogs/Footer'
+import { Header } from '@components/dialogs/Header'
+import { BoolToggle, DualBoolToggle } from '@components/inputs/BoolToggle'
+import { useAnalytics } from '@hooks/useAnalytics'
+import { useTranslateById } from '@hooks/useTranslateById'
 import Dialog from '@mui/material/Dialog'
 import DialogContent from '@mui/material/DialogContent'
 import List from '@mui/material/List'
 import ListItem from '@mui/material/ListItem'
-import { useTranslation } from 'react-i18next'
-
-import { useMemory } from '@store/useMemory'
+import Grid2 from '@mui/material/Unstable_Grid2'
 import { useLayoutStore } from '@store/useLayoutStore'
+import { useMemory } from '@store/useMemory'
 import { useDeepStore, useStorage } from '@store/useStorage'
-import { Header } from '@components/dialogs/Header'
-import { Footer } from '@components/dialogs/Footer'
-import { BoolToggle, DualBoolToggle } from '@components/inputs/BoolToggle'
-import { ENABLED_ALL, XXS_XXL } from '@assets/constants'
-import { useTranslateById } from '@hooks/useTranslateById'
-import { STANDARD_BACKUP, applyToAll } from '@utils/applyToAll'
+import { applyToAll, STANDARD_BACKUP } from '@utils/applyToAll'
 import { checkIfHasAll } from '@utils/hasAll'
-import { useAnalytics } from '@hooks/useAnalytics'
-
-import { StringFilter } from './StringFilter'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 import { SliderTile } from '../inputs/SliderTile'
-import { Size } from './Size'
 import { GenderListItem } from './Gender'
 import { QuestConditionSelector } from './QuestConditions'
+import { Size } from './Size'
+import { StringFilter } from './StringFilter'
 
 export function AdvancedFilter() {
   const { category, id, selectedIds, open, showDefaultForms } = useLayoutStore(
@@ -160,7 +159,7 @@ export function AdvancedFilter() {
                           ...each,
                           disabled: each.disabled || controlsDisabled,
                         }}
-                        // @ts-ignore
+                        // @ts-expect-error
                         handleChange={handleChange}
                         values={filters[each.name]}
                       />

@@ -1,12 +1,14 @@
 // @ts-check
-import * as React from 'react'
+
+import { useMapStore } from '@store/useMapStore'
 
 import { useMemory } from '@store/useMemory'
 import { useStorage } from '@store/useStorage'
-import { useMapStore } from '@store/useMapStore'
+import * as React from 'react'
 
 import { FilterPermCheck } from './QueryData'
 
+// biome-ignore lint/suspicious/noShadowRestrictedNames: component name predates this rule, shadowing is local to this file
 export function DataView() {
   const iconsReady = useMemory((s) => !!s.Icons)
   const mapReady = useMapStore((s) => !!s.map)

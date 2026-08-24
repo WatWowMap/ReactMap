@@ -1,11 +1,11 @@
 // @ts-check
-import * as React from 'react'
-import List from '@mui/material/List'
-import { Popup } from 'react-leaflet'
-import { useTranslation } from 'react-i18next'
 
 import { DividerWithMargin } from '@components/StyledDivider'
-
+import List from '@mui/material/List'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
+import { Popup } from 'react-leaflet'
+import { ConfigContext } from './ContextProvider'
 import {
   InAllowedArea,
   ScanCancel,
@@ -14,7 +14,6 @@ import {
   ScanRequests,
   StyledListItemText,
 } from './Shared'
-import { ConfigContext } from './ContextProvider'
 
 /**
  *

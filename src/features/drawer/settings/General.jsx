@@ -1,17 +1,16 @@
 // @ts-check
-import * as React from 'react'
-import MenuItem from '@mui/material/MenuItem'
+
+import { FCSelectListItem } from '@components/inputs/FCSelect'
+import DevicesOtherIcon from '@mui/icons-material/DevicesOther'
 import MapIcon from '@mui/icons-material/Map'
 import NavIcon from '@mui/icons-material/Navigation'
-import StyleIcon from '@mui/icons-material/Style'
-import DevicesOtherIcon from '@mui/icons-material/DevicesOther'
 import SquareFootIcon from '@mui/icons-material/SquareFoot'
-import { useTranslation } from 'react-i18next'
-
+import StyleIcon from '@mui/icons-material/Style'
+import MenuItem from '@mui/material/MenuItem'
 import { useMemory } from '@store/useMemory'
 import { useStorage } from '@store/useStorage'
-import { getProperName, camelToSnake } from '@utils/strings'
-import { FCSelectListItem } from '@components/inputs/FCSelect'
+import { camelToSnake, getProperName } from '@utils/strings'
+import { useTranslation } from 'react-i18next'
 
 const ICON_MAP = {
   navigation: <NavIcon />,

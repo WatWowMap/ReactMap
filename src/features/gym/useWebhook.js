@@ -1,12 +1,11 @@
 // @ts-check
 
-import { useEffect } from 'react'
 import { useMutation } from '@apollo/client'
-import { useTranslation } from 'react-i18next'
-
 import { Query } from '@services/queries'
-import { useWebhookStore } from '@store/useWebhookStore'
 import { ALL_PROFILES } from '@services/queries/webhook'
+import { useWebhookStore } from '@store/useWebhookStore'
+import { useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
 
 /**
  *

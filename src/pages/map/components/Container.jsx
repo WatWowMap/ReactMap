@@ -1,22 +1,21 @@
 // @ts-check
-import * as React from 'react'
-import { MapContainer } from 'react-leaflet'
 
+import { ScanOnDemand } from '@features/scanner'
+import { WebhookAreaSelection, WebhookMarker } from '@features/webhooks'
+import { useMapStore } from '@store/useMapStore'
 import { useMemory } from '@store/useMemory'
 import { useStorage } from '@store/useStorage'
-import { useMapStore } from '@store/useMapStore'
-import { ScanOnDemand } from '@features/scanner'
-import { WebhookMarker, WebhookAreaSelection } from '@features/webhooks'
 import { timeCheck } from '@utils/timeCheck'
-
-import { Effects } from './Effects'
+import { MapContainer } from 'react-leaflet'
+// biome-ignore lint/suspicious/noShadowRestrictedNames: component name predates this rule, shadowing is local to this file
 import { DataView } from './Data'
-import { Nav } from './Nav'
+import { Effects } from './Effects'
 import {
   ControlledLocate,
   ControlledTileLayer,
   ControlledZoomLayer,
 } from './Layers'
+import { Nav } from './Nav'
 
 /** @param {{ target: import('leaflet').Map, type: string }} args */
 function setLocationZoom({ target: map }) {

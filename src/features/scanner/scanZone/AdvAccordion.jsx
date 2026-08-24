@@ -1,11 +1,12 @@
 // @ts-check
-import * as React from 'react'
+
 import ExpandMore from '@mui/icons-material/ExpandMore'
 import Accordion from '@mui/material/Accordion'
-import AccordionSummary from '@mui/material/AccordionSummary'
 import AccordionDetails from '@mui/material/AccordionDetails'
-import Typography from '@mui/material/Typography'
+import AccordionSummary from '@mui/material/AccordionSummary'
 import { styled } from '@mui/material/styles'
+import Typography from '@mui/material/Typography'
+import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 
 const StyledAccordion = styled(Accordion)((/* { theme } */) => ({

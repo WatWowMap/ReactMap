@@ -1,11 +1,11 @@
 // @ts-check
-import * as React from 'react'
+
+import { SCAN_SIZES } from '@assets/constants'
 import Button from '@mui/material/Button'
 import ButtonGroup from '@mui/material/ButtonGroup'
 import ListItem from '@mui/material/ListItem'
+import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-
-import { SCAN_SIZES } from '@assets/constants'
 
 import { useScanStore } from '../hooks/store'
 

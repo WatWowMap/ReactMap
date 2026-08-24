@@ -1,33 +1,32 @@
 // @ts-check
-import * as React from 'react'
-import ListItem from '@mui/material/ListItem'
-import ListItemIcon from '@mui/material/ListItemIcon'
-import ListSubheader from '@mui/material/ListSubheader'
-import TranslateIcon from '@mui/icons-material/Translate'
+
+import { BasicListButton } from '@components/inputs/BasicListButton'
+import { BoolToggle } from '@components/inputs/BoolToggle'
+import { LocaleSelection } from '@components/inputs/LocaleSelection'
+import { DividerWithMargin } from '@components/StyledDivider'
 import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome'
 import Brightness7Icon from '@mui/icons-material/Brightness7'
 import InsightsIcon from '@mui/icons-material/Insights'
+import LogoDevIcon from '@mui/icons-material/LogoDev'
 import NotificationsActiveIcon from '@mui/icons-material/NotificationsActive'
 import NotificationsOffIcon from '@mui/icons-material/NotificationsOff'
-import LogoDevIcon from '@mui/icons-material/LogoDev'
-import { useTranslation } from 'react-i18next'
-
-import { useMemory } from '@store/useMemory'
-import { toggleDialog } from '@store/useLayoutStore'
+import TranslateIcon from '@mui/icons-material/Translate'
+import ListItem from '@mui/material/ListItem'
+import ListItemIcon from '@mui/material/ListItemIcon'
+import ListSubheader from '@mui/material/ListSubheader'
 import {
-  HAS_API,
   getPermission,
+  HAS_API,
   requestPermission,
 } from '@services/desktopNotification'
-import { LocaleSelection } from '@components/inputs/LocaleSelection'
-import { DividerWithMargin } from '@components/StyledDivider'
-import { BoolToggle } from '@components/inputs/BoolToggle'
-import { BasicListButton } from '@components/inputs/BasicListButton'
+import { toggleDialog } from '@store/useLayoutStore'
+import { useMemory } from '@store/useMemory'
+import { useTranslation } from 'react-i18next'
 
 import { DrawerActions } from '../components/Actions'
 import { GeneralSetting } from './General'
-import { UAssetSetting } from './UAssets'
 import { HolidaySetting } from './Holiday'
+import { UAssetSetting } from './UAssets'
 
 export function Settings() {
   const { t } = useTranslation()

@@ -1,14 +1,13 @@
 // @ts-check
 /* eslint-disable react/no-array-index-key */
-import * as React from 'react'
-import Grid from '@mui/material/Unstable_Grid2'
-import { useTranslation } from 'react-i18next'
 
-import { CustomTile, CustomDialog } from '@features/builder'
 import { ErrorBoundary } from '@components/ErrorBoundary'
-
-import { useSafeParse } from '../hooks/useSafeParse'
+import { CustomDialog, CustomTile } from '@features/builder'
+import Grid from '@mui/material/Unstable_Grid2'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 import { usePlayStore } from '../hooks/store'
+import { useSafeParse } from '../hooks/useSafeParse'
 
 export function Viewer() {
   const hideEditor = usePlayStore((s) => s.hideEditor)
@@ -41,6 +40,7 @@ export function Viewer() {
             sx={configObj.settings.parentSx || {}}
           >
             {configObj.components.map((block, i) => (
+              // biome-ignore lint/suspicious/noArrayIndexKey: pre-existing, tracked for follow-up
               <CustomTile key={i} block={block} />
             ))}
           </Grid>
@@ -54,6 +54,7 @@ export function Viewer() {
               handleClose={() => {}}
             >
               {configObj.components.map((block, i) => (
+                // biome-ignore lint/suspicious/noArrayIndexKey: pre-existing, tracked for follow-up
                 <CustomTile key={i} block={block} />
               ))}
             </CustomDialog>

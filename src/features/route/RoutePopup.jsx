@@ -1,35 +1,35 @@
 // @ts-check
 /* eslint-disable react/destructuring-assignment */
-import * as React from 'react'
-import { Popup } from 'react-leaflet'
+
 import { useLazyQuery } from '@apollo/client'
-import { useTranslation } from 'react-i18next'
-import Grid2 from '@mui/material/Unstable_Grid2'
-import Avatar from '@mui/material/Avatar'
+import { Notification } from '@components/Notification'
+import { Navigation } from '@components/popups/Navigation'
+import { Timer } from '@components/popups/Timer'
+import { Title } from '@components/popups/Title'
+import { useManualPopupTracker } from '@hooks/useManualPopupTracker'
+import ArrowDropDown from '@mui/icons-material/ArrowDropDown'
+import ArrowDropUp from '@mui/icons-material/ArrowDropUp'
 import CheckIcon from '@mui/icons-material/Check'
 import CloseIcon from '@mui/icons-material/Close'
+import DownloadIcon from '@mui/icons-material/Download'
 import ExpandMore from '@mui/icons-material/ExpandMore'
+import Avatar from '@mui/material/Avatar'
+import Box from '@mui/material/Box'
 import Chip from '@mui/material/Chip'
 import Collapse from '@mui/material/Collapse'
 import IconButton from '@mui/material/IconButton'
 import List from '@mui/material/List'
 import ListItem from '@mui/material/ListItem'
 import ListItemText from '@mui/material/ListItemText'
-import Box from '@mui/material/Box'
-import ArrowDropDown from '@mui/icons-material/ArrowDropDown'
-import ArrowDropUp from '@mui/icons-material/ArrowDropUp'
 import Typography from '@mui/material/Typography'
-import DownloadIcon from '@mui/icons-material/Download'
-
+import Grid2 from '@mui/material/Unstable_Grid2'
 import { Query } from '@services/queries'
-import { formatInterval } from '@utils/formatInterval'
 import { useMemory } from '@store/useMemory'
 import { useStorage } from '@store/useStorage'
-import { Title } from '@components/popups/Title'
-import { Timer } from '@components/popups/Timer'
-import { Navigation } from '@components/popups/Navigation'
-import { Notification } from '@components/Notification'
-import { useManualPopupTracker } from '@hooks/useManualPopupTracker'
+import { formatInterval } from '@utils/formatInterval'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
+import { Popup } from 'react-leaflet'
 
 import { useFormatDistance } from './useFormatDistance'
 
@@ -376,7 +376,7 @@ export function RoutePopup({ end, inline = false, ...props }) {
   return (
     <Popup
       ref={(ref) => {
-        if (ref && ref.isOpen() && !called) {
+        if (ref?.isOpen() && !called) {
           getRoute()
         }
       }}

@@ -275,7 +275,7 @@ export interface PoracleAPIRef {
   tracking: <Suffix extends string = ''>(
     userId: number,
     category: PoracleCategory,
-    suffix?: Suffix = '' as const,
+    suffix?: Suffix,
   ) => `/api/tracking/${typeof category}/${number}${Suffix extends ''
     ? ''
     : `/${Suffix}`}}`
@@ -285,8 +285,8 @@ export interface PoracleAPIRef {
     Suffix extends string = '',
   >(
     userId: number,
-    action?: Action = '' as const,
-    suffix?: Suffix = '' as const,
+    action?: Action,
+    suffix?: Suffix,
   ) => `/api/profiles/${number}/${Action extends ''
     ? ''
     : `/${Action}`}${Suffix extends '' ? '' : `/${Suffix}`}`

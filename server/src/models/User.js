@@ -39,7 +39,7 @@ class User extends Model {
    * @param {string} botName
    */
   static async clearPerms(userId, strategy, botName) {
-    await this.query()
+    await User.query()
       .update({ [`${strategy}Perms`]: null })
       .where({ [`${strategy}Id`]: userId })
       .then(() =>
@@ -56,7 +56,7 @@ class User extends Model {
    * @returns {Promise<import('@rm/types').FullUser | null>}
    */
   static async getOne(id) {
-    return this.query().findOne({ id })
+    return User.query().findOne({ id })
   }
 
   /**
@@ -66,8 +66,8 @@ class User extends Model {
    * @returns {Promise<import('@rm/types').FullUser | null>}
    */
   static async updateWebhook(id, selectedWebhook) {
-    await this.query().update({ selectedWebhook }).where({ id })
-    return this.getOne(id)
+    await User.query().update({ selectedWebhook }).where({ id })
+    return User.getOne(id)
   }
 }
 

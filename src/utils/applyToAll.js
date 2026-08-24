@@ -1,7 +1,7 @@
 // @ts-check
 
 import { useMemory } from '@store/useMemory'
-import { useStorage, setDeepStore } from '@store/useStorage'
+import { setDeepStore, useStorage } from '@store/useStorage'
 import { generateSlots } from '@utils/generateSlots'
 
 export const STANDARD_BACKUP =

@@ -1,14 +1,14 @@
 /* eslint-disable react/destructuring-assignment */
 // @ts-check
-import * as React from 'react'
-import { Circle, Marker, Popup } from 'react-leaflet'
 
+import { TooltipWrapper } from '@components/ToolTipWrapper'
+import { useForcePopup } from '@hooks/useForcePopup'
+import { useManualPopupTracker } from '@hooks/useManualPopupTracker'
 import { useMarkerTimer } from '@hooks/useMarkerTimer'
 import { basicEqualFn, useMemory } from '@store/useMemory'
 import { useStorage } from '@store/useStorage'
-import { useForcePopup } from '@hooks/useForcePopup'
-import { useManualPopupTracker } from '@hooks/useManualPopupTracker'
-import { TooltipWrapper } from '@components/ToolTipWrapper'
+import * as React from 'react'
+import { Circle, Marker, Popup } from 'react-leaflet'
 
 import {
   getEffectiveIncludeUpcoming,

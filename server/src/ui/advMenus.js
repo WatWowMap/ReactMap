@@ -47,16 +47,19 @@ function advMenus(perms) {
     .filter((val) => val !== 'poke_type_0')
 
   const forms = Object.entries(
-    Object.values(state.event.masterfile.pokemon).reduce((acc, val) => {
-      Object.values(val.forms || {}).forEach((form) => {
-        if (acc[form.name]) {
-          acc[form.name] += 1
-        } else {
-          acc[form.name] = 1
-        }
-      })
-      return acc
-    }, /** @type {Record<string, number>} */ ({})),
+    Object.values(state.event.masterfile.pokemon).reduce(
+      (acc, val) => {
+        Object.values(val.forms || {}).forEach((form) => {
+          if (acc[form.name]) {
+            acc[form.name] += 1
+          } else {
+            acc[form.name] = 1
+          }
+        })
+        return acc
+      },
+      /** @type {Record<string, number>} */ ({}),
+    ),
   ).filter(([key, count]) => count > 10 && key !== 'Normal' && key !== 'Unset')
 
   const pokemonFilters = {

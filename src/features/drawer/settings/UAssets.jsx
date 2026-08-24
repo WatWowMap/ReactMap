@@ -1,14 +1,14 @@
 // @ts-check
-import * as React from 'react'
+
+import { FCSelectListItem } from '@components/inputs/FCSelect'
+import { DividerWithMargin } from '@components/StyledDivider'
 import ListSubheader from '@mui/material/ListSubheader'
 import MenuItem from '@mui/material/MenuItem'
-import { useTranslation } from 'react-i18next'
 
 import { useMemory } from '@store/useMemory'
 import { useStorage } from '@store/useStorage'
-import { DividerWithMargin } from '@components/StyledDivider'
 import { getProperName } from '@utils/strings'
-import { FCSelectListItem } from '@components/inputs/FCSelect'
+import { useTranslation } from 'react-i18next'
 import { SettingIcon } from './Icon'
 
 /**

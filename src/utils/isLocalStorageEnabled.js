@@ -7,7 +7,7 @@ export function isLocalStorageEnabled() {
     localStorage.setItem(test, test)
     localStorage.removeItem(test)
     return true
-  } catch (e) {
+  } catch (_e) {
     return false
   }
 }

@@ -1,17 +1,16 @@
 // @ts-check
 
-import React from 'react'
-import Person from '@mui/icons-material/Person'
+import { LocaleSelection } from '@components/inputs/LocaleSelection'
 import LockOpen from '@mui/icons-material/LockOpen'
-import Grid from '@mui/material/Unstable_Grid2'
+import Person from '@mui/icons-material/Person'
+import DialogContent from '@mui/material/DialogContent'
 import Fab from '@mui/material/Fab'
 import Typography from '@mui/material/Typography'
-import DialogContent from '@mui/material/DialogContent'
-import { useTranslation } from 'react-i18next'
+import Grid from '@mui/material/Unstable_Grid2'
+import { useLayoutStore } from '@store/useLayoutStore'
 
 import { useMemory } from '@store/useMemory'
-import { useLayoutStore } from '@store/useLayoutStore'
-import { LocaleSelection } from '@components/inputs/LocaleSelection'
+import { useTranslation } from 'react-i18next'
 
 export function TutorialWelcome() {
   const { t } = useTranslation()
@@ -32,7 +31,9 @@ export function TutorialWelcome() {
         return
       if (!s.auth.excludeList.includes(perm)) {
         have += (
-          Array.isArray(value) ? value.length && s.auth.counts[perm] : value
+          Array.isArray(value)
+            ? value.length && s.auth.counts[perm]
+            : value
         )
           ? 1
           : 0

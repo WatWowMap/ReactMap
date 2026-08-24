@@ -5,7 +5,7 @@ const mysqlSession = require('express-mysql-session')
 const config = require('@rm/config')
 
 function sessionMiddleware() {
-  // @ts-ignore
+  // @ts-expect-error
   const MySQLStore = mysqlSession(session)
 
   const dbSelection = config

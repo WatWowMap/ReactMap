@@ -1,21 +1,20 @@
 // @ts-check
 
-import * as React from 'react'
-import { useTranslation } from 'react-i18next'
+import { checkHoliday } from '@features/holiday'
+import { useScannerSessionStorage } from '@features/scanner'
+import { useHideElement } from '@hooks/useHideElement'
 import { setUser } from '@sentry/react'
-import { Navigate } from 'react-router'
-
+import { getSettings } from '@services/fetches'
 import { useMemory } from '@store/useMemory'
 import { useStorage } from '@store/useStorage'
-import { getSettings } from '@services/fetches'
-import { setLoadingText } from '@utils/setLoadingText'
-import { deepMerge } from '@utils/deepMerge'
-import { useHideElement } from '@hooks/useHideElement'
-import { getGlowRules } from '@utils/getGlowRules'
-import { useScannerSessionStorage } from '@features/scanner'
-import { timeCheck } from '@utils/timeCheck'
 import { analytics } from '@utils/analytics'
-import { checkHoliday } from '@features/holiday'
+import { deepMerge } from '@utils/deepMerge'
+import { getGlowRules } from '@utils/getGlowRules'
+import { setLoadingText } from '@utils/setLoadingText'
+import { timeCheck } from '@utils/timeCheck'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
+import { Navigate } from 'react-router'
 
 export function Config({ children }) {
   const { t } = useTranslation()

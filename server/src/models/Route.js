@@ -35,7 +35,7 @@ class Route extends Model {
     const ts =
       getEpoch() - config.getSafe('api.routeUpdateLimit') * 24 * 60 * 60
     const distanceInMeters = (onlyDistance || [0.5, 100]).map((x) => x * 1000)
-    const query = this.query().select(GET_ALL_SELECT)
+    const query = Route.query().select(GET_ALL_SELECT)
     const manualId = applyManualIdFilter(query, {
       manualId: args.filters.onlyManualId,
       latColumn: 'start_lat',
@@ -103,7 +103,7 @@ class Route extends Model {
    */
   static async getOne(id) {
     /** @type {import('@rm/types').FullRoute} */
-    const result = await this.query().findById(id)
+    const result = await Route.query().findById(id)
 
     if (!result) return null
 
@@ -134,12 +134,12 @@ class Route extends Model {
    * @returns {Promise<{ max_distance: number, max_duration: number }>}
    */
   static async getFilterContext() {
-    const result = await this.query()
+    const result = await Route.query()
       .max('distance_meters AS max_distance')
       .max('duration_seconds AS max_duration')
       .first()
 
-    // @ts-ignore // shrug, I think we would TS to make this actually work
+    // @ts-expect-error // shrug, I think we would TS to make this actually work
     return result
   }
 }

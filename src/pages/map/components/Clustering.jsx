@@ -1,13 +1,13 @@
 // @ts-check
-import * as React from 'react'
-import { useMap, GeoJSON } from 'react-leaflet'
-import Supercluster from 'supercluster'
-import { marker, divIcon, point } from 'leaflet'
 
+import { Notification } from '@components/Notification'
 import { useMemory } from '@store/useMemory'
 import { useStorage } from '@store/useStorage'
-import { Notification } from '@components/Notification'
 import { normalizeCategory } from '@utils/normalizeCategory'
+import { divIcon, marker, point } from 'leaflet'
+import * as React from 'react'
+import { GeoJSON, useMap } from 'react-leaflet'
+import Supercluster from 'supercluster'
 
 const IGNORE_CLUSTERING = new Set([
   'devices',
@@ -142,7 +142,7 @@ export function Clustering({ category, children }) {
         }
       }
       if (manualKey) newMarkers.add(manualKey)
-      // @ts-ignore
+      // @ts-expect-error
       featureRef?.current?.addData(newClusters)
       setMarkers(newMarkers)
     } else {

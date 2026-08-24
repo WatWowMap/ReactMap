@@ -1,15 +1,13 @@
 // @ts-check
-import * as React from 'react'
-import { useNavigate } from 'react-router'
-import Grid from '@mui/material/Unstable_Grid2'
-import Divider from '@mui/material/Divider'
+
 import Button from '@mui/material/Button'
-import { useTranslation } from 'react-i18next'
-
+import Divider from '@mui/material/Divider'
+import Grid from '@mui/material/Unstable_Grid2'
 import { hardReset } from '@utils/resetState'
-
-import { BORDER_SX } from './Shared'
+import { useTranslation } from 'react-i18next'
+import { useNavigate } from 'react-router'
 import { setNotification, useDataManagementStore } from '../hooks/store'
+import { BORDER_SX } from './Shared'
 
 export function TopRow() {
   const navigate = useNavigate()

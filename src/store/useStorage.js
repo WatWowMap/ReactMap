@@ -1,11 +1,10 @@
 // @ts-check
 
+import { setDeep } from '@utils/setDeep'
 import dlv from 'dlv'
 import { useCallback, useMemo } from 'react'
 import { create } from 'zustand'
-import { persist, createJSONStorage } from 'zustand/middleware'
-
-import { setDeep } from '@utils/setDeep'
+import { createJSONStorage, persist } from 'zustand/middleware'
 
 /**
  * @typedef {{
@@ -236,6 +235,6 @@ export function useDeepStore(field, defaultValue) {
     [field, defaultValue],
   )
 
-  // @ts-ignore
+  // @ts-expect-error
   return useMemo(() => [value, callback], [value, callback])
 }

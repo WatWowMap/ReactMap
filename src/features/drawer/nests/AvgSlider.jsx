@@ -1,10 +1,11 @@
 // @ts-check
-import * as React from 'react'
+
+import { SliderTile } from '@components/inputs/SliderTile'
 import ListItem from '@mui/material/ListItem'
 
 import { useMemory } from '@store/useMemory'
 import { useDeepStore, useStorage } from '@store/useStorage'
-import { SliderTile } from '@components/inputs/SliderTile'
+import * as React from 'react'
 import { CollapsibleItem } from '../components/CollapsibleItem'
 
 const BaseNestSlider = () => {

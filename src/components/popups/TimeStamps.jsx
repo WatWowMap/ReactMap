@@ -1,10 +1,9 @@
 // @ts-check
-import * as React from 'react'
+
 import Grid from '@mui/material/Unstable_Grid2'
 import { useTranslation } from 'react-i18next'
-
-import { Timer } from './Timer'
 import { ExtraInfo } from './ExtraInfo'
+import { Timer } from './Timer'
 
 /**
  *

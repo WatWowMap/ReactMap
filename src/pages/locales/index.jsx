@@ -1,12 +1,10 @@
 // @ts-check
-import * as React from 'react'
-import Box from '@mui/material/Box'
 
 import { useHideElement } from '@hooks/useHideElement'
-
-import { LocalesTable } from './components/LocalesTable'
-import { LocalesHeader } from './components/LocalesHeader'
+import Box from '@mui/material/Box'
 import { LocalesFooter } from './components/LocalesFooter'
+import { LocalesHeader } from './components/LocalesHeader'
+import { LocalesTable } from './components/LocalesTable'
 
 export function LocalesPage() {
   useHideElement()

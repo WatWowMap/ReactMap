@@ -5,7 +5,7 @@ const router = require('express').Router()
 const { log, TAGS } = require('@rm/logger')
 const { state } = require('../../../services/state')
 
-router.get('/', async (req, res) => {
+router.get('/', async (_req, res) => {
   try {
     res.status(200).json(await state.db.models.User.query())
     log.info(TAGS.api, 'api/v1/users')
@@ -15,7 +15,7 @@ router.get('/', async (req, res) => {
   }
 })
 
-router.get('/export', async (req, res) => {
+router.get('/export', async (_req, res) => {
   try {
     /** @type {import('@rm/types').FullUser[]} */
     const users = await state.db.models.User.query()

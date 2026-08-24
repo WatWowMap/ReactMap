@@ -1,8 +1,8 @@
 // @ts-check
-import { useCallback } from 'react'
 
 import { useMemory } from '@store/useMemory'
 import { normalizeCategory } from '@utils/normalizeCategory'
+import { useCallback } from 'react'
 
 /**
  * Provide a stable handler that keeps manual popup tracking in sync with UI.

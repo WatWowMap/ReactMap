@@ -1,18 +1,17 @@
 // @ts-check
-import * as React from 'react'
-import { useQuery, useLazyQuery } from '@apollo/client'
+
+import { useLazyQuery, useQuery } from '@apollo/client'
+import { SCANNER_CONFIG, SCANNER_STATUS } from '@services/queries/scanner'
 
 import { useMemory } from '@store/useMemory'
 import { useStorage } from '@store/useStorage'
-
-import { SCANNER_CONFIG, SCANNER_STATUS } from '@services/queries/scanner'
-
-import { ScanNext } from './scanNext'
-import { ScanZone } from './scanZone'
-import { getScanNextCoords } from './scanNext/getCoords'
-import { getScanZoneCoords } from './scanZone/getCoords'
+import * as React from 'react'
 import { ConfigContext, DEFAULT } from './ContextProvider'
-import { useScanStore, useScannerSessionStorage } from './hooks/store'
+import { useScannerSessionStorage, useScanStore } from './hooks/store'
+import { ScanNext } from './scanNext'
+import { getScanNextCoords } from './scanNext/getCoords'
+import { ScanZone } from './scanZone'
+import { getScanZoneCoords } from './scanZone/getCoords'
 
 const { setScanMode } = useScanStore.getState()
 

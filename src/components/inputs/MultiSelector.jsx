@@ -1,10 +1,10 @@
 // @ts-check
-import * as React from 'react'
+
 import Button from '@mui/material/Button'
 import ButtonGroup from '@mui/material/ButtonGroup'
-import { useTranslation } from 'react-i18next'
-
 import { useDeepStore } from '@store/useStorage'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 
 const SX = /** @type {import('@mui/material').SxProps} */ ({ mx: 'auto' })
 
@@ -53,7 +53,7 @@ export function MultiSelectorStore({
   /** @type {(o: V, n: V) => import('@mui/material').ButtonProps['onClick']} */
   const onClickWrapper = React.useCallback(
     (oldValue, newValue) => () => {
-      // @ts-ignore // TODO: fix this
+      // @ts-expect-error // TODO: fix this
       setValue(newValue === oldValue && allowNone ? 'none' : newValue)
       onClick?.(oldValue, newValue)
     },

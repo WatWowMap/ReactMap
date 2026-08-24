@@ -1,20 +1,20 @@
 // @ts-check
 
+import { DeviceTile as devices } from '@features/device'
+import { GymTile as gyms } from '@features/gym'
+import { NestTile as nests } from '@features/nest'
 import { PokemonTile as pokemon } from '@features/pokemon'
 import { PokestopTile as pokestops } from '@features/pokestop'
-import { GymTile as gyms } from '@features/gym'
-import { DeviceTile as devices } from '@features/device'
-import { NestTile as nests } from '@features/nest'
 import { PortalTile as portals } from '@features/portal'
 import { RouteTile as routes } from '@features/route'
-import { WeatherTile as weather } from '@features/weather'
-import { SpawnpointTile as spawnpoints } from '@features/spawnpoint'
-import { ScanCellTile as scanCells } from '@features/scanCell'
-import { WayfarerTile as submissionCells } from '@features/wayfarer'
-import { ScanAreaTile as scanAreas } from '@features/scanArea'
 import { BaseCell as s2cells } from '@features/s2cell'
+import { ScanAreaTile as scanAreas } from '@features/scanArea'
+import { ScanCellTile as scanCells } from '@features/scanCell'
+import { SpawnpointTile as spawnpoints } from '@features/spawnpoint'
 import { StationTile as stations } from '@features/station'
 import { TappableTile as tappables } from '@features/tappable'
+import { WayfarerTile as submissionCells } from '@features/wayfarer'
+import { WeatherTile as weather } from '@features/weather'
 
 export const TILES = {
   devices,

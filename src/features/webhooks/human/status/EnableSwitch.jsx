@@ -1,12 +1,11 @@
 // @ts-check
-import * as React from 'react'
-import Switch from '@mui/material/Switch'
-import FormControlLabel from '@mui/material/FormControlLabel'
-import { useMutation } from '@apollo/client'
-import { useTranslation } from 'react-i18next'
 
+import { useMutation } from '@apollo/client'
+import FormControlLabel from '@mui/material/FormControlLabel'
+import Switch from '@mui/material/Switch'
 import { SET_HUMAN } from '@services/queries/webhook'
 import { useWebhookStore } from '@store/useWebhookStore'
+import { useTranslation } from 'react-i18next'
 
 export function EnableSwitch() {
   const { t } = useTranslation()

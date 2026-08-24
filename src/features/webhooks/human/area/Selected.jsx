@@ -1,9 +1,8 @@
 // @ts-check
-import * as React from 'react'
-import Typography from '@mui/material/Typography'
-import { useTranslation } from 'react-i18next'
 
+import Typography from '@mui/material/Typography'
 import { useWebhookStore } from '@store/useWebhookStore'
+import { useTranslation } from 'react-i18next'
 
 export const Selected = () => {
   const { t } = useTranslation()

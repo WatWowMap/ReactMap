@@ -1,21 +1,21 @@
 // @ts-check
-import * as React from 'react'
+
+import { Navigation } from '@components/popups/Navigation'
+import { useAnalytics } from '@hooks/useAnalytics'
 import MoreVert from '@mui/icons-material/MoreVert'
-import Grid from '@mui/material/Unstable_Grid2'
-import Typography from '@mui/material/Typography'
+import Button from '@mui/material/Button'
+import Divider from '@mui/material/Divider'
 import IconButton from '@mui/material/IconButton'
 import Menu from '@mui/material/Menu'
 import MenuItem from '@mui/material/MenuItem'
-import Divider from '@mui/material/Divider'
-import Button from '@mui/material/Button'
-import { useTranslation } from 'react-i18next'
-
-import { useMemory } from '@store/useMemory'
+import Typography from '@mui/material/Typography'
+import Grid from '@mui/material/Unstable_Grid2'
 import { useLayoutStore } from '@store/useLayoutStore'
+import { useMemory } from '@store/useMemory'
 import { setDeepStore } from '@store/useStorage'
 import { getTimeUntil } from '@utils/getTimeUntil'
-import { useAnalytics } from '@hooks/useAnalytics'
-import { Navigation } from '@components/popups/Navigation'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 
 /** @param {number} timeSince */
 const getColor = (timeSince) => {

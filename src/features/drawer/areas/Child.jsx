@@ -1,16 +1,15 @@
 // @ts-check
-import * as React from 'react'
-import Typography from '@mui/material/Typography'
-import TableCell from '@mui/material/TableCell'
+
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
+import Button from '@mui/material/Button'
 import Checkbox from '@mui/material/Checkbox'
 import IconButton from '@mui/material/IconButton'
-import Button from '@mui/material/Button'
+import TableCell from '@mui/material/TableCell'
+import Typography from '@mui/material/Typography'
 import Grid2 from '@mui/material/Unstable_Grid2'
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
-import { useMap } from 'react-leaflet'
-
-import { useDeepStore, useStorage } from '@store/useStorage'
 import { useMemory } from '@store/useMemory'
+import { useDeepStore, useStorage } from '@store/useStorage'
+import { useMap } from 'react-leaflet'
 
 /**
  * @param {{
@@ -40,13 +39,10 @@ export function AreaChild({
 
   if (!scanAreas) return null
 
-  const hasAll =
-    childAreas &&
-    childAreas.every(
-      (c) => c.properties.manual || scanAreas.includes(c.properties.key),
-    )
-  const hasSome =
-    childAreas && childAreas.some((c) => scanAreas.includes(c.properties.key))
+  const hasAll = childAreas?.every(
+    (c) => c.properties.manual || scanAreas.includes(c.properties.key),
+  )
+  const hasSome = childAreas?.some((c) => scanAreas.includes(c.properties.key))
   const hasManual =
     feature?.properties?.manual || childAreas.every((c) => c.properties.manual)
   const color =

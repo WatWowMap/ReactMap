@@ -1,18 +1,18 @@
 // @ts-check
-import * as React from 'react'
-import { styled } from '@mui/material/styles'
+
+import { Footer } from '@components/dialogs/Footer'
+import { Header } from '@components/dialogs/Header'
+import { Img } from '@components/Img'
+import Box from '@mui/material/Box'
 import Dialog from '@mui/material/Dialog'
 import DialogContent from '@mui/material/DialogContent'
-import Box from '@mui/material/Box'
-import booleanPointInPolygon from '@turf/boolean-point-in-polygon'
-import { point, polygon } from '@turf/helpers'
-import { useTranslation } from 'react-i18next'
-
+import { styled } from '@mui/material/styles'
 import { useMemory } from '@store/useMemory'
 import { useStorage } from '@store/useStorage'
-import { Header } from '@components/dialogs/Header'
-import { Footer } from '@components/dialogs/Footer'
-import { Img } from '@components/Img'
+import booleanPointInPolygon from '@turf/boolean-point-in-polygon'
+import { point, polygon } from '@turf/helpers'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 
 import { WeatherPopup } from './WeatherPopup'
 

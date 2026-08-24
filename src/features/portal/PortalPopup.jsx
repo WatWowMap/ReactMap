@@ -1,16 +1,16 @@
 // @ts-check
-import * as React from 'react'
-import Grid from '@mui/material/Unstable_Grid2'
-import Typography from '@mui/material/Typography'
-import { useTranslation } from 'react-i18next'
 
 import { ErrorBoundary } from '@components/ErrorBoundary'
+import { Coords } from '@components/popups/Coords'
+import { Navigation } from '@components/popups/Navigation'
+import { useAnalytics } from '@hooks/useAnalytics'
+import Typography from '@mui/material/Typography'
+import Grid from '@mui/material/Unstable_Grid2'
 import { useMemory } from '@store/useMemory'
 import { useStorage } from '@store/useStorage'
-import { Navigation } from '@components/popups/Navigation'
-import { Coords } from '@components/popups/Coords'
 import { dayCheck } from '@utils/dayCheck'
-import { useAnalytics } from '@hooks/useAnalytics'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 
 /**
  *

@@ -1,19 +1,19 @@
 // @ts-check
-import * as React from 'react'
-import MenuItem from '@mui/material/MenuItem'
-import Button from '@mui/material/Button'
-import Menu from '@mui/material/Menu'
+
+import { useQuery } from '@apollo/client'
 import PagesIcon from '@mui/icons-material/Pages'
+import Button from '@mui/material/Button'
 import Dialog from '@mui/material/Dialog'
-import DialogTitle from '@mui/material/DialogTitle'
+import DialogActions from '@mui/material/DialogActions'
 import DialogContent from '@mui/material/DialogContent'
 import DialogContentText from '@mui/material/DialogContentText'
-import DialogActions from '@mui/material/DialogActions'
-import { useTranslation } from 'react-i18next'
-import { useQuery } from '@apollo/client'
-
+import DialogTitle from '@mui/material/DialogTitle'
+import Menu from '@mui/material/Menu'
+import MenuItem from '@mui/material/MenuItem'
 import { CUSTOM_COMPONENT } from '@services/queries/config'
 import { camelToSnake } from '@utils/strings'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 
 import { setComponent, usePlayStore } from '../hooks/store'
 

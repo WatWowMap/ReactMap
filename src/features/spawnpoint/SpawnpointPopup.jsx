@@ -1,10 +1,9 @@
 // @ts-check
-import * as React from 'react'
-import Typography from '@mui/material/Typography'
-import { useTranslation } from 'react-i18next'
 
 import { ErrorBoundary } from '@components/ErrorBoundary'
+import Typography from '@mui/material/Typography'
 import { dayCheck } from '@utils/dayCheck'
+import { useTranslation } from 'react-i18next'
 
 /**
  *

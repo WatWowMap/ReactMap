@@ -1,17 +1,17 @@
 // @ts-check
-import * as React from 'react'
+
+import { StatusIcon } from '@components/StatusIcon'
+import { ToggleTypography } from '@components/ToggleTypography'
+import { ColoredTile } from '@components/virtual/ColoredTile'
+import { SQUARE_ITEM } from '@components/virtual/VirtualGrid'
+import { useTranslateById } from '@hooks/useTranslateById'
 import TuneIcon from '@mui/icons-material/Tune'
+import Box from '@mui/material/Box'
 import IconButton from '@mui/material/IconButton'
 import Tooltip from '@mui/material/Tooltip'
-import Box from '@mui/material/Box'
-
-import { useTranslateById } from '@hooks/useTranslateById'
-import { hasAmbiguousForm } from '@utils/getAmbiguousForms'
 import { useMemory } from '@store/useMemory'
-import { ColoredTile } from '@components/virtual/ColoredTile'
-import { ToggleTypography } from '@components/ToggleTypography'
-import { SQUARE_ITEM } from '@components/virtual/VirtualGrid'
-import { StatusIcon } from '@components/StatusIcon'
+import { hasAmbiguousForm } from '@utils/getAmbiguousForms'
+import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 
 /**
@@ -135,7 +135,7 @@ export function SelectorItem({
         alignSelf="end"
         px={1}
       >
-        {title && title.split('\n').at(-1).replace(/[()]/g, '')}
+        {title?.split('\n').at(-1).replace(/[()]/g, '')}
       </ToggleTypography>
     </Box>
   )

@@ -1,12 +1,11 @@
 // @ts-check
-import * as React from 'react'
 
 import { useMemory } from '@store/useMemory'
 import { useStorage } from '@store/useStorage'
-
+import * as React from 'react'
+import { PoITile } from './PoI'
 import { S14CellTile } from './S14Cell'
 import { S17CellTile } from './S17Cell'
-import { PoITile } from './PoI'
 
 /**
  *

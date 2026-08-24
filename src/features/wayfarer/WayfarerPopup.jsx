@@ -1,10 +1,9 @@
 // @ts-check
-import * as React from 'react'
-import Typography from '@mui/material/Typography'
-import { useTranslation } from 'react-i18next'
 
 import { ErrorBoundary } from '@components/ErrorBoundary'
 import { useAnalytics } from '@hooks/useAnalytics'
+import Typography from '@mui/material/Typography'
+import { useTranslation } from 'react-i18next'
 
 const GYM_THRESHOLD = [2, 6, 20]
 

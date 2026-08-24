@@ -40,7 +40,7 @@ class Badge extends Model {
    * @returns {Promise<import('@rm/types').FullGymBadge[]>}
    */
   static async getAll(userId, operator = '>', badge = 0) {
-    return this.query()
+    return Badge.query()
       .where('userId', userId)
       .andWhere('badge', operator, badge)
   }
@@ -52,22 +52,22 @@ class Badge extends Model {
    * @param {number} userId
    */
   static async insert(badge, gymId, userId) {
-    // @ts-ignore
+    // @ts-expect-error
     if (
-      await this.query()
+      await Badge.query()
         .where('gymId', gymId)
         .andWhere('userId', userId)
         .first()
     ) {
-      await this.query()
+      await Badge.query()
         .where('gymId', gymId)
         .andWhere('userId', userId)
-        // @ts-ignore
+        // @ts-expect-error
         .update({ badge })
     } else {
-      // @ts-ignore
-      await this.query().insert({
-        // @ts-ignore
+      // @ts-expect-error
+      await Badge.query().insert({
+        // @ts-expect-error
         badge,
         gymId,
         userId,

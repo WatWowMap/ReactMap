@@ -1,12 +1,12 @@
 // @ts-check
-import * as React from 'react'
-import Alert from '@mui/material/Alert'
-import Snackbar from '@mui/material/Snackbar'
-import Slide from '@mui/material/Slide'
-import AlertTitle from '@mui/material/AlertTitle'
-import { useTranslation, Trans } from 'react-i18next'
 
+import Alert from '@mui/material/Alert'
+import AlertTitle from '@mui/material/AlertTitle'
+import Slide from '@mui/material/Slide'
+import Snackbar from '@mui/material/Snackbar'
 import { setLongTimeout } from '@utils/setLongTimeout'
+import * as React from 'react'
+import { Trans, useTranslation } from 'react-i18next'
 
 /** @param {import('@mui/material').SlideProps} props */
 function SlideTransition(props) {
@@ -92,11 +92,9 @@ export function Notification({
           ? messages.map((message, i) => (
               <React.Fragment key={message.key}>
                 <Trans i18nKey={`${i18nKey}_${i}`}>
-                  <>
-                    {message.variables.map((variable, j) => ({
-                      [`variable_${j}`]: t(variable),
-                    }))}
-                  </>
+                  {message.variables.map((variable, j) => ({
+                    [`variable_${j}`]: t(variable),
+                  }))}
                 </Trans>
                 <br />
               </React.Fragment>

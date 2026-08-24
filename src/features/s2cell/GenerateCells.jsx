@@ -1,12 +1,12 @@
 // @ts-check
-import * as React from 'react'
-import { S2LatLng, S2RegionCoverer, S2LatLngRect } from 'nodes2ts'
 
+import { Notification } from '@components/Notification'
 import { useMemory } from '@store/useMemory'
 import { useStorage } from '@store/useStorage'
-import { Notification } from '@components/Notification'
 import { getQueryArgs } from '@utils/getQueryArgs'
 import { getS2Polygon } from '@utils/getS2Polygon'
+import { S2LatLng, S2LatLngRect, S2RegionCoverer } from 'nodes2ts'
+import * as React from 'react'
 
 import { BaseCell } from './BaseCell'
 

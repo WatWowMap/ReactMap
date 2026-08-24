@@ -1,25 +1,25 @@
 // @ts-check
 import { useMemory } from '@store/useMemory'
-
-import * as gymIndex from './gym'
-import * as pokestopIndex from './pokestop'
-import * as pokemonIndex from './pokemon'
-import * as portalIndex from './portal'
-import * as searchIndex from './search'
-import * as webhookIndex from './webhook'
-import * as user from './user'
-import * as stationIndex from './station'
-import * as tappableIndex from './tappable'
 import { GET_ALL_DEVICES } from './device'
-import { GET_ALL_SPAWNPOINTS } from './spawnpoint'
-import { GET_ALL_WEATHER } from './weather'
-import { GET_ALL_SCAN_CELLS } from './scanCell'
-import { GET_ALL_SUBMISSION_CELLS } from './submissionCells'
-import { GET_ONE_NEST, GET_ALL_NESTS, NEST_SUBMISSION } from './nest'
-import { GET_ALL_SCAN_AREAS, GET_SCAN_AREAS_MENU } from './scanAreas'
-import { S2_CELLS } from './s2cell'
+import * as gymIndex from './gym'
+import { GET_ALL_NESTS, GET_ONE_NEST, NEST_SUBMISSION } from './nest'
+import * as pokemonIndex from './pokemon'
+import * as pokestopIndex from './pokestop'
+import * as portalIndex from './portal'
 import { GET_ROUTE, GET_ROUTES } from './route'
+import { S2_CELLS } from './s2cell'
+import { GET_ALL_SCAN_AREAS, GET_SCAN_AREAS_MENU } from './scanAreas'
+import { GET_ALL_SCAN_CELLS } from './scanCell'
+import * as searchIndex from './search'
+import { GET_ALL_SPAWNPOINTS } from './spawnpoint'
+import * as stationIndex from './station'
+import { GET_ALL_SUBMISSION_CELLS } from './submissionCells'
+import * as tappableIndex from './tappable'
+import * as user from './user'
+import { GET_ALL_WEATHER } from './weather'
+import * as webhookIndex from './webhook'
 
+// biome-ignore lint/complexity/noStaticOnlyClass: namespaced grouping of related helpers, called as Query.method() throughout
 export class Query {
   /**
    * @param {Record<string, boolean>} object

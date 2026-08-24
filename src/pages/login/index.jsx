@@ -1,11 +1,11 @@
 // @ts-check
-import * as React from 'react'
-import { Navigate } from 'react-router'
+
+import { ThemeToggle } from '@components/inputs/ThemeToggle'
+import { CustomLoginPage } from '@features/builder'
 import Box from '@mui/material/Box'
 
 import { useMemory } from '@store/useMemory'
-import { ThemeToggle } from '@components/inputs/ThemeToggle'
-import { CustomLoginPage } from '@features/builder'
+import { Navigate } from 'react-router'
 
 import { DefaultLoginPage } from './DefaultPage'
 

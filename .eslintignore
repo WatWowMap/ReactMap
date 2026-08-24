@@ -1,9 +1,0 @@
-dist
-dist-*
-node_modules
-public/missing-locales
-public/images/custom
-public/images/uicons
-server/src/configs/
-packages/**/*.d.ts
-AGENTS.md

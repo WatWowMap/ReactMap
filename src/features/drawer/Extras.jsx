@@ -1,15 +1,14 @@
 // @ts-check
 import * as React from 'react'
-
-import { PokestopDrawer } from './pokestops'
+import { AdminDrawer } from './Admin'
 import { GymDrawer } from './gyms'
 import { NestsDrawer } from './nests'
+import { PokestopDrawer } from './pokestops'
 import { RoutesDrawer } from './Routes'
-import { WayfarerDrawer } from './Wayfarer'
 import { S2CellsDrawer } from './S2Cells'
-import { AdminDrawer } from './Admin'
 import { StationsDrawer } from './Stations'
 import { TappablesDrawer } from './Tappables'
+import { WayfarerDrawer } from './Wayfarer'
 
 function ExtrasComponent({ category, subItem }) {
   switch (category) {

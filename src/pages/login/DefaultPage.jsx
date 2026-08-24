@@ -1,13 +1,13 @@
 // @ts-check
-import * as React from 'react'
-import { useTranslation } from 'react-i18next'
-import Typography from '@mui/material/Typography'
-import Grid from '@mui/material/Unstable_Grid2'
+
+import { LocaleSelection } from '@components/inputs/LocaleSelection'
 import Divider from '@mui/material/Divider'
 import { styled } from '@mui/material/styles'
-
+import Typography from '@mui/material/Typography'
+import Grid from '@mui/material/Unstable_Grid2'
 import { useMemory } from '@store/useMemory'
-import { LocaleSelection } from '@components/inputs/LocaleSelection'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 
 import { methods } from './Methods'
 

@@ -9,14 +9,14 @@ class Session extends Model {
   }
 
   static async clear() {
-    const results = await this.query().delete()
+    const results = await Session.query().delete()
     log.info(TAGS.session, 'Clear Result:', results)
     return results
   }
 
   /** @param {string} strategy */
   static async clearNonDonor(strategy) {
-    const result = await this.query()
+    const result = await Session.query()
       .whereRaw(`json_extract(data, '$.passport.user.perms.donor') = false`)
       .andWhereRaw(
         `json_extract(data, '$.passport.user.rmStrategy') = '${strategy}'`,
@@ -34,7 +34,7 @@ class Session extends Model {
 
   /** @param {string} strategy */
   static async clearTrial(strategy) {
-    return this.query()
+    return Session.query()
       .whereRaw(`json_extract(data, '$.passport.user.perms.trial') = true`)
       .andWhereRaw(
         `json_extract(data, '$.passport.user.rmStrategy') = '${strategy}'`,
@@ -50,7 +50,7 @@ class Session extends Model {
   static async isValidSession(userId) {
     try {
       const ts = Math.floor(Date.now() / 1000)
-      const results = await this.query()
+      const results = await Session.query()
         .select('session_id')
         .whereRaw(`json_extract(data, '$.passport.user.id') = ${userId}`)
         .andWhere('expires', '>=', ts)
@@ -69,7 +69,7 @@ class Session extends Model {
    */
   static async clearOtherSessions(userId, currentSessionId) {
     try {
-      const results = await this.query()
+      const results = await Session.query()
         .whereRaw(`json_extract(data, '$.passport.user.id') = ${userId}`)
         .andWhere('session_id', '!=', currentSessionId || '')
         .delete()
@@ -89,7 +89,7 @@ class Session extends Model {
    */
   static async clearDiscordSessions(discordId, botName) {
     try {
-      const results = await this.query()
+      const results = await Session.query()
         .whereRaw(
           `json_extract(data, '$.passport.user.discordId') = '${discordId}'`,
         )

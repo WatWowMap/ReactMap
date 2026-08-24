@@ -19,7 +19,7 @@ class Device extends Model {
   static async getAll(perms, args, context) {
     const { areaRestrictions } = perms
     const { onlyAreas } = args.filters
-    const query = this.query()
+    const query = Device.query()
       .leftJoin('instance', 'device.instance_name', 'instance.name')
       .select(
         'uuid AS id',
@@ -60,7 +60,7 @@ class Device extends Model {
             ),
         )
       : await query.from('device')
-    // @ts-ignore
+    // @ts-expect-error
     return results.filter((device) => device.id && device.lat && device.lon)
   }
 }

@@ -173,7 +173,7 @@ const loadAreas = (scanAreas) => {
       }
     })
     return normalized
-  } catch (err) {
+  } catch (_err) {
     if (
       config
         .getSafe('authentication.areaRestrictions')

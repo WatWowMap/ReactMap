@@ -1,11 +1,10 @@
 // @ts-check
-import * as React from 'react'
+
+import { ICON_SIZES } from '@assets/constants'
+import { MultiSelectorStore } from '@components/inputs/MultiSelector'
 import ListItem from '@mui/material/ListItem'
 import ListItemText from '@mui/material/ListItemText'
 import { useTranslation } from 'react-i18next'
-
-import { MultiSelectorStore } from '@components/inputs/MultiSelector'
-import { ICON_SIZES } from '@assets/constants'
 
 /**
  * @typedef {(oldValue: (typeof ICON_SIZES)[number], newValue: (typeof ICON_SIZES)[number]) => void} SizeOnClick

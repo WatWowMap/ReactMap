@@ -25,7 +25,7 @@ class ScanCell extends Model {
       maxLat,
       maxLon,
     } = args
-    const query = this.query()
+    const query = ScanCell.query()
       .select(['*', ref('id').castTo('CHAR').as('id')])
       .whereBetween('center_lat', [minLat - 0.01, maxLat + 0.01])
       .andWhereBetween('center_lon', [minLon - 0.01, maxLon + 0.01])

@@ -1,8 +1,8 @@
 // @ts-check
 import { useMemory } from '@store/useMemory'
+import { getShowcaseBuddyFilterLabelKey } from '@utils/showcaseFocus'
 import { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
-import { getShowcaseBuddyFilterLabelKey } from '@utils/showcaseFocus'
 
 export function useGenPokestops() {
   const { t } = useTranslation()
@@ -111,7 +111,7 @@ export function useGenPokestops() {
             break
           case 'm':
             {
-              const monId = id && id.slice(1).split('-')[0]
+              const monId = id?.slice(1).split('-')[0]
               if (tempObj.quest_reward_12 && pokemon[monId]) {
                 tempObj.quest_reward_12[id] = {
                   name: `${t(`poke_${monId}`)} x${id.split('-')[1]}`,
@@ -166,7 +166,7 @@ export function useGenPokestops() {
           case 'x':
           case 'c':
             {
-              const monId = id && id.slice(1)
+              const monId = id?.slice(1)
               if (
                 tempObj.quest_reward_4 &&
                 tempObj.quest_reward_9 &&

@@ -19,7 +19,7 @@ class Weather extends Model {
    * @param {import('@rm/types').BBox & { filters: { onlyAreas: string[] } } } args
    */
   static async getAll(perms, args) {
-    const query = this.query()
+    const query = Weather.query()
       .select([ref('id').castTo('CHAR').as('id')])
       .select(['latitude', 'longitude', 'gameplay_condition', 'updated'])
     const ts = Math.floor(Date.now() / 1000)
@@ -56,7 +56,7 @@ class Weather extends Model {
                   booleanOverlap(geojson, areas.scanAreasObj[area]) ||
                   pointInPolygon(
                     point(
-                      // @ts-ignore // again, probably need real TS types
+                      // @ts-expect-error // again, probably need real TS types
                       areas.scanAreasObj[area].geometry.type === 'MultiPolygon'
                         ? areas.scanAreasObj[area].geometry.coordinates[0][0][0]
                         : areas.scanAreasObj[area].geometry.coordinates[0][0],

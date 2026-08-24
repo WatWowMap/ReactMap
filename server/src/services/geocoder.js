@@ -13,7 +13,7 @@ function formatter(addressFormat, result) {
   return addressFormat
     .replace(
       /{{(streetNumber|streetName|city|state|country|zipcode|latitude|longitude|countryCode|neighborhoods|suburb|town|village)}}/g,
-      (a, b) => result[b] || '',
+      (_a, b) => result[b] || '',
     )
     .trim()
     .replace(/^,|,$/g, '')

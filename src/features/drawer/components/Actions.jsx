@@ -1,27 +1,26 @@
 // @ts-check
-import * as React from 'react'
-import List from '@mui/material/List'
-import Divider from '@mui/material/Divider'
-import { styled } from '@mui/material/styles'
 
-import { Link } from 'react-router'
-import AccountBoxIcon from '@mui/icons-material/AccountBox'
-import ExitToAppIcon from '@mui/icons-material/ExitToApp'
-import HelpOutlineIcon from '@mui/icons-material/HelpOutline'
-import ReplayIcon from '@mui/icons-material/Replay'
-import ImportExportIcon from '@mui/icons-material/ImportExport'
-import TrendingUpIcon from '@mui/icons-material/TrendingUp'
-import FeedbackIcon from '@mui/icons-material/Feedback'
-import HeartIcon from '@mui/icons-material/Favorite'
-
-import { downloadJson } from '@utils/downloadJson'
-import { deepMerge } from '@utils/deepMerge'
-import { useMapStore } from '@store/useMapStore'
-import { useMemory } from '@store/useMemory'
-import { useLayoutStore } from '@store/useLayoutStore'
-import { useStorage } from '@store/useStorage'
 import { I } from '@components/I'
 import { BasicListButton } from '@components/inputs/BasicListButton'
+import AccountBoxIcon from '@mui/icons-material/AccountBox'
+import ExitToAppIcon from '@mui/icons-material/ExitToApp'
+import HeartIcon from '@mui/icons-material/Favorite'
+import FeedbackIcon from '@mui/icons-material/Feedback'
+import HelpOutlineIcon from '@mui/icons-material/HelpOutline'
+import ImportExportIcon from '@mui/icons-material/ImportExport'
+import ReplayIcon from '@mui/icons-material/Replay'
+import TrendingUpIcon from '@mui/icons-material/TrendingUp'
+import Divider from '@mui/material/Divider'
+import List from '@mui/material/List'
+import { styled } from '@mui/material/styles'
+import { useLayoutStore } from '@store/useLayoutStore'
+import { useMapStore } from '@store/useMapStore'
+import { useMemory } from '@store/useMemory'
+import { useStorage } from '@store/useStorage'
+import { deepMerge } from '@utils/deepMerge'
+import { downloadJson } from '@utils/downloadJson'
+import * as React from 'react'
+import { Link } from 'react-router'
 
 /** @type {React.ChangeEventHandler<HTMLInputElement>} */
 const importSettings = (e) => {
@@ -121,7 +120,7 @@ export function DrawerActions() {
       {!!methods.length && (loggedIn ? LogoutButton : LoginButton)}
       <Divider />
       {!(
-        // @ts-ignore
+        // @ts-expect-error
         config.misc.rude
       ) && (
         <BasicListButton

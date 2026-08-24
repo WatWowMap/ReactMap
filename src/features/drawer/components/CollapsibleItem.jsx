@@ -1,7 +1,8 @@
 // @ts-check
-import * as React from 'react'
+
 import Collapse from '@mui/material/Collapse'
 import List from '@mui/material/List'
+import * as React from 'react'
 
 /**
  * @param {{ open: boolean, children: React.ReactNode } & import('@mui/material').CollapseProps} props

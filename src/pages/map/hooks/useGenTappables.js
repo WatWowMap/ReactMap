@@ -1,8 +1,8 @@
 // @ts-check
-import { useEffect } from 'react'
-import { useTranslation } from 'react-i18next'
 
 import { useMemory } from '@store/useMemory'
+import { useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
 
 export function useGenTappables() {
   const { t } = useTranslation()

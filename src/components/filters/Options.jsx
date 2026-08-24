@@ -1,20 +1,20 @@
 // @ts-check
-import * as React from 'react'
-import ExpandMore from '@mui/icons-material/ExpandMore'
-import Typography from '@mui/material/Typography'
-import Accordion from '@mui/material/Accordion'
-import AccordionSummary from '@mui/material/AccordionSummary'
-import AccordionDetails from '@mui/material/AccordionDetails'
-import FormControlLabel from '@mui/material/FormControlLabel'
-import Checkbox from '@mui/material/Checkbox'
-import ListItem from '@mui/material/ListItem'
-import List from '@mui/material/List'
-import { useTranslation } from 'react-i18next'
 
+import ExpandMore from '@mui/icons-material/ExpandMore'
+import Accordion from '@mui/material/Accordion'
+import AccordionDetails from '@mui/material/AccordionDetails'
+import AccordionSummary from '@mui/material/AccordionSummary'
+import Checkbox from '@mui/material/Checkbox'
+import FormControlLabel from '@mui/material/FormControlLabel'
+import List from '@mui/material/List'
+import ListItem from '@mui/material/ListItem'
+import Typography from '@mui/material/Typography'
 import { useMemory } from '@store/useMemory'
 import { setDeepStore, useStorage } from '@store/useStorage'
 import { analytics } from '@utils/analytics'
 import { camelToSnake } from '@utils/strings'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 
 /**
  * @typedef {keyof import('@store/useStorage').UseStorage['menus']} MenuCategories
@@ -33,7 +33,7 @@ const handleChange = (category, subCategory) => (event) => {
     `Category: ${category} Name: ${subCategory}.${event.target.name}`,
   )
   setDeepStore(
-    // @ts-ignore
+    // @ts-expect-error
     `menus.${category}.filters.${subCategory}.${event.target.name}`,
     event.target.checked,
   )

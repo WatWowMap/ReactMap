@@ -1,5 +1,5 @@
 // @ts-check
-import { init, browserTracingIntegration } from '@sentry/react'
+import { browserTracingIntegration, init } from '@sentry/react'
 
 if (CONFIG.sentry.client.enabled) {
   init({

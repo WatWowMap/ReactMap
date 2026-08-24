@@ -34,7 +34,7 @@ router.get('/', (req, res) => {
   }
 })
 
-router.get('/reload', async (req, res) => {
+router.get('/reload', async (_req, res) => {
   const error = await reloadConfig()
   if (error) {
     res.status(500).json({ status: 'error', reason: error.message })

@@ -1,10 +1,11 @@
 // @ts-check
-import { divIcon } from 'leaflet'
+
+import { useOpacity } from '@hooks/useOpacity'
 
 import { basicEqualFn, useMemory } from '@store/useMemory'
 import { useStorage } from '@store/useStorage'
-import { useOpacity } from '@hooks/useOpacity'
 import { renderOverlayIcon } from '@utils/renderOverlayIcon'
+import { divIcon } from 'leaflet'
 
 /**
  *
@@ -99,7 +100,7 @@ export function useStationMarker(station, battle = null) {
              left: battleMod.offsetX * 50,
            })
          : ''
-     }
+}
     </div>
 `,
   })

@@ -1,15 +1,14 @@
 // @ts-check
-import * as React from 'react'
-import Grid from '@mui/material/Unstable_Grid2'
-import Typography from '@mui/material/Typography'
-import { useTranslation } from 'react-i18next'
 
 import { useMapData } from '@hooks/useMapData'
-
-import { TopRow } from './components/TopRow'
-import { ResetGeneral } from './components/ResetGeneral'
-import { ResetFilters } from './components/ResetFilters'
+import Typography from '@mui/material/Typography'
+import Grid from '@mui/material/Unstable_Grid2'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 import { DataManagementNotification } from './components/Notification'
+import { ResetFilters } from './components/ResetFilters'
+import { ResetGeneral } from './components/ResetGeneral'
+import { TopRow } from './components/TopRow'
 import { restoreDefault } from './hooks/store'
 
 export function DataManagerPage() {

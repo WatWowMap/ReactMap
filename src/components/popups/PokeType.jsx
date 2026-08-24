@@ -1,9 +1,8 @@
 // @ts-check
-import * as React from 'react'
 
-import { useMemory } from '@store/useMemory'
-import { NameTT } from '@components/popups/NameTT'
 import { Img } from '@components/Img'
+import { NameTT } from '@components/popups/NameTT'
+import { useMemory } from '@store/useMemory'
 
 const DIMENSIONS = /** @type {const} */ ({
   small: 20,

@@ -19,7 +19,7 @@ const { AuthClient } = require('./AuthClient')
 class TelegramClient extends AuthClient {
   /** @param {TGUser} user */
   async getUserGroups(user) {
-    if (!user || !user.id) return []
+    if (!user?.id) return []
 
     const groups = [user.id]
     await Promise.all(
@@ -94,7 +94,7 @@ class TelegramClient extends AuthClient {
     /** @type { TGUser & { perms: import("@rm/types").Permissions }} */
     const newUserObj = {
       ...user,
-      // @ts-ignore
+      // @ts-expect-error
       perms: {
         ...perms,
         trial: gainedAccessViaTrial,

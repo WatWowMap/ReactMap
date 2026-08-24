@@ -1,9 +1,9 @@
 // @ts-check
 /* eslint-disable react/destructuring-assignment */
-import * as React from 'react'
-import { Marker, Circle, Popup } from 'react-leaflet'
 
 import { useMemory } from '@store/useMemory'
+import * as React from 'react'
+import { Circle, Marker, Popup } from 'react-leaflet'
 
 import { SpawnpointPopup } from './SpawnpointPopup'
 import { spawnpointMarker } from './spawnpointMarker'

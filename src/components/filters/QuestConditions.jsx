@@ -1,13 +1,14 @@
 // @ts-check
-import * as React from 'react'
-import Typography from '@mui/material/Typography'
+
+import { FCSelect } from '@components/inputs/FCSelect'
+import { QuestTitle } from '@components/QuestTitle'
 import MenuItem from '@mui/material/MenuItem'
-import { useTranslation } from 'react-i18next'
+import Typography from '@mui/material/Typography'
 
 import { useMemory } from '@store/useMemory'
 import { useDeepStore, useStorage } from '@store/useStorage'
-import { QuestTitle } from '@components/QuestTitle'
-import { FCSelect } from '@components/inputs/FCSelect'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 
 /**
  *

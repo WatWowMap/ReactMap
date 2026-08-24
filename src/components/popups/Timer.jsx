@@ -1,7 +1,7 @@
 // @ts-check
-import * as React from 'react'
-import Typography from '@mui/material/Typography'
+
 import { useRelativeTimer } from '@hooks/useRelativeTime'
+import Typography from '@mui/material/Typography'
 
 /**
  *

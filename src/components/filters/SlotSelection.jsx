@@ -1,22 +1,21 @@
 // @ts-check
-import * as React from 'react'
-import Grid2 from '@mui/material/Unstable_Grid2'
-import DialogContent from '@mui/material/DialogContent'
-import IconButton from '@mui/material/IconButton'
-import Divider from '@mui/material/Divider'
 
-import { basicEqualFn, useMemory } from '@store/useMemory'
-import { useLayoutStore } from '@store/useLayoutStore'
-import { useStorage, useDeepStore } from '@store/useStorage'
+import { ENABLED_ALL } from '@assets/constants'
+import { Footer } from '@components/dialogs/Footer'
+import { Header } from '@components/dialogs/Header'
 import { Img } from '@components/Img'
 import { DualBoolToggle } from '@components/inputs/BoolToggle'
-import { ENABLED_ALL } from '@assets/constants'
-import { Header } from '@components/dialogs/Header'
-import { Footer } from '@components/dialogs/Footer'
 import { StatusIcon } from '@components/StatusIcon'
-
-import { Size } from './Size'
+import DialogContent from '@mui/material/DialogContent'
+import Divider from '@mui/material/Divider'
+import IconButton from '@mui/material/IconButton'
+import Grid2 from '@mui/material/Unstable_Grid2'
+import { useLayoutStore } from '@store/useLayoutStore'
+import { basicEqualFn, useMemory } from '@store/useMemory'
+import { useDeepStore, useStorage } from '@store/useStorage'
+import * as React from 'react'
 import { DialogWrapper } from '../dialogs/DialogWrapper'
+import { Size } from './Size'
 
 export function SlotSelection() {
   const [id, teamId, open] = useLayoutStore((s) => {

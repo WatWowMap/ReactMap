@@ -1,10 +1,10 @@
 // @ts-check
-import * as React from 'react'
-import ListItem from '@mui/material/ListItem'
 
-import { useStorage } from '@store/useStorage'
 import { ENUM_TTH } from '@assets/constants'
 import { MultiSelectorStore } from '@components/inputs/MultiSelector'
+import ListItem from '@mui/material/ListItem'
+import { useStorage } from '@store/useStorage'
+import * as React from 'react'
 
 import { CollapsibleItem } from './components/CollapsibleItem'
 

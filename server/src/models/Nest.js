@@ -28,7 +28,7 @@ class Nest extends Model {
   static async getAll(perms, args, { polygon }) {
     const { areaRestrictions } = perms
     const { minLat, minLon, maxLat, maxLon, filters } = args
-    const query = this.query().select(['*', 'nest_id AS id'])
+    const query = Nest.query().select(['*', 'nest_id AS id'])
     applyManualIdFilter(query, {
       manualId: filters.onlyManualId,
       latColumn: 'lat',
@@ -62,7 +62,7 @@ class Nest extends Model {
       query.andWhereBetween('pokemon_avg', filters.onlyAvgFilter)
     }
     if (polygon) {
-      query.select(this.raw('ST_AsGeoJSON(polygon)').as('polygon'))
+      query.select(Nest.raw('ST_AsGeoJSON(polygon)').as('polygon'))
     }
     if (!getAreaSql(query, areaRestrictions, filters.onlyAreas || [])) {
       return []
@@ -138,7 +138,7 @@ class Nest extends Model {
    */
   static async getAvailable() {
     const results = /** @type {FullNest[]} */ (
-      await this.query()
+      await Nest.query()
         .select(['pokemon_id', 'pokemon_form'])
         .where('pokemon_id', '!=', 0)
         .whereNotNull('pokemon_id')
@@ -184,7 +184,7 @@ class Nest extends Model {
       search,
     )
 
-    const query = this.query()
+    const query = Nest.query()
       .select([
         'nest_id AS id',
         'name',
@@ -221,7 +221,7 @@ class Nest extends Model {
    * @returns {Promise<FullNest>}
    */
   static async getOne(id) {
-    return this.query().findById(id).select(['lat', 'lon'])
+    return Nest.query().findById(id).select(['lat', 'lon'])
   }
 }
 

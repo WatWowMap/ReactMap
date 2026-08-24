@@ -64,7 +64,7 @@ body {
   margin-right: auto;
   text-align: center;
   border-collapse: separate;
-  border-spacing: 7px 1x;
+  border-spacing: 7px 1px;
   padding-top: 5px;
 }
 
@@ -313,8 +313,10 @@ body {
   bottom: -5px;
 }
 
+/* biome-ignore lint/style/noDescendingSpecificity: low-specificity base rule intentionally precedes more specific selectors below */
 img {
   image-rendering: auto;
+  /* biome-ignore lint/suspicious/noDuplicateProperties: deliberate vendor-prefixed fallback, not a duplicate bug */
   image-rendering: -webkit-optimize-contrast;
 }
 
@@ -414,7 +416,7 @@ img {
   transform: translateX(-50%);
   min-width: 100%;
   font-size: x-large;
-  font-family: Roboto;
+  font-family: Roboto, sans-serif;
   color: white;
   text-shadow:
     #000 0 0 2px,

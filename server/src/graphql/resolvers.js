@@ -445,7 +445,7 @@ const resolvers = {
     },
     search: async (_, args, { Event, perms, Db, req }) => {
       const { category, search } = args
-      if (!search || !search.trim()) {
+      if (!search?.trim()) {
         return []
       }
       switch (category) {
@@ -491,7 +491,7 @@ const resolvers = {
     searchInvasion: (_, args, { perms, Db }) => {
       const { search } = args
       if (perms?.invasions) {
-        if (!search || !search.trim()) {
+        if (!search?.trim()) {
           return []
         }
         return Db.search('Pokestop', perms, args, 'searchInvasions')
@@ -501,7 +501,7 @@ const resolvers = {
     searchLure: (_, args, { perms, Db }) => {
       const { search } = args
       if (perms.lures) {
-        if (!search || !search.trim()) {
+        if (!search?.trim()) {
           return []
         }
         return Db.search('Pokestop', perms, args, 'searchLures')
@@ -511,7 +511,7 @@ const resolvers = {
     searchQuest: (_, args, { perms, Db }) => {
       const { search } = args
       if (perms.quests) {
-        if (!search || !search.trim()) {
+        if (!search?.trim()) {
           return []
         }
         return Db.search('Pokestop', perms, args, 'searchQuests')

@@ -1,22 +1,21 @@
 // @ts-check
 
-import * as React from 'react'
-import Grid from '@mui/material/Unstable_Grid2'
+import { useLazyQuery } from '@apollo/client'
+import { VisibleToggle } from '@components/inputs/VisibleToggle'
 import Box from '@mui/material/Box'
-import Typography from '@mui/material/Typography'
 import Button from '@mui/material/Button'
 import Collapse from '@mui/material/Collapse'
 import FormControl from '@mui/material/FormControl'
+import IconButton from '@mui/material/IconButton'
+import InputAdornment from '@mui/material/InputAdornment'
 import InputLabel from '@mui/material/InputLabel'
 import OutlinedInput from '@mui/material/OutlinedInput'
-import InputAdornment from '@mui/material/InputAdornment'
-import IconButton from '@mui/material/IconButton'
-import { useTranslation } from 'react-i18next'
-import { useLazyQuery } from '@apollo/client'
-
+import Typography from '@mui/material/Typography'
+import Grid from '@mui/material/Unstable_Grid2'
 import { login } from '@services/fetches'
 import { Query } from '@services/queries'
-import { VisibleToggle } from '@components/inputs/VisibleToggle'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 
 /**
  *

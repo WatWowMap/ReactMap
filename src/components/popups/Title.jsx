@@ -1,8 +1,8 @@
 // @ts-check
-import * as React from 'react'
-import Typography from '@mui/material/Typography'
 
+import Typography from '@mui/material/Typography'
 import { useStorage } from '@store/useStorage'
+import * as React from 'react'
 
 /**
  *

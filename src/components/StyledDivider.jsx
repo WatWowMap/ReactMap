@@ -1,6 +1,7 @@
 // @ts-check
-import { styled } from '@mui/material/styles'
+
 import Divider from '@mui/material/Divider'
+import { styled } from '@mui/material/styles'
 
 const SKIP_PROPS = new Set([
   'm',

@@ -1,13 +1,12 @@
 // @ts-check
 
-import React, { useState } from 'react'
+import { SliderTile } from '@components/inputs/SliderTile'
 import DialogContent from '@mui/material/DialogContent'
+import Divider from '@mui/material/Divider'
 import Typography from '@mui/material/Typography'
 import Grid from '@mui/material/Unstable_Grid2'
-import Divider from '@mui/material/Divider'
-import { useTranslation, Trans } from 'react-i18next'
-
-import { SliderTile } from '@components/inputs/SliderTile'
+import { useState } from 'react'
+import { Trans, useTranslation } from 'react-i18next'
 
 import { tutorialData } from './data'
 

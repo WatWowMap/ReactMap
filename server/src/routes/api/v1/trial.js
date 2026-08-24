@@ -5,7 +5,7 @@ const { log, TAGS } = require('@rm/logger')
 
 const { state } = require('../../../services/state')
 
-router.get('/start', async (req, res) => {
+router.get('/start', async (_req, res) => {
   state.setTrials(true)
   res.status(200).json({ status: 'success' })
 })
@@ -20,7 +20,7 @@ router.get('/start/:strategy', async (req, res) => {
   }
 })
 
-router.get('/stop', async (req, res) => {
+router.get('/stop', async (_req, res) => {
   state.setTrials(false)
   res.status(200).json({ status: 'success' })
 })
@@ -35,7 +35,7 @@ router.get('/stop/:strategy', async (req, res) => {
   }
 })
 
-router.get('/status', async (req, res) => {
+router.get('/status', async (_req, res) => {
   res.status(200).json({ status: state.getTrialStatus() })
 })
 

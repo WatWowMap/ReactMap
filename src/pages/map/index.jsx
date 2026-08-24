@@ -1,8 +1,7 @@
 // @ts-check
-import * as React from 'react'
-import { Navigate, useParams } from 'react-router'
 
 import { useMemory } from '@store/useMemory'
+import { Navigate, useParams } from 'react-router'
 
 import { Container } from './components/Container'
 import { WebhookQuery } from './components/WebhookQuery'

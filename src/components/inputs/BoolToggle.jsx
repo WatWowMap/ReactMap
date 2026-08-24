@@ -1,14 +1,14 @@
 // @ts-check
-import * as React from 'react'
+
+import List from '@mui/material/List'
 import ListItem from '@mui/material/ListItem'
 import ListItemText from '@mui/material/ListItemText'
 import Switch from '@mui/material/Switch'
-import List from '@mui/material/List'
 import Grid2 from '@mui/material/Unstable_Grid2'
-import { useTranslation } from 'react-i18next'
-
 import { useDeepStore } from '@store/useStorage'
 import { camelToSnake, fromSnakeCase } from '@utils/strings'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 
 /**
  * @typedef {{
@@ -83,7 +83,7 @@ export function DualBoolToggle({
         <Grid2 key={item} xs={6} component={List}>
           {item && (
             <BoolToggle
-              // @ts-ignore
+              // @ts-expect-error
               field={`${field}.${item}`}
               label={labels[i] || labels[0] || item}
               disablePadding

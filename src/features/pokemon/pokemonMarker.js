@@ -1,8 +1,7 @@
 // @ts-check
 
-import { Icon, divIcon } from 'leaflet'
-
 import { useMemory } from '@store/useMemory'
+import { divIcon, Icon } from 'leaflet'
 
 /**
  *

@@ -1,11 +1,11 @@
 // @ts-check
-import { t } from 'i18next'
 
-import { useMemory } from '@store/useMemory'
-import { useStorage } from '@store/useStorage'
 import { SimpleTTLCache } from '@services/SimpleTTLCache'
 import { useMapStore } from '@store/useMapStore'
+import { useMemory } from '@store/useMemory'
+import { useStorage } from '@store/useStorage'
 import { setLongTimeout } from '@utils/setLongTimeout'
+import { t } from 'i18next'
 
 export const HAS_API = 'Notification' in window
 const cache = new SimpleTTLCache(1000 * 60 * 60)

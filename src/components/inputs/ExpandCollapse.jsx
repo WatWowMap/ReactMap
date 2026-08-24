@@ -1,12 +1,12 @@
 // @ts-check
 
-import * as React from 'react'
-import { styled } from '@mui/material/styles'
-import IconButton from '@mui/material/IconButton'
-import Collapse from '@mui/material/Collapse'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
-import { useDeepStore } from '@store/useStorage'
 import Box from '@mui/material/Box'
+import Collapse from '@mui/material/Collapse'
+import IconButton from '@mui/material/IconButton'
+import { styled } from '@mui/material/styles'
+import { useDeepStore } from '@store/useStorage'
+import * as React from 'react'
 
 /**
  * @typedef {import('@mui/material').IconButtonProps & { expand?: boolean }} RotatingIconButtonProps

@@ -1,20 +1,19 @@
 // @ts-check
-import * as React from 'react'
-import MenuItem from '@mui/material/MenuItem'
-import CircularProgress from '@mui/material/CircularProgress'
-import { useTranslation } from 'react-i18next'
-import { useMutation } from '@apollo/client'
 
+import { useMutation } from '@apollo/client'
+import { FCSelect } from '@components/inputs/FCSelect'
+import CircularProgress from '@mui/material/CircularProgress'
+import MenuItem from '@mui/material/MenuItem'
 import {
+  ALL_PROFILES,
   WEBHOOK_AREAS,
   WEBHOOK_CATEGORIES,
   WEBHOOK_CHANGE,
   WEBHOOK_CONTEXT,
   WEBHOOK_USER,
-  ALL_PROFILES,
 } from '@services/queries/webhook'
 import { useWebhookStore } from '@store/useWebhookStore'
-import { FCSelect } from '@components/inputs/FCSelect'
+import { useTranslation } from 'react-i18next'
 
 import { useGetWebhookData } from '../../hooks/useGetWebhookData'
 

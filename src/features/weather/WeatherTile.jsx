@@ -1,13 +1,12 @@
 /* eslint-disable react/destructuring-assignment */
 // @ts-check
-import * as React from 'react'
-import { Popup, Polyline, Marker } from 'react-leaflet'
 
 import { basicEqualFn, useMemory } from '@store/useMemory'
 import { useStorage } from '@store/useStorage'
-
-import { weatherMarker } from './weatherMarker'
+import * as React from 'react'
+import { Marker, Polyline, Popup } from 'react-leaflet'
 import { WeatherPopup } from './WeatherPopup'
+import { weatherMarker } from './weatherMarker'
 
 /**
  *

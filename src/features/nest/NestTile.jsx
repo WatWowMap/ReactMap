@@ -1,16 +1,15 @@
 // @ts-check
 /* eslint-disable react/destructuring-assignment */
 
-import * as React from 'react'
-import { GeoJSON, Marker, Popup } from 'react-leaflet'
-
-import { basicEqualFn, useMemory } from '@store/useMemory'
-import { useStorage } from '@store/useStorage'
 import { useForcePopup } from '@hooks/useForcePopup'
 import { useManualPopupTracker } from '@hooks/useManualPopupTracker'
 
-import { nestMarker } from './nestMarker'
+import { basicEqualFn, useMemory } from '@store/useMemory'
+import { useStorage } from '@store/useStorage'
+import * as React from 'react'
+import { GeoJSON, Marker, Popup } from 'react-leaflet'
 import { NestPopup } from './NestPopup'
+import { nestMarker } from './nestMarker'
 
 /**
  *
@@ -124,7 +123,7 @@ const NestGeoJSON = ({ polygon_path, eventHandlers, children }) => {
       return typeof polygon_path === 'string'
         ? JSON.parse(polygon_path)
         : polygon_path
-    } catch (e) {
+    } catch (_e) {
       return null
     }
   }, [polygon_path])

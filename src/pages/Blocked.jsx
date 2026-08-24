@@ -1,24 +1,24 @@
 // @ts-check
-import React from 'react'
-import { useParams, useNavigate } from 'react-router'
-import { useTranslation } from 'react-i18next'
-import Typography from '@mui/material/Typography'
-import Button from '@mui/material/Button'
+
+import { DiscordButton } from '@components/auth/Discord'
+import { I } from '@components/I'
+import { ThemeToggle } from '@components/inputs/ThemeToggle'
 import Avatar from '@mui/material/Avatar'
+import Box from '@mui/material/Box'
+import Button from '@mui/material/Button'
 import Card from '@mui/material/Card'
 import CardActions from '@mui/material/CardActions'
 import CardContent from '@mui/material/CardContent'
 import CardHeader from '@mui/material/CardHeader'
-import Box from '@mui/material/Box'
 import List from '@mui/material/List'
 import ListItem from '@mui/material/ListItem'
 import ListItemIcon from '@mui/material/ListItemIcon'
 import ListItemText from '@mui/material/ListItemText'
+import Typography from '@mui/material/Typography'
 
 import { useMemory } from '@store/useMemory'
-import { DiscordButton } from '@components/auth/Discord'
-import { ThemeToggle } from '@components/inputs/ThemeToggle'
-import { I } from '@components/I'
+import { useTranslation } from 'react-i18next'
+import { useNavigate, useParams } from 'react-router'
 
 export function BlockedPage() {
   const { t } = useTranslation()

@@ -1,12 +1,11 @@
 /* eslint-disable react/no-array-index-key */
 // @ts-check
-import * as React from 'react'
-import { useTranslation } from 'react-i18next'
-import Grid from '@mui/material/Unstable_Grid2'
-import { useQuery } from '@apollo/client'
 
-import { CUSTOM_COMPONENT } from '@services/queries/config'
+import { useQuery } from '@apollo/client'
 import { Loading } from '@components/Loading'
+import Grid from '@mui/material/Unstable_Grid2'
+import { CUSTOM_COMPONENT } from '@services/queries/config'
+import { useTranslation } from 'react-i18next'
 
 import { CustomTile } from './components/CustomTile'
 
@@ -36,6 +35,7 @@ export function CustomLoginPage() {
       sx={settings.parentSx || {}}
     >
       {components.map((block, i) => (
+        // biome-ignore lint/suspicious/noArrayIndexKey: pre-existing, tracked for follow-up
         <CustomTile key={i} block={block} />
       ))}
     </Grid>

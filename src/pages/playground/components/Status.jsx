@@ -1,7 +1,8 @@
 // @ts-check
-import * as React from 'react'
-import Snackbar from '@mui/material/Snackbar'
+
 import Alert from '@mui/material/Alert'
+import Snackbar from '@mui/material/Snackbar'
+import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { handleReset, usePlayStore } from '../hooks/store'

@@ -1,18 +1,17 @@
 // @ts-check
 /* eslint-disable react/no-unstable-nested-components */
+
+import { GenericSearch } from '@components/inputs/GenericSearch'
+import { Loading } from '@components/Loading'
+import Box from '@mui/material/Box'
+import Typography from '@mui/material/Typography'
+import { useWebhookStore } from '@store/useWebhookStore'
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { Virtuoso } from 'react-virtuoso'
-import Typography from '@mui/material/Typography'
-import Box from '@mui/material/Box'
-
-import { Loading } from '@components/Loading'
-import { GenericSearch } from '@components/inputs/GenericSearch'
-import { useWebhookStore } from '@store/useWebhookStore'
-
-import { TrackedTile } from './tiles/TrackedTile'
-import { Selecting } from './Selecting'
 import { useGetWebhookData } from './hooks/useGetWebhookData'
+import { Selecting } from './Selecting'
+import { TrackedTile } from './tiles/TrackedTile'
 
 /**
  *
@@ -33,7 +32,7 @@ export const Tracked = ({ category }) => {
       </Box>
       {tracked.length ? (
         <Virtuoso
-          // @ts-ignore
+          // @ts-expect-error
           data={tracked}
           itemContent={(i) => <TrackedTile key={i} index={i} />}
           // useWindowScroll

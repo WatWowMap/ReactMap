@@ -1,18 +1,16 @@
 // @ts-check
-import * as React from 'react'
-import { useTranslation } from 'react-i18next'
 
 import { useMemory } from '@store/useMemory'
 import { resetFilter, resetFilters } from '@utils/resetState'
 import { camelToSnake } from '@utils/strings'
-
+import { useTranslation } from 'react-i18next'
+import { useDataManagementStore } from '../hooks/store'
 import {
   ButtonWithNotification,
   ChildContainer,
   StyledDivider,
   StyledSubHeader,
 } from './Shared'
-import { useDataManagementStore } from '../hooks/store'
 
 export function ResetFilters() {
   const { t } = useTranslation()

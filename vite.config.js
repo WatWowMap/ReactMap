@@ -81,9 +81,6 @@ const viteConfig = defineConfig(({ mode }) => {
               // typescript: {
               //   tsconfigPath: './jsconfig.json',
               // },
-              eslint: {
-                lintCommand: 'eslint "./src/**/*.{js,jsx}"',
-              },
             }),
           ]
         : []),
@@ -170,7 +167,7 @@ const viteConfig = defineConfig(({ mode }) => {
       chunkSizeWarningLimit: 2000,
       rollupOptions: {
         plugins: [
-          // @ts-ignore
+          // @ts-expect-error
           removeFiles({
             targets: ['dist/favicon'],
             hook: 'generateBundle',

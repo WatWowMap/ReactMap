@@ -142,7 +142,7 @@ class LocalClient extends AuthClient {
                   'Authenticated successfully.',
                 )
                 return done(null, user)
-              } catch (e) {
+              } catch (_e) {
                 return done(null, user, { message: 'error_creating_user' })
               }
             }

@@ -1,7 +1,8 @@
 // @ts-check
-import * as React from 'react'
-import Typography from '@mui/material/Typography'
+
 import MenuItem from '@mui/material/MenuItem'
+import Typography from '@mui/material/Typography'
+import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 
 /**

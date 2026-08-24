@@ -1,7 +1,7 @@
 // @ts-check
 
-import * as React from 'react'
 import Button from '@mui/material/Button'
+import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { I } from '../I'

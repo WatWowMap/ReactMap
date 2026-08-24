@@ -1,22 +1,21 @@
 // @ts-check
-import * as React from 'react'
-import { Link } from 'react-router'
-import Button from '@mui/material/Button'
-import MenuIcon from '@mui/icons-material/Menu'
+
 import ClearIcon from '@mui/icons-material/Clear'
+import MenuIcon from '@mui/icons-material/Menu'
 import ReplayIcon from '@mui/icons-material/Replay'
+import Button from '@mui/material/Button'
 import Divider from '@mui/material/Divider'
-import Menu from '@mui/material/Menu'
-import MenuItem from '@mui/material/MenuItem'
 import ListItemIcon from '@mui/material/ListItemIcon'
 import ListItemText from '@mui/material/ListItemText'
+import Menu from '@mui/material/Menu'
+import MenuItem from '@mui/material/MenuItem'
 import { useTranslation } from 'react-i18next'
-
-import { ToggleEditor } from './ToggleEditor'
-import { Download } from './Download'
-import { ThemeMenuItem } from './Theme'
-import { Save } from './Save'
+import { Link } from 'react-router'
 import { closeMenu, openMenu, usePlayStore } from '../hooks/store'
+import { Download } from './Download'
+import { Save } from './Save'
+import { ThemeMenuItem } from './Theme'
+import { ToggleEditor } from './ToggleEditor'
 
 const startIcon = <MenuIcon />
 

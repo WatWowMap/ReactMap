@@ -1,19 +1,18 @@
 // @ts-check
 /* eslint-disable react/no-array-index-key */
-import React from 'react'
-import Divider from '@mui/material/Divider'
-import Grid from '@mui/material/Unstable_Grid2'
 
 import { DiscordButton } from '@components/auth/Discord'
 import { LocalLogin } from '@components/auth/Local'
 import { TelegramWidget } from '@components/auth/Telegram'
 import { Img } from '@components/Img'
 import { LocaleSelection } from '@components/inputs/LocaleSelection'
-
-import { LinkWrapper } from './LinkWrapper'
-import { CustomText } from './CustomText'
+import Divider from '@mui/material/Divider'
+import Grid from '@mui/material/Unstable_Grid2'
+import React from 'react'
+import { getBlockContent, getGridSizes } from '../utils'
 import { CustomButton } from './CustomButton'
-import { getGridSizes, getBlockContent } from '../utils'
+import { CustomText } from './CustomText'
+import { LinkWrapper } from './LinkWrapper'
 
 /**
  *
@@ -78,12 +77,14 @@ export function Generator({ block, defaultReturn = null }) {
             (subBlock, i) =>
               subBlock.type === 'parent' ? (
                 <Generator
+                  // biome-ignore lint/suspicious/noArrayIndexKey: pre-existing, tracked for follow-up
                   key={i}
                   block={subBlock}
                   defaultReturn={defaultReturn}
                 />
               ) : (
                 <Grid
+                  // biome-ignore lint/suspicious/noArrayIndexKey: pre-existing, tracked for follow-up
                   key={i}
                   {...getGridSizes(subBlock.gridSizes)}
                   className={block.className}
@@ -91,6 +92,7 @@ export function Generator({ block, defaultReturn = null }) {
                   sx={subBlock.gridSx}
                 >
                   <Generator
+                    // biome-ignore lint/suspicious/noArrayIndexKey: pre-existing, tracked for follow-up
                     key={i}
                     block={subBlock}
                     defaultReturn={defaultReturn}

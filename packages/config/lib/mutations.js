@@ -261,7 +261,6 @@ const applyMutations = (config) => {
   } else {
     config.multiDomainsObj = {}
   }
-
   // Check if empty
   ;['tileServers', 'navigation'].forEach((opt) => {
     if (!config[opt].length) {

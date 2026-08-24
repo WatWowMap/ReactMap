@@ -1,8 +1,8 @@
 // @ts-check
-import * as React from 'react'
-import { useTranslation } from 'react-i18next'
 
 import { Notification } from '@components/Notification'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 
 import { useScanStore } from './hooks/store'
 

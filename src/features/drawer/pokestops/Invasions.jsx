@@ -1,10 +1,11 @@
 // @ts-check
-import * as React from 'react'
+
+import { BoolToggle } from '@components/inputs/BoolToggle'
 import Box from '@mui/material/Box'
 
 import { useMemory } from '@store/useMemory'
 import { useStorage } from '@store/useStorage'
-import { BoolToggle } from '@components/inputs/BoolToggle'
+import * as React from 'react'
 
 import { CollapsibleItem } from '../components/CollapsibleItem'
 import { MultiSelectorList, SelectorListMemo } from '../components/SelectorList'

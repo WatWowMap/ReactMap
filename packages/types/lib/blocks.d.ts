@@ -1,6 +1,5 @@
 import type {
   ButtonProps,
-  DialogProps,
   DividerProps,
   Grid2Props,
   SxProps,
@@ -22,18 +21,21 @@ interface BaseBlock {
 }
 
 interface CustomText
+  // biome-ignore lint/complexity/noBannedTypes: matches the builtin Function type on purpose to filter callable props
   extends Omit<OnlyType<TypographyProps, Function, false>>,
     BaseBlock {
   type: 'text'
 }
 
 interface CustomDivider
+  // biome-ignore lint/complexity/noBannedTypes: matches the builtin Function type on purpose to filter callable props
   extends Omit<OnlyDType<DividerProps, Function, false>>,
     BaseBlock {
   type: 'divider'
 }
 
 interface CustomButton
+  // biome-ignore lint/complexity/noBannedTypes: matches the builtin Function type on purpose to filter callable props
   extends Omit<OnlyType<ButtonProps, Function, false>>,
     BaseBlock {
   type: 'button'

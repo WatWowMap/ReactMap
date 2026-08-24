@@ -1,8 +1,8 @@
 // @ts-check
-import * as React from 'react'
+
+// biome-ignore lint/suspicious/noShadowRestrictedNames: MUI icon name, shadowing is local to this file
 import Map from '@mui/icons-material/Map'
 import IconButton from '@mui/material/IconButton'
-
 import { useMemory } from '@store/useMemory'
 import { useStorage } from '@store/useStorage'
 
