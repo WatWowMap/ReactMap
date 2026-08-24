@@ -1,9 +1,13 @@
 // @ts-check
 
 /**
+ * Callers pass a single provider's perms row, or the accumulator folding
+ * several of them together -- neither is guaranteed to carry every key of
+ * the full `Permissions` interface, so both sides are typed as partial
+ * rather than complete.
  *
- * @param {import("@rm/types").Permissions} existingPerms
- * @param {import("@rm/types").Permissions} incomingPerms
+ * @param {Partial<import("@rm/types").Permissions>} existingPerms
+ * @param {Partial<import("@rm/types").Permissions>} incomingPerms
  */
 function mergePerms(existingPerms, incomingPerms) {
   const keys = new Set([

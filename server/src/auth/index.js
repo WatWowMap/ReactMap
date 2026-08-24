@@ -46,7 +46,7 @@ function assertSessionSecret(secret) {
  * Pure option construction, split out so the wiring can be tested without
  * opening a database connection.
  *
- * @param {{ strategies: any[], sessionSecret: string, baseURL: string, trustProxy?: unknown, cookieAgeDays?: number, onSessionCreate?: (userId: string) => Promise<void>, checkSignInGate?: (userId: string) => Promise<{ allow: true } | { allow: false, reason: string }>, enforceMaxSessions?: (userId: string) => Promise<void> }} input
+ * @param {{ strategies: any[], sessionSecret: string, baseURL: string, trustProxy?: boolean | number | string, cookieAgeDays?: number, onSessionCreate?: (userId: string) => Promise<void>, checkSignInGate?: (userId: string) => Promise<{ allow: true } | { allow: false, reason: string }>, enforceMaxSessions?: (userId: string) => Promise<void> }} input
  */
 function buildAuthOptions(input) {
   /** @type {Record<string, { clientId: string, clientSecret: string, scope?: string[], redirectURI?: string }>} */
