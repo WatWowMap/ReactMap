@@ -67,7 +67,9 @@ const startServer = async () => {
   app.use(
     loggerMiddleware,
     noSourceMapMiddleware,
-    express.static(distDir, { dotfiles: 'allow' }),
+    // `index: false` keeps serve-static from answering a bare `/` with the 1.0
+    // shell off disk, which would shadow the router that picks a shell per user.
+    express.static(distDir, { dotfiles: 'allow', index: false }),
     sessionMiddleware(),
     compression(),
     express.json({
