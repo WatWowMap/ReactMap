@@ -28,6 +28,7 @@ const { initSentry, sentryMiddleware } = require('./middleware/sentry')
 const { loggerMiddleware } = require('./middleware/logger')
 const { noSourceMapMiddleware } = require('./middleware/noSourceMap')
 const { initPassport } = require('./middleware/passport')
+const { createAuthSessionMiddleware } = require('./middleware/authSession')
 const { errorMiddleware } = require('./middleware/error')
 const { sessionMiddleware } = require('./middleware/session')
 const { apolloMiddleware } = require('./middleware/apollo')
@@ -92,6 +93,7 @@ const startServer = async () => {
   }
 
   initPassport(app)
+  app.use(createAuthSessionMiddleware())
 
   const sentryErrorMiddleware = initSentry(app)
 
