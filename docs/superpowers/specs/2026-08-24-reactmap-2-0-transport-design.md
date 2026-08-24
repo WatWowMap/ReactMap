@@ -102,16 +102,36 @@ registration and no live reload. ReactMap owns the push layer.
 
 Upstream is assumed cheap. ReactMap and Golbat normally share an internal network. Two consequences.
 
-We ask Golbat for the superset and post-filter locally wherever its filter language cannot express
-a rule. Its filters are DNF, an OR of AND'd clauses, with no NOT, so `rule_exclusion` cannot be
-expressed at all, and `pvp_target_species` has no equivalent. Asking broadly and dropping rows
-locally gives the same answer with far less translation logic.
+We translate rules into Golbat's DNF and send them. The vocabularies are close enough that this is
+mechanical, and letting Golbat filter is the whole point of it having a filter language. Only two
+things cannot be expressed: `rule_exclusion`, because DNF is an OR of AND'd clauses with no NOT,
+and `pvp_target_species`, which has no equivalent. Those two are dropped locally, from a result set
+Golbat has already narrowed.
+
+An earlier draft of this spec proposed calling Golbat unfiltered and evaluating everything locally,
+on the grounds that a filtered query cannot tell "unchanged" apart from "no longer matches". That
+was solving the right problem the wrong way, and it is worth recording why, because the reasoning
+recurs. The fix is not to abandon the filter. It is that an incremental query layers on top of a
+full one rather than replacing it: a full DNF query on viewport change and again on a slower cycle,
+with incremental queries on the ticks in between. The full query is the reconciliation, and
+anything the client holds that it does not return gets dropped.
+
+The two entity families differ here. Expired pokemon are dropped at Golbat's response build
+(`decoder/api_pokemon_response.go:197`) and the client evicts them on its own clock, so a pokemon
+that stops matching disappears within its lifetime regardless. Forts never expire. `api_fort.go:218`
+checks lure expiry inside the filter predicate, so a gym whose raid ended simply stops matching and
+would sit on the client forever. Reconciliation is what forts need it for.
 
 There is no upstream coalescing. Two users looking at the same block cause two polls. This removes
 a shared-cache subsystem that would otherwise need writing.
 
 Some operator will run Golbat across the internet. The design assumes cheap upstream without
 depending on it, and coalescing stays addable later.
+
+An `updated_after` filter has been proposed upstream (UnownHash/Golbat#402) to make the in-between
+ticks return only what changed. It is not available yet, so nothing here depends on it. The polling
+shape above works without it, with the incremental ticks simply being full queries, and gets
+cheaper if it lands.
 
 What does translate upstream is most of the rules model, because Golbat's vocabulary and ours are
 close to the same thing. Its pokemon filter takes `pokemon: [{id, form}]` pairs plus ranges for iv,
