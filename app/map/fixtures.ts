@@ -50,17 +50,57 @@ function pick<T>(rng: () => number, values: readonly [T, ...T[]]): T {
   return values[randomInt(rng, 0, values.length - 1)] as T
 }
 
-const GENDERS: readonly [Gender, ...Gender[]] = [1, 2, 3]
 const TEAMS: readonly [Team, ...Team[]] = [0, 1, 2, 3]
 
+/**
+ * A viewport does not contain a uniform sample of the species list. A
+ * dozen commons account for most of what is on screen, a wider pool of
+ * regulars fills in around them, and anything else shows up rarely.
+ * Drawing uniformly across all 493 instead made almost every fixture
+ * visually distinct, which is close to the worst case for a cache keyed
+ * on appearance and made these fixtures useless as evidence that one
+ * works.
+ */
+const COMMON_SPECIES = [16, 19, 21, 23, 41, 43, 46, 52, 60, 69, 74, 96]
+const REGULAR_SPECIES = [
+  1, 4, 7, 10, 13, 25, 27, 29, 32, 35, 37, 39, 50, 54, 58, 63, 66, 72, 77, 79,
+  81, 84, 90, 92, 100, 102, 104, 109, 111, 118,
+]
+const COMMON_SHARE = 0.65
+const REGULAR_SHARE = 0.95
+const MAX_SPECIES = 493
+
+function randomSpecies(rng: () => number): number {
+  const roll = rng()
+  if (roll < COMMON_SHARE) {
+    return COMMON_SPECIES[
+      randomInt(rng, 0, COMMON_SPECIES.length - 1)
+    ] as number
+  }
+  if (roll < REGULAR_SHARE) {
+    return REGULAR_SPECIES[
+      randomInt(rng, 0, REGULAR_SPECIES.length - 1)
+    ] as number
+  }
+  return randomInt(rng, 1, MAX_SPECIES)
+}
+
 function buildPokemon(rng: () => number, index: number): PokemonEntity {
+  const pokemonId = randomSpecies(rng)
+  // Alternate forms belong to a minority of species, and even those spawn
+  // in their default form most of the time. Costumes are event-limited and
+  // rarer still. Gender is a property of the species: a tenth of them are
+  // genderless, and the rest split evenly.
+  const hasAlternateForms = pokemonId % 7 === 0
+  const isGenderless = pokemonId % 10 === 0
+  const gender: Gender = isGenderless ? 3 : rng() < 0.5 ? 1 : 2
   const entity: PokemonEntity = {
     kind: 'pokemon',
     spawnId: `pokemon-${index}`,
-    pokemonId: randomInt(rng, 1, 493),
-    form: randomInt(rng, 0, 3),
-    costume: randomInt(rng, 0, 2),
-    gender: pick(rng, GENDERS),
+    pokemonId,
+    form: hasAlternateForms && rng() < 0.4 ? randomInt(rng, 1, 3) : 0,
+    costume: rng() < 0.02 ? randomInt(rng, 1, 2) : 0,
+    gender,
     lat: randomInRange(rng, FIXTURE_AREA.south, FIXTURE_AREA.north),
     lon: randomInRange(rng, FIXTURE_AREA.west, FIXTURE_AREA.east),
     expiresAt: FIXTURE_EPOCH + randomInt(rng, 60, 1800) * 1000,
