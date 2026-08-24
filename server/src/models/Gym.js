@@ -149,7 +149,7 @@ class Gym extends Model {
     } = args.filters
     const effectiveOnlyArEligible = isDualQuestLayerMode() && onlyArEligible
     const ts = Math.floor(Date.now() / 1000)
-    const query = Gym.query()
+    const query = this.query()
     const { queryLimits, gymValidDataLimit, hideOldGyms } =
       config.getSafe('api')
     const { baseGymSlotAmounts } = config.getSafe('defaultFilters.gyms')
@@ -583,7 +583,7 @@ class Gym extends Model {
       }
     }
     const ts = Math.floor(Date.now() / 1000)
-    const results = await Gym.query()
+    const results = await this.query()
       .select(['raid_pokemon_id', 'raid_pokemon_form', 'raid_level'])
       .from('gym')
       .where('raid_end_timestamp', '>=', ts)
@@ -591,7 +591,7 @@ class Gym extends Model {
       .groupBy(['raid_pokemon_id', 'raid_pokemon_form', 'raid_level'])
       .orderBy('raid_pokemon_id', 'asc')
       .orderBy('raid_level', 'asc')
-    const teamResults = await Gym.query()
+    const teamResults = await this.query()
       .select(['team_id AS team', `${availableSlotsCol} AS slots`])
       .groupBy(['team_id', availableSlotsCol])
       .then((r) => {
@@ -634,7 +634,7 @@ class Gym extends Model {
     const { areaRestrictions } = perms
     const { onlyAreas = [], search = '' } = args
 
-    const query = Gym.query()
+    const query = this.query()
       .select(['name', 'id', 'lat', 'lon', 'url', distance])
       .whereBetween('lat', [bbox.minLat, bbox.maxLat])
       .andWhereBetween('lon', [bbox.minLon, bbox.maxLon])
@@ -660,7 +660,7 @@ class Gym extends Model {
     )
     const ts = Math.floor(Date.now() / 1000)
 
-    const query = Gym.query()
+    const query = this.query()
       .select([
         'name',
         'id',
@@ -693,7 +693,7 @@ class Gym extends Model {
   }
 
   static async getBadges(userGyms) {
-    const query = Gym.query().select(['*', 'gym.id', 'lat', 'lon', 'deleted'])
+    const query = this.query().select(['*', 'gym.id', 'lat', 'lon', 'deleted'])
 
     const results = await query.whereIn(
       'gym.id',
@@ -738,7 +738,7 @@ class Gym extends Model {
         )
       }
     }
-    return Gym.query().select(['lat', 'lon']).where('id', id).first()
+    return this.query().select(['lat', 'lon']).where('id', id).first()
   }
 
   static async getSubmissions(perms, args) {
@@ -750,7 +750,7 @@ class Gym extends Model {
       maxLon,
     } = args
     const wiggle = 0.025
-    const query = Gym.query()
+    const query = this.query()
       .whereBetween('lat', [minLat - wiggle, maxLat + wiggle])
       .andWhereBetween('lon', [minLon - wiggle, maxLon + wiggle])
       .select(['id', 'lat', 'lon', 'partner_id'])

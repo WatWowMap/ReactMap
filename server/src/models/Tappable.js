@@ -30,7 +30,7 @@ class Tappable extends Model {
     const { queryLimits = {} } = config.getSafe('api')
     const timestamp = getEpoch()
 
-    const query = Tappable.query().select([
+    const query = this.query().select([
       'id',
       'lat',
       'lon',
@@ -102,7 +102,7 @@ class Tappable extends Model {
       return []
     }
 
-    const query = Tappable.query().select([
+    const query = this.query().select([
       'id',
       'lat',
       'lon',
@@ -134,7 +134,7 @@ class Tappable extends Model {
    * @returns {Promise<{ available: string[] }>}
    */
   static async getAvailable() {
-    const rows = await Tappable.query()
+    const rows = await this.query()
       .select('item_id')
       .count('id as total')
       .whereNull('pokemon_id')

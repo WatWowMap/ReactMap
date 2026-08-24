@@ -109,7 +109,7 @@ class Pokemon extends Model {
       if (!noPokemonSelect) return []
     }
 
-    const query = Pokemon.query()
+    const query = this.query()
 
     const manualIdFilter = normalizeManualId(args.filters.onlyManualId)
 
@@ -323,7 +323,7 @@ class Pokemon extends Model {
     }
     // second query for pvp
     if (!mem && queryPvp) {
-      const pvpQuery = Pokemon.query()
+      const pvpQuery = this.query()
       pvpQuery.where('expire_timestamp', '>=', ts)
       applyManualIdFilter(pvpQuery, {
         manualId,
@@ -527,7 +527,7 @@ class Pokemon extends Model {
     }
     if (!knexInstance) {
       try {
-        knexInstance = Pokemon.knex()
+        knexInstance = this.knex()
       } catch (_e) {
         knexInstance = null
       }
@@ -631,7 +631,7 @@ class Pokemon extends Model {
       if (!noPokemonSelect) return []
     }
 
-    const query = Pokemon.query().where('expire_timestamp', '>=', ts)
+    const query = this.query().where('expire_timestamp', '>=', ts)
     query.select([
       '*',
       hasSize && !hasHeight ? 'size AS height' : 'size',
@@ -774,7 +774,7 @@ class Pokemon extends Model {
       mem ? `${mem}/api/pokemon/available` : null,
       mem
         ? undefined
-        : Pokemon.query()
+        : this.query()
             .select(['pokemon_id AS id', 'form'])
             .count('pokemon_id AS count')
             .where('expire_timestamp', '>=', ts)
@@ -813,7 +813,7 @@ class Pokemon extends Model {
       mem ? `${mem}/api/pokemon/id/${id}` : null,
       mem
         ? undefined
-        : Pokemon.query().select(['lat', 'lon']).where('id', id).first(),
+        : this.query().select(['lat', 'lon']).where('id', id).first(),
       'GET',
       secret,
       httpAuth,
@@ -839,7 +839,7 @@ class Pokemon extends Model {
     )
     const searchLimit = config.getSafe('api.searchResultsLimit')
     const ts = Math.floor(Date.now() / 1000)
-    const query = Pokemon.query()
+    const query = this.query()
       .select(['pokemon_id', distance])
       .whereIn('pokemon_id', pokemonIds)
       .whereBetween('lat', [bbox.minLat, bbox.maxLat])

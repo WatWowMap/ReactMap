@@ -684,7 +684,7 @@ class Station extends Model {
     const includeBattleData =
       perms.dynamax && (onlyMaxBattles || onlyGmaxStationed)
 
-    const query = Station.query()
+    const query = this.query()
     applyManualIdFilter(query, manualFilterOptions)
     const now = Date.now() / 1000
     const activeCutoff = now - stationUpdateLimit * 60 * 60
@@ -933,7 +933,7 @@ class Station extends Model {
             station[method]((battle) => {
               if (hasMultiBattles) {
                 battle.whereExists(
-                  Station.knex()
+                  this.knex()
                     .select(1)
                     .from(STATION_BATTLE_FILTER_TABLE)
                     .whereRaw(
@@ -1148,7 +1148,7 @@ class Station extends Model {
    */
   static async getOne(id) {
     /** @type {import('@rm/types').FullStation} */
-    const result = await Station.query().findById(id)
+    const result = await this.query().findById(id)
     return result
   }
 
@@ -1183,7 +1183,7 @@ class Station extends Model {
       // failed has no bound knex, so this.query() throws -> empty list.
       try {
         /** @type {import('@rm/types').FullStation} */
-        const result = await Station.query()
+        const result = await this.query()
           .findById(id)
           .select('stationed_pokemon')
         stationedPokemon = result?.stationed_pokemon
@@ -1235,7 +1235,7 @@ class Station extends Model {
     const { stationUpdateLimit } = config.getSafe('api')
     const activeCutoff = Date.now() / 1000 - stationUpdateLimit * 60 * 60
     const results = hasMultiBattles
-      ? await Station.knex()(STATION_BATTLE_ROW_TABLE)
+      ? await this.knex()(STATION_BATTLE_ROW_TABLE)
           .distinct()
           .select([
             `${STATION_BATTLE_ROW_ALIAS}.battle_pokemon_id as battle_pokemon_id`,
@@ -1251,7 +1251,7 @@ class Station extends Model {
           .andWhere(getStationColumn('updated'), '>', activeCutoff)
           .andWhere(`${STATION_BATTLE_ROW_ALIAS}.battle_end`, '>', ts)
           .orderBy('battle_pokemon_id', 'asc')
-      : await Station.query()
+      : await this.query()
           .distinct(
             getStationSelect([
               'battle_pokemon_id',
@@ -1296,7 +1296,7 @@ class Station extends Model {
     const { onlyAreas = [], search = '', locale } = args
     const { searchResultsLimit, stationUpdateLimit } = config.getSafe('api')
     const ts = getEpoch()
-    const knexRef = Station.knex()
+    const knexRef = this.knex()
     const trimmedSearch = search.trim()
     const normalizedSearch = trimmedSearch.toLowerCase()
 
@@ -1332,7 +1332,7 @@ class Station extends Model {
       }
     }
 
-    const query = Station.query()
+    const query = this.query()
       .select(select)
       .whereBetween(getStationColumn('lat'), [bbox.minLat, bbox.maxLat])
       .andWhereBetween(getStationColumn('lon'), [bbox.minLon, bbox.maxLon])

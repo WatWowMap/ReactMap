@@ -19,7 +19,7 @@ class Device extends Model {
   static async getAll(perms, args, context) {
     const { areaRestrictions } = perms
     const { onlyAreas } = args.filters
-    const query = Device.query()
+    const query = this.query()
       .leftJoin('instance', 'device.instance_name', 'instance.name')
       .select(
         'uuid AS id',

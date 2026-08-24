@@ -19,7 +19,7 @@ class Weather extends Model {
    * @param {import('@rm/types').BBox & { filters: { onlyAreas: string[] } } } args
    */
   static async getAll(perms, args) {
-    const query = Weather.query()
+    const query = this.query()
       .select([ref('id').castTo('CHAR').as('id')])
       .select(['latitude', 'longitude', 'gameplay_condition', 'updated'])
     const ts = Math.floor(Date.now() / 1000)

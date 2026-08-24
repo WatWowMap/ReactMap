@@ -29,7 +29,7 @@ class Portal extends Model {
       maxLat,
       maxLon,
     } = args
-    const query = Portal.query()
+    const query = this.query()
     applyManualIdFilter(query, {
       manualId: args.filters.onlyManualId,
       latColumn: 'lat',
@@ -62,7 +62,7 @@ class Portal extends Model {
     const { onlyAreas = [], search = '' } = args
     const { searchResultsLimit, portalUpdateLimit } = config.getSafe('api')
 
-    const query = Portal.query()
+    const query = this.query()
       .select(['name', 'id', 'lat', 'lon', 'url', distance])
       .whereILike('name', `%${search}%`)
       .whereBetween('lat', [bbox.minLat, bbox.maxLat])
@@ -86,7 +86,7 @@ class Portal extends Model {
    * @returns {Promise<import("@rm/types").FullPortal>}
    */
   static async getOne(id) {
-    return Portal.query().findById(id).select(['lat', 'lon'])
+    return this.query().findById(id).select(['lat', 'lon'])
   }
 }
 

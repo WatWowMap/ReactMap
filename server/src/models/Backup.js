@@ -42,7 +42,7 @@ class Backup extends Model {
    * @returns {Promise<import('@rm/types').FullBackup>}
    */
   static async getOne(id, userId) {
-    return Backup.query().findById(id).where('userId', userId)
+    return this.query().findById(id).where('userId', userId)
   }
 
   /**
@@ -51,7 +51,7 @@ class Backup extends Model {
    * @returns {Promise<import('@rm/types').FullBackup[]>}
    */
   static async getAll(userId) {
-    const records = await Backup.query()
+    const records = await this.query()
       .select(['id', 'name', 'createdAt', 'updatedAt'])
       .where({ userId })
       .whereNotNull('data')
@@ -70,12 +70,12 @@ class Backup extends Model {
       config.getSafe('database.settings.userBackupSizeLimit')
     )
       throw new Error('Data too large')
-    const count = await Backup.query().count().where('userId', userId).first()
+    const count = await this.query().count().where('userId', userId).first()
     if (
       count['count(*)'] < config.getSafe('database.settings.userBackupLimits')
     ) {
       // @ts-expect-error
-      await Backup.query().insert({
+      await this.query().insert({
         // @ts-expect-error
         userId,
         name: backup.name,
@@ -97,7 +97,7 @@ class Backup extends Model {
     )
       throw new Error('Data too large')
     return (
-      Backup.query()
+      this.query()
         // @ts-expect-error
         .update({ name: backup.name, data: JSON.stringify(backup.data) })
         .where('id', +backup.id)
@@ -112,7 +112,7 @@ class Backup extends Model {
    * @returns
    */
   static async delete(id, userId) {
-    return Backup.query().deleteById(id).where('userId', userId)
+    return this.query().deleteById(id).where('userId', userId)
   }
 }
 

@@ -50,7 +50,8 @@
       },
       "complexity": {
         "noForEach": "off",
-        "noImportantStyles": "off"
+        "noImportantStyles": "off",
+        "noThisInStatic": "off"
       },
       "correctness": {
         "useHookAtTopLevel": "off",

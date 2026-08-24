@@ -323,7 +323,7 @@ class Pokestop extends Model {
     }
     const dnfFilters = buildPokestopDnfFilters(filters, state.event.invasions)
 
-    const query = Pokestop.query()
+    const query = this.query()
     if (hideOldPokestops) {
       query.where('pokestop.updated', '>', ts - stopValidDataLimit * 86400)
     }
@@ -1422,13 +1422,13 @@ class Pokestop extends Model {
     }
 
     // items
-    queries.items = Pokestop.query()
+    queries.items = this.query()
       .select('quest_item_id', 'quest_title', 'quest_target')
       .from('pokestop')
       .where('quest_reward_type', 2)
       .groupBy('quest_item_id', 'quest_title', 'quest_target')
     if (hasAltQuests) {
-      queries.itemsAlt = Pokestop.query()
+      queries.itemsAlt = this.query()
         .select(
           'alternative_quest_item_id AS quest_item_id',
           'alternative_quest_title AS quest_title',
@@ -1444,7 +1444,7 @@ class Pokestop extends Model {
     // items
 
     // stardust
-    queries.stardust = Pokestop.query().where('quest_reward_type', 3)
+    queries.stardust = this.query().where('quest_reward_type', 3)
     if (hasRewardAmount) {
       queries.stardust
         .select('quest_reward_amount AS amount', 'quest_title', 'quest_target')
@@ -1458,7 +1458,7 @@ class Pokestop extends Model {
         )
     }
     if (hasAltQuests) {
-      queries.stardustAlt = Pokestop.query().where(
+      queries.stardustAlt = this.query().where(
         'alternative_quest_reward_type',
         3,
       )
@@ -1491,7 +1491,7 @@ class Pokestop extends Model {
     // stardust
 
     // xp
-    queries.xp = Pokestop.query().where('quest_reward_type', 1)
+    queries.xp = this.query().where('quest_reward_type', 1)
     if (hasRewardAmount) {
       queries.xp
         .select('quest_reward_amount AS amount', 'quest_title', 'quest_target')
@@ -1505,7 +1505,7 @@ class Pokestop extends Model {
         )
     }
     if (hasAltQuests) {
-      queries.xpAlt = Pokestop.query().where('alternative_quest_reward_type', 1)
+      queries.xpAlt = this.query().where('alternative_quest_reward_type', 1)
       if (hasRewardAmount) {
         queries.xpAlt
           .select(
@@ -1535,7 +1535,7 @@ class Pokestop extends Model {
     // xp
 
     // mega
-    queries.mega = Pokestop.query()
+    queries.mega = this.query()
       .from('pokestop')
       .whereIn('quest_reward_type', TEMP_EVOLUTION_RESOURCE_REWARD_TYPES)
     if (hasRewardAmount) {
@@ -1554,7 +1554,7 @@ class Pokestop extends Model {
         )
     }
     if (hasAltQuests) {
-      queries.megaAlt = Pokestop.query().whereIn(
+      queries.megaAlt = this.query().whereIn(
         'alternative_quest_reward_type',
         TEMP_EVOLUTION_RESOURCE_REWARD_TYPES,
       )
@@ -1587,13 +1587,13 @@ class Pokestop extends Model {
     // mega
 
     // candy
-    queries.candy = Pokestop.query()
+    queries.candy = this.query()
       .select('quest_title', 'quest_target')
       .distinct('quest_pokemon_id AS id')
       .from('pokestop')
       .where('quest_reward_type', 4)
     if (hasAltQuests) {
-      queries.candyAlt = Pokestop.query()
+      queries.candyAlt = this.query()
         .select(
           'alternative_quest_title AS quest_title',
           'alternative_quest_target AS quest_target',
@@ -1604,13 +1604,13 @@ class Pokestop extends Model {
     // candy
 
     // xl candy
-    queries.xlCandy = Pokestop.query()
+    queries.xlCandy = this.query()
       .select('quest_title', 'quest_target')
       .distinct('quest_pokemon_id AS id')
       .from('pokestop')
       .where('quest_reward_type', 9)
     if (hasAltQuests) {
-      queries.xlCandyAlt = Pokestop.query()
+      queries.xlCandyAlt = this.query()
         .select(
           'alternative_quest_title AS quest_title',
           'alternative_quest_target AS quest_target',
@@ -1621,7 +1621,7 @@ class Pokestop extends Model {
     // xl candy
 
     // pokemon
-    queries.pokemon = Pokestop.query()
+    queries.pokemon = this.query()
       .distinct('quest_pokemon_id')
       .select(
         raw('json_extract(quest_rewards, "$[0].info.form_id")').as('form'),
@@ -1630,7 +1630,7 @@ class Pokestop extends Model {
       )
       .where('quest_reward_type', 7)
     if (hasAltQuests) {
-      queries.pokemonAlt = Pokestop.query()
+      queries.pokemonAlt = this.query()
         .distinct('alternative_quest_pokemon_id AS quest_pokemon_id')
         .select(
           raw(
@@ -1645,7 +1645,7 @@ class Pokestop extends Model {
 
     // invasions
     if (hasMultiInvasions) {
-      queries.invasions = Pokestop.query()
+      queries.invasions = this.query()
         .leftJoin('incident', 'pokestop.id', 'incident.pokestop_id')
         .select('incident.character AS grunt_type', 'incident.display_type')
         .where(
@@ -1656,14 +1656,14 @@ class Pokestop extends Model {
         .groupBy('incident.character', 'incident.display_type')
         .orderBy('incident.character', 'incident.display_type')
     } else {
-      queries.invasions = Pokestop.query()
+      queries.invasions = this.query()
         .distinct('grunt_type')
         .where('grunt_type', '>', 0)
         .andWhere('incident_expire_timestamp', '>=', ts)
         .orderBy('grunt_type')
     }
     if (hasConfirmed) {
-      queries.rocketPokemon = Pokestop.query()
+      queries.rocketPokemon = this.query()
         .select([
           'character AS grunt_type',
           'slot_1_pokemon_id',
@@ -1704,7 +1704,7 @@ class Pokestop extends Model {
     // invasions
 
     // lures
-    queries.lures = Pokestop.query()
+    queries.lures = this.query()
       .select('lure_id')
       .andWhere('lure_expire_timestamp', '>=', ts)
       .groupBy('lure_id')
@@ -1718,7 +1718,7 @@ class Pokestop extends Model {
       if (hasShowcaseData) distinct.push('showcase_pokemon_id')
       if (hasShowcaseForm) distinct.push('showcase_pokemon_form_id')
       if (hasShowcaseType) distinct.push('showcase_pokemon_type_id')
-      queries.showcase = Pokestop.query()
+      queries.showcase = this.query()
         .distinct(...distinct)
         .where('showcase_expiry', '>=', ts)
         .orderBy(...distinct)
@@ -1744,7 +1744,7 @@ class Pokestop extends Model {
 
     const genericQuestQueries = []
     if (shouldIncludeBaseQuests) {
-      const genericQuestQuery = Pokestop.query()
+      const genericQuestQuery = this.query()
         .from('pokestop')
         .select('quest_reward_type', 'quest_title', 'quest_target')
         .whereNotNull('quest_reward_type')
@@ -1753,7 +1753,7 @@ class Pokestop extends Model {
       genericQuestQueries.push(genericQuestQuery)
     }
     if (shouldIncludeAltQuests) {
-      const genericQuestQuery = Pokestop.query()
+      const genericQuestQuery = this.query()
         .select(
           'alternative_quest_reward_type AS quest_reward_type',
           'alternative_quest_title AS quest_title',
@@ -1966,7 +1966,7 @@ class Pokestop extends Model {
 
   static async search(perms, args, _ctx, distance, bbox) {
     const { onlyAreas = [], search = '' } = args
-    const query = Pokestop.query()
+    const query = this.query()
       .select(['name', 'id', 'lat', 'lon', 'url', distance])
       .whereBetween('lat', [bbox.minLat, bbox.maxLat])
       .andWhereBetween('lon', [bbox.minLon, bbox.maxLon])
@@ -2026,7 +2026,7 @@ class Pokestop extends Model {
     }
     const queries = []
     if (questLayer !== 'without_ar') {
-      const query = Pokestop.query()
+      const query = this.query()
         .select([
           'id',
           'lat',
@@ -2068,7 +2068,7 @@ class Pokestop extends Model {
       queries.push(query)
     }
     if (hasAltQuests && questLayer !== 'with_ar') {
-      const altQuestQuery = Pokestop.query()
+      const altQuestQuery = this.query()
         .select([
           'id',
           'lat',
@@ -2149,7 +2149,7 @@ class Pokestop extends Model {
           .toLowerCase()
           .includes(search),
       )
-    const query = Pokestop.query()
+    const query = this.query()
       .select(['*', distance])
       .whereBetween('lat', [bbox.minLat, bbox.maxLat])
       .andWhereBetween('lon', [bbox.minLon, bbox.maxLon])
@@ -2204,7 +2204,7 @@ class Pokestop extends Model {
     if (!invasions.length && !pokemonIds.length) {
       return []
     }
-    const query = Pokestop.query()
+    const query = this.query()
       .whereBetween('lat', [bbox.minLat, bbox.maxLat])
       .andWhereBetween('lon', [bbox.minLon, bbox.maxLon])
       .limit(config.getSafe('api.searchResultsLimit'))
@@ -2321,7 +2321,7 @@ class Pokestop extends Model {
         )
       }
     }
-    return Pokestop.query().select(['lat', 'lon']).where('id', id).first()
+    return this.query().select(['lat', 'lon']).where('id', id).first()
   }
 
   static async getSubmissions(perms, args, { hasShowcaseData }) {
@@ -2332,7 +2332,7 @@ class Pokestop extends Model {
       maxLat,
       maxLon,
     } = args
-    const query = Pokestop.query()
+    const query = this.query()
       .whereBetween('lat', [minLat - 0.025, maxLat + 0.025])
       .andWhereBetween('lon', [minLon - 0.025, maxLon + 0.025])
       .select(['id', 'lat', 'lon', 'enabled', 'deleted', 'partner_id'])
@@ -2374,7 +2374,7 @@ class Pokestop extends Model {
 
     // Use original behavior when config is disabled
     if (!hasConfirmed) return { hasConfirmedInvasions: false }
-    const result = await Pokestop.query()
+    const result = await this.query()
       .from('incident')
       .count('id', { as: 'total' })
       .where('confirmed', 1)

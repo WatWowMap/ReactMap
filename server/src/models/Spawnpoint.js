@@ -24,7 +24,7 @@ class Spawnpoint extends Model {
       maxLat,
       maxLon,
     } = args
-    const query = Spawnpoint.query()
+    const query = this.query()
     query
       .whereBetween('lat', [minLat, maxLat])
       .andWhereBetween('lon', [minLon, maxLon])
