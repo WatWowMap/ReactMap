@@ -335,31 +335,54 @@ Discord DM, which the bot could already do and which requires no new infrastruct
 operator-issued reset links. This decision shapes G25 as well, because a payment provider that
 knows only an email address cannot match a local-auth user who has none.
 
-### G25 — An entitlement API for externally managed payment apps _(stated)_
+### G25 — An entitlement API. ReactMap grants access, never handles money  *(stated)*
 
-External billing (Stripe, Patreon, Ko-fi, a Discord bot) calls ReactMap to grant and revoke
-paid access. The pieces to build on already exist: `perms.donor` with five call sites,
-`clearNonDonor`, `donorOnly`, the trial machinery, and lookups by Discord and Telegram id in
-`api/v1/users.js`.
+**The scope boundary, stated first because it decides everything else:** ReactMap ships **no**
+payment integration. No Stripe, no Patreon, no Ko-fi, no SDK, no provider-specific webhook
+parsing, no signature verification, no prices, no currencies, no invoices, no subscription state
+machine, no dependency on any billing service. Anyone who wants that builds it themselves,
+outside ReactMap, and calls in.
+
+What ReactMap exposes is a generic, documented API that says: **this user has this permission
+until this time.** It does not know or care why. The same endpoint serves a donation processor,
+a Patreon sync, a Discord bot, a community reward, or an operator granting access by hand.
+
+That agnosticism is the feature. One mechanism, not one per funding model.
+
+**Vocabulary follows from it.** The API talks about entitlements and permissions and expiry. The
+word "payment" should not appear anywhere in the codebase.
+
+The pieces to build on already exist: `perms.donor` with five call sites, `clearNonDonor`,
+`donorOnly`, the trial machinery, and lookups by Discord and Telegram id in `api/v1/users.js`.
 
 What is missing or wrong today:
 
-- **No grant or revoke endpoint.** Only the trial machinery, and `api/v1/trial.js` mutates state
-  through `GET /start`, which no webhook sender should be asked to call.
+- **No grant, revoke or query endpoint.** Only the trial machinery, and `api/v1/trial.js`
+  mutates state through `GET /start`, which no external caller should be asked to invoke.
 - **Authentication is one shared secret** compared with `!==` rather than a constant-time
-  comparison, and the same secret gates a route with raw SQL interpolation. That is not a
-  foundation to hang billing on. Scoped, rotatable API keys per integration.
-- **Idempotency.** Payment webhooks retry by design. Granting twice must not extend twice.
-- **Identity matching is the hard part.** Billing knows an email address or a Discord id;
-  ReactMap knows its own user ids and whatever accounts happen to be linked. The Discord and
+  comparison, and the same secret gates a route with raw SQL interpolation. Scoped, rotatable,
+  per-integration API keys instead.
+- **Idempotency.** Retries are a fact of any webhook sender's life. Granting twice must not
+  extend twice.
+- **Identity matching is the hard part.** An external caller knows an email address or a Discord
+  id; ReactMap knows its own user ids and whatever accounts happen to be linked. The Discord and
   Telegram lookups cover part of it, and G24's answer on email decides the rest.
+
+**A stable contract raises the bar, and this is the trade being made deliberately.** Because
+third parties will build against it, the API cannot be casually reshaped later and its
+authentication has to hold up against integrations whose code quality ReactMap does not control.
+That is a real ongoing obligation, accepted on purpose.
+
+**Not a contradiction with G16.** G16 refuses to preserve surface that became public by
+accident: dynamic file loading, config keys, table names nobody designed as an interface. This
+is a designed, documented, versioned interface. Deliberate is the opposite of accidental.
 
 **This depends on a defect the audit already found, and cannot ship without it.** Permissions
 are computed once at login and frozen into the session; revocation never reaches a live session,
 and `mergePerms` OR-merges booleans so a once-true permission cannot be revoked by a later
-merge. An entitlement API that can grant but not revoke is a billing problem, not a feature. The
-perm model has to become live-computed or gain an explicit per-provider invalidation hook before
-this is safe to expose.
+merge. An entitlement API that can grant but not revoke is worse than no API at all. The
+permission model has to become live-computed, or gain an explicit per-provider invalidation
+hook, before this is safe to expose.
 
 ---
 
