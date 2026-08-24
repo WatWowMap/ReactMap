@@ -6,8 +6,19 @@ import type { TooltipValueType } from "recharts"
 
 import { cn } from "@app/lib/utils"
 
-// Format: { THEME_NAME: CSS_SELECTOR }
-const THEMES = { light: "", dark: ".dark" } as const
+/*
+ * Upstream scopes the dark half of the generated rules with a .dark class.
+ * This project keeps exactly one dark mechanism, the prefers-color-scheme
+ * query in styles.css; a class variant was introduced by shadcn init once
+ * and removed deliberately. So the dark block is wrapped in that same query
+ * instead, and a chart series follows the OS setting like everything else.
+ *
+ * Format: { THEME_NAME: AT_RULE | null }
+ */
+const THEMES = {
+  light: null,
+  dark: "@media (prefers-color-scheme: dark)",
+} as const
 
 const INITIAL_DIMENSION = { width: 320, height: 200 } as const
 type TooltipNameType = number | string
@@ -94,20 +105,18 @@ const ChartStyle = ({ id, config }: { id: string; config: ChartConfig }) => {
     <style
       dangerouslySetInnerHTML={{
         __html: Object.entries(THEMES)
-          .map(
-            ([theme, prefix]) => `
-${prefix} [data-chart=${id}] {
-${colorConfig
-  .map(([key, itemConfig]) => {
-    const color =
-      itemConfig.theme?.[theme as keyof typeof itemConfig.theme] ??
-      itemConfig.color
-    return color ? `  --color-${key}: ${color};` : null
-  })
-  .join("\n")}
-}
-`
-          )
+          .map(([theme, atRule]) => {
+            const declarations = colorConfig
+              .map(([key, itemConfig]) => {
+                const color =
+                  itemConfig.theme?.[theme as keyof typeof itemConfig.theme] ??
+                  itemConfig.color
+                return color ? `  --color-${key}: ${color};` : null
+              })
+              .join("\n")
+            const block = `[data-chart=${id}] {\n${declarations}\n}`
+            return atRule === null ? block : `${atRule} {\n${block}\n}`
+          })
           .join("\n"),
       }}
     />
