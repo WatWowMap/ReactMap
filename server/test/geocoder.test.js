@@ -958,3 +958,76 @@ test('the Nominatim path also carries the neighborhood alias', async () => {
     })
   }
 })
+
+// Clearing the search box sends an empty string. Photon rejects it with a 400,
+// which surfaces as an error, so a user deleting their own input would fill the
+// log with failures. Nothing should leave the process at all.
+test('an empty search never reaches the upstream', async () => {
+  const seen = []
+  const server = http.createServer((req, res) => {
+    seen.push(req.url)
+    res.writeHead(200, { 'Content-Type': 'application/json' })
+    res.end(JSON.stringify({ type: 'FeatureCollection', features: [] }))
+  })
+  await new Promise((resolve) => {
+    server.listen(0, '127.0.0.1', resolve)
+  })
+  const url = `http://127.0.0.1:${server.address().port}`
+  try {
+    const blank = ['', '   ', '\t\n', undefined, null]
+    // eslint-disable-next-line no-restricted-syntax
+    await Promise.all(
+      blank.map(async (search) => {
+        const photon = await geocoder(url, search, false, '{{city}}', 'photon')
+        assert.deepEqual(
+          photon,
+          [],
+          `photon returned a result for ${JSON.stringify(search)}`,
+        )
+        const nominatim = await geocoder(url, search, false, '{{city}}')
+        assert.deepEqual(
+          nominatim,
+          [],
+          `nominatim returned a result for ${JSON.stringify(search)}`,
+        )
+      }),
+    )
+    assert.deepEqual(seen, [], `requests were sent: ${seen.join(', ')}`)
+
+    // A real query still goes out, so the guard is not swallowing everything.
+    await geocoder(url, 'Denver', false, '{{city}}', 'photon')
+    assert.equal(seen.length, 1)
+  } finally {
+    await new Promise((resolve) => {
+      server.close(resolve)
+    })
+  }
+})
+
+// A reverse lookup at 0,0 is a real coordinate pair, not an empty search.
+test('the empty guard does not swallow a zero coordinate', async () => {
+  const seen = []
+  const server = http.createServer((req, res) => {
+    seen.push(req.url)
+    res.writeHead(200, { 'Content-Type': 'application/json' })
+    res.end(JSON.stringify({ type: 'FeatureCollection', features: [] }))
+  })
+  await new Promise((resolve) => {
+    server.listen(0, '127.0.0.1', resolve)
+  })
+  try {
+    await geocoder(
+      `http://127.0.0.1:${server.address().port}`,
+      { lat: 0, lon: 0 },
+      true,
+      '{{city}}',
+      'photon',
+    )
+    assert.equal(seen.length, 1, 'a reverse lookup at 0,0 must still be sent')
+    assert.match(seen[0], /lat=0/)
+  } finally {
+    await new Promise((resolve) => {
+      server.close(resolve)
+    })
+  }
+})

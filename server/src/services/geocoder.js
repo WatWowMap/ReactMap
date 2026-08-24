@@ -21,6 +21,18 @@ function formatter(addressFormat, result) {
 }
 
 /**
+ * The empty answer for a caller, in the shape its schema declares.
+ *
+ * Query.geocoder is [Geocoder] and Gym.formatted is String, so an object here
+ * makes GraphQL discard the field with "Expected Iterable" or "String cannot
+ * represent value" rather than degrading to an empty result.
+ * @param {boolean} reverse
+ */
+function emptyResult(reverse) {
+  return reverse ? '' : []
+}
+
+/**
  * Fails loudly when the configured URL answered with something that is not a
  * Nominatim response.
  *
@@ -124,7 +136,22 @@ async function geocoder(nominatimUrl, search, reverse, format, provider) {
     // A coordinate pair means a reverse lookup. `reverse` separately controls
     // whether a single formatted string comes back, so the two are not
     // interchangeable.
-    const isReverse = typeof search === 'object'
+    //
+    // The null check is load-bearing: typeof null is 'object', so a null search
+    // would otherwise be taken for a coordinate pair and sent to /reverse with
+    // no lat or lon at all.
+    const isReverse = typeof search === 'object' && search !== null
+
+    // Clearing the search box sends an empty string, and there is nothing to
+    // look up. Photon rejects it outright with
+    // {"message":"q parameter is required when no include categories are
+    // specified"} and a 400, which now surfaces as an error and fills the log
+    // with failures caused by a user deleting their own input. Answering
+    // directly costs nothing and keeps a blank box quiet.
+    if (!isReverse && !String(search ?? '').trim()) {
+      return emptyResult(reverse)
+    }
+
     const results =
       provider === 'photon'
         ? await photonGeocoder(nominatimUrl, search, isReverse)
@@ -140,12 +167,7 @@ async function geocoder(nominatimUrl, search, reverse, format, provider) {
         : results
   } catch (e) {
     log.warn(TAGS.geocoder, 'Unable to geocode for', search, e)
-    // The fallback has to match the shape the caller's schema expects.
-    // Query.geocoder is [Geocoder] and Gym.formatted is String, so returning {}
-    // made GraphQL discard the field with "Expected Iterable" or "String cannot
-    // represent value" rather than degrading to an empty answer. The failure is
-    // still reported: it is logged immediately above.
-    return reverse ? '' : []
+    return emptyResult(reverse)
   }
 }
 
