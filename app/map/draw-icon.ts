@@ -81,6 +81,47 @@ export const drawPokemonIcon: IconDrawer = (
   }
 }
 
+const CLUSTER_ICON_ID = 'cluster-marker-mask'
+let cachedClusterIcon: IconDescriptor | undefined
+
+/**
+ * The single mask icon every cluster bubble shares: a plain circle, same
+ * pattern as `drawGymIcon` and for the same reason - a cluster's only
+ * per-entity property is its count, which is rendered as text on top (see
+ * `buildClusterTextLayer` in layers.ts), not baked into the icon itself.
+ * `IconLayer.getColor` tints this per cluster by size bucket.
+ */
+export function drawClusterIcon(): IconDescriptor {
+  if (cachedClusterIcon) return cachedClusterIcon
+
+  const offscreen = new OffscreenCanvas(ICON_SIZE, ICON_SIZE)
+  const ctx = offscreen.getContext('2d')
+  if (!ctx) throw new Error('2d context unavailable on OffscreenCanvas')
+
+  const center = ICON_SIZE / 2
+  const radius = ICON_SIZE / 2 - 4
+
+  ctx.fillStyle = '#ffffff'
+  ctx.beginPath()
+  ctx.arc(center, center, radius, 0, Math.PI * 2)
+  ctx.fill()
+
+  const bridge = document.createElement('canvas')
+  bridge.width = ICON_SIZE
+  bridge.height = ICON_SIZE
+  const bridgeCtx = bridge.getContext('2d')
+  if (!bridgeCtx) throw new Error('2d context unavailable on bridge canvas')
+  bridgeCtx.drawImage(offscreen, 0, 0)
+
+  cachedClusterIcon = {
+    id: CLUSTER_ICON_ID,
+    url: bridge.toDataURL('image/png'),
+    width: ICON_SIZE,
+    height: ICON_SIZE,
+  }
+  return cachedClusterIcon
+}
+
 const GYM_ICON_ID = 'gym-marker-mask'
 let cachedGymIcon: IconDescriptor | undefined
 

@@ -1,11 +1,22 @@
 import type { Color, Layer } from '@deck.gl/core'
 import { IconLayer, TextLayer } from '@deck.gl/layers'
 import type { IconDescriptor } from './atlas'
-import type { GymEntity, PokemonEntity, Team } from './types'
+import {
+  type ClusterMarker,
+  type ClusterRules,
+  clusterEntities,
+  DEFAULT_GYM_CLUSTER_RULES,
+  DEFAULT_POKEMON_CLUSTER_RULES,
+} from './clustering'
+import type { Bounds, GymEntity, PokemonEntity, Team } from './types'
 
 export const POKEMON_ICON_LAYER_ID = 'pokemon-icons'
 export const POKEMON_LABEL_LAYER_ID = 'pokemon-labels'
 export const GYM_ICON_LAYER_ID = 'gym-icons'
+export const POKEMON_CLUSTER_ICON_LAYER_ID = 'pokemon-cluster-icons'
+export const POKEMON_CLUSTER_LABEL_LAYER_ID = 'pokemon-cluster-labels'
+export const GYM_CLUSTER_ICON_LAYER_ID = 'gym-cluster-icons'
+export const GYM_CLUSTER_LABEL_LAYER_ID = 'gym-cluster-labels'
 
 /** Fallback for a team colour token that failed to resolve. Neutral grey,
  * distinct from every real team colour, so a broken token is visible on
@@ -173,6 +184,70 @@ export function buildGymIconLayer(
   })
 }
 
+/**
+ * Buckets a cluster's colour by how many entities it stands in for, same
+ * three-tier split as 1.0's `marker-cluster-{small,medium,large}` CSS
+ * classes (`Clustering.jsx`'s `createClusterIcon`): a cluster of a few
+ * dozen reads very differently from one standing in for a thousand
+ * entities, and the colour is the only signal of that at a glance.
+ */
+function clusterColorFor(count: number): Color {
+  if (count < 100) return [125, 211, 252, 230] // small: light blue
+  if (count < 1000) return [251, 191, 36, 230] // medium: amber
+  return [248, 113, 113, 230] // large: red
+}
+
+/**
+ * Icon bubble for a set of cluster markers, tinted by `clusterColorFor`.
+ * Shared between the pokemon and gym cluster layers; only the layer `id`
+ * and the input array differ between them.
+ */
+export function buildClusterIconLayer(
+  clusters: readonly ClusterMarker[],
+  id: string,
+  getClusterIcon: () => IconDescriptor,
+): IconLayer<ClusterMarker> {
+  return new IconLayer<ClusterMarker>({
+    id,
+    data: clusters,
+    pickable: false,
+    getPosition: (cluster) => [cluster.lon, cluster.lat],
+    getIcon: () => {
+      const icon = getClusterIcon()
+      return {
+        id: icon.id,
+        url: icon.url,
+        width: icon.width,
+        height: icon.height,
+        mask: true,
+      }
+    },
+    getColor: (cluster) => clusterColorFor(cluster.count),
+    getSize: 36,
+  })
+}
+
+/** The entity count centred on each cluster bubble. */
+export function buildClusterTextLayer(
+  clusters: readonly ClusterMarker[],
+  id: string,
+): TextLayer<ClusterMarker> {
+  return new TextLayer<ClusterMarker>({
+    id,
+    data: clusters,
+    pickable: false,
+    getPosition: (cluster) => [cluster.lon, cluster.lat],
+    getText: (cluster) => String(cluster.count),
+    getSize: 13,
+    getColor: [17, 24, 39, 255],
+  })
+}
+
+export interface MapLayersViewport {
+  bounds: Bounds
+  zoom: number
+}
+
 export interface BuildMapLayersOptions {
   pokemon: readonly PokemonEntity[]
   gyms: readonly GymEntity[]
@@ -180,6 +255,18 @@ export interface BuildMapLayersOptions {
   getGymIcon: () => IconDescriptor
   now: number
   root?: HTMLElement
+  /**
+   * The current camera bounds/zoom. When present, `buildMapLayers` clusters
+   * pokemon and gyms for that viewport and enforces each category's
+   * `forcedLimit` (see clustering.ts) - the fix for the bug traced in the
+   * task brief, where 1.0's limit stopped applying above its clusterer's
+   * `maxZoom`. Omitted, every entity renders individually as before; this
+   * keeps every existing caller (and layers.test.ts) working unchanged.
+   */
+  viewport?: MapLayersViewport
+  /** Per-category override of the default rules read from `config/default.json`. */
+  clusterRules?: { pokemon?: ClusterRules; gyms?: ClusterRules }
+  getClusterIcon?: () => IconDescriptor
 }
 
 /**
@@ -189,6 +276,64 @@ export interface BuildMapLayersOptions {
  * `interleaved`, which only controls where the whole deck.gl stack sits
  * relative to MapLibre's own street-label layer.
  */
+interface ClusteredEntities<T> {
+  points: readonly T[]
+  clusters: readonly ClusterMarker[]
+}
+
+function clusterPokemon(
+  pokemon: readonly PokemonEntity[],
+  viewport: MapLayersViewport,
+  rules: ClusterRules,
+): ClusteredEntities<PokemonEntity> {
+  const wrapped = pokemon.map((entity) => ({
+    id: entity.spawnId,
+    lat: entity.lat,
+    lon: entity.lon,
+    entity,
+  }))
+  const result = clusterEntities(wrapped, viewport.bounds, viewport.zoom, rules)
+  return {
+    points: result.points.map((wrapper) => wrapper.entity),
+    clusters: result.clusters,
+  }
+}
+
+function clusterGyms(
+  gyms: readonly GymEntity[],
+  viewport: MapLayersViewport,
+  rules: ClusterRules,
+): ClusteredEntities<GymEntity> {
+  const wrapped = gyms.map((entity) => ({
+    id: entity.gymId,
+    lat: entity.lat,
+    lon: entity.lon,
+    entity,
+  }))
+  const result = clusterEntities(wrapped, viewport.bounds, viewport.zoom, rules)
+  return {
+    points: result.points.map((wrapper) => wrapper.entity),
+    clusters: result.clusters,
+  }
+}
+
+/**
+ * All layers this task adds, in the order deck.gl should draw them: gyms
+ * and pokemon icons first, pokemon labels last so text always sits on top
+ * of the markers it describes. Draw order between layers is independent of
+ * `interleaved`, which only controls where the whole deck.gl stack sits
+ * relative to MapLibre's own street-label layer.
+ *
+ * Without `viewport`, every entity renders individually - the original
+ * Task 4 behaviour, still what layers.test.ts exercises. With `viewport`,
+ * pokemon and gyms are each clustered and capped against their
+ * `forcedLimit` (clustering.ts; see clustering.test.ts for the bug this
+ * closes) before their icon/text layers are built, and any resulting
+ * cluster bubbles are added as their own layers when `getClusterIcon` is
+ * supplied. `clusterEntities`'s `limitHit` is available to callers that
+ * cluster directly and want to show a warning; this function itself stays
+ * `Layer[]`-in-`Layer[]`-out so existing callers are unaffected.
+ */
 export function buildMapLayers({
   pokemon,
   gyms,
@@ -196,10 +341,60 @@ export function buildMapLayers({
   getGymIcon,
   now,
   root,
+  viewport,
+  clusterRules,
+  getClusterIcon,
 }: BuildMapLayersOptions): Layer[] {
-  return [
-    buildGymIconLayer(gyms, getGymIcon, root),
-    buildPokemonIconLayer(pokemon, getIconFor),
-    buildPokemonTextLayer(pokemon, now),
+  if (!viewport) {
+    return [
+      buildGymIconLayer(gyms, getGymIcon, root),
+      buildPokemonIconLayer(pokemon, getIconFor),
+      buildPokemonTextLayer(pokemon, now),
+    ]
+  }
+
+  const pokemonResult = clusterPokemon(
+    pokemon,
+    viewport,
+    clusterRules?.pokemon ?? DEFAULT_POKEMON_CLUSTER_RULES,
+  )
+  const gymResult = clusterGyms(
+    gyms,
+    viewport,
+    clusterRules?.gyms ?? DEFAULT_GYM_CLUSTER_RULES,
+  )
+
+  const layers: Layer[] = [
+    buildGymIconLayer(gymResult.points, getGymIcon, root),
+    buildPokemonIconLayer(pokemonResult.points, getIconFor),
+    buildPokemonTextLayer(pokemonResult.points, now),
   ]
+
+  if (getClusterIcon) {
+    if (gymResult.clusters.length > 0) {
+      layers.push(
+        buildClusterIconLayer(
+          gymResult.clusters,
+          GYM_CLUSTER_ICON_LAYER_ID,
+          getClusterIcon,
+        ),
+        buildClusterTextLayer(gymResult.clusters, GYM_CLUSTER_LABEL_LAYER_ID),
+      )
+    }
+    if (pokemonResult.clusters.length > 0) {
+      layers.push(
+        buildClusterIconLayer(
+          pokemonResult.clusters,
+          POKEMON_CLUSTER_ICON_LAYER_ID,
+          getClusterIcon,
+        ),
+        buildClusterTextLayer(
+          pokemonResult.clusters,
+          POKEMON_CLUSTER_LABEL_LAYER_ID,
+        ),
+      )
+    }
+  }
+
+  return layers
 }
