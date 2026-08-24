@@ -166,6 +166,12 @@ class LocalClient extends AuthClient {
               user.discordId = userExists.discordId
               user.telegramId = userExists.telegramId
               user.webhookStrategy = userExists.webhookStrategy
+              // Discord and Telegram spread the whole row onto the session
+              // user, so they pick this up for free. Local auth copies fields
+              // one at a time, so an omission here is invisible until someone
+              // notices that flagging a local account onto the 2.0 shell
+              // silently does nothing.
+              user.useAppShell = userExists.useAppShell
               user.data = userExists.data
               user.status = userExists.data
                 ? (typeof userExists.data === 'string'
