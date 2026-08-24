@@ -159,6 +159,7 @@
     "lodash": "^4.18.1",
     "long": "^4.0.0",
     "lucide-react": "1.33.0",
+    "maplibre-gl": "6.5.0",
     "moment-timezone": "^0.6.2",
     "mysql2": "3.11.0",
     "node-cache": "^5.1.2",

@@ -168,6 +168,14 @@ const viteConfig = defineConfig(({ mode }) => {
         ],
         output: {
           manualChunks: (id) => {
+            // MapLibre is only ever imported from app/map, behind the /map
+            // route's own lazy() call, so it needs a bucket of its own.
+            // Grouping it into the same 'vendor'/'index' buckets as
+            // everything else would put it behind app.html's unconditional
+            // modulepreload of vendor (every 2.0 route) or, for its CSS,
+            // behind index.html's stylesheet (every 1.0 route too) -
+            // either way a visitor who never opens /map would pay for it.
+            if (id.includes('node_modules/maplibre-gl')) return 'maplibre'
             if (id.endsWith('.css')) {
               return id.startsWith(appDir) ? 'app' : 'index'
             }

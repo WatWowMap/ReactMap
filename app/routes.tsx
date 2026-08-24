@@ -1,5 +1,6 @@
 import type { RouteObject } from 'react-router'
 import { Shell } from './layout/Shell'
+import { DeepLink } from './pages/DeepLink'
 
 /*
  * Every route is lazy so the bundler gives each one its own chunk. The map
@@ -16,6 +17,21 @@ export const ROUTES: RouteObject[] = [
     lazy: async () => ({
       Component: (await import('./pages/MapPage')).MapPage,
     }),
+  },
+  /*
+   * 1.0's deep links, `/@/:lat/:lon` and `/@/:lat/:lon/:zoom`, are in the
+   * wild. `DeepLink` is registered directly, not through `lazy()`: it has
+   * no heavy dependency of its own, it only redirects into `/map`, and
+   * that redirect is what actually triggers the lazy MapLibre load, on
+   * the same terms as a visitor who navigated to `/map` directly.
+   */
+  {
+    path: '/@/:lat/:lon',
+    Component: DeepLink,
+  },
+  {
+    path: '/@/:lat/:lon/:zoom',
+    Component: DeepLink,
   },
   {
     path: '/filters',
