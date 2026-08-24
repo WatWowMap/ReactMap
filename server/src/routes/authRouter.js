@@ -2,7 +2,7 @@
 const authRouter = require('express').Router()
 
 const { log, TAGS } = require('@rm/logger')
-const { getAuth } = require('../auth')
+const { getAuth, buildAuthRoutePrefix } = require('../auth')
 
 // Passport used to own this router: a `/:strategy` and `/:strategy/callback`
 // pair per enabled strategy, registered by `loadAuthStrategies` below. Better
@@ -16,6 +16,22 @@ authRouter.get('/logout', async (req, res) => {
     log.error(TAGS.auth, 'Unable to logout', err)
   }
   res.redirect('/')
+})
+
+// Operators have `/auth/:provider/callback` registered with their OAuth
+// application, because that is what `config/default.json` ships and what
+// passport served. Better Auth serves `/api/auth/callback/:provider`
+// instead, so Discord (or any other provider) is told to redirect somewhere
+// nothing handles unless this bridges the two. The query string carries the
+// OAuth `code` and `state`, so it has to survive the redirect intact -- an
+// operator upgrading should not have to touch their Discord application or
+// their config.
+authRouter.get('/:provider/callback', (req, res) => {
+  const queryIndex = req.url.indexOf('?')
+  const queryString = queryIndex === -1 ? '' : req.url.slice(queryIndex)
+  res.redirect(
+    `${buildAuthRoutePrefix()}/callback/${req.params.provider}${queryString}`,
+  )
 })
 
 /**
