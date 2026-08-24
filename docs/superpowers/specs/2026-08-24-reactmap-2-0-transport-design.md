@@ -243,7 +243,7 @@ await mf.refresh()                         // re-fetch in place on a game update
 ```
 
 The upstream GAME_MASTER is 8,608,587 bytes across 18,239 entries, roughly ten times the derived
-file 1.x ships, so serving fragments is not an optimisation here. It is the only option.
+file 1.x ships, so serving fragments is not an optimization here. It is the only option.
 
 **Entries are keyed by template id, not by numeric id.** They look like
 `EXTENDED_V0001_POKEMON_BULBASAUR_FALL_2019`: the species number is embedded but the form is a
