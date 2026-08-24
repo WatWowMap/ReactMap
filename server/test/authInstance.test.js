@@ -32,9 +32,18 @@ test('a disabled strategy is not registered', () => {
   expect(options.socialProviders.discord).toBeUndefined()
 })
 
-test('username and password auth is enabled', () => {
-  const options = buildAuthOptions(baseConfig)
-  expect(options.emailAndPassword.enabled).toBe(true)
+test('username and password auth follows the local strategy', () => {
+  const withLocal = {
+    ...baseConfig,
+    strategies: [
+      ...baseConfig.strategies,
+      { name: 'local', type: 'local', enabled: true },
+    ],
+  }
+  expect(buildAuthOptions(withLocal).emailAndPassword.enabled).toBe(true)
+  // Off by default. An instance with local auth disabled must not accept
+  // sign-ups at /api/auth/sign-up/email.
+  expect(buildAuthOptions(baseConfig).emailAndPassword.enabled).toBe(false)
 })
 
 test('the auth tables are the prefixed ones, not the existing users table', () => {
