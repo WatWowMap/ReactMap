@@ -105,16 +105,44 @@ test('a malformed hash fails verification cleanly instead of throwing', async ()
   )
 })
 
-test('forwarded ip headers are ignored unless a proxy is trusted', () => {
+test('forwarded ip headers are ignored by default, the shipped false', () => {
   // Better Auth does not read Express's `trust proxy`, so without this the two
   // disagree and a forged X-Forwarded-For lands in auth_session.ip_address.
   expect(
     buildAuthOptions(baseConfig).advanced.ipAddress.ipAddressHeaders,
-  ).toEqual([])
+  ).toEqual(['x-forwarded-for'])
+  expect(buildAuthOptions(baseConfig).advanced.ipAddress.trustedProxies).toBe(
+    undefined,
+  )
+})
+
+test('trustProxy: true is fully permissive on both layers', () => {
   expect(
-    buildAuthOptions({ ...baseConfig, trustProxy: 1 }).advanced.ipAddress
-      .ipAddressHeaders,
-  ).toBeUndefined()
+    buildAuthOptions({ ...baseConfig, trustProxy: true }).advanced.ipAddress,
+  ).toEqual({})
+})
+
+test('a hop count is not address-based, so it falls back to the socket, not full trust', () => {
+  // Previously any truthy value, including a hop count, collapsed to `{}`
+  // (full trust) here while Express only trusted a fixed number of hops --
+  // exactly the disagreement this reconciles.
+  expect(
+    buildAuthOptions({ ...baseConfig, trustProxy: 1 }).advanced.ipAddress,
+  ).toEqual({ ipAddressHeaders: ['x-forwarded-for'] })
+})
+
+test('a named Express preset cannot be expressed as an address allowlist, so it falls back too', () => {
+  expect(
+    buildAuthOptions({ ...baseConfig, trustProxy: 'loopback' }).advanced
+      .ipAddress,
+  ).toEqual({ ipAddressHeaders: ['x-forwarded-for'] })
+})
+
+test('an address or CIDR allowlist is passed through as trustedProxies', () => {
+  expect(
+    buildAuthOptions({ ...baseConfig, trustProxy: '10.0.0.0/8' }).advanced
+      .ipAddress,
+  ).toEqual({ trustedProxies: ['10.0.0.0/8'] })
 })
 
 test('checkSignInGate is wired to session.create.before and can veto a session', async () => {

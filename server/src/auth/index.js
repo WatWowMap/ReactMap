@@ -8,7 +8,10 @@ const config = require('@rm/config')
 const { getDrizzle } = require('../db/drizzle')
 const schema = require('../db/authSchema')
 const { telegramPlugin } = require('./telegram')
-const { resolveTrustProxy } = require('../middleware/trustProxy')
+const {
+  resolveTrustProxy,
+  resolveIpAddressStrategy,
+} = require('../middleware/trustProxy')
 const { createRecomputeUserPerms } = require('./recomputePermsOnSignIn')
 const { createSignInGateCheck } = require('./signInGate')
 const { hashPassword, verifyPassword } = require('../services/localPassword')
@@ -82,16 +85,28 @@ function buildAuthOptions(input) {
     // Better Auth resolves the client IP itself and does NOT consult Express's
     // `trust proxy`. `getIPFromHeader` in @better-auth/core trusts a
     // single-valued `x-forwarded-for` unconditionally when no trusted proxies
-    // are configured, so with the default Express setting of false the two
-    // layers would disagree and `auth_session.ip_address` would record whatever
-    // a client claimed. Driving both from one value is what keeps them honest.
+    // are configured, so the two layers have to be driven from the same
+    // resolved value or they silently disagree about which forwarded header
+    // entries are attacker-controlled. `resolveIpAddressStrategy`
+    // (`server/src/middleware/trustProxy.js`) is the single place that
+    // decides the mapping; see it for `true` / address-CIDR / fallback.
     //
-    // An empty `ipAddressHeaders` means no forwarded header is consulted at all,
-    // because `[] || DEFAULT_IP_HEADERS` evaluates to the empty array.
+    // The fallback ('socket') case -- `false`, a hop count, or a named
+    // Express preset -- consults no forwarded header at all, because none of
+    // those can be expressed as Better Auth's address allowlist. That would
+    // otherwise leave `auth_session.ip_address` an empty string even for a
+    // direct connection, so `server/src/index.js` overwrites the forwarded
+    // header with the real socket address ahead of the Better Auth handler
+    // in that case, and this reads it back from the same header name.
     advanced: {
-      ipAddress: input.trustProxy
-        ? {}
-        : { ipAddressHeaders: /** @type {string[]} */ ([]) },
+      ipAddress: (() => {
+        const strategy = resolveIpAddressStrategy(input.trustProxy || false)
+        if (strategy.mode === 'permissive') return {}
+        if (strategy.mode === 'trustedProxies') {
+          return { trustedProxies: strategy.trustedProxies }
+        }
+        return { ipAddressHeaders: ['x-forwarded-for'] }
+      })(),
     },
     // Point at the prefixed tables. The unprefixed `session` name belongs to
     // express-mysql-session and `users` to the pre-2.0 user table.

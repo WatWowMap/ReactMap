@@ -28,7 +28,10 @@ const { initSentry, sentryMiddleware } = require('./middleware/sentry')
 const { loggerMiddleware } = require('./middleware/logger')
 const { noSourceMapMiddleware } = require('./middleware/noSourceMap')
 const { createAuthSessionMiddleware } = require('./middleware/authSession')
-const { resolveTrustProxy } = require('./middleware/trustProxy')
+const {
+  resolveTrustProxy,
+  resolveIpAddressStrategy,
+} = require('./middleware/trustProxy')
 const { errorMiddleware } = require('./middleware/error')
 const { apolloMiddleware } = require('./middleware/apollo')
 const { helmetMiddleware } = require('./middleware/helmet')
@@ -66,7 +69,25 @@ const startServer = async () => {
 
   const app = express()
 
-  app.set('trust proxy', resolveTrustProxy(config.getSafe('api.trustProxy')))
+  const trustProxyValue = resolveTrustProxy(config.getSafe('api.trustProxy'))
+  app.set('trust proxy', trustProxyValue)
+
+  // Better Auth resolves ip_address purely from headers (see
+  // buildAuthOptions in server/src/auth/index.js) and never reads the raw
+  // socket. Whenever that resolution falls back to consulting no forwarded
+  // header at all (`resolveIpAddressStrategy`'s 'socket' mode: the shipped
+  // default `false`, a hop count, or a named Express preset), the socket's
+  // own address is written into the same header name instead, so
+  // `auth_session.ip_address` records something rather than an empty string
+  // for a direct connection. This overwrites rather than appends, which is
+  // what keeps it safe: whatever a client sent is discarded outright and
+  // replaced with a value only the TCP connection itself could produce.
+  if (resolveIpAddressStrategy(trustProxyValue).mode === 'socket') {
+    app.use(buildAuthRoutePrefix(), (req, _res, next) => {
+      req.headers['x-forwarded-for'] = req.socket.remoteAddress || ''
+      next()
+    })
+  }
 
   // Better auth reads the raw body itself, so it must sit ahead of the json
   // body parser below (bundled into the next `app.use`), which would
