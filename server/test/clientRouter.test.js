@@ -1,8 +1,13 @@
+const http = require('http')
 const path = require('path')
 const { afterEach, expect, test } = require('bun:test')
+const express = require('express')
 
 const {
+  clientRouter,
   CLIENT_ROUTES,
+  LEGACY_ONLY_ROUTES,
+  MODERN_ROUTES,
   LEGACY_SHELL,
   MODERN_SHELL,
   SHELL_FLAG_COLUMN,
@@ -97,4 +102,73 @@ test('the 2.0 route table is served too, with no duplicates', () => {
   ]
   modern.forEach((route) => expect(CLIENT_ROUTES).toContain(route))
   expect(CLIENT_ROUTES.length).toBe(new Set(CLIENT_ROUTES).size)
+})
+
+/**
+ * The tests above only check list membership, which is what let the router
+ * serve the 2.0 shell on paths only the 1.0 client implements. These drive the
+ * real router over HTTP so the assertion is the shell a request actually gets.
+ */
+
+const SAMPLE_PARAMS = {
+  info: 'banned',
+  lat: '40.7',
+  lon: '-74.0',
+  zoom: '15',
+  category: 'pokemon',
+  id: '25',
+  message: 'boom',
+}
+
+/** @param {string} route */
+const concreteUrl = (route) =>
+  route.replace(/:(\w+)/g, (_full, name) => SAMPLE_PARAMS[name])
+
+/**
+ * Boots the router with `sendFile` replaced by a reply naming the file, so a
+ * request reports which shell it was routed to without needing a built dist.
+ */
+async function withRouter(run) {
+  const app = express()
+  app.use((req, res, next) => {
+    if (req.headers.flagged === 'yes') {
+      req.user = { id: 1, [SHELL_FLAG_COLUMN]: 1 }
+    }
+    res.sendFile = (filePath) => res.status(200).send(path.basename(filePath))
+    next()
+  })
+  app.use(clientRouter)
+
+  const server = http.createServer(app)
+  await new Promise((resolve) => server.listen(0, resolve))
+  const { port } = server.address()
+  try {
+    await run(async (route, flagged) => {
+      const res = await fetch(`http://127.0.0.1:${port}${concreteUrl(route)}`, {
+        headers: flagged ? { flagged: 'yes' } : {},
+      })
+      return res.text()
+    })
+  } finally {
+    await new Promise((resolve) => server.close(resolve))
+  }
+}
+
+test('a path only 1.0 implements serves the 1.0 shell even when flagged', async () => {
+  expect(LEGACY_ONLY_ROUTES.length).toBe(13)
+  await withRouter(async (request) => {
+    for (const route of LEGACY_ONLY_ROUTES) {
+      expect(await request(route, false)).toBe(LEGACY_SHELL)
+      expect(await request(route, true)).toBe(LEGACY_SHELL)
+    }
+  })
+})
+
+test('a path both clients implement follows the flag', async () => {
+  await withRouter(async (request) => {
+    for (const route of MODERN_ROUTES) {
+      expect(await request(route, false)).toBe(LEGACY_SHELL)
+      expect(await request(route, true)).toBe(MODERN_SHELL)
+    }
+  })
 })
