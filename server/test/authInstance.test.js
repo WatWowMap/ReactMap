@@ -21,7 +21,30 @@ test('discord is registered as a social provider when enabled', () => {
   expect(options.socialProviders.discord).toEqual({
     clientId: 'cid',
     clientSecret: 'secret',
+    scope: ['identify', 'guilds'],
   })
+})
+
+test('discord requests the guilds scope, the basis of the whole perms model', () => {
+  const options = buildAuthOptions(baseConfig)
+  expect(options.socialProviders.discord.scope).toEqual(['identify', 'guilds'])
+})
+
+test('a configured redirectUri is passed through to the discord provider', () => {
+  const withRedirect = {
+    ...baseConfig,
+    strategies: [
+      { ...baseConfig.strategies[0], redirectUri: 'https://example.com/cb' },
+    ],
+  }
+  expect(
+    buildAuthOptions(withRedirect).socialProviders.discord.redirectURI,
+  ).toBe('https://example.com/cb')
+})
+
+test('no redirectURI key is set when the strategy has none configured', () => {
+  const options = buildAuthOptions(baseConfig)
+  expect('redirectURI' in options.socialProviders.discord).toBe(false)
 })
 
 test('a disabled strategy is not registered', () => {
@@ -75,4 +98,49 @@ test('forwarded ip headers are ignored unless a proxy is trusted', () => {
     buildAuthOptions({ ...baseConfig, trustProxy: 1 }).advanced.ipAddress
       .ipAddressHeaders,
   ).toBeUndefined()
+})
+
+test('checkSignInGate is wired to session.create.before and can veto a session', async () => {
+  const options = buildAuthOptions({
+    ...baseConfig,
+    checkSignInGate: async () => ({ allow: false, reason: 'blocked_guild' }),
+  })
+  const result = await options.databaseHooks.session.create.before(
+    { userId: 'u1' },
+    null,
+  )
+  expect(result).toBe(false)
+})
+
+test('checkSignInGate allows session creation by returning nothing', async () => {
+  const options = buildAuthOptions({
+    ...baseConfig,
+    checkSignInGate: async () => ({ allow: true }),
+  })
+  const result = await options.databaseHooks.session.create.before(
+    { userId: 'u1' },
+    null,
+  )
+  expect(result).toBeUndefined()
+})
+
+test('session.create.before and .after both wire up when both are provided', async () => {
+  let recomputedFor = null
+  const options = buildAuthOptions({
+    ...baseConfig,
+    checkSignInGate: async () => ({ allow: true }),
+    onSessionCreate: async (userId) => {
+      recomputedFor = userId
+    },
+  })
+  expect(
+    await options.databaseHooks.session.create.before({ userId: 'u1' }, null),
+  ).toBeUndefined()
+  await options.databaseHooks.session.create.after({ userId: 'u1' }, null)
+  expect(recomputedFor).toBe('u1')
+})
+
+test('no databaseHooks are set at all when neither hook input is provided', () => {
+  const options = buildAuthOptions(baseConfig)
+  expect(options.databaseHooks).toBeUndefined()
 })

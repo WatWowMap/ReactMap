@@ -10,15 +10,16 @@ const schema = require('../db/authSchema')
 const { telegramPlugin } = require('./telegram')
 const { resolveTrustProxy } = require('../middleware/trustProxy')
 const { createRecomputeUserPerms } = require('./recomputePermsOnSignIn')
+const { createSignInGateCheck } = require('./signInGate')
 
 /**
  * Pure option construction, split out so the wiring can be tested without
  * opening a database connection.
  *
- * @param {{ strategies: any[], sessionSecret: string, baseURL: string, trustProxy?: unknown, onSessionCreate?: (userId: string) => Promise<void> }} input
+ * @param {{ strategies: any[], sessionSecret: string, baseURL: string, trustProxy?: unknown, onSessionCreate?: (userId: string) => Promise<void>, checkSignInGate?: (userId: string) => Promise<{ allow: true } | { allow: false, reason: string }> }} input
  */
 function buildAuthOptions(input) {
-  /** @type {Record<string, { clientId: string, clientSecret: string }>} */
+  /** @type {Record<string, { clientId: string, clientSecret: string, scope?: string[], redirectURI?: string }>} */
   const socialProviders = {}
   let localEnabled = false
 
@@ -28,6 +29,18 @@ function buildAuthOptions(input) {
       socialProviders.discord = {
         clientId: strategy.clientId,
         clientSecret: strategy.clientSecret,
+        // `identify` is one of Better Auth's default Discord scopes and is
+        // requested again here for clarity; `guilds` is the addition. Without
+        // it, Discord never returns `/users/@me/guilds` data, so
+        // `DiscordClient#getPerms` has no guild list to evaluate
+        // `blockedGuilds`/`allowedGuilds`/roles against -- every guild- and
+        // role-based perm silently resolves to its default.
+        scope: ['identify', 'guilds'],
+        // Operators whitelist this exact URL in their Discord app's OAuth2
+        // settings. Leaving it unset falls back to Better Auth's own
+        // `${baseURL}/callback/discord`, which will not match what most
+        // instances have configured.
+        ...(strategy.redirectUri && { redirectURI: strategy.redirectUri }),
       }
     }
     if (strategy.type === 'local') {
@@ -79,18 +92,34 @@ function buildAuthOptions(input) {
     session: { modelName: 'auth_session' },
     account: { modelName: 'auth_account' },
     verification: { modelName: 'auth_verification' },
-    // Passport's `deserializeUser` used to compute a user's whole permission
-    // set at login and stash it on the session. Better Auth's structural
-    // replacement is this hook: it runs on every sign-in, after the session
-    // row exists, and can write. `session.create.after` (not `before`) is
-    // used deliberately, `user_perms` is downstream of the session, not a
-    // precondition for creating it, so a recompute failure must not block
-    // login.
-    ...(input.onSessionCreate && {
+    // Passport's `deserializeUser` used to do two things on every sign-in:
+    // compute the user's permission set, and refuse the session outright if
+    // it lacked map access. Better Auth splits those across the two ends of
+    // the same hook, because only one of them can still veto anything by the
+    // time it runs.
+    //
+    // `create.before` is the refusal gate (`checkSignInGate`, added below):
+    // it runs before the session row is written and can still reject it, by
+    // returning `false`. That is the direct replacement for
+    // `done('User does not have map permissions', null)`.
+    //
+    // `create.after` is the perms recompute (`onSessionCreate`, from Task 2
+    // of this plan): it runs once the session already exists, so a failure
+    // there must not be allowed to block login -- `user_perms` is downstream
+    // of the session, not a precondition for creating it.
+    ...((input.onSessionCreate || input.checkSignInGate) && {
       databaseHooks: {
         session: {
           create: {
-            after: (session) => input.onSessionCreate(session.userId),
+            ...(input.checkSignInGate && {
+              before: async (session) => {
+                const result = await input.checkSignInGate(session.userId)
+                if (!result.allow) return false
+              },
+            }),
+            ...(input.onSessionCreate && {
+              after: (session) => input.onSessionCreate(session.userId),
+            }),
           },
         },
       },
@@ -132,6 +161,7 @@ function getAuth() {
       baseURL: config.getSafe('api.baseUrl'),
       trustProxy: resolveTrustProxy(config.getSafe('api.trustProxy')),
       onSessionCreate: createRecomputeUserPerms(),
+      checkSignInGate: createSignInGateCheck(),
     }),
     database: drizzleAdapter(getDrizzle(), {
       provider: 'mysql',
