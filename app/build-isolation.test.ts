@@ -26,6 +26,17 @@ import { join } from 'node:path'
 
 const DIST = join(import.meta.dir, '..', 'dist')
 
+/**
+ * A build is present only if dist/ actually holds emitted JS chunks.
+ *
+ * Booting the server creates dist/locales through starti18n, so the directory
+ * existing is not evidence of a build. Keying off the directory alone makes
+ * these tests fail for anyone who has ever run the server.
+ */
+function hasBuild(): boolean {
+  return existsSync(DIST) && readdirSync(DIST).some((f) => f.endsWith('.js'))
+}
+
 // Substrings that only exist because of the 2.0 map stack. Each is a real
 // package name as it appears in bundled module paths and identifiers.
 const MAP_ONLY = [
@@ -40,7 +51,7 @@ const MAP_ONLY = [
 ]
 
 const readIfBuilt = () => {
-  if (!existsSync(DIST)) return null
+  if (!hasBuild()) return null
   const html = join(DIST, 'index.html')
   if (!existsSync(html)) return null
   return readFileSync(html, 'utf8')
@@ -78,7 +89,7 @@ test('the 1.0 entry loads no chunk containing map-only code', () => {
 })
 
 test('the map libraries are emitted as their own chunks', () => {
-  if (!existsSync(DIST)) return
+  if (!hasBuild()) return
   const files = readdirSync(DIST)
   // Both should exist as separate chunks so the map route pays for them alone.
   expect(
