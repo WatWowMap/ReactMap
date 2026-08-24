@@ -70,3 +70,21 @@ test('queryOnce stops listening after the first delivery', async () => {
   expect(deliveries).toBe(1)
   expect(stopped).toBe(true)
 })
+
+test('spawnId is unique per entity while pokemonId repeats across species', async () => {
+  const source = createFixtureSource()
+  const all = await queryOnce(source, {
+    kind: 'pokemon',
+    bounds: { west: -1, south: 51, east: 1, north: 52 },
+    zoom: 12,
+  })
+  const pokemon = all.filter((entity) => entity.kind === 'pokemon')
+
+  const spawnIds = new Set(pokemon.map((entity) => entity.spawnId))
+  const speciesIds = new Set(pokemon.map((entity) => entity.pokemonId))
+
+  expect(spawnIds.size).toBe(pokemon.length)
+  // Anything caching by appearance must key on pokemonId: there are far
+  // fewer species than spawns, which is the whole point of the cache.
+  expect(speciesIds.size).toBeLessThan(pokemon.length / 2)
+})

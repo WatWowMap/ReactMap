@@ -20,16 +20,20 @@ export interface MapQuery {
 }
 
 /**
- * Fields carried here are exactly what determines the icon (id, form,
- * costume, gender, badges, background, weather), what's needed to place
- * and expire the marker (lat, lon, expiresAt), and the optional stats
- * rendered as marker text (iv, level, size). Nothing speculative: a
- * field added later is cheap, one removed after something depends on it
- * is not.
+ * Fields carried here are exactly what determines the icon (pokemonId,
+ * form, costume, gender, badges, background, weather), what's needed to
+ * place and expire the marker (lat, lon, expiresAt), and the optional
+ * stats rendered as marker text (iv, level, size). Nothing speculative:
+ * a field added later is cheap, one removed after something depends on
+ * it is not.
+ *
+ * `spawnId` identifies one encounter and changes every time the pokemon
+ * respawns, so it is useless as a cache key. `pokemonId` is the species
+ * and is what anything keyed on appearance must use.
  */
 export interface PokemonEntity {
   kind: 'pokemon'
-  id: string
+  spawnId: string
   pokemonId: number
   form: number
   costume: number
@@ -47,7 +51,7 @@ export interface PokemonEntity {
 
 export interface GymEntity {
   kind: 'gym'
-  id: string
+  gymId: string
   lat: number
   lon: number
   team: number

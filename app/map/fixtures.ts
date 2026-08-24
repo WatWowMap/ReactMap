@@ -42,7 +42,7 @@ function buildPokemon(rng: () => number, index: number): PokemonEntity {
   const now = Date.now()
   const entity: PokemonEntity = {
     kind: 'pokemon',
-    id: `pokemon-${index}`,
+    spawnId: `pokemon-${index}`,
     pokemonId: randomInt(rng, 1, 493),
     form: randomInt(rng, 0, 3),
     costume: randomInt(rng, 0, 2),
@@ -63,7 +63,7 @@ function buildPokemon(rng: () => number, index: number): PokemonEntity {
 function buildGym(rng: () => number, index: number): GymEntity {
   return {
     kind: 'gym',
-    id: `gym-${index}`,
+    gymId: `gym-${index}`,
     lat: randomInRange(rng, FIXTURE_AREA.south, FIXTURE_AREA.north),
     lon: randomInRange(rng, FIXTURE_AREA.west, FIXTURE_AREA.east),
     team: randomInt(rng, 0, 3),
