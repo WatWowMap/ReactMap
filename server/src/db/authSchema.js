@@ -42,6 +42,12 @@ const authAccount = mysqlTable(
   'auth_account',
   {
     id: varchar('id', { length: 36 }).primaryKey(),
+    // better-auth 1.7.1 requires `issuer` on every account row, credential rows
+    // included. `@better-auth/core` builds it as `local:<providerId>` for
+    // credentials and `local:oauth:<providerId>` for OAuth, both URI encoded.
+    // Omitting it fails at the first sign-up with "The field issuer does not
+    // exist in the auth_account Drizzle schema", after the user row is written.
+    issuer: varchar('issuer', { length: 191 }).notNull(),
     accountId: varchar('account_id', { length: 191 }).notNull(),
     providerId: varchar('provider_id', { length: 191 }).notNull(),
     userId: varchar('user_id', { length: 36 }).notNull(),
@@ -56,8 +62,8 @@ const authAccount = mysqlTable(
     updatedAt: timestamp('updated_at', { fsp: 3 }).defaultNow().notNull(),
   },
   (table) => [
-    uniqueIndex('auth_account_provider_account_uidx').on(
-      table.providerId,
+    uniqueIndex('auth_account_issuer_account_uidx').on(
+      table.issuer,
       table.accountId,
     ),
     index('auth_account_user_id_idx').on(table.userId),

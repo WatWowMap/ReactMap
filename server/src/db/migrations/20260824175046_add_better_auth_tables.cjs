@@ -39,6 +39,7 @@ exports.up = async function up(knex) {
 
   await knex.schema.createTable('auth_account', (table) => {
     table.string('id', 36).primary()
+    table.string('issuer', 191).notNullable()
     table.string('account_id', 191).notNullable()
     table.string('provider_id', 191).notNullable()
     table.string('user_id', 36).notNullable()
@@ -57,8 +58,8 @@ exports.up = async function up(knex) {
       .timestamp('updated_at', { precision: 3 })
       .notNullable()
       .defaultTo(knex.fn.now(3))
-    table.unique(['provider_id', 'account_id'], {
-      indexName: 'auth_account_provider_account_uidx',
+    table.unique(['issuer', 'account_id'], {
+      indexName: 'auth_account_issuer_account_uidx',
     })
     table.index('user_id', 'auth_account_user_id_idx')
     table.foreign('user_id').references('auth_user.id').onDelete('CASCADE')

@@ -34,6 +34,11 @@ test('auth_account carries a password column for credential accounts', () => {
   expect(Object.keys(authAccount)).toContain('password')
 })
 
+test('auth_account carries the issuer column better auth 1.7 requires', () => {
+  // Without it every sign-up throws after the user row is already written.
+  expect(Object.keys(authAccount)).toContain('issuer')
+})
+
 test('auth_user carries username fields for the username plugin', () => {
   const columns = Object.keys(authUser)
   expect(columns).toContain('username')
