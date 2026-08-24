@@ -241,6 +241,13 @@ permissions at all. Removes `getMapConfig(req)`, `multiDomainsObj`, the domain b
 
 ### G21 — No untyped baggage _(stated, and it is the umbrella)_
 
+**Measured 2026-08-23, and it is the number this goal is really about: 612 pre-existing type
+errors across 139 files.** Surfaced by running `tsc` against the repository for the first time
+ever, during the Foundation plan. The cause is that a `@ts-check` pragma forces per-file
+checking regardless of `checkJs: false`, and 531 files carry one while nothing has ever run the
+compiler. That debt is invisible today and becomes a wall the moment anyone widens the typecheck
+gate beyond `app/`. Any plan to convert existing source to TypeScript starts from 612, not zero.
+
 > "I don't want the fully typed codebase to have a ton of untyped baggage due to ReactMap 1.x
 > insane decisions."
 
