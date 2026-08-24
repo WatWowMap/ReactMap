@@ -28,21 +28,32 @@ defaults. All of it is flattened into a GraphQL JSON scalar on every query and e
 
 ## The schema
 
-### One typed table per category
+### A shared rule, typed conditions, one species table
 
-Five categories get rules: pokemon, gym, pokestop, station, nest. Each has its own table with its
-own columns. There is no shared condition table, no `type` discriminator, and no polymorphic value
-column.
+Five categories get rules: pokemon, gym, pokestop, station, nest.
 
-This is deliberate and it is the most important decision in the document. A generic condition bag
-cannot be understood without reading the evaluator, and this codebase has already paid for that kind
-of cleverness once. `SELECT *` on one of these tables shows the entire expressive power of that
-category's rules. Adding a condition means a migration, which is the correct signal that you changed
-what a rule can say.
+Everything a rule has in common lives in one table, so that anything referencing a rule has a single
+foreign key to point at:
+
+```sql
+rule
+  id, user_id, profile_id
+  category            -- pokemon | gym | pokestop | station | nest
+  name
+  size, glow, notify
+```
+
+Conditions live in a table per category, as typed columns. There is no shared condition table, no
+`type` discriminator, and no polymorphic value column.
+
+This is the most important decision in the document. A generic condition bag cannot be understood
+without reading the evaluator, and this codebase has already paid for that kind of cleverness once.
+Adding a condition means a migration, which is the correct signal that you changed what a rule can
+say.
 
 ```sql
 pokemon_rule
-  id, user_id, profile_id, name
+  rule_id
   iv_min, iv_max
   atk_min, atk_max,  def_min, def_max,  sta_min, sta_max
   level_min, level_max
@@ -50,42 +61,119 @@ pokemon_rule
   gender
   xxs, xxl
   great_min, great_max,  ultra_min, ultra_max,  master_min, master_max
-  pvp_target        -- species ids the PvP rank must belong to; null means any evolution
-  size, glow, notify
 ```
 
 ```sql
 nest_rule
-  id, user_id, profile_id, name
+  rule_id
   avg_min, avg_max          -- pokemon_avg, spawns per hour
-  size, glow, notify
 ```
 
 ```sql
 gym_rule
-  id, user_id, profile_id, name
-  raid_tier_min, raid_tier_max
+  rule_id
+  raid_levels int[]         -- egg tiers, gym.js `eggs`
   team
+  slots_min, slots_max      -- available_slots
   ex_eligible, ar_eligible, in_battle, has_badge
-  size, glow, notify
 ```
 
 ```sql
 station_rule
-  id, user_id, profile_id, name
-  battle_tier_min, battle_tier_max
-  max_battles, gmax_stationed, include_inactive
-  size, glow, notify
+  rule_id
+  battle_levels int[]       -- station.js `battleLevels`
+  gmax_stationed
+  include_inactive          -- default false; station_active is otherwise implied
 ```
 
-`pokestop_rule` is the most complex of the five and its exact columns need a pass during planning.
-Quest rewards alone span item, pokemon, candy, XL candy and mega energy, and each keys differently
-(`quest_reward_type` plus one of `quest_reward_item_id` or `quest_reward_pokemon`, per
-`server/src/filters/fort/pokestop.js:194-228`). Invasions key on grunt character ids and lures on
-lure type. Expect three sub-groups of columns rather than one flat set, and expect the sentence to
-read as three separate clauses.
+```sql
+pokestop_rule
+  rule_id
+  quests_enabled, invasions_enabled, lures_enabled, event_stops_enabled
 
-### Species and form selection is a set of pairs
+  -- quests. Reward species live in rule_species; these are the non-species parts.
+  quest_item_ids int[]           -- reward type 2
+  quest_reward_types int[]       -- type-only matches, pokestop.js `typeOnly`
+  quest_dust_amounts int[]       -- type 3, exact amounts
+  quest_xp_amounts int[]         -- type 1, exact amounts
+  quest_mega_amount_min, quest_mega_amount_max   -- types 12 and 20
+
+  -- invasions
+  exclude_grunts, exclude_leaders
+
+  -- lures
+  lure_ids int[]
+```
+
+Pokestop is the most complex of the five because quests, invasions and lures are three separate
+subsystems, and its sentence reads as three clauses rather than one.
+
+One capability is deliberately dropped. 1.x groups mega energy rewards by amount
+(`server/src/filters/fort/pokestop.js:210-219`, `megaByAmount.forEach((pokes, amt) => ...)`), so
+different species can carry different amount thresholds inside a single filter. Here the threshold
+is one range on the rule, applying to every mega species in it. Two thresholds means two rules. The
+table is much simpler and the case is believed rare.
+
+### Species references are one table
+
+Every category references species, and four of them already key on the same `<id>-<form>` pair:
+
+| category | reference | source |
+| --- | --- | --- |
+| pokemon | the spawn, plus the PvP evolution | `PokemonFilter`, `PvPRankEntry.pokemon` |
+| nest | the nesting species | `Nest.js:50` |
+| gym | the raid boss | `gym.js:117-123`, `parseIdFormPair` |
+| station | the max battle boss | `station.js:55-67`, `parseIdFormPair` |
+| pokestop | quest rewards and rocket rewards | `pokestop.js:194-228` |
+
+So species references are the most common thing in the schema, and they get one table:
+
+```sql
+rule_species
+  rule_id            -- FK to rule
+  role               -- see below
+  species_id
+  form_id            -- NULL means any form of this species
+  excluded           -- boolean, default false
+```
+
+```
+spawn            the pokemon that spawned
+nesting          the species nesting at this location
+pvp_target       the evolution a PvP rank belongs to
+raid_boss        gym
+battle_boss      station
+quest_candy      pokestop, quest_reward_type 4
+quest_encounter  pokestop, type 7
+quest_xl         pokestop, type 9
+quest_mega       pokestop, types 12 and 20
+rocket_reward    pokestop invasions
+```
+
+**This is normalisation, not the polymorphism rejected above.** In a polymorphic condition bag the
+columns change meaning per row: `num_min` is an IV on one row and a level on the next. Here they
+never do. `species_id` is always a species and `form_id` is always a form or "any". Only what the
+pair is for varies, and `role` names it explicitly.
+
+Every role names a concrete thing in the domain. There is no general purpose "subject" role, because
+"the pokemon that spawned" and "the species nesting here" are different concepts that happened to
+share a shape.
+
+**Why `excluded` is a column and not a role.** An exclusion has to know what it subtracts from. As a
+role it could only say "not this species, somewhere", so a pokestop rule filtering both encounter
+and candy rewards could not exclude a species from one without excluding it from both. As a column
+alongside the role it is exact:
+
+```
+(role='quest_encounter', species_id=129, excluded=true)   encounter rewards, but not Magikarp
+(role='spawn',           species_id=129, excluded=true)   spawns, but not Magikarp
+```
+
+**Read discipline.** Any query that forgets `excluded = false` silently inverts meaning. Exactly one
+function reads this table, and it returns included and excluded already separated. That predicate
+must not appear at a call site.
+
+### form_id NULL means any form
 
 The single most important correction made during this session. Storing `species int[]` alongside
 `forms int[]` describes a cross product: species {Rattata, Raticate} with forms {Alolan} means
@@ -93,31 +181,14 @@ Alolan Rattata and Alolan Raticate, and there is no way to express "normal Ratta
 Raticate". That is why 1.x keys on `${species}-${form}`. The composite key is the correct model, not
 legacy debt.
 
-```sql
-pokemon_rule_species
-  rule_id, species_id, form_id     -- form_id NULL means any form of this species
-
-nest_rule_species
-  rule_id, species_id, form_id
-```
-
 `NULL` earns its place twice. It is the common case, since "I want Larvitar" rarely means one
 specific Larvitar, and it means a form added to the game later is included automatically. A rule
 that enumerated every form at selection time goes quietly stale the next time a costume ships.
 
-Only pokemon and nest need this table. Gym and station select on numbers and booleans; pokestop
-selects on reward and character ids that are not species-form pairs.
+### Exclusions are rule local
 
-### Exclusions are per rule
-
-There is no hide treatment and no global blocklist. A rule carries its own exclusions:
-
-```sql
-pokemon_rule_species_excluded
-  rule_id, species_id, form_id
-```
-
-"IV 90 and above except Magikarp" is one rule that says exactly that, and it cannot affect any other
+There is no hide treatment and no global blocklist. Exclusions are rows on the rule that owns them,
+so "IV 90 and above except Magikarp" is one rule that says exactly that and cannot affect any other
 rule. A global hide acts at a distance: it silently subtracts from every rule in the list, and six
 months later nobody remembers why the shiny families filter has a hole in it.
 
@@ -143,8 +214,8 @@ something in it needs to be queried, matched against an entity, or reasoned abou
 graduates to a table. Deferring a decision is prudent when the exit condition is written down in
 advance and turns into rot when it is not.
 
-Routes are the most likely graduate. If they turn out to carry real conditions the way nests do, they
-get a table.
+Routes are the most likely graduate. If they turn out to carry real conditions the way nests did,
+they get a table.
 
 ## Evaluation
 
@@ -335,8 +406,11 @@ Recorded because the reasoning is the part that gets lost.
 
 Things deliberately left for the implementation plan rather than decided here.
 
-- `pokestop_rule`'s exact columns, given quests, invasions and lures are three sub systems.
 - Whether `gender`, `team` and similar single valued columns are integers or enums.
+- Whether invasion filtering needs more than `exclude_grunts` and `exclude_leaders`. 1.x narrows by
+  incident display type and confirms the specific reward in a second pass
+  (`server/src/filters/fort/pokestop.js:236-245`), so the `rocket_reward` role may want a companion
+  column for display type.
 - How the sentence renders a rule whose species selection is large. "25 Pokémon" with a peek is
   probably right, but that is a UI question.
 - Indexes. `(user_id, profile_id)` on every rule table is obvious; anything else waits for a real
