@@ -88,6 +88,18 @@ const { createLocalAccountIssuer } = require('better-auth/db')
  * @param {{ botToken: string }} options
  */
 function telegramPlugin(options) {
+  // An empty bot token makes the HMAC key sha256(""), a publicly computable
+  // constant, so anyone can self-sign a payload carrying any back-filled
+  // user's Telegram id and be handed a session. Throwing here, at
+  // construction, refuses to start the instance instead of accepting forged
+  // logins request after request until an operator notices.
+  if (!options.botToken) {
+    throw new Error(
+      'telegramPlugin requires a non-empty botToken; an empty token makes ' +
+        'the HMAC key a publicly computable constant, sha256(""), and lets ' +
+        'anyone self-sign a login for any linked Telegram account.',
+    )
+  }
   return {
     id: 'telegram',
     endpoints: {

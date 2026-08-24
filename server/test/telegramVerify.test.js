@@ -1,7 +1,7 @@
 // server/test/telegramVerify.test.js
 const { test, expect } = require('bun:test')
 const crypto = require('crypto')
-const { verifyTelegramLogin } = require('../src/auth/telegram')
+const { verifyTelegramLogin, telegramPlugin } = require('../src/auth/telegram')
 
 const BOT_TOKEN = '123456:ABC-DEF1234ghIkl-zyx57W2v1u123ew11'
 
@@ -65,4 +65,27 @@ test('rejects a payload with no hash', () => {
 test('rejects a payload with no auth_date', () => {
   const payload = sign({ id: '42', first_name: 'A' })
   expect(verifyTelegramLogin(payload, BOT_TOKEN).ok).toBe(false)
+})
+
+test('an empty bot token makes the HMAC key a publicly computable constant', () => {
+  // Demonstrates the defect verifyTelegramLogin itself does not guard
+  // against: with botToken '', anyone can self-sign a payload carrying any
+  // Telegram id and it verifies as authentic.
+  const forged = sign(
+    { id: '42', first_name: 'A', auth_date: String(now()) },
+    '',
+  )
+  expect(verifyTelegramLogin(forged, '').ok).toBe(true)
+})
+
+test('telegramPlugin refuses to construct with an empty bot token', () => {
+  expect(() => telegramPlugin({ botToken: '' })).toThrow()
+})
+
+test('telegramPlugin refuses to construct with no bot token at all', () => {
+  expect(() => telegramPlugin({})).toThrow()
+})
+
+test('telegramPlugin constructs fine with a real bot token', () => {
+  expect(() => telegramPlugin({ botToken: BOT_TOKEN })).not.toThrow()
 })
