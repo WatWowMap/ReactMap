@@ -11,7 +11,6 @@ const { Portal } = require('./Portal')
 const { PoI } = require('./PoI')
 const { Route } = require('./Route')
 const { ScanCell } = require('./ScanCell')
-const { Session } = require('./Session')
 const { Spawnpoint } = require('./Spawnpoint')
 const { Station } = require('./Station')
 const { Tappable } = require('./Tappable')
@@ -22,7 +21,6 @@ const rmModels = {
   Backup,
   Badge,
   NestSubmission,
-  Session,
   User,
 }
 

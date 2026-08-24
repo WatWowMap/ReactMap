@@ -10,6 +10,11 @@ const { scannerPerms, scannerCooldownBypass } = require('../utils/scannerPerms')
 const { mergePerms } = require('../utils/mergePerms')
 const { AuthClient } = require('./AuthClient')
 const { state } = require('./state')
+const {
+  revokeProviderAccess,
+  createRevocationDeps,
+} = require('../auth/revokeAccessAdapter')
+const { createRecomputeUserPerms } = require('../auth/recomputePermsOnSignIn')
 
 class DiscordClient extends AuthClient {
   /** @type {import('./AuthClient').ClientConstructor} */
@@ -27,6 +32,12 @@ class DiscordClient extends AuthClient {
       intents: ['GuildMessages', 'GuildMembers', 'Guilds'],
     })
 
+    // Lazy: constructing these opens no connection until a handler below
+    // actually fires, same reasoning as the sign-in hook they share
+    // `recompute` with.
+    const revocationDeps = createRevocationDeps()
+    const recompute = createRecomputeUserPerms()
+
     this.client.on('clientReady', (c) => {
       this.log.info(`Logged in as ${c.user?.tag || 'Unknown??'}!`)
       c.user.setPresence({
@@ -38,15 +49,16 @@ class DiscordClient extends AuthClient {
 
     this.client.on('guildMemberRemove', async (member) => {
       try {
-        await state.db.models.Session.clearDiscordSessions(
-          member.id,
-          this.client.user.username,
-        )
-        await state.db.models.User.clearPerms(
-          member.id,
-          'discord',
-          this.client.user.username,
-        )
+        const userId = await revocationDeps.lookupUserId('discord', member.id)
+        // No linked Better Auth account: never signed in through Discord, so
+        // there is nothing in `user_perms` or `auth_session` to revoke.
+        if (userId) {
+          await revokeProviderAccess(
+            userId,
+            'discord',
+            revocationDeps.revokeAccess,
+          )
+        }
       } catch (_e) {
         this.log.error(`Could not clear sessions for ${member.user.username}`)
       }
@@ -67,15 +79,15 @@ class DiscordClient extends AuthClient {
         .concat(rolesAfter.filter((x) => !rolesBefore.includes(x)))
       try {
         if (perms.includes(roleDiff[0])) {
-          await state.db.models.Session.clearDiscordSessions(
-            prev.user.id,
-            this.client.user.username,
-          )
-          await state.db.models.User.clearPerms(
-            prev.user.id,
+          // A role change may grant as well as revoke, so recomputing is
+          // more correct than deleting the row outright: authSession.js
+          // reads `user_perms` fresh on every request, so there is no stale
+          // session to separately clear once this write lands.
+          const userId = await revocationDeps.lookupUserId(
             'discord',
-            this.client.user.username,
+            prev.user.id,
           )
+          if (userId) await recompute(userId)
         }
       } catch (_e) {
         this.log.error(`Could not clear sessions for ${prev.user.username}`)

@@ -3,7 +3,12 @@ const { Logger, log } = require('@rm/logger')
 const config = require('@rm/config')
 
 const { Timer } = require('./Timer')
-const { state } = require('./state')
+const {
+  applyToUsersWithPermsFlag,
+  revokeProviderAccess,
+  createRevocationDeps,
+} = require('../auth/revokeAccessAdapter')
+const { createRecomputeUserPerms } = require('../auth/recomputePermsOnSignIn')
 
 class Trial extends Logger {
   /** @param {import("@rm/types").StrategyConfig} strategy  */
@@ -12,6 +17,10 @@ class Trial extends Logger {
 
     this._name = strategy.name
     this._type = strategy.type
+    // Lazy: constructing these opens no connection until start()/cleanup()
+    // actually fires a timer.
+    this._revocationDeps = createRevocationDeps()
+    this._recompute = createRecomputeUserPerms()
     /** @type {import("@rm/types").StrategyConfig['trialPeriod']} */
     this._trial = config.util.extendDeep(
       {
@@ -109,10 +118,38 @@ class Trial extends Logger {
     )
   }
 
+  // Trial ending removes access outright, so remove the row and revoke
+  // sessions, same as a Discord guild removal. Shared by the end timer and
+  // by cleanup(), which re-checks after the fact in case the timer's own
+  // run was missed (a restart during the window, for example).
+  async #revokeExpiredTrialAccess() {
+    return applyToUsersWithPermsFlag(this._type, 'trial', true, {
+      getUserPermsForProvider:
+        this._revocationDeps.bulkByFlag.getUserPermsForProvider,
+      apply: (userId) =>
+        revokeProviderAccess(
+          userId,
+          this._type,
+          this._revocationDeps.revokeAccess,
+        ),
+    })
+  }
+
   #getClearFn(start = false) {
     return async () => {
       this.log.info('is', start ? 'starting' : 'ending')
-      await state.db.models.Session.clearNonDonor(this._name)
+      if (start) {
+        // Trial starting is a gain, same as a Discord role change: a
+        // non-donor may now be eligible for trial-granted perms, so
+        // recomputing is more correct than revoking their session outright.
+        await applyToUsersWithPermsFlag(this._type, 'donor', false, {
+          getUserPermsForProvider:
+            this._revocationDeps.bulkByFlag.getUserPermsForProvider,
+          apply: this._recompute,
+        })
+      } else {
+        await this.#revokeExpiredTrialAccess()
+      }
       this._active = start
     }
   }
@@ -160,9 +197,9 @@ class Trial extends Logger {
 
   async cleanup() {
     if (!this.active()) {
-      const result = await state.db.models.Session.clearTrial(this._name)
-      if (result > 0) {
-        this.log.info('cleaned up', result, 'sessions')
+      const userIds = await this.#revokeExpiredTrialAccess()
+      if (userIds.length > 0) {
+        this.log.info('cleaned up', userIds.length, 'sessions')
       }
     }
   }
