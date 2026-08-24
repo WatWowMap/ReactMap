@@ -1,7 +1,7 @@
 // @ts-check
-import { useEffect } from 'react'
 
 import { useMemory } from '@store/useMemory'
+import { useEffect } from 'react'
 
 const cleanup = () =>
   useMemory.setState({ manualParams: { category: '', id: '' } })

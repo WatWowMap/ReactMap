@@ -2,5 +2,5 @@
 
 export * from './DevicePath'
 export * from './DevicePopup'
-export * from './deviceMarker'
 export * from './DeviceTile'
+export * from './deviceMarker'

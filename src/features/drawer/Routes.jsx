@@ -1,13 +1,13 @@
 // @ts-check
-import * as React from 'react'
+
+import { SliderTile } from '@components/inputs/SliderTile'
 import ListItem from '@mui/material/ListItem'
 import ListItemText from '@mui/material/ListItemText'
 import Switch from '@mui/material/Switch'
-import { useTranslation } from 'react-i18next'
-
 import { useMemory } from '@store/useMemory'
-import { useStorage, useDeepStore } from '@store/useStorage'
-import { SliderTile } from '@components/inputs/SliderTile'
+import { useDeepStore, useStorage } from '@store/useStorage'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 
 import { CollapsibleItem } from './components/CollapsibleItem'
 

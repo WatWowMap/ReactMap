@@ -1,7 +1,6 @@
 // @ts-check
-import * as React from 'react'
-import Dialog from '@mui/material/Dialog'
 
+import Dialog from '@mui/material/Dialog'
 import { useMemory } from '@store/useMemory'
 import { setMode, useWebhookStore } from '@store/useWebhookStore'
 

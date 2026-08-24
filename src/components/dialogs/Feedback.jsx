@@ -1,18 +1,17 @@
 // @ts-check
-import * as React from 'react'
+
 import Create from '@mui/icons-material/Create'
-import DialogContent from '@mui/material/DialogContent'
-import Typography from '@mui/material/Typography'
 import Button from '@mui/material/Button'
+import DialogContent from '@mui/material/DialogContent'
 import Divider from '@mui/material/Divider'
-import { useTranslation } from 'react-i18next'
-
-import { useMemory } from '@store/useMemory'
+import Typography from '@mui/material/Typography'
 import { useLayoutStore } from '@store/useLayoutStore'
-
-import { Header } from './Header'
-import { Footer } from './Footer'
+import { useMemory } from '@store/useMemory'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 import { DialogWrapper } from './DialogWrapper'
+import { Footer } from './Footer'
+import { Header } from './Header'
 
 export function Feedback() {
   const { t } = useTranslation()

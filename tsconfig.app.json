@@ -1,0 +1,15 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "exactOptionalPropertyTypes": true,
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitOverride": true,
+    "allowJs": false,
+    "paths": {
+      "@app/*": ["./app/*"]
+    }
+  },
+  "include": ["app/**/*.ts", "app/**/*.tsx"]
+}

@@ -1,31 +1,30 @@
 // @ts-check
 // TODO: Fix the types, somehow
 
-import * as React from 'react'
+import FeedIcon from '@mui/icons-material/Feed'
+import OpacityIcon from '@mui/icons-material/Opacity'
+import RoomIcon from '@mui/icons-material/Room'
+import TipsAndUpdatesIcon from '@mui/icons-material/TipsAndUpdates'
+import TuneIcon from '@mui/icons-material/Tune'
 import DialogContent from '@mui/material/DialogContent'
 import Input from '@mui/material/Input'
 import List from '@mui/material/List'
 import ListItem from '@mui/material/ListItem'
 import ListItemText from '@mui/material/ListItemText'
-import Switch from '@mui/material/Switch'
 import ListSubheader from '@mui/material/ListSubheader'
-import { useTranslation } from 'react-i18next'
-import RoomIcon from '@mui/icons-material/Room'
-import FeedIcon from '@mui/icons-material/Feed'
-import OpacityIcon from '@mui/icons-material/Opacity'
-import TuneIcon from '@mui/icons-material/Tune'
-import TipsAndUpdatesIcon from '@mui/icons-material/TipsAndUpdates'
+import Switch from '@mui/material/Switch'
+import { getPermission } from '@services/desktopNotification'
+import { toggleDialog, useLayoutStore } from '@store/useLayoutStore'
 
 import { useMemory } from '@store/useMemory'
-import { toggleDialog, useLayoutStore } from '@store/useLayoutStore'
 import { setDeepStore, useDeepStore, useStorage } from '@store/useStorage'
-import { getPermission } from '@services/desktopNotification'
 import { analytics } from '@utils/analytics'
-import { getProperName, camelToSnake } from '@utils/strings'
-
-import { Header } from './Header'
-import { Footer } from './Footer'
+import { camelToSnake, getProperName } from '@utils/strings'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 import { DialogWrapper } from './DialogWrapper'
+import { Footer } from './Footer'
+import { Header } from './Header'
 
 const ICONS = {
   markers: RoomIcon,

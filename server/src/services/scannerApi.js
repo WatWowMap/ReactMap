@@ -1,5 +1,4 @@
 // @ts-check
-const { default: fetch } = require('node-fetch')
 
 const config = require('@rm/config')
 const { log, TAGS } = require('@rm/logger')
@@ -90,11 +89,10 @@ async function scannerApi(
       default:
         break
     }
-    const payloadObj =
-      /** @type {{ url: string, options: import('node-fetch').RequestInit }} */ ({
-        url: '',
-        options: {},
-      })
+    const payloadObj = /** @type {{ url: string, options: RequestInit }} */ ({
+      url: '',
+      options: {},
+    })
     switch (category) {
       case 'scanNext':
         state.stats.setScanHistory(user.id, coords.length)

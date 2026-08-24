@@ -176,10 +176,9 @@ class Gym extends Model {
     const teams = []
     const eggs = []
     const slots = []
-    const actualBadge =
-      onlyBadge && onlyBadge.startsWith('badge_')
-        ? +onlyBadge.replace('badge_', '')
-        : `${onlyBadge}`
+    const actualBadge = onlyBadge?.startsWith('badge_')
+      ? +onlyBadge.replace('badge_', '')
+      : `${onlyBadge}`
 
     const userBadges =
       onlyGymBadges && gymBadges && userId

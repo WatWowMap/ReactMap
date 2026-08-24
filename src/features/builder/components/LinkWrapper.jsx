@@ -1,7 +1,8 @@
 // @ts-check
+
+import Link from '@mui/material/Link'
 import * as React from 'react'
 import { Link as RouterLink } from 'react-router'
-import Link from '@mui/material/Link'
 
 /**
  * Wraps div in a link if the block has one, otherwise returns children

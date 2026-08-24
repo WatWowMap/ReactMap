@@ -178,6 +178,219 @@ alias. 2.0 gets a real landing page at `/`, the map at `/map`, and Poracle at it
 
 New surface — and public-facing copy, so it goes through the humanizer pass before shipping.
 
+### G16 — No obligation to any public surface except the data _(stated)_
+
+The only thing 2.0 owes anyone is **a migration path from the existing ReactMap tables**.
+Everything else that exists because it might be depended on can go.
+
+Concretely, all of this is now cut rather than preserved:
+
+- **Dynamic module loading by filepath.** `server/src/routes/api/index.js` does `fs.readdir` then
+  `require(resolve(...))` over a directory. A statically-typed codebase cannot see through that,
+  and it exists only so a file could be dropped in.
+- **The config surface as a compatibility contract.** No option needs to survive because someone
+  might be setting it.
+- **Configurable ReactMap table names.** Measured: **40 call sites** across 7 source files and
+  11 migration files. `userTableName` alone is read 25 times, plus `gymBadgeTableName` 7,
+  `backupTableName` 4, `sessionTableName` 3, `migrationTableName` 1. Table names become fixed.
+
+**What the one obligation actually requires.** Because those names were configurable, every
+existing deployment has tables called whatever its own config said. So the migration cannot
+simply assume canonical names: it has to read the operator's existing config, rename their
+tables to the canonical set, and only then hand over to a typed schema. That is a one-time
+migration that must run before anything else touches the database, and getting it wrong renames
+the wrong tables or misses them entirely. It deserves its own plan and its own tests against a
+non-default naming scheme, not a step buried inside another task.
+
+### G17 — uicons.js 3.x _(stated)_
+
+Currently pinned to 2.3.0. **Latest is 3.1.0**, not 3.0 as assumed. Breaking changes between the
+majors need reading before the render layer is built on it, since the icon resolver is load
+bearing for the atlas pipeline in the map spec.
+
+### G18 — Use the `pogo-masterfile` package _(stated)_
+
+Replaces the hand-rolled `packages/masterfile` and its 830 KB fetch.
+`pogo-masterfile` (Hazels-Lab) is on npm at **0.1.46**, described as a runtime API that loads,
+indexes and queries masterfile entries.
+
+**Flagging one risk, not objecting:** it is pre-1.0, so its API can still move. Verify it covers
+what `packages/masterfile` actually provides (invasions, quest reward types, forms, the rarity
+inputs) before the dependency becomes load bearing.
+
+### G19 — Drizzle replaces Knex and Objection _(stated)_
+
+Modern, TypeScript-first, which is the point: the schema becomes types rather than runtime
+strings.
+
+The surface is smaller than it looks. Golbat-only deletes every scanner model, so Drizzle only
+has to cover ReactMap's own tables: users, sessions, badges, nest submissions, the new filter
+and preference tables, and the manual-database nests and portals.
+
+**G16 is a prerequisite, not merely adjacent.** A statically-typed schema and config-driven
+table names are mutually exclusive: Drizzle's table definitions are compile-time constants, so
+`config.getSafe('database.settings.userTableName')` cannot survive into it. Choosing Drizzle
+forces the table-name decision, and that decision was already made.
+
+### G20 — Drop multi-domain _(stated)_
+
+The audit already found it cosmetic: it skins the map per hostname and does not scope auth or
+permissions at all. Removes `getMapConfig(req)`, `multiDomainsObj`, the domain branch in
+`validateJsons`, and the per-domain config files. Measured: 10 `getMapConfig` references and 15
+`multiDomains` references.
+
+### G21 — No untyped baggage _(stated, and it is the umbrella)_
+
+**Measured 2026-08-23, and it is the number this goal is really about: 612 pre-existing type
+errors across 139 files.** Surfaced by running `tsc` against the repository for the first time
+ever, during the Foundation plan. The cause is that a `@ts-check` pragma forces per-file
+checking regardless of `checkJs: false`, and 531 files carry one while nothing has ever run the
+compiler. That debt is invisible today and becomes a wall the moment anyone widens the typecheck
+gate beyond `app/`. Any plan to convert existing source to TypeScript starts from 612, not zero.
+
+> "I don't want the fully typed codebase to have a ton of untyped baggage due to ReactMap 1.x
+> insane decisions."
+
+This is the principle the others are instances of. When something from 1.x resists typing, the
+default is to delete it rather than to write types that describe a shape nobody would choose.
+
+### G22 — Express is not a given _(stated as an option)_
+
+Bun ships a native HTTP server with first-class WebSocket support, which is exactly what the
+transport work needs and what Express does not have without `ws` bolted on. Hono and Elysia are
+the other candidates, both typed and both Bun-friendly.
+
+**The tension worth naming before this is decided.** The client-shape spec's strategy is
+greenfield client, greenfield data service, _strangle_ auth and config, because auth's value is
+accumulated behaviour nobody wrote down. Passport is Express-shaped, so dropping Express means
+rewriting the OAuth plumbing.
+
+The split is more favourable than that sounds. Passport handles the OAuth dance and session
+serialisation, roughly 500 lines across `authRouter`, the passport middleware and the three
+strategy files. The valuable part, permission computation and role merging and the trial state
+machine in `AuthClient` / `DiscordClient` / `TelegramClient` / `Trial`, is around 2,000 lines
+and is plain logic that does not care what served the request.
+
+So dropping Express costs the plumbing and keeps the knowledge. That is a real option rather
+than a contradiction, but it is a session 3 decision and should be made with the transport
+design in front of it, not now.
+
+### G23 — Passport is dead enough to plan around _(established, 2026-08-23)_
+
+Checked against the npm registry rather than assumed:
+
+| package            | latest | published      |                        |
+| ------------------ | ------ | -------------- | ---------------------- |
+| `passport-discord` | 0.1.4  | 2020-06-04     | **deprecated on npm**  |
+| `passport-local`   | 1.0.0  | **2014-03-08** | 12 years old           |
+| `passport`         | 0.7.0  | 2023-11-27     | frozen, not deprecated |
+| `better-auth`      | 1.7.1  | 2026-08-18     | actively shipping      |
+| `arctic`           | 3.7.0  | 2025-05-21     | **deprecated**         |
+| `lucia`            | 3.2.2  | 2024-10-20     | **deprecated**         |
+
+The core is frozen rather than dead, but the strategy ecosystem is gone, and strategies are what
+this project depends on. `package.json` already carries the proof: `passport-discord` points at
+a git fork because the published package is deprecated, and Telegram runs through a scoped fork.
+
+**This weakens the argument for keeping Express.** Part of the case for strangling auth rather
+than rewriting it was that passport is load-bearing infrastructure. If it is dead, the plumbing
+gets rewritten regardless, on a fork's schedule at whatever moment one breaks, rather than
+deliberately.
+
+**Better Auth is the candidate**, and it serves four goals at once: TypeScript-first (G21), a
+native Drizzle adapter (G19), framework-agnostic so it does not pin Express (G22), plus Discord
+OAuth and session management built in, which would also displace `express-session` and
+`express-mysql-session`.
+
+**The split is unchanged and it is the point.** It replaces plumbing, not knowledge. Role-to-
+permission mapping, guild and role checks, area restrictions and the trial state machine are
+bespoke and port across untouched: roughly 500 lines replaced against roughly 2,000 kept.
+
+Caveats worth carrying: better-auth is 1.x and moving fast, so expect churn. Migrating existing
+sessions and users into its schema is real work, though G16 already requires a rename pass over
+those tables, so it lands in the same migration rather than being a separate one.
+
+Note for whoever plans this: **Arctic and Lucia are both deprecated.** They are the obvious
+suggestions from memory and both are wrong.
+
+### G24 — Local auth becomes a first-class citizen _(stated)_
+
+Today it is an afterthought, and the audit measured exactly how much of one. There is **no
+password reset, no email, and no explicit registration**: a grep for reset, forgot, nodemailer
+or smtp across the whole repository returns nothing, and `LocalClient.authHandler` silently
+creates an account whenever the submitted username does not already exist, using the submitted
+password.
+
+**This is the root cause behind the 72-byte lockout, not a coincidence.** That bug was
+catastrophic rather than merely irritating because there is nothing to recover through. Fixing
+local auth properly retires a whole class of "locked out forever" outcomes instead of patching
+them one at a time.
+
+What first-class means here:
+
+- Registration is a deliberate act, not a side effect of a failed login.
+- A recovery path exists.
+- Linking and unlinking Discord and Telegram to a local account is supported in both directions.
+  Some of this exists in `LinkAccounts.jsx`; the audit found the Telegram path does not carry
+  badges and the `data` blob across on link while the Discord path does, so the two are not
+  symmetric today.
+
+**Open question, and it is the maintainer's call because it lands on every self-hoster:** does
+recovery go through email? Email means SMTP configuration and deliverability become an operator
+burden on an app that currently sends none. The alternatives are recovery through a linked
+Discord DM, which the bot could already do and which requires no new infrastructure, or
+operator-issued reset links. This decision shapes G25 as well, because a payment provider that
+knows only an email address cannot match a local-auth user who has none.
+
+### G25 — An entitlement API. ReactMap grants access, never handles money  *(stated)*
+
+**The scope boundary, stated first because it decides everything else:** ReactMap ships **no**
+payment integration. No Stripe, no Patreon, no Ko-fi, no SDK, no provider-specific webhook
+parsing, no signature verification, no prices, no currencies, no invoices, no subscription state
+machine, no dependency on any billing service. Anyone who wants that builds it themselves,
+outside ReactMap, and calls in.
+
+What ReactMap exposes is a generic, documented API that says: **this user has this permission
+until this time.** It does not know or care why. The same endpoint serves a donation processor,
+a Patreon sync, a Discord bot, a community reward, or an operator granting access by hand.
+
+That agnosticism is the feature. One mechanism, not one per funding model.
+
+**Vocabulary follows from it.** The API talks about entitlements and permissions and expiry. The
+word "payment" should not appear anywhere in the codebase.
+
+The pieces to build on already exist: `perms.donor` with five call sites, `clearNonDonor`,
+`donorOnly`, the trial machinery, and lookups by Discord and Telegram id in `api/v1/users.js`.
+
+What is missing or wrong today:
+
+- **No grant, revoke or query endpoint.** Only the trial machinery, and `api/v1/trial.js`
+  mutates state through `GET /start`, which no external caller should be asked to invoke.
+- **Authentication is one shared secret** compared with `!==` rather than a constant-time
+  comparison, and the same secret gates a route with raw SQL interpolation. Scoped, rotatable,
+  per-integration API keys instead.
+- **Idempotency.** Retries are a fact of any webhook sender's life. Granting twice must not
+  extend twice.
+- **Identity matching is the hard part.** An external caller knows an email address or a Discord
+  id; ReactMap knows its own user ids and whatever accounts happen to be linked. The Discord and
+  Telegram lookups cover part of it, and G24's answer on email decides the rest.
+
+**A stable contract raises the bar, and this is the trade being made deliberately.** Because
+third parties will build against it, the API cannot be casually reshaped later and its
+authentication has to hold up against integrations whose code quality ReactMap does not control.
+That is a real ongoing obligation, accepted on purpose.
+
+**Not a contradiction with G16.** G16 refuses to preserve surface that became public by
+accident: dynamic file loading, config keys, table names nobody designed as an interface. This
+is a designed, documented, versioned interface. Deliberate is the opposite of accidental.
+
+**This depends on a defect the audit already found, and cannot ship without it.** Permissions
+are computed once at login and frozen into the session; revocation never reaches a live session,
+and `mergePerms` OR-merges booleans so a once-true permission cannot be revoked by a later
+merge. An entitlement API that can grant but not revoke is worse than no API at all. The
+permission model has to become live-computed, or gain an explicit per-provider invalidation
+hook, before this is safe to expose.
+
 ---
 
 ## 3. Constraints
@@ -237,5 +450,7 @@ Recorded so they do not get re-litigated:
 - **Not preserving multi-domain as a tenancy boundary.** It skins the map per host and does
   not scope auth or permissions. Keep the skinning; stop implying isolation.
 - **Not "no database".** See G5.
+- **Not preserving any public surface except the data.** See G16. The migration path from existing tables is the whole obligation.
+- **Not keeping config-driven table names.** They are incompatible with a typed schema.
 - **Not a multi-provider webhook abstraction.** G14 — it was built for backends that never arrived.
 - **Not a component library swap in place.** G13 lands with the greenfield client, not as a 204-file migration on 1.x.

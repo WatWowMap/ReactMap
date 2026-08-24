@@ -1,13 +1,14 @@
 // @ts-check
-import * as React from 'react'
-import { TileLayer, useMap } from 'react-leaflet'
-import { useTranslation } from 'react-i18next'
-import { control } from 'leaflet'
-import { useStorage } from '@store/useStorage'
+
+import { Notification } from '@components/Notification'
 import { useLocationError } from '@hooks/useLocationError'
 import { useStopFollowingOnFly } from '@hooks/useStopFollowingOnFly'
-import { Notification } from '@components/Notification'
+import { useStorage } from '@store/useStorage'
 import { RecoveringLocateControl } from '@utils/locateControl'
+import { control } from 'leaflet'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
+import { TileLayer, useMap } from 'react-leaflet'
 
 import { useTileLayer } from '../hooks/useTileLayer'
 

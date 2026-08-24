@@ -1,14 +1,13 @@
 // @ts-check
 /* eslint-disable react/destructuring-assignment */
+
+import { ErrorBoundary } from '@components/ErrorBoundary'
+import { basicEqualFn, useMemory } from '@store/useMemory'
 import * as React from 'react'
 import { Marker, Popup } from 'react-leaflet'
-
-import { basicEqualFn, useMemory } from '@store/useMemory'
-import { ErrorBoundary } from '@components/ErrorBoundary'
-
-import { deviceMarker } from './deviceMarker'
 import { DevicePath } from './DevicePath'
 import { DevicePopup } from './DevicePopup'
+import { deviceMarker } from './deviceMarker'
 
 /**
  *

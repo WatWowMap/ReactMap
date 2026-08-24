@@ -1,25 +1,24 @@
 // @ts-check
 
-import * as React from 'react'
 import Menu from '@mui/icons-material/Menu'
 import Settings from '@mui/icons-material/Settings'
 import TuneIcon from '@mui/icons-material/Tune'
-import Grid from '@mui/material/Unstable_Grid2'
-import Fab from '@mui/material/Fab'
+import DialogContent from '@mui/material/DialogContent'
 import Divider from '@mui/material/Divider'
+import Fab from '@mui/material/Fab'
 import List from '@mui/material/List'
 import ListItem from '@mui/material/ListItem'
+import ListItemButton from '@mui/material/ListItemButton'
 import ListItemIcon from '@mui/material/ListItemIcon'
 import ListItemText from '@mui/material/ListItemText'
-import ListItemButton from '@mui/material/ListItemButton'
 import Switch from '@mui/material/Switch'
-import DialogContent from '@mui/material/DialogContent'
 import Typography from '@mui/material/Typography'
-import { useTranslation } from 'react-i18next'
-
-import { useMemory } from '@store/useMemory'
+import Grid from '@mui/material/Unstable_Grid2'
 import { toggleDialog } from '@store/useLayoutStore'
+import { useMemory } from '@store/useMemory'
 import { camelToSnake } from '@utils/strings'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 
 import { tutorialData } from './data'
 

@@ -1,11 +1,10 @@
 // @ts-check
 
-import { useTranslation } from 'react-i18next'
-
 import { useMemory } from '@store/useMemory'
 import { useGetDeepStore, useStorage } from '@store/useStorage'
-import { useEffect } from 'react'
 import { useWebhookStore } from '@store/useWebhookStore'
+import { useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
 
 const filteringPokemon = [
   'pokemon',

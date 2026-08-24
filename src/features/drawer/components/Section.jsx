@@ -1,26 +1,25 @@
 // @ts-check
-import * as React from 'react'
+
+import { BasicListButton } from '@components/inputs/BasicListButton'
+import { BoolToggle } from '@components/inputs/BoolToggle'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import SettingsIcon from '@mui/icons-material/Settings'
 import TuneIcon from '@mui/icons-material/Tune'
-import Typography from '@mui/material/Typography'
 import Accordion from '@mui/material/Accordion'
-import AccordionSummary from '@mui/material/AccordionSummary'
 import AccordionDetails from '@mui/material/AccordionDetails'
+import AccordionSummary from '@mui/material/AccordionSummary'
 import List from '@mui/material/List'
-import { useTranslation } from 'react-i18next'
-
-import { useMemory } from '@store/useMemory'
+import Typography from '@mui/material/Typography'
 import { toggleDialog, useLayoutStore } from '@store/useLayoutStore'
+import { useMemory } from '@store/useMemory'
 import { useStorage } from '@store/useStorage'
-import { BasicListButton } from '@components/inputs/BasicListButton'
-import { BoolToggle } from '@components/inputs/BoolToggle'
 import { camelToSnake } from '@utils/strings'
-
-import { Settings } from '../settings'
-import { PokemonDrawerMemo } from '../pokemon'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 import { AreaSection } from '../areas'
 import { Extras } from '../Extras'
+import { PokemonDrawerMemo } from '../pokemon'
+import { Settings } from '../settings'
 
 const ADV_CATEGORIES = new Set([
   'pokemon',
@@ -84,7 +83,6 @@ const DrawerSection = ({ category }) => {
                     (subItem === 'sliders' || subItem === 'active')
                   ) && (
                     <BoolToggle
-                      // @ts-ignore
                       field={`filters.${
                         hasSubSubCategories ? subItem : category
                       }.${hasSubSubCategories ? 'enabled' : subItem}`}

@@ -1,7 +1,7 @@
 // @ts-check
-import { useEffect } from 'react'
 
 import { setLongTimeout } from '@utils/setLongTimeout'
+import { useEffect } from 'react'
 
 /**
  *

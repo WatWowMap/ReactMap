@@ -1,4 +1,4 @@
-const { mock } = require('node:test')
+const { mock } = require('bun:test')
 
 const { EventManager } = require('../src/services/EventManager')
 
@@ -10,9 +10,8 @@ const state = {
   event: new EventManager(),
 }
 
-mock.module(require.resolve('../src/services/state'), {
-  cache: true,
-  namedExports: { state },
-})
+mock.module(require.resolve('../src/services/state'), () => ({
+  state,
+}))
 
 module.exports = { state }

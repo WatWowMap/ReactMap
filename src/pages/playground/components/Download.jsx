@@ -1,9 +1,9 @@
 // @ts-check
-import * as React from 'react'
-import MenuItem from '@mui/material/MenuItem'
+
+import DownloadIcon from '@mui/icons-material/Download'
 import ListItemIcon from '@mui/material/ListItemIcon'
 import ListItemText from '@mui/material/ListItemText'
-import DownloadIcon from '@mui/icons-material/Download'
+import MenuItem from '@mui/material/MenuItem'
 import { useTranslation } from 'react-i18next'
 
 import { handleDownload, usePlayStore } from '../hooks/store'

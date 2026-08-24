@@ -1,9 +1,8 @@
 // @ts-check
 import * as React from 'react'
-
+import { ActiveNests } from './ActiveNests'
 import { NestSlider } from './AvgSlider'
 import { NestQuickSelect } from './NestSelector'
-import { ActiveNests } from './ActiveNests'
 
 function BaseNestDrawer({ subItem }) {
   switch (subItem) {

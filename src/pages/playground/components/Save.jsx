@@ -1,13 +1,13 @@
 // @ts-check
-import * as React from 'react'
-import MenuItem from '@mui/material/MenuItem'
+
+import { useMutation } from '@apollo/client'
+import SaveIcon from '@mui/icons-material/Save'
 import ListItemIcon from '@mui/material/ListItemIcon'
 import ListItemText from '@mui/material/ListItemText'
-import SaveIcon from '@mui/icons-material/Save'
-import { useMutation } from '@apollo/client'
-import { useTranslation } from 'react-i18next'
-
+import MenuItem from '@mui/material/MenuItem'
 import { SAVE_COMPONENT } from '@services/queries/config'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 
 import { usePlayStore } from '../hooks/store'
 

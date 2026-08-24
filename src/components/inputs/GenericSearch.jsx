@@ -1,11 +1,11 @@
 // @ts-check
+
+import HighlightOffIcon from '@mui/icons-material/HighlightOff'
+import IconButton from '@mui/material/IconButton'
+import TextField from '@mui/material/TextField'
+import { useDeepStore } from '@store/useStorage'
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import TextField from '@mui/material/TextField'
-import IconButton from '@mui/material/IconButton'
-import HighlightOffIcon from '@mui/icons-material/HighlightOff'
-
-import { useDeepStore } from '@store/useStorage'
 
 /**
  * @typedef {{

@@ -1,10 +1,10 @@
 // @ts-check
-import * as React from 'react'
-import Grid from '@mui/material/Unstable_Grid2'
-import Divider from '@mui/material/Divider'
 
-import { LocationMemo } from './Location'
+import Divider from '@mui/material/Divider'
+import Grid from '@mui/material/Unstable_Grid2'
+import * as React from 'react'
 import { HumanArea } from './area'
+import { LocationMemo } from './Location'
 import { Status } from './status'
 
 const BaseHuman = () => (

@@ -1,15 +1,15 @@
 // @ts-check
-import * as React from 'react'
-import { useTranslation } from 'react-i18next'
-import MenuItem from '@mui/material/MenuItem'
-import Typography from '@mui/material/Typography'
+
+import CheckIcon from '@mui/icons-material/Check'
+import ClearIcon from '@mui/icons-material/Clear'
 import PermIdentityIcon from '@mui/icons-material/PermIdentity'
 import PrecisionManufacturingIcon from '@mui/icons-material/PrecisionManufacturing'
 import RuleIcon from '@mui/icons-material/Rule'
-import ClearIcon from '@mui/icons-material/Clear'
-import CheckIcon from '@mui/icons-material/Check'
-
+import MenuItem from '@mui/material/MenuItem'
+import Typography from '@mui/material/Typography'
 import { useStorage } from '@store/useStorage'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 
 import { FCSelect } from './FCSelect'
 

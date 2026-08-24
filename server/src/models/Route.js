@@ -139,7 +139,7 @@ class Route extends Model {
       .max('duration_seconds AS max_duration')
       .first()
 
-    // @ts-ignore // shrug, I think we would TS to make this actually work
+    // @ts-expect-error // shrug, I think we would TS to make this actually work
     return result
   }
 }

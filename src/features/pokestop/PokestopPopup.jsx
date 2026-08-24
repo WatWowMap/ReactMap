@@ -1,54 +1,54 @@
 // @ts-check
-import * as React from 'react'
-import ExpandMore from '@mui/icons-material/ExpandMore'
-import MoreVert from '@mui/icons-material/MoreVert'
-import Divider from '@mui/material/Divider'
-import Box from '@mui/material/Box'
-import Grid from '@mui/material/Unstable_Grid2'
-import IconButton from '@mui/material/IconButton'
-import Collapse from '@mui/material/Collapse'
-import Typography from '@mui/material/Typography'
-import Check from '@mui/icons-material/Check'
-import Help from '@mui/icons-material/Help'
-import { useTranslation, Trans } from 'react-i18next'
-import { useTheme } from '@mui/material/styles'
 
 import { ErrorBoundary } from '@components/ErrorBoundary'
+import { Img } from '@components/Img'
+import { BackgroundCard } from '@components/popups/BackgroundCard'
+import { Coords } from '@components/popups/Coords'
+import { Dropdown } from '@components/popups/Dropdown'
+import { HeaderImage } from '@components/popups/HeaderImage'
+import { NameTT } from '@components/popups/NameTT'
+import { Navigation } from '@components/popups/Navigation'
+import { PowerUp } from '@components/popups/PowerUp'
+import { Timer } from '@components/popups/Timer'
+import { TimeStamp } from '@components/popups/TimeStamps'
+import { TimeTile } from '@components/popups/TimeTile'
+import { Title } from '@components/popups/Title'
+import { useAnalytics } from '@hooks/useAnalytics'
+import { useGetAvailable } from '@hooks/useGetAvailable'
+import {
+  usePokemonBackgroundVisual,
+  usePokemonBackgroundVisuals,
+} from '@hooks/usePokemonBackgroundVisuals'
+import { useTranslateById } from '@hooks/useTranslateById'
+import Check from '@mui/icons-material/Check'
+import ExpandMore from '@mui/icons-material/ExpandMore'
+import Help from '@mui/icons-material/Help'
+import MoreVert from '@mui/icons-material/MoreVert'
+import Box from '@mui/material/Box'
+import Collapse from '@mui/material/Collapse'
+import Divider from '@mui/material/Divider'
+import IconButton from '@mui/material/IconButton'
+import { useTheme } from '@mui/material/styles'
+import Typography from '@mui/material/Typography'
+import Grid from '@mui/material/Unstable_Grid2'
 import { useMemory } from '@store/useMemory'
 import { setDeepStore, useStorage } from '@store/useStorage'
 import { getBadge } from '@utils/getBadge'
-import { getRewardInfo } from '@utils/getRewardInfo'
 import { getGruntReward } from '@utils/getGruntReward'
-import { Dropdown } from '@components/popups/Dropdown'
-import { TimeTile } from '@components/popups/TimeTile'
-import { Navigation } from '@components/popups/Navigation'
-import { Coords } from '@components/popups/Coords'
-import { Title } from '@components/popups/Title'
-import { HeaderImage } from '@components/popups/HeaderImage'
-import { Timer } from '@components/popups/Timer'
-import { PowerUp } from '@components/popups/PowerUp'
-import { NameTT } from '@components/popups/NameTT'
-import { TimeStamp } from '@components/popups/TimeStamps'
-import { BackgroundCard } from '@components/popups/BackgroundCard'
-import { useAnalytics } from '@hooks/useAnalytics'
-import { useGetAvailable } from '@hooks/useGetAvailable'
+import { getRewardInfo } from '@utils/getRewardInfo'
 import { parseQuestConditions } from '@utils/parseConditions'
-import { Img } from '@components/Img'
 import { readableProbability } from '@utils/readableProbability'
 import { getShowcaseBuddyLabelKey } from '@utils/showcaseFocus'
-import { useTranslateById } from '@hooks/useTranslateById'
+import * as React from 'react'
+import { Trans, useTranslation } from 'react-i18next'
 import {
-  usePokemonBackgroundVisuals,
-  usePokemonBackgroundVisual,
-} from '@hooks/usePokemonBackgroundVisuals'
-import { resolveShowcaseEventIcon } from './resolveShowcaseEventIcon'
-import {
-  INCIDENT_DISPLAY_TYPES,
   getEventIncidentPriority,
   getIncidentBlockReason,
   getInvasionIncidentPriority,
+  INCIDENT_DISPLAY_TYPES,
   isIncidentBlockedBy,
 } from './incidentPriority'
+import { resolveShowcaseEventIcon } from './resolveShowcaseEventIcon'
 import {
   getEnabledRocketPokemonFilterKeys,
   isRocketPokemonFilterExcluded,
@@ -205,42 +205,39 @@ export function PokestopPopup({
                   />
                 </>
               )}
-              {hasInvasion && (
-                <>
-                  {popupInvasions.map((invasion, index) => (
-                    <React.Fragment
-                      key={`${invasion.grunt_type}-${invasion.incident_expire_timestamp}`}
+              {hasInvasion &&
+                popupInvasions.map((invasion, index) => (
+                  <React.Fragment
+                    key={`${invasion.grunt_type}-${invasion.incident_expire_timestamp}`}
+                  >
+                    {index || hasQuest || hasLure ? (
+                      <Divider light flexItem className="popup-divider" />
+                    ) : null}
+                    <TimeTile
+                      expandKey={`i${invasion.grunt_type}`}
+                      expireTime={invasion.incident_expire_timestamp}
+                      icon={Icons.getInvasions(
+                        invasion.grunt_type,
+                        invasion.confirmed,
+                      )}
+                      disabled={
+                        isIncidentBlockedBy(
+                          incidentBlocker,
+                          getInvasionIncidentPriority(invasion),
+                        )
+                          ? incidentBlockReason
+                          : ''
+                      }
+                      tt={
+                        invasion.grunt_type === 44 && !invasion.confirmed
+                          ? [`grunt_a_${invasion.grunt_type}`, ' / ', 'decoy']
+                          : `grunt_a_${invasion.grunt_type}`
+                      }
                     >
-                      {index || hasQuest || hasLure ? (
-                        <Divider light flexItem className="popup-divider" />
-                      ) : null}
-                      <TimeTile
-                        expandKey={`i${invasion.grunt_type}`}
-                        expireTime={invasion.incident_expire_timestamp}
-                        icon={Icons.getInvasions(
-                          invasion.grunt_type,
-                          invasion.confirmed,
-                        )}
-                        disabled={
-                          isIncidentBlockedBy(
-                            incidentBlocker,
-                            getInvasionIncidentPriority(invasion),
-                          )
-                            ? incidentBlockReason
-                            : ''
-                        }
-                        tt={
-                          invasion.grunt_type === 44 && !invasion.confirmed
-                            ? [`grunt_a_${invasion.grunt_type}`, ' / ', 'decoy']
-                            : `grunt_a_${invasion.grunt_type}`
-                        }
-                      >
-                        <Invasion {...invasion} />
-                      </TimeTile>
-                    </React.Fragment>
-                  ))}
-                </>
-              )}
+                      <Invasion {...invasion} />
+                    </TimeTile>
+                  </React.Fragment>
+                ))}
               {hasEvent && (
                 <>
                   {(hasQuest || hasLure || hasInvasion) && (
@@ -562,9 +559,9 @@ const RewardInfo = ({ with_ar, ...quest }) => {
           style={{ maxWidth: 35, maxHeight: 35 }}
           alt={altText}
           onError={(e) => {
-            // @ts-ignore
+            // @ts-expect-error
             e.target.onerror = null
-            // @ts-ignore
+            // @ts-expect-error
             e.target.src =
               'https://raw.githubusercontent.com/WatWowMap/wwm-uicons-webp/main/misc/0.webp'
           }}

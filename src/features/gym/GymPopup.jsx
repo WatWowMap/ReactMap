@@ -1,42 +1,42 @@
 // @ts-check
-import * as React from 'react'
-import ExpandMore from '@mui/icons-material/ExpandMore'
-import MoreVert from '@mui/icons-material/MoreVert'
-import Grid from '@mui/material/Unstable_Grid2'
-import IconButton from '@mui/material/IconButton'
-import Menu from '@mui/material/Menu'
-import Box from '@mui/material/Box'
-import MenuItem from '@mui/material/MenuItem'
-import Divider from '@mui/material/Divider'
-import Collapse from '@mui/material/Collapse'
-import Typography from '@mui/material/Typography'
-import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew'
-import ShieldIcon from '@mui/icons-material/Shield'
-import FavoriteIcon from '@mui/icons-material/Favorite'
-import EmojiEventsIcon from '@mui/icons-material/EmojiEvents'
-import SentimentVeryDissatisfiedIcon from '@mui/icons-material/SentimentVeryDissatisfied'
-import RestaurantIcon from '@mui/icons-material/Restaurant'
-import { useTranslation } from 'react-i18next'
-import { useTheme } from '@mui/material/styles'
 
-import { useSyncData } from '@features/webhooks'
-import { useMemory } from '@store/useMemory'
-import { useLayoutStore } from '@store/useLayoutStore'
-import { setDeepStore, useStorage } from '@store/useStorage'
 import { ErrorBoundary } from '@components/ErrorBoundary'
 import { Img } from '@components/Img'
-import { Title } from '@components/popups/Title'
-import { PowerUp } from '@components/popups/PowerUp'
+import { BackgroundCard } from '@components/popups/BackgroundCard'
+import { Coords } from '@components/popups/Coords'
 import { GenderIcon } from '@components/popups/GenderIcon'
 import { Navigation } from '@components/popups/Navigation'
-import { Coords } from '@components/popups/Coords'
+import { PowerUp } from '@components/popups/PowerUp'
 import { TimeStamp } from '@components/popups/TimeStamps'
-import { BackgroundCard } from '@components/popups/BackgroundCard'
+import { Title } from '@components/popups/Title'
+import { useSyncData } from '@features/webhooks'
 import { useAnalytics } from '@hooks/useAnalytics'
-import { getTimeUntil } from '@utils/getTimeUntil'
-import { formatInterval } from '@utils/formatInterval'
 import { usePokemonBackgroundVisuals } from '@hooks/usePokemonBackgroundVisuals'
+import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew'
+import EmojiEventsIcon from '@mui/icons-material/EmojiEvents'
+import ExpandMore from '@mui/icons-material/ExpandMore'
+import FavoriteIcon from '@mui/icons-material/Favorite'
+import MoreVert from '@mui/icons-material/MoreVert'
+import RestaurantIcon from '@mui/icons-material/Restaurant'
+import SentimentVeryDissatisfiedIcon from '@mui/icons-material/SentimentVeryDissatisfied'
+import ShieldIcon from '@mui/icons-material/Shield'
+import Box from '@mui/material/Box'
+import Collapse from '@mui/material/Collapse'
+import Divider from '@mui/material/Divider'
+import IconButton from '@mui/material/IconButton'
+import Menu from '@mui/material/Menu'
+import MenuItem from '@mui/material/MenuItem'
+import { useTheme } from '@mui/material/styles'
+import Typography from '@mui/material/Typography'
+import Grid from '@mui/material/Unstable_Grid2'
+import { useLayoutStore } from '@store/useLayoutStore'
+import { useMemory } from '@store/useMemory'
+import { setDeepStore, useStorage } from '@store/useStorage'
+import { formatInterval } from '@utils/formatInterval'
 import { getFormDisplay } from '@utils/getFormDisplay'
+import { getTimeUntil } from '@utils/getTimeUntil'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 
 import { useWebhook } from './useWebhook'
 
@@ -87,6 +87,7 @@ function DefenderRowLayout({
   const Icons = useMemory((s) => s.Icons)
   const bestBuddySrc = Icons?.getMisc('bestbuddy')
   return (
+    // biome-ignore lint/a11y/useAriaPropsSupportedByRole: aria-label on a plain div is used as a tooltip label here
     <div
       style={{
         display: 'flex',
@@ -533,6 +534,7 @@ function DefendersModal({ gym, onClose }) {
                       />
                       {/* Heart cracks for rounds */}
                       <svg
+                        aria-hidden="true"
                         width={28}
                         height={28}
                         viewBox="0 0 28 28"

@@ -1,8 +1,8 @@
 // @ts-check
-import { useEffect, useMemo, useRef } from 'react'
-import { useQuery } from '@apollo/client'
 
+import { useQuery } from '@apollo/client'
 import { GET_STATION_POKEMON } from '@services/queries/station'
+import { useEffect, useMemo, useRef } from 'react'
 
 /**
  * @param {string} id

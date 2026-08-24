@@ -1,10 +1,10 @@
 // @ts-check
-import * as React from 'react'
+
+import { SliderTile } from '@components/inputs/SliderTile'
 import ListItem from '@mui/material/ListItem'
 
 import { useMemory } from '@store/useMemory'
-import { useStorage, setDeepStore } from '@store/useStorage'
-import { SliderTile } from '@components/inputs/SliderTile'
+import { setDeepStore, useStorage } from '@store/useStorage'
 import { analytics } from '@utils/analytics'
 
 /** @type {import('@rm/types').RMSliderHandleChange<keyof import('@rm/types').PokemonFilter>} */

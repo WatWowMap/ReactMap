@@ -3,14 +3,13 @@
 import * as React from 'react'
 import { Marker, Polyline, Popup, useMapEvents } from 'react-leaflet'
 import 'leaflet-arrowheads'
-import { darken } from '@mui/material/styles'
 
 import { useForcePopup } from '@hooks/useForcePopup'
 import { useManualPopupTracker } from '@hooks/useManualPopupTracker'
-
-import { routeMarker } from './routeMarker'
+import { darken } from '@mui/material/styles'
 import { ROUTE_MARKER_PANE } from './constants'
 import { RoutePopup } from './RoutePopup'
+import { routeMarker } from './routeMarker'
 
 const POSITIONS = /** @type {const} */ (['start', 'end'])
 
@@ -146,7 +145,7 @@ const BaseRouteTile = ({ route, orientation = 'forward' }) => {
         try {
           const group = arrowLine.getArrowheads()
           arrowheadsRef.current = group || null
-        } catch (error) {
+        } catch (_error) {
           arrowheadsRef.current = null
         }
       }

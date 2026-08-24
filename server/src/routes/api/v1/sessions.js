@@ -7,7 +7,7 @@ const { state } = require('../../../services/state')
 
 router.get('/', async (req, res) => {
   try {
-    const ts = Math.floor(new Date().getTime() / 1000)
+    const ts = Math.floor(Date.now() / 1000)
     res
       .status(200)
       .json(await state.db.models.Session.query().where('expires', '>=', ts))

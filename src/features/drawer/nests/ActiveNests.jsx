@@ -1,9 +1,7 @@
 // @ts-check
 
-import * as React from 'react'
-import ListItem from '@mui/material/ListItem'
-
 import { MultiSelectorStore } from '@components/inputs/MultiSelector'
+import ListItem from '@mui/material/ListItem'
 import { useStorage } from '@store/useStorage'
 import { CollapsibleItem } from '../components/CollapsibleItem'
 

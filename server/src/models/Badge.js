@@ -52,7 +52,6 @@ class Badge extends Model {
    * @param {number} userId
    */
   static async insert(badge, gymId, userId) {
-    // @ts-ignore
     if (
       await this.query()
         .where('gymId', gymId)
@@ -62,12 +61,12 @@ class Badge extends Model {
       await this.query()
         .where('gymId', gymId)
         .andWhere('userId', userId)
-        // @ts-ignore
+        // @ts-expect-error
         .update({ badge })
     } else {
-      // @ts-ignore
+      // @ts-expect-error
       await this.query().insert({
-        // @ts-ignore
+        // @ts-expect-error
         badge,
         gymId,
         userId,

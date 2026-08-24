@@ -1,8 +1,8 @@
 // @ts-check
-import { useCallback, useState } from 'react'
-import { useTranslation } from 'react-i18next'
 
 import { GEOLOCATION_ERROR_CODE } from '@utils/locateControl'
+import { useCallback, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 
 /**
  * Shared hook for handling location errors with toast notifications

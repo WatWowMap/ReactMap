@@ -1,9 +1,9 @@
 // @ts-check
-import { useEffect } from 'react'
-import { useTranslation } from 'react-i18next'
 
 import { useMemory } from '@store/useMemory'
 import { getWildFilterId } from '@utils/getWildFilterId'
+import { useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
 
 export function useGenPokemon() {
   const { t } = useTranslation()

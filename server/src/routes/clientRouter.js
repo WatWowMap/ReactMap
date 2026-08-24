@@ -23,7 +23,7 @@ const CLIENT_ROUTES = [
   '/error/:message',
 ]
 
-clientRouter.get(CLIENT_ROUTES, (req, res) => {
+clientRouter.get(CLIENT_ROUTES, (_req, res) => {
   res.sendFile(
     path.join(
       __dirname,

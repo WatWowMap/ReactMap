@@ -1,0 +1,12 @@
+@import 'tailwindcss';
+
+@theme {
+  --font-display: 'Fredoka', ui-sans-serif, system-ui, sans-serif;
+  --font-sans: 'Nunito', ui-sans-serif, system-ui, sans-serif;
+
+  --color-accent-from: #7b5ce0;
+  --color-accent-to: #e067a8;
+
+  --radius-card: 1.125rem;
+  --radius-sheet: 1.25rem;
+}

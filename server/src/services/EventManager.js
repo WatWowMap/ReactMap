@@ -1,7 +1,6 @@
 // @ts-check
 const { promises: fs } = require('fs')
 const path = require('path')
-const { default: fetch } = require('node-fetch')
 
 const config = require('@rm/config')
 const { Logger } = require('@rm/logger')
@@ -499,7 +498,7 @@ class EventManager extends Logger {
   /** @param {keyof EventManager['available']} category */
   addAvailable(category) {
     this.available[category].forEach((item) => {
-      if (!Number.isNaN(parseInt(item.charAt(0)))) {
+      if (!Number.isNaN(parseInt(item.charAt(0), 10))) {
         const [id, form] = item.split('-')
         const formId = form || '0'
         if (category === 'pokemon' && id === '132' && formId === '0') {

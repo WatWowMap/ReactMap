@@ -1,4 +1,5 @@
 import type { AdvCategories, Rarity } from '@rm/types'
+
 import mfjson = require('./data/masterfile.json')
 
 export interface MasterfileForm {
@@ -29,6 +30,7 @@ export interface MasterfilePokemon {
   rarity?: string
   historic?: string
   tempEvolutions?: {
+    // biome-ignore lint/complexity/noBannedTypes: index signature intentionally accepts any non-nullish value
     [evolutionId: string]: {}
   }
 }

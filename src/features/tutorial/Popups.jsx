@@ -1,13 +1,12 @@
 // @ts-check
-import React from 'react'
+
+import { PokemonPopup } from '@features/pokemon'
 import DialogContent from '@mui/material/DialogContent'
 import Divider from '@mui/material/Divider'
 import Typography from '@mui/material/Typography'
 import Grid from '@mui/material/Unstable_Grid2'
-import { useTranslation } from 'react-i18next'
-
 import { useMemory } from '@store/useMemory'
-import { PokemonPopup } from '@features/pokemon'
+import { useTranslation } from 'react-i18next'
 
 import { tutorialData } from './data'
 
@@ -19,7 +18,7 @@ import { tutorialData } from './data'
 export function TutorialPopup({ isMobile }) {
   const { t } = useTranslation()
   const { startLat, startLon } = useMemory((s) => s.config.general)
-  const ts = Math.floor(new Date().getTime() / 1000)
+  const ts = Math.floor(Date.now() / 1000)
   const size = isMobile ? 'subtitle2' : 'subtitle1'
 
   return (

@@ -1,14 +1,14 @@
 // @ts-check
 /* eslint-disable react/destructuring-assignment */
-import * as React from 'react'
-import Box from '@mui/material/Box'
 
+import { Img } from '@components/Img'
 import { NameTT } from '@components/popups/NameTT'
+import { useTranslateById } from '@hooks/useTranslateById'
+import Box from '@mui/material/Box'
 import { useMemory } from '@store/useMemory'
 import { useStorage } from '@store/useStorage'
 import { getRewardInfo } from '@utils/getRewardInfo'
-import { useTranslateById } from '@hooks/useTranslateById'
-import { Img } from '@components/Img'
+import * as React from 'react'
 
 /** @param {Partial<import('@rm/types').Quest>} props */
 function QuestImage(props) {

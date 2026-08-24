@@ -1,9 +1,8 @@
 // @ts-check
 
+import { useFormatStore } from '@store/useFormatStore'
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-
-import { useFormatStore } from '@store/useFormatStore'
 
 /**
  * Hook that returns a periodically updating relative time string for a unix epoch (seconds).

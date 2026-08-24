@@ -1,30 +1,29 @@
 // @ts-check
 
-import React, { useState } from 'react'
+import { useMutation } from '@apollo/client'
+import { Header } from '@components/dialogs/Header'
 import KeyboardArrowLeft from '@mui/icons-material/KeyboardArrowLeft'
 import KeyboardArrowRight from '@mui/icons-material/KeyboardArrowRight'
 import Box from '@mui/material/Box'
-import Dialog from '@mui/material/Dialog'
-import useMediaQuery from '@mui/material/useMediaQuery'
-import DialogActions from '@mui/material/DialogActions'
 import Button from '@mui/material/Button'
+import Dialog from '@mui/material/Dialog'
+import DialogActions from '@mui/material/DialogActions'
 import MobileStepper from '@mui/material/MobileStepper'
 import Slide from '@mui/material/Slide'
 import { useTheme } from '@mui/material/styles'
-import { useTranslation } from 'react-i18next'
-import { useMutation } from '@apollo/client'
+import useMediaQuery from '@mui/material/useMediaQuery'
+import { Query } from '@services/queries'
 
 import { useMemory } from '@store/useMemory'
 import { useStorage } from '@store/useStorage'
-import { Query } from '@services/queries'
-import { Header } from '@components/dialogs/Header'
-
-import { TutorialWelcome } from './Welcome'
+import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { TutorialAdvanced } from './Advanced'
 import { TutorialClosing } from './Closing'
+import { TutorialPopup } from './Popups'
 import { TutorialSidebar } from './Sidebar'
 import { TutorialSliders } from './Sliders'
-import { TutorialPopup } from './Popups'
+import { TutorialWelcome } from './Welcome'
 
 const steps = ['intro', 'sidebar', 'sliders', 'advanced', 'popups', 'closing']
 

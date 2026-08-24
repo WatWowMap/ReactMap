@@ -1,7 +1,6 @@
 // @ts-check
-import * as React from 'react'
+
 import { useQuery } from '@apollo/client'
-import { useTranslation } from 'react-i18next'
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
 import CircularProgress from '@mui/material/CircularProgress'
@@ -9,21 +8,22 @@ import Paper from '@mui/material/Paper'
 import Table from '@mui/material/Table'
 import TableBody from '@mui/material/TableBody'
 import TableCell from '@mui/material/TableCell'
-import TableRow from '@mui/material/TableRow'
 import TableContainer from '@mui/material/TableContainer'
+import TableRow from '@mui/material/TableRow'
 import Typography from '@mui/material/Typography'
-
 import { Query } from '@services/queries'
+import { useMapStore } from '@store/useMapStore'
 import { useMemory } from '@store/useMemory'
 import { useStorage } from '@store/useStorage'
-import { useMapStore } from '@store/useMapStore'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 
 import { useDrawerScrollMemory } from '../hooks/useScrollMemory'
 
 /** @typedef {{ id: string, name: string, lat: number, lon: number }} JumpResult */
 
-import { AreaParent } from './Parent'
 import { AreaChild } from './Child'
+import { AreaParent } from './Parent'
 
 export function ScanAreasTable() {
   /** @type {import('@apollo/client').QueryResult<{ scanAreasMenu: import('@rm/types').Config['areas']['scanAreasMenu'][string] }>} */

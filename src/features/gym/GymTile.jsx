@@ -1,23 +1,22 @@
 /* eslint-disable react/destructuring-assignment */
 // @ts-check
-import * as React from 'react'
-import { Marker, Popup, Circle } from 'react-leaflet'
-import { t } from 'i18next'
 
-import { useMarkerTimer } from '@hooks/useMarkerTimer'
-import { basicEqualFn, useMemory } from '@store/useMemory'
-import { useStorage } from '@store/useStorage'
-import { useOpacity } from '@hooks/useOpacity'
+import { TooltipWrapper } from '@components/ToolTipWrapper'
+import { resolveRoutePoiKey, useRouteStore } from '@features/route'
 import { useForcePopup } from '@hooks/useForcePopup'
 import { useManualPopupTracker } from '@hooks/useManualPopupTracker'
+import { useMarkerTimer } from '@hooks/useMarkerTimer'
+import { useOpacity } from '@hooks/useOpacity'
 import { sendNotification } from '@services/desktopNotification'
-import { TooltipWrapper } from '@components/ToolTipWrapper'
-import { getTimeUntil } from '@utils/getTimeUntil'
+import { basicEqualFn, useMemory } from '@store/useMemory'
+import { useStorage } from '@store/useStorage'
 import { getFormDisplay } from '@utils/getFormDisplay'
-import { useRouteStore, resolveRoutePoiKey } from '@features/route'
-
-import { gymMarker } from './gymMarker'
+import { getTimeUntil } from '@utils/getTimeUntil'
+import { t } from 'i18next'
+import * as React from 'react'
+import { Circle, Marker, Popup } from 'react-leaflet'
 import { GymPopup } from './GymPopup'
+import { gymMarker } from './gymMarker'
 
 /** @param {number} team */
 const getColor = (team) => {

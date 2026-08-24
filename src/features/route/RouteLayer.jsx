@@ -1,18 +1,17 @@
 // @ts-check
-import * as React from 'react'
-import { Marker, useMap, useMapEvents } from 'react-leaflet'
-import { divIcon } from 'leaflet'
-import { t } from 'i18next'
 
 import { useStorage } from '@store/useStorage'
-
+import { t } from 'i18next'
+import { divIcon } from 'leaflet'
+import * as React from 'react'
+import { Marker, useMap, useMapEvents } from 'react-leaflet'
+import { ROUTE_MARKER_PANE } from './constants'
 import { RouteTile } from './RouteTile'
 import { routeMarker } from './routeMarker'
-import { ROUTE_MARKER_PANE } from './constants'
 import {
-  useRouteStore,
-  ROUTE_COORD_EPSILON,
   getRouteCoordKey,
+  ROUTE_COORD_EPSILON,
+  useRouteStore,
 } from './useRouteStore'
 
 const ACTIVE_Z_INDEX = 1800

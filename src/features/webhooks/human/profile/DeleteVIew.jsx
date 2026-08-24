@@ -1,15 +1,14 @@
 // @ts-check
-import * as React from 'react'
+
+import { useMutation } from '@apollo/client'
 import Clear from '@mui/icons-material/Clear'
 import Save from '@mui/icons-material/Save'
-import Typography from '@mui/material/Typography'
 import IconButton from '@mui/material/IconButton'
+import Typography from '@mui/material/Typography'
 import Grid from '@mui/material/Unstable_Grid2'
-import { useTranslation } from 'react-i18next'
-import { useMutation } from '@apollo/client'
-
 import { ALL_PROFILES, SET_PROFILE } from '@services/queries/webhook'
 import { useWebhookStore } from '@store/useWebhookStore'
+import { useTranslation } from 'react-i18next'
 
 import { handleUpdate } from './handleUpdate'
 

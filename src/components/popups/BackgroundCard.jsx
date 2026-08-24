@@ -1,20 +1,24 @@
 // @ts-check
-import * as React from 'react'
-import Tooltip from '@mui/material/Tooltip'
+
 import Box from '@mui/material/Box'
-import ThemeProvider from '@mui/material/styles/ThemeProvider'
 import { createTheme, useTheme } from '@mui/material/styles'
+import ThemeProvider from '@mui/material/styles/ThemeProvider'
+import Tooltip from '@mui/material/Tooltip'
+import * as React from 'react'
 
 const DARK_PALETTE_OVERRIDES = (() => {
   const dark = createTheme({ palette: { mode: 'dark' } }).palette
-  return Object.entries(dark).reduce((acc, [key, value]) => {
-    if (value && typeof value === 'object') {
-      acc[key] = { ...value }
-    } else {
-      acc[key] = value
-    }
-    return acc
-  }, /** @type {Record<string, unknown>} */ ({ mode: 'dark' }))
+  return Object.entries(dark).reduce(
+    (acc, [key, value]) => {
+      if (value && typeof value === 'object') {
+        acc[key] = { ...value }
+      } else {
+        acc[key] = value
+      }
+      return acc
+    },
+    /** @type {Record<string, unknown>} */ ({ mode: 'dark' }),
+  )
 })()
 
 /**
@@ -47,8 +51,7 @@ export function BackgroundCard({
 }) {
   const parentTheme = useTheme()
   const hasBackground = Boolean(visuals?.hasBackground)
-  const tooltipTitle =
-    tooltip ?? (visuals?.backgroundMeta && visuals.backgroundMeta.tooltip)
+  const tooltipTitle = tooltip ?? visuals?.backgroundMeta?.tooltip
   const iconStyles = visuals?.styles?.icon || {}
   const iconBaseColor =
     iconStyles && typeof iconStyles.color === 'string'

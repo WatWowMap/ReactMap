@@ -38,7 +38,7 @@ function deepCompare(a, b, first = true, changedKey = '') {
     const areEqual = reportArray.every((c) => c.areEqual) // Check if all elements are equal.
     const report = reportArray.map((c) => c.report)
     if (!areEqual) {
-      changed.push(...reportArray.map((c) => c.changed).flat())
+      changed.push(...reportArray.flatMap((c) => c.changed))
     }
 
     return { areEqual, report: first ? report : { areEqual, report }, changed }

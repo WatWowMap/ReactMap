@@ -1,13 +1,14 @@
 // @ts-check
-import * as React from 'react'
+
+import { FORT_LEVELS } from '@assets/constants'
+import { MultiSelectorStore } from '@components/inputs/MultiSelector'
 import Box from '@mui/material/Box'
 import ListItem from '@mui/material/ListItem'
 import ListItemText from '@mui/material/ListItemText'
-import { useTranslation } from 'react-i18next'
 
 import { useStorage } from '@store/useStorage'
-import { FORT_LEVELS } from '@assets/constants'
-import { MultiSelectorStore } from '@components/inputs/MultiSelector'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 
 import { CollapsibleItem } from './CollapsibleItem'
 import { SelectorListMemo } from './SelectorList'

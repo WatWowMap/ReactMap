@@ -1,14 +1,14 @@
 // @ts-check
-import * as React from 'react'
+
 import ListItem from '@mui/material/ListItem'
 import TextField from '@mui/material/TextField'
-import { useTranslation } from 'react-i18next'
-import dlv from 'dlv'
-
 import { useStorage } from '@store/useStorage'
-import { setDeep } from '@utils/setDeep'
 import { analytics } from '@utils/analytics'
 import { checkIVFilterValid } from '@utils/checkAdvFilter'
+import { setDeep } from '@utils/setDeep'
+import dlv from 'dlv'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 
 /**
  * Expert string input field for filters

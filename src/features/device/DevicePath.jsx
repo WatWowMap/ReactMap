@@ -1,9 +1,9 @@
 // @ts-check
 /* eslint-disable react/no-array-index-key */
-import * as React from 'react'
-import { Polyline, Polygon, Circle } from 'react-leaflet'
 
 import { useStorage } from '@store/useStorage'
+import * as React from 'react'
+import { Circle, Polygon, Polyline } from 'react-leaflet'
 
 /**
  *
@@ -45,6 +45,7 @@ const BaseDevicePath = ({ route, type, radius }) => {
   return type?.includes('circle')
     ? safeRoute.map((polygon, i) => (
         <Polyline
+          // biome-ignore lint/suspicious/noArrayIndexKey: pre-existing, tracked for follow-up
           key={i}
           positions={polygon.map((poly) => [poly.lat, poly.lon])}
           color={color}
@@ -52,6 +53,7 @@ const BaseDevicePath = ({ route, type, radius }) => {
       ))
     : safeRoute.map((polygon, i) => (
         <Polygon
+          // biome-ignore lint/suspicious/noArrayIndexKey: pre-existing, tracked for follow-up
           key={i}
           positions={polygon.map((poly) => [poly.lat, poly.lon])}
           color={color}

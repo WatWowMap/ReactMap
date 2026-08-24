@@ -1,8 +1,9 @@
 // @ts-check
-import * as React from 'react'
+
 import DialogContent from '@mui/material/DialogContent'
 import Divider from '@mui/material/Divider'
 import Typography from '@mui/material/Typography'
+import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 
 export function TutorialClosing() {

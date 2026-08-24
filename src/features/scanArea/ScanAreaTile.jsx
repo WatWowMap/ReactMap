@@ -1,12 +1,12 @@
 // @ts-check
 /* eslint-disable react/destructuring-assignment */
+
+import { useStorage } from '@store/useStorage'
+import { handleClick, useWebhookStore } from '@store/useWebhookStore'
+import { getProperName } from '@utils/strings'
+import { Polygon } from 'leaflet'
 import * as React from 'react'
 import { GeoJSON } from 'react-leaflet'
-import { Polygon } from 'leaflet'
-
-import { useWebhookStore, handleClick } from '@store/useWebhookStore'
-import { useStorage } from '@store/useStorage'
-import { getProperName } from '@utils/strings'
 
 /**
  *

@@ -60,7 +60,7 @@ class Device extends Model {
             ),
         )
       : await query.from('device')
-    // @ts-ignore
+    // @ts-expect-error
     return results.filter((device) => device.id && device.lat && device.lon)
   }
 }

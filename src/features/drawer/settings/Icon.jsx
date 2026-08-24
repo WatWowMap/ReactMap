@@ -1,7 +1,7 @@
 // @ts-check
-import * as React from 'react'
 
 import { useStorage } from '@store/useStorage'
+import * as React from 'react'
 
 /** @param {React.ImgHTMLAttributes<HTMLImageElement>} props */
 export function SettingIcon({ src, alt, ...props }) {

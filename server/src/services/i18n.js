@@ -15,7 +15,7 @@ const starti18n = async (localePath) => {
     const localeData = await create()
     await writeAll(localeData, true, localePath)
   }
-  // @ts-ignore
+  // @ts-expect-error
   i18next.use(Backend).init(
     {
       lng: 'en',

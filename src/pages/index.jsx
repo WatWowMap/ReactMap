@@ -1,16 +1,15 @@
 // @ts-check
-import * as React from 'react'
-import { Route, Routes } from 'react-router'
 
 import { Config } from '@components/Config'
-
-import { MapPage } from './map'
-import { LoginPage } from './login'
+import * as React from 'react'
+import { Route, Routes } from 'react-router'
 import { BlockedPage } from './Blocked'
-import { ErrorPage } from './Error'
 import { DataManagerPage } from './data'
-import { ResetPage } from './Reset'
+import { ErrorPage } from './Error'
 import { LocalesPage } from './locales'
+import { LoginPage } from './login'
+import { MapPage } from './map'
+import { ResetPage } from './Reset'
 
 const Playground = React.lazy(() =>
   import('./playground').then(({ PlaygroundPage }) => ({

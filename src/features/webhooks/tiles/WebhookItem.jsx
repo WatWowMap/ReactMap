@@ -1,5 +1,4 @@
 // @ts-check
-import * as React from 'react'
 
 import { SelectorItem } from '@components/virtual/SelectorItem'
 import { useWebhookStore } from '@store/useWebhookStore'

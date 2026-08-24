@@ -1,18 +1,17 @@
 // @ts-check
-import * as React from 'react'
+
+import { RADIUS_CHOICES } from '@assets/constants'
 import Button from '@mui/material/Button'
 import ButtonGroup from '@mui/material/ButtonGroup'
 import List from '@mui/material/List'
 import ListItem from '@mui/material/ListItem'
 import Slider from '@mui/material/Slider'
-import { useTranslation } from 'react-i18next'
 import { debounce } from 'lodash'
-
-import { RADIUS_CHOICES } from '@assets/constants'
-
-import { StyledSubHeader } from '../Shared'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 import { ConfigContext } from '../ContextProvider'
 import { useScanStore } from '../hooks/store'
+import { StyledSubHeader } from '../Shared'
 import { AdvAccordion } from './AdvAccordion'
 
 /**

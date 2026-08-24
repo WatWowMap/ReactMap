@@ -1,10 +1,9 @@
 // @ts-check
-import React from 'react'
+
 import Typography from '@mui/material/Typography'
 import Grid from '@mui/material/Unstable_Grid2'
-import { useTranslation, Trans } from 'react-i18next'
-
 import { useWebhookStore } from '@store/useWebhookStore'
+import { Trans, useTranslation } from 'react-i18next'
 
 export function WebhookError({ children }) {
   const { t } = useTranslation()

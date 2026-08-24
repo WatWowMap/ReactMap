@@ -1,7 +1,7 @@
 // @ts-check
-import * as React from 'react'
 
 import { useStorage } from '@store/useStorage'
+import * as React from 'react'
 
 import { CollapsibleItem } from './components/CollapsibleItem'
 import { SelectorListMemo } from './components/SelectorList'

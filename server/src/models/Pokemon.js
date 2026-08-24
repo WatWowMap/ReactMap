@@ -93,7 +93,7 @@ class Pokemon extends Model {
     const { onlyIvOr, onlyHundoIv, onlyZeroIv, onlyAreas = [] } = args.filters
     const { hasSize, hasHeight, hasPokemonBackground, mem, secret, httpAuth } =
       ctx
-    const { filterMap, globalFilter } = this.getFilters(perms, args, ctx)
+    const { filterMap, globalFilter } = Pokemon.getFilters(perms, args, ctx)
 
     let queryPvp = config
       .getSafe('api.pvp.leagues')
@@ -255,7 +255,7 @@ class Pokemon extends Model {
         filters.push({ iv: { min: 100, max: 100 }, pokemon: globalPokes })
     }
     /** @type {import("@rm/types").Pokemon[]} */
-    let results = await this.evalQuery(
+    let results = await Pokemon.evalQuery(
       mem ? `${mem}/api/pokemon/v2/scan` : null,
       mem
         ? JSON.stringify({
@@ -281,7 +281,7 @@ class Pokemon extends Model {
         ? new Set(results.map((pkmn) => `${pkmn.id}`))
         : new Set()
       if (!loadedIds.has(`${manualId}`)) {
-        const manualResult = await this.evalQuery(
+        const manualResult = await Pokemon.evalQuery(
           `${mem}/api/pokemon/id/${manualId}`,
           null,
           'GET',
@@ -343,7 +343,7 @@ class Pokemon extends Model {
         return []
       }
       pvpResults.push(
-        ...(await this.evalQuery(
+        ...(await Pokemon.evalQuery(
           mem,
           pvpQuery.limit(queryLimits.pokemonPvp - results.length),
           'POST',
@@ -424,7 +424,7 @@ class Pokemon extends Model {
    * @returns {import('knex').Knex | null}
    */
   static getStatsKnex(preferredConnection = null) {
-    return this.getStatsHandle(preferredConnection)?.knex ?? null
+    return Pokemon.getStatsHandle(preferredConnection)?.knex ?? null
   }
 
   /**
@@ -494,7 +494,7 @@ class Pokemon extends Model {
    * @returns {boolean}
    */
   static supportsShinyStats(ctx) {
-    const statsHandle = this.getStatsHandle(ctx?.connection)
+    const statsHandle = Pokemon.getStatsHandle(ctx?.connection)
     if (!statsHandle?.knex) {
       return false
     }
@@ -522,13 +522,13 @@ class Pokemon extends Model {
 
     let knexInstance = statsKnex || null
     if (!knexInstance) {
-      const statsHandle = this.getStatsHandle(preferredConnection)
+      const statsHandle = Pokemon.getStatsHandle(preferredConnection)
       knexInstance = statsHandle?.knex ?? null
     }
     if (!knexInstance) {
       try {
         knexInstance = this.knex()
-      } catch (e) {
+      } catch (_e) {
         knexInstance = null
       }
     }
@@ -549,7 +549,7 @@ class Pokemon extends Model {
     const whereClause = pairs
       .map(() => '(pokemon_id = ? AND COALESCE(form_id, 0) = ?)')
       .join(' OR ')
-    const bindings = pairs.flatMap(([pokemonId, formId]) => [pokemonId, formId])
+    const bindings = pairs.flat()
     const query = `
       SELECT
         pokemon_id,
@@ -620,7 +620,7 @@ class Pokemon extends Model {
   static async getLegacy(perms, args, ctx) {
     const { hasSize, hasHeight, mem, secret, httpAuth } = ctx
     const ts = Math.floor(Date.now() / 1000)
-    const { filterMap, globalFilter } = this.getFilters(perms, args, ctx)
+    const { filterMap, globalFilter } = Pokemon.getFilters(perms, args, ctx)
     const manualIdFilter = normalizeManualId(args.filters.onlyManualId)
     const queryLimits = config.getSafe('api.queryLimits')
 
@@ -660,7 +660,7 @@ class Pokemon extends Model {
     if ((perms.iv || perms.pvp) && mem)
       filters.push(...globalFilter.buildApiFilter())
 
-    let results = await this.evalQuery(
+    let results = await Pokemon.evalQuery(
       mem ? `${mem}/api/pokemon/v2/scan` : null,
       mem
         ? JSON.stringify({
@@ -684,7 +684,7 @@ class Pokemon extends Model {
     if (mem && manualId !== null) {
       const loaded = new Set(results.map((pkmn) => `${pkmn.id}`))
       if (!loaded.has(`${manualId}`)) {
-        const manualResult = await this.evalQuery(
+        const manualResult = await Pokemon.evalQuery(
           `${mem}/api/pokemon/id/${manualId}`,
           null,
           'GET',
@@ -726,7 +726,7 @@ class Pokemon extends Model {
    * @returns {Promise<import("@rm/types").PokemonShinyStats | null>}
    */
   static async getShinyStats(_perms, args, ctx) {
-    const statsHandle = this.getStatsHandle(ctx?.connection)
+    const statsHandle = Pokemon.getStatsHandle(ctx?.connection)
     if (!statsHandle?.knex) {
       return null
     }
@@ -746,7 +746,7 @@ class Pokemon extends Model {
     const formId = Number.parseInt(`${args.form ?? 0}`, 10)
     const key = `${pokemonId}-${Number.isNaN(formId) ? 0 : formId}`
     try {
-      const stats = await this.fetchShinyStats(
+      const stats = await Pokemon.fetchShinyStats(
         [key],
         statsHandle.knex,
         statsHandle.connection,
@@ -770,7 +770,7 @@ class Pokemon extends Model {
     const ts = Math.floor(Date.now() / 1000)
 
     /** @type {import("@rm/types").AvailablePokemon[]} */
-    const available = await this.evalQuery(
+    const available = await Pokemon.evalQuery(
       mem ? `${mem}/api/pokemon/available` : null,
       mem
         ? undefined
@@ -809,7 +809,7 @@ class Pokemon extends Model {
    * @returns {Promise<import("@rm/types").Pokemon>}
    */
   static getOne(id, { mem, secret, httpAuth }) {
-    return this.evalQuery(
+    return Pokemon.evalQuery(
       mem ? `${mem}/api/pokemon/id/${id}` : null,
       mem
         ? undefined
@@ -861,7 +861,7 @@ class Pokemon extends Model {
     if (!getAreaSql(query, perms.areaRestrictions, onlyAreas)) {
       return []
     }
-    const results = await this.evalQuery(
+    const results = await Pokemon.evalQuery(
       mem ? `${mem}/api/pokemon/search` : null,
       mem
         ? JSON.stringify({

@@ -1,11 +1,11 @@
 // @ts-check
-import * as React from 'react'
-import Grid from '@mui/material/Unstable_Grid2'
-import DialogContent from '@mui/material/DialogContent'
-import { useTranslation } from 'react-i18next'
 
-import { Header } from '@components/dialogs/Header'
 import { Footer } from '@components/dialogs/Footer'
+import { Header } from '@components/dialogs/Header'
+import DialogContent from '@mui/material/DialogContent'
+import Grid from '@mui/material/Unstable_Grid2'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 
 import { getBlockContent } from '../utils'
 

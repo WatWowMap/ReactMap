@@ -1,9 +1,7 @@
 // @ts-check
 
-import * as React from 'react'
-import Button from '@mui/material/Button'
-
 import { I } from '@components/I'
+import Button from '@mui/material/Button'
 
 const THEME_COLORS = new Set([
   'success',

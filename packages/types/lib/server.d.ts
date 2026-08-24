@@ -1,31 +1,27 @@
+import { Config } from '@rm/types'
+import { NextFunction, Request, Response } from 'express'
+import { OperationTypeNode } from 'graphql'
+import { Knex } from 'knex'
+import { Profile } from 'passport-discord'
+import { VerifyCallback } from 'passport-oauth2'
 import type {
-  ScannerModels,
-  ScannerModelKeys,
-  RmModels,
-  RmModelKeys,
+  Gym,
   ModelKeys,
+  Nest,
+  Pokemon,
+  Pokestop,
+  RmModelKeys,
+  RmModels,
+  ScannerModelKeys,
+  ScannerModels,
   Station,
   Tappable,
-  Backup,
-  Nest,
-  NestSubmission,
-  Pokestop,
-  Gym,
-  Pokemon,
 } from 'server/src/models'
-import { Knex } from 'knex'
-import { Model } from 'objection'
-import { NextFunction, Request, Response } from 'express'
-import { VerifyCallback } from 'passport-oauth2'
-
 import type { DbManager } from 'server/src/services/DbManager'
 import type { EventManager } from 'server/src/services/EventManager'
-import { ModelReturn, OnlyType } from './utility'
-import { Profile } from 'passport-discord'
 import { User } from './models'
 import { ShowcaseFocus } from './scanner'
-import { Config } from '@rm/types'
-import { OperationTypeNode } from 'graphql'
+import { ModelReturn } from './utility'
 
 export interface DbContext {
   mem: string
@@ -254,7 +250,7 @@ export type PokemonFilter =
   import('server/src/filters/pokemon/Frontend').PokemonFilter
 
 export type AllFilters = ReturnType<
-  (typeof import('server/src/filters/builder/base'))['buildDefaultFilters']
+  typeof import('server/src/filters/builder/base')['buildDefaultFilters']
 >
 
 export type Categories = keyof AllFilters
@@ -268,7 +264,7 @@ export type AdvCategories =
   | 'tappables'
 
 export type UIObject = ReturnType<
-  (typeof import('server/src/ui/drawer'))['drawer']
+  typeof import('server/src/ui/drawer')['drawer']
 >
 
 export interface PokemonGlow

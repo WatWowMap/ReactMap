@@ -1,6 +1,4 @@
 // @ts-check
-import * as React from 'react'
-import { useTranslation } from 'react-i18next'
 
 import {
   resetAllGeneral,
@@ -12,14 +10,14 @@ import {
   resetUI,
   resetUserSettings,
 } from '@utils/resetState'
-
+import { useTranslation } from 'react-i18next'
+import { useDataManagementStore } from '../hooks/store'
 import {
   ButtonWithNotification,
   ChildContainer,
   StyledDivider,
   StyledSubHeader,
 } from './Shared'
-import { useDataManagementStore } from '../hooks/store'
 
 export function ResetGeneral() {
   const { t } = useTranslation()

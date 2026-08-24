@@ -1,8 +1,9 @@
 // @ts-check
-import { t } from 'i18next'
 
 import { useWebhookStore } from '@store/useWebhookStore'
+import { t } from 'i18next'
 
+// biome-ignore lint/complexity/noStaticOnlyClass: namespaced grouping of related helpers, called as Poracle.method() throughout
 export class Poracle {
   static getMapCategory(poracleCategory) {
     switch (poracleCategory) {

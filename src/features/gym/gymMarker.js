@@ -1,7 +1,8 @@
 // @ts-check
-import { divIcon } from 'leaflet'
+
 import { useMemory } from '@store/useMemory'
 import { renderOverlayIcon } from '@utils/renderOverlayIcon'
+import { divIcon } from 'leaflet'
 
 /** @param {number} raidLevel */
 const getBadgeColor = (raidLevel) => {

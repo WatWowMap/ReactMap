@@ -1,8 +1,8 @@
 // @ts-check
-import * as React from 'react'
-import { Marker, useMap } from 'react-leaflet'
 
 import { fallbackMarker } from '@assets/fallbackMarker'
+import * as React from 'react'
+import { Marker, useMap } from 'react-leaflet'
 
 import { useScanStore } from './hooks/store'
 

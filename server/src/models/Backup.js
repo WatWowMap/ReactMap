@@ -74,9 +74,9 @@ class Backup extends Model {
     if (
       count['count(*)'] < config.getSafe('database.settings.userBackupLimits')
     ) {
-      // @ts-ignore
+      // @ts-expect-error
       await this.query().insert({
-        // @ts-ignore
+        // @ts-expect-error
         userId,
         name: backup.name,
         data: JSON.stringify(backup.data),
@@ -98,7 +98,7 @@ class Backup extends Model {
       throw new Error('Data too large')
     return (
       this.query()
-        // @ts-ignore
+        // @ts-expect-error
         .update({ name: backup.name, data: JSON.stringify(backup.data) })
         .where('id', +backup.id)
         .where('userId', userId)

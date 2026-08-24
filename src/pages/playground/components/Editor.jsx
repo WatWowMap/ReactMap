@@ -1,8 +1,9 @@
 // @ts-check
-import * as React from 'react'
+
+import Editor from '@monaco-editor/react'
 import { useTheme } from '@mui/material/styles'
 import Grid2 from '@mui/material/Unstable_Grid2'
-import Editor from '@monaco-editor/react'
+import * as React from 'react'
 
 import { setCode, usePlayStore } from '../hooks/store'
 

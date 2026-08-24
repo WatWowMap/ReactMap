@@ -1,13 +1,13 @@
 // @ts-check
-import * as React from 'react'
-import MenuItem from '@mui/material/MenuItem'
-import CircularProgress from '@mui/material/CircularProgress'
-import { useMutation, useQuery } from '@apollo/client'
-import { useTranslation } from 'react-i18next'
 
+import { useMutation, useQuery } from '@apollo/client'
+import { FCSelect } from '@components/inputs/FCSelect'
+import CircularProgress from '@mui/material/CircularProgress'
+import MenuItem from '@mui/material/MenuItem'
 import { ALL_PROFILES, SET_HUMAN } from '@services/queries/webhook'
 import { useWebhookStore } from '@store/useWebhookStore'
-import { FCSelect } from '@components/inputs/FCSelect'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 
 /** @type {React.CSSProperties} */
 const STYLE = { minWidth: 100 }

@@ -17,6 +17,7 @@ export type OnlyType<T, U, V = true> = {
   [K in SpecificValueType<T, U, V>]: T[K]
 }
 
+// biome-ignore lint/complexity/noBannedTypes: matches the builtin Function type on purpose to filter callable props
 export type StoreNoFn<T> = keyof OnlyType<T, Function, false>
 
 export type Split<S extends string, D extends string> = string extends S
@@ -31,6 +32,7 @@ export type PickMatching<T, V> = {
   [K in keyof T as T[K] extends V ? K : never]: T[K]
 }
 
+// biome-ignore lint/complexity/noBannedTypes: matches the builtin Function type on purpose to filter callable props
 export type ExtractMethods<T> = PickMatching<T, Function>
 
 export type Head<T extends any[]> = T extends [...infer Head, any]

@@ -1,12 +1,12 @@
 // @ts-check
-import * as React from 'react'
-import { useQuery } from '@apollo/client'
-import { useTranslation } from 'react-i18next'
 
+import { useQuery } from '@apollo/client'
+import { Loading } from '@components/Loading'
 import { ScanAreaTile } from '@features/scanArea'
 import { WEBHOOK_GEOJSON } from '@services/queries/webhook'
-import { Loading } from '@components/Loading'
 import { useWebhookStore } from '@store/useWebhookStore'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 
 const FALLBACK = {
   type: 'FeatureCollection',

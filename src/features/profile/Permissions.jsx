@@ -1,16 +1,16 @@
 // @ts-check
-import * as React from 'react'
-import { useTranslation } from 'react-i18next'
-import Grid2 from '@mui/material/Unstable_Grid2'
+
+import { ALWAYS_EXCLUDED } from '@assets/constants'
 import Box from '@mui/material/Box'
 import Card from '@mui/material/Card'
 import CardContent from '@mui/material/CardContent'
 import CardMedia from '@mui/material/CardMedia'
 import Typography from '@mui/material/Typography'
-
+import Grid2 from '@mui/material/Unstable_Grid2'
 import { useMemory } from '@store/useMemory'
-import { ALWAYS_EXCLUDED } from '@assets/constants'
-import { getProperName, camelToSnake } from '@utils/strings'
+import { camelToSnake, getProperName } from '@utils/strings'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 
 export function UserPermissions() {
   const perms = useMemory((s) => s.auth.perms)

@@ -1,19 +1,19 @@
 // @ts-check
-import * as React from 'react'
-import { useTranslation } from 'react-i18next'
+
 import { useQuery } from '@apollo/client'
+import { VirtualTable } from '@components/virtual/Table'
+import ClearIcon from '@mui/icons-material/Clear'
+import Box from '@mui/material/Box'
+import Divider from '@mui/material/Divider'
 import TableCell from '@mui/material/TableCell'
 import TableRow from '@mui/material/TableRow'
-import Box from '@mui/material/Box'
-import ClearIcon from '@mui/icons-material/Clear'
-import useMediaQuery from '@mui/material/useMediaQuery'
-import Grid2 from '@mui/material/Unstable_Grid2'
 import Typography from '@mui/material/Typography'
-import Divider from '@mui/material/Divider'
-
+import Grid2 from '@mui/material/Unstable_Grid2'
+import useMediaQuery from '@mui/material/useMediaQuery'
 import { LOCALES_STATUS } from '@services/queries/config'
-import { VirtualTable } from '@components/virtual/Table'
 import { useFormatStore } from '@store/useFormatStore'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 
 import { useLocalesStore } from '../hooks/store'
 import { EditLocale } from './EditLocale'
@@ -32,7 +32,7 @@ const clear = <ClearIcon color="error" fontSize="small" />
 /** @type {import('react-virtuoso').TableVirtuosoProps['fixedHeaderContent']} */
 function fixedHeaderContent() {
   const { t } = useTranslation()
-  // @ts-ignore
+  // @ts-expect-error
   const isMobile = useMediaQuery((theme) => theme.breakpoints.down('sm'))
   return isMobile ? null : (
     <TableRow sx={{ bgcolor: 'background.paper' }}>
@@ -78,7 +78,7 @@ function itemContent(_index, row, ctx) {
 export function LocalesTable() {
   const { i18n } = useTranslation()
   const all = useLocalesStore((s) => s.all)
-  // @ts-ignore
+  // @ts-expect-error
   const isMobile = useMediaQuery((theme) => theme.breakpoints.down('sm'))
   const stringSorter = useFormatStore((s) => s.collator)
 

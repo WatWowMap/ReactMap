@@ -6,11 +6,7 @@
   "types": "./lib/index.d.ts",
   "scripts": {
     "sort": "npx sort-package-json",
-    "depCheck": "npx depcheck",
-    "lint": "eslint \"**/*.{js,jsx}\"",
-    "lint:fix": "eslint \"**/*.{js,jsx}\" --fix",
-    "prettier": "prettier --check \"**/*.{css,html,js,jsx,yml}\"",
-    "prettier:fix": "prettier --write \"**/*.{css,html,js,jsx,yml}\""
+    "depCheck": "npx depcheck"
   },
   "dependencies": {
     "@rm/types": "*",

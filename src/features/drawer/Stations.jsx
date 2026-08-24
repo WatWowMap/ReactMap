@@ -1,15 +1,15 @@
 // @ts-check
-import * as React from 'react'
+
+import { BoolToggle } from '@components/inputs/BoolToggle'
+import { FCSelect } from '@components/inputs/FCSelect'
+import { useGetAvailable } from '@hooks/useGetAvailable'
 import Box from '@mui/material/Box'
 import ListItem from '@mui/material/ListItem'
 import ListItemText from '@mui/material/ListItemText'
 import MenuItem from '@mui/material/MenuItem'
-import { useTranslation } from 'react-i18next'
-
 import { useDeepStore, useStorage } from '@store/useStorage'
-import { useGetAvailable } from '@hooks/useGetAvailable'
-import { FCSelect } from '@components/inputs/FCSelect'
-import { BoolToggle } from '@components/inputs/BoolToggle'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 
 import { CollapsibleItem } from './components/CollapsibleItem'
 import { SelectorListMemo } from './components/SelectorList'

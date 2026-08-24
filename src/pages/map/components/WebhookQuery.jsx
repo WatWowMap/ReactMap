@@ -1,11 +1,11 @@
 // @ts-check
-import * as React from 'react'
-import { useParams } from 'react-router'
-import { useQuery } from '@apollo/client'
 
+import { useQuery } from '@apollo/client'
 import { Query } from '@services/queries'
 import { useMemory } from '@store/useMemory'
 import { useStorage } from '@store/useStorage'
+import * as React from 'react'
+import { useParams } from 'react-router'
 
 /**
  * @param {string} category

@@ -3,9 +3,10 @@ import BackupModel = require('server/src/models/Backup')
 import SessionModel = require('server/src/models/Session')
 import NestSubmissionModel = require('server/src/models/NestSubmission')
 import GymBadgeModel = require('server/src/models/Badge')
-import type { FullModel } from './utility'
-import type { Permissions } from './server'
+
 import { Strategy } from './general'
+import type { Permissions } from './server'
+import type { FullModel } from './utility'
 
 export interface Backup {
   id: number

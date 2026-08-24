@@ -1,9 +1,8 @@
 // @ts-check
 import * as React from 'react'
 import { Polygon, Popup, Tooltip } from 'react-leaflet'
-
-import { WayfarerPopup } from './WayfarerPopup'
 import { getPathOptions } from './typeCell'
+import { WayfarerPopup } from './WayfarerPopup'
 
 /**
  *

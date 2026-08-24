@@ -56,7 +56,6 @@ class Weather extends Model {
                   booleanOverlap(geojson, areas.scanAreasObj[area]) ||
                   pointInPolygon(
                     point(
-                      // @ts-ignore // again, probably need real TS types
                       areas.scanAreasObj[area].geometry.type === 'MultiPolygon'
                         ? areas.scanAreasObj[area].geometry.coordinates[0][0][0]
                         : areas.scanAreasObj[area].geometry.coordinates[0][0],

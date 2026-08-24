@@ -1,9 +1,9 @@
 // @ts-check
-import { useEffect } from 'react'
-import { useQuery } from '@apollo/client'
 
+import { useQuery } from '@apollo/client'
 import { ALL_PROFILES } from '@services/queries/webhook'
 import { useWebhookStore } from '@store/useWebhookStore'
+import { useEffect } from 'react'
 
 /**
  * @template {import('@store/useWebhookStore').WebhookStore['category']} T

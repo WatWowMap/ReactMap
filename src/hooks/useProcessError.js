@@ -1,8 +1,8 @@
 // @ts-check
-import { t } from 'i18next'
 
 import { useMemory } from '@store/useMemory'
 import { useWebhookStore } from '@store/useWebhookStore'
+import { t } from 'i18next'
 import React from 'react'
 
 /**
@@ -28,7 +28,7 @@ export const useProcessError = (error) => {
       }
       if (error.networkError?.statusCode === 429) {
         const until =
-          // @ts-ignore
+          // @ts-expect-error
           error?.networkError?.result?.errors?.[0]?.extensions?.until || 0
         useWebhookStore.setState({
           alert: {

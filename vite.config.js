@@ -4,6 +4,7 @@
 
 const { defineConfig, loadEnv, createLogger } = require('vite')
 const { default: react } = require('@vitejs/plugin-react-swc')
+const { default: tailwindcss } = require('@tailwindcss/vite')
 const { default: checker } = require('vite-plugin-checker')
 const removeFiles = require('rollup-plugin-delete')
 const { resolve } = require('path')
@@ -15,7 +16,6 @@ const { log, TAGS } = require('@rm/logger')
 const { locales, status } = require('@rm/locales')
 const {
   faviconPlugin,
-  customFilePlugin,
   localePlugin,
   muteWarningsPlugin,
 } = require('@rm/vite-plugins')
@@ -27,6 +27,7 @@ const viteLogLevel =
 
 const viteConfig = defineConfig(({ mode }) => {
   const env = loadEnv(mode, resolve(process.cwd(), './'), '')
+  const appDir = `${resolve(__dirname, 'app')}/`
   const isRelease = process.argv.includes('-r')
   const isDevelopment = mode === 'development'
   const serverPort = +(env.PORT || config.getSafe('port') || '8080')
@@ -36,17 +37,6 @@ const viteConfig = defineConfig(({ mode }) => {
   )
   const resolvedVersion = env.npm_package_version || pkg.version
   const version = isDevelopment ? 'development' : resolvedVersion
-  const hasCustom = (function checkFolders(folder, isCustom = false) {
-    const files = fs.readdirSync(folder)
-    for (let i = 0; i < files.length; i += 1) {
-      if (isCustom) return true
-      if (files[i].startsWith('.')) continue
-      if (!files[i].includes('.'))
-        isCustom = checkFolders(`${folder}/${files[i]}`, isCustom)
-      if (/\.custom.(jsx?|css)$/.test(files[i])) return true
-    }
-    return isCustom
-  })(resolve(__dirname, 'src'))
 
   if (mode === 'production') {
     log.info(TAGS.build, `Building production version: ${version}`)
@@ -72,22 +62,19 @@ const viteConfig = defineConfig(({ mode }) => {
   return {
     plugins: [
       react(),
+      tailwindcss(),
       ...(isDevelopment
         ? [
             checker({
               overlay: {
                 initialIsOpen: false,
               },
-              // typescript: {
-              //   tsconfigPath: './jsconfig.json',
-              // },
-              eslint: {
-                lintCommand: 'eslint "./src/**/*.{js,jsx}"',
+              typescript: {
+                tsconfigPath: './tsconfig.app.json',
               },
             }),
           ]
         : []),
-      ...(hasCustom ? [customFilePlugin(isDevelopment)] : []),
       ...(sentry.authToken && sentry.org && sentry.project
         ? [
             sentryVitePlugin({
@@ -114,6 +101,7 @@ const viteConfig = defineConfig(({ mode }) => {
         '@services': resolve(__dirname, './src/services'),
         '@utils': resolve(__dirname, './src/utils'),
         '@store': resolve(__dirname, './src/store'),
+        '@app': resolve(__dirname, './app'),
       },
     },
     define: {
@@ -122,7 +110,6 @@ const viteConfig = defineConfig(({ mode }) => {
           version,
           locales,
           localeStatus: status,
-          hasCustom,
           title: config.getSafe('map.general.headerTitle'),
         },
         sentry: {
@@ -164,13 +151,16 @@ const viteConfig = defineConfig(({ mode }) => {
         isDevelopment || config.getSafe('devOptions.skipMinified')
           ? false
           : 'esbuild',
-      input: { main: resolve(__dirname, 'index.html') },
       assetsDir: '',
       emptyOutDir: true,
       chunkSizeWarningLimit: 2000,
       rollupOptions: {
+        input: {
+          main: resolve(__dirname, 'index.html'),
+          app: resolve(__dirname, 'app.html'),
+        },
         plugins: [
-          // @ts-ignore
+          // @ts-expect-error
           removeFiles({
             targets: ['dist/favicon'],
             hook: 'generateBundle',
@@ -178,7 +168,9 @@ const viteConfig = defineConfig(({ mode }) => {
         ],
         output: {
           manualChunks: (id) => {
-            if (id.endsWith('.css')) return 'index'
+            if (id.endsWith('.css')) {
+              return id.startsWith(appDir) ? 'app' : 'index'
+            }
             if (id.includes('node_modules')) return 'vendor'
             // return id.replace(/.*node_modules\//, '').split('/')[0]
             if (id.includes('src')) return version.replaceAll('.', '-')

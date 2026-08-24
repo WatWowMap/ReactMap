@@ -1,17 +1,18 @@
 // @ts-check
-import * as React from 'react'
-import { styled } from '@mui/material/styles'
+
+import ClearIcon from '@mui/icons-material/Clear'
+import PermScanWifiIcon from '@mui/icons-material/PermScanWifi'
 import ListItem from '@mui/material/ListItem'
-import ListItemText from '@mui/material/ListItemText'
 import ListItemButton from '@mui/material/ListItemButton'
 import ListItemIcon from '@mui/material/ListItemIcon'
+import ListItemText from '@mui/material/ListItemText'
 import ListSubheader from '@mui/material/ListSubheader'
+import { styled } from '@mui/material/styles'
+import * as React from 'react'
 import { Trans, useTranslation } from 'react-i18next'
 import { Circle } from 'react-leaflet'
-import PermScanWifiIcon from '@mui/icons-material/PermScanWifi'
-import ClearIcon from '@mui/icons-material/Clear'
 
-import { useScanStore, useScannerSessionStorage } from './hooks/store'
+import { useScannerSessionStorage, useScanStore } from './hooks/store'
 
 const StyledListItem = styled(ListItem)(() => ({
   padding: '2px 16px',

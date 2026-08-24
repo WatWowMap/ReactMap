@@ -1,12 +1,12 @@
 // @ts-check
-import * as React from 'react'
+
+import { FCSelectListItem } from '@components/inputs/FCSelect'
 import MenuItem from '@mui/material/MenuItem'
 import Typography from '@mui/material/Typography'
-import { useTranslation } from 'react-i18next'
-
 import { useMemory } from '@store/useMemory'
 import { useStorage } from '@store/useStorage'
-import { FCSelectListItem } from '@components/inputs/FCSelect'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 
 export function PokemonModeSelector() {
   const filterMode = useStorage((s) => s.getPokemonFilterMode())

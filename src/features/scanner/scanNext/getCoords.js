@@ -1,6 +1,7 @@
 // @ts-check
-import { point } from '@turf/helpers'
+
 import destination from '@turf/destination'
+import { point } from '@turf/helpers'
 
 const OPTIONS = /** @type {const} */ ({ units: 'kilometers' })
 const POKEMON_RADIUS = 70

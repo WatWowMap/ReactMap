@@ -1,8 +1,7 @@
 // @ts-check
-import * as React from 'react'
-import { Navigate } from 'react-router'
 
 import { hardReset } from '@utils/resetState'
+import { Navigate } from 'react-router'
 
 export function ResetPage() {
   hardReset()

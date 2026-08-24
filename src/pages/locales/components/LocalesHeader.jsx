@@ -1,13 +1,12 @@
 // @ts-check
-import * as React from 'react'
-import Grid from '@mui/material/Unstable_Grid2'
-import Typography from '@mui/material/Typography'
-import Collapse from '@mui/material/Collapse'
-import Button from '@mui/material/Button'
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
-import { useTranslation } from 'react-i18next'
 
 import { LocaleSelection } from '@components/inputs/LocaleSelection'
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
+import Button from '@mui/material/Button'
+import Collapse from '@mui/material/Collapse'
+import Typography from '@mui/material/Typography'
+import Grid from '@mui/material/Unstable_Grid2'
+import { useTranslation } from 'react-i18next'
 
 import { useLocalesStore } from '../hooks/store'
 

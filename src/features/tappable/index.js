@@ -1,4 +1,4 @@
 // @ts-check
 
-export * from './TappableTile'
 export * from './TappablePopup'
+export * from './TappableTile'

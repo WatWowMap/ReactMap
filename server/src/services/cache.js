@@ -32,7 +32,7 @@ const getCache = (unsafeName, fallback = null) => {
     }
     log.info(TAGS.cache, 'Loaded', fileName)
     return data
-  } catch (e) {
+  } catch (_e) {
     return fallback
   }
 }

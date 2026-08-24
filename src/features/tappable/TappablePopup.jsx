@@ -1,25 +1,24 @@
 // @ts-check
-import * as React from 'react'
+
+import { Coords } from '@components/popups/Coords'
+import { Navigation } from '@components/popups/Navigation'
+import { TimeStamp } from '@components/popups/TimeStamps'
+import { Title } from '@components/popups/Title'
+import { StatusIcon } from '@components/StatusIcon'
 import ExpandMore from '@mui/icons-material/ExpandMore'
 import MoreVert from '@mui/icons-material/MoreVert'
-import Grid from '@mui/material/Unstable_Grid2'
-import Typography from '@mui/material/Typography'
-import Tooltip from '@mui/material/Tooltip'
-import IconButton from '@mui/material/IconButton'
 import Collapse from '@mui/material/Collapse'
+import IconButton from '@mui/material/IconButton'
 import Menu from '@mui/material/Menu'
 import MenuItem from '@mui/material/MenuItem'
-import { useTranslation } from 'react-i18next'
-
-import { useStorage, setDeepStore } from '@store/useStorage'
+import Tooltip from '@mui/material/Tooltip'
+import Typography from '@mui/material/Typography'
+import Grid from '@mui/material/Unstable_Grid2'
 import { useMemory } from '@store/useMemory'
-import { Navigation } from '@components/popups/Navigation'
-import { Coords } from '@components/popups/Coords'
-import { TimeStamp } from '@components/popups/TimeStamps'
-import { StatusIcon } from '@components/StatusIcon'
-import { Title } from '@components/popups/Title'
-
+import { setDeepStore, useStorage } from '@store/useStorage'
 import { getTimeUntil } from '@utils/getTimeUntil'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 import { getTappableDisplaySettings } from './displayRules'
 
 /**

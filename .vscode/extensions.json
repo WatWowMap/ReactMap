@@ -1,9 +1,8 @@
 {
   "recommendations": [
     "streetsidesoftware.code-spell-checker",
-    "dbaeumer.vscode-eslint",
+    "biomejs.biome",
     "lokalise.i18n-ally",
-    "esbenp.prettier-vscode",
     "christian-kohler.npm-intellisense",
     "graphql.vscode-graphql"
   ]

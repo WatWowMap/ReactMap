@@ -1,5 +1,5 @@
 // @ts-check
-import * as React from 'react'
+
 import FormControl from '@mui/material/FormControl'
 import InputLabel from '@mui/material/InputLabel'
 import ListItem from '@mui/material/ListItem'

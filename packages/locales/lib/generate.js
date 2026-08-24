@@ -175,6 +175,7 @@ async function generate() {
 
           return [
             locale,
+            // biome-ignore lint/performance/noAccumulatingSpread: preserves non-mutating semantics of the original reduce
             result.reduce((acc, x) => ({ ...acc, ...x }), generated),
           ]
         } catch (error) {

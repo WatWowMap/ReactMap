@@ -95,7 +95,7 @@ class AuthClient extends Logger {
    * @param {MessageEmbed} embed
    * @param {keyof AuthClient['loggingChannels']} [channel]
    */
-  async sendMessage(embed, channel = 'main') {
+  async sendMessage(_embed, _channel = 'main') {
     this.log.info(
       '`message` is not implemented for base AuthClient - you probably should not be seeing this',
     )

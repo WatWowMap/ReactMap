@@ -1,14 +1,14 @@
 // @ts-check
-import * as React from 'react'
-import Typography from '@mui/material/Typography'
+
+import { useMutation } from '@apollo/client'
 import Button from '@mui/material/Button'
 import TextField from '@mui/material/TextField'
+import Typography from '@mui/material/Typography'
 import Grid from '@mui/material/Unstable_Grid2'
-import { useTranslation } from 'react-i18next'
-import { useMutation } from '@apollo/client'
-
 import { ALL_PROFILES, SET_PROFILE } from '@services/queries/webhook'
 import { useWebhookStore } from '@store/useWebhookStore'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 
 export const NewProfile = () => {
   const { t } = useTranslation()

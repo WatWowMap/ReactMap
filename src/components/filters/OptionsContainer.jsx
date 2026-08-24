@@ -1,16 +1,16 @@
 // @ts-check
-import * as React from 'react'
+
+import { BasicListButton } from '@components/inputs/BasicListButton'
+import ReplayIcon from '@mui/icons-material/Replay'
 import Chip from '@mui/material/Chip'
 import List from '@mui/material/List'
 import ListItem from '@mui/material/ListItem'
 import ListItemText from '@mui/material/ListItemText'
-import { useTranslation } from 'react-i18next'
-import ReplayIcon from '@mui/icons-material/Replay'
-
 import { useMemory } from '@store/useMemory'
 import { useStorage } from '@store/useStorage'
-import { BasicListButton } from '@components/inputs/BasicListButton'
 import { camelToSnake } from '@utils/strings'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 
 import { OptionsGroup } from './Options'
 
@@ -61,7 +61,7 @@ function Applied({ category }) {
         <AppliedChipMemo
           key={`${subCategory}-${option}`}
           category={category}
-          // @ts-ignore
+          // @ts-expect-error
           subCategory={subCategory}
           option={option}
         />
@@ -113,7 +113,7 @@ function OptContainer({ categories, category }) {
               <OptionsGroup
                 key={subCategory}
                 category={category}
-                // @ts-ignore
+                // @ts-expect-error
                 subCategory={subCategory}
               />
             )

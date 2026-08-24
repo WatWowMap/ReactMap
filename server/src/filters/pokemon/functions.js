@@ -246,7 +246,7 @@ function dnfifyIvFilter(filter, pokemon) {
       }
       const minMax = { min: parseFloat(match[3]) }
       if (match[4] !== undefined) {
-        minMax.max = parseInt(match[4])
+        minMax.max = parseInt(match[4], 10)
       } else {
         minMax.max = minMax.min
       }

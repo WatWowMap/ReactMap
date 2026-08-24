@@ -1,8 +1,8 @@
 // @ts-check
-import * as React from 'react'
-import Box from '@mui/material/Box'
 
+import Box from '@mui/material/Box'
 import { useStorage } from '@store/useStorage'
+import * as React from 'react'
 
 import { CollapsibleItem } from '../components/CollapsibleItem'
 import { SelectorListMemo } from '../components/SelectorList'

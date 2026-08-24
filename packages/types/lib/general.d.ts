@@ -1,5 +1,5 @@
 import type { SliderProps } from '@mui/material'
-import type { Feature, Polygon, MultiPolygon } from 'geojson'
+import type { Feature, MultiPolygon, Polygon } from 'geojson'
 import { Config } from './config'
 
 export type HttpMethod = 'GET' | 'PUT' | 'POST' | 'PATCH' | 'DELETE'

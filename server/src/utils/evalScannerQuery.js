@@ -64,7 +64,7 @@ async function evalScannerQuery(
 /**
  * Human-readable description of why a scanner endpoint response was not the
  * expected shape, for diagnostic fallback logging. `fetchJson` returns the
- * node-fetch `Response` (with a numeric `status`) on a non-2xx, `undefined` on a
+ * `Response` (with a numeric `status`) on a non-2xx, `undefined` on a
  * network/timeout error, or the parsed JSON on success.
  * @param {any} res
  * @returns {string}

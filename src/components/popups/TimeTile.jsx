@@ -1,15 +1,14 @@
 // @ts-check
-import * as React from 'react'
+
+import ExpandMore from '@mui/icons-material/ExpandMore'
 import Collapse from '@mui/material/Collapse'
-import Grid from '@mui/material/Unstable_Grid2'
 import IconButton from '@mui/material/IconButton'
 import Typography from '@mui/material/Typography'
-import ExpandMore from '@mui/icons-material/ExpandMore'
-
+import Grid from '@mui/material/Unstable_Grid2'
 import { useStorage } from '@store/useStorage'
-
-import { Timer } from './Timer'
+import * as React from 'react'
 import { NameTT } from './NameTT'
+import { Timer } from './Timer'
 
 /**
  *

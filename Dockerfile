@@ -1,20 +1,17 @@
-## Simple Dockerfile to build ReactMap (main branch)
+## Simple Dockerfile to build ReactMap (v2 branch)
 # - Inside the container, the content of this git repo lives in /home/node/
 ## You have to mount your configs into the container:
 # - mount local.json to /home/node/server/src/configs/local.json
 # - mount areas.json to /home/node/server/src/configs/areas.json
-# - Also mount every other configuration file necessary into the according directory.
 
-FROM node:22.23.1-alpine
-
-ENV NPM_CONFIG_PREFIX=/home/node/.npm-global
-ENV PATH=$PATH:/home/node/.npm-global/bin
+FROM oven/bun:1.3.11-alpine
 
 WORKDIR /home/node
-COPY package.json .
-COPY yarn.lock .
-RUN apk add git
-RUN npm install -g yarn
+
+RUN apk add --no-cache git
+
 COPY . .
-RUN yarn install
-RUN yarn build
+RUN bun install --frozen-lockfile
+RUN bun run build
+
+CMD ["bun", "."]

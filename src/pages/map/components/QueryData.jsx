@@ -1,25 +1,24 @@
 // @ts-check
-import * as React from 'react'
-import { useQuery } from '@apollo/client'
-import { useMap } from 'react-leaflet'
 
-import { useMemory } from '@store/useMemory'
-import { useStorage } from '@store/useStorage'
-import { Query } from '@services/queries'
-import { getQueryArgs } from '@utils/getQueryArgs'
-import { RobustTimeout } from '@services/apollo/RobustTimeout'
+import { useQuery } from '@apollo/client'
 import { FILTER_SKIP_LIST } from '@assets/constants'
 import { Notification } from '@components/Notification'
-import { GenerateCells } from '@features/s2cell'
 import { RouteLayer } from '@features/route'
+import { GenerateCells } from '@features/s2cell'
 import { ActiveWeather } from '@features/weather'
 import { useAnalytics } from '@hooks/useAnalytics'
 import { useProcessError } from '@hooks/useProcessError'
+import { RobustTimeout } from '@services/apollo/RobustTimeout'
+import { Query } from '@services/queries'
+import { useMemory } from '@store/useMemory'
+import { useStorage } from '@store/useStorage'
+import { getQueryArgs } from '@utils/getQueryArgs'
 import { normalizeCategory } from '@utils/normalizeCategory'
-
-import { Clustering } from './Clustering'
-import { TILES } from '../tileObject'
+import * as React from 'react'
+import { useMap } from 'react-leaflet'
 import { usePermCheck } from '../hooks/usePermCheck'
+import { TILES } from '../tileObject'
+import { Clustering } from './Clustering'
 
 /** @param {string} category */
 const userSettingsCategory = (category) => {
@@ -83,7 +82,7 @@ const trimFilters = (requestedFilters, userSettings, category, onlyAreas) => {
       ? requestedFilters.ivOr
       : specifics) || { all: false, adv: '' }
 
-    if (specifics && specifics.enabled && staticFilters[category]?.filter[id]) {
+    if (specifics?.enabled && staticFilters[category]?.filter[id]) {
       trimmed[id] = rest
     }
   })

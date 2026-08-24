@@ -1,27 +1,26 @@
 // @ts-check
 
-import * as React from 'react'
-import { useTranslation } from 'react-i18next'
+import { DialogWrapper } from '@components/dialogs/DialogWrapper'
+import { Footer } from '@components/dialogs/Footer'
+import { Header } from '@components/dialogs/Header'
+import { useAnalytics } from '@hooks/useAnalytics'
 import TabContext from '@mui/lab/TabContext'
 import TabList from '@mui/lab/TabList'
 import TabPanel from '@mui/lab/TabPanel'
-import Tab from '@mui/material/Tab'
 import Box from '@mui/material/Box'
 import DialogContent from '@mui/material/DialogContent'
-
-import { useMemory } from '@store/useMemory'
-import { useLayoutStore } from '@store/useLayoutStore'
-import { Header } from '@components/dialogs/Header'
-import { Footer } from '@components/dialogs/Footer'
-import { DialogWrapper } from '@components/dialogs/DialogWrapper'
-import { useAnalytics } from '@hooks/useAnalytics'
+import Tab from '@mui/material/Tab'
 import { getSettings } from '@services/fetches'
+import { useLayoutStore } from '@store/useLayoutStore'
+import { useMemory } from '@store/useMemory'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 
 import { UserBackups } from './Backups'
-import { UserPermissions } from './Permissions'
+import { ExtraUserFields } from './ExtraFields'
 import { UserGymBadges } from './GymBadges'
 import { LinkAccounts } from './LinkAccounts'
-import { ExtraUserFields } from './ExtraFields'
+import { UserPermissions } from './Permissions'
 
 export function UserProfile() {
   useAnalytics('/user-profile')

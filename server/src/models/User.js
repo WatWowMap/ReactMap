@@ -67,7 +67,7 @@ class User extends Model {
    */
   static async updateWebhook(id, selectedWebhook) {
     await this.query().update({ selectedWebhook }).where({ id })
-    return this.getOne(id)
+    return User.getOne(id)
   }
 }
 

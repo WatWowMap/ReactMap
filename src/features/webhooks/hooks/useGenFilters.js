@@ -1,8 +1,8 @@
 // @ts-check
-import { useMemo } from 'react'
-import { useMemory } from '@store/useMemory'
 
+import { useMemory } from '@store/useMemory'
 import { useWebhookStore } from '@store/useWebhookStore'
+import { useMemo } from 'react'
 
 export function useGenFilters() {
   const profile_no = useWebhookStore((s) => s.human.current_profile_no)

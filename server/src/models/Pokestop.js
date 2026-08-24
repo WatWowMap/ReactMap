@@ -891,7 +891,7 @@ class Pokestop extends Model {
           // loop runs while filteredResults.length < resultLimit — omitting it
           // returns zero markers) rather than pre-truncating, which would drop
           // the appended off-viewport manual-id row before filtering.
-          const final = this.secondaryFilter(
+          const final = Pokestop.secondaryFilter(
             mapped,
             filters,
             ts,
@@ -932,8 +932,8 @@ class Pokestop extends Model {
     }
     const results = await query
 
-    const normalized = this.mapRDM(results, ts)
-    const finalResults = this.secondaryFilter(
+    const normalized = Pokestop.mapRDM(results, ts)
+    const finalResults = Pokestop.secondaryFilter(
       normalized,
       filters,
       ts,
@@ -1033,7 +1033,7 @@ class Pokestop extends Model {
           invasion.confirmed &&
           Number(invasion[pokemonId]) > 0
         ) {
-          return this.hasRocketPokemonFilter(
+          return Pokestop.hasRocketPokemonFilter(
             filters,
             invasion[pokemonId],
             invasion[form],
@@ -1041,7 +1041,7 @@ class Pokestop extends Model {
           )
         }
         return info.encounters[name]?.some((poke) =>
-          this.hasRocketPokemonFilter(
+          Pokestop.hasRocketPokemonFilter(
             filters,
             poke.id,
             poke.form,
@@ -1082,7 +1082,7 @@ class Pokestop extends Model {
       const pokestop = queryResults[i]
       const canViewIncidentMetadata = perms.eventStops || perms.invasions
       const incidentBlocker = canViewIncidentMetadata
-        ? this.getIncidentBlocker(pokestop.invasions)
+        ? Pokestop.getIncidentBlocker(pokestop.invasions)
         : null
       const filtered = {
         showcase_expiry: canViewIncidentMetadata
@@ -1093,7 +1093,7 @@ class Pokestop extends Model {
           incidentBlocker?.expireTimestamp || null,
       }
 
-      this.fieldAssigner(filtered, pokestop, [
+      Pokestop.fieldAssigner(filtered, pokestop, [
         'id',
         'lat',
         'lon',
@@ -1105,7 +1105,7 @@ class Pokestop extends Model {
       ])
 
       if (perms.pokestops) {
-        this.fieldAssigner(filtered, pokestop, [
+        Pokestop.fieldAssigner(filtered, pokestop, [
           'ar_scan_eligible',
           'power_up_points',
           'power_up_level',
@@ -1163,7 +1163,7 @@ class Pokestop extends Model {
         (filters.onlyAllPokestops || filters.onlyInvasions)
       ) {
         filtered.invasions = pokestop.invasions.filter((invasion) =>
-          this.invasionMatchesFilters(
+          Pokestop.invasionMatchesFilters(
             invasion,
             filters,
             hasConfirmed,
@@ -1178,7 +1178,7 @@ class Pokestop extends Model {
             pokestop.lure_expire_timestamp >= ts &&
             filters[`l${pokestop.lure_id}`]))
       ) {
-        this.fieldAssigner(filtered, pokestop, [
+        Pokestop.fieldAssigner(filtered, pokestop, [
           'lure_id',
           'lure_expire_timestamp',
         ])
@@ -1194,7 +1194,7 @@ class Pokestop extends Model {
               (effectiveQuestLayer === 'without_ar' && !quest.with_ar))
           ) {
             const newQuest = {}
-            this.parseRdmRewards(quest)
+            Pokestop.parseRdmRewards(quest)
             const fields = [
               'quest_type',
               'quest_timestamp',
@@ -1219,7 +1219,7 @@ class Pokestop extends Model {
             const questCondition = `${quest.quest_title}__${quest.quest_target}`
             const filterMatchesQuest = (key) => {
               const filter = filters[key]
-              if (!filter || !filter.adv || filter.all) return !!filter
+              if (!filter?.adv || filter.all) return !!filter
               const selectedConditions = Array.isArray(filter.adv)
                 ? filter.adv
                 : filter.adv.split(',')
@@ -1233,7 +1233,7 @@ class Pokestop extends Model {
               quest.quest_timestamp >= midnight &&
               (filters.onlyAllPokestops || matchesFilter)
             ) {
-              this.fieldAssigner(newQuest, quest, fields)
+              Pokestop.fieldAssigner(newQuest, quest, fields)
               filtered.quests.push(newQuest)
             }
           }
@@ -2128,7 +2128,9 @@ class Pokestop extends Model {
     mapped.sort((a, b) => a.distance - b.distance)
     if (mapped.length > searchResultsLimit) mapped.length = searchResultsLimit
 
-    return mapped.map((result) => this.parseRdmRewards(result)).filter(Boolean)
+    return mapped
+      .map((result) => Pokestop.parseRdmRewards(result))
+      .filter(Boolean)
   }
 
   static async searchLures(perms, args, _ctx, distance, bbox) {
@@ -2290,7 +2292,11 @@ class Pokestop extends Model {
       ? results.filter(
           (invasion) =>
             invasions.includes(String(invasion.grunt_type)) ||
-            this.invasionMatchesFilters(invasion, pokemonFilters, hasConfirmed),
+            Pokestop.invasionMatchesFilters(
+              invasion,
+              pokemonFilters,
+              hasConfirmed,
+            ),
         )
       : results
   }

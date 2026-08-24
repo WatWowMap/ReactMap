@@ -1,5 +1,5 @@
 <!doctype html>
-<html>
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta
@@ -19,7 +19,7 @@
         role="progressbar"
         style="width: 40px; height: 40px"
       >
-        <svg class="progress-svg" viewBox="22 22 44 44">
+        <svg class="progress-svg" viewBox="22 22 44 44" aria-hidden="true">
           <circle
             class="progress-circle circle-indeterminate"
             cx="44"
@@ -31,6 +31,7 @@
         </svg>
       </div>
       <div style="height: 10px"></div>
+      <!-- biome-ignore lint/a11y/useHeadingContent: text is populated dynamically by loading.js -->
       <h4 id="loading-text" class="loading-text"></h4>
       <noscript>
         <h4 class="loading-text">This app requires JavaScript</h4>

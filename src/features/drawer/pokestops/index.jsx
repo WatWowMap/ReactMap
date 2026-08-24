@@ -2,10 +2,10 @@
 import * as React from 'react'
 
 import { AllForts } from '../components/AllForts'
-import { LureQuickSelect } from './Lures'
-import { InvasionQuickSelect } from './Invasions'
-import { QuestQuickSelect } from './Quests'
 import { EventsQuickSelect } from './EventStops'
+import { InvasionQuickSelect } from './Invasions'
+import { LureQuickSelect } from './Lures'
+import { QuestQuickSelect } from './Quests'
 
 function ExtrasComponent({ subItem }) {
   switch (subItem) {

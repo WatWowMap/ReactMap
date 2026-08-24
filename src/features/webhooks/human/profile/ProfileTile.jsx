@@ -1,16 +1,15 @@
 // @ts-check
-import * as React from 'react'
-import Grid from '@mui/material/Unstable_Grid2'
-import Divider from '@mui/material/Divider'
+
 import CircularProgress from '@mui/material/CircularProgress'
+import Divider from '@mui/material/Divider'
 import { styled } from '@mui/material/styles'
-
+import Grid from '@mui/material/Unstable_Grid2'
 import { useWebhookStore } from '@store/useWebhookStore'
-
-import { ProfileView } from './ProfileView'
-import { EditView } from './EditView'
-import { DeleteView } from './DeleteVIew'
+import * as React from 'react'
 import { CopyView } from './CopyView'
+import { DeleteView } from './DeleteVIew'
+import { EditView } from './EditView'
+import { ProfileView } from './ProfileView'
 
 /**
  * @typedef {'profile' | 'edit' | 'delete' | 'copy'} View

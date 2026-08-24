@@ -1,13 +1,13 @@
 // @ts-check
-import * as React from 'react'
-import Grid from '@mui/material/Unstable_Grid2'
+
+import { BasicListButton } from '@components/inputs/BasicListButton'
+import { StatusIcon } from '@components/StatusIcon'
 import Divider from '@mui/material/Divider'
 import List from '@mui/material/List'
 import ListSubheader from '@mui/material/ListSubheader'
 import { styled } from '@mui/material/styles'
-
-import { BasicListButton } from '@components/inputs/BasicListButton'
-import { StatusIcon } from '@components/StatusIcon'
+import Grid from '@mui/material/Unstable_Grid2'
+import * as React from 'react'
 
 import { setNotification, useDataManagementStore } from '../hooks/store'
 

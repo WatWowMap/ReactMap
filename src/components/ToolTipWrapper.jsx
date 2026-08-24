@@ -1,9 +1,9 @@
 // @ts-check
-import * as React from 'react'
-import { Tooltip } from 'react-leaflet'
-import { useTranslation } from 'react-i18next'
 
 import { getTimeUntil } from '@utils/getTimeUntil'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
+import { Tooltip } from 'react-leaflet'
 
 const Timer = ({ timestamp }) => {
   const { t } = useTranslation()
@@ -32,7 +32,7 @@ export function TooltipWrapper({ timers, offset, children }) {
       {children}
       {[...new Set(timers)].map((timer, i) => (
         <Timer
-          // eslint-disable-next-line react/no-array-index-key
+          // biome-ignore lint/suspicious/noArrayIndexKey: pre-existing, tracked for follow-up
           key={timer + i * 123}
           timestamp={timer}
         />

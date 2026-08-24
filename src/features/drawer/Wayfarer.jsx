@@ -1,11 +1,12 @@
 // @ts-check
-import * as React from 'react'
-import ListItemText from '@mui/material/ListItemText'
-import { useTranslation } from 'react-i18next'
 
-import { useStorage } from '@store/useStorage'
 import { WAYFARER_OPTIONS } from '@assets/constants'
 import { BoolToggle } from '@components/inputs/BoolToggle'
+import ListItemText from '@mui/material/ListItemText'
+
+import { useStorage } from '@store/useStorage'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 
 import { CollapsibleItem } from './components/CollapsibleItem'
 

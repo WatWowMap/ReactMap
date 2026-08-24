@@ -1,7 +1,7 @@
 // @ts-check
-import { create } from 'zustand'
 
 import { analytics } from '@utils/analytics'
+import { create } from 'zustand'
 
 import { useStorage } from './useStorage'
 

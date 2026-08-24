@@ -1,4 +1,4 @@
 // @ts-check
 
-export * from './GenerateCells'
 export * from './BaseCell'
+export * from './GenerateCells'

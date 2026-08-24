@@ -1,14 +1,13 @@
 // @ts-check
-import * as React from 'react'
+
+import { NUNDO_HUNDO, XXS_XXL } from '@assets/constants'
+import { GenderListItem } from '@components/filters/Gender'
+import { DualBoolToggle } from '@components/inputs/BoolToggle'
+import { TabPanel } from '@components/TabPanel'
 import Divider from '@mui/material/Divider'
 import List from '@mui/material/List'
 import ListSubheader from '@mui/material/ListSubheader'
 import { useTranslation } from 'react-i18next'
-
-import { XXS_XXL, NUNDO_HUNDO } from '@assets/constants'
-import { TabPanel } from '@components/TabPanel'
-import { GenderListItem } from '@components/filters/Gender'
-import { DualBoolToggle } from '@components/inputs/BoolToggle'
 import { PokemonSlider } from './PokemonSlider'
 
 /**

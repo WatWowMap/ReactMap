@@ -1,9 +1,10 @@
 /* eslint-disable no-fallthrough */
 // @ts-check
-import { useMemo } from 'react'
-import { useTranslation } from 'react-i18next'
+
 import { getFormDisplay } from '@utils/getFormDisplay'
 import { getShowcaseBuddyFilterLabelKey } from '@utils/showcaseFocus'
+import { useMemo } from 'react'
+import { useTranslation } from 'react-i18next'
 
 /**
  * @typedef {{ plural?: boolean, amount?: boolean, alt?: boolean, newLine?: boolean, quest?: boolean, omitFormSuffix?: boolean, showDefaultForms?: boolean }} CustomTOptions
@@ -118,6 +119,7 @@ export function useTranslateById(options = {}) {
             return i18n.t(getShowcaseBuddyFilterLabelKey(id))
           case 'a':
           // rocket pokemon
+          // biome-ignore lint/suspicious/noFallthroughSwitchClause: intentional fallthrough into the pokemon-name default case
           case 'f':
             // showcase mons
             id = id.slice(1)

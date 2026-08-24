@@ -1,22 +1,21 @@
 /* eslint-disable react/destructuring-assignment */
 // @ts-check
-import * as React from 'react'
-import { Marker, Popup, Circle } from 'react-leaflet'
 
+import { TooltipWrapper } from '@components/ToolTipWrapper'
+import { resolveRoutePoiKey, useRouteStore } from '@features/route'
+import { useForcePopup } from '@hooks/useForcePopup'
+import { useManualPopupTracker } from '@hooks/useManualPopupTracker'
 import { useMarkerTimer } from '@hooks/useMarkerTimer'
 import { basicEqualFn, useMemory } from '@store/useMemory'
 import { useStorage } from '@store/useStorage'
-import { useRouteStore, resolveRoutePoiKey } from '@features/route'
-import { useForcePopup } from '@hooks/useForcePopup'
-import { useManualPopupTracker } from '@hooks/useManualPopupTracker'
-import { TooltipWrapper } from '@components/ToolTipWrapper'
 import { isBuddyShowcaseFocus } from '@utils/showcaseFocus'
-
-import { PokestopPopup } from './PokestopPopup'
+import * as React from 'react'
+import { Circle, Marker, Popup } from 'react-leaflet'
 import {
-  INCIDENT_DISPLAY_TYPES,
   getPokestopIncidentState,
+  INCIDENT_DISPLAY_TYPES,
 } from './incidentPriority'
+import { PokestopPopup } from './PokestopPopup'
 import { usePokestopMarker } from './usePokestopMarker'
 
 /**

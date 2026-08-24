@@ -146,13 +146,16 @@ class PoracleAPI {
   async getUserAreas(userId) {
     /** @type {{ areas: import("@rm/types").PoracleHumanArea[] }} */
     const { areas } = await this.#sendRequest(APIS.humans(userId))
-    const areaGroups = areas.reduce((groupMap, area) => {
-      if (area.userSelectable) {
-        if (!groupMap[area.group]) groupMap[area.group] = []
-        groupMap[area.group].push(area.name)
-      }
-      return groupMap
-    }, /** @type {Record<string, string[]>} */ ({}))
+    const areaGroups = areas.reduce(
+      (groupMap, area) => {
+        if (area.userSelectable) {
+          if (!groupMap[area.group]) groupMap[area.group] = []
+          groupMap[area.group].push(area.name)
+        }
+        return groupMap
+      },
+      /** @type {Record<string, string[]>} */ ({}),
+    )
 
     return Object.entries(areaGroups)
       .map(([group, children]) => ({

@@ -1,8 +1,8 @@
 // @ts-check
-import * as React from 'react'
+
+import { TutorialAdvanced } from '@features/tutorial'
 
 import { useLayoutStore } from '@store/useLayoutStore'
-import { TutorialAdvanced } from '@features/tutorial'
 
 import { DialogWrapper } from './DialogWrapper'
 

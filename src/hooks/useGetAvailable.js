@@ -1,10 +1,10 @@
 // @ts-check
-import { useEffect, useMemo } from 'react'
+
 import { useQuery } from '@apollo/client'
 import { capitalize } from '@mui/material/utils'
-
 import * as queries from '@services/queries/available'
 import { useMemory } from '@store/useMemory'
+import { useEffect, useMemo } from 'react'
 
 /**
  * @param {keyof import('packages/types/lib').Available} category

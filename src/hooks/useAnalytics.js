@@ -1,7 +1,7 @@
 // @ts-check
-import { useEffect } from 'react'
 
 import { analytics } from '@utils/analytics'
+import { useEffect } from 'react'
 
 /**
  *

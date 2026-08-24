@@ -1,5 +1,4 @@
 import { Request } from 'express'
-import type { ButtonProps } from '@mui/material'
 
 import { Config, ConfigAreas, GetSafeConfig } from './config'
 import { ExpressUser, Permissions } from './server'

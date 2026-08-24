@@ -18,7 +18,7 @@ function rateLimitingMiddleware() {
       type: 'error',
       message: `Too many requests from this IP, please try again in ${minutes} minutes.`,
     },
-    handler: (req, res, next, options) => {
+    handler: (req, res, _next, options) => {
       log.info(
         TAGS.express,
         req?.user?.username || 'Unknown user',

@@ -1,29 +1,22 @@
-import type { LogLevelNames } from 'loglevel'
 import type { DialogProps } from '@mui/material'
+import type { LogLevelNames } from 'loglevel'
 import type { UiconsIndex } from 'uicons.js'
 
-import { Props as ImgProps } from '@components/Img'
-
 import type { CustomComponent } from './blocks'
+
 import config = require('../../../config/default.json')
 import example = require('../../../config/local.example.json')
 
-import type { Schema } from './server'
-import {
-  OnlyType,
-  DeepMerge,
-  ComparisonReport,
-  Paths,
-  ObjectPathValue,
-} from './utility'
-import { Strategy } from './general'
 import { TileLayer } from './client'
+import { Strategy } from './general'
+import type { Schema } from './server'
+import { ComparisonReport, DeepMerge, ObjectPathValue, Paths } from './utility'
 
 type BaseConfig = typeof config
 type ExampleConfig = typeof example
 
 export type ConfigAreas = Awaited<
-  ReturnType<(typeof import('server/src/services/areas'))['loadLatestAreas']>
+  ReturnType<typeof import('server/src/services/areas')['loadLatestAreas']>
 >
 
 export type Config<Client extends boolean = false> = DeepMerge<
@@ -34,9 +27,8 @@ export type Config<Client extends boolean = false> = DeepMerge<
           version: string
           locales: string[]
           localeStatus: ReturnType<
-            (typeof import('@rm/locales/lib/utils'))['getStatus']
+            typeof import('@rm/locales/lib/utils')['getStatus']
           >
-          hasCustom: boolean
           title: string
         }
       : never

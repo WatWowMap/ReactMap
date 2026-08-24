@@ -1,17 +1,16 @@
 // @ts-check
 
-import * as React from 'react'
-import { useParams } from 'react-router'
-import { useMap } from 'react-leaflet'
-import { useTranslation } from 'react-i18next'
-import useMediaQuery from '@mui/material/useMediaQuery'
-
 import { useMapData } from '@hooks/useMapData'
+import useMediaQuery from '@mui/material/useMediaQuery'
 import { useMemory } from '@store/useMemory'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
+import { useMap } from 'react-leaflet'
+import { useParams } from 'react-router'
 
 import { useGenGyms } from '../hooks/useGenGyms'
-import { useGenPokestops } from '../hooks/useGenPokestops'
 import { useGenPokemon } from '../hooks/useGenPokemon'
+import { useGenPokestops } from '../hooks/useGenPokestops'
 import { useGenTappables } from '../hooks/useGenTappables'
 
 export function Effects() {

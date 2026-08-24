@@ -1,18 +1,17 @@
 // @ts-check
 /* eslint-disable react/no-array-index-key */
-import * as React from 'react'
-import Typography from '@mui/material/Typography'
-import Dialog from '@mui/material/Dialog'
-import Box from '@mui/material/Box'
-import { useQuery } from '@apollo/client'
 
+import { useQuery } from '@apollo/client'
+import { Loading } from '@components/Loading'
+import Box from '@mui/material/Box'
+import Dialog from '@mui/material/Dialog'
+import Typography from '@mui/material/Typography'
+import { CUSTOM_COMPONENT, MOTD_CHECK } from '@services/queries/config'
 import { useLayoutStore } from '@store/useLayoutStore'
 import { useStorage } from '@store/useStorage'
-import { CUSTOM_COMPONENT, MOTD_CHECK } from '@services/queries/config'
-import { Loading } from '@components/Loading'
-
-import { CustomTile } from './components/CustomTile'
+import * as React from 'react'
 import { CustomDialog } from './components/CustomDialog'
+import { CustomTile } from './components/CustomTile'
 import { getBlockContent } from './utils'
 
 const DEFAULT =
@@ -72,6 +71,7 @@ export function MessageOfTheDay() {
         ) : (
           motd.components.map((block, i) => (
             <CustomTile
+              // biome-ignore lint/suspicious/noArrayIndexKey: pre-existing, tracked for follow-up
               key={i}
               block={block}
               defaultReturn={block.type ? null : <DefaultMotD block={block} />}

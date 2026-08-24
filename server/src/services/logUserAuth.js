@@ -1,5 +1,4 @@
 // @ts-check
-const { default: fetch } = require('node-fetch')
 const { log, TAGS } = require('@rm/logger')
 
 // PII fields inside getAuthInfo embed

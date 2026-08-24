@@ -1,5 +1,5 @@
 // @ts-check
-import * as React from 'react'
+
 import Clear from '@mui/icons-material/Clear'
 import DialogTitle from '@mui/material/DialogTitle'
 import IconButton from '@mui/material/IconButton'

@@ -1,6 +1,7 @@
 // @ts-check
-import * as React from 'react'
+
 import Typography from '@mui/material/Typography'
+import * as React from 'react'
 
 /** @param {import('@mui/material').TypographyProps} props */
 export function ToggleTypography(props) {

@@ -255,7 +255,7 @@ class DbManager extends Logger {
     let hasPokemonShinyStats
     try {
       hasPokemonShinyStats = await schema.schema.hasTable('pokemon_shiny_stats')
-    } catch (e) {
+    } catch (_e) {
       hasPokemonShinyStats = false
     }
 

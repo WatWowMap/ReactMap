@@ -1,21 +1,22 @@
 // @ts-check
-import * as React from 'react'
+
+import { useQuery } from '@apollo/client'
+import { Img } from '@components/Img'
+import HighlightOffIcon from '@mui/icons-material/HighlightOff'
+import CircularProgress from '@mui/material/CircularProgress'
 import Divider from '@mui/material/Divider'
 import IconButton from '@mui/material/IconButton'
-import Menu from '@mui/material/Menu'
-import MenuItem from '@mui/material/MenuItem'
 import ListItemIcon from '@mui/material/ListItemIcon'
 import ListItemText from '@mui/material/ListItemText'
+import Menu from '@mui/material/Menu'
+import MenuItem from '@mui/material/MenuItem'
 import TextField from '@mui/material/TextField'
-import CircularProgress from '@mui/material/CircularProgress'
-import HighlightOffIcon from '@mui/icons-material/HighlightOff'
-import { useTranslation } from 'react-i18next'
-import { useQuery } from '@apollo/client'
+import { SEARCHABLE } from '@services/queries/config'
 
 import { useMemory } from '@store/useMemory'
 import { useStorage } from '@store/useStorage'
-import { SEARCHABLE } from '@services/queries/config'
-import { Img } from '@components/Img'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 
 const SearchImage = React.memo(
   /** @param {{ name: string }} props */ ({ name }) => {
