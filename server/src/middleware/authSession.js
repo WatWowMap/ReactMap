@@ -3,22 +3,30 @@ const { eq } = require('drizzle-orm')
 
 const { log, TAGS } = require('@rm/logger')
 
+const { mergePerms: mergePermsPair } = require('../utils/mergePerms')
+
 /**
  * Folds the per-provider perms rows into the single object the app expects.
  * A true from any provider wins, which matches how a linked account behaves
  * today: linking never removes an ability the person already had.
  *
+ * `merged[key] || value` was the naive version of that fold, but an empty
+ * array is truthy in JS, so the first row processed always won outright for
+ * any array-valued perm (`areaRestrictions`). Since `areaRestrictions` treats
+ * an empty array as unrestricted (`server/src/utils/getAreaSql.js`), and the
+ * `user_perms` query carries no `ORDER BY`, a user restricted to one area by
+ * one provider could get the whole map depending on unspecified row order.
+ * `mergePermsPair` (`server/src/utils/mergePerms.js`, the 1.x
+ * implementation) unions array values explicitly instead, so this reduces
+ * pairwise through it rather than re-deriving the same semantics here.
+ *
  * @param {{ providerId: string, perms: Record<string, boolean> }[]} rows
  */
 function mergePerms(rows) {
-  /** @type {Record<string, any>} */
-  const merged = {}
-  for (const row of rows) {
-    for (const [key, value] of Object.entries(row.perms || {})) {
-      merged[key] = merged[key] || value
-    }
-  }
-  return merged
+  return rows.reduce(
+    (merged, row) => mergePermsPair(merged, row.perms || {}),
+    /** @type {Record<string, any>} */ ({}),
+  )
 }
 
 /**

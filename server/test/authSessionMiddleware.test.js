@@ -26,6 +26,40 @@ test('no rows merge to an empty object, not undefined', () => {
   expect(mergePerms([])).toEqual({})
 })
 
+test('array-valued perms union instead of the first row winning, in either row order', () => {
+  const restricted = {
+    providerId: 'discord',
+    perms: { areaRestrictions: ['area1'] },
+  }
+  const unrestricted = {
+    providerId: 'telegram',
+    perms: { areaRestrictions: [] },
+  }
+
+  // The query has no ORDER BY, so MySQL can return either row first. An
+  // empty array is truthy, so a naive `merged[key] || value` fold lets
+  // whichever row lands first decide the outcome -- and an empty
+  // areaRestrictions means unrestricted, so row order silently controls map
+  // access. Both orderings must produce the identical, restricted result.
+  const forward = mergePerms([restricted, unrestricted])
+  const backward = mergePerms([unrestricted, restricted])
+  expect(forward).toEqual({ areaRestrictions: ['area1'] })
+  expect(backward).toEqual({ areaRestrictions: ['area1'] })
+  expect(forward).toEqual(backward)
+})
+
+test('array-valued perms union values from both providers, deduplicated', () => {
+  const rows = [
+    { providerId: 'discord', perms: { areaRestrictions: ['area1', 'area2'] } },
+    { providerId: 'telegram', perms: { areaRestrictions: ['area2', 'area3'] } },
+  ]
+  expect(mergePerms(rows).areaRestrictions.sort()).toEqual([
+    'area1',
+    'area2',
+    'area3',
+  ])
+})
+
 test('an existing passport user is left alone when better auth has no session', async () => {
   const middleware = authSessionMiddleware({
     getSession: async () => null,
