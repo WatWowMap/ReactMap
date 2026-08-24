@@ -29,11 +29,19 @@ function getDrizzle() {
     user: schema.username,
     password: schema.password,
     database: schema.database,
-    connectionLimit: schema.connectionLimit || 10,
   })
 
   cached = drizzle(pool)
   return cached
 }
 
-module.exports = { getDrizzle }
+/**
+ * Drops the cached client. `bun test` runs every file in one process, so
+ * without this a test that builds a client leaves it in place for every test
+ * after it, including ones that mean to exercise a different configuration.
+ */
+function resetDrizzle() {
+  cached = null
+}
+
+module.exports = { getDrizzle, resetDrizzle }

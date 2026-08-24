@@ -25,3 +25,14 @@ test('returns null when no schema serves reactmap categories', () => {
 test('returns null for an empty schema list', () => {
   expect(resolveReactMapSchema([])).toBeNull()
 })
+
+test('only user selects, matching DbManager', () => {
+  // DbManager.js:118 sets reactMapDb on `User` and nothing else. A schema
+  // carrying session or backup without user is one DbManager would reject.
+  expect(
+    resolveReactMapSchema([{ host: 'a', useFor: ['session', 'backup'] }]),
+  ).toBeNull()
+  expect(
+    resolveReactMapSchema([{ host: 'a', useFor: ['nest', 'portal'] }]),
+  ).toBeNull()
+})

@@ -2,16 +2,15 @@
 // @ts-check
 
 /**
- * Categories that live in the ReactMap database rather than a scanner database.
- * Mirrors the `useFor` values DbManager treats as ReactMap-owned.
+ * The single `useFor` category that selects the ReactMap database.
+ *
+ * Only `user` does. `DbManager.js:118` sets `reactMapDb` on the capitalised
+ * category `User` and on nothing else, then `bindConnections` force-binds
+ * Badge, Backup, NestSubmission and Session to whichever schema won on `user`,
+ * ignoring their own `useFor`. Matching any wider set would pick a schema that
+ * DbManager refuses, which is auth writes going to the wrong database.
  */
-const REACTMAP_CATEGORIES = new Set([
-  'user',
-  'session',
-  'backup',
-  'gymBadge',
-  'nestSubmission',
-])
+const REACTMAP_CATEGORIES = new Set(['user'])
 
 /**
  * @param {{ useFor?: string[] }[]} schemas
