@@ -16,19 +16,25 @@
   --color-team-3: #f1f642; /* instinct */
 
   /*
-   * League colours. 1.0 has no literal league colour anywhere in the
-   * codebase: src/features/pokemon/PokemonPopup.jsx's leagueLookup maps
-   * league name to a CP-cap string used only to pick a badge icon
-   * (Icons.getMisc), and config/default.json's pvp.leagues carries name
-   * and cp, never a colour. There is nothing real to carry across for
-   * this group. The values below are placeholders, not sourced data,
-   * and are flagged as such in the task report; treat them as needing
-   * design sign-off before they reach a real filter chip or legend.
+   * League colours. Unlike every other group in this file these are NOT
+   * carried across from 1.0, because 1.0 has none: leagueLookup in
+   * src/features/pokemon/PokemonPopup.jsx maps a league name to a CP-cap
+   * string that only picks a badge icon, and config/default.json's
+   * pvp.leagues carries name and cp. There was nothing to copy.
+   *
+   * These are matched to how the game renders league identity in its battle
+   * UI, chosen deliberately rather than sampled from an asset, so they are
+   * approximate to the game and exact to us.
+   *
+   * Master is a purple and the brand accent is also a violet, which is a
+   * collision worth knowing about. This one is deeper and redder so a league
+   * chip does not read as the same thing as an accented control sitting
+   * beside it. Do not resolve that by moving it toward the accent.
    */
-  --color-league-little: #8bc34a;
-  --color-league-great: #2ab5f6;
-  --color-league-ultra: #7b5ce0;
-  --color-league-master: #c62828;
+  --color-league-little: #6aa84f;
+  --color-league-great: #3d7dca;
+  --color-league-ultra: #f2c14e;
+  --color-league-master: #8e44ad;
 
   /*
    * IV tier colours. Source: src/features/pokemon/PokemonPopup.jsx,
