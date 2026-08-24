@@ -80,6 +80,13 @@ test('ignores schemas with an empty useFor', () => {
   expect(resolveReactMapSchema(schemas)).toEqual(schemas[1])
 })
 
+test('only user selects, matching DbManager', () => {
+  // DbManager.js:118 sets reactMapDb on `User` and nothing else. A schema
+  // carrying session or backup without user is one DbManager would reject.
+  expect(resolveReactMapSchema([{ host: 'a', useFor: ['session', 'backup'] }])).toBeNull()
+  expect(resolveReactMapSchema([{ host: 'a', useFor: ['nest', 'portal'] }])).toBeNull()
+})
+
 test('returns null when no schema serves reactmap categories', () => {
   expect(resolveReactMapSchema([{ host: 'a', useFor: ['pokemon'] }])).toBeNull()
 })
@@ -101,16 +108,15 @@ Expected: FAIL, `Cannot find module '../src/db/reactMapDb'`.
 // @ts-check
 
 /**
- * Categories that live in the ReactMap database rather than a scanner database.
- * Mirrors the `useFor` values DbManager treats as ReactMap-owned.
+ * The single `useFor` category that selects the ReactMap database.
+ *
+ * Only `user` does. `DbManager.js:118` sets `reactMapDb` on the capitalised
+ * category `User` and on nothing else, then `bindConnections` force-binds
+ * Badge, Backup, NestSubmission and Session to whichever schema won on `user`,
+ * ignoring their own `useFor`. Matching any wider set would pick a schema that
+ * DbManager refuses, which is auth writes going to the wrong database.
  */
-const REACTMAP_CATEGORIES = new Set([
-  'user',
-  'session',
-  'backup',
-  'gymBadge',
-  'nestSubmission',
-])
+const REACTMAP_CATEGORIES = new Set(['user'])
 
 /**
  * @param {{ useFor?: string[] }[]} schemas
@@ -151,6 +157,15 @@ const { resolveReactMapSchema } = require('./reactMapDb')
 let cached = null
 
 /**
+ * Drops the cached client. `bun test` runs every file in one process, so
+ * without this a test that builds a client leaves it in place for every test
+ * after it, including ones that mean to exercise a different configuration.
+ */
+function resetDrizzle() {
+  cached = null
+}
+
+/**
  * Drizzle client over the ReactMap database. Built once, on first use, so that
  * importing this module never opens a connection during tests.
  */
@@ -170,14 +185,13 @@ function getDrizzle() {
     user: schema.username,
     password: schema.password,
     database: schema.database,
-    connectionLimit: schema.connectionLimit || 10,
   })
 
   cached = drizzle(pool)
   return cached
 }
 
-module.exports = { getDrizzle }
+module.exports = { getDrizzle, resetDrizzle }
 ```
 
 - [ ] **Step 6: Confirm nothing else broke**
