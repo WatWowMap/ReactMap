@@ -49,4 +49,6 @@ test('a better auth session replaces req.user and fills perms', async () => {
   await middleware(req, {}, () => {})
   expect(req.user.id).toBe('abc')
   expect(req.session.perms).toEqual({ map: true })
+  // Most of the codebase reads perms off the user, not the session.
+  expect(req.user.perms).toEqual({ map: true })
 })
