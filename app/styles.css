@@ -4,6 +4,7 @@
 @theme {
   --font-display: 'Fredoka', ui-sans-serif, system-ui, sans-serif;
   --font-sans: 'Nunito', ui-sans-serif, system-ui, sans-serif;
+  --font-heading: var(--font-display);
 
   --color-accent-from: #7b5ce0;
   --color-accent-to: #e067a8;
@@ -11,8 +12,20 @@
   --color-surface: #ffffff;
   --color-foreground: #1c1a26;
   --color-muted: #6f6b80;
+  --color-muted-foreground: #524e63;
   --color-border: #e3e0ec;
   --color-ring: #7b5ce0;
+
+  --color-background: var(--color-surface);
+  --color-card: var(--color-surface);
+  --color-card-foreground: var(--color-foreground);
+  --color-primary: var(--color-accent-from);
+  --color-primary-foreground: #ffffff;
+  --color-secondary: #f1eef9;
+  --color-secondary-foreground: var(--color-foreground);
+  --color-destructive: #dc2626;
+  --color-destructive-foreground: #ffffff;
+  --color-input: var(--color-border);
 
   --radius-card: 1.125rem;
   --radius-sheet: 1.25rem;
@@ -29,13 +42,19 @@
  * @theme above already emits these as real custom properties on :root
  * (that is how Tailwind v4 tokens work), so the override below targets
  * the same variables directly rather than declaring a second :root set.
+ * Tokens defined above as var() references onto these (background, card,
+ * card-foreground, secondary-foreground, input) pick up the override for
+ * free since custom properties resolve through the cascade, not at
+ * declaration time.
  */
 @media (prefers-color-scheme: dark) {
   :root {
     --color-surface: #17151f;
     --color-foreground: #f1eef9;
     --color-muted: #a29dbb;
+    --color-muted-foreground: #c7c2dc;
     --color-border: #322d42;
     --color-ring: #a78bfa;
+    --color-secondary: #241f30;
   }
 }
