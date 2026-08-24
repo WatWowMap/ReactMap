@@ -257,6 +257,11 @@ test('auth_account carries a password column for credential accounts', () => {
   expect(Object.keys(authAccount)).toContain('password')
 })
 
+test('auth_account carries the issuer column better auth 1.7 requires', () => {
+  // Without it every sign-up throws after the user row is already written.
+  expect(Object.keys(authAccount)).toContain('issuer')
+})
+
 test('auth_user carries username fields for the username plugin', () => {
   const columns = Object.keys(authUser)
   expect(columns).toContain('username')
@@ -315,6 +320,12 @@ const authAccount = mysqlTable(
   'auth_account',
   {
     id: varchar('id', { length: 36 }).primaryKey(),
+    // better-auth 1.7.1 requires `issuer` on every account row, credential rows
+    // included. `@better-auth/core` builds it as `local:<providerId>` for
+    // credentials and `local:oauth:<providerId>` for OAuth, both URI encoded.
+    // Omitting it fails at the first sign-up with "The field issuer does not
+    // exist in the auth_account Drizzle schema", after the user row is written.
+    issuer: varchar('issuer', { length: 191 }).notNull(),
     accountId: varchar('account_id', { length: 191 }).notNull(),
     providerId: varchar('provider_id', { length: 191 }).notNull(),
     userId: varchar('user_id', { length: 36 }).notNull(),
@@ -329,8 +340,8 @@ const authAccount = mysqlTable(
     updatedAt: timestamp('updated_at', { fsp: 3 }).defaultNow().notNull(),
   },
   (table) => [
-    uniqueIndex('auth_account_provider_account_uidx').on(
-      table.providerId,
+    uniqueIndex('auth_account_issuer_account_uidx').on(
+      table.issuer,
       table.accountId,
     ),
     index('auth_account_user_id_idx').on(table.userId),
@@ -394,6 +405,7 @@ exports.up = async function up(knex) {
 
   await knex.schema.createTable('auth_account', (table) => {
     table.string('id', 36).primary()
+    table.string('issuer', 191).notNullable()
     table.string('account_id', 191).notNullable()
     table.string('provider_id', 191).notNullable()
     table.string('user_id', 36).notNullable()
@@ -406,8 +418,8 @@ exports.up = async function up(knex) {
     table.text('password')
     table.timestamp('created_at', { precision: 3 }).notNullable().defaultTo(knex.fn.now(3))
     table.timestamp('updated_at', { precision: 3 }).notNullable().defaultTo(knex.fn.now(3))
-    table.unique(['provider_id', 'account_id'], {
-      indexName: 'auth_account_provider_account_uidx',
+    table.unique(['issuer', 'account_id'], {
+      indexName: 'auth_account_issuer_account_uidx',
     })
     table.index('user_id', 'auth_account_user_id_idx')
     table.foreign('user_id').references('auth_user.id').onDelete('CASCADE')
@@ -1096,6 +1108,13 @@ A user row today carries `id`, `username`, `password`, `discordId`, `telegramId`
 const { test, expect } = require('bun:test')
 const { planBackfill } = require('../src/auth/backfill')
 
+test('accounts carry the issuer strings better auth generates', () => {
+  const plan = planBackfill({ id: 7, username: 'ash', password: '$2b$10$h', discordId: '99' })
+  const byProvider = Object.fromEntries(plan.accounts.map((a) => [a.providerId, a.issuer]))
+  expect(byProvider.credential).toBe('local:credential')
+  expect(byProvider.discord).toBe('local:oauth:discord')
+})
+
 test('a local account keeps its password hash on the account row', () => {
   const plan = planBackfill({
     id: 7, username: 'ash', password: '$2b$10$hash', strategy: 'local',
@@ -1168,6 +1187,20 @@ Expected: FAIL, `Cannot find module '../src/auth/backfill'`.
 const crypto = require('crypto')
 
 /**
+ * Rebuilds the issuer strings `@better-auth/core` generates, because a row this
+ * back-fill writes has to look exactly like one Better Auth would have written.
+ * Getting these wrong does not fail loudly: the row inserts fine and the person
+ * simply cannot sign in.
+ */
+function localIssuer(providerId) {
+  return `local:${encodeURIComponent(providerId)}`
+}
+
+function oauthIssuer(providerId) {
+  return `local:oauth:${encodeURIComponent(providerId)}`
+}
+
+/**
  * Derives a stable auth_user id from the legacy numeric id, so the back-fill
  * is idempotent: running it twice produces the same ids and the second run is
  * an upsert rather than a duplicate.
@@ -1208,16 +1241,27 @@ function planBackfill(row) {
   if (row.password) {
     accounts.push({
       providerId: 'credential',
+      issuer: localIssuer('credential'),
       accountId: row.username || String(row.id),
       userId: id,
       password: row.password,
     })
   }
   if (row.discordId) {
-    accounts.push({ providerId: 'discord', accountId: String(row.discordId), userId: id })
+    accounts.push({
+      providerId: 'discord',
+      issuer: oauthIssuer('discord'),
+      accountId: String(row.discordId),
+      userId: id,
+    })
   }
   if (row.telegramId) {
-    accounts.push({ providerId: 'telegram', accountId: String(row.telegramId), userId: id })
+    accounts.push({
+      providerId: 'telegram',
+      issuer: oauthIssuer('telegram'),
+      accountId: String(row.telegramId),
+      userId: id,
+    })
   }
 
   const perms = []
@@ -1231,7 +1275,7 @@ function planBackfill(row) {
   return { user, accounts, perms }
 }
 
-module.exports = { planBackfill, authIdForLegacy }
+module.exports = { planBackfill, authIdForLegacy, localIssuer, oauthIssuer }
 ```
 
 - [ ] **Step 4: Run the test and watch it pass**
@@ -1264,7 +1308,7 @@ exports.up = async function up(knex) {
     for (const account of accounts) {
       await knex('auth_account')
         .insert({ id: `${account.userId}:${account.providerId}`, ...account })
-        .onConflict(['provider_id', 'account_id'])
+        .onConflict(['issuer', 'account_id'])
         .merge()
     }
 
