@@ -1614,6 +1614,8 @@ test('a better auth session replaces req.user and fills perms', async () => {
   await middleware(req, {}, () => {})
   expect(req.user.id).toBe('abc')
   expect(req.session.perms).toEqual({ map: true })
+  // Most of the codebase reads perms off the user, not the session.
+  expect(req.user.perms).toEqual({ map: true })
 })
 ```
 
@@ -1661,9 +1663,15 @@ function authSessionMiddleware(deps) {
     try {
       const session = await deps.getSession(req.headers)
       if (session?.user) {
-        req.user = session.user
+        const perms = mergePerms(await deps.getPerms(session.user.id))
+        // Perms go on BOTH. 41 sites in server/src read `user.perms` against 8
+        // that read `session.perms`, because passport's deserializeUser spread
+        // the whole user object, perms included, onto req.user. Populating only
+        // the session copy leaves every authenticated request throwing on
+        // `perms[...]` of undefined, for example clientOptions.js:333.
+        req.user = { ...session.user, perms }
         req.session = req.session || {}
-        req.session.perms = mergePerms(await deps.getPerms(session.user.id))
+        req.session.perms = perms
       }
     } catch (e) {
       // A failure here must not take the request down: passport is still
