@@ -154,3 +154,25 @@ test('does not fall back for a hash written by Bun', async () => {
   }
   assert.equal(updates.length, 0)
 })
+
+test('rejects a malformed stored hash instead of throwing', async () => {
+  // bcrypt.compareSync returned false for these. Bun.password.verify throws,
+  // and the throw escapes to a catch that never calls done, hanging the
+  // request. Every row must resolve to a plain false.
+  assert.equal(await verifyPassword('reactmap', 'not-a-hash-at-all'), false)
+  assert.equal(await verifyPassword('reactmap', ''), false)
+  assert.equal(
+    await verifyPassword('reactmap', '$2b$10$tooshorttobeabcrypthash'),
+    false,
+  )
+  // Discord and Telegram rows have no password at all.
+  assert.equal(await verifyPassword('reactmap', null), false)
+})
+
+test('rejects a malformed stored hash for a password over 72 bytes', async () => {
+  // The truncation fallback verifies a second time, so it needs the same guard.
+  assert.equal(
+    await verifyPassword(LEGACY_LONG_PASSWORD, 'not-a-hash-at-all'),
+    false,
+  )
+})
