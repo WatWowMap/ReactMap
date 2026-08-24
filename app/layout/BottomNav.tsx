@@ -11,7 +11,7 @@ const DESTINATIONS = [
 
 export function BottomNav() {
   return (
-    <nav className="fixed inset-x-0 bottom-0 grid grid-cols-4 border-t border-border bg-surface pb-[env(safe-area-inset-bottom)]">
+    <nav className="fixed inset-x-0 bottom-0 grid grid-cols-4 border-t border-border-strong bg-surface pb-[env(safe-area-inset-bottom)]">
       {DESTINATIONS.map(({ to, label, icon: Icon }) => (
         <NavLink
           key={to}

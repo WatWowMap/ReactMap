@@ -19,7 +19,17 @@
    */
   --color-muted: #f5f3fb;
   --color-muted-foreground: #6f6b80;
-  --color-border: #e3e0ec;
+  /*
+   * Two border roles, two floors. --color-border is the decorative hairline
+   * on cards and button outlines: it identifies no control and carries no
+   * state, so WCAG 1.4.11 does not bind it and it stays soft, raised only
+   * from an invisible 1.30:1 to 1.95:1. --color-border-strong is for a
+   * boundary that does carry meaning, currently the bottom nav's top edge,
+   * which is the only thing separating a fixed bar from content scrolling
+   * under it. That one is held to the 3:1 non-text floor.
+   */
+  --color-border: #bdb6cf;
+  --color-border-strong: #968dae;
   --color-ring: #7b5ce0;
 
   --color-background: var(--color-surface);
@@ -59,7 +69,8 @@
     --color-foreground: #f1eef9;
     --color-muted: #221f2d;
     --color-muted-foreground: #a29dbb;
-    --color-border: #322d42;
+    --color-border: #4b4465;
+    --color-border-strong: #6f668c;
     --color-ring: #a78bfa;
     --color-secondary: #241f30;
 
