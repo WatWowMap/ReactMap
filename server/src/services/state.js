@@ -1,7 +1,4 @@
 // @ts-check
-const fs = require('fs')
-const path = require('path')
-
 const config = require('@rm/config')
 const { log, TAGS } = require('@rm/logger')
 
@@ -31,23 +28,42 @@ const state = {
           )
           return !!enabled
         })
-        .map(({ name, type }, i) => {
+        .map((strategyConfig, i) => {
+          const { name, type } = strategyConfig
           try {
             if (this.event.authClients[name]) {
               // Clear any existing trials before we reinitialize
               this.event.authClients[name]?.trialManager?.end()
             }
-            const buildStrategy = fs.existsSync(
-              path.resolve(__dirname, `../strategies/${name}.js`),
-            )
-              ? require(path.resolve(__dirname, `../strategies/${name}.js`))
-              : require(path.resolve(__dirname, `../strategies/${type}.js`))
-            return [
-              name ?? `${type}-${i}}`,
-              typeof buildStrategy === 'function'
-                ? buildStrategy(name)
-                : buildStrategy,
-            ]
+            // Required lazily, not at module load, because DiscordClient and
+            // TelegramClient both require this file back for the `state`
+            // singleton. By the time this method runs, `state.js` has already
+            // finished its own require and is in the module cache, so the
+            // require below resolves the real exports instead of a partial one.
+            //
+            // Better Auth owns login for every strategy type now
+            // (socialProviders for discord, the telegram plugin, email/password
+            // for local); these clients only drive the Discord/Telegram bot
+            // integrations (trial management, role sync, sendMessage), so
+            // `local` has never needed one and stays unmapped here.
+            switch (type) {
+              case 'discord': {
+                const { DiscordClient } = require('./DiscordClient')
+                return [
+                  name ?? `${type}-${i}}`,
+                  new DiscordClient(name, strategyConfig),
+                ]
+              }
+              case 'telegram': {
+                const { TelegramClient } = require('./TelegramClient')
+                return [
+                  name ?? `${type}-${i}}`,
+                  new TelegramClient(name, strategyConfig),
+                ]
+              }
+              default:
+                return [name ?? `${type}-${i}}`, null]
+            }
           } catch (e) {
             log.error(TAGS.auth, e)
             return [name, null]

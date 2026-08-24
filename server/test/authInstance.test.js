@@ -64,3 +64,15 @@ test('passwords hash as bcrypt, so existing hashes keep verifying', async () => 
   expect(await verify({ hash: hashed, password: 'reactmap' })).toBe(true)
   expect(await verify({ hash: hashed, password: 'wrong' })).toBe(false)
 })
+
+test('forwarded ip headers are ignored unless a proxy is trusted', () => {
+  // Better Auth does not read Express's `trust proxy`, so without this the two
+  // disagree and a forged X-Forwarded-For lands in auth_session.ip_address.
+  expect(
+    buildAuthOptions(baseConfig).advanced.ipAddress.ipAddressHeaders,
+  ).toEqual([])
+  expect(
+    buildAuthOptions({ ...baseConfig, trustProxy: 1 }).advanced.ipAddress
+      .ipAddressHeaders,
+  ).toBeUndefined()
+})
