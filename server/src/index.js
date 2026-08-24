@@ -28,6 +28,7 @@ const { initSentry, sentryMiddleware } = require('./middleware/sentry')
 const { loggerMiddleware } = require('./middleware/logger')
 const { noSourceMapMiddleware } = require('./middleware/noSourceMap')
 const { createAuthSessionMiddleware } = require('./middleware/authSession')
+const { resolveTrustProxy } = require('./middleware/trustProxy')
 const { errorMiddleware } = require('./middleware/error')
 const { apolloMiddleware } = require('./middleware/apollo')
 const { helmetMiddleware } = require('./middleware/helmet')
@@ -64,6 +65,8 @@ const startServer = async () => {
   await starti18n(path.resolve(distDir, 'locales'))
 
   const app = express()
+
+  app.set('trust proxy', resolveTrustProxy(config.getSafe('api.trustProxy')))
 
   // Better auth reads the raw body itself, so it must sit ahead of the json
   // body parser below (bundled into the next `app.use`), which would
