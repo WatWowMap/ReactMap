@@ -1,6 +1,10 @@
 // server/test/authBackfill.test.js
 const { test, expect } = require('bun:test')
-const { planBackfill } = require('../src/auth/backfill')
+const {
+  planBackfill,
+  detectCollisions,
+  formatCollisionReport,
+} = require('../src/auth/backfill')
 
 test('accounts carry the issuer strings better auth generates', () => {
   const plan = planBackfill({
@@ -98,4 +102,93 @@ test('reactmap-owned preferences ride along on the user row', () => {
 
 test('the plan carries the legacy id as the join key back to users', () => {
   expect(planBackfill({ id: 7 }).user.legacyId).toBe(7)
+})
+
+test('detectCollisions flags two rows with the exact same username', () => {
+  const collisions = detectCollisions([
+    { id: 300, username: 'AshKetchum' },
+    { id: 301, username: 'AshKetchum' },
+  ])
+  expect(collisions).toEqual([
+    { field: 'username', value: 'ashketchum', ids: [300, 301] },
+  ])
+})
+
+test('detectCollisions flags usernames differing only by case', () => {
+  const collisions = detectCollisions([
+    { id: 300, username: 'AshKetchum' },
+    { id: 301, username: 'ashketchum' },
+  ])
+  expect(collisions).toHaveLength(1)
+  expect(collisions[0].field).toBe('username')
+  expect(collisions[0].ids).toEqual([300, 301])
+})
+
+test('detectCollisions flags usernames differing only by trailing whitespace', () => {
+  const collisions = detectCollisions([
+    { id: 300, username: 'ashketchum' },
+    { id: 301, username: 'ashketchum ' },
+  ])
+  expect(collisions).toHaveLength(1)
+  expect(collisions[0].field).toBe('username')
+  expect(collisions[0].ids).toEqual([300, 301])
+})
+
+test('detectCollisions flags two rows sharing a discordId', () => {
+  const collisions = detectCollisions([
+    { id: 303, discordId: '555' },
+    { id: 304, discordId: '555' },
+  ])
+  expect(collisions).toEqual([
+    { field: 'discordId', value: '555', ids: [303, 304] },
+  ])
+})
+
+test('detectCollisions flags two rows sharing a telegramId', () => {
+  const collisions = detectCollisions([
+    { id: 305, telegramId: '999' },
+    { id: 306, telegramId: '999' },
+  ])
+  expect(collisions).toEqual([
+    { field: 'telegramId', value: '999', ids: [305, 306] },
+  ])
+})
+
+test('detectCollisions returns nothing for a clean table', () => {
+  const collisions = detectCollisions([
+    { id: 1, username: 'ash', discordId: '1', telegramId: '10' },
+    { id: 2, username: 'brock', discordId: '2', telegramId: '20' },
+  ])
+  expect(collisions).toEqual([])
+})
+
+test('detectCollisions returns nothing for an empty table', () => {
+  expect(detectCollisions([])).toEqual([])
+})
+
+test('detectCollisions finds multiple independent collisions in one pass', () => {
+  const collisions = detectCollisions([
+    { id: 300, username: 'AshKetchum' },
+    { id: 301, username: 'ashketchum' },
+    { id: 302, username: 'brock' },
+    { id: 303, username: 'misty', discordId: '555' },
+    { id: 304, username: 'gary', discordId: '555' },
+  ])
+  const fields = collisions.map((c) => c.field).sort()
+  expect(fields).toEqual(['discordId', 'username'])
+})
+
+test('formatCollisionReport names the colliding ids and the shared value', () => {
+  const message = formatCollisionReport([
+    { field: 'username', value: 'ashketchum', ids: [300, 301] },
+    { field: 'discordId', value: '555', ids: [303, 304] },
+  ])
+  expect(message).toContain('300')
+  expect(message).toContain('301')
+  expect(message).toContain('303')
+  expect(message).toContain('304')
+  expect(message).toContain('username')
+  expect(message).toContain('ashketchum')
+  expect(message).toContain('discordId')
+  expect(message).toContain('555')
 })

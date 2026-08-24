@@ -97,4 +97,91 @@ function planBackfill(row) {
   return { user, accounts, perms }
 }
 
-module.exports = { planBackfill, authIdForLegacy }
+/**
+ * Groups legacy rows by lowercased/trimmed username, and separately by
+ * discordId and telegramId, and reports every group with more than one row.
+ *
+ * The legacy `users` table has no unique index on any of these three
+ * columns, but `auth_user.username` is unique under a case-insensitive
+ * collation and the back-fill merges accounts on `(issuer, account_id)`.
+ * Two legacy rows that collide on one of these keys would otherwise be
+ * silently folded into a single auth user, or made to fight over a single
+ * `auth_account`/`user_perms` row. Only an operator who can see both rows can
+ * decide which one is real, so this only detects and reports, it never
+ * decides for them.
+ *
+ * Pure: takes rows, returns a description, writes nothing.
+ *
+ * @param {Record<string, any>[]} rows
+ * @returns {{ field: 'username' | 'discordId' | 'telegramId', value: string, ids: any[] }[]}
+ */
+function detectCollisions(rows) {
+  const groups = {
+    username: new Map(),
+    discordId: new Map(),
+    telegramId: new Map(),
+  }
+
+  for (const row of rows) {
+    if (row.username != null && String(row.username).trim() !== '') {
+      const key = String(row.username).trim().toLowerCase()
+      const bucket = groups.username.get(key) || []
+      bucket.push(row.id)
+      groups.username.set(key, bucket)
+    }
+    if (row.discordId != null) {
+      const key = String(row.discordId)
+      const bucket = groups.discordId.get(key) || []
+      bucket.push(row.id)
+      groups.discordId.set(key, bucket)
+    }
+    if (row.telegramId != null) {
+      const key = String(row.telegramId)
+      const bucket = groups.telegramId.get(key) || []
+      bucket.push(row.id)
+      groups.telegramId.set(key, bucket)
+    }
+  }
+
+  /** @type {{ field: 'username' | 'discordId' | 'telegramId', value: string, ids: any[] }[]} */
+  const collisions = []
+  for (const field of /** @type {const} */ ([
+    'username',
+    'discordId',
+    'telegramId',
+  ])) {
+    for (const [value, ids] of groups[field]) {
+      if (ids.length > 1) {
+        collisions.push({ field, value, ids })
+      }
+    }
+  }
+  return collisions
+}
+
+/**
+ * Renders `detectCollisions` output into a message an operator can act on
+ * without reading this code, naming exactly which legacy ids collide on
+ * which value.
+ *
+ * @param {ReturnType<typeof detectCollisions>} collisions
+ */
+function formatCollisionReport(collisions) {
+  const lines = collisions.map(
+    (c) =>
+      `  - ${c.field} "${c.value}" is shared by legacy users.id ${c.ids.join(', ')}`,
+  )
+  return [
+    `auth back-fill refused: ${collisions.length} colliding group(s) found in the legacy "users" table.`,
+    ...lines,
+    'The legacy table has no unique index on username, discordId or telegramId, so these rows would otherwise be silently merged into one account.',
+    'Resolve the duplicates by hand (rename, merge, or delete the extra legacy row) and re-run migrate:latest.',
+  ].join('\n')
+}
+
+module.exports = {
+  planBackfill,
+  authIdForLegacy,
+  detectCollisions,
+  formatCollisionReport,
+}
