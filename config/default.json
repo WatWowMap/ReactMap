@@ -20,6 +20,7 @@
     "showStrategiesInConfigApi": false,
     "maxSessions": 5,
     "sessionCheckIntervalMs": 900000,
+    "baseUrl": "http://localhost:8080",
     "cookieAgeDays": 7,
     "rateLimit": {
       "time": 60,
