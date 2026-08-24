@@ -85,7 +85,7 @@
           "assets": [
             "CHANGELOG.md",
             "package.json",
-            "yarn.lock"
+            "bun.lock"
           ],
           "message": "chore(release): ${nextRelease.gitTag} [skip ci]\n\n${nextRelease.notes}"
         }
