@@ -56,6 +56,18 @@ export interface GymEntity {
 
 export type MapEntity = PokemonEntity | GymEntity
 
+/** Called with the full current set, then again whenever it changes. */
+export type MapChangeHandler = (entities: MapEntity[]) => void
+
+/** Returned by subscribe; calling it stops delivery. */
+export type Unsubscribe = () => void
+
+/**
+ * Subscription is the only operation because the real transport pushes.
+ * A caller that wants a single answer uses `queryOnce` from ./query,
+ * which is that push stream read once, so there is one code path to
+ * implement and one to get wrong.
+ */
 export interface MapSource {
-  query(request: MapQuery): Promise<MapEntity[]>
+  subscribe(request: MapQuery, onChange: MapChangeHandler): Unsubscribe
 }
