@@ -1,5 +1,5 @@
 import { afterAll, afterEach, beforeAll, expect, mock, test } from 'bun:test'
-import { render } from '@testing-library/react'
+import { cleanup, render } from '@testing-library/react'
 import { MemoryRouter } from 'react-router'
 import { setupDom, teardownDom } from '../test-setup'
 import { Profile } from './Profile'
@@ -11,6 +11,10 @@ const originalFetch = globalThis.fetch
 
 afterEach(() => {
   globalThis.fetch = originalFetch
+  // `render()` queries are bound to `document.body`, not to the returned
+  // container, so a prior test's markup is still visible to the next
+  // test's queries unless the render tree is unmounted here.
+  cleanup()
 })
 
 test('renders a loading affordance while the session resolves', () => {
