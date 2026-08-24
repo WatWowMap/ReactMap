@@ -296,6 +296,20 @@ there is nothing for a client-side schema to check. The boundary that does take 
 `fromRemote`, parsing a third-party URL, and that already has `MasterfileParseError` inside the
 library.
 
+## Amendments from the stack review
+
+Recorded 2026-08-24, after a four-lens review of the presentation document re-examined this design against upstream source.
+
+**Fort deltas come from Golbat's webhooks; only Pokémon poll fast.** The earlier dismissal of webhooks-out ("decode events rather than viewport queries") understated it: the pokemon hook fires only on a new record or a changed pokemon_id, weather or cp, and the fort hook carries an explicit new / removal / edit change type, so decode events are deltas. The honest reasons webhooks cannot carry the whole stream are different: routing is by geofence name with no bbox, the sender empties its buffer before the POST so a failed delivery is silently lost, and the stream is unfiltered. Those defeat it for Pokémon and merely bound it for forts, which change rarely, never expire, and are exactly what reconciliation exists for. So: subscribe to the fort event types, drop the fort poll to a multi-minute reconciliation cycle that also heals webhook loss, and keep the fast poll for Pokémon only. One `[[webhooks]]` config block of operator burden.
+
+**Client-side eviction keys on `expire_timestamp_verified`.** Golbat hands out synthetic expiries of now plus twenty minutes for unverified spawns and extends them while the spawn is still seen. A client that evicts on an unverified time drops a live entity, and because the server's per-connection map still records it as delivered and unchanged, nothing ever re-sends it. Self-eviction only on verified times; unverified ones are the server's to remove.
+
+**`limit_reached` triggers viewport subdivision, and reconciliation refuses truncated responses.** The caps (3,000 pokemon, 9,000 forts by default) cannot be raised from the client side; the limit parameter only clamps downward. On `limit_reached: true`, split the bbox into quarters and re-query; never run the drop-what-was-not-returned reconciliation on a truncated response. Read the actual caps from `GET /api/status` at boot.
+
+**The masterfile motivation is restated honestly.** 831,799 bytes is the on-disk size; the wire cost behind the existing gzip is 67,329 bytes. The reasons to move it server-side survive, but they are the re-download on a timer, the parse on every load, and the fragment model, not raw bytes.
+
+**gRPC is rejected for the hot loop, with reasons.** Golbat's gRPC service is pokemon-only so forts need HTTP regardless, its response omits `limit_reached`, and its pvp payload is an opaque string. Its one advantage, gzip, is better fixed by proposing compression middleware on Golbat's HTTP side, in the same breath as the updated_after proposal.
+
 ## Deferred
 
 - Binary or positional encoding for entity batches. Revisit with a measurement, not an argument.

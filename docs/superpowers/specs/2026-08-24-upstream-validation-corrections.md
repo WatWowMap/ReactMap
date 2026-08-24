@@ -22,7 +22,7 @@ Poracle's `monsters` table is keyed on `uid` alone. For pokemon there is no matc
 
 So the push is a mapping, not an identity, and three consequences follow.
 
-**PvP is one league per row, and mutually exclusive with IV.** `pvp_ranking_league` is a single integer beside a best and worst rank. A `rule_pokemon` row carrying an IV range plus Great and Ultra ranges becomes three Poracle rows, not one. ReactMap 1.x already knows this and branches on it.
+**PvP is one league per row.** `pvp_ranking_league` is a single integer beside a best and worst rank, so a `rule_pokemon` row carrying Great and Ultra ranges needs one Poracle row per league. A correction to this correction, caught on review: IV and a league are NOT mutually exclusive on one row. Nothing in the write path rejects both, and the matcher applies both gates, so a row carrying `min_iv` and a league fires only when both hold. The fan-out is per league, not per filter kind.
 
 **Push is not idempotent.** Poracle updates in place only when exactly one field differs and that field is tagged updatable, which for monsters is `clean`, `distance`, `template` and `min_iv`. `max_iv` is not. Two changed fields at once inserts a second row. Repeated pushes of an edited rule accumulate duplicates rather than converging, so push has to delete by uid and re-insert, and ReactMap must retain the uid of every row it created. Neither spec mentions uid.
 
@@ -48,7 +48,7 @@ So the push is a mapping, not an identity, and three consequences follow.
 
 `rule_pokemon.xxs` and `xxl` as two booleans cannot express a middle range. Both upstreams model size as a range: Golbat takes a size min and max, Poracle takes size and max_size from 1 for XXS to 5 for XXL. Two booleans round-trip cleanly to neither.
 
-Poracle carries per-row fields with no ReactMap column: costume, rarity, weight, min_time, distance, template, ping, clean, and since its fourth migration, per-rule area and location overrides. The rules spec puts areas and location on the profile only, so importing silently drops any per-row override. That is data loss on import rather than a modelling gap.
+Poracle carries per-row fields with no ReactMap column: costume, rarity, weight, min_time (a floor on seconds left before despawn, not time of day; schedules live on the profile), distance, template, ping, clean, and since its fourth migration, per-rule area and location overrides. The rules spec puts areas and location on the profile only, so importing silently drops any per-row override. That is data loss on import rather than a modelling gap.
 
 ## Capabilities we are not using
 

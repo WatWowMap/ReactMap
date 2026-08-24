@@ -314,8 +314,9 @@ hr.soft { border: 0; border-top: 1px solid var(--border); margin: 34px 0; }
         <li><a href="#wire"><span class="n">03</span>Getting it to you</a></li>
         <li><a href="#rules"><span class="n">04</span>Building rules</a></li>
         <li><a href="#alerts"><span class="n">05</span>Alerts</a></li>
-        <li><a href="#roadmap"><span class="n">06</span>Where we are</a></li>
-        <li><a href="#open"><span class="n">07</span>Open questions</a></li>
+        <li><a href="#operators"><span class="n">06</span>Running it</a></li>
+        <li><a href="#roadmap"><span class="n">07</span>Where we are</a></li>
+        <li><a href="#open"><span class="n">08</span>Open questions</a></li>
       </ol>
     </nav>
 
@@ -324,7 +325,7 @@ hr.soft { border: 0; border-top: 1px solid var(--border); margin: 34px 0; }
       <section id="overview">
         <div class="col">
           <div class="kicker">01 &middot; The stack</div>
-          <h2>Four systems, one direction of travel</h2>
+          <h2>Four systems, and how data moves between them</h2>
           <p class="lede">Nothing here is new except ReactMap. The pieces around it already exist and already work; 2.0 changes how ReactMap talks to them.</p>
           <p>A scanner walks the world and produces raw game data. <strong>Golbat</strong> decodes it, keeps the live picture in memory, and answers questions about it. <strong>ReactMap</strong> asks those questions on your behalf and paints the answers. <strong>PoracleNG</strong> sends you a message when something you care about appears.</p>
         </div>
@@ -366,7 +367,8 @@ flowchart LR
         <div class="col">
           <div class="call">
             <h4>The one thing to notice</h4>
-            <p>Golbat pushes to Poracle but not to ReactMap. There is no websocket, no server-sent events, and no streaming RPC on Golbat's read side, so ReactMap has to ask repeatedly rather than being told. That single fact shapes every decision in section 03.</p>
+            <p>Golbat can push, but only in a limited way: it posts decode events to a fixed list of URLs in its config file, routed by named region rather than by what anyone is looking at, and a delivery that fails is simply gone. There is no websocket, no event stream, and no way to say "tell me about this box on the map". So live viewports come from asking repeatedly, and that shapes section 03.</p>
+            <p>The push is still worth taking where it fits. Gyms and stops change rarely and never expire, so ReactMap will subscribe to Golbat's fort events and keep only a slow safety-net poll for them, while Pokémon, high-volume and filtered hard on Golbat's side, stay on the fast poll.</p>
           </div>
         </div>
       </section>
@@ -376,22 +378,22 @@ flowchart LR
         <div class="col">
           <div class="kicker">02 &middot; Where data comes from</div>
           <h2>Golbat holds the live world</h2>
-          <p class="lede">Golbat keeps active Pokémon and forts in memory, indexed spatially, and answers bounding-box queries with server-side filtering. ReactMap 2.0 leans on that far harder than 1.x did.</p>
+          <p class="lede">Golbat keeps active Pokémon in memory, indexed spatially, and forts too once the operator turns that on. It answers bounding-box queries with server-side filtering. ReactMap 2.0 leans on that far harder than 1.x did.</p>
           <p>The important shift: 1.x could talk to Golbat <em>or</em> fall back to reading scanner database tables directly, which meant every filter had to be written twice. 2.0 requires Golbat and deletes the second implementation.</p>
         </div>
         <div id="golbat-api" class="breakout"><div class="panel">
   <div class="panel-head">
     <h4>Golbat, the endpoints 2.0 uses</h4>
-    <span class="note">40 exist &middot; 17 relevant &middot; verified against source</span>
+    <span class="note">36 HTTP endpoints + 3 gRPC methods &middot; the ones 2.0 uses &middot; verified against source</span>
   </div>
   <div class="panel-body scroll-x">
     <table>
       <thead><tr><th>Endpoint</th><th>What it does</th><th>Notes</th></tr></thead>
       <tbody>
-        <tr><td class="mono"><span class="m">GET</span> /api/status</td><td>Reports what this Golbat can do and its result caps</td><td>Read at boot. The only fort endpoint not gated behind the experimental flag.</td></tr>
+        <tr><td class="mono"><span class="m">GET</span> /api/status</td><td>Reports what this Golbat can do and its result caps</td><td>Read at boot, so 2.0 clamps to the real limits instead of guessing.</td></tr>
         <tr><td class="mono"><span class="m">POST</span> /api/pokemon/v3/scan</td><td>Pok&eacute;mon in a box, filtered server-side</td><td>Returns a count envelope, not a bare list. 2.0 uses v3, not the v2 that 1.x calls.</td></tr>
         <tr><td class="mono"><span class="m">POST</span> /api/fort/scan</td><td>Gyms, stops and stations in <em>one</em> spatial pass</td><td>1.x makes three separate calls. Needs the experimental flag.</td></tr>
-        <tr><td class="mono"><span class="m">GET</span> /api/fort/available</td><td>Which raids, quests, lures and showcases actually exist right now</td><td>Builds the filter menus, so you only see options that are real.</td></tr>
+        <tr><td class="mono"><span class="m">GET</span> /api/fort/available</td><td>Which raids, quests, lures and showcases actually exist right now</td><td>Builds the filter menus, so you only see options that are real. Needs the experimental flag.</td></tr>
         <tr><td class="mono"><span class="m">GET</span> /api/pokemon/available</td><td>Which species are currently on the map</td><td>Same idea, for Pok&eacute;mon.</td></tr>
         <tr><td class="mono"><span class="m">GET</span> /api/&hellip;/id/{id}</td><td>One gym, stop, station or Pok&eacute;mon by id</td><td>Popups and deep links.</td></tr>
         <tr><td class="mono"><span class="m">POST</span> /api/pokemon/search</td><td>Nearest matches to a point</td><td>Powers search.</td></tr>
@@ -420,8 +422,8 @@ flowchart LR
 <div class="call warn" style="margin-top:18px; max-width: var(--measure)">
   <h4>Three things that constrain the design</h4>
   <p><strong>Golbat cannot be asked "what changed".</strong> There is no incremental query, confirmed by searching the whole codebase. Every poll returns the full matching set and ReactMap works out the difference itself. We have proposed adding one upstream.</p>
-  <p><strong>The fort endpoints are off by default.</strong> <code>fort_in_memory</code> is marked experimental and gates eight endpoints, which answer 503 when it is off. Operators will need to turn it on.</p>
-  <p><strong>Results are capped</strong> at 3,000 Pok&eacute;mon and 9,000 forts per query by default. A dense city viewport can exceed that, and a truncated response must never be mistaken for a complete one.</p>
+  <p><strong>The fort scans are off by default, and marked as drafts.</strong> <code>fort_in_memory</code> is experimental and gates the eight scan and availability endpoints, which answer 503 when it is off; looking a single gym or stop up by id works either way. Upstream also stamps all eight with a Draft badge, meaning their shapes may still change. 2.0 accepts both risks knowingly.</p>
+  <p><strong>Results are capped</strong> at 3,000 Pokémon and 9,000 forts per query by default, and the cap cannot be raised from the client side. When a response comes back truncated it says so, and ReactMap responds by splitting the viewport into quarters and asking again, never treating a truncated answer as complete.</p>
 </div></div>
       </section>
 
@@ -450,17 +452,19 @@ sequenceDiagram
   R->>G: scan bbox
   G-->>R: every entity in the box
   R-->>B: every entity, again
-  Note over B,R: repeats every 10–20s per category
+  Note over B,R: 10-20s for pokemon and gyms; stops default to 300s
   Note over B,G: 2.0: subscribe once, receive changes
   B->>R: subscribe(rules, viewport)
   R->>G: scan bbox + filters
   G-->>R: matching entities
   R-->>B: initial set
   loop each tick
-    R->>G: scan again
-    G-->>R: matching entities
+    R->>G: scan pokemon again
+    G-->>R: matching pokemon
     R-->>B: only add / update / remove
   end
+  G-->>R: fort event (webhook, on change)
+  R-->>B: gym / stop update
             </pre>
           </div>
         </div>
@@ -471,16 +475,16 @@ sequenceDiagram
         </div>
 
         <div class="breakout panel">
-          <div class="panel-head"><h4>Per-connection cost</h4><span class="note">measured, not estimated</span></div>
+          <div class="panel-head"><h4>Per-connection cost</h4><span class="note">~90 B per entity measured; the rest is that times a viewport</span></div>
           <div class="panel-body scroll-x">
             <table>
               <thead><tr><th>What</th><th class="tnum">Size</th><th>Why</th></tr></thead>
               <tbody>
                 <tr><td>One tracked entity</td><td class="mono tnum">~90 B</td><td>map entry, a 20-char id, a timestamp</td></tr>
                 <tr><td>Typical viewport</td><td class="mono tnum">~100 KB</td><td>around 1,000 entities</td></tr>
-                <tr><td>Dense urban viewport</td><td class="mono tnum">~500 KB</td><td>around 5,000 entities</td></tr>
+                <tr><td>Dense urban viewport</td><td class="mono tnum">~500 KB</td><td>around 5,000 entities, reached by splitting the view across capped queries</td></tr>
                 <tr><td>200 concurrent users</td><td class="mono tnum">~20 MB</td><td>the whole fan-out layer</td></tr>
-                <tr><td>Golbat, for comparison</td><td class="mono tnum">~11 GB</td><td>full entities for the whole world</td></tr>
+                <tr><td>Golbat, for comparison</td><td class="mono tnum">~11 GB</td><td>operator-reported on one large instance; full entities for its whole scanned area</td></tr>
               </tbody>
             </table>
           </div>
@@ -488,8 +492,8 @@ sequenceDiagram
 
         <div class="col">
           <div class="call ok">
-            <h4>Pokémon expire on their own</h4>
-            <p>Every Pokémon carries a despawn time, so the browser removes it on its own clock and the server never sends a "gone" message for it. Removals are only needed when something leaves your viewport, stops matching your rules, or a gym's raid ends.</p>
+            <h4>Pokémon expire on their own, when the time is trusted</h4>
+            <p>A Pokémon whose despawn time has been confirmed is removed by the browser on its own clock, with no message from the server. When Golbat has not confirmed the time it sends a guess instead, and it says which is which, so the browser only self-evicts on confirmed times and lets the server decide the rest. Removals are otherwise only needed when something leaves your viewport, stops matching your rules, or a raid ends.</p>
           </div>
 
           <h3>The biggest saving is not the socket</h3>
@@ -497,13 +501,13 @@ sequenceDiagram
         </div>
 
         <div class="breakout panel">
-          <div class="panel-head"><h4>What every visitor downloads today</h4><span class="note">measured on disk</span></div>
+          <div class="panel-head"><h4>What every visitor downloads today</h4><span class="note">measured: raw on disk, and gzipped as actually sent</span></div>
           <div class="panel-body scroll-x">
             <table>
               <thead><tr><th>Payload</th><th class="tnum">Bytes</th><th>In 2.0</th></tr></thead>
               <tbody>
-                <tr><td class="mono">masterfile.json</td><td class="mono tnum">831,799</td><td>stays on the server; the browser asks for the few species on screen</td></tr>
-                <tr><td class="mono">&nbsp;&nbsp;└ pokemon key alone</td><td class="mono tnum">436,079</td><td>52% of it</td></tr>
+                <tr><td class="mono">masterfile.json</td><td class="mono tnum">831,799 raw &middot; 67,329 gzipped</td><td>stays on the server; the browser asks for the few species on screen. The win is less raw size than that it re-downloads on a timer and re-parses on every load</td></tr>
+                <tr><td class="mono">&nbsp;&nbsp;└ pokemon key alone</td><td class="mono tnum">436,079 raw</td><td>52% of it</td></tr>
                 <tr><td>Full viewport, every poll</td><td class="mono">varies</td><td>replaced by add / update / remove</td></tr>
                 <tr><td class="mono">__typename</td><td class="mono">every entity</td><td>gone with GraphQL</td></tr>
               </tbody>
@@ -525,7 +529,7 @@ sequenceDiagram
           <div class="mock">
             <div class="mock-bar">
               <i class="tl"></i><i class="tl"></i><i class="tl"></i>
-              <span class="ttl">Filters &middot; Pokémon</span>
+              <span class="ttl">Filters &middot; Pokémon &middot; <em>design mockup, phase 7, not built yet</em></span>
             </div>
             <div class="mock-grid">
               <div class="mock-list">
@@ -534,11 +538,11 @@ sequenceDiagram
                   <span>Hundos</span><span class="cnt">25 species</span>
                 </div>
                 <div class="rule-row">
-                  <span class="ring" style="background: conic-gradient(var(--sys-golbat) 0turn .5turn, var(--sys-poracle) .5turn 1turn)"></span>
+                  <span class="ring" style="background: conic-gradient(var(--sys-golbat) 0turn 1turn)"></span>
                   <span>Great League rank 1</span><span class="cnt">88 species</span>
                 </div>
                 <div class="rule-row">
-                  <span class="ring" style="background: conic-gradient(var(--ok) 0turn .333turn, var(--sys-golbat) .333turn .666turn, var(--sys-poracle) .666turn 1turn)"></span>
+                  <span class="ring" style="background: conic-gradient(var(--ok) 0turn 1turn)"></span>
                   <span>Shiny-eligible starters</span><span class="cnt">9 species</span>
                 </div>
                 <div class="rule-row">
@@ -581,7 +585,6 @@ sequenceDiagram
                     <span class="pill on">Large</span>
                     <span class="pill on">Gold ring</span>
                     <span class="pill on">Notify</span>
-                    <span class="pill">Hide</span>
                   </div>
                 </div>
               </div>
@@ -592,7 +595,8 @@ sequenceDiagram
 
         <div class="col">
           <h3>When two rules both match</h3>
-          <p>They both apply, and there is no ordering to reason about. Each display attribute has its own rule for combining, chosen so that nothing a person asked for is silently discarded.</p>
+          <p>The coloured ring beside each rule in the list is its glow, the colour it paints around a matching Pokémon on the map. When several rules match the same Pokémon, its ring splits into segments, one per rule, so every colour you asked for survives.</p>
+          <p>Both rules apply, and there is no ordering to reason about. Each display attribute has its own rule for combining, chosen so that nothing a person asked for is silently discarded.</p>
         </div>
 
         <div class="breakout panel">
@@ -603,7 +607,7 @@ sequenceDiagram
               <tbody>
                 <tr><td>Size</td><td>largest wins</td><td>you asked for attention twice; give the louder one</td></tr>
                 <tr><td>Notify</td><td>any true wins</td><td>a missed alert is worse than an extra one</td></tr>
-                <tr><td>Hide</td><td>any hide wins</td><td>hiding is explicit; it should not be outvoted</td></tr>
+                <tr><td>Not showing something</td><td>each rule carries its own exceptions</td><td>a rule can only ever add to what you see; nothing subtracts from another rule at a distance</td></tr>
                 <tr><td>Glow</td><td>ring segments, up to three</td><td>mixing colours invents a meaning nobody assigned, and hurts colourblind users</td></tr>
               </tbody>
             </table>
@@ -624,28 +628,28 @@ sequenceDiagram
           <div class="kicker">05 &middot; Alerts</div>
           <h2>Poracle, on its own page</h2>
           <p class="lede">Notifications move out of the map's filter panel and become their own thing, with one provider instead of the current multi-provider arrangement.</p>
-          <p>Because a ReactMap rule and a Poracle tracking row describe the same shape, sending a filter to Poracle is a copy rather than a conversion.</p>
+          <p>A ReactMap rule and a Poracle tracking row are close cousins rather than twins, so the alerts page translates between them instead of forwarding blindly. The differences are small but real, and they are listed here because pretending they do not exist is how imports lose data.</p>
         </div>
         <div id="poracle-api" class="breakout"><div class="panel">
   <div class="panel-head">
     <h4>PoracleNG v2, the endpoints 2.0 uses</h4>
-    <span class="note">52 exist &middot; 34 relevant &middot; verified against source</span>
+    <span class="note">the v2 surface 2.0 uses &middot; paths as a client calls them &middot; verified against source</span>
   </div>
   <div class="panel-body scroll-x">
     <table>
       <thead><tr><th>Endpoint</th><th>What it does</th></tr></thead>
       <tbody>
-        <tr><td class="mono"><span class="m">GET</span> /humans/{id}/tracking</td><td>Everything about one person in a single call: their rules, presets, saved places, schedules and mutes</td></tr>
-        <tr><td class="mono"><span class="m">GET</span> /humans/{id}</td><td>Does this person exist yet? 404 is how we know to create them</td></tr>
-        <tr><td class="mono"><span class="m">POST</span> /humans</td><td>Register someone the first time they open the alerts page</td></tr>
-        <tr><td class="mono"><span class="m">POST</span> /humans/{id}/tracking/{type}</td><td>Add rules. Body is always a list, even for one</td></tr>
-        <tr><td class="mono"><span class="m">PUT</span> /humans/{id}/tracking/{type}/{uid}</td><td>Replace a rule outright. There is no partial edit</td></tr>
-        <tr><td class="mono"><span class="m">DELETE</span> /humans/{id}/tracking/{type}</td><td>Remove several rules at once</td></tr>
-        <tr><td class="mono"><span class="m">GET</span> /humans/{id}/areas</td><td>Which regions this person is allowed to pick from</td></tr>
-        <tr><td class="mono"><span class="m">GET</span> <span class="m">POST</span> /humans/{id}/profiles</td><td>Presets: home, work, weekend, each with its own areas and schedule</td></tr>
-        <tr><td class="mono"><span class="m">POST</span> /humans/{id}/location</td><td>Set the home point that distance rules measure from</td></tr>
-        <tr><td class="mono"><span class="m">GET</span> <span class="m">POST</span> /humans/{id}/mutes</td><td>Silence a gym, a species, a region, or everything, for a while</td></tr>
-        <tr><td class="mono"><span class="m">POST</span> /humans/{id}/enable</td><td>The master switch</td></tr>
+        <tr><td class="mono"><span class="m">GET</span> /api/v2/humans/{id}/tracking</td><td>Everything about one person in a single call: their rules, presets, saved places, schedules and mutes</td></tr>
+        <tr><td class="mono"><span class="m">GET</span> /api/v2/humans/{id}</td><td>Does this person exist yet? 404 is how we know to create them</td></tr>
+        <tr><td class="mono"><span class="m">POST</span> /api/v2/humans</td><td>Register someone the first time they open the alerts page</td></tr>
+        <tr><td class="mono"><span class="m">POST</span> /api/v2/humans/{id}/tracking/{type}</td><td>Add rules. Body is always a list, even for one</td></tr>
+        <tr><td class="mono"><span class="m">PUT</span> /api/v2/humans/{id}/tracking/{type}/{uid}</td><td>Replace a rule outright. There is no partial edit</td></tr>
+        <tr><td class="mono"><span class="m">DELETE</span> /api/v2/humans/{id}/tracking/{type}</td><td>Remove several rules at once</td></tr>
+        <tr><td class="mono"><span class="m">GET</span> /api/v2/humans/{id}/areas</td><td>Which regions this person is allowed to pick from</td></tr>
+        <tr><td class="mono"><span class="m">GET</span> <span class="m">POST</span> /api/v2/humans/{id}/profiles</td><td>Presets: home, work, weekend, each with its own areas and schedule</td></tr>
+        <tr><td class="mono"><span class="m">POST</span> /api/v2/humans/{id}/location</td><td>Set the home point that distance rules measure from</td></tr>
+        <tr><td class="mono"><span class="m">GET</span> <span class="m">POST</span> /api/v2/humans/{id}/mutes</td><td>Silence a gym, a species, a region, or everything, for a while</td></tr>
+        <tr><td class="mono"><span class="m">POST</span> /api/v2/humans/{id}/enable</td><td>The master switch</td></tr>
       </tbody>
     </table>
   </div>
@@ -655,7 +659,7 @@ sequenceDiagram
   <h4>Correction: this is a mapping, not a copy</h4>
   <p>An earlier draft of our design said a ReactMap rule and a Poracle rule were the same shape, so sending one across was a rename. Reading Poracle's source disproved that, and it is the largest error validation caught.</p>
   <p><strong>Poracle Pok&eacute;mon rules have no identity key.</strong> A rule <em>is</em> its whole set of fields, and holding several rules for the same species is the intended design, not a mistake. So changing one field edits a rule in place, but changing two adds a second one.</p>
-  <p><strong>League ranks live one per rule</strong>, and cannot be combined with an IV filter. One ReactMap rule asking for hundos <em>or</em> a good Great League rank <em>or</em> a good Ultra rank becomes three rules on Poracle's side.</p>
+  <p><strong>League ranks live one per rule.</strong> A rule can carry an IV floor beside its one league, and both then have to hold at once, but a second league needs a second rule. So one ReactMap rule asking for hundos <em>or</em> a good Great rank <em>or</em> a good Ultra rank becomes three rules on Poracle's side, and the OR between them exists only because they are separate rows.</p>
   <p>None of this is a blocker. It means the alerts page has to translate rather than forward, and has to re-read after writing, because the id returned when you create a rule is not usable.</p>
 </div>
 
@@ -666,9 +670,28 @@ sequenceDiagram
       </section>
 
       <!-- 06 ------------------------------------------------------------- -->
+      <section id="operators">
+        <div class="col">
+          <div class="kicker">06 &middot; Running it</div>
+          <h2>What changes for operators</h2>
+          <p class="lede">If you run a ReactMap today, this is the part that affects you. Collected in one place because these are the first questions that matter.</p>
+
+          <h3>What becomes required</h3>
+          <p>Golbat becomes mandatory. The fallback where ReactMap reads scanner database tables directly is deleted for Pokémon, gyms, stops and stations, so those four come from Golbat or not at all. Nests, routes and the other quiet layers keep their database path, because Golbat has no endpoint for them.</p>
+          <p>Two Golbat settings matter: <code>fort_in_memory = true</code>, without which gyms, stops and stations do not load, and a <code>[[webhooks]]</code> entry pointing at ReactMap if you want fort changes pushed rather than polled. Both are one config line.</p>
+
+          <h3>What your users will notice</h3>
+          <p>Logins carry over: existing passwords keep working, migrated by a script you run once, which refuses loudly and changes nothing if it finds accounts it cannot safely migrate, naming the exact rows so you can fix them first. Filters do not carry over, because 1.x kept them in each browser rather than on the server; everyone starts from the new rules system. Notifications move to their own page and to a single Poracle.</p>
+
+          <h3>Rollback</h3>
+          <p>2.0 runs beside your production map at its own address until you choose to switch, and it writes to its own tables. Your existing user table is read, never modified, so going back is turning 2.0 off.</p>
+        </div>
+      </section>
+
+      <!-- 07 ------------------------------------------------------------- -->
       <section id="roadmap">
         <div class="col">
-          <div class="kicker">06 &middot; Where we are</div>
+          <div class="kicker">07 &middot; Where we are</div>
           <h2>Built, building, next</h2>
           <p class="lede">2.0 is a rewrite of the client and the server it talks to. The map, the design system and the shell exist. The parts that carry data are in progress.</p>
         </div>
@@ -689,7 +712,7 @@ sequenceDiagram
       <!-- 07 ------------------------------------------------------------- -->
       <section id="open">
         <div class="col">
-          <div class="kicker">07 &middot; Open questions</div>
+          <div class="kicker">08 &middot; Open questions</div>
           <h2>What we are actually asking</h2>
           <p class="lede">This document exists to be disagreed with. These are the decisions that are still live, and the ones where being wrong would be expensive.</p>
         </div>
@@ -728,7 +751,7 @@ sequenceDiagram
   </div>
 </div></div>
         <div class="col">
-          <p class="footnote">Every number on this page was measured against a running system or read out of source, not estimated. Where something could not be confirmed, it says so.</p>
+          <p class="footnote">Byte counts and endpoint behaviour on this page were read out of source or measured on disk. Where a figure is a scenario rather than a measurement, the table says so. Where something could not be confirmed, it says so.</p>
         </div>
       </section>
     </main>
