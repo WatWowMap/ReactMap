@@ -600,6 +600,10 @@ test('the auth tables are the prefixed ones, not the existing users table', () =
   expect(options.user.modelName).toBe('auth_user')
   expect(options.session.modelName).toBe('auth_session')
 })
+
+test('the base url comes straight from config', () => {
+  expect(buildAuthOptions(baseConfig).baseURL).toBe('http://localhost:8080')
+})
 ```
 
 - [ ] **Step 2: Run the test and watch it fail**
@@ -665,7 +669,7 @@ function getAuth() {
     ...buildAuthOptions({
       strategies: config.getSafe('authentication.strategies'),
       sessionSecret: config.getSafe('api.sessionSecret'),
-      baseURL: config.getSafe('domain'),
+      baseURL: config.getSafe('api.baseUrl'),
     }),
     database: drizzleAdapter(getDrizzle(), { provider: 'mysql', schema }),
     plugins: [username()],
@@ -676,15 +680,36 @@ function getAuth() {
 module.exports = { getAuth, buildAuthOptions }
 ```
 
-- [ ] **Step 4: Run the test and watch it pass**
+- [ ] **Step 4: Add the `api.baseUrl` config key**
 
-Run: `bun test server/test/authInstance.test.js`
-Expected: PASS, 4 tests.
+There is no site-URL key in the config today. Callback URLs are configured per strategy, as
+`redirectUri` on the discord entry, and `interface` defaults to `0.0.0.0`, which is a bind address
+rather than something a browser can be redirected to. Better Auth needs one URL for the whole
+instance, so add it.
 
-- [ ] **Step 5: Commit**
+In `config/default.json`, inside the `api` block beside `sessionCheckIntervalMs`:
+
+```json
+"baseUrl": "http://localhost:8080",
+```
+
+Confirm it resolves before moving on:
 
 ```bash
-git add server/src/auth/index.js server/test/authInstance.test.js package.json bun.lock
+bun -e 'require("dotenv").config(); console.log(require("@rm/config").getSafe("api.baseUrl"))'
+```
+
+Expected: `http://localhost:8080`. A throw here means the key was added to the wrong block.
+
+- [ ] **Step 5: Run the test and watch it pass**
+
+Run: `bun test server/test/authInstance.test.js`
+Expected: PASS, 5 tests.
+
+- [ ] **Step 6: Commit**
+
+```bash
+git add server/src/auth/index.js server/test/authInstance.test.js config/default.json package.json bun.lock
 git commit -m "feat(server): add the better auth instance
 
 Option construction is split from instantiation so the provider wiring
@@ -1740,3 +1765,59 @@ Recorded so the next plan does not assume otherwise.
 - The legacy `users` and `session` tables are left in place and populated. Dropping them is a separate change once the auth tables have run in production long enough to trust.
 - Entitlements and the billing API are not built here. The `user_perms` table is shaped to accept them.
 - Nothing about the socket, deltas, or revocation cadence. Those need the transport that the tRPC and delta plans build.
+
+---
+
+## Local development setup
+
+Verified working before this plan was executed. An implementer starting fresh needs all of it.
+
+MySQL runs locally with a `reactmap_dev` database and a dedicated user:
+
+```sql
+CREATE DATABASE IF NOT EXISTS reactmap_dev CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+CREATE USER IF NOT EXISTS 'reactmap'@'127.0.0.1' IDENTIFIED BY 'reactmap_dev_pw';
+GRANT ALL PRIVILEGES ON reactmap_dev.* TO 'reactmap'@'127.0.0.1';
+FLUSH PRIVILEGES;
+```
+
+Configuration goes in `.env` at the repo root, which is gitignored:
+
+```
+REACT_MAP_DB_HOST=127.0.0.1
+REACT_MAP_DB_PORT=3306
+REACT_MAP_DB_NAME=reactmap_dev
+REACT_MAP_DB_USERNAME=reactmap
+REACT_MAP_DB_PASSWORD=reactmap_dev_pw
+MANUAL_DB_HOST=127.0.0.1
+MANUAL_DB_PORT=3306
+MANUAL_DB_NAME=reactmap_dev
+MANUAL_DB_USERNAME=reactmap
+MANUAL_DB_PASSWORD=reactmap_dev_pw
+```
+
+Three things about this will waste an hour each if you do not know them up front.
+
+**`config/local.json` does not work for database schemas.** `packages/config/lib/mutations.js:29`
+destructures `NODE_CONFIG_DIR` into `[rootConfigDir, serverConfigDir]`, where the root is
+`<repo>/config` and the server one is `<repo>/server/src/configs`. Line 57 then guards the env-var
+path with `fs.existsSync(path.join(serverConfigDir, 'local.json'))`, checking the directory the file
+never lives in. So node-config loads `config/local.json`, and then line 96 resets
+`config.database.schemas = []` and rebuilds from environment variables regardless. Use `.env`.
+
+**An empty password silently disables a database.** The guard is a plain `&&` chain over the five
+variables, so `REACT_MAP_DB_PASSWORD=` is falsy and the whole schema is skipped with only an
+`info`-level log. This is why the dev user above has a password rather than being root.
+
+**`bun run migrate:latest` does not load `.env`.** It shells out to the knex CLI, which never calls
+`dotenv.config()`. Export the file into the shell first:
+
+```bash
+set -a; . ./.env; set +a
+bun run migrate:latest
+```
+
+Running the legacy migrations creates `users`, `backups`, `gymBadges`, `nest_submissions` and the
+knex bookkeeping tables. Note there is no `session` table: express-mysql-session creates it at
+runtime through `createDatabaseTable: true`, so a fresh database will not have one until the server
+has run once.
