@@ -1,0 +1,736 @@
+<title>ReactMap 2.0 Stack</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+
+<style>
+/* ---------------------------------------------------------------------------
+   Tokens are ReactMap 2.0's own, lifted from app/styles.css and
+   app/tokens/data-palette.css, so this document wears the product's identity
+   rather than a new one. Light is the bare :root; dark is redefined twice so
+   both the OS default and an explicit toggle resolve.
+   --------------------------------------------------------------------------- */
+:root {
+  --surface: #ffffff;
+  --raised: #ffffff;
+  --fg: #1c1a26;
+  --muted: #f5f3fb;
+  --muted-fg: #6f6b80;
+  --border: #bdb6cf;
+  --border-strong: #968dae;
+  --primary: #7b5ce0;
+  --accent-to: #e067a8;
+
+  /* Systems get the league palette, so each actor keeps one colour throughout. */
+  --sys-golbat: #3d7dca;
+  --sys-reactmap: #7b5ce0;
+  --sys-poracle: #d99a1c;
+  --sys-scanner: #6f6b80;
+
+  /* Darkened from #4d8a37 and #b8860b: on the muted surface those measured
+     3.81 and 2.96 against a 4.5 minimum, which made the roadmap status pills
+     unreadable in light mode. These are 5.51 and 4.84. */
+  --ok: #3d6e2c;
+  --warn: #8a6508;
+  --risk: #c62828;
+
+  --shadow: 0 1px 2px rgb(28 26 38 / .06), 0 8px 24px -12px rgb(28 26 38 / .18);
+  --radius: 10px;
+  --measure: 68ch;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --surface: #17151f;
+    --raised: #1d1a28;
+    --fg: #f1eef9;
+    --muted: #221f2d;
+    --muted-fg: #a29dbb;
+    --border: #4b4465;
+    --border-strong: #6f668c;
+    --primary: #8c70e5;
+    --accent-to: #ec86bd;
+    --sys-golbat: #6ba3e8;
+    --sys-reactmap: #8c70e5;
+    --sys-poracle: #f2c14e;
+    --sys-scanner: #a29dbb;
+    --ok: #7cc45c;
+    --warn: #f2c14e;
+    --risk: #ef5350;
+    --shadow: 0 1px 2px rgb(0 0 0 / .4), 0 8px 24px -12px rgb(0 0 0 / .6);
+  }
+}
+:root[data-theme="dark"] {
+  --surface: #17151f;
+  --raised: #1d1a28;
+  --fg: #f1eef9;
+  --muted: #221f2d;
+  --muted-fg: #a29dbb;
+  --border: #4b4465;
+  --border-strong: #6f668c;
+  --primary: #8c70e5;
+  --accent-to: #ec86bd;
+  --sys-golbat: #6ba3e8;
+  --sys-reactmap: #8c70e5;
+  --sys-poracle: #f2c14e;
+  --sys-scanner: #a29dbb;
+  --ok: #7cc45c;
+  --warn: #f2c14e;
+  --risk: #ef5350;
+  --shadow: 0 1px 2px rgb(0 0 0 / .4), 0 8px 24px -12px rgb(0 0 0 / .6);
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--surface);
+  color: var(--fg);
+  font-family: "Source Serif 4", Georgia, "Times New Roman", serif;
+  font-size: 17px;
+  line-height: 1.62;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4, .display {
+  font-family: "Bricolage Grotesque", "Helvetica Neue", Arial, sans-serif;
+  text-wrap: balance;
+  margin: 0;
+}
+code, kbd, .mono { font-family: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace; }
+
+a { color: var(--primary); }
+
+.wrap { max-width: 1180px; margin: 0 auto; padding: 0 clamp(18px, 4vw, 40px); }
+.col { max-width: var(--measure); }
+
+/* ---- masthead ---- */
+.masthead { padding: clamp(56px, 9vw, 104px) 0 clamp(32px, 5vw, 56px); border-bottom: 1px solid var(--border); }
+.eyebrow {
+  font-family: "Bricolage Grotesque", sans-serif;
+  font-size: 12px; font-weight: 600; letter-spacing: .13em; text-transform: uppercase;
+  color: var(--muted-fg); margin-bottom: 20px;
+}
+.masthead h1 {
+  font-size: clamp(38px, 6.4vw, 70px); font-weight: 800; line-height: 1.02;
+  letter-spacing: -.028em; margin-bottom: 22px;
+}
+.masthead h1 em {
+  font-style: normal;
+  background: linear-gradient(96deg, var(--primary), var(--accent-to));
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+.standfirst { font-size: clamp(18px, 2.1vw, 21px); color: var(--muted-fg); max-width: 60ch; }
+.masthead-meta { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 30px; }
+
+.chip {
+  display: inline-flex; align-items: center; gap: 7px;
+  font-family: "IBM Plex Mono", monospace; font-size: 12px;
+  padding: 5px 11px; border: 1px solid var(--border); border-radius: 999px;
+  color: var(--muted-fg); background: var(--muted);
+}
+.dot { width: 8px; height: 8px; border-radius: 50%; flex: none; }
+
+/* ---- layout ---- */
+.shell { display: grid; grid-template-columns: 1fr; gap: 0; }
+@media (min-width: 1080px) {
+  .shell { grid-template-columns: 214px minmax(0, 1fr); gap: 52px; align-items: start; }
+  .rail { position: sticky; top: 26px; padding-top: 58px; }
+}
+.rail { display: none; }
+@media (min-width: 1080px) { .rail { display: block; } }
+.rail ol { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 2px; }
+.rail a {
+  display: flex; gap: 10px; text-decoration: none; color: var(--muted-fg);
+  font-family: "Bricolage Grotesque", sans-serif; font-size: 13px; line-height: 1.35;
+  padding: 7px 10px; border-radius: 7px; border-left: 2px solid transparent;
+}
+.rail a:hover { color: var(--fg); background: var(--muted); }
+.rail a .n { font-family: "IBM Plex Mono", monospace; font-size: 11px; opacity: .6; padding-top: 1px; }
+
+section { padding: clamp(48px, 7vw, 84px) 0; border-bottom: 1px solid var(--border); }
+section:last-of-type { border-bottom: 0; }
+section > .col > * + * { margin-top: 18px; }
+
+h2 { font-size: clamp(27px, 3.6vw, 38px); font-weight: 700; letter-spacing: -.02em; line-height: 1.1; }
+h3 { font-size: clamp(19px, 2.2vw, 22px); font-weight: 600; letter-spacing: -.01em; margin-top: 38px; }
+h4 { font-size: 15px; font-weight: 600; letter-spacing: .01em; }
+.kicker {
+  font-family: "IBM Plex Mono", monospace; font-size: 11px; letter-spacing: .1em;
+  text-transform: uppercase; color: var(--primary); margin-bottom: 12px;
+}
+p { margin: 0; }
+p + p { margin-top: 15px; }
+
+.lede { font-size: 19px; color: var(--muted-fg); }
+strong { font-weight: 600; }
+
+/* ---- breakout: diagrams and tables run wider than the prose ---- */
+.breakout { margin-top: 30px; margin-bottom: 30px; }
+@media (min-width: 1080px) { .breakout { width: min(100%, 1180px); } }
+
+.panel {
+  background: var(--raised); border: 1px solid var(--border);
+  border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden;
+}
+.panel-head {
+  display: flex; align-items: baseline; justify-content: space-between; gap: 14px;
+  padding: 13px 17px; border-bottom: 1px solid var(--border); background: var(--muted);
+  flex-wrap: wrap;
+}
+.panel-head h4 { font-family: "Bricolage Grotesque", sans-serif; }
+.panel-head .note { font-size: 12.5px; color: var(--muted-fg); font-family: "IBM Plex Mono", monospace; }
+.panel-body { padding: 18px; }
+.scroll-x { overflow-x: auto; }
+
+/* ---- tables ---- */
+table { border-collapse: collapse; width: 100%; font-size: 13.5px; }
+th, td { text-align: left; padding: 9px 12px; border-bottom: 1px solid var(--border); vertical-align: top; }
+th {
+  font-family: "Bricolage Grotesque", sans-serif; font-size: 11px; font-weight: 600;
+  letter-spacing: .07em; text-transform: uppercase; color: var(--muted-fg);
+  white-space: nowrap; background: var(--muted);
+  position: sticky; top: 0;
+}
+tbody tr:last-child td { border-bottom: 0; }
+td.mono, th.mono { font-family: "IBM Plex Mono", monospace; font-size: 12.5px; }
+td .m { font-family: "IBM Plex Mono", monospace; font-size: 11px; font-weight: 600; padding: 1px 6px; border-radius: 4px; background: var(--muted); border: 1px solid var(--border); }
+.tnum { font-variant-numeric: tabular-nums; }
+
+/* ---- callouts ---- */
+.call {
+  border: 1px solid var(--border); border-left: 3px solid var(--primary);
+  background: var(--muted); border-radius: 0 var(--radius) var(--radius) 0;
+  padding: 15px 18px; font-size: 15.5px;
+}
+.call.warn { border-left-color: var(--warn); }
+.call.risk { border-left-color: var(--risk); }
+.call.ok { border-left-color: var(--ok); }
+.call h4 { margin-bottom: 6px; font-family: "Bricolage Grotesque", sans-serif; }
+
+/* ---- mermaid ---- */
+.mermaid { background: transparent; display: flex; justify-content: center; padding: 6px 0; }
+
+/* ---- legend ---- */
+.legend { display: flex; flex-wrap: wrap; gap: 16px; font-size: 13px; color: var(--muted-fg); }
+.legend span { display: inline-flex; align-items: center; gap: 7px; }
+
+/* ---- roadmap ---- */
+.phases { display: grid; gap: 12px; }
+.phase {
+  display: grid; grid-template-columns: 76px minmax(0,1fr) auto; gap: 16px; align-items: start;
+  padding: 15px 17px; border: 1px solid var(--border); border-radius: var(--radius);
+  background: var(--raised);
+}
+@media (max-width: 620px) { .phase { grid-template-columns: 1fr; gap: 8px; } }
+.phase .ph { font-family: "IBM Plex Mono", monospace; font-size: 12px; color: var(--muted-fg); padding-top: 3px; }
+.phase h4 { font-family: "Bricolage Grotesque", sans-serif; font-size: 16px; }
+.phase p { font-size: 14.5px; color: var(--muted-fg); margin-top: 4px; }
+.status {
+  font-family: "IBM Plex Mono", monospace; font-size: 11px; font-weight: 600;
+  padding: 3px 9px; border-radius: 999px; white-space: nowrap; border: 1px solid;
+}
+.status.done { color: var(--ok); border-color: color-mix(in srgb, var(--ok) 40%, transparent); background: color-mix(in srgb, var(--ok) 12%, transparent); }
+.status.wip { color: var(--warn); border-color: color-mix(in srgb, var(--warn) 40%, transparent); background: color-mix(in srgb, var(--warn) 12%, transparent); }
+.status.next { color: var(--muted-fg); border-color: var(--border); background: var(--muted); }
+
+/* ---- rules mockup ---- */
+.mock {
+  border: 1px solid var(--border-strong); border-radius: 12px; overflow: hidden;
+  background: var(--raised); box-shadow: var(--shadow);
+}
+.mock-bar {
+  display: flex; align-items: center; gap: 9px; padding: 10px 14px;
+  background: var(--muted); border-bottom: 1px solid var(--border);
+}
+.mock-bar .tl { width: 9px; height: 9px; border-radius: 50%; background: var(--border-strong); }
+.mock-bar .ttl { font-family: "Bricolage Grotesque", sans-serif; font-size: 13px; color: var(--muted-fg); margin-left: 6px; }
+.mock-grid { display: grid; grid-template-columns: 1fr; }
+@media (min-width: 800px) { .mock-grid { grid-template-columns: 288px minmax(0,1fr); } }
+.mock-list { border-right: 1px solid var(--border); padding: 12px; display: flex; flex-direction: column; gap: 7px; }
+@media (max-width: 799px) { .mock-list { border-right: 0; border-bottom: 1px solid var(--border); } }
+.rule-row {
+  display: flex; align-items: center; gap: 11px; padding: 9px 11px;
+  border: 1px solid var(--border); border-radius: 8px; background: var(--surface);
+  font-size: 13.5px;
+}
+.rule-row.sel { border-color: var(--primary); box-shadow: 0 0 0 2px color-mix(in srgb, var(--primary) 18%, transparent); }
+.rule-row .cnt { margin-left: auto; font-family: "IBM Plex Mono", monospace; font-size: 11px; color: var(--muted-fg); }
+
+/* the ring: one glow fills it, two halve it, three make thirds */
+.ring { width: 26px; height: 26px; border-radius: 50%; flex: none; position: relative; }
+.ring::after {
+  content: ""; position: absolute; inset: 6px; border-radius: 50%;
+  background: var(--raised);
+}
+.mock-edit { padding: 16px 18px; display: flex; flex-direction: column; gap: 15px; }
+.field { display: flex; flex-direction: column; gap: 6px; }
+.field .lbl { font-family: "Bricolage Grotesque", sans-serif; font-size: 11.5px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--muted-fg); }
+.pillrow { display: flex; flex-wrap: wrap; gap: 6px; }
+.pill {
+  font-size: 12.5px; padding: 4px 10px; border-radius: 999px;
+  border: 1px solid var(--border); background: var(--muted); color: var(--fg);
+}
+.pill.on { border-color: var(--primary); background: color-mix(in srgb, var(--primary) 14%, transparent); color: var(--primary); font-weight: 600; }
+.slider { display: flex; align-items: center; gap: 11px; }
+.track { flex: 1; height: 5px; border-radius: 999px; background: var(--muted); position: relative; border: 1px solid var(--border); }
+.track i { position: absolute; top: -1px; bottom: -1px; border-radius: 999px; background: linear-gradient(90deg, var(--primary), var(--accent-to)); }
+.track b { position: absolute; top: 50%; width: 13px; height: 13px; margin-top: -6.5px; margin-left: -6.5px; border-radius: 50%; background: var(--raised); border: 2px solid var(--primary); }
+.slider .v { font-family: "IBM Plex Mono", monospace; font-size: 12px; color: var(--muted-fg); min-width: 62px; text-align: right; font-variant-numeric: tabular-nums; }
+.sentence {
+  font-size: 14.5px; padding: 11px 13px; border-radius: 8px;
+  background: var(--muted); border: 1px dashed var(--border-strong); color: var(--muted-fg);
+}
+.sentence b { color: var(--fg); font-weight: 600; }
+
+.footnote { font-size: 13.5px; color: var(--muted-fg); }
+.footnote code { font-size: 12.5px; }
+
+ul.tight { margin: 0; padding-left: 20px; }
+ul.tight li + li { margin-top: 7px; }
+
+hr.soft { border: 0; border-top: 1px solid var(--border); margin: 34px 0; }
+
+:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; border-radius: 4px; }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+</style>
+
+<div class="wrap">
+  <header class="masthead">
+    <div class="eyebrow">ReactMap 2.0 &middot; architecture for review</div>
+    <h1>How the map gets<br><em>from a scanner to your screen</em></h1>
+    <p class="standfirst">The whole stack, end to end: where data comes from, how it reaches a browser, how you build the rules that decide what you see, and how alerts get to you. Written to be argued with.</p>
+    <div class="masthead-meta">
+      <span class="chip"><i class="dot" style="background: var(--sys-golbat)"></i>Golbat</span>
+      <span class="chip"><i class="dot" style="background: var(--sys-reactmap)"></i>ReactMap 2.0</span>
+      <span class="chip"><i class="dot" style="background: var(--sys-poracle)"></i>PoracleNG</span>
+    </div>
+  </header>
+
+  <div class="shell">
+    <nav class="rail" aria-label="Sections">
+      <ol>
+        <li><a href="#overview"><span class="n">01</span>The stack</a></li>
+        <li><a href="#data"><span class="n">02</span>Where data comes from</a></li>
+        <li><a href="#wire"><span class="n">03</span>Getting it to you</a></li>
+        <li><a href="#rules"><span class="n">04</span>Building rules</a></li>
+        <li><a href="#alerts"><span class="n">05</span>Alerts</a></li>
+        <li><a href="#roadmap"><span class="n">06</span>Where we are</a></li>
+        <li><a href="#open"><span class="n">07</span>Open questions</a></li>
+      </ol>
+    </nav>
+
+    <main>
+      <!-- 01 ------------------------------------------------------------- -->
+      <section id="overview">
+        <div class="col">
+          <div class="kicker">01 &middot; The stack</div>
+          <h2>Four systems, one direction of travel</h2>
+          <p class="lede">Nothing here is new except ReactMap. The pieces around it already exist and already work; 2.0 changes how ReactMap talks to them.</p>
+          <p>A scanner walks the world and produces raw game data. <strong>Golbat</strong> decodes it, keeps the live picture in memory, and answers questions about it. <strong>ReactMap</strong> asks those questions on your behalf and paints the answers. <strong>PoracleNG</strong> sends you a message when something you care about appears.</p>
+        </div>
+
+        <div class="breakout panel">
+          <div class="panel-head">
+            <h4>End to end</h4>
+            <span class="note">solid = request/response &middot; dashed = push</span>
+          </div>
+          <div class="panel-body scroll-x">
+            <pre class="mermaid">
+flowchart LR
+  SC["Scanner<br/><small>Dragonite etc.</small>"]:::scanner
+  GB["Golbat<br/><small>decode · cache · serve</small>"]:::golbat
+  DB[("MySQL<br/><small>durable store</small>")]:::store
+  RM["ReactMap server<br/><small>rules · auth · fan-out</small>"]:::rm
+  CL["Your browser<br/><small>map · filters</small>"]:::rm
+  PO["PoracleNG<br/><small>tracking · alerts</small>"]:::por
+  DC["Discord / Telegram"]:::por
+
+  SC -->|raw protos| GB
+  GB --> DB
+  GB -->|"bbox + filter query"| RM
+  RM -->|"deltas over one socket"| CL
+  CL -->|"rules, viewport"| RM
+  GB -.->|"webhook on decode"| PO
+  PO --> DC
+  RM <-->|"tracking CRUD"| PO
+
+  classDef scanner fill:#6f6b80,stroke:#6f6b80,color:#fff
+  classDef golbat fill:#3d7dca,stroke:#3d7dca,color:#fff
+  classDef rm fill:#7b5ce0,stroke:#7b5ce0,color:#fff
+  classDef por fill:#d99a1c,stroke:#d99a1c,color:#fff
+  classDef store fill:#f5f3fb,stroke:#bdb6cf,color:#1c1a26
+            </pre>
+          </div>
+        </div>
+
+        <div class="col">
+          <div class="call">
+            <h4>The one thing to notice</h4>
+            <p>Golbat pushes to Poracle but not to ReactMap. There is no websocket, no server-sent events, and no streaming RPC on Golbat's read side, so ReactMap has to ask repeatedly rather than being told. That single fact shapes every decision in section 03.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- 02 ------------------------------------------------------------- -->
+      <section id="data">
+        <div class="col">
+          <div class="kicker">02 &middot; Where data comes from</div>
+          <h2>Golbat holds the live world</h2>
+          <p class="lede">Golbat keeps active Pokémon and forts in memory, indexed spatially, and answers bounding-box queries with server-side filtering. ReactMap 2.0 leans on that far harder than 1.x did.</p>
+          <p>The important shift: 1.x could talk to Golbat <em>or</em> fall back to reading scanner database tables directly, which meant every filter had to be written twice. 2.0 requires Golbat and deletes the second implementation.</p>
+        </div>
+        <div id="golbat-api" class="breakout"><div class="panel">
+  <div class="panel-head">
+    <h4>Golbat, the endpoints 2.0 uses</h4>
+    <span class="note">40 exist &middot; 17 relevant &middot; verified against source</span>
+  </div>
+  <div class="panel-body scroll-x">
+    <table>
+      <thead><tr><th>Endpoint</th><th>What it does</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr><td class="mono"><span class="m">GET</span> /api/status</td><td>Reports what this Golbat can do and its result caps</td><td>Read at boot. The only fort endpoint not gated behind the experimental flag.</td></tr>
+        <tr><td class="mono"><span class="m">POST</span> /api/pokemon/v3/scan</td><td>Pok&eacute;mon in a box, filtered server-side</td><td>Returns a count envelope, not a bare list. 2.0 uses v3, not the v2 that 1.x calls.</td></tr>
+        <tr><td class="mono"><span class="m">POST</span> /api/fort/scan</td><td>Gyms, stops and stations in <em>one</em> spatial pass</td><td>1.x makes three separate calls. Needs the experimental flag.</td></tr>
+        <tr><td class="mono"><span class="m">GET</span> /api/fort/available</td><td>Which raids, quests, lures and showcases actually exist right now</td><td>Builds the filter menus, so you only see options that are real.</td></tr>
+        <tr><td class="mono"><span class="m">GET</span> /api/pokemon/available</td><td>Which species are currently on the map</td><td>Same idea, for Pok&eacute;mon.</td></tr>
+        <tr><td class="mono"><span class="m">GET</span> /api/&hellip;/id/{id}</td><td>One gym, stop, station or Pok&eacute;mon by id</td><td>Popups and deep links.</td></tr>
+        <tr><td class="mono"><span class="m">POST</span> /api/pokemon/search</td><td>Nearest matches to a point</td><td>Powers search.</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="panel" style="margin-top:18px">
+  <div class="panel-head"><h4>What you can filter on, before anything reaches ReactMap</h4></div>
+  <div class="panel-body scroll-x">
+    <table>
+      <thead><tr><th>Pok&eacute;mon</th><th>Gyms</th><th>Stops</th><th>Stations</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>species and form, IV, individual attack / defence / stamina, level, CP, size, gender, and rank in each of the three leagues</td>
+          <td>raid tier, boss, team, open slots, AR eligibility</td>
+          <td>quest reward and item, lure, invasion character, showcase contest and focus</td>
+          <td>battle level, boss, Gigantamax, whether it is still active</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="call warn" style="margin-top:18px; max-width: var(--measure)">
+  <h4>Three things that constrain the design</h4>
+  <p><strong>Golbat cannot be asked "what changed".</strong> There is no incremental query, confirmed by searching the whole codebase. Every poll returns the full matching set and ReactMap works out the difference itself. We have proposed adding one upstream.</p>
+  <p><strong>The fort endpoints are off by default.</strong> <code>fort_in_memory</code> is marked experimental and gates eight endpoints, which answer 503 when it is off. Operators will need to turn it on.</p>
+  <p><strong>Results are capped</strong> at 3,000 Pok&eacute;mon and 9,000 forts per query by default. A dense city viewport can exceed that, and a truncated response must never be mistaken for a complete one.</p>
+</div></div>
+      </section>
+
+      <!-- 03 ------------------------------------------------------------- -->
+      <section id="wire">
+        <div class="col">
+          <div class="kicker">03 &middot; Getting it to you</div>
+          <h2>One socket, and only what changed</h2>
+          <p class="lede">Today every browser polls on a timer and receives a full viewport each time, most of it identical to the last one. 2.0 opens one connection and sends differences.</p>
+        </div>
+
+        <div class="breakout panel">
+          <div class="panel-head">
+            <h4>1.x polling versus 2.0 deltas</h4>
+            <span class="note">per browser, steady state on a still map</span>
+          </div>
+          <div class="panel-body scroll-x">
+            <pre class="mermaid">
+sequenceDiagram
+  autonumber
+  participant B as Browser
+  participant R as ReactMap
+  participant G as Golbat
+  Note over B,G: 1.x: poll, full payload, every time
+  B->>R: POST /graphql (filters, bbox)
+  R->>G: scan bbox
+  G-->>R: every entity in the box
+  R-->>B: every entity, again
+  Note over B,R: repeats every 10–20s per category
+  Note over B,G: 2.0: subscribe once, receive changes
+  B->>R: subscribe(rules, viewport)
+  R->>G: scan bbox + filters
+  G-->>R: matching entities
+  R-->>B: initial set
+  loop each tick
+    R->>G: scan again
+    G-->>R: matching entities
+    R-->>B: only add / update / remove
+  end
+            </pre>
+          </div>
+        </div>
+
+        <div class="col">
+          <h3>What the server remembers</h3>
+          <p>For each open connection ReactMap keeps a map of entity id to a change stamp. Not the entities themselves: it already has those in hand when it builds a message, so storing them twice buys nothing.</p>
+        </div>
+
+        <div class="breakout panel">
+          <div class="panel-head"><h4>Per-connection cost</h4><span class="note">measured, not estimated</span></div>
+          <div class="panel-body scroll-x">
+            <table>
+              <thead><tr><th>What</th><th class="tnum">Size</th><th>Why</th></tr></thead>
+              <tbody>
+                <tr><td>One tracked entity</td><td class="mono tnum">~90 B</td><td>map entry, a 20-char id, a timestamp</td></tr>
+                <tr><td>Typical viewport</td><td class="mono tnum">~100 KB</td><td>around 1,000 entities</td></tr>
+                <tr><td>Dense urban viewport</td><td class="mono tnum">~500 KB</td><td>around 5,000 entities</td></tr>
+                <tr><td>200 concurrent users</td><td class="mono tnum">~20 MB</td><td>the whole fan-out layer</td></tr>
+                <tr><td>Golbat, for comparison</td><td class="mono tnum">~11 GB</td><td>full entities for the whole world</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="col">
+          <div class="call ok">
+            <h4>Pokémon expire on their own</h4>
+            <p>Every Pokémon carries a despawn time, so the browser removes it on its own clock and the server never sends a "gone" message for it. Removals are only needed when something leaves your viewport, stops matching your rules, or a gym's raid ends.</p>
+          </div>
+
+          <h3>The biggest saving is not the socket</h3>
+          <p>It is a file. ReactMap currently ships the Pokémon master data to every visitor inside a GraphQL response, which means the browser cannot cache it and re-downloads it on a timer.</p>
+        </div>
+
+        <div class="breakout panel">
+          <div class="panel-head"><h4>What every visitor downloads today</h4><span class="note">measured on disk</span></div>
+          <div class="panel-body scroll-x">
+            <table>
+              <thead><tr><th>Payload</th><th class="tnum">Bytes</th><th>In 2.0</th></tr></thead>
+              <tbody>
+                <tr><td class="mono">masterfile.json</td><td class="mono tnum">831,799</td><td>stays on the server; the browser asks for the few species on screen</td></tr>
+                <tr><td class="mono">&nbsp;&nbsp;└ pokemon key alone</td><td class="mono tnum">436,079</td><td>52% of it</td></tr>
+                <tr><td>Full viewport, every poll</td><td class="mono">varies</td><td>replaced by add / update / remove</td></tr>
+                <tr><td class="mono">__typename</td><td class="mono">every entity</td><td>gone with GraphQL</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- 04 ------------------------------------------------------------- -->
+      <section id="rules">
+        <div class="col">
+          <div class="kicker">04 &middot; Building rules</div>
+          <h2>A rule is one sentence</h2>
+          <p class="lede">The filter system is the part of ReactMap people find hardest, and it is the part 2.0 changes most. The design goal was that you should be able to read your own filters back.</p>
+          <p>Each rule names <strong>one thing</strong> and says what should happen when it appears. Leaving a field blank means "any". You never build a rule out of nested conditions.</p>
+        </div>
+
+        <div class="breakout">
+          <div class="mock">
+            <div class="mock-bar">
+              <i class="tl"></i><i class="tl"></i><i class="tl"></i>
+              <span class="ttl">Filters &middot; Pokémon</span>
+            </div>
+            <div class="mock-grid">
+              <div class="mock-list">
+                <div class="rule-row sel">
+                  <span class="ring" style="background: conic-gradient(var(--sys-poracle) 0turn 1turn)"></span>
+                  <span>Hundos</span><span class="cnt">25 species</span>
+                </div>
+                <div class="rule-row">
+                  <span class="ring" style="background: conic-gradient(var(--sys-golbat) 0turn .5turn, var(--sys-poracle) .5turn 1turn)"></span>
+                  <span>Great League rank 1</span><span class="cnt">88 species</span>
+                </div>
+                <div class="rule-row">
+                  <span class="ring" style="background: conic-gradient(var(--ok) 0turn .333turn, var(--sys-golbat) .333turn .666turn, var(--sys-poracle) .666turn 1turn)"></span>
+                  <span>Shiny-eligible starters</span><span class="cnt">9 species</span>
+                </div>
+                <div class="rule-row">
+                  <span class="ring" style="background: conic-gradient(var(--border-strong) 0turn 1turn)"></span>
+                  <span>Everything else</span><span class="cnt">any</span>
+                </div>
+              </div>
+
+              <div class="mock-edit">
+                <div class="sentence">Show <b>any Pokémon</b> with <b>IV 100</b>, make it <b>large</b>, ring it in <b>gold</b>, and <b>notify me</b>.</div>
+
+                <div class="field">
+                  <span class="lbl">Species</span>
+                  <div class="pillrow">
+                    <span class="pill on">Any species</span>
+                    <span class="pill">Pick species…</span>
+                    <span class="pill">Except: 4 chosen</span>
+                  </div>
+                </div>
+
+                <div class="field">
+                  <span class="lbl">IV</span>
+                  <div class="slider">
+                    <div class="track"><i style="left:100%; right:0"></i><b style="left:100%"></b></div>
+                    <span class="v">100 – 100</span>
+                  </div>
+                </div>
+
+                <div class="field">
+                  <span class="lbl">Level</span>
+                  <div class="slider">
+                    <div class="track"><i style="left:0; right:0"></i><b style="left:0"></b><b style="left:100%"></b></div>
+                    <span class="v">1 – 35</span>
+                  </div>
+                </div>
+
+                <div class="field">
+                  <span class="lbl">When it appears</span>
+                  <div class="pillrow">
+                    <span class="pill on">Large</span>
+                    <span class="pill on">Gold ring</span>
+                    <span class="pill on">Notify</span>
+                    <span class="pill">Hide</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <p class="footnote" style="margin-top:12px">Rules that differ only in which species they name are shown as one row. Editing the group edits all of them; editing one separates it out. Nothing about the grouping is stored, so it can always be undone.</p>
+        </div>
+
+        <div class="col">
+          <h3>When two rules both match</h3>
+          <p>They both apply, and there is no ordering to reason about. Each display attribute has its own rule for combining, chosen so that nothing a person asked for is silently discarded.</p>
+        </div>
+
+        <div class="breakout panel">
+          <div class="panel-head"><h4>Combining matched rules</h4></div>
+          <div class="panel-body scroll-x">
+            <table>
+              <thead><tr><th>Attribute</th><th>Combines by</th><th>Reasoning</th></tr></thead>
+              <tbody>
+                <tr><td>Size</td><td>largest wins</td><td>you asked for attention twice; give the louder one</td></tr>
+                <tr><td>Notify</td><td>any true wins</td><td>a missed alert is worse than an extra one</td></tr>
+                <tr><td>Hide</td><td>any hide wins</td><td>hiding is explicit; it should not be outvoted</td></tr>
+                <tr><td>Glow</td><td>ring segments, up to three</td><td>mixing colours invents a meaning nobody assigned, and hurts colourblind users</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="col">
+          <div class="call">
+            <h4>Why one row per thing</h4>
+            <p>A rule that named twenty species would have to answer questions like "which of these does the IV range apply to". Naming one thing per row deletes that question instead of answering it, and it happens to be exactly the shape Poracle stores tracking in, which makes the two systems line up without translation.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- 05 ------------------------------------------------------------- -->
+      <section id="alerts">
+        <div class="col">
+          <div class="kicker">05 &middot; Alerts</div>
+          <h2>Poracle, on its own page</h2>
+          <p class="lede">Notifications move out of the map's filter panel and become their own thing, with one provider instead of the current multi-provider arrangement.</p>
+          <p>Because a ReactMap rule and a Poracle tracking row describe the same shape, sending a filter to Poracle is a copy rather than a conversion.</p>
+        </div>
+        <div id="poracle-api" class="breakout"><div class="panel">
+  <div class="panel-head">
+    <h4>PoracleNG v2, the endpoints 2.0 uses</h4>
+    <span class="note">52 exist &middot; 34 relevant &middot; verified against source</span>
+  </div>
+  <div class="panel-body scroll-x">
+    <table>
+      <thead><tr><th>Endpoint</th><th>What it does</th></tr></thead>
+      <tbody>
+        <tr><td class="mono"><span class="m">GET</span> /humans/{id}/tracking</td><td>Everything about one person in a single call: their rules, presets, saved places, schedules and mutes</td></tr>
+        <tr><td class="mono"><span class="m">GET</span> /humans/{id}</td><td>Does this person exist yet? 404 is how we know to create them</td></tr>
+        <tr><td class="mono"><span class="m">POST</span> /humans</td><td>Register someone the first time they open the alerts page</td></tr>
+        <tr><td class="mono"><span class="m">POST</span> /humans/{id}/tracking/{type}</td><td>Add rules. Body is always a list, even for one</td></tr>
+        <tr><td class="mono"><span class="m">PUT</span> /humans/{id}/tracking/{type}/{uid}</td><td>Replace a rule outright. There is no partial edit</td></tr>
+        <tr><td class="mono"><span class="m">DELETE</span> /humans/{id}/tracking/{type}</td><td>Remove several rules at once</td></tr>
+        <tr><td class="mono"><span class="m">GET</span> /humans/{id}/areas</td><td>Which regions this person is allowed to pick from</td></tr>
+        <tr><td class="mono"><span class="m">GET</span> <span class="m">POST</span> /humans/{id}/profiles</td><td>Presets: home, work, weekend, each with its own areas and schedule</td></tr>
+        <tr><td class="mono"><span class="m">POST</span> /humans/{id}/location</td><td>Set the home point that distance rules measure from</td></tr>
+        <tr><td class="mono"><span class="m">GET</span> <span class="m">POST</span> /humans/{id}/mutes</td><td>Silence a gym, a species, a region, or everything, for a while</td></tr>
+        <tr><td class="mono"><span class="m">POST</span> /humans/{id}/enable</td><td>The master switch</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="call risk" style="margin-top:18px; max-width: var(--measure)">
+  <h4>Correction: this is a mapping, not a copy</h4>
+  <p>An earlier draft of our design said a ReactMap rule and a Poracle rule were the same shape, so sending one across was a rename. Reading Poracle's source disproved that, and it is the largest error validation caught.</p>
+  <p><strong>Poracle Pok&eacute;mon rules have no identity key.</strong> A rule <em>is</em> its whole set of fields, and holding several rules for the same species is the intended design, not a mistake. So changing one field edits a rule in place, but changing two adds a second one.</p>
+  <p><strong>League ranks live one per rule</strong>, and cannot be combined with an IV filter. One ReactMap rule asking for hundos <em>or</em> a good Great League rank <em>or</em> a good Ultra rank becomes three rules on Poracle's side.</p>
+  <p>None of this is a blocker. It means the alerts page has to translate rather than forward, and has to re-read after writing, because the id returned when you create a rule is not usable.</p>
+</div>
+
+<div class="call" style="margin-top:18px; max-width: var(--measure)">
+  <h4>How you are identified</h4>
+  <p>Poracle does not have accounts. It has delivery destinations, keyed by your Discord or Telegram id, because that is where the message has to go. ReactMap signs its requests with one shared server secret, so ReactMap itself is responsible for making sure you can only reach your own alerts.</p>
+</div></div>
+      </section>
+
+      <!-- 06 ------------------------------------------------------------- -->
+      <section id="roadmap">
+        <div class="col">
+          <div class="kicker">06 &middot; Where we are</div>
+          <h2>Built, building, next</h2>
+          <p class="lede">2.0 is a rewrite of the client and the server it talks to. The map, the design system and the shell exist. The parts that carry data are in progress.</p>
+        </div>
+        <div class="breakout">
+          <div class="phases">
+            <div class="phase"><span class="ph">Phase 1</span><div><h4>Foundation</h4><p>Bun as runtime and package manager, Biome, strict TypeScript, a two-entry build.</p></div><span class="status done">merged</span></div>
+            <div class="phase"><span class="ph">Phase 2</span><div><h4>Shell and navigation</h4><p>Routing and the app frame, with a per-user flag deciding who sees the new client.</p></div><span class="status done">merged</span></div>
+            <div class="phase"><span class="ph">Phase 3</span><div><h4>Design system</h4><p>Tailwind v4, the full shadcn component set, and the data palettes this page is using.</p></div><span class="status done">merged</span></div>
+            <div class="phase"><span class="ph">Phase 4</span><div><h4>Map engine</h4><p>MapLibre and deck.gl replacing Leaflet, with clustering and icon atlases.</p></div><span class="status done">merged</span></div>
+            <div class="phase"><span class="ph">Phase 5</span><div><h4>Accounts</h4><p>Better Auth over Drizzle. Reworking after review found the permission layer was tied to the old login system.</p></div><span class="status wip">in progress</span></div>
+            <div class="phase"><span class="ph">Phase 6</span><div><h4>Transport</h4><p>One Bun server, tRPC for requests, a socket for map deltas.</p></div><span class="status next">next</span></div>
+            <div class="phase"><span class="ph">Phase 7</span><div><h4>Filters</h4><p>The rules model above, and the interface for building them.</p></div><span class="status next">next</span></div>
+            <div class="phase"><span class="ph">Phase 8</span><div><h4>Alerts</h4><p>Poracle as a single provider on its own page.</p></div><span class="status next">next</span></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 07 ------------------------------------------------------------- -->
+      <section id="open">
+        <div class="col">
+          <div class="kicker">07 &middot; Open questions</div>
+          <h2>What we are actually asking</h2>
+          <p class="lede">This document exists to be disagreed with. These are the decisions that are still live, and the ones where being wrong would be expensive.</p>
+        </div>
+        <div id="questions" class="breakout"><div class="panel">
+  <div class="panel-head"><h4>Live decisions</h4><span class="note">each of these could still go the other way</span></div>
+  <div class="panel-body">
+    <table>
+      <thead><tr><th>Question</th><th>Where it stands</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><strong>Should rules have an order?</strong></td>
+          <td>Two of our own documents disagree. One says drag to reorder and first match wins; the other says no order, and each display property resolves on its own. The second is newer and argues the first discards intent a person expressed, but the first is what answers "why is this one big".</td>
+        </tr>
+        <tr>
+          <td><strong>Is requiring an experimental Golbat flag acceptable?</strong></td>
+          <td><code>fort_in_memory</code> is off by default. Without it there are no gym, stop or station scans at all. 2.0 currently assumes operators will turn it on.</td>
+        </tr>
+        <tr>
+          <td><strong>Do we wait for an incremental query upstream?</strong></td>
+          <td>Golbat cannot say what changed, so ReactMap polls and diffs. We have proposed adding it. The design works without it and gets cheaper if it lands.</td>
+        </tr>
+        <tr>
+          <td><strong>Should Mega raids and showcase contests be filterable?</strong></td>
+          <td>Both upstreams support them and our rules schema does not. Adding columns later is expensive, so this is close to a now-or-never call.</td>
+        </tr>
+        <tr>
+          <td><strong>Does the text filter syntax come back?</strong></td>
+          <td>Currently deferred, to avoid shipping two ways of expressing the same thing. Power users rely on it today.</td>
+        </tr>
+        <tr>
+          <td><strong>How much does a Poracle import promise?</strong></td>
+          <td>Poracle carries per-rule settings ReactMap has no column for, including costume, weight, time of day and per-rule area overrides. An import that silently drops them is data loss rather than a missing feature.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div></div>
+        <div class="col">
+          <p class="footnote">Every number on this page was measured against a running system or read out of source, not estimated. Where something could not be confirmed, it says so.</p>
+        </div>
+      </section>
+    </main>
+  </div>
+</div>
