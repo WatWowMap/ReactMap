@@ -153,10 +153,10 @@ remembers why the shiny families filter has a hole in it.
 Singular rows are correct for storage and wrong for a person reading a list, so the interface groups
 them. That grouping is computed, not persisted. There is no group table and no group id.
 
-**Two rules group when they are identical in every column except the one that identifies them.**
-species for pokemon and nests, reward for quests, character for invasions, lure for lures. That makes
-grouping deterministic, reversible, and free of a second source of truth about which rules belong
-together.
+**Two rules group when they are identical in every column except the one that identifies them**,
+which is species for pokemon and nests, reward for quests, character for invasions, and lure for
+lures. That makes grouping deterministic, reversible, and free of a second source of truth about
+which rules belong together.
 
 Given that definition, "editing one rule ungroups it" is not behaviour anyone implements. Change one
 row's `iv_min` and it stops matching its siblings, so it falls out of the group by itself. That
