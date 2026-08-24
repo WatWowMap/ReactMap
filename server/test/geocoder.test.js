@@ -137,56 +137,74 @@ test('echoes the result name into its locality field', () => {
 // sends no `city` at all. Reading only `city` drops the settlement from both
 // the entry and the formatted address, so a {{city}} format renders blank for
 // every rural address.
-test('falls back to Photon locality when there is no city', () => {
+// Captured verbatim from a live Photon index: reverse at 41.9088,-87.6796.
+// Nominatim's own answer for the same building carries quarter "Wicker Park"
+// and suburb "West Town", which is what fixes these two mappings.
+const WICKER_PARK_REVERSE = {
+  city: 'West Chicago Township',
+  country: 'United States',
+  countrycode: 'US',
+  county: 'Cook County',
+  district: 'West Town',
+  housenumber: '1521',
+  locality: 'Wicker Park',
+  osm_key: 'building',
+  osm_value: 'yes',
+  postcode: '60647',
+  state: 'Illinois',
+  street: 'North Hoyne Avenue',
+  type: 'house',
+}
+
+test("maps Photon's locality to neighbourhood and district to suburb", () => {
   const got = formatPhotonFeature(
-    feature(
-      {
-        housenumber: '4',
-        street: 'County Road 15',
-        locality: 'Bootjack',
-        county: 'Mariposa County',
-        state: 'California',
-        postcode: '95338',
-        country: 'United States',
-        countrycode: 'US',
-        osm_key: 'building',
-        osm_value: 'yes',
-      },
-      [-119.9515, 37.4744],
-    ),
+    feature(WICKER_PARK_REVERSE, [-87.6796, 41.9088]),
   )
-  assert.equal(got.city, 'Bootjack')
+  assert.equal(got.neighbourhood, 'Wicker Park')
+  assert.equal(got.suburb, 'West Town')
+  // Neither is the settlement. Reporting a neighbourhood as the city would name
+  // an area of Chicago as a town.
+  assert.equal(got.city, 'West Chicago Township')
+})
+
+test('places locality and district between the street and the settlement', () => {
+  const got = formatPhotonFeature(
+    feature(WICKER_PARK_REVERSE, [-87.6796, 41.9088]),
+  )
   assert.equal(
     got.formattedAddress,
-    '4, County Road 15, Bootjack, Mariposa County, California, 95338, United States',
+    '1521, North Hoyne Avenue, Wicker Park, West Town, West Chicago Township, Cook County, Illinois, 60647, United States',
   )
 })
 
-// Photon's own hierarchy puts city above locality, so a response carrying both
-// must not demote the city.
-test('prefers city over locality when Photon sends both', () => {
+// A hamlet does not arrive in `locality`. Live index, q=Bootjack California:
+// osm_value=locality, type=other, name carries the hamlet, no locality field.
+test('a place tagged as a locality keeps its name out of the address fields', () => {
   const got = formatPhotonFeature(
     feature({
-      city: 'Mariposa',
-      locality: 'Bootjack',
+      name: 'Bootjack',
+      type: 'other',
+      osm_key: 'place',
+      osm_value: 'locality',
+      county: 'Mariposa',
       state: 'California',
       country: 'United States',
       countrycode: 'US',
     }),
   )
-  assert.equal(got.city, 'Mariposa')
+  assert.equal(got.neighbourhood, '')
+  assert.equal(
+    got.formattedAddress,
+    'Bootjack, Mariposa, California, United States',
+  )
 })
 
-// Photon reports the result's own layer in properties.type, and a city, state
-// or country is usually an administrative boundary in OSM, arriving as
-// osm_key=boundary. Gating self-reference on osm_key=place alone would keep
-// only the exception and drop the common case.
 test('places the result name using the Photon type layer', () => {
   const cases = [
     { type: 'city', name: 'Denver', field: 'city' },
     { type: 'state', name: 'Illinois', field: 'state' },
     { type: 'country', name: 'United States', field: 'country' },
-    { type: 'locality', name: 'Bootjack', field: 'city' },
+    { type: 'locality', name: 'Wicker Park', field: 'neighbourhood' },
     { type: 'street', name: 'Lake Shore Drive', field: 'streetName' },
   ]
   cases.forEach(({ type, name, field }) => {
@@ -296,7 +314,7 @@ test("Photon's own city wins over the echoed name", () => {
 
 // Photon's nearest field is `district`, a different OSM concept. Equating them
 // would be an invention rather than a translation.
-test('leaves suburb and neighbourhood empty', () => {
+test('leaves suburb and neighbourhood empty when Photon sends neither', () => {
   const got = formatPhotonFeature(STREET_ADDRESS)
   assert.equal(got.suburb, '')
   assert.equal(got.neighbourhood, '')
@@ -590,12 +608,21 @@ const serveNominatim = async () => {
   }
 }
 
+// Documents a limitation rather than a behaviour. Nominatim's /reverse answers
+// XML unless format=json is asked for, and Photon rejects any parameter outside
+// its allow list with a 400, so asking would break every correctly configured
+// Photon. The body therefore fails to parse and is logged as a failed fetch.
+// The forward path below is where this misconfiguration is actually reported.
+// Nominatim's /reverse answers XML unless format=json is asked for, and Photon
+// rejects any parameter outside its allow list with a 400, so asking would
+// break every correctly configured Photon. The unparseable body is the signal
+// instead.
 test('a Nominatim reverse response on the Photon provider raises a provider error', async () => {
   const server = await serveNominatim()
   try {
     await assert.rejects(
       () => photonGeocoder(server.url, { lat: 39.7392, lon: -104.9903 }, true),
-      /Nominatim's format/,
+      /not a Photon instance|Photon provider|answers \/reverse with XML/,
     )
   } finally {
     await server.close()
@@ -620,7 +647,27 @@ test('a Nominatim host on the Photon provider raises an error on the forward pat
 // The classifier only ever sees a JSON body because the request asks for one.
 // Without format=json this endpoint answers XML, fetchJson cannot parse it, and
 // the mismatch goes unreported.
-test('the reverse request asks Nominatim for JSON so the mismatch is visible', async () => {
+// The request must carry nothing outside Photon's allow list. A live instance
+// answers 400 to any unknown parameter, so an extra one added to help diagnose
+// a misconfiguration would break every correctly configured deployment.
+test('the outgoing requests send only parameters Photon accepts', async () => {
+  const PHOTON_PARAMS = new Set([
+    'include',
+    'debug',
+    'dedupe',
+    'query_string_filter',
+    'lon',
+    'layer',
+    'limit',
+    'osm_tag',
+    'distance_sort',
+    'geometry',
+    'exclude',
+    'lang',
+    'radius',
+    'lat',
+    'q',
+  ])
   const seen = []
   const server = http.createServer((req, res) => {
     seen.push(req.url)
@@ -630,13 +677,19 @@ test('the reverse request asks Nominatim for JSON so the mismatch is visible', a
   await new Promise((resolve) => {
     server.listen(0, '127.0.0.1', resolve)
   })
+  const url = `http://127.0.0.1:${server.address().port}`
   try {
-    await photonGeocoder(
-      `http://127.0.0.1:${server.address().port}`,
-      { lat: 39.7392, lon: -104.9903 },
-      true,
-    )
-    assert.match(seen[0], /format=json/)
+    await photonGeocoder(url, 'Denver', false)
+    await photonGeocoder(url, { lat: 39.7392, lon: -104.9903 }, true)
+    seen.forEach((requested) => {
+      const params = new URL(requested, 'http://127.0.0.1').searchParams
+      params.forEach((_, key) => {
+        assert.ok(
+          PHOTON_PARAMS.has(key),
+          `${key} is not a parameter Photon accepts (${requested})`,
+        )
+      })
+    })
   } finally {
     await new Promise((resolve) => {
       server.close(resolve)
