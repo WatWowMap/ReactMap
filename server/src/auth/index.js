@@ -9,12 +9,13 @@ const { getDrizzle } = require('../db/drizzle')
 const schema = require('../db/authSchema')
 const { telegramPlugin } = require('./telegram')
 const { resolveTrustProxy } = require('../middleware/trustProxy')
+const { createRecomputeUserPerms } = require('./recomputePermsOnSignIn')
 
 /**
  * Pure option construction, split out so the wiring can be tested without
  * opening a database connection.
  *
- * @param {{ strategies: any[], sessionSecret: string, baseURL: string, trustProxy?: unknown }} input
+ * @param {{ strategies: any[], sessionSecret: string, baseURL: string, trustProxy?: unknown, onSessionCreate?: (userId: string) => Promise<void> }} input
  */
 function buildAuthOptions(input) {
   /** @type {Record<string, { clientId: string, clientSecret: string }>} */
@@ -78,6 +79,22 @@ function buildAuthOptions(input) {
     session: { modelName: 'auth_session' },
     account: { modelName: 'auth_account' },
     verification: { modelName: 'auth_verification' },
+    // Passport's `deserializeUser` used to compute a user's whole permission
+    // set at login and stash it on the session. Better Auth's structural
+    // replacement is this hook: it runs on every sign-in, after the session
+    // row exists, and can write. `session.create.after` (not `before`) is
+    // used deliberately, `user_perms` is downstream of the session, not a
+    // precondition for creating it, so a recompute failure must not block
+    // login.
+    ...(input.onSessionCreate && {
+      databaseHooks: {
+        session: {
+          create: {
+            after: (session) => input.onSessionCreate(session.userId),
+          },
+        },
+      },
+    }),
   }
 }
 
@@ -114,6 +131,7 @@ function getAuth() {
       sessionSecret: config.getSafe('api.sessionSecret'),
       baseURL: config.getSafe('api.baseUrl'),
       trustProxy: resolveTrustProxy(config.getSafe('api.trustProxy')),
+      onSessionCreate: createRecomputeUserPerms(),
     }),
     database: drizzleAdapter(getDrizzle(), {
       provider: 'mysql',
