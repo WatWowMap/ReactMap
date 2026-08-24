@@ -182,9 +182,26 @@ const viteConfig = defineConfig(({ mode }) => {
             // every 2.0 route - confirmed by build output before this rule
             // existed, where deck.gl's ~1.4MB landed in vendor and pushed
             // every route's preload past 2.2MB, not just /map's.
+            // deck.gl's rendering engine ships under separate npm scopes, so
+            // matching only its own name left luma.gl, math.gl and loaders.gl
+            // falling through to the generic vendor bucket that every entry
+            // preloads, the 1.0 hub included. Measured at the time: 414 kB
+            // raw and 118 kB gzipped of WebGL engine in front of visitors who
+            // never open the map.
+            //
+            // Enumerating scopes is fragile, and this is the fourth thing to
+            // leak through this rule after tailwind's preflight, the font
+            // faces and maplibre's stylesheet. The durable fix is to stop
+            // bucketing by path prefix and let rollup place modules by which
+            // entry reaches them, but dropping the vendor catch-all changes
+            // the chunk 1.0 users are served, so that wants its own change
+            // with its own verification rather than riding along here.
             if (
               id.includes('node_modules/@deck.gl') ||
-              id.includes('node_modules/deck.gl')
+              id.includes('node_modules/deck.gl') ||
+              id.includes('node_modules/@luma.gl') ||
+              id.includes('node_modules/@math.gl') ||
+              id.includes('node_modules/@loaders.gl')
             ) {
               return 'deckgl'
             }
