@@ -156,7 +156,13 @@ Expected: FAIL, cannot find `./atlas`.
 
 - [ ] **Step 3: Implement the key and the cache**
 
-The key is the combination the spec names: pokemon id, form, costume, gender, badges, background, weather. The cache is LRU with an explicit bound. `OffscreenCanvas` is not available in the test environment, so structure the module so the key function and the cache are testable without it and the drawing is injected. That separation is the point: keying is what has silent failure modes, and drawing is what needs a browser.
+The key is the combination that determines appearance: **`pokemonId` (the species number), NOT `id`**, plus form, costume, gender, badge, background and weather.
+
+That distinction is the whole task. `PokemonEntity` carries both an `id`, which is unique per spawn,
+and a `pokemonId`, which is the species. Keying on `id` produces a cache entry per marker, so the
+cache never hits once, the atlas repacks constantly, and the rendering goes exactly as choppy as the
+Leaflet version this rewrite exists to replace. Every test would still pass. Read the field names in
+`app/map/types.ts` rather than trusting this sentence. The cache is LRU with an explicit bound. `OffscreenCanvas` is not available in the test environment, so structure the module so the key function and the cache are testable without it and the drawing is injected. That separation is the point: keying is what has silent failure modes, and drawing is what needs a browser.
 
 - [ ] **Step 4: Run the tests to verify they pass**
 
