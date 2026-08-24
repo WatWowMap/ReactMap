@@ -685,8 +685,33 @@ function getAuth() {
       sessionSecret: config.getSafe('api.sessionSecret'),
       baseURL: config.getSafe('api.baseUrl'),
     }),
-    database: drizzleAdapter(getDrizzle(), { provider: 'mysql', schema }),
-    plugins: [username()],
+    database: drizzleAdapter(getDrizzle(), {
+      provider: 'mysql',
+      // The adapter resolves a model by looking up `schema[modelName]`, so the
+      // keys have to be the table names, not the camelCase export names. Handing
+      // it `authSchema` directly fails at runtime with "The model auth_user was
+      // not found in the schema object", and no pure unit test catches it.
+      schema: {
+        auth_user: schema.authUser,
+        auth_session: schema.authSession,
+        auth_account: schema.authAccount,
+        auth_verification: schema.authVerification,
+      },
+    }),
+    plugins: [
+      username({
+        // Better Auth defaults to /^[a-zA-Z0-9_.]+$/, min 3, max 30. ReactMap
+        // 1.x never validated usernames at all and stores them in a
+        // varchar(255), so anyone whose name carries a hyphen, a space or fewer
+        // than three characters would be unable to sign in after migrating.
+        // These limits exist to preserve every existing login. Tightening the
+        // rules for new signups is a product decision, not something to smuggle
+        // into a migration.
+        minUsernameLength: 1,
+        maxUsernameLength: 255,
+        usernameValidator: (name) => name.length > 0 && name.length <= 255,
+      }),
+    ],
   })
   return cached
 }
@@ -720,7 +745,68 @@ Expected: `http://localhost:8080`. A throw here means the key was added to the w
 Run: `bun test server/test/authInstance.test.js`
 Expected: PASS, 5 tests.
 
-- [ ] **Step 6: Commit**
+- [ ] **Step 6: Prove the instance actually works against the database**
+
+Everything above tests `buildAuthOptions`, which is pure. That is deliberate, but it means none of
+it would notice if Better Auth could not reach the tables at all. Exercise the real thing once:
+
+```bash
+bun -e '
+require("dotenv").config()
+const { getAuth } = require("./server/src/auth")
+const auth = getAuth()
+const u = "planprobe"
+try {
+  const up = await auth.api.signUpEmail({
+    body: { email: u + "@x.invalid", password: "probe-password-123", name: "probe", username: u },
+  })
+  console.log("signUp OK", up.user.id.slice(0, 8))
+  const si = await auth.api.signInUsername({
+    body: { username: u, password: "probe-password-123" },
+  })
+  console.log("signIn OK", Boolean(si))
+} catch (e) {
+  console.log("FAILED", e.body ? JSON.stringify(e.body) : e.message.split("\n")[0])
+}
+process.exit(0)'
+```
+
+Expected: `signUp OK <id>` then `signIn OK true`.
+
+A `The model "auth_user" was not found in the schema object` here means the adapter schema keys do
+not match the model names. An `INVALID_USERNAME` means the username plugin options did not apply.
+
+Then also confirm a legacy-shaped username survives, because that is what Task 6 depends on:
+
+```bash
+bun -e '
+require("dotenv").config()
+const { getAuth } = require("./server/src/auth")
+const auth = getAuth()
+for (const u of ["ash-ketchum", "jo", "a.b_c"]) {
+  try {
+    await auth.api.signUpEmail({
+      body: { email: u + "@x.invalid", password: "probe-password-123", name: "p", username: u },
+    })
+    console.log("accepted", u)
+  } catch (e) { console.log("REJECTED", u, e.body ? JSON.stringify(e.body) : e.message) }
+}
+process.exit(0)'
+```
+
+Expected: all three accepted. A rejection means someone with that username cannot log in after the
+migration.
+
+Clean up afterwards, since these rows are probes and not fixtures:
+
+```bash
+mysql -u root -D reactmap_dev -e \
+  "DELETE FROM auth_user WHERE email LIKE '%@x.invalid';"
+```
+
+Put the real output of all three commands in the task report.
+
+- [ ] **Step 7: Commit**
 
 ```bash
 git add server/src/auth/index.js server/test/authInstance.test.js config/default.json package.json bun.lock
