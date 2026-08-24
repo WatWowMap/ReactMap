@@ -1,5 +1,7 @@
 // @ts-check
 
+const { Response } = require('node-fetch')
+
 const { fetchJson } = require('../utils/fetchJson')
 
 /**
@@ -275,6 +277,12 @@ async function photonGeocoder(photonUrl, search, isReverse) {
           lat: search.lat,
           lon: search.lon,
           limit: 1,
+          // Photon ignores this parameter. Nominatim's /reverse defaults to
+          // XML, which fetchJson cannot parse, so a misconfigured webhook
+          // would produce an unreadable body rather than one this function can
+          // recognise and report. Asking for JSON costs nothing and keeps the
+          // mismatch diagnosable.
+          format: 'json',
         })
       : buildUrl(photonUrl, '/api', {
           q: String(search),
@@ -287,6 +295,15 @@ async function photonGeocoder(photonUrl, search, isReverse) {
   // single object. Checking only the array would let gym reverse geocoding
   // fall through to an empty result set with no reason given, which is the
   // path resolvers.js takes for every fort lookup.
+  // fetchJson hands back the Response itself when the request failed, so this
+  // covers every non-2xx. Photon serves /api, and a Nominatim host has no such
+  // endpoint at all: it answers 404 whatever format is asked for, which is the
+  // forward half of the same misconfiguration.
+  if (response instanceof Response) {
+    throw new Error(
+      `${photonUrl} answered ${response.status} for Photon's ${response.status === 404 ? '/api endpoint, so it is not a Photon instance' : 'request'}. Check the URL, or remove "geocoderProvider": "photon" from this webhook.`,
+    )
+  }
   if (isNominatimResponse(response)) {
     throw new Error(
       `${photonUrl} answered in Nominatim's format rather than Photon's. Remove "geocoderProvider": "photon" from this webhook, or point the URL at a Photon instance.`,

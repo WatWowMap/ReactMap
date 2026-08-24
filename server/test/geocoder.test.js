@@ -549,8 +549,49 @@ const NOMINATIM_REVERSE_BODY = {
 // geocoder() catches everything and returns {}, so a mismatch and a plain miss
 // look identical from there -- the whole point of this change is which error
 // reaches the log, and only the inner function exposes that.
+// Behaves the way a real Nominatim host does, rather than answering the same
+// JSON on every path. That distinction matters: a stub that always returns
+// Nominatim JSON made these checks look like they worked when they did not.
+//
+//   /api      Photon's endpoint. Nominatim has none, so it answers 404.
+//   /reverse  defaults to XML unless format=json is asked for.
+//   /search   the array shape.
+const serveNominatim = async () => {
+  const server = http.createServer((req, res) => {
+    const url = new URL(req.url, 'http://127.0.0.1')
+    const json = (code, body) => {
+      res.writeHead(code, { 'Content-Type': 'application/json' })
+      res.end(JSON.stringify(body))
+    }
+    if (url.pathname === '/reverse') {
+      if (url.searchParams.get('format') !== 'json') {
+        res.writeHead(200, { 'Content-Type': 'text/xml' })
+        res.end('<?xml version="1.0" encoding="UTF-8" ?><reversegeocode/>')
+        return
+      }
+      json(200, NOMINATIM_REVERSE_BODY)
+      return
+    }
+    if (url.pathname === '/search') {
+      json(200, NOMINATIM_BODY)
+      return
+    }
+    json(404, { title: '404 Not Found' })
+  })
+  await new Promise((resolve) => {
+    server.listen(0, '127.0.0.1', resolve)
+  })
+  return {
+    url: `http://127.0.0.1:${server.address().port}`,
+    close: () =>
+      new Promise((resolve) => {
+        server.close(resolve)
+      }),
+  }
+}
+
 test('a Nominatim reverse response on the Photon provider raises a provider error', async () => {
-  const server = await serveOnce(NOMINATIM_REVERSE_BODY)
+  const server = await serveNominatim()
   try {
     await assert.rejects(
       () => photonGeocoder(server.url, { lat: 39.7392, lon: -104.9903 }, true),
@@ -561,7 +602,50 @@ test('a Nominatim reverse response on the Photon provider raises a provider erro
   }
 })
 
-test('a Nominatim search response on the Photon provider raises a provider error', async () => {
+// The forward half of the same misconfiguration. Nominatim has no /api, so it
+// answers 404 rather than a readable body, and the previous check could never
+// have seen a Nominatim search array here.
+test('a Nominatim host on the Photon provider raises an error on the forward path', async () => {
+  const server = await serveNominatim()
+  try {
+    await assert.rejects(
+      () => photonGeocoder(server.url, 'Denver', false),
+      /not a Photon instance/,
+    )
+  } finally {
+    await server.close()
+  }
+})
+
+// The classifier only ever sees a JSON body because the request asks for one.
+// Without format=json this endpoint answers XML, fetchJson cannot parse it, and
+// the mismatch goes unreported.
+test('the reverse request asks Nominatim for JSON so the mismatch is visible', async () => {
+  const seen = []
+  const server = http.createServer((req, res) => {
+    seen.push(req.url)
+    res.writeHead(200, { 'Content-Type': 'application/json' })
+    res.end(JSON.stringify({ type: 'FeatureCollection', features: [] }))
+  })
+  await new Promise((resolve) => {
+    server.listen(0, '127.0.0.1', resolve)
+  })
+  try {
+    await photonGeocoder(
+      `http://127.0.0.1:${server.address().port}`,
+      { lat: 39.7392, lon: -104.9903 },
+      true,
+    )
+    assert.match(seen[0], /format=json/)
+  } finally {
+    await new Promise((resolve) => {
+      server.close(resolve)
+    })
+  }
+})
+
+// A JSON array is still Nominatim's /search shape, whatever served it.
+test('a Nominatim search array on the Photon provider raises a provider error', async () => {
   const server = await serveOnce(NOMINATIM_BODY)
   try {
     await assert.rejects(
