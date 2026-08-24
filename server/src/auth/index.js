@@ -20,7 +20,7 @@ const { hashPassword, verifyPassword } = require('../services/localPassword')
  * Pure option construction, split out so the wiring can be tested without
  * opening a database connection.
  *
- * @param {{ strategies: any[], sessionSecret: string, baseURL: string, trustProxy?: unknown, onSessionCreate?: (userId: string) => Promise<void>, checkSignInGate?: (userId: string) => Promise<{ allow: true } | { allow: false, reason: string }> }} input
+ * @param {{ strategies: any[], sessionSecret: string, baseURL: string, trustProxy?: unknown, cookieAgeDays?: number, onSessionCreate?: (userId: string) => Promise<void>, checkSignInGate?: (userId: string) => Promise<{ allow: true } | { allow: false, reason: string }> }} input
  */
 function buildAuthOptions(input) {
   /** @type {Record<string, { clientId: string, clientSecret: string, scope?: string[], redirectURI?: string }>} */
@@ -111,7 +111,16 @@ function buildAuthOptions(input) {
     // Point at the prefixed tables. The unprefixed `session` name belongs to
     // express-mysql-session and `users` to the pre-2.0 user table.
     user: { modelName: 'auth_user' },
-    session: { modelName: 'auth_session' },
+    session: {
+      modelName: 'auth_session',
+      // `api.cookieAgeDays` used to be dead config: Better Auth's own 7-day
+      // default governed because nothing here read it. `expiresIn` is in
+      // seconds, not days -- see @better-auth/core's `SessionOptions` --
+      // so the config value is converted here rather than passed through.
+      ...(input.cookieAgeDays && {
+        expiresIn: input.cookieAgeDays * 24 * 60 * 60,
+      }),
+    },
     account: { modelName: 'auth_account' },
     verification: { modelName: 'auth_verification' },
     // Passport's `deserializeUser` used to do two things on every sign-in:
@@ -182,6 +191,7 @@ function getAuth() {
       sessionSecret: config.getSafe('api.sessionSecret'),
       baseURL: config.getSafe('api.baseUrl'),
       trustProxy: resolveTrustProxy(config.getSafe('api.trustProxy')),
+      cookieAgeDays: config.getSafe('api.cookieAgeDays'),
       onSessionCreate: createRecomputeUserPerms(),
       checkSignInGate: createSignInGateCheck(),
     }),

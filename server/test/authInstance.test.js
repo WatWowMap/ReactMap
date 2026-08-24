@@ -189,3 +189,13 @@ test('no databaseHooks are set at all when neither hook input is provided', () =
   const options = buildAuthOptions(baseConfig)
   expect(options.databaseHooks).toBeUndefined()
 })
+
+test('cookieAgeDays is converted to seconds for session.expiresIn', () => {
+  const options = buildAuthOptions({ ...baseConfig, cookieAgeDays: 7 })
+  expect(options.session.expiresIn).toBe(7 * 24 * 60 * 60)
+})
+
+test('session.expiresIn is left unset when cookieAgeDays is not provided', () => {
+  const options = buildAuthOptions(baseConfig)
+  expect('expiresIn' in options.session).toBe(false)
+})
