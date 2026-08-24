@@ -8,7 +8,16 @@
  * (task report) for exact sourcing per group.
  */
 
-@theme {
+/*
+ * `static` because Tailwind v4 otherwise prunes theme variables nothing
+ * references, and every colour here was being dropped from the build
+ * entirely. Usage does bring them back, but only when the scanner can see the
+ * literal name in source. The map layer picks a colour from data, so it will
+ * write something like var(--color-team-${id}), which the scanner cannot
+ * resolve. Pruned tokens then resolve to nothing and markers render colourless
+ * with no error anywhere.
+ */
+@theme static {
   /* Team colours. Source: src/features/gym/GymTile.jsx, getColor(team). */
   --color-team-0: #a9a9a9; /* uncontested */
   --color-team-1: #0030c8; /* mystic */
