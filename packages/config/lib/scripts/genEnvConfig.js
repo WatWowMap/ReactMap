@@ -31,7 +31,7 @@ const generateEnvConfig = async () => {
     resolve(
       `${__dirname}/../../../../config/custom-environment-variables.json`,
     ),
-    JSON.stringify(recursiveObjCheck(sourceConfig), null, 2),
+    `${JSON.stringify(recursiveObjCheck(sourceConfig), null, 2)}\n`,
   )
 }
 

@@ -41,7 +41,7 @@ async function missingAll() {
             ? fileName.replace('.json', '.js')
             : fileName,
         ),
-        JSON.stringify(missingKeys, null, 2),
+        `${JSON.stringify(missingKeys, null, 2)}\n`,
       )
       log.info(TAGS.locales, fileName, 'file saved.')
     }),

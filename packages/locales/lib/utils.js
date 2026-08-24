@@ -67,10 +67,11 @@ function readLocaleDirectory(human = false) {
 async function writeJson(translations, ...directories) {
   try {
     const resolved = resolve(...directories)
-    const file =
+    const contents =
       typeof translations === 'string'
         ? translations
         : JSON.stringify(translations, null, 2)
+    const file = contents.endsWith('\n') ? contents : `${contents}\n`
 
     await fs.writeFile(resolved, file, 'utf8')
     log.info(TAGS.locales, 'wrote file', `${resolved.split('/').pop()}`)
