@@ -11,8 +11,14 @@
 
   --color-surface: #ffffff;
   --color-foreground: #1c1a26;
-  --color-muted: #6f6b80;
-  --color-muted-foreground: #524e63;
+  /*
+   * shadcn's contract: --muted is a SURFACE and --muted-foreground is the
+   * text that sits on it. The vendored button and card read it that way
+   * (hover:bg-muted, bg-muted/50), so these have to hold surface and text
+   * respectively or those components paint text-coloured slabs.
+   */
+  --color-muted: #f5f3fb;
+  --color-muted-foreground: #6f6b80;
   --color-border: #e3e0ec;
   --color-ring: #7b5ce0;
 
@@ -51,8 +57,8 @@
   :root {
     --color-surface: #17151f;
     --color-foreground: #f1eef9;
-    --color-muted: #a29dbb;
-    --color-muted-foreground: #c7c2dc;
+    --color-muted: #221f2d;
+    --color-muted-foreground: #a29dbb;
     --color-border: #322d42;
     --color-ring: #a78bfa;
     --color-secondary: #241f30;
