@@ -258,13 +258,18 @@ is immutable within a game version, so those results cache indefinitely under a 
 masterfile version, which is exactly what TanStack Query is for. Pushing fragments alongside deltas
 would save a round trip and lose the caching, which is the wrong trade on a page that reloads.
 
-**Use the loose types at the tRPC boundary.** `pogo-masterfile-types` generates literal lookups by
-default, where `get` on a known template id returns that entry's concrete type rather than a union.
-That precision is worth having in server-side code. It is a liability in a procedure's inferred
-return type, because a ~60 procedure router carrying thousands of literal keys is the tsserver
-slowdown this spec already warns about. A `--ts-loose` build exists and drops both the literal
-lookup and the per-entry narrow types (`src/generate.ts:93`), which is the right shape for the
-wire.
+**Use the widened types at the tRPC boundary.** `pogo-masterfile-types` exports two tiers per group
+and the choice between them matters here. `<Group>Lookup` is a literal table mapping every template
+id to its own narrow entry type, so `get` on a known id returns that entry rather than a union.
+`<Group>Type` is `W<<Group>>`, where `W` recursively turns literals into primitives and tuples into
+arrays (`dist/_utils.d.ts`).
+
+The literal tier is worth having in server-side code. It is a liability in a procedure's inferred
+return type: the lookup tables carry 13,775 keys in total, `pokemon-settings` alone accounting for
+2,468, across a 14 MB `dist`. A ~60 procedure router pulling that into its inference is the
+tsserver slowdown this spec already warns about, arriving from a second direction. Procedures
+return the `W`-widened `<Group>Type`; anything wanting the narrow type keeps it behind the server
+boundary.
 
 Zod exports are not needed. The fragments we send are server-produced and therefore trusted, so
 there is nothing for a client-side schema to check. The boundary that does take untrusted input is
