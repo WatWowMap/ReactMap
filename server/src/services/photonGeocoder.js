@@ -247,6 +247,11 @@ function formatPhotonFeature(feature) {
     // same building, Photon's locality and district carry the values Nominatim
     // returns as quarter and suburb.
     neighbourhood: properties.locality || '',
+    // The same value under the spelling the GraphQL schema and formatter use.
+    // Geocoder.neighborhood is American and formatter() templates on
+    // neighborhoods, while node-geocoder emits neighbourhood, so without the
+    // alias the mapped value reaches no consumer at all.
+    neighborhood: properties.locality || '',
     suburb: properties.district || '',
     town: town || '',
     village: village || '',

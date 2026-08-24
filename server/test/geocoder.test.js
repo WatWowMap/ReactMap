@@ -6,7 +6,11 @@ const NodeGeocoder = require('node-geocoder')
 const http = require('node:http')
 
 const { PoracleAPI } = require('../src/services/Poracle')
-const { geocoder } = require('../src/services/geocoder')
+const {
+  formatter,
+  geocoder,
+  nominatimGeocoder,
+} = require('../src/services/geocoder')
 const {
   formatPhotonFeature,
   joinComponents,
@@ -59,6 +63,7 @@ test('maps a Photon city onto the geocoder entry shape', () => {
     streetNumber: undefined,
     countryCode: 'US',
     neighbourhood: '',
+    neighborhood: '',
     suburb: '',
     town: '',
     village: '',
@@ -374,12 +379,18 @@ test('the Photon path emits the same keys as the Nominatim path', () => {
     osmServer: 'http://127.0.0.1:0',
     timeout: 5000,
   })
-  stockGeocoder._geocoder._formatResult = ((original) => (result) => ({
-    ...original(result),
-    suburb: result.address.suburb || '',
-    town: result.address.town || '',
-    village: result.address.village || '',
-  }))(stockGeocoder._geocoder._formatResult.bind(stockGeocoder._geocoder))
+  // Mirrors the patch in geocoder.js, alias included. The duplication is the
+  // point: if the two drift apart, this test stops proving parity.
+  stockGeocoder._geocoder._formatResult = ((original) => (result) => {
+    const formatted = original(result)
+    return {
+      ...formatted,
+      suburb: result.address?.suburb || '',
+      town: result.address?.town || '',
+      village: result.address?.village || '',
+      neighborhood: formatted.neighbourhood || '',
+    }
+  })(stockGeocoder._geocoder._formatResult.bind(stockGeocoder._geocoder))
 
   // The same place as STREET_ADDRESS, in Nominatim's response shape.
   const fromNominatim = stockGeocoder._geocoder._formatResult({
@@ -805,6 +816,145 @@ test('a transient upstream failure keeps the shape the schema expects', async ()
   } finally {
     await new Promise((resolve) => {
       failing.close(resolve)
+    })
+  }
+})
+
+// Behaves like a real Photon instance rather than accepting anything: it serves
+// /api and /reverse only, and rejects any parameter outside its allow list.
+// node-geocoder forces format and addressdetails onto every request and calls
+// /search, so a Photon URL left on the Nominatim provider never reaches a
+// FeatureCollection at all. Captured from a live instance.
+const servePhoton = async () => {
+  const ALLOWED = new Set([
+    'include',
+    'debug',
+    'dedupe',
+    'query_string_filter',
+    'lon',
+    'layer',
+    'limit',
+    'osm_tag',
+    'distance_sort',
+    'geometry',
+    'exclude',
+    'lang',
+    'radius',
+    'lat',
+    'q',
+  ])
+  const server = http.createServer((req, res) => {
+    const url = new URL(req.url, 'http://127.0.0.1')
+    const json = (code, body) => {
+      res.writeHead(code, { 'Content-Type': 'application/json' })
+      res.end(JSON.stringify(body))
+    }
+    if (url.pathname !== '/api' && url.pathname !== '/reverse') {
+      json(404, {
+        title: `Endpoint ${req.method} ${url.pathname} not found`,
+        status: 404,
+        type: 'https://javalin.io/documentation#endpointnotfound',
+        details: {},
+      })
+      return
+    }
+    const bad = [...url.searchParams.keys()].find((k) => !ALLOWED.has(k))
+    if (bad) {
+      json(400, {
+        message: `Unknown query parameter '${bad}'.  Allowed parameters are: [${[...ALLOWED].join(', ')}]`,
+      })
+      return
+    }
+    json(200, { type: 'FeatureCollection', features: [] })
+  })
+  await new Promise((resolve) => {
+    server.listen(0, '127.0.0.1', resolve)
+  })
+  return {
+    url: `http://127.0.0.1:${server.address().port}`,
+    close: () =>
+      new Promise((resolve) => {
+        server.close(resolve)
+      }),
+  }
+}
+
+// The exact production misconfiguration: a Photon URL inherited from Poracle
+// with no geocoderProvider set. It used to format into a single blank result.
+test('a Photon URL on the Nominatim provider is reported on the forward path', async () => {
+  const server = await servePhoton()
+  try {
+    await assert.rejects(
+      () => nominatimGeocoder(server.url, 'Denver', false),
+      /answered as a Photon instance/,
+    )
+  } finally {
+    await server.close()
+  }
+})
+
+test('a Photon URL on the Nominatim provider is reported on the reverse path', async () => {
+  const server = await servePhoton()
+  try {
+    await assert.rejects(
+      () =>
+        nominatimGeocoder(server.url, { lat: 39.7392, lon: -104.9903 }, true),
+      /answered as a Photon instance/,
+    )
+  } finally {
+    await server.close()
+  }
+})
+
+// The value has to reach the two consumers that actually exist: the GraphQL
+// field is `neighborhood` and formatter() templates on `neighborhoods`, while
+// node-geocoder produces `neighbourhood`.
+test('locality reaches the public neighborhood contract', () => {
+  const got = formatPhotonFeature(
+    feature(WICKER_PARK_REVERSE, [-87.6796, 41.9088]),
+  )
+  assert.equal(got.neighbourhood, 'Wicker Park')
+  assert.equal(got.neighborhood, 'Wicker Park')
+  assert.equal(formatter('{{neighborhood}}', got), 'Wicker Park')
+  assert.equal(formatter('{{neighbourhood}}', got), 'Wicker Park')
+})
+
+// The alias has to exist on the Nominatim path too. node-geocoder emits
+// neighbourhood there, and the GraphQL field and formatter token both use the
+// American spellings, so a Nominatim deployment had the same invisible value.
+test('the Nominatim path also carries the neighborhood alias', async () => {
+  const server = http.createServer((_, res) => {
+    res.writeHead(200, { 'Content-Type': 'application/json' })
+    res.end(
+      JSON.stringify([
+        {
+          lat: '41.9088',
+          lon: '-87.6796',
+          display_name: 'Wicker Park, Chicago',
+          address: {
+            neighbourhood: 'Wicker Park',
+            city: 'Chicago',
+            country_code: 'us',
+          },
+        },
+      ]),
+    )
+  })
+  await new Promise((resolve) => {
+    server.listen(0, '127.0.0.1', resolve)
+  })
+  try {
+    const [entry] = await nominatimGeocoder(
+      `http://127.0.0.1:${server.address().port}`,
+      'Wicker Park',
+      false,
+    )
+    assert.equal(entry.neighbourhood, 'Wicker Park')
+    assert.equal(entry.neighborhood, 'Wicker Park')
+    assert.equal(formatter('{{neighborhood}}', entry), 'Wicker Park')
+  } finally {
+    await new Promise((resolve) => {
+      server.close(resolve)
     })
   }
 })

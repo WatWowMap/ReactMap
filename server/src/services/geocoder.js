@@ -12,7 +12,7 @@ const { photonGeocoder } = require('./photonGeocoder')
 function formatter(addressFormat, result) {
   return addressFormat
     .replace(
-      /{{(streetNumber|streetName|city|state|country|zipcode|latitude|longitude|countryCode|neighborhoods|suburb|town|village)}}/g,
+      /{{(streetNumber|streetName|city|state|country|zipcode|latitude|longitude|countryCode|neighborhoods|neighborhood|neighbourhood|suburb|town|village)}}/g,
       (a, b) => result[b] || '',
     )
     .trim()
@@ -38,9 +38,33 @@ function formatter(addressFormat, result) {
  */
 function assertNominatimResponse(results, url) {
   const raw = results?.raw
-  if (raw && !Array.isArray(raw) && raw.type === 'FeatureCollection') {
+  if (!raw || Array.isArray(raw) || typeof raw !== 'object') return
+
+  // Photon rarely gets far enough to answer with GeoJSON here, because
+  // node-geocoder asks for routes and parameters it does not serve. Verified
+  // against a live instance:
+  //
+  //   GET /search?q=..&format=json&addressdetails=1
+  //     404 {"title":"Endpoint GET /search not found","status":404,...}
+  //     Photon serves /api, not /search.
+  //
+  //   GET /reverse?lat=..&lon=..&format=json&addressdetails=1
+  //     400 {"message":"Unknown query parameter 'format'. Allowed parameters
+  //          are: [include, debug, dedupe, ...]"}
+  //     Photon rejects anything outside its allow list, and format and
+  //     addressdetails are forced onto every request by node-geocoder.
+  //
+  // node-geocoder ignores the status and parses the body regardless, so both
+  // arrive here as an object with no address and format into a blank result.
+  const isPhoton =
+    raw.type === 'FeatureCollection' ||
+    (typeof raw.title === 'string' && typeof raw.status === 'number') ||
+    (typeof raw.message === 'string' &&
+      raw.message.includes('Unknown query parameter'))
+
+  if (isPhoton) {
     throw new Error(
-      `${url} answered with GeoJSON, which is Photon's format rather than Nominatim's. Set "geocoderProvider": "photon" on this webhook, or point the URL at a Nominatim instance.`,
+      `${url} answered as a Photon instance rather than a Nominatim one. Set "geocoderProvider": "photon" on this webhook, or point the URL at a Nominatim instance.`,
     )
   }
 }
@@ -57,12 +81,20 @@ async function nominatimGeocoder(url, search, isReverse) {
     osmServer: url,
     timeout: 5000,
   })
-  stockGeocoder._geocoder._formatResult = ((original) => (result) => ({
-    ...original(result),
-    suburb: result.address?.suburb || '',
-    town: result.address?.town || '',
-    village: result.address?.village || '',
-  }))(stockGeocoder._geocoder._formatResult)
+  stockGeocoder._geocoder._formatResult = ((original) => (result) => {
+    const formatted = original(result)
+    return {
+      ...formatted,
+      suburb: result.address?.suburb || '',
+      town: result.address?.town || '',
+      village: result.address?.village || '',
+      // node-geocoder emits the British spelling. The GraphQL schema exposes
+      // `neighborhood` and formatter() templates on `neighborhoods`, so the
+      // value reached neither consumer. Carrying the alias is what makes it
+      // visible without changing what node-geocoder itself produces.
+      neighborhood: formatted.neighbourhood || '',
+    }
+  })(stockGeocoder._geocoder._formatResult)
   // Awaited rather than returned so the shape check runs here. A throw inside
   // _formatResult would not reach geocoder()'s catch at all: node-geocoder
   // resolves through bluebird's asCallback, so it surfaces as an uncaught
@@ -117,4 +149,4 @@ async function geocoder(nominatimUrl, search, reverse, format, provider) {
   }
 }
 
-module.exports = { geocoder, formatter }
+module.exports = { geocoder, formatter, nominatimGeocoder }
