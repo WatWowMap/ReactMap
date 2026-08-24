@@ -78,9 +78,9 @@ const viteConfig = defineConfig(({ mode }) => {
               overlay: {
                 initialIsOpen: false,
               },
-              // typescript: {
-              //   tsconfigPath: './jsconfig.json',
-              // },
+              typescript: {
+                tsconfigPath: './tsconfig.app.json',
+              },
             }),
           ]
         : []),
