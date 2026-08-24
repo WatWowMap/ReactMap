@@ -8,6 +8,7 @@ const {
   boolean,
   index,
   uniqueIndex,
+  json,
 } = require('drizzle-orm/mysql-core')
 
 const authUser = mysqlTable('auth_user', {
@@ -76,4 +77,28 @@ const authVerification = mysqlTable(
   (table) => [index('auth_verification_identifier_idx').on(table.identifier)],
 )
 
-module.exports = { authUser, authSession, authAccount, authVerification }
+const userPerms = mysqlTable(
+  'user_perms',
+  {
+    id: varchar('id', { length: 36 }).primaryKey(),
+    userId: varchar('user_id', { length: 36 }).notNull(),
+    providerId: varchar('provider_id', { length: 191 }).notNull(),
+    perms: json('perms').notNull(),
+    updatedAt: timestamp('updated_at', { fsp: 3 }).defaultNow().notNull(),
+  },
+  (table) => [
+    uniqueIndex('user_perms_user_provider_uidx').on(
+      table.userId,
+      table.providerId,
+    ),
+    index('user_perms_user_id_idx').on(table.userId),
+  ],
+)
+
+module.exports = {
+  authUser,
+  authSession,
+  authAccount,
+  authVerification,
+  userPerms,
+}
