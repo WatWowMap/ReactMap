@@ -84,5 +84,13 @@
      * #8c70e5 is the same violet lifted just far enough to reach 4.78:1.
      */
     --color-primary: #8c70e5;
+
+    /*
+     * The lighter dark primary is a better text colour on the dark surface
+     * and a worse background under white: white on #8c70e5 is 3.77:1. So
+     * the on-colour flips to the dark surface tone, 4.78:1, which is the
+     * same thing shadcn's own dark theme does with a lightened primary.
+     */
+    --color-primary-foreground: #17151f;
   }
 }
