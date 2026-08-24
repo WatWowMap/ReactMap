@@ -1,0 +1,45 @@
+/*
+ * These colours are a language on the map surface, not a brand choice.
+ * Team, league and IV-tier colours mean specific things to players and
+ * must never be derived from the accent tokens or otherwise harmonised
+ * with the rest of the UI, because that would make the map lie about
+ * what it is showing. Values below are carried across unchanged from
+ * the 1.0 client rather than invented; see app/tokens/data-palette.md
+ * (task report) for exact sourcing per group.
+ */
+
+@theme {
+  /* Team colours. Source: src/features/gym/GymTile.jsx, getColor(team). */
+  --color-team-0: #a9a9a9; /* uncontested */
+  --color-team-1: #0030c8; /* mystic */
+  --color-team-2: #d83c22; /* valor */
+  --color-team-3: #f1f642; /* instinct */
+
+  /*
+   * League colours. 1.0 has no literal league colour anywhere in the
+   * codebase: src/features/pokemon/PokemonPopup.jsx's leagueLookup maps
+   * league name to a CP-cap string used only to pick a badge icon
+   * (Icons.getMisc), and config/default.json's pvp.leagues carries name
+   * and cp, never a colour. There is nothing real to carry across for
+   * this group. The values below are placeholders, not sourced data,
+   * and are flagged as such in the task report; treat them as needing
+   * design sign-off before they reach a real filter chip or legend.
+   */
+  --color-league-little: #8bc34a;
+  --color-league-great: #2ab5f6;
+  --color-league-ultra: #7b5ce0;
+  --color-league-master: #c62828;
+
+  /*
+   * IV tier colours. Source: src/features/pokemon/PokemonPopup.jsx,
+   * getColor(ivPercent), which returns MUI theme palette keys. The
+   * theme (src/assets/theme.js) only overrides info.main; error,
+   * warning and success are unmodified MUI v5 light-mode defaults.
+   * Values here are those resolved defaults, keyed by the same tiers.
+   */
+  --color-iv-low: #c62828; /* < 51%, error.dark */
+  --color-iv-mid-low: #ef5350; /* < 66%, error.light */
+  --color-iv-mid: #ed6c02; /* < 82%, warning.main */
+  --color-iv-mid-high: #2ab5f6; /* < 100%, info.main (1.0 override) */
+  --color-iv-perfect: #2e7d32; /* = 100%, success.main */
+}

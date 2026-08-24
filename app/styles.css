@@ -1,4 +1,5 @@
 @import 'tailwindcss';
+@import './tokens/data-palette.css';
 
 @theme {
   --font-display: 'Fredoka', ui-sans-serif, system-ui, sans-serif;
@@ -7,6 +8,34 @@
   --color-accent-from: #7b5ce0;
   --color-accent-to: #e067a8;
 
+  --color-surface: #ffffff;
+  --color-foreground: #1c1a26;
+  --color-muted: #6f6b80;
+  --color-border: #e3e0ec;
+  --color-ring: #7b5ce0;
+
   --radius-card: 1.125rem;
   --radius-sheet: 1.25rem;
+}
+
+/*
+ * One mechanism for dark mode: prefers-color-scheme, not a data-theme
+ * attribute. Nothing in app/ writes a theme attribute to the document
+ * yet (no toggle, no persisted preference), so a data-theme override
+ * would be dead CSS today. prefers-color-scheme works immediately from
+ * the OS setting with no wiring, and can be layered under a future
+ * data-theme override later without conflict.
+ *
+ * @theme above already emits these as real custom properties on :root
+ * (that is how Tailwind v4 tokens work), so the override below targets
+ * the same variables directly rather than declaring a second :root set.
+ */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-surface: #17151f;
+    --color-foreground: #f1eef9;
+    --color-muted: #a29dbb;
+    --color-border: #322d42;
+    --color-ring: #a78bfa;
+  }
 }
