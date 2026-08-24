@@ -7,8 +7,10 @@ const {
   applyToUsersWithPermsFlag,
   revokeProviderAccess,
   createRevocationDeps,
-} = require('../auth/revokeAccessAdapter')
-const { createRecomputeUserPerms } = require('../auth/recomputePermsOnSignIn')
+} = require('../auth/revoke-access-adapter')
+const {
+  createRecomputeUserPerms,
+} = require('../auth/recompute-perms-on-sign-in')
 
 class Trial extends Logger {
   /** @param {import("@rm/types").StrategyConfig} strategy  */

@@ -23,15 +23,15 @@ const { checkForUpdates } = require('./services/checkForUpdates')
 const { loadLatestAreas, loadCachedAreas } = require('./services/areas')
 const { startWatcher } = require('./services/watcher')
 
-const { rateLimitingMiddleware } = require('./middleware/rateLimiting')
+const { rateLimitingMiddleware } = require('./middleware/rate-limiting')
 const { initSentry, sentryMiddleware } = require('./middleware/sentry')
 const { loggerMiddleware } = require('./middleware/logger')
-const { noSourceMapMiddleware } = require('./middleware/noSourceMap')
-const { createAuthSessionMiddleware } = require('./middleware/authSession')
+const { noSourceMapMiddleware } = require('./middleware/no-source-map')
+const { createAuthSessionMiddleware } = require('./middleware/auth-session')
 const {
   resolveTrustProxy,
   resolveIpAddressStrategy,
-} = require('./middleware/trustProxy')
+} = require('./middleware/trust-proxy')
 const { errorMiddleware } = require('./middleware/error')
 const { apolloMiddleware } = require('./middleware/apollo')
 const { helmetMiddleware } = require('./middleware/helmet')
@@ -43,7 +43,7 @@ const { rootRouter } = require('./routes/rootRouter')
 const { getAuth, buildAuthRoutePrefix } = require('./auth')
 const {
   createUsernameAvailabilityGate,
-} = require('./auth/usernameAvailability')
+} = require('./auth/username-availability')
 
 const startServer = async () => {
   await state.event.initialize()

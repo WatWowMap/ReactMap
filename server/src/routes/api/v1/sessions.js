@@ -5,7 +5,7 @@ const { and, eq, gte, inArray } = require('drizzle-orm')
 const { log, TAGS } = require('@rm/logger')
 
 const { getDrizzle } = require('../../../db/drizzle')
-const { authSession, authAccount } = require('../../../db/authSchema')
+const { authSession, authAccount } = require('../../../db/auth-schema')
 
 /**
  * The legacy `sessions` table stored a JSON blob shaped by passport's

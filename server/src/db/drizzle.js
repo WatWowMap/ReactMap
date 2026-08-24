@@ -4,7 +4,7 @@ const mysql = require('mysql2/promise')
 const { drizzle } = require('drizzle-orm/mysql2')
 
 const config = require('@rm/config')
-const { resolveReactMapSchema } = require('./reactMapDb')
+const { resolveReactMapSchema } = require('./react-map-db')
 
 /** @type {import('drizzle-orm/mysql2').MySql2Database | null} */
 let cached = null

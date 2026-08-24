@@ -6,15 +6,15 @@ const { username } = require('better-auth/plugins')
 
 const config = require('@rm/config')
 const { getDrizzle } = require('../db/drizzle')
-const schema = require('../db/authSchema')
+const schema = require('../db/auth-schema')
 const { telegramPlugin } = require('./telegram')
 const {
   resolveTrustProxy,
   resolveIpAddressStrategy,
-} = require('../middleware/trustProxy')
-const { createRecomputeUserPerms } = require('./recomputePermsOnSignIn')
-const { createSignInGateCheck } = require('./signInGate')
-const { createEnforceMaxSessions } = require('./maxSessions')
+} = require('../middleware/trust-proxy')
+const { createRecomputeUserPerms } = require('./recompute-perms-on-sign-in')
+const { createSignInGateCheck } = require('./sign-in-gate')
+const { createEnforceMaxSessions } = require('./max-sessions')
 const { hashPassword, verifyPassword } = require('../services/localPassword')
 
 // Better Auth's own hard minimum. `config/default.json` used to ship a fixed
