@@ -21,7 +21,7 @@ if (CONFIG.sentry.client.enabled) {
       const errors = event.exception.values
       const isLibrary = errors.find((e) => e?.value?.includes('vendor'))
       const fetchError = errors.find((e) => e?.value?.includes('<'))
-      return CONFIG.client.hasCustom || isLibrary || fetchError ? null : event
+      return isLibrary || fetchError ? null : event
     },
   })
 }

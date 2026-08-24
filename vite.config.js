@@ -16,7 +16,6 @@ const { log, TAGS } = require('@rm/logger')
 const { locales, status } = require('@rm/locales')
 const {
   faviconPlugin,
-  customFilePlugin,
   localePlugin,
   muteWarningsPlugin,
 } = require('@rm/vite-plugins')
@@ -38,17 +37,6 @@ const viteConfig = defineConfig(({ mode }) => {
   )
   const resolvedVersion = env.npm_package_version || pkg.version
   const version = isDevelopment ? 'development' : resolvedVersion
-  const hasCustom = (function checkFolders(folder, isCustom = false) {
-    const files = fs.readdirSync(folder)
-    for (let i = 0; i < files.length; i += 1) {
-      if (isCustom) return true
-      if (files[i].startsWith('.')) continue
-      if (!files[i].includes('.'))
-        isCustom = checkFolders(`${folder}/${files[i]}`, isCustom)
-      if (/\.custom.(jsx?|css)$/.test(files[i])) return true
-    }
-    return isCustom
-  })(resolve(__dirname, 'src'))
 
   if (mode === 'production') {
     log.info(TAGS.build, `Building production version: ${version}`)
@@ -87,7 +75,6 @@ const viteConfig = defineConfig(({ mode }) => {
             }),
           ]
         : []),
-      ...(hasCustom ? [customFilePlugin(isDevelopment)] : []),
       ...(sentry.authToken && sentry.org && sentry.project
         ? [
             sentryVitePlugin({
@@ -123,7 +110,6 @@ const viteConfig = defineConfig(({ mode }) => {
           version,
           locales,
           localeStatus: status,
-          hasCustom,
           title: config.getSafe('map.general.headerTitle'),
         },
         sentry: {

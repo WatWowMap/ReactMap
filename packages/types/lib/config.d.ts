@@ -29,7 +29,6 @@ export type Config<Client extends boolean = false> = DeepMerge<
           localeStatus: ReturnType<
             typeof import('@rm/locales/lib/utils')['getStatus']
           >
-          hasCustom: boolean
           title: string
         }
       : never
