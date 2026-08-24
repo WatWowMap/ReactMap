@@ -2,7 +2,10 @@ const assert = require('node:assert/strict')
 const { test, spyOn } = require('bun:test')
 
 const { state } = require('./stateMock')
-const { hashPassword, verifyPassword } = require('../src/services/LocalClient')
+const {
+  hashPassword,
+  verifyPassword,
+} = require('../src/services/localPassword')
 
 test('hashes a password into bcrypt format', async () => {
   const hash = await hashPassword('correct horse battery staple')

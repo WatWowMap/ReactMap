@@ -1,7 +1,4 @@
 // @ts-check
-const { TelegramStrategy } = require('@rainb0w-clwn/passport-telegram-official')
-const passport = require('passport')
-
 const config = require('@rm/config')
 
 const { state } = require('./state')
@@ -13,7 +10,7 @@ const { getUserDisplayName } = require('../utils/getUserDisplayName')
 const { AuthClient } = require('./AuthClient')
 
 /**
- * @typedef {import('@rainb0w-clwn/passport-telegram-official/dist/types').PassportTelegramUser} TGUser
+ * @typedef {Record<string, any>} TGUser
  */
 
 class TelegramClient extends AuthClient {
@@ -119,7 +116,7 @@ class TelegramClient extends AuthClient {
     return newUserObj
   }
 
-  /** @type {import('@rainb0w-clwn/passport-telegram-official/dist/types').CallbackWithRequest} */
+  /** @type {(req: Record<string, any>, profile: TGUser, done: (...args: any[]) => any) => Promise<any>} */
   async authHandler(req, profile, done) {
     const baseUser = {
       ...profile,
@@ -240,18 +237,10 @@ class TelegramClient extends AuthClient {
     }
   }
 
-  initPassport() {
-    passport.use(
-      this.rmStrategy,
-      new TelegramStrategy(
-        {
-          botToken: this.strategy.botToken,
-          passReqToCallback: true,
-        },
-        (req, profile, done) => this.authHandler(req, profile, done),
-      ),
-    )
-  }
+  // `initPassport` (declared on the `AuthClient` base) is intentionally not
+  // overridden here. Passport's login widget verification is gone; Telegram
+  // sign-in now goes through Better Auth's `telegramPlugin`
+  // (`server/src/auth/telegram.js`), which does not use this class at all.
 }
 
 module.exports = { TelegramClient }

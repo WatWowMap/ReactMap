@@ -1,7 +1,5 @@
 // @ts-check
 const { Client } = require('discord.js')
-const { Strategy } = require('passport-discord')
-const passport = require('passport')
 
 const config = require('@rm/config')
 
@@ -124,7 +122,7 @@ class DiscordClient extends AuthClient {
 
   /**
    *
-   * @param {import('passport-discord').Profile} user
+   * @param {Record<string, any>} user
    * @returns {Promise<import("@rm/types").Permissions>}
    */
   async getPerms(user) {
@@ -398,22 +396,10 @@ class DiscordClient extends AuthClient {
     }
   }
 
-  initPassport() {
-    passport.use(
-      this.rmStrategy,
-      new Strategy(
-        {
-          clientID: this.strategy.clientId,
-          clientSecret: this.strategy.clientSecret,
-          callbackURL: this.strategy.redirectUri,
-          scope: ['identify', 'guilds'],
-          passReqToCallback: true,
-          prompt: this.strategy.clientPrompt,
-        },
-        (...args) => this.authHandler(...args),
-      ),
-    )
-  }
+  // `initPassport` (declared on the `AuthClient` base) is intentionally not
+  // overridden here. Passport's OAuth flow is gone; Discord sign-in now goes
+  // through Better Auth's `socialProviders.discord`
+  // (`server/src/auth/index.js`), which does not use this class at all.
 }
 
 module.exports = { DiscordClient }

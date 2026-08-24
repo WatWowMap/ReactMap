@@ -27,10 +27,8 @@ const { rateLimitingMiddleware } = require('./middleware/rateLimiting')
 const { initSentry, sentryMiddleware } = require('./middleware/sentry')
 const { loggerMiddleware } = require('./middleware/logger')
 const { noSourceMapMiddleware } = require('./middleware/noSourceMap')
-const { initPassport } = require('./middleware/passport')
 const { createAuthSessionMiddleware } = require('./middleware/authSession')
 const { errorMiddleware } = require('./middleware/error')
-const { sessionMiddleware } = require('./middleware/session')
 const { apolloMiddleware } = require('./middleware/apollo')
 const { helmetMiddleware } = require('./middleware/helmet')
 
@@ -78,7 +76,6 @@ const startServer = async () => {
     // `index: false` keeps serve-static from answering a bare `/` with the 1.0
     // shell off disk, which would shadow the router that picks a shell per user.
     express.static(distDir, { dotfiles: 'allow', index: false }),
-    sessionMiddleware(),
     compression(),
     express.json({
       limit: '50mb',
@@ -92,7 +89,6 @@ const startServer = async () => {
     app.use(helmetMiddleware())
   }
 
-  initPassport(app)
   app.use(createAuthSessionMiddleware())
 
   const sentryErrorMiddleware = initSentry(app)
