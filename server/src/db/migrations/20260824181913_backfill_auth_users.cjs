@@ -36,6 +36,7 @@ exports.up = async function up(knex) {
     await knex('auth_user')
       .insert({
         id: user.id,
+        legacy_id: user.legacyId,
         name: user.name,
         email: user.email,
         email_verified: user.emailVerified,

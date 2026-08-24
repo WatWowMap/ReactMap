@@ -8,6 +8,7 @@ exports.up = async function up(knex) {
     table.text('image')
     table.string('username', 255).unique()
     table.text('display_username')
+    table.bigInteger('legacy_id').nullable()
     table
       .timestamp('created_at', { precision: 3 })
       .notNullable()
@@ -16,6 +17,7 @@ exports.up = async function up(knex) {
       .timestamp('updated_at', { precision: 3 })
       .notNullable()
       .defaultTo(knex.fn.now(3))
+    table.index('legacy_id', 'auth_user_legacy_id_idx')
   })
 
   await knex.schema.createTable('auth_session', (table) => {

@@ -95,3 +95,7 @@ test('reactmap-owned preferences ride along on the user row', () => {
   const plan = planBackfill({ id: 7, tutorial: true, useAppShell: true })
   expect(plan.user.legacyId).toBe(7)
 })
+
+test('the plan carries the legacy id as the join key back to users', () => {
+  expect(planBackfill({ id: 7 }).user.legacyId).toBe(7)
+})

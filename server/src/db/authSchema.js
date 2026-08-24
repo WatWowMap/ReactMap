@@ -6,22 +6,31 @@ const {
   text,
   timestamp,
   boolean,
+  bigint,
   index,
   uniqueIndex,
   json,
 } = require('drizzle-orm/mysql-core')
 
-const authUser = mysqlTable('auth_user', {
-  id: varchar('id', { length: 36 }).primaryKey(),
-  name: varchar('name', { length: 255 }).notNull(),
-  email: varchar('email', { length: 255 }).notNull().unique(),
-  emailVerified: boolean('email_verified').default(false).notNull(),
-  image: text('image'),
-  username: varchar('username', { length: 255 }).unique(),
-  displayUsername: text('display_username'),
-  createdAt: timestamp('created_at', { fsp: 3 }).defaultNow().notNull(),
-  updatedAt: timestamp('updated_at', { fsp: 3 }).defaultNow().notNull(),
-})
+const authUser = mysqlTable(
+  'auth_user',
+  {
+    id: varchar('id', { length: 36 }).primaryKey(),
+    name: varchar('name', { length: 255 }).notNull(),
+    email: varchar('email', { length: 255 }).notNull().unique(),
+    emailVerified: boolean('email_verified').default(false).notNull(),
+    image: text('image'),
+    username: varchar('username', { length: 255 }).unique(),
+    displayUsername: text('display_username'),
+    // Join key back to the legacy `users` row this account was back-filled
+    // from. Nullable because users created after the migration have no
+    // legacy row. See server/src/auth/backfill.js.
+    legacyId: bigint('legacy_id', { mode: 'number' }),
+    createdAt: timestamp('created_at', { fsp: 3 }).defaultNow().notNull(),
+    updatedAt: timestamp('updated_at', { fsp: 3 }).defaultNow().notNull(),
+  },
+  (table) => [index('auth_user_legacy_id_idx').on(table.legacyId)],
+)
 
 const authSession = mysqlTable(
   'auth_session',

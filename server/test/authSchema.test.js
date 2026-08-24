@@ -44,3 +44,7 @@ test('auth_user carries username fields for the username plugin', () => {
   expect(columns).toContain('username')
   expect(columns).toContain('displayUsername')
 })
+
+test('auth_user carries a legacy_id join key back to the legacy users row', () => {
+  expect(Object.keys(authUser)).toContain('legacyId')
+})
