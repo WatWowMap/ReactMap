@@ -1,0 +1,68 @@
+import type { RouteObject } from 'react-router'
+import { Shell } from './layout/Shell'
+
+/*
+ * Every route is lazy so the bundler gives each one its own chunk. The map
+ * route is the only one that will ever pull in MapLibre and deck.gl, and that
+ * only holds if nothing here imports a page eagerly.
+ */
+export const ROUTES: RouteObject[] = [
+  {
+    path: '/',
+    lazy: async () => ({ Component: (await import('./pages/Hub')).Hub }),
+  },
+  {
+    path: '/map',
+    lazy: async () => ({
+      Component: (await import('./pages/MapPage')).MapPage,
+    }),
+  },
+  {
+    path: '/filters',
+    lazy: async () => ({
+      Component: (await import('./pages/FiltersPage')).FiltersPage,
+    }),
+  },
+  {
+    path: '/alerts',
+    lazy: async () => ({
+      Component: (await import('./pages/AlertsPage')).AlertsPage,
+    }),
+  },
+  {
+    path: '/profile',
+    lazy: async () => ({
+      Component: (await import('./pages/Profile')).Profile,
+    }),
+  },
+  {
+    path: '/locales',
+    lazy: async () => ({
+      Component: (await import('./pages/Locales')).Locales,
+    }),
+  },
+  {
+    path: '/playground',
+    lazy: async () => ({
+      Component: (await import('./pages/Playground')).Playground,
+    }),
+  },
+  {
+    path: '*',
+    lazy: async () => ({
+      Component: (await import('./pages/NotFound')).NotFound,
+    }),
+  },
+]
+
+/*
+ * The route table `createBrowserRouter` actually consumes: ROUTES nested as
+ * children of one layout route rendering Shell, which owns the bottom nav.
+ * ROUTES itself stays flat because Task 1's test asserts against that shape.
+ */
+export const ROUTER_ROUTES: RouteObject[] = [
+  {
+    Component: Shell,
+    children: ROUTES,
+  },
+]
