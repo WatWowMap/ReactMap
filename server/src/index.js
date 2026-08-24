@@ -89,11 +89,6 @@ const startServer = async () => {
     })
   }
 
-  // Better auth reads the raw body itself, so it must sit ahead of the json
-  // body parser below (bundled into the next `app.use`), which would
-  // otherwise consume the stream first.
-  app.all(`${buildAuthRoutePrefix()}/*splat`, toNodeHandler(getAuth()))
-
   app.use(
     loggerMiddleware,
     noSourceMapMiddleware,
@@ -101,6 +96,20 @@ const startServer = async () => {
     // shell off disk, which would shadow the router that picks a shell per user.
     express.static(distDir, { dotfiles: 'allow', index: false }),
     compression(),
+  )
+
+  if (config.getSafe('api.enableHelmet')) {
+    app.use(helmetMiddleware())
+  }
+
+  // Better auth reads the raw body itself, so it must sit ahead of the json
+  // body parser below, which would otherwise consume the stream first. It
+  // still needs to come after helmet and the logger above, so the endpoints
+  // that issue session cookies get security headers and an access log entry
+  // like every other route.
+  app.all(`${buildAuthRoutePrefix()}/*splat`, toNodeHandler(getAuth()))
+
+  app.use(
     express.json({
       limit: '50mb',
       verify: (req, _res, buf) => {
@@ -108,10 +117,6 @@ const startServer = async () => {
       },
     }),
   )
-
-  if (config.getSafe('api.enableHelmet')) {
-    app.use(helmetMiddleware())
-  }
 
   app.use(createAuthSessionMiddleware())
 
