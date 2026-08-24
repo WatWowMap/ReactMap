@@ -42,6 +42,7 @@ These are the merge gate. Write them first, watch them fail, and treat them as t
 - **No code on this branch may import, call, or adapt anything under `server/src/services/DiscordClient.js`, `TelegramClient.js`, `server/src/graphql/`, or `server/src/models/`.** Read them to learn what 1.x did, then write the 2.0 behaviour fresh. This is the rule the whole plan exists to enforce.
 - The 1.0 client in `src/` stays in the repo and is served by nothing here.
 - Knex still owns schema DDL. The data back-fill stops being a migration.
+- **All filenames are kebab-case**, components included: `map-canvas.tsx`, not `MapCanvas.tsx`; `use-dismiss-on-escape.ts`, not `useDismissOnEscape.ts`. Symbol names inside files are unaffected. Any new file this plan creates follows it.
 - Never write the user's name into code, comments, or documentation.
 - Commit messages: conventional style, wrapped at 72 columns, ending with the `Co-Authored-By` trailer used on this branch.
 
