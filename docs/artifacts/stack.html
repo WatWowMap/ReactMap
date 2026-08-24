@@ -1,4 +1,5 @@
 <title>ReactMap 2.0 Stack</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
@@ -208,7 +209,12 @@ td .m { font-family: "IBM Plex Mono", monospace; font-size: 11px; font-weight: 6
 .call h4 { margin-bottom: 6px; font-family: "Bricolage Grotesque", sans-serif; }
 
 /* ---- mermaid ---- */
-.mermaid { background: transparent; display: flex; justify-content: center; padding: 6px 0; }
+.mermaid { background: transparent; display: flex; justify-content: center; padding: 6px 0; overflow-x: auto; }
+.mermaid svg { max-width: 100%; height: auto; }
+
+/* A grid item's min-width defaults to auto, so one wide diagram widens the
+   whole page instead of scrolling inside its own container. */
+.shell > main { min-width: 0; }
 
 /* ---- legend ---- */
 .legend { display: flex; flex-wrap: wrap; gap: 16px; font-size: 13px; color: var(--muted-fg); }
@@ -290,6 +296,86 @@ ul.tight li + li { margin-top: 7px; }
 
 hr.soft { border: 0; border-top: 1px solid var(--border); margin: 34px 0; }
 
+/* ---- eli5 strip ---- */
+.eli5 { padding: clamp(30px, 4.5vw, 48px) 0; border-bottom: 1px solid var(--border); }
+.eli5-eyebrow {
+  font-family: "IBM Plex Mono", monospace; font-size: 11px; letter-spacing: .1em;
+  text-transform: uppercase; color: var(--muted-fg); margin-bottom: 18px; text-align: center;
+}
+.eli5-strip { display: grid; grid-template-columns: 1fr; gap: 10px; }
+@media (min-width: 880px) {
+  .eli5-strip { grid-template-columns: 1fr auto 1fr auto 1fr auto 1fr; align-items: stretch; }
+}
+.eli5-card {
+  border: 1px solid var(--border); border-radius: var(--radius); background: var(--raised);
+  padding: 18px 16px 16px; text-align: center; box-shadow: var(--shadow);
+  border-top: 3px solid var(--card-accent, var(--border-strong));
+}
+.eli5-card svg { display: block; margin: 0 auto 10px; width: 44px; height: 44px; color: var(--card-accent, var(--fg)); }
+.eli5-card h4 { font-family: "Bricolage Grotesque", sans-serif; font-size: 15px; margin-bottom: 5px; }
+.eli5-card p { font-size: 13.5px; color: var(--muted-fg); line-height: 1.45; }
+.eli5-arrow {
+  align-self: center; color: var(--border-strong); font-size: 20px; text-align: center;
+  font-family: "Bricolage Grotesque", sans-serif;
+}
+@media (max-width: 879px) { .eli5-arrow { transform: rotate(90deg); } }
+
+/* ---- delta animation ---- */
+.delta-demo { display: grid; grid-template-columns: 1fr; gap: 14px; }
+@media (min-width: 760px) { .delta-demo { grid-template-columns: 1fr 1fr; } }
+.demo-side { border: 1px solid var(--border); border-radius: var(--radius); background: var(--raised); overflow: hidden; }
+.demo-head { padding: 10px 14px; border-bottom: 1px solid var(--border); background: var(--muted);
+  font-family: "Bricolage Grotesque", sans-serif; font-size: 13px; display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+.demo-head .amt { font-family: "IBM Plex Mono", monospace; font-size: 11px; color: var(--muted-fg); }
+.demo-grid { display: grid; grid-template-columns: repeat(8, 1fr); gap: 9px; padding: 18px; }
+.demo-dot { aspect-ratio: 1; border-radius: 50%; background: var(--sys-reactmap); opacity: .55; }
+/* 1.x: every dot re-sent every cycle */
+.demo-old .demo-dot { animation: resend 4s ease-in-out infinite; }
+@keyframes resend {
+  0%, 12% { opacity: 1; box-shadow: 0 0 0 3px color-mix(in srgb, var(--sys-reactmap) 35%, transparent); }
+  25%, 100% { opacity: .55; box-shadow: 0 0 0 0 transparent; }
+}
+/* 2.0: only three dots ever change */
+.demo-new .demo-dot { opacity: .55; }
+.demo-new .d-add { animation: dadd 8s ease-in-out infinite; }
+.demo-new .d-upd { animation: dupd 8s ease-in-out infinite; }
+.demo-new .d-del { animation: ddel 8s ease-in-out infinite; }
+@keyframes dadd { 0%, 20% { opacity: 0; transform: scale(.2); } 30%, 100% { opacity: 1; transform: scale(1); } }
+@keyframes dupd { 0%, 45% { background: var(--sys-reactmap); } 55%, 100% { background: var(--sys-poracle); opacity: 1; } }
+@keyframes ddel { 0%, 70% { opacity: .55; } 82%, 100% { opacity: 0; transform: scale(.3); } }
+.demo-note { padding: 10px 14px; border-top: 1px solid var(--border); font-size: 13px; color: var(--muted-fg); }
+
+/* ---- ring legend map ---- */
+.ringmap {
+  border: 1px solid var(--border); border-radius: var(--radius); background: var(--raised);
+  box-shadow: var(--shadow); overflow: hidden;
+}
+.ringmap-canvas {
+  position: relative; padding: 34px 12px 12px;
+  background:
+    linear-gradient(color-mix(in srgb, var(--border) 32%, transparent) 1px, transparent 1px),
+    linear-gradient(90deg, color-mix(in srgb, var(--border) 32%, transparent) 1px, transparent 1px),
+    var(--muted);
+  background-size: 34px 34px, 34px 34px, auto;
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; align-items: end;
+}
+.mk { text-align: center; padding-bottom: 12px; }
+.mk .marker {
+  display: inline-grid; place-items: center; border-radius: 50%;
+  width: var(--mk, 34px); height: var(--mk, 34px);
+  background: var(--ring-paint, transparent); position: relative;
+}
+.mk .marker::after {
+  content: ""; position: absolute; inset: 5px; border-radius: 50%;
+  background: var(--raised); border: 1px solid var(--border);
+}
+.mk .marker b {
+  position: relative; z-index: 1; font-family: "Bricolage Grotesque", sans-serif;
+  font-size: calc(var(--mk, 34px) * .34); line-height: 1;
+}
+.mk .cap { margin-top: 10px; font-size: 12.5px; color: var(--muted-fg); line-height: 1.4; }
+.mk .cap b { color: var(--fg); font-weight: 600; display: block; font-size: 12.5px; }
+
 :focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; border-radius: 4px; }
 @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
 </style>
@@ -305,6 +391,47 @@ hr.soft { border: 0; border-top: 1px solid var(--border); margin: 34px 0; }
       <span class="chip"><i class="dot" style="background: var(--sys-poracle)"></i>PoracleNG</span>
     </div>
   </header>
+
+  <div class="eli5">
+    <div class="eli5-eyebrow">The ten-second version</div>
+    <div class="eli5-strip">
+      <div class="eli5-card" style="--card-accent: var(--sys-scanner)">
+        <svg viewBox="0 0 44 44" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <rect x="14" y="6" width="16" height="30" rx="3.5"/>
+          <path d="M22 30.5 h.01"/>
+          <path d="M8 14 a17 17 0 0 1 0 16 M36 14 a17 17 0 0 0 0 16" opacity=".55"/>
+        </svg>
+        <h4>A scanner walks the world</h4>
+        <p>and reports every Pok&eacute;mon, gym and stop it sees.</p>
+      </div>
+      <div class="eli5-arrow" aria-hidden="true">&rarr;</div>
+      <div class="eli5-card" style="--card-accent: var(--sys-golbat)">
+        <svg viewBox="0 0 44 44" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M7 8 h30 l-11 13 v11 l-8 5 v-16 z"/>
+        </svg>
+        <h4>Golbat catches it all</h4>
+        <p>It decodes the firehose and remembers what is live right now.</p>
+      </div>
+      <div class="eli5-arrow" aria-hidden="true">&rarr;</div>
+      <div class="eli5-card" style="--card-accent: var(--sys-reactmap)">
+        <svg viewBox="0 0 44 44" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M22 38 c8-9 13-14.5 13-21 a13 13 0 1 0 -26 0 c0 6.5 5 12 13 21 z"/>
+          <circle cx="22" cy="17" r="4.5"/>
+        </svg>
+        <h4>ReactMap draws your slice</h4>
+        <p>Your rules pick what appears, and only changes travel to your screen.</p>
+      </div>
+      <div class="eli5-arrow" aria-hidden="true">&rarr;</div>
+      <div class="eli5-card" style="--card-accent: var(--sys-poracle)">
+        <svg viewBox="0 0 44 44" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M22 6 a10 10 0 0 1 10 10 c0 8 3 10 4 12 h-28 c1-2 4-4 4-12 a10 10 0 0 1 10-10 z"/>
+          <path d="M18 33 a4 4 0 0 0 8 0"/>
+        </svg>
+        <h4>Poracle pings you</h4>
+        <p>When something you track appears, a message reaches your Discord or Telegram.</p>
+      </div>
+    </div>
+  </div>
 
   <div class="shell">
     <nav class="rail" aria-label="Sections">
@@ -469,6 +596,29 @@ sequenceDiagram
           </div>
         </div>
 
+        <div class="breakout">
+          <div class="delta-demo" aria-hidden="true">
+            <div class="demo-side demo-old">
+              <div class="demo-head"><span>1.x today</span><span class="amt">everything, every poll</span></div>
+              <div class="demo-grid">
+                <i class="demo-dot"></i><i class="demo-dot"></i><i class="demo-dot"></i><i class="demo-dot"></i><i class="demo-dot"></i><i class="demo-dot"></i><i class="demo-dot"></i><i class="demo-dot"></i>
+                <i class="demo-dot"></i><i class="demo-dot"></i><i class="demo-dot"></i><i class="demo-dot"></i><i class="demo-dot"></i><i class="demo-dot"></i><i class="demo-dot"></i><i class="demo-dot"></i>
+                <i class="demo-dot"></i><i class="demo-dot"></i><i class="demo-dot"></i><i class="demo-dot"></i><i class="demo-dot"></i><i class="demo-dot"></i><i class="demo-dot"></i><i class="demo-dot"></i>
+              </div>
+              <div class="demo-note">Every flash is the same 24 Pok&eacute;mon crossing the wire again, whether anything changed or not.</div>
+            </div>
+            <div class="demo-side demo-new">
+              <div class="demo-head"><span>2.0</span><span class="amt">only what changed</span></div>
+              <div class="demo-grid">
+                <i class="demo-dot"></i><i class="demo-dot"></i><i class="demo-dot d-upd"></i><i class="demo-dot"></i><i class="demo-dot"></i><i class="demo-dot"></i><i class="demo-dot"></i><i class="demo-dot"></i>
+                <i class="demo-dot"></i><i class="demo-dot"></i><i class="demo-dot"></i><i class="demo-dot"></i><i class="demo-dot d-add"></i><i class="demo-dot"></i><i class="demo-dot"></i><i class="demo-dot"></i>
+                <i class="demo-dot"></i><i class="demo-dot d-del"></i><i class="demo-dot"></i><i class="demo-dot"></i><i class="demo-dot"></i><i class="demo-dot"></i><i class="demo-dot"></i><i class="demo-dot"></i>
+              </div>
+              <div class="demo-note">One appears, one changes, one despawns. Three tiny messages; the other 21 cost nothing.</div>
+            </div>
+          </div>
+        </div>
+
         <div class="col">
           <h3>What the server remembers</h3>
           <p>For each open connection ReactMap keeps a map of entity id to a change stamp. Not the entities themselves: it already has those in hand when it builds a message, so storing them twice buys nothing.</p>
@@ -611,6 +761,30 @@ sequenceDiagram
                 <tr><td>Glow</td><td>ring segments, up to three</td><td>mixing colours invents a meaning nobody assigned, and hurts colourblind users</td></tr>
               </tbody>
             </table>
+          </div>
+        </div>
+
+        <div class="breakout">
+          <div class="ringmap">
+            <div class="panel-head"><h4>What that looks like on the map</h4><span class="note">the ring is the glow your rules paint</span></div>
+            <div class="ringmap-canvas">
+              <div class="mk" style="--mk: 26px; --ring-paint: transparent">
+                <span class="marker"><b>:)</b></span>
+                <span class="cap"><b>No rules match</b>small, no ring</span>
+              </div>
+              <div class="mk" style="--mk: 40px; --ring-paint: conic-gradient(var(--sys-poracle) 0turn 1turn)">
+                <span class="marker"><b>100</b></span>
+                <span class="cap"><b>One rule</b>a full gold ring</span>
+              </div>
+              <div class="mk" style="--mk: 40px; --ring-paint: conic-gradient(var(--sys-poracle) 0turn .5turn, var(--sys-golbat) .5turn 1turn)">
+                <span class="marker"><b>100</b></span>
+                <span class="cap"><b>Two rules</b>half gold, half blue</span>
+              </div>
+              <div class="mk" style="--mk: 40px; --ring-paint: conic-gradient(var(--sys-poracle) 0turn .333turn, var(--sys-golbat) .333turn .666turn, var(--ok) .666turn 1turn)">
+                <span class="marker"><b>100</b></span>
+                <span class="cap"><b>Three rules</b>thirds; every colour survives</span>
+              </div>
+            </div>
           </div>
         </div>
 
