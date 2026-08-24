@@ -57,6 +57,30 @@
   --color-iv-mid: #ed6c02; /* < 82%, warning.main */
   --color-iv-mid-high: #2ab5f6; /* < 100%, info.main (1.0 override) */
   --color-iv-perfect: #2e7d32; /* = 100%, success.main */
+
+  /*
+   * Cluster bubble colours. Source: src/assets/css/main.css lines 623-644,
+   * the .marker-cluster-{small,medium,large} div fills, keyed by the same
+   * count thresholds src/pages/map/components/Clustering.jsx line 29 uses.
+   * A bubble covering a few dozen reads very differently from one covering a
+   * thousand, and colour is the only signal of that at a glance.
+   *
+   * The map engine paints these at higher opacity than 1.0's 0.6, which is
+   * the one thing here not carried across: the opacity is the bubble's
+   * material rather than its meaning, so it lives with the layer and not in
+   * this file.
+   *
+   * One set for both themes, like the team colours above and unlike the
+   * chart series below, because a bubble is painted on map tiles rather than
+   * on the page background and the theme does not change what sits behind
+   * it. The count uses --color-cluster-label and clears 4.5:1 on all three
+   * fills, which is therefore true in both themes by construction (verified
+   * in contrast.test.ts).
+   */
+  --color-cluster-small: #6ecc39; /* < 100 entities */
+  --color-cluster-medium: #f0c20c; /* < 1000 */
+  --color-cluster-large: #f18017; /* 1000 and up */
+  --color-cluster-label: #111827;
 }
 
 /*

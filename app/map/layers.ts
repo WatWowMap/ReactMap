@@ -185,16 +185,67 @@ export function buildGymIconLayer(
 }
 
 /**
- * Buckets a cluster's colour by how many entities it stands in for, same
- * three-tier split as 1.0's `marker-cluster-{small,medium,large}` CSS
- * classes (`Clustering.jsx`'s `createClusterIcon`): a cluster of a few
- * dozen reads very differently from one standing in for a thousand
- * entities, and the colour is the only signal of that at a glance.
+ * How opaque a cluster bubble is painted. Not a token: this is the bubble's
+ * material, letting a little of the basemap through so a cluster does not
+ * read as a hole punched in the map, and it is the same for every bucket.
+ * The colour tokens carry the meaning; this carries none.
  */
-function clusterColorFor(count: number): Color {
-  if (count < 100) return [125, 211, 252, 230] // small: light blue
-  if (count < 1000) return [251, 191, 36, 230] // medium: amber
-  return [248, 113, 113, 230] // large: red
+const CLUSTER_ALPHA = 230
+
+/**
+ * Buckets a cluster by how many entities it stands in for, same three-tier
+ * split as 1.0's `marker-cluster-{small,medium,large}` CSS classes
+ * (`Clustering.jsx`'s `createClusterIcon`): a cluster of a few dozen reads
+ * very differently from one standing in for a thousand entities, and the
+ * colour is the only signal of that at a glance.
+ */
+function clusterColorToken(count: number): string {
+  if (count < 100) return '--color-cluster-small'
+  if (count < 1000) return '--color-cluster-medium'
+  return '--color-cluster-large'
+}
+
+/**
+ * Reads a cluster bubble's fill from the data palette, the same way
+ * `readTeamColor` reads a team's, and for the same reason: map entity
+ * colours live in `app/tokens/data-palette.css` and nowhere else. Same
+ * unresolved-token fallback too, since a pruned custom property fails
+ * silently rather than loudly.
+ */
+export function readClusterColor(
+  count: number,
+  root: HTMLElement = document.documentElement,
+): Color {
+  const token = clusterColorToken(count)
+  const raw = getComputedStyle(root).getPropertyValue(token)
+  const color = parseHexColor(raw)
+  if (!color) {
+    console.warn(
+      `[map] cluster colour token ${token} resolved to ${JSON.stringify(raw)}, expected a #rrggbb value. Falling back to grey.`,
+    )
+    return [
+      FALLBACK_TEAM_COLOR[0],
+      FALLBACK_TEAM_COLOR[1],
+      FALLBACK_TEAM_COLOR[2],
+      CLUSTER_ALPHA,
+    ]
+  }
+  return [color[0], color[1], color[2], CLUSTER_ALPHA]
+}
+
+/** The count drawn on a bubble, read from the same palette as the fill. */
+export function readClusterLabelColor(
+  root: HTMLElement = document.documentElement,
+): Color {
+  const raw = getComputedStyle(root).getPropertyValue('--color-cluster-label')
+  const color = parseHexColor(raw)
+  if (!color) {
+    console.warn(
+      `[map] cluster label colour token --color-cluster-label resolved to ${JSON.stringify(raw)}, expected a #rrggbb value. Falling back to grey.`,
+    )
+    return FALLBACK_TEAM_COLOR
+  }
+  return color
 }
 
 /**
@@ -206,6 +257,7 @@ export function buildClusterIconLayer(
   clusters: readonly ClusterMarker[],
   id: string,
   getClusterIcon: () => IconDescriptor,
+  root?: HTMLElement,
 ): IconLayer<ClusterMarker> {
   return new IconLayer<ClusterMarker>({
     id,
@@ -222,7 +274,7 @@ export function buildClusterIconLayer(
         mask: true,
       }
     },
-    getColor: (cluster) => clusterColorFor(cluster.count),
+    getColor: (cluster) => readClusterColor(cluster.count, root),
     getSize: 36,
   })
 }
@@ -231,6 +283,7 @@ export function buildClusterIconLayer(
 export function buildClusterTextLayer(
   clusters: readonly ClusterMarker[],
   id: string,
+  root?: HTMLElement,
 ): TextLayer<ClusterMarker> {
   return new TextLayer<ClusterMarker>({
     id,
@@ -239,7 +292,7 @@ export function buildClusterTextLayer(
     getPosition: (cluster) => [cluster.lon, cluster.lat],
     getText: (cluster) => String(cluster.count),
     getSize: 13,
-    getColor: [17, 24, 39, 255],
+    getColor: readClusterLabelColor(root),
   })
 }
 
@@ -404,8 +457,13 @@ export function buildMapLayers({
           gymResult.clusters,
           GYM_CLUSTER_ICON_LAYER_ID,
           getClusterIcon,
+          root,
         ),
-        buildClusterTextLayer(gymResult.clusters, GYM_CLUSTER_LABEL_LAYER_ID),
+        buildClusterTextLayer(
+          gymResult.clusters,
+          GYM_CLUSTER_LABEL_LAYER_ID,
+          root,
+        ),
       )
     }
     if (pokemonResult.clusters.length > 0) {
@@ -414,10 +472,12 @@ export function buildMapLayers({
           pokemonResult.clusters,
           POKEMON_CLUSTER_ICON_LAYER_ID,
           getClusterIcon,
+          root,
         ),
         buildClusterTextLayer(
           pokemonResult.clusters,
           POKEMON_CLUSTER_LABEL_LAYER_ID,
+          root,
         ),
       )
     }

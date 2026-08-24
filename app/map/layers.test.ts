@@ -2,14 +2,20 @@ import { afterAll, beforeAll, expect, test } from 'bun:test'
 import { setupDom, teardownDom } from '../test-setup'
 import type { IconDescriptor } from './atlas'
 import {
+  buildClusterIconLayer,
+  buildClusterTextLayer,
   buildGymIconLayer,
   buildMapLayers,
   buildPokemonIconLayer,
   buildPokemonTextLayer,
   formatCountdown,
+  GYM_CLUSTER_ICON_LAYER_ID,
+  GYM_CLUSTER_LABEL_LAYER_ID,
   GYM_ICON_LAYER_ID,
   POKEMON_ICON_LAYER_ID,
   POKEMON_LABEL_LAYER_ID,
+  readClusterColor,
+  readClusterLabelColor,
   readTeamColor,
 } from './layers'
 import type { GymEntity, PokemonEntity } from './types'
@@ -246,4 +252,88 @@ test('buildMapLayers carries limitHit out of the gym clusterer', () => {
   })
   expect(result.limitHit.gyms).toBe(true)
   expect(result.limitHit.pokemon).toBe(false)
+})
+
+/*
+ * Cluster bubbles read the same palette the gym layer does. These were
+ * hardcoded RGBA literals in this file until the tokens existed, which is the
+ * one thing the plan's colour constraint exists to prevent: a map colour that
+ * cannot be changed from the palette is a map colour nothing can review.
+ */
+test('readClusterColor picks a bucket token by count and keeps the bubble alpha', () => {
+  const root = document.createElement('div')
+  root.style.setProperty('--color-cluster-small', '#6ecc39')
+  root.style.setProperty('--color-cluster-medium', '#f0c20c')
+  root.style.setProperty('--color-cluster-large', '#f18017')
+  document.body.appendChild(root)
+  try {
+    expect(readClusterColor(12, root)).toEqual([0x6e, 0xcc, 0x39, 230])
+    expect(readClusterColor(100, root)).toEqual([0xf0, 0xc2, 0x0c, 230])
+    expect(readClusterColor(1000, root)).toEqual([0xf1, 0x80, 0x17, 230])
+  } finally {
+    root.remove()
+  }
+})
+
+test('readClusterColor falls back to a visible grey when its token does not resolve', () => {
+  const root = document.createElement('div')
+  const warn = console.warn
+  let warned = false
+  console.warn = () => {
+    warned = true
+  }
+  try {
+    expect(readClusterColor(5, root)).toEqual([128, 128, 128, 230])
+    expect(warned).toBe(true)
+  } finally {
+    console.warn = warn
+  }
+})
+
+test('buildClusterIconLayer and buildClusterTextLayer take their colours from the palette', () => {
+  const root = document.createElement('div')
+  root.style.setProperty('--color-cluster-medium', '#f0c20c')
+  root.style.setProperty('--color-cluster-label', '#111827')
+  document.body.appendChild(root)
+  const cluster = {
+    kind: 'cluster' as const,
+    id: 'cluster-1',
+    lat: 51.5,
+    lon: -0.1,
+    count: 250,
+  }
+  try {
+    const icons = buildClusterIconLayer(
+      [cluster],
+      GYM_CLUSTER_ICON_LAYER_ID,
+      () => STUB_ICON,
+      root,
+    )
+    const getColor = icons.props.getColor as (marker: typeof cluster) => unknown
+    expect(getColor(cluster)).toEqual([0xf0, 0xc2, 0x0c, 230])
+
+    const labels = buildClusterTextLayer(
+      [cluster],
+      GYM_CLUSTER_LABEL_LAYER_ID,
+      root,
+    )
+    expect(labels.props.getColor).toEqual([0x11, 0x18, 0x27, 255])
+  } finally {
+    root.remove()
+  }
+})
+
+test('readClusterLabelColor falls back to a visible grey when its token does not resolve', () => {
+  const root = document.createElement('div')
+  const warn = console.warn
+  let warned = false
+  console.warn = () => {
+    warned = true
+  }
+  try {
+    expect(readClusterLabelColor(root)).toEqual([128, 128, 128, 255])
+    expect(warned).toBe(true)
+  } finally {
+    console.warn = warn
+  }
 })
