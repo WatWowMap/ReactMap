@@ -65,6 +65,22 @@ Amending the Part 1 migrations in place is correct here for the same reason it w
 
 **Approach.** Request `guilds` and honour `redirectUri` in the Discord provider config. Enforce the gate in the same `session.create.before` hook Task 2 adds, rejecting rather than creating a session.
 
+## Task 4b: Keep the legacy OAuth callback path working
+
+**The defect.** Operators have `http://<host>/auth/discord/callback` registered with their Discord
+application, because that is what `config/default.json` ships and what passport served. Better Auth
+serves `/api/auth/callback/discord`. Passing the configured `redirectUri` straight through, as Task
+4 now does faithfully, therefore points Discord at a path nothing handles.
+
+**Approach.** Add an Express redirect from `/auth/:provider/callback` to
+`/api/auth/callback/:provider`, preserving the query string, which is where the OAuth `code` and
+`state` live. That way an operator upgrades without touching their Discord application or their
+config, which is the difference between a migration and a support thread.
+
+Do not instead change the config default and document that operators must update Discord. A
+redirect URI mismatch surfaces as a Discord-side error page with no reference to ReactMap, and it
+would hit every existing installation on upgrade.
+
 ## Task 5: Wire auth through localPassword
 
 **The defect.** `server/src/services/localPassword.js` is a hardened bcrypt wrapper with more than twenty tests covering bcrypt's 72-byte truncation, a hazard that has already caused a security incident in this codebase. It has no callers. Part 1 handed Better Auth raw `Bun.password` instead, so a legacy password longer than 72 bytes locks its owner out and a malformed hash returns a 500.
