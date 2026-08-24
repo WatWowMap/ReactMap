@@ -406,13 +406,14 @@ Recorded because the reasoning is the part that gets lost.
 Things deliberately left for the implementation plan rather than decided here.
 
 - Whether `gender`, `team` and similar single valued columns are integers or enums.
-- Whether `rule_pokestop.invasion_ids` is enough on its own. 1.x narrows by incident display type and
-  then confirms the specific reward in a second pass
+- Whether `rule_pokestop.invasion_character_id` is enough on its own. 1.x narrows by incident
+  display type and then confirms the specific reward in a second pass
   (`server/src/filters/fort/pokestop.js:236-245`), deliberately, because the reward is a slot one
   value that an optional invasion check populates and a reward derived filter can drop stops that
-  should match. Invasion ids may need a display type companion for the same reason.
-- How the sentence renders a rule whose species selection is large. "25 Pokémon" with a peek is
-  probably right, but that is a UI question.
+  should match. The character id may need a display type companion for the same reason.
+- How the sentence renders a large group. A single rule always names one thing, so this is a
+  question about the grouped view: "25 Pokémon" with a peek is probably right, but it is a UI
+  question.
 - Indexes. `(user_id, profile_id)` on every rule table is obvious; anything else waits for a real
   query shape.
 - Whether the four teaching starting points are seeded rows or created client side on tap.
