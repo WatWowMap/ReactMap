@@ -4,7 +4,7 @@
  * must never be derived from the accent tokens or otherwise harmonised
  * with the rest of the UI, because that would make the map lie about
  * what it is showing. Values below are carried across unchanged from
- * the 1.0 client rather than invented; see app/tokens/data-palette.md
+ * the 1.0 client rather than invented. Each group notes its source below.
  * (task report) for exact sourcing per group.
  */
 
