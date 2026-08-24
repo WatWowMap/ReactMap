@@ -1,4 +1,4 @@
-import type { GymEntity, PokemonEntity } from './types'
+import type { Gender, GymEntity, PokemonEntity, Team } from './types'
 
 /**
  * The area every fixture is scattered across. Chosen to comfortably
@@ -46,6 +46,13 @@ function randomInt(rng: () => number, min: number, max: number): number {
   return Math.floor(randomInRange(rng, min, max + 1))
 }
 
+function pick<T>(rng: () => number, values: readonly [T, ...T[]]): T {
+  return values[randomInt(rng, 0, values.length - 1)] as T
+}
+
+const GENDERS: readonly [Gender, ...Gender[]] = [1, 2, 3]
+const TEAMS: readonly [Team, ...Team[]] = [0, 1, 2, 3]
+
 function buildPokemon(rng: () => number, index: number): PokemonEntity {
   const entity: PokemonEntity = {
     kind: 'pokemon',
@@ -53,7 +60,7 @@ function buildPokemon(rng: () => number, index: number): PokemonEntity {
     pokemonId: randomInt(rng, 1, 493),
     form: randomInt(rng, 0, 3),
     costume: randomInt(rng, 0, 2),
-    gender: randomInt(rng, 1, 3),
+    gender: pick(rng, GENDERS),
     lat: randomInRange(rng, FIXTURE_AREA.south, FIXTURE_AREA.north),
     lon: randomInRange(rng, FIXTURE_AREA.west, FIXTURE_AREA.east),
     expiresAt: FIXTURE_EPOCH + randomInt(rng, 60, 1800) * 1000,
@@ -73,7 +80,7 @@ function buildGym(rng: () => number, index: number): GymEntity {
     gymId: `gym-${index}`,
     lat: randomInRange(rng, FIXTURE_AREA.south, FIXTURE_AREA.north),
     lon: randomInRange(rng, FIXTURE_AREA.west, FIXTURE_AREA.east),
-    team: randomInt(rng, 0, 3),
+    team: pick(rng, TEAMS),
     inBattle: rng() < 0.1,
   }
 }

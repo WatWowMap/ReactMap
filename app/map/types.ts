@@ -19,9 +19,15 @@ export interface MapQuery {
   zoom: number
 }
 
+/** 0 unset, 1 male, 2 female, 3 genderless. */
+export type Gender = 0 | 1 | 2 | 3
+
+/** 0 uncontested, 1 Mystic, 2 Valor, 3 Instinct. */
+export type Team = 0 | 1 | 2 | 3
+
 /**
  * Fields carried here are exactly what determines the icon (pokemonId,
- * form, costume, gender, badges, background, weather), what's needed to
+ * form, costume, gender, badge, background, weather), what's needed to
  * place and expire the marker (lat, lon, expiresAt), and the optional
  * stats rendered as marker text (iv, level, size). Nothing speculative:
  * a field added later is cheap, one removed after something depends on
@@ -35,9 +41,10 @@ export interface PokemonEntity {
   kind: 'pokemon'
   spawnId: string
   pokemonId: number
+  /** Left as open numbers: valid values vary per species. */
   form: number
   costume: number
-  gender: number
+  gender: Gender
   badge?: number
   background?: number
   weather?: number
@@ -54,7 +61,7 @@ export interface GymEntity {
   gymId: string
   lat: number
   lon: number
-  team: number
+  team: Team
   inBattle: boolean
 }
 
