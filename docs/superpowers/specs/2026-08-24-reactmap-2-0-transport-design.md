@@ -208,12 +208,14 @@ put explicit return types on the fat procedures from the first commit, not as a 
 
 Measured today, ordered by size.
 
-**masterfile.json is 831,799 bytes** and ships to every client. The `pokemon` key alone is 436,079
-of that. It goes out through the `available` query as `masterfile: JSON`
-(`server/src/graphql/resolvers.js:40`, `typeDefs/map.graphql:2`), which means it is a response body
-the browser cannot cache, re-sent on an hourly poll. It becomes a content-hashed static asset,
-downloaded once and then a 304 forever. This is the largest single item in the system and it is not
-map data.
+**The masterfile stops being sent.** Today it is 831,799 bytes shipped whole to every client, the
+`pokemon` key alone accounting for 436,079 of that, going out through the `available` query as
+`masterfile: JSON` (`server/src/graphql/resolvers.js:40`, `typeDefs/map.graphql:2`). Being a
+response body rather than an asset, the browser cannot cache it, and an hourly poll re-sends it.
+This is the largest single item in the system and it is not map data.
+
+2.0 keeps the whole masterfile on the server and sends only the fragments a client actually
+references. See "The masterfile" below.
 
 **Deltas instead of full viewports.** Steady state on a still map falls to near zero.
 
@@ -226,6 +228,48 @@ Encoding stays JSON. Binary is worth perhaps 20 to 30 percent on top of the four
 none of those wins depend on it. The contracts package keeps the door open to measure later.
 
 Responses are gzipped today via the `compression` package. Requests are never compressed.
+
+## The masterfile
+
+`pogo-masterfile` is the runtime package and `pogo-masterfile-types` the generated types. The
+server holds one `Masterfile` instance and answers for fragments; the client never sees the whole
+thing.
+
+```ts
+const mf = await Masterfile.fromRemote()   // DEFAULT_MASTERFILE_URL, alexelgt/game_masters
+mf.pokemon.get(templateId)                 // literal-typed, returns the exact entry
+mf.pokemon.filter(predicate)               // per-group accessors, plus find/has/all/templateIds
+await mf.refresh()                         // re-fetch in place on a game update
+```
+
+The upstream GAME_MASTER is 8,608,587 bytes across 18,239 entries, roughly ten times the derived
+file 1.x ships, so serving fragments is not an optimisation here. It is the only option.
+
+**Entries are keyed by template id, not by numeric id.** They look like
+`EXTENDED_V0001_POKEMON_BULBASAUR_FALL_2019`: the species number is embedded but the form is a
+name, while ReactMap and Golbat both speak numeric `form_id`. So the server builds an index once at
+boot, mapping `${species_id}-${form_id}` to its entry, which is the same key scheme the rules model
+and Poracle already use. This is the part of `packages/masterfile` that survives. It does not
+disappear, it moves behind the index.
+
+Fragments are pulled, not pushed. The delta stream carries entity ids; when a batch names a species
+the client has no entry for, it asks for the missing ones in one batched procedure. Masterfile data
+is immutable within a game version, so those results cache indefinitely under a key carrying the
+masterfile version, which is exactly what TanStack Query is for. Pushing fragments alongside deltas
+would save a round trip and lose the caching, which is the wrong trade on a page that reloads.
+
+**Use the loose types at the tRPC boundary.** `pogo-masterfile-types` generates literal lookups by
+default, where `get` on a known template id returns that entry's concrete type rather than a union.
+That precision is worth having in server-side code. It is a liability in a procedure's inferred
+return type, because a ~60 procedure router carrying thousands of literal keys is the tsserver
+slowdown this spec already warns about. A `--ts-loose` build exists and drops both the literal
+lookup and the per-entry narrow types (`src/generate.ts:93`), which is the right shape for the
+wire.
+
+Zod exports are not needed. The fragments we send are server-produced and therefore trusted, so
+there is nothing for a client-side schema to check. The boundary that does take untrusted input is
+`fromRemote`, parsing a third-party URL, and that already has `MasterfileParseError` inside the
+library.
 
 ## Deferred
 
@@ -263,5 +307,9 @@ Responses are gzipped today via the `compression` package. Requests are never co
 - What the client sends on reconnect. Full resync is simplest and probably right, but it is worth
   pricing against a resume token.
 - Indexes for the perms table, once its shape is settled alongside the entitlement API.
+- Which masterfile groups the client actually needs fragments from. Pokemon, moves, items and
+  invasions are certain; the rest of the 18,239 entries are probably server-only.
+- Whether the `${species_id}-${form_id}` index is built eagerly at boot or lazily per group. Eager
+  is simpler and the cost is paid once, but it wants measuring against the 8.6 MB parse.
 - Whether Poracle's move to a single provider on its own page changes the webhook procedure surface
   or only its client routing.
