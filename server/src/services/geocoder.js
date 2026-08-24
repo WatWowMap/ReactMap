@@ -68,9 +68,15 @@ function assertNominatimResponse(results, url) {
   //
   // node-geocoder ignores the status and parses the body regardless, so both
   // arrive here as an object with no address and format into a blank result.
+  // The 404 body is matched on Javalin's own documentation URL rather than on
+  // the generic title/status pair, because that pair is RFC 7807's shape: a
+  // rate-limiting proxy in front of a healthy Nominatim answers
+  // {"title":"Too Many Requests","status":429}, and diagnosing that as "your
+  // provider is wrong" would turn a transient failure into advice to break a
+  // working configuration permanently.
   const isPhoton =
     raw.type === 'FeatureCollection' ||
-    (typeof raw.title === 'string' && typeof raw.status === 'number') ||
+    (typeof raw.type === 'string' && raw.type.includes('javalin.io')) ||
     (typeof raw.message === 'string' &&
       raw.message.includes('Unknown query parameter'))
 
@@ -104,7 +110,13 @@ async function nominatimGeocoder(url, search, isReverse) {
       // `neighborhood` and formatter() templates on `neighborhoods`, so the
       // value reached neither consumer. Carrying the alias is what makes it
       // visible without changing what node-geocoder itself produces.
-      neighborhood: formatted.neighbourhood || '',
+      //
+      // quarter is the fallback because Nominatim reports neighbourhood-level
+      // data under that key for many places: 1521 N Hoyne Ave carries
+      // quarter "Wicker Park" and no neighbourhood at all, and node-geocoder
+      // only reads address.neighbourhood, leaving the pair empty.
+      neighbourhood: formatted.neighbourhood || result.address?.quarter || '',
+      neighborhood: formatted.neighbourhood || result.address?.quarter || '',
     }
   })(stockGeocoder._geocoder._formatResult)
   // Awaited rather than returned so the shape check runs here. A throw inside
@@ -159,10 +171,13 @@ async function geocoder(nominatimUrl, search, reverse, format, provider) {
     return reverse
       ? formatter(format, results[0])
       : format
-        ? results.map((result) => ({
+        ? // The mapped fields ride along rather than being rebuilt, because the
+          // Geocoder GraphQL type resolves neighborhood, suburb and the rest
+          // straight off this object. Returning only the formatted triple made
+          // every other field null whenever an addressFormat was configured.
+          results.map((result) => ({
+            ...result,
             formatted: formatter(format, result),
-            latitude: result.latitude,
-            longitude: result.longitude,
           }))
         : results
   } catch (e) {

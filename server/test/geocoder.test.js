@@ -537,9 +537,13 @@ test('a correctly configured Photon webhook still geocodes', async () => {
       '{{city}}',
       'photon',
     )
-    assert.deepEqual(result, [
-      { formatted: 'Denver', latitude: 39.7392, longitude: -104.9903 },
-    ])
+    assert.equal(result.length, 1)
+    assert.equal(result[0].formatted, 'Denver')
+    assert.equal(result[0].latitude, 39.7392)
+    assert.equal(result[0].longitude, -104.9903)
+    // The mapped fields ride along with formatted: Geocoder resolves
+    // neighborhood, suburb and the rest straight off this object.
+    assert.equal(result[0].city, 'Denver')
   } finally {
     await server.close()
   }
@@ -549,9 +553,11 @@ test('a correctly configured Nominatim webhook still geocodes', async () => {
   const server = await serveOnce(NOMINATIM_BODY)
   try {
     const result = await geocoder(server.url, 'Denver', false, '{{city}}')
-    assert.deepEqual(result, [
-      { formatted: 'Denver', latitude: 39.7392, longitude: -104.9903 },
-    ])
+    assert.equal(result.length, 1)
+    assert.equal(result[0].formatted, 'Denver')
+    assert.equal(result[0].latitude, 39.7392)
+    assert.equal(result[0].longitude, -104.9903)
+    assert.equal(result[0].city, 'Denver')
   } finally {
     await server.close()
   }
@@ -1029,5 +1035,115 @@ test('the empty guard does not swallow a zero coordinate', async () => {
     await new Promise((resolve) => {
       server.close(resolve)
     })
+  }
+})
+
+// An RFC 7807 problem body is not a Photon signature. A rate-limiting proxy in
+// front of a healthy Nominatim answers {"title":"Too Many Requests","status":
+// 429}, and diagnosing that as a provider mismatch advises the operator to
+// break a working configuration to fix a transient failure.
+test('an RFC 7807 error from a Nominatim proxy is not diagnosed as Photon', async () => {
+  const server = await serveOnce({ title: 'Too Many Requests', status: 429 })
+  try {
+    // The generic path resolves with a blank entry, as it always did. What must
+    // not happen is the provider-mismatch throw, whose message tells the
+    // operator to change geocoderProvider.
+    const results = await nominatimGeocoder(server.url, 'Denver', false)
+    assert.equal(results.length, 1)
+  } finally {
+    await server.close()
+  }
+})
+
+// The Javalin signatures still fire, so narrowing did not disable the check.
+test('the Javalin 404 body is still diagnosed as Photon', async () => {
+  const server = await serveOnce({
+    title: 'Endpoint GET /search not found',
+    status: 404,
+    type: 'https://javalin.io/documentation#endpointnotfound',
+  })
+  try {
+    await assert.rejects(
+      () => nominatimGeocoder(server.url, 'Denver', false),
+      /Photon instance/,
+    )
+  } finally {
+    await server.close()
+  }
+})
+
+// Nominatim reports neighbourhood-level data under `quarter` for many places:
+// 1521 N Hoyne Ave carries quarter "Wicker Park" and no neighbourhood key.
+// node-geocoder only reads address.neighbourhood, so both spellings came out
+// empty for exactly the responses the alias exists to surface.
+test('a quarter-shaped Nominatim response populates both neighborhood spellings', async () => {
+  const server = await serveOnce([
+    {
+      lat: '41.9088',
+      lon: '-87.6796',
+      display_name:
+        '1521, North Hoyne Avenue, Wicker Park, West Town, Chicago, Illinois, 60622, United States',
+      address: {
+        house_number: '1521',
+        road: 'North Hoyne Avenue',
+        quarter: 'Wicker Park',
+        suburb: 'West Town',
+        city: 'Chicago',
+        state: 'Illinois',
+        postcode: '60622',
+        country: 'United States',
+        country_code: 'us',
+      },
+    },
+  ])
+  try {
+    const results = await nominatimGeocoder(server.url, 'Denver', false)
+    assert.equal(results[0].neighbourhood, 'Wicker Park')
+    assert.equal(results[0].neighborhood, 'Wicker Park')
+  } finally {
+    await server.close()
+  }
+})
+
+// When an addressFormat is configured, the resolver's list still resolves the
+// Geocoder fields off these objects. Returning only the formatted triple made
+// neighborhood, suburb and the rest null for every formatted call.
+test('a formatted result keeps the mapped fields for the Geocoder type', async () => {
+  const server = await serveOnce({
+    type: 'FeatureCollection',
+    features: [
+      {
+        geometry: { type: 'Point', coordinates: [-87.6796, 41.9088] },
+        properties: {
+          housenumber: '1521',
+          street: 'North Hoyne Avenue',
+          locality: 'Wicker Park',
+          district: 'West Town',
+          city: 'Chicago',
+          state: 'Illinois',
+          postcode: '60622',
+          country: 'United States',
+          countrycode: 'US',
+          osm_key: 'building',
+          osm_value: 'yes',
+          type: 'house',
+        },
+      },
+    ],
+  })
+  try {
+    const results = await geocoder(
+      server.url,
+      '1521 N Hoyne',
+      false,
+      '{{city}}',
+      'photon',
+    )
+    assert.equal(results[0].formatted, 'Chicago')
+    assert.equal(results[0].neighborhood, 'Wicker Park')
+    assert.equal(results[0].suburb, 'West Town')
+    assert.equal(results[0].streetNumber, '1521')
+  } finally {
+    await server.close()
   }
 })
