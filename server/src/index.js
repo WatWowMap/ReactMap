@@ -41,6 +41,9 @@ const { bindConnections } = require('./models')
 const { migrate } = require('./db/migrate')
 const { rootRouter } = require('./routes/rootRouter')
 const { getAuth, buildAuthRoutePrefix } = require('./auth')
+const {
+  createUsernameAvailabilityGate,
+} = require('./auth/usernameAvailability')
 
 const startServer = async () => {
   await state.event.initialize()
@@ -101,6 +104,13 @@ const startServer = async () => {
   if (config.getSafe('api.enableHelmet')) {
     app.use(helmetMiddleware())
   }
+
+  // Blocks POST is-username-available outright unless local sign-up is on --
+  // see server/src/auth/usernameAvailability.js. Has to run ahead of the
+  // handler mount below so it can 404 before Better Auth ever answers.
+  app.use(
+    createUsernameAvailabilityGate(config.getSafe('authentication.strategies')),
+  )
 
   // Better auth reads the raw body itself, so it must sit ahead of the json
   // body parser below, which would otherwise consume the stream first. It
