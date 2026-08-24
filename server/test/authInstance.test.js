@@ -46,3 +46,12 @@ test('the auth tables are the prefixed ones, not the existing users table', () =
 test('the base url comes straight from config', () => {
   expect(buildAuthOptions(baseConfig).baseURL).toBe('http://localhost:8080')
 })
+
+test('passwords hash as bcrypt, so existing hashes keep verifying', async () => {
+  const { hash, verify } =
+    buildAuthOptions(baseConfig).emailAndPassword.password
+  const hashed = await hash('reactmap')
+  expect(hashed.startsWith('$2b$')).toBe(true)
+  expect(await verify({ hash: hashed, password: 'reactmap' })).toBe(true)
+  expect(await verify({ hash: hashed, password: 'wrong' })).toBe(false)
+})

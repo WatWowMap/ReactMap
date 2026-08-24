@@ -31,7 +31,22 @@ function buildAuthOptions(input) {
   return {
     baseURL: input.baseURL,
     secret: input.sessionSecret,
-    emailAndPassword: { enabled: true },
+    emailAndPassword: {
+      enabled: true,
+      // Better Auth hashes with scrypt by default, storing `salt:hash` hex.
+      // ReactMap has always stored bcrypt (`$2b$`, cost 10, originally from
+      // bcrypt@5.1.1). Those formats are not interchangeable, so a back-filled
+      // hash would insert cleanly and then fail every verification, locking out
+      // every local-auth user with no error anywhere to explain it.
+      //
+      // Staying on bcrypt keeps one format across the migration. Bun.password
+      // detects the algorithm from the hash prefix, so this verifies legacy
+      // rows and anything written from here on.
+      password: {
+        hash: (password) => Bun.password.hash(password, 'bcrypt'),
+        verify: ({ hash, password }) => Bun.password.verify(password, hash),
+      },
+    },
     socialProviders,
     // Point at the prefixed tables. The unprefixed `session` name belongs to
     // express-mysql-session and `users` to the pre-2.0 user table.
