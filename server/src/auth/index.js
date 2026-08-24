@@ -58,6 +58,25 @@ function buildAuthOptions(input) {
   }
 }
 
+const AUTH_ROUTE_PREFIX = '/api/auth'
+
+function buildAuthRoutePrefix() {
+  return AUTH_ROUTE_PREFIX
+}
+
+/**
+ * Passport currently owns `/auth/*`, so better auth is mounted under
+ * `/api/auth/*` and the two do not overlap while both are running.
+ *
+ * @param {string} pathname
+ */
+function isAuthRequest(pathname) {
+  return (
+    pathname === AUTH_ROUTE_PREFIX ||
+    pathname.startsWith(`${AUTH_ROUTE_PREFIX}/`)
+  )
+}
+
 /** @type {any} */
 let cached = null
 
@@ -104,4 +123,9 @@ function getAuth() {
   return cached
 }
 
-module.exports = { getAuth, buildAuthOptions }
+module.exports = {
+  getAuth,
+  buildAuthOptions,
+  buildAuthRoutePrefix,
+  isAuthRequest,
+}

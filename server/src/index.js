@@ -12,6 +12,7 @@ const { rainbow } = require('chalkercli')
 const cors = require('cors')
 const { json } = require('body-parser')
 const http = require('http')
+const { toNodeHandler } = require('better-auth/node')
 
 const { log, TAGS, Logger } = require('@rm/logger')
 const config = require('@rm/config')
@@ -36,6 +37,7 @@ const { startApollo } = require('./graphql/server')
 const { bindConnections } = require('./models')
 const { migrate } = require('./db/migrate')
 const { rootRouter } = require('./routes/rootRouter')
+const { getAuth, buildAuthRoutePrefix } = require('./auth')
 
 const startServer = async () => {
   await state.event.initialize()
@@ -63,6 +65,11 @@ const startServer = async () => {
   await starti18n(path.resolve(distDir, 'locales'))
 
   const app = express()
+
+  // Better auth reads the raw body itself, so it must sit ahead of the json
+  // body parser below (bundled into the next `app.use`), which would
+  // otherwise consume the stream first.
+  app.all(`${buildAuthRoutePrefix()}/*splat`, toNodeHandler(getAuth()))
 
   app.use(
     loggerMiddleware,
