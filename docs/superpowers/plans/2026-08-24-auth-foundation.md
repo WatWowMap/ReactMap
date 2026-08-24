@@ -1132,10 +1132,16 @@ const { test, expect } = require('bun:test')
 const { planBackfill } = require('../src/auth/backfill')
 
 test('accounts carry the issuer strings better auth generates', () => {
-  const plan = planBackfill({ id: 7, username: 'ash', password: '$2b$10$h', discordId: '99' })
+  const plan = planBackfill({
+    id: 7, username: 'ash', password: '$2b$10$h', discordId: '99', telegramId: '55',
+  })
   const byProvider = Object.fromEntries(plan.accounts.map((a) => [a.providerId, a.issuer]))
   expect(byProvider.credential).toBe('local:credential')
   expect(byProvider.discord).toBe('local:oauth:discord')
+  // Telegram is a local provider, not OAuth. Its plugin looks this exact string
+  // up, so `local:oauth:telegram` would be invisible to it and every migrated
+  // Telegram user would silently fail to sign in.
+  expect(byProvider.telegram).toBe('local:telegram')
 })
 
 test('a local account keeps its password hash on the account row', () => {
@@ -1211,19 +1217,22 @@ Expected: FAIL, `Cannot find module '../src/auth/backfill'`.
 // @ts-check
 const crypto = require('crypto')
 
-/**
- * Rebuilds the issuer strings `@better-auth/core` generates, because a row this
- * back-fill writes has to look exactly like one Better Auth would have written.
- * Getting these wrong does not fail loudly: the row inserts fine and the person
- * simply cannot sign in.
- */
-function localIssuer(providerId) {
-  return `local:${encodeURIComponent(providerId)}`
-}
-
-function oauthIssuer(providerId) {
-  return `local:oauth:${encodeURIComponent(providerId)}`
-}
+// Import the issuer helpers rather than reimplementing them. A row this
+// back-fill writes has to look exactly like one Better Auth would have written,
+// and getting it wrong does not fail loudly: the row inserts fine and the person
+// simply cannot sign in. Reconstructing the format by hand is how that happens,
+// so the library stays the single source of truth.
+//
+// Which helper applies is per provider, and it is not guessable from the name.
+// Telegram is a local provider, not OAuth, because its login widget is an
+// HMAC-signed payload rather than an OAuth2 flow. So it gets `local:telegram`
+// while Discord gets `local:oauth:discord`. The Telegram plugin in
+// `server/src/auth/telegram.js` looks up `createLocalAccountIssuer('telegram')`,
+// and a row written under any other issuer is invisible to it.
+const {
+  createLocalAccountIssuer,
+  createOAuthAccountIssuer,
+} = require('better-auth/db')
 
 /**
  * Derives a stable auth_user id from the legacy numeric id, so the back-fill
@@ -1266,7 +1275,7 @@ function planBackfill(row) {
   if (row.password) {
     accounts.push({
       providerId: 'credential',
-      issuer: localIssuer('credential'),
+      issuer: createLocalAccountIssuer('credential'),
       // Better Auth writes the user's own id here for credential accounts,
       // verified by inspecting a row it created. Putting the username here
       // instead would diverge from every row Better Auth writes afterwards.
@@ -1278,7 +1287,7 @@ function planBackfill(row) {
   if (row.discordId) {
     accounts.push({
       providerId: 'discord',
-      issuer: oauthIssuer('discord'),
+      issuer: createOAuthAccountIssuer('discord'),
       accountId: String(row.discordId),
       userId: id,
     })
@@ -1286,7 +1295,7 @@ function planBackfill(row) {
   if (row.telegramId) {
     accounts.push({
       providerId: 'telegram',
-      issuer: oauthIssuer('telegram'),
+      issuer: createLocalAccountIssuer('telegram'),
       accountId: String(row.telegramId),
       userId: id,
     })
@@ -1303,7 +1312,7 @@ function planBackfill(row) {
   return { user, accounts, perms }
 }
 
-module.exports = { planBackfill, authIdForLegacy, localIssuer, oauthIssuer }
+module.exports = { planBackfill, authIdForLegacy }
 ```
 
 - [ ] **Step 4: Run the test and watch it pass**
