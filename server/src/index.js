@@ -92,14 +92,7 @@ const startServer = async () => {
     })
   }
 
-  app.use(
-    loggerMiddleware,
-    noSourceMapMiddleware,
-    // `index: false` keeps serve-static from answering a bare `/` with the 1.0
-    // shell off disk, which would shadow the router that picks a shell per user.
-    express.static(distDir, { dotfiles: 'allow', index: false }),
-    compression(),
-  )
+  app.use(loggerMiddleware, noSourceMapMiddleware)
 
   if (config.getSafe('api.enableHelmet')) {
     app.use(helmetMiddleware())
@@ -118,6 +111,19 @@ const startServer = async () => {
   // that issue session cookies get security headers and an access log entry
   // like every other route.
   app.all(`${buildAuthRoutePrefix()}/*splat`, toNodeHandler(getAuth()))
+
+  // Static and compression come AFTER the auth handler, not before it.
+  // `compression` wraps res.write and res.end, and `toNodeHandler` bridges a Web
+  // Response into the Node stream in a way it never sees the flush for, so an
+  // auth request upstream of compression returns its status and then holds the
+  // connection open until the client gives up. Measured: /api/auth/ok answered
+  // 200 and hung for the full client timeout, every time.
+  app.use(
+    // `index: false` keeps serve-static from answering a bare `/` with the 1.0
+    // shell off disk, which would shadow the router that picks a shell per user.
+    express.static(distDir, { dotfiles: 'allow', index: false }),
+    compression(),
+  )
 
   app.use(
     express.json({

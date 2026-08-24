@@ -12,17 +12,24 @@ function loggerMiddleware(req, res, next) {
   let resBodySize = 0
 
   res.write = function write(chunk) {
-    resBodySize += chunk.length
+    resBodySize += chunk?.length || 0
+    // The return value is the backpressure signal: false means the internal
+    // buffer is full and the writer should wait for 'drain'. Dropping it
+    // returns undefined, which any streaming writer reads as "full", and it
+    // then waits for a drain that never comes. Express's own res.send ignores
+    // this, which is why every ordinary route worked while Better Auth's
+    // handler, which pipes a Web ReadableStream, hung until the client gave up.
     // biome-ignore lint/complexity/noArguments: forwards the caller's exact arity to the original res.write
-    oldWrite.apply(res, arguments)
+    return oldWrite.apply(res, arguments)
   }
 
   res.end = function end(chunk) {
     if (chunk) {
       resBodySize += chunk.length
     }
+    // Returns `res` for chaining; dropping it breaks callers that chain.
     // biome-ignore lint/complexity/noArguments: forwards the caller's exact arity to the original res.end
-    oldEnd.apply(res, arguments)
+    return oldEnd.apply(res, arguments)
   }
 
   res.on('finish', () => {
