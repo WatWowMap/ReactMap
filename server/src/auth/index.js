@@ -17,6 +17,31 @@ const { createSignInGateCheck } = require('./signInGate')
 const { createEnforceMaxSessions } = require('./maxSessions')
 const { hashPassword, verifyPassword } = require('../services/localPassword')
 
+// Better Auth's own hard minimum. `config/default.json` used to ship a fixed
+// 31-character placeholder -- one character under this floor -- shared by
+// every install that never overrode `api.sessionSecret`. That secret now
+// signs every session cookie, so a shared or short value is a forgeable
+// session, not just a Better Auth warning. Refusing to start is the chosen
+// fix over silently generating and persisting one on first boot: this
+// codebase has no existing mechanism for writing config files at runtime
+// (`packages/config/lib/mutations.js` only ever mutates the in-memory
+// config object), and a refusal is loud and unmissable in exactly the way a
+// silently-written file would not be, at the cost of requiring every
+// upgrading install -- including ones already running the old shipped
+// value -- to set a real secret once.
+const MIN_SESSION_SECRET_LENGTH = 32
+
+/**
+ * @param {string} secret
+ */
+function assertSessionSecret(secret) {
+  if (!secret || secret.length < MIN_SESSION_SECRET_LENGTH) {
+    throw new Error(
+      `api.sessionSecret must be set to a random string of at least ${MIN_SESSION_SECRET_LENGTH} characters -- it now signs every session cookie. Generate one (for example: \`openssl rand -base64 32\`) and set it in your local.json or the API_SESSION_SECRET environment variable.`,
+    )
+  }
+}
+
 /**
  * Pure option construction, split out so the wiring can be tested without
  * opening a database connection.
@@ -195,6 +220,7 @@ let cached = null
 
 function getAuth() {
   if (cached) return cached
+  assertSessionSecret(config.getSafe('api.sessionSecret'))
   const telegram = config
     .getSafe('authentication.strategies')
     .find((s) => s.type === 'telegram' && s.enabled)
@@ -248,4 +274,5 @@ module.exports = {
   buildAuthOptions,
   buildAuthRoutePrefix,
   isAuthRequest,
+  assertSessionSecret,
 }

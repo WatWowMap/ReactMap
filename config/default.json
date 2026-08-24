@@ -13,7 +13,7 @@
     "skipUpdateCheck": false
   },
   "api": {
-    "sessionSecret": "98ki^e72~!@#(85o3kXLI*#c9wu5l!Z",
+    "sessionSecret": "",
     "reactMapSecret": "",
     "enableHelmet": false,
     "showSchemasInConfigApi": false,

@@ -5,6 +5,7 @@
   "reloadConfigOnSave": true,
   "api": {
     "reactMapSecret": "You Should Change Me",
+    "sessionSecret": "Change Me To A Random String Of At Least 32 Characters",
     "maxSessions": 5
   },
   "map": {
