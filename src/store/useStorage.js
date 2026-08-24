@@ -235,6 +235,5 @@ export function useDeepStore(field, defaultValue) {
     [field, defaultValue],
   )
 
-  // @ts-expect-error
   return useMemo(() => [value, callback], [value, callback])
 }

@@ -94,7 +94,6 @@ class TelegramClient extends AuthClient {
     /** @type { TGUser & { perms: import("@rm/types").Permissions }} */
     const newUserObj = {
       ...user,
-      // @ts-expect-error
       perms: {
         ...perms,
         trial: gainedAccessViaTrial,

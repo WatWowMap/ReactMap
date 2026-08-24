@@ -11,14 +11,12 @@ function loggerMiddleware(req, res, next) {
   const oldEnd = res.end
   let resBodySize = 0
 
-  // @ts-expect-error
   res.write = function write(chunk) {
     resBodySize += chunk.length
     // biome-ignore lint/complexity/noArguments: forwards the caller's exact arity to the original res.write
     oldWrite.apply(res, arguments)
   }
 
-  // @ts-expect-error
   res.end = function end(chunk) {
     if (chunk) {
       resBodySize += chunk.length

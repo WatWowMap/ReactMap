@@ -86,7 +86,6 @@ export function SliderTile({
           setText(existing)
           if (existing.every((x) => typeof x === 'number')) {
             // annoying but TypeScript is rude for not liking my check above
-            // @ts-expect-error
             handleChange(name, existing)
           }
         },

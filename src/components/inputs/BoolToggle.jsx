@@ -83,7 +83,6 @@ export function DualBoolToggle({
         <Grid2 key={item} xs={6} component={List}>
           {item && (
             <BoolToggle
-              // @ts-expect-error
               field={`${field}.${item}`}
               label={labels[i] || labels[0] || item}
               disablePadding

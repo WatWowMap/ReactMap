@@ -159,7 +159,6 @@ export function AdvancedFilter() {
                           ...each,
                           disabled: each.disabled || controlsDisabled,
                         }}
-                        // @ts-expect-error
                         handleChange={handleChange}
                         values={filters[each.name]}
                       />

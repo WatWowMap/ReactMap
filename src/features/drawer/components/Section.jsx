@@ -83,7 +83,6 @@ const DrawerSection = ({ category }) => {
                     (subItem === 'sliders' || subItem === 'active')
                   ) && (
                     <BoolToggle
-                      // @ts-expect-error
                       field={`filters.${
                         hasSubSubCategories ? subItem : category
                       }.${hasSubSubCategories ? 'enabled' : subItem}`}

@@ -33,7 +33,6 @@ const handleChange = (category, subCategory) => (event) => {
     `Category: ${category} Name: ${subCategory}.${event.target.name}`,
   )
   setDeepStore(
-    // @ts-expect-error
     `menus.${category}.filters.${subCategory}.${event.target.name}`,
     event.target.checked,
   )

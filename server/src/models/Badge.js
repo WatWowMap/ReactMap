@@ -52,7 +52,6 @@ class Badge extends Model {
    * @param {number} userId
    */
   static async insert(badge, gymId, userId) {
-    // @ts-expect-error
     if (
       await Badge.query()
         .where('gymId', gymId)

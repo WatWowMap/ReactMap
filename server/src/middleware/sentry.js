@@ -52,7 +52,6 @@ function sentryMiddleware(_req, res, next) {
 
   if (sentry.enabled || process.env.SENTRY_DSN) {
     const transaction =
-      // @ts-expect-error
       res.__sentry_transaction ??
       Sentry.startTransaction({ name: 'POST /graphql' })
     Sentry.configureScope((scope) => {
