@@ -192,6 +192,37 @@ test('rejects a non-positive capacity', () => {
   expect(() => new LruCache(0)).toThrow()
 })
 
+test('clear empties the cache', () => {
+  const cache = new LruCache<string, number>(3)
+  cache.set('a', 1)
+  cache.set('b', 2)
+  cache.clear()
+  expect(cache.size).toBe(0)
+  expect(cache.has('a')).toBe(false)
+  expect(cache.get('b')).toBeUndefined()
+})
+
+test('atlas.clear forces the next getIconFor for a previously-cached key to redraw', () => {
+  let drawCount = 0
+  const atlas = createAtlas({
+    capacity: 10,
+    draw: (_entity, key): IconDescriptor => {
+      drawCount += 1
+      return { id: key, url: `data:${key}`, width: 32, height: 32 }
+    },
+  })
+
+  atlas.getIconFor(BASE)
+  atlas.getIconFor(BASE)
+  expect(drawCount).toBe(1)
+
+  atlas.clear()
+  atlas.getIconFor(BASE)
+
+  expect(drawCount).toBe(2)
+  expect(atlas.cache.size).toBe(1)
+})
+
 test('getIconFor draws once per distinct key and reuses the cached descriptor on repeats', () => {
   let drawCount = 0
   const seenKeys: string[] = []

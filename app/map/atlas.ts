@@ -66,6 +66,17 @@ export class LruCache<K, V> {
       if (oldest !== undefined) this.#store.delete(oldest)
     }
   }
+
+  /**
+   * Drops every entry. Used to re-warm the atlas after WebGL context
+   * restoration (see useWebglContextRecovery.ts / MapCanvas.tsx): the
+   * cached descriptors' composited pixels rode on the GPU resources the
+   * lost context took with it, so keeping them around would serve stale
+   * icons instead of ones drawn for the new context.
+   */
+  clear(): void {
+    this.#store.clear()
+  }
 }
 
 /** What `IconLayer`'s `getIcon` accessor needs for one marker. */
@@ -107,6 +118,8 @@ export function createAtlas({
 }: AtlasOptions): {
   getIconFor: (entity: PokemonEntity) => IconDescriptor
   cache: LruCache<string, IconDescriptor>
+  /** Drops every cached icon. See `LruCache.clear` for why. */
+  clear: () => void
 } {
   const cache = new LruCache<string, IconDescriptor>(capacity)
 
@@ -119,5 +132,5 @@ export function createAtlas({
     return drawn
   }
 
-  return { getIconFor, cache }
+  return { getIconFor, cache, clear: () => cache.clear() }
 }

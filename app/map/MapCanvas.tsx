@@ -11,6 +11,7 @@ import type { GymEntity, MapEntity, MapQuery, PokemonEntity } from './types'
 import { useDismissOnEscape } from './useDismissOnEscape'
 import type { Camera } from './useMapLibre'
 import { anchorFor, pickedEntityFrom, useMapLibre } from './useMapLibre'
+import { useWebglContextRecovery } from './useWebglContextRecovery'
 
 export interface MapCanvasProps {
   initialCamera: Camera
@@ -79,11 +80,29 @@ export function MapCanvas({ initialCamera, onCameraChange }: MapCanvasProps) {
   // popup, so one nullable slot is the whole model.
   const [selected, setSelected] = useState<MapEntity | null>(null)
 
+  // Bumped on WebGL context restoration purely to force `layers` below to
+  // recompute immediately. buildMapLayers already gets fresh Layer
+  // instances every clock tick regardless, since `now` is in its deps -
+  // this just closes the gap between "context restored" and "next tick"
+  // rather than leaving the map blank for up to a second.
+  const [rebuildToken, setRebuildToken] = useState(0)
+
   const handlePick = useCallback((info: PickingInfo) => {
     setSelected(pickedEntityFrom(info))
   }, [])
 
   const closePopup = useCallback(() => setSelected(null), [])
+
+  // The atlas's cached icons are gone the moment the context that held
+  // their composited pixels dies, so restoration re-warms it before
+  // forcing the layer rebuild - a rebuild that reused the stale cache
+  // would still hand deck.gl icons composited for a context that no
+  // longer exists, which task-6-7-brief.md calls out as rendering an
+  // empty map with no error.
+  const handleContextRestore = useCallback(() => {
+    atlasRef.current?.clear()
+    setRebuildToken((token) => token + 1)
+  }, [])
 
   useDismissOnEscape(selected !== null, closePopup)
 
@@ -122,7 +141,9 @@ export function MapCanvas({ initialCamera, onCameraChange }: MapCanvasProps) {
       getGymIcon: drawGymIcon,
       now,
     })
-  }, [pokemon, gyms, now])
+    // rebuildToken is intentionally in this array with no other purpose
+    // than to invalidate this memo; see handleContextRestore above.
+  }, [pokemon, gyms, now, rebuildToken])
 
   const { containerRef, screenPosition } = useMapLibre({
     initialCamera,
@@ -132,6 +153,10 @@ export function MapCanvas({ initialCamera, onCameraChange }: MapCanvasProps) {
     anchor,
   })
 
+  const { restoring } = useWebglContextRecovery(containerRef, {
+    onRestore: handleContextRestore,
+  })
+
   return (
     <div
       className="relative h-[calc(100dvh-4rem)] w-full"
@@ -139,6 +164,14 @@ export function MapCanvas({ initialCamera, onCameraChange }: MapCanvasProps) {
       aria-label="Map"
     >
       <div ref={containerRef} className="h-full w-full" />
+      {restoring && (
+        <div
+          role="status"
+          className="absolute inset-0 flex items-center justify-center bg-black/60 text-white"
+        >
+          Restoring map…
+        </div>
+      )}
       {selected && screenPosition && (
         <Popup
           entity={selected}
