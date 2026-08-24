@@ -18,7 +18,8 @@
     "lineWidth": 80
   },
   "css": {
-    "formatter": { "quoteStyle": "single" }
+    "formatter": { "quoteStyle": "single" },
+    "parser": { "tailwindDirectives": true }
   },
   "javascript": {
     "formatter": {

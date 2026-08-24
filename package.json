@@ -182,6 +182,7 @@
     "@semantic-release/changelog": "^6.0.3",
     "@semantic-release/git": "^10.0.1",
     "@sentry/vite-plugin": "4.6.2",
+    "@tailwindcss/vite": "4.3.3",
     "@types/dlv": "^1.1.2",
     "@types/leaflet": "^1.9.21",
     "@types/node": "^22.20.1",
@@ -196,6 +197,7 @@
     "nodemon": "3.1.14",
     "rollup-plugin-delete": "^2.0.0",
     "semantic-release": "^22",
+    "tailwindcss": "4.3.3",
     "typescript": "5.5.4",
     "vite": "^6.4.3",
     "vite-plugin-checker": "0.7.2"

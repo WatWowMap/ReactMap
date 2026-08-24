@@ -4,6 +4,7 @@
 
 const { defineConfig, loadEnv, createLogger } = require('vite')
 const { default: react } = require('@vitejs/plugin-react-swc')
+const { default: tailwindcss } = require('@tailwindcss/vite')
 const { default: checker } = require('vite-plugin-checker')
 const removeFiles = require('rollup-plugin-delete')
 const { resolve } = require('path')
@@ -72,6 +73,7 @@ const viteConfig = defineConfig(({ mode }) => {
   return {
     plugins: [
       react(),
+      tailwindcss(),
       ...(isDevelopment
         ? [
             checker({
@@ -111,6 +113,7 @@ const viteConfig = defineConfig(({ mode }) => {
         '@services': resolve(__dirname, './src/services'),
         '@utils': resolve(__dirname, './src/utils'),
         '@store': resolve(__dirname, './src/store'),
+        '@app': resolve(__dirname, './app'),
       },
     },
     define: {
@@ -161,11 +164,14 @@ const viteConfig = defineConfig(({ mode }) => {
         isDevelopment || config.getSafe('devOptions.skipMinified')
           ? false
           : 'esbuild',
-      input: { main: resolve(__dirname, 'index.html') },
       assetsDir: '',
       emptyOutDir: true,
       chunkSizeWarningLimit: 2000,
       rollupOptions: {
+        input: {
+          main: resolve(__dirname, 'index.html'),
+          app: resolve(__dirname, 'app.html'),
+        },
         plugins: [
           // @ts-expect-error
           removeFiles({
