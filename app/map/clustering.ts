@@ -70,9 +70,33 @@ function toFeature(entity: ClusterableEntity): {
   }
 }
 
+interface Rendered<T> {
+  clusters: ClusterMarker[]
+  points: T[]
+}
+
+/**
+ * Last-resort cap for when even zoom 0 will not fit: keep the markers
+ * standing for the most entities. A cluster covers at least `minPoints`
+ * entities and a loose point covers one, so clusters by descending count come
+ * first and points fill whatever budget is left. This maximises how much of
+ * the data is still represented on screen, which is the only defensible
+ * ordering when something genuinely has to go.
+ */
+function keepDensest<T>(rendered: Rendered<T>, limit: number): Rendered<T> {
+  const clusters = [...rendered.clusters]
+    .sort((a, b) => b.count - a.count)
+    .slice(0, limit)
+  return {
+    clusters,
+    points: rendered.points.slice(0, Math.max(0, limit - clusters.length)),
+  }
+}
+
 /**
  * Clusters `entities` for one viewport/zoom and enforces `rules.forcedLimit`
- * as a hard cap on the rendered set, independent of zoom.
+ * as a hard cap on the total rendered set - clusters plus loose points -
+ * independent of zoom.
  *
  * supercluster's `maxZoom` is the zoom ABOVE WHICH it stops clustering and
  * returns raw, unclustered points - it is not a bound on how many markers
@@ -83,13 +107,29 @@ function toFeature(entity: ClusterableEntity): {
  * stops clustering, so every entity in view comes back individually and
  * nothing enforces the limit any more.
  *
- * This keeps `maxZoom: rules.zoomLevel` (the configured "zoom in to
- * declutter" behaviour is still worth having below that zoom) but then
- * caps the combined cluster+point count against `forcedLimit` itself,
- * after clustering runs, so the bound holds at every zoom rather than only
- * while supercluster is still willing to cluster. Clusters are kept in
- * full and loose points are truncated first, since a cluster already
- * represents many entities in one cheap marker.
+ * An earlier pass at this capped only `points`, against a budget of
+ * `forcedLimit - clusters.length`, which binds for a uniformly scattered
+ * map and for nothing else. Give it many well-separated small groups - a
+ * country of small towns with a few gyms each - and every group survives as
+ * its own cluster, the point budget is zero before any capping happens, and
+ * the cluster count runs unbounded. Measured at gym rules with 3500 groups
+ * of 5, zooms 8, 10 and 13 each rendered 3500 markers against a limit of
+ * 2500.
+ *
+ * The cap here is on the total, and it is applied by COARSENING rather than
+ * by dropping markers: if the count at the requested zoom does not fit, the
+ * same index is queried at successively lower zooms until it does. Every
+ * entity in view is then still standing behind some marker, just a bigger
+ * one, which is the property that separates a decluttered map from a map
+ * that has silently deleted a third of its towns. Dropping the smallest
+ * clusters would have made whole regions vanish with nothing on screen
+ * saying so, and truncating an arbitrary slice is worse again.
+ *
+ * Only if even zoom 0 does not fit does anything get dropped, and then the
+ * markers kept are the ones standing for the most entities (see
+ * `keepDensest`). That path needs a `forcedLimit` smaller than the number of
+ * clusters the whole world collapses to, so in practice it is a guard, not a
+ * behaviour.
  */
 export function clusterEntities<T extends ClusterableEntity>(
   entities: readonly T[],
@@ -111,37 +151,45 @@ export function clusterEntities<T extends ClusterableEntity>(
     bounds.east,
     bounds.north,
   ]
-  const raw = index.getClusters(bbox, Math.round(zoom))
-
   const byId = new Map(entities.map((entity) => [entity.id, entity]))
-  const clusters: ClusterMarker[] = []
-  const points: T[] = []
-  for (const feature of raw) {
-    const [lon, lat] = feature.geometry.coordinates
-    const properties = feature.properties
-    if (properties.cluster === true) {
-      clusters.push({
-        kind: 'cluster',
-        id: `cluster-${feature.id}`,
-        lat,
-        lon,
-        count: properties.point_count as number,
-      })
-    } else if (feature.id !== undefined) {
-      const entity = byId.get(String(feature.id))
-      if (entity) points.push(entity)
+
+  const collect = (at: number): Rendered<T> => {
+    const clusters: ClusterMarker[] = []
+    const points: T[] = []
+    for (const feature of index.getClusters(bbox, at)) {
+      const [lon, lat] = feature.geometry.coordinates
+      const properties = feature.properties
+      if (properties.cluster === true) {
+        clusters.push({
+          kind: 'cluster',
+          id: `cluster-${feature.id}`,
+          lat,
+          lon,
+          count: properties.point_count as number,
+        })
+      } else if (feature.id !== undefined) {
+        const entity = byId.get(String(feature.id))
+        if (entity) points.push(entity)
+      }
     }
+    return { clusters, points }
   }
 
-  const rendered = clusters.length + points.length
-  if (rendered <= rules.forcedLimit) {
-    return { points, clusters, limitHit: false }
+  const fits = (rendered: Rendered<T>) =>
+    rendered.clusters.length + rendered.points.length <= rules.forcedLimit
+
+  const requested = Math.round(zoom)
+  const first = collect(requested)
+  if (fits(first)) return { ...first, limitHit: false }
+
+  // Everything above `zoomLevel` returns the same unclustered set, so the
+  // descent starts at `zoomLevel` rather than walking those zooms one by one
+  // to get the identical answer each time.
+  let coarsest = first
+  for (let at = Math.min(requested - 1, rules.zoomLevel); at >= 0; at -= 1) {
+    coarsest = collect(at)
+    if (fits(coarsest)) return { ...coarsest, limitHit: true }
   }
 
-  const pointBudget = Math.max(0, rules.forcedLimit - clusters.length)
-  return {
-    points: points.slice(0, pointBudget),
-    clusters,
-    limitHit: true,
-  }
+  return { ...keepDensest(coarsest, rules.forcedLimit), limitHit: true }
 }

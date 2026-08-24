@@ -26,6 +26,36 @@ function scatter(count: number): ClusterableEntity[] {
   }))
 }
 
+/**
+ * `groupCount` well-separated groups of `size` entities each, laid out on a
+ * grid across `BOUNDS`. This is the shape the uniform `scatter` above cannot
+ * produce and the one that broke the cap: every group is far enough from its
+ * neighbours to survive as its own cluster, so the cluster count alone runs
+ * past `forcedLimit` while the loose-point budget is already zero. A map of
+ * many small towns, each with a handful of gyms, viewed at country zoom.
+ */
+function groupsOf(groupCount: number, size: number): ClusterableEntity[] {
+  const columns = Math.ceil(Math.sqrt(groupCount))
+  const rows = Math.ceil(groupCount / columns)
+  const entities: ClusterableEntity[] = []
+  for (let group = 0; group < groupCount; group += 1) {
+    const column = group % columns
+    const row = Math.floor(group / columns)
+    const lon =
+      BOUNDS.west + ((column + 0.5) / columns) * (BOUNDS.east - BOUNDS.west)
+    const lat =
+      BOUNDS.south + ((row + 0.5) / rows) * (BOUNDS.north - BOUNDS.south)
+    for (let member = 0; member < size; member += 1) {
+      entities.push({
+        id: `group-${group}-${member}`,
+        lat: lat + member * 0.00002,
+        lon: lon + member * 0.00002,
+      })
+    }
+  }
+  return entities
+}
+
 const RULES: ClusterRules = { zoomLevel: 10, forcedLimit: 200, minPoints: 5 }
 
 /*
@@ -65,14 +95,24 @@ test('clusterEntities groups nearby points into clusters below zoomLevel', () =>
   expect(clusteredCount + result.points.length).toBe(500)
 })
 
-test('clusterEntities keeps every cluster and truncates only loose points when capping', () => {
+/*
+ * This asserted the earlier policy, keep every cluster and truncate points,
+ * and it is now wrong on purpose: capping coarsens instead of truncating, so
+ * a set that came back as 2000 loose points at zoom 20 comes back as clusters
+ * drawn at whatever lower zoom first fits. What matters is that the total
+ * binds and that nothing was thrown away to make it bind.
+ */
+test('clusterEntities caps by coarsening rather than by dropping markers', () => {
   const entities = scatter(2000)
   const result = clusterEntities(entities, BOUNDS, 20, RULES)
-  // At zoom 20 (past zoomLevel 10) supercluster returns no clusters at all,
-  // so this exercises the plain truncation path: the cap comes entirely
-  // out of `points`, and `clusters` stays empty.
-  expect(result.clusters.length).toBe(0)
-  expect(result.points.length).toBe(RULES.forcedLimit)
+  expect(result.clusters.length).toBeGreaterThan(0)
+  expect(result.clusters.length + result.points.length).toBeLessThanOrEqual(
+    RULES.forcedLimit,
+  )
+  const represented =
+    result.clusters.reduce((sum, cluster) => sum + cluster.count, 0) +
+    result.points.length
+  expect(represented).toBe(2000)
 })
 
 test('clusterEntities is deterministic for the same inputs', () => {
@@ -80,4 +120,59 @@ test('clusterEntities is deterministic for the same inputs', () => {
   const first = clusterEntities(entities, BOUNDS, 20, RULES)
   const second = clusterEntities(entities, BOUNDS, 20, RULES)
   expect(first.points.map((p) => p.id)).toEqual(second.points.map((p) => p.id))
+})
+
+/*
+ * The many-small-groups shape. `scatter` above is uniform, so at any zoom
+ * past `zoomLevel` it yields loose points only and the cap comes entirely out
+ * of the point budget - which is exactly why it passed while this failed.
+ * With 800 separated groups of 5 the clusters alone are 800 against a limit
+ * of 200, the point budget is already zero, and capping only points caps
+ * nothing. Measured on the pre-fix code at gym rules and 3500 groups:
+ * zoom 8, 10 and 13 each rendered 3500 clusters against a limit of 2500.
+ */
+test('clusterEntities bounds the total when clusters alone exceed the limit', () => {
+  const entities = groupsOf(800, 5)
+  for (const zoom of [4, 8, 10, 13, 20]) {
+    const result = clusterEntities(entities, BOUNDS, zoom, RULES)
+    const rendered = result.clusters.length + result.points.length
+    expect(`zoom ${zoom}: ${rendered}`).toBe(
+      `zoom ${zoom}: ${Math.min(rendered, RULES.forcedLimit)}`,
+    )
+  }
+})
+
+test('clusterEntities flags limitHit for the many-small-groups shape', () => {
+  const result = clusterEntities(groupsOf(800, 5), BOUNDS, 10, RULES)
+  expect(result.limitHit).toBe(true)
+})
+
+/*
+ * Coarsening is what keeps the cap from being a silent deletion: every entity
+ * in view is still standing behind some marker, just a bigger one. If this
+ * ever regresses to truncation the sum drops below the input count.
+ */
+test('clusterEntities represents every entity even when it has to cap', () => {
+  const entities = groupsOf(800, 5)
+  const result = clusterEntities(entities, BOUNDS, 10, RULES)
+  const represented =
+    result.clusters.reduce((sum, cluster) => sum + cluster.count, 0) +
+    result.points.length
+  expect(represented).toBe(entities.length)
+})
+
+test('clusterEntities bounds a mix of one dense blob and many small groups', () => {
+  const blob = Array.from({ length: 4000 }, (_, index) => ({
+    id: `blob-${index}`,
+    lat: BOUNDS.south + 0.5 + index * 0.000001,
+    lon: BOUNDS.west + 0.5 + index * 0.000001,
+  }))
+  const entities = [...groupsOf(600, 5), ...blob, ...scatter(1000)]
+  for (const zoom of [4, 10, 14, 20]) {
+    const result = clusterEntities(entities, BOUNDS, zoom, RULES)
+    const rendered = result.clusters.length + result.points.length
+    expect(`zoom ${zoom}: ${rendered}`).toBe(
+      `zoom ${zoom}: ${Math.min(rendered, RULES.forcedLimit)}`,
+    )
+  }
 })
