@@ -66,18 +66,88 @@ test('an absent optional field cannot collide with a present one sharing its num
   expect(iconKeyFor(withBadge)).not.toBe(iconKeyFor(withoutBadge))
 })
 
-test('keying on spawnId instead of pokemonId would fail this: 5000 fixture pokemon collapse into far fewer appearance keys', () => {
+/**
+ * The capacity `createAtlas` defaults to. Duplicated rather than exported
+ * from atlas.ts so that moving the default is a deliberate edit here too.
+ */
+const DEFAULT_CAPACITY = 512
+
+/**
+ * A box inside the fixture area holding roughly one screenful of markers.
+ * Viewport scale is the condition that matters: the map draws a few hundred
+ * markers at a time, not all five thousand.
+ */
+const VIEWPORT = { west: -0.12, south: 51.25, east: 0.12, north: 51.75 }
+
+/**
+ * Thresholds are a floor on usefulness, not a record of the current number.
+ * A cache that serves under a quarter of a cold viewport pass is not paying
+ * for itself, and the fixture feeding it has stopped resembling a real
+ * viewport. Measured against the fixtures at the time of writing: 42.5
+ * percent over a viewport batch and 73.2 percent over the full set, so both
+ * floors have room beneath them. Uniformly random fixtures score 1.1 and 1.4
+ * percent, so the gap either side of these lines is wide.
+ */
+const VIEWPORT_MIN_HIT_RATE = 0.25
+const FULL_SET_MIN_HIT_RATE = 0.5
+
+function viewportBatch(): PokemonEntity[] {
+  return getFixturePokemon().filter(
+    (entity) =>
+      entity.lat >= VIEWPORT.south &&
+      entity.lat <= VIEWPORT.north &&
+      entity.lon >= VIEWPORT.west &&
+      entity.lon <= VIEWPORT.east,
+  )
+}
+
+/** An atlas that counts composites, so a pass reports its own hit rate. */
+function countingAtlas() {
+  let draws = 0
+  const atlas = createAtlas({
+    capacity: DEFAULT_CAPACITY,
+    draw: (_entity, key): IconDescriptor => {
+      draws += 1
+      return { id: key, url: `data:${key}`, width: 32, height: 32 }
+    },
+  })
+  return {
+    pass(entities: PokemonEntity[]) {
+      const before = draws
+      for (const entity of entities) atlas.getIconFor(entity)
+      const drawn = draws - before
+      return { drawn, hitRate: 1 - drawn / entities.length }
+    },
+  }
+}
+
+test('a cold pass over a viewport-sized batch serves a quarter of its markers from cache', () => {
+  const batch = viewportBatch()
+  expect(batch.length).toBeGreaterThan(100)
+  expect(countingAtlas().pass(batch).hitRate).toBeGreaterThanOrEqual(
+    VIEWPORT_MIN_HIT_RATE,
+  )
+})
+
+test('a cold pass over the whole fixture set serves half its markers from cache', () => {
   const pokemon = getFixturePokemon()
-  const keys = new Set(pokemon.map(iconKeyFor))
-  const spawnIds = new Set(pokemon.map((entity) => entity.spawnId))
-  // Every fixture has a distinct spawnId (spawnIds.size === pokemon.length),
-  // so a key that incorporated spawnId would produce exactly that many
-  // distinct keys too, and this cache would never hit. The appearance key
-  // must collapse below that: several fixtures share a species with the
-  // same form/costume/gender/badge/background/weather combination.
+  // The engine exists because past three thousand markers the old renderer
+  // goes choppy, so the fixture set has to clear that bar to be evidence.
   expect(pokemon.length).toBeGreaterThanOrEqual(3000)
-  expect(spawnIds.size).toBe(pokemon.length)
-  expect(keys.size).toBeLessThan(spawnIds.size)
+  expect(countingAtlas().pass(pokemon).hitRate).toBeGreaterThanOrEqual(
+    FULL_SET_MIN_HIT_RATE,
+  )
+})
+
+test("a viewport's icons fit inside capacity, so a second pass over it draws nothing", () => {
+  const batch = viewportBatch()
+  const atlas = countingAtlas()
+  atlas.pass(batch)
+  // Nothing was evicted during the first pass, so every marker still on
+  // screen is already composited. This is what makes panning and redrawing
+  // cheap, and it fails the moment a viewport's icon variety outgrows the
+  // cache.
+  expect(atlas.pass(batch).drawn).toBe(0)
 })
 
 test('LruCache returns what was set', () => {
