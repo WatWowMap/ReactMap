@@ -51,7 +51,8 @@ const LEGACY_MULTIBYTE_HASH =
   '$2b$10$bo6ga7lhKno/p//bkO6Bruz1JO2dJsHBjX0.AUWsnYkKRDWrUcAa6'
 
 /**
- * Records every write the self-heal makes so tests can assert on it.
+ * Records every write to the users table so tests can assert none happens.
+ * A legacy verify must never touch the stored hash.
  * @returns {{patch: object, column: string, value: unknown}[]}
  */
 function trackUserUpdates() {
@@ -71,52 +72,45 @@ function trackUserUpdates() {
 }
 
 test('verifies a password longer than 72 bytes against its legacy hash', async () => {
-  trackUserUpdates()
+  const updates = trackUserUpdates()
   assert.equal(
-    await verifyPassword(LEGACY_LONG_PASSWORD, LEGACY_LONG_HASH, 7),
+    await verifyPassword(LEGACY_LONG_PASSWORD, LEGACY_LONG_HASH),
+    true,
+  )
+  assert.equal(updates.length, 0)
+})
+
+test('does not rewrite the row for a login with a different tail', async () => {
+  // The bytes past 72 were never verified against anything, so a mistyped tail
+  // reaches this path looking exactly like the real one. Re-hashing the
+  // submitted string would make the mistyped password canonical and lock the
+  // owner out. The stored hash has to survive untouched.
+  const updates = trackUserUpdates()
+  const mistyped = `${LEGACY_LONG_PASSWORD.slice(0, 72)}totally different tail`
+  assert.equal(Buffer.byteLength(mistyped, 'utf8') > 72, true)
+  assert.notEqual(mistyped, LEGACY_LONG_PASSWORD)
+
+  assert.equal(await verifyPassword(mistyped, LEGACY_LONG_HASH), true)
+
+  assert.equal(updates.length, 0)
+  // The real password still works, because nothing was written.
+  assert.equal(
+    await verifyPassword(LEGACY_LONG_PASSWORD, LEGACY_LONG_HASH),
     true,
   )
 })
 
-test('re-hashes the full password after a legacy verify', async () => {
+test('keeps accepting the legacy prefix on every login', async () => {
+  // Without the rewrite this path never converges, so it has to stay repeatable
+  // rather than working once.
   const updates = trackUserUpdates()
-
-  await verifyPassword(LEGACY_LONG_PASSWORD, LEGACY_LONG_HASH, 7)
-
-  assert.equal(updates.length, 1)
-  assert.equal(updates[0].column, 'id')
-  assert.equal(updates[0].value, 7)
-  assert.match(updates[0].patch.password, /^\$2[aby]\$10\$/)
-  assert.notEqual(updates[0].patch.password, LEGACY_LONG_HASH)
-  // The replacement covers every byte, not just the first 72.
-  assert.equal(
-    await Bun.password.verify(LEGACY_LONG_PASSWORD, updates[0].patch.password),
-    true,
-  )
-  assert.equal(
-    await Bun.password.verify(
-      LEGACY_LONG_PASSWORD.slice(0, 72),
-      updates[0].patch.password,
-    ),
-    false,
-  )
-})
-
-test('takes the fast path once the hash has been upgraded', async () => {
-  const updates = trackUserUpdates()
-  await verifyPassword(LEGACY_LONG_PASSWORD, LEGACY_LONG_HASH, 7)
-  const upgraded = updates[0].patch.password
-
-  const spy = spyOn(Bun.password, 'verify')
-  try {
-    assert.equal(await verifyPassword(LEGACY_LONG_PASSWORD, upgraded, 7), true)
-    // One call means the first verify succeeded and no fallback was attempted.
-    assert.equal(spy.mock.calls.length, 1)
-  } finally {
-    spy.mockRestore()
+  for (let i = 0; i < 3; ++i) {
+    assert.equal(
+      await verifyPassword(LEGACY_LONG_PASSWORD, LEGACY_LONG_HASH),
+      true,
+    )
   }
-  // And no second row rewrite.
-  assert.equal(updates.length, 1)
+  assert.equal(updates.length, 0)
 })
 
 test('rejects a wrong password longer than 72 bytes', async () => {
@@ -124,7 +118,7 @@ test('rejects a wrong password longer than 72 bytes', async () => {
   const wrong = `wrong ${LEGACY_LONG_PASSWORD}`
   assert.equal(Buffer.byteLength(wrong, 'utf8') > 72, true)
 
-  assert.equal(await verifyPassword(wrong, LEGACY_LONG_HASH, 7), false)
+  assert.equal(await verifyPassword(wrong, LEGACY_LONG_HASH), false)
   assert.equal(updates.length, 0)
 })
 
@@ -135,11 +129,10 @@ test('truncates on the byte boundary, not the character boundary', async () => {
   assert.equal(Buffer.byteLength(LEGACY_MULTIBYTE_PASSWORD, 'utf8'), 100)
 
   assert.equal(
-    await verifyPassword(LEGACY_MULTIBYTE_PASSWORD, LEGACY_MULTIBYTE_HASH, 12),
+    await verifyPassword(LEGACY_MULTIBYTE_PASSWORD, LEGACY_MULTIBYTE_HASH),
     true,
   )
-  assert.equal(updates.length, 1)
-  assert.equal(updates[0].value, 12)
+  assert.equal(updates.length, 0)
 })
 
 test('does not fall back for a hash written by Bun', async () => {
@@ -147,26 +140,17 @@ test('does not fall back for a hash written by Bun', async () => {
   const hash = await hashPassword(LEGACY_LONG_PASSWORD)
 
   assert.equal(
-    await verifyPassword(`${LEGACY_LONG_PASSWORD} extra`, hash, 7),
+    await verifyPassword(`${LEGACY_LONG_PASSWORD} extra`, hash),
     false,
   )
   assert.equal(updates.length, 0)
 
   const spy = spyOn(Bun.password, 'verify')
   try {
-    assert.equal(await verifyPassword(LEGACY_LONG_PASSWORD, hash, 7), true)
+    assert.equal(await verifyPassword(LEGACY_LONG_PASSWORD, hash), true)
     assert.equal(spy.mock.calls.length, 1)
   } finally {
     spy.mockRestore()
   }
-  assert.equal(updates.length, 0)
-})
-
-test('accepts a legacy verify when no user id is available', async () => {
-  const updates = trackUserUpdates()
-  assert.equal(
-    await verifyPassword(LEGACY_LONG_PASSWORD, LEGACY_LONG_HASH),
-    true,
-  )
   assert.equal(updates.length, 0)
 })
