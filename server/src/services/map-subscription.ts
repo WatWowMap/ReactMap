@@ -270,7 +270,42 @@ function updateSubscription(
   else state.wakePending = true
 }
 
+/**
+ * Set PROFILE_MAP=1 to log what each Golbat poll costs.
+ *
+ * This is the hop the client cannot time. The browser can only measure
+ * subscribe-to-next-delta, and the poll loop emits on its own schedule, so
+ * from there a slow scan and a long wait for the next tick look identical.
+ * Only the server sees the scan itself.
+ *
+ * What it prints is the number that decides whether a viewport is
+ * expensive: how long Golbat took and how many entities it sent back
+ * before any filtering. A narrow rule set returns a handful in about the
+ * round-trip time; asking for everything returns thousands and takes
+ * seconds, and the difference is entirely in the request.
+ */
+const PROFILE_POLLS = process.env.PROFILE_MAP === '1'
+
 async function pollOnce(
+  golbatClient: PollingGolbatClient,
+  category: Category,
+  viewport: Viewport,
+  filters: object[],
+): Promise<{ entities: any[]; complete: boolean }> {
+  const startedAt = PROFILE_POLLS ? performance.now() : 0
+  const result = await runScan(golbatClient, category, viewport, filters)
+  if (PROFILE_POLLS) {
+    const ms = Math.round(performance.now() - startedAt)
+    const { min, max } = viewport
+    log.info(
+      TAGS.ReactMap,
+      `[profile] ${category} poll ${ms}ms  entities=${result.entities.length}  complete=${result.complete}  clauses=${filters.length}  box=${min.lat.toFixed(3)},${min.lon.toFixed(3)}..${max.lat.toFixed(3)},${max.lon.toFixed(3)}`,
+    )
+  }
+  return result
+}
+
+async function runScan(
   golbatClient: PollingGolbatClient,
   category: Category,
   viewport: Viewport,

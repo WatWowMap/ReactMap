@@ -54,7 +54,36 @@ export interface MapSocket {
   close: () => void
 }
 
-const CATEGORIES: readonly WireCategory[] = ['pokemon', 'gym']
+const ALL_CATEGORIES: readonly WireCategory[] = ['pokemon', 'gym']
+
+/**
+ * Which categories to subscribe to, narrowable for looking at one layer on
+ * its own:
+ *
+ *   localStorage.setItem('mapCategories', 'pokemon')   // then reload
+ *   ?mapCategories=pokemon
+ *
+ * Unset means all of them, which is the only behaviour production ever
+ * sees. A name that is not a real category is ignored rather than sent, so
+ * a typo shows up as a missing layer rather than a rejected subscribe.
+ */
+function subscribedCategories(): readonly WireCategory[] {
+  if (typeof window === 'undefined') return ALL_CATEGORIES
+  let raw: string | null = null
+  try {
+    raw =
+      new URLSearchParams(window.location.search).get('mapCategories') ??
+      window.localStorage.getItem('mapCategories')
+  } catch {
+    return ALL_CATEGORIES
+  }
+  if (!raw) return ALL_CATEGORIES
+  const wanted = raw.split(',').map((name) => name.trim())
+  const kept = ALL_CATEGORIES.filter((category) => wanted.includes(category))
+  return kept.length > 0 ? kept : ALL_CATEGORIES
+}
+
+const CATEGORIES: readonly WireCategory[] = subscribedCategories()
 const DEFAULT_RECONNECT_DELAY_MS = 1_000
 const MAX_RECONNECT_DELAY_MS = 30_000
 // A handshake that never completes is the one failure this client cannot
