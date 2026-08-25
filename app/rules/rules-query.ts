@@ -29,9 +29,20 @@ import type { Rule } from './rule-types'
  */
 export type RulePatch = Partial<Omit<Rule, 'id' | 'speciesId'>>
 
-/** The two `rules.*` procedures this hook needs. */
+/**
+ * A new rule, as `rules.create` takes it: a name, the species it covers
+ * (`[null]` for Any Pokémon), and whatever conditions and appearance it
+ * starts with.
+ */
+export interface RuleCreateInput extends RulePatch {
+  name: string
+  speciesIds: (number | null)[]
+}
+
+/** The three `rules.*` procedures this hook needs. */
 export interface RulesClient {
   list(): Promise<Rule[]>
+  create(input: RuleCreateInput): Promise<void>
   update(ruleIds: number[], patch: RulePatch): Promise<void>
 }
 
@@ -41,6 +52,9 @@ function createDefaultRulesClient(): RulesClient {
   })
   return {
     list: () => client.query('rules.list') as Promise<Rule[]>,
+    create: async (input) => {
+      await client.mutation('rules.create', input)
+    },
     update: async (ruleIds, patch) => {
       await client.mutation('rules.update', { ruleIds, patch })
     },
@@ -84,6 +98,7 @@ export interface UseRulesResult {
    * `split-warning.tsx` for why those are the only two possibilities.
    */
   update: (ruleIds: number[], patch: RulePatch) => Promise<void>
+  create: (input: RuleCreateInput) => Promise<void>
   refetch: () => void
 }
 
@@ -130,6 +145,14 @@ export function useRules(
     },
   })
 
+  const createMutation = useMutation({
+    mutationFn: (input: RuleCreateInput) => client.create(input),
+    // No optimistic insert: the row's id comes back from the server, and
+    // every card, group and appearance lookup is keyed by it. Guessing
+    // one would put a card on screen that nothing else could resolve.
+    onSuccess: () => queryClient.invalidateQueries({ queryKey }),
+  })
+
   return {
     rules,
     isLoading: query.isLoading,
@@ -137,7 +160,7 @@ export function useRules(
     // `mutation.error` outlives the call that produced it (react-query
     // clears it only on the next `mutate`), which is exactly what lets a
     // caller render "that edit failed" after the fact.
-    error: query.error ?? mutation.error ?? null,
+    error: query.error ?? mutation.error ?? createMutation.error ?? null,
     update: async (ruleIds, patch) => {
       try {
         await mutation.mutateAsync({ ruleIds, patch })
@@ -145,6 +168,14 @@ export function useRules(
         // Rolled back in `onError` above; surfaced through `error`. A
         // caller that wants to react to the failure reads that field
         // rather than catching this promise.
+      }
+    },
+    create: async (input) => {
+      try {
+        await createMutation.mutateAsync(input)
+      } catch {
+        // Surfaced through `error`, same as an update. Nothing was
+        // written, so there is nothing to roll back.
       }
     },
     refetch: () => {

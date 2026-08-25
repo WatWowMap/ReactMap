@@ -3,7 +3,7 @@ import { QueryClientProvider } from '@tanstack/react-query'
 import { cleanup, fireEvent, render, waitFor } from '@testing-library/react'
 import { ruleFixture } from '../rules/rule-fixtures'
 import type { Rule } from '../rules/rule-types'
-import type { RulesClient } from '../rules/rules-query'
+import type { RuleCreateInput, RulesClient } from '../rules/rules-query'
 import { createRulesQueryClient } from '../rules/rules-query'
 import type { MasterfileClient, SpeciesEntry } from '../rules/use-names'
 import { setupDom, teardownDom } from '../test-setup'
@@ -21,14 +21,20 @@ const SPECIES_FIXTURE: SpeciesEntry[] = [
 ]
 
 interface FakeRulesClient extends RulesClient {
+  created: RuleCreateInput[]
   updated: { ruleIds: number[]; patch: unknown }[]
 }
 
 function fakeRulesClient(rules: Rule[]): FakeRulesClient {
+  const created: RuleCreateInput[] = []
   const updated: { ruleIds: number[]; patch: unknown }[] = []
   return {
+    created,
     updated,
     list: () => Promise.resolve(rules),
+    create: async (input) => {
+      created.push(input)
+    },
     update: async (ruleIds, patch) => {
       updated.push({ ruleIds, patch })
     },
@@ -106,6 +112,24 @@ test('the empty state offers the four starting points', async () => {
   for (const name of ['Everything', '100% IV', 'Great League', 'Rare spawns']) {
     expect(await findByRole('button', { name })).toBeTruthy()
   }
+})
+
+test('a starting point writes a real rule rather than holding a preset', async () => {
+  const { client, findByRole } = renderWithRules([])
+  fireEvent.click(await findByRole('button', { name: 'Great League' }))
+  await waitFor(() => expect(client.created).toHaveLength(1))
+  expect(client.created[0]).toMatchObject({
+    name: 'Great League',
+    speciesIds: [null],
+    pvpLeague: 1500,
+  })
+})
+
+test('the page header can create a filter without emptying the list first', async () => {
+  const { client, findByRole } = renderWithRules(rareSpawns(1))
+  fireEvent.click(await findByRole('button', { name: /new filter/i }))
+  await waitFor(() => expect(client.created).toHaveLength(1))
+  expect(client.created[0]).toMatchObject({ name: 'New filter' })
 })
 
 test('clicking a card opens its editor', async () => {

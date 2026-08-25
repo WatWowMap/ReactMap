@@ -10,6 +10,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs'
 import { RuleCard } from '../rules/rule-card'
 import { RuleEditor } from '../rules/rule-editor'
 import { groupRules } from '../rules/rule-grouping'
+import type { RuleTemplate } from '../rules/rule-templates'
+import { BLANK_TEMPLATE, STARTING_POINTS } from '../rules/rule-templates'
 import type { RulesClient } from '../rules/rules-query'
 import { useRules } from '../rules/rules-query'
 import type { MasterfileClient } from '../rules/use-names'
@@ -22,15 +24,6 @@ import { useNames, useSpeciesCatalog } from '../rules/use-names'
  */
 const CURRENT_PROFILE_ID = 1
 
-/**
- * The four canned rules a brand-new, rule-less profile can start from. A
- * fresh account never actually sees this -- `seedProfileForUser` gives it
- * an "Everything" rule already -- but a profile whose one rule was
- * deleted lands right back here, so the empty state has to be a real
- * starting point, not a dead end.
- */
-const STARTING_POINTS = ['Everything', '100% IV', 'Great League', 'Rare spawns']
-
 export interface FiltersPageProps {
   /** Test seam: a fake in place of the default tRPC-backed client. */
   rulesClient?: RulesClient
@@ -42,7 +35,7 @@ export function FiltersPage({
   rulesClient,
   namesClient,
 }: FiltersPageProps = {}) {
-  const { rules, update } = useRules(
+  const { rules, create, update } = useRules(
     CURRENT_PROFILE_ID,
     rulesClient ? { client: rulesClient } : undefined,
   )
@@ -57,11 +50,20 @@ export function FiltersPage({
   const [openGroupId, setOpenGroupId] = useState<string | null>(null)
   const openGroup = groups.find((group) => group.id === openGroupId) ?? null
 
+  function startFrom(template: RuleTemplate) {
+    void create(template.input)
+  }
+
   return (
     <section className="p-6">
-      <h1 className="font-display text-2xl font-semibold text-foreground">
-        Filters
-      </h1>
+      <div className="flex items-center justify-between gap-2">
+        <h1 className="font-display text-2xl font-semibold text-foreground">
+          Filters
+        </h1>
+        <Button variant="outline" onClick={() => startFrom(BLANK_TEMPLATE)}>
+          + New filter
+        </Button>
+      </div>
       <Tabs defaultValue="pokemon" className="mt-4">
         <TabsList>
           <TabsTrigger value="pokemon">Pokémon</TabsTrigger>
@@ -78,11 +80,16 @@ export function FiltersPage({
                 No rules yet. Start from one of these:
               </p>
               <div className="flex flex-wrap gap-2">
-                {/* The sheet these open into is Task 10 -- this is only
-                    the list surfacing them as a starting point. */}
-                {STARTING_POINTS.map((name) => (
-                  <Button key={name} variant="outline">
-                    {name}
+                {/* Each writes a real, editable rule rather than holding a
+                    preset in front of one -- the card it leaves behind is
+                    the starting point, per the design spec. */}
+                {STARTING_POINTS.map((template) => (
+                  <Button
+                    key={template.label}
+                    variant="outline"
+                    onClick={() => startFrom(template)}
+                  >
+                    {template.label}
                   </Button>
                 ))}
               </div>

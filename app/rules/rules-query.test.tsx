@@ -36,6 +36,9 @@ function createFakeClient(initial: Map<number, Rule>): FakeRulesClient {
       }
       return rows
     },
+    async create(input) {
+      rows = [...rows, { ...(input as any), id: rows.length + 100 }]
+    },
     async update(ruleIds, patch) {
       if (failUpdate) {
         failUpdate = false
