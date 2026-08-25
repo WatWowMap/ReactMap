@@ -31,6 +31,14 @@
   },
   "overrides": [
     {
+      "includes": ["**/*.test.ts", "**/*.test.tsx", "**/*.acceptance.ts"],
+      "linter": {
+        "rules": {
+          "style": { "noNonNullAssertion": "off" }
+        }
+      }
+    },
+    {
       "includes": ["app/components/ui/**"],
       "linter": {
         "rules": {

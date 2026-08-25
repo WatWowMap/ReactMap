@@ -194,6 +194,13 @@ function buildAuthOptions(input: {
           create: {
             ...(input.checkSignInGate && {
               before: async (session: { userId: string }) => {
+                // The enclosing `input.checkSignInGate && {...}` spread is
+                // what puts this hook here at all, so the property cannot be
+                // absent by the time it runs. Biome offers `?.` as an unsafe
+                // fix and that fix is a sign-in bypass: the call would yield
+                // `undefined`, and the next line would throw reading `.allow`
+                // rather than deny the sign-in.
+                // biome-ignore lint/style/noNonNullAssertion: guarded by the enclosing checkSignInGate spread; the offered `?.` fix would bypass the gate
                 const result = await input.checkSignInGate!(session.userId)
                 if (!result.allow) return false
               },

@@ -16,7 +16,7 @@
     "config:env": "bun run --filter @rm/config generate",
     "dev": "NODE_ENV=development bun --watch server/src/serve.ts",
     "lint": "biome check",
-    "format": "biome check --write --unsafe",
+    "format": "biome check --write",
     "locales:create": "bun run --filter @rm/locales create",
     "locales:generate": "bun run --filter @rm/locales generate",
     "locales:missing": "bun run --filter @rm/locales missing",
@@ -34,7 +34,8 @@
     "typecheck": "tsc -p tsconfig.app.json --noEmit && tsc -p tsconfig.server.json --noEmit",
     "typecheck:server": "tsc -p tsconfig.server.json --noEmit",
     "prepare": "husky install",
-    "watch": "vite"
+    "watch": "vite",
+    "format:unsafe": "biome check --write --unsafe"
   },
   "nodemonConfig": {
     "watch": [
