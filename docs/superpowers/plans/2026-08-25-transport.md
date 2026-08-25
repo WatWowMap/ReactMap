@@ -22,7 +22,9 @@ Three agents read Golbat and PoracleNG in full and returned twenty corrections, 
 
 **But Golbat can push forts.** Its webhook sender posts decode events to configured URLs, and the fort hook carries an explicit new, removal or edit change type. Those are deltas. They cannot carry Pokémon, because routing is by geofence name rather than viewport, delivery is fire-and-forget with the buffer emptied before the POST, and the stream carries no filter. For forts, which change rarely and never expire, those limits are acceptable against a slow reconciliation poll.
 
-**Results are capped and cannot be raised from the client.** 3,000 Pokémon and 9,000 forts by default. `limit_reached` is the only signal a response was truncated, and reconciliation must never run on one.
+**Results are capped and cannot be raised from the client.** 3,000 Pokémon and 9,000 forts by default, but the cap is per-instance: a real production Golbat reports 5,000. Read it from `/api/status` at boot; never hardcode either number. `limit_reached` is the only signal a response was truncated, and reconciliation must never run on one.
+
+**On a default Golbat there is no fort poll at all.** Verified against a live instance on 2026-08-25: `fort_in_memory` is `false` and every one of the eight endpoints it gates answers 503, `/api/fort/scan` included. So the webhook receiver in Task 6 is not a fast path in front of a working poll, it is the only source of fort data most operators will have, and the slow reconciliation cycle this plan names as the safety net does not exist for them. Task 6 has to stand on its own.
 
 **The PvP filter is not a superset.** Golbat collapses every entry to a single best rank per league across all evolutions, so a rule asking for Great rank 100 to 500 is excluded when some evolution ranks better than 100. Any non-1 minimum rank must widen upstream to 1 and compare locally.
 
