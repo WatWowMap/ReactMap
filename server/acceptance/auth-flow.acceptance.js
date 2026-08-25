@@ -197,6 +197,16 @@ afterAll(async () => {
       `acceptance-${RUN_ID}-%`,
     ])
     if (legacyUserIds.length) {
+      // Criterion 6's auth_user row is created by the real back-fill
+      // script, not by this suite's sign-up calls, so its email is the
+      // script's own derived placeholder rather than one matching
+      // `acceptance-${RUN_ID}-%` above. It is still ours to clean up: it
+      // carries the legacy_id of a row this suite inserted, and every FK
+      // that hangs off auth_user.id (auth_session, auth_account,
+      // user_perms) cascades on delete, so this one statement is enough.
+      await db.query(`DELETE FROM auth_user WHERE legacy_id IN (?)`, [
+        legacyUserIds,
+      ])
       await db.query(`DELETE FROM users WHERE id IN (?)`, [legacyUserIds])
     }
     await db.end()
@@ -483,15 +493,12 @@ describe('criterion 5: a revoked permission stops appearing on the next request'
 // sign in with their existing password.
 // ---------------------------------------------------------------------------
 describe('criterion 6: a migrated legacy user can sign in with their existing password', () => {
-  // There is no operator-invoked migration script yet -- Task 6 is what
-  // extracts one. The only thing that back-fills legacy users today is
-  // knex migration 20260824181913_backfill_auth_users.cjs, which already
-  // ran once, at whatever point this database's schema was set up, and
-  // knex never re-runs a completed migration. A legacy row inserted now,
-  // after that point, has no operator-invocable path into auth_user/
-  // auth_account today. This test seeds exactly that row and drives the
-  // real sign-in endpoint, honestly expecting it to fail until Task 6
-  // ships a script this suite can invoke here instead of doing nothing.
+  // Task 6 extracted the back-fill out of `migrate:latest` into
+  // server/src/scripts/backfill-auth-users.js, an operator-invoked script.
+  // This test seeds a legacy row, runs that script exactly the way an
+  // operator would (a real subprocess, not an imported function), and only
+  // then drives the real sign-in endpoint -- so this is a true end-to-end
+  // check of the path an operator actually has, not of an internal.
   const legacyUsername = usernameFor('c6-legacy')
   const legacyPassword = 'a legacy password from 1.x'
 
@@ -505,7 +512,22 @@ describe('criterion 6: a migrated legacy user can sign in with their existing pa
       [legacyUsername, hash],
     )
     legacyUserIds.push(result.insertId)
-  })
+
+    const backfillProcess = Bun.spawn({
+      cmd: ['bun', 'server/src/scripts/backfill-auth-users.js'],
+      cwd: REPO_ROOT,
+      env: process.env,
+      stdout: 'pipe',
+      stderr: 'pipe',
+    })
+    const exitCode = await backfillProcess.exited
+    if (exitCode !== 0) {
+      const stderr = await new Response(backfillProcess.stderr).text()
+      throw new Error(
+        `backfill-auth-users.js exited ${exitCode}, expected 0:\n${stderr}`,
+      )
+    }
+  }, 30_000)
 
   test('signing in with the legacy username/password succeeds', async () => {
     const signIn = await timedFetch(`${BASE_URL}/api/auth/sign-in/username`, {

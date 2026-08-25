@@ -1,9 +1,11 @@
 // server/test/authBackfill.test.js
 const { test, expect } = require('bun:test')
+const { knex: knexFactory } = require('knex')
 const {
   planBackfill,
-  detectCollisions,
+  detectIdentityCollisions,
   formatCollisionReport,
+  buildNormalizedUsernameExpression,
 } = require('../src/auth/backfill')
 
 test('accounts carry the issuer strings better auth generates', () => {
@@ -104,38 +106,18 @@ test('the plan carries the legacy id as the join key back to users', () => {
   expect(planBackfill({ id: 7 }).user.legacyId).toBe(7)
 })
 
-test('detectCollisions flags two rows with the exact same username', () => {
-  const collisions = detectCollisions([
-    { id: 300, username: 'AshKetchum' },
-    { id: 301, username: 'AshKetchum' },
-  ])
-  expect(collisions).toEqual([
-    { field: 'username', value: 'ashketchum', ids: [300, 301] },
-  ])
-})
+// Username collisions moved to detectUsernameCollisions in
+// server/src/auth/backfill.js, which asks MySQL to group rows under the
+// same utf8mb4_unicode_ci collation auth_user.username enforces -- the
+// fix for this task's defect 2. That function needs a real database
+// connection to mean anything (a JS re-implementation is exactly the bug
+// being fixed), so it is exercised against real MySQL as part of this
+// task's manual verification rather than here. detectIdentityCollisions
+// keeps the exact-match JS comparison because discordId/telegramId are
+// plain identity keys, not text subject to a collation.
 
-test('detectCollisions flags usernames differing only by case', () => {
-  const collisions = detectCollisions([
-    { id: 300, username: 'AshKetchum' },
-    { id: 301, username: 'ashketchum' },
-  ])
-  expect(collisions).toHaveLength(1)
-  expect(collisions[0].field).toBe('username')
-  expect(collisions[0].ids).toEqual([300, 301])
-})
-
-test('detectCollisions flags usernames differing only by trailing whitespace', () => {
-  const collisions = detectCollisions([
-    { id: 300, username: 'ashketchum' },
-    { id: 301, username: 'ashketchum ' },
-  ])
-  expect(collisions).toHaveLength(1)
-  expect(collisions[0].field).toBe('username')
-  expect(collisions[0].ids).toEqual([300, 301])
-})
-
-test('detectCollisions flags two rows sharing a discordId', () => {
-  const collisions = detectCollisions([
+test('detectIdentityCollisions flags two rows sharing a discordId', () => {
+  const collisions = detectIdentityCollisions([
     { id: 303, discordId: '555' },
     { id: 304, discordId: '555' },
   ])
@@ -144,8 +126,8 @@ test('detectCollisions flags two rows sharing a discordId', () => {
   ])
 })
 
-test('detectCollisions flags two rows sharing a telegramId', () => {
-  const collisions = detectCollisions([
+test('detectIdentityCollisions flags two rows sharing a telegramId', () => {
+  const collisions = detectIdentityCollisions([
     { id: 305, telegramId: '999' },
     { id: 306, telegramId: '999' },
   ])
@@ -154,28 +136,40 @@ test('detectCollisions flags two rows sharing a telegramId', () => {
   ])
 })
 
-test('detectCollisions returns nothing for a clean table', () => {
-  const collisions = detectCollisions([
+test('detectIdentityCollisions returns nothing for a clean table', () => {
+  const collisions = detectIdentityCollisions([
     { id: 1, username: 'ash', discordId: '1', telegramId: '10' },
     { id: 2, username: 'brock', discordId: '2', telegramId: '20' },
   ])
   expect(collisions).toEqual([])
 })
 
-test('detectCollisions returns nothing for an empty table', () => {
-  expect(detectCollisions([])).toEqual([])
+test('detectIdentityCollisions returns nothing for an empty table', () => {
+  expect(detectIdentityCollisions([])).toEqual([])
 })
 
-test('detectCollisions finds multiple independent collisions in one pass', () => {
-  const collisions = detectCollisions([
-    { id: 300, username: 'AshKetchum' },
-    { id: 301, username: 'ashketchum' },
-    { id: 302, username: 'brock' },
-    { id: 303, username: 'misty', discordId: '555' },
-    { id: 304, username: 'gary', discordId: '555' },
+test('detectIdentityCollisions finds multiple independent collisions in one pass', () => {
+  const collisions = detectIdentityCollisions([
+    { id: 303, discordId: '555' },
+    { id: 304, discordId: '555' },
+    { id: 305, telegramId: '999' },
+    { id: 306, telegramId: '999' },
   ])
   const fields = collisions.map((c) => c.field).sort()
-  expect(fields).toEqual(['discordId', 'username'])
+  expect(fields).toEqual(['discordId', 'telegramId'])
+})
+
+// buildNormalizedUsernameExpression is the query fragment
+// detectUsernameCollisions groups and compares on. Checking its compiled
+// SQL, rather than its result, is what a unit test can do without a
+// database connection -- the fold itself (jose === josé, straße === strasse
+// under this exact collation) is confirmed against real MySQL as part of
+// this task's manual verification.
+test('the username grouping expression compiles to the collation auth_user.username enforces', () => {
+  const knex = knexFactory({ client: 'mysql2' })
+  const sql = buildNormalizedUsernameExpression(knex, 'users').toString()
+  expect(sql).toContain('COLLATE utf8mb4_unicode_ci')
+  expect(sql).toContain('users`.`username')
 })
 
 test('formatCollisionReport names the colliding ids and the shared value', () => {

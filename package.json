@@ -21,6 +21,7 @@
     "locales:generate": "bun run --filter @rm/locales generate",
     "locales:missing": "bun run --filter @rm/locales missing",
     "masterfile": "bun run --filter @rm/masterfile generate",
+    "backfill:auth-users": "bun server/src/scripts/backfill-auth-users.js",
     "migrate:latest": "knex --knexfile server/src/db/knexfile.cjs migrate:latest",
     "migrate:make": "knex --knexfile server/src/db/knexfile.cjs migrate:make",
     "migrate:rollback": "knex --knexfile server/src/db/knexfile.cjs migrate:rollback",

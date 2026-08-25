@@ -98,37 +98,31 @@ function planBackfill(row) {
 }
 
 /**
- * Groups legacy rows by lowercased/trimmed username, and separately by
- * discordId and telegramId, and reports every group with more than one row.
+ * Groups legacy rows by discordId and by telegramId, and reports every
+ * group with more than one row.
  *
- * The legacy `users` table has no unique index on any of these three
- * columns, but `auth_user.username` is unique under a case-insensitive
- * collation and the back-fill merges accounts on `(issuer, account_id)`.
- * Two legacy rows that collide on one of these keys would otherwise be
- * silently folded into a single auth user, or made to fight over a single
- * `auth_account`/`user_perms` row. Only an operator who can see both rows can
- * decide which one is real, so this only detects and reports, it never
- * decides for them.
+ * These are plain string/numeric identity keys, not text subject to a
+ * collation, so comparing them in JavaScript is exact: there is no MySQL
+ * collation folding to reproduce, unlike `username` (see
+ * `detectUsernameCollisions` below). The legacy `users` table has no unique
+ * index on either column, but the back-fill merges `auth_account` rows on
+ * `(issuer, account_id)`, so two legacy rows sharing an identity would
+ * otherwise fight over the same account row. Only an operator who can see
+ * both rows can decide which one is real, so this only detects and reports,
+ * it never decides for them.
  *
  * Pure: takes rows, returns a description, writes nothing.
  *
  * @param {Record<string, any>[]} rows
- * @returns {{ field: 'username' | 'discordId' | 'telegramId', value: string, ids: any[] }[]}
+ * @returns {{ field: 'discordId' | 'telegramId', value: string, ids: any[] }[]}
  */
-function detectCollisions(rows) {
+function detectIdentityCollisions(rows) {
   const groups = {
-    username: new Map(),
     discordId: new Map(),
     telegramId: new Map(),
   }
 
   for (const row of rows) {
-    if (row.username != null && String(row.username).trim() !== '') {
-      const key = String(row.username).trim().toLowerCase()
-      const bucket = groups.username.get(key) || []
-      bucket.push(row.id)
-      groups.username.set(key, bucket)
-    }
     if (row.discordId != null) {
       const key = String(row.discordId)
       const bucket = groups.discordId.get(key) || []
@@ -143,13 +137,9 @@ function detectCollisions(rows) {
     }
   }
 
-  /** @type {{ field: 'username' | 'discordId' | 'telegramId', value: string, ids: any[] }[]} */
+  /** @type {{ field: 'discordId' | 'telegramId', value: string, ids: any[] }[]} */
   const collisions = []
-  for (const field of /** @type {const} */ ([
-    'username',
-    'discordId',
-    'telegramId',
-  ])) {
+  for (const field of /** @type {const} */ (['discordId', 'telegramId'])) {
     for (const [value, ids] of groups[field]) {
       if (ids.length > 1) {
         collisions.push({ field, value, ids })
@@ -159,12 +149,74 @@ function detectCollisions(rows) {
   return collisions
 }
 
+// `auth_user.username` is UNIQUE under this exact collation (confirmed
+// against the running schema: `SHOW FULL COLUMNS FROM auth_user` reports
+// `utf8mb4_unicode_ci` on the `username` column). It folds case, but it also
+// folds accents and the German sharp-s: `jose` and `josé` collide, and so do
+// `strasse` and `straße`. A JavaScript `toLowerCase()` comparison does
+// neither, so two legacy rows that collide under this collation used to
+// pass the old check, insert cleanly (MySQL's own unique index caught one
+// of them), and vanish under `INSERT IGNORE` without a word to the
+// operator.
+const USERNAME_COLLATION = 'utf8mb4_unicode_ci'
+
 /**
- * Renders `detectCollisions` output into a message an operator can act on
- * without reading this code, naming exactly which legacy ids collide on
- * which value.
+ * Builds the `knex.raw` expression that normalizes `username` under the
+ * exact collation `auth_user.username` enforces. Split out from
+ * `detectUsernameCollisions` so the query it produces -- the part that
+ * actually encodes "match MySQL's collation" -- can be inspected by a unit
+ * test without a database connection.
  *
- * @param {ReturnType<typeof detectCollisions>} collisions
+ * @param {import('knex').Knex} knex
+ * @param {string} usersTable
+ */
+function buildNormalizedUsernameExpression(knex, usersTable) {
+  return knex.raw(
+    `CONVERT(TRIM(??) USING utf8mb4) COLLATE ${USERNAME_COLLATION}`,
+    [`${usersTable}.username`],
+  )
+}
+
+/**
+ * Finds legacy `username` collisions by asking MySQL to group rows under
+ * the exact collation `auth_user.username` enforces, rather than
+ * reimplementing that collation in JavaScript. This is the one collision
+ * check in this file that talks to the database, because it is the one
+ * check where "the same rule the database will enforce" cannot be
+ * expressed any other way.
+ *
+ * @param {import('knex').Knex} knex
+ * @param {string} usersTable
+ * @returns {Promise<{ field: 'username', value: string, ids: any[] }[]>}
+ */
+async function detectUsernameCollisions(knex, usersTable) {
+  const normalized = buildNormalizedUsernameExpression(knex, usersTable)
+
+  const groups = await knex(usersTable)
+    .whereNotNull('username')
+    .andWhere('username', '<>', '')
+    .select({ normalized })
+    .count({ total: '*' })
+    .groupByRaw(normalized.toString())
+    .having(knex.raw('count(*) > 1'))
+
+  /** @type {{ field: 'username', value: string, ids: any[] }[]} */
+  const collisions = []
+  for (const group of groups) {
+    const ids = await knex(usersTable)
+      .whereRaw(`${normalized.toString()} = ?`, [group.normalized])
+      .pluck('id')
+    collisions.push({ field: 'username', value: group.normalized, ids })
+  }
+  return collisions
+}
+
+/**
+ * Renders combined `detectIdentityCollisions`/`detectUsernameCollisions`
+ * output into a message an operator can act on without reading this code,
+ * naming exactly which legacy ids collide on which value.
+ *
+ * @param {{ field: 'username' | 'discordId' | 'telegramId', value: string, ids: any[] }[]} collisions
  */
 function formatCollisionReport(collisions) {
   const lines = collisions.map(
@@ -174,14 +226,39 @@ function formatCollisionReport(collisions) {
   return [
     `auth back-fill refused: ${collisions.length} colliding group(s) found in the legacy "users" table.`,
     ...lines,
-    'The legacy table has no unique index on username, discordId or telegramId, so these rows would otherwise be silently merged into one account.',
-    'Resolve the duplicates by hand (rename, merge, or delete the extra legacy row) and re-run migrate:latest.',
+    'The legacy table has no unique index on username, discordId or telegramId, so these rows would otherwise be silently merged into one account. The username check matches the utf8mb4_unicode_ci collation MySQL enforces on auth_user.username, so it also catches pairs that only differ by accent or by sharp-s/ss.',
+    'Resolve the duplicates by hand (rename, merge, or delete the extra legacy row) and re-run the back-fill script.',
   ].join('\n')
+}
+
+/**
+ * Derives a stable id for a row keyed off a legacy user's derived
+ * `auth_user.id`, so a second run of the back-fill hits the same primary
+ * key as the first (an idempotent no-op) instead of writing a duplicate row
+ * with a fresh random id. Used for `auth_account.id` and `user_perms.id`,
+ * neither of which has a natural id of its own to reuse.
+ *
+ * `auth_account.id`/`user_perms.id` are varchar(36), and the id
+ * `authIdForLegacy` derives is already 36 characters, so concatenating
+ * `${userId}:${providerId}` would overflow the column. Hashing again keeps
+ * the id both deterministic and inside the column width.
+ *
+ * @param {...(string | number)} parts
+ */
+function derivedId(...parts) {
+  return crypto
+    .createHash('sha256')
+    .update(`reactmap-derived:${parts.join(':')}`)
+    .digest('hex')
+    .slice(0, 36)
 }
 
 module.exports = {
   planBackfill,
   authIdForLegacy,
-  detectCollisions,
+  derivedId,
+  detectIdentityCollisions,
+  detectUsernameCollisions,
+  buildNormalizedUsernameExpression,
   formatCollisionReport,
 }
