@@ -270,13 +270,16 @@ describe('criterion 2: the session cookie identifies the caller on /api/settings
     cookie = getSessionCookie(signIn.response)
 
     // Grants a permission directly in the row /api/settings reads from, as
-    // an ARRANGE step: nothing in the current stack computes permissions
-    // for a local/credential sign-in yet (Task 4's job -- "credential users
-    // currently get none at all"), so without this the response would
-    // legitimately have nowhere to get a permission from. The assertion
-    // below still only reads the HTTP response.
+    // an ARRANGE step. Task 4 landed: the sign-in above already triggered a
+    // real recompute and wrote its own `credential` row (a default config
+    // grants no perm to anyone, so that row exists but is all-false). This
+    // forces `map: true` deterministically for the READ-path assertion
+    // below, which is what this test is actually about -- an upsert rather
+    // than a plain INSERT, because the row this overwrites is now expected
+    // to already exist, not a sign that anything is broken.
     await db.query(
-      `INSERT INTO user_perms (id, user_id, provider_id, perms) VALUES (?, ?, 'credential', ?)`,
+      `INSERT INTO user_perms (id, user_id, provider_id, perms) VALUES (?, ?, 'credential', ?)
+       ON DUPLICATE KEY UPDATE perms = VALUES(perms)`,
       [
         crypto.randomUUID().replace(/-/g, '').slice(0, 36),
         userId,
@@ -411,11 +414,20 @@ describe('criterion 5: a revoked permission stops appearing on the next request'
   // calls `revokeProviderAccess` (server/src/auth/revokeAccessAdapter.js)
   // is server/src/services/DiscordClient.js, which this plan forbids
   // wiring into the 2.0 server, and server/src/services/Trial.js, which
-  // needs a live trial window and provider account to exercise. Task 4 is
-  // expected to give the 2.0 stack its own real trigger (a guild-kick
-  // handler, an admin action, a recompute that can also remove a perm).
-  // When it does, the mutation below should be replaced by calling that
-  // trigger through real HTTP/the real event path instead.
+  // needs a live trial window and provider account to exercise.
+  //
+  // Task 4 landed, and it gave `credential` its own real recompute -- which
+  // is exactly why this row is written under a synthetic `manual-grant`
+  // provider id instead: `/api/settings` merges every user_perms row
+  // regardless of provider (`mergePerms` in
+  // server/src/middleware/authSession.js), but a real `credential` row now
+  // gets recomputed to a fresh, config-derived value on every sign-in (see
+  // criterion 2's identical situation), which would silently overwrite this
+  // test's manual "revoke" write the moment `signInAndGetSettings` below
+  // signs in again. `manual-grant` is not a provider any computer recomputes,
+  // so it survives exactly as long as this test controls it -- the same
+  // property `credential` had before Task 4, now moved to a name that
+  // documents why it has to stay untouched here.
   //
   // What this test DOES verify honestly, over real HTTP: that a fresh
   // /api/settings request reads live from user_perms rather than serving a
@@ -441,7 +453,7 @@ describe('criterion 5: a revoked permission stops appearing on the next request'
     userId = signUp.json?.user?.id
     permRowId = crypto.randomUUID().replace(/-/g, '').slice(0, 36)
     await db.query(
-      `INSERT INTO user_perms (id, user_id, provider_id, perms) VALUES (?, ?, 'credential', ?)`,
+      `INSERT INTO user_perms (id, user_id, provider_id, perms) VALUES (?, ?, 'manual-grant', ?)`,
       [permRowId, userId, JSON.stringify({ map: true, pokemon: true })],
     )
   })

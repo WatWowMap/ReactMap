@@ -5,20 +5,21 @@ const { computeUserPermsRows } = require('./recompute-perms')
 /**
  * Decides whether a sign-in may proceed, given the perms already computed
  * for each of the user's linked provider accounts (one entry per Discord or
- * Telegram account, in the same shape `DiscordClient#getPerms` and
- * `TelegramClient#getUserPerms` return).
+ * Telegram account, in the same shape `discord-perms.js`'s
+ * `computeDiscordPerms` and `telegram-perms.js`'s `computeTelegramPerms`
+ * return).
  *
  * This is deliberately a consumer of that output, not a second
- * implementation of it. `DiscordClient#getPerms` already encodes Discord's
+ * implementation of it. `computeDiscordPerms` already encodes Discord's
  * `blockedGuilds`/`allowedUsers` precedence: an `allowedUsers` id skips the
- * `blockedGuilds` check entirely and sets `perms.map = true`, so by the time
- * perms reach here a blocked-but-allowed user already has `blocked`
- * unset and `map` true. Re-deriving that precedence from raw guild ids and
- * config here would be a second, divergeable source of truth for the same
- * rule, and would also be wrong for Telegram: `TelegramClient` has no
- * `allowedUsers` bypass at all (an allow-listed Telegram user only gets
- * `admin: true`, not a free pass on `map`), so a shared "allowedUsers wins"
- * rule would misgate that provider.
+ * `blockedGuilds` check entirely and sets every enabled perm (including
+ * `map`) true, so by the time perms reach here a blocked-but-allowed user
+ * already has `blocked` unset and `map` true. Re-deriving that precedence
+ * from raw guild ids and config here would be a second, divergeable source
+ * of truth for the same rule, and would also be wrong for Telegram:
+ * `computeTelegramPerms` has no `allowedUsers` bypass at all (an
+ * allow-listed Telegram user only gets `admin: true`, not a free pass on
+ * `map`), so a shared "allowedUsers wins" rule would misgate that provider.
  *
  * A user with no linked provider accounts (a local-only sign-in, with no
  * computed perms rows at all) is allowed: nothing here has an opinion on the
@@ -66,17 +67,36 @@ async function checkSignInGate(userId, deps) {
  */
 function createSignInGateCheck() {
   return async function checkGate(userId) {
-    const { eq } = require('drizzle-orm')
+    const { eq, and } = require('drizzle-orm')
+    const config = require('@rm/config')
     const { getDrizzle } = require('../db/drizzle')
     const { authAccount } = require('../db/auth-schema')
-    const { state } = require('../services/state')
     const { buildComputers } = require('./recompute-perms-on-sign-in')
 
     const db = getDrizzle()
+    const getDiscordAccessToken = async (uid) => {
+      const rows = await db
+        .select({ accessToken: authAccount.accessToken })
+        .from(authAccount)
+        .where(
+          and(
+            eq(authAccount.userId, uid),
+            eq(authAccount.providerId, 'discord'),
+          ),
+        )
+      return rows[0]?.accessToken || null
+    }
+
     return checkSignInGate(userId, {
       getAccounts: (id) =>
         db.select().from(authAccount).where(eq(authAccount.userId, id)),
-      computers: buildComputers(state.event.authClients),
+      // No `credential` computer -- see recomputePermsOnSignIn.js's own
+      // comment on the same omission. The gate deliberately does not gain
+      // an opinion on local sign-in here; that stays out of scope.
+      computers: buildComputers({
+        strategies: config.getSafe('authentication.strategies'),
+        getDiscordAccessToken,
+      }),
     })
   }
 }

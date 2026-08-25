@@ -103,14 +103,56 @@ test('recomputeUserPerms upserts nothing for a user with no linked accounts', as
   expect(upserted).toEqual([])
 })
 
-test('buildComputers only maps providers whose client is registered', () => {
+test('buildComputers only maps providers whose strategy is enabled', () => {
   const computers = buildComputers({
-    discord: { strategy: { type: 'discord' } },
+    strategies: [{ type: 'discord', enabled: true }],
+    getDiscordAccessToken: async () => null,
   })
   expect(Object.keys(computers)).toEqual(['discord'])
 })
 
-test('buildComputers maps to nothing when no auth clients are registered', () => {
-  expect(buildComputers({})).toEqual({})
-  expect(buildComputers(undefined)).toEqual({})
+test('buildComputers maps to nothing when no strategy is enabled', () => {
+  expect(
+    buildComputers({ strategies: [], getDiscordAccessToken: async () => null }),
+  ).toEqual({})
+  expect(
+    buildComputers({
+      strategies: [
+        { type: 'discord', enabled: false },
+        { type: 'telegram', enabled: false },
+      ],
+      getDiscordAccessToken: async () => null,
+    }),
+  ).toEqual({})
+})
+
+test('buildComputers registers no credential computer -- see recomputePermsOnSignIn.js for why', () => {
+  const computers = buildComputers({
+    strategies: [
+      { type: 'discord', enabled: true },
+      { type: 'telegram', enabled: true, botToken: 't', groups: [] },
+      { type: 'local', enabled: true },
+    ],
+    getDiscordAccessToken: async () => null,
+  })
+  expect(Object.keys(computers).sort()).toEqual(['discord', 'telegram'])
+})
+
+test("buildComputers' discord computer fetches guilds and computes perms, skipping the row when the token is missing", async () => {
+  const computers = buildComputers({
+    strategies: [
+      {
+        type: 'discord',
+        enabled: true,
+        allowedUsers: ['admin-1'],
+        allowedGuilds: [],
+        blockedGuilds: [],
+      },
+    ],
+    getDiscordAccessToken: async () => null,
+  })
+  expect(await computers.discord('some-account', 'some-user')).toBeNull()
+  expect(await computers.discord('admin-1', 'some-user')).toEqual(
+    expect.objectContaining({ admin: true }),
+  )
 })
