@@ -23,7 +23,7 @@ generate(true)
   })
   .then(() => build())
   .then(() => log.info(TAGS.build, 'React Map Compiled'))
-  .then(() => require('./server/src/index'))
+  .then(() => require('./server/src/serve'))
   .catch((e) => {
     log.error(TAGS.ReactMap, 'Unable to start ReactMap', e)
     process.exitCode = 1

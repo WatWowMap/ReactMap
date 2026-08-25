@@ -83,7 +83,11 @@ const settingsHandler = createSettingsHandler()
 
 const server = Bun.serve({
   hostname: config.getSafe('interface'),
-  port: config.has('v2Port') ? config.getSafe('v2Port') : 8081,
+  // The Express entry that owned 8080 is gone from this branch, so the 2.0
+  // server takes the standard `port`/`PORT` config key outright instead of
+  // a separate `v2Port` coexistence knob -- there is nothing left to share
+  // the machine with.
+  port: config.getSafe('port'),
   async fetch(request, bunServer) {
     const url = new URL(request.url)
 

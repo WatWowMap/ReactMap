@@ -53,13 +53,14 @@ function computeLocalPerms(rules) {
   )
   perms.admin = false
   perms.trial = false
-  // areaPerms reads config.areas, which is only populated once the server
-  // has loaded its area boundary files at boot (`config.setAreas`, called
-  // from server/src/index.js's startup, not from module load). Guarding on
-  // config.has keeps this function callable -- and this file's own unit
-  // tests runnable -- before that has happened, same as
-  // `getFromConfigOverrideOrArea` in packages/config/lib/index.js does for
-  // the same reason.
+  // areaPerms reads config.areas, which is only populated once something
+  // calls `config.setAreas` with the loaded area boundary files -- 2.0's
+  // entry (server/src/serve.js) does not do this yet, so this currently
+  // always falls through to the config.has guard below. Keeping the guard
+  // rather than assuming `config.areas` exists is what keeps this function
+  // callable -- and this file's own unit tests runnable -- either way, same
+  // as `getFromConfigOverrideOrArea` in packages/config/lib/index.js does
+  // for the same reason.
   perms.areaRestrictions = config.has('areas') ? areaPerms([LOCAL_ROLE]) : []
   perms.webhooks = webhookPerms([LOCAL_ROLE], 'local')
   perms.scanner = scannerPerms([LOCAL_ROLE], 'local')

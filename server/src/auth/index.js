@@ -121,7 +121,7 @@ function buildAuthOptions(input) {
     // Express preset -- consults no forwarded header at all, because none of
     // those can be expressed as Better Auth's address allowlist. That would
     // otherwise leave `auth_session.ip_address` an empty string even for a
-    // direct connection, so `server/src/index.js` overwrites the forwarded
+    // direct connection, so `server/src/serve.js` overwrites the forwarded
     // header with the real socket address ahead of the Better Auth handler
     // in that case, and this reads it back from the same header name.
     advanced: {

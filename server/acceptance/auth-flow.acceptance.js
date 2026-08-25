@@ -1,4 +1,4 @@
-// server/acceptance/authFlow.acceptance.js
+// server/acceptance/auth-flow.acceptance.js
 //
 // The seven acceptance criteria for the 2.0 Server Foundation plan
 // (docs/superpowers/plans/2026-08-24-2-0-server-foundation.md), written
@@ -14,22 +14,24 @@
 //   - Every request carries an explicit client-side timeout, and every
 //     criterion checks elapsed time, not just status. A response that
 //     answers correctly and then holds the connection open is a failure
-//     here, per criterion 7 -- this has shipped once already on this
-//     branch (see server/src/index.js's comment on compression/toNodeHandler
-//     ordering).
+//     here, per criterion 7 -- this shipped once already on this branch
+//     under the old Express entry, where `compression` sat ahead of
+//     `toNodeHandler` and held a response open after it answered. The
+//     2.0 entry (server/src/serve.js) has no middleware stack for that
+//     class of bug to exist in, but the check stays.
 //   - Database access in this file is only ever used to ARRANGE a
 //     precondition (seed a legacy row, grant/revoke a permission) or to
 //     CLEAN UP what this run created. It is never used as the assertion
 //     itself -- every assertion reads a real HTTP response.
 //
-// Run with `bun test ./server/acceptance/authFlow.acceptance.js` (see
+// Run with `bun test ./server/acceptance/auth-flow.acceptance.js` (see
 // package.json's `test:acceptance` script). This file is deliberately
-// named without ".test." in it so bare `bun test` -- the unit gate, 351
+// named without ".test." in it so bare `bun test` -- the unit gate, 306
 // tests -- does not pick it up; Bun only discovers "*.test.*"/"*.spec.*"
 // files automatically, so this one only runs when asked for by path.
 //
 // Requires: a real MySQL reachable via the same REACT_MAP_DB_* variables
-// server/src/index.js uses (from .env), and API_SESSION_SECRET set (also
+// server/src/serve.js uses (from .env), and API_SESSION_SECRET set (also
 // from .env). Local sign-up/sign-in is enabled for the server process this
 // file spawns via the AUTHENTICATION_STRATEGIES env var, which overrides
 // config/default.json's `authentication.strategies` (disabled there) for
@@ -150,7 +152,7 @@ beforeAll(async () => {
   })
 
   serverProcess = Bun.spawn({
-    cmd: ['bun', 'server/src/index.js'],
+    cmd: ['bun', 'server/src/serve.js'],
     cwd: REPO_ROOT,
     env: {
       ...process.env,
@@ -410,16 +412,17 @@ describe('criterion 5: a revoked permission stops appearing on the next request'
   // The ARRANGE and the "revoke" step below both write to user_perms
   // directly, because nothing in the current stack can trigger a
   // revocation over HTTP or from a real event yet: the only code that
-  // calls `revokeProviderAccess` (server/src/auth/revokeAccessAdapter.js)
-  // is server/src/services/DiscordClient.js, which this plan forbids
-  // wiring into the 2.0 server, and server/src/services/Trial.js, which
-  // needs a live trial window and provider account to exercise.
+  // calls `revokeProviderAccess` (server/src/auth/revoke-access-adapter.js)
+  // is 1.x's Discord client, which this plan forbids wiring into the 2.0
+  // server (and which Task 7 removed from this branch entirely), and 1.x's
+  // trial service, which needs a live trial window and provider account to
+  // exercise and was removed the same way.
   //
   // Task 4 landed, and it gave `credential` its own real recompute -- which
   // is exactly why this row is written under a synthetic `manual-grant`
   // provider id instead: `/api/settings` merges every user_perms row
   // regardless of provider (`mergePerms` in
-  // server/src/middleware/authSession.js), but a real `credential` row now
+  // server/src/settings-response.js), but a real `credential` row now
   // gets recomputed to a fresh, config-derived value on every sign-in (see
   // criterion 2's identical situation), which would silently overwrite this
   // test's manual "revoke" write the moment `signInAndGetSettings` below

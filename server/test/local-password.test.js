@@ -1,7 +1,6 @@
 const assert = require('node:assert/strict')
 const { test, spyOn } = require('bun:test')
 
-const { state } = require('./state-mock')
 const {
   hashPassword,
   verifyPassword,
@@ -53,49 +52,26 @@ const LEGACY_MULTIBYTE_PASSWORD = `p@sswörd-${'日'.repeat(30)}`
 const LEGACY_MULTIBYTE_HASH =
   '$2b$10$bo6ga7lhKno/p//bkO6Bruz1JO2dJsHBjX0.AUWsnYkKRDWrUcAa6'
 
-/**
- * Records every write to the users table so tests can assert none happens.
- * A legacy verify must never touch the stored hash.
- * @returns {{patch: object, column: string, value: unknown}[]}
- */
-function trackUserUpdates() {
-  /** @type {{patch: object, column: string, value: unknown}[]} */
-  const updates = []
-  state.db.models.User = {
-    query: () => ({
-      update: (patch) => ({
-        where: (column, value) => {
-          updates.push({ patch, column, value })
-          return Promise.resolve(1)
-        },
-      }),
-    }),
-  }
-  return updates
-}
-
 test('verifies a password longer than 72 bytes against its legacy hash', async () => {
-  const updates = trackUserUpdates()
   assert.equal(
     await verifyPassword(LEGACY_LONG_PASSWORD, LEGACY_LONG_HASH),
     true,
   )
-  assert.equal(updates.length, 0)
 })
 
 test('does not rewrite the row for a login with a different tail', async () => {
   // The bytes past 72 were never verified against anything, so a mistyped tail
   // reaches this path looking exactly like the real one. Re-hashing the
   // submitted string would make the mistyped password canonical and lock the
-  // owner out. The stored hash has to survive untouched.
-  const updates = trackUserUpdates()
+  // owner out. The stored hash has to survive untouched -- verifyPassword
+  // itself never writes anywhere, so "untouched" here means its return value
+  // stays derived purely from the hash it was given, not from a side effect.
   const mistyped = `${LEGACY_LONG_PASSWORD.slice(0, 72)}totally different tail`
   assert.equal(Buffer.byteLength(mistyped, 'utf8') > 72, true)
   assert.notEqual(mistyped, LEGACY_LONG_PASSWORD)
 
   assert.equal(await verifyPassword(mistyped, LEGACY_LONG_HASH), true)
 
-  assert.equal(updates.length, 0)
   // The real password still works, because nothing was written.
   assert.equal(
     await verifyPassword(LEGACY_LONG_PASSWORD, LEGACY_LONG_HASH),
@@ -106,27 +82,22 @@ test('does not rewrite the row for a login with a different tail', async () => {
 test('keeps accepting the legacy prefix on every login', async () => {
   // Without the rewrite this path never converges, so it has to stay repeatable
   // rather than working once.
-  const updates = trackUserUpdates()
   for (let i = 0; i < 3; ++i) {
     assert.equal(
       await verifyPassword(LEGACY_LONG_PASSWORD, LEGACY_LONG_HASH),
       true,
     )
   }
-  assert.equal(updates.length, 0)
 })
 
 test('rejects a wrong password longer than 72 bytes', async () => {
-  const updates = trackUserUpdates()
   const wrong = `wrong ${LEGACY_LONG_PASSWORD}`
   assert.equal(Buffer.byteLength(wrong, 'utf8') > 72, true)
 
   assert.equal(await verifyPassword(wrong, LEGACY_LONG_HASH), false)
-  assert.equal(updates.length, 0)
 })
 
 test('truncates on the byte boundary, not the character boundary', async () => {
-  const updates = trackUserUpdates()
   // Under 72 characters, so a length check would never reach the fallback.
   assert.equal(LEGACY_MULTIBYTE_PASSWORD.length < 72, true)
   assert.equal(Buffer.byteLength(LEGACY_MULTIBYTE_PASSWORD, 'utf8'), 100)
@@ -135,18 +106,15 @@ test('truncates on the byte boundary, not the character boundary', async () => {
     await verifyPassword(LEGACY_MULTIBYTE_PASSWORD, LEGACY_MULTIBYTE_HASH),
     true,
   )
-  assert.equal(updates.length, 0)
 })
 
 test('does not fall back for a hash written by Bun', async () => {
-  const updates = trackUserUpdates()
   const hash = await hashPassword(LEGACY_LONG_PASSWORD)
 
   assert.equal(
     await verifyPassword(`${LEGACY_LONG_PASSWORD} extra`, hash),
     false,
   )
-  assert.equal(updates.length, 0)
 
   const spy = spyOn(Bun.password, 'verify')
   try {
@@ -155,7 +123,6 @@ test('does not fall back for a hash written by Bun', async () => {
   } finally {
     spy.mockRestore()
   }
-  assert.equal(updates.length, 0)
 })
 
 test('rejects a malformed stored hash instead of throwing', async () => {
