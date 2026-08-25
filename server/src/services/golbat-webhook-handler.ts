@@ -98,8 +98,14 @@ function createGolbatWebhookHandler({
       }
     }
 
-    // Checked before the body is read at all, so an oversized POST costs
-    // this process a header lookup rather than a 16MB read and parse.
+    // A courtesy early-out for an honest sender: it turns an oversized POST
+    // into a header lookup and a clean 413 rather than a 16MB read. It is
+    // NOT the size limit. A caller who omits `content-length` -- which any
+    // chunked `Transfer-Encoding` request does -- reads back as `null` here,
+    // and `Number(null)` is `0`, which is finite and under any ceiling. The
+    // real ceiling is `maxRequestBodySize` on `Bun.serve` in `serve.ts`,
+    // enforced by the transport before this handler is ever entered, and so
+    // indifferent to how the body was framed.
     const declaredBytes = Number(request.headers.get('content-length'))
     if (
       Number.isFinite(declaredBytes) &&
@@ -151,5 +157,6 @@ function createGolbatWebhookHandler({
 export {
   createGolbatWebhookHandler,
   GOLBAT_WEBHOOK_SECRET_HEADER,
+  MAX_WEBHOOK_BATCH_BYTES,
   warnIfWebhookSecretMissing,
 }

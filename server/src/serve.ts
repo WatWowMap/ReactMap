@@ -15,6 +15,7 @@ import {
 import { createGolbatClient } from './services/golbat-client'
 import {
   createGolbatWebhookHandler,
+  MAX_WEBHOOK_BATCH_BYTES,
   warnIfWebhookSecretMissing,
 } from './services/golbat-webhook-handler'
 import { createSubscriptionRegistry } from './services/subscription-registry'
@@ -136,6 +137,13 @@ const server = Bun.serve({
   // a separate `v2Port` coexistence knob -- there is nothing left to share
   // the machine with.
   port: config.getSafe('port'),
+  // The webhook receiver is unauthenticated unless an operator configures a
+  // shared secret, so the largest body this process will read has to be
+  // capped somewhere that a caller cannot talk its way past. Its own
+  // `content-length` check cannot be that place: the header is absent on a
+  // chunked request and reads back as `null`. This is enforced by the
+  // transport, before any handler runs, whatever encoding the sender chose.
+  maxRequestBodySize: MAX_WEBHOOK_BATCH_BYTES,
   async fetch(request, bunServer) {
     const url = new URL(request.url)
 

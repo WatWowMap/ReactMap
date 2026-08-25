@@ -1221,4 +1221,44 @@ describe('criterion 8: every response completes, over HTTP and over the socket',
     })
     expect(post.elapsedMs).toBeLessThan(HANG_THRESHOLD_MS)
   })
+
+  // The webhook receiver's own size check reads `content-length`, and a
+  // chunked request does not send one. `Number(null)` is `0`, so that check
+  // waves an arbitrarily large body straight through -- it stops an honest
+  // sender and nobody else. The real ceiling is `maxRequestBodySize` on
+  // `Bun.serve`, which the transport applies before any handler runs, and
+  // only a live server over a real socket can show that it holds. Both
+  // framings are sent here because the bug was that they disagreed.
+  test('an oversized body is refused however it is framed, not just when it declares its length', async () => {
+    const oversized = JSON.stringify([
+      {
+        type: 'raid',
+        message: { gym_id: 'x'.repeat(17 * 1024 * 1024), level: 5 },
+      },
+    ])
+
+    const declared = await fetch(`${BASE_URL}/api/webhooks/golbat`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: oversized,
+    })
+    expect(declared.status).toBe(413)
+
+    // A stream body makes the client send `Transfer-Encoding: chunked` with
+    // no `content-length`, which is what defeated the handler-level check.
+    const chunked = await fetch(`${BASE_URL}/api/webhooks/golbat`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: new ReadableStream({
+        start(controller) {
+          controller.enqueue(new TextEncoder().encode(oversized))
+          controller.close()
+        },
+      }),
+      // @ts-expect-error -- `duplex` is required for a stream body and is
+      // not yet in the lib.dom RequestInit type.
+      duplex: 'half',
+    })
+    expect(chunked.status).toBe(413)
+  })
 })
