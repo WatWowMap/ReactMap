@@ -52,32 +52,39 @@ beats maintaining a second, slower code path for one of four layers.
 Not because it is unwanted, but to see whether the rules system can carry what
 power users currently use it for. Revisit only if it cannot.
 
-## 6. A Poracle import promises everything Poracle can track
+## 6. A Poracle import promises the location anchor, not the area list
 
-Including the per-rule overrides ReactMap has no column for. Poracle's
-`000004_per_rule_overrides` migration adds two columns to every tracking table
-(`monsters`, `raid`, `egg`, `quest`, `invasion`, `lures`, `nests`, `gym`,
-`forts`, `maxbattle`):
+Poracle's `000004_per_rule_overrides` migration adds two columns to every
+tracking table (`monsters`, `raid`, `egg`, `quest`, `invasion`, `lures`,
+`nests`, `gym`, `forts`, `maxbattle`). ReactMap takes one of them.
 
-- `override_areas TEXT NULL` — a geofence list that **replaces** the person's
-  global area subscriptions for that one rule, rather than intersecting with
-  them.
-- `override_location_label VARCHAR(64) NULL` — names a row in `user_locations`
-  (`id`, `label`, `latitude`, `longitude`), and distance for that rule is
-  measured from there instead of from the person's own position.
+**In scope: `override_location_label VARCHAR(64) NULL`.** It names a row in
+Poracle's `user_locations` table (`id`, `label`, `latitude`, `longitude`), and
+distance for that rule is measured from there rather than from the person's own
+position. So one rule can say "within 2km of work" while everything else stays
+relative to home. ReactMap needs a saved-locations table of its own to hold the
+places, since the label is meaningless without them.
 
-So one rule can say "within 2km of work" while the rest stay relative to home,
-and another can fire only inside two named areas regardless of what its owner is
-otherwise subscribed to.
+**Out of scope: `override_areas TEXT NULL`.** In Poracle this replaces the
+person's global geofence subscriptions for one rule, rather than intersecting
+with them. ReactMap already has its own area model and is not adopting
+Poracle's per-rule one.
 
-Two properties of `resolveOverride` (`matching/generic.go:146`) that the import
-has to respect. A label pointing at a saved location that no longer exists
-**silently falls back** to the person's default position rather than erroring, so
-a partial import would not announce itself. And the label is meaningless without
-`user_locations`, so the saved places have to come across with the rules.
+**What that costs, and what the importer owes the user because of it.** An
+imported rule that carried `override_areas` will now fire against the person's
+ReactMap areas instead of the narrower list they had set on that rule. That is
+the silent data loss this question was originally asked about, so it must not
+be silent: the importer reports every rule it changed the area behaviour of,
+names them, and says what they will do now. Dropping a setting the user chose is
+acceptable when they are told; it is not acceptable quietly.
 
-Scope still open: whether the first release carries both halves or only
-`override_areas`, with saved locations deferred.
+There is a matching trap on the half being kept. `resolveOverride`
+(`matching/generic.go:146`) falls back to the person's default position when a
+label points at a saved location that no longer exists, silently and without
+error. An import that brings rules across without their `user_locations` rows
+would therefore produce rules that look right and quietly measure from the wrong
+place. The saved locations come across with the rules or the labels do not come
+across at all.
 
 ## 7. Do not wait on the incremental Golbat query
 
