@@ -79,6 +79,15 @@ export interface PokemonEntity {
   iv?: number
   level?: number
   size?: number
+  /**
+   * The rule ids `map-subscription.ts` says matched this entity, in the
+   * order the server sent them. `app/rules/resolve-appearance.ts` reads
+   * this to decide how the marker draws. Absent on a subscription rules
+   * do not drive and on every fixture built before rules existed, both
+   * of which read the same as "no rule opinion" -- `resolveAppearance`
+   * treats a missing/empty list and an unresolved id identically.
+   */
+  matched?: number[]
 }
 
 /**

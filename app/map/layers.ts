@@ -1,5 +1,7 @@
 import type { Color, Layer } from '@deck.gl/core'
 import { IconLayer, TextLayer } from '@deck.gl/layers'
+import { resolveAppearance, type SIZE_ORDER } from '../rules/resolve-appearance'
+import type { Rule } from '../rules/rule-types'
 import type { IconDescriptor } from './atlas'
 import {
   type ClusterMarker,
@@ -9,6 +11,23 @@ import {
   DEFAULT_POKEMON_CLUSTER_RULES,
 } from './clustering'
 import type { GymEntity, PokemonEntity, Team, Viewport } from './types'
+
+/** No rule matched anything: every entity resolves to `resolveAppearance`'s
+ * own defaults. One shared instance, not a fresh `new Map()` per call --
+ * `buildMapLayers` runs on every clock tick (see MapCanvas), and an empty
+ * map costs nothing to share. */
+const NO_RULES: ReadonlyMap<number, Rule> = new Map()
+
+/** `rule.size` in pixels. `'md'`'s value is deliberately what an
+ * unresolved marker drew at before rules existed, so a pokemon nothing
+ * matched (or a subscription with no rules source at all) looks exactly
+ * as it always did. */
+const SIZE_PIXELS: Record<(typeof SIZE_ORDER)[number], number> = {
+  sm: 24,
+  md: 32,
+  lg: 40,
+  xl: 48,
+}
 
 export const POKEMON_ICON_LAYER_ID = 'pokemon-icons'
 export const POKEMON_LABEL_LAYER_ID = 'pokemon-labels'
@@ -103,10 +122,18 @@ function pokemonLabelText(entity: PokemonEntity, now: number): string {
  * entity rather than pre-drawing the whole array: the atlas's own LRU is
  * what keeps that cheap on a hit, and staying entity-in-descriptor-out here
  * keeps this layer ignorant of the drawing/caching machinery entirely.
+ *
+ * `getSize` runs `resolveAppearance` per entity, inside the accessor deck.gl
+ * itself calls to build the size attribute -- never over `pokemon` up front
+ * into a second array. `rules` is read fresh on every call rather than
+ * closed over once, for the same reason `data` here is the array
+ * `entity-store.ts` already keeps stable: this function must not allocate
+ * anything deck.gl would see as a new top-level reference.
  */
 export function buildPokemonIconLayer(
   pokemon: readonly PokemonEntity[],
   getIconFor: (entity: PokemonEntity) => IconDescriptor,
+  rules: ReadonlyMap<number, Rule> = NO_RULES,
 ): IconLayer<PokemonEntity> {
   return new IconLayer<PokemonEntity>({
     id: POKEMON_ICON_LAYER_ID,
@@ -122,7 +149,8 @@ export function buildPokemonIconLayer(
         height: icon.height,
       }
     },
-    getSize: 32,
+    getSize: (entity) =>
+      SIZE_PIXELS[resolveAppearance(entity.matched ?? [], rules).size],
   })
 }
 
@@ -318,6 +346,13 @@ export interface BuildMapLayersOptions {
   /** Per-category override of the default rules read from `config/default.json`. */
   clusterRules?: { pokemon?: ClusterRules; gyms?: ClusterRules }
   getClusterIcon?: () => IconDescriptor
+  /**
+   * The signed-in profile's rules (`app/rules/rules-query.ts`'s
+   * `useRules`), read by `buildPokemonIconLayer` to size each marker from
+   * what matched it. Omitted, every pokemon draws at the pre-rules
+   * default -- `NO_RULES` above.
+   */
+  rules?: ReadonlyMap<number, Rule>
 }
 
 /**
@@ -432,12 +467,13 @@ export function buildMapLayers({
   viewport,
   clusterRules,
   getClusterIcon,
+  rules,
 }: BuildMapLayersOptions): MapLayersResult {
   if (!viewport) {
     return {
       layers: [
         buildGymIconLayer(gyms, getGymIcon, root),
-        buildPokemonIconLayer(pokemon, getIconFor),
+        buildPokemonIconLayer(pokemon, getIconFor, rules),
         buildPokemonTextLayer(pokemon, now),
       ],
       limitHit: NOTHING_CAPPED,
@@ -458,7 +494,7 @@ export function buildMapLayers({
 
   const layers: Layer[] = [
     buildGymIconLayer(gymResult.points, getGymIcon, root),
-    buildPokemonIconLayer(pokemonResult.points, getIconFor),
+    buildPokemonIconLayer(pokemonResult.points, getIconFor, rules),
     buildPokemonTextLayer(pokemonResult.points, now),
   ]
 

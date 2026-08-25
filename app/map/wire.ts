@@ -41,6 +41,18 @@ export interface DeltaMessage {
   added: RawEntity[]
   changed: RawEntity[]
   removed: string[]
+  /**
+   * One integer per envelope, not per entity -- stamped by
+   * `map-subscription.ts` whenever rules drove this poll. A rule edited
+   * elsewhere bumps it without changing any rule's id, which is the case
+   * `rules-query.ts`'s staleness check needs a version for: an unknown
+   * matched id alone cannot see an edit. Optional because a subscription
+   * rules do not drive (an anonymous connection, or a gym category today
+   * -- see the task 6 report) never stamps one, and every fixture built
+   * before this field existed still constructs a valid `DeltaMessage`
+   * without it.
+   */
+  rulesVersion?: number
 }
 
 const CATEGORIES: readonly string[] = ['pokemon', 'gym']
@@ -68,7 +80,9 @@ export function isDeltaMessage(value: unknown): value is DeltaMessage {
     CATEGORIES.includes(message.category) &&
     isRawEntityArray(message.added) &&
     isRawEntityArray(message.changed) &&
-    isStringArray(message.removed)
+    isStringArray(message.removed) &&
+    (message.rulesVersion === undefined ||
+      typeof message.rulesVersion === 'number')
   )
 }
 

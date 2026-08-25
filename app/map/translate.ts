@@ -92,6 +92,11 @@ export function translatePokemon(raw: RawEntity): PokemonEntity | null {
   if (level !== undefined) entity.level = level
   const size = num(raw.size)
   if (size !== undefined) entity.size = size
+  if (Array.isArray(raw.matched)) {
+    entity.matched = raw.matched.filter(
+      (id): id is number => typeof id === 'number',
+    )
+  }
 
   return entity
 }

@@ -2,6 +2,7 @@ import 'maplibre-gl/dist/maplibre-gl.css'
 
 import type { PickingInfo } from '@deck.gl/core'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useRules } from '../rules/rules-query'
 import { createAtlas } from './atlas'
 import {
   drawClusterIcon,
@@ -40,6 +41,17 @@ const EMPTY_LAYERS: MapLayersResult = {
 const CLOCK_TICK_MS = 1000
 
 /**
+ * Every account has exactly one profile, seeded on first sign-in
+ * (`seedProfileForUser`), and the profile switcher this would come from
+ * is deferred -- see the filters design spec's Deferred section. This id
+ * exists only to give `useRules`' query key the shape it will need once
+ * a switcher lands (`rules-query.ts`'s `rulesQueryKey`); `rules.list`
+ * itself never reads it, since the server resolves the caller's profile
+ * from the session.
+ */
+const CURRENT_PROFILE_ID = 1
+
+/**
  * Mounts one MapLibre instance sized to the viewport minus the bottom nav
  * (`Shell` reserves that with `pb-16`, 4rem, so this container claims the
  * rest of the dynamic viewport height rather than the full 100dvh, or the
@@ -65,6 +77,13 @@ export function MapCanvas({ initialCamera, onCameraChange }: MapCanvasProps) {
   // buffers for a change in the other one.
   const pokemon = useEntityStore((state) => state.pokemon)
   const gyms = useEntityStore((state) => state.gyms)
+  // `useRules`' own `rules` reference is stable across renders that did
+  // not change the fetched set (see rules-query.ts), so this does not
+  // reintroduce the per-render allocation `buildMapLayers` below has to
+  // avoid. The profile id is a placeholder: this plan seeds exactly one
+  // profile per account and defers the switcher, so there is nothing yet
+  // for a client to choose between -- see rules-query.ts's `rulesQueryKey`.
+  const { rules } = useRules(CURRENT_PROFILE_ID)
   // Countdown/IV text is layer data, not a per-marker component: this is
   // the one clock this whole tree reads, and every timer-bearing layer is
   // rebuilt from it on the same tick rather than each owning its own. It
@@ -153,13 +172,14 @@ export function MapCanvas({ initialCamera, onCameraChange }: MapCanvasProps) {
       getIconFor: atlas.getIconFor,
       getGymIcon: drawGymIcon,
       getClusterIcon: drawClusterIcon,
+      rules,
       // Any value: the text layer this produces is replaced on every tick.
       now: 0,
       ...(viewport ? { viewport } : {}),
     })
     // rebuildToken is intentionally in this array with no other purpose
     // than to invalidate this memo; see handleContextRestore above.
-  }, [pokemon, gyms, viewport, rebuildToken])
+  }, [pokemon, gyms, viewport, rebuildToken, rules])
 
   const built = useMemo(() => {
     const atlas = atlasRef.current
