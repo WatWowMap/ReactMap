@@ -18,6 +18,7 @@ import {
 import { hashPassword, verifyPassword } from '../services/local-password'
 import { createEnforceMaxSessions } from './max-sessions'
 import { createRecomputeUserPerms } from './recompute-perms-on-sign-in'
+import { createSeedProfileOnSignIn } from './seed-profile'
 import { createSignInGateCheck } from './sign-in-gate'
 import { telegramPlugin } from './telegram'
 
@@ -255,7 +256,20 @@ function getAuth() {
       baseURL: config.getSafe('api.baseUrl'),
       trustProxy: resolveTrustProxy(config.getSafe('api.trustProxy')),
       cookieAgeDays: config.getSafe('api.cookieAgeDays'),
-      onSessionCreate: createRecomputeUserPerms(),
+      // Two independent pieces of first-sign-in work share the one
+      // `session.create.after` hook rather than each adding a layer of its
+      // own: recompute the user's perms, then make sure they have a profile
+      // and a rule to look at. Both swallow their own failures, because
+      // this hook runs after the session row is already written -- see the
+      // `create.after` note in buildAuthOptions.
+      onSessionCreate: (() => {
+        const recomputePerms = createRecomputeUserPerms()
+        const seedProfile = createSeedProfileOnSignIn()
+        return async (userId: string) => {
+          await recomputePerms(userId)
+          await seedProfile(userId)
+        }
+      })(),
       checkSignInGate: createSignInGateCheck(),
       enforceMaxSessions: createEnforceMaxSessions(
         config.getSafe('api.maxSessions'),
