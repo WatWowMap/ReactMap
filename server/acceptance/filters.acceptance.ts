@@ -165,8 +165,24 @@ afterAll(async () => {
     fakeGolbat.close()
   }
   if (db) {
-    // A later task in this plan adds the rules table. If it hangs a foreign
-    // key off auth_user, its own cleanup belongs here, ahead of these.
+    // The rule tables carry no foreign key to auth_user, so nothing cascades
+    // and these rows outlive the run unless they are removed by hand. Order
+    // matters anyway: the children are keyed by rule id, so they go first.
+    const userScope = `SELECT id FROM auth_user WHERE email LIKE ?`
+    const ruleScope = `SELECT id FROM rule WHERE user_id IN (${userScope})`
+    await db.query(
+      `DELETE FROM rule_exclusion WHERE rule_id IN (${ruleScope})`,
+      [`${USER_PREFIX}-%`],
+    )
+    await db.query(`DELETE FROM rule_pokemon WHERE rule_id IN (${ruleScope})`, [
+      `${USER_PREFIX}-%`,
+    ])
+    await db.query(`DELETE FROM rule WHERE user_id IN (${userScope})`, [
+      `${USER_PREFIX}-%`,
+    ])
+    await db.query(`DELETE FROM profile WHERE user_id IN (${userScope})`, [
+      `${USER_PREFIX}-%`,
+    ])
     await db.query(
       `DELETE FROM auth_session WHERE user_id IN (SELECT id FROM auth_user WHERE email LIKE ?)`,
       [`${USER_PREFIX}-%`],
