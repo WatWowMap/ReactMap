@@ -132,16 +132,22 @@ function startFakeGolbat(): FakeGolbat {
       }
 
       // decoder api_pokemon_scan_v3.go / routes_huma.go:53 -- POST /api/pokemon/v3/scan
+      //
+      // 202, not 200. Measured against the production Golbat at amp4:4001:
+      // a successful `POST /api/pokemon/v3/scan` answers `202 Accepted`.
+      // `golbat-client.ts` tests `!response.ok`, which accepts either, but a
+      // fake that answers 200 is not reproducing the contract the client
+      // actually meets.
       if (
         url.pathname === '/api/pokemon/v3/scan' &&
         request.method === 'POST'
       ) {
-        return Response.json(pokemonHandler(body))
+        return Response.json(pokemonHandler(body), { status: 202 })
       }
 
       // decoder api_fort.go / routes_huma.go:236 -- POST /api/fort/scan
       if (url.pathname === '/api/fort/scan' && request.method === 'POST') {
-        return Response.json(fortHandler(body))
+        return Response.json(fortHandler(body), { status: 202 })
       }
 
       // routes_huma.go:72 -- GET /api/status
