@@ -635,6 +635,10 @@
     },
     "schemas": []
   },
+  "golbat": {
+    "apiUrl": "",
+    "apiSecret": ""
+  },
   "scanner": {
     "backendConfig": {
       "platform": "rdm/dragonite/custom",

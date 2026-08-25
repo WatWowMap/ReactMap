@@ -1481,6 +1481,10 @@
       "__format": "json"
     }
   },
+  "golbat": {
+    "apiUrl": "GOLBAT_API_URL",
+    "apiSecret": "GOLBAT_API_SECRET"
+  },
   "scanner": {
     "backendConfig": {
       "platform": "SCANNER_BACKEND_CONFIG_PLATFORM",
