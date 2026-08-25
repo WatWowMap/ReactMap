@@ -12,6 +12,8 @@
  * to its species id here rather than being silently dropped.
  */
 
+import { Label } from '../components/ui/label'
+import { Switch } from '../components/ui/switch'
 import type { ConditionSeed } from './condition-editor'
 import { ConditionEditor } from './condition-editor'
 import type { RulePatch } from './rules-query'
@@ -27,6 +29,8 @@ function toExclusionIds(selection: SpeciesSelection[]): number[] {
 export interface RuleSheetProps {
   /** The rule's subject: `null` means "Any Pokémon". */
   speciesId: number | null
+  /** Whether the rule is switched on. A rule that is off matches nothing. */
+  enabled?: boolean
   species?: SpeciesEntry[]
   exclusions?: number[]
   conditions?: ConditionSeed[]
@@ -36,6 +40,7 @@ export interface RuleSheetProps {
 
 export function RuleSheet({
   speciesId,
+  enabled = true,
   species = [],
   exclusions = [],
   conditions,
@@ -44,6 +49,18 @@ export function RuleSheet({
 }: RuleSheetProps) {
   return (
     <div className="flex flex-col gap-4">
+      {/* The off switch sits above the conditions rather than beside the
+          Save button: it is a statement about the whole rule, not another
+          field of it, and it reports as a patch like every other edit so
+          the split warning gates it too. */}
+      <div className="flex items-center justify-between gap-2">
+        <Label htmlFor="rule-enabled">Enabled</Label>
+        <Switch
+          id="rule-enabled"
+          checked={enabled}
+          onCheckedChange={(next) => onChange?.({ enabled: next })}
+        />
+      </div>
       <ConditionEditor
         {...(conditions ? { conditions } : {})}
         {...(onChange ? { onChange } : {})}

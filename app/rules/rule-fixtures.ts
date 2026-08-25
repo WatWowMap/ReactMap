@@ -38,6 +38,7 @@ export function ruleFixture(overrides: Partial<Rule> & { id: number }): Rule {
     pvpRankMin: null,
     pvpRankMax: null,
     exclusions: [],
+    enabled: true,
     ...overrides,
   }
 }

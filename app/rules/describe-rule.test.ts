@@ -10,6 +10,7 @@ function ruleFixture(overrides: Partial<Rule> = {}): Rule {
     size: null,
     glow: null,
     notify: false,
+    enabled: true,
     speciesId: null,
     formId: null,
     pvpTargetSpecies: null,

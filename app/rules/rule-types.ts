@@ -10,6 +10,8 @@ export interface Rule {
   size: string | null
   glow: string | null
   notify: boolean
+  /** False means the user switched this rule off; it matches nothing. */
+  enabled: boolean
   speciesId: number | null
   formId: number | null
   pvpTargetSpecies: number | null

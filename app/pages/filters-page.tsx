@@ -106,6 +106,13 @@ export function FiltersPage({
                   group={group}
                   names={names}
                   onOpen={() => setOpenGroupId(group.id)}
+                  // Every member of the card, which separates nothing:
+                  // the whole group moves to the same state, so there is
+                  // no split for the warning to gate. Switching ONE
+                  // species off is the editor's job.
+                  onToggle={(enabled) => {
+                    void update(group.ruleIds, { enabled })
+                  }}
                 />
               ))}
             </div>

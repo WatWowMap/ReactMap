@@ -196,3 +196,25 @@ test('an edit aimed at every member rewrites them all, and warns about nothing',
   await waitFor(() => expect(client.updated).toHaveLength(1))
   expect(client.updated[0]?.ruleIds).toEqual([1, 2, 3])
 })
+
+test('the card switch turns the whole group off in one write', async () => {
+  const { client, findByRole } = renderWithRules(rareSpawns(25))
+
+  fireEvent.click(await findByRole('switch', { name: /disable rare spawns/i }))
+
+  await waitFor(() => expect(client.updated).toHaveLength(1))
+  expect(client.updated[0]?.ruleIds).toHaveLength(25)
+  expect(client.updated[0]?.patch).toEqual({ enabled: false })
+})
+
+test('a group that is off still shows, and its switch turns it back on', async () => {
+  const off = rareSpawns(3).map((rule) => ({ ...rule, enabled: false }))
+  const { client, findByRole, getByText } = renderWithRules(off)
+
+  const toggle = await findByRole('switch', { name: /enable rare spawns/i })
+  expect(getByText('Off')).toBeTruthy()
+  fireEvent.click(toggle)
+
+  await waitFor(() => expect(client.updated).toHaveLength(1))
+  expect(client.updated[0]?.patch).toEqual({ enabled: true })
+})

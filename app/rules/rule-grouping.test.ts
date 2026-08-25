@@ -31,6 +31,7 @@ function ruleFixture(overrides: Partial<Rule> & { id: number }): Rule {
     pvpRankMin: null,
     pvpRankMax: null,
     exclusions: [],
+    enabled: true,
     ...overrides,
   }
 }
@@ -66,4 +67,32 @@ test('exclusions participate in the key, so rules with different ones do not gro
     ruleFixture({ id: 2, name: 'Any', speciesId: null, exclusions: [] }),
   ])
   expect(groups).toHaveLength(2)
+})
+
+// `enabled` is in the grouping key for the same reason `size` is: nothing
+// in the schema can say "this row is off but the other twenty-four are on"
+// while they share a card, so switching one off has to split it out.
+test('a disabled rule does not group with its enabled twins', () => {
+  const groups = groupRules([
+    ruleFixture({ id: 1, name: 'Rare', speciesId: 147 }),
+    ruleFixture({ id: 2, name: 'Rare', speciesId: 246, enabled: false }),
+  ])
+  expect(groups).toHaveLength(2)
+})
+
+test('disabling one of twenty-five leaves a card of twenty-four', () => {
+  const species = Array.from({ length: 25 }, (_, index) => 100 + index)
+  const groups = groupRules(
+    species.map((speciesId, index) =>
+      ruleFixture({
+        id: index + 1,
+        name: 'Rare',
+        speciesId,
+        ...(index === 7 ? { enabled: false } : {}),
+      }),
+    ),
+  )
+  expect(groups).toHaveLength(2)
+  expect(groups.map((group) => group.ruleIds.length)).toEqual([24, 1])
+  expect(groups[1]?.sample.enabled).toBe(false)
 })

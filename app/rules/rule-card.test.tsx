@@ -49,6 +49,7 @@ function groupFixture(overrides: Partial<RuleGroup>): RuleGroup {
       pvpRankMin: null,
       pvpRankMax: null,
       exclusions: [],
+      enabled: true,
     },
     ...overrides,
   }
@@ -99,6 +100,54 @@ test('the whole card is a control that opens the rule, keyboard included', () =>
   )
   // A real button, so it is focusable and announced as something that can
   // be opened -- not a div with a click handler.
+  fireEvent.click(getByRole('button', { name: 'Edit Hundos' }))
+  expect(opened).toBe(1)
+})
+
+// The list still shows a rule that is off -- hiding it would defeat the
+// point of being able to turn one off rather than delete it. So the card
+// stays readable, stays openable, and says plainly that it is off.
+
+test('a card carries a switch that reports the state it is moving to', () => {
+  const toggles: boolean[] = []
+  const { getByRole } = render(
+    <RuleCard
+      group={groupFixture({ name: 'Hundos', speciesIds: [null] })}
+      names={NAMES}
+      onToggle={(enabled) => toggles.push(enabled)}
+    />,
+  )
+  fireEvent.click(getByRole('switch', { name: /hundos/i }))
+  expect(toggles).toEqual([false])
+})
+
+test('a disabled card says so, and its switch turns it back on', () => {
+  const toggles: boolean[] = []
+  const group = groupFixture({ name: 'Hundos', speciesIds: [null] })
+  const { getByRole, getByText } = render(
+    <RuleCard
+      group={{ ...group, sample: { ...group.sample, enabled: false } }}
+      names={NAMES}
+      onToggle={(enabled) => toggles.push(enabled)}
+    />,
+  )
+  expect(getByText('Off')).toBeTruthy()
+  fireEvent.click(getByRole('switch', { name: /hundos/i }))
+  expect(toggles).toEqual([true])
+})
+
+test('a disabled card is still openable for editing', () => {
+  let opened = 0
+  const group = groupFixture({ name: 'Hundos', speciesIds: [null] })
+  const { getByRole } = render(
+    <RuleCard
+      group={{ ...group, sample: { ...group.sample, enabled: false } }}
+      names={NAMES}
+      onOpen={() => {
+        opened += 1
+      }}
+    />,
+  )
   fireEvent.click(getByRole('button', { name: 'Edit Hundos' }))
   expect(opened).toBe(1)
 })

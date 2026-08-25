@@ -13,6 +13,11 @@ function buildGroupKey(rule: Rule): string {
     rule.size,
     rule.glow,
     rule.notify,
+    // Two rules identical but for being switched off are not one card:
+    // nothing in the schema can express "off for this member only", so
+    // disabling one species out of twenty-five splits it out exactly as
+    // changing its size does.
+    rule.enabled,
     rule.pvpTargetSpecies,
     rule.ivMin,
     rule.ivMax,

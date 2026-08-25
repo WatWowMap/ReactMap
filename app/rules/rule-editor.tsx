@@ -93,6 +93,7 @@ export function RuleEditor({
 
       <RuleSheet
         speciesId={group.sample.speciesId}
+        enabled={draft.enabled ?? group.sample.enabled}
         species={species}
         exclusions={group.sample.exclusions}
         conditions={conditionSeeds(group.sample)}
