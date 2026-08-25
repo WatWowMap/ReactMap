@@ -68,6 +68,26 @@ function injectionsFor(
   )
 }
 
+// How many (injection x subscription) match attempts one fan-out chunk is
+// allowed before it yields the event loop.
+//
+// The matching is O(injections x subscriptions) and neither dimension is
+// bounded by anything ReactMap controls: the batch size is whatever Golbat
+// -- or an unauthenticated caller, since the secret is optional -- puts in
+// the body, and the subscription count is however many people have the map
+// open. Done in one synchronous pass, a large batch against a busy
+// instance blocks every socket, every other request and Golbat's own next
+// POST for as long as it takes. Measured against this code before the
+// chunking: 3,000 subscriptions x 200,000 injections was 8.4 seconds of
+// frozen event loop.
+//
+// 50,000 is roughly a millisecond of matching, which is a fair share of a
+// tick to take. The rest of the fan-out continues on later ticks. There is
+// a cap on batch size too (`MAX_WEBHOOK_BATCH_ENTRIES` in
+// golbat-webhook-handler.ts); this is the half that holds regardless of
+// what got past it.
+const DISPATCH_WORK_BUDGET = 50_000
+
 /**
  * The process-wide index of live subscriptions, and the fan-out of one
  * batch of pushed changes across it.
@@ -103,23 +123,43 @@ function createSubscriptionRegistry() {
      */
     dispatch(injections: WebhookInjection[]) {
       if (injections.length === 0) return
-      for (const entry of entries) {
-        const mine = injectionsFor(entry, injections)
-        if (mine.length === 0) continue
-        try {
-          injectIntoSubscription(entry.state as any, mine)
-        } catch (err) {
-          // One subscription that has come apart -- a socket closed
-          // between the fan-out starting and this entry being reached --
-          // must not cost every later entry its delivery.
-          log.error(
-            TAGS.ReactMap,
-            `failed to deliver a Golbat webhook change to a subscription: ${
-              (err as any)?.message || err
-            }`,
-          )
+      // Snapshotted so a subscription registering or ending mid-fan-out
+      // cannot disturb the walk. `entries.has` below is what keeps a
+      // subscription that ended in between from being delivered to.
+      const targets = [...entries]
+      const chunkSize = Math.max(
+        1,
+        Math.floor(DISPATCH_WORK_BUDGET / injections.length),
+      )
+      let next = 0
+
+      const deliverChunk = () => {
+        const end = Math.min(next + chunkSize, targets.length)
+        for (; next < end; next += 1) {
+          const entry = targets[next]
+          if (!entry || !entries.has(entry)) continue
+          const mine = injectionsFor(entry, injections)
+          if (mine.length === 0) continue
+          try {
+            injectIntoSubscription(entry.state as any, mine)
+          } catch (err) {
+            // One subscription that has come apart -- a socket closed
+            // between the fan-out starting and this entry being reached --
+            // must not cost every later entry its delivery.
+            log.error(
+              TAGS.ReactMap,
+              `failed to deliver a Golbat webhook change to a subscription: ${
+                (err as any)?.message || err
+              }`,
+            )
+          }
         }
+        // A tick, not a microtask: a microtask queue drained before the
+        // loop turns is the same stall wearing a different hat.
+        if (next < targets.length) setTimeout(deliverChunk, 0)
       }
+
+      deliverChunk()
     },
 
     /** Live entry count. Exposed so a leak is observable rather than inferred. */

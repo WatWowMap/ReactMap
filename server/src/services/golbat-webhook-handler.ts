@@ -38,6 +38,25 @@ import { parseGolbatWebhookBatch, secretMatches } from './golbat-webhook'
  */
 const GOLBAT_WEBHOOK_SECRET_HEADER = 'X-ReactMap-Webhook-Secret'
 
+/**
+ * The largest batch this endpoint will accept, in entries and in bytes.
+ *
+ * The endpoint is unauthenticated unless an operator sets a secret, which
+ * is the documented default, so the body is attacker-controlled input to a
+ * fan-out whose cost is entries x live subscriptions. A 21MB array of
+ * 200,000 raid messages against a few thousand connected clients is
+ * seconds of frozen event loop -- not a hypothetical, it was measured at
+ * 8.4 seconds. `subscription-registry.ts` chunks the fan-out so no single
+ * batch can monopolise the loop whatever its size; these caps are the
+ * cheaper half, refusing the absurd body outright.
+ *
+ * Both are far above anything Golbat produces. Its sender flushes on a
+ * one-second ticker (webhooks/sender.go), so a real batch is what changed
+ * in one second across the areas that webhook is scoped to.
+ */
+const MAX_WEBHOOK_BATCH_ENTRIES = 20_000
+const MAX_WEBHOOK_BATCH_BYTES = 16 * 1024 * 1024
+
 interface WebhookRegistry {
   dispatch: (injections: any[]) => void
 }
@@ -79,6 +98,16 @@ function createGolbatWebhookHandler({
       }
     }
 
+    // Checked before the body is read at all, so an oversized POST costs
+    // this process a header lookup rather than a 16MB read and parse.
+    const declaredBytes = Number(request.headers.get('content-length'))
+    if (
+      Number.isFinite(declaredBytes) &&
+      declaredBytes > MAX_WEBHOOK_BATCH_BYTES
+    ) {
+      return new Response('Batch too large', { status: 413 })
+    }
+
     let body: unknown
     try {
       body = await request.json()
@@ -92,6 +121,21 @@ function createGolbatWebhookHandler({
       return new Response('Expected a JSON array of {type, message}', {
         status: 400,
       })
+    }
+
+    if (body.length > MAX_WEBHOOK_BATCH_ENTRIES) {
+      // Rejected rather than truncated: a 202 means "queued", and it would
+      // be a lie about the half of the batch that got dropped. Nothing
+      // Golbat sends is this big, so a body this size says the sender is not
+      // Golbat.
+      log.warn(
+        TAGS.ReactMap,
+        `refused a Golbat webhook batch of ${body.length} entries; the limit is ` +
+          `${MAX_WEBHOOK_BATCH_ENTRIES}. Golbat flushes every second and never batches this ` +
+          `much, so this is either a misconfigured sender or someone else posting to an ` +
+          `unauthenticated endpoint.`,
+      )
+      return new Response('Batch too large', { status: 413 })
     }
 
     registry.dispatch(parseGolbatWebhookBatch(body))

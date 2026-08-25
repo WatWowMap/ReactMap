@@ -134,3 +134,38 @@ describe('createGolbatWebhookHandler: bad input', () => {
     expect(registry.batches).toEqual([[]])
   })
 })
+
+describe('createGolbatWebhookHandler: oversized batches', () => {
+  test('refuses a batch with more entries than Golbat ever sends', async () => {
+    const registry = fakeRegistry()
+    const handler = createGolbatWebhookHandler({ registry, secret: '' })
+    const body = JSON.stringify(
+      Array.from({ length: 20_001 }, (_, i) => ({
+        type: 'raid',
+        message: { gym_id: `g${i}`, latitude: 1, longitude: 2, level: 5 },
+      })),
+    )
+
+    const response = await handler(post(body))
+
+    // The fan-out is entries x live subscriptions, and on an
+    // unauthenticated endpoint the entry count is whoever is posting.
+    expect(response.status).toBe(413)
+    expect(registry.batches).toEqual([])
+  })
+
+  test('refuses an oversized body without reading it', async () => {
+    const registry = fakeRegistry()
+    const handler = createGolbatWebhookHandler({ registry, secret: '' })
+    const request = post(raidBody())
+    // A body big enough that parsing it is itself the attack. The real
+    // request would carry this content-length honestly; a lying one is
+    // caught by the entry cap instead.
+    request.headers.set('content-length', String(64 * 1024 * 1024))
+
+    const response = await handler(request)
+
+    expect(response.status).toBe(413)
+    expect(registry.batches).toEqual([])
+  })
+})

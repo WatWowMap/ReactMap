@@ -155,3 +155,54 @@ describe('createSubscriptionRegistry', () => {
     expect(state.wakePending).toBe(false)
   })
 })
+
+describe('createSubscriptionRegistry: fan-out cost', () => {
+  test('a large batch does not match every subscription in one synchronous pass', async () => {
+    // Matching is O(injections x subscriptions) and neither dimension is
+    // bounded by anything ReactMap controls, so a big batch against a busy
+    // instance used to freeze the event loop for the whole fan-out. The
+    // work is now chunked across ticks: whatever is left when the budget
+    // runs out lands on a later one.
+    const registry = createSubscriptionRegistry()
+    const states = Array.from({ length: 8 }, () => gymState())
+    for (const state of states) registry.register({ category: 'gym', state })
+
+    const injections = Array.from({ length: 25_000 }, (_, i) =>
+      upsert(`g${i}`, 5, 5),
+    )
+    registry.dispatch(injections)
+
+    const deliveredSynchronously = states.filter(
+      (state) => state.injections.length > 0,
+    ).length
+    expect(deliveredSynchronously).toBeGreaterThan(0)
+    expect(deliveredSynchronously).toBeLessThan(states.length)
+
+    // Everyone still gets their copy, just not all in the same tick.
+    await new Promise((resolve) => setTimeout(resolve, 20))
+    for (const state of states) {
+      expect(state.injections.length).toBe(injections.length)
+    }
+  })
+
+  test('a subscription that ends mid-fan-out is not delivered to', async () => {
+    const registry = createSubscriptionRegistry()
+    const states = Array.from({ length: 8 }, () => gymState())
+    const unregisters = states.map((state) =>
+      registry.register({ category: 'gym', state }),
+    )
+
+    registry.dispatch(
+      Array.from({ length: 25_000 }, (_, i) => upsert(`g${i}`, 5, 5)),
+    )
+    // Whatever the first chunk did not reach is still pending; ending those
+    // subscriptions now must not queue anything onto them.
+    const pending = states.filter((state) => state.injections.length === 0)
+    for (const [index, state] of states.entries()) {
+      if (state.injections.length === 0) unregisters[index]?.()
+    }
+
+    await new Promise((resolve) => setTimeout(resolve, 20))
+    for (const state of pending) expect(state.injections).toEqual([])
+  })
+})
