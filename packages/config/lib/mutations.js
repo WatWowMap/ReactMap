@@ -54,7 +54,17 @@ const applyMutations = (config) => {
     )
   }
 
-  if (!fs.existsSync(path.join(serverConfigDir, `local.json`))) {
+  // `local.json` lives in the root `config/` directory. It used to live in
+  // `server/src/configs`, and this check was left pointing there when the
+  // files moved, so it never found one and the env-var branch below ran
+  // every time -- wiping a configured `database.schemas` even for someone
+  // who had never set a DB environment variable in their life. Both
+  // directories are checked so a leftover in the old location still counts.
+  const hasLocalJson = [rootConfigDir, serverConfigDir].some(
+    (dir) => dir && fs.existsSync(path.join(dir, `local.json`)),
+  )
+
+  if (!hasLocalJson) {
     // add database env variables from .env or docker-compose
     const {
       SCANNER_DB_HOST,
