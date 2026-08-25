@@ -1,5 +1,7 @@
 // @ts-check
 
+const { Response } = require('node-fetch')
+
 const { fetchJson } = require('../utils/fetchJson')
 
 /**
@@ -19,8 +21,13 @@ const { fetchJson } = require('../utils/fetchJson')
  * @property {string} [street]
  * @property {string} [postcode]
  * @property {string} [city]
- * @property {string} [locality] A settlement below Photon's city layer, such
- *   as the hamlet a rural address sits in. Present when `city` is not.
+ * @property {string} [locality] The finest named area containing the result,
+ *   equivalent to Nominatim's `neighbourhood` or `quarter`. Verified against a
+ *   live index: Photon's `locality` for 1521 N Hoyne Ave is "Wicker Park", and
+ *   Nominatim's `quarter` for the same building is "Wicker Park".
+ * @property {string} [district] The city subdivision containing the result,
+ *   equivalent to Nominatim's `suburb` or `borough`. Same building: Photon's
+ *   `district` is "West Town", Nominatim's `suburb` is "West Town".
  * @property {string} [county]
  * @property {string} [state]
  * @property {string} [country]
@@ -62,6 +69,11 @@ const TYPE_TO_PROPERTY = {
   state: 'state',
   county: 'county',
   city: 'city',
+  // A search for a suburb by name comes back as type=district with the label in
+  // `name` and no `district` field, so without this the result being asked for
+  // is the one value missing from the answer. Live index, q=West Town Chicago:
+  // {name: "West Town", type: "district", osm_key: "place", osm_value: "suburb"}
+  district: 'district',
   locality: 'locality',
   street: 'street',
 }
@@ -143,12 +155,19 @@ function preferBroader(parts) {
 function buildFormattedAddress(properties, settlement) {
   const street = joinComponents([properties.housenumber, properties.street])
 
+  // locality and district sit between the street and the settlement, which is
+  // where Nominatim puts the levels they correspond to. For 1521 N Hoyne Ave it
+  // renders "1521, North Hoyne Avenue, Wicker Park, West Town, ...", matching
+  // the order of Nominatim's own quarter and suburb for that building.
+  //
   // The result's own name leads. When it was already echoed into a hierarchy
   // field, joinComponents drops the repeat rather than printing it twice.
   return joinComponents([
     properties.name,
     ...preferBroader([
       street,
+      properties.locality,
+      properties.district,
       settlement,
       properties.county,
       properties.state,
@@ -196,31 +215,24 @@ function formatPhotonFeature(feature) {
 
   const town = named('town')
   const village = named('village')
-  // Photon's hierarchy runs city > district > locality > street, so an address
-  // whose containing settlement sits below the city layer carries that name in
-  // `locality` and has no `city` at all. Without it a rural address loses its
-  // settlement from both `city` and formattedAddress. Named `settlement` rather
-  // than `locality` so it is not confused with the Photon field it falls back
-  // to.
   // properties.city covers both what Photon sent and what resolveSelfReference
   // placed there from the type layer; named('city') covers a place=city tagged
   // result that carries no type at all.
+  //
+  // `locality` is deliberately not in this chain. It is neighbourhood-level
+  // rather than a smaller settlement: a live index returns locality "Wicker
+  // Park" alongside a city, and a genuine hamlet such as Bootjack arrives as
+  // osm_value=locality with its name in `name` and no `locality` field at all.
+  // Reporting it as the city would name a neighbourhood as a town.
   const settlement =
-    properties.city ||
-    named('city') ||
-    town ||
-    village ||
-    named('hamlet') ||
-    properties.locality ||
-    ''
+    properties.city || named('city') || town || village || named('hamlet') || ''
 
   return {
     latitude,
     longitude,
     formattedAddress: buildFormattedAddress(properties, settlement),
     country: properties.country,
-    // Mirrors _formatResult's own city/town/village/hamlet fallback, with
-    // Photon's locality layer appended to it.
+    // Mirrors _formatResult's own city/town/village/hamlet fallback.
     city: settlement || undefined,
     state: properties.state,
     zipcode: properties.postcode,
@@ -231,11 +243,44 @@ function formatPhotonFeature(feature) {
     // Photon already sends this upper-case, which is what node-geocoder
     // produces after upper-casing Nominatim's lower-case value.
     countryCode: properties.countrycode,
-    neighbourhood: '',
-    suburb: '',
+    // Both verified against a live Photon index rather than inferred: for the
+    // same building, Photon's locality and district carry the values Nominatim
+    // returns as quarter and suburb.
+    neighbourhood: properties.locality || '',
+    // The same value under the spelling the GraphQL schema and formatter use.
+    // Geocoder.neighborhood is American and formatter() templates on
+    // neighborhoods, while node-geocoder emits neighbourhood, so without the
+    // alias the mapped value reaches no consumer at all.
+    neighborhood: properties.locality || '',
+    suburb: properties.district || '',
     town: town || '',
     village: village || '',
   }
+}
+
+/**
+ * Recognises a response that came from Nominatim rather than Photon.
+ *
+ * An array is Nominatim's /search shape. A single object carrying result fields
+ * and no `features` is its /reverse shape. Both mean the URL and the configured
+ * provider disagree.
+ *
+ * The test is deliberately positive: it looks for fields a Nominatim result
+ * has, rather than treating anything without `features` as suspect. fetchJson
+ * hands back a Response object on a failed request, and Nominatim answers a
+ * miss with {"error":"Unable to geocode"} -- neither is a provider mismatch,
+ * and an empty result set is already the right outcome for both.
+ * @param {any} response
+ */
+function isNominatimResponse(response) {
+  if (Array.isArray(response)) return true
+  if (!response || typeof response !== 'object') return false
+  if ('features' in response) return false
+  return (
+    'address' in response ||
+    'display_name' in response ||
+    'place_id' in response
+  )
 }
 
 /**
@@ -256,7 +301,54 @@ async function photonGeocoder(photonUrl, search, isReverse) {
           limit: SEARCH_LIMIT,
         })
 
-  const response = await fetchJson(url)
+  let response
+  try {
+    response = await fetchJson(url)
+  } catch (err) {
+    // fetchJson does not catch this itself: it does `return response.json()`
+    // inside its try block, so a body that fails to parse rejects the promise
+    // it already returned and escapes its local catch.
+    //
+    // This is the reverse half of the provider mismatch. Nominatim's /reverse
+    // defaults to XML and only sends JSON when asked, and Photon rejects any
+    // parameter outside its allow list with a 400, so asking would break every
+    // correctly configured Photon. Recognising the unparseable body instead
+    // costs nothing and needs no extra parameter.
+    throw new Error(
+      `${photonUrl} returned a body that is not JSON. Nominatim answers /reverse with XML unless asked otherwise, so this is usually a Nominatim URL on the Photon provider. Remove "geocoderProvider": "photon" from this webhook, or point the URL at a Photon instance. (${err instanceof Error ? err.message : err})`,
+    )
+  }
+  // The mirror of the Nominatim check. Both of Nominatim's shapes have to be
+  // recognised: /search answers with an array, and /reverse answers with a
+  // single object. Checking only the array would let gym reverse geocoding
+  // fall through to an empty result set with no reason given, which is the
+  // path resolvers.js takes for every fort lookup.
+  // fetchJson hands back the Response itself when the request failed, so this
+  // covers every non-2xx. Photon serves /api and a Nominatim host has no such
+  // endpoint, so a forward search against a misconfigured webhook answers 404
+  // and is reported here.
+
+  if (response instanceof Response) {
+    // Only a 404 on Photon's own route is evidence about the provider: Photon
+    // serves /api, so a host without it is not a Photon instance. Any other
+    // status -- a 429 or 500 from a healthy but struggling Photon, a 401/403
+    // from an authentication proxy in front of one -- is an operational
+    // failure, and advising the operator to remove geocoderProvider there
+    // prompts them to break a working configuration to cure a transient error.
+    if (response.status === 404) {
+      throw new Error(
+        `${photonUrl} answered 404 for Photon's /api endpoint, so it is not a Photon instance. Check the URL, or remove "geocoderProvider": "photon" from this webhook.`,
+      )
+    }
+    throw new Error(
+      `${photonUrl} answered ${response.status}; the upstream geocoder is failing, not misconfigured.`,
+    )
+  }
+  if (isNominatimResponse(response)) {
+    throw new Error(
+      `${photonUrl} answered in Nominatim's format rather than Photon's. Remove "geocoderProvider": "photon" from this webhook, or point the URL at a Photon instance.`,
+    )
+  }
   // fetchJson answers a failed request with the Response rather than throwing,
   // so an absent features array covers both a network failure and an empty
   // result set.
