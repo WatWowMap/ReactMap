@@ -24,7 +24,6 @@
 // surface a browser tRPC client (or a future Node-hosted consumer that CAN
 // use `@trpc/server/adapters/ws`) would subscribe through.
 
-import { initTRPC } from '@trpc/server'
 import { z } from 'zod'
 
 import {
@@ -32,17 +31,8 @@ import {
   pollIntervalForCategory,
   subscribeCategory,
 } from '../services/map-subscription'
-
-interface Context {
-  user: any
-  session: any
-  golbatClient: any
-  registry?: {
-    register: (entry: { category: 'pokemon' | 'gym'; state: any }) => () => void
-  }
-}
-
-const t = initTRPC.context<Context>().create()
+import { rulesRouter } from './rules-router'
+import { t } from './trpc-base'
 
 const viewportSchema = z.object({
   min: z.object({ lat: z.number(), lon: z.number() }),
@@ -88,6 +78,7 @@ const mapRouter = t.router({
 const appRouter = t.router({
   health: t.procedure.query(() => ({ ok: true })),
   map: mapRouter,
+  rules: rulesRouter,
 })
 
 export { appRouter, t }
