@@ -318,3 +318,32 @@ describe('end to end: rules -> translatePokemonRules -> buildPokemonMatcher -> c
     expect(addedIds).toEqual(['b', 'c'])
   })
 })
+
+describe('pokemonRuleMatches size range', () => {
+  const xxlLarvitar = { id: 1, species_id: 246, size_min: 5, size_max: 5 }
+
+  test('an entity inside the size range matches', () => {
+    expect(
+      pokemonRuleMatches(xxlLarvitar, { pokemon_id: 246, form: 0, size: 5 }),
+    ).toBe(true)
+  })
+
+  test('an entity outside the size range does not', () => {
+    expect(
+      pokemonRuleMatches(xxlLarvitar, { pokemon_id: 246, form: 0, size: 3 }),
+    ).toBe(false)
+  })
+
+  test('a declared size bound an entity cannot answer never passes', () => {
+    expect(pokemonRuleMatches(xxlLarvitar, { pokemon_id: 246, form: 0 })).toBe(
+      false,
+    )
+  })
+
+  test('a rule with no size bounds ignores the entity size entirely', () => {
+    const anySize = { id: 2, species_id: 246 }
+    expect(
+      pokemonRuleMatches(anySize, { pokemon_id: 246, form: 0, size: 1 }),
+    ).toBe(true)
+  })
+})

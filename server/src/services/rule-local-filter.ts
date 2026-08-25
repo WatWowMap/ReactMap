@@ -161,10 +161,11 @@ function pokemonRuleMatches(rule: any, entity: any): boolean {
   if (!matchesRange(entity.cp, rule.cp_min, rule.cp_max)) return false
   if (rule.gender != null && entity.gender !== rule.gender) return false
 
-  // xxs/xxl intentionally not evaluated here either, mirroring Task 3's own
-  // deferral (rules-to-golbat-filters.js's `buildPokemonClause`): Golbat's
-  // `size` field is a numeric range and `rule_pokemon` stores two booleans,
-  // and bridging the two is a schema decision this module doesn't invent.
+  // Golbat already filtered on `size` upstream, and the entity carries the
+  // value back (`app/map/translate.ts` reads `raw.size`), so checking it
+  // again here is what keeps this predicate the same question the Golbat
+  // clause asked -- the invariant every other range in this function holds.
+  if (!matchesRange(entity.size, rule.size_min, rule.size_max)) return false
 
   for (const league of PVP_LEAGUES) {
     const min = rule[`${league}_min`]

@@ -34,12 +34,11 @@ const LEAGUE_BY_CAP: Record<number, string> = {
 /**
  * Turns one `StoredRule` into the joined row shape the two evaluators read.
  *
- * `sizeMin`/`sizeMax` are deliberately dropped: neither evaluator has an
- * xxs/xxl check to hand them to, for the reason Task 3 documents at
- * `buildPokemonClause` -- Golbat's `size` filter is a numeric range and the
- * rules table stores a pair of bounds whose mapping onto it is a schema
- * decision nothing has taken yet. Passing them through under a name nobody
- * reads would only look like they were being honoured.
+ * `sizeMin`/`sizeMax` cross as `size_min`/`size_max`, the names both
+ * evaluators read. The pair is already Golbat's own vocabulary -- an
+ * inclusive numeric range, 1 for XXS through 5 for XXL -- which is the
+ * whole reason the design spec replaced 1.x's two `xxs`/`xxl` booleans
+ * with it, so there is no threshold left to invent between the two.
  */
 function toRuleRow(stored: StoredRule): Record<string, unknown> {
   const row: Record<string, unknown> = {
@@ -60,6 +59,8 @@ function toRuleRow(stored: StoredRule): Record<string, unknown> {
     cp_min: stored.cpMin,
     cp_max: stored.cpMax,
     gender: stored.gender,
+    size_min: stored.sizeMin,
+    size_max: stored.sizeMax,
     // The evaluators match an exclusion on species AND form; the table only
     // stores a species today (`rules-repo.ts` writes `form_id: null`), and a
     // null form there means "every form of it".

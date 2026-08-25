@@ -302,3 +302,28 @@ describe('translateNestRules', () => {
     expect(translateNestRules([])).toEqual({ upstream: null, local: [] })
   })
 })
+
+describe('translatePokemonRules size range', () => {
+  test('a size range becomes an upstream size clause and no local predicate', () => {
+    const xxlOnly = { id: 7, species_id: 246, size_min: 5, size_max: 5 }
+    const { upstream, local } = translatePokemonRules([xxlOnly])
+    expect(upstream).toEqual({
+      filters: [
+        { pokemon: [{ id: 246, form: null }], size: { min: 5, max: 5 } },
+      ],
+    })
+    expect(local).toEqual([])
+  })
+
+  test('a one-sided size bound still sends both ends, like every other range', () => {
+    const { upstream } = translatePokemonRules([
+      { id: 8, species_id: null, size_min: 4, size_max: null },
+    ])
+    expect((upstream as any).filters[0].size).toEqual({ min: 4, max: 32767 })
+  })
+
+  test('no size bounds leaves the clause without a size key', () => {
+    const { upstream } = translatePokemonRules([{ id: 9, species_id: null }])
+    expect((upstream as any).filters[0]).not.toHaveProperty('size')
+  })
+})

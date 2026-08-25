@@ -122,13 +122,14 @@ function buildPokemonClause(rule: any): Record<string, any> {
   if (cp) clause.cp = cp
   if (rule.gender != null) clause.gender = [rule.gender]
 
-  // xxs/xxl intentionally NOT translated here -- see the module header and
-  // this task's report. Golbat's `size` filter is a numeric min/max range
-  // (decoder/api_pokemon_scan_v3.go:40) and rule_pokemon stores two
-  // booleans, which the corrections doc already flags as unable to express
-  // a middle range. Inventing a threshold to bridge the two is a schema
-  // decision, not a translation-layer one, so it is left out of both
-  // `upstream` and `local` rather than guessed at.
+  // `size` is a straight range: `rule_pokemon.size_min`/`size_max` hold 1
+  // (XXS) through 5 (XXL), and Golbat's `size` clause
+  // (decoder/api_pokemon_scan_v3.go:40) is an inclusive int range over the
+  // same scale. The design spec chose that pair over 1.x's `xxs`/`xxl`
+  // booleans precisely so this stays a translation and not a threshold
+  // somebody had to invent.
+  const size = toRange(rule.size_min, rule.size_max)
+  if (size) clause.size = size
 
   for (const league of PVP_LEAGUES) {
     const min = rule[`${league}_min`]
@@ -166,15 +167,6 @@ function pokemonLocalPredicates(rule: any): Record<string, any>[] {
       // into a real per-entry check against the response's
       // `pvp.<league>[]` array (pokemon/form/cap/evolution/rank).
       targetSpeciesId: rule.pvp_target_species ?? null,
-    })
-  }
-
-  if (rule.xxs || rule.xxl) {
-    local.push({
-      type: 'size_unsupported',
-      ruleId: rule.id,
-      xxs: Boolean(rule.xxs),
-      xxl: Boolean(rule.xxl),
     })
   }
 
