@@ -27,6 +27,7 @@
  */
 
 import { create } from 'zustand'
+import { profilingMap, profRecord } from './profile-map'
 import { mergeGym, translateGymPatch, translatePokemon } from './translate'
 import type { GymEntity, PokemonEntity } from './types'
 import type { DeltaMessage } from './wire'
@@ -77,6 +78,7 @@ export const useEntityStore = create<EntityStoreState>()((set, get) => ({
   gymsById: {},
 
   applyDelta(delta) {
+    const profAt = profilingMap() ? performance.now() : 0
     // The subscribe acknowledgement, and every gym reconciliation sweep
     // that found nothing. Cheap to recognise, and worth recognising: the
     // pokemon record holds thousands of keys and copying it every two
@@ -119,6 +121,9 @@ export const useEntityStore = create<EntityStoreState>()((set, get) => ({
 
       if (!touched) return
       set({ pokemonById: byId, pokemon: Object.values(byId) })
+      profRecord('store apply (pokemon)', performance.now() - profAt, {
+        held: Object.keys(byId).length,
+      })
       return
     }
 
@@ -159,6 +164,9 @@ export const useEntityStore = create<EntityStoreState>()((set, get) => ({
 
     if (!touched) return
     set({ gymsById: byId, gyms: Object.values(byId) })
+    profRecord('store apply (gym)', performance.now() - profAt, {
+      held: Object.keys(byId).length,
+    })
   },
 
   evictExpired(now) {

@@ -11,6 +11,7 @@
 
 import { useEffect, useRef } from 'react'
 import { useEntityStore } from './entity-store'
+import { profilingMap, profRecord } from './profile-map'
 import type { MapSocket, SocketLike } from './socket-client'
 import { createMapSocket, defaultSocketUrl } from './socket-client'
 import type { Bounds } from './types'
@@ -82,7 +83,11 @@ export function useMapSocket(
 
   useEffect(() => {
     if (!bounds) return
+    const requestedAt = profilingMap() ? performance.now() : 0
     const timer = setTimeout(() => {
+      // Time actually spent waiting for the camera to stop, which is the
+      // settle constant plus however long React took to hand us new bounds.
+      profRecord('settle wait', performance.now() - requestedAt)
       clientRef.current?.setViewport(bounds)
     }, settleMs)
     // A move that lands before the timer fires replaces it, so only the

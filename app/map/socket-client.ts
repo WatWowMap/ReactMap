@@ -23,6 +23,7 @@
  * that is the trade the task 7 report argues for.
  */
 
+import { profEnd, profStart } from './profile-map'
 import type { Bounds } from './types'
 import type { DeltaMessage, SubscribeMessage, WireCategory } from './wire'
 import { isDeltaMessage, toWireViewport } from './wire'
@@ -102,6 +103,9 @@ export function createMapSocket({
         // No rule engine on this branch yet, so nothing to filter by.
         filters: [],
       }
+      // One span per category: the two subscriptions are independent
+      // requests and the server answers them on different schedules.
+      profStart(`server-leg:${category}`)
       socket.send(JSON.stringify(message))
     }
   }
@@ -156,6 +160,15 @@ export function createMapSocket({
         return
       }
       if (!isDeltaMessage(parsed)) return
+      profEnd(
+        `server-leg:${parsed.category}`,
+        `server leg (${parsed.category})`,
+        {
+          added: (parsed.added ?? []).length,
+          removed: (parsed.removed ?? []).length,
+          kb: Math.round(event.data.length / 102.4) / 10,
+        },
+      )
       onDelta(parsed)
     }
     next.onclose = () => {

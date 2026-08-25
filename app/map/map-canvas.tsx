@@ -18,6 +18,7 @@ import {
   POKEMON_LABEL_LAYER_ID,
 } from './layers'
 import { Popup } from './popup'
+import { profilingMap, profRecord } from './profile-map'
 import type { MapEntity, Viewport } from './types'
 import { useDismissOnEscape } from './use-dismiss-on-escape'
 import type { Camera } from './use-map-libre'
@@ -198,7 +199,8 @@ export function MapCanvas({ initialCamera, onCameraChange }: MapCanvasProps) {
   const clustered = useMemo(() => {
     const atlas = atlasRef.current
     if (!atlas) return null
-    return buildMapLayers({
+    const profAt = profilingMap() ? performance.now() : 0
+    const result = buildMapLayers({
       pokemon,
       gyms,
       getIconFor: atlas.getIconFor,
@@ -209,6 +211,12 @@ export function MapCanvas({ initialCamera, onCameraChange }: MapCanvasProps) {
       now: 0,
       ...(viewport ? { viewport } : {}),
     })
+    profRecord('cluster + build layers', performance.now() - profAt, {
+      inPokemon: pokemon.length,
+      inGyms: gyms.length,
+      outLayers: result.layers.length,
+    })
+    return result
     // rebuildToken is intentionally in this array with no other purpose
     // than to invalidate this memo; see handleContextRestore above.
   }, [pokemon, gyms, viewport, rebuildToken, rules])
