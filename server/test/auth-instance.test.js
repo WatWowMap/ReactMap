@@ -21,13 +21,13 @@ test('discord is registered as a social provider when enabled', () => {
   expect(options.socialProviders.discord).toEqual({
     clientId: 'cid',
     clientSecret: 'secret',
-    scope: ['identify', 'guilds'],
+    scope: ['identify'],
   })
 })
 
-test('discord requests the guilds scope, the basis of the whole perms model', () => {
+test('discord does not request the guilds scope -- the bot client resolves guild membership and roles instead', () => {
   const options = buildAuthOptions(baseConfig)
-  expect(options.socialProviders.discord.scope).toEqual(['identify', 'guilds'])
+  expect(options.socialProviders.discord.scope).toEqual(['identify'])
 })
 
 test('a configured redirectUri is passed through to the discord provider', () => {

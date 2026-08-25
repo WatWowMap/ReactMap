@@ -106,22 +106,18 @@ test('recomputeUserPerms upserts nothing for a user with no linked accounts', as
 test('buildComputers only maps providers whose strategy is enabled', () => {
   const computers = buildComputers({
     strategies: [{ type: 'discord', enabled: true }],
-    getDiscordAccessToken: async () => null,
   })
   expect(Object.keys(computers)).toEqual(['discord'])
 })
 
 test('buildComputers maps to nothing when no strategy is enabled', () => {
-  expect(
-    buildComputers({ strategies: [], getDiscordAccessToken: async () => null }),
-  ).toEqual({})
+  expect(buildComputers({ strategies: [] })).toEqual({})
   expect(
     buildComputers({
       strategies: [
         { type: 'discord', enabled: false },
         { type: 'telegram', enabled: false },
       ],
-      getDiscordAccessToken: async () => null,
     }),
   ).toEqual({})
 })
@@ -133,26 +129,61 @@ test('buildComputers registers no credential computer -- see recomputePermsOnSig
       { type: 'telegram', enabled: true, botToken: 't', groups: [] },
       { type: 'local', enabled: true },
     ],
-    getDiscordAccessToken: async () => null,
   })
   expect(Object.keys(computers).sort()).toEqual(['discord', 'telegram'])
 })
 
-test("buildComputers' discord computer fetches guilds and computes perms, skipping the row when the token is missing", async () => {
+test("buildComputers' discord computer fetches guild results via the bot client and computes perms, skipping the row when the bot cannot resolve a relevant guild", async () => {
   const computers = buildComputers({
     strategies: [
       {
         type: 'discord',
         enabled: true,
         allowedUsers: ['admin-1'],
-        allowedGuilds: [],
+        allowedGuilds: ['good-guild'],
         blockedGuilds: [],
       },
     ],
-    getDiscordAccessToken: async () => null,
+    // No getDiscordClient/fetchDiscordGuildResultsImpl injected, so the
+    // computer falls back to the shared bot client, which is null in this
+    // test process (never started) -- exercising the same "bot not
+    // configured" path discord-roles.js's own tests drive directly.
   })
-  expect(await computers.discord('some-account', 'some-user')).toBeNull()
-  expect(await computers.discord('admin-1', 'some-user')).toEqual(
+  expect(await computers.discord('some-account')).toBeNull()
+  // allowedUsers needs no guild data at all, so it is honoured even with no
+  // bot connection.
+  expect(await computers.discord('admin-1')).toEqual(
     expect.objectContaining({ admin: true }),
   )
+})
+
+test("buildComputers' discord computer honours an injected client + fetch implementation, passing the client and relevant guild ids straight through", async () => {
+  let calledWith = null
+  const computers = buildComputers({
+    strategies: [
+      {
+        type: 'discord',
+        enabled: true,
+        allowedUsers: [],
+        allowedGuilds: ['good-guild'],
+        blockedGuilds: ['bad-guild'],
+      },
+    ],
+    getDiscordClient: () => ({ fake: true }),
+    fetchDiscordGuildResultsImpl: async (client, guildIds, userId) => {
+      calledWith = { client, guildIds, userId }
+      return { 'good-guild': { status: 'member', roles: [] } }
+    },
+  })
+  const perms = await computers.discord('some-account')
+  expect(calledWith).toEqual({
+    client: { fake: true },
+    guildIds: ['bad-guild', 'good-guild'],
+    userId: 'some-account',
+  })
+  // `bad-guild` has no entry in the injected result, so it is unknown and
+  // the whole computation is skipped -- this is exercising the wiring, not
+  // re-testing computeDiscordPerms's own role-matching rules (covered by
+  // auth-discord-perms.test.js).
+  expect(perms).toBeNull()
 })

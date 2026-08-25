@@ -1,16 +1,18 @@
-// server/test/authDiscordPerms.test.js
 const { test, expect } = require('bun:test')
 const { computeDiscordPerms } = require('../src/auth/discord-perms')
 
 const permsConfig = {
-  map: { enabled: true },
-  pokemon: { enabled: true },
-  admin: { enabled: false },
+  map: { enabled: true, roles: [] },
+  pokemon: { enabled: true, roles: ['pokemon-role'] },
+  admin: { enabled: false, roles: [] },
 }
 
-test('an allowedUsers id gets every enabled perm and admin, guilds notwithstanding', () => {
+const member = (roles, guildName) => ({ status: 'member', roles, guildName })
+const notMember = { status: 'not_member' }
+
+test('an allowedUsers id gets every enabled perm and admin, guildResults notwithstanding', () => {
   const perms = computeDiscordPerms(
-    { id: 'admin-1', guilds: [] },
+    { id: 'admin-1', guildResults: {} },
     {
       allowedUsers: ['admin-1'],
       allowedGuilds: [],
@@ -27,9 +29,9 @@ test('an allowedUsers id gets every enabled perm and admin, guilds notwithstandi
   })
 })
 
-test('an allowedUsers id is never blocked, even if their guilds include a blocked one', () => {
+test('an allowedUsers id is never blocked, even if member of a blocked guild', () => {
   const perms = computeDiscordPerms(
-    { id: 'admin-1', guilds: [{ id: 'evil-guild', name: 'Evil Guild' }] },
+    { id: 'admin-1', guildResults: { 'evil-guild': member([], 'Evil Guild') } },
     {
       allowedUsers: ['admin-1'],
       allowedGuilds: [],
@@ -42,9 +44,25 @@ test('an allowedUsers id is never blocked, even if their guilds include a blocke
   expect(perms.map).toBe(true)
 })
 
+test('an allowedUsers id needs no guild data at all -- honoured even when the bot could not be reached', () => {
+  const perms = computeDiscordPerms(
+    { id: 'admin-1', guildResults: null },
+    {
+      allowedUsers: ['admin-1'],
+      allowedGuilds: [],
+      blockedGuilds: [],
+      permsConfig,
+      alwaysEnabledPerms: [],
+    },
+  )
+  expect(perms).toEqual(
+    expect.objectContaining({ admin: true, map: true, pokemon: true }),
+  )
+})
+
 test('a member of a blocked guild gets perms.blocked and the guild name, and no perms', () => {
   const perms = computeDiscordPerms(
-    { id: 'u1', guilds: [{ id: 'evil-guild', name: 'Evil Guild' }] },
+    { id: 'u1', guildResults: { 'evil-guild': member([], 'Evil Guild') } },
     {
       allowedUsers: [],
       allowedGuilds: [],
@@ -58,9 +76,59 @@ test('a member of a blocked guild gets perms.blocked and the guild name, and no 
   expect(perms.map).toBe(false)
 })
 
+test('a non-member of a blocked guild is not blocked', () => {
+  const perms = computeDiscordPerms(
+    { id: 'u1', guildResults: { 'evil-guild': notMember } },
+    {
+      allowedUsers: [],
+      allowedGuilds: [],
+      blockedGuilds: ['evil-guild'],
+      permsConfig,
+      alwaysEnabledPerms: ['map'],
+    },
+  )
+  expect(perms.blocked).toBeUndefined()
+})
+
 test('a member of an allowedGuilds guild gets every alwaysEnabledPerms perm', () => {
   const perms = computeDiscordPerms(
-    { id: 'u1', guilds: [{ id: 'good-guild', name: 'Good Guild' }] },
+    { id: 'u1', guildResults: { 'good-guild': member([], 'Good Guild') } },
+    {
+      allowedUsers: [],
+      allowedGuilds: ['good-guild'],
+      blockedGuilds: [],
+      permsConfig,
+      alwaysEnabledPerms: ['map'],
+    },
+  )
+  expect(perms.map).toBe(true)
+  expect(perms.pokemon).toBe(false)
+})
+
+test('a member of an allowedGuilds guild holding a mapped role gets that role-gated perm', () => {
+  const perms = computeDiscordPerms(
+    {
+      id: 'u1',
+      guildResults: { 'good-guild': member(['pokemon-role'], 'Good Guild') },
+    },
+    {
+      allowedUsers: [],
+      allowedGuilds: ['good-guild'],
+      blockedGuilds: [],
+      permsConfig,
+      alwaysEnabledPerms: ['map'],
+    },
+  )
+  expect(perms.map).toBe(true)
+  expect(perms.pokemon).toBe(true)
+})
+
+test('a member holding none of the mapped roles gets only the always-enabled set', () => {
+  const perms = computeDiscordPerms(
+    {
+      id: 'u1',
+      guildResults: { 'good-guild': member(['unrelated-role'], 'Good Guild') },
+    },
     {
       allowedUsers: [],
       allowedGuilds: ['good-guild'],
@@ -75,7 +143,7 @@ test('a member of an allowedGuilds guild gets every alwaysEnabledPerms perm', ()
 
 test('a non-member of any allowedGuilds guild gets nothing', () => {
   const perms = computeDiscordPerms(
-    { id: 'u1', guilds: [{ id: 'unrelated', name: 'Unrelated' }] },
+    { id: 'u1', guildResults: { 'good-guild': notMember } },
     {
       allowedUsers: [],
       allowedGuilds: ['good-guild'],
@@ -90,7 +158,7 @@ test('a non-member of any allowedGuilds guild gets nothing', () => {
 
 test('an alwaysEnabledPerms perm that is disabled in config is never granted', () => {
   const perms = computeDiscordPerms(
-    { id: 'u1', guilds: [{ id: 'good-guild' }] },
+    { id: 'u1', guildResults: { 'good-guild': member([]) } },
     {
       allowedUsers: [],
       allowedGuilds: ['good-guild'],
@@ -106,9 +174,9 @@ test('an alwaysEnabledPerms perm that is disabled in config is never granted', (
   expect(perms.admin).toBe(false)
 })
 
-test('a null guild list (Discord unreachable, no token, etc.) is skipped rather than treated as no perms', () => {
+test('a missing/unknown result for a relevant guild is skipped rather than treated as no perms', () => {
   const perms = computeDiscordPerms(
-    { id: 'u1', guilds: null },
+    { id: 'u1', guildResults: {} },
     {
       allowedUsers: [],
       allowedGuilds: ['good-guild'],
@@ -120,18 +188,35 @@ test('a null guild list (Discord unreachable, no token, etc.) is skipped rather 
   expect(perms).toBeNull()
 })
 
-test('a null guild list still honours allowedUsers, since that check needs no guild data', () => {
+test('an explicit unknown status for a relevant guild is skipped', () => {
   const perms = computeDiscordPerms(
-    { id: 'admin-1', guilds: null },
     {
-      allowedUsers: ['admin-1'],
-      allowedGuilds: [],
+      id: 'u1',
+      guildResults: {
+        'good-guild': { status: 'unknown', reason: 'rate_limited' },
+      },
+    },
+    {
+      allowedUsers: [],
+      allowedGuilds: ['good-guild'],
       blockedGuilds: [],
       permsConfig,
-      alwaysEnabledPerms: [],
+      alwaysEnabledPerms: ['map'],
     },
   )
-  expect(perms).toEqual(
-    expect.objectContaining({ admin: true, map: true, pokemon: true }),
+  expect(perms).toBeNull()
+})
+
+test('a null guildResults map (bot not configured) is skipped rather than treated as no perms', () => {
+  const perms = computeDiscordPerms(
+    { id: 'u1', guildResults: null },
+    {
+      allowedUsers: [],
+      allowedGuilds: ['good-guild'],
+      blockedGuilds: [],
+      permsConfig,
+      alwaysEnabledPerms: ['map'],
+    },
   )
+  expect(perms).toBeNull()
 })

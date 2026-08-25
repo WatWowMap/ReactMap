@@ -8,9 +8,30 @@ const config = require('@rm/config')
 
 const { getAuth, isAuthRequest } = require('./auth')
 const {
+  startDiscordBot,
+  createOnRoleChange,
+} = require('./auth/discord-bot-client')
+const {
   resolveTrustProxy,
   resolveIpAddressStrategy,
 } = require('./middleware/trust-proxy')
+
+// Fire-and-forget: `startDiscordBot` never awaits the gateway login, so a
+// missing bot token or an unreachable Discord cannot delay `Bun.serve`
+// below or block a local sign-in. Every guild/role lookup this process
+// makes while the bot is absent or still connecting is treated as
+// `unknown` (see discord-roles.js / discord-perms.js), not as "no perms" --
+// an outage never turns into a denial, it just leaves `user_perms`
+// un-refreshed until the bot is reachable again.
+const discordStrategy = config
+  .getSafe('authentication.strategies')
+  .find((s) => s.type === 'discord' && s.enabled)
+if (discordStrategy) {
+  startDiscordBot({
+    botToken: discordStrategy.botToken,
+    onRoleChange: createOnRoleChange(),
+  })
+}
 
 // There is no Express here to hold a `trust proxy` setting, so this reads
 // the same `api.trustProxy` config key `getAuth()` already feeds into

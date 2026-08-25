@@ -368,37 +368,26 @@ describe('criterion 3: no session cookie yields an anonymous, not an error, resp
 // ---------------------------------------------------------------------------
 describe('criterion 4: a blocked-guild Discord account cannot obtain a session', () => {
   // This cannot be driven honestly right now, over real HTTP, without
-  // stubbing the thing under test. Two reasons, both structural rather
-  // than "we didn't get to it":
+  // stubbing the thing under test.
   //
-  // 1. There are no Discord credentials in this environment. Enabling the
-  //    discord strategy makes `state.setAuthClients()` construct a real
-  //    `DiscordClient`, which is a discord.js bot client that logs in to
-  //    Discord's gateway with a bot token -- there is no way to reach the
-  //    real sign-in gate over HTTP without that succeeding first.
-  //
-  // 2. Even with credentials, the current code cannot fail this test the
-  //    right way: `buildComputers` in
-  //    server/src/auth/recomputePermsOnSignIn.js hardcodes
-  //    `discordClient.getPerms({ id: accountId, guilds: [] })` -- an empty
-  //    guild list -- because Better Auth is not requesting Discord's
-  //    `guilds` OAuth scope yet (that is Task 4's job). `blockedGuilds` is
-  //    evaluated against that list, so it is structurally unable to see a
-  //    membership in a blocked guild today. A green result here right now
-  //    would only prove the empty list, not the gate.
-  //
-  // What would let this run for real: Task 4 landing (Discord perms
-  // fetched from the OAuth token Better Auth stores, using the `guilds`
-  // scope it already requests -- see server/src/auth/index.js), plus
-  // either real Discord test credentials for an account that is a member
-  // of a guild configured in `blockedGuilds`, or a seam Task 4 adds that
-  // lets a test supply the account's guild list without stubbing
-  // `DiscordClient#getPerms`/its 2.0 replacement itself (for example, an
-  // adapter boundary the test can inject a fake OAuth token response
-  // behind, the same shape `signInGate.js` already uses for its unit
-  // tests -- but exercised here through the real HTTP sign-in, not by
-  // calling the pure function directly).
-  test.skip('a Discord account in a blocked guild is refused a session (pending: no Discord credentials, no guild-fetching seam yet -- see comment above)', async () => {
+  // 2.0 keeps a Discord bot (server/src/auth/discord-bot-client.js):
+  // guild membership and role data now come from the bot's gateway
+  // connection (server/src/auth/discord-roles.js), not from an OAuth
+  // `guilds` scope -- that scope was removed entirely. `blockedGuilds` and
+  // `allowedGuilds` are evaluated for real against whatever the bot
+  // reports (server/src/auth/discord-perms.js). But this environment has
+  // no bot token and cannot reach Discord's gateway at all, so there is no
+  // way to get a real Discord account into a real blocked guild's member
+  // list over HTTP here. Without a bot connection, `computeDiscordPerms`
+  // sees every relevant guild as `unknown` and skips the row rather than
+  // deny -- correct behaviour for an unreachable bot, but it means this
+  // criterion cannot be exercised end-to-end without either real Discord
+  // bot credentials in a guild configured as `blockedGuilds`, or a test
+  // seam that injects a fake bot client through the real HTTP sign-in
+  // flow (the pure function and the bot-client adapter each already have
+  // unit tests that inject a fake client this way; what is missing is
+  // wiring that same injection point through a live `/api/auth/*` request).
+  test.skip('a Discord account in a blocked guild is refused a session (pending: no Discord bot credentials in this environment -- see comment above)', async () => {
     throw new Error('not runnable in this environment yet -- see comment above')
   })
 })

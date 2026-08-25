@@ -60,12 +60,12 @@ function buildAuthOptions(input) {
         clientId: strategy.clientId,
         clientSecret: strategy.clientSecret,
         // `identify` is one of Better Auth's default Discord scopes and is
-        // requested again here for clarity; `guilds` is the addition. Without
-        // it, Discord never returns `/users/@me/guilds` data, so
-        // `DiscordClient#getPerms` has no guild list to evaluate
-        // `blockedGuilds`/`allowedGuilds`/roles against -- every guild- and
-        // role-based perm silently resolves to its default.
-        scope: ['identify', 'guilds'],
+        // requested again here for clarity. There is no `guilds` scope: 2.0
+        // keeps a Discord bot (`discord-bot-client.js`) that can see guild
+        // membership and roles for any account directly, so the OAuth grant
+        // never needs to ask the user's own token for it -- one less scope
+        // on the consent screen.
+        scope: ['identify'],
         // Operators whitelist this exact URL in their Discord app's OAuth2
         // settings. Leaving it unset falls back to Better Auth's own
         // `${baseURL}/callback/discord`, which will not match what most

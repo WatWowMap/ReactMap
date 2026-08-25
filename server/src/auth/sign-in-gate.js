@@ -67,25 +67,13 @@ async function checkSignInGate(userId, deps) {
  */
 function createSignInGateCheck() {
   return async function checkGate(userId) {
-    const { eq, and } = require('drizzle-orm')
+    const { eq } = require('drizzle-orm')
     const config = require('@rm/config')
     const { getDrizzle } = require('../db/drizzle')
     const { authAccount } = require('../db/auth-schema')
     const { buildComputers } = require('./recompute-perms-on-sign-in')
 
     const db = getDrizzle()
-    const getDiscordAccessToken = async (uid) => {
-      const rows = await db
-        .select({ accessToken: authAccount.accessToken })
-        .from(authAccount)
-        .where(
-          and(
-            eq(authAccount.userId, uid),
-            eq(authAccount.providerId, 'discord'),
-          ),
-        )
-      return rows[0]?.accessToken || null
-    }
 
     return checkSignInGate(userId, {
       getAccounts: (id) =>
@@ -95,7 +83,6 @@ function createSignInGateCheck() {
       // an opinion on local sign-in here; that stays out of scope.
       computers: buildComputers({
         strategies: config.getSafe('authentication.strategies'),
-        getDiscordAccessToken,
       }),
     })
   }

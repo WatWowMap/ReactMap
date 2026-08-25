@@ -2,7 +2,8 @@
 // @ts-check
 const { computeUserPermsRows } = require('./recompute-perms')
 const { computeDiscordPerms } = require('./discord-perms')
-const { fetchDiscordGuilds } = require('./discord-guilds')
+const { fetchDiscordGuildResults } = require('./discord-roles')
+const { getSharedDiscordClient } = require('./discord-bot-client')
 const { computeTelegramPerms } = require('./telegram-perms')
 const { fetchTelegramGroups } = require('./telegram-groups')
 const { computeLocalPerms } = require('./local-perms')
@@ -28,16 +29,17 @@ async function recomputeUserPerms(userId, deps) {
 /**
  * Builds the provider -> compute function map `computeUserPermsRows` calls
  * through. Each entry is a thin adapter: fetch whatever this provider
- * needs (an OAuth token, a bot API response) and hand it to the matching
- * pure permission function (`discord-perms.js`, `telegram-perms.js`). Only
- * registered for a strategy that is actually enabled in config, mirroring
- * which providers 1.x's `authClients` registry populated -- except that
- * registry held live `DiscordClient`/`TelegramClient` instances
+ * needs (Discord's bot gateway, a Telegram Bot API response) and hand it
+ * to the matching pure permission function (`discord-perms.js`,
+ * `telegram-perms.js`). Only registered for a strategy that is actually
+ * enabled in config, mirroring which providers 1.x's `authClients`
+ * registry populated -- except that registry held live
+ * `DiscordClient`/`TelegramClient` instances
  * (`server/src/services/DiscordClient.js`, `TelegramClient.js`), which this
  * branch may not import, call, or adapt. This is the fresh 2.0 replacement:
- * it reaches Discord and Telegram itself, over plain `fetch`, using
- * whatever the account row and config already have on hand -- no bot
- * client, no 1.x class, of either kind.
+ * Discord's computer reads the process-wide bot connection
+ * (`discord-bot-client.js`), Telegram's still reaches the Bot API over
+ * plain `fetch` -- no 1.x class, of either kind.
  *
  * The credential (local/email-password) provider is deliberately NOT
  * registered here -- see `createRecomputeUserPerms` below for where it is
@@ -45,8 +47,8 @@ async function recomputeUserPerms(userId, deps) {
  *
  * @param {{
  *   strategies: any[],
- *   getDiscordAccessToken: (userId: string) => Promise<string | null>,
- *   fetchDiscordGuildsImpl?: typeof fetch,
+ *   getDiscordClient?: () => import('discord.js').Client | null,
+ *   fetchDiscordGuildResultsImpl?: typeof fetchDiscordGuildResults,
  *   fetchTelegramGroupsImpl?: typeof fetch,
  * }} deps
  */
@@ -66,14 +68,23 @@ function buildComputers(deps) {
   const computers = {}
 
   if (discordStrategy) {
-    computers.discord = async (accountId, userId) => {
-      const accessToken = await deps.getDiscordAccessToken(userId)
-      const { guilds } = await fetchDiscordGuilds(
-        accessToken,
-        deps.fetchDiscordGuildsImpl,
+    const relevantGuildIds = [
+      ...(discordStrategy.blockedGuilds || []),
+      ...(discordStrategy.allowedGuilds || []),
+    ]
+    const fetchGuildResults =
+      deps.fetchDiscordGuildResultsImpl || fetchDiscordGuildResults
+    computers.discord = async (accountId) => {
+      const client = deps.getDiscordClient
+        ? deps.getDiscordClient()
+        : getSharedDiscordClient()
+      const guildResults = await fetchGuildResults(
+        client,
+        relevantGuildIds,
+        accountId,
       )
       return computeDiscordPerms(
-        { id: accountId, guilds },
+        { id: accountId, guildResults },
         {
           allowedUsers: discordStrategy.allowedUsers || [],
           allowedGuilds: discordStrategy.allowedGuilds || [],
@@ -114,25 +125,13 @@ function buildComputers(deps) {
  */
 function createRecomputeUserPerms() {
   return async function recompute(userId) {
-    const { eq, and } = require('drizzle-orm')
+    const { eq } = require('drizzle-orm')
     const { log, TAGS } = require('@rm/logger')
     const config = require('@rm/config')
     const { getDrizzle } = require('../db/drizzle')
     const { authAccount, userPerms } = require('../db/auth-schema')
 
     const db = getDrizzle()
-    const getDiscordAccessToken = async (userId) => {
-      const rows = await db
-        .select({ accessToken: authAccount.accessToken })
-        .from(authAccount)
-        .where(
-          and(
-            eq(authAccount.userId, userId),
-            eq(authAccount.providerId, 'discord'),
-          ),
-        )
-      return rows[0]?.accessToken || null
-    }
 
     try {
       await recomputeUserPerms(userId, {
@@ -141,7 +140,6 @@ function createRecomputeUserPerms() {
         computers: {
           ...buildComputers({
             strategies: config.getSafe('authentication.strategies'),
-            getDiscordAccessToken,
           }),
           // Registered here, not in buildComputers, and only for recompute
           // -- not for the sign-in gate (server/src/auth/sign-in-gate.js
