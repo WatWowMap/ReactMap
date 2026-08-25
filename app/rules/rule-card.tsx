@@ -6,6 +6,8 @@ import type { NamesLookup } from './use-names'
 export interface RuleCardProps {
   group: RuleGroup
   names: NamesLookup
+  /** Opens the editing sheet for this group. */
+  onOpen?: () => void
 }
 
 /**
@@ -24,16 +26,32 @@ function subjectFor(group: RuleGroup, names: NamesLookup): string {
   return `${group.speciesIds.length} Pokémon`
 }
 
-/** One grouped rule, as a card in the filters list. Editing opens the sheet (Task 10). */
-export function RuleCard({ group, names }: RuleCardProps) {
+/**
+ * One grouped rule, as a card in the filters list. The whole card is the
+ * affordance -- a real `<button>` around it rather than a click handler on
+ * a div, so it is reachable by keyboard and announced as something that
+ * can be opened, which is the entire point of a card nobody can edit
+ * otherwise.
+ */
+export function RuleCard({ group, names, onOpen }: RuleCardProps) {
   return (
-    <Card>
-      <CardHeader>
-        <div className="flex items-center justify-between gap-2">
-          <CardTitle>{group.name}</CardTitle>
-          <Badge variant="secondary">{subjectFor(group, names)}</Badge>
-        </div>
-      </CardHeader>
-    </Card>
+    <button
+      type="button"
+      // Named for what the control does rather than left to the card's
+      // own text, which is a name and a subject read as one run-on
+      // string.
+      aria-label={`Edit ${group.name}`}
+      className="w-full cursor-pointer text-left"
+      onClick={onOpen}
+    >
+      <Card>
+        <CardHeader>
+          <div className="flex items-center justify-between gap-2">
+            <CardTitle>{group.name}</CardTitle>
+            <Badge variant="secondary">{subjectFor(group, names)}</Badge>
+          </div>
+        </CardHeader>
+      </Card>
+    </button>
   )
 }

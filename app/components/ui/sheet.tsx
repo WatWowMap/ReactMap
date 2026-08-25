@@ -20,10 +20,27 @@ function SheetClose({
   return <SheetPrimitive.Close data-slot="sheet-close" {...props} />
 }
 
+/**
+ * `container` defaults to `document.body`, computed here rather than left
+ * to Radix -- the same gate `alert-dialog.tsx`'s `AlertDialogPortal`
+ * documents at length: Radix's own fallback waits on a layout effect that
+ * this project's test setup permanently turns into a no-op, so without an
+ * explicit container nothing a sheet renders ever portals anywhere.
+ */
 function SheetPortal({
+  container,
   ...props
 }: React.ComponentProps<typeof SheetPrimitive.Portal>) {
-  return <SheetPrimitive.Portal data-slot="sheet-portal" {...props} />
+  return (
+    <SheetPrimitive.Portal
+      data-slot="sheet-portal"
+      container={
+        container ??
+        (typeof document === 'undefined' ? undefined : document.body)
+      }
+      {...props}
+    />
+  )
 }
 
 function SheetOverlay({

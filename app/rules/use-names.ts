@@ -90,12 +90,22 @@ export interface UseNamesOptions {
   client?: MasterfileClient
 }
 
-export function useNames({
+/**
+ * The catalog itself, for the one caller that needs the entries rather
+ * than a name for an id: the exclusion picker, which renders a tile per
+ * species. Same query key as `useNames`, so the two share one fetch.
+ */
+export function useSpeciesCatalog({
   client = getDefaultClient(),
-}: UseNamesOptions = {}): NamesLookup {
+}: UseNamesOptions = {}): SpeciesEntry[] {
   const { data } = useQuery({
     queryKey: masterfileSpeciesQueryKey(),
     queryFn: () => client.species(),
   })
-  return useMemo(() => buildLookup(data ?? []), [data])
+  return data ?? []
+}
+
+export function useNames(options: UseNamesOptions = {}): NamesLookup {
+  const species = useSpeciesCatalog(options)
+  return useMemo(() => buildLookup(species), [species])
 }

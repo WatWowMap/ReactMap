@@ -1,5 +1,5 @@
 import { afterAll, afterEach, beforeAll, expect, test } from 'bun:test'
-import { cleanup, render } from '@testing-library/react'
+import { cleanup, fireEvent, render } from '@testing-library/react'
 import { setupDom, teardownDom } from '../test-setup'
 import { RuleCard } from './rule-card'
 import type { RuleGroup } from './rule-types'
@@ -84,4 +84,21 @@ test('the card title is the rule name', () => {
     />,
   )
   expect(getByText('Hundos')).toBeTruthy()
+})
+
+test('the whole card is a control that opens the rule, keyboard included', () => {
+  let opened = 0
+  const { getByRole } = render(
+    <RuleCard
+      group={groupFixture({ name: 'Hundos', speciesIds: [null] })}
+      names={NAMES}
+      onOpen={() => {
+        opened += 1
+      }}
+    />,
+  )
+  // A real button, so it is focusable and announced as something that can
+  // be opened -- not a div with a click handler.
+  fireEvent.click(getByRole('button', { name: 'Edit Hundos' }))
+  expect(opened).toBe(1)
 })

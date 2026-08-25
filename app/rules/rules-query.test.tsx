@@ -174,7 +174,7 @@ test('a failed mutation rolls back and the map keeps rendering', async () => {
   await waitFor(() => expect(result.current.isLoading).toBe(false))
   expect(result.current.rules.get(7)?.size).toBe('lg')
 
-  await failNextMutation(() => result.current.update(7, { size: 'xl' }))
+  await failNextMutation(() => result.current.update([7], { size: 'xl' }))
 
   expect(result.current.rules.get(7)?.size).toBe('lg')
   expect(result.current.error).toBeTruthy()
@@ -187,7 +187,7 @@ test('a successful update is applied optimistically', async () => {
   await waitFor(() => expect(result.current.isLoading).toBe(false))
 
   await act(async () => {
-    await result.current.update(7, { size: 'xl' })
+    await result.current.update([7], { size: 'xl' })
     await new Promise((resolve) => setTimeout(resolve, 0))
   })
 

@@ -1,6 +1,6 @@
 import { afterAll, afterEach, beforeAll, expect, test } from 'bun:test'
 import { QueryClientProvider } from '@tanstack/react-query'
-import { cleanup, render, waitFor } from '@testing-library/react'
+import { cleanup, fireEvent, render, waitFor } from '@testing-library/react'
 import { ruleFixture } from '../rules/rule-fixtures'
 import type { Rule } from '../rules/rule-types'
 import type { RulesClient } from '../rules/rules-query'
@@ -20,10 +20,18 @@ const SPECIES_FIXTURE: SpeciesEntry[] = [
   { id: 246, name: 'Larvitar', forms: [] },
 ]
 
-function fakeRulesClient(rules: Rule[]): RulesClient {
+interface FakeRulesClient extends RulesClient {
+  updated: { ruleIds: number[]; patch: unknown }[]
+}
+
+function fakeRulesClient(rules: Rule[]): FakeRulesClient {
+  const updated: { ruleIds: number[]; patch: unknown }[] = []
   return {
+    updated,
     list: () => Promise.resolve(rules),
-    update: async () => {},
+    update: async (ruleIds, patch) => {
+      updated.push({ ruleIds, patch })
+    },
   }
 }
 
@@ -34,14 +42,15 @@ function fakeNamesClient(): MasterfileClient {
 /** Renders `FiltersPage` against a fake rules list, no network involved. */
 function renderWithRules(rules: Rule[]) {
   const queryClient = createRulesQueryClient()
-  return render(
-    <QueryClientProvider client={queryClient}>
-      <FiltersPage
-        rulesClient={fakeRulesClient(rules)}
-        namesClient={fakeNamesClient()}
-      />
-    </QueryClientProvider>,
-  )
+  const client = fakeRulesClient(rules)
+  return {
+    client,
+    ...render(
+      <QueryClientProvider client={queryClient}>
+        <FiltersPage rulesClient={client} namesClient={fakeNamesClient()} />
+      </QueryClientProvider>,
+    ),
+  }
 }
 
 /** `count` rules sharing a name, each targeting its own species -- one group. */
@@ -97,4 +106,69 @@ test('the empty state offers the four starting points', async () => {
   for (const name of ['Everything', '100% IV', 'Great League', 'Rare spawns']) {
     expect(await findByRole('button', { name })).toBeTruthy()
   }
+})
+
+test('clicking a card opens its editor', async () => {
+  const { findByRole, getByRole } = renderWithRules([
+    ruleFixture({ id: 1, name: 'Hundos', speciesId: null, ivMin: 100 }),
+  ])
+  fireEvent.click(await findByRole('button', { name: 'Edit Hundos' }))
+  // The sheet is the only thing on the page that can commit an edit.
+  expect(getByRole('button', { name: 'Save' })).toBeTruthy()
+})
+
+test('an edit to a one-row group commits without a split warning', async () => {
+  const { client, findByRole, getByRole, queryByRole } = renderWithRules([
+    ruleFixture({ id: 1, name: 'Hundos', speciesId: null, ivMin: 100 }),
+  ])
+  fireEvent.click(await findByRole('button', { name: 'Edit Hundos' }))
+  // Add a condition rather than typing into one: `fireEvent.change` does
+  // not drive React's controlled-input path under this DOM shim, which is
+  // why every other editor test reaches for the `+` menu too.
+  fireEvent.click(getByRole('button', { name: '+' }))
+  fireEvent.click(getByRole('option', { name: /^level$/i }))
+  fireEvent.click(getByRole('button', { name: 'Save' }))
+
+  expect(queryByRole('alertdialog')).toBeNull()
+  await waitFor(() => expect(client.updated).toHaveLength(1))
+  const committed = client.updated[0]
+  expect(committed?.ruleIds).toEqual([1])
+  expect(
+    (committed?.patch as { levelMin?: number } | undefined)?.levelMin,
+  ).toBeDefined()
+})
+
+test('singling one species out of a group warns before it separates', async () => {
+  const { client, findByRole, getByRole } = renderWithRules([
+    ...rareSpawns(24),
+    ruleFixture({ id: 100, name: 'Rare spawns', speciesId: 246 }),
+  ])
+  fireEvent.click(await findByRole('button', { name: 'Edit Rare spawns' }))
+  fireEvent.click(getByRole('radio', { name: 'Larvitar' }))
+  fireEvent.click(getByRole('button', { name: '+' }))
+  fireEvent.click(getByRole('option', { name: /^size$/i }))
+  fireEvent.click(getByRole('button', { name: 'Save' }))
+
+  const dialog = await findByRole('alertdialog')
+  expect(dialog.textContent).toContain('Larvitar')
+  expect(dialog.textContent).toContain('24')
+  expect(client.updated).toHaveLength(0)
+
+  fireEvent.click(getByRole('button', { name: 'Separate' }))
+  await waitFor(() => expect(client.updated).toHaveLength(1))
+  expect(client.updated[0]?.ruleIds).toEqual([100])
+})
+
+test('an edit aimed at every member rewrites them all, and warns about nothing', async () => {
+  const { client, findByRole, getByRole, queryByRole } = renderWithRules(
+    rareSpawns(3),
+  )
+  fireEvent.click(await findByRole('button', { name: 'Edit Rare spawns' }))
+  fireEvent.click(getByRole('button', { name: '+' }))
+  fireEvent.click(getByRole('option', { name: /^size$/i }))
+  fireEvent.click(getByRole('button', { name: 'Save' }))
+
+  expect(queryByRole('alertdialog')).toBeNull()
+  await waitFor(() => expect(client.updated).toHaveLength(1))
+  expect(client.updated[0]?.ruleIds).toEqual([1, 2, 3])
 })

@@ -76,7 +76,14 @@ export interface UseRulesResult {
   isLoading: boolean
   isFetching: boolean
   error: unknown
-  update: (ruleId: number, patch: RulePatch) => Promise<void>
+  /**
+   * Patches every rule named, which is how a card commits: a group is
+   * several rows that differ only in their subject, so an edit to the
+   * card is the same write to each of them. A caller that means to peel
+   * ONE member off passes that member's id alone -- see
+   * `split-warning.tsx` for why those are the only two possibilities.
+   */
+  update: (ruleIds: number[], patch: RulePatch) => Promise<void>
   refetch: () => void
 }
 
@@ -131,9 +138,9 @@ export function useRules(
     // clears it only on the next `mutate`), which is exactly what lets a
     // caller render "that edit failed" after the fact.
     error: query.error ?? mutation.error ?? null,
-    update: async (ruleId, patch) => {
+    update: async (ruleIds, patch) => {
       try {
-        await mutation.mutateAsync({ ruleIds: [ruleId], patch })
+        await mutation.mutateAsync({ ruleIds, patch })
       } catch {
         // Rolled back in `onError` above; surfaced through `error`. A
         // caller that wants to react to the failure reads that field
