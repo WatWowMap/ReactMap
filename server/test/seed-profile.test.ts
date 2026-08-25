@@ -87,7 +87,16 @@ test('seeding twice leaves one profile', async () => {
 
 test('the seeded rule has no conditions, so it matches everything', async () => {
   await seedProfileForUser(db, 'user-3')
-  const [row] = await db.select().from(rulePokemon)
+  // Filtered to this user's own rule. An unfiltered select would grade
+  // whichever row the table happened to return first, and the dev database
+  // carries rule rows other suites left behind.
+  const rules = await db.select().from(rule).where(eq(rule.userId, 'user-3'))
+  expect(rules).toHaveLength(1)
+  const [row] = await db
+    .select()
+    .from(rulePokemon)
+    .where(eq(rulePokemon.ruleId, rules[0].id))
+  expect(row).toBeDefined()
   for (const [column, value] of Object.entries(row!)) {
     if (column === 'ruleId') continue
     expect(value).toBeNull()
