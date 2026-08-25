@@ -3,7 +3,7 @@ import { eq } from 'drizzle-orm'
 import { getAuth } from './auth'
 import { userPerms } from './db/auth-schema'
 import { getDrizzle } from './db/drizzle'
-import { mergePerms as mergePermsPair } from './utils/mergePerms'
+import { mergePerms as mergePermsPair } from './utils/merge-perms'
 
 /**
  * Folds the per-provider `user_perms` rows into the single perms object the

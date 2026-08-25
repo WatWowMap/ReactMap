@@ -15,7 +15,7 @@ import {
   resolveIpAddressStrategy,
   resolveTrustProxy,
 } from '../middleware/trust-proxy'
-import { hashPassword, verifyPassword } from '../services/localPassword'
+import { hashPassword, verifyPassword } from '../services/local-password'
 import { createEnforceMaxSessions } from './max-sessions'
 import { createRecomputeUserPerms } from './recompute-perms-on-sign-in'
 import { createSignInGateCheck } from './sign-in-gate'

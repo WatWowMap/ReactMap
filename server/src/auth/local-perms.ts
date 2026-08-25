@@ -2,9 +2,9 @@
 
 import config from '@rm/config'
 
-import { areaPerms } from '../utils/areaPerms'
-import { scannerCooldownBypass, scannerPerms } from '../utils/scannerPerms'
-import { webhookPerms } from '../utils/webhookPerms'
+import { areaPerms } from '../utils/area-perms'
+import { scannerCooldownBypass, scannerPerms } from '../utils/scanner-perms'
+import { webhookPerms } from '../utils/webhook-perms'
 
 /** The role identifier every credential (local, non-social) account carries. */
 const LOCAL_ROLE = 'local'

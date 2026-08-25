@@ -1,7 +1,7 @@
 import { spyOn, test } from 'bun:test'
 import assert from 'node:assert/strict'
 
-import { hashPassword, verifyPassword } from '../src/services/localPassword'
+import { hashPassword, verifyPassword } from '../src/services/local-password'
 
 test('hashes a password into bcrypt format', async () => {
   const hash = await hashPassword('correct horse battery staple')
