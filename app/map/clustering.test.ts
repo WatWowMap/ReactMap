@@ -3,6 +3,8 @@ import {
   type ClusterableEntity,
   type ClusterRules,
   clusterEntities,
+  clusterIndexBuildCount,
+  clusterIndexFor,
 } from './clustering'
 import type { Bounds } from './types'
 
@@ -55,6 +57,9 @@ function groupsOf(groupCount: number, size: number): ClusterableEntity[] {
   }
   return entities
 }
+
+/** Every entity in this file carries its own id. */
+const byOwnId = (entity: ClusterableEntity) => entity.id
 
 const RULES: ClusterRules = { zoomLevel: 10, forcedLimit: 200, minPoints: 5 }
 
@@ -175,4 +180,77 @@ test('clusterEntities bounds a mix of one dense blob and many small groups', () 
       `zoom ${zoom}: ${Math.min(rendered, RULES.forcedLimit)}`,
     )
   }
+})
+
+/*
+ * Panning is a query, not a rebuild. supercluster's `load` builds a KD-tree
+ * per zoom level so that `getClusters` can be a cheap range scan; measured on
+ * this machine, build+load costs 16-119x what one query costs. The index
+ * therefore has to outlive the camera, and `clusterIndexFor` is where that
+ * lifetime is decided: same entity array and same rules, same index object.
+ */
+test('clusterIndexFor reuses the index across viewport and zoom changes', () => {
+  const entities = scatter(500)
+  const first = clusterIndexFor(entities, RULES, byOwnId)
+  const second = clusterIndexFor(entities, RULES, byOwnId)
+  expect(second).toBe(first)
+  first.query(BOUNDS, 12)
+  first.query({ west: -0.5, south: 51.2, east: 0.5, north: 51.8 }, 16)
+  expect(clusterIndexFor(entities, RULES, byOwnId)).toBe(first)
+})
+
+test('clusterIndexFor rebuilds when the entity set changes', () => {
+  const entities = scatter(500)
+  const first = clusterIndexFor(entities, RULES, byOwnId)
+  expect(clusterIndexFor([...entities], RULES, byOwnId)).not.toBe(first)
+})
+
+/*
+ * `maxZoom` and `minPoints` are constructor arguments, so a rules change is
+ * not something a query can pick up -- the index has to go.
+ */
+test('clusterIndexFor rebuilds when the rules change', () => {
+  const entities = scatter(500)
+  const first = clusterIndexFor(entities, RULES, byOwnId)
+  expect(
+    clusterIndexFor(entities, { ...RULES, minPoints: 3 }, byOwnId),
+  ).not.toBe(first)
+  expect(
+    clusterIndexFor(entities, { ...RULES, zoomLevel: 12 }, byOwnId),
+  ).not.toBe(first)
+  expect(
+    clusterIndexFor(entities, { ...RULES, forcedLimit: 50 }, byOwnId),
+  ).not.toBe(first)
+})
+
+/*
+ * The whole point of caching is that it changes nothing visible. This pins
+ * the cached index's answers against the previous shape -- one throwaway
+ * index per query -- across a plain zoom, a zoom past `zoomLevel` that
+ * overflows into the coarsening descent, and the many-small-groups shape
+ * that overflows for the other reason.
+ */
+test('a reused index answers exactly as a fresh one does', () => {
+  for (const entities of [scatter(2000), groupsOf(800, 5)]) {
+    const index = clusterIndexFor(entities, RULES, byOwnId)
+    for (const zoom of [2, 8, 10, 14, 20]) {
+      const cached = index.query(BOUNDS, zoom)
+      const fresh = clusterEntities(entities, BOUNDS, zoom, RULES)
+      expect(cached.points.map((entity) => entity.id)).toEqual(
+        fresh.points.map((entity) => entity.id),
+      )
+      expect(cached.clusters).toEqual(fresh.clusters)
+      expect(cached.limitHit).toBe(fresh.limitHit)
+    }
+  }
+})
+
+test('clusterIndexFor counts one build per entity set, not one per query', () => {
+  const entities = scatter(500)
+  const before = clusterIndexBuildCount()
+  const index = clusterIndexFor(entities, RULES, byOwnId)
+  index.query(BOUNDS, 10)
+  index.query(BOUNDS, 14)
+  clusterIndexFor(entities, RULES, byOwnId).query(BOUNDS, 16)
+  expect(clusterIndexBuildCount() - before).toBe(1)
 })

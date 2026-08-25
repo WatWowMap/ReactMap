@@ -2,6 +2,7 @@ import { afterAll, beforeAll, expect, test } from 'bun:test'
 import { ruleFixture } from '../rules/rule-fixtures'
 import { setupDom, teardownDom } from '../test-setup'
 import type { IconDescriptor } from './atlas'
+import { clusterIndexBuildCount } from './clustering'
 import {
   buildClusterIconLayer,
   buildClusterTextLayer,
@@ -447,5 +448,104 @@ test('buildMapLayers draws rings beneath the sprites, and only when asked for', 
   ])
   expect(buildMapLayers(options).layers.map((layer) => layer.id)).not.toContain(
     POKEMON_RING_LAYER_ID,
+  )
+})
+
+/*
+ * A pan changes the viewport and nothing else, and `MapCanvas`'s clustering
+ * memo has `viewport` in its deps, so this ran a full `Supercluster.load`
+ * over every subscribed entity on every camera move -- measured at 16-119x
+ * what the query it then ran costs. The index has to be keyed on the entity
+ * set, not on the camera.
+ */
+function clusterableSet() {
+  const pokemon = Array.from({ length: 200 }, (_, index) => ({
+    ...POKEMON,
+    spawnId: `spawn-${index}`,
+    lat: 51 + (index % 20) * 0.01,
+    lon: -0.5 + Math.floor(index / 20) * 0.01,
+  }))
+  const gyms = Array.from({ length: 200 }, (_, index) => ({
+    ...GYM,
+    gymId: `gym-${index}`,
+    lat: 51 + (index % 20) * 0.01,
+    lon: -0.5 + Math.floor(index / 20) * 0.01,
+  }))
+  return { pokemon, gyms }
+}
+
+const VIEWPORT_A = {
+  bounds: { west: -1, south: 50, east: 1, north: 53 },
+  zoom: 12,
+}
+const VIEWPORT_B = {
+  bounds: { west: -0.9, south: 50.1, east: 1.1, north: 53.1 },
+  zoom: 14,
+}
+
+function build(
+  pokemon: PokemonEntity[],
+  gyms: GymEntity[],
+  viewport: { bounds: typeof VIEWPORT_A.bounds; zoom: number },
+) {
+  return buildMapLayers({
+    pokemon,
+    gyms,
+    getIconFor: () => STUB_ICON,
+    getGymIcon: () => STUB_ICON,
+    now: 0,
+    viewport,
+  })
+}
+
+test('buildMapLayers does not rebuild the cluster index when only the viewport moved', () => {
+  const { pokemon, gyms } = clusterableSet()
+  const before = clusterIndexBuildCount()
+  build(pokemon, gyms, VIEWPORT_A)
+  // One index per category, and only on the first build.
+  expect(clusterIndexBuildCount() - before).toBe(2)
+  build(pokemon, gyms, VIEWPORT_B)
+  build(pokemon, gyms, { ...VIEWPORT_A, zoom: 16 })
+  expect(clusterIndexBuildCount() - before).toBe(2)
+})
+
+test('buildMapLayers rebuilds the cluster index when the entity set changes', () => {
+  const { pokemon, gyms } = clusterableSet()
+  build(pokemon, gyms, VIEWPORT_A)
+  const before = clusterIndexBuildCount()
+  build([...pokemon], gyms, VIEWPORT_A)
+  expect(clusterIndexBuildCount() - before).toBe(1)
+})
+
+test('buildMapLayers rebuilds the cluster index when the cluster rules change', () => {
+  const { pokemon, gyms } = clusterableSet()
+  build(pokemon, gyms, VIEWPORT_A)
+  const before = clusterIndexBuildCount()
+  buildMapLayers({
+    pokemon,
+    gyms,
+    getIconFor: () => STUB_ICON,
+    getGymIcon: () => STUB_ICON,
+    now: 0,
+    viewport: VIEWPORT_A,
+    clusterRules: {
+      pokemon: { zoomLevel: 9, forcedLimit: 3000, minPoints: 3 },
+    },
+  })
+  expect(clusterIndexBuildCount() - before).toBe(1)
+})
+
+/* The cached index must answer exactly as a one-shot one does. */
+test('a viewport-only rebuild renders the same markers as a fresh index does', () => {
+  const { pokemon, gyms } = clusterableSet()
+  build(pokemon, gyms, VIEWPORT_A)
+  const cached = build(pokemon, gyms, VIEWPORT_B)
+  const fresh = build([...pokemon], [...gyms], VIEWPORT_B)
+  expect(cached.renderedPokemon.map((entity) => entity.spawnId)).toEqual(
+    fresh.renderedPokemon.map((entity) => entity.spawnId),
+  )
+  expect(cached.limitHit).toEqual(fresh.limitHit)
+  expect(cached.layers.map((layer) => layer.id)).toEqual(
+    fresh.layers.map((layer) => layer.id),
   )
 })

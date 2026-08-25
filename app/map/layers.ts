@@ -5,8 +5,9 @@ import type { Rule } from '../rules/rule-types'
 import type { IconDescriptor } from './atlas'
 import {
   type ClusterMarker,
+  type ClusterResult,
   type ClusterRules,
-  clusterEntities,
+  clusterIndexFor,
   DEFAULT_GYM_CLUSTER_RULES,
   DEFAULT_POKEMON_CLUSTER_RULES,
 } from './clustering'
@@ -428,49 +429,30 @@ export interface BuildMapLayersOptions {
  * `interleaved`, which only controls where the whole deck.gl stack sits
  * relative to MapLibre's own street-label layer.
  */
-interface ClusteredEntities<T> {
-  points: readonly T[]
-  clusters: readonly ClusterMarker[]
-  /** Carried straight out of `clusterEntities`; see `MapLayersResult`. */
-  limitHit: boolean
-}
+const pokemonId = (entity: PokemonEntity) => entity.spawnId
+const gymId = (entity: GymEntity) => entity.gymId
 
-function clusterPokemon(
-  pokemon: readonly PokemonEntity[],
+/**
+ * Clusters one category against an index that outlives the camera.
+ *
+ * `clusterIndexFor` keys the index on the entity array's identity, and
+ * `entity-store.ts` keeps that array stable across renders that changed
+ * nothing, so a pan reaches the index that is already built and pays for a
+ * query instead of a `Supercluster.load` over everything subscribed.
+ *
+ * Entities go in as they are, with `pokemonId`/`gymId` supplying identity.
+ * An earlier pass wrapped each one in a `{ id, lat, lon, entity }` object
+ * first and unwrapped the results afterwards, which allocated two arrays
+ * per category per call -- on the query path, which is the path a pan runs.
+ */
+function clusterCategory<T extends PokemonEntity | GymEntity>(
+  entities: readonly T[],
   viewport: Viewport,
   rules: ClusterRules,
-): ClusteredEntities<PokemonEntity> {
-  const wrapped = pokemon.map((entity) => ({
-    id: entity.spawnId,
-    lat: entity.lat,
-    lon: entity.lon,
-    entity,
-  }))
-  const result = clusterEntities(wrapped, viewport.bounds, viewport.zoom, rules)
-  return {
-    points: result.points.map((wrapper) => wrapper.entity),
-    clusters: result.clusters,
-    limitHit: result.limitHit,
-  }
-}
-
-function clusterGyms(
-  gyms: readonly GymEntity[],
-  viewport: Viewport,
-  rules: ClusterRules,
-): ClusteredEntities<GymEntity> {
-  const wrapped = gyms.map((entity) => ({
-    id: entity.gymId,
-    lat: entity.lat,
-    lon: entity.lon,
-    entity,
-  }))
-  const result = clusterEntities(wrapped, viewport.bounds, viewport.zoom, rules)
-  return {
-    points: result.points.map((wrapper) => wrapper.entity),
-    clusters: result.clusters,
-    limitHit: result.limitHit,
-  }
+  idOf: (entity: T) => string,
+): ClusterResult<T> {
+  const index = clusterIndexFor(entities, rules, idOf)
+  return index.query(viewport.bounds, viewport.zoom)
 }
 
 /**
@@ -479,7 +461,7 @@ function clusterGyms(
  * This exists because a capped map and a genuinely empty area are pixel for
  * pixel identical: the user has no way to tell "there is nothing here" from
  * "there is too much here to draw and some of it has been merged away". The
- * flag `clusterEntities` computes has to survive the trip out to something
+ * flag the clusterer computes has to survive the trip out to something
  * that can say so, which means `buildMapLayers` cannot return a bare array.
  *
  * Both are false when no `viewport` is given, since nothing was clustered and
@@ -552,15 +534,17 @@ export function buildMapLayers({
     }
   }
 
-  const pokemonResult = clusterPokemon(
+  const pokemonResult = clusterCategory(
     pokemon,
     viewport,
     clusterRules?.pokemon ?? DEFAULT_POKEMON_CLUSTER_RULES,
+    pokemonId,
   )
-  const gymResult = clusterGyms(
+  const gymResult = clusterCategory(
     gyms,
     viewport,
     clusterRules?.gyms ?? DEFAULT_GYM_CLUSTER_RULES,
+    gymId,
   )
 
   const layers: Layer[] = [
