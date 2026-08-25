@@ -1,4 +1,5 @@
 import { afterAll, beforeAll, expect, test } from 'bun:test'
+import { ruleFixture } from '../rules/rule-fixtures'
 import { setupDom, teardownDom } from '../test-setup'
 import type { IconDescriptor } from './atlas'
 import {
@@ -7,6 +8,7 @@ import {
   buildGymIconLayer,
   buildMapLayers,
   buildPokemonIconLayer,
+  buildPokemonRingLayer,
   buildPokemonTextLayer,
   formatCountdown,
   GYM_CLUSTER_ICON_LAYER_ID,
@@ -14,10 +16,12 @@ import {
   GYM_ICON_LAYER_ID,
   POKEMON_ICON_LAYER_ID,
   POKEMON_LABEL_LAYER_ID,
+  POKEMON_RING_LAYER_ID,
   readClusterColor,
   readClusterLabelColor,
   readTeamColor,
 } from './layers'
+import { RING_SIZE_SCALE } from './ring-icon'
 import type { GymEntity, PokemonEntity } from './types'
 
 /*
@@ -336,4 +340,113 @@ test('readClusterLabelColor falls back to a visible grey when its token does not
   } finally {
     console.warn = warn
   }
+})
+
+/*
+ * Rings and sizes: what the rule system actually asks a marker to look
+ * like. The pixels are a browser's business, but which entity gets a ring,
+ * which icon it asks for, and how big it draws are all decided here.
+ */
+
+const RULES = new Map([
+  [7, ruleFixture({ id: 7, name: 'Hundos', size: 'xl', glow: '#ffc83d' })],
+  [12, ruleFixture({ id: 12, name: 'Great League', glow: '#4f8cff' })],
+  [30, ruleFixture({ id: 30, name: 'Big', size: 'lg' })],
+])
+
+test('marker size follows the rule that matched, largest wins, md when nothing did', () => {
+  const layer = buildPokemonIconLayer(
+    [POKEMON],
+    () => STUB_ICON,
+    new Map([
+      [1, ruleFixture({ id: 1, size: 'sm' })],
+      [2, ruleFixture({ id: 2, size: 'md' })],
+      [3, ruleFixture({ id: 3, size: 'lg' })],
+      [4, ruleFixture({ id: 4, size: 'xl' })],
+    ]),
+  )
+  const getSize = layer.props.getSize as (entity: PokemonEntity) => number
+  // 'sm' is reachable as a rule value but not as a resolved one:
+  // resolveAppearance starts at 'md' and only ever takes the maximum, so a
+  // small rule leaves the marker at the neutral default. The mapping still
+  // has to carry it, since the sheet can store it.
+  expect(getSize({ ...POKEMON, matched: [1] })).toBe(32)
+  expect(getSize({ ...POKEMON, matched: [2] })).toBe(32)
+  expect(getSize({ ...POKEMON, matched: [3] })).toBe(40)
+  expect(getSize({ ...POKEMON, matched: [4] })).toBe(48)
+  expect(getSize({ ...POKEMON, matched: [1, 4] })).toBe(48)
+  expect(getSize(POKEMON)).toBe(32)
+})
+
+test('the ring layer carries only the pokemon a glow rule actually matched', () => {
+  const glowing = { ...POKEMON, spawnId: 'glow', matched: [7] }
+  const sized = { ...POKEMON, spawnId: 'sized', matched: [30] }
+  const layer = buildPokemonRingLayer(
+    [glowing, sized, POKEMON],
+    () => STUB_ICON,
+    RULES,
+  )
+  expect(layer.id).toBe(POKEMON_RING_LAYER_ID)
+  expect(layer.props.data).toEqual([glowing])
+})
+
+test('the ring layer asks for an icon by colour combination, not by species', () => {
+  const asked: string[][] = []
+  const layer = buildPokemonRingLayer(
+    [{ ...POKEMON, matched: [7, 12] }],
+    (rings) => {
+      asked.push([...rings])
+      return STUB_ICON
+    },
+    RULES,
+  )
+  const getIcon = layer.props.getIcon as (entity: PokemonEntity) => unknown
+  getIcon({ ...POKEMON, pokemonId: 6, matched: [7, 12] })
+  getIcon({ ...POKEMON, pokemonId: 149, matched: [7, 12] })
+  expect(asked).toEqual([
+    ['#ffc83d', '#4f8cff'],
+    ['#ffc83d', '#4f8cff'],
+  ])
+})
+
+test('a ring draws larger than the sprite it surrounds, at every rule size', () => {
+  const layer = buildPokemonRingLayer(
+    [{ ...POKEMON, matched: [7] }],
+    () => STUB_ICON,
+    RULES,
+  )
+  const ringSize = (layer.props.getSize as (entity: PokemonEntity) => number)({
+    ...POKEMON,
+    matched: [7],
+  })
+  const spriteSize = (
+    buildPokemonIconLayer([POKEMON], () => STUB_ICON, RULES).props.getSize as (
+      entity: PokemonEntity,
+    ) => number
+  )({ ...POKEMON, matched: [7] })
+  expect(ringSize).toBe(spriteSize * RING_SIZE_SCALE)
+  expect(ringSize).toBeGreaterThan(spriteSize)
+})
+
+test('buildMapLayers draws rings beneath the sprites, and only when asked for', () => {
+  const options = {
+    pokemon: [POKEMON],
+    gyms: [GYM],
+    getIconFor: () => STUB_ICON,
+    getGymIcon: () => STUB_ICON,
+    now: 0,
+  }
+  expect(
+    buildMapLayers({ ...options, getRingIcon: () => STUB_ICON }).layers.map(
+      (layer) => layer.id,
+    ),
+  ).toEqual([
+    GYM_ICON_LAYER_ID,
+    POKEMON_RING_LAYER_ID,
+    POKEMON_ICON_LAYER_ID,
+    POKEMON_LABEL_LAYER_ID,
+  ])
+  expect(buildMapLayers(options).layers.map((layer) => layer.id)).not.toContain(
+    POKEMON_RING_LAYER_ID,
+  )
 })

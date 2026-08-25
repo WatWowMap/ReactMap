@@ -10,6 +10,7 @@ import {
   DEFAULT_GYM_CLUSTER_RULES,
   DEFAULT_POKEMON_CLUSTER_RULES,
 } from './clustering'
+import { RING_SIZE_SCALE } from './ring-icon'
 import type { GymEntity, PokemonEntity, Team, Viewport } from './types'
 
 /** No rule matched anything: every entity resolves to `resolveAppearance`'s
@@ -18,10 +19,17 @@ import type { GymEntity, PokemonEntity, Team, Viewport } from './types'
  * map costs nothing to share. */
 const NO_RULES: ReadonlyMap<number, Rule> = new Map()
 
-/** `rule.size` in pixels. `'md'`'s value is deliberately what an
- * unresolved marker drew at before rules existed, so a pokemon nothing
- * matched (or a subscription with no rules source at all) looks exactly
- * as it always did. */
+/** `rule.size` in pixels, as the height deck.gl scales a sprite to.
+ *
+ * `'md'` is the neutral default and is deliberately what an unresolved
+ * marker drew at before rules existed, so a pokemon nothing matched (or a
+ * subscription with no rules source at all) looks exactly as it always
+ * did. The steps are 8px apart rather than a ratio: an 8px difference is
+ * the smallest one that reads at a glance on a crowded map, and a
+ * multiplicative ladder from 24 would put `xl` near 80px, which at
+ * downtown density covers its own neighbours. `sm` stops at 24 because
+ * below that a sprite's silhouette stops being recognisable, which defeats
+ * the point of real artwork. */
 const SIZE_PIXELS: Record<(typeof SIZE_ORDER)[number], number> = {
   sm: 24,
   md: 32,
@@ -29,6 +37,7 @@ const SIZE_PIXELS: Record<(typeof SIZE_ORDER)[number], number> = {
   xl: 48,
 }
 
+export const POKEMON_RING_LAYER_ID = 'pokemon-rings'
 export const POKEMON_ICON_LAYER_ID = 'pokemon-icons'
 export const POKEMON_LABEL_LAYER_ID = 'pokemon-labels'
 export const GYM_ICON_LAYER_ID = 'gym-icons'
@@ -151,6 +160,56 @@ export function buildPokemonIconLayer(
     },
     getSize: (entity) =>
       SIZE_PIXELS[resolveAppearance(entity.matched ?? [], rules).size],
+  })
+}
+
+/**
+ * The glow rings, as their own layer drawn UNDER the species sprites.
+ *
+ * Keeping them separate is the load-bearing performance decision here.
+ * `iconKeyFor` already keys the sprite atlas on seven appearance fields;
+ * compositing a ring into that art would multiply all of it by every
+ * colour combination a profile's rules can produce, and re-key the lot on
+ * every rule edit. Keyed on the colours alone (`ringKeyFor`), this atlas is
+ * a few dozen entries and never grows with what is on screen.
+ *
+ * `data` is the glowing subset rather than the whole array, so deck.gl
+ * uploads one instance per ring instead of one per pokemon with most of
+ * them invisible. That filter allocates - which is fine precisely because
+ * this is called from the clustering memo, not from the once-a-second
+ * clock tick (see MapCanvas); it runs when the entity set or the rules
+ * actually changed, and never on a tick.
+ */
+export function buildPokemonRingLayer(
+  pokemon: readonly PokemonEntity[],
+  getRingIcon: (rings: readonly string[]) => IconDescriptor,
+  rules: ReadonlyMap<number, Rule> = NO_RULES,
+): IconLayer<PokemonEntity> {
+  const glowing = pokemon.filter(
+    (entity) => resolveAppearance(entity.matched ?? [], rules).rings.length > 0,
+  )
+  return new IconLayer<PokemonEntity>({
+    id: POKEMON_RING_LAYER_ID,
+    data: glowing,
+    // The sprite on top is what a click is meant to land on; a ring that
+    // was pickable would swallow picks in the margin around the artwork
+    // and report the same entity twice.
+    pickable: false,
+    getPosition: (entity) => [entity.lon, entity.lat],
+    getIcon: (entity) => {
+      const icon = getRingIcon(
+        resolveAppearance(entity.matched ?? [], rules).rings,
+      )
+      return {
+        id: icon.id,
+        url: icon.url,
+        width: icon.width,
+        height: icon.height,
+      }
+    },
+    getSize: (entity) =>
+      SIZE_PIXELS[resolveAppearance(entity.matched ?? [], rules).size] *
+      RING_SIZE_SCALE,
   })
 }
 
@@ -347,6 +406,12 @@ export interface BuildMapLayersOptions {
   clusterRules?: { pokemon?: ClusterRules; gyms?: ClusterRules }
   getClusterIcon?: () => IconDescriptor
   /**
+   * Draws (or serves from cache) the ring icon for one colour combination.
+   * Omitted, no ring layer is built at all -- which is what every caller
+   * that predates rings, layers.test.ts included, gets.
+   */
+  getRingIcon?: (rings: readonly string[]) => IconDescriptor
+  /**
    * The signed-in profile's rules (`app/rules/rules-query.ts`'s
    * `useRules`), read by `buildPokemonIconLayer` to size each marker from
    * what matched it. Omitted, every pokemon draws at the pre-rules
@@ -357,8 +422,9 @@ export interface BuildMapLayersOptions {
 
 /**
  * All layers this task adds, in the order deck.gl should draw them: gyms
- * and pokemon icons first, pokemon labels last so text always sits on top
- * of the markers it describes. Draw order between layers is independent of
+ * first, then glow rings, then the pokemon sprites that sit on top of
+ * them, and pokemon labels last so text always sits above the markers it
+ * describes. Draw order between layers is independent of
  * `interleaved`, which only controls where the whole deck.gl stack sits
  * relative to MapLibre's own street-label layer.
  */
@@ -441,8 +507,9 @@ const NOTHING_CAPPED: LimitHit = { pokemon: false, gyms: false }
 
 /**
  * All layers this task adds, in the order deck.gl should draw them: gyms
- * and pokemon icons first, pokemon labels last so text always sits on top
- * of the markers it describes. Draw order between layers is independent of
+ * first, then glow rings, then the pokemon sprites that sit on top of
+ * them, and pokemon labels last so text always sits above the markers it
+ * describes. Draw order between layers is independent of
  * `interleaved`, which only controls where the whole deck.gl stack sits
  * relative to MapLibre's own street-label layer.
  *
@@ -467,12 +534,16 @@ export function buildMapLayers({
   viewport,
   clusterRules,
   getClusterIcon,
+  getRingIcon,
   rules,
 }: BuildMapLayersOptions): MapLayersResult {
   if (!viewport) {
     return {
       layers: [
         buildGymIconLayer(gyms, getGymIcon, root),
+        ...(getRingIcon
+          ? [buildPokemonRingLayer(pokemon, getRingIcon, rules)]
+          : []),
         buildPokemonIconLayer(pokemon, getIconFor, rules),
         buildPokemonTextLayer(pokemon, now),
       ],
@@ -494,6 +565,9 @@ export function buildMapLayers({
 
   const layers: Layer[] = [
     buildGymIconLayer(gymResult.points, getGymIcon, root),
+    ...(getRingIcon
+      ? [buildPokemonRingLayer(pokemonResult.points, getRingIcon, rules)]
+      : []),
     buildPokemonIconLayer(pokemonResult.points, getIconFor, rules),
     buildPokemonTextLayer(pokemonResult.points, now),
   ]
