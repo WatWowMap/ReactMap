@@ -47,7 +47,7 @@ Written first, failing, as the merge gate. The server foundation plan did this a
 - Runtime is Bun. Every command `bun`, never npm or node.
 - Tests are `bun test`, currently 306. Acceptance is `bun run test:acceptance`, currently 11 pass and 1 skip.
 - Lint is Biome. Never ESLint or Prettier.
-- Server code is CommonJS. Filenames are kebab-case, components included.
+- **Server code is TypeScript with ES modules**, the same as the client. Never CommonJS, never plain `.js`. The constraint that once said otherwise was matching `server/src/index.js`, which the cutover deleted. Filenames are kebab-case, components included.
 - **Nothing imports, calls or adapts 1.x.** There is no 1.x server code left on this branch, and there is no route back to it. Read git history to learn what it did, then write fresh.
 - Golbat is required. `GET /api/status` is read at boot for capabilities and caps.
 - Never write the user's name into code, comments, or documentation.
