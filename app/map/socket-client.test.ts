@@ -183,3 +183,59 @@ test('closing deliberately does not reconnect', async () => {
   expect(sockets).toHaveLength(1)
   expect(sockets[0]?.closed).toBe(true)
 })
+
+test('a handshake that never completes is abandoned and retried', async () => {
+  const sockets: FakeSocket[] = []
+  const client = createMapSocket({
+    url: 'ws://test.invalid/api/ws',
+    onDelta: () => undefined,
+    reconnectDelayMs: 0,
+    connectTimeoutMs: 1,
+    connect: () => {
+      const socket = new FakeSocket()
+      sockets.push(socket)
+      return socket
+    },
+  })
+  client.setViewport(BOUNDS)
+
+  // Nothing opens, and nothing closes either -- a proxy that answers the
+  // upgrade as ordinary HTTP leaves the socket in CONNECTING with no
+  // event at all, so `onclose` cannot be what recovers from it.
+  await tick()
+  await tick()
+  expect(sockets[0]?.closed).toBe(true)
+  expect(sockets.length).toBeGreaterThan(1)
+
+  // The retry is an ordinary connection: it opens and subscribes.
+  const live = sockets[sockets.length - 1]
+  live?.open()
+  expect(live?.subscribes().map((msg) => msg.category)).toEqual([
+    'pokemon',
+    'gym',
+  ])
+  client.close()
+})
+
+test('a socket that opens in time is left alone', async () => {
+  const sockets: FakeSocket[] = []
+  const client = createMapSocket({
+    url: 'ws://test.invalid/api/ws',
+    onDelta: () => undefined,
+    reconnectDelayMs: 0,
+    connectTimeoutMs: 1,
+    connect: () => {
+      const socket = new FakeSocket()
+      sockets.push(socket)
+      return socket
+    },
+  })
+  client.setViewport(BOUNDS)
+  sockets[0]?.open()
+
+  await tick()
+  await tick()
+  expect(sockets).toHaveLength(1)
+  expect(sockets[0]?.closed).toBe(false)
+  client.close()
+})

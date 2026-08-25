@@ -43,6 +43,8 @@ export interface MapSocketOptions {
   connect?: (url: string) => SocketLike
   /** First reconnect wait; doubles per failed attempt up to a cap. */
   reconnectDelayMs?: number
+  /** How long a handshake may take before the attempt is abandoned. */
+  connectTimeoutMs?: number
 }
 
 export interface MapSocket {
@@ -54,6 +56,14 @@ export interface MapSocket {
 const CATEGORIES: readonly WireCategory[] = ['pokemon', 'gym']
 const DEFAULT_RECONNECT_DELAY_MS = 1_000
 const MAX_RECONNECT_DELAY_MS = 30_000
+// A handshake that never completes is the one failure this client cannot
+// see. Recovery hangs off `onclose`, and a socket parked in CONNECTING
+// has not closed -- a proxy that accepts the TCP connection and then
+// answers the upgrade as ordinary HTTP leaves it there with no `open`,
+// no `error` and no `close` at all, so nothing retries and the map stays
+// silently empty. Ten seconds is far longer than a real upgrade takes
+// and short enough that a wedged attempt turns into an ordinary retry.
+const DEFAULT_CONNECT_TIMEOUT_MS = 10_000
 
 /** `/api/ws` on the origin the app was served from. */
 export function defaultSocketUrl(): string {
@@ -66,6 +76,7 @@ export function createMapSocket({
   onDelta,
   connect = (target) => new WebSocket(target) as unknown as SocketLike,
   reconnectDelayMs = DEFAULT_RECONNECT_DELAY_MS,
+  connectTimeoutMs = DEFAULT_CONNECT_TIMEOUT_MS,
 }: MapSocketOptions): MapSocket {
   let socket: SocketLike | null = null
   let open = false
@@ -73,6 +84,12 @@ export function createMapSocket({
   let attempts = 0
   let bounds: Bounds | null = null
   let retryTimer: ReturnType<typeof setTimeout> | null = null
+  let connectTimer: ReturnType<typeof setTimeout> | null = null
+
+  function clearConnectTimer() {
+    if (connectTimer) clearTimeout(connectTimer)
+    connectTimer = null
+  }
 
   function sendSubscriptions() {
     if (!open || !socket || !bounds) return
@@ -108,7 +125,24 @@ export function createMapSocket({
     socket = next
     open = false
 
+    connectTimer = setTimeout(() => {
+      connectTimer = null
+      // Only ever the socket this attempt created. Detaching the handlers
+      // first means the close it may eventually report cannot schedule a
+      // second reconnect on top of the one below, or on top of a healthy
+      // connection that replaced it in the meantime.
+      if (socket !== next || open) return
+      next.onopen = null
+      next.onmessage = null
+      next.onclose = null
+      next.onerror = null
+      socket = null
+      next.close()
+      scheduleReconnect()
+    }, connectTimeoutMs)
+
     next.onopen = () => {
+      clearConnectTimer()
       open = true
       attempts = 0
       sendSubscriptions()
@@ -125,6 +159,7 @@ export function createMapSocket({
       onDelta(parsed)
     }
     next.onclose = () => {
+      clearConnectTimer()
       open = false
       socket = null
       scheduleReconnect()
@@ -145,6 +180,7 @@ export function createMapSocket({
       stopped = true
       if (retryTimer) clearTimeout(retryTimer)
       retryTimer = null
+      clearConnectTimer()
       socket?.close()
       socket = null
       open = false
