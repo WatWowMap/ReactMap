@@ -23,6 +23,9 @@ import { injectionMatches } from './fort-injection-match'
 import type { createGolbatClient } from './golbat-client'
 import { matchesFortFilters, matchesPokemonFilters } from './golbat-dnf-match'
 import type { WebhookInjection } from './golbat-webhook'
+import { buildPokemonMatcher } from './rule-local-filter'
+import { toRuleRows } from './rule-row'
+import { translatePokemonRules } from './rules-to-golbat-filters'
 import { scanFortsComplete, scanPokemonComplete } from './viewport-scanner'
 
 type Category = 'pokemon' | 'gym'
@@ -46,6 +49,25 @@ interface SubscriptionState {
   // `subscription-registry.ts`, waiting for the loop to drain them. See
   // `injectIntoSubscription` and the injection tick in `subscribeCategory`.
   injections: WebhookInjection[]
+}
+
+/**
+ * Where a subscription's rules come from. Two methods rather than one
+ * because the version is cheap and the rules are not: `currentVersion` is a
+ * primary-key read run on every tick, and `loadRules` only runs when that
+ * number moved. A rule edited on another device therefore reaches an open
+ * map within one poll interval without either side polling the rules
+ * themselves.
+ *
+ * Injected rather than imported so the loop stays testable without a
+ * database, and so a connection with no session at all
+ * (`ws/socket-server.ts`) can simply not have one.
+ */
+interface RulesSource {
+  /** The profile's `rules_version`. */
+  currentVersion(): Promise<number>
+  /** The profile's rules, as `rules-repo.ts`'s `listRules` returns them. */
+  loadRules(): Promise<any[]>
 }
 
 /** What the poll loop needs off a Golbat client, and nothing more. */
@@ -325,12 +347,14 @@ async function* subscribeCategory({
   signal,
   pollIntervalMs,
   initialDelayMs,
+  rulesSource,
 }: {
   golbatClient: PollingGolbatClient
   state: SubscriptionState
   signal: AbortSignal
   pollIntervalMs?: number
   initialDelayMs?: number
+  rulesSource?: RulesSource
 }) {
   const interval = pollIntervalMs ?? pollIntervalForCategory(state.category)
   const initialDelay =
@@ -343,15 +367,69 @@ async function* subscribeCategory({
   // connected client.
   let warnedFortPollUnavailable = false
 
+  // A connection with no rules source is one with no session behind it: an
+  // anonymous visitor on an instance that allows them. There are no rules
+  // to resolve for such a connection, so it keeps the pre-rules behaviour
+  // (whatever the viewport holds), and `rulesVersion` stays 0 -- honestly,
+  // since a version it can never change is exactly what it has.
+  const rulesDrivePokemon = rulesSource != null && state.category === 'pokemon'
+  let rulesVersion = 0
+  // The version the rules in hand were read at, so a tick whose version has
+  // not moved does not re-read them. Null until the first successful read.
+  let loadedVersion: number | null = null
+  let matchRules: (entity: any) => number[] = () => []
+  // Golbat's own "match nothing" (rules-to-golbat-filters.ts, trap 1) is an
+  // empty `filters` array, so a rule set that translates to nothing upstream
+  // is a request not worth making at all. Null means "skip the scan".
+  let upstreamFilters: object[] | null = null
+  let warnedRulesUnavailable = false
+
+  /**
+   * Re-reads the profile's rules if, and only if, its version moved.
+   *
+   * A failure leaves the last known rules in place and lets the next tick
+   * try again, rather than ending the subscription: a database blip should
+   * cost a stale rule set for a few seconds, not every open map on the
+   * instance. Before the FIRST successful read there is nothing to fall
+   * back on, and the loop stays closed -- sending a user entities no rule
+   * of theirs asked for is the worse of the two failures.
+   */
+  async function refreshRules(): Promise<void> {
+    if (!rulesSource) return
+    try {
+      const version = await rulesSource.currentVersion()
+      if (version === loadedVersion) return
+      if (rulesDrivePokemon) {
+        const rows = toRuleRows(await rulesSource.loadRules())
+        matchRules = buildPokemonMatcher(rows)
+        upstreamFilters = translatePokemonRules(rows).upstream?.filters ?? null
+      }
+      loadedVersion = version
+      rulesVersion = version
+    } catch (err) {
+      if (!warnedRulesUnavailable) {
+        warnedRulesUnavailable = true
+        log.warn(
+          TAGS.ReactMap,
+          `could not read this subscription's rules; serving the last known set: ${
+            (err as any)?.message || err
+          }`,
+        )
+      }
+    }
+  }
+
   // A gym subscription defers its first sweep (see
   // GYM_INITIAL_SWEEP_DELAY_MS), and on a Golbat without fort_in_memory it
   // never sweeps at all -- so without this the client would sit in silence
   // wondering whether its subscribe was heard. Pokemon needs no equivalent:
   // its first poll fires immediately and IS the acknowledgement.
   if (state.category === 'gym') {
+    await refreshRules()
     yield {
       type: 'delta',
       category: state.category,
+      rulesVersion,
       added: [] as any[],
       changed: [] as any[],
       removed: [] as string[],
@@ -361,6 +439,12 @@ async function* subscribeCategory({
   }
 
   while (!signal.aborted) {
+    // Cheap on every tick, and the whole of what makes a rule edited on
+    // another device reach this one: the version is a primary-key read, and
+    // the rules themselves are re-read only when it has moved.
+    await refreshRules()
+    if (signal.aborted) return
+
     // Injection tick. Not a poll: no request to Golbat, but the same
     // `previousMap` update and the same `yield`, so the pushed change and
     // the reconciliation sweep can never disagree about what this
@@ -384,7 +468,12 @@ async function* subscribeCategory({
         injected.changed.length > 0 ||
         injected.removed.length > 0
       ) {
-        yield { type: 'delta', category: state.category, ...injected }
+        yield {
+          type: 'delta',
+          category: state.category,
+          rulesVersion,
+          ...injected,
+        }
         if (signal.aborted) return
         // Sleep before looping rather than falling straight through to a
         // poll. A webhook is the authoritative, up-to-date answer for the
@@ -427,15 +516,22 @@ async function* subscribeCategory({
     const oldMap = previousMap
     const baseMap = viewportChanged ? new Map() : previousMap
 
-    let entities: any[]
-    let complete: boolean
+    // A rule set Golbat cannot be asked anything for is not a request:
+    // `entities: []` is the true answer, and `complete: true` because it is
+    // a complete one -- anything the client is still holding really has
+    // stopped matching and must be taken back off its map.
+    const skipScan = rulesDrivePokemon && upstreamFilters === null
+    let entities: any[] = []
+    let complete = true
     try {
-      ;({ entities, complete } = await pollOnce(
-        golbatClient,
-        state.category,
-        state.viewport,
-        state.filters,
-      ))
+      if (!skipScan) {
+        ;({ entities, complete } = await pollOnce(
+          golbatClient,
+          state.category,
+          state.viewport,
+          rulesDrivePokemon ? (upstreamFilters ?? []) : state.filters,
+        ))
+      }
     } catch (err) {
       if (state.category !== 'gym') throw err
       // A failed reconciliation sweep is not a failed subscription: the
@@ -455,8 +551,18 @@ async function* subscribeCategory({
     }
     if (signal.aborted) return
 
-    const localFilter =
-      state.category === 'gym'
+    // Which rules matched which entity, for this tick only. The predicate
+    // `computeDelta` wants is the same question asked as a yes/no, so the
+    // two can never disagree about what was sent.
+    const matchedById = new Map<string, number[]>()
+    const localFilter = rulesDrivePokemon
+      ? (entity: any) => {
+          const matched = matchRules(entity)
+          if (matched.length === 0) return false
+          matchedById.set(String(entity.id), matched)
+          return true
+        }
+      : state.category === 'gym'
         ? matchesFortFilters(state.filters)
         : matchesPokemonFilters(state.filters)
 
@@ -469,6 +575,17 @@ async function* subscribeCategory({
       },
     )
 
+    // Copied rather than mutated: the entity came off a Golbat response
+    // this loop does not own, and a `matched` array written onto it would
+    // outlive the tick that computed it.
+    const withMatched = (list: any[]) =>
+      rulesDrivePokemon
+        ? list.map((entity) => ({
+            ...entity,
+            matched: matchedById.get(String(entity.id)) ?? [],
+          }))
+        : list
+
     const finalRemoved = viewportChanged
       ? [...oldMap.keys()].filter((id) => !nextMap.has(id))
       : removed
@@ -479,8 +596,9 @@ async function* subscribeCategory({
     yield {
       type: 'delta',
       category: state.category,
-      added,
-      changed,
+      rulesVersion,
+      added: withMatched(added),
+      changed: withMatched(changed),
       removed: finalRemoved,
     }
 
@@ -488,6 +606,7 @@ async function* subscribeCategory({
   }
 }
 
+export type { RulesSource }
 export {
   createSubscriptionState,
   GYM_INITIAL_SWEEP_DELAY_MS,

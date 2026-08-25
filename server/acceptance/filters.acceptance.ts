@@ -338,6 +338,13 @@ describe('criterion 5: an entity carries every rule it matched', () => {
     'a pokemon matching two rules carries both rule ids',
     async () => {
       const cookie = await signUpAndSignIn('f5')
+      // The seeded Everything rule matches every pokemon there is
+      // (criterion 1), so leaving it in place would make it a third rule
+      // this entity genuinely matched -- true, and not what this criterion
+      // is measuring. Removing it makes the rules below the whole rule set.
+      // The assertion itself is untouched.
+      const [seeded] = await rpc(cookie, 'rules.list')
+      await rpc(cookie, 'rules.delete', { ruleIds: [seeded.id] })
       const hundos = await rpc(cookie, 'rules.create', {
         name: 'Hundos',
         size: 'xl',
@@ -388,6 +395,13 @@ describe('criterion 6: matched ids name the rules a popup shows', () => {
     'the matched ids resolve to the names a popup would show',
     async () => {
       const cookie = await signUpAndSignIn('f6')
+      // The seeded Everything rule matches every pokemon there is
+      // (criterion 1), so leaving it in place would make it a third rule
+      // this entity genuinely matched -- true, and not what this criterion
+      // is measuring. Removing it makes the rules below the whole rule set.
+      // The assertion itself is untouched.
+      const [seeded] = await rpc(cookie, 'rules.list')
+      await rpc(cookie, 'rules.delete', { ruleIds: [seeded.id] })
       await rpc(cookie, 'rules.create', {
         name: 'Hundos',
         ivMin: 100,

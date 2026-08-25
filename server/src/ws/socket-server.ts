@@ -25,6 +25,14 @@
 // write landing on a different process, and a session revoked from another
 // device.
 //
+// What a subscription shows is NOT read off the subscribe message. The
+// message names a category and a viewport; the rules come from the
+// session's own profile (`services/rules-source.ts`), are re-read whenever
+// that profile's `rules_version` moves, and are what both narrows the
+// Golbat request and decides what survives it. A `filters` field on an
+// incoming message is ignored -- a client that could name its own Golbat
+// filters could ask for whatever it liked, whatever its rules say.
+//
 // Per-connection state lives on `ws.data` (Bun's per-socket attachment,
 // set once at `server.upgrade(request, { data })` and handed back on every
 // callback): one `SubscriptionState`+`AbortController` pair per category,
@@ -35,12 +43,14 @@
 
 import { log, TAGS } from '@rm/logger'
 import { randomUUID } from 'crypto'
+import { getDrizzle } from '../db/drizzle'
 import {
   createSubscriptionState,
   pollIntervalForCategory,
   subscribeCategory,
   updateSubscription,
 } from '../services/map-subscription'
+import { createRulesSource } from '../services/rules-source'
 import type { createSubscriptionRegistry } from '../services/subscription-registry'
 import { resolveSession } from '../trpc/context'
 
@@ -50,8 +60,11 @@ const VALID_CATEGORIES = new Set(['pokemon', 'gym'])
 function createSocketServer({
   golbatClient,
   registry,
+  getDb = getDrizzle,
 }: {
   golbatClient: any
+  /** The drizzle client rules are read through; injectable for tests. */
+  getDb?: () => any
   // The process-wide routing table Task 6's webhook receiver fans out
   // through (`services/subscription-registry.ts`). Optional so a caller
   // that only wants the poll loop -- a test, or a build with the receiver
@@ -82,16 +95,15 @@ function createSocketServer({
     ws: any,
     category: 'pokemon' | 'gym',
     viewport: any,
-    filters: object[],
   ) {
     const existing = ws.data.subscriptions.get(category)
     if (existing) {
-      updateSubscription(existing.state, { viewport, filters })
+      updateSubscription(existing.state, { viewport })
       return
     }
 
     const controller = new AbortController()
-    const state = createSubscriptionState({ category, viewport, filters })
+    const state = createSubscriptionState({ category, viewport })
     // Registered before the loop starts, so a webhook that lands between
     // the subscribe message and the first poll is still delivered. A
     // viewport change mutates this same `state` in place
@@ -101,6 +113,10 @@ function createSocketServer({
     const unregister = registry?.register({ category, state }) ?? (() => {})
     ws.data.subscriptions.set(category, { state, controller, unregister })
 
+    // Built per subscription rather than per connection so it captures the
+    // user this socket authenticated as, and nothing the message said.
+    const rulesSource = createRulesSource({ userId: ws.data.userId, getDb })
+
     ;(async () => {
       try {
         for await (const delta of subscribeCategory({
@@ -108,6 +124,7 @@ function createSocketServer({
           state,
           signal: controller.signal,
           pollIntervalMs: pollIntervalForCategory(category),
+          ...(rulesSource ? { rulesSource } : {}),
         })) {
           if (controller.signal.aborted) break
           ws.send(JSON.stringify(delta))
@@ -184,12 +201,7 @@ function createSocketServer({
         VALID_CATEGORIES.has(msg.category) &&
         msg.viewport
       ) {
-        startOrUpdateSubscription(
-          ws,
-          msg.category,
-          msg.viewport,
-          Array.isArray(msg.filters) ? msg.filters : [],
-        )
+        startOrUpdateSubscription(ws, msg.category, msg.viewport)
       }
     },
     close(ws: any) {

@@ -1,8 +1,8 @@
 import { describe, expect, test } from 'bun:test'
 import { computeDelta } from '../src/services/delta-engine'
 import {
-  buildGymLocalFilter,
-  buildPokemonLocalFilter,
+  buildGymMatcher,
+  buildPokemonMatcher,
   gymRuleMatches,
   matchesRange,
   pokemonRuleMatches,
@@ -61,7 +61,7 @@ describe('pvpRankMatches', () => {
 })
 
 // ---------------------------------------------------------------------------
-// pokemonRuleMatches / buildPokemonLocalFilter
+// pokemonRuleMatches / buildPokemonMatcher
 // ---------------------------------------------------------------------------
 describe('pokemonRuleMatches: exclusion', () => {
   const rule = {
@@ -98,14 +98,16 @@ describe('pokemonRuleMatches: verification 2, exclusion scope', () => {
     expect(pokemonRuleMatches(excludingRule, rattata)).toBe(false)
     expect(pokemonRuleMatches(catchAllRule, rattata)).toBe(true)
 
-    const filter = buildPokemonLocalFilter([excludingRule, catchAllRule])
+    const matcher = buildPokemonMatcher([excludingRule, catchAllRule])
     // Justification: the rules model spec is explicit -- "Does it show at
     // all? Any matching rule makes it visible" and "adding a rule can only
     // ever add visibility. No rule can hide what another shows, because
     // exclusions are rule local." catchAllRule genuinely, independently
     // matches this Rattata (it does not itself exclude Rattata), so the
     // entity shows despite excludingRule's veto.
-    expect(filter(rattata)).toBe(true)
+    // Only rule 2's id lands on the wire: rule 1 vetoed this Rattata, so it
+    // is not one of the rules that matched it.
+    expect(matcher(rattata)).toEqual([2])
   })
 
   test('the soundness gap this module exists to close: a narrow, non-excluding rule must NOT vacuously pass for an entity it does not actually match', () => {
@@ -124,8 +126,8 @@ describe('pokemonRuleMatches: verification 2, exclusion scope', () => {
     const rattata95 = { pokemon_id: 19, form: 0, iv: 95 }
     expect(pokemonRuleMatches(hundoOnlyRule, rattata95)).toBe(false)
 
-    const filter = buildPokemonLocalFilter([excludingRule, hundoOnlyRule])
-    expect(filter(rattata95)).toBe(false)
+    const matcher = buildPokemonMatcher([excludingRule, hundoOnlyRule])
+    expect(matcher(rattata95)).toEqual([])
   })
 })
 
@@ -200,20 +202,38 @@ describe('verification 5: a cleanly-matching rule is not defeated by an unrelate
     }
     expect(pokemonRuleMatches(pvpRule, bulbasaur)).toBe(true)
     expect(pokemonRuleMatches(exclusionRule, bulbasaur)).toBe(false)
-    const filter = buildPokemonLocalFilter([pvpRule, exclusionRule])
-    expect(filter(bulbasaur)).toBe(true)
+    const matcher = buildPokemonMatcher([pvpRule, exclusionRule])
+    expect(matcher(bulbasaur)).toEqual([1])
   })
 })
 
-describe('verification 6: no rules at all accepts everything', () => {
-  test('buildPokemonLocalFilter([])', () => {
-    const filter = buildPokemonLocalFilter([])
-    expect(filter({ pokemon_id: 1 })).toBe(true)
-    expect(filter({ pokemon_id: 999 })).toBe(true)
+describe('verification 6: no rules at all matches nothing', () => {
+  // Filtering is subtractive from nothing rather than from everything: a
+  // user with no rules has asked for nothing, so nothing is sent. The map
+  // a fresh account sees is populated by the seeded Everything rule
+  // (auth/seed-profile.ts), not by a special case here.
+  test('buildPokemonMatcher([])', () => {
+    const matcher = buildPokemonMatcher([])
+    expect(matcher({ pokemon_id: 1 })).toEqual([])
+    expect(matcher({ pokemon_id: 999 })).toEqual([])
   })
-  test('buildGymLocalFilter([])', () => {
-    const filter = buildGymLocalFilter([])
-    expect(filter({ raid_level: 5 })).toBe(true)
+  test('buildGymMatcher([])', () => {
+    const matcher = buildGymMatcher([])
+    expect(matcher({ raid_level: 5 })).toEqual([])
+  })
+})
+
+describe('a matcher reports every rule that matched, not just the first', () => {
+  test('two independently matching rules both land on the wire', () => {
+    const hundos = { id: 7, species_id: null, iv_min: 100 }
+    const dratini = { id: 12, species_id: 147 }
+    const matcher = buildPokemonMatcher([hundos, dratini])
+    // Sorted numerically: `[7, 12].sort()` is lexicographic and answers
+    // `[12, 7]`, which is a trap rather than an assertion.
+    const matched = matcher({ pokemon_id: 147, form: 0, iv: 100 })
+    expect([...matched].sort((a, b) => a - b)).toEqual([7, 12])
+    // Same species, wrong IV: only the species rule matched.
+    expect(matcher({ pokemon_id: 147, form: 0, iv: 12 })).toEqual([12])
   })
 })
 
@@ -239,7 +259,7 @@ describe('gymRuleMatches', () => {
 // ---------------------------------------------------------------------------
 // Verification 7: end to end, Task 3 -> this evaluator -> computeDelta.
 // ---------------------------------------------------------------------------
-describe('end to end: rules -> translatePokemonRules -> buildPokemonLocalFilter -> computeDelta', () => {
+describe('end to end: rules -> translatePokemonRules -> buildPokemonMatcher -> computeDelta', () => {
   test('the right entities survive the pipeline', () => {
     const rules = [
       {
@@ -254,7 +274,8 @@ describe('end to end: rules -> translatePokemonRules -> buildPokemonLocalFilter 
     const { upstream } = translatePokemonRules(rules)
     expect(upstream).not.toBeNull() // sanity: caller has something to send Golbat
 
-    const localFilter = buildPokemonLocalFilter(rules)
+    const matcher = buildPokemonMatcher(rules)
+    const localFilter = (entity: any) => matcher(entity).length > 0
 
     // Fixture entities as if returned by Golbat for the upstream query above.
     const hundoRattata = {

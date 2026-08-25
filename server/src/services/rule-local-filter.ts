@@ -1,12 +1,20 @@
 // server/src/services/rule-local-filter.ts
 //
 // Closes the gap between Task 3 (rules-to-golbat-filters.js) and Task 4
-// (delta-engine.js): turns a user's rule set into the `localFilter`
-// predicate `computeDelta` accepts.
+// (delta-engine.js): turns a user's rule set into a matcher that answers,
+// for one entity, WHICH of the rules matched it.
+//
+// The answer is a list of rule ids rather than a boolean because both
+// callers need both halves of it. "Is this entity visible at all" is "is
+// the list non-empty", which is the `localFilter` predicate `computeDelta`
+// accepts; and the ids themselves ride out on the wire as an entity's
+// `matched` array, so a client holding a pokemon that two overlapping
+// rules both claim can decide for itself which one styles it, instead of
+// racing the server for an answer only one of them can see.
 //
 // The combining semantics (see the task report for the full derivation):
 //
-//   An entity is visible iff AT LEAST ONE rule, taken as a whole -- its own
+//   An entity is matched by every rule that, taken as a whole -- its own
 //   scope (species/form or boss/reward/etc.), its own numeric bounds, its
 //   own exclusions, and its own PVP bounds -- matches the entity. Rules are
 //   OR'd; a rule's own criteria are AND'd together. This mirrors the rules
@@ -173,14 +181,38 @@ function pokemonRuleMatches(rule: any, entity: any): boolean {
 }
 
 /**
+ * The shape every category's matcher shares: ask each rule whether it
+ * matches this entity, on its own terms, and collect the ids of the ones
+ * that said yes.
+ */
+function buildMatcher(
+  rules: any[],
+  ruleMatches: (rule: any, entity: any) => boolean,
+): (entity: any) => number[] {
+  const list = rules ?? []
+  if (list.length === 0) return () => []
+  return (entity) => {
+    const matched: number[] = []
+    for (const rule of list) {
+      if (ruleMatches(rule, entity)) matched.push(rule.id)
+    }
+    return matched
+  }
+}
+
+/**
  * @param rules Same shape `translatePokemonRules` takes: `rule`
  *   rows joined with `rule_pokemon`, plus `exclusions` on any rule whose own
  *   species is NULL.
+ * @returns every rule id that matched, in the order the rules were given.
+ *   Empty means the entity is not visible: filtering is subtractive from
+ *   nothing rather than from everything, so a user with no rules has asked
+ *   for nothing and is sent nothing. What makes a fresh account's map
+ *   populated is the seeded Everything rule (auth/seed-profile.ts), not a
+ *   special case here.
  */
-function buildPokemonLocalFilter(rules: any[]): (entity: any) => boolean {
-  const list = rules ?? []
-  if (list.length === 0) return () => true
-  return (entity) => list.some((rule) => pokemonRuleMatches(rule, entity))
+function buildPokemonMatcher(rules: any[]): (entity: any) => number[] {
+  return buildMatcher(rules, pokemonRuleMatches)
 }
 
 // ---------------------------------------------------------------------------
@@ -243,10 +275,8 @@ function gymRuleMatches(rule: any, entity: any): boolean {
 }
 
 /** @param rules `rule` rows joined with `rule_gym`. */
-function buildGymLocalFilter(rules: any[]): (entity: any) => boolean {
-  const list = rules ?? []
-  if (list.length === 0) return () => true
-  return (entity) => list.some((rule) => gymRuleMatches(rule, entity))
+function buildGymMatcher(rules: any[]): (entity: any) => number[] {
+  return buildMatcher(rules, gymRuleMatches)
 }
 
 function pokestopRuleMatches(rule: any, entity: any): boolean {
@@ -319,10 +349,8 @@ function pokestopRuleMatches(rule: any, entity: any): boolean {
  * @param rules `rule` rows joined with `rule_pokestop` (and, for
  *   quest rules, `conditions`).
  */
-function buildPokestopLocalFilter(rules: any[]): (entity: any) => boolean {
-  const list = rules ?? []
-  if (list.length === 0) return () => true
-  return (entity) => list.some((rule) => pokestopRuleMatches(rule, entity))
+function buildPokestopMatcher(rules: any[]): (entity: any) => number[] {
+  return buildMatcher(rules, pokestopRuleMatches)
 }
 
 function stationRuleMatches(rule: any, entity: any): boolean {
@@ -348,18 +376,16 @@ function stationRuleMatches(rule: any, entity: any): boolean {
 }
 
 /** @param rules `rule` rows joined with `rule_station`. */
-function buildStationLocalFilter(rules: any[]): (entity: any) => boolean {
-  const list = rules ?? []
-  if (list.length === 0) return () => true
-  return (entity) => list.some((rule) => stationRuleMatches(rule, entity))
+function buildStationMatcher(rules: any[]): (entity: any) => number[] {
+  return buildMatcher(rules, stationRuleMatches)
 }
 
 /**
- * Convenience entry point: build all four category predicates from one
+ * Convenience entry point: build all four category matchers from one
  * rules-by-category bundle, so a caller has one obvious call from rules to
- * working `localFilter`s.
+ * a working matcher.
  */
-function buildLocalFilters({
+function buildMatchers({
   pokemon = [],
   gym = [],
   pokestop = [],
@@ -370,25 +396,25 @@ function buildLocalFilters({
   pokestop?: any[]
   station?: any[]
 } = {}): {
-  pokemon: (entity: any) => boolean
-  gym: (entity: any) => boolean
-  pokestop: (entity: any) => boolean
-  station: (entity: any) => boolean
+  pokemon: (entity: any) => number[]
+  gym: (entity: any) => number[]
+  pokestop: (entity: any) => number[]
+  station: (entity: any) => number[]
 } {
   return {
-    pokemon: buildPokemonLocalFilter(pokemon),
-    gym: buildGymLocalFilter(gym),
-    pokestop: buildPokestopLocalFilter(pokestop),
-    station: buildStationLocalFilter(station),
+    pokemon: buildPokemonMatcher(pokemon),
+    gym: buildGymMatcher(gym),
+    pokestop: buildPokestopMatcher(pokestop),
+    station: buildStationMatcher(station),
   }
 }
 
 export {
-  buildGymLocalFilter,
-  buildLocalFilters,
-  buildPokemonLocalFilter,
-  buildPokestopLocalFilter,
-  buildStationLocalFilter,
+  buildGymMatcher,
+  buildMatchers,
+  buildPokemonMatcher,
+  buildPokestopMatcher,
+  buildStationMatcher,
   gymRuleMatches,
   matchesRange,
   pokemonRuleMatches,

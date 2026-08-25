@@ -200,6 +200,26 @@ async function assertOwnsRules(
   return [...new Set<number>(rows.map((row: any) => row.profileId))]
 }
 
+/**
+ * The user's profile, or null when they have none yet. One account, one
+ * profile in this plan; the oldest is taken if that ever stops being true,
+ * so the answer is stable rather than whichever row the table happened to
+ * return first.
+ *
+ * Null rather than a throw because the two callers disagree about what an
+ * absent profile means: an RPC turns it into a 404, and a live subscription
+ * treats it as "no rules", which is an empty map rather than a dead socket.
+ */
+async function findProfileId(db: any, userId: string): Promise<number | null> {
+  const [row] = await db
+    .select({ id: profile.id })
+    .from(profile)
+    .where(eq(profile.userId, userId))
+    .orderBy(asc(profile.id))
+    .limit(1)
+  return row?.id ?? null
+}
+
 /** The user's rules in one profile, flat, each with its exclusions. */
 async function listRules(
   db: any,
@@ -418,6 +438,7 @@ export {
   createRules,
   currentRulesVersion,
   deleteRules,
+  findProfileId,
   listRules,
   POKEMON_CONDITION_FIELDS,
   RULE_FIELDS,

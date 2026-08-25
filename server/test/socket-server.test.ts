@@ -105,3 +105,36 @@ test('a healthy subscription keeps its entry and updates in place', async () => 
 
   server.websocket.close(ws)
 })
+
+test('subscribe no longer accepts client-sent filters', async () => {
+  // The server resolves rules from the session. A `filters` field on the
+  // message is ignored rather than trusted -- otherwise any client could
+  // ask Golbat for whatever it liked, whatever its own rules say.
+  const server = createSocketServer({
+    golbatClient: {
+      scanPokemon: async () => ({ pokemon: [], limitReached: false }),
+      scanForts: async () => ({
+        gyms: [],
+        pokestops: [],
+        stations: [],
+        limitReached: false,
+      }),
+    },
+  })
+  const ws = fakeWs()
+
+  server.websocket.message(
+    ws,
+    JSON.stringify({
+      type: 'subscribe',
+      category: 'pokemon',
+      viewport: VIEWPORT,
+      filters: [{ pokemon: [{ id: 1 }] }],
+    }),
+  )
+  await settle()
+
+  expect(ws.data.subscriptions.get('pokemon').state.filters).toEqual([])
+
+  server.websocket.close(ws)
+})

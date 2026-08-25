@@ -20,14 +20,13 @@
 // someone else throws rather than being written.
 
 import { TRPCError } from '@trpc/server'
-import { asc, eq } from 'drizzle-orm'
 import { z } from 'zod'
 
 import { getDrizzle } from '../db/drizzle'
-import { profile } from '../db/rules-schema'
 import {
   createRules,
   deleteRules,
+  findProfileId,
   listRules,
   updateRules,
 } from '../services/rules-repo'
@@ -103,25 +102,16 @@ function requireUserId(ctx: any): string {
   return userId
 }
 
-/**
- * The user's profile. One account, one profile in this plan; the oldest is
- * taken if that ever stops being true, so the answer is stable rather than
- * whichever row the table happened to return first.
- */
+/** The user's profile, or a 404 for an account that has none yet. */
 async function resolveProfileId(db: any, userId: string): Promise<number> {
-  const [row] = await db
-    .select({ id: profile.id })
-    .from(profile)
-    .where(eq(profile.userId, userId))
-    .orderBy(asc(profile.id))
-    .limit(1)
-  if (!row) {
+  const profileId = await findProfileId(db, userId)
+  if (profileId == null) {
     throw new TRPCError({
       code: 'NOT_FOUND',
       message: 'This account has no profile yet',
     })
   }
-  return row.id
+  return profileId
 }
 
 /**

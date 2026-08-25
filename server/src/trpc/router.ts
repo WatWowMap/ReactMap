@@ -26,11 +26,13 @@
 
 import { z } from 'zod'
 
+import { getDrizzle } from '../db/drizzle'
 import {
   createSubscriptionState,
   pollIntervalForCategory,
   subscribeCategory,
 } from '../services/map-subscription'
+import { createRulesSource } from '../services/rules-source'
 import { rulesRouter } from './rules-router'
 import { t } from './trpc-base'
 
@@ -39,10 +41,12 @@ const viewportSchema = z.object({
   max: z.object({ lat: z.number(), lon: z.number() }),
 })
 
+// No `filters`: what a subscription shows comes from the caller's own rules
+// (`services/rules-source.ts`), not from anything on the wire. The same
+// contract `ws/socket-server.ts` documents at its own header.
 const subscribeInputSchema = z.object({
   category: z.enum(['pokemon', 'gym']),
   viewport: viewportSchema,
-  filters: z.array(z.record(z.string(), z.any())).default([]),
 })
 
 const mapRouter = t.router({
@@ -62,12 +66,17 @@ const mapRouter = t.router({
       const unregister =
         ctx.registry?.register({ category: input.category, state }) ??
         (() => {})
+      const rulesSource = createRulesSource({
+        userId: ctx.user?.id,
+        getDb: () => ctx.db ?? getDrizzle(),
+      })
       try {
         yield* subscribeCategory({
           golbatClient: ctx.golbatClient,
           state,
           signal: abortSignal,
           pollIntervalMs: pollIntervalForCategory(input.category),
+          ...(rulesSource ? { rulesSource } : {}),
         })
       } finally {
         unregister()

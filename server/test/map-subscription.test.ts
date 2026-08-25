@@ -105,6 +105,7 @@ describe('subscribeCategory', () => {
     expect(first).toEqual({
       type: 'delta',
       category: 'pokemon',
+      rulesVersion: 0,
       added: [],
       changed: [],
       removed: [],
@@ -447,6 +448,7 @@ describe('subscribeCategory: webhook injections', () => {
     expect(ack).toEqual({
       type: 'delta',
       category: 'gym',
+      rulesVersion: 0,
       added: [],
       changed: [],
       removed: [],
@@ -498,6 +500,7 @@ describe('subscribeCategory: webhook injections', () => {
     expect(poll).toEqual({
       type: 'delta',
       category: 'gym',
+      rulesVersion: 0,
       added: [],
       changed: [],
       removed: [],
@@ -536,6 +539,7 @@ describe('subscribeCategory: webhook injections', () => {
     expect(next).toEqual({
       type: 'delta',
       category: 'gym',
+      rulesVersion: 0,
       added: [],
       changed: [],
       removed: [],
@@ -676,5 +680,192 @@ describe('subscribeCategory: gyms without fort_in_memory', () => {
 
     expect(attempts).toBeGreaterThan(0)
     expect(injected.added.map((g: any) => g.id)).toEqual(['g1'])
+  })
+})
+
+// ---------------------------------------------------------------------------
+// Task 6: the server resolves the subscription's rules for itself.
+// ---------------------------------------------------------------------------
+
+/** A `rules-repo.ts` `StoredRule`, at the columns these tests care about. */
+function ruleFixture(overrides: Record<string, unknown>) {
+  return {
+    speciesId: null,
+    formId: null,
+    pvpTargetSpecies: null,
+    ivMin: null,
+    ivMax: null,
+    levelMin: null,
+    levelMax: null,
+    cpMin: null,
+    cpMax: null,
+    gender: null,
+    pvpLeague: null,
+    pvpRankMin: null,
+    pvpRankMax: null,
+    exclusions: [],
+    ...overrides,
+  }
+}
+
+/** The `rulesSource` a real connection gets, without a database behind it. */
+function fakeRulesSource(rules: any[], rulesVersion: number) {
+  return {
+    currentVersion: async () => rulesVersion,
+    loadRules: async () => rules,
+  }
+}
+
+/** The first delta a pokemon subscription yields for one rule set. */
+async function firstDelta({
+  rules = [] as any[],
+  entities = [] as any[],
+  rulesVersion = 1,
+}: {
+  rules?: any[]
+  entities?: any[]
+  rulesVersion?: number
+} = {}) {
+  const state = createSubscriptionState({
+    category: 'pokemon',
+    viewport: VIEWPORT_A,
+  })
+  const controller = new AbortController()
+  const golbatClient = fakeGolbatClient({
+    scanPokemon: async () => ({ pokemon: entities, limitReached: false }),
+  })
+  const [delta] = await take(
+    subscribeCategory({
+      golbatClient,
+      state,
+      signal: controller.signal,
+      pollIntervalMs: 10,
+      rulesSource: fakeRulesSource(rules, rulesVersion),
+    }),
+    1,
+  )
+  controller.abort()
+  return delta
+}
+
+describe('rules drive the subscription', () => {
+  test('each entity carries the ids of the rules that matched it', async () => {
+    const rules = [
+      ruleFixture({ id: 7, ivMin: 100 }),
+      ruleFixture({ id: 12, pvpLeague: 1500, pvpRankMax: 100 }),
+    ]
+    const delta = await firstDelta({
+      rules,
+      entities: [
+        {
+          id: 'a',
+          updated: 1,
+          pokemon_id: 147,
+          form: 0,
+          iv: 100,
+          pvp: { great: [{ pokemon: 147, form: 0, cap: 40, rank: 4 }] },
+        },
+      ],
+    })
+    // Numeric sort: `[7, 12].sort()` is lexicographic and answers `[12, 7]`.
+    const matched = delta.added[0].matched
+    expect([...matched].sort((a: number, b: number) => a - b)).toEqual([7, 12])
+  })
+
+  test('an entity matching no rule is not sent at all', async () => {
+    const delta = await firstDelta({
+      rules: [ruleFixture({ id: 7, ivMin: 100 })],
+      entities: [{ id: 'a', updated: 1, pokemon_id: 147, form: 0, iv: 12 }],
+    })
+    expect(delta.added).toEqual([])
+  })
+
+  test('the delta envelope carries the current rules version', async () => {
+    const delta = await firstDelta({ rules: [], rulesVersion: 41 })
+    expect(delta.rulesVersion).toBe(41)
+  })
+
+  test('a rules edit elsewhere reaches an open subscription', async () => {
+    // Criterion 7 in miniature: nothing about the connection changed, but
+    // the profile's version moved, so the next tick re-reads the rules and
+    // stamps the new version.
+    let version = 1
+    let loads = 0
+    const state = createSubscriptionState({
+      category: 'pokemon',
+      viewport: VIEWPORT_A,
+    })
+    const controller = new AbortController()
+    const golbatClient = fakeGolbatClient({
+      scanPokemon: async () => ({
+        pokemon: [{ id: 'a', updated: 1, pokemon_id: 147, form: 0, iv: 12 }],
+        limitReached: false,
+      }),
+    })
+    const generator = subscribeCategory({
+      golbatClient,
+      state,
+      signal: controller.signal,
+      pollIntervalMs: 5,
+      rulesSource: {
+        currentVersion: async () => version,
+        loadRules: async () => {
+          loads += 1
+          return version === 1 ? [] : [ruleFixture({ id: 3, speciesId: 147 })]
+        },
+      },
+    })
+
+    const before = await nextValue(generator)
+    expect(before.rulesVersion).toBe(1)
+    expect(before.added).toEqual([])
+
+    version = 2
+    const after = await nextValue(generator)
+    controller.abort()
+
+    expect(after.rulesVersion).toBe(2)
+    expect(after.added.map((e: any) => e.id)).toEqual(['a'])
+    // Two versions, two reads -- the rules are not re-read on every tick.
+    expect(loads).toBe(2)
+  })
+
+  test('a subscription with no rules never asks Golbat anything', async () => {
+    // An empty upstream `filters` array is Golbat's own "match nothing"
+    // (rules-to-golbat-filters.ts, trap 1), so there is no request worth
+    // making. The delta is still yielded: it is the acknowledgement.
+    let scans = 0
+    const state = createSubscriptionState({
+      category: 'pokemon',
+      viewport: VIEWPORT_A,
+    })
+    const controller = new AbortController()
+    const golbatClient = fakeGolbatClient({
+      scanPokemon: async () => {
+        scans += 1
+        return { pokemon: [], limitReached: false }
+      },
+    })
+    const [delta] = await take(
+      subscribeCategory({
+        golbatClient,
+        state,
+        signal: controller.signal,
+        pollIntervalMs: 10,
+        rulesSource: fakeRulesSource([], 4),
+      }),
+      1,
+    )
+    controller.abort()
+
+    expect(scans).toBe(0)
+    expect(delta).toEqual({
+      type: 'delta',
+      category: 'pokemon',
+      rulesVersion: 4,
+      added: [],
+      changed: [],
+      removed: [],
+    })
   })
 })

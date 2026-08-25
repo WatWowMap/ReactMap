@@ -81,21 +81,29 @@
 //     part of why criteria 1-4, 6 and 7 read as connection failures rather
 //     than data mismatches.
 //   - Subscribe message (client -> server): {"type":"subscribe","category":
-//     "pokemon"|"gym","viewport":{"min":{"lat","lon"},"max":{"lat","lon"}},
-//     "filters":[...]}. `filters` is Golbat's own v3 DNF clause array
-//     (ApiPokemonDnfFilter3 / ApiFortDnfFilter) passed straight through --
-//     since Task 3 (rules -> DNF translation) has not landed and there is no
-//     rules table on this branch yet to seed a real rule row from, this
-//     file declares what it wants directly in Golbat's own vocabulary,
-//     matching the design doc's "the client declares what it needs once, at
-//     subscribe time." Re-sending a subscribe message with a new viewport
-//     is this file's assumed contract for "the client moved the map."
+//     "pokemon"|"gym","viewport":{"min":{"lat","lon"},"max":{"lat","lon"}}}.
+//     Re-sending a subscribe message with a new viewport is this file's
+//     assumed contract for "the client moved the map."
+//
+//     This message carried a `filters` array until the filters plan's Task
+//     6, which is the change that updated this section. `filters` was
+//     Golbat's own v3 DNF clause array (ApiPokemonDnfFilter3 /
+//     ApiFortDnfFilter) passed straight through, because there was no rules
+//     table on the branch yet to seed a real rule from. There is one now, so
+//     what a subscription shows comes from the signed-in user's own rules
+//     and a `filters` field on the message is ignored -- a client that could
+//     name its own Golbat filters could ask for whatever it liked, whatever
+//     its rules say. The two criteria below that needed a narrow filter
+//     (1 and 7) now write a real rule over `rules.*` first, which is also a
+//     truer test: it exercises the path a browser will actually take.
 //   - Delta message (server -> client): {"type":"delta","category":
-//     "pokemon"|"gym","added":[...],"changed":[...],"removed":[...ids]}.
-//     Entities are Golbat's own response shapes (ApiPokemonResult /
-//     ApiGymResult field names), again passed through rather than
-//     invented, since nothing has decided a ReactMap-specific entity
-//     projection yet.
+//     "pokemon"|"gym","rulesVersion":N,"added":[...],"changed":[...],
+//     "removed":[...ids]}. Entities are Golbat's own response shapes
+//     (ApiPokemonResult / ApiGymResult field names), passed through rather
+//     than invented, plus one field this server adds: `matched`, the ids of
+//     the rules that matched that entity. `rulesVersion` is the profile's
+//     `rules_version` the delta was computed against, so an open map can
+//     notice that its cached rules went stale.
 //
 // ---------------------------------------------------------------------------
 // Criterion 8's WebSocket liveness definition
@@ -175,6 +183,68 @@ class TransportSocketClient extends AcceptanceSocketClient {
   }
 }
 
+const TRPC_URL = `${BASE_URL}/api/trpc`
+
+/**
+ * Calls one `rules.*` procedure over real HTTP with a real session cookie.
+ * tRPC decides a procedure's kind by method: GET is a query, POST a
+ * mutation.
+ */
+async function rulesRpc(
+  cookie: string | null,
+  procedure: 'rules.list' | 'rules.create' | 'rules.delete',
+  input?: unknown,
+): Promise<any> {
+  // `rules.list` takes no input, so a query needs no `?input=` here.
+  const isQuery = procedure === 'rules.list'
+  const { response, json, text } = await timedFetch(
+    `${TRPC_URL}/${procedure}`,
+    {
+      method: isQuery ? 'GET' : 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        // A missing cookie is a 401 from the procedure, which is the loud
+        // failure an arrange step wants rather than a silent anonymous call.
+        ...(cookie ? { Cookie: cookie } : {}),
+      },
+      ...(isQuery ? {} : { body: JSON.stringify(input ?? {}) }),
+    },
+  )
+  const errorMessage = json?.error?.message ?? json?.error?.json?.message
+  if (!response.ok || errorMessage) {
+    throw new Error(
+      `${procedure} failed (HTTP ${response.status}): ${errorMessage ?? text}`,
+    )
+  }
+  return json?.result?.data
+}
+
+/**
+ * Narrows an account to exactly one species, and answers the id of the rule
+ * that does it.
+ *
+ * The seeded Everything rule (auth/seed-profile.ts) is what makes a first
+ * login show a populated map, and it matches every pokemon there is -- so a
+ * criterion asserting that a NON-matching pokemon is withheld has to delete
+ * it first, or everything in the world matches something.
+ */
+async function showOnlySpecies(
+  cookie: string | null,
+  speciesId: number,
+): Promise<number> {
+  const existing = await rulesRpc(cookie, 'rules.list')
+  if (existing.length) {
+    await rulesRpc(cookie, 'rules.delete', {
+      ruleIds: existing.map((rule: any) => rule.id),
+    })
+  }
+  const { ids } = await rulesRpc(cookie, 'rules.create', {
+    name: `Species ${speciesId}`,
+    speciesIds: [speciesId],
+  })
+  return ids[0]
+}
+
 beforeAll(async () => {
   db = await mysql.createConnection({
     host: process.env.REACT_MAP_DB_HOST!,
@@ -217,6 +287,25 @@ afterAll(async () => {
     fakeGolbat.close()
   }
   if (db) {
+    // Signing in seeds a profile and a rule per account (auth/seed-profile.ts),
+    // and two criteria write rules of their own. None of it carries a foreign
+    // key to auth_user, so it outlives the run unless removed by hand; the
+    // children are keyed by rule id, so they go first.
+    const userScope = `SELECT id FROM auth_user WHERE email LIKE ?`
+    const ruleScope = `SELECT id FROM rule WHERE user_id IN (${userScope})`
+    await db.query(
+      `DELETE FROM rule_exclusion WHERE rule_id IN (${ruleScope})`,
+      [`${USER_PREFIX}-%`],
+    )
+    await db.query(`DELETE FROM rule_pokemon WHERE rule_id IN (${ruleScope})`, [
+      `${USER_PREFIX}-%`,
+    ])
+    await db.query(`DELETE FROM rule WHERE user_id IN (${userScope})`, [
+      `${USER_PREFIX}-%`,
+    ])
+    await db.query(`DELETE FROM profile WHERE user_id IN (${userScope})`, [
+      `${USER_PREFIX}-%`,
+    ])
     await db.query(
       `DELETE FROM auth_session WHERE user_id IN (SELECT id FROM auth_user WHERE email LIKE ?)`,
       [`${USER_PREFIX}-%`],
@@ -270,6 +359,8 @@ describe('criterion 1: initial subscribe yields only matching pokemon', () => {
       }))
 
       const cookie = await signUpAndSignIn('c1')
+      // The narrowing lives in the account's rules now, not in the message.
+      const ruleId = await showOnlySpecies(cookie, 1)
       const client = new TransportSocketClient(cookie)
       await client.waitForOpen()
 
@@ -278,7 +369,6 @@ describe('criterion 1: initial subscribe yields only matching pokemon', () => {
         type: 'subscribe',
         category: 'pokemon',
         viewport: WORLD_VIEWPORT,
-        filters: [{ pokemon: [{ id: 1 }] }],
       })
 
       const delta = await client.waitForSince(
@@ -293,6 +383,8 @@ describe('criterion 1: initial subscribe yields only matching pokemon', () => {
       )
       expect(performance.now() - start).toBeLessThan(WS_WAIT_MS)
       expect(delta.added.some((p: any) => p.pokemon_id === 99)).toBe(false)
+      // And the entity says which rule put it there.
+      expect(delta.added[0].matched).toEqual([ruleId])
 
       await client.closeAndWait()
     },
@@ -347,7 +439,6 @@ describe('criterion 2: moving the viewport swaps what the client sees', () => {
         type: 'subscribe',
         category: 'pokemon',
         viewport: REGION_A,
-        filters: [],
       })
       await client.waitForSince(
         0,
@@ -364,7 +455,6 @@ describe('criterion 2: moving the viewport swaps what the client sees', () => {
         type: 'subscribe',
         category: 'pokemon',
         viewport: REGION_B,
-        filters: [],
       })
 
       await client.waitForSince(
@@ -417,7 +507,6 @@ describe('criterion 3: an upstream addition reaches an already-subscribed client
         type: 'subscribe',
         category: 'pokemon',
         viewport: WORLD_VIEWPORT,
-        filters: [],
       })
       await client.waitForSince(
         0,
@@ -520,7 +609,6 @@ describe('criterion 4: verified expiries evict silently, unverified ones do not 
         type: 'subscribe',
         category: 'pokemon',
         viewport: WORLD_VIEWPORT,
-        filters: [],
       })
       await client.waitForSince(
         0,
@@ -598,7 +686,6 @@ describe('criterion 5: a raid change reaches the client via webhook, not a poll'
         type: 'subscribe',
         category: 'gym',
         viewport: WORLD_VIEWPORT,
-        filters: [],
       })
       const mark = client.mark()
 
@@ -706,7 +793,6 @@ describe('criterion 6: limit_reached suppresses reconciliation eviction', () => 
         type: 'subscribe',
         category: 'pokemon',
         viewport: WORLD_VIEWPORT,
-        filters: [],
       })
       await client.waitForSince(
         0,
@@ -772,6 +858,10 @@ describe('criterion 7: per-connection filtering isolates two clients on the same
 
       const cookieA = await signUpAndSignIn('c7a')
       const cookieB = await signUpAndSignIn('c7b')
+      // Two accounts wanting different things: what separates them is their
+      // own rules, which is the whole point of the criterion.
+      await showOnlySpecies(cookieA, 1)
+      await showOnlySpecies(cookieB, 4)
       const clientA = new TransportSocketClient(cookieA)
       const clientB = new TransportSocketClient(cookieB)
       await Promise.all([clientA.waitForOpen(), clientB.waitForOpen()])
@@ -780,13 +870,11 @@ describe('criterion 7: per-connection filtering isolates two clients on the same
         type: 'subscribe',
         category: 'pokemon',
         viewport: WORLD_VIEWPORT,
-        filters: [{ pokemon: [{ id: 1 }] }],
       })
       clientB.send({
         type: 'subscribe',
         category: 'pokemon',
         viewport: WORLD_VIEWPORT,
-        filters: [{ pokemon: [{ id: 4 }] }],
       })
 
       const deltaA = await clientA.waitForSince(
@@ -853,7 +941,6 @@ describe('criterion 8: every response completes, over HTTP and over the socket',
         type: 'subscribe',
         category: 'pokemon',
         viewport: WORLD_VIEWPORT,
-        filters: [],
       })
       await client.waitForSince(
         0,
