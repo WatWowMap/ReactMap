@@ -85,6 +85,27 @@ function assertNominatimResponse(results, url) {
       `${url} answered as a Photon instance rather than a Nominatim one. Set "geocoderProvider": "photon" on this webhook, or point the URL at a Nominatim instance.`,
     )
   }
+
+  // Anything else object-shaped that carries no Nominatim result fields is an
+  // upstream error body, such as RFC 7807 problem JSON from a proxy in front
+  // of Nominatim. node-geocoder has already mapped it onto one blank entry by
+  // the time it gets here, and letting that through hands the caller a result
+  // with null coordinates -- Location.jsx pans the map to it. Rejecting keeps
+  // geocoder()'s fallback shape ([] or ''), and the message stays generic
+  // because this is a failing upstream, not a misconfigured provider.
+  // {"error": ...} bodies never reach this: node-geocoder converts those to a
+  // thrown Error itself. A genuine /reverse result always carries lat,
+  // display_name and address (all 42 captured fixtures do).
+  const isNominatimResult =
+    'lat' in raw ||
+    'display_name' in raw ||
+    'address' in raw ||
+    'place_id' in raw
+  if (!isNominatimResult) {
+    throw new Error(
+      `${url} answered with an error body instead of a geocoding result: ${JSON.stringify(raw).slice(0, 200)}`,
+    )
+  }
 }
 
 /**

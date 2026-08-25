@@ -1048,11 +1048,20 @@ test('the empty guard does not swallow a zero coordinate', async () => {
 test('an RFC 7807 error from a Nominatim proxy is not diagnosed as Photon', async () => {
   const server = await serveOnce({ title: 'Too Many Requests', status: 429 })
   try {
-    // The generic path resolves with a blank entry, as it always did. What must
-    // not happen is the provider-mismatch throw, whose message tells the
-    // operator to change geocoderProvider.
-    const results = await nominatimGeocoder(server.url, 'Denver', false)
-    assert.equal(results.length, 1)
+    // A problem body rejects with a generic upstream error. It must not carry
+    // the provider-mismatch advice, which would tell the operator to change
+    // geocoderProvider to cure a transient 429, and it must not fall through as
+    // a blank entry either: node-geocoder maps the object onto one result with
+    // undefined coordinates, and Location.jsx pans the map to [null, null].
+    await assert.rejects(
+      () => nominatimGeocoder(server.url, 'Denver', false),
+      (err) => /error body/.test(err.message) && !/Photon/.test(err.message),
+    )
+
+    // Through the public entry point the caller gets the schema's empty shape,
+    // never a result with null coordinates.
+    const viaGeocoder = await geocoder(server.url, 'Denver', false, '{{city}}')
+    assert.deepEqual(viaGeocoder, [])
   } finally {
     await server.close()
   }
