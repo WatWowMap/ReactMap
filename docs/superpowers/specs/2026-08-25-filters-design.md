@@ -313,9 +313,17 @@ Show  25 Pokémon  with  IV 100%  as  extra large  ·  gold ring  ·  notify me
 ```
 
 **The picker** is 1.x's `react-virtuoso` grid restyled: one tile per species showing default form
-art, an affordance on species that have forms, search matching form names so "alolan" surfaces every
-Alolan form at once, and a select-all-shown action. That pairing is what makes "hundos for these 25
-species" a search and two taps rather than 25 enable-and-customise cycles.
+art, an affordance on species that have forms, search over the composed label, and a select-all-shown
+action. That pairing is what makes "hundos for these 25 species" a search and two taps rather than 25
+enable-and-customise cycles.
+
+Names come from the translations endpoint 1.x already uses, `map.misc.translations` in
+`config/default.json`, at `${endpoint}/static/locales/${locale}.json`. Keys are `poke_{species_id}`
+and `form_{form_id}`, and 1.x composes a label as `poke_20` plus a parenthesised `form_46`, giving
+**"Raticate (Alola)"**. The form key holds only the form's own name, so the search term for Alolan
+forms is "alola" rather than "alolan" — worth stating because the obvious example is wrong. The
+whole `en.json` is 609 KB across 9,351 keys; the `poke_` and `form_` subset the picker needs is
+about 42 KB, which is the backend-filters-before-sending rule the transport spec already set.
 
 **Conditions AND together**, with `+` to add another. The full Pokémon set ships: IV, individual
 attack, defence and stamina, level, CP, gender, size range, and one PvP league with a rank range. The
