@@ -19,6 +19,8 @@ import {
 } from './layers'
 import { Popup } from './popup'
 import { profilingMap, profRecord } from './profile-map'
+import { createRingAtlas } from './ring-icon'
+import { loadSpriteIndex } from './sprite-source'
 import type { MapEntity, Viewport } from './types'
 import { useDismissOnEscape } from './use-dismiss-on-escape'
 import type { Camera } from './use-map-libre'
@@ -73,6 +75,15 @@ export function MapCanvas({ initialCamera, onCameraChange }: MapCanvasProps) {
     atlasRef.current = createAtlas({ draw: drawPokemonIcon })
   }
 
+  // The rings are a second, much smaller atlas, created once for the same
+  // reason and kept apart from the species one on purpose: it is keyed by
+  // colour combination alone, so it neither grows with what is on screen
+  // nor gets thrown away when the species atlas does. See ring-icon.ts.
+  const ringAtlasRef = useRef<ReturnType<typeof createRingAtlas> | null>(null)
+  if (ringAtlasRef.current === null) {
+    ringAtlasRef.current = createRingAtlas()
+  }
+
   // One narrow selector per array, read in the component that draws them.
   // Each array is a stable reference until a delta batch actually changes
   // that category, which is what keeps deck.gl from re-uploading a layer's
@@ -123,10 +134,30 @@ export function MapCanvas({ initialCamera, onCameraChange }: MapCanvasProps) {
   // empty map with no error.
   const handleContextRestore = useCallback(() => {
     atlasRef.current?.clear()
+    ringAtlasRef.current?.clear()
     // The gym and cluster icons live in module state, not in the atlas, so
     // they need clearing too or the restore reuses dead textures.
     resetSharedIconCaches()
     setRebuildToken((token) => token + 1)
+  }, [])
+
+  // Sprites resolve against an index fetched once per page. Until it
+  // lands, every marker drew as a placeholder and got cached as one, so
+  // the atlas has to be dropped and the layers rebuilt the moment it
+  // arrives -- otherwise the first viewport keeps its placeholders for the
+  // rest of the session. Failure resolves to null rather than throwing;
+  // that leaves the placeholders, which is a degraded map, not a broken
+  // one.
+  useEffect(() => {
+    let live = true
+    loadSpriteIndex().then((index) => {
+      if (!live || !index) return
+      atlasRef.current?.clear()
+      setRebuildToken((token) => token + 1)
+    })
+    return () => {
+      live = false
+    }
   }, [])
 
   useDismissOnEscape(selected !== null, closePopup)
@@ -206,6 +237,9 @@ export function MapCanvas({ initialCamera, onCameraChange }: MapCanvasProps) {
       getIconFor: atlas.getIconFor,
       getGymIcon: drawGymIcon,
       getClusterIcon: drawClusterIcon,
+      ...(ringAtlasRef.current
+        ? { getRingIcon: ringAtlasRef.current.getRingIconFor }
+        : {}),
       rules,
       // Any value: the text layer this produces is replaced on every tick.
       now: 0,

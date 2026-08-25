@@ -1,16 +1,14 @@
 import type { IconDescriptor, IconDrawer } from './atlas'
+import { SPRITE_ICON_SIZE, spriteIndex, spriteUrlFor } from './sprite-source'
 import type { PokemonEntity } from './types'
 
 const ICON_SIZE = 64
 
 /**
- * Colours a pokemon's base circle by whether it carries a badge or weather
- * boost, the only two appearance modifiers this placeholder renders
- * distinctly (background and costume/form influence real sprite art, which
- * this project has none of yet). This is a stand-in for real species
- * artwork, not a claim that it is one; swapping in sprite sheets later
- * replaces this function's body without touching its signature or anyone
- * that calls it.
+ * Colours the fallback circle by whether the entity carries a badge or a
+ * weather boost, the only two appearance modifiers a marker with no
+ * artwork can still say something about (form and costume are exactly
+ * what the missing sprite would have shown).
  */
 function baseColorFor(entity: PokemonEntity): string {
   if (entity.weather !== undefined) return '#7dd3fc'
@@ -19,10 +17,19 @@ function baseColorFor(entity: PokemonEntity): string {
 }
 
 /**
- * Draws one pokemon marker's pixels onto an `OffscreenCanvas` - a circle in
+ * The marker for a pokemon whose sprite could not be named: a circle in
  * `baseColorFor`'s colour with the species id centred on it, plus a ring
- * when the entity carries a badge - and hands back a data URL `IconLayer`
- * can fetch.
+ * when the entity carries a badge.
+ *
+ * Visible on purpose. An entity with no artwork still has to be something
+ * a person can see and click, not a hole in the map, and the species id
+ * printed on it is what turns "this one is broken" into a bug report.
+ *
+ * Its `id` carries a `:placeholder` suffix so it can never be confused
+ * with the real sprite for the same appearance key. deck.gl's icon manager
+ * caches by icon id and does not re-fetch when only the url changes, so
+ * reusing the key would leave placeholders on screen for the rest of the
+ * session once the sprite index finished loading.
  *
  * `OffscreenCanvas` has no synchronous way to produce a data URL
  * (`convertToBlob` is promise-based, and `IconDrawer` is synchronous so the
@@ -36,10 +43,10 @@ function baseColorFor(entity: PokemonEntity): string {
  * test` environment, so this function is exercised by manual/browser
  * verification, not a unit test (see task-4-report.md).
  */
-export const drawPokemonIcon: IconDrawer = (
+function drawPlaceholderIcon(
   entity: PokemonEntity,
   key: string,
-): IconDescriptor => {
+): IconDescriptor {
   const offscreen = new OffscreenCanvas(ICON_SIZE, ICON_SIZE)
   const ctx = offscreen.getContext('2d')
   if (!ctx) throw new Error('2d context unavailable on OffscreenCanvas')
@@ -74,10 +81,39 @@ export const drawPokemonIcon: IconDrawer = (
   bridgeCtx.drawImage(offscreen, 0, 0)
 
   return {
-    id: key,
+    id: `${key}:placeholder`,
     url: bridge.toDataURL('image/png'),
     width: ICON_SIZE,
     height: ICON_SIZE,
+  }
+}
+
+/**
+ * One pokemon marker's species artwork: a remote uicons sprite, named by
+ * the index `sprite-source.ts` loads once for the page.
+ *
+ * Nothing is composited here on the happy path. `IconDescriptor.url` may be
+ * a remote URL, and deck.gl's `IconLayer` fetches it and packs it into its
+ * own texture atlas, so real art needs no async plumbing on this side of
+ * the seam - which is the whole reason `IconDrawer` can stay synchronous.
+ *
+ * Rings are NOT drawn here. They are their own layer beneath this one, for
+ * the atlas-explosion reason `ring-icon.ts` explains at length.
+ *
+ * Falls through to `drawPlaceholderIcon` while the index is still loading
+ * and for anything it cannot name.
+ */
+export const drawPokemonIcon: IconDrawer = (
+  entity: PokemonEntity,
+  key: string,
+): IconDescriptor => {
+  const url = spriteUrlFor(spriteIndex(), entity)
+  if (url === undefined) return drawPlaceholderIcon(entity, key)
+  return {
+    id: key,
+    url,
+    width: SPRITE_ICON_SIZE,
+    height: SPRITE_ICON_SIZE,
   }
 }
 
