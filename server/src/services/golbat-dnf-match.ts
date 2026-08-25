@@ -34,12 +34,16 @@
 // task wiring the real rules pipeline through this socket is what should
 // add it, reusing `rule-local-filter.js` rather than this module.
 //
-// Gym/fort clauses are out of scope entirely: no acceptance criterion in
-// this task exercises fort-side local filtering (criterion 5, the only fort
-// criterion, is expected to stay red until Task 6's webhook receiver
-// exists -- see the Task 5 report), so `matchesFortFilters` below is
-// deliberately a pass-through rather than a guessed-at implementation of
-// fields nothing here can test.
+// Fort clauses (Task 6). These stopped being optional the moment forts
+// started arriving by push: Golbat's webhook sender broadcasts the same
+// payload to every configured webhook (webhooks/webhook.go's getPayload
+// filters by TYPE and AREA, never by a DNF clause), so a pushed gym has
+// passed through no upstream filtering at all. This matcher is the only
+// thing standing between a raid the subscription asked for and one it did
+// not. Scope is `buildGymClause`'s own fields (rules-to-golbat-filters.ts)
+// plus `raid_temp_evolution_id`, matched against Golbat's `ApiGymResult`
+// column names (decoder/api_gym.go:139-183); pokestop, station and quest
+// clause fields are left out because no category subscribes to them yet.
 
 function matchesRange(
   value: number | null | undefined,
@@ -99,11 +103,93 @@ function matchesPokemonFilters(filters: object[]): (entity: any) => boolean {
 }
 
 /**
- * See module header: no criterion in this task exercises fort-side local
- * filtering, so this stays a pass-through rather than a guess.
+ * Golbat's `ApiDnfId` pair list -- decoder/api_fort.go:114-117. A null/absent
+ * `form` matches any form of that pokedex id.
  */
-function matchesFortFilters(_filters: object[]): (entity: any) => boolean {
-  return () => true
+function matchesDnfIds(
+  pairs: any[],
+  pokemonId: unknown,
+  formId: unknown,
+): boolean {
+  return pairs.some(
+    (pair) =>
+      pair?.pokemon_id === pokemonId &&
+      (pair?.form == null || pair.form === (formId ?? null)),
+  )
+}
+
+/**
+ * One `ApiFortDnfFilter` clause (decoder/api_fort.go:72-104) against one gym.
+ *
+ * An ABSENT field on the entity is treated as unknown and does not reject,
+ * while a field that is present and null does. That asymmetry is the whole
+ * reason this is written by hand rather than borrowed from the pokemon
+ * matcher: a webhook-delivered gym is a PATCH carrying only what its
+ * payload carried (golbat-webhook.ts), so a `gym_details` change to a gym
+ * the client is watching arrives with no raid columns at all, and
+ * rejecting it against a raid clause would silently drop it. A gym from a
+ * scan response, by contrast, always carries every key -- `raid_level:
+ * null` there really does mean "this gym has no raid", and rejects.
+ *
+ * The cost of that choice is a webhook patch that under-filters: a
+ * `gym_details` push for a gym whose raid does not match still reaches the
+ * client. It is delivering a fact about a gym the client can see rather
+ * than a raid it did not ask for, which is the safer of the two errors.
+ */
+function entityMatchesFortClause(entity: any, clause: any): boolean {
+  const known = (value: unknown) => value !== undefined
+
+  if (Array.isArray(clause.raid_level) && known(entity.raid_level)) {
+    if (!clause.raid_level.includes(entity.raid_level)) return false
+  }
+  if (Array.isArray(clause.team_id) && known(entity.team_id)) {
+    if (!clause.team_id.includes(entity.team_id)) return false
+  }
+  if (
+    Array.isArray(clause.raid_pokemon_id) &&
+    known(entity.raid_pokemon_id) &&
+    !matchesDnfIds(
+      clause.raid_pokemon_id,
+      entity.raid_pokemon_id,
+      entity.raid_pokemon_form,
+    )
+  ) {
+    return false
+  }
+  if (
+    Array.isArray(clause.raid_temp_evolution_id) &&
+    known(entity.raid_pokemon_evolution)
+  ) {
+    if (!clause.raid_temp_evolution_id.includes(entity.raid_pokemon_evolution))
+      return false
+  }
+  if (clause.available_slots && known(entity.available_slots)) {
+    if (!matchesRange(entity.available_slots, clause.available_slots))
+      return false
+  }
+  if (
+    typeof clause.is_ar_scan_eligible === 'boolean' &&
+    known(entity.ar_scan_eligible)
+  ) {
+    if (Boolean(entity.ar_scan_eligible) !== clause.is_ar_scan_eligible)
+      return false
+  }
+  return true
+}
+
+/**
+ * A `computeDelta`-shaped `localFilter` (delta-engine.ts) for forts, and
+ * the routing predicate `subscription-registry.ts` uses to decide which
+ * subscriptions a pushed fort belongs to.
+ *
+ * An empty/omitted `filters` array means "no fort filter configured", so
+ * everything in the viewport passes -- the same deliberate inversion of
+ * Golbat's own wire convention that `matchesPokemonFilters` documents.
+ */
+function matchesFortFilters(filters: object[]): (entity: any) => boolean {
+  if (!Array.isArray(filters) || filters.length === 0) return () => true
+  return (entity) =>
+    filters.some((clause) => entityMatchesFortClause(entity, clause))
 }
 
 export { matchesFortFilters, matchesPokemonFilters }
