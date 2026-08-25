@@ -389,6 +389,7 @@ hr.soft { border: 0; border-top: 1px solid var(--border); margin: 34px 0; }
       <span class="chip"><i class="dot" style="background: var(--sys-golbat)"></i>Golbat</span>
       <span class="chip"><i class="dot" style="background: var(--sys-reactmap)"></i>ReactMap 2.0</span>
       <span class="chip"><i class="dot" style="background: var(--sys-poracle)"></i>PoracleNG</span>
+      <span class="chip"><i class="dot" style="background: var(--sys-scanner)"></i>Discord bot</span>
     </div>
   </header>
 
@@ -419,7 +420,7 @@ hr.soft { border: 0; border-top: 1px solid var(--border); margin: 34px 0; }
           <circle cx="22" cy="17" r="4.5"/>
         </svg>
         <h4>ReactMap draws your slice</h4>
-        <p>Your rules pick what appears, and only changes travel to your screen.</p>
+        <p>Your rules pick what appears, your Discord roles decide what you may see, and only changes travel to your screen.</p>
       </div>
       <div class="eli5-arrow" aria-hidden="true">&rarr;</div>
       <div class="eli5-card" style="--card-accent: var(--sys-poracle)">
@@ -455,6 +456,7 @@ hr.soft { border: 0; border-top: 1px solid var(--border); margin: 34px 0; }
           <h2>Four systems, and how data moves between them</h2>
           <p class="lede">Nothing here is new except ReactMap. The pieces around it already exist and already work; 2.0 changes how ReactMap talks to them.</p>
           <p>A scanner walks the world and produces raw game data. <strong>Golbat</strong> decodes it, keeps the live picture in memory, and answers questions about it. <strong>ReactMap</strong> asks those questions on your behalf and paints the answers. <strong>PoracleNG</strong> sends you a message when something you care about appears.</p>
+          <p>A fifth piece decides what you are allowed to see. Most instances gate access on Discord roles, so ReactMap keeps a <strong>bot</strong> in your server. It reads which roles a person holds and turns that into permissions, and because it is watching, losing a role takes effect immediately rather than at next login.</p>
         </div>
 
         <div class="breakout panel">
@@ -476,11 +478,15 @@ flowchart LR
   SC -->|raw protos| GB
   GB --> DB
   GB -->|"bbox + filter query"| RM
+  GB -.->|"fort changes, pushed"| RM
   RM -->|"deltas over one socket"| CL
   CL -->|"rules, viewport"| RM
   GB -.->|"webhook on decode"| PO
   PO --> DC
   RM <-->|"tracking CRUD"| PO
+  BOT["Discord bot<br/><small>roles to permissions</small>"]:::scanner
+  BOT -.->|"role changed"| RM
+  RM -->|"who holds which role"| BOT
 
   classDef scanner fill:#6f6b80,stroke:#6f6b80,color:#fff
   classDef golbat fill:#3d7dca,stroke:#3d7dca,color:#fff
@@ -679,7 +685,7 @@ sequenceDiagram
           <div class="mock">
             <div class="mock-bar">
               <i class="tl"></i><i class="tl"></i><i class="tl"></i>
-              <span class="ttl">Filters &middot; Pokémon &middot; <em>design mockup, phase 7, not built yet</em></span>
+              <span class="ttl">Filters &middot; Pokémon &middot; <em>design mockup, phase 8, not built yet</em></span>
             </div>
             <div class="mock-grid">
               <div class="mock-list">
@@ -867,7 +873,7 @@ sequenceDiagram
         <div class="col">
           <div class="kicker">07 &middot; Where we are</div>
           <h2>Built, building, next</h2>
-          <p class="lede">2.0 is a rewrite of the client and the server it talks to. The map, the design system and the shell exist. The parts that carry data are in progress.</p>
+          <p class="lede">2.0 is a rewrite of the client and the server it talks to. The map, the design system, the shell, accounts and the server itself are done. What remains is the pipe that carries live data, and the interfaces built on it.</p>
         </div>
         <div class="breakout">
           <div class="phases">
@@ -875,10 +881,11 @@ sequenceDiagram
             <div class="phase"><span class="ph">Phase 2</span><div><h4>Shell and navigation</h4><p>Routing and the app frame, with a per-user flag deciding who sees the new client.</p></div><span class="status done">merged</span></div>
             <div class="phase"><span class="ph">Phase 3</span><div><h4>Design system</h4><p>Tailwind v4, the full shadcn component set, and the data palettes this page is using.</p></div><span class="status done">merged</span></div>
             <div class="phase"><span class="ph">Phase 4</span><div><h4>Map engine</h4><p>MapLibre and deck.gl replacing Leaflet, with clustering and icon atlases.</p></div><span class="status done">merged</span></div>
-            <div class="phase"><span class="ph">Phase 5</span><div><h4>Accounts</h4><p>Better Auth over Drizzle. Reworking after review found the permission layer was tied to the old login system.</p></div><span class="status wip">in progress</span></div>
-            <div class="phase"><span class="ph">Phase 6</span><div><h4>Transport</h4><p>One Bun server, tRPC for requests, a socket for map deltas.</p></div><span class="status next">next</span></div>
-            <div class="phase"><span class="ph">Phase 7</span><div><h4>Filters</h4><p>The rules model above, and the interface for building them.</p></div><span class="status next">next</span></div>
-            <div class="phase"><span class="ph">Phase 8</span><div><h4>Alerts</h4><p>Poracle as a single provider on its own page.</p></div><span class="status next">next</span></div>
+            <div class="phase"><span class="ph">Phase 5</span><div><h4>Accounts</h4><p>Better Auth over Drizzle, with Discord roles driving permissions and a one-time script that migrates existing logins. Reworked once, after review found the permission layer had been tied to the old login system.</p></div><span class="status done">merged</span></div>
+            <div class="phase"><span class="ph">Phase 6</span><div><h4>Server</h4><p>One Bun process serving the 2.0 client. Express, Apollo and GraphQL removed from the branch entirely.</p></div><span class="status done">merged</span></div>
+            <div class="phase"><span class="ph">Phase 7</span><div><h4>Transport</h4><p>tRPC for requests and a socket carrying map deltas. This is what puts data back on the map.</p></div><span class="status wip">next</span></div>
+            <div class="phase"><span class="ph">Phase 8</span><div><h4>Filters</h4><p>The rules model above, and the interface for building them.</p></div><span class="status next">next</span></div>
+            <div class="phase"><span class="ph">Phase 9</span><div><h4>Alerts</h4><p>Poracle as a single provider on its own page.</p></div><span class="status next">next</span></div>
           </div>
         </div>
       </section>
