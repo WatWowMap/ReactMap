@@ -2,6 +2,7 @@ import { describe, expect, test } from 'bun:test'
 import {
   createSubscriptionState,
   GYM_POLL_INTERVAL_MS,
+  injectIntoSubscription,
   POKEMON_POLL_INTERVAL_MS,
   pollIntervalForCategory,
   subscribeCategory,
@@ -359,5 +360,283 @@ describe('updateSubscription while the loop is not sleeping', () => {
 
     expect((second.value as any).added.map((e: any) => e.id)).toEqual(['b'])
     expect((second.value as any).removed).toEqual(['a'])
+  })
+})
+
+// ---------------------------------------------------------------------------
+// Task 6: webhook injections. A fort change pushed by Golbat is delivered by
+// the SAME generator, folded into the SAME previousMap the poll diffs
+// against, so the reconciliation poll and the push path cannot fight.
+// ---------------------------------------------------------------------------
+
+/** One value off a running generator, typed loosely for assertions. */
+async function nextValue(generator: AsyncGenerator<any>): Promise<any> {
+  const { value } = await generator.next()
+  return value
+}
+
+function raidInjection(id: string, updated: number, extra: object = {}) {
+  return {
+    category: 'gym' as const,
+    kind: 'upsert' as const,
+    entity: { id, updated, lat: 0.5, lon: 0.5, raid_level: 5, ...extra },
+  }
+}
+
+describe('injectIntoSubscription', () => {
+  test('queues the injection and wakes a sleeping loop', () => {
+    const state = createSubscriptionState({
+      category: 'gym',
+      viewport: VIEWPORT_A,
+    })
+    let woken = false
+    state.wake = () => {
+      woken = true
+    }
+    injectIntoSubscription(state, [raidInjection('g1', 10)])
+    expect(state.injections.length).toBe(1)
+    expect(woken).toBe(true)
+  })
+
+  test('records a wake that arrives while the loop is awake, like updateSubscription', () => {
+    const state = createSubscriptionState({
+      category: 'gym',
+      viewport: VIEWPORT_A,
+    })
+    expect(state.wake).toBe(null)
+    injectIntoSubscription(state, [raidInjection('g1', 10)])
+    expect(state.wakePending).toBe(true)
+  })
+
+  test('an empty batch neither queues nor wakes', () => {
+    const state = createSubscriptionState({
+      category: 'gym',
+      viewport: VIEWPORT_A,
+    })
+    injectIntoSubscription(state, [])
+    expect(state.injections.length).toBe(0)
+    expect(state.wakePending).toBe(false)
+  })
+})
+
+describe('subscribeCategory: webhook injections', () => {
+  test('an injected gym is delivered without any fort scan', async () => {
+    const state = createSubscriptionState({
+      category: 'gym',
+      viewport: VIEWPORT_A,
+    })
+    const controller = new AbortController()
+    let fortScans = 0
+    const golbatClient = fakeGolbatClient({
+      scanForts: async () => {
+        fortScans += 1
+        return { gyms: [], pokestops: [], stations: [], limitReached: false }
+      },
+    })
+
+    const generator = subscribeCategory({
+      golbatClient,
+      state,
+      signal: controller.signal,
+      pollIntervalMs: 60_000,
+      initialDelayMs: 60_000,
+    })
+
+    // The subscribe acknowledgement, before any sweep.
+    const ack = await nextValue(generator)
+    expect(ack).toEqual({
+      type: 'delta',
+      category: 'gym',
+      added: [],
+      changed: [],
+      removed: [],
+    })
+
+    injectIntoSubscription(state, [raidInjection('g1', 1000)])
+    const injected = await nextValue(generator)
+    controller.abort()
+
+    expect(injected.added.map((g: any) => g.id)).toEqual(['g1'])
+    expect(injected.changed).toEqual([])
+    expect(fortScans).toBe(0)
+  })
+
+  test('a poll landing right after an injection does not re-report the gym as added', async () => {
+    const state = createSubscriptionState({
+      category: 'gym',
+      viewport: VIEWPORT_A,
+    })
+    const controller = new AbortController()
+    const gym = { id: 'g1', updated: 1000, lat: 0.5, lon: 0.5, raid_level: 5 }
+    const golbatClient = fakeGolbatClient({
+      scanForts: async () => ({
+        gyms: [gym],
+        pokestops: [],
+        stations: [],
+        limitReached: false,
+      }),
+    })
+
+    const generator = subscribeCategory({
+      golbatClient,
+      state,
+      signal: controller.signal,
+      pollIntervalMs: 5,
+      initialDelayMs: 60_000,
+    })
+
+    await generator.next() // ack
+    injectIntoSubscription(state, [raidInjection('g1', 1000)])
+    const injected = await nextValue(generator)
+    expect(injected.added.map((g: any) => g.id)).toEqual(['g1'])
+
+    // The very next tick is a real reconciliation poll returning the same
+    // gym at the same change stamp. If the injection had not been folded
+    // into previousMap this would report it as `added` all over again.
+    const poll = await nextValue(generator)
+    controller.abort()
+    expect(poll).toEqual({
+      type: 'delta',
+      category: 'gym',
+      added: [],
+      changed: [],
+      removed: [],
+    })
+  })
+
+  test('a webhook removal evicts a gym the subscription is holding', async () => {
+    const state = createSubscriptionState({
+      category: 'gym',
+      viewport: VIEWPORT_A,
+    })
+    const controller = new AbortController()
+    const golbatClient = fakeGolbatClient()
+
+    const generator = subscribeCategory({
+      golbatClient,
+      state,
+      signal: controller.signal,
+      pollIntervalMs: 60_000,
+      initialDelayMs: 60_000,
+    })
+    await generator.next() // ack
+
+    injectIntoSubscription(state, [raidInjection('g1', 1000)])
+    await generator.next()
+
+    injectIntoSubscription(state, [
+      { category: 'gym', kind: 'remove', id: 'g1' },
+    ])
+    const removal = await nextValue(generator)
+    controller.abort()
+
+    expect(removal.removed).toEqual(['g1'])
+  })
+
+  test('a removal for a gym this subscription never held yields nothing at all', async () => {
+    const state = createSubscriptionState({
+      category: 'gym',
+      viewport: VIEWPORT_A,
+    })
+    const controller = new AbortController()
+    let fortScans = 0
+    const golbatClient = fakeGolbatClient({
+      scanForts: async () => {
+        fortScans += 1
+        return { gyms: [], pokestops: [], stations: [], limitReached: false }
+      },
+    })
+
+    const generator = subscribeCategory({
+      golbatClient,
+      state,
+      signal: controller.signal,
+      pollIntervalMs: 5,
+      initialDelayMs: 60_000,
+    })
+    await generator.next() // ack
+
+    injectIntoSubscription(state, [
+      { category: 'gym', kind: 'remove', id: 'never-seen' },
+    ])
+    // Nothing to say about a gym this connection was not tracking, so the
+    // next value is the reconciliation poll, not an empty removal message.
+    const next = await nextValue(generator)
+    controller.abort()
+    expect(next.removed).toEqual([])
+    expect(fortScans).toBe(1)
+  })
+})
+
+describe('subscribeCategory: gyms without fort_in_memory', () => {
+  test('no fort scan is attempted when Golbat has already said fort_in_memory is off', async () => {
+    const state = createSubscriptionState({
+      category: 'gym',
+      viewport: VIEWPORT_A,
+    })
+    const controller = new AbortController()
+    let fortScans = 0
+    const golbatClient = {
+      ...fakeGolbatClient({
+        scanForts: async () => {
+          fortScans += 1
+          return { gyms: [], pokestops: [], stations: [], limitReached: false }
+        },
+      }),
+      isFortInMemoryEnabled: () => false,
+    }
+
+    const generator = subscribeCategory({
+      golbatClient,
+      state,
+      signal: controller.signal,
+      pollIntervalMs: 5,
+      initialDelayMs: 0,
+    })
+
+    // Still a live subscription: it acks, and it still delivers webhooks.
+    await generator.next()
+    injectIntoSubscription(state, [raidInjection('g1', 1000)])
+    const injected = await nextValue(generator)
+    controller.abort()
+
+    expect(injected.added.map((g: any) => g.id)).toEqual(['g1'])
+    expect(fortScans).toBe(0)
+  })
+
+  test('a fort scan that fails does not kill the subscription', async () => {
+    const state = createSubscriptionState({
+      category: 'gym',
+      viewport: VIEWPORT_A,
+    })
+    const controller = new AbortController()
+    let attempts = 0
+    const golbatClient = fakeGolbatClient({
+      scanForts: async () => {
+        attempts += 1
+        throw new Error('fort_in_memory not enabled')
+      },
+    })
+
+    const generator = subscribeCategory({
+      golbatClient,
+      state,
+      signal: controller.signal,
+      pollIntervalMs: 5,
+      initialDelayMs: 0,
+    })
+
+    await generator.next() // ack
+
+    // Let the loop take a failing scan or two before the webhook lands, so
+    // the assertion is that a thrown scan did not end the generator.
+    const pending = nextValue(generator)
+    await new Promise((resolve) => setTimeout(resolve, 25))
+    injectIntoSubscription(state, [raidInjection('g1', 1000)])
+    const injected = await pending
+    controller.abort()
+
+    expect(attempts).toBeGreaterThan(0)
+    expect(injected.added.map((g: any) => g.id)).toEqual(['g1'])
   })
 })

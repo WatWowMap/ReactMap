@@ -16,9 +16,12 @@
 // exception, documented on `subscribeCategory` below, for entities that
 // leave the viewport.
 
-import { computeDelta } from './delta-engine'
+import { log, TAGS } from '@rm/logger'
+
+import { computeDelta, getChangeStamp } from './delta-engine'
 import type { createGolbatClient } from './golbat-client'
 import { matchesFortFilters, matchesPokemonFilters } from './golbat-dnf-match'
+import type { WebhookInjection } from './golbat-webhook'
 import { scanFortsComplete, scanPokemonComplete } from './viewport-scanner'
 
 type Category = 'pokemon' | 'gym'
@@ -38,16 +41,56 @@ interface SubscriptionState {
   // Set when a wake arrives while `wake` is null, i.e. while the loop is
   // anywhere other than its sleep. Consumed by the next `sleepOrWake`.
   wakePending: boolean
+  // Fort changes pushed by Golbat's webhook sender and routed here by
+  // `subscription-registry.ts`, waiting for the loop to drain them. See
+  // `injectIntoSubscription` and the injection tick in `subscribeCategory`.
+  injections: WebhookInjection[]
 }
 
+/** What the poll loop needs off a Golbat client, and nothing more. */
+type PollingGolbatClient = Pick<
+  ReturnType<typeof createGolbatClient>,
+  'scanPokemon' | 'scanForts'
+> &
+  Partial<Pick<ReturnType<typeof createGolbatClient>, 'isFortInMemoryEnabled'>>
+
 const POKEMON_POLL_INTERVAL_MS = 2_000
-// Forts never expire and only change on a rare raid/quest/lure edit
-// (transport spec, "Fort deltas come from Golbat's webhooks; only Pokémon
-// poll fast"). This poll is gym reconciliation only in this task -- Task 6
-// is what wires the webhook push that is supposed to carry the fast path --
-// so it stays slow rather than hammering Golbat for something that changes
-// on the order of minutes.
-const GYM_POLL_INTERVAL_MS = 30_000
+// Task 6 wired the fast path: a fort change reaches a subscribed client
+// from Golbat's webhook sender (`golbat-webhook.ts` ->
+// `subscription-registry.ts` -> the injection tick below), not from this
+// poll. What is left for the poll is reconciliation -- healing a delivery
+// that was lost because the socket was mid-reconnect when the webhook
+// landed, and picking up anything the webhook stream never carried at all
+// (an operator who enabled only some `types`, or a fort that changed while
+// ReactMap was down).
+//
+// Five minutes is the balance point. A lost delivery leaves one fort stale
+// for at most that long, which is well inside the lifetime of the shortest
+// fort state a client cares about -- a raid egg is ~60 minutes and a raid
+// battle ~45 -- so no client ever sees a raid come and go entirely inside
+// one reconciliation gap. Going faster buys nothing (the push path already
+// covers the common case) and costs a full subdivided fort scan per
+// connection per cycle, which is the single most expensive request
+// ReactMap makes of Golbat.
+//
+// Note the honest limit, documented for operators in
+// docs/operators/golbat-webhooks.md: `/api/fort/scan` is gated behind
+// Golbat's experimental `fort_in_memory`, which is OFF by default. On such
+// an instance this poll never runs at all (see `subscribeCategory`), so
+// there is no reconciliation and a dropped delivery is not healed until
+// that fort changes again.
+const GYM_POLL_INTERVAL_MS = 300_000
+
+// How long a gym subscription waits before its FIRST reconciliation sweep.
+// The sweep is deliberately not fired the instant a client subscribes, for
+// two reasons. A scan racing an inbound webhook can deliver the pre-change
+// state a moment after the webhook already delivered the post-change one,
+// which is exactly the stale-overwrites-fresh ordering the push path
+// exists to avoid; and a client that subscribes and then immediately
+// adjusts its viewport (a pan settling, a zoom) would otherwise pay for
+// two full fort scans back to back. A webhook arriving inside the delay
+// cuts it short, since the injection tick is what the loop wakes for.
+const GYM_INITIAL_SWEEP_DELAY_MS = 2_000
 
 // Bounds the worst-case fan-out of one poll tick's subdivision (see
 // viewport-scanner.js's `scanComplete`). The module's own default is 5
@@ -79,7 +122,77 @@ function createSubscriptionState({
     generation: 0,
     wake: null,
     wakePending: false,
+    injections: [],
   }
+}
+
+/**
+ * Queues fort changes pushed by Golbat for this subscription and wakes the
+ * loop to deliver them.
+ *
+ * The wake is the same two-branch dance `updateSubscription` documents
+ * below, and for the same reason: `state.wake` is non-null only while the
+ * loop is parked in `sleepOrWake`, and a webhook is overwhelmingly likely
+ * to arrive while it is somewhere else. Without `wakePending` a push that
+ * landed during a poll or while the consumer had not yet pulled the last
+ * batch would sit in the queue for a full reconciliation interval.
+ */
+function injectIntoSubscription(
+  state: SubscriptionState,
+  injections: WebhookInjection[],
+) {
+  if (injections.length === 0) return
+  state.injections.push(...injections)
+  if (state.wake) state.wake()
+  else state.wakePending = true
+}
+
+/**
+ * Folds one drained batch of pushed fort changes into the SAME
+ * `previousMap` the poll loop diffs against, and reports what the client
+ * needs to be told.
+ *
+ * Folding into `previousMap` is the whole point: if a webhook delivered
+ * gym X to a client but the map did not learn about it, the next
+ * reconciliation poll would report X as `added` all over again, and a
+ * webhook-delivered removal would come straight back. `previousMap` is
+ * mutated in place rather than rebuilt, because unlike a poll tick there
+ * is no truncation rule to apply and nothing to reconcile against -- an
+ * injection is authoritative about exactly the entities it names, and says
+ * nothing at all about the ones it does not.
+ *
+ * Unlike `computeDelta`, an injection is emitted regardless of whether the
+ * change stamp moved. Golbat's webhook payloads carry no `updated` column,
+ * so `golbat-webhook.ts` stamps them with the second they were received,
+ * and two changes to the same gym inside one second would otherwise
+ * collapse into silence.
+ *
+ * `selfEvicts` is always false: a fort has no `expire_timestamp_verified`
+ * and never expires on the client's own clock (delta-engine.ts, rule 2).
+ */
+function applyInjections(
+  previousMap: Map<string, { stamp: number; selfEvicts: boolean }>,
+  injections: WebhookInjection[],
+): { added: any[]; changed: any[]; removed: string[] } {
+  const added: any[] = []
+  const changed: any[] = []
+  const removed: string[] = []
+
+  for (const injection of injections) {
+    if (injection.kind === 'remove') {
+      // Nothing to say about an entity this connection was never holding.
+      if (previousMap.delete(injection.id)) removed.push(injection.id)
+      continue
+    }
+    const entity = injection.entity
+    const id = String(entity.id)
+    const isNew = !previousMap.has(id)
+    previousMap.set(id, { stamp: getChangeStamp(entity), selfEvicts: false })
+    if (isNew) added.push(entity)
+    else changed.push(entity)
+  }
+
+  return { added, changed, removed }
 }
 
 /**
@@ -109,10 +222,7 @@ function updateSubscription(
 }
 
 async function pollOnce(
-  golbatClient: Pick<
-    ReturnType<typeof createGolbatClient>,
-    'scanPokemon' | 'scanForts'
-  >,
+  golbatClient: PollingGolbatClient,
   category: Category,
   viewport: Viewport,
   filters: object[],
@@ -213,31 +323,120 @@ async function* subscribeCategory({
   state,
   signal,
   pollIntervalMs,
+  initialDelayMs,
 }: {
-  golbatClient: Pick<
-    ReturnType<typeof createGolbatClient>,
-    'scanPokemon' | 'scanForts'
-  >
+  golbatClient: PollingGolbatClient
   state: SubscriptionState
   signal: AbortSignal
   pollIntervalMs?: number
+  initialDelayMs?: number
 }) {
   const interval = pollIntervalMs ?? pollIntervalForCategory(state.category)
+  const initialDelay =
+    initialDelayMs ??
+    (state.category === 'gym' ? GYM_INITIAL_SWEEP_DELAY_MS : 0)
   let previousMap = new Map<string, any>()
   let lastGeneration = state.generation
+  // One line per subscription, not one per skipped tick: a Golbat without
+  // fort_in_memory would otherwise flood the log every interval for every
+  // connected client.
+  let warnedFortPollUnavailable = false
+
+  // A gym subscription defers its first sweep (see
+  // GYM_INITIAL_SWEEP_DELAY_MS), and on a Golbat without fort_in_memory it
+  // never sweeps at all -- so without this the client would sit in silence
+  // wondering whether its subscribe was heard. Pokemon needs no equivalent:
+  // its first poll fires immediately and IS the acknowledgement.
+  if (state.category === 'gym') {
+    yield {
+      type: 'delta',
+      category: state.category,
+      added: [] as any[],
+      changed: [] as any[],
+      removed: [] as string[],
+    }
+    if (signal.aborted) return
+    if (initialDelay > 0) await sleepOrWake(state, initialDelay, signal)
+  }
 
   while (!signal.aborted) {
+    // Injection tick. Not a poll: no request to Golbat, but the same
+    // `previousMap` update and the same `yield`, so the pushed change and
+    // the reconciliation sweep can never disagree about what this
+    // connection is holding.
+    if (state.injections.length > 0) {
+      const batch = state.injections.splice(0, state.injections.length)
+      const injected = applyInjections(previousMap, batch)
+      if (
+        injected.added.length > 0 ||
+        injected.changed.length > 0 ||
+        injected.removed.length > 0
+      ) {
+        yield { type: 'delta', category: state.category, ...injected }
+        if (signal.aborted) return
+      }
+      // Sleep before looping rather than falling straight through to a
+      // poll. A webhook is the authoritative, up-to-date answer for the
+      // fort it names; scanning Golbat the instant one arrives would be
+      // the very round trip the push path exists to remove.
+      await sleepOrWake(state, interval, signal)
+      continue
+    }
+
+    // Golbat gates every fort endpoint behind `fort_in_memory`
+    // (routes_huma.go:176-310), which is experimental and defaults OFF, and
+    // `golbat-client.ts` refuses the request locally once `/api/status` has
+    // said so. On such an instance the webhook stream is the only source of
+    // fort data there is, so the subscription stays alive and
+    // injection-driven instead of looping on a refusal.
+    if (
+      state.category === 'gym' &&
+      golbatClient.isFortInMemoryEnabled?.() === false
+    ) {
+      if (!warnedFortPollUnavailable) {
+        warnedFortPollUnavailable = true
+        log.info(
+          TAGS.ReactMap,
+          'Golbat has fort_in_memory disabled, so gym reconciliation polling is off for this ' +
+            'subscription. Fort data comes from webhooks only; a dropped delivery will not be ' +
+            'healed until that fort changes again.',
+        )
+      }
+      await sleepOrWake(state, interval, signal)
+      continue
+    }
+
     const generationAtPollStart = state.generation
     const viewportChanged = generationAtPollStart !== lastGeneration
     const oldMap = previousMap
     const baseMap = viewportChanged ? new Map() : previousMap
 
-    const { entities, complete } = await pollOnce(
-      golbatClient,
-      state.category,
-      state.viewport,
-      state.filters,
-    )
+    let entities: any[]
+    let complete: boolean
+    try {
+      ;({ entities, complete } = await pollOnce(
+        golbatClient,
+        state.category,
+        state.viewport,
+        state.filters,
+      ))
+    } catch (err) {
+      if (state.category !== 'gym') throw err
+      // A failed reconciliation sweep is not a failed subscription: the
+      // push path is what carries fort changes, and killing the generator
+      // here would take the client's webhook deliveries down with it.
+      if (!warnedFortPollUnavailable) {
+        warnedFortPollUnavailable = true
+        log.warn(
+          TAGS.ReactMap,
+          `gym reconciliation sweep failed; continuing on webhook deliveries alone: ${
+            (err as any)?.message || err
+          }`,
+        )
+      }
+      await sleepOrWake(state, interval, signal)
+      continue
+    }
     if (signal.aborted) return
 
     const localFilter =
@@ -275,7 +474,9 @@ async function* subscribeCategory({
 
 export {
   createSubscriptionState,
+  GYM_INITIAL_SWEEP_DELAY_MS,
   GYM_POLL_INTERVAL_MS,
+  injectIntoSubscription,
   MAX_SUBDIVISION_DEPTH,
   POKEMON_POLL_INTERVAL_MS,
   pollIntervalForCategory,
