@@ -23,6 +23,7 @@ import { TRPCError } from '@trpc/server'
 import { z } from 'zod'
 
 import { getDrizzle } from '../db/drizzle'
+import { listSpecies } from '../services/masterfile'
 import {
   createRules,
   deleteRules,
@@ -161,4 +162,14 @@ const rulesRouter = t.router({
   }),
 })
 
-export { rulesRouter }
+/**
+ * The species/form catalog behind a rule's species picker and any display
+ * that needs a name for a species/form id pair -- see
+ * `services/masterfile.ts`. No user/profile scoping: the catalog is the
+ * same for every signed-in caller.
+ */
+const masterfileRouter = t.router({
+  species: t.procedure.query(() => listSpecies()),
+})
+
+export { masterfileRouter, rulesRouter }

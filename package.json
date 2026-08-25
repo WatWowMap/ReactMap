@@ -168,6 +168,7 @@
     "nodes2ts": "3.0.0",
     "objection": "3.1.5",
     "ohbem": "1.5.3",
+    "pogo-masterfile": "0.1.48",
     "radix-ui": "1.6.7",
     "react": "19.2.8",
     "react-day-picker": "10.0.1",

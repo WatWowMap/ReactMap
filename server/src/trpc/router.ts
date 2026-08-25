@@ -33,7 +33,7 @@ import {
   subscribeCategory,
 } from '../services/map-subscription'
 import { createRulesSource } from '../services/rules-source'
-import { rulesRouter } from './rules-router'
+import { masterfileRouter, rulesRouter } from './rules-router'
 import { t } from './trpc-base'
 
 const viewportSchema = z.object({
@@ -88,6 +88,7 @@ const appRouter = t.router({
   health: t.procedure.query(() => ({ ok: true })),
   map: mapRouter,
   rules: rulesRouter,
+  masterfile: masterfileRouter,
 })
 
 export { appRouter, t }

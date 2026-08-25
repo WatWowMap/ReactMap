@@ -73,6 +73,7 @@
         "nodes2ts": "3.0.0",
         "objection": "3.1.5",
         "ohbem": "1.5.3",
+        "pogo-masterfile": "0.1.48",
         "radix-ui": "1.6.7",
         "react": "19.2.8",
         "react-day-picker": "10.0.1",
@@ -2449,6 +2450,10 @@
     "png-js": ["png-js@1.1.0", "", { "dependencies": { "browserify-zlib": "^0.2.0" } }, "sha512-PM/uYGzGdNSzqeOgly68+6wKQDL1SY0a/N+OEa/+br6LnHWOAJB0Npiamnodfq3jd2LS/i2fMeOKSAILjA+m5Q=="],
 
     "pogo-data-generator": ["pogo-data-generator@1.21.2", "", { "dependencies": { "@na-ji/pogo-protos": "<3.0.0", "jszip": "^3.10.1", "node-fetch": "2.6.7" } }, "sha512-hc5ZAYSonPAuhIYgTV/6RzWYm8ZYF2iW3vdU4xO2BJxwu3vNLxn9SZ3Zd5oCe2fzjiUdDmQHog4Rj6BO9yRXAA=="],
+
+    "pogo-masterfile": ["pogo-masterfile@0.1.48", "", { "dependencies": { "pogo-masterfile-types": "^0.1.46" }, "peerDependencies": { "typescript": ">=5.0" }, "optionalPeers": ["typescript"] }, "sha512-7id3ShVDTgnDZOqK9GyttB33Rb4WHsiuOPDnw4pxvYH7EKs+XbNd8O5OUAmDJNn7p6i/D259Aa35WuE/ZsDAHg=="],
+
+    "pogo-masterfile-types": ["pogo-masterfile-types@0.1.46", "", { "peerDependencies": { "typescript": ">=5.0" }, "optionalPeers": ["typescript"] }, "sha512-wzMdzrUO4Im7ve7oNVRPh/JpbwrLBjlKa6c63kEUFEHqbhm7hCUdeTkoSz/sf0OF+lJHKbPxNgATnf/bL9Q5iQ=="],
 
     "point-in-polygon-hao": ["point-in-polygon-hao@1.2.4", "", { "dependencies": { "robust-predicates": "^3.0.2" } }, "sha512-x2pcvXeqhRHlNRdhLs/tgFapAbSSe86wa/eqmj1G6pWftbEs5aVRJhRGM6FYSUERKu0PjekJzMq0gsI2XyiclQ=="],
 
