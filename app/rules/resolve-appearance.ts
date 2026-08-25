@@ -43,7 +43,9 @@ export interface Appearance {
 
 /**
  * Combines every rule that matched one entity into what it draws as. Size
- * takes the maximum across matches, every glow contributes its own ring
+ * takes the maximum across the matches that named one -- and only across
+ * those, so a lone 'sm' rule resolves to 'sm' rather than to the 'md' an
+ * entity with no rules gets. Every glow contributes its own ring
  * segment (the marker popup names each ring by the rule that produced
  * it, so they must stay distinct), and notify is an OR: any matching rule
  * that asks to notify wins.
@@ -62,11 +64,15 @@ export function resolveAppearance(
     .map((id) => rules.get(id))
     .filter((rule): rule is Rule => rule !== undefined)
 
+  // Only the sizes rules actually named take part in the maximum. Seeding
+  // the reduce at 'md' instead would make 'sm' unreachable -- the maximum
+  // of {sm} is sm, but max('md', 'sm') is md, so a rule set deliberately to
+  // shrink a marker would draw at exactly the default it was trying to
+  // leave. 'md' is the fallback for nothing named, not a floor.
+  const sizes = hit.map((rule) => rule.size).filter(isSizeName)
+
   return {
-    size: hit.reduce<SizeName>(
-      (biggest, rule) => maxSize(biggest, rule.size),
-      'md',
-    ),
+    size: sizes.reduce<SizeName>(maxSize, sizes[0] ?? 'md'),
     rings: hit
       .map((rule) => rule.glow)
       .filter((glow): glow is string => Boolean(glow)),

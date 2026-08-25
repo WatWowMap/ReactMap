@@ -366,11 +366,10 @@ test('marker size follows the rule that matched, largest wins, md when nothing d
     ]),
   )
   const getSize = layer.props.getSize as (entity: PokemonEntity) => number
-  // 'sm' is reachable as a rule value but not as a resolved one:
-  // resolveAppearance starts at 'md' and only ever takes the maximum, so a
-  // small rule leaves the marker at the neutral default. The mapping still
-  // has to carry it, since the sheet can store it.
-  expect(getSize({ ...POKEMON, matched: [1] })).toBe(32)
+  // A rule set to 'sm' draws smaller than the neutral default: the maximum
+  // runs over the sizes rules named, and 'md' is only what an entity with
+  // no sized rule falls back to.
+  expect(getSize({ ...POKEMON, matched: [1] })).toBe(24)
   expect(getSize({ ...POKEMON, matched: [2] })).toBe(32)
   expect(getSize({ ...POKEMON, matched: [3] })).toBe(40)
   expect(getSize({ ...POKEMON, matched: [4] })).toBe(48)

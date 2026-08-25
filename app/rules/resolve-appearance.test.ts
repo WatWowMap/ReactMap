@@ -33,3 +33,20 @@ test('an unknown rule id is skipped rather than throwing', () => {
   expect(() => resolveAppearance([999], ruleMap([]))).not.toThrow()
   expect(resolveAppearance([999], ruleMap([])).rings).toEqual([])
 })
+
+test('a lone small rule resolves to sm, not to the neutral default', () => {
+  const rules = ruleMap([{ id: 4, size: 'sm' }])
+  expect(resolveAppearance([4], rules).size).toBe('sm')
+})
+
+test('a rule that named no size does not drag a small one up to md', () => {
+  const rules = ruleMap([
+    { id: 4, size: 'sm' },
+    { id: 5, size: null },
+  ])
+  expect(resolveAppearance([4, 5], rules).size).toBe('sm')
+})
+
+test('an entity matching nothing still draws at md', () => {
+  expect(resolveAppearance([], ruleMap([])).size).toBe('md')
+})
