@@ -176,19 +176,46 @@ export function buildPokemonIconLayer(
  *
  * `data` is the glowing subset rather than the whole array, so deck.gl
  * uploads one instance per ring instead of one per pokemon with most of
- * them invisible. That filter allocates - which is fine precisely because
- * this is called from the clustering memo, not from the once-a-second
- * clock tick (see MapCanvas); it runs when the entity set or the rules
- * actually changed, and never on a tick.
+ * them invisible. That subset comes from `glowingIn`, which keeps it
+ * against the rendered set and the rules: computing it inline allocated a
+ * fresh array on every rebuild, and a fresh array is a re-upload of every
+ * ring on the map for a set that had not changed.
  */
+const glowingCache = new WeakMap<
+  object,
+  { rules: ReadonlyMap<number, Rule>; glowing: PokemonEntity[] }
+>()
+
+/**
+ * The glowing subset for one rendered set, computed once and kept.
+ *
+ * The filter below is the only pokemon layer whose `data` is not the
+ * clustering result's own array, so it was the only one handing deck.gl a
+ * new reference on every rebuild -- and rebuilds are frequent: a pokemon
+ * expiring re-clusters, and so does every camera move. Which entities
+ * glow is a function of the rendered set and the rules and nothing else,
+ * so both identities are the key. Weak, so a set that has been replaced
+ * takes its subset with it.
+ */
+function glowingIn(
+  pokemon: readonly PokemonEntity[],
+  rules: ReadonlyMap<number, Rule>,
+): PokemonEntity[] {
+  const cached = glowingCache.get(pokemon)
+  if (cached && cached.rules === rules) return cached.glowing
+  const glowing = pokemon.filter(
+    (entity) => resolveAppearance(entity.matched ?? [], rules).rings.length > 0,
+  )
+  glowingCache.set(pokemon, { rules, glowing })
+  return glowing
+}
+
 export function buildPokemonRingLayer(
   pokemon: readonly PokemonEntity[],
   getRingIcon: (rings: readonly string[]) => IconDescriptor,
   rules: ReadonlyMap<number, Rule> = NO_RULES,
 ): IconLayer<PokemonEntity> {
-  const glowing = pokemon.filter(
-    (entity) => resolveAppearance(entity.matched ?? [], rules).rings.length > 0,
-  )
+  const glowing = glowingIn(pokemon, rules)
   return new IconLayer<PokemonEntity>({
     id: POKEMON_RING_LAYER_ID,
     data: glowing,

@@ -1,5 +1,6 @@
 import { afterAll, beforeAll, expect, test } from 'bun:test'
 import { ruleFixture } from '../rules/rule-fixtures'
+import type { Rule } from '../rules/rule-types'
 import { setupDom, teardownDom } from '../test-setup'
 import type { IconDescriptor } from './atlas'
 import { clusterIndexBuildCount } from './clustering'
@@ -548,4 +549,71 @@ test('a viewport-only rebuild renders the same markers as a fresh index does', (
   expect(cached.layers.map((layer) => layer.id)).toEqual(
     fresh.layers.map((layer) => layer.id),
   )
+})
+
+/*
+ * The store keeps each category's array stable across a write that
+ * changed the other one, precisely so deck.gl does not re-upload a layer
+ * nothing touched. That guarantee was being thrown away one level up:
+ * `clusterCategory` ran a fresh query for BOTH categories on any rebuild,
+ * and a query allocates its own `points` array, so a pokemon eviction
+ * handed the gym layer a new `data` reference. Measured in a browser at
+ * downtown Boston, zoom 13: `data NEW: gym-icons` fired six times over ten
+ * idle seconds while no gym data changed at all.
+ */
+test('a pokemon-only change keeps the gym layer data reference', () => {
+  const { pokemon, gyms } = clusterableSet()
+  const first = build(pokemon, gyms, VIEWPORT_A)
+  const second = build([...pokemon], gyms, { ...VIEWPORT_A })
+  const gymLayerData = (result: ReturnType<typeof build>) =>
+    result.layers.find((layer) => layer.id === GYM_ICON_LAYER_ID)?.props.data
+  expect(gymLayerData(second)).toBe(gymLayerData(first))
+})
+
+/*
+ * The ring layer's `data` is a FILTERED subset, so it allocated a fresh
+ * array on every call while every other pokemon layer handed deck.gl the
+ * clustering result's array unchanged. Measured in a browser at downtown
+ * Boston, zoom 13: five camera moves that did not actually move the
+ * camera left the icon, label and cluster layers on the data deck.gl
+ * already held, and re-uploaded the rings all five times.
+ *
+ * The subset is a function of the points and the rules and nothing else,
+ * so it is cached on those two identities -- the same shape the cluster
+ * index is cached with, and for the same reason.
+ */
+test('rebuilding over an unchanged set keeps the ring layer data reference', () => {
+  const { pokemon, gyms } = clusterableSet()
+  const rules = new Map<number, Rule>()
+  const buildWithRings = () =>
+    buildMapLayers({
+      pokemon,
+      gyms,
+      getIconFor: () => STUB_ICON,
+      getGymIcon: () => STUB_ICON,
+      getRingIcon: () => STUB_ICON,
+      rules,
+      now: 0,
+      viewport: VIEWPORT_A,
+    })
+  const ringData = (result: ReturnType<typeof buildWithRings>) =>
+    result.layers.find((layer) => layer.id === POKEMON_RING_LAYER_ID)?.props
+      .data
+  expect(ringData(buildWithRings())).toBe(ringData(buildWithRings()))
+})
+
+test('a different rules map gives the ring layer its own data', () => {
+  const { pokemon, gyms } = clusterableSet()
+  const build2 = (rules: Map<number, Rule>) =>
+    buildMapLayers({
+      pokemon,
+      gyms,
+      getIconFor: () => STUB_ICON,
+      getGymIcon: () => STUB_ICON,
+      getRingIcon: () => STUB_ICON,
+      rules,
+      now: 0,
+      viewport: VIEWPORT_A,
+    }).layers.find((layer) => layer.id === POKEMON_RING_LAYER_ID)?.props.data
+  expect(build2(new Map())).not.toBe(build2(new Map()))
 })
