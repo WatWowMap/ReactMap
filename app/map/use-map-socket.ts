@@ -18,11 +18,27 @@ import type { Bounds } from './types'
 export interface UseMapSocketOptions {
   url?: string
   connect?: (url: string) => SocketLike
+  /** Overridable so a test does not have to wait out the real delay. */
+  settleMs?: number
 }
+
+/**
+ * How long the camera has to sit still before the new bounds are sent.
+ *
+ * Every settled camera move is a fresh subscribe for both categories, and
+ * on the server each one is a full Golbat scan of the new area. A flick
+ * pan or a run of zoom steps fires several of those in under a second,
+ * and every one but the last is for an area the user has already left.
+ * Waiting for the camera to settle turns that run into one subscribe.
+ *
+ * Short enough to read as immediate, and small next to the scan it
+ * guards.
+ */
+const VIEWPORT_SETTLE_MS = 200
 
 export function useMapSocket(
   bounds: Bounds | null,
-  { url, connect }: UseMapSocketOptions = {},
+  { url, connect, settleMs = VIEWPORT_SETTLE_MS }: UseMapSocketOptions = {},
 ): void {
   const clientRef = useRef<MapSocket | null>(null)
 
@@ -46,6 +62,11 @@ export function useMapSocket(
 
   useEffect(() => {
     if (!bounds) return
-    clientRef.current?.setViewport(bounds)
-  }, [bounds])
+    const timer = setTimeout(() => {
+      clientRef.current?.setViewport(bounds)
+    }, settleMs)
+    // A move that lands before the timer fires replaces it, so only the
+    // bounds the camera actually came to rest on are ever sent.
+    return () => clearTimeout(timer)
+  }, [bounds, settleMs])
 }

@@ -29,7 +29,10 @@ class FakeSocket implements SocketLike {
 
 const BOUNDS: Bounds = { west: -1, south: 51, east: 1, north: 52 }
 
-function setup() {
+// The hook waits for the camera to settle before subscribing. Tests that
+// are not about that wait pass 0 so a rerender still subscribes on the
+// next tick rather than 200ms later.
+function setup(settleMs = 0) {
   const sockets: FakeSocket[] = []
   const connect = () => {
     const socket = new FakeSocket()
@@ -37,13 +40,15 @@ function setup() {
     return socket
   }
   function Harness({ bounds }: { bounds: Bounds | null }) {
-    useMapSocket(bounds, { url: 'ws://test.invalid/api/ws', connect })
+    useMapSocket(bounds, { url: 'ws://test.invalid/api/ws', connect, settleMs })
     return <div>map</div>
   }
   return { sockets, Harness }
 }
 
-test('connects once and subscribes when the camera reports its bounds', () => {
+const tick = (ms: number) => new Promise((done) => setTimeout(done, ms))
+
+test('connects once and subscribes when the camera reports its bounds', async () => {
   const { sockets, Harness } = setup()
   const view = render(<Harness bounds={null} />)
   expect(sockets).toHaveLength(1)
@@ -52,6 +57,7 @@ test('connects once and subscribes when the camera reports its bounds', () => {
 
   socket?.onopen?.()
   view.rerender(<Harness bounds={BOUNDS} />)
+  await tick(0)
   expect(sockets).toHaveLength(1)
   expect(socket?.sent.map((raw) => JSON.parse(raw).category).sort()).toEqual([
     'gym',
@@ -77,4 +83,33 @@ test('unmounting closes the socket and empties the store', () => {
   view.unmount()
   expect(sockets[0]?.closed).toBe(true)
   expect(useEntityStore.getState().gyms).toHaveLength(0)
+})
+
+test('a run of camera moves subscribes once, to where it came to rest', async () => {
+  const { sockets, Harness } = setup(20)
+  const view = render(<Harness bounds={null} />)
+  const socket = sockets[0]
+  socket?.onopen?.()
+
+  // A flick pan or a run of zoom steps: several settled moves in quick
+  // succession. Every one but the last is an area the user has already
+  // left, and each would otherwise cost a full Golbat scan per category.
+  for (const west of [-4, -3, -2]) {
+    view.rerender(<Harness bounds={{ ...BOUNDS, west }} />)
+    await tick(5)
+  }
+  expect(socket?.sent).toHaveLength(0)
+
+  view.rerender(<Harness bounds={{ ...BOUNDS, west: -1 }} />)
+  await tick(40)
+
+  expect(socket?.sent).toHaveLength(2)
+  const sent = (socket?.sent ?? []).map((raw) => JSON.parse(raw))
+  expect(sent.map((message) => message.category).sort()).toEqual([
+    'gym',
+    'pokemon',
+  ])
+  for (const message of sent) {
+    expect(message.viewport.min.lon).toBe(-1)
+  }
 })
