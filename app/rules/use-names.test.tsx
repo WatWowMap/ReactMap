@@ -60,3 +60,18 @@ test('a species id the catalog does not have is visible rather than empty', asyn
   expect(result.current.species(9999)).toBe('#9999')
   expect(result.current.label(9999, 48)).toBe('#9999 (#48)')
 })
+
+test('before the catalog loads, a formless label is still its own #id', () => {
+  const { result } = renderUseNames(fakeClient(FIXTURE))
+  expect(result.current.label(147)).toBe('#147')
+  expect(result.current.label(147, null)).toBe('#147')
+})
+
+test('a known species with an unknown form keeps the species name', async () => {
+  // The mirror of the server's `label(9999, 46)` case: never collapse a
+  // name we do have back to a raw id just because the form is missing.
+  const { result } = renderUseNames(fakeClient(FIXTURE))
+  await waitFor(() => expect(result.current.species(20)).toBe('Raticate'))
+  expect(result.current.label(20, 99)).toBe('Raticate (#99)')
+  expect(result.current.label(147, 99)).toBe('Dratini (#99)')
+})
