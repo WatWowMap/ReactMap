@@ -7,6 +7,7 @@ const { log, TAGS } = require('@rm/logger')
 const config = require('@rm/config')
 
 const { getAuth, isAuthRequest } = require('./auth')
+const { createSettingsHandler } = require('./settings-response')
 const {
   startDiscordBot,
   createOnRoleChange,
@@ -78,6 +79,8 @@ const resolveStaticPath = (pathname) => {
 
 const notFound = () => new Response('Not Found', { status: 404 })
 
+const settingsHandler = createSettingsHandler()
+
 const server = Bun.serve({
   hostname: config.getSafe('interface'),
   port: config.has('v2Port') ? config.getSafe('v2Port') : 8081,
@@ -100,6 +103,10 @@ const server = Bun.serve({
       // nothing here that wraps a write, buffers a body, or can be mounted
       // in the wrong order.
       return getAuth().handler(request)
+    }
+
+    if (url.pathname === '/api/settings') {
+      return settingsHandler(request)
     }
 
     if (url.pathname.startsWith('/api/')) {
