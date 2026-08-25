@@ -80,15 +80,18 @@ type PokemonConditionField = (typeof POKEMON_CONDITION_FIELDS)[number]
  * out. `speciesId` is not here -- it is the argument that fans one input
  * into many rows.
  */
+// Every optional property spells out `| undefined` because the server
+// tsconfig sets `exactOptionalPropertyTypes`: without it, a Zod-parsed input
+// (whose optionals are genuinely `T | undefined`) is not assignable here.
 interface RuleInput
-  extends Partial<Record<PokemonConditionField, number | null>> {
-  category?: string
-  name?: string
-  size?: string | null
-  glow?: string | null
-  notify?: boolean
+  extends Partial<Record<PokemonConditionField, number | null | undefined>> {
+  category?: string | undefined
+  name?: string | undefined
+  size?: string | null | undefined
+  glow?: string | null | undefined
+  notify?: boolean | undefined
   /** Species ids excluded from an otherwise-matching any-species rule. */
-  exclusions?: number[]
+  exclusions?: number[] | undefined
 }
 
 /** One rule as `listRules` returns it, joined flat across its three tables. */
