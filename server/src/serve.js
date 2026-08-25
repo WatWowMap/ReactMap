@@ -5,6 +5,7 @@ const path = require('path')
 
 const { log, TAGS } = require('@rm/logger')
 const config = require('@rm/config')
+const { fetchRequestHandler } = require('@trpc/server/adapters/fetch')
 
 const { getAuth, isAuthRequest } = require('./auth')
 const { createSettingsHandler } = require('./settings-response')
@@ -16,6 +17,10 @@ const {
   resolveTrustProxy,
   resolveIpAddressStrategy,
 } = require('./middleware/trust-proxy')
+const { createGolbatClient } = require('./services/golbat-client')
+const { createContextFactory } = require('./trpc/context')
+const { appRouter } = require('./trpc/router')
+const { createSocketServer } = require('./ws/socket-server')
 
 // Fire-and-forget: `startDiscordBot` never awaits the gateway login, so a
 // missing bot token or an unreachable Discord cannot delay `Bun.serve`
@@ -81,6 +86,27 @@ const notFound = () => new Response('Not Found', { status: 404 })
 
 const settingsHandler = createSettingsHandler()
 
+// One Golbat client shared by every RPC procedure and every socket's poll
+// loop -- Golbat is stateless per-request, so there is nothing connection-
+// scoped to gain by creating a fresh one each time. `init()` reads
+// `GET /api/status` once at boot (caps, `fort_in_memory`) per the transport
+// spec ("Golbat is required ... read at boot for capabilities and caps");
+// it is fire-and-forget so an unreachable Golbat at startup cannot block
+// this process from serving auth/settings/static at all -- every caller
+// below tolerates `capabilities` still being `null` (see golbat-client.js).
+const golbatClient = createGolbatClient()
+golbatClient.init().catch((err) => {
+  log.warn(
+    TAGS.ReactMap,
+    `Golbat status check failed at boot (will retry lazily on first use): ${err?.message || err}`,
+  )
+})
+
+const trpcCreateContext = createContextFactory({ golbatClient })
+const socketServer = createSocketServer({ golbatClient })
+
+const TRPC_PATH_PREFIX = '/api/trpc'
+
 const server = Bun.serve({
   hostname: config.getSafe('interface'),
   // The Express entry that owned 8080 is gone from this branch, so the 2.0
@@ -113,6 +139,30 @@ const server = Bun.serve({
       return settingsHandler(request)
     }
 
+    if (url.pathname === '/api/ws') {
+      const upgraded = await socketServer.upgrade(request, bunServer)
+      // A successful `server.upgrade()` hands the connection off to Bun's
+      // native websocket handling; returning `undefined` here is the
+      // documented way to tell `Bun.serve` not to also send an HTTP
+      // response on top of it.
+      if (upgraded) return undefined
+      return new Response('Upgrade required', { status: 426 })
+    }
+
+    if (
+      url.pathname === TRPC_PATH_PREFIX ||
+      url.pathname.startsWith(`${TRPC_PATH_PREFIX}/`)
+    ) {
+      // Same native mount shape as Better Auth above: `Request` in,
+      // `Response` out, nothing adapting a Node-shaped req/res in between.
+      return fetchRequestHandler({
+        endpoint: TRPC_PATH_PREFIX,
+        req: request,
+        router: appRouter,
+        createContext: trpcCreateContext,
+      })
+    }
+
     if (url.pathname.startsWith('/api/')) {
       return notFound()
     }
@@ -133,6 +183,7 @@ const server = Bun.serve({
 
     return notFound()
   },
+  websocket: socketServer.websocket,
 })
 
 log.info(
