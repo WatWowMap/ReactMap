@@ -1,16 +1,21 @@
 {
   "extends": "./tsconfig.json",
   "compilerOptions": {
-    "module": "CommonJS",
-    "moduleResolution": "node",
-    "allowJs": true,
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "exactOptionalPropertyTypes": true,
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitOverride": true,
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "allowJs": false,
     "checkJs": false,
-    "noEmit": true,
-    "types": ["node"]
+    "types": ["bun-types", "node"]
   },
-  "include": [
-    "server/src/auth/**/*.js",
-    "server/src/middleware/**/*.js",
-    "server/src/db/**/*.js"
+  "include": ["server/**/*.ts"],
+  "exclude": [
+    "node_modules",
+    "**/node_modules/*",
+    "server/src/db/migrations/**"
   ]
 }
