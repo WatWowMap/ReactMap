@@ -127,6 +127,17 @@ export function translateGymPatch(raw: RawEntity): GymPatch | null {
  * result still has no position -- a gym with nowhere to be drawn is not
  * something deck.gl can take, and a later patch carrying a location will
  * arrive as `changed` and complete it.
+ *
+ * When the fold changes nothing this returns `existing` ITSELF, not an
+ * equal copy, and callers are expected to compare by identity. That is
+ * not a micro-optimisation: unlike the poll path, a webhook-sourced gym
+ * is emitted as `changed` whether or not Golbat's change stamp moved
+ * (`services/map-subscription.ts`, `applyInjections`), because the
+ * payloads carry no `updated` column. Scanner senders routinely re-fire
+ * `fort_update`/`gym_details` for a gym whose team, battle state and
+ * position are all unchanged, so without this a re-delivery would churn
+ * the store's gym array and make deck.gl re-upload every gym's buffers
+ * for a message that said nothing.
  */
 export function mergeGym(
   existing: GymEntity | undefined,
@@ -142,5 +153,21 @@ export function mergeGym(
   const inBattle = patch.inBattle ?? existing?.inBattle
   if (inBattle !== undefined) gym.inBattle = inBattle
 
+  if (existing !== undefined && sameGym(existing, gym)) return existing
   return gym
+}
+
+/**
+ * Field-by-field on the whole `GymEntity` shape. `gymId` is compared too
+ * even though the store looks both up under the same key, so this stays
+ * honest if it is ever called with two unrelated gyms.
+ */
+function sameGym(a: GymEntity, b: GymEntity): boolean {
+  return (
+    a.gymId === b.gymId &&
+    a.lat === b.lat &&
+    a.lon === b.lon &&
+    a.team === b.team &&
+    a.inBattle === b.inBattle
+  )
 }

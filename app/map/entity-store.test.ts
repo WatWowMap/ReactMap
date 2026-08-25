@@ -193,3 +193,53 @@ test('an untranslatable row is dropped without disturbing the batch', () => {
   )
   expect(useEntityStore.getState().pokemon).toHaveLength(1)
 })
+
+test('a re-fired webhook patch that changes nothing leaves the array alone', () => {
+  const { applyDelta } = useEntityStore.getState()
+  const gym = { id: 'gym-1', lat: 51.5, lon: -0.1, team_id: 2, in_battle: 0 }
+  applyDelta(delta({ category: 'gym', added: [gym] }))
+  const gyms = useEntityStore.getState().gyms
+  const entity = useEntityStore.getState().gymsById['gym-1']
+
+  // The shape `applyInjections` emits for a routine `fort_update` re-scan:
+  // `changed`, because the gym is already in the connection's map, and with
+  // every field identical to what the client holds.
+  applyDelta(delta({ category: 'gym', changed: [{ ...gym }] }))
+  expect(useEntityStore.getState().gyms).toBe(gyms)
+  expect(useEntityStore.getState().gymsById['gym-1']).toBe(entity)
+
+  // A partial patch that only re-states what is already known is the same
+  // non-event, even though it carries fewer fields than the store holds.
+  applyDelta(delta({ category: 'gym', changed: [{ id: 'gym-1', team_id: 2 }] }))
+  expect(useEntityStore.getState().gyms).toBe(gyms)
+
+  // A patch that genuinely moves the team still lands.
+  applyDelta(delta({ category: 'gym', changed: [{ id: 'gym-1', team_id: 3 }] }))
+  expect(useEntityStore.getState().gyms).not.toBe(gyms)
+  expect(useEntityStore.getState().gymsById['gym-1']?.team).toBe(3)
+})
+
+test('an unchanged gym in a batch does not suppress a changed one', () => {
+  const { applyDelta } = useEntityStore.getState()
+  applyDelta(
+    delta({
+      category: 'gym',
+      added: [
+        { id: 'gym-1', lat: 51.5, lon: -0.1, team_id: 2 },
+        { id: 'gym-2', lat: 51.6, lon: -0.2, team_id: 1 },
+      ],
+    }),
+  )
+  const gyms = useEntityStore.getState().gyms
+  applyDelta(
+    delta({
+      category: 'gym',
+      changed: [
+        { id: 'gym-1', team_id: 2 },
+        { id: 'gym-2', team_id: 3 },
+      ],
+    }),
+  )
+  expect(useEntityStore.getState().gyms).not.toBe(gyms)
+  expect(useEntityStore.getState().gymsById['gym-2']?.team).toBe(3)
+})

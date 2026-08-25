@@ -139,3 +139,31 @@ test('merging a patch keeps the fields the patch did not carry', () => {
 test('a gym with nowhere to be drawn is not renderable', () => {
   expect(mergeGym(undefined, { gymId: 'gym-1', team: 1 })).toBeNull()
 })
+
+test('a fold that changes nothing hands back the existing gym itself', () => {
+  const existing = mergeGym(undefined, {
+    gymId: 'gym-1',
+    lat: 51.5,
+    lon: -0.1,
+    team: 2,
+    inBattle: false,
+  })
+  expect(existing).not.toBeNull()
+
+  // Identity, not equality: the store skips its write on `===`.
+  expect(mergeGym(existing ?? undefined, { gymId: 'gym-1', team: 2 })).toBe(
+    existing,
+  )
+  expect(
+    mergeGym(existing ?? undefined, {
+      gymId: 'gym-1',
+      lat: 51.5,
+      lon: -0.1,
+      team: 2,
+      inBattle: false,
+    }),
+  ).toBe(existing)
+  expect(
+    mergeGym(existing ?? undefined, { gymId: 'gym-1', inBattle: true }),
+  ).not.toBe(existing)
+})

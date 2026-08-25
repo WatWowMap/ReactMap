@@ -103,8 +103,16 @@ export const useEntityStore = create<EntityStoreState>()((set, get) => ({
       // Merged over what we already hold: a gym delivered by webhook
       // carries only what its payload knew, and overwriting with the
       // patch alone would erase the rest.
-      const gym = mergeGym(byId[patch.gymId], patch)
+      const existing = byId[patch.gymId]
+      const gym = mergeGym(existing, patch)
       if (!gym) continue
+      // `mergeGym` hands back the SAME object when the fold changed
+      // nothing. That happens often: a webhook-sourced gym reaches us as
+      // `changed` whether or not Golbat's change stamp moved, so a
+      // re-fired `fort_update` for an unchanged gym is a routine message
+      // rather than a rare one. Writing it anyway would rebuild the gym
+      // array and make deck.gl re-upload every gym on the map.
+      if (gym === existing) continue
       byId[patch.gymId] = gym
       touched = true
     }
