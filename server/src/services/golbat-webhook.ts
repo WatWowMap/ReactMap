@@ -85,6 +85,46 @@ function setIfPresent(target: GymPatch, key: string, value: unknown) {
 }
 
 /**
+ * Copies `value` only when it is neither absent nor Golbat's zero
+ * sentinel for "unset".
+ *
+ * The webhook structs are plain `int64`/`string`
+ * (decoder/gym_state.go:145-163,165-195) built out of nullable columns with
+ * `.ValueOrZero()` (decoder/gym_state.go:225,267-296), so an unsponsored,
+ * unpartnered, never-powered-up gym -- which is nearly all of them --
+ * arrives carrying `sponsor_id: 0`, `partner_id: ""`, `guard_pokemon_id: 0`.
+ * The scan API builds that same unset state with `.Ptr()`
+ * (decoder/api_gym.go:146,170,171), i.e. JSON `null`. Passing the sentinel
+ * through would make a pushed gym and a polled gym disagree about
+ * identical state, and would light a sponsor or partner badge on an
+ * ordinary gym the instant a raid fired on it.
+ */
+function setUnlessUnsetSentinel(target: GymPatch, key: string, value: unknown) {
+  if (value === 0 || value === '') return
+  setIfPresent(target, key, value)
+}
+
+/**
+ * The power-up trio, which is unset as a group or not at all: Golbat ties
+ * power-up state to the level, and a gym that was never powered up sends
+ * all three as 0 where a scan sends all three as null. A real power-up
+ * always has a non-zero level, so a genuine `power_up_points: 0` still
+ * travels as long as it arrives with one.
+ */
+function setPowerUp(target: GymPatch, message: Record<string, any>) {
+  if (
+    !message.power_up_level &&
+    !message.power_up_points &&
+    !message.power_up_end_timestamp
+  ) {
+    return
+  }
+  setIfPresent(target, 'power_up_points', message.power_up_points)
+  setIfPresent(target, 'power_up_level', message.power_up_level)
+  setIfPresent(target, 'power_up_end_timestamp', message.power_up_end_timestamp)
+}
+
+/**
  * The change stamp for a webhook-built entity. Golbat's webhook payloads
  * carry no `updated` column (only the scan responses do -- see
  * delta-engine.ts on why `updated` is the stamp), so this is the moment
@@ -121,11 +161,11 @@ function raidToGymPatch(message: Record<string, any>): UpsertInjection | null {
   setIfPresent(entity, 'raid_pokemon_move_2', message.move_2)
   setIfPresent(entity, 'raid_is_exclusive', message.is_exclusive)
   setIfPresent(entity, 'ex_raid_eligible', message.ex_raid_eligible)
-  setIfPresent(entity, 'sponsor_id', message.sponsor_id)
-  setIfPresent(entity, 'partner_id', message.partner_id)
-  setIfPresent(entity, 'power_up_points', message.power_up_points)
-  setIfPresent(entity, 'power_up_level', message.power_up_level)
-  setIfPresent(entity, 'power_up_end_timestamp', message.power_up_end_timestamp)
+  setUnlessUnsetSentinel(entity, 'sponsor_id', message.sponsor_id)
+  // `partner_id` is a string on this payload and an int64 on gym details;
+  // the scan response's own type is *string.
+  setUnlessUnsetSentinel(entity, 'partner_id', message.partner_id)
+  setPowerUp(entity, message)
   setIfPresent(entity, 'ar_scan_eligible', message.ar_scan_eligible)
   setIfPresent(entity, 'rsvps', message.rsvps)
 
@@ -146,7 +186,11 @@ function gymDetailsToGymPatch(
   setIfPresent(entity, 'url', message.url)
   // `team`, not `team_id` -- the divergence noted in the module header.
   setIfPresent(entity, 'team_id', message.team)
-  setIfPresent(entity, 'guarding_pokemon_id', message.guard_pokemon_id)
+  setUnlessUnsetSentinel(
+    entity,
+    'guarding_pokemon_id',
+    message.guard_pokemon_id,
+  )
   setIfPresent(entity, 'available_slots', message.slots_available)
   setIfPresent(entity, 'ex_raid_eligible', message.ex_raid_eligible)
   // `in_battle` is a Go bool on the webhook and an *int64 on the scan
@@ -157,15 +201,15 @@ function gymDetailsToGymPatch(
   } else {
     setIfPresent(entity, 'in_battle', message.in_battle)
   }
-  setIfPresent(entity, 'sponsor_id', message.sponsor_id)
+  setUnlessUnsetSentinel(entity, 'sponsor_id', message.sponsor_id)
   // `partner_id` is an int64 here and a string on the raid payload; the
-  // scan response's own type is *string.
-  if (message.partner_id !== undefined && message.partner_id !== null) {
+  // scan response's own type is *string. `createGymWebhooks`
+  // (decoder/gym_state.go:215-244) never populates it on gym details at
+  // all, so in practice it is always the 0 the sentinel rule drops.
+  if (message.partner_id) {
     entity.partner_id = String(message.partner_id)
   }
-  setIfPresent(entity, 'power_up_points', message.power_up_points)
-  setIfPresent(entity, 'power_up_level', message.power_up_level)
-  setIfPresent(entity, 'power_up_end_timestamp', message.power_up_end_timestamp)
+  setPowerUp(entity, message)
   setIfPresent(entity, 'ar_scan_eligible', message.ar_scan_eligible)
   setIfPresent(entity, 'defenders', message.defenders)
 

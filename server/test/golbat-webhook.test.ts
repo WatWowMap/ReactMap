@@ -115,6 +115,45 @@ describe('parseGolbatWebhookBatch: raid', () => {
     expect('available_slots' in gym).toBe(false)
   })
 
+  test('Golbat`s unset sentinels do not travel as real sponsor/partner values', () => {
+    // decoder/gym_state.go:267-296 builds the raid payload with
+    // `.ValueOrZero()`, so an ordinary gym sends sponsor_id 0, partner_id ""
+    // and the power-up trio as zeros. The scan API sends null for all of
+    // them (decoder/api_gym.go:170-171), and a 0 sponsor on the wire is a
+    // sponsor badge on a gym that has none.
+    const [injection] = parseGolbatWebhookBatch([
+      { type: 'raid', message: raidMessage() },
+    ])
+    const gym = (injection as any).entity
+    expect('sponsor_id' in gym).toBe(false)
+    expect('partner_id' in gym).toBe(false)
+    expect('power_up_points' in gym).toBe(false)
+    expect('power_up_level' in gym).toBe(false)
+    expect('power_up_end_timestamp' in gym).toBe(false)
+  })
+
+  test('a real sponsor, partner and power-up still travel', () => {
+    const [injection] = parseGolbatWebhookBatch([
+      {
+        type: 'raid',
+        message: raidMessage({
+          sponsor_id: 4,
+          partner_id: 'some-partner',
+          power_up_points: 0,
+          power_up_level: 2,
+          power_up_end_timestamp: 1_700_009_000,
+        }),
+      },
+    ])
+    const gym = (injection as any).entity
+    expect(gym.sponsor_id).toBe(4)
+    expect(gym.partner_id).toBe('some-partner')
+    // Zero points alongside a real level is a real value, not a sentinel.
+    expect(gym.power_up_points).toBe(0)
+    expect(gym.power_up_level).toBe(2)
+    expect(gym.power_up_end_timestamp).toBe(1_700_009_000)
+  })
+
   test('a raid with no gym_id is dropped rather than injected under an empty id', () => {
     expect(
       parseGolbatWebhookBatch([
@@ -143,6 +182,23 @@ describe('parseGolbatWebhookBatch: gym_details', () => {
       { type: 'gym_details', message: gymDetailsMessage({ in_battle: true }) },
     ])
     expect((injection as any).entity.in_battle).toBe(1)
+  })
+
+  test('gym_details drops its unset sponsor, partner and guard sentinels', () => {
+    // `createGymWebhooks` (decoder/gym_state.go:215-244) never populates
+    // sponsor or partner on gym details at all, so they arrive as the
+    // struct's zero values; guard_pokemon_id is `.ValueOrZero()` and is 0
+    // for a gym with nothing guarding it.
+    const [injection] = parseGolbatWebhookBatch([
+      {
+        type: 'gym_details',
+        message: gymDetailsMessage({ guard_pokemon_id: 0 }),
+      },
+    ])
+    const gym = (injection as any).entity
+    expect('sponsor_id' in gym).toBe(false)
+    expect('partner_id' in gym).toBe(false)
+    expect('guarding_pokemon_id' in gym).toBe(false)
   })
 
   test('gym_details carries no raid fields', () => {
