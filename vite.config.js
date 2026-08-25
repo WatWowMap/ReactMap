@@ -144,7 +144,19 @@ const viteConfig = defineConfig(({ mode }) => {
         ['SOURCEMAP_ERROR', "Can't resolve original location of error"],
       ]),
     ],
-    optimizeDeps: isDevelopment ? { exclude: ['@mui/*'] } : undefined,
+    optimizeDeps: isDevelopment
+      ? {
+          // maplibre loads its worker with a dynamic import of
+          // `maplibre-gl-worker.mjs`, resolved relative to itself. Pre-bundling
+          // maplibre moves it into `.vite/deps`, where the optimizer never
+          // emits the worker, so the import 404s: vite warns that the file
+          // "does not exist in the optimize deps directory" and the map then
+          // throws `Cannot read properties of undefined (reading 'height')`
+          // on a loop, because tile processing has nowhere to run.
+          // Serving maplibre unbundled keeps the worker beside it.
+          exclude: ['@mui/*', 'maplibre-gl'],
+        }
+      : undefined,
     publicDir: 'public',
     resolve: {
       alias: {
