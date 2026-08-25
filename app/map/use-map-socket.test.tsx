@@ -113,3 +113,44 @@ test('a run of camera moves subscribes once, to where it came to rest', async ()
     expect(message.viewport.min.lon).toBe(-1)
   }
 })
+
+test('onDelta sees each delta, after the store already has it', () => {
+  const seen: unknown[] = []
+  const sockets: FakeSocket[] = []
+  const connect = () => {
+    const socket = new FakeSocket()
+    sockets.push(socket)
+    return socket
+  }
+  function Harness() {
+    useMapSocket(BOUNDS, {
+      url: 'ws://test.invalid/api/ws',
+      connect,
+      settleMs: 0,
+      onDelta: (delta) => {
+        // Read the store from inside the callback: the rules half of an
+        // envelope is only useful once the entity half has landed.
+        seen.push({
+          rulesVersion: delta.rulesVersion,
+          gyms: useEntityStore.getState().gyms.length,
+        })
+      },
+    })
+    return <div>map</div>
+  }
+
+  render(<Harness />)
+  sockets[0]?.onopen?.()
+  sockets[0]?.onmessage?.({
+    data: JSON.stringify({
+      type: 'delta',
+      category: 'gym',
+      added: [{ id: 'gym-1', lat: 51.5, lon: -0.1, team_id: 2 }],
+      changed: [],
+      removed: [],
+      rulesVersion: 7,
+    }),
+  })
+
+  expect(seen).toEqual([{ rulesVersion: 7, gyms: 1 }])
+})

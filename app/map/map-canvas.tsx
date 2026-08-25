@@ -2,7 +2,7 @@ import 'maplibre-gl/dist/maplibre-gl.css'
 
 import type { PickingInfo } from '@deck.gl/core'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { useRules } from '../rules/rules-query'
+import { applyDeltaWithRules, useRules } from '../rules/rules-query'
 import { createAtlas } from './atlas'
 import {
   drawClusterIcon,
@@ -24,6 +24,7 @@ import type { Camera } from './use-map-libre'
 import { anchorFor, pickedEntityFrom, useMapLibre } from './use-map-libre'
 import { useMapSocket } from './use-map-socket'
 import { useWebglContextRecovery } from './use-webgl-context-recovery'
+import type { DeltaMessage } from './wire'
 
 export interface MapCanvasProps {
   initialCamera: Camera
@@ -83,7 +84,7 @@ export function MapCanvas({ initialCamera, onCameraChange }: MapCanvasProps) {
   // avoid. The profile id is a placeholder: this plan seeds exactly one
   // profile per account and defers the switcher, so there is nothing yet
   // for a client to choose between -- see rules-query.ts's `rulesQueryKey`.
-  const { rules } = useRules(CURRENT_PROFILE_ID)
+  const { rules, refetch: refetchRules } = useRules(CURRENT_PROFILE_ID)
   // Countdown/IV text is layer data, not a per-marker component: this is
   // the one clock this whole tree reads, and every timer-bearing layer is
   // rebuilt from it on the same tick rather than each owning its own. It
@@ -134,11 +135,42 @@ export function MapCanvas({ initialCamera, onCameraChange }: MapCanvasProps) {
   // a fresh object every render would refire it needlessly.
   const anchor = useMemo(() => anchorFor(selected), [selected])
 
+  // The rules version the current `rules` were fetched at. There is no
+  // version on `rules.list`'s response, so the first delta of a
+  // connection establishes it -- the rules were fetched moments earlier,
+  // so whatever version that delta carries is the one they came from.
+  // Every later move is a rule edited somewhere else.
+  const fetchedRulesVersion = useRef<number | undefined>(undefined)
+
+  const handleDelta = useCallback(
+    (delta: DeltaMessage) => {
+      const matched = [...delta.added, ...delta.changed].flatMap((raw) =>
+        Array.isArray(raw.matched) ? (raw.matched as number[]) : [],
+      )
+      applyDeltaWithRules({
+        matched,
+        ...(delta.rulesVersion !== undefined
+          ? { rulesVersion: delta.rulesVersion }
+          : {}),
+        ...(fetchedRulesVersion.current !== undefined
+          ? { fetchedAt: fetchedRulesVersion.current }
+          : {}),
+        rules,
+        invalidate: refetchRules,
+      })
+      if (delta.rulesVersion !== undefined) {
+        fetchedRulesVersion.current = delta.rulesVersion
+      }
+    },
+    [rules, refetchRules],
+  )
+
   // The live transport. One socket for the map's lifetime, resubscribed
   // to whatever the camera frames; deltas land in the store the two
   // selectors above read, so nothing here re-renders on arrival except
-  // through those.
-  useMapSocket(viewport?.bounds ?? null)
+  // through those. The rules half of an envelope is the exception, and
+  // goes through `handleDelta` above.
+  useMapSocket(viewport?.bounds ?? null, { onDelta: handleDelta })
 
   useEffect(() => {
     const interval = setInterval(() => {

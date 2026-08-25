@@ -14,12 +14,22 @@ import { useEntityStore } from './entity-store'
 import type { MapSocket, SocketLike } from './socket-client'
 import { createMapSocket, defaultSocketUrl } from './socket-client'
 import type { Bounds } from './types'
+import type { DeltaMessage } from './wire'
 
 export interface UseMapSocketOptions {
   url?: string
   connect?: (url: string) => SocketLike
   /** Overridable so a test does not have to wait out the real delay. */
   settleMs?: number
+  /**
+   * Called with each delta AFTER the store has it, for whatever the
+   * envelope carries that is not entity data -- today that is
+   * `rulesVersion` and the `matched` ids, which is how a rule edited on
+   * another device reaches this map (`rules-query.ts`'s
+   * `applyDeltaWithRules`). Held in a ref, so a caller may pass a fresh
+   * closure every render without reconnecting the socket.
+   */
+  onDelta?: (delta: DeltaMessage) => void
 }
 
 /**
@@ -38,14 +48,24 @@ const VIEWPORT_SETTLE_MS = 200
 
 export function useMapSocket(
   bounds: Bounds | null,
-  { url, connect, settleMs = VIEWPORT_SETTLE_MS }: UseMapSocketOptions = {},
+  {
+    url,
+    connect,
+    settleMs = VIEWPORT_SETTLE_MS,
+    onDelta,
+  }: UseMapSocketOptions = {},
 ): void {
   const clientRef = useRef<MapSocket | null>(null)
+  const onDeltaRef = useRef(onDelta)
+  onDeltaRef.current = onDelta
 
   useEffect(() => {
     const client = createMapSocket({
       url: url ?? defaultSocketUrl(),
-      onDelta: (delta) => useEntityStore.getState().applyDelta(delta),
+      onDelta: (delta) => {
+        useEntityStore.getState().applyDelta(delta)
+        onDeltaRef.current?.(delta)
+      },
       ...(connect ? { connect } : {}),
     })
     clientRef.current = client
