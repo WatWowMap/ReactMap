@@ -127,6 +127,20 @@ function createSocketServer({
         // disconnect and fans webhooks out to sockets that will never
         // read them.
         unregister()
+        // And it takes the connection's own record of the subscription
+        // with it too. A pokemon poll that throws (Golbat down, or not
+        // configured at all) ends this loop for good; leaving the entry
+        // behind would make every later `subscribe` for the category --
+        // every viewport change the client makes -- take the
+        // `updateSubscription` branch and mutate a state nothing is
+        // reading, so the category stayed silent for the life of the
+        // socket and only a page reload brought it back. Dropping the
+        // entry makes the next subscribe start a fresh loop and retry.
+        // Guarded on identity so a loop finishing after the category was
+        // already resubscribed cannot delete the live one.
+        if (ws.data.subscriptions.get(category)?.state === state) {
+          ws.data.subscriptions.delete(category)
+        }
       }
     })()
   }
