@@ -115,10 +115,21 @@ function createSubscriptionRegistry() {
     },
 
     /**
-     * Routes one parsed webhook batch to every subscription that wants any
-     * of it. Synchronous and in-memory by design: the receiver answers
-     * Golbat while holding nothing open, because Golbat's sender is
-     * fire-and-forget on a short timeout (webhooks/webhook.go).
+     * Routes one parsed webhook batch to every subscription that wants
+     * any of it. In-memory by design: the receiver answers Golbat while
+     * holding nothing open.
+     *
+     * That matters more than it looks, because Golbat has NO client-side
+     * safety net. Its sender builds the HTTP client as a bare
+     * `&http.Client{}` (webhooks/webhook.go:192), Go's zero value, which
+     * has no request timeout, and `sendCollection` uses a plain
+     * `http.NewRequest` with no context deadline (webhooks/webhook.go:127)
+     * -- so `Do` blocks for as long as the receiver keeps the connection
+     * open. Meanwhile `sender.Run()` fires `go sender.Flush()` on its
+     * ticker regardless of whether the previous flush finished. A receiver
+     * that hangs therefore accumulates blocked goroutines and connections
+     * on Golbat's side, uncapped, until something else gives. Nothing
+     * upstream will unstick it; not blocking is entirely ReactMap's job.
      */
     dispatch(injections: WebhookInjection[]) {
       if (injections.length === 0) return

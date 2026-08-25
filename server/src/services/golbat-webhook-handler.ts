@@ -4,14 +4,19 @@
 // `server/src/serve.ts`. Request in, Response out -- no middleware, nothing
 // that wraps a write, matching how Better Auth and tRPC are mounted there.
 //
-// The one hard rule here is that the response must not wait on delivery.
-// Golbat's sender is fire-and-forget on a short client timeout
-// (webhooks/webhook.go), and a receiver that blocks while it fans out to
-// sockets shows up on Golbat's side as a slow or failed webhook, which is
-// how a whole batch of fort changes gets dropped upstream. The fan-out is
-// a synchronous in-memory push into per-subscription queues
-// (subscription-registry.ts) precisely so there is nothing to wait for --
-// the actual sends happen later, on each subscription's own loop.
+// The one hard rule here is that the response must not wait on delivery,
+// and the reason is that Golbat cannot protect itself if it does. Its
+// sender's HTTP client is a bare `&http.Client{}` (webhooks/webhook.go:192)
+// -- Go's zero value, which has no request timeout -- and the request is
+// built with a plain `http.NewRequest`, no context deadline
+// (webhooks/webhook.go:127). A hung receiver is not dropped after a few
+// seconds; it holds that goroutine and connection open indefinitely while
+// the sender's ticker keeps launching new flushes behind it. So a receiver
+// that blocks does not merely lose its own batch, it slowly consumes the
+// instance sending to it. The fan-out is an in-memory push into
+// per-subscription queues (subscription-registry.ts) precisely so there is
+// nothing to wait for -- the actual sends happen later, on each
+// subscription's own loop.
 //
 // Authentication is OPTIONAL and deliberately so. Golbat's own `api_secret`
 // is optional (routes.go:430-432 -- an empty secret disables auth entirely

@@ -101,6 +101,19 @@ Turning `fort_in_memory` on is what buys you reconciliation. It is
 experimental in Golbat and costs memory proportional to your fort count, so
 it is your call.
 
+## Why ReactMap answers before it delivers
+
+The endpoint replies as soon as it has parsed your batch, before any of it
+reaches a client. That is not laziness about durability, it protects your
+Golbat. Golbat's webhook sender uses an HTTP client with no request timeout
+and no deadline on the request, so a receiver that stalls holds the sending
+goroutine and its connection open for as long as it likes, while the sender's
+ticker keeps starting new deliveries behind it. Nothing on Golbat's side
+gives up and moves on. So do not put a slow reverse proxy, an auth service
+round trip, or a rate limiter that queues in front of `/api/webhooks/golbat`
+-- a receiver that hangs is a problem for the instance sending to it, not
+just for ReactMap.
+
 ## Checking it works
 
 ReactMap answers `202 Accepted` to a well-formed batch. From the machine
