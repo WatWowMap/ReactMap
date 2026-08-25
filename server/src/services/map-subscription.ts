@@ -77,7 +77,27 @@ type PollingGolbatClient = Pick<
 > &
   Partial<Pick<ReturnType<typeof createGolbatClient>, 'isFortInMemoryEnabled'>>
 
-const POKEMON_POLL_INTERVAL_MS = 2_000
+/**
+ * How often a stationary map re-asks Golbat for its viewport.
+ *
+ * This does NOT govern how fast a pan updates. A viewport change calls
+ * `updateSubscription`, which wakes the loop out of its sleep immediately
+ * (see `sleepOrWake` and `wakePending` below), so panning costs one scan
+ * regardless of what this is set to. Raising it is free for the latency
+ * anyone actually feels.
+ *
+ * What it does govern is how quickly a NEW spawn, or an IV that arrived
+ * after the encounter, shows up on a map nobody is touching. Expiry needs
+ * no poll at all: the client evicts verified expiries on its own clock
+ * without a server message.
+ *
+ * So the trade is new-spawn freshness against Golbat load, and it is
+ * linear -- every halving of this doubles the scans one connection costs.
+ * Ten seconds keeps a stationary map current to within a spawn or two
+ * while asking Golbat for a fifth of what two seconds did. It was two
+ * seconds because that is a plausible-sounding number, not a measured one.
+ */
+const POKEMON_POLL_INTERVAL_MS = 10_000
 // Task 6 wired the fast path: a fort change reaches a subscribed client
 // from Golbat's webhook sender (`golbat-webhook.ts` ->
 // `subscription-registry.ts` -> the injection tick below), not from this

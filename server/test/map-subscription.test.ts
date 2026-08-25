@@ -931,3 +931,59 @@ describe('subscribeCategory with no rules source', () => {
     expect(bodies[0].filters).toEqual([{ iv: { min: 100, max: 100 } }])
   })
 })
+
+describe('the poll interval does not govern pan latency', () => {
+  test('a viewport change re-polls immediately rather than waiting out the interval', async () => {
+    // This is what makes POKEMON_POLL_INTERVAL_MS safe to raise: the
+    // interval decides how fresh a STATIONARY map is, never how fast a pan
+    // updates. If this ever regressed, raising the interval would start
+    // costing pan latency directly, which is the one thing it must not do.
+    const scanAt: number[] = []
+    const golbatClient = fakeGolbatClient({
+      scanPokemon: async ({ min }: { min: { lat: number; lon: number } }) => {
+        scanAt.push(Date.now())
+        return {
+          pokemon: [
+            {
+              id: min.lat >= 10 ? 'moved' : 'original',
+              pokemon_id: 1,
+              updated: 1,
+              expire_timestamp_verified: true,
+            },
+          ],
+          limitReached: false,
+        }
+      },
+    })
+    const state = createSubscriptionState({
+      category: 'pokemon',
+      viewport: VIEWPORT_A,
+    })
+    const controller = new AbortController()
+    const generator = subscribeCategory({
+      golbatClient,
+      state,
+      signal: controller.signal,
+      // Ten minutes. Any wait on the interval fails this outright rather
+      // than passing slowly, so the assertion cannot be satisfied by luck.
+      pollIntervalMs: 600_000,
+    })
+
+    const first = await generator.next()
+    expect((first.value as any).added.map((e: any) => e.id)).toEqual([
+      'original',
+    ])
+
+    const pannedAt = Date.now()
+    updateSubscription(state, { viewport: VIEWPORT_B, filters: [] })
+    const second = await generator.next()
+    controller.abort()
+    await generator.next().catch(() => {})
+
+    expect((second.value as any).added.map((e: any) => e.id)).toEqual(['moved'])
+    // The second scan happened because the pan woke the loop, not because
+    // ten minutes elapsed.
+    expect(scanAt).toHaveLength(2)
+    expect(Date.now() - pannedAt).toBeLessThan(1_000)
+  })
+})
