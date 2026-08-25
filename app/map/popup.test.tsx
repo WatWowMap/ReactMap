@@ -1,5 +1,6 @@
 import { afterAll, afterEach, beforeAll, expect, test } from 'bun:test'
 import { cleanup, fireEvent, render, within } from '@testing-library/react'
+import { ruleMap } from '../rules/rule-fixtures'
 import { setupDom, teardownDom } from '../test-setup'
 import { Popup } from './popup'
 import type { GymEntity, PokemonEntity } from './types'
@@ -75,6 +76,63 @@ test('the team swatch reads its colour from the data palette token, not a litera
   expect((swatch as HTMLElement).style.backgroundColor).toBe(
     'var(--color-team-2)',
   )
+})
+
+/**
+ * `matched` plus a `rules` map is all the popup's "why" lines need --
+ * `resolveAppearance` and the rule names read straight off it, nothing
+ * else is fetched. `ruleMap` (`rule-fixtures.ts`) fills every column this
+ * suite doesn't care about with its usual defaults.
+ */
+function renderPopup({
+  matched,
+  rules,
+}: {
+  matched: number[]
+  rules: ReturnType<typeof ruleMap>
+}) {
+  const entity: PokemonEntity = { ...POKEMON, matched }
+  return render(
+    <Popup
+      entity={entity}
+      x={0}
+      y={0}
+      onClose={() => {}}
+      now={0}
+      rules={rules}
+    />,
+  )
+}
+
+test('the popup names every rule that matched', () => {
+  const { container } = renderPopup({
+    matched: [7, 12],
+    rules: ruleMap([
+      { id: 7, name: 'Hundos', size: 'xl', glow: '#ffc83d', notify: true },
+      { id: 12, name: 'Great League', glow: '#4f8cff' },
+    ]),
+  })
+  expect(
+    within(container).getByText(/Extra large because Hundos matched/),
+  ).toBeTruthy()
+  expect(
+    within(container).getByText(/Blue ring from Great League/),
+  ).toBeTruthy()
+  expect(
+    within(container).getByText(/Notifying, because Hundos asks to/),
+  ).toBeTruthy()
+})
+
+test('the popup says what did not happen, too', () => {
+  const { container } = renderPopup({
+    matched: [88],
+    rules: ruleMap([{ id: 88, name: 'Rare spawns', size: 'lg' }]),
+  })
+  expect(
+    within(container).getByText(
+      /Not notifying, because no matching rule asks to/,
+    ),
+  ).toBeTruthy()
 })
 
 test('closing calls back exactly once per click', () => {

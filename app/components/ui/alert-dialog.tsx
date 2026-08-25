@@ -17,11 +17,35 @@ function AlertDialogTrigger({
   )
 }
 
+/**
+ * `container` defaults to `document.body`, computed here at render time
+ * rather than left to Radix's own default. Radix's `Portal` only falls
+ * back to `document.body` once its internal `mounted` state flips true in
+ * a layout effect, and that effect is `@radix-ui/react-use-layout-effect`
+ * -- a plain `globalThis?.document ? useLayoutEffect : noop` decided once,
+ * at that module's own import time. In this project's test setup
+ * (`test-setup.ts`), `document` is registered in a file's `beforeAll`,
+ * strictly after every file's top-level imports have already run and
+ * resolved that ternary -- so the effect is permanently a no-op for the
+ * whole `bun test` process, `mounted` never becomes true, and nothing
+ * this component renders ever portals anywhere. Passing an explicit
+ * `container` sidesteps that gate entirely (Radix uses `containerProp`
+ * unconditionally when given one); harmless in the browser, where
+ * `document` already exists at this same render.
+ */
 function AlertDialogPortal({
+  container,
   ...props
 }: React.ComponentProps<typeof AlertDialogPrimitive.Portal>) {
   return (
-    <AlertDialogPrimitive.Portal data-slot="alert-dialog-portal" {...props} />
+    <AlertDialogPrimitive.Portal
+      data-slot="alert-dialog-portal"
+      container={
+        container ??
+        (typeof document === 'undefined' ? undefined : document.body)
+      }
+      {...props}
+    />
   )
 }
 
