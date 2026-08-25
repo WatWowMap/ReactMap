@@ -314,3 +314,50 @@ describe('subscribeCategory', () => {
     expect(delta.added.map((e: any) => e.id)).toEqual(['match'])
   })
 })
+
+describe('updateSubscription while the loop is not sleeping', () => {
+  test('a wake that arrives between yield and the next poll is not lost -- the generator is suspended at `yield`, so `state.wake` is null', async () => {
+    const golbatClient = fakeGolbatClient({
+      scanPokemon: async ({ min }: { min: { lat: number; lon: number } }) => ({
+        pokemon: [
+          {
+            id: min.lat >= 10 ? 'b' : 'a',
+            pokemon_id: 1,
+            updated: 1,
+            expire_timestamp_verified: true,
+          },
+        ],
+        limitReached: false,
+      }),
+    })
+    const state = createSubscriptionState({
+      category: 'pokemon',
+      viewport: VIEWPORT_A,
+    })
+    const controller = new AbortController()
+    const generator = subscribeCategory({
+      golbatClient,
+      state,
+      signal: controller.signal,
+      // Long enough that sleeping it out is indistinguishable from a hang:
+      // if the wake is dropped, this test times out rather than passing slowly.
+      pollIntervalMs: 60_000,
+    })
+
+    const first = await generator.next()
+    expect((first.value as any).added.map((e: any) => e.id)).toEqual(['a'])
+
+    // Awaiting the first `next()` leaves the generator parked on its `yield`,
+    // which is BEFORE `sleepOrWake` runs -- so `state.wake` is null here, every
+    // time, with no race to lose. A wake recorded now has to survive until the
+    // loop reaches its sleep, or the viewport move waits out the full interval.
+    updateSubscription(state, { viewport: VIEWPORT_B, filters: [] })
+
+    const second = await generator.next()
+    controller.abort()
+    await generator.next().catch(() => {})
+
+    expect((second.value as any).added.map((e: any) => e.id)).toEqual(['b'])
+    expect((second.value as any).removed).toEqual(['a'])
+  })
+})

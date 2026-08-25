@@ -33,7 +33,11 @@ interface SubscriptionState {
   viewport: Viewport
   filters: object[]
   generation: number
+  // Set only while the loop is parked in `sleepOrWake`.
   wake: (() => void) | null
+  // Set when a wake arrives while `wake` is null, i.e. while the loop is
+  // anywhere other than its sleep. Consumed by the next `sleepOrWake`.
+  wakePending: boolean
 }
 
 const POKEMON_POLL_INTERVAL_MS = 2_000
@@ -74,6 +78,7 @@ function createSubscriptionState({
     filters: filters ?? [],
     generation: 0,
     wake: null,
+    wakePending: false,
   }
 }
 
@@ -92,7 +97,15 @@ function updateSubscription(
   state.viewport = viewport
   state.filters = filters ?? []
   state.generation += 1
+  // `wake` is non-null only while the loop is actually asleep. The loop
+  // spends most of its time elsewhere -- suspended on its `yield` until the
+  // consumer asks for the next batch, and awaiting `pollOnce` -- so calling
+  // `wake` when it happens to be set is not enough on its own. Record the
+  // wake instead and let the next sleep consume it, or an update that lands
+  // in either of those windows waits out a full poll interval: 2s for
+  // pokemon, 30s for gyms.
   if (state.wake) state.wake()
+  else state.wakePending = true
 }
 
 async function pollOnce(
@@ -135,6 +148,24 @@ function sleepOrWake(
   signal: AbortSignal,
 ): Promise<void> {
   return new Promise((resolve) => {
+    // Both of these are the same hazard: the loop is only listening for a
+    // wake or an abort while it is parked here, and it spends most of its
+    // life elsewhere. `addEventListener` on a signal that has ALREADY
+    // aborted never fires, so without this check an abort raised while the
+    // loop was awake would sleep out a full interval before the `while`
+    // condition got to see it -- 30s of a leaked generator and timer per
+    // gym disconnect.
+    if (signal.aborted) {
+      resolve(undefined)
+      return
+    }
+    // A wake that arrived while the loop was awake is not lost, just
+    // deferred to here.
+    if (state.wakePending) {
+      state.wakePending = false
+      resolve(undefined)
+      return
+    }
     let done = false
     const finish = () => {
       if (done) return
