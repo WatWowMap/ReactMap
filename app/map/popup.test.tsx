@@ -1,6 +1,15 @@
 import { afterAll, afterEach, beforeAll, expect, test } from 'bun:test'
-import { cleanup, fireEvent, render, within } from '@testing-library/react'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import {
+  cleanup,
+  fireEvent,
+  render,
+  waitFor,
+  within,
+} from '@testing-library/react'
+import type { ReactElement } from 'react'
 import { ruleMap } from '../rules/rule-fixtures'
+import type { MasterfileClient, SpeciesEntry } from '../rules/use-names'
 import { setupDom, teardownDom } from '../test-setup'
 import { Popup } from './popup'
 import type { GymEntity, PokemonEntity } from './types'
@@ -32,6 +41,34 @@ const POKEMON: PokemonEntity = {
   iv: 87,
 }
 
+const SPECIES: SpeciesEntry[] = [
+  { id: 25, name: 'Pikachu', forms: [] },
+  {
+    id: 20,
+    name: 'Raticate',
+    forms: [{ id: 48, name: 'Alola', label: 'Raticate (Alola)' }],
+  },
+]
+
+/** The masterfile the popup's `useNames` reads, without a network. */
+function fakeNames(species: SpeciesEntry[] = []): MasterfileClient {
+  return { species: () => Promise.resolve(species) }
+}
+
+/**
+ * `useNames` is a react-query hook, so every render needs a provider --
+ * the app supplies one in `app.tsx`. An empty catalog is the pre-load
+ * state, where every id still falls back to its own `#id`.
+ */
+function renderPopup(node: ReactElement) {
+  const queryClient = new QueryClient({
+    defaultOptions: { queries: { retry: false } },
+  })
+  return render(
+    <QueryClientProvider client={queryClient}>{node}</QueryClientProvider>,
+  )
+}
+
 const GYM: GymEntity = {
   kind: 'gym',
   gymId: 'gym-1',
@@ -42,8 +79,15 @@ const GYM: GymEntity = {
 }
 
 test('positions itself at the fixed x/y it is given, not something it computes', () => {
-  const { container } = render(
-    <Popup entity={POKEMON} x={123} y={45} onClose={() => {}} now={0} />,
+  const { container } = renderPopup(
+    <Popup
+      entity={POKEMON}
+      x={123}
+      y={45}
+      onClose={() => {}}
+      now={0}
+      namesClient={fakeNames()}
+    />,
   )
   const card = container.querySelector('[data-slot="map-popup"]')
   expect(card).toBeTruthy()
@@ -52,8 +96,15 @@ test('positions itself at the fixed x/y it is given, not something it computes',
 })
 
 test("shows a pokemon entity's species, IV and countdown", () => {
-  const { container } = render(
-    <Popup entity={POKEMON} x={0} y={0} onClose={() => {}} now={0} />,
+  const { container } = renderPopup(
+    <Popup
+      entity={POKEMON}
+      x={0}
+      y={0}
+      onClose={() => {}}
+      now={0}
+      namesClient={fakeNames()}
+    />,
   )
   expect(within(container).getByText('Pokemon #25')).toBeTruthy()
   expect(within(container).getByText(/87% IV/)).toBeTruthy()
@@ -61,16 +112,30 @@ test("shows a pokemon entity's species, IV and countdown", () => {
 })
 
 test("shows a gym entity's team and battle state", () => {
-  const { container } = render(
-    <Popup entity={GYM} x={0} y={0} onClose={() => {}} now={0} />,
+  const { container } = renderPopup(
+    <Popup
+      entity={GYM}
+      x={0}
+      y={0}
+      onClose={() => {}}
+      now={0}
+      namesClient={fakeNames()}
+    />,
   )
   expect(within(container).getByText('Gym (in battle)')).toBeTruthy()
   expect(within(container).getByText('Team 2')).toBeTruthy()
 })
 
 test('the team swatch reads its colour from the data palette token, not a literal', () => {
-  const { container } = render(
-    <Popup entity={GYM} x={0} y={0} onClose={() => {}} now={0} />,
+  const { container } = renderPopup(
+    <Popup
+      entity={GYM}
+      x={0}
+      y={0}
+      onClose={() => {}}
+      now={0}
+      namesClient={fakeNames()}
+    />,
   )
   const swatch = container.querySelector('[aria-hidden="true"].rounded-full')
   expect((swatch as HTMLElement).style.backgroundColor).toBe(
@@ -84,7 +149,7 @@ test('the team swatch reads its colour from the data palette token, not a litera
  * else is fetched. `ruleMap` (`rule-fixtures.ts`) fills every column this
  * suite doesn't care about with its usual defaults.
  */
-function renderPopup({
+function renderPopupWithRules({
   matched,
   rules,
 }: {
@@ -92,7 +157,7 @@ function renderPopup({
   rules: ReturnType<typeof ruleMap>
 }) {
   const entity: PokemonEntity = { ...POKEMON, matched }
-  return render(
+  return renderPopup(
     <Popup
       entity={entity}
       x={0}
@@ -100,12 +165,13 @@ function renderPopup({
       onClose={() => {}}
       now={0}
       rules={rules}
+      namesClient={fakeNames()}
     />,
   )
 }
 
 test('the popup names every rule that matched', () => {
-  const { container } = renderPopup({
+  const { container } = renderPopupWithRules({
     matched: [7, 12],
     rules: ruleMap([
       { id: 7, name: 'Hundos', size: 'xl', glow: '#ffc83d', notify: true },
@@ -124,7 +190,7 @@ test('the popup names every rule that matched', () => {
 })
 
 test('the popup says what did not happen, too', () => {
-  const { container } = renderPopup({
+  const { container } = renderPopupWithRules({
     matched: [88],
     rules: ruleMap([{ id: 88, name: 'Rare spawns', size: 'lg' }]),
   })
@@ -137,7 +203,7 @@ test('the popup says what did not happen, too', () => {
 
 test('closing calls back exactly once per click', () => {
   let closeCount = 0
-  const { container } = render(
+  const { container } = renderPopup(
     <Popup
       entity={POKEMON}
       x={0}
@@ -146,6 +212,7 @@ test('closing calls back exactly once per click', () => {
         closeCount += 1
       }}
       now={0}
+      namesClient={fakeNames()}
     />,
   )
   const closeButton = within(container).getByRole('button', {
@@ -153,4 +220,37 @@ test('closing calls back exactly once per click', () => {
   })
   fireEvent.click(closeButton)
   expect(closeCount).toBe(1)
+})
+
+test('the title names the species once the catalog loads', async () => {
+  const { container } = renderPopup(
+    <Popup
+      entity={POKEMON}
+      x={0}
+      y={0}
+      onClose={() => {}}
+      now={0}
+      namesClient={fakeNames(SPECIES)}
+    />,
+  )
+  expect(within(container).getByText('Pokemon #25')).toBeTruthy()
+  await waitFor(() => {
+    expect(within(container).getByText('Pikachu')).toBeTruthy()
+  })
+})
+
+test('the title names the form, not just the species', async () => {
+  const { container } = renderPopup(
+    <Popup
+      entity={{ ...POKEMON, pokemonId: 20, form: 48 }}
+      x={0}
+      y={0}
+      onClose={() => {}}
+      now={0}
+      namesClient={fakeNames(SPECIES)}
+    />,
+  )
+  await waitFor(() => {
+    expect(within(container).getByText('Raticate (Alola)')).toBeTruthy()
+  })
 })

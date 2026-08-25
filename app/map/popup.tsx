@@ -10,6 +10,8 @@ import {
 import { XIcon } from 'lucide-react'
 import { resolveAppearance } from '../rules/resolve-appearance'
 import type { Rule } from '../rules/rule-types'
+import type { MasterfileClient, NamesLookup } from '../rules/use-names'
+import { useNames } from '../rules/use-names'
 import { formatCountdown } from './layers'
 import type { MapEntity } from './types'
 
@@ -36,12 +38,24 @@ export interface PopupProps {
    * (see `resolve-appearance.ts`), so naming them costs only this lookup.
    */
   rules?: ReadonlyMap<number, Rule>
+  /**
+   * Test seam: a fake in place of the default tRPC-backed masterfile
+   * client `useNames` otherwise reaches for. Same shape `FiltersPage`
+   * uses, for the same reason -- the catalog is a shared query, so this
+   * costs one lookup, not one fetch per popup.
+   */
+  namesClient?: MasterfileClient
 }
 
-function titleFor(entity: MapEntity): string {
-  return entity.kind === 'pokemon'
-    ? `Pokemon #${entity.pokemonId}`
-    : `Gym${entity.inBattle ? ' (in battle)' : ''}`
+function titleFor(entity: MapEntity, names: NamesLookup): string {
+  if (entity.kind !== 'pokemon') {
+    return `Gym${entity.inBattle ? ' (in battle)' : ''}`
+  }
+  // `label` resolves the form too, so an Alolan Raticate reads as one.
+  // Until the catalog loads it hands back its own `#id` fallback, which
+  // needs the prefix to read as a species rather than a bare number.
+  const name = names.label(entity.pokemonId, entity.form)
+  return name.startsWith('#') ? `Pokemon ${name}` : name
 }
 
 /** `resolveAppearance`'s size vocabulary, as the word a person reads. */
@@ -126,7 +140,9 @@ export function Popup({
   onClose,
   now = Date.now(),
   rules,
+  namesClient,
 }: PopupProps) {
+  const names = useNames(namesClient ? { client: namesClient } : undefined)
   const lines =
     entity.kind === 'pokemon' && rules
       ? appearanceLines(entity.matched ?? [], rules)
@@ -140,7 +156,7 @@ export function Popup({
       style={{ left: x, top: y - 12 }}
     >
       <CardHeader>
-        <CardTitle>{titleFor(entity)}</CardTitle>
+        <CardTitle>{titleFor(entity, names)}</CardTitle>
         <CardAction>
           <Button
             variant="ghost"
