@@ -267,3 +267,32 @@ test('a refused update leaves rules_version alone', async () => {
   ).rejects.toThrow()
   expect(await currentRulesVersion(db, ownerProfileId)).toBe(before)
 })
+
+// `updateInput.patch` accepts `exclusions`, so the repository has to honour
+// it. It used to drop the field silently: the exclusion list a client had
+// just saved was never written and no error said so.
+
+test('updating replaces the exclusion list, and an empty list clears it', async () => {
+  const ids = await createRules(
+    db,
+    'u1',
+    profileId,
+    { name: 'Hundos', exclusions: [129] },
+    [null],
+  )
+
+  await updateRules(db, 'u1', ids, { exclusions: [10, 20] })
+  const [replaced] = await listRules(db, 'u1', profileId)
+  expect(replaced?.exclusions.sort((a, b) => a - b)).toEqual([10, 20])
+
+  await updateRules(db, 'u1', ids, { exclusions: [] })
+  const [cleared] = await listRules(db, 'u1', profileId)
+  expect(cleared?.exclusions).toEqual([])
+})
+
+test('an update cannot add an exclusion to a rule that names a species', async () => {
+  const ids = await createRules(db, 'u1', profileId, { name: 'Rare' }, [147])
+  await expect(
+    updateRules(db, 'u1', ids, { exclusions: [129] }),
+  ).rejects.toThrow(/exclusion/i)
+})

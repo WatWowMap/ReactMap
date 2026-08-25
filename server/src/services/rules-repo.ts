@@ -301,6 +301,42 @@ async function createRules(
 }
 
 /**
+ * Replaces the exclusion list on every rule in `ruleIds`. An empty list
+ * clears them; the rows are rewritten rather than merged, because a patch
+ * carrying `exclusions` states what the list should be, not what to add.
+ */
+async function replaceExclusions(
+  tx: any,
+  ruleIds: number[],
+  exclusions: number[],
+): Promise<void> {
+  if (exclusions.length) {
+    // The same invariant `createRules` enforces, applied to rules that
+    // already exist: a rule narrowed to one species has nothing to carve.
+    const conditions = await tx
+      .select({ speciesId: rulePokemon.speciesId })
+      .from(rulePokemon)
+      .where(inArray(rulePokemon.ruleId, ruleIds))
+    if (conditions.some((row: any) => row.speciesId != null)) {
+      throw new Error(
+        'A rule that names a species cannot carry an exclusion: there is nothing to exclude from',
+      )
+    }
+  }
+
+  await tx.delete(ruleExclusion).where(inArray(ruleExclusion.ruleId, ruleIds))
+  if (!exclusions.length) return
+
+  await tx
+    .insert(ruleExclusion)
+    .values(
+      ruleIds.flatMap((ruleId) =>
+        exclusions.map((speciesId) => ({ ruleId, speciesId, formId: null })),
+      ),
+    )
+}
+
+/**
  * Applies one patch to every rule in `ruleIds`. This is what an edit to a
  * grouped card does: the client sends the whole group's ids and the one
  * field that changed, and the group splits or stays whole on its own.
@@ -328,6 +364,11 @@ async function updateRules(
         .update(rulePokemon)
         .set(conditionValues)
         .where(inArray(rulePokemon.ruleId, ruleIds))
+    }
+    // `exclusions` lives on its own table, so `splitInput` never carries it.
+    // Absent means "leave the list alone"; present means "make it this".
+    if (patch.exclusions !== undefined) {
+      await replaceExclusions(tx, ruleIds, patch.exclusions)
     }
 
     await bumpRulesVersion(tx, userId, profileIds)
