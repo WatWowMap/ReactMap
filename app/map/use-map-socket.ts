@@ -11,7 +11,7 @@
 
 import { useEffect, useRef } from 'react'
 import { useEntityStore } from './entity-store'
-import { profilingMap, profRecord } from './profile-map'
+import { profCount, profilingMap, profRecord } from './profile-map'
 import type { MapSocket, SocketLike } from './socket-client'
 import { createMapSocket, defaultSocketUrl } from './socket-client'
 import type { Bounds } from './types'
@@ -73,6 +73,7 @@ export function useMapSocket(
     const client = createMapSocket({
       url: url ?? defaultSocketUrl(),
       onDelta: (delta) => {
+        profCount(`socket delta: ${delta.category}`)
         useEntityStore.getState().applyDelta(delta)
         onDeltaRef.current?.(delta)
       },

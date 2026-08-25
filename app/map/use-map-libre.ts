@@ -4,6 +4,7 @@ import { MapboxOverlay } from '@deck.gl/mapbox'
 import { Map as MapLibreMap, NavigationControl } from 'maplibre-gl'
 import { type RefObject, useEffect, useRef, useState } from 'react'
 import { resolveBasemapStyle } from './basemap'
+import { profCount, profilingMap, profTrackLayerData } from './profile-map'
 import type { MapEntity, Viewport } from './types'
 
 export interface Camera {
@@ -220,6 +221,7 @@ export function useMapLibre({
     overlayRef.current = overlay
 
     const handleMoveEnd = () => {
+      profCount('maplibre moveend')
       onViewportChangeRef.current?.(viewportFrom(map))
       const center = map.getCenter()
       onCameraChangeRef.current?.({
@@ -238,11 +240,13 @@ export function useMapLibre({
     // See task-5-report.md for why this reprojects instead of riding a
     // MapLibre `Marker`.
     const handleMove = () => {
+      profCount('maplibre move frames')
       const current = anchorRef.current
       if (!current) {
         setScreenPosition(null)
         return
       }
+      profCount('setScreenPosition (move frame)')
       const point = map.project([current.lon, current.lat])
       setScreenPosition({ x: point.x, y: point.y })
     }
@@ -253,6 +257,13 @@ export function useMapLibre({
     onViewportChangeRef.current?.(viewportFrom(map))
 
     mapRef.current = map
+    // Under the profiler flag only, so a console session can drive the
+    // camera itself. Counting what one settled camera move costs needs a
+    // move nobody had to perform by hand, and `jumpTo` fires the whole
+    // movestart/move/moveend sequence synchronously.
+    if (profilingMap()) {
+      Object.assign(window, { __map: map, __overlay: overlay })
+    }
     return () => {
       map.off('moveend', handleMoveEnd)
       map.off('move', handleMove)
@@ -269,6 +280,7 @@ export function useMapLibre({
   }, [])
 
   useEffect(() => {
+    profTrackLayerData(layers ?? [])
     overlayRef.current?.setProps({ layers: layers ?? [] })
   }, [layers])
 

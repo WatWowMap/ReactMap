@@ -18,7 +18,7 @@ import {
   POKEMON_LABEL_LAYER_ID,
 } from './layers'
 import { Popup } from './popup'
-import { profilingMap, profRecord } from './profile-map'
+import { profCount, profilingMap, profRecord } from './profile-map'
 import { createRingAtlas } from './ring-icon'
 import { loadSpriteIndex } from './sprite-source'
 import type { MapEntity, Viewport } from './types'
@@ -67,6 +67,7 @@ const CURRENT_PROFILE_ID = 1
  * NavigationControl and attribution end up unstyled and mispositioned.
  */
 export function MapCanvas({ initialCamera, onCameraChange }: MapCanvasProps) {
+  profCount('render: MapCanvas')
   // Lazy-initialized on the ref directly (a documented React pattern) so
   // the atlas's LRU cache is created exactly once for the component's
   // lifetime, not rebuilt on every render.
@@ -245,6 +246,7 @@ export function MapCanvas({ initialCamera, onCameraChange }: MapCanvasProps) {
       now: 0,
       ...(viewport ? { viewport } : {}),
     })
+    profCount('memo: cluster + build layers')
     profRecord('cluster + build layers', performance.now() - profAt, {
       inPokemon: pokemon.length,
       inGyms: gyms.length,
@@ -258,6 +260,7 @@ export function MapCanvas({ initialCamera, onCameraChange }: MapCanvasProps) {
   const built = useMemo(() => {
     const atlas = atlasRef.current
     if (!atlas || !clustered) return EMPTY_LAYERS
+    profCount('memo: text layer rebuild')
     // Only the text layer reads the clock, so only it is rebuilt on a tick.
     return {
       layers: clustered.layers.map((layer) =>

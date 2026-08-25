@@ -114,3 +114,70 @@ function report(): void {
     ]
   }, 0)
 }
+
+/**
+ * Counters, for the questions timings cannot answer: how MANY times did
+ * this happen during one pan? A render count is not a duration, and the
+ * two get confused -- a hop that measures 0.2ms is not cheap if it runs
+ * sixty times per drag.
+ *
+ * Same gate as the timings above, so off is a boolean check and a return.
+ * Read them from the console with `__mapCounters()`, and zero them with
+ * `__mapResetCounters()` so a count can be scoped to one gesture.
+ */
+const counters = new Map<string, number>()
+
+export function profCount(name: string, by = 1): void {
+  if (!enabled) return
+  counters.set(name, (counters.get(name) ?? 0) + by)
+}
+
+export function profCounters(): Record<string, number> {
+  return Object.fromEntries([...counters.entries()].sort())
+}
+
+/**
+ * Zeroes the counts so the next gesture can be counted on its own. The
+ * layer-data identity memory below is deliberately NOT cleared: it is
+ * what "did this reference survive?" is asked against, and clearing it
+ * would make the first `setProps` after a reset unanswerable.
+ */
+export function profResetCounters(): void {
+  counters.clear()
+}
+
+/**
+ * The reference-identity question the GPU actually cares about.
+ *
+ * deck.gl re-uploads a layer's buffers when its `data` prop changes
+ * identity, and is cheap when a new `Layer` instance carries the SAME
+ * `data`. Counting new `Layer` instances therefore says nothing on its
+ * own; this counts, per layer id, how many of those instances arrived
+ * with data deck.gl had already uploaded.
+ */
+const lastLayerData = new Map<string, unknown>()
+
+export function profTrackLayerData(
+  layers: readonly { id: string; props?: { data?: unknown } }[],
+): void {
+  if (!enabled) return
+  profCount('setProps calls')
+  for (const layer of layers) {
+    profCount('layer instances')
+    const seen = lastLayerData.has(layer.id)
+    const previous = lastLayerData.get(layer.id)
+    const data = layer.props?.data
+    lastLayerData.set(layer.id, data)
+    if (!seen) continue
+    profCount(
+      previous === data ? `data kept: ${layer.id}` : `data NEW: ${layer.id}`,
+    )
+  }
+}
+
+if (enabled && typeof window !== 'undefined') {
+  Object.assign(window, {
+    __mapCounters: profCounters,
+    __mapResetCounters: profResetCounters,
+  })
+}
