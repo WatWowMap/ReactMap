@@ -70,7 +70,14 @@ const POKEMON_CONDITION_FIELDS = [
 ] as const
 
 /** The columns on `rule` itself that a caller may set. */
-const RULE_FIELDS = ['category', 'name', 'size', 'glow', 'notify'] as const
+const RULE_FIELDS = [
+  'category',
+  'name',
+  'size',
+  'glow',
+  'notify',
+  'enabled',
+] as const
 
 type PokemonConditionField = (typeof POKEMON_CONDITION_FIELDS)[number]
 
@@ -90,6 +97,8 @@ interface RuleInput
   size?: string | null | undefined
   glow?: string | null | undefined
   notify?: boolean | undefined
+  /** False switches the rule off without deleting it. Defaults to true. */
+  enabled?: boolean | undefined
   /** Species ids excluded from an otherwise-matching any-species rule. */
   exclusions?: number[] | undefined
 }
@@ -102,6 +111,7 @@ interface StoredRule {
   size: string | null
   glow: string | null
   notify: boolean
+  enabled: boolean
   speciesId: number | null
   formId: number | null
   pvpTargetSpecies: number | null
@@ -256,6 +266,10 @@ async function listRules(
       size: row.rule.size,
       glow: row.rule.glow,
       notify: row.rule.notify,
+      // MySQL hands a tinyint back, and every consumer of this field
+      // decides visibility on it, so it crosses as a real boolean rather
+      // than as a 0 that is not `=== false`.
+      enabled: Boolean(row.rule.enabled),
       speciesId: conditions.speciesId ?? null,
       exclusions: exclusionsByRule.get(row.rule.id) ?? [],
     }

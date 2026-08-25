@@ -293,3 +293,49 @@ test('an update cannot add an exclusion to a rule that names a species', async (
     updateRules(db, 'u1', ids, { exclusions: [129] }),
   ).rejects.toThrow(/exclusion/i)
 })
+
+// --- `enabled` --------------------------------------------------------------
+// A rule can be switched off without being deleted. The column defaults to
+// true, which is what makes adding it safe for rows that already exist, and
+// a toggle is a write like any other -- so it bumps `rules_version` or no
+// other device ever learns the map changed.
+
+test('a rule created without an explicit value is enabled', async () => {
+  await createRules(db, 'u1', profileId, { name: 'A' }, [null])
+  const [created] = await listRules(db, 'u1', profileId)
+  expect(created?.enabled).toBe(true)
+})
+
+test('disabling a rule persists, and re-enabling brings it back', async () => {
+  const ids = await createRules(db, 'u1', profileId, { name: 'A' }, [null])
+
+  await updateRules(db, 'u1', ids, { enabled: false })
+  const [disabled] = await listRules(db, 'u1', profileId)
+  expect(disabled?.enabled).toBe(false)
+
+  await updateRules(db, 'u1', ids, { enabled: true })
+  const [reEnabled] = await listRules(db, 'u1', profileId)
+  expect(reEnabled?.enabled).toBe(true)
+})
+
+test('disabling a rule bumps rules_version', async () => {
+  const ids = await createRules(db, 'u1', profileId, { name: 'A' }, [null])
+  const before = await currentRulesVersion(db, profileId)
+  await updateRules(db, 'u1', ids, { enabled: false })
+  expect(await currentRulesVersion(db, profileId)).toBe(before + 1)
+})
+
+test('disabling one member of a group leaves the others enabled', async () => {
+  const ids = await createRules(
+    db,
+    'u1',
+    profileId,
+    { name: 'Rare' },
+    SPECIES_25,
+  )
+  await updateRules(db, 'u1', [ids[0]!], { enabled: false })
+
+  const rows = await listRules(db, 'u1', profileId)
+  expect(rows.filter((r) => r.enabled)).toHaveLength(24)
+  expect(rows.find((r) => r.id === ids[0])?.enabled).toBe(false)
+})

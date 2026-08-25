@@ -106,6 +106,7 @@ const ruleShape = {
   size: z.string().max(8).nullable().optional(),
   glow: z.string().max(16).nullable().optional(),
   notify: z.boolean().optional(),
+  enabled: z.boolean().optional(),
   exclusions: z.array(z.number().int()).max(MAX_SPECIES).optional(),
 }
 

@@ -35,6 +35,9 @@ const rule = mysqlTable(
     size: varchar('size', { length: 8 }),
     glow: varchar('glow', { length: 16 }),
     notify: boolean('notify').default(false).notNull(),
+    // A rule the user switched off: kept, listed, and editable, but it
+    // matches nothing until it is switched back on.
+    enabled: boolean('enabled').default(true).notNull(),
   },
   (table) => [
     index('rule_user_id_profile_id_idx').on(table.userId, table.profileId),
