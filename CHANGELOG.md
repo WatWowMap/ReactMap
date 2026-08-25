@@ -1,3 +1,25 @@
+# [1.51.0](https://github.com/WatWowMap/ReactMap/compare/v1.50.2...v1.51.0) (2026-08-25)
+
+
+### Bug Fixes
+
+* **geocoder:** correct the Photon mapping against a live index ([d3d9347](https://github.com/WatWowMap/ReactMap/commit/d3d9347356afb7d88ebbb1c76464d10315776707))
+* **geocoder:** detect Nominatim's reverse shape on the Photon path ([73d14bd](https://github.com/WatWowMap/ReactMap/commit/73d14bd7ec0636ce5971146e2dc1ce62c9297a06))
+* **geocoder:** do not query the upstream for an empty search ([02de8dc](https://github.com/WatWowMap/ReactMap/commit/02de8dc2586a67425681791bcef48cb8c4a7d175))
+* **geocoder:** keep the caller's shape on failure and resolve district results ([0e168b6](https://github.com/WatWowMap/ReactMap/commit/0e168b6f1118feb7bc6df6d58bf18642606fe9f4))
+* **geocoder:** make the provider mismatch observable against a real Nominatim host ([170258c](https://github.com/WatWowMap/ReactMap/commit/170258ce9e2d1e1089b08f282f4911bb42bea6ed))
+* **geocoder:** narrow the Photon signature and carry neighborhood end to end ([70eedcd](https://github.com/WatWowMap/ReactMap/commit/70eedcd2c506748d9e04c2b3b1015b8bc37280af))
+* **geocoder:** only inherit Poracle's provider alongside its URL ([b647126](https://github.com/WatWowMap/ReactMap/commit/b6471267dd66b2852abe3d68eb9d7c94d98a8458))
+* **geocoder:** reject non-Nominatim problem bodies instead of passing a blank result ([6b37fd3](https://github.com/WatWowMap/ReactMap/commit/6b37fd3230d7828d673ca51732fa8d28b4510872))
+* **geocoder:** report a Photon URL left on the Nominatim provider ([c1e868e](https://github.com/WatWowMap/ReactMap/commit/c1e868e518dfda4c3ad25f59d53c5cb51c47e75f))
+* **geocoder:** stop a provider mismatch from crashing the server ([ddf394d](https://github.com/WatWowMap/ReactMap/commit/ddf394dfd11bd2134043ba96b7045734139cff93))
+* **geocoder:** validate coordinates and keep transient failures out of provider advice ([fb398d7](https://github.com/WatWowMap/ReactMap/commit/fb398d783e06c3e80418d5610c55ed06e15c5a8b))
+
+
+### Features
+
+* **geocoder:** derive geocoderProvider from Poracle's remote config ([bbd43da](https://github.com/WatWowMap/ReactMap/commit/bbd43dae161869a566dcf4d3da76d6ccdbaaf14a))
+
 ## [1.50.2](https://github.com/WatWowMap/ReactMap/compare/v1.50.1...v1.50.2) (2026-08-23)
 
 
