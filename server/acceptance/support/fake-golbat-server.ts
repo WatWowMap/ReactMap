@@ -146,8 +146,16 @@ function startFakeGolbat(): FakeGolbat {
       }
 
       // decoder api_fort.go / routes_huma.go:236 -- POST /api/fort/scan
+      //
+      // 200, unlike the pokemon scan above. This is not an oversight on
+      // either side: `registerFortScanRoutes` sets
+      // `DefaultStatus: http.StatusOK` on all eight fort_in_memory-gated
+      // endpoints (routes_huma.go:187,205,223,241,259,277,295,313), while
+      // only the pokemon routes use `http.StatusAccepted`. Confirmed live
+      // against the production Golbat at amp4:4001, which answers 200 to a
+      // small-viewport `POST /api/fort/scan`.
       if (url.pathname === '/api/fort/scan' && request.method === 'POST') {
-        return Response.json(fortHandler(body), { status: 202 })
+        return Response.json(fortHandler(body))
       }
 
       // routes_huma.go:72 -- GET /api/status
