@@ -8,6 +8,7 @@
  * doing so here is exactly how the key format leaked back out before.
  */
 
+import type React from 'react'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { Button } from '../components/ui/button'
 import { Checkbox } from '../components/ui/checkbox'
@@ -32,6 +33,27 @@ export interface SpeciesEntry {
  * nothing else -- selecting a form never implies its base species.
  */
 export type SpeciesSelection = number | { speciesId: number; formId: number }
+
+/**
+ * The UICONS style the tiles draw from when the caller names none. This
+ * is the same default style 1.x ships in `config/local.example.json`, and
+ * the URL shape is UICONS' own (`uicons.js`'s `pokemon()`): `{id}.webp`
+ * is a species' default form art, `{id}_f{formId}.webp` one specific
+ * form. A style that has no asset for a particular form simply 404s, and
+ * the row falls back to the species art -- see `handleFormArtError`.
+ */
+export const DEFAULT_ICON_BASE =
+  'https://raw.githubusercontent.com/WatWowMap/wwm-uicons-webp/main'
+
+/** The art for one species (`formId` omitted) or one of its forms. */
+export function speciesIconUrl(
+  base: string,
+  speciesId: number,
+  formId?: number,
+): string {
+  const suffix = formId ? `_f${formId}` : ''
+  return `${base}/pokemon/${speciesId}${suffix}.webp`
+}
 
 function isWholeSpecies(
   selection: SpeciesSelection,
@@ -95,16 +117,31 @@ function filterSpecies(species: SpeciesEntry[], term: string): FilteredEntry[] {
   return results
 }
 
+/**
+ * Not every style draws every form. A form whose art 404s falls back to
+ * its species' default art once -- the guard is what stops a missing
+ * species asset looping the same failing request forever.
+ */
+function handleFormArtError(event: React.SyntheticEvent<HTMLImageElement>) {
+  const img = event.currentTarget
+  const fallback = img.dataset.speciesArt
+  if (!fallback || img.src === fallback) return
+  img.src = fallback
+}
+
 export interface SpeciesPickerProps {
   species: SpeciesEntry[]
   selected?: SpeciesSelection[]
   onChange?: (selection: SpeciesSelection[]) => void
+  /** A UICONS style root, so a deployment's configured style can be passed in. */
+  iconBase?: string
 }
 
 export function SpeciesPicker({
   species,
   selected = [],
   onChange,
+  iconBase = DEFAULT_ICON_BASE,
 }: SpeciesPickerProps) {
   const [term, setTerm] = useState('')
   const [expanded, setExpanded] = useState<ReadonlySet<number>>(new Set())
@@ -219,6 +256,14 @@ export function SpeciesPicker({
           return (
             <div key={entry.id} className="flex flex-col gap-1 py-1">
               <div className="flex items-center gap-2">
+                <img
+                  className="size-8 shrink-0"
+                  src={speciesIconUrl(iconBase, entry.id)}
+                  // Decorative: the species name sits right beside it, so
+                  // an alt would only make a screen reader say it twice.
+                  alt=""
+                  loading="lazy"
+                />
                 <Checkbox
                   aria-label={entry.name}
                   checked={checked}
@@ -241,6 +286,14 @@ export function SpeciesPicker({
               {isExpanded &&
                 visibleForms.map((form) => (
                   <div key={form.id} className="ml-6 flex items-center gap-2">
+                    <img
+                      className="size-6 shrink-0"
+                      src={speciesIconUrl(iconBase, entry.id, form.id)}
+                      data-species-art={speciesIconUrl(iconBase, entry.id)}
+                      onError={handleFormArtError}
+                      alt=""
+                      loading="lazy"
+                    />
                     <Checkbox
                       aria-label={form.label}
                       checked={selected.some((s) =>

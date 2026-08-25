@@ -2,7 +2,7 @@ import { afterAll, afterEach, beforeAll, expect, test, vi } from 'bun:test'
 import { cleanup, fireEvent, render } from '@testing-library/react'
 import { setupDom, teardownDom } from '../test-setup'
 import type { SpeciesEntry, SpeciesSelection } from './species-picker'
-import { SpeciesPicker } from './species-picker'
+import { DEFAULT_ICON_BASE, SpeciesPicker } from './species-picker'
 
 beforeAll(setupDom)
 afterAll(teardownDom)
@@ -126,4 +126,37 @@ test('selecting a form alone does not select its base species', () => {
   fireEvent.click(getByRole('checkbox', { name: 'Raticate (Alola)' }))
   // (20, 46) alone. Selecting a form must not imply (20, null).
   expect(onChange).toHaveBeenCalledWith([{ speciesId: 20, formId: 46 }])
+})
+
+test('each species tile draws its default form art', () => {
+  const { container } = renderPicker({ species: [RATICATE] })
+  const art = container.querySelectorAll('img')
+  expect(art).toHaveLength(1)
+  expect(art[0]?.getAttribute('src')).toBe(
+    `${DEFAULT_ICON_BASE}/pokemon/20.webp`,
+  )
+})
+
+test('an expanded form row draws that form art, not the species art', () => {
+  const { container, getByRole } = renderPicker({ species: [RATICATE] })
+  fireEvent.click(getByRole('button', { name: /expand raticate/i }))
+  const sources = [...container.querySelectorAll('img')].map((img) =>
+    img.getAttribute('src'),
+  )
+  expect(sources).toEqual([
+    `${DEFAULT_ICON_BASE}/pokemon/20.webp`,
+    `${DEFAULT_ICON_BASE}/pokemon/20_f46.webp`,
+  ])
+})
+
+test('a caller can point the art at its own configured UICONS style', () => {
+  const { container } = render(
+    <SpeciesPicker
+      species={normalizeSpecies([DRATINI])}
+      iconBase="https://icons.example/style"
+    />,
+  )
+  expect(container.querySelector('img')?.getAttribute('src')).toBe(
+    'https://icons.example/style/pokemon/147.webp',
+  )
 })
