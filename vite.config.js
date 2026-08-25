@@ -30,7 +30,27 @@ const viteConfig = defineConfig(({ mode }) => {
   const appDir = `${resolve(__dirname, 'app')}/`
   const isRelease = process.argv.includes('-r')
   const isDevelopment = mode === 'development'
-  const serverPort = +(env.PORT || config.getSafe('port') || '8080')
+  // `PORT` means the BACKEND's port by this repo's convention, and vite binds
+  // one above it. But tooling that launches vite with `--port` often exports
+  // `PORT` to say the same thing about vite itself, and then this proxies
+  // `/api` straight back at the dev server: every call answers
+  // `EADDRNOTAVAIL` against vite's own port instead of reaching the API.
+  // When both numbers agree, `PORT` was describing vite, so the backend port
+  // has to come from config instead.
+  const cliPortAt = process.argv.indexOf('--port')
+  const cliPort = cliPortAt > -1 ? +process.argv[cliPortAt + 1] : undefined
+  const envPort = env.PORT ? +env.PORT : undefined
+  // Falling back to `config.getSafe('port')` does NOT work here:
+  // custom-environment-variables.json maps PORT onto config.port, so when
+  // PORT was describing vite the config copy carries the same wrong number.
+  // The checked-in default is the only value that env cannot reach.
+  const defaultServerPort = +(
+    JSON.parse(
+      fs.readFileSync(resolve(__dirname, 'config/default.json'), 'utf8'),
+    ).port || 8080
+  )
+  const serverPort =
+    envPort && envPort !== cliPort ? envPort : defaultServerPort
 
   const pkg = JSON.parse(
     fs.readFileSync(resolve(__dirname, 'package.json'), 'utf8'),
