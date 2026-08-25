@@ -73,6 +73,24 @@ test('leaves nullable stats off rather than inventing them', () => {
   expect(entity?.expiresAtVerified).toBe(false)
 })
 
+test('carries the matched rule ids through to the entity', () => {
+  const entity = translatePokemon(rawPokemon({ matched: [7, 12] }))
+  expect(entity?.matched).toEqual([7, 12])
+})
+
+test('keeps only numeric matched ids, and omits matched when absent', () => {
+  // The wire type says number[], but this is the one seam that sees the
+  // raw payload, and `resolveAppearance` looks every id up in a map.
+  const mixed = translatePokemon(
+    rawPokemon({ matched: [7, 'nine', null, 12] as unknown as number[] }),
+  )
+  expect(mixed?.matched).toEqual([7, 12])
+  expect(translatePokemon(rawPokemon())).not.toHaveProperty('matched')
+  expect(translatePokemon(rawPokemon({ matched: null }))).not.toHaveProperty(
+    'matched',
+  )
+})
+
 test('drops a pokemon missing anything a marker cannot be placed without', () => {
   expect(translatePokemon(rawPokemon({ id: null }))).toBeNull()
   expect(translatePokemon(rawPokemon({ lat: null }))).toBeNull()
