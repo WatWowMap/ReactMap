@@ -108,11 +108,21 @@ const viteConfig = defineConfig(({ mode }) => {
                   const wantsHtml = (request.headers.accept || '').includes(
                     'text/html',
                   )
-                  // A path with an extension is an asset; /index.html stays
-                  // reachable by name so the 1.0 client can still be opened
-                  // deliberately until it is retired.
-                  const isAsset = path.includes('.')
-                  if (wantsHtml && !isAsset && !path.startsWith('/@')) {
+                  // An asset ends in an extension. Testing for any dot at
+                  // all is wrong here: ReactMap's deep links carry decimal
+                  // coordinates (/@/43.165/-77.687/15), so a contains-a-dot
+                  // test reads every one of them as a file and hands the
+                  // visitor the 1.0 client. /index.html stays reachable by
+                  // name so 1.0 can still be opened deliberately.
+                  const isAsset = /\.[a-z0-9]+$/i.test(path)
+                  // Vite's own internals live under /@vite/, /@fs/, /@id/ and
+                  // /@react-refresh. ReactMap's 1.0 deep links are /@/lat/lon,
+                  // which is a ROUTE and must reach the client -- so match
+                  // vite's prefixes exactly rather than every path starting
+                  // with an @.
+                  const isViteInternal =
+                    /^\/@(vite|fs|id|react-refresh)\b/.test(path)
+                  if (wantsHtml && !isAsset && !isViteInternal) {
                     request.url = '/app.html'
                   }
                   next()
