@@ -179,7 +179,10 @@ export function buildGymIconLayer(
         mask: true,
       }
     },
-    getColor: (entity) => readTeamColor(entity.team, root),
+    // A gym whose team nobody has told us yet is drawn uncontested. That
+    // is a rendering fallback, not a stored value: the store leaves the
+    // field absent until a message actually carries it (see GymEntity).
+    getColor: (entity) => readTeamColor(entity.team ?? 0, root),
     getSize: 28,
   })
 }

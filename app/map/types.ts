@@ -57,18 +57,39 @@ export interface PokemonEntity {
   lat: number
   lon: number
   expiresAt: number
+  /**
+   * Whether `expiresAt` is a despawn time the scanner actually observed
+   * rather than Golbat's twenty-minute guess. Only a verified expiry is
+   * safe to evict on the client's own clock: an unverified one gets
+   * extended while the spawn is still being seen, so a client that
+   * dropped it would lose a live pokemon the server believes it has
+   * already delivered, and nothing would re-send it.
+   *
+   * Optional because a source may not know -- the fixtures do not -- and
+   * "unknown" must behave like "unverified", which is the reading a
+   * missing field already gets.
+   */
+  expiresAtVerified?: boolean
   iv?: number
   level?: number
   size?: number
 }
 
+/**
+ * `team` and `inBattle` are optional because a gym is not always
+ * delivered whole. On a Golbat with `fort_in_memory` off -- the default
+ * -- gyms arrive only as webhook patches, and a raid webhook genuinely
+ * does not know whether the gym is in battle. Both columns are nullable
+ * on the scan response too (decoder/api_gym.go). Rendering picks a
+ * fallback; the store does not invent one.
+ */
 export interface GymEntity {
   kind: 'gym'
   gymId: string
   lat: number
   lon: number
-  team: Team
-  inBattle: boolean
+  team?: Team
+  inBattle?: boolean
 }
 
 export type MapEntity = PokemonEntity | GymEntity

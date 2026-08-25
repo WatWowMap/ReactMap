@@ -79,10 +79,10 @@ export function Popup({ entity, x, y, onClose, now = Date.now() }: PopupProps) {
               aria-hidden="true"
               className="size-2.5 shrink-0 rounded-full"
               style={{
-                backgroundColor: `var(--color-team-${entity.team})`,
+                backgroundColor: `var(--color-team-${entity.team ?? 0})`,
               }}
             />
-            Team {entity.team}
+            {entity.team === undefined ? 'Team unknown' : `Team ${entity.team}`}
           </CardDescription>
         )}
       </CardContent>
