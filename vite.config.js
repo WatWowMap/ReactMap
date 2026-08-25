@@ -98,7 +98,21 @@ const viteConfig = defineConfig(({ mode }) => {
               name: 'reactmap-dev-root-is-the-2-0-client',
               configureServer(server) {
                 server.middlewares.use((request, _response, next) => {
-                  if (request.url === '/' || request.url?.startsWith('/?')) {
+                  // Vite's history fallback serves index.html, which is the
+                  // 1.0 client. That makes every 2.0 route -- /filters, /map,
+                  // and any deep link -- silently load 1.0 in dev while the
+                  // built server serves app.html for all of them. Rewriting
+                  // only `/` was not enough: it fixed the landing page and
+                  // left every route behind it wrong.
+                  const [path = '/'] = (request.url || '/').split('?')
+                  const wantsHtml = (request.headers.accept || '').includes(
+                    'text/html',
+                  )
+                  // A path with an extension is an asset; /index.html stays
+                  // reachable by name so the 1.0 client can still be opened
+                  // deliberately until it is retired.
+                  const isAsset = path.includes('.')
+                  if (wantsHtml && !isAsset && !path.startsWith('/@')) {
                     request.url = '/app.html'
                   }
                   next()
