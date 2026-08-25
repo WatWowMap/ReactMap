@@ -244,6 +244,12 @@ const viteConfig = defineConfig(({ mode }) => {
           target: `http://0.0.0.0:${serverPort}`,
           changeOrigin: true,
           secure: false,
+          // The map's delta transport upgrades at `/api/ws`. Without this
+          // the dev proxy answers the upgrade with a plain HTTP response
+          // and the browser socket sits in CONNECTING forever -- no open,
+          // no error, no close, so the client's reconnect never fires
+          // either and the map is silently empty.
+          ws: true,
         },
         '/auth': {
           target: `http://0.0.0.0:${serverPort}`,
