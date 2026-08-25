@@ -31,6 +31,7 @@
     "test": "bun test",
     "test:acceptance": "bun test ./server/acceptance/auth-flow.acceptance.ts",
     "test:acceptance:transport": "bun test ./server/acceptance/transport.acceptance.ts",
+    "test:acceptance:filters": "bun test ./server/acceptance/filters.acceptance.ts",
     "typecheck": "tsc -p tsconfig.app.json --noEmit && tsc -p tsconfig.server.json --noEmit",
     "typecheck:server": "tsc -p tsconfig.server.json --noEmit",
     "prepare": "husky install",
