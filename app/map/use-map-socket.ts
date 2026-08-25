@@ -36,16 +36,25 @@ export interface UseMapSocketOptions {
 /**
  * How long the camera has to sit still before the new bounds are sent.
  *
- * Every settled camera move is a fresh subscribe for both categories, and
- * on the server each one is a full Golbat scan of the new area. A flick
- * pan or a run of zoom steps fires several of those in under a second,
- * and every one but the last is for an area the user has already left.
- * Waiting for the camera to settle turns that run into one subscribe.
+ * Zero, because the premise this existed for was wrong. It was added to
+ * coalesce "a flick pan or a run of zoom steps" into one subscribe, on the
+ * assumption that a pan fires several `moveend` events. It does not:
+ * MapLibre fires `moveend` once when movement stops, inertia included, so
+ * a drag was always exactly one subscribe and the delay bought nothing.
+ * What it cost was a floor under every pan -- measured at 201ms against a
+ * 212ms poll, so roughly half the wait, to coalesce events that were not
+ * arriving.
  *
- * Short enough to read as immediate, and small next to the scan it
- * guards.
+ * Repeated zoom-button clicks are the one case that really does fire
+ * several in a row. An extra scan there is cheaper than taxing every pan,
+ * which is why this is zero rather than a smaller non-zero number.
+ *
+ * Still routed through a timer rather than removed: a zero-delay timeout
+ * defers to the next macrotask, which batches the two categories' sends
+ * within one tick, and it keeps the knob for anyone who finds a case that
+ * needs it.
  */
-const VIEWPORT_SETTLE_MS = 200
+const VIEWPORT_SETTLE_MS = 0
 
 export function useMapSocket(
   bounds: Bounds | null,
