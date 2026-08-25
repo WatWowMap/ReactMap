@@ -59,6 +59,18 @@ export const useEntityStore = create<EntityStoreState>()((set, get) => ({
   gymsById: {},
 
   applyDelta(delta) {
+    // The subscribe acknowledgement, and every gym reconciliation sweep
+    // that found nothing. Cheap to recognise, and worth recognising: the
+    // pokemon record holds thousands of keys and copying it every two
+    // seconds to discover a batch was empty is work nobody asked for.
+    if (
+      delta.added.length === 0 &&
+      delta.changed.length === 0 &&
+      delta.removed.length === 0
+    ) {
+      return
+    }
+
     if (delta.category === 'pokemon') {
       const byId = { ...get().pokemonById }
       let touched = false
