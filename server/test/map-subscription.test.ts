@@ -869,3 +869,65 @@ describe('rules drive the subscription', () => {
     })
   })
 })
+
+describe('subscribeCategory with no rules source', () => {
+  test('an anonymous pokemon subscription asks Golbat for everything, not for nothing', async () => {
+    const bodies: any[] = []
+    const golbatClient = fakeGolbatClient({
+      scanPokemon: async (params: any) => {
+        bodies.push(params)
+        return { pokemon: [], limitReached: false }
+      },
+    })
+    const state = createSubscriptionState({
+      category: 'pokemon',
+      viewport: VIEWPORT_A,
+    })
+    const controller = new AbortController()
+
+    await take(
+      subscribeCategory({
+        golbatClient,
+        state,
+        signal: controller.signal,
+        pollIntervalMs: 10,
+      }),
+      1,
+    )
+    controller.abort()
+
+    // An empty `filters` array is Golbat's "match nothing": every
+    // candidate misses all three lookup keys and is skipped. One clause
+    // with no `pokemon` entries is the match-everything key.
+    expect(bodies[0].filters).toEqual([{ pokemon: [] }])
+  })
+
+  test('filters a caller did supply are still sent verbatim', async () => {
+    const bodies: any[] = []
+    const golbatClient = fakeGolbatClient({
+      scanPokemon: async (params: any) => {
+        bodies.push(params)
+        return { pokemon: [], limitReached: false }
+      },
+    })
+    const state = createSubscriptionState({
+      category: 'pokemon',
+      viewport: VIEWPORT_A,
+      filters: [{ iv: { min: 100, max: 100 } }],
+    })
+    const controller = new AbortController()
+
+    await take(
+      subscribeCategory({
+        golbatClient,
+        state,
+        signal: controller.signal,
+        pollIntervalMs: 10,
+      }),
+      1,
+    )
+    controller.abort()
+
+    expect(bodies[0].filters).toEqual([{ iv: { min: 100, max: 100 } }])
+  })
+})

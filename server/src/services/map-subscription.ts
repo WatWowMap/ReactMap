@@ -125,6 +125,32 @@ const GYM_INITIAL_SWEEP_DELAY_MS = 2_000
 // is all rule 1 (limit_reached suppresses reconciliation) needs.
 const MAX_SUBDIVISION_DEPTH = 2
 
+/**
+ * Golbat's real "match every pokemon" is ONE clause with no constraints,
+ * never an empty filter list. An empty `filters` array builds an empty
+ * lookup map, so every candidate misses the (id,form), (id,-1) and
+ * (-1,-1) keys in turn and is skipped without being matched at all
+ * (decoder/api_pokemon_common.go:130-146) -- Golbat's "match nothing".
+ * A clause with no `pokemon` entries is keyed to (-1,-1)
+ * (decoder/api_pokemon_scan_v3.go:60-70), which is the key every
+ * candidate falls through to. The fort endpoint is the other way round
+ * (`combinedFortMatches`: a group with no clauses matches its whole
+ * type), which is why this is the pokemon scan's problem alone.
+ */
+const MATCH_EVERY_POKEMON: object[] = [{ pokemon: [] }]
+
+/**
+ * What to ask Golbat for on a subscription no rule set drives -- an
+ * anonymous visitor on an instance that allows signed-out access, who has
+ * no profile to hold rules in. Without the fallback such a visitor gets a
+ * permanently empty map rather than the implicit everything the design
+ * promises them.
+ */
+function unruledFilters(state: SubscriptionState): object[] {
+  if (state.category !== 'pokemon') return state.filters
+  return state.filters.length > 0 ? state.filters : MATCH_EVERY_POKEMON
+}
+
 function pollIntervalForCategory(category: Category): number {
   return category === 'gym' ? GYM_POLL_INTERVAL_MS : POKEMON_POLL_INTERVAL_MS
 }
@@ -529,7 +555,7 @@ async function* subscribeCategory({
           golbatClient,
           state.category,
           state.viewport,
-          rulesDrivePokemon ? (upstreamFilters ?? []) : state.filters,
+          rulesDrivePokemon ? (upstreamFilters ?? []) : unruledFilters(state),
         ))
       }
     } catch (err) {
