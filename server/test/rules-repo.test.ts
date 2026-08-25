@@ -127,22 +127,19 @@ test('the bump and the write are one transaction', async () => {
 })
 
 // The briefed transaction test would also pass with no transaction at all,
-// because the bump happens after the inserts. This is the half that proves
-// the rollback: a create that fails on its twenty-fifth row leaves none of
-// the first twenty-four behind.
+// because the bump happens after the inserts. So would a batch that is
+// invalid in its `name`, since every row of it fails alike and the first
+// insert throws before anything has been written.
+//
+// This is the half that proves the rollback. The failure has to be
+// per-row, so the last species id is one no INT column can hold: the
+// twenty-four rows before it insert successfully, and only a real
+// transaction takes them back out again.
 test('a create that fails partway leaves no rows behind', async () => {
-  const names = [...SPECIES_25]
-  await expect(
-    createRules(db, 'u1', profileId, { name: 'Rare' }, names),
-  ).resolves.toHaveLength(25)
-  await deleteRules(
-    db,
-    'u1',
-    await listRules(db, 'u1', profileId).then((r) => r.map((x) => x.id)),
-  )
+  const speciesIds = [...SPECIES_25.slice(0, 24), 2 ** 40]
 
   await expect(
-    createRules(db, 'u1', profileId, { name: 'x'.repeat(500) }, names),
+    createRules(db, 'u1', profileId, { name: 'Rare' }, speciesIds),
   ).rejects.toThrow()
   expect(await listRules(db, 'u1', profileId)).toEqual([])
 })
