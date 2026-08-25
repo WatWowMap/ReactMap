@@ -5,7 +5,7 @@ const path = require('path')
 
 const { log, TAGS } = require('@rm/logger')
 
-const { validateJsons } = require('./validateJsons')
+const { validateJsons } = require('./validate-jsons')
 
 let firstRun = true
 const QUEST_LAYER_MODES = new Set(['dual', 'with_ar', 'without_ar'])

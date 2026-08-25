@@ -1,5 +1,5 @@
 import { LogLevelNames } from 'loglevel'
-import { Logger } from './Logger'
+import { Logger } from './logger'
 import { TAGS } from './tags'
 
 type Helpers = typeof TAGS

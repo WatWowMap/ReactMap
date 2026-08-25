@@ -5,8 +5,8 @@
   "main": "./lib/index.js",
   "types": "./lib/index.d.ts",
   "scripts": {
-    "generate": "node ./lib/scripts/genEnvConfig.js",
-    "check": "node ./lib/scripts/configCheck.js",
+    "generate": "node ./lib/scripts/gen-env-config.js",
+    "check": "node ./lib/scripts/config-check.js",
     "sort": "npx sort-package-json",
     "depCheck": "npx depcheck"
   },
