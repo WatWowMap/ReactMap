@@ -165,3 +165,66 @@ test('delete removes the rules it names and leaves the rest', async () => {
   const rows = await caller.rules.list()
   expect(rows.map((r) => r.speciesId)).toEqual([246])
 })
+
+// ---------------------------------------------------------------------------
+// Input bounds. Every one of these is refused before the resolver runs, so
+// none of them reaches a transaction -- which is the point: an unbounded
+// array is one HTTP request that holds row locks while it writes millions
+// of rows.
+// ---------------------------------------------------------------------------
+
+test('an update naming more rules than the species catalog holds is refused', async () => {
+  const caller = callerFor('router-u1')
+  const ruleIds = Array.from({ length: 3001 }, (_, i) => i + 1)
+  await expect(
+    caller.rules.update({ ruleIds, patch: { size: 'xl' } }),
+  ).rejects.toThrow()
+})
+
+test('rules times exclusions is bounded, not just each array on its own', async () => {
+  const caller = callerFor('router-u1')
+  const ruleIds = Array.from({ length: 1000 }, (_, i) => i + 1)
+  const exclusions = Array.from({ length: 1000 }, (_, i) => i + 1)
+  await expect(
+    caller.rules.update({ ruleIds, patch: { exclusions } }),
+  ).rejects.toThrow(/exclusion rows/i)
+})
+
+test('a condition outside the INT column range is a 400, not a 500', async () => {
+  const caller = callerFor('router-u1')
+  await expect(
+    caller.rules.create({
+      name: 'Overflow',
+      speciesIds: [null],
+      ivMin: 2 ** 53,
+    }),
+  ).rejects.toThrow()
+})
+
+test('a pvp league outside the three the schema documents is refused', async () => {
+  const caller = callerFor('router-u1')
+  await expect(
+    caller.rules.create({
+      name: 'Master League',
+      speciesIds: [null],
+      // Cast because the input type already refuses it at compile time --
+      // this test is about the runtime edge, which is what a browser hits.
+      pvpLeague: 10000 as any,
+    }),
+  ).rejects.toThrow()
+
+  const ok = await caller.rules.create({
+    name: 'Great League',
+    speciesIds: [null],
+    pvpLeague: 1500,
+  })
+  expect(ok.ids).toHaveLength(1)
+})
+
+test('a create naming more species than the catalog could hold is refused', async () => {
+  const caller = callerFor('router-u1')
+  const speciesIds = Array.from({ length: 3001 }, (_, i) => i + 1)
+  await expect(
+    caller.rules.create({ name: 'Everything twice', speciesIds }),
+  ).rejects.toThrow()
+})

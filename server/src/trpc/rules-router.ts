@@ -33,8 +33,39 @@ import {
 } from '../services/rules-repo'
 import { t } from './trpc-base'
 
+// MySQL's signed INT range, which every condition column is (`db/rules-schema.ts`).
+// Without it `z.number().int()` lets 2**53 through to an INT column, and an
+// out-of-range value comes back as a 500 rather than the 400 it is.
+const INT_MIN = -2_147_483_648
+const INT_MAX = 2_147_483_647
+
 /** A nullable integer condition column, absent when the caller says nothing. */
-const condition = z.number().int().nullable().optional()
+const condition = z
+  .number()
+  .int()
+  .min(INT_MIN)
+  .max(INT_MAX)
+  .nullable()
+  .optional()
+
+/**
+ * How many rules one request may name, and how many species one rule may
+ * cover. Both are the species catalog with headroom: a rule per species is
+ * a normal-sized selection under the one-row-per-species model, and the
+ * catalog is around a thousand entries and grows by a few dozen a year.
+ * Past that a request is not a selection anybody made in the picker.
+ */
+const MAX_SPECIES = 3000
+
+/**
+ * A cap on what one update can actually WRITE, which the two array
+ * bounds above cannot express on their own: `replaceExclusions` inserts
+ * one row per rule per exclusion, so their product is the row count, and
+ * two individually-plausible arrays multiply into a transaction big
+ * enough to exhaust the process and block every other rules write on the
+ * instance while it runs.
+ */
+const MAX_EXCLUSION_ROWS = 20_000
 
 /**
  * The `rule_pokemon` condition columns as they arrive on the wire: flat,
@@ -58,7 +89,12 @@ const conditionShape = {
   gender: condition,
   sizeMin: condition,
   sizeMax: condition,
-  pvpLeague: condition,
+  // The three caps `rule_pokemon.pvp_league` documents -- see rule-row.ts's
+  // `LEAGUE_BY_CAP`, which silently drops the rank range for anything else.
+  pvpLeague: z
+    .union([z.literal(500), z.literal(1500), z.literal(2500)])
+    .nullable()
+    .optional(),
   pvpRankMin: condition,
   pvpRankMax: condition,
 }
@@ -70,7 +106,7 @@ const ruleShape = {
   size: z.string().max(8).nullable().optional(),
   glow: z.string().max(16).nullable().optional(),
   notify: z.boolean().optional(),
-  exclusions: z.array(z.number().int()).optional(),
+  exclusions: z.array(z.number().int()).max(MAX_SPECIES).optional(),
 }
 
 const createInput = z.object({
@@ -79,16 +115,26 @@ const createInput = z.object({
   name: z.string().min(1).max(64),
   // `[null]` is a rule that names no species. An empty array would write
   // nothing at all, which is a mistake rather than a request.
-  speciesIds: z.array(z.number().int().nullable()).min(1),
+  speciesIds: z.array(z.number().int().nullable()).min(1).max(MAX_SPECIES),
 })
 
-const updateInput = z.object({
-  ruleIds: z.array(z.number().int()).min(1),
-  patch: z.object({ ...ruleShape, ...conditionShape }),
-})
+const updateInput = z
+  .object({
+    ruleIds: z.array(z.number().int()).min(1).max(MAX_SPECIES),
+    patch: z.object({ ...ruleShape, ...conditionShape }),
+  })
+  .refine(
+    (input) =>
+      input.ruleIds.length * (input.patch.exclusions?.length ?? 0) <=
+      MAX_EXCLUSION_ROWS,
+    {
+      message: `An update may write at most ${MAX_EXCLUSION_ROWS} exclusion rows`,
+      path: ['patch', 'exclusions'],
+    },
+  )
 
 const deleteInput = z.object({
-  ruleIds: z.array(z.number().int()).min(1),
+  ruleIds: z.array(z.number().int()).min(1).max(MAX_SPECIES),
 })
 
 /** The signed-in user, or a 401. */
