@@ -30,6 +30,7 @@ const stored = {
   pvpRankMin: null,
   pvpRankMax: null,
   exclusions: [],
+  enabled: true,
 } as any
 
 describe('toRuleRow', () => {
@@ -43,6 +44,16 @@ describe('toRuleRow', () => {
     const row = toRuleRow({ ...stored, sizeMin: null, sizeMax: null })
     expect(row.size_min).toBeNull()
     expect(row.size_max).toBeNull()
+  })
+
+  test('carries `enabled`, which both evaluators refuse to match on', () => {
+    expect(toRuleRow(stored).enabled).toBe(true)
+    expect(toRuleRow({ ...stored, enabled: false }).enabled).toBe(false)
+  })
+
+  test('a row that never carried the column is treated as enabled', () => {
+    const { enabled: _dropped, ...withoutColumn } = stored
+    expect(toRuleRow(withoutColumn as any).enabled).toBe(true)
   })
 
   test('toRuleRows maps every row', () => {

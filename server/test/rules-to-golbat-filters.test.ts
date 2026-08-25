@@ -327,3 +327,40 @@ describe('translatePokemonRules size range', () => {
     expect((upstream as any).filters[0]).not.toHaveProperty('size')
   })
 })
+
+// --- Disabled rules ---------------------------------------------------------
+// A rule the user switched off is not a rule to ask Golbat about. Leaving
+// its clause in would fetch entities across the network only to have
+// `rule-local-filter.ts` throw them away again.
+
+describe('a disabled rule asks Golbat for nothing', () => {
+  const hundo = { id: 1, species_id: null, iv_min: 100, iv_max: 100 }
+  const larvitar = { id: 2, species_id: 246, form_id: null }
+
+  test('a disabled rule contributes no upstream clause', () => {
+    const { upstream } = translatePokemonRules([
+      hundo,
+      { ...larvitar, enabled: false },
+    ])
+    expect(upstream).toEqual({
+      filters: [{ pokemon: [], iv: { min: 100, max: 100 } }],
+    })
+  })
+
+  test('every rule disabled is no request at all, never match-everything', () => {
+    // `null` is what tells `map-subscription.ts` to skip the scan. An
+    // empty `filters` array would be Golbat's own "match nothing" (trap 1)
+    // and a clause with no conditions would be match-EVERYTHING, which is
+    // the outcome a user turning off their last filter must never get.
+    const { upstream, local } = translatePokemonRules([
+      { ...hundo, enabled: false },
+      { ...larvitar, enabled: false },
+    ])
+    expect(upstream).toBeNull()
+    expect(local).toEqual([])
+  })
+
+  test('a rule with no `enabled` field at all still translates', () => {
+    expect(translatePokemonRules([hundo]).upstream).not.toBeNull()
+  })
+})

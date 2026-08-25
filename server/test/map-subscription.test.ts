@@ -870,6 +870,93 @@ describe('rules drive the subscription', () => {
   })
 })
 
+// --- Disabling every rule ---------------------------------------------------
+// The two states that look alike and mean opposite things. An ANONYMOUS
+// visitor has no rules source at all and gets the implicit everything the
+// design promises them (the describe block below). A signed-in user who
+// switched all their rules off HAS rules and chose to silence them: their
+// map goes empty. Routing the second case through the first is the worst
+// outcome this feature can produce -- turn off your last filter and watch
+// every pokemon in the viewport appear.
+describe('disabled rules', () => {
+  test('an entity matched only by a now-disabled rule is not sent', async () => {
+    const delta = await firstDelta({
+      rules: [ruleFixture({ id: 7, speciesId: 147, enabled: false })],
+      entities: [{ id: 'a', updated: 1, pokemon_id: 147, form: 0, iv: 100 }],
+    })
+    expect(delta.added).toEqual([])
+  })
+
+  test('a disabled rule stays out of a matched entity`s rule ids', async () => {
+    const delta = await firstDelta({
+      rules: [
+        ruleFixture({ id: 7, speciesId: 147 }),
+        ruleFixture({ id: 8, speciesId: 147, enabled: false }),
+      ],
+      entities: [{ id: 'a', updated: 1, pokemon_id: 147, form: 0, iv: 100 }],
+    })
+    expect(delta.added[0].matched).toEqual([7])
+  })
+
+  test('re-enabling it restores both the match and the id', async () => {
+    const delta = await firstDelta({
+      rules: [ruleFixture({ id: 7, speciesId: 147, enabled: true })],
+      entities: [{ id: 'a', updated: 1, pokemon_id: 147, form: 0, iv: 100 }],
+    })
+    expect(delta.added.map((e: any) => e.id)).toEqual(['a'])
+    expect(delta.added[0].matched).toEqual([7])
+  })
+
+  test('every rule disabled empties the map rather than filling it', async () => {
+    const bodies: any[] = []
+    const state = createSubscriptionState({
+      category: 'pokemon',
+      viewport: VIEWPORT_A,
+    })
+    const controller = new AbortController()
+    const golbatClient = fakeGolbatClient({
+      scanPokemon: async (params: any) => {
+        bodies.push(params)
+        return {
+          pokemon: [{ id: 'a', updated: 1, pokemon_id: 147, form: 0 }],
+          limitReached: false,
+        }
+      },
+    })
+
+    const [delta] = await take(
+      subscribeCategory({
+        golbatClient,
+        state,
+        signal: controller.signal,
+        pollIntervalMs: 10,
+        rulesSource: fakeRulesSource(
+          [
+            ruleFixture({ id: 7, speciesId: 147, enabled: false }),
+            ruleFixture({ id: 8, speciesId: null, ivMin: 100, enabled: false }),
+          ],
+          9,
+        ),
+      }),
+      1,
+    )
+    controller.abort()
+
+    // Not asked at all -- and above all never asked with
+    // `[{ pokemon: [] }]`, which is Golbat's match-everything clause and
+    // the shape the anonymous fallback sends.
+    expect(bodies).toEqual([])
+    expect(delta).toEqual({
+      type: 'delta',
+      category: 'pokemon',
+      rulesVersion: 9,
+      added: [],
+      changed: [],
+      removed: [],
+    })
+  })
+})
+
 describe('subscribeCategory with no rules source', () => {
   test('an anonymous pokemon subscription asks Golbat for everything, not for nothing', async () => {
     const bodies: any[] = []

@@ -67,6 +67,8 @@
 //      at all (upstream-validation-corrections.md, "Golbat: three that
 //      change the design").
 
+import { enabledRules } from './rule-enabled'
+
 /** Golbat's DNF range fields are int16; used as the open end of a one-sided range. */
 const INT16_MAX = 32767
 
@@ -190,7 +192,13 @@ function translatePokemonRules(rules: any[] | undefined): {
   upstream: { filters: Record<string, any>[] } | null
   local: Record<string, any>[]
 } {
-  if (!rules || rules.length === 0) {
+  // A switched-off rule is not a rule to ask Golbat about, and a rule set
+  // where every rule is off asks for nothing at all -- which falls through
+  // to trap 1's `null` below, the same "skip the request" answer a user
+  // with no rules gets, rather than to a conditionless match-everything
+  // clause.
+  const active = enabledRules(rules)
+  if (active.length === 0) {
     // Trap 1: do not hand back `{ filters: [] }` -- that's Golbat's own
     // "matches nothing" shape, indistinguishable from a caller bug. `null`
     // tells the caller to skip the pokemon scan entirely.
@@ -199,7 +207,7 @@ function translatePokemonRules(rules: any[] | undefined): {
 
   const filters: Record<string, any>[] = []
   const local: Record<string, any>[] = []
-  for (const rule of rules) {
+  for (const rule of active) {
     filters.push(buildPokemonClause(rule))
     local.push(...pokemonLocalPredicates(rule))
   }
@@ -352,10 +360,14 @@ function buildFortGroup(
   group: { filters: Record<string, any>[] } | null
   local: Record<string, any>[]
 } {
-  if (!rules || rules.length === 0) return { group: null, local: [] }
+  // Same reasoning as `translatePokemonRules`: a group whose every rule is
+  // switched off is an omitted group, not an empty one. Trap 2 covers the
+  // case where that is true of all three.
+  const active = enabledRules(rules)
+  if (active.length === 0) return { group: null, local: [] }
   const filters: Record<string, any>[] = []
   const local: Record<string, any>[] = []
-  for (const rule of rules) {
+  for (const rule of active) {
     filters.push(clauseBuilder(rule))
     local.push(...localBuilder(rule))
   }

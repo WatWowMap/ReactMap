@@ -45,6 +45,8 @@
 // optimization that keeps the poll payload small. This module is what
 // decides the truth.
 
+import { enabledRules } from './rule-enabled'
+
 const PVP_LEAGUES = /** @type {const} */ (['little', 'great', 'ultra'])
 
 /**
@@ -190,7 +192,10 @@ function buildMatcher(
   rules: any[],
   ruleMatches: (rule: any, entity: any) => boolean,
 ): (entity: any) => number[] {
-  const list = rules ?? []
+  // A rule the user switched off matches nothing, so its id can never
+  // reach an entity's `matched` array -- where it would still drive
+  // appearance and the popup's explanation lines on the client.
+  const list = enabledRules(rules)
   if (list.length === 0) return () => []
   return (entity) => {
     const matched: number[] = []

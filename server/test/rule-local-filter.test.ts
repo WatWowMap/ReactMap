@@ -347,3 +347,48 @@ describe('pokemonRuleMatches size range', () => {
     ).toBe(true)
   })
 })
+
+// --- Disabled rules ---------------------------------------------------------
+// The `matched` ids ride out to the client, where they drive both
+// `resolveAppearance` and the marker popup's explanation lines. A disabled
+// rule leaking into that list would keep painting rings and naming itself.
+
+describe('a disabled rule never matches', () => {
+  const entity = { id: 'a', pokemon_id: 246, form: 0, iv: 100 }
+
+  test('its id stays out of `matched`', () => {
+    const matcher = buildPokemonMatcher([
+      { id: 1, species_id: null, iv_min: 100 },
+      { id: 2, species_id: 246, enabled: false },
+    ])
+    expect(matcher(entity)).toEqual([1])
+  })
+
+  test('an entity matched only by a disabled rule matches nothing', () => {
+    const matcher = buildPokemonMatcher([
+      { id: 2, species_id: 246, enabled: false },
+    ])
+    expect(matcher(entity)).toEqual([])
+  })
+
+  test('re-enabling it brings the match back', () => {
+    const matcher = buildPokemonMatcher([
+      { id: 2, species_id: 246, enabled: true },
+    ])
+    expect(matcher(entity)).toEqual([2])
+  })
+
+  test('a rule row with no `enabled` field is enabled', () => {
+    expect(buildPokemonMatcher([{ id: 2, species_id: 246 }])(entity)).toEqual([
+      2,
+    ])
+  })
+
+  test('a disabled gym rule is skipped too', () => {
+    const matcher = buildGymMatcher([
+      { id: 5, team: 1, enabled: false },
+      { id: 6, team: 1 },
+    ])
+    expect(matcher({ id: 'g', team_id: 1 })).toEqual([6])
+  })
+})

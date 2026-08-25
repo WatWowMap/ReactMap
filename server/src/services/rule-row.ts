@@ -17,6 +17,7 @@
 // So the conversion lives here rather than in either of them, and the
 // subscription is its only caller.
 
+import { isRuleEnabled } from './rule-enabled'
 import type { StoredRule } from './rules-repo'
 
 /**
@@ -43,6 +44,9 @@ const LEAGUE_BY_CAP: Record<number, string> = {
 function toRuleRow(stored: StoredRule): Record<string, unknown> {
   const row: Record<string, unknown> = {
     id: stored.id,
+    // Both evaluators refuse to match on a rule that is switched off, so
+    // the flag has to survive the crossing (`rule-enabled.ts`).
+    enabled: isRuleEnabled(stored),
     species_id: stored.speciesId,
     form_id: stored.formId,
     pvp_target_species: stored.pvpTargetSpecies,
