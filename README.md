@@ -54,6 +54,7 @@ Pokemon GO Map frontend built with React.
 ## Installation Instructions & More
 
 - Check out the [Wiki](https://github.com/WatWowMap/ReactMap/wiki)!
+- Setting up gyms and raids on 2.0: [Golbat fort webhooks](docs/operators/golbat-webhooks.md)
 
 ## Support
 
