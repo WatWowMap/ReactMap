@@ -858,7 +858,7 @@ sequenceDiagram
 
           <h3>What becomes required</h3>
           <p>Golbat becomes mandatory. The fallback where ReactMap reads scanner database tables directly is deleted for Pokémon, gyms, stops and stations, so those four come from Golbat or not at all. Nests, routes and the other quiet layers keep their database path, because Golbat has no endpoint for them.</p>
-          <p>Two Golbat settings matter: <code>fort_in_memory = true</code>, without which gyms, stops and stations do not load, and a <code>[[webhooks]]</code> entry pointing at ReactMap if you want fort changes pushed rather than polled. Both are one config line.</p>
+          <p>Two Golbat settings matter. <code>fort_in_memory = true</code> is what pokestops and stations need to load at all, and it also gives gyms a faster path and a reconciliation poll that heals anything a dropped webhook lost. A <code>[[webhooks]]</code> entry pointing at ReactMap is how fort changes arrive live; with the flag off it is the only way they arrive, so it is not optional the way it sounds. Both are one config line.</p>
 
           <h3>What your users will notice</h3>
           <p>Logins carry over: existing passwords keep working, migrated by a script you run once, which refuses loudly and changes nothing if it finds accounts it cannot safely migrate, naming the exact rows so you can fix them first. Filters do not carry over, because 1.x kept them in each browser rather than on the server; everyone starts from the new rules system. Notifications move to their own page and to a single Poracle.</p>
@@ -909,7 +909,7 @@ sequenceDiagram
         </tr>
         <tr>
           <td><strong>Is requiring an experimental Golbat flag acceptable?</strong></td>
-          <td><code>fort_in_memory</code> is off by default. Without it there are no gym, stop or station scans at all. 2.0 currently assumes operators will turn it on.</td>
+          <td><code>fort_in_memory</code> is off by default, and without it the scan endpoints answer 503. Checking each fort route for its own gate rather than assuming they share one turned up <code>/api/gym/search</code>, which is not gated, takes a bounding box, and returns whole gym records. So gyms can load on a default install after all, at about 110KB and two thirds of a second for a city block, since it reads the database instead of the in-memory cache. Nothing equivalent exists for stops or stations. The question is now narrower: require the flag for two layers, or ask upstream to ungate the scans.</td>
         </tr>
         <tr>
           <td><strong>Do we wait for an incremental query upstream?</strong></td>
