@@ -20,9 +20,14 @@ import {
  * browser (see task-4-report.md).
  */
 
-test('overlay props request interleaved rendering', () => {
+test('overlay props do NOT request interleaved rendering', () => {
   const props = buildOverlayProps([])
-  expect(props.interleaved).toBe(true)
+  // Interleaved draws deck.gl into MapLibre's GL context and, against this
+  // basemap, draws nothing: layers arrive with data and never appear.
+  // Verified in a browser; a beforeId does not rescue it. This assertion is
+  // what keeps someone from "restoring" it on the strength of the old
+  // comment.
+  expect(props.interleaved).toBe(false)
 })
 
 test('overlay props carry whatever layers are passed through unchanged', () => {

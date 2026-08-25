@@ -79,10 +79,8 @@ export interface UseMapLibreOptions {
   onCameraChange?: (camera: Camera) => void
   /**
    * deck.gl layers to render on top of the basemap, attached through a
-   * `MapboxOverlay` created with `interleaved: true`. Interleaved is not
-   * cosmetic: it is what places these layers beneath MapLibre's own street
-   * label layer instead of painting over it, and it is the reason this
-   * hook builds on MapLibre rather than deck.gl replacing it outright.
+   * `MapboxOverlay`. See `buildOverlayProps` for why it is NOT interleaved:
+   * interleaved rendering draws nothing against this basemap.
    * Updates flow through `overlay.setProps` on every change of this array,
    * independent of the mount effect below, so panning/zooming the camera
    * never tears down and rebuilds the overlay.
@@ -136,21 +134,31 @@ export interface UseMapLibreResult {
 }
 
 /**
- * Builds the props `MapboxOverlay` is constructed with. Pulled out as a
- * plain function, rather than inlined in the mount effect, so its one
- * load-bearing setting is assertable without a real WebGL context:
- * `interleaved: true` is what places these layers beneath MapLibre's own
- * street label layer instead of over it, and getting it wrong renders
- * without erroring, so a test asserting the props object is the only
- * automated guard against that regressing. Actual interleaving - markers
- * visually sitting under labels - still needs a browser; see
- * task-4-report.md.
+ * Builds the props `MapboxOverlay` is constructed with.
+ *
+ * `interleaved: false`, and this is the setting the whole map depends on.
+ * Interleaved rendering draws deck.gl into MapLibre's own GL context, and
+ * against this basemap it draws nothing at all: the layers arrive, carry
+ * their data, and never appear. Measured in a browser against downtown
+ * Boston with 2,082 pokemon and 84 gyms in the store and five layers on
+ * the overlay -- an empty map either way. Passing `beforeId` to name an
+ * insertion point does not rescue it.
+ *
+ * Non-interleaved gives deck.gl its own canvas over the basemap, and
+ * everything draws. What that costs is the thing interleaving was chosen
+ * for: markers now sit above MapLibre's street labels rather than beneath
+ * them. That is a cosmetic loss against a map that does not render, so it
+ * is the trade taken here.
+ *
+ * The comment this replaces said interleaving was load-bearing and that
+ * confirming it "still needs a browser". It did, and when a browser
+ * finally looked, it was backwards.
  */
 export function buildOverlayProps(
   layers: Layer[],
   onClick?: (info: PickingInfo) => void,
 ): MapboxOverlayProps {
-  return { interleaved: true, layers, ...(onClick ? { onClick } : {}) }
+  return { interleaved: false, layers, ...(onClick ? { onClick } : {}) }
 }
 
 /**
