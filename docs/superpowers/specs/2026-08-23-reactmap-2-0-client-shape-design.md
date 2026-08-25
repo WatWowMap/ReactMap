@@ -7,6 +7,12 @@
 
 ---
 
+> **Partly superseded.** Three sections of this spec were overtaken by later decisions and are
+> marked inline below: rule ordering (section 4), the MapJS DSL (section 4), and coexistence
+> (section 6). Where this document and a later one disagree, the later one governs. See
+> `2026-08-24-reactmap-2-0-rules-model-design.md`, `2026-08-24-reactmap-2-0-no-coexistence.md`
+> and `2026-08-24-upstream-validation-corrections.md`.
+
 ## Scope
 
 This spec covers the **shape of the 2.0 client**: information architecture, design language,
@@ -61,7 +67,7 @@ separate exercise. The map route carries MapLibre and deck.gl; nothing else does
 ### Deleted by this IA
 
 - `/data-management` folds into `/profile` as a reset action.
-- **Backups** dies entirely — the `Backup` model, the `backups` table, `Backups.jsx`. Filter
+- **Backups** dies entirely (confirmed: the transport spec listed it among surviving procedures, which was an error) — the `Backup` model, the `backups` table, `Backups.jsx`. Filter
   sets supersede it once preferences are server-side.
 - **The tutorial** dies. 1,087 lines nobody read. Empty states teach instead.
 - Poracle as a modal mounted from `Nav.jsx` dies.
@@ -211,6 +217,13 @@ than a sync.
 
 ### A filter
 
+> **Superseded by the rules model spec.** Rules have no order, no `position` column, and no drag
+> handles. Each display property resolves independently: notify is OR, size takes the maximum, and
+> glows paint ring segments. First-match-wins was rejected because a Pokémon matching a size rule
+> and a glow rule got the size and lost the glow, discarding intent the user had expressed. The
+> question this was meant to answer, "why is this one big", is answered instead by a marker popup
+> naming every rule that matched. This paragraph is kept for the reasoning, not as the decision.
+
 A name and a sentence. Drag to reorder; **first match wins the display treatment**, which is
 what finally answers "why is this one big and that one small".
 
@@ -237,6 +250,12 @@ Alerts use the same grammar with a different tail:
 map for tuning one filter so markers respond as you drag.
 
 ### The MapJS DSL survives as a notation, not a mode
+
+> **Superseded by the rules model spec.** The DSL is deferred entirely from 2.0: no Sentence and
+> Text toggle, no live echo, no parser. Shipping two ways to express the same filter was judged
+> worse than shipping one, and the round-trip success criterion below no longer applies. The parser
+> and its `vm.runInNewContext` call stay where they are in 1.0; 2.0 simply never imports them, so
+> the security win claimed here still holds by a different route.
 
 Power users depend on it, and the DSL and the rule model already express the same shape —
 `dnfifyIvFilter` converts a string into DNF clauses today, and a DNF clause is a rule.
@@ -376,6 +395,12 @@ changes. That lands on the same people as the 2.0 migration itself and should be
 deliberately.
 
 ### Coexistence
+
+> **Superseded by the no-coexistence spec.** 2.0 is never deployed to production before it is
+> merged; operators run it alongside at a separate host. So the 2.0 server does not serve the 1.0
+> client, and nothing on the v2 branch keeps 1.x working. The two-entry build and the per-user
+> shell flag still exist and are harmless, but the architecture described below is not the plan.
+> Of 27 root causes found while building auth against this model, 20 came from touching 1.x.
 
 Two Vite entries from one config: `index.html` → `src/` (1.0), `app.html` → `app/` (2.0). One
 server, both bundles in `dist/`. A per-user flag on the users table decides which shell is
