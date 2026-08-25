@@ -5,6 +5,8 @@ import {
   clusterEntities,
   clusterIndexBuildCount,
   clusterIndexFor,
+  createClusterIndex,
+  DEFAULT_POKEMON_CLUSTER_RULES,
 } from './clustering'
 import type { Bounds } from './types'
 
@@ -253,4 +255,38 @@ test('clusterIndexFor counts one build per entity set, not one per query', () =>
   index.query(BOUNDS, 14)
   clusterIndexFor(entities, RULES, byOwnId).query(BOUNDS, 16)
   expect(clusterIndexBuildCount() - before).toBe(1)
+})
+
+/*
+ * Two queries for the same camera are the same answer, so they should be
+ * the same arrays. deck.gl re-uploads a layer's buffers when `data`
+ * changes identity, and the caller rebuilds both categories' layers
+ * whenever either category changes -- so without this, the category that
+ * did NOT change still handed deck.gl fresh arrays.
+ *
+ * Keyed on the bounds' values rather than the object's identity: the
+ * caller builds a fresh `Bounds` from the map on every `moveend`, so an
+ * identity key would never hit.
+ */
+test('the same camera queried twice returns the same arrays', () => {
+  const entities = Array.from({ length: 50 }, (_, index) => ({
+    id: `e-${index}`,
+    lat: 51 + (index % 10) * 0.01,
+    lon: -0.5 + Math.floor(index / 10) * 0.01,
+  }))
+  const index = createClusterIndex(
+    entities,
+    DEFAULT_POKEMON_CLUSTER_RULES,
+    (entity) => entity.id,
+  )
+  const bounds = { west: -1, south: 50, east: 1, north: 53 }
+  const first = index.query(bounds, 12)
+  const second = index.query({ ...bounds }, 12)
+  expect(second.points).toBe(first.points)
+  expect(second.clusters).toBe(first.clusters)
+
+  const moved = index.query({ ...bounds, west: -0.9 }, 12)
+  expect(moved.points).not.toBe(first.points)
+  const zoomed = index.query(bounds, 14)
+  expect(zoomed.points).not.toBe(first.points)
 })

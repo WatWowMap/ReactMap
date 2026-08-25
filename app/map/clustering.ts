@@ -218,20 +218,45 @@ export function createClusterIndex<T extends ClusterPoint>(
     return { clusters, points }
   }
 
+  /**
+   * The last answer, and the camera it answered for.
+   *
+   * Two queries for the same camera are the same answer, and deck.gl
+   * cares that they are the same ARRAYS: it re-uploads a layer's buffers
+   * whenever `data` changes identity. The caller rebuilds both
+   * categories' layers whenever either category changes, so without this
+   * a pokemon expiring handed the gym layer fresh arrays for a gym set
+   * that had not moved -- which is exactly the re-upload `entity-store.ts`
+   * keeps its two arrays apart to avoid.
+   *
+   * Keyed on the bounds' VALUES, because the caller reads a fresh
+   * `Bounds` off the map on every `moveend`; an identity key would never
+   * hit. One entry, not an LRU: the map has one camera, and a second
+   * entry would only ever be the one it just left.
+   */
+  let last: { key: string; result: ClusterResult<T> } | null = null
+
   return {
     query(bounds, zoom) {
+      const key = `${bounds.west},${bounds.south},${bounds.east},${bounds.north}@${zoom}`
+      if (last && last.key === key) return last.result
+
       const bbox: [number, number, number, number] = [
         bounds.west,
         bounds.south,
         bounds.east,
         bounds.north,
       ]
+      const remember = (result: ClusterResult<T>): ClusterResult<T> => {
+        last = { key, result }
+        return result
+      }
       const fits = (rendered: Rendered<T>) =>
         rendered.clusters.length + rendered.points.length <= rules.forcedLimit
 
       const requested = Math.round(zoom)
       const first = collect(bbox, requested)
-      if (fits(first)) return { ...first, limitHit: false }
+      if (fits(first)) return remember({ ...first, limitHit: false })
 
       // Everything above `zoomLevel` returns the same unclustered set, so the
       // descent starts at `zoomLevel` rather than walking those zooms one by
@@ -243,10 +268,13 @@ export function createClusterIndex<T extends ClusterPoint>(
         at -= 1
       ) {
         coarsest = collect(bbox, at)
-        if (fits(coarsest)) return { ...coarsest, limitHit: true }
+        if (fits(coarsest)) return remember({ ...coarsest, limitHit: true })
       }
 
-      return { ...keepDensest(coarsest, rules.forcedLimit), limitHit: true }
+      return remember({
+        ...keepDensest(coarsest, rules.forcedLimit),
+        limitHit: true,
+      })
     },
   }
 }
