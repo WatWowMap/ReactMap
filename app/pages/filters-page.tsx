@@ -66,7 +66,11 @@ export function FiltersPage({
       </div>
       <Tabs defaultValue="pokemon" className="mt-4">
         <TabsList>
-          <TabsTrigger value="pokemon">Pokémon</TabsTrigger>
+          {/* "Filters" rather than "Pokémon": the pair of tabs answers which
+              SYSTEM you are editing, per the design's reason for having them
+              at all. Rule categories are a different axis and live inside
+              this tab. */}
+          <TabsTrigger value="pokemon">Filters</TabsTrigger>
           {/* Not wired up yet -- disabled so it reads as "not yet" rather
               than a broken tab that goes nowhere. */}
           <TabsTrigger value="alerts" disabled>

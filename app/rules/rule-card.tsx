@@ -1,5 +1,6 @@
 import { Badge } from '../components/ui/badge'
 import { Card, CardHeader, CardTitle } from '../components/ui/card'
+import { describeRule } from './describe-rule'
 import type { RuleGroup } from './rule-types'
 import type { NamesLookup } from './use-names'
 
@@ -50,6 +51,12 @@ export function RuleCard({ group, names, onOpen }: RuleCardProps) {
             <CardTitle>{group.name}</CardTitle>
             <Badge variant="secondary">{subjectFor(group, names)}</Badge>
           </div>
+          {/* The sentence: what the rule asks for and what it does. Every
+              member of a group is identical except for its species, so the
+              sample describes the whole card. */}
+          <p className="text-muted-foreground text-sm">
+            {describeRule(group.sample)}
+          </p>
         </CardHeader>
       </Card>
     </button>
