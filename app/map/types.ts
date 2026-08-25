@@ -1,7 +1,13 @@
 /**
- * The map source interface. A later session implements this for real
- * against a WebSocket transport; every task in this plan is written
- * against fixtures behind the same shape.
+ * The client's own vocabulary for what is on the map, plus the
+ * pull-shaped `MapSource` the fixtures implement.
+ *
+ * The live transport does NOT go through `MapSource`. It pushes delta
+ * batches into the entity store (`./entity-store`), because a source
+ * that hands back the full set on every change is exactly the rebuild
+ * deck.gl must not be given every two seconds. `MapSource` and
+ * `./fixtures` remain what the layer and clustering tests are written
+ * against: a deterministic set with no socket in it.
  */
 
 export interface Bounds {

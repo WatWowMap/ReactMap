@@ -9,7 +9,7 @@ import {
   drawPokemonIcon,
   resetSharedIconCaches,
 } from './draw-icon'
-import { FIXTURE_EPOCH } from './fixtures'
+import { useEntityStore } from './entity-store'
 import type { MapLayersResult } from './layers'
 import {
   buildMapLayers,
@@ -17,44 +17,16 @@ import {
   POKEMON_LABEL_LAYER_ID,
 } from './layers'
 import { Popup } from './popup'
-import { createFixtureSource } from './source'
-import type {
-  GymEntity,
-  MapEntity,
-  MapQuery,
-  PokemonEntity,
-  Viewport,
-} from './types'
+import type { MapEntity, Viewport } from './types'
 import { useDismissOnEscape } from './use-dismiss-on-escape'
 import type { Camera } from './use-map-libre'
 import { anchorFor, pickedEntityFrom, useMapLibre } from './use-map-libre'
+import { useMapSocket } from './use-map-socket'
 import { useWebglContextRecovery } from './use-webgl-context-recovery'
 
 export interface MapCanvasProps {
   initialCamera: Camera
   onCameraChange?: (camera: Camera) => void
-}
-
-/**
- * A source with no live transport yet has no notion of "the current
- * viewport", so this queries the whole world rather than the camera's
- * bounds; a later task narrows this to what `useMapLibre`'s camera state
- * actually frames.
- */
-const WORLD_BOUNDS = { west: -180, south: -90, east: 180, north: 90 }
-const POKEMON_QUERY: MapQuery = {
-  kind: 'pokemon',
-  bounds: WORLD_BOUNDS,
-  zoom: 12,
-}
-const GYM_QUERY: MapQuery = { kind: 'gym', bounds: WORLD_BOUNDS, zoom: 12 }
-
-function isPokemon(entity: MapEntity): entity is PokemonEntity {
-  return entity.kind === 'pokemon'
-}
-
-function isGym(entity: MapEntity): entity is GymEntity {
-  return entity.kind === 'gym'
 }
 
 /** What the layer memo falls back to before the atlas exists. */
@@ -80,29 +52,25 @@ const CLOCK_TICK_MS = 1000
  */
 export function MapCanvas({ initialCamera, onCameraChange }: MapCanvasProps) {
   // Lazy-initialized on the ref directly (a documented React pattern) so
-  // the atlas's LRU cache and the fixture source are each created exactly
-  // once for the component's lifetime, not rebuilt on every render.
+  // the atlas's LRU cache is created exactly once for the component's
+  // lifetime, not rebuilt on every render.
   const atlasRef = useRef<ReturnType<typeof createAtlas> | null>(null)
   if (atlasRef.current === null) {
     atlasRef.current = createAtlas({ draw: drawPokemonIcon })
   }
-  const sourceRef = useRef<ReturnType<typeof createFixtureSource> | null>(null)
-  if (sourceRef.current === null) {
-    sourceRef.current = createFixtureSource()
-  }
 
-  const [pokemon, setPokemon] = useState<PokemonEntity[]>([])
-  const [gyms, setGyms] = useState<GymEntity[]>([])
+  // One narrow selector per array, read in the component that draws them.
+  // Each array is a stable reference until a delta batch actually changes
+  // that category, which is what keeps deck.gl from re-uploading a layer's
+  // buffers for a change in the other one.
+  const pokemon = useEntityStore((state) => state.pokemon)
+  const gyms = useEntityStore((state) => state.gyms)
   // Countdown/IV text is layer data, not a per-marker component: this is
   // the one clock this whole tree reads, and every timer-bearing layer is
-  // rebuilt from it on the same tick rather than each owning its own.
-  // Fixture expiries are measured from a fixed epoch so the generator stays
-  // reproducible, which means real wall-clock time is long past all of them and
-  // every countdown would read 0:00. Running the clock from that epoch instead
-  // keeps the fixtures deterministic and the timers live. When a real source
-  // replaces the fixtures this becomes Date.now() again.
-  const timeOrigin = useRef(Date.now())
-  const [now, setNow] = useState(() => FIXTURE_EPOCH)
+  // rebuilt from it on the same tick rather than each owning its own. It
+  // is also the clock a verified expiry is evicted against, so the tick
+  // below does both.
+  const [now, setNow] = useState(() => Date.now())
 
   // The one selected entity, or none. This is the entire replacement for
   // 1.0's per-marker ref plus useForcePopup/useMarkerTimer: deck.gl's
@@ -147,26 +115,22 @@ export function MapCanvas({ initialCamera, onCameraChange }: MapCanvasProps) {
   // a fresh object every render would refire it needlessly.
   const anchor = useMemo(() => anchorFor(selected), [selected])
 
-  useEffect(() => {
-    const source = sourceRef.current
-    if (!source) return undefined
-    const unsubscribePokemon = source.subscribe(POKEMON_QUERY, (entities) => {
-      setPokemon(entities.filter(isPokemon))
-    })
-    const unsubscribeGyms = source.subscribe(GYM_QUERY, (entities) => {
-      setGyms(entities.filter(isGym))
-    })
-    return () => {
-      unsubscribePokemon()
-      unsubscribeGyms()
-    }
-  }, [])
+  // The live transport. One socket for the map's lifetime, resubscribed
+  // to whatever the camera frames; deltas land in the store the two
+  // selectors above read, so nothing here re-renders on arrival except
+  // through those.
+  useMapSocket(viewport?.bounds ?? null)
 
   useEffect(() => {
-    const interval = setInterval(
-      () => setNow(FIXTURE_EPOCH + (Date.now() - timeOrigin.current)),
-      CLOCK_TICK_MS,
-    )
+    const interval = setInterval(() => {
+      const tick = Date.now()
+      setNow(tick)
+      // A pokemon with a verified despawn time leaves the map on this
+      // clock alone. The server never sends a `removed` for one, because
+      // it holds that the client can work it out -- so if this did not
+      // run, the marker would sit there until the viewport moved.
+      useEntityStore.getState().evictExpired(tick)
+    }, CLOCK_TICK_MS)
     return () => clearInterval(interval)
   }, [])
 
