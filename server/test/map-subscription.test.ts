@@ -504,6 +504,44 @@ describe('subscribeCategory: webhook injections', () => {
     })
   })
 
+  test('an injection queued before a pan is not delivered after it', async () => {
+    // The registry matches an injection against the viewport it sees when
+    // the webhook lands. The client can pan before the loop drains it, so
+    // the drain matches again -- otherwise the gym goes out as `added` for
+    // a viewport the client has already left, and the next sweep takes it
+    // straight back off.
+    const state = createSubscriptionState({
+      category: 'gym',
+      viewport: VIEWPORT_A,
+    })
+    const controller = new AbortController()
+    const golbatClient = fakeGolbatClient()
+
+    const generator = subscribeCategory({
+      golbatClient,
+      state,
+      signal: controller.signal,
+      pollIntervalMs: 60_000,
+      initialDelayMs: 60_000,
+    })
+    await generator.next() // ack
+
+    injectIntoSubscription(state, [raidInjection('g1', 1000)])
+    updateSubscription(state, { viewport: VIEWPORT_B })
+
+    // VIEWPORT_B holds no gyms, so the next value is the reconciliation
+    // sweep for the new viewport rather than an added-then-removed g1.
+    const next = await nextValue(generator)
+    controller.abort()
+    expect(next).toEqual({
+      type: 'delta',
+      category: 'gym',
+      added: [],
+      changed: [],
+      removed: [],
+    })
+  })
+
   test('a webhook removal evicts a gym the subscription is holding', async () => {
     const state = createSubscriptionState({
       category: 'gym',

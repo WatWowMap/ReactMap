@@ -19,6 +19,7 @@
 import { log, TAGS } from '@rm/logger'
 
 import { computeDelta, getChangeStamp } from './delta-engine'
+import { injectionMatches } from './fort-injection-match'
 import type { createGolbatClient } from './golbat-client'
 import { matchesFortFilters, matchesPokemonFilters } from './golbat-dnf-match'
 import type { WebhookInjection } from './golbat-webhook'
@@ -365,7 +366,18 @@ async function* subscribeCategory({
     // the reconciliation sweep can never disagree about what this
     // connection is holding.
     if (state.injections.length > 0) {
-      const batch = state.injections.splice(0, state.injections.length)
+      const drained = state.injections.splice(0, state.injections.length)
+      // Matched a second time, against the viewport and filters that are
+      // current NOW rather than the ones the registry saw when the webhook
+      // landed. The client may have panned in between, and delivering a
+      // fort it has already moved away from would emit `added` for
+      // something the next sweep immediately takes back off again.
+      // Removals are exempt and pass straight through -- see
+      // fort-injection-match.ts.
+      const matchesFilters = matchesFortFilters(state.filters)
+      const batch = drained.filter((injection) =>
+        injectionMatches(injection, state.viewport, matchesFilters),
+      )
       const injected = applyInjections(previousMap, batch)
       if (
         injected.added.length > 0 ||
@@ -374,13 +386,17 @@ async function* subscribeCategory({
       ) {
         yield { type: 'delta', category: state.category, ...injected }
         if (signal.aborted) return
+        // Sleep before looping rather than falling straight through to a
+        // poll. A webhook is the authoritative, up-to-date answer for the
+        // fort it names; scanning Golbat the instant one arrives would be
+        // the very round trip the push path exists to remove.
+        await sleepOrWake(state, interval, signal)
+        continue
       }
-      // Sleep before looping rather than falling straight through to a
-      // poll. A webhook is the authoritative, up-to-date answer for the
-      // fort it names; scanning Golbat the instant one arrives would be
-      // the very round trip the push path exists to remove.
-      await sleepOrWake(state, interval, signal)
-      continue
+      // Nothing survived the re-check, so there is nothing to say and no
+      // reason to park: fall through to the sweep, which is very likely
+      // what the viewport change that invalidated these injections wants
+      // next anyway.
     }
 
     // Golbat gates every fort endpoint behind `fort_in_memory`

@@ -22,11 +22,14 @@
 //   - Only `gym` subscriptions take gym injections. Nothing else is
 //     produced yet (see golbat-webhook.ts).
 //   - An upsert must fall inside the subscription's viewport AND satisfy
-//     its filters. Filters go through `matchesFortFilters`
-//     (golbat-dnf-match.ts) rather than a second matcher written here --
-//     this is the same predicate the poll path uses as `computeDelta`'s
-//     `localFilter`, and two implementations of "does this gym match this
-//     clause" would drift.
+//     its filters. Both go through `injectionMatches`
+//     (fort-injection-match.ts), which wraps `matchesFortFilters` -- the
+//     same predicate the poll path uses as `computeDelta`'s `localFilter`,
+//     so there is one answer to "does this gym match this clause" rather
+//     than two that drift. The drain in `map-subscription.ts` asks the
+//     same question again against the viewport that is current when the
+//     delta actually goes out, since the client may have panned in
+//     between.
 //   - A removal goes to every gym subscription regardless of viewport or
 //     filters. The registry cannot know which connections were holding the
 //     fort -- only each subscription's own `previousMap` knows that, and
@@ -38,14 +41,10 @@
 
 import { log, TAGS } from '@rm/logger'
 
+import { injectionMatches, type Viewport } from './fort-injection-match'
 import { matchesFortFilters } from './golbat-dnf-match'
 import type { WebhookInjection } from './golbat-webhook'
 import { injectIntoSubscription } from './map-subscription'
-
-interface Viewport {
-  min: { lat: number; lon: number }
-  max: { lat: number; lon: number }
-}
 
 interface RegisteredSubscription {
   category: 'pokemon' | 'gym'
@@ -58,44 +57,15 @@ interface RegisteredSubscription {
   }
 }
 
-/**
- * Whether a coordinate falls inside a viewport, handling the antimeridian
- * case where a westward pan leaves `min.lon` greater than `max.lon` (a box
- * from 170 to -170 covers 20 degrees across the date line, not the 340 the
- * other way round).
- */
-function containsPoint(viewport: Viewport, lat: number, lon: number): boolean {
-  if (lat < viewport.min.lat || lat > viewport.max.lat) return false
-  if (viewport.min.lon <= viewport.max.lon) {
-    return lon >= viewport.min.lon && lon <= viewport.max.lon
-  }
-  return lon >= viewport.min.lon || lon <= viewport.max.lon
-}
-
-function isNumber(value: unknown): value is number {
-  return typeof value === 'number' && Number.isFinite(value)
-}
-
 function injectionsFor(
   entry: RegisteredSubscription,
   injections: WebhookInjection[],
 ): WebhookInjection[] {
   if (entry.category !== 'gym') return []
   const matchesFilters = matchesFortFilters(entry.state.filters)
-
-  return injections.filter((injection) => {
-    if (injection.category !== 'gym') return false
-    if (injection.kind === 'remove') return true
-
-    const { lat, lon } = injection.entity as { lat?: unknown; lon?: unknown }
-    // A payload with no position is a Golbat-side defect, not a reason to
-    // drop a real change on the floor -- deliver it and let the client
-    // merge it over the position it already has.
-    if (isNumber(lat) && isNumber(lon)) {
-      if (!containsPoint(entry.state.viewport, lat, lon)) return false
-    }
-    return matchesFilters(injection.entity)
-  })
+  return injections.filter((injection) =>
+    injectionMatches(injection, entry.state.viewport, matchesFilters),
+  )
 }
 
 /**
@@ -160,4 +130,4 @@ function createSubscriptionRegistry() {
 }
 
 export type { RegisteredSubscription }
-export { containsPoint, createSubscriptionRegistry }
+export { createSubscriptionRegistry }
