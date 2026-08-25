@@ -26,13 +26,23 @@ async function resolveSession(
   }
 }
 
-function createContextFactory({ golbatClient }: { golbatClient: any }) {
+function createContextFactory({
+  golbatClient,
+  registry,
+}: {
+  golbatClient: any
+  // Task 6's routing table, so a tRPC subscription receives pushed fort
+  // changes on the same terms the WebSocket bridge does. Optional: a
+  // caller that has not built one still gets a working poll loop.
+  registry?: any
+}) {
   return async function createContext({ req }: { req: Request }) {
     const session = await resolveSession(req.headers)
     return {
       user: session?.user ?? null,
       session: session?.session ?? null,
       golbatClient,
+      registry,
     }
   }
 }

@@ -13,6 +13,11 @@ import {
   resolveTrustProxy,
 } from './middleware/trust-proxy'
 import { createGolbatClient } from './services/golbat-client'
+import {
+  createGolbatWebhookHandler,
+  warnIfWebhookSecretMissing,
+} from './services/golbat-webhook-handler'
+import { createSubscriptionRegistry } from './services/subscription-registry'
 import { createSettingsHandler } from './settings-response'
 import { createContextFactory } from './trpc/context'
 import { appRouter } from './trpc/router'
@@ -96,8 +101,31 @@ golbatClient.init().catch((err) => {
   )
 })
 
-const trpcCreateContext = createContextFactory({ golbatClient })
-const socketServer = createSocketServer({ golbatClient })
+// The process-wide index of live map subscriptions. Both transports
+// register into it, and Task 6's webhook receiver is the only thing that
+// reads it -- an HTTP request from Golbat has no connection of its own to
+// fan out from. See services/subscription-registry.ts.
+const subscriptionRegistry = createSubscriptionRegistry()
+
+const trpcCreateContext = createContextFactory({
+  golbatClient,
+  registry: subscriptionRegistry,
+})
+const socketServer = createSocketServer({
+  golbatClient,
+  registry: subscriptionRegistry,
+})
+
+// Optional by design (see services/golbat-webhook-handler.ts): Golbat's own
+// api_secret is optional, so requiring one here would break every existing
+// operator's forts on upgrade. Unconfigured warns once, here, rather than
+// on every request.
+const golbatWebhookSecret = config.getSafe('golbat.webhookSecret') || ''
+warnIfWebhookSecretMissing(golbatWebhookSecret)
+const golbatWebhookHandler = createGolbatWebhookHandler({
+  registry: subscriptionRegistry,
+  secret: golbatWebhookSecret,
+})
 
 const TRPC_PATH_PREFIX = '/api/trpc'
 
@@ -131,6 +159,13 @@ const server = Bun.serve({
 
     if (url.pathname === '/api/settings') {
       return settingsHandler(request)
+    }
+
+    if (url.pathname === '/api/webhooks/golbat') {
+      if (request.method !== 'POST') {
+        return new Response('Method Not Allowed', { status: 405 })
+      }
+      return golbatWebhookHandler(request)
     }
 
     if (url.pathname === '/api/ws') {

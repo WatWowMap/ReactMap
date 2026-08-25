@@ -37,6 +37,9 @@ interface Context {
   user: any
   session: any
   golbatClient: any
+  registry?: {
+    register: (entry: { category: 'pokemon' | 'gym'; state: any }) => () => void
+  }
 }
 
 const t = initTRPC.context<Context>().create()
@@ -61,12 +64,24 @@ const mapRouter = t.router({
       // direct `createCaller` invocation in a test); a generator needs a
       // real signal to await on, so an un-aborted fallback stands in.
       const abortSignal = signal ?? new AbortController().signal
-      yield* subscribeCategory({
-        golbatClient: ctx.golbatClient,
-        state,
-        signal: abortSignal,
-        pollIntervalMs: pollIntervalForCategory(input.category),
-      })
+      // Same registration the WebSocket bridge does
+      // (`server/src/ws/socket-server.ts`), so a tRPC consumer receives
+      // Task 6's pushed fort changes rather than only poll results. The
+      // `finally` is what keeps the registry from outliving the
+      // subscription, however the generator ends.
+      const unregister =
+        ctx.registry?.register({ category: input.category, state }) ??
+        (() => {})
+      try {
+        yield* subscribeCategory({
+          golbatClient: ctx.golbatClient,
+          state,
+          signal: abortSignal,
+          pollIntervalMs: pollIntervalForCategory(input.category),
+        })
+      } finally {
+        unregister()
+      }
     }),
 })
 

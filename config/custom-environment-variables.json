@@ -1483,7 +1483,8 @@
   },
   "golbat": {
     "apiUrl": "GOLBAT_API_URL",
-    "apiSecret": "GOLBAT_API_SECRET"
+    "apiSecret": "GOLBAT_API_SECRET",
+    "webhookSecret": "GOLBAT_WEBHOOK_SECRET"
   },
   "scanner": {
     "backendConfig": {

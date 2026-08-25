@@ -637,7 +637,8 @@
   },
   "golbat": {
     "apiUrl": "",
-    "apiSecret": ""
+    "apiSecret": "",
+    "webhookSecret": ""
   },
   "scanner": {
     "backendConfig": {

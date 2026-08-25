@@ -41,12 +41,23 @@ import {
   subscribeCategory,
   updateSubscription,
 } from '../services/map-subscription'
+import type { createSubscriptionRegistry } from '../services/subscription-registry'
 import { resolveSession } from '../trpc/context'
 
 const REVOCATION_CHECK_INTERVAL_MS = 60_000
 const VALID_CATEGORIES = new Set(['pokemon', 'gym'])
 
-function createSocketServer({ golbatClient }: { golbatClient: any }) {
+function createSocketServer({
+  golbatClient,
+  registry,
+}: {
+  golbatClient: any
+  // The process-wide routing table Task 6's webhook receiver fans out
+  // through (`services/subscription-registry.ts`). Optional so a caller
+  // that only wants the poll loop -- a test, or a build with the receiver
+  // unmounted -- still gets a working socket.
+  registry?: ReturnType<typeof createSubscriptionRegistry>
+}) {
   /** @returns whether the upgrade succeeded */
   async function upgrade(request: Request, server: any): Promise<boolean> {
     const session = await resolveSession(request.headers)
@@ -60,7 +71,7 @@ function createSocketServer({ golbatClient }: { golbatClient: any }) {
         userId: session?.user?.id ?? null,
         subscriptions: new Map<
           'pokemon' | 'gym',
-          { state: any; controller: AbortController }
+          { state: any; controller: AbortController; unregister: () => void }
         >(),
         revocationTimer: null as ReturnType<typeof setInterval> | null,
       },
@@ -81,7 +92,14 @@ function createSocketServer({ golbatClient }: { golbatClient: any }) {
 
     const controller = new AbortController()
     const state = createSubscriptionState({ category, viewport, filters })
-    ws.data.subscriptions.set(category, { state, controller })
+    // Registered before the loop starts, so a webhook that lands between
+    // the subscribe message and the first poll is still delivered. A
+    // viewport change mutates this same `state` in place
+    // (`updateSubscription`), so the registry keeps routing against
+    // whatever the connection is currently looking at without needing to
+    // re-register.
+    const unregister = registry?.register({ category, state }) ?? (() => {})
+    ws.data.subscriptions.set(category, { state, controller, unregister })
 
     ;(async () => {
       try {
@@ -102,13 +120,25 @@ function createSocketServer({ golbatClient }: { golbatClient: any }) {
             err,
           )
         }
+      } finally {
+        // The loop ending for ANY reason -- abort, a thrown poll, the
+        // socket going away -- takes the registry entry with it. A
+        // registry that only grows leaks a dead subscription per
+        // disconnect and fans webhooks out to sockets that will never
+        // read them.
+        unregister()
       }
     })()
   }
 
   function stopAllSubscriptions(ws: any) {
-    for (const { controller } of ws.data.subscriptions.values()) {
+    for (const { controller, unregister } of ws.data.subscriptions.values()) {
       controller.abort()
+      // Also unregistered in the loop's `finally`, but not necessarily
+      // yet: the generator only observes the abort when it next reaches a
+      // suspension point. Unregistering here as well makes the entry gone
+      // by the time `close` returns, and both paths are idempotent.
+      unregister?.()
     }
     ws.data.subscriptions.clear()
   }
