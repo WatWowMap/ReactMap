@@ -52,6 +52,24 @@ export interface EntityStoreState {
   clear: () => void
 }
 
+/**
+ * A row the translator refused is a row that never reaches the map, and
+ * the failure looks exactly like an area with nothing in it. Golbat
+ * renaming or retyping a field would present as markers quietly going
+ * missing, so say it happened.
+ *
+ * Counted per batch and reported once rather than per row: a wire change
+ * breaks every row in the batch, and a warning per row would bury the
+ * signal it is meant to raise.
+ */
+function warnDiscarded(category: string, discarded: number, total: number) {
+  if (discarded === 0) return
+  // eslint-disable-next-line no-console
+  console.warn(
+    `[map] discarded ${discarded} of ${total} ${category} rows: required fields were missing or the wrong type. This is what a Golbat wire change looks like from here.`,
+  )
+}
+
 export const useEntityStore = create<EntityStoreState>()((set, get) => ({
   pokemon: [],
   pokemonById: {},
@@ -75,14 +93,24 @@ export const useEntityStore = create<EntityStoreState>()((set, get) => ({
       const byId = { ...get().pokemonById }
       let touched = false
 
+      let discarded = 0
+
       for (const raw of [...delta.added, ...delta.changed]) {
         // A complete scan row replaces what we hold outright; unlike a
         // gym there is no such thing as a partial pokemon on this wire.
         const entity = translatePokemon(raw)
-        if (!entity) continue
+        if (!entity) {
+          discarded += 1
+          continue
+        }
         byId[entity.spawnId] = entity
         touched = true
       }
+      warnDiscarded(
+        'pokemon',
+        discarded,
+        delta.added.length + delta.changed.length,
+      )
       for (const id of delta.removed) {
         if (!(id in byId)) continue
         delete byId[id]
@@ -97,9 +125,14 @@ export const useEntityStore = create<EntityStoreState>()((set, get) => ({
     const byId = { ...get().gymsById }
     let touched = false
 
+    let discarded = 0
+
     for (const raw of [...delta.added, ...delta.changed]) {
       const patch = translateGymPatch(raw)
-      if (!patch) continue
+      if (!patch) {
+        discarded += 1
+        continue
+      }
       // Merged over what we already hold: a gym delivered by webhook
       // carries only what its payload knew, and overwriting with the
       // patch alone would erase the rest.
@@ -116,6 +149,8 @@ export const useEntityStore = create<EntityStoreState>()((set, get) => ({
       byId[patch.gymId] = gym
       touched = true
     }
+    warnDiscarded('gym', discarded, delta.added.length + delta.changed.length)
+
     for (const id of delta.removed) {
       if (!(id in byId)) continue
       delete byId[id]

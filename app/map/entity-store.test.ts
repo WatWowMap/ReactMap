@@ -243,3 +243,46 @@ test('an unchanged gym in a batch does not suppress a changed one', () => {
   expect(useEntityStore.getState().gyms).not.toBe(gyms)
   expect(useEntityStore.getState().gymsById['gym-2']?.team).toBe(3)
 })
+
+test('a batch with rows the translator refuses says how many it discarded', () => {
+  const warnings: string[] = []
+  const original = console.warn
+  console.warn = (message: string) => warnings.push(message)
+
+  try {
+    useEntityStore.getState().applyDelta(
+      delta({
+        added: [
+          rawPokemon({ id: 'kept' }),
+          // A renamed or retyped Golbat field arrives looking like this.
+          // Nothing can key it, so it never reaches the map, and without a
+          // warning that is indistinguishable from an empty area.
+          rawPokemon({ id: undefined }),
+          rawPokemon({ id: 'no-species', pokemon_id: undefined }),
+        ],
+      }),
+    )
+  } finally {
+    console.warn = original
+  }
+
+  expect(useEntityStore.getState().pokemon).toHaveLength(1)
+  expect(warnings).toHaveLength(1)
+  expect(warnings[0]).toContain('discarded 2 of 3 pokemon rows')
+})
+
+test('a batch every row of which translated says nothing', () => {
+  const warnings: string[] = []
+  const original = console.warn
+  console.warn = (message: string) => warnings.push(message)
+
+  try {
+    useEntityStore
+      .getState()
+      .applyDelta(delta({ added: [rawPokemon({ id: 'a' })] }))
+  } finally {
+    console.warn = original
+  }
+
+  expect(warnings).toHaveLength(0)
+})
