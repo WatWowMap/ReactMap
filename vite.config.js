@@ -65,6 +65,26 @@ const viteConfig = defineConfig(({ mode }) => {
       tailwindcss(),
       ...(isDevelopment
         ? [
+            {
+              // The built server answers `/` with app.html
+              // (server/src/serve.ts), but the dev server answers it with
+              // Vite's root index.html, which is the 1.0 client. That one
+              // throws on the 2.0 /api/settings response, so the obvious
+              // way to look at the map -- open the dev server and go to
+              // `/` -- lands on a broken 1.0 shell rather than on 2.0.
+              // Rewriting the root here makes dev agree with production.
+              // index.html stays reachable by name, and stays a build
+              // entry, until the 1.0 client is retired at merge.
+              name: 'reactmap-dev-root-is-the-2-0-client',
+              configureServer(server) {
+                server.middlewares.use((request, _response, next) => {
+                  if (request.url === '/' || request.url?.startsWith('/?')) {
+                    request.url = '/app.html'
+                  }
+                  next()
+                })
+              },
+            },
             checker({
               overlay: {
                 initialIsOpen: false,
