@@ -239,6 +239,10 @@ export function MapCanvas({ initialCamera, onCameraChange }: MapCanvasProps) {
           x={screenPosition.x}
           y={screenPosition.y}
           onClose={closePopup}
+          // The same map the layers resolve appearance from, so the
+          // popup names the rules that produced what is on screen rather
+          // than resolving a second, possibly different, answer.
+          rules={rules}
         />
       )}
     </div>
