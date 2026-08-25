@@ -94,13 +94,18 @@ function assertNominatimResponse(results, url) {
   // geocoder()'s fallback shape ([] or ''), and the message stays generic
   // because this is a failing upstream, not a misconfigured provider.
   // {"error": ...} bodies never reach this: node-geocoder converts those to a
-  // thrown Error itself. A genuine /reverse result always carries lat,
-  // display_name and address (all 42 captured fixtures do).
+  // thrown Error itself.
+  //
+  // The test is on coordinate values, not key presence. RFC 7807 permits
+  // extension members, so {"title":"Too Many Requests","status":429,
+  // "address":null} would pass a presence check and still format into an entry
+  // with undefined coordinates. A genuine /reverse result always carries lat
+  // and lon as parseable strings (all 42 captured fixtures do), and a result
+  // node-geocoder cannot derive coordinates from is unusable to every caller
+  // regardless of what else it carries.
   const isNominatimResult =
-    'lat' in raw ||
-    'display_name' in raw ||
-    'address' in raw ||
-    'place_id' in raw
+    Number.isFinite(Number.parseFloat(raw.lat)) &&
+    Number.isFinite(Number.parseFloat(raw.lon))
   if (!isNominatimResult) {
     throw new Error(
       `${url} answered with an error body instead of a geocoding result: ${JSON.stringify(raw).slice(0, 200)}`,

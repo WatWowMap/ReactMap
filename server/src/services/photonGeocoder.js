@@ -329,8 +329,19 @@ async function photonGeocoder(photonUrl, search, isReverse) {
   // and is reported here.
 
   if (response instanceof Response) {
+    // Only a 404 on Photon's own route is evidence about the provider: Photon
+    // serves /api, so a host without it is not a Photon instance. Any other
+    // status -- a 429 or 500 from a healthy but struggling Photon, a 401/403
+    // from an authentication proxy in front of one -- is an operational
+    // failure, and advising the operator to remove geocoderProvider there
+    // prompts them to break a working configuration to cure a transient error.
+    if (response.status === 404) {
+      throw new Error(
+        `${photonUrl} answered 404 for Photon's /api endpoint, so it is not a Photon instance. Check the URL, or remove "geocoderProvider": "photon" from this webhook.`,
+      )
+    }
     throw new Error(
-      `${photonUrl} answered ${response.status} for Photon's ${response.status === 404 ? '/api endpoint, so it is not a Photon instance' : 'request'}. Check the URL, or remove "geocoderProvider": "photon" from this webhook.`,
+      `${photonUrl} answered ${response.status}; the upstream geocoder is failing, not misconfigured.`,
     )
   }
   if (isNominatimResponse(response)) {

@@ -464,9 +464,9 @@ test('PoracleAPI leaves the provider undefined when it is not configured', () =>
 // node-geocoder resolves through bluebird's asCallback the throw never reached
 // geocoder()'s catch: it surfaced as an uncaught exception and killed the
 // process.
-const serveOnce = async (body) => {
+const serveOnce = async (body, status = 200) => {
   const server = http.createServer((_, res) => {
-    res.writeHead(200, { 'Content-Type': 'application/json' })
+    res.writeHead(status, { 'Content-Type': 'application/json' })
     res.end(typeof body === 'string' ? body : JSON.stringify(body))
   })
   await new Promise((resolve) => {
@@ -1250,4 +1250,69 @@ test('a Poracle geocoding provider never overwrites the webhook provider', () =>
 
   assert.equal(api.provider, 'poracle')
   assert.equal(api.geocoderProvider, 'photon')
+})
+
+// Only a 404 on /api is evidence about the provider. Any other status is an
+// operational failure from a correctly configured Photon (429, 500) or a proxy
+// in front of one (401, 403), and advice to remove geocoderProvider there
+// prompts the operator to break a working configuration.
+test('a transient Photon failure is not blamed on configuration', async () => {
+  const statuses = [429, 500, 401, 403]
+  // eslint-disable-next-line no-restricted-syntax
+  for (const status of statuses) {
+    // eslint-disable-next-line no-await-in-loop
+    const server = await serveOnce('', status)
+    try {
+      // eslint-disable-next-line no-await-in-loop
+      await assert.rejects(
+        () => photonGeocoder(server.url, 'Denver', false),
+        (err) =>
+          !/geocoderProvider/.test(err.message) &&
+          new RegExp(String(status)).test(err.message),
+        `a ${status} must read as an upstream failure, not provider advice`,
+      )
+    } finally {
+      // eslint-disable-next-line no-await-in-loop
+      await server.close()
+    }
+  }
+})
+
+// RFC 7807 permits extension members, so a presence check on address or lat is
+// defeatable: this body carries an address key and still formats into an entry
+// with undefined coordinates. The classifier validates coordinate values.
+test('an extended problem body does not pass as a Nominatim result', async () => {
+  const server = await serveOnce({
+    title: 'Too Many Requests',
+    status: 429,
+    address: null,
+  })
+  try {
+    await assert.rejects(
+      () => nominatimGeocoder(server.url, 'Denver', false),
+      (err) => /error body/.test(err.message) && !/Photon/.test(err.message),
+    )
+    const viaGeocoder = await geocoder(server.url, 'Denver', false, '{{city}}')
+    assert.deepEqual(viaGeocoder, [])
+  } finally {
+    await server.close()
+  }
+})
+
+// The coordinate validation must not reject what it exists to protect: a
+// genuine reverse result, whose lat and lon are parseable strings.
+test('a genuine Nominatim reverse result passes the coordinate validation', async () => {
+  const server = await serveOnce(NOMINATIM_REVERSE_BODY)
+  try {
+    const results = await nominatimGeocoder(
+      server.url,
+      { lat: 39.7392, lon: -104.9903 },
+      true,
+    )
+    assert.equal(results.length, 1)
+    assert.equal(results[0].latitude, 39.7392)
+    assert.equal(results[0].city, 'Denver')
+  } finally {
+    await server.close()
+  }
 })
