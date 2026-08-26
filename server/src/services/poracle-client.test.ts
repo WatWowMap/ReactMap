@@ -23,7 +23,7 @@ test('sends the secret as a header and never in the URL', async () => {
 
   await client.get('/v2/humans/123')
 
-  expect(seenUrl).toBe('http://poracle.test:3030/v2/humans/123')
+  expect(seenUrl).toBe('http://poracle.test:3030/api/v2/humans/123')
   expect(seenHeaders['X-Poracle-Secret']).toBe('shhh')
   expect(seenUrl).not.toContain('shhh')
 })
@@ -140,4 +140,48 @@ test('poracleConfigured is false when the secret is missing', () => {
   expect(poracleConfigured({ config: { ...CONFIG, poracleSecret: '' } })).toBe(
     false,
   )
+})
+
+test('every route lives under the /api group Poracle mounts them on', async () => {
+  // PoracleNG registers the whole authenticated surface on r.Group("/api") and
+  // its OpenAPI document carries no `servers` entry, so every path in the spec
+  // reads /v2/... and the prefix is invisible. Against a live instance
+  // /v2/humans/1/tracking is a 404 and /api/v2/humans/1/tracking is a 401.
+  //
+  // A 404 is the worst possible way to get this wrong: the human check reads
+  // one as "this account has no Poracle", so a missing prefix presents as
+  // every user being told they are not registered, which looks exactly like
+  // the feature working. The prefix lives here, in the base URL, rather than
+  // in each caller's path, so no route can be added without it.
+  const urls: string[] = []
+  const client = createPoracleClient({
+    config: CONFIG,
+    fetch: (async (url: any) => {
+      urls.push(String(url))
+      return new Response('{}', { status: 200 })
+    }) as any,
+  })
+
+  await client.get('/v2/humans/123/tracking')
+  await client.send('POST', '/v2/humans/123/tracking/pokemon?silent=true', [])
+  await client.send('DELETE', '/v2/humans/123/tracking/pokemon/7')
+
+  expect(urls).toEqual([
+    'http://poracle.test:3030/api/v2/humans/123/tracking',
+    'http://poracle.test:3030/api/v2/humans/123/tracking/pokemon?silent=true',
+    'http://poracle.test:3030/api/v2/humans/123/tracking/pokemon/7',
+  ])
+})
+
+test('a host with no port still reaches the /api group', async () => {
+  let seenUrl = ''
+  const client = createPoracleClient({
+    config: { ...CONFIG, port: 0 },
+    fetch: (async (url: any) => {
+      seenUrl = String(url)
+      return new Response('{}', { status: 200 })
+    }) as any,
+  })
+  await client.get('/v2/humans/123')
+  expect(seenUrl).toBe('http://poracle.test/api/v2/humans/123')
 })

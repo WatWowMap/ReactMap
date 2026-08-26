@@ -14,6 +14,15 @@
 // `path` is an already-encoded path suffix such as
 // `/v2/humans/123/tracking/pokemon`. Callers build their own segments with
 // `encodeURIComponent`; this module does no interpolation of its own.
+//
+// The `/api` prefix is added HERE and nowhere else. PoracleNG mounts its whole
+// authenticated surface on `r.Group("/api")` and its OpenAPI document carries
+// no `servers` entry, so every path in the spec reads `/v2/...` and the prefix
+// is invisible -- against a live instance `/v2/humans/1/tracking` is a 404 and
+// `/api/v2/humans/1/tracking` is a 401. A 404 is the worst way to get that
+// wrong, because the human check reads one as "this account has no Poracle":
+// a missing prefix would tell every user they are not registered and look
+// exactly like the feature working. One base means no route can forget it.
 
 import config from '@rm/config'
 import type { Poracle } from '@rm/types'
@@ -25,6 +34,9 @@ import type { Poracle } from '@rm/types'
 // from having to fake fields this module never touches.
 type PoracleConfig = Pick<Poracle, 'host' | 'port' | 'poracleSecret'> &
   Partial<Omit<Poracle, 'host' | 'port' | 'poracleSecret'>>
+
+/** The gin group PoracleNG mounts every authenticated route under. */
+const API_PREFIX = '/api'
 
 interface PoracleResponse {
   status: number
@@ -74,7 +86,7 @@ function createPoracleClient(
       },
     }
     if (body !== undefined) init.body = JSON.stringify(body)
-    const response = await doFetch(`${base}${path}`, init)
+    const response = await doFetch(`${base}${API_PREFIX}${path}`, init)
     const text = await response.text()
     let parsed: any = null
     try {
