@@ -1144,17 +1144,39 @@ Pure refactor. Filters behaviour must not change, and its existing tests are the
     suffix?: string
     /** Renders a bound as a word instead of a number, e.g. XXS..XXL. */
     words?: Record<number, string>
+    /** PvP only. The label prefix is looked up from ANOTHER column's value,
+     *  so `pvpLeague: 1500` with `label: 'rank'` renders "Great rank 1-100".
+     *  The whole condition is omitted when that column is null. */
+    labelField?: string
+    labelWords?: Record<number, string>
   }
   interface ChoiceCondition {
     kind: 'choice'
     key: string
     label: string
     field: string
-    options: { value: number; label: string }[]
+    /** Renders the matched option's label ALONE, with no `label` prefix:
+     *  gender 1 is "male", not "gender male". `value` is a string for
+     *  `rule.size`, whose column is 'sm' | 'md' | 'lg' | 'xl'. */
+    options: { value: number | string; label: string }[]
   }
+  /** Truthy renders `label` verbatim: 'ring', 'notifies'. Falsy renders nothing. */
   interface ToggleCondition { kind: 'toggle'; key: string; label: string; field: string }
   interface TextCondition { kind: 'text'; key: string; label: string; field: string }
-  type ConditionDef = RangeCondition | ChoiceCondition | ToggleCondition | TextCondition
+  /** A counted array: '1 exception' / '3 exceptions'. Omitted when empty. */
+  interface CountCondition {
+    kind: 'count'
+    key: string
+    field: string
+    singular: string
+    plural: string
+  }
+  type ConditionDef =
+    | RangeCondition
+    | ChoiceCondition
+    | ToggleCondition
+    | TextCondition
+    | CountCondition
   interface Vocabulary {
     id: 'reactmap' | 'poracle'
     conditions: ConditionDef[]
