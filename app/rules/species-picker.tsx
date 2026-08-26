@@ -35,15 +35,18 @@ export interface SpeciesEntry {
 export type SpeciesSelection = number | { speciesId: number; formId: number }
 
 /**
- * The UICONS style the tiles draw from when the caller names none. This
- * is the same default style 1.x ships in `config/local.example.json`, and
- * the URL shape is UICONS' own (`uicons.js`'s `pokemon()`): `{id}.webp`
+ * The UICONS style the tiles draw from when the caller names none: our
+ * own icon proxy, the same origin the map's sprites come from, so a
+ * firewalled deploy can open this picker.
+ *
+ * The URL shape is UICONS' own (`uicons.js`'s `pokemon()`): `{id}.webp`
  * is a species' default form art, `{id}_f{formId}.webp` one specific
- * form. A style that has no asset for a particular form simply 404s, and
- * the row falls back to the species art -- see `handleFormArtError`.
+ * form. A style that has no asset for a particular form simply 404s --
+ * and the proxy answers a file its index does not list with the same 404,
+ * without reaching upstream -- so the row still falls back to the species
+ * art, see `handleFormArtError`.
  */
-export const DEFAULT_ICON_BASE =
-  'https://raw.githubusercontent.com/WatWowMap/wwm-uicons-webp/main'
+export const DEFAULT_ICON_BASE = '/api/icons'
 
 /** The art for one species (`formId` omitted) or one of its forms. */
 export function speciesIconUrl(
@@ -125,8 +128,12 @@ function filterSpecies(species: SpeciesEntry[], term: string): FilteredEntry[] {
 function handleFormArtError(event: React.SyntheticEvent<HTMLImageElement>) {
   const img = event.currentTarget
   const fallback = img.dataset.speciesArt
-  if (!fallback || img.src === fallback) return
-  img.src = fallback
+  // The attribute, not the `src` property: the property is resolved
+  // against the document, so a same-origin base like `/api/icons/...`
+  // never compares equal to the attribute it came from and the guard
+  // would let a missing species asset request itself forever.
+  if (!fallback || img.getAttribute('src') === fallback) return
+  img.setAttribute('src', fallback)
 }
 
 export interface SpeciesPickerProps {

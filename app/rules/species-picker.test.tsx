@@ -48,16 +48,19 @@ function renderPicker({
   species,
   selected = [],
   onChange = vi.fn(),
+  iconBase,
 }: {
   species: RawSpeciesEntry[]
   selected?: SpeciesSelection[]
   onChange?: (selection: SpeciesSelection[]) => void
+  iconBase?: string
 }) {
   const view = render(
     <SpeciesPicker
       species={normalizeSpecies(species)}
       selected={selected}
       onChange={onChange}
+      {...(iconBase ? { iconBase } : {})}
     />,
   )
   return { ...view, onChange }
@@ -137,15 +140,31 @@ test('each species tile draws its default form art', () => {
   )
 })
 
+test('the default art base is our own origin, not a third party', () => {
+  // A firewalled or air-gapped deploy has to be able to open this picker,
+  // which means the tiles come from the same icon proxy the map's sprites
+  // do rather than straight from the uicons repository.
+  expect(DEFAULT_ICON_BASE.startsWith('/')).toBe(true)
+  expect(DEFAULT_ICON_BASE).not.toInclude('://')
+})
+
 test('an expanded form row draws that form art, not the species art', () => {
-  const { container, getByRole } = renderPicker({ species: [RATICATE] })
+  // An absolute base on purpose: happy-dom dispatches a load error for a
+  // relative image src, which fires the 404 fallback this test exists to
+  // watch NOT fire. The url-building itself is base-agnostic, and the
+  // default base is covered by the test above.
+  const base = 'https://icons.example.test'
+  const { container, getByRole } = renderPicker({
+    species: [RATICATE],
+    iconBase: base,
+  })
   fireEvent.click(getByRole('button', { name: /expand raticate/i }))
   const sources = [...container.querySelectorAll('img')].map((img) =>
     img.getAttribute('src'),
   )
   expect(sources).toEqual([
-    `${DEFAULT_ICON_BASE}/pokemon/20.webp`,
-    `${DEFAULT_ICON_BASE}/pokemon/20_f46.webp`,
+    `${base}/pokemon/20.webp`,
+    `${base}/pokemon/20_f46.webp`,
   ])
 })
 
