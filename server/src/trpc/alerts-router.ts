@@ -335,6 +335,42 @@ function toPoracleRule(rule: AlertInput): Record<string, unknown> {
   return body
 }
 
+/**
+ * The stored fields a full replace must put back, because nothing on the way
+ * in can carry them.
+ *
+ * Poracle's PUT is a full replace and `translateV2Pokemon` defaults every
+ * omitted field, so anything `alertRuleShape` does not accept is destroyed by
+ * an edit rather than left alone. `clean` is the sharp one: the column is a
+ * bitmask packed from (clean, edit, summary), so a rule saved with `clean`
+ * alone clears the other two bits. Someone who set "keep updated in place"
+ * from the Discord bot would lose it the moment they touched that rule in the
+ * tab, with nothing to tell them.
+ *
+ * `override_areas` is conditional, because Poracle rejects it alongside a
+ * distance or a location label (`validateOverrideFields`). Carrying it back
+ * regardless would turn every edit that picks a radius into a 422, and a user
+ * picking a radius is a user replacing the areas.
+ *
+ * A field Poracle projected as `null` is at its default and is left out: a
+ * replace that omits it lands on the same default.
+ */
+function carriedForward(row: any, rule: AlertInput): Record<string, unknown> {
+  const carried: Record<string, unknown> = {}
+  for (const column of ['edit', 'summary', 'pvp_ranking_evolution']) {
+    if (row?.[column] !== null && row?.[column] !== undefined) {
+      carried[column] = row[column]
+    }
+  }
+  const areas = row?.override_areas
+  const areasConflict =
+    (rule.distance ?? 0) > 0 || (rule.overrideLocationLabel ?? '').length > 0
+  if (!areasConflict && Array.isArray(areas) && areas.length > 0) {
+    carried.override_areas = areas
+  }
+  return carried
+}
+
 /** Poracle rules, projected to what a client sees, stamped with the profile written to. */
 function toAlertRows(list: unknown, profileNo: number): AlertRow[] {
   const rows = Array.isArray(list) ? list : []
@@ -661,7 +697,7 @@ const alertsRouter = t.router({
     .input(z.object({ uid: z.number().int(), rule: alertInput }))
     .mutation(async ({ ctx, input }): Promise<{ uid: number }> => {
       const session = await beginWrite(ctx)
-      const { profileNo } = findRule(session.body, input.uid)
+      const { row, profileNo } = findRule(session.body, input.uid)
       if (
         input.rule.profileNo !== undefined &&
         input.rule.profileNo !== profileNo
@@ -674,12 +710,10 @@ const alertsRouter = t.router({
         })
       }
       const path = `${pokemonPath(session.platformId)}/${input.uid}${writeQuery(profileNo)}`
-      const body = await sendWrite(
-        session.client,
-        'PUT',
-        path,
-        toPoracleRule(input.rule),
-      )
+      const body = await sendWrite(session.client, 'PUT', path, {
+        ...carriedForward(row, input.rule),
+        ...toPoracleRule(input.rule),
+      })
       const uid = body?.updated?.[0]?.uid
       if (typeof uid !== 'number') {
         throw new TRPCError({

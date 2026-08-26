@@ -645,3 +645,101 @@ test('a rule that names no pokemon is refused before it costs a round trip', asy
   ).rejects.toThrow()
   expect(client.sent).toEqual([])
 })
+
+test('a replace preserves the settings the tab cannot edit', async () => {
+  // PUT is a full replace and translateV2Pokemon defaults every omitted
+  // field, so anything alertRuleShape does not carry is destroyed by an edit.
+  // clean is the sharp one: Poracle stores it as a bitmask packed from
+  // (clean, edit, summary), so sending clean alone clears the other two bits.
+  // Someone who set "keep updated in place" from the Discord bot would lose it
+  // the moment they touched that rule in the tab.
+  const client = fakeWrites({
+    body: {
+      ...WRITE_BODY,
+      tracking: {
+        pokemon: [
+          {
+            uid: 7,
+            profile_no: 1,
+            pokemon_id: 25,
+            edit: true,
+            summary: true,
+            pvp_ranking_evolution: 2,
+          },
+        ],
+      },
+    },
+    response: { updated: [{ uid: 99 }] },
+  })
+  await caller({ ...BASE, poracleClient: client }).replace({
+    uid: 7,
+    rule: { pokemonId: 25, clean: true },
+  })
+  expect(client.sent[0]?.body).toMatchObject({
+    pokemon_id: 25,
+    clean: true,
+    edit: true,
+    summary: true,
+    pvp_ranking_evolution: 2,
+  })
+})
+
+test('a replace preserves override areas when the edit does not conflict', async () => {
+  const client = fakeWrites({
+    body: {
+      ...WRITE_BODY,
+      tracking: {
+        pokemon: [
+          { uid: 7, profile_no: 1, pokemon_id: 25, override_areas: ['city'] },
+        ],
+      },
+    },
+    response: { updated: [{ uid: 99 }] },
+  })
+  await caller({ ...BASE, poracleClient: client }).replace({
+    uid: 7,
+    rule: { pokemonId: 25, ivMin: 90 },
+  })
+  expect(client.sent[0]?.body?.override_areas).toEqual(['city'])
+})
+
+test('an edit that picks a radius drops the areas rather than 422ing', async () => {
+  // Poracle rejects override_areas alongside distance > 0 or a location
+  // label. Carrying them forward regardless would turn every such edit into a
+  // 422; the user picking a radius is the user replacing the areas.
+  const client = fakeWrites({
+    body: {
+      ...WRITE_BODY,
+      tracking: {
+        pokemon: [
+          { uid: 7, profile_no: 1, pokemon_id: 25, override_areas: ['city'] },
+        ],
+      },
+    },
+    response: { updated: [{ uid: 99 }] },
+  })
+  await caller({ ...BASE, poracleClient: client }).replace({
+    uid: 7,
+    rule: { pokemonId: 25, distance: 500 },
+  })
+  expect(client.sent[0]?.body).not.toHaveProperty('override_areas')
+})
+
+test('a field the stored rule left unset is not invented on the way out', async () => {
+  // Poracle projects a field at its default to null on the way out. Sending
+  // that null back is harmless but noisy; sending it as a value would not be.
+  const client = fakeWrites({ response: { updated: [{ uid: 99 }] } })
+  await caller({ ...BASE, poracleClient: client }).replace({
+    uid: 7,
+    rule: { pokemonId: 25 },
+  })
+  expect(Object.keys(client.sent[0]?.body)).toEqual(['pokemon_id'])
+})
+
+test('create carries nothing forward, because there is nothing to carry', async () => {
+  const client = fakeWrites()
+  await caller({ ...BASE, poracleClient: client }).create({
+    rules: [{ pokemonId: 25 }],
+  })
+  expect(Object.keys(client.sent[0]?.body[0])).toEqual(['pokemon_id'])
+})
