@@ -301,7 +301,9 @@ test('replace returns the new uid, because PUT is delete plus insert', async () 
       send: async () => ({ status: 200, body: { updated: [{ uid: 99 }] } }),
     },
   }
-  expect(await caller(ctx).replace({ uid: 7, rule: {} as any })).toEqual({
+  expect(
+    await caller(ctx).replace({ uid: 7, rule: { pokemonId: 25 } }),
+  ).toEqual({
     uid: 99,
   })
 })
@@ -341,7 +343,7 @@ test('a blocked human can read but cannot write', async () => {
   await expect(caller(ctx).snapshot()).resolves.toBeDefined()
   for (const call of [
     () => caller(ctx).create({ rules: [] }),
-    () => caller(ctx).replace({ uid: 7, rule: {} as any }),
+    () => caller(ctx).replace({ uid: 7, rule: { pokemonId: 25 } }),
     () => caller(ctx).remove({ uid: 7 }),
   ]) {
     await expect(call()).rejects.toThrow(/blocked/i)
@@ -525,5 +527,18 @@ test('a batch may not straddle two profiles', async () => {
       ],
     }),
   ).rejects.toThrow(/profile/i)
+  expect(client.sent).toEqual([])
+})
+
+test('a rule that names no pokemon is refused before it costs a round trip', async () => {
+  // pokemon_id is the one field Poracle requires. Leaving it to Poracle's 422
+  // would validate a network hop later than we can, and would hand Tasks 12
+  // and 13 an AlertInput whose pokemonId is optional but not really optional.
+  const client = fakeWrites()
+  await expect(
+    caller({ ...BASE, poracleClient: client }).create({
+      rules: [{ ivMin: 90 } as any],
+    }),
+  ).rejects.toThrow()
   expect(client.sent).toEqual([])
 })

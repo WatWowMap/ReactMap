@@ -211,17 +211,19 @@ const filter = z.number().int().min(INT_MIN).max(INT_MAX).nullable().optional()
  * The fields of one rule, named as `AlertRow` names them so a rule a client
  * read back can be edited and sent again without translating twice.
  *
- * Every field is optional, Poracle's own strict-request rule: an omitted field
- * is that filter's documented default, which is what makes a PUT a full
- * replace rather than a patch. `pokemon_id` is the one field Poracle requires,
- * and Poracle is where that requirement is enforced -- a rule without it comes
- * back as a 422 that `sendWrite` surfaces.
+ * Every filter is optional, Poracle's own strict-request rule: an omitted
+ * field is that filter's documented default, which is what makes a PUT a full
+ * replace rather than a patch. `pokemonId` is the exception, because it is the
+ * one field Poracle requires. Requiring it here too refuses the rule before it
+ * costs a round trip, and keeps every later consumer of `AlertInput` from
+ * inheriting an optional field that is not really optional.
  *
  * Absent from it on purpose: `ping`, which Poracle stores server-side and
  * ignores on the way in, and `uid`, which is Poracle's to assign.
  */
 const alertRuleShape = {
-  pokemonId: filter,
+  // Not `filter`: a rule names exactly one species, and 0 is not a Pokedex id.
+  pokemonId: z.number().int().min(1).max(INT_MAX),
   form: filter,
   costume: filter,
   distance: filter,
