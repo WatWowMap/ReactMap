@@ -300,7 +300,7 @@ test('create suppresses the confirmation push', async () => {
       },
     },
   }
-  await caller(ctx).create({ rules: [] })
+  await caller(ctx).create({ rules: [{ pokemonId: 25 }] })
   expect(seenPath).toContain('silent=true')
 })
 
@@ -395,7 +395,7 @@ test('a blocked human can read but cannot write', async () => {
   }
   await expect(caller(ctx).snapshot()).resolves.toBeDefined()
   for (const call of [
-    () => caller(ctx).create({ rules: [] }),
+    () => caller(ctx).create({ rules: [{ pokemonId: 25 }] }),
     () => caller(ctx).replace({ uid: 7, rule: { pokemonId: 25 } }),
     () => caller(ctx).remove({ uid: 7 }),
   ]) {
@@ -572,7 +572,9 @@ test('a Poracle that is not answering fails the write rather than reporting succ
       },
     },
   }
-  await expect(caller(ctx).create({ rules: [] })).rejects.toThrow(/Alerts/i)
+  await expect(
+    caller(ctx).create({ rules: [{ pokemonId: 25 }] }),
+  ).rejects.toThrow(/Alerts/i)
 })
 
 test('a write refuses when the snapshot that authorizes it cannot be read', async () => {
@@ -744,4 +746,15 @@ test('create carries nothing forward, because there is nothing to carry', async 
     rules: [{ pokemonId: 25 }],
   })
   expect(Object.keys(client.sent[0]?.body[0])).toEqual(['pokemon_id'])
+})
+
+test('an empty batch is refused rather than sent', async () => {
+  // Poracle answers a body with no rules in it with a 422, so an empty batch
+  // is a round trip that can only fail, and a save with nothing in it is a bug
+  // in the caller either way.
+  const client = fakeWrites()
+  await expect(
+    caller({ ...BASE, poracleClient: client }).create({ rules: [] }),
+  ).rejects.toThrow()
+  expect(client.sent).toEqual([])
 })

@@ -687,7 +687,10 @@ const alertsRouter = t.router({
    * See `AlertWriteResult`.
    */
   create: t.procedure
-    .input(z.object({ rules: z.array(alertInput).max(MAX_RULES) }))
+    // `.min(1)`: Poracle answers an empty body with a 422, so an empty batch
+    // is a round trip that can only fail. It is also a request nobody meant to
+    // make -- a save with nothing in it is a bug in the caller.
+    .input(z.object({ rules: z.array(alertInput).min(1).max(MAX_RULES) }))
     .mutation(async ({ ctx, input }): Promise<AlertWriteResult> => {
       const session = await beginWrite(ctx)
       const profileNo = resolveProfile(session.body, batchProfile(input.rules))
