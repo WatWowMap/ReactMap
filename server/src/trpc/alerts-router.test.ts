@@ -238,6 +238,17 @@ const ITEM_PATH = '/v2/humans/123/tracking/pokemon/7'
  * endpoint and pass. `owned` is the set of uids this human has, so a write
  * against somebody else's rule takes the 404 Poracle would return.
  */
+/**
+ * A snapshot with one rule in it, which every by-uid write now needs: the
+ * profile a write targets comes from the rule, so a uid the snapshot does not
+ * carry is refused before the round trip.
+ */
+const WRITE_BODY = {
+  ...SNAPSHOT_BODY,
+  tracking: { pokemon: [{ uid: 7, profile_no: 1, pokemon_id: 25 }] },
+  profiles: [{ profile_no: 1, name: 'default' }],
+}
+
 function fakeWrites(
   options: { body?: any; owned?: number[]; response?: any } = {},
 ) {
@@ -251,7 +262,7 @@ function fakeWrites(
     sent,
     get: async (path: string) => {
       if (path === TRACKING_PATH)
-        return { status: 200, body: options.body ?? SNAPSHOT_BODY }
+        return { status: 200, body: options.body ?? WRITE_BODY }
       return { status: 404, body: null }
     },
     send: async (method: string, path: string, body: any) => {
@@ -297,7 +308,7 @@ test('replace returns the new uid, because PUT is delete plus insert', async () 
   const ctx = {
     ...BASE,
     poracleClient: {
-      get: async () => ({ status: 200, body: SNAPSHOT_BODY }),
+      get: async () => ({ status: 200, body: WRITE_BODY }),
       send: async () => ({ status: 200, body: { updated: [{ uid: 99 }] } }),
     },
   }
@@ -354,7 +365,7 @@ test('no write procedure accepts a human id', () => {
 test('the write inputs are exactly the fields the procedures document', () => {
   expect(inputFields('create')).toContain('rules')
   expect(inputFields('replace')).toContain('rule')
-  expect(inputFields('remove')).toEqual(['uid', 'profileNo'])
+  expect(inputFields('remove')).toEqual(['uid'])
   // The nested rule is reached, so a field hidden inside it is reached too.
   expect(inputFields('replace')).toContain('pokemonId')
 })
@@ -375,8 +386,8 @@ test('a blocked human can read but cannot write', async () => {
       get: async () => ({
         status: 200,
         body: {
-          ...SNAPSHOT_BODY,
-          human: { ...SNAPSHOT_BODY.human, blocked_alerts: '["monster"]' },
+          ...WRITE_BODY,
+          human: { ...WRITE_BODY.human, blocked_alerts: '["monster"]' },
         },
       }),
       send: async () => ({ status: 200, body: {} }),
@@ -488,13 +499,63 @@ test('remove deletes the addressed rule and returns the uids', async () => {
   expect(result).toEqual({ deleted: [7] })
 })
 
-test('a rule this human does not own comes back as a 404, not a success', async () => {
-  // Poracle 404s a uid its owner check rejects. Swallowing that would report
-  // a delete that never happened.
-  const client = fakeWrites({ owned: [7] })
+test('a rule this human does not own is refused without a round trip', async () => {
+  // The uid is not in this human's snapshot, so it is not theirs to delete.
+  // Poracle's own ownership check would 404 it as well; refusing here means
+  // the answer does not depend on which check the request reaches first.
+  const client = fakeWrites()
   await expect(
     caller({ ...BASE, poracleClient: client }).remove({ uid: 8 }),
   ).rejects.toThrow(/not found/i)
+  expect(client.sent).toEqual([])
+})
+
+test('a 404 from Poracle is surfaced, not swallowed', async () => {
+  // The snapshot said the rule was there and Poracle says it is not, which is
+  // what a rule deleted from the Discord bot mid-edit looks like. Reporting a
+  // delete that never happened is the one outcome worse than an error.
+  const ctx = {
+    ...BASE,
+    poracleClient: {
+      get: async () => ({ status: 200, body: WRITE_BODY }),
+      send: async () => ({ status: 404, body: null }),
+    },
+  }
+  await expect(caller(ctx).remove({ uid: 7 })).rejects.toThrow(/not found/i)
+})
+
+test('a rule outside the active profile is written to its own profile', async () => {
+  // The tab reads with all_profiles=true, so it lists rules the human's active
+  // profile does not contain. Poracle's ownership check is profile-scoped and
+  // a write with no profile goes to the active one, so taking the profile from
+  // the request would 404 every one of those rules -- a missing argument
+  // presenting as data corruption.
+  const client = fakeWrites({
+    body: {
+      ...WRITE_BODY,
+      human: { ...WRITE_BODY.human, current_profile_no: 1 },
+      tracking: { pokemon: [{ uid: 7, profile_no: 2, pokemon_id: 25 }] },
+      profiles: [
+        { profile_no: 1, name: 'default' },
+        { profile_no: 2, name: 'work' },
+      ],
+    },
+  })
+  await caller({ ...BASE, poracleClient: client }).remove({ uid: 7 })
+  expect(client.sent[0]?.path).toContain('profile=2')
+})
+
+test('a replace may not move a rule to another profile', async () => {
+  // PUT deletes and re-inserts within one profile, and the ownership check
+  // that finds the old row is scoped to it, so a move cannot be honoured.
+  const client = fakeWrites()
+  await expect(
+    caller({ ...BASE, poracleClient: client }).replace({
+      uid: 7,
+      rule: { pokemonId: 25, profileNo: 2 },
+    }),
+  ).rejects.toThrow(/moved between profiles/i)
+  expect(client.sent).toEqual([])
 })
 
 test('a Poracle that is not answering fails the write rather than reporting success', async () => {
@@ -531,7 +592,7 @@ test('replace fails when Poracle names no replacement rule', async () => {
   const ctx = {
     ...BASE,
     poracleClient: {
-      get: async () => ({ status: 200, body: SNAPSHOT_BODY }),
+      get: async () => ({ status: 200, body: WRITE_BODY }),
       send: async () => ({ status: 200, body: { updated: [] } }),
     },
   }

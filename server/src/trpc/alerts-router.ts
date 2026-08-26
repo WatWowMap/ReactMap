@@ -419,10 +419,16 @@ function batchProfile(rules: AlertInput[]): number | undefined {
   return requested[0]
 }
 
-interface WriteTarget {
+interface WriteSession {
   client: PoracleClient
   platformId: string
-  profileNo: number
+  /**
+   * The raw snapshot the write is authorized against, kept rather than
+   * projected. Two things a write needs are deliberately not in
+   * `AlertsSnapshot`: the human's `blocked_alerts`, and the stored value of
+   * every field `alertRuleShape` does not accept (see `carriedForward`).
+   */
+  body: any
 }
 
 /**
@@ -433,10 +439,7 @@ interface WriteTarget {
  * with. The read side stays open -- someone whose alerts are blocked can still
  * see what they are subscribed to -- and only the writes refuse.
  */
-async function beginWrite(
-  ctx: Context,
-  requestedProfile: number | undefined,
-): Promise<WriteTarget> {
+async function beginWrite(ctx: Context): Promise<WriteSession> {
   const userId = requirePerm(ctx, 'alerts')
   const client = clientFor(ctx)
   if (!client) {
@@ -460,11 +463,42 @@ async function beginWrite(
       message: 'Pokemon alerts are blocked for this account',
     })
   }
-  return {
-    client,
-    platformId,
-    profileNo: resolveProfile(body, requestedProfile),
+  return { client, platformId, body }
+}
+
+/**
+ * The stored rule a by-uid write addresses, and the profile it lives in.
+ *
+ * The profile is taken from the rule rather than from the request, and that is
+ * the fix for a whole class of nonsense: Poracle's `v2FindOwnedRow` scopes by
+ * profile, the tab reads its rules with `all_profiles=true`, and a write with
+ * no profile goes to the active one. So a rule the tab listed from a
+ * non-active profile would be deleted "successfully" against the wrong scope
+ * and come back 404 -- a missing argument presenting as data corruption.
+ * Nothing a client sends can select the profile here, so nothing can omit it
+ * either.
+ *
+ * A uid that is not in the snapshot is refused before the round trip. Poracle
+ * would 404 it too; doing it here means the answer does not depend on which of
+ * the two checks the request happens to reach first.
+ */
+function findRule(body: any, uid: number): { row: any; profileNo: number } {
+  const rules = Array.isArray(body?.tracking?.pokemon)
+    ? body.tracking.pokemon
+    : []
+  const row = rules.find((rule: any) => rule?.uid === uid)
+  if (!row) {
+    throw new TRPCError({
+      code: 'NOT_FOUND',
+      message: 'That alert was not found',
+    })
   }
+  const view = toAlertsSnapshot(body)
+  const profileNo =
+    typeof row.profile_no === 'number'
+      ? row.profile_no
+      : view.human.currentProfileNo
+  return { row, profileNo }
 }
 
 /**
@@ -595,18 +629,19 @@ const alertsRouter = t.router({
   create: t.procedure
     .input(z.object({ rules: z.array(alertInput).max(MAX_RULES) }))
     .mutation(async ({ ctx, input }): Promise<AlertWriteResult> => {
-      const target = await beginWrite(ctx, batchProfile(input.rules))
-      const path = `${pokemonPath(target.platformId)}${writeQuery(target.profileNo)}`
+      const session = await beginWrite(ctx)
+      const profileNo = resolveProfile(session.body, batchProfile(input.rules))
+      const path = `${pokemonPath(session.platformId)}${writeQuery(profileNo)}`
       const body = await sendWrite(
-        target.client,
+        session.client,
         'POST',
         path,
         input.rules.map(toPoracleRule),
       )
       return {
-        created: toAlertRows(body?.created, target.profileNo),
-        updated: toAlertRows(body?.updated, target.profileNo),
-        unchanged: toAlertRows(body?.unchanged, target.profileNo),
+        created: toAlertRows(body?.created, profileNo),
+        updated: toAlertRows(body?.updated, profileNo),
+        unchanged: toAlertRows(body?.unchanged, profileNo),
       }
     }),
 
@@ -625,10 +660,22 @@ const alertsRouter = t.router({
   replace: t.procedure
     .input(z.object({ uid: z.number().int(), rule: alertInput }))
     .mutation(async ({ ctx, input }): Promise<{ uid: number }> => {
-      const target = await beginWrite(ctx, input.rule.profileNo)
-      const path = `${pokemonPath(target.platformId)}/${input.uid}${writeQuery(target.profileNo)}`
+      const session = await beginWrite(ctx)
+      const { profileNo } = findRule(session.body, input.uid)
+      if (
+        input.rule.profileNo !== undefined &&
+        input.rule.profileNo !== profileNo
+      ) {
+        // PUT deletes and re-inserts within one profile, and the ownership
+        // check that finds the old row is scoped to it. A rule cannot move.
+        throw new TRPCError({
+          code: 'BAD_REQUEST',
+          message: 'A rule cannot be moved between profiles',
+        })
+      }
+      const path = `${pokemonPath(session.platformId)}/${input.uid}${writeQuery(profileNo)}`
       const body = await sendWrite(
-        target.client,
+        session.client,
         'PUT',
         path,
         toPoracleRule(input.rule),
@@ -643,22 +690,21 @@ const alertsRouter = t.router({
       return { uid }
     }),
 
-  /** Delete one rule, and report the uids that actually went. */
+  /**
+   * Delete one rule, and report the uids that actually went.
+   *
+   * No profile on the input: it comes from the rule, so a rule the tab listed
+   * from a non-active profile is deletable rather than a 404.
+   */
   remove: t.procedure
-    .input(
-      z.object({
-        uid: z.number().int(),
-        profileNo: z.number().int().min(0).max(INT_MAX).optional(),
-      }),
-    )
+    .input(z.object({ uid: z.number().int() }))
     .mutation(async ({ ctx, input }): Promise<{ deleted: number[] }> => {
-      const target = await beginWrite(ctx, input.profileNo)
-      const path = `${pokemonPath(target.platformId)}/${input.uid}${writeQuery(target.profileNo)}`
-      const body = await sendWrite(target.client, 'DELETE', path)
+      const session = await beginWrite(ctx)
+      const { profileNo } = findRule(session.body, input.uid)
+      const path = `${pokemonPath(session.platformId)}/${input.uid}${writeQuery(profileNo)}`
+      const body = await sendWrite(session.client, 'DELETE', path)
       return {
-        deleted: toAlertRows(body?.deleted, target.profileNo).map(
-          (row) => row.uid,
-        ),
+        deleted: toAlertRows(body?.deleted, profileNo).map((row) => row.uid),
       }
     }),
 })
