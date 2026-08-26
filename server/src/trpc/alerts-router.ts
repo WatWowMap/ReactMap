@@ -13,7 +13,8 @@
 // explicit literals. 1.x leaked nothing here only because the GraphQL schema
 // declared no matching fields, and tRPC prunes nothing on the way out.
 
-import { and, eq } from 'drizzle-orm'
+import type { Poracle } from '@rm/types'
+import { eq } from 'drizzle-orm'
 
 import { authAccount } from '../db/auth-schema'
 import { getDrizzle } from '../db/drizzle'
@@ -30,28 +31,50 @@ import { type Context, t } from './trpc-base'
 /** Poracle's own name for the pokemon category, in config and in a human row. */
 const MONSTER = 'monster'
 
+/** Better Auth's name for the provider whose account id Poracle keys on. */
+const DISCORD = 'discord'
+
+interface AccountRow {
+  providerId: string
+  accountId: string
+}
+
+interface PlatformIdDeps {
+  listAccounts?: (db: any, userId: string) => Promise<AccountRow[]>
+}
+
+/** This user's linked identities, and nobody else's. */
+function listAccountRows(db: any, userId: string): Promise<AccountRow[]> {
+  return db
+    .select({
+      providerId: authAccount.providerId,
+      accountId: authAccount.accountId,
+    })
+    .from(authAccount)
+    .where(eq(authAccount.userId, userId))
+}
+
 /**
  * The Poracle human id for this account: the id of its linked Discord
  * identity, read from Better Auth's own account table.
  *
  * Never a column on the user row that something else wrote once, and never a
- * value off the wire.
+ * value off the wire. This return value becomes the `{id}` path segment, which
+ * is the identity Poracle acts as, so which row it picks is the whole
+ * impersonation boundary (spec 7.4).
+ *
+ * The provider choice is made here rather than in the WHERE clause so that it
+ * is one decision a test can reach: an account with a Telegram row and a
+ * Discord row is ordinary, and the table has no order that puts Discord first.
  */
 async function resolvePlatformId(
   db: any,
   userId: string,
+  deps: PlatformIdDeps = {},
 ): Promise<string | null> {
-  const rows = await db
-    .select({ accountId: authAccount.accountId })
-    .from(authAccount)
-    .where(
-      and(
-        eq(authAccount.userId, userId),
-        eq(authAccount.providerId, 'discord'),
-      ),
-    )
-    .limit(1)
-  return rows[0]?.accountId ?? null
+  const rows = await (deps.listAccounts ?? listAccountRows)(db, userId)
+  const discord = rows.find((row) => row.providerId === DISCORD)
+  return discord?.accountId ?? null
 }
 
 /**
@@ -85,7 +108,7 @@ function parseBlockedAlerts(value: any): string[] {
  * disagree about who is blocked, which is worse than either answer alone.
  */
 function pokemonBlocked(
-  poracleConfig: { disabledHooks?: string[] } | null | undefined,
+  poracleConfig: Partial<Poracle> | null | undefined,
   human: any,
 ): boolean {
   const disabled = poracleConfig?.disabledHooks ?? []

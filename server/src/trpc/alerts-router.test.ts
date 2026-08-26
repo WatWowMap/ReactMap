@@ -1,6 +1,7 @@
 import { expect, test } from 'bun:test'
+import config from '@rm/config'
 
-import { alertsRouter } from './alerts-router'
+import { alertsRouter, resolvePlatformId } from './alerts-router'
 
 function caller(ctx: any) {
   return alertsRouter.createCaller(ctx)
@@ -98,4 +99,55 @@ test('blocked_alerts that is null does not crash and does not block', async () =
     },
   }
   expect(await caller(ctx).status()).toMatchObject({ pokemonBlocked: false })
+})
+
+test('the platform id is the linked Discord account, not whatever row came first', async () => {
+  // This return value becomes the `{id}` path segment, which is the identity
+  // Poracle acts as, so picking the wrong row is the impersonation bug the
+  // whole feature is guarded against. A user with two linked identities is
+  // ordinary, and the account table has no order that puts Discord first.
+  const rows = [
+    { providerId: 'telegram', accountId: 'tg-999' },
+    { providerId: 'discord', accountId: 'dc-123' },
+  ]
+  const platformId = await resolvePlatformId({}, 'u1', {
+    listAccounts: async () => rows,
+  })
+  expect(platformId).toBe('dc-123')
+})
+
+test('an account with no Discord row has no platform id', async () => {
+  const platformId = await resolvePlatformId({}, 'u1', {
+    listAccounts: async () => [{ providerId: 'telegram', accountId: 'tg-999' }],
+  })
+  expect(platformId).toBeNull()
+})
+
+test('a user with no account rows at all has no platform id', async () => {
+  const platformId = await resolvePlatformId({}, 'u1', {
+    listAccounts: async () => [],
+  })
+  expect(platformId).toBeNull()
+})
+
+test('the account lookup is scoped to the asking user', async () => {
+  // The one argument the lookup may narrow on. A lookup that ignored it would
+  // hand back somebody else's Discord id and every check downstream would
+  // still pass.
+  let seen: unknown
+  await resolvePlatformId({}, 'u1', {
+    listAccounts: async (_db, userId) => {
+      seen = userId
+      return []
+    },
+  })
+  expect(seen).toBe('u1')
+})
+
+test('an operator can actually disable a category in config', () => {
+  // pokemonBlocked reads poracle.disabledHooks. Without the key on the
+  // interface and in the config default there is no way for an operator to
+  // set it, and the plan's operator-disabled criterion is unreachable.
+  const poracle: any = config.getSafe('poracle')
+  expect(Array.isArray(poracle.disabledHooks)).toBe(true)
 })
