@@ -111,6 +111,56 @@ test('the output carries exactly its declared keys and nothing else', () => {
     'latitude',
     'longitude',
   ])
+  expect(Object.keys(view.alerts[0] ?? {}).sort()).toEqual([
+    'atkMax',
+    'atkMin',
+    'clean',
+    'costume',
+    'cpMax',
+    'cpMin',
+    'defMax',
+    'defMin',
+    'description',
+    'distance',
+    'form',
+    'gender',
+    'ivMax',
+    'ivMin',
+    'levelMax',
+    'levelMin',
+    'minTime',
+    'overrideLocationLabel',
+    'ping',
+    'pokemonId',
+    'profileNo',
+    'pvpCap',
+    'pvpLeague',
+    'pvpMinCp',
+    'pvpRankBest',
+    'pvpRankWorst',
+    'rarityMax',
+    'rarityMin',
+    'sizeMax',
+    'sizeMin',
+    'staMax',
+    'staMin',
+    'template',
+    'uid',
+    'weightMax',
+    'weightMin',
+  ])
+  // Poracle's profile row carries the human's id, saved coordinates and area
+  // alongside the two fields wanted here. A spreading mapper would put a
+  // Discord id and a home location on the wire.
+  expect(Object.keys(view.profiles[0] ?? {}).sort()).toEqual([
+    'name',
+    'profileNo',
+  ])
+  expect(Object.keys(view.locations[0] ?? {}).sort()).toEqual([
+    'label',
+    'latitude',
+    'longitude',
+  ])
 })
 
 test('a field Poracle adds later does not reach the client', () => {
@@ -123,6 +173,10 @@ test('a field Poracle adds later does not reach the client', () => {
     tracking: {
       ...SNAPSHOT.tracking,
       pokemon: [{ ...SNAPSHOT.tracking.pokemon[0], another_new_one: 'leaked' }],
+    },
+    profiles: [{ ...SNAPSHOT.profiles[0], id: 'leaked', latitude: 'leaked' }],
+    locations: {
+      locations: [{ ...SNAPSHOT.locations.locations[0], extra: 'leaked' }],
     },
   }
   expect(JSON.stringify(toAlertsSnapshot(withNewField))).not.toContain('leaked')
