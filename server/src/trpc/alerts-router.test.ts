@@ -427,6 +427,7 @@ test('replace puts to the addressed rule', async () => {
   })
   expect(client.sent[0]?.method).toBe('PUT')
   expect(client.sent[0]?.path.split('?')[0]).toBe(ITEM_PATH)
+  expect(client.sent[0]?.path).toContain('silent=true')
   expect(client.sent[0]?.body).toEqual({ pokemon_id: 25 })
 })
 
@@ -437,6 +438,9 @@ test('remove deletes the addressed rule and returns the uids', async () => {
   })
   expect(client.sent[0]?.method).toBe('DELETE')
   expect(client.sent[0]?.path.split('?')[0]).toBe(ITEM_PATH)
+  // Poracle pushes a removal confirmation too, so an edit or a delete made in
+  // the tab would otherwise DM the user about what they just did in the tab.
+  expect(client.sent[0]?.path).toContain('silent=true')
   expect(result).toEqual({ deleted: [7] })
 })
 

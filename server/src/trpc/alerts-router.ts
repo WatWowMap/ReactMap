@@ -466,6 +466,23 @@ async function beginWrite(
 }
 
 /**
+ * The query string every write carries.
+ *
+ * `silent=true` is not an optimization, and it belongs on all three writes.
+ * Poracle pushes a confirmation for a create, an edit and a delete alike, so
+ * without it somebody working in the Alerts tab is messaged about each thing
+ * they just did in the Alerts tab -- once per rule, on whatever platform they
+ * linked.
+ *
+ * The profile is resolved server side by `beginWrite` and sent explicitly
+ * rather than left to Poracle's active-profile fallback, so which profile a
+ * write landed in is never ambiguous.
+ */
+function writeQuery(profileNo: number): string {
+  return `?silent=true&profile=${profileNo}`
+}
+
+/**
  * A write, with Poracle's answer turned into something a client can act on.
  *
  * The reads degrade to an empty tab on purpose; a write may not. A save that
@@ -572,18 +589,12 @@ const alertsRouter = t.router({
     }
   }),
 
-  /**
-   * Create rules, and update the ones the batch turns out to already cover.
-   *
-   * `silent=true` is not an optimization. Poracle sends a confirmation push
-   * per rule it created, so without it a batch notifies the user about the
-   * batch they just performed, once per rule, on whatever platform they linked.
-   */
+  /** Create rules, and update the ones the batch turns out to already cover. */
   create: t.procedure
     .input(z.object({ rules: z.array(alertInput).max(MAX_RULES) }))
     .mutation(async ({ ctx, input }): Promise<AlertWriteResult> => {
       const target = await beginWrite(ctx, batchProfile(input.rules))
-      const path = `${pokemonPath(target.platformId)}?silent=true&profile=${target.profileNo}`
+      const path = `${pokemonPath(target.platformId)}${writeQuery(target.profileNo)}`
       const body = await sendWrite(
         target.client,
         'POST',
@@ -613,7 +624,7 @@ const alertsRouter = t.router({
     .input(z.object({ uid: z.number().int(), rule: alertInput }))
     .mutation(async ({ ctx, input }): Promise<{ uid: number }> => {
       const target = await beginWrite(ctx, input.rule.profileNo)
-      const path = `${pokemonPath(target.platformId)}/${input.uid}?profile=${target.profileNo}`
+      const path = `${pokemonPath(target.platformId)}/${input.uid}${writeQuery(target.profileNo)}`
       const body = await sendWrite(
         target.client,
         'PUT',
@@ -640,7 +651,7 @@ const alertsRouter = t.router({
     )
     .mutation(async ({ ctx, input }): Promise<{ deleted: number[] }> => {
       const target = await beginWrite(ctx, input.profileNo)
-      const path = `${pokemonPath(target.platformId)}/${input.uid}?profile=${target.profileNo}`
+      const path = `${pokemonPath(target.platformId)}/${input.uid}${writeQuery(target.profileNo)}`
       const body = await sendWrite(target.client, 'DELETE', path)
       return {
         deleted: toAlertRows(body?.deleted, target.profileNo).map(
