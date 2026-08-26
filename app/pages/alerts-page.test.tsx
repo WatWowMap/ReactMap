@@ -400,6 +400,29 @@ test('a failed copyProfileRules shows the banner once the copy is confirmed', as
 // whether the page wires it up at all -- these render the real AlertsPage
 // and assert the client method the control is supposed to reach was called.
 
+test("the areas picker on the real page is built from the client's availableAreas, and adding one reaches setAreas", async () => {
+  // Proves the wiring end to end: AlertsPage actually fetches
+  // `availableAreas` and passes it down, rather than the picker only being
+  // exercised against a prop a component test supplied directly.
+  const calls: { areas: string[] }[] = []
+  const { findByRole, getByRole } = renderWith({
+    status: async () => ({ state: 'present' }),
+    snapshot: async () => EMPTY_SNAPSHOT,
+    availableAreas: async () => ({ areas: ['uptown'] }),
+    setAreas: async (args: { areas: string[] }) => {
+      calls.push(args)
+      return { areas: args.areas }
+    },
+  } as unknown as AlertsClient)
+  const picker = await findByRole('combobox', { name: /add area/i })
+  await waitFor(() =>
+    expect(within(picker).getByRole('option', { name: 'uptown' })).toBeTruthy(),
+  )
+  fireEvent.change(picker, { target: { value: 'uptown' } })
+  fireEvent.click(getByRole('button', { name: /^add area$/i }))
+  await waitFor(() => expect(calls).toEqual([{ areas: ['uptown'] }]))
+})
+
 test("removing an area from the panel reaches the client's setAreas, not a no-op", async () => {
   const calls: { areas: string[] }[] = []
   const { findByRole } = renderWith({

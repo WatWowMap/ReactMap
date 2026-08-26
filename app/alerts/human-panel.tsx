@@ -59,6 +59,17 @@ export interface HumanPanelProps {
   human: HumanView
   profiles: ProfileView[]
   locations: LocationView[]
+  /**
+   * The areas this human may pick, already filtered by Poracle's own
+   * community rules and by the operator's `areasToSkip`
+   * (`alerts-router.ts`'s `availableAreas`). The add-area control offers
+   * only these -- never free text -- so a typo or a hidden area can never be
+   * "selected" only to have Poracle silently drop it: `distance = 0` means
+   * "use my areas", so a name that looked selected but was never actually
+   * kept would be a rule's real scope quietly diverging from what is on
+   * screen.
+   */
+  availableAreas: string[]
   onSetEnabled: (enabled: boolean) => void
   onSwitchProfile: (profileNo: number) => void
   onAddProfile: (name: string) => void
@@ -91,6 +102,7 @@ export function HumanPanel({
   human,
   profiles,
   locations,
+  availableAreas,
   onSetEnabled,
   onSwitchProfile,
   onAddProfile,
@@ -134,7 +146,6 @@ export function HumanPanel({
   // Uncontrolled for the same reason `newProfileNameRef` is: read once, on
   // click, rather than driven by state this harness's happy-dom setup does
   // not dispatch the events for.
-  const newAreaRef = useRef<HTMLInputElement>(null)
   const newLocationLabelRef = useRef<HTMLInputElement>(null)
   const newLocationLatRef = useRef<HTMLInputElement>(null)
   const newLocationLonRef = useRef<HTMLInputElement>(null)
@@ -146,15 +157,29 @@ export function HumanPanel({
     null,
   )
 
+  // A `<select>`, not a text field: `availableAreas` is the set Poracle will
+  // actually keep (community-filtered, `areasToSkip`-filtered), so choosing
+  // from it cannot produce a name that gets silently dropped the way free
+  // text could. Compared case-insensitively against what is already
+  // selected, since Poracle itself treats area names that way.
+  const [areaToAdd, setAreaToAdd] = useState('')
+  const selectedAreas = new Set(human.areas.map((area) => area.toLowerCase()))
+  const addableAreas = availableAreas.filter(
+    (area) => !selectedAreas.has(area.toLowerCase()),
+  )
+
   function removeArea(area: string) {
-    onSetAreas(human.areas.filter((existing) => existing !== area))
+    onSetAreas(
+      human.areas.filter(
+        (existing) => existing.toLowerCase() !== area.toLowerCase(),
+      ),
+    )
   }
 
   function addArea() {
-    const name = newAreaRef.current?.value.trim() ?? ''
-    if (!name) return
-    if (!human.areas.includes(name)) onSetAreas([...human.areas, name])
-    if (newAreaRef.current) newAreaRef.current.value = ''
+    if (!areaToAdd) return
+    onSetAreas([...human.areas, areaToAdd])
+    setAreaToAdd('')
   }
 
   function addLocation() {
@@ -390,12 +415,24 @@ export function HumanPanel({
             ))}
           </ul>
           <div className="flex items-center gap-2">
-            <Input
-              ref={newAreaRef}
-              aria-label="New area name"
-              defaultValue=""
-            />
-            <Button type="button" variant="outline" onClick={addArea}>
+            <NativeSelect
+              aria-label="Add area"
+              value={areaToAdd}
+              onChange={(event) => setAreaToAdd(event.target.value)}
+            >
+              <NativeSelectOption value="">Choose an area</NativeSelectOption>
+              {addableAreas.map((area) => (
+                <NativeSelectOption key={area} value={area}>
+                  {area}
+                </NativeSelectOption>
+              ))}
+            </NativeSelect>
+            <Button
+              type="button"
+              variant="outline"
+              disabled={areaToAdd === ''}
+              onClick={addArea}
+            >
               Add area
             </Button>
           </div>

@@ -22,6 +22,7 @@ function renderPanel(overrides: Partial<HumanPanelProps> = {}) {
     },
     profiles: [{ profileNo: 1, name: 'default' }],
     locations: [],
+    availableAreas: [],
     onSetEnabled: () => {},
     onSwitchProfile: () => {},
     onAddProfile: () => {},
@@ -284,7 +285,10 @@ test('each selected area renders with a way to remove it', () => {
   expect(calls).toEqual([['uptown']])
 })
 
-test('typing an area name and adding sends the full updated list, then clears the field', () => {
+test('choosing an area from the picker and adding sends the full updated list, then resets the picker', () => {
+  // A `<select>`, not free text: `availableAreas` is what Poracle will
+  // actually keep, so a chosen value can never be silently dropped the way
+  // a typo in a text field could be.
   const calls: string[][] = []
   const { getByRole } = renderPanel({
     human: {
@@ -294,25 +298,63 @@ test('typing an area name and adding sends the full updated list, then clears th
       longitude: null,
       areas: ['downtown'],
     },
+    availableAreas: ['downtown', 'uptown'],
     onSetAreas: (areas) => calls.push(areas),
   })
-  const input = getByRole('textbox', { name: /new area name/i })
-  fireEvent.change(input, { target: { value: 'uptown' } })
+  const picker = getByRole('combobox', { name: /add area/i })
+  fireEvent.change(picker, { target: { value: 'uptown' } })
   fireEvent.click(getByRole('button', { name: /^add area$/i }))
   expect(calls).toEqual([['downtown', 'uptown']])
-  expect((input as HTMLInputElement).value).toBe('')
+  expect((picker as HTMLSelectElement).value).toBe('')
 })
 
-test('an empty or blank area name is never sent', () => {
+test('the picker never offers an area that is already selected', () => {
+  const { getByRole } = renderPanel({
+    human: {
+      enabled: true,
+      currentProfileNo: 1,
+      latitude: null,
+      longitude: null,
+      areas: ['downtown'],
+    },
+    availableAreas: ['downtown', 'uptown'],
+  })
+  const picker = within(getByRole('combobox', { name: /add area/i }))
+  expect(picker.queryByRole('option', { name: 'downtown' })).toBeNull()
+  expect(picker.getByRole('option', { name: 'uptown' })).toBeTruthy()
+})
+
+test('the Add area button starts disabled until an area is chosen', () => {
   const calls: string[][] = []
   const { getByRole } = renderPanel({
+    availableAreas: ['uptown'],
     onSetAreas: (areas) => calls.push(areas),
   })
-  fireEvent.click(getByRole('button', { name: /^add area$/i }))
-  const input = getByRole('textbox', { name: /new area name/i })
-  fireEvent.change(input, { target: { value: '   ' } })
+  expect(
+    getByRole('button', { name: /^add area$/i }).hasAttribute('disabled'),
+  ).toBe(true)
   fireEvent.click(getByRole('button', { name: /^add area$/i }))
   expect(calls).toEqual([])
+})
+
+test('the picker excludes an available area that differs from a selected one only in case', () => {
+  // The bug this guards against: `addArea` used to dedup case-sensitively,
+  // so `Downtown` and `downtown` could both end up selected. Filtering the
+  // picker's own options case-insensitively makes that unreachable rather
+  // than merely discouraged.
+  const { getByRole } = renderPanel({
+    human: {
+      enabled: true,
+      currentProfileNo: 1,
+      latitude: null,
+      longitude: null,
+      areas: ['Downtown'],
+    },
+    availableAreas: ['downtown', 'uptown'],
+  })
+  const picker = within(getByRole('combobox', { name: /add area/i }))
+  expect(picker.queryByRole('option', { name: 'downtown' })).toBeNull()
+  expect(picker.getByRole('option', { name: 'uptown' })).toBeTruthy()
 })
 
 // --- saved locations -----------------------------------------------------

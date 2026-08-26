@@ -115,10 +115,20 @@ export interface AlertsClient {
     fromProfileNo: number
     toProfileNo: number
   }): Promise<{ toProfileNo: number }>
-  /** Replaces the whole selected-areas list. Echoes what was actually sent,
-   *  after `alerts-router.ts`'s own `areasToSkip` filter -- see `setAreas`
-   *  below. */
+  /**
+   * Replaces the whole selected-areas list. Echoes what was *sent*, after
+   * `alerts-router.ts`'s own `areasToSkip` filter -- never a report of what
+   * Poracle actually *kept* (its own response here is `{status: "ok"}`).
+   * `useAlerts.setAreas` does not trust this return value for that reason;
+   * it refetches instead. See `alerts-router.ts`'s own comment on `setAreas`.
+   */
   setAreas(args: { areas: string[] }): Promise<{ areas: string[] }>
+  /**
+   * The areas this human may actually pick, already community-filtered by
+   * Poracle and further cut by `areasToSkip` -- what a picker is built from
+   * so it cannot offer a name `setAreas` would silently drop.
+   */
+  availableAreas(): Promise<{ areas: string[] }>
   addLocation(args: {
     label: string
     latitude: number
@@ -172,6 +182,8 @@ function createDefaultAlertsClient(): AlertsClient {
       client.mutation('alerts.setAreas', args) as Promise<{
         areas: string[]
       }>,
+    availableAreas: () =>
+      client.query('alerts.availableAreas') as Promise<{ areas: string[] }>,
     addLocation: (args) =>
       client.mutation('alerts.addLocation', args) as Promise<LocationView>,
     updateLocation: (args) =>
@@ -199,6 +211,10 @@ export function alertsSnapshotQueryKey() {
   return ['alerts', 'snapshot'] as const
 }
 
+export function alertsAvailableAreasQueryKey() {
+  return ['alerts', 'availableAreas'] as const
+}
+
 export interface UseAlertsOptions {
   client?: AlertsClient
 }
@@ -219,6 +235,14 @@ export interface UseAlertsResult {
    * piece missing before.
    */
   error: unknown
+  /**
+   * This human's selectable areas -- community-filtered by Poracle and cut
+   * by the operator's `areasToSkip`, the same as `snapshot`'s own
+   * `human.areas`. What the areas picker is built from, so it cannot offer
+   * a name `setAreas` would silently drop. `[]` while loading or absent,
+   * the same as `snapshot`.
+   */
+  availableAreas: string[]
   /**
    * Writes a new alert. Never patches the cache with a guessed row --
    * Poracle's create cannot name what it made (`AlertCreateResult`), so
@@ -262,10 +286,14 @@ export interface UseAlertsResult {
     fromProfileNo: number,
     toProfileNo: number,
   ) => Promise<void>
-  /** Replaces the whole selected-areas list -- what a `distance = 0` rule
-   *  actually fires against. The response names the set that was actually
-   *  saved (after the server's own `areasToSkip` filter), so the cache is
-   *  patched directly rather than refetched. */
+  /**
+   * Replaces the whole selected-areas list -- what a `distance = 0` rule
+   * actually fires against. Poracle's own response here names nothing
+   * (`{status: "ok"}`); the router echoes what was sent, which is not the
+   * same claim as what was kept, so this refetches the snapshot rather than
+   * trusting that echo -- the same answer `create` reaches for, for the
+   * same reason.
+   */
   setAreas: (areas: string[]) => Promise<void>
   /** Creates a saved location, and adds it to the cache from the response --
    *  Poracle's own answer names nothing beyond `{status: "ok"}`, so the
@@ -306,6 +334,14 @@ export function useAlerts({
     queryKey: alertsSnapshotQueryKey(),
     queryFn: () => client.snapshot(),
     // Only `present` has anything to read -- see the module comment.
+    enabled: state === 'present',
+  })
+
+  // Same gating as `snapshotQuery`: nothing to pick from until a human
+  // exists to ask Poracle on behalf of.
+  const availableAreasQuery = useQuery({
+    queryKey: alertsAvailableAreasQueryKey(),
+    queryFn: () => client.availableAreas(),
     enabled: state === 'present',
   })
 
@@ -405,18 +441,19 @@ export function useAlerts({
       queryClient.invalidateQueries({ queryKey: alertsSnapshotQueryKey() }),
   })
 
+  // Poracle's own `POST /areas` answers `{status: "ok"}` and names nothing.
+  // `alerts-router.ts`'s `setAreas` echoes back what was *sent*, not a
+  // report of what was *kept* -- Poracle's own intersection against this
+  // human's allowed set can still drop an entry the router's own filter let
+  // through. Patching the cache from that echo would show an area that was
+  // never actually stored, and since `distance = 0` means "use my areas",
+  // that is a rule's real scope silently diverging from what is on screen.
+  // A refetch is the only honest answer -- the same one `create` already
+  // reaches for, for the same reason (`AlertCreateResult`'s own comment).
   const setAreasMutation = useMutation({
     mutationFn: (vars: { areas: string[] }) => client.setAreas(vars),
-    onSuccess: (result) => {
-      queryClient.setQueryData<AlertsSnapshot>(
-        alertsSnapshotQueryKey(),
-        (current) =>
-          current && {
-            ...current,
-            human: { ...current.human, areas: result.areas },
-          },
-      )
-    },
+    onSuccess: () =>
+      queryClient.invalidateQueries({ queryKey: alertsSnapshotQueryKey() }),
   })
 
   const addLocationMutation = useMutation({
@@ -473,6 +510,8 @@ export function useAlerts({
   return {
     state: statusQuery.isLoading ? 'loading' : resolvedState,
     snapshot: state === 'present' ? (snapshotQuery.data ?? null) : null,
+    availableAreas:
+      state === 'present' ? (availableAreasQuery.data?.areas ?? []) : [],
     error:
       createMutation.error ??
       replaceMutation.error ??

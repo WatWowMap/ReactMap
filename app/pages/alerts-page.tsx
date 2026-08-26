@@ -65,6 +65,7 @@ export function AlertsPage({
     addProfile,
     deleteProfile,
     copyProfileRules,
+    availableAreas,
     setAreas,
     addLocation,
     updateLocation,
@@ -136,6 +137,7 @@ export function AlertsPage({
                 human={snapshot.human}
                 profiles={snapshot.profiles}
                 locations={snapshot.locations}
+                availableAreas={availableAreas}
                 onSetEnabled={(enabled) => void setEnabled(enabled)}
                 onSwitchProfile={(profileNo) => void switchProfile(profileNo)}
                 onAddProfile={(name) => void addProfile(name)}

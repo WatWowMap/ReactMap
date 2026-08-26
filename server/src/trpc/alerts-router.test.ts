@@ -1028,6 +1028,56 @@ test('areasToSkip are not offered', async () => {
   expect(res.human.areas).toContain('uptown')
 })
 
+function fakeAreasGet(areas: { name: string }[]) {
+  const seen: string[] = []
+  return {
+    seen,
+    get: async (path: string) => {
+      seen.push(path)
+      if (path === '/v2/humans/123/areas') {
+        return { status: 200, body: { areas } }
+      }
+      return { status: 404, body: null }
+    },
+  }
+}
+
+test('availableAreas lists names, filtered by areasToSkip case-insensitively', async () => {
+  const client = fakeAreasGet([
+    { name: 'downtown' },
+    { name: 'uptown' },
+    { name: 'suburbs' },
+  ])
+  const ctx = {
+    ...BASE,
+    poracleClient: client,
+    poracleConfig: { areasToSkip: ['Downtown'] },
+  }
+  const result = await caller(ctx).availableAreas()
+  expect(result).toEqual({ areas: ['uptown', 'suburbs'] })
+  expect(client.seen).toEqual(['/v2/humans/123/areas'])
+})
+
+test("availableAreas' transport failure fails as unavailable, not a silent empty list", async () => {
+  const ctx = {
+    ...BASE,
+    poracleClient: {
+      get: async () => {
+        throw new Error('fetch failed: ECONNREFUSED')
+      },
+    },
+  }
+  await expect(caller(ctx).availableAreas()).rejects.toThrow(/unavailable/i)
+})
+
+test("availableAreas' non-2xx fails as unavailable, not a silent empty list", async () => {
+  const ctx = {
+    ...BASE,
+    poracleClient: { get: async () => ({ status: 500, body: null }) },
+  }
+  await expect(caller(ctx).availableAreas()).rejects.toThrow(/unavailable/i)
+})
+
 test('setAreas posts the filtered set and echoes what was actually sent', async () => {
   const client = fakeProfileWrites()
   const ctx = {

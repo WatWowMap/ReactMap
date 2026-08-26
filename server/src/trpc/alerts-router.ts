@@ -1002,15 +1002,60 @@ const alertsRouter = t.router({
     }),
 
   /**
+   * This human's selectable areas: `GET /v2/humans/{id}/areas`, already
+   * community-filtered by Poracle when `area_security` is on, further cut by
+   * `withoutSkippedAreas` so an operator-hidden area is never offered as a
+   * choice -- see the module comment. Existing to back a picker, not a bare
+   * text field: a picker built from this list cannot produce a name Poracle
+   * will drop, which is what makes `setAreas`'s own divergence (below)
+   * unreachable rather than merely correctable after the fact.
+   */
+  availableAreas: t.procedure.query(
+    async ({ ctx }): Promise<{ areas: string[] }> => {
+      const { client, platformId } = await requireClientAndPlatform(ctx)
+      let res: { status: number; body: any }
+      try {
+        res = await client.get(areasPath(platformId))
+      } catch {
+        throw new TRPCError({
+          code: 'SERVICE_UNAVAILABLE',
+          message: 'Alerts are unavailable right now',
+        })
+      }
+      if (res.status < 200 || res.status >= 300) {
+        throw new TRPCError({
+          code: 'SERVICE_UNAVAILABLE',
+          message: `Alerts are unavailable right now (Poracle returned ${res.status})`,
+        })
+      }
+      const rows = Array.isArray(res.body?.areas) ? res.body.areas : []
+      const names = rows
+        .map((row: any) => (typeof row?.name === 'string' ? row.name : ''))
+        .filter((name: string) => name.length > 0)
+      return { areas: withoutSkippedAreas(names, ctx.poracleConfig) }
+    },
+  ),
+
+  /**
    * Sets this human's selected areas -- what a `distance = 0` alert actually
    * fires against.
    *
    * Poracle's own endpoint already lowercases, dedups and intersects against
    * what this human may select; `withoutSkippedAreas` additionally drops
    * anything the operator listed in `areasToSkip`, so a hidden area cannot be
-   * selected here either, not only left off the read side. Poracle's response
-   * is `{ status: "ok" }` and names nothing, so what is returned is the set
-   * that was actually sent -- the same convention `setEnabled` follows.
+   * selected here either, not only left off the read side.
+   *
+   * The returned `areas` is what was *sent*, not a report of what Poracle
+   * *kept* -- its response here is `{ status: "ok" }` and names nothing, and
+   * Poracle's own intersection against this human's allowed set can still
+   * drop an entry this filter let through (a fence that stopped being
+   * user-selectable between `availableAreas` being read and this call, for
+   * instance). A caller that treats this return value as ground truth can
+   * end up showing a human areas that were never actually stored -- exactly
+   * the class of silent divergence `deleteLocation`'s refusal exists to
+   * prevent for saved locations. `useAlerts.setAreas` does not trust it: it
+   * refetches the snapshot instead, the same answer `create` already reaches
+   * for the same reason (`AlertCreateResult`'s own comment).
    */
   setAreas: t.procedure
     .input(z.object({ areas: z.array(z.string().max(255)).max(1000) }))

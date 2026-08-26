@@ -37,13 +37,17 @@ const EMPTY_SNAPSHOT: AlertsSnapshot = {
  * the same way a real card's Save or Delete would.
  */
 function Probe({ client }: { client: AlertsClient }) {
-  const { state, snapshot, error, create, replace, remove } = useAlerts({
-    client,
-  })
+  const { state, snapshot, error, create, replace, remove, setAreas } =
+    useAlerts({
+      client,
+    })
   return (
     <div>
       <span data-testid="state">{state}</span>
       <span data-testid="alert-count">{snapshot?.alerts.length ?? 'null'}</span>
+      <span data-testid="areas">
+        {snapshot ? snapshot.human.areas.join(',') : 'null'}
+      </span>
       <span data-testid="error">
         {error instanceof Error ? error.message : String(error)}
       </span>
@@ -55,6 +59,12 @@ function Probe({ client }: { client: AlertsClient }) {
       </button>
       <button type="button" onClick={() => void remove(1)}>
         remove
+      </button>
+      <button
+        type="button"
+        onClick={() => void setAreas(['uptown', 'downtown'])}
+      >
+        setAreas
       </button>
     </div>
   )
@@ -105,6 +115,9 @@ const unusedWrites = {
     throw new Error('not used by this test')
   },
   deleteLocation: async () => {
+    throw new Error('not used by this test')
+  },
+  availableAreas: async () => {
     throw new Error('not used by this test')
   },
 }
@@ -264,4 +277,39 @@ test('a rejected remove surfaces through error and leaves the card in place', as
   // Deleting appeared to succeed and the row stayed -- exactly the bug
   // report this whole change exists to fix. It should still be there.
   expect(getByTestId('alert-count').textContent).toBe('1')
+})
+
+test('setAreas refetches rather than trusting its own response, so what Poracle actually kept is what shows', async () => {
+  // Poracle's `POST /areas` answers `{status: "ok"}` and names nothing --
+  // `alerts-router.ts`'s `setAreas` echoes the request back, which is what
+  // was *sent*, not a report of what was *kept*. Poracle's own intersection
+  // against this human's allowed set can still drop an entry after this
+  // filter let it through, so a client that trusted the echo could show an
+  // area that was never actually stored -- and since `distance = 0` means
+  // "use my areas", that is a rule's real geographic scope silently
+  // diverging from what the person sees. This fake's `setAreas` reports back
+  // both areas that were requested; the *second* `snapshot()` call (the
+  // refetch) reports back only one of them actually stuck. The visible
+  // result must be the smaller, refetched set.
+  let snapshots = 0
+  const { getByTestId, getByText } = renderProbe({
+    ...unusedWrites,
+    status: async () => ({ state: 'present' }),
+    snapshot: async () => {
+      snapshots += 1
+      return {
+        ...EMPTY_SNAPSHOT,
+        human: {
+          ...EMPTY_SNAPSHOT.human,
+          areas: snapshots === 1 ? [] : ['uptown'],
+        },
+      }
+    },
+    setAreas: async () => ({ areas: ['uptown', 'downtown'] }),
+  })
+  await waitFor(() => expect(getByTestId('areas').textContent).toBe(''))
+  fireEvent.click(getByText('setAreas'))
+  await waitFor(() => expect(getByTestId('areas').textContent).toBe('uptown'))
+  // Never the guessed superset the mutation's own response claimed.
+  expect(getByTestId('areas').textContent).not.toBe('uptown,downtown')
 })

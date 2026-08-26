@@ -73,6 +73,9 @@ const unusedWrites = {
   deleteLocation: async () => {
     throw new Error('not used by this test')
   },
+  availableAreas: async () => {
+    throw new Error('not used by this test')
+  },
 }
 
 function fakeAlertsClient(state: AlertsState): AlertsClient {
