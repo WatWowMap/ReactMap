@@ -53,6 +53,67 @@ export const ALLOWED_ICON_SIZES = [32, 64, 128] as const
  */
 const SEGMENT = /^[A-Za-z0-9][A-Za-z0-9._-]*$/
 
+/**
+ * How many sprites this process will fetch-and-encode at the same time,
+ * and how many may wait for a slot before the rest are turned away.
+ *
+ * Without a bound, one caller walking the index at every size and format
+ * can put six figures' worth of outbound connections in flight at once,
+ * which exhausts sockets and file descriptors here and looks like abuse
+ * from the upstream's side -- either of which takes icons away from every
+ * legitimate viewer of the map. Eight at a time keeps a cold viewport
+ * filling quickly (a dense one needs ~138 distinct sprites) while leaving
+ * the process's socket budget somewhere near where it started.
+ */
+const DEFAULT_MAX_CONCURRENT_FETCHES = 8
+const DEFAULT_MAX_QUEUED_FETCHES = 512
+
+/**
+ * How many fetched source images are remembered so their size and format
+ * variants can share one round trip. Small on purpose: these are the
+ * unresized originals, and the resized results already live on disk.
+ */
+const SOURCE_CACHE_LIMIT = 64
+
+/**
+ * A counting semaphore with a bounded waiting room. Work beyond the queue
+ * limit is rejected rather than parked, because an unbounded queue just
+ * moves the exhaustion from sockets to memory.
+ */
+function createWorkGate(limit: number, maxQueued: number) {
+  let active = 0
+  const waiting: (() => void)[] = []
+
+  const release = () => {
+    active -= 1
+    waiting.shift()?.()
+  }
+
+  const acquire = () =>
+    new Promise<void>((resolve, reject) => {
+      if (active < limit) {
+        active += 1
+        resolve()
+      } else if (waiting.length >= maxQueued) {
+        reject(new Error('icon proxy saturated'))
+      } else {
+        waiting.push(() => {
+          active += 1
+          resolve()
+        })
+      }
+    })
+
+  return async <T>(task: () => Promise<T>): Promise<T> => {
+    await acquire()
+    try {
+      return await task()
+    } finally {
+      release()
+    }
+  }
+}
+
 export interface IconProxyConfig {
   /** Upstream uicons repository root, no trailing slash. */
   baseUrl: string
@@ -62,6 +123,12 @@ export interface IconProxyConfig {
   timeoutMs: number
   /** How long the in-memory copy of the index is trusted for. */
   indexTtlMs: number
+  /** Sprites fetched and encoded at once. See the default above. */
+  maxConcurrentFetches?: number
+  /** Sprites allowed to wait for a slot before the rest are refused. */
+  maxQueuedFetches?: number
+  /** Source images memoised so their variants share one round trip. */
+  sourceCacheLimit?: number
   sizes?: readonly number[]
   defaultSize?: number
   defaultFormat?: IconFormat
@@ -186,8 +253,13 @@ export function createIconProxy(config: IconProxyConfig): IconProxy {
     sizes = ALLOWED_ICON_SIZES,
     defaultSize = 64,
     defaultFormat = 'webp',
+    maxConcurrentFetches = DEFAULT_MAX_CONCURRENT_FETCHES,
+    maxQueuedFetches = DEFAULT_MAX_QUEUED_FETCHES,
+    sourceCacheLimit = SOURCE_CACHE_LIMIT,
     fetch: fetchImpl = globalThis.fetch,
   } = config
+
+  const gate = createWorkGate(maxConcurrentFetches, maxQueuedFetches)
 
   const base = baseUrl.endsWith('/') ? baseUrl.slice(0, -1) : baseUrl
   const indexCachePath = path.join(cacheDir, 'index.json')
@@ -195,7 +267,7 @@ export function createIconProxy(config: IconProxyConfig): IconProxy {
   let index: IndexState | null = null
   let indexInFlight: Promise<IndexState | null> | null = null
   const spritesInFlight = new Map<string, Promise<Response>>()
-  const sourcesInFlight = new Map<string, Promise<Uint8Array>>()
+  const sources = new Map<string, Promise<Uint8Array>>()
   const fallbacks = new Map<string, Uint8Array>()
 
   const parseIndex = (body: string): IndexState => {
@@ -266,17 +338,29 @@ export function createIconProxy(config: IconProxyConfig): IconProxy {
   }
 
   /**
-   * The source bytes for one listed file, fetched at most once no matter
-   * how many size/format variants of it are being built at the same time.
+   * The source bytes for one listed file, fetched at most once for every
+   * size and format built from it.
    *
    * Deduping on the cache path alone was not enough: that key carries the
    * size and the format, so the same sprite asked for at three sizes in
    * three formats used to open nine upstream connections for one image.
-   * The upstream file does not vary with either, so all nine share this.
+   * The upstream file does not vary with either.
+   *
+   * The promise is kept after it settles, not just while it is in flight,
+   * because the concurrency gate below deliberately serialises variants --
+   * an entry dropped the moment it resolved would be refetched by whichever
+   * variant was still waiting for a slot. Only the most recent
+   * `sourceCacheLimit` keys are held, and a rejected fetch is
+   * dropped immediately so a blip is never remembered as a failure.
    */
   const fetchSource = (key: string): Promise<Uint8Array> => {
-    const existing = sourcesInFlight.get(key)
-    if (existing) return existing
+    const existing = sources.get(key)
+    if (existing) {
+      // Re-inserting makes the map's insertion order an LRU order.
+      sources.delete(key)
+      sources.set(key, existing)
+      return existing
+    }
 
     const pending = (async () => {
       const response = await fetchImpl(`${base}/${key}`, {
@@ -284,11 +368,15 @@ export function createIconProxy(config: IconProxyConfig): IconProxy {
       })
       if (!response.ok) throw new Error(`upstream ${response.status}`)
       return new Uint8Array(await response.arrayBuffer())
-    })().finally(() => {
-      sourcesInFlight.delete(key)
-    })
+    })()
+    pending.catch(() => sources.delete(key))
 
-    sourcesInFlight.set(key, pending)
+    sources.set(key, pending)
+    while (sources.size > sourceCacheLimit) {
+      const oldest = sources.keys().next().value
+      if (oldest === undefined) break
+      sources.delete(oldest)
+    }
     return pending
   }
 
@@ -359,9 +447,17 @@ export function createIconProxy(config: IconProxyConfig): IconProxy {
     const existing = spritesInFlight.get(inFlightKey)
     if (existing) return existing.then((response) => response.clone())
 
-    const pending = buildSprite(key, size, format).finally(() => {
-      spritesInFlight.delete(inFlightKey)
-    })
+    // Building a sprite is the only work here that touches the network and
+    // the CPU, so it is the only work that is bounded. Past the queue limit
+    // a caller gets the fallback disc rather than a slot: it is not cached,
+    // so a legitimate client that hit a flood sees the real art on its next
+    // request, and nobody can make this process open connections without
+    // limit in the meantime.
+    const pending = gate(() => buildSprite(key, size, format))
+      .catch(() => fallbackResponse(size, format))
+      .finally(() => {
+        spritesInFlight.delete(inFlightKey)
+      })
     spritesInFlight.set(inFlightKey, pending)
     return pending.then((response) => response.clone())
   }

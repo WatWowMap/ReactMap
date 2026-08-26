@@ -994,7 +994,9 @@
       "defaultSize": 64,
       "defaultFormat": "webp",
       "timeoutMs": 5000,
-      "indexTtlHours": 24
+      "indexTtlHours": 24,
+      "maxConcurrentFetches": 8,
+      "maxQueuedFetches": 512
     },
     "sizes": {
       "device": {

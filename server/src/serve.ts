@@ -147,6 +147,8 @@ const iconProxy = createIconProxy({
   defaultFormat: iconProxyConfig.defaultFormat as IconFormat,
   timeoutMs: iconProxyConfig.timeoutMs,
   indexTtlMs: iconProxyConfig.indexTtlHours * 60 * 60 * 1000,
+  maxConcurrentFetches: iconProxyConfig.maxConcurrentFetches,
+  maxQueuedFetches: iconProxyConfig.maxQueuedFetches,
 })
 
 const server = Bun.serve({

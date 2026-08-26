@@ -250,7 +250,29 @@ describe('icon proxy cache', () => {
     const after = await get(h, '/api/icons/pokemon/25.webp')
 
     expect(await bytesOf(after)).toEqual(good)
-    expect(h.calls.filter((c) => !c.endsWith('/index.json'))).toHaveLength(2)
+    expect(after.headers.get('x-icon-fallback')).toBeNull()
+    // Rebuilt on disk, so the corrupt bytes are gone rather than waiting
+    // there for the next request. The rebuild costs no second round trip
+    // while the source image is still memoised in this process.
+    expect(Uint8Array.from(fs.readFileSync(cached))).toEqual(good)
+    expect(h.calls.filter((c) => !c.endsWith('/index.json'))).toHaveLength(1)
+  })
+
+  it('refetches a corrupt cached file once the source is no longer memoised', async () => {
+    const h = makeHarness({ sourceCacheLimit: 1 })
+    const good = await bytesOf(await get(h, '/api/icons/pokemon/25.webp'))
+
+    const cached = h.proxy.cachePathFor('pokemon/25.webp', 64, 'webp')
+    fs.writeFileSync(cached, 'not an image at all')
+    // Another file evicts the memoised source, so this really does go
+    // back upstream rather than serving the corrupt bytes.
+    await get(h, '/api/icons/pokemon/0.webp')
+    const before = h.calls.length
+
+    const after = await get(h, '/api/icons/pokemon/25.webp')
+
+    expect(await bytesOf(after)).toEqual(good)
+    expect(h.calls.length).toBe(before + 1)
   })
 })
 
@@ -325,5 +347,74 @@ describe('icon proxy upstream load', () => {
     ).toBe(true)
     const sprites = h.calls.filter((url) => !url.endsWith('/index.json'))
     expect(sprites).toEqual([`${BASE_URL}/pokemon/25.webp`])
+  })
+
+  it('never has more than the configured number of fetches in flight', async () => {
+    let live = 0
+    let peak = 0
+    const sprite = await upstreamSprite()
+    const h = makeHarness({
+      maxConcurrentFetches: 2,
+      fetch: (async (input: string | URL | Request) => {
+        const url = String(input instanceof Request ? input.url : input)
+        if (url.endsWith('/index.json')) {
+          return new Response(JSON.stringify(INDEX), { status: 200 })
+        }
+        live += 1
+        peak = Math.max(peak, live)
+        await Bun.sleep(20)
+        live -= 1
+        return new Response(sprite, { status: 200 })
+      }) as typeof fetch,
+    })
+
+    // Three distinct files, so nothing here is deduped by the source cache
+    // and every request is its own upstream round trip.
+    const files = ['pokemon/25.webp', 'pokemon/0.webp', 'raid/egg/1.webp']
+    const urls = [32, 64, 128].flatMap((size) =>
+      files.map((file) => `/api/icons/${file}?size=${size}`),
+    )
+    const responses = await Promise.all(urls.map((url) => get(h, url)))
+
+    expect(responses.every((res) => res.status === 200)).toBe(true)
+    // Three distinct files would otherwise be in flight together, so this
+    // is the gate and not the source dedupe doing the work.
+    expect(peak).toBeLessThanOrEqual(2)
+  })
+
+  it('serves the fallback rather than queueing without limit', async () => {
+    const h = makeHarness({
+      maxConcurrentFetches: 1,
+      maxQueuedFetches: 1,
+      fetch: (async (input: string | URL | Request) => {
+        const url = String(input instanceof Request ? input.url : input)
+        if (url.endsWith('/index.json')) {
+          return new Response(JSON.stringify(INDEX), { status: 200 })
+        }
+        await Bun.sleep(30)
+        return new Response(await upstreamSprite(), { status: 200 })
+      }) as typeof fetch,
+    })
+
+    // Warm the index first, so all four sprite requests reach the gate in
+    // the same tick rather than queueing behind the index load.
+    await get(h, '/api/icons/index.json')
+    const responses = await Promise.all(
+      [32, 64, 128, 32].map((size, i) =>
+        get(
+          h,
+          `/api/icons/pokemon/${i === 3 ? 0 : 25}.webp?size=${size}&format=png`,
+        ),
+      ),
+    )
+
+    expect(responses.every((res) => res.status === 200)).toBe(true)
+    const refused = responses.filter(
+      (res) => res.headers.get('x-icon-fallback') === '1',
+    )
+    expect(refused.length).toBeGreaterThan(0)
+    expect(
+      refused.every((res) => res.headers.get('cache-control') === 'no-store'),
+    ).toBe(true)
   })
 })
