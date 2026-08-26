@@ -173,6 +173,8 @@ interface IndexState {
   body: string
   files: Set<string>
   loadedAt: number
+  /** Compressed once, on the first client that accepts it. */
+  gzipped?: Uint8Array
 }
 
 export function createIconProxy(config: IconProxyConfig): IconProxy {
@@ -353,12 +355,20 @@ export function createIconProxy(config: IconProxyConfig): IconProxy {
       if (!state) {
         return new Response('Icon index unavailable', { status: 503 })
       }
-      return new Response(state.body, {
-        headers: {
-          'content-type': 'application/json; charset=utf-8',
-          'cache-control': 'public, max-age=3600',
-        },
-      })
+      const headers: Record<string, string> = {
+        'content-type': 'application/json; charset=utf-8',
+        'cache-control': 'public, max-age=3600',
+      }
+      // The real index is 328KB of filenames and compresses about 9:1.
+      // Bun.serve does not negotiate encodings on its own, and this is the
+      // largest single thing the map downloads before it can draw a
+      // marker, so it is worth the one gzip this branch ever performs.
+      if (!request.headers.get('accept-encoding')?.includes('gzip')) {
+        return new Response(state.body, { headers })
+      }
+      state.gzipped ??= Uint8Array.from(Bun.gzipSync(state.body))
+      headers['content-encoding'] = 'gzip'
+      return new Response(state.gzipped, { headers })
     }
 
     // Everything below runs before the index is even consulted, so a

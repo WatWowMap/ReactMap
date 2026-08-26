@@ -107,6 +107,29 @@ describe('icon proxy index', () => {
     expect(h.calls.filter((c) => c.endsWith('/index.json'))).toHaveLength(1)
   })
 
+  it('gzips the index for a client that accepts it', async () => {
+    const h = makeHarness()
+    const res = await h.proxy.handle(
+      new Request('http://localhost:8080/api/icons/index.json', {
+        headers: { 'accept-encoding': 'gzip, deflate, br' },
+      }),
+    )
+
+    expect(res.headers.get('content-encoding')).toBe('gzip')
+    const raw = await bytesOf(res)
+    expect(JSON.parse(new TextDecoder().decode(Bun.gunzipSync(raw)))).toEqual(
+      INDEX,
+    )
+  })
+
+  it('sends the index uncompressed to a client that did not ask for gzip', async () => {
+    const h = makeHarness()
+    const res = await get(h, '/api/icons/index.json')
+
+    expect(res.headers.get('content-encoding')).toBeNull()
+    expect(await res.json()).toEqual(INDEX)
+  })
+
   it('degrades to 503 rather than throwing when the index cannot load', async () => {
     const h = makeHarness()
     h.indexStatus = 500
