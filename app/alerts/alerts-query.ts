@@ -113,8 +113,21 @@ export function useAlerts({
     enabled: state === 'present',
   })
 
+  // A rejected `status()` -- `alerts.status` throws UNAUTHORIZED for a
+  // signed-out visitor and FORBIDDEN for a signed-in one the operator's
+  // Discord role gating excludes, both ordinary outcomes `requirePerm`
+  // produces on every route `BottomNav` mounts on -- fails closed to
+  // `absent` rather than staying pinned to `loading`. An error means this
+  // account's access to Alerts could not be established, which is exactly
+  // the case `absent` already exists to hide the tab for; the alternative
+  // (`loading` forever) leaves the nav entry and a blank page up
+  // indefinitely for precisely the population `absent` is for.
+  const resolvedState: AlertsState | 'loading' = statusQuery.isError
+    ? 'absent'
+    : (state ?? 'loading')
+
   return {
-    state: statusQuery.isLoading ? 'loading' : (state ?? 'loading'),
+    state: statusQuery.isLoading ? 'loading' : resolvedState,
     snapshot: state === 'present' ? (snapshotQuery.data ?? null) : null,
   }
 }

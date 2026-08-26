@@ -95,3 +95,33 @@ test('never fetches snapshot when Poracle is unconfigured', async () => {
   await act(async () => {})
   expect(spy.calls).toBe(0)
 })
+
+function rejectingClient(
+  snapshotSpy: { calls: number } = { calls: 0 },
+): AlertsClient {
+  return {
+    status: async () => {
+      throw new Error('UNAUTHORIZED')
+    },
+    snapshot: async () => {
+      snapshotSpy.calls += 1
+      return EMPTY_SNAPSHOT
+    },
+  }
+}
+
+// `alerts.status` throws UNAUTHORIZED for a signed-out visitor and
+// FORBIDDEN for a signed-in one the operator's Discord role gating
+// excludes -- both ordinary outcomes on every route `BottomNav` mounts
+// on. A rejected `status()` must fail closed to `absent` rather than
+// stick at `loading` forever, which would leave the nav entry and a
+// blank tab visible to exactly the population `absent` exists to hide
+// them from.
+test('a rejected status() fails closed to absent, not stuck loading', async () => {
+  const spy = { calls: 0 }
+  const { getByTestId } = renderProbe(rejectingClient(spy))
+  await waitFor(() => expect(getByTestId('state').textContent).toBe('absent'))
+  await act(async () => {})
+  expect(spy.calls).toBe(0)
+  expect(getByTestId('alert-count').textContent).toBe('null')
+})

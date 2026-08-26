@@ -115,3 +115,33 @@ test('an unconfigured Poracle renders nothing', async () => {
   await flushStatus(calls)
   expect(container.textContent).toBe('')
 })
+
+// Removing the `loading` branch of the guard (leaving only
+// `unconfigured`/`absent`) let every other test in this file keep
+// passing, because a resolved status always lands there fast. A
+// `status()` that never resolves is what actually proves loading itself
+// renders nothing rather than falling through to "No alerts yet." before
+// the real answer is known.
+test('while loading, renders nothing rather than a premature empty-list message', () => {
+  const { container } = renderWith({
+    status: () => new Promise(() => {}),
+    snapshot: async () => EMPTY_SNAPSHOT,
+  } as unknown as AlertsClient)
+  expect(container.textContent).toBe('')
+})
+
+// `alerts.status` rejects for a signed-out visitor and for a signed-in one
+// the operator's role gating excludes -- the tab must fail closed to
+// nothing rather than getting stuck on the loading branch forever.
+test('a rejected status() renders nothing rather than getting stuck loading', async () => {
+  const calls = { count: 0 }
+  const { container } = renderWith({
+    status: async () => {
+      calls.count += 1
+      throw new Error('UNAUTHORIZED')
+    },
+    snapshot: async () => EMPTY_SNAPSHOT,
+  } as unknown as AlertsClient)
+  await flushStatus(calls)
+  expect(container.textContent).toBe('')
+})

@@ -24,6 +24,17 @@ export interface BottomNavProps {
  * from the same `useAlerts` hook the page itself reads keeps the nav and
  * the page from ever disagreeing about which is true.
  */
+// Tailwind's scanner only picks up class names it can see as literal
+// strings, so the column count a hidden Alerts entry leaves behind is
+// looked up rather than interpolated (`grid-cols-${n}` would compile to
+// nothing). Keyed on how many destinations are actually rendered, not on
+// the state, so a future fifth destination does not silently freeze this
+// at four and three again.
+const GRID_COLS: Record<number, string> = {
+  3: 'grid-cols-3',
+  4: 'grid-cols-4',
+}
+
 export function BottomNav({ alertsClient }: BottomNavProps = {}) {
   const { state } = useAlerts(
     alertsClient ? { client: alertsClient } : undefined,
@@ -35,7 +46,12 @@ export function BottomNav({ alertsClient }: BottomNavProps = {}) {
   )
 
   return (
-    <nav className="fixed inset-x-0 bottom-0 grid grid-cols-4 border-t border-border-strong bg-surface pb-[env(safe-area-inset-bottom)]">
+    <nav
+      className={cn(
+        'fixed inset-x-0 bottom-0 grid border-t border-border-strong bg-surface pb-[env(safe-area-inset-bottom)]',
+        GRID_COLS[destinations.length] ?? GRID_COLS[4],
+      )}
+    >
       {destinations.map(({ to, label, icon: Icon }) => (
         <NavLink
           key={to}

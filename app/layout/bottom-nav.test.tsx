@@ -20,7 +20,19 @@ afterAll(teardownDom)
 
 // Every render is appended to the same document and stays there, so without
 // this each test sees the leftovers of the ones before it.
-afterEach(cleanup)
+//
+// The one-tick delay first: React's scheduler queues its own commit
+// follow-up work on a macrotask (MessageChannel), not a microtask, so a
+// query that settles late in a test can still have a scheduler callback
+// in flight when the test function returns. Unmounting first and
+// `teardownDom` afterward (in `afterAll`) can both land before that
+// callback fires, and it then throws reaching for a `window` this file no
+// longer has -- reported as an "Unhandled error between tests" rather
+// than a failing assertion, so it is easy to miss.
+afterEach(async () => {
+  await new Promise((resolve) => setTimeout(resolve, 0))
+  cleanup()
+})
 
 function fakeAlertsClient(state: AlertsState): AlertsClient {
   return {
@@ -48,6 +60,29 @@ function renderNav(path: string, state: AlertsState = 'present') {
       </MemoryRouter>
     </QueryClientProvider>,
   )
+}
+
+function renderNavWithRejectingClient(path: string) {
+  const calls = { count: 0 }
+  const client: AlertsClient = {
+    status: async () => {
+      calls.count += 1
+      throw new Error('UNAUTHORIZED')
+    },
+    snapshot: async () => {
+      throw new Error('should never be called')
+    },
+  }
+  return {
+    calls,
+    ...render(
+      <QueryClientProvider client={createRulesQueryClient()}>
+        <MemoryRouter initialEntries={[path]}>
+          <BottomNav alertsClient={client} />
+        </MemoryRouter>
+      </QueryClientProvider>,
+    ),
+  }
 }
 
 // Queries are scoped to the container this render owns rather than the whole
@@ -96,4 +131,42 @@ test('hides the Alerts destination when the operator has no Poracle configured',
   await waitFor(() =>
     expect(within(container).getAllByRole('link')).toHaveLength(3),
   )
+})
+
+// `alerts.status` rejects for a signed-out visitor and for a signed-in one
+// the operator's role gating excludes -- both are the common case, not an
+// edge case, and both must fail closed to no Alerts entry rather than
+// leaving it up while stuck on a permanently-loading state.
+test('hides the Alerts destination when status() rejects', async () => {
+  const { container, calls } = renderNavWithRejectingClient('/map')
+  await waitFor(() => expect(calls.count).toBeGreaterThan(0))
+  await waitFor(() =>
+    expect(within(container).getAllByRole('link')).toHaveLength(3),
+  )
+  const labels = within(container)
+    .getAllByRole('link')
+    .map((link) => link.textContent)
+  expect(labels).toEqual(['Map', 'Filters', 'Me'])
+})
+
+// The column count keys off how many destinations are actually rendered,
+// not off the state, so a hidden Alerts entry never leaves the nav
+// visibly lopsided (three links in a four-column grid).
+test('the grid narrows to match the destinations actually shown', async () => {
+  const { container } = renderNav('/map', 'absent')
+  await waitFor(() =>
+    expect(within(container).getAllByRole('link')).toHaveLength(3),
+  )
+  const nav = container.querySelector('nav') as HTMLElement
+  expect(nav.className).toContain('grid-cols-3')
+  expect(nav.className).not.toContain('grid-cols-4')
+})
+
+test('the grid uses all four columns when every destination is shown', async () => {
+  const { container } = renderNav('/map', 'present')
+  await waitFor(() =>
+    expect(within(container).getAllByRole('link')).toHaveLength(4),
+  )
+  const nav = container.querySelector('nav') as HTMLElement
+  expect(nav.className).toContain('grid-cols-4')
 })
