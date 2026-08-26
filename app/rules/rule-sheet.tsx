@@ -14,7 +14,7 @@
 
 import { Label } from '../components/ui/label'
 import { Switch } from '../components/ui/switch'
-import type { ConditionSeed } from './condition-editor'
+import type { ConditionPatch, ConditionSeed } from './condition-editor'
 import { ConditionEditor } from './condition-editor'
 import type { Vocabulary } from './condition-vocabulary'
 import type { RulePatch } from './rules-query'
@@ -68,7 +68,18 @@ export function RuleSheet({
       <ConditionEditor
         {...(conditions ? { conditions } : {})}
         {...(vocabulary ? { vocabulary } : {})}
-        {...(onChange ? { onChange } : {})}
+        {...(onChange
+          ? {
+              // `ConditionEditor` emits a `ConditionPatch` keyed by whatever
+              // vocabulary it was handed, not by `RulePatch`'s columns -- it
+              // has no way to know which schema those keys belong to. This
+              // sheet does: it is the ReactMap call site, its own `onChange`
+              // contract is `RulePatch`, and its default vocabulary is
+              // ReactMap's own, so narrowing back to `RulePatch` here is
+              // where that knowledge actually lives.
+              onChange: (patch: ConditionPatch) => onChange(patch as RulePatch),
+            }
+          : {})}
       />
       {speciesId === null && (
         <div className="flex flex-col gap-2 border-t border-border pt-3">

@@ -40,7 +40,6 @@ import type {
   Vocabulary,
 } from './condition-vocabulary'
 import { REACTMAP_VOCABULARY } from './condition-vocabulary'
-import type { RulePatch } from './rules-query'
 
 export interface ConditionSeed {
   /** The vocabulary condition's key this seed feeds, e.g. 'iv', 'gender'. */
@@ -52,8 +51,17 @@ export interface ConditionSeed {
   value?: number | string | null
 }
 
-/** What the editor holds per row while it is open, before it becomes a patch. */
-type FieldValues = Record<string, number | string | null>
+/**
+ * What the editor emits: a field map keyed by whatever the vocabulary
+ * declared -- `ivMin`/`ivMax` for ReactMap's own conditions, `weightMin`
+ * or `ping` for Poracle's. This type never names `Rule`/`RulePatch` on
+ * purpose: only a caller that knows which vocabulary it handed the editor
+ * knows which schema the keys belong to, so narrowing to a concrete patch
+ * type is that caller's job, not this component's.
+ */
+export type ConditionPatch = Record<string, number | string | null>
+
+type FieldValues = ConditionPatch
 
 interface EditorState {
   active: ReadonlySet<string>
@@ -98,7 +106,7 @@ export interface ConditionEditorProps {
   conditions?: ConditionSeed[]
   /** The schema this editor's rows are drawn from. Defaults to ReactMap's own `rule` columns. */
   vocabulary?: Vocabulary
-  onChange?: (patch: RulePatch) => void
+  onChange?: (patch: ConditionPatch) => void
 }
 
 export function ConditionEditor({
@@ -133,7 +141,7 @@ export function ConditionEditor({
 
   function commit(nextActive: ReadonlySet<string>, nextFields: FieldValues) {
     setState({ active: nextActive, fields: nextFields })
-    onChange?.(nextFields as RulePatch)
+    onChange?.(nextFields)
   }
 
   function addCondition(key: string) {
@@ -275,7 +283,7 @@ export function ConditionEditor({
             {Object.entries(pvpDef.labelWords ?? {}).map(([cap, label]) => (
               <span key={cap} className="flex items-center gap-1.5 text-sm">
                 <RadioGroupItem id={`pvp-league-${cap}`} value={cap} />
-                <label htmlFor={`pvp-league-${cap}`}>{label}</label>
+                <label htmlFor={`pvp-league-${cap}`}>{capitalize(label)}</label>
               </span>
             ))}
           </RadioGroup>
