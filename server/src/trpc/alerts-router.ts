@@ -14,7 +14,9 @@
 // declared no matching fields, and tRPC prunes nothing on the way out.
 
 import type { Poracle } from '@rm/types'
+import { TRPCError } from '@trpc/server'
 import { eq } from 'drizzle-orm'
+import { z } from 'zod'
 
 import { authAccount } from '../db/auth-schema'
 import { getDrizzle } from '../db/drizzle'
@@ -24,7 +26,12 @@ import {
   poracleConfigured,
 } from '../services/poracle-client'
 import { type HumanState, resolveHumanState } from '../services/poracle-human'
-import { type AlertsSnapshot, toAlertsSnapshot } from '../services/poracle-view'
+import {
+  type AlertRow,
+  type AlertsSnapshot,
+  toAlertRow,
+  toAlertsSnapshot,
+} from '../services/poracle-view'
 import { requirePerm } from './require-perm'
 import { type Context, t } from './trpc-base'
 
@@ -143,6 +150,11 @@ function trackingPath(platformId: string): string {
   return `${humanPath(platformId)}/tracking?all_profiles=true&include_descriptions=true`
 }
 
+/** The collection every pokemon rule is created in, listed under, and lives in. */
+function pokemonPath(platformId: string): string {
+  return `${humanPath(platformId)}/tracking/pokemon`
+}
+
 /**
  * The Poracle client for this request, or `null` when there is no Poracle.
  *
@@ -172,6 +184,323 @@ async function readHuman(
   } catch {
     return null
   }
+}
+
+// --- writes ---------------------------------------------------------------
+
+/**
+ * The signed INT range every one of Poracle's filter columns is. Without a
+ * bound `z.number().int()` lets 2**53 through to an INT column, and Poracle
+ * answers that with a 500 rather than the 400 it is.
+ */
+const INT_MIN = -2_147_483_648
+const INT_MAX = 2_147_483_647
+
+/**
+ * How many rules one create may carry. Poracle diffs the whole batch against
+ * the profile's existing rules inside a single transaction, so an unbounded
+ * array is a request that holds that transaction open for as long as it likes.
+ * A rule per species with headroom is past anything the picker can produce.
+ */
+const MAX_RULES = 3000
+
+/** A filter a caller may leave unset: absent and null both mean Poracle's default. */
+const filter = z.number().int().min(INT_MIN).max(INT_MAX).nullable().optional()
+
+/**
+ * The fields of one rule, named as `AlertRow` names them so a rule a client
+ * read back can be edited and sent again without translating twice.
+ *
+ * Every field is optional, Poracle's own strict-request rule: an omitted field
+ * is that filter's documented default, which is what makes a PUT a full
+ * replace rather than a patch. `pokemon_id` is the one field Poracle requires,
+ * and Poracle is where that requirement is enforced -- a rule without it comes
+ * back as a 422 that `sendWrite` surfaces.
+ *
+ * Absent from it on purpose: `ping`, which Poracle stores server-side and
+ * ignores on the way in, and `uid`, which is Poracle's to assign.
+ */
+const alertRuleShape = {
+  pokemonId: filter,
+  form: filter,
+  costume: filter,
+  distance: filter,
+  template: z.string().max(64).nullable().optional(),
+  clean: z.boolean().nullable().optional(),
+  overrideLocationLabel: z.string().max(255).nullable().optional(),
+  ivMin: filter,
+  ivMax: filter,
+  cpMin: filter,
+  cpMax: filter,
+  levelMin: filter,
+  levelMax: filter,
+  atkMin: filter,
+  atkMax: filter,
+  defMin: filter,
+  defMax: filter,
+  staMin: filter,
+  staMax: filter,
+  gender: z.enum(['any', 'male', 'female', 'genderless']).nullable().optional(),
+  weightMin: filter,
+  weightMax: filter,
+  minTime: filter,
+  rarityMin: filter,
+  rarityMax: filter,
+  sizeMin: filter,
+  sizeMax: filter,
+  pvpLeague: filter,
+  pvpRankBest: filter,
+  pvpRankWorst: filter,
+  pvpMinCp: filter,
+  pvpCap: filter,
+}
+
+/**
+ * The column each input field lands in on Poracle's side.
+ *
+ * This map is also the allowlist: `toPoracleRule` walks it rather than the
+ * request, so a key a client invents never reaches the wire. That matters more
+ * than it looks -- Poracle's v2 request schema rejects an unknown property, so
+ * a stray field is a 422 on a rule the client meant to save.
+ *
+ * `profileNo` is deliberately not here. It is a query parameter, not a rule
+ * field, and Poracle would reject it in a body.
+ */
+const POKEMON_WIRE_NAMES: Record<keyof typeof alertRuleShape, string> = {
+  pokemonId: 'pokemon_id',
+  form: 'form',
+  costume: 'costume',
+  distance: 'distance',
+  template: 'template',
+  clean: 'clean',
+  overrideLocationLabel: 'override_location_label',
+  ivMin: 'min_iv',
+  ivMax: 'max_iv',
+  cpMin: 'min_cp',
+  cpMax: 'max_cp',
+  levelMin: 'min_level',
+  levelMax: 'max_level',
+  atkMin: 'atk',
+  atkMax: 'max_atk',
+  defMin: 'def',
+  defMax: 'max_def',
+  staMin: 'sta',
+  staMax: 'max_sta',
+  gender: 'gender',
+  weightMin: 'min_weight',
+  weightMax: 'max_weight',
+  minTime: 'min_time',
+  rarityMin: 'rarity',
+  rarityMax: 'max_rarity',
+  sizeMin: 'size',
+  sizeMax: 'max_size',
+  pvpLeague: 'pvp_ranking_league',
+  pvpRankBest: 'pvp_ranking_best',
+  pvpRankWorst: 'pvp_ranking_worst',
+  pvpMinCp: 'pvp_ranking_min_cp',
+  pvpCap: 'pvp_ranking_cap',
+}
+
+const alertInput = z.object({
+  ...alertRuleShape,
+  // The profile this rule belongs to. Checked against the human's own profiles
+  // before it is forwarded -- Poracle does not check it (see `resolveProfile`).
+  profileNo: z.number().int().min(0).max(INT_MAX).optional(),
+})
+
+type AlertInput = z.infer<typeof alertInput>
+
+interface AlertWriteResult {
+  created: AlertRow[]
+  updated: AlertRow[]
+  unchanged: AlertRow[]
+}
+
+/**
+ * One rule, in Poracle's spelling.
+ *
+ * Built by walking the allowlist rather than the request, so the output holds
+ * the fields this module knows about and nothing else. An unset field is left
+ * out entirely: Poracle reads an omitted field as its documented default, and
+ * a key present with `undefined` marshals to nothing useful either way.
+ */
+function toPoracleRule(rule: AlertInput): Record<string, unknown> {
+  const body: Record<string, unknown> = {}
+  for (const [field, column] of Object.entries(POKEMON_WIRE_NAMES)) {
+    const value = (rule as Record<string, unknown>)[field]
+    if (value !== undefined) body[column] = value
+  }
+  return body
+}
+
+/** Poracle rules, projected to what a client sees, stamped with the profile written to. */
+function toAlertRows(list: unknown, profileNo: number): AlertRow[] {
+  const rows = Array.isArray(list) ? list : []
+  return rows.map((row) => toAlertRow(row, profileNo))
+}
+
+/**
+ * The snapshot a write is authorized against.
+ *
+ * A write cannot degrade to an empty tab the way the reads do: the blocked
+ * check and the profile check both read this body, so a write that proceeded
+ * without it would be a write with neither check performed.
+ */
+async function readSnapshotForWrite(
+  client: PoracleClient,
+  platformId: string,
+): Promise<any> {
+  let res: { status: number; body: any }
+  try {
+    res = await client.get(trackingPath(platformId))
+  } catch {
+    throw new TRPCError({
+      code: 'SERVICE_UNAVAILABLE',
+      message: 'Alerts are unavailable right now',
+    })
+  }
+  if (res.status < 200 || res.status >= 300) {
+    throw new TRPCError({
+      code: 'SERVICE_UNAVAILABLE',
+      message: `Alerts are unavailable right now (Poracle returned ${res.status})`,
+    })
+  }
+  return res.body
+}
+
+/**
+ * The profile this write lands in.
+ *
+ * Poracle's `resolveHuman` takes `?profile` off the query string and uses it
+ * without checking the human owns that profile, so this is the only check
+ * there is (spec 7.4). Both sides of the comparison come from the snapshot,
+ * which is Poracle's own answer for this human -- never from the request.
+ */
+function resolveProfile(body: any, requested: number | undefined): number {
+  const view = toAlertsSnapshot(body)
+  const active = view.human.currentProfileNo
+  if (requested === undefined) return active
+  const owned =
+    requested === active ||
+    view.profiles.some((profile) => profile.profileNo === requested)
+  if (!owned) {
+    throw new TRPCError({
+      code: 'FORBIDDEN',
+      message: 'That profile is not one of yours',
+    })
+  }
+  return requested
+}
+
+/**
+ * The one profile a batch writes to.
+ *
+ * Poracle's create endpoint takes a single `?profile` for the whole body, so a
+ * batch naming two profiles cannot be honoured. Refusing is the only honest
+ * answer: writing them all to the first rule's profile would silently move
+ * rules between profiles.
+ */
+function batchProfile(rules: AlertInput[]): number | undefined {
+  const requested = [
+    ...new Set(
+      rules
+        .map((rule) => rule.profileNo)
+        .filter((no): no is number => no !== undefined),
+    ),
+  ]
+  if (requested.length > 1) {
+    throw new TRPCError({
+      code: 'BAD_REQUEST',
+      message: 'One profile per batch: save each profile separately',
+    })
+  }
+  return requested[0]
+}
+
+interface WriteTarget {
+  client: PoracleClient
+  platformId: string
+  profileNo: number
+}
+
+/**
+ * Everything a write needs before it may touch Poracle: the perm, the identity
+ * to act as, the blocked-category refusal, and the profile.
+ *
+ * The blocked check is `pokemonBlocked`, the same function `status` answers
+ * with. The read side stays open -- someone whose alerts are blocked can still
+ * see what they are subscribed to -- and only the writes refuse.
+ */
+async function beginWrite(
+  ctx: Context,
+  requestedProfile: number | undefined,
+): Promise<WriteTarget> {
+  const userId = requirePerm(ctx, 'alerts')
+  const client = clientFor(ctx)
+  if (!client) {
+    throw new TRPCError({
+      code: 'PRECONDITION_FAILED',
+      message: 'Alerts are not configured on this server',
+    })
+  }
+  const platformId = await platformIdFor(ctx, userId)
+  if (!platformId) {
+    throw new TRPCError({
+      code: 'PRECONDITION_FAILED',
+      message: 'Link a Discord account to use Alerts',
+    })
+  }
+
+  const body = await readSnapshotForWrite(client, platformId)
+  if (pokemonBlocked(ctx.poracleConfig, body?.human)) {
+    throw new TRPCError({
+      code: 'FORBIDDEN',
+      message: 'Pokemon alerts are blocked for this account',
+    })
+  }
+  return {
+    client,
+    platformId,
+    profileNo: resolveProfile(body, requestedProfile),
+  }
+}
+
+/**
+ * A write, with Poracle's answer turned into something a client can act on.
+ *
+ * The reads degrade to an empty tab on purpose; a write may not. A save that
+ * quietly did nothing is the worst of the three outcomes, so every non-2xx
+ * becomes an error. The status is all that is reported -- never the response
+ * body, which is Poracle's internals.
+ */
+async function sendWrite(
+  client: PoracleClient,
+  method: 'POST' | 'PUT' | 'DELETE',
+  path: string,
+  body?: unknown,
+): Promise<any> {
+  let res: { status: number; body: any }
+  try {
+    res = await client.send(method, path, body)
+  } catch {
+    throw new TRPCError({
+      code: 'SERVICE_UNAVAILABLE',
+      message: 'Alerts could not be saved right now',
+    })
+  }
+  if (res.status === 404) {
+    throw new TRPCError({
+      code: 'NOT_FOUND',
+      message: 'That alert was not found',
+    })
+  }
+  if (res.status < 200 || res.status >= 300) {
+    throw new TRPCError({
+      code: 'BAD_GATEWAY',
+      message: `Alerts could not be saved (Poracle returned ${res.status})`,
+    })
+  }
+  return res.body
 }
 
 interface AlertsStatus {
@@ -242,7 +571,90 @@ const alertsRouter = t.router({
       return toAlertsSnapshot(null)
     }
   }),
+
+  /**
+   * Create rules, and update the ones the batch turns out to already cover.
+   *
+   * `silent=true` is not an optimization. Poracle sends a confirmation push
+   * per rule it created, so without it a batch notifies the user about the
+   * batch they just performed, once per rule, on whatever platform they linked.
+   */
+  create: t.procedure
+    .input(z.object({ rules: z.array(alertInput).max(MAX_RULES) }))
+    .mutation(async ({ ctx, input }): Promise<AlertWriteResult> => {
+      const target = await beginWrite(ctx, batchProfile(input.rules))
+      const path = `${pokemonPath(target.platformId)}?silent=true&profile=${target.profileNo}`
+      const body = await sendWrite(
+        target.client,
+        'POST',
+        path,
+        input.rules.map(toPoracleRule),
+      )
+      return {
+        created: toAlertRows(body?.created, target.profileNo),
+        updated: toAlertRows(body?.updated, target.profileNo),
+        unchanged: toAlertRows(body?.unchanged, target.profileNo),
+      }
+    }),
+
+  /**
+   * Replace one rule, and hand back the uid it now has.
+   *
+   * Poracle's PUT is documented as delete plus insert, and its diff-update
+   * path does the same thing, so no Poracle write preserves a uid. Returning
+   * the one we were given would leave a client pointing at a row that no
+   * longer exists, invalidated by its own save.
+   *
+   * The uid on the way in is safe to take from a client: every by-uid endpoint
+   * resolves the row through Poracle's own ownership check and 404s a uid this
+   * human does not own.
+   */
+  replace: t.procedure
+    .input(z.object({ uid: z.number().int(), rule: alertInput }))
+    .mutation(async ({ ctx, input }): Promise<{ uid: number }> => {
+      const target = await beginWrite(ctx, input.rule.profileNo)
+      const path = `${pokemonPath(target.platformId)}/${input.uid}?profile=${target.profileNo}`
+      const body = await sendWrite(
+        target.client,
+        'PUT',
+        path,
+        toPoracleRule(input.rule),
+      )
+      const uid = body?.updated?.[0]?.uid
+      if (typeof uid !== 'number') {
+        throw new TRPCError({
+          code: 'BAD_GATEWAY',
+          message: 'Poracle replaced the rule without naming its new uid',
+        })
+      }
+      return { uid }
+    }),
+
+  /** Delete one rule, and report the uids that actually went. */
+  remove: t.procedure
+    .input(
+      z.object({
+        uid: z.number().int(),
+        profileNo: z.number().int().min(0).max(INT_MAX).optional(),
+      }),
+    )
+    .mutation(async ({ ctx, input }): Promise<{ deleted: number[] }> => {
+      const target = await beginWrite(ctx, input.profileNo)
+      const path = `${pokemonPath(target.platformId)}/${input.uid}?profile=${target.profileNo}`
+      const body = await sendWrite(target.client, 'DELETE', path)
+      return {
+        deleted: toAlertRows(body?.deleted, target.profileNo).map(
+          (row) => row.uid,
+        ),
+      }
+    }),
 })
 
-export type { AlertsStatus }
-export { alertsRouter, pokemonBlocked, resolvePlatformId }
+export type { AlertInput, AlertsStatus, AlertWriteResult }
+export {
+  alertRuleShape,
+  alertsRouter,
+  POKEMON_WIRE_NAMES,
+  pokemonBlocked,
+  resolvePlatformId,
+}
