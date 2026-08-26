@@ -25,3 +25,10 @@ test('an absent perms object denies rather than defaulting to allowed', () => {
   const ctx = { user: { id: 'u1' }, session: null, perms: {} }
   expect(() => requirePerm(ctx as any, 'alerts')).toThrow(/not available/)
 })
+
+test('a truthy non-boolean is not a grant', () => {
+  // `!== true`, not a truthiness check: a provider writing a string into the
+  // perms row must not accidentally grant the capability.
+  const ctx = { user: { id: 'u1' }, session: null, perms: { alerts: 'yes' } }
+  expect(() => requirePerm(ctx as any, 'alerts')).toThrow(/not available/)
+})

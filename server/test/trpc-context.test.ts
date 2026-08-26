@@ -1,6 +1,7 @@
 import { expect, test } from 'bun:test'
 
 import { createContextFactory } from '../src/trpc/context'
+import { requirePerm } from '../src/trpc/require-perm'
 
 const req = { req: new Request('http://localhost/trpc') }
 
@@ -47,4 +48,26 @@ test('a signed-in account holding no rows gets an empty perms object', async () 
   const ctx = await createContext(req)
 
   expect(ctx.perms).toEqual({})
+})
+
+test('a revoked grant is denied on the next request, with no logout', async () => {
+  // The acceptance criterion this whole task exists for. Perms are re-read on
+  // every request, so a role lost between two requests is gone from the second
+  // context -- no logout, nothing cleared. Caching the loaded perms anywhere is
+  // 1.x's `selectedWebhook` bug, and it would break exactly this assertion.
+  let call = 0
+  const createContext = createContextFactory({
+    golbatClient: {},
+    getSession: async () => ({ user: { id: 'u1' }, session: { userId: 'u1' } }),
+    getPerms: async () => {
+      call += 1
+      return [{ providerId: 'discord', perms: { alerts: call === 1 } }]
+    },
+  })
+
+  const before = await createContext(req)
+  expect(requirePerm(before as any, 'alerts')).toBe('u1')
+
+  const after = await createContext(req)
+  expect(() => requirePerm(after as any, 'alerts')).toThrow(/not available/)
 })
