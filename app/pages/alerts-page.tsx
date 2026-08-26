@@ -52,7 +52,7 @@ export function AlertsPage({
   alertsClient,
   namesClient,
 }: AlertsPageProps = {}) {
-  const { state, snapshot, create, replace, remove } = useAlerts(
+  const { state, snapshot, error, create, replace, remove } = useAlerts(
     alertsClient ? { client: alertsClient } : undefined,
   )
   const species = useSpeciesCatalog(
@@ -97,6 +97,17 @@ export function AlertsPage({
           </Button>
         )}
       </div>
+      {error !== null && (
+        // `role="alert"` so a screen reader announces it the moment a
+        // write fails -- a click that silently did nothing was the bug
+        // this exists to fix, and a message nobody hears is the same bug
+        // with extra steps.
+        <p role="alert" className="mt-4 text-sm text-destructive">
+          {error instanceof Error
+            ? error.message
+            : 'That request failed. Try again.'}
+        </p>
+      )}
       {state === 'unreachable' ? (
         <p className="mt-4 text-sm text-muted-foreground">
           Poracle is unreachable right now. Your alerts will show again once it

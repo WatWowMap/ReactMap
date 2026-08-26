@@ -1,6 +1,12 @@
 import { afterAll, afterEach, beforeAll, expect, test } from 'bun:test'
 import { QueryClientProvider } from '@tanstack/react-query'
-import { act, cleanup, render, waitFor } from '@testing-library/react'
+import {
+  act,
+  cleanup,
+  fireEvent,
+  render,
+  waitFor,
+} from '@testing-library/react'
 import { createRulesQueryClient } from '../rules/rules-query'
 import { setupDom, teardownDom } from '../test-setup'
 import type { AlertsClient, AlertsSnapshot, AlertsState } from './alerts-query'
@@ -23,13 +29,33 @@ const EMPTY_SNAPSHOT: AlertsSnapshot = {
   locations: [],
 }
 
-/** Renders the hook's result into text the DOM queries can read. */
+/**
+ * Renders the hook's result into text the DOM queries can read, plus one
+ * button per write method -- `error`'s only consumer that matters is
+ * whether a failed write is still reachable after the promise it came
+ * from has already settled, and a button click is what exercises that
+ * the same way a real card's Save or Delete would.
+ */
 function Probe({ client }: { client: AlertsClient }) {
-  const { state, snapshot } = useAlerts({ client })
+  const { state, snapshot, error, create, replace, remove } = useAlerts({
+    client,
+  })
   return (
     <div>
       <span data-testid="state">{state}</span>
       <span data-testid="alert-count">{snapshot?.alerts.length ?? 'null'}</span>
+      <span data-testid="error">
+        {error instanceof Error ? error.message : String(error)}
+      </span>
+      <button type="button" onClick={() => void create({ pokemonId: 1 })}>
+        create
+      </button>
+      <button type="button" onClick={() => void replace(1, { ivMin: 100 })}>
+        replace
+      </button>
+      <button type="button" onClick={() => void remove(1)}>
+        remove
+      </button>
     </div>
   )
 }
@@ -140,4 +166,75 @@ test('a rejected status() fails closed to absent, not stuck loading', async () =
   await act(async () => {})
   expect(spy.calls).toBe(0)
   expect(getByTestId('alert-count').textContent).toBe('null')
+})
+
+// The fifth instance of a repeated shape in this plan: a fake that only
+// ever resolves hides a write path that only ever throws. Each of these
+// rejects one write and asserts the failure is still readable through
+// `error` after the failed promise has already settled -- the same
+// property `useRules.error` (`rules-query.ts`) has always had, which
+// `create`/`replace`/`remove` here silently dropped until now.
+function writingClient(overrides: Partial<AlertsClient>): AlertsClient {
+  return {
+    ...unusedWrites,
+    status: async () => ({ state: 'present' }),
+    snapshot: async () => ({
+      ...EMPTY_SNAPSHOT,
+      alerts: [{ uid: 1, pokemonId: 149 } as any],
+    }),
+    ...overrides,
+  }
+}
+
+test('a rejected create surfaces through error rather than doing nothing', async () => {
+  const { getByTestId, getByText } = renderProbe(
+    writingClient({
+      create: async () => {
+        throw new Error('pokemon_id is required')
+      },
+    }),
+  )
+  await waitFor(() => expect(getByTestId('alert-count').textContent).toBe('1'))
+  fireEvent.click(getByText('create'))
+  await waitFor(() =>
+    expect(getByTestId('error').textContent).toBe('pokemon_id is required'),
+  )
+  // Nothing was written -- the one seeded row is still the only one.
+  expect(getByTestId('alert-count').textContent).toBe('1')
+})
+
+test('a rejected replace surfaces through error and leaves the row untouched', async () => {
+  const { getByTestId, getByText } = renderProbe(
+    writingClient({
+      replace: async () => {
+        throw new Error('Poracle is unreachable right now')
+      },
+    }),
+  )
+  await waitFor(() => expect(getByTestId('alert-count').textContent).toBe('1'))
+  fireEvent.click(getByText('replace'))
+  await waitFor(() =>
+    expect(getByTestId('error').textContent).toBe(
+      'Poracle is unreachable right now',
+    ),
+  )
+  expect(getByTestId('alert-count').textContent).toBe('1')
+})
+
+test('a rejected remove surfaces through error and leaves the card in place', async () => {
+  const { getByTestId, getByText } = renderProbe(
+    writingClient({
+      remove: async () => {
+        throw new Error('not found')
+      },
+    }),
+  )
+  await waitFor(() => expect(getByTestId('alert-count').textContent).toBe('1'))
+  fireEvent.click(getByText('remove'))
+  await waitFor(() =>
+    expect(getByTestId('error').textContent).toBe('not found'),
+  )
+  // Deleting appeared to succeed and the row stayed -- exactly the bug
+  // report this whole change exists to fix. It should still be there.
+  expect(getByTestId('alert-count').textContent).toBe('1')
 })

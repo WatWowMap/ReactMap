@@ -56,10 +56,11 @@ export interface AlertsSnapshot {
 
 /**
  * One rule, as `alerts.create` and `alerts.replace` take it: every column
- * `server/src/trpc/alerts-router.ts`'s `alertRuleShape` accepts, `pokemonId`
- * required and everything else optional -- the same shape a client reads
- * an `AlertRow` back as, minus the three fields that are Poracle's to set
- * (`uid`, `ping`) or read-only (`description`).
+ * `server/src/trpc/alerts-router.ts`'s `alertInput` accepts -- `alertRuleShape`
+ * plus `profileNo`, which rides along on `AlertPatch` since `AlertRow` already
+ * carries it -- `pokemonId` required and everything else optional. The same
+ * shape a client reads an `AlertRow` back as, minus the three fields that are
+ * Poracle's to set (`uid`, `ping`) or read-only (`description`).
  */
 export type AlertWriteInput = AlertPatch & { pokemonId: number }
 
@@ -140,6 +141,19 @@ export interface UseAlertsOptions {
 export interface UseAlertsResult {
   state: 'loading' | AlertsState
   snapshot: AlertsSnapshot | null
+  /**
+   * The most recent failure from `create`, `replace` or `remove` --
+   * `mutation.error` outlives the call that produced it (react-query
+   * clears it only on the next `mutate`), which is what lets a caller
+   * keep showing "that write failed" after the failed promise has
+   * already resolved. `null` once nothing has failed, or once react-query
+   * has cleared it for a fresh attempt. Modelled on `useRules`'s own
+   * `error` (`rules-query.ts`) -- the write methods below still swallow
+   * the promise, exactly like `useRules`'s do, but that swallow is only
+   * safe when the error stays reachable through this field; that was the
+   * piece missing before.
+   */
+  error: unknown
   /**
    * Writes a new alert. Never patches the cache with a guessed row --
    * Poracle's create cannot name what it made (`AlertCreateResult`), so
@@ -240,6 +254,11 @@ export function useAlerts({
   return {
     state: statusQuery.isLoading ? 'loading' : resolvedState,
     snapshot: state === 'present' ? (snapshotQuery.data ?? null) : null,
+    error:
+      createMutation.error ??
+      replaceMutation.error ??
+      removeMutation.error ??
+      null,
     create: async (rule) => {
       try {
         await createMutation.mutateAsync(rule)

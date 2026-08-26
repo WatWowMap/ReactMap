@@ -234,3 +234,23 @@ test('picking a species from the New alert sheet creates and refetches', async (
   await waitFor(() => expect(created).toEqual([{ pokemonId: 246 }]))
   await waitFor(() => expect(getByText('Pokémon #246')).toBeTruthy())
 })
+
+test('a failed delete shows an error message instead of doing nothing', async () => {
+  const { getByTestId, findByRole } = renderWith({
+    status: async () => ({ state: 'present' }),
+    snapshot: async () => ({
+      ...EMPTY_SNAPSHOT,
+      alerts: [{ uid: 7, pokemonId: 149 }],
+    }),
+    remove: async () => {
+      throw new Error('Poracle is unreachable right now')
+    },
+  } as unknown as AlertsClient)
+  await waitFor(() => expect(getByTestId('alert-7')).toBeTruthy())
+  fireEvent.click(await findByRole('button', { name: /delete/i }))
+  const alert = await findByRole('alert')
+  expect(alert.textContent).toBe('Poracle is unreachable right now')
+  // The bug this exists to fix: deleting appeared to succeed and the row
+  // stayed. It should still be there, now with an explanation.
+  expect(getByTestId('alert-7')).toBeTruthy()
+})
