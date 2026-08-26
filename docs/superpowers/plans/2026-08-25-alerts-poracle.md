@@ -1783,9 +1783,8 @@ value would point at a row that no longer exists and the next edit would
   alertsRouter.setEnabled   // input { enabled: boolean } -> { enabled: boolean }
   alertsRouter.switchProfile // input { profileNo: number } -> { currentProfileNo: number }
   alertsRouter.addProfile    // input { name: string } -> { profileNo: number }
-  alertsRouter.renameProfile // input { profileNo: number; name: string } -> { profileNo: number }
   alertsRouter.deleteProfile // input { profileNo: number } -> { deleted: number }
-  alertsRouter.copyProfile   // input { profileNo: number } -> { profileNo: number }
+  alertsRouter.copyProfileRules // input { fromProfileNo: number; toProfileNo: number } -> { toProfileNo: number }
   ```
 
 - [ ] **Step 1: Write the failing test**
@@ -1837,7 +1836,21 @@ Expected: FAIL, cannot resolve `./human-panel`.
 - [ ] **Step 3: Implement**
 
 Procedures map onto `POST /v2/humans/{id}/enable` and `/disable`, `POST .../profile` to switch, and
-the four `/profiles` operations. Each validates `profileNo` against the human's own profiles first.
+the `/profiles` operations that actually exist.
+
+**Two corrections, read off the handlers rather than the route names.** `renameProfile` is gone:
+`PATCH /v2/humans/{id}/profiles/{profile_no}` is documented as updating a profile's active_hours
+and calls `UpdateProfileHours`. Poracle has no way to rename a profile, so the procedure cannot be
+written honestly, and a no-op reporting success is the silent-failure defect this plan already
+shipped once.
+
+`copyProfile` becomes `copyProfileRules` and takes two profile numbers. The path segment is the
+**destination**, the source rides in the body as `from_profile`, and the operation **replaces the
+destination's existing rules**. It is a destructive overwrite between two profiles, not a
+duplicate, and the old one-argument signature named it for something it does not do.
+
+`addProfile` returns nothing the client can use. Poracle assigns the number server-side and never
+returns it, so the client refetches, exactly as it does after a `create`. Each validates `profileNo` against the human's own profiles first.
 The panel invalidates the snapshot query after a profile switch.
 
 - [ ] **Step 4: Gate and commit**
