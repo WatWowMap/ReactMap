@@ -8,11 +8,18 @@
 // (`server/src/ws/socket-server.js`).
 //
 // Anonymous is a valid context, not an error: `session` is `null` for a
-// signed-out visitor, and callers decide what that means for a given
-// procedure (nothing in this task enforces a permission on any procedure --
-// see the Task 5 report for why that is out of scope here).
+// signed-out visitor, and so is `perms`. The two nulls travel together and
+// mean different things to `require-perm.ts`: a null `perms` is "there is
+// no account", an empty one is "we loaded this account's perms and it holds
+// none". A signed-in context carries the merged `user_perms` rows, re-read
+// on every request so that losing a role revokes the capability with it.
+
+import { eq } from 'drizzle-orm'
 
 import { getAuth } from '../auth'
+import { userPerms } from '../db/auth-schema'
+import { getDrizzle } from '../db/drizzle'
+import { mergePerms } from '../settings-response'
 
 async function resolveSession(
   headers: Headers,
@@ -26,21 +33,37 @@ async function resolveSession(
   }
 }
 
+/** The real `user_perms` rows, used when a caller injects nothing else. */
+function loadPerms(userId: string): Promise<any[]> {
+  return getDrizzle()
+    .select()
+    .from(userPerms)
+    .where(eq(userPerms.userId, userId))
+}
+
 function createContextFactory({
   golbatClient,
   registry,
+  getSession = resolveSession,
+  getPerms = loadPerms,
 }: {
   golbatClient: any
   // Task 6's routing table, so a tRPC subscription receives pushed fort
   // changes on the same terms the WebSocket bridge does. Optional: a
   // caller that has not built one still gets a working poll loop.
   registry?: any
+  // Injected the same way `buildSettingsResponse` takes its deps, so the
+  // context is testable without a live Better Auth instance or a database.
+  getSession?: (headers: Headers) => Promise<{ user: any; session: any } | null>
+  getPerms?: (userId: string) => Promise<any[]>
 }) {
   return async function createContext({ req }: { req: Request }) {
-    const session = await resolveSession(req.headers)
+    const session = await getSession(req.headers)
+    const user = session?.user ?? null
     return {
-      user: session?.user ?? null,
+      user,
       session: session?.session ?? null,
+      perms: user ? mergePerms(await getPerms(user.id)) : null,
       golbatClient,
       registry,
     }
