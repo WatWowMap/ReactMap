@@ -358,8 +358,11 @@ const applyMutations = (config) => {
     ),
   ]
 
-  if (Array.isArray(config.webhooks)) {
-    config.webhooks = config.webhooks.map(replaceBothAliases)
+  // Poracle's role lists take aliases too. Without this an operator who
+  // writes an `authentication.aliases` name into `poracle.discordRoles` gets
+  // no grant and no error -- a silent authorization failure.
+  if (config.poracle) {
+    config.poracle = replaceBothAliases(config.poracle)
   }
   Object.keys(config.scanner || {}).forEach((key) => {
     config.scanner[key] = replaceBothAliases(config.scanner[key] || {})
