@@ -1,52 +1,49 @@
-import { expect, mock, test } from 'bun:test'
+import { expect, test } from 'bun:test'
 
-mock.module('@rm/config', () => ({
-  default: {
-    getSafe: (key: string) =>
-      key === 'poracle'
-        ? {
-            enabled: true,
-            host: 'http://localhost',
-            port: 3030,
-            poracleSecret: 's',
-            discordRoles: ['role-a'],
-            telegramGroups: [],
-            local: [],
-          }
-        : undefined,
-  },
-}))
+import { computeDiscordPerms } from '../auth/discord-perms'
+import { alertsPerm } from './alerts-perms'
 
-const { alertsPerm } = await import('./alerts-perms')
+// Injected rather than mocked: bun applies `mock.module` process-wide, so a
+// file that mocks `@rm/config` takes the real config away from every suite
+// running after it. Every function under test here takes its config as a dep.
+const PORACLE = {
+  enabled: true,
+  host: 'http://localhost',
+  port: 3030,
+  poracleSecret: 's',
+  discordRoles: ['role-a'],
+  telegramGroups: [] as string[],
+  local: [] as string[],
+}
 
 test('a listed role grants alerts', () => {
-  expect(alertsPerm(['role-a'], 'discordRoles')).toBe(true)
+  expect(alertsPerm(['role-a'], 'discordRoles', { config: PORACLE })).toBe(true)
 })
 
 test('an unlisted role does not', () => {
-  expect(alertsPerm(['role-b'], 'discordRoles')).toBe(false)
+  expect(alertsPerm(['role-b'], 'discordRoles', { config: PORACLE })).toBe(
+    false,
+  )
 })
 
 test('a provider with no configured roles denies rather than throwing', () => {
   // telegramGroups is [], and a config that omits the key entirely must
   // behave the same way. 1.x relied on optional chaining here; losing it
   // turns a malformed config into a boot crash.
-  expect(alertsPerm(['role-a'], 'telegramGroups')).toBe(false)
+  expect(alertsPerm(['role-a'], 'telegramGroups', { config: PORACLE })).toBe(
+    false,
+  )
 })
 
 test('no roles is a denial, not a grant', () => {
   // The empty-means-everything idiom elsewhere in this repo (areaPerms)
   // must not leak into a grant.
-  expect(alertsPerm([], 'discordRoles')).toBe(false)
+  expect(alertsPerm([], 'discordRoles', { config: PORACLE })).toBe(false)
 })
 
 // The Discord grant lives here rather than beside the other Discord perm
-// tests because `mock.module` is process-wide in bun: a second file mocking
-// `@rm/config` takes the real config away from every suite that runs after
-// it. computeDiscordPerms reaches config only through alertsPerm, so this
-// file's existing mock is all it needs.
-const { computeDiscordPerms } = await import('../auth/discord-perms')
-
+// tests because computeDiscordPerms reaches config only through alertsPerm,
+// and this is where that function's config shape is described.
 const discordRules = {
   allowedUsers: [] as string[],
   allowedGuilds: ['good-guild'],
@@ -62,6 +59,7 @@ test('a Discord role listed under poracle.discordRoles grants alerts', () => {
       guildResults: { 'good-guild': { status: 'member', roles: ['role-a'] } },
     },
     discordRules,
+    { poracleConfig: PORACLE },
   )
   expect(perms?.alerts).toBe(true)
 })
@@ -73,6 +71,7 @@ test('a Discord account with no listed role is denied alerts', () => {
       guildResults: { 'good-guild': { status: 'member', roles: ['role-b'] } },
     },
     discordRules,
+    { poracleConfig: PORACLE },
   )
   expect(perms?.alerts).toBe(false)
 })
@@ -81,6 +80,7 @@ test('a non-member of every allowed guild still gets the key, set to false', () 
   const perms = computeDiscordPerms(
     { id: 'u1', guildResults: { 'good-guild': { status: 'not_member' } } },
     discordRules,
+    { poracleConfig: PORACLE },
   )
   expect(perms?.alerts).toBe(false)
 })
@@ -89,6 +89,7 @@ test('an allowedUsers id gets alerts without any guild data', () => {
   const perms = computeDiscordPerms(
     { id: 'admin-1', guildResults: null },
     { ...discordRules, allowedUsers: ['admin-1'] },
+    { poracleConfig: PORACLE },
   )
   expect(perms?.alerts).toBe(true)
 })

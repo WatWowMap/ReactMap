@@ -1,4 +1,6 @@
 // server/src/auth/discord-perms.ts
+import type { Poracle } from '@rm/types'
+
 import { alertsPerm } from '../utils/alerts-perms'
 import type { DiscordGuildResult } from './discord-roles'
 
@@ -41,6 +43,10 @@ function computeDiscordPerms(
     permsConfig: Record<string, { enabled: boolean; roles?: string[] }>
     alwaysEnabledPerms: string[]
   },
+  // Only `alertsPerm` reads config here, and only for the role lists. A test
+  // hands its own in rather than mocking `@rm/config`, which bun applies
+  // process-wide and would take the real config from every later suite.
+  deps: { poracleConfig?: Partial<Poracle> } = {},
 ): Record<string, any> | null {
   const basePerms = (): Record<string, any> => {
     const perms: Record<string, any> = Object.fromEntries(
@@ -132,7 +138,9 @@ function computeDiscordPerms(
     })
   })
 
-  perms.alerts = alertsPerm(roleIds, 'discordRoles')
+  perms.alerts = alertsPerm(roleIds, 'discordRoles', {
+    ...(deps.poracleConfig ? { config: deps.poracleConfig } : {}),
+  })
 
   return perms
 }

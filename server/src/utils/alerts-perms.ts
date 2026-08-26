@@ -1,4 +1,5 @@
 import config from '@rm/config'
+import type { Poracle } from '@rm/types'
 
 type AlertsProvider = 'discordRoles' | 'telegramGroups' | 'local'
 
@@ -10,8 +11,15 @@ type AlertsProvider = 'discordRoles' | 'telegramGroups' | 'local'
  * optional chaining is load-bearing -- a config that omits a provider's role
  * list must deny, not throw during boot.
  */
-function alertsPerm(roles: string[], provider: AlertsProvider): boolean {
-  const poracle: any = config.getSafe('poracle')
+function alertsPerm(
+  roles: string[],
+  provider: AlertsProvider,
+  // Injected by tests. `mock.module` is process-wide in bun, so mocking
+  // `@rm/config` here would steal the real config from every suite that runs
+  // after this one -- the same widening `poracleConfigured` already has.
+  deps: { config?: Partial<Poracle> } = {},
+): boolean {
+  const poracle: any = deps.config ?? config.getSafe('poracle')
   if (!poracle?.enabled) return false
   const allowed: string[] | undefined = poracle?.[provider]
   if (!allowed?.length) return false
