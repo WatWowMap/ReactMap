@@ -1142,11 +1142,16 @@ Pure refactor. Filters behaviour must not change, and its existing tests are the
     minField: string
     maxField: string
     suffix?: string
-    /** Renders a bound as a word instead of a number, e.g. XXS..XXL. */
+    /** Renders a bound as a word instead of a number, e.g. XXS..XXL.
+     *  An unmapped bound OMITS the whole condition, matching the old size
+     *  range, which fell through its if-chain and pushed nothing. This is the
+     *  opposite of `labelWords` below, and the difference is deliberate. */
     words?: Record<number, string>
     /** PvP only. The label prefix is looked up from ANOTHER column's value,
      *  so `pvpLeague: 1500` with `label: 'rank'` renders "Great rank 1-100".
-     *  The whole condition is omitted when that column is null. */
+     *  The whole condition is omitted when that column is null, and an
+     *  unmapped league falls back to the RAW value (`LEAGUE_WORD[x] ?? x`),
+     *  unlike `words` above which omits. */
     labelField?: string
     labelWords?: Record<number, string>
   }
@@ -1159,6 +1164,24 @@ Pure refactor. Filters behaviour must not change, and its existing tests are the
      *  gender 1 is "male", not "gender male". `value` is a string for
      *  `rule.size`, whose column is 'sm' | 'md' | 'lg' | 'xl'. */
     options: { value: number | string; label: string }[]
+    /** What an unmatched value does. The old renderer differed per site and
+     *  both behaviours are load-bearing: gender used `?? null` and omitted,
+     *  marker size used `?? rule.size` and rendered the raw value. Default
+     *  false (omit); marker size sets it true. */
+    fallbackToRaw?: boolean
+  }
+  /** A single numeric column rendered as a whole phrase. Poracle needs shapes
+   *  a range cannot express: `distance` is one int where 0 means "use my
+   *  areas" and 5000 means "within 5 km", and `minTime` reads "at least N
+   *  seconds left". Without this, Task 9 would have to edit the shared
+   *  renderer, which is the second mechanism this design exists to avoid. */
+  interface ValueCondition {
+    kind: 'value'
+    key: string
+    label: string
+    field: string
+    /** Renders the whole phrase. Return null to omit the condition. */
+    format: (value: number) => string | null
   }
   /** Truthy renders `label` verbatim: 'ring', 'notifies'. Falsy renders nothing. */
   interface ToggleCondition { kind: 'toggle'; key: string; label: string; field: string }
@@ -1177,6 +1200,7 @@ Pure refactor. Filters behaviour must not change, and its existing tests are the
     | ToggleCondition
     | TextCondition
     | CountCondition
+    | ValueCondition
   interface Vocabulary {
     id: 'reactmap' | 'poracle'
     conditions: ConditionDef[]
