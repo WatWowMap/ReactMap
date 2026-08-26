@@ -44,8 +44,8 @@ function poracleConfig(): PoracleConfig {
   return config.getSafe<PoracleConfig>('poracle')
 }
 
-function poracleConfigured(): boolean {
-  const c = poracleConfig()
+function poracleConfigured(deps: { config?: PoracleConfig } = {}): boolean {
+  const c = deps.config ?? poracleConfig()
   return Boolean(c?.enabled && c?.host && c?.poracleSecret)
 }
 
