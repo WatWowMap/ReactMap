@@ -308,13 +308,55 @@ test('replace returns the new uid, because PUT is delete plus insert', async () 
   })
 })
 
-test('no write procedure accepts a human id', () => {
-  for (const name of ['create', 'replace', 'remove']) {
-    const def: any = (alertsRouter as any)._def.procedures[name]._def
-    const schema = JSON.stringify(def.inputs ?? [])
-    expect(schema).not.toContain('humanId')
-    expect(schema).not.toContain('platformId')
+/**
+ * Every field name an input schema accepts, nested objects and arrays
+ * included.
+ *
+ * Walking `shape` rather than stringifying the schema, which is the whole
+ * point: zod keeps `shape` as a lazy getter, so `JSON.stringify` of an input
+ * schema is 198 characters carrying no field names at all. A test asserting
+ * `not.toContain('humanId')` against that string passes no matter what the
+ * inputs are -- `toContain('uid')` is equally false against a schema whose
+ * first field is `uid`.
+ */
+function inputFields(name: string): string[] {
+  const def: any = (alertsRouter as any)._def.procedures[name]._def
+  const found: string[] = []
+  const walk = (schema: any) => {
+    const inner = schema?._def?.innerType ?? schema?._def?.type ?? schema
+    const shape = inner?.shape ?? inner?._def?.shape
+    const resolved = typeof shape === 'function' ? shape() : shape
+    if (!resolved) return
+    for (const [key, value] of Object.entries(resolved)) {
+      found.push(key)
+      walk(value)
+    }
   }
+  for (const input of def.inputs ?? []) walk(input)
+  return found
+}
+
+test('no write procedure accepts a human id', () => {
+  // spec 7.4. The `{id}` path segment is the identity Poracle acts as, so an
+  // id on the wire is a request to act as somebody else. A uid is different
+  // and is allowed: Poracle resolves every by-uid route through its own
+  // ownership check and 404s a row this human does not own.
+  const identity = /human|platform|discord|account|user|owner/i
+  for (const name of ['create', 'replace', 'remove']) {
+    const fields = inputFields(name)
+    // The walk has to actually reach the fields, or this asserts nothing
+    // twice over.
+    expect(fields.length).toBeGreaterThan(0)
+    expect(fields.filter((field) => identity.test(field))).toEqual([])
+  }
+})
+
+test('the write inputs are exactly the fields the procedures document', () => {
+  expect(inputFields('create')).toContain('rules')
+  expect(inputFields('replace')).toContain('rule')
+  expect(inputFields('remove')).toEqual(['uid', 'profileNo'])
+  // The nested rule is reached, so a field hidden inside it is reached too.
+  expect(inputFields('replace')).toContain('pokemonId')
 })
 
 test('a write requires the alerts perm', async () => {
