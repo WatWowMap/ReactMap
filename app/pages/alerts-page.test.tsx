@@ -1,6 +1,12 @@
 import { afterAll, afterEach, beforeAll, expect, test } from 'bun:test'
 import { QueryClientProvider } from '@tanstack/react-query'
-import { cleanup, fireEvent, render, waitFor } from '@testing-library/react'
+import {
+  cleanup,
+  fireEvent,
+  render,
+  waitFor,
+  within,
+} from '@testing-library/react'
 import type { AlertsClient } from '../alerts/alerts-query'
 import { createRulesQueryClient } from '../rules/rules-query'
 import type { MasterfileClient, SpeciesEntry } from '../rules/use-names'
@@ -233,6 +239,36 @@ test('picking a species from the New alert sheet creates and refetches', async (
   fireEvent.click(await findByRole('checkbox', { name: 'Larvitar' }))
   await waitFor(() => expect(created).toEqual([{ pokemonId: 246 }]))
   await waitFor(() => expect(getByText('Pokémon #246')).toBeTruthy())
+})
+
+test('switching profile refetches, because a stale currentProfileNo would still steer the next write', async () => {
+  // The tab already lists every profile's rules at once
+  // (`all_profiles=true`), so nothing about the visible rule list depends
+  // on which profile is active. `human.currentProfileNo` does, and only a
+  // refetch keeps it honest once Poracle's own answer has changed.
+  let snapshots = 0
+  const { getByRole, findByRole } = renderWith({
+    status: async () => ({ state: 'present' }),
+    snapshot: async () => {
+      snapshots += 1
+      return {
+        ...EMPTY_SNAPSHOT,
+        profiles: [
+          { profileNo: 1, name: 'default' },
+          { profileNo: 2, name: 'work' },
+        ],
+      }
+    },
+    switchProfile: async () => ({ currentProfileNo: 2 }),
+  } as unknown as AlertsClient)
+  await findByRole('listbox', { name: 'Profiles' })
+  const before = snapshots
+  // Scoped to the listbox: the copy-rules selects (visible once there is
+  // more than one profile) also render `<option>work</option>`, and an
+  // unscoped query cannot tell the two apart.
+  const list = getByRole('listbox', { name: 'Profiles' })
+  fireEvent.click(within(list).getByRole('option', { name: 'work' }))
+  await waitFor(() => expect(snapshots).toBeGreaterThan(before))
 })
 
 test('a failed delete shows an error message instead of doing nothing', async () => {

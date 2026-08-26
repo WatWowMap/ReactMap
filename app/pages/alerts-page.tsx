@@ -3,6 +3,7 @@ import { AlertCard } from '../alerts/alert-card'
 import { AlertEditor } from '../alerts/alert-editor'
 import type { AlertsClient, AlertWriteInput } from '../alerts/alerts-query'
 import { useAlerts } from '../alerts/alerts-query'
+import { HumanPanel } from '../alerts/human-panel'
 import { Button } from '../components/ui/button'
 import {
   Sheet,
@@ -52,9 +53,19 @@ export function AlertsPage({
   alertsClient,
   namesClient,
 }: AlertsPageProps = {}) {
-  const { state, snapshot, error, create, replace, remove } = useAlerts(
-    alertsClient ? { client: alertsClient } : undefined,
-  )
+  const {
+    state,
+    snapshot,
+    error,
+    create,
+    replace,
+    remove,
+    setEnabled,
+    switchProfile,
+    addProfile,
+    deleteProfile,
+    copyProfileRules,
+  } = useAlerts(alertsClient ? { client: alertsClient } : undefined)
   const species = useSpeciesCatalog(
     namesClient ? { client: namesClient } : undefined,
   )
@@ -113,19 +124,40 @@ export function AlertsPage({
           Poracle is unreachable right now. Your alerts will show again once it
           is back.
         </p>
-      ) : snapshot && snapshot.alerts.length > 0 ? (
-        <div className="mt-4 grid gap-3">
-          {snapshot.alerts.map((alert) => (
-            <AlertCard
-              key={alert.uid}
-              alert={alert}
-              onOpen={() => setOpenUid(alert.uid)}
-              onDelete={() => void remove(alert.uid)}
-            />
-          ))}
-        </div>
       ) : (
-        <p className="mt-4 text-sm text-muted-foreground">No alerts yet.</p>
+        snapshot && (
+          <>
+            <div className="mt-4">
+              <HumanPanel
+                human={snapshot.human}
+                profiles={snapshot.profiles}
+                onSetEnabled={(enabled) => void setEnabled(enabled)}
+                onSwitchProfile={(profileNo) => void switchProfile(profileNo)}
+                onAddProfile={(name) => void addProfile(name)}
+                onDeleteProfile={(profileNo) => void deleteProfile(profileNo)}
+                onCopyProfileRules={(fromProfileNo, toProfileNo) =>
+                  void copyProfileRules(fromProfileNo, toProfileNo)
+                }
+              />
+            </div>
+            {snapshot.alerts.length > 0 ? (
+              <div className="mt-4 grid gap-3">
+                {snapshot.alerts.map((alert) => (
+                  <AlertCard
+                    key={alert.uid}
+                    alert={alert}
+                    onOpen={() => setOpenUid(alert.uid)}
+                    onDelete={() => void remove(alert.uid)}
+                  />
+                ))}
+              </div>
+            ) : (
+              <p className="mt-4 text-sm text-muted-foreground">
+                No alerts yet.
+              </p>
+            )}
+          </>
+        )
       )}
 
       {openAlert && (

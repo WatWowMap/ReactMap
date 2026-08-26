@@ -34,8 +34,8 @@ afterEach(async () => {
   cleanup()
 })
 
-// The three write methods are unused by this file's tests -- they exist
-// only so a fake satisfies `AlertsClient`'s shape.
+// The write methods are unused by this file's tests -- they exist only so a
+// fake satisfies `AlertsClient`'s shape.
 const unusedWrites = {
   create: async () => {
     throw new Error('not used by this test')
@@ -44,6 +44,21 @@ const unusedWrites = {
     throw new Error('not used by this test')
   },
   remove: async () => {
+    throw new Error('not used by this test')
+  },
+  setEnabled: async () => {
+    throw new Error('not used by this test')
+  },
+  switchProfile: async () => {
+    throw new Error('not used by this test')
+  },
+  addProfile: async () => {
+    throw new Error('not used by this test')
+  },
+  deleteProfile: async () => {
+    throw new Error('not used by this test')
+  },
+  copyProfileRules: async () => {
     throw new Error('not used by this test')
   },
 }

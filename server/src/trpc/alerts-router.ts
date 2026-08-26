@@ -154,6 +154,11 @@ function pokemonPath(platformId: string): string {
   return `${humanPath(platformId)}/tracking/pokemon`
 }
 
+/** One profile, by number, under this human. */
+function profilePath(platformId: string, profileNo: number): string {
+  return `${humanPath(platformId)}/profiles/${profileNo}`
+}
+
 /**
  * The Poracle client for this request, or `null` when there is no Poracle.
  *
@@ -486,15 +491,20 @@ interface WriteSession {
   body: any
 }
 
+/** `WriteSession` under a name that fits the profile procedures below --
+ *  the same three fields, gathered the same way, but without the pokemon
+ *  category being relevant to any of them. */
+type ProfileSession = WriteSession
+
 /**
- * Everything a write needs before it may touch Poracle: the perm, the identity
- * to act as, the blocked-category refusal, and the profile.
- *
- * The blocked check is `pokemonBlocked`, the same function `status` answers
- * with. The read side stays open -- someone whose alerts are blocked can still
- * see what they are subscribed to -- and only the writes refuse.
+ * The perm, the identity to act as, and (for the procedures that need it) the
+ * profile list to validate a `profileNo` against -- everything a profile or
+ * human-level write needs before it may touch Poracle, minus the
+ * pokemon-category refusal that only ever applied to alert rules.
  */
-async function beginWrite(ctx: Context): Promise<WriteSession> {
+async function requireClientAndPlatform(
+  ctx: Context,
+): Promise<{ userId: string; client: PoracleClient; platformId: string }> {
   const userId = requirePerm(ctx, 'alerts')
   const client = clientFor(ctx)
   if (!client) {
@@ -510,15 +520,34 @@ async function beginWrite(ctx: Context): Promise<WriteSession> {
       message: 'Link a Discord account to use Alerts',
     })
   }
+  return { userId, client, platformId }
+}
 
+/** `requireClientAndPlatform`, plus the snapshot every profile procedure
+ *  validates a `profileNo` against via `resolveProfile`. */
+async function beginProfileSession(ctx: Context): Promise<ProfileSession> {
+  const { client, platformId } = await requireClientAndPlatform(ctx)
   const body = await readSnapshotForWrite(client, platformId)
-  if (pokemonBlocked(ctx.poracleConfig, body?.human)) {
+  return { client, platformId, body }
+}
+
+/**
+ * Everything a rule write needs before it may touch Poracle: the perm, the
+ * identity to act as, the blocked-category refusal, and the profile.
+ *
+ * The blocked check is `pokemonBlocked`, the same function `status` answers
+ * with. The read side stays open -- someone whose alerts are blocked can still
+ * see what they are subscribed to -- and only the writes refuse.
+ */
+async function beginWrite(ctx: Context): Promise<WriteSession> {
+  const session = await beginProfileSession(ctx)
+  if (pokemonBlocked(ctx.poracleConfig, session.body?.human)) {
     throw new TRPCError({
       code: 'FORBIDDEN',
       message: 'Pokemon alerts are blocked for this account',
     })
   }
-  return { client, platformId, body }
+  return session
 }
 
 /**
@@ -586,6 +615,12 @@ async function sendWrite(
   method: 'POST' | 'PUT' | 'DELETE',
   path: string,
   body?: unknown,
+  // Overridable because a 404 here does not always mean the same thing:
+  // an alert-rule write 404s on a uid, a profile write 404s on a
+  // profile_no, and telling a client "alert" when it asked about a
+  // profile is confusing in exactly the way this whole module exists to
+  // avoid.
+  notFoundMessage = 'That alert was not found',
 ): Promise<any> {
   let res: { status: number; body: any }
   try {
@@ -599,7 +634,7 @@ async function sendWrite(
   if (res.status === 404) {
     throw new TRPCError({
       code: 'NOT_FOUND',
-      message: 'That alert was not found',
+      message: notFoundMessage,
     })
   }
   if (res.status < 200 || res.status >= 300) {
@@ -765,6 +800,141 @@ const alertsRouter = t.router({
       const path = `${pokemonPath(session.platformId)}/${input.uid}${writeQuery(profileNo)}`
       const body = await sendWrite(session.client, 'DELETE', path)
       return { deleted: deletedUids(body?.deleted) }
+    }),
+
+  /**
+   * The master switch: whether Poracle sends this human anything at all.
+   *
+   * Poracle's `/enable` and `/disable` both answer `{ status: "ok" }`, so the
+   * response is the flag the caller asked for, not anything read off the
+   * wire -- there is nothing on the wire worth reading.
+   */
+  setEnabled: t.procedure
+    .input(z.object({ enabled: z.boolean() }))
+    .mutation(async ({ ctx, input }): Promise<{ enabled: boolean }> => {
+      const { client, platformId } = await requireClientAndPlatform(ctx)
+      const path = `${humanPath(platformId)}/${input.enabled ? 'enable' : 'disable'}`
+      await sendWrite(
+        client,
+        'POST',
+        path,
+        undefined,
+        'That account was not found',
+      )
+      return { enabled: input.enabled }
+    }),
+
+  /**
+   * Makes one of this human's own profiles active.
+   *
+   * `resolveProfile` is the ownership check spec 7.4 requires: Poracle's
+   * `?profile` (and, here, this endpoint's `profile_no` body field) is taken
+   * on trust, with nothing on Poracle's side confirming the human asking owns
+   * it. The number this returns is the one that was just validated, not
+   * anything Poracle sent back -- its response is `{ status: "ok" }` and
+   * nothing else.
+   */
+  switchProfile: t.procedure
+    .input(z.object({ profileNo: z.number().int().min(0).max(INT_MAX) }))
+    .mutation(async ({ ctx, input }): Promise<{ currentProfileNo: number }> => {
+      const session = await beginProfileSession(ctx)
+      const profileNo = resolveProfile(session.body, input.profileNo)
+      const path = `${humanPath(session.platformId)}/profile`
+      await sendWrite(
+        session.client,
+        'POST',
+        path,
+        { profile_no: profileNo },
+        'That profile was not found',
+      )
+      return { currentProfileNo: profileNo }
+    }),
+
+  /**
+   * Creates a profile.
+   *
+   * Poracle assigns `profile_no` itself -- the lowest number not already in
+   * use -- and its create response is `{ status: "ok" }`, naming nothing.
+   * Recovering that number by re-listing profiles before and after would only
+   * be a guess dressed up as data: two adds racing, or another client's own
+   * write landing between the two reads, both make it wrong. `create` already
+   * answers this same gap by having the caller refetch the snapshot, which is
+   * the only place a profile number can be trusted; this does the same.
+   */
+  addProfile: t.procedure
+    .input(z.object({ name: z.string().min(1).max(255) }))
+    .mutation(async ({ ctx, input }): Promise<{ added: true }> => {
+      const { client, platformId } = await requireClientAndPlatform(ctx)
+      const path = `${humanPath(platformId)}/profiles`
+      await sendWrite(
+        client,
+        'POST',
+        path,
+        { name: input.name },
+        'That account was not found',
+      )
+      return { added: true }
+    }),
+
+  /**
+   * Deletes one of this human's own profiles, along with its tracking rules.
+   *
+   * Poracle reassigns the human's active profile itself when the deleted one
+   * was active, so the number this returns is only ever the one that was
+   * deleted -- confirmation, not a claim about what is active now. A client
+   * that needs to know the new active profile refetches the snapshot the same
+   * way every other profile-shaped write here does.
+   */
+  deleteProfile: t.procedure
+    .input(z.object({ profileNo: z.number().int().min(0).max(INT_MAX) }))
+    .mutation(async ({ ctx, input }): Promise<{ deleted: number }> => {
+      const session = await beginProfileSession(ctx)
+      const profileNo = resolveProfile(session.body, input.profileNo)
+      const path = profilePath(session.platformId, profileNo)
+      await sendWrite(
+        session.client,
+        'DELETE',
+        path,
+        undefined,
+        'That profile was not found',
+      )
+      return { deleted: profileNo }
+    }),
+
+  /**
+   * Replaces every tracking rule in `toProfileNo` with a copy of
+   * `fromProfileNo`'s. Named for what Poracle's endpoint actually does --
+   * `POST .../profiles/{to}/copy` with `{ from_profile }` in the body --
+   * rather than for what the old one-argument shape implied. It is a
+   * destructive overwrite of an existing destination profile, not a way to
+   * duplicate one: `toProfileNo` must already exist, and whatever it was
+   * tracking before this call is gone.
+   *
+   * Both numbers are validated against the human's own profiles, not just the
+   * destination -- an owned destination fed a `fromProfileNo` belonging to
+   * somebody else would still be a read of that person's rule set, even
+   * though nothing about it is returned to the caller.
+   */
+  copyProfileRules: t.procedure
+    .input(
+      z.object({
+        fromProfileNo: z.number().int().min(0).max(INT_MAX),
+        toProfileNo: z.number().int().min(0).max(INT_MAX),
+      }),
+    )
+    .mutation(async ({ ctx, input }): Promise<{ toProfileNo: number }> => {
+      const session = await beginProfileSession(ctx)
+      const fromProfileNo = resolveProfile(session.body, input.fromProfileNo)
+      const toProfileNo = resolveProfile(session.body, input.toProfileNo)
+      const path = `${profilePath(session.platformId, toProfileNo)}/copy`
+      await sendWrite(
+        session.client,
+        'POST',
+        path,
+        { from_profile: fromProfileNo },
+        'That profile was not found',
+      )
+      return { toProfileNo }
     }),
 })
 

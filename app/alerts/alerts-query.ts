@@ -87,7 +87,15 @@ export interface AlertCreateResult {
   unchanged: number
 }
 
-/** The three `alerts.*` write procedures, plus the two reads. */
+/**
+ * The write procedures `alerts-router.ts` added for the human panel, plus
+ * the five above and the two reads.
+ *
+ * `addProfile` answers `{ added: true }` rather than a profile number --
+ * Poracle assigns one server-side and never returns it, and guessing by
+ * re-listing profiles before and after is a race dressed up as data. See the
+ * router's own comment on that procedure.
+ */
 export interface AlertsClient {
   status(): Promise<{ state: AlertsState }>
   snapshot(): Promise<AlertsSnapshot>
@@ -97,6 +105,16 @@ export interface AlertsClient {
     rule: AlertWriteInput
   }): Promise<{ uid: number }>
   remove(args: { uid: number }): Promise<{ deleted: number[] }>
+  setEnabled(args: { enabled: boolean }): Promise<{ enabled: boolean }>
+  switchProfile(args: {
+    profileNo: number
+  }): Promise<{ currentProfileNo: number }>
+  addProfile(args: { name: string }): Promise<{ added: true }>
+  deleteProfile(args: { profileNo: number }): Promise<{ deleted: number }>
+  copyProfileRules(args: {
+    fromProfileNo: number
+    toProfileNo: number
+  }): Promise<{ toProfileNo: number }>
 }
 
 function createDefaultAlertsClient(): AlertsClient {
@@ -115,6 +133,24 @@ function createDefaultAlertsClient(): AlertsClient {
       client.mutation('alerts.replace', args) as Promise<{ uid: number }>,
     remove: (args) =>
       client.mutation('alerts.remove', args) as Promise<{ deleted: number[] }>,
+    setEnabled: (args) =>
+      client.mutation('alerts.setEnabled', args) as Promise<{
+        enabled: boolean
+      }>,
+    switchProfile: (args) =>
+      client.mutation('alerts.switchProfile', args) as Promise<{
+        currentProfileNo: number
+      }>,
+    addProfile: (args) =>
+      client.mutation('alerts.addProfile', args) as Promise<{ added: true }>,
+    deleteProfile: (args) =>
+      client.mutation('alerts.deleteProfile', args) as Promise<{
+        deleted: number
+      }>,
+    copyProfileRules: (args) =>
+      client.mutation('alerts.copyProfileRules', args) as Promise<{
+        toProfileNo: number
+      }>,
   }
 }
 
@@ -173,6 +209,30 @@ export interface UseAlertsResult {
   replace: (uid: number, patch: AlertPatch) => Promise<void>
   /** Deletes one alert by uid, and drops it from the cache by the uids the write actually deleted. */
   remove: (uid: number) => Promise<void>
+  /** Flips the master switch. The response names the flag it just set, so the
+   *  cache is patched directly rather than refetched. */
+  setEnabled: (enabled: boolean) => Promise<void>
+  /**
+   * Makes a profile active. Poracle's `all_profiles=true` read already lists
+   * every rule regardless of which profile is active, so nothing about the
+   * rule list itself goes stale here -- what a refetch is for is
+   * `human.currentProfileNo` and the rest of the human/profile picture the
+   * panel renders, which the mutation's own response does not carry.
+   */
+  switchProfile: (profileNo: number) => Promise<void>
+  /** Creates a profile. Poracle assigns its number and never returns it, so
+   *  this refetches rather than guessing one -- same reasoning as `create`. */
+  addProfile: (name: string) => Promise<void>
+  /** Deletes a profile and its tracking rules. Poracle may reassign the
+   *  active profile as a side effect, which only a refetch can reveal. */
+  deleteProfile: (profileNo: number) => Promise<void>
+  /** Overwrites `toProfileNo`'s tracking rules with a copy of
+   *  `fromProfileNo`'s. The rules that changed are not named in the
+   *  response, so this refetches rather than guessing their new shape. */
+  copyProfileRules: (
+    fromProfileNo: number,
+    toProfileNo: number,
+  ) => Promise<void>
 }
 
 export function useAlerts({
@@ -251,6 +311,45 @@ export function useAlerts({
     },
   })
 
+  const setEnabledMutation = useMutation({
+    mutationFn: (vars: { enabled: boolean }) => client.setEnabled(vars),
+    onSuccess: (result) => {
+      queryClient.setQueryData<AlertsSnapshot>(
+        alertsSnapshotQueryKey(),
+        (current) =>
+          current && {
+            ...current,
+            human: { ...current.human, enabled: result.enabled },
+          },
+      )
+    },
+  })
+
+  const switchProfileMutation = useMutation({
+    mutationFn: (vars: { profileNo: number }) => client.switchProfile(vars),
+    onSuccess: () =>
+      queryClient.invalidateQueries({ queryKey: alertsSnapshotQueryKey() }),
+  })
+
+  const addProfileMutation = useMutation({
+    mutationFn: (vars: { name: string }) => client.addProfile(vars),
+    onSuccess: () =>
+      queryClient.invalidateQueries({ queryKey: alertsSnapshotQueryKey() }),
+  })
+
+  const deleteProfileMutation = useMutation({
+    mutationFn: (vars: { profileNo: number }) => client.deleteProfile(vars),
+    onSuccess: () =>
+      queryClient.invalidateQueries({ queryKey: alertsSnapshotQueryKey() }),
+  })
+
+  const copyProfileRulesMutation = useMutation({
+    mutationFn: (vars: { fromProfileNo: number; toProfileNo: number }) =>
+      client.copyProfileRules(vars),
+    onSuccess: () =>
+      queryClient.invalidateQueries({ queryKey: alertsSnapshotQueryKey() }),
+  })
+
   return {
     state: statusQuery.isLoading ? 'loading' : resolvedState,
     snapshot: state === 'present' ? (snapshotQuery.data ?? null) : null,
@@ -258,6 +357,11 @@ export function useAlerts({
       createMutation.error ??
       replaceMutation.error ??
       removeMutation.error ??
+      setEnabledMutation.error ??
+      switchProfileMutation.error ??
+      addProfileMutation.error ??
+      deleteProfileMutation.error ??
+      copyProfileRulesMutation.error ??
       null,
     create: async (rule) => {
       try {
@@ -283,6 +387,44 @@ export function useAlerts({
         await removeMutation.mutateAsync({ uid })
       } catch {
         // The stored row is untouched; nothing to roll back.
+      }
+    },
+    setEnabled: async (enabled) => {
+      try {
+        await setEnabledMutation.mutateAsync({ enabled })
+      } catch {
+        // The stored flag is untouched; nothing to roll back.
+      }
+    },
+    switchProfile: async (profileNo) => {
+      try {
+        await switchProfileMutation.mutateAsync({ profileNo })
+      } catch {
+        // Nothing was switched; nothing to reconcile.
+      }
+    },
+    addProfile: async (name) => {
+      try {
+        await addProfileMutation.mutateAsync({ name })
+      } catch {
+        // Nothing was created; nothing to reconcile.
+      }
+    },
+    deleteProfile: async (profileNo) => {
+      try {
+        await deleteProfileMutation.mutateAsync({ profileNo })
+      } catch {
+        // The profile is untouched; nothing to roll back.
+      }
+    },
+    copyProfileRules: async (fromProfileNo, toProfileNo) => {
+      try {
+        await copyProfileRulesMutation.mutateAsync({
+          fromProfileNo,
+          toProfileNo,
+        })
+      } catch {
+        // Nothing was copied; nothing to reconcile.
       }
     },
   }

@@ -758,3 +758,137 @@ test('an empty batch is refused rather than sent', async () => {
   ).rejects.toThrow()
   expect(client.sent).toEqual([])
 })
+
+// --- human and profile procedures ------------------------------------------
+
+// Two profiles this human actually owns, for the ownership checks below.
+const PROFILES_BODY = {
+  ...WRITE_BODY,
+  profiles: [
+    { profile_no: 1, name: 'default' },
+    { profile_no: 2, name: 'work' },
+  ],
+}
+
+function fakeProfileWrites(options: { body?: any; response?: any } = {}) {
+  const sent: { method: string; path: string; body: any }[] = []
+  return {
+    sent,
+    get: async (path: string) => {
+      if (path === TRACKING_PATH)
+        return { status: 200, body: options.body ?? PROFILES_BODY }
+      return { status: 404, body: null }
+    },
+    send: async (method: string, path: string, body: any) => {
+      sent.push({ method, path, body })
+      return { status: 200, body: options.response ?? {} }
+    },
+  }
+}
+
+test('a profile number the human does not own is rejected before forwarding', async () => {
+  // Poracle's resolveHuman takes ?profile from the query string without
+  // checking ownership, so this check has to happen here.
+  await expect(caller(BASE).switchProfile({ profileNo: 99 })).rejects.toThrow(
+    /profile/i,
+  )
+})
+
+test('switching profile posts the validated number and reports it back', async () => {
+  const client = fakeProfileWrites()
+  const result = await caller({ ...BASE, poracleClient: client }).switchProfile(
+    { profileNo: 2 },
+  )
+  expect(result).toEqual({ currentProfileNo: 2 })
+  expect(client.sent).toEqual([
+    { method: 'POST', path: '/v2/humans/123/profile', body: { profile_no: 2 } },
+  ])
+})
+
+test('setEnabled posts to enable or disable depending on the flag', async () => {
+  const client = fakeProfileWrites()
+  expect(
+    await caller({ ...BASE, poracleClient: client }).setEnabled({
+      enabled: true,
+    }),
+  ).toEqual({ enabled: true })
+  expect(
+    await caller({ ...BASE, poracleClient: client }).setEnabled({
+      enabled: false,
+    }),
+  ).toEqual({ enabled: false })
+  expect(client.sent.map((call) => call.path)).toEqual([
+    '/v2/humans/123/enable',
+    '/v2/humans/123/disable',
+  ])
+})
+
+test('addProfile reports nothing beyond confirmation, because Poracle never names the number it assigned', async () => {
+  const client = fakeProfileWrites()
+  const result = await caller({ ...BASE, poracleClient: client }).addProfile({
+    name: 'work',
+  })
+  expect(result).toEqual({ added: true })
+  expect(client.sent).toEqual([
+    {
+      method: 'POST',
+      path: '/v2/humans/123/profiles',
+      body: { name: 'work' },
+    },
+  ])
+})
+
+test('deleteProfile refuses a profile this human does not own', async () => {
+  const client = fakeProfileWrites()
+  await expect(
+    caller({ ...BASE, poracleClient: client }).deleteProfile({
+      profileNo: 99,
+    }),
+  ).rejects.toThrow(/profile/i)
+  expect(client.sent).toEqual([])
+})
+
+test('deleteProfile deletes the validated profile and reports its number', async () => {
+  const client = fakeProfileWrites()
+  const result = await caller({
+    ...BASE,
+    poracleClient: client,
+  }).deleteProfile({ profileNo: 2 })
+  expect(result).toEqual({ deleted: 2 })
+  expect(client.sent).toEqual([
+    { method: 'DELETE', path: '/v2/humans/123/profiles/2', body: undefined },
+  ])
+})
+
+test('copyProfileRules is named for what it does: a destructive overwrite of the destination, not a duplicate', async () => {
+  const client = fakeProfileWrites()
+  const result = await caller({
+    ...BASE,
+    poracleClient: client,
+  }).copyProfileRules({ fromProfileNo: 1, toProfileNo: 2 })
+  expect(result).toEqual({ toProfileNo: 2 })
+  expect(client.sent).toEqual([
+    {
+      method: 'POST',
+      path: '/v2/humans/123/profiles/2/copy',
+      body: { from_profile: 1 },
+    },
+  ])
+})
+
+test('copyProfileRules validates both profile numbers, not just the destination', async () => {
+  const client = fakeProfileWrites()
+  await expect(
+    caller({ ...BASE, poracleClient: client }).copyProfileRules({
+      fromProfileNo: 99,
+      toProfileNo: 2,
+    }),
+  ).rejects.toThrow(/profile/i)
+  await expect(
+    caller({ ...BASE, poracleClient: client }).copyProfileRules({
+      fromProfileNo: 1,
+      toProfileNo: 99,
+    }),
+  ).rejects.toThrow(/profile/i)
+  expect(client.sent).toEqual([])
+})
