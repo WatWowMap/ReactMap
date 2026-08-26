@@ -419,21 +419,20 @@ test('create posts the batch to the pokemon collection', async () => {
   expect(client.sent[0]?.path.split('?')[0]).toBe(CREATE_PATH)
   // Poracle's POST body is a bare array of rule objects, not an envelope.
   expect(client.sent[0]?.body).toEqual([{ pokemon_id: 25, min_iv: 90 }])
-  expect(result.created).toHaveLength(1)
-  expect(result.created[0]).toMatchObject({ uid: 11, pokemonId: 25 })
-  expect(result.updated[0]).toMatchObject({ uid: 12 })
-  expect(result.unchanged).toEqual([])
+  expect(result).toEqual({ created: 1, updated: 1, unchanged: 0 })
 })
 
-test('a write response carries the profile it was written to', async () => {
-  // Poracle stamps profile_no onto a rule only in the snapshot's all_profiles
-  // mode; a write response has none. Left unfilled every created rule comes
-  // back as profile 0, which is not a profile anybody owns.
+test('create promises no uids, because Poracle cannot supply them', async () => {
+  // ApplyDiff throws away the uid Insert returns, so a created row comes back
+  // with uid 0 and an updated row with the uid that was just deleted to make
+  // it. Only PUT stamps a real one. Handing those out would invite a client to
+  // edit or delete by an identifier for a row that does not exist.
   const client = fakeWrites()
   const result = await caller({ ...BASE, poracleClient: client }).create({
     rules: [{ pokemonId: 25 }],
   })
-  expect(result.created[0]?.profileNo).toBe(1)
+  expect(JSON.stringify(result)).not.toContain('uid')
+  expect(Object.values(result).every((v) => typeof v === 'number')).toBe(true)
 })
 
 test('an unset filter is omitted rather than sent as null', async () => {

@@ -27,7 +27,6 @@ import {
 } from '../services/poracle-client'
 import { type HumanState, resolveHumanState } from '../services/poracle-human'
 import {
-  type AlertRow,
   type AlertsSnapshot,
   toAlertRow,
   toAlertsSnapshot,
@@ -312,10 +311,25 @@ const alertInput = z.object({
 
 type AlertInput = z.infer<typeof alertInput>
 
+/**
+ * What a create did, counted rather than listed.
+ *
+ * Poracle's create cannot name the rules it made. `ApplyDiff` throws away the
+ * uid `Insert` returns, so a created row carries uid 0 and an updated row
+ * carries the uid that was just deleted to make it -- only PUT stamps a real
+ * one. Returning those rows would hand a client an identifier for a row that
+ * does not exist and invite it to edit or delete by it.
+ *
+ * Counts are what can be said truthfully: how many were new, how many
+ * replaced one already there, and how many were already exactly that rule.
+ * A client that needs the rules themselves refetches the snapshot, which is
+ * the only place a uid can be trusted. Fixing this properly is a change to
+ * Poracle, not to ReactMap.
+ */
 interface AlertWriteResult {
-  created: AlertRow[]
-  updated: AlertRow[]
-  unchanged: AlertRow[]
+  created: number
+  updated: number
+  unchanged: number
 }
 
 /**
@@ -371,10 +385,15 @@ function carriedForward(row: any, rule: AlertInput): Record<string, unknown> {
   return carried
 }
 
-/** Poracle rules, projected to what a client sees, stamped with the profile written to. */
-function toAlertRows(list: unknown, profileNo: number): AlertRow[] {
+/** How many rules Poracle put in one bucket of its diff response. */
+function countRules(list: unknown): number {
+  return Array.isArray(list) ? list.length : 0
+}
+
+/** The uids of the rules Poracle reports it deleted, and nothing else. */
+function deletedUids(list: unknown): number[] {
   const rows = Array.isArray(list) ? list : []
-  return rows.map((row) => toAlertRow(row, profileNo))
+  return rows.map((row) => toAlertRow(row).uid)
 }
 
 /**
@@ -661,7 +680,12 @@ const alertsRouter = t.router({
     }
   }),
 
-  /** Create rules, and update the ones the batch turns out to already cover. */
+  /**
+   * Create rules, and update the ones the batch turns out to already cover.
+   *
+   * Answers in counts, not rules: Poracle's create cannot name what it made.
+   * See `AlertWriteResult`.
+   */
   create: t.procedure
     .input(z.object({ rules: z.array(alertInput).max(MAX_RULES) }))
     .mutation(async ({ ctx, input }): Promise<AlertWriteResult> => {
@@ -675,9 +699,9 @@ const alertsRouter = t.router({
         input.rules.map(toPoracleRule),
       )
       return {
-        created: toAlertRows(body?.created, profileNo),
-        updated: toAlertRows(body?.updated, profileNo),
-        unchanged: toAlertRows(body?.unchanged, profileNo),
+        created: countRules(body?.created),
+        updated: countRules(body?.updated),
+        unchanged: countRules(body?.unchanged),
       }
     }),
 
@@ -737,9 +761,7 @@ const alertsRouter = t.router({
       const { profileNo } = findRule(session.body, input.uid)
       const path = `${pokemonPath(session.platformId)}/${input.uid}${writeQuery(profileNo)}`
       const body = await sendWrite(session.client, 'DELETE', path)
-      return {
-        deleted: toAlertRows(body?.deleted, profileNo).map((row) => row.uid),
-      }
+      return { deleted: deletedUids(body?.deleted) }
     }),
 })
 

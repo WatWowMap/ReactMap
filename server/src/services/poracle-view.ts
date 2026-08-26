@@ -144,16 +144,16 @@ function toHumanView(human: any): HumanView {
 /**
  * One Poracle rule, projected to the shape a client sees.
  *
- * `profileNo` takes a fallback because Poracle stamps `profile_no` onto a rule
- * only in the snapshot's `all_profiles` mode. A write response carries none,
- * so a created rule mapped without one would come back as profile 0, which is
- * not a profile anybody owns. The fallback is the profile the write was
- * addressed to, resolved server side -- never a number off the wire.
+ * `profileNo` is 0 for a rule Poracle did not stamp one onto. Poracle stamps
+ * it only in the snapshot's `all_profiles` mode, which is the mode this router
+ * reads in, so every rule a client sees carries a real one. A write response
+ * carries none -- and nothing built from a write response is handed to a
+ * client, precisely because Poracle's create cannot name the rules it made.
  */
-export function toAlertRow(row: any, profileNo?: number): AlertRow {
+export function toAlertRow(row: any): AlertRow {
   return {
     uid: num(row?.uid),
-    profileNo: num(row?.profile_no ?? profileNo),
+    profileNo: num(row?.profile_no),
     pokemonId: num(row?.pokemon_id),
     form: num(row?.form),
     costume: num(row?.costume),
@@ -220,10 +220,6 @@ function asArray(value: any): any[] {
 export function toAlertsSnapshot(body: any): AlertsSnapshot {
   return {
     human: toHumanView(body?.human),
-    // Called through an arrow rather than passed to `map` directly: `map`
-    // supplies the index as a second argument, which `toAlertRow` now reads as
-    // the profile fallback, so a point-free call would number every rule after
-    // its position in the list.
     alerts: asArray(body?.tracking?.pokemon).map((row) => toAlertRow(row)),
     profiles: asArray(body?.profiles).map(toProfileView),
     // Poracle's container is `{ default?, named[] }` -- reading `locations`
