@@ -192,6 +192,12 @@ export interface Poracle {
    */
   geocoderProvider?: 'nominatim' | 'photon'
   areasToSkip: string[]
+  /**
+   * Poracle's own category names that this deployment refuses, `monster`
+   * among them. An operator turning a category off here turns it off for
+   * everyone, before any human's own `blocked_alerts` is consulted.
+   */
+  disabledHooks: string[]
   discordRoles: string[]
   telegramGroups: string[]
   local: string[]

@@ -5,6 +5,7 @@
 // procedures without importing the root router that merges it -- which
 // would be a cycle.
 
+import type { Poracle } from '@rm/types'
 import { initTRPC } from '@trpc/server'
 
 import type { PoracleClient } from '../services/poracle-client'
@@ -31,10 +32,9 @@ interface Context {
   // `config.poracle`, read once per process. The router reads `disabledHooks`
   // off it and never reaches for the config itself, so a test can hand in its
   // own without `mock.module` stealing the real one process-wide.
-  poracleConfig?:
-    | { disabledHooks?: string[]; areasToSkip?: string[] }
-    | null
-    | undefined
+  // `Partial` because a caller may hand in only the keys a procedure reads;
+  // the real shape otherwise, so a typo in a key name is a type error.
+  poracleConfig?: Partial<Poracle> | null | undefined
   // Supplied by a caller that has its own database client -- a test does.
   // Procedures fall back to the shared pooled client when it is absent.
   db?: any

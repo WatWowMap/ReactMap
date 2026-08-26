@@ -710,6 +710,7 @@
     "nominatimUrl": "",
     "geocoderProvider": "nominatim",
     "areasToSkip": [],
+    "disabledHooks": [],
     "discordRoles": [],
     "telegramGroups": [],
     "local": []
