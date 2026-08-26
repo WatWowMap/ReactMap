@@ -42,11 +42,26 @@ function renderProbe(client: AlertsClient) {
   )
 }
 
+// The three write methods below are unused by this file's tests -- they
+// exist only so a fake satisfies `AlertsClient`'s shape.
+const unusedWrites = {
+  create: async () => {
+    throw new Error('not used by this test')
+  },
+  replace: async () => {
+    throw new Error('not used by this test')
+  },
+  remove: async () => {
+    throw new Error('not used by this test')
+  },
+}
+
 function fakeClient(
   state: AlertsState,
   snapshotSpy: { calls: number } = { calls: 0 },
 ): AlertsClient {
   return {
+    ...unusedWrites,
     status: async () => ({ state }),
     snapshot: async () => {
       snapshotSpy.calls += 1
@@ -100,6 +115,7 @@ function rejectingClient(
   snapshotSpy: { calls: number } = { calls: 0 },
 ): AlertsClient {
   return {
+    ...unusedWrites,
     status: async () => {
       throw new Error('UNAUTHORIZED')
     },

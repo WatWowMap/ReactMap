@@ -34,8 +34,23 @@ afterEach(async () => {
   cleanup()
 })
 
+// The three write methods are unused by this file's tests -- they exist
+// only so a fake satisfies `AlertsClient`'s shape.
+const unusedWrites = {
+  create: async () => {
+    throw new Error('not used by this test')
+  },
+  replace: async () => {
+    throw new Error('not used by this test')
+  },
+  remove: async () => {
+    throw new Error('not used by this test')
+  },
+}
+
 function fakeAlertsClient(state: AlertsState): AlertsClient {
   return {
+    ...unusedWrites,
     status: async () => ({ state }),
     snapshot: async () => ({
       human: {
@@ -65,6 +80,7 @@ function renderNav(path: string, state: AlertsState = 'present') {
 function renderNavWithRejectingClient(path: string) {
   const calls = { count: 0 }
   const client: AlertsClient = {
+    ...unusedWrites,
     status: async () => {
       calls.count += 1
       throw new Error('UNAUTHORIZED')

@@ -14,11 +14,16 @@
 import type { ConditionSeed } from './condition-editor'
 import type { ConditionPatch, Vocabulary } from './condition-vocabulary'
 import { REACTMAP_VOCABULARY } from './condition-vocabulary'
-import type { Rule } from './rule-types'
 import type { RulePatch } from './rules-query'
 
 export function conditionSeeds<P extends ConditionPatch = RulePatch>(
-  rule: Rule,
+  // `object` rather than a `Record<string, unknown>`: `Rule` and
+  // `AlertRow` (`alert-editor.tsx`) both lack an index signature, which
+  // TypeScript treats as incompatible with a mapped-type parameter even
+  // though every field on either is read here only by the vocabulary's
+  // own names. `object` accepts both without demanding one, and the cast
+  // below is where the field-by-name reads actually happen.
+  rule: object,
   vocab: Vocabulary<P> = REACTMAP_VOCABULARY as unknown as Vocabulary<P>,
 ): ConditionSeed[] {
   const row = rule as unknown as Record<string, unknown>

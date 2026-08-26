@@ -1,6 +1,6 @@
 import { afterAll, afterEach, beforeAll, expect, test } from 'bun:test'
 import { QueryClientProvider } from '@tanstack/react-query'
-import { cleanup, render, waitFor } from '@testing-library/react'
+import { cleanup, fireEvent, render, waitFor } from '@testing-library/react'
 import type { AlertsClient } from '../alerts/alerts-query'
 import { createRulesQueryClient } from '../rules/rules-query'
 import { setupDom, teardownDom } from '../test-setup'
@@ -8,7 +8,17 @@ import { AlertsPage } from './alerts-page'
 
 beforeAll(setupDom)
 afterAll(teardownDom)
-afterEach(cleanup)
+// The one-tick delay first, then cleanup: React's scheduler queues its own
+// commit follow-up on a macrotask, not a microtask, so a query that settles
+// late in a test (every write here does) can still have a scheduler
+// callback in flight when the test function returns. Unmounting and
+// `teardownDom` can both land before that callback fires, and it then
+// throws reaching for a `window` this file no longer has -- see
+// `bottom-nav.test.tsx`'s `afterEach` for the same fix.
+afterEach(async () => {
+  await new Promise((resolve) => setTimeout(resolve, 0))
+  cleanup()
+})
 
 // Not the global `screen`: it snapshots `document` at import time, before
 // `setupDom` runs in `beforeAll`, and throws on every query as a result.
@@ -144,4 +154,41 @@ test('a rejected status() renders nothing rather than getting stuck loading', as
   } as unknown as AlertsClient)
   await flushStatus(calls)
   expect(container.textContent).toBe('')
+})
+
+test('saving an edit adopts the new uid rather than keeping the old one', async () => {
+  // PUT is delete plus insert. A cache keyed on the old uid would point at a
+  // row that no longer exists, and the next edit would 404.
+  const replaced: any[] = []
+  const { getByText, getByTestId, queryByTestId, findByRole } = renderWith({
+    status: async () => ({ state: 'present' }),
+    snapshot: async () => ({
+      ...EMPTY_SNAPSHOT,
+      alerts: [{ uid: 7, pokemonId: 149, ivMin: 100, ivMax: 100 }],
+    }),
+    replace: async (args: any) => {
+      replaced.push(args)
+      return { uid: 99 }
+    },
+  } as unknown as AlertsClient)
+  await waitFor(() => expect(getByText(/IV 100%/)).toBeTruthy())
+  fireEvent.click(getByText(/IV 100%/))
+  fireEvent.click(await findByRole('button', { name: /save/i }))
+  await waitFor(() => expect(replaced[0].uid).toBe(7))
+  await waitFor(() => expect(queryByTestId('alert-7')).toBeNull())
+  expect(getByTestId('alert-99')).toBeTruthy()
+})
+
+test('deleting removes the card', async () => {
+  const { getByTestId, queryByTestId, findByRole } = renderWith({
+    status: async () => ({ state: 'present' }),
+    snapshot: async () => ({
+      ...EMPTY_SNAPSHOT,
+      alerts: [{ uid: 7, pokemonId: 149 }],
+    }),
+    remove: async () => ({ deleted: [7] }),
+  } as unknown as AlertsClient)
+  await waitFor(() => expect(getByTestId('alert-7')).toBeTruthy())
+  fireEvent.click(await findByRole('button', { name: /delete/i }))
+  await waitFor(() => expect(queryByTestId('alert-7')).toBeNull())
 })
