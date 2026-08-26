@@ -252,57 +252,43 @@ that it could not tell the two states apart.
 
 ---
 
-## 7. Authorization, carried from 1.x
+## 7. Authorization
 
-1.x's webhook authorization is not one gate. It is five overlapping controls across four
-subsystems, and a five-lens audit of the tree at `3a128a4b` found 33 of them plus 17 places where a
-missing or empty value grants more access rather than less. This section records what 2.0 must
-carry, what it must fix, and the one thing most likely to be gotten wrong.
+One Poracle instance, not many. That decision is section 7.1, and it deletes most of what this
+section would otherwise have had to say.
 
-### 7.1 Read the code at 3a128a4b, do not run it
+What remains comes from a five-lens audit of the 1.x tree at `3a128a4b`, which found 33 controls
+and 17 places where a missing or empty value grants more access rather than less. Roughly half of
+those findings were about choosing between instances and are now moot.
 
-`3a128a4b` is the last commit with the 1.x server intact, but it is a hybrid: Better Auth had
-already replaced Passport, and `auth-session.js` builds `req.user` from the Better Auth row, which
-has no `selectedWebhook` column. Every webhook resolver at that commit gates on
-`req.user?.selectedWebhook`, so the entire Poracle path is inert there.
+### 7.1 One instance
 
-The code is authoritative. The behaviour is not. Anyone trying to verify 1.x empirically at this
-commit will conclude the feature does nothing.
+`config.webhooks` stops being an array and becomes a single `config.poracle` object. There is no
+instance name, no selection, no per-user stored choice, and no selector in the UI.
 
-### 7.2 The controls to carry
+`provider: 'poracle'` was the only value that field ever carried, so multi-provider was notional
+as well. `trialPeriodEligible` goes with it, since the trial period is already absent from 2.0. The
+rest of the per-instance settings survive as plain settings: `host`, `port`, `poracleSecret`,
+`addressFormat`, `nominatimUrl`, `geocoderProvider`, `areasToSkip`, and the three role lists.
 
-| Control | 1.x location | Carry into 2.0 as |
-| --- | --- | --- |
-| Role to webhook allowlist | `utils/webhookPerms.js` | Present as `utils/webhook-perms.ts`, unchanged |
-| Re-derive selection from current perms | `utils/validateSelectedWebhook.js` | Request middleware, and it must revoke (7.4) |
-| Client-settable selection, membership checked | `resolvers.js:774` | The only client-settable entry point, same check |
-| Platform id resolved server side | `Poracle.js:120-138` | Never from client input (7.5) |
-| Category subtraction | `Poracle.js:113-119` | `disabledHooks` minus `blocked_alerts` |
-| Secret never leaves the server | `Poracle.js:94-106` allow-list | Explicit allow-list, not schema pruning (7.6) |
+`perms.webhooks: string[]` becomes `perms.alerts: boolean`. It is a grant rather than a list, and
+`alerts` is what the tab is called. This is free to do now: `webhookPerms` has two call sites
+(`telegram-perms.ts:53`, `local-perms.ts:62`) and nothing in 2.0 reads the result yet.
 
-Two 1.x controls are deliberately not carried. The trial period (`Trial.js`) is already documented
-as absent in 2.0 and stays absent. `Poracle.js:64`'s `admins` field is dead in 1.x, never read or
-written, and should not be recreated.
+A boolean also sidesteps 7.6 for this key. `mergePerms` folds non-array values with
+`existingValue || incomingValue`, which is the correct OR for a grant.
 
-### 7.3 Poracle enforces more than 1.x assumed
+### 7.2 What dropping instances removes
 
-Some of what 1.x checked, Poracle now checks itself, and the V2 API is explicit about it.
+Recorded because these were real controls in 1.x, and their absence in 2.0 should read as a
+decision rather than an oversight.
 
-Every by-uid tracking operation calls `v2FindOwnedRow(typ, deps, human.ID, profileNo, in.UID)` and
-404s when the uid is not owned by that human. `resolveHuman` 404s an unknown id and never
-autocreates. So a client-supplied `uid` is safe to forward, and the three human-check states in
-section 6 are distinguishable directly from Poracle's responses.
+Gone entirely: the `selectedWebhook` column, `validateSelectedWebhook`, the `webhookChange`
+mutation, the `Event.webhookObj[name]` lookup, the `/api/settings` backfill at
+`rootRouter.js:174-192`, and the instance selector UI.
 
-One thing it does not check: `resolveHuman` takes `profileNo` from the `?profile` query parameter
-without verifying the human owns that profile. ReactMap validates a requested profile against the
-profile list from the snapshot before forwarding it.
-
-### 7.4 The revocation gap, and the mistake behind it
-
-This is the single most important finding, and the one most likely to be repeated.
-
-`validateSelectedWebhook` is correct. It returns null when the user's perms no longer include the
-stored webhook. Its only call site is not:
+**Including the audit's single most dangerous finding.** `validateSelectedWebhook` was correct and
+never revoked anything, because its only call site guarded the result:
 
 ```js
 const selectedWebhook = await validateSelectedWebhook(req.user, Db, Event)
@@ -312,47 +298,61 @@ if (selectedWebhook) {
 }
 ```
 
-The `if` makes the null return a no-op. On revocation nothing clears `req.user.selectedWebhook` and
-nothing clears the database column, so the stale name survives indefinitely. It is a repair
-function that no path uses to revoke.
+A null return, which is what revocation produces, was a no-op. Nothing cleared the session value or
+the database column, so losing a Discord role left the stale capability in place. It compounded:
+the call site sat inside the `fabButtons` resolver, so it ran only when a client queried that
+field, and 1.x's seven webhook read paths did not agree on how to gate. Three checked
+`perms?.webhooks` for truthiness (`resolvers.js:578`, `:197`, `:641`) while four checked membership
+(`:610`, `:618`, `:633`, `:740`).
 
-It compounds. The call site is inside the `fabButtons` resolver, so it runs only when a client
-happens to query that field, and 1.x's seven webhook read paths do not agree on how to gate:
-`resolvers.js:578`, `:197` and `:641` check `perms?.webhooks` for truthiness, while `:610`, `:618`,
-`:633` and `:740` check membership. The split is not principled. An empty array is truthy, and
-anonymous sessions are given `webhooks: []` at `rootRouter.js:148`.
+The category mistake underneath is worth keeping even though the specific bug is now unreachable:
+**`selectedWebhook` was treated as a stored preference rather than as a capability.** It read like
+`locale`, a column set once and read everywhere, so the missing re-authorization looked like
+ordinary code rather than an absent check.
 
-The category mistake underneath all of it: **`selectedWebhook` was treated as a stored preference
-rather than as a capability.** It reads like `locale` or `tutorial`, a column set once and read
-everywhere, so the missing re-authorization looks like ordinary code rather than an absent check.
+With one instance there is nothing to select, so nothing to go stale. The remaining question is
+only whether this user may use Alerts at all, which is answered from `perms.alerts` on every
+request and never read from a user row.
 
-2.0 makes each precondition worse. The column does not exist yet, so someone will add it fresh and
-naturally add it beside `locale`. The transport is tRPC, which returns whatever a procedure
-returns, so the accidental protection in 7.6 disappears. And Discord accounts produce no `webhooks`
-key at all (7.7), so the first person to stop the crashes will write `perms.webhooks ?? []`, in a
-codebase where `areaPerms` already establishes empty-means-everything as an idiom.
+### 7.3 The controls that still matter
 
-**The rule for 2.0: resolve the webhook from perms on every request. Never read it from the user
-row. If it does not resolve, deny.** Repair and revoke are one operation, and the order is
-check-then-clear, never check-then-maybe-assign.
+| Control | 1.x location | Carry into 2.0 as |
+| --- | --- | --- |
+| Role to Poracle grant | `utils/webhookPerms.js` | `perms.alerts`, boolean |
+| Platform id resolved server side | `Poracle.js:120-138` | Never from client input (7.4) |
+| Category subtraction | `Poracle.js:113-119` | `disabledHooks` minus `blocked_alerts` |
+| Secret never leaves the server | `Poracle.js:94-106` allow-list | Explicit allow-list, not schema pruning (7.5) |
 
-### 7.5 What a client may never influence
+Two 1.x controls are deliberately not carried. The trial period (`Trial.js`) is already documented
+as absent in 2.0 and stays absent. `Poracle.js:64`'s `admins` field is dead in 1.x, never read or
+written, and should not be recreated.
+
+### 7.4 What a client may never influence
 
 Poracle scopes by the `{id}` path segment. Whatever ReactMap puts there is the identity Poracle
 acts as. That value is derived server side from the session, and no procedure accepts it as input.
+With instance selection gone, this is the only remaining input a client must never reach.
 
-A client may supply a `uid` (Poracle checks ownership), a profile number (validated against the
-snapshot first, per 7.3), and a webhook name (membership-checked, per 7.2).
+A client may supply a `uid`, because Poracle checks ownership itself: every by-uid tracking
+operation calls `v2FindOwnedRow(typ, deps, human.ID, profileNo, in.UID)` and 404s when the uid is
+not owned by that human.
 
-### 7.6 The GraphQL schema was closing holes nobody was checking
+A client may supply a profile number, but ReactMap validates it against the profile list from the
+snapshot first. `resolveHuman` takes `profileNo` from the `?profile` query parameter without
+checking that the human owns that profile.
+
+`resolveHuman` also 404s an unknown id and never autocreates, which is what makes the three states
+in section 6 distinguishable directly from Poracle's responses.
+
+### 7.5 The GraphQL schema was closing holes nobody was checking
 
 1.x's `api(userId, 'humans')` returns the raw `GET /api/humans/{id}` body, and
 `api(userId, 'areaSecurity')` returns the raw `GET /api/geofence/{id}` body. Neither response's
 keys exist as fields on `type Poracle`, so Apollo silently drops them before anything reaches a
 browser.
 
-That is the only reason those paths leak nothing. It is a property of the schema declaration, not
-of any authorization code, and both reach Poracle through the weaker of the two gate styles.
+That is the only reason those paths leak nothing. It is a property of the schema declaration rather
+than of any authorization code, and both reach Poracle through the weaker of the two gate styles.
 
 2.0 is tRPC. There is no field pruning. Porting the `api()` dispatch shape verbatim behind a
 procedure converts an accidental deny-by-default into an allow-by-default. Every procedure returns
@@ -361,68 +361,59 @@ an explicitly constructed object, never a passthrough of a Poracle response.
 The same reasoning applies to the secret. `getClientContext`'s hand-picked allow-list is correct
 and is kept, but it is currently the second of two layers, and the first one is disappearing.
 
-### 7.7 The 2.0 perms gap is four keys, not one
+### 7.6 The 2.0 perms gap is four keys, not one
 
 `computeDiscordPerms` sets `admin`, `blocked`, `blockedGuildNames` and `trial`. `telegram-perms.ts`
 and `local-perms.ts` also set `webhooks`, `scanner`, `scannerCooldownBypass` and `areaRestrictions`.
 Discord, the primary strategy and the platform Poracle DMs through, sets none of those four.
 
-For this spec, the missing `webhooks` key blocks everything: no Discord user can reach Poracle at
-all. It is the first task.
+For this spec, the missing grant blocks everything: no Discord user can reach Poracle at all. That
+is the first task, and it lands as `perms.alerts` per 7.1.
 
 The missing `areaRestrictions` is more dangerous but not yet live. Nothing in 2.0 consumes
-`perms.areaRestrictions` and no area filtering is wired into the map path, so it is latent. It
-matters here only because the fix has a trap: `areaPerms` returns `[]` to mean unrestricted, so
+`perms.areaRestrictions` and no area filtering is wired into the map path. It matters here only
+because the fix has a trap: `areaPerms` returns `[]` to mean unrestricted, so
 `perms.areaRestrictions ?? []` would grant every Discord user unrestricted area access. Whoever
 wires area restrictions must make the perms object total, with every array key present and
 defaulted, rather than coalescing at the point of use.
 
-There is an ordering dependency between these two. In 1.x the sole call site of
-`validateSelectedWebhook` is `fabButtons`, which also reads `perms.scanner`. With `perms.scanner`
-absent, that resolver throws before the re-validation runs. A perms object with missing keys does
-not merely remove access, it takes down whatever else shares the resolver. Make the object total
-first, then wire the re-validation.
+`mergePerms` folds two providers' perms by unioning every array-valued key. For a grant list that
+is right. For `areaRestrictions` it is not, because of the same empty-means-unrestricted sentinel:
 
-### 7.8 mergePerms and the empty-array sentinel
-
-`utils/merge-perms.ts` folds two providers' perms by unioning every array-valued key. For
-`webhooks`, a grant list, union is right. For `areaRestrictions` it is not, because `areaPerms`
-returns `[]` to mean unrestricted, and set union reads that sentinel as nothing:
-
-- `['north']` union `['south']` gives both, which is correct for accumulating allowlists.
+- `['north']` union `['south']` gives both, correct for accumulating allowlists.
 - `[]` union `['north']` gives `['north']`, so linking a restricted account silently removes
   unrestricted access.
 
-This fails closed, so it is a correctness bug rather than an escalation, and it is live in 2.0
-today. The fix is to stop using one operator for keys of opposite polarity: treat the unrestricted
-sentinel explicitly, or represent unrestricted as something other than an empty array.
+That fails closed, so it is a correctness bug rather than an escalation, and it is live in 2.0
+today. It is listed here because it is the same sentinel, not because this spec fixes it.
 
-### 7.9 Acceptance criteria this section owes
+### 7.7 Read the code at 3a128a4b, do not run it
+
+`3a128a4b` is the last commit with the 1.x server intact, but it is a hybrid: Better Auth had
+already replaced Passport, and `auth-session.js` builds `req.user` from the Better Auth row, which
+has no `selectedWebhook` column. Every webhook resolver at that commit gates on
+`req.user?.selectedWebhook`, so the entire Poracle path is inert there.
+
+The code is authoritative. The behaviour is not. Anyone trying to verify 1.x empirically at this
+commit will conclude the feature does nothing.
+
+### 7.8 Acceptance criteria this section owes
 
 Written failing first, like the rest.
 
-1. A user whose webhook permission is revoked between requests is denied on the next request, with
-   no logout and no cache clear.
-2. A user with access to two Poracle instances cannot reach the second one's data by any request
-   shaped against the first.
-3. No procedure accepts a Poracle human id as input. Asserted structurally over the router, not by
+1. A user whose Alerts grant is revoked between requests is denied on the next request, with no
+   logout and no cache clear.
+2. No procedure accepts a Poracle human id as input. Asserted structurally over the router, not by
    testing procedures one at a time.
-4. No Poracle response is returned to a client unmodified.
-5. The Poracle secret does not appear in any procedure output, log line, or error body.
-6. A Discord account resolves a complete perms object, with every array key present.
-7. Requesting a profile the human does not own is rejected before anything is forwarded.
+3. No Poracle response is returned to a client unmodified.
+4. The Poracle secret does not appear in any procedure output, log line, or error body.
+5. A Discord account resolves a complete perms object, with every array key present and
+   `perms.alerts` set.
+6. Requesting a profile the human does not own is rejected before anything is forwarded.
 
 ---
 
-## 8. Multiple Poracle instances
-
-`config.webhooks` is already an array and `webhookPerms` already returns a list of names, so the
-model costs nothing to keep. The instance selector renders only when a user has access to more than
-one, matching 1.x's `HookSelection`.
-
----
-
-## 9. Testing
+## 8. Testing
 
 Acceptance criteria are written failing first, as the merge gate, matching the filters plan.
 
