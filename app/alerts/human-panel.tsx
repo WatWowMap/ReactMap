@@ -58,14 +58,7 @@ import type { HumanView, LocationView, ProfileView } from './alerts-query'
 export interface HumanPanelProps {
   human: HumanView
   profiles: ProfileView[]
-  /**
-   * Optional, and defaulted to `[]`, so that a caller wired up before this
-   * task's `alerts.addLocation` / `alerts.updateLocation` /
-   * `alerts.deleteLocation` procedures existed keeps compiling. Wiring
-   * `AlertsPage` itself to these four controls is outside this task's scope
-   * (see the module comment) -- flagged rather than done here.
-   */
-  locations?: LocationView[]
+  locations: LocationView[]
   onSetEnabled: (enabled: boolean) => void
   onSwitchProfile: (profileNo: number) => void
   onAddProfile: (name: string) => void
@@ -76,13 +69,9 @@ export interface HumanPanelProps {
    * "use my areas" (`server/src/trpc/alerts-router.ts`), so this list is the
    * geographic scope every such rule fires against, not decoration.
    */
-  onSetAreas?: (areas: string[]) => void
-  onAddLocation?: (label: string, latitude: number, longitude: number) => void
-  onUpdateLocation?: (
-    label: string,
-    latitude: number,
-    longitude: number,
-  ) => void
+  onSetAreas: (areas: string[]) => void
+  onAddLocation: (label: string, latitude: number, longitude: number) => void
+  onUpdateLocation: (label: string, latitude: number, longitude: number) => void
   /**
    * Deletes a saved location. The router refuses this when a rule's
    * `overrideLocationLabel` still names it -- Poracle's `resolveOverride`
@@ -91,7 +80,7 @@ export interface HumanPanelProps {
    * failure does (`useAlerts.error`), so this panel only needs to confirm
    * before asking.
    */
-  onDeleteLocation?: (label: string) => void
+  onDeleteLocation: (label: string) => void
 }
 
 function profileName(profiles: ProfileView[], profileNo: number): string {
@@ -101,16 +90,16 @@ function profileName(profiles: ProfileView[], profileNo: number): string {
 export function HumanPanel({
   human,
   profiles,
-  locations = [],
+  locations,
   onSetEnabled,
   onSwitchProfile,
   onAddProfile,
   onDeleteProfile,
   onCopyProfileRules,
-  onSetAreas = () => {},
-  onAddLocation = () => {},
-  onUpdateLocation = () => {},
-  onDeleteLocation = () => {},
+  onSetAreas,
+  onAddLocation,
+  onUpdateLocation,
+  onDeleteLocation,
 }: HumanPanelProps) {
   // Uncontrolled on purpose: this field is read once, at the moment "Add
   // profile" is clicked, and there is nothing else on screen that needs to

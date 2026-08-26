@@ -61,6 +61,18 @@ const unusedWrites = {
   copyProfileRules: async () => {
     throw new Error('not used by this test')
   },
+  setAreas: async () => {
+    throw new Error('not used by this test')
+  },
+  addLocation: async () => {
+    throw new Error('not used by this test')
+  },
+  updateLocation: async () => {
+    throw new Error('not used by this test')
+  },
+  deleteLocation: async () => {
+    throw new Error('not used by this test')
+  },
 }
 
 function fakeAlertsClient(state: AlertsState): AlertsClient {

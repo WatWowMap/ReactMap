@@ -65,6 +65,10 @@ export function AlertsPage({
     addProfile,
     deleteProfile,
     copyProfileRules,
+    setAreas,
+    addLocation,
+    updateLocation,
+    deleteLocation,
   } = useAlerts(alertsClient ? { client: alertsClient } : undefined)
   const species = useSpeciesCatalog(
     namesClient ? { client: namesClient } : undefined,
@@ -131,6 +135,7 @@ export function AlertsPage({
               <HumanPanel
                 human={snapshot.human}
                 profiles={snapshot.profiles}
+                locations={snapshot.locations}
                 onSetEnabled={(enabled) => void setEnabled(enabled)}
                 onSwitchProfile={(profileNo) => void switchProfile(profileNo)}
                 onAddProfile={(name) => void addProfile(name)}
@@ -138,6 +143,14 @@ export function AlertsPage({
                 onCopyProfileRules={(fromProfileNo, toProfileNo) =>
                   void copyProfileRules(fromProfileNo, toProfileNo)
                 }
+                onSetAreas={(areas) => void setAreas(areas)}
+                onAddLocation={(label, latitude, longitude) =>
+                  void addLocation(label, latitude, longitude)
+                }
+                onUpdateLocation={(label, latitude, longitude) =>
+                  void updateLocation(label, latitude, longitude)
+                }
+                onDeleteLocation={(label) => void deleteLocation(label)}
               />
             </div>
             {snapshot.alerts.length > 0 ? (

@@ -393,3 +393,125 @@ test('a failed copyProfileRules shows the banner once the copy is confirmed', as
   const alert = await findByRole('alert')
   expect(alert.textContent).toBe('Poracle is unreachable right now')
 })
+
+// --- areas and saved locations: alerts-page must actually pass the four ----
+// new handlers and `locations` to HumanPanel, not just have them exist on
+// AlertsClient. A component test that renders HumanPanel directly cannot see
+// whether the page wires it up at all -- these render the real AlertsPage
+// and assert the client method the control is supposed to reach was called.
+
+test("removing an area from the panel reaches the client's setAreas, not a no-op", async () => {
+  const calls: { areas: string[] }[] = []
+  const { findByRole } = renderWith({
+    status: async () => ({ state: 'present' }),
+    snapshot: async () => ({
+      ...EMPTY_SNAPSHOT,
+      human: { ...EMPTY_SNAPSHOT.human, areas: ['downtown', 'uptown'] },
+    }),
+    setAreas: async (args: { areas: string[] }) => {
+      calls.push(args)
+      return { areas: args.areas }
+    },
+  } as unknown as AlertsClient)
+  fireEvent.click(await findByRole('button', { name: /remove area downtown/i }))
+  await waitFor(() => expect(calls).toEqual([{ areas: ['uptown'] }]))
+})
+
+test("deleting a saved location from the panel reaches the client's deleteLocation once confirmed", async () => {
+  const calls: { label: string }[] = []
+  const { findByRole } = renderWith({
+    status: async () => ({ state: 'present' }),
+    snapshot: async () => ({
+      ...EMPTY_SNAPSHOT,
+      locations: [{ label: 'work', latitude: 1, longitude: 2 }],
+    }),
+    deleteLocation: async (args: { label: string }) => {
+      calls.push(args)
+      return { deleted: args.label }
+    },
+  } as unknown as AlertsClient)
+  fireEvent.click(await findByRole('button', { name: /delete location work/i }))
+  const dialog = await findByRole('alertdialog')
+  fireEvent.click(within(dialog).getByRole('button', { name: /^delete$/i }))
+  await waitFor(() => expect(calls).toEqual([{ label: 'work' }]))
+})
+
+test('a failed setAreas shows the banner', async () => {
+  const { findByRole } = renderWith({
+    status: async () => ({ state: 'present' }),
+    snapshot: async () => ({
+      ...EMPTY_SNAPSHOT,
+      human: { ...EMPTY_SNAPSHOT.human, areas: ['downtown'] },
+    }),
+    setAreas: async () => {
+      throw new Error('Poracle is unreachable right now')
+    },
+  } as unknown as AlertsClient)
+  fireEvent.click(await findByRole('button', { name: /remove area downtown/i }))
+  const alert = await findByRole('alert')
+  expect(alert.textContent).toBe('Poracle is unreachable right now')
+})
+
+test('a failed addLocation shows the banner', async () => {
+  const { getByRole, findByRole } = renderWith({
+    status: async () => ({ state: 'present' }),
+    snapshot: async () => EMPTY_SNAPSHOT,
+    addLocation: async () => {
+      throw new Error('Poracle is unreachable right now')
+    },
+  } as unknown as AlertsClient)
+  fireEvent.change(
+    await findByRole('textbox', { name: /new location label/i }),
+    { target: { value: 'work' } },
+  )
+  fireEvent.change(
+    getByRole('spinbutton', { name: /new location latitude/i }),
+    { target: { value: '1' } },
+  )
+  fireEvent.change(
+    getByRole('spinbutton', { name: /new location longitude/i }),
+    { target: { value: '2' } },
+  )
+  fireEvent.click(getByRole('button', { name: /^add location$/i }))
+  const alert = await findByRole('alert')
+  expect(alert.textContent).toBe('Poracle is unreachable right now')
+})
+
+test('a failed updateLocation shows the banner', async () => {
+  const { getByRole, findByRole } = renderWith({
+    status: async () => ({ state: 'present' }),
+    snapshot: async () => ({
+      ...EMPTY_SNAPSHOT,
+      locations: [{ label: 'work', latitude: 1, longitude: 2 }],
+    }),
+    updateLocation: async () => {
+      throw new Error('Poracle is unreachable right now')
+    },
+  } as unknown as AlertsClient)
+  fireEvent.click(await findByRole('button', { name: /^edit$/i }))
+  fireEvent.click(getByRole('button', { name: /^save$/i }))
+  const alert = await findByRole('alert')
+  expect(alert.textContent).toBe('Poracle is unreachable right now')
+})
+
+test('a failed deleteLocation shows the banner once the delete is confirmed', async () => {
+  const { findByRole } = renderWith({
+    status: async () => ({ state: 'present' }),
+    snapshot: async () => ({
+      ...EMPTY_SNAPSHOT,
+      locations: [{ label: 'work', latitude: 1, longitude: 2 }],
+    }),
+    deleteLocation: async () => {
+      throw new Error(
+        'That location is in use by an alert and cannot be deleted',
+      )
+    },
+  } as unknown as AlertsClient)
+  fireEvent.click(await findByRole('button', { name: /delete location work/i }))
+  const dialog = await findByRole('alertdialog')
+  fireEvent.click(within(dialog).getByRole('button', { name: /^delete$/i }))
+  const alert = await findByRole('alert')
+  expect(alert.textContent).toBe(
+    'That location is in use by an alert and cannot be deleted',
+  )
+})

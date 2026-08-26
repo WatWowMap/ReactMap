@@ -115,6 +115,23 @@ export interface AlertsClient {
     fromProfileNo: number
     toProfileNo: number
   }): Promise<{ toProfileNo: number }>
+  /** Replaces the whole selected-areas list. Echoes what was actually sent,
+   *  after `alerts-router.ts`'s own `areasToSkip` filter -- see `setAreas`
+   *  below. */
+  setAreas(args: { areas: string[] }): Promise<{ areas: string[] }>
+  addLocation(args: {
+    label: string
+    latitude: number
+    longitude: number
+  }): Promise<LocationView>
+  updateLocation(args: {
+    label: string
+    latitude: number
+    longitude: number
+  }): Promise<LocationView>
+  /** Refused (see `alerts-router.ts`'s `deleteLocation`) when a rule's
+   *  `overrideLocationLabel` still names this location. */
+  deleteLocation(args: { label: string }): Promise<{ deleted: string }>
 }
 
 function createDefaultAlertsClient(): AlertsClient {
@@ -150,6 +167,18 @@ function createDefaultAlertsClient(): AlertsClient {
     copyProfileRules: (args) =>
       client.mutation('alerts.copyProfileRules', args) as Promise<{
         toProfileNo: number
+      }>,
+    setAreas: (args) =>
+      client.mutation('alerts.setAreas', args) as Promise<{
+        areas: string[]
+      }>,
+    addLocation: (args) =>
+      client.mutation('alerts.addLocation', args) as Promise<LocationView>,
+    updateLocation: (args) =>
+      client.mutation('alerts.updateLocation', args) as Promise<LocationView>,
+    deleteLocation: (args) =>
+      client.mutation('alerts.deleteLocation', args) as Promise<{
+        deleted: string
       }>,
   }
 }
@@ -233,6 +262,32 @@ export interface UseAlertsResult {
     fromProfileNo: number,
     toProfileNo: number,
   ) => Promise<void>
+  /** Replaces the whole selected-areas list -- what a `distance = 0` rule
+   *  actually fires against. The response names the set that was actually
+   *  saved (after the server's own `areasToSkip` filter), so the cache is
+   *  patched directly rather than refetched. */
+  setAreas: (areas: string[]) => Promise<void>
+  /** Creates a saved location, and adds it to the cache from the response --
+   *  Poracle's own answer names nothing beyond `{status: "ok"}`, so the
+   *  router echoes what was sent and this trusts that echo the same way
+   *  `setEnabled` trusts its own. */
+  addLocation: (
+    label: string,
+    latitude: number,
+    longitude: number,
+  ) => Promise<void>
+  /** Overwrites a saved location's coordinates, and patches the cache from
+   *  the response the same way `addLocation` does. */
+  updateLocation: (
+    label: string,
+    latitude: number,
+    longitude: number,
+  ) => Promise<void>
+  /** Deletes a saved location. Refused server-side when a rule's
+   *  `overrideLocationLabel` still names it -- see `alerts-router.ts`'s
+   *  `deleteLocation` -- so a rejection here is not a bug to route around,
+   *  it is the point: `error` carries why, the same as every other write. */
+  deleteLocation: (label: string) => Promise<void>
 }
 
 export function useAlerts({
@@ -350,6 +405,71 @@ export function useAlerts({
       queryClient.invalidateQueries({ queryKey: alertsSnapshotQueryKey() }),
   })
 
+  const setAreasMutation = useMutation({
+    mutationFn: (vars: { areas: string[] }) => client.setAreas(vars),
+    onSuccess: (result) => {
+      queryClient.setQueryData<AlertsSnapshot>(
+        alertsSnapshotQueryKey(),
+        (current) =>
+          current && {
+            ...current,
+            human: { ...current.human, areas: result.areas },
+          },
+      )
+    },
+  })
+
+  const addLocationMutation = useMutation({
+    mutationFn: (vars: {
+      label: string
+      latitude: number
+      longitude: number
+    }) => client.addLocation(vars),
+    onSuccess: (result) => {
+      queryClient.setQueryData<AlertsSnapshot>(
+        alertsSnapshotQueryKey(),
+        (current) =>
+          current && { ...current, locations: [...current.locations, result] },
+      )
+    },
+  })
+
+  const updateLocationMutation = useMutation({
+    mutationFn: (vars: {
+      label: string
+      latitude: number
+      longitude: number
+    }) => client.updateLocation(vars),
+    onSuccess: (result) => {
+      queryClient.setQueryData<AlertsSnapshot>(
+        alertsSnapshotQueryKey(),
+        (current) =>
+          current && {
+            ...current,
+            locations: current.locations.map((location) =>
+              location.label === result.label ? result : location,
+            ),
+          },
+      )
+    },
+  })
+
+  const deleteLocationMutation = useMutation({
+    mutationFn: (vars: { label: string }) => client.deleteLocation(vars),
+    onSuccess: (result) => {
+      queryClient.setQueryData<AlertsSnapshot>(
+        alertsSnapshotQueryKey(),
+        (current) =>
+          current && {
+            ...current,
+            locations: current.locations.filter(
+              (location) => location.label !== result.deleted,
+            ),
+          },
+      )
+    },
+  })
+
   return {
     state: statusQuery.isLoading ? 'loading' : resolvedState,
     snapshot: state === 'present' ? (snapshotQuery.data ?? null) : null,
@@ -362,6 +482,10 @@ export function useAlerts({
       addProfileMutation.error ??
       deleteProfileMutation.error ??
       copyProfileRulesMutation.error ??
+      setAreasMutation.error ??
+      addLocationMutation.error ??
+      updateLocationMutation.error ??
+      deleteLocationMutation.error ??
       null,
     create: async (rule) => {
       try {
@@ -425,6 +549,40 @@ export function useAlerts({
         })
       } catch {
         // Nothing was copied; nothing to reconcile.
+      }
+    },
+    setAreas: async (areas) => {
+      try {
+        await setAreasMutation.mutateAsync({ areas })
+      } catch {
+        // The stored areas are untouched; nothing to roll back.
+      }
+    },
+    addLocation: async (label, latitude, longitude) => {
+      try {
+        await addLocationMutation.mutateAsync({ label, latitude, longitude })
+      } catch {
+        // Nothing was created; nothing to reconcile.
+      }
+    },
+    updateLocation: async (label, latitude, longitude) => {
+      try {
+        await updateLocationMutation.mutateAsync({
+          label,
+          latitude,
+          longitude,
+        })
+      } catch {
+        // The stored location is untouched; nothing to roll back.
+      }
+    },
+    deleteLocation: async (label) => {
+      try {
+        await deleteLocationMutation.mutateAsync({ label })
+      } catch {
+        // The stored location is untouched; nothing to roll back -- this is
+        // also the "in use" refusal's path, which is not a bug to swallow
+        // quietly; `error` carries it to the banner.
       }
     },
   }
