@@ -347,19 +347,32 @@ function inputFields(name: string): string[] {
   return found
 }
 
-test('no write procedure accepts a human id', () => {
+test('no procedure on this router accepts a human id', () => {
   // spec 7.4. The `{id}` path segment is the identity Poracle acts as, so an
   // id on the wire is a request to act as somebody else. A uid is different
   // and is allowed: Poracle resolves every by-uid route through its own
   // ownership check and 404s a row this human does not own.
+  //
+  // Read off the router rather than from a hardcoded list of names: a list
+  // covers whatever somebody remembered to add to it, which is how this went
+  // from covering every write to covering three of fourteen without anything
+  // failing. The procedure that needs this assertion most is always the next
+  // one somebody writes.
   const identity = /human|platform|discord|account|user|owner/i
-  for (const name of ['create', 'replace', 'remove']) {
+  const names = Object.keys(alertsRouter._def.procedures)
+  const inputless: string[] = []
+  for (const name of names) {
     const fields = inputFields(name)
-    // The walk has to actually reach the fields, or this asserts nothing
-    // twice over.
-    expect(fields.length).toBeGreaterThan(0)
+    if (fields.length === 0) {
+      inputless.push(name)
+      continue
+    }
     expect(fields.filter((field) => identity.test(field))).toEqual([])
   }
+  // The walk has to actually reach the fields, or the loop above asserts
+  // nothing fourteen times over. Only the three reads take no input at all,
+  // so a procedure whose fields the walk failed to reach shows up here.
+  expect(inputless.sort()).toEqual(['availableAreas', 'snapshot', 'status'])
 })
 
 test('the write inputs are exactly the fields the procedures document', () => {
