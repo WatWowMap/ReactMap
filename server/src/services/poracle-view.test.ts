@@ -200,3 +200,22 @@ test('a malformed area string yields no areas rather than throwing', () => {
   const bad = { ...SNAPSHOT, human: { ...SNAPSHOT.human, area: 'not json' } }
   expect(toAlertsSnapshot(bad).human.areas).toEqual([])
 })
+
+test('a rule Poracle did not stamp a profile onto is profile 0, not a guess', () => {
+  // Poracle stamps profile_no only in the snapshot's all_profiles mode, which
+  // is the mode this router reads in, so a rule without one is a rule from
+  // some other response shape. 0 says "unknown" rather than quietly reading
+  // the row's position in the list or the human's active profile, either of
+  // which would be a profile number that looks real and is not.
+  const snapshot = toAlertsSnapshot({
+    human: { current_profile_no: 2 },
+    tracking: {
+      pokemon: [
+        { uid: 1, pokemon_id: 25 },
+        { uid: 2, pokemon_id: 26 },
+        { uid: 3, profile_no: 4, pokemon_id: 27 },
+      ],
+    },
+  })
+  expect(snapshot.alerts.map((alert) => alert.profileNo)).toEqual([0, 0, 4])
+})

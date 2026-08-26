@@ -418,7 +418,10 @@ test('create posts the batch to the pokemon collection', async () => {
   expect(client.sent[0]?.method).toBe('POST')
   expect(client.sent[0]?.path.split('?')[0]).toBe(CREATE_PATH)
   // Poracle's POST body is a bare array of rule objects, not an envelope.
-  expect(client.sent[0]?.body).toEqual([{ pokemon_id: 25, min_iv: 90 }])
+  // toStrictEqual, not toEqual: a property set to undefined compares equal to
+  // a missing one, so toEqual passes against a body carrying all 32 columns as
+  // undefined -- which is exactly the mistake this is watching for.
+  expect(client.sent[0]?.body).toStrictEqual([{ pokemon_id: 25, min_iv: 90 }])
   expect(result).toEqual({ created: 1, updated: 1, unchanged: 0 })
 })
 
@@ -482,7 +485,7 @@ test('replace puts to the addressed rule', async () => {
   expect(client.sent[0]?.method).toBe('PUT')
   expect(client.sent[0]?.path.split('?')[0]).toBe(ITEM_PATH)
   expect(client.sent[0]?.path).toContain('silent=true')
-  expect(client.sent[0]?.body).toEqual({ pokemon_id: 25 })
+  expect(client.sent[0]?.body).toStrictEqual({ pokemon_id: 25 })
 })
 
 test('remove deletes the addressed rule and returns the uids', async () => {
