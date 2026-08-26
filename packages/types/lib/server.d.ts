@@ -208,7 +208,7 @@ export interface Permissions extends BasePerms {
   scanner: string[]
   scannerCooldownBypass: string[]
   areaRestrictions: string[]
-  webhooks: string[]
+  alerts: boolean
   trial: boolean
 }
 
