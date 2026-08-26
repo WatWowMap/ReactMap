@@ -56,9 +56,9 @@ async function resolveHumanState(
 ): Promise<HumanState> {
   const state = await checkHuman(client, platformId)
   if (state === 'unreachable') {
-    return cache.get(userId) ?? 'unreachable'
+    return cachedHumanState(userId) ?? 'unreachable'
   }
-  cache.set(userId, state)
+  rememberHumanState(userId, state)
   return state
 }
 

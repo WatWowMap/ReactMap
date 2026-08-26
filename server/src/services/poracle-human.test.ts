@@ -44,3 +44,11 @@ test('an absent human is cached too, so a 404 is not re-fetched every load', asy
   expect(await resolveHumanState(missing, 'u2', '123')).toBe('absent')
   expect(await resolveHumanState(down, 'u2', '123')).toBe('absent')
 })
+
+test('a deleted human downgrades from present to absent', async () => {
+  // A 404 is a real answer and must overwrite the cache -- only
+  // `unreachable` declines to. This guards the regression where a cache
+  // hit short-circuits the fresh check.
+  expect(await resolveHumanState(ok, 'u3', '123')).toBe('present')
+  expect(await resolveHumanState(missing, 'u3', '123')).toBe('absent')
+})
