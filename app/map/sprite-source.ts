@@ -5,9 +5,10 @@
  * a fallback grammar, not a formula -- `20_b1_c11_g2_s.webp`,
  * `1_f897_a1_a1_s.webp` -- and the obvious guess 404s constantly
  * (`pokemon/25.webp` is 200, `pokemon/25_f1.webp` and `pokemon/20_f46.webp`
- * are both 404). `uicons.js` fetches the repository's `index.json` once and
- * resolves a request against what is actually there, walking the fallback
- * chain down to `pokemon/0.webp` when nothing more specific exists.
+ * are both 404). `uicons.js` fetches the repository's `index.json` once --
+ * from our own origin, see `SPRITE_BASE_URL` -- and resolves a request
+ * against what is actually there, walking the fallback chain down to
+ * `pokemon/0.webp` when nothing more specific exists.
  *
  * That fetch happens exactly once for the page: `loadSpriteIndex` memoises
  * both the resolved index and the in-flight promise, so a second caller
@@ -19,9 +20,23 @@
 import { UICONS } from 'uicons.js'
 import type { PokemonEntity } from './types'
 
-/** The sprite set 1.0 ships against, and the one this index is verified on. */
-export const UICONS_BASE_URL =
-  'https://raw.githubusercontent.com/WatWowMap/wwm-uicons-webp/main'
+/**
+ * Where the browser asks for sprites: our own origin, never the uicons
+ * repository directly.
+ *
+ * The server behind this path fetches the upstream set once, treats its
+ * index as an allowlist, resizes each sprite into the atlas cell and
+ * caches the result (see `server/src/services/icon-proxy.ts`). Two things
+ * follow that a direct `raw.githubusercontent.com` base could not give:
+ * a proxied, firewalled or air-gapped deploy can paint a map at all, and
+ * the client stops downloading roughly twice the pixels it displays.
+ *
+ * Relative on purpose. `uicons.js` builds every url by string
+ * concatenation, so a leading-slash base resolves against whatever origin
+ * the page was served from -- which is also what makes the dev server's
+ * `/api` proxy work without a second configuration knob.
+ */
+export const SPRITE_BASE_URL = '/api/icons'
 
 /**
  * The box deck.gl packs each remote sprite into. The source webp files are
@@ -78,7 +93,10 @@ export function spriteUrlFor(
     entity.costume,
     entity.gender,
   )
-  return url === '' ? undefined : url
+  // The size is asked for rather than assumed, so the box deck.gl packs
+  // into and the box the server resizes into can never drift apart: change
+  // `SPRITE_ICON_SIZE` and the request follows it.
+  return url === '' ? undefined : `${url}?size=${SPRITE_ICON_SIZE}`
 }
 
 let loaded: SpriteIndex | null = null
@@ -100,7 +118,7 @@ export function spriteIndex(): SpriteIndex | null {
  */
 export function loadSpriteIndex(
   create: () => Promise<SpriteIndex> = () =>
-    new UICONS(UICONS_BASE_URL).remoteInit(),
+    new UICONS(SPRITE_BASE_URL).remoteInit(),
 ): Promise<SpriteIndex | null> {
   if (loaded) return Promise.resolve(loaded)
   if (inFlight) return inFlight
