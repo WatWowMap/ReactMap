@@ -58,7 +58,18 @@ function poracleConfig(): PoracleConfig {
 
 function poracleConfigured(deps: { config?: PoracleConfig } = {}): boolean {
   const c = deps.config ?? poracleConfig()
-  return Boolean(c?.enabled && c?.host && c?.poracleSecret)
+  // Deliberately not requiring `poracleSecret`. Poracle's own middleware
+  // skips the check when its API secret is unset (`RequireSecretGin`:
+  // `if apiSecret == "" { c.Next() }`), so an instance reachable only on a
+  // private network runs without one, and demanding it here reported that
+  // deployment as having no Poracle at all -- `status` answered
+  // `unconfigured` and the tab never rendered.
+  //
+  // An operator who sets a host but forgets a secret Poracle *does* want
+  // gets 401s, which `checkHuman` maps to `unreachable` rather than
+  // `absent`, so it surfaces as a connection problem instead of silently
+  // hiding the tab.
+  return Boolean(c?.enabled && c?.host)
 }
 
 function createPoracleClient(

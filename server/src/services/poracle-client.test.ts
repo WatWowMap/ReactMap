@@ -136,10 +136,22 @@ test('poracleConfigured is false when not enabled', () => {
   )
 })
 
-test('poracleConfigured is false when the secret is missing', () => {
+test('poracleConfigured is true with a blank secret, for a private network', () => {
+  // Poracle's own middleware skips the check entirely when its API secret is
+  // unset (`if apiSecret == "" { c.Next() }`), so an instance reachable only
+  // on a private network legitimately runs without one. Requiring a secret
+  // here reported such a deployment as having no Poracle at all, and the tab
+  // never rendered.
   expect(poracleConfigured({ config: { ...CONFIG, poracleSecret: '' } })).toBe(
-    false,
+    true,
   )
+})
+
+test('poracleConfigured is false without a host', () => {
+  // The host is the part that cannot be defaulted. Without it there is
+  // nothing to call, which is a different state from calling something that
+  // happens to need no secret.
+  expect(poracleConfigured({ config: { ...CONFIG, host: '' } })).toBe(false)
 })
 
 test('every route lives under the /api group Poracle mounts them on', async () => {
