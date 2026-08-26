@@ -60,7 +60,12 @@ const SNAPSHOT = {
     raid: [],
   },
   profiles: [{ profile_no: 2, name: 'default' }],
-  locations: { locations: [{ label: 'work', latitude: 1, longitude: 2 }] },
+  // Poracle's real container: `{ default?, named[] }` (locations.go). The
+  // default is the human's own latitude/longitude, which HumanView carries.
+  locations: {
+    default: { latitude: 3, longitude: 4 },
+    named: [{ label: 'work', latitude: 1, longitude: 2 }],
+  },
   summaries: [],
   mutes: [],
 }
@@ -176,7 +181,7 @@ test('a field Poracle adds later does not reach the client', () => {
     },
     profiles: [{ ...SNAPSHOT.profiles[0], id: 'leaked', latitude: 'leaked' }],
     locations: {
-      locations: [{ ...SNAPSHOT.locations.locations[0], extra: 'leaked' }],
+      named: [{ ...SNAPSHOT.locations.named[0], extra: 'leaked' }],
     },
   }
   expect(JSON.stringify(toAlertsSnapshot(withNewField))).not.toContain('leaked')

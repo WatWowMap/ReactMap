@@ -201,6 +201,10 @@ export function toAlertsSnapshot(body: any): AlertsSnapshot {
     human: toHumanView(body?.human),
     alerts: asArray(body?.tracking?.pokemon).map(toAlertRow),
     profiles: asArray(body?.profiles).map(toProfileView),
-    locations: asArray(body?.locations?.locations).map(toLocationView),
+    // Poracle's container is `{ default?, named[] }` -- reading `locations`
+    // off it yields an empty list against a live Poracle while passing any
+    // fixture that invented the key. The default location is the human's own
+    // latitude/longitude, which `HumanView` already carries.
+    locations: asArray(body?.locations?.named).map(toLocationView),
   }
 }
