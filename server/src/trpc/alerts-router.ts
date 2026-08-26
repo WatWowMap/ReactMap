@@ -1008,7 +1008,23 @@ const alertsRouter = t.router({
    * choice -- see the module comment. Existing to back a picker, not a bare
    * text field: a picker built from this list cannot produce a name Poracle
    * will drop, which is what makes `setAreas`'s own divergence (below)
-   * unreachable rather than merely correctable after the fact.
+   * unreachable rather than merely correctable after the fact -- for a
+   * non-admin, which is the only case this filters correctly (see below).
+   *
+   * The GET and the POST are deliberately asymmetric on Poracle's side
+   * (`v2_humans.go`): the POST drops a non-`userSelectable` fence *before*
+   * intersecting against the request, admin or not; the GET hands back every
+   * community-allowed fence *with the flag attached* and leaves the caller to
+   * decide -- Poracle's own Discord bot filters on it for non-admins
+   * (`AreaLogic.GetAvailableAreas`) and does not for admins. Dropping a row
+   * whose `userSelectable` is `false` here mirrors the POST's own filter, so
+   * the picker cannot offer a name the POST will silently drop for the
+   * ordinary case. ReactMap has no way to know whether this human is a
+   * Poracle admin (that list lives in Poracle's own config, not anything
+   * synced here), so this filters unconditionally -- an admin loses the
+   * ability to pick a non-selectable fence through this control, which is
+   * the safer of the two wrong answers: offering less than Poracle allows,
+   * never more than it accepts.
    */
   availableAreas: t.procedure.query(
     async ({ ctx }): Promise<{ areas: string[] }> => {
@@ -1030,6 +1046,7 @@ const alertsRouter = t.router({
       }
       const rows = Array.isArray(res.body?.areas) ? res.body.areas : []
       const names = rows
+        .filter((row: any) => row?.userSelectable === true)
         .map((row: any) => (typeof row?.name === 'string' ? row.name : ''))
         .filter((name: string) => name.length > 0)
       return { areas: withoutSkippedAreas(names, ctx.poracleConfig) }

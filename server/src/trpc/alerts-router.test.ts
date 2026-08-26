@@ -1028,7 +1028,7 @@ test('areasToSkip are not offered', async () => {
   expect(res.human.areas).toContain('uptown')
 })
 
-function fakeAreasGet(areas: { name: string }[]) {
+function fakeAreasGet(areas: { name: string; userSelectable?: boolean }[]) {
   const seen: string[] = []
   return {
     seen,
@@ -1044,9 +1044,9 @@ function fakeAreasGet(areas: { name: string }[]) {
 
 test('availableAreas lists names, filtered by areasToSkip case-insensitively', async () => {
   const client = fakeAreasGet([
-    { name: 'downtown' },
-    { name: 'uptown' },
-    { name: 'suburbs' },
+    { name: 'downtown', userSelectable: true },
+    { name: 'uptown', userSelectable: true },
+    { name: 'suburbs', userSelectable: true },
   ])
   const ctx = {
     ...BASE,
@@ -1056,6 +1056,25 @@ test('availableAreas lists names, filtered by areasToSkip case-insensitively', a
   const result = await caller(ctx).availableAreas()
   expect(result).toEqual({ areas: ['uptown', 'suburbs'] })
   expect(client.seen).toEqual(['/v2/humans/123/areas'])
+})
+
+test('availableAreas drops a fence the POST would also drop: not userSelectable', async () => {
+  // Poracle's two area endpoints are deliberately asymmetric
+  // (`v2_humans.go`): the POST filters out a non-userSelectable fence before
+  // intersecting against the request; the GET hands back every
+  // community-allowed fence with the flag attached and expects the caller to
+  // decide. Offering a fence here that the POST will silently drop is
+  // exactly the divergence this procedure exists to make unreachable.
+  const client = fakeAreasGet([
+    { name: 'downtown', userSelectable: true },
+    { name: 'staff-only', userSelectable: false },
+    { name: 'uptown' }, // Missing the field reads the same as false.
+  ])
+  const result = await caller({
+    ...BASE,
+    poracleClient: client,
+  }).availableAreas()
+  expect(result).toEqual({ areas: ['downtown'] })
 })
 
 test("availableAreas' transport failure fails as unavailable, not a silent empty list", async () => {
