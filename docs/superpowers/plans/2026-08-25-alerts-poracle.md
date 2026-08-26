@@ -395,34 +395,36 @@ HTTP only. No tRPC, no view model, no knowledge of who is asking.
     get(path: string): Promise<{ status: number; body: any }>
     send(method: 'POST' | 'PUT' | 'DELETE', path: string, body?: unknown): Promise<{ status: number; body: any }>
   }
-  function createPoracleClient(deps?: { fetch?: typeof fetch }): PoracleClient
+  function createPoracleClient(deps?: { fetch?: typeof fetch; config?: PoracleConfig }): PoracleClient
   function poracleConfigured(): boolean
   ```
 - Paths passed in are already-encoded path suffixes such as `/v2/humans/123/tracking/pokemon`. Callers build them with `encodeURIComponent`.
 
 - [ ] **Step 1: Write the failing test**
 
+`mock.module` is process-wide in bun. A second test file mocking `@rm/config` steals the real
+config from every suite that runs after it, which took the whole run to six unrelated failures
+during Task 1. So this client takes its config as an injected dep instead, matching how
+`buildSettingsResponse` in `server/src/settings-response.ts` already takes `getSession` and
+`getPerms`. Do not call `mock.module` in this file.
+
 ```ts
 // server/src/services/poracle-client.test.ts
-import { expect, mock, test } from 'bun:test'
+import { expect, test } from 'bun:test'
+import { createPoracleClient } from './poracle-client'
 
-mock.module('@rm/config', () => ({
-  default: {
-    getSafe: () => ({
-      enabled: true,
-      host: 'http://poracle.test',
-      port: 3030,
-      poracleSecret: 'shhh',
-    }),
-  },
-}))
-
-const { createPoracleClient } = await import('./poracle-client')
+const CONFIG = {
+  enabled: true,
+  host: 'http://poracle.test',
+  port: 3030,
+  poracleSecret: 'shhh',
+}
 
 test('sends the secret as a header and never in the URL', async () => {
   let seenUrl = ''
   let seenHeaders: any = {}
   const client = createPoracleClient({
+    config: CONFIG,
     fetch: (async (url: any, init: any) => {
       seenUrl = String(url)
       seenHeaders = init.headers
@@ -441,6 +443,7 @@ test('a 404 is returned as a status, not thrown', async () => {
   // The human check needs to tell 404 (no human) from a transport failure.
   // Throwing on both would collapse two of the three states in spec 6.
   const client = createPoracleClient({
+    config: CONFIG,
     fetch: (async () => new Response('{}', { status: 404 })) as any,
   })
   const res = await client.get('/v2/humans/nobody')
@@ -449,6 +452,7 @@ test('a 404 is returned as a status, not thrown', async () => {
 
 test('a transport failure throws so it cannot be mistaken for a 404', async () => {
   const client = createPoracleClient({
+    config: CONFIG,
     fetch: (async () => {
       throw new Error('ECONNREFUSED')
     }) as any,
@@ -458,6 +462,7 @@ test('a transport failure throws so it cannot be mistaken for a 404', async () =
 
 test('the secret never reaches an error message', async () => {
   const client = createPoracleClient({
+    config: CONFIG,
     fetch: (async () => new Response('nope', { status: 500 })) as any,
   })
   const res = await client.get('/v2/humans/123')
@@ -510,15 +515,21 @@ function poracleConfigured(): boolean {
  * `path` is an already-encoded suffix. Callers encode their own segments;
  * this deliberately does no interpolation of its own.
  */
-function createPoracleClient(deps: { fetch?: typeof fetch } = {}): PoracleClient {
+function createPoracleClient(
+  deps: { fetch?: typeof fetch; config?: any } = {},
+): PoracleClient {
   const doFetch = deps.fetch ?? fetch
+  // Injected in tests. `mock.module` is process-wide in bun, so mocking
+  // `@rm/config` here would steal the real config from every suite that runs
+  // after this one.
+  const readConfig = () => deps.config ?? poracleConfig()
 
   async function call(
     method: string,
     path: string,
     body?: unknown,
   ): Promise<PoracleResponse> {
-    const c = poracleConfig()
+    const c = readConfig()
     const base = c.port ? `${c.host}:${c.port}` : c.host
     const response = await doFetch(`${base}${path}`, {
       method,
