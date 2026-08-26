@@ -177,14 +177,24 @@ export const useEntityStore = create<EntityStoreState>()((set, get) => ({
     const current = get().pokemonById
 
     // Two passes, and the split is the point. This runs once a second
-    // forever, and at a dense viewport roughly half of those seconds have
-    // nothing to evict at all -- measured at downtown Boston, zoom 13,
-    // ~1,900 held: 5 of 11 ticks over ten idle seconds replaced anything.
+    // forever, and some of those seconds have nothing to evict at all.
     // Building the replacement record before knowing whether it is needed
     // paid a full copy of the record plus an `Object.entries` pair array
     // for every one of those seconds and then threw both away. A
     // `for...in` scan that stops at the first expiry allocates nothing:
-    // 0.34ms -> 0.07ms per no-op tick at 1,900 held.
+    // over a 5,500-entry record the empty tick goes 0.52ms -> 0.16ms in a
+    // tight loop, and measures a median 0.0ms here in the app.
+    //
+    // Read the rest of this before concluding the once-a-second cost is
+    // dealt with, because it mostly is not. Measured live at downtown
+    // Boston, zoom 13, ~5,500 held, 41 idle ticks: 15 evicted nothing and
+    // 26 -- the majority -- evicted something. A tick that evicts still
+    // rebuilds the record and the array, still hands clustering a new
+    // identity to index, and still costs a median 6.2ms. So this split
+    // removes the cost of the empty ticks and leaves the busy ones
+    // exactly as expensive as they were, and at a genuinely dense
+    // viewport the busy ones are the common case. Anyone measuring a
+    // slow idle map should start here rather than assume it was fixed.
     let expired = false
     for (const id in current) {
       const entity = current[id]
