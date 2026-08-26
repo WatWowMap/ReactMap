@@ -56,6 +56,11 @@
       "__name": "API_SESSION_CHECK_INTERVAL_MS",
       "__format": "number"
     },
+    "trustProxy": {
+      "__name": "API_TRUST_PROXY",
+      "__format": "boolean"
+    },
+    "baseUrl": "API_BASE_URL",
     "cookieAgeDays": {
       "__name": "API_COOKIE_AGE_DAYS",
       "__format": "number"
@@ -1670,9 +1675,40 @@
       }
     }
   },
-  "webhooks": {
-    "__name": "WEBHOOKS",
-    "__format": "json"
+  "poracle": {
+    "enabled": {
+      "__name": "PORACLE_ENABLED",
+      "__format": "boolean"
+    },
+    "host": "PORACLE_HOST",
+    "port": {
+      "__name": "PORACLE_PORT",
+      "__format": "number"
+    },
+    "poracleSecret": "PORACLE_PORACLE_SECRET",
+    "addressFormat": "PORACLE_ADDRESS_FORMAT",
+    "nominatimUrl": "PORACLE_NOMINATIM_URL",
+    "geocoderProvider": "PORACLE_GEOCODER_PROVIDER",
+    "areasToSkip": {
+      "__name": "PORACLE_AREAS_TO_SKIP",
+      "__format": "json"
+    },
+    "disabledHooks": {
+      "__name": "PORACLE_DISABLED_HOOKS",
+      "__format": "json"
+    },
+    "discordRoles": {
+      "__name": "PORACLE_DISCORD_ROLES",
+      "__format": "json"
+    },
+    "telegramGroups": {
+      "__name": "PORACLE_TELEGRAM_GROUPS",
+      "__format": "json"
+    },
+    "local": {
+      "__name": "PORACLE_LOCAL",
+      "__format": "json"
+    }
   },
   "authentication": {
     "strategies": {
@@ -2131,6 +2167,34 @@
     "cacheHrs": {
       "__name": "ICONS_CACHE_HRS",
       "__format": "number"
+    },
+    "proxy": {
+      "baseUrl": "ICONS_PROXY_BASE_URL",
+      "sizes": {
+        "__name": "ICONS_PROXY_SIZES",
+        "__format": "json"
+      },
+      "defaultSize": {
+        "__name": "ICONS_PROXY_DEFAULT_SIZE",
+        "__format": "number"
+      },
+      "defaultFormat": "ICONS_PROXY_DEFAULT_FORMAT",
+      "timeoutMs": {
+        "__name": "ICONS_PROXY_TIMEOUT_MS",
+        "__format": "number"
+      },
+      "indexTtlHours": {
+        "__name": "ICONS_PROXY_INDEX_TTL_HOURS",
+        "__format": "number"
+      },
+      "maxConcurrentFetches": {
+        "__name": "ICONS_PROXY_MAX_CONCURRENT_FETCHES",
+        "__format": "number"
+      },
+      "maxQueuedFetches": {
+        "__name": "ICONS_PROXY_MAX_QUEUED_FETCHES",
+        "__format": "number"
+      }
     },
     "sizes": {
       "device": {
