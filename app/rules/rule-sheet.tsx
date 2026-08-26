@@ -76,27 +76,34 @@ export function RuleSheet<P extends ConditionPatch = RulePatch>({
   // `REACTMAP_VOCABULARY` is declared as.
   const resolvedVocabulary =
     vocabulary ?? (REACTMAP_VOCABULARY as unknown as Vocabulary<P>)
+  const enabledField = resolvedVocabulary.enabledField
 
   return (
     <div className="flex flex-col gap-4">
       {/* The off switch sits above the conditions rather than beside the
           Save button: it is a statement about the whole rule, not another
           field of it, and it reports as a patch like every other edit so
-          the split warning gates it too. `enabled` isn't vocabulary-driven
-          -- every schema this sheet edits carries an on/off column -- so
-          this is the one write here that stays outside the `P` inference
-          `ConditionEditor` participates in, and needs its own narrow
-          assertion rather than a structural guarantee. */}
-      <div className="flex items-center justify-between gap-2">
-        <Label htmlFor="rule-enabled">Enabled</Label>
-        <Switch
-          id="rule-enabled"
-          checked={enabled}
-          onCheckedChange={(next) =>
-            onChange?.({ enabled: next } as unknown as P)
-          }
-        />
-      </div>
+          the split warning gates it too. Which column it writes -- and
+          whether the schema has one at all -- comes off the vocabulary
+          like every other field here: Poracle's alerts have no per-alert
+          enabled column (its flag is account-level, on the human row), so
+          its vocabulary omits `enabledField` and the control does not
+          render rather than writing a field the row hasn't got. */}
+      {enabledField && (
+        <div className="flex items-center justify-between gap-2">
+          <Label htmlFor="rule-enabled">Enabled</Label>
+          <Switch
+            id="rule-enabled"
+            checked={enabled}
+            onCheckedChange={(next) =>
+              // The key is `keyof P & string` off the vocabulary, so the
+              // column is compiler-checked; only the write-through-a-
+              // generic-key is what TypeScript cannot prove on its own.
+              onChange?.({ [enabledField]: next } as unknown as P)
+            }
+          />
+        </div>
+      )}
       <ConditionEditor
         vocabulary={resolvedVocabulary}
         {...(conditions ? { conditions } : {})}

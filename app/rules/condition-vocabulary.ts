@@ -132,6 +132,16 @@ export interface Vocabulary<P extends ConditionPatch = ConditionPatch> {
   conditions: ConditionDef<P>[]
   /** Appearance or delivery, rendered after the conditions in the sentence. */
   tail: ConditionDef<P>[]
+  /**
+   * The column a whole row is switched off with, if the schema has one.
+   * ReactMap's `rule` table does; Poracle's `monsters` does not -- its
+   * enabled flag is account-level, on the human row, not per alert. The
+   * sheet's on/off `Switch` renders only when this is set, so a schema
+   * without the column neither shows the control nor is written a field
+   * it hasn't got. Typed `keyof P` so naming a column the patch does not
+   * carry is a compile error rather than a runtime surprise.
+   */
+  enabledField?: keyof P & string
 }
 
 /** Golbat stores a league as its CP cap, so the cap is the league's name. */
@@ -152,6 +162,7 @@ const SIZE_RANGE_WORD: Record<number, string> = {
 
 export const REACTMAP_VOCABULARY: Vocabulary<RulePatch> = {
   id: 'reactmap',
+  enabledField: 'enabled',
   conditions: [
     {
       kind: 'range',
