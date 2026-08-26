@@ -21,11 +21,16 @@ function renderPanel(overrides: Partial<HumanPanelProps> = {}) {
       areas: [],
     },
     profiles: [{ profileNo: 1, name: 'default' }],
+    locations: [],
     onSetEnabled: () => {},
     onSwitchProfile: () => {},
     onAddProfile: () => {},
     onDeleteProfile: () => {},
     onCopyProfileRules: () => {},
+    onSetAreas: () => {},
+    onAddLocation: () => {},
+    onUpdateLocation: () => {},
+    onDeleteLocation: () => {},
     ...overrides,
   }
   return render(<HumanPanel {...props} />)
@@ -259,4 +264,144 @@ test('arrow keys move focus between profile options, not just the active one', (
 
   fireEvent.keyDown(workOption, { key: 'ArrowUp' })
   expect(document.activeElement).toBe(defaultOption)
+})
+
+// --- areas -------------------------------------------------------------
+
+test('each selected area renders with a way to remove it', () => {
+  const calls: string[][] = []
+  const { getByRole } = renderPanel({
+    human: {
+      enabled: true,
+      currentProfileNo: 1,
+      latitude: null,
+      longitude: null,
+      areas: ['downtown', 'uptown'],
+    },
+    onSetAreas: (areas) => calls.push(areas),
+  })
+  fireEvent.click(getByRole('button', { name: /remove area downtown/i }))
+  expect(calls).toEqual([['uptown']])
+})
+
+test('typing an area name and adding sends the full updated list, then clears the field', () => {
+  const calls: string[][] = []
+  const { getByRole } = renderPanel({
+    human: {
+      enabled: true,
+      currentProfileNo: 1,
+      latitude: null,
+      longitude: null,
+      areas: ['downtown'],
+    },
+    onSetAreas: (areas) => calls.push(areas),
+  })
+  const input = getByRole('textbox', { name: /new area name/i })
+  fireEvent.change(input, { target: { value: 'uptown' } })
+  fireEvent.click(getByRole('button', { name: /^add area$/i }))
+  expect(calls).toEqual([['downtown', 'uptown']])
+  expect((input as HTMLInputElement).value).toBe('')
+})
+
+test('an empty or blank area name is never sent', () => {
+  const calls: string[][] = []
+  const { getByRole } = renderPanel({
+    onSetAreas: (areas) => calls.push(areas),
+  })
+  fireEvent.click(getByRole('button', { name: /^add area$/i }))
+  const input = getByRole('textbox', { name: /new area name/i })
+  fireEvent.change(input, { target: { value: '   ' } })
+  fireEvent.click(getByRole('button', { name: /^add area$/i }))
+  expect(calls).toEqual([])
+})
+
+// --- saved locations -----------------------------------------------------
+
+test('each saved location renders its label and coordinates', () => {
+  const { getByRole } = renderPanel({
+    locations: [{ label: 'work', latitude: 1, longitude: 2 }],
+  })
+  const list = within(getByRole('list', { name: /saved locations/i }))
+  expect(list.getByText(/work \(1, 2\)/)).toBeTruthy()
+})
+
+test('filling label, latitude and longitude and adding creates a location, then clears the fields', () => {
+  const calls: [string, number, number][] = []
+  const { getByRole } = renderPanel({
+    onAddLocation: (label, latitude, longitude) =>
+      calls.push([label, latitude, longitude]),
+  })
+  fireEvent.change(getByRole('textbox', { name: /new location label/i }), {
+    target: { value: 'work' },
+  })
+  fireEvent.change(
+    getByRole('spinbutton', { name: /new location latitude/i }),
+    { target: { value: '1' } },
+  )
+  fireEvent.change(
+    getByRole('spinbutton', { name: /new location longitude/i }),
+    { target: { value: '2' } },
+  )
+  fireEvent.click(getByRole('button', { name: /^add location$/i }))
+  expect(calls).toEqual([['work', 1, 2]])
+  expect(
+    (getByRole('textbox', { name: /new location label/i }) as HTMLInputElement)
+      .value,
+  ).toBe('')
+})
+
+test('adding a location with no coordinates is never sent', () => {
+  const calls: unknown[] = []
+  const { getByRole } = renderPanel({
+    onAddLocation: (...args) => calls.push(args),
+  })
+  fireEvent.change(getByRole('textbox', { name: /new location label/i }), {
+    target: { value: 'work' },
+  })
+  fireEvent.click(getByRole('button', { name: /^add location$/i }))
+  expect(calls).toEqual([])
+})
+
+test('editing a location saves the new coordinates it was given', () => {
+  const calls: [string, number, number][] = []
+  const { getByRole } = renderPanel({
+    locations: [{ label: 'work', latitude: 1, longitude: 2 }],
+    onUpdateLocation: (label, latitude, longitude) =>
+      calls.push([label, latitude, longitude]),
+  })
+  fireEvent.click(getByRole('button', { name: /^edit$/i }))
+  fireEvent.change(getByRole('spinbutton', { name: /latitude for work/i }), {
+    target: { value: '3' },
+  })
+  fireEvent.change(getByRole('spinbutton', { name: /longitude for work/i }), {
+    target: { value: '4' },
+  })
+  fireEvent.click(getByRole('button', { name: /^save$/i }))
+  expect(calls).toEqual([['work', 3, 4]])
+})
+
+test('deleting a location asks for confirmation before calling back', async () => {
+  const calls: string[] = []
+  const { getByRole, findByRole } = renderPanel({
+    locations: [{ label: 'work', latitude: 1, longitude: 2 }],
+    onDeleteLocation: (label) => calls.push(label),
+  })
+  fireEvent.click(getByRole('button', { name: /delete location work/i }))
+  expect(calls).toEqual([])
+  const dialog = await findByRole('alertdialog')
+  fireEvent.click(within(dialog).getByRole('button', { name: /^delete$/i }))
+  expect(calls).toEqual(['work'])
+})
+
+test('cancelling a location delete never calls back', async () => {
+  const calls: string[] = []
+  const { getByRole, findByRole, queryByRole } = renderPanel({
+    locations: [{ label: 'work', latitude: 1, longitude: 2 }],
+    onDeleteLocation: (label) => calls.push(label),
+  })
+  fireEvent.click(getByRole('button', { name: /delete location work/i }))
+  const dialog = await findByRole('alertdialog')
+  fireEvent.click(within(dialog).getByRole('button', { name: /cancel/i }))
+  expect(calls).toEqual([])
+  expect(queryByRole('alertdialog')).toBeNull()
 })

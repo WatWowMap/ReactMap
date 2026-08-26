@@ -28,6 +28,7 @@ import {
 import { type HumanState, resolveHumanState } from '../services/poracle-human'
 import {
   type AlertsSnapshot,
+  type LocationView,
   toAlertRow,
   toAlertsSnapshot,
 } from '../services/poracle-view'
@@ -157,6 +158,40 @@ function pokemonPath(platformId: string): string {
 /** One profile, by number, under this human. */
 function profilePath(platformId: string, profileNo: number): string {
   return `${humanPath(platformId)}/profiles/${profileNo}`
+}
+
+/** This human's selectable areas. */
+function areasPath(platformId: string): string {
+  return `${humanPath(platformId)}/areas`
+}
+
+/** This human's saved locations. */
+function locationsPath(platformId: string): string {
+  return `${humanPath(platformId)}/locations`
+}
+
+/** One saved location, by label. Poracle matches the label case-insensitively. */
+function locationPath(platformId: string, label: string): string {
+  return `${locationsPath(platformId)}/${encodeURIComponent(label)}`
+}
+
+/**
+ * `areas`, with every entry the operator listed in `poracleConfig.areasToSkip`
+ * removed.
+ *
+ * 1.x normalised `areasToSkip` to lowercase at boot and compared
+ * case-insensitively; Poracle itself already lowercases every area name it
+ * stores (`v2SetAreasBody`, `v2_humans.go`), so the only side left to
+ * lowercase here is the operator's own list.
+ */
+function withoutSkippedAreas(
+  areas: string[],
+  poracleConfig: Partial<Poracle> | null | undefined,
+): string[] {
+  const skip = new Set(
+    (poracleConfig?.areasToSkip ?? []).map((area) => area.toLowerCase()),
+  )
+  return areas.filter((area) => !skip.has(area.toLowerCase()))
 }
 
 /**
@@ -706,7 +741,18 @@ const alertsRouter = t.router({
     try {
       const res = await client.get(trackingPath(platformId))
       if (res.status < 200 || res.status >= 300) return toAlertsSnapshot(null)
-      return toAlertsSnapshot(res.body)
+      const snapshot = toAlertsSnapshot(res.body)
+      return {
+        ...snapshot,
+        human: {
+          ...snapshot.human,
+          // `config.poracle.areasToSkip` lets an operator hide an area from
+          // everyone; distance = 0 means "use my areas", so an area offered
+          // here silently becomes geographic scope the operator meant to
+          // hide.
+          areas: withoutSkippedAreas(snapshot.human.areas, ctx.poracleConfig),
+        },
+      }
     } catch {
       // A Poracle that is not answering is an empty tab, the same way
       // `readHuman` already degrades. Throwing here turns a restart into an
@@ -953,6 +999,126 @@ const alertsRouter = t.router({
         'That profile was not found',
       )
       return { toProfileNo }
+    }),
+
+  /**
+   * Sets this human's selected areas -- what a `distance = 0` alert actually
+   * fires against.
+   *
+   * Poracle's own endpoint already lowercases, dedups and intersects against
+   * what this human may select; `withoutSkippedAreas` additionally drops
+   * anything the operator listed in `areasToSkip`, so a hidden area cannot be
+   * selected here either, not only left off the read side. Poracle's response
+   * is `{ status: "ok" }` and names nothing, so what is returned is the set
+   * that was actually sent -- the same convention `setEnabled` follows.
+   */
+  setAreas: t.procedure
+    .input(z.object({ areas: z.array(z.string().max(255)).max(1000) }))
+    .mutation(async ({ ctx, input }): Promise<{ areas: string[] }> => {
+      const { client, platformId } = await requireClientAndPlatform(ctx)
+      const areas = withoutSkippedAreas(input.areas, ctx.poracleConfig)
+      await sendWrite(
+        client,
+        'POST',
+        areasPath(platformId),
+        { areas },
+        'That account was not found',
+      )
+      return { areas }
+    }),
+
+  /**
+   * Creates a saved location. Poracle's response is `{ status: "ok" }`, so
+   * what is returned is what was just saved, not anything read off the wire.
+   */
+  addLocation: t.procedure
+    .input(
+      z.object({
+        label: z.string().min(1).max(255),
+        latitude: z.number(),
+        longitude: z.number(),
+      }),
+    )
+    .mutation(async ({ ctx, input }): Promise<LocationView> => {
+      const { client, platformId } = await requireClientAndPlatform(ctx)
+      await sendWrite(
+        client,
+        'POST',
+        locationsPath(platformId),
+        { label: input.label, lat: input.latitude, lon: input.longitude },
+        'That account was not found',
+      )
+      return {
+        label: input.label,
+        latitude: input.latitude,
+        longitude: input.longitude,
+      }
+    }),
+
+  /**
+   * Overwrites the coordinates of an existing saved location. Poracle 404s a
+   * label that does not exist, and its response otherwise names nothing, so
+   * this echoes the coordinates that were just saved.
+   */
+  updateLocation: t.procedure
+    .input(
+      z.object({
+        label: z.string().min(1).max(255),
+        latitude: z.number(),
+        longitude: z.number(),
+      }),
+    )
+    .mutation(async ({ ctx, input }): Promise<LocationView> => {
+      const { client, platformId } = await requireClientAndPlatform(ctx)
+      await sendWrite(
+        client,
+        'PUT',
+        locationPath(platformId, input.label),
+        { lat: input.latitude, lon: input.longitude },
+        'That location was not found',
+      )
+      return {
+        label: input.label,
+        latitude: input.latitude,
+        longitude: input.longitude,
+      }
+    }),
+
+  /**
+   * Deletes a saved location -- refused when any alert still anchors to it.
+   *
+   * `override_location_label` names a row here, and Poracle's own
+   * `resolveOverride` (`matching/generic.go`) falls back to the person's
+   * default position, silently and without error, when the label it holds no
+   * longer resolves. So a delete that proceeded anyway would not break the
+   * alert -- it would leave it running, quietly measuring from the wrong
+   * place, which is worse than a delete that failed loudly. The label is
+   * matched case-insensitively, the same way Poracle's own locations
+   * endpoints do.
+   */
+  deleteLocation: t.procedure
+    .input(z.object({ label: z.string().min(1).max(255) }))
+    .mutation(async ({ ctx, input }): Promise<{ deleted: string }> => {
+      const { client, platformId } = await requireClientAndPlatform(ctx)
+      const body = await readSnapshotForWrite(client, platformId)
+      const label = input.label.toLowerCase()
+      const inUse = toAlertsSnapshot(body).alerts.some(
+        (alert) => (alert.overrideLocationLabel ?? '').toLowerCase() === label,
+      )
+      if (inUse) {
+        throw new TRPCError({
+          code: 'BAD_REQUEST',
+          message: 'That location is in use by an alert and cannot be deleted',
+        })
+      }
+      await sendWrite(
+        client,
+        'DELETE',
+        locationPath(platformId, input.label),
+        undefined,
+        'That location was not found',
+      )
+      return { deleted: input.label }
     }),
 })
 

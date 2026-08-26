@@ -43,6 +43,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '../components/ui/alert-dialog'
+import { Badge } from '../components/ui/badge'
 import { Button } from '../components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card'
 import { Input } from '../components/ui/input'
@@ -52,16 +53,45 @@ import {
   NativeSelectOption,
 } from '../components/ui/native-select'
 import { Switch } from '../components/ui/switch'
-import type { HumanView, ProfileView } from './alerts-query'
+import type { HumanView, LocationView, ProfileView } from './alerts-query'
 
 export interface HumanPanelProps {
   human: HumanView
   profiles: ProfileView[]
+  /**
+   * Optional, and defaulted to `[]`, so that a caller wired up before this
+   * task's `alerts.addLocation` / `alerts.updateLocation` /
+   * `alerts.deleteLocation` procedures existed keeps compiling. Wiring
+   * `AlertsPage` itself to these four controls is outside this task's scope
+   * (see the module comment) -- flagged rather than done here.
+   */
+  locations?: LocationView[]
   onSetEnabled: (enabled: boolean) => void
   onSwitchProfile: (profileNo: number) => void
   onAddProfile: (name: string) => void
   onDeleteProfile: (profileNo: number) => void
   onCopyProfileRules: (fromProfileNo: number, toProfileNo: number) => void
+  /**
+   * Replaces the whole selected-areas list. `distance = 0` on a rule means
+   * "use my areas" (`server/src/trpc/alerts-router.ts`), so this list is the
+   * geographic scope every such rule fires against, not decoration.
+   */
+  onSetAreas?: (areas: string[]) => void
+  onAddLocation?: (label: string, latitude: number, longitude: number) => void
+  onUpdateLocation?: (
+    label: string,
+    latitude: number,
+    longitude: number,
+  ) => void
+  /**
+   * Deletes a saved location. The router refuses this when a rule's
+   * `overrideLocationLabel` still names it -- Poracle's `resolveOverride`
+   * falls back to this person's default position, silently, when a label no
+   * longer resolves. That refusal surfaces the same way every other write
+   * failure does (`useAlerts.error`), so this panel only needs to confirm
+   * before asking.
+   */
+  onDeleteLocation?: (label: string) => void
 }
 
 function profileName(profiles: ProfileView[], profileNo: number): string {
@@ -71,11 +101,16 @@ function profileName(profiles: ProfileView[], profileNo: number): string {
 export function HumanPanel({
   human,
   profiles,
+  locations = [],
   onSetEnabled,
   onSwitchProfile,
   onAddProfile,
   onDeleteProfile,
   onCopyProfileRules,
+  onSetAreas = () => {},
+  onAddLocation = () => {},
+  onUpdateLocation = () => {},
+  onDeleteLocation = () => {},
 }: HumanPanelProps) {
   // Uncontrolled on purpose: this field is read once, at the moment "Add
   // profile" is clicked, and there is nothing else on screen that needs to
@@ -106,6 +141,58 @@ export function HumanPanel({
   >(null)
 
   const copyDisabled = toProfileNo === '' || toProfileNo === fromProfileNo
+
+  // Uncontrolled for the same reason `newProfileNameRef` is: read once, on
+  // click, rather than driven by state this harness's happy-dom setup does
+  // not dispatch the events for.
+  const newAreaRef = useRef<HTMLInputElement>(null)
+  const newLocationLabelRef = useRef<HTMLInputElement>(null)
+  const newLocationLatRef = useRef<HTMLInputElement>(null)
+  const newLocationLonRef = useRef<HTMLInputElement>(null)
+  const editLatRefs = useRef<Record<string, HTMLInputElement | null>>({})
+  const editLonRefs = useRef<Record<string, HTMLInputElement | null>>({})
+
+  const [editingLabel, setEditingLabel] = useState<string | null>(null)
+  const [pendingDeleteLabel, setPendingDeleteLabel] = useState<string | null>(
+    null,
+  )
+
+  function removeArea(area: string) {
+    onSetAreas(human.areas.filter((existing) => existing !== area))
+  }
+
+  function addArea() {
+    const name = newAreaRef.current?.value.trim() ?? ''
+    if (!name) return
+    if (!human.areas.includes(name)) onSetAreas([...human.areas, name])
+    if (newAreaRef.current) newAreaRef.current.value = ''
+  }
+
+  function addLocation() {
+    const label = newLocationLabelRef.current?.value.trim() ?? ''
+    const latitude = newLocationLatRef.current?.valueAsNumber
+    const longitude = newLocationLonRef.current?.valueAsNumber
+    if (!label || !Number.isFinite(latitude) || !Number.isFinite(longitude))
+      return
+    onAddLocation(label, latitude as number, longitude as number)
+    if (newLocationLabelRef.current) newLocationLabelRef.current.value = ''
+    if (newLocationLatRef.current) newLocationLatRef.current.value = ''
+    if (newLocationLonRef.current) newLocationLonRef.current.value = ''
+  }
+
+  function saveLocation(label: string) {
+    const latitude = editLatRefs.current[label]?.valueAsNumber
+    const longitude = editLonRefs.current[label]?.valueAsNumber
+    if (Number.isFinite(latitude) && Number.isFinite(longitude)) {
+      onUpdateLocation(label, latitude as number, longitude as number)
+    }
+    setEditingLabel(null)
+  }
+
+  function confirmDeleteLocation() {
+    if (pendingDeleteLabel !== null) onDeleteLocation(pendingDeleteLabel)
+    setPendingDeleteLabel(null)
+  }
 
   function addProfile() {
     const name = newProfileNameRef.current?.value.trim() ?? ''
@@ -292,6 +379,125 @@ export function HumanPanel({
             </div>
           </div>
         )}
+
+        <div className="flex flex-col gap-2 border-t border-border pt-3">
+          <span className="text-sm text-muted-foreground">
+            Areas -- what a rule with no radius fires against
+          </span>
+          <ul className="flex flex-wrap gap-2" aria-label="Areas">
+            {human.areas.map((area) => (
+              <li key={area}>
+                <Badge variant="secondary" className="gap-1">
+                  {area}
+                  <button
+                    type="button"
+                    aria-label={`Remove area ${area}`}
+                    onClick={() => removeArea(area)}
+                  >
+                    {'×'}
+                  </button>
+                </Badge>
+              </li>
+            ))}
+          </ul>
+          <div className="flex items-center gap-2">
+            <Input
+              ref={newAreaRef}
+              aria-label="New area name"
+              defaultValue=""
+            />
+            <Button type="button" variant="outline" onClick={addArea}>
+              Add area
+            </Button>
+          </div>
+        </div>
+
+        <div className="flex flex-col gap-2 border-t border-border pt-3">
+          <span className="text-sm text-muted-foreground">Saved locations</span>
+          <ul className="flex flex-col gap-2" aria-label="Saved locations">
+            {locations.map((location) => (
+              <li
+                key={location.label}
+                className="flex items-center justify-between gap-2"
+              >
+                {editingLabel === location.label ? (
+                  <>
+                    <span className="flex-1 text-sm">{location.label}</span>
+                    <Input
+                      ref={(el) => {
+                        editLatRefs.current[location.label] = el
+                      }}
+                      type="number"
+                      aria-label={`Latitude for ${location.label}`}
+                      defaultValue={location.latitude}
+                    />
+                    <Input
+                      ref={(el) => {
+                        editLonRefs.current[location.label] = el
+                      }}
+                      type="number"
+                      aria-label={`Longitude for ${location.label}`}
+                      defaultValue={location.longitude}
+                    />
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => saveLocation(location.label)}
+                    >
+                      Save
+                    </Button>
+                  </>
+                ) : (
+                  <>
+                    <span className="flex-1 text-sm">
+                      {`${location.label} (${location.latitude}, ${location.longitude})`}
+                    </span>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setEditingLabel(location.label)}
+                    >
+                      Edit
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      aria-label={`Delete location ${location.label}`}
+                      onClick={() => setPendingDeleteLabel(location.label)}
+                    >
+                      Delete
+                    </Button>
+                  </>
+                )}
+              </li>
+            ))}
+          </ul>
+          <div className="flex items-center gap-2">
+            <Input
+              ref={newLocationLabelRef}
+              aria-label="New location label"
+              defaultValue=""
+            />
+            <Input
+              ref={newLocationLatRef}
+              type="number"
+              aria-label="New location latitude"
+              defaultValue=""
+            />
+            <Input
+              ref={newLocationLonRef}
+              type="number"
+              aria-label="New location longitude"
+              defaultValue=""
+            />
+            <Button type="button" variant="outline" onClick={addLocation}>
+              Add location
+            </Button>
+          </div>
+        </div>
       </CardContent>
 
       {pendingCopy && (
@@ -350,6 +556,32 @@ export function HumanPanel({
                 Cancel
               </AlertDialogCancel>
               <AlertDialogAction onClick={confirmDelete}>
+                Delete
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+      )}
+
+      {pendingDeleteLabel !== null && (
+        <AlertDialog
+          open
+          onOpenChange={(open) => {
+            if (!open) setPendingDeleteLabel(null)
+          }}
+        >
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Delete this location?</AlertDialogTitle>
+              <AlertDialogDescription>
+                {`This deletes ${pendingDeleteLabel}. A rule still pointing at it will be refused rather than deleted.`}
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel onClick={() => setPendingDeleteLabel(null)}>
+                Cancel
+              </AlertDialogCancel>
+              <AlertDialogAction onClick={confirmDeleteLocation}>
                 Delete
               </AlertDialogAction>
             </AlertDialogFooter>

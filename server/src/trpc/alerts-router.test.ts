@@ -1004,3 +1004,196 @@ test('addProfile also fails loudly on a transport failure', async () => {
     caller({ ...BASE, poracleClient: client }).addProfile({ name: 'work' }),
   ).rejects.toThrow(/could not be saved/i)
 })
+
+// --- areas and saved locations ----------------------------------------------
+
+test('areasToSkip are not offered', async () => {
+  // Config-level suppression. 1.x normalised these to lowercase at boot and
+  // compared case-insensitively; matching case-sensitively would silently
+  // offer an area the operator hid.
+  const client = fakePoracle({
+    ...SNAPSHOT_BODY,
+    human: {
+      ...SNAPSHOT_BODY.human,
+      area: JSON.stringify(['downtown', 'uptown']),
+    },
+  })
+  const ctx = {
+    ...BASE,
+    poracleClient: client,
+    poracleConfig: { areasToSkip: ['Downtown'] },
+  }
+  const res = await caller(ctx).snapshot()
+  expect(res.human.areas).not.toContain('downtown')
+  expect(res.human.areas).toContain('uptown')
+})
+
+test('setAreas posts the filtered set and echoes what was actually sent', async () => {
+  const client = fakeProfileWrites()
+  const ctx = {
+    ...BASE,
+    poracleClient: client,
+    poracleConfig: { areasToSkip: ['Downtown'] },
+  }
+  const result = await caller(ctx).setAreas({ areas: ['downtown', 'uptown'] })
+  expect(result).toEqual({ areas: ['uptown'] })
+  expect(client.sent).toEqual([
+    {
+      method: 'POST',
+      path: '/v2/humans/123/areas',
+      body: { areas: ['uptown'] },
+    },
+  ])
+})
+
+test("setAreas' transport failure fails loudly, not as a silent no-op", async () => {
+  const client = fakeProfileWrites({ sendThrows: true })
+  await expect(
+    caller({ ...BASE, poracleClient: client }).setAreas({ areas: ['uptown'] }),
+  ).rejects.toThrow(/could not be saved/i)
+})
+
+test('addLocation posts to the locations collection and echoes what was saved', async () => {
+  const client = fakeProfileWrites()
+  const result = await caller({ ...BASE, poracleClient: client }).addLocation({
+    label: 'work',
+    latitude: 1,
+    longitude: 2,
+  })
+  expect(result).toEqual({ label: 'work', latitude: 1, longitude: 2 })
+  expect(client.sent).toEqual([
+    {
+      method: 'POST',
+      path: '/v2/humans/123/locations',
+      body: { label: 'work', lat: 1, lon: 2 },
+    },
+  ])
+})
+
+test("addLocation's non-2xx fails as a bad gateway, not a silent no-op", async () => {
+  const client = fakeProfileWrites({ sendStatus: 409 })
+  await expect(
+    caller({ ...BASE, poracleClient: client }).addLocation({
+      label: 'work',
+      latitude: 1,
+      longitude: 2,
+    }),
+  ).rejects.toThrow(/could not be saved/i)
+})
+
+test("updateLocation puts to the location's own path and echoes the new coordinates", async () => {
+  const client = fakeProfileWrites()
+  const result = await caller({
+    ...BASE,
+    poracleClient: client,
+  }).updateLocation({ label: 'work', latitude: 3, longitude: 4 })
+  expect(result).toEqual({ label: 'work', latitude: 3, longitude: 4 })
+  expect(client.sent).toEqual([
+    {
+      method: 'PUT',
+      path: '/v2/humans/123/locations/work',
+      body: { lat: 3, lon: 4 },
+    },
+  ])
+})
+
+test("updateLocation's 404 names the location, not an alert or a profile", async () => {
+  const client = fakeProfileWrites({ sendStatus: 404 })
+  await expect(
+    caller({ ...BASE, poracleClient: client }).updateLocation({
+      label: 'ghost',
+      latitude: 3,
+      longitude: 4,
+    }),
+  ).rejects.toThrow(/location was not found/i)
+})
+
+test('deleting a saved location an alert anchors to is refused', async () => {
+  // resolveOverride falls back to the person's default position when a label
+  // points at a location that no longer exists, silently and without error.
+  // So the alert keeps working and quietly measures from the wrong place.
+  const ctx = {
+    ...BASE,
+    poracleClient: {
+      get: async () => ({
+        status: 200,
+        body: {
+          ...SNAPSHOT_BODY,
+          tracking: { pokemon: [{ uid: 1, override_location_label: 'work' }] },
+          locations: {
+            locations: [{ label: 'work', latitude: 1, longitude: 2 }],
+          },
+        },
+      }),
+      send: async () => ({ status: 200, body: {} }),
+    },
+  }
+  await expect(caller(ctx).deleteLocation({ label: 'work' })).rejects.toThrow(
+    /in use/i,
+  )
+})
+
+test('a location referenced under a different case is still refused', async () => {
+  const ctx = {
+    ...BASE,
+    poracleClient: {
+      get: async () => ({
+        status: 200,
+        body: {
+          ...SNAPSHOT_BODY,
+          tracking: { pokemon: [{ uid: 1, override_location_label: 'Work' }] },
+        },
+      }),
+      send: async () => ({ status: 200, body: {} }),
+    },
+  }
+  await expect(caller(ctx).deleteLocation({ label: 'work' })).rejects.toThrow(
+    /in use/i,
+  )
+})
+
+test('a location not in use deletes normally', async () => {
+  const ctx = {
+    ...BASE,
+    poracleClient: {
+      get: async () => ({ status: 200, body: SNAPSHOT_BODY }),
+      send: async () => ({ status: 200, body: {} }),
+    },
+  }
+  expect(await caller(ctx).deleteLocation({ label: 'unused' })).toEqual({
+    deleted: 'unused',
+  })
+})
+
+test('deleteLocation sends the delete to the label-scoped path', async () => {
+  const sent: { method: string; path: string }[] = []
+  const ctx = {
+    ...BASE,
+    poracleClient: {
+      get: async () => ({ status: 200, body: SNAPSHOT_BODY }),
+      send: async (method: string, path: string) => {
+        sent.push({ method, path })
+        return { status: 200, body: {} }
+      },
+    },
+  }
+  await caller(ctx).deleteLocation({ label: 'unused' })
+  expect(sent).toEqual([
+    { method: 'DELETE', path: '/v2/humans/123/locations/unused' },
+  ])
+})
+
+test("deleteLocation's transport failure fails loudly, not as a silent no-op", async () => {
+  const ctx = {
+    ...BASE,
+    poracleClient: {
+      get: async () => ({ status: 200, body: SNAPSHOT_BODY }),
+      send: async () => {
+        throw new Error('fetch failed: ECONNREFUSED')
+      },
+    },
+  }
+  await expect(caller(ctx).deleteLocation({ label: 'unused' })).rejects.toThrow(
+    /could not be saved/i,
+  )
+})
