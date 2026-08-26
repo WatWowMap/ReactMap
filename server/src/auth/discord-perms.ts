@@ -1,4 +1,5 @@
 // server/src/auth/discord-perms.ts
+import { alertsPerm } from '../utils/alerts-perms'
 import type { DiscordGuildResult } from './discord-roles'
 
 /**
@@ -47,6 +48,11 @@ function computeDiscordPerms(
     )
     perms.admin = false
     perms.trial = false
+    // Seeded here so the key is present on every object this function
+    // returns; the branches that know the account's role ids overwrite it
+    // below. basePerms has no roles in scope, and an absent key reads as a
+    // denial only by accident.
+    perms.alerts = false
     return perms
   }
 
@@ -60,6 +66,9 @@ function computeDiscordPerms(
       if (rules.permsConfig[key]?.enabled) perms[key] = true
     })
     perms.admin = true
+    // 1.x's allowedUsers branch added every configured webhook to the
+    // account's grants. Operators use allowedUsers for their own accounts.
+    perms.alerts = true
     return perms
   }
 
@@ -98,10 +107,17 @@ function computeDiscordPerms(
       .filter(Boolean)
   }
 
+  // Every role id the account holds in a guild the operator allows, which is
+  // the same set `permsConfig[key].roles` is matched against below. Alerts is
+  // a single yes/no rather than a per-guild answer, so the union is what
+  // `alertsPerm` wants.
+  const roleIds: string[] = []
+
   rules.allowedGuilds.forEach((guildId) => {
     const result = resultFor(guildId)
     if (result?.status !== 'member') return
     const roles = result.roles
+    roleIds.push(...roles)
     Object.keys(rules.permsConfig).forEach((key) => {
       const info = rules.permsConfig[key]
       if (!info?.enabled) return
@@ -115,6 +131,8 @@ function computeDiscordPerms(
       }
     })
   })
+
+  perms.alerts = alertsPerm(roleIds, 'discordRoles')
 
   return perms
 }

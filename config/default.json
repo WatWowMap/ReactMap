@@ -701,7 +701,19 @@
       "telegramGroups": []
     }
   },
-  "webhooks": [],
+  "poracle": {
+    "enabled": false,
+    "host": "http://localhost",
+    "port": 3030,
+    "poracleSecret": "",
+    "addressFormat": "",
+    "nominatimUrl": "",
+    "geocoderProvider": "nominatim",
+    "areasToSkip": [],
+    "discordRoles": [],
+    "telegramGroups": [],
+    "local": []
+  },
   "authentication": {
     "strategies": [
       {

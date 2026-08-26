@@ -2,9 +2,9 @@
 
 import config from '@rm/config'
 
+import { alertsPerm } from '../utils/alerts-perms'
 import { areaPerms } from '../utils/area-perms'
 import { scannerCooldownBypass, scannerPerms } from '../utils/scanner-perms'
-import { webhookPerms } from '../utils/webhook-perms'
 
 /** The role identifier every credential (local, non-social) account carries. */
 const LOCAL_ROLE = 'local'
@@ -59,7 +59,7 @@ function computeLocalPerms(rules: {
   // as `getFromConfigOverrideOrArea` in packages/config/lib/index.js does
   // for the same reason.
   perms.areaRestrictions = config.has('areas') ? areaPerms([LOCAL_ROLE]) : []
-  perms.webhooks = webhookPerms([LOCAL_ROLE], 'local')
+  perms.alerts = alertsPerm([LOCAL_ROLE], 'local')
   perms.scanner = scannerPerms([LOCAL_ROLE], 'local')
   perms.scannerCooldownBypass = scannerCooldownBypass([LOCAL_ROLE], 'local')
   return perms

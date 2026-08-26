@@ -32,7 +32,7 @@ export type Config<Client extends boolean = false> = DeepMerge<
           title: string
         }
       : never
-    webhooks: Webhook[]
+    poracle: Poracle
     tileServers: TileLayer[]
     devOptions: {
       logLevel: LogLevelNames
@@ -177,10 +177,8 @@ export interface ExtraField {
   disabled: boolean
 }
 
-export interface Webhook {
+export interface Poracle {
   enabled: boolean
-  provider: 'poracle'
-  name: string
   host: string
   port: number
   poracleSecret: string
@@ -193,11 +191,10 @@ export interface Webhook {
    * handling. Defaults to `nominatim`.
    */
   geocoderProvider?: 'nominatim' | 'photon'
-  trialPeriodEligible?: boolean
   areasToSkip: string[]
-  discordRoles: []
-  telegramGroups: []
-  local: []
+  discordRoles: string[]
+  telegramGroups: string[]
+  local: string[]
 }
 
 export interface GridSizes {

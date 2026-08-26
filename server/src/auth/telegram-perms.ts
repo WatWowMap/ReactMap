@@ -2,9 +2,9 @@
 
 import config from '@rm/config'
 
+import { alertsPerm } from '../utils/alerts-perms'
 import { areaPerms } from '../utils/area-perms'
 import { scannerCooldownBypass, scannerPerms } from '../utils/scanner-perms'
-import { webhookPerms } from '../utils/webhook-perms'
 
 /**
  * Pure: computes the permission set for a Telegram account, given the
@@ -19,7 +19,7 @@ import { webhookPerms } from '../utils/webhook-perms'
  * Discord's "allowedUsers skips everything" bypass, `signInGate.js`'s own
  * tests already rely on that difference), and area/webhook/scanner perms
  * derived from the same `groups` list via the shared, config-driven
- * `areaPerms`/`webhookPerms`/`scannerPerms` utilities (not the forbidden
+ * `areaPerms`/`alertsPerm`/`scannerPerms` utilities (not the forbidden
  * `TelegramClient` class -- those utilities live in `server/src/utils/` and
  * take plain role arrays, nothing 1.x-shaped).
  *
@@ -50,7 +50,7 @@ function computeTelegramPerms(
   // See local-perms.js's identical guard for why: config.areas is only set
   // once the server has actually booted and loaded area boundaries.
   perms.areaRestrictions = config.has('areas') ? areaPerms(user.groups) : []
-  perms.webhooks = webhookPerms(user.groups, 'telegramGroups')
+  perms.alerts = alertsPerm(user.groups, 'telegramGroups')
   perms.scanner = scannerPerms(user.groups, 'telegramGroups')
   perms.scannerCooldownBypass = scannerCooldownBypass(
     user.groups,

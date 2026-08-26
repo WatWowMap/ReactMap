@@ -30,6 +30,7 @@ test('an allowedUsers id gets every enabled perm and admin, guildResults notwith
     pokemon: true,
     admin: true,
     trial: false,
+    alerts: true,
   })
 })
 
