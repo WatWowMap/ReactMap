@@ -770,7 +770,20 @@ const PROFILES_BODY = {
   ],
 }
 
-function fakeProfileWrites(options: { body?: any; response?: any } = {}) {
+function fakeProfileWrites(
+  options: {
+    body?: any
+    response?: any
+    // Overrides the status `send` answers with -- 404 to exercise a
+    // procedure's own `notFoundMessage`, or any other non-2xx to exercise
+    // the generic BAD_GATEWAY path. Ignored when `sendThrows` is set.
+    sendStatus?: number
+    // A transport failure (connection refused, DNS, etc.) rather than an
+    // HTTP response at all -- `sendWrite` turns this into
+    // SERVICE_UNAVAILABLE, distinct from a Poracle-answered non-2xx.
+    sendThrows?: boolean
+  } = {},
+) {
   const sent: { method: string; path: string; body: any }[] = []
   return {
     sent,
@@ -781,7 +794,11 @@ function fakeProfileWrites(options: { body?: any; response?: any } = {}) {
     },
     send: async (method: string, path: string, body: any) => {
       sent.push({ method, path, body })
-      return { status: 200, body: options.response ?? {} }
+      if (options.sendThrows) throw new Error('fetch failed: ECONNREFUSED')
+      return {
+        status: options.sendStatus ?? 200,
+        body: options.response ?? {},
+      }
     },
   }
 }
@@ -891,4 +908,99 @@ test('copyProfileRules validates both profile numbers, not just the destination'
     }),
   ).rejects.toThrow(/profile/i)
   expect(client.sent).toEqual([])
+})
+
+test('copyProfileRules refuses a self-copy, because Poracle deletes the destination before reading the source', async () => {
+  // CopyProfile (store/human_sql.go) runs DELETE ... WHERE profile_no =
+  // toProfile, then SELECT ... WHERE profile_no = fromProfile. When the two
+  // are equal, the delete empties the profile and the select finds nothing
+  // left to restore -- a silent, total loss with a 200 back, unless this is
+  // refused before the round trip even starts.
+  const client = fakeProfileWrites()
+  await expect(
+    caller({ ...BASE, poracleClient: client }).copyProfileRules({
+      fromProfileNo: 1,
+      toProfileNo: 1,
+    }),
+  ).rejects.toThrow(/itself/i)
+  expect(client.sent).toEqual([])
+})
+
+// --- negative paths for the five procedures above --------------------------
+//
+// `fakeProfileWrites` previously only ever answered 200, so nothing here
+// exercised a Poracle 404, a non-2xx, or a transport failure for any of
+// them -- and `sendWrite`'s `notFoundMessage` override (added for these five
+// procedures) was never actually asserted to differ from one procedure to
+// the next.
+
+test("setEnabled's 404 names the account, not an alert or a profile", async () => {
+  const client = fakeProfileWrites({ sendStatus: 404 })
+  await expect(
+    caller({ ...BASE, poracleClient: client }).setEnabled({ enabled: true }),
+  ).rejects.toThrow(/account was not found/i)
+})
+
+test("switchProfile's 404 names the profile", async () => {
+  const client = fakeProfileWrites({ sendStatus: 404 })
+  await expect(
+    caller({ ...BASE, poracleClient: client }).switchProfile({
+      profileNo: 1,
+    }),
+  ).rejects.toThrow(/profile was not found/i)
+})
+
+test("addProfile's 404 names the account, not a profile that does not exist yet", async () => {
+  const client = fakeProfileWrites({ sendStatus: 404 })
+  await expect(
+    caller({ ...BASE, poracleClient: client }).addProfile({ name: 'work' }),
+  ).rejects.toThrow(/account was not found/i)
+})
+
+test("deleteProfile's 404 names the profile", async () => {
+  const client = fakeProfileWrites({ sendStatus: 404 })
+  await expect(
+    caller({ ...BASE, poracleClient: client }).deleteProfile({
+      profileNo: 1,
+    }),
+  ).rejects.toThrow(/profile was not found/i)
+})
+
+test("copyProfileRules' 404 names the profile", async () => {
+  const client = fakeProfileWrites({ sendStatus: 404 })
+  await expect(
+    caller({ ...BASE, poracleClient: client }).copyProfileRules({
+      fromProfileNo: 1,
+      toProfileNo: 2,
+    }),
+  ).rejects.toThrow(/profile was not found/i)
+})
+
+test('a non-2xx Poracle response fails a profile write as a bad gateway, not a silent no-op', async () => {
+  const client = fakeProfileWrites({ sendStatus: 500 })
+  await expect(
+    caller({ ...BASE, poracleClient: client }).switchProfile({
+      profileNo: 1,
+    }),
+  ).rejects.toThrow(/could not be saved/i)
+})
+
+test('a transport failure fails a profile write as unavailable, not a silent no-op', async () => {
+  const client = fakeProfileWrites({ sendThrows: true })
+  await expect(
+    caller({ ...BASE, poracleClient: client }).deleteProfile({
+      profileNo: 1,
+    }),
+  ).rejects.toThrow(/could not be saved/i)
+})
+
+test('addProfile also fails loudly on a transport failure', async () => {
+  // The one procedure of the five with no snapshot read of its own
+  // (`requireClientAndPlatform` rather than `beginProfileSession`), so its
+  // failure path is worth its own check rather than assuming it shares
+  // `deleteProfile`'s.
+  const client = fakeProfileWrites({ sendThrows: true })
+  await expect(
+    caller({ ...BASE, poracleClient: client }).addProfile({ name: 'work' }),
+  ).rejects.toThrow(/could not be saved/i)
 })

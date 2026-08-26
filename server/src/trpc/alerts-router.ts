@@ -914,6 +914,17 @@ const alertsRouter = t.router({
    * destination -- an owned destination fed a `fromProfileNo` belonging to
    * somebody else would still be a read of that person's rule set, even
    * though nothing about it is returned to the caller.
+   *
+   * A self-copy (`fromProfileNo === toProfileNo`) is refused before the round
+   * trip rather than merely discouraged client-side. `CopyProfile`
+   * (`store/human_sql.go`) runs, per tracking table, a `DELETE ... WHERE
+   * profile_no = toProfile` and only then a `SELECT ... WHERE profile_no =
+   * fromProfile`: when the two numbers are equal, the delete empties the
+   * profile and the select that was meant to repopulate it finds nothing --
+   * every rule in it gone, with a 200 back. The client-side guard
+   * (`human-panel.tsx`) exists so nobody has to find that out; this one
+   * exists because a refusal a client can choose not to send is not a
+   * refusal.
    */
   copyProfileRules: t.procedure
     .input(
@@ -926,6 +937,13 @@ const alertsRouter = t.router({
       const session = await beginProfileSession(ctx)
       const fromProfileNo = resolveProfile(session.body, input.fromProfileNo)
       const toProfileNo = resolveProfile(session.body, input.toProfileNo)
+      if (fromProfileNo === toProfileNo) {
+        throw new TRPCError({
+          code: 'BAD_REQUEST',
+          message:
+            'Copying a profile into itself would delete every rule in it',
+        })
+      }
       const path = `${profilePath(session.platformId, toProfileNo)}/copy`
       await sendWrite(
         session.client,

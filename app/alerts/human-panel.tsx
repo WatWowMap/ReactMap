@@ -19,10 +19,30 @@
  * it replaces the destination profile's tracking rules with a copy of the
  * source's. There is no "duplicate this profile" operation on Poracle's
  * side -- the destination must already exist, and whatever it was tracking
- * before is gone. The copy control below says so.
+ * before is gone. `store.HumanStore.CopyProfile` runs, per tracking table, a
+ * `DELETE ... WHERE profile_no = toProfile` before its `SELECT ... WHERE
+ * profile_no = fromProfile`: a self-copy (`from === to`) deletes the
+ * profile's rules and then finds nothing left to put back, silently. That
+ * case is refused outright below rather than merely discouraged -- both here
+ * and, more importantly, in `alerts-router.ts`'s `copyProfileRules`, since a
+ * refusal a client can bypass is not a refusal. Both destructive actions in
+ * this panel -- copying rules and deleting a profile -- confirm before
+ * calling their prop, the same `AlertDialog`-mounted-only-while-pending
+ * pattern `split-warning.tsx` uses and for the same reason: there is no undo
+ * on Poracle's side.
  */
 
 import { useRef, useState } from 'react'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '../components/ui/alert-dialog'
 import { Button } from '../components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card'
 import { Input } from '../components/ui/input'
@@ -44,6 +64,10 @@ export interface HumanPanelProps {
   onCopyProfileRules: (fromProfileNo: number, toProfileNo: number) => void
 }
 
+function profileName(profiles: ProfileView[], profileNo: number): string {
+  return profiles.find((p) => p.profileNo === profileNo)?.name ?? 'that profile'
+}
+
 export function HumanPanel({
   human,
   profiles,
@@ -63,17 +87,78 @@ export function HumanPanel({
   // through a ref sidesteps that rather than leaving this one form
   // untestable.
   const newProfileNameRef = useRef<HTMLInputElement>(null)
-  // Copy defaults to "into the active profile", the one shape of this
-  // control where getting it wrong by accident (never touching the selects)
-  // still does nothing: `from` and `to` land on the same profile.
+
+  // `fromProfileNo` defaults to the active profile -- a reasonable starting
+  // *source*. `toProfileNo` starts unselected (`''`) rather than mirroring
+  // it: defaulting both to the same profile once made "click Copy rules
+  // without touching either dropdown" the single most likely first
+  // interaction with this control, and a self-copy silently deletes
+  // everything in it (see the module comment). An unselected destination
+  // keeps the button disabled until a person has actually chosen one.
   const [fromProfileNo, setFromProfileNo] = useState(human.currentProfileNo)
-  const [toProfileNo, setToProfileNo] = useState(human.currentProfileNo)
+  const [toProfileNo, setToProfileNo] = useState<number | ''>('')
+  const [pendingCopy, setPendingCopy] = useState<{
+    fromProfileNo: number
+    toProfileNo: number
+  } | null>(null)
+  const [pendingDeleteProfileNo, setPendingDeleteProfileNo] = useState<
+    number | null
+  >(null)
+
+  const copyDisabled = toProfileNo === '' || toProfileNo === fromProfileNo
 
   function addProfile() {
     const name = newProfileNameRef.current?.value.trim() ?? ''
     if (!name) return
     onAddProfile(name)
     if (newProfileNameRef.current) newProfileNameRef.current.value = ''
+  }
+
+  function requestCopy() {
+    if (copyDisabled) return
+    setPendingCopy({ fromProfileNo, toProfileNo })
+  }
+
+  function confirmCopy() {
+    if (pendingCopy)
+      onCopyProfileRules(pendingCopy.fromProfileNo, pendingCopy.toProfileNo)
+    setPendingCopy(null)
+  }
+
+  function confirmDelete() {
+    if (pendingDeleteProfileNo !== null) onDeleteProfile(pendingDeleteProfileNo)
+    setPendingDeleteProfileNo(null)
+  }
+
+  // Roving tabindex for the profile listbox: only the active profile (or,
+  // once focus has moved off it, whichever option last received focus) is a
+  // tab stop, and the arrow keys move focus between the rest -- the keyboard
+  // behaviour the `listbox`/`option` roles promise, which plain buttons in a
+  // `div` do not get for free.
+  const optionRefs = useRef<Record<number, HTMLButtonElement | null>>({})
+
+  function focusOptionAt(index: number) {
+    const profile = profiles[(index + profiles.length) % profiles.length]
+    if (profile) optionRefs.current[profile.profileNo]?.focus()
+  }
+
+  function handleOptionKeyDown(
+    event: React.KeyboardEvent<HTMLButtonElement>,
+    index: number,
+  ) {
+    if (event.key === 'ArrowDown') {
+      event.preventDefault()
+      focusOptionAt(index + 1)
+    } else if (event.key === 'ArrowUp') {
+      event.preventDefault()
+      focusOptionAt(index - 1)
+    } else if (event.key === 'Home') {
+      event.preventDefault()
+      focusOptionAt(0)
+    } else if (event.key === 'End') {
+      event.preventDefault()
+      focusOptionAt(profiles.length - 1)
+    }
   }
 
   return (
@@ -98,17 +183,24 @@ export function HumanPanel({
             aria-label="Profiles"
             className="flex flex-col gap-1"
           >
-            {profiles.map((profile) => (
+            {profiles.map((profile, index) => (
               <div
                 key={profile.profileNo}
                 className="flex items-center justify-between gap-2"
               >
                 <button
+                  ref={(el) => {
+                    optionRefs.current[profile.profileNo] = el
+                  }}
                   type="button"
                   role="option"
                   aria-selected={profile.profileNo === human.currentProfileNo}
+                  tabIndex={
+                    profile.profileNo === human.currentProfileNo ? 0 : -1
+                  }
                   className="flex-1 rounded-md px-2 py-1 text-left text-sm hover:bg-muted aria-selected:font-semibold"
                   onClick={() => onSwitchProfile(profile.profileNo)}
+                  onKeyDown={(event) => handleOptionKeyDown(event, index)}
                 >
                   {profile.name}
                 </button>
@@ -117,7 +209,7 @@ export function HumanPanel({
                   variant="ghost"
                   size="sm"
                   aria-label={`Delete profile ${profile.name}`}
-                  onClick={() => onDeleteProfile(profile.profileNo)}
+                  onClick={() => setPendingDeleteProfileNo(profile.profileNo)}
                 >
                   Delete
                 </Button>
@@ -139,15 +231,23 @@ export function HumanPanel({
         {profiles.length > 1 && (
           <div className="flex flex-col gap-2 border-t border-border pt-3">
             <span className="text-sm text-muted-foreground">
-              Copy rules -- replaces every rule in the destination profile
+              Copy rules -- permanently replaces every rule in the destination
+              profile
             </span>
             <div className="flex items-center gap-2">
               <NativeSelect
                 aria-label="Copy rules from"
                 value={fromProfileNo}
-                onChange={(event) =>
-                  setFromProfileNo(Number(event.target.value))
-                }
+                onChange={(event) => {
+                  // Also clears a destination that the new source would
+                  // now collide with -- the "into" list below already
+                  // filters that profile out of its own options, so a
+                  // stale selection would otherwise point at an option
+                  // that no longer renders.
+                  const next = Number(event.target.value)
+                  setFromProfileNo(next)
+                  setToProfileNo((current) => (current === next ? '' : current))
+                }}
               >
                 {profiles.map((profile) => (
                   <NativeSelectOption
@@ -161,21 +261,31 @@ export function HumanPanel({
               <NativeSelect
                 aria-label="Copy rules into"
                 value={toProfileNo}
-                onChange={(event) => setToProfileNo(Number(event.target.value))}
+                onChange={(event) =>
+                  setToProfileNo(
+                    event.target.value === '' ? '' : Number(event.target.value),
+                  )
+                }
               >
-                {profiles.map((profile) => (
-                  <NativeSelectOption
-                    key={profile.profileNo}
-                    value={profile.profileNo}
-                  >
-                    {profile.name}
-                  </NativeSelectOption>
-                ))}
+                <NativeSelectOption value="">
+                  Choose a destination
+                </NativeSelectOption>
+                {profiles
+                  .filter((profile) => profile.profileNo !== fromProfileNo)
+                  .map((profile) => (
+                    <NativeSelectOption
+                      key={profile.profileNo}
+                      value={profile.profileNo}
+                    >
+                      {profile.name}
+                    </NativeSelectOption>
+                  ))}
               </NativeSelect>
               <Button
                 type="button"
                 variant="outline"
-                onClick={() => onCopyProfileRules(fromProfileNo, toProfileNo)}
+                disabled={copyDisabled}
+                onClick={requestCopy}
               >
                 Copy rules
               </Button>
@@ -183,6 +293,69 @@ export function HumanPanel({
           </div>
         )}
       </CardContent>
+
+      {pendingCopy && (
+        // Mounted only while a copy is pending, not driven by a persistent
+        // `open` prop -- see `split-warning.tsx`'s own comment on why: this
+        // project's test setup registers `document` after every module's
+        // top-level imports resolve Radix's Portal-mount gate, which
+        // permanently no-ops the open/close transition for the whole `bun
+        // test` process. A dialog whose `open` is `true` on its first
+        // render starts mounted directly, no transition required.
+        <AlertDialog
+          open
+          onOpenChange={(open) => {
+            if (!open) setPendingCopy(null)
+          }}
+        >
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>
+                Replace rules in this profile?
+              </AlertDialogTitle>
+              <AlertDialogDescription>
+                {`This permanently replaces every rule in ${profileName(profiles, pendingCopy.toProfileNo)} with a copy of ${profileName(profiles, pendingCopy.fromProfileNo)}'s. This cannot be undone.`}
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel onClick={() => setPendingCopy(null)}>
+                Cancel
+              </AlertDialogCancel>
+              <AlertDialogAction onClick={confirmCopy}>
+                Copy rules
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+      )}
+
+      {pendingDeleteProfileNo !== null && (
+        <AlertDialog
+          open
+          onOpenChange={(open) => {
+            if (!open) setPendingDeleteProfileNo(null)
+          }}
+        >
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Delete this profile?</AlertDialogTitle>
+              <AlertDialogDescription>
+                {`This deletes ${profileName(profiles, pendingDeleteProfileNo)} and every tracking rule in it. This cannot be undone.`}
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel
+                onClick={() => setPendingDeleteProfileNo(null)}
+              >
+                Cancel
+              </AlertDialogCancel>
+              <AlertDialogAction onClick={confirmDelete}>
+                Delete
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+      )}
     </Card>
   )
 }

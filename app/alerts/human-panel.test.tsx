@@ -113,9 +113,12 @@ test('an empty or blank name is never sent', () => {
   expect(calls).toEqual([])
 })
 
-test('deleting a profile calls back with its number', () => {
+test('deleting a profile asks for confirmation before calling back', async () => {
+  // Deleting a profile is irreversible on Poracle's side, so the callback
+  // fires only once someone confirms -- clicking "Delete" alone must not
+  // touch anything.
   const calls: number[] = []
-  const { getByRole } = renderPanel({
+  const { getByRole, findByRole } = renderPanel({
     profiles: [
       { profileNo: 1, name: 'default' },
       { profileNo: 2, name: 'work' },
@@ -123,7 +126,26 @@ test('deleting a profile calls back with its number', () => {
     onDeleteProfile: (profileNo) => calls.push(profileNo),
   })
   fireEvent.click(getByRole('button', { name: /delete profile work/i }))
+  expect(calls).toEqual([])
+  const dialog = await findByRole('alertdialog')
+  fireEvent.click(within(dialog).getByRole('button', { name: /^delete$/i }))
   expect(calls).toEqual([2])
+})
+
+test('cancelling a profile delete never calls back', async () => {
+  const calls: number[] = []
+  const { getByRole, findByRole, queryByRole } = renderPanel({
+    profiles: [
+      { profileNo: 1, name: 'default' },
+      { profileNo: 2, name: 'work' },
+    ],
+    onDeleteProfile: (profileNo) => calls.push(profileNo),
+  })
+  fireEvent.click(getByRole('button', { name: /delete profile work/i }))
+  const dialog = await findByRole('alertdialog')
+  fireEvent.click(within(dialog).getByRole('button', { name: /cancel/i }))
+  expect(calls).toEqual([])
+  expect(queryByRole('alertdialog')).toBeNull()
 })
 
 test('copying rules is offered only once there is more than one profile', () => {
@@ -133,9 +155,40 @@ test('copying rules is offered only once there is more than one profile', () => 
   expect(queryByRole('button', { name: /copy rules/i })).toBeNull()
 })
 
-test('copying rules names both the source and the destination, never a duplicate', () => {
-  const calls: { fromProfileNo: number; toProfileNo: number }[] = []
+test('the copy button starts disabled: nothing is selected as a destination yet', () => {
+  // The bug this guards against: defaulting both selects to the same
+  // profile made "click Copy rules without touching either dropdown" --
+  // the single most likely first interaction with this control -- silently
+  // delete every rule in the active profile, because Poracle's copy deletes
+  // the destination before reading the source.
   const { getByRole } = renderPanel({
+    profiles: [
+      { profileNo: 1, name: 'default' },
+      { profileNo: 2, name: 'work' },
+    ],
+  })
+  expect(
+    getByRole('button', { name: /copy rules/i }).hasAttribute('disabled'),
+  ).toBe(true)
+})
+
+test('the destination list never offers the selected source, so a self-copy cannot be chosen', () => {
+  const { getByRole } = renderPanel({
+    profiles: [
+      { profileNo: 1, name: 'default' },
+      { profileNo: 2, name: 'work' },
+    ],
+  })
+  const into = within(getByRole('combobox', { name: /copy rules into/i }))
+  // Source defaults to the active profile (profileNo 1, "default"), so
+  // "default" must not appear as a destination option.
+  expect(into.queryByRole('option', { name: 'default' })).toBeNull()
+  expect(into.getByRole('option', { name: 'work' })).toBeTruthy()
+})
+
+test('copying rules confirms, then names both the source and the destination, never a duplicate', async () => {
+  const calls: { fromProfileNo: number; toProfileNo: number }[] = []
+  const { getByRole, findByRole } = renderPanel({
     profiles: [
       { profileNo: 1, name: 'default' },
       { profileNo: 2, name: 'work' },
@@ -143,12 +196,67 @@ test('copying rules names both the source and the destination, never a duplicate
     onCopyProfileRules: (fromProfileNo, toProfileNo) =>
       calls.push({ fromProfileNo, toProfileNo }),
   })
-  fireEvent.change(getByRole('combobox', { name: /copy rules from/i }), {
-    target: { value: '1' },
+  fireEvent.change(getByRole('combobox', { name: /copy rules into/i }), {
+    target: { value: '2' },
+  })
+  const copyButton = getByRole('button', { name: /copy rules/i })
+  expect(copyButton.hasAttribute('disabled')).toBe(false)
+  fireEvent.click(copyButton)
+  expect(calls).toEqual([])
+  const dialog = await findByRole('alertdialog')
+  fireEvent.click(within(dialog).getByRole('button', { name: /^copy rules$/i }))
+  expect(calls).toEqual([{ fromProfileNo: 1, toProfileNo: 2 }])
+})
+
+test('changing the source clears a destination it would now collide with', () => {
+  const { getByRole } = renderPanel({
+    profiles: [
+      { profileNo: 1, name: 'default' },
+      { profileNo: 2, name: 'work' },
+      { profileNo: 3, name: 'raids' },
+    ],
   })
   fireEvent.change(getByRole('combobox', { name: /copy rules into/i }), {
     target: { value: '2' },
   })
-  fireEvent.click(getByRole('button', { name: /copy rules/i }))
-  expect(calls).toEqual([{ fromProfileNo: 1, toProfileNo: 2 }])
+  fireEvent.change(getByRole('combobox', { name: /copy rules from/i }), {
+    target: { value: '2' },
+  })
+  // The destination that just became the new source is no longer a valid
+  // choice, so the button goes back to disabled rather than silently
+  // pointing at a self-copy.
+  expect(
+    getByRole('button', { name: /copy rules/i }).hasAttribute('disabled'),
+  ).toBe(true)
+})
+
+test('arrow keys move focus between profile options, not just the active one', () => {
+  // A `listbox`/`option` pair promises roving keyboard navigation; plain
+  // buttons in a `div` don't get that for free without a handler wiring it
+  // up. Only the active profile starts as a tab stop (`tabIndex={0}`).
+  const { getByRole } = renderPanel({
+    human: {
+      enabled: true,
+      currentProfileNo: 1,
+      latitude: null,
+      longitude: null,
+      areas: [],
+    },
+    profiles: [
+      { profileNo: 1, name: 'default' },
+      { profileNo: 2, name: 'work' },
+    ],
+  })
+  const list = within(getByRole('listbox', { name: 'Profiles' }))
+  const defaultOption = list.getByRole('option', { name: 'default' })
+  const workOption = list.getByRole('option', { name: 'work' })
+  expect(defaultOption.getAttribute('tabindex')).toBe('0')
+  expect(workOption.getAttribute('tabindex')).toBe('-1')
+
+  defaultOption.focus()
+  fireEvent.keyDown(defaultOption, { key: 'ArrowDown' })
+  expect(document.activeElement).toBe(workOption)
+
+  fireEvent.keyDown(workOption, { key: 'ArrowUp' })
+  expect(document.activeElement).toBe(defaultOption)
 })

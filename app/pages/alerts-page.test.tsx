@@ -290,3 +290,106 @@ test('a failed delete shows an error message instead of doing nothing', async ()
   // stayed. It should still be there, now with an explanation.
   expect(getByTestId('alert-7')).toBeTruthy()
 })
+
+// --- the five human-panel writes surface their own failures too ------------
+//
+// `useAlerts.error` already funnels create/replace/remove failures to the
+// banner (see the test above); these five are newer surface area wired the
+// same way, and nothing previously proved any of them actually reaches it
+// rather than failing silently against a control that looks like it worked.
+
+test('a failed setEnabled shows the banner rather than leaving the switch looking changed', async () => {
+  const { getByRole, findByRole } = renderWith({
+    status: async () => ({ state: 'present' }),
+    snapshot: async () => EMPTY_SNAPSHOT,
+    setEnabled: async () => {
+      throw new Error('Poracle is unreachable right now')
+    },
+  } as unknown as AlertsClient)
+  fireEvent.click(await findByRole('switch', { name: /alerts/i }))
+  const alert = await findByRole('alert')
+  expect(alert.textContent).toBe('Poracle is unreachable right now')
+  expect(
+    getByRole('switch', { name: /alerts/i }).getAttribute('aria-checked'),
+  ).toBe('true')
+})
+
+test('a failed switchProfile shows the banner', async () => {
+  const { findByRole } = renderWith({
+    status: async () => ({ state: 'present' }),
+    snapshot: async () => ({
+      ...EMPTY_SNAPSHOT,
+      profiles: [
+        { profileNo: 1, name: 'default' },
+        { profileNo: 2, name: 'work' },
+      ],
+    }),
+    switchProfile: async () => {
+      throw new Error('Poracle is unreachable right now')
+    },
+  } as unknown as AlertsClient)
+  const list = within(await findByRole('listbox', { name: 'Profiles' }))
+  fireEvent.click(list.getByRole('option', { name: 'work' }))
+  const alert = await findByRole('alert')
+  expect(alert.textContent).toBe('Poracle is unreachable right now')
+})
+
+test('a failed addProfile shows the banner', async () => {
+  const { getByRole, findByRole } = renderWith({
+    status: async () => ({ state: 'present' }),
+    snapshot: async () => EMPTY_SNAPSHOT,
+    addProfile: async () => {
+      throw new Error('Poracle is unreachable right now')
+    },
+  } as unknown as AlertsClient)
+  const input = await findByRole('textbox', { name: /new profile name/i })
+  fireEvent.change(input, { target: { value: 'work' } })
+  fireEvent.click(getByRole('button', { name: /add profile/i }))
+  const alert = await findByRole('alert')
+  expect(alert.textContent).toBe('Poracle is unreachable right now')
+})
+
+test('a failed deleteProfile shows the banner once the delete is confirmed', async () => {
+  const { findByRole } = renderWith({
+    status: async () => ({ state: 'present' }),
+    snapshot: async () => ({
+      ...EMPTY_SNAPSHOT,
+      profiles: [
+        { profileNo: 1, name: 'default' },
+        { profileNo: 2, name: 'work' },
+      ],
+    }),
+    deleteProfile: async () => {
+      throw new Error('Poracle is unreachable right now')
+    },
+  } as unknown as AlertsClient)
+  fireEvent.click(await findByRole('button', { name: /delete profile work/i }))
+  const dialog = await findByRole('alertdialog')
+  fireEvent.click(within(dialog).getByRole('button', { name: /^delete$/i }))
+  const alert = await findByRole('alert')
+  expect(alert.textContent).toBe('Poracle is unreachable right now')
+})
+
+test('a failed copyProfileRules shows the banner once the copy is confirmed', async () => {
+  const { getByRole, findByRole } = renderWith({
+    status: async () => ({ state: 'present' }),
+    snapshot: async () => ({
+      ...EMPTY_SNAPSHOT,
+      profiles: [
+        { profileNo: 1, name: 'default' },
+        { profileNo: 2, name: 'work' },
+      ],
+    }),
+    copyProfileRules: async () => {
+      throw new Error('Poracle is unreachable right now')
+    },
+  } as unknown as AlertsClient)
+  fireEvent.change(await findByRole('combobox', { name: /copy rules into/i }), {
+    target: { value: '2' },
+  })
+  fireEvent.click(getByRole('button', { name: /copy rules/i }))
+  const dialog = await findByRole('alertdialog')
+  fireEvent.click(within(dialog).getByRole('button', { name: /^copy rules$/i }))
+  const alert = await findByRole('alert')
+  expect(alert.textContent).toBe('Poracle is unreachable right now')
+})
