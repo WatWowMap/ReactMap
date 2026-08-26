@@ -18,6 +18,11 @@ import {
   MAX_WEBHOOK_BATCH_BYTES,
   warnIfWebhookSecretMissing,
 } from './services/golbat-webhook-handler'
+import {
+  createIconProxy,
+  ICON_ROUTE_PREFIX,
+  type IconFormat,
+} from './services/icon-proxy'
 import { createSubscriptionRegistry } from './services/subscription-registry'
 import { createSettingsHandler } from './settings-response'
 import { createContextFactory } from './trpc/context'
@@ -130,6 +135,20 @@ const golbatWebhookHandler = createGolbatWebhookHandler({
 
 const TRPC_PATH_PREFIX = '/api/trpc'
 
+// Sprites are cached under the directory this repo already reserves for
+// cached artefacts (`server/.cache`, whose contents .gitignore covers), so
+// a warm working set never shows up in `git status`.
+const iconProxyConfig = config.getSafe('icons.proxy')
+const iconProxy = createIconProxy({
+  baseUrl: iconProxyConfig.baseUrl,
+  cacheDir: path.join(__dirname, '..', '.cache', 'icons'),
+  sizes: iconProxyConfig.sizes,
+  defaultSize: iconProxyConfig.defaultSize,
+  defaultFormat: iconProxyConfig.defaultFormat as IconFormat,
+  timeoutMs: iconProxyConfig.timeoutMs,
+  indexTtlMs: iconProxyConfig.indexTtlHours * 60 * 60 * 1000,
+})
+
 const server = Bun.serve({
   hostname: config.getSafe('interface'),
   // The Express entry that owned 8080 is gone from this branch, so the 2.0
@@ -198,6 +217,10 @@ const server = Bun.serve({
         router: appRouter,
         createContext: trpcCreateContext,
       })
+    }
+
+    if (url.pathname.startsWith(ICON_ROUTE_PREFIX)) {
+      return iconProxy.handle(request)
     }
 
     if (url.pathname.startsWith('/api/')) {

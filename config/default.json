@@ -988,6 +988,14 @@
     "defaultIcons": {},
     "overrides": {},
     "cacheHrs": 1,
+    "proxy": {
+      "baseUrl": "https://raw.githubusercontent.com/WatWowMap/wwm-uicons-webp/main",
+      "sizes": [32, 64, 128],
+      "defaultSize": 64,
+      "defaultFormat": "webp",
+      "timeoutMs": 5000,
+      "indexTtlHours": 24
+    },
     "sizes": {
       "device": {
         "sm": 15,
