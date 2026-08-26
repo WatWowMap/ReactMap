@@ -14,14 +14,14 @@
  * only ever writes the rule's own declared bounds.
  *
  * The vocabulary is the same descriptor `describeWithVocabulary` reads
- * (`condition-vocabulary.ts`): this editor only knows how to draw two of
- * its five condition kinds -- `range` and `choice` -- which is every kind
- * a rule row's own columns need edited in place. The rest (`toggle`,
- * `text`, `count`, `value`) describe things this sheet either has its own
- * dedicated control for already (exclusions -> `SpeciesPicker`) or that
- * belong to a delivery tail no rule-row editor writes; a vocabulary is
- * free to declare them and this editor simply does not offer them in its
- * `+` menu.
+ * (`condition-vocabulary.ts`): this editor draws three of its five
+ * condition kinds -- `range`, `choice` and `value` (one numeric input,
+ * e.g. Poracle's `minTime`) -- every kind a rule or alert row's own
+ * columns need edited in place. The rest (`toggle`, `text`, `count`)
+ * describe things this sheet either has its own dedicated control for
+ * already (exclusions -> `SpeciesPicker`) or that belong to a delivery
+ * tail no rule-row editor writes; a vocabulary is free to declare them
+ * and this editor simply does not offer them in its `+` menu.
  *
  * A vocabulary's `label` is written for `describeWithVocabulary`'s
  * mid-sentence use ("attack 10+", not "Attack 10+"), but a form control's
@@ -48,6 +48,7 @@ import type {
   ChoiceCondition,
   ConditionPatch,
   RangeCondition,
+  ValueCondition,
   Vocabulary,
 } from './condition-vocabulary'
 import { REACTMAP_VOCABULARY } from './condition-vocabulary'
@@ -83,8 +84,9 @@ function capitalize(word: string): string {
 
 function editableDefs<P extends ConditionPatch>(vocab: Vocabulary<P>) {
   return vocab.conditions.filter(
-    (def): def is RangeCondition<P> | ChoiceCondition<P> =>
-      (def.kind === 'range' || def.kind === 'choice') && def.key !== 'pvp',
+    (def): def is RangeCondition<P> | ChoiceCondition<P> | ValueCondition<P> =>
+      (def.kind === 'range' || def.kind === 'choice' || def.kind === 'value') &&
+      def.key !== 'pvp',
   )
 }
 
@@ -99,7 +101,7 @@ function seedState<P extends ConditionPatch>(
     const def = byKey.get(seed.type)
     if (!def) continue
     active.add(seed.type)
-    if (def.kind === 'choice') {
+    if (def.kind === 'choice' || def.kind === 'value') {
       fields[def.field] = seed.value ?? null
     } else if (def.kind === 'range') {
       if (seed.min != null) fields[def.minField] = seed.min
@@ -171,6 +173,9 @@ export function ConditionEditor<P extends ConditionPatch = RulePatch>({
   const activeChoices = [...active]
     .map((key) => byKey.get(key))
     .filter((def): def is ChoiceCondition<P> => def?.kind === 'choice')
+  const activeValues = [...active]
+    .map((key) => byKey.get(key))
+    .filter((def): def is ValueCondition<P> => def?.kind === 'value')
   const pvpDef = resolvedVocabulary.conditions.find(
     (def): def is RangeCondition<P> =>
       def.kind === 'range' && def.key === 'pvp',
@@ -203,6 +208,8 @@ export function ConditionEditor<P extends ConditionPatch = RulePatch>({
       nextFields[def.field] = def.options[0]?.value ?? null
     } else if (def.kind === 'range') {
       nextFields[def.minField] = 0
+    } else if (def.kind === 'value') {
+      nextFields[def.field] = 0
     }
     setMenuOpen(false)
     commit(nextActive, nextFields)
@@ -223,6 +230,11 @@ export function ConditionEditor<P extends ConditionPatch = RulePatch>({
   function updateChoice(def: ChoiceCondition<P>, value: string) {
     const option = def.options.find((o) => String(o.value) === value)
     commit(active, { ...fields, [def.field]: option?.value ?? value })
+  }
+
+  function updateValue(def: ValueCondition<P>, raw: string) {
+    const value = raw === '' ? null : Number(raw)
+    commit(active, { ...fields, [def.field]: value })
   }
 
   function updatePvpLeague(def: RangeCondition<P>, cap: number) {
@@ -285,6 +297,20 @@ export function ConditionEditor<P extends ConditionPatch = RulePatch>({
               </span>
             ))}
           </RadioGroup>
+        </div>
+      ))}
+
+      {activeValues.map((def) => (
+        <div key={def.key} className="flex items-center gap-2">
+          <span className="w-16 text-sm text-muted-foreground">
+            {capitalize(def.label)}
+          </span>
+          <Input
+            type="number"
+            aria-label={capitalize(def.label)}
+            value={(fields[def.field] as number | null | undefined) ?? ''}
+            onChange={(event) => updateValue(def, event.target.value)}
+          />
         </div>
       ))}
 

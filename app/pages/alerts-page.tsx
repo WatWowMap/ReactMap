@@ -1,18 +1,39 @@
 import { useState } from 'react'
 import { AlertCard } from '../alerts/alert-card'
 import { AlertEditor } from '../alerts/alert-editor'
-import type { AlertsClient } from '../alerts/alerts-query'
+import type { AlertsClient, AlertWriteInput } from '../alerts/alerts-query'
 import { useAlerts } from '../alerts/alerts-query'
+import { Button } from '../components/ui/button'
 import {
   Sheet,
   SheetContent,
   SheetHeader,
   SheetTitle,
 } from '../components/ui/sheet'
+import type { SpeciesSelection } from '../rules/species-picker'
+import { SpeciesPicker } from '../rules/species-picker'
+import type { MasterfileClient } from '../rules/use-names'
+import { useSpeciesCatalog } from '../rules/use-names'
 
 export interface AlertsPageProps {
   /** Test seam: a fake in place of the default tRPC-backed client. */
   alertsClient?: AlertsClient
+  /** Test seam: a fake in place of the default tRPC-backed client. */
+  namesClient?: MasterfileClient
+}
+
+/**
+ * The species picker's own selection shape, collapsed to what `alerts.
+ * create` needs: `pokemonId` off a bare species pick, `pokemonId` plus
+ * `form` off a form pick. Poracle's `form` is `0` for "no specific form"
+ * (`alertRuleShape`'s `filter`), matching what an unpicked `AlertRow.form`
+ * already reads as, so a bare species pick simply omits the field rather
+ * than sending a sentinel.
+ */
+function toNewAlertInput(pick: SpeciesSelection): AlertWriteInput {
+  return typeof pick === 'number'
+    ? { pokemonId: pick }
+    : { pokemonId: pick.speciesId, form: pick.formId }
 }
 
 /**
@@ -27,9 +48,15 @@ export interface AlertsPageProps {
  * operator has set no Poracle at all. `loading` renders nothing rather
  * than a placeholder that would flash before the real state lands.
  */
-export function AlertsPage({ alertsClient }: AlertsPageProps = {}) {
-  const { state, snapshot, replace, remove } = useAlerts(
+export function AlertsPage({
+  alertsClient,
+  namesClient,
+}: AlertsPageProps = {}) {
+  const { state, snapshot, create, replace, remove } = useAlerts(
     alertsClient ? { client: alertsClient } : undefined,
+  )
+  const species = useSpeciesCatalog(
+    namesClient ? { client: namesClient } : undefined,
   )
 
   // Which alert's sheet is open, by uid rather than the row itself, so a
@@ -40,15 +67,36 @@ export function AlertsPage({ alertsClient }: AlertsPageProps = {}) {
   const openAlert =
     snapshot?.alerts.find((alert) => alert.uid === openUid) ?? null
 
+  // Whether the species picker for a brand-new alert is open. A Poracle
+  // rule has no "Any Pokémon" subject the way a ReactMap rule does --
+  // `pokemonId` is required (`alertRuleShape`) -- so, unlike
+  // `filters-page.tsx`'s `startFrom`, there is no fixed template to write
+  // immediately; the species has to be picked first.
+  const [pickingSpecies, setPickingSpecies] = useState(false)
+
+  function pickSpecies(selection: SpeciesSelection[]) {
+    const picked = selection.at(-1)
+    if (picked === undefined) return
+    void create(toNewAlertInput(picked))
+    setPickingSpecies(false)
+  }
+
   if (state === 'loading' || state === 'unconfigured' || state === 'absent') {
     return null
   }
 
   return (
     <section className="p-6">
-      <h1 className="font-display text-2xl font-semibold text-foreground">
-        Alerts
-      </h1>
+      <div className="flex items-center justify-between gap-2">
+        <h1 className="font-display text-2xl font-semibold text-foreground">
+          Alerts
+        </h1>
+        {state === 'present' && (
+          <Button variant="outline" onClick={() => setPickingSpecies(true)}>
+            + New alert
+          </Button>
+        )}
+      </div>
       {state === 'unreachable' ? (
         <p className="mt-4 text-sm text-muted-foreground">
           Poracle is unreachable right now. Your alerts will show again once it
@@ -98,6 +146,22 @@ export function AlertsPage({ alertsClient }: AlertsPageProps = {}) {
                 setOpenUid(null)
               }}
             />
+          </SheetContent>
+        </Sheet>
+      )}
+
+      {pickingSpecies && (
+        <Sheet
+          open
+          onOpenChange={(next) => {
+            if (!next) setPickingSpecies(false)
+          }}
+        >
+          <SheetContent side="right" className="gap-4 overflow-y-auto p-6">
+            <SheetHeader className="p-0">
+              <SheetTitle>New alert</SheetTitle>
+            </SheetHeader>
+            <SpeciesPicker species={species} onChange={pickSpecies} />
           </SheetContent>
         </Sheet>
       )}

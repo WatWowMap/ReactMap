@@ -108,3 +108,29 @@ test('never renders the enabled switch -- Poracle has no per-alert column for it
   )
   expect(queryByRole('switch', { name: /enabled/i })).toBeNull()
 })
+
+test('a seeded value condition (minTime) renders its current value, not a blank row', () => {
+  const { getByDisplayValue } = render(
+    <AlertEditor
+      alert={{ ...BASE, minTime: 300 }}
+      onSave={() => {}}
+      onDelete={() => {}}
+    />,
+  )
+  expect(getByDisplayValue('300')).toBeTruthy()
+})
+
+test('adding a value condition through the + menu reports its starting value', () => {
+  const saved: unknown[] = []
+  const { getByRole } = render(
+    <AlertEditor
+      alert={BASE}
+      onSave={(patch) => saved.push(patch)}
+      onDelete={() => {}}
+    />,
+  )
+  fireEvent.click(getByRole('button', { name: '+' }))
+  fireEvent.click(getByRole('option', { name: /time remaining/i }))
+  fireEvent.click(getByRole('button', { name: /save/i }))
+  expect(saved).toEqual([{ ivMin: 100, ivMax: 100, minTime: 0 }])
+})

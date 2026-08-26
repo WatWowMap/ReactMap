@@ -3,6 +3,7 @@ import { QueryClientProvider } from '@tanstack/react-query'
 import { cleanup, fireEvent, render, waitFor } from '@testing-library/react'
 import type { AlertsClient } from '../alerts/alerts-query'
 import { createRulesQueryClient } from '../rules/rules-query'
+import type { MasterfileClient, SpeciesEntry } from '../rules/use-names'
 import { setupDom, teardownDom } from '../test-setup'
 import { AlertsPage } from './alerts-page'
 
@@ -25,12 +26,23 @@ afterEach(async () => {
 // Using the queries `render()` returns needs the DOM only once the test
 // body runs -- `split-warning.test.tsx` and `species-picker.test.tsx` hit
 // the same thing and sidestep it the same way.
-function renderWith(client: AlertsClient) {
+function renderWith(client: AlertsClient, namesClient?: MasterfileClient) {
   return render(
     <QueryClientProvider client={createRulesQueryClient()}>
-      <AlertsPage alertsClient={client} />
+      <AlertsPage
+        alertsClient={client}
+        {...(namesClient ? { namesClient } : {})}
+      />
     </QueryClientProvider>,
   )
+}
+
+const SPECIES_FIXTURE: SpeciesEntry[] = [
+  { id: 246, name: 'Larvitar', forms: [] },
+]
+
+function fakeNamesClient(): MasterfileClient {
+  return { species: () => Promise.resolve(SPECIES_FIXTURE) }
 }
 
 const EMPTY_SNAPSHOT = {
@@ -191,4 +203,34 @@ test('deleting removes the card', async () => {
   await waitFor(() => expect(getByTestId('alert-7')).toBeTruthy())
   fireEvent.click(await findByRole('button', { name: /delete/i }))
   await waitFor(() => expect(queryByTestId('alert-7')).toBeNull())
+})
+
+test('picking a species from the New alert sheet creates and refetches', async () => {
+  const created: any[] = []
+  let refetched = false
+  const { getByRole, getByText, findByRole } = renderWith(
+    {
+      status: async () => ({ state: 'present' }),
+      snapshot: async () => {
+        if (refetched) {
+          return {
+            ...EMPTY_SNAPSHOT,
+            alerts: [{ uid: 12, pokemonId: 246 }],
+          }
+        }
+        return EMPTY_SNAPSHOT
+      },
+      create: async (rule: any) => {
+        created.push(rule)
+        refetched = true
+        return { created: 1, updated: 0, unchanged: 0 }
+      },
+    } as unknown as AlertsClient,
+    fakeNamesClient(),
+  )
+  await waitFor(() => expect(getByText(/no alerts yet/i)).toBeTruthy())
+  fireEvent.click(getByRole('button', { name: /new alert/i }))
+  fireEvent.click(await findByRole('checkbox', { name: 'Larvitar' }))
+  await waitFor(() => expect(created).toEqual([{ pokemonId: 246 }]))
+  await waitFor(() => expect(getByText('Pokémon #246')).toBeTruthy())
 })

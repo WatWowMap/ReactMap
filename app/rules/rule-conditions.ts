@@ -5,10 +5,11 @@
  *
  * Reads the same vocabulary the editor and the renderer do
  * (`condition-vocabulary.ts`) instead of its own column list, so a rule's
- * range and choice columns need naming once, not here and in the editor
- * both. PvP is left unseeded, matching `ConditionEditor`'s permanent block:
- * its visibility already depends on the vocabulary declaring a `pvp`
- * condition, not on `active`, so there is no row here for it to seed.
+ * range, choice and value columns need naming once, not here and in the
+ * editor both. PvP is left unseeded, matching `ConditionEditor`'s
+ * permanent block: its visibility already depends on the vocabulary
+ * declaring a `pvp` condition, not on `active`, so there is no row here
+ * for it to seed.
  */
 
 import type { ConditionSeed } from './condition-editor'
@@ -34,7 +35,7 @@ export function conditionSeeds<P extends ConditionPatch = RulePatch>(
       const max = (row[def.maxField] as number | null | undefined) ?? null
       if (min == null && max == null) continue
       seeds.push({ type: def.key, min, max })
-    } else if (def.kind === 'choice') {
+    } else if (def.kind === 'choice' || def.kind === 'value') {
       const value = row[def.field] as number | string | null | undefined
       if (value == null) continue
       seeds.push({ type: def.key, value })
