@@ -1543,6 +1543,36 @@ test('a write requires the alerts perm', async () => {
   const ctx = { ...BASE, perms: { alerts: false } }
   await expect(caller(ctx).remove({ uid: 1 })).rejects.toThrow(/not available/)
 })
+
+test('a blocked human can read but cannot write', async () => {
+  // Task 6 computes pokemonBlocked for `status`. The reads stay available so
+  // someone can still see what they are subscribed to; only the writes are
+  // refused. A blocked account that could still create rules would make the
+  // block decorative.
+  const ctx = {
+    ...BASE,
+    poracleClient: {
+      get: async () => ({
+        status: 200,
+        body: { ...SNAPSHOT_BODY, human: { ...SNAPSHOT_BODY.human, blocked_alerts: '["monster"]' } },
+      }),
+      send: async () => ({ status: 200, body: {} }),
+    },
+  }
+  await expect(caller(ctx).snapshot()).resolves.toBeDefined()
+  for (const call of [
+    () => caller(ctx).create({ rules: [] }),
+    () => caller(ctx).replace({ uid: 7, rule: {} as any }),
+    () => caller(ctx).remove({ uid: 7 }),
+  ]) {
+    await expect(call()).rejects.toThrow(/blocked/i)
+  }
+})
+
+test('an operator-disabled category blocks writes for everyone', async () => {
+  const ctx = { ...BASE, poracleConfig: { disabledHooks: ['monster'] } }
+  await expect(caller(ctx).remove({ uid: 7 })).rejects.toThrow(/blocked/i)
+})
 ```
 
 - [ ] **Step 2: Run it and watch it fail**
@@ -1559,6 +1589,12 @@ Each write calls `requirePerm(ctx, 'alerts')`, resolves the platform id server s
 Validate `profileNo` against the profile list from the snapshot before forwarding it: `resolveHuman`
 in Poracle takes `?profile` from the query string without checking the human owns that profile
 (spec 7.4).
+
+Every write also refuses when the category is blocked, reusing Task 6's `pokemonBlocked`
+computation rather than recomputing it: extract that logic into a shared helper in Task 6 and call
+it here. Reads stay available, because someone whose alerts are blocked should still be able to see
+what they are subscribed to. Only the writes are refused. This is the plan's "a blocked human
+cannot write" criterion, and without it Task 6's `pokemonBlocked` is decorative.
 
 - [ ] **Step 4: Gate and commit**
 
