@@ -28,6 +28,15 @@
  * label is not mid-sentence -- so every label this editor shows is run
  * through `capitalize` at the point of rendering, rather than the
  * descriptor carrying a second, editor-specific casing of the same word.
+ *
+ * `ConditionEditor<P>` is generic over the same patch type its vocabulary
+ * is (`Vocabulary<P>`, `condition-vocabulary.ts`), and `onChange` is typed
+ * `(patch: P) => void` -- the exact same `P`. That is what makes handing
+ * this component a foreign vocabulary (Poracle's, task 9) together with an
+ * `onChange` typed for `RulePatch` a compile error instead of a silent
+ * relabel: the two props are tied to one type parameter, not two
+ * independently-typed ones. `RuleSheet<P>` (`rule-sheet.tsx`) carries the
+ * same parameter through for the same reason.
  */
 
 import { useMemo, useState } from 'react'
@@ -36,10 +45,12 @@ import { Input } from '../components/ui/input'
 import { RadioGroup, RadioGroupItem } from '../components/ui/radio-group'
 import type {
   ChoiceCondition,
+  ConditionPatch,
   RangeCondition,
   Vocabulary,
 } from './condition-vocabulary'
 import { REACTMAP_VOCABULARY } from './condition-vocabulary'
+import type { RulePatch } from './rules-query'
 
 export interface ConditionSeed {
   /** The vocabulary condition's key this seed feeds, e.g. 'iv', 'gender'. */
@@ -51,17 +62,13 @@ export interface ConditionSeed {
   value?: number | string | null
 }
 
-/**
- * What the editor emits: a field map keyed by whatever the vocabulary
- * declared -- `ivMin`/`ivMax` for ReactMap's own conditions, `weightMin`
- * or `ping` for Poracle's. This type never names `Rule`/`RulePatch` on
- * purpose: only a caller that knows which vocabulary it handed the editor
- * knows which schema the keys belong to, so narrowing to a concrete patch
- * type is that caller's job, not this component's.
- */
-export type ConditionPatch = Record<string, number | string | null>
-
-type FieldValues = ConditionPatch
+/** What the editor holds per row while it is open, before it becomes a
+ *  patch. Deliberately not typed `P`: `P`'s own keys can carry values (a
+ *  `boolean` `enabled`, a `number[]` `exclusions`) this editor never
+ *  writes, and TypeScript cannot prove a write through a generic key is
+ *  safe against all of them -- see `commit`, the one place this crosses
+ *  into `P`. */
+type FieldValues = Record<string, number | string | null>
 
 interface EditorState {
   active: ReadonlySet<string>
@@ -73,16 +80,16 @@ function capitalize(word: string): string {
   return word.length > 0 ? word.charAt(0).toUpperCase() + word.slice(1) : word
 }
 
-function editableDefs(vocab: Vocabulary) {
+function editableDefs<P extends ConditionPatch>(vocab: Vocabulary<P>) {
   return vocab.conditions.filter(
-    (def): def is RangeCondition | ChoiceCondition =>
+    (def): def is RangeCondition<P> | ChoiceCondition<P> =>
       (def.kind === 'range' || def.kind === 'choice') && def.key !== 'pvp',
   )
 }
 
-function seedState(
+function seedState<P extends ConditionPatch>(
   conditions: ConditionSeed[],
-  vocab: Vocabulary,
+  vocab: Vocabulary<P>,
 ): EditorState {
   const byKey = new Map(vocab.conditions.map((def) => [def.key, def]))
   const active = new Set<string>()
@@ -101,47 +108,67 @@ function seedState(
   return { active, fields }
 }
 
-export interface ConditionEditorProps {
+export interface ConditionEditorProps<P extends ConditionPatch = RulePatch> {
   /** Conditions already on the rule -- each becomes one active row, seeded with its value. */
   conditions?: ConditionSeed[]
   /** The schema this editor's rows are drawn from. Defaults to ReactMap's own `rule` columns. */
-  vocabulary?: Vocabulary
-  onChange?: (patch: ConditionPatch) => void
+  vocabulary?: Vocabulary<P>
+  onChange?: (patch: P) => void
 }
 
-export function ConditionEditor({
+export function ConditionEditor<P extends ConditionPatch = RulePatch>({
   conditions = [],
-  vocabulary = REACTMAP_VOCABULARY,
+  vocabulary,
   onChange,
-}: ConditionEditorProps) {
+}: ConditionEditorProps<P>) {
+  // `REACTMAP_VOCABULARY` is concretely `Vocabulary<RulePatch>`; the
+  // fallback only runs when the caller also left `P` at its default
+  // (`RulePatch`), which is the one case this is actually sound in. A
+  // caller supplying its own `P` must supply its own `vocabulary` too --
+  // there is no meaningful default for a schema this component doesn't
+  // know about.
+  const resolvedVocabulary =
+    vocabulary ?? (REACTMAP_VOCABULARY as unknown as Vocabulary<P>)
+
   const byKey = useMemo(
-    () => new Map(vocabulary.conditions.map((def) => [def.key, def])),
-    [vocabulary],
+    () => new Map(resolvedVocabulary.conditions.map((def) => [def.key, def])),
+    [resolvedVocabulary],
   )
   const [{ active, fields }, setState] = useState<EditorState>(() =>
-    seedState(conditions, vocabulary),
+    seedState(conditions, resolvedVocabulary),
   )
   const [menuOpen, setMenuOpen] = useState(false)
 
-  const addableDefs = editableDefs(vocabulary).filter(
+  const addableDefs = editableDefs(resolvedVocabulary).filter(
     (def) => !active.has(def.key),
   )
   const activeRanges = [...active]
     .map((key) => byKey.get(key))
     .filter(
-      (def): def is RangeCondition =>
+      (def): def is RangeCondition<P> =>
         def?.kind === 'range' && def.key !== 'pvp',
     )
   const activeChoices = [...active]
     .map((key) => byKey.get(key))
-    .filter((def): def is ChoiceCondition => def?.kind === 'choice')
-  const pvpDef = vocabulary.conditions.find(
-    (def): def is RangeCondition => def.kind === 'range' && def.key === 'pvp',
+    .filter((def): def is ChoiceCondition<P> => def?.kind === 'choice')
+  const pvpDef = resolvedVocabulary.conditions.find(
+    (def): def is RangeCondition<P> =>
+      def.kind === 'range' && def.key === 'pvp',
   )
 
   function commit(nextActive: ReadonlySet<string>, nextFields: FieldValues) {
     setState({ active: nextActive, fields: nextFields })
-    onChange?.(nextFields)
+    // Every key written into `nextFields` came from a `def.field`,
+    // `def.minField` or `def.maxField` -- each typed `keyof P & string` --
+    // so this object's keys are a subset of `P`'s by construction. `P`
+    // itself is a record of optional columns (`RulePatch` is a `Partial`;
+    // any concrete `P` a vocabulary is declared against should be too), so
+    // a partial key set is a valid `P`. TypeScript cannot verify a write
+    // through a generic key is sound against every possible `P`, which is
+    // what this one cast bridges -- unlike the cast this replaces, it is
+    // not asserting an unrelated schema onto the result, it is asserting
+    // that code which only ever writes keys typed `keyof P` produced a `P`.
+    onChange?.(nextFields as P)
   }
 
   function addCondition(key: string) {
@@ -161,7 +188,11 @@ export function ConditionEditor({
     commit(nextActive, nextFields)
   }
 
-  function updateRange(def: RangeCondition, bound: 'min' | 'max', raw: string) {
+  function updateRange(
+    def: RangeCondition<P>,
+    bound: 'min' | 'max',
+    raw: string,
+  ) {
     const value = raw === '' ? null : Number(raw)
     commit(active, {
       ...fields,
@@ -169,18 +200,18 @@ export function ConditionEditor({
     })
   }
 
-  function updateChoice(def: ChoiceCondition, value: string) {
+  function updateChoice(def: ChoiceCondition<P>, value: string) {
     const option = def.options.find((o) => String(o.value) === value)
     commit(active, { ...fields, [def.field]: option?.value ?? value })
   }
 
-  function updatePvpLeague(def: RangeCondition, cap: number) {
+  function updatePvpLeague(def: RangeCondition<P>, cap: number) {
     if (!def.labelField) return
     commit(active, { ...fields, [def.labelField]: cap })
   }
 
   function updatePvpRank(
-    def: RangeCondition,
+    def: RangeCondition<P>,
     bound: 'min' | 'max',
     raw: string,
   ) {

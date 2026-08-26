@@ -10,13 +10,20 @@
  * exclusion) because that is what `Rule.exclusions` carries on the wire
  * today (`rule-types.ts`); a form-level exclusion in the picker collapses
  * to its species id here rather than being silently dropped.
+ *
+ * `RuleSheet<P>` carries the same patch type parameter `ConditionEditor<P>`
+ * does, and for the same reason: `vocabulary` and `onChange` must agree on
+ * one schema, and tying them to one type parameter is what makes a
+ * mismatched pair a compile error instead of a silent relabel. Task 12's
+ * Alerts sheet is expected to reuse this component unmodified as
+ * `RuleSheet<AlertPatch>` with Poracle's vocabulary.
  */
 
 import { Label } from '../components/ui/label'
 import { Switch } from '../components/ui/switch'
-import type { ConditionPatch, ConditionSeed } from './condition-editor'
+import type { ConditionSeed } from './condition-editor'
 import { ConditionEditor } from './condition-editor'
-import type { Vocabulary } from './condition-vocabulary'
+import type { ConditionPatch, Vocabulary } from './condition-vocabulary'
 import type { RulePatch } from './rules-query'
 import type { SpeciesEntry, SpeciesSelection } from './species-picker'
 import { SpeciesPicker } from './species-picker'
@@ -27,7 +34,7 @@ function toExclusionIds(selection: SpeciesSelection[]): number[] {
   )
 }
 
-export interface RuleSheetProps {
+export interface RuleSheetProps<P extends ConditionPatch = RulePatch> {
   /** The rule's subject: `null` means "Any Pokémon". */
   speciesId: number | null
   /** Whether the rule is switched on. A rule that is off matches nothing. */
@@ -36,12 +43,12 @@ export interface RuleSheetProps {
   exclusions?: number[]
   conditions?: ConditionSeed[]
   /** The schema `ConditionEditor` draws its rows from. Defaults to ReactMap's own. */
-  vocabulary?: Vocabulary
-  onChange?: (patch: RulePatch) => void
+  vocabulary?: Vocabulary<P>
+  onChange?: (patch: P) => void
   onExclusionsChange?: (exclusions: number[]) => void
 }
 
-export function RuleSheet({
+export function RuleSheet<P extends ConditionPatch = RulePatch>({
   speciesId,
   enabled = true,
   species = [],
@@ -50,36 +57,31 @@ export function RuleSheet({
   vocabulary,
   onChange,
   onExclusionsChange,
-}: RuleSheetProps) {
+}: RuleSheetProps<P>) {
   return (
     <div className="flex flex-col gap-4">
       {/* The off switch sits above the conditions rather than beside the
           Save button: it is a statement about the whole rule, not another
           field of it, and it reports as a patch like every other edit so
-          the split warning gates it too. */}
+          the split warning gates it too. `enabled` isn't vocabulary-driven
+          -- every schema this sheet edits carries an on/off column -- so
+          this is the one write here that stays outside the `P` inference
+          `ConditionEditor` participates in, and needs its own narrow
+          assertion rather than a structural guarantee. */}
       <div className="flex items-center justify-between gap-2">
         <Label htmlFor="rule-enabled">Enabled</Label>
         <Switch
           id="rule-enabled"
           checked={enabled}
-          onCheckedChange={(next) => onChange?.({ enabled: next })}
+          onCheckedChange={(next) =>
+            onChange?.({ enabled: next } as unknown as P)
+          }
         />
       </div>
       <ConditionEditor
         {...(conditions ? { conditions } : {})}
         {...(vocabulary ? { vocabulary } : {})}
-        {...(onChange
-          ? {
-              // `ConditionEditor` emits a `ConditionPatch` keyed by whatever
-              // vocabulary it was handed, not by `RulePatch`'s columns -- it
-              // has no way to know which schema those keys belong to. This
-              // sheet does: it is the ReactMap call site, its own `onChange`
-              // contract is `RulePatch`, and its default vocabulary is
-              // ReactMap's own, so narrowing back to `RulePatch` here is
-              // where that knowledge actually lives.
-              onChange: (patch: ConditionPatch) => onChange(patch as RulePatch),
-            }
-          : {})}
+        {...(onChange ? { onChange } : {})}
       />
       {speciesId === null && (
         <div className="flex flex-col gap-2 border-t border-border pt-3">

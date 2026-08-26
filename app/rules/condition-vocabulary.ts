@@ -7,14 +7,49 @@
  * edited by the same `ConditionEditor` (task 8). Keeping the column
  * knowledge in a descriptor rather than in code is what lets a single
  * renderer and a single editor serve two unrelated schemas.
+ *
+ * `Vocabulary<P>` is generic over the patch shape its columns belong to --
+ * `REACTMAP_VOCABULARY: Vocabulary<RulePatch>`, Poracle's will be
+ * `Vocabulary<AlertPatch>` (task 9). Every condition's field/minField/
+ * maxField/labelField is typed `keyof P & string` rather than plain
+ * `string`, so a typo'd column name is a compile error here, and so a
+ * caller cannot pair a vocabulary with an `onChange` typed for a
+ * different, unrelated patch -- see `ConditionEditor<P>` and
+ * `RuleSheet<P>`, which is what this exists to make possible. The
+ * renderer (`describeWithVocabulary`) never needs a specific `P`: it reads
+ * an arbitrary `row: Record<string, any>` and stays generic over
+ * `ConditionPatch`, the umbrella every concrete patch extends.
  */
 
-export interface RangeCondition {
+import type { RulePatch } from './rules-query'
+
+/**
+ * The umbrella every concrete rule/alert patch extends -- wide enough for
+ * `RulePatch` (which also carries `boolean` and `number[]` columns) while
+ * still forcing every column name declared below to be a real key of it.
+ *
+ * A patch type only satisfies this constraint if it carries a synthesized
+ * index signature, which a plain hand-written `interface` does not -- a
+ * `Partial<...>` (or other homomorphic mapped type) over one does. This is
+ * not a new rule invented for this file: `RulePatch` is already exactly
+ * that shape (`type RulePatch = Partial<Omit<Rule, 'id' | 'speciesId'>>`,
+ * `rules-query.ts`). A future `AlertPatch` should follow the same pattern
+ * -- `type AlertPatch = Partial<Alert>` -- rather than a plain interface,
+ * or `Vocabulary<AlertPatch>` will fail to compile with "index signature
+ * for type 'string' is missing", not with an error that names the real
+ * cause.
+ */
+export type ConditionPatch = Record<
+  string,
+  number | string | boolean | number[] | null
+>
+
+export interface RangeCondition<P extends ConditionPatch = ConditionPatch> {
   kind: 'range'
   key: string
   label: string
-  minField: string
-  maxField: string
+  minField: keyof P & string
+  maxField: keyof P & string
   suffix?: string
   /** Renders a bound as a word instead of a number, e.g. XXS..XXL.
    *  An unmapped bound OMITS the whole condition, matching the old size
@@ -26,15 +61,15 @@ export interface RangeCondition {
    *  The whole condition is omitted when that column is null, and an
    *  unmapped league falls back to the RAW value (`LEAGUE_WORD[x] ?? x`),
    *  unlike `words` above which omits. */
-  labelField?: string
+  labelField?: keyof P & string
   labelWords?: Record<number, string>
 }
 
-export interface ChoiceCondition {
+export interface ChoiceCondition<P extends ConditionPatch = ConditionPatch> {
   kind: 'choice'
   key: string
   label: string
-  field: string
+  field: keyof P & string
   /** Renders the matched option's label ALONE, with no `label` prefix:
    *  gender 1 is "male", not "gender male". `value` is a string for
    *  `rule.size`, whose column is 'sm' | 'md' | 'lg' | 'xl'. */
@@ -51,52 +86,52 @@ export interface ChoiceCondition {
  *  areas" and 5000 means "within 5 km", and `minTime` reads "at least N
  *  seconds left". Without this, Task 9 would have to edit the shared
  *  renderer, which is the second mechanism this design exists to avoid. */
-export interface ValueCondition {
+export interface ValueCondition<P extends ConditionPatch = ConditionPatch> {
   kind: 'value'
   key: string
   label: string
-  field: string
+  field: keyof P & string
   /** Renders the whole phrase. Return null to omit the condition. */
   format: (value: number) => string | null
 }
 
 /** Truthy renders `label` verbatim: 'ring', 'notifies'. Falsy renders nothing. */
-export interface ToggleCondition {
+export interface ToggleCondition<P extends ConditionPatch = ConditionPatch> {
   kind: 'toggle'
   key: string
   label: string
-  field: string
+  field: keyof P & string
 }
 
-export interface TextCondition {
+export interface TextCondition<P extends ConditionPatch = ConditionPatch> {
   kind: 'text'
   key: string
   label: string
-  field: string
+  field: keyof P & string
 }
 
 /** A counted array: '1 exception' / '3 exceptions'. Omitted when empty. */
-export interface CountCondition {
+export interface CountCondition<P extends ConditionPatch = ConditionPatch> {
   kind: 'count'
   key: string
-  field: string
+  field: keyof P & string
   singular: string
   plural: string
 }
 
-export type ConditionDef =
-  | RangeCondition
-  | ChoiceCondition
-  | ToggleCondition
-  | TextCondition
-  | CountCondition
-  | ValueCondition
+export type ConditionDef<P extends ConditionPatch = ConditionPatch> =
+  | RangeCondition<P>
+  | ChoiceCondition<P>
+  | ToggleCondition<P>
+  | TextCondition<P>
+  | CountCondition<P>
+  | ValueCondition<P>
 
-export interface Vocabulary {
+export interface Vocabulary<P extends ConditionPatch = ConditionPatch> {
   id: 'reactmap' | 'poracle'
-  conditions: ConditionDef[]
+  conditions: ConditionDef<P>[]
   /** Appearance or delivery, rendered after the conditions in the sentence. */
-  tail: ConditionDef[]
+  tail: ConditionDef<P>[]
 }
 
 /** Golbat stores a league as its CP cap, so the cap is the league's name. */
@@ -115,7 +150,7 @@ const SIZE_RANGE_WORD: Record<number, string> = {
   5: 'XXL',
 }
 
-export const REACTMAP_VOCABULARY: Vocabulary = {
+export const REACTMAP_VOCABULARY: Vocabulary<RulePatch> = {
   id: 'reactmap',
   conditions: [
     {

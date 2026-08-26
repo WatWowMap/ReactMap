@@ -12,13 +12,14 @@
  */
 
 import type { ConditionSeed } from './condition-editor'
-import type { Vocabulary } from './condition-vocabulary'
+import type { ConditionPatch, Vocabulary } from './condition-vocabulary'
 import { REACTMAP_VOCABULARY } from './condition-vocabulary'
 import type { Rule } from './rule-types'
+import type { RulePatch } from './rules-query'
 
-export function conditionSeeds(
+export function conditionSeeds<P extends ConditionPatch = RulePatch>(
   rule: Rule,
-  vocab: Vocabulary = REACTMAP_VOCABULARY,
+  vocab: Vocabulary<P> = REACTMAP_VOCABULARY as unknown as Vocabulary<P>,
 ): ConditionSeed[] {
   const row = rule as unknown as Record<string, unknown>
   const seeds: ConditionSeed[] = []
