@@ -1,6 +1,6 @@
 /**
- * The condition rows inside a rule sheet: IV, attack, defence, stamina,
- * level, CP, gender and size range are added one at a time via `+`, and
+ * The condition rows inside a rule sheet: whatever `range` and `choice`
+ * conditions the vocabulary declares are added one at a time via `+`, and
  * every active row ANDs together into the patch the sheet writes back --
  * a rule has always been the conjunction of its conditions, never a
  * choice of one. PvP is its own permanent block below the range rows
@@ -12,87 +12,71 @@
  * against Golbat's collapsed-rank lookup already lives in
  * `rules-to-golbat-filters.ts` and is never re-derived here -- this editor
  * only ever writes the rule's own declared bounds.
+ *
+ * The vocabulary is the same descriptor `describeWithVocabulary` reads
+ * (`condition-vocabulary.ts`): this editor only knows how to draw two of
+ * its five condition kinds -- `range` and `choice` -- which is every kind
+ * a rule row's own columns need edited in place. The rest (`toggle`,
+ * `text`, `count`, `value`) describe things this sheet either has its own
+ * dedicated control for already (exclusions -> `SpeciesPicker`) or that
+ * belong to a delivery tail no rule-row editor writes; a vocabulary is
+ * free to declare them and this editor simply does not offer them in its
+ * `+` menu.
  */
 
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { Button } from '../components/ui/button'
 import { Input } from '../components/ui/input'
 import { RadioGroup, RadioGroupItem } from '../components/ui/radio-group'
+import type {
+  ChoiceCondition,
+  RangeCondition,
+  Vocabulary,
+} from './condition-vocabulary'
+import { REACTMAP_VOCABULARY } from './condition-vocabulary'
 import type { RulePatch } from './rules-query'
 
-export const RANGE_KINDS = [
-  'iv',
-  'atk',
-  'def',
-  'sta',
-  'level',
-  'cp',
-  'size',
-] as const
-export type RangeKind = (typeof RANGE_KINDS)[number]
-export type ConditionKind = RangeKind | 'gender'
-
 export interface ConditionSeed {
-  type: ConditionKind
+  /** The vocabulary condition's key this seed feeds, e.g. 'iv', 'gender'. */
+  type: string
   min?: number | null
   max?: number | null
-  /** Gender only -- see `app/map/types.ts`: 0 unset, 1 male, 2 female, 3 genderless. */
-  value?: number | null
+  /** Choice conditions only, e.g. gender -- see `app/map/types.ts`: 0
+   *  unset, 1 male, 2 female, 3 genderless. */
+  value?: number | string | null
 }
 
-/** Every `RulePatch` key whose value is `number | null` -- the only kind a range row ever writes. */
-type NumericPatchKey = {
-  [K in keyof RulePatch]-?: NonNullable<RulePatch[K]> extends number ? K : never
-}[keyof RulePatch]
-
-interface RangeSpec {
-  min: NumericPatchKey
-  max: NumericPatchKey
-  label: string
-}
-
-const RANGE_SPECS: Record<RangeKind, RangeSpec> = {
-  iv: { min: 'ivMin', max: 'ivMax', label: 'IV' },
-  atk: { min: 'atkMin', max: 'atkMax', label: 'Attack' },
-  def: { min: 'defMin', max: 'defMax', label: 'Defence' },
-  sta: { min: 'staMin', max: 'staMax', label: 'Stamina' },
-  level: { min: 'levelMin', max: 'levelMax', label: 'Level' },
-  cp: { min: 'cpMin', max: 'cpMax', label: 'CP' },
-  size: { min: 'sizeMin', max: 'sizeMax', label: 'Size' },
-}
-
-const CONDITION_LABEL: Record<ConditionKind, string> = {
-  ...Object.fromEntries(
-    RANGE_KINDS.map((kind) => [kind, RANGE_SPECS[kind].label]),
-  ),
-  gender: 'Gender',
-} as Record<ConditionKind, string>
-
-const ALL_KINDS: ConditionKind[] = [...RANGE_KINDS, 'gender']
-
-/** `500 | 1500 | 2500`, per `rule_pokemon.pvp_league` -- see rule-row.ts's `LEAGUE_BY_CAP`. */
-const PVP_LEAGUES = [
-  { cap: 500, label: 'Little' },
-  { cap: 1500, label: 'Great' },
-  { cap: 2500, label: 'Ultra' },
-] as const
+/** What the editor holds per row while it is open, before it becomes a patch. */
+type FieldValues = Record<string, number | string | null>
 
 interface EditorState {
-  active: ReadonlySet<ConditionKind>
-  fields: RulePatch
+  active: ReadonlySet<string>
+  fields: FieldValues
 }
 
-function seedState(conditions: ConditionSeed[]): EditorState {
-  const active = new Set<ConditionKind>()
-  const fields: RulePatch = {}
+function editableDefs(vocab: Vocabulary) {
+  return vocab.conditions.filter(
+    (def): def is RangeCondition | ChoiceCondition =>
+      (def.kind === 'range' || def.kind === 'choice') && def.key !== 'pvp',
+  )
+}
+
+function seedState(
+  conditions: ConditionSeed[],
+  vocab: Vocabulary,
+): EditorState {
+  const byKey = new Map(vocab.conditions.map((def) => [def.key, def]))
+  const active = new Set<string>()
+  const fields: FieldValues = {}
   for (const seed of conditions) {
+    const def = byKey.get(seed.type)
+    if (!def) continue
     active.add(seed.type)
-    if (seed.type === 'gender') {
-      fields.gender = seed.value ?? null
-    } else {
-      const spec = RANGE_SPECS[seed.type]
-      if (seed.min != null) fields[spec.min] = seed.min
-      if (seed.max != null) fields[spec.max] = seed.max
+    if (def.kind === 'choice') {
+      fields[def.field] = seed.value ?? null
+    } else if (def.kind === 'range') {
+      if (seed.min != null) fields[def.minField] = seed.min
+      if (seed.max != null) fields[def.maxField] = seed.max
     }
   }
   return { active, fields }
@@ -101,126 +85,138 @@ function seedState(conditions: ConditionSeed[]): EditorState {
 export interface ConditionEditorProps {
   /** Conditions already on the rule -- each becomes one active row, seeded with its value. */
   conditions?: ConditionSeed[]
+  /** The schema this editor's rows are drawn from. Defaults to ReactMap's own `rule` columns. */
+  vocabulary?: Vocabulary
   onChange?: (patch: RulePatch) => void
 }
 
 export function ConditionEditor({
   conditions = [],
+  vocabulary = REACTMAP_VOCABULARY,
   onChange,
 }: ConditionEditorProps) {
+  const byKey = useMemo(
+    () => new Map(vocabulary.conditions.map((def) => [def.key, def])),
+    [vocabulary],
+  )
   const [{ active, fields }, setState] = useState<EditorState>(() =>
-    seedState(conditions),
+    seedState(conditions, vocabulary),
   )
   const [menuOpen, setMenuOpen] = useState(false)
 
-  const addableKinds = ALL_KINDS.filter((kind) => !active.has(kind))
+  const addableDefs = editableDefs(vocabulary).filter(
+    (def) => !active.has(def.key),
+  )
+  const activeRanges = [...active]
+    .map((key) => byKey.get(key))
+    .filter(
+      (def): def is RangeCondition =>
+        def?.kind === 'range' && def.key !== 'pvp',
+    )
+  const activeChoices = [...active]
+    .map((key) => byKey.get(key))
+    .filter((def): def is ChoiceCondition => def?.kind === 'choice')
+  const pvpDef = vocabulary.conditions.find(
+    (def): def is RangeCondition => def.kind === 'range' && def.key === 'pvp',
+  )
 
-  function commit(
-    nextActive: ReadonlySet<ConditionKind>,
-    nextFields: RulePatch,
-  ) {
+  function commit(nextActive: ReadonlySet<string>, nextFields: FieldValues) {
     setState({ active: nextActive, fields: nextFields })
-    onChange?.(nextFields)
+    onChange?.(nextFields as RulePatch)
   }
 
-  function addCondition(kind: ConditionKind) {
+  function addCondition(key: string) {
+    const def = byKey.get(key)
+    if (!def) return
     const nextActive = new Set(active)
-    nextActive.add(kind)
-    const nextFields: RulePatch = { ...fields }
-    if (kind === 'gender') {
-      nextFields.gender = 1
-    } else {
+    nextActive.add(key)
+    const nextFields: FieldValues = { ...fields }
+    if (def.kind === 'choice') {
       // A starting value the user immediately edits -- not a guess at
       // what they meant, just something other than "unset" to edit from.
-      nextFields[RANGE_SPECS[kind].min] = 0
+      nextFields[def.field] = def.options[0]?.value ?? null
+    } else if (def.kind === 'range') {
+      nextFields[def.minField] = 0
     }
     setMenuOpen(false)
     commit(nextActive, nextFields)
   }
 
-  function updateRange(kind: RangeKind, bound: 'min' | 'max', raw: string) {
-    const spec = RANGE_SPECS[kind]
+  function updateRange(def: RangeCondition, bound: 'min' | 'max', raw: string) {
     const value = raw === '' ? null : Number(raw)
     commit(active, {
       ...fields,
-      [bound === 'min' ? spec.min : spec.max]: value,
+      [bound === 'min' ? def.minField : def.maxField]: value,
     })
   }
 
-  function updateGender(value: number) {
-    commit(active, { ...fields, gender: value })
+  function updateChoice(def: ChoiceCondition, value: string) {
+    const option = def.options.find((o) => String(o.value) === value)
+    commit(active, { ...fields, [def.field]: option?.value ?? value })
   }
 
-  function updatePvpLeague(cap: number) {
-    commit(active, { ...fields, pvpLeague: cap })
+  function updatePvpLeague(def: RangeCondition, cap: number) {
+    if (!def.labelField) return
+    commit(active, { ...fields, [def.labelField]: cap })
   }
 
-  function updatePvpRank(bound: 'min' | 'max', raw: string) {
-    const value = raw === '' ? null : Number(raw)
-    commit(active, {
-      ...fields,
-      [bound === 'min' ? 'pvpRankMin' : 'pvpRankMax']: value,
-    })
+  function updatePvpRank(
+    def: RangeCondition,
+    bound: 'min' | 'max',
+    raw: string,
+  ) {
+    updateRange(def, bound, raw)
   }
 
   return (
     <div className="flex flex-col gap-3">
-      {[...active]
-        .filter((kind): kind is RangeKind => kind !== 'gender')
-        .map((kind) => {
-          const spec = RANGE_SPECS[kind]
-          return (
-            <div key={kind} className="flex items-center gap-2">
-              <span className="w-16 text-sm text-muted-foreground">
-                {spec.label}
-              </span>
-              <Input
-                type="number"
-                aria-label={`${spec.label} minimum`}
-                value={(fields[spec.min] as number | null | undefined) ?? ''}
-                onChange={(event) =>
-                  updateRange(kind, 'min', event.target.value)
-                }
-              />
-              <Input
-                type="number"
-                aria-label={`${spec.label} maximum`}
-                value={(fields[spec.max] as number | null | undefined) ?? ''}
-                onChange={(event) =>
-                  updateRange(kind, 'max', event.target.value)
-                }
-              />
-            </div>
-          )
-        })}
+      {activeRanges.map((def) => (
+        <div key={def.key} className="flex items-center gap-2">
+          <span className="w-16 text-sm text-muted-foreground">
+            {def.label}
+          </span>
+          <Input
+            type="number"
+            aria-label={`${def.label} minimum`}
+            value={(fields[def.minField] as number | null | undefined) ?? ''}
+            onChange={(event) => updateRange(def, 'min', event.target.value)}
+          />
+          <Input
+            type="number"
+            aria-label={`${def.label} maximum`}
+            value={(fields[def.maxField] as number | null | undefined) ?? ''}
+            onChange={(event) => updateRange(def, 'max', event.target.value)}
+          />
+        </div>
+      ))}
 
-      {active.has('gender') && (
-        <div className="flex items-center gap-2">
-          <span className="w-16 text-sm text-muted-foreground">Gender</span>
+      {activeChoices.map((def) => (
+        <div key={def.key} className="flex items-center gap-2">
+          <span className="w-16 text-sm text-muted-foreground">
+            {def.label}
+          </span>
           <RadioGroup
             className="flex flex-row gap-3"
-            value={String(fields.gender ?? 1)}
-            onValueChange={(value) => updateGender(Number(value))}
+            value={String(fields[def.field] ?? def.options[0]?.value ?? '')}
+            onValueChange={(value) => updateChoice(def, value)}
           >
-            {[
-              { value: 1, label: 'Male' },
-              { value: 2, label: 'Female' },
-              { value: 3, label: 'Genderless' },
-            ].map((option) => (
+            {def.options.map((option) => (
               <span
                 key={option.value}
                 className="flex items-center gap-1.5 text-sm"
               >
                 <RadioGroupItem
-                  id={`gender-${option.value}`}
+                  id={`${def.key}-${option.value}`}
                   value={String(option.value)}
                 />
-                <label htmlFor={`gender-${option.value}`}>{option.label}</label>
+                <label htmlFor={`${def.key}-${option.value}`}>
+                  {option.label}
+                </label>
               </span>
             ))}
           </RadioGroup>
         </div>
-      )}
+      ))}
 
       <div className="relative">
         <Button
@@ -237,57 +233,65 @@ export function ConditionEditor({
             aria-label="Add condition"
             className="absolute z-10 mt-1 flex flex-col rounded-lg border border-border bg-popover p-1 shadow-md"
           >
-            {addableKinds.map((kind) => (
+            {addableDefs.map((def) => (
               <button
-                key={kind}
+                key={def.key}
                 type="button"
                 role="option"
                 aria-selected={false}
                 className="rounded-md px-2 py-1 text-left text-sm hover:bg-muted"
-                onClick={() => addCondition(kind)}
+                onClick={() => addCondition(def.key)}
               >
-                {CONDITION_LABEL[kind]}
+                {def.label}
               </button>
             ))}
           </div>
         )}
       </div>
 
-      <div className="flex flex-col gap-2 border-t border-border pt-3">
-        <span className="text-sm text-muted-foreground">PvP league</span>
-        <RadioGroup
-          className="flex flex-row gap-3"
-          value={fields.pvpLeague != null ? String(fields.pvpLeague) : null}
-          onValueChange={(value) => updatePvpLeague(Number(value))}
-        >
-          {PVP_LEAGUES.map((league) => (
-            <span
-              key={league.cap}
-              className="flex items-center gap-1.5 text-sm"
-            >
-              <RadioGroupItem
-                id={`pvp-league-${league.cap}`}
-                value={String(league.cap)}
-              />
-              <label htmlFor={`pvp-league-${league.cap}`}>{league.label}</label>
-            </span>
-          ))}
-        </RadioGroup>
-        <div className="flex items-center gap-2">
-          <Input
-            type="number"
-            aria-label="PvP rank minimum"
-            value={fields.pvpRankMin ?? ''}
-            onChange={(event) => updatePvpRank('min', event.target.value)}
-          />
-          <Input
-            type="number"
-            aria-label="PvP rank maximum"
-            value={fields.pvpRankMax ?? ''}
-            onChange={(event) => updatePvpRank('max', event.target.value)}
-          />
+      {pvpDef?.labelField && (
+        <div className="flex flex-col gap-2 border-t border-border pt-3">
+          <span className="text-sm text-muted-foreground">PvP league</span>
+          <RadioGroup
+            className="flex flex-row gap-3"
+            value={
+              fields[pvpDef.labelField] != null
+                ? String(fields[pvpDef.labelField])
+                : null
+            }
+            onValueChange={(value) => updatePvpLeague(pvpDef, Number(value))}
+          >
+            {Object.entries(pvpDef.labelWords ?? {}).map(([cap, label]) => (
+              <span key={cap} className="flex items-center gap-1.5 text-sm">
+                <RadioGroupItem id={`pvp-league-${cap}`} value={cap} />
+                <label htmlFor={`pvp-league-${cap}`}>{label}</label>
+              </span>
+            ))}
+          </RadioGroup>
+          <div className="flex items-center gap-2">
+            <Input
+              type="number"
+              aria-label="PvP rank minimum"
+              value={
+                (fields[pvpDef.minField] as number | null | undefined) ?? ''
+              }
+              onChange={(event) =>
+                updatePvpRank(pvpDef, 'min', event.target.value)
+              }
+            />
+            <Input
+              type="number"
+              aria-label="PvP rank maximum"
+              value={
+                (fields[pvpDef.maxField] as number | null | undefined) ?? ''
+              }
+              onChange={(event) =>
+                updatePvpRank(pvpDef, 'max', event.target.value)
+              }
+            />
+          </div>
         </div>
-      </div>
+      )}
     </div>
   )
 }

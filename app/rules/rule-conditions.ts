@@ -2,32 +2,37 @@
  * A stored rule's conditions, as the seeds `ConditionEditor` opens with.
  * Only the conditions actually set become rows -- an unset bound is not a
  * condition someone added and left blank, it is one they never added.
+ *
+ * Reads the same vocabulary the editor and the renderer do
+ * (`condition-vocabulary.ts`) instead of its own column list, so a rule's
+ * range and choice columns need naming once, not here and in the editor
+ * both. PvP is left unseeded, matching `ConditionEditor`'s permanent block:
+ * its visibility already depends on the vocabulary declaring a `pvp`
+ * condition, not on `active`, so there is no row here for it to seed.
  */
 
-import type { ConditionSeed, RangeKind } from './condition-editor'
-import { RANGE_KINDS } from './condition-editor'
+import type { ConditionSeed } from './condition-editor'
+import type { Vocabulary } from './condition-vocabulary'
+import { REACTMAP_VOCABULARY } from './condition-vocabulary'
 import type { Rule } from './rule-types'
 
-/** The rule columns each range kind reads, in the same order the editor lists them. */
-const RANGE_COLUMNS: Record<RangeKind, [keyof Rule, keyof Rule]> = {
-  iv: ['ivMin', 'ivMax'],
-  atk: ['atkMin', 'atkMax'],
-  def: ['defMin', 'defMax'],
-  sta: ['staMin', 'staMax'],
-  level: ['levelMin', 'levelMax'],
-  cp: ['cpMin', 'cpMax'],
-  size: ['sizeMin', 'sizeMax'],
-}
-
-export function conditionSeeds(rule: Rule): ConditionSeed[] {
+export function conditionSeeds(
+  rule: Rule,
+  vocab: Vocabulary = REACTMAP_VOCABULARY,
+): ConditionSeed[] {
+  const row = rule as unknown as Record<string, unknown>
   const seeds: ConditionSeed[] = []
-  for (const kind of RANGE_KINDS) {
-    const [minKey, maxKey] = RANGE_COLUMNS[kind]
-    const min = rule[minKey] as number | null
-    const max = rule[maxKey] as number | null
-    if (min == null && max == null) continue
-    seeds.push({ type: kind, min, max })
+  for (const def of vocab.conditions) {
+    if (def.kind === 'range' && def.key !== 'pvp') {
+      const min = (row[def.minField] as number | null | undefined) ?? null
+      const max = (row[def.maxField] as number | null | undefined) ?? null
+      if (min == null && max == null) continue
+      seeds.push({ type: def.key, min, max })
+    } else if (def.kind === 'choice') {
+      const value = row[def.field] as number | string | null | undefined
+      if (value == null) continue
+      seeds.push({ type: def.key, value })
+    }
   }
-  if (rule.gender != null) seeds.push({ type: 'gender', value: rule.gender })
   return seeds
 }

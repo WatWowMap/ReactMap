@@ -16,6 +16,7 @@ import { Label } from '../components/ui/label'
 import { Switch } from '../components/ui/switch'
 import type { ConditionSeed } from './condition-editor'
 import { ConditionEditor } from './condition-editor'
+import type { Vocabulary } from './condition-vocabulary'
 import type { RulePatch } from './rules-query'
 import type { SpeciesEntry, SpeciesSelection } from './species-picker'
 import { SpeciesPicker } from './species-picker'
@@ -34,6 +35,8 @@ export interface RuleSheetProps {
   species?: SpeciesEntry[]
   exclusions?: number[]
   conditions?: ConditionSeed[]
+  /** The schema `ConditionEditor` draws its rows from. Defaults to ReactMap's own. */
+  vocabulary?: Vocabulary
   onChange?: (patch: RulePatch) => void
   onExclusionsChange?: (exclusions: number[]) => void
 }
@@ -44,6 +47,7 @@ export function RuleSheet({
   species = [],
   exclusions = [],
   conditions,
+  vocabulary,
   onChange,
   onExclusionsChange,
 }: RuleSheetProps) {
@@ -63,6 +67,7 @@ export function RuleSheet({
       </div>
       <ConditionEditor
         {...(conditions ? { conditions } : {})}
+        {...(vocabulary ? { vocabulary } : {})}
         {...(onChange ? { onChange } : {})}
       />
       {speciesId === null && (
