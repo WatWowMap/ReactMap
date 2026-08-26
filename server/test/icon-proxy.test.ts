@@ -304,3 +304,26 @@ describe('icon proxy failure modes', () => {
     expect(Date.now() - started).toBeLessThan(2_000)
   })
 })
+
+describe('icon proxy upstream load', () => {
+  it('fetches one source image once for every size and format', async () => {
+    const h = makeHarness()
+    const variants: string[] = []
+    for (const size of [32, 64, 128]) {
+      for (const format of ['webp', 'png', 'avif']) {
+        variants.push(
+          `/api/icons/pokemon/25.webp?size=${size}&format=${format}`,
+        )
+      }
+    }
+
+    const responses = await Promise.all(variants.map((url) => get(h, url)))
+
+    expect(responses.every((res) => res.status === 200)).toBe(true)
+    expect(
+      responses.every((res) => res.headers.get('x-icon-fallback') === null),
+    ).toBe(true)
+    const sprites = h.calls.filter((url) => !url.endsWith('/index.json'))
+    expect(sprites).toEqual([`${BASE_URL}/pokemon/25.webp`])
+  })
+})

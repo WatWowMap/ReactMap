@@ -195,6 +195,7 @@ export function createIconProxy(config: IconProxyConfig): IconProxy {
   let index: IndexState | null = null
   let indexInFlight: Promise<IndexState | null> | null = null
   const spritesInFlight = new Map<string, Promise<Response>>()
+  const sourcesInFlight = new Map<string, Promise<Uint8Array>>()
   const fallbacks = new Map<string, Uint8Array>()
 
   const parseIndex = (body: string): IndexState => {
@@ -264,6 +265,33 @@ export function createIconProxy(config: IconProxyConfig): IconProxy {
     })
   }
 
+  /**
+   * The source bytes for one listed file, fetched at most once no matter
+   * how many size/format variants of it are being built at the same time.
+   *
+   * Deduping on the cache path alone was not enough: that key carries the
+   * size and the format, so the same sprite asked for at three sizes in
+   * three formats used to open nine upstream connections for one image.
+   * The upstream file does not vary with either, so all nine share this.
+   */
+  const fetchSource = (key: string): Promise<Uint8Array> => {
+    const existing = sourcesInFlight.get(key)
+    if (existing) return existing
+
+    const pending = (async () => {
+      const response = await fetchImpl(`${base}/${key}`, {
+        signal: AbortSignal.timeout(timeoutMs),
+      })
+      if (!response.ok) throw new Error(`upstream ${response.status}`)
+      return new Uint8Array(await response.arrayBuffer())
+    })().finally(() => {
+      sourcesInFlight.delete(key)
+    })
+
+    sourcesInFlight.set(key, pending)
+    return pending
+  }
+
   const buildSprite = async (
     key: string,
     size: number,
@@ -272,11 +300,7 @@ export function createIconProxy(config: IconProxyConfig): IconProxy {
     const cachePath = cachePathFor(key, size, format)
     let source: Uint8Array
     try {
-      const response = await fetchImpl(`${base}/${key}`, {
-        signal: AbortSignal.timeout(timeoutMs),
-      })
-      if (!response.ok) throw new Error(`upstream ${response.status}`)
-      source = new Uint8Array(await response.arrayBuffer())
+      source = await fetchSource(key)
     } catch {
       return fallbackResponse(size, format)
     }
