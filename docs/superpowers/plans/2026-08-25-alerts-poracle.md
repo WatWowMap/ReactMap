@@ -895,6 +895,34 @@ test('drops every field the client has no business seeing', () => {
   }
 })
 
+test('the output carries exactly its declared keys and nothing else', () => {
+  // The denylist above only catches fields somebody thought to name. This
+  // catches the ones nobody did, which is the case that actually bites:
+  // Poracle adds a column, the mapper spreads it through, and no test fails.
+  const view = toAlertsSnapshot(SNAPSHOT)
+  expect(Object.keys(view).sort()).toEqual([
+    'alerts', 'human', 'locations', 'profiles',
+  ])
+  expect(Object.keys(view.human).sort()).toEqual([
+    'areas', 'currentProfileNo', 'enabled', 'latitude', 'longitude',
+  ])
+})
+
+test('a field Poracle adds later does not reach the client', () => {
+  // The inverse of the mapping rule, stated directly. An implementation that
+  // spreads the source row passes every other test in this file and fails
+  // this one.
+  const withNewField = {
+    ...SNAPSHOT,
+    human: { ...SNAPSHOT.human, some_future_column: 'leaked' },
+    tracking: {
+      ...SNAPSHOT.tracking,
+      pokemon: [{ ...SNAPSHOT.tracking.pokemon[0], another_new_one: 'leaked' }],
+    },
+  }
+  expect(JSON.stringify(toAlertsSnapshot(withNewField))).not.toContain('leaked')
+})
+
 test('only the pokemon tracking type crosses the boundary', () => {
   // Pokemon only, per the spec. A raid array arriving must not appear.
   expect(JSON.stringify(toAlertsSnapshot(SNAPSHOT))).not.toContain('raid')
