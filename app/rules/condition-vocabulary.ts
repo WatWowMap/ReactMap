@@ -144,15 +144,17 @@ export interface Vocabulary<P extends ConditionPatch = ConditionPatch> {
   enabledField?: keyof P & string
 }
 
-/** Golbat stores a league as its CP cap, so the cap is the league's name. */
-const LEAGUE_WORD: Record<number, string> = {
+/** Golbat stores a league as its CP cap, so the cap is the league's name.
+ *  Exported: Poracle's own PvP league column (task 9) uses the same words. */
+export const LEAGUE_WORD: Record<number, string> = {
   500: 'Little',
   1500: 'Great',
   2500: 'Ultra',
 }
 
-/** 1 = XXS .. 5 = XXL, matching Poracle's size and max_size. */
-const SIZE_RANGE_WORD: Record<number, string> = {
+/** 1 = XXS .. 5 = XXL, matching Poracle's size and max_size. Exported so
+ *  Poracle's vocabulary (task 9) can reuse it for its own size range. */
+export const SIZE_RANGE_WORD: Record<number, string> = {
   1: 'XXS',
   2: 'XS',
   3: 'M',

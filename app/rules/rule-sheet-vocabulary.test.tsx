@@ -15,22 +15,12 @@ import { afterAll, afterEach, beforeAll, expect, test } from 'bun:test'
 import { cleanup, render } from '@testing-library/react'
 import { setupDom, teardownDom } from '../test-setup'
 import type { Vocabulary } from './condition-vocabulary'
+import type { AlertPatch } from './poracle-vocabulary'
 import { RuleSheet } from './rule-sheet'
 
 beforeAll(setupDom)
 afterAll(teardownDom)
 afterEach(cleanup)
-
-/** Poracle's `monsters` row, as task 5's `AlertRow` already ships it: no
- *  per-alert enabled column, because its enabled flag is account-level. */
-interface AlertRow {
-  uid: number
-  ping: string
-  distance: number
-  weightMin: number
-  weightMax: number
-}
-type AlertPatch = Partial<AlertRow>
 
 const PORACLE_VOCABULARY: Vocabulary<AlertPatch> = {
   id: 'poracle',
