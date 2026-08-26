@@ -22,6 +22,7 @@
  * `app/map/draw-icon.ts` where an `OffscreenCanvas` can actually draw them.
  */
 
+import type { Dirent } from 'fs'
 import fs from 'fs/promises'
 import path from 'path'
 
@@ -74,6 +75,37 @@ const DEFAULT_MAX_QUEUED_FETCHES = 512
  * unresized originals, and the resized results already live on disk.
  */
 const SOURCE_CACHE_LIMIT = 64
+
+/**
+ * How large the sprite cache may grow before the oldest entries are dropped.
+ *
+ * The route only ever serves files the upstream index lists, so this cannot
+ * grow without limit -- but the ceiling is the whole icon set rather than
+ * anything the map actually asks for. 15,606 listed files across three sizes
+ * and three formats is roughly 285MB, and an unauthenticated visitor can walk
+ * all of it. That is a slow disk-fill rather than a break-in, and a cap is the
+ * whole fix.
+ *
+ * 256MB is comfortably above any real working set: a dense viewport resolves
+ * about 140 distinct sprites, so a busy instance lives in single-digit MB and
+ * never sweeps at all.
+ */
+const DEFAULT_MAX_CACHE_BYTES = 256 * 1024 * 1024
+
+/**
+ * How far under the cap a sweep goes. Sweeping to exactly the cap would make
+ * the next write sweep again; leaving headroom means a sweep is rare rather
+ * than continuous.
+ */
+const SWEEP_TARGET_RATIO = 0.8
+
+/**
+ * Bytes written between size checks. Stat-ing the whole tree on every write
+ * would cost more than the eviction saves, and the cap is a disk-space
+ * guardrail rather than a precise budget, so overshooting by this much
+ * between checks is fine.
+ */
+const SWEEP_CHECK_INTERVAL_BYTES = 8 * 1024 * 1024
 
 /**
  * A counting semaphore with a bounded waiting room. Work beyond the queue
@@ -129,6 +161,8 @@ export interface IconProxyConfig {
   maxQueuedFetches?: number
   /** Source images memoised so their variants share one round trip. */
   sourceCacheLimit?: number
+  /** Disk the cached sprites may occupy before the oldest are evicted. */
+  maxCacheBytes?: number
   sizes?: readonly number[]
   defaultSize?: number
   defaultFormat?: IconFormat
@@ -141,6 +175,14 @@ export interface IconProxy {
   handle(request: Request): Promise<Response>
   /** Where a given sprite lands on disk. Exposed for tests. */
   cachePathFor(key: string, size: number, format: IconFormat): string
+  /**
+   * Evicts least-recently-used sprites until the cache is under its cap,
+   * and answers how many it dropped.
+   *
+   * Exposed because the sweep is normally amortised and deliberately not
+   * awaited -- a test that cannot force it would have to sleep and hope.
+   */
+  sweepCache(): Promise<number>
 }
 
 /**
@@ -256,6 +298,7 @@ export function createIconProxy(config: IconProxyConfig): IconProxy {
     maxConcurrentFetches = DEFAULT_MAX_CONCURRENT_FETCHES,
     maxQueuedFetches = DEFAULT_MAX_QUEUED_FETCHES,
     sourceCacheLimit = SOURCE_CACHE_LIMIT,
+    maxCacheBytes = DEFAULT_MAX_CACHE_BYTES,
     fetch: fetchImpl = globalThis.fetch,
   } = config
 
@@ -380,6 +423,135 @@ export function createIconProxy(config: IconProxyConfig): IconProxy {
     return pending
   }
 
+  // Bytes written since the last size check. The sweep is amortised: a
+  // check costs a walk of the tree, so doing it per write would cost more
+  // than the eviction saves.
+  let bytesSinceCheck = 0
+  let sweeping = false
+
+  /**
+   * Use order of each cached sprite, by path, as a monotonic sequence.
+   *
+   * Two reasons this is a counter rather than a timestamp, and not mtime.
+   *
+   * Not mtime, because a hit must not wait on a filesystem write, and a
+   * fire-and-forget `utimes` can land after a later sprite's write -- which
+   * makes the most-requested icon on the map look staler than one nobody
+   * has asked for.
+   *
+   * Not `Date.now()`, because it is millisecond-granular and a viewport
+   * resolves its sprites far faster than that. Every hit in the same
+   * millisecond ties, and a tie is broken arbitrarily, so the sprite being
+   * served constantly can be evicted ahead of one touched once. A counter
+   * cannot tie.
+   */
+  let useCounter = 0
+  const useOrder = new Map<string, number>()
+
+  const noteUsed = (cachePath: string): void => {
+    useCounter += 1
+    useOrder.set(cachePath, useCounter)
+  }
+
+  /**
+   * Every cached sprite with its size and use order, least recent first.
+   *
+   * Anything used during this run of the process is more recently used than
+   * anything known only from a previous run, so the two are ranked in tiers
+   * rather than compared on one scale: files with no counter sort first,
+   * ordered among themselves by mtime.
+   */
+  const listCached = async (): Promise<
+    { path: string; bytes: number; seq: number | undefined; mtime: number }[]
+  > => {
+    const found: {
+      path: string
+      bytes: number
+      seq: number | undefined
+      mtime: number
+    }[] = []
+    const walk = async (dir: string): Promise<void> => {
+      let entries: Dirent[]
+      try {
+        entries = await fs.readdir(dir, { withFileTypes: true })
+      } catch {
+        return
+      }
+      for (const entry of entries) {
+        const full = path.join(dir, entry.name)
+        if (entry.isDirectory()) {
+          await walk(full)
+          continue
+        }
+        // index.json is not a sprite and is cheap to refetch, but evicting
+        // it would cost every client a round trip, so it is left alone.
+        if (full === indexCachePath) continue
+        if (entry.name.endsWith('.tmp')) continue
+        try {
+          const stat = await fs.stat(full)
+          found.push({
+            path: full,
+            bytes: stat.size,
+            seq: useOrder.get(full),
+            mtime: stat.mtimeMs,
+          })
+        } catch {
+          // Raced with another sweep or an eviction; nothing to account for.
+        }
+      }
+    }
+    await walk(cacheDir)
+    return found.sort((a, b) => {
+      if (a.seq === undefined && b.seq === undefined) return a.mtime - b.mtime
+      if (a.seq === undefined) return -1
+      if (b.seq === undefined) return 1
+      return a.seq - b.seq
+    })
+  }
+
+  /**
+   * Drops least-recently-used sprites until the cache is under the target.
+   *
+   * Recency comes from mtime, which `serveSprite` touches on a hit, so this
+   * is a real LRU rather than eviction by age. Without that touch a sprite
+   * fetched once and served ten thousand times would look as stale as one
+   * nobody has asked for since.
+   */
+  const sweepCache = async (): Promise<number> => {
+    if (sweeping) return 0
+    sweeping = true
+    try {
+      const files = await listCached()
+      let total = files.reduce((sum, file) => sum + file.bytes, 0)
+      if (total <= maxCacheBytes) return 0
+      const target = Math.floor(maxCacheBytes * SWEEP_TARGET_RATIO)
+      let dropped = 0
+      for (const file of files) {
+        if (total <= target) break
+        try {
+          await fs.rm(file.path, { force: true })
+          useOrder.delete(file.path)
+          total -= file.bytes
+          dropped += 1
+        } catch {
+          // Already gone, or not ours to remove. Keep going.
+        }
+      }
+      return dropped
+    } finally {
+      sweeping = false
+    }
+  }
+
+  const noteWrite = (bytes: number): void => {
+    bytesSinceCheck += bytes
+    if (bytesSinceCheck < SWEEP_CHECK_INTERVAL_BYTES) return
+    bytesSinceCheck = 0
+    // Deliberately not awaited: a sweep must never sit in front of a
+    // response. Worst case the cache runs over by one interval's writes.
+    void sweepCache()
+  }
+
   const buildSprite = async (
     key: string,
     size: number,
@@ -407,6 +579,8 @@ export function createIconProxy(config: IconProxyConfig): IconProxy {
       const scratch = `${cachePath}.${crypto.randomUUID()}.tmp`
       await fs.writeFile(scratch, bytes)
       await fs.rename(scratch, cachePath)
+      noteUsed(cachePath)
+      noteWrite(bytes.byteLength)
     } catch {
       // A cache that cannot be written is a slow proxy, not a broken one.
     }
@@ -429,6 +603,7 @@ export function createIconProxy(config: IconProxyConfig): IconProxy {
       const cached = await fs.readFile(cachePath)
       const bytes = Uint8Array.from(cached)
       if (looksLike(format, bytes)) {
+        noteUsed(cachePath)
         return new Response(bytes, {
           headers: {
             'content-type': CONTENT_TYPES[format],
@@ -530,5 +705,5 @@ export function createIconProxy(config: IconProxyConfig): IconProxy {
     return serveSprite(key, size, format)
   }
 
-  return { handle, cachePathFor }
+  return { handle, cachePathFor, sweepCache }
 }

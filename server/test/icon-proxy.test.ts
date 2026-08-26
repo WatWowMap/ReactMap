@@ -418,3 +418,101 @@ describe('icon proxy upstream load', () => {
     ).toBe(true)
   })
 })
+
+describe('the sprite cache does not grow without limit', () => {
+  /** Total bytes of cached sprites, ignoring the index. */
+  const cacheBytes = (dir: string): number => {
+    let total = 0
+    const walk = (at: string) => {
+      for (const entry of fs.readdirSync(at, { withFileTypes: true })) {
+        const full = path.join(at, entry.name)
+        if (entry.isDirectory()) walk(full)
+        else if (entry.name !== 'index.json') total += fs.statSync(full).size
+      }
+    }
+    walk(dir)
+    return total
+  }
+
+  const cachedFiles = (dir: string): string[] => {
+    const out: string[] = []
+    const walk = (at: string) => {
+      for (const entry of fs.readdirSync(at, { withFileTypes: true })) {
+        const full = path.join(at, entry.name)
+        if (entry.isDirectory()) walk(full)
+        else if (entry.name !== 'index.json') out.push(full)
+      }
+    }
+    walk(dir)
+    return out
+  }
+
+  it('evicts the least recently used sprites once past the cap', async () => {
+    // The route only serves what the index lists, so the cache cannot grow
+    // unbounded -- but its ceiling is the whole icon set, and an
+    // unauthenticated caller can walk all of it. The cap is the whole fix.
+    const h = makeHarness({ maxCacheBytes: 4_000 })
+    for (const size of [32, 64, 128]) {
+      for (const name of ['25.webp', '0.webp']) {
+        await get(h, `/api/icons/pokemon/${name}?size=${size}`)
+      }
+    }
+    const before = cacheBytes(h.cacheDir)
+    expect(before).toBeGreaterThan(4_000)
+
+    const dropped = await h.proxy.sweepCache()
+
+    expect(dropped).toBeGreaterThan(0)
+    expect(cacheBytes(h.cacheDir)).toBeLessThanOrEqual(4_000)
+  })
+
+  it('leaves the cache alone when it is under the cap', async () => {
+    const h = makeHarness({ maxCacheBytes: 10 * 1024 * 1024 })
+    await get(h, '/api/icons/pokemon/25.webp?size=64')
+    const before = cachedFiles(h.cacheDir)
+
+    expect(await h.proxy.sweepCache()).toBe(0)
+    expect(cachedFiles(h.cacheDir)).toEqual(before)
+  })
+
+  it('keeps a sprite still being served, and drops a newer one that is not', async () => {
+    // The discriminator: `hot` is written FIRST and every cold sprite after
+    // it, so under eviction-by-age hot dies and the newest cold file lives.
+    // Under real recency it is the other way round. Asserting only that hot
+    // survives passes even with recency disabled, because a stable sort
+    // leaves files in walk order -- so the cold file must be asserted too.
+    const h = makeHarness({ maxCacheBytes: 3_000 })
+    const hot = '/api/icons/pokemon/25.webp?size=64'
+    await get(h, hot)
+
+    const coldRequests = [
+      '/api/icons/pokemon/0.webp?size=32',
+      '/api/icons/pokemon/25.webp?size=32',
+      '/api/icons/pokemon/0.webp?size=128',
+      '/api/icons/pokemon/0.webp?size=64',
+    ]
+    for (const cold of coldRequests) {
+      await get(h, cold)
+      // Keep hot in use while every one of them arrives.
+      await get(h, hot)
+    }
+
+    await h.proxy.sweepCache()
+
+    const hotPath = h.proxy.cachePathFor('pokemon/25.webp', 64, 'webp')
+    const newestCold = h.proxy.cachePathFor('pokemon/0.webp', 64, 'webp')
+    expect(fs.existsSync(hotPath)).toBe(true)
+    expect(fs.existsSync(newestCold)).toBe(false)
+  })
+
+  it('never evicts the index, which every client needs', async () => {
+    const h = makeHarness({ maxCacheBytes: 1 })
+    await get(h, '/api/icons/index.json')
+    const indexPath = path.join(h.cacheDir, 'index.json')
+    const existed = fs.existsSync(indexPath)
+
+    await h.proxy.sweepCache()
+
+    expect(fs.existsSync(indexPath)).toBe(existed)
+  })
+})
