@@ -157,11 +157,20 @@ export function profResetCounters(): void {
  */
 const lastLayerData = new Map<string, unknown>()
 
+/**
+ * How many layers arrived with a new `data` reference on the most recent
+ * call, so the frame timing below can be read against the amount of
+ * re-upload that frame was asked for. Without it every frame figure is a
+ * bare number with nothing to attribute it to.
+ */
+let lastNewData = 0
+
 export function profTrackLayerData(
   layers: readonly { id: string; props?: { data?: unknown } }[],
 ): void {
   if (!enabled) return
   profCount('setProps calls')
+  lastNewData = 0
   for (const layer of layers) {
     profCount('layer instances')
     const seen = lastLayerData.has(layer.id)
@@ -169,10 +178,57 @@ export function profTrackLayerData(
     const data = layer.props?.data
     lastLayerData.set(layer.id, data)
     if (!seen) continue
-    profCount(
-      previous === data ? `data kept: ${layer.id}` : `data NEW: ${layer.id}`,
-    )
+    const kept = previous === data
+    if (!kept) lastNewData += 1
+    profCount(`data ${kept ? 'kept' : 'NEW'}: ${layer.id}`)
   }
+}
+
+/**
+ * What a `setProps` costs, which the identity counter above cannot say.
+ *
+ * `profTrackLayerData` answers whether a reference survived; it never
+ * answers what replacing one costs, and "this data reference is new" is
+ * only worth acting on next to a number. Two marks, because the work
+ * lands in two different places:
+ *
+ * - `setProps (sync)` is deck.gl's own layer diff, on this call stack.
+ * - `frame after setProps` is the frame that actually draws the result.
+ *   The overlay is a maplibre custom layer, so deck renders inside the
+ *   map's animation frame rather than here; attribute generation and the
+ *   GPU upload for any layer whose `data` changed identity land in that
+ *   frame. Measured start-of-frame to start-of-next-frame, so it carries
+ *   whatever else that frame did -- it is an upper bound on the upload,
+ *   not an isolated figure for it.
+ *
+ * `toFrame` is the wait for that first frame, and it is there to keep the
+ * measurement honest rather than to describe the upload: a tab that is not
+ * on screen gets no `requestAnimationFrame`, so a frame figure gathered
+ * behind another window is meaningless. A `toFrame` around one refresh
+ * interval says a real frame answered; a large one says the reading is not
+ * about drawing at all and should be thrown away.
+ */
+export function profTimeSetProps(apply: () => void): void {
+  if (!enabled) {
+    apply()
+    return
+  }
+  // Read here rather than inside the frame callback: another `setProps`
+  // can land before that frame runs, and the figure has to belong to the
+  // call this frame is being attributed to.
+  const newData = lastNewData
+  const at = performance.now()
+  apply()
+  profRecord('setProps (sync)', performance.now() - at, { newData })
+  requestAnimationFrame(() => {
+    const frameStart = performance.now()
+    requestAnimationFrame(() => {
+      profRecord('frame after setProps', performance.now() - frameStart, {
+        newData,
+        toFrame: Math.round((frameStart - at) * 10) / 10,
+      })
+    })
+  })
 }
 
 if (enabled && typeof window !== 'undefined') {

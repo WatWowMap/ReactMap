@@ -87,8 +87,10 @@ export function MapCanvas({ initialCamera, onCameraChange }: MapCanvasProps) {
 
   // One narrow selector per array, read in the component that draws them.
   // Each array is a stable reference until a delta batch actually changes
-  // that category, which is what keeps deck.gl from re-uploading a layer's
-  // buffers for a change in the other one.
+  // that category, so a change in one category does not re-cluster and
+  // rebuild the other's layers. The buffer upload it also avoids is the
+  // minor half of that -- `clusterIndexFor` in clustering.ts carries the
+  // measurement, and re-indexing is what actually costs.
   const pokemon = useEntityStore((state) => state.pokemon)
   const gyms = useEntityStore((state) => state.gyms)
   // `useRules`' own `rules` reference is stable across renders that did

@@ -221,13 +221,18 @@ export function createClusterIndex<T extends ClusterPoint>(
   /**
    * The last answer, and the camera it answered for.
    *
-   * Two queries for the same camera are the same answer, and deck.gl
-   * cares that they are the same ARRAYS: it re-uploads a layer's buffers
-   * whenever `data` changes identity. The caller rebuilds both
+   * Two queries for the same camera are the same answer, and this hands
+   * back the same ARRAYS rather than equal ones. The caller rebuilds both
    * categories' layers whenever either category changes, so without this
    * a pokemon expiring handed the gym layer fresh arrays for a gym set
-   * that had not moved -- which is exactly the re-upload `entity-store.ts`
-   * keeps its two arrays apart to avoid.
+   * that had not moved.
+   *
+   * What that is worth is measured, and it is not the GPU: see
+   * `clusterIndexFor` below for the numbers. Replacing a layer's `data`
+   * reference turns out to cost nothing measurable, so this cache is
+   * worth its two lines for the work it saves ABOVE deck.gl -- a repeat
+   * query re-running `getClusters` and rebuilding the marker arrays --
+   * and not for any buffer upload it avoids.
    *
    * Keyed on the bounds' VALUES, because the caller reads a fresh
    * `Bounds` off the map on every `moveend`; an identity key would never
@@ -312,9 +317,27 @@ function sameRules(a: ClusterRules, b: ClusterRules): boolean {
  *
  * Note what this does NOT do: it does not memoize query RESULTS. Each
  * `query` returns fresh arrays, so a caller feeding deck.gl must keep its
- * own memo around the call - handing deck.gl a new `data` reference every
- * render would trade an index rebuild for a GPU buffer upload, which is the
- * worse of the two.
+ * own memo around the call.
+ *
+ * Keep that memo, but not for the reason this note used to give. It framed
+ * the choice as trading an index rebuild for a GPU buffer upload and called
+ * the upload the worse of the two, which was reasoning, not measurement,
+ * and the measurement says the opposite. Live at downtown Boston with the
+ * profiler on: `setProps` is 0.0-0.2ms, and across ~35 frames that actually
+ * rendered, a frame handed fresh `data` for every pokemon layer sat in the
+ * same 0.2-12ms band as a frame where every reference survived -- at 164
+ * rendered points and again at the 3,000 `forcedLimit` cap. Clustering is
+ * why: a 5,500-entity set reaches deck.gl as ~23 markers at zoom 13 and 164
+ * at zoom 16, so what gets re-uploaded is tens to hundreds of items, never
+ * the whole set. Re-indexing those 5,500 entities, by contrast, costs
+ * several ms. The upload is the cheap side of the trade; the memo earns its
+ * place by not re-clustering.
+ *
+ * Read the frame figures as an upper bound rather than an isolated cost.
+ * They are frame-to-frame durations that carry whatever else the map drew
+ * that frame, and deck.gl may fold an update into a later frame than the
+ * one measured. What they support is the ranking above and a baseline to
+ * notice a regression against -- not a precise price for one upload.
  */
 export function clusterIndexFor<T extends ClusterPoint>(
   entities: readonly T[],

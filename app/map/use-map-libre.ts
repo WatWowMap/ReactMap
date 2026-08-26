@@ -4,7 +4,12 @@ import { MapboxOverlay } from '@deck.gl/mapbox'
 import { Map as MapLibreMap, NavigationControl } from 'maplibre-gl'
 import { type RefObject, useEffect, useRef, useState } from 'react'
 import { resolveBasemapStyle } from './basemap'
-import { profCount, profilingMap, profTrackLayerData } from './profile-map'
+import {
+  profCount,
+  profilingMap,
+  profTimeSetProps,
+  profTrackLayerData,
+} from './profile-map'
 import type { MapEntity, Viewport } from './types'
 
 export interface Camera {
@@ -281,7 +286,9 @@ export function useMapLibre({
 
   useEffect(() => {
     profTrackLayerData(layers ?? [])
-    overlayRef.current?.setProps({ layers: layers ?? [] })
+    profTimeSetProps(() => {
+      overlayRef.current?.setProps({ layers: layers ?? [] })
+    })
   }, [layers])
 
   // Projects immediately when the anchor itself changes (a new selection,
