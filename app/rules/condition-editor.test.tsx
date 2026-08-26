@@ -91,3 +91,15 @@ test("a foreign vocabulary offers its own conditions and none of ReactMap's", ()
   expect(getByText('Weight')).toBeTruthy()
   expect(queryByText('IV')).toBeNull()
 })
+
+test('a row label is capitalised for the form, not left lowercase as the sentence renderer wants it', () => {
+  // REACTMAP_VOCABULARY's `attack` label is lowercase so it reads right
+  // mid-sentence in describeWithVocabulary ("attack 10+"); a standalone
+  // form label is not mid-sentence, so the editor capitalises it itself
+  // rather than the vocabulary carrying a second, editor-only casing.
+  const { getByRole, getByText, queryByText } = render(<ConditionEditor />)
+  fireEvent.click(getByRole('button', { name: '+' }))
+  fireEvent.click(getByRole('option', { name: /^attack$/i }))
+  expect(getByText('Attack')).toBeTruthy()
+  expect(queryByText('attack')).toBeNull()
+})

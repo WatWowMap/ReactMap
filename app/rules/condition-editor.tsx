@@ -22,6 +22,12 @@
  * belong to a delivery tail no rule-row editor writes; a vocabulary is
  * free to declare them and this editor simply does not offer them in its
  * `+` menu.
+ *
+ * A vocabulary's `label` is written for `describeWithVocabulary`'s
+ * mid-sentence use ("attack 10+", not "Attack 10+"), but a form control's
+ * label is not mid-sentence -- so every label this editor shows is run
+ * through `capitalize` at the point of rendering, rather than the
+ * descriptor carrying a second, editor-specific casing of the same word.
  */
 
 import { useMemo, useState } from 'react'
@@ -52,6 +58,11 @@ type FieldValues = Record<string, number | string | null>
 interface EditorState {
   active: ReadonlySet<string>
   fields: FieldValues
+}
+
+/** "attack" -> "Attack". Already-capitalised words (`IV`, `CP`, `Little`) pass through unchanged. */
+function capitalize(word: string): string {
+  return word.length > 0 ? word.charAt(0).toUpperCase() + word.slice(1) : word
 }
 
 function editableDefs(vocab: Vocabulary) {
@@ -173,17 +184,17 @@ export function ConditionEditor({
       {activeRanges.map((def) => (
         <div key={def.key} className="flex items-center gap-2">
           <span className="w-16 text-sm text-muted-foreground">
-            {def.label}
+            {capitalize(def.label)}
           </span>
           <Input
             type="number"
-            aria-label={`${def.label} minimum`}
+            aria-label={`${capitalize(def.label)} minimum`}
             value={(fields[def.minField] as number | null | undefined) ?? ''}
             onChange={(event) => updateRange(def, 'min', event.target.value)}
           />
           <Input
             type="number"
-            aria-label={`${def.label} maximum`}
+            aria-label={`${capitalize(def.label)} maximum`}
             value={(fields[def.maxField] as number | null | undefined) ?? ''}
             onChange={(event) => updateRange(def, 'max', event.target.value)}
           />
@@ -193,7 +204,7 @@ export function ConditionEditor({
       {activeChoices.map((def) => (
         <div key={def.key} className="flex items-center gap-2">
           <span className="w-16 text-sm text-muted-foreground">
-            {def.label}
+            {capitalize(def.label)}
           </span>
           <RadioGroup
             className="flex flex-row gap-3"
@@ -210,7 +221,7 @@ export function ConditionEditor({
                   value={String(option.value)}
                 />
                 <label htmlFor={`${def.key}-${option.value}`}>
-                  {option.label}
+                  {capitalize(option.label)}
                 </label>
               </span>
             ))}
@@ -242,7 +253,7 @@ export function ConditionEditor({
                 className="rounded-md px-2 py-1 text-left text-sm hover:bg-muted"
                 onClick={() => addCondition(def.key)}
               >
-                {def.label}
+                {capitalize(def.label)}
               </button>
             ))}
           </div>
