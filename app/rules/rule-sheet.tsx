@@ -12,18 +12,20 @@
  * to its species id here rather than being silently dropped.
  *
  * `RuleSheet<P>` carries the same patch type parameter `ConditionEditor<P>`
- * does, and for the same reason: `vocabulary` and `onChange` must agree on
- * one schema, and tying them to one type parameter is what makes a
- * mismatched pair a compile error instead of a silent relabel. Task 12's
- * Alerts sheet is expected to reuse this component unmodified as
+ * does, and the same overload pair: `vocabulary` and `onChange` must agree
+ * on one schema, and omitting the vocabulary pins the schema to ReactMap's
+ * rather than letting `onChange` name one on its own. Task 12's Alerts
+ * sheet is expected to reuse this component unmodified as
  * `RuleSheet<AlertPatch>` with Poracle's vocabulary.
  */
 
+import type { ReactElement } from 'react'
 import { Label } from '../components/ui/label'
 import { Switch } from '../components/ui/switch'
 import type { ConditionSeed } from './condition-editor'
 import { ConditionEditor } from './condition-editor'
 import type { ConditionPatch, Vocabulary } from './condition-vocabulary'
+import { REACTMAP_VOCABULARY } from './condition-vocabulary'
 import type { RulePatch } from './rules-query'
 import type { SpeciesEntry, SpeciesSelection } from './species-picker'
 import { SpeciesPicker } from './species-picker'
@@ -48,6 +50,17 @@ export interface RuleSheetProps<P extends ConditionPatch = RulePatch> {
   onExclusionsChange?: (exclusions: number[]) => void
 }
 
+/**
+ * Same overload pair as `ConditionEditor`, and for the same reason:
+ * omitting `vocabulary` pins the patch type to `RulePatch`, so a sheet
+ * wired to a foreign `onChange` cannot silently inherit ReactMap's
+ * columns. `rule-sheet-vocabulary.test.tsx` holds a `@ts-expect-error`
+ * for that call.
+ */
+export function RuleSheet(props: RuleSheetProps<RulePatch>): ReactElement
+export function RuleSheet<P extends ConditionPatch>(
+  props: RuleSheetProps<P> & { vocabulary: Vocabulary<P> },
+): ReactElement
 export function RuleSheet<P extends ConditionPatch = RulePatch>({
   speciesId,
   enabled = true,
@@ -58,6 +71,12 @@ export function RuleSheet<P extends ConditionPatch = RulePatch>({
   onChange,
   onExclusionsChange,
 }: RuleSheetProps<P>) {
+  // Sound because of the overloads above: `vocabulary` can only be absent
+  // on the first signature, whose `P` is `RulePatch` -- exactly what
+  // `REACTMAP_VOCABULARY` is declared as.
+  const resolvedVocabulary =
+    vocabulary ?? (REACTMAP_VOCABULARY as unknown as Vocabulary<P>)
+
   return (
     <div className="flex flex-col gap-4">
       {/* The off switch sits above the conditions rather than beside the
@@ -79,8 +98,8 @@ export function RuleSheet<P extends ConditionPatch = RulePatch>({
         />
       </div>
       <ConditionEditor
+        vocabulary={resolvedVocabulary}
         {...(conditions ? { conditions } : {})}
-        {...(vocabulary ? { vocabulary } : {})}
         {...(onChange ? { onChange } : {})}
       />
       {speciesId === null && (

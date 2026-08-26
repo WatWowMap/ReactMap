@@ -39,6 +39,7 @@
  * same parameter through for the same reason.
  */
 
+import type { ReactElement } from 'react'
 import { useMemo, useState } from 'react'
 import { Button } from '../components/ui/button'
 import { Input } from '../components/ui/input'
@@ -116,17 +117,36 @@ export interface ConditionEditorProps<P extends ConditionPatch = RulePatch> {
   onChange?: (patch: P) => void
 }
 
+/**
+ * Two call shapes, and the overload pair is what keeps them apart.
+ * Omitting `vocabulary` PINS the patch type to `RulePatch` rather than
+ * inferring it from `onChange` alone: the default vocabulary is
+ * ReactMap's own columns, so an `onChange` typed for anything else is a
+ * mislabel, and this signature rejects it. Supplying a vocabulary infers
+ * the patch type from it, and `onChange` must then agree.
+ *
+ * Without the first signature, `<ConditionEditor onChange={(patch:
+ * AlertPatch) => ...} />` compiled: `P` inferred as `AlertPatch` from
+ * `onChange`, and ReactMap's vocabulary got handed to the caller under
+ * Poracle's name. `condition-editor.test.tsx` holds a `@ts-expect-error`
+ * for exactly that call, so deleting these signatures fails typecheck.
+ */
+export function ConditionEditor(
+  props: ConditionEditorProps<RulePatch>,
+): ReactElement
+export function ConditionEditor<P extends ConditionPatch>(
+  props: ConditionEditorProps<P> & { vocabulary: Vocabulary<P> },
+): ReactElement
 export function ConditionEditor<P extends ConditionPatch = RulePatch>({
   conditions = [],
   vocabulary,
   onChange,
 }: ConditionEditorProps<P>) {
-  // `REACTMAP_VOCABULARY` is concretely `Vocabulary<RulePatch>`; the
-  // fallback only runs when the caller also left `P` at its default
-  // (`RulePatch`), which is the one case this is actually sound in. A
-  // caller supplying its own `P` must supply its own `vocabulary` too --
-  // there is no meaningful default for a schema this component doesn't
-  // know about.
+  // Sound because of the overloads above, not because of a convention:
+  // `vocabulary` can only be absent on the first signature, whose `P` is
+  // `RulePatch`, which is exactly what `REACTMAP_VOCABULARY` is declared
+  // as. The cast is the implementation signature's generic `P` catching
+  // up with what the call site already proved.
   const resolvedVocabulary =
     vocabulary ?? (REACTMAP_VOCABULARY as unknown as Vocabulary<P>)
 

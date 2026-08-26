@@ -103,3 +103,18 @@ test('a row label is capitalised for the form, not left lowercase as the sentenc
   expect(getByText('Attack')).toBeTruthy()
   expect(queryByText('attack')).toBeNull()
 })
+
+test('an editor with a foreign onChange and no vocabulary does not compile', () => {
+  /** Task 5's `AlertRow` shape, cut down: Poracle's columns, not a rule's. */
+  type AlertPatch = Partial<{ ping: string; weightMin: number }>
+  // Omitting `vocabulary` pins the patch type to ReactMap's `RulePatch`,
+  // which is what the default vocabulary actually describes. This used to
+  // infer `P` from `onChange` alone, so the editor rendered ReactMap's
+  // rows and handed the caller a rule patch under Poracle's name. The
+  // directive fails typecheck if that hole ever reopens.
+  const bad = (
+    // @ts-expect-error
+    <ConditionEditor onChange={(patch: AlertPatch) => patch} />
+  )
+  expect(bad).toBeTruthy()
+})
