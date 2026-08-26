@@ -26,13 +26,22 @@ test('an unlisted role does not', () => {
   )
 })
 
-test('a provider with no configured roles denies rather than throwing', () => {
-  // telegramGroups is [], and a config that omits the key entirely must
-  // behave the same way. 1.x relied on optional chaining here; losing it
-  // turns a malformed config into a boot crash.
+test('a provider whose role list is empty denies rather than granting', () => {
   expect(alertsPerm(['role-a'], 'telegramGroups', { config: PORACLE })).toBe(
     false,
   )
+})
+
+test('a provider the config omits entirely denies rather than throwing', () => {
+  // Not the same case as the empty list above, and the one the optional
+  // chaining in `alertsPerm` exists for: an operator's config carries only the
+  // providers they use, so the key is absent rather than []. 1.x relied on the
+  // same chaining; losing it turns an ordinary config into a boot crash.
+  const omitted = { enabled: true, host: 'http://localhost', port: 3030 }
+  expect(alertsPerm(['role-a'], 'telegramGroups', { config: omitted })).toBe(
+    false,
+  )
+  expect(alertsPerm(['role-a'], 'local', { config: omitted })).toBe(false)
 })
 
 test('no roles is a denial, not a grant', () => {
