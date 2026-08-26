@@ -11,6 +11,20 @@
  * No `enabledField`: Poracle's per-alert row has no `enabled` column, its
  * enabled flag lives on the human row instead, so the sheet's on/off
  * switch correctly does not render for this vocabulary.
+ *
+ * Every optional filter column is `number | null`: Poracle's v2 API
+ * projects an unset filter to JSON `null` rather than to its stored
+ * sentinel (`pokemonRowToRule`, PoracleNG's `v2_pokemon.go`), and
+ * `describeWithVocabulary`'s `?? null` omission logic already does the
+ * right thing with that -- an unfiltered alert should say nothing, not
+ * "IV 0%, CP 0, ...". `gender` is `string | null`
+ * (`'male' | 'female' | 'genderless'`, `null` for "any") rather than a
+ * number: Poracle's wire genuinely encodes it as the word, not the int it
+ * stores internally, so this is not a type chosen to be different, it is
+ * the real one -- and it is also what keeps `RulePatch` (whose `gender` is
+ * `number | null`) from becoming assignable into `AlertPatch` now that
+ * every other shared column matches `Rule`'s own nullability. See the
+ * `@ts-expect-error` in `rule-sheet-vocabulary.test.tsx` this guards.
  */
 
 import {
@@ -31,31 +45,31 @@ export interface AlertRow {
   distance: number
   template: string
   overrideLocationLabel: string | null
-  ivMin: number
-  ivMax: number
-  cpMin: number
-  cpMax: number
-  levelMin: number
-  levelMax: number
-  atkMin: number
-  atkMax: number
-  defMin: number
-  defMax: number
-  staMin: number
-  staMax: number
-  gender: number
-  weightMin: number
-  weightMax: number
-  minTime: number
-  rarityMin: number
-  rarityMax: number
-  sizeMin: number
-  sizeMax: number
-  pvpLeague: number
-  pvpRankBest: number
-  pvpRankWorst: number
-  pvpMinCp: number
-  pvpCap: number
+  ivMin: number | null
+  ivMax: number | null
+  cpMin: number | null
+  cpMax: number | null
+  levelMin: number | null
+  levelMax: number | null
+  atkMin: number | null
+  atkMax: number | null
+  defMin: number | null
+  defMax: number | null
+  staMin: number | null
+  staMax: number | null
+  gender: string | null
+  weightMin: number | null
+  weightMax: number | null
+  minTime: number | null
+  rarityMin: number | null
+  rarityMax: number | null
+  sizeMin: number | null
+  sizeMax: number | null
+  pvpLeague: number | null
+  pvpRankBest: number | null
+  pvpRankWorst: number | null
+  pvpMinCp: number | null
+  pvpCap: number | null
   description: string | null
 }
 
@@ -125,9 +139,9 @@ export const PORACLE_VOCABULARY: Vocabulary<AlertPatch> = {
       label: 'gender',
       field: 'gender',
       options: [
-        { value: 1, label: 'male' },
-        { value: 2, label: 'female' },
-        { value: 3, label: 'genderless' },
+        { value: 'male', label: 'male' },
+        { value: 'female', label: 'female' },
+        { value: 'genderless', label: 'genderless' },
       ],
     },
     {

@@ -15,6 +15,18 @@
  * a few fields deleted.
  */
 
+/**
+ * Every optional filter Poracle's v2 API carries is a pointer on its side,
+ * projected to JSON `null` when the rule is at that filter's documented
+ * wildcard -- never the stored sentinel itself (`pokemonRowToRule`,
+ * PoracleNG's `v2_pokemon.go`). "Unset" and "set to the sentinel value" are
+ * not events that can happen on the wire, so a column that can be unset is
+ * typed `number | null` here, matching how `Rule`'s own nullable columns
+ * (`app/rules/rule-types.ts`) already mean the same thing. `gender` is a
+ * nullable *string* enum on the wire (`"male" | "female" | "genderless"`,
+ * `null` for "any"), not a number -- Poracle stores it as an int but its v2
+ * response translates it back to the enum's words before sending it.
+ */
 export interface AlertRow {
   uid: number
   profileNo: number
@@ -26,31 +38,31 @@ export interface AlertRow {
   distance: number
   template: string
   overrideLocationLabel: string | null
-  ivMin: number
-  ivMax: number
-  cpMin: number
-  cpMax: number
-  levelMin: number
-  levelMax: number
-  atkMin: number
-  atkMax: number
-  defMin: number
-  defMax: number
-  staMin: number
-  staMax: number
-  gender: number
-  weightMin: number
-  weightMax: number
-  minTime: number
-  rarityMin: number
-  rarityMax: number
-  sizeMin: number
-  sizeMax: number
-  pvpLeague: number
-  pvpRankBest: number
-  pvpRankWorst: number
-  pvpMinCp: number
-  pvpCap: number
+  ivMin: number | null
+  ivMax: number | null
+  cpMin: number | null
+  cpMax: number | null
+  levelMin: number | null
+  levelMax: number | null
+  atkMin: number | null
+  atkMax: number | null
+  defMin: number | null
+  defMax: number | null
+  staMin: number | null
+  staMax: number | null
+  gender: string | null
+  weightMin: number | null
+  weightMax: number | null
+  minTime: number | null
+  rarityMin: number | null
+  rarityMax: number | null
+  sizeMin: number | null
+  sizeMax: number | null
+  pvpLeague: number | null
+  pvpRankBest: number | null
+  pvpRankWorst: number | null
+  pvpMinCp: number | null
+  pvpCap: number | null
   description: string | null
 }
 
@@ -141,31 +153,31 @@ function toAlertRow(row: any): AlertRow {
     distance: num(row?.distance),
     template: str(row?.template),
     overrideLocationLabel: nullableStr(row?.override_location_label),
-    ivMin: num(row?.min_iv),
-    ivMax: num(row?.max_iv),
-    cpMin: num(row?.min_cp),
-    cpMax: num(row?.max_cp),
-    levelMin: num(row?.min_level),
-    levelMax: num(row?.max_level),
-    atkMin: num(row?.atk),
-    atkMax: num(row?.max_atk),
-    defMin: num(row?.def),
-    defMax: num(row?.max_def),
-    staMin: num(row?.sta),
-    staMax: num(row?.max_sta),
-    gender: num(row?.gender),
-    weightMin: num(row?.min_weight),
-    weightMax: num(row?.max_weight),
-    minTime: num(row?.min_time),
-    rarityMin: num(row?.rarity),
-    rarityMax: num(row?.max_rarity),
-    sizeMin: num(row?.size),
-    sizeMax: num(row?.max_size),
-    pvpLeague: num(row?.pvp_ranking_league),
-    pvpRankBest: num(row?.pvp_ranking_best),
-    pvpRankWorst: num(row?.pvp_ranking_worst),
-    pvpMinCp: num(row?.pvp_ranking_min_cp),
-    pvpCap: num(row?.pvp_ranking_cap),
+    ivMin: nullableNum(row?.min_iv),
+    ivMax: nullableNum(row?.max_iv),
+    cpMin: nullableNum(row?.min_cp),
+    cpMax: nullableNum(row?.max_cp),
+    levelMin: nullableNum(row?.min_level),
+    levelMax: nullableNum(row?.max_level),
+    atkMin: nullableNum(row?.atk),
+    atkMax: nullableNum(row?.max_atk),
+    defMin: nullableNum(row?.def),
+    defMax: nullableNum(row?.max_def),
+    staMin: nullableNum(row?.sta),
+    staMax: nullableNum(row?.max_sta),
+    gender: nullableStr(row?.gender),
+    weightMin: nullableNum(row?.min_weight),
+    weightMax: nullableNum(row?.max_weight),
+    minTime: nullableNum(row?.min_time),
+    rarityMin: nullableNum(row?.rarity),
+    rarityMax: nullableNum(row?.max_rarity),
+    sizeMin: nullableNum(row?.size),
+    sizeMax: nullableNum(row?.max_size),
+    pvpLeague: nullableNum(row?.pvp_ranking_league),
+    pvpRankBest: nullableNum(row?.pvp_ranking_best),
+    pvpRankWorst: nullableNum(row?.pvp_ranking_worst),
+    pvpMinCp: nullableNum(row?.pvp_ranking_min_cp),
+    pvpCap: nullableNum(row?.pvp_ranking_cap),
     description: nullableStr(row?.description),
   }
 }
