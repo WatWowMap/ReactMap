@@ -31,10 +31,14 @@
 The V2 endpoints this plan uses. `{id}` is the platform id (a Discord snowflake), and Poracle owns
 the scoping.
 
+These were read off PoracleNG's Go structs, not inferred from field names. Two shapes bit this
+plan already: `GET /v2/humans/{id}` returns `{ human }` and nothing else, so it cannot serve the
+tab; and the snapshot's locations container is `{ default?, named[] }`, not `{ locations[] }`.
+
 | Purpose | Method and path |
 | --- | --- |
-| Does this human exist | `GET /v2/humans/{id}`, 404 when not |
-| Everything for the tab | `GET /v2/humans/{id}/tracking?all_profiles=true&include_descriptions=true` |
+| Does this human exist | `GET /v2/humans/{id}`, 404 when not. Returns `{ human }` ONLY, no tracking or profiles or locations |
+| Everything for the tab | `GET /v2/humans/{id}/tracking?all_profiles=true&include_descriptions=true`. The ONLY endpoint that serves the tab. Dropping the query params costs `profileNo` and `description` |
 | List one type | `GET /v2/humans/{id}/tracking/pokemon` |
 | Create | `POST /v2/humans/{id}/tracking/pokemon?silent=true`, body is an array, returns `{created,updated,unchanged}` |
 | Full replace | `PUT /v2/humans/{id}/tracking/pokemon/{uid}`, returns a NEW uid in `{updated}` |
@@ -867,7 +871,7 @@ const SNAPSHOT = {
     raid: [],
   },
   profiles: [{ profile_no: 2, name: 'default' }],
-  locations: { locations: [{ label: 'work', latitude: 1, longitude: 2 }] },
+  locations: { named: [{ label: 'work', latitude: 1, longitude: 2 }] },
   summaries: [],
   mutes: [],
 }
@@ -1011,7 +1015,7 @@ const SNAPSHOT_BODY = {
   human: { enabled: 1, current_profile_no: 1, latitude: null, longitude: null, area: '[]' },
   tracking: { pokemon: [] },
   profiles: [],
-  locations: { locations: [] },
+  locations: { named: [] },
 }
 
 test('snapshot requires the alerts perm', async () => {
@@ -1846,7 +1850,7 @@ test('deleting a saved location an alert anchors to is refused', async () => {
         body: {
           ...SNAPSHOT_BODY,
           tracking: { pokemon: [{ uid: 1, override_location_label: 'work' }] },
-          locations: { locations: [{ label: 'work', latitude: 1, longitude: 2 }] },
+          locations: { named: [{ label: 'work', latitude: 1, longitude: 2 }] },
         },
       }),
       send: async () => ({ status: 200, body: {} }),
