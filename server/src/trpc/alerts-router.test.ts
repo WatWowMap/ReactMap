@@ -7,6 +7,15 @@ function caller(ctx: any) {
   return alertsRouter.createCaller(ctx)
 }
 
+// The two endpoints this router may call, spelled out. `GET /v2/humans/{id}`
+// returns `{ human }` and nothing else, so it cannot serve the tab; the
+// snapshot endpoint is the only one carrying tracking, profiles and locations
+// together, and dropping either query param silently costs every rule's
+// profile number and description.
+const HUMAN_PATH = '/v2/humans/123'
+const TRACKING_PATH =
+  '/v2/humans/123/tracking?all_profiles=true&include_descriptions=true'
+
 const SNAPSHOT_BODY = {
   human: {
     enabled: 1,
@@ -17,14 +26,35 @@ const SNAPSHOT_BODY = {
   },
   tracking: { pokemon: [] },
   profiles: [],
-  locations: { locations: [] },
+  locations: { named: [] },
+}
+
+/**
+ * A Poracle that answers the paths Poracle actually has, and 404s the rest.
+ *
+ * A fake answering every URL identically cannot test routing, which is how a
+ * snapshot pointed at the human endpoint passed every test while rendering an
+ * empty tab against a live Poracle. `seen` is what a test asserts on.
+ */
+function fakePoracle(body: any = SNAPSHOT_BODY) {
+  const seen: string[] = []
+  return {
+    seen,
+    get: async (path: string) => {
+      seen.push(path)
+      if (path === HUMAN_PATH)
+        return { status: 200, body: { human: body.human } }
+      if (path === TRACKING_PATH) return { status: 200, body }
+      return { status: 404, body: null }
+    },
+  }
 }
 
 const BASE = {
   user: { id: 'u1' },
   session: null,
   perms: { alerts: true },
-  poracleClient: { get: async () => ({ status: 200, body: SNAPSHOT_BODY }) },
+  poracleClient: fakePoracle(),
   platformId: '123',
 }
 
@@ -46,9 +76,54 @@ test('the platform id is never accepted as input', () => {
   expect(def.inputs ?? []).toHaveLength(0)
 })
 
+test('the tab comes from the tracking endpoint, with both query params', async () => {
+  // GET /v2/humans/{id} carries the human and nothing else, so a snapshot
+  // taken from it renders a tab with no rules, no profiles and no locations.
+  // all_profiles is what makes a rule outside the active profile visible, and
+  // include_descriptions is the only source of AlertRow.description.
+  const client = fakePoracle({
+    ...SNAPSHOT_BODY,
+    tracking: { pokemon: [{ uid: 7, profile_no: 2, description: 'a shiny' }] },
+    profiles: [{ profile_no: 2, name: 'default' }],
+    locations: { named: [{ label: 'work', latitude: 1, longitude: 2 }] },
+  })
+  const snapshot = await caller({ ...BASE, poracleClient: client }).snapshot()
+
+  expect(client.seen).toEqual([TRACKING_PATH])
+  expect(snapshot.alerts).toHaveLength(1)
+  expect(snapshot.alerts[0]).toMatchObject({
+    uid: 7,
+    profileNo: 2,
+    description: 'a shiny',
+  })
+  expect(snapshot.profiles).toHaveLength(1)
+  // Poracle's container is { default?, named[] }, not { locations[] }.
+  expect(snapshot.locations).toEqual([
+    { label: 'work', latitude: 1, longitude: 2 },
+  ])
+})
+
+test('a Poracle that is not answering gives an empty tab, not a 500', async () => {
+  // The whole point of the three states: an outage is a tab that says so, and
+  // status already degrades this way. A snapshot that throws instead turns a
+  // restart into an error page.
+  const ctx = {
+    ...BASE,
+    poracleClient: {
+      get: async () => {
+        throw new Error('fetch failed: ECONNREFUSED')
+      },
+    },
+  }
+  expect(await caller(ctx).snapshot()).toMatchObject({ alerts: [] })
+})
+
 test('status reports unconfigured when no Poracle is set up', async () => {
   const ctx = { ...BASE, poracleClient: null }
-  expect(await caller(ctx).status()).toEqual({ state: 'unconfigured' })
+  expect(await caller(ctx).status()).toEqual({
+    state: 'unconfigured',
+    pokemonBlocked: false,
+  })
 })
 
 test('an account with no linked Discord identity is absent, not a crash', async () => {
@@ -62,15 +137,10 @@ test('a human blocked from monster alerts gets a live tab that cannot write', as
   // left, but the subtraction still decides whether this account may use it.
   const ctx = {
     ...BASE,
-    poracleClient: {
-      get: async () => ({
-        status: 200,
-        body: {
-          ...SNAPSHOT_BODY,
-          human: { ...SNAPSHOT_BODY.human, blocked_alerts: '["monster"]' },
-        },
-      }),
-    },
+    poracleClient: fakePoracle({
+      ...SNAPSHOT_BODY,
+      human: { ...SNAPSHOT_BODY.human, blocked_alerts: '["monster"]' },
+    }),
   }
   expect(await caller(ctx).status()).toMatchObject({
     state: 'present',
@@ -88,15 +158,10 @@ test('blocked_alerts that is null does not crash and does not block', async () =
   // how a dead Poracle became an empty tab with dead buttons.
   const ctx = {
     ...BASE,
-    poracleClient: {
-      get: async () => ({
-        status: 200,
-        body: {
-          ...SNAPSHOT_BODY,
-          human: { ...SNAPSHOT_BODY.human, blocked_alerts: null },
-        },
-      }),
-    },
+    poracleClient: fakePoracle({
+      ...SNAPSHOT_BODY,
+      human: { ...SNAPSHOT_BODY.human, blocked_alerts: null },
+    }),
   }
   expect(await caller(ctx).status()).toMatchObject({ pokemonBlocked: false })
 })

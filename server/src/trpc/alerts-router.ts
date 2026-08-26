@@ -43,7 +43,16 @@ interface PlatformIdDeps {
   listAccounts?: (db: any, userId: string) => Promise<AccountRow[]>
 }
 
-/** This user's linked identities, and nobody else's. */
+/**
+ * This user's linked identities, and nobody else's.
+ *
+ * Ordered because two Discord rows under one user id are schema-legal: the
+ * unique index is (issuer, account_id), not (user_id, provider_id). Both ids
+ * belong to the same person, so nothing can be impersonated, but an unordered
+ * SELECT could return them in either order and a flip would move that person's
+ * subscriptions between two Poracle humans -- writes go to this id, and the
+ * human-state cache is keyed on the user rather than on it.
+ */
 function listAccountRows(db: any, userId: string): Promise<AccountRow[]> {
   return db
     .select({
@@ -52,6 +61,7 @@ function listAccountRows(db: any, userId: string): Promise<AccountRow[]> {
     })
     .from(authAccount)
     .where(eq(authAccount.userId, userId))
+    .orderBy(authAccount.accountId)
 }
 
 /**
@@ -121,6 +131,19 @@ function humanPath(platformId: string): string {
 }
 
 /**
+ * The only endpoint that can fill the tab.
+ *
+ * `humanPath` returns the human record and nothing else -- no tracking, no
+ * profiles, no locations -- so a snapshot taken from it renders every panel
+ * empty. Both query params are load-bearing too: without `all_profiles` the
+ * rules come back for the active profile only, and without
+ * `include_descriptions` every rule's description is null.
+ */
+function trackingPath(platformId: string): string {
+  return `${humanPath(platformId)}/tracking?all_profiles=true&include_descriptions=true`
+}
+
+/**
  * The Poracle client for this request, or `null` when there is no Poracle.
  *
  * An explicit `null` on the context is the context saying so; only a context
@@ -153,7 +176,7 @@ async function readHuman(
 
 interface AlertsStatus {
   state: HumanState | 'unconfigured'
-  pokemonBlocked?: boolean
+  pokemonBlocked: boolean
 }
 
 const alertsRouter = t.router({
@@ -167,7 +190,15 @@ const alertsRouter = t.router({
   status: t.procedure.query(async ({ ctx }): Promise<AlertsStatus> => {
     const userId = requirePerm(ctx, 'alerts')
     const client = clientFor(ctx)
-    if (!client) return { state: 'unconfigured' }
+    if (!client) {
+      // Carried on every branch, including this one: a client reading
+      // `!status.pokemonBlocked` would otherwise take a missing key as a
+      // grant.
+      return {
+        state: 'unconfigured',
+        pokemonBlocked: pokemonBlocked(ctx.poracleConfig, null),
+      }
+    }
 
     const platformId = await platformIdFor(ctx, userId)
     if (!platformId) {
@@ -200,9 +231,16 @@ const alertsRouter = t.router({
     const platformId = await platformIdFor(ctx, userId)
     if (!platformId) return toAlertsSnapshot(null)
 
-    const res = await client.get(humanPath(platformId))
-    if (res.status < 200 || res.status >= 300) return toAlertsSnapshot(null)
-    return toAlertsSnapshot(res.body)
+    try {
+      const res = await client.get(trackingPath(platformId))
+      if (res.status < 200 || res.status >= 300) return toAlertsSnapshot(null)
+      return toAlertsSnapshot(res.body)
+    } catch {
+      // A Poracle that is not answering is an empty tab, the same way
+      // `readHuman` already degrades. Throwing here turns a restart into an
+      // error page, and `status` has already told the client what is wrong.
+      return toAlertsSnapshot(null)
+    }
   }),
 })
 
