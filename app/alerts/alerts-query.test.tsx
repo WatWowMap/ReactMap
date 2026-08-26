@@ -7,6 +7,7 @@ import {
   render,
   waitFor,
 } from '@testing-library/react'
+import type { AlertRow } from '../rules/poracle-vocabulary'
 import { createRulesQueryClient } from '../rules/rules-query'
 import { setupDom, teardownDom } from '../test-setup'
 import type { AlertsClient, AlertsSnapshot, AlertsState } from './alerts-query'
@@ -312,4 +313,86 @@ test('setAreas refetches rather than trusting its own response, so what Poracle 
   await waitFor(() => expect(getByTestId('areas').textContent).toBe('uptown'))
   // Never the guessed superset the mutation's own response claimed.
   expect(getByTestId('areas').textContent).not.toBe('uptown,downtown')
+})
+
+/**
+ * A rule at every wildcard Poracle has one for, typed as the `AlertRow` a
+ * client really reads back: each unset filter is `null`, because that is what
+ * the v2 surface projects a wildcard column to (`poracle-view.ts`). `costume`
+ * is the field this exists for -- `null` there means "any costume" (stored
+ * 9000), and the value `0` means the opposite, "only uncostumed spawns".
+ */
+const ANY_COSTUME_ROW: AlertRow = {
+  uid: 1,
+  profileNo: 1,
+  pokemonId: 149,
+  // `form` is not nullable here and does not need to be: its wildcard is 0 on
+  // both sides, so the wire's `null` and the stored "any form" are the same
+  // value once mapped. `costume` is the exception -- its wildcard is 9000.
+  form: 0,
+  costume: null,
+  ping: '<@123>',
+  clean: false,
+  distance: 0,
+  template: '',
+  overrideLocationLabel: null,
+  ivMin: 90,
+  ivMax: null,
+  cpMin: null,
+  cpMax: null,
+  levelMin: null,
+  levelMax: null,
+  atkMin: null,
+  atkMax: null,
+  defMin: null,
+  defMax: null,
+  staMin: null,
+  staMax: null,
+  gender: null,
+  weightMin: null,
+  weightMax: null,
+  minTime: null,
+  rarityMin: null,
+  rarityMax: null,
+  sizeMin: null,
+  sizeMax: null,
+  pvpLeague: null,
+  pvpRankBest: null,
+  pvpRankWorst: null,
+  pvpMinCp: null,
+  pvpCap: null,
+  description: 'Dragonite 90%+',
+}
+
+test('editing one field of a rule never narrows its costume from any to none', () => {
+  // The read and the write together: `replace` merges its patch onto the
+  // stored row and sends the whole thing back, because Poracle's PUT is a full
+  // replace. So whatever the read produced for an untouched column is what
+  // gets written. A read that turned "any costume" into 0 would therefore stop
+  // a person being alerted for every costumed spawn of the species the moment
+  // they saved an unrelated edit, with nothing on screen saying so.
+  let sent: unknown = null
+  const client: AlertsClient = {
+    ...unusedWrites,
+    status: async () => ({ state: 'present' }),
+    snapshot: async () => ({ ...EMPTY_SNAPSHOT, alerts: [ANY_COSTUME_ROW] }),
+    replace: async (args) => {
+      sent = args.rule
+      return { uid: args.uid }
+    },
+  }
+  const { getByTestId, getByText } = renderProbe(client)
+  return waitFor(() => expect(getByTestId('alert-count').textContent).toBe('1'))
+    .then(() => {
+      fireEvent.click(getByText('replace'))
+      return waitFor(() => expect(sent).not.toBeNull())
+    })
+    .then(() => {
+      const rule = sent as Record<string, unknown>
+      expect(rule.costume).toBeNull()
+      expect(rule.costume).not.toBe(0)
+      // The patched field still travels, so this is not passing by writing
+      // nothing at all.
+      expect(rule.ivMin).toBe(100)
+    })
 })

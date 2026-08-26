@@ -17,7 +17,10 @@
  * sentinel (`pokemonRowToRule`, PoracleNG's `v2_pokemon.go`), and
  * `describeWithVocabulary`'s `?? null` omission logic already does the
  * right thing with that -- an unfiltered alert should say nothing, not
- * "IV 0%, CP 0, ...". `gender` is `string | null`
+ * "IV 0%, CP 0, ...". `costume` is the one where that nullability decides a
+ * rule's meaning rather than its wording: Poracle's wildcard for it is 9000,
+ * so `null` is "any costume" and `0` is "no costume" -- two different filters,
+ * not two spellings of the same one. `gender` is `string | null`
  * (`'male' | 'female' | 'genderless'`, `null` for "any") rather than a
  * number: Poracle's wire genuinely encodes it as the word, not the int it
  * stores internally, so this is not a type chosen to be different, it is
@@ -39,7 +42,7 @@ export interface AlertRow {
   profileNo: number
   pokemonId: number
   form: number
-  costume: number
+  costume: number | null
   ping: string
   clean: boolean
   distance: number

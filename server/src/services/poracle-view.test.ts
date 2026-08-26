@@ -26,33 +26,40 @@ const SNAPSHOT = {
         distance: 5000,
         template: 'default',
         pokemon_id: 149,
-        form: 0,
-        costume: 0,
+        // Every filter this rule does not use arrives as JSON `null`, never as
+        // the stored sentinel: Poracle's v2 surface projects a column sitting
+        // at its documented wildcard through `ptrUnless` before it answers
+        // (`pokemonRowToRule`, PoracleNG's `v2_pokemon.go`, and the snapshot
+        // endpoint reuses that same projection). A fixture full of `0`/`-1`/`6`
+        // is a shape the wire cannot produce, and it hides the one case that
+        // matters -- see the costume tests below.
+        form: null,
+        costume: null,
         min_iv: 90,
-        max_iv: 100,
-        min_cp: 0,
+        max_iv: null,
+        min_cp: null,
         max_cp: 4096,
         min_level: 1,
         max_level: 40,
-        atk: 0,
-        max_atk: 15,
-        def: 0,
-        max_def: 15,
-        sta: 0,
-        max_sta: 15,
-        gender: 0,
-        min_weight: 0,
-        max_weight: 9999999,
-        min_time: 0,
-        rarity: -1,
-        max_rarity: 6,
-        size: -1,
-        max_size: 5,
-        pvp_ranking_league: 0,
-        pvp_ranking_best: 1,
-        pvp_ranking_worst: 4096,
+        atk: null,
+        max_atk: null,
+        def: null,
+        max_def: null,
+        sta: null,
+        max_sta: null,
+        gender: null,
+        min_weight: null,
+        max_weight: null,
+        min_time: null,
+        rarity: null,
+        max_rarity: null,
+        size: null,
+        max_size: null,
+        pvp_ranking_league: null,
+        pvp_ranking_best: null,
+        pvp_ranking_worst: null,
         pvp_ranking_min_cp: 1,
-        pvp_ranking_cap: 0,
+        pvp_ranking_cap: null,
         override_location_label: null,
         description: 'Dragonite 90%+',
       },
@@ -77,7 +84,7 @@ test('maps a monster row into the view model', () => {
     uid: 7,
     pokemonId: 149,
     ivMin: 90,
-    ivMax: 100,
+    ivMax: null,
     clean: true,
     distance: 5000,
     description: 'Dragonite 90%+',
@@ -218,4 +225,25 @@ test('a rule Poracle did not stamp a profile onto is profile 0, not a guess', ()
     },
   })
   expect(snapshot.alerts.map((alert) => alert.profileNo)).toEqual([0, 0, 4])
+})
+
+test('a null costume stays null rather than collapsing to "no costume"', () => {
+  // The one column where the wildcard and a real filter value are different
+  // numbers: Poracle stores 9000 for "any costume" and 0 for "uncostumed", so
+  // `null` on the wire means 9000, not 0 (`pokemonRowToRule`, and the matcher
+  // in PoracleNG's `processor/internal/matching/pokemon.go`). Reading it with
+  // the non-nullable `num()` turned every "any costume" rule into an
+  // "uncostumed only" rule the moment it was read back and saved.
+  expect(toAlertsSnapshot(SNAPSHOT).alerts[0]?.costume).toBeNull()
+})
+
+test('a costume of 0 is kept, because 0 is a filter and not an absence', () => {
+  const uncostumed = {
+    ...SNAPSHOT,
+    tracking: {
+      ...SNAPSHOT.tracking,
+      pokemon: [{ ...SNAPSHOT.tracking.pokemon[0], costume: 0 }],
+    },
+  }
+  expect(toAlertsSnapshot(uncostumed).alerts[0]?.costume).toBe(0)
 })

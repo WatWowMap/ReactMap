@@ -22,7 +22,11 @@
  * PoracleNG's `v2_pokemon.go`). "Unset" and "set to the sentinel value" are
  * not events that can happen on the wire, so a column that can be unset is
  * typed `number | null` here, matching how `Rule`'s own nullable columns
- * (`app/rules/rule-types.ts`) already mean the same thing. `gender` is a
+ * (`app/rules/rule-types.ts`) already mean the same thing. `costume` is the
+ * one where that distinction is load-bearing rather than cosmetic: its
+ * wildcard is 9000, so `null` and `0` are different filters ("any costume"
+ * against "no costume"), and a rule read back as 0 is a narrower rule than
+ * the one that was stored. `gender` is a
  * nullable *string* enum on the wire (`"male" | "female" | "genderless"`,
  * `null` for "any"), not a number -- Poracle stores it as an int but its v2
  * response translates it back to the enum's words before sending it.
@@ -32,7 +36,7 @@ export interface AlertRow {
   profileNo: number
   pokemonId: number
   form: number
-  costume: number
+  costume: number | null
   ping: string
   clean: boolean
   distance: number
@@ -156,7 +160,11 @@ export function toAlertRow(row: any): AlertRow {
     profileNo: num(row?.profile_no),
     pokemonId: num(row?.pokemon_id),
     form: num(row?.form),
-    costume: num(row?.costume),
+    // `null` here is "any costume" (Poracle stores 9000 for it), and `0` is
+    // the opposite -- "only an uncostumed spawn". Reading it with `num()`
+    // silently rewrote the first as the second, so a rule tracking every
+    // costumed form of a species stopped doing so the next time it was saved.
+    costume: nullableNum(row?.costume),
     ping: str(row?.ping),
     clean: bool(row?.clean),
     distance: num(row?.distance),
