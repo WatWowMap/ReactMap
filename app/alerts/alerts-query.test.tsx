@@ -396,3 +396,62 @@ test('editing one field of a rule never narrows its costume from any to none', (
       expect(rule.ivMin).toBe(100)
     })
 })
+
+test('the banner shows the most recent failure, not the first one by field order', () => {
+  // react-query clears a mutation's error only when that same mutation runs
+  // again, so a chain of `??` over twelve of them pins the banner to whichever
+  // one is written first and masks every later failure. The one that matters
+  // most is last in that chain: `deleteLocation`'s refusal message exists to
+  // say why a delete was refused, and it was unreachable after any earlier
+  // write had failed.
+  const { getByTestId, getByText } = renderProbe(
+    writingClient({
+      create: async () => {
+        throw new Error('create blew up')
+      },
+      remove: async () => {
+        throw new Error('remove blew up')
+      },
+    }),
+  )
+  return waitFor(() => expect(getByTestId('alert-count').textContent).toBe('1'))
+    .then(() => {
+      fireEvent.click(getByText('create'))
+      return waitFor(() =>
+        expect(getByTestId('error').textContent).toBe('create blew up'),
+      )
+    })
+    .then(() => {
+      fireEvent.click(getByText('remove'))
+      return waitFor(() =>
+        expect(getByTestId('error').textContent).toBe('remove blew up'),
+      )
+    })
+})
+
+test('a write that succeeds clears the banner an earlier failure left behind', () => {
+  // Without this the banner is permanent: the failed mutation never runs
+  // again, so its error never clears, and the page keeps reporting a failure
+  // that has since been superseded by a write that worked.
+  const { getByTestId, getByText } = renderProbe(
+    writingClient({
+      create: async () => {
+        throw new Error('create blew up')
+      },
+      replace: async (args) => ({ uid: args.uid }),
+    }),
+  )
+  return waitFor(() => expect(getByTestId('alert-count').textContent).toBe('1'))
+    .then(() => {
+      fireEvent.click(getByText('create'))
+      return waitFor(() =>
+        expect(getByTestId('error').textContent).toBe('create blew up'),
+      )
+    })
+    .then(() => {
+      fireEvent.click(getByText('replace'))
+      return waitFor(() =>
+        expect(getByTestId('error').textContent).toBe('null'),
+      )
+    })
+})

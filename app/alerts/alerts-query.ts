@@ -197,6 +197,37 @@ function createDefaultAlertsClient(): AlertsClient {
 
 // Constructed once and reused across every `useAlerts` call that does not
 // supply its own client -- one link chain, not one per mount.
+/**
+ * The error from the most recently submitted write, and nothing else.
+ *
+ * A chain of `??` over the twelve mutations reads like recency and is not:
+ * react-query clears a mutation's error only when that same mutation runs
+ * again, so a single failed `create` pins the banner forever and masks every
+ * later failure. `deleteLocation`'s refusal message is the one that shows why
+ * that matters -- its whole job is explaining a refused delete, and it sits
+ * last in any fixed order.
+ *
+ * `submittedAt` is the timestamp of the last `mutate` call, so the largest one
+ * names the write that ran most recently. Reading that mutation's error --
+ * rather than the first error found -- makes a success clear the banner and a
+ * second failure replace the first. An idle mutation has `submittedAt` 0 and
+ * so can never win.
+ */
+function mostRecentError(
+  mutations: { submittedAt: number; error: unknown }[],
+): unknown {
+  let latest: { submittedAt: number; error: unknown } | null = null
+  for (const mutation of mutations) {
+    if (
+      mutation.submittedAt > 0 &&
+      mutation.submittedAt >= (latest?.submittedAt ?? 0)
+    ) {
+      latest = mutation
+    }
+  }
+  return latest?.error ?? null
+}
+
 let defaultClient: AlertsClient | null = null
 function getDefaultClient(): AlertsClient {
   if (!defaultClient) defaultClient = createDefaultAlertsClient()
@@ -223,16 +254,15 @@ export interface UseAlertsResult {
   state: 'loading' | AlertsState
   snapshot: AlertsSnapshot | null
   /**
-   * The most recent failure from `create`, `replace` or `remove` --
-   * `mutation.error` outlives the call that produced it (react-query
-   * clears it only on the next `mutate`), which is what lets a caller
-   * keep showing "that write failed" after the failed promise has
-   * already resolved. `null` once nothing has failed, or once react-query
-   * has cleared it for a fresh attempt. Modelled on `useRules`'s own
-   * `error` (`rules-query.ts`) -- the write methods below still swallow
-   * the promise, exactly like `useRules`'s do, but that swallow is only
-   * safe when the error stays reachable through this field; that was the
-   * piece missing before.
+   * The failure from whichever of the twelve writes ran last, or `null` if
+   * that one succeeded. `mutation.error` outlives the call that produced it
+   * (react-query clears it only when that same mutation runs again), which is
+   * what lets a caller keep showing "that write failed" after the failed
+   * promise has already resolved -- but it is also why the answer cannot be a
+   * chain of `??` over the twelve. See `mostRecentError`. Modelled on
+   * `useRules`'s own `error` (`rules-query.ts`) -- the write methods below
+   * still swallow the promise, exactly like `useRules`'s do, but that swallow
+   * is only safe when the error stays reachable through this field.
    */
   error: unknown
   /**
@@ -512,20 +542,20 @@ export function useAlerts({
     snapshot: state === 'present' ? (snapshotQuery.data ?? null) : null,
     availableAreas:
       state === 'present' ? (availableAreasQuery.data?.areas ?? []) : [],
-    error:
-      createMutation.error ??
-      replaceMutation.error ??
-      removeMutation.error ??
-      setEnabledMutation.error ??
-      switchProfileMutation.error ??
-      addProfileMutation.error ??
-      deleteProfileMutation.error ??
-      copyProfileRulesMutation.error ??
-      setAreasMutation.error ??
-      addLocationMutation.error ??
-      updateLocationMutation.error ??
-      deleteLocationMutation.error ??
-      null,
+    error: mostRecentError([
+      createMutation,
+      replaceMutation,
+      removeMutation,
+      setEnabledMutation,
+      switchProfileMutation,
+      addProfileMutation,
+      deleteProfileMutation,
+      copyProfileRulesMutation,
+      setAreasMutation,
+      addLocationMutation,
+      updateLocationMutation,
+      deleteLocationMutation,
+    ]),
     create: async (rule) => {
       try {
         await createMutation.mutateAsync(rule)
