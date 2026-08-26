@@ -33,6 +33,7 @@ import {
   subscribeCategory,
 } from '../services/map-subscription'
 import { createRulesSource } from '../services/rules-source'
+import { alertsRouter } from './alerts-router'
 import { masterfileRouter, rulesRouter } from './rules-router'
 import { t } from './trpc-base'
 
@@ -88,6 +89,7 @@ const appRouter = t.router({
   health: t.procedure.query(() => ({ ok: true })),
   map: mapRouter,
   rules: rulesRouter,
+  alerts: alertsRouter,
   masterfile: masterfileRouter,
 })
 

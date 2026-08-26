@@ -14,11 +14,17 @@
 // none". A signed-in context carries the merged `user_perms` rows, re-read
 // on every request so that losing a role revokes the capability with it.
 
+import config from '@rm/config'
 import { eq } from 'drizzle-orm'
 
 import { getAuth } from '../auth'
 import { userPerms } from '../db/auth-schema'
 import { getDrizzle } from '../db/drizzle'
+import {
+  createPoracleClient,
+  type PoracleClient,
+  poracleConfigured,
+} from '../services/poracle-client'
 import { mergePerms } from '../settings-response'
 
 async function resolveSession(
@@ -41,11 +47,24 @@ function loadPerms(userId: string): Promise<any[]> {
     .where(eq(userPerms.userId, userId))
 }
 
+/**
+ * The Poracle client for this deployment, or `null` when there is none.
+ *
+ * Built once, like `golbatClient`, rather than per request: it holds nothing
+ * request-scoped. `null` is a real answer the Alerts procedures act on --
+ * "there is no Poracle" is not the same as "you have no human there".
+ */
+function buildPoracleClient(): PoracleClient | null {
+  return poracleConfigured() ? createPoracleClient() : null
+}
+
 function createContextFactory({
   golbatClient,
   registry,
   getSession = resolveSession,
   getPerms = loadPerms,
+  poracleClient = buildPoracleClient(),
+  poracleConfig = config.getSafe('poracle'),
 }: {
   golbatClient: any
   // Task 6's routing table, so a tRPC subscription receives pushed fort
@@ -56,6 +75,8 @@ function createContextFactory({
   // context is testable without a live Better Auth instance or a database.
   getSession?: (headers: Headers) => Promise<{ user: any; session: any } | null>
   getPerms?: (userId: string) => Promise<any[]>
+  poracleClient?: PoracleClient | null
+  poracleConfig?: any
 }) {
   return async function createContext({ req }: { req: Request }) {
     const session = await getSession(req.headers)
@@ -66,6 +87,11 @@ function createContextFactory({
       perms: user ? mergePerms(await getPerms(user.id)) : null,
       golbatClient,
       registry,
+      poracleClient,
+      poracleConfig,
+      // Left absent on purpose: resolving the linked Discord account is a
+      // query, and only the Alerts procedures need it. `alerts-router.ts`
+      // resolves it lazily so every other request does not pay for it.
     }
   }
 }

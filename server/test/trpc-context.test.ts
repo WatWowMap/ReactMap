@@ -71,3 +71,21 @@ test('a revoked grant is denied on the next request, with no logout', async () =
   const after = await createContext(req)
   expect(() => requirePerm(after as any, 'alerts')).toThrow(/not available/)
 })
+
+test('a deployment with no Poracle gets a null client, not a broken one', async () => {
+  // `null` is what `alerts.status` turns into "unconfigured". A client built
+  // against an absent host would instead fail at request time, which reads to
+  // a user as Poracle being down rather than absent.
+  const createContext = createContextFactory({
+    golbatClient: {},
+    getSession: async () => null,
+    getPerms: async () => [],
+    poracleClient: null,
+  })
+
+  const ctx: any = await createContext(req)
+
+  expect(ctx.poracleClient).toBeNull()
+  // Resolved lazily by the Alerts procedures, so nothing else pays the query.
+  expect('platformId' in ctx).toBe(false)
+})
