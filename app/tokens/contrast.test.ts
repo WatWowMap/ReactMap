@@ -102,9 +102,19 @@ for (const theme of ['light', 'dark'] as const) {
   })
 
   test(`${theme}: no chart series is a tint of the brand`, () => {
+    /*
+     * --color-primary is in this list even though it aliases
+     * --color-accent-from today. The dark theme overrode it separately
+     * for most of this file's life, and while it did, a primary that
+     * collided with a chart series would have passed here: the accent it
+     * had stopped pointing at was the only thing being measured. Naming
+     * it explicitly means a future override is held to the same bar as
+     * the value it replaces.
+     */
     const brand = [
       hex(theme, '--color-accent-from'),
       hex(theme, '--color-accent-to'),
+      hex(theme, '--color-primary'),
     ]
     for (const token of CHART) {
       for (const stop of brand) {
@@ -157,3 +167,33 @@ for (const theme of ['light', 'dark'] as const) {
     }
   })
 }
+
+/*
+ * The two source colours are what the accents are derived from, not values
+ * anything paints with. Neither clears the 15 dE separation the accents
+ * above are held to -- the pink lands 9.5 dE from the green chart series
+ * under deuteranopia and the blue 4.0 dE from the pale blue one in dark --
+ * so a component reading either directly would put a colour on screen that
+ * this file's own bar rejects. Reading them from styles.css to derive an
+ * accent is the intended use and is why they exist.
+ */
+test('nothing paints with a raw source colour', () => {
+  const styles = readFileSync(join(import.meta.dir, '..', 'styles.css'), 'utf8')
+  for (const token of ['--color-brand-blue', '--color-brand-pink']) {
+    expect(styles).toContain(`${token}:`)
+  }
+
+  const app = join(import.meta.dir, '..')
+  // `scanSync` yields a generator, which has no `filter`; spreading it
+  // first is what makes this an array rather than an empty object.
+  const offenders = [
+    ...new Bun.Glob('**/*.{ts,tsx,css}').scanSync({ cwd: app, absolute: true }),
+  ]
+    .filter((file) => !file.endsWith('styles.css'))
+    .filter((file) => !file.endsWith('contrast.test.ts'))
+    .filter((file) => {
+      const body = readFileSync(file, 'utf8')
+      return body.includes('brand-blue') || body.includes('brand-pink')
+    })
+  expect(offenders).toEqual([])
+})

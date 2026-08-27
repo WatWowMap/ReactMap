@@ -93,14 +93,19 @@
  * be pruned, which is the exact failure the note at the top of this file
  * describes.
  *
- * They are not tints of the brand violet. Every hue here sits at least 35
- * degrees off it, so a series never reads as a branded control, and the
+ * They are not tints of the brand. Every series sits at least 15 dE from
+ * every brand stop, measured across normal vision and the three
+ * dichromacies rather than as a hue angle, so a series never reads as a
+ * branded control -- `contrast.test.ts` enforces it in both directions,
+ * and it is what sent the current accents through a derivation rather
+ * than letting their source colours ship as-is. The
  * separation between series survives protanopia, deuteranopia and
  * tritanopia (verified in contrast.test.ts, worst pair 19.3 dE under
  * protanopia in light, 23.1 dE in dark).
  *
  * Unlike the groups above these do change with the theme, because a set that
- * clears 3:1 on white and on #17151f at once has to sit inside a luminance
+ * clears 3:1 on white and on the dark surface at once has to sit inside a
+ * luminance
  * band too narrow to keep five hues apart for a dichromat. Two sets, one per
  * theme, each with the full range to work in.
  */

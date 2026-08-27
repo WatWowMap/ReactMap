@@ -18,8 +18,46 @@
   --font-sans: 'Nunito', ui-sans-serif, system-ui, sans-serif;
   --font-heading: var(--font-display);
 
-  --color-accent-from: #7b5ce0;
-  --color-accent-to: #e067a8;
+  /*
+   * The two source colours the accents below are derived from: a light
+   * blue and a pink. They are recorded here rather than inlined so the
+   * derivation has something to point at, and nothing renders either one
+   * directly -- for two separate reasons, both of which shape every value
+   * under them.
+   *
+   * They are pastels. #5bcefa is 1.80:1 on white and #f5a9b8 is 1.87:1,
+   * against a 4.5:1 floor. That alone would only mean darkening them for
+   * the light theme.
+   *
+   * The binding one is `contrast.test.ts`, which holds each brand stop at
+   * least 15 dE from every chart series, measured as the WORST case
+   * across normal vision and the three dichromacies. Both fail it:
+   * #f5a9b8 lands 9.5 dE from the green series --color-chart-3, because a
+   * pale pink and a mid green converge under deuteranopia, and #5bcefa
+   * lands 4.0 dE from the pale blue --color-chart-1 in dark.
+   *
+   * White is not a third colour here. It is --color-surface.
+   */
+  --color-brand-blue: #5bcefa;
+  --color-brand-pink: #f5a9b8;
+
+  /*
+   * The two systems, per the client-shape spec: Filters is the blue end
+   * and Alerts the pink one.
+   *
+   * --color-accent-from keeps the source blue's hue almost exactly, 190
+   * against 197, because the blue survives darkening without changing
+   * character. 5.07:1 on white, 26.1 dE clear of the nearest series.
+   *
+   * --color-accent-to could not stay on hue. Its source sits at 348, and
+   * anything dark enough to read as text there reads as CRIMSON rather
+   * than pink: #c72343 at that hue is a blood red 12 degrees off the
+   * map's own iv-low. Rotating toward magenta fixes both problems at
+   * once, so the derived pink sits at 320, still unmistakably pink at
+   * text weight and 22.7 dE clear of every chart series.
+   */
+  --color-accent-from: #047990;
+  --color-accent-to: #964079;
 
   --color-surface: #ffffff;
   --color-foreground: #1c1a26;
@@ -29,8 +67,8 @@
    * (hover:bg-muted, bg-muted/50), so these have to hold surface and text
    * respectively or those components paint text-coloured slabs.
    */
-  --color-muted: #f5f3fb;
-  --color-muted-foreground: #6f6b80;
+  --color-muted: #f2f7fb;
+  --color-muted-foreground: #5f6b78;
   /*
    * Two border roles, two floors. --color-border is the decorative hairline
    * on cards and button outlines: it identifies no control and carries no
@@ -40,16 +78,16 @@
    * which is the only thing separating a fixed bar from content scrolling
    * under it. That one is held to the 3:1 non-text floor.
    */
-  --color-border: #bdb6cf;
-  --color-border-strong: #968dae;
-  --color-ring: #7b5ce0;
+  --color-border: #a8bcca;
+  --color-border-strong: #7f92a1;
+  --color-ring: var(--color-accent-from);
 
   --color-background: var(--color-surface);
   --color-card: var(--color-surface);
   --color-card-foreground: var(--color-foreground);
   --color-primary: var(--color-accent-from);
   --color-primary-foreground: #ffffff;
-  --color-secondary: #f1eef9;
+  --color-secondary: #eef7fc;
   --color-secondary-foreground: var(--color-foreground);
   --color-destructive: #dc2626;
   --color-destructive-foreground: #ffffff;
@@ -143,33 +181,39 @@
  */
 @media (prefers-color-scheme: dark) {
   :root {
-    --color-surface: #17151f;
-    --color-foreground: #f1eef9;
-    --color-muted: #221f2d;
-    --color-muted-foreground: #a29dbb;
-    --color-border: #4b4465;
-    --color-border-strong: #6f668c;
-    --color-ring: #a78bfa;
-    --color-secondary: #241f30;
+    --color-surface: #151824;
+    --color-foreground: #eef4f8;
+    --color-muted: #1e2331;
+    --color-muted-foreground: #9aa7b8;
+    --color-border: #3f4a5e;
+    --color-border-strong: #5b6779;
+    --color-ring: var(--color-brand-blue);
+    --color-secondary: #1f2734;
 
     /*
-     * --color-primary aliases --color-accent-from, and the brand violet is
-     * the same value in both themes, so the alias inherits a colour that
-     * never lightens for the dark surface. #7b5ce0 on #17151f is 3.82:1,
-     * under the 4.5:1 floor, and the active bottom-nav destination is the
-     * state that fails. Overriding the alias rather than the brand keeps
-     * --color-accent-from as the single brand value everything else reads.
-     * #8c70e5 is the same violet lifted just far enough to reach 4.78:1.
+     * Both accents lighten for this surface, and both stay off the chart
+     * series. #06b8f9 is the source blue with the saturation pushed up,
+     * 0.6 degrees off its hue and 18.5 dE clear of the pale blue series
+     * that the source itself sits 4.0 dE from. #fcc5d4 is the source pink
+     * lightened, 18.0 dE clear of the green series that the source sits
+     * 9.5 dE from.
      */
-    --color-primary: #8c70e5;
+    --color-accent-from: #06b8f9;
+    --color-accent-to: #fcc5d4;
 
     /*
-     * The lighter dark primary is a better text colour on the dark surface
-     * and a worse background under white: white on #8c70e5 is 3.77:1. So
-     * the on-colour flips to the dark surface tone, 4.78:1, which is the
-     * same thing shadcn's own dark theme does with a lightened primary.
+     * --color-primary aliases --color-accent-from, which is overridden
+     * just above, so the alias follows it and needs no separate value.
+     * The light accent would have failed here: #047990 on #151824 is
+     * 2.53:1, and the active bottom-nav destination is the state that
+     * fails.
+     *
+     * A light accent is a better text colour on a dark surface than a
+     * background under white: white on #06b8f9 is 2.19:1. So the
+     * on-colour flips to the surface tone, 7.77:1, which is the same
+     * thing shadcn's own dark theme does with a lightened primary.
      */
-    --color-primary-foreground: #17151f;
+    --color-primary-foreground: var(--color-surface);
 
     /*
      * Same shape as --color-primary above. #dc2626 reads at 3.74 on the dark
@@ -180,6 +224,6 @@
      * accent, and leaving the second instance would be odd.
      */
     --color-destructive: #f87171;
-    --color-destructive-foreground: #17151f;
+    --color-destructive-foreground: var(--color-surface);
   }
 }

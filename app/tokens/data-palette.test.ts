@@ -17,7 +17,7 @@ test('the data palette defines the groups the map depends on', () => {
 
 test('the data palette does not duplicate an accent value literally', () => {
   // The token-name check above misses the case this actually shipped in:
-  // --color-league-ultra held #7b5ce0, the accent violet, copied by value.
+  // --color-league-ultra held the accent colour of the day, copied by value.
   // It referenced no accent token, so the name check passed while the palette
   // was in fact harmonised with the brand.
   const styles = readFileSync(join(import.meta.dir, '..', 'styles.css'), 'utf8')
