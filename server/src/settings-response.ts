@@ -1,3 +1,4 @@
+import config from '@rm/config'
 import { eq } from 'drizzle-orm'
 
 import { getAuth } from './auth'
@@ -41,6 +42,13 @@ async function buildSettingsResponse(
   deps: {
     getSession: (headers: Headers) => Promise<any>
     getPerms: (userId: string) => Promise<any[]>
+    /**
+     * Which sign-in methods this instance actually offers. The client cannot
+     * infer it: hardcoding a provider would show a Discord button on an
+     * instance running only local auth, and hide one on an instance that
+     * needs it.
+     */
+    getMethods?: () => string[]
   },
 ) {
   let session = null
@@ -55,7 +63,7 @@ async function buildSettingsResponse(
   if (!session?.user) {
     return {
       user: { loggedIn: false, perms: {} },
-      authentication: { loggedIn: false },
+      authentication: { loggedIn: false, methods: deps.getMethods?.() ?? [] },
     }
   }
 
@@ -67,7 +75,7 @@ async function buildSettingsResponse(
       username: session.user.username,
       perms: mergePerms(rows),
     },
-    authentication: { loggedIn: true },
+    authentication: { loggedIn: true, methods: deps.getMethods?.() ?? [] },
   }
 }
 
@@ -75,6 +83,10 @@ async function buildSettingsResponse(
 function createSettingsHandler() {
   const deps = {
     getSession: (headers: Headers) => getAuth().api.getSession({ headers }),
+    getMethods: () =>
+      (config.getSafe('authentication.strategies') as any[])
+        .filter((strategy) => strategy.enabled)
+        .map((strategy) => strategy.type as string),
     getPerms: (userId: string) =>
       getDrizzle().select().from(userPerms).where(eq(userPerms.userId, userId)),
   }

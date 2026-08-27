@@ -49,3 +49,32 @@ test('does not reconstruct a req.user-shaped object -- only loggedIn, username, 
     'username',
   ])
 })
+
+test('the response names the sign-in methods an operator enabled', async () => {
+  // Without this the client has to hardcode a provider, and an instance
+  // running only local auth would show a Discord button that cannot work.
+  const body = await buildSettingsResponse(new Headers(), {
+    getSession: async () => null,
+    getPerms: async () => [],
+    getMethods: () => ['discord'],
+  })
+  expect(body.authentication.methods).toEqual(['discord'])
+})
+
+test('a signed-in response names them too, so a client can offer switching', async () => {
+  const body = await buildSettingsResponse(new Headers(), {
+    getSession: async () => ({ user: { id: 'u1', username: 'someone' } }),
+    getPerms: async () => [],
+    getMethods: () => ['discord', 'local'],
+  })
+  expect(body.authentication.methods).toEqual(['discord', 'local'])
+})
+
+test('an instance with no enabled strategy offers nothing rather than everything', async () => {
+  const body = await buildSettingsResponse(new Headers(), {
+    getSession: async () => null,
+    getPerms: async () => [],
+    getMethods: () => [],
+  })
+  expect(body.authentication.methods).toEqual([])
+})

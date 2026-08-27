@@ -1,3 +1,4 @@
+import { SignInButtons, SignOutButton } from '../session/sign-in-buttons'
 import { useSession } from '../session/use-session'
 
 export function Profile() {
@@ -23,6 +24,7 @@ export function Profile() {
         <p className="mt-2 text-muted-foreground">
           Sign in to see your profile.
         </p>
+        <SignInButtons methods={data?.authentication?.methods ?? []} />
       </section>
     )
   }
@@ -43,6 +45,7 @@ export function Profile() {
       <p className="mt-6 text-sm text-muted-foreground">
         Account reset and linked accounts arrive in a later plan.
       </p>
+      <SignOutButton />
     </section>
   )
 }
