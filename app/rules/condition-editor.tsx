@@ -215,7 +215,16 @@ export function ConditionEditor<P extends ConditionPatch = RulePatch>({
       // what they meant, just something other than "unset" to edit from.
       nextFields[def.field] = def.options[0]?.value ?? null
     } else if (def.kind === 'range') {
-      nextFields[def.minField] = 0
+      nextFields[def.minField] = def.floor ?? 0
+      // A PvP range says nothing without its league -- `describeCondition`
+      // omits the whole condition when the league column is null -- so a
+      // row added without one is a control the person can edit and a
+      // sentence that never changes. Seed it the same way a `choice` gets
+      // its first option.
+      if (def.labelField && fields[def.labelField] == null) {
+        const first = Object.keys(def.labelWords ?? {})[0]
+        if (first !== undefined) nextFields[def.labelField] = Number(first)
+      }
     } else if (def.kind === 'value') {
       nextFields[def.field] = 0
     }

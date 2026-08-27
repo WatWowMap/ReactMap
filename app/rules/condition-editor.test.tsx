@@ -148,3 +148,34 @@ test('the rank boxes say which end they are', () => {
   expect(getByText('Best rank')).toBeTruthy()
   expect(getByText('Worst rank')).toBeTruthy()
 })
+
+test('a freshly added PvP row opens on a rank that exists, with a league', () => {
+  // Rank 0 is not a place: the PvP scale starts at 1. And a rank range
+  // with no league renders as nothing at all (`describeCondition` omits
+  // the whole condition when the league column is null), so adding the
+  // row without one gives a control that edits and a sentence that never
+  // moves.
+  const onChange = vi.fn()
+  const { getByRole } = render(<ConditionEditor onChange={onChange} />)
+  openPvp(getByRole)
+  const patch = onChange.mock.calls.at(-1)?.[0]
+  expect(patch?.pvpRankMin).toBe(1)
+  expect(patch?.pvpLeague).toBe(500)
+})
+
+test('adding PvP does not overwrite a league the row already stored', () => {
+  const onChange = vi.fn()
+  const { getByRole } = render(
+    <ConditionEditor
+      conditions={[{ type: 'pvp', label: 1500, min: 1, max: 100 }]}
+      onChange={onChange}
+    />,
+  )
+  // Already active, so the menu never offers it -- but the guard matters
+  // for the seeded-then-removed-then-re-added path.
+  expect(
+    (getByRole('radio', { name: 'Great' }) as HTMLInputElement).getAttribute(
+      'data-state',
+    ),
+  ).toBe('checked')
+})

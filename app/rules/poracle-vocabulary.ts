@@ -184,6 +184,7 @@ export const PORACLE_VOCABULARY: Vocabulary<AlertPatch> = {
       maxField: 'pvpRankWorst',
       labelField: 'pvpLeague',
       labelWords: LEAGUE_WORD,
+      floor: 1,
     },
     {
       kind: 'value',

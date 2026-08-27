@@ -63,6 +63,11 @@ export interface RangeCondition<P extends ConditionPatch = ConditionPatch> {
    *  unlike `words` above which omits. */
   labelField?: keyof P & string
   labelWords?: Record<number, string>
+  /** Where this range's scale starts, for a freshly added row. Defaults to
+   *  0, which reads as "no floor" on IV, CP and level. PvP rank has no
+   *  zeroth place -- rank 1 is the best result -- so it sets 1 and a new
+   *  row opens on a rank that exists. */
+  floor?: number
 }
 
 export interface ChoiceCondition<P extends ConditionPatch = ConditionPatch> {
@@ -236,6 +241,7 @@ export const REACTMAP_VOCABULARY: Vocabulary<RulePatch> = {
       maxField: 'pvpRankMax',
       labelField: 'pvpLeague',
       labelWords: LEAGUE_WORD,
+      floor: 1,
     },
     {
       kind: 'count',
