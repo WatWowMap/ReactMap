@@ -48,6 +48,17 @@ export interface RuleSheetProps<P extends ConditionPatch = RulePatch> {
   vocabulary?: Vocabulary<P>
   onChange?: (patch: P) => void
   onExclusionsChange?: (exclusions: number[]) => void
+  /**
+   * Whether this sheet draws the exception list itself. Defaults to the
+   * rule being about "Any Pokémon", which is the only subject an exception
+   * can be carved out of.
+   *
+   * A caller passes `false` when it owns the species question already --
+   * `RuleEditor` does on a draft, where "only these" and "all except" are
+   * two answers to one question and belong in one control rather than two
+   * identical lists stacked one above the other.
+   */
+  showExclusions?: boolean
 }
 
 /**
@@ -70,6 +81,7 @@ export function RuleSheet<P extends ConditionPatch = RulePatch>({
   vocabulary,
   onChange,
   onExclusionsChange,
+  showExclusions,
 }: RuleSheetProps<P>) {
   // Sound because of the overloads above: `vocabulary` can only be absent
   // on the first signature, whose `P` is `RulePatch` -- exactly what
@@ -109,7 +121,7 @@ export function RuleSheet<P extends ConditionPatch = RulePatch>({
         {...(conditions ? { conditions } : {})}
         {...(onChange ? { onChange } : {})}
       />
-      {speciesId === null && (
+      {(showExclusions ?? speciesId === null) && (
         <div className="flex flex-col gap-2 border-t border-border pt-3">
           <p className="text-sm font-medium text-foreground">Except</p>
           <SpeciesPicker

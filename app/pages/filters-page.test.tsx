@@ -1,6 +1,12 @@
 import { afterAll, afterEach, beforeAll, expect, test } from 'bun:test'
 import { QueryClientProvider } from '@tanstack/react-query'
-import { cleanup, fireEvent, render, waitFor } from '@testing-library/react'
+import {
+  cleanup,
+  fireEvent,
+  render,
+  waitFor,
+  within,
+} from '@testing-library/react'
 import { ruleFixture } from '../rules/rule-fixtures'
 import type { Rule } from '../rules/rule-types'
 import type { RuleCreateInput, RulesClient } from '../rules/rules-query'
@@ -232,4 +238,87 @@ test('a group that is off still shows, and its switch turns it back on', async (
 
   await waitFor(() => expect(client.updated).toHaveLength(1))
   expect(client.updated[0]?.patch).toEqual({ enabled: true })
+})
+
+test('a new filter opens with a way to say which Pokémon it is about', async () => {
+  // The draft carried `speciesIds` (plural, the rows to create) and never
+  // the singular `speciesId` the sheet gates its species control on, so
+  // `undefined === null` was false and a new filter rendered with no
+  // species control at all -- neither a subject nor an exception list.
+  const { getByRole, findByText } = renderWithRules([])
+  fireEvent.click(getByRole('button', { name: /new filter/i }))
+  expect(await findByText('Pokémon')).toBeTruthy()
+  expect(
+    await findByText(/nothing picked, so this matches every pokémon/i),
+  ).toBeTruthy()
+  // Two answers to one question, in one list -- not two identical pickers.
+  expect(getByRole('radio', { name: /only these/i })).toBeTruthy()
+  expect(getByRole('radio', { name: /every pokémon except/i })).toBeTruthy()
+})
+
+test('picking a species writes it as the new rule subject, not as an exception', async () => {
+  const { client, getByRole, findByTestId } = renderWithRules([])
+  fireEvent.click(getByRole('button', { name: /new filter/i }))
+  const subject = within(await findByTestId('rule-subject'))
+  fireEvent.click(subject.getByRole('checkbox', { name: 'Larvitar' }))
+  fireEvent.click(getByRole('button', { name: /^save$/i }))
+  await waitFor(() => expect(client.created).toHaveLength(1))
+  // One row per species: the subject IS `speciesIds`, and the template's
+  // `[null]` -- every Pokémon -- must not survive the choice.
+  expect(client.created[0]?.speciesIds).toEqual([246])
+  expect(client.created[0]?.exclusions).toBeUndefined()
+})
+
+test('clearing every species puts the rule back to any Pokémon', async () => {
+  const { client, getByRole, findByTestId } = renderWithRules([])
+  fireEvent.click(getByRole('button', { name: /new filter/i }))
+  const subject = within(await findByTestId('rule-subject'))
+  const larvitar = subject.getByRole('checkbox', { name: 'Larvitar' })
+  fireEvent.click(larvitar)
+  fireEvent.click(larvitar)
+  fireEvent.click(getByRole('button', { name: /^save$/i }))
+  await waitFor(() => expect(client.created).toHaveLength(1))
+  // An empty array would write no rows at all, which the router rejects.
+  expect(client.created[0]?.speciesIds).toEqual([null])
+})
+
+test('a written rule offers no subject picker, because Save cannot move rows', async () => {
+  // `rules.update` patches columns on the ids it is given. A different
+  // subject is different ROWS, so offering the control on an existing rule
+  // would be a promise the Save button cannot keep.
+  const { getByRole, findByRole, queryByText } = renderWithRules([
+    ruleFixture({ id: 1, name: 'Existing', speciesId: 246 }),
+  ])
+  fireEvent.click(await findByRole('button', { name: /existing/i }))
+  expect(getByRole('button', { name: /^save$/i })).toBeTruthy()
+  expect(queryByText(/pick some to narrow it/i)).toBeNull()
+})
+
+test('the except mode writes exclusions and leaves the rule about every Pokémon', async () => {
+  // "Only these" and "every Pokémon except" are opposite claims about the
+  // same list. Except keeps ONE row -- subject `[null]` -- and names the
+  // skipped species in a column on it; only-these writes a row per species.
+  const { client, getByRole, findByTestId } = renderWithRules([])
+  fireEvent.click(getByRole('button', { name: /new filter/i }))
+  fireEvent.click(getByRole('radio', { name: /every pokémon except/i }))
+  const subject = within(await findByTestId('rule-subject'))
+  fireEvent.click(subject.getByRole('checkbox', { name: 'Larvitar' }))
+  fireEvent.click(getByRole('button', { name: /^save$/i }))
+  await waitFor(() => expect(client.created).toHaveLength(1))
+  expect(client.created[0]?.speciesIds).toEqual([null])
+  expect(client.created[0]?.exclusions).toEqual([246])
+})
+
+test('switching sides does not carry the picked species across', async () => {
+  // Species to match and species to skip are opposite claims, so keeping a
+  // selection through the switch would silently invert what it meant.
+  const { client, getByRole, findByTestId } = renderWithRules([])
+  fireEvent.click(getByRole('button', { name: /new filter/i }))
+  const subject = within(await findByTestId('rule-subject'))
+  fireEvent.click(subject.getByRole('checkbox', { name: 'Larvitar' }))
+  fireEvent.click(getByRole('radio', { name: /every pokémon except/i }))
+  fireEvent.click(getByRole('button', { name: /^save$/i }))
+  await waitFor(() => expect(client.created).toHaveLength(1))
+  expect(client.created[0]?.speciesIds).toEqual([null])
+  expect(client.created[0]?.exclusions).toEqual([])
 })

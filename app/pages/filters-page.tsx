@@ -57,10 +57,22 @@ export function FiltersPage({
   // starting points are deliberately broad, so the blank one matches every
   // Pokemon there is.
   const [draft, setDraft] = useState<RuleTemplate | null>(null)
+  // Which Pokemon the draft is about, editable until it is written. A rule
+  // that exists cannot change its subject through `rules.update` -- one row
+  // per species means a different subject is different ROWS, created and
+  // deleted rather than patched -- so this is a draft-only control.
+  const [draftSpeciesIds, setDraftSpeciesIds] = useState<(number | null)[]>([
+    null,
+  ])
 
   function startFrom(template: RuleTemplate) {
     setDraft(template)
+    setDraftSpeciesIds(template.input.speciesIds ?? [null])
   }
+
+  // `[null]` is the subject "Any Pokemon"; anything else names species.
+  const draftIsAnyPokemon =
+    draftSpeciesIds.length === 1 && draftSpeciesIds[0] === null
 
   /**
    * The draft as the shape `RuleEditor` edits. It has no rule ids because
@@ -71,11 +83,21 @@ export function FiltersPage({
         id: 'draft',
         name: draft.input.name ?? 'New filter',
         ruleIds: [],
-        speciesIds: draft.input.speciesIds ?? [null],
+        speciesIds: draftSpeciesIds,
         // The editor reads only speciesId, enabled, exclusions and the
         // condition columns off this; anything the template leaves out
         // reads as unset, which is what an unconfigured draft is.
-        sample: draft.input as unknown as RuleGroup['sample'],
+        //
+        // `speciesId` is written in rather than left to the template: a
+        // template carries `speciesIds` (plural, the rows to create) and
+        // never the singular column, so reading it straight off gave
+        // `undefined`. The sheet gates its exclusion picker on
+        // `speciesId === null`, and `undefined` is not `null`, so a new
+        // filter rendered with no species control of any kind.
+        sample: {
+          ...draft.input,
+          speciesId: draftIsAnyPokemon ? null : (draftSpeciesIds[0] ?? null),
+        } as unknown as RuleGroup['sample'],
       }
     : null
 
@@ -184,8 +206,14 @@ export function FiltersPage({
                   names={names}
                   species={species}
                   isNew
+                  subjectIds={draftSpeciesIds}
+                  onSubjectChange={setDraftSpeciesIds}
                   onCommit={(_ruleIds, patch) => {
-                    void create({ ...draft.input, ...patch })
+                    void create({
+                      ...draft.input,
+                      ...patch,
+                      speciesIds: draftSpeciesIds,
+                    })
                     setDraft(null)
                   }}
                   onDiscard={() => setDraft(null)}
