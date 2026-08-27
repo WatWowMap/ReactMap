@@ -211,7 +211,7 @@ test('deleting removes the card', async () => {
   await waitFor(() => expect(queryByTestId('alert-7')).toBeNull())
 })
 
-test('picking a species from the New alert sheet creates and refetches', async () => {
+test('picking a species opens the editor and writes nothing yet', async () => {
   const created: any[] = []
   let refetched = false
   const { getByRole, getByText, findByRole } = renderWith(
@@ -237,7 +237,16 @@ test('picking a species from the New alert sheet creates and refetches', async (
   await waitFor(() => expect(getByText(/no alerts yet/i)).toBeTruthy())
   fireEvent.click(getByRole('button', { name: /new alert/i }))
   fireEvent.click(await findByRole('checkbox', { name: 'Larvitar' }))
-  await waitFor(() => expect(created).toEqual([{ pokemonId: 246 }]))
+
+  // The editor opens against a draft. An alert with no conditions matches
+  // every spawn of that species, so writing one the instant a species is
+  // picked is a Discord flood nobody asked for.
+  expect(await findByRole('button', { name: /^save$/i })).toBeTruthy()
+  expect(created).toEqual([])
+
+  fireEvent.click(await findByRole('button', { name: /^save$/i }))
+  await waitFor(() => expect(created).toHaveLength(1))
+  expect(created[0]).toMatchObject({ pokemonId: 246 })
   await waitFor(() => expect(getByText('Pokémon #246')).toBeTruthy())
 })
 
@@ -537,4 +546,45 @@ test('a failed deleteLocation shows the banner once the delete is confirmed', as
   expect(alert.textContent).toBe(
     'That location is in use by an alert and cannot be deleted',
   )
+})
+
+test('discarding a new alert writes nothing', async () => {
+  const created: any[] = []
+  const { getByRole, findByRole, getByText } = renderWith(
+    {
+      status: async () => ({ state: 'present' }),
+      snapshot: async () => EMPTY_SNAPSHOT,
+      create: async (rule: any) => {
+        created.push(rule)
+        return { created: 1, updated: 0, unchanged: 0 }
+      },
+    } as unknown as AlertsClient,
+    fakeNamesClient(),
+  )
+  await waitFor(() => expect(getByText(/no alerts yet/i)).toBeTruthy())
+  fireEvent.click(getByRole('button', { name: /new alert/i }))
+  fireEvent.click(await findByRole('checkbox', { name: 'Larvitar' }))
+  fireEvent.click(await findByRole('button', { name: /discard/i }))
+
+  await waitFor(() => expect(getByText(/no alerts yet/i)).toBeTruthy())
+  expect(created).toEqual([])
+})
+
+test('a new alert offers Discard, an existing one offers Delete', async () => {
+  const { findByRole, getByTestId, queryByRole } = renderWith(
+    {
+      status: async () => ({ state: 'present' }),
+      snapshot: async () => ({
+        ...EMPTY_SNAPSHOT,
+        alerts: [{ uid: 7, pokemonId: 149 }],
+      }),
+    } as unknown as AlertsClient,
+    fakeNamesClient(),
+  )
+  await waitFor(() => expect(getByTestId('alert-7')).toBeTruthy())
+
+  // An existing row can be deleted; a draft that was never written cannot.
+  fireEvent.click(getByTestId('alert-7').querySelector('button') as Element)
+  expect(await findByRole('button', { name: /^delete$/i })).toBeTruthy()
+  expect(queryByRole('button', { name: /discard/i })).toBeNull()
 })

@@ -11,6 +11,7 @@ import {
   SheetHeader,
   SheetTitle,
 } from '../components/ui/sheet'
+import type { AlertRow } from '../rules/poracle-vocabulary'
 import type { SpeciesSelection } from '../rules/species-picker'
 import { SpeciesPicker } from '../rules/species-picker'
 import type { MasterfileClient } from '../rules/use-names'
@@ -90,10 +91,16 @@ export function AlertsPage({
   // immediately; the species has to be picked first.
   const [pickingSpecies, setPickingSpecies] = useState(false)
 
+  // A picked species becomes a draft, not a row. An alert with no
+  // conditions matches every spawn of that species, so writing one the
+  // instant a species is chosen is a notification flood nobody asked for.
+  // Nothing reaches Poracle until Save.
+  const [draft, setDraft] = useState<AlertWriteInput | null>(null)
+
   function pickSpecies(selection: SpeciesSelection[]) {
     const picked = selection.at(-1)
     if (picked === undefined) return
-    void create(toNewAlertInput(picked))
+    setDraft(toNewAlertInput(picked))
     setPickingSpecies(false)
   }
 
@@ -175,7 +182,7 @@ export function AlertsPage({
         )
       )}
 
-      {openAlert && (
+      {(openAlert || draft) && (
         // `open` fixed true, mounted only while an alert is open -- the
         // reason `filters-page.tsx`'s sheet does the same: a Radix
         // component whose `open` starts true never has to run the
@@ -183,27 +190,48 @@ export function AlertsPage({
         <Sheet
           open
           onOpenChange={(next) => {
-            if (!next) setOpenUid(null)
+            if (next) return
+            setOpenUid(null)
+            setDraft(null)
           }}
         >
           <SheetContent side="right" className="gap-4 overflow-y-auto p-6">
             <SheetHeader className="p-0">
-              <SheetTitle>Pokémon #{openAlert.pokemonId}</SheetTitle>
+              <SheetTitle>
+                Pokémon #{openAlert?.pokemonId ?? draft?.pokemonId}
+              </SheetTitle>
             </SheetHeader>
-            <AlertEditor
-              // Remounted per alert, so the draft never carries from one
-              // row to the next.
-              key={openAlert.uid}
-              alert={openAlert}
-              onSave={(patch) => {
-                void replace(openAlert.uid, patch)
-                setOpenUid(null)
-              }}
-              onDelete={() => {
-                void remove(openAlert.uid)
-                setOpenUid(null)
-              }}
-            />
+            {openAlert ? (
+              <AlertEditor
+                // Remounted per alert, so the draft never carries from one
+                // row to the next.
+                key={openAlert.uid}
+                alert={openAlert}
+                onSave={(patch) => {
+                  void replace(openAlert.uid, patch)
+                  setOpenUid(null)
+                }}
+                onDelete={() => {
+                  void remove(openAlert.uid)
+                  setOpenUid(null)
+                }}
+              />
+            ) : (
+              draft && (
+                <AlertEditor
+                  isNew
+                  // The species is the draft's identity; picking a
+                  // different one starts a different draft.
+                  key={`draft-${draft.pokemonId}`}
+                  alert={draft as unknown as AlertRow}
+                  onSave={(patch) => {
+                    void create({ ...draft, ...patch })
+                    setDraft(null)
+                  }}
+                  onDelete={() => setDraft(null)}
+                />
+              )
+            )}
           </SheetContent>
         </Sheet>
       )}

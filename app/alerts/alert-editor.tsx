@@ -24,9 +24,24 @@ export interface AlertEditorProps {
   alert: AlertRow
   onSave: (patch: AlertPatch) => void
   onDelete: () => void
+  /**
+   * A draft that has not been written yet.
+   *
+   * An alert with no conditions matches every spawn of its species, so
+   * creating one the moment a species is picked is a notification flood
+   * nobody chose. A draft reaches Poracle only when someone presses Save,
+   * and until then the destructive action is discarding it rather than
+   * deleting something that exists.
+   */
+  isNew?: boolean
 }
 
-export function AlertEditor({ alert, onSave, onDelete }: AlertEditorProps) {
+export function AlertEditor({
+  alert,
+  onSave,
+  onDelete,
+  isNew = false,
+}: AlertEditorProps) {
   const [draft, setDraft] = useState<AlertPatch>({})
 
   return (
@@ -38,8 +53,12 @@ export function AlertEditor({ alert, onSave, onDelete }: AlertEditorProps) {
         onChange={(patch) => setDraft((current) => ({ ...current, ...patch }))}
       />
       <div className="flex items-center justify-between gap-2">
-        <Button type="button" variant="destructive" onClick={onDelete}>
-          Delete
+        <Button
+          type="button"
+          variant={isNew ? 'outline' : 'destructive'}
+          onClick={onDelete}
+        >
+          {isNew ? 'Discard' : 'Delete'}
         </Button>
         <Button type="button" onClick={() => onSave(draft)}>
           Save

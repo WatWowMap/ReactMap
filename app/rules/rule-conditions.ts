@@ -6,10 +6,15 @@
  * Reads the same vocabulary the editor and the renderer do
  * (`condition-vocabulary.ts`) instead of its own column list, so a rule's
  * range, choice and value columns need naming once, not here and in the
- * editor both. PvP is left unseeded, matching `ConditionEditor`'s
- * permanent block: its visibility already depends on the vocabulary
- * declaring a `pvp` condition, not on `active`, so there is no row here
- * for it to seed.
+ * editor both.
+ *
+ * PvP seeds like any other range, plus the league its rank is named after.
+ * It was skipped here once on the reasoning that its block's visibility
+ * depends on the vocabulary rather than on `active` -- true, and about
+ * whether the block renders, not about what it renders against. The block
+ * read its league and both bounds out of these seeds, so skipping them left
+ * it permanently blank while the card beside it described the same row's
+ * league correctly.
  */
 
 import type { ConditionSeed } from './condition-editor'
@@ -30,11 +35,17 @@ export function conditionSeeds<P extends ConditionPatch = RulePatch>(
   const row = rule as unknown as Record<string, unknown>
   const seeds: ConditionSeed[] = []
   for (const def of vocab.conditions) {
-    if (def.kind === 'range' && def.key !== 'pvp') {
+    if (def.kind === 'range') {
       const min = (row[def.minField] as number | null | undefined) ?? null
       const max = (row[def.maxField] as number | null | undefined) ?? null
-      if (min == null && max == null) continue
-      seeds.push({ type: def.key, min, max })
+      const label = def.labelField
+        ? ((row[def.labelField] as number | string | null | undefined) ?? null)
+        : null
+      // A labelled range is present when its label is, even with both
+      // bounds at their wildcards: a rule can name a league and leave the
+      // ranks alone.
+      if (min == null && max == null && label == null) continue
+      seeds.push({ type: def.key, min, max, label })
     } else if (def.kind === 'choice' || def.kind === 'value') {
       const value = row[def.field] as number | string | null | undefined
       if (value == null) continue

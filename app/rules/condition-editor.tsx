@@ -62,6 +62,12 @@ export interface ConditionSeed {
   /** Choice conditions only, e.g. gender -- see `app/map/types.ts`: 0
    *  unset, 1 male, 2 female, 3 genderless. */
   value?: number | string | null
+  /**
+   * A range whose prefix is looked up from another column, which today is
+   * only PvP: the league naming the rank beside it. Without this the block
+   * renders against nothing and a stored league shows as unselected.
+   */
+  label?: number | string | null
 }
 
 /** What the editor holds per row while it is open, before it becomes a
@@ -106,6 +112,9 @@ function seedState<P extends ConditionPatch>(
     } else if (def.kind === 'range') {
       if (seed.min != null) fields[def.minField] = seed.min
       if (seed.max != null) fields[def.maxField] = seed.max
+      if (def.labelField && seed.label != null) {
+        fields[def.labelField] = seed.label
+      }
     }
   }
   return { active, fields }
@@ -364,27 +373,53 @@ export function ConditionEditor<P extends ConditionPatch = RulePatch>({
               </span>
             ))}
           </RadioGroup>
-          <div className="flex items-center gap-2">
-            <Input
-              type="number"
-              aria-label="PvP rank minimum"
-              value={
-                (fields[pvpDef.minField] as number | null | undefined) ?? ''
-              }
-              onChange={(event) =>
-                updatePvpRank(pvpDef, 'min', event.target.value)
-              }
-            />
-            <Input
-              type="number"
-              aria-label="PvP rank maximum"
-              value={
-                (fields[pvpDef.maxField] as number | null | undefined) ?? ''
-              }
-              onChange={(event) =>
-                updatePvpRank(pvpDef, 'max', event.target.value)
-              }
-            />
+          {/*
+            Labelled visibly, not just for a screen reader. Two bare number
+            boxes under a league picker do not say what they are, and rank 1
+            being the best result rather than the worst is exactly the thing
+            a person needs told rather than guessed.
+          */}
+          <div className="flex items-end gap-2">
+            <span className="flex flex-1 flex-col gap-1">
+              <label
+                htmlFor="pvp-rank-best"
+                className="text-xs text-muted-foreground"
+              >
+                Best rank
+              </label>
+              <Input
+                id="pvp-rank-best"
+                type="number"
+                placeholder="1"
+                aria-label="PvP rank minimum"
+                value={
+                  (fields[pvpDef.minField] as number | null | undefined) ?? ''
+                }
+                onChange={(event) =>
+                  updatePvpRank(pvpDef, 'min', event.target.value)
+                }
+              />
+            </span>
+            <span className="flex flex-1 flex-col gap-1">
+              <label
+                htmlFor="pvp-rank-worst"
+                className="text-xs text-muted-foreground"
+              >
+                Worst rank
+              </label>
+              <Input
+                id="pvp-rank-worst"
+                type="number"
+                placeholder="4096"
+                aria-label="PvP rank maximum"
+                value={
+                  (fields[pvpDef.maxField] as number | null | undefined) ?? ''
+                }
+                onChange={(event) =>
+                  updatePvpRank(pvpDef, 'max', event.target.value)
+                }
+              />
+            </span>
           </div>
         </div>
       )}

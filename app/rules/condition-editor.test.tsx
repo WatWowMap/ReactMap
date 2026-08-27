@@ -118,3 +118,24 @@ test('an editor with a foreign onChange and no vocabulary does not compile', () 
   )
   expect(bad).toBeTruthy()
 })
+
+test('a stored PvP league opens with that league selected', () => {
+  // The card beside the editor described the league correctly from the same
+  // row, so a blank radio group here read as the editor losing it.
+  const { getByLabelText } = render(
+    <ConditionEditor
+      conditions={[{ type: 'pvp', label: 1500, min: 1, max: 100 }]}
+    />,
+  )
+  expect(
+    (getByLabelText('Great') as HTMLInputElement).getAttribute('data-state'),
+  ).toBe('checked')
+})
+
+test('the rank boxes say which end they are', () => {
+  // Two bare number inputs under a league picker do not say what they hold,
+  // and rank 1 being the best rather than the worst is not guessable.
+  const { getByText } = render(<ConditionEditor />)
+  expect(getByText('Best rank')).toBeTruthy()
+  expect(getByText('Worst rank')).toBeTruthy()
+})

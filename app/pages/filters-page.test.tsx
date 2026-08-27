@@ -114,9 +114,16 @@ test('the empty state offers the four starting points', async () => {
   }
 })
 
-test('a starting point writes a real rule rather than holding a preset', async () => {
+test('a starting point opens its editor and writes nothing yet', async () => {
+  // A filter that exists before anyone has said what it should match is a
+  // rule doing something on the map that nobody asked for.
   const { client, findByRole } = renderWithRules([])
   fireEvent.click(await findByRole('button', { name: 'Great League' }))
+
+  expect(await findByRole('button', { name: /^save$/i })).toBeTruthy()
+  expect(client.created).toEqual([])
+
+  fireEvent.click(await findByRole('button', { name: /^save$/i }))
   await waitFor(() => expect(client.created).toHaveLength(1))
   expect(client.created[0]).toMatchObject({
     name: 'Great League',
@@ -125,9 +132,17 @@ test('a starting point writes a real rule rather than holding a preset', async (
   })
 })
 
+test('discarding a new filter writes nothing', async () => {
+  const { client, findByRole } = renderWithRules([])
+  fireEvent.click(await findByRole('button', { name: 'Great League' }))
+  fireEvent.click(await findByRole('button', { name: /discard/i }))
+  await waitFor(() => expect(client.created).toEqual([]))
+})
+
 test('the page header can create a filter without emptying the list first', async () => {
   const { client, findByRole } = renderWithRules(rareSpawns(1))
   fireEvent.click(await findByRole('button', { name: /new filter/i }))
+  fireEvent.click(await findByRole('button', { name: /^save$/i }))
   await waitFor(() => expect(client.created).toHaveLength(1))
   expect(client.created[0]).toMatchObject({ name: 'New filter' })
 })

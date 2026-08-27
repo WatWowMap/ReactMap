@@ -35,6 +35,15 @@ export interface RuleEditorProps {
   /** The species catalog the exclusion picker draws from. */
   species?: SpeciesEntry[]
   onCommit: (ruleIds: number[], patch: RulePatch) => void
+  /**
+   * A draft that has not been written yet, so Save creates rather than
+   * updates and the escape is discarding rather than leaving a rule behind.
+   * The starting points are deliberately broad, and the blank one matches
+   * every Pokemon, so writing one before anyone has narrowed it puts a rule
+   * on the map nobody chose.
+   */
+  isNew?: boolean
+  onDiscard?: () => void
 }
 
 function labelFor(speciesId: number | null, names: NamesLookup): string {
@@ -46,6 +55,8 @@ export function RuleEditor({
   names,
   species = [],
   onCommit,
+  isNew = false,
+  onDiscard,
 }: RuleEditorProps) {
   const [target, setTarget] = useState<string>(EVERY_MEMBER)
   const [draft, setDraft] = useState<RulePatch>({})
@@ -113,13 +124,16 @@ export function RuleEditor({
         onCommit={(patch) => onCommit(ruleIds, patch)}
       >
         {(attemptChange) => (
-          <Button
-            type="button"
-            className="self-start"
-            onClick={() => attemptChange(draft)}
-          >
-            Save
-          </Button>
+          <div className="flex items-center gap-2 self-start">
+            {isNew && onDiscard && (
+              <Button type="button" variant="outline" onClick={onDiscard}>
+                Discard
+              </Button>
+            )}
+            <Button type="button" onClick={() => attemptChange(draft)}>
+              Save
+            </Button>
+          </div>
         )}
       </SplitWarning>
     </div>

@@ -12,6 +12,7 @@ import { RuleEditor } from '../rules/rule-editor'
 import { groupRules } from '../rules/rule-grouping'
 import type { RuleTemplate } from '../rules/rule-templates'
 import { BLANK_TEMPLATE, STARTING_POINTS } from '../rules/rule-templates'
+import type { RuleGroup } from '../rules/rule-types'
 import type { RulesClient } from '../rules/rules-query'
 import { useRules } from '../rules/rules-query'
 import type { MasterfileClient } from '../rules/use-names'
@@ -50,9 +51,33 @@ export function FiltersPage({
   const [openGroupId, setOpenGroupId] = useState<string | null>(null)
   const openGroup = groups.find((group) => group.id === openGroupId) ?? null
 
+  // A starting point opens the editor against a draft rather than writing a
+  // rule. A filter that exists before anyone has said what it should match
+  // is already doing something on the map nobody asked for, and the
+  // starting points are deliberately broad, so the blank one matches every
+  // Pokemon there is.
+  const [draft, setDraft] = useState<RuleTemplate | null>(null)
+
   function startFrom(template: RuleTemplate) {
-    void create(template.input)
+    setDraft(template)
   }
+
+  /**
+   * The draft as the shape `RuleEditor` edits. It has no rule ids because
+   * nothing has been written; Save creates instead of updating.
+   */
+  const draftGroup: RuleGroup | null = draft
+    ? {
+        id: 'draft',
+        name: draft.input.name ?? 'New filter',
+        ruleIds: [],
+        speciesIds: draft.input.speciesIds ?? [null],
+        // The editor reads only speciesId, enabled, exclusions and the
+        // condition columns off this; anything the template leaves out
+        // reads as unset, which is what an unconfigured draft is.
+        sample: draft.input as unknown as RuleGroup['sample'],
+      }
+    : null
 
   return (
     <section className="p-6">
@@ -120,7 +145,7 @@ export function FiltersPage({
         </TabsContent>
       </Tabs>
 
-      {openGroup && (
+      {(openGroup || draftGroup) && (
         // Mounted only while a group is open, and `open` fixed true, for
         // the reason `split-warning.tsx` sets out: a Radix component whose
         // `open` starts true never has to run the presence transition this
@@ -128,25 +153,45 @@ export function FiltersPage({
         <Sheet
           open
           onOpenChange={(next) => {
-            if (!next) setOpenGroupId(null)
+            if (next) return
+            setOpenGroupId(null)
+            setDraft(null)
           }}
         >
           <SheetContent side="right" className="gap-4 overflow-y-auto p-6">
             <SheetHeader className="p-0">
-              <SheetTitle>{openGroup.name}</SheetTitle>
+              <SheetTitle>{(openGroup ?? draftGroup)?.name}</SheetTitle>
             </SheetHeader>
-            <RuleEditor
-              // Remounted per group, so the draft state inside never
-              // carries from one rule to the next.
-              key={openGroup.id}
-              group={openGroup}
-              names={names}
-              species={species}
-              onCommit={(ruleIds, patch) => {
-                void update(ruleIds, patch)
-                setOpenGroupId(null)
-              }}
-            />
+            {openGroup ? (
+              <RuleEditor
+                // Remounted per group, so the draft state inside never
+                // carries from one rule to the next.
+                key={openGroup.id}
+                group={openGroup}
+                names={names}
+                species={species}
+                onCommit={(ruleIds, patch) => {
+                  void update(ruleIds, patch)
+                  setOpenGroupId(null)
+                }}
+              />
+            ) : (
+              draftGroup &&
+              draft && (
+                <RuleEditor
+                  key={`draft-${draft.label}`}
+                  group={draftGroup}
+                  names={names}
+                  species={species}
+                  isNew
+                  onCommit={(_ruleIds, patch) => {
+                    void create({ ...draft.input, ...patch })
+                    setDraft(null)
+                  }}
+                  onDiscard={() => setDraft(null)}
+                />
+              )
+            )}
           </SheetContent>
         </Sheet>
       )}
