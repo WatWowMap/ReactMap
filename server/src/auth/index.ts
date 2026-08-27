@@ -53,6 +53,17 @@ function buildAuthOptions(input: {
   strategies: any[]
   sessionSecret: string
   baseURL: string
+  /**
+   * Origins allowed to make authenticated requests, on top of `baseURL`.
+   *
+   * Better Auth defaults this to `[baseURL]` and answers INVALID_ORIGIN with
+   * a 403 once a cookie is present. In development the client is served by
+   * Vite on its own port and proxies the API, so every browser request
+   * carries an Origin that is not `baseURL` and sign-in fails the moment any
+   * cookie exists. The check passes with no cookie, which makes it look
+   * intermittent.
+   */
+  trustedOrigins?: string[]
   trustProxy?: boolean | number | string
   cookieAgeDays?: number
   onSessionCreate?: (userId: string) => Promise<void>
@@ -99,6 +110,15 @@ function buildAuthOptions(input: {
 
   return {
     baseURL: input.baseURL,
+    // `baseURL` is always trusted; anything an operator adds joins it rather
+    // than replacing it, so a misconfigured extra origin cannot lock out the
+    // origin the server is actually served from.
+    trustedOrigins: [
+      input.baseURL,
+      ...(input.trustedOrigins ?? []).filter(
+        (origin) => origin !== input.baseURL,
+      ),
+    ],
     secret: input.sessionSecret,
     emailAndPassword: {
       // Gated on the `local` strategy, which defaults to disabled. Leaving this
@@ -254,6 +274,7 @@ function getAuth() {
       strategies: config.getSafe('authentication.strategies'),
       sessionSecret: config.getSafe('api.sessionSecret'),
       baseURL: config.getSafe('api.baseUrl'),
+      trustedOrigins: config.getSafe('api.trustedOrigins') ?? [],
       trustProxy: resolveTrustProxy(config.getSafe('api.trustProxy')),
       cookieAgeDays: config.getSafe('api.cookieAgeDays'),
       // Two independent pieces of first-sign-in work share the one

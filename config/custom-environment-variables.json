@@ -61,6 +61,10 @@
       "__format": "boolean"
     },
     "baseUrl": "API_BASE_URL",
+    "trustedOrigins": {
+      "__name": "API_TRUSTED_ORIGINS",
+      "__format": "json"
+    },
     "cookieAgeDays": {
       "__name": "API_COOKIE_AGE_DAYS",
       "__format": "number"

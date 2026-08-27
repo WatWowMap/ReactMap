@@ -22,6 +22,7 @@
     "sessionCheckIntervalMs": 900000,
     "trustProxy": false,
     "baseUrl": "http://localhost:8080",
+    "trustedOrigins": [],
     "cookieAgeDays": 7,
     "rateLimit": {
       "time": 60,

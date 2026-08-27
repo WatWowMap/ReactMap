@@ -210,3 +210,29 @@ test('enforceMaxSessions is wired to session.create.after alongside onSessionCre
   await options.databaseHooks!.session.create.after!({ userId: 'u1' })
   expect(enforcedFor as string | null).toBe('u1')
 })
+
+test('an operator can trust origins the app is actually served from', () => {
+  // Better Auth defaults trustedOrigins to [baseURL] and answers
+  // INVALID_ORIGIN once a cookie is present. In development the client is
+  // served by Vite on its own port and proxies the API, so every browser
+  // request carries an Origin that is not baseURL, and sign-in 403s as soon
+  // as any cookie exists.
+  const options = buildAuthOptions({
+    ...baseConfig,
+    trustedOrigins: ['http://localhost:8081'],
+  })
+  expect(options.trustedOrigins).toContain('http://localhost:8081')
+})
+
+test('baseURL is always trusted, whatever else an operator adds', () => {
+  const options = buildAuthOptions({
+    ...baseConfig,
+    trustedOrigins: ['http://localhost:8081'],
+  })
+  expect(options.trustedOrigins).toContain('http://localhost:8080')
+})
+
+test('no configured origins still trusts baseURL and nothing else', () => {
+  const options = buildAuthOptions(baseConfig)
+  expect(options.trustedOrigins).toEqual(['http://localhost:8080'])
+})
