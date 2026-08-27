@@ -91,8 +91,7 @@ function capitalize(word: string): string {
 function editableDefs<P extends ConditionPatch>(vocab: Vocabulary<P>) {
   return vocab.conditions.filter(
     (def): def is RangeCondition<P> | ChoiceCondition<P> | ValueCondition<P> =>
-      (def.kind === 'range' || def.kind === 'choice' || def.kind === 'value') &&
-      def.key !== 'pvp',
+      def.kind === 'range' || def.kind === 'choice' || def.kind === 'value',
   )
 }
 
@@ -324,13 +323,18 @@ export function ConditionEditor<P extends ConditionPatch = RulePatch>({
       ))}
 
       <div className="relative">
+        {/*
+          Named rather than a bare `+`. It is the only way to put a
+          condition on a rule, and a lone glyph says neither what it adds
+          nor that anything is addable.
+        */}
         <Button
           type="button"
           variant="outline"
           size="sm"
           onClick={() => setMenuOpen((o) => !o)}
         >
-          +
+          + Add a condition
         </Button>
         {menuOpen && (
           <div
@@ -354,7 +358,7 @@ export function ConditionEditor<P extends ConditionPatch = RulePatch>({
         )}
       </div>
 
-      {pvpDef?.labelField && (
+      {pvpDef?.labelField && active.has(pvpDef.key) && (
         <div className="flex flex-col gap-2 border-t border-border pt-3">
           <span className="text-sm text-muted-foreground">PvP league</span>
           <RadioGroup

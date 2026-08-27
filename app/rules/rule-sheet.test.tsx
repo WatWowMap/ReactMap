@@ -23,9 +23,14 @@ test('the exclusion control appears only when the subject is Any Pokémon', () =
 
 test('a specific-species sheet still edits its conditions', () => {
   // The exclusion picker is the only thing gated on subject -- everything
-  // else in the sheet (here, the always-on PvP league control) applies
-  // to a one-species rule exactly as it does to an Any-Pokémon one.
-  const { getAllByRole } = renderSheet({ speciesId: 147 })
+  // else in the sheet applies to a one-species rule exactly as it does to
+  // an Any-Pokémon one. This used to witness that through the PvP league
+  // control, which the sheet rendered whether or not the rule used it;
+  // PvP is opt-in now like every other condition, so the witness is the
+  // add-a-condition path itself.
+  const { getAllByRole, getByRole } = renderSheet({ speciesId: 147 })
+  fireEvent.click(getByRole('button', { name: /add a condition/i }))
+  fireEvent.click(getByRole('option', { name: /rank/i }))
   expect(getAllByRole('radio', { name: /little|great|ultra/i })).toHaveLength(3)
 })
 

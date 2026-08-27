@@ -66,7 +66,7 @@ test('saving reports the seeded condition plus a newly added one', () => {
       onDelete={() => {}}
     />,
   )
-  fireEvent.click(getByRole('button', { name: '+' }))
+  fireEvent.click(getByRole('button', { name: /add a condition/i }))
   fireEvent.click(getByRole('option', { name: /^level$/i }))
   fireEvent.click(getByRole('button', { name: /save/i }))
   // `ConditionEditor` reports the whole active-fields object on every
@@ -129,7 +129,7 @@ test('adding a value condition through the + menu reports its starting value', (
       onDelete={() => {}}
     />,
   )
-  fireEvent.click(getByRole('button', { name: '+' }))
+  fireEvent.click(getByRole('button', { name: /add a condition/i }))
   fireEvent.click(getByRole('option', { name: /time remaining/i }))
   fireEvent.click(getByRole('button', { name: /save/i }))
   expect(saved).toEqual([{ ivMin: 100, ivMax: 100, minTime: 0 }])

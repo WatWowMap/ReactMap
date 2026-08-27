@@ -16,7 +16,7 @@ test('conditions AND together, and + adds another', () => {
       onChange={onChange}
     />,
   )
-  fireEvent.click(getByRole('button', { name: '+' }))
+  fireEvent.click(getByRole('button', { name: /add a condition/i }))
   fireEvent.click(getByRole('option', { name: /level/i }))
   const patch = onChange.mock.calls.at(-1)?.[0]
   // Both survive: a rule is the conjunction of its conditions.
@@ -24,8 +24,15 @@ test('conditions AND together, and + adds another', () => {
   expect(patch?.levelMin).toBeDefined()
 })
 
+/** PvP is opt-in like every other condition; add it before asserting on it. */
+function openPvp(getByRole: any) {
+  fireEvent.click(getByRole('button', { name: /add a condition/i }))
+  fireEvent.click(getByRole('option', { name: /rank/i }))
+}
+
 test('the PvP control offers one league, not three', () => {
-  const { getAllByRole } = render(<ConditionEditor />)
+  const { getAllByRole, getByRole } = render(<ConditionEditor />)
+  openPvp(getByRole)
   // One radio group, three mutually-exclusive leagues -- not three
   // independently-settable range widgets, one per league, the way 1.x did.
   expect(getAllByRole('radio', { name: /little|great|ultra/i })).toHaveLength(3)
@@ -35,7 +42,7 @@ test('the + menu never offers a condition that is already active', () => {
   const { getByRole, queryByRole } = render(
     <ConditionEditor conditions={[{ type: 'iv', min: 0 }]} />,
   )
-  fireEvent.click(getByRole('button', { name: '+' }))
+  fireEvent.click(getByRole('button', { name: /add a condition/i }))
   expect(queryByRole('option', { name: /^iv$/i })).toBeNull()
   expect(getByRole('option', { name: /^cp$/i })).toBeTruthy()
 })
@@ -51,6 +58,7 @@ test('a seeded condition renders its current value, not a blank row', () => {
 test('picking a PvP league patches pvpLeague with the CP cap, not an index', () => {
   const onChange = vi.fn()
   const { getByRole } = render(<ConditionEditor onChange={onChange} />)
+  openPvp(getByRole)
   fireEvent.click(getByRole('radio', { name: /great/i }))
   const patch = onChange.mock.calls.at(-1)?.[0]
   // rule_pokemon.pvp_league is NULL | 500 | 1500 | 2500 -- see
@@ -64,11 +72,11 @@ test('picking a PvP league patches pvpLeague with the CP cap, not an index', () 
  * this file's `beforeAll`, and throws on every query (`split-warning.test.tsx`
  * and `species-picker.test.tsx` hit the same thing and use `render`'s own
  * bound queries instead). It also asked for an accessible name matching
- * "add condition", but every other test in this file -- and
- * `filters-page.test.tsx` -- opens the same menu via the literal name '+',
- * which this refactor must not change. Both are adapted to the file's
- * existing convention; the assertion itself (a foreign vocabulary offers
- * its own conditions and none of ReactMap's) is unchanged from the brief.
+ * "add condition". The button was a bare '+' at the time and every test
+ * here addressed it that way; it is now named "+ Add a condition", because
+ * a lone glyph says neither what it adds nor that anything is addable, and
+ * these queries follow it. The assertion itself (a foreign vocabulary
+ * offers its own conditions and none of ReactMap's) is unchanged.
  */
 test("a foreign vocabulary offers its own conditions and none of ReactMap's", () => {
   const vocab: Vocabulary = {
@@ -87,7 +95,7 @@ test("a foreign vocabulary offers its own conditions and none of ReactMap's", ()
   const { getByRole, getByText, queryByText } = render(
     <ConditionEditor vocabulary={vocab} />,
   )
-  fireEvent.click(getByRole('button', { name: '+' }))
+  fireEvent.click(getByRole('button', { name: /add a condition/i }))
   expect(getByText('Weight')).toBeTruthy()
   expect(queryByText('IV')).toBeNull()
 })
@@ -98,7 +106,7 @@ test('a row label is capitalised for the form, not left lowercase as the sentenc
   // form label is not mid-sentence, so the editor capitalises it itself
   // rather than the vocabulary carrying a second, editor-only casing.
   const { getByRole, getByText, queryByText } = render(<ConditionEditor />)
-  fireEvent.click(getByRole('button', { name: '+' }))
+  fireEvent.click(getByRole('button', { name: /add a condition/i }))
   fireEvent.click(getByRole('option', { name: /^attack$/i }))
   expect(getByText('Attack')).toBeTruthy()
   expect(queryByText('attack')).toBeNull()
@@ -135,7 +143,8 @@ test('a stored PvP league opens with that league selected', () => {
 test('the rank boxes say which end they are', () => {
   // Two bare number inputs under a league picker do not say what they hold,
   // and rank 1 being the best rather than the worst is not guessable.
-  const { getByText } = render(<ConditionEditor />)
+  const { getByRole, getByText } = render(<ConditionEditor />)
+  openPvp(getByRole)
   expect(getByText('Best rank')).toBeTruthy()
   expect(getByText('Worst rank')).toBeTruthy()
 })

@@ -164,7 +164,7 @@ test('an edit to a one-row group commits without a split warning', async () => {
   // Add a condition rather than typing into one: `fireEvent.change` does
   // not drive React's controlled-input path under this DOM shim, which is
   // why every other editor test reaches for the `+` menu too.
-  fireEvent.click(getByRole('button', { name: '+' }))
+  fireEvent.click(getByRole('button', { name: /add a condition/i }))
   fireEvent.click(getByRole('option', { name: /^level$/i }))
   fireEvent.click(getByRole('button', { name: 'Save' }))
 
@@ -184,7 +184,7 @@ test('singling one species out of a group warns before it separates', async () =
   ])
   fireEvent.click(await findByRole('button', { name: 'Edit Rare spawns' }))
   fireEvent.click(getByRole('radio', { name: 'Larvitar' }))
-  fireEvent.click(getByRole('button', { name: '+' }))
+  fireEvent.click(getByRole('button', { name: /add a condition/i }))
   fireEvent.click(getByRole('option', { name: /^size$/i }))
   fireEvent.click(getByRole('button', { name: 'Save' }))
 
@@ -203,7 +203,7 @@ test('an edit aimed at every member rewrites them all, and warns about nothing',
     rareSpawns(3),
   )
   fireEvent.click(await findByRole('button', { name: 'Edit Rare spawns' }))
-  fireEvent.click(getByRole('button', { name: '+' }))
+  fireEvent.click(getByRole('button', { name: /add a condition/i }))
   fireEvent.click(getByRole('option', { name: /^size$/i }))
   fireEvent.click(getByRole('button', { name: 'Save' }))
 
