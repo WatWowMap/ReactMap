@@ -55,7 +55,24 @@ test('renders the alert sentence through the Poracle vocabulary', () => {
   expect(getByText(/within 5 km/)).toBeTruthy()
 })
 
-test('names the species by id', () => {
+test('a card with no catalogue still says which species it is about', () => {
+  // The title is `names.label` now rather than a hardcoded "Pokémon #id",
+  // so a caller that has not loaded the masterfile gets the bare id --
+  // recognisable, and never a blank heading.
   const { getByText } = render(<AlertCard alert={BASE} />)
-  expect(getByText('Pokémon #149')).toBeTruthy()
+  expect(getByText('#149')).toBeTruthy()
+})
+
+test('a card with a catalogue names the species and its form', () => {
+  const { getByText, queryByText } = render(
+    <AlertCard
+      alert={{ ...BASE, pokemonId: 778, form: 1042 }}
+      names={{
+        species: () => 'Mimikyu',
+        label: (_id, formId) => (formId ? 'Mimikyu Busted' : 'Mimikyu'),
+      }}
+    />,
+  )
+  expect(getByText('Mimikyu Busted')).toBeTruthy()
+  expect(queryByText(/^#778$/)).toBeNull()
 })

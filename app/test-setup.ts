@@ -18,6 +18,15 @@ import { GlobalRegistrator } from '@happy-dom/global-registrator'
  * `beforeAll`/`afterAll` to register happy-dom only around that file's
  * tests, instead of registering it here at preload time.
  */
+/*
+ * Registered without a `url`, so the document location stays `about:blank`
+ * and a relative `fetch` is not a URL at all. Components that fetch their
+ * own data -- the sprite index, for one -- therefore take their failure
+ * path here and log it. That is the intended trade: giving the document a
+ * real origin makes those same fetches into real connection attempts
+ * against whatever is listening on that port, which is a far worse thing
+ * for a test suite to do than printing a caught warning.
+ */
 export function setupDom() {
   GlobalRegistrator.register()
 }

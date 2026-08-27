@@ -18,10 +18,15 @@
 import { useState } from 'react'
 import { Button } from '../components/ui/button'
 import { RadioGroup, RadioGroupItem } from '../components/ui/radio-group'
+import {
+  describeWithVocabulary,
+  REACTMAP_VOCABULARY,
+} from './condition-vocabulary'
 import { conditionSeeds } from './rule-conditions'
 import { RuleSheet } from './rule-sheet'
 import type { RuleGroup } from './rule-types'
 import type { RulePatch } from './rules-query'
+import { SpeciesHeader } from './species-header'
 import type { SpeciesEntry } from './species-picker'
 import { SplitWarning } from './split-warning'
 import type { NamesLookup } from './use-names'
@@ -71,8 +76,31 @@ export function RuleEditor({
   // out of a larger group peels it into its own row.
   const separates = editingOneMember && group.ruleIds.length > 1
 
+  // Who this sheet is about, when that is one subject. Selecting a member
+  // names it; a whole group of several does not have one subject to show,
+  // and the radio list below already names each member.
+  const subjectId = editingOneMember
+    ? (group.speciesIds[targetIndex] ?? null)
+    : group.ruleIds.length === 1
+      ? group.sample.speciesId
+      : undefined
+
+  // The sentence the card would read if this were saved now, so the effect
+  // of a change is visible without closing the sheet to go and look.
+  const sentence = describeWithVocabulary(
+    { ...group.sample, ...draft },
+    REACTMAP_VOCABULARY,
+  )
+
   return (
     <div className="flex flex-col gap-4">
+      {subjectId !== undefined && (
+        <SpeciesHeader
+          speciesId={subjectId}
+          names={names}
+          sentence={sentence}
+        />
+      )}
       {group.ruleIds.length > 1 && (
         <div className="flex flex-col gap-2">
           <span className="text-sm text-muted-foreground">Applies to</span>

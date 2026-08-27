@@ -15,7 +15,7 @@ import type { AlertRow } from '../rules/poracle-vocabulary'
 import type { SpeciesSelection } from '../rules/species-picker'
 import { SpeciesPicker } from '../rules/species-picker'
 import type { MasterfileClient } from '../rules/use-names'
-import { useSpeciesCatalog } from '../rules/use-names'
+import { useNames, useSpeciesCatalog } from '../rules/use-names'
 
 export interface AlertsPageProps {
   /** Test seam: a fake in place of the default tRPC-backed client. */
@@ -72,9 +72,9 @@ export function AlertsPage({
     updateLocation,
     deleteLocation,
   } = useAlerts(alertsClient ? { client: alertsClient } : undefined)
-  const species = useSpeciesCatalog(
-    namesClient ? { client: namesClient } : undefined,
-  )
+  const namesOptions = namesClient ? { client: namesClient } : undefined
+  const species = useSpeciesCatalog(namesOptions)
+  const names = useNames(namesOptions)
 
   // Which alert's sheet is open, by uid rather than the row itself, so a
   // save that changes the row's shape (`replace` adopts a new uid) never
@@ -168,6 +168,7 @@ export function AlertsPage({
                   <AlertCard
                     key={alert.uid}
                     alert={alert}
+                    names={names}
                     onOpen={() => setOpenUid(alert.uid)}
                     onDelete={() => void remove(alert.uid)}
                   />
@@ -196,9 +197,19 @@ export function AlertsPage({
           }}
         >
           <SheetContent side="right" className="gap-4 overflow-y-auto p-6">
-            <SheetHeader className="p-0">
+            {/*
+             * The sheet's visible heading is `SpeciesHeader`, inside the
+             * editor: sprite, name and form, plus the sentence the rule
+             * currently reads as. Radix still needs a `SheetTitle` for the
+             * dialog's accessible name, so this one carries the name and
+             * nothing draws it twice.
+             */}
+            <SheetHeader className="sr-only p-0">
               <SheetTitle>
-                Pokémon #{openAlert?.pokemonId ?? draft?.pokemonId}
+                {names.label(
+                  (openAlert?.pokemonId ?? draft?.pokemonId) as number,
+                  openAlert?.form ?? draft?.form ?? null,
+                )}
               </SheetTitle>
             </SheetHeader>
             {openAlert ? (
@@ -207,6 +218,7 @@ export function AlertsPage({
                 // row to the next.
                 key={openAlert.uid}
                 alert={openAlert}
+                names={names}
                 onSave={(patch) => {
                   void replace(openAlert.uid, patch)
                   setOpenUid(null)
@@ -224,6 +236,7 @@ export function AlertsPage({
                   // different one starts a different draft.
                   key={`draft-${draft.pokemonId}`}
                   alert={draft as unknown as AlertRow}
+                  names={names}
                   onSave={(patch) => {
                     void create({ ...draft, ...patch })
                     setDraft(null)

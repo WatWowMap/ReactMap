@@ -15,10 +15,13 @@
 
 import { useState } from 'react'
 import { Button } from '../components/ui/button'
+import { describeWithVocabulary } from '../rules/condition-vocabulary'
 import type { AlertPatch, AlertRow } from '../rules/poracle-vocabulary'
 import { PORACLE_VOCABULARY } from '../rules/poracle-vocabulary'
 import { conditionSeeds } from '../rules/rule-conditions'
 import { RuleSheet } from '../rules/rule-sheet'
+import { SpeciesHeader } from '../rules/species-header'
+import { EMPTY_LOOKUP, type NamesLookup } from '../rules/use-names'
 
 export interface AlertEditorProps {
   alert: AlertRow
@@ -34,6 +37,8 @@ export interface AlertEditorProps {
    * deleting something that exists.
    */
   isNew?: boolean
+  /** Names the header renders. Falls back to bare ids when absent. */
+  names?: NamesLookup
 }
 
 export function AlertEditor({
@@ -41,11 +46,25 @@ export function AlertEditor({
   onSave,
   onDelete,
   isNew = false,
+  names,
 }: AlertEditorProps) {
   const [draft, setDraft] = useState<AlertPatch>({})
 
+  // The sentence the card would show if this were saved now, so the effect
+  // of a change is readable without closing the sheet to go and look.
+  const sentence = describeWithVocabulary(
+    { ...alert, ...draft },
+    PORACLE_VOCABULARY,
+  )
+
   return (
     <div className="flex flex-col gap-4">
+      <SpeciesHeader
+        speciesId={alert.pokemonId}
+        formId={alert.form}
+        names={names ?? EMPTY_LOOKUP}
+        sentence={sentence}
+      />
       <RuleSheet<AlertPatch>
         speciesId={alert.pokemonId}
         vocabulary={PORACLE_VOCABULARY}

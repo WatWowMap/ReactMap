@@ -60,7 +60,7 @@ export interface NamesLookup {
 }
 
 /** A lookup with nothing loaded yet -- every id falls back to its own `#id`. */
-const EMPTY_LOOKUP: NamesLookup = {
+export const EMPTY_LOOKUP: NamesLookup = {
   species: (id) => `#${id}`,
   label: (speciesId, formId) =>
     formId ? `#${speciesId} (#${formId})` : `#${speciesId}`,

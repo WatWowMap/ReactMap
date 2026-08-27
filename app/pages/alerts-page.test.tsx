@@ -247,7 +247,8 @@ test('picking a species opens the editor and writes nothing yet', async () => {
   fireEvent.click(await findByRole('button', { name: /^save$/i }))
   await waitFor(() => expect(created).toHaveLength(1))
   expect(created[0]).toMatchObject({ pokemonId: 246 })
-  await waitFor(() => expect(getByText('Pokémon #246')).toBeTruthy())
+  // The new card names the species, the same way the picker did.
+  await waitFor(() => expect(getByText('Larvitar')).toBeTruthy())
 })
 
 test('switching profile refetches, because a stale currentProfileNo would still steer the next write', async () => {
