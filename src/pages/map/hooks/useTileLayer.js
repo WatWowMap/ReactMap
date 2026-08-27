@@ -40,10 +40,7 @@ export function useTileLayer() {
       ...layer,
       style: layer.style || 'light',
       key: `${layer?.name}_${timeOfDay}}`,
-      url:
-        layer?.[timeOfDay] ||
-        layer?.url ||
-        'https://{s}.basemaps.cartocdn.com/rastertiles/voyager_labels_under/{z}/{x}/{y}{r}.png',
+      url: layer?.[timeOfDay] || layer?.url,
       minZoom: config.general.minZoom || 18,
       maxZoom: config.general.maxZoom || 10,
       zIndex: 250,
