@@ -66,8 +66,18 @@ export interface RangeCondition<P extends ConditionPatch = ConditionPatch> {
   /** Where this range's scale starts, for a freshly added row. Defaults to
    *  0, which reads as "no floor" on IV, CP and level. PvP rank has no
    *  zeroth place -- rank 1 is the best result -- so it sets 1 and a new
-   *  row opens on a rank that exists. */
+   *  row opens on a rank that exists. Doubles as the low box's placeholder. */
   floor?: number
+  /** The top of this range's scale, shown as the high box's placeholder.
+   *  Only worth setting where the ceiling is real and unguessable -- PvP's
+   *  4096th rank is, an IV's 100 is not, since the label says percent. */
+  ceiling?: number
+  /** What the two boxes are called on screen. Defaults read the range as
+   *  the conjunction it is: "at least X, at most Y". PvP rank overrides
+   *  them because its scale runs backwards -- rank 1 is the BEST result,
+   *  so "at least 1" is numerically right and exactly the wrong words. */
+  minLabel?: string
+  maxLabel?: string
 }
 
 export interface ChoiceCondition<P extends ConditionPatch = ConditionPatch> {
@@ -242,6 +252,9 @@ export const REACTMAP_VOCABULARY: Vocabulary<RulePatch> = {
       labelField: 'pvpLeague',
       labelWords: LEAGUE_WORD,
       floor: 1,
+      ceiling: 4096,
+      minLabel: 'Best rank',
+      maxLabel: 'Worst rank',
     },
     {
       kind: 'count',

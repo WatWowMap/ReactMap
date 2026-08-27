@@ -174,21 +174,13 @@ export function ConditionEditor<P extends ConditionPatch = RulePatch>({
   )
   const activeRanges = [...active]
     .map((key) => byKey.get(key))
-    .filter(
-      (def): def is RangeCondition<P> =>
-        def?.kind === 'range' && def.key !== 'pvp',
-    )
+    .filter((def): def is RangeCondition<P> => def?.kind === 'range')
   const activeChoices = [...active]
     .map((key) => byKey.get(key))
     .filter((def): def is ChoiceCondition<P> => def?.kind === 'choice')
   const activeValues = [...active]
     .map((key) => byKey.get(key))
     .filter((def): def is ValueCondition<P> => def?.kind === 'value')
-  const pvpDef = resolvedVocabulary.conditions.find(
-    (def): def is RangeCondition<P> =>
-      def.kind === 'range' && def.key === 'pvp',
-  )
-
   function commit(nextActive: ReadonlySet<string>, nextFields: FieldValues) {
     setState({ active: nextActive, fields: nextFields })
     // Every key written into `nextFields` came from a `def.field`,
@@ -254,47 +246,113 @@ export function ConditionEditor<P extends ConditionPatch = RulePatch>({
     commit(active, { ...fields, [def.field]: value })
   }
 
-  function updatePvpLeague(def: RangeCondition<P>, cap: number) {
+  /** The column a range reads its prefix from -- PvP's league, today. */
+  function updateRangeLabel(def: RangeCondition<P>, value: number) {
     if (!def.labelField) return
-    commit(active, { ...fields, [def.labelField]: cap })
-  }
-
-  function updatePvpRank(
-    def: RangeCondition<P>,
-    bound: 'min' | 'max',
-    raw: string,
-  ) {
-    updateRange(def, bound, raw)
+    commit(active, { ...fields, [def.labelField]: value })
   }
 
   return (
     <div className="flex flex-col gap-3">
+      {/*
+        Every box carries a visible label, not just an `aria-label`: two
+        identical number inputs side by side say nothing about which end
+        of the range they are, and a person reading the screen has no way
+        to find out. The names come from the vocabulary so the words and
+        the columns can never drift apart.
+
+        PvP renders through this same block rather than one of its own.
+        It differs only in having a league to pick and its own names for
+        the two bounds, both of which are now things a range CAN declare,
+        so a second hand-written copy of the range row bought nothing but
+        a place for the two to disagree.
+      */}
       {activeRanges.map((def) => (
-        <div key={def.key} className="flex items-center gap-2">
-          <span className="w-16 text-sm text-muted-foreground">
+        <div key={def.key} className="flex flex-col gap-1.5">
+          <span className="text-sm text-muted-foreground">
             {capitalize(def.label)}
           </span>
-          <Input
-            type="number"
-            aria-label={`${capitalize(def.label)} minimum`}
-            value={(fields[def.minField] as number | null | undefined) ?? ''}
-            onChange={(event) => updateRange(def, 'min', event.target.value)}
-          />
-          <Input
-            type="number"
-            aria-label={`${capitalize(def.label)} maximum`}
-            value={(fields[def.maxField] as number | null | undefined) ?? ''}
-            onChange={(event) => updateRange(def, 'max', event.target.value)}
-          />
+          {def.labelField && (
+            <RadioGroup
+              className="flex flex-row gap-3"
+              value={
+                fields[def.labelField] != null
+                  ? String(fields[def.labelField])
+                  : null
+              }
+              onValueChange={(value) => updateRangeLabel(def, Number(value))}
+            >
+              {Object.entries(def.labelWords ?? {}).map(([value, label]) => (
+                <span key={value} className="flex items-center gap-1.5 text-sm">
+                  <RadioGroupItem id={`${def.key}-${value}`} value={value} />
+                  <label htmlFor={`${def.key}-${value}`}>
+                    {capitalize(label)}
+                  </label>
+                </span>
+              ))}
+            </RadioGroup>
+          )}
+          <div className="flex items-end gap-2">
+            <span className="flex flex-1 flex-col gap-1">
+              <label
+                htmlFor={`${def.key}-min`}
+                className="text-xs text-muted-foreground"
+              >
+                {def.minLabel ?? 'At least'}
+              </label>
+              <Input
+                id={`${def.key}-min`}
+                type="number"
+                placeholder={def.floor != null ? String(def.floor) : undefined}
+                value={
+                  (fields[def.minField] as number | null | undefined) ?? ''
+                }
+                onChange={(event) =>
+                  updateRange(def, 'min', event.target.value)
+                }
+              />
+            </span>
+            <span className="flex flex-1 flex-col gap-1">
+              <label
+                htmlFor={`${def.key}-max`}
+                className="text-xs text-muted-foreground"
+              >
+                {def.maxLabel ?? 'At most'}
+              </label>
+              <Input
+                id={`${def.key}-max`}
+                type="number"
+                placeholder={
+                  def.ceiling != null ? String(def.ceiling) : undefined
+                }
+                value={
+                  (fields[def.maxField] as number | null | undefined) ?? ''
+                }
+                onChange={(event) =>
+                  updateRange(def, 'max', event.target.value)
+                }
+              />
+            </span>
+          </div>
         </div>
       ))}
 
       {activeChoices.map((def) => (
         <div key={def.key} className="flex items-center gap-2">
-          <span className="w-16 text-sm text-muted-foreground">
+          {/*
+            A group of radios cannot be wrapped in a `<label>` the way one
+            input can, so the name is pointed AT the group instead. Without
+            this the group has no accessible name at all and the options
+            read as three loose radios with no idea what they choose.
+          */}
+          <span
+            id={`${def.key}-label`}
+            className="w-16 text-sm text-muted-foreground"
+          >
             {capitalize(def.label)}
           </span>
           <RadioGroup
+            aria-labelledby={`${def.key}-label`}
             className="flex flex-row gap-3"
             value={String(fields[def.field] ?? def.options[0]?.value ?? '')}
             onValueChange={(value) => updateChoice(def, value)}
@@ -319,12 +377,20 @@ export function ConditionEditor<P extends ConditionPatch = RulePatch>({
 
       {activeValues.map((def) => (
         <div key={def.key} className="flex items-center gap-2">
-          <span className="w-16 text-sm text-muted-foreground">
+          {/*
+            A real `<label>` rather than a `<span>` beside the box: it puts
+            the name IN the box's accessible name instead of merely near
+            it, and clicking the word focuses the input.
+          */}
+          <label
+            htmlFor={`${def.key}-value`}
+            className="w-16 text-sm text-muted-foreground"
+          >
             {capitalize(def.label)}
-          </span>
+          </label>
           <Input
+            id={`${def.key}-value`}
             type="number"
-            aria-label={capitalize(def.label)}
             value={(fields[def.field] as number | null | undefined) ?? ''}
             onChange={(event) => updateValue(def, event.target.value)}
           />
@@ -366,76 +432,6 @@ export function ConditionEditor<P extends ConditionPatch = RulePatch>({
           </div>
         )}
       </div>
-
-      {pvpDef?.labelField && active.has(pvpDef.key) && (
-        <div className="flex flex-col gap-2 border-t border-border pt-3">
-          <span className="text-sm text-muted-foreground">PvP league</span>
-          <RadioGroup
-            className="flex flex-row gap-3"
-            value={
-              fields[pvpDef.labelField] != null
-                ? String(fields[pvpDef.labelField])
-                : null
-            }
-            onValueChange={(value) => updatePvpLeague(pvpDef, Number(value))}
-          >
-            {Object.entries(pvpDef.labelWords ?? {}).map(([cap, label]) => (
-              <span key={cap} className="flex items-center gap-1.5 text-sm">
-                <RadioGroupItem id={`pvp-league-${cap}`} value={cap} />
-                <label htmlFor={`pvp-league-${cap}`}>{capitalize(label)}</label>
-              </span>
-            ))}
-          </RadioGroup>
-          {/*
-            Labelled visibly, not just for a screen reader. Two bare number
-            boxes under a league picker do not say what they are, and rank 1
-            being the best result rather than the worst is exactly the thing
-            a person needs told rather than guessed.
-          */}
-          <div className="flex items-end gap-2">
-            <span className="flex flex-1 flex-col gap-1">
-              <label
-                htmlFor="pvp-rank-best"
-                className="text-xs text-muted-foreground"
-              >
-                Best rank
-              </label>
-              <Input
-                id="pvp-rank-best"
-                type="number"
-                placeholder="1"
-                aria-label="PvP rank minimum"
-                value={
-                  (fields[pvpDef.minField] as number | null | undefined) ?? ''
-                }
-                onChange={(event) =>
-                  updatePvpRank(pvpDef, 'min', event.target.value)
-                }
-              />
-            </span>
-            <span className="flex flex-1 flex-col gap-1">
-              <label
-                htmlFor="pvp-rank-worst"
-                className="text-xs text-muted-foreground"
-              >
-                Worst rank
-              </label>
-              <Input
-                id="pvp-rank-worst"
-                type="number"
-                placeholder="4096"
-                aria-label="PvP rank maximum"
-                value={
-                  (fields[pvpDef.maxField] as number | null | undefined) ?? ''
-                }
-                onChange={(event) =>
-                  updatePvpRank(pvpDef, 'max', event.target.value)
-                }
-              />
-            </span>
-          </div>
-        </div>
-      )}
     </div>
   )
 }

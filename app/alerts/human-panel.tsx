@@ -317,12 +317,20 @@ export function HumanPanel({
               </div>
             ))}
           </div>
-          <div className="flex items-center gap-2">
-            <Input
-              ref={newProfileNameRef}
-              aria-label="New profile name"
-              defaultValue=""
-            />
+          <div className="flex items-end gap-2">
+            <span className="flex flex-1 flex-col gap-1">
+              <label
+                htmlFor="new-profile-name"
+                className="text-xs text-muted-foreground"
+              >
+                New profile name
+              </label>
+              <Input
+                id="new-profile-name"
+                ref={newProfileNameRef}
+                defaultValue=""
+              />
+            </span>
             <Button type="button" variant="outline" onClick={addProfile}>
               Add profile
             </Button>
@@ -449,22 +457,40 @@ export function HumanPanel({
                 {editingLabel === location.label ? (
                   <>
                     <span className="flex-1 text-sm">{location.label}</span>
-                    <Input
-                      ref={(el) => {
-                        editLatRefs.current[location.label] = el
-                      }}
-                      type="number"
-                      aria-label={`Latitude for ${location.label}`}
-                      defaultValue={location.latitude}
-                    />
-                    <Input
-                      ref={(el) => {
-                        editLonRefs.current[location.label] = el
-                      }}
-                      type="number"
-                      aria-label={`Longitude for ${location.label}`}
-                      defaultValue={location.longitude}
-                    />
+                    <span className="flex flex-1 flex-col gap-1">
+                      <label
+                        htmlFor={`lat-${location.label}`}
+                        className="text-xs text-muted-foreground"
+                      >
+                        Latitude
+                      </label>
+                      <Input
+                        id={`lat-${location.label}`}
+                        ref={(el) => {
+                          editLatRefs.current[location.label] = el
+                        }}
+                        type="number"
+                        aria-label={`Latitude for ${location.label}`}
+                        defaultValue={location.latitude}
+                      />
+                    </span>
+                    <span className="flex flex-1 flex-col gap-1">
+                      <label
+                        htmlFor={`lon-${location.label}`}
+                        className="text-xs text-muted-foreground"
+                      >
+                        Longitude
+                      </label>
+                      <Input
+                        id={`lon-${location.label}`}
+                        ref={(el) => {
+                          editLonRefs.current[location.label] = el
+                        }}
+                        type="number"
+                        aria-label={`Longitude for ${location.label}`}
+                        defaultValue={location.longitude}
+                      />
+                    </span>
                     <Button
                       type="button"
                       variant="outline"
@@ -501,24 +527,51 @@ export function HumanPanel({
               </li>
             ))}
           </ul>
-          <div className="flex items-center gap-2">
-            <Input
-              ref={newLocationLabelRef}
-              aria-label="New location label"
-              defaultValue=""
-            />
-            <Input
-              ref={newLocationLatRef}
-              type="number"
-              aria-label="New location latitude"
-              defaultValue=""
-            />
-            <Input
-              ref={newLocationLonRef}
-              type="number"
-              aria-label="New location longitude"
-              defaultValue=""
-            />
+          <div className="flex items-end gap-2">
+            <span className="flex flex-1 flex-col gap-1">
+              <label
+                htmlFor="new-location-label"
+                className="text-xs text-muted-foreground"
+              >
+                Name
+              </label>
+              <Input
+                id="new-location-label"
+                ref={newLocationLabelRef}
+                aria-label="New location label"
+                defaultValue=""
+              />
+            </span>
+            <span className="flex flex-1 flex-col gap-1">
+              <label
+                htmlFor="new-location-lat"
+                className="text-xs text-muted-foreground"
+              >
+                Latitude
+              </label>
+              <Input
+                id="new-location-lat"
+                ref={newLocationLatRef}
+                type="number"
+                aria-label="New location latitude"
+                defaultValue=""
+              />
+            </span>
+            <span className="flex flex-1 flex-col gap-1">
+              <label
+                htmlFor="new-location-lon"
+                className="text-xs text-muted-foreground"
+              >
+                Longitude
+              </label>
+              <Input
+                id="new-location-lon"
+                ref={newLocationLonRef}
+                type="number"
+                aria-label="New location longitude"
+                defaultValue=""
+              />
+            </span>
             <Button type="button" variant="outline" onClick={addLocation}>
               Add location
             </Button>

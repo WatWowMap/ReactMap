@@ -447,3 +447,14 @@ test('cancelling a location delete never calls back', async () => {
   expect(calls).toEqual([])
   expect(queryByRole('alertdialog')).toBeNull()
 })
+
+test('every box on the panel says what goes in it', () => {
+  // Six inputs that carried an `aria-label` and nothing else. The saved
+  // locations row was two blank number boxes with no hint they wanted
+  // coordinates.
+  const { getByText, getAllByText } = renderPanel()
+  expect(getByText('New profile name')).toBeTruthy()
+  expect(getByText('Name')).toBeTruthy()
+  expect(getAllByText('Latitude').length).toBeGreaterThan(0)
+  expect(getAllByText('Longitude').length).toBeGreaterThan(0)
+})

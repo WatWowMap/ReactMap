@@ -227,14 +227,28 @@ export function SpeciesPicker({
 
   return (
     <div className="flex flex-col gap-2">
-      <div className="flex items-center gap-2">
-        <Input
-          ref={searchRef}
-          type="search"
-          aria-label="Search Pokémon"
-          placeholder="Search Pokémon or form..."
-          defaultValue=""
-        />
+      <div className="flex items-end gap-2">
+        {/*
+          Labelled as well as placeheld. A placeholder is the one piece of
+          help that leaves the moment it is needed -- the box goes blank of
+          explanation the instant someone types into it.
+        */}
+        <span className="flex flex-1 flex-col gap-1">
+          <label
+            htmlFor="species-search"
+            className="text-xs text-muted-foreground"
+          >
+            Search
+          </label>
+          <Input
+            id="species-search"
+            ref={searchRef}
+            type="search"
+            aria-label="Search Pokémon"
+            placeholder="Search Pokémon or form..."
+            defaultValue=""
+          />
+        </span>
         <Button
           type="button"
           variant="outline"

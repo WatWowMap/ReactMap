@@ -3,6 +3,7 @@ import { cleanup, fireEvent, render } from '@testing-library/react'
 import { setupDom, teardownDom } from '../test-setup'
 import { ConditionEditor } from './condition-editor'
 import type { Vocabulary } from './condition-vocabulary'
+import { PORACLE_VOCABULARY } from './poracle-vocabulary'
 
 beforeAll(setupDom)
 afterAll(teardownDom)
@@ -178,4 +179,60 @@ test('adding PvP does not overwrite a league the row already stored', () => {
       'data-state',
     ),
   ).toBe('checked')
+})
+
+test('both ends of a range are named on screen, not only to a screen reader', () => {
+  // Two identical number boxes side by side say nothing about which end
+  // of the range each one is, and `aria-label` alone tells only half the
+  // people looking at it.
+  const { getByLabelText, getByText } = render(
+    <ConditionEditor conditions={[{ type: 'cp', min: 500, max: 2500 }]} />,
+  )
+  expect(getByText('At least')).toBeTruthy()
+  expect(getByText('At most')).toBeTruthy()
+  // The visible words ARE the accessible name -- no `aria-label` shadowing
+  // them with different text.
+  expect((getByLabelText('At least') as HTMLInputElement).value).toBe('500')
+  expect((getByLabelText('At most') as HTMLInputElement).value).toBe('2500')
+})
+
+test('a range whose scale runs backwards uses its own words for the ends', () => {
+  // Rank 1 is the BEST result, so "at least 1" is numerically right and
+  // exactly the wrong thing to tell someone.
+  const { getByLabelText, queryByText } = render(
+    <ConditionEditor conditions={[{ type: 'pvp', label: 1500, min: 1 }]} />,
+  )
+  expect((getByLabelText('Best rank') as HTMLInputElement).value).toBe('1')
+  expect(getByLabelText('Worst rank')).toBeTruthy()
+  expect(queryByText('At least')).toBeNull()
+})
+
+test('a single-value condition names its own box', () => {
+  const { getByLabelText } = render(
+    <ConditionEditor
+      conditions={[{ type: 'pvpMinCp', value: 1450 }]}
+      vocabulary={PORACLE_VOCABULARY}
+    />,
+  )
+  expect((getByLabelText('PvP min CP') as HTMLInputElement).value).toBe('1450')
+})
+
+test('a group of radios carries the name of what it chooses', () => {
+  // A `<label>` cannot wrap a radio group, so without `aria-labelledby`
+  // the three options read as loose radios choosing nothing in particular.
+  const { getByRole } = render(
+    <ConditionEditor conditions={[{ type: 'gender', value: 1 }]} />,
+  )
+  expect(getByRole('radiogroup', { name: /gender/i })).toBeTruthy()
+})
+
+test('the PvP league picker renders through the range row, not a block of its own', () => {
+  // The league radios and the rank boxes used to live in a hand-written
+  // copy of the range row, keyed off the literal 'pvp'. Two copies meant
+  // two labelling schemes, and only one of them got labelled.
+  const { getByRole, getByLabelText } = render(
+    <ConditionEditor conditions={[{ type: 'pvp', label: 2500, min: 1 }]} />,
+  )
+  expect(getByRole('radio', { name: 'Ultra' })).toBeTruthy()
+  expect(getByLabelText('Best rank')).toBeTruthy()
 })
