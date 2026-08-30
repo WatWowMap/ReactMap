@@ -61,6 +61,8 @@ export type Config<Client extends boolean = false> = DeepMerge<
       alwaysEnabledPerms: string[]
       aliases: { role: string | string[]; name: string }[]
       methods: Strategy[]
+      /** Derived: a telegram strategy has both a `clientId` and a `clientSecret` */
+      telegramOAuth: boolean
       strategies: {
         type: Strategy
         trialPeriod: {

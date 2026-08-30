@@ -477,6 +477,7 @@
   "go_back": "Go Back",
   "access": "Access",
   "link_discord": "Link Discord",
+  "link_telegram": "Link Telegram",
   "select_webhook_strategy": "Alert Manager",
   "webhook_strategy_success_0": "Success! Refreshing to fetch alert settings...",
   "register": "Register",

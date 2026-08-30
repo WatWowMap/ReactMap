@@ -52,6 +52,7 @@ function getServerSettings(req) {
       loggedIn: !!req.user,
       excludeList: authentication.excludeFromTutorial,
       methods: authentication.methods,
+      telegramOAuth: authentication.telegramOAuth,
     },
     database: {
       settings: {

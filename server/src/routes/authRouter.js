@@ -70,6 +70,21 @@ const loadAuthStrategies = () => {
           delete req.session.discordPromptRetry
         }
 
+        // Telegram's OAuth flow reports a cancelled consent screen as an error
+        // param, which passport-oauth2 turns into a thrown AuthorizationError.
+        // Send those to /blocked, the same place a rejected login ends up.
+        if (
+          strategy.type === 'telegram' &&
+          typeof req.query.error === 'string'
+        ) {
+          log.debug(TAGS.auth, 'Telegram auth was denied:', req.query.error)
+          return res.redirect(
+            `/blocked/${encodeURIComponent(
+              new URLSearchParams({ message: 'access_denied' }).toString(),
+            )}`,
+          )
+        }
+
         return passport.authenticate(
           name,
           getAuthenticateOptions(req),
