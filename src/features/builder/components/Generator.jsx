@@ -49,6 +49,7 @@ export function Generator({ block, defaultReturn = null }) {
         <TelegramLogin
           botName={block.telegramBotName}
           authUrl={block.telegramAuthUrl}
+          telegramOAuth={block.telegramOAuth}
         />
       )
     case 'discord':

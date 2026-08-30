@@ -2,6 +2,7 @@ const assert = require('node:assert/strict')
 const { test } = require('node:test')
 
 const {
+  annotateTelegramBlocks,
   getStrategyNameFromAuthUrl,
   getTelegramStrategy,
   isTelegramOAuth,
@@ -107,4 +108,84 @@ test('non telegram strategies never match', () => {
 
   assert.equal(getTelegramStrategy('/auth/discord/callback', [discord]), null)
   assert.equal(isTelegramOAuth('/auth/discord/callback', [discord]), false)
+})
+
+test('annotates custom login page blocks from their own auth url', () => {
+  const strategies = [LEGACY, OAUTH]
+  // the shape people actually have in their loginPage config
+  const blocks = [
+    {
+      type: 'telegram',
+      gridSizes: { sm: 6 },
+      telegramBotName: 'CandyMapBot',
+      telegramAuthUrl: '/auth/telegram/callback',
+      gridStyle: { marginTop: 20, textDecoration: 'none' },
+    },
+    {
+      type: 'telegram',
+      telegramBotName: 'CandyMapBot',
+      telegramAuthUrl: '/auth/telegram-oauth/callback',
+    },
+    { type: 'discord', link: '/auth/discord/callback' },
+  ]
+
+  const [legacyBlock, oauthBlock, discordBlock] = annotateTelegramBlocks(
+    blocks,
+    strategies,
+  )
+
+  assert.equal(legacyBlock.telegramOAuth, false)
+  assert.equal(oauthBlock.telegramOAuth, true)
+  assert.equal('telegramOAuth' in discordBlock, false)
+  // every other key on the block survives untouched
+  assert.deepEqual(legacyBlock.gridSizes, { sm: 6 })
+  assert.equal(legacyBlock.telegramBotName, 'CandyMapBot')
+  assert.deepEqual(legacyBlock.gridStyle, {
+    marginTop: 20,
+    textDecoration: 'none',
+  })
+})
+
+test('annotates telegram blocks nested inside parent blocks', () => {
+  const annotated = annotateTelegramBlocks(
+    [
+      {
+        type: 'parent',
+        components: [
+          { type: 'telegram', telegramAuthUrl: '/auth/telegram/callback' },
+          {
+            type: 'parent',
+            components: [
+              {
+                type: 'telegram',
+                telegramAuthUrl: '/auth/telegram-oauth/callback',
+              },
+            ],
+          },
+        ],
+      },
+    ],
+    [LEGACY, OAUTH],
+  )
+
+  assert.equal(annotated[0].components[0].telegramOAuth, false)
+  assert.equal(annotated[0].components[1].components[0].telegramOAuth, true)
+})
+
+test('annotating does not mutate the config objects it is given', () => {
+  const block = {
+    type: 'telegram',
+    telegramAuthUrl: '/auth/telegram-oauth/callback',
+  }
+  const blocks = [block]
+
+  annotateTelegramBlocks(blocks, [LEGACY, OAUTH])
+
+  assert.equal('telegramOAuth' in block, false)
+  assert.equal(blocks[0], block)
+})
+
+test('annotating tolerates a missing or empty component list', () => {
+  assert.deepEqual(annotateTelegramBlocks(undefined, [OAUTH]), [])
+  assert.deepEqual(annotateTelegramBlocks([], [OAUTH]), [])
 })

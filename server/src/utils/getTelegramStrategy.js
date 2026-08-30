@@ -61,7 +61,35 @@ function isTelegramOAuth(authUrl, strategies) {
   return !!(strategy?.clientId && strategy?.clientSecret)
 }
 
+/**
+ * Custom login page blocks carry their own `telegramAuthUrl`, which can point
+ * at a different strategy than the domain's `customRoutes` default, so each
+ * block gets its flow resolved from its own route rather than inheriting the
+ * page level flag.
+ *
+ * @param {import("@rm/types").CustomComponent[]} components
+ * @param {import('@rm/types').StrategyConfig[]} strategies
+ * @returns {import("@rm/types").CustomComponent[]}
+ */
+function annotateTelegramBlocks(components, strategies) {
+  return (Array.isArray(components) ? components : []).map((component) => {
+    if ('components' in component && Array.isArray(component.components)) {
+      return {
+        ...component,
+        components: annotateTelegramBlocks(component.components, strategies),
+      }
+    }
+    return component.type === 'telegram'
+      ? {
+          ...component,
+          telegramOAuth: isTelegramOAuth(component.telegramAuthUrl, strategies),
+        }
+      : component
+  })
+}
+
 module.exports = {
+  annotateTelegramBlocks,
   getStrategyNameFromAuthUrl,
   getTelegramStrategy,
   isTelegramOAuth,

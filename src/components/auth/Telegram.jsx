@@ -76,15 +76,21 @@ export function TelegramButton({
 }
 
 /**
- * Renders whichever Telegram flow the server is configured for.
+ * Renders whichever Telegram flow the route in `authUrl` is running.
  *
- * @param {{ botName: string, authUrl: string } & Omit<Parameters<typeof TelegramButton>[0], 'href'>} props
+ * Custom login page blocks carry their own `telegramAuthUrl`, which can point
+ * at a different strategy than the domain default, so they pass the flow the
+ * server resolved for that block. Everything else uses the flow resolved for
+ * `customRoutes.telegramAuthUrl`.
+ *
+ * @param {{ botName: string, authUrl: string, telegramOAuth?: boolean } & Omit<Parameters<typeof TelegramButton>[0], 'href'>} props
  * @returns
  */
-export function TelegramLogin({ botName, authUrl, ...props }) {
-  const telegramOAuth = useMemory((s) => s.auth.telegramOAuth)
+export function TelegramLogin({ botName, authUrl, telegramOAuth, ...props }) {
+  const domainDefault = useMemory((s) => s.auth.telegramOAuth)
+  const isOAuth = telegramOAuth ?? domainDefault
 
-  return telegramOAuth ? (
+  return isOAuth ? (
     <TelegramButton href={authUrl} {...props} />
   ) : (
     <TelegramWidget botName={botName} authUrl={authUrl} />
