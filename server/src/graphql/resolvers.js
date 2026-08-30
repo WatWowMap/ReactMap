@@ -10,6 +10,7 @@ const { missing, readAndParseJson } = require('@rm/locales')
 
 const { buildDefaultFilters } = require('../filters/builder/base')
 const { filterComponents } = require('../utils/filterComponents')
+const { annotateTelegramBlocks } = require('../utils/getTelegramStrategy')
 const { validateSelectedWebhook } = require('../utils/validateSelectedWebhook')
 const { PoracleAPI } = require('../services/Poracle')
 const { geocoder } = require('../services/geocoder')
@@ -146,14 +147,16 @@ const resolvers = {
               components = [],
               ...rest
             } = config.getMapConfig(req)[component]
+            const strategies = config.getSafe('authentication.strategies')
+            const prepare = (blocks) =>
+              annotateTelegramBlocks(
+                filterComponents(blocks, !!username, perms.donor),
+                strategies,
+              )
             return {
               ...rest,
-              footerButtons: filterComponents(
-                footerButtons,
-                !!username,
-                perms.donor,
-              ),
-              components: filterComponents(components, !!username, perms.donor),
+              footerButtons: prepare(footerButtons),
+              components: prepare(components),
             }
           }
           return null

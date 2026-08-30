@@ -52,6 +52,8 @@ interface CustomTelegram extends BaseBlock {
   type: 'telegram'
   telegramBotName: string
   telegramAuthUrl: string
+  /** Resolved server side from `telegramAuthUrl`, not set in config */
+  telegramOAuth?: boolean
 }
 
 interface CustomLocal extends BaseBlock {

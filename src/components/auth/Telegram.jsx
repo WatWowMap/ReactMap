@@ -1,7 +1,16 @@
 // @ts-check
 import * as React from 'react'
+import Button from '@mui/material/Button'
+import { useTranslation } from 'react-i18next'
+
+import { useMemory } from '@store/useMemory'
+
+import { I } from '../I'
 
 /**
+ * Legacy hash signed Login Widget. Telegram has archived its documentation in
+ * favor of the OAuth/OIDC flow, but it still works, so it stays the default for
+ * anyone who has not set a `clientId`/`clientSecret` on their strategy.
  *
  * @param {{ botName: string, authUrl: string }} props
  * @returns
@@ -33,4 +42,57 @@ export function TelegramWidget({ botName, authUrl }) {
   }, [botName, authUrl, ref])
 
   return <div ref={ref} />
+}
+
+/**
+ * OAuth/OIDC entry point. Like Discord, the href points at the callback route,
+ * which passport redirects away from when there is no `code` in the query.
+ *
+ * @param {{ children?: string, bgcolor?: string } & import('@mui/material/Button').ButtonProps} props
+ * @returns {React.JSX.Element}
+ */
+export function TelegramButton({
+  href = '/auth/telegram/callback',
+  children = 'login',
+  size = 'large',
+  bgcolor = 'telegram.main',
+  ...props
+}) {
+  const { t } = useTranslation()
+
+  return (
+    // TODO: Augment Mui Types
+    <Button
+      variant="contained"
+      bgcolor={bgcolor}
+      size={size}
+      href={href}
+      startIcon={<I className="fab fa-telegram" size={size} color="white" />}
+      {...props}
+    >
+      {t(children)}
+    </Button>
+  )
+}
+
+/**
+ * Renders whichever Telegram flow the route in `authUrl` is running.
+ *
+ * Custom login page blocks carry their own `telegramAuthUrl`, which can point
+ * at a different strategy than the domain default, so they pass the flow the
+ * server resolved for that block. Everything else uses the flow resolved for
+ * `customRoutes.telegramAuthUrl`.
+ *
+ * @param {{ botName: string, authUrl: string, telegramOAuth?: boolean } & Omit<Parameters<typeof TelegramButton>[0], 'href'>} props
+ * @returns
+ */
+export function TelegramLogin({ botName, authUrl, telegramOAuth, ...props }) {
+  const domainDefault = useMemory((s) => s.auth.telegramOAuth)
+  const isOAuth = telegramOAuth ?? domainDefault
+
+  return isOAuth ? (
+    <TelegramButton href={authUrl} {...props} />
+  ) : (
+    <TelegramWidget botName={botName} authUrl={authUrl} />
+  )
 }

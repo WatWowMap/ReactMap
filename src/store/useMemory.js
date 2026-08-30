@@ -18,6 +18,7 @@ import { create } from 'zustand'
  *    perms: Partial<import('@rm/types').Permissions>,
  *    loggedIn: boolean,
  *    methods: import('@rm/types').Strategy[],
+ *    telegramOAuth: boolean,
  *    strategy: import('@rm/types').Strategy | '',
  *    userBackupLimits: number,
  *    excludeList: string[],
@@ -92,6 +93,7 @@ export const useMemory = create(() => ({
     loggedIn: false,
     perms: {},
     methods: [],
+    telegramOAuth: false,
     username: '',
     data: {},
     counts: {

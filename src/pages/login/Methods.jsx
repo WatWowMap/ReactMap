@@ -4,7 +4,7 @@ import Grid from '@mui/material/Unstable_Grid2'
 import { useTranslation } from 'react-i18next'
 
 import { DiscordButton } from '@components/auth/Discord'
-import { TelegramWidget } from '@components/auth/Telegram'
+import { TelegramLogin } from '@components/auth/Telegram'
 import { LocalLogin } from '@components/auth/Local'
 import { useMemory } from '@store/useMemory'
 
@@ -46,7 +46,7 @@ function Telegram() {
   )
   return (
     <Grid>
-      <TelegramWidget botName={telegramBotName} authUrl={telegramAuthUrl} />
+      <TelegramLogin botName={telegramBotName} authUrl={telegramAuthUrl} />
     </Grid>
   )
 }

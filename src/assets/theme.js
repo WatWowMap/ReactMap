@@ -192,6 +192,10 @@ export function useCustomTheme() {
               fuchsia: '#EB459E',
               red: '#ED4245',
             },
+            telegram: {
+              main: '#2AABEE',
+              contrastText: '#fff',
+            },
           },
           components,
         }),
