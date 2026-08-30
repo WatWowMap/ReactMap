@@ -4,6 +4,7 @@ const config = require('@rm/config')
 const { clientOptions } = require('../ui/clientOptions')
 const { advMenus } = require('../ui/advMenus')
 const { drawer } = require('../ui/drawer')
+const { isTelegramOAuth } = require('./getTelegramStrategy')
 
 /**
  *
@@ -52,7 +53,12 @@ function getServerSettings(req) {
       loggedIn: !!req.user,
       excludeList: authentication.excludeFromTutorial,
       methods: authentication.methods,
-      telegramOAuth: authentication.telegramOAuth,
+      // Resolved per domain, since customRoutes is part of the domain's map
+      // config and each domain can target a different telegram strategy
+      telegramOAuth: isTelegramOAuth(
+        mapConfig.customRoutes.telegramAuthUrl,
+        authentication.strategies,
+      ),
     },
     database: {
       settings: {

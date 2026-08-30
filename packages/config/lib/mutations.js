@@ -349,16 +349,6 @@ const applyMutations = (config) => {
     ),
   ]
 
-  // `methods` only carries strategy types, so the client cannot tell whether
-  // telegram is running the OAuth/OIDC flow or the legacy hash widget
-  config.authentication.telegramOAuth = config.authentication.strategies.some(
-    (strategy) =>
-      strategy.enabled &&
-      strategy.type === 'telegram' &&
-      !!strategy.clientId &&
-      !!strategy.clientSecret,
-  )
-
   if (Array.isArray(config.webhooks)) {
     config.webhooks = config.webhooks.map(replaceBothAliases)
   }
