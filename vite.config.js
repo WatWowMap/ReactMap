@@ -59,6 +59,8 @@ const viteConfig = defineConfig(({ mode }) => {
     )
   }
 
+  const mapTheme = config.getSafe('map.theme')
+
   const sentry = config.getSafe('sentry.client')
   sentry.enabled = sentry.enabled || !!env.SENTRY_DSN
   if (env.SENTRY_AUTH_TOKEN) sentry.authToken = env.SENTRY_AUTH_TOKEN
@@ -98,7 +100,11 @@ const viteConfig = defineConfig(({ mode }) => {
           ]
         : []),
       localePlugin(isDevelopment),
-      faviconPlugin(isDevelopment),
+      faviconPlugin(isDevelopment, {
+        name: config.getSafe('map.general.title'),
+        shortName: config.getSafe('map.general.headerTitle'),
+        theme: mapTheme,
+      }),
       muteWarningsPlugin([
         ['SOURCEMAP_ERROR', "Can't resolve original location of error"],
       ]),
@@ -141,7 +147,7 @@ const viteConfig = defineConfig(({ mode }) => {
             startLon: config.getSafe('map.general.startLon'),
             startZoom: config.getSafe('map.general.startZoom'),
           },
-          theme: config.getSafe('map.theme'),
+          theme: mapTheme,
         },
         api: {
           polling: config.getSafe('api.polling'),
