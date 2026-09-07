@@ -51,6 +51,10 @@ declare module '@mui/material/styles' {
       fuchsia: string
       red: string
     }
+    telegram: {
+      main: string
+      contrastText: string
+    }
   }
 
   interface PaletteOptions {
@@ -60,6 +64,10 @@ declare module '@mui/material/styles' {
       yellow: string
       fuchsia: string
       red: string
+    }
+    telegram?: {
+      main: string
+      contrastText: string
     }
   }
 }

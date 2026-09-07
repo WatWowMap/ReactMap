@@ -745,6 +745,9 @@
         "eventLogGroupId": "",
         "enabled": false,
         "botToken": "",
+        "clientId": "",
+        "clientSecret": "",
+        "redirectUri": "http://localhost:8080/auth/telegram/callback",
         "groups": [],
         "trialPeriod": {
           "start": {
