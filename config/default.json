@@ -375,7 +375,7 @@
       "lureRange": false,
       "customRange": 0,
       "hasQuestIndicator": true,
-      "invasionRewardMarker": false,
+      "invasionRewardMarker": true,
       "showArQuestDotBadge": false,
       "showNoArQuestDotBadge": false,
       "showArBadge": false,
