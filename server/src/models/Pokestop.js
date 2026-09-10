@@ -30,6 +30,7 @@ const { getCombinedFortAvailable } = require('../utils/fortAvailable')
 const { buildPokestopDnfFilters } = require('../filters/fort/pokestop')
 const { describeDnfNarrowing } = require('../filters/fort/describeDnfNarrowing')
 const { state } = require('../services/state')
+const { golbatCapabilities } = require('../services/GolbatCapabilities')
 const {
   isDualQuestLayerMode,
   resolveQuestLayerSelection,
@@ -48,6 +49,21 @@ const TEMP_EVOLUTION_RESOURCE_REWARD_TYPES = [
   MEGA_RESOURCE_REWARD_TYPE,
   TEMP_EVO_BRANCH_RESOURCE_REWARD_TYPE,
 ]
+
+/**
+ * Whether the Golbat at `mem` applies contest_focus (showcase focus) inside
+ * its DNF matcher before the result cap. /api/status is the source of truth
+ * once a build advertises filters; an older build that does not is judged by
+ * the deprecated per-response `showcase_focus_filter` flag instead.
+ * @param {string} mem endpoint base url
+ * @param {{ showcase_focus_filter?: boolean }} payload /api/fort/available pokestops block
+ */
+function supportsShowcaseFocus(mem, payload) {
+  if (golbatCapabilities.advertisesFilters(mem)) {
+    return golbatCapabilities.supportsFilter(mem, 'showcase_focus')
+  }
+  return payload.showcase_focus_filter === true
+}
 
 /** @typedef {Partial<import('@rm/types').Quest>} QuestReward */
 
@@ -1343,10 +1359,16 @@ class Pokestop extends Model {
       // contract. Do not let an outdated endpoint masquerade as a transient
       // failure and fall through to SQL.
       const hasPayload = res && typeof res === 'object' && !Array.isArray(res)
-      if (hasPayload && res.showcase_focus_filter !== true) {
-        throw new Error(
-          'Golbat lacks the required showcase_focus_filter capability',
-        )
+      if (hasPayload && !supportsShowcaseFocus(mem, res)) {
+        // The registry can lag a Golbat upgrade that dropped the legacy flag
+        // (its status was last read before the upgrade). One debounced
+        // re-read settles it before the verdict becomes a hard error.
+        await golbatCapabilities.recheck(mem)
+        if (!supportsShowcaseFocus(mem, res)) {
+          throw new Error(
+            'Golbat lacks the required showcase_focus filter capability',
+          )
+        }
       }
       // Transport failures and malformed responses may use the source's
       // normal SQL fallback. Keep only the mapper call inside this catch so
