@@ -128,26 +128,45 @@ test('a Golbat without a filters block is judged by the legacy showcase_focus_fi
   assert.equal(sql.executions, 0)
 })
 
-test('an unsupported verdict rechecks the status route once before failing', async (t) => {
-  // Registry still says "no filters block" from before an upgrade that dropped
-  // the legacy flag; the recheck flips it and the same call succeeds.
-  let filters = null
-  t.mock.method(golbatCapabilities, 'advertisesFilters', () => filters !== null)
-  t.mock.method(
-    golbatCapabilities,
-    'supportsFilter',
-    (_mem, key) => filters?.[key] === true,
-  )
-  const rechecks = []
-  t.mock.method(golbatCapabilities, 'recheck', async (mem) => {
-    rechecks.push(mem)
-    filters = { showcase_focus: true }
+test('an unsupported verdict re-reads the status even seconds after the last fetch', async (t) => {
+  // Real registry, fake transport: the status route answers as an older
+  // Golbat at discovery, then as an upgraded build that dropped the legacy
+  // flag. The upgrade lands inside the recheck debounce window, so a
+  // debounced recheck would skip and the pass would throw.
+  let now = 1_000_000
+  let statusReply = { status: 404 }
+  const statusCalls = []
+  const originalFetch = golbatCapabilities.fetch
+  const originalNow = golbatCapabilities.now
+  t.after(() => {
+    golbatCapabilities.fetch = originalFetch
+    golbatCapabilities.now = originalNow
+    golbatCapabilities.instances = new Map()
+    golbatCapabilities.stop()
   })
+  golbatCapabilities.now = () => now
+  golbatCapabilities.fetch = async (url) => {
+    statusCalls.push(url)
+    return {
+      ok: statusReply.status === 200,
+      status: statusReply.status,
+      statusText: '',
+      json: async () => statusReply.body,
+    }
+  }
+  await golbatCapabilities.discover([{ endpoint: MEM }])
+  assert.equal(golbatCapabilities.advertisesFilters(MEM), false)
+
+  statusReply = {
+    status: 200,
+    body: { features: {}, limits: {}, filters: { showcase_focus: true } },
+  }
+  now += 10_000
   const { Pokestop, sql } = loadPokestop(t, () => showcasePayload())
 
   const result = await Pokestop.getAvailable(CONTEXT)
 
-  assert.deepEqual(rechecks, [MEM])
+  assert.equal(statusCalls.length, 2)
   assert.deepEqual(result.available, ['b9', 'y3'])
   assert.equal(sql.executions, 0)
 })

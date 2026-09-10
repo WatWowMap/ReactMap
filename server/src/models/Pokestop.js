@@ -1361,9 +1361,12 @@ class Pokestop extends Model {
       const hasPayload = res && typeof res === 'object' && !Array.isArray(res)
       if (hasPayload && !supportsShowcaseFocus(mem, res)) {
         // The registry can lag a Golbat upgrade that dropped the legacy flag
-        // (its status was last read before the upgrade). One debounced
-        // re-read settles it before the verdict becomes a hard error.
-        await golbatCapabilities.recheck(mem)
+        // (its status was last read before the upgrade). Re-read it before
+        // the verdict becomes a hard error. This is refresh(), not the
+        // debounced recheck(): the upgrade may land seconds after a periodic
+        // status fetch, and this path is already throttled by the
+        // availability refresh window, so it cannot hammer Golbat.
+        await golbatCapabilities.refresh(mem)
         if (!supportsShowcaseFocus(mem, res)) {
           throw new Error(
             'Golbat lacks the required showcase_focus filter capability',
