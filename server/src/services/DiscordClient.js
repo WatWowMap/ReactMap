@@ -1,5 +1,5 @@
 // @ts-check
-const { Client } = require('discord.js')
+const { Client, Partials } = require('discord.js')
 const { Strategy } = require('passport-discord')
 const passport = require('passport')
 
@@ -27,6 +27,8 @@ class DiscordClient extends AuthClient {
 
     this.client = new Client({
       intents: ['GuildMessages', 'GuildMembers', 'Guilds'],
+      // without it, updates and removals of members the bot has not cached are never emitted
+      partials: [Partials.GuildMember],
     })
 
     this.client.on('clientReady', (c) => {
@@ -38,53 +40,61 @@ class DiscordClient extends AuthClient {
       })
     })
 
-    this.client.on('guildMemberRemove', async (member) => {
-      try {
-        await state.db.models.Session.clearDiscordSessions(
-          member.id,
-          this.client.user.username,
-        )
-        await state.db.models.User.clearPerms(
-          member.id,
-          'discord',
-          this.client.user.username,
-        )
-      } catch (e) {
-        this.log.error(`Could not clear sessions for ${member.user.username}`)
-      }
-    })
+    this.client.on('guildMemberRemove', (member) => this.clearUser(member.user))
 
     this.client.on('guildMemberUpdate', async (prev, next) => {
-      const rolesBefore = prev.roles.cache.map((x) => x.id)
-      const rolesAfter = next.roles.cache.map((x) => x.id)
-      const perms = [
-        ...new Set(
-          Object.values(config.getSafe('authentication.perms')).flatMap(
-            (x) => x.roles,
-          ),
-        ),
-      ]
-      const roleDiff = rolesBefore
-        .filter((x) => !rolesAfter.includes(x))
-        .concat(rolesAfter.filter((x) => !rolesBefore.includes(x)))
-      try {
-        if (perms.includes(roleDiff[0])) {
-          await state.db.models.Session.clearDiscordSessions(
-            prev.user.id,
-            this.client.user.username,
-          )
-          await state.db.models.User.clearPerms(
-            prev.user.id,
-            'discord',
-            this.client.user.username,
-          )
+      if (prev.partial) {
+        // an uncached member's previous roles are unknown, so any of them may have been removed
+        if (this.strategy.allowedGuilds.includes(next.guild.id)) {
+          await this.clearUser(next.user)
         }
-      } catch (e) {
-        this.log.error(`Could not clear sessions for ${prev.user.username}`)
+        return
+      }
+      /** @type {{ roles: string[], areas: string[] }[]} */
+      const areaRestrictions = config.getSafe('authentication.areaRestrictions')
+      /** @type {import('@rm/types').Webhook[]} */
+      const webhooks = config.getSafe('webhooks')
+      // every role getPerms checks, rules without roles match all members through @everyone, which never changes
+      const permRoles = [
+        ...Object.values(this.perms).flatMap((perm) => perm.roles),
+        ...this.strategy.trialPeriod.roles,
+        ...areaRestrictions.flatMap((restriction) => restriction.roles),
+        ...webhooks.flatMap((webhook) => webhook.discordRoles || []),
+        ...Object.values(config.getSafe('scanner')).flatMap((mode) => [
+          ...(mode.discordRoles || []),
+          ...(mode.cooldownBypass?.discordRoles || []),
+        ]),
+      ]
+      if (
+        permRoles.some(
+          (role) => prev.roles.cache.has(role) !== next.roles.cache.has(role),
+        )
+      ) {
+        await this.clearUser(next.user)
       }
     })
 
     this.client.login(this.strategy.botToken)
+  }
+
+  /**
+   * Revokes the linked perms and every session of a Discord user
+   * @param {import('discord.js').User} user
+   */
+  async clearUser(user) {
+    const botName = this.client.user.username
+    try {
+      // clearing the linked perms first narrows the window for a local login to copy them into a new session,
+      // a login that already read them can still finish with the old perms
+      await state.db.models.User.clearPerms(user.id, 'discord', botName)
+    } catch (e) {
+      this.log.error(`Could not clear perms for ${user.username}`, e)
+    }
+    try {
+      await state.db.models.Session.clearDiscordSessions(user.id, botName)
+    } catch (e) {
+      this.log.error(`Could not clear sessions for ${user.username}`, e)
+    }
   }
 
   /**
