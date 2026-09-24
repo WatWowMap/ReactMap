@@ -45,7 +45,7 @@
  * @property {Record<string, any>|null} showcase_focus
  *
  * @typedef {object} AvailablePokestops
- * @property {boolean} showcase_focus_filter
+ * @property {boolean} [showcase_focus_filter] deprecated — see GolbatStatus.filters.showcase_focus
  * @property {AvailablePokestopQuest[]} quests
  * @property {AvailablePokestopInvasion[]} invasions
  * @property {AvailablePokestopLure[]} lures

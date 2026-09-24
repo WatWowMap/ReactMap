@@ -109,7 +109,13 @@ export interface AvailablePokestopShowcase {
 }
 
 export interface AvailablePokestops {
-  showcase_focus_filter: boolean
+  /**
+   * @deprecated Golbat advertises showcase focus support via
+   * GET /api/status `filters.showcase_focus` (see GolbatStatus). This
+   * per-response flag is only consulted for a Golbat whose status route
+   * reports no filters block, and will be dropped once such builds are gone.
+   */
+  showcase_focus_filter?: boolean
   quests: AvailablePokestopQuest[]
   invasions: AvailablePokestopInvasion[]
   lures: AvailablePokestopLure[]
@@ -123,6 +129,30 @@ export interface Available {
   nests: ModelReturn<typeof Nest, 'getAvailable'>
   stations: ModelReturn<typeof Station, 'getAvailable'>
   tappables: ModelReturn<typeof Tappable, 'getAvailable'>
+}
+
+/**
+ * Parsed GET /api/status from one Golbat instance. Every key a build defines
+ * is true; the signal is the key's presence. `filters` is null when the build
+ * predates the block (it then advertises no optional DNF filter fields), so
+ * consumers can fall back to older per-response flags for that build only.
+ */
+export interface GolbatStatus {
+  features: Record<string, boolean>
+  limits: Record<string, number>
+  filters: Record<string, boolean> | null
+}
+
+/** Registry entry kept by GolbatCapabilities, keyed by the endpoint base url. */
+export interface GolbatInstance {
+  mem: string
+  secret: string
+  httpAuth: { username: string; password: string } | null
+  /** Last good status; null until the instance has answered once. */
+  status: GolbatStatus | null
+  /** Epoch ms of the last refresh start; drives the recheck debounce. */
+  lastFetchAt: number
+  inflight: Promise<void> | null
 }
 
 export interface ApiEndpoint {

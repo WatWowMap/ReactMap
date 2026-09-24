@@ -5,6 +5,13 @@ const { resolve } = require('path')
 const config = require('@rm/config')
 const { log } = require('@rm/logger')
 const { fetchJson } = require('./fetchJson')
+const { buildScannerHeaders } = require('./scannerHeaders')
+const { golbatCapabilities } = require('../services/GolbatCapabilities')
+
+// Validation-class rejections. A Golbat that no longer knows a filter field
+// answers one of these, which is the first sign it was downgraded — so the
+// capability registry re-reads that instance's /api/status right away.
+const CAPABILITY_RECHECK_STATUSES = new Set([400, 422])
 
 /**
  * Endpoint-or-knex query evaluator shared by Golbat-backed scanner models.
@@ -42,21 +49,21 @@ async function evalScannerQuery(
   const results = await (mem
     ? fetchJson(mem, {
         method,
-        headers: {
-          Accept: 'application/json',
-          'Content-Type': 'application/json',
-          ...(secret ? { 'X-Golbat-Secret': secret } : {}),
-          ...(httpAuth
-            ? {
-                Authorization: `Basic ${Buffer.from(
-                  `${httpAuth.username}:${httpAuth.password}`,
-                ).toString('base64')}`,
-              }
-            : {}),
-        },
+        headers: buildScannerHeaders(secret, httpAuth),
         body: query,
       })
     : query)
+  const apiPathIndex = mem ? mem.indexOf('/api/') : -1
+  if (
+    apiPathIndex > 0 &&
+    results &&
+    typeof results === 'object' &&
+    CAPABILITY_RECHECK_STATUSES.has(results.status)
+  ) {
+    golbatCapabilities
+      .recheck(mem.slice(0, apiPathIndex))
+      .catch((e) => log.warn(tag, 'capability recheck failed', e))
+  }
   log.debug(tag, 'raw result length', results?.length || 0)
   return results
 }
