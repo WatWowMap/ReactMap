@@ -88,24 +88,19 @@ class Session extends Model {
    * @returns
    */
   static async clearDiscordSessions(discordId, botName) {
-    try {
-      const results = await this.query()
-        .whereRaw(
-          `json_extract(data, '$.passport.user.discordId') = '${discordId}'`,
-        )
-        .orWhereRaw(`json_extract(data, '$.passport.user.id') = '${discordId}'`)
-        .delete()
-      log.info(
-        TAGS.session,
-        botName ? TAGS.custom(botName) : '',
-        'Clear Result:',
-        results,
-      )
-      return results
-    } catch (e) {
-      log.error(TAGS.session, 'Unable to clear Discord sessions', e)
-    }
-    return 0
+    const results = await this.query()
+      .whereRaw(`json_extract(data, '$.passport.user.discordId') = ?`, [
+        discordId,
+      ])
+      .orWhereRaw(`json_extract(data, '$.passport.user.id') = ?`, [discordId])
+      .delete()
+    log.info(
+      TAGS.session,
+      botName ? TAGS.custom(botName) : '',
+      'Clear Result:',
+      results,
+    )
+    return results
   }
 }
 
