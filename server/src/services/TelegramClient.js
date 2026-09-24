@@ -1,7 +1,9 @@
 // @ts-check
 const { default: fetch } = require('node-fetch')
 const { TelegramStrategy } = require('@rainb0w-clwn/passport-telegram-official')
+const { createRemoteJWKSet, jwtVerify } = require('jose')
 const passport = require('passport')
+const OAuth2Strategy = require('passport-oauth2')
 
 const config = require('@rm/config')
 
@@ -11,11 +13,40 @@ const { webhookPerms } = require('../utils/webhookPerms')
 const { scannerPerms, scannerCooldownBypass } = require('../utils/scannerPerms')
 const { mergePerms } = require('../utils/mergePerms')
 const { getUserDisplayName } = require('../utils/getUserDisplayName')
+const { isOAuthStrategy } = require('../utils/getTelegramStrategy')
 const { AuthClient } = require('./AuthClient')
 
 /**
  * @typedef {import('@rainb0w-clwn/passport-telegram-official/dist/types').PassportTelegramUser} TGUser
+ * @typedef {Parameters<import('@rainb0w-clwn/passport-telegram-official/dist/types').CallbackWithRequest>[0]} AuthRequest
  */
+
+const TG_ISSUER = 'https://oauth.telegram.org'
+const TG_AUTHORIZATION_URL = `${TG_ISSUER}/auth`
+const TG_TOKEN_URL = `${TG_ISSUER}/token`
+const TG_JWKS_URL = `${TG_ISSUER}/.well-known/jwks.json`
+
+/**
+ * Telegram rotates its signing keys, so `jose` fetches and caches them lazily.
+ * They are not client specific, so every strategy shares one set.
+ */
+const getJwks = (() => {
+  /** @type {ReturnType<typeof createRemoteJWKSet>} */
+  let jwks
+  return () => {
+    if (!jwks) jwks = createRemoteJWKSet(new URL(TG_JWKS_URL))
+    return jwks
+  }
+})()
+
+/**
+ * Optional claims are absent when the user has not set them on their account.
+ *
+ * @param {unknown} claim
+ * @returns {string | undefined}
+ */
+const claimToString = (claim) =>
+  claim === undefined || claim === null ? undefined : String(claim)
 
 class TelegramClient extends AuthClient {
   /** @param {TGUser} user */
@@ -242,15 +273,114 @@ class TelegramClient extends AuthClient {
     }
   }
 
+  /**
+   * Telegram has no UserInfo endpoint - the profile is carried by the
+   * `id_token`, so it has to be verified against the JWKS before it is trusted.
+   *
+   * `sub` is an opaque, client specific identifier. The real Telegram user id
+   * only arrives as the `id` claim under the `profile` scope, and that is what
+   * `users.telegramId`, `strategy.groups`, `strategy.allowedUsers` and the
+   * `getChatMember` lookup all key off, so `sub` is unused here.
+   *
+   * @param {AuthRequest} req
+   * @param {Record<string, any>} params token endpoint response
+   * @param {(err: any, user?: any, info?: any) => void} done
+   */
+  async oidcHandler(req, params, done) {
+    try {
+      if (!params?.id_token) {
+        throw new Error('No id_token was returned by Telegram')
+      }
+      const { payload } = await jwtVerify(params.id_token, getJwks(), {
+        issuer: TG_ISSUER,
+        audience: String(this.strategy.clientId),
+      })
+      if (!payload.id) {
+        throw new Error(
+          'The id_token has no `id` claim, the `profile` scope was not granted',
+        )
+      }
+      // `profile` always returns `name`; the `given_name`/`family_name` pair is
+      // only sometimes sent alongside it. Without the fallback a user with no
+      // @username would be displayed as their numeric id.
+      const [first, ...rest] = (claimToString(payload.name) ?? '').split(' ')
+      const firstName =
+        claimToString(payload.given_name) ?? (first || undefined)
+      const lastName =
+        claimToString(payload.family_name) ?? (rest.join(' ') || undefined)
+
+      return this.authHandler(
+        req,
+        // Not a complete PassportTelegramUser - `hash` and `auth_date` belong
+        // to the legacy widget
+        // @ts-ignore
+        {
+          // `telegramId` is a varchar and `groups` / `allowedUsers` hold
+          // string ids, so a number here would silently fail every comparison
+          id: String(payload.id),
+          username: claimToString(payload.preferred_username),
+          first_name: firstName,
+          last_name: lastName,
+          name: { givenName: firstName, familyName: lastName },
+          photo_url: claimToString(payload.picture),
+          provider: 'telegram',
+        },
+        done,
+      )
+    } catch (e) {
+      this.log.error('Unable to validate the Telegram id_token', e)
+      return done(null, false, { message: 'access_denied' })
+    }
+  }
+
   initPassport() {
+    const { clientId, clientSecret, redirectUri } = this.strategy
+
+    if (!isOAuthStrategy(this.strategy)) {
+      if (clientId && clientSecret && !redirectUri) {
+        this.log.error(
+          'has a `clientId` and `clientSecret` but no `redirectUri`, so the OAuth flow cannot be started - falling back to the legacy login widget.',
+          `Add "redirectUri": "https://<your domain>/auth/${this.rmStrategy}/callback" to the strategy`,
+          'and register that same URL with @BotFather under Login Widget > Allowed URLs.',
+        )
+      }
+      // Legacy hash signed Login Widget, still supported by Telegram
+      passport.use(
+        this.rmStrategy,
+        new TelegramStrategy(
+          {
+            botToken: this.strategy.botToken,
+            passReqToCallback: true,
+          },
+          (req, profile, done) => this.authHandler(req, profile, done),
+        ),
+      )
+      return
+    }
+
     passport.use(
       this.rmStrategy,
-      new TelegramStrategy(
+      new OAuth2Strategy(
         {
-          botToken: this.strategy.botToken,
+          authorizationURL: TG_AUTHORIZATION_URL,
+          tokenURL: TG_TOKEN_URL,
+          clientID: clientId,
+          clientSecret,
+          callbackURL: redirectUri,
+          // `profile` is required, it is the only source of the Telegram user id
+          scope: ['openid', 'profile'],
+          // passport-oauth2 otherwise derives this from the authorization URL
+          // host, which every Telegram strategy shares, and concurrent logins
+          // would overwrite each other's `state` and PKCE verifier
+          sessionKey: `oauth2:telegram:${this.rmStrategy}`,
+          state: true,
+          pkce: 'S256',
           passReqToCallback: true,
         },
-        (req, profile, done) => this.authHandler(req, profile, done),
+        // passport-oauth2 only passes `params`, which carries the id_token, to
+        // a verify callback of this arity
+        (req, _accessToken, _refreshToken, params, _profile, done) =>
+          this.oidcHandler(req, params, done),
       ),
     )
   }

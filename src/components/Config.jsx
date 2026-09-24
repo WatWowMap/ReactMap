@@ -110,6 +110,7 @@ export function Config({ children }) {
           loggedIn: !!data.user?.loggedIn,
           perms: data.user ? data.user.perms : {},
           methods: data.authentication.methods || [],
+          telegramOAuth: !!data.authentication.telegramOAuth,
           username: data.user?.username || '',
           data: data.user?.data
             ? typeof data.user?.data === 'string'
