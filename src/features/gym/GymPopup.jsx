@@ -1297,7 +1297,9 @@ const ExtraGymInfo = ({ last_modified_timestamp, lat, lon, updated }) => {
 
   return (
     <Grid container alignItems="center" justifyContent="center">
-      <TimeStamp time={updated}>last_seen</TimeStamp>
+      <TimeStamp time={updated} xs={last_modified_timestamp ? 6 : 12}>
+        last_seen
+      </TimeStamp>
       <TimeStamp time={last_modified_timestamp}>last_modified</TimeStamp>
       {enableGymPopupCoords && (
         <Grid xs={12} textAlign="center">

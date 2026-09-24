@@ -811,7 +811,9 @@ const ExtraInfo = ({ last_modified_timestamp, updated, lat, lon }) => {
   return (
     <Collapse in={open} timeout="auto" unmountOnExit sx={{ width: '100%' }}>
       <Grid container alignItems="center" justifyContent="center">
-        <TimeStamp time={updated}>last_seen</TimeStamp>
+        <TimeStamp time={updated} xs={last_modified_timestamp ? 6 : 12}>
+          last_seen
+        </TimeStamp>
         <TimeStamp time={last_modified_timestamp}>last_modified</TimeStamp>
         {enablePokestopPopupCoords && (
           <Grid xs={12} textAlign="center">
