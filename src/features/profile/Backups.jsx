@@ -21,6 +21,28 @@ import Box from '@mui/material/Box'
 import { useMemory } from '@store/useMemory'
 import { useStorage } from '@store/useStorage'
 import { Query } from '@services/queries'
+import { createBackupData } from './backupData'
+
+/** @param {unknown} err @param {(key: string) => string} t */
+function getBackupErrorMessage(err, t) {
+  let message = t('backup_error_generic')
+  if (err instanceof ApolloError) {
+    const { networkError } = err
+    if (
+      networkError &&
+      'statusCode' in networkError &&
+      networkError.statusCode === 413
+    ) {
+      message = t('backup_error_too_large')
+    } else if (err.message) {
+      message = err.message
+    }
+  }
+  return message
+}
+
+const getCurrentBackupData = () =>
+  createBackupData(useStorage.getState(), useMemory.getState().filters)
 
 export function UserBackups() {
   const { t } = useTranslation()
@@ -73,24 +95,11 @@ function CreateNew({ backups }) {
     setErrorMessage('')
     try {
       await create({
-        variables: { backup: { name, data: useStorage.getState() } },
+        variables: { backup: { name, data: getCurrentBackupData() } },
       })
       setName('')
     } catch (err) {
-      let message = t('backup_error_generic')
-      if (err instanceof ApolloError) {
-        const { networkError } = err
-        if (
-          networkError &&
-          'statusCode' in networkError &&
-          networkError.statusCode === 413
-        ) {
-          message = t('backup_error_too_large')
-        } else if (err.message) {
-          message = err.message
-        }
-      }
-      setErrorMessage(message)
+      setErrorMessage(getBackupErrorMessage(err, t))
     }
   }, [backups, create, loading, name, t, userBackupLimits])
 
@@ -139,6 +148,7 @@ function BackupItem({ backup }) {
   const { t } = useTranslation()
   const [name, setName] = React.useState(backup.name)
   const [loading, setLoading] = React.useState(false)
+  const [errorMessage, setErrorMessage] = React.useState('')
 
   const [update, { loading: l1 }] = useMutation(Query.user('UPDATE_BACKUP'), {
     refetchQueries: ['GetBackups'],
@@ -152,6 +162,24 @@ function BackupItem({ backup }) {
 
   React.useEffect(() => setName(backup.name), [backup])
   React.useEffect(() => setLoading(l1 || l2 || l3), [l1, l2, l3])
+
+  const handleUpdate = React.useCallback(async () => {
+    if (loading) return
+    setErrorMessage('')
+    try {
+      await update({
+        variables: {
+          backup: {
+            id: backup.id,
+            name,
+            data: getCurrentBackupData(),
+          },
+        },
+      })
+    } catch (err) {
+      setErrorMessage(getBackupErrorMessage(err, t))
+    }
+  }, [backup.id, loading, name, t, update])
 
   React.useEffect(() => {
     if (fullBackup?.backup?.data) {
@@ -180,54 +208,56 @@ function BackupItem({ backup }) {
   }, [fullBackup])
 
   return (
-    <ListItem>
-      <TextField
-        label={`${t('name')}${
-          localStorage.getItem('last-loaded') === backup.name ? '*' : ''
-        }`}
-        size="small"
-        value={name || ''}
-        onChange={(e) => setName(e.target.value)}
-        variant="outlined"
-        sx={{ mr: 2 }}
-      />
-      <ButtonGroup variant="outlined" size="small">
-        <Button
-          disabled={loading}
-          color="secondary"
-          onClick={() => {
-            load({ variables: { id: backup.id } })
+    <ListItem sx={{ flexDirection: 'column', alignItems: 'stretch' }}>
+      <Box sx={{ display: 'flex', width: '100%' }}>
+        <TextField
+          label={`${t('name')}${
+            localStorage.getItem('last-loaded') === backup.name ? '*' : ''
+          }`}
+          size="small"
+          value={name || ''}
+          onChange={(e) => {
+            setErrorMessage('')
+            setName(e.target.value)
           }}
+          variant="outlined"
+          sx={{ mr: 2 }}
+        />
+        <ButtonGroup variant="outlined" size="small">
+          <Button
+            disabled={loading}
+            color="secondary"
+            onClick={() => {
+              setErrorMessage('')
+              load({ variables: { id: backup.id } })
+            }}
+          >
+            {t('load')}
+          </Button>
+          <Button disabled={loading} color="secondary" onClick={handleUpdate}>
+            {t('update')}
+          </Button>
+          <Button
+            disabled={loading}
+            color="primary"
+            onClick={() => {
+              setErrorMessage('')
+              remove({ variables: { id: backup.id } })
+            }}
+          >
+            {t('delete')}
+          </Button>
+        </ButtonGroup>
+      </Box>
+      {errorMessage ? (
+        <Typography
+          variant="caption"
+          color="error"
+          sx={{ mt: 1, alignSelf: 'flex-start' }}
         >
-          {t('load')}
-        </Button>
-        <Button
-          disabled={loading}
-          color="secondary"
-          onClick={() => {
-            update({
-              variables: {
-                backup: {
-                  id: backup.id,
-                  name,
-                  data: useStorage.getState(),
-                },
-              },
-            })
-          }}
-        >
-          {t('update')}
-        </Button>
-        <Button
-          disabled={loading}
-          color="primary"
-          onClick={() => {
-            remove({ variables: { id: backup.id } })
-          }}
-        >
-          {t('delete')}
-        </Button>
-      </ButtonGroup>
+          {errorMessage}
+        </Typography>
+      ) : null}
     </ListItem>
   )
 }
