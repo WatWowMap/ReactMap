@@ -12,6 +12,7 @@ import { useForcePopup } from '@hooks/useForcePopup'
 import { useMarkerTimer } from '@hooks/useMarkerTimer'
 import { useOpacity } from '@hooks/useOpacity'
 import { TooltipWrapper } from '@components/ToolTipWrapper'
+import { getOffset } from '@utils/offset'
 
 import { TappablePopup } from './TappablePopup'
 import { getTappableDisplaySettings } from './displayRules'
@@ -57,6 +58,19 @@ const BaseTappableTile = (tappable) => {
     () =>
       tappable.expire_timestamp ? getOpacity(tappable.expire_timestamp) : 1,
     [getOpacity, tappable.expire_timestamp],
+  )
+  /** @type {[number, number]} */
+  const finalLocation = React.useMemo(
+    () =>
+      tappable.fort_id
+        ? getOffset({
+            coords: [tappable.lat, tappable.lon],
+            id: tappable.id,
+            // same hash key as the pokemon encountered from this lure tappable
+            seenType: 'tappable_lure_encounter',
+          })
+        : [tappable.lat, tappable.lon],
+    [tappable.id, tappable.fort_id, tappable.lat, tappable.lon],
   )
   const theme = useTheme()
   const bubbleFill = alpha(theme.palette.background.paper, 0.5)
@@ -238,11 +252,11 @@ const BaseTappableTile = (tappable) => {
   return (
     <Marker
       ref={setMarkerRef}
-      position={[tappable.lat, tappable.lon]}
+      position={finalLocation}
       icon={icon}
       eventHandlers={{ popupopen: handlePopupOpen }}
     >
-      <Popup position={[tappable.lat, tappable.lon]}>
+      <Popup position={finalLocation}>
         <TappablePopup tappable={tappable} rewardIcon={rewardIcon} />
       </Popup>
       {(showTimerSetting || timerForced) && !!timers.length && (
