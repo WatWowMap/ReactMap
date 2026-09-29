@@ -1,3 +1,10 @@
+## [1.51.3](https://github.com/WatWowMap/ReactMap/compare/v1.51.2...v1.51.3) (2026-09-29)
+
+
+### Bug Fixes
+
+* missing lure tappable offset ([b752389](https://github.com/WatWowMap/ReactMap/commit/b752389c985b7b33d580d6366ad7f2036d535cf1))
+
 ## [1.51.2](https://github.com/WatWowMap/ReactMap/compare/v1.51.1...v1.51.2) (2026-09-24)
 
 
