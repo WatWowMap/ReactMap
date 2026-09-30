@@ -218,7 +218,7 @@ const resolvers = {
       return []
     },
     gymsSingle: (_, args, { perms, Db }) => {
-      if (perms?.[args.perm]) {
+      if (perms?.gyms || perms?.raids) {
         return Db.getOne('Gym', args.id)
       }
       return {}
@@ -251,7 +251,7 @@ const resolvers = {
       return []
     },
     nestsSingle: (_, args, { perms, Db }) => {
-      if (perms?.[args.perm]) {
+      if (perms?.nests) {
         return Db.getOne('Nest', args.id)
       }
       return {}
@@ -263,7 +263,7 @@ const resolvers = {
       return []
     },
     pokestopsSingle: (_, args, { perms, Db }) => {
-      if (perms?.[args.perm]) {
+      if (hasAnyPokestopPermission(perms)) {
         return Db.getOne('Pokestop', args.id)
       }
       return {}
@@ -278,7 +278,7 @@ const resolvers = {
       return []
     },
     pokemonSingle: (_, args, { perms, Db }) => {
-      if (perms?.[args.perm]) {
+      if (perms?.pokemon) {
         return Db.getOne('Pokemon', args.id)
       }
       return {}
@@ -307,7 +307,7 @@ const resolvers = {
       return []
     },
     portalsSingle: (_, args, { perms, Db }) => {
-      if (perms?.[args.perm]) {
+      if (perms?.portals) {
         return Db.getOne('Portal', args.id)
       }
       return {}
