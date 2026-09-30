@@ -1,3 +1,10 @@
+# [1.52.0](https://github.com/WatWowMap/ReactMap/compare/v1.51.4...v1.52.0) (2026-09-30)
+
+
+### Features
+
+* **auth:** support Telegram OAuth (OpenID Connect) ([25938dd](https://github.com/WatWowMap/ReactMap/commit/25938dd6de4a7f1be85984c5a3a676c69fed8145))
+
 ## [1.51.4](https://github.com/WatWowMap/ReactMap/compare/v1.51.3...v1.51.4) (2026-09-30)
 
 

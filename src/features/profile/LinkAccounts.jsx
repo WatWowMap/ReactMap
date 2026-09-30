@@ -11,7 +11,7 @@ import { useMemory } from '@store/useMemory'
 import { Query } from '@services/queries'
 import { METHODS } from '@assets/constants'
 import { DiscordButton } from '@components/auth/Discord'
-import { TelegramWidget } from '@components/auth/Telegram'
+import { TelegramLogin } from '@components/auth/Telegram'
 import { Notification } from '@components/Notification'
 import { getProperName } from '@utils/strings'
 
@@ -36,10 +36,13 @@ export function LinkAccounts() {
         {METHODS.map((method, i) => {
           if (!auth.methods.includes(method)) return null
           const Component = i ? (
-            <TelegramWidget
+            <TelegramLogin
               authUrl={telegramAuthUrl}
               botName={telegramBotName}
-            />
+              size="medium"
+            >
+              link_telegram
+            </TelegramLogin>
           ) : (
             <DiscordButton href={discordAuthUrl} size="medium">
               {t('link_discord')}

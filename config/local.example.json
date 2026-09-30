@@ -83,6 +83,17 @@
         "blockedGuilds": [],
         "allowedUsers": [],
         "clientPrompt": "none"
+      },
+      {
+        "enabled": false,
+        "type": "telegram",
+        "name": "telegram",
+        "botToken": "",
+        "clientId": "",
+        "clientSecret": "",
+        "redirectUri": "http://localhost:8080/auth/telegram/callback",
+        "groups": [],
+        "allowedUsers": []
       }
     ],
     "areaRestrictions": [
