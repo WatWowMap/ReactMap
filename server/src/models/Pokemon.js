@@ -282,7 +282,7 @@ class Pokemon extends Model {
         : new Set()
       if (!loadedIds.has(`${manualId}`)) {
         const manualResult = await this.evalQuery(
-          `${mem}/api/pokemon/id/${manualId}`,
+          `${mem}/api/pokemon/id/${encodeURIComponent(manualId)}`,
           null,
           'GET',
           secret,
@@ -685,7 +685,7 @@ class Pokemon extends Model {
       const loaded = new Set(results.map((pkmn) => `${pkmn.id}`))
       if (!loaded.has(`${manualId}`)) {
         const manualResult = await this.evalQuery(
-          `${mem}/api/pokemon/id/${manualId}`,
+          `${mem}/api/pokemon/id/${encodeURIComponent(manualId)}`,
           null,
           'GET',
           secret,
@@ -806,18 +806,24 @@ class Pokemon extends Model {
   /**
    * @param {string} id
    * @param {import("@rm/types").DbContext} ctx
-   * @returns {Promise<import("@rm/types").Pokemon>}
    */
-  static getOne(id, { mem, secret, httpAuth }) {
-    return this.evalQuery(
-      mem ? `${mem}/api/pokemon/id/${id}` : null,
-      mem
-        ? undefined
-        : this.query().select(['lat', 'lon']).where('id', id).first(),
-      'GET',
-      secret,
-      httpAuth,
-    )
+  static async getOne(id, { mem, secret, httpAuth }) {
+    if (mem) {
+      const one = await this.evalQuery(
+        `${mem}/api/pokemon/id/${encodeURIComponent(id)}`,
+        undefined,
+        'GET',
+        secret,
+        httpAuth,
+      )
+      // Match the SQL projection ({lat, lon} only). Returning the raw Golbat
+      // record would leak IV/CP/level past the iv perm and area restrictions
+      // — a deep link only needs centering.
+      return one && typeof one === 'object' && 'lat' in one && 'lon' in one
+        ? { lat: one.lat, lon: one.lon }
+        : null
+    }
+    return this.query().select(['lat', 'lon']).where('id', id).first()
   }
 
   /**

@@ -1,3 +1,10 @@
+## [1.51.4](https://github.com/WatWowMap/ReactMap/compare/v1.51.3...v1.51.4) (2026-09-30)
+
+
+### Bug Fixes
+
+* **api:** enforce server-side perms on single-entity queries ([9922240](https://github.com/WatWowMap/ReactMap/commit/99222407839e6ec2d626bd3f0f61a05edf6204ac))
+
 ## [1.51.3](https://github.com/WatWowMap/ReactMap/compare/v1.51.2...v1.51.3) (2026-09-29)
 
 
