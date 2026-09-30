@@ -128,6 +128,26 @@ test('matches strategy names the way express routes them, case insensitively', (
     false,
   )
 
+  // the `/auth` mount and the `/callback` route match case insensitively too
+  assert.equal(
+    getStrategyNameFromAuthUrl('/auth/tg-oauth/CALLBACK'),
+    'tg-oauth',
+  )
+  assert.equal(
+    getStrategyNameFromAuthUrl('/AUTH/tg-oauth/callback'),
+    'tg-oauth',
+  )
+  assert.equal(getStrategyNameFromAuthUrl('/Auth/tg-oauth'), 'tg-oauth')
+  assert.equal(getStrategyNameFromAuthUrl('/AUTH/Auth/Callback'), 'Auth')
+  assert.equal(
+    isTelegramOAuth('/auth/telegram/CALLBACK', [upper, otherLegacy]),
+    true,
+  )
+  assert.equal(
+    isTelegramOAuth('/AUTH/telegram/callback', [upper, otherLegacy]),
+    true,
+  )
+
   // when two names differ only by case express answers both spellings with the
   // route it registered first, which is strategy order
   assert.equal(

@@ -16,10 +16,14 @@ function getStrategyNameFromAuthUrl(authUrl) {
   if (!URL.canParse(authUrl, 'http://localhost')) return null
   const { pathname } = new URL(authUrl, 'http://localhost')
   const segments = pathname.split('/').filter(Boolean)
-  if (segments.at(-1) === 'callback' && segments.at(-3) === 'auth') {
+  // express matches the `/auth` mount and the `/callback` route case
+  // insensitively too, so `/AUTH/tg/CALLBACK` still reaches the `tg` strategy
+  /** @param {number} index @param {string} segment */
+  const isAt = (index, segment) => segments.at(index)?.toLowerCase() === segment
+  if (isAt(-1, 'callback') && isAt(-3, 'auth')) {
     return segments.at(-2)
   }
-  return segments.at(-2) === 'auth' ? segments.at(-1) : null
+  return isAt(-2, 'auth') ? segments.at(-1) : null
 }
 
 /**
