@@ -22,6 +22,7 @@ import { useLayoutStore } from '@store/useLayoutStore'
 import { useDeepStore, useStorage } from '@store/useStorage'
 import { useGetAvailable } from '@hooks/useGetAvailable'
 import { getAmbiguousForms, hasAmbiguousForm } from '@utils/getAmbiguousForms'
+import { matchesFilterSelection } from '@utils/filterSelection'
 import { VirtualGrid } from '@components/virtual/VirtualGrid'
 import { TabPanel } from '@components/TabPanel'
 import { BoolToggle } from '@components/inputs/BoolToggle'
@@ -85,47 +86,7 @@ function SelectorList({
   const { translated, ambiguousForms } = React.useMemo(() => {
     const ids = (
       onlyShowAvailable ? available : Object.keys(allFilters)
-    ).filter((key) => {
-      if (key === 'global') return false
-      switch (subCategory) {
-        case 'raids':
-          return key.startsWith('e')
-        case 'lures':
-          return key.startsWith('l')
-        case 'invasions':
-          return key.startsWith('i')
-        case 'quests':
-          return (
-            key.startsWith('q') ||
-            key.startsWith('m') ||
-            key.startsWith('x') ||
-            key.startsWith('c') ||
-            key.startsWith('d') ||
-            key.startsWith('p') ||
-            key.startsWith('u')
-          )
-        case 'showcase':
-          return (
-            key.startsWith('f') ||
-            key.startsWith('h') ||
-            key.startsWith('y') ||
-            key.startsWith('b')
-          )
-        case 'rocketPokemon':
-          return key.startsWith('a')
-        case 'pokemon':
-          return Number.isInteger(Number(key.charAt(0)))
-        default:
-          switch (category) {
-            case 'gyms':
-              return key.startsWith('t')
-            case 'tappables':
-              return key.startsWith('q') && key !== 'q0'
-            default:
-              return Number.isInteger(Number(key.charAt(0)))
-          }
-      }
-    })
+    ).filter((key) => matchesFilterSelection(category, key, subCategory))
     // two identical looking entries (e.g. Litleo Unset + Normal) must show
     // their form to be told apart, but only for as long as both are around
     const ambiguous = getAmbiguousForms(ids)
@@ -179,18 +140,27 @@ function SelectorList({
   /** @param {'enable' | 'disable' | 'advanced'} action */
   const setAll = (action) => {
     const keys = new Set(items.map((item) => item))
+    const enabled = action !== 'disable'
+    const all = action === 'enable'
     useStorage.setState((prev) => ({
       filters: {
         ...prev.filters,
         [category]: {
           ...prev.filters[category],
+          ...(search
+            ? {}
+            : {
+                selectionDefaults: {
+                  ...prev.filters[category].selectionDefaults,
+                  [subCategory || 'default']: enabled,
+                },
+              }),
           filter: Object.fromEntries(
             Object.entries(prev.filters[category].filter).map(
-              ([key, value]) => {
-                const enabled = action !== 'disable'
-                const all = action === 'enable'
-                return [key, keys.has(key) ? { ...value, enabled, all } : value]
-              },
+              ([key, value]) => [
+                key,
+                keys.has(key) ? { ...value, enabled, all } : value,
+              ],
             ),
           ),
         },

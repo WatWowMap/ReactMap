@@ -1,7 +1,7 @@
 // @ts-check
 
 import { useMemory } from '@store/useMemory'
-import { useStorage, setDeepStore } from '@store/useStorage'
+import { useStorage } from '@store/useStorage'
 import { generateSlots } from '@utils/generateSlots'
 
 export const STANDARD_BACKUP =
@@ -37,8 +37,11 @@ export function applyToAll(
   const idSet = new Set(selectedIds ?? [])
 
   const menuSelections = storageState.menus?.[category]?.filters ?? {}
+  // Availability limits the visible roster, not the default for future entries.
   const hasMenuFiltersApplied = Object.values(menuSelections).some((options) =>
-    Object.values(options || {}).some(Boolean),
+    Object.entries(options || {}).some(
+      ([key, value]) => key !== 'onlyAvailable' && value,
+    ),
   )
   const advancedSearch =
     /** @type {string | undefined} */ (
@@ -66,29 +69,29 @@ export function applyToAll(
       return filters
     }),
   )
-  if (
-    category === 'pokemon' &&
+  const saveDefault =
     typeof newFilter.enabled === 'boolean' &&
-    newObj.global &&
     !hasMenuFiltersApplied &&
     !hasSearchApplied
-  ) {
+  if (saveDefault && newObj.global) {
     newObj.global = {
       ...newObj.global,
       enabled: newFilter.enabled,
-      all: newFilter.enabled ? !!easyMode : false,
-    }
-  } else if (
-    category !== 'pokemon' &&
-    typeof newFilter.enabled === 'boolean' &&
-    newObj.global &&
-    !hasMenuFiltersApplied &&
-    !hasSearchApplied
-  ) {
-    newObj.global = {
-      ...newObj.global,
-      enabled: newFilter.enabled,
+      ...(category === 'pokemon'
+        ? { all: newFilter.enabled ? !!easyMode : false }
+        : {}),
     }
   }
-  setDeepStore(`filters.${category}.filter`, newObj)
+  useStorage.setState((prev) => ({
+    filters: {
+      ...prev.filters,
+      [category]: {
+        ...prev.filters[category],
+        filter: newObj,
+        ...(saveDefault
+          ? { selectionDefaults: { all: newFilter.enabled } }
+          : {}),
+      },
+    },
+  }))
 }

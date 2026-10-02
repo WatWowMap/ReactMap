@@ -85,28 +85,24 @@ function StationsQuickSelect() {
   )
 }
 
-function IncludeUpcomingToggle() {
-  const enabled = useStorage(
-    (s) =>
-      !!s.filters?.stations?.maxBattles && !s.filters?.stations?.allStations,
+/** @param {{ subItem: 'allStations' | 'maxBattles' }} props */
+export function StationsDrawer({ subItem }) {
+  const enabled = useStorage((s) =>
+    subItem === 'allStations'
+      ? !!s.filters?.stations?.allStations
+      : !!s.filters?.stations?.maxBattles && !s.filters?.stations?.allStations,
   )
 
-  return (
-    <CollapsibleItem open={enabled}>
-      <BoolToggle
-        field="filters.stations.includeUpcoming"
-        label="include_upcoming"
-      />
-    </CollapsibleItem>
-  )
-}
-
-export function StationsDrawer() {
   return (
     <>
-      <StationLevels />
-      <IncludeUpcomingToggle />
-      <StationsQuickSelect />
+      {subItem === 'maxBattles' && <StationLevels />}
+      <CollapsibleItem open={enabled}>
+        <BoolToggle
+          field="filters.stations.includeUpcoming"
+          label="include_upcoming"
+        />
+      </CollapsibleItem>
+      {subItem === 'maxBattles' && <StationsQuickSelect />}
     </>
   )
 }
