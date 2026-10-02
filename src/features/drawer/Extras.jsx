@@ -28,7 +28,11 @@ function ExtrasComponent({ category, subItem }) {
     case 'admin':
       return <AdminDrawer subItem={subItem} />
     case 'stations':
-      return subItem === 'maxBattles' && <StationsDrawer />
+      return (
+        (subItem === 'allStations' || subItem === 'maxBattles') && (
+          <StationsDrawer subItem={subItem} />
+        )
+      )
     case 'tappables':
       return <TappablesDrawer />
     default:

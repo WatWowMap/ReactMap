@@ -48,7 +48,7 @@ export function getStationBattleKey(battle) {
  * @returns {boolean}
  */
 export function getEffectiveIncludeUpcoming(filters) {
-  return !!filters?.allStations || (filters?.includeUpcoming ?? true)
+  return filters?.includeUpcoming ?? true
 }
 
 /**
