@@ -60,7 +60,12 @@ export const RADIUS_CHOICES = /** @type {const} */ (['pokemon', 'gym'])
 
 export const METHODS = /** @type {const} */ (['discord', 'telegram'])
 
-export const FILTER_SKIP_LIST = ['filter', 'enabled', 'legacy']
+export const FILTER_SKIP_LIST = [
+  'filter',
+  'enabled',
+  'legacy',
+  'selectionDefaults',
+]
 
 export const ALWAYS_EXCLUDED = new Set(['donor', 'blockedGuildNames', 'admin'])
 

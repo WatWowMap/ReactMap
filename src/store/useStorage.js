@@ -40,7 +40,7 @@ import { setDeep } from '@utils/setDeep'
  *   tutorial: boolean,
  *   searchTab: string,
  *   search: string,
- *   filters: Partial<import('@rm/types').AllFilters>,
+ *   filters: Partial<import('@utils/filterSelection').StoredFilters>,
  *   icons: Record<string, string>
  *   audio: Record<string, string>
  *   userSettings: Partial<ReturnType<import('server/src/ui/clientOptions')['clientOptions']>['clientValues']>
