@@ -1,3 +1,15 @@
+# [1.53.0](https://github.com/WatWowMap/ReactMap/compare/v1.52.0...v1.53.0) (2026-10-02)
+
+
+### Bug Fixes
+
+* apply to all applies to future ([77e7d09](https://github.com/WatWowMap/ReactMap/commit/77e7d0913bfabfd3a836cebfd3c1dd05b5fb9456))
+
+
+### Features
+
+* allow exclude upcoming for all stations ([1fc870d](https://github.com/WatWowMap/ReactMap/commit/1fc870d94bc0e3a53010367e213e18af399c3b27))
+
 # [1.52.0](https://github.com/WatWowMap/ReactMap/compare/v1.51.4...v1.52.0) (2026-09-30)
 
 
