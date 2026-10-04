@@ -1289,10 +1289,16 @@ class Station extends Model {
         ...new Set(
           results
             .filter(({ battle_level }) => !!battle_level)
-            .flatMap((station) => [
-              `${station.battle_pokemon_id}-${station.battle_pokemon_form}`,
-              `j${station.battle_level}`,
-            ]),
+            .flatMap((station) =>
+              // Mirrors mapStationAvailable: an unknown boss (NULL or 0) must
+              // not publish a `0-0`/`null-null` boss key.
+              Number(station.battle_pokemon_id) > 0
+                ? [
+                    `${station.battle_pokemon_id}-${station.battle_pokemon_form}`,
+                    `j${station.battle_level}`,
+                  ]
+                : [`j${station.battle_level}`],
+            ),
         ),
       ],
     }
