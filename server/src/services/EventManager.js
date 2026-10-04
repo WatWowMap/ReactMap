@@ -507,6 +507,12 @@ class EventManager extends Logger {
           // into the masterfile as a real form entry.
           return
         }
+        if (!+id) {
+          // Pokémon 0 is an unknown-boss placeholder. Backfilling it would
+          // spawn a hidden, default-enabled `0-0` raid filter that matches
+          // every egg (eggs store raid_pokemon_id/form as 0).
+          return
+        }
         if (!this.masterfile.pokemon[id]) {
           this.masterfile.pokemon[id] = {
             name: '',
