@@ -1,3 +1,10 @@
+## [1.53.1](https://github.com/WatWowMap/ReactMap/compare/v1.53.0...v1.53.1) (2026-10-04)
+
+
+### Bug Fixes
+
+* unknown station boss leaking all raid eggs ([5c7f260](https://github.com/WatWowMap/ReactMap/commit/5c7f260c6309e64714411791e03be9de96f483f4))
+
 # [1.53.0](https://github.com/WatWowMap/ReactMap/compare/v1.52.0...v1.53.0) (2026-10-02)
 
 
