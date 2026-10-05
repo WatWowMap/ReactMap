@@ -29,6 +29,7 @@ const TAGS = /** @type {const} */ ({
   geocoder: chalk.hex('#ff5722')('[GEOCODER]'),
   fetch: chalk.hex('#880e4f')('[FETCH]'),
   scanner: chalk.hex('#b39ddb')('[SCANNER]'),
+  golbat: chalk.hex('#ffb300')('[GOLBAT]'),
   build: chalk.hex('#ef6c00')('[BUILD]'),
   ReactMap: chalk.hex('#ff3d00')('[ReactMap]'),
   trial: chalk.hex('#fff320')('[TRIAL]'),
