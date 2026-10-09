@@ -11,10 +11,10 @@ const { state } = require('./state')
 const { areaPerms } = require('../utils/areaPerms')
 const { webhookPerms } = require('../utils/webhookPerms')
 const { scannerPerms, scannerCooldownBypass } = require('../utils/scannerPerms')
-const { mergePerms } = require('../utils/mergePerms')
 const { getUserDisplayName } = require('../utils/getUserDisplayName')
 const { isOAuthStrategy } = require('../utils/getTelegramStrategy')
 const { AuthClient } = require('./AuthClient')
+const { linkAccount, sessionUser } = require('./linkAccount')
 
 /**
  * @typedef {import('@rainb0w-clwn/passport-telegram-official/dist/types').PassportTelegramUser} TGUser
@@ -167,71 +167,79 @@ class TelegramClient extends AuthClient {
       return done(null, false, { message: 'access_denied' })
     }
     try {
-      await state.db.models.User.query()
-        .findOne({ telegramId: user.id })
-        .then(
-          async (/** @type {import('@rm/types').FullUser} */ userExists) => {
-            const selectedWebhook = Object.keys(state.event.webhookObj).find(
-              (x) => user?.perms?.webhooks.includes(x),
-            )
-            if (req.user && userExists?.strategy === 'local') {
-              await state.db.models.User.query()
-                .update({
-                  telegramId: user.id,
-                  telegramPerms: JSON.stringify(user.perms),
-                  webhookStrategy: 'telegram',
-                })
-                .where('id', req.user.id)
-              await state.db.models.User.query()
-                .where('telegramId', user.id)
-                .whereNot('id', req.user.id)
-                .delete()
-              this.log.info(
-                user.username,
-                `(${user.id})`,
-                'Authenticated successfully.',
-              )
-              return done(null, {
-                selectedWebhook,
-                ...user,
-                ...req.user,
-                username: userExists.username || user.username,
-                telegramId: user.id,
-                perms: mergePerms(req.user.perms, user.perms),
-              })
-            }
-            if (!userExists) {
-              userExists = await state.db.models.User.query().insertAndFetch({
-                telegramId: user.id,
-                strategy: user.provider,
-                tutorial: !config.getSafe('map.misc.forceTutorial'),
-                selectedWebhook,
-              })
-            }
-            if (userExists.strategy !== 'telegram') {
-              await state.db.models.User.query()
-                .update({ strategy: 'telegram' })
-                .where('id', userExists.id)
-              userExists.strategy = 'telegram'
-            }
-            if (!userExists.selectedWebhook && selectedWebhook) {
-              await state.db.models.User.query()
-                .update({ selectedWebhook })
-                .where('id', userExists.id)
-              userExists.selectedWebhook = selectedWebhook
-            }
-            this.log.info(
-              user.username,
-              `(${user.id})`,
-              'Authenticated successfully.',
-            )
-            return done(null, {
-              ...user,
-              ...userExists,
-              username: userExists.username || user.username,
-            })
-          },
+      const selectedWebhook = Object.keys(state.event.webhookObj).find((x) =>
+        user?.perms?.webhooks.includes(x),
+      )
+      /** @type {Awaited<ReturnType<typeof linkAccount>> | undefined} */
+      let link
+      if (req.user) {
+        link = await linkAccount(state.db.models, {
+          userId: req.user.id,
+          platform: 'telegram',
+          externalId: user.id,
+          perms: user.perms,
+          sessionId: req.sessionID,
+        })
+        if (link.action === 'refuse') {
+          this.log.warn(
+            user.username,
+            `(${user.id})`,
+            'is already linked to another account, not linking it to user',
+            req.user.id,
+          )
+          return done(null, false, { message: 'account_already_linked' })
+        }
+        if (link.action === 'link') {
+          this.log.info(
+            user.username,
+            `(${user.id})`,
+            'linked to user',
+            req.user.id,
+          )
+          return done(null, {
+            selectedWebhook,
+            ...sessionUser(req.user, user, link.linked),
+          })
+        }
+      }
+
+      // a signed-in user's link attempt already read this row
+      await Promise.resolve(
+        link?.action === 'login'
+          ? link.account
+          : state.db.models.User.query().findOne({ telegramId: user.id }),
+      ).then(async (/** @type {import('@rm/types').FullUser} */ userExists) => {
+        if (!userExists) {
+          userExists = await state.db.models.User.query().insertAndFetch({
+            telegramId: user.id,
+            strategy: user.provider,
+            tutorial: !config.getSafe('map.misc.forceTutorial'),
+            selectedWebhook,
+          })
+        }
+        if (userExists.strategy !== 'telegram') {
+          await state.db.models.User.query()
+            .update({ strategy: 'telegram' })
+            .where('id', userExists.id)
+          userExists.strategy = 'telegram'
+        }
+        if (!userExists.selectedWebhook && selectedWebhook) {
+          await state.db.models.User.query()
+            .update({ selectedWebhook })
+            .where('id', userExists.id)
+          userExists.selectedWebhook = selectedWebhook
+        }
+        this.log.info(
+          user.username,
+          `(${user.id})`,
+          'Authenticated successfully.',
         )
+        return done(null, {
+          ...user,
+          ...userExists,
+          username: userExists.username || user.username,
+        })
+      })
     } catch (e) {
       this.log.error('User has failed auth.', e)
     }
