@@ -61,7 +61,8 @@ export function LinkAccounts() {
             </Grid2>
           )
         })}
-        {auth.discordId && auth.telegramId && (
+        {/* Discord and Telegram sign-ins always alert the account they used */}
+        {auth.strategy === 'local' && auth.discordId && auth.telegramId && (
           <Grid2 container alignItems="center" justifyContent="center">
             <Grid2 xs={6} sm={6} md={5} textAlign="center" padding="20px 0">
               <Typography>{t('select_webhook_strategy')}</Typography>
