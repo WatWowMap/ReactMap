@@ -331,8 +331,10 @@ class DiscordClient extends AuthClient {
       const selectedWebhook = Object.keys(state.event.webhookObj).find((x) =>
         discordUser?.perms?.webhooks.includes(x),
       )
+      /** @type {Awaited<ReturnType<typeof linkAccount>> | undefined} */
+      let link
       if (req.user) {
-        const link = await linkAccount(state.db.models, {
+        link = await linkAccount(state.db.models, {
           userId: req.user.id,
           platform: 'discord',
           externalId: discordUser.id,
@@ -362,38 +364,39 @@ class DiscordClient extends AuthClient {
         }
       }
 
-      await state.db.models.User.query()
-        .findOne({ discordId: discordUser.id })
-        .then(
-          async (/** @type {import('@rm/types').FullUser} */ userExists) => {
-            if (!userExists) {
-              userExists = await state.db.models.User.query().insertAndFetch({
-                discordId: discordUser.id,
-                strategy: 'discord',
-                tutorial: !config.getSafe('map.misc.forceTutorial'),
-                selectedWebhook,
-              })
-            }
-            if (userExists.strategy !== 'discord') {
-              await state.db.models.User.query()
-                .update({ strategy: 'discord' })
-                .where('id', userExists.id)
-              userExists.strategy = 'discord'
-            }
-            if (!userExists.selectedWebhook && selectedWebhook) {
-              await state.db.models.User.query()
-                .update({ selectedWebhook })
-                .where('id', userExists.id)
-              userExists.selectedWebhook = selectedWebhook
-            }
-            return done(null, {
-              ...discordUser,
-              ...userExists,
-              id: userExists.id,
-              username: userExists.username || discordUser.username,
-            })
-          },
-        )
+      // a signed-in user's link attempt already read this row
+      await Promise.resolve(
+        link?.action === 'login'
+          ? link.account
+          : state.db.models.User.query().findOne({ discordId: discordUser.id }),
+      ).then(async (/** @type {import('@rm/types').FullUser} */ userExists) => {
+        if (!userExists) {
+          userExists = await state.db.models.User.query().insertAndFetch({
+            discordId: discordUser.id,
+            strategy: 'discord',
+            tutorial: !config.getSafe('map.misc.forceTutorial'),
+            selectedWebhook,
+          })
+        }
+        if (userExists.strategy !== 'discord') {
+          await state.db.models.User.query()
+            .update({ strategy: 'discord' })
+            .where('id', userExists.id)
+          userExists.strategy = 'discord'
+        }
+        if (!userExists.selectedWebhook && selectedWebhook) {
+          await state.db.models.User.query()
+            .update({ selectedWebhook })
+            .where('id', userExists.id)
+          userExists.selectedWebhook = selectedWebhook
+        }
+        return done(null, {
+          ...discordUser,
+          ...userExists,
+          id: userExists.id,
+          username: userExists.username || discordUser.username,
+        })
+      })
     } catch (e) {
       this.log.error('User has failed auth.', e)
     }

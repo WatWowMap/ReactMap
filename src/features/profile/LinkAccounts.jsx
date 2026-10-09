@@ -23,6 +23,12 @@ export function LinkAccounts() {
   )
 
   const [refreshing, setRefreshing] = React.useState(false)
+  // Discord and Telegram sign-ins always alert the account they used, only a
+  // local session (which carries no strategy) picks one
+  const showWebhookStrategy =
+    !['discord', 'telegram'].includes(auth.strategy) &&
+    !!auth.discordId &&
+    !!auth.telegramId
 
   const [setWebhookStrategy] = useMutation(Query.user('SET_WEBHOOK_STRATEGY'))
 
@@ -61,8 +67,7 @@ export function LinkAccounts() {
             </Grid2>
           )
         })}
-        {/* Discord and Telegram sign-ins always alert the account they used */}
-        {auth.strategy === 'local' && auth.discordId && auth.telegramId && (
+        {showWebhookStrategy && (
           <Grid2 container alignItems="center" justifyContent="center">
             <Grid2 xs={6} sm={6} md={5} textAlign="center" padding="20px 0">
               <Typography>{t('select_webhook_strategy')}</Typography>

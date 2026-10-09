@@ -17,16 +17,28 @@ const telegram = (id, extra = {}) => ({
 })
 
 test('without a logged in row it is a plain login', () => {
-  assert.deepEqual(planLink(null, null, 'telegram'), { action: 'login' })
+  assert.deepEqual(planLink(null, null, 'telegram'), {
+    action: 'login',
+    account: null,
+  })
 })
 
 test('a row that already has that platform logs in instead of linking', () => {
-  assert.deepEqual(planLink(telegram(1), null, 'telegram'), {
+  const current = telegram(1)
+  assert.deepEqual(planLink(current, current, 'telegram'), {
     action: 'login',
+    account: current,
   })
   // a different account of the same platform switches accounts
-  assert.deepEqual(planLink(telegram(1), telegram(2), 'telegram'), {
+  const other = telegram(2)
+  assert.deepEqual(planLink(current, other, 'telegram'), {
     action: 'login',
+    account: other,
+  })
+  // ...including one that has no row yet
+  assert.deepEqual(planLink(current, null, 'telegram'), {
+    action: 'login',
+    account: null,
   })
 })
 
@@ -82,13 +94,10 @@ test('an account linked to a different account of the other platform is refused'
   })
 })
 
-test('the other row brings its link along when the current row has none', () => {
+test('a row with both ids is never merged away, even into a row without either', () => {
   const local = { id: 1, strategy: 'local', username: 'me' }
   const other = discord(2, { telegramId: 't7' })
-  assert.deepEqual(planLink(local, other, 'discord'), {
-    action: 'link',
-    merge: other,
-  })
+  assert.deepEqual(planLink(local, other, 'discord'), { action: 'refuse' })
 })
 
 test('a local account that last signed in with discord is still never merged away', () => {

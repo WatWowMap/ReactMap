@@ -3,7 +3,7 @@ const { mergePerms } = require('../utils/mergePerms')
 
 /** @typedef {'discord' | 'telegram'} Platform */
 /**
- * @typedef {{ action: 'login' }
+ * @typedef {{ action: 'login', account: import('@rm/types').FullUser | null }
  *   | { action: 'refuse' }
  *   | { action: 'link', merge: import('@rm/types').FullUser | null }} LinkPlan
  */
@@ -17,7 +17,8 @@ const OTHER = { discord: 'telegram', telegram: 'discord' }
  * platform id, if any.
  *
  * - `login`: nothing to link, the row already has that platform (the same
- *   account re-authenticating, or a different one, which switches accounts)
+ *   account re-authenticating, or a different one, which switches accounts);
+ *   `account` is `other`, the row that login uses
  * - `link`: attach the id to `current`, absorbing `other` when there is one
  * - `refuse`: `other` is a whole account of its own, merging it would lose it
  *
@@ -27,21 +28,17 @@ const OTHER = { discord: 'telegram', telegram: 'discord' }
  * @returns {LinkPlan}
  */
 function planLink(current, other, platform) {
-  if (!current || current[`${platform}Id`]) return { action: 'login' }
+  if (!current || current[`${platform}Id`]) {
+    return { action: 'login', account: other || null }
+  }
   if (!other) return { action: 'link', merge: null }
 
   // a local account has a password a merge would throw away, and its strategy
   // may read discord or telegram after the user last signed in with one
   if (other.strategy === 'local' || other.password) return { action: 'refuse' }
+  // a row with both ids is a linked account of its own
+  if (other[`${OTHER[platform]}Id`]) return { action: 'refuse' }
 
-  const otherField = `${OTHER[platform]}Id`
-  if (
-    other[otherField] &&
-    current[otherField] &&
-    other[otherField] !== current[otherField]
-  ) {
-    return { action: 'refuse' }
-  }
   return { action: 'link', merge: other }
 }
 
@@ -97,7 +94,9 @@ async function moveBadges(Badge, fromId, toId, trx) {
 
 /**
  * Links a Discord or Telegram account to the row of the user who is signed in.
- * A row that only existed for that account is merged in and deleted.
+ * A row that only existed for that account is merged in and deleted. Both rows
+ * are read and locked in the transaction that changes them, so concurrent
+ * callbacks for the same user cannot both link.
  *
  * @param {Pick<import('@rm/types').Models, 'User' | 'Badge' | 'Backup' | 'NestSubmission' | 'Session'>} models
  * @param {{
@@ -117,33 +116,31 @@ async function linkAccount(
   const otherPlatform = OTHER[platform]
   const otherField = `${otherPlatform}Id`
 
-  const [current, other] = await Promise.all([
-    User.query().findOne({ id: userId }),
-    User.query().findOne({ [field]: externalId }),
-  ])
-  const plan = planLink(current, other, platform)
-  if (plan.action !== 'link') return plan
+  const result = await User.transaction(async (trx) => {
+    /** @type {import('@rm/types').FullUser[]} */
+    const rows = await User.query(trx)
+      .where('id', userId)
+      .orWhere(field, externalId)
+      .orderBy('id')
+      .forUpdate()
+    const current = rows.find((row) => `${row.id}` === `${userId}`)
+    const other = rows.find((row) => `${row[field]}` === `${externalId}`)
 
-  const { merge } = plan
-  const update = {
-    [field]: externalId,
-    [`${platform}Perms`]: JSON.stringify(perms),
-    // only a local sign-in reads this, Discord and Telegram sign-ins always
-    // alert the account they used; keep a local user's alerts where they were
-    webhookStrategy:
-      current.webhookStrategy ||
-      (current[otherField] ? otherPlatform : platform),
-  }
-  if (merge) {
-    if (!current.data && merge.data) update.data = merge.data
-    if (!current[otherField] && merge[otherField]) {
-      update[otherField] = merge[otherField]
-      update[`${otherPlatform}Perms`] = merge[`${otherPlatform}Perms`]
+    const plan = planLink(current, other, platform)
+    if (plan.action !== 'link') return plan
+
+    const { merge } = plan
+    const update = {
+      [field]: externalId,
+      [`${platform}Perms`]: JSON.stringify(perms),
+      // only a local sign-in reads this, Discord and Telegram sign-ins always
+      // alert the account they used; keep a local user's alerts where they were
+      webhookStrategy:
+        current.webhookStrategy ||
+        (current[otherField] ? otherPlatform : platform),
     }
-  }
-
-  await User.transaction(async (trx) => {
     if (merge) {
+      if (!current.data && merge.data) update.data = merge.data
       await moveBadges(Badge, merge.id, current.id, trx)
       await Backup.query(trx)
         .update({ userId: current.id })
@@ -154,21 +151,22 @@ async function linkAccount(
       await User.query(trx).delete().where('id', merge.id)
     }
     await User.query(trx).update(update).where('id', current.id)
+
+    return {
+      ...plan,
+      linked: {
+        discordId: update.discordId ?? current.discordId,
+        telegramId: update.telegramId ?? current.telegramId,
+        webhookStrategy: update.webhookStrategy,
+      },
+    }
   })
 
-  if (merge) {
+  if (result.action === 'link' && result.merge) {
     // sessions of the deleted row point at a user that no longer exists
-    await Session.clearOtherSessions(merge.id, sessionId).catch(() => {})
+    await Session.clearOtherSessions(result.merge.id, sessionId).catch(() => {})
   }
-
-  return {
-    ...plan,
-    linked: {
-      discordId: update.discordId ?? current.discordId,
-      telegramId: update.telegramId ?? current.telegramId,
-      webhookStrategy: update.webhookStrategy,
-    },
-  }
+  return result
 }
 
 module.exports = { linkAccount, planLink, sessionUser }
