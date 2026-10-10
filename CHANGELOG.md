@@ -1,3 +1,10 @@
+## [1.53.2](https://github.com/WatWowMap/ReactMap/compare/v1.53.1...v1.53.2) (2026-10-10)
+
+
+### Bug Fixes
+
+* **pokemon:** apply glow to background box instead of sprite ([70cfd77](https://github.com/WatWowMap/ReactMap/commit/70cfd77f44054ad3df4ab18720fa880934e9ee63))
+
 ## [1.53.1](https://github.com/WatWowMap/ReactMap/compare/v1.53.0...v1.53.1) (2026-10-04)
 
 
