@@ -148,7 +148,7 @@
     "i18next": "23.12.3",
     "i18next-browser-languagedetector": "8.0.0",
     "i18next-fs-backend": "2.6.6",
-    "i18next-http-backend": "3.0.5",
+    "i18next-http-backend": "4.0.2",
     "jose": "^5.9.6",
     "knex": "3.1.0",
     "leaflet": "1.9.4",
