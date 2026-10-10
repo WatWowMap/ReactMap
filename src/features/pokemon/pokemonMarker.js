@@ -45,6 +45,9 @@ export const fancyPokemonMarker = ({
   const { Icons } = useMemory.getState()
   const [pokemonMod, weatherMod] = Icons.getModifiers('pokemon', 'weather')
   const pokemonBackground = backgroundUrl || ''
+  const glowFilter = showGlow
+    ? `drop-shadow(0 0 10px ${showGlow})drop-shadow(0 0 10px ${showGlow})`
+    : 'none'
 
   return divIcon({
     popupAnchor: [
@@ -68,6 +71,8 @@ export const fancyPokemonMarker = ({
           src="${pokemonBackground}"
           alt="background-${pkmn.background || 'override'}"
           style="
+            -webkit-filter: ${glowFilter};
+            filter: ${glowFilter};
             height: ${iconSize}px;
             width: ${iconSize}px;
           "
@@ -78,16 +83,8 @@ export const fancyPokemonMarker = ({
           src="${iconUrl}"
           alt="${pkmn.pokemon_id}"
           style="
-            -webkit-filter: ${
-              showGlow
-                ? `drop-shadow(0 0 10px ${showGlow})drop-shadow(0 0 10px ${showGlow})`
-                : 'none'
-            };
-            filter: ${
-              showGlow
-                ? `drop-shadow(0 0 10px ${showGlow})drop-shadow(0 0 10px ${showGlow})`
-                : 'none'
-            };
+            -webkit-filter: ${pokemonBackground ? 'none' : glowFilter};
+            filter: ${pokemonBackground ? 'none' : glowFilter};
             height: ${iconSize}px;
             width: ${iconSize}px;
           "
