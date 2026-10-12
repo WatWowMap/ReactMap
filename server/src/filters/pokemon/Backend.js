@@ -431,6 +431,9 @@ class PkmnBackend {
     }
 
     if (!this.perms.pokemon) return result
+    if (Array.isArray(pokemon.shiny_for) && pokemon.shiny_for.length) {
+      result.shiny_for = pokemon.shiny_for
+    }
     if (this.perms.iv) {
       assign(result, pokemon, [
         'atk_iv',

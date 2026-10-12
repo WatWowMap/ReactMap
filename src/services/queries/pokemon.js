@@ -18,6 +18,7 @@ const core = gql`
     display_pokemon_id
     seen_type
     background
+    shiny_for
   }
 `
 

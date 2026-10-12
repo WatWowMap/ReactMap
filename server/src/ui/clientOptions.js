@@ -338,6 +338,12 @@ function clientOptions(perms) {
       enablePokemonPopupCoords: map.misc.enablePokemonPopupCoordsSelector
         ? { type: 'bool', perm: ['pokemon'], category: 'popups' }
         : undefined,
+      personalShinyIds: map.misc.enablePersonalShiny
+        ? { type: 'text', perm: ['personalShiny'], category: 'markers' }
+        : undefined,
+      onlyPersonalShiny: map.misc.enablePersonalShiny
+        ? { type: 'bool', perm: ['personalShiny'], category: 'filters' }
+        : undefined,
     },
     wayfarer: {
       clustering: { type: 'bool', perm: ['portals'], category: 'markers' },
@@ -475,7 +481,9 @@ function clientOptions(perms) {
     Object.entries(options).forEach(([name, meta]) => {
       if (!meta) return
       clientMenus[key][name].value =
-        clientSideOptions[key][name] || meta.value || false
+        meta.type === 'text'
+          ? clientSideOptions[key][name] || ''
+          : clientSideOptions[key][name] || meta.value || false
       clientMenus[key][name].disabled = !meta.perm.some((x) => perms[x])
       clientValues[key][name] = meta.value
       delete clientMenus[key][name].perm

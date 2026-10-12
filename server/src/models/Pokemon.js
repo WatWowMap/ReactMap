@@ -25,6 +25,12 @@ const {
   getWildFilterKey,
 } = require('../filters/pokemon/getWildFilterKey')
 const { state } = require('../services/state')
+const { parsePlayerIds, toV3Filter } = require('../utils/personalShiny')
+
+const GOLBAT_STATUS_TTL_MS = 5 * 60 * 1000
+
+/** @type {Map<string, { expires: number, supported: Promise<boolean> }>} */
+const personalShinySupport = new Map()
 
 class Pokemon extends Model {
   static get tableName() {
@@ -254,9 +260,30 @@ class Pokemon extends Model {
       if (onlyHundoIv)
         filters.push({ iv: { min: 100, max: 100 }, pokemon: globalPokes })
     }
+    // Personal shiny annotation is only offered by Golbat's v3 scan
+    const annotateFor =
+      mem &&
+      perms.personalShiny &&
+      config.getSafe('map.misc.enablePersonalShiny')
+        ? parsePlayerIds(args.filters.onlyPersonalShinyIds)
+        : []
+    const useV3 =
+      annotateFor.length > 0 && (await this.supportsPersonalShiny(ctx))
+    const onlyPersonalShiny =
+      annotateFor.length > 0 && !!args.filters.onlyPersonalShiny
+    // Golbat applies shiny_for before its result limit, so zoomed out views
+    // aren't truncated by non shiny Pokémon
+    const scanFilters = useV3
+      ? filters.map((filter) =>
+          onlyPersonalShiny
+            ? { ...toV3Filter(filter), shiny_for: annotateFor }
+            : toV3Filter(filter),
+        )
+      : filters
+
     /** @type {import("@rm/types").Pokemon[]} */
     let results = await this.evalQuery(
-      mem ? `${mem}/api/pokemon/v2/scan` : null,
+      mem ? `${mem}/api/pokemon/${useV3 ? 'v3' : 'v2'}/scan` : null,
       mem
         ? JSON.stringify({
             min: {
@@ -268,13 +295,25 @@ class Pokemon extends Model {
               longitude: args.maxLon,
             },
             limit: queryLimits.pokemon + queryLimits.pokemonPvp,
-            filters,
+            filters: scanFilters,
+            ...(useV3 ? { annotate_for: annotateFor } : {}),
           })
         : query.limit(queryLimits.pokemon),
       'POST',
       secret,
       httpAuth,
     )
+    if (useV3) {
+      // v3 wraps the list with scan stats
+      results = /** @type {any} */ (results)?.pokemon
+    }
+    if (onlyPersonalShiny) {
+      // Without v3 support nothing can be known to be shiny
+      results =
+        useV3 && Array.isArray(results)
+          ? results.filter((pkmn) => pkmn.shiny_for?.length)
+          : []
+    }
 
     if (mem && manualId !== null) {
       const loadedIds = Array.isArray(results)
@@ -417,6 +456,42 @@ class Pokemon extends Model {
       : query)
     log.debug(TAGS.pokemon, 'raw result length', results?.length || 0)
     return results || []
+  }
+
+  /**
+   * Whether the Golbat endpoint advertises `annotate_for` in /api/status,
+   * cached per endpoint so it doesn't add a request to every scan
+   * @param {import("@rm/types").DbContext} ctx
+   * @returns {Promise<boolean>}
+   */
+  static async supportsPersonalShiny({ mem, secret, httpAuth }) {
+    const cached = personalShinySupport.get(mem)
+    if (cached && cached.expires > Date.now()) return cached.supported
+    const supported = this.evalQuery(
+      `${mem}/api/status`,
+      undefined,
+      'GET',
+      secret,
+      httpAuth,
+    )
+      .then(
+        (status) => /** @type {any} */ (status)?.filters?.annotate_for === true,
+      )
+      .catch(() => false)
+      .then((isSupported) => {
+        if (!isSupported) {
+          log.warn(
+            TAGS.pokemon,
+            `${mem} does not support personal shiny annotation, configure [shiny_rates] in Golbat`,
+          )
+        }
+        return isSupported
+      })
+    personalShinySupport.set(mem, {
+      expires: Date.now() + GOLBAT_STATUS_TTL_MS,
+      supported,
+    })
+    return supported
   }
 
   /**

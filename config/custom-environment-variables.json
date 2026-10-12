@@ -519,6 +519,10 @@
         "__name": "MAP_MISC_ENABLE_POKEMON_POPUP_COORDS_SELECTOR",
         "__format": "boolean"
       },
+      "enablePersonalShiny": {
+        "__name": "MAP_MISC_ENABLE_PERSONAL_SHINY",
+        "__format": "boolean"
+      },
       "enableGymPopupCoordsSelector": {
         "__name": "MAP_MISC_ENABLE_GYM_POPUP_COORDS_SELECTOR",
         "__format": "boolean"
@@ -2098,6 +2102,20 @@
         },
         "roles": {
           "__name": "AUTHENTICATION_PERMS_DYNAMAX_ROLES",
+          "__format": "json"
+        }
+      },
+      "personalShiny": {
+        "enabled": {
+          "__name": "AUTHENTICATION_PERMS_PERSONAL_SHINY_ENABLED",
+          "__format": "boolean"
+        },
+        "trialPeriodEligible": {
+          "__name": "AUTHENTICATION_PERMS_PERSONAL_SHINY_TRIAL_PERIOD_ELIGIBLE",
+          "__format": "boolean"
+        },
+        "roles": {
+          "__name": "AUTHENTICATION_PERMS_PERSONAL_SHINY_ROLES",
           "__format": "json"
         }
       }

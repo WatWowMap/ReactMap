@@ -262,6 +262,11 @@
         "enabled": true,
         "trialPeriodEligible": false,
         "roles": []
+      },
+      "personalShiny": {
+        "enabled": true,
+        "trialPeriodEligible": false,
+        "roles": []
       }
     }
   },
