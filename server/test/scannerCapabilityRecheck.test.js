@@ -21,11 +21,14 @@ test('a 4xx from a Golbat feature call rechecks that instance immediately', asyn
 
   reply = { status: 422, statusText: 'Unprocessable Entity' }
   await evalScannerQuery('tag', `${MEM}/api/pokestop/scan`, '{}', 'POST')
-  assert.deepEqual(rechecked, [MEM])
+  assert.deepEqual(rechecked, [`${MEM}/api/pokestop/scan`])
 
   reply = { status: 400, statusText: 'Bad Request' }
   await evalScannerQuery('tag', `${MEM}/api/pokemon/v3/scan`, '{}', 'POST')
-  assert.deepEqual(rechecked, [MEM, MEM])
+  assert.deepEqual(rechecked, [
+    `${MEM}/api/pokestop/scan`,
+    `${MEM}/api/pokemon/v3/scan`,
+  ])
 })
 
 test('other outcomes of a Golbat call do not trigger a recheck', async (t) => {

@@ -151,7 +151,7 @@ test('an unsupported verdict re-reads the status even seconds after the last fet
       ok: statusReply.status === 200,
       status: statusReply.status,
       statusText: '',
-      json: async () => statusReply.body,
+      text: async () => JSON.stringify(statusReply.body),
     }
   }
   await golbatCapabilities.discover([{ endpoint: MEM }])
@@ -169,6 +169,42 @@ test('an unsupported verdict re-reads the status even seconds after the last fet
   assert.equal(statusCalls.length, 2)
   assert.deepEqual(result.available, ['b9', 'y3'])
   assert.equal(sql.executions, 0)
+})
+
+test('a source that stays unsupported re-reads the status once per availability payload', async (t) => {
+  const statusCalls = []
+  const originalFetch = golbatCapabilities.fetch
+  t.after(() => {
+    golbatCapabilities.fetch = originalFetch
+    golbatCapabilities.instances = new Map()
+    golbatCapabilities.stop()
+  })
+  golbatCapabilities.fetch = async (url) => {
+    statusCalls.push(url)
+    return { ok: false, status: 404, statusText: '' }
+  }
+  await golbatCapabilities.discover([{ endpoint: MEM }])
+  assert.equal(statusCalls.length, 1)
+
+  // The combined fort cache returns the same payload for its whole window.
+  let pokestops = showcasePayload()
+  const { Pokestop } = loadPokestop(t, () => pokestops)
+
+  await Promise.all(
+    [1, 2, 3].map(() =>
+      assert.rejects(
+        Pokestop.getAvailable(CONTEXT),
+        /required showcase_focus filter capability/,
+      ),
+    ),
+  )
+  await assert.rejects(Pokestop.getAvailable(CONTEXT))
+  assert.equal(statusCalls.length, 2)
+
+  // A new snapshot gets one fresh chance.
+  pokestops = showcasePayload()
+  await assert.rejects(Pokestop.getAvailable(CONTEXT))
+  assert.equal(statusCalls.length, 3)
 })
 
 test('malformed endpoint availability falls through to dual-source SQL', async (t) => {

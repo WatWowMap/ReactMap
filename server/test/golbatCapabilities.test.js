@@ -19,9 +19,9 @@ function fakeFetch(reply) {
       ok: res.status >= 200 && res.status < 300,
       status: res.status,
       statusText: '',
-      json: async () => {
-        if ('body' in res) return res.body
-        throw new SyntaxError(`Unexpected token in JSON: ${res.text}`)
+      text: async () => {
+        if ('bodyError' in res) throw res.bodyError
+        return 'body' in res ? JSON.stringify(res.body) : res.text
       },
     }
   }
@@ -254,15 +254,15 @@ test('concurrent refreshes of one instance share a single request', async (t) =>
       ok: true,
       status: 200,
       statusText: '',
-      json: async () => STATUS_WITH_FILTERS,
+      text: async () => JSON.stringify(STATUS_WITH_FILTERS),
     }
   }
   const caps = new GolbatCapabilities({ fetch: fetchImpl })
   t.after(() => caps.stop())
   caps.instances.set(MEM, {
     mem: MEM,
-    secret: '',
-    httpAuth: null,
+    credentials: [{ secret: '', httpAuth: null }],
+    credentialIndex: 0,
     status: null,
   })
 
@@ -330,4 +330,92 @@ test('a changed status is logged at info and an unchanged refresh is not', async
 
   await caps.refresh(MEM)
   assert.equal(info.mock.callCount(), 2)
+})
+
+test('a body that fails mid-read keeps the last good result', async (t) => {
+  let reply = { status: 200, body: STATUS_WITH_FILTERS }
+  const { fetchImpl } = fakeFetch(() => reply)
+  const caps = new GolbatCapabilities({ fetch: fetchImpl })
+  t.after(() => caps.stop())
+
+  await caps.discover([{ endpoint: MEM }])
+
+  const aborted = new Error('The operation was aborted.')
+  aborted.name = 'AbortError'
+  reply = { status: 200, bodyError: aborted }
+  await caps.refresh(MEM)
+  assert.deepEqual(caps.get(MEM), STATUS_WITH_FILTERS)
+
+  reply = { status: 200, bodyError: new Error('socket hang up') }
+  await caps.refresh(MEM)
+  assert.deepEqual(caps.get(MEM), STATUS_WITH_FILTERS)
+})
+
+test('sources sharing a url fall back to the next credentials when one is rejected', async (t) => {
+  const { fetchImpl, calls } = fakeFetch((url, init) =>
+    init.headers['X-Golbat-Secret'] === 'good'
+      ? { status: 200, body: STATUS_WITH_FILTERS }
+      : { status: 401, text: 'unauthorised' },
+  )
+  const caps = new GolbatCapabilities({ fetch: fetchImpl })
+  t.after(() => caps.stop())
+
+  await caps.discover([
+    { endpoint: MEM, secret: 'expired' },
+    { endpoint: MEM, secret: 'expired' },
+    { endpoint: MEM, secret: 'good' },
+  ])
+
+  assert.deepEqual(
+    calls.map((c) => c.init.headers['X-Golbat-Secret']),
+    ['expired', 'good'],
+  )
+  assert.equal(caps.supportsFilter(MEM, 'showcase_focus'), true)
+
+  // The set that got through is tried first on the next refresh.
+  await caps.refresh(MEM)
+  assert.equal(calls.length, 3)
+  assert.equal(calls[2].init.headers['X-Golbat-Secret'], 'good')
+})
+
+test('a rejection from every credential set keeps the last good result', async (t) => {
+  let reject = false
+  const { fetchImpl, calls } = fakeFetch(() =>
+    reject
+      ? { status: 403, text: 'forbidden' }
+      : { status: 200, body: STATUS_WITH_FILTERS },
+  )
+  const caps = new GolbatCapabilities({ fetch: fetchImpl })
+  t.after(() => caps.stop())
+
+  await caps.discover([
+    { endpoint: MEM, secret: 'a' },
+    { endpoint: MEM, secret: 'b' },
+  ])
+  reject = true
+  await caps.refresh(MEM)
+
+  assert.equal(calls.length, 3)
+  assert.deepEqual(caps.get(MEM), STATUS_WITH_FILTERS)
+})
+
+test('recheck resolves a request url to an endpoint configured with a path', async (t) => {
+  let now = 1_000_000
+  const PREFIXED = 'https://host/api/golbat'
+  const { fetchImpl, calls } = fakeFetch(() => ({
+    status: 200,
+    body: STATUS_WITH_FILTERS,
+  }))
+  const caps = new GolbatCapabilities({ fetch: fetchImpl, now: () => now })
+  t.after(() => caps.stop())
+
+  await caps.discover([{ endpoint: 'https://host' }, { endpoint: PREFIXED }])
+  assert.equal(caps.memFor(`${PREFIXED}/api/pokestop/scan`), PREFIXED)
+  assert.equal(caps.memFor('https://host/api/pokestop/scan'), 'https://host')
+  assert.equal(caps.memFor('https://hostile/api/pokestop/scan'), null)
+
+  now += GolbatCapabilities.RECHECK_DEBOUNCE_MS
+  await caps.recheck(`${PREFIXED}/api/pokestop/scan`)
+  assert.equal(calls.length, 3)
+  assert.equal(calls[2].url, `${PREFIXED}/api/status`)
 })

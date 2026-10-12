@@ -53,15 +53,14 @@ async function evalScannerQuery(
         body: query,
       })
     : query)
-  const apiPathIndex = mem ? mem.indexOf('/api/') : -1
   if (
-    apiPathIndex > 0 &&
+    mem &&
     results &&
     typeof results === 'object' &&
     CAPABILITY_RECHECK_STATUSES.has(results.status)
   ) {
     golbatCapabilities
-      .recheck(mem.slice(0, apiPathIndex))
+      .recheck(mem)
       .catch((e) => log.warn(tag, 'capability recheck failed', e))
   }
   log.debug(tag, 'raw result length', results?.length || 0)

@@ -146,8 +146,13 @@ export interface GolbatStatus {
 /** Registry entry kept by GolbatCapabilities, keyed by the endpoint base url. */
 export interface GolbatInstance {
   mem: string
-  secret: string
-  httpAuth: { username: string; password: string } | null
+  /** Every distinct credential set configured for this url, in config order. */
+  credentials: {
+    secret: string
+    httpAuth: { username: string; password: string } | null
+  }[]
+  /** Index into `credentials` of the set that last got through; tried first. */
+  credentialIndex: number
   /** Last good status; null until the instance has answered once. */
   status: GolbatStatus | null
   /** Epoch ms of the last refresh start; drives the recheck debounce. */

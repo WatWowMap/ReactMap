@@ -65,6 +65,16 @@ function supportsShowcaseFocus(mem, payload) {
   return payload.showcase_focus_filter === true
 }
 
+/**
+ * Status refreshes already forced by an unsupported verdict, keyed by the
+ * availability payload that triggered them. The combined fort cache hands back
+ * the same payload object for its whole window, so a failing source re-reads
+ * the status once per availability snapshot, not on every session init (a
+ * failed refresh never stamps the availability TTL).
+ * @type {WeakMap<object, Promise<void>>}
+ */
+const statusRefreshByPayload = new WeakMap()
+
 /** @typedef {Partial<import('@rm/types').Quest>} QuestReward */
 
 const QUEST_REWARD_FILTER_DEFINITIONS = {
@@ -1364,9 +1374,15 @@ class Pokestop extends Model {
         // (its status was last read before the upgrade). Re-read it before
         // the verdict becomes a hard error. This is refresh(), not the
         // debounced recheck(): the upgrade may land seconds after a periodic
-        // status fetch, and this path is already throttled by the
-        // availability refresh window, so it cannot hammer Golbat.
-        await golbatCapabilities.refresh(mem)
+        // status fetch. It runs at most once per payload (see
+        // statusRefreshByPayload), so a persistently failing source cannot
+        // hammer Golbat.
+        let statusRefresh = statusRefreshByPayload.get(res)
+        if (!statusRefresh) {
+          statusRefresh = golbatCapabilities.refresh(mem)
+          statusRefreshByPayload.set(res, statusRefresh)
+        }
+        await statusRefresh
         if (!supportsShowcaseFocus(mem, res)) {
           throw new Error(
             'Golbat lacks the required showcase_focus filter capability',
