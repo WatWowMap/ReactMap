@@ -11,6 +11,9 @@ function clientOptions(perms) {
   const map = config.getSafe('map')
   const levels = config.getSafe('api.pvp.levels')
   const hasDualQuestLayer = isDualQuestLayerMode(getQuestLayerMode(map))
+  const hasPersonalShiny = !!(
+    map.misc.enablePersonalShiny && perms.personalShiny
+  )
 
   // the values here are the relevant perms to use them, they are looped through and the values are set based on your config, then the type is set based off of those values in the above function
   const clientMenus = {
@@ -338,13 +341,13 @@ function clientOptions(perms) {
       enablePokemonPopupCoords: map.misc.enablePokemonPopupCoordsSelector
         ? { type: 'bool', perm: ['pokemon'], category: 'popups' }
         : undefined,
-      personalShinyIds: map.misc.enablePersonalShiny
+      personalShinyIds: hasPersonalShiny
         ? { type: 'text', perm: ['personalShiny'], category: 'markers' }
         : undefined,
-      onlyPersonalShiny: map.misc.enablePersonalShiny
+      onlyPersonalShiny: hasPersonalShiny
         ? { type: 'bool', perm: ['personalShiny'], category: 'filters' }
         : undefined,
-      onlyShundo: map.misc.enablePersonalShiny
+      onlyShundo: hasPersonalShiny
         ? { type: 'bool', perm: ['personalShiny'], category: 'filters' }
         : undefined,
     },
