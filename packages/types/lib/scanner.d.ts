@@ -272,6 +272,7 @@ export interface Pokemon {
   pvp: CleanPvp
   distance?: number
   shiny?: boolean
+  shiny_for?: string[]
 }
 
 export type FullPokemon = FullModel<Pokemon, PokemonModel.Pokemon>

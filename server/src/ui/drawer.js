@@ -108,6 +108,18 @@ function drawer(req, perms) {
                   perm: 'iv',
                   color: 'secondary',
                 },
+                ...(perms.personalShiny && mapConfig.misc.enablePersonalShiny
+                  ? [
+                      {
+                        name: 'shinyIv',
+                        label: '%',
+                        min: 0,
+                        max: 100,
+                        perm: 'iv',
+                        color: 'secondary',
+                      },
+                    ]
+                  : []),
                 ...leagues.map((league) => ({
                   name: league.name,
                   label: 'rank',

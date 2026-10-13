@@ -62,6 +62,11 @@ const trimFilters = (requestedFilters, userSettings, category, onlyAreas) => {
     onlyLegacy: userSettings?.legacyFilter,
     onlyLinkGlobal: userSettings?.linkGlobalAndAdvanced || easyMode,
     onlyAllPvp: userSettings?.showAllPvpRanks,
+    onlyPersonalShinyIds:
+      category === 'pokemon' ? userSettings?.personalShinyIds : undefined,
+    onlyPersonalShiny:
+      category === 'pokemon' ? !!userSettings?.onlyPersonalShiny : undefined,
+    onlyShundo: category === 'pokemon' ? !!userSettings?.onlyShundo : undefined,
     onlyAreas: onlyAreas || [],
   }
   Object.entries(requestedFilters || {}).forEach((topLevelFilter) => {
