@@ -25,6 +25,18 @@ function parsePlayerIds(raw) {
 }
 
 /**
+ * Validates the client's Shiny IV Range slider value
+ * @param {unknown} raw
+ * @returns {[number, number] | null}
+ */
+function parseIvRange(raw) {
+  if (!Array.isArray(raw) || raw.length !== 2) return null
+  const [min, max] = raw.map(Number)
+  if (!Number.isFinite(min) || !Number.isFinite(max) || min > max) return null
+  return [Math.max(0, min), Math.min(100, max)]
+}
+
+/**
  * The v3 scan takes `gender` as an explicit list instead of the v2 min/max
  * range, every other clause field is identical
  * @param {import('@rm/types').DnfFilter} filter
@@ -47,4 +59,4 @@ function toShundoFilter(filter) {
   return { ...filter, iv: { min: 100, max: 100 } }
 }
 
-module.exports = { parsePlayerIds, toV3Filter, toShundoFilter }
+module.exports = { parsePlayerIds, parseIvRange, toV3Filter, toShundoFilter }
