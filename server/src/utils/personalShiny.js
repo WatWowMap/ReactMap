@@ -37,4 +37,14 @@ function toV3Filter(filter) {
   return { ...rest, gender: genders }
 }
 
-module.exports = { parsePlayerIds, toV3Filter }
+/**
+ * Narrows a v3 clause to 100% IV, or drops it when its IV range excludes 100
+ * @param {import('@rm/types').DnfFilter} filter
+ * @returns {import('@rm/types').DnfFilter | null}
+ */
+function toShundoFilter(filter) {
+  if (filter.iv && filter.iv.max < 100) return null
+  return { ...filter, iv: { min: 100, max: 100 } }
+}
+
+module.exports = { parsePlayerIds, toV3Filter, toShundoFilter }

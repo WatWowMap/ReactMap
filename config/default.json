@@ -428,6 +428,7 @@
       "spacialRendRange": false,
       "personalShinyIds": "",
       "onlyPersonalShiny": false,
+      "onlyShundo": false,
       "glow": [
         {
           "name": "Hundo",

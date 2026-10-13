@@ -344,6 +344,9 @@ function clientOptions(perms) {
       onlyPersonalShiny: map.misc.enablePersonalShiny
         ? { type: 'bool', perm: ['personalShiny'], category: 'filters' }
         : undefined,
+      onlyShundo: map.misc.enablePersonalShiny
+        ? { type: 'bool', perm: ['personalShiny'], category: 'filters' }
+        : undefined,
     },
     wayfarer: {
       clustering: { type: 'bool', perm: ['portals'], category: 'markers' },

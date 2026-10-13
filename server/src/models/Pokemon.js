@@ -25,7 +25,11 @@ const {
   getWildFilterKey,
 } = require('../filters/pokemon/getWildFilterKey')
 const { state } = require('../services/state')
-const { parsePlayerIds, toV3Filter } = require('../utils/personalShiny')
+const {
+  parsePlayerIds,
+  toV3Filter,
+  toShundoFilter,
+} = require('../utils/personalShiny')
 
 const GOLBAT_STATUS_TTL_MS = 5 * 60 * 1000
 
@@ -269,16 +273,20 @@ class Pokemon extends Model {
         : []
     const useV3 =
       annotateFor.length > 0 && (await this.supportsPersonalShiny(ctx))
+    // Shundos are personal shinies with 100% IV
+    const onlyShundo =
+      annotateFor.length > 0 && perms.iv && !!args.filters.onlyShundo
     const onlyPersonalShiny =
-      annotateFor.length > 0 && !!args.filters.onlyPersonalShiny
-    // Golbat applies shiny_for before its result limit, so zoomed out views
-    // aren't truncated by non shiny Pokémon
+      annotateFor.length > 0 && (onlyShundo || !!args.filters.onlyPersonalShiny)
+    // Golbat applies shiny_for and iv before its result limit, so zoomed out
+    // views aren't truncated by non shiny Pokémon
     const scanFilters = useV3
-      ? filters.map((filter) =>
-          onlyPersonalShiny
-            ? { ...toV3Filter(filter), shiny_for: annotateFor }
-            : toV3Filter(filter),
-        )
+      ? filters.flatMap((filter) => {
+          const v3Filter = toV3Filter(filter)
+          if (!onlyPersonalShiny) return [v3Filter]
+          const shinyFilter = onlyShundo ? toShundoFilter(v3Filter) : v3Filter
+          return shinyFilter ? [{ ...shinyFilter, shiny_for: annotateFor }] : []
+        })
       : filters
 
     /** @type {import("@rm/types").Pokemon[]} */
@@ -311,7 +319,10 @@ class Pokemon extends Model {
       // Without v3 support nothing can be known to be shiny
       results =
         useV3 && Array.isArray(results)
-          ? results.filter((pkmn) => pkmn.shiny_for?.length)
+          ? results.filter(
+              (pkmn) =>
+                pkmn.shiny_for?.length && (!onlyShundo || pkmn.iv === 100),
+            )
           : []
     }
 

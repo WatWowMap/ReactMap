@@ -27,6 +27,7 @@ import { basicPokemonMarker, fancyPokemonMarker } from './pokemonMarker'
 
 const INTERACTION_RANGE_COLOR = '#BA42F6'
 const PERSONAL_SHINY_GLOW = '#FFD700'
+const SHUNDO_GLOW = '#9B30FF'
 
 /**
  *
@@ -54,6 +55,7 @@ const BasePokemonTile = (pkmn) => {
 
   const opacity = useOpacity('pokemon')(pkmn.expire_timestamp)
   const isPersonalShiny = !!pkmn.shiny_for?.length
+  const isShundo = isPersonalShiny && pkmn.iv === 100
 
   const [
     showTimer,
@@ -80,11 +82,13 @@ const BasePokemonTile = (pkmn) => {
     } = s.userSettings.pokemon
     return [
       pokemonTimers,
-      isPersonalShiny
-        ? PERSONAL_SHINY_GLOW
-        : glow
-          ? getGlowStatus(pkmn, s.userSettings.pokemon)
-          : undefined,
+      isShundo
+        ? SHUNDO_GLOW
+        : isPersonalShiny
+          ? PERSONAL_SHINY_GLOW
+          : glow
+            ? getGlowStatus(pkmn, s.userSettings.pokemon)
+            : undefined,
       !!(ivCircles && pkmn.iv !== null && pkmn.iv >= minIvCircle),
       !!(levelCircles && pkmn.level !== null && pkmn.level >= minLevelCircle),
       !!(pkmn.weather && weatherIndicator),

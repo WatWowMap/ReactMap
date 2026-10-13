@@ -66,6 +66,7 @@ const trimFilters = (requestedFilters, userSettings, category, onlyAreas) => {
       category === 'pokemon' ? userSettings?.personalShinyIds : undefined,
     onlyPersonalShiny:
       category === 'pokemon' ? !!userSettings?.onlyPersonalShiny : undefined,
+    onlyShundo: category === 'pokemon' ? !!userSettings?.onlyShundo : undefined,
     onlyAreas: onlyAreas || [],
   }
   Object.entries(requestedFilters || {}).forEach((topLevelFilter) => {
