@@ -44,12 +44,13 @@ function planLink(current, other, platform) {
 
 /**
  * The session user after linking: still the logged in row, with the linked
- * ids and both platforms' perms
+ * ids and both platforms' perms. `linkedStrategies` lists every strategy whose
+ * perms the session holds, so a trial of either one ending clears it
  *
- * @template {{ perms: import('@rm/types').Permissions, username?: string }} T
- * @param {import('@rm/types').User} reqUser
+ * @template {{ perms: import('@rm/types').Permissions, username?: string, rmStrategy?: string }} T
+ * @param {import('@rm/types').User & { linkedStrategies?: string[] }} reqUser
  * @param {T} platformUser
- * @param {{ discordId?: string, telegramId?: string, webhookStrategy?: string }} linked
+ * @param {{ discordId?: string, telegramId?: string, webhookStrategy?: string, selectedWebhook?: string }} linked
  */
 function sessionUser(reqUser, platformUser, linked) {
   return {
@@ -58,6 +59,15 @@ function sessionUser(reqUser, platformUser, linked) {
     ...linked,
     username: reqUser.username || platformUser.username,
     perms: mergePerms(reqUser.perms, platformUser.perms),
+    linkedStrategies: [
+      ...new Set(
+        [
+          ...(reqUser.linkedStrategies || []),
+          reqUser.rmStrategy,
+          platformUser.rmStrategy,
+        ].filter(Boolean),
+      ),
+    ],
   }
 }
 
@@ -104,13 +114,14 @@ async function moveBadges(Badge, fromId, toId, trx) {
  *   platform: Platform,
  *   externalId: string,
  *   perms: import('@rm/types').Permissions,
+ *   selectedWebhook?: string,
  *   sessionId?: string,
  * }} options
- * @returns {Promise<LinkPlan & { linked?: { discordId?: string, telegramId?: string, webhookStrategy?: string } }>}
+ * @returns {Promise<LinkPlan & { linked?: { discordId?: string, telegramId?: string, webhookStrategy?: string, selectedWebhook?: string } }>}
  */
 async function linkAccount(
   { User, Badge, Backup, NestSubmission, Session },
-  { userId, platform, externalId, perms, sessionId },
+  { userId, platform, externalId, perms, selectedWebhook, sessionId },
 ) {
   const field = `${platform}Id`
   const otherPlatform = OTHER[platform]
@@ -139,6 +150,10 @@ async function linkAccount(
         current.webhookStrategy ||
         (current[otherField] ? otherPlatform : platform),
     }
+    // the linked platform may grant the first webhook this user has access to
+    if (!current.selectedWebhook && selectedWebhook) {
+      update.selectedWebhook = selectedWebhook
+    }
     if (merge) {
       if (!current.data && merge.data) update.data = merge.data
       await moveBadges(Badge, merge.id, current.id, trx)
@@ -158,6 +173,7 @@ async function linkAccount(
         discordId: update.discordId ?? current.discordId,
         telegramId: update.telegramId ?? current.telegramId,
         webhookStrategy: update.webhookStrategy,
+        selectedWebhook: update.selectedWebhook ?? current.selectedWebhook,
       },
     }
   })

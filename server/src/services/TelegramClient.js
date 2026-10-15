@@ -178,6 +178,7 @@ class TelegramClient extends AuthClient {
           platform: 'telegram',
           externalId: user.id,
           perms: user.perms,
+          selectedWebhook,
           sessionId: req.sessionID,
         })
         if (link.action === 'refuse') {
@@ -196,10 +197,7 @@ class TelegramClient extends AuthClient {
             'linked to user',
             req.user.id,
           )
-          return done(null, {
-            selectedWebhook,
-            ...sessionUser(req.user, user, link.linked),
-          })
+          return done(null, sessionUser(req.user, user, link.linked))
         }
       }
 

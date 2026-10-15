@@ -145,3 +145,23 @@ test('the session keeps the logged in row and gains the linked id', () => {
   assert.equal(user.perms.raids, true)
   assert.deepEqual([...user.perms.webhooks].sort(), ['a', 'b'])
 })
+
+test('the linked session lists both strategies for trial cleanup', () => {
+  const user = sessionUser(
+    { id: 1, rmStrategy: 'discord', perms: { donor: false, webhooks: [] } },
+    { rmStrategy: 'telegram', perms: { trial: true, webhooks: [] } },
+    {},
+  )
+  assert.equal(user.rmStrategy, 'discord')
+  assert.deepEqual(user.linkedStrategies, ['discord', 'telegram'])
+  assert.equal(user.perms.trial, true)
+})
+
+test('a null selected webhook does not hide the linked one', () => {
+  const user = sessionUser(
+    { id: 1, selectedWebhook: null, perms: { webhooks: [] } },
+    { perms: { webhooks: ['poracle'] } },
+    { selectedWebhook: 'poracle' },
+  )
+  assert.equal(user.selectedWebhook, 'poracle')
+})

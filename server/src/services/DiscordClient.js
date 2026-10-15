@@ -339,6 +339,7 @@ class DiscordClient extends AuthClient {
           platform: 'discord',
           externalId: discordUser.id,
           perms: discordUser.perms,
+          selectedWebhook,
           sessionId: req.sessionID,
         })
         if (link.action === 'refuse') {
@@ -357,10 +358,7 @@ class DiscordClient extends AuthClient {
             'linked to user',
             req.user.id,
           )
-          return done(null, {
-            selectedWebhook,
-            ...sessionUser(req.user, discordUser, link.linked),
-          })
+          return done(null, sessionUser(req.user, discordUser, link.linked))
         }
       }
 
