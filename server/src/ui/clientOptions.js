@@ -5,6 +5,20 @@ const {
   getQuestLayerMode,
 } = require('../utils/questLayerMode')
 
+// Keep in sync with src/services/alertSounds.js
+const ALERT_SOUNDS = [
+  'cry',
+  'chime',
+  'bell',
+  'ping',
+  'alert',
+  'fanfare',
+  'sonar',
+  'arcade',
+  'siren',
+  'none',
+]
+
 /** @param {import("@rm/types").Permissions} perms */
 function clientOptions(perms) {
   const clientSideOptions = config.getSafe('clientSideOptions')
@@ -453,7 +467,20 @@ function clientOptions(perms) {
         max: 100,
       },
       pokemon: { type: 'bool', perm: ['pokemon'] },
+      pokemonSound: {
+        type: 'select',
+        perm: ['pokemon'],
+        options: ALERT_SOUNDS,
+      },
       raids: { type: 'bool', perm: ['raids'] },
+      raidsSound: { type: 'select', perm: ['raids'], options: ALERT_SOUNDS },
+      // left out entirely without the feature, like showArBadge
+      personalShiny: perms.personalShiny
+        ? { type: 'bool', perm: ['personalShiny'] }
+        : undefined,
+      personalShinySound: perms.personalShiny
+        ? { type: 'select', perm: ['personalShiny'], options: ALERT_SOUNDS }
+        : undefined,
       // invasions: { type: 'bool', perm: ['invasions'] },
       // quests: { type: 'bool', perm: ['quests'] },
       // eventStops: { type: 'bool', perm: ['eventStops'] },

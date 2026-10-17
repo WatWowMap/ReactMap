@@ -22,6 +22,9 @@ import { analytics } from '@utils/analytics'
 export function useSendSearch(search, open) {
   const [options, setOptions] = useState([])
   const searchTab = useStorage((s) => s.searchTab)
+  // the user's own shinies / backgrounds are listed without a name too
+  const listsAll =
+    searchTab === 'personalShiny' || searchTab === 'personalBackground'
 
   const { i18n } = useTranslation()
   const { map } = useMapStore()
@@ -77,7 +80,7 @@ export function useSendSearch(search, open) {
 
   useEffect(() => {
     setOptions(
-      search
+      search || listsAll
         ? (
             (data || previousData)?.[
               searchTab === 'quests'
@@ -102,7 +105,7 @@ export function useSendSearch(search, open) {
     // This is just a reset upon initial open
     if (open && map) {
       map.closePopup()
-      if (search) sendToServer(search)
+      if (search || listsAll) sendToServer(search)
     }
   }, [open, map])
 
@@ -112,7 +115,7 @@ export function useSendSearch(search, open) {
   }, [searchTab])
 
   useEffect(() => {
-    if (search === '' && open) setOptions([])
+    if (search === '' && open && !listsAll) setOptions([])
   }, [search === '', open])
 
   return { loading, options, handleInputChange }

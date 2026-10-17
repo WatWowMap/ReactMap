@@ -87,6 +87,14 @@ export function Search() {
 
   const search = useStorage((s) => s.search)
   const isMobile = useMemory((s) => s.isMobile)
+  const searchTab = useStorage((s) => s.searchTab)
+  // the background search only finds something during background events
+  const noBackgrounds = useMemory(
+    (s) => searchTab === 'personalBackground' && !s.auth.personalBackgrounds,
+  )
+  // the user's own shinies / backgrounds are listed without a name too
+  const listsAll =
+    searchTab === 'personalShiny' || searchTab === 'personalBackground'
   const open = useLayoutStore((s) => s.search)
 
   const { loading, options, handleInputChange } = useSendSearch(search, open)
@@ -121,13 +129,15 @@ export function Search() {
       <Box width={BOX_WIDTH}>
         <Header titles="search" action={handleClose} />
         <Autocomplete
-          freeSolo={!search.length}
+          freeSolo={!search.length && !listsAll}
           inputValue={search}
           onInputChange={handleInputChange}
           options={options}
           loading={loading}
           loadingText={t('searching')}
-          noOptionsText={t('no_options')}
+          noOptionsText={t(
+            noBackgrounds ? 'personal_background_none' : 'no_options',
+          )}
           renderInput={(params) => renderInput(params, inputRef)}
           {...STATIC_PROPS}
         />

@@ -194,6 +194,9 @@ type Pokemon {
   first_seen_timestamp: Int
   expire_timestamp_verified: Boolean
   updated: Int
+  personal_shiny: [String]
+  personal_background: [String]
+  personal_background_id: Int
 }
 
 type Portal {

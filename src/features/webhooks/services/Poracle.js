@@ -3,7 +3,37 @@ import { t } from 'i18next'
 
 import { useWebhookStore } from '@store/useWebhookStore'
 
+/**
+ * The personal shiny condition is the lowest bit of PoracleNG's `personal`
+ * @param {unknown} personal
+ */
+const hasPersonalShiny = (personal) =>
+  Math.floor(Math.abs(Number(personal) || 0)) % 2 === 1
+
+/**
+ * @param {unknown} personal
+ * @param {boolean} shiny
+ */
+const withPersonalShiny = (personal, shiny) => {
+  const value = Math.floor(Math.abs(Number(personal) || 0))
+  return value - (hasPersonalShiny(value) ? 1 : 0) + (shiny ? 1 : 0)
+}
+
 export class Poracle {
+  /**
+   * The values of a saved rule for the dialog: the personal shiny switch is
+   * read from PoracleNG's `personal` bits
+   * @template {Record<string, any>} T
+   * @param {T} values
+   * @returns {T}
+   */
+  static withSwitches(values) {
+    if (!values || values.personal === undefined || values.personal === null) {
+      return values
+    }
+    return { ...values, personalShiny: hasPersonalShiny(values.personal) }
+  }
+
   static getMapCategory(poracleCategory) {
     switch (poracleCategory) {
       case 'gym':
@@ -192,6 +222,7 @@ export class Poracle {
       'xl',
       'allForms',
       'pvpEntry',
+      'personalShiny',
     ]
     const dupes = {}
     switch (category) {
@@ -294,6 +325,14 @@ export class Poracle {
                 (newPokemon[field] =
                   pkmn[field] === undefined ? defaults[field] : pkmn[field]),
             )
+            // only Poracle versions that support it have the switch
+            const personalShiny = pkmn.personalShiny ?? defaults.personalShiny
+            if (personalShiny !== undefined) {
+              newPokemon.personal = withPersonalShiny(
+                pkmn.personal,
+                personalShiny,
+              )
+            }
             return newPokemon
           })
           .filter((pokemon) => pokemon)
@@ -369,7 +408,7 @@ export class Poracle {
           item.distance ? ` | d${item.distance}` : ''
         }`
       case 'pokemon':
-        return `${
+        return `${hasPersonalShiny(item.personal) ? ' ✨ ' : ''}${
           item.pokemon_id
             ? ` ${t(`poke_${item.pokemon_id}`)} | `
             : ` ${t('poke_global')} | `

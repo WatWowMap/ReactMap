@@ -12,6 +12,7 @@ const { areaPerms } = require('../utils/areaPerms')
 const { webhookPerms } = require('../utils/webhookPerms')
 const { scannerPerms, scannerCooldownBypass } = require('../utils/scannerPerms')
 const { mergePerms } = require('../utils/mergePerms')
+const { personalShinyLimits } = require('../utils/personalShinyLimits')
 const { getUserDisplayName } = require('../utils/getUserDisplayName')
 const { isOAuthStrategy } = require('../utils/getTelegramStrategy')
 const { AuthClient } = require('./AuthClient')
@@ -135,6 +136,8 @@ class TelegramClient extends AuthClient {
         webhooks: webhookPerms(groups, 'telegramGroups', trialActive),
         scanner: scannerPerms(groups, 'telegramGroups', trialActive),
         scannerCooldownBypass: scannerCooldownBypass(groups, 'telegramGroups'),
+        // a limit can also be set for a single user by their id
+        personalShinyLimits: personalShinyLimits([...groups, `${user.id}`]),
       },
     }
     if (newUserObj.perms.trial) {

@@ -21,6 +21,7 @@ import Box from '@mui/material/Box'
 import { useMemory } from '@store/useMemory'
 import { useStorage } from '@store/useStorage'
 import { Query } from '@services/queries'
+import { getSyncMeta, pauseSync, setSyncMeta } from '@hooks/useSettingsSync'
 
 export function UserBackups() {
   const { t } = useTranslation()
@@ -157,7 +158,11 @@ function BackupItem({ backup }) {
     if (fullBackup?.backup?.data) {
       try {
         setLoading(true)
+        pauseSync()
+        const syncMeta = getSyncMeta()
         localStorage.clear()
+        // the loaded backup replaces the synced settings on other browsers too
+        setSyncMeta({ ...syncMeta, dirty: true })
         localStorage.setItem(
           'local-state',
           JSON.stringify({
