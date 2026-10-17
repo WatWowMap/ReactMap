@@ -8,6 +8,7 @@ import { useMapStore } from '@store/useMapStore'
 import { ScanOnDemand } from '@features/scanner'
 import { WebhookMarker, WebhookAreaSelection } from '@features/webhooks'
 import { timeCheck } from '@utils/timeCheck'
+import { useSettingsSync } from '@hooks/useSettingsSync'
 
 import { Effects } from './Effects'
 import { DataView } from './Data'
@@ -36,6 +37,7 @@ const MAX_BOUNDS = /** @type {[[number, number], [number, number]]} */ ([
 
 export function Container() {
   const { location, zoom } = useStorage.getState()
+  useSettingsSync()
 
   return (
     <MapContainer

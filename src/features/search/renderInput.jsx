@@ -1,5 +1,6 @@
 // @ts-check
 import * as React from 'react'
+import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome'
 import Divider from '@mui/material/Divider'
 import IconButton from '@mui/material/IconButton'
 import Menu from '@mui/material/Menu'
@@ -16,6 +17,8 @@ import { useMemory } from '@store/useMemory'
 import { useStorage } from '@store/useStorage'
 import { SEARCHABLE } from '@services/queries/config'
 import { Img } from '@components/Img'
+import { fromSearchCategory } from '@utils/fromSearchCategory'
+import { BACKGROUND_STARS } from '@assets/constants'
 
 const SearchImage = React.memo(
   /** @param {{ name: string }} props */ ({ name }) => {
@@ -24,10 +27,25 @@ const SearchImage = React.memo(
     const darkMode = useStorage((s) => s.darkMode)
     const Icons = useMemory((s) => s.Icons)
 
+    // the three small blue stars the game marks special backgrounds with
+    if (name === 'personalBackground') {
+      return (
+        <AutoAwesomeIcon
+          titleAccess={t(name)}
+          sx={{ fontSize: 20, color: BACKGROUND_STARS }}
+        />
+      )
+    }
     return (
       <Img
-        className={darkMode ? '' : 'darken-image'}
-        src={Icons.getMisc(name)}
+        className={
+          darkMode || name.startsWith('personal') ? '' : 'darken-image'
+        }
+        src={
+          name === 'personalShiny'
+            ? Icons.getMisc('sparkles')
+            : Icons.getMisc(fromSearchCategory(name))
+        }
         alt={t(name)}
         maxWidth={20}
         maxHeight={20}

@@ -20,6 +20,7 @@ import { StatusIcon } from '@components/StatusIcon'
 import { Title } from '@components/popups/Title'
 
 import { getTimeUntil } from '@utils/getTimeUntil'
+import { hideItem } from '@utils/hideItem'
 import { getTappableDisplaySettings } from './displayRules'
 
 /**
@@ -106,11 +107,8 @@ export function TappablePopup({ tappable, rewardIcon }) {
 
   const handleHide = React.useCallback(() => {
     setMenuAnchorEl(null)
-    if (tappable.id === undefined || tappable.id === null) return
-    useMemory.setState((prev) => ({
-      hideList: new Set(prev.hideList).add(tappable.id),
-    }))
-  }, [tappable.id])
+    hideItem(tappable.id, tappable.expire_timestamp)
+  }, [tappable.id, tappable.expire_timestamp])
 
   const handleExclude = React.useCallback(() => {
     setMenuAnchorEl(null)

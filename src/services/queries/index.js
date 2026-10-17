@@ -168,6 +168,9 @@ export class Query {
       case 'invasions':
       case 'pokemon':
         return searchIndex[category.toUpperCase()]
+      case 'personalShiny':
+      case 'personalBackground':
+        return searchIndex.POKEMON
       case 'webhook':
         return searchIndex.POI_WEBHOOK
       case 'stations':

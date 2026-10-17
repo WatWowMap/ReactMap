@@ -26,6 +26,12 @@ export const SET_GYM_BADGE = gql`
   }
 `
 
+export const SET_PERSONAL_SHINY = gql`
+  mutation SetPersonalShiny($players: JSON) {
+    setPersonalShiny(players: $players)
+  }
+`
+
 export const SET_EXTRA_FIELDS = gql`
   mutation SetExtraFields($key: String, $value: String) {
     setExtraFields(key: $key, value: $value)
@@ -61,6 +67,24 @@ export const CREATE_BACKUP = gql`
 export const UPDATE_BACKUP = gql`
   mutation UpdateBackup($backup: BackupUpdate!) {
     updateBackup(backup: $backup)
+  }
+`
+
+export const GET_SETTINGS_SYNC = gql`
+  query GetSettingsSync($withData: Boolean) {
+    settingsSync(withData: $withData) {
+      rev
+      data
+    }
+  }
+`
+
+export const SET_SETTINGS_SYNC = gql`
+  mutation SetSettingsSync($data: JSON, $baseRev: Float) {
+    setSettingsSync(data: $data, baseRev: $baseRev) {
+      rev
+      conflict
+    }
   }
 `
 

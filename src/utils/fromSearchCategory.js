@@ -15,6 +15,9 @@ export function fromSearchCategory(searchCategory) {
     case 'gyms':
     case 'raids':
       return 'gyms'
+    case 'personalShiny':
+    case 'personalBackground':
+      return 'pokemon'
     default:
       return searchCategory
   }

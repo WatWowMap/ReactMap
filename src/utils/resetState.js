@@ -1,6 +1,10 @@
 // @ts-check
 import { useMemory } from '@store/useMemory'
 import { useStorage } from '@store/useStorage'
+import { SETTINGS_SYNC_KEY, markSyncDirty } from '@hooks/useSettingsSync'
+
+// resets also run outside the map (the data page, /reset), where nothing
+// notices the change, so they are marked to be saved for synced settings
 
 /** @param {keyof import('@store/useStorage').UseStorage & keyof import('@store/useMemory').UseMemory} key */
 const resetState = (key) => {
@@ -22,12 +26,14 @@ const resetState = (key) => {
           )
         : structuredClone(state),
   })
+  markSyncDirty()
 }
 
 /** @param {'Audio' | 'Icons'} key */
 const resetAssets = (key) => {
   useMemory.setState({ [key]: null })
   useStorage.setState({ [key.toLowerCase()]: {} })
+  markSyncDirty()
 }
 
 export const resetSettings = () => resetState('settings')
@@ -42,7 +48,7 @@ export const resetIcons = () => resetAssets('Icons')
 
 export const resetAudio = () => resetAssets('Audio')
 
-export const resetUI = () =>
+export const resetUI = () => {
   useStorage.setState({
     holidayEffects: {},
     enhancedGraphics: true,
@@ -59,6 +65,8 @@ export const resetUI = () =>
     stateTraceLog: false,
     darkMode: !!window?.matchMedia('(prefers-color-scheme: dark)').matches,
   })
+  markSyncDirty()
+}
 
 export const resetLocation = () => {
   const { config } = useMemory.getState()
@@ -66,6 +74,7 @@ export const resetLocation = () => {
     location: [config.general.startLat || 0, config.general.startLon || 0],
     zoom: config.general.startZoom || 18,
   })
+  markSyncDirty()
 }
 
 export const resetAllGeneral = () => {
@@ -84,11 +93,16 @@ export const resetFilter = (key) => {
   useStorage.setState((prev) => ({
     filters: { ...prev.filters, [key]: structuredClone(reference) },
   }))
+  markSyncDirty()
 }
 
 export const hardReset = () => {
+  // the sync state survives, so the reset is saved instead of the old
+  // settings being loaded back from the server
+  const sync = localStorage.getItem(SETTINGS_SYNC_KEY)
   localStorage.clear()
   sessionStorage.clear()
+  if (sync) localStorage.setItem(SETTINGS_SYNC_KEY, sync)
   resetAllGeneral()
   resetFilters()
 }

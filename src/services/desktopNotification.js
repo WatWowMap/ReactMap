@@ -7,6 +7,8 @@ import { SimpleTTLCache } from '@services/SimpleTTLCache'
 import { useMapStore } from '@store/useMapStore'
 import { setLongTimeout } from '@utils/setLongTimeout'
 
+import { playSynth } from './alertSounds'
+
 export const HAS_API = 'Notification' in window
 const cache = new SimpleTTLCache(1000 * 60 * 60)
 let isAudioPlaying = false
@@ -30,12 +32,45 @@ export async function requestPermission() {
 }
 
 /**
+ * Plays the chosen notification sound. `cry` plays the given audio url (the
+ * Pokémon cry); other values are built-in synthesised sounds.
+ *
+ * @param {string} sound
+ * @param {string} [cryUrl]
+ * @param {number} [volume] 0-1
+ */
+export function playAlertSound(sound, cryUrl, volume = 0.5) {
+  if (isAudioPlaying || sound === 'none') return
+  if (sound !== 'cry') {
+    isAudioPlaying = true
+    playSynth(sound, volume).then(() => {
+      isAudioPlaying = false
+    })
+    return
+  }
+  if (!cryUrl) return
+  isAudioPlaying = true
+  const cry = new Audio(cryUrl)
+  cry.volume = volume
+  cry.addEventListener('ended', () => {
+    isAudioPlaying = false
+  })
+  const isPlaying = cry.play()
+  if (isPlaying !== undefined) {
+    isPlaying.catch(() => {
+      isAudioPlaying = false
+    })
+  }
+}
+
+/**
  * @typedef {import('@rm/types').Config['clientSideOptions']['notifications']} RMNotificationOptions
  *
  * @param {string} key
  * @param {string} title
- * @param {keyof Omit<RMNotificationOptions, 'enabled' | 'audio' | 'audioAlwaysOn' | 'volumeLevel'>} category
- * @param {NotificationOptions & { lat?: number, lon?: number, expire?: number, audio?: string }} [options]
+ * @param {keyof Omit<RMNotificationOptions, 'enabled' | 'audio' | 'audioAlwaysOn' | 'volumeLevel' | 'pokemonSound' | 'raidsSound' | 'personalShinySound'>} category
+ * @param {NotificationOptions & { lat?: number, lon?: number, expire?: number, audio?: string, manualId?: string | number }} [options]
+ * `manualId` is the item to open on click when `key` is not its id
  */
 export function sendNotification(key, title, category, options) {
   if (cache.has(key) || !canConstructNotification) return
@@ -79,7 +114,8 @@ export function sendNotification(key, title, category, options) {
           const { map } = useMapStore.getState()
           useMemory.setState({
             manualParams: {
-              category,
+              // personal shinies are Pokémon on the map
+              category: category === 'personalShiny' ? 'pokemon' : category,
               id: manualId ?? key,
             },
           })
@@ -95,24 +131,14 @@ export function sendNotification(key, title, category, options) {
       }
 
       if (
-        audio &&
         userSettings.audio &&
         (userSettings.audioAlwaysOn ? true : !document.hasFocus())
       ) {
-        if (!isAudioPlaying) {
-          isAudioPlaying = true
-          const cry = new Audio(audio)
-          cry.volume = userSettings.volumeLevel / 100
-          cry.addEventListener('ended', () => {
-            isAudioPlaying = false
-          })
-          const isPlaying = cry.play()
-          if (isPlaying !== undefined) {
-            isPlaying.catch(() => {
-              isAudioPlaying = false
-            })
-          }
-        }
+        playAlertSound(
+          userSettings[`${category}Sound`] || 'cry',
+          audio,
+          userSettings.volumeLevel / 100,
+        )
       }
     }
   }
