@@ -9,6 +9,7 @@ const { areaPerms } = require('../utils/areaPerms')
 const { webhookPerms } = require('../utils/webhookPerms')
 const { scannerPerms, scannerCooldownBypass } = require('../utils/scannerPerms')
 const { mergePerms } = require('../utils/mergePerms')
+const { personalShinyLimits } = require('../utils/personalShinyLimits')
 const { AuthClient } = require('./AuthClient')
 const { state } = require('./state')
 
@@ -48,6 +49,7 @@ class LocalClient extends AuthClient {
         webhooks: [],
         scanner: [],
         scannerCooldownBypass: [],
+        personalShinyLimits: personalShinyLimits(['local']),
       }),
       rmStrategy: this.rmStrategy,
     }
@@ -113,6 +115,10 @@ class LocalClient extends AuthClient {
               user.perms = {
                 ...user.perms,
                 ...this.getPerms(trialActive, user.status),
+                personalShinyLimits: personalShinyLimits([
+                  'local',
+                  user.status,
+                ]),
               }
 
               webhookPerms([user.status], 'local', trialActive).forEach((x) =>

@@ -1,6 +1,7 @@
 // @ts-check
 import * as React from 'react'
 import { useLazyQuery } from '@apollo/client'
+import AutoAwesome from '@mui/icons-material/AutoAwesome'
 import ExpandMore from '@mui/icons-material/ExpandMore'
 import MoreVert from '@mui/icons-material/MoreVert'
 import Grid from '@mui/material/Unstable_Grid2'
@@ -34,6 +35,9 @@ import { usePokemonBackgroundVisual } from '@hooks/usePokemonBackgroundVisuals'
 import { BackgroundCard } from '@components/popups/BackgroundCard'
 import { getFormDisplay } from '@utils/getFormDisplay'
 import { getWildFilterId } from '@utils/getWildFilterId'
+import { hideItem } from '@utils/hideItem'
+import { BACKGROUND_STARS } from '@assets/constants'
+import { formatIv } from '@utils/formatIv'
 
 const rowClass = { width: 30, fontWeight: 'bold' }
 
@@ -228,7 +232,7 @@ export function PokemonPopup({ pokemon, iconUrl, isTutorial = false }) {
 
   useAnalytics(
     'Popup',
-    `ID: ${pokemon.pokemon_id} IV: ${pokemon.iv}% PVP: #${pokemon.bestPvp}`,
+    `ID: ${pokemon.pokemon_id} IV: ${formatIv(pokemon.iv)}% PVP: #${pokemon.bestPvp}`,
     'Pokemon',
   )
 
@@ -247,6 +251,29 @@ export function PokemonPopup({ pokemon, iconUrl, isTutorial = false }) {
         userSettings={userSettings}
         isTutorial={isTutorial}
       />
+      {!!pokemon.personal_shiny?.length && (
+        <Grid xs={12} textAlign="center">
+          <Typography variant="subtitle2" color="#c79a00">
+            ✨{' '}
+            {t('personal_shiny_for', {
+              names: pokemon.personal_shiny.join(', '),
+            })}
+          </Typography>
+        </Grid>
+      )}
+      {!!pokemon.personal_background?.length && (
+        <Grid xs={12} textAlign="center">
+          <Typography variant="subtitle2" color={BACKGROUND_STARS}>
+            <AutoAwesome
+              fontSize="inherit"
+              sx={{ verticalAlign: 'text-bottom' }}
+            />{' '}
+            {t('personal_background_for', {
+              names: pokemon.personal_background.join(', '),
+            })}
+          </Typography>
+        </Grid>
+      )}
       {pokemon.seen_type !== 'encounter' && (
         <Grid xs={12} textAlign="center">
           <Typography
@@ -359,7 +386,7 @@ const Header = ({ pokemon, metaData, iconUrl, userSettings, isTutorial }) => {
 
   const handleHide = () => {
     setAnchorEl(null)
-    useMemory.setState((prev) => ({ hideList: new Set(prev.hideList).add(id) }))
+    hideItem(id, pokemon.expire_timestamp)
   }
 
   const handleExclude = () => {
@@ -456,7 +483,7 @@ const Stats = ({ pokemon }) => {
       {iv !== null && (
         <Grid>
           <Typography variant="h5" align="center" color={getColor(iv)}>
-            {iv.toFixed(2)}
+            {formatIv(iv)}
             {t('%')}
           </Typography>
         </Grid>

@@ -298,6 +298,13 @@ const applyMutations = (config) => {
       : undefined,
   })
 
+  // the personal shiny player limits name roles too
+  const shinyLimits = config.authentication.perms.personalShiny?.limits
+  if (Array.isArray(shinyLimits)) {
+    config.authentication.perms.personalShiny.limits = shinyLimits.map(
+      (limit) => ({ ...limit, roles: replaceRoleArray(limit?.roles) || [] }),
+    )
+  }
   Object.keys(config.authentication.perms).forEach((perm) => {
     config.authentication.perms[perm].roles =
       config.authentication.perms[perm].roles.flatMap(replaceAliases)

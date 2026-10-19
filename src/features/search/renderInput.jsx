@@ -1,5 +1,6 @@
 // @ts-check
 import * as React from 'react'
+import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome'
 import Divider from '@mui/material/Divider'
 import IconButton from '@mui/material/IconButton'
 import Menu from '@mui/material/Menu'
@@ -16,6 +17,8 @@ import { useMemory } from '@store/useMemory'
 import { useStorage } from '@store/useStorage'
 import { SEARCHABLE } from '@services/queries/config'
 import { Img } from '@components/Img'
+import { BACKGROUND_STARS } from '@assets/constants'
+import { useHasShinyPlayers } from '@hooks/usePersonalShiny'
 
 const SearchImage = React.memo(
   /** @param {{ name: string }} props */ ({ name }) => {
@@ -24,10 +27,21 @@ const SearchImage = React.memo(
     const darkMode = useStorage((s) => s.darkMode)
     const Icons = useMemory((s) => s.Icons)
 
+    // the three small blue stars the game marks special backgrounds with
+    if (name === 'personalBackground') {
+      return (
+        <AutoAwesomeIcon
+          titleAccess={t(name)}
+          sx={{ fontSize: 20, color: BACKGROUND_STARS }}
+        />
+      )
+    }
     return (
       <Img
-        className={darkMode ? '' : 'darken-image'}
-        src={Icons.getMisc(name)}
+        className={
+          darkMode || `${name}`.startsWith('personal') ? '' : 'darken-image'
+        }
+        src={Icons.getMisc(name === 'personalShiny' ? 'sparkles' : name)}
         alt={t(name)}
         maxWidth={20}
         maxHeight={20}
@@ -79,9 +93,22 @@ export function renderInput({ InputProps, ...props }, inputRef) {
 
   const searchTab = useStorage((s) => s.searchTab)
 
-  const { data } = useQuery(SEARCHABLE, {
+  const { data: queried } = useQuery(SEARCHABLE, {
     fetchPolicy: 'cache-first',
   })
+  // the personal tabs only with active players, like the rest of personal
+  // shiny; the server returns nothing for them otherwise
+  const hasShinyPlayers = useHasShinyPlayers()
+  const data = React.useMemo(
+    () =>
+      queried && {
+        ...queried,
+        searchable: (queried.searchable || []).filter(
+          (option) => hasShinyPlayers || !`${option}`.startsWith('personal'),
+        ),
+      },
+    [queried, hasShinyPlayers],
+  )
 
   const [anchorEl, setAnchorEl] = React.useState(null)
 

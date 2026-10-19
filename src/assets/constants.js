@@ -6,6 +6,15 @@ export const XXS_XXL = /** @type {const} */ (['xxs', 'xxl'])
 
 export const NUNDO_HUNDO = /** @type {const} */ (['zeroIv', 'hundoIv'])
 
+// the blue of the stars the game marks special backgrounds with
+export const BACKGROUND_STARS = '#4fc3f7'
+
+// the personal background quick select fills the left half of a row
+export const PERSONAL_BACKGROUND = /** @type {const} */ ([
+  'personalBackground',
+  '',
+])
+
 export const ENUM_GENDER = /** @type {const} */ ([0, 1, 2, 3])
 
 export const ENUM_BADGES = /** @type {const} */ ([0, 1, 2, 3, 4])
@@ -67,7 +76,13 @@ export const FILTER_SKIP_LIST = [
   'selectionDefaults',
 ]
 
-export const ALWAYS_EXCLUDED = new Set(['donor', 'blockedGuildNames', 'admin'])
+// personalShinyLimits is an internal list of numbers (the matched limits), not a permission
+export const ALWAYS_EXCLUDED = new Set([
+  'donor',
+  'blockedGuildNames',
+  'admin',
+  'personalShinyLimits',
+])
 
 export const SCAN_MODES = ['confirmed', 'loading', 'error']
 

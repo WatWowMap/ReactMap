@@ -25,6 +25,14 @@
       "time": 60,
       "requests": 1000
     },
+    "playerIdLookup": {
+      "url": "https://playerid.mew.is",
+      "apiKey": ""
+    },
+    "shinyRates": {
+      "url": "",
+      "timezone": ""
+    },
     "polling": {
       "devices": 10,
       "gyms": 10,
@@ -49,7 +57,9 @@
       "nests": true,
       "pokemon": true,
       "invasions": true,
-      "stations": true
+      "stations": true,
+      "personalShiny": true,
+      "personalBackground": true
     },
     "queryUpdateHours": {
       "pokemon": 0.17,
@@ -427,6 +437,12 @@
       "spacialRendRange": false,
       "glow": [
         {
+          "name": "Personal Shiny",
+          "perm": "personalShiny",
+          "value": "#ffd700",
+          "op": "shiny"
+        },
+        {
           "name": "Hundo",
           "perm": "iv",
           "num": 100,
@@ -437,7 +453,7 @@
           "name": "Nundo",
           "perm": "iv",
           "num": 0,
-          "value": "#000000",
+          "value": "#00e5ff",
           "op": "="
         },
         {
@@ -492,7 +508,11 @@
       "audioAlwaysOn": false,
       "volumeLevel": 50,
       "pokemon": false,
-      "raids": false
+      "pokemonSound": "cry",
+      "raids": false,
+      "raidsSound": "cry",
+      "personalShiny": false,
+      "personalShinySound": "chime"
     }
   },
   "defaultFilters": {
@@ -898,6 +918,19 @@
         "enabled": true,
         "trialPeriodEligible": false,
         "roles": []
+      },
+      "personalShiny": {
+        "enabled": false,
+        "trialPeriodEligible": false,
+        "roles": [],
+        "limits": [],
+        "defaultMax": 1,
+        "golbat": true,
+        "showPlayerId": false,
+        "changeLimit": {
+          "changes": 1,
+          "hours": 24
+        }
       },
       "backups": {
         "enabled": true,

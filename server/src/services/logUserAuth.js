@@ -2,6 +2,8 @@
 const { default: fetch } = require('node-fetch')
 const { log, TAGS } = require('@rm/logger')
 
+const { getPersonalShinyMax } = require('../utils/personalShinyLimits')
+
 // PII fields inside getAuthInfo embed
 const PII_FIELDS = [
   'Ip Address',
@@ -118,7 +120,12 @@ async function logUserAuth(req, user, strategy = 'custom', hidePii = false) {
       },
       {
         name: 'Pokemon',
-        value: mapPerms(['pokemon', 'iv', 'pvp'], user.perms),
+        // with how many players the user may save for personal shiny
+        value: `${mapPerms(['pokemon', 'iv', 'pvp', 'personalShiny'], user.perms)}${
+          user.perms.personalShiny
+            ? ` (max ${getPersonalShinyMax(user.perms)})`
+            : ''
+        }`,
         inline: true,
       },
       {

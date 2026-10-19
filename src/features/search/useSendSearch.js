@@ -1,5 +1,5 @@
 // @ts-check
-import { useState, useCallback, useMemo, useEffect } from 'react'
+import { useState, useCallback, useMemo, useEffect, useRef } from 'react'
 import { useLazyQuery } from '@apollo/client'
 import { useTranslation } from 'react-i18next'
 import { debounce } from 'lodash'
@@ -22,6 +22,9 @@ import { analytics } from '@utils/analytics'
 export function useSendSearch(search, open) {
   const [options, setOptions] = useState([])
   const searchTab = useStorage((s) => s.searchTab)
+  // the user's own shinies / backgrounds are listed without a name too
+  const listsAll =
+    searchTab === 'personalShiny' || searchTab === 'personalBackground'
 
   const { i18n } = useTranslation()
   const { map } = useMapStore()
@@ -77,7 +80,7 @@ export function useSendSearch(search, open) {
 
   useEffect(() => {
     setOptions(
-      search
+      search || listsAll
         ? (
             (data || previousData)?.[
               searchTab === 'quests'
@@ -102,7 +105,7 @@ export function useSendSearch(search, open) {
     // This is just a reset upon initial open
     if (open && map) {
       map.closePopup()
-      if (search) sendToServer(search)
+      if (search || listsAll) sendToServer(search)
     }
   }, [open, map])
 
@@ -112,8 +115,20 @@ export function useSendSearch(search, open) {
   }, [searchTab])
 
   useEffect(() => {
-    if (search === '' && open) setOptions([])
+    if (search === '' && open && !listsAll) setOptions([])
   }, [search === '', open])
+
+  // the personal tabs list everything without a search text: clearing the
+  // text (the clear button doesn't type) asks for all of them again
+  const lastSearch = useRef(search)
+  useEffect(() => {
+    if (lastSearch.current && search === '' && open && listsAll) {
+      // a typed search still waiting would be sent after this one
+      debounceChange.cancel()
+      sendToServer('')
+    }
+    lastSearch.current = search
+  }, [search])
 
   return { loading, options, handleInputChange }
 }

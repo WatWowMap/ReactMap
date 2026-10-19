@@ -18,6 +18,9 @@ const core = gql`
     display_pokemon_id
     seen_type
     background
+    personal_shiny
+    personal_background
+    personal_background_id
   }
 `
 

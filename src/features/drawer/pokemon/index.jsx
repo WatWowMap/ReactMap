@@ -14,6 +14,7 @@ import { StringFilterMemo } from '@components/filters/StringFilter'
 import { TabPanel } from '@components/TabPanel'
 import { BasicListButton } from '@components/inputs/BasicListButton'
 import { BoolToggle } from '@components/inputs/BoolToggle'
+import { useHasShinyPlayers } from '@hooks/usePersonalShiny'
 
 import { SelectorListMemo } from '../components/SelectorList'
 import { PokemonTabPanel } from './PokemonTab'
@@ -24,6 +25,11 @@ function PokemonDrawer() {
   const filterMode = useStorage((s) => s.getPokemonFilterMode())
   const [openTab, setOpenTab] = useDeepStore(`tabs.pokemon`, 0)
   const ui = useMemory((s) => s.ui.pokemon)
+  const hasShinyPlayers = useHasShinyPlayers()
+  // kept visible while on, so it can always be turned off again
+  const exclusiveOn = useStorage(
+    (s) => !!s.filters?.pokemon?.personalShinyExclusive,
+  )
 
   /** @type {import('@mui/material').TabsProps['onChange']} */
   const handleTabChange = React.useCallback(
@@ -34,6 +40,12 @@ function PokemonDrawer() {
   return (
     <>
       <BoolToggle field="filters.pokemon.enabled" label="enabled" />
+      {ui.personalShiny && (hasShinyPlayers || exclusiveOn) && (
+        <BoolToggle
+          field="filters.pokemon.personalShinyExclusive"
+          label="only_personal_shiny"
+        />
+      )}
       <PokemonModeSelector />
       <Collapse in={filterMode === 'intermediate'}>
         <BoolToggle

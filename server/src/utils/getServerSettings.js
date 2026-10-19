@@ -5,6 +5,9 @@ const { clientOptions } = require('../ui/clientOptions')
 const { advMenus } = require('../ui/advMenus')
 const { drawer } = require('../ui/drawer')
 const { isTelegramOAuth } = require('./getTelegramStrategy')
+const { getPersonalShinyMax } = require('./personalShinyLimits')
+const playerIdLookup = require('../services/playerIdLookup')
+const personalShiny = require('../services/personalShiny')
 
 /**
  *
@@ -17,6 +20,15 @@ function getServerSettings(req) {
       loggedIn: !!req.user,
       cooldown: req.session?.cooldown || 0,
     })
+  user.personalShinyMax = getPersonalShinyMax(user.perms)
+  // friend codes are turned into player ids by the server
+  user.personalShinyLookup = playerIdLookup.enabled()
+  // whether the player id behind a friend code is shown in the profile
+  user.personalShinyShowId = !!config.getSafe(
+    'authentication.perms.personalShiny.showPlayerId',
+  )
+  // whether the rates have backgrounds that can be predicted right now
+  user.personalBackgrounds = personalShiny.backgroundsKnown()
 
   const { clientValues, clientMenus } = clientOptions(user.perms)
 

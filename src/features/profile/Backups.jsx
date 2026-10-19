@@ -21,6 +21,12 @@ import Box from '@mui/material/Box'
 import { useMemory } from '@store/useMemory'
 import { useStorage } from '@store/useStorage'
 import { Query } from '@services/queries'
+import {
+  getSyncMeta,
+  pauseSync,
+  resumeSync,
+  setSyncMeta,
+} from '@hooks/useSettingsSync'
 
 export function UserBackups() {
   const { t } = useTranslation()
@@ -155,8 +161,10 @@ function BackupItem({ backup }) {
 
   React.useEffect(() => {
     if (fullBackup?.backup?.data) {
+      const syncMeta = getSyncMeta()
       try {
         setLoading(true)
+        pauseSync()
         localStorage.clear()
         localStorage.setItem(
           'local-state',
@@ -167,11 +175,18 @@ function BackupItem({ backup }) {
                 : fullBackup.backup.data,
           }),
         )
+        // the loaded backup replaces the synced settings on other browsers
+        // too; only once it is in place, so a failed load can't do that
+        setSyncMeta({ ...syncMeta, dirty: true, takeOver: true })
         localStorage.setItem('last-loaded', fullBackup.backup.name)
         setTimeout(() => window.location.reload(), 1500)
       } catch (e) {
         // eslint-disable-next-line no-console
         console.error(e)
+        // the load failed after the stored settings were cleared: the synced
+        // copy is loaded again next time instead of being overwritten
+        setSyncMeta({ rev: 0, dirty: false })
+        resumeSync()
         setLoading(false)
       } finally {
         setLoading(false)

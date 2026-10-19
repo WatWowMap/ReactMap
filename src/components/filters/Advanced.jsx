@@ -1,5 +1,6 @@
 // @ts-check
 import * as React from 'react'
+import Box from '@mui/material/Box'
 import Grid2 from '@mui/material/Unstable_Grid2'
 import Dialog from '@mui/material/Dialog'
 import DialogContent from '@mui/material/DialogContent'
@@ -18,12 +19,17 @@ import { useTranslateById } from '@hooks/useTranslateById'
 import { STANDARD_BACKUP, applyToAll } from '@utils/applyToAll'
 import { checkIfHasAll } from '@utils/hasAll'
 import { useAnalytics } from '@hooks/useAnalytics'
+import { useHasShinyPlayers } from '@hooks/usePersonalShiny'
 
 import { StringFilter } from './StringFilter'
 import { SliderTile } from '../inputs/SliderTile'
 import { Size } from './Size'
 import { GenderListItem } from './Gender'
 import { QuestConditionSelector } from './QuestConditions'
+import { PersonalShinyFilter } from './PersonalShiny'
+
+// the only shiny toggle fills the left half of a row of two
+const SHINY_ONLY = /** @type {const} */ (['personal_shiny_only', ''])
 
 export function AdvancedFilter() {
   const { category, id, selectedIds, open, showDefaultForms } = useLayoutStore(
@@ -43,6 +49,9 @@ export function AdvancedFilter() {
       : s.filters[category]?.filter?.[id] || STANDARD_BACKUP
   })
   const easyMode = useStorage((s) => !!s.filters?.[category]?.easyMode)
+  const hasShinyPlayers = useHasShinyPlayers()
+  const personalShiny =
+    useMemory((s) => !!s.ui.pokemon?.personalShiny) && hasShinyPlayers
   const [filters, setFilters] = useDeepStore(
     category ? `filters.${category}.filter.${id}` : `filters.gyms.standard`,
     defaultFilter,
@@ -110,6 +119,14 @@ export function AdvancedFilter() {
     [setFilters],
   )
 
+  /** @type {import('@mui/material').SwitchProps['onChange']} */
+  const handleShinyActivate = React.useCallback(
+    (_, checked) => {
+      if (checked) setFilters('enabled', true)
+    },
+    [setFilters],
+  )
+
   React.useLayoutEffect(() => {
     if (open) backup.current = filters
   }, [open])
@@ -121,6 +138,20 @@ export function AdvancedFilter() {
     ((category === 'gyms' || category === 'stations') && /^\d+-/.test(id))
   const hasAll = checkIfHasAll(category, id)
   const controlsDisabled = hasAll && filters.all
+  const enabledToggle = hasAll ? (
+    <DualBoolToggle
+      items={ENABLED_ALL}
+      field={`filters.${category}.filter.${id}`}
+      switchColor="secondary"
+      secondColor="success"
+      onChange={handleAllEnabled}
+    />
+  ) : (
+    <BoolToggle
+      field={`filters.${category}.filter.${id}.enabled`}
+      disableGutters
+    />
+  )
   return (
     <Dialog
       open={!!open}
@@ -143,69 +174,150 @@ export function AdvancedFilter() {
           {legacyFilter && 'legacy' in ui ? (
             <StringFilter field={`filters.${category}.filter.${id}`} />
           ) : (
-            <Grid2 container component={ListItem} disableGutters disablePadding>
+            <Grid2
+              container
+              component={ListItem}
+              disableGutters
+              disablePadding
+              alignItems="flex-start"
+            >
               {Object.entries(
                 'sliders' in ui && !easyMode ? ui.sliders : {},
               ).map(([subCat, sliders], i) => (
                 <Grid2 key={subCat} component={List} xs={12} sm={6}>
-                  {sliders.map((each) => (
-                    <ListItem
-                      key={`${subCat}${each.name}`}
-                      disableGutters
-                      disablePadding
-                      sx={{ pr: { xs: 0, sm: i ? 0 : 2 } }}
-                    >
-                      <SliderTile
-                        slide={{
-                          ...each,
-                          disabled: each.disabled || controlsDisabled,
-                        }}
-                        // @ts-ignore
-                        handleChange={handleChange}
-                        values={filters[each.name]}
-                      />
-                    </ListItem>
+                  {sliders.map((each, j) => (
+                    <React.Fragment key={`${subCat}${each.name}`}>
+                      <ListItem
+                        disableGutters
+                        disablePadding
+                        sx={{ pr: { xs: 0, sm: i ? 0 : 2 } }}
+                      >
+                        <SliderTile
+                          slide={{
+                            ...each,
+                            // with only shinies the shiny IV range takes over
+                            disabled:
+                              each.disabled ||
+                              controlsDisabled ||
+                              (personalShiny &&
+                                each.name === 'iv' &&
+                                !!filters.personal_shiny_only),
+                          }}
+                          // @ts-ignore
+                          handleChange={handleChange}
+                          values={filters[each.name]}
+                        />
+                      </ListItem>
+                      {/* the shiny condition goes right below the IV range */}
+                      {!i && !j && showMoreFilters && personalShiny && (
+                        <Box sx={{ pr: { xs: 0, sm: 2 } }}>
+                          <PersonalShinyFilter
+                            field={`filters.${category}.filter.${id}`}
+                            disabled={controlsDisabled}
+                            // @ts-ignore
+                            onChange={handleChange}
+                          />
+                        </Box>
+                      )}
+                    </React.Fragment>
                   ))}
                 </Grid2>
               ))}
-              <Grid2 component={List} xs={12} sm={showMoreFilters ? 6 : 12}>
-                {showGenderFilter && (
-                  <GenderListItem
-                    field={`filters.${category}.filter.${id}`}
-                    disabled={controlsDisabled}
-                    disableGutters
-                  />
-                )}
-                <Size
-                  field={`filters.${category}.filter.${id}`}
-                  disableGutters
-                />
-              </Grid2>
-              <Grid2 component={List} xs={12} sm={showMoreFilters ? 6 : 12}>
-                {showMoreFilters && (
-                  <DualBoolToggle
-                    items={XXS_XXL}
-                    field={`filters.${category}.filter.${id}`}
-                    disabled={controlsDisabled}
-                    label="size_1-size_5"
-                  />
-                )}
-                {category === 'pokestops' && <QuestConditionSelector id={id} />}
-                {hasAll ? (
-                  <DualBoolToggle
-                    items={ENABLED_ALL}
-                    field={`filters.${category}.filter.${id}`}
-                    switchColor="secondary"
-                    secondColor="success"
-                    onChange={handleAllEnabled}
-                  />
-                ) : (
-                  <BoolToggle
-                    field={`filters.${category}.filter.${id}.enabled`}
-                    disableGutters
-                  />
-                )}
-              </Grid2>
+              {showMoreFilters ? (
+                // the left and right halves share each row, so they line up; on a
+                // narrow screen the left half comes first, as before
+                <>
+                  <Grid2 xs={12} sm={6} order={{ xs: 1, sm: 0 }}>
+                    <GenderListItem
+                      field={`filters.${category}.filter.${id}`}
+                      disabled={controlsDisabled}
+                      disableGutters
+                    />
+                  </Grid2>
+                  <Grid2
+                    xs={12}
+                    sm={6}
+                    order={{ xs: 3, sm: 0 }}
+                    display="flex"
+                    alignItems="center"
+                    alignSelf="stretch"
+                  >
+                    <DualBoolToggle
+                      items={XXS_XXL}
+                      field={`filters.${category}.filter.${id}`}
+                      disabled={controlsDisabled}
+                      label="size_1-size_5"
+                    />
+                  </Grid2>
+                  <Grid2 xs={12} sm={6} order={{ xs: 2, sm: 0 }}>
+                    <Size
+                      field={`filters.${category}.filter.${id}`}
+                      disableGutters
+                    />
+                  </Grid2>
+                  <Grid2
+                    xs={12}
+                    sm={6}
+                    order={{ xs: 4, sm: 0 }}
+                    display="flex"
+                    alignItems="center"
+                    alignSelf="stretch"
+                  >
+                    {personalShiny ? (
+                      // half a row, so it lines up with the toggles around it
+                      <DualBoolToggle
+                        items={SHINY_ONLY}
+                        field={`filters.${category}.filter.${id}`}
+                        label="personal_shiny_only-"
+                        disabled={controlsDisabled}
+                        onChange={handleShinyActivate}
+                      />
+                    ) : (
+                      enabledToggle
+                    )}
+                  </Grid2>
+                  {personalShiny && (
+                    <Grid2 xs={12} sm={6} order={{ xs: 5, sm: 0 }} smOffset={6}>
+                      {enabledToggle}
+                    </Grid2>
+                  )}
+                </>
+              ) : (
+                <>
+                  <Grid2 component={List} xs={12}>
+                    {showGenderFilter && (
+                      <GenderListItem
+                        field={`filters.${category}.filter.${id}`}
+                        disabled={controlsDisabled}
+                        disableGutters
+                      />
+                    )}
+                    <Size
+                      field={`filters.${category}.filter.${id}`}
+                      disableGutters
+                    />
+                  </Grid2>
+                  <Grid2 component={List} xs={12}>
+                    {category === 'pokestops' && (
+                      <QuestConditionSelector id={id} />
+                    )}
+                    {hasAll ? (
+                      <DualBoolToggle
+                        items={ENABLED_ALL}
+                        field={`filters.${category}.filter.${id}`}
+                        switchColor="secondary"
+                        secondColor="success"
+                        onChange={handleAllEnabled}
+                      />
+                    ) : (
+                      <BoolToggle
+                        field={`filters.${category}.filter.${id}.enabled`}
+                        disableGutters
+                      />
+                    )}
+                  </Grid2>
+                </>
+              )}
             </Grid2>
           )}
         </List>

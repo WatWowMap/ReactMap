@@ -19,6 +19,9 @@ import { useRelativeTimer } from '@hooks/useRelativeTime'
 import { getFormDisplay } from '@utils/getFormDisplay'
 import { setLongTimeout } from '@utils/setLongTimeout'
 
+import { fromSearchCategory } from '@utils/fromSearchCategory'
+import { formatIv } from '@utils/formatIv'
+import { parseShinyPlayers } from '@hooks/usePersonalShiny'
 import { OptionImageMemo } from './OptionImage'
 
 /** @param {string} tab */
@@ -116,14 +119,36 @@ const Timer = ({ expireTime, startTime = 0 }) => {
   return time
 }
 
+/**
+ * Whom a personal shiny / background result is for, only when the user has
+ * more than one active player, like the names on the map
+ * @param {string} searchTab
+ * @param {{ personal_shiny?: string[], personal_background?: string[] }} option
+ * @returns {string}
+ */
+function personalNames(searchTab, option) {
+  const names =
+    searchTab === 'personalShiny'
+      ? option.personal_shiny
+      : searchTab === 'personalBackground'
+        ? option.personal_background
+        : null
+  if (!names?.length) return ''
+  const { auth } = useMemory.getState()
+  const active = parseShinyPlayers(auth.data?.personalShiny)
+    .slice(0, auth.personalShinyMax || 0)
+    .filter((player) => player.id.trim() && !player.paused)
+  return active.length > 1 ? names.join(', ') : ''
+}
+
 /** @type {import('@mui/material').AutocompleteProps['renderOption']} */
 export const renderOption = ({ key, ...props }, option) => {
   const { searchTab } = useStorage.getState()
   const { questLayerMode, questMessage } = useMemory.getState().config.misc
-  const pokemonFormLabel =
-    searchTab === 'pokemon'
-      ? getFormDisplay(option.pokemon_id, option.form, option.costume)
-      : ''
+  const isPokemon = fromSearchCategory(searchTab) === 'pokemon'
+  const pokemonFormLabel = isPokemon
+    ? getFormDisplay(option.pokemon_id, option.form, option.costume)
+    : ''
 
   return (
     <ListItem
@@ -141,10 +166,10 @@ export const renderOption = ({ key, ...props }, option) => {
       </ListItemIcon>
       <ListItemText
         primary={
-          searchTab === 'pokemon'
+          isPokemon
             ? `${t(`poke_${option.pokemon_id}`)}${
                 pokemonFormLabel ? ` (${pokemonFormLabel})` : ''
-              }${option.iv ? ` - ${option.iv}%` : ''}`
+              }${option.iv ? ` - ${formatIv(option.iv)}%` : ''}`
             : option.grunt_type
               ? t(`grunt_${option.grunt_type}`).toString()
               : option.name || t(getBackupName(searchTab))
@@ -160,7 +185,7 @@ export const renderOption = ({ key, ...props }, option) => {
           ) : option.grunt_type ? (
             <InvasionSubtitle {...option} />
           ) : (
-            ''
+            personalNames(searchTab, option)
           )
         }
         primaryTypographyProps={{
@@ -186,7 +211,7 @@ export const renderOption = ({ key, ...props }, option) => {
             <Timer expireTime={option.lure_expire_timestamp} />
           ) : searchTab === 'raids' ? (
             <Timer expireTime={option.raid_end_timestamp} />
-          ) : searchTab === 'pokemon' ? (
+          ) : isPokemon ? (
             <Timer expireTime={option.expire_timestamp} />
           ) : searchTab === 'stations' ? (
             <Timer

@@ -1,5 +1,7 @@
 // @ts-check
 
+const { default: fetch } = require('node-fetch')
+
 const { log, TAGS } = require('@rm/logger')
 const { fetchJson } = require('../utils/fetchJson')
 const { setCache, getCache } = require('./cache')
@@ -75,6 +77,13 @@ function resolveGeocoderProvider({ remote, local, usingRemoteURL }) {
     : undefined
 }
 
+/**
+ * An account path with the player id masked, for logs
+ * @param {string} path
+ */
+const redactAccountPath = (path) =>
+  path.replace(/\/accounts\/[^/?]+/, '/accounts/<redacted>')
+
 class PoracleAPI {
   /** @param {import("@rm/types").Config['webhooks'][number]} webhook */
   constructor(webhook) {
@@ -107,6 +116,8 @@ class PoracleAPI {
     this.prefix = '!'
     this.locale = 'en'
     this.gymBattles = false
+    // whether Poracle tracks per-player shinies (PoracleNG `personal` bits)
+    this.personalShiny = false
     /** @type {import("@rm/types").RMGeoJSON} */
     this.geojson = { features: [], type: 'FeatureCollection' }
     this.templates = { discord: {}, telegram: {} }
@@ -150,6 +161,94 @@ class PoracleAPI {
         !(this.disabledHooks.includes(key) || blockedAlerts?.includes(key)),
     )
     return categories
+  }
+
+  /**
+   * Links a game account (player id) to the user, for Poracle's personal
+   * shiny tracking. One that is already linked counts as linked.
+   * @param {import("@rm/types").User} user
+   * @param {string} playerId
+   * @param {string} [label]
+   */
+  async linkAccount(user, playerId, label) {
+    const path = `/api/v2/humans/${PoracleAPI.getWebhookId(user)}/accounts`
+    const status = await this.#accountRequest('POST', path, {
+      player_id: playerId,
+      ...(label ? { label } : {}),
+    })
+    if (status !== 409 || !label) return
+    // 409: the player id is linked already, then it only gets the label, or
+    // the label is in use by another account, then it is linked without one
+    if ((await this.labelAccount(user, playerId, label)) === 404) {
+      await this.#accountRequest('POST', path, { player_id: playerId })
+    }
+  }
+
+  /**
+   * Sets the label of a linked game account; 409 when another account of the
+   * user has it, 404 when the player id isn't linked
+   * @param {import("@rm/types").User} user
+   * @param {string} playerId
+   * @param {string} label
+   * @returns {Promise<number>}
+   */
+  async labelAccount(user, playerId, label) {
+    return this.#accountRequest(
+      'PUT',
+      `/api/v2/humans/${PoracleAPI.getWebhookId(user)}/accounts/${encodeURIComponent(playerId)}`,
+      { label },
+    )
+  }
+
+  /**
+   * @param {import("@rm/types").User} user
+   * @param {string} playerId
+   * @returns {Promise<number>} the HTTP status, 0 when the request failed
+   */
+  async unlinkAccount(user, playerId) {
+    return this.#accountRequest(
+      'DELETE',
+      `/api/v2/humans/${PoracleAPI.getWebhookId(user)}/accounts/${encodeURIComponent(playerId)}`,
+    )
+  }
+
+  /**
+   * @param {'POST' | 'PUT' | 'DELETE'} method
+   * @param {string} path
+   * @param {object} [body]
+   * @returns {Promise<number>} the HTTP status, 0 when the request failed
+   */
+  async #accountRequest(method, path, body) {
+    try {
+      const response = await fetch(`${this.endpoint}${path}`, {
+        method,
+        headers: {
+          'X-Poracle-Secret': this.secret,
+          Accept: 'application/json',
+          ...(body ? { 'Content-Type': 'application/json' } : {}),
+        },
+        body: body ? JSON.stringify(body) : undefined,
+        timeout: 10_000,
+      })
+      // 404: not registered in Poracle, 409: already linked
+      if (!response.ok && response.status !== 404 && response.status !== 409) {
+        // the path holds the user's player id: logged without it
+        log.warn(
+          TAGS.webhooks,
+          `${this.name}: ${method} ${redactAccountPath(path)}`,
+          response.status,
+        )
+      }
+      return response.status
+    } catch (e) {
+      // the error's message repeats the URL with the player id
+      log.warn(
+        TAGS.webhooks,
+        `${this.name}: ${method} ${redactAccountPath(path)} failed`,
+        e instanceof Error ? e.name : '',
+      )
+      return 0
+    }
   }
 
   /**
@@ -233,6 +332,7 @@ class PoracleAPI {
         this.#fetchConfig(),
         this.#fetchGeojson(),
         this.#fetchTemplates(),
+        this.#fetchCapabilities(),
       ])
       this.ui = this.generateUi()
       this.lastFetched = Date.now()
@@ -240,6 +340,19 @@ class PoracleAPI {
       await setCache(`${this.name}-webhook.json`, this)
     } catch (e) {
       log.error(TAGS.webhooks, `Error initializing ${this.name} webhook`, e)
+    }
+  }
+
+  /** PoracleNG lists what it supports in /health, other versions have none */
+  async #fetchCapabilities() {
+    try {
+      const response = await fetch(`${this.endpoint}/health`, {
+        timeout: 10_000,
+      })
+      const health = response.ok ? await response.json() : null
+      this.personalShiny = health?.capabilities?.personalShiny === true
+    } catch (e) {
+      this.personalShiny = false
     }
   }
 
@@ -610,6 +723,8 @@ class PoracleAPI {
 
   generateUi() {
     const isOhbem = this.pvp === 'ohbem'
+    // the pokemon switches share one row
+    const switchSm = this.personalShiny ? 12 / 5 : 3
     const poracleUiObj = /** @type {const} */ ({
       human: true,
       pokemon: {
@@ -649,6 +764,7 @@ class PoracleAPI {
           allForms: false,
           pvpEntry: false,
           noIv: false,
+          ...(this.personalShiny ? { personalShiny: false } : {}),
           byDistance: false,
           xs: false,
           xl: false,
@@ -799,10 +915,13 @@ class PoracleAPI {
               { name: 'gender', options: [0, 1, 2], xs: 4, sm: 4 },
             ],
             booleans: [
-              { name: 'clean', xs: 6, sm: 3 },
-              { name: 'allForms', xs: 6, sm: 3 },
-              { name: 'pvpEntry', xs: 6, sm: 3 },
-              { name: 'noIv', xs: 6, sm: 3 },
+              { name: 'clean', xs: 6, sm: switchSm },
+              { name: 'allForms', xs: 6, sm: switchSm },
+              { name: 'pvpEntry', xs: 6, sm: switchSm },
+              { name: 'noIv', xs: 6, sm: switchSm },
+              ...(this.personalShiny
+                ? [{ name: 'personalShiny', xs: 6, sm: switchSm }]
+                : []),
             ],
             distanceOrArea: {
               booleans: [

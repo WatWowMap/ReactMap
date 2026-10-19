@@ -11,6 +11,8 @@ type Query {
   badges: [Badge]
   backup(id: ID): Backup
   backups: [Backup]
+  settingsSync(withData: Boolean): SettingsSync
+  personalShinyPlayers: JSON
   checkUsername(username: String): Boolean
   fabButtons: FabButtons
   checkValidScan(mode: String, points: [[Float]]): [Boolean]
@@ -172,12 +174,14 @@ type Mutation {
   createBackup(backup: BackupCreate): Boolean
   updateBackup(backup: BackupUpdate): Boolean
   deleteBackup(id: ID): Boolean
+  setSettingsSync(data: JSON, baseRev: Float): SettingsSync
   webhook(category: String, data: JSON, status: String): Poracle
   webhookChange(webhook: String): Poracle
   tutorial(tutorial: Boolean): Boolean
   strategy(strategy: String): Boolean
   setGymBadge(gymId: String, badge: Int): Boolean
   setExtraFields(key: String, value: String): Boolean
+  setPersonalShiny(players: JSON): JSON
   nestSubmission(id: ID, name: String): Boolean
   saveComponent(component: String, code: String): String
 }
