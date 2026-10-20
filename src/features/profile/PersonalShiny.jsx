@@ -179,7 +179,8 @@ export function PersonalShinyPlayers() {
 
   return (
     <Grid2 container alignItems="flex-start" justifyContent="center">
-      <Grid2 xs={12} textAlign="center">
+      {/* room for the field labels, which sit above the fields' border */}
+      <Grid2 xs={12} textAlign="center" sx={{ mb: 1.5 }}>
         <Typography variant="h6">✨ {t('personal_shiny')}</Typography>
         <Typography variant="caption">
           {t(

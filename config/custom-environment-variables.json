@@ -1010,6 +1010,22 @@
         "__name": "CLIENT_SIDE_OPTIONS_POKEMON_SPACIAL_REND_RANGE",
         "__format": "boolean"
       },
+      "personalShinyShowIv": {
+        "__name": "CLIENT_SIDE_OPTIONS_POKEMON_PERSONAL_SHINY_SHOW_IV",
+        "__format": "boolean"
+      },
+      "personalShinyNames": {
+        "__name": "CLIENT_SIDE_OPTIONS_POKEMON_PERSONAL_SHINY_NAMES",
+        "__format": "boolean"
+      },
+      "personalShinySparkle": {
+        "__name": "CLIENT_SIDE_OPTIONS_POKEMON_PERSONAL_SHINY_SPARKLE",
+        "__format": "boolean"
+      },
+      "halfHalfGlow": {
+        "__name": "CLIENT_SIDE_OPTIONS_POKEMON_HALF_HALF_GLOW",
+        "__format": "boolean"
+      },
       "glow": {
         "__name": "CLIENT_SIDE_OPTIONS_POKEMON_GLOW",
         "__format": "json"

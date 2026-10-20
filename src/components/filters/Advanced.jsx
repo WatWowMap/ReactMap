@@ -26,7 +26,11 @@ import { SliderTile } from '../inputs/SliderTile'
 import { Size } from './Size'
 import { GenderListItem } from './Gender'
 import { QuestConditionSelector } from './QuestConditions'
-import { PersonalShinyFilter } from './PersonalShiny'
+import {
+  PersonalShinyFilter,
+  usePersonalShinyOff,
+  usePersonalShinyOnly,
+} from './PersonalShiny'
 
 // the only shiny toggle fills the left half of a row of two
 const SHINY_ONLY = /** @type {const} */ (['personal_shiny_only', ''])
@@ -52,6 +56,8 @@ export function AdvancedFilter() {
   const hasShinyPlayers = useHasShinyPlayers()
   const personalShiny =
     useMemory((s) => !!s.ui.pokemon?.personalShiny) && hasShinyPlayers
+  const shinyOff = usePersonalShinyOff()
+  const shinyOnly = usePersonalShinyOnly()
   const [filters, setFilters] = useDeepStore(
     category ? `filters.${category}.filter.${id}` : `filters.gyms.standard`,
     defaultFilter,
@@ -200,8 +206,9 @@ export function AdvancedFilter() {
                               each.disabled ||
                               controlsDisabled ||
                               (personalShiny &&
+                                !shinyOff &&
                                 each.name === 'iv' &&
-                                !!filters.personal_shiny_only),
+                                (shinyOnly || !!filters.personal_shiny_only)),
                           }}
                           // @ts-ignore
                           handleChange={handleChange}
@@ -269,7 +276,7 @@ export function AdvancedFilter() {
                         items={SHINY_ONLY}
                         field={`filters.${category}.filter.${id}`}
                         label="personal_shiny_only-"
-                        disabled={controlsDisabled}
+                        disabled={controlsDisabled || shinyOff}
                         onChange={handleShinyActivate}
                       />
                     ) : (

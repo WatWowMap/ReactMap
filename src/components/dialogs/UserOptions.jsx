@@ -153,6 +153,10 @@ function BaseUserOptions() {
 
   const staticUserSettings = useMemory((s) => s.clientMenus[category])
   const hasShinyPlayers = useHasShinyPlayers()
+  // with half/half glows the "Multiple" colour isn't used
+  const halfHalfGlow = useStorage(
+    (s) => s.userSettings?.pokemon?.halfHalfGlow !== false,
+  )
 
   /** @param {string} label */
   const getLabel = (label) => {
@@ -277,6 +281,11 @@ function BaseUserOptions() {
                                 staticUserSettings[option].sub[subOption],
                                 hasShinyPlayers,
                                 subOption,
+                              ) &&
+                              !(
+                                option === 'glow' &&
+                                subOption === 'Multiple' &&
+                                halfHalfGlow
                               ),
                           )
                           .map((subOption) => (

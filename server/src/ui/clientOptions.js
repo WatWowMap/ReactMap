@@ -307,6 +307,28 @@ function clientOptions(perms) {
         perm: ['pokemon'],
         category: 'tooltips',
       },
+      // personal shiny, left out entirely without the feature
+      ...(perms.personalShiny
+        ? {
+            personalShinyShowIv: {
+              type: 'bool',
+              perm: ['personalShiny'],
+              category: 'tooltips',
+            },
+            personalShinyNames: {
+              type: 'bool',
+              perm: ['personalShiny'],
+              category: 'tooltips',
+            },
+            personalShinySparkle: {
+              type: 'bool',
+              perm: ['personalShiny'],
+              category: 'markers',
+            },
+          }
+        : {}),
+      // two glows: both colours half/half instead of the "Multiple" colour
+      halfHalfGlow: { type: 'bool', perm: ['pokemon'], category: 'markers' },
       pokemonOpacity: {
         type: 'bool',
         perm: ['pokemon'],

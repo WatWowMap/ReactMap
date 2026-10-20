@@ -2,7 +2,7 @@
 import * as React from 'react'
 import ListItem from '@mui/material/ListItem'
 
-import { useDeepStore } from '@store/useStorage'
+import { useDeepStore, useStorage } from '@store/useStorage'
 import { SliderTile } from '@components/inputs/SliderTile'
 
 /** @type {import('@rm/types').RMSlider} */
@@ -15,6 +15,14 @@ const SLIDER = {
   color: 'secondary',
 }
 const FULL_RANGE = [0, 100]
+
+/** Personal shinies are off: their filters can't be set and are ignored */
+export const usePersonalShinyOff = () =>
+  useStorage((s) => (s.filters?.pokemon?.personalShinyMode || 'off') === 'off')
+
+/** Only personal shinies: the shiny IV ranges take over the IV ranges */
+export const usePersonalShinyOnly = () =>
+  useStorage((s) => s.filters?.pokemon?.personalShinyMode === 'only')
 
 /**
  * The IV range of a Pokémon filter for the Pokémon that are shiny for the
@@ -29,6 +37,7 @@ const FULL_RANGE = [0, 100]
  *  filter on like its other sliders do
  */
 export function PersonalShinyFilter({ field, disabled = false, onChange }) {
+  const off = usePersonalShinyOff()
   const [range, setRange] = useDeepStore(
     /** @type {any} */ (`${field}.personal_shiny_iv`),
     FULL_RANGE,
@@ -43,7 +52,7 @@ export function PersonalShinyFilter({ field, disabled = false, onChange }) {
   return (
     <ListItem disableGutters disablePadding>
       <SliderTile
-        slide={{ ...SLIDER, disabled }}
+        slide={{ ...SLIDER, disabled: disabled || off }}
         handleChange={handleRange}
         values={range}
       />

@@ -315,7 +315,7 @@ const resolvers = {
       }
       if (!perms?.pokemon) return []
       // the shiny IV range is an IV condition, which needs the iv permission
-      const args = perms.iv
+      let args = perms.iv
         ? rawArgs
         : {
             ...rawArgs,
@@ -336,12 +336,21 @@ const resolvers = {
             .slice(0, getPersonalShinyMax(perms))
             .filter((player) => player.id && !player.paused)
         : []
-      // only personal shinies needs the permission, and doesn't apply to the
-      // legacy filter, which has no personal shiny conditions
+      // personal shinies off / include (all of them, besides the other
+      // results, like the 0% / 100% quick selects) / only; only doesn't apply
+      // to the legacy filter, which has no personal shiny conditions
+      const shinyMode = perms.personalShiny
+        ? args.filters.onlyPersonalShinyMode
+        : 'off'
       const onlyPersonalShinyExclusive =
-        !!perms.personalShiny &&
-        !args.filters.onlyLegacy &&
-        !!args.filters.onlyPersonalShinyExclusive
+        shinyMode === 'only' && !args.filters.onlyLegacy
+      args = {
+        ...args,
+        filters: {
+          ...args.filters,
+          onlyPersonalShinyExclusive,
+        },
+      }
       const getResults = () =>
         Db.query(
           'Pokemon',
@@ -364,8 +373,21 @@ const resolvers = {
       const rates = await personalShiny.getRates(
         Db.models.Pokemon?.[0]?.SubModel?.getStatsKnex?.() ?? null,
       )
+      // off: none are added (the results are still marked); include: every
+      // shiny within the shiny IV ranges; only: those matching the filters
       const getShinies = () =>
-        Db.query('Pokemon', 'getPersonalShiny', perms, args, players, rates)
+        shinyMode === 'include' || shinyMode === 'only'
+          ? Db.query(
+              'Pokemon',
+              'getPersonalShiny',
+              perms,
+              shinyMode === 'include'
+                ? { ...args, personalShinyScan: true }
+                : args,
+              players,
+              rates,
+            )
+          : []
       // the background quick select adds every Pokémon with a special
       // background for the user, like the 0% / 100% quick selects
       const getBackgrounds = () =>

@@ -43,17 +43,14 @@ const getPersonalShinyGlow = (pokemonSettings) => {
 }
 
 /**
- *
+ * The colours of every glow rule the Pokémon matches
  * @param {import('@rm/types').Pokemon} pkmn
  * @param {import('@rm/types').PokemonGlow} userSettings
- * @returns {string}
+ * @returns {string[]}
  */
-const getGlowStatus = (pkmn, userSettings) => {
+const getGlowColors = (pkmn, userSettings) => {
   const { glowRules } = useMemory.getState()
-  const valid = glowRules
-    .map((rule) => userSettings[rule(pkmn)])
-    .filter(Boolean)
-  return valid.length > 1 ? userSettings.Multiple : valid[0]
+  return glowRules.map((rule) => userSettings[rule(pkmn)]).filter(Boolean)
 }
 
 /**
@@ -85,6 +82,8 @@ const BasePokemonTile = (pkmn) => {
     showInteractionRange,
     showSpacialRendRange,
     filterSize,
+    showShinyNames,
+    showSparkle,
   ] = useStorage((s) => {
     const {
       pokemonTimers,
@@ -97,24 +96,35 @@ const BasePokemonTile = (pkmn) => {
       showSizeIndicator,
       interactionRanges,
       spacialRendRange,
+      personalShinyShowIv,
+      personalShinyNames,
+      personalShinySparkle,
+      halfHalfGlow,
     } = s.userSettings.pokemon
+    // like every glow, the personal shiny glow follows the glow setting; it
+    // comes first
+    const colors = glow
+      ? [
+          ...(shinyFor ? [getPersonalShinyGlow(s.userSettings.pokemon)] : []),
+          ...getGlowColors(pkmn, s.userSettings.pokemon),
+        ]
+      : []
+    // two or more glows: the first two half/half, or the "Multiple" colour
+    const halfHalf = halfHalfGlow !== false && colors.length > 1
     return [
       pokemonTimers,
-      // like every glow, the personal shiny glow follows the glow setting
-      glow
-        ? shinyFor
-          ? getPersonalShinyGlow(s.userSettings.pokemon)
-          : getGlowStatus(pkmn, s.userSettings.pokemon)
-        : undefined,
-      // a personal shiny that also matches another glow rule shows both colours
-      shinyFor && glow
-        ? getGlowStatus(pkmn, s.userSettings.pokemon) || undefined
-        : undefined,
-      // shiny for one of the user's players or 0%: always show the IV
+      colors.length > 1 && !halfHalf
+        ? s.userSettings.pokemon.Multiple || colors[0]
+        : colors[0],
+      halfHalf ? colors[1] : undefined,
+      // 0%, and (unless turned off) shiny for one of the user's players:
+      // always show the IV
       !!(
         ivCircles &&
         pkmn.iv !== null &&
-        (pkmn.iv >= minIvCircle || pkmn.iv === 0 || !!shinyFor)
+        (pkmn.iv >= minIvCircle ||
+          pkmn.iv === 0 ||
+          (!!shinyFor && personalShinyShowIv !== false))
       ),
       !!(levelCircles && pkmn.level !== null && pkmn.level >= minLevelCircle),
       !!(pkmn.weather && weatherIndicator),
@@ -122,6 +132,8 @@ const BasePokemonTile = (pkmn) => {
       interactionRanges,
       spacialRendRange,
       s.filters.pokemon.filter[internalId]?.size || 'md',
+      personalShinyNames !== false,
+      personalShinySparkle !== false,
     ]
   }, basicEqualFn)
 
@@ -197,10 +209,12 @@ const BasePokemonTile = (pkmn) => {
   /** @type {(string | import('react').ReactElement)[]} */
   const extras = React.useMemo(() => {
     const decorators = []
-    if (shinyFor && multipleShinyPlayers) decorators.push(`✨ ${shinyFor}`)
+    // the players' names, unless turned off; then just the marks below
+    const named = multipleShinyPlayers && showShinyNames
+    if (shinyFor && named) decorators.push(`✨ ${shinyFor}`)
     // a special background for one of the user's players: its picture is
     // shown behind the Pokémon, the names only when there is more than one
-    if (backgroundFor && multipleShinyPlayers) {
+    if (backgroundFor && named) {
       decorators.push(`✦ ${backgroundFor}`)
     }
     if (showIv) decorators.push(`${Math.round(pkmn.iv)}%`)
@@ -210,8 +224,8 @@ const BasePokemonTile = (pkmn) => {
     // a single player: just the sparkle (and the background star) in front of
     // the first value
     const marks = [
-      shinyFor && !multipleShinyPlayers ? '✨' : '',
-      backgroundFor && !multipleShinyPlayers ? '✦' : '',
+      shinyFor && !named ? '✨' : '',
+      backgroundFor && !named ? '✦' : '',
     ]
       .filter(Boolean)
       .join(' ')
@@ -232,6 +246,7 @@ const BasePokemonTile = (pkmn) => {
     shinyFor,
     backgroundFor,
     multipleShinyPlayers,
+    showShinyNames,
     showIv,
     showLevel,
     showSize,
@@ -358,7 +373,7 @@ const BasePokemonTile = (pkmn) => {
         position={finalLocation}
         icon={
           Boolean(backgroundUrl) ||
-          Boolean(shinyFor) ||
+          Boolean(shinyFor && showSparkle) ||
           (pkmn.bestPvp !== null && pkmn.bestPvp < 4 && extras.length === 0) ||
           showGlow ||
           showWeather ||
@@ -375,7 +390,7 @@ const BasePokemonTile = (pkmn) => {
                 opacity,
                 timeOfDay,
                 backgroundUrl,
-                sparkle: !!shinyFor,
+                sparkle: !!shinyFor && showSparkle,
               })
             : basicPokemonMarker({ iconUrl, iconSize })
         }

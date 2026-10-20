@@ -4,6 +4,8 @@ import AppBar from '@mui/material/AppBar'
 import Tab from '@mui/material/Tab'
 import Tabs from '@mui/material/Tabs'
 import Collapse from '@mui/material/Collapse'
+import ListItem from '@mui/material/ListItem'
+import ListItemText from '@mui/material/ListItemText'
 import { useTranslation } from 'react-i18next'
 import Help from '@mui/icons-material/HelpOutline'
 
@@ -14,6 +16,8 @@ import { StringFilterMemo } from '@components/filters/StringFilter'
 import { TabPanel } from '@components/TabPanel'
 import { BasicListButton } from '@components/inputs/BasicListButton'
 import { BoolToggle } from '@components/inputs/BoolToggle'
+import { MultiSelectorStore } from '@components/inputs/MultiSelector'
+import { PERSONAL_SHINY_MODES } from '@assets/constants'
 import { useHasShinyPlayers } from '@hooks/usePersonalShiny'
 
 import { SelectorListMemo } from '../components/SelectorList'
@@ -27,8 +31,8 @@ function PokemonDrawer() {
   const ui = useMemory((s) => s.ui.pokemon)
   const hasShinyPlayers = useHasShinyPlayers()
   // kept visible while on, so it can always be turned off again
-  const exclusiveOn = useStorage(
-    (s) => !!s.filters?.pokemon?.personalShinyExclusive,
+  const shinyModeOn = useStorage(
+    (s) => (s.filters?.pokemon?.personalShinyMode || 'off') !== 'off',
   )
 
   /** @type {import('@mui/material').TabsProps['onChange']} */
@@ -40,11 +44,16 @@ function PokemonDrawer() {
   return (
     <>
       <BoolToggle field="filters.pokemon.enabled" label="enabled" />
-      {ui.personalShiny && (hasShinyPlayers || exclusiveOn) && (
-        <BoolToggle
-          field="filters.pokemon.personalShinyExclusive"
-          label="only_personal_shiny"
-        />
+      {ui.personalShiny && (hasShinyPlayers || shinyModeOn) && (
+        <ListItem>
+          <ListItemText primary={t('personal_shiny_mode')} />
+          <MultiSelectorStore
+            field="filters.pokemon.personalShinyMode"
+            items={PERSONAL_SHINY_MODES}
+            tKey="personal_shiny_mode_"
+            defaultValue="off"
+          />
+        </ListItem>
       )}
       <PokemonModeSelector />
       <Collapse in={filterMode === 'intermediate'}>

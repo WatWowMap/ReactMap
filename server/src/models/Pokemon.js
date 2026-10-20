@@ -27,7 +27,11 @@ const {
   getWildFilterKey,
 } = require('../filters/pokemon/getWildFilterKey')
 const { state } = require('../services/state')
-const { shinyFor, backgroundFor } = require('../services/personalShiny')
+const {
+  shinyFor,
+  backgroundFor,
+  getRates,
+} = require('../services/personalShiny')
 
 /**
  * Golbat stops a scan at `max_pokemon_results` (3000 by default) matches. The
@@ -232,9 +236,11 @@ class Pokemon extends Model {
     // Pokémon set to only shinies come from the personal shiny scan; here they
     // only show when the 0% / 100% quick selects match them
     // without active players there are no shinies to show instead
+    // and only while personal shinies are included (or the only ones)
     const shinyAllowed =
       !!perms.personalShiny &&
       !args.filters.onlyLegacy &&
+      (args.filters.onlyPersonalShinyMode || 'off') !== 'off' &&
       Array.isArray(args.personalShinyPlayers) &&
       args.personalShinyPlayers.length > 0
     /** @param {PkmnBackend} filter */
@@ -763,6 +769,9 @@ class Pokemon extends Model {
     // the personal background quick select: every Pokémon with a background
     // for the user, like the 0% / 100% quick selects, whatever the filters
     const background = !!args.personalBackgroundScan
+    // personal shinies "include": every shiny for the user within the shiny
+    // IV ranges, whatever the other filters
+    const includeAll = !background && !!args.personalShinyScan
     const golbatRolls = !!mem && (await this.supportsPersonalShiny(ctx))
     // only personal shinies: all of them, narrowed down by every condition
     // the filters set; every Pokémon the filters apply to is scanned
@@ -783,19 +792,21 @@ class Pokemon extends Model {
       const [id, form] = key.split('-', 2).map(Number)
       return { id, form }
     })
-    let clauses = background
-      ? golbatRolls
-        ? [{}]
-        : backgroundPokemon.length
-          ? [{ pokemon: backgroundPokemon }]
-          : []
-      : regular
-        ? regular.globalFilter.mods.onlyLinkGlobal
-          ? filtered.length
-            ? [{ pokemon: filtered }]
+    let clauses = includeAll
+      ? [{}]
+      : background
+        ? golbatRolls
+          ? [{}]
+          : backgroundPokemon.length
+            ? [{ pokemon: backgroundPokemon }]
             : []
-          : [{}]
-        : this.getShinyClauses(perms, args, ctx)
+        : regular
+          ? regular.globalFilter.mods.onlyLinkGlobal
+            ? filtered.length
+              ? [{ pokemon: filtered }]
+              : []
+            : [{}]
+          : this.getShinyClauses(perms, args, ctx)
     if (Array.isArray(args.speciesIds)) {
       const species = new Set(args.speciesIds)
       clauses = clauses
@@ -821,6 +832,18 @@ class Pokemon extends Model {
       }
       const key = getWildFilterKey(pkmn.pokemon_id, pkmn.form)
       if (background) return shinyFilters.filterMap[key] || globalFilter
+      if (includeAll) {
+        // within the Pokémon's own shiny IV range, or else the global one;
+        // 0-100 is every shiny, also those without IVs
+        const own = shinyFilters.filterMap[key]
+        const [min, max] = getShinyRange(
+          own?.filter?.personal_shiny_iv ? own.filter : globalFilter.filter,
+        )
+        const inRange =
+          (min <= 0 && max >= 100) ||
+          (typeof pkmn.iv === 'number' && pkmn.iv >= min && pkmn.iv <= max)
+        return inRange ? own || globalFilter : null
+      }
       if (regular) {
         const filter = regular.filterMap[key] || regular.globalFilter
         if (filter === regular.globalFilter && filter.mods.onlyLinkGlobal) {
@@ -1364,6 +1387,19 @@ class Pokemon extends Model {
             MAX_GOLBAT_PLAYER_IDS,
           )
         : null
+    // "shiny" in the filter: with a Golbat that rolls personal shinies it
+    // asks for them (shiny_for); otherwise the other conditions are fetched
+    // and it is checked here
+    const hasShinyTerm = filters.some((clause) => clause.personal_shiny)
+    /** @param {boolean} v3 */
+    const scanFilters = (v3) =>
+      filters.map(({ personal_shiny: shinyTerm, ...clause }) =>
+        shinyTerm && v3 && annotateFor
+          ? toV3Filter({ ...clause, shiny_for: annotateFor })
+          : v3
+            ? toV3Filter(clause)
+            : clause,
+      )
     /** @param {boolean} v3 */
     const scanBody = (v3) =>
       JSON.stringify({
@@ -1376,7 +1412,7 @@ class Pokemon extends Model {
           longitude: args.maxLon,
         },
         limit: queryLimits.pokemon + queryLimits.pokemonPvp,
-        filters: v3 ? filters.map(toV3Filter) : filters,
+        filters: scanFilters(v3),
         ...(v3 ? { annotate_for: annotateFor } : {}),
       })
     /** @type {WeakSet<object>} results Golbat checked for the players */
@@ -1415,6 +1451,11 @@ class Pokemon extends Model {
     const shinyNames = new Map(
       shinyPlayers.map((player) => [player.id, player.name]),
     )
+    // a shiny term Golbat didn't check is checked here
+    const localRates =
+      hasShinyTerm && shinyPlayers.length
+        ? await getRates(this.getStatsKnex())
+        : null
     /** @param {string[] | undefined} playerIds */
     const toNames = (playerIds) =>
       [
@@ -1451,11 +1492,17 @@ class Pokemon extends Model {
           globalFilter
         const result = filter.build(item)
         // an empty list tells the resolver Golbat checked it
-        return annotated.has(item)
+        if (annotated.has(item)) {
+          return {
+            ...result,
+            personal_shiny: toNames(item.shiny_for),
+            personal_background: toNames(item.background_for),
+          }
+        }
+        return localRates
           ? {
               ...result,
-              personal_shiny: toNames(item.shiny_for),
-              personal_background: toNames(item.background_for),
+              personal_shiny: shinyFor(item, shinyPlayers, localRates),
             }
           : result
       })
