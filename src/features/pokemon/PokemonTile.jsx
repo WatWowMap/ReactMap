@@ -14,7 +14,6 @@ import { useOpacity } from '@hooks/useOpacity'
 import { useForcePopup } from '@hooks/useForcePopup'
 import { useManualPopupTracker } from '@hooks/useManualPopupTracker'
 import { sendNotification } from '@services/desktopNotification'
-import { useMapStore } from '@store/useMapStore'
 import { TooltipWrapper } from '@components/ToolTipWrapper'
 import { getTimeUntil } from '@utils/getTimeUntil'
 import { normalizeCategory } from '@utils/normalizeCategory'
@@ -89,20 +88,30 @@ const BasePokemonTile = (pkmn) => {
     ]
   }, basicEqualFn)
 
-  const [
-    timerOverride,
-    iconUrl,
-    iconSize,
-    badge,
-    configZoom,
-    timeOfDay,
-    cry,
-    backgroundUrl,
-  ] = useMemory((s) => {
-    const { Icons, timerList, config, Audio } = s
-    const badgeId = getBadge(pkmn.bestPvp)
-    return [
-      timerList.includes(pkmn.id),
+  // This selector runs for every marker on every useMemory change, so it
+  // stays cheap; the asset lookups below only rerun when their inputs change.
+  const [timerOverride, interactionRangeZoom, timeOfDay, Icons, Audio] =
+    useMemory(
+      (s) => [
+        s.timerList.includes(pkmn.id),
+        s.config.general.interactionRangeZoom,
+        s.timeOfDay,
+        s.Icons,
+        s.Audio,
+      ],
+      basicEqualFn,
+    )
+  // the stored zoom, so the tile re-renders when a zoom crosses the threshold
+  const configZoom = useStorage((s) => s.zoom >= interactionRangeZoom)
+  // Icons and Audio are changed in place when the viewer picks another set,
+  // and the stored selection is a new object each time, so it keys the
+  // lookups and the icon
+  const iconSelection = useStorage((s) => s.icons)
+  const audioSelection = useStorage((s) => s.audio)
+  const badgeId = getBadge(pkmn.bestPvp)
+
+  const [iconUrl, iconSize, badge, backgroundUrl] = React.useMemo(
+    () => [
       Icons.getPokemon(
         pkmn.pokemon_id,
         pkmn.form,
@@ -112,9 +121,22 @@ const BasePokemonTile = (pkmn) => {
       ),
       Icons.getSize('pokemon', filterSize),
       badgeId ? Icons.getMisc(badgeId) : '',
-      config.general.interactionRangeZoom <=
-        useMapStore.getState().map.getZoom(),
-      s.timeOfDay,
+      Icons.getBackground(pkmn.background),
+    ],
+    [
+      Icons,
+      iconSelection,
+      pkmn.pokemon_id,
+      pkmn.form,
+      pkmn.gender,
+      pkmn.costume,
+      pkmn.background,
+      filterSize,
+      badgeId,
+    ],
+  )
+  const cry = React.useMemo(
+    () =>
       Audio.getPokemon(
         pkmn.pokemon_id,
         pkmn.form,
@@ -122,12 +144,15 @@ const BasePokemonTile = (pkmn) => {
         pkmn.gender,
         pkmn.costume,
       ),
-      Icons.getBackground(pkmn.background),
-    ]
-  }, basicEqualFn)
-  // Icons is changed in place when the viewer picks another set, and the
-  // stored selection is a new object each time, so it keys the icon
-  const iconSelection = useStorage((s) => s.icons)
+    [
+      Audio,
+      audioSelection,
+      pkmn.pokemon_id,
+      pkmn.form,
+      pkmn.gender,
+      pkmn.costume,
+    ],
+  )
 
   const isNearbyStop = pkmn.seen_type === 'nearby_stop'
   const isLure = pkmn.seen_type?.includes('lure')
@@ -261,6 +286,7 @@ const BasePokemonTile = (pkmn) => {
       opacity,
       timeOfDay,
       backgroundUrl,
+      Icons,
       iconSelection,
     ],
   )
