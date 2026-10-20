@@ -125,6 +125,9 @@ const BasePokemonTile = (pkmn) => {
       Icons.getBackground(pkmn.background),
     ]
   }, basicEqualFn)
+  // Icons is changed in place when the viewer picks another set, and the
+  // stored selection is a new object each time, so it keys the icon
+  const iconSelection = useStorage((s) => s.icons)
 
   const isNearbyStop = pkmn.seen_type === 'nearby_stop'
   const isLure = pkmn.seen_type?.includes('lure')
@@ -216,6 +219,52 @@ const BasePokemonTile = (pkmn) => {
     pkmn.sta_iv,
     pokemonForm,
   ])
+  const fancy =
+    Boolean(backgroundUrl) ||
+    (pkmn.bestPvp !== null && pkmn.bestPvp < 4 && extras.length === 0) ||
+    !!showGlow ||
+    showWeather ||
+    opacity < 1 ||
+    pkmn.seen_type === 'nearby_cell'
+  const iconBadge = extras.length ? null : badge
+  // react-leaflet calls setIcon, replacing the marker's DOM, whenever the icon
+  // is a new object, so only build one when something it draws has changed
+  const icon = React.useMemo(
+    () =>
+      fancy
+        ? fancyPokemonMarker({
+            pkmn,
+            iconUrl,
+            iconSize,
+            showGlow,
+            showWeather,
+            badge: iconBadge,
+            opacity,
+            timeOfDay,
+            backgroundUrl,
+          })
+        : basicPokemonMarker({ iconUrl, iconSize }),
+    // the icon reads only these pkmn fields, and the weather, grass and
+    // modifier assets straight from Icons
+    [
+      fancy,
+      pkmn.id,
+      pkmn.background,
+      pkmn.pokemon_id,
+      pkmn.seen_type,
+      pkmn.weather,
+      iconUrl,
+      iconSize,
+      showGlow,
+      showWeather,
+      iconBadge,
+      opacity,
+      timeOfDay,
+      backgroundUrl,
+      iconSelection,
+    ],
+  )
+
   if (pkmn.expire_timestamp < Date.now() / 1000) {
     return null
   }
@@ -257,26 +306,7 @@ const BasePokemonTile = (pkmn) => {
           pkmn.bestPvp
         }
         position={finalLocation}
-        icon={
-          Boolean(backgroundUrl) ||
-          (pkmn.bestPvp !== null && pkmn.bestPvp < 4 && extras.length === 0) ||
-          showGlow ||
-          showWeather ||
-          opacity < 1 ||
-          pkmn.seen_type === 'nearby_cell'
-            ? fancyPokemonMarker({
-                pkmn,
-                iconUrl,
-                iconSize,
-                showGlow,
-                showWeather,
-                badge: extras.length ? null : badge,
-                opacity,
-                timeOfDay,
-                backgroundUrl,
-              })
-            : basicPokemonMarker({ iconUrl, iconSize })
-        }
+        icon={icon}
         eventHandlers={{ popupopen: handlePopupOpen }}
       >
         <Popup position={finalLocation}>
