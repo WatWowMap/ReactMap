@@ -10,23 +10,50 @@ const { log, TAGS } = require('@rm/logger')
 const { setLongTimeout } = require('./setLongTimeout')
 
 const REDACTED_HEADERS = new Set(['authorization', 'x-golbat-secret'])
+/** Body fields with users' game player ids, left out of what is logged */
+const PLAYER_ID_FIELDS = new Set(['annotate_for', 'shiny_for'])
 
 /**
- * Returns a shallow copy of the fetch options with credential headers masked,
- * so debug logs and the failed-request payload dump never persist the
- * X-Golbat-Secret or Basic auth to disk.
+ * A JSON body without users' player ids
+ * @param {unknown} body
+ */
+function withoutPlayerIds(body) {
+  if (typeof body !== 'string' || !body.includes('_for')) return body
+  try {
+    return JSON.stringify(
+      JSON.parse(body, (key, value) =>
+        PLAYER_ID_FIELDS.has(key) ? undefined : value,
+      ),
+    )
+  } catch (e) {
+    return body
+  }
+}
+
+/**
+ * Returns a shallow copy of the fetch options with credential headers masked
+ * and users' player ids left out, so debug logs and the failed-request
+ * payload dump never persist the X-Golbat-Secret, Basic auth or player ids
+ * to disk.
  * @param {import('node-fetch').RequestInit} [options]
  */
 function redactOptions(options) {
-  const headers = options && /** @type {any} */ (options).headers
-  if (!headers || typeof headers !== 'object') return options
+  if (!options) return options
+  const { headers } = /** @type {any} */ (options)
   return {
     ...options,
-    headers: Object.fromEntries(
-      Object.entries(headers).map(([k, v]) =>
-        REDACTED_HEADERS.has(k.toLowerCase()) ? [k, '<redacted>'] : [k, v],
-      ),
-    ),
+    body: withoutPlayerIds(options.body),
+    ...(headers && typeof headers === 'object'
+      ? {
+          headers: Object.fromEntries(
+            Object.entries(headers).map(([k, v]) =>
+              REDACTED_HEADERS.has(k.toLowerCase())
+                ? [k, '<redacted>']
+                : [k, v],
+            ),
+          ),
+        }
+      : {}),
   }
 }
 

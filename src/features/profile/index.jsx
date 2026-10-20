@@ -22,6 +22,7 @@ import { UserPermissions } from './Permissions'
 import { UserGymBadges } from './GymBadges'
 import { LinkAccounts } from './LinkAccounts'
 import { ExtraUserFields } from './ExtraFields'
+import { PlayerAccounts } from './PlayerAccounts'
 
 export function UserProfile() {
   useAnalytics('/user-profile')
@@ -114,6 +115,7 @@ export function UserProfile() {
             <TabPanel value="profile">
               <LinkAccounts />
               <ExtraUserFields refreshing={refreshing} />
+              <PlayerAccounts />
               <UserBackups />
             </TabPanel>
             <TabPanel value="badges" sx={{ height: '100%', px: 0 }}>

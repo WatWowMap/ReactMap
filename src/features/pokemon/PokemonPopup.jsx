@@ -247,6 +247,16 @@ export function PokemonPopup({ pokemon, iconUrl, isTutorial = false }) {
         userSettings={userSettings}
         isTutorial={isTutorial}
       />
+      {!!pokemon.personal_shiny?.length && (
+        <Grid xs={12} textAlign="center">
+          <Typography variant="caption">
+            ✨{' '}
+            {t('personal_shiny_for', {
+              names: pokemon.personal_shiny.join(', '),
+            })}
+          </Typography>
+        </Grid>
+      )}
       {pokemon.seen_type !== 'encounter' && (
         <Grid xs={12} textAlign="center">
           <Typography
@@ -814,6 +824,9 @@ const PvpInfo = ({ pokemon, league, data }) => {
                     each.evolution,
                     each.gender,
                     pokemon.costume,
+                    0,
+                    // a shiny stays shiny when it evolves
+                    !!pokemon.personal_shiny?.length,
                   )}
                   style={{ maxWidth: 40, maxHeight: 20 }}
                   alt={t(`poke_${each.pokemon}`)}

@@ -3,6 +3,11 @@
 import { Icon, divIcon } from 'leaflet'
 
 import { useMemory } from '@store/useMemory'
+import { RAINBOW_GLOW } from '@utils/getGlowRules'
+
+/** A multi-colour halo for pokemon that match the combined "shundo" rule. */
+const RAINBOW_GLOW_FILTER =
+  'drop-shadow(0 0 4px #ff3b30) drop-shadow(0 0 4px #ff9500) drop-shadow(0 0 4px #ffd60a) drop-shadow(0 0 4px #34c759) drop-shadow(0 0 4px #32ade6) drop-shadow(0 0 4px #af52de)'
 
 /**
  *
@@ -46,7 +51,9 @@ export const fancyPokemonMarker = ({
   const [pokemonMod, weatherMod] = Icons.getModifiers('pokemon', 'weather')
   const pokemonBackground = backgroundUrl || ''
   const glowFilter = showGlow
-    ? `drop-shadow(0 0 10px ${showGlow})drop-shadow(0 0 10px ${showGlow})`
+    ? showGlow === RAINBOW_GLOW
+      ? RAINBOW_GLOW_FILTER
+      : `drop-shadow(0 0 10px ${showGlow})drop-shadow(0 0 10px ${showGlow})`
     : 'none'
 
   return divIcon({

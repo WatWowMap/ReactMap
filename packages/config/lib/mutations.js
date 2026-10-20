@@ -302,6 +302,11 @@ const applyMutations = (config) => {
     config.authentication.perms[perm].roles =
       config.authentication.perms[perm].roles.flatMap(replaceAliases)
   })
+  config.authentication.perms.personalShiny.limits =
+    config.authentication.perms.personalShiny.limits.map(({ roles, max }) => ({
+      roles: roles.flatMap(replaceAliases),
+      max,
+    }))
 
   config.authentication.areaRestrictions =
     config.authentication.areaRestrictions.map(({ roles, areas }) => ({

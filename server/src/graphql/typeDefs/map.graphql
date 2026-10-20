@@ -217,6 +217,23 @@ type WebhookAreaGroups {
   children: [String]
 }
 
+type PlayerAccount {
+  playerId: String
+  label: String
+  active: Boolean
+}
+
+type PlayerAccounts {
+  accounts: [PlayerAccount]
+  error: String
+}
+
+input PlayerAccountInput {
+  playerId: String
+  label: String
+  active: Boolean
+}
+
 input BackupCreate {
   name: String
   data: JSON

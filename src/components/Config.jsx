@@ -119,6 +119,8 @@ export function Config({ children }) {
             : {},
           counts: data.authReferences,
           userBackupLimits: data.database.settings.userBackupLimits || 0,
+          personalShinyMax: data.user?.personalShinyMax || 0,
+          personalShinySelfService: !!data.user?.personalShinySelfService,
           excludeList: data.authentication.excludeList || [],
         },
         theme: data.map.theme,

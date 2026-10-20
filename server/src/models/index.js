@@ -5,6 +5,7 @@ const { Device } = require('./Device')
 const { Gym } = require('./Gym')
 const { Nest } = require('./Nest')
 const { NestSubmission } = require('./NestSubmission')
+const { PlayerAccount } = require('./PlayerAccount')
 const { Pokestop } = require('./Pokestop')
 const { Pokemon } = require('./Pokemon')
 const { Portal } = require('./Portal')
@@ -22,6 +23,7 @@ const rmModels = {
   Backup,
   Badge,
   NestSubmission,
+  PlayerAccount,
   Session,
   User,
 }

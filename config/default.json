@@ -448,6 +448,18 @@
           "op": "<="
         },
         {
+          "name": "Shiny for Me",
+          "perm": "personalShiny",
+          "value": "#ffd700"
+        },
+        {
+          "name": "Shundo",
+          "perm": ["personalShiny", "iv"],
+          "num": 100,
+          "value": "rainbow",
+          "op": "="
+        },
+        {
           "name": "Multiple",
           "perm": "pvp",
           "value": "#800080"
@@ -625,6 +637,7 @@
       "gymBadgeTableName": "gymBadges",
       "sessionTableName": "session",
       "backupTableName": "backups",
+      "playerAccountTableName": "playerAccounts",
       "migrationTableName": "knex_migrations",
       "maxConnections": 10,
       "userBackupLimits": 10,
@@ -923,6 +936,14 @@
         "enabled": true,
         "trialPeriodEligible": false,
         "roles": []
+      },
+      "personalShiny": {
+        "enabled": false,
+        "trialPeriodEligible": false,
+        "roles": [],
+        "limits": [],
+        "defaultMax": 1,
+        "selfService": true
       }
     }
   },

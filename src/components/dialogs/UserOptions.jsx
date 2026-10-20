@@ -82,6 +82,14 @@ function InputType({ option, subOption, category }) {
           disabled={staticSetting?.disabled}
         />
       )
+    case 'rainbow':
+      return (
+        <div
+          className={`rainbow-swatch${
+            staticSetting?.disabled ? ' disabled' : ''
+          }`}
+        />
+      )
     default:
       return (
         <Input

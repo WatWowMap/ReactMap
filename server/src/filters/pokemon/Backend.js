@@ -41,6 +41,7 @@ class PkmnBackend {
    * @param {boolean} mods.onlyEasyMode
    * @param {string[]} mods.onlyAreas
    * @param {boolean} mods.onlyLegacy
+   * @param {import('../../utils/personalShiny').PersonalShinyMode} mods.onlyPersonalShiny
    */
   constructor(id, filter, global, perms, mods) {
     /** @type {import("@rm/types").Config['api']['pvp']} */
@@ -356,9 +357,12 @@ class PkmnBackend {
       !this.mods.mem ||
       filterRTree(pokemon, this.perms.areaRestrictions, this.mods.onlyAreas)
     ) {
+      const personalShiny = !!pokemon.personal_shiny?.length
+      if (this.mods.onlyPersonalShiny === 'only' && !personalShiny) return false
       if (
         (this.mods.onlyHundoIv && pokemon.iv === 100) ||
-        (this.mods.onlyZeroIv && pokemon.iv === 0)
+        (this.mods.onlyZeroIv && pokemon.iv === 0) ||
+        (this.mods.onlyPersonalShiny === 'include' && personalShiny)
       )
         return true
       if (
@@ -428,6 +432,10 @@ class PkmnBackend {
       } else {
         result.seen_type = 'encounter'
       }
+    }
+
+    if (this.perms.personalShiny && pokemon.personal_shiny?.length) {
+      result.personal_shiny = pokemon.personal_shiny
     }
 
     if (!this.perms.pokemon) return result

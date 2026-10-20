@@ -174,6 +174,7 @@ function buildDefaultFilters(perms) {
             gender: defaultFilters.pokemon.globalValues.gender,
             zeroIv: perms.iv ? false : undefined,
             hundoIv: perms.iv ? true : undefined,
+            personalShiny: perms.personalShiny ? 'off' : undefined,
             filter: pokemon.full,
           }
         : undefined,

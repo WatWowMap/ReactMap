@@ -98,6 +98,7 @@ function drawer(req, perms) {
             // gender: true,
             zeroIv: perms.iv || BLOCKED,
             hundoIv: perms.iv || BLOCKED,
+            personalShiny: perms.personalShiny || BLOCKED,
             sliders: {
               primary: [
                 {

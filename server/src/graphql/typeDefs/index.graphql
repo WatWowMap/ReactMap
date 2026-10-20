@@ -51,6 +51,7 @@ type Query {
     filters: JSON
   ): [Pokemon]
   pokemonSingle(id: ID, perm: String): Pokemon
+  playerAccounts: [PlayerAccount]
   pokemonShinyStats(pokemon_id: Int!, form: Int): PokemonShinyStats
   portals(
     minLat: Float
@@ -178,6 +179,7 @@ type Mutation {
   strategy(strategy: String): Boolean
   setGymBadge(gymId: String, badge: Int): Boolean
   setExtraFields(key: String, value: String): Boolean
+  setPlayerAccounts(accounts: [PlayerAccountInput]): PlayerAccounts
   nestSubmission(id: ID, name: String): Boolean
   saveComponent(component: String, code: String): String
 }
