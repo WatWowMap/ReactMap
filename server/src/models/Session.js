@@ -14,13 +14,28 @@ class Session extends Model {
     return results
   }
 
+  /**
+   * Sessions holding perms of `strategy`: signed in with it, or linked to it
+   *
+   * @param {import('objection').QueryBuilder<Session>} builder
+   * @param {string} strategy
+   */
+  static fromStrategy(builder, strategy) {
+    return builder
+      .whereRaw(`json_extract(data, '$.passport.user.rmStrategy') = ?`, [
+        strategy,
+      ])
+      .orWhereRaw(
+        `json_contains(json_extract(data, '$.passport.user.linkedStrategies'), ?)`,
+        [JSON.stringify(strategy)],
+      )
+  }
+
   /** @param {string} strategy */
   static async clearNonDonor(strategy) {
     const result = await this.query()
       .whereRaw(`json_extract(data, '$.passport.user.perms.donor') = false`)
-      .andWhereRaw(
-        `json_extract(data, '$.passport.user.rmStrategy') = '${strategy}'`,
-      )
+      .andWhere((builder) => Session.fromStrategy(builder, strategy))
       .delete()
     log.info(
       TAGS.session,
@@ -36,9 +51,7 @@ class Session extends Model {
   static async clearTrial(strategy) {
     return this.query()
       .whereRaw(`json_extract(data, '$.passport.user.perms.trial') = true`)
-      .andWhereRaw(
-        `json_extract(data, '$.passport.user.rmStrategy') = '${strategy}'`,
-      )
+      .andWhere((builder) => Session.fromStrategy(builder, strategy))
       .delete()
   }
 
