@@ -95,11 +95,14 @@ export function WebhookAdvanced() {
   const human = useWebhookStore((s) => s.human)
   const profile = useWebhookStore((s) => s.profile)
   const tempFilters = useWebhookStore((s) => s.tempFilters[id])
+  // a rule Poracle has saved has a uid; PoracleNG saves rules made with a
+  // command with an empty template, to use its default when sending
+  const saved = !!tempFilters?.template || tempFilters?.uid !== undefined
   const { pokemon, moves, types } = useMemory((s) => s.masterfile)
   const isMobile = useMemory((s) => s.isMobile)
 
   const [filterValues, setFilterValues] = React.useState(
-    tempFilters?.template
+    saved
       ? Poracle.reactMapFriendly(tempFilters)
       : {
           ...Poracle.reactMapFriendly(info?.defaults),
@@ -107,7 +110,7 @@ export function WebhookAdvanced() {
         },
   )
   const [poracleValues, setPoracleValues] = React.useState(
-    tempFilters?.template
+    saved
       ? tempFilters
       : { ...info?.defaults, profile_no: human.current_profile_no },
   )
@@ -146,12 +149,12 @@ export function WebhookAdvanced() {
 
   React.useEffect(() => {
     setPoracleValues(
-      tempFilters?.template
+      saved
         ? { ...tempFilters }
         : { ...info?.defaults, profile_no: human.current_profile_no },
     )
     setFilterValues(
-      tempFilters?.template
+      saved
         ? Poracle.reactMapFriendly(tempFilters)
         : {
             ...Poracle.reactMapFriendly(info?.defaults),
@@ -394,12 +397,17 @@ export function WebhookAdvanced() {
     if (
       field === 'size' &&
       (poracleValues.size > 1 || poracleValues.max_size < 5)
-    )
-      return poracleValues.size === poracleValues.max_size
-        ? `size:${t(`size_${poracleValues.size}`)}`
-        : `size:${t(`size_${poracleValues.size}`)}-${t(
-            `size_${poracleValues.max_size}`,
-          )}`
+    ) {
+      // rules made with a command store "any size" as -1
+      const minSize = Math.max(poracleValues.size, 1)
+      return minSize === poracleValues.max_size
+        ? `size:${t(`size_${minSize}`)}`
+        : `size:${t(`size_${minSize}`)}-${t(`size_${poracleValues.max_size}`)}`
+    }
+    // any size adds nothing, and nor does the empty template of a rule made
+    // with a command
+    if (field === 'size') return ''
+    if (field === 'template' && !poracleValues.template) return ''
 
     if (
       field === 'distance' &&
