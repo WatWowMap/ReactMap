@@ -51,13 +51,14 @@ export function Clustering({ category, children }) {
   const userCluster = useStorage(
     (s) => s.userSettings[category]?.clustering || false,
   )
-  const manualParams = useMemory((s) => s.manualParams)
-  const manualKey = React.useMemo(() => {
+  // a string, so a popup opening in another layer doesn't re-render this one
+  const manualKey = useMemory((s) => {
+    const { manualParams } = s
     const normalized = normalizeCategory(manualParams.category)
     return normalized === category && manualParams.id !== undefined
       ? `${manualParams.id}`
       : null
-  }, [manualParams, category])
+  })
   const {
     config: {
       clustering,
