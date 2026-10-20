@@ -32,6 +32,29 @@ export const SET_EXTRA_FIELDS = gql`
   }
 `
 
+export const GET_PLAYER_ACCOUNTS = gql`
+  query PlayerAccounts {
+    playerAccounts {
+      playerId
+      label
+      active
+    }
+  }
+`
+
+export const SET_PLAYER_ACCOUNTS = gql`
+  mutation SetPlayerAccounts($accounts: [PlayerAccountInput]) {
+    setPlayerAccounts(accounts: $accounts) {
+      accounts {
+        playerId
+        label
+        active
+      }
+      error
+    }
+  }
+`
+
 export const GET_BACKUPS = gql`
   query GetBackups {
     backups {

@@ -21,6 +21,8 @@ import { create } from 'zustand'
  *    telegramOAuth: boolean,
  *    strategy: import('@rm/types').Strategy | '',
  *    userBackupLimits: number,
+ *    personalShinyMax: number,
+ *    personalShinySelfService: boolean,
  *    excludeList: string[],
  *    discordId: string,
  *    telegramId: string,
@@ -33,7 +35,7 @@ import { create } from 'zustand'
  *      scanner: number,
  *    },
  *   },
- *   glowRules: ((pkmn: import('@rm/types').Pokemon) => string)[],
+ *   glowRules: import('@utils/getGlowRules').GlowRule[],
  *   menus: Partial<ReturnType<import('server/src/ui/advMenus')['advMenus']>>
  *   menuFilters: import('@rm/types').ClientFilterObj,
  *   filters: Partial<import('@rm/types').AllFilters>,
@@ -103,6 +105,8 @@ export const useMemory = create(() => ({
     },
     excludeList: [],
     userBackupLimits: 0,
+    personalShinyMax: 0,
+    personalShinySelfService: false,
   },
   glowRules: [],
   config: {

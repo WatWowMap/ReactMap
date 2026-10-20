@@ -75,8 +75,10 @@ export type Config<Client extends boolean = false> = DeepMerge<
       perms: {
         [K in keyof BaseConfig['authentication']['perms']]: Omit<
           BaseConfig['authentication']['perms'][K],
-          'roles'
-        > & { roles: string[] }
+          'roles' | 'limits'
+        > & { roles: string[] } & (K extends 'personalShiny'
+            ? { limits: { roles: string[]; max: number }[] }
+            : {})
       }
     }
     api: {

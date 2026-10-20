@@ -5,6 +5,7 @@ const { clientOptions } = require('../ui/clientOptions')
 const { advMenus } = require('../ui/advMenus')
 const { drawer } = require('../ui/drawer')
 const { isTelegramOAuth } = require('./getTelegramStrategy')
+const { getPersonalShinyMax } = require('./personalShinyLimits')
 
 /**
  *
@@ -17,6 +18,10 @@ function getServerSettings(req) {
       loggedIn: !!req.user,
       cooldown: req.session?.cooldown || 0,
     })
+  user.personalShinyMax = getPersonalShinyMax(user.perms)
+  user.personalShinySelfService = !!config.getSafe(
+    'authentication.perms.personalShiny.selfService',
+  )
 
   const { clientValues, clientMenus } = clientOptions(user.perms)
 

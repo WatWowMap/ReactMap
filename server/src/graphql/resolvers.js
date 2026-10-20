@@ -22,6 +22,8 @@ const { getValidCoords } = require('../utils/getValidCoords')
 const {
   hasAnyPokestopPermission,
 } = require('../utils/hasAnyPokestopPermission')
+const { getPersonalShinyMax } = require('../utils/personalShinyLimits')
+const { validatePlayerAccounts } = require('../utils/validatePlayerAccounts')
 
 /** @type {import("@apollo/server").ApolloServerOptions<import("@rm/types").GqlContext>['resolvers']} */
 const resolvers = {
@@ -271,12 +273,28 @@ const resolvers = {
       }
       return {}
     },
-    pokemon: (_, args, { perms, Db }) => {
+    pokemon: async (_, args, { perms, Db, req }) => {
       if (perms?.pokemon) {
-        if (args.filters.onlyLegacy) {
-          return Db.query('Pokemon', 'getLegacy', perms, args)
+        const scoped = {
+          ...args,
+          personalShinyPlayers:
+            perms.personalShiny && req.user?.id
+              ? await Db.models.PlayerAccount.getActive(
+                  req.user.id,
+                  getPersonalShinyMax(perms),
+                )
+              : [],
         }
-        return Db.query('Pokemon', 'getAll', perms, args)
+        if (args.filters.onlyLegacy) {
+          return Db.query('Pokemon', 'getLegacy', perms, scoped)
+        }
+        return Db.query('Pokemon', 'getAll', perms, scoped)
+      }
+      return []
+    },
+    playerAccounts: (_, __, { req, perms, Db }) => {
+      if (perms?.personalShiny && req.user?.id) {
+        return Db.models.PlayerAccount.getAll(req.user.id)
       }
       return []
     },
@@ -868,6 +886,23 @@ const resolvers = {
         return true
       }
       return false
+    },
+    setPlayerAccounts: async (_, { accounts }, { req, Db, perms }) => {
+      if (!perms?.personalShiny || !req.user?.id) return { error: 'no_access' }
+      if (!config.getSafe('authentication.perms.personalShiny.selfService')) {
+        return { error: 'read_only' }
+      }
+      const result = validatePlayerAccounts(
+        accounts,
+        getPersonalShinyMax(perms),
+      )
+      if (result.error) return result
+      return {
+        accounts: await Db.models.PlayerAccount.replace(
+          req.user.id,
+          result.accounts,
+        ),
+      }
     },
     setGymBadge: async (_, args, { req, Db, perms }) => {
       if (perms?.gymBadges && req?.user?.id) {

@@ -78,7 +78,7 @@ function jsifyIvFilter(filter) {
   }
   const input = filter.toUpperCase()
   const tokenizer =
-    /\s*([()|&!,]|([ADSLXG]?|CP|LC|[GU]L)\s*([0-9]+(?:\.[0-9]*)?)(?:\s*-\s*([0-9]+(?:\.[0-9]*)?))?)/g
+    /\s*([()|&!,]|SHINY|([ADSLXG]?|CP|LC|[GU]L)\s*([0-9]+(?:\.[0-9]*)?)(?:\s*-\s*([0-9]+(?:\.[0-9]*)?))?)/g
   let result = ''
   let expectClause = true // expect a clause or '('
   let stack = 0
@@ -88,7 +88,11 @@ function jsifyIvFilter(filter) {
     if (match.index > lastIndex) {
       return null
     }
-    if (expectClause) {
+    if (expectClause && match[1] === 'SHINY') {
+      // shiny for one of the user's players
+      result += "(!!pokemon['personal_shiny']?.length)"
+      expectClause = false
+    } else if (expectClause) {
       if (match[3] !== undefined) {
         const lower = parseFloat(match[3])
         let column = 'iv'
@@ -153,7 +157,7 @@ function jsifyIvFilter(filter) {
             return null
         }
       }
-    } else if (match[3] !== undefined) {
+    } else if (match[3] !== undefined || match[1] === 'SHINY') {
       return null
     } else {
       switch (match[1]) {
@@ -198,7 +202,7 @@ function dnfifyIvFilter(filter, pokemon) {
   const results = /** @type {import('@rm/types').DnfFilter[]} */ ([])
   const input = filter.toUpperCase()
   const tokenizer =
-    /\s*([|&,]|([ADSLXG]?|CP|LC|[GU]L)\s*([0-9]+(?:\.[0-9]*)?)(?:\s*-\s*([0-9]+(?:\.[0-9]*)?))?)/g
+    /\s*([|&,]|SHINY|([ADSLXG]?|CP|LC|[GU]L)\s*([0-9]+(?:\.[0-9]*)?)(?:\s*-\s*([0-9]+(?:\.[0-9]*)?))?)/g
   let expectClause = true // expect a clause or '('
   let lastIndex = 0
   let match
@@ -207,7 +211,11 @@ function dnfifyIvFilter(filter, pokemon) {
     if (match.index > lastIndex) {
       return []
     }
-    if (expectClause) {
+    if (expectClause && match[1] === 'SHINY') {
+      // shiny for one of the user's players, which the scan fills in
+      clause.personal_shiny = true
+      expectClause = false
+    } else if (expectClause) {
       if (match[3] === undefined) {
         return []
       }
@@ -252,7 +260,7 @@ function dnfifyIvFilter(filter, pokemon) {
       }
       clause[column] = minMax
       expectClause = false
-    } else if (match[3] !== undefined) {
+    } else if (match[3] !== undefined || match[1] === 'SHINY') {
       return []
     } else {
       switch (match[1]) {

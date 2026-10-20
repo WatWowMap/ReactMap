@@ -249,6 +249,7 @@ export interface Permissions extends BasePerms {
   areaRestrictions: string[]
   webhooks: string[]
   trial: boolean
+  personalShinyLimits: number[]
 }
 
 export interface FilterId {
@@ -262,13 +263,15 @@ export interface DnfMinMax {
 
 export interface DnfFilter {
   pokemon?: FilterId | FilterId[]
+  shiny_for?: string[]
+  personal_shiny?: boolean
   iv?: DnfMinMax
   level?: DnfMinMax
   cp?: DnfMinMax
   atk_iv?: DnfMinMax
   def_iv?: DnfMinMax
   sta_iv?: DnfMinMax
-  gender?: DnfMinMax
+  gender?: DnfMinMax | number[]
   size?: DnfMinMax
   pvp_little?: DnfMinMax
   pvp_great?: DnfMinMax
@@ -312,6 +315,8 @@ export interface PokemonGlow
   Hundo?: string
   Nundo?: string
   'Top PVP Rank'?: string
+  'Shiny for Me'?: string
+  Shundo?: string
   Multiple?: string
 }
 export interface ClientOptions

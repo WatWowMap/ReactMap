@@ -25,6 +25,14 @@ const {
   getWildFilterKey,
 } = require('../filters/pokemon/getWildFilterKey')
 const { state } = require('../services/state')
+const {
+  getPersonalShinyPlayers,
+  getPersonalShinyMode,
+  toV3Filter,
+  withPersonalShinyMode,
+  withPersonalShinyTerm,
+  labelPersonalShinies,
+} = require('../utils/personalShiny')
 
 class Pokemon extends Model {
   static get tableName() {
@@ -35,11 +43,13 @@ class Pokemon extends Model {
    * @param {import("@rm/types").Permissions} perms
    * @param {object} args
    * @param {import("@rm/types").DbContext} ctx
+   * @param {import('../utils/personalShiny').PersonalShinyMode} [personalShinyMode]
    * @returns {{ filterMap: Record<string, PkmnBackend>, globalFilter: PkmnBackend }}
    */
-  static getFilters(perms, args, ctx) {
+  static getFilters(perms, args, ctx, personalShinyMode = 'off') {
     const mods = {
       onlyAreas: args.filters.onlyAreas || [],
+      onlyPersonalShiny: personalShinyMode,
       ...ctx,
       ...Object.fromEntries(
         config
@@ -93,7 +103,16 @@ class Pokemon extends Model {
     const { onlyIvOr, onlyHundoIv, onlyZeroIv, onlyAreas = [] } = args.filters
     const { hasSize, hasHeight, hasPokemonBackground, mem, secret, httpAuth } =
       ctx
-    const { filterMap, globalFilter } = this.getFilters(perms, args, ctx)
+    const players = getPersonalShinyPlayers(args, ctx)
+    const playerIds = players.map((player) => player.playerId)
+    const { filterMap, globalFilter } = this.getFilters(
+      perms,
+      args,
+      ctx,
+      playerIds.length
+        ? getPersonalShinyMode(args.filters.onlyPersonalShiny)
+        : 'off',
+    )
 
     let queryPvp = config
       .getSafe('api.pvp.leagues')
@@ -254,27 +273,68 @@ class Pokemon extends Model {
       if (onlyHundoIv)
         filters.push({ iv: { min: 100, max: 100 }, pokemon: globalPokes })
     }
+    /**
+     * @param {import("@rm/types").DnfFilter[]} scanFilters
+     * @param {string[]} [annotateFor]
+     */
+    const scanBody = (scanFilters, annotateFor = undefined) =>
+      JSON.stringify({
+        min: {
+          latitude: args.minLat,
+          longitude: args.minLon,
+        },
+        max: {
+          latitude: args.maxLat,
+          longitude: args.maxLon,
+        },
+        limit: queryLimits.pokemon + queryLimits.pokemonPvp,
+        filters: scanFilters,
+        annotate_for: annotateFor,
+      })
     /** @type {import("@rm/types").Pokemon[]} */
-    let results = await this.evalQuery(
-      mem ? `${mem}/api/pokemon/v2/scan` : null,
-      mem
-        ? JSON.stringify({
-            min: {
-              latitude: args.minLat,
-              longitude: args.minLon,
-            },
-            max: {
-              latitude: args.maxLat,
-              longitude: args.maxLon,
-            },
-            limit: queryLimits.pokemon + queryLimits.pokemonPvp,
+    let results
+    if (playerIds.length) {
+      // the v3 scan marks the user's shinies, and filters them by the mode
+      const scan = await this.evalQuery(
+        `${mem}/api/pokemon/v3/scan`,
+        scanBody(
+          withPersonalShinyMode(
             filters,
-          })
-        : query.limit(queryLimits.pokemon),
-      'POST',
-      secret,
-      httpAuth,
-    )
+            globalFilter.mods.onlyPersonalShiny,
+            playerIds,
+            [
+              ...Object.keys(filterMap).map((key) => {
+                const [id, form] = key.split('-', 2).map(Number)
+                return { id, form }
+              }),
+              { id: -1 },
+            ],
+          ).map(toV3Filter),
+          playerIds,
+        ),
+        'POST',
+        secret,
+        httpAuth,
+      )
+      if (Array.isArray(scan?.pokemon)) {
+        results = scan.pokemon
+        labelPersonalShinies(results, players)
+      } else {
+        // the Golbat refused the players, e.g. before its shiny rates have
+        // loaded: the plain scan, where the mode can't apply (every filter
+        // shares these mods)
+        globalFilter.mods.onlyPersonalShiny = 'off'
+      }
+    }
+    if (!results) {
+      results = await this.evalQuery(
+        mem ? `${mem}/api/pokemon/v2/scan` : null,
+        mem ? scanBody(filters) : query.limit(queryLimits.pokemon),
+        'POST',
+        secret,
+        httpAuth,
+      )
+    }
 
     if (mem && manualId !== null) {
       const loadedIds = Array.isArray(results)
@@ -620,6 +680,8 @@ class Pokemon extends Model {
   static async getLegacy(perms, args, ctx) {
     const { hasSize, hasHeight, mem, secret, httpAuth } = ctx
     const ts = Math.floor(Date.now() / 1000)
+    const players = getPersonalShinyPlayers(args, ctx)
+    const playerIds = players.map((player) => player.playerId)
     const { filterMap, globalFilter } = this.getFilters(perms, args, ctx)
     const manualIdFilter = normalizeManualId(args.filters.onlyManualId)
     const queryLimits = config.getSafe('api.queryLimits')
@@ -660,26 +722,47 @@ class Pokemon extends Model {
     if ((perms.iv || perms.pvp) && mem)
       filters.push(...globalFilter.buildApiFilter())
 
-    let results = await this.evalQuery(
-      mem ? `${mem}/api/pokemon/v2/scan` : null,
-      mem
-        ? JSON.stringify({
-            min: {
-              latitude: args.minLat,
-              longitude: args.minLon,
-            },
-            max: {
-              latitude: args.maxLat,
-              longitude: args.maxLon,
-            },
-            limit: queryLimits.pokemon + queryLimits.pokemonPvp,
-            filters,
-          })
-        : query,
-      'POST',
-      secret,
-      httpAuth,
-    )
+    /** @param {string[]} annotateFor */
+    const scanBody = (annotateFor) =>
+      JSON.stringify({
+        min: {
+          latitude: args.minLat,
+          longitude: args.minLon,
+        },
+        max: {
+          latitude: args.maxLat,
+          longitude: args.maxLon,
+        },
+        limit: queryLimits.pokemon + queryLimits.pokemonPvp,
+        filters: annotateFor.length
+          ? withPersonalShinyTerm(filters, annotateFor).map(toV3Filter)
+          : withPersonalShinyTerm(filters, annotateFor),
+        annotate_for: annotateFor.length ? annotateFor : undefined,
+      })
+    let results
+    if (playerIds.length) {
+      // the v3 scan marks the user's shinies and resolves the shiny term
+      const scan = await this.evalQuery(
+        `${mem}/api/pokemon/v3/scan`,
+        scanBody(playerIds),
+        'POST',
+        secret,
+        httpAuth,
+      )
+      if (Array.isArray(scan?.pokemon)) {
+        results = scan.pokemon
+        labelPersonalShinies(results, players)
+      }
+    }
+    if (!results) {
+      results = await this.evalQuery(
+        mem ? `${mem}/api/pokemon/v2/scan` : null,
+        mem ? scanBody([]) : query,
+        'POST',
+        secret,
+        httpAuth,
+      )
+    }
 
     if (mem && manualId !== null) {
       const loaded = new Set(results.map((pkmn) => `${pkmn.id}`))

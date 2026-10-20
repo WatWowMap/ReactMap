@@ -1458,6 +1458,7 @@
       "gymBadgeTableName": "DATABASE_SETTINGS_GYM_BADGE_TABLE_NAME",
       "sessionTableName": "DATABASE_SETTINGS_SESSION_TABLE_NAME",
       "backupTableName": "DATABASE_SETTINGS_BACKUP_TABLE_NAME",
+      "playerAccountTableName": "DATABASE_SETTINGS_PLAYER_ACCOUNT_TABLE_NAME",
       "migrationTableName": "DATABASE_SETTINGS_MIGRATION_TABLE_NAME",
       "maxConnections": {
         "__name": "DATABASE_SETTINGS_MAX_CONNECTIONS",
@@ -2099,6 +2100,32 @@
         "roles": {
           "__name": "AUTHENTICATION_PERMS_DYNAMAX_ROLES",
           "__format": "json"
+        }
+      },
+      "personalShiny": {
+        "enabled": {
+          "__name": "AUTHENTICATION_PERMS_PERSONAL_SHINY_ENABLED",
+          "__format": "boolean"
+        },
+        "trialPeriodEligible": {
+          "__name": "AUTHENTICATION_PERMS_PERSONAL_SHINY_TRIAL_PERIOD_ELIGIBLE",
+          "__format": "boolean"
+        },
+        "roles": {
+          "__name": "AUTHENTICATION_PERMS_PERSONAL_SHINY_ROLES",
+          "__format": "json"
+        },
+        "limits": {
+          "__name": "AUTHENTICATION_PERMS_PERSONAL_SHINY_LIMITS",
+          "__format": "json"
+        },
+        "defaultMax": {
+          "__name": "AUTHENTICATION_PERMS_PERSONAL_SHINY_DEFAULT_MAX",
+          "__format": "number"
+        },
+        "selfService": {
+          "__name": "AUTHENTICATION_PERMS_PERSONAL_SHINY_SELF_SERVICE",
+          "__format": "boolean"
         }
       }
     }

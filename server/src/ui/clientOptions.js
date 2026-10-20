@@ -330,7 +330,11 @@ function clientOptions(perms) {
             sub: Object.fromEntries(
               clientSideOptions.pokemon.glow.map(({ name, ...glow }) => [
                 name,
-                { ...glow, disabled: !perms[glow.perm], type: 'color' },
+                {
+                  ...glow,
+                  disabled: [glow.perm].flat().some((perm) => !perms[perm]),
+                  type: glow.value === 'rainbow' ? 'rainbow' : 'color',
+                },
               ]),
             ),
           }
