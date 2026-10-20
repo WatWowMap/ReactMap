@@ -844,6 +844,17 @@ const resolvers = {
       return false
     },
     setExtraFields: async (_, { key, value }, { req, Db }) => {
+      // only the fields the profile can edit: the rest of the user's data,
+      // such as the status a local login takes its perms from, is not theirs
+      // to write
+      const editable = config
+        .getSafe('database.settings.extraUserFields')
+        .some((field) =>
+          typeof field === 'string'
+            ? field === key
+            : field?.database === key && !field.disabled,
+        )
+      if (!editable) return false
       if (req.user?.id) {
         const user = await Db.query('User', 'getOne', req.user.id)
         if (user) {
