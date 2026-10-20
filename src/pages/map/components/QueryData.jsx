@@ -118,7 +118,6 @@ function QueryData({ category, timeout }) {
 
   const hideList = useMemory((s) => s.hideList)
   const active = useMemory((s) => s.active)
-  const manualParams = useMemory((s) => s.manualParams)
 
   const userSettings = useStorage(
     (s) => s.userSettings[userSettingsCategory(category)],
@@ -134,7 +133,10 @@ function QueryData({ category, timeout }) {
     () => normalizeCategory(category),
     [category],
   )
-  const manualId = React.useMemo(() => {
+  // only this category's id, so opening a popup elsewhere doesn't re-render
+  // every layer
+  const manualId = useMemory((s) => {
+    const { manualParams } = s
     if (
       manualParams?.id === undefined ||
       manualParams.id === '' ||
@@ -144,7 +146,7 @@ function QueryData({ category, timeout }) {
     }
     const manualCategory = normalizeCategory(manualParams.category)
     return manualCategory === normalizedCategory ? manualParams.id : undefined
-  }, [manualParams, normalizedCategory])
+  })
 
   const buildVariables = React.useCallback(() => {
     const args = getQueryArgs()

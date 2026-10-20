@@ -126,19 +126,17 @@ const BasePokemonTile = (pkmn) => {
     ]
   }, basicEqualFn)
 
-  const manualParams = useMemory((s) => s.manualParams)
-
   const isNearbyStop = pkmn.seen_type === 'nearby_stop'
   const isLure = pkmn.seen_type?.includes('lure')
   const isNearbyCell = pkmn.seen_type === 'nearby_cell'
 
-  const isPopupOpen = React.useMemo(() => {
-    if (!manualParams) return false
-    if (normalizeCategory(manualParams.category) !== 'pokemon') {
-      return false
-    }
-    return `${manualParams.id}` === `${pkmn.id}`
-  }, [manualParams, pkmn.id])
+  // a boolean, so opening one popup doesn't re-render every marker
+  const isPopupOpen = useMemory(
+    (s) =>
+      !!s.manualParams &&
+      normalizeCategory(s.manualParams.category) === 'pokemon' &&
+      `${s.manualParams.id}` === `${pkmn.id}`,
+  )
 
   /** @type {[number, number]} */
   const finalLocation = React.useMemo(() => {
