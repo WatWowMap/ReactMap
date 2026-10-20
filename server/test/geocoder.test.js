@@ -5,6 +5,8 @@ const NodeGeocoder = require('node-geocoder')
 
 const http = require('node:http')
 
+const { log } = require('@rm/logger')
+
 const {
   PoracleAPI,
   resolveGeocoderProvider,
@@ -763,6 +765,26 @@ test('a correctly configured Photon webhook still reverse geocodes', async () =>
       'photon',
     )
     assert.equal(result, 'Denver')
+  } finally {
+    await server.close()
+  }
+})
+
+// Coordinates without an address (open water, say) used to be formatted as
+// an undefined result, which threw and was logged as a failed lookup.
+test('a reverse lookup that finds nothing answers empty without a warning', async (t) => {
+  const warn = t.mock.method(log, 'warn')
+  const server = await serveOnce({ type: 'FeatureCollection', features: [] })
+  try {
+    const result = await geocoder(
+      server.url,
+      { lat: 0, lon: 0 },
+      true,
+      '{{streetName}} - {{city}}',
+      'photon',
+    )
+    assert.equal(result, '')
+    assert.equal(warn.mock.callCount(), 0)
   } finally {
     await server.close()
   }

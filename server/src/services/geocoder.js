@@ -194,6 +194,11 @@ async function geocoder(nominatimUrl, search, reverse, format, provider) {
       provider === 'photon'
         ? await photonGeocoder(nominatimUrl, search, isReverse)
         : await nominatimGeocoder(nominatimUrl, search, isReverse)
+    // nothing at those coordinates is an answer, not a failure: there is no
+    // address to format
+    if (reverse && !results[0]) {
+      return emptyResult(reverse)
+    }
     return reverse
       ? formatter(format, results[0])
       : format
