@@ -23,9 +23,11 @@ function setLocationZoom({ target: map }) {
   const { lat, lng } = map.getCenter()
   const zoom = map.getZoom()
   useStorage.setState({ location: [lat, lng], zoom })
-  useMemory.setState({
-    timeOfDay: timeCheck(lat, lng),
-  })
+  // every marker's useMemory selectors run on any write, so skip a no-op one
+  const timeOfDay = timeCheck(lat, lng)
+  if (useMemory.getState().timeOfDay !== timeOfDay) {
+    useMemory.setState({ timeOfDay })
+  }
   if (map.hasEventListeners('fetchdata')) map.fire('fetchdata')
 }
 
@@ -45,8 +47,9 @@ export function Container() {
         if (ref) {
           const { attributionPrefix } = useMemory.getState().config.general
           ref.attributionControl.setPrefix(attributionPrefix || '')
+          // a zoom fires zoomend and then moveend, so moveend alone covers
+          // both without saving and refetching twice
           ref.on('moveend', setLocationZoom)
-          ref.on('zoomend', setLocationZoom)
         }
         useMapStore.setState({ map: ref })
       }}
