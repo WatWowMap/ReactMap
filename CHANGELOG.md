@@ -1,3 +1,10 @@
+# [1.54.0](https://github.com/WatWowMap/ReactMap/compare/v1.53.2...v1.54.0) (2026-10-20)
+
+
+### Features
+
+* **golbat:** discover instance capabilities from /api/status ([#1258](https://github.com/WatWowMap/ReactMap/issues/1258)) ([c83f93f](https://github.com/WatWowMap/ReactMap/commit/c83f93f6e61eeb8f403bf44d160510f1073807d3))
+
 ## [1.53.2](https://github.com/WatWowMap/ReactMap/compare/v1.53.1...v1.53.2) (2026-10-10)
 
 
