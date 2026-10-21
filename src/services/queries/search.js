@@ -139,6 +139,8 @@ export const POKEMON = gql`
       shiny
       iv
       expire_timestamp
+      personal_shiny
+      personal_background
     }
   }
 `

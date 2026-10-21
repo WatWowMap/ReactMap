@@ -5,7 +5,15 @@
   "reloadConfigOnSave": true,
   "api": {
     "reactMapSecret": "You Should Change Me",
-    "maxSessions": 5
+    "maxSessions": 5,
+    "playerIdLookup": {
+      "url": "https://playerid.mew.is",
+      "apiKey": ""
+    },
+    "shinyRates": {
+      "url": "",
+      "timezone": "Europe/Berlin"
+    }
   },
   "map": {
     "general": {
@@ -242,6 +250,19 @@
         "enabled": true,
         "trialPeriodEligible": false,
         "roles": []
+      },
+      "personalShiny": {
+        "enabled": true,
+        "trialPeriodEligible": false,
+        "roles": [],
+        "limits": [
+          { "roles": ["897581458191"], "max": 2 },
+          { "roles": ["supporter-role-id"], "max": 0 }
+        ],
+        "defaultMax": 1,
+        "golbat": true,
+        "showPlayerId": false,
+        "changeLimit": { "changes": 1, "hours": 24 }
       },
       "routes": {
         "enabled": true,

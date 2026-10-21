@@ -10,6 +10,25 @@ const { log, TAGS } = require('@rm/logger')
 const { setLongTimeout } = require('./setLongTimeout')
 
 const REDACTED_HEADERS = new Set(['authorization', 'x-golbat-secret'])
+/** Request body fields with users' game player ids */
+const REDACTED_FIELDS = new Set(['annotate_for', 'shiny_for', 'background_for'])
+
+/**
+ * The JSON body with users' player ids masked
+ * @param {unknown} body
+ */
+function redactBody(body) {
+  if (typeof body !== 'string' || !body.includes('_for')) return body
+  try {
+    return JSON.stringify(
+      JSON.parse(body, (key, value) =>
+        REDACTED_FIELDS.has(key) ? '<redacted>' : value,
+      ),
+    )
+  } catch (e) {
+    return body
+  }
+}
 
 /**
  * Returns a shallow copy of the fetch options with credential headers masked,
@@ -18,10 +37,14 @@ const REDACTED_HEADERS = new Set(['authorization', 'x-golbat-secret'])
  * @param {import('node-fetch').RequestInit} [options]
  */
 function redactOptions(options) {
-  const headers = options && /** @type {any} */ (options).headers
-  if (!headers || typeof headers !== 'object') return options
+  if (!options) return options
+  const { headers } = /** @type {any} */ (options)
+  if (!headers || typeof headers !== 'object') {
+    return { ...options, body: redactBody(options.body) }
+  }
   return {
     ...options,
+    body: redactBody(options.body),
     headers: Object.fromEntries(
       Object.entries(headers).map(([k, v]) =>
         REDACTED_HEADERS.has(k.toLowerCase()) ? [k, '<redacted>'] : [k, v],

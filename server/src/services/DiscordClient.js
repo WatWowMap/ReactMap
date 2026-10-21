@@ -10,6 +10,7 @@ const { areaPerms } = require('../utils/areaPerms')
 const { webhookPerms } = require('../utils/webhookPerms')
 const { scannerPerms, scannerCooldownBypass } = require('../utils/scannerPerms')
 const { mergePerms } = require('../utils/mergePerms')
+const { personalShinyLimits } = require('../utils/personalShinyLimits')
 const { AuthClient } = require('./AuthClient')
 const { state } = require('./state')
 
@@ -153,6 +154,7 @@ class DiscordClient extends AuthClient {
       scanner: new Set(),
       scannerCooldownBypass: new Set(),
       blockedGuildNames: new Set(),
+      personalShinyLimits: new Set(),
     }
     const scanner = config.getSafe('scanner')
     try {
@@ -226,6 +228,10 @@ class DiscordClient extends AuthClient {
               )
               scannerCooldownBypass(userRoles, 'discordRoles').forEach((x) =>
                 permSets.scannerCooldownBypass.add(x),
+              )
+              // a limit can also be set for a single user by their id
+              personalShinyLimits([...userRoles, user.id]).forEach((x) =>
+                permSets.personalShinyLimits.add(x),
               )
             }
           }),

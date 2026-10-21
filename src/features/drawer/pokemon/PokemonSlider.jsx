@@ -6,6 +6,8 @@ import { useMemory } from '@store/useMemory'
 import { useStorage, setDeepStore } from '@store/useStorage'
 import { SliderTile } from '@components/inputs/SliderTile'
 import { analytics } from '@utils/analytics'
+import { useHasShinyPlayers } from '@hooks/usePersonalShiny'
+import { usePersonalShinyOnly } from '@components/filters/PersonalShiny'
 
 /** @type {import('@rm/types').RMSliderHandleChange<keyof import('@rm/types').PokemonFilter>} */
 const handleChange = (name, values) => {
@@ -19,9 +21,22 @@ const handleChange = (name, values) => {
 /** @param {{ slider: import('@rm/types').RMSlider }} props */
 export function PokemonSlider({ slider }) {
   const values = useStorage((s) => s.filters.pokemon.ivOr[slider.name])
+  // with only personal shinies the shiny IV range takes over
+  const only = usePersonalShinyOnly()
+  const personalShiny = useMemory((s) => !!s.ui.pokemon?.personalShiny)
+  const hasShinyPlayers = useHasShinyPlayers()
+  const shinyOnly = only && personalShiny && hasShinyPlayers
   return (
     <ListItem disablePadding>
-      <SliderTile slide={slider} handleChange={handleChange} values={values} />
+      <SliderTile
+        slide={
+          shinyOnly && slider.name === 'iv'
+            ? { ...slider, disabled: true }
+            : slider
+        }
+        handleChange={handleChange}
+        values={values}
+      />
     </ListItem>
   )
 }

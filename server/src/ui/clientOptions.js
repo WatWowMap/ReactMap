@@ -5,6 +5,20 @@ const {
   getQuestLayerMode,
 } = require('../utils/questLayerMode')
 
+// Keep in sync with src/services/alertSounds.js
+const ALERT_SOUNDS = [
+  'cry',
+  'chime',
+  'bell',
+  'ping',
+  'alert',
+  'fanfare',
+  'sonar',
+  'arcade',
+  'siren',
+  'none',
+]
+
 /** @param {import("@rm/types").Permissions} perms */
 function clientOptions(perms) {
   const clientSideOptions = config.getSafe('clientSideOptions')
@@ -293,6 +307,28 @@ function clientOptions(perms) {
         perm: ['pokemon'],
         category: 'tooltips',
       },
+      // personal shiny, left out entirely without the feature
+      ...(perms.personalShiny
+        ? {
+            personalShinyShowIv: {
+              type: 'bool',
+              perm: ['personalShiny'],
+              category: 'tooltips',
+            },
+            personalShinyNames: {
+              type: 'bool',
+              perm: ['personalShiny'],
+              category: 'tooltips',
+            },
+            personalShinySparkle: {
+              type: 'bool',
+              perm: ['personalShiny'],
+              category: 'markers',
+            },
+          }
+        : {}),
+      // two glows: both colours half/half instead of the "Multiple" colour
+      halfHalfGlow: { type: 'bool', perm: ['pokemon'], category: 'markers' },
       pokemonOpacity: {
         type: 'bool',
         perm: ['pokemon'],
@@ -453,7 +489,20 @@ function clientOptions(perms) {
         max: 100,
       },
       pokemon: { type: 'bool', perm: ['pokemon'] },
+      pokemonSound: {
+        type: 'select',
+        perm: ['pokemon'],
+        options: ALERT_SOUNDS,
+      },
       raids: { type: 'bool', perm: ['raids'] },
+      raidsSound: { type: 'select', perm: ['raids'], options: ALERT_SOUNDS },
+      // left out entirely without the feature, like showArBadge
+      personalShiny: perms.personalShiny
+        ? { type: 'bool', perm: ['personalShiny'] }
+        : undefined,
+      personalShinySound: perms.personalShiny
+        ? { type: 'select', perm: ['personalShiny'], options: ALERT_SOUNDS }
+        : undefined,
       // invasions: { type: 'bool', perm: ['invasions'] },
       // quests: { type: 'bool', perm: ['quests'] },
       // eventStops: { type: 'bool', perm: ['eventStops'] },

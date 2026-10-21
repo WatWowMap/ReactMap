@@ -36,6 +36,7 @@ const { startApollo } = require('./graphql/server')
 const { bindConnections } = require('./models')
 const { migrate } = require('./db/migrate')
 const { rootRouter } = require('./routes/rootRouter')
+const personalShiny = require('./services/personalShiny')
 
 const startServer = async () => {
   await state.event.initialize()
@@ -108,6 +109,15 @@ const startServer = async () => {
   await migrate()
 
   await state.db.getDbContext()
+  // the settings say whether backgrounds can be predicted, which the rates
+  // tell; without this they would only load with the first Pokémon request
+  if (config.getSafe('authentication.perms.personalShiny.enabled')) {
+    personalShiny
+      .getRates(
+        state.db.models.Pokemon?.[0]?.SubModel?.getStatsKnex?.() ?? null,
+      )
+      .catch(() => {})
+  }
 
   const serverInterface = config.getSafe('interface')
   const serverPort = config.getSafe('port')

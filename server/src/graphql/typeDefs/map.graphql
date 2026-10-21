@@ -73,6 +73,8 @@ type Search {
   shiny: Int
   iv: Float
   expire_timestamp: Int
+  personal_shiny: [String]
+  personal_background: [String]
   battle_pokemon_id: Int
   battle_pokemon_form: Int
   battle_pokemon_gender: Int
@@ -215,6 +217,12 @@ type ScannerConfig {
 type WebhookAreaGroups {
   group: String
   children: [String]
+}
+
+type SettingsSync {
+  rev: Float
+  data: JSON
+  conflict: Boolean
 }
 
 input BackupCreate {

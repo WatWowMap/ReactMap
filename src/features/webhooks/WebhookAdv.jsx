@@ -36,6 +36,7 @@ import { FCSelect } from '@components/inputs/FCSelect'
 import { Poracle } from './services/Poracle'
 
 const skipFields = new Set([
+  'personal',
   'profile_no',
   'allForms',
   'pvpEntry',
@@ -95,11 +96,13 @@ export function WebhookAdvanced() {
   const human = useWebhookStore((s) => s.human)
   const profile = useWebhookStore((s) => s.profile)
   const tempFilters = useWebhookStore((s) => s.tempFilters[id])
+  // a saved rule; rules made with a command can have an empty template
+  const saved = !!tempFilters?.template || tempFilters?.uid !== undefined
   const { pokemon, moves, types } = useMemory((s) => s.masterfile)
   const isMobile = useMemory((s) => s.isMobile)
 
   const [filterValues, setFilterValues] = React.useState(
-    tempFilters?.template
+    saved
       ? Poracle.reactMapFriendly(tempFilters)
       : {
           ...Poracle.reactMapFriendly(info?.defaults),
@@ -107,8 +110,8 @@ export function WebhookAdvanced() {
         },
   )
   const [poracleValues, setPoracleValues] = React.useState(
-    tempFilters?.template
-      ? tempFilters
+    saved
+      ? Poracle.withSwitches(tempFilters)
       : { ...info?.defaults, profile_no: human.current_profile_no },
   )
 
@@ -146,12 +149,12 @@ export function WebhookAdvanced() {
 
   React.useEffect(() => {
     setPoracleValues(
-      tempFilters?.template
-        ? { ...tempFilters }
+      saved
+        ? Poracle.withSwitches({ ...tempFilters })
         : { ...info?.defaults, profile_no: human.current_profile_no },
     )
     setFilterValues(
-      tempFilters?.template
+      saved
         ? Poracle.reactMapFriendly(tempFilters)
         : {
             ...Poracle.reactMapFriendly(info?.defaults),
@@ -400,6 +403,9 @@ export function WebhookAdvanced() {
         : `size:${t(`size_${poracleValues.size}`)}-${t(
             `size_${poracleValues.max_size}`,
           )}`
+    // rules made with a command store "any size" as -1 and no template
+    if (field === 'size') return ''
+    if (field === 'template' && !poracleValues.template) return ''
 
     if (
       field === 'distance' &&
@@ -412,6 +418,9 @@ export function WebhookAdvanced() {
     if (field === 'exclusive' && poracleValues.exclusive)
       return ` ${t('exclusive')} `
     if (field === 'clean' && poracleValues.clean) return ` ${t('clean')} `
+    if (field === 'personalShiny') {
+      return poracleValues.personalShiny ? ' personalshiny ' : ''
+    }
     if (field === 'min_spawn_avg' && poracleValues.min_spawn_avg > 0)
       return ` ${t('minspawn')}${poracleValues.min_spawn_avg} `
     if (field === 'slot_changes' && poracleValues.slot_changes)
@@ -533,6 +542,8 @@ export function WebhookAdvanced() {
       ${
         poracleValues.noIv
           ? `${poracleValues.clean ? ` ${t('clean')} ` : ''}${
+              poracleValues.personalShiny ? ' personalshiny ' : ''
+            }${
               poracleValues.byDistance && parseInt(poracleValues.distance)
                 ? ` d${poracleValues.distance} `
                 : ''

@@ -8,6 +8,8 @@ import List from '@mui/material/List'
 import ListItem from '@mui/material/ListItem'
 import ListItemText from '@mui/material/ListItemText'
 import Switch from '@mui/material/Switch'
+import Select from '@mui/material/Select'
+import MenuItem from '@mui/material/MenuItem'
 import ListSubheader from '@mui/material/ListSubheader'
 import { useTranslation } from 'react-i18next'
 import RoomIcon from '@mui/icons-material/Room'
@@ -19,8 +21,12 @@ import TipsAndUpdatesIcon from '@mui/icons-material/TipsAndUpdates'
 import { useMemory } from '@store/useMemory'
 import { toggleDialog, useLayoutStore } from '@store/useLayoutStore'
 import { setDeepStore, useDeepStore, useStorage } from '@store/useStorage'
-import { getPermission } from '@services/desktopNotification'
+import { getPermission, playAlertSound } from '@services/desktopNotification'
 import { analytics } from '@utils/analytics'
+import {
+  isHiddenShinyOption,
+  useHasShinyPlayers,
+} from '@hooks/usePersonalShiny'
 import { getProperName, camelToSnake } from '@utils/strings'
 
 import { Header } from './Header'
@@ -46,6 +52,7 @@ const ICONS = {
  * }} props
  */
 function InputType({ option, subOption, category }) {
+  const { t } = useTranslation()
   const staticSetting = useMemory((s) =>
     subOption
       ? s.clientMenus[category]?.[option]?.sub?.[subOption]
@@ -73,6 +80,33 @@ function InputType({ option, subOption, category }) {
   }
 
   switch (staticSetting.type) {
+    case 'select':
+      return (
+        <Select
+          color="secondary"
+          size="small"
+          value={userValue ?? staticSetting.value ?? ''}
+          disabled={staticSetting.disabled}
+          onChange={(event) => {
+            handleChange(event)
+            if (option.endsWith('Sound')) {
+              const { volumeLevel = 50 } =
+                useStorage.getState().userSettings?.notifications || {}
+              playAlertSound(
+                `${event.target.value}`,
+                undefined,
+                volumeLevel / 100,
+              )
+            }
+          }}
+        >
+          {(staticSetting.options || []).map((value) => (
+            <MenuItem key={value} value={value}>
+              {t(option.endsWith('Sound') ? `sound_${value}` : value)}
+            </MenuItem>
+          ))}
+        </Select>
+      )
     case 'bool':
       return (
         <Switch
@@ -118,6 +152,11 @@ function BaseUserOptions() {
   const { open, category, type } = useLayoutStore((s) => s.dialog)
 
   const staticUserSettings = useMemory((s) => s.clientMenus[category])
+  const hasShinyPlayers = useHasShinyPlayers()
+  // with half/half glows the "Multiple" colour isn't used
+  const halfHalfGlow = useStorage(
+    (s) => s.userSettings?.pokemon?.halfHalfGlow !== false,
+  )
 
   /** @param {string} label */
   const getLabel = (label) => {
@@ -216,31 +255,58 @@ function BaseUserOptions() {
                     {t(key)}
                   </ListSubheader>
                 )}
-                {values.map((option) => (
-                  <React.Fragment key={option}>
-                    <ListItem key={option} disableGutters disablePadding>
-                      <ListItemText sx={{ pl: 2 }} primary={getLabel(option)} />
-                      <MemoInputType category={category} option={option} />
-                    </ListItem>
-                    {!!staticUserSettings[option]?.sub &&
-                      Object.keys(staticUserSettings[option].sub).map(
-                        (subOption) => (
-                          <ListItem
-                            key={subOption}
-                            disableGutters
-                            disablePadding
-                          >
-                            <ListItemText primary={getLabel(subOption)} inset />
-                            <MemoInputType
-                              category={category}
-                              option={option}
-                              subOption={subOption}
-                            />
-                          </ListItem>
-                        ),
-                      )}
-                  </React.Fragment>
-                ))}
+                {values
+                  .filter(
+                    (option) =>
+                      !isHiddenShinyOption(
+                        staticUserSettings[option],
+                        hasShinyPlayers,
+                        option,
+                      ),
+                  )
+                  .map((option) => (
+                    <React.Fragment key={option}>
+                      <ListItem key={option} disableGutters disablePadding>
+                        <ListItemText
+                          sx={{ pl: 2 }}
+                          primary={getLabel(option)}
+                        />
+                        <MemoInputType category={category} option={option} />
+                      </ListItem>
+                      {!!staticUserSettings[option]?.sub &&
+                        Object.keys(staticUserSettings[option].sub)
+                          .filter(
+                            (subOption) =>
+                              !isHiddenShinyOption(
+                                staticUserSettings[option].sub[subOption],
+                                hasShinyPlayers,
+                                subOption,
+                              ) &&
+                              !(
+                                option === 'glow' &&
+                                subOption === 'Multiple' &&
+                                halfHalfGlow
+                              ),
+                          )
+                          .map((subOption) => (
+                            <ListItem
+                              key={subOption}
+                              disableGutters
+                              disablePadding
+                            >
+                              <ListItemText
+                                primary={getLabel(subOption)}
+                                inset
+                              />
+                              <MemoInputType
+                                category={category}
+                                option={option}
+                                subOption={subOption}
+                              />
+                            </ListItem>
+                          ))}
+                    </React.Fragment>
+                  ))}
               </React.Fragment>
             )
           })}

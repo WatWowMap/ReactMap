@@ -135,6 +135,7 @@ type PoraclePokemon {
   pvp_ranking_min_cp: Int
   pvp_ranking_league: Int
   pvp_ranking_cap: Int
+  personal: Int
   description: String
   allForms: Boolean
   pvpEntry: Boolean

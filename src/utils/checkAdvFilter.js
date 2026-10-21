@@ -10,7 +10,7 @@
 export function checkIVFilterValid(filter, dnf = true) {
   const input = filter.toUpperCase()
   const tokenizer =
-    /\s*([()|&!,]|([ADSLXG]?|CP|LC|[GU]L)\s*([0-9]+(?:\.[0-9]*)?)(?:\s*-\s*([0-9]+(?:\.[0-9]*)?))?)/g
+    /\s*([()|&!,]|SHINY|([ADSLXG]?|CP|LC|[GU]L)\s*([0-9]+(?:\.[0-9]*)?)(?:\s*-\s*([0-9]+(?:\.[0-9]*)?))?)/g
   let expectClause = true
   let stack = 0
   let lastIndex = 0
@@ -20,7 +20,8 @@ export function checkIVFilterValid(filter, dnf = true) {
       return null
     }
     if (expectClause) {
-      if (match[3] !== undefined) {
+      // shiny: shiny for one of the user's players
+      if (match[3] !== undefined || match[1] === 'SHINY') {
         expectClause = false
       } else {
         switch (match[1]) {
@@ -38,7 +39,7 @@ export function checkIVFilterValid(filter, dnf = true) {
             return null
         }
       }
-    } else if (match[3] !== undefined) {
+    } else if (match[3] !== undefined || match[1] === 'SHINY') {
       return null
     } else {
       switch (match[1]) {

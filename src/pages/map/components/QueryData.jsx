@@ -16,6 +16,7 @@ import { ActiveWeather } from '@features/weather'
 import { useAnalytics } from '@hooks/useAnalytics'
 import { useProcessError } from '@hooks/useProcessError'
 import { normalizeCategory } from '@utils/normalizeCategory'
+import { isHidden } from '@utils/hideItem'
 
 import { Clustering } from './Clustering'
 import { TILES } from '../tileObject'
@@ -117,6 +118,7 @@ function QueryData({ category, timeout }) {
   const map = useMap()
 
   const hideList = useMemory((s) => s.hideList)
+  const hiddenUntil = useStorage((s) => s.hiddenUntil)
   const active = useMemory((s) => s.active)
   const manualParams = useMemory((s) => s.manualParams)
 
@@ -224,7 +226,10 @@ function QueryData({ category, timeout }) {
     ) : null
   }
 
-  const filteredData = returnData.filter((each) => !hideList.has(each.id))
+  const now = Date.now() / 1000
+  const filteredData = returnData.filter(
+    (each) => !isHidden(each.id, hideList, hiddenUntil, now),
+  )
 
   if (category === 'routes') {
     return <RouteLayer routes={filteredData} />

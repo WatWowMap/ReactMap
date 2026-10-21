@@ -6,6 +6,7 @@ const { GraphQLJSON } = require('graphql-type-json')
 const { S2LatLng, S2RegionCoverer, S2LatLngRect } = require('nodes2ts')
 
 const config = require('@rm/config')
+const { log, TAGS } = require('@rm/logger')
 const { missing, readAndParseJson } = require('@rm/locales')
 
 const { buildDefaultFilters } = require('../filters/builder/base')
@@ -22,6 +23,9 @@ const { getValidCoords } = require('../utils/getValidCoords')
 const {
   hasAnyPokestopPermission,
 } = require('../utils/hasAnyPokestopPermission')
+const personalShiny = require('../services/personalShiny')
+const playerIdLookup = require('../services/playerIdLookup')
+const { getPersonalShinyMax } = require('../utils/personalShinyLimits')
 
 /** @type {import("@apollo/server").ApolloServerOptions<import("@rm/types").GqlContext>['resolvers']} */
 const resolvers = {
@@ -117,6 +121,17 @@ const resolvers = {
       }
       return []
     },
+    // the user's players, read again while a friend code is being looked up
+    personalShinyPlayers: async (_, __, { req, perms, Db, Event }) =>
+      perms?.personalShiny && req.user?.id
+        ? personalShiny.getPlayers(req.user, Db, Event)
+        : null,
+    settingsSync: async (_, { withData }, { req, perms, Db }) => {
+      if (!perms?.backups || !req?.user?.id) return null
+      return (
+        (await Db.models.Backup.getSync(req.user.id, !!withData)) || { rev: 0 }
+      )
+    },
     badges: async (_, _args, { req, perms, Db }) => {
       if (perms?.gymBadges) {
         const badges = await Db.query('Badge', 'getAll', req.user?.id)
@@ -175,10 +190,32 @@ const resolvers = {
 
       const scanner = config.getSafe('scanner')
 
-      const selectedWebhook = await validateSelectedWebhook(req.user, Db, Event)
+      // the webhook stored now: the session keeps the one from its login
+      const stored = req.user?.id
+        ? await Db.query('User', 'getOne', req.user.id)
+        : null
+      const previous = stored?.selectedWebhook || req.user?.selectedWebhook
+      const selectedWebhook = await validateSelectedWebhook(
+        req.user ? { ...req.user, selectedWebhook: previous } : req.user,
+        Db,
+        Event,
+      )
       if (selectedWebhook) {
         req.user.selectedWebhook = selectedWebhook
         req.session.save()
+        // the webhook was switched (access to the old one lost): the
+        // personal shiny players follow, and are unlinked in the old one
+        if (previous && previous !== selectedWebhook) {
+          personalShiny
+            .moveWebhook({ ...req.user, perms }, Db, Event, previous)
+            .catch((e) =>
+              log.warn(
+                TAGS.webhooks,
+                'personal shiny: moving players failed',
+                e,
+              ),
+            )
+        }
       }
 
       return {
@@ -271,14 +308,156 @@ const resolvers = {
       }
       return {}
     },
-    pokemon: (_, args, { perms, Db }) => {
-      if (perms?.pokemon) {
-        if (args.filters.onlyLegacy) {
-          return Db.query('Pokemon', 'getLegacy', perms, args)
-        }
-        return Db.query('Pokemon', 'getAll', perms, args)
+    pokemon: async (_, rawArgs, { perms, Db, req, Event }) => {
+      // also for users who lost the pokemon perm with it (a role ran out)
+      if (!perms?.personalShiny) {
+        personalShiny.unlinkWithoutPerm(req.user, Db, Event)
       }
-      return []
+      if (!perms?.pokemon) return []
+      // the shiny IV range is an IV condition, which needs the iv permission
+      let args = perms.iv
+        ? rawArgs
+        : {
+            ...rawArgs,
+            filters: Object.fromEntries(
+              Object.entries(rawArgs.filters || {}).map(([key, filter]) => [
+                key,
+                filter && typeof filter === 'object' && filter.personal_shiny_iv
+                  ? { ...filter, personal_shiny_iv: [0, 100] }
+                  : filter,
+              ]),
+            ),
+          }
+      // the per-role limit is re-applied here so lowering it takes effect
+      // without users having to re-save; paused players and friend codes
+      // still being looked up count towards it
+      const players = perms.personalShiny
+        ? (await personalShiny.getPlayers(req.user, Db, Event))
+            .slice(0, getPersonalShinyMax(perms))
+            .filter((player) => player.id && !player.paused)
+        : []
+      // personal shinies off / include (all of them, besides the other
+      // results, like the 0% / 100% quick selects) / only; only doesn't apply
+      // to the legacy filter, which has no personal shiny conditions
+      const shinyMode = perms.personalShiny
+        ? args.filters.onlyPersonalShinyMode
+        : 'off'
+      const onlyPersonalShinyExclusive =
+        shinyMode === 'only' && !args.filters.onlyLegacy
+      args = {
+        ...args,
+        filters: {
+          ...args.filters,
+          onlyPersonalShinyExclusive,
+        },
+      }
+      const getResults = () =>
+        Db.query(
+          'Pokemon',
+          args.filters.onlyLegacy ? 'getLegacy' : 'getAll',
+          perms,
+          // a Golbat that rolls personal shinies marks the results itself
+          { ...args, personalShinyPlayers: players },
+        )
+      if (!players.length) {
+        // without active players, only personal shinies would leave the map
+        // empty, so it is ignored until there are some again
+        return onlyPersonalShinyExclusive
+          ? Db.query('Pokemon', 'getAll', perms, {
+              ...args,
+              filters: { ...args.filters, onlyPersonalShinyExclusive: false },
+              personalShinyPlayers: players,
+            })
+          : getResults()
+      }
+      const rates = await personalShiny.getRates(
+        Db.models.Pokemon?.[0]?.SubModel?.getStatsKnex?.() ?? null,
+      )
+      // off: none are added (the results are still marked); include: every
+      // shiny within the shiny IV ranges; only: those matching the filters
+      const getShinies = () =>
+        shinyMode === 'include' || shinyMode === 'only'
+          ? Db.query(
+              'Pokemon',
+              'getPersonalShiny',
+              perms,
+              shinyMode === 'include'
+                ? { ...args, personalShinyScan: true }
+                : args,
+              players,
+              rates,
+            )
+          : []
+      // the background quick select adds every Pokémon with a special
+      // background for the user, like the 0% / 100% quick selects
+      const getBackgrounds = () =>
+        args.filters.onlyPersonalBackground && !args.filters.onlyLegacy
+          ? Db.query(
+              'Pokemon',
+              'getPersonalShiny',
+              perms,
+              { ...args, personalBackgroundScan: true },
+              players,
+              rates,
+            )
+          : []
+      // only personal shinies still marks backgrounds but adds none
+      const [results, shinies, backgrounds] = await Promise.all([
+        onlyPersonalShinyExclusive ? [] : getResults(),
+        getShinies(),
+        onlyPersonalShinyExclusive ? [] : getBackgrounds(),
+      ])
+      // what the scans found wins, it may come from Golbat's own rates
+      /** @type {Map<string, Record<string, any>>} */
+      const scanned = new Map()
+      ;[...shinies, ...backgrounds].forEach((pkmn) => {
+        const id = `${pkmn.id}`
+        scanned.set(id, { ...scanned.get(id), ...pkmn })
+      })
+      /** @param {Record<string, any>} pkmn */
+      const mark = (pkmn) => {
+        const found = scanned.get(`${pkmn.id}`)
+        const shiny = Array.isArray(pkmn.personal_shiny)
+          ? pkmn.personal_shiny
+          : found?.personal_shiny ||
+            personalShiny.shinyFor(pkmn, players, rates)
+        const background = Array.isArray(pkmn.personal_background)
+          ? pkmn.personal_background
+          : found?.personal_background ||
+            personalShiny.backgroundFor(pkmn, players, rates)
+        return {
+          ...pkmn,
+          personal_shiny: shiny,
+          personal_background: background,
+        }
+      }
+      const seen = new Set(results.map((pkmn) => `${pkmn.id}`))
+      const all = [
+        ...results.map(mark),
+        ...[...scanned.values()]
+          .filter((pkmn) => !seen.has(`${pkmn.id}`))
+          .map(mark),
+      ]
+      // the rates only say that there is a background, not which: the one
+      // Golbat sees most around here right now is the event's
+      /** @type {Map<number, number>} */
+      const seenBackgrounds = new Map()
+      all.forEach(({ background }) => {
+        if (background) {
+          seenBackgrounds.set(
+            background,
+            (seenBackgrounds.get(background) || 0) + 1,
+          )
+        }
+      })
+      const eventBackground = [...seenBackgrounds].sort(
+        (a, b) => b[1] - a[1],
+      )[0]?.[0]
+      return all.map((pkmn) =>
+        pkmn.personal_background.length && !pkmn.background && eventBackground
+          ? { ...pkmn, personal_background_id: eventBackground }
+          : pkmn,
+      )
     },
     pokemonSingle: (_, args, { perms, Db }) => {
       if (perms?.pokemon) {
@@ -448,7 +627,12 @@ const resolvers = {
     },
     search: async (_, args, { Event, perms, Db, req }) => {
       const { category, search } = args
-      if (!search || !search.trim()) {
+      // the user's own shinies / backgrounds are listed without a name too
+      if (
+        (!search || !search.trim()) &&
+        category !== 'personalShiny' &&
+        category !== 'personalBackground'
+      ) {
         return []
       }
       switch (category) {
@@ -487,6 +671,31 @@ const resolvers = {
           return perms.nests ? Db.search('Nest', perms, args) : []
         case 'stations':
           return perms.stations ? Db.search('Station', perms, args) : []
+        case 'personalShiny':
+        case 'personalBackground': {
+          // like the tabs, only when the admin has the search turned on
+          if (!config.getSafe('api.searchable')?.[category]) return []
+          // the user's own shinies / backgrounds near the map's centre; they
+          // are Pokémon positions, so the pokemon perm is needed as well
+          if (!perms.personalShiny || !perms.pokemon) return []
+          const players = (await personalShiny.getPlayers(req.user, Db, Event))
+            .slice(0, getPersonalShinyMax(perms))
+            .filter((player) => player.id && !player.paused)
+          if (!players.length) return []
+          const rates = await personalShiny.getRates(
+            Db.models.Pokemon?.[0]?.SubModel?.getStatsKnex?.() ?? null,
+          )
+          const found = await Db.query('Pokemon', 'searchPersonal', perms, {
+            ...args,
+            kind: category === 'personalShiny' ? 'shiny' : 'background',
+            players,
+            rates,
+          })
+          // each scanner source sorts and limits its own results
+          return (Array.isArray(found) ? found : [])
+            .sort((a, b) => a.distance - b.distance)
+            .slice(0, config.getSafe('api.searchResultsLimit'))
+        }
         default:
           return []
       }
@@ -523,7 +732,15 @@ const resolvers = {
     },
     searchable: (_, __, { perms }) => {
       const options = config.getSafe('api.searchable')
-      return Object.keys(options).filter((k) => perms[k] && options[k])
+      // the personal shiny and background searches need personal shiny, and
+      // pokemon as they list Pokémon
+      return Object.keys(options).filter(
+        (k) =>
+          options[k] &&
+          (k === 'personalShiny' || k === 'personalBackground'
+            ? !!perms.personalShiny && !!perms.pokemon
+            : !!perms[k]),
+      )
     },
     spawnpoints: (_, args, { perms, Db }) => {
       if (perms?.spawnpoints) {
@@ -715,6 +932,16 @@ const resolvers = {
         await Db.models.Backup.delete(args.id, req.user.id)
       }
     },
+    setSettingsSync: async (_, { data, baseRev }, { req, perms, Db }) => {
+      if (
+        !perms?.backups ||
+        !req?.user?.id ||
+        !data ||
+        typeof data !== 'object'
+      )
+        return null
+      return Db.models.Backup.setSync(data, Number(baseRev) || 0, req.user.id)
+    },
     updateBackup: async (_, args, { req, perms, Db }) => {
       if (perms?.backups && req.user?.id) {
         await Db.models.Backup.update(args.backup, req.user.id)
@@ -776,6 +1003,10 @@ const resolvers = {
     },
     webhookChange: async (_, args, { req, Db, perms, Event }) => {
       if (req.user?.id && perms.webhooks.includes(args.webhook)) {
+        // the webhook selected now: another device may have changed it since
+        // this session started
+        const stored = await Db.query('User', 'getOne', req.user.id)
+        const previous = stored?.selectedWebhook || req.user.selectedWebhook
         const user = await Db.query(
           'User',
           'updateWebhook',
@@ -784,6 +1015,12 @@ const resolvers = {
         )
         req.user.selectedWebhook = user.selectedWebhook
         req.session.save()
+        // the personal shiny players follow the user to the other Poracle
+        personalShiny
+          .moveWebhook({ ...req.user, perms }, Db, Event, previous)
+          .catch((e) =>
+            log.warn(TAGS.webhooks, 'personal shiny: moving players failed', e),
+          )
         return Event.webhookObj[user.selectedWebhook].api(
           PoracleAPI.getWebhookId(req.user),
           'oneHuman',
@@ -844,19 +1081,123 @@ const resolvers = {
       return false
     },
     setExtraFields: async (_, { key, value }, { req, Db }) => {
+      // only the fields the profile offers: the rest of the user's data
+      // (personal shiny players, status, ...) is not for the user to write
+      const editable = config
+        .getSafe('database.settings.extraUserFields')
+        .filter((field) => typeof field === 'string' || !field?.disabled)
+        .map((field) => (typeof field === 'string' ? field : field?.database))
+      if (!editable.includes(key)) return false
       if (req.user?.id) {
-        const user = await Db.query('User', 'getOne', req.user.id)
-        if (user) {
-          const data =
-            typeof user.data === 'string'
-              ? JSON.parse(user.data)
-              : user.data || {}
-          data[key] = value
-          await user.$query().update({ data: JSON.stringify(data) })
-        }
+        // queued with the user's other saves of the same data
+        await personalShiny.queueSave(req.user.id, async () => {
+          const user = await Db.query('User', 'getOne', req.user.id)
+          if (user) {
+            const data =
+              typeof user.data === 'string'
+                ? JSON.parse(user.data)
+                : user.data || {}
+            data[key] = value
+            await user.$query().update({ data: JSON.stringify(data) })
+          }
+        })
         return true
       }
       return false
+    },
+    setPersonalShiny: async (_, { players }, { req, Db, perms, Event }) => {
+      if (!perms?.personalShiny || !req.user?.id) return null
+      const lookup = playerIdLookup.enabled()
+      // the whole save runs in the user's save queue, so saves (and the
+      // background lookups) can't overwrite each other or Poracle's links
+      return personalShiny.queueSave(req.user.id, async () => {
+        const user = await Db.query('User', 'getOne', req.user.id)
+        if (!user) return null
+        const data =
+          typeof user.data === 'string'
+            ? JSON.parse(user.data)
+            : user.data || {}
+        const before = personalShiny.cleanPlayers(data.personalShiny)
+        const max = getPersonalShinyMax(perms)
+        const saved = new Map(
+          before.filter((p) => p.fc).map((player) => [player.fc, player]),
+        )
+        const cleaned = personalShiny
+          .cleanPlayers(players)
+          .slice(0, max)
+          .map((player) => {
+            if (!player.fc) return player
+            const base = {
+              name: player.name,
+              ...(player.paused ? { paused: true } : {}),
+            }
+            // without lookups there are only player ids
+            if (!lookup) return { ...base, id: player.id }
+            // the id and trainer behind a friend code only ever come from the
+            // lookup, never from the client
+            const known = saved.get(player.fc)
+            return {
+              ...base,
+              id: known?.id || '',
+              fc: player.fc,
+              ...(known?.trainer ? { trainer: known.trainer } : {}),
+              ...(known?.lookup ? { lookup: known.lookup } : {}),
+            }
+          })
+          // nothing would ever look a friend code up, also not one typed as id
+          .filter(
+            (player) =>
+              player.fc ||
+              (player.id && !playerIdLookup.normalizeFriendCode(player.id)),
+          )
+        // the limit is checked before anything is looked up, so a refused
+        // save costs no lookups
+        const { log: changes, retryAt } = personalShiny.checkChanges(
+          data.personalShinyChanges,
+          before,
+          cleaned,
+          max,
+          config.getSafe('authentication.perms.personalShiny.changeLimit'),
+        )
+        if (retryAt) return { error: 'change_limit', retryAt }
+        // a new code, or one whose lookup ended without an id, is asked for
+        // again
+        const forceCodes = new Set(
+          cleaned
+            .map((player) => player.fc)
+            .filter(
+              (fc) =>
+                fc && (!saved.has(fc) || saved.get(fc)?.lookup === 'failed'),
+            ),
+        )
+        const result = lookup
+          ? (await playerIdLookup.resolvePlayers(cleaned, { forceCodes }))
+              .players
+          : cleaned
+        // the lookup can take a while: the rest of the user's data is read
+        // again, so only the personal shiny fields are written
+        const fresh = (await Db.query('User', 'getOne', req.user.id)) || user
+        const freshData =
+          typeof fresh.data === 'string'
+            ? JSON.parse(fresh.data)
+            : fresh.data || {}
+        freshData.personalShiny = result
+        freshData.personalShinyChanges = changes
+        await fresh.$query().update({ data: JSON.stringify(freshData) })
+        personalShiny.setCachedPlayers(req.user.id, result)
+        // with the webhook the user has selected now, which another device
+        // may have changed since this session started
+        await personalShiny.syncPoracle(
+          {
+            ...req.user,
+            selectedWebhook: fresh.selectedWebhook || req.user.selectedWebhook,
+          },
+          Event,
+          before,
+          result,
+        )
+        return result
+      })
     },
     setGymBadge: async (_, args, { req, Db, perms }) => {
       if (perms?.gymBadges && req?.user?.id) {

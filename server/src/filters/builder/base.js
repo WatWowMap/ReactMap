@@ -168,12 +168,16 @@ function buildDefaultFilters(perms) {
             iv: perms.iv ? true : undefined,
             pvp: perms.pvp ? true : undefined,
             standard: base,
-            ivOr: custom,
+            ivOr: perms.personalShiny
+              ? { ...custom, personal_shiny_iv: [0, 100] }
+              : custom,
             // xsRat: defaultFilters.pokemon.xsRat,
             // xlKarp: defaultFilters.pokemon.xlKarp,
             gender: defaultFilters.pokemon.globalValues.gender,
             zeroIv: perms.iv ? false : undefined,
             hundoIv: perms.iv ? true : undefined,
+            personalShinyMode: perms.personalShiny ? 'off' : undefined,
+            personalBackground: perms.personalShiny ? false : undefined,
             filter: pokemon.full,
           }
         : undefined,

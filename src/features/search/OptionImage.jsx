@@ -188,7 +188,16 @@ function Misc() {
 function OptionImage(props) {
   if ('url' in props && props.url) return <FortImage url={props.url} />
   if ('quest_reward_type' in props) return <QuestImage {...props} />
-  if ('pokemon_id' in props) return <PokemonImage {...props} />
+  if ('pokemon_id' in props) {
+    // every result of the shiny search is shiny for the user
+    const { searchTab } = useStorage.getState()
+    return (
+      <PokemonImage
+        {...props}
+        shiny={props.shiny || searchTab === 'personalShiny'}
+      />
+    )
+  }
   if ('raid_pokemon_id' in props) return <RaidImage {...props} />
   if ('lure_id' in props) return <LureImage {...props} />
   if ('nest_pokemon_id' in props) return <NestImage {...props} />

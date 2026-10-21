@@ -70,6 +70,14 @@
         "__format": "number"
       }
     },
+    "playerIdLookup": {
+      "url": "API_PLAYER_ID_LOOKUP_URL",
+      "apiKey": "API_PLAYER_ID_LOOKUP_API_KEY"
+    },
+    "shinyRates": {
+      "url": "API_SHINY_RATES_URL",
+      "timezone": "API_SHINY_RATES_TIMEZONE"
+    },
     "polling": {
       "devices": {
         "__name": "API_POLLING_DEVICES",
@@ -159,6 +167,14 @@
       },
       "stations": {
         "__name": "API_SEARCHABLE_STATIONS",
+        "__format": "boolean"
+      },
+      "personalShiny": {
+        "__name": "API_SEARCHABLE_PERSONAL_SHINY",
+        "__format": "boolean"
+      },
+      "personalBackground": {
+        "__name": "API_SEARCHABLE_PERSONAL_BACKGROUND",
         "__format": "boolean"
       }
     },
@@ -994,6 +1010,22 @@
         "__name": "CLIENT_SIDE_OPTIONS_POKEMON_SPACIAL_REND_RANGE",
         "__format": "boolean"
       },
+      "personalShinyShowIv": {
+        "__name": "CLIENT_SIDE_OPTIONS_POKEMON_PERSONAL_SHINY_SHOW_IV",
+        "__format": "boolean"
+      },
+      "personalShinyNames": {
+        "__name": "CLIENT_SIDE_OPTIONS_POKEMON_PERSONAL_SHINY_NAMES",
+        "__format": "boolean"
+      },
+      "personalShinySparkle": {
+        "__name": "CLIENT_SIDE_OPTIONS_POKEMON_PERSONAL_SHINY_SPARKLE",
+        "__format": "boolean"
+      },
+      "halfHalfGlow": {
+        "__name": "CLIENT_SIDE_OPTIONS_POKEMON_HALF_HALF_GLOW",
+        "__format": "boolean"
+      },
       "glow": {
         "__name": "CLIENT_SIDE_OPTIONS_POKEMON_GLOW",
         "__format": "json"
@@ -1079,10 +1111,17 @@
         "__name": "CLIENT_SIDE_OPTIONS_NOTIFICATIONS_POKEMON",
         "__format": "boolean"
       },
+      "pokemonSound": "CLIENT_SIDE_OPTIONS_NOTIFICATIONS_POKEMON_SOUND",
       "raids": {
         "__name": "CLIENT_SIDE_OPTIONS_NOTIFICATIONS_RAIDS",
         "__format": "boolean"
-      }
+      },
+      "raidsSound": "CLIENT_SIDE_OPTIONS_NOTIFICATIONS_RAIDS_SOUND",
+      "personalShiny": {
+        "__name": "CLIENT_SIDE_OPTIONS_NOTIFICATIONS_PERSONAL_SHINY",
+        "__format": "boolean"
+      },
+      "personalShinySound": "CLIENT_SIDE_OPTIONS_NOTIFICATIONS_PERSONAL_SHINY_SOUND"
     }
   },
   "defaultFilters": {
@@ -2029,6 +2068,46 @@
         "roles": {
           "__name": "AUTHENTICATION_PERMS_GYM_BADGES_ROLES",
           "__format": "json"
+        }
+      },
+      "personalShiny": {
+        "enabled": {
+          "__name": "AUTHENTICATION_PERMS_PERSONAL_SHINY_ENABLED",
+          "__format": "boolean"
+        },
+        "trialPeriodEligible": {
+          "__name": "AUTHENTICATION_PERMS_PERSONAL_SHINY_TRIAL_PERIOD_ELIGIBLE",
+          "__format": "boolean"
+        },
+        "roles": {
+          "__name": "AUTHENTICATION_PERMS_PERSONAL_SHINY_ROLES",
+          "__format": "json"
+        },
+        "limits": {
+          "__name": "AUTHENTICATION_PERMS_PERSONAL_SHINY_LIMITS",
+          "__format": "json"
+        },
+        "defaultMax": {
+          "__name": "AUTHENTICATION_PERMS_PERSONAL_SHINY_DEFAULT_MAX",
+          "__format": "number"
+        },
+        "golbat": {
+          "__name": "AUTHENTICATION_PERMS_PERSONAL_SHINY_GOLBAT",
+          "__format": "boolean"
+        },
+        "showPlayerId": {
+          "__name": "AUTHENTICATION_PERMS_PERSONAL_SHINY_SHOW_PLAYER_ID",
+          "__format": "boolean"
+        },
+        "changeLimit": {
+          "changes": {
+            "__name": "AUTHENTICATION_PERMS_PERSONAL_SHINY_CHANGE_LIMIT_CHANGES",
+            "__format": "number"
+          },
+          "hours": {
+            "__name": "AUTHENTICATION_PERMS_PERSONAL_SHINY_CHANGE_LIMIT_HOURS",
+            "__format": "number"
+          }
         }
       },
       "backups": {
