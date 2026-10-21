@@ -27,6 +27,7 @@ const {
   getWildFilterKey,
 } = require('../filters/pokemon/getWildFilterKey')
 const { state } = require('../services/state')
+const { golbatCapabilities } = require('../services/GolbatCapabilities')
 const {
   shinyFor,
   backgroundFor,
@@ -43,8 +44,8 @@ const GOLBAT_DEFAULT_LIMIT = 3000
 const V2_CAPPED_SHARE = 0.7
 /** How often a capped box is split in four (4^3 = 64 boxes at most) */
 const MAX_SPLIT_DEPTH = 3
-/** Golbat's /api/status is checked for personal shiny support this often */
-const GOLBAT_STATUS_TTL_MS = 5 * 60 * 1000
+/** How long a Golbat without the v3 scan isn't asked for it */
+const GOLBAT_NO_V3_MS = 5 * 60 * 1000
 /** How long a Golbat that refused a personal scan isn't asked for one */
 const GOLBAT_REFUSED_MS = 60 * 1000
 /** Failed personal scans in a row before Golbat counts as refusing them */
@@ -58,8 +59,8 @@ const golbatFailures = new Map()
 /** Golbat rejects more player ids than this in one scan */
 const MAX_GOLBAT_PLAYER_IDS = 50
 
-/** @type {Map<string, { expires: number, supported: Promise<boolean>, known?: boolean }>} */
-const personalShinySupport = new Map()
+/** @type {Map<string, number>} Golbats that refused personal scans, until when */
+const golbatRefused = new Map()
 
 /**
  * The v3 scan takes `gender` as a list instead of the v2 min/max range, every
@@ -698,55 +699,25 @@ class Pokemon extends Model {
     golbatFailures.set(mem, { count: failures, at: now })
     if (failures < GOLBAT_REFUSED_AFTER) return
     golbatFailures.delete(mem)
-    personalShinySupport.set(mem, {
-      known: personalShinySupport.get(mem)?.known,
-      expires: Date.now() + GOLBAT_REFUSED_MS,
-      supported: Promise.resolve(false),
-    })
+    golbatRefused.set(mem, Date.now() + GOLBAT_REFUSED_MS)
+    // it may have been downgraded: its status is read again now
+    golbatCapabilities.recheck(mem)
   }
 
   /**
    * Whether the Golbat endpoint advertises personal shiny filtering
-   * (`annotate_for`) in /api/status, cached per endpoint. Turned off with
-   * `authentication.perms.personalShiny.golbat`, then ReactMap always checks
-   * the candidates itself.
+   * (`annotate_for`) in /api/status and hasn't refused it lately. Turned off
+   * with `authentication.perms.personalShiny.golbat`, then ReactMap always
+   * checks the candidates itself.
    * @param {import("@rm/types").DbContext} ctx
    * @returns {Promise<boolean>}
    */
-  static async supportsPersonalShiny({ mem, secret, httpAuth }) {
+  static async supportsPersonalShiny({ mem }) {
     if (config.getSafe('authentication.perms.personalShiny.golbat') === false) {
       return false
     }
-    const cached = personalShinySupport.get(mem)
-    if (cached && cached.expires > Date.now()) return cached.supported
-    const supported = this.evalQuery(
-      `${mem}/api/status`,
-      undefined,
-      'GET',
-      secret,
-      httpAuth,
-    )
-      .then(
-        (status) => /** @type {any} */ (status)?.filters?.annotate_for === true,
-      )
-      .catch(() => false)
-      .then((isSupported) => {
-        if (cached && cached.known !== isSupported) {
-          log.info(
-            TAGS.pokemon,
-            `personal shiny: ${mem} ${isSupported ? 'filters' : 'no longer filters'} personal shinies itself`,
-          )
-        }
-        const entry = personalShinySupport.get(mem)
-        if (entry) entry.known = isSupported
-        return isSupported
-      })
-    personalShinySupport.set(mem, {
-      known: cached?.known,
-      expires: Date.now() + GOLBAT_STATUS_TTL_MS,
-      supported,
-    })
-    return supported
+    if ((golbatRefused.get(mem) || 0) > Date.now()) return false
+    return golbatCapabilities.supportsFilter(mem, 'annotate_for')
   }
 
   /**
@@ -994,7 +965,7 @@ class Pokemon extends Model {
             useV3 = false
             // only an answer without it (an HTTP error), not a timeout
             if (typeof (/** @type {any} */ (v3)?.status) === 'number') {
-              golbatNoV3.set(mem, Date.now() + GOLBAT_STATUS_TTL_MS)
+              golbatNoV3.set(mem, Date.now() + GOLBAT_NO_V3_MS)
             }
           }
         }
