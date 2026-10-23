@@ -273,6 +273,13 @@ export function PokemonPopup({ pokemon, iconUrl, isTutorial = false }) {
       {pokemon.seen_type === 'nearby_cell' && (
         <Typography>{t('pokemon_cell')}</Typography>
       )}
+      {!!pokemon.shiny_for?.length && (
+        <Grid xs={12} textAlign="center">
+          <Typography variant="caption">
+            {t('personal_shiny_for', { ids: pokemon.shiny_for.join(', ') })}
+          </Typography>
+        </Grid>
+      )}
       {!!pokemon.expire_timestamp && (
         <Timer pokemon={pokemon} hasStats={hasStats} />
       )}

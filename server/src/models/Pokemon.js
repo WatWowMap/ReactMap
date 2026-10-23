@@ -26,6 +26,17 @@ const {
   getWildFilterKey,
 } = require('../filters/pokemon/getWildFilterKey')
 const { state } = require('../services/state')
+const {
+  parsePlayerIds,
+  parseIvRange,
+  toV3Filter,
+  toShundoFilter,
+} = require('../utils/personalShiny')
+
+const GOLBAT_STATUS_TTL_MS = 5 * 60 * 1000
+
+/** @type {Map<string, { expires: number, supported: Promise<boolean> }>} */
+const personalShinySupport = new Map()
 
 class Pokemon extends Model {
   static get tableName() {
@@ -36,9 +47,10 @@ class Pokemon extends Model {
    * @param {import("@rm/types").Permissions} perms
    * @param {object} args
    * @param {import("@rm/types").DbContext} ctx
+   * @param {number[]} [ivOverride] replaces every IV range, used for the shiny IV filters
    * @returns {{ filterMap: Record<string, PkmnBackend>, globalFilter: PkmnBackend }}
    */
-  static getFilters(perms, args, ctx) {
+  static getFilters(perms, args, ctx, ivOverride = undefined) {
     const mods = {
       onlyAreas: args.filters.onlyAreas || [],
       ...ctx,
@@ -50,16 +62,13 @@ class Pokemon extends Model {
     }
     /** @type {Record<string, PkmnBackend>} */
     const filterMap = {}
+    const withIv = (filter) =>
+      ivOverride && filter ? { ...filter, iv: ivOverride } : filter
+    const ivOr = withIv(args.filters.onlyIvOr)
 
     Object.entries(args.filters).forEach(([key, filter]) => {
       if (key.includes('-')) {
-        filterMap[key] = new PkmnBackend(
-          key,
-          filter,
-          args.filters.onlyIvOr,
-          perms,
-          mods,
-        )
+        filterMap[key] = new PkmnBackend(key, withIv(filter), ivOr, perms, mods)
       } else if (typeof filter === 'boolean') {
         mods[key] = filter
       }
@@ -69,13 +78,7 @@ class Pokemon extends Model {
       // if no pokemon are present we want global filters to apply still
       mods.onlyLinkGlobal = false
     }
-    const globalFilter = new PkmnBackend(
-      'global',
-      args.filters.onlyIvOr,
-      args.filters.onlyIvOr,
-      perms,
-      mods,
-    )
+    const globalFilter = new PkmnBackend('global', ivOr, ivOr, perms, mods)
 
     return {
       filterMap,
@@ -227,37 +230,90 @@ class Pokemon extends Model {
       }
     }
 
-    const filters = mem
-      ? Object.values(filterMap).flatMap((filter) => filter.buildApiFilter())
-      : []
-    if ((perms.iv || perms.pvp) && mem) {
-      const pokemon = Object.keys(filterMap)
-        .filter((key) => key.includes('-'))
-        .map((key) => {
-          const [id, form] = key.split('-', 2).map(Number)
-          return { id, form }
-        })
-      if (!globalFilter.mods.onlyLinkGlobal) {
-        pokemon.push({ id: -1 }) // add everything else
+    /**
+     * @param {ReturnType<typeof Pokemon.getFilters>} filterSet
+     * @returns {import('@rm/types').DnfFilter[]}
+     */
+    const buildScanFilters = (filterSet) => {
+      const built = mem
+        ? Object.values(filterSet.filterMap).flatMap((filter) =>
+            filter.buildApiFilter(),
+          )
+        : []
+      if ((perms.iv || perms.pvp) && mem) {
+        const pokemon = Object.keys(filterSet.filterMap)
+          .filter((key) => key.includes('-'))
+          .map((key) => {
+            const [id, form] = key.split('-', 2).map(Number)
+            return { id, form }
+          })
+        if (!filterSet.globalFilter.mods.onlyLinkGlobal) {
+          pokemon.push({ id: -1 }) // add everything else
+        }
+        if (
+          filterSet.globalFilter.mods.onlyLinkGlobal
+            ? !!built.length || filterSet.globalFilter.mods.onlyEasyMode
+            : true
+        ) {
+          built.push(...filterSet.globalFilter.buildApiFilter(pokemon))
+        }
+        const globalPokes = filterSet.globalFilter.mods.onlyLinkGlobal
+          ? [...pokemon, { id: -1 }]
+          : pokemon
+        if (onlyZeroIv)
+          built.push({ iv: { min: 0, max: 0 }, pokemon: globalPokes })
+        if (onlyHundoIv)
+          built.push({ iv: { min: 100, max: 100 }, pokemon: globalPokes })
       }
-      if (
-        globalFilter.mods.onlyLinkGlobal
-          ? !!filters.length || globalFilter.mods.onlyEasyMode
-          : true
-      ) {
-        filters.push(...globalFilter.buildApiFilter(pokemon))
-      }
-      const globalPokes = globalFilter.mods.onlyLinkGlobal
-        ? [...pokemon, { id: -1 }]
-        : pokemon
-      if (onlyZeroIv)
-        filters.push({ iv: { min: 0, max: 0 }, pokemon: globalPokes })
-      if (onlyHundoIv)
-        filters.push({ iv: { min: 100, max: 100 }, pokemon: globalPokes })
+      return built
     }
+    const filters = buildScanFilters({ filterMap, globalFilter })
+    // Personal shiny annotation is only offered by Golbat's v3 scan
+    const annotateFor =
+      mem &&
+      perms.personalShiny &&
+      config.getSafe('map.misc.enablePersonalShiny')
+        ? parsePlayerIds(args.filters.onlyPersonalShinyIds)
+        : []
+    const useV3 =
+      annotateFor.length > 0 && (await this.supportsPersonalShiny(ctx))
+    // Shundos are personal shinies with 100% IV
+    const onlyShundo =
+      annotateFor.length > 0 && perms.iv && !!args.filters.onlyShundo
+    const onlyPersonalShiny =
+      annotateFor.length > 0 && (onlyShundo || !!args.filters.onlyPersonalShiny)
+    // The Shiny IV Range replaces every IV range for personal shinies, leaving
+    // them untouched by the regular IV Range
+    const shinyIv =
+      useV3 && perms.iv && !globalFilter.mods.onlyLegacy
+        ? parseIvRange(args.filters.onlyShinyIv)
+        : null
+    const shinyFilterSet = shinyIv
+      ? this.getFilters(perms, args, ctx, shinyIv)
+      : null
+    /** @param {import('@rm/types').DnfFilter} filter */
+    const toShinyFilter = (filter) => {
+      const v3Filter = toV3Filter(filter)
+      const shinyFilter = onlyShundo ? toShundoFilter(v3Filter) : v3Filter
+      return shinyFilter ? [{ ...shinyFilter, shiny_for: annotateFor }] : []
+    }
+    // Golbat applies shiny_for and iv before its result limit, so zoomed out
+    // views aren't truncated by non shiny Pokémon
+    const scanFilters = useV3
+      ? [
+          ...(onlyPersonalShiny ? [] : filters.map(toV3Filter)),
+          ...(onlyPersonalShiny || shinyFilterSet
+            ? (shinyFilterSet
+                ? buildScanFilters(shinyFilterSet)
+                : filters
+              ).flatMap(toShinyFilter)
+            : []),
+        ]
+      : filters
+
     /** @type {import("@rm/types").Pokemon[]} */
     let results = await this.evalQuery(
-      mem ? `${mem}/api/pokemon/v2/scan` : null,
+      mem ? `${mem}/api/pokemon/${useV3 ? 'v3' : 'v2'}/scan` : null,
       mem
         ? JSON.stringify({
             min: {
@@ -269,13 +325,28 @@ class Pokemon extends Model {
               longitude: args.maxLon,
             },
             limit: queryLimits.pokemon + queryLimits.pokemonPvp,
-            filters,
+            filters: scanFilters,
+            ...(useV3 ? { annotate_for: annotateFor } : {}),
           })
         : query.limit(queryLimits.pokemon),
       'POST',
       secret,
       httpAuth,
     )
+    if (useV3) {
+      // v3 wraps the list with scan stats
+      results = /** @type {any} */ (results)?.pokemon
+    }
+    if (onlyPersonalShiny) {
+      // Without v3 support nothing can be known to be shiny
+      results =
+        useV3 && Array.isArray(results)
+          ? results.filter(
+              (pkmn) =>
+                pkmn.shiny_for?.length && (!onlyShundo || pkmn.iv === 100),
+            )
+          : []
+    }
 
     if (mem && manualId !== null) {
       const loadedIds = Array.isArray(results)
@@ -305,11 +376,25 @@ class Pokemon extends Model {
     const pvpResults = []
     const listOfIds = []
 
+    /**
+     * Personal shinies are validated against the Shiny IV Range filters
+     * @param {import("@rm/types").Pokemon} pkmn
+     */
+    const getFilter = (pkmn) => {
+      const filterSet =
+        shinyFilterSet && pkmn.shiny_for?.length
+          ? shinyFilterSet
+          : { filterMap, globalFilter }
+      return (
+        filterSet.filterMap[getWildFilterKey(pkmn.pokemon_id, pkmn.form)] ||
+        filterSet.globalFilter
+      )
+    }
+
     // form checker
     for (let i = 0; i < results.length; i += 1) {
       const pkmn = results[i]
-      const id = getWildFilterKey(pkmn.pokemon_id, pkmn.form)
-      const filter = filterMap[id] || globalFilter
+      const filter = getFilter(pkmn)
       let noPvp = true
 
       if (pvp && pkmn.pvp) {
@@ -356,8 +441,7 @@ class Pokemon extends Model {
 
     for (let i = 0; i < pvpResults.length; i += 1) {
       const pkmn = pvpResults[i]
-      const filter =
-        filterMap[getWildFilterKey(pkmn.pokemon_id, pkmn.form)] || globalFilter
+      const filter = getFilter(pkmn)
       const result = filter.build(pkmn)
       if (filter.valid(result)) {
         finalResults.push(result)
@@ -418,6 +502,42 @@ class Pokemon extends Model {
       : query)
     log.debug(TAGS.pokemon, 'raw result length', results?.length || 0)
     return results || []
+  }
+
+  /**
+   * Whether the Golbat endpoint advertises `annotate_for` in /api/status,
+   * cached per endpoint so it doesn't add a request to every scan
+   * @param {import("@rm/types").DbContext} ctx
+   * @returns {Promise<boolean>}
+   */
+  static async supportsPersonalShiny({ mem, secret, httpAuth }) {
+    const cached = personalShinySupport.get(mem)
+    if (cached && cached.expires > Date.now()) return cached.supported
+    const supported = this.evalQuery(
+      `${mem}/api/status`,
+      undefined,
+      'GET',
+      secret,
+      httpAuth,
+    )
+      .then(
+        (status) => /** @type {any} */ (status)?.filters?.annotate_for === true,
+      )
+      .catch(() => false)
+      .then((isSupported) => {
+        if (!isSupported) {
+          log.warn(
+            TAGS.pokemon,
+            `${mem} does not support personal shiny annotation, configure [shiny_rates] in Golbat`,
+          )
+        }
+        return isSupported
+      })
+    personalShinySupport.set(mem, {
+      expires: Date.now() + GOLBAT_STATUS_TTL_MS,
+      supported,
+    })
+    return supported
   }
 
   /**

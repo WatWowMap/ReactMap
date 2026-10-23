@@ -26,6 +26,9 @@ import { PokemonPopup } from './PokemonPopup'
 import { basicPokemonMarker, fancyPokemonMarker } from './pokemonMarker'
 
 const INTERACTION_RANGE_COLOR = '#BA42F6'
+const PERSONAL_SHINY_GLOW = '#FFD700'
+const SHUNDO_GLOW = '#9B30FF'
+const SPARKLE_MIN_IV = 70
 
 /**
  *
@@ -52,6 +55,8 @@ const BasePokemonTile = (pkmn) => {
   const [markerRef, setMarkerRef] = React.useState(null)
 
   const opacity = useOpacity('pokemon')(pkmn.expire_timestamp)
+  const isPersonalShiny = !!pkmn.shiny_for?.length
+  const isShundo = isPersonalShiny && pkmn.iv === 100
 
   const [
     showTimer,
@@ -63,6 +68,7 @@ const BasePokemonTile = (pkmn) => {
     showInteractionRange,
     showSpacialRendRange,
     filterSize,
+    sparkle,
   ] = useStorage((s) => {
     const {
       pokemonTimers,
@@ -75,10 +81,17 @@ const BasePokemonTile = (pkmn) => {
       showSizeIndicator,
       interactionRanges,
       spacialRendRange,
+      shinySparkles,
     } = s.userSettings.pokemon
     return [
       pokemonTimers,
-      glow ? getGlowStatus(pkmn, s.userSettings.pokemon) : undefined,
+      isShundo
+        ? SHUNDO_GLOW
+        : isPersonalShiny
+          ? PERSONAL_SHINY_GLOW
+          : glow
+            ? getGlowStatus(pkmn, s.userSettings.pokemon)
+            : undefined,
       !!(ivCircles && pkmn.iv !== null && pkmn.iv >= minIvCircle),
       !!(levelCircles && pkmn.level !== null && pkmn.level >= minLevelCircle),
       !!(pkmn.weather && weatherIndicator),
@@ -86,6 +99,13 @@ const BasePokemonTile = (pkmn) => {
       interactionRanges,
       spacialRendRange,
       s.filters.pokemon.filter[internalId]?.size || 'md',
+      shinySparkles !== false && isPersonalShiny
+        ? isShundo
+          ? 'shundo'
+          : pkmn.iv >= SPARKLE_MIN_IV
+            ? 'high'
+            : undefined
+        : undefined,
     ]
   }, basicEqualFn)
 
@@ -109,6 +129,8 @@ const BasePokemonTile = (pkmn) => {
         0,
         pkmn.gender,
         pkmn.costume,
+        0,
+        isPersonalShiny,
       ),
       Icons.getSize('pokemon', filterSize),
       badgeId ? Icons.getMisc(badgeId) : '',
@@ -155,6 +177,7 @@ const BasePokemonTile = (pkmn) => {
   /** @type {(string | import('react').ReactElement)[]} */
   const extras = React.useMemo(() => {
     const decorators = []
+    if (isPersonalShiny) decorators.push('✨')
     if (showIv) decorators.push(`${Math.round(pkmn.iv)}%`)
     if (showLevel) decorators.push(`L${Math.round(pkmn.level)}`)
     if (showSize)
@@ -164,7 +187,7 @@ const BasePokemonTile = (pkmn) => {
         <img key={badge} src={badge} alt={badge} style={{ height: 12 }} />,
       )
     return decorators
-  }, [showIv, showLevel, showSize, badge])
+  }, [isPersonalShiny, showIv, showLevel, showSize, badge])
 
   useForcePopup(pkmn.id, markerRef)
   useMarkerTimer(pkmn.expire_timestamp, markerRef)
@@ -276,6 +299,7 @@ const BasePokemonTile = (pkmn) => {
                 opacity,
                 timeOfDay,
                 backgroundUrl,
+                sparkle,
               })
             : basicPokemonMarker({ iconUrl, iconSize })
         }
@@ -334,5 +358,7 @@ const BasePokemonTile = (pkmn) => {
 
 export const PokemonTile = React.memo(
   BasePokemonTile,
-  (prev, next) => prev.updated === next.updated,
+  (prev, next) =>
+    prev.updated === next.updated &&
+    prev.shiny_for?.join() === next.shiny_for?.join(),
 )

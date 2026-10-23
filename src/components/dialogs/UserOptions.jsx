@@ -86,7 +86,10 @@ function InputType({ option, subOption, category }) {
       return (
         <Input
           color="secondary"
-          style={{ width: 50, minHeight: 38 }}
+          style={{
+            width: staticSetting.type === 'text' ? 160 : 50,
+            minHeight: 38,
+          }}
           value={userValue ?? ''}
           onChange={handleChange}
           size="small"

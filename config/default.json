@@ -263,6 +263,7 @@
       "clientTimeoutMinutes": 30,
       "distanceUnit": "kilometers",
       "enablePokemonPopupCoordsSelector": false,
+      "enablePersonalShiny": false,
       "enableGymPopupCoordsSelector": false,
       "enablePokestopPopupCoordsSelector": false,
       "enablePortalPopupCoordsSelector": false,
@@ -426,6 +427,10 @@
       "showSizeIndicator": false,
       "enablePokemonPopupCoords": false,
       "spacialRendRange": false,
+      "personalShinyIds": "",
+      "onlyPersonalShiny": false,
+      "onlyShundo": false,
+      "shinySparkles": true,
       "glow": [
         {
           "name": "Hundo",
@@ -565,6 +570,7 @@
       "onlyShowAvailable": true,
       "legacyFilter": false,
       "allPokemon": false,
+      "shinyIv": [0, 100],
       "globalValues": {
         "iv": [80, 100],
         "level": [1, 55],
@@ -921,6 +927,11 @@
         "roles": []
       },
       "dynamax": {
+        "enabled": true,
+        "trialPeriodEligible": false,
+        "roles": []
+      },
+      "personalShiny": {
         "enabled": true,
         "trialPeriodEligible": false,
         "roles": []
