@@ -1007,6 +1007,10 @@
         "__name": "CLIENT_SIDE_OPTIONS_POKEMON_ONLY_SHUNDO",
         "__format": "boolean"
       },
+      "shinySparkles": {
+        "__name": "CLIENT_SIDE_OPTIONS_POKEMON_SHINY_SPARKLES",
+        "__format": "boolean"
+      },
       "glow": {
         "__name": "CLIENT_SIDE_OPTIONS_POKEMON_GLOW",
         "__format": "json"

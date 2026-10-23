@@ -350,6 +350,9 @@ function clientOptions(perms) {
       onlyShundo: hasPersonalShiny
         ? { type: 'bool', perm: ['personalShiny'], category: 'filters' }
         : undefined,
+      shinySparkles: hasPersonalShiny
+        ? { type: 'bool', perm: ['personalShiny'], category: 'markers' }
+        : undefined,
     },
     wayfarer: {
       clustering: { type: 'bool', perm: ['portals'], category: 'markers' },

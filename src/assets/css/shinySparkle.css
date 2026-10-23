@@ -1,0 +1,224 @@
+/* Animated sparkles for personal shinies: ripple for 70-99% IV, crowned for shundos */
+
+.shiny-sparkle {
+  --sparkle-color: #ffd54a;
+  --sparkle-light: #fff3bf;
+  --sparkle-aura: rgba(255, 213, 74, 0.55);
+  --sparkle-aura-soft: rgba(255, 213, 74, 0.18);
+  /* matches the sprite's box inside .marker-image-holder */
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  pointer-events: none;
+}
+
+.shiny-sparkle.shundo {
+  --sparkle-color: #b26bff;
+  --sparkle-light: #ffb3ec;
+  --sparkle-aura: rgba(178, 107, 255, 0.55);
+  --sparkle-aura-soft: rgba(178, 107, 255, 0.18);
+}
+
+.shiny-sparkle > span,
+.shiny-sparkle__stars > span {
+  position: absolute;
+  display: block;
+}
+
+/* soft breathing glow behind the sprite */
+.shiny-sparkle__aura {
+  inset: -18%;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    var(--sparkle-aura) 0,
+    var(--sparkle-aura-soft) 42%,
+    transparent 66%
+  );
+  animation: shiny-sparkle-breathe 2.6s ease-in-out infinite;
+  animation-delay: var(--sparkle-offset, 0s);
+}
+
+/* four-point stars that pop and spin */
+.shiny-sparkle__stars {
+  inset: 0;
+  filter: drop-shadow(0 0 0.035em var(--sparkle-color))
+    drop-shadow(0 0 0.07em var(--sparkle-color));
+}
+.shiny-sparkle__stars > span {
+  width: var(--star-size);
+  height: var(--star-size);
+  background: radial-gradient(
+    circle,
+    #fff 0 22%,
+    var(--sparkle-light) 40%,
+    var(--sparkle-color) 75%
+  );
+  clip-path: polygon(
+    50% 0,
+    57% 43%,
+    100% 50%,
+    57% 57%,
+    50% 100%,
+    43% 57%,
+    0 50%,
+    43% 43%
+  );
+  transform: scale(0);
+  animation: shiny-sparkle-twinkle 2.4s cubic-bezier(0.3, 0.7, 0.4, 1) infinite;
+  animation-delay: calc(var(--star-delay) + var(--sparkle-offset, 0s));
+}
+
+/* 70-99%: glowing pool with rings spreading outward */
+.shiny-sparkle__pool {
+  left: 18%;
+  right: 18%;
+  bottom: 2%;
+  height: 16%;
+  border-radius: 50%;
+  background: radial-gradient(
+    closest-side,
+    rgba(255, 213, 74, 0.7),
+    transparent
+  );
+  filter: blur(0.03em);
+}
+.shiny-sparkle__ripple {
+  left: 5%;
+  right: 5%;
+  bottom: -4%;
+  height: 34%;
+  border-radius: 50%;
+  box-shadow:
+    0 0 0 0.025em var(--sparkle-color),
+    0 0 0.12em 0.02em var(--sparkle-color),
+    inset 0 0 0.1em var(--sparkle-aura);
+  opacity: 0;
+  animation: shiny-sparkle-ripple 2.4s cubic-bezier(0.2, 0.6, 0.3, 1) infinite;
+  animation-delay: calc(var(--ripple-delay, 0s) + var(--sparkle-offset, 0s));
+}
+
+/* shundo: spinning spectrum halo */
+.shiny-sparkle__halo {
+  inset: -16%;
+  border-radius: 50%;
+  background: conic-gradient(
+    from 0deg,
+    #ff6bd5,
+    #b26bff,
+    #6bb8ff,
+    #6bffd8,
+    #fff36b,
+    #ff9a6b,
+    #ff6bd5
+  );
+  -webkit-mask: radial-gradient(
+    closest-side,
+    transparent 74%,
+    #000 78%,
+    #000 83%,
+    transparent 88%
+  );
+  mask: radial-gradient(
+    closest-side,
+    transparent 74%,
+    #000 78%,
+    #000 83%,
+    transparent 88%
+  );
+  animation: shiny-sparkle-spin 3.4s linear infinite;
+}
+.shiny-sparkle__halo--bloom {
+  inset: -22%;
+  filter: blur(0.05em);
+  opacity: 0.85;
+}
+
+/* shundo: iridescent band sweeping across the sprite */
+.shiny-sparkle__sheen {
+  inset: 0;
+  background: linear-gradient(
+    115deg,
+    transparent 32%,
+    rgba(255, 120, 220, 0) 38%,
+    rgba(255, 130, 225, 0.75) 44%,
+    #fff 50%,
+    rgba(120, 210, 255, 0.75) 56%,
+    rgba(120, 210, 255, 0) 62%,
+    transparent 68%
+  );
+  background-size: 320% 100%;
+  background-repeat: no-repeat;
+  -webkit-mask: var(--sparkle-sprite) center / contain no-repeat;
+  mask: var(--sparkle-sprite) center / contain no-repeat;
+  mix-blend-mode: screen;
+  animation: shiny-sparkle-sweep 3s ease-in-out infinite;
+  animation-delay: var(--sparkle-offset, 0s);
+}
+
+@keyframes shiny-sparkle-breathe {
+  0%,
+  100% {
+    opacity: 0.55;
+    transform: scale(0.92);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.04);
+  }
+}
+
+@keyframes shiny-sparkle-twinkle {
+  0% {
+    transform: scale(0) rotate(0deg);
+    opacity: 0;
+  }
+  12% {
+    opacity: 1;
+  }
+  26% {
+    transform: scale(1) rotate(45deg);
+    opacity: 1;
+  }
+  44%,
+  100% {
+    transform: scale(0) rotate(90deg);
+    opacity: 0;
+  }
+}
+
+@keyframes shiny-sparkle-ripple {
+  0% {
+    transform: scale(0.25);
+    opacity: 0;
+  }
+  15% {
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1.35);
+    opacity: 0;
+  }
+}
+
+@keyframes shiny-sparkle-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes shiny-sparkle-sweep {
+  0% {
+    background-position: 100% 0;
+  }
+  55%,
+  100% {
+    background-position: 0% 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .shiny-sparkle span {
+    animation: none !important;
+  }
+}

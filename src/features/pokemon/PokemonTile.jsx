@@ -28,6 +28,7 @@ import { basicPokemonMarker, fancyPokemonMarker } from './pokemonMarker'
 const INTERACTION_RANGE_COLOR = '#BA42F6'
 const PERSONAL_SHINY_GLOW = '#FFD700'
 const SHUNDO_GLOW = '#9B30FF'
+const SPARKLE_MIN_IV = 70
 
 /**
  *
@@ -67,6 +68,7 @@ const BasePokemonTile = (pkmn) => {
     showInteractionRange,
     showSpacialRendRange,
     filterSize,
+    sparkle,
   ] = useStorage((s) => {
     const {
       pokemonTimers,
@@ -79,6 +81,7 @@ const BasePokemonTile = (pkmn) => {
       showSizeIndicator,
       interactionRanges,
       spacialRendRange,
+      shinySparkles,
     } = s.userSettings.pokemon
     return [
       pokemonTimers,
@@ -96,6 +99,13 @@ const BasePokemonTile = (pkmn) => {
       interactionRanges,
       spacialRendRange,
       s.filters.pokemon.filter[internalId]?.size || 'md',
+      shinySparkles !== false && isPersonalShiny
+        ? isShundo
+          ? 'shundo'
+          : pkmn.iv >= SPARKLE_MIN_IV
+            ? 'high'
+            : undefined
+        : undefined,
     ]
   }, basicEqualFn)
 
@@ -289,6 +299,7 @@ const BasePokemonTile = (pkmn) => {
                 opacity,
                 timeOfDay,
                 backgroundUrl,
+                sparkle,
               })
             : basicPokemonMarker({ iconUrl, iconSize })
         }

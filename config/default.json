@@ -429,6 +429,7 @@
       "personalShinyIds": "",
       "onlyPersonalShiny": false,
       "onlyShundo": false,
+      "shinySparkles": true,
       "glow": [
         {
           "name": "Hundo",
