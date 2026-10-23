@@ -57,7 +57,38 @@ const setCache = async (unsafeName, data) => {
   }
 }
 
+/**
+ * Reads a cached file, atomically creating it first if it is missing, so that
+ * processes sharing the cache dir (e.g. PM2 cluster workers) all agree on it
+ * @template T
+ * @param {string} unsafeName
+ * @param {() => T} create
+ * @returns {T}
+ */
+const getOrCreateCache = (unsafeName, create) => {
+  const fileName = fsFriendlyName(unsafeName)
+  const filePath = path.resolve(CACHE_DIR, fileName)
+  if (!fs.existsSync(filePath)) {
+    fs.mkdirSync(CACHE_DIR, { recursive: true })
+    const tempPath = `${filePath}.${process.pid}.tmp`
+    fs.writeFileSync(tempPath, JSON.stringify(create()))
+    try {
+      // unlike rename, link fails if another process created the file first
+      fs.linkSync(tempPath, filePath)
+      log.info(TAGS.cache, 'Cached', fileName)
+    } catch (e) {
+      if (e.code !== 'EEXIST') throw e
+    } finally {
+      fs.unlinkSync(tempPath)
+    }
+  }
+  const data = JSON.parse(fs.readFileSync(filePath, 'utf-8'))
+  log.info(TAGS.cache, 'Loaded', fileName)
+  return data
+}
+
 module.exports = {
   getCache,
   setCache,
+  getOrCreateCache,
 }

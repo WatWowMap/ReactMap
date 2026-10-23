@@ -150,6 +150,7 @@ export const GET_POKEMON_SHINY_STATS = gql`
 export const GET_ONE_POKEMON = gql`
   query GetOnePokemon($id: ID!, $perm: String!) {
     pokemonSingle(id: $id, perm: $perm) {
+      id
       lat
       lon
     }

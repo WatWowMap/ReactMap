@@ -15,6 +15,10 @@ const { validateSelectedWebhook } = require('../utils/validateSelectedWebhook')
 const { PoracleAPI } = require('../services/Poracle')
 const { geocoder } = require('../services/geocoder')
 const { scannerApi } = require('../services/scannerApi')
+const {
+  encodeEncounterId,
+  decodeEncounterId,
+} = require('../services/encounterToken')
 const { getPolyVector } = require('../utils/getPolyVector')
 const { getPlacementCells } = require('../utils/getPlacementCells')
 const { getTypeCells } = require('../utils/getTypeCells')
@@ -273,16 +277,28 @@ const resolvers = {
     },
     pokemon: (_, args, { perms, Db }) => {
       if (perms?.pokemon) {
-        if (args.filters.onlyLegacy) {
-          return Db.query('Pokemon', 'getLegacy', perms, args)
+        const decodedArgs = {
+          ...args,
+          filters: {
+            ...args.filters,
+            onlyManualId: decodeEncounterId(args.filters.onlyManualId),
+          },
         }
-        return Db.query('Pokemon', 'getAll', perms, args)
+        if (args.filters.onlyLegacy) {
+          return Db.query('Pokemon', 'getLegacy', perms, decodedArgs)
+        }
+        return Db.query('Pokemon', 'getAll', perms, decodedArgs)
       }
       return []
     },
-    pokemonSingle: (_, args, { perms, Db }) => {
+    pokemonSingle: async (_, args, { perms, Db }) => {
       if (perms?.pokemon) {
-        return Db.getOne('Pokemon', args.id)
+        const id = decodeEncounterId(args.id, { allowRaw: true })
+        if (id === null) return {}
+        const result = await Db.getOne('Pokemon', id)
+        return 'lat' in result
+          ? { ...result, id: encodeEncounterId(id) }
+          : result
       }
       return {}
     },
@@ -551,8 +567,15 @@ const resolvers = {
     },
     tappableById: async (_, { id }, { perms, Db }) => {
       if (perms?.tappables) {
-        const results = await Db.query('Tappable', 'getById', perms, id)
-        return Array.isArray(results) ? results[0] || null : results
+        const tappableId = decodeEncounterId(id)
+        if (tappableId === null) return null
+        const results = await Db.query('Tappable', 'getById', perms, tappableId)
+        const result = Array.isArray(results) ? results[0] || null : results
+        if (result && config.getSafe('api.hideEncounterIds')) {
+          // a pokemon's tappable shares its encounter ID, so echo the token
+          return { ...result, id }
+        }
+        return result
       }
       return null
     },
