@@ -18,6 +18,7 @@
     "enableHelmet": false,
     "showSchemasInConfigApi": false,
     "showStrategiesInConfigApi": false,
+    "hideEncounterIds": true,
     "maxSessions": 5,
     "sessionCheckIntervalMs": 900000,
     "cookieAgeDays": 7,

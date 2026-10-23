@@ -14,6 +14,7 @@ const {
   dnfifyIvFilter,
 } = require('./functions')
 const { filterRTree } = require('../../utils/filterRTree')
+const { encodeEncounterId } = require('../../services/encounterToken')
 const { PokemonFilter } = require('./Frontend')
 
 class PkmnBackend {
@@ -404,7 +405,7 @@ class PkmnBackend {
    */
   build(pokemon) {
     const result = {
-      id: pokemon.id,
+      id: encodeEncounterId(pokemon.id),
       encounter_id: pokemon.encounter_id,
       spawnpoint_id: pokemon.spawnpoint_id,
       lat: pokemon.lat,
