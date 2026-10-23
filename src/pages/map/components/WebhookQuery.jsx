@@ -57,7 +57,7 @@ export function WebhookQuery({ children }) {
       useMemory.setState({
         manualParams: {
           category: params.category,
-          id: params.id,
+          id: data[`${lowercase}Single`].id ?? params.id,
         },
       })
       setReady(true)

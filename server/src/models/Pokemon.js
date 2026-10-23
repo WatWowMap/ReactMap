@@ -14,6 +14,7 @@ const config = require('@rm/config')
 const { getAreaSql } = require('../utils/getAreaSql')
 const { filterRTree } = require('../utils/filterRTree')
 const { fetchJson } = require('../utils/fetchJson')
+const { encodeEncounterId } = require('../services/encounterToken')
 const {
   applyManualIdFilter,
   normalizeManualId,
@@ -1018,6 +1019,7 @@ class Pokemon extends Model {
       )
       .map((poke) => ({
         ...poke,
+        id: encodeEncounterId(poke.id),
         iv: perms.iv && poke.iv ? +poke.iv.toFixed(2) : null,
         distance:
           poke.distance ||
