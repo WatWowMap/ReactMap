@@ -1,3 +1,15 @@
+# [1.55.0](https://github.com/WatWowMap/ReactMap/compare/v1.54.0...v1.55.0) (2026-10-24)
+
+
+### Bug Fixes
+
+* **security:** patch node2shell (CVE-2026-111497) ([e259ee4](https://github.com/WatWowMap/ReactMap/commit/e259ee4cbf799cd3028d54608ae202d41dca0536))
+
+
+### Features
+
+* **pokemon:** replace encounter ids with encrypted tokens ([19ba69e](https://github.com/WatWowMap/ReactMap/commit/19ba69ef5933aa8a52af22732d3e9fd1e751ab89))
+
 # [1.54.0](https://github.com/WatWowMap/ReactMap/compare/v1.53.2...v1.54.0) (2026-10-20)
 
 
