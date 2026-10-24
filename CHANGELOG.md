@@ -1,3 +1,10 @@
+## [1.55.2](https://github.com/WatWowMap/ReactMap/compare/v1.55.1...v1.55.2) (2026-10-24)
+
+
+### Bug Fixes
+
+* **security:** bump body-parser to 2.4.0 ([d826f72](https://github.com/WatWowMap/ReactMap/commit/d826f72bf6161b1c2905074e4c0df89df97bc63a))
+
 ## [1.55.1](https://github.com/WatWowMap/ReactMap/compare/v1.55.0...v1.55.1) (2026-10-24)
 
 
