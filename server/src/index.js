@@ -72,6 +72,8 @@ const startServer = async () => {
     compression(),
     express.json({
       limit: '50mb',
+      // clients never send compressed bodies, keep untrusted input away from zlib (CVE-2026-111497)
+      inflate: false,
       verify: (req, _res, buf) => {
         req.bodySize = (req.bodySize || 0) + buf.length
       },
@@ -94,7 +96,7 @@ const startServer = async () => {
   app.use(
     '/graphql',
     cors({ origin: '/' }),
-    json(),
+    json({ inflate: false }),
     sentryMiddleware,
     apolloMiddleware(server),
     rateLimitingMiddleware(),
