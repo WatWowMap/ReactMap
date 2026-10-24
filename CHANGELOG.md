@@ -1,3 +1,10 @@
+## [1.55.1](https://github.com/WatWowMap/ReactMap/compare/v1.55.0...v1.55.1) (2026-10-24)
+
+
+### Bug Fixes
+
+* **server:** restore request body inflation ([410570c](https://github.com/WatWowMap/ReactMap/commit/410570c06f831392c6d029419f40480ebf73b6c0))
+
 # [1.55.0](https://github.com/WatWowMap/ReactMap/compare/v1.54.0...v1.55.0) (2026-10-24)
 
 
