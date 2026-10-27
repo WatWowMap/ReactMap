@@ -53,7 +53,14 @@ const PLAYERS_TTL = 60 * 1000
 const RESYNC_MS = 60 * 60 * 1000
 // absolute cap; the per-role limit is applied by utils/personalShinyLimits
 const MAX_PLAYERS = 50
-const ELIGIBLE_SEEN_TYPES = new Set(['wild', 'encounter'])
+// the Pokémon Golbat #423 rolls: tappable encounters (lured or not) take the
+// same per-player draws as wild spawns, nearby and lure sightings don't
+const ELIGIBLE_SEEN_TYPES = new Set([
+  'wild',
+  'encounter',
+  'tappable_encounter',
+  'tappable_lure_encounter',
+])
 const DITTO_ID = 132
 /** A known Ditto is shiny on the third draw at its own rate */
 const DITTO_RATE = 1 / 64
@@ -895,8 +902,9 @@ function getTimezone() {
 }
 
 /**
- * Whether the Pokémon takes the personal draws at all: wild or encountered,
- * not disguised (a Ditto Golbat knows of is the one disguise that does)
+ * Whether the Pokémon takes the personal draws at all: wild, encountered or
+ * from a tappable, not disguised (a Ditto Golbat knows of is the one disguise
+ * that does)
  * @param {Partial<import('@rm/types').Pokemon>} pkmn
  * @returns {'ditto' | 'regular' | null}
  */

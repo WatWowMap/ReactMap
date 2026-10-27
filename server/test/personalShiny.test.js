@@ -103,6 +103,24 @@ test('nearby Pokémon and other disguises are never personal shinies', () => {
   )
 })
 
+test('tappable Pokémon take the personal draws, lure sightings do not', () => {
+  const rates = remoteRates([['16-0', 1, 1]])
+  ;['tappable_encounter', 'tappable_lure_encounter'].forEach((seen_type) =>
+    assert.notDeepEqual(
+      shinyFor(wild({ pokemon_id: 16, seen_type }), PLAYERS, rates),
+      [],
+    ),
+  )
+  assert.deepEqual(
+    shinyFor(
+      wild({ pokemon_id: 16, seen_type: 'lure_wild' }),
+      PLAYERS,
+      rates,
+    ),
+    [],
+  )
+})
+
 test('without a rates service only variants seen shiny are predicted', () => {
   const own = buildRates([
     { pokemon_id: 25, form: 0, days_ago: 1, shiny: 2, checks: 900 },
