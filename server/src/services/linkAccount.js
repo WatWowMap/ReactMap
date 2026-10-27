@@ -45,10 +45,12 @@ function planLink(current, other, platform) {
 /**
  * The session user after linking: still the logged in row, with the linked
  * ids and both platforms' perms. `linkedStrategies` lists every strategy whose
- * perms the session holds, so a trial of either one ending clears it
+ * perms the session holds, so a trial of either one ending clears it.
+ * `trialStrategies` lists the ones that granted trial perms, those clear the
+ * session even when the other platform makes it a donor
  *
  * @template {{ perms: import('@rm/types').Permissions, username?: string, rmStrategy?: string }} T
- * @param {import('@rm/types').User & { linkedStrategies?: string[] }} reqUser
+ * @param {import('@rm/types').User & { linkedStrategies?: string[], trialStrategies?: string[] }} reqUser
  * @param {T} platformUser
  * @param {{ discordId?: string, telegramId?: string, webhookStrategy?: string, selectedWebhook?: string }} linked
  */
@@ -65,6 +67,15 @@ function sessionUser(reqUser, platformUser, linked) {
           ...(reqUser.linkedStrategies || []),
           reqUser.rmStrategy,
           platformUser.rmStrategy,
+        ].filter(Boolean),
+      ),
+    ],
+    trialStrategies: [
+      ...new Set(
+        [
+          ...(reqUser.trialStrategies ||
+            (reqUser.perms?.trial ? [reqUser.rmStrategy] : [])),
+          platformUser.perms?.trial && platformUser.rmStrategy,
         ].filter(Boolean),
       ),
     ],

@@ -165,3 +165,36 @@ test('a null selected webhook does not hide the linked one', () => {
   )
   assert.equal(user.selectedWebhook, 'poracle')
 })
+
+test('the linked session records which strategy granted the trial', () => {
+  const user = sessionUser(
+    { id: 1, rmStrategy: 'discord', perms: { donor: true, webhooks: [] } },
+    { rmStrategy: 'telegram', perms: { trial: true, webhooks: [] } },
+    {},
+  )
+  assert.equal(user.perms.donor, true)
+  assert.deepEqual(user.trialStrategies, ['telegram'])
+})
+
+test('a trial of the signed in platform carries into the linked session', () => {
+  const user = sessionUser(
+    { id: 1, rmStrategy: 'discord', perms: { trial: true, webhooks: [] } },
+    { rmStrategy: 'telegram', perms: { donor: true, webhooks: [] } },
+    {},
+  )
+  assert.deepEqual(user.trialStrategies, ['discord'])
+})
+
+test('relinking keeps the recorded trial strategies', () => {
+  const user = sessionUser(
+    {
+      id: 1,
+      rmStrategy: 'discord',
+      perms: { trial: true, webhooks: [] },
+      trialStrategies: ['telegram'],
+    },
+    { rmStrategy: 'telegram', perms: { trial: false, webhooks: [] } },
+    {},
+  )
+  assert.deepEqual(user.trialStrategies, ['telegram'])
+})

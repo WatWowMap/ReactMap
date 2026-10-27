@@ -31,11 +31,23 @@ class Session extends Model {
       )
   }
 
-  /** @param {string} strategy */
+  /**
+   * Non-donor sessions holding perms of `strategy`, plus linked sessions whose
+   * trial perms came from it, since the other platform may make those donors
+   *
+   * @param {string} strategy
+   */
   static async clearNonDonor(strategy) {
     const result = await this.query()
-      .whereRaw(`json_extract(data, '$.passport.user.perms.donor') = false`)
-      .andWhere((builder) => Session.fromStrategy(builder, strategy))
+      .where((builder) =>
+        builder
+          .whereRaw(`json_extract(data, '$.passport.user.perms.donor') = false`)
+          .andWhere((inner) => Session.fromStrategy(inner, strategy)),
+      )
+      .orWhereRaw(
+        `json_contains(json_extract(data, '$.passport.user.trialStrategies'), ?)`,
+        [JSON.stringify(strategy)],
+      )
       .delete()
     log.info(
       TAGS.session,
