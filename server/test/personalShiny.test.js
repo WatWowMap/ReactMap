@@ -14,6 +14,9 @@ const {
   jsifyIvFilter,
   dnfifyIvFilter,
 } = require('../src/filters/pokemon/functions')
+const { PkmnBackend } = require('../src/filters/pokemon/Backend')
+const { PokemonFilter } = require('../src/filters/pokemon/Frontend')
+const { passesAll } = require('../src/filters/pokemon/personalShiny')
 
 // Test vectors of Golbat #423 (decoder/api_pokemon_shiny_test.go)
 const PLAYERS = ['0123456789abcdef', 'Player-ID:ABC/123', ' Trainer-é '].map(
@@ -143,4 +146,24 @@ test('the legacy filter knows the shiny term', () => {
     { pokemon, personal_shiny: true },
   ])
   assert.deepEqual(dnfifyIvFilter('100 shiny', pokemon), [])
+})
+
+test('only personal shinies: a PvP rank condition is kept when all ranks are shown', () => {
+  const perms = { pokemon: true, iv: true, pvp: true, areaRestrictions: [] }
+  const great = { ...new PokemonFilter(), great: [1, 50], enabled: true }
+  /** @param {number} rank */
+  const pkmn = (rank) =>
+    /** @type {any} */ ({
+      id: '1',
+      pokemon_id: 16,
+      form: 0,
+      iv: 50,
+      pvp: { great: [{ pokemon: 16, form: 0, rank, cp: 1400, capped: true }] },
+    })
+  ;[false, true].forEach((onlyAllPvp) => {
+    const mods = { onlyLinkGlobal: false, onlyIvOr: true, onlyAllPvp }
+    const backend = new PkmnBackend('global', great, great, perms, mods)
+    assert.equal(passesAll(backend, pkmn(10)), true, `rank 10, all ${onlyAllPvp}`)
+    assert.equal(passesAll(backend, pkmn(900)), false, `rank 900, all ${onlyAllPvp}`)
+  })
 })
