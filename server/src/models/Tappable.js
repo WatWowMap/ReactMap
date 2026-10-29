@@ -62,6 +62,22 @@ class Tappable extends Model {
     const { queryLimits = {} } = config.getSafe('api')
     const timestamp = getEpoch()
 
+    /** @type {Record<string, number[]>} */
+    const ids = Object.fromEntries(
+      REWARD_FILTERS.map(({ prefix }) => [prefix, []]),
+    )
+    Object.keys(filterArgs).forEach((key) => {
+      if (!key || key.startsWith('only') || !ids[key.charAt(0)]) return
+      const id = Number.parseInt(key.slice(1), 10)
+      if (!Number.isNaN(id) && id !== 0) {
+        ids[key.charAt(0)].push(id)
+      }
+    })
+
+    const hasIdFilter = Object.values(ids).some((list) => list.length)
+    // sources without reward columns only have items to match a selection
+    if (!hasTappableRewards && hasIdFilter && !ids.q.length) return []
+
     const query = this.query().select(getSelectColumns(hasTappableRewards))
 
     applyManualIdFilter(query, {
@@ -81,20 +97,7 @@ class Tappable extends Model {
 
     query.andWhere('expire_timestamp', '>', timestamp)
 
-    /** @type {Record<string, number[]>} */
-    const ids = Object.fromEntries(
-      REWARD_FILTERS.map(({ prefix }) => [prefix, []]),
-    )
-    Object.keys(filterArgs).forEach((key) => {
-      if (!key || key.startsWith('only') || !ids[key.charAt(0)]) return
-      const id = Number.parseInt(key.slice(1), 10)
-      if (!Number.isNaN(id) && id !== 0) {
-        ids[key.charAt(0)].push(id)
-      }
-    })
-
     if (hasTappableRewards) {
-      const hasIdFilter = Object.values(ids).some((list) => list.length)
       query.andWhere((rewards) => {
         REWARD_FILTERS.forEach(({ prefix, rewardTypes, column }) => {
           if (hasIdFilter && !ids[prefix].length) return

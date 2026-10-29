@@ -122,6 +122,19 @@ test('tappable query without reward columns stays item-only', async (t) => {
   assert.match(statements[0].sql, /`item_id` is not null/)
 })
 
+test('tappable query without reward columns skips reward-only selections', async (t) => {
+  const statements = captureQueries(t, () => [{ id: '1', item_id: 1301 }])
+
+  const results = await Tappable.getAll(
+    perms,
+    { ...bounds, filters: { c25: {}, onlyAreas: [] } },
+    {},
+  )
+
+  assert.deepEqual(results, [])
+  assert.equal(statements.length, 0)
+})
+
 test('tappable filters are built for available candy and mega energy', () => {
   state.event.masterfile = { items: {} }
   state.event.available.tappables = ['c25', 'x25', 'm6']
