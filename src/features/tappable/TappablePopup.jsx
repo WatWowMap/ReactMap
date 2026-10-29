@@ -21,6 +21,7 @@ import { Title } from '@components/popups/Title'
 
 import { getTimeUntil } from '@utils/getTimeUntil'
 import { getTappableDisplaySettings } from './displayRules'
+import { getTappableReward, getTappableRewardName } from './rewards'
 
 /**
  * @param {{
@@ -34,7 +35,8 @@ export function TappablePopup({ tappable, rewardIcon }) {
     (s) => !!s.userSettings.tappables?.enableTappablePopupCoords,
   )
   const popups = useStorage((s) => s.popups)
-  const filterKey = tappable.item_id ? `q${tappable.item_id}` : ''
+  const reward = getTappableReward(tappable)
+  const filterKey = reward?.filterKey || ''
   const filterEnabled = useStorage((s) =>
     filterKey ? s.filters?.tappables?.filter?.[filterKey]?.enabled : undefined,
   )
@@ -44,11 +46,12 @@ export function TappablePopup({ tappable, rewardIcon }) {
 
   const count = tappable.count ?? 1
   const itemName = React.useMemo(() => {
-    if (i18n.exists(`item_${tappable.item_id}`)) {
-      return t(`item_${tappable.item_id}`)
+    if (!reward) return ''
+    if (reward.questRewardType !== 2 || i18n.exists(`item_${reward.id}`)) {
+      return getTappableRewardName(reward, t)
     }
-    return masterfile.items?.[tappable.item_id]?.name || `#${tappable.item_id}`
-  }, [t, i18n, masterfile.items, tappable.item_id])
+    return masterfile.items?.[reward.id]?.name || `#${reward.id}`
+  }, [t, i18n, masterfile.items, reward?.questRewardType, reward?.id])
 
   const formattedType = React.useMemo(() => {
     if (!tappable.type) return ''

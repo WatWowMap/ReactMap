@@ -213,7 +213,9 @@ type Tappable {
   lon: Float
   type: String
   fort_id: String
+  reward_type: String
   item_id: Int
+  reward_pokemon_id: Int
   count: Int
   expire_timestamp: Int
   expire_timestamp_verified: Boolean

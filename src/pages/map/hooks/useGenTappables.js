@@ -3,6 +3,10 @@ import { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { useMemory } from '@store/useMemory'
+import {
+  getTappableRewardFromKey,
+  getTappableRewardName,
+} from '@features/tappable/rewards'
 
 export function useGenTappables() {
   const { t } = useTranslation()
@@ -21,9 +25,9 @@ export function useGenTappables() {
     const tappableFilters = {}
 
     Object.keys(tappables.filter).forEach((id) => {
-      if (id === 'global' || id === 'q0') return
-      const itemId = id.startsWith('q') ? id.slice(1) : id
-      const name = t(`item_${itemId}`, `#${itemId}`)
+      const reward = getTappableRewardFromKey(id)
+      if (!reward) return
+      const name = getTappableRewardName(reward, t)
       tappableFilters[id] = {
         name,
         perms: ['tappables'],

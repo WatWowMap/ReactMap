@@ -1282,6 +1282,18 @@
       "items": {
         "__name": "DEFAULT_FILTERS_TAPPABLES_ITEMS",
         "__format": "boolean"
+      },
+      "candy": {
+        "__name": "DEFAULT_FILTERS_TAPPABLES_CANDY",
+        "__format": "boolean"
+      },
+      "xlCandy": {
+        "__name": "DEFAULT_FILTERS_TAPPABLES_XL_CANDY",
+        "__format": "boolean"
+      },
+      "megaEnergy": {
+        "__name": "DEFAULT_FILTERS_TAPPABLES_MEGA_ENERGY",
+        "__format": "boolean"
       }
     },
     "pokemon": {

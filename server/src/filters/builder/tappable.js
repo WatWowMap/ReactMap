@@ -18,8 +18,19 @@ function buildTappables(perms, defaults) {
   })
 
   state.event.getAvailable('tappables').forEach((key) => {
-    if (!filters[key]) {
-      filters[key] = new BaseFilter(defaults.items)
+    if (filters[key]) return
+    switch (key.charAt(0)) {
+      case 'c':
+        filters[key] = new BaseFilter(defaults.candy)
+        break
+      case 'x':
+        filters[key] = new BaseFilter(defaults.xlCandy)
+        break
+      case 'm':
+        filters[key] = new BaseFilter(defaults.megaEnergy)
+        break
+      default:
+        filters[key] = new BaseFilter(defaults.items)
     }
   })
 

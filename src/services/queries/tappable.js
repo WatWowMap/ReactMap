@@ -21,7 +21,9 @@ export const GET_ALL_TAPPABLES = gql`
       lon
       type
       fort_id
+      reward_type
       item_id
+      reward_pokemon_id
       count
       expire_timestamp
       expire_timestamp_verified
@@ -36,7 +38,9 @@ export const GET_TAPPABLE_BY_ID = gql`
       id
       type
       fort_id
+      reward_type
       item_id
+      reward_pokemon_id
       count
       expire_timestamp
       expire_timestamp_verified

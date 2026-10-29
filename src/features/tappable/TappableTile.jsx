@@ -16,6 +16,7 @@ import { getOffset } from '@utils/offset'
 
 import { TappablePopup } from './TappablePopup'
 import { getTappableDisplaySettings } from './displayRules'
+import { getTappableReward } from './rewards'
 
 /**
  * @param {import('@rm/types').Tappable} tappable
@@ -79,11 +80,14 @@ const BaseTappableTile = (tappable) => {
   const useRewardPrimary = displaySettings.map.rewardAsPrimary
 
   const { icon, rewardIcon } = React.useMemo(() => {
-    if (!Icons || !tappable.item_id) {
+    const reward = getTappableReward(tappable)
+    if (!Icons || !reward) {
       return { icon: null, rewardIcon: '', size: 24 }
     }
-    const filterKey = `q${tappable.item_id}`
-    const tappableSize = Icons.getSize('tappable', itemFilters[filterKey]?.size)
+    const tappableSize = Icons.getSize(
+      'tappable',
+      itemFilters[reward.filterKey]?.size,
+    )
     const tappableIcon = Icons.getTappable(tappable.type)
     const [tappableMod, rewardMod] = Icons.getModifiers('tappable', 'reward')
     const popupAnchor = [
@@ -93,8 +97,8 @@ const BaseTappableTile = (tappable) => {
         (tappableMod?.popupY || 0),
     ]
     const tappableReward = Icons.getRewards(
-      2,
-      tappable.item_id,
+      reward.questRewardType,
+      reward.id,
       tappable.count || 1,
     )
     const count = tappable.count || 1
@@ -232,7 +236,9 @@ const BaseTappableTile = (tappable) => {
     Icons,
     itemFilters,
     tappable.type,
+    tappable.reward_type,
     tappable.item_id,
+    tappable.reward_pokemon_id,
     tappable.count,
     opacity,
     bubbleFill,
