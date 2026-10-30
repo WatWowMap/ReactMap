@@ -25,6 +25,7 @@ const {
   getRocketPokemonFilterKey,
   isRocketPokemonFilterExcluded,
 } = require('../utils/rocketPokemonFiltering')
+const { getMegaEnergyFilterKey } = require('../utils/megaEnergyFilterKey')
 const { mapScanPokestop } = require('./pokestopScanMapper')
 const { getCombinedFortAvailable } = require('../utils/fortAvailable')
 const { buildPokestopDnfFilters } = require('../filters/fort/pokestop')
@@ -118,13 +119,21 @@ const QUEST_REWARD_FILTER_DEFINITIONS = {
   [MEGA_RESOURCE_REWARD_TYPE]: {
     fields: ['mega_pokemon_id', 'mega_amount', 'temp_evolution'],
     getKey: (/** @type {QuestReward} */ quest) =>
-      `m${quest.mega_pokemon_id}-${quest.mega_amount}`,
+      getMegaEnergyFilterKey(
+        quest.mega_pokemon_id,
+        quest.mega_amount,
+        quest.temp_evolution,
+      ),
   },
   [TEMP_EVO_BRANCH_RESOURCE_REWARD_TYPE]: {
     fields: ['mega_pokemon_id', 'mega_amount', 'temp_evolution'],
     getKey: (/** @type {QuestReward} */ quest) =>
       quest.mega_pokemon_id && quest.mega_amount
-        ? `m${quest.mega_pokemon_id}-${quest.mega_amount}`
+        ? getMegaEnergyFilterKey(
+            quest.mega_pokemon_id,
+            quest.mega_amount,
+            quest.temp_evolution,
+          )
         : '',
   },
 }
@@ -1594,6 +1603,12 @@ class Pokestop extends Model {
           raw('json_extract(quest_rewards, "$[0].info.amount")').as('amount'),
         )
     }
+    // No column carries the temp evolution, so read it from the rewards JSON.
+    queries.mega.distinct(
+      raw('json_extract(quest_rewards, "$[0].info.temp_evolution")').as(
+        'temp_evolution',
+      ),
+    )
     if (hasAltQuests) {
       queries.megaAlt = this.query().whereIn(
         'alternative_quest_reward_type',
@@ -1624,6 +1639,11 @@ class Pokestop extends Model {
             ).as('amount'),
           )
       }
+      queries.megaAlt.distinct(
+        raw(
+          'json_extract(alternative_quest_rewards, "$[0].info.temp_evolution")',
+        ).as('temp_evolution'),
+      )
     }
     // mega
 
@@ -1841,7 +1861,11 @@ class Pokestop extends Model {
           rewards.forEach((reward) => {
             if (reward.id && reward.amount) {
               process(
-                `m${reward.id}-${reward.amount}`,
+                getMegaEnergyFilterKey(
+                  reward.id,
+                  reward.amount,
+                  reward.temp_evolution,
+                ),
                 reward.quest_title,
                 reward.quest_target,
               )

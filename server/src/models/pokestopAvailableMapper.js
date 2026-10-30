@@ -20,6 +20,7 @@
  * @property {number} amount
  * @property {number} pokemon_id
  * @property {number} form_id
+ * @property {number} [temp_evolution] absent on Golbat builds that predate it
  * @property {string} title
  * @property {number} target
  * @property {number} count
@@ -73,6 +74,7 @@ const {
   getShowcaseFocusFilterKey,
   parseShowcaseFocus,
 } = require('../utils/showcaseFocus')
+const { getMegaEnergyFilterKey } = require('../utils/megaEnergyFilterKey')
 
 /**
  * Builds the quest reward filter key for a single quest tuple, mirroring
@@ -89,7 +91,8 @@ const {
  * @returns {string}
  */
 function questRewardKey(quest) {
-  const { reward_type, amount, item_id, pokemon_id, form_id } = quest
+  const { reward_type, amount, item_id, pokemon_id, form_id, temp_evolution } =
+    quest
   switch (reward_type) {
     case 1:
       return `p${amount}`
@@ -110,14 +113,19 @@ function questRewardKey(quest) {
     case 9:
       return `x${pokemon_id}`
     case 12:
-      return `m${pokemon_id}-${amount}`
+      return getMegaEnergyFilterKey(pokemon_id, amount, temp_evolution)
     case 20:
       // §type20: temp-evo branch mega energy. secondaryFilter keys type 20 as a
       // dedicated mega reward ONLY when both pokemon_id and amount are present
       // (else no key), and never emits `u20` (type 20 has a dedicated filter).
       // So advertise `m<id>-<amt>` only when complete — `u20`/`m<id>-0` would be
-      // a filter no marker can satisfy.
-      return pokemon_id > 0 && amount > 0 ? `m${pokemon_id}-${amount}` : ''
+      // a filter no marker can satisfy. A Golbat that predates
+      // `temp_evolution` cannot tell Mega X from Mega Y energy, and its
+      // `m<id>-<amt>` would match plain mega energy instead, so advertise
+      // nothing for it either.
+      return pokemon_id > 0 && amount > 0 && temp_evolution !== undefined
+        ? getMegaEnergyFilterKey(pokemon_id, amount, temp_evolution)
+        : ''
     default:
       return `u${reward_type}`
   }
