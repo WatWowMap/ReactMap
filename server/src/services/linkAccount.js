@@ -1,4 +1,6 @@
 // @ts-check
+const config = require('@rm/config')
+
 const { mergePerms } = require('../utils/mergePerms')
 
 /** @typedef {'discord' | 'telegram'} Platform */
@@ -43,14 +45,24 @@ function planLink(current, other, platform) {
 }
 
 /**
- * The session user after linking: still the logged in row, with the linked
- * ids and both platforms' perms. `linkedStrategies` lists every strategy whose
- * perms the session holds, so a trial of either one ending clears it.
- * `trialStrategies` lists the ones that granted trial perms, those clear the
- * session even when the other platform makes it a donor
+ * Only a local sign-in links accounts. A Discord or Telegram session would have
+ * to carry both platforms' perms, which trial expiry and donor checks, keyed on
+ * one strategy, cannot clear correctly
  *
- * @template {{ perms: import('@rm/types').Permissions, username?: string, rmStrategy?: string }} T
- * @param {import('@rm/types').User & { linkedStrategies?: string[], trialStrategies?: string[] }} reqUser
+ * @param {{ rmStrategy?: string } | undefined} user
+ */
+function canLink(user) {
+  return config
+    .getSafe('authentication.strategies')
+    .some((s) => s.type === 'local' && s.name === user?.rmStrategy)
+}
+
+/**
+ * The session user after linking: still the local sign-in, with the linked
+ * ids and both perm sets
+ *
+ * @template {{ perms: import('@rm/types').Permissions, username?: string }} T
+ * @param {import('@rm/types').User} reqUser
  * @param {T} platformUser
  * @param {{ discordId?: string, telegramId?: string, webhookStrategy?: string, selectedWebhook?: string }} linked
  */
@@ -61,24 +73,6 @@ function sessionUser(reqUser, platformUser, linked) {
     ...linked,
     username: reqUser.username || platformUser.username,
     perms: mergePerms(reqUser.perms, platformUser.perms),
-    linkedStrategies: [
-      ...new Set(
-        [
-          ...(reqUser.linkedStrategies || []),
-          reqUser.rmStrategy,
-          platformUser.rmStrategy,
-        ].filter(Boolean),
-      ),
-    ],
-    trialStrategies: [
-      ...new Set(
-        [
-          ...(reqUser.trialStrategies ||
-            (reqUser.perms?.trial ? [reqUser.rmStrategy] : [])),
-          platformUser.perms?.trial && platformUser.rmStrategy,
-        ].filter(Boolean),
-      ),
-    ],
   }
 }
 
@@ -114,7 +108,8 @@ async function moveBadges(Badge, fromId, toId, trx) {
 }
 
 /**
- * Links a Discord or Telegram account to the row of the user who is signed in.
+ * Links a Discord or Telegram account to the row of the local user who is
+ * signed in, see `canLink`.
  * A row that only existed for that account is merged in and deleted. Both rows
  * are read and locked in the transaction that changes them, so concurrent
  * callbacks for the same user cannot both link.
@@ -196,4 +191,4 @@ async function linkAccount(
   return result
 }
 
-module.exports = { linkAccount, planLink, sessionUser }
+module.exports = { canLink, linkAccount, planLink, sessionUser }

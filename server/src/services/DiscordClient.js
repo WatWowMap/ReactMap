@@ -10,7 +10,7 @@ const { areaPerms } = require('../utils/areaPerms')
 const { webhookPerms } = require('../utils/webhookPerms')
 const { scannerPerms, scannerCooldownBypass } = require('../utils/scannerPerms')
 const { AuthClient } = require('./AuthClient')
-const { linkAccount, sessionUser } = require('./linkAccount')
+const { canLink, linkAccount, sessionUser } = require('./linkAccount')
 const { state } = require('./state')
 
 class DiscordClient extends AuthClient {
@@ -333,7 +333,8 @@ class DiscordClient extends AuthClient {
       )
       /** @type {Awaited<ReturnType<typeof linkAccount>> | undefined} */
       let link
-      if (req.user) {
+      // other sign-ins switch to this account, like a sign-in while logged out
+      if (canLink(req.user)) {
         link = await linkAccount(state.db.models, {
           userId: req.user.id,
           platform: 'discord',
@@ -411,6 +412,11 @@ class DiscordClient extends AuthClient {
           scope: ['identify', 'guilds'],
           passReqToCallback: true,
           prompt: this.strategy.clientPrompt,
+          // binds the callback to the session that started it, so nobody can
+          // link their Discord to a signed-in user by sending them a callback
+          // url; keyed per strategy like Telegram's
+          sessionKey: `oauth2:discord:${this.rmStrategy}`,
+          state: true,
         },
         (...args) => this.authHandler(...args),
       ),

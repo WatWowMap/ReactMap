@@ -1,7 +1,23 @@
 const assert = require('node:assert/strict')
-const { test } = require('node:test')
+const { mock, test } = require('node:test')
+const config = require('@rm/config')
 
-const { planLink, sessionUser } = require('../src/services/linkAccount')
+const { getSafe } = config
+mock.method(config, 'getSafe', (key) =>
+  key === 'authentication.strategies'
+    ? [
+        { name: 'local', type: 'local' },
+        { name: 'discord', type: 'discord' },
+        { name: 'telegram', type: 'telegram' },
+      ]
+    : getSafe(key),
+)
+
+const {
+  canLink,
+  planLink,
+  sessionUser,
+} = require('../src/services/linkAccount')
 
 const discord = (id, extra = {}) => ({
   id,
@@ -146,17 +162,6 @@ test('the session keeps the logged in row and gains the linked id', () => {
   assert.deepEqual([...user.perms.webhooks].sort(), ['a', 'b'])
 })
 
-test('the linked session lists both strategies for trial cleanup', () => {
-  const user = sessionUser(
-    { id: 1, rmStrategy: 'discord', perms: { donor: false, webhooks: [] } },
-    { rmStrategy: 'telegram', perms: { trial: true, webhooks: [] } },
-    {},
-  )
-  assert.equal(user.rmStrategy, 'discord')
-  assert.deepEqual(user.linkedStrategies, ['discord', 'telegram'])
-  assert.equal(user.perms.trial, true)
-})
-
 test('a null selected webhook does not hide the linked one', () => {
   const user = sessionUser(
     { id: 1, selectedWebhook: null, perms: { webhooks: [] } },
@@ -166,35 +171,10 @@ test('a null selected webhook does not hide the linked one', () => {
   assert.equal(user.selectedWebhook, 'poracle')
 })
 
-test('the linked session records which strategy granted the trial', () => {
-  const user = sessionUser(
-    { id: 1, rmStrategy: 'discord', perms: { donor: true, webhooks: [] } },
-    { rmStrategy: 'telegram', perms: { trial: true, webhooks: [] } },
-    {},
-  )
-  assert.equal(user.perms.donor, true)
-  assert.deepEqual(user.trialStrategies, ['telegram'])
-})
-
-test('a trial of the signed in platform carries into the linked session', () => {
-  const user = sessionUser(
-    { id: 1, rmStrategy: 'discord', perms: { trial: true, webhooks: [] } },
-    { rmStrategy: 'telegram', perms: { donor: true, webhooks: [] } },
-    {},
-  )
-  assert.deepEqual(user.trialStrategies, ['discord'])
-})
-
-test('relinking keeps the recorded trial strategies', () => {
-  const user = sessionUser(
-    {
-      id: 1,
-      rmStrategy: 'discord',
-      perms: { trial: true, webhooks: [] },
-      trialStrategies: ['telegram'],
-    },
-    { rmStrategy: 'telegram', perms: { trial: false, webhooks: [] } },
-    {},
-  )
-  assert.deepEqual(user.trialStrategies, ['telegram'])
+test('only a local sign-in can link accounts', () => {
+  assert.equal(canLink({ rmStrategy: 'local' }), true)
+  assert.equal(canLink({ rmStrategy: 'discord' }), false)
+  assert.equal(canLink({ rmStrategy: 'telegram' }), false)
+  assert.equal(canLink({ rmStrategy: 'unknown' }), false)
+  assert.equal(canLink(undefined), false)
 })

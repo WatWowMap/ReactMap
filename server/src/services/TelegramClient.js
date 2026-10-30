@@ -14,7 +14,7 @@ const { scannerPerms, scannerCooldownBypass } = require('../utils/scannerPerms')
 const { getUserDisplayName } = require('../utils/getUserDisplayName')
 const { isOAuthStrategy } = require('../utils/getTelegramStrategy')
 const { AuthClient } = require('./AuthClient')
-const { linkAccount, sessionUser } = require('./linkAccount')
+const { canLink, linkAccount, sessionUser } = require('./linkAccount')
 
 /**
  * @typedef {import('@rainb0w-clwn/passport-telegram-official/dist/types').PassportTelegramUser} TGUser
@@ -172,7 +172,10 @@ class TelegramClient extends AuthClient {
       )
       /** @type {Awaited<ReturnType<typeof linkAccount>> | undefined} */
       let link
-      if (req.user) {
+      // the legacy widget's signed callback is not bound to the session, anyone
+      // could send theirs to a signed-in user, so only OAuth links. Everything
+      // else switches to this account, like a sign-in while logged out
+      if (isOAuthStrategy(this.strategy) && canLink(req.user)) {
         link = await linkAccount(state.db.models, {
           userId: req.user.id,
           platform: 'telegram',
