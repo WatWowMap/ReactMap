@@ -1,39 +1,8 @@
 // @ts-check
 import * as React from 'react'
 
-/** @type {Map<string, { state: import('react-virtuoso').GridStateSnapshot, count: number }>} */
-const gridStateMemory = new Map()
-
 /** @type {Map<string, number>} */
 const scrollTopMemory = new Map()
-
-/**
- * The grid's saved state, only while the list still has as many items as when it was saved: a snapshot of a
- * list that has since grown or shrunk (e.g. tappable rewards coming and going) restores to an empty window.
- * Dropping it also drops the saved scroll offset, which `useDrawerScrollMemory` would otherwise still restore,
- * so a changed list starts at the top. Call it before the scroller mounts
- * @param {string} key
- * @param {number} count
- * @returns {import('react-virtuoso').GridStateSnapshot | null}
- */
-export function getDrawerGridState(key, count) {
-  const saved = gridStateMemory.get(key)
-  if (saved && saved.count === count) return saved.state
-  if (saved) {
-    gridStateMemory.delete(key)
-    scrollTopMemory.delete(key)
-  }
-  return null
-}
-
-/**
- * @param {string} key
- * @param {import('react-virtuoso').GridStateSnapshot} state
- * @param {number} count
- */
-export function setDrawerGridState(key, state, count) {
-  gridStateMemory.set(key, { state, count })
-}
 
 /**
  * @template {HTMLElement} T

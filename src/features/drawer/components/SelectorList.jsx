@@ -29,11 +29,7 @@ import { BoolToggle } from '@components/inputs/BoolToggle'
 import { GenericSearchMemo } from '@components/inputs/GenericSearch'
 import { StandardItem } from '@components/virtual/StandardItem'
 
-import {
-  getDrawerGridState,
-  setDrawerGridState,
-  useDrawerScrollMemory,
-} from '../hooks/useScrollMemory'
+import { useDrawerScrollMemory } from '../hooks/useScrollMemory'
 
 /**
  * @template {keyof import('@rm/types').Available} T
@@ -111,32 +107,9 @@ function SelectorList({
       .map((item) => item.id)
   }, [translated, search])
 
-  // read once per mount, the grid only applies it when it mounts
-  const restoreStateFrom = React.useMemo(
-    () => getDrawerGridState(listScrollKey, items.length),
-    [listScrollKey],
-  )
-  const shouldPersistGridState = drawer && visible
-  const scrollMemory = useDrawerScrollMemory(
-    listScrollKey,
-    shouldPersistGridState,
-  )
-
-  const handleStateChanged = React.useCallback(
-    (state) => {
-      if (
-        !shouldPersistGridState ||
-        !state.viewport.height ||
-        !state.viewport.width ||
-        !state.item.height ||
-        !state.item.width
-      ) {
-        return
-      }
-      setDrawerGridState(listScrollKey, state, items.length)
-    },
-    [listScrollKey, shouldPersistGridState, items.length],
-  )
+  // only the scroll offset is restored: the grid works out which tiles to draw from it. Also restoring a
+  // grid state snapshot made the two disagree, and the grid drew a range that wasn't on screen (blank tiles)
+  const scrollMemory = useDrawerScrollMemory(listScrollKey, drawer && visible)
 
   /** @param {'enable' | 'disable' | 'advanced'} action */
   const setAll = (action) => {
@@ -227,13 +200,7 @@ function SelectorList({
             : height
         }
       >
-        <VirtualGrid
-          data={items}
-          xs={4}
-          scrollerRef={scrollMemory.ref}
-          restoreStateFrom={restoreStateFrom}
-          stateChanged={handleStateChanged}
-        >
+        <VirtualGrid data={items} xs={4} scrollerRef={scrollMemory.ref}>
           {(_, key) => (
             <StandardItem
               id={key}
