@@ -12,21 +12,7 @@ const base = gql`
 
 const Egg = gql`
   fragment PoracleEgg on Poracle {
-    egg {
-      distance
-      clean
-      exclusive
-      gym_id
-      ping
-      level
-      id
-      profile_no
-      team
-      rsvp_changes
-      template
-      uid
-      description
-    }
+    egg
   }
 `
 
@@ -56,117 +42,31 @@ const Human = gql`
 
 const Gym = gql`
   fragment PoracleGym on Poracle {
-    gym {
-      clean
-      gym_id
-      distance
-      id
-      ping
-      profile_no
-      slot_changes
-      team
-      template
-      uid
-      description
-    }
+    gym
   }
 `
 
 const Invasion = gql`
   fragment PoracleInvasion on Poracle {
-    invasion {
-      clean
-      gender
-      distance
-      grunt_type
-      id
-      ping
-      profile_no
-      template
-      uid
-      description
-      real_grunt_id
-    }
+    invasion
   }
 `
 
 const Lure = gql`
   fragment PoracleLure on Poracle {
-    lure {
-      distance
-      clean
-      id
-      lure_id
-      ping
-      template
-      uid
-      profile_no
-      description
-    }
+    lure
   }
 `
 
 const Nest = gql`
   fragment PoracleNest on Poracle {
-    nest {
-      clean
-      distance
-      id
-      min_spawn_avg
-      ping
-      pokemon_id
-      form
-      profile_no
-      template
-      uid
-    }
+    nest
   }
 `
 
 const Pokemon = gql`
   fragment PoraclePokemon on Poracle {
-    pokemon {
-      atk
-      clean
-      def
-      description
-      distance
-      form
-      gender
-      id
-      max_atk
-      max_cp
-      max_def
-      max_iv
-      max_level
-      max_rarity
-      max_sta
-      max_weight
-      min_cp
-      min_iv
-      min_level
-      min_time
-      min_weight
-      ping
-      pokemon_id
-      profile_no
-      pvp_ranking_best
-      pvp_ranking_league
-      pvp_ranking_min_cp
-      pvp_ranking_worst
-      pvp_ranking_cap
-      rarity
-      size
-      max_size
-      sta
-      template
-      uid
-      description
-      allForms
-      pvpEntry
-      xs
-      xl
-    }
+    pokemon
   }
 `
 
@@ -177,6 +77,9 @@ export const PROFILE = gql`
         day
         hours
         mins
+        step
+        end_hours
+        end_mins
         id
       }
       area
@@ -192,61 +95,19 @@ export const PROFILE = gql`
 
 const Quest = gql`
   fragment PoracleQuest on Poracle {
-    quest {
-      amount
-      clean
-      form
-      distance
-      id
-      ping
-      profile_no
-      reward
-      reward_type
-      shiny
-      template
-      uid
-      description
-    }
+    quest
   }
 `
 
 const Raid = gql`
   fragment PoracleRaid on Poracle {
-    raid {
-      exclusive
-      distance
-      clean
-      form
-      gym_id
-      level
-      move
-      id
-      ping
-      pokemon_id
-      profile_no
-      team
-      rsvp_changes
-      template
-      uid
-      description
-      allMoves
-    }
+    raid
   }
 `
 
-const Weather = gql`
-  fragment PoracleWeather on Poracle {
-    weather {
-      cell
-      clean
-      condition
-      id
-      ping
-      profile_no
-      template
-      uid
-      description
-    }
+const Incident = gql`
+  fragment PoracleIncident on Poracle {
+    incident
   }
 `
 
@@ -254,6 +115,7 @@ export const ALL_PROFILES = gql`
   ${Human}
   ${Egg}
   ${Gym}
+  ${Incident}
   ${Invasion}
   ${Lure}
   ${Nest}
@@ -261,12 +123,12 @@ export const ALL_PROFILES = gql`
   ${PROFILE}
   ${Quest}
   ${Raid}
-  ${Weather}
   query Webhook($category: String!, $status: String!) {
     webhook(category: $category, status: $status) {
       ...PoracleHuman
       ...PoracleEgg
       ...PoracleGym
+      ...PoracleIncident
       ...PoracleInvasion
       ...PoracleLure
       ...PoracleNest
@@ -274,7 +136,6 @@ export const ALL_PROFILES = gql`
       ...PoracleProfile
       ...PoracleQuest
       ...PoracleRaid
-      ...PoracleWeather
     }
   }
 `
@@ -292,6 +153,7 @@ export const QUICK_ADD = gql`
   ${Human}
   ${Egg}
   ${Gym}
+  ${Incident}
   ${Invasion}
   ${Lure}
   ${Nest}
@@ -299,12 +161,12 @@ export const QUICK_ADD = gql`
   ${PROFILE}
   ${Quest}
   ${Raid}
-  ${Weather}
   mutation Webhook($data: JSON, $category: String!, $status: String!) {
     webhook(data: $data, category: $category, status: $status) {
       ...PoracleHuman
       ...PoracleEgg
       ...PoracleGym
+      ...PoracleIncident
       ...PoracleInvasion
       ...PoracleLure
       ...PoracleNest
@@ -312,7 +174,6 @@ export const QUICK_ADD = gql`
       ...PoracleProfile
       ...PoracleQuest
       ...PoracleRaid
-      ...PoracleWeather
       status
       message
     }
@@ -396,6 +257,17 @@ export const INVASION = gql`
   }
 `
 
+export const INCIDENT = gql`
+  ${base}
+  ${Incident}
+  mutation Webhook($data: JSON, $category: String!, $status: String!) {
+    webhook(data: $data, category: $category, status: $status) {
+      ...Base
+      ...PoracleIncident
+    }
+  }
+`
+
 export const LURE = gql`
   ${base}
   ${Lure}
@@ -446,6 +318,7 @@ export const WEBHOOK_CONTEXT = gql`
       }
       pvp
       ui
+      capabilities
     }
   }
 `

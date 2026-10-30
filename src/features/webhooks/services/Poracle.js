@@ -1,7 +1,10 @@
 // @ts-check
 import { t } from 'i18next'
 
+import { useMemory } from '@store/useMemory'
 import { useWebhookStore } from '@store/useWebhookStore'
+
+import { ruleId } from './ruleForm'
 
 export class Poracle {
   static getMapCategory(poracleCategory) {
@@ -11,6 +14,7 @@ export class Poracle {
       case 'raid':
         return 'gyms'
       case 'invasion':
+      case 'incident':
       case 'lure':
       case 'quest':
         return 'pokestops'
@@ -26,6 +30,7 @@ export class Poracle {
       case 'egg':
         return ['eggs']
       case 'invasion':
+      case 'incident':
         return ['invasions']
       case 'gym':
         return ['teams']
@@ -51,53 +56,17 @@ export class Poracle {
   static getId(item) {
     if (!item) return ''
     const { category } = useWebhookStore.getState()
-
-    switch (category) {
-      case 'egg':
-        return `e${item.level}`
-      case 'invasion':
-        return item.grunt_type === 'gold-stop'
-          ? 'gold-stop'
-          : item.grunt_type === 'kecleon'
-            ? 'kecleon'
-            : item.grunt_type === 'showcase'
-              ? 'showcase'
-              : `i${item.real_grunt_id}`
-      case 'lure':
-        return `l${item.lure_id}`
-      case 'gym':
-        return `t${item.team}-0`
-      case 'raid':
-        return item.pokemon_id === 9000
-          ? `r${item.level}`
-          : `${item.pokemon_id}-${item.form}`
-      case 'quest':
-        return (() => {
-          switch (item.reward_type) {
-            case 2:
-              return `q${item.reward}`
-            case 3:
-              return `d${item.amount}`
-            case 4:
-              return `c${item.reward}`
-            case 9:
-              return `x${item.reward}`
-            case 12:
-              return `m${item.reward}-${item.amount}`
-            default:
-              return `${item.reward}-${item.form}`
-          }
-        })()
-      default:
-        return `${item.pokemon_id}-${item.form}`
-    }
+    return ruleId(category, item, useMemory.getState().masterfile.invasions)
   }
 
   static getIdObj(id) {
     if (!id) return {}
-    if (id === 'gold-stop') return { id: 'gold-stop', type: 'invasion' }
-    if (id === 'kecleon') return { id: 'kecleon', type: 'invasion' }
-    if (id === 'showcase') return { id: 'showcase', type: 'invasion' }
+    if (id === 'gold-stop' || id === 'kecleon' || id === 'showcase') {
+      return { id, type: 'incident' }
+    }
+    if (id.startsWith('incident-')) {
+      return { id: id.replace('incident-', ''), type: 'incident' }
+    }
     switch (id.charAt(0)) {
       case 'e':
         return { id: id.replace('e', ''), type: 'egg' }
@@ -128,10 +97,13 @@ export class Poracle {
     switch (idObj.type) {
       case 'egg':
         return idObj.id === '90' ? ['poke_global'] : [`egg_${idObj.id}_plural`]
-      case 'invasion':
+      case 'incident':
         if (idObj.id === 'gold-stop') return ['gold_stop']
         if (idObj.id === 'kecleon') return ['poke_352']
         if (idObj.id === 'showcase') return ['showcase']
+        // unknown display type: no locale key exists, so give a readable title
+        return [`${t('incident')} ${idObj.id}`]
+      case 'invasion':
         return idObj.id === '0' ? ['poke_global'] : [`grunt_a_${idObj.id}`]
       case 'lure':
         return [`lure_${idObj.id}`]
@@ -148,158 +120,6 @@ export class Poracle {
     }
   }
 
-  static reactMapFriendly(values) {
-    const reactMapFriendly = {}
-    if (!values) return reactMapFriendly
-    Object.keys(values).forEach((key) => {
-      if (key === 'min_time') {
-        reactMapFriendly[key] = values[key]
-      } else if (key.startsWith('min')) {
-        const trim = key.replace('min_', '')
-        reactMapFriendly[trim] = [values[`min_${trim}`], values[`max_${trim}`]]
-      } else if (key.startsWith('max')) {
-        // do nothing, handled above
-      } else if (key.startsWith('pvp')) {
-        reactMapFriendly.pvp = [
-          values.pvp_ranking_best,
-          values.pvp_ranking_worst,
-        ]
-      } else if (key === 'atk' || key === 'def' || key === 'sta') {
-        reactMapFriendly[`${key}_iv`] = [values[key], values[`max_${key}`]]
-      } else if (key.startsWith('rarity')) {
-        reactMapFriendly.rarity = [values[key], values[`max_${key}`]]
-      } else if (key.startsWith('size')) {
-        reactMapFriendly.size = [values[key], values[`max_${key}`]]
-      } else {
-        reactMapFriendly[key] = values[key]
-      }
-    })
-    return reactMapFriendly
-  }
-
-  static processor(category, entries, defaults) {
-    const pvpFields = [
-      'pvp_ranking_league',
-      'pvp_ranking_best',
-      'pvp_ranking_worst',
-      'pvp_ranking_min_cp',
-      'pvp_ranking_cap',
-    ]
-    const ignoredFields = [
-      'noIv',
-      'byDistance',
-      'xs',
-      'xl',
-      'allForms',
-      'pvpEntry',
-    ]
-    const dupes = {}
-    switch (category) {
-      case 'egg':
-        return entries.map((egg) => ({
-          ...defaults,
-          ...egg,
-          byDistance: undefined,
-        }))
-      case 'invasion':
-        return entries.map((invasion) => ({
-          ...defaults,
-          ...invasion,
-          byDistance: undefined,
-        }))
-      case 'lure':
-        return entries.map((lure) => ({
-          ...defaults,
-          ...lure,
-          lure_id: +lure.lure_id,
-          byDistance: undefined,
-        }))
-      case 'gym':
-        return entries.map((gym) => ({
-          ...defaults,
-          ...gym,
-          byDistance: undefined,
-        }))
-      case 'raid':
-        return entries
-          .map((boss) => {
-            if (boss.allForms) {
-              boss.form = defaults.form
-              if (dupes[boss.pokemon_id]) {
-                return null
-              }
-              dupes[boss.pokemon_id] = true
-            }
-            if (boss.byDistance === false) {
-              boss.distance = 0
-            }
-            return { ...defaults, ...boss }
-          })
-          .filter((boss) => boss)
-      case 'quest':
-        return entries
-          .map((quest) => {
-            if (quest.allForms) {
-              quest.form = defaults.form
-              if (dupes[quest.reward]) {
-                return null
-              }
-              dupes[quest.reward] = true
-            }
-            return {
-              ...defaults,
-              ...quest,
-              byDistance: undefined,
-              allForms: undefined,
-            }
-          })
-          .filter((quest) => quest)
-      default:
-        return entries
-          .map((pkmn) => {
-            const fields = [
-              'pokemon_id',
-              'form',
-              'clean',
-              'distance',
-              'min_time',
-              'template',
-              'profile_no',
-              'gender',
-              'rarity',
-              'max_rarity',
-              'size',
-              'max_size',
-            ]
-            const newPokemon = {}
-            if (pkmn.allForms) {
-              pkmn.form = 0
-              if (dupes[pkmn.pokemon_id]) {
-                return null
-              }
-              dupes[pkmn.pokemon_id] = true
-            }
-            if (pkmn.pvpEntry) {
-              fields.push(...pvpFields)
-            } else {
-              fields.push(
-                ...Object.keys(pkmn).filter(
-                  (key) =>
-                    !pvpFields.includes(key) && !ignoredFields.includes(key),
-                ),
-              )
-            }
-            new Set(fields).forEach(
-              (field) =>
-                (newPokemon[field] =
-                  pkmn[field] === undefined ? defaults[field] : pkmn[field]),
-            )
-            return newPokemon
-          })
-          .filter((pokemon) => pokemon)
-    }
-  }
-
   /**
    *
    * @param {object} item
@@ -307,21 +127,35 @@ export class Poracle {
    * @returns {string}
    */
   static generateDescription(item, category) {
+    if (typeof item.description === 'string' && item.description) {
+      return item.description
+    }
     const { leagues } = useWebhookStore.getState().context
     switch (category) {
       case 'invasion': {
-        let name = t(
-          item.grunt_type === 'gold-stop'
-            ? 'gold_stop'
-            : item.grunt_type === 'kecleon'
-              ? 'poke_352'
-              : item.grunt_type === 'showcase'
-                ? 'showcase'
-                : item.real_grunt_id
-                  ? `grunt_${item.real_grunt_id}`
-                  : 'poke_global',
+        const gruntId = ruleId(
+          'invasion',
+          item,
+          useMemory.getState().masterfile.invasions,
         )
-        if (!item.gender) name = name.replace(/\(.+?\)/g, `(${t('all')})`)
+        let name = t(
+          gruntId === 'i0' ? 'poke_global' : `grunt_${gruntId.slice(1)}`,
+        )
+        if (!item.gender || item.gender === 'any') {
+          name = name.replace(/\(.+?\)/g, `(${t('all')})`)
+        }
+        return `${name}${item.clean ? ` | ${t('clean')} ` : ''}${
+          item.distance ? ` | d${item.distance}` : ''
+        }`
+      }
+      case 'incident': {
+        const id = ruleId('incident', item)
+        const key = {
+          'gold-stop': 'gold_stop',
+          kecleon: 'poke_352',
+          showcase: 'showcase',
+        }[id]
+        const name = key ? t(key) : `${t('incident')} ${item.display_type}`
         return `${name}${item.clean ? ` | ${t('clean')} ` : ''}${
           item.distance ? ` | d${item.distance}` : ''
         }`
@@ -387,12 +221,12 @@ export class Poracle {
               }${item.clean ? ` | ${t('clean')} ` : ''}${
                 item.distance ? ` | d${item.distance}` : ''
               }`
-            : `${item.min_iv}-${item.max_iv}% | L${item.min_level}-${
-                item.max_level
-              }
-      A${item.atk}-${item.max_atk} | D${item.def}-${item.max_def} | S${
-        item.sta
-      }-${item.max_sta}${item.clean ? ` | ${t('clean')} ` : ''}${
+            : `${item.min_iv ?? 0}-${item.max_iv ?? 100}% | L${
+                item.min_level ?? 1
+              }-${item.max_level ?? 55}
+      A${item.atk ?? 0}-${item.max_atk ?? 15} | D${item.def ?? 0}-${
+        item.max_def ?? 15
+      } | S${item.sta ?? 0}-${item.max_sta ?? 15}${item.clean ? ` | ${t('clean')} ` : ''}${
         item.distance ? ` | d${item.distance}` : ''
       }`
         }${
@@ -416,9 +250,9 @@ export class Poracle {
     switch (id.charAt(0)) {
       case 'e':
       case 'r':
-        return { level: id.slice(1) }
+        return { level: +id.slice(1) }
       default:
-        return { pokemon_id: id.split('-')[0], form: id.split('-')[1] }
+        return { pokemon_id: +id.split('-')[0], form: +id.split('-')[1] || 0 }
     }
   }
 }

@@ -27,6 +27,7 @@ import { useGenFilters } from './hooks/useGenFilters'
 import { useGetHookContext } from './hooks/useGetHookContext'
 import { ProfileEditing } from './human/profile'
 import { Poracle } from './services/Poracle'
+import { formToRule, toForm } from './services/ruleForm'
 import { WebhookItem } from './tiles/WebhookItem'
 
 export function Manage() {
@@ -90,27 +91,62 @@ export function Manage() {
   }, [category])
 
   React.useEffect(() => {
+    if (addNew.open && category !== 'human') {
+      // Start Add New clean: editing a tracked rule leaves it in tempFilters
+      useWebhookStore.setState({ tempFilters: { ...filters[category] } })
+    }
     if (!addNew.open && addNew.save && category !== 'human') {
-      const { tempFilters } = useWebhookStore.getState()
-      const values = Poracle.processor(
-        category,
-        Object.values(tempFilters || {}).filter((x) => x && x.enabled),
-        useWebhookStore.getState().context.ui[category].defaults,
-      )
-      apolloClient.mutate({
-        // @ts-ignore
-        mutation: Query.webhook(category.toUpperCase()),
-        variables: {
-          category,
-          data: values,
-          status: 'POST',
-        },
-        refetchQueries: [ALL_PROFILES],
-      })
-      useWebhookStore.setState((prev) => ({
-        [category]: [...prev[category], ...values],
-        tempFilters: { ...filters[category] },
-      }))
+      const { tempFilters, context } = useWebhookStore.getState()
+      const info = context.ui[category]
+      // allForms collapses several form tiles into one rule: send it once
+      const seen = new Set()
+      const values = Object.values(tempFilters || {})
+        .filter((x) => x && x.enabled)
+        // new rules only: an edited tracked rule may have left its uid here
+        .map((x) => {
+          const form = toForm(category, x, info)
+          delete form.uid
+          return formToRule(category, form, info)
+        })
+        .filter((rule) => {
+          const key = JSON.stringify(rule)
+          if (seen.has(key)) return false
+          seen.add(key)
+          return true
+        })
+      useWebhookStore.setState({ tempFilters: { ...filters[category] } })
+      if (!values.length) return
+      apolloClient
+        .mutate({
+          // @ts-ignore
+          mutation: Query.webhook(category.toUpperCase()),
+          variables: {
+            category,
+            data: values,
+            status: 'POST',
+          },
+          refetchQueries: [ALL_PROFILES],
+        })
+        .then(({ data }) => {
+          const result = data?.webhook
+          if (Array.isArray(result?.[category])) {
+            useWebhookStore.setState({ [category]: result[category] })
+          }
+          if (result?.status === 'error') {
+            useWebhookStore.setState({
+              alert: {
+                open: true,
+                severity: 'error',
+                message: result.message,
+              },
+            })
+          }
+        })
+        .catch((error) =>
+          useWebhookStore.setState({
+            alert: { open: true, severity: 'error', message: error.message },
+          }),
+        )
     }
   }, [addNew])
 

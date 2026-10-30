@@ -4,6 +4,8 @@ import { useMemory } from '@store/useMemory'
 
 import { useWebhookStore } from '@store/useWebhookStore'
 
+import { ruleToForm } from '../services/ruleForm'
+
 export function useGenFilters() {
   const profile_no = useWebhookStore((s) => s.human.current_profile_no)
   const ui = useWebhookStore((s) => s.context.ui)
@@ -14,239 +16,170 @@ export function useGenFilters() {
       masterfile: { invasions },
     } = useMemory.getState()
     if (!ui) return {}
-    const { pokemon, egg, gym, invasion, lure, quest, nest, raid } = ui
+    const { pokemon, egg, gym, invasion, incident, lure, quest, nest, raid } =
+      ui
+    /**
+     * @param {string} category
+     * @param {Record<string, any>} [rule]
+     */
+    const form = (category, rule = {}) =>
+      ruleToForm(category, { ...rule, profile_no }, ui[category])
+    const EXTRA_IDENTITY = {
+      pokemon: ['form'],
+      raid: ['form', 'level'],
+      nest: ['form'],
+      quest: ['form', 'amount'],
+      invasion: ['gender'],
+    }
+    /** @param {string} category */
+    const globalForm = (category) => {
+      const global = form(category)
+      ;[
+        ...(ui[category]?.identifiers || []),
+        ...(EXTRA_IDENTITY[category] || []),
+      ].forEach((key) => delete global[key])
+      return global
+    }
     const filters = {
       pokemon: pokemon
-        ? {
-            global: { ...pokemon.defaults, profile_no },
-            '0-0': { ...pokemon.defaults, profile_no },
-          }
+        ? { global: globalForm('pokemon'), '0-0': form('pokemon') }
         : {},
       raid: raid
         ? {
-            global: { ...raid.defaults, profile_no },
-            r90: {
-              ...raid.defaults,
-              level: 90,
-              profile_no,
-            },
+            global: globalForm('raid'),
+            r90: form('raid', { level: 90 }),
           }
         : {},
       egg: egg
         ? {
-            global: { ...egg.defaults, profile_no },
-            e90: {
-              ...egg.defaults,
-              level: 90,
-              profile_no,
-            },
+            global: globalForm('egg'),
+            e90: form('egg', { level: 90 }),
           }
         : {},
       gym: gym
         ? {
-            global: { ...gym.defaults, profile_no },
-            t4: { ...gym.defaults, profile_no },
+            global: globalForm('gym'),
+            t4: form('gym', { team: 'any' }),
           }
         : {},
       invasion: invasion
         ? {
-            global: {
-              ...invasion.defaults,
-              profile_no,
-            },
-            i0: {
-              ...invasion.defaults,
-              grunt_type: 'everything',
-              profile_no,
-            },
-            'gold-stop': {
-              ...invasion.defaults,
-              grunt_type: 'gold-stop',
-              profile_no,
-            },
-            kecleon: {
-              ...invasion.defaults,
-              grunt_type: 'kecleon',
-              profile_no,
-            },
-            showcase: {
-              ...invasion.defaults,
-              grunt_type: 'showcase',
-              profile_no,
-            },
+            global: globalForm('invasion'),
+            i0: form('invasion', { grunt_type: 'everything' }),
           }
         : {},
-      lure: {
-        global: lure ? { ...lure.defaults, profile_no } : {},
-      },
-      nest: {
-        global: nest ? { ...nest.defaults, profile_no } : {},
-      },
-      quest: {
-        global: quest ? { ...quest.defaults, profile_no } : {},
-      },
+      incident: incident
+        ? {
+            global: globalForm('incident'),
+            'gold-stop': form('incident', { display_type: 7 }),
+            kecleon: form('incident', { display_type: 8 }),
+            showcase: form('incident', { display_type: 9 }),
+          }
+        : {},
+      lure: { global: lure ? globalForm('lure') : {} },
+      nest: { global: nest ? globalForm('nest') : {} },
+      quest: { global: quest ? globalForm('quest') : {} },
     }
+    const TEAMS = ['harmony', 'mystic', 'valor', 'instinct', 'any']
+    const GENDERS = ['any', 'male', 'female']
+    const off = { enabled: false }
+
     Object.keys(rmFilters.pokemon?.filter || {}).forEach((key) => {
-      if (pokemon)
-        filters.pokemon[key] = {
-          ...pokemon.defaults,
-          pokemon_id: +key.split('-')[0],
-          form: +key.split('-')[1],
-          profile_no,
-          enabled: false,
-        }
-      if (raid)
-        filters.raid[key] = {
-          ...raid.defaults,
-          pokemon_id: +key.split('-')[0],
-          form: +key.split('-')[1],
-          profile_no,
-          enabled: false,
-        }
-      if (nest)
-        filters.nest[key] = {
-          ...nest.defaults,
-          pokemon_id: +key.split('-')[0],
-          form: +key.split('-')[1],
-          profile_no,
-          enabled: false,
-        }
-      if (quest)
-        filters.quest[key] = {
-          ...quest.defaults,
-          reward: +key.split('-')[0],
-          form: +key.split('-')[1],
-          profile_no,
+      if (key === 'global') return
+      const [id, formId] = key.split('-').map(Number)
+      if (pokemon) {
+        filters.pokemon[key] = form('pokemon', {
+          pokemon_id: id,
+          form: formId,
+          ...off,
+        })
+      }
+      if (raid) {
+        filters.raid[key] = form('raid', {
+          pokemon_id: id,
+          form: formId,
+          ...off,
+        })
+      }
+      if (nest) {
+        filters.nest[key] = form('nest', {
+          pokemon_id: id,
+          form: formId,
+          ...off,
+        })
+      }
+      if (quest) {
+        filters.quest[key] = form('quest', {
+          reward: id,
+          form: formId,
           reward_type: 7,
-          enabled: false,
-        }
-      if (key === 'global') {
-        if (pokemon) {
-          delete filters.pokemon[key].pokemon_id
-          delete filters.pokemon[key].form
-        }
-        if (raid) {
-          delete filters.raid[key].pokemon_id
-          delete filters.raid[key].form
-        }
-        if (nest) {
-          delete filters.nest[key].pokemon_id
-          delete filters.nest[key].form
-        }
-        if (quest) {
-          delete filters.quest[key].reward
-          delete filters.quest[key].form
-        }
+          ...off,
+        })
       }
     })
     Object.keys(rmFilters.pokestops?.filter || {}).forEach((key) => {
-      if (key.startsWith('i') && invasion) {
-        filters.invasion[key] = {
-          ...invasion.defaults,
-          grunt_type: invasions[key.slice(1)].type.toLowerCase(),
-          gender: invasions[key.slice(1)].gender,
-          profile_no,
-          enabled: false,
-        }
+      if (key === 'global') return
+      const num = key.slice(1)
+      if (key.startsWith('i') && invasion && invasions[num]) {
+        filters.invasion[key] = form('invasion', {
+          grunt_type: invasions[num].type.toLowerCase(),
+          gender: GENDERS[invasions[num].gender] ?? 'any',
+          ...off,
+        })
       }
       if (key.startsWith('l') && lure) {
-        filters.lure[key] = {
-          ...lure.defaults,
-          lure_id: key.slice(1),
-          profile_no,
-          enabled: false,
-        }
+        filters.lure[key] = form('lure', { lure_id: +num, ...off })
       }
       if (key.startsWith('q') && quest) {
-        filters.quest[key] = {
-          ...quest.defaults,
-          reward: +key.slice(1),
-          profile_no,
+        filters.quest[key] = form('quest', {
+          reward: +num,
           reward_type: 2,
-          enabled: false,
-        }
+          ...off,
+        })
       }
       if (key.startsWith('c') && quest) {
-        filters.quest[key] = {
-          ...quest.defaults,
-          reward: +key.slice(1),
-          profile_no,
+        filters.quest[key] = form('quest', {
+          reward: +num,
           reward_type: 4,
-          enabled: false,
-        }
+          ...off,
+        })
       }
       if (key.startsWith('d') && quest) {
-        filters.quest[key] = {
-          ...quest.defaults,
-          profile_no,
+        filters.quest[key] = form('quest', {
           reward_type: 3,
-          amount: +key.slice(1),
-          enabled: false,
-        }
+          amount: +num,
+          ...off,
+        })
       }
       if (key.startsWith('m') && quest) {
-        filters.quest[key] = {
-          ...quest.defaults,
-          profile_no,
+        filters.quest[key] = form('quest', {
           reward_type: 12,
           reward: +key.split('-')[0].slice(1),
           amount: +key.split('-')[1],
-          enabled: false,
-        }
+          ...off,
+        })
       }
       if (key.startsWith('x') && quest) {
-        filters.quest[key] = {
-          ...quest.defaults,
-          reward: +key.slice(1),
-          profile_no,
+        filters.quest[key] = form('quest', {
+          reward: +num,
           reward_type: 9,
-          enabled: false,
-        }
-      }
-      if (key === 'global') {
-        if (invasion) {
-          delete filters.invasion[key].grunt_type
-          delete filters.invasion[key].gender
-        }
-        if (lure) {
-          delete filters.lure[key].lure_id
-        }
-        if (quest) {
-          delete filters.quest[key].reward
-          delete filters.quest[key].reward_type
-          delete filters.quest[key].amount
-        }
+          ...off,
+        })
       }
     })
     Object.keys(rmFilters.gyms?.filter || {}).forEach((key) => {
+      if (key === 'global') return
       if (key.startsWith('r') && raid) {
-        filters.raid[key] = {
-          ...raid.defaults,
-          level: +key.slice(1),
-          profile_no,
-          enabled: false,
-        }
+        filters.raid[key] = form('raid', { level: +key.slice(1), ...off })
       }
       if (key.startsWith('e') && egg) {
-        filters.egg[key] = {
-          ...egg.defaults,
-          level: +key.slice(1),
-          profile_no,
-          enabled: false,
-        }
+        filters.egg[key] = form('egg', { level: +key.slice(1), ...off })
       }
       if (key.startsWith('t') && gym) {
-        filters.gym[key] = {
-          ...gym.defaults,
-          team: +key.slice(1).split('-')[0],
-          profile_no,
-          enabled: false,
-        }
-      }
-      if (key === 'global') {
-        if (raid) delete filters.raid[key].level
-        if (egg) delete filters.egg[key].level
-        if (gym) delete filters.gym[key].team
+        filters.gym[key] = form('gym', {
+          team: TEAMS[+key.slice(1).split('-')[0]] ?? 'any',
+          ...off,
+        })
       }
     })
     return filters

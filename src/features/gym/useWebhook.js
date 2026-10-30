@@ -23,15 +23,16 @@ export function useWebhook({ category }) {
 
   useEffect(() => {
     if (data?.webhook || error) {
+      const failed = error || data?.webhook?.status === 'error'
       const message = error
         ? error.message
-        : data?.webhook
-          ? t(`webhook_success_${category.replace('quick', '').toLowerCase()}`)
-          : t('success')
+        : failed
+          ? data.webhook.message
+          : t(`webhook_success_${category.replace('quick', '').toLowerCase()}`)
       useWebhookStore.setState({
         alert: {
           open: true,
-          severity: error ? 'error' : 'success',
+          severity: failed ? 'error' : 'success',
           message,
         },
       })

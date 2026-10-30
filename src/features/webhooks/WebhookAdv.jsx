@@ -34,44 +34,34 @@ import { camelToSnake } from '@utils/strings'
 import { FCSelect } from '@components/inputs/FCSelect'
 
 import { Poracle } from './services/Poracle'
+import { FORM_ONLY_FIELDS, toForm } from './services/ruleForm'
 
 const skipFields = new Set([
-  'profile_no',
-  'allForms',
-  'pvpEntry',
-  'noIv',
-  'byDistance',
+  ...FORM_ONLY_FIELDS,
   'distance',
-  'xs',
-  'xl',
-  'clean',
   'gender',
-  'description',
-  'uid',
   'max_size',
-  'id',
   'ping',
   'pokemon_id',
   'form',
-  '__typename',
-  'allMoves',
-  'enabled',
   'level',
-  'exclusive',
   'lure_id',
   'reward',
   'reward_type',
   'grunt_type',
-  'grunt_id',
+  'display_type',
   'gym_id',
+  'shiny',
+  'clean',
+  'edit',
+  'summary',
+  'exclusive',
   'slot_changes',
+  'battle_changes',
   'team',
   'rsvp_changes',
-  'battle_changes',
-  'shiny',
-  'everything_individually',
-  'all',
-  'real_grunt_id',
+  'uid',
+  'description',
 ])
 
 const wildCards = {
@@ -81,16 +71,63 @@ const wildCards = {
   invasion: ['i0'],
 }
 
+/** Global edits must not overwrite what identifies each selected item. */
+const GLOBAL_IDENTITY = {
+  pokemon: ['form'],
+  raid: ['form', 'level'],
+  nest: ['form'],
+  quest: ['form', 'amount'],
+  invasion: ['gender'],
+}
+/** Derived from identity fields, so they stay per item too. */
+const GLOBAL_DERIVED = ['allForms', 'xs', 'xl', 'min_weight', 'max_weight']
+
+/** Switches shown only when the Poracle server supports them. */
+const CAPABILITY_GATED = { edit: true, summary: true }
+
+/** MUI selects cannot hold `null`; this stands in for "any" in the menu. */
+const ANY = '__any__'
+
+/** Named values map back to the numeric locale keys (`team_1`, ...). */
+const LABEL_INDEX = {
+  team: { harmony: 0, mystic: 1, valor: 2, instinct: 3, any: 4 },
+  gender: { male: 1, female: 2, genderless: 3 },
+  rsvp_changes: { none: 0, rsvp: 1, rsvp_only: 2 },
+}
+const LABEL_PREFIX = { team: 'team', gender: 'gender', rsvp_changes: 'rsvp' }
+
+/**
+ * @param {(key: string, fallback?: string) => string} t
+ * @param {'team' | 'gender' | 'rsvp_changes'} field
+ * @param {string | null} value
+ */
+const namedLabel = (t, field, value) => {
+  // rsvp_changes null means "none" (no RSVP updates), not "any"
+  if (field === 'rsvp_changes' && (value === null || value === undefined))
+    return t('rsvp_0')
+  return value === null || value === undefined || value === 'any'
+    ? t('any')
+    : t(`${LABEL_PREFIX[field]}_${LABEL_INDEX[field][value] ?? value}`, value)
+}
+
 export function WebhookAdvanced() {
-  const { id, category, open, selectedIds, onClose } = useWebhookStore(
+  const { id, uid, category, open, selectedIds, onClose } = useWebhookStore(
     (s) => s.advanced,
   )
   const idObj = Poracle.getIdObj(id)
   const { t } = useTranslation()
   const location = useStorage((s) => s.location)
   const webhookAdv = useStorage((s) => s.webhookAdv)
-  const { templates, prefix, leagues, pvp, hasNominatim, locale, everything } =
-    useWebhookStore((s) => s.context)
+  const {
+    templates,
+    prefix,
+    leagues,
+    pvp,
+    hasNominatim,
+    locale,
+    everything,
+    capabilities,
+  } = useWebhookStore((s) => s.context)
   const info = useWebhookStore((s) => s.context.ui?.[category])
   const human = useWebhookStore((s) => s.human)
   const profile = useWebhookStore((s) => s.profile)
@@ -98,18 +135,18 @@ export function WebhookAdvanced() {
   const { pokemon, moves, types } = useMemory((s) => s.masterfile)
   const isMobile = useMemory((s) => s.isMobile)
 
-  const [filterValues, setFilterValues] = React.useState(
-    tempFilters?.template
-      ? Poracle.reactMapFriendly(tempFilters)
-      : {
-          ...Poracle.reactMapFriendly(info?.defaults),
+  /** @returns {Record<string, any>} */
+  const initialForm = () =>
+    info
+      ? {
           profile_no: human.current_profile_no,
-        },
-  )
-  const [poracleValues, setPoracleValues] = React.useState(
-    tempFilters?.template
-      ? tempFilters
-      : { ...info?.defaults, profile_no: human.current_profile_no },
+          ...toForm(category, tempFilters ?? info.defaults, info),
+        }
+      : {}
+  const [poracleValues, setPoracleValues] = React.useState(initialForm)
+  const defaultForm = React.useMemo(
+    () => (info ? toForm(category, info.defaults, info) : {}),
+    [category, info],
   )
 
   useAnalytics(`/poracle/${category}`)
@@ -145,20 +182,8 @@ export function WebhookAdvanced() {
   const fetchedData = data || previousData
 
   React.useEffect(() => {
-    setPoracleValues(
-      tempFilters?.template
-        ? { ...tempFilters }
-        : { ...info?.defaults, profile_no: human.current_profile_no },
-    )
-    setFilterValues(
-      tempFilters?.template
-        ? Poracle.reactMapFriendly(tempFilters)
-        : {
-            ...Poracle.reactMapFriendly(info?.defaults),
-            profile_no: human.current_profile_no,
-          },
-    )
-  }, [tempFilters, id, human.current_profile_no, info?.defaults])
+    setPoracleValues(initialForm())
+  }, [tempFilters, id, human.current_profile_no, info])
 
   React.useEffect(() => {
     setPoracleValues((prev) => ({
@@ -169,7 +194,6 @@ export function WebhookAdvanced() {
 
   const handleSlider = React.useCallback(
     (low, high) => (name, values) => {
-      setFilterValues((prev) => ({ ...prev, [name]: values }))
       setPoracleValues((prev) => ({
         ...prev,
         [low]: values[0],
@@ -188,8 +212,8 @@ export function WebhookAdvanced() {
           ...poracleValues,
           min_weight: checked
             ? Math.ceil(pokemon[idObj.id].weight * 1.313)
-            : info?.defaults.min_weight,
-          max_weight: info?.defaults.max_weight,
+            : null,
+          max_weight: null,
           [name]: checked,
           xs: false,
         })
@@ -197,10 +221,10 @@ export function WebhookAdvanced() {
       case 'xs':
         setPoracleValues({
           ...poracleValues,
-          min_weight: info?.defaults.min_weight,
+          min_weight: null,
           max_weight: checked
             ? Math.floor(pokemon[idObj.id].weight / 1.6431924)
-            : info?.defaults.max_weight,
+            : null,
           [name]: checked,
           xl: false,
         })
@@ -223,7 +247,7 @@ export function WebhookAdvanced() {
         setPoracleValues({
           ...poracleValues,
           [name]: checked,
-          move: 9000,
+          move: null,
         })
         break
       case 'byDistance':
@@ -239,21 +263,33 @@ export function WebhookAdvanced() {
   }
 
   const handleSelect = (event) => {
-    const { name, value } = event.target
+    const { name } = event.target
+    const value = event.target.value === ANY ? null : event.target.value
     const newObj = { [name]: value }
     if (name === 'pvp_ranking_league') {
-      newObj.pvp_ranking_min_cp = pvp === 'ohbem' ? 0 : value - 50
+      newObj.pvp_ranking_min_cp = pvp === 'ohbem' || !value ? 0 : value - 50
     }
     if (name.startsWith('pvp')) {
-      newObj.pvpEntry = true
+      newObj.pvpEntry = name === 'pvp_ranking_league' ? value > 0 : true
     }
-    if (name === 'move' && value !== 9000) {
-      newObj.allMoves = false
+    if (name === 'move') {
+      newObj.move = value === null ? null : +value
+      newObj.allMoves = value === null
     }
     if (name === 'template') {
-      newObj[name] = value?.toString() || ''
+      newObj[name] = value === null ? null : value.toString()
     }
     setPoracleValues({ ...poracleValues, ...newObj })
+  }
+
+  /** Number inputs hand back strings; rules need numbers. */
+  const handleText = (type) => (event) => {
+    const { name, value } = event.target
+    setPoracleValues({
+      ...poracleValues,
+      [name]: type === 'number' ? Number(value) || 0 : value,
+      ...(name.startsWith('pvp') ? { pvpEntry: true } : {}),
+    })
   }
 
   const handleChange = (panel) => (_, isExpanded) => {
@@ -266,6 +302,12 @@ export function WebhookAdvanced() {
     const menuItems = []
     switch (option.name) {
       case 'template':
+        // null = the Poracle server's default template
+        menuItems.push(
+          <MenuItem key={ANY} value={ANY} dense>
+            {t('default_template', 'Default')}
+          </MenuItem>,
+        )
         templates[poracleValues.noIv ? `${category}NoIv` : category]?.[
           human.language || locale
         ]?.forEach((item) =>
@@ -312,35 +354,19 @@ export function WebhookAdvanced() {
         )
         break
       case 'gender':
-        option.options.forEach((gender) =>
-          menuItems.push(
-            <MenuItem key={gender} value={gender} dense>
-              {t(`gender_${gender}`)}
-            </MenuItem>,
-          ),
-        )
-        break
       case 'team':
-        option.options.forEach((team) =>
-          menuItems.push(
-            <MenuItem key={team} value={team} dense>
-              {t(`team_${team}`, t('any'))}
-            </MenuItem>,
-          ),
-        )
-        break
       case 'rsvp_changes':
-        option.options.forEach((rsvp_changes) =>
+        option.options.forEach((named) =>
           menuItems.push(
-            <MenuItem key={rsvp_changes} value={rsvp_changes} dense>
-              {t(`rsvp_${rsvp_changes}`)}
+            <MenuItem key={named ?? ANY} value={named ?? ANY} dense>
+              {namedLabel(t, option.name, named)}
             </MenuItem>,
           ),
         )
         break
       case 'move':
         menuItems.push(
-          <MenuItem key={9000} value={9000} dense>
+          <MenuItem key={ANY} value={ANY} dense>
             {t('any')}
           </MenuItem>,
         )
@@ -412,27 +438,46 @@ export function WebhookAdvanced() {
     if (field === 'exclusive' && poracleValues.exclusive)
       return ` ${t('exclusive')} `
     if (field === 'clean' && poracleValues.clean) return ` ${t('clean')} `
+    if (field === 'edit' && poracleValues.edit && capabilities?.edit)
+      return ` ${t('edit')} `
+    if (field === 'summary' && poracleValues.summary && capabilities?.summary)
+      return ` ${t('summary')} `
     if (field === 'min_spawn_avg' && poracleValues.min_spawn_avg > 0)
       return ` ${t('minspawn')}${poracleValues.min_spawn_avg} `
     if (field === 'slot_changes' && poracleValues.slot_changes)
       return ` ${t('slot_changes_poracle')} `
     if (field === 'battle_changes' && poracleValues.battle_changes)
       return ` ${t('battle_changes_poracle')} `
-    if (field === 'team' && poracleValues.team !== 4)
-      return t(`team_${poracleValues.team}`)
-    if (field === 'rsvp_changes' && poracleValues.rsvp_changes !== 0)
-      return t(`rsvp_${poracleValues.rsvp_changes}`)
+    if (
+      field === 'team' &&
+      poracleValues.team !== null &&
+      poracleValues.team !== undefined &&
+      poracleValues.team !== 'any'
+    )
+      return namedLabel(t, 'team', poracleValues.team)
+    if (
+      field === 'rsvp_changes' &&
+      poracleValues.rsvp_changes !== null &&
+      poracleValues.rsvp_changes !== undefined &&
+      poracleValues.rsvp_changes !== 'none'
+    )
+      return namedLabel(t, 'rsvp_changes', poracleValues.rsvp_changes)
     if (
       field === 'everything_individually' &&
       poracleValues.everything_individually
     )
       return ` ${t('individually')} `
-    if (skipFields.has(field)) return ''
+    if (
+      field === 'template' &&
+      (poracleValues.template === null || poracleValues.template === '')
+    )
+      return ''
+    if (skipFields.has(field) || !(field in defaultForm)) return ''
     if (field.startsWith('pvp')) {
       if (
         poracleValues.pvpEntry &&
         poracleValues.pvp_ranking_league &&
-        poracleValues[field] !== info?.defaults[field]
+        poracleValues[field] !== defaultForm[field]
       ) {
         const league =
           leagues.find((x) => x.cp === poracleValues.pvp_ranking_league) || {}
@@ -456,7 +501,7 @@ export function WebhookAdvanced() {
       return ''
     }
     if (!poracleValues.pvpEntry) {
-      return poracleValues[field] === info?.defaults[field]
+      return poracleValues[field] === defaultForm[field]
         ? ''
         : `${field.replace(/_/g, '').replace('min', '')}${poracleValues[field]}`
     }
@@ -464,20 +509,22 @@ export function WebhookAdvanced() {
 
   const getPoracleString = () => {
     if (!id) return ''
-    if (id === 'gold-stop')
-      return `${prefix}${t('invasion')} gold-stop ${Object.keys(poracleValues)
-        .map(checkDefaults)
-        .join(' ')}`
-    if (id === 'kecleon')
-      return `${prefix}${t('invasion')} ${t('poke_352')} ${Object.keys(
-        poracleValues,
-      )
-        .map(checkDefaults)
-        .join(' ')}`
-    if (id === 'showcase')
-      return `${prefix}${t('showcase')} ${Object.keys(poracleValues)
-        .map(checkDefaults)
-        .join(' ')}`
+    if (category === 'incident') {
+      const settings = Object.keys(poracleValues).map(checkDefaults).join(' ')
+      switch (id) {
+        case 'gold-stop':
+          return `${prefix}${t('invasion')} gold-stop ${settings}`
+        case 'kecleon':
+          return `${prefix}${t('invasion')} ${t('poke_352')} ${settings}`
+        case 'showcase':
+          return `${prefix}${t('showcase')} ${settings}`
+        default:
+          return `${prefix}${t('invasion')} ${t(
+            `incident_${idObj.id}`,
+            `${idObj.id}`,
+          )} ${settings}`
+      }
+    }
     switch (id.charAt(0)) {
       case 't':
         return `${prefix}${t('gym')}
@@ -539,7 +586,11 @@ export function WebhookAdvanced() {
             }`
           : Object.keys(poracleValues).map(checkDefaults).join(' ')
       }
-      ${poracleValues.gender ? ` ${t(`gender_${poracleValues.gender}`)}` : ''}`
+      ${
+        poracleValues.gender && poracleValues.gender !== 'any'
+          ? ` ${namedLabel(t, 'gender', poracleValues.gender)}`
+          : ''
+      }`
     }
   }
 
@@ -570,7 +621,7 @@ export function WebhookAdvanced() {
     switch (type) {
       case 'sliders':
         return options
-          .filter((option) => filterValues[option.name] !== undefined)
+          .filter((option) => poracleValues[option.low] !== undefined)
           .map((option, i) => (
             <Grid
               key={option.name}
@@ -581,7 +632,7 @@ export function WebhookAdvanced() {
               <SliderTile
                 slide={option}
                 handleChange={handleSlider(option.low, option.high)}
-                values={filterValues[option.name]}
+                values={[poracleValues[option.low], poracleValues[option.high]]}
               />
             </Grid>
           ))
@@ -597,7 +648,7 @@ export function WebhookAdvanced() {
             >
               <FCSelect
                 name={option.name}
-                value={poracleValues[option.name]}
+                value={poracleValues[option.name] ?? ANY}
                 onChange={handleSelect}
                 label={t(option.name)}
                 disabled={getDisabled(option)}
@@ -608,33 +659,38 @@ export function WebhookAdvanced() {
             </Grid>
           ))
       case 'booleans':
-        return options.map((option) => (
-          <Grid
-            key={option.name}
-            container
-            xs={option.xs || 6}
-            sm={option.sm || size}
-            justifyContent="center"
-            alignItems="center"
-            direction={isMobile || option.override ? 'row' : 'column'}
-            style={{ margin: '10px 0' }}
-          >
-            <Grid xs={6} textAlign="center">
-              <Typography variant="subtitle2">
-                {t(camelToSnake(option.name))}
-              </Typography>
+        return options
+          .filter(
+            (option) =>
+              !(option.name in CAPABILITY_GATED) || capabilities?.[option.name],
+          )
+          .map((option) => (
+            <Grid
+              key={option.name}
+              container
+              xs={option.xs || 6}
+              sm={option.sm || size}
+              justifyContent="center"
+              alignItems="center"
+              direction={isMobile || option.override ? 'row' : 'column'}
+              style={{ margin: '10px 0' }}
+            >
+              <Grid xs={6} textAlign="center">
+                <Typography variant="subtitle2">
+                  {t(camelToSnake(option.name))}
+                </Typography>
+              </Grid>
+              <Grid xs={6} textAlign="center">
+                <Switch
+                  name={option.name}
+                  color="primary"
+                  onChange={handleSwitch}
+                  checked={Boolean(poracleValues[option.name])}
+                  disabled={getDisabled(option)}
+                />
+              </Grid>
             </Grid>
-            <Grid xs={6} textAlign="center">
-              <Switch
-                name={option.name}
-                color="primary"
-                onChange={handleSwitch}
-                checked={Boolean(poracleValues[option.name])}
-                disabled={getDisabled(option)}
-              />
-            </Grid>
-          </Grid>
-        ))
+          ))
       case 'texts':
         return options.map((option) => (
           <Grid
@@ -651,7 +707,7 @@ export function WebhookAdvanced() {
                 poracleValues[option.name] ||
                 (option.type === 'number' ? 0 : '')
               }
-              onChange={handleSelect}
+              onChange={handleText(option.type)}
               variant="outlined"
               disabled={getDisabled(option)}
               type={option.type || 'text'}
@@ -775,28 +831,29 @@ export function WebhookAdvanced() {
 
   const handleClose = (save, filterId, filterToSave) => {
     const realSave = typeof save === 'boolean' && save
-    if (realSave) {
+    if (uid) {
+      // A tracked rule saves through its own onClose (TrackedTile); writing it
+      // to tempFilters would re-POST it from Add New later.
+    } else if (realSave) {
       useWebhookStore.setState((prev) => {
         if (filterId === 'global' && filterToSave) {
           const newFilters = {}
           const wc = wildCards[category] || ['0-0']
-          if (filterToSave.everything_individually !== false) {
-            selectedIds.forEach((item) => {
-              newFilters[item] = {
-                ...prev.tempFilters[item],
-                ...filterToSave,
-                enabled: true,
-              }
-            })
-          } else {
-            wc.forEach((item) => {
-              newFilters[item] = {
-                ...prev.tempFilters[item],
-                ...filterToSave,
-                enabled: true,
-              }
-            })
-          }
+          const shared = { ...filterToSave }
+          ;[
+            ...(info?.identifiers || []),
+            ...(GLOBAL_IDENTITY[category] || []),
+            ...GLOBAL_DERIVED,
+          ].forEach((key) => delete shared[key])
+          const targets =
+            filterToSave.everything_individually !== false ? selectedIds : wc
+          targets.forEach((item) => {
+            newFilters[item] = {
+              ...prev.tempFilters[item],
+              ...shared,
+              enabled: true,
+            }
+          })
           return {
             tempFilters: {
               ...prev.tempFilters,

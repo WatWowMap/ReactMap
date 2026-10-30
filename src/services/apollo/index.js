@@ -15,33 +15,6 @@ export const apolloCache = new InMemoryCache({
     PoracleProfile: {
       keyFields: ['uid'],
     },
-    PoraclePokemon: {
-      keyFields: ['uid'],
-    },
-    PoracleGym: {
-      keyFields: ['uid'],
-    },
-    PoracleRaid: {
-      keyFields: ['uid'],
-    },
-    PoracleEgg: {
-      keyFields: ['uid'],
-    },
-    PoracleInvasion: {
-      keyFields: ['uid'],
-    },
-    PoracleLure: {
-      keyFields: ['uid'],
-    },
-    PoracleQuest: {
-      keyFields: ['uid'],
-    },
-    PoracleNest: {
-      keyFields: ['uid'],
-    },
-    PoracleWeather: {
-      keyFields: ['uid'],
-    },
   },
 })
 
