@@ -214,6 +214,9 @@ type Tappable {
   type: String
   fort_id: String
   item_id: Int
+  reward_type: String
+  reward_pokemon_id: Int
+  temp_evolution: Int
   count: Int
   expire_timestamp: Int
   expire_timestamp_verified: Boolean

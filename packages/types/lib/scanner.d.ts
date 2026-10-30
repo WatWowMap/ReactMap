@@ -295,7 +295,10 @@ export interface Tappable {
   lon: number
   type: string
   fort_id: string | null
-  item_id: number
+  item_id: number | null
+  reward_type?: string | null
+  reward_pokemon_id?: number | null
+  temp_evolution?: number | null
   count: number | null
   expire_timestamp: number | null
   expire_timestamp_verified: boolean

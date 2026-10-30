@@ -111,10 +111,12 @@ export function useGenPokestops() {
             break
           case 'm':
             {
-              const monId = id && id.slice(1).split('-')[0]
+              const [monId, amount, tempEvolution] = id.slice(1).split('-', 3)
               if (tempObj.quest_reward_12 && pokemon[monId]) {
                 tempObj.quest_reward_12[id] = {
-                  name: `${t(`poke_${monId}`)} x${id.split('-')[1]}`,
+                  name: `${
+                    tempEvolution ? `${t(`evo_${tempEvolution}`)} ` : ''
+                  }${t(`poke_${monId}`)} x${amount}`,
                   perms: ['quests'],
                   genId: `generation_${pokemon[monId].genId}`,
                   formTypes: pokemon[monId].types.map((x) => `poke_type_${x}`),

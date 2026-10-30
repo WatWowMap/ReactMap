@@ -22,14 +22,34 @@ export function useGenTappables() {
 
     Object.keys(tappables.filter).forEach((id) => {
       if (id === 'global' || id === 'q0') return
-      const itemId = id.startsWith('q') ? id.slice(1) : id
-      const name = t(`item_${itemId}`, `#${itemId}`)
+      let name
+      switch (id.charAt(0)) {
+        case 'c':
+          name = `${t(`poke_${id.slice(1)}`)} ${t('candy')}`
+          break
+        case 'x':
+          name = `${t(`poke_${id.slice(1)}`)} ${t('xl')}`
+          break
+        case 'm': {
+          const [pokemonId, amount, tempEvolution] = id.slice(1).split('-', 3)
+          name = `${tempEvolution ? `${t(`evo_${tempEvolution}`)} ` : ''}${t(
+            `poke_${pokemonId}`,
+          )} x${amount}`
+          break
+        }
+        default: {
+          const itemId = id.startsWith('q') ? id.slice(1) : id
+          name = t(`item_${itemId}`, `#${itemId}`)
+        }
+      }
       tappableFilters[id] = {
         name,
         perms: ['tappables'],
       }
       tappableFilters[id].searchMeta =
-        `${t('tappables').toLowerCase()} ${String(name).toLowerCase()}`
+        `${t('tappables').toLowerCase()} ${String(name).toLowerCase()}${
+          id.startsWith('m') ? ` ${t('quest_reward_12').toLowerCase()}` : ''
+        }`
     })
 
     if (Object.keys(tappableFilters).length === 0) {

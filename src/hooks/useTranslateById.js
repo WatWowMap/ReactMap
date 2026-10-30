@@ -86,8 +86,14 @@ export function useTranslateById(options = {}) {
             return i18n.t(`lure_${id.slice(1)}`)
           case 'm': {
             // mega energy
-            const a = amount ? `(${id.slice(1).split('-')[1]})` : ''
-            return `${i18n.t(`poke_${id.slice(1).split('-')[0]}`)} ${a}`
+            const [pokemon, megaAmount, tempEvolution] = id
+              .slice(1)
+              .split('-', 3)
+            const a = amount ? `(${megaAmount})` : ''
+            const evolution = tempEvolution
+              ? `${i18n.t(`evo_${tempEvolution}`)} `
+              : ''
+            return `${evolution}${i18n.t(`poke_${pokemon}`)} ${a}`
           }
           case 'p': {
             // experience
