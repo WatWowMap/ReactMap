@@ -21,6 +21,7 @@ import { Title } from '@components/popups/Title'
 
 import { getTimeUntil } from '@utils/getTimeUntil'
 import { getTappableDisplaySettings } from './displayRules'
+import { getTappableReward } from './getTappableReward'
 
 /**
  * @param {{
@@ -34,7 +35,8 @@ export function TappablePopup({ tappable, rewardIcon }) {
     (s) => !!s.userSettings.tappables?.enableTappablePopupCoords,
   )
   const popups = useStorage((s) => s.popups)
-  const filterKey = tappable.item_id ? `q${tappable.item_id}` : ''
+  const reward = getTappableReward(tappable)
+  const filterKey = reward?.filterKey || ''
   const filterEnabled = useStorage((s) =>
     filterKey ? s.filters?.tappables?.filter?.[filterKey]?.enabled : undefined,
   )
@@ -43,12 +45,34 @@ export function TappablePopup({ tappable, rewardIcon }) {
   const displaySettings = getTappableDisplaySettings(tappable)
 
   const count = tappable.count ?? 1
-  const itemName = React.useMemo(() => {
+  const rewardName = React.useMemo(() => {
+    switch (reward?.rewardType) {
+      case 4:
+      case 9:
+        return `${t(`poke_${reward.id}`)} ${t(
+          `quest_reward_${reward.rewardType}`,
+        )}`
+      case 12:
+        return `${
+          tappable.temp_evolution
+            ? `${t(`evo_${tappable.temp_evolution}`)} `
+            : ''
+        }${t(`poke_${reward.id}`)} ${t('quest_reward_12')}`
+      default:
+    }
     if (i18n.exists(`item_${tappable.item_id}`)) {
       return t(`item_${tappable.item_id}`)
     }
     return masterfile.items?.[tappable.item_id]?.name || `#${tappable.item_id}`
-  }, [t, i18n, masterfile.items, tappable.item_id])
+  }, [
+    t,
+    i18n,
+    masterfile.items,
+    tappable.item_id,
+    tappable.temp_evolution,
+    reward?.rewardType,
+    reward?.id,
+  ])
 
   const formattedType = React.useMemo(() => {
     if (!tappable.type) return ''
@@ -79,7 +103,7 @@ export function TappablePopup({ tappable, rewardIcon }) {
   const useRewardAsPrimary =
     displaySettings.popup.rewardAsPrimary && hasRewardIcon
   const hasTappableIcon = !!tappableIcon && !useRewardAsPrimary
-  const itemDisplayName = count > 1 ? `${itemName} x${count}` : itemName
+  const rewardDisplayName = count > 1 ? `${rewardName} x${count}` : rewardName
   const isLure = React.useMemo(
     () => Boolean(tappable.fort_id),
     [tappable.fort_id],
@@ -164,7 +188,7 @@ export function TappablePopup({ tappable, rewardIcon }) {
               <Grid xs={3} display="flex" justifyContent="center">
                 <img
                   src={rewardIcon}
-                  alt={itemName}
+                  alt={rewardName}
                   style={{
                     width: 35,
                     height: 35,
@@ -180,7 +204,7 @@ export function TappablePopup({ tappable, rewardIcon }) {
               justifyContent="center"
               alignItems="center"
             >
-              <Title>{itemDisplayName}</Title>
+              <Title>{rewardDisplayName}</Title>
             </Grid>
           </>
         ) : (
@@ -254,7 +278,7 @@ export function TappablePopup({ tappable, rewardIcon }) {
             <Grid xs={3} display="flex" justifyContent="center">
               <img
                 src={rewardIcon}
-                alt={itemName}
+                alt={rewardName}
                 style={{
                   maxWidth: 35,
                   maxHeight: 35,
@@ -263,7 +287,7 @@ export function TappablePopup({ tappable, rewardIcon }) {
             </Grid>
           ) : null}
           <Grid xs={hasRewardIcon ? 9 : 12} textAlign="center">
-            <Typography variant="caption">{itemDisplayName}</Typography>
+            <Typography variant="caption">{rewardDisplayName}</Typography>
           </Grid>
         </Grid>
       )}

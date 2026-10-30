@@ -557,7 +557,10 @@
     },
     "tappables": {
       "enabled": false,
-      "items": true
+      "items": true,
+      "megaEnergy": true,
+      "candy": true,
+      "xlCandy": true
     },
     "pokemon": {
       "enabled": false,
