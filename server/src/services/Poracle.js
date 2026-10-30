@@ -1,8 +1,63 @@
 // @ts-check
 
+const { default: fetch } = require('node-fetch')
+
 const { log, TAGS } = require('@rm/logger')
 const { fetchJson } = require('../utils/fetchJson')
 const { setCache, getCache } = require('./cache')
+const { createPoracleHttp, PoracleRequestError } = require('./poracle/http')
+const { createTrackingV1 } = require('./poracle/trackingV1')
+const { createTrackingV2 } = require('./poracle/trackingV2')
+const { UnsupportedOnV1 } = require('./poracle/v1Adapter')
+
+/** Categories served by the tracking clients. */
+const TRACKING_CATEGORIES = new Set([
+  'pokemon',
+  'raid',
+  'egg',
+  'quest',
+  'invasion',
+  'incident',
+  'lure',
+  'nest',
+  'gym',
+])
+
+/** @param {unknown} value */
+const pad2 = (value) => String(value ?? 0).padStart(2, '0')
+
+/**
+ * Converts ReactMap's active hours (string hours/mins plus a client-side id)
+ * into v2's strict integer schedule entries.
+ * @param {Array<Record<string, any>> | undefined} entries
+ */
+function toV2ActiveHours(entries) {
+  return (entries || []).map(
+    ({ day, hours, mins, step, end_hours: endHours, end_mins: endMins }) => {
+      /** @type {Record<string, number>} */
+      const entry = { day: +day, hours: +hours, mins: +mins }
+      if (+step > 0) {
+        entry.step = +step
+        entry.end_hours = +endHours
+        entry.end_mins = +endMins
+      }
+      return entry
+    },
+  )
+}
+
+/**
+ * Converts v2 schedule entries into ReactMap's shape, with zero-padded string
+ * hours and minutes as v1 stores them.
+ * @param {Array<Record<string, any>> | null | undefined} entries
+ */
+function fromV2ActiveHours(entries) {
+  return (entries || []).map((entry) => ({
+    ...entry,
+    hours: pad2(entry.hours),
+    mins: pad2(entry.mins),
+  }))
+}
 
 const PLATFORMS = /** @type {const} */ (['discord', 'telegram'])
 
@@ -37,9 +92,33 @@ const APIS = /** @type {APIReference} */ ({
     }`,
 })
 
-const SUBCATEGORIES = /** @type {const} */ ({
-  gym: ['raid', 'egg', 'gym'],
-})
+/** PoracleNG v2 routes, used when the server supports them. */
+const V2 = {
+  human: (userId) => `/api/v2/humans/${userId}`,
+  action: (userId, action) => `/api/v2/humans/${userId}/${action}`,
+  profiles: (userId, suffix) =>
+    `/api/v2/humans/${userId}/profiles${suffix ? `/${suffix}` : ''}`,
+}
+
+/**
+ * OpenAPI paths (relative to the spec's `/api` server) that the v2 code path
+ * relies on. `auto` only switches to v2 when all of them are served.
+ */
+const V2_REQUIRED_PATHS = [
+  '/v2/humans/{id}',
+  '/v2/humans/{id}/areas',
+  '/v2/humans/{id}/enable',
+  '/v2/humans/{id}/disable',
+  '/v2/humans/{id}/location',
+  '/v2/humans/{id}/profile',
+  '/v2/humans/{id}/profiles',
+  '/v2/humans/{id}/profiles/{profile_no}',
+  '/v2/humans/{id}/profiles/{profile_no}/copy',
+  ...[...TRACKING_CATEGORIES].flatMap((type) => [
+    `/v2/humans/{id}/tracking/${type}`,
+    `/v2/humans/{id}/tracking/${type}/{uid}`,
+  ]),
+]
 
 /**
  * Geocoding backends ReactMap can drive. Poracle also offers `google` and
@@ -76,6 +155,9 @@ function resolveGeocoderProvider({ remote, local, usingRemoteURL }) {
 }
 
 class PoracleAPI {
+  /** @type {ReturnType<typeof createTrackingV2>} */
+  #tracking
+
   /** @param {import("@rm/types").Config['webhooks'][number]} webhook */
   constructor(webhook) {
     if (!webhook.name)
@@ -91,6 +173,10 @@ class PoracleAPI {
     this.nominatimUrl = webhook.nominatimUrl
     this.geocoderProvider = webhook.geocoderProvider
     this.enabled = webhook.enabled || false
+    this.apiVersion = webhook.apiVersion || 'auto'
+    /** Whether requests go to the PoracleNG v2 API, resolved during init */
+    this.v2 = this.apiVersion === 'v2'
+    this.#buildTracking()
 
     this.discordRoles = webhook.discordRoles || []
     this.telegramGroups = webhook.telegramGroups || []
@@ -136,6 +222,7 @@ class PoracleAPI {
       leagues: this.leagues,
       pvp: this.pvp,
       ui: this.ui,
+      capabilities: { edit: this.v2, summary: this.v2 },
     }
   }
 
@@ -179,7 +266,9 @@ class PoracleAPI {
    */
   async getUserAreas(userId) {
     /** @type {{ areas: import("@rm/types").PoracleHumanArea[] }} */
-    const { areas } = await this.#sendRequest(APIS.humans(userId))
+    const { areas } = await this.#sendRequest(
+      this.v2 ? V2.action(userId, 'areas') : APIS.humans(userId),
+    )
     const areaGroups = areas.reduce((groupMap, area) => {
       if (area.userSelectable) {
         if (!groupMap[area.group]) groupMap[area.group] = []
@@ -218,13 +307,28 @@ class PoracleAPI {
     }
   }
 
+  /** Picks the tracking client matching the resolved API version. */
+  #buildTracking() {
+    const http = createPoracleHttp({
+      endpoint: this.endpoint,
+      secret: this.secret,
+    })
+    this.#tracking = this.v2 ? createTrackingV2(http) : createTrackingV1(http)
+  }
+
   initFromCache() {
     const cached = getCache(`${this.name}-webhook.json`)
     if (!cached) {
       log.warn(TAGS.webhooks, `${this.name} webhook not found in cache`)
       return false
     }
+    // The configured apiVersion wins over a cached one; a cached `auto`
+    // result is only reused while the config still says `auto`.
+    const { apiVersion } = this
     Object.assign(this, cached)
+    this.apiVersion = apiVersion
+    if (apiVersion !== 'auto') this.v2 = apiVersion === 'v2'
+    this.#buildTracking()
   }
 
   async init() {
@@ -233,7 +337,9 @@ class PoracleAPI {
         this.#fetchConfig(),
         this.#fetchGeojson(),
         this.#fetchTemplates(),
+        this.#detectApiVersion(),
       ])
+      this.#buildTracking()
       this.ui = this.generateUi()
       this.lastFetched = Date.now()
       log.info(TAGS.webhooks, `${this.name} webhook initialized`)
@@ -299,6 +405,34 @@ class PoracleAPI {
     }
   }
 
+  /**
+   * Resolves `apiVersion: 'auto'` by checking the server's public OpenAPI spec
+   * for the v2 routes this service uses. PoracleJS has no spec, so it stays on
+   * v1; the probe is quiet because that miss is expected.
+   */
+  async #detectApiVersion() {
+    if (this.apiVersion !== 'auto') {
+      this.v2 = this.apiVersion === 'v2'
+      return
+    }
+    try {
+      const response = await fetch(`${this.endpoint}/openapi.json`, {
+        headers: { Accept: 'application/json' },
+        signal: AbortSignal.timeout(10_000),
+      })
+      const spec = response.ok ? await response.json() : null
+      const paths = spec?.paths || {}
+      this.v2 = V2_REQUIRED_PATHS.every((path) => path in paths)
+    } catch (e) {
+      log.debug(TAGS.webhooks, `[${this.name}] v2 API probe failed`, e)
+      this.v2 = false
+    }
+    log.info(
+      TAGS.webhooks,
+      `[${this.name}] using Poracle API ${this.v2 ? 'v2' : 'v1'}`,
+    )
+  }
+
   async #fetchGeojson() {
     /** @type {{ geoJSON: import("@rm/types").RMGeoJSON }} */
     const { geoJSON } = await this.#sendRequest(APIS.geofence)
@@ -346,27 +480,54 @@ class PoracleAPI {
   }
 
   /**
+   * Like #sendRequest, but only sends a body when one is given: v2 is strict
+   * about bodies (bulk DELETE takes `?uid=` or a body, not both).
+   * @param {string} path
+   * @param {Method} [method]
+   * @param {any} [body]
+   */
+  async #sendV2(path, method = 'GET', body = undefined) {
+    return fetchJson(`${this.endpoint}${path}`, {
+      method,
+      headers: {
+        'X-Poracle-Secret': this.secret,
+        Accept: 'application/json',
+        ...(body === undefined ? {} : { 'Content-Type': 'application/json' }),
+      },
+      body: body === undefined ? undefined : JSON.stringify(body),
+    })
+  }
+
+  /**
+   * v1 returns the list columns as JSON-encoded strings, v2 as arrays.
+   * @param {string | string[] | null | undefined} value
+   * @returns {string[]}
+   */
+  static #parseList(value) {
+    if (!value) return []
+    return typeof value === 'string' ? JSON.parse(value) : value
+  }
+
+  /**
    *
    * @param {string | number} userId
    * @returns
    */
   async #oneHuman(userId) {
-    const { human } = await this.#sendRequest(APIS.oneHuman(userId))
+    const { human } = this.v2
+      ? await this.#sendV2(V2.human(userId))
+      : await this.#sendRequest(APIS.oneHuman(userId))
     return {
       human: {
         ...human,
         enabled: !!human.enabled,
         admin_disable: !!human.admin_disable,
-        area: human.area ? JSON.parse(human.area) : [],
-        area_restrictions: human.area_restrictions
-          ? JSON.parse(human.area_restrictions)
-          : [],
-        blocked_alerts: human.blocked_alerts
-          ? JSON.parse(human.blocked_alerts)
-          : [],
-        community_membership: human.community_membership
-          ? JSON.parse(human.community_membership)
-          : [],
+        area: PoracleAPI.#parseList(human.area),
+        area_restrictions: PoracleAPI.#parseList(
+          this.v2 ? human.area_restriction : human.area_restrictions,
+        ),
+        blocked_alerts: PoracleAPI.#parseList(human.blocked_alerts),
+        community_membership: PoracleAPI.#parseList(human.community_membership),
       },
     }
   }
@@ -412,11 +573,25 @@ class PoracleAPI {
         ? {
             ...data,
             active_hours:
-              data?.active_hours?.map(({ day, mins, hours }) => ({
-                day,
-                mins: mins.padStart(2, '0'),
-                hours: hours.padStart(2, '0'),
-              })) || [],
+              data?.active_hours?.map(
+                ({
+                  day,
+                  mins,
+                  hours,
+                  step,
+                  end_hours: endHours,
+                  end_mins: endMins,
+                }) => ({
+                  day,
+                  mins: mins.padStart(2, '0'),
+                  hours: hours.padStart(2, '0'),
+                  // PoracleNG range entries repeat every `step` hours until
+                  // the end time; keep them so a save does not flatten them.
+                  ...(+step > 0
+                    ? { step: +step, end_hours: +endHours, end_mins: +endMins }
+                    : {}),
+                }),
+              ) || [],
           }
         : undefined,
     )
@@ -435,11 +610,13 @@ class PoracleAPI {
   static #processProfiles(profiles) {
     return profiles.map((profile) => ({
       ...profile,
-      area: profile.area ? JSON.parse(profile.area) : [],
+      area: PoracleAPI.#parseList(profile.area),
       active_hours:
         profile.active_hours && profile.active_hours !== '{}'
           ? /** @type {import("@rm/types").PoracleActiveHours[]} */ (
-              JSON.parse(profile.active_hours)
+              typeof profile.active_hours === 'string'
+                ? JSON.parse(profile.active_hours)
+                : profile.active_hours
             )
               .sort((a, b) =>
                 a.day === b.day
@@ -477,33 +654,6 @@ class PoracleAPI {
     return { ...first, ...second }
   }
 
-  /** @type {PoracleAPI['api']} */
-  async #tracking(userId, category, method, data) {
-    const [main, action] = PoracleAPI.#split(category)
-    const first = action
-      ? await this.#sendRequest(
-          APIS.tracking(userId, main, action),
-          method,
-          method === 'POST' ? data : undefined,
-        )
-      : await this.#sendRequest(
-          APIS.tracking(
-            userId,
-            main,
-            method === 'DELETE' ? `byUid/${data.uid}` : '',
-          ),
-          method,
-          data,
-        )
-    const second = await this.#sendRequest(APIS.tracking(userId, main))
-
-    const sortBy = this.ui[category]?.sortProp
-    if (sortBy) {
-      second[category].sort((a, b) => a[sortBy] - b[sortBy])
-    }
-    return { ...first, ...second }
-  }
-
   /**
    *
    * @template {APIInput} T
@@ -514,7 +664,11 @@ class PoracleAPI {
    * @returns {Promise<import("@rm/types").APIReturnType[import("@rm/types").Split<T, '-'>[0]]>}
    */
   async api(userId, category, method = 'GET', data = null) {
+    if (this.v2) return this.#apiV2(userId, category, method, data)
     const [main, action] = PoracleAPI.#split(category)
+    if (TRACKING_CATEGORIES.has(main)) {
+      return this.#trackingApi(userId, main, action, method, data)
+    }
     switch (main) {
       case 'start':
       case 'stop':
@@ -541,57 +695,201 @@ class PoracleAPI {
           method,
           data,
         )
-      case 'egg':
-      case 'invasion':
-      case 'lure':
-      case 'nest':
-      case 'pokemon':
-      case 'quest':
-      case 'raid':
-      case 'gym':
-        return this.#tracking(userId, category, method, data)
       case 'quickGym':
         return this.#quickGym(userId, data)
       case 'human':
       case 'oneHuman':
         return this.#oneHuman(userId)
       default:
-        return this.#tracking(userId, category, method, data)
+        return this.#trackingApi(userId, main, action, method, data)
     }
   }
 
   /**
-   *
+   * Runs one tracking operation and returns the fresh rule list.
    * @param {string | number} userId
-   * @param {string} data
+   * @param {string} category
+   * @param {Action | undefined} action
+   * @param {Method} method
+   * @param {any} data
+   * @returns {Promise<any>}
    */
-  async #quickGym(userId, data) {
-    await Promise.all(
-      SUBCATEGORIES.gym.map((subCategory) =>
-        this.#sendRequest(APIS.tracking(userId, subCategory), 'POST', {
-          ...this.ui[subCategory].defaults,
-          ...this.#wildCards(subCategory),
-          gym_id: data,
-        }),
-      ),
-    )
-    return this.#sendRequest(APIS.tracking(userId, 'gym'))
+  async #trackingApi(userId, category, action, method, data) {
+    const id = String(userId)
+    return this.#runTracking(id, category, async () => {
+      if (action === 'delete') {
+        await this.#tracking.remove(id, category, data || [])
+      } else if (method === 'DELETE') {
+        await this.#tracking.remove(id, category, [data.uid])
+      } else if (method === 'POST') {
+        await this.#tracking.save(
+          id,
+          category,
+          Array.isArray(data) ? data : [data],
+        )
+      }
+    })
   }
 
   /**
-   *
-   * @param {typeof SUBCATEGORIES.gym[number]} category
-   * @returns
+   * Runs a write, then lists the category; request and adapter errors become
+   * a `status: 'error'` result carrying the current rules.
+   * @param {string} id
+   * @param {string} category
+   * @param {() => Promise<void>} operation
    */
-  #wildCards(category) {
-    switch (category) {
-      case 'gym':
-        return { team: 4, slot_changes: true, battle_changes: this.gymBattles }
-      case 'egg':
-      case 'raid':
-        return { level: 90 }
+  async #runTracking(id, category, operation) {
+    /** @type {string | undefined} */
+    let message
+    try {
+      await operation()
+    } catch (e) {
+      if (e instanceof PoracleRequestError || e instanceof UnsupportedOnV1) {
+        message = e.message
+      } else {
+        throw e
+      }
+    }
+    /** @type {Record<string, any>[]} */
+    let rules = []
+    try {
+      rules = await this.#tracking.list(id, category)
+    } catch (e) {
+      if (!(e instanceof PoracleRequestError)) throw e
+      message ||= e.message
+    }
+    const sortBy = this.ui[category]?.sortProp
+    if (sortBy) rules.sort((a, b) => a[sortBy] - b[sortBy])
+    if (message !== undefined) {
+      log.warn(TAGS.webhooks, `${this.name} ${category} tracking:`, message)
+    }
+    return message === undefined
+      ? { status: 'ok', [category]: rules }
+      : { status: 'error', message, [category]: rules }
+  }
+
+  /**
+   * Tracks a gym with minimal raid, egg and gym rules.
+   * @param {string | number} userId
+   * @param {string} gymId
+   */
+  async #quickGym(userId, gymId) {
+    const id = String(userId)
+    return this.#runTracking(id, 'gym', async () => {
+      await Promise.all([
+        this.#tracking.save(id, 'raid', [{ gym_id: gymId }]),
+        this.#tracking.save(id, 'egg', [{ level: 90, gym_id: gymId }]),
+        this.#tracking.save(id, 'gym', [
+          {
+            team: 'any',
+            slot_changes: true,
+            battle_changes: this.gymBattles,
+            gym_id: gymId,
+          },
+        ]),
+      ])
+    })
+  }
+
+  /**
+   * v2 counterpart of api(): same categories, same v1-shaped results.
+   * @param {string | number} userId
+   * @param {APIInput} category
+   * @param {Method} method
+   * @param {any} data
+   * @returns {Promise<any>}
+   */
+  async #apiV2(userId, category, method = 'GET', data = null) {
+    const [main, action] = PoracleAPI.#split(category)
+    if (TRACKING_CATEGORIES.has(main)) {
+      return this.#trackingApi(userId, main, action, method, data)
+    }
+    switch (main) {
+      case 'start':
+      case 'stop':
+        await this.#sendV2(
+          V2.action(userId, main === 'start' ? 'enable' : 'disable'),
+          'POST',
+        )
+        return this.#oneHuman(userId)
+      case 'switchProfile':
+        await this.#sendV2(V2.action(userId, 'profile'), 'POST', {
+          profile_no: +data,
+        })
+        return this.#oneHuman(userId)
+      case 'setLocation':
+        await this.#sendV2(V2.action(userId, 'location'), 'POST', {
+          latitude: +data[0],
+          longitude: +data[1],
+        })
+        return this.#oneHuman(userId)
+      case 'setAreas': {
+        const first = await this.#sendV2(V2.action(userId, 'areas'), 'POST', {
+          areas: data,
+        })
+        return { ...first, ...(await this.#oneHuman(userId)) }
+      }
+      case 'geojson':
+        return this.#sendRequest(APIS.geofence)
+      case 'areaSecurity':
+        return this.#sendRequest(APIS.areaSecurity(userId))
+      case 'humans':
+        return this.#sendV2(V2.action(userId, 'areas'))
+      case 'profile':
+      case 'profiles':
+        return this.#profileManagementV2(userId, action, method, data)
+      case 'quickGym':
+        return this.#quickGym(userId, data)
+      case 'human':
+      case 'oneHuman':
+        return this.#oneHuman(userId)
       default:
-        return {}
+        return this.#trackingApi(userId, main, action, method, data)
+    }
+  }
+
+  /**
+   * @param {string | number} userId
+   * @param {Action | undefined} action
+   * @param {Method} method
+   * @param {any} data
+   */
+  async #profileManagementV2(userId, action, method, data) {
+    switch (action) {
+      case 'add':
+        await this.#sendV2(V2.profiles(userId), 'POST', {
+          name: data.name,
+          ...(data.active_hours?.length
+            ? { active_hours: toV2ActiveHours(data.active_hours) }
+            : {}),
+        })
+        break
+      case 'update':
+        // v1's update only ever wrote active_hours; keep it that way.
+        await this.#sendV2(V2.profiles(userId, data.profile_no), 'PATCH', {
+          active_hours: toV2ActiveHours(data.active_hours),
+        })
+        break
+      case 'byProfileNo':
+        if (method === 'DELETE') {
+          await this.#sendV2(V2.profiles(userId, data), 'DELETE')
+        }
+        break
+      case 'copy':
+        await this.#sendV2(V2.profiles(userId, `${data.to}/copy`), 'POST', {
+          from_profile: +data.from,
+        })
+        break
+      default:
+    }
+    const { profiles } = await this.#sendV2(V2.profiles(userId))
+    return {
+      profile: PoracleAPI.#processProfiles(
+        (profiles || []).map((profile) => ({
+          ...profile,
+          active_hours: fromV2ActiveHours(profile.active_hours),
+        })),
+      ),
     }
   }
 
@@ -617,30 +915,31 @@ class PoracleAPI {
         identifiers: ['pokemon_id', 'form'],
         defaults: {
           clean: false,
+          edit: false,
           distance: 0,
           template: this.defaultTemplateName.toString(),
-          pokemon_id: 0,
-          form: 0,
-          gender: 0,
-          atk: 0,
-          max_atk: 15,
-          min_cp: 0,
-          max_cp: 9000,
-          def: 0,
-          max_def: 15,
-          min_iv: -1,
-          max_iv: 100,
-          min_level: 0,
-          max_level: 55,
-          size: 1,
-          max_size: 5,
-          rarity: -1,
-          max_rarity: 6,
-          sta: 0,
-          max_sta: 15,
-          max_weight: 9000000,
+          pokemon_id: null,
+          form: null,
+          gender: null,
+          atk: null,
+          max_atk: null,
+          min_cp: null,
+          max_cp: null,
+          def: null,
+          max_def: null,
+          min_iv: null,
+          max_iv: null,
+          min_level: null,
+          max_level: null,
+          size: null,
+          max_size: null,
+          rarity: null,
+          max_rarity: null,
+          sta: null,
+          max_sta: null,
+          max_weight: null,
           min_time: 0,
-          min_weight: 0,
+          min_weight: null,
           pvp_ranking_league: 0,
           pvp_ranking_best: 1,
           pvp_ranking_worst: this.pvpFilterMaxRank,
@@ -668,6 +967,8 @@ class PoracleAPI {
                 perm: 'iv',
                 low: 'min_iv',
                 high: 'max_iv',
+                anyLow: true,
+                anyHigh: true,
               },
               {
                 name: 'level',
@@ -677,6 +978,8 @@ class PoracleAPI {
                 perm: 'iv',
                 low: 'min_level',
                 high: 'max_level',
+                anyLow: true,
+                anyHigh: true,
               },
             ],
           },
@@ -690,6 +993,8 @@ class PoracleAPI {
                 perm: 'iv',
                 low: 'min_cp',
                 high: 'max_cp',
+                anyLow: true,
+                anyHigh: true,
               },
               {
                 name: 'atk_iv',
@@ -699,6 +1004,8 @@ class PoracleAPI {
                 perm: 'iv',
                 low: 'atk',
                 high: 'max_atk',
+                anyLow: true,
+                anyHigh: true,
               },
               {
                 name: 'def_iv',
@@ -708,6 +1015,8 @@ class PoracleAPI {
                 perm: 'iv',
                 low: 'def',
                 high: 'max_def',
+                anyLow: true,
+                anyHigh: true,
               },
               {
                 name: 'sta_iv',
@@ -717,6 +1026,8 @@ class PoracleAPI {
                 perm: 'iv',
                 low: 'sta',
                 high: 'max_sta',
+                anyLow: true,
+                anyHigh: true,
               },
               {
                 name: 'size',
@@ -727,6 +1038,8 @@ class PoracleAPI {
                 perm: 'iv',
                 low: 'size',
                 high: 'max_size',
+                anyLow: true,
+                anyHigh: true,
                 marks: [1, 2, 3, 4, 5],
                 markI18n: 'size_',
               },
@@ -783,6 +1096,8 @@ class PoracleAPI {
                 perm: 'pvp',
                 low: 'pvp_ranking_best',
                 high: 'pvp_ranking_worst',
+                anyLow: false,
+                anyHigh: false,
               },
             ],
           },
@@ -796,10 +1111,16 @@ class PoracleAPI {
                 sm: 4,
               },
               { name: 'template', options: [], xs: 4, sm: 4 },
-              { name: 'gender', options: [0, 1, 2], xs: 4, sm: 4 },
+              {
+                name: 'gender',
+                options: [null, 'male', 'female'],
+                xs: 4,
+                sm: 4,
+              },
             ],
             booleans: [
               { name: 'clean', xs: 6, sm: 3 },
+              { name: 'edit', xs: 6, sm: 3 },
               { name: 'allForms', xs: 6, sm: 3 },
               { name: 'pvpEntry', xs: 6, sm: 3 },
               { name: 'noIv', xs: 6, sm: 3 },
@@ -834,16 +1155,17 @@ class PoracleAPI {
         identifiers: ['pokemon_id', 'form', 'level'],
         defaults: {
           clean: false,
+          edit: false,
           distance: 0,
           template: this.defaultTemplateName.toString(),
-          pokemon_id: 9000,
-          evolution: 9000,
-          form: 0,
-          move: 9000,
+          pokemon_id: null,
+          evolution: null,
+          form: null,
+          move: null,
           exclusive: false,
-          level: 9000,
-          team: 4,
-          rsvp_changes: 0,
+          level: null,
+          team: null,
+          rsvp_changes: null,
           gym_id: null,
           byDistance: false,
           allMoves: true,
@@ -864,12 +1186,23 @@ class PoracleAPI {
                 sm: 4,
               },
               { name: 'template', options: [], xs: 6, sm: 4 },
-              { name: 'team', options: [0, 1, 2, 3, 4], xs: 6, sm: 4 },
+              {
+                name: 'team',
+                options: [null, 'harmony', 'mystic', 'valor', 'instinct'],
+                xs: 6,
+                sm: 4,
+              },
               { name: 'move', options: [], xs: 6, sm: 5 },
-              { name: 'rsvp_changes', options: [0, 1, 2], xs: 6, sm: 5 },
+              {
+                name: 'rsvp_changes',
+                options: [null, 'rsvp', 'rsvp_only'],
+                xs: 6,
+                sm: 5,
+              },
             ],
             booleans: [
               { name: 'clean', xs: 6, sm: 3 },
+              { name: 'edit', xs: 6, sm: 3 },
               { name: 'exclusive', xs: 6, sm: 3 },
               { name: 'allForms', disabled: ['r'], xs: 6, sm: 3 },
               { name: 'allMoves', disabled: ['r'], xs: 6, sm: 3 },
@@ -913,12 +1246,13 @@ class PoracleAPI {
         identifiers: ['level'],
         defaults: {
           clean: false,
+          edit: false,
           distance: 0,
           template: this.defaultTemplateName.toString(),
           exclusive: false,
-          level: 9000,
-          team: 4,
-          rsvp_changes: 0,
+          level: 90,
+          team: null,
+          rsvp_changes: null,
           gym_id: null,
           byDistance: false,
           everything_individually:
@@ -937,12 +1271,23 @@ class PoracleAPI {
                 sm: 3,
               },
               { name: 'template', options: [], xs: 6, sm: 3 },
-              { name: 'team', options: [0, 1, 2, 3, 4], xs: 6, sm: 3 },
-              { name: 'rsvp_changes', options: [0, 1, 2], xs: 6, sm: 3 },
+              {
+                name: 'team',
+                options: [null, 'harmony', 'mystic', 'valor', 'instinct'],
+                xs: 6,
+                sm: 3,
+              },
+              {
+                name: 'rsvp_changes',
+                options: [null, 'rsvp', 'rsvp_only'],
+                xs: 6,
+                sm: 3,
+              },
             ],
             booleans: [
-              { name: 'clean', xs: 6, sm: 6 },
-              { name: 'exclusive', xs: 6, sm: 6 },
+              { name: 'clean', xs: 4, sm: 4 },
+              { name: 'edit', xs: 4, sm: 4 },
+              { name: 'exclusive', xs: 4, sm: 4 },
             ],
             autoComplete: [
               {
@@ -985,7 +1330,7 @@ class PoracleAPI {
           clean: false,
           distance: 0,
           template: this.defaultTemplateName.toString(),
-          team: 4,
+          team: 'any',
           slot_changes: false,
           battle_changes: false,
           gym_id: null,
@@ -1056,7 +1401,7 @@ class PoracleAPI {
           distance: 0,
           template: this.defaultTemplateName.toString(),
           grunt_type: null,
-          gender: 0,
+          gender: null,
           byDistance: false,
           everything_individually:
             this.everythingFlagPermissions ===
@@ -1102,10 +1447,60 @@ class PoracleAPI {
           },
         },
       },
+      incident: {
+        identifiers: ['display_type'],
+        defaults: {
+          clean: false,
+          edit: false,
+          distance: 0,
+          template: this.defaultTemplateName.toString(),
+          display_type: null,
+          byDistance: false,
+        },
+        ui: {
+          general: {
+            selects: [
+              {
+                name: 'profile_no',
+                disabled: true,
+                options: [],
+                xs: 4,
+                sm: 4,
+              },
+              { name: 'template', options: [], xs: 4, sm: 4 },
+            ],
+            booleans: [
+              { name: 'clean', xs: 4, sm: 4 },
+              { name: 'edit', xs: 4, sm: 4 },
+            ],
+            distanceOrArea: {
+              booleans: [
+                {
+                  name: 'byDistance',
+                  max: this.maxDistance,
+                  xs: 6,
+                  sm: 8,
+                  override: true,
+                },
+              ],
+              texts: [
+                {
+                  name: 'distance',
+                  type: 'number',
+                  adornment: 'm',
+                  xs: 6,
+                  sm: 4,
+                },
+              ],
+            },
+          },
+        },
+      },
       lure: {
         identifiers: ['lure_id'],
         defaults: {
           clean: false,
+          edit: false,
           distance: 0,
           template: this.defaultTemplateName.toString(),
           lure_id: 0,
@@ -1123,7 +1518,10 @@ class PoracleAPI {
               },
               { name: 'template', options: [], xs: 4, sm: 4 },
             ],
-            booleans: [{ name: 'clean', xs: 4, sm: 4 }],
+            booleans: [
+              { name: 'clean', xs: 4, sm: 4 },
+              { name: 'edit', xs: 4, sm: 4 },
+            ],
             distanceOrArea: {
               booleans: [
                 {
@@ -1151,13 +1549,14 @@ class PoracleAPI {
         identifiers: ['reward', 'reward_type'],
         defaults: {
           clean: false,
+          summary: false,
           distance: 0,
           template: this.defaultTemplateName.toString(),
           reward: null,
-          shiny: 0,
+          shiny: false,
           reward_type: 0,
           amount: 0,
-          form: 0,
+          form: null,
           byDistance: false,
           allForms: false,
         },
@@ -1175,6 +1574,7 @@ class PoracleAPI {
             ],
             booleans: [
               { name: 'clean', xs: 4, sm: 4 },
+              { name: 'summary', xs: 4, sm: 4 },
               {
                 name: 'allForms',
                 xs: 6,
@@ -1220,9 +1620,9 @@ class PoracleAPI {
           clean: false,
           distance: 0,
           template: this.defaultTemplateName.toString(),
-          pokemon_id: 0,
+          pokemon_id: null,
           min_spawn_avg: 0,
-          form: 0,
+          form: null,
           byDistance: false,
           allForms: false,
         },
@@ -1284,23 +1684,11 @@ class PoracleAPI {
     // this.disabledHooks.forEach((hook) => delete poracleUiObj[hook])
     return poracleUiObj
   }
-
-  /**
-   *
-   * @param {import('@rm/types').PoracleInvasion} item
-   * @param {import('@rm/masterfile').Masterfile['invasions']} invasions
-   */
-  static getRealGruntId(item, invasions) {
-    return (
-      +Object.keys(invasions).find(
-        (key) =>
-          invasions[key]?.type?.toLowerCase() ===
-            item.grunt_type.toLowerCase() &&
-          (invasions[key]?.gender === 0 ||
-            invasions[key].gender === (item.gender || 1)),
-      ) || 0
-    )
-  }
 }
 
-module.exports = { PoracleAPI, resolveGeocoderProvider }
+module.exports = {
+  PoracleAPI,
+  resolveGeocoderProvider,
+  toV2ActiveHours,
+  fromV2ActiveHours,
+}

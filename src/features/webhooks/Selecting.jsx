@@ -5,17 +5,18 @@ import Fab from '@mui/material/Fab'
 import Slide from '@mui/material/Slide'
 import Typography from '@mui/material/Typography'
 import { useTranslation } from 'react-i18next'
-import { useMutation } from '@apollo/client'
 
-import { SET_PROFILE, ALL_PROFILES } from '@services/queries/webhook'
-import { useWebhookStore, setSelected } from '@store/useWebhookStore'
+import { apolloClient } from '@services/apollo'
+import * as webhookNodes from '@services/queries/webhook'
+import {
+  useWebhookStore,
+  setSelected,
+  applyWebhookResult,
+  showWebhookError,
+} from '@store/useWebhookStore'
 
 export function Selecting() {
   const { t } = useTranslation()
-  const [save] = useMutation(SET_PROFILE, {
-    refetchQueries: [ALL_PROFILES],
-  })
-
   const selected = useWebhookStore((s) => s.selected)
 
   const handleAll = () => {
@@ -30,13 +31,18 @@ export function Selecting() {
 
   const deleteAll = () => {
     const { category } = useWebhookStore.getState()
-    save({
-      variables: {
-        category: `${category}-delete`,
-        data: Object.keys(selected).filter((x) => selected[x]),
-        status: 'POST',
-      },
-    })
+    apolloClient
+      .mutate({
+        mutation: webhookNodes[category.toUpperCase()],
+        variables: {
+          category: `${category}-delete`,
+          data: Object.keys(selected).filter((x) => selected[x]),
+          status: 'POST',
+        },
+        refetchQueries: [webhookNodes.ALL_PROFILES],
+      })
+      .then(({ data }) => applyWebhookResult(category, data?.webhook))
+      .catch(showWebhookError)
     setSelected()()
   }
 
