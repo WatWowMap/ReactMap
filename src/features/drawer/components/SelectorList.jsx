@@ -111,8 +111,9 @@ function SelectorList({
       .map((item) => item.id)
   }, [translated, search])
 
+  // read once per mount, the grid only applies it when it mounts
   const restoreStateFrom = React.useMemo(
-    () => getDrawerGridState(listScrollKey),
+    () => getDrawerGridState(listScrollKey, items.length),
     [listScrollKey],
   )
   const shouldPersistGridState = drawer && visible
@@ -132,9 +133,9 @@ function SelectorList({
       ) {
         return
       }
-      setDrawerGridState(listScrollKey, state)
+      setDrawerGridState(listScrollKey, state, items.length)
     },
-    [listScrollKey, shouldPersistGridState],
+    [listScrollKey, shouldPersistGridState, items.length],
   )
 
   /** @param {'enable' | 'disable' | 'advanced'} action */
