@@ -1,3 +1,10 @@
+## [1.56.2](https://github.com/WatWowMap/ReactMap/compare/v1.56.1...v1.56.2) (2026-10-31)
+
+
+### Bug Fixes
+
+* **map:** cancel stale idle timer on repeated blur ([959d74b](https://github.com/WatWowMap/ReactMap/commit/959d74bd43804d947a6777bf4cbe8790c6e045b0)), closes [#1270](https://github.com/WatWowMap/ReactMap/issues/1270)
+
 ## [1.56.1](https://github.com/WatWowMap/ReactMap/compare/v1.56.0...v1.56.1) (2026-10-31)
 
 
