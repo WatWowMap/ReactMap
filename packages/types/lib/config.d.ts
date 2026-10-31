@@ -192,6 +192,12 @@ export interface Webhook {
   host: string
   port: number
   poracleSecret: string
+  /**
+   * Which Poracle API to use. `auto` (the default) uses the PoracleNG v2 API
+   * when the server's `/openapi.json` lists the v2 routes, and v1 otherwise
+   * (PoracleJS, older PoracleNG). `v1` and `v2` skip the check.
+   */
+  apiVersion?: 'auto' | 'v1' | 'v2'
   addressFormat?: string
   /** Base URL of the geocoding backend. Used for both providers. */
   nominatimUrl?: string

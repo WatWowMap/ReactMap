@@ -10,12 +10,18 @@ import Checkbox from '@mui/material/Checkbox'
 import Box from '@mui/material/Box'
 
 import { useMemory } from '@store/useMemory'
-import { apolloClient, apolloCache } from '@services/apollo'
+import { apolloClient } from '@services/apollo'
 import * as webhookNodes from '@services/queries/webhook'
 import { getTileBackground } from '@utils/getTileBackground'
-import { useWebhookStore, setSelected } from '@store/useWebhookStore'
+import {
+  useWebhookStore,
+  setSelected,
+  applyWebhookResult,
+  showWebhookError,
+} from '@store/useWebhookStore'
 
 import { Poracle } from '../services/Poracle'
+import { formToRule } from '../services/ruleForm'
 
 export function TrackedTile({ index }) {
   const category = useWebhookStore((s) => s.category)
@@ -23,8 +29,8 @@ export function TrackedTile({ index }) {
   const id = Poracle.getId(item)
   const advOpen = useWebhookStore((s) => s.advanced)
   const selected = useWebhookStore((s) => (item ? s.selected[item.uid] : false))
-  const defaults = useWebhookStore((s) =>
-    category === 'human' ? null : s.context.ui[category].defaults,
+  const info = useWebhookStore((s) =>
+    category === 'human' ? null : s.context.ui[category],
   )
 
   React.useEffect(() => {
@@ -32,7 +38,7 @@ export function TrackedTile({ index }) {
       useWebhookStore.setState((prev) => ({
         tempFilters: {
           ...prev.tempFilters,
-          [id]: { ...item, byDistance: !!item.distance },
+          [id]: { ...item },
         },
       }))
     }
@@ -40,18 +46,21 @@ export function TrackedTile({ index }) {
 
   const onClose = React.useCallback(
     (newFilter, save) => {
-      if (save) {
-        apolloClient.mutate({
-          mutation: webhookNodes[category.toUpperCase()],
-          variables: {
-            data: Poracle.processor(category, [newFilter], defaults),
-            status: 'POST',
-            category,
-          },
-        })
+      if (save && info) {
+        apolloClient
+          .mutate({
+            mutation: webhookNodes[category.toUpperCase()],
+            variables: {
+              data: [formToRule(category, newFilter, info, item)],
+              status: 'POST',
+              category,
+            },
+          })
+          .then(({ data }) => applyWebhookResult(category, data?.webhook))
+          .catch(showWebhookError)
       }
     },
-    [category, defaults],
+    [category, info, item],
   )
 
   if (!item || category === 'human') return <Box>&nbsp;</Box>
@@ -100,25 +109,17 @@ export function TrackedTile({ index }) {
           size="small"
           disabled={!item.uid}
           onClick={() => {
-            useWebhookStore.setState((prev) => ({
-              [category]: prev[category].filter((x) => x.uid !== item.uid),
-            }))
-            apolloClient.mutate({
-              mutation: webhookNodes.SET_PROFILE,
-              variables: {
-                category,
-                data: { uid: item.uid },
-                status: 'DELETE',
-              },
-            })
-            apolloClient.cache.modify({
-              id: apolloCache.identify(item),
-              fields: {
-                uid() {
-                  // deletes...?
+            apolloClient
+              .mutate({
+                mutation: webhookNodes[category.toUpperCase()],
+                variables: {
+                  category,
+                  data: { uid: item.uid },
+                  status: 'DELETE',
                 },
-              },
-            })
+              })
+              .then(({ data }) => applyWebhookResult(category, data?.webhook))
+              .catch(showWebhookError)
           }}
         >
           <DeleteForever />

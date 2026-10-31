@@ -15,8 +15,20 @@ const StyledChip = styled(Chip)(({ theme }) => ({
   margin: theme.spacing(0.5),
 }))
 
+/** @param {unknown} value */
+const pad = (value) => String(value).padStart(2, '0')
+
 /** @param {import("@rm/types").PoracleActiveHours & { uid: number }} props */
-export const ActiveHourChip = ({ day, hours, mins, uid, id }) => {
+export const ActiveHourChip = ({
+  day,
+  hours,
+  mins,
+  step,
+  end_hours: endHours,
+  end_mins: endMins,
+  uid,
+  id,
+}) => {
   const { t } = useTranslation()
   const [save] = useMutation(SET_PROFILE, {
     refetchQueries: [ALL_PROFILES],
@@ -47,7 +59,9 @@ export const ActiveHourChip = ({ day, hours, mins, uid, id }) => {
       clickable
       color="secondary"
       deleteIcon={<Clear />}
-      label={`${t(`day_${day}`)} ${hours}:${String(mins).padStart(2, '0')}`}
+      label={`${t(`day_${day}`)} ${hours}:${pad(mins)}${
+        step > 0 ? `-${pad(endHours)}:${pad(endMins)} /${step}h` : ''
+      }`}
       onDelete={handleRemoveSchedule}
       size="small"
     />

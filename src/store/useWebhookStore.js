@@ -21,6 +21,7 @@ import { create } from 'zustand'
  *  raid: import("@rm/types").PoracleRaid[]
  *  egg: import("@rm/types").PoracleEgg[]
  *  invasion: import("@rm/types").PoracleInvasion[]
+ *  incident: import("@rm/types").PoracleIncident[]
  *  lure: import("@rm/types").PoracleLure[]
  *  nest: import("@rm/types").PoracleNest[]
  *  quest: import("@rm/types").PoracleQuest[]
@@ -203,3 +204,21 @@ export const handleClick =
       })
     return newAreas
   }
+
+/** @param {{ message?: string }} error */
+export const showWebhookError = (error) =>
+  useWebhookStore.setState({
+    alert: { open: true, severity: 'error', message: error?.message },
+  })
+
+/**
+ * Shows the category list a webhook mutation returned and any error it reported.
+ * @param {string} category
+ * @param {Record<string, any> | undefined} result
+ */
+export const applyWebhookResult = (category, result) => {
+  if (Array.isArray(result?.[category])) {
+    useWebhookStore.setState({ [category]: result[category] })
+  }
+  if (result?.status === 'error') showWebhookError(result)
+}

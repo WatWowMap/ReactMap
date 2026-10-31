@@ -228,6 +228,9 @@ export class UAssets {
       id = 'b7'
     } else if (id === 'showcase') {
       id = 'b9'
+    } else if (id.startsWith('incident-')) {
+      // Poracle incident without a named id: the event stop by display type
+      id = `b${id.slice('incident-'.length)}`
     }
     switch (id.charAt(0)) {
       case 'a': {
