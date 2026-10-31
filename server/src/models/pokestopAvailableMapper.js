@@ -20,7 +20,7 @@
  * @property {number} amount
  * @property {number} pokemon_id
  * @property {number} form_id
- * @property {number} [temp_evolution] absent on Golbat builds that predate it
+ * @property {number} [temp_evolution_id] 0 for none; absent on Golbat builds that predate it
  * @property {string} title
  * @property {number} target
  * @property {number} count
@@ -61,6 +61,7 @@
  * @property {Record<number, InvasionRewardConfig>} invasions
  * @property {boolean} [includeBaseQuests] include AR (`with_ar:true`) quests; default true
  * @property {boolean} [includeAltQuests] include non-AR (`with_ar:false`) quests; default true
+ * @property {boolean} [questTempEvolutionId] Golbat advertises `filters.quest_temp_evolution_id` on /api/status; default false
  *
  * @typedef {{ title: number | string, target: number }} QuestCondition
  * @typedef {Record<string, Record<string, QuestCondition>>} QuestConditions
@@ -88,11 +89,18 @@ const { getMegaEnergyFilterKey } = require('../utils/megaEnergyFilterKey')
  * filters `=== 9`, `mega` filters `=== MEGA_RESOURCE_REWARD_TYPE` (`12`).
  *
  * @param {AvailablePokestopQuest} quest
+ * @param {boolean} [questTempEvolutionId] see `MapAvailablePokestopsCtx`
  * @returns {string}
  */
-function questRewardKey(quest) {
-  const { reward_type, amount, item_id, pokemon_id, form_id, temp_evolution } =
-    quest
+function questRewardKey(quest, questTempEvolutionId = false) {
+  const {
+    reward_type,
+    amount,
+    item_id,
+    pokemon_id,
+    form_id,
+    temp_evolution_id,
+  } = quest
   switch (reward_type) {
     case 1:
       return `p${amount}`
@@ -113,18 +121,18 @@ function questRewardKey(quest) {
     case 9:
       return `x${pokemon_id}`
     case 12:
-      return getMegaEnergyFilterKey(pokemon_id, amount, temp_evolution)
+      return getMegaEnergyFilterKey(pokemon_id, amount, temp_evolution_id)
     case 20:
       // §type20: temp-evo branch mega energy. secondaryFilter keys type 20 as a
       // dedicated mega reward ONLY when both pokemon_id and amount are present
       // (else no key), and never emits `u20` (type 20 has a dedicated filter).
       // So advertise `m<id>-<amt>` only when complete — `u20`/`m<id>-0` would be
-      // a filter no marker can satisfy. A Golbat that predates
-      // `temp_evolution` cannot tell Mega X from Mega Y energy, and its
-      // `m<id>-<amt>` would match plain mega energy instead, so advertise
-      // nothing for it either.
-      return pokemon_id > 0 && amount > 0 && temp_evolution !== undefined
-        ? getMegaEnergyFilterKey(pokemon_id, amount, temp_evolution)
+      // a filter no marker can satisfy. A Golbat that does not advertise
+      // `filters.quest_temp_evolution_id` cannot tell Mega X from Mega Y
+      // energy, and its `m<id>-<amt>` would match plain mega energy instead,
+      // so advertise nothing for it either.
+      return pokemon_id > 0 && amount > 0 && questTempEvolutionId
+        ? getMegaEnergyFilterKey(pokemon_id, amount, temp_evolution_id)
         : ''
     default:
       return `u${reward_type}`
@@ -141,7 +149,11 @@ function questRewardKey(quest) {
  * @returns {{ available: string[], conditions: QuestConditions }}
  */
 function mapAvailablePokestops(api, ctx) {
-  const { includeBaseQuests = true, includeAltQuests = true } = ctx
+  const {
+    includeBaseQuests = true,
+    includeAltQuests = true,
+    questTempEvolutionId = false,
+  } = ctx
   const available = new Set()
   /** @type {QuestConditions} */
   const conditions = {}
@@ -180,7 +192,7 @@ function mapAvailablePokestops(api, ctx) {
     ) {
       return
     }
-    const key = questRewardKey(quest)
+    const key = questRewardKey(quest, questTempEvolutionId)
     // An incomplete reward (e.g. type-20 missing pokemon_id/amount) yields no
     // key — advertise nothing rather than a filter no marker can satisfy.
     if (!key) return

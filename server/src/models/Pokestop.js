@@ -1418,6 +1418,10 @@ class Pokestop extends Model {
             invasions: state.event.invasions,
             includeBaseQuests: questLayer !== 'without_ar',
             includeAltQuests: questLayer !== 'with_ar',
+            questTempEvolutionId: golbatCapabilities.supportsFilter(
+              mem,
+              'quest_temp_evolution_id',
+            ),
           })
         } catch (e) {
           endpointError = e

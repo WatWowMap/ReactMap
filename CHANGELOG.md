@@ -1,3 +1,16 @@
+# [1.56.0](https://github.com/WatWowMap/ReactMap/compare/v1.55.2...v1.56.0) (2026-10-31)
+
+
+### Bug Fixes
+
+* **pokestop:** key mega energy by temp evolution ([6827243](https://github.com/WatWowMap/ReactMap/commit/682724386b1c7ac82952e9e8222568a926f6881f)), closes [UnownHash/Golbat#432](https://github.com/UnownHash/Golbat/issues/432)
+* **pokestop:** read Golbat quest temp evolution id ([8dfbcf6](https://github.com/WatWowMap/ReactMap/commit/8dfbcf663c3a0b45ea10977f08fbe2402af6e9cd)), closes [UnownHash/Golbat#432](https://github.com/UnownHash/Golbat/issues/432)
+
+
+### Features
+
+* **tappable:** support candy rewards ([9b78da7](https://github.com/WatWowMap/ReactMap/commit/9b78da74f0d4fc8298466effaef04a387a2afcdc)), closes [UnownHash/Golbat#428](https://github.com/UnownHash/Golbat/issues/428) [#1272](https://github.com/WatWowMap/ReactMap/issues/1272)
+
 ## [1.55.2](https://github.com/WatWowMap/ReactMap/compare/v1.55.1...v1.55.2) (2026-10-24)
 
 
