@@ -9,6 +9,8 @@ export class HolidayAnimations {
     this.imageWidth = 15 * scale
     this.baseImages = images
     this.images = []
+    /** @type {Map<string, HTMLImageElement>} */
+    this.loaded = new Map()
     this.minScale = 0.3
     this.interval = null
     this.canvas = /** @type {HTMLCanvasElement} */ (
@@ -39,12 +41,10 @@ export class HolidayAnimations {
     this.setCanvasSize()
     this.ctx.clearRect(0, 0, this.w, this.h)
     this.images.forEach((item) => {
-      item.image = new Image()
-      item.image.style.height = item.height
-      item.image.style.width = item.width
-      item.image.src = item.src
+      const image = this.loaded.get(item.src)
+      if (!image || !image.complete || !image.naturalWidth) return
       this.ctx.globalAlpha = item.opacity
-      this.ctx.drawImage(item.image, item.x, item.y, item.width, item.height)
+      this.ctx.drawImage(image, item.x, item.y, item.width, item.height)
     })
     this.move()
   }
@@ -54,6 +54,19 @@ export class HolidayAnimations {
       return
     }
     this.setCanvasSize()
+    // Load each source once; creating a new Image every frame triggered
+    // a network request per item per frame (and endless retries on failure)
+    this.baseImages.forEach((src) => {
+      if (this.loaded.has(src)) return
+      const image = new Image()
+      image.onerror = () => {
+        this.loaded.delete(src)
+        // eslint-disable-next-line no-console
+        console.warn('[HolidayEffect] failed to load image', src)
+      }
+      image.src = src
+      this.loaded.set(src, image)
+    })
     for (let a = 0; a < 30; a += 1) {
       const scale = Math.random() * (1 - this.minScale) + this.minScale
       this.images.push({
