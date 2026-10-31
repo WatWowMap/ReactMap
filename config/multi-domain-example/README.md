@@ -76,3 +76,5 @@ pm2 start ecosystem.config.js
 - The `NODE_CONFIG_ENV` var names should not contain `/` or `.`
 - The `NODE_CONFIG_ENV` value does not have to be related to the domain its representing. The URL for the map could be `https://www.my-super-map.com` and the `NODE_CONFIG_ENV` could be `applemap` or `orangemap` or `bananamap` or whatever you want, as long as you point the nginx reverse proxy to the correct instance of the app
 - Custom favicons can be set by putting the respective `{NODE_CONFIG_ENV}.ico` in the `public/favicon` folder
+- Custom PWA icons (the icon used when the map is added to a phone's home screen) follow the same pattern in the same folder: `{NODE_CONFIG_ENV}-180.png` (Apple touch icon), `{NODE_CONFIG_ENV}-192.png`, `{NODE_CONFIG_ENV}-256.png` and `{NODE_CONFIG_ENV}-512.png`. An optional `{NODE_CONFIG_ENV}-maskable.png` can be added for Android adaptive icons. Any icon that isn't provided falls back to the bundled `fallback-*.png` files
+- The web app manifest is generated at build time from `map.general.title` (app name), `map.general.headerTitle` (short name) and `map.theme` (theme and background colors), so each domain gets its own
