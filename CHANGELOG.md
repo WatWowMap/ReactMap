@@ -1,3 +1,10 @@
+## [1.56.1](https://github.com/WatWowMap/ReactMap/compare/v1.56.0...v1.56.1) (2026-10-31)
+
+
+### Bug Fixes
+
+* **drawer:** stop scrolled selector grids from reopening blank ([3c493b6](https://github.com/WatWowMap/ReactMap/commit/3c493b6ff4e38a8e0a9b1b3c4885d164de86dc0f)), closes [#1275](https://github.com/WatWowMap/ReactMap/issues/1275)
+
 # [1.56.0](https://github.com/WatWowMap/ReactMap/compare/v1.55.2...v1.56.0) (2026-10-31)
 
 

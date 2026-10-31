@@ -111,10 +111,13 @@ function SelectorList({
       .map((item) => item.id)
   }, [translated, search])
 
-  const restoreStateFrom = React.useMemo(
-    () => getDrawerGridState(listScrollKey),
-    [listScrollKey],
-  )
+  // VirtuosoGrid hides all tiles while it restores a snapshot's scrollTop, and
+  // in production builds that restore can stay stuck (blank grid), so the grid
+  // only gets the measured sizes and useDrawerScrollMemory restores the offset
+  const restoreStateFrom = React.useMemo(() => {
+    const state = getDrawerGridState(listScrollKey)
+    return state && { ...state, scrollTop: 0 }
+  }, [listScrollKey])
   const shouldPersistGridState = drawer && visible
   const scrollMemory = useDrawerScrollMemory(
     listScrollKey,
