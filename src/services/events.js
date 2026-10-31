@@ -20,6 +20,9 @@ window.addEventListener('focus', () => {
 })
 
 window.addEventListener('blur', () => {
+  if (timer) {
+    timer()
+  }
   timer = setLongTimeout(
     () => {
       useMemory.setState({ active: false })
