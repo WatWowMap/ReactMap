@@ -20,6 +20,7 @@ import { StatusIcon } from '@components/StatusIcon'
 import { Title } from '@components/popups/Title'
 
 import { getTimeUntil } from '@utils/getTimeUntil'
+import { getFormDisplay } from '@utils/getFormDisplay'
 import { getTappableDisplaySettings } from './displayRules'
 import { getTappableReward } from './getTappableReward'
 
@@ -47,6 +48,16 @@ export function TappablePopup({ tappable, rewardIcon }) {
   const count = tappable.count ?? 1
   const rewardName = React.useMemo(() => {
     switch (reward?.rewardType) {
+      case 7: {
+        const formLabel = getFormDisplay(
+          reward.id,
+          tappable.form,
+          tappable.costume,
+        )
+        return formLabel
+          ? `${t(`poke_${reward.id}`)} (${formLabel})`
+          : t(`poke_${reward.id}`)
+      }
       case 4:
       case 9:
         return `${t(`poke_${reward.id}`)} ${t(
@@ -69,6 +80,8 @@ export function TappablePopup({ tappable, rewardIcon }) {
     i18n,
     masterfile.items,
     tappable.item_id,
+    tappable.form,
+    tappable.costume,
     tappable.temp_evolution,
     reward?.rewardType,
     reward?.id,

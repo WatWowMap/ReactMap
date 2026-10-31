@@ -96,12 +96,15 @@ const BaseTappableTile = (tappable) => {
         tappableSize / 2 +
         (tappableMod?.popupY || 0),
     ]
-    const tappableReward = Icons.getRewards(
-      reward.rewardType,
-      reward.id,
-      tappable.count || 1,
-      tappable.temp_evolution,
-    )
+    const tappableReward =
+      reward.rewardType === 7
+        ? Icons.getPokemon(reward.id, tappable.form, 0, 0, tappable.costume)
+        : Icons.getRewards(
+            reward.rewardType,
+            reward.id,
+            tappable.count || 1,
+            tappable.temp_evolution,
+          )
     const count = tappable.count || 1
     if (useRewardPrimary && tappableReward) {
       const countBadge =
@@ -238,6 +241,9 @@ const BaseTappableTile = (tappable) => {
     itemFilters,
     tappable.type,
     tappable.item_id,
+    tappable.pokemon_id,
+    tappable.form,
+    tappable.costume,
     tappable.reward_type,
     tappable.reward_pokemon_id,
     tappable.temp_evolution,

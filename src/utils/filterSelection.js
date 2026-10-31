@@ -40,7 +40,8 @@ export function matchesFilterSelection(category, key, scope = 'default') {
           return key.startsWith('t')
         case 'tappables':
           return (
-            ['q', 'c', 'x', 'm'].some((prefix) => key.startsWith(prefix)) &&
+            (['q', 'c', 'x', 'm'].some((prefix) => key.startsWith(prefix)) ||
+              Number.isInteger(Number(key.charAt(0)))) &&
             key !== 'q0'
           )
         default:

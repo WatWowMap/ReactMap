@@ -269,6 +269,7 @@ const drawerCases = [
   ['tappables', undefined, 'q1', 'c25'],
   ['tappables', undefined, 'q1', 'x25'],
   ['tappables', undefined, 'q1', 'm6-20-2'],
+  ['tappables', undefined, 'q1', '94'],
   ['gyms', undefined, 't1-0', 't2-0'],
   ['gyms', 'raids', 'e1', 'e2'],
   ['gyms', 'pokemon', '19-0', '25-0'],

@@ -1294,6 +1294,10 @@
       "xlCandy": {
         "__name": "DEFAULT_FILTERS_TAPPABLES_XL_CANDY",
         "__format": "boolean"
+      },
+      "pokemon": {
+        "__name": "DEFAULT_FILTERS_TAPPABLES_POKEMON",
+        "__format": "boolean"
       }
     },
     "pokemon": {

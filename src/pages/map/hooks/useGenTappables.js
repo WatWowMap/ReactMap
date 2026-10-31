@@ -38,6 +38,10 @@ export function useGenTappables() {
           break
         }
         default: {
+          if (Number.isInteger(Number(id))) {
+            name = t(`poke_${id}`)
+            break
+          }
           const itemId = id.startsWith('q') ? id.slice(1) : id
           name = t(`item_${itemId}`, `#${itemId}`)
         }

@@ -25,6 +25,8 @@ function buildTappables(perms, defaults) {
       filters[key] = new BaseFilter(defaults.xlCandy)
     } else if (key.startsWith('m')) {
       filters[key] = new BaseFilter(defaults.megaEnergy)
+    } else if (Number.isInteger(Number(key.charAt(0)))) {
+      filters[key] = new BaseFilter(defaults.pokemon)
     } else {
       filters[key] = new BaseFilter(defaults.items)
     }

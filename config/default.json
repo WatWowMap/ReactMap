@@ -560,7 +560,8 @@
       "items": true,
       "megaEnergy": true,
       "candy": true,
-      "xlCandy": true
+      "xlCandy": true,
+      "pokemon": true
     },
     "pokemon": {
       "enabled": false,

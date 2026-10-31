@@ -40,6 +40,7 @@ const TAGS = /** @type {const} */ ({
   pokestops: chalk.hex('#e91e63')('[POKESTOPS]'),
   gyms: chalk.hex('#9c27b0')('[GYMS]'),
   stations: chalk.hex('#00bcd4')('[STATIONS]'),
+  tappables: chalk.hex('#cddc39')('[TAPPABLES]'),
   weather: chalk.hex('#3f51b5')('[WEATHER]'),
   available: chalk.hex('#2196f3')('[AVAILABLE]'),
   scanAreas: chalk.hex('#00bcd4')('[SCAN AREAS]'),

@@ -4,9 +4,16 @@
  * Describes a tappable's reward by the quest reward type whose icons and
  * names it shares, along with its filter key. Null for rewards not shown.
  * @param {import('@rm/types').Tappable} tappable
- * @returns {{ rewardType: 2 | 4 | 9 | 12, id: number, filterKey: string } | null}
+ * @returns {{ rewardType: 2 | 4 | 7 | 9 | 12, id: number, filterKey: string } | null}
  */
 export function getTappableReward(tappable) {
+  if (tappable.pokemon_id) {
+    return {
+      rewardType: 7,
+      id: tappable.pokemon_id,
+      filterKey: `${tappable.pokemon_id}`,
+    }
+  }
   if (tappable.item_id) {
     return {
       rewardType: 2,

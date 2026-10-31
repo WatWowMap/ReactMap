@@ -296,6 +296,9 @@ export interface Tappable {
   type: string
   fort_id: string | null
   item_id: number | null
+  pokemon_id?: number | null
+  form?: number | null
+  costume?: number | null
   reward_type?: string | null
   reward_pokemon_id?: number | null
   temp_evolution?: number | null
