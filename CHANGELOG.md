@@ -1,3 +1,24 @@
+# [1.57.0](https://github.com/WatWowMap/ReactMap/compare/v1.56.3...v1.57.0) (2026-11-01)
+
+
+### Bug Fixes
+
+* **geocoder:** answer empty when a reverse lookup finds no address ([677ac81](https://github.com/WatWowMap/ReactMap/commit/677ac8173d5db31827adca9e96b624d23709b31c))
+* **search:** skip sources a fort search cannot query ([f56b021](https://github.com/WatWowMap/ReactMap/commit/f56b0216973f9435f659e82256bb76b4d5a22aeb))
+
+
+### Features
+
+* **discord:** accept user ids in roles lists ([b2fa07f](https://github.com/WatWowMap/ReactMap/commit/b2fa07ff2ff9107bea42fe5a691d95b2e8cb4bef))
+
+
+### Performance Improvements
+
+* **map:** make a pan cheap for every marker on the map ([5a9536f](https://github.com/WatWowMap/ReactMap/commit/5a9536fc5402ac9fe1b25028e1ff8a70c737ccee))
+* **map:** rebuild a layer's markers only when its data changes ([4e9c564](https://github.com/WatWowMap/ReactMap/commit/4e9c564617d78a673746028f6fdea396d7a9ce2c))
+* **map:** stop re-rendering every marker when a popup opens ([d4fc29e](https://github.com/WatWowMap/ReactMap/commit/d4fc29eb201f16e85acc119bf4a1426e6b422416))
+* **pokemon:** build a marker's icon only when what it draws changes ([5dac9d3](https://github.com/WatWowMap/ReactMap/commit/5dac9d3075524fe363bd0dca8d7e3cca1409aa64))
+
 ## [1.56.3](https://github.com/WatWowMap/ReactMap/compare/v1.56.2...v1.56.3) (2026-11-01)
 
 
