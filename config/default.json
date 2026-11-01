@@ -212,8 +212,8 @@
         "name": "Halloween",
         "enabled": true,
         "images": [
-          "https://upload.wikimedia.org/wikipedia/commons/thumb/d/dc/Fluent_Emoji_flat_1f383.svg/640px-Fluent_Emoji_flat_1f383.svg.png",
-          "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fc/Ghost.svg/640px-Ghost.svg.png"
+          "https://upload.wikimedia.org/wikipedia/commons/thumb/d/dc/Fluent_Emoji_flat_1f383.svg/120px-Fluent_Emoji_flat_1f383.svg.png",
+          "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fc/Ghost.svg/120px-Ghost.svg.png"
         ],
         "imageScale": 2,
         "startDay": 29,
