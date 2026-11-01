@@ -42,7 +42,7 @@ export class HolidayAnimations {
     this.ctx.clearRect(0, 0, this.w, this.h)
     this.images.forEach((item) => {
       const image = this.loaded.get(item.src)
-      if (!image || !image.complete || !image.naturalWidth) return
+      if (!image.complete || !image.naturalWidth) return
       this.ctx.globalAlpha = item.opacity
       this.ctx.drawImage(image, item.x, item.y, item.width, item.height)
     })
@@ -54,13 +54,12 @@ export class HolidayAnimations {
       return
     }
     this.setCanvasSize()
-    // Load each source once; creating a new Image every frame triggered
-    // a network request per item per frame (and endless retries on failure)
+    // Load each source once; creating a new Image every frame re-requested
+    // any URL that failed to load, every frame
     this.baseImages.forEach((src) => {
       if (this.loaded.has(src)) return
       const image = new Image()
       image.onerror = () => {
-        this.loaded.delete(src)
         // eslint-disable-next-line no-console
         console.warn('[HolidayEffect] failed to load image', src)
       }
