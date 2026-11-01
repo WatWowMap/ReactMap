@@ -1,6 +1,6 @@
 {
   "name": "reactmap",
-  "version": "1.56.3",
+  "version": "1.57.0",
   "private": true,
   "description": "React based frontend map.",
   "license": "MIT",
@@ -148,7 +148,7 @@
     "i18next": "23.12.3",
     "i18next-browser-languagedetector": "8.0.0",
     "i18next-fs-backend": "2.6.6",
-    "i18next-http-backend": "4.0.2",
+    "i18next-http-backend": "4.0.7",
     "jose": "^5.9.6",
     "knex": "3.1.0",
     "leaflet": "1.9.4",
@@ -221,7 +221,7 @@
   "resolutions": {
     "got": ">=11.8.5",
     "dot-prop": ">=4.2.1",
-    "qs": ">=6.16.0",
+    "qs": ">=6.16.1",
     "tmp": ">=0.2.6",
     "protobufjs": "7.6.5",
     "uuid": "11.1.1",
@@ -240,7 +240,7 @@
     "express-mysql-session/mysql2": "3.24.4"
   },
   "engines": {
-    "node": ">=22.23.4",
+    "node": "^22.23.4 || ^24.22.1 || >=26.12.1",
     "yarn": "^1.22.x"
   }
 }

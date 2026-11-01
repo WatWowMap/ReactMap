@@ -36,6 +36,9 @@ const userSettingsCategory = (category) => {
   }
 }
 
+/** Stable empty results, so a memo keyed on them doesn't change every render */
+const NO_RESULTS = []
+
 const MANUAL_ID_CATEGORIES = new Set([
   'gyms',
   'pokestops',
@@ -118,7 +121,6 @@ function QueryData({ category, timeout }) {
 
   const hideList = useMemory((s) => s.hideList)
   const active = useMemory((s) => s.active)
-  const manualParams = useMemory((s) => s.manualParams)
 
   const userSettings = useStorage(
     (s) => s.userSettings[userSettingsCategory(category)],
@@ -134,7 +136,10 @@ function QueryData({ category, timeout }) {
     () => normalizeCategory(category),
     [category],
   )
-  const manualId = React.useMemo(() => {
+  // only this category's id, so opening a popup elsewhere doesn't re-render
+  // every layer
+  const manualId = useMemory((s) => {
+    const { manualParams } = s
     if (
       manualParams?.id === undefined ||
       manualParams.id === '' ||
@@ -144,7 +149,7 @@ function QueryData({ category, timeout }) {
     }
     const manualCategory = normalizeCategory(manualParams.category)
     return manualCategory === normalizedCategory ? manualParams.id : undefined
-  }, [manualParams, normalizedCategory])
+  })
 
   const buildVariables = React.useCallback(() => {
     const args = getQueryArgs()
@@ -204,9 +209,23 @@ function QueryData({ category, timeout }) {
 
   const errorState = useProcessError(error)
 
-  const returnData = errorState
-    ? []
-    : (data || previousData || { [category]: [] })[category]
+  const result = data || previousData
+  const returnData = errorState || !result ? NO_RESULTS : result[category]
+
+  // Clustering reloads Supercluster whenever its children change, and the
+  // children are every marker, so they're only rebuilt when the data or the
+  // hide list changes, not on every filter or setting write
+  const filteredData = React.useMemo(
+    () => returnData?.filter((each) => !hideList.has(each.id)) ?? null,
+    [returnData, hideList],
+  )
+  const markers = React.useMemo(
+    () =>
+      filteredData?.map((each) => (
+        <Component key={each.id || category} {...each} />
+      )) ?? null,
+    [filteredData, Component, category],
+  )
 
   if (!returnData) {
     return error && process.env.NODE_ENV === 'development' ? (
@@ -224,19 +243,13 @@ function QueryData({ category, timeout }) {
     ) : null
   }
 
-  const filteredData = returnData.filter((each) => !hideList.has(each.id))
-
   if (category === 'routes') {
     return <RouteLayer routes={filteredData} />
   }
 
   return (
     <>
-      <Clustering category={category}>
-        {filteredData.map((each) => (
-          <Component key={each.id || category} {...each} />
-        ))}
-      </Clustering>
+      <Clustering category={category}>{markers}</Clustering>
       {category === 'weather' && <ActiveWeather weatherData={filteredData} />}
     </>
   )

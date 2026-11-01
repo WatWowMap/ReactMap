@@ -12,17 +12,20 @@ const cleanup = () =>
  * @param {import('leaflet').Marker<any>} ref
  */
 export function useForcePopup(id, ref) {
-  const manualParams = useMemory((s) => s.manualParams)
-
-  useEffect(() => {
-    const manualId = manualParams?.id
-    if (
+  // a boolean, so every marker on the map doesn't re-render whenever any
+  // popup opens or closes
+  const isTarget = useMemory((s) => {
+    const manualId = s.manualParams?.id
+    return (
       manualId !== undefined &&
       manualId !== null &&
       manualId !== '' &&
-      `${id}` === `${manualId}` &&
-      ref
-    ) {
+      `${id}` === `${manualId}`
+    )
+  })
+
+  useEffect(() => {
+    if (isTarget && ref) {
       ref.openPopup()
       ref.on('popupclose', cleanup)
       return () => {
@@ -30,5 +33,5 @@ export function useForcePopup(id, ref) {
         ref.closePopup()
       }
     }
-  }, [manualParams, ref])
+  }, [isTarget, ref])
 }

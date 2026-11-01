@@ -191,7 +191,12 @@ class DiscordClient extends AuthClient {
         await Promise.all(
           this.strategy.allowedGuilds.map(async (guildId) => {
             if (guilds.includes(guildId)) {
-              const userRoles = await this.getUserRoles(guildId, user.id)
+              // the user's own id counts as a role, so any roles list can name
+              // a user; snowflakes are unique, so it never matches a real role
+              const userRoles = [
+                ...(await this.getUserRoles(guildId, user.id)),
+                user.id,
+              ]
               Object.entries(this.perms).forEach(([perm, info]) => {
                 if (info.enabled) {
                   if (this.alwaysEnabledPerms.includes(perm)) {

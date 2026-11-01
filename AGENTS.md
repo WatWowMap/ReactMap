@@ -6,7 +6,7 @@ Coding style and naming conventions - Prettier governs formatting (2-space inden
 
 Spacing discipline - DO NOT introduce or adjust margins, padding, gaps, line-height, or other spacing-related styles anywhere in the repo without explicit written permission from the user.
 
-Testing guidelines - No dedicated Jest suite today; rely on `yarn lint`, type checks from editor tooling, and manual verification in a local dev session. When adding backend features, exercise relevant GraphQL/REST paths via the dev server and document sanity checks in the PR description.
+Testing guidelines - `yarn test` runs the masterfile tests and the server suite (`node --test server/test/*.test.js`, with module mocks; `server/test/stateMock.js` keeps it database-free). Run one file with `node --experimental-test-module-mocks --test server/test/<name>.test.js`. Also rely on `yarn lint`, type checks from editor tooling, and manual verification in a local dev session. When adding backend features, exercise relevant GraphQL/REST paths via the dev server and document sanity checks in the PR description.
 
 Commit and pull request guidelines - Use Conventional Commits (`type(scope): summary`), matching existing history (e.g. `feat(map): add weather overlays`). Each PR should describe scope, link related issues, list testing steps, and include screenshots or GIFs for UI changes. Re-run `yarn lint`, `yarn build`, and integration steps touched by the change before requesting review.
 
