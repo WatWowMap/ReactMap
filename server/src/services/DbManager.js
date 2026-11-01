@@ -31,6 +31,9 @@ const STATION_BATTLE_REQUIRED_COLUMNS = [
   'updated',
 ]
 
+// Pokemon.search is the only search method with a Golbat endpoint branch.
+const ENDPOINT_SEARCH_MODELS = new Set(['Pokemon'])
+
 // Pure: buckets summed spawn counts into rarity tiers and RETURNS the map (no
 // mutation), so callers can commit it atomically under a gate — see
 // DbManager.getAvailable / EventManager's generation check.
@@ -528,11 +531,12 @@ class DbManager extends Logger {
    * @template T
    * @param {import("../models").ScannerModelKeys} model
    * @param {(source: any) => Promise<T>} handler
+   * @param {any[]} [sources]
    * @returns {Promise<T[]>}
    */
-  async runScannerSources(model, handler) {
+  async runScannerSources(model, handler, sources = this.models[model]) {
     const settled = await Promise.allSettled(
-      this.models[model].map(async ({ SubModel, ...source }) =>
+      sources.map(async ({ SubModel, ...source }) =>
         handler({ SubModel, ...source }),
       ),
     )
@@ -543,7 +547,7 @@ class DbManager extends Logger {
       if (result.status === 'fulfilled') {
         successful.push(result.value)
       } else {
-        const source = this.models[model][index]
+        const source = sources[index]
         this.log.warn(
           TAGS[model.toLowerCase()] || `[${model.toUpperCase()}]`,
           DbManager.sourceLabel(model, source),
@@ -553,6 +557,18 @@ class DbManager extends Logger {
     })
 
     return successful
+  }
+
+  /**
+   * The sources a search can query: a source with no database behind it only
+   * answers models whose search method has an endpoint branch.
+   * @param {import("../models").ScannerModelKeys} model
+   */
+  searchableSources(model) {
+    if (ENDPOINT_SEARCH_MODELS.has(model)) return this.models[model]
+    return this.models[model].filter(
+      ({ connection }) => !!this.connections[connection],
+    )
   }
 
   /**
@@ -632,11 +648,9 @@ class DbManager extends Logger {
       const loopTime = Date.now()
       count += 1
       const bbox = getBboxFromCenter(args.lat, args.lon, distance)
-      // runScannerSources (allSettled + logs rejections): the fort search
-      // methods have no endpoint branch, so a pure-endpoint source hits an
-      // unbound this.query() and rejects. Isolating it degrades that source to
-      // no results rather than failing the whole batch, while a genuine SQL
-      // error from a DB source stays visible in the logs.
+      // runScannerSources (allSettled + logs rejections) keeps one failing
+      // database from failing the whole batch, while its SQL error stays
+      // visible in the logs.
       const data = await this.runScannerSources(
         model,
         ({ SubModel, ...source }) =>
@@ -647,12 +661,13 @@ class DbManager extends Logger {
             DbManager.getDistance(args),
             bbox,
           ),
+        this.searchableSources(model),
       )
-      // runScannerSources returns [] ONLY when every source rejected — a
+      // runScannerSources returns [] ONLY when no source answered: every
+      // source rejected, or a fort model has only pure-endpoint sources. A
       // genuine-empty source is fulfilled with [] (so data would be [[]]).
-      // That happens for an all-pure-endpoint fort search (the search methods
-      // have no endpoint branch) or a DB outage; widening just reissues the
-      // same failing queries, so stop rather than spin the radius to `max`.
+      // Widening just reissues the same queries, so stop rather than spin the
+      // radius to `max`.
       if (data.length === 0) break
       const results = DbManager.deDupeResults(data)
       if (results.length > deDuped.length) {
