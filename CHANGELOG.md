@@ -1,3 +1,10 @@
+## [1.56.3](https://github.com/WatWowMap/ReactMap/compare/v1.56.2...v1.56.3) (2026-11-01)
+
+
+### Bug Fixes
+
+* **holiday:** use standard Wikimedia thumbnail size and load images once ([#1278](https://github.com/WatWowMap/ReactMap/issues/1278)) ([5202ee2](https://github.com/WatWowMap/ReactMap/commit/5202ee2103953e1999b7dbdd90270685a591fcaa))
+
 ## [1.56.2](https://github.com/WatWowMap/ReactMap/compare/v1.56.1...v1.56.2) (2026-10-31)
 
 
