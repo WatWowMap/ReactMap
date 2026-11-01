@@ -32,7 +32,6 @@ export function BlockedPage() {
   const username = queryParams.get('username')
   const avatar = queryParams.get('avatar')
   const id = queryParams.get('id')
-  const alreadyLinked = queryParams.get('message') === 'account_already_linked'
 
   return (
     <Box
@@ -81,7 +80,7 @@ export function BlockedPage() {
             </>
           ) : (
             <Typography variant="body1" align="center">
-              {t(alreadyLinked ? 'account_already_linked' : 'missing_map_perm')}
+              {t('missing_map_perm')}
             </Typography>
           )}
           {discordInvite && (

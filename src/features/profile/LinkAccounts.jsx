@@ -23,8 +23,8 @@ export function LinkAccounts() {
   )
 
   const [refreshing, setRefreshing] = React.useState(false)
-  // only a local session (which carries no strategy) links accounts, and
-  // picks which one alerts, Discord and Telegram sign-ins use their own
+  // only a local session (which carries no strategy) can link accounts, and
+  // pick which one alerts, Discord and Telegram sign-ins use their own
   const isLocal = !['discord', 'telegram'].includes(auth.strategy)
   const showWebhookStrategy = isLocal && !!auth.discordId && !!auth.telegramId
 
@@ -39,10 +39,7 @@ export function LinkAccounts() {
       <Grid2 container alignItems="center" justifyContent="center">
         {METHODS.map((method, i) => {
           if (!auth.methods.includes(method)) return null
-          // the legacy Telegram widget cannot link, its callback is not tied
-          // to this session
-          const canLink = isLocal && (!i || auth.telegramOAuth)
-          if (!auth[`${method}Id`] && !canLink) return null
+          if (!auth[`${method}Id`] && !isLocal) return null
           const Component = i ? (
             <TelegramLogin
               authUrl={telegramAuthUrl}
