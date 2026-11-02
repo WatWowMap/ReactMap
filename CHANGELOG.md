@@ -1,3 +1,10 @@
+## [1.57.1](https://github.com/WatWowMap/ReactMap/compare/v1.57.0...v1.57.1) (2026-11-02)
+
+
+### Bug Fixes
+
+* **profile:** only offer account linking to local sign-ins ([#1261](https://github.com/WatWowMap/ReactMap/issues/1261)) ([f01a1a2](https://github.com/WatWowMap/ReactMap/commit/f01a1a22fda0f4e6886e98785bca8221173d1a4b))
+
 # [1.57.0](https://github.com/WatWowMap/ReactMap/compare/v1.56.3...v1.57.0) (2026-11-01)
 
 
