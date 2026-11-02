@@ -16,6 +16,7 @@ export const FORM_ONLY_FIELDS = [
   'gymName',
   'profile_no',
   'enabled',
+  'all',
 ]
 
 /** Categories for which v2 rejects `edit: true`. */

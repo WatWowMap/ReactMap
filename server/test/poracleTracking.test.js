@@ -373,6 +373,28 @@ test('save surfaces the v1 error message', async () => {
   }
 })
 
+test('v1 list surfaces a 200 status error', async () => {
+  const stub = await stubPoracle({
+    routes: {
+      'GET /api/tracking/invasion/123': {
+        status: 'error',
+        message: 'User not found',
+      },
+    },
+  })
+  try {
+    await assert.rejects(
+      stub.v1.list('123', 'invasion'),
+      (e) =>
+        e instanceof PoracleRequestError &&
+        e.status === 200 &&
+        e.message === 'User not found',
+    )
+  } finally {
+    await stub.close()
+  }
+})
+
 test('v1 list splits incidents from invasions', async () => {
   const stub = await stubPoracle({
     routes: {

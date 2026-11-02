@@ -95,7 +95,8 @@ function createPoracleHttp({ endpoint, secret }) {
         } catch {
           parsed = {}
         }
-        if (!response.ok) {
+        // PoracleJS also reports some failures as 200 { status: 'error' }.
+        if (!response.ok || parsed?.status === 'error') {
           throw new PoracleRequestError(
             errorMessage(parsed, response),
             response.status,

@@ -138,7 +138,12 @@ test('form-only fields never reach the rule', () => {
       const ui = uis[category]
       const rule = mod.formToRule(
         category,
-        { ...mod.ruleToForm(category, {}, ui), xs: true, xl: true },
+        {
+          ...mod.ruleToForm(category, {}, ui),
+          xs: true,
+          xl: true,
+          all: false,
+        },
         ui,
       )
       mod.FORM_ONLY_FIELDS.forEach((key) => {
