@@ -18,7 +18,13 @@ import { apolloClient } from '@services/apollo'
 import { Query } from '@services/queries'
 import { ALL_PROFILES } from '@services/queries/webhook'
 import { Menu } from '@components/Menu'
-import { setMode, setSelected, useWebhookStore } from '@store/useWebhookStore'
+import {
+  applyWebhookResult,
+  setMode,
+  setSelected,
+  showWebhookError,
+  useWebhookStore,
+} from '@store/useWebhookStore'
 import { analytics } from '@utils/analytics'
 
 import { Human } from './human'
@@ -127,26 +133,8 @@ export function Manage() {
           },
           refetchQueries: [ALL_PROFILES],
         })
-        .then(({ data }) => {
-          const result = data?.webhook
-          if (Array.isArray(result?.[category])) {
-            useWebhookStore.setState({ [category]: result[category] })
-          }
-          if (result?.status === 'error') {
-            useWebhookStore.setState({
-              alert: {
-                open: true,
-                severity: 'error',
-                message: result.message,
-              },
-            })
-          }
-        })
-        .catch((error) =>
-          useWebhookStore.setState({
-            alert: { open: true, severity: 'error', message: error.message },
-          }),
-        )
+        .then(({ data }) => applyWebhookResult(category, data?.webhook))
+        .catch(showWebhookError)
     }
   }, [addNew])
 

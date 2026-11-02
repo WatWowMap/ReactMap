@@ -1,6 +1,10 @@
 // @ts-check
 import { apolloClient } from '@services/apollo'
-import { SET_HUMAN, WEBHOOK_AREAS } from '@services/queries/webhook'
+import {
+  ALL_PROFILES,
+  SET_HUMAN,
+  WEBHOOK_AREAS,
+} from '@services/queries/webhook'
 import { create } from 'zustand'
 
 /**
@@ -213,12 +217,21 @@ export const showWebhookError = (error) =>
 
 /**
  * Shows the category list a webhook mutation returned and any error it reported.
+ * The list goes into the tracked query's cache, so `useGetWebhookData` applies
+ * the active search and the list and its tiles stay on the same rules.
  * @param {string} category
  * @param {Record<string, any> | undefined} result
  */
 export const applyWebhookResult = (category, result) => {
   if (Array.isArray(result?.[category])) {
-    useWebhookStore.setState({ [category]: result[category] })
+    apolloClient.cache.updateQuery(
+      { query: ALL_PROFILES, variables: { category, status: 'GET' } },
+      (data) =>
+        data && {
+          ...data,
+          webhook: { ...data.webhook, [category]: result[category] },
+        },
+    )
   }
   if (result?.status === 'error') showWebhookError(result)
 }

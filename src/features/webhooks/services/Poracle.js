@@ -102,7 +102,7 @@ export class Poracle {
         if (idObj.id === 'kecleon') return ['poke_352']
         if (idObj.id === 'showcase') return ['showcase']
         // unknown display type: no locale key exists, so give a readable title
-        return [`${t('incident')} ${idObj.id}`]
+        return [t('incident_unknown', { id: idObj.id })]
       case 'invasion':
         return idObj.id === '0' ? ['poke_global'] : [`grunt_a_${idObj.id}`]
       case 'lure':
@@ -155,7 +155,9 @@ export class Poracle {
           kecleon: 'poke_352',
           showcase: 'showcase',
         }[id]
-        const name = key ? t(key) : `${t('incident')} ${item.display_type}`
+        const name = key
+          ? t(key)
+          : t('incident_unknown', { id: item.display_type })
         return `${name}${item.clean ? ` | ${t('clean')} ` : ''}${
           item.distance ? ` | d${item.distance}` : ''
         }`

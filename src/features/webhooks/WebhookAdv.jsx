@@ -305,7 +305,7 @@ export function WebhookAdvanced() {
         // null = the Poracle server's default template
         menuItems.push(
           <MenuItem key={ANY} value={ANY} dense>
-            {t('default_template', 'Default')}
+            {t('default_template')}
           </MenuItem>,
         )
         templates[poracleValues.noIv ? `${category}NoIv` : category]?.[
@@ -519,10 +519,9 @@ export function WebhookAdvanced() {
         case 'showcase':
           return `${prefix}${t('showcase')} ${settings}`
         default:
-          return `${prefix}${t('invasion')} ${t(
-            `incident_${idObj.id}`,
-            `${idObj.id}`,
-          )} ${settings}`
+          return `${prefix}${t('invasion')} ${t('incident_unknown', {
+            id: idObj.id,
+          })} ${settings}`
       }
     }
     switch (id.charAt(0)) {

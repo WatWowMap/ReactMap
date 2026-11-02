@@ -364,6 +364,7 @@
   "quest": "Quest",
   "invasion": "Invasion",
   "incident": "Pokestop Events",
+  "incident_unknown": "Pokestop Event #{{id}}",
   "nest": "Nest",
   "pokestop": "Pokestop",
   "team": "Team",
