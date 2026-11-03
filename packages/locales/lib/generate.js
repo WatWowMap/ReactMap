@@ -2,6 +2,7 @@
 // @ts-check
 /* eslint-disable no-restricted-syntax */
 /* eslint-disable guard-for-in */
+/* eslint-disable import/no-extraneous-dependencies */
 
 require('dotenv').config()
 const { OpenAI } = require('openai')

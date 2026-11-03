@@ -15,8 +15,6 @@ packages/masterfile/lib/data/masterfile.json
 
 # Docker file
 /docker-compose.yml
-.gitref
-.gitsha
 
 # Favicon
 public/favicon/*
