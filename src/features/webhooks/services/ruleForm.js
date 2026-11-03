@@ -110,6 +110,33 @@ export function ruleToForm(category, rule, ui) {
   return form
 }
 
+/** Identity fields that stay per item in an apply-to-all edit. */
+export const GLOBAL_IDENTITY = {
+  pokemon: ['form'],
+  raid: ['form', 'level'],
+  nest: ['form'],
+  quest: ['form', 'amount'],
+  invasion: ['gender'],
+}
+
+/**
+ * The starting form of the apply-to-all editor: defaults without the fields
+ * that identify an item, and All Forms off until the user ticks it (the
+ * absent form would otherwise read as "all forms").
+ * @param {string} category
+ * @param {any} ui
+ * @param {Record<string, any>} [base]
+ * @returns {Record<string, any>}
+ */
+export function globalPreset(category, ui, base = {}) {
+  const preset = ruleToForm(category, base, ui)
+  ;[...(ui.identifiers || []), ...(GLOBAL_IDENTITY[category] || [])].forEach(
+    (key) => delete preset[key],
+  )
+  if ('allForms' in preset) preset.allForms = !!ui.defaults.allForms
+  return preset
+}
+
 /**
  * Like `ruleToForm`, but keeps the form-only fields `value` already carries,
  * so it accepts either a stored rule or a form the editor produced earlier.

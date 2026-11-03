@@ -1,5 +1,7 @@
 // @ts-check
 
+const { pathInt } = require('./http')
+
 const INVASION_TARGETING = ['type_id', 'grunt_id', 'everything', 'boss']
 
 /**
@@ -52,8 +54,12 @@ function createTrackingV2(http) {
     async save(userId, category, rules) {
       const created = rules.filter((r) => r.uid == null)
       const edited = rules.filter((r) => r.uid != null)
-      const calls = edited.map((r) =>
-        http.request(`${base(userId, category)}/${r.uid}`, {
+      // validate every uid before the first request goes out
+      const paths = edited.map(
+        (r) => `${base(userId, category)}/${pathInt(r.uid, 'rule uid')}`,
+      )
+      const calls = edited.map((r, i) =>
+        http.request(paths[i], {
           method: 'PUT',
           body: cleanRule(category, r, true),
         }),
@@ -76,7 +82,8 @@ function createTrackingV2(http) {
      */
     async remove(userId, category, uids) {
       if (!uids.length) return
-      await http.request(`${base(userId, category)}?uid=${uids.join(',')}`, {
+      const list = uids.map((uid) => pathInt(uid, 'rule uid')).join(',')
+      await http.request(`${base(userId, category)}?uid=${list}`, {
         method: 'DELETE',
       })
     },

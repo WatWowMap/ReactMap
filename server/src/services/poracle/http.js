@@ -110,4 +110,34 @@ function createPoracleHttp({ endpoint, secret }) {
   }
 }
 
-module.exports = { createPoracleHttp, PoracleRequestError }
+/**
+ * A client-supplied id (rule uid, profile number) as a URL path segment.
+ * Anything but digits could move the request to another path, such as
+ * another human's rules, so it is refused before any request is made.
+ * @param {unknown} value
+ * @param {string} name
+ * @returns {string}
+ */
+function pathInt(value, name) {
+  const text = String(value)
+  if (!/^\d+$/.test(text)) {
+    throw new PoracleRequestError(`Invalid ${name}`, 400)
+  }
+  return text
+}
+
+/**
+ * A client-supplied coordinate as a URL path segment.
+ * @param {unknown} value
+ * @param {string} name
+ * @returns {string}
+ */
+function pathNumber(value, name) {
+  const number = typeof value === 'string' && value.trim() ? +value : value
+  if (typeof number !== 'number' || !Number.isFinite(number)) {
+    throw new PoracleRequestError(`Invalid ${name}`, 400)
+  }
+  return String(number)
+}
+
+module.exports = { createPoracleHttp, PoracleRequestError, pathInt, pathNumber }

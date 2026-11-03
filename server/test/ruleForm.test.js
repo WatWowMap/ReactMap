@@ -394,3 +394,12 @@ test('turning pvp on saves the ceiling the slider shows', () => {
   )
   assert.equal(rule.pvp_ranking_worst, 100)
 })
+
+test('the apply-to-all preset starts without All Forms', () => {
+  ;['pokemon', 'raid', 'quest', 'nest'].forEach((category) => {
+    const preset = mod.globalPreset(category, uis[category], { profile_no: 1 })
+    assert.equal(preset.allForms, false, category)
+    assert.equal('form' in preset, false, category)
+    assert.equal(preset.profile_no, 1, category)
+  })
+})

@@ -913,3 +913,71 @@ test('the invasion switches also hide incidents', () => {
   api.v2 = false
   assert.ok(!api.getAllowedCategories(['invasion']).includes('incident'))
 })
+
+/** @param {(() => Promise<any>)[]} attempts */
+const assertRefused = (attempts) =>
+  Promise.all(
+    attempts.map(async (attempt) => {
+      const result = await attempt().catch((e) => ({ thrown: e }))
+      assert.ok(
+        result.thrown instanceof PoracleRequestError ||
+          result.status === 'error',
+        JSON.stringify(result),
+      )
+    }),
+  )
+
+test('client values never reach a request path unchecked', async () => {
+  const bad = '../../../victim/tracking/pokemon/7'
+  const stub = await stubPoracle({ spec: v2Spec })
+  const legacy = await stubPoracle()
+  try {
+    await assert.rejects(
+      stub.client.save('123', 'pokemon', [{ uid: bad, pokemon_id: 1 }]),
+      (e) => e instanceof PoracleRequestError && e.status === 400,
+    )
+    await assert.rejects(
+      stub.client.remove('123', 'pokemon', [1, '2&uid=3']),
+      (e) => e instanceof PoracleRequestError,
+    )
+    await stub.client.save('123', 'pokemon', [{ uid: '7', pokemon_id: 1 }])
+
+    const v2 = await initApi(stub.port, 'path-v2')
+    const v1 = await initApi(legacy.port, 'path-v1')
+    const before = stub.requests.length
+    const attempts = [
+      () => v2.api('123', '../../victim/tracking/pokemon', 'POST', [{}]),
+      () => v2.api('123', 'pokemon', 'POST', [{ uid: bad }]),
+      () => v2.api('123', 'pokemon', 'DELETE', { uid: bad }),
+      () => v2.api('123', 'profiles-update', 'POST', { profile_no: bad }),
+      () => v2.api('123', 'profiles-byProfileNo', 'DELETE', bad),
+      () => v2.api('123', 'profiles-copy', 'POST', { from: 1, to: bad }),
+    ]
+    await assertRefused(attempts)
+    // only the rule list re-reads after a refused write reach the server
+    assert.deepEqual(
+      stub.requests
+        .slice(before)
+        .filter((r) => r.method !== 'GET')
+        .map((r) => r.url),
+      [],
+    )
+
+    const legacyBefore = legacy.requests.length
+    await assertRefused([
+      () => v1.api('123', 'switchProfile', 'POST', bad),
+      () => v1.api('123', 'setLocation', 'POST', ['1', bad]),
+      () => v1.api('123', 'profiles-copy', 'POST', { from: bad, to: 2 }),
+      () => v1.api('123', 'profiles-byProfileNo', 'DELETE', bad),
+    ])
+    assert.deepEqual(
+      legacy.requests
+        .slice(legacyBefore)
+        .filter((r) => r.method !== 'GET')
+        .map((r) => r.url),
+      [],
+    )
+  } finally {
+    await Promise.all([stub.close(), legacy.close()])
+  }
+})

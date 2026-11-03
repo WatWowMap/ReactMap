@@ -5,7 +5,12 @@ const { default: fetch } = require('node-fetch')
 const { log, TAGS } = require('@rm/logger')
 const { fetchJson } = require('../utils/fetchJson')
 const { setCache, getCache } = require('./cache')
-const { createPoracleHttp, PoracleRequestError } = require('./poracle/http')
+const {
+  createPoracleHttp,
+  PoracleRequestError,
+  pathInt,
+  pathNumber,
+} = require('./poracle/http')
 const { createTrackingV1 } = require('./poracle/trackingV1')
 const { createTrackingV2 } = require('./poracle/trackingV2')
 const { UnsupportedOnV1 } = require('./poracle/v1Adapter')
@@ -22,6 +27,13 @@ const TRACKING_CATEGORIES = new Set([
   'nest',
   'gym',
 ])
+
+/** Profile actions the client sends as `profiles-<action>`. */
+const PROFILE_ACTIONS = new Set(['add', 'update', 'copy', 'byProfileNo'])
+
+/** @param {unknown} category */
+const unknownCategory = (category) =>
+  new PoracleRequestError(`Unknown webhook category: ${category}`, 400)
 
 /** @param {unknown} value */
 const pad2 = (value) => String(value ?? 0).padStart(2, '0')
@@ -570,15 +582,18 @@ class PoracleAPI {
    */
   async #profileManagement(userId, category, method, data) {
     const [, action] = PoracleAPI.#split(category)
+    if (action && !PROFILE_ACTIONS.has(action)) throw unknownCategory(category)
 
     const first = await this.#sendRequest(
       action
         ? APIS.profileAction(
             userId,
             action,
-            `${action === 'copy' ? `${data.from}/${data.to}` : ''}${
-              method === 'DELETE' ? `${data}` : ''
-            }`,
+            `${
+              action === 'copy'
+                ? `${pathInt(data.from, 'profile')}/${pathInt(data.to, 'profile')}`
+                : ''
+            }${method === 'DELETE' ? pathInt(data, 'profile') : ''}`,
           )
         : APIS.profiles(userId),
       method,
@@ -650,7 +665,11 @@ class PoracleAPI {
    * @returns
    */
   async #setLocation(userId, location) {
-    await this.#sendRequest(APIS.location(userId, location), 'POST')
+    if (!Array.isArray(location) || location.length !== 2) {
+      throw new PoracleRequestError('Invalid location', 400)
+    }
+    const coords = location.map((value) => pathNumber(value, 'location'))
+    await this.#sendRequest(APIS.location(userId, coords), 'POST')
     const second = await this.#oneHuman(userId)
     return second
   }
@@ -687,9 +706,10 @@ class PoracleAPI {
       case 'stop':
         return this.#setActive(userId, category, method)
       case 'switchProfile':
-        return this.#sendRequest(APIS.switchProfile(userId, data), method).then(
-          () => this.#oneHuman(userId),
-        )
+        return this.#sendRequest(
+          APIS.switchProfile(userId, pathInt(data, 'profile')),
+          method,
+        ).then(() => this.#oneHuman(userId))
       case 'setLocation':
         return this.#setLocation(userId, data)
       case 'setAreas':
@@ -714,7 +734,7 @@ class PoracleAPI {
       case 'oneHuman':
         return this.#oneHuman(userId)
       default:
-        return this.#trackingApi(userId, main, action, method, data)
+        throw unknownCategory(category)
     }
   }
 
@@ -858,7 +878,7 @@ class PoracleAPI {
       case 'oneHuman':
         return this.#oneHuman(userId)
       default:
-        return this.#trackingApi(userId, main, action, method, data)
+        throw unknownCategory(category)
     }
   }
 
@@ -880,19 +900,26 @@ class PoracleAPI {
         break
       case 'update':
         // v1's update only ever wrote active_hours; keep it that way.
-        await this.#sendV2(V2.profiles(userId, data.profile_no), 'PATCH', {
-          active_hours: toV2ActiveHours(data.active_hours),
-        })
+        await this.#sendV2(
+          V2.profiles(userId, pathInt(data.profile_no, 'profile')),
+          'PATCH',
+          { active_hours: toV2ActiveHours(data.active_hours) },
+        )
         break
       case 'byProfileNo':
         if (method === 'DELETE') {
-          await this.#sendV2(V2.profiles(userId, data), 'DELETE')
+          await this.#sendV2(
+            V2.profiles(userId, pathInt(data, 'profile')),
+            'DELETE',
+          )
         }
         break
       case 'copy':
-        await this.#sendV2(V2.profiles(userId, `${data.to}/copy`), 'POST', {
-          from_profile: +data.from,
-        })
+        await this.#sendV2(
+          V2.profiles(userId, `${pathInt(data.to, 'profile')}/copy`),
+          'POST',
+          { from_profile: +data.from },
+        )
         break
       default:
     }

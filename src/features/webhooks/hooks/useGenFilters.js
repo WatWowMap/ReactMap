@@ -4,7 +4,7 @@ import { useMemory } from '@store/useMemory'
 
 import { useWebhookStore } from '@store/useWebhookStore'
 
-import { ruleToForm } from '../services/ruleForm'
+import { globalPreset, ruleToForm } from '../services/ruleForm'
 
 export function useGenFilters() {
   const profile_no = useWebhookStore((s) => s.human.current_profile_no)
@@ -24,22 +24,9 @@ export function useGenFilters() {
      */
     const form = (category, rule = {}) =>
       ruleToForm(category, { ...rule, profile_no }, ui[category])
-    const EXTRA_IDENTITY = {
-      pokemon: ['form'],
-      raid: ['form', 'level'],
-      nest: ['form'],
-      quest: ['form', 'amount'],
-      invasion: ['gender'],
-    }
     /** @param {string} category */
-    const globalForm = (category) => {
-      const global = form(category)
-      ;[
-        ...(ui[category]?.identifiers || []),
-        ...(EXTRA_IDENTITY[category] || []),
-      ].forEach((key) => delete global[key])
-      return global
-    }
+    const globalForm = (category) =>
+      globalPreset(category, ui[category], { profile_no })
     const filters = {
       pokemon: pokemon
         ? { global: globalForm('pokemon'), '0-0': form('pokemon') }

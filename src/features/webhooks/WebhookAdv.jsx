@@ -34,7 +34,7 @@ import { camelToSnake } from '@utils/strings'
 import { FCSelect } from '@components/inputs/FCSelect'
 
 import { Poracle } from './services/Poracle'
-import { FORM_ONLY_FIELDS, toForm } from './services/ruleForm'
+import { FORM_ONLY_FIELDS, GLOBAL_IDENTITY, toForm } from './services/ruleForm'
 
 const skipFields = new Set([
   ...FORM_ONLY_FIELDS,
@@ -71,14 +71,6 @@ const wildCards = {
   invasion: ['i0'],
 }
 
-/** Global edits must not overwrite what identifies each selected item. */
-const GLOBAL_IDENTITY = {
-  pokemon: ['form'],
-  raid: ['form', 'level'],
-  nest: ['form'],
-  quest: ['form', 'amount'],
-  invasion: ['gender'],
-}
 /**
  * Derived from identity fields, so they stay per item too (an explicit
  * All Forms is applied separately in handleClose).
@@ -100,7 +92,7 @@ const LABEL_INDEX = {
 const LABEL_PREFIX = { team: 'team', gender: 'gender', rsvp_changes: 'rsvp' }
 
 /**
- * @param {(key: string, fallback?: string) => string} t
+ * @param {(key: string) => string} t
  * @param {'team' | 'gender' | 'rsvp_changes'} field
  * @param {string | null} value
  */
@@ -110,7 +102,7 @@ const namedLabel = (t, field, value) => {
     return t('rsvp_0')
   return value === null || value === undefined || value === 'any'
     ? t('any')
-    : t(`${LABEL_PREFIX[field]}_${LABEL_INDEX[field][value] ?? value}`, value)
+    : t(`${LABEL_PREFIX[field]}_${LABEL_INDEX[field][value] ?? value}`)
 }
 
 export function WebhookAdvanced() {

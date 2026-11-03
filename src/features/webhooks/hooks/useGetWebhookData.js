@@ -62,22 +62,27 @@ export function useGetWebhookData(category) {
         ) || []
   }, [data, previousData, search])
 
+  // The list and its tiles read the same filtered rows, also while a failed
+  // read keeps the last list on screen.
   useEffect(() => {
-    if (!loading && data?.webhook) {
-      if (data.webhook.status === 'error') {
-        const { context } = useWebhookStore.getState()
-        useWebhookStore.setState({
-          alert: {
-            open: true,
-            severity: data.webhook.status,
-            message: t(data.webhook.message, { name: context.name || '' }),
-          },
-        })
-      } else {
-        useWebhookStore.setState({ [category]: filtererData })
-      }
+    if (!loading && data?.webhook && filtererData !== undefined) {
+      useWebhookStore.setState({ [category]: filtererData })
     }
   }, [data, filtererData, search])
+
+  // Once per read result, not again on every search change.
+  useEffect(() => {
+    if (!loading && data?.webhook?.status === 'error') {
+      const { context } = useWebhookStore.getState()
+      useWebhookStore.setState({
+        alert: {
+          open: true,
+          severity: data.webhook.status,
+          message: t(data.webhook.message, { name: context.name || '' }),
+        },
+      })
+    }
+  }, [data, loading])
 
   useEffect(() => {
     if (category === 'human') {
