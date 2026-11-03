@@ -9,14 +9,15 @@ const execPromise = promisify(exec)
 const REPO_API = 'https://api.github.com/repos/WatWowMap/ReactMap'
 
 /**
- * Docker images receive `GIT_REF` / `GIT_SHA` at build time,
- * bare-metal installs fall back to the local git checkout.
- *
- * @returns {Promise<{ branch: string, isDocker: boolean }>}
+ * Docker images always define `GIT_REF` / `GIT_SHA` (empty when built without
+ * `--build-arg`) and ship no git, bare-metal installs use the local checkout.
  */
+const isDocker = 'GIT_REF' in process.env
+
+/** @returns {Promise<{ branch: string, isDocker: boolean }>} */
 async function getCurrentBranch() {
-  const gitRef = process.env.GIT_REF?.trim()
-  if (gitRef) {
+  if (isDocker) {
+    const gitRef = (process.env.GIT_REF || '').trim()
     return {
       branch: gitRef.startsWith('refs/heads/')
         ? gitRef.slice('refs/heads/'.length)
@@ -39,8 +40,7 @@ async function getCurrentBranch() {
 }
 
 async function getCurrentSha() {
-  const gitSha = process.env.GIT_SHA?.trim()
-  if (gitSha) return gitSha
+  if (isDocker) return (process.env.GIT_SHA || '').trim()
   try {
     const { stdout } = await execPromise('git rev-parse HEAD')
     return stdout.trim()
@@ -84,12 +84,15 @@ async function getRemoteSha(branch) {
 
 async function checkForUpdates() {
   try {
-    const { branch, isDocker } = await getCurrentBranch()
-    if (!branch) {
-      log.info(TAGS.update, 'Not running from a branch, skipping update check')
+    const { branch } = await getCurrentBranch()
+    const sha = branch ? await getCurrentSha() : ''
+    if (!branch || !sha) {
+      log.info(
+        TAGS.update,
+        'No branch or commit information available, skipping update check',
+      )
       return
     }
-    const sha = await getCurrentSha()
     const remoteSha = await getRemoteSha(branch)
     if (sha && remoteSha && remoteSha !== sha) {
       log.info(
