@@ -302,3 +302,95 @@ test('getId for catch-alls', () => {
     'i4',
   )
 })
+
+test('an untouched wildcard pvp ceiling stays a wildcard', () => {
+  const base = uis.pokemon
+  const ui = { ...base, defaults: { ...base.defaults, pvp_ranking_worst: 100 } }
+  const original = {
+    pokemon_id: 25,
+    pvp_ranking_league: 1500,
+    pvp_ranking_best: 1,
+    pvp_ranking_worst: null,
+  }
+  const form = mod.ruleToForm('pokemon', original, ui)
+  assert.equal(form.pvp_ranking_worst, 100)
+  const kept = mod.formToRule(
+    'pokemon',
+    { ...form, template: 'x' },
+    ui,
+    original,
+  )
+  assert.equal(kept.pvp_ranking_worst, null)
+  const moved = mod.formToRule(
+    'pokemon',
+    { ...form, pvp_ranking_worst: 50 },
+    ui,
+    original,
+  )
+  assert.equal(moved.pvp_ranking_worst, 50)
+})
+
+test('switching distance mode clears the conflicting override', () => {
+  const ui = uis.raid
+  const labelled = {
+    level: 5,
+    distance: 500,
+    override_location_label: 'home',
+    override_areas: null,
+  }
+  const toArea = mod.formToRule(
+    'raid',
+    { ...mod.ruleToForm('raid', labelled, ui), byDistance: false },
+    ui,
+    labelled,
+  )
+  assert.equal(toArea.distance, 0)
+  assert.equal(toArea.override_location_label, null)
+
+  const kept = mod.formToRule(
+    'raid',
+    { ...mod.ruleToForm('raid', labelled, ui), template: 'x' },
+    ui,
+    labelled,
+  )
+  assert.equal(kept.override_location_label, 'home')
+
+  const areas = { level: 5, distance: 0, override_areas: ['north'] }
+  const toDistance = mod.formToRule(
+    'raid',
+    { ...mod.ruleToForm('raid', areas, ui), byDistance: true, distance: 300 },
+    ui,
+    areas,
+  )
+  assert.equal(toDistance.distance, 300)
+  assert.equal(toDistance.override_areas, null)
+
+  const keptAreas = mod.formToRule(
+    'raid',
+    mod.ruleToForm('raid', areas, ui),
+    ui,
+    areas,
+  )
+  assert.deepEqual(keptAreas.override_areas, ['north'])
+})
+
+test('turning pvp on saves the ceiling the slider shows', () => {
+  const base = uis.pokemon
+  const ui = { ...base, defaults: { ...base.defaults, pvp_ranking_worst: 100 } }
+  const original = {
+    pokemon_id: 25,
+    pvp_ranking_league: 0,
+    pvp_ranking_worst: null,
+  }
+  const rule = mod.formToRule(
+    'pokemon',
+    {
+      ...mod.ruleToForm('pokemon', original, ui),
+      pvpEntry: true,
+      pvp_ranking_league: 1500,
+    },
+    ui,
+    original,
+  )
+  assert.equal(rule.pvp_ranking_worst, 100)
+})

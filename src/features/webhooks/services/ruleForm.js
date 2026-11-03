@@ -136,11 +136,33 @@ export function toForm(category, value, ui) {
  */
 export function formToRule(category, form, ui, original) {
   const converted = { ...form }
+  // A rule just switched to PVP has no ceiling of its own to keep.
+  const newPvp =
+    category === 'pokemon' &&
+    form.pvpEntry &&
+    !(original?.pvp_ranking_league > 0)
+  /** @param {string} key */
+  const storedWildcard = (key) =>
+    !newPvp && original?.[key] === null && key in ui.defaults
   collectSliders(ui.ui).forEach(({ low, high, min, max, anyLow, anyHigh }) => {
     if (anyLow && converted[low] === min) converted[low] = null
     if (anyHigh && converted[high] === max) converted[high] = null
+    // A slider without an "any" end shows a stored wildcard as its default;
+    // left there, the wildcard is kept rather than narrowed to that default.
+    if (!anyLow && storedWildcard(low)) {
+      if (converted[low] === (ui.defaults[low] ?? min)) converted[low] = null
+    }
+    if (!anyHigh && storedWildcard(high)) {
+      if (converted[high] === (ui.defaults[high] ?? max)) converted[high] = null
+    }
   })
   if (!form.byDistance) converted.distance = 0
+  // v2 refuses a location label without distance, and areas with distance.
+  if (form.byDistance) {
+    if (original?.override_areas?.length) converted.override_areas = null
+  } else if (original?.override_location_label) {
+    converted.override_location_label = null
+  }
   if ('form' in ui.defaults && form.allForms) converted.form = null
   if ('move' in ui.defaults && form.allMoves) converted.move = null
   if (category === 'pokemon') {

@@ -55,4 +55,10 @@ test('client webhook documents validate against the schema', async () => {
       name,
     )
   })
+  // a failed read must reach useGetWebhookData's error branch
+  const fields = mod.ALL_PROFILES.definitions
+    .find((d) => d.kind === 'OperationDefinition')
+    .selectionSet.selections[0].selectionSet.selections.map((s) => s.name.value)
+  assert.ok(fields.includes('status'), 'ALL_PROFILES selects status')
+  assert.ok(fields.includes('message'), 'ALL_PROFILES selects message')
 })

@@ -125,6 +125,8 @@ export const ALL_PROFILES = gql`
   ${Raid}
   query Webhook($category: String!, $status: String!) {
     webhook(category: $category, status: $status) {
+      status
+      message
       ...PoracleHuman
       ...PoracleEgg
       ...PoracleGym

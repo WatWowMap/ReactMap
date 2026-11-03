@@ -79,7 +79,10 @@ const GLOBAL_IDENTITY = {
   quest: ['form', 'amount'],
   invasion: ['gender'],
 }
-/** Derived from identity fields, so they stay per item too. */
+/**
+ * Derived from identity fields, so they stay per item too (an explicit
+ * All Forms is applied separately in handleClose).
+ */
 const GLOBAL_DERIVED = ['allForms', 'xs', 'xl', 'min_weight', 'max_weight']
 
 /** Switches shown only when the Poracle server supports them. */
@@ -850,6 +853,9 @@ export function WebhookAdvanced() {
             newFilters[item] = {
               ...prev.tempFilters[item],
               ...shared,
+              // An explicit All Forms applies everywhere; unticked, each
+              // tile keeps the form it stands for.
+              ...(filterToSave.allForms && { allForms: true }),
               enabled: true,
             }
           })

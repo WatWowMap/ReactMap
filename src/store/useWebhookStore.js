@@ -229,7 +229,13 @@ export const applyWebhookResult = (category, result) => {
       (data) =>
         data && {
           ...data,
-          webhook: { ...data.webhook, [category]: result[category] },
+          // the list was read fine, whatever happened to the write
+          webhook: {
+            ...data.webhook,
+            status: 'ok',
+            message: null,
+            [category]: result[category],
+          },
         },
     )
   }

@@ -162,7 +162,11 @@ test('v1 adapter: gym team and quest summary', () => {
 /**
  * @param {{ routes?: Record<string, any> }} [opts]
  */
-async function stubPoracle({ routes = {}, spec = null } = {}) {
+async function stubPoracle({
+  routes = {},
+  spec = null,
+  templates = { discord: {}, telegram: {} },
+} = {}) {
   /** @type {{ method: string, url: string, body: any }[]} */
   const requests = []
   const server = http.createServer((req, res) => {
@@ -182,7 +186,7 @@ async function stubPoracle({ routes = {}, spec = null } = {}) {
         return reply(200, { geoJSON: { features: [] } })
       }
       if (url.startsWith('/api/config/templates')) {
-        return reply(200, { discord: {}, telegram: {} })
+        return reply(200, templates)
       }
       requests.push({ method, url, body: raw ? JSON.parse(raw) : undefined })
       const hit = routes[`${method} ${url.split('?')[0]}`]
@@ -599,7 +603,29 @@ test('an unreachable server is a generic error without its URL', async () => {
   assert.equal(result.status, 'error')
   assert.equal(result.message, 'Poracle server unreachable')
   assert.ok(!result.message.includes('127.0.0.1'))
-  assert.deepEqual(result.pokemon, [])
+  // no list: the client keeps the rules it shows instead of clearing them
+  assert.equal(result.pokemon, null)
+})
+
+test('a failed tracking read returns no list', async () => {
+  const stub = await stubPoracle({
+    spec: v2Spec,
+    routes: {
+      'GET /api/v2/humans/123/tracking/raid': {
+        status: 500,
+        body: { title: 'Internal Server Error', detail: 'db down' },
+      },
+    },
+  })
+  try {
+    const api = await initApi(stub.port, 'trk-readerr')
+    const result = await api.api('123', 'raid', 'GET')
+    assert.equal(result.status, 'error')
+    assert.equal(result.message, 'db down')
+    assert.equal(result.raid, null)
+  } finally {
+    await stub.close()
+  }
 })
 
 test('quick gym on v2 posts raid, egg and gym rules', async () => {
@@ -855,4 +881,35 @@ test('generateUi is v2-shaped', () => {
     ui.pokemon.ui.general.selects.find((s) => s.name === 'gender').options,
     [null, 'male', 'female'],
   )
+})
+
+test('incident uses invasion templates on v1 only', async () => {
+  const templates = {
+    discord: { invasion: { '%': ['1', 'gold'] }, incident: { '%': ['1'] } },
+    telegram: { invasion: { '%': ['1'] } },
+  }
+  const ng = await stubPoracle({ spec: v2Spec, templates })
+  const legacy = await stubPoracle({ templates })
+  try {
+    const v2 = await initApi(ng.port, 'tpl-v2')
+    const v1 = await initApi(legacy.port, 'tpl-v1')
+    assert.deepEqual(v2.templates.discord.incident, { '%': ['1'] })
+    assert.equal(v2.templates.telegram.incident, undefined)
+    assert.deepEqual(v1.templates.discord.incident, { '%': ['1', 'gold'] })
+    assert.deepEqual(v1.templates.telegram.incident, { '%': ['1'] })
+  } finally {
+    await Promise.all([ng.close(), legacy.close()])
+  }
+})
+
+test('the invasion switches also hide incidents', () => {
+  const api = new PoracleAPI({ name: 'hooks', host: 'http://x', port: 1 })
+  api.ui = api.generateUi()
+  api.disabledHooks = ['invasion']
+  assert.ok(!api.getAllowedCategories().includes('incident'))
+  api.disabledHooks = []
+  api.v2 = true
+  assert.ok(api.getAllowedCategories(['invasion']).includes('incident'))
+  api.v2 = false
+  assert.ok(!api.getAllowedCategories(['invasion']).includes('incident'))
 })

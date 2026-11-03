@@ -47,10 +47,11 @@ export function useGetWebhookData(category) {
   }, [category, realCategory, refetch, timeout.current])
 
   const filtererData = useMemo(() => {
-    const source = data ?? previousData
+    // A failed read has no list: keep showing the last one.
+    const list = data?.webhook?.[category] ?? previousData?.webhook?.[category]
     return category === 'human' || category === 'profile'
-      ? source?.webhook?.[category]
-      : (source?.webhook?.[category] || []).filter(
+      ? list
+      : (list || []).filter(
           (x) =>
             !search ||
             (x.description

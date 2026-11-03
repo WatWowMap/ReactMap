@@ -232,11 +232,15 @@ class PoracleAPI {
    * @returns
    */
   getAllowedCategories(blockedAlerts = []) {
-    const categories = Object.keys(this.ui).filter(
-      (key) =>
-        !(this.disabledHooks.includes(key) || blockedAlerts?.includes(key)),
-    )
-    return categories
+    // Pokestop events come from the invasion webhook, so its switch covers
+    // them; PoracleJS (v1) also delivers them as invasion alerts.
+    const disabled = (key) =>
+      this.disabledHooks.includes(key) ||
+      (key === 'incident' && this.disabledHooks.includes('invasion'))
+    const blocked = (key) =>
+      blockedAlerts?.includes(key) ||
+      (key === 'incident' && !this.v2 && blockedAlerts?.includes('invasion'))
+    return Object.keys(this.ui).filter((key) => !disabled(key) && !blocked(key))
   }
 
   /**
@@ -339,6 +343,7 @@ class PoracleAPI {
         this.#fetchTemplates(),
         this.#detectApiVersion(),
       ])
+      if (!this.v2) this.#useInvasionTemplatesForIncidents()
       this.#buildTracking()
       this.ui = this.generateUi()
       this.lastFetched = Date.now()
@@ -457,6 +462,14 @@ class PoracleAPI {
         )
       })
     }
+  }
+
+  /** PoracleJS (v1) renders pokestop events with its invasion templates. */
+  #useInvasionTemplatesForIncidents() {
+    PLATFORMS.forEach((platform) => {
+      const list = this.templates[platform]
+      if (list?.invasion) list.incident = list.invasion
+    })
   }
 
   /**
@@ -750,8 +763,9 @@ class PoracleAPI {
         throw e
       }
     }
-    /** @type {Record<string, any>[]} */
-    let rules = []
+    // Stays null when the read fails, so the client keeps the rules it shows.
+    /** @type {Record<string, any>[] | null} */
+    let rules = null
     try {
       rules = await this.#tracking.list(id, category)
     } catch (e) {
@@ -759,7 +773,7 @@ class PoracleAPI {
       message ||= e.message
     }
     const sortBy = this.ui[category]?.sortProp
-    if (sortBy) rules.sort((a, b) => a[sortBy] - b[sortBy])
+    if (sortBy && rules) rules.sort((a, b) => a[sortBy] - b[sortBy])
     if (message !== undefined) {
       log.warn(TAGS.webhooks, `${this.name} ${category} tracking:`, message)
     }
