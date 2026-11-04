@@ -69,6 +69,8 @@ const wildCards = {
   egg: ['e90'],
   gym: ['t4'],
   invasion: ['i0'],
+  // v2 has no "any event" incident: apply to every event tile instead
+  incident: ['gold-stop', 'kecleon', 'showcase'],
 }
 
 /**

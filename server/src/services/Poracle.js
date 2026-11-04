@@ -248,13 +248,16 @@ class PoracleAPI {
    */
   getAllowedCategories(blockedAlerts = []) {
     // Pokestop events come from the invasion webhook, so its switch covers
-    // them; PoracleJS (v1) also delivers them as invasion alerts.
+    // them, and both Poracles match them as invasion alerts: an `invasion`
+    // block (the only one blocked_alerts carries for them) stops them too.
     const disabled = (key) =>
       this.disabledHooks.includes(key) ||
       (key === 'incident' && this.disabledHooks.includes('invasion'))
+    // blocked_alerts uses Poracle's alert names: pokemon alerts are `monster`.
     const blocked = (key) =>
       blockedAlerts?.includes(key) ||
-      (key === 'incident' && !this.v2 && blockedAlerts?.includes('invasion'))
+      (key === 'incident' && blockedAlerts?.includes('invasion')) ||
+      (key === 'pokemon' && blockedAlerts?.includes('monster'))
     return Object.keys(this.ui).filter((key) => !disabled(key) && !blocked(key))
   }
 
@@ -354,12 +357,17 @@ class PoracleAPI {
 
   async init() {
     try {
-      await Promise.all([
-        this.#fetchConfig(),
-        this.#fetchGeojson(),
-        this.#fetchTemplates(),
-        this.#detectApiVersion(),
-      ])
+      // Settle all first: a failed webhook is still used, so none may change
+      // it after init returns (detection would flip v2 under live requests).
+      const failed = (
+        await Promise.allSettled([
+          this.#fetchConfig(),
+          this.#fetchGeojson(),
+          this.#fetchTemplates(),
+          this.#detectApiVersion(),
+        ])
+      ).find((result) => result.status === 'rejected')
+      if (failed) throw failed.reason
       if (!this.v2) this.#useInvasionTemplatesForIncidents()
       this.#buildTracking()
       this.ui = this.generateUi()
@@ -435,6 +443,7 @@ class PoracleAPI {
   async #detectApiVersion() {
     if (this.apiVersion !== 'auto') {
       this.v2 = this.apiVersion === 'v2'
+      this.#buildTracking()
       return
     }
     try {
@@ -453,6 +462,9 @@ class PoracleAPI {
       TAGS.webhooks,
       `[${this.name}] using Poracle API ${this.v2 ? 'v2' : 'v1'}`,
     )
+    // Right away: if another init request fails, the webhook is still used,
+    // and tracking must not stay on the other API version.
+    this.#buildTracking()
   }
 
   async #fetchGeojson() {

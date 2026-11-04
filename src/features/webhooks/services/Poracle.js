@@ -4,7 +4,7 @@ import { t } from 'i18next'
 import { useMemory } from '@store/useMemory'
 import { useWebhookStore } from '@store/useWebhookStore'
 
-import { ruleId } from './ruleForm'
+import { ruleId, sizeSuffix } from './ruleForm'
 
 export class Poracle {
   static getMapCategory(poracleCategory) {
@@ -231,17 +231,7 @@ export class Poracle {
       } | S${item.sta ?? 0}-${item.max_sta ?? 15}${item.clean ? ` | ${t('clean')} ` : ''}${
         item.distance ? ` | d${item.distance}` : ''
       }`
-        }${
-          item.size > 1 || item.max_size < 5
-            ? ` | ${t('size', 'Size')}:${
-                item.size === item.max_size
-                  ? `size:${t(`size_${item.size}`)}`
-                  : `size:${t(`size_${item.size}`)}-${t(
-                      `size_${item.max_size}`,
-                    )}`
-              }`
-            : ''
-        }`
+        }${sizeSuffix(item, t)}`
       default:
         return item.description || ''
     }

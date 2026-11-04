@@ -621,13 +621,14 @@ const resolvers = {
     },
     webhookCategories: async (_, __, { req, perms, Event }) => {
       if (req.user?.id && perms.webhooks.includes(req.user?.selectedWebhook)) {
-        const human = await Event.webhookObj[req.user?.selectedWebhook].api(
+        // api() wraps the human as { human }; on a failed read it has none.
+        const { human } = await Event.webhookObj[req.user?.selectedWebhook].api(
           PoracleAPI.getWebhookId(req.user),
           'oneHuman',
           'GET',
         )
         return Event.webhookObj[req.user?.selectedWebhook].getAllowedCategories(
-          human.blocked_alerts,
+          human?.blocked_alerts,
         )
       }
       return []

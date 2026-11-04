@@ -273,3 +273,20 @@ export function ruleId(category, rule, invasions = {}) {
       return `${rule.pokemon_id ?? 0}-${rule.form ?? 0}`
   }
 }
+
+/**
+ * The size part of a pokemon rule's fallback description. A null bound is the
+ * wildcard (any size), as are the stored sentinels -1 and 5.
+ * @param {{ size?: number | null, max_size?: number | null }} item
+ * @param {(key: string, fallback?: string) => string} t
+ */
+export function sizeSuffix(item, t) {
+  const min = item.size > 0 ? item.size : 1
+  const max = item.max_size ?? 5
+  if (min <= 1 && max >= 5) return ''
+  return ` | ${t('size', 'Size')}:${
+    min === max
+      ? `size:${t(`size_${min}`)}`
+      : `size:${t(`size_${min}`)}-${t(`size_${max}`)}`
+  }`
+}

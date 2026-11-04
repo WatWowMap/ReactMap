@@ -412,3 +412,17 @@ test('an edit keeps the profile of the rule it edits', () => {
   assert.equal(rule.profile_no, 2)
   assert.equal('profile_no' in mod.formToRule('pokemon', form, ui), false)
 })
+
+test('the fallback size label treats null bounds as any size', () => {
+  const t = (key) => key
+  assert.equal(mod.sizeSuffix({ size: null, max_size: null }, t), '')
+  assert.equal(mod.sizeSuffix({ size: -1, max_size: 5 }, t), '')
+  assert.equal(
+    mod.sizeSuffix({ size: 4, max_size: null }, t),
+    ' | size:size:size_4-size_5',
+  )
+  assert.equal(
+    mod.sizeSuffix({ size: null, max_size: 1 }, t),
+    ' | size:size:size_1',
+  )
+})

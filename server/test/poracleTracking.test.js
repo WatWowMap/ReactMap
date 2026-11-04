@@ -174,6 +174,7 @@ async function stubPoracle({
   routes = {},
   spec = null,
   templates = { discord: {}, telegram: {} },
+  config = { version: '9' },
 } = {}) {
   /** @type {{ method: string, url: string, body: any }[]} */
   const requests = []
@@ -189,7 +190,9 @@ async function stubPoracle({
         res.end(JSON.stringify(body))
       }
       if (url === '/openapi.json') return reply(spec ? 200 : 404, spec ?? {})
-      if (url === '/api/config/poracleWeb') return reply(200, { version: '9' })
+      if (url === '/api/config/poracleWeb') {
+        return config ? reply(200, config) : reply(503, {})
+      }
       if (url === '/api/geofence/all/geojson') {
         return reply(200, { geoJSON: { features: [] } })
       }
@@ -995,10 +998,32 @@ test('the invasion switches also hide incidents', () => {
   api.disabledHooks = ['invasion']
   assert.ok(!api.getAllowedCategories().includes('incident'))
   api.disabledHooks = []
-  api.v2 = true
-  assert.ok(api.getAllowedCategories(['invasion']).includes('incident'))
-  api.v2 = false
-  assert.ok(!api.getAllowedCategories(['invasion']).includes('incident'))
+  // both Poracles match incidents as invasion alerts
+  ;[true, false].forEach((v2) => {
+    api.v2 = v2
+    const allowed = api.getAllowedCategories(['invasion', 'monster'])
+    assert.ok(!allowed.includes('incident'))
+    assert.ok(!allowed.includes('invasion'))
+    assert.ok(!allowed.includes('pokemon'))
+    assert.ok(allowed.includes('raid'))
+  })
+})
+
+test('a half-failed init keeps tracking on the detected API version', async () => {
+  const stub = await stubPoracle({ spec: v2Spec, config: null })
+  try {
+    const api = await initApi(stub.port, 'half-init')
+    assert.equal(api.v2, true)
+    await api.api('123', 'pokemon', 'GET')
+    assert.ok(
+      stub.requests.some((r) =>
+        r.url.startsWith('/api/v2/humans/123/tracking/pokemon'),
+      ),
+      JSON.stringify(stub.requests),
+    )
+  } finally {
+    await stub.close()
+  }
 })
 
 /** @param {(() => Promise<any>)[]} attempts */
