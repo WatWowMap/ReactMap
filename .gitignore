@@ -21,6 +21,7 @@ packages/masterfile/lib/data/masterfile.json
 # Favicon
 public/favicon/*
 !public/favicon/fallback.ico
+!public/favicon/fallback-*.png
 
 # Asset Links JSON
 /public/.well-known/assetlinks.json
@@ -90,3 +91,4 @@ server/.cache/*
 
 # Misc
 ts-check.js
+.history
