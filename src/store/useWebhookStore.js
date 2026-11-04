@@ -201,11 +201,7 @@ export const handleClick =
           status: 'POST',
         },
       })
-      .then(({ data }) => {
-        if (data?.webhook?.human) {
-          useWebhookStore.setState({ human: data.webhook.human })
-        }
-      })
+      .then(({ data }) => applyHumanResult(data?.webhook))
     return newAreas
   }
 
@@ -214,6 +210,16 @@ export const showWebhookError = (error) =>
   useWebhookStore.setState({
     alert: { open: true, severity: 'error', message: error?.message },
   })
+
+/**
+ * Shows the human a webhook mutation returned and any error it reported; a
+ * failed request has no human, so the one on screen stays.
+ * @param {Record<string, any> | undefined} result
+ */
+export const applyHumanResult = (result) => {
+  if (result?.human) useWebhookStore.setState({ human: result.human })
+  if (result?.status === 'error') showWebhookError(result)
+}
 
 /**
  * Shows the category list a webhook mutation returned and any error it reported.

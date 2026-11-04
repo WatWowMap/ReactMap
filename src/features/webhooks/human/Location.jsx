@@ -18,7 +18,11 @@ import { WEBHOOK_NOMINATIM } from '@services/queries/geocoder'
 import { useLocation } from '@hooks/useLocation'
 import { Loading } from '@components/Loading'
 import { basicEqualFn } from '@store/useMemory'
-import { setModeBtn, useWebhookStore } from '@store/useWebhookStore'
+import {
+  applyHumanResult,
+  setModeBtn,
+  useWebhookStore,
+} from '@store/useWebhookStore'
 
 import { useSyncData } from '../hooks/useSyncData'
 
@@ -76,11 +80,7 @@ const Location = () => {
           status: 'POST',
         },
       })
-        .then(({ data: newData }) => {
-          if (newData?.webhook) {
-            useWebhookStore.setState({ human: newData.webhook.human })
-          }
-        })
+        .then(({ data: newData }) => applyHumanResult(newData?.webhook))
         .finally(() => {
           // Only clear if a newer save has not already claimed the ref, so an
           // in-flight save can't wipe the marker for the location after it.

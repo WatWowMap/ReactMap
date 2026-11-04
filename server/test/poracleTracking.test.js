@@ -814,6 +814,85 @@ test('v2 profile update sends only typed active hours', async () => {
   }
 })
 
+test('a failed v2 profile read is an error, not an empty list', async () => {
+  const stub = await stubPoracle({
+    spec: v2Spec,
+    routes: {
+      'GET /api/v2/humans/123/profiles': {
+        status: 503,
+        body: { title: 'Service Unavailable', detail: 'db down' },
+      },
+    },
+  })
+  try {
+    const api = await initApi(stub.port, 'trk-profile-503')
+    const result = await api.api('123', 'profiles', 'GET')
+    assert.equal(result.status, 'error')
+    assert.equal(result.message, 'db down')
+    // no list: the client keeps the profiles it shows
+    assert.equal(result.profile, null)
+  } finally {
+    await stub.close()
+  }
+})
+
+test('a failed v2 profile write still returns the current profiles', async () => {
+  const stub = await stubPoracle({
+    spec: v2Spec,
+    routes: {
+      'DELETE /api/v2/humans/123/profiles/2': {
+        status: 409,
+        body: { title: 'Conflict', detail: 'active profile' },
+      },
+      'GET /api/v2/humans/123/profiles': {
+        profiles: [{ uid: 9, profile_no: 2, name: 'home', area: [] }],
+      },
+    },
+  })
+  try {
+    const api = await initApi(stub.port, 'trk-profile-409')
+    const result = await api.api('123', 'profiles-byProfileNo', 'DELETE', 2)
+    assert.equal(result.status, 'error')
+    assert.equal(result.message, 'active profile')
+    assert.deepEqual(
+      result.profile.map((p) => p.profile_no),
+      [2],
+    )
+  } finally {
+    await stub.close()
+  }
+})
+
+test('a failed v2 human request is an error without a human', async () => {
+  const stub = await stubPoracle({
+    spec: v2Spec,
+    routes: {
+      'POST /api/v2/humans/123/enable': {
+        status: 503,
+        body: { title: 'Service Unavailable', detail: 'db down' },
+      },
+      'GET /api/v2/humans/123': {
+        status: 503,
+        body: { title: 'Service Unavailable', detail: 'db down' },
+      },
+    },
+  })
+  try {
+    const api = await initApi(stub.port, 'trk-human-503')
+    const results = await Promise.all([
+      api.api('123', 'start', 'POST'),
+      api.api('123', 'oneHuman', 'GET'),
+    ])
+    results.forEach((result) => {
+      assert.equal(result.status, 'error')
+      assert.equal(result.message, 'db down')
+      assert.equal(result.human, undefined)
+    })
+  } finally {
+    await stub.close()
+  }
+})
+
 test('a cached v2 result does not override a configured apiVersion', () => {
   const name = 'v2-cache-override'
   const file = path.join(__dirname, '../.cache', `${name}-webhook.json`)

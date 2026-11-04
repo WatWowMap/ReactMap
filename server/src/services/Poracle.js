@@ -170,6 +170,9 @@ class PoracleAPI {
   /** @type {ReturnType<typeof createTrackingV2>} */
   #tracking
 
+  /** @type {ReturnType<typeof createPoracleHttp>} */
+  #http
+
   /** @param {import("@rm/types").Config['webhooks'][number]} webhook */
   constructor(webhook) {
     if (!webhook.name)
@@ -325,11 +328,13 @@ class PoracleAPI {
 
   /** Picks the tracking client matching the resolved API version. */
   #buildTracking() {
-    const http = createPoracleHttp({
+    this.#http = createPoracleHttp({
       endpoint: this.endpoint,
       secret: this.secret,
     })
-    this.#tracking = this.v2 ? createTrackingV2(http) : createTrackingV1(http)
+    this.#tracking = this.v2
+      ? createTrackingV2(this.#http)
+      : createTrackingV1(this.#http)
   }
 
   initFromCache() {
@@ -505,22 +510,15 @@ class PoracleAPI {
   }
 
   /**
-   * Like #sendRequest, but only sends a body when one is given: v2 is strict
-   * about bodies (bulk DELETE takes `?uid=` or a body, not both).
+   * A v2 request through the Poracle transport: only sends a body when one is
+   * given (v2 is strict about bodies), and rejects with a PoracleRequestError
+   * on any failure, so an error never reads as an empty result.
    * @param {string} path
    * @param {Method} [method]
    * @param {any} [body]
    */
   async #sendV2(path, method = 'GET', body = undefined) {
-    return fetchJson(`${this.endpoint}${path}`, {
-      method,
-      headers: {
-        'X-Poracle-Secret': this.secret,
-        Accept: 'application/json',
-        ...(body === undefined ? {} : { 'Content-Type': 'application/json' }),
-      },
-      body: body === undefined ? undefined : JSON.stringify(body),
-    })
+    return this.#http.request(path, { method, body })
   }
 
   /**
@@ -838,6 +836,27 @@ class PoracleAPI {
     if (TRACKING_CATEGORIES.has(main)) {
       return this.#trackingApi(userId, main, action, method, data)
     }
+    if (main === 'profile' || main === 'profiles') {
+      return this.#profileManagementV2(userId, action, method, data)
+    }
+    try {
+      return await this.#humanApiV2(userId, category, main, data)
+    } catch (e) {
+      if (!(e instanceof PoracleRequestError)) throw e
+      log.warn(TAGS.webhooks, `${this.name} ${category}:`, e.message)
+      // No human in the result: the client keeps the one it shows.
+      return { status: 'error', message: e.message }
+    }
+  }
+
+  /**
+   * The v2 human actions of #apiV2.
+   * @param {string | number} userId
+   * @param {APIInput} category
+   * @param {Category} main
+   * @param {any} data
+   */
+  async #humanApiV2(userId, category, main, data) {
     switch (main) {
       case 'start':
       case 'stop':
@@ -869,9 +888,6 @@ class PoracleAPI {
         return this.#sendRequest(APIS.areaSecurity(userId))
       case 'humans':
         return this.#sendV2(V2.action(userId, 'areas'))
-      case 'profile':
-      case 'profiles':
-        return this.#profileManagementV2(userId, action, method, data)
       case 'quickGym':
         return this.#quickGym(userId, data)
       case 'human':
@@ -889,6 +905,42 @@ class PoracleAPI {
    * @param {any} data
    */
   async #profileManagementV2(userId, action, method, data) {
+    /** @type {string | undefined} */
+    let message
+    try {
+      await this.#profileWriteV2(userId, action, method, data)
+    } catch (e) {
+      if (!(e instanceof PoracleRequestError)) throw e
+      message = e.message
+    }
+    // Stays null when the read fails, so the client keeps the profiles it shows.
+    /** @type {import("@rm/types").PoracleProfile[] | null} */
+    let profile = null
+    try {
+      const { profiles } = await this.#sendV2(V2.profiles(userId))
+      profile = PoracleAPI.#processProfiles(
+        (profiles || []).map((p) => ({
+          ...p,
+          active_hours: fromV2ActiveHours(p.active_hours),
+        })),
+      )
+    } catch (e) {
+      if (!(e instanceof PoracleRequestError)) throw e
+      message ||= e.message
+    }
+    if (message === undefined) return { status: 'ok', profile }
+    log.warn(TAGS.webhooks, `${this.name} profiles:`, message)
+    return { status: 'error', message, profile }
+  }
+
+  /**
+   * The write half of a v2 profile action; a plain read writes nothing.
+   * @param {string | number} userId
+   * @param {Action | undefined} action
+   * @param {Method} method
+   * @param {any} data
+   */
+  async #profileWriteV2(userId, action, method, data) {
     switch (action) {
       case 'add':
         await this.#sendV2(V2.profiles(userId), 'POST', {
@@ -922,15 +974,6 @@ class PoracleAPI {
         )
         break
       default:
-    }
-    const { profiles } = await this.#sendV2(V2.profiles(userId))
-    return {
-      profile: PoracleAPI.#processProfiles(
-        (profiles || []).map((profile) => ({
-          ...profile,
-          active_hours: fromV2ActiveHours(profile.active_hours),
-        })),
-      ),
     }
   }
 
