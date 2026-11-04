@@ -403,3 +403,12 @@ test('the apply-to-all preset starts without All Forms', () => {
     assert.equal(preset.profile_no, 1, category)
   })
 })
+
+test('an edit keeps the profile of the rule it edits', () => {
+  const ui = uis.pokemon
+  const original = { uid: 7, pokemon_id: 25, profile_no: 2 }
+  const form = { ...mod.ruleToForm('pokemon', original, ui), profile_no: 3 }
+  const rule = mod.formToRule('pokemon', form, ui, original)
+  assert.equal(rule.profile_no, 2)
+  assert.equal('profile_no' in mod.formToRule('pokemon', form, ui), false)
+})

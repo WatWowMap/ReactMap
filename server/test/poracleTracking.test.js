@@ -143,6 +143,14 @@ test('v1 round trip keeps NG-only fields', () => {
   })
 })
 
+test('v1 edits keep the profile the rule was read from', () => {
+  const rule = fromV1Row('pokemon', { uid: 1, pokemon_id: 25, profile_no: 2 })
+  assert.equal(rule.profile_no, 2)
+  assert.equal(toV1Row('pokemon', rule).profile_no, 2)
+  // a new rule has none, so Poracle files it under the active profile
+  assert.equal('profile_no' in toV1Row('pokemon', { pokemon_id: 25 }), false)
+})
+
 test('v1 adapter: gym team and quest summary', () => {
   assert.partialDeepStrictEqual(
     toV1Row('gym', { team: 'any', slot_changes: true }),

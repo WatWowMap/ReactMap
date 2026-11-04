@@ -316,6 +316,10 @@ function toV1Row(category, rule) {
   /** @type {Record<string, any>} */
   const row = {}
   if (rule.uid !== undefined) row.uid = rule.uid
+  // An edit names its profile: v1 updates a pokemon row by uid and files a
+  // missing profile_no under the active profile, which moves the rule if the
+  // profile was switched (schedule, bot command) while it was being edited.
+  if (Number.isInteger(rule.profile_no)) row.profile_no = rule.profile_no
   if (category === 'incident') incidentToV1(rule, row)
   else copyToV1(rule, FIELDS[category] || {}, row)
   if (category === 'raid') raidToV1(rule, row)
@@ -337,6 +341,8 @@ function fromV1Row(category, row) {
   const rule = {}
   if (row.uid !== undefined) rule.uid = row.uid
   if (row.description !== undefined) rule.description = row.description
+  const profileNo = toInt(row.profile_no)
+  if (profileNo !== null && profileNo !== undefined) rule.profile_no = profileNo
   if (category === 'incident') {
     rule.display_type = EVENT_DISPLAY_TYPES[row.grunt_type] ?? null
   } else {
