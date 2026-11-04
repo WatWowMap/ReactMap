@@ -1,0 +1,32 @@
+# VCS / CI
+.git
+.github
+.husky
+
+# Dependencies & build output (rebuilt inside the image)
+node_modules
+**/node_modules
+dist
+dist-*
+
+# Local runtime state & secrets (mount these instead)
+.env
+config/local.json
+config/areas.json
+server/src/configs/**
+!server/src/configs/.gitkeep
+server/.cache/**
+!server/.cache/.gitkeep
+logs/**
+!logs/.gitkeep
+.eslintcache
+
+# Docs & editor files
+docs
+*.md
+.idea
+.vscode
+.DS_Store
+docker-compose*.yml
+Dockerfile
+.dockerignore

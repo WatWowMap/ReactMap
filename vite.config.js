@@ -4,7 +4,6 @@
 
 const { defineConfig, loadEnv, createLogger } = require('vite')
 const { default: react } = require('@vitejs/plugin-react-swc')
-const { default: checker } = require('vite-plugin-checker')
 const removeFiles = require('rollup-plugin-delete')
 const { resolve } = require('path')
 const fs = require('fs')
@@ -74,7 +73,7 @@ const viteConfig = defineConfig(({ mode }) => {
       react(),
       ...(isDevelopment
         ? [
-            checker({
+            require('vite-plugin-checker').default({
               overlay: {
                 initialIsOpen: false,
               },
@@ -94,6 +93,14 @@ const viteConfig = defineConfig(({ mode }) => {
               org: sentry.org,
               project: sentry.project,
               authToken: sentry.authToken,
+              // Docker images have no git, so fall back to the baked GIT_SHA
+              // (the plugin would otherwise run `git rev-parse HEAD`)
+              release: {
+                name:
+                  process.env.SENTRY_RELEASE ||
+                  process.env.GIT_SHA ||
+                  undefined,
+              },
             }),
           ]
         : []),
