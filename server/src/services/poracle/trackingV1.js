@@ -49,15 +49,16 @@ function createTrackingV1(http) {
     },
 
     /**
+     * v1 deletes by uid within the human, whatever the profile.
      * @param {string} userId
      * @param {string} category
-     * @param {number[]} uids
+     * @param {{ uid: number | string }[]} targets
      */
-    async remove(userId, category, uids) {
-      if (!uids.length) return
+    async remove(userId, category, targets) {
+      if (!targets.length) return
       await http.request(`${base(userId, category)}/delete`, {
         method: 'POST',
-        body: uids,
+        body: targets.map((target) => target.uid),
       })
     },
   }

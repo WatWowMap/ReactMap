@@ -40,6 +40,9 @@ function errorMessage(parsed, response) {
   if (typeof parsed?.message === 'string' && parsed.message) {
     return parsed.message
   }
+  if (typeof parsed?.reason === 'string' && parsed.reason) {
+    return parsed.reason
+  }
   return parsed?.title || `${response.status} ${response.statusText}`
 }
 
@@ -95,8 +98,12 @@ function createPoracleHttp({ endpoint, secret }) {
         } catch {
           parsed = {}
         }
-        // PoracleJS also reports some failures as 200 { status: 'error' }.
-        if (!response.ok || parsed?.status === 'error') {
+        // PoracleJS also reports failures with a 200: { status: 'error' },
+        // { status: 'authError' } for the secret and { webserver: 'unhappy' }
+        // for its IP lists, the last two with a `reason`.
+        const rejected =
+          parsed?.status === 'authError' || parsed?.webserver === 'unhappy'
+        if (!response.ok || parsed?.status === 'error' || rejected) {
           throw new PoracleRequestError(
             errorMessage(parsed, response),
             response.status,

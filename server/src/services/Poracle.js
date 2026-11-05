@@ -761,9 +761,15 @@ class PoracleAPI {
     const id = String(userId)
     return this.#runTracking(id, category, async () => {
       if (action === 'delete') {
-        await this.#tracking.remove(id, category, data || [])
+        await this.#tracking.remove(
+          id,
+          category,
+          (Array.isArray(data) ? data : []).map(PoracleAPI.#deleteTarget),
+        )
       } else if (method === 'DELETE') {
-        await this.#tracking.remove(id, category, [data.uid])
+        await this.#tracking.remove(id, category, [
+          PoracleAPI.#deleteTarget(data),
+        ])
       } else if (method === 'POST') {
         await this.#tracking.save(
           id,
@@ -772,6 +778,18 @@ class PoracleAPI {
         )
       }
     })
+  }
+
+  /**
+   * A rule to delete: its uid, and the profile it was read from when known.
+   * Older clients send bare uids.
+   * @param {any} item
+   * @returns {{ uid: any, profile_no?: number | null }}
+   */
+  static #deleteTarget(item) {
+    return item !== null && typeof item === 'object'
+      ? { uid: item.uid, profile_no: item.profile_no }
+      : { uid: item }
   }
 
   /**

@@ -31,12 +31,19 @@ export function Selecting() {
 
   const deleteAll = () => {
     const { category } = useWebhookStore.getState()
+    const rules = useWebhookStore.getState()[category] || []
     apolloClient
       .mutate({
         mutation: webhookNodes[category.toUpperCase()],
         variables: {
           category: `${category}-delete`,
-          data: Object.keys(selected).filter((x) => selected[x]),
+          // each with the profile it was read from: v2 deletes within it
+          data: Object.keys(selected)
+            .filter((uid) => selected[uid])
+            .map((uid) => {
+              const rule = rules.find((r) => String(r.uid) === uid)
+              return rule ? { uid: rule.uid, profile_no: rule.profile_no } : uid
+            }),
           status: 'POST',
         },
         refetchQueries: [webhookNodes.ALL_PROFILES],

@@ -114,7 +114,8 @@ export function TrackedTile({ index }) {
                 mutation: webhookNodes[category.toUpperCase()],
                 variables: {
                   category,
-                  data: { uid: item.uid },
+                  // the profile it was read from: v2 deletes within it
+                  data: { uid: item.uid, profile_no: item.profile_no },
                   status: 'DELETE',
                 },
               })

@@ -230,16 +230,66 @@ async function stubPoracle({
   }
 }
 
-test('v2 list asks for descriptions and returns rules untouched', async () => {
+test('v2 list reads the active profile and tags its rules with it', async () => {
   const rules = [{ uid: 1, display_type: 9, description: 'Showcase' }]
   const stub = await stubPoracle({
-    routes: { 'GET /api/v2/humans/123/tracking/incident': { rules } },
+    routes: {
+      'GET /api/v2/humans/123': { human: { current_profile_no: 2 } },
+      'GET /api/v2/humans/123/tracking/incident': { rules },
+    },
   })
   try {
-    assert.deepEqual(await stub.client.list('123', 'incident'), rules)
+    assert.deepEqual(await stub.client.list('123', 'incident'), [
+      { ...rules[0], profile_no: 2 },
+    ])
     assert.equal(
-      stub.requests[0].url,
-      '/api/v2/humans/123/tracking/incident?include_descriptions=true',
+      stub.requests[1].url,
+      '/api/v2/humans/123/tracking/incident?include_descriptions=true&profile=2',
+    )
+  } finally {
+    await stub.close()
+  }
+})
+
+test('v2 edits and deletes name the profile the rule was read from', async () => {
+  const stub = await stubPoracle({
+    routes: {
+      'DELETE /api/v2/humans/123/tracking/raid': {
+        deleted: [{ uid: 4 }, { uid: 5 }],
+      },
+    },
+  })
+  try {
+    await stub.client.save('123', 'raid', [{ uid: 4, profile_no: 1, level: 5 }])
+    await stub.client.remove('123', 'raid', [
+      { uid: 4, profile_no: 1 },
+      { uid: 5, profile_no: 1 },
+    ])
+    assert.deepEqual(
+      stub.requests.map((r) => [r.method, r.url, r.body]),
+      [
+        ['PUT', '/api/v2/humans/123/tracking/raid/4?profile=1', { level: 5 }],
+        [
+          'DELETE',
+          '/api/v2/humans/123/tracking/raid?uid=4,5&profile=1',
+          undefined,
+        ],
+      ],
+    )
+  } finally {
+    await stub.close()
+  }
+})
+
+test('a v2 delete that removes nothing is an error', async () => {
+  // v2 skips a uid it doesn't find in the profile and still answers 200
+  const stub = await stubPoracle({
+    routes: { 'DELETE /api/v2/humans/123/tracking/raid': { deleted: [] } },
+  })
+  try {
+    await assert.rejects(
+      stub.client.remove('123', 'raid', [{ uid: 4, profile_no: 1 }]),
+      (e) => e instanceof PoracleRequestError && e.status === 404,
     )
   } finally {
     await stub.close()
@@ -297,11 +347,17 @@ test('v2 invasion edit keeps only grunt_type', async () => {
 })
 
 test('v2 remove is one bulk delete without a body', async () => {
-  const stub = await stubPoracle()
+  const stub = await stubPoracle({
+    routes: {
+      'DELETE /api/v2/humans/123/tracking/raid': {
+        deleted: [{ uid: 4 }, { uid: 5 }],
+      },
+    },
+  })
   try {
     await stub.client.remove('123', 'raid', [])
     assert.equal(stub.requests.length, 0)
-    await stub.client.remove('123', 'raid', [4, 5])
+    await stub.client.remove('123', 'raid', [{ uid: 4 }, { uid: 5 }])
     assert.deepEqual(stub.requests, [
       {
         method: 'DELETE',
@@ -410,6 +466,37 @@ test('v1 list surfaces a 200 status error', async () => {
   }
 })
 
+test('PoracleJS auth and IP rejections are errors with their reason', async () => {
+  const stub = await stubPoracle({
+    routes: {
+      'GET /api/tracking/raid/123': {
+        status: 'authError',
+        reason: 'incorrect or missing api secret',
+      },
+      'POST /api/tracking/raid/123': {
+        webserver: 'unhappy',
+        reason: 'ip 1.2.3.4 not in whitelist',
+      },
+    },
+  })
+  try {
+    await assert.rejects(
+      stub.v1.list('123', 'raid'),
+      (e) =>
+        e instanceof PoracleRequestError &&
+        e.message === 'incorrect or missing api secret',
+    )
+    await assert.rejects(
+      stub.v1.save('123', 'raid', [{ level: 5 }]),
+      (e) =>
+        e instanceof PoracleRequestError &&
+        e.message === 'ip 1.2.3.4 not in whitelist',
+    )
+  } finally {
+    await stub.close()
+  }
+})
+
 test('v1 list splits incidents from invasions', async () => {
   const stub = await stubPoracle({
     routes: {
@@ -484,7 +571,7 @@ test('v1 save rejects unsupported before sending', async () => {
 test('v1 remove', async () => {
   const stub = await stubPoracle()
   try {
-    await stub.v1.remove('123', 'incident', [2])
+    await stub.v1.remove('123', 'incident', [{ uid: 2, profile_no: 1 }])
     assert.equal(stub.requests[0].method, 'POST')
     assert.equal(stub.requests[0].url, '/api/tracking/invasion/123/delete')
     assert.deepEqual(stub.requests[0].body, [2])
