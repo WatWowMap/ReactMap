@@ -13,7 +13,7 @@ import {
   WEBHOOK_USER,
   ALL_PROFILES,
 } from '@services/queries/webhook'
-import { useWebhookStore } from '@store/useWebhookStore'
+import { applyHumanResult, useWebhookStore } from '@store/useWebhookStore'
 import { FCSelect } from '@components/inputs/FCSelect'
 
 import { useGetWebhookData } from '../../hooks/useGetWebhookData'
@@ -47,10 +47,8 @@ export function HookSelection() {
       label={t('select_webhook')}
       value={selected}
       onChange={(e) => {
-        save({ variables: { webhook: e.target.value } }).then(
-          ({ data }) =>
-            data?.webhook?.human &&
-            useWebhookStore.setState({ human: data.webhook.human }),
+        save({ variables: { webhook: e.target.value } }).then(({ data }) =>
+          applyHumanResult(data?.webhookChange),
         )
       }}
       fcSx={{ m: 1, width: '90%' }}

@@ -607,27 +607,6 @@ const resolvers = {
           category,
           status,
         )
-        if (category === 'pokemon' && result.pokemon) {
-          result.pokemon = result.pokemon.map((x) => ({
-            ...x,
-            allForms: !x.form,
-            pvpEntry: !!x.pvp_ranking_league,
-            xs: x.max_weight !== 9000000,
-            xl: x.min_weight !== 0,
-          }))
-        }
-        if (category === 'invasion' && result.invasion) {
-          result.invasion = result.invasion.map((x) => ({
-            ...x,
-            real_grunt_id: PoracleAPI.getRealGruntId(x, Event.invasions),
-          }))
-        }
-        if (category === 'raid' && result.raid) {
-          result.raid = result.raid.map((x) => ({
-            ...x,
-            allMoves: x.move === 9000,
-          }))
-        }
         return result
       }
       return {}
@@ -642,13 +621,14 @@ const resolvers = {
     },
     webhookCategories: async (_, __, { req, perms, Event }) => {
       if (req.user?.id && perms.webhooks.includes(req.user?.selectedWebhook)) {
-        const human = await Event.webhookObj[req.user?.selectedWebhook].api(
+        // api() wraps the human as { human }; on a failed read it has none.
+        const { human } = await Event.webhookObj[req.user?.selectedWebhook].api(
           PoracleAPI.getWebhookId(req.user),
           'oneHuman',
           'GET',
         )
         return Event.webhookObj[req.user?.selectedWebhook].getAllowedCategories(
-          human.blocked_alerts,
+          human?.blocked_alerts,
         )
       }
       return []
@@ -772,27 +752,6 @@ const resolvers = {
           status,
           data,
         )
-        if (category === 'pokemon' && result.pokemon) {
-          result.pokemon = result.pokemon.map((x) => ({
-            ...x,
-            allForms: !x.form,
-            pvpEntry: !!x.pvp_ranking_league,
-            xs: x.max_weight !== 9000000,
-            xl: x.min_weight !== 0,
-          }))
-        }
-        if (category === 'invasion' && result.invasion) {
-          result.invasion = result.invasion.map((x) => ({
-            ...x,
-            real_grunt_id: PoracleAPI.getRealGruntId(x, Event.invasions),
-          }))
-        }
-        if (category === 'raid' && result.raid) {
-          result.raid = result.raid.map((x) => ({
-            ...x,
-            allMoves: x.move === 9000,
-          }))
-        }
         return result
       }
       return {}

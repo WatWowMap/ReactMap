@@ -6,7 +6,7 @@ import { useMutation } from '@apollo/client'
 import { useTranslation } from 'react-i18next'
 
 import { SET_HUMAN } from '@services/queries/webhook'
-import { useWebhookStore } from '@store/useWebhookStore'
+import { applyHumanResult, useWebhookStore } from '@store/useWebhookStore'
 
 export function EnableSwitch() {
   const { t } = useTranslation()
@@ -26,9 +26,7 @@ export function EnableSwitch() {
                 category: enabled ? 'stop' : 'start',
                 status: 'POST',
               },
-            }).then(({ data }) =>
-              useWebhookStore.setState({ human: data.webhook.human }),
-            )
+            }).then(({ data }) => applyHumanResult(data?.webhook))
           }}
         />
       }

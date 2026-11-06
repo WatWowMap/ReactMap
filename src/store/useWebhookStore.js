@@ -1,6 +1,10 @@
 // @ts-check
 import { apolloClient } from '@services/apollo'
-import { SET_HUMAN, WEBHOOK_AREAS } from '@services/queries/webhook'
+import {
+  ALL_PROFILES,
+  SET_HUMAN,
+  WEBHOOK_AREAS,
+} from '@services/queries/webhook'
 import { create } from 'zustand'
 
 /**
@@ -21,6 +25,7 @@ import { create } from 'zustand'
  *  raid: import("@rm/types").PoracleRaid[]
  *  egg: import("@rm/types").PoracleEgg[]
  *  invasion: import("@rm/types").PoracleInvasion[]
+ *  incident: import("@rm/types").PoracleIncident[]
  *  lure: import("@rm/types").PoracleLure[]
  *  nest: import("@rm/types").PoracleNest[]
  *  quest: import("@rm/types").PoracleQuest[]
@@ -196,10 +201,49 @@ export const handleClick =
           status: 'POST',
         },
       })
-      .then(({ data }) => {
-        if (data?.webhook?.human) {
-          useWebhookStore.setState({ human: data.webhook.human })
-        }
-      })
+      .then(({ data }) => applyHumanResult(data?.webhook))
     return newAreas
   }
+
+/** @param {{ message?: string }} error */
+export const showWebhookError = (error) =>
+  useWebhookStore.setState({
+    alert: { open: true, severity: 'error', message: error?.message },
+  })
+
+/**
+ * Shows the human a webhook mutation returned and any error it reported; a
+ * failed request has no human, so the one on screen stays.
+ * @param {Record<string, any> | undefined} result
+ */
+export const applyHumanResult = (result) => {
+  if (result?.human) useWebhookStore.setState({ human: result.human })
+  if (result?.status === 'error') showWebhookError(result)
+}
+
+/**
+ * Shows the category list a webhook mutation returned and any error it reported.
+ * The list goes into the tracked query's cache, so `useGetWebhookData` applies
+ * the active search and the list and its tiles stay on the same rules.
+ * @param {string} category
+ * @param {Record<string, any> | undefined} result
+ */
+export const applyWebhookResult = (category, result) => {
+  if (Array.isArray(result?.[category])) {
+    apolloClient.cache.updateQuery(
+      { query: ALL_PROFILES, variables: { category, status: 'GET' } },
+      (data) =>
+        data && {
+          ...data,
+          // the list was read fine, whatever happened to the write
+          webhook: {
+            ...data.webhook,
+            status: 'ok',
+            message: null,
+            [category]: result[category],
+          },
+        },
+    )
+  }
+  if (result?.status === 'error') showWebhookError(result)
+}

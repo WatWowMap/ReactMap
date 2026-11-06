@@ -1,12 +1,16 @@
 // @ts-check
-import { useWebhookStore } from '@store/useWebhookStore'
+import { showWebhookError, useWebhookStore } from '@store/useWebhookStore'
 
 /**
- * @param {{ data: { webhook: { profile: import("@rm/types").PoracleProfile[]} } }} params
+ * Applies a profile mutation result. A failed read has no list, so the
+ * profiles on screen stay; an error is shown either way.
+ * @param {{ data?: { webhook?: { status?: string, message?: string, profile?: import("@rm/types").PoracleProfile[] | null } } }} params
  */
 export function handleUpdate({ data }) {
+  const result = data?.webhook
   useWebhookStore.setState({
     profileLoading: null,
-    profile: data.webhook.profile,
+    ...(Array.isArray(result?.profile) && { profile: result.profile }),
   })
+  if (result?.status === 'error') showWebhookError(result)
 }
