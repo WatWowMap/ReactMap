@@ -205,6 +205,7 @@ async function stubPoracle({
       res.writeHead(isCustom ? hit.status : 200, {
         'Content-Type': 'application/json',
       })
+      if (isCustom && typeof hit.raw === 'string') return res.end(hit.raw)
       res.end(JSON.stringify(isCustom ? hit.body : (hit ?? {})))
     })
   })
@@ -460,6 +461,49 @@ test('v1 list surfaces a 200 status error', async () => {
         e instanceof PoracleRequestError &&
         e.status === 200 &&
         e.message === 'User not found',
+    )
+  } finally {
+    await stub.close()
+  }
+})
+
+test('a 200 without a JSON object is an error, not an empty result', async () => {
+  const stub = await stubPoracle({
+    routes: {
+      'GET /api/tracking/raid/123': {
+        status: 200,
+        raw: '<html><body>Login</body></html>',
+      },
+      'POST /api/tracking/raid/123': { status: 200, raw: '' },
+      'GET /api/v2/humans/123': { status: 200, raw: 'null' },
+    },
+  })
+  try {
+    const invalid = (e) =>
+      e instanceof PoracleRequestError &&
+      e.status === 502 &&
+      e.message === 'Poracle returned an invalid response'
+    await assert.rejects(stub.v1.list('123', 'raid'), invalid)
+    await assert.rejects(stub.v1.save('123', 'raid', [{ level: 5 }]), invalid)
+    await assert.rejects(stub.client.list('123', 'raid'), invalid)
+  } finally {
+    await stub.close()
+  }
+})
+
+test('an error status with a non-JSON body keeps its status', async () => {
+  const stub = await stubPoracle({
+    routes: {
+      'GET /api/tracking/raid/123': {
+        status: 502,
+        raw: '<html>Bad Gateway</html>',
+      },
+    },
+  })
+  try {
+    await assert.rejects(
+      stub.v1.list('123', 'raid'),
+      (e) => e instanceof PoracleRequestError && e.status === 502,
     )
   } finally {
     await stub.close()

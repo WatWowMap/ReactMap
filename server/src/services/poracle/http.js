@@ -92,10 +92,26 @@ function createPoracleHttp({ endpoint, secret }) {
           )
         }
         /** @type {any} */
-        let parsed = {}
+        let parsed = null
         try {
-          parsed = text ? JSON.parse(text) : {}
+          parsed = text ? JSON.parse(text) : null
         } catch {
+          parsed = null
+        }
+        if (parsed === null || typeof parsed !== 'object') {
+          // A success without a JSON object is not a Poracle answer (an HTML
+          // login page from a proxy, say): an empty result would clear the
+          // rules on screen and report a write that never happened.
+          if (response.ok) {
+            log.warn(
+              TAGS.webhooks,
+              `Poracle ${method} ${path} returned a non-JSON body`,
+            )
+            throw new PoracleRequestError(
+              'Poracle returned an invalid response',
+              502,
+            )
+          }
           parsed = {}
         }
         // PoracleJS also reports failures with a 200: { status: 'error' },
