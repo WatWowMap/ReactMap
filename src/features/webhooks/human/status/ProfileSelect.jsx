@@ -6,7 +6,7 @@ import { useMutation, useQuery } from '@apollo/client'
 import { useTranslation } from 'react-i18next'
 
 import { ALL_PROFILES, SET_HUMAN } from '@services/queries/webhook'
-import { useWebhookStore } from '@store/useWebhookStore'
+import { applyHumanResult, useWebhookStore } from '@store/useWebhookStore'
 import { FCSelect } from '@components/inputs/FCSelect'
 
 /** @type {React.CSSProperties} */
@@ -45,11 +45,7 @@ export function ProfileSelect() {
           status: 'POST',
           data: +event.target.value || currentProfile,
         },
-      }).then(({ data }) => {
-        if (data.webhook.human) {
-          useWebhookStore.setState({ human: data.webhook.human })
-        }
-      })
+      }).then(({ data }) => applyHumanResult(data?.webhook))
     },
     [currentProfile],
   )

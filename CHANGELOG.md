@@ -1,3 +1,10 @@
+# [1.58.0](https://github.com/WatWowMap/ReactMap/compare/v1.57.1...v1.58.0) (2026-11-10)
+
+
+### Features
+
+* **webhooks:** native PoracleNG v2 tracking rules, v1 via adapter ([#1273](https://github.com/WatWowMap/ReactMap/issues/1273)) ([d685632](https://github.com/WatWowMap/ReactMap/commit/d6856326ae1127b45dedcfb8121a533a9c3e0bda))
+
 ## [1.57.1](https://github.com/WatWowMap/ReactMap/compare/v1.57.0...v1.57.1) (2026-11-02)
 
 

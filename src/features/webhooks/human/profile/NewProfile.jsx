@@ -10,6 +10,8 @@ import { useMutation } from '@apollo/client'
 import { ALL_PROFILES, SET_PROFILE } from '@services/queries/webhook'
 import { useWebhookStore } from '@store/useWebhookStore'
 
+import { handleUpdate } from './handleUpdate'
+
 export const NewProfile = () => {
   const { t } = useTranslation()
   const [save] = useMutation(SET_PROFILE, {
@@ -29,7 +31,7 @@ export const NewProfile = () => {
         data: { name: newProfile },
         status: 'POST',
       },
-    })
+    }).then(handleUpdate)
   }, [newProfile, save])
 
   /** @type {React.FormEventHandler<HTMLFormElement>} */
