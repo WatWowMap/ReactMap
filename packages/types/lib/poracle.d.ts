@@ -27,6 +27,10 @@ export interface PoracleActiveHours {
   day: number
   hours: string
   mins: string
+  /** Hours between repeats; set (> 0) on a range entry. */
+  step?: number
+  end_hours?: number
+  end_mins?: number
 }
 
 export interface PoracleProfile<Parsed extends boolean = true> {
@@ -40,177 +44,37 @@ export interface PoracleProfile<Parsed extends boolean = true> {
   name: string
 }
 
-export interface PoracleGym {
-  uid: number
-  id: string
-  profile_no: number
-  ping: string
-  clean: boolean
-  distance: number
-  template: string
-  team: number
-  slot_changes: number
-  gym_id: string
-  description: string
+/** A tracking rule as PoracleNG v2 returns it (`null` = any). */
+export type PoracleRule = {
+  uid?: number
   description?: string
-}
+} & Record<string, unknown>
 
-export interface PoracleRaid {
-  uid: number
-  id: string
-  profile_no: number
-  ping: string
-  exclusive: boolean
-  level: number
-  clean: boolean
-  distance: number
-  template: string
-  team: number
-  rsvp_changes: number
-  gym_id: string
-  form: number
-  move: number
-  pokemon_id: number
-  description: string
-}
-
-export interface PoracleEgg {
-  uid: number
-  id: string
-  profile_no: number
-  ping: string
-  exclusive: boolean
-  level: number
-  clean: boolean
-  distance: number
-  template: string
-  team: number
-  rsvp_changes: number
-  gym_id: string
-  description: string
-}
-
-export interface PoracleInvasion {
-  uid: number
-  id: string
-  profile_no: number
-  ping: string
-  clean: boolean
-  gender: number
-  grunt_type: string
-  template: string
-  distance: number
-  description: string
-  real_grunt_id?: number
-}
-
-export interface PoraclePokemon {
-  uid: number
-  id: string
-  ping: string
-  clean: boolean
-  pokemon_id: number
-  distance: number
-  min_iv: number
-  max_iv: number
-  min_cp: number
-  max_cp: number
-  min_level: number
-  max_level: number
-  atk: number
-  def: number
-  sta: number
-  template: string
-  min_weight: number
-  max_weight: number
-  form: number
-  max_atk: number
-  max_def: number
-  max_sta: number
-  gender: number
-  profile_no: number
-  min_time: number
-  rarity: number
-  max_rarity: number
-  size: number
-  max_size: number
-  pvp_ranking_worst: number
-  pvp_ranking_best: number
-  pvp_ranking_min_cp: number
-  pvp_ranking_league: number
-  pvp_ranking_cap: number
-  description: string
-}
-
-export interface PoracleLure {
-  uid: number
-  id: string
-  profile_no: number
-  ping: string
-  clean: boolean
-  lure_id: number
-  template: string
-  distance: number
-  description: string
-}
-
-export interface PoracleQuest {
-  uid: number
-  id: string
-  profile_no: number
-  ping: string
-  clean: boolean
-  template: string
-  distance: number
-  amount: number
-  form: number
-  reward: number
-  reward_type: number
-  shiny: boolean
-  description: string
-}
-
-export interface PoracleNest {
-  uid: number
-  id: string
-  profile_no: number
-  ping: string
-  clean: boolean
-  template: string
-  distance: number
-  min_spawn_avg: number
-  pokemon_id: number
-  form: number
-  description?: string
-}
-
-export interface PoracleWeather {
-  uid: number
-  id: string
-  profile_no: number
-  ping: string
-  clean: boolean
-  template: string
-  cell: number
-  condition: number
-  description: string
-}
+export type PoracleGym = PoracleRule
+export type PoracleRaid = PoracleRule
+export type PoracleEgg = PoracleRule
+export type PoracleInvasion = PoracleRule
+export type PoracleIncident = PoracleRule
+export type PoraclePokemon = PoracleRule
+export type PoracleLure = PoracleRule
+export type PoracleQuest = PoracleRule
+export type PoracleNest = PoracleRule
 
 export interface Poracle {
   status: string
   message: string
   category: string
   human: PoracleHuman
-  gym: PoracleGym[]
-  egg: PoracleEgg[]
-  raid: PoracleRaid[]
-  pokemon: PoraclePokemon[]
-  invasion: PoracleInvasion[]
-  lure: PoracleLure[]
-  quest: PoracleQuest[]
   profile: PoracleProfile[]
-  nest: PoracleNest[]
-  weather: PoracleWeather[]
+  pokemon: PoracleRule[]
+  raid: PoracleRule[]
+  egg: PoracleRule[]
+  quest: PoracleRule[]
+  invasion: PoracleRule[]
+  incident: PoracleRule[]
+  lure: PoracleRule[]
+  nest: PoracleRule[]
+  gym: PoracleRule[]
 }
 
 export interface PoracleHumanArea {
@@ -234,6 +98,7 @@ export type PoracleCategory =
   | 'profiles'
   | 'egg'
   | 'invasion'
+  | 'incident'
   | 'lure'
   | 'nest'
   | 'pokemon'
@@ -319,7 +184,7 @@ interface APIReturnType {
   lure: PoracleLure[]
   quest: PoracleQuest[]
   nest: PoracleNest[]
-  weather: PoracleWeather[]
+  incident: PoracleIncident[]
   profile: PoracleProfile[]
   profiles: PoracleProfile[]
   gym: PoracleGym[]

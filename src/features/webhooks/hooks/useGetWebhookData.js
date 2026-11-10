@@ -47,10 +47,11 @@ export function useGetWebhookData(category) {
   }, [category, realCategory, refetch, timeout.current])
 
   const filtererData = useMemo(() => {
-    const source = data ?? previousData
+    // A failed read has no list: keep showing the last one.
+    const list = data?.webhook?.[category] ?? previousData?.webhook?.[category]
     return category === 'human' || category === 'profile'
-      ? source?.webhook?.[category]
-      : (source?.webhook?.[category] || []).filter(
+      ? list
+      : (list || []).filter(
           (x) =>
             !search ||
             (x.description
@@ -61,22 +62,27 @@ export function useGetWebhookData(category) {
         ) || []
   }, [data, previousData, search])
 
+  // The list and its tiles read the same filtered rows, also while a failed
+  // read keeps the last list on screen.
   useEffect(() => {
-    if (!loading && data?.webhook) {
-      if (data.webhook.status === 'error') {
-        const { context } = useWebhookStore.getState()
-        useWebhookStore.setState({
-          alert: {
-            open: true,
-            severity: data.webhook.status,
-            message: t(data.webhook.message, { name: context.name || '' }),
-          },
-        })
-      } else {
-        useWebhookStore.setState({ [category]: filtererData })
-      }
+    if (!loading && data?.webhook && filtererData !== undefined) {
+      useWebhookStore.setState({ [category]: filtererData })
     }
   }, [data, filtererData, search])
+
+  // Once per read result, not again on every search change.
+  useEffect(() => {
+    if (!loading && data?.webhook?.status === 'error') {
+      const { context } = useWebhookStore.getState()
+      useWebhookStore.setState({
+        alert: {
+          open: true,
+          severity: data.webhook.status,
+          message: t(data.webhook.message, { name: context.name || '' }),
+        },
+      })
+    }
+  }, [data, loading])
 
   useEffect(() => {
     if (category === 'human') {
