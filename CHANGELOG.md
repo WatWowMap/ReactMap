@@ -1,3 +1,10 @@
+## [1.58.1](https://github.com/WatWowMap/ReactMap/compare/v1.58.0...v1.58.1) (2026-11-11)
+
+
+### Bug Fixes
+
+* **station:** keep every placed pokemon across multiple sources ([8142b3d](https://github.com/WatWowMap/ReactMap/commit/8142b3d27e9ee1e60f2e8e30548e7276e7f9db34))
+
 # [1.58.0](https://github.com/WatWowMap/ReactMap/compare/v1.57.1...v1.58.0) (2026-11-10)
 
 

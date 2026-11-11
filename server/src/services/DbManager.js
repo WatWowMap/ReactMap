@@ -609,6 +609,26 @@ class DbManager extends Logger {
   }
 
   /**
+   * Stationed mons have no id for deDupeResults to key on, so the list from
+   * the source with the freshest station row wins instead.
+   * @param {number} id
+   * @returns {Promise<import("@rm/types").StationPokemon[]>}
+   */
+  async getStationPokemon(id) {
+    const data = await this.runScannerSources(
+      'Station',
+      ({ SubModel, ...source }) => SubModel.getDynamaxMons(id, source),
+    )
+    let newest = null
+    data.forEach((result) => {
+      if (result && (!newest || result.updated > newest.updated)) {
+        newest = result
+      }
+    })
+    return newest?.stationed_pokemon || []
+  }
+
+  /**
    * @template {import("@rm/types").BaseRecord} T
    * @template {Exclude<import("../models").ScannerModelKeys, 'Device' | 'Route' | 'ScanCell' | 'Spawnpoint' | 'Weather'>} U
    * @param {U} model
