@@ -1169,47 +1169,52 @@ class Station extends Model {
   }
 
   /**
-   * Returns the stationed mons for a given station
+   * Returns the stationed mons for a given station, with the station's
+   * `updated` so DbManager can pick the freshest source; null when this
+   * source does not have the station
    * @param {number} id
    * @param {import('@rm/types').DbContext} _ctx
-   * @returns {Promise<import('@rm/types').StationPokemon[]>}
+   * @returns {Promise<{ updated: number, stationed_pokemon: import('@rm/types').StationPokemon[] } | null>}
    */
   // eslint-disable-next-line no-unused-vars
   static async getDynamaxMons(id, ctx = {}) {
     const { mem, secret, httpAuth } = ctx
-    let stationedPokemon
+    /** @type {Pick<import('@rm/types').FullStation, 'stationed_pokemon' | 'updated'> | undefined} */
+    let station
     if (mem) {
       // Endpoint source: the whole-record by-id response carries
       // stationed_pokemon, so a pure-endpoint station source (unbound model,
       // where this.query() would throw) can still serve the dynamax popup.
-      const one = await evalScannerQuery(
+      const one = await fetchFortById(
         TAGS.stations,
         `${mem}/api/station/id/${encodeURIComponent(id)}`,
-        undefined,
-        'GET',
         secret,
         httpAuth,
       ).catch(() => null)
-      if (one && typeof one === 'object') {
-        stationedPokemon = one.stationed_pokemon
+      if (one) {
+        station = one
       }
     }
-    if (stationedPokemon === undefined) {
+    if (station === undefined) {
       // SQL (dual source or SQL-only). A pure-endpoint source whose fetch
-      // failed has no bound knex, so this.query() throws -> empty list.
+      // failed has no bound knex, so this.query() throws -> no station.
       try {
-        /** @type {import('@rm/types').FullStation} */
-        const result = await this.query()
-          .findById(id)
-          .select('stationed_pokemon')
-        stationedPokemon = result?.stationed_pokemon
+        station = /** @type {import('@rm/types').FullStation} */ (
+          await this.query().findById(id).select('stationed_pokemon', 'updated')
+        )
       } catch {
-        return []
+        return null
       }
     }
-    return typeof stationedPokemon === 'string'
-      ? JSON.parse(stationedPokemon)
-      : stationedPokemon || []
+    if (!station) return null
+    const { stationed_pokemon: stationedPokemon, updated } = station
+    return {
+      updated,
+      stationed_pokemon:
+        typeof stationedPokemon === 'string'
+          ? JSON.parse(stationedPokemon)
+          : stationedPokemon || [],
+    }
   }
 
   static async getAvailable({ hasMultiBattles, mem, secret, httpAuth }) {

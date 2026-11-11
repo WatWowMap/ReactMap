@@ -555,7 +555,7 @@ const resolvers = {
     },
     stationPokemon: (_, { id }, { perms, Db }) => {
       if (perms?.stations) {
-        return Db.query('Station', 'getDynamaxMons', id)
+        return Db.getStationPokemon(id)
       }
       return []
     },
