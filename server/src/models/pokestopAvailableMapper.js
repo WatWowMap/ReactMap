@@ -68,6 +68,7 @@
  */
 
 const {
+  getInvasionFilterCharacters,
   getRocketPokemonFilterKey,
   isRocketPokemonFilterExcluded,
 } = require('../utils/rocketPokemonFiltering')
@@ -219,7 +220,14 @@ function mapAvailablePokestops(api, ctx) {
       slot3_pokemon_id,
       slot3_form,
     } = invasion
-    available.add(character > 0 ? `i${character}` : `b${display_type}`)
+    if (character > 0) {
+      // An unconfirmed Giovanni also answers to the Decoy filters.
+      getInvasionFilterCharacters(character, confirmed).forEach((id) =>
+        available.add(`i${id}`),
+      )
+    } else {
+      available.add(`b${display_type}`)
+    }
 
     if (confirmed && !isRocketPokemonFilterExcluded(character)) {
       // Each slot the event config marks as a reward contributes an `a` key,

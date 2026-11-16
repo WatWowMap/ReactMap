@@ -1,12 +1,52 @@
 // @ts-check
 
 import ROCKET_POKEMON_FILTER_EXCLUDED_GRUNT_TYPES from '@rm/masterfile/lib/rocketPokemonFilterExcludedCharacters.json'
+import GIOVANNI_DECOY_GRUNT_TYPES from '@rm/masterfile/lib/giovanniDecoyCharacters.json'
 
 // Rocket Pokemon filters apply only to standard grunts. Team leaders (41-43),
 // Giovanni (44), and Decoys (45-46) remain selectable by invasion type.
 /** @param {number|string|null|undefined} gruntType */
 export function isRocketPokemonFilterExcluded(gruntType) {
   return ROCKET_POKEMON_FILTER_EXCLUDED_GRUNT_TYPES.includes(Number(gruntType))
+}
+
+const GIOVANNI_GRUNT_TYPE = 44
+
+/**
+ * Invasion filter grunt types an incident answers to. An unconfirmed Giovanni
+ * may be a disguised Decoy, so it also answers to the Decoy filters.
+ * @param {number|string|null|undefined} gruntType
+ * @param {unknown} confirmed
+ * @returns {number[]}
+ */
+export function getInvasionFilterGruntTypes(gruntType, confirmed) {
+  const id = Number(gruntType)
+  return id === GIOVANNI_GRUNT_TYPE && !confirmed
+    ? [GIOVANNI_GRUNT_TYPE, ...GIOVANNI_DECOY_GRUNT_TYPES]
+    : [id]
+}
+
+/**
+ * Whether an invasion filter is on once the Exclude Grunts / Exclude Leaders
+ * toggles have switched their grunt types off.
+ * @param {number} gruntType
+ * @param {import('@rm/types').AllFilters['pokestops']['filter']} filters
+ * @param {{ excludeGrunts?: boolean, excludeLeaders?: boolean }} exclusions
+ * @param {import('@rm/masterfile').Masterfile['invasions']} invasions
+ * @returns {boolean}
+ */
+export function isInvasionFilterEnabled(
+  gruntType,
+  filters,
+  { excludeGrunts, excludeLeaders },
+  invasions,
+) {
+  if (!filters[`i${gruntType}`]?.enabled) return false
+  const grunt = invasions[gruntType]?.grunt
+  return !(
+    (excludeGrunts && grunt === 'Grunt') ||
+    (excludeLeaders && (grunt === 'Executive' || grunt === 'Giovanni'))
+  )
 }
 
 /**

@@ -1,5 +1,9 @@
 // @ts-check
 const { parseIdFormPair } = require('./parseIdForm')
+const {
+  GIOVANNI_CHARACTER,
+  GIOVANNI_DECOY_CHARACTERS,
+} = require('../../utils/rocketPokemonFiltering')
 
 // Incident display types for Team Rocket grunt invasions (the only invasions
 // that carry a catchable reward). Sourced from the GMO, so reliable — unlike
@@ -263,6 +267,11 @@ function buildPokestopDnfFilters(filters, eventInvasions) {
           incidentCharacter.delete(id)
       })
     }
+    // An unconfirmed Giovanni may be a disguised Decoy, so a Decoy filter that
+    // survived the exclusions also requests Giovanni; secondaryFilter then
+    // admits only the unconfirmed ones.
+    if (GIOVANNI_DECOY_CHARACTERS.some((id) => incidentCharacter.has(id)))
+      incidentCharacter.add(GIOVANNI_CHARACTER)
     if (incidentCharacter.size)
       clauses.push({ incident_character: [...incidentCharacter] })
   }

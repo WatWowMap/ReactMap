@@ -51,6 +51,8 @@ import {
 } from './incidentPriority'
 import {
   getEnabledRocketPokemonFilterKeys,
+  getInvasionFilterGruntTypes,
+  isInvasionFilterEnabled,
   isRocketPokemonFilterExcluded,
 } from './rocketPokemonFiltering'
 
@@ -401,9 +403,10 @@ const MenuActions = ({
     setState(quests[i].key)
   }
 
-  const excludeInvasion = (i) => {
+  /** @param {number} gruntType */
+  const excludeInvasion = (gruntType) => {
     setAnchorEl(null)
-    setState(`i${invasions[i].grunt_type}`)
+    setState(`i${gruntType}`)
   }
 
   const handleTimer = () => {
@@ -457,16 +460,30 @@ const MenuActions = ({
 
   if (hasInvasion || hasLure) {
     if (hasInvasion) {
-      invasions.forEach((invasion, i) => {
-        if (filters.pokestops.filter[`i${invasion.grunt_type}`]?.enabled) {
+      invasions.forEach((invasion) => {
+        // An unconfirmed Giovanni may be a Decoy, so offer each enabled filter
+        // it answers to.
+        getInvasionFilterGruntTypes(
+          invasion.grunt_type,
+          invasion.confirmed,
+        ).forEach((gruntType) => {
+          if (
+            !isInvasionFilterEnabled(
+              gruntType,
+              filters.pokestops.filter,
+              filters.pokestops,
+              masterfile.invasions,
+            )
+          )
+            return
           options.push({
-            key: `${invasion.grunt_type}-${invasion.incident_expire_timestamp}`,
+            key: `${invasion.grunt_type}-${invasion.incident_expire_timestamp}-${gruntType}`,
             name: t('exclude_invasion_multi', {
-              invasion: t(`grunt_a_${invasion.grunt_type}`),
+              invasion: t(`grunt_a_${gruntType}`),
             }),
-            action: () => excludeInvasion(i),
+            action: () => excludeInvasion(gruntType),
           })
-        }
+        })
 
         if (
           hasConfirmed &&
